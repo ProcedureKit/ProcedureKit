@@ -22,6 +22,7 @@
 		65D6F5771B5ADEF6003D35AD /* BlockOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D6F5761B5ADEF6003D35AD /* BlockOperation.swift */; };
 		65D6F5791B5AE925003D35AD /* GroupOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D6F5781B5AE925003D35AD /* GroupOperation.swift */; };
 		65D6F57B1B5AF091003D35AD /* GroupOperationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D6F57A1B5AF091003D35AD /* GroupOperationTests.swift */; };
+		65D6F57D1B5B009D003D35AD /* DelayOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D6F57C1B5B009D003D35AD /* DelayOperation.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -53,6 +54,7 @@
 		65D6F5761B5ADEF6003D35AD /* BlockOperation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BlockOperation.swift; sourceTree = "<group>"; };
 		65D6F5781B5AE925003D35AD /* GroupOperation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GroupOperation.swift; sourceTree = "<group>"; };
 		65D6F57A1B5AF091003D35AD /* GroupOperationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GroupOperationTests.swift; sourceTree = "<group>"; };
+		65D6F57C1B5B009D003D35AD /* DelayOperation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DelayOperation.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -166,6 +168,7 @@
 				65D6F5741B5AC453003D35AD /* Operation.swift */,
 				65D6F5761B5ADEF6003D35AD /* BlockOperation.swift */,
 				65D6F5781B5AE925003D35AD /* GroupOperation.swift */,
+				65D6F57C1B5B009D003D35AD /* DelayOperation.swift */,
 			);
 			path = Operations;
 			sourceTree = "<group>";
@@ -278,6 +281,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				65D6F57D1B5B009D003D35AD /* DelayOperation.swift in Sources */,
 				65D6F5771B5ADEF6003D35AD /* BlockOperation.swift in Sources */,
 				65CB76FF1B3F284A00791E18 /* OperationQueue.swift in Sources */,
 				657729801B3DAA0400B5D153 /* OperationCondition.swift in Sources */,
