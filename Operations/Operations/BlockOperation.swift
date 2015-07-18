@@ -26,7 +26,12 @@ public class BlockOperation: Operation {
         super.init()
     }
 
-    convenience init(mainQueueBlock: dispatch_block_t) {
+    /**
+    Convenience initializer.
+    
+    - paramter block: a dispatch block which is run on the main thread.
+    */
+    public convenience init(mainQueueBlock: dispatch_block_t) {
         self.init(block: { continuation in
             dispatch_async(dispatch_get_main_queue()) {
                 mainQueueBlock()
