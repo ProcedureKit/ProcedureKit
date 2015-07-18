@@ -19,6 +19,7 @@
 		65CB76FF1B3F284A00791E18 /* OperationQueue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65CB76FB1B3F284A00791E18 /* OperationQueue.swift */; };
 		65CB77011B3F28E800791E18 /* ExclusivityManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65CB77001B3F28E800791E18 /* ExclusivityManager.swift */; };
 		65D6F5751B5AC453003D35AD /* Operation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D6F5741B5AC453003D35AD /* Operation.swift */; };
+		65D6F5771B5ADEF6003D35AD /* BlockOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D6F5761B5ADEF6003D35AD /* BlockOperation.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -47,6 +48,7 @@
 		65CB76FB1B3F284A00791E18 /* OperationQueue.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OperationQueue.swift; sourceTree = "<group>"; };
 		65CB77001B3F28E800791E18 /* ExclusivityManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ExclusivityManager.swift; sourceTree = "<group>"; };
 		65D6F5741B5AC453003D35AD /* Operation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Operation.swift; sourceTree = "<group>"; };
+		65D6F5761B5ADEF6003D35AD /* BlockOperation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BlockOperation.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -157,6 +159,7 @@
 			isa = PBXGroup;
 			children = (
 				65D6F5741B5AC453003D35AD /* Operation.swift */,
+				65D6F5761B5ADEF6003D35AD /* BlockOperation.swift */,
 			);
 			path = Operations;
 			sourceTree = "<group>";
@@ -269,6 +272,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				65D6F5771B5ADEF6003D35AD /* BlockOperation.swift in Sources */,
 				65CB76FF1B3F284A00791E18 /* OperationQueue.swift in Sources */,
 				657729801B3DAA0400B5D153 /* OperationCondition.swift in Sources */,
 				65CB76FC1B3F284A00791E18 /* BlockObserver.swift in Sources */,
