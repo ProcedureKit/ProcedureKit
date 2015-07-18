@@ -12,7 +12,7 @@ import XCTest
 @testable
 import Operations
 
-class GroupOperationTests: OperationsTests {
+class GroupOperationTests: OperationTests {
 
     func createGroupOperations() -> [TestOperation] {
         return (0..<3).map { _ in TestOperation() }

@@ -22,7 +22,7 @@ class TestOperation: Operation {
         numberOfSeconds = Double(delay)
         simulatedError = error
     }
-    
+
     override func execute() {
         let after = dispatch_time(DISPATCH_TIME_NOW, Int64(numberOfSeconds * Double(NSEC_PER_SEC)))
         dispatch_after(after, dispatch_get_main_queue()) {
@@ -66,7 +66,7 @@ class TestQueueDelegate: OperationQueueDelegate {
     }
 }
 
-class OperationsTests: XCTestCase {
+class OperationTests: XCTestCase {
     
     var queue: OperationQueue!
     var delegate: TestQueueDelegate!
@@ -113,7 +113,7 @@ class OperationsTests: XCTestCase {
     }
 }
 
-class BlockOperationTests: OperationsTests {
+class BlockOperationTests: OperationTests {
 
     func test__that_block_in_block_operation_executes() {
 
@@ -140,5 +140,50 @@ class BlockOperationTests: OperationsTests {
     }
 }
 
+class DelayOperationTests: OperationTests {
+
+    func test__delay_operation_with_negative_time_interval_finishes_immediately() {
+        let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
+        let operation = DelayOperation(interval: -9_000_000)
+        runOperation(operation)
+        let after = dispatch_time(DISPATCH_TIME_NOW, Int64(0.5 * Double(NSEC_PER_SEC)))
+        dispatch_after(after, dispatch_get_main_queue()) {
+            expectation.fulfill()
+        }
+        waitForExpectationsWithTimeout(1, handler: nil)
+        XCTAssertTrue(operation.finished)
+    }
+
+    func test__delay_operation_with_distant_past_finishes_immediately() {
+        let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
+        let operation = DelayOperation(date: NSDate.distantPast())
+        runOperation(operation)
+        let after = dispatch_time(DISPATCH_TIME_NOW, Int64(0.5 * Double(NSEC_PER_SEC)))
+        dispatch_after(after, dispatch_get_main_queue()) {
+            expectation.fulfill()
+        }
+        waitForExpectationsWithTimeout(1, handler: nil)
+        XCTAssertTrue(operation.finished)
+    }
+
+    func test__delay_operation_completes_after_interval() {
+        var started: NSDate!
+        var ended: NSDate!
+        let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
+        let interval: NSTimeInterval = 1
+        let operation = DelayOperation(interval: interval)
+        operation.addCompletionBlock {
+            ended = NSDate()
+            expectation.fulfill()
+        }
+        started = NSDate()
+        runOperation(operation)
+        waitForExpectationsWithTimeout(3, handler: nil)
+        XCTAssertTrue(operation.finished)
+        let timeTaken = ended.timeIntervalSinceDate(started)
+        XCTAssertGreaterThanOrEqual(timeTaken, interval)
+        XCTAssertLessThanOrEqual(timeTaken - interval, 1.0)
+    }
+}
 
 
