@@ -83,15 +83,18 @@ class OperationsTests: XCTestCase {
         super.tearDown()
     }
 
+    func runOperation(operation: Operation) {
+        queue.delegate = delegate
+        queue.addOperation(operation)
+    }
+
     func test__queue_delegate_is_notified_when_operation_starts() {
         let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
 
         let operation = TestOperation(delay: 1)
         operation.addCompletionBlockToTestOperation(operation, withExpectation: expectation)
 
-        queue.delegate = delegate
-        queue.addOperation(operation)
-
+        runOperation(operation)
         waitForExpectationsWithTimeout(3, handler: nil)
 
         XCTAssertTrue(delegate.did_willAddOperation)
@@ -108,9 +111,34 @@ class OperationsTests: XCTestCase {
         queue.addOperation(operation)
         waitForExpectationsWithTimeout(3, handler: nil)
     }
-
-
-
-
-
 }
+
+class BlockOperationTests: OperationsTests {
+
+    func test__that_block_in_block_operation_executes() {
+
+        let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
+        var didExecuteBlock: Bool = false
+        let operation = BlockOperation {
+            didExecuteBlock = true
+            expectation.fulfill()
+        }
+        runOperation(operation)
+        waitForExpectationsWithTimeout(3, handler: nil)
+        XCTAssertTrue(didExecuteBlock)
+    }
+
+    func test__that_block_operation_with_no_block_finishes_immediately() {
+        let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
+        let operation = BlockOperation()
+        operation.addCompletionBlock {
+            expectation.fulfill()
+        }
+        runOperation(operation)
+        waitForExpectationsWithTimeout(3, handler: nil)
+        XCTAssertTrue(operation.finished)
+    }
+}
+
+
+
