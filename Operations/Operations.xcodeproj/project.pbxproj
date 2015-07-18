@@ -12,13 +12,13 @@
 		657729691B3D9E0E00B5D153 /* Operations.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6577295D1B3D9E0E00B5D153 /* Operations.framework */; };
 		657729701B3D9E0E00B5D153 /* OperationsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6577296F1B3D9E0E00B5D153 /* OperationsTests.swift */; };
 		657729801B3DAA0400B5D153 /* OperationCondition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6577297E1B3DAA0400B5D153 /* OperationCondition.swift */; };
-		657729811B3DAA0400B5D153 /* Operation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6577297F1B3DAA0400B5D153 /* Operation.swift */; };
 		657729851B3DAAA400B5D153 /* Support.swift in Sources */ = {isa = PBXBuildFile; fileRef = 657729841B3DAAA400B5D153 /* Support.swift */; };
 		65CB76FC1B3F284A00791E18 /* BlockObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65CB76F71B3F284A00791E18 /* BlockObserver.swift */; };
 		65CB76FD1B3F284A00791E18 /* OperationObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65CB76F81B3F284A00791E18 /* OperationObserver.swift */; };
 		65CB76FE1B3F284A00791E18 /* TimeoutObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65CB76F91B3F284A00791E18 /* TimeoutObserver.swift */; };
 		65CB76FF1B3F284A00791E18 /* OperationQueue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65CB76FB1B3F284A00791E18 /* OperationQueue.swift */; };
 		65CB77011B3F28E800791E18 /* ExclusivityManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65CB77001B3F28E800791E18 /* ExclusivityManager.swift */; };
+		65D6F5751B5AC453003D35AD /* Operation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D6F5741B5AC453003D35AD /* Operation.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -40,13 +40,13 @@
 		6577296E1B3D9E0E00B5D153 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		6577296F1B3D9E0E00B5D153 /* OperationsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OperationsTests.swift; sourceTree = "<group>"; };
 		6577297E1B3DAA0400B5D153 /* OperationCondition.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OperationCondition.swift; sourceTree = "<group>"; };
-		6577297F1B3DAA0400B5D153 /* Operation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Operation.swift; sourceTree = "<group>"; };
 		657729841B3DAAA400B5D153 /* Support.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Support.swift; sourceTree = "<group>"; };
 		65CB76F71B3F284A00791E18 /* BlockObserver.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BlockObserver.swift; sourceTree = "<group>"; };
 		65CB76F81B3F284A00791E18 /* OperationObserver.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OperationObserver.swift; sourceTree = "<group>"; };
 		65CB76F91B3F284A00791E18 /* TimeoutObserver.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TimeoutObserver.swift; sourceTree = "<group>"; };
 		65CB76FB1B3F284A00791E18 /* OperationQueue.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OperationQueue.swift; sourceTree = "<group>"; };
 		65CB77001B3F28E800791E18 /* ExclusivityManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ExclusivityManager.swift; sourceTree = "<group>"; };
+		65D6F5741B5AC453003D35AD /* Operation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Operation.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -90,10 +90,10 @@
 			isa = PBXGroup;
 			children = (
 				657729621B3D9E0E00B5D153 /* Operations.h */,
-				6577297F1B3DAA0400B5D153 /* Operation.swift */,
 				657729841B3DAAA400B5D153 /* Support.swift */,
 				6577297D1B3DAA0400B5D153 /* Conditions */,
 				65CB76F61B3F284A00791E18 /* Observers */,
+				65D6F5731B5AC453003D35AD /* Operations */,
 				65CB76FA1B3F284A00791E18 /* Queue */,
 				657729601B3D9E0E00B5D153 /* Supporting Files */,
 			);
@@ -151,6 +151,14 @@
 				65CB76FB1B3F284A00791E18 /* OperationQueue.swift */,
 			);
 			path = Queue;
+			sourceTree = "<group>";
+		};
+		65D6F5731B5AC453003D35AD /* Operations */ = {
+			isa = PBXGroup;
+			children = (
+				65D6F5741B5AC453003D35AD /* Operation.swift */,
+			);
+			path = Operations;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -264,8 +272,8 @@
 				65CB76FF1B3F284A00791E18 /* OperationQueue.swift in Sources */,
 				657729801B3DAA0400B5D153 /* OperationCondition.swift in Sources */,
 				65CB76FC1B3F284A00791E18 /* BlockObserver.swift in Sources */,
+				65D6F5751B5AC453003D35AD /* Operation.swift in Sources */,
 				65CB77011B3F28E800791E18 /* ExclusivityManager.swift in Sources */,
-				657729811B3DAA0400B5D153 /* Operation.swift in Sources */,
 				657729851B3DAAA400B5D153 /* Support.swift in Sources */,
 				65CB76FD1B3F284A00791E18 /* OperationObserver.swift in Sources */,
 				65CB76FE1B3F284A00791E18 /* TimeoutObserver.swift in Sources */,
