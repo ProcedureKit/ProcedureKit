@@ -23,6 +23,8 @@
 		65D6F5791B5AE925003D35AD /* GroupOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D6F5781B5AE925003D35AD /* GroupOperation.swift */; };
 		65D6F57B1B5AF091003D35AD /* GroupOperationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D6F57A1B5AF091003D35AD /* GroupOperationTests.swift */; };
 		65D6F57D1B5B009D003D35AD /* DelayOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D6F57C1B5B009D003D35AD /* DelayOperation.swift */; };
+		65D6F5851B5BE620003D35AD /* BackgroundObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D6F5841B5BE620003D35AD /* BackgroundObserver.swift */; };
+		65D6F5871B5BE62C003D35AD /* BackgroundObserverTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D6F5861B5BE62C003D35AD /* BackgroundObserverTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -55,6 +57,8 @@
 		65D6F5781B5AE925003D35AD /* GroupOperation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GroupOperation.swift; sourceTree = "<group>"; };
 		65D6F57A1B5AF091003D35AD /* GroupOperationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GroupOperationTests.swift; sourceTree = "<group>"; };
 		65D6F57C1B5B009D003D35AD /* DelayOperation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DelayOperation.swift; sourceTree = "<group>"; };
+		65D6F5841B5BE620003D35AD /* BackgroundObserver.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BackgroundObserver.swift; sourceTree = "<group>"; };
+		65D6F5861B5BE62C003D35AD /* BackgroundObserverTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BackgroundObserverTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -119,6 +123,7 @@
 		6577296C1B3D9E0E00B5D153 /* OperationsTests */ = {
 			isa = PBXGroup;
 			children = (
+				65D6F5861B5BE62C003D35AD /* BackgroundObserverTests.swift */,
 				65D6F57A1B5AF091003D35AD /* GroupOperationTests.swift */,
 				6577296F1B3D9E0E00B5D153 /* OperationsTests.swift */,
 				655E43FE1B3F43D60013A3E1 /* TimeoutObserverTests.swift */,
@@ -146,6 +151,7 @@
 		65CB76F61B3F284A00791E18 /* Observers */ = {
 			isa = PBXGroup;
 			children = (
+				65D6F5841B5BE620003D35AD /* BackgroundObserver.swift */,
 				65CB76F71B3F284A00791E18 /* BlockObserver.swift */,
 				65CB76F81B3F284A00791E18 /* OperationObserver.swift */,
 				65CB76F91B3F284A00791E18 /* TimeoutObserver.swift */,
@@ -284,6 +290,7 @@
 				65D6F57D1B5B009D003D35AD /* DelayOperation.swift in Sources */,
 				65D6F5771B5ADEF6003D35AD /* BlockOperation.swift in Sources */,
 				65CB76FF1B3F284A00791E18 /* OperationQueue.swift in Sources */,
+				65D6F5851B5BE620003D35AD /* BackgroundObserver.swift in Sources */,
 				657729801B3DAA0400B5D153 /* OperationCondition.swift in Sources */,
 				65CB76FC1B3F284A00791E18 /* BlockObserver.swift in Sources */,
 				65D6F5751B5AC453003D35AD /* Operation.swift in Sources */,
@@ -302,6 +309,7 @@
 				657729701B3D9E0E00B5D153 /* OperationsTests.swift in Sources */,
 				655E43FF1B3F43D60013A3E1 /* TimeoutObserverTests.swift in Sources */,
 				65D6F57B1B5AF091003D35AD /* GroupOperationTests.swift in Sources */,
+				65D6F5871B5BE62C003D35AD /* BackgroundObserverTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
