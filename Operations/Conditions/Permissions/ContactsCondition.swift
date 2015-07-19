@@ -1,5 +1,5 @@
 //
-//  ContactsPermissionCondition.swift
+//  ContactsCondition.swift
 //  Operations
 //
 //  Created by Daniel Thorpe on 19/07/2015.
