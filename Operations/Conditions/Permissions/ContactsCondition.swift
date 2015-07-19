@@ -32,7 +32,7 @@ public class ContactsPermissionCondition: OperationCondition {
         init(manager: ContactsAuthenticationManager) {
             self.manager = manager
             super.init()
-            addCondition(AlertPresentation())
+            addCondition(SystemAlertPresentation())
         }
 
         private override func execute() {

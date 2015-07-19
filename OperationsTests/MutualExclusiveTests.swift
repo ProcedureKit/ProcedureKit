@@ -14,17 +14,17 @@ import Operations
 class MutualExclusiveTests: XCTestCase {
 
     func test__alert_presentation_name() {
-        let condition = AlertPresentation()
-        XCTAssertEqual(condition.dynamicType.name, "MutuallyExclusive<Operations.Alert>")
+        let condition = SystemAlertPresentation()
+        XCTAssertEqual(condition.dynamicType.name, "MutuallyExclusive<Operations.SystemAlert>")
     }
 
     func test__alert_presentation_is_mutually_exclusive() {
-        let condition = AlertPresentation()
+        let condition = SystemAlertPresentation()
         XCTAssertTrue(condition.dynamicType.isMutuallyExclusive)
     }
 
     func test__alert_presentation_evaluation_satisfied() {
-        let condition = AlertPresentation()
+        let condition = SystemAlertPresentation()
         condition.evaluateForOperation(TestOperation()) { result in
             switch result {
             case .Satisfied:

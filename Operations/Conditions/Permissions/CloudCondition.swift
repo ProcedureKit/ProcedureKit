@@ -33,7 +33,7 @@ public struct CloudKitContainerCondition: OperationCondition {
             if permissions != [] {
                 // Requesting non-zero permissions will potentially
                 // present a system alert.
-                addCondition(AlertPresentation())
+                addCondition(SystemAlertPresentation())
             }
         }
 
