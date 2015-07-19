@@ -33,7 +33,7 @@ public class BlockOperation: Operation {
     */
     public convenience init(mainQueueBlock: dispatch_block_t) {
         self.init(block: { continuation in
-            dispatch_async(dispatch_get_main_queue()) {
+            dispatch_async(Queue.Main.queue) {
                 mainQueueBlock()
                 continuation()
             }

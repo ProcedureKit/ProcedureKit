@@ -12,6 +12,7 @@ import Foundation
 
 enum Queue {
 
+    case Main
     case Default
     case Initiated
     case Interactive
@@ -20,6 +21,7 @@ enum Queue {
 
     var queue: dispatch_queue_t {
         switch self {
+        case .Main: return dispatch_get_main_queue()
         case .Default: return dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0)
         case .Initiated: return dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0)
         case .Interactive: return dispatch_get_global_queue(QOS_CLASS_USER_INTERACTIVE, 0)

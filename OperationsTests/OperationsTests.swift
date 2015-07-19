@@ -25,7 +25,7 @@ class TestOperation: Operation {
 
     override func execute() {
         let after = dispatch_time(DISPATCH_TIME_NOW, Int64(numberOfSeconds * Double(NSEC_PER_SEC)))
-        dispatch_after(after, dispatch_get_main_queue()) {
+        dispatch_after(after, Queue.Main.queue) {
             self.didExecute = true
             self.finish(self.simulatedError)
         }
@@ -147,7 +147,7 @@ class DelayOperationTests: OperationTests {
         let operation = DelayOperation(interval: -9_000_000)
         runOperation(operation)
         let after = dispatch_time(DISPATCH_TIME_NOW, Int64(0.5 * Double(NSEC_PER_SEC)))
-        dispatch_after(after, dispatch_get_main_queue()) {
+        dispatch_after(after, Queue.Main.queue) {
             expectation.fulfill()
         }
         waitForExpectationsWithTimeout(1, handler: nil)
@@ -159,7 +159,7 @@ class DelayOperationTests: OperationTests {
         let operation = DelayOperation(date: NSDate.distantPast())
         runOperation(operation)
         let after = dispatch_time(DISPATCH_TIME_NOW, Int64(0.5 * Double(NSEC_PER_SEC)))
-        dispatch_after(after, dispatch_get_main_queue()) {
+        dispatch_after(after, Queue.Main.queue) {
             expectation.fulfill()
         }
         waitForExpectationsWithTimeout(1, handler: nil)
