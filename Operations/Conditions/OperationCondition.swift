@@ -10,12 +10,10 @@ import Foundation
 
 public let OperationConditionKey = "OperationCondition"
 
-
 public enum OperationConditionResult {
     case Satisfied
     case Failed(ErrorType)
 }
-
 
 public enum OperationError: ErrorType {
     case ConditionFailed
