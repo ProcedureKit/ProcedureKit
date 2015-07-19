@@ -26,10 +26,7 @@ class TimeoutObserverTests: OperationTests {
         }
 
         runOperation(operation)
-
         waitForExpectationsWithTimeout(6, handler: nil)
-
         XCTAssertEqual(delegate.did_numberOfErrorThatOperationDidFinish, 1)
     }
-
 }

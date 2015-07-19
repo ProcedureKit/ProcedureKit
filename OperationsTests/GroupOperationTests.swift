@@ -44,7 +44,7 @@ class GroupOperationTests: OperationTests {
         runOperation(operation)
         operation.addOperation(extra)
 
-        waitForExpectationsWithTimeout(4, handler: nil)
+        waitForExpectationsWithTimeout(5, handler: nil)
         XCTAssertTrue(operation.finished)
         XCTAssertTrue(extra.didExecute)
     }
@@ -57,7 +57,7 @@ class GroupOperationTests: OperationTests {
         runOperation(operation)
 
         let after = dispatch_time(DISPATCH_TIME_NOW, Int64(0.2 * Double(NSEC_PER_SEC)))
-        dispatch_after(after, dispatch_get_main_queue()) {
+        dispatch_after(after, Queue.Main.queue) {
             operation.cancel()
             expectation.fulfill()
         }
