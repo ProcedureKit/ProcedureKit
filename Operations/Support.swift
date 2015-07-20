@@ -19,15 +19,30 @@ enum Queue {
     case Utility
     case Background
 
+    private var qos_class: qos_class_t {
+        switch self {
+        case .Main: return qos_class_main()
+        case .Default: return QOS_CLASS_DEFAULT
+        case .Initiated: return QOS_CLASS_USER_INITIATED
+        case .Interactive: return QOS_CLASS_USER_INTERACTIVE
+        case .Utility: return QOS_CLASS_UTILITY
+        case .Background: return QOS_CLASS_BACKGROUND
+        }
+    }
+
     var queue: dispatch_queue_t {
         switch self {
         case .Main: return dispatch_get_main_queue()
-        case .Default: return dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0)
-        case .Initiated: return dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0)
-        case .Interactive: return dispatch_get_global_queue(QOS_CLASS_USER_INTERACTIVE, 0)
-        case .Utility: return dispatch_get_global_queue(QOS_CLASS_UTILITY, 0)
-        case .Background: return dispatch_get_global_queue(QOS_CLASS_BACKGROUND, 0)
+        default: return dispatch_get_global_queue(qos_class, 0)
         }
+    }
+
+    func serial(named: String) -> dispatch_queue_t {
+        return dispatch_queue_create(named, dispatch_queue_attr_make_with_qos_class(DISPATCH_QUEUE_SERIAL, qos_class, QOS_MIN_RELATIVE_PRIORITY))
+    }
+
+    func concurrent(named: String) -> dispatch_queue_t {
+        return dispatch_queue_create(named, dispatch_queue_attr_make_with_qos_class(DISPATCH_QUEUE_CONCURRENT, qos_class, QOS_MIN_RELATIVE_PRIORITY))
     }
 }
 
