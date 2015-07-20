@@ -1,5 +1,5 @@
 //
-//  ContactsPermissionCondition.swift
+//  ContactsCondition.swift
 //  Operations
 //
 //  Created by Daniel Thorpe on 19/07/2015.
@@ -32,7 +32,7 @@ public class ContactsPermissionCondition: OperationCondition {
         init(manager: ContactsAuthenticationManager) {
             self.manager = manager
             super.init()
-            addCondition(AlertPresentation())
+            addCondition(SystemAlertPresentation())
         }
 
         private override func execute() {

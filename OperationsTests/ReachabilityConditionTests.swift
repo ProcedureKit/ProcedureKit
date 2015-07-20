@@ -79,6 +79,7 @@ class ReachabilityConditionTests: OperationTests {
         runOperation(operation)
 
         waitForExpectationsWithTimeout(3) { _ in
+            XCTAssertFalse(operation.didExecute)            
             if let error = observedErrors[0] as? ReachabilityCondition.Error {
                 XCTAssertTrue(error == ReachabilityCondition.Error.NotReachableWithConnectivity(.ConnectedViaWiFi))
             }
