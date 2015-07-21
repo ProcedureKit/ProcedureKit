@@ -35,6 +35,7 @@
 		65D6F5891B5BEAC9003D35AD /* NetworkObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D6F5881B5BEAC9003D35AD /* NetworkObserver.swift */; };
 		65D6F58B1B5BF264003D35AD /* NetworkObserverTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D6F58A1B5BF264003D35AD /* NetworkObserverTests.swift */; };
 		65D6F58D1B5BFE59003D35AD /* ReachabilityCondition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D6F58C1B5BFE59003D35AD /* ReachabilityCondition.swift */; };
+		65DB2B831B5EFD37008792C3 /* WebpageOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65DB2B821B5EFD37008792C3 /* WebpageOperation.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -79,6 +80,7 @@
 		65D6F5881B5BEAC9003D35AD /* NetworkObserver.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkObserver.swift; sourceTree = "<group>"; };
 		65D6F58A1B5BF264003D35AD /* NetworkObserverTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkObserverTests.swift; sourceTree = "<group>"; };
 		65D6F58C1B5BFE59003D35AD /* ReachabilityCondition.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReachabilityCondition.swift; sourceTree = "<group>"; };
+		65DB2B821B5EFD37008792C3 /* WebpageOperation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WebpageOperation.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -209,10 +211,11 @@
 		65D6F5731B5AC453003D35AD /* Operations */ = {
 			isa = PBXGroup;
 			children = (
-				65D6F5741B5AC453003D35AD /* Operation.swift */,
 				65D6F5761B5ADEF6003D35AD /* BlockOperation.swift */,
-				65D6F5781B5AE925003D35AD /* GroupOperation.swift */,
 				65D6F57C1B5B009D003D35AD /* DelayOperation.swift */,
+				65D6F5781B5AE925003D35AD /* GroupOperation.swift */,
+				65D6F5741B5AC453003D35AD /* Operation.swift */,
+				65DB2B821B5EFD37008792C3 /* WebpageOperation.swift */,
 			);
 			path = Operations;
 			sourceTree = "<group>";
@@ -342,6 +345,7 @@
 				65CB76FD1B3F284A00791E18 /* OperationObserver.swift in Sources */,
 				65CB76FE1B3F284A00791E18 /* TimeoutObserver.swift in Sources */,
 				65D6F5791B5AE925003D35AD /* GroupOperation.swift in Sources */,
+				65DB2B831B5EFD37008792C3 /* WebpageOperation.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
