@@ -134,7 +134,7 @@ class CloudConditionTests: OperationTests {
         waitForExpectationsWithTimeout(5) { error in
             XCTAssertFalse(self.operation.didExecute)
             XCTAssertTrue(self.operation.cancelled)
-            if let error = receivedErrors[0] as? CloudContainerCondition.Error {
+            if let error = receivedErrors.first as? CloudContainerCondition.Error {
                 XCTAssertTrue(error == CloudContainerCondition.Error.PermissionRequestRequired)
             }
             else {
