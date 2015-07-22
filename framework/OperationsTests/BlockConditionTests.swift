@@ -7,7 +7,6 @@
 //
 
 import XCTest
-import CloudKit
 import Operations
 
 class BlockConditionTests: OperationTests {
