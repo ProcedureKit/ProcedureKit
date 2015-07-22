@@ -41,12 +41,12 @@ public class BlockOperation: Operation {
     }
 
     public override func execute() {
-        guard let block = block else {
-            finish()
-            return
+        if let block = block {
+            block { self.finish() }
         }
-
-        block { self.finish() }
+        else {
+            finish()
+        }
     }
 }
 

@@ -8,7 +8,7 @@
 
 import UIKit
 
-internal protocol BackgroundTaskApplicationInterface {
+public protocol BackgroundTaskApplicationInterface {
     var applicationState: UIApplicationState { get }
     func beginBackgroundTaskWithName(taskName: String?, expirationHandler handler: (() -> Void)?) -> UIBackgroundTaskIdentifier
     func endBackgroundTask(identifier: UIBackgroundTaskIdentifier)
@@ -16,9 +16,9 @@ internal protocol BackgroundTaskApplicationInterface {
 
 extension UIApplication: BackgroundTaskApplicationInterface { }
 
-class BackgroundObserver: NSObject {
+public class BackgroundObserver: NSObject {
 
-    static let backgroundTaskName = "Background Operation Observer"
+    public static let backgroundTaskName = "Background Operation Observer"
 
     private var identifier: UIBackgroundTaskIdentifier? = .None
     private let application: BackgroundTaskApplicationInterface
@@ -27,11 +27,11 @@ class BackgroundObserver: NSObject {
         return application.applicationState == .Background
     }
 
-    override convenience init() {
+    public override convenience init() {
         self.init(app: UIApplication.sharedApplication())
     }
 
-    internal init(app: BackgroundTaskApplicationInterface) {
+    public init(app: BackgroundTaskApplicationInterface) {
         application = app
 
         super.init()
@@ -62,11 +62,10 @@ class BackgroundObserver: NSObject {
     }
 
     private func startBackgroundTask() {
-        guard let _ = identifier else {
+        if identifier == nil {
             identifier = application.beginBackgroundTaskWithName(self.dynamicType.backgroundTaskName) {
                 self.endBackgroundTask()
             }
-            return
         }
     }
 
@@ -80,15 +79,15 @@ class BackgroundObserver: NSObject {
 
 extension BackgroundObserver: OperationObserver {
 
-    func operationDidStart(operation: Operation) {
+    public func operationDidStart(operation: Operation) {
         // no-op
     }
 
-    func operation(operation: Operation, didProduceOperation newOperation: NSOperation) {
+    public func operation(operation: Operation, didProduceOperation newOperation: NSOperation) {
         // no-op
     }
 
-    func operationDidFinish(operation: Operation, errors: [ErrorType]) {
+    public func operationDidFinish(operation: Operation, errors: [ErrorType]) {
         endBackgroundTask()
     }
 }

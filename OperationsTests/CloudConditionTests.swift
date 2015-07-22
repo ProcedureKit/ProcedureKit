@@ -8,8 +8,6 @@
 
 import XCTest
 import CloudKit
-
-@testable
 import Operations
 
 class TestableCloudContainer: CloudContainer {
@@ -28,18 +26,18 @@ class TestableCloudContainer: CloudContainer {
     }
 
     func verifyPermissions(permissions: CKApplicationPermissions, requestPermissionIfNecessary: Bool, completion: ErrorType? -> Void) {
-        verifyAccountStatusForContainer(self, permissions: permissions, shouldRequest: requestPermissionIfNecessary, completion: completion)
+        verifyAccountStatusForContainer(self, permissions, requestPermissionIfNecessary, completion)
     }
 
-    func accountStatusWithCompletionHandler(completionHandler: (CKAccountStatus, NSError?) -> Void) {
+    func accountStatusWithCompletionHandler(completionHandler: ((CKAccountStatus, NSError!) -> Void)!) {
         completionHandler(accountStatus, accountStatusError)
     }
 
-    func statusForApplicationPermission(applicationPermission: CKApplicationPermissions, completionHandler: CKApplicationPermissionBlock) {
+    func statusForApplicationPermission(applicationPermission: CKApplicationPermissions, completionHandler: CKApplicationPermissionBlock!) {
         completionHandler(applicationPermissionStatus, applicationPermissionStatusError)
     }
 
-    func requestApplicationPermission(applicationPermission: CKApplicationPermissions, completionHandler: CKApplicationPermissionBlock) {
+    func requestApplicationPermission(applicationPermission: CKApplicationPermissions, completionHandler: CKApplicationPermissionBlock!) {
         completionHandler(requestApplicationPermissionStatus, requestApplicationPermissionStatusError)
     }
 }
@@ -78,7 +76,7 @@ class CloudConditionTests: OperationTests {
     func test__cloud_container_executes_when_permissions_are_discoverable() {
         let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
         operation.addCompletionBlockToTestOperation(operation, withExpectation: expectation)
-        let condition = CloudContainerCondition(container: container, permissions: .UserDiscoverability)
+        let condition = CloudContainerCondition(container: container, permissions: .PermissionUserDiscoverability)
         operation.addCondition(condition)
 
         runOperation(operation)
@@ -123,7 +121,7 @@ class CloudConditionTests: OperationTests {
         operation.addCompletionBlockToTestOperation(operation, withExpectation: expectation)
         container.applicationPermissionStatus = .InitialState
         container.requestApplicationPermissionStatus = .Granted
-        let condition = CloudContainerCondition(container: container, permissions: .UserDiscoverability)
+        let condition = CloudContainerCondition(container: container, permissions: .PermissionUserDiscoverability)
         operation.addCondition(condition)
 
         var receivedErrors = [ErrorType]()

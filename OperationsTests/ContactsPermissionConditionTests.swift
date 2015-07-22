@@ -8,8 +8,6 @@
 
 import XCTest
 import Contacts
-
-@testable
 import Operations
 
 @available(iOS 9.0, *)

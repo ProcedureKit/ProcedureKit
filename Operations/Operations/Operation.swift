@@ -117,7 +117,7 @@ public class Operation: NSOperation {
             }
             else {
                 self.state = .Cancelled
-                self.finish(errors)
+                self.finish(errors: errors)
             }
         }
     }
@@ -218,7 +218,7 @@ public class Operation: NSOperation {
     */
     final public func finish(error: ErrorType?) {
         if let error = error {
-            finish([error])
+            finish(errors: [error])
         }
         else {
             finish()
@@ -255,7 +255,7 @@ private func ==(lhs: Operation.State, rhs: Operation.State) -> Bool {
 extension NSOperation {
 
     /// Chain completion blocks
-    func addCompletionBlock(block: Void -> Void) {
+    public func addCompletionBlock(block: Void -> Void) {
         if let existing = completionBlock {
             completionBlock = {
                 existing()
