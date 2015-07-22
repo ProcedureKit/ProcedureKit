@@ -44,7 +44,7 @@ public struct CloudContainerCondition: OperationCondition {
             if permissions & CKApplicationPermissions.PermissionUserDiscoverability != nil {
                 // Requesting non-zero permissions will potentially
                 // present a system alert.
-                addCondition(SystemAlertPresentation())
+                addCondition(AlertPresentation())
             }
         }
 
