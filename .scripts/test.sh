@@ -4,4 +4,4 @@
 
 #bundle update
 #bundle exec 
-set -o pipefail && xcodebuild -scheme "Operations" -destination "platform=iOS Simulator,name=iPhone 6,OS=9.0" test
+set -o pipefail && xcodebuild -scheme "Operations" -destination "platform=iOS Simulator,name=iPhone 6,OS=8.4" test
