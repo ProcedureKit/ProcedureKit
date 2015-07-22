@@ -85,6 +85,9 @@ class OperationTests: XCTestCase {
         queue.delegate = delegate
         queue.addOperation(operation)
     }
+}
+
+class BasicTests: OperationTests {
 
     func test__queue_delegate_is_notified_when_operation_starts() {
         let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
