@@ -12,23 +12,21 @@ import Foundation
     A generic condition for describing operations that
     cannot be allowed to execute concurrently.
 */
-struct MutuallyExclusive<T>: OperationCondition {
+public struct MutuallyExclusive<T>: OperationCondition {
 
-    static var name: String {
+    public var name: String {
         return "MutuallyExclusive<\(T.self)>"
     }
 
-    static var isMutuallyExclusive: Bool {
-        return true
-    }
+    public var isMutuallyExclusive = true
 
-    init() { }
+    public init() { }
 
-    func dependencyForOperation(operation: Operation) -> NSOperation? {
+    public func dependencyForOperation(operation: Operation) -> NSOperation? {
         return .None
     }
 
-    func evaluateForOperation(operation: Operation, completion: OperationConditionResult -> Void) {
+    public func evaluateForOperation(operation: Operation, completion: OperationConditionResult -> Void) {
         completion(.Satisfied)
     }
 }
@@ -36,7 +34,7 @@ struct MutuallyExclusive<T>: OperationCondition {
 /**
     A non-constructible type to be used with `MutuallyExclusive<T>`
 */
-enum SystemAlert { }
+public enum SystemAlert { }
 
 /// A condition to indicate that the associated operation may present an alert
-typealias SystemAlertPresentation = MutuallyExclusive<SystemAlert>
+public typealias SystemAlertPresentation = MutuallyExclusive<SystemAlert>

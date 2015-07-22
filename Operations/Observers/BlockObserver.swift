@@ -8,30 +8,30 @@
 
 import Foundation
 
-struct BlockObserver: OperationObserver {
-    typealias StartHandler = Operation -> Void
-    typealias ProduceHandler = (Operation, NSOperation) -> Void
-    typealias FinishHandler = (Operation, [ErrorType]) -> Void
+public struct BlockObserver: OperationObserver {
+    public typealias StartHandler = Operation -> Void
+    public typealias ProduceHandler = (Operation, NSOperation) -> Void
+    public typealias FinishHandler = (Operation, [ErrorType]) -> Void
 
     let startHandler: StartHandler?
     let produceHandler: ProduceHandler?
     let finishHandler: FinishHandler?
 
-    init(startHandler: StartHandler? = .None, produceHandler: ProduceHandler? = .None, finishHandler: FinishHandler? = .None) {
+    public init(startHandler: StartHandler? = .None, produceHandler: ProduceHandler? = .None, finishHandler: FinishHandler? = .None) {
         self.startHandler = startHandler
         self.produceHandler = produceHandler
         self.finishHandler = finishHandler
     }
 
-    func operationDidStart(operation: Operation) {
+    public func operationDidStart(operation: Operation) {
         startHandler?(operation)
     }
 
-    func operation(operation: Operation, didProduceOperation newOperation: NSOperation) {
+    public func operation(operation: Operation, didProduceOperation newOperation: NSOperation) {
         produceHandler?(operation, newOperation)
     }
 
-    func operationDidFinish(operation: Operation, errors: [ErrorType]) {
+    public func operationDidFinish(operation: Operation, errors: [ErrorType]) {
         finishHandler?(operation, errors)
     }
 }

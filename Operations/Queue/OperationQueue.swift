@@ -35,7 +35,7 @@ public class OperationQueue: NSOperationQueue {
             operation.addObserver(observer)
 
             let dependencies = operation.conditions.flatMap {
-                $0.dependencyForOperation(operation)
+                flatMap($0.dependencyForOperation(operation), { [$0] }) ?? []
             }
 
             for dependency in dependencies {
@@ -44,9 +44,11 @@ public class OperationQueue: NSOperationQueue {
             }
 
             // Check for exclusive mutability constraints
-            let concurrencyCategories: [String] = operation.conditions.flatMap { condition in
-                if !condition.dynamicType.isMutuallyExclusive { return .None }
-                return "\(condition.dynamicType)"
+            let concurrencyCategories: [String] = operation.conditions.flatMap {
+                flatMap($0) {
+                    if !$0.isMutuallyExclusive { return .None }
+                    return ["\($0.dynamicType)"]
+                } ?? []
             }
 
             if !concurrencyCategories.isEmpty {
@@ -64,8 +66,9 @@ public class OperationQueue: NSOperationQueue {
         else {
 
             op.addCompletionBlock { [weak self, weak op] in
-                guard let queue = self, let op = op else { return }
-                queue.delegate?.operationQueue(queue, operationDidFinish: op, withErrors: [])
+                if let queue = self, let op = op {
+                    queue.delegate?.operationQueue(queue, operationDidFinish: op, withErrors: [])
+                }
             }
         }
 
@@ -74,12 +77,14 @@ public class OperationQueue: NSOperationQueue {
         super.addOperation(op)
     }
 
-    public override func addOperations(ops: [NSOperation], waitUntilFinished wait: Bool) {
-        ops.map(addOperation)
+    public override func addOperations(ops: [AnyObject], waitUntilFinished wait: Bool) {
+        if let ops = ops as? [NSOperation] {
+            ops.map(addOperation)
 
-        if wait {
-            for operation in operations {
-                operation.waitUntilFinished()
+            if wait {
+                for operation in operations {
+                    operation.waitUntilFinished()
+                }
             }
         }
     }
