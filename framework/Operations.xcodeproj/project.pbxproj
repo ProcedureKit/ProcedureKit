@@ -50,8 +50,6 @@
 		652122D61B5C407100E26052 /* MutuallyExclusive.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MutuallyExclusive.swift; sourceTree = "<group>"; };
 		652122D81B5C427F00E26052 /* MutualExclusiveTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MutualExclusiveTests.swift; sourceTree = "<group>"; };
 		655E43FE1B3F43D60013A3E1 /* TimeoutObserverTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TimeoutObserverTests.swift; sourceTree = "<group>"; };
-		656010061B5C557A0052EE78 /* ContactsCondition.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ContactsCondition.swift; path = Permissions/ContactsCondition.swift; sourceTree = "<group>"; };
-		656010091B5C5E570052EE78 /* ContactsPermissionConditionTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContactsPermissionConditionTests.swift; sourceTree = "<group>"; };
 		6560100B1B5C64E20052EE78 /* CloudCondition.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CloudCondition.swift; path = Permissions/CloudCondition.swift; sourceTree = "<group>"; };
 		6560100D1B5C6C0E0052EE78 /* CloudConditionTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CloudConditionTests.swift; sourceTree = "<group>"; };
 		6577295D1B3D9E0E00B5D153 /* Operations.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Operations.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -101,7 +99,6 @@
 		656010081B5C557D0052EE78 /* Permissions */ = {
 			isa = PBXGroup;
 			children = (
-				656010061B5C557A0052EE78 /* ContactsCondition.swift */,
 				6560100B1B5C64E20052EE78 /* CloudCondition.swift */,
 			);
 			name = Permissions;
@@ -152,7 +149,6 @@
 			children = (
 				65D6F5861B5BE62C003D35AD /* BackgroundObserverTests.swift */,
 				6560100D1B5C6C0E0052EE78 /* CloudConditionTests.swift */,
-				656010091B5C5E570052EE78 /* ContactsPermissionConditionTests.swift */,
 				65D6F57A1B5AF091003D35AD /* GroupOperationTests.swift */,
 				652122D81B5C427F00E26052 /* MutualExclusiveTests.swift */,
 				65D6F58A1B5BF264003D35AD /* NetworkObserverTests.swift */,
