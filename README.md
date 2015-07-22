@@ -8,4 +8,4 @@ While not currently feature compatible with Apple’s sample code, it currently 
 
 In addition, the framework is well tested, with approximately 70% coverage. This is known as I wrote it using Xcode 7 but have back ported it to Swift 1.2.
 
-Missing Operation types will be added, see the project’s Milestones.
+Development of the Swift 2.0 version is the priority, as Swift 1.2 will soon be obsolete in a couple of month. However, any significant additions will be backported. Therefore the versioning of this project will follow this pattern: Swift 1.2: `0.4 -> 0.x` and Swift 2.0: `1.0 -> 1.x` 
