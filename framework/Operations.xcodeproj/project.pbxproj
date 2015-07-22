@@ -10,6 +10,7 @@
 		652122D21B5C2F4700E26052 /* ReachabilityConditionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652122D11B5C2F4700E26052 /* ReachabilityConditionTests.swift */; };
 		652122D71B5C407100E26052 /* MutuallyExclusive.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652122D61B5C407100E26052 /* MutuallyExclusive.swift */; };
 		652122D91B5C427F00E26052 /* MutualExclusiveTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652122D81B5C427F00E26052 /* MutualExclusiveTests.swift */; };
+		654D7E701B600FA5005108E8 /* BlockConditionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 654D7E6F1B600FA5005108E8 /* BlockConditionTests.swift */; };
 		655E43FF1B3F43D60013A3E1 /* TimeoutObserverTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 655E43FE1B3F43D60013A3E1 /* TimeoutObserverTests.swift */; };
 		6560100C1B5C64E20052EE78 /* CloudCondition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6560100B1B5C64E20052EE78 /* CloudCondition.swift */; };
 		6560100E1B5C6C0E0052EE78 /* CloudConditionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6560100D1B5C6C0E0052EE78 /* CloudConditionTests.swift */; };
@@ -33,6 +34,7 @@
 		65D6F5891B5BEAC9003D35AD /* NetworkObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D6F5881B5BEAC9003D35AD /* NetworkObserver.swift */; };
 		65D6F58B1B5BF264003D35AD /* NetworkObserverTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D6F58A1B5BF264003D35AD /* NetworkObserverTests.swift */; };
 		65D6F58D1B5BFE59003D35AD /* ReachabilityCondition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D6F58C1B5BFE59003D35AD /* ReachabilityCondition.swift */; };
+		65FABD601B600DA40072B599 /* BlockCondition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65FABD5F1B600DA40072B599 /* BlockCondition.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -49,6 +51,7 @@
 		652122D11B5C2F4700E26052 /* ReachabilityConditionTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReachabilityConditionTests.swift; sourceTree = "<group>"; };
 		652122D61B5C407100E26052 /* MutuallyExclusive.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MutuallyExclusive.swift; sourceTree = "<group>"; };
 		652122D81B5C427F00E26052 /* MutualExclusiveTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MutualExclusiveTests.swift; sourceTree = "<group>"; };
+		654D7E6F1B600FA5005108E8 /* BlockConditionTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BlockConditionTests.swift; sourceTree = "<group>"; };
 		655E43FE1B3F43D60013A3E1 /* TimeoutObserverTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TimeoutObserverTests.swift; sourceTree = "<group>"; };
 		6560100B1B5C64E20052EE78 /* CloudCondition.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CloudCondition.swift; path = Permissions/CloudCondition.swift; sourceTree = "<group>"; };
 		6560100D1B5C6C0E0052EE78 /* CloudConditionTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CloudConditionTests.swift; sourceTree = "<group>"; };
@@ -75,6 +78,7 @@
 		65D6F5881B5BEAC9003D35AD /* NetworkObserver.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkObserver.swift; sourceTree = "<group>"; };
 		65D6F58A1B5BF264003D35AD /* NetworkObserverTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkObserverTests.swift; sourceTree = "<group>"; };
 		65D6F58C1B5BFE59003D35AD /* ReachabilityCondition.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReachabilityCondition.swift; sourceTree = "<group>"; };
+		65FABD5F1B600DA40072B599 /* BlockCondition.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BlockCondition.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -148,6 +152,7 @@
 			isa = PBXGroup;
 			children = (
 				65D6F5861B5BE62C003D35AD /* BackgroundObserverTests.swift */,
+				654D7E6F1B600FA5005108E8 /* BlockConditionTests.swift */,
 				6560100D1B5C6C0E0052EE78 /* CloudConditionTests.swift */,
 				65D6F57A1B5AF091003D35AD /* GroupOperationTests.swift */,
 				652122D81B5C427F00E26052 /* MutualExclusiveTests.swift */,
@@ -171,9 +176,10 @@
 		6577297D1B3DAA0400B5D153 /* Conditions */ = {
 			isa = PBXGroup;
 			children = (
+				65FABD5F1B600DA40072B599 /* BlockCondition.swift */,
+				652122D61B5C407100E26052 /* MutuallyExclusive.swift */,
 				6577297E1B3DAA0400B5D153 /* OperationCondition.swift */,
 				65D6F58C1B5BFE59003D35AD /* ReachabilityCondition.swift */,
-				652122D61B5C407100E26052 /* MutuallyExclusive.swift */,
 				656010081B5C557D0052EE78 /* Permissions */,
 			);
 			path = Conditions;
@@ -326,6 +332,7 @@
 				65D6F5851B5BE620003D35AD /* BackgroundObserver.swift in Sources */,
 				657729801B3DAA0400B5D153 /* OperationCondition.swift in Sources */,
 				65CB76FC1B3F284A00791E18 /* BlockObserver.swift in Sources */,
+				65FABD601B600DA40072B599 /* BlockCondition.swift in Sources */,
 				65D6F5751B5AC453003D35AD /* Operation.swift in Sources */,
 				65D6F58D1B5BFE59003D35AD /* ReachabilityCondition.swift in Sources */,
 				65CB77011B3F28E800791E18 /* ExclusivityManager.swift in Sources */,
@@ -348,6 +355,7 @@
 				655E43FF1B3F43D60013A3E1 /* TimeoutObserverTests.swift in Sources */,
 				652122D21B5C2F4700E26052 /* ReachabilityConditionTests.swift in Sources */,
 				65D6F57B1B5AF091003D35AD /* GroupOperationTests.swift in Sources */,
+				654D7E701B600FA5005108E8 /* BlockConditionTests.swift in Sources */,
 				65D6F5871B5BE62C003D35AD /* BackgroundObserverTests.swift in Sources */,
 				65D6F58B1B5BF264003D35AD /* NetworkObserverTests.swift in Sources */,
 			);
