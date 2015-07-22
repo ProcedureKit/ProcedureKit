@@ -89,7 +89,6 @@ class CloudConditionTests: OperationTests {
 
     func test__cloud_container_errors_when_account_status_is_not_available() {
         let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
-        operation.addCompletionBlockToTestOperation(operation, withExpectation: expectation)
         container = TestableCloudContainer(accountStatus: CKAccountStatus.NoAccount)
         let accountStatusError = NSError(domain: "Operations Test", code: 1234, userInfo: nil)
         container.accountStatusError = accountStatusError
@@ -111,14 +110,14 @@ class CloudConditionTests: OperationTests {
                 XCTAssertTrue(error == CloudContainerCondition.Error.AccountStatusError(accountStatusError))
             }
             else {
-                XCTFail("No error message was observer")
+                XCTFail("No error message was observed")
             }
         }
     }
 
     func test__cloud_container_requests_permissions_which_would_be_granted_if_requested() {
         let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
-        operation.addCompletionBlockToTestOperation(operation, withExpectation: expectation)
+
         container.applicationPermissionStatus = .InitialState
         container.requestApplicationPermissionStatus = .Granted
         let condition = CloudContainerCondition(container: container, permissions: .PermissionUserDiscoverability)
