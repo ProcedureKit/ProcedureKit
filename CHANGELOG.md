@@ -1,4 +1,7 @@
-# 0.4.1 - Initial Release of Operations.
+# 0.5.0
+1. [[OPR-26](https://github.com/blindingskies/Slots/pull/26)]: Adds a Block Condition. This allows an operation to only execute if a block evaluates true.
+
+# 0.4.2 - Initial Release of Operations.
 Base `Operation` and `OperationQueue` classes, with the following features.
 
 The project has been developed using Xcode 7 and Swift 2.0, with  unit testing (~ 75% test coverage). It has now been back-ported to Swift 1.2 for version 1.0 of the framework. Version 2.0 will support Swift 2.0 features, including iOS 9 technologies such as Contacts framework etc.
