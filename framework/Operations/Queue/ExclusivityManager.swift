@@ -12,7 +12,7 @@ class ExclusivityManager {
 
     static let sharedInstance = ExclusivityManager()
 
-    private let queue = Queue.Utility.serial("me.danthorpe.Operations.Exclusivity")
+    private let queue = Queue.Initiated.serial("me.danthorpe.Operations.Exclusivity")
     private var operations: [String: [Operation]] = [:]
 
     private init() {

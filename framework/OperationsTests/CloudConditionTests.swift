@@ -44,13 +44,14 @@ class TestableCloudContainer: CloudContainer {
 
 class CloudConditionTests: OperationTests {
 
+    var timeout: NSTimeInterval = 5
     var operation: TestOperation!
     var container: TestableCloudContainer!
 
     override func setUp() {
         super.setUp()
 
-        operation = TestOperation(delay: 1)
+        operation = TestOperation()
         container = TestableCloudContainer(accountStatus: .Available)
     }
 
@@ -67,10 +68,9 @@ class CloudConditionTests: OperationTests {
 
         runOperation(operation)
 
-        waitForExpectationsWithTimeout(3) { error in
-            XCTAssertTrue(self.operation.didExecute)
-            XCTAssertTrue(self.operation.finished)
-        }
+        waitForExpectationsWithTimeout(timeout, handler: nil)
+        XCTAssertTrue(self.operation.didExecute)
+        XCTAssertTrue(self.operation.finished)
     }
 
     func test__cloud_container_executes_when_permissions_are_discoverable() {
@@ -80,11 +80,9 @@ class CloudConditionTests: OperationTests {
         operation.addCondition(condition)
 
         runOperation(operation)
-
-        waitForExpectationsWithTimeout(3) { error in
-            XCTAssertTrue(self.operation.didExecute)
-            XCTAssertTrue(self.operation.finished)
-        }
+        waitForExpectationsWithTimeout(3, handler: nil)
+        XCTAssertTrue(self.operation.didExecute)
+        XCTAssertTrue(self.operation.finished)
     }
 
     func test__cloud_container_errors_when_account_status_is_not_available() {
@@ -103,15 +101,14 @@ class CloudConditionTests: OperationTests {
 
         runOperation(operation)
 
-        waitForExpectationsWithTimeout(3) { _ in
-            XCTAssertFalse(self.operation.didExecute)
-            XCTAssertTrue(self.operation.cancelled)
-            if let error = receivedErrors[0] as? CloudContainerCondition.Error {
-                XCTAssertTrue(error == CloudContainerCondition.Error.AccountStatusError(accountStatusError))
-            }
-            else {
-                XCTFail("No error message was observed")
-            }
+        waitForExpectationsWithTimeout(timeout, handler: nil)
+        XCTAssertFalse(self.operation.didExecute)
+        XCTAssertTrue(self.operation.cancelled)
+        if let error = receivedErrors.first as? CloudContainerCondition.Error {
+            XCTAssertTrue(error == CloudContainerCondition.Error.AccountStatusError(accountStatusError))
+        }
+        else {
+            XCTFail("No error message was observed")
         }
     }
 
@@ -131,16 +128,16 @@ class CloudConditionTests: OperationTests {
 
         runOperation(operation)
 
-        waitForExpectationsWithTimeout(5) { error in
-            XCTAssertFalse(self.operation.didExecute)
-            XCTAssertTrue(self.operation.cancelled)
-            if let error = receivedErrors.first as? CloudContainerCondition.Error {
-                XCTAssertTrue(error == CloudContainerCondition.Error.PermissionRequestRequired)
-            }
-            else {
-                XCTFail("No error message was observer")
-            }
+        waitForExpectationsWithTimeout(timeout, handler: nil)
+        XCTAssertFalse(self.operation.didExecute)
+        XCTAssertTrue(self.operation.cancelled)
+        if let error = receivedErrors.first as? CloudContainerCondition.Error {
+            XCTAssertTrue(error == CloudContainerCondition.Error.PermissionRequestRequired)
         }
+        else {
+            XCTFail("No error message was observer")
+        }
+
     }
 
 
