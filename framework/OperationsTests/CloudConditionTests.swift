@@ -72,7 +72,7 @@ class CloudConditionTests: OperationTests {
         XCTAssertTrue(self.operation.didExecute)
         XCTAssertTrue(self.operation.finished)
     }
-/*
+
     func test__cloud_container_executes_when_permissions_are_discoverable() {
         let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
         operation.addCompletionBlockToTestOperation(operation, withExpectation: expectation)
@@ -84,7 +84,7 @@ class CloudConditionTests: OperationTests {
         XCTAssertTrue(operation.didExecute)
         XCTAssertTrue(operation.finished)
     }
-*/
+
     func test__cloud_container_errors_when_account_status_is_not_available() {
         let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
         container = TestableCloudContainer(accountStatus: CKAccountStatus.NoAccount)
@@ -105,13 +105,13 @@ class CloudConditionTests: OperationTests {
         XCTAssertFalse(operation.didExecute)
         XCTAssertTrue(operation.cancelled)
         if let error = receivedErrors.first as? CloudContainerCondition.Error {
-            XCTAssertTrue(error == CloudContainerCondition.Error.AccountStatusError(accountStatusError))
+            XCTAssertTrue(error == CloudContainerCondition.Error.NotAuthenticated)
         }
         else {
             XCTFail("No error message was observed")
         }
     }
-/*
+
     func test__cloud_container_requests_permissions_which_would_be_granted_if_requested() {
         let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
 
@@ -138,6 +138,4 @@ class CloudConditionTests: OperationTests {
             XCTFail("No error message was observer")
         }
     }
-*/
-
 }

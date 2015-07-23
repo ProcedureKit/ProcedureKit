@@ -78,6 +78,7 @@ class OperationTests: XCTestCase {
     override func tearDown() {
         queue = nil
         delegate = nil
+        ExclusivityManager.sharedInstance.__tearDownForUnitTesting()
         super.tearDown()
     }
 
