@@ -26,6 +26,7 @@ public protocol CloudContainer {
 public struct CloudContainerCondition: OperationCondition {
 
     public enum Error: ErrorType {
+        case NotAuthenticated
         case AccountStatusError(NSError?)
         case PermissionRequestRequired
         case PermissionStatusError(NSError?)
@@ -44,7 +45,7 @@ public struct CloudContainerCondition: OperationCondition {
             if permissions & CKApplicationPermissions.PermissionUserDiscoverability != nil {
                 // Requesting non-zero permissions will potentially
                 // present a system alert.
-                addCondition(SystemAlertPresentation())
+                addCondition(AlertPresentation())
             }
         }
 
@@ -91,6 +92,8 @@ extension CloudContainerCondition.Error: Equatable { }
 
 public func ==(a: CloudContainerCondition.Error, b: CloudContainerCondition.Error) -> Bool {
     switch (a, b) {
+    case (.NotAuthenticated, .NotAuthenticated):
+        return true
     case let (.AccountStatusError(aError), .AccountStatusError(bError)):
         return aError == bError
     case    (.PermissionRequestRequired, .PermissionRequestRequired):
@@ -113,17 +116,23 @@ extension CKContainer: CloudContainer {
 
 public func verifyAccountStatusForContainer(container: CloudContainer, permissions: CKApplicationPermissions, shouldRequest: Bool, completion: ErrorType? -> Void) {
     container.accountStatusWithCompletionHandler { (status, error) in
-        if status == .Available {
+        
+        switch status {
+        
+        case .Available:
             if permissions != nil {
                 verifyPermissionsForContainer(container, permissions, shouldRequest, completion)
             }
             else {
                 completion(.None)
             }
-        }
-        else {
+
+        case .NoAccount:
+            completion(CloudContainerCondition.Error.NotAuthenticated)
+        
+        default:
             completion(CloudContainerCondition.Error.AccountStatusError(error))
-        }
+        }        
     }
 }
 

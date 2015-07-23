@@ -34,7 +34,7 @@ public struct MutuallyExclusive<T>: OperationCondition {
 /**
     A non-constructible type to be used with `MutuallyExclusive<T>`
 */
-public enum SystemAlert { }
+public enum Alert { }
 
 /// A condition to indicate that the associated operation may present an alert
-public typealias SystemAlertPresentation = MutuallyExclusive<SystemAlert>
+public typealias AlertPresentation = MutuallyExclusive<Alert>

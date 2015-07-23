@@ -183,7 +183,7 @@ public class Operation: NSOperation {
         state = .Cancelled
     }
     
-    final func produceOperation(operation: NSOperation) {
+    public final func produceOperation(operation: NSOperation) {
         observers.map { $0.operation(self, didProduceOperation: operation) }
     }
     
