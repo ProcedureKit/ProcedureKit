@@ -1,5 +1,9 @@
 # 0.5.0
-1. [[OPR-26](https://github.com/blindingskies/Slots/pull/26)]: Adds a Block Condition. This allows an operation to only execute if a block evaluates true.
+1. [[OPR-22](https://github.com/blindingskies/Slots/pull/22)]: Supports displaying a `UIAlertController` as a `AlertOperation`.
+2. [[OPR-26](https://github.com/blindingskies/Slots/pull/26)]: Adds a Block Condition. This allows an operation to only execute if a block evaluates true.
+3. [[OPR-27](https://github.com/blindingskies/Slots/pull/27)]: Fixes a bug where the `produceOperation` function was not publicly accessible. Thanks - @MattKiazyk
+4. [[OPR-28](https://github.com/blindingskies/Slots/pull/28)]: Supports a generic `Operation` subclass which wraps a `CKDatabaseOperation` setting the provided `CKDatabase`.
+5. [[OPR-29](https://github.com/blindingskies/Slots/pull/29)]: Improves the `CloudCondition.Error` to include `.NotAuthenticated` for when the user is not signed into iCloud.
 
 # 0.4.2 - Initial Release of Operations.
 Base `Operation` and `OperationQueue` classes, with the following features.
