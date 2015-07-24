@@ -62,8 +62,8 @@ class CloudConditionTests: OperationTests {
     }
 
     func test__cloud_container_executes_when_available() {
-        let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
-        operation.addCompletionBlockToTestOperation(operation, withExpectation: expectation)
+
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
         operation.addCondition(CloudContainerCondition(container: container))
 
         runOperation(operation)
@@ -74,8 +74,8 @@ class CloudConditionTests: OperationTests {
     }
 
     func test__cloud_container_executes_when_permissions_are_discoverable() {
-        let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
-        operation.addCompletionBlockToTestOperation(operation, withExpectation: expectation)
+
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
         let condition = CloudContainerCondition(container: container, permissions: .PermissionUserDiscoverability)
         operation.addCondition(condition)
 

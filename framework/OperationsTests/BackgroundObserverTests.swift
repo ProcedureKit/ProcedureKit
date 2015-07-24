@@ -76,12 +76,10 @@ class BackgroundObserverTests: OperationTests {
             didBeginTask: didBeginTask,
             didEndTask: didEndTask)
 
-        let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
-
         let operation = TestOperation(delay: 2)
-        operation.addCompletionBlockToTestOperation(operation, withExpectation: expectation)
         operation.addObserver(BackgroundObserver(app: application))
 
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
         runOperation(operation)
         applicationEntersBackground(application)
 
@@ -115,14 +113,12 @@ class BackgroundObserverTests: OperationTests {
             didBeginTask: didBeginTask,
             didEndTask: didEndTask)
 
-        let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
-
         applicationEntersBackground(application)
 
         let operation = TestOperation(delay: 2)
-        operation.addCompletionBlockToTestOperation(operation, withExpectation: expectation)
         operation.addObserver(BackgroundObserver(app: application))
 
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
         runOperation(operation)
         applicationBecomesActive(application)
 
