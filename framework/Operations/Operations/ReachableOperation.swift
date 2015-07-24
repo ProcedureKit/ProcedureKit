@@ -8,6 +8,15 @@
 
 import Foundation
 
+/**
+    Compose your `NSOperation` inside a `ReachableOperation` to
+    ensure that it is executed when the desired connectivity is
+    available.
+
+    If the device is not reachable, the operation will observe
+    the default route reachability, and add your operation as
+    soon as the conditions are met.
+*/
 public class ReachableOperation<O: NSOperation>: GroupOperation {
 
     public let operation: O
@@ -35,16 +44,13 @@ public class ReachableOperation<O: NSOperation>: GroupOperation {
     }
 
     private func evaluate() {
-        println("Evaluating...")
         if checkStatus() {
-            println("  status: true")
             if let token = token {
                 reachability.removeObserverWithToken(token)
             }
             addOperation(operation)
         }
         else {
-            println("  status: false")
             checkStatusAgain()
         }
     }
@@ -72,8 +78,7 @@ public class ReachableOperation<O: NSOperation>: GroupOperation {
         if delay > 0.0 {
             reevaluate.addDependency(DelayOperation(interval: delay))
         }
-        
-        println("Will re-evaluate..")
+
         addOperation(reevaluate)
     }
 }
