@@ -67,8 +67,6 @@ class LoggingObserverTests: OperationTests {
         runOperation(operation)
         waitForExpectationsWithTimeout(5, handler: nil)
 
-        println(receivedMessages)
-
         XCTAssertEqual(receivedMessages.count, 5)
         XCTAssertEqual(receivedMessages[0], "Test Operation: did start.")
         XCTAssertEqual(receivedMessages[1], "Test Operation: did produce operation: Produced Operation.")
