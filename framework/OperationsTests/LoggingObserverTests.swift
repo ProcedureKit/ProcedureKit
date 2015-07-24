@@ -13,10 +13,9 @@ class LoggingObserverTests: OperationTests {
 
     func test__logger_receives_messages_when_operation_is_named() {
 
-        let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
         var operation = TestOperation()
         operation.name = "Test Logging Operation"
-        operation.addCompletionBlockToTestOperation(operation, withExpectation: expectation)
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
 
         var receivedMessages = [String]()
         let logger = LoggingObserver() { message in
@@ -33,9 +32,9 @@ class LoggingObserverTests: OperationTests {
     }
 
     func test__logger_outputs_number_of_received_errors() {
-        let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
+
         var operation = TestOperation(error: CloudContainerCondition.Error.NotAuthenticated)
-        operation.addCompletionBlockToTestOperation(operation, withExpectation: expectation)
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
 
         var receivedMessages = [String]()
         let logger = LoggingObserver() { message in
@@ -51,12 +50,12 @@ class LoggingObserverTests: OperationTests {
     }
 
     func test__logger_receives_messages_from_produced_operation() {
-        let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
+
         let produced = TestOperation(delay: 0)
         produced.name = "Produced Operation"
         var operation = TestOperation(error: CloudContainerCondition.Error.NotAuthenticated, produced: produced)
         operation.name = "Test Operation"
-        operation.addCompletionBlockToTestOperation(operation, withExpectation: expectation)
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
 
         var receivedMessages = [String]()
         let logger = LoggingObserver() { message in

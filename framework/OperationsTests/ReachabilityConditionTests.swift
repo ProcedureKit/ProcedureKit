@@ -28,12 +28,11 @@ class ReachabilityConditionTests: OperationTests {
 
     func test__condition_is_satisfied_when_host_is_reachable_via_wifi() {
 
-        let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
         let operation = TestOperation(delay: 1)
-        operation.addCompletionBlockToTestOperation(operation, withExpectation: expectation)
         let condition = ReachabilityCondition(url: url, reachability: TestableReachability(networkStatus: .ReachableViaWiFi))
         operation.addCondition(condition)
 
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
         runOperation(operation)
 
         waitForExpectationsWithTimeout(3) { error in
@@ -44,12 +43,11 @@ class ReachabilityConditionTests: OperationTests {
 
     func test__condition_is_satisfied_when_host_is_reachable_via_wwan() {
 
-        let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
         let operation = TestOperation(delay: 1)
-        operation.addCompletionBlockToTestOperation(operation, withExpectation: expectation)
         let condition = ReachabilityCondition(url: url, connectivity: .ConnectedViaWWAN, reachability: TestableReachability(networkStatus: .ReachableViaWWAN))
         operation.addCondition(condition)
 
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
         runOperation(operation)
 
         waitForExpectationsWithTimeout(3) { error in

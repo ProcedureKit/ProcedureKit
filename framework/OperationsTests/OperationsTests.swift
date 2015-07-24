@@ -39,15 +39,6 @@ class TestOperation: Operation {
             self.finish(self.simulatedError)
         }
     }
-
-    func addCompletionBlockToTestOperation(operation: TestOperation, withExpectation expectation: XCTestExpectation) {
-        operation.completionBlock = { [weak operation] in
-            if let weakOperation = operation {
-                XCTAssertTrue(weakOperation.didExecute)
-                expectation.fulfill()
-            }
-        }
-    }
 }
 
 class TestQueueDelegate: OperationQueueDelegate {
@@ -97,6 +88,14 @@ class OperationTests: XCTestCase {
         queue.delegate = delegate
         queue.addOperation(operation)
     }
+
+    func addCompletionBlockToTestOperation(operation: Operation, withExpectation expectation: XCTestExpectation) {
+        operation.completionBlock = { [weak operation] in
+            if let weakOperation = operation {
+                expectation.fulfill()
+            }
+        }
+    }
 }
 
 class BasicTests: OperationTests {
@@ -105,11 +104,11 @@ class BasicTests: OperationTests {
         let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
 
         let operation = TestOperation(delay: 1)
-        operation.addCompletionBlockToTestOperation(operation, withExpectation: expectation)
+        addCompletionBlockToTestOperation(operation, withExpectation: expectation)
 
         runOperation(operation)
         waitForExpectationsWithTimeout(3, handler: nil)
-
+        XCTAssertTrue(operation.didExecute)
         XCTAssertTrue(delegate.did_willAddOperation)
         XCTAssertTrue(delegate.did_operationDidFinish)
     }
@@ -119,10 +118,11 @@ class BasicTests: OperationTests {
         let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
 
         let operation = TestOperation(delay: 1)
-        operation.addCompletionBlockToTestOperation(operation, withExpectation: expectation)
+        addCompletionBlockToTestOperation(operation, withExpectation: expectation)
 
         queue.addOperation(operation)
         waitForExpectationsWithTimeout(3, handler: nil)
+        XCTAssertTrue(operation.didExecute)        
     }
 }
 
