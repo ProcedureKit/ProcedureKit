@@ -11,8 +11,13 @@ import SystemConfiguration
 
 public final class Reachability {
 
-    public enum NetworkStatus: Int {
-        case NotConnected = 1, ReachableViaWiFi, ReachableViaWWAN
+    public enum Connectivity {
+        case AnyConnectionKind, ViaWWAN, ViaWiFi
+    }
+
+    public enum NetworkStatus {
+        case NotReachable
+        case Reachable(Connectivity)
     }
 
     public typealias ObserverBlockType = (NetworkStatus) -> Void
@@ -24,9 +29,7 @@ public final class Reachability {
     public static let sharedInstance = Reachability()
 
     public class func addObserver(observer: ObserverBlockType) -> String {
-        let token = NSUUID().UUIDString
-        sharedInstance.addObserverWithToken(token, observer: observer)
-        return token
+        return sharedInstance.addObserver(observer)
     }
 
     public class func removeObserverWithToken(token: String) {
@@ -70,6 +73,12 @@ public final class Reachability {
         }()
     }
 
+    public func addObserver(observer: ObserverBlockType) -> String {
+        let token = NSUUID().UUIDString
+        addObserverWithToken(token, observer: observer)
+        return token
+    }
+
     public func addObserverWithToken(token: String, observer: ObserverBlockType) {
         observers.updateValue(Observer(reachabilityDidChange: observer), forKey: token)
         startNotifier()
@@ -83,7 +92,7 @@ public final class Reachability {
     public func requestReachabilityForURL(url: NSURL, completion: ObserverBlockType) {
         if let host = url.host {
             dispatch_async(queue) {
-                var status = NetworkStatus.NotConnected
+                var status = NetworkStatus.NotReachable
                 let ref = self.refs[host] ?? SCNetworkReachabilityCreateWithName(nil, (host as NSString).UTF8String).takeRetainedValue()
 
                 self.refs[host] = ref
@@ -147,12 +156,12 @@ public final class Reachability {
 
     private func networkStatusFromFlags(flags: SCNetworkReachabilityFlags) -> NetworkStatus {
         if isReachableViaWifi(flags) {
-            return .ReachableViaWiFi
+            return .Reachable(.ViaWiFi)
         }
         else if isReachableViaWWAN(flags) {
-            return .ReachableViaWWAN
+            return .Reachable(.ViaWWAN)
         }
-        return .NotConnected
+        return .NotReachable
     }
 
     private func isReachable(flags: SCNetworkReachabilityFlags) -> Bool {
@@ -175,10 +184,16 @@ public final class Reachability {
     }
 }
 
+public protocol SystemReachability {
+    func addObserver(observer: Reachability.ObserverBlockType) -> String
+    func removeObserverWithToken(token: String)
+}
+
 public protocol HostReachability {
     func requestReachabilityForURL(url: NSURL, completion: Reachability.ObserverBlockType)
 }
 
+extension Reachability: SystemReachability {}
 extension Reachability: HostReachability {}
 
 /**
@@ -188,27 +203,23 @@ attached to is asked about its readiness.
 */
 public class ReachabilityCondition: OperationCondition {
 
-    public enum Connectivity: Int {
-        case AnyConnectionKind = 1, ConnectedViaWWAN, ConnectedViaWiFi
-    }
-
     public enum Error: ErrorType, Equatable {
         case NotReachable
-        case NotReachableWithConnectivity(Connectivity)
+        case NotReachableWithConnectivity(Reachability.Connectivity)
     }
 
     public let name = "Reachability"
     public let isMutuallyExclusive = false
 
     let url: NSURL
-    let connectivity: Connectivity
+    let connectivity: Reachability.Connectivity
     let reachability: HostReachability
 
-    public convenience init(url: NSURL, connectivity: Connectivity = .AnyConnectionKind) {
+    public convenience init(url: NSURL, connectivity: Reachability.Connectivity = .AnyConnectionKind) {
         self.init(url: url, connectivity: connectivity, reachability: Reachability.sharedInstance)
     }
 
-    public init(url: NSURL, connectivity: Connectivity = .AnyConnectionKind, reachability: HostReachability) {
+    public init(url: NSURL, connectivity: Reachability.Connectivity = .AnyConnectionKind, reachability: HostReachability) {
         self.url = url
         self.connectivity = connectivity
         self.reachability = reachability
@@ -221,11 +232,11 @@ public class ReachabilityCondition: OperationCondition {
     public func evaluateForOperation(operation: Operation, completion: OperationConditionResult -> Void) {
         reachability.requestReachabilityForURL(url) { kind in
             switch (self.connectivity, kind) {
-            case (_, .NotConnected):
+            case (_, .NotReachable):
                 completion(.Failed(Error.NotReachable))
-            case (.AnyConnectionKind, _), (.ConnectedViaWWAN, _):
+            case (.AnyConnectionKind, _), (.ViaWWAN, _):
                 completion(.Satisfied)
-            case (.ConnectedViaWiFi, .ReachableViaWWAN):
+            case (.ViaWiFi, .Reachable(.ViaWWAN)):
                 completion(.Failed(Error.NotReachableWithConnectivity(self.connectivity)))
             default:
                 completion(.Failed(Error.NotReachable))
