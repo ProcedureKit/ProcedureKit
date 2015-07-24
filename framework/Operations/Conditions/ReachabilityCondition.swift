@@ -188,6 +188,8 @@ attached to is asked about its readiness.
 */
 public class ReachabilityCondition: OperationCondition {
 
+    static let defaultURL = NSURL(string: "http://apple.com")
+
     public enum Connectivity: Int {
         case AnyConnectionKind = 1, ConnectedViaWWAN, ConnectedViaWiFi
     }
@@ -199,10 +201,14 @@ public class ReachabilityCondition: OperationCondition {
 
     public let name = "Reachability"
     public let isMutuallyExclusive = false
+    public var url: NSURL
 
-    let url: NSURL
     let connectivity: Connectivity
     let reachability: HostReachability
+
+    public convenience init() {
+        self.init(url:ReachabilityCondition.defaultURL!, connectivity:.AnyConnectionKind, reachability: Reachability.sharedInstance)
+    }
 
     public convenience init(url: NSURL, connectivity: Connectivity = .AnyConnectionKind) {
         self.init(url: url, connectivity: connectivity, reachability: Reachability.sharedInstance)
