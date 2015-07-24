@@ -14,14 +14,25 @@ class TestOperation: Operation {
     
     let numberOfSeconds: Double
     let simulatedError: ErrorType?
+    let producedOperation: NSOperation?
     var didExecute: Bool = false
     
-    init(delay: Int = 1, error: ErrorType? = .None) {
+    init(delay: Int = 1, error: ErrorType? = .None, produced: NSOperation? = .None) {
         numberOfSeconds = Double(delay)
         simulatedError = error
+        producedOperation = produced
+        super.init()
     }
 
     override func execute() {
+
+        if let producedOperation = self.producedOperation {
+            let after = dispatch_time(DISPATCH_TIME_NOW, Int64(numberOfSeconds * Double(0.5) * Double(NSEC_PER_SEC)))
+            dispatch_after(after, Queue.Main.queue) {
+                self.produceOperation(producedOperation)
+            }
+        }
+
         let after = dispatch_time(DISPATCH_TIME_NOW, Int64(numberOfSeconds * Double(NSEC_PER_SEC)))
         dispatch_after(after, Queue.Main.queue) {
             self.didExecute = true
