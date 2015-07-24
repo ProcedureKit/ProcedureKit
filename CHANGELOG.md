@@ -1,3 +1,6 @@
+# 0.6.0
+1. [[OPR-30](https://github.com/blindingskies/Slots/pull/30)]: Adds a `LoggingObserver` to log operation lifecycle events.
+
 # 0.5.0
 1. [[OPR-22](https://github.com/blindingskies/Slots/pull/22)]: Supports displaying a `UIAlertController` as a `AlertOperation`.
 2. [[OPR-26](https://github.com/blindingskies/Slots/pull/26)]: Adds a Block Condition. This allows an operation to only execute if a block evaluates true.
