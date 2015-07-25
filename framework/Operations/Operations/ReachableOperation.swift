@@ -39,19 +39,26 @@ public class ReachableOperation<O: NSOperation>: GroupOperation {
         token = reachability.addObserver { status in
             self.status = status
         }
-
-        checkStatusAgain(delay: 0.0)
     }
 
-    private func evaluate() {
+    public override func execute() {
+        begin()
+        super.execute()
+    }
+
+    private func begin() {
+        addOperation(checkStatusAgain(delay: 0.0))
+    }
+
+    private func evaluate() -> NSOperation {
         if checkStatus() {
             if let token = token {
                 reachability.removeObserverWithToken(token)
             }
-            addOperation(operation)
+            return operation
         }
         else {
-            checkStatusAgain()
+            return checkStatusAgain()
         }
     }
 
@@ -69,17 +76,20 @@ public class ReachableOperation<O: NSOperation>: GroupOperation {
         return false
     }
 
-    private func checkStatusAgain(delay: NSTimeInterval = 1.0) {
+    private func checkStatusAgain(delay: NSTimeInterval = 1.0) -> Operation {
 
-        let reevaluate = BlockOperation { [weak self] continuation in
-            self?.evaluate()
+        let reevaluate = BlockOperation { [weak self] (continuation: BlockOperation.ContinuationBlockType) in
+            let after = dispatch_time(DISPATCH_TIME_NOW, Int64(delay * Double(NSEC_PER_SEC)))
+            dispatch_after(after, Queue.Default.queue) {
+                if let weakSelf = self {
+                    weakSelf.addOperation(weakSelf.evaluate())
+                }
+                continuation()
+            }
         }
+        reevaluate.name = "Reevaluate Network Status"
 
-        if delay > 0.0 {
-            reevaluate.addDependency(DelayOperation(interval: delay))
-        }
-
-        addOperation(reevaluate)
+        return reevaluate
     }
 }
 
