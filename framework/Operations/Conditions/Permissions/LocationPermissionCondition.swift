@@ -15,6 +15,9 @@ internal protocol LocationManager: NSObjectProtocol {
     var authorizationStatus: CLAuthorizationStatus { get }
     
     weak var delegate: CLLocationManagerDelegate! { get set }
+
+    func requestWhenInUseAuthorization()
+    func requestAlwaysAuthorization()
 }
 
 extension CLLocationManager: LocationManager {
@@ -38,33 +41,6 @@ struct LocationCondition: OperationCondition {
     enum Error: ErrorType {
         case LocationServicesNotEnabled
         case AuthenticationStatusNotSufficient(CLAuthorizationStatus, Usage)
-    }
-
-    private class LocationPermissionOperation: Operation {
-        let usage: Usage
-        var manager: LocationManager
-
-        init(usage: Usage, manager: LocationManager = CLLocationManager()) {
-            self.usage = usage
-            self.manager = manager
-            super.init()
-            addCondition(AlertPresentation())
-        }
-
-        private override func execute() {
-            switch (manager.authorizationStatus, usage) {
-            case (.NotDetermined, _), (.AuthorizedWhenInUse, .Always):
-                dispatch_async(Queue.Main.queue, requestPermission)
-            default:
-                finish()
-            }
-        }
-
-        private func requestPermission() {
-            manager.delegate = self
-
-            
-        }
     }
 
     let name = "Location"
@@ -102,7 +78,45 @@ struct LocationCondition: OperationCondition {
     }
 }
 
-extension LocationCondition.LocationPermissionOperation: CLLocationManagerDelegate {
+class LocationPermissionOperation: Operation, CLLocationManagerDelegate {
+    let usage: LocationCondition.Usage
+    var manager: LocationManager
+
+    init(usage: LocationCondition.Usage, manager: LocationManager = CLLocationManager()) {
+        self.usage = usage
+        self.manager = manager
+        super.init()
+        addCondition(AlertPresentation())
+    }
+
+    override func execute() {
+        switch (manager.authorizationStatus, usage) {
+        case (.NotDetermined, _), (.AuthorizedWhenInUse, .Always):
+            dispatch_async(Queue.Main.queue, requestPermission)
+        default:
+            finish()
+        }
+    }
+
+    private func requestPermission() {
+        manager.delegate = self
+
+        let authorizationKey: String
+
+        switch usage {
+
+        case .WhenInUse:
+            authorizationKey = "NSLocationWhenInUseUsageDescription"
+            manager.requestWhenInUseAuthorization()
+
+        case .Always:
+            authorizationKey = "NSLocationAlwaysUsageDescription"
+            manager.requestWhenInUseAuthorization()
+        }
+
+        // This is helpful when developing the app.
+        assert(NSBundle.mainBundle().objectForInfoDictionaryKey(authorizationKey) != nil, "Requesting location permission requires the \(authorizationKey) key in your Info.plist")
+    }
 
     @objc func locationManager(manager: CLLocationManager, didChangeAuthorizationStatus status: CLAuthorizationStatus) {
         if executing && status != CLAuthorizationStatus.NotDetermined {
@@ -115,5 +129,8 @@ extension LocationCondition.LocationPermissionOperation: CLLocationManagerDelega
         }
     }
 }
+
+
+
 
 

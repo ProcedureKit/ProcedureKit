@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		6503CB791B626BF800691029 /* LoggingObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6503CB781B626BF800691029 /* LoggingObserver.swift */; };
 		650630331B629161005BD9F8 /* GatedOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 650630321B629161005BD9F8 /* GatedOperation.swift */; };
+		6514BE5A1B65993F0020A39D /* LocationPermissionCondition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6514BE591B65993F0020A39D /* LocationPermissionCondition.swift */; };
 		652122D21B5C2F4700E26052 /* ReachabilityConditionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652122D11B5C2F4700E26052 /* ReachabilityConditionTests.swift */; };
 		652122D71B5C407100E26052 /* MutuallyExclusive.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652122D61B5C407100E26052 /* MutuallyExclusive.swift */; };
 		652122D91B5C427F00E26052 /* MutualExclusiveTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652122D81B5C427F00E26052 /* MutualExclusiveTests.swift */; };
@@ -64,6 +65,7 @@
 /* Begin PBXFileReference section */
 		6503CB781B626BF800691029 /* LoggingObserver.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoggingObserver.swift; sourceTree = "<group>"; };
 		650630321B629161005BD9F8 /* GatedOperation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GatedOperation.swift; sourceTree = "<group>"; };
+		6514BE591B65993F0020A39D /* LocationPermissionCondition.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = LocationPermissionCondition.swift; path = Permissions/LocationPermissionCondition.swift; sourceTree = "<group>"; };
 		652122D11B5C2F4700E26052 /* ReachabilityConditionTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReachabilityConditionTests.swift; sourceTree = "<group>"; };
 		652122D61B5C407100E26052 /* MutuallyExclusive.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MutuallyExclusive.swift; sourceTree = "<group>"; };
 		652122D81B5C427F00E26052 /* MutualExclusiveTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MutualExclusiveTests.swift; sourceTree = "<group>"; };
@@ -131,6 +133,7 @@
 		656010081B5C557D0052EE78 /* Permissions */ = {
 			isa = PBXGroup;
 			children = (
+				6514BE591B65993F0020A39D /* LocationPermissionCondition.swift */,
 				6560100B1B5C64E20052EE78 /* CloudCondition.swift */,
 			);
 			name = Permissions;
@@ -370,6 +373,7 @@
 				653E5A001B64899F00AAAA98 /* NegatedCondition.swift in Sources */,
 				65D6F57D1B5B009D003D35AD /* DelayOperation.swift in Sources */,
 				65D6F5771B5ADEF6003D35AD /* BlockOperation.swift in Sources */,
+				6514BE5A1B65993F0020A39D /* LocationPermissionCondition.swift in Sources */,
 				65D6F5891B5BEAC9003D35AD /* NetworkObserver.swift in Sources */,
 				65CB76FF1B3F284A00791E18 /* OperationQueue.swift in Sources */,
 				65D6F5851B5BE620003D35AD /* BackgroundObserver.swift in Sources */,
