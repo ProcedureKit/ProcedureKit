@@ -1,5 +1,9 @@
 # 0.6.0
-1. [[OPR-30](https://github.com/blindingskies/Slots/pull/30)]: Adds a `LoggingObserver` to log operation lifecycle events.
+1. [[OPR-5](https://github.com/blindingskies/Slots/pull/5)]: Supports silent conditions. This means that if a condition would normally produce an operation (say, to request access to a resource) as a dependency, composing it inside a `SilentCondition` will suppress that dependent operation.
+2. [[OPR-6](https://github.com/blindingskies/Slots/pull/r)]: Supports negating condition.
+3. [[OPR-30](https://github.com/blindingskies/Slots/pull/30)]: Adds a `LoggingObserver` to log operation lifecycle events.
+4. [[OPR-33](https://github.com/blindingskies/Slots/pull/33)]: Adds `GatedOperation` which will only execute the composed operation if the supplied block evaluates true - i.e. opens the gate.
+5. [[OPR-34](https://github.com/blindingskies/Slots/pull/34)] & [[OPR-35](https://github.com/blindingskies/Slots/pull/35)]: Adds a `ReachableOperation`. Composing an operation inside a `ReachableOperation` will ensure that it runs after the device regains network reachability. If the network is reachable, the operation will execute immediately, if not, it will register a Reachability observer to execute the operation when the network is available. Unlike the `ReachabilityCondition` which will fail if a host is not available, use `ReachableOperation` to perform network related tasks which must be executed regardless.
 
 # 0.5.0
 1. [[OPR-22](https://github.com/blindingskies/Slots/pull/22)]: Supports displaying a `UIAlertController` as a `AlertOperation`.
