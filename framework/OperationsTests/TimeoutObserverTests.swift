@@ -15,8 +15,8 @@ class TimeoutObserverTests: OperationTests {
         let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
 
         let operation = TestOperation(delay: 3)
-        operation.addCompletionBlockToTestOperation(operation, withExpectation: expectation)
         operation.addObserver(TimeoutObserver(timeout: 1.0))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectation)
 
         delegate = TestQueueDelegate { (_, errors) in
             XCTAssertEqual(errors.count, 1)

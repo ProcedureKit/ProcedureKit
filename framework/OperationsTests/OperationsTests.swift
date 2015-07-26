@@ -14,27 +14,29 @@ class TestOperation: Operation {
     
     let numberOfSeconds: Double
     let simulatedError: ErrorType?
+    let producedOperation: NSOperation?
     var didExecute: Bool = false
     
-    init(delay: Int = 1, error: ErrorType? = .None) {
+    init(delay: Int = 1, error: ErrorType? = .None, produced: NSOperation? = .None) {
         numberOfSeconds = Double(delay)
         simulatedError = error
+        producedOperation = produced
+        super.init()
     }
 
     override func execute() {
+
+        if let producedOperation = self.producedOperation {
+            let after = dispatch_time(DISPATCH_TIME_NOW, Int64(numberOfSeconds * Double(0.5) * Double(NSEC_PER_SEC)))
+            dispatch_after(after, Queue.Main.queue) {
+                self.produceOperation(producedOperation)
+            }
+        }
+
         let after = dispatch_time(DISPATCH_TIME_NOW, Int64(numberOfSeconds * Double(NSEC_PER_SEC)))
         dispatch_after(after, Queue.Main.queue) {
             self.didExecute = true
             self.finish(self.simulatedError)
-        }
-    }
-
-    func addCompletionBlockToTestOperation(operation: TestOperation, withExpectation expectation: XCTestExpectation) {
-        operation.completionBlock = { [weak operation] in
-            if let weakOperation = operation {
-                XCTAssertTrue(weakOperation.didExecute)
-                expectation.fulfill()
-            }
         }
     }
 }
@@ -86,6 +88,14 @@ class OperationTests: XCTestCase {
         queue.delegate = delegate
         queue.addOperation(operation)
     }
+
+    func addCompletionBlockToTestOperation(operation: Operation, withExpectation expectation: XCTestExpectation) {
+        operation.completionBlock = { [weak operation] in
+            if let weakOperation = operation {
+                expectation.fulfill()
+            }
+        }
+    }
 }
 
 class BasicTests: OperationTests {
@@ -94,11 +104,11 @@ class BasicTests: OperationTests {
         let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
 
         let operation = TestOperation(delay: 1)
-        operation.addCompletionBlockToTestOperation(operation, withExpectation: expectation)
+        addCompletionBlockToTestOperation(operation, withExpectation: expectation)
 
         runOperation(operation)
         waitForExpectationsWithTimeout(3, handler: nil)
-
+        XCTAssertTrue(operation.didExecute)
         XCTAssertTrue(delegate.did_willAddOperation)
         XCTAssertTrue(delegate.did_operationDidFinish)
     }
@@ -108,10 +118,11 @@ class BasicTests: OperationTests {
         let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
 
         let operation = TestOperation(delay: 1)
-        operation.addCompletionBlockToTestOperation(operation, withExpectation: expectation)
+        addCompletionBlockToTestOperation(operation, withExpectation: expectation)
 
         queue.addOperation(operation)
         waitForExpectationsWithTimeout(3, handler: nil)
+        XCTAssertTrue(operation.didExecute)        
     }
 }
 

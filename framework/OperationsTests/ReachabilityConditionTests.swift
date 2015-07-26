@@ -28,12 +28,11 @@ class ReachabilityConditionTests: OperationTests {
 
     func test__condition_is_satisfied_when_host_is_reachable_via_wifi() {
 
-        let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
         let operation = TestOperation(delay: 1)
-        operation.addCompletionBlockToTestOperation(operation, withExpectation: expectation)
-        let condition = ReachabilityCondition(url: url, reachability: TestableReachability(networkStatus: .ReachableViaWiFi))
+        let condition = ReachabilityCondition(url: url, reachability: TestableReachability(networkStatus: .Reachable(.ViaWiFi)))
         operation.addCondition(condition)
 
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
         runOperation(operation)
 
         waitForExpectationsWithTimeout(3) { error in
@@ -44,12 +43,11 @@ class ReachabilityConditionTests: OperationTests {
 
     func test__condition_is_satisfied_when_host_is_reachable_via_wwan() {
 
-        let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
         let operation = TestOperation(delay: 1)
-        operation.addCompletionBlockToTestOperation(operation, withExpectation: expectation)
-        let condition = ReachabilityCondition(url: url, connectivity: .ConnectedViaWWAN, reachability: TestableReachability(networkStatus: .ReachableViaWWAN))
+        let condition = ReachabilityCondition(url: url, connectivity: .ViaWWAN, reachability: TestableReachability(networkStatus: .Reachable(.ViaWWAN)))
         operation.addCondition(condition)
 
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
         runOperation(operation)
 
         waitForExpectationsWithTimeout(3) { error in
@@ -63,7 +61,7 @@ class ReachabilityConditionTests: OperationTests {
         let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
         let operation = TestOperation(delay: 1)
 
-        let condition = ReachabilityCondition(url: url, connectivity: .ConnectedViaWiFi, reachability: TestableReachability(networkStatus: .ReachableViaWWAN))
+        let condition = ReachabilityCondition(url: url, connectivity: .ViaWiFi, reachability: TestableReachability(networkStatus: .Reachable(.ViaWWAN)))
         operation.addCondition(condition)
 
         var observedErrors = Array<ErrorType>()
@@ -79,7 +77,7 @@ class ReachabilityConditionTests: OperationTests {
         waitForExpectationsWithTimeout(3) { _ in
             XCTAssertFalse(operation.didExecute)            
             if let error = observedErrors[0] as? ReachabilityCondition.Error {
-                XCTAssertTrue(error == ReachabilityCondition.Error.NotReachableWithConnectivity(.ConnectedViaWiFi))
+                XCTAssertTrue(error == ReachabilityCondition.Error.NotReachableWithConnectivity(.ViaWiFi))
             }
             else {
                 XCTFail("No error message was observer")
@@ -92,7 +90,7 @@ class ReachabilityConditionTests: OperationTests {
         let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
         let operation = TestOperation(delay: 1)
 
-        let condition = ReachabilityCondition(url: url, reachability: TestableReachability(networkStatus: .NotConnected))
+        let condition = ReachabilityCondition(url: url, reachability: TestableReachability(networkStatus: .NotReachable))
         operation.addCondition(condition)
 
         var observedErrors = Array<ErrorType>()

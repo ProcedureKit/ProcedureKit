@@ -13,11 +13,10 @@ class BlockConditionTests: OperationTests {
 
     func test__operation_with_successful_block_condition_finishes() {
 
-        let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
         let operation = TestOperation()
         operation.addCondition(BlockCondition { true })
 
-        operation.addCompletionBlockToTestOperation(operation, withExpectation: expectation)
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
         runOperation(operation)
 
         waitForExpectationsWithTimeout(3, handler: nil)

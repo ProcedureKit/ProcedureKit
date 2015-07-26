@@ -45,11 +45,10 @@ class NetworkObserverTests: OperationTests {
 
     func test__network_indicator_shows_when_operation_starts() {
 
-        let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
         let operation = TestOperation(delay: 1)
-        operation.addCompletionBlockToTestOperation(operation, withExpectation: expectation)
         operation.addObserver(NetworkObserver(indicator: indicator))
 
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
         runOperation(operation)
 
         waitForExpectationsWithTimeout(3) { error in
