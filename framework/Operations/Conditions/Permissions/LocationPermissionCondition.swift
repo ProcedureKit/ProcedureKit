@@ -11,13 +11,22 @@ import CoreLocation
 
 internal protocol LocationManager: NSObjectProtocol {
 
-    static func locationServicesEnabled() -> Bool
-    static func authorizationStatus() -> CLAuthorizationStatus
-
-    weak var delegate: CLLocationManagerDelegate? { get set }
+    var serviceEnabled: Bool { get }
+    var authorizationStatus: CLAuthorizationStatus { get }
+    
+    weak var delegate: CLLocationManagerDelegate! { get set }
 }
 
-extension CLLocationManager: LocationManager { }
+extension CLLocationManager: LocationManager {
+    
+    var serviceEnabled: Bool {
+        return CLLocationManager.locationServicesEnabled()
+    }
+    
+    var authorizationStatus: CLAuthorizationStatus {
+        return CLLocationManager.authorizationStatus()
+    }
+}
 
 /**
     A condition for verifying access to the user's location.
@@ -35,7 +44,7 @@ struct LocationCondition: OperationCondition {
         let usage: Usage
         var manager: LocationManager
 
-        init(usage: Usage, manager: LocationManager) {
+        init(usage: Usage, manager: LocationManager = CLLocationManager()) {
             self.usage = usage
             self.manager = manager
             super.init()
@@ -43,8 +52,7 @@ struct LocationCondition: OperationCondition {
         }
 
         private override func execute() {
-            let actual = manager.dynamicType.authorizationStatus()
-            switch (actual, usage) {
+            switch (manager.authorizationStatus, usage) {
             case (.NotDetermined, _), (.AuthorizedWhenInUse, .Always):
                 dispatch_async(Queue.Main.queue, requestPermission)
             default:
@@ -59,8 +67,8 @@ struct LocationCondition: OperationCondition {
         }
     }
 
-    static let name = "Location"
-    static let isMutuallyExclusive = false
+    let name = "Location"
+    let isMutuallyExclusive = false
 
     let usage: Usage
     let manager: LocationManager
@@ -75,8 +83,8 @@ struct LocationCondition: OperationCondition {
     }
 
     func evaluateForOperation(operation: Operation, completion: OperationConditionResult -> Void) {
-        let enabled = manager.dynamicType.locationServicesEnabled()
-        let actual = manager.dynamicType.authorizationStatus()
+        let enabled = manager.serviceEnabled
+        let actual = manager.authorizationStatus
 
         switch (enabled, usage, actual) {
 
