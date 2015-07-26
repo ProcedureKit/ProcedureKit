@@ -1,5 +1,5 @@
 //
-//  LocationPermissionCondition.swift
+//  LocationCondition.swift
 //  Operations
 //
 //  Created by Daniel Thorpe on 19/07/2015.
@@ -9,8 +9,9 @@
 import Foundation
 import CoreLocation
 
-internal protocol LocationManager: NSObjectProtocol {
-
+public protocol LocationManager: NSObjectProtocol {
+    // In Swift 2.0, these can be static properties 
+    // as in `CLLocationManager`.
     var serviceEnabled: Bool { get }
     var authorizationStatus: CLAuthorizationStatus { get }
     
@@ -21,12 +22,12 @@ internal protocol LocationManager: NSObjectProtocol {
 }
 
 extension CLLocationManager: LocationManager {
-    
-    var serviceEnabled: Bool {
+
+    public var serviceEnabled: Bool {
         return CLLocationManager.locationServicesEnabled()
     }
     
-    var authorizationStatus: CLAuthorizationStatus {
+    public var authorizationStatus: CLAuthorizationStatus {
         return CLLocationManager.authorizationStatus()
     }
 }
@@ -34,31 +35,31 @@ extension CLLocationManager: LocationManager {
 /**
     A condition for verifying access to the user's location.
 */
-struct LocationCondition: OperationCondition {
+public struct LocationCondition: OperationCondition {
 
-    enum Usage: Int { case WhenInUse = 1, Always }
+    public enum Usage: Int { case WhenInUse = 1, Always }
 
     enum Error: ErrorType {
         case LocationServicesNotEnabled
         case AuthenticationStatusNotSufficient(CLAuthorizationStatus, Usage)
     }
 
-    let name = "Location"
-    let isMutuallyExclusive = false
+    public let name = "Location"
+    public let isMutuallyExclusive = false
 
     let usage: Usage
     let manager: LocationManager
 
-    init(usage: Usage, manager: LocationManager = CLLocationManager()) {
+    public init(usage: Usage = .WhenInUse, manager: LocationManager = CLLocationManager()) {
         self.usage = usage
         self.manager = manager
     }
 
-    func dependencyForOperation(operation: Operation) -> NSOperation? {
+    public func dependencyForOperation(operation: Operation) -> NSOperation? {
         return LocationPermissionOperation(usage: usage, manager: manager)
     }
 
-    func evaluateForOperation(operation: Operation, completion: OperationConditionResult -> Void) {
+    public func evaluateForOperation(operation: Operation, completion: OperationConditionResult -> Void) {
         let enabled = manager.serviceEnabled
         let actual = manager.authorizationStatus
 
@@ -111,11 +112,8 @@ class LocationPermissionOperation: Operation, CLLocationManagerDelegate {
 
         case .Always:
             authorizationKey = "NSLocationAlwaysUsageDescription"
-            manager.requestWhenInUseAuthorization()
+            manager.requestAlwaysAuthorization()
         }
-
-        // This is helpful when developing the app.
-        assert(NSBundle.mainBundle().objectForInfoDictionaryKey(authorizationKey) != nil, "Requesting location permission requires the \(authorizationKey) key in your Info.plist")
     }
 
     @objc func locationManager(manager: CLLocationManager, didChangeAuthorizationStatus status: CLAuthorizationStatus) {
