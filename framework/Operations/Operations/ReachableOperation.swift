@@ -42,12 +42,8 @@ public class ReachableOperation<O: NSOperation>: GroupOperation {
     }
 
     public override func execute() {
-        begin()
+        addOperation(evaluate())
         super.execute()
-    }
-
-    private func begin() {
-        addOperation(checkStatusAgain(delay: 0.0))
     }
 
     private func evaluate() -> NSOperation {
