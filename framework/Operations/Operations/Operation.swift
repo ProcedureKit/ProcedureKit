@@ -30,9 +30,8 @@ public class Operation: NSOperation {
         // Execution has completed, but not yet notified queue
         case Finishing
 
+        // The operation has finished.
         case Finished
-
-        case Cancelled
     }
 
     // use the KVO mechanism to indicate that changes to "state" affect other properties as well
@@ -63,7 +62,7 @@ public class Operation: NSOperation {
             willChangeValueForKey("state")
 
             switch (_state, newState) {
-            case (.Cancelled, _), (.Finished, _):
+            case (.Finished, _):
                 break
             default:
                 assert(_state != newState, "Attempting to perform illegal cyclic state transition.")
@@ -75,14 +74,24 @@ public class Operation: NSOperation {
     }
 
     public override var ready: Bool {
-        switch state {
-        case .Pending:
+        switch (cancelled, state) {
+
+        case (true, _):
+            // If the operation is cancelled, isReady should return true
+            return true
+
+        case (false, .Pending):
+
             if super.ready {
                 evaluateConditions()
             }
+
+            // Until conditions have been evaluated, we're not ready
             return false
-        case .Ready:
+
+        case (false, .Ready):
             return super.ready
+
         default:
             return false
         }
@@ -95,11 +104,7 @@ public class Operation: NSOperation {
     public override var finished: Bool {
         return state == .Finished
     }
-    
-    public override var cancelled: Bool {
-        return state == .Cancelled
-    }
-    
+
     /**
     Indicates that the Operation can now begin to evaluate readiness conditions,
     if appropriate.
@@ -111,14 +116,18 @@ public class Operation: NSOperation {
     private func evaluateConditions() {
         assert(state == .Pending, "\(__FUNCTION__) was called out of order.")
         state = .EvaluatingConditions
-        OperationConditionEvaluator.evaluate(conditions, operation: self) { errors in
-            if errors.isEmpty {
-                self.state = .Ready
+        if conditions.count > 0 {
+            OperationConditionEvaluator.evaluate(conditions, operation: self) { errors in
+                if errors.isEmpty {
+                    self.state = .Ready
+                }
+                else {
+                    self.finish(errors: errors)
+                }
             }
-            else {
-                self.state = .Cancelled
-                self.finish(errors: errors)
-            }
+        }
+        else {
+            state = .Ready
         }
     }
 
@@ -170,17 +179,13 @@ public class Operation: NSOperation {
     }
     
     private var _internalErrors = [ErrorType]()
-    
-    public override func cancel() {
-        cancelWithError()
-    }
-    
+
     public func cancelWithError(error: ErrorType? = .None) {
         if let error = error {
             _internalErrors.append(error)
         }
         
-        state = .Cancelled
+        cancel()
     }
     
     public final func produceOperation(operation: NSOperation) {

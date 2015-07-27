@@ -1,7 +1,7 @@
 Pod::Spec.new do |s|
   s.name              = "Operations"
-  s.version           = "0.6.0"
-  s.summary           = "Powerful NSOperation subclasses"
+  s.version           = "0.7.0"
+  s.summary           = "Powerful NSOperation subclasses in Swift."
   s.description       = <<-DESC
   
 A Swift 1.2 framework inspired by Apple's WWDC 2015
