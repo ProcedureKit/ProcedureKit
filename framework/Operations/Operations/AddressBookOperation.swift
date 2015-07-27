@@ -46,6 +46,9 @@ public class AddressBookOperation: GroupOperation {
     private let manager: AddressBookAuthenticationManager
     private let handler: AddressBookHandler
 
+    private var access: AccessAddressBook
+    private var block: BlockOperation
+
     public convenience init(suppressPermissionRequest: Bool = false, handler: AddressBookHandler) {
         self.init(manager: SystemAddressBookAuthenticationManager(), silent: suppressPermissionRequest, handler: handler)
     }
@@ -55,16 +58,28 @@ public class AddressBookOperation: GroupOperation {
         self.silent = silent
         self.handler = handler
 
-        let access = AccessAddressBook(manager: manager)
-        access.addCondition(silent ? SilentCondition(AddressBookCondition()) : AddressBookCondition())
+        access = AccessAddressBook(manager: manager)
+        let condition = AddressBookCondition(manager: manager)
+        access.addCondition(silent ? SilentCondition(condition) : condition)
 
-        let block = BlockOperation { [access = access] (continuation) in
+        block = BlockOperation { [access = access] (continuation) in
             handler(addressBook: access.addressBook, continuation: continuation)
         }
 
         block.addDependency(access)
         super.init(operations: [block, access])
     }
+
+    public override func operationDidFinish(operation: NSOperation, withErrors errors: [ErrorType]) {
+        if errors.count > 0 {
+            if operation == access {
+                // Doesn't really matter what the error is, 
+                // we should finish with the error
+                finish(errors.first)
+            }
+        }
+    }
+
 }
 
 
