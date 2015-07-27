@@ -39,47 +39,16 @@ struct SystemAddressBookAuthenticationManager: AddressBookAuthenticationManager 
     }
 }
 
-public class AddressBookOperation: GroupOperation {
-    public typealias AddressBookHandler = (addressBook: ABAddressBookRef, continuation: BlockOperation.ContinuationBlockType) -> Void
-
-    private var silent = true
-    private let manager: AddressBookAuthenticationManager
-    private let handler: AddressBookHandler
-
-    private var access: AccessAddressBook
-    private var block: BlockOperation
+public class AddressBookOperation: AccessAddressBook {
 
     public convenience init(suppressPermissionRequest: Bool = false, handler: AddressBookHandler) {
         self.init(manager: SystemAddressBookAuthenticationManager(), silent: suppressPermissionRequest, handler: handler)
     }
 
-    public init(manager: AddressBookAuthenticationManager, silent: Bool, handler: AddressBookHandler) {
-        self.manager = manager
-        self.silent = silent
-        self.handler = handler
-
-        access = AccessAddressBook(manager: manager)
+    public init(manager: AddressBookAuthenticationManager, silent: Bool = false, handler: AddressBookHandler) {
+        super.init(manager: manager, handler: handler)
         let condition = AddressBookCondition(manager: manager)
-        access.addCondition(silent ? SilentCondition(condition) : condition)
-
-        block = BlockOperation { [access = access] (continuation) in
-            handler(addressBook: access.addressBook, continuation: continuation)
-        }
-
-        block.addDependency(access)
-        super.init(operations: [block, access])
+        addCondition(silent ? SilentCondition(condition) : condition)
     }
-
-    public override func operationDidFinish(operation: NSOperation, withErrors errors: [ErrorType]) {
-        if errors.count > 0 {
-            if operation == access {
-                // Doesn't really matter what the error is, 
-                // we should finish with the error
-                finish(errors.first)
-            }
-        }
-    }
-
 }
-
 

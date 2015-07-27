@@ -40,6 +40,12 @@ class TestableAddressBookManager: AddressBookAuthenticationManager {
 
     func requestAccessToAddressBook(addressBook: ABAddressBookRef, completion: ABAddressBookRequestAccessCompletionHandler) {
         didRequestAccess = true
+        if requestShouldSucceed {
+            status = .Authorized
+        }
+        else {
+            status = .Denied
+        }
         completion(requestShouldSucceed, error)
     }
 }
@@ -53,16 +59,16 @@ class AddressBookOperationTests: OperationTests {
         manager.addressBook = posedAddressBook as CFTypeRef
 
         var didReceiveAddressBook = false
-        let operation = AddressBookOperation(manager: manager, silent: false) { (addressBook, continuation) in
+        let operation = AddressBookOperation(manager: manager, silent: false) { (addressBook, continueWithError) in
             if let addressBook = addressBook as? String {
                 didReceiveAddressBook = addressBook == posedAddressBook
             }
-            continuation()
+            continueWithError(error: nil)
         }
 
         addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
         runOperation(operation)
-        waitForExpectationsWithTimeout(5, handler: nil)
+        waitForExpectationsWithTimeout(3, handler: nil)
 
         XCTAssertTrue(didReceiveAddressBook)
     }
@@ -74,16 +80,16 @@ class AddressBookOperationTests: OperationTests {
         manager.addressBook = posedAddressBook as CFTypeRef
 
         var didReceiveAddressBook = false
-        let operation = AddressBookOperation(manager: manager, silent: false) { (addressBook, continuation) in
+        let operation = AddressBookOperation(manager: manager, silent: false) { (addressBook, continueWithError) in
             if let addressBook = addressBook as? String {
                 didReceiveAddressBook = addressBook == posedAddressBook
             }
-            continuation()
+            continueWithError(error: nil)
         }
 
         addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
         runOperation(operation)
-        waitForExpectationsWithTimeout(5, handler: nil)
+        waitForExpectationsWithTimeout(3, handler: nil)
 
         XCTAssertTrue(manager.didRequestAccess)
         XCTAssertTrue(didReceiveAddressBook)
@@ -96,9 +102,9 @@ class AddressBookOperationTests: OperationTests {
         manager.requestShouldSucceed = false
         
         var didExecuteHandler = false
-        let operation = AddressBookOperation(manager: manager, silent: true) { (addressBook, continuation) in
+        let operation = AddressBookOperation(manager: manager, silent: true) { (addressBook, continueWithError) in
             didExecuteHandler = true
-            continuation()
+            continueWithError(error: nil)
         }
 
         operation.addObserver(LoggingObserver())
@@ -110,7 +116,7 @@ class AddressBookOperationTests: OperationTests {
         })
 
         runOperation(operation)
-        waitForExpectationsWithTimeout(5, handler: nil)
+        waitForExpectationsWithTimeout(3, handler: nil)
 
         XCTAssertFalse(manager.didRequestAccess)
         XCTAssertFalse(didExecuteHandler)

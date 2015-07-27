@@ -74,17 +74,17 @@ public class ReachableOperation<O: NSOperation>: GroupOperation {
 
     private func checkStatusAgain(delay: NSTimeInterval = 1.0) -> Operation {
 
-        let reevaluate = BlockOperation { [weak self] (continuation: BlockOperation.ContinuationBlockType) in
+        let reevaluate = BlockOperation { [weak self] (continueWithError: BlockOperation.ContinuationBlockType) in
             let after = dispatch_time(DISPATCH_TIME_NOW, Int64(delay * Double(NSEC_PER_SEC)))
             dispatch_after(after, Queue.Default.queue) {
                 if let weakSelf = self {
                     weakSelf.addOperation(weakSelf.evaluate())
                 }
-                continuation()
+                continueWithError(error: nil)
             }
         }
-        reevaluate.name = "Reevaluate Network Status"
 
+        reevaluate.name = "Reevaluate Network Status"
         return reevaluate
     }
 }

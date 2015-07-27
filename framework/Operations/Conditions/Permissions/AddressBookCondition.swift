@@ -32,7 +32,9 @@ public struct AddressBookCondition: OperationCondition {
     public func dependencyForOperation(operation: Operation) -> NSOperation? {
         switch manager.status {
         case .NotDetermined:
-            return AccessAddressBook(manager: manager)
+            return AccessAddressBook(manager: manager) { (_, continueWithError) in
+                continueWithError(error: nil)
+            }
         default:
             return .None
         }
@@ -54,38 +56,34 @@ public struct AddressBookCondition: OperationCondition {
     }
 }
 
-class AccessAddressBook: Operation {
+public class AccessAddressBook: BlockOperation {
+
+    public typealias AddressBookHandler = (addressBook: ABAddressBookRef, continueWithError: BlockOperation.ContinuationBlockType) -> Void
 
     enum Error: ErrorType {
         case FailedToCreateAddressBook
         case FailedToAuthorize
     }
 
-    private let manager: AddressBookAuthenticationManager
-    private(set) var addressBook: ABAddressBookRef!
+    init(manager: AddressBookAuthenticationManager, handler: AddressBookHandler) {
+        super.init(block: { (continueWithError: ContinuationBlockType) in
 
-    init(manager: AddressBookAuthenticationManager) {
-        self.manager = manager
-        super.init()
-        addCondition(AlertPresentation())
-    }
-
-    override func execute() {
-        let (addressBook: ABAddressBookRef!, error) = manager.createAddressBook()
-        if let addressBook: ABAddressBookRef = addressBook {
-            manager.requestAccessToAddressBook(addressBook) { (success, error) in
-                if success {
-                    self.addressBook = addressBook
-                    self.finish()
-                }
-                else {
-                    self.finish(Error.FailedToAuthorize)
+            let (addressBook: ABAddressBookRef!, error) = manager.createAddressBook()
+            if let addressBook: ABAddressBookRef = addressBook {
+                manager.requestAccessToAddressBook(addressBook) { (success, error) in
+                    if success {
+                        handler(addressBook: addressBook, continueWithError: continueWithError)
+                    }
+                    else {
+                        continueWithError(error: Error.FailedToAuthorize)
+                    }
                 }
             }
-        }
-        else {
-            self.finish(Error.FailedToCreateAddressBook)
-        }
+            else {
+                continueWithError(error: Error.FailedToCreateAddressBook)
+            }
+        })
+        addCondition(AlertPresentation())
     }
 }
 
