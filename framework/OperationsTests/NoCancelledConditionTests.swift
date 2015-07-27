@@ -78,10 +78,16 @@ class NoCancelledConditionTests: OperationTests {
         operation.addCondition(NoCancelledCondition())
         operation.addObserver(LoggingObserver())
 
+        var receivedErrors = [ErrorType]()
+        operation.addObserver(BlockObserver { (_ , errors) in
+            receivedErrors = errors
+        })
+
         runOperations(operation, dependency1, dependency2)
         waitForExpectationsWithTimeout(3, handler: nil)
 
         XCTAssertFalse(operation.didExecute)
+        XCTAssertEqual(receivedErrors.count, 1)
     }
 
 
