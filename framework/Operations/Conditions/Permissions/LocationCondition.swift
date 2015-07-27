@@ -14,11 +14,15 @@ public protocol LocationManager: NSObjectProtocol {
     // as in `CLLocationManager`.
     var serviceEnabled: Bool { get }
     var authorizationStatus: CLAuthorizationStatus { get }
-    
-    weak var delegate: CLLocationManagerDelegate! { get set }
 
-    func requestWhenInUseAuthorization()
-    func requestAlwaysAuthorization()
+    func opr_requestWhenInUseAuthorization()
+    func opr_requestAlwaysAuthorization()
+
+    func opr_startUpdatingLocation()
+    func opr_stopLocationUpdates()
+
+    func opr_setDesiredAccuracy(desiredAccuracy: CLLocationAccuracy)
+    func opr_setDelegate(aDelegate: CLLocationManagerDelegate)
 }
 
 extension CLLocationManager: LocationManager {
@@ -29,6 +33,30 @@ extension CLLocationManager: LocationManager {
     
     public var authorizationStatus: CLAuthorizationStatus {
         return CLLocationManager.authorizationStatus()
+    }
+
+    public func opr_requestWhenInUseAuthorization() {
+        requestWhenInUseAuthorization()
+    }
+
+    public func opr_requestAlwaysAuthorization() {
+        requestAlwaysAuthorization()
+    }
+
+    public func opr_setDesiredAccuracy(accuracy: CLLocationAccuracy) {
+        desiredAccuracy = accuracy
+    }
+
+    public func opr_setDelegate(aDelegate: CLLocationManagerDelegate) {
+        delegate = aDelegate
+    }
+
+    public func opr_startUpdatingLocation() {
+        startUpdatingLocation()
+    }
+
+    public func opr_stopLocationUpdates() {
+        stopUpdatingLocation()
     }
 }
 
@@ -50,9 +78,9 @@ public struct LocationCondition: OperationCondition {
     let usage: Usage
     let manager: LocationManager
 
-    public init(usage: Usage = .WhenInUse, manager: LocationManager = CLLocationManager()) {
+    public init(usage: Usage = .WhenInUse, manager: LocationManager?) {
         self.usage = usage
-        self.manager = manager
+        self.manager = manager ?? CLLocationManager()
     }
 
     public func dependencyForOperation(operation: Operation) -> NSOperation? {
@@ -100,7 +128,7 @@ class LocationPermissionOperation: Operation, CLLocationManagerDelegate {
     }
 
     private func requestPermission() {
-        manager.delegate = self
+        manager.opr_setDelegate(self)
 
         let authorizationKey: String
 
@@ -108,11 +136,11 @@ class LocationPermissionOperation: Operation, CLLocationManagerDelegate {
 
         case .WhenInUse:
             authorizationKey = "NSLocationWhenInUseUsageDescription"
-            manager.requestWhenInUseAuthorization()
+            manager.opr_requestWhenInUseAuthorization()
 
         case .Always:
             authorizationKey = "NSLocationAlwaysUsageDescription"
-            manager.requestAlwaysAuthorization()
+            manager.opr_requestAlwaysAuthorization()
         }
     }
 
@@ -121,6 +149,7 @@ class LocationPermissionOperation: Operation, CLLocationManagerDelegate {
             if self.manager.isKindOfClass(CLLocationManager) && (self.manager as! CLLocationManager) == manager {
                 finish()
             }
+                // This is just for test support
             else if !self.manager.isKindOfClass(CLLocationManager) {
                 finish()
             }

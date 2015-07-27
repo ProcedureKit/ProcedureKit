@@ -16,8 +16,15 @@ class TestableLocationManager: NSObject, LocationManager {
     var serviceEnabled: Bool
     var authorizationStatus: CLAuthorizationStatus
     var returnedStatus = CLAuthorizationStatus.AuthorizedAlways
+    var returnedLocation: CLLocation!
+
+    var didSetDelegate = false
+    var didSetDesiredAccuracy: CLLocationAccuracy? = .None
+
     var didRequestWhenInUseAuthorization = false
     var didRequestAlwaysAuthorization = false
+    var didStartUpdatingLocation = false
+    var didStopLocationUpdates = false
 
     weak var delegate: CLLocationManagerDelegate!
 
@@ -26,15 +33,34 @@ class TestableLocationManager: NSObject, LocationManager {
         authorizationStatus = status
     }
 
-    func requestWhenInUseAuthorization() {
+    func opr_setDesiredAccuracy(accuracy: CLLocationAccuracy) {
+        didSetDesiredAccuracy = accuracy
+    }
+
+    func opr_setDelegate(aDelegate: CLLocationManagerDelegate) {
+        didSetDelegate = true
+        delegate = aDelegate
+    }
+
+    func opr_requestWhenInUseAuthorization() {
         didRequestWhenInUseAuthorization = true
         changeStatus()
     }
 
-    func requestAlwaysAuthorization() {
+    func opr_requestAlwaysAuthorization() {
         didRequestAlwaysAuthorization = true
         changeStatus()
     }
+
+    func opr_startUpdatingLocation() {
+        didStartUpdatingLocation = true
+        delegate.locationManager!(fakeLocationManager, didUpdateLocations: [returnedLocation])
+    }
+
+    func opr_stopLocationUpdates() {
+        didStopLocationUpdates = true
+    }
+
 
     private func changeStatus() {
         authorizationStatus = returnedStatus
@@ -45,15 +71,6 @@ class TestableLocationManager: NSObject, LocationManager {
             serviceEnabled = false
         }
         delegate.locationManager!(fakeLocationManager, didChangeAuthorizationStatus: returnedStatus)
-    }
-}
-
-class TestableLocationManagerDelegate: NSObject, CLLocationManagerDelegate {
-
-    var didReceiveChangedStatus = CLAuthorizationStatus.NotDetermined
-
-    func locationManager(manager: CLLocationManager, didChangeAuthorizationStatus status: CLAuthorizationStatus) {
-        didReceiveChangedStatus = status
     }
 }
 
@@ -108,9 +125,7 @@ class LocationConditionTests: OperationTests {
 
     func test__service_disabled__then__always_permissions_requested() {
 
-        let locationManagerDelegate = TestableLocationManagerDelegate()
         let locationManager = TestableLocationManager(enabled: false, status: .NotDetermined)
-        locationManager.delegate = locationManagerDelegate
 
         let operation = TestOperation()
         operation.addCondition(LocationCondition(usage: .Always, manager: locationManager))
@@ -125,11 +140,8 @@ class LocationConditionTests: OperationTests {
     }
 
     func test__service_disabled_when_is_use_required_then__when_in_use_permissions_requested() {
-
-        let locationManagerDelegate = TestableLocationManagerDelegate()
         let locationManager = TestableLocationManager(enabled: false, status: .NotDetermined)
         locationManager.returnedStatus = .AuthorizedWhenInUse
-        locationManager.delegate = locationManagerDelegate
 
         let operation = TestOperation()
         operation.addCondition(LocationCondition(usage: .WhenInUse, manager: locationManager))
