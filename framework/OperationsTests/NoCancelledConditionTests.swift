@@ -11,9 +11,8 @@ import Operations
 
 class NoCancelledConditionTests: OperationTests {
 
-    func createCancellingOperation(shouldCancel: Bool) -> TestOperation {
+    func createCancellingOperation(shouldCancel: Bool, expectation: XCTestExpectation) -> TestOperation {
 
-        let expectation = expectationWithDescription("Dependency for Test: \(__FUNCTION__)")
         let operation = TestOperation()
         operation.name = shouldCancel ? "Cancelled Dependency" : "Successful Dependency"
         operation.addObserver(LoggingObserver())
@@ -45,7 +44,7 @@ class NoCancelledConditionTests: OperationTests {
 
         let operation = TestOperation()
         addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
-        let dependency = createCancellingOperation(false)
+        let dependency = createCancellingOperation(false, expectation: expectationWithDescription("Dependency for Test: \(__FUNCTION__)"))
         operation.addDependency(dependency)
         operation.addCondition(NoCancelledCondition())
 
@@ -58,7 +57,7 @@ class NoCancelledConditionTests: OperationTests {
     func test__operation_with_single_cancelled_dependency_doesnt_execute() {
 
         let operation = TestOperation()
-        let dependency = createCancellingOperation(true)
+        let dependency = createCancellingOperation(true, expectation: expectationWithDescription("Dependency for Test: \(__FUNCTION__)"))
         operation.addDependency(dependency)
         operation.addCondition(NoCancelledCondition())
         operation.addObserver(LoggingObserver())
@@ -70,10 +69,11 @@ class NoCancelledConditionTests: OperationTests {
     }
 
     func test__operation_with_mixture_fails() {
+        let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
         let operation = TestOperation()
-        let dependency1 = createCancellingOperation(true)
+        let dependency1 = createCancellingOperation(true, expectation: expectationWithDescription("Dependency 1 for Test: \(__FUNCTION__)"))
         operation.addDependency(dependency1)
-        let dependency2 = createCancellingOperation(false)
+        let dependency2 = createCancellingOperation(false, expectation: expectationWithDescription("Dependency 2 for Test: \(__FUNCTION__)"))
         operation.addDependency(dependency2)
         operation.addCondition(NoCancelledCondition())
         operation.addObserver(LoggingObserver())
@@ -81,6 +81,7 @@ class NoCancelledConditionTests: OperationTests {
         var receivedErrors = [ErrorType]()
         operation.addObserver(BlockObserver { (_ , errors) in
             receivedErrors = errors
+            expectation.fulfill()
         })
 
         runOperations(operation, dependency1, dependency2)
