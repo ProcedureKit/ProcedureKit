@@ -26,7 +26,6 @@ class NegatedConditionTests: OperationTests {
 
         waitForExpectationsWithTimeout(3, handler: nil)
         XCTAssertFalse(operation.didExecute)
-        XCTAssertTrue(operation.cancelled)
         XCTAssertEqual(receivedErrors.count, 1)
         if let error = receivedErrors.first as? NegatedConditionError {
             XCTAssertTrue(error == .ConditionSatisfied("Block Condition"))

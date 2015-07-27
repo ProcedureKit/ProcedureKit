@@ -103,7 +103,6 @@ class CloudConditionTests: OperationTests {
 
         waitForExpectationsWithTimeout(timeout, handler: nil)
         XCTAssertFalse(operation.didExecute)
-        XCTAssertTrue(operation.cancelled)
         if let error = receivedErrors.first as? CloudContainerCondition.Error {
             XCTAssertTrue(error == CloudContainerCondition.Error.NotAuthenticated)
         }
@@ -130,7 +129,6 @@ class CloudConditionTests: OperationTests {
 
         waitForExpectationsWithTimeout(timeout, handler: nil)
         XCTAssertFalse(operation.didExecute)
-        XCTAssertTrue(operation.cancelled)
         if let error = receivedErrors.first as? CloudContainerCondition.Error {
             XCTAssertTrue(error == CloudContainerCondition.Error.PermissionRequestRequired)
         }

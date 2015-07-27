@@ -38,7 +38,6 @@ class BlockConditionTests: OperationTests {
         runOperation(operation)
         waitForExpectationsWithTimeout(3, handler: nil)
         XCTAssertFalse(operation.didExecute)
-        XCTAssertTrue(operation.cancelled)
         if let error = receivedErrors[0] as? BlockCondition.Error {
             XCTAssertTrue(error == BlockCondition.Error.BlockConditionFailed)
         }

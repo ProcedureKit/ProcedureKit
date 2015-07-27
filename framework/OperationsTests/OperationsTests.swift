@@ -11,7 +11,11 @@ import XCTest
 import Operations
 
 class TestOperation: Operation {
-    
+
+    enum Error: ErrorType {
+        case SimulatedError
+    }
+
     let numberOfSeconds: Double
     let simulatedError: ErrorType?
     let producedOperation: NSOperation?
@@ -89,8 +93,13 @@ class OperationTests: XCTestCase {
         queue.addOperation(operation)
     }
 
+    func runOperations(operations: Operation...) {
+        queue.delegate = delegate
+        queue.addOperations(operations, waitUntilFinished: false)
+    }
+
     func addCompletionBlockToTestOperation(operation: Operation, withExpectation expectation: XCTestExpectation) {
-        operation.completionBlock = { [weak operation] in
+        operation.addCompletionBlock { [weak operation] in
             if let weakOperation = operation {
                 expectation.fulfill()
             }
