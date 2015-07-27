@@ -9,12 +9,6 @@
 import Foundation
 import AddressBook
 
-public protocol AddressBookAuthenticationManager {
-    var status: ABAuthorizationStatus { get }
-    func createAddressBook() -> (ABAddressBookRef!, CFErrorRef!)
-    func requestAccessToAddressBook(addressBook: ABAddressBookRef, completion: ABAddressBookRequestAccessCompletionHandler)
-}
-
 /**
     A condition for verifying acces to the user's AddressBook
 */
@@ -22,9 +16,9 @@ public protocol AddressBookAuthenticationManager {
 public struct AddressBookCondition: OperationCondition {
 
     public enum Error: ErrorType {
-        case AuthenticationDenied
-        case AuthenticationRestricted
-        case AuthenticationNotDetermined
+        case AuthorizationDenied
+        case AuthorizationRestricted
+        case AuthorizationNotDetermined
     }
 
     public let name = "Address Book"
@@ -38,7 +32,7 @@ public struct AddressBookCondition: OperationCondition {
     public func dependencyForOperation(operation: Operation) -> NSOperation? {
         switch manager.status {
         case .NotDetermined:
-            return RequestAddressBookPermission(manager: manager)
+            return AccessAddressBook(manager: manager)
         default:
             return .None
         }
@@ -49,18 +43,18 @@ public struct AddressBookCondition: OperationCondition {
         case .Authorized:
             completion(.Satisfied)
         case .Denied:
-            completion(.Failed(Error.AuthenticationDenied))
+            completion(.Failed(Error.AuthorizationDenied))
         case .Restricted:
-            completion(.Failed(Error.AuthenticationRestricted))
+            completion(.Failed(Error.AuthorizationRestricted))
         case .NotDetermined:
             // This could be possible, because the condition may have been
             // suppressed with a `SilentCondition`.
-            completion(.Failed(Error.AuthenticationNotDetermined))
+            completion(.Failed(Error.AuthorizationNotDetermined))
         }
     }
 }
 
-class RequestAddressBookPermission: Operation {
+class AccessAddressBook: Operation {
 
     enum Error: ErrorType {
         case FailedToCreateAddressBook
@@ -68,8 +62,7 @@ class RequestAddressBookPermission: Operation {
     }
 
     private let manager: AddressBookAuthenticationManager
-
-//    private(set) var addressBook: ABAddressBookRef? = .None
+    private(set) var addressBook: ABAddressBookRef!
 
     init(manager: AddressBookAuthenticationManager) {
         self.manager = manager
@@ -78,19 +71,11 @@ class RequestAddressBookPermission: Operation {
     }
 
     override func execute() {
-        switch manager.status {
-        case .NotDetermined:
-            dispatch_async(Queue.Main.queue, requestPermission)
-        default:
-            finish()
-        }
-    }
-
-    func requestPermission() {
         let (addressBook: ABAddressBookRef!, error) = manager.createAddressBook()
         if let addressBook: ABAddressBookRef = addressBook {
             manager.requestAccessToAddressBook(addressBook) { (success, error) in
                 if success {
+                    self.addressBook = addressBook
                     self.finish()
                 }
                 else {
@@ -104,26 +89,4 @@ class RequestAddressBookPermission: Operation {
     }
 }
 
-struct SystemAddressBookAuthenticationManager: AddressBookAuthenticationManager {
 
-    var status: ABAuthorizationStatus {
-        return ABAddressBookGetAuthorizationStatus()
-    }
-
-    func createAddressBook() -> (ABAddressBookRef!, CFErrorRef!) {
-        var addressBookError: Unmanaged<CFErrorRef>? = .None
-        var addressBook: ABAddressBookRef? = .None
-        if let ref = ABAddressBookCreateWithOptions(nil, &addressBookError) {
-            addressBook = ref.takeUnretainedValue()
-            return (addressBook, nil)
-        }
-        else if let addressBookError = addressBookError {
-            return (nil, addressBookError.takeUnretainedValue())
-        }
-        return (nil, nil)
-    }
-
-    func requestAccessToAddressBook(addressBook: ABAddressBookRef, completion: ABAddressBookRequestAccessCompletionHandler) {
-        ABAddressBookRequestAccessWithCompletion(addressBook, completion)
-    }
-}

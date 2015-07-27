@@ -15,6 +15,7 @@
 		652122D91B5C427F00E26052 /* MutualExclusiveTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652122D81B5C427F00E26052 /* MutualExclusiveTests.swift */; };
 		652E271F1B62C13400A53AA6 /* GatedOperationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652E271E1B62C13400A53AA6 /* GatedOperationTests.swift */; };
 		65343F5A1B6656070022968E /* AddressBookCondition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65343F591B6656070022968E /* AddressBookCondition.swift */; };
+		65343F8A1B6670230022968E /* AddressBookOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65343F891B6670230022968E /* AddressBookOperation.swift */; };
 		653E5A001B64899F00AAAA98 /* NegatedCondition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 653E59FF1B64899F00AAAA98 /* NegatedCondition.swift */; };
 		654308461B648D090081C211 /* NegatedConditionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 654308451B648D090081C211 /* NegatedConditionTests.swift */; };
 		654308481B6490740081C211 /* SlientCondition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 654308471B6490740081C211 /* SlientCondition.swift */; };
@@ -75,6 +76,7 @@
 		652122D81B5C427F00E26052 /* MutualExclusiveTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MutualExclusiveTests.swift; sourceTree = "<group>"; };
 		652E271E1B62C13400A53AA6 /* GatedOperationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GatedOperationTests.swift; sourceTree = "<group>"; };
 		65343F591B6656070022968E /* AddressBookCondition.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AddressBookCondition.swift; path = Permissions/AddressBookCondition.swift; sourceTree = "<group>"; };
+		65343F891B6670230022968E /* AddressBookOperation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddressBookOperation.swift; sourceTree = "<group>"; };
 		653E59FF1B64899F00AAAA98 /* NegatedCondition.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NegatedCondition.swift; sourceTree = "<group>"; };
 		654308451B648D090081C211 /* NegatedConditionTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NegatedConditionTests.swift; sourceTree = "<group>"; };
 		654308471B6490740081C211 /* SlientCondition.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SlientCondition.swift; sourceTree = "<group>"; };
@@ -261,6 +263,7 @@
 		65D6F5731B5AC453003D35AD /* Operations */ = {
 			isa = PBXGroup;
 			children = (
+				65343F891B6670230022968E /* AddressBookOperation.swift */,
 				6558091B1B6049F700CF0722 /* AlertOperation.swift */,
 				65D6F5761B5ADEF6003D35AD /* BlockOperation.swift */,
 				654D7E711B6024C6005108E8 /* CloudKitOperation.swift */,
@@ -390,6 +393,7 @@
 				6597EAD81B65A8B100129294 /* LocationOperation.swift in Sources */,
 				65CB76FF1B3F284A00791E18 /* OperationQueue.swift in Sources */,
 				65D6F5851B5BE620003D35AD /* BackgroundObserver.swift in Sources */,
+				65343F8A1B6670230022968E /* AddressBookOperation.swift in Sources */,
 				657729801B3DAA0400B5D153 /* OperationCondition.swift in Sources */,
 				654308481B6490740081C211 /* SlientCondition.swift in Sources */,
 				65CB76FC1B3F284A00791E18 /* BlockObserver.swift in Sources */,
