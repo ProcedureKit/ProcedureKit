@@ -111,14 +111,19 @@ public class Operation: NSOperation {
     private func evaluateConditions() {
         assert(state == .Pending, "\(__FUNCTION__) was called out of order.")
         state = .EvaluatingConditions
-        OperationConditionEvaluator.evaluate(conditions, operation: self) { errors in
-            if errors.isEmpty {
-                self.state = .Ready
+        if conditions.count > 0 {
+            OperationConditionEvaluator.evaluate(conditions, operation: self) { errors in
+                if errors.isEmpty {
+                    self.state = .Ready
+                }
+                else {
+                    self.state = .Cancelled
+                    self.finish(errors: errors)
+                }
             }
-            else {
-                self.state = .Cancelled
-                self.finish(errors: errors)
-            }
+        }
+        else {
+            state = .Ready
         }
     }
 
