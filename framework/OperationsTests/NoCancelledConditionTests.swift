@@ -15,7 +15,6 @@ class NoCancelledConditionTests: OperationTests {
 
         let operation = TestOperation()
         operation.name = shouldCancel ? "Cancelled Dependency" : "Successful Dependency"
-        operation.addObserver(LoggingObserver())
 
         if !shouldCancel {
             addCompletionBlockToTestOperation(operation, withExpectation: expectation)
@@ -60,7 +59,6 @@ class NoCancelledConditionTests: OperationTests {
         let dependency = createCancellingOperation(true, expectation: expectationWithDescription("Dependency for Test: \(__FUNCTION__)"))
         operation.addDependency(dependency)
         operation.addCondition(NoCancelledCondition())
-        operation.addObserver(LoggingObserver())
 
         runOperations(operation, dependency)
         waitForExpectationsWithTimeout(3, handler: nil)
@@ -76,7 +74,6 @@ class NoCancelledConditionTests: OperationTests {
         let dependency2 = createCancellingOperation(false, expectation: expectationWithDescription("Dependency 2 for Test: \(__FUNCTION__)"))
         operation.addDependency(dependency2)
         operation.addCondition(NoCancelledCondition())
-        operation.addObserver(LoggingObserver())
 
         var receivedErrors = [ErrorType]()
         operation.addObserver(BlockObserver { (_ , errors) in
