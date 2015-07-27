@@ -28,6 +28,18 @@ public class LocationOperation: Operation {
     private var manager: LocationManager?
     private let handler: LocationResponseHandler
 
+    /**
+        This is the true public API, the other public initializer is really just a testing
+        interface, and will not be public in Swift 2.0, Operations 2.0
+    */
+    public convenience init(accuracy: CLLocationAccuracy, handler: LocationResponseHandler) {
+        self.init(accuracy: accuracy, manager: .None, handler: handler)
+    }
+
+    /**
+        This is a testing interface, and will not be public in Swift 2.0, Operations 2.0.
+        Instead use init(:CLLocationAccuracy, handler: LocationResponseHandler)
+    */
     public init(accuracy: CLLocationAccuracy, manager: LocationManager? = .None, handler: LocationResponseHandler) {
         self.accuracy = accuracy
         self.manager = manager
