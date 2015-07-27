@@ -47,11 +47,12 @@ class AddressBookOperationTests: OperationTests {
 
         var didReceiveAddressBook = false
         let manager = TestableAddressBookManager(.Authorized)
-        manager.addressBook = "I'm posing as an Address Book Ref!" as CFTypeRef
+        let posedAddressBook = "I'm posing as an Address Book Ref!"
+        manager.addressBook = posedAddressBook as CFTypeRef
 
         let operation = AddressBookOperation(manager: manager, silent: false) { (addressBook, continuation) in
-            if let posedAddressBook = addressBook as? String {
-                didReceiveAddressBook = true
+            if let addressBook = addressBook as? String {
+                didReceiveAddressBook = addressBook == posedAddressBook
             }
             continuation()
         }
