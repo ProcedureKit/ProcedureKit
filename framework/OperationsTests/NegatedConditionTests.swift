@@ -14,7 +14,7 @@ class NegatedConditionTests: OperationTests {
     func test__operation_with_successful_block_condition_fails() {
         let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
         let operation = TestOperation()
-        operation.addCondition(NegatedCondition(condition: BlockCondition { true }))
+        operation.addCondition(NegatedCondition(BlockCondition { true }))
 
         var receivedErrors = [ErrorType]()
         operation.addObserver(BlockObserver(finishHandler: { (_, errors) in
@@ -39,7 +39,7 @@ class NegatedConditionTests: OperationTests {
     func test__operation_with_unsuccessful_block_condition_executes() {
 
         let operation = TestOperation()
-        operation.addCondition(NegatedCondition(condition: BlockCondition { false }))
+        operation.addCondition(NegatedCondition(BlockCondition { false }))
 
         runOperation(operation)
         addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))

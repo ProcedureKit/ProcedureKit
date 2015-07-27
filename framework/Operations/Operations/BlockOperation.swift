@@ -10,8 +10,8 @@ import Foundation
 
 public class BlockOperation: Operation {
 
-    public typealias ContinuationBlockType = Void -> Void
-    public typealias BlockType = (ContinuationBlockType) -> Void
+    public typealias ContinuationBlockType = (error: ErrorType?) -> Void
+    public typealias BlockType = (continueWithError: ContinuationBlockType) -> Void
 
     private let block: BlockType?
 
@@ -35,14 +35,14 @@ public class BlockOperation: Operation {
         self.init(block: { continuation in
             dispatch_async(Queue.Main.queue) {
                 mainQueueBlock()
-                continuation()
+                continuation(error: nil)
             }
         })
     }
 
     public override func execute() {
         if let block = block {
-            block { self.finish() }
+            block { error in self.finish(error) }
         }
         else {
             finish()

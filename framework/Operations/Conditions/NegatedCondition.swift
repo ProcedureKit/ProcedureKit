@@ -28,8 +28,8 @@ public struct NegatedCondition<Condition: OperationCondition>: OperationConditio
         return condition.isMutuallyExclusive
     }
     
-    public init(condition: Condition) {
-        self.condition = condition
+    public init(_ c: Condition) {
+        condition = c
     }
     
     public func dependencyForOperation(operation: Operation) -> NSOperation? {

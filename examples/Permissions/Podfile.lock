@@ -1,0 +1,14 @@
+PODS:
+  - Operations (0.6.0)
+
+DEPENDENCIES:
+  - Operations (from `../../`)
+
+EXTERNAL SOURCES:
+  Operations:
+    :path: "../../"
+
+SPEC CHECKSUMS:
+  Operations: a69cd5df1b1899bd680ce42d63517a4e7d064940
+
+COCOAPODS: 0.38.2
