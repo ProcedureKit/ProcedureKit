@@ -27,12 +27,12 @@ class ReachabilityConditionTests: OperationTests {
     let url = NSURL(string: "http://apple.com")!
 
     func test__condition_is_satisfied_when_host_is_reachable_via_wifi() {
-
+        let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
         let operation = TestOperation(delay: 1)
         let condition = ReachabilityCondition(url: url, reachability: TestableReachability(networkStatus: .Reachable(.ViaWiFi)))
         operation.addCondition(condition)
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectation)
         runOperation(operation)
 
         waitForExpectationsWithTimeout(3) { error in

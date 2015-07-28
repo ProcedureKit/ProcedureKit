@@ -54,6 +54,7 @@ class AddressBookOperationTests: OperationTests {
 
     func test__when_authorized__handler_receives_addressbook() {
 
+        let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
         let manager = TestableAddressBookManager(.Authorized)
         let posedAddressBook = "I'm posing as an Address Book Ref!"
         manager.addressBook = posedAddressBook as CFTypeRef
@@ -64,17 +65,19 @@ class AddressBookOperationTests: OperationTests {
                 didReceiveAddressBook = addressBook == posedAddressBook
             }
             continueWithError(error: nil)
+            expectation.fulfill()
         }
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
         runOperation(operation)
         waitForExpectationsWithTimeout(3, handler: nil)
 
         XCTAssertTrue(didReceiveAddressBook)
     }
 
+
     func test__when_not_determined__manager_requests_permission() {
 
+        let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
         let manager = TestableAddressBookManager(.NotDetermined)
         let posedAddressBook = "I'm posing as an Address Book Ref!"
         manager.addressBook = posedAddressBook as CFTypeRef
@@ -85,9 +88,9 @@ class AddressBookOperationTests: OperationTests {
                 didReceiveAddressBook = addressBook == posedAddressBook
             }
             continueWithError(error: nil)
+            expectation.fulfill()
         }
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
         runOperation(operation)
         waitForExpectationsWithTimeout(3, handler: nil)
 
@@ -107,8 +110,6 @@ class AddressBookOperationTests: OperationTests {
             continueWithError(error: nil)
         }
 
-        operation.addObserver(LoggingObserver())
-
         var receivedErrors = [ErrorType]()
         operation.addObserver(BlockObserver { (op, errors) in
             receivedErrors = errors
@@ -126,6 +127,5 @@ class AddressBookOperationTests: OperationTests {
         else {
             XCTFail("No error message was observed")
         }
-
     }
 }
