@@ -52,8 +52,16 @@ code_sign_if_enabled() {
 
 
 if [[ "$CONFIGURATION" == "Debug" ]]; then
+  install_framework 'Pods/CocoaLumberjack.framework'
   install_framework 'Pods/Operations.framework'
+  install_framework 'Pods/TaylorSource.framework'
+  install_framework 'Pods/YapDatabase.framework'
+  install_framework 'Pods/YapDatabaseExtensions.framework'
 fi
 if [[ "$CONFIGURATION" == "Release" ]]; then
+  install_framework 'Pods/CocoaLumberjack.framework'
   install_framework 'Pods/Operations.framework'
+  install_framework 'Pods/TaylorSource.framework'
+  install_framework 'Pods/YapDatabase.framework'
+  install_framework 'Pods/YapDatabaseExtensions.framework'
 fi
