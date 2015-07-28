@@ -99,11 +99,10 @@ class OperationTests: XCTestCase {
     }
 
     func addCompletionBlockToTestOperation(operation: Operation, withExpectation expectation: XCTestExpectation) {
-        operation.addCompletionBlock { [weak operation] in
-            if let weakOperation = operation {
-                expectation.fulfill()
-            }
-        }
+        weak var weakExpectation = expectation
+        operation.addObserver(BlockObserver { (_, _) in
+            weakExpectation?.fulfill()
+        })
     }
 }
 

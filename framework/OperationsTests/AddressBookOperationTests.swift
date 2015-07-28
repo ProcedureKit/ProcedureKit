@@ -110,8 +110,6 @@ class AddressBookOperationTests: OperationTests {
             continueWithError(error: nil)
         }
 
-        operation.addObserver(LoggingObserver())
-
         var receivedErrors = [ErrorType]()
         operation.addObserver(BlockObserver { (op, errors) in
             receivedErrors = errors
