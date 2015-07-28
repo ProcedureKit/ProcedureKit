@@ -18,16 +18,23 @@ enum Demo: Int {
         let subtitle: String
     }
 
-    case AddressBook
+    case AddressBook, Location
 
-    static let all: [Demo] = [ .AddressBook ]
+    static let all: [Demo] = [ .AddressBook, .Location ]
 
     var info: Info {
         switch self {
+
         case .AddressBook:
             return Info(
                 title: "Address Book",
-                subtitle: "Encapsulate access to ABAddressBook inside a AddressBookOperation. Use AddressBookCondition to test whether the user has granted permissions. Combine with SilentCondition and NegatedCondition to test this before presenting permissions."
+                subtitle: "Access to ABAddressBook inside a AddressBookOperation. Use AddressBookCondition to test whether the user has granted permissions. Combine with SilentCondition and NegatedCondition to test this before presenting permissions."
+            )
+
+        case .Location:
+            return Info(
+                title: "Location",
+                subtitle: "Get the user's current location. Use LocationCondition to test whether the user has granted permissions."
             )
         }
     }
@@ -35,6 +42,7 @@ enum Demo: Int {
     var segue: UIStoryboardSegue.Segue {
         switch self {
         case .AddressBook: return UIStoryboardSegue.Segue.AddressBook
+        case .Location: return UIStoryboardSegue.Segue.Location
         }
     }
 }
@@ -123,6 +131,7 @@ extension UIStoryboardSegue {
 
     enum Segue: String {
         case AddressBook = "AddressBook"
+        case Location = "Location"
 
         var pushSegueIdentifier: String {
             return segueIdentifierWithPrefix("push")

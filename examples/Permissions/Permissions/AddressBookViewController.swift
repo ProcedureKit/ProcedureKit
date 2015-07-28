@@ -10,14 +10,7 @@ import Foundation
 import AddressBook
 import Operations
 
-
-class AddressBookViewController: UIViewController {
-
-    enum State: Int {
-        case Unknown, Authorized, Denied, Completed
-
-        static var all: [State] = [ .Unknown, .Authorized, .Denied, .Completed ]
-    }
+class AddressBookViewController: PermissionViewController {
 
     // Address Book status not determined
     @IBOutlet var statusNotDeterminedContainerView: UIView!
@@ -50,30 +43,6 @@ class AddressBookViewController: UIViewController {
                 else {
                     label.text = "You don't have any contacts yet."
                 }
-            }
-        }
-    }
-
-    let queue = OperationQueue()
-
-    private var _state: State = .Unknown
-    var state: State {
-        get {
-            return _state
-        }
-        set {
-            switch (_state, newValue) {
-
-            case (.Completed, _):
-                break
-
-            case (.Unknown, _):
-                queue.addOperation(displayOperationForState(newValue, silent: true))
-                _state = newValue
-
-            default:
-                queue.addOperation(displayOperationForState(newValue, silent: false))
-                _state = newValue
             }
         }
     }
@@ -122,7 +91,13 @@ class AddressBookViewController: UIViewController {
         queue.addOperation(authorized)
     }
 
-    func conditionsForState(state: State, silent: Bool = true) -> [OperationCondition] {
+    func requestAccess() {
+        determineAuthorizationStatus(silently: false)
+    }
+
+    // MARK: Update UI
+
+    override func conditionsForState(state: State, silent: Bool = true) -> [OperationCondition] {
 
         switch state {
         case .Unknown:
@@ -136,13 +111,7 @@ class AddressBookViewController: UIViewController {
         }
     }
 
-    func requestAccess() {
-        determineAuthorizationStatus(silently: false)
-    }
-
-    // MARK: Update UI
-
-    func viewsForState(state: State) -> [UIView] {
+    override func viewsForState(state: State) -> [UIView] {
         switch state {
         case .Unknown:
             return [statusNotDeterminedContainerView]
@@ -153,31 +122,6 @@ class AddressBookViewController: UIViewController {
         case .Completed:
             return [addressBookResultsContainerView, resetPermissionsView]
         }
-    }
-
-    func displayOperationForState(state: State, silent: Bool = true) -> Operation {
-        let others: [State] = {
-            var all = Set(State.all)
-            let _ = all.remove(state)
-            return Array(all)
-        }()
-
-        let viewsToHide = others.flatMap { self.viewsForState($0) }
-        let viewsToShow = viewsForState(state)
-
-        let update = BlockOperation { (continueWithError: BlockOperation.ContinuationBlockType) in
-            dispatch_async(Queue.Main.queue) {
-                viewsToHide.map { $0.hidden = true }
-                viewsToShow.map { $0.hidden = false }
-                continueWithError(error: nil)
-            }
-        }
-        update.name = "Update UI for state: \(state)"
-
-        let conditions = conditionsForState(state, silent: silent)
-        conditions.map { update.addCondition($0) }
-
-        return update
     }
 
     func countContacts() {
