@@ -153,9 +153,7 @@ class BlockOperationTests: OperationTests {
     func test__that_block_operation_with_no_block_finishes_immediately() {
         let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
         let operation = BlockOperation()
-        operation.addCompletionBlock {
-            expectation.fulfill()
-        }
+        addCompletionBlockToTestOperation(operation, withExpectation: expectation)
         runOperation(operation)
         waitForExpectationsWithTimeout(3, handler: nil)
         XCTAssertTrue(operation.finished)

@@ -13,7 +13,7 @@ public class BlockOperation: Operation {
     public typealias ContinuationBlockType = (error: ErrorType?) -> Void
     public typealias BlockType = (continueWithError: ContinuationBlockType) -> Void
 
-    private let block: BlockType?
+    private let block: BlockType
 
     /**
     Designated initializer.
@@ -21,7 +21,7 @@ public class BlockOperation: Operation {
     - parameter block: The closure to run when the operation executes.
     If this block is nil, the operation will immediately finish.
     */
-    public init(block: BlockType? = .None) {
+    public init(block: BlockType = { (continueWithError) in continueWithError(error: nil) }) {
         self.block = block
         super.init()
     }
@@ -41,12 +41,7 @@ public class BlockOperation: Operation {
     }
 
     public override func execute() {
-        if let block = block {
-            block { error in self.finish(error) }
-        }
-        else {
-            finish()
-        }
+        block { error in self.finish(error) }
     }
 }
 
