@@ -1,14 +1,38 @@
 PODS:
-  - Operations (0.6.0)
+  - CocoaLumberjack (1.9.2):
+    - CocoaLumberjack/Extensions (= 1.9.2)
+  - CocoaLumberjack/Core (1.9.2)
+  - CocoaLumberjack/Extensions (1.9.2):
+    - CocoaLumberjack/Core
+  - Operations (0.8.0)
+  - TaylorSource/Base (0.14.0)
+  - TaylorSource/YapDatabase (0.14.0):
+    - TaylorSource/Base
+    - YapDatabase (~> 2.6)
+    - YapDatabaseExtensions (~> 1.5.0)
+  - YapDatabase (2.6.5):
+    - YapDatabase/standard (= 2.6.5)
+  - YapDatabase/standard (2.6.5):
+    - CocoaLumberjack (~> 1)
+  - YapDatabaseExtensions (1.5.0):
+    - YapDatabase (~> 2.6)
+    - YapDatabaseExtensions/Common (= 1.5.0)
+  - YapDatabaseExtensions/Common (1.5.0):
+    - YapDatabase (~> 2.6)
 
 DEPENDENCIES:
   - Operations (from `../../`)
+  - TaylorSource/YapDatabase
 
 EXTERNAL SOURCES:
   Operations:
     :path: "../../"
 
 SPEC CHECKSUMS:
-  Operations: a69cd5df1b1899bd680ce42d63517a4e7d064940
+  CocoaLumberjack: 628fca2e88ef06f7cf6817309aa405f325d9a6fa
+  Operations: 4407762cf842882452a61449723c592a9d3e413d
+  TaylorSource: f3cc99d5c55295d48a79d92cd86cfe745ce3ff00
+  YapDatabase: 814f9ff862a95c1e581d93335a4020482b69155b
+  YapDatabaseExtensions: 78d968b16ac81b458f49abd976aabc0f36808e27
 
 COCOAPODS: 0.38.2

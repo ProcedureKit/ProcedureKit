@@ -114,20 +114,11 @@ public class Operation: NSOperation {
     }
 
     private func evaluateConditions() {
-        assert(state == .Pending, "\(__FUNCTION__) was called out of order.")
+        assert(state == .Pending && cancelled == false, "\(__FUNCTION__) was called out of order.")
         state = .EvaluatingConditions
-        if conditions.count > 0 {
-            OperationConditionEvaluator.evaluate(conditions, operation: self) { errors in
-                if errors.isEmpty {
-                    self.state = .Ready
-                }
-                else {
-                    self.finish(errors: errors)
-                }
-            }
-        }
-        else {
-            state = .Ready
+        OperationConditionEvaluator.evaluate(conditions, operation: self) { errors in
+            self._internalErrors.extend(errors)
+            self.state = .Ready
         }
     }
 
@@ -136,7 +127,7 @@ public class Operation: NSOperation {
     private(set) var conditions = [OperationCondition]()
 
     public func addCondition(condition: OperationCondition) {
-        assert(state < .Executing, "Cannot modify conditions after execution has begun.")
+        assert(state < .Executing, "Cannot modify conditions after execution has begun, current state: \(state).")
         conditions.append(condition)
     }
 
@@ -145,29 +136,40 @@ public class Operation: NSOperation {
     private(set) var observers = [OperationObserver]()
     
     public func addObserver(observer: OperationObserver) {
-        assert(state < .Executing, "Cannot modify observers after execution has begun.")
-        
+        assert(state < .Executing, "Cannot modify observers after execution has begun, current state: \(state).")
         observers.append(observer)
     }
     
     public override func addDependency(operation: NSOperation) {
-        assert(state <= .Executing, "Dependencies cannot be modified after execution has begun.")
-        
+        assert(state <= .Executing, "Dependencies cannot be modified after execution has begun, current state: \(state).")        
         super.addDependency(operation)
     }
 
     // MARK: - Execution and Cancellation
     
     public override final func start() {
-        assert(state == .Ready, "This operation must be performed on an operation queue.")
-        
-        state = .Executing
-        
-        observers.map { $0.operationDidStart(self) }
-        
-        execute()
+        // NSOperation.start() has important logic which shouldn't be bypassed
+        super.start()
+
+        // If the operation has been cancelled, we still need to enter the finished state
+        if cancelled {
+            finish()
+        }
     }
-    
+
+    public override final func main() {
+        assert(state == .Ready, "This operation must be performed on an operation queue, current state: \(state).")
+
+        if _internalErrors.isEmpty && cancelled == false {
+            state = .Executing
+            observers.map { $0.operationDidStart(self) }
+            execute()
+        }
+        else {
+            finish()
+        }
+    }
+
     /**
     Subclasses should override this method to perform their specialized task.
     They must call a finish methods in order to complete.
@@ -255,6 +257,25 @@ private func <(lhs: Operation.State, rhs: Operation.State) -> Bool {
 
 private func ==(lhs: Operation.State, rhs: Operation.State) -> Bool {
     return lhs.rawValue == rhs.rawValue
+}
+
+extension Operation.State: DebugPrintable, Printable {
+
+    var description: String {
+        switch self {
+        case .Initialized:          return "Initialized"
+        case .Pending:              return "Pending"
+        case .EvaluatingConditions: return "EvaluatingConditions"
+        case .Ready:                return "Ready"
+        case .Executing:            return "Executing"
+        case .Finishing:            return "Finishing"
+        case .Finished:             return "Finished"
+        }
+    }
+
+    var debugDescription: String {
+        return "state: \(description)"
+    }
 }
 
 extension NSOperation {
