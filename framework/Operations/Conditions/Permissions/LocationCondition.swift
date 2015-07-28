@@ -67,7 +67,7 @@ public struct LocationCondition: OperationCondition {
 
     public enum Usage: Int { case WhenInUse = 1, Always }
 
-    enum Error: ErrorType {
+    public enum Error: ErrorType {
         case LocationServicesNotEnabled
         case AuthenticationStatusNotSufficient(CLAuthorizationStatus, Usage)
     }
@@ -91,7 +91,7 @@ public struct LocationCondition: OperationCondition {
         This is a testing interface, and will not be public in Swift 2.0, Operations 2.0.
         Instead use init(:Usage)
     */
-    public init(usage: Usage = .WhenInUse, manager: LocationManager? = .None) {
+    public init(usage: Usage, manager: LocationManager? = .None) {
         self.usage = usage
         self.manager = manager ?? CLLocationManager()
     }

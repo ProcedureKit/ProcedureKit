@@ -32,7 +32,7 @@ public class LocationOperation: Operation {
         This is the true public API, the other public initializer is really just a testing
         interface, and will not be public in Swift 2.0, Operations 2.0
     */
-    public convenience init(accuracy: CLLocationAccuracy, handler: LocationResponseHandler) {
+    public convenience init(accuracy: CLLocationAccuracy = kCLLocationAccuracyThreeKilometers, handler: LocationResponseHandler) {
         self.init(accuracy: accuracy, manager: .None, handler: handler)
     }
 
