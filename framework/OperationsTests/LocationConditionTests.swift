@@ -80,7 +80,7 @@ class LocationConditionTests: OperationTests {
 
         let locationManager = TestableLocationManager(enabled: true, status: .AuthorizedAlways)
         let operation = TestOperation()
-        operation.addCondition(LocationCondition(manager: locationManager))
+        operation.addCondition(LocationCondition(usage: .Always, manager: locationManager))
 
         addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
         runOperation(operation)
@@ -96,7 +96,7 @@ class LocationConditionTests: OperationTests {
 
         let locationManager = TestableLocationManager(enabled: true, status: .AuthorizedWhenInUse)
         let operation = TestOperation()
-        operation.addCondition(LocationCondition(manager: locationManager))
+        operation.addCondition(LocationCondition(usage: .WhenInUse, manager: locationManager))
 
         addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
         runOperation(operation)
