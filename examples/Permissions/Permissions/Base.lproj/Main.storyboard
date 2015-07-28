@@ -2,6 +2,7 @@
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="7706" systemVersion="15A235d" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="Gvy-X9-mf7">
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="7703"/>
+        <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
     </dependencies>
     <scenes>
         <!--Permissions-->
@@ -36,6 +37,7 @@
                     <connections>
                         <outlet property="tableView" destination="ZJ7-po-oIY" id="6PB-SL-5HC"/>
                         <segue destination="Att-gB-tIe" kind="show" identifier="push.AddressBook" id="Gza-QC-0uM"/>
+                        <segue destination="32S-Xk-tgw" kind="show" identifier="push.Location" id="tQv-DH-mxd"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="x5A-6p-PRh" sceneMemberID="firstResponder"/>
@@ -187,7 +189,7 @@
                                     <constraint firstAttribute="trailing" secondItem="VT7-vq-523" secondAttribute="trailing" constant="20" id="mE8-ls-yeH"/>
                                 </constraints>
                             </view>
-                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="gge-Ee-XDf">
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="gge-Ee-XDf" userLabel="Reset Instructions">
                                 <rect key="frame" x="0.0" y="506" width="600" height="94"/>
                                 <subviews>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="You can reset the permissions in Settings &gt; General &gt; Reset &gt; Reset Location &amp; Privacy." lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="H1M-5f-xMK">
@@ -248,6 +250,171 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="63W-cJ-Ibd" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="1763" y="673"/>
+        </scene>
+        <!--Location View Controller-->
+        <scene sceneID="BxM-rX-Be8">
+            <objects>
+                <viewController id="32S-Xk-tgw" customClass="LocationViewController" customModule="Permissions" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="fgX-r7-0S5"/>
+                        <viewControllerLayoutGuide type="bottom" id="nWF-rq-q0E"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="H1E-8A-eMZ">
+                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <view hidden="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="RWd-VD-emJ" userLabel="Not Determined">
+                                <rect key="frame" x="150" y="213" width="300" height="175"/>
+                                <subviews>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="We haven't yet asked permission to access the user's Location." textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="i4K-8b-KVQ">
+                                        <rect key="frame" x="20" y="20" width="260" height="36"/>
+                                        <animations/>
+                                        <fontDescription key="fontDescription" style="UICTFontTextStyleSubhead"/>
+                                        <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Tap the button below to present an alert." textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="bsh-Wn-ic4">
+                                        <rect key="frame" x="30" y="76" width="240" height="41"/>
+                                        <animations/>
+                                        <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
+                                        <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="cME-gd-e4c">
+                                        <rect key="frame" x="129" y="125" width="40" height="30"/>
+                                        <animations/>
+                                        <state key="normal" title="Begin">
+                                            <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                        </state>
+                                        <connections>
+                                            <action selector="beginAuthorizationRequestButtonAction:" destination="32S-Xk-tgw" eventType="touchUpInside" id="XaZ-m5-Odh"/>
+                                            <action selector="beginAuthorizationRequestButtonAction:" destination="Att-gB-tIe" eventType="touchUpInside" id="bPv-sD-jUO"/>
+                                        </connections>
+                                    </button>
+                                </subviews>
+                                <animations/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <constraints>
+                                    <constraint firstAttribute="centerX" secondItem="cME-gd-e4c" secondAttribute="centerX" constant="0.5" id="0of-1g-bYa"/>
+                                    <constraint firstItem="cME-gd-e4c" firstAttribute="top" secondItem="bsh-Wn-ic4" secondAttribute="bottom" constant="8" id="2DB-LC-ddY"/>
+                                    <constraint firstAttribute="width" constant="300" id="GT6-86-juw"/>
+                                    <constraint firstItem="i4K-8b-KVQ" firstAttribute="leading" secondItem="RWd-VD-emJ" secondAttribute="leading" constant="20" id="JyV-rU-sFh"/>
+                                    <constraint firstAttribute="bottom" secondItem="cME-gd-e4c" secondAttribute="bottom" constant="20" id="KCW-8L-6J1"/>
+                                    <constraint firstAttribute="trailing" secondItem="i4K-8b-KVQ" secondAttribute="trailing" constant="20" id="N2R-1J-QR0"/>
+                                    <constraint firstItem="i4K-8b-KVQ" firstAttribute="top" secondItem="RWd-VD-emJ" secondAttribute="top" constant="20" id="XiT-go-jDh"/>
+                                    <constraint firstItem="bsh-Wn-ic4" firstAttribute="leading" secondItem="RWd-VD-emJ" secondAttribute="leading" constant="30" id="YK4-tW-51Q"/>
+                                    <constraint firstItem="bsh-Wn-ic4" firstAttribute="top" secondItem="i4K-8b-KVQ" secondAttribute="bottom" constant="20" id="ajN-Ce-mvw"/>
+                                    <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="300" id="bca-RC-ipU"/>
+                                    <constraint firstAttribute="trailing" secondItem="bsh-Wn-ic4" secondAttribute="trailing" constant="30" id="fGi-h0-mms"/>
+                                    <constraint firstItem="i4K-8b-KVQ" firstAttribute="top" secondItem="bsh-Wn-ic4" secondAttribute="top" constant="-84" id="gRE-VB-iz5"/>
+                                </constraints>
+                                <variation key="default">
+                                    <mask key="constraints">
+                                        <exclude reference="bca-RC-ipU"/>
+                                        <exclude reference="gRE-VB-iz5"/>
+                                    </mask>
+                                </variation>
+                            </view>
+                            <mapView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" mapType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="Nyn-ak-Gja">
+                                <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                                <animations/>
+                            </mapView>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="2Y3-3G-ap6" userLabel="Reset Instructions">
+                                <rect key="frame" x="0.0" y="506" width="600" height="94"/>
+                                <subviews>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="You can reset the permissions in Settings &gt; General &gt; Reset &gt; Reset Location &amp; Privacy." lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="KUi-ml-8md">
+                                        <rect key="frame" x="20" y="20" width="560" height="15"/>
+                                        <animations/>
+                                        <fontDescription key="fontDescription" style="UICTFontTextStyleFootnote"/>
+                                        <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Note that these settings are system wide. So, if running on your personal device, you can also change the bundle identifier." lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="zR1-LB-AL6">
+                                        <rect key="frame" x="20" y="43" width="560" height="31"/>
+                                        <animations/>
+                                        <fontDescription key="fontDescription" style="UICTFontTextStyleFootnote"/>
+                                        <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                </subviews>
+                                <animations/>
+                                <color key="backgroundColor" red="0.7843137255" green="0.29411764709999999" blue="0.29411764709999999" alpha="0.75" colorSpace="calibratedRGB"/>
+                                <constraints>
+                                    <constraint firstItem="zR1-LB-AL6" firstAttribute="top" secondItem="KUi-ml-8md" secondAttribute="bottom" constant="8" symbolic="YES" id="9lW-M6-WoI"/>
+                                    <constraint firstAttribute="trailing" secondItem="zR1-LB-AL6" secondAttribute="trailing" constant="20" id="KIA-hq-OxK"/>
+                                    <constraint firstItem="KUi-ml-8md" firstAttribute="top" secondItem="2Y3-3G-ap6" secondAttribute="top" constant="20" id="Ug8-bF-fJq"/>
+                                    <constraint firstItem="zR1-LB-AL6" firstAttribute="leading" secondItem="2Y3-3G-ap6" secondAttribute="leading" constant="20" id="X7u-7d-6fi"/>
+                                    <constraint firstAttribute="trailing" secondItem="KUi-ml-8md" secondAttribute="trailing" constant="20" id="egW-6D-KN1"/>
+                                    <constraint firstAttribute="bottom" secondItem="zR1-LB-AL6" secondAttribute="bottom" constant="20" id="hdg-NE-aL4"/>
+                                    <constraint firstItem="KUi-ml-8md" firstAttribute="leading" secondItem="2Y3-3G-ap6" secondAttribute="leading" constant="20" id="rUI-vj-gGC"/>
+                                </constraints>
+                            </view>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Tes-pe-eQ7">
+                                <rect key="frame" x="220" y="270" width="160" height="60"/>
+                                <animations/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="160" id="dIc-QV-De5"/>
+                                    <constraint firstAttribute="height" constant="60" id="hoP-Dt-SMf"/>
+                                </constraints>
+                                <state key="normal" title="Show my location">
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <action selector="showMyLocationButtonAction:" destination="32S-Xk-tgw" eventType="touchUpInside" id="9LZ-ZQ-pqK"/>
+                                </connections>
+                            </button>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="WxX-P7-Qkb" userLabel="Access Denied">
+                                <rect key="frame" x="150" y="270" width="300" height="60"/>
+                                <subviews>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Access denied or restricted" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="gLK-lg-pLg">
+                                        <rect key="frame" x="20" y="20" width="260" height="20"/>
+                                        <animations/>
+                                        <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
+                                        <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                </subviews>
+                                <animations/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <constraints>
+                                    <constraint firstItem="gLK-lg-pLg" firstAttribute="leading" secondItem="WxX-P7-Qkb" secondAttribute="leading" constant="20" id="I6t-5q-R52"/>
+                                    <constraint firstAttribute="bottom" secondItem="gLK-lg-pLg" secondAttribute="bottom" constant="20" id="LCY-0a-aV5"/>
+                                    <constraint firstItem="gLK-lg-pLg" firstAttribute="top" secondItem="WxX-P7-Qkb" secondAttribute="top" constant="20" id="TB4-xb-0Ph"/>
+                                    <constraint firstAttribute="trailing" secondItem="gLK-lg-pLg" secondAttribute="trailing" constant="20" id="Zwp-ex-7fQ"/>
+                                    <constraint firstAttribute="width" constant="300" id="tp3-Yt-I3S"/>
+                                </constraints>
+                            </view>
+                        </subviews>
+                        <animations/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstAttribute="centerX" secondItem="WxX-P7-Qkb" secondAttribute="centerX" id="3X9-As-e9d"/>
+                            <constraint firstItem="Nyn-ak-Gja" firstAttribute="leading" secondItem="H1E-8A-eMZ" secondAttribute="leading" id="DPN-py-l81"/>
+                            <constraint firstItem="Nyn-ak-Gja" firstAttribute="top" secondItem="fgX-r7-0S5" secondAttribute="bottom" constant="-64" id="LGu-12-4ez"/>
+                            <constraint firstItem="2Y3-3G-ap6" firstAttribute="leading" secondItem="H1E-8A-eMZ" secondAttribute="leadingMargin" constant="-16" id="Lni-2D-Nzm"/>
+                            <constraint firstAttribute="centerY" secondItem="Tes-pe-eQ7" secondAttribute="centerY" id="Wye-9N-HHf"/>
+                            <constraint firstItem="nWF-rq-q0E" firstAttribute="top" secondItem="Nyn-ak-Gja" secondAttribute="bottom" id="a28-0P-0VY"/>
+                            <constraint firstAttribute="trailing" secondItem="Nyn-ak-Gja" secondAttribute="trailing" id="aL1-Pe-hb0"/>
+                            <constraint firstAttribute="centerY" secondItem="RWd-VD-emJ" secondAttribute="centerY" id="cS2-mk-kfl"/>
+                            <constraint firstAttribute="centerX" secondItem="RWd-VD-emJ" secondAttribute="centerX" id="dKY-Bi-xZy"/>
+                            <constraint firstAttribute="trailingMargin" secondItem="2Y3-3G-ap6" secondAttribute="trailing" constant="-16" id="fFs-Pi-CAM"/>
+                            <constraint firstItem="nWF-rq-q0E" firstAttribute="top" secondItem="2Y3-3G-ap6" secondAttribute="bottom" id="lQ7-kg-b07"/>
+                            <constraint firstAttribute="centerX" secondItem="Tes-pe-eQ7" secondAttribute="centerX" id="yip-Sa-kgc"/>
+                            <constraint firstAttribute="centerY" secondItem="WxX-P7-Qkb" secondAttribute="centerY" id="ywA-dB-SZc"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="accessDeniedViewContainer" destination="WxX-P7-Qkb" id="aFV-08-2SX"/>
+                        <outlet property="getLocationButton" destination="cME-gd-e4c" id="A13-02-YLH"/>
+                        <outlet property="mapView" destination="Nyn-ak-Gja" id="Qz4-q4-wmA"/>
+                        <outlet property="notDeterminedContainerView" destination="RWd-VD-emJ" id="VnD-RU-IsX"/>
+                        <outlet property="requestLocationButton" destination="Tes-pe-eQ7" id="mm0-yY-sig"/>
+                        <outlet property="resetLocationInstructionsView" destination="2Y3-3G-ap6" id="B2m-0b-RNi"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="5B0-i5-hsW" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1763" y="1363"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="YQt-0J-kDF">
