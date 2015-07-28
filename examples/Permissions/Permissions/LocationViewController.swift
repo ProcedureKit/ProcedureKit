@@ -24,8 +24,6 @@ class LocationViewController: PermissionViewController {
         didSet {
             if let location = location {
                 dispatch_async(Queue.Main.queue) {
-                    println("User location: \(location)")                    
-//                    self.mapView.setCenterCoordinate(location.coordinate, animated: true)
                     self.mapView.setRegion(location.region, animated: true)
                 }
             }
