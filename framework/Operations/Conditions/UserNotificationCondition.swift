@@ -1,0 +1,147 @@
+//
+//  UserNotificationCondition.swift
+//  Operations
+//
+//  Created by Daniel Thorpe on 28/07/2015.
+//  Copyright (c) 2015 Daniel Thorpe. All rights reserved.
+//
+
+#if os(iOS)
+
+import UIKit
+
+public protocol UserNotificationManager {
+    func registerUserNotificationSettings(notificationSettings: UIUserNotificationSettings)
+    func currentUserNotificationSettings() -> UIUserNotificationSettings!
+}
+
+extension UIApplication: UserNotificationManager { }
+
+/**
+    A condition for verifying that we can present alerts
+    to the user via `UILocalNotification` and/or remote
+    notifications.
+*/
+public struct UserNotificationCondition: OperationCondition {
+
+    public enum Behavior {
+        // Merge the new settings with the current settings
+        case Merge
+        // Replace the current settings with the new settings
+        case Replace
+    }
+
+    public enum Error: ErrorType {
+        public typealias UserSettingsPair = (current: UIUserNotificationSettings, desired: UIUserNotificationSettings)
+        case SettingsNotSufficient(UserSettingsPair)
+    }
+
+    public let name = "UserNotification"
+    public let isMutuallyExclusive = false
+
+    let settings: UIUserNotificationSettings
+    let behavior: Behavior
+    let manager: UserNotificationManager
+
+    public init(settings: UIUserNotificationSettings, behavior: Behavior = .Merge, manager: UserNotificationManager = UIApplication.sharedApplication()) {
+        self.settings = settings
+        self.behavior = behavior
+        self.manager = manager
+    }
+
+    public func dependencyForOperation(operation: Operation) -> NSOperation? {
+        return UserNotificationPermissionOperation(settings: settings, behavior: behavior, manager: manager)
+    }
+
+    public func evaluateForOperation(operation: Operation, completion: OperationConditionResult -> Void) {
+        let current = manager.currentUserNotificationSettings()
+        switch (current, settings) {
+        case (let current, let settings) where current.contains(settings):
+            completion(.Satisfied)
+        default:
+            completion(.Failed(Error.SettingsNotSufficient((current, settings))))
+        }
+    }
+}
+
+class UserNotificationPermissionOperation: Operation {
+
+    let settings: UIUserNotificationSettings
+    let behavior: UserNotificationCondition.Behavior
+    let manager: UserNotificationManager
+
+    init(settings: UIUserNotificationSettings, behavior: UserNotificationCondition.Behavior = .Merge, manager: UserNotificationManager = UIApplication.sharedApplication()) {
+        self.settings = settings
+        self.behavior = behavior
+        self.manager = manager
+        super.init()
+        addCondition(AlertPresentation())
+    }
+
+    override func execute() {
+        dispatch_async(Queue.Main.queue, request)
+    }
+
+    func request() {
+        let current = manager.currentUserNotificationSettings()
+        let settingsToRegister: UIUserNotificationSettings = {
+            switch (current, self.behavior) {
+            case (let currentSettings, .Merge) where current != nil:
+                return currentSettings.settingsByMerging(self.settings)
+            default:
+                return self.settings
+            }
+        }()
+        manager.registerUserNotificationSettings(settingsToRegister)
+    }
+}
+
+
+extension UIUserNotificationSettings {
+
+    func contains(settings: UIUserNotificationSettings) -> Bool {
+        // This going to be so much easier with Swift 2.0's improved RawOptionSetType
+        // Need to check that our types contain all of the other types
+        // but without access to `contains:`
+        if (types & UIUserNotificationType.Alert) && !(settings.types & UIUserNotificationType.Alert) {
+            return false
+        }
+        if (types & UIUserNotificationType.Badge) && !(settings.types & UIUserNotificationType.Badge) {
+            return false
+        }
+        if (types & UIUserNotificationType.Sound) && !(settings.types & UIUserNotificationType.Sound) {
+            return false
+        }
+
+        let myCategories = categories ?? []
+        let otherCategories = settings.categories ?? []
+        return myCategories.isSupersetOf(otherCategories)
+    }
+
+    func settingsByMerging(settings: UIUserNotificationSettings) -> UIUserNotificationSettings {
+        let union = types | settings.types
+
+        let myCategories = categories as? Set<UIUserNotificationCategory> ?? []
+        var existingCategoriesByIdentifier = Dictionary(sequence: myCategories) { $0.identifier }
+
+        let newCategories = settings.categories as? Set<UIUserNotificationCategory> ?? []
+        var newCategoriesByIdentifier = Dictionary(sequence: myCategories) { $0.identifier }
+
+        for (newIdentifier, newCategory) in newCategoriesByIdentifier {
+            existingCategoriesByIdentifier[newIdentifier] = newCategory
+        }
+
+        let mergedCategories = Set(existingCategoriesByIdentifier.values)
+        return UIUserNotificationSettings(forTypes: union, categories: mergedCategories)
+    }
+}
+
+extension UIUserNotificationType: BooleanType {
+
+    public var boolValue: Bool {
+        return self != .allZeros
+    }
+}
+
+#endif
+

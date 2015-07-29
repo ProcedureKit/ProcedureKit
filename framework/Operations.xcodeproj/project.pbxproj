@@ -39,6 +39,7 @@
 		6597EADC1B66373500129294 /* NoCancelledCondition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6597EADB1B66373500129294 /* NoCancelledCondition.swift */; };
 		6597EADE1B66399700129294 /* NoCancelledConditionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6597EADD1B66399700129294 /* NoCancelledConditionTests.swift */; };
 		65B551DC1B626FAA003B0C58 /* LoggingObserverTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65B551DB1B626FAA003B0C58 /* LoggingObserverTests.swift */; };
+		65C00C2A1B6836D800599903 /* UserNotificationCondition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65C00C291B6836D800599903 /* UserNotificationCondition.swift */; };
 		65CB76FC1B3F284A00791E18 /* BlockObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65CB76F71B3F284A00791E18 /* BlockObserver.swift */; };
 		65CB76FD1B3F284A00791E18 /* OperationObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65CB76F81B3F284A00791E18 /* OperationObserver.swift */; };
 		65CB76FE1B3F284A00791E18 /* TimeoutObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65CB76F91B3F284A00791E18 /* TimeoutObserver.swift */; };
@@ -106,6 +107,7 @@
 		6597EADB1B66373500129294 /* NoCancelledCondition.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NoCancelledCondition.swift; sourceTree = "<group>"; };
 		6597EADD1B66399700129294 /* NoCancelledConditionTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NoCancelledConditionTests.swift; sourceTree = "<group>"; };
 		65B551DB1B626FAA003B0C58 /* LoggingObserverTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoggingObserverTests.swift; sourceTree = "<group>"; };
+		65C00C291B6836D800599903 /* UserNotificationCondition.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserNotificationCondition.swift; sourceTree = "<group>"; };
 		65CB76F71B3F284A00791E18 /* BlockObserver.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BlockObserver.swift; sourceTree = "<group>"; };
 		65CB76F81B3F284A00791E18 /* OperationObserver.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OperationObserver.swift; sourceTree = "<group>"; };
 		65CB76F91B3F284A00791E18 /* TimeoutObserver.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TimeoutObserver.swift; sourceTree = "<group>"; };
@@ -242,6 +244,7 @@
 				6577297E1B3DAA0400B5D153 /* OperationCondition.swift */,
 				65D6F58C1B5BFE59003D35AD /* ReachabilityCondition.swift */,
 				654308471B6490740081C211 /* SlientCondition.swift */,
+				65C00C291B6836D800599903 /* UserNotificationCondition.swift */,
 				656010081B5C557D0052EE78 /* Permissions */,
 			);
 			path = Conditions;
@@ -400,6 +403,7 @@
 				6597EADC1B66373500129294 /* NoCancelledCondition.swift in Sources */,
 				6514BE5A1B65993F0020A39D /* LocationCondition.swift in Sources */,
 				65D6F5891B5BEAC9003D35AD /* NetworkObserver.swift in Sources */,
+				65C00C2A1B6836D800599903 /* UserNotificationCondition.swift in Sources */,
 				6597EAD81B65A8B100129294 /* LocationOperation.swift in Sources */,
 				65CB76FF1B3F284A00791E18 /* OperationQueue.swift in Sources */,
 				65D6F5851B5BE620003D35AD /* BackgroundObserver.swift in Sources */,
