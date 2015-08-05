@@ -16,7 +16,29 @@ class PermissionViewController: UIViewController {
 
         static var all: [State] = [ .Unknown, .Authorized, .Denied, .Completed ]
     }
+    
+    // Permission not determined
+    @IBOutlet weak var permissionNotDeterminedContainerView: UIView!
+    @IBOutlet weak var permissionNotDeterminedLabel: UILabel!
+    @IBOutlet weak var permissionTapTheButtonLabel: UILabel!
+    @IBOutlet weak var permissionBeginButton: UIButton!
 
+    // Permission access denied
+    @IBOutlet weak var permissionAccessDeniedContainerView: UIView!
+    @IBOutlet weak var permissionAccessDeniedView: UIView!
+    
+    // Permission granted
+    @IBOutlet weak var permissionGrantedContainerView: UIView!
+    @IBOutlet weak var permissionGrantedPerformOperationInstructionsLabel: UILabel!
+    @IBOutlet weak var permissionGrantedPerformOperationButton: UIButton!
+    
+    // Operation Results
+    @IBOutlet weak var operationResultsContainerView: UIView!
+    @IBOutlet weak var operationResultsLabel: UILabel!
+    
+    // Permission reset instructions
+    @IBOutlet weak var permissionResetInstructionsView: UIView!
+    
     let queue = OperationQueue()
 
     private var _state: State = .Unknown
@@ -42,16 +64,45 @@ class PermissionViewController: UIViewController {
         }
     }
 
+    func condition<Condition: OperationCondition>() -> Condition {
+        fatalError("Must be overridded in subclass.")
+    }
+    
     // MARK: Update UI
 
+    func configureConditionsForState<Condition: OperationCondition>(state: State, silent: Bool = true) -> (Condition) -> [OperationCondition] {
+        return { condition in
+            switch (silent, state) {
+            case (true, .Unknown):
+                return [ SilentCondition(NegatedCondition(condition)) ]
+            case (false, .Unknown):
+                return [ NegatedCondition(condition) ]
+            case (true, .Authorized):
+                return [ SilentCondition(condition) ]
+            case (false, .Authorized):
+                return [ condition ]
+            default:
+                return []
+            }
+        }
+    }
+
     func conditionsForState(state: State, silent: Bool = true) -> [OperationCondition] {
-        assertionFailure("Must be over-ridden in a subclass.")
-        return []
+        // Subclasses should over-ride and call this...
+        return configureConditionsForState(state, silent: silent)(BlockCondition { true })
     }
 
     func viewsForState(state: State) -> [UIView] {
-        assertionFailure("Must be over-ridden in a subclass.")
-        return []
+        switch state {
+        case .Unknown:
+            return [permissionNotDeterminedContainerView]
+        case .Authorized:
+            return [permissionGrantedContainerView, permissionResetInstructionsView]
+        case .Denied:
+            return [permissionAccessDeniedContainerView, permissionResetInstructionsView]
+        case .Completed:
+            return [operationResultsContainerView, permissionResetInstructionsView]
+        }
     }
 
     func displayOperationForState(state: State, silent: Bool = true) -> Operation {

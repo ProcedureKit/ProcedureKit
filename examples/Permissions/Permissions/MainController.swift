@@ -18,9 +18,9 @@ enum Demo: Int {
         let subtitle: String
     }
 
-    case AddressBook, Location
+    case AddressBook, Location, UserNotificationSettings
 
-    static let all: [Demo] = [ .AddressBook, .Location ]
+    static let all: [Demo] = [ .AddressBook, .Location, .UserNotificationSettings ]
 
     var info: Info {
         switch self {
@@ -36,13 +36,19 @@ enum Demo: Int {
                 title: "Location",
                 subtitle: "Get the user's current location. Use LocationCondition to test whether the user has granted permissions."
             )
+            
+        case .UserNotificationSettings:
+            return Info(
+                title: "User Notification Settings",
+                subtitle: "Use this condition to ensure that your app has requested the appropriate permissions from the user before setting up notifications."
+            )
         }
     }
 
-    var segue: UIStoryboardSegue.Segue {
+    var segueIdentifier: MainController.SegueIdentifier? {
         switch self {
-        case .AddressBook: return UIStoryboardSegue.Segue.AddressBook
-        case .Location: return UIStoryboardSegue.Segue.Location
+        case .Location: return .ShowLocation
+        default: return .None
         }
     }
 }
@@ -68,6 +74,10 @@ struct ContentsDatasourceProvider: DatasourceProviderType {
 
 class MainController: UIViewController {
 
+    enum SegueIdentifier: String {
+        case ShowLocation = "show.Location"
+    }
+    
     @IBOutlet var tableView: UITableView!
 
     let queue = OperationQueue()
@@ -92,18 +102,39 @@ extension MainController: UITableViewDelegate {
 
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         if let demo = provider.datasource.itemAtIndexPath(indexPath) {
-            let present = BlockOperation {
-                self.performSegueWithIdentifier(demo.segue.pushSegueIdentifier, sender: nil)
-            }
-
-            present.addCondition(MutuallyExclusive<UIViewController>())
-            present.addObserver(BlockObserver { (_, errors) in
-                dispatch_async(Queue.Main.queue) {
-                    tableView.deselectRowAtIndexPath(indexPath, animated: true)
+            var show: BlockOperation? = .None
+            
+            switch demo {
+            case .Location:
+                if let segueIdentifier = demo.segueIdentifier {
+                    show = BlockOperation {
+                        self.performSegueWithIdentifier(segueIdentifier.rawValue, sender: nil)
+                    }
                 }
-            })
 
-            queue.addOperation(present)
+            case .AddressBook:
+                let viewController = AddressBookViewController()
+                show = BlockOperation {
+                    self.navigationController?.pushViewController(viewController, animated: true)
+                }
+                
+            case .UserNotificationSettings:
+                let viewController = AddressBookViewController()
+                show = BlockOperation {
+                    self.navigationController?.pushViewController(viewController, animated: true)
+                }
+            }
+            
+            if let show = show {
+                show.addCondition(MutuallyExclusive<UIViewController>())
+                show.addObserver(BlockObserver { (_, errors) in
+                    dispatch_async(Queue.Main.queue) {
+                        tableView.deselectRowAtIndexPath(indexPath, animated: true)
+                    }
+                })
+                
+                queue.addOperation(show)
+            }
         }
     }
 }
@@ -132,6 +163,7 @@ extension UIStoryboardSegue {
     enum Segue: String {
         case AddressBook = "AddressBook"
         case Location = "Location"
+        case UserNotificationSettings = "UserNotificationSettings"
 
         var pushSegueIdentifier: String {
             return segueIdentifierWithPrefix("push")

@@ -39,6 +39,10 @@ class LocationViewController: PermissionViewController {
         determineAuthorizationStatus()
     }
 
+    override func conditionsForState(state: State, silent: Bool) -> [OperationCondition] {
+        return configureConditionsForState(state, silent: silent)(LocationCondition())
+    }
+    
     func determineAuthorizationStatus(silently: Bool = true) {
 
         // Create a simple block operation to set the state.
@@ -92,20 +96,6 @@ class LocationViewController: PermissionViewController {
     }
 
     // MARK: Update UI
-
-    override func conditionsForState(state: State, silent: Bool = true) -> [OperationCondition] {
-
-        switch state {
-        case .Unknown:
-            return silent ? [ SilentCondition(NegatedCondition(LocationCondition())) ] : [ NegatedCondition(LocationCondition()) ]
-
-        case .Authorized:
-            return silent ? [ SilentCondition(LocationCondition()) ] : [ LocationCondition() ]
-
-        default:
-            return []
-        }
-    }
 
     override func viewsForState(state: State) -> [UIView] {
         switch state {
