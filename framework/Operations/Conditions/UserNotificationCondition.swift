@@ -11,11 +11,20 @@
 import UIKit
 
 public protocol UserNotificationManager {
-    func registerUserNotificationSettings(notificationSettings: UIUserNotificationSettings)
-    func currentUserNotificationSettings() -> UIUserNotificationSettings!
+    func opr_registerUserNotificationSettings(notificationSettings: UIUserNotificationSettings)
+    func opr_currentUserNotificationSettings() -> UIUserNotificationSettings?
 }
 
-extension UIApplication: UserNotificationManager { }
+extension UIApplication: UserNotificationManager {
+    
+    public func opr_registerUserNotificationSettings(notificationSettings: UIUserNotificationSettings) {
+            registerUserNotificationSettings(notificationSettings)
+    }
+    
+    public func opr_currentUserNotificationSettings() -> UIUserNotificationSettings? {
+        return currentUserNotificationSettings() ?? .None
+    }
+}
 
 /**
     A condition for verifying that we can present alerts
@@ -31,8 +40,8 @@ public struct UserNotificationCondition: OperationCondition {
         case Replace
     }
 
-    public enum Error: ErrorType {
-        public typealias UserSettingsPair = (current: UIUserNotificationSettings, desired: UIUserNotificationSettings)
+    public enum Error: ErrorType, Equatable {
+        public typealias UserSettingsPair = (current: UIUserNotificationSettings?, desired: UIUserNotificationSettings)
         case SettingsNotSufficient(UserSettingsPair)
     }
 
@@ -54,16 +63,28 @@ public struct UserNotificationCondition: OperationCondition {
     }
 
     public func evaluateForOperation(operation: Operation, completion: OperationConditionResult -> Void) {
-        let current = manager.currentUserNotificationSettings()
-        switch (current, settings) {
-        case (let current, let settings) where current.contains(settings):
-            completion(.Satisfied)
-        default:
-            completion(.Failed(Error.SettingsNotSufficient((current, settings))))
+        if let current = manager.opr_currentUserNotificationSettings() {
+            switch (current, settings) {
+            case (let current, let settings) where current.contains(settings):
+                completion(.Satisfied)
+            default:
+                completion(.Failed(Error.SettingsNotSufficient((current, settings))))
+            }
+        }
+        else {
+            completion(.Failed(Error.SettingsNotSufficient((.None, settings))))
         }
     }
 }
 
+public func ==(a: UserNotificationCondition.Error, b: UserNotificationCondition.Error) -> Bool {
+    switch (a, b) {
+    case let (.SettingsNotSufficient(current: aCurrent, desired: aDesired), .SettingsNotSufficient(current: bCurrent, desired: bDesired)):
+        return (aCurrent == bCurrent) && (aDesired == bDesired)
+    default: return false
+    }
+}
+    
 class UserNotificationPermissionOperation: Operation {
 
     let settings: UIUserNotificationSettings
@@ -83,19 +104,18 @@ class UserNotificationPermissionOperation: Operation {
     }
 
     func request() {
-        let current = manager.currentUserNotificationSettings()
-        let settingsToRegister: UIUserNotificationSettings = {
-            switch (current, self.behavior) {
-            case (let currentSettings, .Merge) where current != nil:
-                return currentSettings.settingsByMerging(self.settings)
+        var settingsToRegister = settings
+        if let current = manager.opr_currentUserNotificationSettings() {
+            switch (current, behavior) {
+            case (let currentSettings, .Merge):
+                settingsToRegister = currentSettings.settingsByMerging(settings)
             default:
-                return self.settings
+                break
             }
-        }()
-        manager.registerUserNotificationSettings(settingsToRegister)
+        }
+        manager.opr_registerUserNotificationSettings(settingsToRegister)
     }
 }
-
 
 extension UIUserNotificationSettings {
 
