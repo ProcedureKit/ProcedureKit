@@ -118,8 +118,48 @@ func dismiss() {
 
 In the above example, we're able to compose reusable (and testable!) units of work in order to express relatively complex control logic. Another way to achieve this kind of behaviour might be through FRP techniques, however those are unlikely to yield re-usable types like `UnsavedChangesCondition`, or even `DismissController` if the above was composed inside a custom `GroupOperation`.
 
+Requesting permissions from the user can often be a relatively complex task, which almost all apps have to perform at some point. Often developers put requests for these permissions in their AppDelegate, meaning that new users are bombarded with alerts. This isn't a great experience, and Apple expressly suggest only requesting permissions when you need them. However, this is easier said than done. The Operations framework can help however. Lets say we want to get the user's current location.
 
-There is an example app, Permissions.app in `example/Permissions` which contains more examples of usage. 
+```swift
+func getCurrentLocation(completion: CLLocation? -> Void) {
+    let location = LocationOperation() { location in
+        completion(location)
+    }
+    location.addCondition(LocationCondition())
+    queue.addOperation(location)
+}
+```
+
+This operation will automatically request the user's permission if the application doesn't already have the required authorization, the default is "when in use".
+
+Perhaps also you want to just test to see if authorization has already been granted, but not ask for it if it hasn't. This can be done using a `BlockOperation` and `SilentCondition`.
+
+```swift
+func determineAuthorizationStatus() {
+    let authorized = BlockOperation { (continueWithError: BlockOperation.ContinuationBlockType) in
+        self.state = .Authorized
+        continueWithError(error: nil)
+    }
+    authorized.addCondition(SilentCondition(LocationCondition()))
+    authorized.addObserver(BlockObserver { (_, errors) in
+        if let error = errors.first as? LocationCondition.Error {
+            switch error {
+            case let .AuthenticationStatusNotSufficient(CLAuthorizationStatus.NotDetermined, _):
+                self.state = .Unknown
+
+            case let .AuthenticationStatusNotSufficient(CLAuthorizationStatus.Denied, _):
+                self.state = .Denied
+
+            default:
+                self.state = .Unknown
+            }
+        }
+    })
+    queue.addOperation(authorized)
+}
+```
+
+There is an example app, Permissions.app in `example/Permissions` which contains more examples of this sort of usage. 
 
 ## Current Status
 
