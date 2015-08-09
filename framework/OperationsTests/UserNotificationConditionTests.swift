@@ -23,7 +23,7 @@ class TestableUserNotificationManager: UserNotificationManager {
         println("Registering notification settings")        
         didRegisterSettings = notificationSettings
         currentSettings = notificationSettings
-        UserNotificationSettingsNotification.notificationSettingsDidChange(notificationSettings)
+        UserNotificationCondition.didRegisterUserNotificationSettings(notificationSettings)
     }
 
     func opr_currentUserNotificationSettings() -> UIUserNotificationSettings? {

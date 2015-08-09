@@ -26,17 +26,8 @@ extension UIApplication: UserNotificationManager {
     }
 }
 
-public struct UserNotificationSettingsNotification {
-
-    static let name = "UserNotificationSettingsNotification"
-    static let notificationKey = "UserNotificationSettingsKey"
-
-    public static func notificationSettingsDidChange(notificationSettings: UIUserNotificationSettings) {
-        NSNotificationCenter
-            .defaultCenter()
-            .postNotificationName(name, object: nil, userInfo: [notificationKey: notificationSettings] )
-    }
-}
+private let DidRegisterSettingsNotificationName = "DidRegisterSettingsNotificationName"
+private let NotificationSettingsKey = "NotificationSettingsKey"
 
 
 /**
@@ -50,7 +41,7 @@ public struct UserNotificationSettingsNotification {
 
     Like this:
         func application(_ application: UIApplication, didRegisterUserNotificationSettings notificationSettings: UIUserNotificationSettings) {
-            UserNotificationSettingsNotification.notificationSettingsDidChange(notificationSettings)
+            UserNotificationCondition.didRegisterUserNotificationSettings(notificationSettings)
         }
 
 */
@@ -68,8 +59,11 @@ public struct UserNotificationCondition: OperationCondition {
         case SettingsNotSufficient(UserSettingsPair)
     }
 
-    public static let ApplicationDidRegisterUserNotificationSettingsNotificationName = "application:didRegisterUserNotificationSettingsNotification"
-    public static let UserNotificationSettingsKey = "UserNotificationSettingsKey"
+    public static func didRegisterUserNotificationSettings(notificationSettings: UIUserNotificationSettings) {
+        NSNotificationCenter
+            .defaultCenter()
+            .postNotificationName(DidRegisterSettingsNotificationName, object: nil, userInfo: [NotificationSettingsKey: notificationSettings] )
+    }
 
     public let name = "UserNotification"
     public let isMutuallyExclusive = false
@@ -134,7 +128,9 @@ class UserNotificationPermissionOperation: Operation {
     }
 
     override func execute() {
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: NotificationObserver.SettingsDidChange.rawValue, name: UserNotificationSettingsNotification.name, object: nil)
+        NSNotificationCenter
+            .defaultCenter()
+            .addObserver(self, selector: NotificationObserver.SettingsDidChange.rawValue, name: DidRegisterSettingsNotificationName, object: nil)
         dispatch_async(Queue.Main.queue, request)
     }
 
@@ -152,6 +148,7 @@ class UserNotificationPermissionOperation: Operation {
     }
 
     func notificationSettingsDidChange(aNotification: NSNotification) {
+        NSNotificationCenter.defaultCenter().removeObserver(self)
         self.finish()
     }
 }
