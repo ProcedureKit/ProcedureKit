@@ -14,14 +14,21 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
 
-
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
         // Override point for customization after application launch.
         return true
     }
 
     func application(application: UIApplication, didRegisterUserNotificationSettings notificationSettings: UIUserNotificationSettings) {
-        UserNotificationSettingsNotification.notificationSettingsDidChange(notificationSettings)
+        UserNotificationCondition.didRegisterUserNotificationSettings(notificationSettings)
+    }
+
+    func application(application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: NSData) {
+        RemoteNotificationCondition.didReceiveNotificationToken(deviceToken)
+    }
+
+    func application(application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: NSError) {
+        RemoteNotificationCondition.didFailToRegisterForRemoteNotifications(error)
     }
 }
 

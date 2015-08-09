@@ -127,8 +127,6 @@ public class RemoteNotificationsRegistration: Operation {
     }
 }
 
-
-
 private let RemoteNotificationName = "DidRegisterSettingsNotificationName"
 private let RemoteNotificationTokenKey = "RemoteNotificationTokenKey"
 private let RemoteNotificationErrorKey = "RemoteNotificationErrorKey"

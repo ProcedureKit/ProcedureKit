@@ -29,7 +29,6 @@ enum UserNotificationSettings {
     }
 }
 
-
 class UserNotificationSettingsViewController: PermissionViewController {
 
     var currentUserNotificationSettings: UIUserNotificationSettings {

@@ -112,7 +112,6 @@ public func ==(a: UserNotificationCondition.Error, b: UserNotificationCondition.
     }
 }
     
-
 public class UserNotificationPermissionOperation: Operation {
 
     enum NotificationObserver: Selector {
