@@ -44,13 +44,6 @@ enum Demo: Int {
             )
         }
     }
-
-    var segueIdentifier: MainController.SegueIdentifier? {
-        switch self {
-        case .Location: return .ShowLocation
-        default: return .None
-        }
-    }
 }
 
 struct ContentsDatasourceProvider: DatasourceProviderType {
@@ -74,10 +67,6 @@ struct ContentsDatasourceProvider: DatasourceProviderType {
 
 class MainController: UIViewController {
 
-    enum SegueIdentifier: String {
-        case ShowLocation = "show.Location"
-    }
-    
     @IBOutlet var tableView: UITableView!
 
     let queue = OperationQueue()

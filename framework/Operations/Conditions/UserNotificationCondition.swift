@@ -18,7 +18,7 @@ public protocol UserNotificationManager {
 extension UIApplication: UserNotificationManager {
     
     public func opr_registerUserNotificationSettings(notificationSettings: UIUserNotificationSettings) {
-            registerUserNotificationSettings(notificationSettings)
+        registerUserNotificationSettings(notificationSettings)
     }
     
     public func opr_currentUserNotificationSettings() -> UIUserNotificationSettings? {
@@ -64,9 +64,12 @@ public struct UserNotificationCondition: OperationCondition {
 
     public func evaluateForOperation(operation: Operation, completion: OperationConditionResult -> Void) {
         if let current = manager.opr_currentUserNotificationSettings() {
+
             switch (current, settings) {
-            case (let current, let settings) where current.contains(settings):
+
+            case let (current, settings) where current.contains(settings):
                 completion(.Satisfied)
+
             default:
                 completion(.Failed(Error.SettingsNotSufficient((current, settings))))
             }
@@ -124,6 +127,9 @@ extension UIUserNotificationSettings {
         // This going to be so much easier with Swift 2.0's improved RawOptionSetType
         // Need to check that our types contain all of the other types
         // but without access to `contains:`
+        if (types == UIUserNotificationType.allZeros) && (settings.types.rawValue > 0) {
+            return false
+        }
         if (types & UIUserNotificationType.Alert) && !(settings.types & UIUserNotificationType.Alert) {
             return false
         }
