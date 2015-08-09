@@ -10,39 +10,13 @@ import Foundation
 import AddressBook
 import Operations
 
-
-class AddressBookViewController: UIViewController {
-
-    enum State: Int {
-        case Unknown, Authorized, Denied, Completed
-
-        static var all: [State] = [ .Unknown, .Authorized, .Denied, .Completed ]
-    }
-
-    // Address Book status not determined
-    @IBOutlet var statusNotDeterminedContainerView: UIView!
-    @IBOutlet var beginAuthorizationRequestButton: UIButton!
-
-    // Address Book status authorized
-    @IBOutlet var statusAuthorizedContainerView: UIView!
-    @IBOutlet var countContactsButton: UIButton!
-
-    // Address Book status denied
-    @IBOutlet var statusDeniedContainerView: UIView!
-
-    // Address Book contacts results
-    @IBOutlet var addressBookResultsContainerView: UIView!
-    @IBOutlet var addressBookResultsLabel: UILabel!
-
-    // Reset instructions
-    @IBOutlet var resetPermissionsView: UIView!
-
+class AddressBookViewController: PermissionViewController {
 
     var numberOfContacts: Int = 0 {
         didSet {
-            dispatch_async(Queue.Main.queue) { [count = numberOfContacts, label = addressBookResultsLabel] in
+            dispatch_async(Queue.Main.queue) { [count = numberOfContacts, label = operationResults.informationLabel] in
                 if count > 1 {
-                    label.text = "There are \(count) in your Address Book."
+                    label.text = "There are \(count) contacts in your Address Book."
                 }
                 else if count == 1 {
                     label.text = "There is only one contact in your Address Book."
@@ -54,37 +28,22 @@ class AddressBookViewController: UIViewController {
         }
     }
 
-    let queue = OperationQueue()
-
-    private var _state: State = .Unknown
-    var state: State {
-        get {
-            return _state
-        }
-        set {
-            switch (_state, newValue) {
-
-            case (.Completed, _):
-                break
-
-            case (.Unknown, _):
-                queue.addOperation(displayOperationForState(newValue, silent: true))
-                _state = newValue
-
-            default:
-                queue.addOperation(displayOperationForState(newValue, silent: false))
-                _state = newValue
-            }
-        }
-    }
-
     override func viewDidLoad() {
         super.viewDidLoad()
         title = NSLocalizedString("Address Book", comment: "Address Book")
+
+        permissionNotDetermined.informationLabel.text = "We haven't yet asked permission to access your Address Book."
+        permissionGranted.instructionLabel.text = "Perform an operation with the Address Book"
+        permissionGranted.button.setTitle("Count the number of Contacts", forState: .Normal)
+        operationResults.informationLabel.text = "These are the results of our Address Book Operation"
     }
 
     override func viewWillAppear(animated: Bool) {
         determineAuthorizationStatus()
+    }
+
+    override func conditionsForState(state: State, silent: Bool) -> [OperationCondition] {
+        return configureConditionsForState(state, silent: silent)(AddressBookCondition())
     }
 
     func determineAuthorizationStatus(silently: Bool = true) {
@@ -122,65 +81,11 @@ class AddressBookViewController: UIViewController {
         queue.addOperation(authorized)
     }
 
-    func conditionsForState(state: State, silent: Bool = true) -> [OperationCondition] {
-
-        switch state {
-        case .Unknown:
-            return silent ? [ SilentCondition(NegatedCondition(AddressBookCondition())) ] : [ NegatedCondition(AddressBookCondition()) ]
-
-        case .Authorized:
-            return silent ? [ SilentCondition(AddressBookCondition()) ] : [ AddressBookCondition() ]
-
-        default:
-            return []
-        }
-    }
-
-    func requestAccess() {
+    override func requestPermission() {
         determineAuthorizationStatus(silently: false)
     }
 
-    // MARK: Update UI
-
-    func viewsForState(state: State) -> [UIView] {
-        switch state {
-        case .Unknown:
-            return [statusNotDeterminedContainerView]
-        case .Authorized:
-            return [statusAuthorizedContainerView, resetPermissionsView]
-        case .Denied:
-            return [statusDeniedContainerView, resetPermissionsView]
-        case .Completed:
-            return [addressBookResultsContainerView, resetPermissionsView]
-        }
-    }
-
-    func displayOperationForState(state: State, silent: Bool = true) -> Operation {
-        let others: [State] = {
-            var all = Set(State.all)
-            let _ = all.remove(state)
-            return Array(all)
-        }()
-
-        let viewsToHide = others.flatMap { self.viewsForState($0) }
-        let viewsToShow = viewsForState(state)
-
-        let update = BlockOperation { (continueWithError: BlockOperation.ContinuationBlockType) in
-            dispatch_async(Queue.Main.queue) {
-                viewsToHide.map { $0.hidden = true }
-                viewsToShow.map { $0.hidden = false }
-                continueWithError(error: nil)
-            }
-        }
-        update.name = "Update UI for state: \(state)"
-
-        let conditions = conditionsForState(state, silent: silent)
-        conditions.map { update.addCondition($0) }
-
-        return update
-    }
-
-    func countContacts() {
+    override func performOperation() {
 
         let countContactsOperation = AddressBookOperation { (addressBook, continueWithError) -> Void in
             let contacts: NSArray = ABAddressBookCopyArrayOfAllPeople(addressBook).takeRetainedValue()
@@ -190,15 +95,6 @@ class AddressBookViewController: UIViewController {
         }
         countContactsOperation.addCondition(AddressBookCondition())
         queue.addOperation(countContactsOperation)
-    }
-
-
-    @IBAction func beginAuthorizationRequestButtonAction(sender: UIButton) {
-        requestAccess()
-    }
-
-    @IBAction func countContactsButtonAction(sender: UIButton) {
-        countContacts()
     }
 }
 

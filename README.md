@@ -44,14 +44,15 @@ This is a brief summary of the current and planned functionality.
 - [x] `CloudKitOperation` compose a `CKDatabaseOperation` inside an `Operation` with the appropriate `CKDatabase`.
 - [x] `LocationCondition` requires permission to access the user’s location with support for specifying always or when in use permissions.
 - [x] `LocationOperation` access the user’s current location with desired accuracy. 
-- [ ] User Notifications
-- [ ] Remote Notifications
+- [x] User Notifications
+- [x] Remote Notifications
 - [ ] HealthKit
 - [ ] Photos & Camera
-- [ ] Events & Reminders
-- [ ] Passbook
+- [x] Events & Reminders
+- [x] Passbook
 - [ ] Contacts - some initial work is done on the `swift_2.0` branch. However, currently this branch is behind `development` by quite a margin.
 - [ ] Webpage - some initial work is done on a feature branch, again, Swift 2.0 only.
+- [x] User Confirmation Alert - condition an operation with a user confirmation, so that the operation will only be executed if the user confirms it. Great for “delete” operation for example.
 
 
 The framework is well tested, with approximately 70% coverage. This is known as I wrote it much of the foundation bits using Xcode 7 but have back ported it to Swift 1.2.
