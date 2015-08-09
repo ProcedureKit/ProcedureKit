@@ -13,12 +13,7 @@ import Operations
 
 class LocationViewController: PermissionViewController {
 
-    @IBOutlet var mapView: MKMapView!
-    @IBOutlet var notDeterminedContainerView: UIView!
-    @IBOutlet var accessDeniedViewContainer: UIView!
-    @IBOutlet var resetLocationInstructionsView: UIView!
-    @IBOutlet var getLocationButton: UIButton!
-    @IBOutlet var requestLocationButton: UIButton!
+    var mapView: MKMapView!
 
     var location: CLLocation? = .None {
         didSet {
@@ -33,6 +28,16 @@ class LocationViewController: PermissionViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         title = NSLocalizedString("Location", comment: "Location")
+
+        permissionNotDetermined.informationLabel.text = "We haven't yet asked permission to access your Location."
+        permissionGranted.instructionLabel.text = "Perform an operation to get your current Location."
+        permissionGranted.button.setTitle("Where am I?", forState: .Normal)
+        operationResults.informationLabel.hidden = true
+
+        mapView = MKMapView.newAutoLayoutView()
+        operationResults.addSubview(mapView)
+        mapView.autoPinEdgesToSuperviewEdgesWithInsets(UIEdgeInsetsZero)
+
     }
 
     override func viewWillAppear(animated: Bool) {
@@ -81,43 +86,18 @@ class LocationViewController: PermissionViewController {
 
         queue.addOperation(authorized)
     }
-    
-    func requestAccess() {
+
+    override func requestPermission() {
         determineAuthorizationStatus(silently: false)
     }
 
-    func getLocation() {
+    override func performOperation() {
         let location = LocationOperation() { location in
             self.state = .Completed
             self.location = location
         }
         location.addCondition(LocationCondition())
         queue.addOperation(location)
-    }
-
-    // MARK: Update UI
-
-    override func viewsForState(state: State) -> [UIView] {
-        switch state {
-        case .Unknown:
-            return [notDeterminedContainerView]
-        case .Authorized:
-            return [requestLocationButton, resetLocationInstructionsView]
-        case .Completed:
-            return [mapView, resetLocationInstructionsView]
-        case .Denied:
-            return [accessDeniedViewContainer, resetLocationInstructionsView]
-        }
-    }
-
-    // Button Actions
-
-    @IBAction func beginAuthorizationRequestButtonAction(sender: UIButton) {
-        requestAccess()
-    }
-
-    @IBAction func showMyLocationButtonAction(sender: UIButton) {
-        getLocation()
     }
 }
 

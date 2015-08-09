@@ -106,10 +106,9 @@ extension MainController: UITableViewDelegate {
             
             switch demo {
             case .Location:
-                if let segueIdentifier = demo.segueIdentifier {
-                    show = BlockOperation {
-                        self.performSegueWithIdentifier(segueIdentifier.rawValue, sender: nil)
-                    }
+                let viewController = LocationViewController()
+                show = BlockOperation {
+                    self.navigationController?.pushViewController(viewController, animated: true)
                 }
 
             case .AddressBook:
@@ -119,7 +118,7 @@ extension MainController: UITableViewDelegate {
                 }
                 
             case .UserNotificationSettings:
-                let viewController = AddressBookViewController()
+                let viewController = UserNotificationSettingsViewController()
                 show = BlockOperation {
                     self.navigationController?.pushViewController(viewController, animated: true)
                 }

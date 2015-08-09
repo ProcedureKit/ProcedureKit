@@ -11,7 +11,6 @@
 import UIKit
 
 public protocol UserNotificationManager {
-<<<<<<< Updated upstream
     func opr_registerUserNotificationSettings(notificationSettings: UIUserNotificationSettings)
     func opr_currentUserNotificationSettings() -> UIUserNotificationSettings?
 }
@@ -26,13 +25,6 @@ extension UIApplication: UserNotificationManager {
         return currentUserNotificationSettings() ?? .None
     }
 }
-=======
-    func registerUserNotificationSettings(notificationSettings: UIUserNotificationSettings)
-    func currentUserNotificationSettings() -> UIUserNotificationSettings!
-}
-
-extension UIApplication: UserNotificationManager { }
->>>>>>> Stashed changes
 
 /**
     A condition for verifying that we can present alerts
@@ -48,13 +40,8 @@ public struct UserNotificationCondition: OperationCondition {
         case Replace
     }
 
-<<<<<<< Updated upstream
     public enum Error: ErrorType, Equatable {
         public typealias UserSettingsPair = (current: UIUserNotificationSettings?, desired: UIUserNotificationSettings)
-=======
-    public enum Error: ErrorType {
-        public typealias UserSettingsPair = (current: UIUserNotificationSettings, desired: UIUserNotificationSettings)
->>>>>>> Stashed changes
         case SettingsNotSufficient(UserSettingsPair)
     }
 
@@ -76,7 +63,6 @@ public struct UserNotificationCondition: OperationCondition {
     }
 
     public func evaluateForOperation(operation: Operation, completion: OperationConditionResult -> Void) {
-<<<<<<< Updated upstream
         if let current = manager.opr_currentUserNotificationSettings() {
             switch (current, settings) {
             case (let current, let settings) where current.contains(settings):
@@ -87,19 +73,10 @@ public struct UserNotificationCondition: OperationCondition {
         }
         else {
             completion(.Failed(Error.SettingsNotSufficient((.None, settings))))
-=======
-        let current = manager.currentUserNotificationSettings()
-        switch (current, settings) {
-        case (let current, let settings) where current.contains(settings):
-            completion(.Satisfied)
-        default:
-            completion(.Failed(Error.SettingsNotSufficient((current, settings))))
->>>>>>> Stashed changes
         }
     }
 }
 
-<<<<<<< Updated upstream
 public func ==(a: UserNotificationCondition.Error, b: UserNotificationCondition.Error) -> Bool {
     switch (a, b) {
     case let (.SettingsNotSufficient(current: aCurrent, desired: aDesired), .SettingsNotSufficient(current: bCurrent, desired: bDesired)):
@@ -108,8 +85,7 @@ public func ==(a: UserNotificationCondition.Error, b: UserNotificationCondition.
     }
 }
     
-=======
->>>>>>> Stashed changes
+
 class UserNotificationPermissionOperation: Operation {
 
     let settings: UIUserNotificationSettings
@@ -129,7 +105,6 @@ class UserNotificationPermissionOperation: Operation {
     }
 
     func request() {
-<<<<<<< Updated upstream
         var settingsToRegister = settings
         if let current = manager.opr_currentUserNotificationSettings() {
             switch (current, behavior) {
@@ -143,22 +118,6 @@ class UserNotificationPermissionOperation: Operation {
     }
 }
 
-=======
-        let current = manager.currentUserNotificationSettings()
-        let settingsToRegister: UIUserNotificationSettings = {
-            switch (current, self.behavior) {
-            case (let currentSettings, .Merge) where current != nil:
-                return currentSettings.settingsByMerging(self.settings)
-            default:
-                return self.settings
-            }
-        }()
-        manager.registerUserNotificationSettings(settingsToRegister)
-    }
-}
-
-
->>>>>>> Stashed changes
 extension UIUserNotificationSettings {
 
     func contains(settings: UIUserNotificationSettings) -> Bool {

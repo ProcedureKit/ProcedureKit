@@ -28,25 +28,29 @@ class PermissionViewController: UIViewController {
 
         func configure() {
             informationLabel.textAlignment = .Center
-            informationLabel.numberOfLines = 0
+            informationLabel.numberOfLines = 4
             informationLabel.font = UIFont.preferredFontForTextStyle(UIFontTextStyleHeadline)
         }
     }
 
     class InfoInstructionButtonBox: InfoBox {
+
         let instructionLabel = UILabel.newAutoLayoutView()
         let button = UIButton.buttonWithType(.Custom) as! UIButton
-        
+
+        var verticalSpaceBetweenLabels: NSLayoutConstraint!
+        var verticalSpaceBetweenButton: NSLayoutConstraint!
+
         override init(frame: CGRect) {
             super.init(frame: frame)
             addSubview(instructionLabel)
             addSubview(button)
             removeConstraints(constraints())
             informationLabel.autoPinEdgesToSuperviewMarginsExcludingEdge(.Bottom)
-            instructionLabel.autoPinEdge(.Top, toEdge: .Bottom, ofView: informationLabel, withOffset: 20)
+            verticalSpaceBetweenLabels = instructionLabel.autoPinEdge(.Top, toEdge: .Bottom, ofView: informationLabel, withOffset: 10)
             instructionLabel.autoPinEdgeToSuperviewMargin(.Leading)
             instructionLabel.autoPinEdgeToSuperviewMargin(.Trailing)
-            button.autoPinEdge(.Top, toEdge: .Bottom, ofView: instructionLabel, withOffset: 20)
+            verticalSpaceBetweenButton = button.autoPinEdge(.Top, toEdge: .Bottom, ofView: instructionLabel, withOffset: 10)
             button.autoPinEdgeToSuperviewMargin(.Bottom)
             button.autoAlignAxisToSuperviewMarginAxis(.Vertical)
             configure()
@@ -76,37 +80,13 @@ class PermissionViewController: UIViewController {
         static var all: [State] = [ .Unknown, .Authorized, .Denied, .Completed ]
     }
     
-<<<<<<< Updated upstream
-    // Permission not determined
-    @IBOutlet weak var permissionNotDeterminedContainerView: UIView!
-    @IBOutlet weak var permissionNotDeterminedLabel: UILabel!
-    @IBOutlet weak var permissionTapTheButtonLabel: UILabel!
-    @IBOutlet weak var permissionBeginButton: UIButton!
-
-    // Permission access denied
-    @IBOutlet weak var permissionAccessDeniedContainerView: UIView!
-    @IBOutlet weak var permissionAccessDeniedView: UIView!
-    
-    // Permission granted
-    @IBOutlet weak var permissionGrantedContainerView: UIView!
-    @IBOutlet weak var permissionGrantedPerformOperationInstructionsLabel: UILabel!
-    @IBOutlet weak var permissionGrantedPerformOperationButton: UIButton!
-    
-    // Operation Results
-    @IBOutlet weak var operationResultsContainerView: UIView!
-    @IBOutlet weak var operationResultsLabel: UILabel!
-    
-    // Permission reset instructions
-    @IBOutlet weak var permissionResetInstructionsView: UIView!
-=======
     // UIViews
     let permissionNotDetermined = InfoInstructionButtonBox.newAutoLayoutView()
     let permissionDenied = InfoInstructionButtonBox.newAutoLayoutView()
     let permissionGranted = InfoInstructionButtonBox.newAutoLayoutView()
     let permissionReset = InfoInstructionButtonBox.newAutoLayoutView()
     let operationResults = InfoBox.newAutoLayoutView()
->>>>>>> Stashed changes
-    
+
     let queue = OperationQueue()
 
     private var _state: State = .Unknown
@@ -132,10 +112,6 @@ class PermissionViewController: UIViewController {
         }
     }
 
-<<<<<<< Updated upstream
-    func condition<Condition: OperationCondition>() -> Condition {
-        fatalError("Must be overridded in subclass.")
-=======
     override func loadView() {
 
         let _view = UIView(frame: CGRectZero)
@@ -156,8 +132,9 @@ class PermissionViewController: UIViewController {
             }
             
             operationResults.autoPinEdgesToSuperviewEdgesWithInsets(UIEdgeInsetsZero)
-            
-            permissionReset.autoSetDimension(.Height, toSize: 100)
+
+            permissionReset.button.hidden = true
+            permissionReset.verticalSpaceBetweenButton.constant = 0
             permissionReset.autoPinEdgesToSuperviewEdgesWithInsets(UIEdgeInsetsZero, excludingEdge: .Top)
         }
         
@@ -185,10 +162,13 @@ class PermissionViewController: UIViewController {
         permissionDenied.button.enabled = false
         permissionDenied.button.hidden = true
         
-        permissionReset.informationLabel.text = "iOS remembers permissions for apps between launches and installes. But you can get around this..."
-        permissionReset.instructionLabel.text = "Either, run the app with a different bundle identififier. or reset your global permissions in General > Reset > Location & Address Book for example."
+        permissionReset.informationLabel.text = "iOS remembers permissions for apps between launches and installes. But you can get around this."
         permissionReset.informationLabel.font = UIFont.preferredFontForTextStyle(UIFontTextStyleCaption1)
+        permissionReset.informationLabel.textColor = UIColor.redColor()
+        permissionReset.instructionLabel.text = "Either, run the app with a different bundle identififier. or reset your global permissions in General > Reset > Location & Address Book for example."
         permissionReset.instructionLabel.font = UIFont.preferredFontForTextStyle(UIFontTextStyleCaption1)
+        permissionReset.instructionLabel.textColor = UIColor.redColor()
+        permissionReset.backgroundColor = UIColor.redColor().colorWithAlphaComponent(0.3)
 
         for view in [permissionNotDetermined, permissionGranted, permissionDenied, permissionReset, operationResults] {
             view.hidden = true
@@ -205,8 +185,7 @@ class PermissionViewController: UIViewController {
     }
     
     func performOperation() {
-        assertionFailure("Must be overridden")    
->>>>>>> Stashed changes
+        assertionFailure("Must be overridden")
     }
     
     // MARK: Update UI
@@ -236,23 +215,13 @@ class PermissionViewController: UIViewController {
     func viewsForState(state: State) -> [UIView] {
         switch state {
         case .Unknown:
-<<<<<<< Updated upstream
-            return [permissionNotDeterminedContainerView]
-        case .Authorized:
-            return [permissionGrantedContainerView, permissionResetInstructionsView]
-        case .Denied:
-            return [permissionAccessDeniedContainerView, permissionResetInstructionsView]
-        case .Completed:
-            return [operationResultsContainerView, permissionResetInstructionsView]
-=======
             return [permissionNotDetermined]
         case .Authorized:
             return [permissionGranted, permissionReset]
         case .Denied:
             return [permissionDenied, permissionReset]
         case .Completed:
-            return [operationResults, permissionReset]
->>>>>>> Stashed changes
+            return [operationResults]
         }
     }
 
