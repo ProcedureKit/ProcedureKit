@@ -7,16 +7,76 @@
 //
 
 import UIKit
+import PureLayout
 import Operations
 
 class PermissionViewController: UIViewController {
 
+    class InfoBox: UIView {
+        let informationLabel = UILabel.newAutoLayoutView()
+        
+        override init(frame: CGRect) {
+            super.init(frame: frame)
+            addSubview(informationLabel)
+            informationLabel.autoPinEdgesToSuperviewMargins()
+            configure()
+        }
+
+        required init(coder aDecoder: NSCoder) {
+            fatalError("init(coder:) has not been implemented")
+        }
+
+        func configure() {
+            informationLabel.textAlignment = .Center
+            informationLabel.numberOfLines = 0
+            informationLabel.font = UIFont.preferredFontForTextStyle(UIFontTextStyleHeadline)
+        }
+    }
+
+    class InfoInstructionButtonBox: InfoBox {
+        let instructionLabel = UILabel.newAutoLayoutView()
+        let button = UIButton.buttonWithType(.Custom) as! UIButton
+        
+        override init(frame: CGRect) {
+            super.init(frame: frame)
+            addSubview(instructionLabel)
+            addSubview(button)
+            removeConstraints(constraints())
+            informationLabel.autoPinEdgesToSuperviewMarginsExcludingEdge(.Bottom)
+            instructionLabel.autoPinEdge(.Top, toEdge: .Bottom, ofView: informationLabel, withOffset: 20)
+            instructionLabel.autoPinEdgeToSuperviewMargin(.Leading)
+            instructionLabel.autoPinEdgeToSuperviewMargin(.Trailing)
+            button.autoPinEdge(.Top, toEdge: .Bottom, ofView: instructionLabel, withOffset: 20)
+            button.autoPinEdgeToSuperviewMargin(.Bottom)
+            button.autoAlignAxisToSuperviewMarginAxis(.Vertical)
+            configure()
+        }
+        
+        required init(coder aDecoder: NSCoder) {
+            fatalError("init(coder:) has not been implemented")
+        }
+        
+        override func configure() {
+            super.configure()
+            instructionLabel.textAlignment = .Center
+            instructionLabel.numberOfLines = 0
+            instructionLabel.font = UIFont.preferredFontForTextStyle(UIFontTextStyleBody)
+            button.titleLabel?.font = UIFont.preferredFontForTextStyle(UIFontTextStyleHeadline)
+        }
+    }
+    
+    enum Action: Selector {
+        case RequestPermission = "requestPermissionAction:"
+        case PerformOperation = "performOperationAction:"
+    }
+    
     enum State: Int {
         case Unknown, Authorized, Denied, Completed
 
         static var all: [State] = [ .Unknown, .Authorized, .Denied, .Completed ]
     }
     
+<<<<<<< Updated upstream
     // Permission not determined
     @IBOutlet weak var permissionNotDeterminedContainerView: UIView!
     @IBOutlet weak var permissionNotDeterminedLabel: UILabel!
@@ -38,6 +98,14 @@ class PermissionViewController: UIViewController {
     
     // Permission reset instructions
     @IBOutlet weak var permissionResetInstructionsView: UIView!
+=======
+    // UIViews
+    let permissionNotDetermined = InfoInstructionButtonBox.newAutoLayoutView()
+    let permissionDenied = InfoInstructionButtonBox.newAutoLayoutView()
+    let permissionGranted = InfoInstructionButtonBox.newAutoLayoutView()
+    let permissionReset = InfoInstructionButtonBox.newAutoLayoutView()
+    let operationResults = InfoBox.newAutoLayoutView()
+>>>>>>> Stashed changes
     
     let queue = OperationQueue()
 
@@ -64,8 +132,81 @@ class PermissionViewController: UIViewController {
         }
     }
 
+<<<<<<< Updated upstream
     func condition<Condition: OperationCondition>() -> Condition {
         fatalError("Must be overridded in subclass.")
+=======
+    override func loadView() {
+
+        let _view = UIView(frame: CGRectZero)
+        _view.backgroundColor = UIColor.whiteColor()
+        
+        func configureHierarchy() {
+            _view.addSubview(permissionNotDetermined)
+            _view.addSubview(permissionDenied)
+            _view.addSubview(permissionGranted)
+            _view.addSubview(operationResults)
+            _view.addSubview(permissionReset)
+        }
+        
+        func configureLayout() {
+            for view in [permissionNotDetermined, permissionDenied, permissionGranted] {
+                view.autoSetDimension(.Width, toSize: 300)
+                view.autoCenterInSuperview()
+            }
+            
+            operationResults.autoPinEdgesToSuperviewEdgesWithInsets(UIEdgeInsetsZero)
+            
+            permissionReset.autoSetDimension(.Height, toSize: 100)
+            permissionReset.autoPinEdgesToSuperviewEdgesWithInsets(UIEdgeInsetsZero, excludingEdge: .Top)
+        }
+        
+        configureHierarchy()
+        configureLayout()
+        
+        view = _view
+    }
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        permissionNotDetermined.informationLabel.text = "We haven't yet asked permission to access your Address Book."
+        permissionNotDetermined.instructionLabel.text = "Tap the button below to ask for permissions."
+        permissionNotDetermined.button.setTitle("Start", forState: .Normal)
+        permissionNotDetermined.button.addTarget(self, action: Action.RequestPermission.rawValue, forControlEvents: .TouchUpInside)
+        
+        permissionGranted.informationLabel.text = "Permissions was granted. Yay!"
+        permissionGranted.instructionLabel.text = "We can now perform an operation as we've been granted the required permissions."
+        permissionGranted.button.setTitle("Run", forState: .Normal)
+        permissionGranted.button.addTarget(self, action: Action.PerformOperation.rawValue, forControlEvents: .TouchUpInside)
+        
+        permissionDenied.informationLabel.text = "Permission was denied or restricted. Oh Nos!"
+        permissionDenied.instructionLabel.hidden = true
+        permissionDenied.button.enabled = false
+        permissionDenied.button.hidden = true
+        
+        permissionReset.informationLabel.text = "iOS remembers permissions for apps between launches and installes. But you can get around this..."
+        permissionReset.instructionLabel.text = "Either, run the app with a different bundle identififier. or reset your global permissions in General > Reset > Location & Address Book for example."
+        permissionReset.informationLabel.font = UIFont.preferredFontForTextStyle(UIFontTextStyleCaption1)
+        permissionReset.instructionLabel.font = UIFont.preferredFontForTextStyle(UIFontTextStyleCaption1)
+
+        for view in [permissionNotDetermined, permissionGranted, permissionDenied, permissionReset, operationResults] {
+            view.hidden = true
+        }
+        
+        for button in [permissionNotDetermined.button, permissionGranted.button] {
+            button.setTitleColor(UIColor.globalTintColor ?? UIColor.blueColor(), forState: .Normal)
+        }
+    }
+    
+    // For Overriding
+    func requestPermission() {
+        assertionFailure("Must be overridden")
+    }
+    
+    func performOperation() {
+        assertionFailure("Must be overridden")    
+>>>>>>> Stashed changes
     }
     
     // MARK: Update UI
@@ -95,6 +236,7 @@ class PermissionViewController: UIViewController {
     func viewsForState(state: State) -> [UIView] {
         switch state {
         case .Unknown:
+<<<<<<< Updated upstream
             return [permissionNotDeterminedContainerView]
         case .Authorized:
             return [permissionGrantedContainerView, permissionResetInstructionsView]
@@ -102,6 +244,15 @@ class PermissionViewController: UIViewController {
             return [permissionAccessDeniedContainerView, permissionResetInstructionsView]
         case .Completed:
             return [operationResultsContainerView, permissionResetInstructionsView]
+=======
+            return [permissionNotDetermined]
+        case .Authorized:
+            return [permissionGranted, permissionReset]
+        case .Denied:
+            return [permissionDenied, permissionReset]
+        case .Completed:
+            return [operationResults, permissionReset]
+>>>>>>> Stashed changes
         }
     }
 
@@ -130,6 +281,14 @@ class PermissionViewController: UIViewController {
         return update
     }
 
-
+    // Actions
+    
+    @IBAction func requestPermissionAction(sender: UIButton) {
+        requestPermission()
+    }
+    
+    @IBAction func performOperationAction(sender: UIButton) {
+        performOperation()
+    }
 }
 

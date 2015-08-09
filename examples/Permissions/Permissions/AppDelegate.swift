@@ -44,3 +44,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 }
 
+extension UIColor {
+    
+    static var globalTintColor: UIColor? {
+        return UIApplication.sharedApplication().keyWindow?.tintColor
+    }
+}
+

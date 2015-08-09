@@ -14,7 +14,11 @@ class AddressBookViewController: PermissionViewController {
 
     var numberOfContacts: Int = 0 {
         didSet {
+<<<<<<< Updated upstream
             dispatch_async(Queue.Main.queue) { [count = numberOfContacts, label = operationResultsLabel] in
+=======
+            dispatch_async(Queue.Main.queue) { [count = numberOfContacts, label = operationResults.informationLabel] in
+>>>>>>> Stashed changes
                 if count > 1 {
                     label.text = "There are \(count) contacts in your Address Book."
                 }
@@ -32,11 +36,18 @@ class AddressBookViewController: PermissionViewController {
         super.viewDidLoad()
         title = NSLocalizedString("Address Book", comment: "Address Book")
 
+<<<<<<< Updated upstream
         permissionNotDeterminedLabel.text = "We haven't yet asked permission to access your Address Book."
         permissionGrantedPerformOperationInstructionsLabel.text = "Perform an operation with the Address Book"
         permissionGrantedPerformOperationButton.setTitle("Count the number of Contacts", forState: .Normal)
         operationResultsLabel.text = "These are the results of our Address Book Operation"
         
+=======
+        permissionNotDetermined.informationLabel.text = "We haven't yet asked permission to access your Address Book."
+        permissionGranted.instructionLabel.text = "Perform an operation with the Address Book"
+        permissionGranted.button.setTitle("Count the number of Contacts", forState: .Normal)
+        operationResults.informationLabel.text = "These are the results of our Address Book Operation"        
+>>>>>>> Stashed changes
     }
 
     override func viewWillAppear(animated: Bool) {
@@ -82,12 +93,17 @@ class AddressBookViewController: PermissionViewController {
         queue.addOperation(authorized)
     }
 
-    func requestAccess() {
+    override func requestPermission() {
         determineAuthorizationStatus(silently: false)
     }
 
+<<<<<<< Updated upstream
     func countContacts() {
 
+=======
+    override func performOperation() {
+        
+>>>>>>> Stashed changes
         let countContactsOperation = AddressBookOperation { (addressBook, continueWithError) -> Void in
             let contacts: NSArray = ABAddressBookCopyArrayOfAllPeople(addressBook).takeRetainedValue()
             self.numberOfContacts = contacts.count
@@ -96,15 +112,6 @@ class AddressBookViewController: PermissionViewController {
         }
         countContactsOperation.addCondition(AddressBookCondition())
         queue.addOperation(countContactsOperation)
-    }
-
-
-    @IBAction func beginAuthorizationRequestButtonAction(sender: UIButton) {
-        requestAccess()
-    }
-
-    @IBAction func countContactsButtonAction(sender: UIButton) {
-        countContacts()
     }
 }
 

@@ -22,7 +22,6 @@
 		654308481B6490740081C211 /* SlientCondition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 654308471B6490740081C211 /* SlientCondition.swift */; };
 		654D7E701B600FA5005108E8 /* BlockConditionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 654D7E6F1B600FA5005108E8 /* BlockConditionTests.swift */; };
 		654D7E721B6024C6005108E8 /* CloudKitOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 654D7E711B6024C6005108E8 /* CloudKitOperation.swift */; };
-		654EE1431B72308A00B8B265 /* UserConfirmationCondition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 654EE1421B72308A00B8B265 /* UserConfirmationCondition.swift */; };
 		6558091A1B60292500CF0722 /* CloudKitOperationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 655809191B60292500CF0722 /* CloudKitOperationTests.swift */; };
 		6558091C1B6049F700CF0722 /* AlertOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6558091B1B6049F700CF0722 /* AlertOperation.swift */; };
 		6558091E1B604FD300CF0722 /* AlertOperationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6558091D1B604FD300CF0722 /* AlertOperationTests.swift */; };
@@ -89,7 +88,6 @@
 		654308471B6490740081C211 /* SlientCondition.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SlientCondition.swift; sourceTree = "<group>"; };
 		654D7E6F1B600FA5005108E8 /* BlockConditionTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BlockConditionTests.swift; sourceTree = "<group>"; };
 		654D7E711B6024C6005108E8 /* CloudKitOperation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CloudKitOperation.swift; sourceTree = "<group>"; };
-		654EE1421B72308A00B8B265 /* UserConfirmationCondition.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserConfirmationCondition.swift; sourceTree = "<group>"; };
 		655809191B60292500CF0722 /* CloudKitOperationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CloudKitOperationTests.swift; sourceTree = "<group>"; };
 		6558091B1B6049F700CF0722 /* AlertOperation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AlertOperation.swift; sourceTree = "<group>"; };
 		6558091D1B604FD300CF0722 /* AlertOperationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AlertOperationTests.swift; sourceTree = "<group>"; };
@@ -249,7 +247,10 @@
 				6577297E1B3DAA0400B5D153 /* OperationCondition.swift */,
 				65D6F58C1B5BFE59003D35AD /* ReachabilityCondition.swift */,
 				654308471B6490740081C211 /* SlientCondition.swift */,
+<<<<<<< Updated upstream
 				654EE1421B72308A00B8B265 /* UserConfirmationCondition.swift */,
+=======
+>>>>>>> Stashed changes
 				65C00C291B6836D800599903 /* UserNotificationCondition.swift */,
 				656010081B5C557D0052EE78 /* Permissions */,
 			);
@@ -412,7 +413,6 @@
 				65C00C2A1B6836D800599903 /* UserNotificationCondition.swift in Sources */,
 				6597EAD81B65A8B100129294 /* LocationOperation.swift in Sources */,
 				65CB76FF1B3F284A00791E18 /* OperationQueue.swift in Sources */,
-				654EE1431B72308A00B8B265 /* UserConfirmationCondition.swift in Sources */,
 				65D6F5851B5BE620003D35AD /* BackgroundObserver.swift in Sources */,
 				65343F8A1B6670230022968E /* AddressBookOperation.swift in Sources */,
 				657729801B3DAA0400B5D153 /* OperationCondition.swift in Sources */,
