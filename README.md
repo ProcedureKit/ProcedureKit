@@ -25,7 +25,7 @@ For example, an operation to save a `Contact` value in `YapDatabase` might be:
 
 ```swift
 public class SaveContactOperation: Operation {
-    public type alias CompletionBlockType = Contact -> Void
+    public typealias CompletionBlockType = Contact -> Void
 
     let connection: YapDatabaseConnection
     let contact: Contact
@@ -51,20 +51,70 @@ public class SaveContactOperation: Operation {
 The power of the `Operations` framework however, comes with attaching conditions and observer to operations. For example, perhaps before the user is allowed to delete a `Contact`, we want them to confirm their intention. We can achieve this using the supplied `UserConfirmationCondition`.
 
 ```swift
-let delete = DeleteContactOperation(connection: readWriteConnection, contact: contact)
-let confirmation = UserConfirmationCondition(
-    title: NSLocalizedString("Are you sure?", comment: "Are you sure?"),
-    message: NSLocalizedString("The contact will be removed from all your devices.", comment: "The contact will be removed fromon all your devices."),
-    action: NSLocalizedString("Delete", comment: "Delete"),
-    isDestructive: true,
-    cancelAction: NSLocalizedString("Cancel", comment: "Cancel"),
-    presentingController: self)
-delete.addCondition(confirmation)
-queue.addOperation(delete)
+func deleteContact(contact: Contact) {
+    let delete = DeleteContactOperation(connection: readWriteConnection, contact: contact)
+    let confirmation = UserConfirmationCondition(
+        title: NSLocalizedString("Are you sure?", comment: "Are you sure?"),
+        message: NSLocalizedString("The contact will be removed from all your devices.", comment: "The contact will be removed fromon all your devices."),
+        action: NSLocalizedString("Delete", comment: "Delete"),
+        isDestructive: true,
+        cancelAction: NSLocalizedString("Cancel", comment: "Cancel"),
+        presentingController: self)
+    delete.addCondition(confirmation)
+    queue.addOperation(delete)
+}
+```
+
+When this delete operation is added to the queue, the user will be presented with a standard system `UIAlertController` asking if they're sure. Additionally, other `AlertOperation` instances will be prevented from running.
+
+Sometimes, creating an `Operation` subclass is a little heavy handed, and in these situations, we can utilize a `BlockOperation`. For example, let say we want to warn the user before they cancel a "Add New Contact" controller without saving the Contact. 
+
+```swift
+@IBAction didTapCancelButton(button: UIButton) {
+    dismiss()
+}
+
+func dismiss() {
+    // Define a dispatch block for unwinding.
+    let dismiss = {
+        self.performSegueWithIdentifier(SegueIdentifier.UnwindToContacts.rawValue, sender: nil)
+    }
+
+    // Wrap this in a block operation
+    let operation = BlockOperation(mainQueueBlock: dismiss)
+
+    // Attach a condition to check if there are unsaved changes
+    // this is an imaginary conditon - doesn't exist in Operation framework
+    let condition = UnsavedChangesCondition(
+        connection: connection,
+        value: contact,
+        save: save(dismiss),
+        discard: BlockOperation(mainQueueBlock: dismiss),
+        presenter: self
+    )
+    operation.addCondition(condition)
+
+    // Attach an observer to see if the operation failed because
+    // there were no edits from a default Contact - in which case
+    // continue with dismissing the controller.
+    operation.addObserver(BlockObserver { [unowned queue] (_, errors) in
+        if let error = errors.first as? UnsavedChangesConditionError {
+            switch error {
+            case .NoChangesFromDefault:
+                queue.addOperation(BlockOperation(mainQueueBlock: dismiss))
+
+            case .HasUnsavedChanges:
+                break
+            }
+        }
+    })
+
+    queue.addOperation(operation)
+}
 
 ```
 
-
+In the above example, we're able to compose reusable (and testable!) units of work in order to express relatively complex control logic. Another way to achieve this kind of behaviour might be through FRP techniques, however those are unlikely to yield re-usable types like `UnsavedChangesCondition`, or even `DismissController` if the above was composed inside a custom `GroupOperation`.
 
 
 There is an example app, Permissions.app in `example/Permissions` which contains more examples of usage. 
