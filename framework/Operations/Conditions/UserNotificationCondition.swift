@@ -10,12 +10,12 @@
 
 import UIKit
 
-public protocol UserNotificationManager {
+public protocol UserNotificationRegistrarType {
     func opr_registerUserNotificationSettings(notificationSettings: UIUserNotificationSettings)
     func opr_currentUserNotificationSettings() -> UIUserNotificationSettings?
 }
 
-extension UIApplication: UserNotificationManager {
+extension UIApplication: UserNotificationRegistrarType {
     
     public func opr_registerUserNotificationSettings(notificationSettings: UIUserNotificationSettings) {
         registerUserNotificationSettings(notificationSettings)
@@ -26,17 +26,8 @@ extension UIApplication: UserNotificationManager {
     }
 }
 
-public struct UserNotificationSettingsNotification {
-
-    static let name = "UserNotificationSettingsNotification"
-    static let notificationKey = "UserNotificationSettingsKey"
-
-    public static func notificationSettingsDidChange(notificationSettings: UIUserNotificationSettings) {
-        NSNotificationCenter
-            .defaultCenter()
-            .postNotificationName(name, object: nil, userInfo: [notificationKey: notificationSettings] )
-    }
-}
+private let DidRegisterSettingsNotificationName = "DidRegisterSettingsNotificationName"
+private let NotificationSettingsKey = "NotificationSettingsKey"
 
 
 /**
@@ -50,7 +41,7 @@ public struct UserNotificationSettingsNotification {
 
     Like this:
         func application(_ application: UIApplication, didRegisterUserNotificationSettings notificationSettings: UIUserNotificationSettings) {
-            UserNotificationSettingsNotification.notificationSettingsDidChange(notificationSettings)
+            UserNotificationCondition.didRegisterUserNotificationSettings(notificationSettings)
         }
 
 */
@@ -68,28 +59,35 @@ public struct UserNotificationCondition: OperationCondition {
         case SettingsNotSufficient(UserSettingsPair)
     }
 
-    public static let ApplicationDidRegisterUserNotificationSettingsNotificationName = "application:didRegisterUserNotificationSettingsNotification"
-    public static let UserNotificationSettingsKey = "UserNotificationSettingsKey"
+    public static func didRegisterUserNotificationSettings(notificationSettings: UIUserNotificationSettings) {
+        NSNotificationCenter
+            .defaultCenter()
+            .postNotificationName(DidRegisterSettingsNotificationName, object: nil, userInfo: [NotificationSettingsKey: notificationSettings] )
+    }
 
     public let name = "UserNotification"
     public let isMutuallyExclusive = false
 
     let settings: UIUserNotificationSettings
     let behavior: Behavior
-    let manager: UserNotificationManager
+    let registrar: UserNotificationRegistrarType
 
-    public init(settings: UIUserNotificationSettings, behavior: Behavior = .Merge, manager: UserNotificationManager = UIApplication.sharedApplication()) {
+    public init(settings: UIUserNotificationSettings, behavior: Behavior = .Merge) {
+        self.init(settings: settings, behavior: behavior, registrar: UIApplication.sharedApplication())
+    }
+
+    public init(settings: UIUserNotificationSettings, behavior: Behavior = .Merge, registrar: UserNotificationRegistrarType) {
         self.settings = settings
         self.behavior = behavior
-        self.manager = manager
+        self.registrar = registrar
     }
 
     public func dependencyForOperation(operation: Operation) -> NSOperation? {
-        return UserNotificationPermissionOperation(settings: settings, behavior: behavior, manager: manager)
+        return UserNotificationPermissionOperation(settings: settings, behavior: behavior, registrar: registrar)
     }
 
     public func evaluateForOperation(operation: Operation, completion: OperationConditionResult -> Void) {
-        if let current = manager.opr_currentUserNotificationSettings() {
+        if let current = registrar.opr_currentUserNotificationSettings() {
 
             switch (current, settings) {
 
@@ -114,8 +112,7 @@ public func ==(a: UserNotificationCondition.Error, b: UserNotificationCondition.
     }
 }
     
-
-class UserNotificationPermissionOperation: Operation {
+public class UserNotificationPermissionOperation: Operation {
 
     enum NotificationObserver: Selector {
         case SettingsDidChange = "notificationSettingsDidChange:"
@@ -123,24 +120,30 @@ class UserNotificationPermissionOperation: Operation {
 
     let settings: UIUserNotificationSettings
     let behavior: UserNotificationCondition.Behavior
-    let manager: UserNotificationManager
+    let registrar: UserNotificationRegistrarType
 
-    init(settings: UIUserNotificationSettings, behavior: UserNotificationCondition.Behavior = .Merge, manager: UserNotificationManager = UIApplication.sharedApplication()) {
+    public convenience init(settings: UIUserNotificationSettings, behavior: UserNotificationCondition.Behavior = .Merge) {
+        self.init(settings: settings, behavior: behavior, registrar: UIApplication.sharedApplication())
+    }
+
+    public init(settings: UIUserNotificationSettings, behavior: UserNotificationCondition.Behavior = .Merge, registrar: UserNotificationRegistrarType) {
         self.settings = settings
         self.behavior = behavior
-        self.manager = manager
+        self.registrar = registrar
         super.init()
         addCondition(AlertPresentation())
     }
 
-    override func execute() {
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: NotificationObserver.SettingsDidChange.rawValue, name: UserNotificationSettingsNotification.name, object: nil)
+    public override func execute() {
+        NSNotificationCenter
+            .defaultCenter()
+            .addObserver(self, selector: NotificationObserver.SettingsDidChange.rawValue, name: DidRegisterSettingsNotificationName, object: nil)
         dispatch_async(Queue.Main.queue, request)
     }
 
     func request() {
         var settingsToRegister = settings
-        if let current = manager.opr_currentUserNotificationSettings() {
+        if let current = registrar.opr_currentUserNotificationSettings() {
             switch (current, behavior) {
             case (let currentSettings, .Merge):
                 settingsToRegister = currentSettings.settingsByMerging(settings)
@@ -148,10 +151,11 @@ class UserNotificationPermissionOperation: Operation {
                 break
             }
         }
-        manager.opr_registerUserNotificationSettings(settingsToRegister)
+        registrar.opr_registerUserNotificationSettings(settingsToRegister)
     }
 
     func notificationSettingsDidChange(aNotification: NSNotification) {
+        NSNotificationCenter.defaultCenter().removeObserver(self)
         self.finish()
     }
 }

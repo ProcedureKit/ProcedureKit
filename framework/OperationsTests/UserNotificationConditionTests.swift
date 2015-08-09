@@ -9,25 +9,22 @@
 import XCTest
 import Operations
 
-class TestableUserNotificationManager: UserNotificationManager {
+class TestableUserNotificationRegistrar: UserNotificationRegistrarType {
 
     var currentSettings: UIUserNotificationSettings?
     var didRegisterSettings: UIUserNotificationSettings? = .None
-    
-    
+
     init(settings: UIUserNotificationSettings? = .None) {
         currentSettings = settings
     }
     
     func opr_registerUserNotificationSettings(notificationSettings: UIUserNotificationSettings) {
-        println("Registering notification settings")        
         didRegisterSettings = notificationSettings
         currentSettings = notificationSettings
-        UserNotificationSettingsNotification.notificationSettingsDidChange(notificationSettings)
+        UserNotificationCondition.didRegisterUserNotificationSettings(notificationSettings)
     }
 
     func opr_currentUserNotificationSettings() -> UIUserNotificationSettings? {
-        println("Reading current notification settings")
         return currentSettings
     }
 }
@@ -63,8 +60,8 @@ class UserNotificationConditionTests: OperationTests {
     
     func test__condition_fails_when_current_settings_are_empty() {
         let settings = createSimpleSettings()
-        let manager = TestableUserNotificationManager(settings: .None)
-        let condition = UserNotificationCondition(settings: settings, behavior: .Merge, manager: manager)
+        let registrar = TestableUserNotificationRegistrar(settings: .None)
+        let condition = UserNotificationCondition(settings: settings, behavior: .Merge, registrar: registrar)
         
         let operation = TestOperation()
         operation.addCondition(SilentCondition(condition))
@@ -91,8 +88,8 @@ class UserNotificationConditionTests: OperationTests {
     func test__condition_succeeds_when_current_settings_match_desired() {
         
         let settings = createSimpleSettings()
-        let manager = TestableUserNotificationManager(settings: settings)
-        let condition = UserNotificationCondition(settings: settings, behavior: .Merge, manager: manager)
+        let registrar = TestableUserNotificationRegistrar(settings: settings)
+        let condition = UserNotificationCondition(settings: settings, behavior: .Merge, registrar: registrar)
         
         let operation = TestOperation()
         operation.addCondition(SilentCondition(condition))
@@ -106,8 +103,8 @@ class UserNotificationConditionTests: OperationTests {
     
     func test__permission_is_requested_if_permissions_are_not_enough() {
         let settings = createSimpleSettings()
-        let manager = TestableUserNotificationManager(settings: UIUserNotificationSettings(forTypes: .allZeros, categories: nil))
-        let condition = UserNotificationCondition(settings: settings, behavior: .Merge, manager: manager)
+        let registrar = TestableUserNotificationRegistrar(settings: UIUserNotificationSettings(forTypes: .allZeros, categories: nil))
+        let condition = UserNotificationCondition(settings: settings, behavior: .Merge, registrar: registrar)
         
         let operation = TestOperation()
         operation.addCondition(condition)
@@ -116,7 +113,7 @@ class UserNotificationConditionTests: OperationTests {
         runOperation(operation)
         waitForExpectationsWithTimeout(300, handler: nil)
         
-        XCTAssertEqual(manager.didRegisterSettings!, settings)
+        XCTAssertEqual(registrar.didRegisterSettings!, settings)
 
     }
 }
