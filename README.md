@@ -21,32 +21,49 @@ pod ‘Operations’
 
 `NSOperation` is a class which enables composition of discrete tasks or work for asynchronous execution on an operation queue. It is therefore an abstract class, and `Operation` is a similar abstract class. Therefore, typical usage in your own codebase would be to subclass `Operation` and override `execute`.
 
-For example, a database save operation might be:
+For example, an operation to save a `Contact` value in `YapDatabase` might be:
 
 ```swift
-public class SaveReminderOperation: Operation {
-    public type alias CompletionBlockType = Reminder -> Void
+public class SaveContactOperation: Operation {
+    public type alias CompletionBlockType = Contact -> Void
 
     let connection: YapDatabaseConnection
-    let reminder: Reminder
+    let contact: Contact
     let completion: CompletionBlockType?
 
-    public init(connection: YapDatabaseConnection, reminder: Reminder, completion: CompletionBlockType? = .None) {
+    public init(connection: YapDatabaseConnection, contact: Contact, completion: CompletionBlockType? = .None) {
         self.connection = connection
-        self.reminder = reminder
+        self.contact = contact
         self.completion = completion
         super.init()
-        name = “Save Reminder: \(reminder.title.text)”
+        name = “Save Contact: \(contact.displayName)”
     }
 
     public override func execute() {
-        connection.asyncWrite(reminder) { (returned: Reminder) in
+        connection.asyncWrite(contact) { (returned: Contact) in
             self.completion?(returned)
             self.finish()
         }
     }
 }
 ```
+
+The power of the `Operations` framework however, comes with attaching conditions and observer to operations. For example, perhaps before the user is allowed to delete a `Contact`, we want them to confirm their intention. We can achieve this using the supplied `UserConfirmationCondition`.
+
+```swift
+let delete = DeleteContactOperation(connection: readWriteConnection, contact: contact)
+let confirmation = UserConfirmationCondition(
+    title: NSLocalizedString("Are you sure?", comment: "Are you sure?"),
+    message: NSLocalizedString("The contact will be removed from all your devices.", comment: "The contact will be removed fromon all your devices."),
+    action: NSLocalizedString("Delete", comment: "Delete"),
+    isDestructive: true,
+    cancelAction: NSLocalizedString("Cancel", comment: "Cancel"),
+    presentingController: self)
+delete.addCondition(confirmation)
+queue.addOperation(delete)
+
+```
+
 
 
 
