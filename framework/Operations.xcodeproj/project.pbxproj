@@ -247,10 +247,7 @@
 				6577297E1B3DAA0400B5D153 /* OperationCondition.swift */,
 				65D6F58C1B5BFE59003D35AD /* ReachabilityCondition.swift */,
 				654308471B6490740081C211 /* SlientCondition.swift */,
-<<<<<<< Updated upstream
 				654EE1421B72308A00B8B265 /* UserConfirmationCondition.swift */,
-=======
->>>>>>> Stashed changes
 				65C00C291B6836D800599903 /* UserNotificationCondition.swift */,
 				656010081B5C557D0052EE78 /* Permissions */,
 			);

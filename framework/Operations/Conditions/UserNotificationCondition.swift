@@ -26,10 +26,33 @@ extension UIApplication: UserNotificationManager {
     }
 }
 
+public struct UserNotificationSettingsNotification {
+
+    static let name = "UserNotificationSettingsNotification"
+    static let notificationKey = "UserNotificationSettingsKey"
+
+    public static func notificationSettingsDidChange(notificationSettings: UIUserNotificationSettings) {
+        NSNotificationCenter
+            .defaultCenter()
+            .postNotificationName(name, object: nil, userInfo: [notificationKey: notificationSettings] )
+    }
+}
+
+
 /**
     A condition for verifying that we can present alerts
     to the user via `UILocalNotification` and/or remote
     notifications.
+    
+    In order to use this condition effectively, it is 
+    required that you post a notification from inside the
+    UIApplication.sharedApplication()'s delegate method.
+
+    Like this:
+        func application(_ application: UIApplication, didRegisterUserNotificationSettings notificationSettings: UIUserNotificationSettings) {
+            UserNotificationSettingsNotification.notificationSettingsDidChange(notificationSettings)
+        }
+
 */
 public struct UserNotificationCondition: OperationCondition {
 
@@ -44,6 +67,9 @@ public struct UserNotificationCondition: OperationCondition {
         public typealias UserSettingsPair = (current: UIUserNotificationSettings?, desired: UIUserNotificationSettings)
         case SettingsNotSufficient(UserSettingsPair)
     }
+
+    public static let ApplicationDidRegisterUserNotificationSettingsNotificationName = "application:didRegisterUserNotificationSettingsNotification"
+    public static let UserNotificationSettingsKey = "UserNotificationSettingsKey"
 
     public let name = "UserNotification"
     public let isMutuallyExclusive = false
@@ -91,6 +117,10 @@ public func ==(a: UserNotificationCondition.Error, b: UserNotificationCondition.
 
 class UserNotificationPermissionOperation: Operation {
 
+    enum NotificationObserver: Selector {
+        case SettingsDidChange = "notificationSettingsDidChange:"
+    }
+
     let settings: UIUserNotificationSettings
     let behavior: UserNotificationCondition.Behavior
     let manager: UserNotificationManager
@@ -104,6 +134,7 @@ class UserNotificationPermissionOperation: Operation {
     }
 
     override func execute() {
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: NotificationObserver.SettingsDidChange.rawValue, name: UserNotificationSettingsNotification.name, object: nil)
         dispatch_async(Queue.Main.queue, request)
     }
 
@@ -118,6 +149,10 @@ class UserNotificationPermissionOperation: Operation {
             }
         }
         manager.opr_registerUserNotificationSettings(settingsToRegister)
+    }
+
+    func notificationSettingsDidChange(aNotification: NSNotification) {
+        self.finish()
     }
 }
 

@@ -1,9 +1,5 @@
 //
-<<<<<<< Updated upstream
 //  UserNotificationConditionTests.swift
-=======
-//  BlockConditionTests.swift
->>>>>>> Stashed changes
 //  Operations
 //
 //  Created by Daniel Thorpe on 20/07/2015.
@@ -13,7 +9,6 @@
 import XCTest
 import Operations
 
-<<<<<<< Updated upstream
 class TestableUserNotificationManager: UserNotificationManager {
 
     var currentSettings: UIUserNotificationSettings?
@@ -28,6 +23,7 @@ class TestableUserNotificationManager: UserNotificationManager {
         println("Registering notification settings")        
         didRegisterSettings = notificationSettings
         currentSettings = notificationSettings
+        UserNotificationSettingsNotification.notificationSettingsDidChange(notificationSettings)
     }
 
     func opr_currentUserNotificationSettings() -> UIUserNotificationSettings? {
@@ -110,76 +106,18 @@ class UserNotificationConditionTests: OperationTests {
     
     func test__permission_is_requested_if_permissions_are_not_enough() {
         let settings = createSimpleSettings()
-        let manager = TestableUserNotificationManager(settings: .None)
+        let manager = TestableUserNotificationManager(settings: UIUserNotificationSettings(forTypes: .allZeros, categories: nil))
         let condition = UserNotificationCondition(settings: settings, behavior: .Merge, manager: manager)
         
         let operation = TestOperation()
         operation.addCondition(condition)
-        
-        let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
-        var receivedErrors = [ErrorType]()
-        operation.addObserver(BlockObserver(finishHandler: { (op, errors) in
-            receivedErrors = errors
-            expectation.fulfill()
-        }))
-        
+
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
         runOperation(operation)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForExpectationsWithTimeout(300, handler: nil)
         
         XCTAssertEqual(manager.didRegisterSettings!, settings)
-        XCTAssertFalse(operation.didExecute)
-//        if let error = receivedErrors.first as? UserNotificationCondition.Error {
-//            XCTAssertTrue(error == UserNotificationCondition.Error.SettingsNotSufficient((current: nil, desired: settings)))
-//        }
-//        else {
-//            XCTFail("No error message was observed")
-//        }
+
     }
-    
-=======
-class TestablePresentingController: PresentingViewController {
-    typealias CheckBlockType = (String?, String?) -> Void
-
-    var check: CheckBlockType? = .None
-    var expectation: XCTestExpectation? = .None
-
-    func presentViewController(viewController: UIViewController, animated: Bool, completion: (() -> Void)?) {
-        if let alertController = viewController as? UIAlertController {
-            check?(alertController.title, alertController.message)
-            expectation?.fulfill()
-        }
-    }
-}
-
-class AlertOperationTests: OperationTests {
-
-    var presentingController: TestablePresentingController!
-
-    override func setUp() {
-        super.setUp()
-        presentingController = TestablePresentingController()
-    }
-
-    func test__alert_operation_presents_alert_controller() {
-
-        var didPresentAlert = false
-        let alert = AlertOperation(presentFromController: presentingController)
-        alert.title = "This is the alert title"
-        alert.message = "This is the alert message"
-
-        presentingController.expectation = expectationWithDescription("Test: \(__FUNCTION__)")
-        presentingController.check = { (title, message) in
-            XCTAssertTrue(title == alert.title)
-            XCTAssertTrue(message == alert.message)
-            didPresentAlert = true
-        }
-
-        runOperation(alert)
-
-        waitForExpectationsWithTimeout(5, handler: nil)
-        XCTAssertTrue(didPresentAlert)
-    }
-
->>>>>>> Stashed changes
 }
 

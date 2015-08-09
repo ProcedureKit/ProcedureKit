@@ -46,6 +46,8 @@ class UserNotificationSettingsViewController: PermissionViewController {
 
         permissionNotDetermined.informationLabel.text = "We haven't yet asked for permission to set the User Notification Settings."
 
+        permissionDenied.informationLabel.text = "Currently settings are not sufficient. 😞"
+
         permissionGranted.instructionLabel.text = "We don't support any User Notification Operations"
         permissionGranted.button.hidden = true
 
@@ -76,7 +78,6 @@ class UserNotificationSettingsViewController: PermissionViewController {
         authorized.addObserver(BlockObserver { (_, errors) in
             if let error = errors.first as? UserNotificationCondition.Error {
                 switch error {
-
                 case let .SettingsNotSufficient(current: current, desired: desired):
                     if let current = current {
                         self.state = .Denied
