@@ -16,6 +16,7 @@
 		65343F801B6663EF0022968E /* PermissionsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65343F7F1B6663EF0022968E /* PermissionsTests.swift */; };
 		6539CCB41B680C9B00A16D7B /* LocationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6539CCB31B680C9B00A16D7B /* LocationViewController.swift */; };
 		6539CCB61B680F0100A16D7B /* PermissionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6539CCB51B680F0100A16D7B /* PermissionViewController.swift */; };
+		65719F711B7119960012A775 /* UserNotificationSettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65719F701B7119960012A775 /* UserNotificationSettingsViewController.swift */; };
 		65AF540C1B66E9F800562306 /* DemoContentCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 65AF540A1B66E9F800562306 /* DemoContentCell.xib */; };
 		65AF540E1B66F05E00562306 /* AddressBookViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65AF540D1B66F05E00562306 /* AddressBookViewController.swift */; };
 /* End PBXBuildFile section */
@@ -44,6 +45,7 @@
 		65343F7F1B6663EF0022968E /* PermissionsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PermissionsTests.swift; sourceTree = "<group>"; };
 		6539CCB31B680C9B00A16D7B /* LocationViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LocationViewController.swift; sourceTree = "<group>"; };
 		6539CCB51B680F0100A16D7B /* PermissionViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PermissionViewController.swift; sourceTree = "<group>"; };
+		65719F701B7119960012A775 /* UserNotificationSettingsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserNotificationSettingsViewController.swift; sourceTree = "<group>"; };
 		65AF540B1B66E9F800562306 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/DemoContentCell.xib; sourceTree = "<group>"; };
 		65AF540D1B66F05E00562306 /* AddressBookViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddressBookViewController.swift; sourceTree = "<group>"; };
 		87E0DB0BC2684E40E7B2284B /* Pods.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -109,11 +111,9 @@
 		65343F661B6663EF0022968E /* Permissions */ = {
 			isa = PBXGroup;
 			children = (
-				65AF540D1B66F05E00562306 /* AddressBookViewController.swift */,
+				65719F721B7119A80012A775 /* View Controllers */,
 				65343F691B6663EF0022968E /* AppDelegate.swift */,
-				6539CCB31B680C9B00A16D7B /* LocationViewController.swift */,
 				65343F6B1B6663EF0022968E /* MainController.swift */,
-				6539CCB51B680F0100A16D7B /* PermissionViewController.swift */,
 				65343F701B6663EF0022968E /* Images.xcassets */,
 				65AF540A1B66E9F800562306 /* DemoContentCell.xib */,
 				65343F721B6663EF0022968E /* LaunchScreen.xib */,
@@ -146,6 +146,17 @@
 				65343F7E1B6663EF0022968E /* Info.plist */,
 			);
 			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		65719F721B7119A80012A775 /* View Controllers */ = {
+			isa = PBXGroup;
+			children = (
+				65AF540D1B66F05E00562306 /* AddressBookViewController.swift */,
+				6539CCB31B680C9B00A16D7B /* LocationViewController.swift */,
+				6539CCB51B680F0100A16D7B /* PermissionViewController.swift */,
+				65719F701B7119960012A775 /* UserNotificationSettingsViewController.swift */,
+			);
+			name = "View Controllers";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -304,6 +315,7 @@
 				65AF540E1B66F05E00562306 /* AddressBookViewController.swift in Sources */,
 				65343F6C1B6663EF0022968E /* MainController.swift in Sources */,
 				65343F6A1B6663EF0022968E /* AppDelegate.swift in Sources */,
+				65719F711B7119960012A775 /* UserNotificationSettingsViewController.swift in Sources */,
 				6539CCB41B680C9B00A16D7B /* LocationViewController.swift in Sources */,
 				6539CCB61B680F0100A16D7B /* PermissionViewController.swift in Sources */,
 			);

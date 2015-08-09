@@ -12,30 +12,11 @@ import Operations
 
 class AddressBookViewController: PermissionViewController {
 
-    // Address Book status not determined
-    @IBOutlet var statusNotDeterminedContainerView: UIView!
-    @IBOutlet var beginAuthorizationRequestButton: UIButton!
-
-    // Address Book status authorized
-    @IBOutlet var statusAuthorizedContainerView: UIView!
-    @IBOutlet var countContactsButton: UIButton!
-
-    // Address Book status denied
-    @IBOutlet var statusDeniedContainerView: UIView!
-
-    // Address Book contacts results
-    @IBOutlet var addressBookResultsContainerView: UIView!
-    @IBOutlet var addressBookResultsLabel: UILabel!
-
-    // Reset instructions
-    @IBOutlet var resetPermissionsView: UIView!
-
-
     var numberOfContacts: Int = 0 {
         didSet {
-            dispatch_async(Queue.Main.queue) { [count = numberOfContacts, label = addressBookResultsLabel] in
+            dispatch_async(Queue.Main.queue) { [count = numberOfContacts, label = operationResults.informationLabel] in
                 if count > 1 {
-                    label.text = "There are \(count) in your Address Book."
+                    label.text = "There are \(count) contacts in your Address Book."
                 }
                 else if count == 1 {
                     label.text = "There is only one contact in your Address Book."
@@ -50,10 +31,19 @@ class AddressBookViewController: PermissionViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         title = NSLocalizedString("Address Book", comment: "Address Book")
+
+        permissionNotDetermined.informationLabel.text = "We haven't yet asked permission to access your Address Book."
+        permissionGranted.instructionLabel.text = "Perform an operation with the Address Book"
+        permissionGranted.button.setTitle("Count the number of Contacts", forState: .Normal)
+        operationResults.informationLabel.text = "These are the results of our Address Book Operation"
     }
 
     override func viewWillAppear(animated: Bool) {
         determineAuthorizationStatus()
+    }
+
+    override func conditionsForState(state: State, silent: Bool) -> [OperationCondition] {
+        return configureConditionsForState(state, silent: silent)(AddressBookCondition())
     }
 
     func determineAuthorizationStatus(silently: Bool = true) {
@@ -91,40 +81,11 @@ class AddressBookViewController: PermissionViewController {
         queue.addOperation(authorized)
     }
 
-    func requestAccess() {
+    override func requestPermission() {
         determineAuthorizationStatus(silently: false)
     }
 
-    // MARK: Update UI
-
-    override func conditionsForState(state: State, silent: Bool = true) -> [OperationCondition] {
-
-        switch state {
-        case .Unknown:
-            return silent ? [ SilentCondition(NegatedCondition(AddressBookCondition())) ] : [ NegatedCondition(AddressBookCondition()) ]
-
-        case .Authorized:
-            return silent ? [ SilentCondition(AddressBookCondition()) ] : [ AddressBookCondition() ]
-
-        default:
-            return []
-        }
-    }
-
-    override func viewsForState(state: State) -> [UIView] {
-        switch state {
-        case .Unknown:
-            return [statusNotDeterminedContainerView]
-        case .Authorized:
-            return [statusAuthorizedContainerView, resetPermissionsView]
-        case .Denied:
-            return [statusDeniedContainerView, resetPermissionsView]
-        case .Completed:
-            return [addressBookResultsContainerView, resetPermissionsView]
-        }
-    }
-
-    func countContacts() {
+    override func performOperation() {
 
         let countContactsOperation = AddressBookOperation { (addressBook, continueWithError) -> Void in
             let contacts: NSArray = ABAddressBookCopyArrayOfAllPeople(addressBook).takeRetainedValue()
@@ -134,15 +95,6 @@ class AddressBookViewController: PermissionViewController {
         }
         countContactsOperation.addCondition(AddressBookCondition())
         queue.addOperation(countContactsOperation)
-    }
-
-
-    @IBAction func beginAuthorizationRequestButtonAction(sender: UIButton) {
-        requestAccess()
-    }
-
-    @IBAction func countContactsButtonAction(sender: UIButton) {
-        countContacts()
     }
 }
 

@@ -49,3 +49,15 @@ public enum Queue {
 public protocol ErrorType { }
 
 
+extension Dictionary {
+
+    internal init<Sequence: SequenceType where Sequence.Generator.Element == Value>(sequence: Sequence, keyMapper: Value -> Key?) {
+        self.init()
+        for item in sequence {
+            if let key = keyMapper(item) {
+                self[key] = item
+            }
+        }
+    }
+}
+
