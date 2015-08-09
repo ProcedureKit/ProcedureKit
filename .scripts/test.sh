@@ -4,4 +4,4 @@
 
 #bundle update
 #bundle exec 
-set -o pipefail && xcodebuild -project "framework/Operations.xcodeproj" -scheme "Operations" -destination "platform=iOS Simulator,name=iPhone 6,OS=8.4" test
+set -o pipefail && xcodebuild -project "framework/Operations.xcodeproj" -scheme "Operations" -destination "platform=iOS Simulator,name=iPhone 6,OS=8.4" test | xcpretty -c
