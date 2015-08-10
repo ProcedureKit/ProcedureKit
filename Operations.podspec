@@ -16,7 +16,7 @@ session Advanced NSOperations: https://developer.apple.com/videos/wwdc/2015/?id=
   s.social_media_url  = 'https://twitter.com/danthorpe'
   s.requires_arc      = true
   s.platform          = :ios, '8.0'
-  s.source_files      = 'framework/Operations/**/*.{swift,m,h}'
+  s.source_files      = 'Operations/**/*.{swift,m,h}'
 
 end
 
