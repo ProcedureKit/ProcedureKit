@@ -1,3 +1,7 @@
+# 0.10.0
+1. [[OPR-14](https://github.com/danthorpe/Operations/pull/14)]: Supports Photos library permission condition.
+2. [[OPR-16](https://github.com/danthorpe/Operations/pull/16)]: Supports Health Kit permission condition.
+
 # 0.9.0
 1. [[OPR-11](https://github.com/danthorpe/Operations/pull/11)]: Supports Passbook condition.
 2. [[OPR-13](https://github.com/danthorpe/Operations/pull/13)]: Supports a EventKit permission condition.
