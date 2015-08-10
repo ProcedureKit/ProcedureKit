@@ -10,6 +10,8 @@ import XCTest
 import HealthKit
 import Operations
 
+#if os(iOS)
+
 class TestableHealthManager: HealthManagerType {
 
     var available: Bool
@@ -133,4 +135,5 @@ class HealthConditionTests: OperationTests {
     }
 }
 
+#endif
 

@@ -6,6 +6,8 @@
 //  Copyright (c) 2015 Daniel Thorpe. All rights reserved.
 //
 
+#if os(iOS)
+
 import HealthKit
 
 public protocol HealthManagerType {
@@ -126,5 +128,5 @@ class HealthPermissionOperation: Operation {
     }
 }
 
-
+#endif
 
