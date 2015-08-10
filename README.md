@@ -113,9 +113,7 @@ Requesting permissions from the user can often be a relatively complex task, whi
 
 ```swift
 func getCurrentLocation(completion: CLLocation -> Void) {
-    let location = LocationOperation(handler: completion)
-    location.addCondition(LocationCondition())
-    queue.addOperation(location)
+    queue.addOperation(LocationOperation(handler: completion))
 }
 ```
 
