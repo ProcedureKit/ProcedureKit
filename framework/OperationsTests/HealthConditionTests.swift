@@ -6,11 +6,11 @@
 //  Copyright © 2015 Daniel Thorpe. All rights reserved.
 //
 
+#if os(iOS)
+
 import XCTest
 import HealthKit
 import Operations
-
-#if os(iOS)
 
 class TestableHealthManager: HealthManagerType {
 
