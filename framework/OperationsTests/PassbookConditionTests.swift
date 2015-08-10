@@ -6,6 +6,8 @@
 //  Copyright © 2015 Daniel Thorpe. All rights reserved.
 //
 
+#if os(iOS)
+
 import XCTest
 import Operations
 
@@ -34,7 +36,6 @@ class PassbookConditionTests: OperationTests {
         runOperation(operation)
         waitForExpectationsWithTimeout(3, handler: nil)
         XCTAssertTrue(operation.didExecute)
-
     }
 
     func test__condition_fails__when_library_is_not_available() {
@@ -66,3 +67,5 @@ class PassbookConditionTests: OperationTests {
     }
 }
 
+
+#endif
