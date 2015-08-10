@@ -10,15 +10,6 @@ I want to stress that this code is heavily influenced by Apple. In no way am I a
 
 Rather than just copy Apple’s sample code, I have been re-writing it from scratch, but heavily guided. The main changes I have made, other than some minor bug fixes, have been architectural to enhance the testability of the code. Unfortunately, this makes the public API a little messy for Swift 1.2, but thanks to `@testable` will not be visible in Swift 2.
 
-## Installation
-
-Operations is available through [CocoaPods](http://cocoapods.org). To install
-it, simply add the following line to your Podfile:
-
-```ruby
-pod ‘Operations’
-```
-
 ## Usage
 
 `NSOperation` is a class which enables composition of discrete tasks or work for asynchronous execution on an operation queue. It is therefore an abstract class, and `Operation` is a similar abstract class. Therefore, typical usage in your own codebase would be to subclass `Operation` and override `execute`.
@@ -158,6 +149,15 @@ func determineAuthorizationStatus() {
 ```
 
 There is an example app, Permissions.app in `example/Permissions` which contains more examples of this sort of usage. 
+
+## Installation
+
+Operations is available through [CocoaPods](http://cocoapods.org). To install
+it, simply add the following line to your Podfile:
+
+```ruby
+pod ‘Operations’
+```
 
 ## Current Status
 
