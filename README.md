@@ -197,8 +197,8 @@ This is a brief summary of the current and planned functionality.
 - [x] `LocationOperation` access the user’s current location with desired accuracy. 
 - [x] User Notifications
 - [x] Remote Notifications
-- [ ] HealthKit
-- [ ] Photos & Camera
+- [x] HealthKit
+- [x] Photos
 - [x] Events & Reminders
 - [x] Passbook
 - [ ] Contacts - some initial work is done on the `swift_2.0` branch. However, currently this branch is behind `development` by quite a margin.
