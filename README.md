@@ -121,10 +121,8 @@ In the above example, we're able to compose reusable (and testable!) units of wo
 Requesting permissions from the user can often be a relatively complex task, which almost all apps have to perform at some point. Often developers put requests for these permissions in their AppDelegate, meaning that new users are bombarded with alerts. This isn't a great experience, and Apple expressly suggest only requesting permissions when you need them. However, this is easier said than done. The Operations framework can help however. Lets say we want to get the user's current location.
 
 ```swift
-func getCurrentLocation(completion: CLLocation? -> Void) {
-    let location = LocationOperation() { location in
-        completion(location)
-    }
+func getCurrentLocation(completion: CLLocation -> Void) {
+    let location = LocationOperation(handler: completion)
     location.addCondition(LocationCondition())
     queue.addOperation(location)
 }
