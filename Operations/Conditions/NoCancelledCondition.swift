@@ -29,7 +29,7 @@ public struct NoCancelledCondition: OperationCondition {
     }
 
     public func evaluateForOperation(operation: Operation, completion: OperationConditionResult -> Void) {
-        let cancelled = (operation.dependencies as! [NSOperation]).filter { $0.cancelled }
+        let cancelled = operation.dependencies.filter { $0.cancelled }
 
         if !cancelled.isEmpty {
             completion(.Failed(Error.CancelledDependencies))

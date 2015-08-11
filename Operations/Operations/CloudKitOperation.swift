@@ -24,7 +24,7 @@ public class CloudKitOperation<CloudOperation where CloudOperation: CloudKitOper
 
     public let operation: CloudOperation
 
-    public init(var operation: CloudOperation, database: CKDatabase = CKContainer.defaultContainer().privateCloudDatabase, completion: dispatch_block_t = { }) {
+    public init(operation: CloudOperation, database: CKDatabase = CKContainer.defaultContainer().privateCloudDatabase, completion: dispatch_block_t = { }) {
         operation.database = database
         let finished = NSBlockOperation(block: completion)
         finished.addDependency(operation)

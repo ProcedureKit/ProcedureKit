@@ -76,7 +76,7 @@ public struct HealthCondition: OperationCondition {
             reveals sensetive information.
         */
 
-        let unauthorizedShareTypes = filter(shareTypes) { type in
+        let unauthorizedShareTypes = shareTypes.filter { type in
             return self.manager.opr_authorizationStatusForType(type) != .SharingAuthorized
         }
 

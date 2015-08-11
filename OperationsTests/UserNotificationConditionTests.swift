@@ -32,7 +32,7 @@ class TestableUserNotificationRegistrar: UserNotificationRegistrarType {
 class UserNotificationConditionTests: OperationTests {
 
     func createSimpleSettings() -> UIUserNotificationSettings {
-        return UIUserNotificationSettings(forTypes: .Badge | .Alert, categories: nil)
+        return UIUserNotificationSettings(forTypes: [.Badge, .Alert], categories: nil)
     }
     
     func createAdvancedSettings() -> UIUserNotificationSettings {
@@ -54,7 +54,7 @@ class UserNotificationConditionTests: OperationTests {
         category.identifier = "me.danthorpe.Operations.Tests.UserNotification.Actions"
         category.setActions([action1, action2], forContext: .Default)
         
-        let types: UIUserNotificationType = .Badge | .Sound | .Alert
+        let types: UIUserNotificationType = [.Badge, .Sound, .Alert]
         return UIUserNotificationSettings(forTypes: types, categories: Set(arrayLiteral: category))
     }
     
@@ -103,7 +103,7 @@ class UserNotificationConditionTests: OperationTests {
     
     func test__permission_is_requested_if_permissions_are_not_enough() {
         let settings = createSimpleSettings()
-        let registrar = TestableUserNotificationRegistrar(settings: UIUserNotificationSettings(forTypes: .allZeros, categories: nil))
+        let registrar = TestableUserNotificationRegistrar(settings: UIUserNotificationSettings(forTypes: [], categories: nil))
         let condition = UserNotificationCondition(settings: settings, behavior: .Merge, registrar: registrar)
         
         let operation = TestOperation()

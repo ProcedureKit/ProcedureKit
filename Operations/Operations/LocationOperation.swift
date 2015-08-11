@@ -57,7 +57,7 @@ public class LocationOperation: Operation {
             manager.opr_startUpdatingLocation()
         }
 
-        if var manager = manager {
+        if let manager = manager {
             configureLocationManager(manager)
         }
         else {
@@ -84,7 +84,7 @@ public class LocationOperation: Operation {
 
 extension LocationOperation: CLLocationManagerDelegate {
 
-    public func locationManager(manager: CLLocationManager!, didUpdateLocations locations: [AnyObject]!) {
+    public func locationManager(manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         if let locations = locations as? [CLLocation], location = locations.last where location.horizontalAccuracy <= accuracy {
             stopLocationUpdates()
             handler(location: location)
@@ -92,7 +92,7 @@ extension LocationOperation: CLLocationManagerDelegate {
         }
     }
 
-    public func locationManager(manager: CLLocationManager!, didFailWithError error: NSError!) {
+    public func locationManager(manager: CLLocationManager, didFailWithError error: NSError) {
         stopLocationUpdates()
         finish(Error.LocationManagerDidFail(error))
     }

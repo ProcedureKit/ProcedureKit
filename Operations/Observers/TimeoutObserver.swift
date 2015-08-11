@@ -22,7 +22,7 @@ public struct TimeoutObserver: OperationObserver {
         dispatch_after(when, Queue.Default.queue) {
             if !operation.finished && !operation.cancelled {
                 let error = OperationError.OperationTimedOut(self.timeout)
-                operation.cancelWithError(error: error)
+                operation.cancelWithError(error)
             }
         }
     }
