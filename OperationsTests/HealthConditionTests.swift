@@ -58,7 +58,7 @@ class HealthConditionTests: OperationTests {
         let heartRate = HKQuantityType.quantityTypeForIdentifier(HKQuantityTypeIdentifierHeartRate)
         let mass = HKQuantityType.quantityTypeForIdentifier(HKQuantityTypeIdentifierBodyMass)
         let height = HKQuantityType.quantityTypeForIdentifier(HKQuantityTypeIdentifierHeight)
-        return [ heartRate, mass, height ]
+        return [ heartRate!, mass!, height! ]
     }()
 
     func test__condition_succeeds__when_access_is_authorized() {

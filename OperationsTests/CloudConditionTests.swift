@@ -26,18 +26,18 @@ class TestableCloudContainer: CloudContainer {
     }
 
     func verifyPermissions(permissions: CKApplicationPermissions, requestPermissionIfNecessary: Bool, completion: ErrorType? -> Void) {
-        verifyAccountStatusForContainer(self, permissions, requestPermissionIfNecessary, completion)
+        verifyAccountStatusForContainer(self, permissions: permissions, shouldRequest: requestPermissionIfNecessary, completion: completion)
     }
 
-    func accountStatusWithCompletionHandler(completionHandler: ((CKAccountStatus, NSError!) -> Void)!) {
+    func accountStatusWithCompletionHandler(completionHandler: ((CKAccountStatus, NSError?) -> Void)) {
         completionHandler(accountStatus, accountStatusError)
     }
 
-    func statusForApplicationPermission(applicationPermission: CKApplicationPermissions, completionHandler: CKApplicationPermissionBlock!) {
+    func statusForApplicationPermission(applicationPermission: CKApplicationPermissions, completionHandler: CKApplicationPermissionBlock) {
         completionHandler(applicationPermissionStatus, applicationPermissionStatusError)
     }
 
-    func requestApplicationPermission(applicationPermission: CKApplicationPermissions, completionHandler: CKApplicationPermissionBlock!) {
+    func requestApplicationPermission(applicationPermission: CKApplicationPermissions, completionHandler: CKApplicationPermissionBlock) {
         completionHandler(requestApplicationPermissionStatus, requestApplicationPermissionStatusError)
     }
 }

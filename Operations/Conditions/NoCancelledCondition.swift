@@ -41,11 +41,6 @@ public struct NoCancelledCondition: OperationCondition {
 }
 
 public func ==(a: NoCancelledCondition.Error, b: NoCancelledCondition.Error) -> Bool {
-    switch (a, b) {
-    case (.CancelledDependencies, .CancelledDependencies):
-        return true
-    default:
-        return false
-    }
+    return true // Only one case in the enum
 }
 

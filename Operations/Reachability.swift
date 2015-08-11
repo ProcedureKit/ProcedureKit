@@ -59,8 +59,8 @@ public final class Reachability {
     private var defaultRouteReachabilityFlags: SCNetworkReachabilityFlags? {
         get {
             if let ref = defaultRouteReachability {
-                var flags: SCNetworkReachabilityFlags = 0
-                if SCNetworkReachabilityGetFlags(ref, &flags) != 0 {
+                var flags: SCNetworkReachabilityFlags = []
+                if SCNetworkReachabilityGetFlags(ref, &flags) {
                     return flags
                 }
             }
@@ -83,7 +83,7 @@ public final class Reachability {
             zeroAddress.sin_len = UInt8(sizeofValue(zeroAddress))
             zeroAddress.sin_family = sa_family_t(AF_INET)
             return withUnsafePointer(&zeroAddress) {
-                SCNetworkReachabilityCreateWithAddress(nil, UnsafePointer($0)).takeRetainedValue()
+                SCNetworkReachabilityCreateWithAddress(nil, UnsafePointer($0))
             }
         }()
     }
@@ -108,15 +108,14 @@ public final class Reachability {
         if let host = url.host {
             dispatch_async(queue) {
                 var status = NetworkStatus.NotReachable
-                let ref = self.refs[host] ?? SCNetworkReachabilityCreateWithName(nil, (host as NSString).UTF8String).takeRetainedValue()
+                if let ref = self.refs[host] ?? SCNetworkReachabilityCreateWithName(nil, (host as NSString).UTF8String) {
+                    self.refs[host] = ref
 
-                self.refs[host] = ref
-
-                var flags: SCNetworkReachabilityFlags = 0
-                if SCNetworkReachabilityGetFlags(ref, &flags) != 0 {
-                    status = self.networkStatusFromFlags(flags)
+                    var flags: SCNetworkReachabilityFlags = []
+                    if SCNetworkReachabilityGetFlags(ref, &flags) {
+                        status = self.networkStatusFromFlags(flags)
+                    }
                 }
-
                 completion(status)
             }
         }
@@ -207,42 +206,41 @@ public final class Reachability {
 
     private func isOnWWAN(flags: SCNetworkReachabilityFlags) -> Bool {
         #if os(iOS)
-            return flags & SCNetworkReachabilityFlags.IsWWAN != 0
-            #else
+            return flags.contains(.IsWWAN)
+        #else
             return false
         #endif
     }
 
     private func isReachable(flags: SCNetworkReachabilityFlags) -> Bool {
-        return flags & SCNetworkReachabilityFlags.Reachable != 0
+        return flags.contains(.Reachable)
     }
     private func isConnectionRequired(flags: SCNetworkReachabilityFlags) -> Bool {
-        return flags & SCNetworkReachabilityFlags.ConnectionRequired != 0
+        return flags.contains(.ConnectionRequired)
     }
     private func isInterventionRequired(flags: SCNetworkReachabilityFlags) -> Bool {
-        return flags & SCNetworkReachabilityFlags.InterventionRequired != 0
+        return flags.contains(.InterventionRequired)
     }
     private func isConnectionOnTraffic(flags: SCNetworkReachabilityFlags) -> Bool {
-        return flags & SCNetworkReachabilityFlags.ConnectionOnTraffic != 0
+        return flags.contains(.ConnectionOnTraffic)
     }
     private func isConnectionOnDemand(flags: SCNetworkReachabilityFlags) -> Bool {
-        return flags & SCNetworkReachabilityFlags.ConnectionOnDemand != 0
+        return flags.contains(.ConnectionOnDemand)
     }
     func isConnectionOnTrafficOrDemand(flags: SCNetworkReachabilityFlags) -> Bool {
-        return flags & SCNetworkReachabilityFlags(SCNetworkReachabilityFlags.ConnectionOnTraffic | SCNetworkReachabilityFlags.ConnectionOnDemand) != 0
+        return flags.contains(.ConnectionOnTraffic) || flags.contains(.ConnectionOnDemand)
     }
     private func isTransientConnection(flags: SCNetworkReachabilityFlags) -> Bool {
-        return flags & SCNetworkReachabilityFlags.TransientConnection != 0
+        return flags.contains(.TransientConnection)
     }
     private func isLocalAddress(flags: SCNetworkReachabilityFlags) -> Bool {
-        return flags & SCNetworkReachabilityFlags.IsLocalAddress != 0
+        return flags.contains(.IsLocalAddress)
     }
     private func isDirect(flags: SCNetworkReachabilityFlags) -> Bool {
-        return flags & SCNetworkReachabilityFlags.IsDirect != 0
+        return flags.contains(.IsDirect)
     }
     private func isConnectionRequiredOrTransient(flags: SCNetworkReachabilityFlags) -> Bool {
-        let testcase = SCNetworkReachabilityFlags(SCNetworkReachabilityFlags.ConnectionRequired | SCNetworkReachabilityFlags.TransientConnection)
-        return flags & testcase == testcase
+        return flags.contains(.ConnectionRequired) || flags.contains(.TransientConnection)
     }
 }
 
@@ -250,7 +248,7 @@ public final class Reachability {
 extension Reachability: SystemReachability {}
 extension Reachability: HostReachability {}
 
-extension Reachability.NetworkStatus: Printable {
+extension Reachability.NetworkStatus: CustomStringConvertible {
 
     public var description: String {
         switch self {

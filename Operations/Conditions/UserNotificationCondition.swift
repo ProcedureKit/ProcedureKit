@@ -108,7 +108,6 @@ public func ==(a: UserNotificationCondition.Error, b: UserNotificationCondition.
     switch (a, b) {
     case let (.SettingsNotSufficient(current: aCurrent, desired: aDesired), .SettingsNotSufficient(current: bCurrent, desired: bDesired)):
         return (aCurrent == bCurrent) && (aDesired == bDesired)
-    default: return false
     }
 }
     
@@ -180,7 +179,7 @@ extension UIUserNotificationSettings {
         var existingCategoriesByIdentifier = Dictionary(sequence: myCategories) { $0.identifier }
 
         let newCategories = settings.categories ?? []
-        var newCategoriesByIdentifier = Dictionary(sequence: myCategories) { $0.identifier }
+        let newCategoriesByIdentifier = Dictionary(sequence: newCategories) { $0.identifier }
 
         for (newIdentifier, newCategory) in newCategoriesByIdentifier {
             existingCategoriesByIdentifier[newIdentifier] = newCategory

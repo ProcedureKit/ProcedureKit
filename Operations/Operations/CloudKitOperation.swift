@@ -10,7 +10,7 @@ import Foundation
 import CloudKit
 
 public protocol CloudKitOperationType: class {
-    var database: CKDatabase! { get set }
+    var database: CKDatabase? { get set }
 }
 
 /**

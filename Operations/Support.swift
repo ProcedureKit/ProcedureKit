@@ -46,9 +46,6 @@ public enum Queue {
     }
 }
 
-public protocol ErrorType { }
-
-
 extension Dictionary {
 
     internal init<Sequence: SequenceType where Sequence.Generator.Element == Value>(sequence: Sequence, keyMapper: Value -> Key?) {
