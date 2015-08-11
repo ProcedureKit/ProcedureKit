@@ -13,7 +13,7 @@ class MutualExclusiveTests: XCTestCase {
 
     func test__alert_presentation_name() {
         let condition = AlertPresentation()
-        XCTAssertEqual(condition.name, "MutuallyExclusive<Operations.Alert>")
+        XCTAssertEqual(condition.name, "MutuallyExclusive<Alert>")
     }
 
     func test__alert_presentation_is_mutually_exclusive() {
