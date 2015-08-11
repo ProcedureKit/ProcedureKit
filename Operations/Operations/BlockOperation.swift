@@ -10,10 +10,10 @@ import Foundation
 
 public class BlockOperation: Operation {
 
-    public typealias ContinuationBlockType = Void -> Void
-    public typealias BlockType = (ContinuationBlockType) -> Void
+    public typealias ContinuationBlockType = (error: ErrorType?) -> Void
+    public typealias BlockType = (continueWithError: ContinuationBlockType) -> Void
 
-    private let block: BlockType?
+    private let block: BlockType
 
     /**
     Designated initializer.
@@ -21,7 +21,7 @@ public class BlockOperation: Operation {
     - parameter block: The closure to run when the operation executes.
     If this block is nil, the operation will immediately finish.
     */
-    public init(block: BlockType? = .None) {
+    public init(block: BlockType = { (continueWithError) in continueWithError(error: nil) }) {
         self.block = block
         super.init()
     }
@@ -35,18 +35,13 @@ public class BlockOperation: Operation {
         self.init(block: { continuation in
             dispatch_async(Queue.Main.queue) {
                 mainQueueBlock()
-                continuation()
+                continuation(error: nil)
             }
         })
     }
 
     public override func execute() {
-        guard let block = block else {
-            finish()
-            return
-        }
-
-        block { self.finish() }
+        block { error in self.finish(error) }
     }
 }
 

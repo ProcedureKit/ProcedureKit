@@ -1,0 +1,6 @@
+framework module TaylorSource {
+  umbrella header "TaylorSource-umbrella.h"
+
+  export *
+  module * { export * }
+}

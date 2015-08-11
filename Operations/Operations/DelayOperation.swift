@@ -47,17 +47,18 @@ public class DelayOperation: Operation {
     }
 
     public override func execute() {
-        let interval = delay.interval
-        guard interval > 0 else {
-            finish()
-            return
-        }
 
-        let after = dispatch_time(DISPATCH_TIME_NOW, Int64(interval * Double(NSEC_PER_SEC)))
-        dispatch_after(after, Queue.Main.queue) {
-            if !self.cancelled {
-                self.finish()
+        switch delay.interval {
+
+        case (let interval) where interval > 0.0:
+            let after = dispatch_time(DISPATCH_TIME_NOW, Int64(interval * Double(NSEC_PER_SEC)))
+            dispatch_after(after, Queue.Main.queue) {
+                if !self.cancelled {
+                    self.finish()
+                }
             }
+        default:
+            finish()
         }
     }
 

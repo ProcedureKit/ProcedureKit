@@ -59,7 +59,7 @@ public class GroupOperation: Operation {
         _aggregateErrors.append(error)
     }
 
-    func operationDidFinish(operation: NSOperation, withErrors errors: [ErrorType]) {
+    public func operationDidFinish(operation: NSOperation, withErrors errors: [ErrorType]) {
         // no-op, subclasses can override for their own functionality.
     }
 }

@@ -8,8 +8,6 @@
 
 import Foundation
 import XCTest
-
-@testable
 import Operations
 
 class GroupOperationTests: OperationTests {
@@ -47,25 +45,6 @@ class GroupOperationTests: OperationTests {
         waitForExpectationsWithTimeout(5, handler: nil)
         XCTAssertTrue(operation.finished)
         XCTAssertTrue(extra.didExecute)
-    }
-
-    func test__group_operation_supports_cancellation() {
-        let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
-        let groupedOperation = TestOperation(delay: 5)
-        let operation = GroupOperation(operations: groupedOperation)
-
-        runOperation(operation)
-
-        let after = dispatch_time(DISPATCH_TIME_NOW, Int64(0.2 * Double(NSEC_PER_SEC)))
-        dispatch_after(after, Queue.Main.queue) {
-            operation.cancel()
-            expectation.fulfill()
-        }
-
-        waitForExpectationsWithTimeout(4, handler: nil)
-        XCTAssertTrue(operation.cancelled)
-        XCTAssertTrue(groupedOperation.cancelled)
-        XCTAssertFalse(groupedOperation.didExecute)
     }
 }
 

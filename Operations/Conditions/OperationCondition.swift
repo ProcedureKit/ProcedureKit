@@ -23,9 +23,9 @@ public enum OperationError: ErrorType {
 
 public protocol OperationCondition {
 
-    static var name: String { get }
+    var name: String { get }
 
-    static var isMutuallyExclusive: Bool { get }
+     var isMutuallyExclusive: Bool { get }
 
     /**
     Some conditions may have the ability to satisfy the condition
@@ -63,7 +63,12 @@ struct OperationConditionEvaluator {
 
         dispatch_group_notify(group, Queue.Default.queue) {
 
-            var failures = results.flatMap { $0?.error }
+            var failures: [ErrorType] = results.reduce([ErrorType]()) { (var acc, result) in
+                if let error = result?.error {
+                    acc.append(error)
+                }
+                return acc
+            }
 
             if operation.cancelled {
                 failures.append(OperationError.ConditionFailed)

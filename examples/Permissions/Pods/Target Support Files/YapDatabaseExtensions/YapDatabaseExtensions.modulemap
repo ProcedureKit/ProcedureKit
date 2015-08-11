@@ -1,0 +1,6 @@
+framework module YapDatabaseExtensions {
+  umbrella header "YapDatabaseExtensions-umbrella.h"
+
+  export *
+  module * { export * }
+}

@@ -45,7 +45,7 @@ public class OperationQueue: NSOperationQueue {
 
             // Check for exclusive mutability constraints
             let concurrencyCategories: [String] = operation.conditions.flatMap { condition in
-                if !condition.dynamicType.isMutuallyExclusive { return .None }
+                if condition.isMutuallyExclusive { return .None }
                 return "\(condition.dynamicType)"
             }
 
@@ -64,8 +64,9 @@ public class OperationQueue: NSOperationQueue {
         else {
 
             op.addCompletionBlock { [weak self, weak op] in
-                guard let queue = self, let op = op else { return }
-                queue.delegate?.operationQueue(queue, operationDidFinish: op, withErrors: [])
+                if let queue = self, let op = op {
+                    queue.delegate?.operationQueue(queue, operationDidFinish: op, withErrors: [])
+                }
             }
         }
 
@@ -83,6 +84,5 @@ public class OperationQueue: NSOperationQueue {
             }
         }
     }
-
 }
 

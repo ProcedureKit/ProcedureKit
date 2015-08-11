@@ -30,9 +30,8 @@ public class Operation: NSOperation {
         // Execution has completed, but not yet notified queue
         case Finishing
 
+        // The operation has finished.
         case Finished
-
-        case Cancelled
     }
 
     // use the KVO mechanism to indicate that changes to "state" affect other properties as well
@@ -63,7 +62,7 @@ public class Operation: NSOperation {
             willChangeValueForKey("state")
 
             switch (_state, newState) {
-            case (.Cancelled, _), (.Finished, _):
+            case (.Finished, _):
                 break
             default:
                 assert(_state != newState, "Attempting to perform illegal cyclic state transition.")
@@ -75,14 +74,24 @@ public class Operation: NSOperation {
     }
 
     public override var ready: Bool {
-        switch state {
-        case .Pending:
+        switch (cancelled, state) {
+
+        case (true, _):
+            // If the operation is cancelled, isReady should return true
+            return true
+
+        case (false, .Pending):
+
             if super.ready {
                 evaluateConditions()
             }
+
+            // Until conditions have been evaluated, we're not ready
             return false
-        case .Ready:
+
+        case (false, .Ready):
             return super.ready
+
         default:
             return false
         }
@@ -95,11 +104,7 @@ public class Operation: NSOperation {
     public override var finished: Bool {
         return state == .Finished
     }
-    
-    public override var cancelled: Bool {
-        return state == .Cancelled
-    }
-    
+
     /**
     Indicates that the Operation can now begin to evaluate readiness conditions,
     if appropriate.
@@ -109,16 +114,11 @@ public class Operation: NSOperation {
     }
 
     private func evaluateConditions() {
-        assert(state == .Pending, "\(__FUNCTION__) was called out of order.")
+        assert(state == .Pending && cancelled == false, "\(__FUNCTION__) was called out of order.")
         state = .EvaluatingConditions
         OperationConditionEvaluator.evaluate(conditions, operation: self) { errors in
-            if errors.isEmpty {
-                self.state = .Ready
-            }
-            else {
-                self.state = .Cancelled
-                self.finish(errors)
-            }
+            self._internalErrors.extend(errors)
+            self.state = .Ready
         }
     }
 
@@ -127,7 +127,7 @@ public class Operation: NSOperation {
     private(set) var conditions = [OperationCondition]()
 
     public func addCondition(condition: OperationCondition) {
-        assert(state < .Executing, "Cannot modify conditions after execution has begun.")
+        assert(state < .Executing, "Cannot modify conditions after execution has begun, current state: \(state).")
         conditions.append(condition)
     }
 
@@ -136,54 +136,61 @@ public class Operation: NSOperation {
     private(set) var observers = [OperationObserver]()
     
     public func addObserver(observer: OperationObserver) {
-        assert(state < .Executing, "Cannot modify observers after execution has begun.")
-        
+        assert(state < .Executing, "Cannot modify observers after execution has begun, current state: \(state).")
         observers.append(observer)
     }
     
     public override func addDependency(operation: NSOperation) {
-        assert(state <= .Executing, "Dependencies cannot be modified after execution has begun.")
-        
+        assert(state <= .Executing, "Dependencies cannot be modified after execution has begun, current state: \(state).")        
         super.addDependency(operation)
     }
 
     // MARK: - Execution and Cancellation
     
     public override final func start() {
-        assert(state == .Ready, "This operation must be performed on an operation queue.")
-        
-        state = .Executing
-        
-        observers.map { $0.operationDidStart(self) }
-        
-        execute()
+        // NSOperation.start() has important logic which shouldn't be bypassed
+        super.start()
+
+        // If the operation has been cancelled, we still need to enter the finished state
+        if cancelled {
+            finish()
+        }
     }
-    
+
+    public override final func main() {
+        assert(state == .Ready, "This operation must be performed on an operation queue, current state: \(state).")
+
+        if _internalErrors.isEmpty && cancelled == false {
+            state = .Executing
+            observers.map { $0.operationDidStart(self) }
+            execute()
+        }
+        else {
+            finish()
+        }
+    }
+
     /**
     Subclasses should override this method to perform their specialized task.
     They must call a finish methods in order to complete.
     */
     public func execute() {
-        print("\(self.dynamicType) must override `execute()`.")
+        print("\(self.dynamicType) must override `execute()`.", appendNewline: false)
         
         finish()
     }
     
     private var _internalErrors = [ErrorType]()
-    
-    public override func cancel() {
-        cancelWithError()
-    }
-    
+
     public func cancelWithError(error: ErrorType? = .None) {
         if let error = error {
             _internalErrors.append(error)
         }
         
-        state = .Cancelled
+        cancel()
     }
     
-    final func produceOperation(operation: NSOperation) {
+    public final func produceOperation(operation: NSOperation) {
         observers.map { $0.operation(self, didProduceOperation: operation) }
     }
     
@@ -252,10 +259,29 @@ private func ==(lhs: Operation.State, rhs: Operation.State) -> Bool {
     return lhs.rawValue == rhs.rawValue
 }
 
+extension Operation.State: CustomDebugStringConvertible, CustomStringConvertible {
+
+    var description: String {
+        switch self {
+        case .Initialized:          return "Initialized"
+        case .Pending:              return "Pending"
+        case .EvaluatingConditions: return "EvaluatingConditions"
+        case .Ready:                return "Ready"
+        case .Executing:            return "Executing"
+        case .Finishing:            return "Finishing"
+        case .Finished:             return "Finished"
+        }
+    }
+
+    var debugDescription: String {
+        return "state: \(description)"
+    }
+}
+
 extension NSOperation {
 
     /// Chain completion blocks
-    func addCompletionBlock(block: Void -> Void) {
+    public func addCompletionBlock(block: Void -> Void) {
         if let existing = completionBlock {
             completionBlock = {
                 existing()
