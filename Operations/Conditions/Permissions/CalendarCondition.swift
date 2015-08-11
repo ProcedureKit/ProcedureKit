@@ -71,8 +71,6 @@ public func ==(a: CalendarCondition.Error, b: CalendarCondition.Error) -> Bool {
     switch (a, b) {
     case let (.AuthorizationFailed(aStatus), .AuthorizationFailed(bStatus)):
         return aStatus == bStatus
-    default:
-        return false
     }
 }
 

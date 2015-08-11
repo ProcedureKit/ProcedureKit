@@ -85,7 +85,7 @@ public class LocationOperation: Operation {
 extension LocationOperation: CLLocationManagerDelegate {
 
     public func locationManager(manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        if let locations = locations as? [CLLocation], location = locations.last where location.horizontalAccuracy <= accuracy {
+        if let location = locations.last where location.horizontalAccuracy <= accuracy {
             stopLocationUpdates()
             handler(location: location)
             finish()
@@ -103,6 +103,5 @@ public func ==(a: LocationOperation.Error, b: LocationOperation.Error) -> Bool {
     switch (a, b) {
     case let (.LocationManagerDidFail(aError), .LocationManagerDidFail(bError)):
         return aError == bError
-    default: return false
     }
 }

@@ -12,15 +12,9 @@ import CloudKit
 public protocol CloudContainer {
     func verifyPermissions(permissions: CKApplicationPermissions, requestPermissionIfNecessary: Bool, completion: ErrorType? -> Void)
 
-/* Swift 2.0
     func accountStatusWithCompletionHandler(completionHandler: (CKAccountStatus, NSError?) -> Void)
     func statusForApplicationPermission(applicationPermission: CKApplicationPermissions, completionHandler: CKApplicationPermissionBlock)
     func requestApplicationPermission(applicationPermission: CKApplicationPermissions, completionHandler: CKApplicationPermissionBlock)
-*/
-
-    func accountStatusWithCompletionHandler(completionHandler: ((CKAccountStatus, NSError!) -> Void)!)
-    func statusForApplicationPermission(applicationPermission: CKApplicationPermissions, completionHandler: CKApplicationPermissionBlock!)
-    func requestApplicationPermission(applicationPermission: CKApplicationPermissions, completionHandler: CKApplicationPermissionBlock!)
 }
 
 public struct CloudContainerCondition: OperationCondition {

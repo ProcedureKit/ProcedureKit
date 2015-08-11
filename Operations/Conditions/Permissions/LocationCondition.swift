@@ -155,6 +155,10 @@ class LocationPermissionOperation: Operation, CLLocationManagerDelegate {
             authorizationKey = "NSLocationAlwaysUsageDescription"
             manager.opr_requestAlwaysAuthorization()
         }
+
+        if NSBundle.mainBundle().objectForInfoDictionaryKey(authorizationKey) == nil {
+            print("[Operations:LocationCondition]: Requesting location permission requires the \(authorizationKey) key in your Info.plist")
+        }
     }
 
     @objc func locationManager(manager: CLLocationManager, didChangeAuthorizationStatus status: CLAuthorizationStatus) {

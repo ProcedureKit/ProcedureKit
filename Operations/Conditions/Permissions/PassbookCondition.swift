@@ -61,10 +61,7 @@ public struct PassbookCondition: OperationCondition {
 }
 
 public func ==(a: PassbookCondition.Error, b: PassbookCondition.Error) -> Bool {
-    switch (a, b) {
-    case (.LibraryNotAvailable, .LibraryNotAvailable): return true
-    default: return false
-    }
+    return true // Only one case in enum
 }
 
 #endif

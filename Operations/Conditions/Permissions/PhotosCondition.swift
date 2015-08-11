@@ -67,8 +67,6 @@ public func ==(a: PhotosCondition.Error, b: PhotosCondition.Error) -> Bool {
     switch (a, b) {
     case let (.AuthorizationNotAuthorized(aStatus), .AuthorizationNotAuthorized(bStatus)):
         return aStatus == bStatus
-    default:
-        return false
     }
 }
 

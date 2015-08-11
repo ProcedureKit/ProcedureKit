@@ -76,16 +76,13 @@ public class OperationQueue: NSOperationQueue {
     }
 
     public override func addOperations(ops: [NSOperation], waitUntilFinished wait: Bool) {
-        if let ops = ops as? [NSOperation] {
-            ops.map(addOperation)
+        ops.map(addOperation)
 
-            if wait {
-                for operation in operations {
-                    operation.waitUntilFinished()
-                }
+        if wait {
+            for operation in operations {
+                operation.waitUntilFinished()
             }
         }
     }
-
 }
 

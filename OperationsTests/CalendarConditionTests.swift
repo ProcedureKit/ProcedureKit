@@ -34,7 +34,7 @@ class TestableEventKitAuthorizationManager: EventKitAuthorizationManagerType {
     func requestAccessToEntityType(entityType: EKEntityType, completion: EKEventStoreRequestAccessCompletionHandler) {
         didRequestAccess = true
         authorizationStatus = requestedAuthorizationStatus
-        completion(accessAllowed, nil)
+        completion(ObjCBool(accessAllowed), nil)
     }
 }
 
@@ -72,7 +72,7 @@ class CalendarConditionTests: OperationTests {
         if let error = receivedErrors.first as? CalendarCondition.Error {
             switch error {
             case .AuthorizationFailed(let status):
-                XCTAssertEqual(status, .Denied)
+                XCTAssertEqual(status, EKAuthorizationStatus.Denied)
             }
         }
         else {
