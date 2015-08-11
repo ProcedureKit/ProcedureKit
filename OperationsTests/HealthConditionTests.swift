@@ -29,7 +29,7 @@ class TestableHealthManager: HealthManagerType {
 
     func opr_authorizationStatusForType(type: HKObjectType) -> HKAuthorizationStatus {
         if let sampleType = type as? HKSampleType {
-            if contains(allowedForSharing, sampleType) {
+            if allowedForSharing.contains(sampleType) {
                 return .SharingAuthorized
             }
             else {

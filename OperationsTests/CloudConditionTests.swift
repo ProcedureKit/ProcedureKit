@@ -76,7 +76,7 @@ class CloudConditionTests: OperationTests {
     func test__cloud_container_executes_when_permissions_are_discoverable() {
 
         addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
-        let condition = CloudContainerCondition(container: container, permissions: .PermissionUserDiscoverability)
+        let condition = CloudContainerCondition(container: container, permissions: .UserDiscoverability)
         operation.addCondition(condition)
 
         runOperation(operation)
@@ -116,7 +116,7 @@ class CloudConditionTests: OperationTests {
 
         container.applicationPermissionStatus = .InitialState
         container.requestApplicationPermissionStatus = .Granted
-        let condition = CloudContainerCondition(container: container, permissions: .PermissionUserDiscoverability)
+        let condition = CloudContainerCondition(container: container, permissions: .UserDiscoverability)
         operation.addCondition(condition)
 
         var receivedErrors = [ErrorType]()

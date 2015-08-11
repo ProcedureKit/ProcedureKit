@@ -26,7 +26,7 @@ public struct LoggingObserver: OperationObserver {
     let logger: LoggerBlockType
     let queue: dispatch_queue_t
 
-    public init(queue: dispatch_queue_t = Queue.Initiated.serial("me.danthorpe.Operations.Logger"), logger: LoggerBlockType = { println($0) }) {
+    public init(queue: dispatch_queue_t = Queue.Initiated.serial("me.danthorpe.Operations.Logger"), logger: LoggerBlockType = { print($0) }) {
         self.queue = queue
         self.logger = logger
     }
@@ -47,7 +47,7 @@ public struct LoggingObserver: OperationObserver {
     }
 
     public func operationDidFinish(operation: Operation, errors: [ErrorType]) {
-        var detail = errors.count > 0 ? "\(errors.count) error(s)" : "no errors"
+        let detail = errors.count > 0 ? "\(errors.count) error(s)" : "no errors"
         log("\(operationName(operation)): finished with \(detail).")
     }
 

@@ -163,19 +163,8 @@ public class UserNotificationPermissionOperation: Operation {
 extension UIUserNotificationSettings {
 
     func contains(settings: UIUserNotificationSettings) -> Bool {
-        // This going to be so much easier with Swift 2.0's improved RawOptionSetType
-        // Need to check that our types contain all of the other types
-        // but without access to `contains:`
-        if (types == UIUserNotificationType.allZeros) && (settings.types.rawValue > 0) {
-            return false
-        }
-        if (types & UIUserNotificationType.Alert) && !(settings.types & UIUserNotificationType.Alert) {
-            return false
-        }
-        if (types & UIUserNotificationType.Badge) && !(settings.types & UIUserNotificationType.Badge) {
-            return false
-        }
-        if (types & UIUserNotificationType.Sound) && !(settings.types & UIUserNotificationType.Sound) {
+
+        if !types.contains(settings.types) {
             return false
         }
 
@@ -185,12 +174,12 @@ extension UIUserNotificationSettings {
     }
 
     func settingsByMerging(settings: UIUserNotificationSettings) -> UIUserNotificationSettings {
-        let union = types | settings.types
+        let union = types.union(settings.types)
 
-        let myCategories = categories as? Set<UIUserNotificationCategory> ?? []
+        let myCategories = categories ?? []
         var existingCategoriesByIdentifier = Dictionary(sequence: myCategories) { $0.identifier }
 
-        let newCategories = settings.categories as? Set<UIUserNotificationCategory> ?? []
+        let newCategories = settings.categories ?? []
         var newCategoriesByIdentifier = Dictionary(sequence: myCategories) { $0.identifier }
 
         for (newIdentifier, newCategory) in newCategoriesByIdentifier {
@@ -205,7 +194,7 @@ extension UIUserNotificationSettings {
 extension UIUserNotificationType: BooleanType {
 
     public var boolValue: Bool {
-        return self != .allZeros
+        return self != []
     }
 }
 

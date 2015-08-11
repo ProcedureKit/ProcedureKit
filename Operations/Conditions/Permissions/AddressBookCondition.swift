@@ -71,7 +71,7 @@ public class AccessAddressBook: BlockOperation {
         self.manager = manager
         super.init(block: { (continueWithError: ContinuationBlockType) in
 
-            let (addressBook: ABAddressBookRef!, error) = manager.createAddressBook()
+            let (addressBook, error): (ABAddressBookRef!, CFErrorRef!) = manager.createAddressBook()
             if let addressBook: ABAddressBookRef = addressBook {
                 manager.requestAccessToAddressBook(addressBook) { (success, error) in
                     if success {

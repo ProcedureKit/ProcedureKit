@@ -175,7 +175,7 @@ public class Operation: NSOperation {
     They must call a finish methods in order to complete.
     */
     public func execute() {
-        print("\(self.dynamicType) must override `execute()`.")
+        print("\(self.dynamicType) must override `execute()`.", appendNewline: false)
         
         finish()
     }
@@ -225,7 +225,7 @@ public class Operation: NSOperation {
     */
     final public func finish(error: ErrorType?) {
         if let error = error {
-            finish(errors: [error])
+            finish([error])
         }
         else {
             finish()
@@ -259,7 +259,7 @@ private func ==(lhs: Operation.State, rhs: Operation.State) -> Bool {
     return lhs.rawValue == rhs.rawValue
 }
 
-extension Operation.State: DebugPrintable, Printable {
+extension Operation.State: CustomDebugStringConvertible, CustomStringConvertible {
 
     var description: String {
         switch self {

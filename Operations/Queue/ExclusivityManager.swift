@@ -53,7 +53,7 @@ public class ExclusivityManager {
         let matchingOperations = operations[category]
 
         if  var operationsWithThisCategory = matchingOperations,
-            let index = find(operationsWithThisCategory, operation) {
+            let index = operationsWithThisCategory.indexOf(operation) {
                 operationsWithThisCategory.removeAtIndex(index)
                 operations[category] = operationsWithThisCategory
         }
