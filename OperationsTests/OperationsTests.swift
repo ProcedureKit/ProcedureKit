@@ -175,7 +175,7 @@ class DelayOperationTests: OperationTests {
 
     func test__delay_operation_with_distant_past_finishes_immediately() {
         let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
-        let operation = DelayOperation(date: NSDate.distantPast() as! NSDate)
+        let operation = DelayOperation(date: NSDate.distantPast())
         runOperation(operation)
         let after = dispatch_time(DISPATCH_TIME_NOW, Int64(0.5 * Double(NSEC_PER_SEC)))
         dispatch_after(after, Queue.Main.queue) {
