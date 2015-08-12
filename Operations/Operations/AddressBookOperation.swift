@@ -57,7 +57,7 @@ public class AddressBookOperation: AccessAddressBook {
 
 public class AddressBookMapAllRecords<T>: AddressBookOperation {
 
-    public init(suppressPermissionRequest silent: Bool = false, inGroupWithName groupName: String? = .None, transform: (addressBook: ABAddressBookRef, record: ABRecordRef) -> T?, completion: [T] -> Void) {
+    public init(suppressPermissionRequest silent: Bool = false, inGroupWithName groupName: String? = .None, transform: (addressBook: ABAddressBookRef, record: ABRecordRef) -> T?, completion: (results: [T], continueWithError: BlockOperation.ContinuationBlockType) -> Void) {
 
         let getGroup: (ABAddressBookRef, String) -> ABRecordRef? = { (addressBook, searchTerm) in
             let groups = ABAddressBookCopyArrayOfAllGroups(addressBook)?.takeRetainedValue() as! [ABRecordRef]
@@ -80,8 +80,8 @@ public class AddressBookMapAllRecords<T>: AddressBookOperation {
 
         super.init(suppressPermissionRequest: silent, handler: { (addressBook, continueWithError) in
             // Get all the records, map them with the transform, use flatMap to trim an .None elements.
-            completion(getAllRecords(addressBook).flatMap { flatMap(transform(addressBook: addressBook, record: $0), { [$0] }) ?? [] })
-            continueWithError(error: nil)
+            let results: [T] = getAllRecords(addressBook).flatMap { flatMap(transform(addressBook: addressBook, record: $0), { [$0] }) ?? [] }
+            completion(results: results, continueWithError: continueWithError)
         })
 
         if let groupName = groupName {
