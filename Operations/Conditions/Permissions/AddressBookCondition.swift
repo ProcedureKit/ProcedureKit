@@ -65,7 +65,10 @@ public class AccessAddressBook: BlockOperation {
         case FailedToAuthorize
     }
 
+    let manager: AddressBookAuthenticationManager
+
     init(manager: AddressBookAuthenticationManager, handler: AddressBookHandler) {
+        self.manager = manager
         super.init(block: { (continueWithError: ContinuationBlockType) in
 
             let (addressBook: ABAddressBookRef!, error) = manager.createAddressBook()
