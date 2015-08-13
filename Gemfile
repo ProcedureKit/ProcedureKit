@@ -1,6 +1,4 @@
 source "https://rubygems.org"
 
-gem 'cocoapods'
-gem 'fastlane'
+gem 'fastlane', '>= 1.16'
 gem 'xcpretty'
-gem 'shenzhen'
