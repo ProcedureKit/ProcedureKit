@@ -114,6 +114,101 @@ public class AddressBookGetPersonAndGroup: AddressBookOperation {
         })
         name = "Get Person Record: \(recordID) and Group: \(groupName)"
         let condition = AddressBookGroupExistsCondition(name: groupName, manager: manager, suppressPermissionRequest: silent)
+        // Note that we don't silence this condition, as the flag is to supress
+        // the permission request within AddressBookOperation only.
+        addCondition(condition)
+    }
+}
+
+public class AddressBookCreateGroup: AddressBookOperation {
+
+    public enum CreateGroupError: ErrorType {
+        case FailedToSetGroupNameProperty(CFError?)
+        case FailedToAddGroupRecord(CFError?)
+        case FailedToSaveAddressBook(CFError?)
+    }
+
+    public typealias Result = (group: ABRecordRef?, error: CreateGroupError?)
+    public typealias CompletionType = Result -> Void
+
+    internal static func createGroupRecordWithName(groupName: String, inAddressBook addressBook: ABAddressBookRef) -> AddressBookCreateGroup.Result {
+        let group: ABRecordRef = ABGroupCreate().takeRetainedValue()
+        let error: CreateGroupError? = {
+            var error: Unmanaged<CFError>?
+            if !ABRecordSetValue(group, kABGroupNameProperty, groupName, &error) {
+                println("Failed to set group name value: \(error?.takeRetainedValue())")
+                return .FailedToSetGroupNameProperty(error?.takeRetainedValue())
+            }
+            else if !ABAddressBookAddRecord(addressBook, group, &error) {
+                println("Failed to add record: \(error?.takeRetainedValue())")
+                return .FailedToAddGroupRecord(error?.takeRetainedValue())
+            }
+            else if !ABAddressBookSave(addressBook, &error) {
+                println("Failed to save address book: \(error?.takeRetainedValue())")
+                return .FailedToSaveAddressBook(error?.takeRetainedValue())
+            }
+            return .None
+            }()
+        return (group, error)
+    }
+
+    public convenience init(suppressPermissionRequest silent: Bool = false, groupName: String, completion: CompletionType? = .None) {
+        self.init(manager: SystemAddressBookAuthenticationManager(), suppressPermissionRequest: silent, groupName: groupName, completion: completion)
+    }
+
+    public init(manager: AddressBookAuthenticationManager, suppressPermissionRequest silent: Bool = false, groupName: String, completion: CompletionType? = .None) {
+        super.init(manager: manager, suppressPermissionRequest: silent, handler: { (addressBook, continueWithError) in
+            if let group: ABRecordRef = readGroupRecordWithName(groupName, fromAddressBook: addressBook) {
+                completion?((group, .None))
+            }
+            else {
+                let result = AddressBookCreateGroup.createGroupRecordWithName(groupName, inAddressBook: addressBook)
+                completion?(result)
+            }
+            continueWithError(error: nil)
+        })
+        name = "Address Book Create Group: \(groupName)"
+    }
+}
+
+public class AddressBookRemoveGroup: AddressBookOperation {
+
+    public enum RemoveGroupError: ErrorType {
+        case FailedToRemoveGroupRecord(CFError?)
+        case FailedToSaveAddressBook(CFError?)
+    }
+
+    public typealias Result = RemoveGroupError?
+    public typealias CompletionType = Result -> Void
+
+    internal static func removeGroupRecordWithName(groupName: String, inAddressBook addressBook: ABAddressBookRef) -> AddressBookRemoveGroup.Result {
+        let groups: [ABRecordRef] = readGroupRecordsWithName(groupName, fromAddressBook: addressBook)
+        for group in groups {
+            var error: Unmanaged<CFError>?
+            if !ABAddressBookRemoveRecord(addressBook, group, &error) {
+                println("Failed to remove group: \(error?.takeRetainedValue())")
+                return .FailedToRemoveGroupRecord(error?.takeRetainedValue())
+            }
+            if !ABAddressBookSave(addressBook, &error) {
+                println("Failed to save address book: \(error?.takeRetainedValue())")
+                return .FailedToSaveAddressBook(error?.takeRetainedValue())
+            }
+        }
+        return .None
+    }
+
+    public convenience init(suppressPermissionRequest silent: Bool = false, groupName: String, completion: CompletionType? = .None) {
+        self.init(manager: SystemAddressBookAuthenticationManager(), suppressPermissionRequest: silent, groupName: groupName, completion: completion)
+    }
+
+    public init(manager: AddressBookAuthenticationManager, suppressPermissionRequest silent: Bool = false, groupName: String, completion: CompletionType? = .None) {
+        super.init(manager: manager, suppressPermissionRequest: silent, handler: { (addressBook, continueWithError) in
+            let result = AddressBookRemoveGroup.removeGroupRecordWithName(groupName, inAddressBook: addressBook)
+            completion?(result)
+            continueWithError(error: nil)
+        })
+        name = "Address Book Create Group: \(groupName)"
+        let condition = AddressBookGroupExistsCondition(name: groupName, manager: manager, suppressPermissionRequest: true)
         addCondition(silent ? SilentCondition(condition) : condition)
     }
 }
@@ -126,12 +221,12 @@ public class AddressBookGroupExistsCondition: OperationCondition {
 
     public let name = "Address Book Group Exists"
     public let isMutuallyExclusive = false
-
     public let groupName: String
+
     private var manager: AddressBookAuthenticationManager
     private var suppressPermissionRequest: Bool
-    private var createAddressBookGroup: AddressBookCreateGroup?
-    private var createAddressBookGroupResult: AddressBookCreateGroupResult? = .None
+    private var createAddressBookGroup: AddressBookCreateGroup? = .None
+    private var createAddressBookGroupResult: AddressBookCreateGroup.Result? = .None
 
     public init(name: String, manager: AddressBookAuthenticationManager? = .None, suppressPermissionRequest silent: Bool = false) {
         self.groupName = name
@@ -156,63 +251,19 @@ public class AddressBookGroupExistsCondition: OperationCondition {
     }
 }
 
-internal class AddressBookCreateGroup: AddressBookOperation {
-
-    internal init(manager: AddressBookAuthenticationManager, suppressPermissionRequest silent: Bool = false, groupName: String, completion: AddressBookCreateGroupResult -> Void) {
-        super.init(manager: manager, suppressPermissionRequest: silent, handler: { (addressBook, continueWithError) in
-            if let group: ABRecordRef = readGroupRecordWithName(groupName, fromAddressBook: addressBook) {
-                completion((group, .None))
-            }
-            else {
-                completion(createGroupRecordWithName(groupName, inAddressBook: addressBook))
-            }
-            continueWithError(error: nil)
-        })
-        name = "Address Book Create Group: \(groupName)"
-    }
-}
-
 // MARK: - Helpers
 
 private func readGroupRecordWithName(searchTerm: String, fromAddressBook addressBook: ABAddressBookRef) -> ABRecordRef? {
+    return readGroupRecordsWithName(searchTerm, fromAddressBook: addressBook).first
+}
+
+private func readGroupRecordsWithName(searchTerm: String, fromAddressBook addressBook: ABAddressBookRef) -> [ABRecordRef] {
     let groups = ABAddressBookCopyArrayOfAllGroups(addressBook)?.takeRetainedValue() as! [ABRecordRef]
-    let groupNames = groups.map { ABRecordCopyValue($0, kABGroupNameProperty)?.takeRetainedValue() as! String }
     let filtered = groups.filter { record in
         let name = ABRecordCopyValue(record, kABGroupNameProperty).takeRetainedValue() as! String
         return name == searchTerm
     }
-    return filtered.first
-}
-
-internal enum AddressBookCreateGroupError: ErrorType {
-    case FailedToSetGroupNameProperty(CFError?)
-    case FailedToAddGroupRecord(CFError?)
-    case FailedToSaveAddressBook(CFError?)
-}
-
-internal typealias AddressBookCreateGroupResult = (group: ABRecordRef?, error: AddressBookCreateGroupError?)
-
-private func createGroupRecordWithName(groupName: String, inAddressBook addressBook: ABAddressBookRef) -> AddressBookCreateGroupResult {
-
-    let group: ABRecordRef = ABGroupCreate().takeRetainedValue()
-    let error: AddressBookCreateGroupError? = {
-        var error: Unmanaged<CFError>?
-        if !ABRecordSetValue(group, kABGroupNameProperty, groupName, &error) {
-            println("Failed to set group name value: \(error?.takeRetainedValue())")
-            return .FailedToSetGroupNameProperty(error?.takeRetainedValue())
-        }
-        else if !ABAddressBookAddRecord(addressBook, group, &error) {
-            println("Failed to add record: \(error?.takeRetainedValue())")
-            return .FailedToAddGroupRecord(error?.takeRetainedValue())
-        }
-        else if !ABAddressBookSave(addressBook, &error) {
-            println("Failed to save address book: \(error?.takeRetainedValue())")
-            return .FailedToSaveAddressBook(error?.takeRetainedValue())
-        }
-        return .None
-        }()
-    
-    return (group, error)
+    return filtered
 }
 
 
