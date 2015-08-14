@@ -60,7 +60,7 @@ class AddressBookOperationTests: OperationTests {
         manager.addressBook = posedAddressBook as CFTypeRef
 
         var didReceiveAddressBook = false
-        let operation = AddressBookOperation(manager: manager, silent: false) { (addressBook, continueWithError) in
+        let operation = AddressBookOperation(manager: manager, suppressPermissionRequest: false) { (addressBook, continueWithError) in
             if let addressBook = addressBook as? String {
                 didReceiveAddressBook = addressBook == posedAddressBook
             }
@@ -83,7 +83,7 @@ class AddressBookOperationTests: OperationTests {
         manager.addressBook = posedAddressBook as CFTypeRef
 
         var didReceiveAddressBook = false
-        let operation = AddressBookOperation(manager: manager, silent: false) { (addressBook, continueWithError) in
+        let operation = AddressBookOperation(manager: manager, suppressPermissionRequest: false) { (addressBook, continueWithError) in
             if let addressBook = addressBook as? String {
                 didReceiveAddressBook = addressBook == posedAddressBook
             }
@@ -105,7 +105,7 @@ class AddressBookOperationTests: OperationTests {
         manager.requestShouldSucceed = false
         
         var didExecuteHandler = false
-        let operation = AddressBookOperation(manager: manager, silent: true) { (addressBook, continueWithError) in
+        let operation = AddressBookOperation(manager: manager, suppressPermissionRequest: true) { (addressBook, continueWithError) in
             didExecuteHandler = true
             continueWithError(error: nil)
         }
