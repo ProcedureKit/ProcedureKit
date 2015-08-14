@@ -188,6 +188,14 @@
 			name = Permissions;
 			sourceTree = "<group>";
 		};
+		656F21CD1B7E238000849E9F /* Extras */ = {
+			isa = PBXGroup;
+			children = (
+				656F21CB1B7E0A3D00849E9F /* AddressBookExtras.swift */,
+			);
+			name = Extras;
+			sourceTree = "<group>";
+		};
 		657729531B3D9E0E00B5D153 = {
 			isa = PBXGroup;
 			children = (
@@ -217,7 +225,7 @@
 				65D6F5731B5AC453003D35AD /* Operations */,
 				65CB76FA1B3F284A00791E18 /* Queue */,
 				657729601B3D9E0E00B5D153 /* Supporting Files */,
-				656F21CB1B7E0A3D00849E9F /* AddressBookExtras.swift */,
+				656F21CD1B7E238000849E9F /* Extras */,
 			);
 			path = Operations;
 			sourceTree = "<group>";
