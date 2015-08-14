@@ -82,6 +82,87 @@ public class AddressBookMapAllRecords<T>: AddressBookOperation {
     }
 }
 
+public class AddressBookAddPersonToGroup: AddressBookGetPersonAndGroup {
+
+    enum AddPersonToGroupError: ErrorType {
+        case FailedToAddMember(CFError?)
+        case FailedToSaveAddressBook(CFError?)
+    }
+
+    public init(personRecordID recordID: ABRecordID, groupName: String) {
+        super.init(personRecordID: recordID, groupName: groupName, handler: { (addressBook, group, person, continueWithError) in
+            var error: Unmanaged<CFError>?
+            if !ABGroupAddMember(group, person, &error) {
+                println("Failed to add group member: \(error?.takeRetainedValue())")
+                continueWithError(error: AddPersonToGroupError.FailedToAddMember(error?.takeRetainedValue()))
+            }
+            else if !ABAddressBookSave(addressBook, &error) {
+                println("Failed to save the address book: \(error?.takeRetainedValue())")
+                continueWithError(error: AddPersonToGroupError.FailedToSaveAddressBook(error?.takeRetainedValue()))
+            }
+            else {
+                continueWithError(error: nil)
+            }
+        })
+        name = "Add Person Record: \(recordID) to Group: \(groupName)"
+        addCondition(AddressBookGroupExistsCondition(name: groupName, manager: manager))
+    }
+}
+
+public class AddressBookRemovePersonFromGroup: AddressBookGetPersonAndGroup {
+
+    enum RemovePersonFromGroupError: ErrorType {
+        case FailedToRemoveMember(CFError?)
+        case FailedToSaveAddressBook(CFError?)
+    }
+
+    public init(personRecordID recordID: ABRecordID, groupName: String) {
+        super.init(personRecordID: recordID, groupName: groupName, handler: { (addressBook, group, person, continueWithError) in
+            var error: Unmanaged<CFError>?
+            if !ABGroupRemoveMember(group, person, &error) {
+                println("Failed to remove group member: \(error?.takeRetainedValue())")
+                continueWithError(error: RemovePersonFromGroupError.FailedToRemoveMember(error?.takeRetainedValue()))
+            }
+            else if !ABAddressBookSave(addressBook, &error) {
+                println("Failed to save the address book: \(error?.takeRetainedValue())")
+                continueWithError(error: RemovePersonFromGroupError.FailedToSaveAddressBook(error?.takeRetainedValue()))
+            }
+            else {
+                continueWithError(error: nil)
+            }
+        })
+        name = "Add Person Record: \(recordID) to Group: \(groupName)"
+        addCondition(AddressBookGroupExistsCondition(name: groupName, manager: manager))
+    }
+}
+
+public class AddressBookGetPersonAndGroup: AddressBookOperation {
+
+    public typealias GetPersonAndGroupHandler = (addressBook: ABAddressBookRef, group: ABRecordRef, person: ABRecordRef, continueWithError: ContinuationBlockType) -> Void
+
+    enum GetPersonAndGroupError: ErrorType {
+        case FailedToGetPersonRecord
+        case FailedToGetGroupRecord
+    }
+
+    public init(personRecordID recordID: ABRecordID, groupName: String, handler: GetPersonAndGroupHandler) {
+        super.init(handler: { (addressBook, continueWithError) in
+            if let group: ABRecordRef = readGroupRecordWithName(groupName, fromAddressBook: addressBook) {
+                if let person: ABRecordRef = ABAddressBookGetPersonWithRecordID(addressBook, recordID)?.takeRetainedValue() {
+                    handler(addressBook: addressBook, group: group, person: person, continueWithError: continueWithError)
+                } else {
+                    continueWithError(error: GetPersonAndGroupError.FailedToGetPersonRecord)
+                }
+            }
+            else {
+                continueWithError(error: GetPersonAndGroupError.FailedToGetGroupRecord)
+            }
+        })
+        name = "Get Person Record: \(recordID) and Group: \(groupName)"
+        addCondition(AddressBookGroupExistsCondition(name: groupName, manager: manager))
+    }
+}
+
 public class AddressBookGroupExistsCondition: OperationCondition {
 
     enum Error: ErrorType {
@@ -123,11 +204,9 @@ internal class AddressBookCreateGroup: AddressBookOperation {
     internal init(manager: AddressBookAuthenticationManager, suppressPermissionRequest silent: Bool = false, groupName: String, completion: AddressBookCreateGroupResult -> Void) {
         super.init(manager: manager, silent: silent, handler: { (addressBook, continueWithError) in
             if let group: ABRecordRef = readGroupRecordWithName(groupName, fromAddressBook: addressBook) {
-                println("Address Book group already exists.")
                 completion((group, .None))
             }
             else {
-                println("Will create Address Book group.")
                 completion(createGroupRecordWithName(groupName, inAddressBook: addressBook))
             }
             continueWithError(error: nil)
