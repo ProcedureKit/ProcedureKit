@@ -33,6 +33,7 @@
 		655E43FF1B3F43D60013A3E1 /* TimeoutObserverTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 655E43FE1B3F43D60013A3E1 /* TimeoutObserverTests.swift */; };
 		6560100C1B5C64E20052EE78 /* CloudCondition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6560100B1B5C64E20052EE78 /* CloudCondition.swift */; };
 		6560100E1B5C6C0E0052EE78 /* CloudConditionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6560100D1B5C6C0E0052EE78 /* CloudConditionTests.swift */; };
+		656F21CC1B7E0A3D00849E9F /* AddressBookExtras.swift in Sources */ = {isa = PBXBuildFile; fileRef = 656F21CB1B7E0A3D00849E9F /* AddressBookExtras.swift */; };
 		65719F6F1B70FE090012A775 /* UserNotificationConditionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65719F6E1B70FE090012A775 /* UserNotificationConditionTests.swift */; };
 		657729631B3D9E0E00B5D153 /* Operations.h in Headers */ = {isa = PBXBuildFile; fileRef = 657729621B3D9E0E00B5D153 /* Operations.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		657729691B3D9E0E00B5D153 /* Operations.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6577295D1B3D9E0E00B5D153 /* Operations.framework */; };
@@ -110,6 +111,7 @@
 		655E43FE1B3F43D60013A3E1 /* TimeoutObserverTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TimeoutObserverTests.swift; sourceTree = "<group>"; };
 		6560100B1B5C64E20052EE78 /* CloudCondition.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CloudCondition.swift; path = Permissions/CloudCondition.swift; sourceTree = "<group>"; };
 		6560100D1B5C6C0E0052EE78 /* CloudConditionTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CloudConditionTests.swift; sourceTree = "<group>"; };
+		656F21CB1B7E0A3D00849E9F /* AddressBookExtras.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AddressBookExtras.swift; path = Extras/AddressBookExtras.swift; sourceTree = "<group>"; };
 		65719F6E1B70FE090012A775 /* UserNotificationConditionTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserNotificationConditionTests.swift; sourceTree = "<group>"; };
 		6577295D1B3D9E0E00B5D153 /* Operations.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Operations.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		657729611B3D9E0E00B5D153 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -215,6 +217,7 @@
 				65D6F5731B5AC453003D35AD /* Operations */,
 				65CB76FA1B3F284A00791E18 /* Queue */,
 				657729601B3D9E0E00B5D153 /* Supporting Files */,
+				656F21CB1B7E0A3D00849E9F /* AddressBookExtras.swift */,
 			);
 			path = Operations;
 			sourceTree = "<group>";
@@ -455,6 +458,7 @@
 				65D6F5751B5AC453003D35AD /* Operation.swift in Sources */,
 				65DADF631B62D73100EAD25B /* ReachableOperation.swift in Sources */,
 				65D6F58D1B5BFE59003D35AD /* ReachabilityCondition.swift in Sources */,
+				656F21CC1B7E0A3D00849E9F /* AddressBookExtras.swift in Sources */,
 				65343F5A1B6656070022968E /* AddressBookCondition.swift in Sources */,
 				657A4A3D1B77F10F006B3D7A /* RemoteNotificationCondition.swift in Sources */,
 				6528035F1B78F47100717334 /* PhotosCondition.swift in Sources */,

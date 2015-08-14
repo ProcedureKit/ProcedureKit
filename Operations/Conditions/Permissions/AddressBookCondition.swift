@@ -67,7 +67,7 @@ public class AccessAddressBook: BlockOperation {
 
     let manager: AddressBookAuthenticationManager
 
-    init(manager: AddressBookAuthenticationManager, handler: AddressBookHandler) {
+    init(manager: AddressBookAuthenticationManager, suppressPermissionRequest silent: Bool = false, handler: AddressBookHandler) {
         self.manager = manager
         super.init(block: { (continueWithError: ContinuationBlockType) in
 
@@ -86,7 +86,8 @@ public class AccessAddressBook: BlockOperation {
                 continueWithError(error: Error.FailedToCreateAddressBook)
             }
         })
-        addCondition(AlertPresentation())
+        let condition = AlertPresentation()
+        addCondition(silent ? SilentCondition(condition) : condition)
     }
 }
 
