@@ -22,19 +22,16 @@ import Foundation
 */
 public class GroupOperation: Operation {
 
-    private let _queue = OperationQueue()
-    private let _finishingOperation = NSBlockOperation(block: {})
-    private var _aggregateErrors = Array<ErrorType>()
+    private let queue = OperationQueue()
+    private let operations: [NSOperation]
+    private let finishingOperation = NSBlockOperation(block: {})
+    private var aggregateErrors = Array<ErrorType>()
 
-    public init(operations: [NSOperation]) {
+    public init(operations ops: [NSOperation]) {
+        operations = ops
         super.init()
-
-        _queue.suspended = true
-        _queue.delegate = self
-
-        for operation in operations {
-            _queue.addOperation(operation)
-        }
+        queue.suspended = true
+        queue.delegate = self
     }
 
     public convenience init(operations: NSOperation...) {
@@ -42,21 +39,24 @@ public class GroupOperation: Operation {
     }
 
     public override func cancel() {
-        _queue.cancelAllOperations()
+        queue.cancelAllOperations()
         super.cancel()
     }
 
     public override func execute() {
-        _queue.suspended = false
-        _queue.addOperation(_finishingOperation)
+        for operation in operations {
+            queue.addOperation(operation)
+        }
+        queue.suspended = false
+        queue.addOperation(finishingOperation)
     }
 
     public func addOperation(operation: NSOperation) {
-        _queue.addOperation(operation)
+        queue.addOperation(operation)
     }
 
     final func aggregateError(error: ErrorType) {
-        _aggregateErrors.append(error)
+        aggregateErrors.append(error)
     }
 
     public func operationDidFinish(operation: NSOperation, withErrors errors: [ErrorType]) {
@@ -67,19 +67,19 @@ public class GroupOperation: Operation {
 extension GroupOperation: OperationQueueDelegate {
 
     public func operationQueue(queue: OperationQueue, willAddOperation operation: NSOperation) {
-        assert(!_finishingOperation.finished && !_finishingOperation.executing, "Cannot add new operations to a group after the group has completed.")
+        assert(!finishingOperation.finished && !finishingOperation.executing, "Cannot add new operations to a group after the group has completed.")
 
-        if operation !== _finishingOperation {
-            _finishingOperation.addDependency(operation)
+        if operation !== finishingOperation {
+            finishingOperation.addDependency(operation)
         }
     }
 
     public func operationQueue(queue: OperationQueue, operationDidFinish operation: NSOperation, withErrors errors: [ErrorType]) {
-        _aggregateErrors.extend(errors)
+        aggregateErrors.extend(errors)
 
-        if operation === _finishingOperation {
-            _queue.suspended = true
-            finish(errors: _aggregateErrors)
+        if operation === finishingOperation {
+            queue.suspended = true
+            finish(errors: aggregateErrors)
         }
         else {
             operationDidFinish(operation, withErrors: errors)
