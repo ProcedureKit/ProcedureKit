@@ -79,7 +79,7 @@ extension GroupOperation: OperationQueueDelegate {
 
         if operation === finishingOperation {
             queue.suspended = true
-            finish(errors: aggregateErrors)
+            finish(aggregateErrors)
         }
         else {
             operationDidFinish(operation, withErrors: errors)

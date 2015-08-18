@@ -27,7 +27,7 @@ public class AddressBookMapAllRecords<T>: AddressBookOperation {
         super.init(suppressPermissionRequest: silent, handler: { (addressBook, continueWithError) in
             // Get all the records, map them with the transform, use flatMap to trim an .None elements.
             let records: [ABRecordRef] = getAllRecords(addressBook)
-            let results: [T] = records.flatMap { flatMap(transform($0), { [$0] }) ?? [] }
+            let results: [T] = records.flatMap(transform)
             completion(results: results, continueWithError: continueWithError)
         })
 
@@ -49,11 +49,11 @@ public class AddressBookAddPersonToGroup: AddressBookGetPersonAndGroup {
         super.init(suppressPermissionRequest: silent, personRecordID: recordID, groupName: groupName, handler: { (addressBook, group, person, continueWithError) in
             var error: Unmanaged<CFError>?
             if !ABGroupAddMember(group, person, &error) {
-                println("Failed to add group member: \(error?.takeRetainedValue())")
+                print("Failed to add group member: \(error?.takeRetainedValue())")
                 continueWithError(error: AddPersonToGroupError.FailedToAddMember(error?.takeRetainedValue()))
             }
             else if !ABAddressBookSave(addressBook, &error) {
-                println("Failed to save the address book: \(error?.takeRetainedValue())")
+                print("Failed to save the address book: \(error?.takeRetainedValue())")
                 continueWithError(error: AddPersonToGroupError.FailedToSaveAddressBook(error?.takeRetainedValue()))
             }
             else {
@@ -75,11 +75,11 @@ public class AddressBookRemovePersonFromGroup: AddressBookGetPersonAndGroup {
         super.init(suppressPermissionRequest: silent, personRecordID: recordID, groupName: groupName, handler: { (addressBook, group, person, continueWithError) in
             var error: Unmanaged<CFError>?
             if !ABGroupRemoveMember(group, person, &error) {
-                println("Failed to remove group member: \(error?.takeRetainedValue())")
+                print("Failed to remove group member: \(error?.takeRetainedValue())")
                 continueWithError(error: RemovePersonFromGroupError.FailedToRemoveMember(error?.takeRetainedValue()))
             }
             else if !ABAddressBookSave(addressBook, &error) {
-                println("Failed to save the address book: \(error?.takeRetainedValue())")
+                print("Failed to save the address book: \(error?.takeRetainedValue())")
                 continueWithError(error: RemovePersonFromGroupError.FailedToSaveAddressBook(error?.takeRetainedValue()))
             }
             else {
@@ -136,15 +136,15 @@ public class AddressBookCreateGroup: AddressBookOperation {
         let error: CreateGroupError? = {
             var error: Unmanaged<CFError>?
             if !ABRecordSetValue(group, kABGroupNameProperty, groupName, &error) {
-                println("Failed to set group name value: \(error?.takeRetainedValue())")
+                print("Failed to set group name value: \(error?.takeRetainedValue())")
                 return .FailedToSetGroupNameProperty(error?.takeRetainedValue())
             }
             else if !ABAddressBookAddRecord(addressBook, group, &error) {
-                println("Failed to add record: \(error?.takeRetainedValue())")
+                print("Failed to add record: \(error?.takeRetainedValue())")
                 return .FailedToAddGroupRecord(error?.takeRetainedValue())
             }
             else if !ABAddressBookSave(addressBook, &error) {
-                println("Failed to save address book: \(error?.takeRetainedValue())")
+                print("Failed to save address book: \(error?.takeRetainedValue())")
                 return .FailedToSaveAddressBook(error?.takeRetainedValue())
             }
             return .None
@@ -186,11 +186,11 @@ public class AddressBookRemoveGroup: AddressBookOperation {
         for group in groups {
             var error: Unmanaged<CFError>?
             if !ABAddressBookRemoveRecord(addressBook, group, &error) {
-                println("Failed to remove group: \(error?.takeRetainedValue())")
+                print("Failed to remove group: \(error?.takeRetainedValue())")
                 return .FailedToRemoveGroupRecord(error?.takeRetainedValue())
             }
             if !ABAddressBookSave(addressBook, &error) {
-                println("Failed to save address book: \(error?.takeRetainedValue())")
+                print("Failed to save address book: \(error?.takeRetainedValue())")
                 return .FailedToSaveAddressBook(error?.takeRetainedValue())
             }
         }
