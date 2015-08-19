@@ -8,6 +8,73 @@
 
 import Foundation
 import AddressBook
+import AddressBookUI
+
+// MARK: - UI
+
+public class AddressBookPresentNewPersonController: GroupOperation {
+
+    class PresentNewPersonController: AddressBookOperation {
+        init(delegate: ABNewPersonViewControllerDelegate, fromPresentingViewController from: PresentingViewController, group: ABRecordRef? = .None) {
+            super.init(handler: { (addressBook, continueWithError) in
+                let newPersonViewController = ABNewPersonViewController()
+                newPersonViewController.newPersonViewDelegate = delegate
+                newPersonViewController.addressBook = addressBook
+                if let group: ABRecordRef = group {
+                    newPersonViewController.parentGroup = group
+                }
+                dispatch_async(Queue.Main.queue) {
+                    from.presentViewController(UINavigationController(rootViewController: newPersonViewController), animated: true) {
+                        continueWithError(error: nil)
+                    }
+                }
+            })
+        }
+    }
+
+    let delegate: ABNewPersonViewControllerDelegate
+    let presentingViewController: PresentingViewController
+    let groupName: String?
+
+    var group: ABRecordRef? = .None
+    var getGroup: AddressBookGetGroup? = .None
+
+    public init(delegate: ABNewPersonViewControllerDelegate, fromPresentingViewController from: PresentingViewController, addToGroupWithName groupName: String? = .None) {
+        self.delegate = delegate
+        self.presentingViewController = from
+        self.groupName = groupName
+        super.init(operations: [])
+        addCondition(MutuallyExclusive<AddressBookPresentNewPersonController>())
+        configure()
+    }
+
+    public func configure() {
+        if let groupName = groupName {
+            getGroup = AddressBookGetGroup(groupName: groupName) { [weak self] (addressBook, group, continueWithError) in
+                self?.group = group
+                continueWithError(error: nil)
+            }
+            addOperation(getGroup!)
+        }
+        else {
+            addPresentationOperation()
+        }
+    }
+
+    func addPresentationOperation() {
+        addOperation(PresentNewPersonController(delegate: delegate, fromPresentingViewController: presentingViewController))
+    }
+
+    public override func operationDidFinish(operation: NSOperation, withErrors errors: [ErrorType]) {
+        if let getGroup = getGroup {
+            if errors.isEmpty && getGroup == operation {
+                addPresentationOperation()
+            }
+        }
+    }
+}
+
+// MARK: - Records
 
 public class AddressBookMapAllRecords<T>: AddressBookOperation {
 
