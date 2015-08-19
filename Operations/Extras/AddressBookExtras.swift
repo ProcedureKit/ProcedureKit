@@ -120,6 +120,31 @@ public class AddressBookGetPersonAndGroup: AddressBookOperation {
     }
 }
 
+public class AddressBookGetGroup: AddressBookOperation {
+
+    public typealias GetGroupHandler = (addressBook: ABAddressBookRef, group: ABRecordRef, continueWithError: ContinuationBlockType) -> Void
+
+    enum GetGroupError: ErrorType {
+        case FailedToGetGroupRecord
+    }
+
+    public init(suppressPermissionRequest silent: Bool = false, groupName: String, handler: GetGroupHandler) {
+        super.init(suppressPermissionRequest: silent, handler: { (addressBook, continueWithError) in
+            if let group: ABRecordRef = readGroupRecordWithName(groupName, fromAddressBook: addressBook) {
+                handler(addressBook: addressBook, group: group, continueWithError: continueWithError)
+            }
+            else {
+                continueWithError(error: GetGroupError.FailedToGetGroupRecord)
+            }
+        })
+        name = "Get Group: \(groupName)"
+        let condition = AddressBookGroupExistsCondition(name: groupName, manager: manager, suppressPermissionRequest: silent)
+        // Note that we don't silence this condition, as the flag is to supress
+        // the permission request within AddressBookOperation only.
+        addCondition(condition)
+    }
+}
+
 public class AddressBookCreateGroup: AddressBookOperation {
 
     public enum CreateGroupError: ErrorType {
