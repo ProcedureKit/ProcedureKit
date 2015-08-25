@@ -145,115 +145,115 @@ class AddressBookRecordTypeTests: XCTestCase {
 
 class AddressBookSourceTypeTests: XCTestCase {
 
-    var sourceType: AddressBook.SourceType!
+    var sourceKind: AddressBook.SourceKind!
 
     func test__given_local_source__then_rawValue_is_correct() {
-        sourceType = .Local
-        XCTAssertEqual(sourceType.rawValue, numericCast(kABSourceTypeLocal))
+        sourceKind = .Local
+        XCTAssertEqual(sourceKind.rawValue, numericCast(kABSourceTypeLocal))
     }
 
     func test__given_exchange_source__then_rawValue_is_correct() {
-        sourceType = .Exchange
-        XCTAssertEqual(sourceType.rawValue, numericCast(kABSourceTypeExchange))
+        sourceKind = .Exchange
+        XCTAssertEqual(sourceKind.rawValue, numericCast(kABSourceTypeExchange))
     }
 
     func test__given_exchangegal_source__then_rawValue_is_correct() {
-        sourceType = .ExchangeGAL
-        XCTAssertEqual(sourceType.rawValue, numericCast(kABSourceTypeExchangeGAL))
+        sourceKind = .ExchangeGAL
+        XCTAssertEqual(sourceKind.rawValue, numericCast(kABSourceTypeExchangeGAL))
     }
 
     func test__given_mobileme_source__then_rawValue_is_correct() {
-        sourceType = .MobileMe
-        XCTAssertEqual(sourceType.rawValue, numericCast(kABSourceTypeMobileMe))
+        sourceKind = .MobileMe
+        XCTAssertEqual(sourceKind.rawValue, numericCast(kABSourceTypeMobileMe))
     }
 
     func test__given_ldap_source__then_rawValue_is_correct() {
-        sourceType = .LDAP
-        XCTAssertEqual(sourceType.rawValue, numericCast(kABSourceTypeLDAP))
+        sourceKind = .LDAP
+        XCTAssertEqual(sourceKind.rawValue, numericCast(kABSourceTypeLDAP))
     }
 
     func test__given_carddav_source__then_rawValue_is_correct() {
-        sourceType = .CardDAV
-        XCTAssertEqual(sourceType.rawValue, numericCast(kABSourceTypeCardDAV))
+        sourceKind = .CardDAV
+        XCTAssertEqual(sourceKind.rawValue, numericCast(kABSourceTypeCardDAV))
     }
 
     func test__given_carddavsearch_source__then_rawValue_is_correct() {
-        sourceType = .CardDAVSearch
-        XCTAssertEqual(sourceType.rawValue, numericCast(kABSourceTypeCardDAVSearch))
+        sourceKind = .CardDAVSearch
+        XCTAssertEqual(sourceKind.rawValue, numericCast(kABSourceTypeCardDAVSearch))
     }
 
     func test__given_local_source__then_description_is_correct() {
-        sourceType = .Local
-        XCTAssertEqual(sourceType.description, "Local")
+        sourceKind = .Local
+        XCTAssertEqual(sourceKind.description, "Local")
     }
 
     func test__given_exchange_source__then_description_is_correct() {
-        sourceType = .Exchange
-        XCTAssertEqual(sourceType.description, "Exchange")
+        sourceKind = .Exchange
+        XCTAssertEqual(sourceKind.description, "Exchange")
     }
 
     func test__given_exchangegal_source__then_description_is_correct() {
-        sourceType = .ExchangeGAL
-        XCTAssertEqual(sourceType.description, "ExchangeGAL")
+        sourceKind = .ExchangeGAL
+        XCTAssertEqual(sourceKind.description, "ExchangeGAL")
     }
 
     func test__given_mobileme_source__then_description_is_correct() {
-        sourceType = .MobileMe
-        XCTAssertEqual(sourceType.description, "MobileMe")
+        sourceKind = .MobileMe
+        XCTAssertEqual(sourceKind.description, "MobileMe")
     }
 
     func test__given_ldap_source__then_description_is_correct() {
-        sourceType = .LDAP
-        XCTAssertEqual(sourceType.description, "LDAP")
+        sourceKind = .LDAP
+        XCTAssertEqual(sourceKind.description, "LDAP")
     }
 
     func test__given_carddav_source__then_description_is_correct() {
-        sourceType = .CardDAV
-        XCTAssertEqual(sourceType.description, "CardDAV")
+        sourceKind = .CardDAV
+        XCTAssertEqual(sourceKind.description, "CardDAV")
     }
 
     func test__given_carddavsearch_source__then_description_is_correct() {
-        sourceType = .CardDAVSearch
-        XCTAssertEqual(sourceType.description, "CardDAVSearch")
+        sourceKind = .CardDAVSearch
+        XCTAssertEqual(sourceKind.description, "CardDAVSearch")
     }
 
     func test__given_initialized_local__then_is_correct() {
-        sourceType = .Local
-        XCTAssertEqual(sourceType, AddressBook.SourceType(rawValue: numericCast(kABSourceTypeLocal))!)
+        sourceKind = .Local
+        XCTAssertEqual(sourceKind, AddressBook.SourceKind(rawValue: numericCast(kABSourceTypeLocal))!)
     }
 
     func test__given_initialized_exchange__then_is_correct() {
-        sourceType = .Exchange
-        XCTAssertEqual(sourceType, AddressBook.SourceType(rawValue: numericCast(kABSourceTypeExchange))!)
+        sourceKind = .Exchange
+        XCTAssertEqual(sourceKind, AddressBook.SourceKind(rawValue: numericCast(kABSourceTypeExchange))!)
     }
 
     func test__given_initialized_exchangegal__then_is_correct() {
-        sourceType = .ExchangeGAL
-        XCTAssertEqual(sourceType, AddressBook.SourceType(rawValue: numericCast(kABSourceTypeExchangeGAL))!)
+        sourceKind = .ExchangeGAL
+        XCTAssertEqual(sourceKind, AddressBook.SourceKind(rawValue: numericCast(kABSourceTypeExchangeGAL))!)
     }
 
     func test__given_initialized_mobileme__then_is_correct() {
-        sourceType = .MobileMe
-        XCTAssertEqual(sourceType, AddressBook.SourceType(rawValue: numericCast(kABSourceTypeMobileMe))!)
+        sourceKind = .MobileMe
+        XCTAssertEqual(sourceKind, AddressBook.SourceKind(rawValue: numericCast(kABSourceTypeMobileMe))!)
     }
 
     func test__given_initialized_ldap__then_is_correct() {
-        sourceType = .LDAP
-        XCTAssertEqual(sourceType, AddressBook.SourceType(rawValue: numericCast(kABSourceTypeLDAP))!)
+        sourceKind = .LDAP
+        XCTAssertEqual(sourceKind, AddressBook.SourceKind(rawValue: numericCast(kABSourceTypeLDAP))!)
     }
 
     func test__given_initialized_carddav__then_is_correct() {
-        sourceType = .CardDAV
-        XCTAssertEqual(sourceType, AddressBook.SourceType(rawValue: numericCast(kABSourceTypeCardDAV))!)
+        sourceKind = .CardDAV
+        XCTAssertEqual(sourceKind, AddressBook.SourceKind(rawValue: numericCast(kABSourceTypeCardDAV))!)
     }
 
     func test__given_initialized_carddavsearch__then_is_correct() {
-        sourceType = .CardDAVSearch
-        XCTAssertEqual(sourceType, AddressBook.SourceType(rawValue: numericCast(kABSourceTypeCardDAVSearch))!)
+        sourceKind = .CardDAVSearch
+        XCTAssertEqual(sourceKind, AddressBook.SourceKind(rawValue: numericCast(kABSourceTypeCardDAVSearch))!)
     }
 
     func test__given_initialized_with_other_int__then_result_is_nil() {
-        XCTAssertTrue(AddressBook.SourceType(rawValue: 666) == nil)
+        XCTAssertTrue(AddressBook.SourceKind(rawValue: 666) == nil)
     }
 }
 
