@@ -44,18 +44,75 @@ public protocol AddressBookPermissionRegistrar {
     func requestAccessToAddressBook(addressBook: ABAddressBookRef, completion: (AddressBookPermissionRegistrarError?) -> Void)
 }
 
+
 public protocol AddressBookType {
 
-    var addressBook: ABAddressBookRef { get }
+    typealias RecordStorage
+    typealias PersonStorage
+    typealias GroupStorage
+    typealias SourceStorage
 
     func requestAccess(completion: (AddressBookPermissionRegistrarError?) -> Void)
 
-//    func save() -> ErrorType?
+    func save() -> ErrorType?
 }
+
+public protocol StorageType {
+    typealias Storage
+
+    var storage: Storage { get }
+
+    init(storage: Storage)
+}
+
+public protocol AddressBookRecordType: StorageType {
+
+    var id: ABRecordID { get }
+
+    var kind: AddressBook.RecordKind { get }
+
+    var compositeName: String { get }
+
+    func value<P: ReadablePropertyType>(forProperty property: P) -> P.ValueType?
+
+    func setValue<P: WriteablePropertyType>(value: P.ValueType?, forProperty property: P) -> ErrorType?
+}
+
+public protocol AddressBook_PersonType: AddressBookRecordType {
+    typealias GroupStorage
+    typealias SourceStorage
+}
+
+public protocol AddressBookPersonType: AddressBook_PersonType {
+
+    var compositeNameFormat: AddressBook.CompositeNameFormat { get }
+}
+
+public protocol AddressBook_GroupType: AddressBookRecordType {
+    typealias PersonStorage
+    typealias SourceStorage
+}
+
+public protocol AddressBookGroupType: AddressBook_GroupType {
+
+    func members<P: AddressBook_PersonType where P.Storage == PersonStorage>(ordering: AddressBook.SortOrdering?) -> [P]
+
+    func add<P: AddressBook_PersonType where P.Storage == PersonStorage>(member: P) -> ErrorType?
+
+    func remove<P: AddressBook_PersonType where P.Storage == PersonStorage>(member: P) -> ErrorType?
+}
+
+
+
+
+
+
+
+
 
 // MARK: - Types
 
-public struct AddressBook: AddressBookType {
+public final class AddressBook: AddressBookType {
 
     public enum SortOrdering: RawRepresentable, Printable {
 
@@ -125,7 +182,7 @@ public struct AddressBook: AddressBookType {
         }
     }
 
-    public enum RecordType: RawRepresentable, Printable {
+    public enum RecordKind: RawRepresentable, Printable {
 
         case Source, Group, Person
 
@@ -265,8 +322,23 @@ public struct AddressBook: AddressBookType {
         }
     }
 
+    public typealias RecordStorage = ABRecordRef
+    public typealias PersonStorage = ABRecordRef
+    public typealias GroupStorage = ABRecordRef
+    public typealias SourceStorage = ABRecordRef
+
     enum Error: ErrorType {
+        case UnderlyingError(NSError)
         case UnknownError
+
+        init(error: Unmanaged<CFErrorRef>?) {
+            if let error = error {
+                self = .UnderlyingError(unsafeBitCast(error.takeUnretainedValue(), NSError.self))
+            }
+            else {
+                self = .UnknownError
+            }
+        }
     }
 
     private let registrar: AddressBookPermissionRegistrar
@@ -289,13 +361,26 @@ public struct AddressBook: AddressBookType {
         }
     }
 
+
+}
+
+extension AddressBook {
+
     public func requestAccess(completion: (AddressBookPermissionRegistrarError?) -> Void) {
         registrar.requestAccessToAddressBook(addressBook, completion: completion)
     }
 
+    public func save() -> ErrorType? {
+        var error: Unmanaged<CFErrorRef>? = .None
+        if ABAddressBookSave(addressBook, &error) {
+            return .None
+        }
 
+        return AddressBook.Error(error: error)
+    }
 
 }
+
 
 // MARK: - Property
 
@@ -322,6 +407,135 @@ public struct AddressBookWriteableProperty<Value>: WriteablePropertyType {
         self.id = id
         self.reader = reader
         self.writer = writer
+    }
+}
+
+// MARK: - Record
+
+public class AddressBookRecord: AddressBookRecordType {
+
+    public let storage: ABRecordRef
+
+    public var id: ABRecordID {
+        return ABRecordGetRecordID(storage)
+    }
+
+    public var kind: AddressBook.RecordKind {
+        return AddressBook.RecordKind(rawValue: ABRecordGetRecordType(storage))!
+    }
+
+    public var compositeName: String {
+        assert(kind != .Source, "compositeName is not defined for Source records")
+        return ABRecordCopyCompositeName(storage).takeRetainedValue() as String
+    }
+
+    public required init(storage: ABRecordRef) {
+        self.storage = storage
+    }
+
+    public func value<P: ReadablePropertyType>(forProperty property: P) -> P.ValueType? {
+        if let unmanaged = ABRecordCopyValue(storage, property.id) {
+            let value: CFTypeRef = unmanaged.takeRetainedValue()
+            return property.reader?(value) ?? value as! P.ValueType
+        }
+        return .None
+    }
+
+    public func setValue<P: WriteablePropertyType>(value: P.ValueType?, forProperty property: P) -> ErrorType? {
+        var error: Unmanaged<CFErrorRef>? = .None
+        if let value = value {
+            let transformed: CFTypeRef = property.writer?(value) ?? value as! CFTypeRef
+            if ABRecordSetValue(storage, property.id, transformed, &error) {
+                return .None
+            }
+        }
+        else {
+            if ABRecordRemoveValue(storage, property.id, &error) {
+                return .None
+            }
+        }
+
+        return AddressBook.Error(error: error)
+    }
+}
+
+// MARK: - Person
+
+public class AddressBookPerson: AddressBookRecord, AddressBookPersonType {
+
+    public struct Property {
+        public struct Name {
+            public static let prefix        = AddressBookWriteableProperty<String>(id: kABPersonPrefixProperty)
+            public static let first         = AddressBookWriteableProperty<String>(id: kABPersonFirstNameProperty)
+            public static let middle        = AddressBookWriteableProperty<String>(id: kABPersonMiddleNameProperty)
+            public static let last          = AddressBookWriteableProperty<String>(id: kABPersonLastNameProperty)
+            public static let suffix        = AddressBookWriteableProperty<String>(id: kABPersonSuffixProperty)
+            public static let nickname      = AddressBookWriteableProperty<String>(id: kABPersonNicknameProperty)
+        }
+        public struct Phonetic {
+            public static let first         = AddressBookWriteableProperty<String>(id: kABPersonFirstNamePhoneticProperty)
+            public static let middle        = AddressBookWriteableProperty<String>(id: kABPersonMiddleNamePhoneticProperty)
+            public static let last          = AddressBookWriteableProperty<String>(id: kABPersonLastNamePhoneticProperty)
+        }
+        public struct Work {
+            public static let organization  = AddressBookWriteableProperty<String>(id: kABPersonOrganizationProperty)
+            public static let deptartment   = AddressBookWriteableProperty<String>(id: kABPersonDepartmentProperty)
+            public static let job           = AddressBookWriteableProperty<String>(id: kABPersonJobTitleProperty)
+        }
+    }
+
+    public typealias GroupStorage = ABRecordRef
+    public typealias SourceStorage = ABRecordRef
+
+    public var compositeNameFormat: AddressBook.CompositeNameFormat {
+        return AddressBook.CompositeNameFormat(rawValue: ABPersonGetCompositeNameFormatForRecord(storage))!
+    }
+
+}
+
+// MARK: - Group
+
+public class AddressBookGroup: AddressBookRecord, AddressBookGroupType {
+
+    public struct Property {
+        public static let name = AddressBookWriteableProperty<String>(id: kABGroupNameProperty)
+    }
+
+    public typealias PersonStorage = ABRecordRef
+    public typealias SourceStorage = ABRecordRef
+
+    public convenience init() {
+        let storage: ABRecordRef = ABGroupCreate().takeRetainedValue()
+        self.init(storage: storage)
+    }
+
+    public func members<P: AddressBook_PersonType where P.Storage == PersonStorage>(_ ordering: AddressBook.SortOrdering? = .None) -> [P] {
+        let result: [ABRecordRef] = {
+            if let ordering = ordering {
+                return ABGroupCopyArrayOfAllMembersWithSortOrdering(self.storage, ordering.rawValue).takeRetainedValue() as [ABRecordRef]
+            }
+            else {
+                return ABGroupCopyArrayOfAllMembers(self.storage).takeRetainedValue() as [ABRecordRef]
+            }
+        }()
+
+        return result.map { P(storage: $0) }
+    }
+
+    public func add<P : AddressBook_PersonType where P.Storage == PersonStorage>(member: P) -> ErrorType? {
+        var error: Unmanaged<CFErrorRef>? = .None
+        if ABGroupAddMember(storage, member.storage, &error) {
+            return .None
+        }
+        return AddressBook.Error(error: error)
+    }
+
+    public func remove<P : AddressBook_PersonType where P.Storage == PersonStorage>(member: P) -> ErrorType? {
+        var error: Unmanaged<CFErrorRef>? = .None
+        if ABGroupRemoveMember(storage, member.storage, &error) {
+            return .None
+        }
+        return AddressBook.Error(error: error)
     }
 }
 
@@ -365,13 +579,6 @@ public func ==(a: CFNumberRef, b: CFNumberRef) -> Bool {
 
 
 
-
-public protocol AddressBookRecordType {
-    var recordID: ABRecordID { get }
-    var compositeName: String { get }
-
-    init(recordRef: ABRecordRef)
-}
 
 
 public enum AddressBookPermissionRegistrarError: ErrorType {

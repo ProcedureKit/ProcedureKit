@@ -91,55 +91,55 @@ class AddressBookCompositeNameFormatTests: XCTestCase {
 
 class AddressBookRecordTypeTests: XCTestCase {
 
-    var recordType: AddressBook.RecordType!
+    var recordKind: AddressBook.RecordKind!
 
     func test__given_source_type__then_rawValue_is_correct() {
-        recordType = .Source
-        XCTAssertEqual(recordType.rawValue, numericCast(kABSourceType))
+        recordKind = .Source
+        XCTAssertEqual(recordKind.rawValue, numericCast(kABSourceType))
     }
 
     func test__given_group_type__then_rawValue_is_correct() {
-        recordType = .Group
-        XCTAssertEqual(recordType.rawValue, numericCast(kABGroupType))
+        recordKind = .Group
+        XCTAssertEqual(recordKind.rawValue, numericCast(kABGroupType))
     }
 
     func test__given_person_type__then_rawValue_is_correct() {
-        recordType = .Person
-        XCTAssertEqual(recordType.rawValue, numericCast(kABPersonType))
+        recordKind = .Person
+        XCTAssertEqual(recordKind.rawValue, numericCast(kABPersonType))
     }
 
     func test__given_source_type__then_description_is_correct() {
-        recordType = .Source
-        XCTAssertEqual(recordType.description, "Source")
+        recordKind = .Source
+        XCTAssertEqual(recordKind.description, "Source")
     }
 
     func test__given_group_type__then_description_is_correct() {
-        recordType = .Group
-        XCTAssertEqual(recordType.description, "Group")
+        recordKind = .Group
+        XCTAssertEqual(recordKind.description, "Group")
     }
 
     func test__given_person_type__then_description_is_correct() {
-        recordType = .Person
-        XCTAssertEqual(recordType.description, "Person")
+        recordKind = .Person
+        XCTAssertEqual(recordKind.description, "Person")
     }
 
     func test__given_initialized_source__then_is_correct() {
-        recordType = .Source
-        XCTAssertEqual(recordType, AddressBook.RecordType(rawValue: numericCast(kABSourceType))!)
+        recordKind = .Source
+        XCTAssertEqual(recordKind, AddressBook.RecordKind(rawValue: numericCast(kABSourceType))!)
     }
 
     func test__given_initialized_group__then_is_correct() {
-        recordType = .Group
-        XCTAssertEqual(recordType, AddressBook.RecordType(rawValue: numericCast(kABGroupType))!)
+        recordKind = .Group
+        XCTAssertEqual(recordKind, AddressBook.RecordKind(rawValue: numericCast(kABGroupType))!)
     }
 
     func test__given_initialized_person__then_is_correct() {
-        recordType = .Person
-        XCTAssertEqual(recordType, AddressBook.RecordType(rawValue: numericCast(kABPersonType))!)
+        recordKind = .Person
+        XCTAssertEqual(recordKind, AddressBook.RecordKind(rawValue: numericCast(kABPersonType))!)
     }
 
     func test__given_initialized_with_other_int__then_result_is_nil() {
-        XCTAssertTrue(AddressBook.RecordType(rawValue: 666) == nil)
+        XCTAssertTrue(AddressBook.RecordKind(rawValue: 666) == nil)
     }
 }
 
