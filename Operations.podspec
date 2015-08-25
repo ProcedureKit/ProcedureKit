@@ -23,6 +23,11 @@ session Advanced NSOperations: https://developer.apple.com/videos/wwdc/2015/?id=
     ss.exclude_files     = 'Operations/Extras/**/*.{swift,m,h}'
   end
 
+  s.subspec '+AddressBook' do |ss|
+    ss.dependency 'Operations/Base'    
+    ss.source_files   = 'Operations/AddressBook/**/*.{swift,m,h}'
+  end
+
   s.subspec '+Extras' do |ss|
     ss.dependency 'Operations/Base'    
     ss.source_files   = 'Operations/Extras/**/*.{swift,m,h}'

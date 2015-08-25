@@ -865,68 +865,6 @@ private func readGroupRecordsWithName(searchTerm: String, fromAddressBook addres
 
 
 
-// MARK: - AddressBook System Wrapper
-
-/*
-
-I looked into https://github.com/a2/Gulliver & https://github.com/SocialbitGmbH/SwiftAddressBook and
-created this with inspiration from both. 
-
-Wanted to avoid dependencies in Operations, also didn't
-like the way Gulliver mixed up SourceType/Kind/RecordType. 
-Some of the code in SwiftAddressBook wasn't to my liking, 
-and it lacked the necessary hooks for testability.
-
-*/
-
-public enum AddressBookSortOrdering: Int {
-    case ByLastName, ByFirstName
-
-    public var value: ABPersonSortOrdering {
-        switch self {
-        case .ByLastName: return UInt32(kABPersonSortByLastName)
-        case .ByFirstName: return UInt32(kABPersonSortByFirstName)
-        }
-    }
-
-    public init(ordering: Int) {
-        switch ordering {
-        case kABPersonSortByFirstName:
-            self = .ByFirstName
-        default:
-            self = .ByLastName
-        }
-    }
-}
-
-
-
-
-
-
-
-
-
-public protocol AddressBookType {
-
-    init(addressBookRef: ABAddressBookRef)
-
-    func save() -> ErrorType?
-}
-
-public protocol AddressBookRecordType {
-    var recordID: ABRecordID { get }
-    var compositeName: String { get }
-
-    init(recordRef: ABRecordRef)
-}
-
-
-
-
-
-
-
 
 
 
