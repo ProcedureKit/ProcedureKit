@@ -52,15 +52,45 @@ public protocol AddressBookType {
     typealias GroupStorage
     typealias SourceStorage
 
-    var numberOfPeople: Int { get }
-
     func requestAccess(completion: (AddressBookPermissionRegistrarError?) -> Void)
 
     func save() -> ErrorType?
 
+    // Records
+
+    func addRecord<R: AddressBookRecordType where R.Storage == RecordStorage>(record: R) -> ErrorType?
+
+    func removeRecord<R: AddressBookRecordType where R.Storage == RecordStorage>(record: R) -> ErrorType?
+
+    // People
+
+    var numberOfPeople: Int { get }
+
     func personWithID<P: AddressBook_PersonType where P.Storage == PersonStorage>(id: ABRecordID) -> P?
 
     func peopleWithName<P: AddressBook_PersonType where P.Storage == PersonStorage>(name: String) -> [P]
+
+    func peopleInSource<P: AddressBook_PersonType, S: AddressBook_SourceType where P.Storage == PersonStorage, S.Storage == SourceStorage>(source: S) -> [P]
+
+    func peopleInSource<P: AddressBook_PersonType, S: AddressBook_SourceType where P.Storage == PersonStorage, S.Storage == SourceStorage>(source: S, withSortOrdering sortOrdering: AddressBook.SortOrdering) -> [P]
+
+    // Groups
+
+    var numberOfGroups: Int { get }
+
+    func groupWithID<G: AddressBook_GroupType where G.Storage == GroupStorage>(id: ABRecordID) -> G?
+
+    func groupsInSource<G: AddressBook_GroupType, S: AddressBook_SourceType where G.Storage == GroupStorage, S.Storage == SourceStorage>(source: S) -> [G]
+
+    func groups<G: AddressBook_GroupType where G.Storage == GroupStorage>() -> [G]
+
+    // Sources
+
+    func defaultSource<S: AddressBook_SourceType where S.Storage == SourceStorage>() -> S
+
+    func sourceWithID<S: AddressBook_SourceType where S.Storage == SourceStorage>(id: ABRecordID) -> S?
+
+    func sources<S: AddressBook_SourceType where S.Storage == SourceStorage>() -> [S]
 }
 
 public protocol StorageType {
@@ -121,35 +151,6 @@ public protocol AddressBookSourceType: AddressBook_SourceType {
 
     func newGroup<G: AddressBook_GroupType where G.Storage == GroupStorage>() -> G
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 // MARK: - Types
@@ -387,10 +388,6 @@ public final class AddressBook: AddressBookType {
 
     public let addressBook: ABAddressBookRef
 
-    public var numberOfPeople: Int {
-        return ABAddressBookGetPersonCount(addressBook)
-    }
-
     public init(registrar: AddressBookPermissionRegistrar = SystemAddressBookRegistrar()) {
         self.registrar = registrar
         let (addressBook: ABAddressBookRef?, error) = registrar.createAddressBook()
@@ -423,6 +420,32 @@ extension AddressBook {
 
         return AddressBook.Error(error: error)
     }
+}
+
+extension AddressBook { // Records
+
+    public func addRecord<R: AddressBookRecordType where R.Storage == RecordStorage>(record: R) -> ErrorType? {
+        var error: Unmanaged<CFErrorRef>? = .None
+        if ABAddressBookAddRecord(addressBook, record.storage, &error) {
+            return .None
+        }
+        return AddressBook.Error(error: error)
+    }
+
+    public func removeRecord<R: AddressBookRecordType where R.Storage == RecordStorage>(record: R) -> ErrorType? {
+        var error: Unmanaged<CFErrorRef>? = .None
+        if ABAddressBookRemoveRecord(addressBook, record.storage, &error) {
+            return .None
+        }
+        return AddressBook.Error(error: error)
+    }
+}
+
+extension AddressBook { // People
+
+    public var numberOfPeople: Int {
+        return ABAddressBookGetPersonCount(addressBook)
+    }
 
     public func personWithID<P: AddressBook_PersonType where P.Storage == PersonStorage>(id: ABRecordID) -> P? {
         if let record = ABAddressBookGetPersonWithRecordID(addressBook, id) {
@@ -435,6 +458,75 @@ extension AddressBook {
         if let people = ABAddressBookCopyPeopleWithName(addressBook, name) {
             let values = people.takeRetainedValue() as [ABRecordRef]
             return values.map { P(storage: $0) }
+        }
+        return []
+    }
+
+    public func peopleInSource<P : AddressBook_PersonType, S : AddressBook_SourceType where P.Storage == PersonStorage, S.Storage == SourceStorage>(source: S) -> [P] {
+        if let people = ABAddressBookCopyArrayOfAllPeopleInSource(addressBook, source.storage) {
+            let values = people.takeRetainedValue() as [ABRecordRef]
+            return values.map { P(storage: $0) }
+        }
+        return []
+    }
+
+    public func peopleInSource<P : AddressBook_PersonType, S : AddressBook_SourceType where P.Storage == PersonStorage, S.Storage == SourceStorage>(source: S, withSortOrdering sortOrdering: AddressBook.SortOrdering) -> [P] {
+        if let people = ABAddressBookCopyArrayOfAllPeopleInSourceWithSortOrdering(addressBook, source.storage, sortOrdering.rawValue) {
+            let values = people.takeRetainedValue() as [ABRecordRef]
+            return values.map { P(storage: $0) }
+        }
+        return []
+    }
+}
+
+extension AddressBook { // Groups
+
+    public var numberOfGroups: Int {
+        return ABAddressBookGetGroupCount(addressBook)
+    }
+
+    public func groupWithID<G: AddressBook_GroupType where G.Storage == GroupStorage>(id: ABRecordID) -> G? {
+        if let record = ABAddressBookGetGroupWithRecordID(addressBook, id) {
+            return G(storage: record.takeUnretainedValue())
+        }
+        return .None
+    }
+
+    public func groups<G: AddressBook_GroupType where G.Storage == GroupStorage>() -> [G] {
+        if let records = ABAddressBookCopyArrayOfAllGroups(addressBook) {
+            let values = records.takeRetainedValue() as [ABRecordRef]
+            return values.map { G(storage: $0) }
+        }
+        return []
+    }
+
+    public func groupsInSource<G: AddressBook_GroupType, S : AddressBook_SourceType where G.Storage == GroupStorage, S.Storage == SourceStorage>(source: S) -> [G] {
+        if let records = ABAddressBookCopyArrayOfAllGroupsInSource(addressBook, source.storage) {
+            let values = records.takeRetainedValue() as [ABRecordRef]
+            return values.map { G(storage: $0) }
+        }
+        return []
+    }
+}
+
+extension AddressBook { // Sources
+
+    public func defaultSource<S : AddressBook_SourceType where S.Storage == SourceStorage>() -> S {
+        let source: ABRecordRef = ABAddressBookCopyDefaultSource(addressBook).takeRetainedValue()
+        return S(storage: source)
+    }
+
+    public func sourceWithID<S : AddressBook_SourceType where S.Storage == SourceStorage>(id: ABRecordID) -> S? {
+        if let record = ABAddressBookGetSourceWithRecordID(addressBook, id) {
+            return S(storage: record.takeUnretainedValue())
+        }
+        return .None
+    }
+
+    public func sources<S : AddressBook_SourceType where S.Storage == SourceStorage>() -> [S] {
+        if let sources = ABAddressBookCopyArrayOfAllSources(addressBook) {
+            let values = sources.takeRetainedValue() as [ABRecordRef]
+            return values.map { S(storage: $0) }
         }
         return []
     }
@@ -455,7 +547,7 @@ public struct AddressBookReadableProperty<Value>: ReadablePropertyType {
     }
 }
 
-public struct AddressBookWriteableProperty<Value>: WriteablePropertyType {
+public struct AddressBookWriteableProperty<Value>: ReadablePropertyType, WriteablePropertyType {
     typealias ValueType = Value
 
     public let id: ABPropertyID

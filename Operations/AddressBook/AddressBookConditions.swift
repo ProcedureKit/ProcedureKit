@@ -1,5 +1,5 @@
 //
-//  AddressBookCondition.swift
+//  AddressBookConditions.swift
 //  Operations
 //
 //  Created by Daniel Thorpe on 27/07/2015.
@@ -46,26 +46,6 @@ public struct AddressBookCondition: OperationCondition {
             // This could be possible, because the condition may have been
             // suppressed with a `SilentCondition`.
             completion(.Failed(Error.AuthorizationNotDetermined))
-        }
-    }
-}
-
-public class AddressBookOperation: Operation {
-
-    public var addressBook: AddressBook
-
-    public init(registrar: AddressBookPermissionRegistrar? = .None) {
-        addressBook = AddressBook(registrar: registrar ?? SystemAddressBookRegistrar())
-    }
-
-    public override func execute() {
-        addressBook.requestAccess { error in
-            if let error = error {
-                self.finish(error)
-            }
-            else {
-                self.finish()
-            }
         }
     }
 }
