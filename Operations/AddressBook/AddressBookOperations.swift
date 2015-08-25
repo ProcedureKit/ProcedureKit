@@ -45,13 +45,19 @@ public class AddressBookOperation: Operation {
 
 public class AddressBookGetResource: AddressBookOperation {
 
+    public enum Error: ErrorType {
+        case FailedToGetGroup(Query?)
+        case FailedToGetPerson(Query?)
+    }
+
     public enum Source {
         case DefaultSource
         case WithRecordID(ABRecordID)
     }
 
-    public enum Get {
-        case RecordID(ABRecordID)
+    public enum Query {
+
+        case ID(ABRecordID)
         case Name(String)
 
         var name: String? {
@@ -63,13 +69,19 @@ public class AddressBookGetResource: AddressBookOperation {
 
         var id: ABRecordID? {
             switch self {
-            case .RecordID(let id): return id
+            case .ID(let id): return id
             default: return .None
             }
         }
     }
 
     var inSource: Source? = .DefaultSource
+
+    var groupQuery: Query? = .None
+    var personQuery: Query? = .None
+
+    public var group: AddressBookGroup? = .None
+    public var person: AddressBookPerson? = .None
 
     func source() -> AddressBookSource? {
         if let inSource = inSource {
@@ -83,64 +95,81 @@ public class AddressBookGetResource: AddressBookOperation {
         }
         return .None
     }
+
+    func allGroups() -> [AddressBookGroup] {
+        if let source = source() {
+            return addressBook.groupsInSource(source)
+        }
+        else {
+            return addressBook.groups()
+        }
+    }
+
+    func allPeople() -> [AddressBookPerson] {
+        if let source = source() {
+            return addressBook.peopleInSource(source)
+        }
+        else {
+            return addressBook.people()
+        }
+    }
+
+    override func executeAddressBookTask() -> ErrorType? {
+        if let error = super.executeAddressBookTask() {
+            return error
+        }
+
+        if let query = groupQuery {
+            switch query {
+
+            case .ID(let id):
+                group = addressBook.groupWithID(id)
+
+            case .Name(let groupName):
+                group = allGroups().filter {
+                    if let name = $0.value(forProperty: AddressBookGroup.Property.name) {
+                        return groupName == name
+                    }
+                    return false
+                }.first
+            }
+        }
+
+        if let query = personQuery {
+            switch query {
+            case .ID(let id):
+                person = addressBook.personWithID(id)
+
+            case .Name(let name):
+                person = addressBook.peopleWithName(name).first
+            }
+        }
+
+        return .None
+    }
 }
 
 // MARK: - Group
 
-public class AddressBookGetGroups: AddressBookGetResource {
+public class AddressBookGetGroup: AddressBookGetResource {
 
-    var groups = Array<AddressBookGroup>()
-
-    override func executeAddressBookTask() -> ErrorType? {
-        if let source = source() {
-            groups = addressBook.groupsInSource(source)
-        }
-        else {
-            groups = addressBook.groups()
-        }
-        return .None
-    }
-}
-
-public class AddressBookGetGroup: AddressBookGetGroups {
-
-    let get: Get
-
-    public var group: AddressBookGroup?
-
-    public init(registrar: AddressBookPermissionRegistrar? = .None, get: Get) {
-        self.get = get
+    public init(registrar: AddressBookPermissionRegistrar? = .None, name: String) {
         super.init(registrar: registrar)
-    }
-
-    override func executeAddressBookTask() -> ErrorType? {
-        switch get {
-        case .RecordID(let id):
-            group = addressBook.groupWithID(id)
-        case .Name(let groupName):
-            if let error = super.executeAddressBookTask() {
-                return error
-            }
-
-            group = groups.filter {
-                if let name = $0.value(forProperty: AddressBookGroup.Property.name) {
-                    return groupName == name
-                }
-                return false
-            }.first
-        }
-        return .None
+        groupQuery = .Name(name)
     }
 }
 
 public class AddressBookCreateGroup: AddressBookGetGroup {
 
-    public init(registrar: AddressBookPermissionRegistrar? = .None, name: String) {
-        super.init(registrar: registrar, get: .Name(name))
+    override func executeAddressBookTask() -> ErrorType? {
+        if let error = super.executeAddressBookTask() {
+            return error
+        }
+        return createGroup()
     }
 
     func createGroup() -> ErrorType? {
-        if group == nil, let groupName = get.name {
+        if group == nil, let groupName = groupQuery?.name {
 
             let group = AddressBookGroup()
             if let error = group.setValue(groupName, forProperty: AddressBookGroup.Property.name) {
@@ -158,13 +187,6 @@ public class AddressBookCreateGroup: AddressBookGetGroup {
             self.group = group
         }
         return .None
-    }
-
-    override func executeAddressBookTask() -> ErrorType? {
-        if let error = super.executeAddressBookTask() {
-            return error
-        }
-        return createGroup()
     }
 }
 
@@ -190,7 +212,86 @@ public class AddressBookRemoveGroup: AddressBookGetGroup {
     }
 }
 
-// MARK: - Person
+public class AddressBookAddPersonToGroup: AddressBookGetResource {
+
+    public init(registrar: AddressBookPermissionRegistrar? = .None, group: String, personID: ABRecordID) {
+        super.init(registrar: registrar)
+        groupQuery = .Name(group)
+        personQuery = .ID(personID)
+        addCondition(AddressBookGroupExistsCondition(registrar: registrar, name: group))
+    }
+
+    override func executeAddressBookTask() -> ErrorType? {
+        if let error = super.executeAddressBookTask() {
+            return error
+        }
+        return addPersonToGroup()
+    }
+
+    func addPersonToGroup() -> ErrorType? {
+        if group == nil {
+            return Error.FailedToGetGroup(groupQuery)
+        }
+
+        if person == nil {
+            return Error.FailedToGetPerson(personQuery)
+        }
+
+        if let group = group, person = person, error = group.add(person) {
+            return error
+        }
+
+        if let error = addressBook.save() {
+            return error
+        }
+
+        return .None
+    }
+}
+
+public class AddressBookRemovePersonFromGroup: AddressBookGetResource {
+
+    public init(registrar: AddressBookPermissionRegistrar? = .None, group: String, personID: ABRecordID) {
+        super.init(registrar: registrar)
+        groupQuery = .Name(group)
+        personQuery = .ID(personID)
+    }
+
+    override func executeAddressBookTask() -> ErrorType? {
+        if let error = super.executeAddressBookTask() {
+            return error
+        }
+        return removePersonFromGroup()
+    }
+
+    func removePersonFromGroup() -> ErrorType? {
+        if group == nil {
+            return Error.FailedToGetGroup(groupQuery)
+        }
+
+        if person == nil {
+            return Error.FailedToGetPerson(personQuery)
+        }
+
+        if let group = group, person = person, error = group.remove(person) {
+            return error
+        }
+
+        if let error = addressBook.save() {
+            return error
+        }
+        
+        return .None
+    }
+}
+
+
+
+
+
+
+
+
 
 
 

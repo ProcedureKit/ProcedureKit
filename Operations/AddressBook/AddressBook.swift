@@ -70,6 +70,8 @@ public protocol AddressBookType {
 
     func peopleWithName<P: AddressBook_PersonType where P.Storage == PersonStorage>(name: String) -> [P]
 
+    func people<P: AddressBook_PersonType where P.Storage == PersonStorage>() -> [P]
+
     func peopleInSource<P: AddressBook_PersonType, S: AddressBook_SourceType where P.Storage == PersonStorage, S.Storage == SourceStorage>(source: S) -> [P]
 
     func peopleInSource<P: AddressBook_PersonType, S: AddressBook_SourceType where P.Storage == PersonStorage, S.Storage == SourceStorage>(source: S, withSortOrdering sortOrdering: AddressBook.SortOrdering) -> [P]
@@ -80,9 +82,9 @@ public protocol AddressBookType {
 
     func groupWithID<G: AddressBook_GroupType where G.Storage == GroupStorage>(id: ABRecordID) -> G?
 
-    func groupsInSource<G: AddressBook_GroupType, S: AddressBook_SourceType where G.Storage == GroupStorage, S.Storage == SourceStorage>(source: S) -> [G]
-
     func groups<G: AddressBook_GroupType where G.Storage == GroupStorage>() -> [G]
+
+    func groupsInSource<G: AddressBook_GroupType, S: AddressBook_SourceType where G.Storage == GroupStorage, S.Storage == SourceStorage>(source: S) -> [G]
 
     // Sources
 
@@ -456,6 +458,14 @@ extension AddressBook { // People
 
     public func peopleWithName<P: AddressBook_PersonType where P.Storage == PersonStorage>(name: String) -> [P] {
         if let people = ABAddressBookCopyPeopleWithName(addressBook, name) {
+            let values = people.takeRetainedValue() as [ABRecordRef]
+            return values.map { P(storage: $0) }
+        }
+        return []
+    }
+
+    public func people<P : AddressBook_PersonType where P.Storage == PersonStorage>() -> [P] {
+        if let people = ABAddressBookCopyArrayOfAllPeople(addressBook) {
             let values = people.takeRetainedValue() as [ABRecordRef]
             return values.map { P(storage: $0) }
         }
