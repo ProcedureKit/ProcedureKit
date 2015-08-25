@@ -96,7 +96,7 @@ public class AddressBookGetResource: AddressBookOperation {
         return .None
     }
 
-    func allGroups() -> [AddressBookGroup] {
+    func groups() -> [AddressBookGroup] {
         if let source = source() {
             return addressBook.groupsInSource(source)
         }
@@ -105,8 +105,11 @@ public class AddressBookGetResource: AddressBookOperation {
         }
     }
 
-    func allPeople() -> [AddressBookPerson] {
-        if let source = source() {
+    func people() -> [AddressBookPerson] {
+        if let group = group {
+            return group.members()
+        }
+        else if let source = source() {
             return addressBook.peopleInSource(source)
         }
         else {
@@ -126,7 +129,7 @@ public class AddressBookGetResource: AddressBookOperation {
                 group = addressBook.groupWithID(id)
 
             case .Name(let groupName):
-                group = allGroups().filter {
+                group = groups().filter {
                     if let name = $0.value(forProperty: AddressBookGroup.Property.name) {
                         return groupName == name
                     }
@@ -149,7 +152,7 @@ public class AddressBookGetResource: AddressBookOperation {
     }
 }
 
-// MARK: - Group
+// MARK: - Group Actions
 
 public class AddressBookGetGroup: AddressBookGetResource {
 
@@ -285,7 +288,34 @@ public class AddressBookRemovePersonFromGroup: AddressBookGetResource {
     }
 }
 
+// MARK: - Person Actions
 
+public class AddressBookMapPeople<T>: AddressBookGetResource {
+
+    let transform: (AddressBookPerson) -> T?
+    var results = Array<T>()
+
+    public init(registrar: AddressBookPermissionRegistrar?, inGroupNamed groupName: String? = .None, transform: (AddressBookPerson) -> T?) {
+        self.transform = transform
+        super.init(registrar: registrar)
+        if let groupName = groupName {
+            groupQuery = .Name(groupName)
+            addCondition(AddressBookGroupExistsCondition(registrar: registrar, name: groupName))
+        }
+    }
+
+    override func executeAddressBookTask() -> ErrorType? {
+        if let error = super.executeAddressBookTask() {
+            return error
+        }
+        return mapPeople()
+    }
+
+    func mapPeople() -> ErrorType? {
+        results = people().flatMap { flatMap(self.transform($0), { [$0] }) ?? [] }
+        return .None
+    }
+}
 
 
 
