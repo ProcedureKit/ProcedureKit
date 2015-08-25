@@ -71,7 +71,6 @@
 		65DADF651B62D75400EAD25B /* ReachableOperationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65DADF641B62D75400EAD25B /* ReachableOperationTests.swift */; };
 		65DADF671B62F70300EAD25B /* Reachability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65DADF661B62F70300EAD25B /* Reachability.swift */; };
 		65E4E1501B8B9B7E00A8F5DD /* AddressBook.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65E4E14F1B8B9B7E00A8F5DD /* AddressBook.swift */; };
-		65E4E1521B8BC66400A8F5DD /* AddressBookOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65E4E1511B8BC66400A8F5DD /* AddressBookOperation.swift */; };
 		65E4E1541B8BC6BA00A8F5DD /* AddressBookCondition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65E4E1531B8BC6BA00A8F5DD /* AddressBookCondition.swift */; };
 		65FABD601B600DA40072B599 /* BlockCondition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65FABD5F1B600DA40072B599 /* BlockCondition.swift */; };
 /* End PBXBuildFile section */
@@ -154,7 +153,6 @@
 		65DADF641B62D75400EAD25B /* ReachableOperationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReachableOperationTests.swift; sourceTree = "<group>"; };
 		65DADF661B62F70300EAD25B /* Reachability.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Reachability.swift; sourceTree = "<group>"; };
 		65E4E14F1B8B9B7E00A8F5DD /* AddressBook.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AddressBook.swift; path = AddressBook/AddressBook.swift; sourceTree = "<group>"; };
-		65E4E1511B8BC66400A8F5DD /* AddressBookOperation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AddressBookOperation.swift; path = AddressBook/AddressBookOperation.swift; sourceTree = "<group>"; };
 		65E4E1531B8BC6BA00A8F5DD /* AddressBookCondition.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AddressBookCondition.swift; path = AddressBook/AddressBookCondition.swift; sourceTree = "<group>"; };
 		65FABD5F1B600DA40072B599 /* BlockCondition.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BlockCondition.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -345,7 +343,6 @@
 			children = (
 				65E4E14F1B8B9B7E00A8F5DD /* AddressBook.swift */,
 				65E4E1531B8BC6BA00A8F5DD /* AddressBookCondition.swift */,
-				65E4E1511B8BC66400A8F5DD /* AddressBookOperation.swift */,
 			);
 			name = AddressBook;
 			sourceTree = "<group>";
@@ -480,7 +477,6 @@
 				65DADF631B62D73100EAD25B /* ReachableOperation.swift in Sources */,
 				65D6F58D1B5BFE59003D35AD /* ReachabilityCondition.swift in Sources */,
 				656F21CC1B7E0A3D00849E9F /* AddressBookExtras.swift in Sources */,
-				65E4E1521B8BC66400A8F5DD /* AddressBookOperation.swift in Sources */,
 				657A4A3D1B77F10F006B3D7A /* RemoteNotificationCondition.swift in Sources */,
 				6528035F1B78F47100717334 /* PhotosCondition.swift in Sources */,
 				6558091C1B6049F700CF0722 /* AlertOperation.swift in Sources */,

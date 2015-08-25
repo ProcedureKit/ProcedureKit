@@ -28,7 +28,7 @@ public struct AddressBookCondition: OperationCondition {
     public func dependencyForOperation(operation: Operation) -> NSOperation? {
         switch registrar.status {
         case .NotDetermined:
-            return AddressBookAccess(registrar: registrar)
+            return AddressBookOperation(registrar: registrar)
         default:
             return .None
         }
@@ -50,7 +50,7 @@ public struct AddressBookCondition: OperationCondition {
     }
 }
 
-public class AddressBookAccess: Operation {
+public class AddressBookOperation: Operation {
 
     public var addressBook: AddressBook
 

@@ -58,7 +58,7 @@ class TestableAddressBookRegistrar: AddressBookPermissionRegistrar {
     }
 }
 
-class AddressBookAccessTests: OperationTests {
+class AddressBookOperationTests: OperationTests {
 
     var registrar: TestableAddressBookRegistrar!
 
@@ -73,7 +73,7 @@ class AddressBookAccessTests: OperationTests {
 
         var didStart = false
         var didSucceed = false
-        let operation = AddressBookAccess(registrar: registrar)
+        let operation = AddressBookOperation(registrar: registrar)
         operation.addObserver(BlockObserver(
             startHandler: { _ in
                 didStart = true
@@ -101,7 +101,7 @@ class AddressBookAccessTests: OperationTests {
         registrar.status = .NotDetermined
         registrar.requestShouldSucceed = false
 
-        let operation = AddressBookAccess(registrar: registrar)
+        let operation = AddressBookOperation(registrar: registrar)
         operation.addObserver(BlockObserver(
             startHandler: { _ in
                 didStart = true
