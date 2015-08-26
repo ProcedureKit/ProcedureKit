@@ -35,7 +35,7 @@ public class AddressBookOperation: Operation {
 
     /*  Sub-classes may over-ride this method to perform AddressBook related
         functions before the operation finishes. */
-    func executeAddressBookTask() -> ErrorType? {
+    public func executeAddressBookTask() -> ErrorType? {
         return .None
     }
 
@@ -46,7 +46,7 @@ public class AddressBookOperation: Operation {
 
 public class AddressBookGetResource: AddressBookOperation {
 
-    public enum Error: ErrorType {
+    public enum AddressBookError: ErrorType {
         case FailedToGetGroup(Query?)
         case FailedToGetPerson(Query?)
     }
@@ -76,15 +76,15 @@ public class AddressBookGetResource: AddressBookOperation {
         }
     }
 
-    var inSource: Source? = .DefaultSource
+    public var inSource: Source? = .DefaultSource
 
-    var groupQuery: Query? = .None
-    var personQuery: Query? = .None
+    public var groupQuery: Query? = .None
+    public var personQuery: Query? = .None
 
     public var group: AddressBookGroup? = .None
     public var person: AddressBookPerson? = .None
 
-    func source() -> AddressBookSource? {
+    public func source() -> AddressBookSource? {
         if let inSource = inSource {
             switch inSource {
             case .DefaultSource:
@@ -97,7 +97,7 @@ public class AddressBookGetResource: AddressBookOperation {
         return .None
     }
 
-    func groups() -> [AddressBookGroup] {
+    public func groups() -> [AddressBookGroup] {
         if let source = source() {
             return addressBook.groupsInSource(source)
         }
@@ -106,7 +106,7 @@ public class AddressBookGetResource: AddressBookOperation {
         }
     }
 
-    func people() -> [AddressBookPerson] {
+    public func people() -> [AddressBookPerson] {
         if let group = group {
             return group.members()
         }
@@ -118,7 +118,7 @@ public class AddressBookGetResource: AddressBookOperation {
         }
     }
 
-    override func executeAddressBookTask() -> ErrorType? {
+    public override func executeAddressBookTask() -> ErrorType? {
         if let error = super.executeAddressBookTask() {
             return error
         }
@@ -165,7 +165,7 @@ public class AddressBookGetGroup: AddressBookGetResource {
 
 public class AddressBookCreateGroup: AddressBookGetGroup {
 
-    override func executeAddressBookTask() -> ErrorType? {
+    public override func executeAddressBookTask() -> ErrorType? {
         if let error = super.executeAddressBookTask() {
             return error
         }
@@ -208,7 +208,7 @@ public class AddressBookRemoveGroup: AddressBookGetGroup {
         return .None
     }
 
-    override func executeAddressBookTask() -> ErrorType? {
+    public override func executeAddressBookTask() -> ErrorType? {
         if let error = super.executeAddressBookTask() {
             return error
         }
@@ -225,7 +225,7 @@ public class AddressBookAddPersonToGroup: AddressBookGetResource {
         addCondition(AddressBookGroupExistsCondition(registrar: registrar, name: group))
     }
 
-    override func executeAddressBookTask() -> ErrorType? {
+    public override func executeAddressBookTask() -> ErrorType? {
         if let error = super.executeAddressBookTask() {
             return error
         }
@@ -234,11 +234,11 @@ public class AddressBookAddPersonToGroup: AddressBookGetResource {
 
     func addPersonToGroup() -> ErrorType? {
         if group == nil {
-            return Error.FailedToGetGroup(groupQuery)
+            return AddressBookError.FailedToGetGroup(groupQuery)
         }
 
         if person == nil {
-            return Error.FailedToGetPerson(personQuery)
+            return AddressBookError.FailedToGetPerson(personQuery)
         }
 
         if let group = group, person = person, error = group.add(person) {
@@ -261,7 +261,7 @@ public class AddressBookRemovePersonFromGroup: AddressBookGetResource {
         personQuery = .ID(personID)
     }
 
-    override func executeAddressBookTask() -> ErrorType? {
+    public override func executeAddressBookTask() -> ErrorType? {
         if let error = super.executeAddressBookTask() {
             return error
         }
@@ -270,11 +270,11 @@ public class AddressBookRemovePersonFromGroup: AddressBookGetResource {
 
     func removePersonFromGroup() -> ErrorType? {
         if group == nil {
-            return Error.FailedToGetGroup(groupQuery)
+            return AddressBookError.FailedToGetGroup(groupQuery)
         }
 
         if person == nil {
-            return Error.FailedToGetPerson(personQuery)
+            return AddressBookError.FailedToGetPerson(personQuery)
         }
 
         if let group = group, person = person, error = group.remove(person) {
@@ -305,7 +305,7 @@ public class AddressBookMapPeople<T>: AddressBookGetResource {
         }
     }
 
-    override func executeAddressBookTask() -> ErrorType? {
+    public override func executeAddressBookTask() -> ErrorType? {
         if let error = super.executeAddressBookTask() {
             return error
         }

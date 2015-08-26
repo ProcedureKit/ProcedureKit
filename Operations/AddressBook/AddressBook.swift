@@ -38,6 +38,12 @@ public protocol WriteablePropertyType: PropertyType {
     var writer: ((ValueType) -> CFTypeRef)? { get }
 }
 
+public protocol MultiValueRepresentable {
+    static var propertyKind: AddressBook.PropertyKind { get }
+    var multiValueRepresentation: CFTypeRef { get }
+    init?(multiValueRepresentation: CFTypeRef)
+}
+
 public protocol AddressBookPermissionRegistrar {
     var status: ABAuthorizationStatus { get }
     func createAddressBook() -> (ABAddressBookRef?, AddressBookPermissionRegistrarError?)
@@ -159,6 +165,8 @@ public protocol AddressBookSourceType: AddressBook_SourceType {
 
 public final class AddressBook: AddressBookType {
 
+// MARK: - SortOrdering
+
     public enum SortOrdering: RawRepresentable, Printable {
 
         case ByLastName, ByFirstName
@@ -194,6 +202,8 @@ public final class AddressBook: AddressBookType {
         }
     }
 
+// MARK: - CompositeNameFormat
+
     public enum CompositeNameFormat: RawRepresentable, Printable {
 
         case FirstNameFirst, LastNameFirst
@@ -226,6 +236,8 @@ public final class AddressBook: AddressBookType {
             }
         }
     }
+
+// MARK: - RecordKind
 
     public enum RecordKind: RawRepresentable, Printable {
 
@@ -267,6 +279,8 @@ public final class AddressBook: AddressBookType {
             }
         }
     }
+
+// MARK: - SourceKind
 
     public enum SourceKind: RawRepresentable, Printable {
 
@@ -333,6 +347,113 @@ public final class AddressBook: AddressBookType {
         }
     }
 
+// MARK: - PropertyKind
+
+    public enum PropertyKind: RawRepresentable, Printable {
+
+        case Invalid, String, Integer, Real, DateTime, Dictionary, MultiString, MultiInteger, MultiReal, MultiDateTime, MultiDictionary
+
+        public var rawValue: ABPropertyType {
+            switch self {
+            case .Invalid:
+                return numericCast(kABInvalidPropertyType)
+            case .String:
+                return numericCast(kABStringPropertyType)
+            case .Integer:
+                return numericCast(kABIntegerPropertyType)
+            case .Real:
+                return numericCast(kABRealPropertyType)
+            case .DateTime:
+                return numericCast(kABDateTimePropertyType)
+            case .Dictionary:
+                return numericCast(kABDictionaryPropertyType)
+            case .MultiString:
+                return numericCast(kABMultiStringPropertyType)
+            case .MultiInteger:
+                return numericCast(kABMultiIntegerPropertyType)
+            case .MultiReal:
+                return numericCast(kABMultiRealPropertyType)
+            case .MultiDateTime:
+                return numericCast(kABMultiDateTimePropertyType)
+            case .MultiDictionary:
+                return numericCast(kABMultiDictionaryPropertyType)
+            }
+        }
+
+        public var invalid: Bool {
+            return self != .Invalid
+        }
+
+        public var multiValue: Bool {
+            switch self {
+            case .MultiString, .MultiInteger, .MultiReal, .MultiDateTime, .MultiDictionary:
+                return true
+            default:
+                return false
+            }
+        }
+
+        public var description: Swift.String {
+            switch self {
+            case .Invalid:
+                return "Invalid"
+            case .String:
+                return "String"
+            case .Integer:
+                return "Integer"
+            case .Real:
+                return "Real"
+            case .DateTime:
+                return "DateTime"
+            case .Dictionary:
+                return "Dictionary"
+            case .MultiString:
+                return "MultiString"
+            case .MultiInteger:
+                return "MultiInteger"
+            case .MultiReal:
+                return "MultiReal"
+            case .MultiDateTime:
+                return "MultiDateTime"
+            case .MultiDictionary:
+                return "MultiDictionary"
+            }
+        }
+
+        public init?(rawValue: ABPropertyType) {
+            let value: Int = numericCast(rawValue)
+            switch value {
+            case kABInvalidPropertyType:
+                self = .Invalid
+            case kABStringPropertyType:
+                self = .String
+            case kABIntegerPropertyType:
+                self = .Integer
+            case kABRealPropertyType:
+                self = .Real
+            case kABDateTimePropertyType:
+                self = .DateTime
+            case kABDictionaryPropertyType:
+                self = .Dictionary
+            case kABMultiStringPropertyType:
+                self = .MultiString
+            case kABMultiIntegerPropertyType:
+                self = .MultiInteger
+            case kABMultiRealPropertyType:
+                self = .MultiReal
+            case kABMultiDateTimePropertyType:
+                self = .MultiDateTime
+            case kABMultiDictionaryPropertyType:
+                self = .MultiDictionary
+            default:
+                return nil
+            }
+        }
+
+    }
+
+// MARK: - ImageFormat
+
     public enum ImageFormat: RawRepresentable, Printable {
 
         case OriginalSize, Thumbnail
@@ -366,6 +487,110 @@ public final class AddressBook: AddressBookType {
             }
         }
     }
+
+// MARK: - StringMultiValue
+
+    public struct StringMultiValue: MultiValueRepresentable, Equatable, Printable, StringLiteralConvertible {
+
+        public static let propertyKind = AddressBook.PropertyKind.String
+
+        public var value: String
+
+        public var multiValueRepresentation: CFTypeRef {
+            return value
+        }
+
+        public var description: String {
+            return value
+        }
+
+        public init?(multiValueRepresentation: CFTypeRef) {
+            if let value = multiValueRepresentation as? String {
+                self.value = value
+            }
+            else {
+                return nil
+            }
+        }
+
+        public init(stringLiteral value: String){
+            self.value = value
+        }
+
+        public  init(extendedGraphemeClusterLiteral value: String){
+            self.value = value
+        }
+
+        public  init(unicodeScalarLiteral value: String){
+            self.value = value
+        }
+    }
+
+// MARK: - DateMultiValue
+
+    public struct DateMultiValue: MultiValueRepresentable, Comparable, Printable, DebugPrintable {
+
+        public static let propertyKind = AddressBook.PropertyKind.DateTime
+
+        public var value: NSDate
+
+        public var multiValueRepresentation: CFTypeRef {
+            return value
+        }
+
+        public var description: String {
+            return toString(value)
+        }
+
+        public var debugDescription: String {
+            return toDebugString(value)
+        }
+
+        public init?(multiValueRepresentation: CFTypeRef) {
+            if let value = multiValueRepresentation as? NSDate {
+                self.value = value
+            }
+            else {
+                return nil
+            }
+        }
+
+    }
+
+// MARK: - Labels
+
+    public struct Labels {
+        public struct Date {
+            public static let anniversary = kABPersonAnniversaryLabel as String
+        }
+        public struct Telephone {
+            public static let mobile    = kABPersonPhoneMobileLabel as String
+            public static let iPhone    = kABPersonPhoneIPhoneLabel as String
+            public static let main      = kABPersonPhoneMainLabel as String
+            public static let homeFAX   = kABPersonPhoneHomeFAXLabel as String
+            public static let workFAX   = kABPersonPhoneWorkFAXLabel as String
+            public static let otherFAX  = kABPersonPhoneOtherFAXLabel as String
+            public static let pager     = kABPersonPhonePagerLabel as String
+        }
+        public struct Relations {
+            public static let mother    = kABPersonMotherLabel as String
+            public static let father    = kABPersonFatherLabel as String
+            public static let parent    = kABPersonParentLabel as String
+            public static let brother   = kABPersonBrotherLabel as String
+            public static let sister    = kABPersonSisterLabel as String
+            public static let child     = kABPersonChildLabel as String
+            public static let friend    = kABPersonFriendLabel as String
+            public static let spouse    = kABPersonSpouseLabel as String
+            public static let partner   = kABPersonPartnerLabel as String
+            public static let assistant = kABPersonAssistantLabel as String
+            public static let manager   = kABPersonManagerLabel as String
+        }
+        public struct URLs {
+            public static let homePage  = kABPersonHomePageLabel as String
+        }
+    }
+
+// MARK: - Main Type
 
     public typealias RecordStorage = ABRecordRef
     public typealias PersonStorage = ABRecordRef
@@ -542,7 +767,6 @@ extension AddressBook { // Sources
     }
 }
 
-
 // MARK: - Property
 
 public struct AddressBookReadableProperty<Value>: ReadablePropertyType {
@@ -568,6 +792,47 @@ public struct AddressBookWriteableProperty<Value>: ReadablePropertyType, Writeab
         self.id = id
         self.reader = reader
         self.writer = writer
+    }
+}
+
+// MARK: - LabeledValue
+
+public struct LabeledValue<Value: MultiValueRepresentable>: DebugPrintable, Printable {
+
+    static func read(multiValue: ABMultiValueRef) -> [LabeledValue<Value>] {
+        assert(AddressBook.PropertyKind(rawValue: ABMultiValueGetPropertyType(multiValue)) == Value.propertyKind, "ABMultiValueRef has incompatible property kind.")
+        let count: Int = ABMultiValueGetCount(multiValue)
+        return reduce(0..<count, [LabeledValue<Value>]()) { (var acc, index) in
+            let representation: CFTypeRef = ABMultiValueCopyValueAtIndex(multiValue, index).takeRetainedValue()
+            if let value = Value(multiValueRepresentation: representation) {
+                let label = ABMultiValueCopyLabelAtIndex(multiValue, index).takeRetainedValue() as String
+                let labeledValue = LabeledValue(label: label, value: value)
+                acc.append(labeledValue)
+            }
+            return acc
+        }
+    }
+
+    static func write(labeledValues: [LabeledValue<Value>]) -> ABMultiValueRef {
+        return reduce(labeledValues, ABMultiValueCreateMutable(Value.propertyKind.rawValue).takeRetainedValue() as ABMutableMultiValueRef) { (multiValue, labeledValue) -> ABMutableMultiValueRef in
+            ABMultiValueAddValueAndLabel(multiValue, labeledValue.value.multiValueRepresentation, labeledValue.label, nil)
+        }
+    }
+
+    public let label: String
+    public let value: Value
+
+    public var description: String {
+        return "\(label): \(toString(value))"
+    }
+
+    public var debugDescription: String {
+        return "\(label): \(toDebugString(value))"
+    }
+
+    public init(label: String, value: Value) {
+        self.label = label
+        self.value = value
     }
 }
 
@@ -625,6 +890,12 @@ public class AddressBookRecord: AddressBookRecordType {
 public class AddressBookPerson: AddressBookRecord, AddressBookPersonType {
 
     public struct Property {
+
+        public struct Metadata {
+            public static let creationDate      = AddressBookReadableProperty<NSDate>(id: kABPersonCreationDateProperty)
+            public static let modificationDate  = AddressBookReadableProperty<NSDate>(id: kABPersonModificationDateProperty)
+        }
+
         public struct Name {
             public static let prefix        = AddressBookWriteableProperty<String>(id: kABPersonPrefixProperty)
             public static let first         = AddressBookWriteableProperty<String>(id: kABPersonFirstNameProperty)
@@ -633,16 +904,21 @@ public class AddressBookPerson: AddressBookRecord, AddressBookPersonType {
             public static let suffix        = AddressBookWriteableProperty<String>(id: kABPersonSuffixProperty)
             public static let nickname      = AddressBookWriteableProperty<String>(id: kABPersonNicknameProperty)
         }
+
         public struct Phonetic {
             public static let first         = AddressBookWriteableProperty<String>(id: kABPersonFirstNamePhoneticProperty)
             public static let middle        = AddressBookWriteableProperty<String>(id: kABPersonMiddleNamePhoneticProperty)
             public static let last          = AddressBookWriteableProperty<String>(id: kABPersonLastNamePhoneticProperty)
         }
+
         public struct Work {
             public static let organization  = AddressBookWriteableProperty<String>(id: kABPersonOrganizationProperty)
             public static let deptartment   = AddressBookWriteableProperty<String>(id: kABPersonDepartmentProperty)
             public static let job           = AddressBookWriteableProperty<String>(id: kABPersonJobTitleProperty)
         }
+
+        public static let emails            = AddressBookWriteableProperty<[LabeledValue<AddressBook.StringMultiValue>]>(id: kABPersonEmailProperty, reader: reader, writer: writer)
+        public static let telephones        = AddressBookWriteableProperty<[LabeledValue<AddressBook.StringMultiValue>]>(id: kABPersonPhoneProperty, reader: reader, writer: writer)
     }
 
     public typealias GroupStorage = ABRecordRef
@@ -753,7 +1029,7 @@ public class AddressBookSource: AddressBookRecord, AddressBookSourceType {
 
 
 
-// MARK: - Helpers
+// MARK: - Equatable
 
 extension ABPersonImageFormat: Equatable {}
 
@@ -767,6 +1043,20 @@ public func ==(a: CFNumberRef, b: CFNumberRef) -> Bool {
     return CFNumberCompare(a, b, nil) == .CompareEqualTo
 }
 
+public func ==(a: AddressBook.StringMultiValue, b: AddressBook.StringMultiValue) -> Bool {
+    return a.value == b.value
+}
+
+public func ==(lhs: AddressBook.DateMultiValue, rhs: AddressBook.DateMultiValue) -> Bool {
+    return lhs.value == rhs.value
+}
+
+public func <(lhs: AddressBook.DateMultiValue, rhs: AddressBook.DateMultiValue) -> Bool {
+    return lhs.value.compare(rhs.value) == .OrderedAscending
+}
+
+// MARK: - Helpers
+
 func reader<T: RawRepresentable>(value: CFTypeRef) -> T {
     return T(rawValue: value as! T.RawValue)!
 }
@@ -775,7 +1065,13 @@ func writer<T: RawRepresentable>(value: T) -> CFTypeRef {
     return value.rawValue as! CFTypeRef
 }
 
+func reader<T: MultiValueRepresentable>(value: CFTypeRef) -> [LabeledValue<T>] {
+    return LabeledValue.read(value as ABMultiValueRef)
+}
 
+func writer<T: MultiValueRepresentable>(value: [LabeledValue<T>]) -> CFTypeRef {
+    return LabeledValue.write(value)
+}
 
 
 
