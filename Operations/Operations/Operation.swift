@@ -117,7 +117,7 @@ public class Operation: NSOperation {
         assert(state == .Pending && cancelled == false, "\(__FUNCTION__) was called out of order.")
         state = .EvaluatingConditions
         OperationConditionEvaluator.evaluate(conditions, operation: self) { errors in
-            self._internalErrors.extend(errors)
+            self._internalErrors.appendContentsOf(errors)
             self.state = .Ready
         }
     }
@@ -175,7 +175,7 @@ public class Operation: NSOperation {
     They must call a finish methods in order to complete.
     */
     public func execute() {
-        print("\(self.dynamicType) must override `execute()`.", appendNewline: false)
+        print("\(self.dynamicType) must override `execute()`.", terminator: "")
         
         finish()
     }
