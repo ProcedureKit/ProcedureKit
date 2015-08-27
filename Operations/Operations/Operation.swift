@@ -162,7 +162,7 @@ public class Operation: NSOperation {
 
         if _internalErrors.isEmpty && cancelled == false {
             state = .Executing
-            observers.map { $0.operationDidStart(self) }
+            for o in observers { o.operationDidStart(self) }
             execute()
         }
         else {
@@ -191,7 +191,7 @@ public class Operation: NSOperation {
     }
     
     public final func produceOperation(operation: NSOperation) {
-        observers.map { $0.operation(self, didProduceOperation: operation) }
+        for o in observers { o.operation(self, didProduceOperation: operation) }
     }
     
     // MARK: Finishing
@@ -214,7 +214,7 @@ public class Operation: NSOperation {
             let combinedErrors = _internalErrors + errors
             finished(combinedErrors)
             
-            observers.map { $0.operationDidFinish(self, errors: combinedErrors) }
+            for o in observers { o.operationDidFinish(self, errors: combinedErrors) }
             
             state = .Finished
         }
@@ -295,7 +295,7 @@ extension NSOperation {
     
     /// Add multiple depdendencies to the operation.
     func addDependencies(dependencies: [NSOperation]) {
-        dependencies.map { self.addDependency($0) }
+        for d in dependencies { self.addDependency(d) }
     }
 }
 

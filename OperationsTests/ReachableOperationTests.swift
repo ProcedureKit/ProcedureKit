@@ -14,7 +14,7 @@ class TestableSystemReachability: SystemReachability {
     var observers = Array<Reachability.ObserverBlockType>()
     var status: Reachability.NetworkStatus {
         didSet {
-            observers.map { $0(self.status) }
+            for o in observers { o(self.status) }
         }
     }
 
