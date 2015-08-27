@@ -34,7 +34,7 @@ class TestableEventKitAuthorizationManager: EventKitAuthorizationManagerType {
     func requestAccessToEntityType(entityType: EKEntityType, completion: EKEventStoreRequestAccessCompletionHandler) {
         didRequestAccess = true
         authorizationStatus = requestedAuthorizationStatus
-        completion(ObjCBool(accessAllowed), nil)
+        completion(accessAllowed, nil)
     }
 }
 
