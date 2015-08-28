@@ -998,6 +998,7 @@ public class AddressBookPerson: AddressBookRecord, AddressBookPersonType {
 
         public static let emails            = AddressBookWriteableProperty<[LabeledValue<AddressBook.StringMultiValue>]>(id: kABPersonEmailProperty, reader: reader, writer: writer)
         public static let telephones        = AddressBookWriteableProperty<[LabeledValue<AddressBook.StringMultiValue>]>(id: kABPersonPhoneProperty, reader: reader, writer: writer)
+        public static let notes             = AddressBookWriteableProperty<String>(id: kABPersonNoteProperty)
     }
 
     public typealias GroupStorage = ABRecordRef
