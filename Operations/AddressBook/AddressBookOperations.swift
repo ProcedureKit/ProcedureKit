@@ -14,10 +14,12 @@ import AddressBookUI
 
 public class AddressBookOperation: Operation {
 
+    internal var registrar: AddressBookPermissionRegistrar
     public var addressBook: AddressBook
 
-    public init(registrar: AddressBookPermissionRegistrar? = .None) {
-        addressBook = AddressBook(registrar: registrar ?? SystemAddressBookRegistrar())
+    public init(registrar r: AddressBookPermissionRegistrar? = .None) {
+        registrar = r ?? SystemAddressBookRegistrar()
+        addressBook = AddressBook(registrar: registrar)
     }
 
     final func requestAccess() {
@@ -81,8 +83,8 @@ public class AddressBookGetResource: AddressBookOperation {
     public var groupQuery: Query? = .None
     public var personQuery: Query? = .None
 
-    public var group: AddressBookGroup? = .None
-    public var person: AddressBookPerson? = .None
+    public var addressBookGroup: AddressBookGroup? = .None
+    public var addressBookPerson: AddressBookPerson? = .None
 
     public func source() -> AddressBookSource? {
         if let inSource = inSource {
@@ -106,8 +108,24 @@ public class AddressBookGetResource: AddressBookOperation {
         }
     }
 
-    public func people() -> [AddressBookPerson] {
-        if let group = group {
+    public func allAddressBookPeople() -> [AddressBookPerson] {
+        return addressBook.people()
+    }
+
+    public func addressBookPeopleInGroup() -> [AddressBookPerson]? {
+        return addressBookGroup.map { $0.members() }
+    }
+
+    public func addressBookPeopleNotInGroup() -> [AddressBookPerson] {
+        let all = allAddressBookPeople()
+        return addressBookGroup.map {
+            let members: [AddressBookPerson] = $0.members()
+            return all.filter { !contains(members, $0) }
+        } ?? all
+    }
+
+    public func addressBookPeople() -> [AddressBookPerson] {
+        if let group = addressBookGroup {
             return group.members()
         }
         else if let source = source() {
@@ -118,35 +136,57 @@ public class AddressBookGetResource: AddressBookOperation {
         }
     }
 
+    // Queries
+
+    public func executeAddressBookGroupQuery(query: Query) -> AddressBookGroup? {
+        switch query {
+
+        case .ID(let id):
+            return addressBook.groupWithID(id)
+
+        case .Name(let groupName):
+            return groups().filter {
+                if let name = $0.value(forProperty: AddressBookGroup.Property.name) {
+                    return groupName == name
+                }
+                return false
+            }.first
+        }
+    }
+
+    public func executeAddressBookPersonQuery(query: Query) -> AddressBookPerson? {
+        switch query {
+        case .ID(let id):
+            return addressBook.personWithID(id)
+
+        case .Name(let name):
+            return addressBook.peopleWithName(name).first
+        }
+    }
+
     public override func executeAddressBookTask() -> ErrorType? {
         if let error = super.executeAddressBookTask() {
             return error
         }
 
-        if let query = groupQuery {
-            switch query {
+        addressBookGroup = groupQuery.map { self.executeAddressBookGroupQuery($0) } ?? .None
+        addressBookPerson = personQuery.map { self.executeAddressBookPersonQuery($0) } ?? .None
 
-            case .ID(let id):
-                group = addressBook.groupWithID(id)
+        return .None
+    }
 
-            case .Name(let groupName):
-                group = groups().filter {
-                    if let name = $0.value(forProperty: AddressBookGroup.Property.name) {
-                        return groupName == name
-                    }
-                    return false
-                }.first
+    // Actions
+
+    public func addPeople(people: [AddressBookPerson], toGroup group: AddressBookGroup) -> ErrorType? {
+
+        for person in people {
+            if let error = group.add(person) {
+                return error
             }
         }
 
-        if let query = personQuery {
-            switch query {
-            case .ID(let id):
-                person = addressBook.personWithID(id)
-
-            case .Name(let name):
-                person = addressBook.peopleWithName(name).first
-            }
+        if let error = addressBook.save() {
+            return error
         }
 
         return .None
@@ -157,8 +197,8 @@ public class AddressBookGetResource: AddressBookOperation {
 
 public class AddressBookGetGroup: AddressBookGetResource {
 
-    public init(registrar: AddressBookPermissionRegistrar? = .None, name: String) {
-        super.init(registrar: registrar)
+    public init(registrar r: AddressBookPermissionRegistrar? = .None, name: String) {
+        super.init(registrar: r)
         groupQuery = .Name(name)
     }
 }
@@ -173,7 +213,7 @@ public class AddressBookCreateGroup: AddressBookGetGroup {
     }
 
     func createGroup() -> ErrorType? {
-        if group == nil, let groupName = groupQuery?.name {
+        if addressBookGroup == nil, let groupName = groupQuery?.name {
 
             let group = AddressBookGroup()
             if let error = group.setValue(groupName, forProperty: AddressBookGroup.Property.name) {
@@ -188,7 +228,7 @@ public class AddressBookCreateGroup: AddressBookGetGroup {
                 return error
             }
 
-            self.group = group
+            self.addressBookGroup = group
         }
         return .None
     }
@@ -197,7 +237,7 @@ public class AddressBookCreateGroup: AddressBookGetGroup {
 public class AddressBookRemoveGroup: AddressBookGetGroup {
 
     func removeGroup() -> ErrorType? {
-        if let group = group {
+        if let group = addressBookGroup {
             if let error = addressBook.removeRecord(group) {
                 return error
             }
@@ -222,7 +262,6 @@ public class AddressBookAddPersonToGroup: AddressBookGetResource {
         super.init(registrar: registrar)
         groupQuery = .Name(group)
         personQuery = .ID(personID)
-        addCondition(AddressBookGroupExistsCondition(registrar: registrar, name: group))
     }
 
     public override func executeAddressBookTask() -> ErrorType? {
@@ -233,23 +272,18 @@ public class AddressBookAddPersonToGroup: AddressBookGetResource {
     }
 
     func addPersonToGroup() -> ErrorType? {
-        if group == nil {
+
+        if let group = addressBookGroup {
+            if let person = addressBookPerson {
+                return addPeople([person], toGroup: group)
+            }
+            else {
+                return AddressBookError.FailedToGetPerson(personQuery)
+            }
+        }
+        else {
             return AddressBookError.FailedToGetGroup(groupQuery)
         }
-
-        if person == nil {
-            return AddressBookError.FailedToGetPerson(personQuery)
-        }
-
-        if let group = group, person = person, error = group.add(person) {
-            return error
-        }
-
-        if let error = addressBook.save() {
-            return error
-        }
-
-        return .None
     }
 }
 
@@ -269,15 +303,15 @@ public class AddressBookRemovePersonFromGroup: AddressBookGetResource {
     }
 
     func removePersonFromGroup() -> ErrorType? {
-        if group == nil {
+        if addressBookGroup == nil {
             return AddressBookError.FailedToGetGroup(groupQuery)
         }
 
-        if person == nil {
+        if addressBookPerson == nil {
             return AddressBookError.FailedToGetPerson(personQuery)
         }
 
-        if let group = group, person = person, error = group.remove(person) {
+        if let group = addressBookGroup, person = addressBookPerson, error = group.remove(person) {
             return error
         }
 
@@ -301,7 +335,6 @@ public class AddressBookMapPeople<T>: AddressBookGetResource {
         super.init(registrar: registrar)
         if let groupName = groupName {
             groupQuery = .Name(groupName)
-            addCondition(AddressBookGroupExistsCondition(registrar: registrar, name: groupName))
         }
     }
 
@@ -313,7 +346,7 @@ public class AddressBookMapPeople<T>: AddressBookGetResource {
     }
 
     func mapPeople() -> ErrorType? {
-        results = people().flatMap { flatMap(self.transform($0), { [$0] }) ?? [] }
+        results = addressBookPeople().flatMap { flatMap(self.transform($0), { [$0] }) ?? [] }
         return .None
     }
 }
@@ -422,7 +455,7 @@ public class AddressBookDisplayPersonViewController: GroupOperation {
     }
 
     public override func operationDidFinish(operation: NSOperation, withErrors errors: [ErrorType]) {
-        if errors.isEmpty && get == operation, let person = get.person {
+        if errors.isEmpty && get == operation, let person = get.addressBookPerson {
             let op = DisplayPersonViewController(personViewController: personViewController, delegate: delegate, displayStyle: displayStyle, sender: sender, addressBook: get.addressBook, person: person)
             addOperation(op)
         }
