@@ -11,6 +11,7 @@ import CloudKit
 
 public protocol CloudKitOperationType: class {
     var database: CKDatabase! { get set }
+    func begin()
 }
 
 /**
@@ -20,17 +21,27 @@ public protocol CloudKitOperationType: class {
     for execution on an `OperationQueue`. This means that 
     observers and conditions can be attached.
 */
-public class CloudKitOperation<CloudOperation where CloudOperation: CloudKitOperationType, CloudOperation: NSOperation>: GroupOperation {
+public class CloudKitOperation<CloudOperation where CloudOperation: CloudKitOperationType, CloudOperation: NSOperation>: Operation {
 
     public let operation: CloudOperation
 
     public init(var operation: CloudOperation, database: CKDatabase = CKContainer.defaultContainer().privateCloudDatabase, completion: dispatch_block_t = { }) {
         operation.database = database
-        let finished = NSBlockOperation(block: completion)
-        finished.addDependency(operation)
         self.operation = operation
-        super.init(operations: [operation, finished])
+        super.init()
+    }
+
+    public override func execute() {
+        operation.addCompletionBlock {
+            self.finish()
+        }
+        operation.begin()
     }
 }
 
-extension CKDatabaseOperation: CloudKitOperationType {}
+extension CKDatabaseOperation: CloudKitOperationType {
+
+    public func begin() {
+        database.addOperation(self)
+    }
+}
