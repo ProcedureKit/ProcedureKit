@@ -513,7 +513,7 @@ public class AddressBookDisplayNewPersonViewController: GroupOperation {
 
     public override func operationDidFinish(operation: NSOperation, withErrors errors: [ErrorType]) {
         if errors.isEmpty && get == operation {
-            let op = DisplayNewPersonController(displayStyle: displayStyle, delegate: delegate, sender: sender, addressBook: get.addressBook, group: get.group)
+            let op = DisplayNewPersonController(displayStyle: displayStyle, delegate: delegate, sender: sender, addressBook: get.addressBook, group: get.addressBookGroup)
             addOperation(op)
         }
     }
@@ -521,6 +521,114 @@ public class AddressBookDisplayNewPersonViewController: GroupOperation {
 
 
 
+// MARK: - External Change Callbacks
+
+public struct AddressBookObserverQueue {
+
+    private static let queue = OperationQueue()
+    private static var shared = AddressBookObserverQueue()
+
+    public static func start() -> AddressBookObserverQueue {
+        shared.start()
+        return shared
+    }
+
+    public static func stop() {
+        shared.stop()
+    }
+
+    var observer: AddressBookObserver? = .None
+
+    private init() { }
+
+    private mutating func start() {
+        observer = AddressBookObserver()
+        observer?.addObserver(self)
+        AddressBookObserverQueue.queue.addOperation(observer!)
+    }
+
+    private mutating func stop() {
+        observer?.cancel()
+    }
+}
+
+extension AddressBookObserverQueue: OperationObserver {
+    public func operationDidStart(operation: Operation) {
+        println("Started listening for AddressBook changes.")
+    }
+
+    public func operation(operation: Operation, didProduceOperation newOperation: NSOperation) {
+        println("AddressBookObserver produced new Observer?")
+    }
+
+    public func operationDidFinish(operation: Operation, errors: [ErrorType]) {
+        println("Stopped listening for AddressBook changes.")
+    }
+}
+
+public class AddressBookObserver: GroupOperation {
+
+    class Observer: AddressBookOperation {
+        typealias AddressBookDidChange = [NSObject: AnyObject]? -> Void
+
+        let addressBookDidChange: AddressBookDidChange
+        var observer: AddressBookExternalChangeObserver?
+
+        init(_ block: AddressBookDidChange) {
+            addressBookDidChange = block
+        }
+
+        deinit {
+            observer?.endObservingExternalChangesToAddressBook()
+        }
+
+        override func executeAddressBookTask() -> ErrorType? {
+            if let error = super.executeAddressBookTask() {
+                return error
+            }
+            observer = addressBook.observeExternalChanges { info in
+                self.addressBookDidChange(info)
+                self.finish(nil)
+            }
+            return .None
+        }
+
+        override func cancel() {
+            observer?.endObservingExternalChangesToAddressBook()
+        }
+    }
+
+    var observer: Observer? = .None
+
+    public init() {
+        super.init(operations: [])
+        addCondition(MutuallyExclusive<AddressBookObserver>())
+        addCondition(SilentCondition(AddressBookCondition()))
+    }
+
+    public override func execute() {
+        observer = Observer(addressBookDidChange)
+        addOperation(observer!)
+    }
+
+    public override func cancel() {
+        observer?.cancel()
+    }
+
+    func addressBookDidChange(info: [NSObject: AnyObject]?) {
+        println("Address book did change: \(info)")
+    }
+
+    public override func operationDidFinish(operation: NSOperation, withErrors errors: [ErrorType]) {
+        if errors.isEmpty, let current = operation as? Observer {
+            println("Observer did finish")
+            if !cancelled {
+                observer = Observer(addressBookDidChange)
+                addOperation(observer!)
+            }
+        }
+    }
+}
 
 
 
