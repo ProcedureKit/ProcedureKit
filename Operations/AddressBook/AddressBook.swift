@@ -50,6 +50,9 @@ public protocol AddressBookPermissionRegistrar {
     func requestAccessToAddressBook(addressBook: ABAddressBookRef, completion: (AddressBookPermissionRegistrarError?) -> Void)
 }
 
+public protocol AddressBookExternalChangeObserver {
+    mutating func endObservingExternalChangesToAddressBook()
+}
 
 public protocol AddressBookType {
 
@@ -646,6 +649,37 @@ extension AddressBook {
         }
 
         return AddressBook.Error(error: error)
+    }
+}
+
+extension AddressBook { // External Changes
+
+    private class ExternalChangeObserver: AddressBookExternalChangeObserver {
+        typealias BlockType = Void -> Void
+        var handler: BlockType?
+
+        init(handler: BlockType) {
+            self.handler = handler
+        }
+
+        deinit {
+            assert(handler == nil, "AddressBook ExternalChangeObserver was not un-registered before being deallocated.")
+        }
+
+        private func endObservingExternalChangesToAddressBook() {
+            handler?()
+            handler = .None
+        }
+    }
+
+    public typealias ExternalChangesBlockType = (info: [NSObject: AnyObject]?) -> Void
+
+    @asmname("OPRAddressBookRegisterExternalChangeHandler")
+    private func createHandlerForExternalChangesInAddressBook(addressBookRef: ABAddressBookRef, withCallback callback: ExternalChangesBlockType) -> ExternalChangeObserver.BlockType
+
+    public func observeExternalChanges(callback: ExternalChangesBlockType) -> AddressBookExternalChangeObserver {
+        let handler = createHandlerForExternalChangesInAddressBook(addressBook, withCallback: callback)
+        return ExternalChangeObserver(handler: handler)
     }
 }
 
