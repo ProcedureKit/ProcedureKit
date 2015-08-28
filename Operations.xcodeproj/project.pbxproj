@@ -26,7 +26,6 @@
 		654308481B6490740081C211 /* SlientCondition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 654308471B6490740081C211 /* SlientCondition.swift */; };
 		654D7E701B600FA5005108E8 /* BlockConditionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 654D7E6F1B600FA5005108E8 /* BlockConditionTests.swift */; };
 		654D7E721B6024C6005108E8 /* CloudKitOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 654D7E711B6024C6005108E8 /* CloudKitOperation.swift */; };
-		6558091A1B60292500CF0722 /* CloudKitOperationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 655809191B60292500CF0722 /* CloudKitOperationTests.swift */; };
 		6558091C1B6049F700CF0722 /* AlertOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6558091B1B6049F700CF0722 /* AlertOperation.swift */; };
 		6558091E1B604FD300CF0722 /* AlertOperationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6558091D1B604FD300CF0722 /* AlertOperationTests.swift */; };
 		655E43FF1B3F43D60013A3E1 /* TimeoutObserverTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 655E43FE1B3F43D60013A3E1 /* TimeoutObserverTests.swift */; };
@@ -106,7 +105,6 @@
 		654308471B6490740081C211 /* SlientCondition.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SlientCondition.swift; sourceTree = "<group>"; };
 		654D7E6F1B600FA5005108E8 /* BlockConditionTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BlockConditionTests.swift; sourceTree = "<group>"; };
 		654D7E711B6024C6005108E8 /* CloudKitOperation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CloudKitOperation.swift; sourceTree = "<group>"; };
-		655809191B60292500CF0722 /* CloudKitOperationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CloudKitOperationTests.swift; sourceTree = "<group>"; };
 		6558091B1B6049F700CF0722 /* AlertOperation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AlertOperation.swift; sourceTree = "<group>"; };
 		6558091D1B604FD300CF0722 /* AlertOperationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AlertOperationTests.swift; sourceTree = "<group>"; };
 		655E43FE1B3F43D60013A3E1 /* TimeoutObserverTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TimeoutObserverTests.swift; sourceTree = "<group>"; };
@@ -251,7 +249,6 @@
 				654D7E6F1B600FA5005108E8 /* BlockConditionTests.swift */,
 				657A4A3A1B77E7CA006B3D7A /* CalendarConditionTests.swift */,
 				6560100D1B5C6C0E0052EE78 /* CloudConditionTests.swift */,
-				655809191B60292500CF0722 /* CloudKitOperationTests.swift */,
 				652E271E1B62C13400A53AA6 /* GatedOperationTests.swift */,
 				65D6F57A1B5AF091003D35AD /* GroupOperationTests.swift */,
 				6528035C1B78DB8F00717334 /* HealthConditionTests.swift */,
@@ -517,7 +514,6 @@
 				65D6F57B1B5AF091003D35AD /* GroupOperationTests.swift in Sources */,
 				6597EADE1B66399700129294 /* NoCancelledConditionTests.swift in Sources */,
 				657A4A3B1B77E7CA006B3D7A /* CalendarConditionTests.swift in Sources */,
-				6558091A1B60292500CF0722 /* CloudKitOperationTests.swift in Sources */,
 				6597EADA1B65B3A100129294 /* LocationOperationTests.swift in Sources */,
 				65DADF651B62D75400EAD25B /* ReachableOperationTests.swift in Sources */,
 				654308461B648D090081C211 /* NegatedConditionTests.swift in Sources */,
