@@ -172,6 +172,10 @@ public final class AddressBook: AddressBookType {
 
     public enum SortOrdering: RawRepresentable, Printable {
 
+        public static var current: SortOrdering {
+            return SortOrdering(rawValue: ABPersonGetSortOrdering()) ?? .ByLastName
+        }
+
         case ByLastName, ByFirstName
 
         public var rawValue: ABPersonSortOrdering {
