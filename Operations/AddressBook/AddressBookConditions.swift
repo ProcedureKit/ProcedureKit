@@ -50,42 +50,4 @@ public struct AddressBookCondition: OperationCondition {
     }
 }
 
-public struct AddressBookGroupExistsCondition: OperationCondition {
-
-    private static let queue = OperationQueue()
-
-    public let name = "Address Book"
-    public let isMutuallyExclusive = false
-
-    private let create: AddressBookCreateGroup
-    private let get: AddressBookGetGroup
-    private var queue: OperationQueue {
-        return AddressBookGroupExistsCondition.queue
-    }
-
-    public init(registrar: AddressBookPermissionRegistrar? = .None, name: String) {
-        create = AddressBookCreateGroup(registrar: registrar, name: name)
-        get = AddressBookGetGroup(registrar: registrar, name: name)
-    }
-
-    public func dependencyForOperation(operation: Operation) -> NSOperation? {
-        return create
-    }
-
-    public func evaluateForOperation(operation: Operation, completion: OperationConditionResult -> Void) {
-        get.addObserver(BlockObserver { (op, errors) in
-            if self.get == op {
-                if errors.isEmpty {
-                    completion(.Satisfied)
-                }
-                else if let error = errors.first as? AddressBook.Error {
-                    completion(.Failed(error))
-                }
-            }
-        })
-        queue.addOperation(get)
-    }
-}
-
-
 
