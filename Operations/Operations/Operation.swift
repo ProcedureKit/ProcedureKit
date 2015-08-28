@@ -162,7 +162,7 @@ public class Operation: NSOperation {
 
         if _internalErrors.isEmpty && cancelled == false {
             state = .Executing
-            for o in observers { o.operationDidStart(self) }
+            observers.forEach { $0.operationDidStart(self) }
             execute()
         }
         else {
@@ -191,7 +191,7 @@ public class Operation: NSOperation {
     }
     
     public final func produceOperation(operation: NSOperation) {
-        for o in observers { o.operation(self, didProduceOperation: operation) }
+        observers.forEach { $0.operation(self, didProduceOperation: operation) }
     }
     
     // MARK: Finishing
@@ -214,7 +214,7 @@ public class Operation: NSOperation {
             let combinedErrors = _internalErrors + errors
             finished(combinedErrors)
             
-            for o in observers { o.operationDidFinish(self, errors: combinedErrors) }
+            observers.forEach { $0.operationDidFinish(self, errors: combinedErrors) }
             
             state = .Finished
         }
