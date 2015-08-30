@@ -32,6 +32,26 @@ public class Operation: NSOperation {
 
         // The operation has finished.
         case Finished
+
+        func canTransitionToState(other: State) -> Bool {
+            switch (self, other) {
+            case (.Initialized, .Pending),
+                (.Pending, .EvaluatingConditions),
+                (.EvaluatingConditions, .Ready),
+                (.Ready, .Executing),
+                (.Ready, .Finishing),
+                (.Executing, .Finishing),
+                (.Finishing, .Finished):
+                return true
+
+            default:
+                return false
+            }
+        }
+    }
+
+    private struct ProtectedState {
+        var state: State = .Initialized
     }
 
     // use the KVO mechanism to indicate that changes to "state" affect other properties as well
@@ -51,6 +71,8 @@ public class Operation: NSOperation {
         return ["state"]
     }
 
+    private var protected = Protector(ProtectedState())
+
 
     private var _state = State.Initialized
     private var _internalErrors = [ErrorType]()
@@ -60,17 +82,20 @@ public class Operation: NSOperation {
 
     private var state: State {
         get {
-            return _state
+            return protected.read { $0.state }
         }
         set (newState) {
             willChangeValueForKey("state")
 
-            switch (_state, newState) {
-            case (.Finished, _):
-                break
-            default:
-                assert(_state != newState, "Attempting to perform illegal cyclic state transition.")
-                _state = newState
+            protected.write { (inout protected: ProtectedState) in
+
+                switch (protected.state, newState) {
+                case (.Finished, _):
+                    break
+                default:
+                    assert(protected.state != newState, "Attempting to perform illegal cyclic state transition.")
+                    protected.state = newState
+                }
             }
 
             didChangeValueForKey("state")
@@ -110,6 +135,16 @@ public class Operation: NSOperation {
 
         default:
             return false
+        }
+    }
+
+    var userInitiated: Bool {
+        get {
+            return qualityOfService == .UserInitiated
+        }
+        set {
+            assert(state < .Executing, "Cannot modify userInitiated after execution has begun.")
+            qualityOfService = newValue ? .UserInitiated : .Default
         }
     }
 
@@ -172,7 +207,7 @@ public class Operation: NSOperation {
     public override final func main() {
         assert(state == .Ready, "This operation must be performed on an operation queue, current state: \(state).")
 
-        if _internalErrors.isEmpty && cancelled == false {
+        if _internalErrors.isEmpty && !cancelled {
             state = .Executing
             observers.map { $0.operationDidStart(self) }
             execute()
