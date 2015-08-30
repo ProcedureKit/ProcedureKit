@@ -1,1 +1,1 @@
-../../../CocoaLumberjack/Lumberjack/DDTTYLogger.h
+../../../CocoaLumberjack/Classes/DDTTYLogger.h

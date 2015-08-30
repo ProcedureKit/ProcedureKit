@@ -35,8 +35,13 @@ extension YapDatabaseReadTransaction {
     :param: index The YapDB.Index value.
     :returns: An optional Value.
     */
-    public func readAtIndex<Value where Value: Saveable, Value: Persistable, Value.ArchiverType.ValueType == Value>(index: YapDB.Index) -> Value? {
-        return valueFromArchive(readAtIndex(index))
+    public func readAtIndex<
+        Value
+        where
+        Value: Saveable,
+        Value: Persistable,
+        Value.ArchiverType.ValueType == Value>(index: YapDB.Index) -> Value? {
+            return Value.ArchiverType.unarchive(readAtIndex(index))
     }
 }
 
@@ -58,8 +63,11 @@ extension YapDatabaseReadTransaction {
     :param: index The YapDB.Index value.
     :returns: An optional MetadataObject.
     */
-    public func readMetadataAtIndex<MetadataObject where MetadataObject: NSCoding>(index: YapDB.Index) -> MetadataObject? {
-        return readMetadataAtIndex(index) as? MetadataObject
+    public func readMetadataAtIndex<
+        MetadataObject
+        where
+        MetadataObject: NSCoding>(index: YapDB.Index) -> MetadataObject? {
+            return readMetadataAtIndex(index) as? MetadataObject
     }
 
     /**
@@ -68,8 +76,13 @@ extension YapDatabaseReadTransaction {
     :param: index The YapDB.Index value.
     :returns: An optional MetadataValue.
     */
-    public func readMetadataAtIndex<MetadataValue where MetadataValue: Saveable, MetadataValue.ArchiverType.ValueType == MetadataValue>(index: YapDB.Index) -> MetadataValue? {
-        return valueFromArchive(readMetadataAtIndex(index))
+    public func readMetadataAtIndex<
+        MetadataValue
+        where
+        MetadataValue: Saveable,
+        MetadataValue.ArchiverType: NSCoding,
+        MetadataValue.ArchiverType.ValueType == MetadataValue>(index: YapDB.Index) -> MetadataValue? {
+            return MetadataValue.ArchiverType.unarchive(readMetadataAtIndex(index))
     }
 }
 
@@ -81,8 +94,11 @@ extension YapDatabaseReadTransaction {
     :param: indexes An array of YapDB.Index values.
     :returns: An array of Object instances.
     */
-    public func readAtIndexes<Object where Object: Persistable>(indexes: [YapDB.Index]) -> [Object] {
-        return map(unique(indexes), readAtIndex)
+    public func readAtIndexes<
+        Object
+        where
+        Object: Persistable>(indexes: [YapDB.Index]) -> [Object] {
+            return indexes.unique().flatMap { self.readAtIndex($0) }
     }
 
     /**
@@ -91,8 +107,13 @@ extension YapDatabaseReadTransaction {
     :param: indexes An array of YapDB.Index values.
     :returns: An array of Value instances.
     */
-    public func readAtIndexes<Value where Value: Saveable, Value: Persistable, Value.ArchiverType.ValueType == Value>(indexes: [YapDB.Index]) -> [Value] {
-        return map(unique(indexes), readAtIndex)
+    public func readAtIndexes<
+        Value
+        where
+        Value: Saveable,
+        Value: Persistable,
+        Value.ArchiverType.ValueType == Value>(indexes: [YapDB.Index]) -> [Value] {
+            return indexes.unique().flatMap { self.readAtIndex($0) }
     }
 }
 
@@ -104,8 +125,11 @@ extension YapDatabaseReadTransaction {
     :param: key A String
     :returns: An optional Object
     */
-    public func read<Object where Object: Persistable>(key: String) -> Object? {
-        return objectForKey(key, inCollection: Object.collection) as? Object
+    public func read<
+        Object
+        where
+        Object: Persistable>(key: String) -> Object? {
+            return objectForKey(key, inCollection: Object.collection) as? Object
     }
 
     /**
@@ -114,8 +138,14 @@ extension YapDatabaseReadTransaction {
     :param: key A String
     :returns: An optional Value
     */
-    public func read<Value where Value: Saveable, Value: Persistable, Value.ArchiverType.ValueType == Value>(key: String) -> Value? {
-        return valueFromArchive(objectForKey(key, inCollection: Value.collection))
+    public func read<
+        Value
+        where
+        Value: Saveable,
+        Value: Persistable,
+        Value.ArchiverType: NSCoding,
+        Value.ArchiverType.ValueType == Value>(key: String) -> Value? {
+            return Value.ArchiverType.unarchive(objectForKey(key, inCollection: Value.collection))
     }
 }
 
@@ -128,8 +158,11 @@ extension YapDatabaseReadTransaction {
     :param: keys An array of String instances
     :returns: An array of Object types.
     */
-    public func read<Object where Object: Persistable>(keys: [String]) -> [Object] {
-        return map(unique(keys), read)
+    public func read<
+        Object
+        where
+        Object: Persistable>(keys: [String]) -> [Object] {
+            return keys.unique().flatMap { self.read($0) }
     }
 
     /**
@@ -139,8 +172,14 @@ extension YapDatabaseReadTransaction {
     :param: keys An array of String instances
     :returns: An array of Value types.
     */
-    public func read<Value where Value: Saveable, Value: Persistable, Value.ArchiverType.ValueType == Value>(keys: [String]) -> [Value] {
-        return map(unique(keys), read)
+    public func read<
+        Value
+        where
+        Value: Saveable,
+        Value: Persistable,
+        Value.ArchiverType: NSCoding,
+        Value.ArchiverType.ValueType == Value>(keys: [String]) -> [Value] {
+            return keys.unique().flatMap { self.read($0) }
     }
 }
 
@@ -155,7 +194,7 @@ extension YapDatabaseReadTransaction {
     :returns: An array of Object types.
     */
     public func readAll<Object where Object: Persistable>() -> [Object] {
-        return map(allKeysInCollection(Object.collection) as! [String], read)
+        return (allKeysInCollection(Object.collection) as! [String]).flatMap { self.read($0) }
     }
 
     /**
@@ -166,8 +205,14 @@ extension YapDatabaseReadTransaction {
 
     :returns: An array of Value types.
     */
-    public func readAll<Value where Value: Saveable, Value: Persistable, Value.ArchiverType.ValueType == Value>() -> [Value] {
-        return map(allKeysInCollection(Value.collection) as! [String], read)
+    public func readAll<
+        Value
+        where
+        Value: Saveable,
+        Value: Persistable,
+        Value.ArchiverType: NSCoding,
+        Value.ArchiverType.ValueType == Value>() -> [Value] {
+            return (allKeysInCollection(Value.collection) as! [String]).flatMap { self.read($0) }
     }
 }
 
@@ -185,7 +230,7 @@ extension YapDatabaseReadTransaction {
     public func filterExisting<Object where Object: Persistable>(keys: [String]) -> ([Object], [String]) {
         let existing: [Object] = read(keys)
         let existingKeys = existing.map { indexForPersistable($0).key }
-        let missingKeys = filter(keys) { !contains(existingKeys, $0) }
+        let missingKeys = keys.filter { !existingKeys.contains($0) }
         return (existing, missingKeys)
     }
 
@@ -198,11 +243,16 @@ extension YapDatabaseReadTransaction {
     :param: keys An array of String instances
     :returns: An ([Value], [String]) tuple.
     */
-    public func filterExisting<Value where Value: Saveable, Value: Persistable, Value.ArchiverType.ValueType == Value>(keys: [String]) -> ([Value], [String]) {
-        let existing: [Value] = read(keys)
-        let existingKeys = existing.map { indexForPersistable($0).key }
-        let missingKeys = filter(keys) { !contains(existingKeys, $0) }
-        return (existing, missingKeys)
+    public func filterExisting<
+        Value
+        where
+        Value: Saveable,
+        Value: Persistable,
+        Value.ArchiverType.ValueType == Value>(keys: [String]) -> ([Value], [String]) {
+            let existing: [Value] = read(keys)
+            let existingKeys = existing.map { indexForPersistable($0).key }
+            let missingKeys = keys.filter { !existingKeys.contains($0) }
+            return (existing, missingKeys)
     }
 }
 
@@ -241,8 +291,14 @@ extension YapDatabaseConnection {
     :param: index The YapDB.Index value.
     :returns: An optional Value.
     */
-    public func readAtIndex<Value where Value: Saveable, Value: Persistable, Value.ArchiverType.ValueType == Value>(index: YapDB.Index) -> Value? {
-        return read({ $0.readAtIndex(index) })
+    public func readAtIndex<
+        Value
+        where
+        Value: Saveable,
+        Value: Persistable,
+        Value.ArchiverType: NSCoding,
+        Value.ArchiverType.ValueType == Value>(index: YapDB.Index) -> Value? {
+            return read({ $0.readAtIndex(index) })
     }
 }
 
@@ -266,8 +322,13 @@ extension YapDatabaseConnection {
     :param: queue A dispatch_queue_t, defaults to the main queue.
     :param: completion A closure which receives an optional Value
     */
-    public func asyncReadAtIndex<Value where Value: Saveable, Value: Persistable, Value.ArchiverType.ValueType == Value>(index: YapDB.Index, queue: dispatch_queue_t = dispatch_get_main_queue(), completion: (Value?) -> Void) {
-        asyncRead({ $0.readAtIndex(index) }, queue: queue, completion: completion)
+    public func asyncReadAtIndex<
+        Value
+        where
+        Value: Saveable,
+        Value: Persistable,
+        Value.ArchiverType.ValueType == Value>(index: YapDB.Index, queue: dispatch_queue_t = dispatch_get_main_queue(), completion: (Value?) -> Void) {
+            asyncRead({ $0.readAtIndex(index) }, queue: queue, completion: completion)
     }
 }
 
@@ -289,8 +350,11 @@ extension YapDatabaseConnection {
     :param: index The YapDB.Index value.
     :returns: An optional MetadataObject.
     */
-    public func readMetadataAtIndex<MetadataObject where MetadataObject: NSCoding>(index: YapDB.Index) -> MetadataObject? {
-        return read { $0.readMetadataAtIndex(index) as? MetadataObject }
+    public func readMetadataAtIndex<
+        MetadataObject
+        where
+        MetadataObject: NSCoding>(index: YapDB.Index) -> MetadataObject? {
+            return read { $0.readMetadataAtIndex(index) as? MetadataObject }
     }
 
     /**
@@ -299,8 +363,13 @@ extension YapDatabaseConnection {
     :param: index The YapDB.Index value.
     :returns: An optional MetadataValue.
     */
-    public func readMetadataAtIndex<MetadataValue where MetadataValue: Saveable, MetadataValue.ArchiverType.ValueType == MetadataValue>(index: YapDB.Index) -> MetadataValue? {
-        return read { $0.readMetadataAtIndex(index) as? MetadataValue }
+    public func readMetadataAtIndex<
+        MetadataValue
+        where
+        MetadataValue: Saveable,
+        MetadataValue.ArchiverType: NSCoding,
+        MetadataValue.ArchiverType.ValueType == MetadataValue>(index: YapDB.Index) -> MetadataValue? {
+            return read { $0.readMetadataAtIndex(index) }
     }
 }
 
@@ -322,8 +391,14 @@ extension YapDatabaseConnection {
     :param: indexes An array of YapDB.Index values.
     :returns: An array of Value instances.
     */
-    public func readAtIndexes<Value where Value: Saveable, Value: Persistable, Value.ArchiverType.ValueType == Value>(indexes: [YapDB.Index]) -> [Value] {
-        return read({ $0.readAtIndexes(indexes) })
+    public func readAtIndexes<
+        Value
+        where
+        Value: Saveable,
+        Value: Persistable,
+        Value.ArchiverType: NSCoding,
+        Value.ArchiverType.ValueType == Value>(indexes: [YapDB.Index]) -> [Value] {
+            return read({ $0.readAtIndexes(indexes) })
     }
 }
 
@@ -347,8 +422,14 @@ extension YapDatabaseConnection {
     :param: queue A dispatch_queue_t, defaults to the main queue.
     :param: completion A closure which receives an array of Value instances
     */
-    public func asyncReadAtIndexes<Value where Value: Saveable, Value: Persistable, Value.ArchiverType.ValueType == Value>(indexes: [YapDB.Index], queue: dispatch_queue_t = dispatch_get_main_queue(), completion: ([Value]) -> Void) {
-        asyncRead({ $0.readAtIndexes(indexes) }, queue: queue, completion: completion)
+    public func asyncReadAtIndexes<
+        Value
+        where
+        Value: Saveable,
+        Value: Persistable,
+        Value.ArchiverType: NSCoding,
+        Value.ArchiverType.ValueType == Value>(indexes: [YapDB.Index], queue: dispatch_queue_t = dispatch_get_main_queue(), completion: ([Value]) -> Void) {
+            asyncRead({ $0.readAtIndexes(indexes) }, queue: queue, completion: completion)
     }
 }
 
@@ -370,8 +451,14 @@ extension YapDatabaseConnection {
     :param: key A String
     :returns: An optional Value
     */
-    public func read<Value where Value: Saveable, Value: Persistable, Value.ArchiverType.ValueType == Value>(key: String) -> Value? {
-        return read({ $0.read(key) })
+    public func read<
+        Value
+        where
+        Value: Saveable,
+        Value: Persistable,
+        Value.ArchiverType: NSCoding,
+        Value.ArchiverType.ValueType == Value>(key: String) -> Value? {
+            return read({ $0.read(key) })
     }
 }
 
@@ -395,8 +482,14 @@ extension YapDatabaseConnection {
     :param: queue A dispatch_queue_t, defaults to the main queue.
     :param: completion A closure which receives an optional Value
     */
-    public func asyncRead<Value where Value: Saveable, Value: Persistable, Value.ArchiverType.ValueType == Value>(key: String, queue: dispatch_queue_t = dispatch_get_main_queue(), completion: (Value?) -> Void) {
-        asyncRead({ $0.read(key) }, queue: queue, completion: completion)
+    public func asyncRead<
+        Value
+        where
+        Value: Saveable,
+        Value: Persistable,
+        Value.ArchiverType: NSCoding,
+        Value.ArchiverType.ValueType == Value>(key: String, queue: dispatch_queue_t = dispatch_get_main_queue(), completion: (Value?) -> Void) {
+            asyncRead({ $0.read(key) }, queue: queue, completion: completion)
     }
 }
 
@@ -418,8 +511,14 @@ extension YapDatabaseConnection {
     :param: keys An array of String instances
     :returns: An array of Value instances
     */
-    public func read<Value where Value: Saveable, Value: Persistable, Value.ArchiverType.ValueType == Value>(keys: [String]) -> [Value] {
-        return read({ $0.read(keys) })
+    public func read<
+        Value
+        where
+        Value: Saveable,
+        Value: Persistable,
+        Value.ArchiverType: NSCoding,
+        Value.ArchiverType.ValueType == Value>(keys: [String]) -> [Value] {
+            return read({ $0.read(keys) })
     }
 }
 
@@ -443,8 +542,14 @@ extension YapDatabaseConnection {
     :param: queue A dispatch_queue_t, defaults to the main queue.
     :param: completion A closure which receives an array of Value instances
     */
-    public func asyncRead<Value where Value: Saveable, Value: Persistable, Value.ArchiverType.ValueType == Value>(keys: [String], queue: dispatch_queue_t = dispatch_get_main_queue(), completion: ([Value]) -> Void) {
-        asyncRead({ $0.read(keys) }, queue: queue, completion: completion)
+    public func asyncRead<
+        Value
+        where
+        Value: Saveable,
+        Value: Persistable,
+        Value.ArchiverType: NSCoding,
+        Value.ArchiverType.ValueType == Value>(keys: [String], queue: dispatch_queue_t = dispatch_get_main_queue(), completion: ([Value]) -> Void) {
+            asyncRead({ $0.read(keys) }, queue: queue, completion: completion)
     }
 }
 
@@ -470,8 +575,14 @@ extension YapDatabaseConnection {
 
     :returns: An array of Value types.
     */
-    public func readAll<Value where Value: Saveable, Value: Persistable, Value.ArchiverType.ValueType == Value>() -> [Value] {
-        return read({ $0.readAll() })
+    public func readAll<
+        Value
+        where
+        Value: Saveable,
+        Value: Persistable,
+        Value.ArchiverType: NSCoding,
+        Value.ArchiverType.ValueType == Value>() -> [Value] {
+            return read({ $0.readAll() })
     }
 }
 
@@ -497,8 +608,14 @@ extension YapDatabaseConnection {
 
     :returns: An array of Value types.
     */
-    public func asyncReadAll<Value where Value: Saveable, Value: Persistable, Value.ArchiverType.ValueType == Value>(queue: dispatch_queue_t = dispatch_get_main_queue(), completion: ([Value]) -> Void) {
-        asyncRead({ $0.readAll() }, queue: queue, completion: completion)
+    public func asyncReadAll<
+        Value
+        where
+        Value: Saveable,
+        Value: Persistable,
+        Value.ArchiverType: NSCoding,
+        Value.ArchiverType.ValueType == Value>(queue: dispatch_queue_t = dispatch_get_main_queue(), completion: ([Value]) -> Void) {
+            asyncRead({ $0.readAll() }, queue: queue, completion: completion)
     }
 }
 
@@ -526,14 +643,16 @@ extension YapDatabaseConnection {
     :param: keys An array of String instances
     :returns: An ([Value], [String]) tuple.
     */
-    public func filterExisting<Value where Value: Saveable, Value: Persistable, Value.ArchiverType.ValueType == Value>(keys: [String]) -> (existing: [Value], missing: [String]) {
-        return read({ $0.filterExisting(keys) })
+    public func filterExisting<
+        Value
+        where
+        Value: Saveable,
+        Value: Persistable,
+        Value.ArchiverType: NSCoding,
+        Value.ArchiverType.ValueType == Value>(keys: [String]) -> (existing: [Value], missing: [String]) {
+            return read({ $0.filterExisting(keys) })
     }
 }
-
-
-
-
 
 
 // MARK: - YapDatabase
@@ -556,8 +675,14 @@ extension YapDatabase {
     :param: index The YapDB.Index value.
     :returns: An optional Value.
     */
-    public func readAtIndex<Value where Value: Saveable, Value: Persistable, Value.ArchiverType.ValueType == Value>(index: YapDB.Index) -> Value? {
-        return newConnection().readAtIndex(index)
+    public func readAtIndex<
+        Value
+        where
+        Value: Saveable,
+        Value: Persistable,
+        Value.ArchiverType: NSCoding,
+        Value.ArchiverType.ValueType == Value>(index: YapDB.Index) -> Value? {
+            return newConnection().readAtIndex(index)
     }
 }
 
@@ -581,8 +706,13 @@ extension YapDatabase {
     :param: queue A dispatch_queue_t, defaults to the main queue.
     :param: completion A closure which receives an optional Value
     */
-    public func asyncReadAtIndex<Value where Value: Saveable, Value: Persistable, Value.ArchiverType.ValueType == Value>(index: YapDB.Index, queue: dispatch_queue_t = dispatch_get_main_queue(), completion: (Value?) -> Void) {
-        newConnection().asyncReadAtIndex(index, queue: queue, completion: completion)
+    public func asyncReadAtIndex<
+        Value
+        where
+        Value: Saveable,
+        Value: Persistable,
+        Value.ArchiverType.ValueType == Value>(index: YapDB.Index, queue: dispatch_queue_t = dispatch_get_main_queue(), completion: (Value?) -> Void) {
+            newConnection().asyncReadAtIndex(index, queue: queue, completion: completion)
     }
 }
 
@@ -594,8 +724,11 @@ extension YapDatabase {
     :param: index The YapDB.Index value.
     :returns: An optional MetadataObject.
     */
-    public func readMetadataAtIndex<MetadataObject where MetadataObject: NSCoding>(index: YapDB.Index) -> MetadataObject? {
-        return newConnection().readMetadataAtIndex(index) as? MetadataObject
+    public func readMetadataAtIndex<
+        MetadataObject
+        where
+        MetadataObject: NSCoding>(index: YapDB.Index) -> MetadataObject? {
+            return newConnection().readMetadataAtIndex(index) as? MetadataObject
     }
 
     /**
@@ -604,8 +737,13 @@ extension YapDatabase {
     :param: index The YapDB.Index value.
     :returns: An optional MetadataValue.
     */
-    public func readMetadataAtIndex<MetadataValue where MetadataValue: Saveable, MetadataValue.ArchiverType.ValueType == MetadataValue>(index: YapDB.Index) -> MetadataValue? {
-        return valueFromArchive(newConnection().readMetadataAtIndex(index))
+    public func readMetadataAtIndex<
+        MetadataValue
+        where
+        MetadataValue: Saveable,
+        MetadataValue.ArchiverType: NSCoding,
+        MetadataValue.ArchiverType.ValueType == MetadataValue>(index: YapDB.Index) -> MetadataValue? {
+            return newConnection().readMetadataAtIndex(index)
     }
 }
 
@@ -627,8 +765,14 @@ extension YapDatabase {
     :param: indexes An array of YapDB.Index values.
     :returns: An array of Value instances.
     */
-    public func readAtIndexes<Value where Value: Saveable, Value: Persistable, Value.ArchiverType.ValueType == Value>(indexes: [YapDB.Index]) -> [Value] {
-        return newConnection().readAtIndexes(indexes)
+    public func readAtIndexes<
+        Value
+        where
+        Value: Saveable,
+        Value: Persistable,
+        Value.ArchiverType: NSCoding,
+        Value.ArchiverType.ValueType == Value>(indexes: [YapDB.Index]) -> [Value] {
+            return newConnection().readAtIndexes(indexes)
     }
 }
 
@@ -652,8 +796,14 @@ extension YapDatabase {
     :param: queue A dispatch_queue_t, defaults to the main queue.
     :param: completion A closure which receives an array of Value instances
     */
-    public func asyncReadAtIndexes<Value where Value: Saveable, Value: Persistable, Value.ArchiverType.ValueType == Value>(indexes: [YapDB.Index], queue: dispatch_queue_t = dispatch_get_main_queue(), completion: ([Value]) -> Void) {
-        return newConnection().asyncReadAtIndexes(indexes, queue: queue, completion: completion)
+    public func asyncReadAtIndexes<
+        Value
+        where
+        Value: Saveable,
+        Value: Persistable,
+        Value.ArchiverType: NSCoding,
+        Value.ArchiverType.ValueType == Value>(indexes: [YapDB.Index], queue: dispatch_queue_t = dispatch_get_main_queue(), completion: ([Value]) -> Void) {
+            return newConnection().asyncReadAtIndexes(indexes, queue: queue, completion: completion)
     }
 }
 
@@ -675,8 +825,14 @@ extension YapDatabase {
     :param: key A String
     :returns: An optional Value
     */
-    public func read<Value where Value: Saveable, Value: Persistable, Value.ArchiverType.ValueType == Value>(key: String) -> Value? {
-        return newConnection().read(key)
+    public func read<
+        Value
+        where
+        Value: Saveable,
+        Value: Persistable,
+        Value.ArchiverType: NSCoding,
+        Value.ArchiverType.ValueType == Value>(key: String) -> Value? {
+            return newConnection().read(key)
     }
 }
 
@@ -700,8 +856,14 @@ extension YapDatabase {
     :param: queue A dispatch_queue_t, defaults to the main queue.
     :param: completion A closure which receives an optional Value
     */
-    public func asyncRead<Value where Value: Saveable, Value: Persistable, Value.ArchiverType.ValueType == Value>(key: String, queue: dispatch_queue_t = dispatch_get_main_queue(), completion: (Value?) -> Void) {
-        newConnection().asyncRead(key, queue: queue, completion: completion)
+    public func asyncRead<
+        Value
+        where
+        Value: Saveable,
+        Value: Persistable,
+        Value.ArchiverType: NSCoding,
+        Value.ArchiverType.ValueType == Value>(key: String, queue: dispatch_queue_t = dispatch_get_main_queue(), completion: (Value?) -> Void) {
+            newConnection().asyncRead(key, queue: queue, completion: completion)
     }
 }
 
@@ -713,8 +875,11 @@ extension YapDatabase {
     :param: keys An array of String instances
     :returns: An array of Object instances
     */
-    public func read<Object where Object: Persistable>(keys: [String]) -> [Object] {
-        return newConnection().read(keys)
+    public func read<
+        Object
+        where
+        Object: Persistable>(keys: [String]) -> [Object] {
+            return newConnection().read(keys)
     }
 
     /**
@@ -723,8 +888,14 @@ extension YapDatabase {
     :param: keys An array of String instances
     :returns: An array of Value instances
     */
-    public func read<Value where Value: Saveable, Value: Persistable, Value.ArchiverType.ValueType == Value>(keys: [String]) -> [Value] {
-        return newConnection().read(keys)
+    public func read<
+        Value
+        where
+        Value: Saveable,
+        Value: Persistable,
+        Value.ArchiverType: NSCoding,
+        Value.ArchiverType.ValueType == Value>(keys: [String]) -> [Value] {
+            return newConnection().read(keys)
     }
 }
 
@@ -737,8 +908,11 @@ extension YapDatabase {
     :param: queue A dispatch_queue_t, defaults to the main queue.
     :param: completion A closure which receives an array of Object instances
     */
-    public func asyncRead<Object where Object: Persistable>(keys: [String], queue: dispatch_queue_t = dispatch_get_main_queue(), completion: ([Object]) -> Void) {
-        newConnection().asyncRead(keys, queue: queue, completion: completion)
+    public func asyncRead<
+        Object
+        where
+        Object: Persistable>(keys: [String], queue: dispatch_queue_t = dispatch_get_main_queue(), completion: ([Object]) -> Void) {
+            newConnection().asyncRead(keys, queue: queue, completion: completion)
     }
 
     /**
@@ -748,8 +922,14 @@ extension YapDatabase {
     :param: queue A dispatch_queue_t, defaults to the main queue.
     :param: completion A closure which receives an array of Value instances
     */
-    public func asyncRead<Value where Value: Saveable, Value: Persistable, Value.ArchiverType.ValueType == Value>(keys: [String], queue: dispatch_queue_t = dispatch_get_main_queue(), completion: ([Value]) -> Void) {
-        newConnection().asyncRead(keys, queue: queue, completion: completion)
+    public func asyncRead<
+        Value
+        where
+        Value: Saveable,
+        Value: Persistable,
+        Value.ArchiverType: NSCoding,
+        Value.ArchiverType.ValueType == Value>(keys: [String], queue: dispatch_queue_t = dispatch_get_main_queue(), completion: ([Value]) -> Void) {
+            newConnection().asyncRead(keys, queue: queue, completion: completion)
     }
 }
 
@@ -763,8 +943,11 @@ extension YapDatabase {
 
     :returns: An array of Object types.
     */
-    public func readAll<Object where Object: Persistable>() -> [Object] {
-        return newConnection().readAll()
+    public func readAll<
+        Object
+        where
+        Object: Persistable>() -> [Object] {
+            return newConnection().readAll()
     }
 
     /**
@@ -775,8 +958,14 @@ extension YapDatabase {
 
     :returns: An array of Value types.
     */
-    public func readAll<Value where Value: Saveable, Value: Persistable, Value.ArchiverType.ValueType == Value>() -> [Value] {
-        return newConnection().readAll()
+    public func readAll<
+        Value
+        where
+        Value: Saveable,
+        Value: Persistable,
+        Value.ArchiverType: NSCoding,
+        Value.ArchiverType.ValueType == Value>() -> [Value] {
+            return newConnection().readAll()
     }
 }
 
@@ -790,8 +979,11 @@ extension YapDatabase {
 
     :returns: An array of Object types.
     */
-    public func asyncReadAll<Object where Object: Persistable>(queue: dispatch_queue_t = dispatch_get_main_queue(), completion: ([Object]) -> Void) {
-        newConnection().asyncReadAll(queue: queue, completion: completion)
+    public func asyncReadAll<
+        Object
+        where
+        Object: Persistable>(queue: dispatch_queue_t = dispatch_get_main_queue(), completion: ([Object]) -> Void) {
+            newConnection().asyncReadAll(queue, completion: completion)
     }
 
     /**
@@ -802,8 +994,14 @@ extension YapDatabase {
 
     :returns: An array of Object types.
     */
-    public func asyncReadAll<Value where Value: Saveable, Value: Persistable, Value.ArchiverType.ValueType == Value>(queue: dispatch_queue_t = dispatch_get_main_queue(), completion: ([Value]) -> Void) {
-        newConnection().asyncReadAll(queue: queue, completion: completion)
+    public func asyncReadAll<
+        Value
+        where
+        Value: Saveable,
+        Value: Persistable,
+        Value.ArchiverType: NSCoding,
+        Value.ArchiverType.ValueType == Value>(queue: dispatch_queue_t = dispatch_get_main_queue(), completion: ([Value]) -> Void) {
+            newConnection().asyncReadAll(queue, completion: completion)
     }
 }
 
@@ -831,8 +1029,16 @@ extension YapDatabase {
     :param: keys An array of String instances
     :returns: An ([Value], [String]) tuple.
     */
-    public func filterExisting<Value where Value: Saveable, Value: Persistable, Value.ArchiverType.ValueType == Value>(keys: [String]) -> (existing: [Value], missing: [String]) {
-        return newConnection().filterExisting(keys)
+    public func filterExisting<
+        Value
+        where
+        Value: Saveable,
+        Value: Persistable,
+        Value.ArchiverType: NSCoding,
+        Value.ArchiverType.ValueType == Value>(keys: [String]) -> (existing: [Value], missing: [String]) {
+            return newConnection().filterExisting(keys)
     }
 }
+
+
 

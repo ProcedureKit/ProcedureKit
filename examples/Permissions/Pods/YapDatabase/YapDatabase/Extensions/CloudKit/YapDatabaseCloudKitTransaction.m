@@ -475,7 +475,7 @@ static BOOL ClassVersionsAreCompatible(int oldClassVersion, int newClassVersion)
 			YapCollectionKey *ck = [databaseTransaction collectionKeyForRowid:rowid];
 			if (ck)
 			{
-				recordBlock(inOutRecord, recordInfo, ck.collection, ck.key);
+				recordBlock(databaseTransaction, inOutRecord, recordInfo, ck.collection, ck.key);
 			}
 		};
 	}
@@ -491,7 +491,7 @@ static BOOL ClassVersionsAreCompatible(int oldClassVersion, int newClassVersion)
 			
 			if ([databaseTransaction getCollectionKey:&ck object:&object forRowid:rowid])
 			{
-				recordBlock(inOutRecord, recordInfo, ck.collection, ck.key, object);
+				recordBlock(databaseTransaction, inOutRecord, recordInfo, ck.collection, ck.key, object);
 			}
 		};
 	}
@@ -507,7 +507,7 @@ static BOOL ClassVersionsAreCompatible(int oldClassVersion, int newClassVersion)
 			
 			if ([databaseTransaction getCollectionKey:&ck metadata:&metadata forRowid:rowid])
 			{
-				recordBlock(inOutRecord, recordInfo, ck.collection, ck.key, metadata);
+				recordBlock(databaseTransaction, inOutRecord, recordInfo, ck.collection, ck.key, metadata);
 			}
 		};
 	}
@@ -524,7 +524,7 @@ static BOOL ClassVersionsAreCompatible(int oldClassVersion, int newClassVersion)
 			
 			if ([databaseTransaction getCollectionKey:&ck object:&object metadata:&metadata forRowid:rowid])
 			{
-				recordBlock(inOutRecord, recordInfo, ck.collection, ck.key, object, metadata);
+				recordBlock(databaseTransaction, inOutRecord, recordInfo, ck.collection, ck.key, object, metadata);
 			}
 		};
 	}
@@ -598,15 +598,15 @@ static BOOL ClassVersionsAreCompatible(int oldClassVersion, int newClassVersion)
 		{
 			dirtyRecordTableInfo =
 			  [[YDBCKDirtyRecordTableInfo alloc] initWithDatabaseIdentifier:databaseIdentifier
-			                                                       recordID:nil
+			                                                       recordID:record.recordID
 			                                                     ownerCount:0];
 			
 			dirtyRecordTableInfo.dirty_record = record;
 			[dirtyRecordTableInfo incrementOwnerCount];
 			[dirtyRecordTableInfo mergeOriginalValues:recordInfo.originalValues];
 			
-			[parentConnection->cleanRecordTableInfoCache removeObjectForKey:@(rowid)];
-			[parentConnection->dirtyRecordTableInfoDict setObject:dirtyRecordTableInfo forKey:@(rowid)];
+			[parentConnection->cleanRecordTableInfoCache removeObjectForKey:hash];
+			[parentConnection->dirtyRecordTableInfoDict setObject:dirtyRecordTableInfo forKey:hash];
 		}
 		else
 		{
@@ -634,7 +634,7 @@ static BOOL ClassVersionsAreCompatible(int oldClassVersion, int newClassVersion)
 			recordInfo.databaseIdentifier = nil;
 			recordInfo.originalValues = nil;
 			
-			recordBlock(&record, recordInfo, collection, key);
+			recordBlock(databaseTransaction, &record, recordInfo, collection, key);
 			
 			if (record) {
 				InsertRecord(record, recordInfo, rowid);
@@ -668,7 +668,7 @@ static BOOL ClassVersionsAreCompatible(int oldClassVersion, int newClassVersion)
 			recordInfo.databaseIdentifier = nil;
 			recordInfo.originalValues = nil;
 			
-			recordBlock(&record, recordInfo, collection, key, object);
+			recordBlock(databaseTransaction, &record, recordInfo, collection, key, object);
 			
 			if (record) {
 				InsertRecord(record, recordInfo, rowid);
@@ -702,7 +702,7 @@ static BOOL ClassVersionsAreCompatible(int oldClassVersion, int newClassVersion)
 			recordInfo.databaseIdentifier = nil;
 			recordInfo.originalValues = nil;
 			
-			recordBlock(&record, recordInfo, collection, key, metadata);
+			recordBlock(databaseTransaction, &record, recordInfo, collection, key, metadata);
 			
 			if (record) {
 				InsertRecord(record, recordInfo, rowid);
@@ -736,7 +736,7 @@ static BOOL ClassVersionsAreCompatible(int oldClassVersion, int newClassVersion)
 			recordInfo.databaseIdentifier = nil;
 			recordInfo.originalValues = nil;
 			
-			recordBlock(&record, recordInfo, collection, key, object, metadata);
+			recordBlock(databaseTransaction, &record, recordInfo, collection, key, object, metadata);
 			
 			if (record) {
 				InsertRecord(record, recordInfo, rowid);
@@ -813,7 +813,7 @@ static BOOL ClassVersionsAreCompatible(int oldClassVersion, int newClassVersion)
 		enumBlock = ^(int64_t rowid, NSString *collection, NSString *key, BOOL *stop) {
 			
 			enumHelperBlock(rowid);
-			recordBlock(&record, recordInfo, collection, key);
+			recordBlock(databaseTransaction, &record, recordInfo, collection, key);
 			
 			[self processRecord:record recordInfo:recordInfo
 			                    preCalculatedHash:nil
@@ -847,7 +847,7 @@ static BOOL ClassVersionsAreCompatible(int oldClassVersion, int newClassVersion)
 		enumBlock = ^(int64_t rowid, NSString *collection, NSString *key, id object, BOOL *stop) {
 			
 			enumHelperBlock(rowid);
-			recordBlock(&record, recordInfo, collection, key, object);
+			recordBlock(databaseTransaction, &record, recordInfo, collection, key, object);
 			
 			[self processRecord:record recordInfo:recordInfo
 			                    preCalculatedHash:nil
@@ -881,7 +881,7 @@ static BOOL ClassVersionsAreCompatible(int oldClassVersion, int newClassVersion)
 		enumBlock = ^(int64_t rowid, NSString *collection, NSString *key, id metadata, BOOL *stop) {
 			
 			enumHelperBlock(rowid);
-			recordBlock(&record, recordInfo, collection, key, metadata);
+			recordBlock(databaseTransaction, &record, recordInfo, collection, key, metadata);
 			
 			[self processRecord:record recordInfo:recordInfo
 			                    preCalculatedHash:nil
@@ -915,7 +915,7 @@ static BOOL ClassVersionsAreCompatible(int oldClassVersion, int newClassVersion)
 		enumBlock = ^(int64_t rowid, NSString *collection, NSString *key, id object, id metadata, BOOL *stop) {
 			
 			enumHelperBlock(rowid);
-			recordBlock(&record, recordInfo, collection, key, object, metadata);
+			recordBlock(databaseTransaction, &record, recordInfo, collection, key, object, metadata);
 			
 			[self processRecord:record recordInfo:recordInfo
 			                    preCalculatedHash:nil
@@ -1269,7 +1269,7 @@ static BOOL ClassVersionsAreCompatible(int oldClassVersion, int newClassVersion)
 		{
 			YDBCKDirtyRecordTableInfo *newDirtyRecordTableInfo =
 			  [[YDBCKDirtyRecordTableInfo alloc] initWithDatabaseIdentifier:recordInfo.databaseIdentifier
-			                                                       recordID:nil
+			                                                       recordID:record.recordID
 			                                                     ownerCount:0];
 			
 			newDirtyRecordTableInfo.dirty_record = record;
@@ -1311,7 +1311,7 @@ static BOOL ClassVersionsAreCompatible(int oldClassVersion, int newClassVersion)
 		{
 			YDBCKDirtyRecordTableInfo *newDirtyRecordTableInfo =
 			  [[YDBCKDirtyRecordTableInfo alloc] initWithDatabaseIdentifier:recordInfo.databaseIdentifier
-			                                                       recordID:nil
+			                                                       recordID:record.recordID
 			                                                     ownerCount:0];
 			
 			newDirtyRecordTableInfo.dirty_record = record;
@@ -1492,9 +1492,9 @@ static BOOL ClassVersionsAreCompatible(int oldClassVersion, int newClassVersion)
 		for (NSUInteger i = 0; i < count; i++)
 		{
 			if (i == 0)
-				[query appendFormat:@"?"];
+				[query appendString:@"?"];
 			else
-				[query appendFormat:@", ?"];
+				[query appendString:@", ?"];
 		}
 		
 		[query appendString:@");"];
@@ -1947,9 +1947,9 @@ static BOOL ClassVersionsAreCompatible(int oldClassVersion, int newClassVersion)
 		for (NSUInteger i = 0; i < count; i++)
 		{
 			if (i == 0)
-				[query appendFormat:@"?"];
+				[query appendString:@"?"];
 			else
-				[query appendFormat:@", ?"];
+				[query appendString:@", ?"];
 		}
 		
 		[query appendString:@");"];
@@ -2267,9 +2267,9 @@ static BOOL ClassVersionsAreCompatible(int oldClassVersion, int newClassVersion)
 		for (NSUInteger i = 0; i < numParams; i++)
 		{
 			if (i == 0)
-				[query appendFormat:@"?"];
+				[query appendString:@"?"];
 			else
-				[query appendFormat:@", ?"];
+				[query appendString:@", ?"];
 		}
 		
 		[query appendString:@");"];
@@ -3215,28 +3215,28 @@ static BOOL ClassVersionsAreCompatible(int oldClassVersion, int newClassVersion)
 		__unsafe_unretained YapDatabaseCloudKitRecordWithKeyBlock recordBlock =
 		  (YapDatabaseCloudKitRecordWithKeyBlock)parentConnection->parent->recordBlock;
 		
-		recordBlock(&record, recordInfo, collection, key);
+		recordBlock(databaseTransaction, &record, recordInfo, collection, key);
 	}
 	else if (recordBlockType == YapDatabaseCloudKitBlockTypeWithObject)
 	{
 		__unsafe_unretained YapDatabaseCloudKitRecordWithObjectBlock recordBlock =
 		  (YapDatabaseCloudKitRecordWithObjectBlock)parentConnection->parent->recordBlock;
 		
-		recordBlock(&record, recordInfo, collection, key, object);
+		recordBlock(databaseTransaction, &record, recordInfo, collection, key, object);
 	}
 	else if (recordBlockType == YapDatabaseCloudKitBlockTypeWithMetadata)
 	{
 		__unsafe_unretained YapDatabaseCloudKitRecordWithMetadataBlock recordBlock =
 		  (YapDatabaseCloudKitRecordWithMetadataBlock)parentConnection->parent->recordBlock;
 		
-		recordBlock(&record, recordInfo, collection, key, metadata);
+		recordBlock(databaseTransaction, &record, recordInfo, collection, key, metadata);
 	}
 	else // if (recordBlockType == YapDatabaseCloudKitBlockTypeWithRow)
 	{
 		__unsafe_unretained YapDatabaseCloudKitRecordWithRowBlock recordBlock =
 		  (YapDatabaseCloudKitRecordWithRowBlock)parentConnection->parent->recordBlock;
 		
-		recordBlock(&record, recordInfo, collection, key, object, metadata);
+		recordBlock(databaseTransaction, &record, recordInfo, collection, key, object, metadata);
 	}
 	
 	// Figure if anything changed, and schedule updates to the table(s) accordingly
@@ -3314,28 +3314,28 @@ static BOOL ClassVersionsAreCompatible(int oldClassVersion, int newClassVersion)
 		__unsafe_unretained YapDatabaseCloudKitRecordWithKeyBlock recordBlock =
 		  (YapDatabaseCloudKitRecordWithKeyBlock)parentConnection->parent->recordBlock;
 		
-		recordBlock(&record, recordInfo, collection, key);
+		recordBlock(databaseTransaction, &record, recordInfo, collection, key);
 	}
 	else if (recordBlockType == YapDatabaseCloudKitBlockTypeWithObject)
 	{
 		__unsafe_unretained YapDatabaseCloudKitRecordWithObjectBlock recordBlock =
 		  (YapDatabaseCloudKitRecordWithObjectBlock)parentConnection->parent->recordBlock;
 		
-		recordBlock(&record, recordInfo, collection, key, object);
+		recordBlock(databaseTransaction, &record, recordInfo, collection, key, object);
 	}
 	else if (recordBlockType == YapDatabaseCloudKitBlockTypeWithMetadata)
 	{
 		__unsafe_unretained YapDatabaseCloudKitRecordWithMetadataBlock recordBlock =
 		  (YapDatabaseCloudKitRecordWithMetadataBlock)parentConnection->parent->recordBlock;
 		
-		recordBlock(&record, recordInfo, collection, key, metadata);
+		recordBlock(databaseTransaction, &record, recordInfo, collection, key, metadata);
 	}
 	else // if (recordBlockType == YapDatabaseCloudKitBlockTypeWithRow)
 	{
 		__unsafe_unretained YapDatabaseCloudKitRecordWithRowBlock recordBlock =
 		  (YapDatabaseCloudKitRecordWithRowBlock)parentConnection->parent->recordBlock;
 		
-		recordBlock(&record, recordInfo, collection, key, object, metadata);
+		recordBlock(databaseTransaction, &record, recordInfo, collection, key, object, metadata);
 	}
 	
 	// Figure if anything changed, and schedule updates to the table(s) accordingly
@@ -3419,7 +3419,7 @@ static BOOL ClassVersionsAreCompatible(int oldClassVersion, int newClassVersion)
 		__unsafe_unretained YapDatabaseCloudKitRecordWithObjectBlock recordBlock =
 		  (YapDatabaseCloudKitRecordWithObjectBlock)parentConnection->parent->recordBlock;
 		
-		recordBlock(&record, recordInfo, collection, key, object);
+		recordBlock(databaseTransaction, &record, recordInfo, collection, key, object);
 	}
 	else // if (recordBlockType == YapDatabaseCloudKitBlockTypeWithRow)
 	{
@@ -3428,7 +3428,7 @@ static BOOL ClassVersionsAreCompatible(int oldClassVersion, int newClassVersion)
 		
 		id metadata = [databaseTransaction metadataForCollectionKey:collectionKey withRowid:rowid];
 		
-		recordBlock(&record, recordInfo, collection, key, object, metadata);
+		recordBlock(databaseTransaction, &record, recordInfo, collection, key, object, metadata);
 	}
 	
 	// Figure if anything changed, and schedule updates to the table(s) accordingly
@@ -3512,7 +3512,7 @@ static BOOL ClassVersionsAreCompatible(int oldClassVersion, int newClassVersion)
 		__unsafe_unretained YapDatabaseCloudKitRecordWithMetadataBlock recordBlock =
 		  (YapDatabaseCloudKitRecordWithMetadataBlock)parentConnection->parent->recordBlock;
 		
-		recordBlock(&record, recordInfo, collection, key, metadata);
+		recordBlock(databaseTransaction, &record, recordInfo, collection, key, metadata);
 	}
 	else // if (recordBlockType == YapDatabaseCloudKitBlockTypeWithRow)
 	{
@@ -3521,7 +3521,7 @@ static BOOL ClassVersionsAreCompatible(int oldClassVersion, int newClassVersion)
 		
 		id object = [databaseTransaction objectForCollectionKey:collectionKey withRowid:rowid];
 		
-		recordBlock(&record, recordInfo, collection, key, object, metadata);
+		recordBlock(databaseTransaction, &record, recordInfo, collection, key, object, metadata);
 	}
 	
 	// Figure if anything changed, and schedule updates to the table(s) accordingly
@@ -3543,8 +3543,8 @@ static BOOL ClassVersionsAreCompatible(int oldClassVersion, int newClassVersion)
 	// Nothing to do here.
 	// "Touch" is generally meant for local operations.
 	//
-	// We may add an explicit "remote" touch (declared in YapDatabaseCloudKitTransaction.h)
-	// in the future if there seems to be a need for it.
+	// We may change this in the future if this decision proves to be misguided.
+	// Alternatively, would could possibly add an explicit "remote" touch for YapDatabaseCloudKitTransaction.
 }
 
 /**
@@ -3556,8 +3556,21 @@ static BOOL ClassVersionsAreCompatible(int oldClassVersion, int newClassVersion)
 	// Nothing to do here.
 	// "Touch" is generally meant for local operations.
 	//
-	// We may add an explicit "remote" touch (declared in YapDatabaseCloudKitTransaction.h)
-	// in the future if there seems to be a need for it.
+	// We may change this in the future if this decision proves to be misguided.
+	// Alternatively, would could possibly add an explicit "remote" touch for YapDatabaseCloudKitTransaction.
+}
+
+/**
+ * YapDatabase extension hook.
+ * This method is invoked by a YapDatabaseReadWriteTransaction as a post-operation-hook.
+**/
+- (void)handleTouchRowForCollectionKey:(YapCollectionKey *)collectionKey withRowid:(int64_t)rowid
+{
+	// Nothing to do here.
+	// "Touch" is generally meant for local operations.
+	//
+	// We may change this in the future if this decision proves to be misguided.
+	// Alternatively, would could possibly add an explicit "remote" touch for YapDatabaseCloudKitTransaction.
 }
 
 /**
@@ -3795,8 +3808,8 @@ static BOOL ClassVersionsAreCompatible(int oldClassVersion, int newClassVersion)
 	                    preCalculatedHash:hash
 	                             forRowid:rowid
 	             withPrevMappingTableInfo:mappingTableInfo
-	                     prevRecordTableInfo:recordTableInfo
-	                                        flags:flags];
+	                  prevRecordTableInfo:recordTableInfo
+	                                flags:flags];
 	
 	return YES;
 }
@@ -4113,6 +4126,13 @@ static BOOL ClassVersionsAreCompatible(int oldClassVersion, int newClassVersion)
 - (BOOL)saveRecord:(CKRecord *)record databaseIdentifier:(NSString *)databaseIdentifier
 {
 	YDBLogAutoTrace();
+	
+	// Proper API usage check
+	if (!databaseTransaction->isReadWriteTransaction)
+	{
+		@throw [self requiresReadWriteTransactionException:NSStringFromSelector(_cmd)];
+		return NO;
+	}
 	
 	if (record == nil) return NO;
 	

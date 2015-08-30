@@ -10,21 +10,31 @@ import XCTest
 import Operations
 
 class TestablePresentingController: PresentingViewController {
-    typealias CheckBlockType = (String?, String?) -> Void
+    typealias CheckBlockType = (received: UIViewController) -> Void
 
     var check: CheckBlockType? = .None
     var expectation: XCTestExpectation? = .None
 
     func presentViewController(viewController: UIViewController, animated: Bool, completion: (() -> Void)?) {
-        if let alertController = viewController as? UIAlertController {
-            check?(alertController.title, alertController.message)
-            expectation?.fulfill()
-        }
+        check?(received: viewController)
+        expectation?.fulfill()
+    }
+
+    func showViewController(vc: UIViewController, sender: AnyObject?) {
+        check?(received: vc)
+        expectation?.fulfill()
+    }
+
+    func showDetailViewController(vc: UIViewController, sender: AnyObject?) {
+        check?(received: vc)
+        expectation?.fulfill()
     }
 }
 
 class AlertOperationTests: OperationTests {
 
+    let title = "This is the alert title"
+    let message = "This is the alert message"
     var presentingController: TestablePresentingController!
 
     override func setUp() {
@@ -32,18 +42,35 @@ class AlertOperationTests: OperationTests {
         presentingController = TestablePresentingController()
     }
 
+    func test__alert_title_works() {
+        let alert = AlertOperation(presentAlertFrom: presentingController)
+        alert.title = title
+        XCTAssertEqual(alert.title, title)
+    }
+
+    func test__alert_message_works() {
+        let alert = AlertOperation(presentAlertFrom: presentingController)
+        alert.message = message
+        XCTAssertEqual(alert.message, message)
+    }
+
     func test__alert_operation_presents_alert_controller() {
 
         var didPresentAlert = false
-        let alert = AlertOperation(presentFromController: presentingController)
-        alert.title = "This is the alert title"
-        alert.message = "This is the alert message"
+        let alert = AlertOperation(presentAlertFrom: presentingController)
+        alert.title = title
+        alert.message = message
 
         presentingController.expectation = expectationWithDescription("Test: \(__FUNCTION__)")
-        presentingController.check = { (title, message) in
-            XCTAssertTrue(title == alert.title)
-            XCTAssertTrue(message == alert.message)
-            didPresentAlert = true
+        presentingController.check = { received in
+            if let alertController = received as? UIAlertController {
+                XCTAssertTrue(alertController.title == alert.title)
+                XCTAssertTrue(alertController.message == alert.message)
+                didPresentAlert = true
+            }
+            else {
+                XCTFail("Did not receive a UIAlertController")
+            }
         }
 
         runOperation(alert)

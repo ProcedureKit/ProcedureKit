@@ -79,10 +79,12 @@ static NSString *const ext_key_class = @"class";
 /**
  * General utility methods.
 **/
-+ (int)pragma:(NSString *)pragmaSetting using:(sqlite3 *)aDb;
-+ (NSString *)pragmaValueForAutoVacuum:(int)auto_vacuum;
-+ (NSString *)pragmaValueForSynchronous:(int)synchronous;
++ (int64_t)pragma:(NSString *)pragmaSetting using:(sqlite3 *)aDb;
++ (NSString *)pragmaValueForAutoVacuum:(int64_t)auto_vacuum;
++ (NSString *)pragmaValueForSynchronous:(int64_t)synchronous;
+
 + (BOOL)tableExists:(NSString *)tableName using:(sqlite3 *)aDb;
++ (NSArray *)tableNamesUsing:(sqlite3 *)aDb;
 + (NSArray *)columnNamesForTable:(NSString *)tableName using:(sqlite3 *)aDb;
 + (NSDictionary *)columnNamesAndAffinityForTable:(NSString *)tableName using:(sqlite3 *)aDb;
 
@@ -258,8 +260,6 @@ static NSString *const ext_key_class = @"class";
 - (YapDatabaseReadWriteTransaction *)newReadWriteTransaction;
 
 - (void)markSqlLevelSharedReadLockAcquired;
-
-- (void)postRollbackCleanup;
 
 - (void)getInternalChangeset:(NSMutableDictionary **)internalPtr externalChangeset:(NSMutableDictionary **)externalPtr;
 - (void)processChangeset:(NSDictionary *)changeset;

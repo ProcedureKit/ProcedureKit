@@ -4,13 +4,61 @@
 
 CocoaLumberjack
 ===============
-[![Build Status](http://img.shields.io/travis/CocoaLumberjack/CocoaLumberjack/master.svg?style=flat)](https://travis-ci.org/CocoaLumberjack/CocoaLumberjack)
+[![Build Status](https://travis-ci.org/CocoaLumberjack/CocoaLumberjack.svg)](https://travis-ci.org/CocoaLumberjack/CocoaLumberjack)
 [![Pod Version](http://img.shields.io/cocoapods/v/CocoaLumberjack.svg?style=flat)](http://cocoadocs.org/docsets/CocoaLumberjack/)
+[![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/Carthage/Carthage)
 [![Pod Platform](http://img.shields.io/cocoapods/p/CocoaLumberjack.svg?style=flat)](http://cocoadocs.org/docsets/CocoaLumberjack/)
 [![Pod License](http://img.shields.io/cocoapods/l/CocoaLumberjack.svg?style=flat)](http://opensource.org/licenses/BSD-3-Clause)
 [![Reference Status](https://www.versioneye.com/objective-c/cocoalumberjack/reference_badge.svg?style=flat)](https://www.versioneye.com/objective-c/cocoalumberjack/references)
 
 **CocoaLumberjack** is a fast & simple, yet powerful & flexible logging framework for Mac and iOS.
+
+### How to get started
+- install via [CocoaPods](http://cocoapods.org)
+
+```ruby
+platform :ios, '5.0'
+pod 'CocoaLumberjack'
+```
+- or [install manually](Documentation/GettingStarted.md#manual-installation)
+- read the [Getting started](Documentation/GettingStarted.md) guide, check out the [FAQ](Documentation/FAQ.md) section or the other [docs](Documentation/)
+- if you find issues or want to suggest improvements, create an issue or a pull request
+- for all kinds of questions involving CocoaLumberjack, use the [Google group](http://groups.google.com/group/cocoalumberjack) or StackOverflow (use [#lumberjack](http://stackoverflow.com/questions/tagged/lumberjack)).
+
+### CocoaLumberjack 2
+
+#### Migrating to 2.x
+
+* Replace `DDLog.h` imports by `#import <CocoaLumberjack/CocoaLumberjack.h>`.
+
+Advanced users, third party libraries:
+
+* Replace all `DDLogC` macros for regular `DDLog` macros.
+* Replace log level (`LOG_LEVEL_*`) macros with `DDLogLevel` enum values
+* Replace log flag (`LOG_FLAG_*`) macros with `DDLogFlag` enum values
+* Replace `DDLogMessage` ivars and method calls to the new ivars and methods
+  * `logMsg` with `_message`
+  * `logLevel` with `_level`
+  * `logFlag` with `_flag`
+  * `logContext` with `_context`
+  * `lineNumber` with `_line` (type changed from `int` to `NSUInteger`)
+  * `file` with `_file` (`filename` contains just the file name, without the extension and the full path)
+  * `timestamp` with `_timestamp`
+  * `methodName` with `function`
+* Replace `DDAbstractLogger` `formatter` to `logFormatter`
+* `YSSingleFileLogger` ivars are no longer accesible, use the methods instead
+* Replace `[DDLog addLogger:withLogLevel:]` with `[DDLog addLogger:withLevel:]`
+
+#### Forcing 1.x
+
+If an included library requires it, you can force CocoaLumberjack 1.x by setting the version before the conflicting library:
+
+```ruby
+pod 'CocoaLumberjack', '~> 1.9'
+pod 'ConflictingLibrary'
+```
+
+### Features
 
 #### Lumberjack is Fast & Simple, yet Powerful & Flexible.
 
@@ -39,28 +87,18 @@ Configure your logging however you want. Change log levels per file (perfect for
 -   You're looking to take your application to the next level in terms of support and stability.
 -   You're looking for an enterprise level logging solution for your application (Mac or iPhone).
 
-### How to get started
-- install via [CocoaPods](http://cocoapods.org)
-
-```ruby
-platform :ios, '6.1'
-pod 'CocoaLumberjack'
-```
-- read the [Getting started](https://github.com/CocoaLumberjack/CocoaLumberjack/wiki/GettingStarted) guide, check out the [FAQ](https://github.com/CocoaLumberjack/CocoaLumberjack/wiki/FAQ) section or the other [docs](https://github.com/CocoaLumberjack/CocoaLumberjack/wiki)
-- if you find issues or want to suggest improvements, create an issue or a pull request
-- for all kinds of questions involving CocoaLumberjack, use the [Google group](http://groups.google.com/group/cocoalumberjack) or StackOverflow (use [#lumberjack](http://stackoverflow.com/questions/tagged/lumberjack)).
-
 ### Documentation
-- **[Get started using Lumberjack](https://github.com/CocoaLumberjack/CocoaLumberjack/wiki/GettingStarted)**<br/>
-- [Different log levels for Debug and Release builds](https://github.com/CocoaLumberjack/CocoaLumberjack/wiki/XcodeTricks)<br/>
-- [Different log levels for each logger](https://github.com/CocoaLumberjack/CocoaLumberjack/wiki/PerLoggerLogLevels)<br/>
-- [Use colors in the Xcode debugging console](https://github.com/CocoaLumberjack/CocoaLumberjack/wiki/XcodeColors)<br/>
-- [Write your own custom formatters](https://github.com/CocoaLumberjack/CocoaLumberjack/wiki/CustomFormatters)<br/>
-- [FAQ](https://github.com/CocoaLumberjack/CocoaLumberjack/wiki/FAQ)<br/>
-- [Analysis of performance with benchmarks](https://github.com/CocoaLumberjack/CocoaLumberjack/wiki/Performance)<br/>
-- [Common issues you may encounter and their solutions](https://github.com/CocoaLumberjack/CocoaLumberjack/wiki/ProblemSolution)<br/>
-- [AppCode support](https://github.com/CocoaLumberjack/CocoaLumberjack/wiki/AppCode-support)
-- **[full Lumberjack wiki](https://github.com/CocoaLumberjack/CocoaLumberjack/wiki)**<br/>
+
+- **[Get started using Lumberjack](Documentation/GettingStarted.md)**<br/>
+- [Different log levels for Debug and Release builds](Documentation/XcodeTricks.md)<br/>
+- [Different log levels for each logger](Documentation/PerLoggerLogLevels.md)<br/>
+- [Use colors in the Xcode debugging console](Documentation/XcodeColors.md)<br/>
+- [Write your own custom formatters](Documentation/CustomFormatters.md)<br/>
+- [FAQ](Documentation/FAQ.md)<br/>
+- [Analysis of performance with benchmarks](Documentation/Performance.md)<br/>
+- [Common issues you may encounter and their solutions](Documentation/ProblemSolution.md)<br/>
+- [AppCode support](Documentation/AppCode-support.md)
+- **[Full Lumberjack documentation](Documentation/)**<br/>
 
 ### Requirements 
 - Xcode 4.4 or later is required
