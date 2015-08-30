@@ -55,14 +55,14 @@ public enum UIOperationError: ErrorType {
 }
 
 
-public class UIOperation<C, F where C: UIViewController, F: PresentingViewController>: Operation {
+public class UIOperation<C, From where C: UIViewController, From: PresentingViewController>: Operation {
 
     let controller: C
-    let from: ViewControllerDisplayStyle<F>
+    let from: ViewControllerDisplayStyle<From>
     let sender: AnyObject?
     let completion: (() -> Void)?
 
-    public init(controller: C, displayControllerFrom from: ViewControllerDisplayStyle<F>, sender: AnyObject? = .None, completion: (() -> Void)? = .None) {
+    public init(controller: C, displayControllerFrom from: ViewControllerDisplayStyle<From>, sender: AnyObject? = .None, completion: (() -> Void)? = .None) {
         self.controller = controller
         self.from = from
         self.sender = sender

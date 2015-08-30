@@ -23,7 +23,7 @@ enum UserConfirmationError: ErrorType {
     Attach this condition to an operation to present an alert
     to the user requesting their confirmation before proceeding.
 */
-public class UserConfirmationCondition<F: PresentingViewController>: OperationCondition {
+public class UserConfirmationCondition<From: PresentingViewController>: OperationCondition {
 
     public let name: String
     public let isMutuallyExclusive = false
@@ -31,11 +31,11 @@ public class UserConfirmationCondition<F: PresentingViewController>: OperationCo
     private let action: String
     private let isDestructive: Bool
     private let cancelAction: String
-    private var alert: AlertOperation<F>
+    private var alert: AlertOperation<From>
     private var confirmation: UserConfirmationResult = .Unknown
     private var alertOperationErrors = [ErrorType]()
 
-    public init(title: String, message: String? = .None, action: String, isDestructive: Bool = true, cancelAction: String = NSLocalizedString("Cancel", comment: "Cancel"), presentConfirmationFrom from: F) {
+    public init(title: String, message: String? = .None, action: String, isDestructive: Bool = true, cancelAction: String = NSLocalizedString("Cancel", comment: "Cancel"), presentConfirmationFrom from: From) {
         self.action = action
         self.isDestructive = isDestructive
         self.cancelAction = cancelAction

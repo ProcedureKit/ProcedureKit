@@ -8,9 +8,9 @@
 
 import UIKit
 
-public class AlertOperation<F: PresentingViewController>: Operation {
+public class AlertOperation<From: PresentingViewController>: Operation {
 
-    private var ui: UIOperation<UIAlertController, F>
+    private var ui: UIOperation<UIAlertController, From>
 
     public var title: String? {
         get {
@@ -31,11 +31,8 @@ public class AlertOperation<F: PresentingViewController>: Operation {
         }
     }
 
-    public init(presentAlertFrom from: F) {
-
+    public init(presentAlertFrom from: From) {
         ui = UIOperation(controller: UIAlertController(title: .None, message: .None, preferredStyle: .Alert), displayControllerFrom: .Present(from))
-
-
         super.init()
         addCondition(AlertPresentation())
         addCondition(MutuallyExclusive<UIViewController>())

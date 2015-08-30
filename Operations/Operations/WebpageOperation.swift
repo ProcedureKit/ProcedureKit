@@ -10,17 +10,17 @@ import Foundation
 import SafariServices
 
 @available(iOS 9.0, *)
-public protocol WebpageController: class {
+protocol WebpageController: class {
     weak var delegate: SFSafariViewControllerDelegate? { get set }
     init(URL: NSURL, entersReaderIfAvailable: Bool)
 }
 
 @available(iOS 9.0, *)
-public class WebpageOperation<F: PresentingViewController>: Operation, SFSafariViewControllerDelegate {
+public class WebpageOperation<From: PresentingViewController>: Operation, SFSafariViewControllerDelegate {
 
-    let operation: UIOperation<SFSafariViewController, F>
+    let operation: UIOperation<SFSafariViewController, From>
 
-    public init(url: NSURL, displayControllerFrom from: ViewControllerDisplayStyle<F>, sender: AnyObject? = .None, completion: (() -> Void)? = .None) {
+    public init(url: NSURL, displayControllerFrom from: ViewControllerDisplayStyle<From>, sender: AnyObject? = .None, completion: (() -> Void)? = .None) {
         operation = UIOperation(controller: SFSafariViewController(URL: url, entersReaderIfAvailable: true), displayControllerFrom: from, sender: sender, completion: completion)
         super.init()
         addCondition(MutuallyExclusive<UIViewController>())
