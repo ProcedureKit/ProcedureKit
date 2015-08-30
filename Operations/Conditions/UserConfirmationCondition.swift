@@ -8,22 +8,22 @@
 
 import UIKit
 
+enum UserConfirmationResult {
+    case Unknown
+    case Confirmed
+    case Cancelled
+}
+
+enum UserConfirmationError: ErrorType {
+    case ConfirmationUnknown
+    case ConfirmationCancelled
+}
+
 /**
     Attach this condition to an operation to present an alert
     to the user requesting their confirmation before proceeding.
 */
-public class UserConfirmationCondition: OperationCondition {
-
-    enum Confirmation {
-        case Unknown
-        case Confirmed
-        case Cancelled
-    }
-
-    enum Error: ErrorType {
-        case ConfirmationUnknown
-        case ConfirmationCancelled
-    }
+public class UserConfirmationCondition<F: PresentingViewController>: OperationCondition {
 
     public let name: String
     public let isMutuallyExclusive = false
@@ -31,15 +31,15 @@ public class UserConfirmationCondition: OperationCondition {
     private let action: String
     private let isDestructive: Bool
     private let cancelAction: String
-    private var alert: AlertOperation
-    private var confirmation: Confirmation = .Unknown
+    private var alert: AlertOperation<F>
+    private var confirmation: UserConfirmationResult = .Unknown
     private var alertOperationErrors = [ErrorType]()
 
-    public init(title: String, message: String? = .None, action: String, isDestructive: Bool = true, cancelAction: String = NSLocalizedString("Cancel", comment: "Cancel"), presentingController: PresentingViewController? = .None) {
+    public init(title: String, message: String? = .None, action: String, isDestructive: Bool = true, cancelAction: String = NSLocalizedString("Cancel", comment: "Cancel"), presentConfirmationFrom from: F) {
         self.action = action
         self.isDestructive = isDestructive
         self.cancelAction = cancelAction
-        self.alert = AlertOperation(presentFromController: presentingController)
+        self.alert = AlertOperation(presentAlertFrom: from)
         self.alert.title = title
         self.alert.message = message
         self.name = "UserConfirmationCondition(\(title))"
@@ -59,15 +59,10 @@ public class UserConfirmationCondition: OperationCondition {
     public func evaluateForOperation(operation: Operation, completion: OperationConditionResult -> Void) {
         switch confirmation {
         case .Unknown:
-            if let alertError = alertOperationErrors.first as? AlertOperation.Error {
-                completion(.Failed(alertError))
-            }
-            else {
-                // This should never happen, but you never know.
-                completion(.Failed(Error.ConfirmationUnknown))
-            }
+            // This should never happen, but you never know.
+            completion(.Failed(UserConfirmationError.ConfirmationUnknown))
         case .Cancelled:
-            completion(.Failed(Error.ConfirmationCancelled))
+            completion(.Failed(UserConfirmationError.ConfirmationCancelled))
         case .Confirmed:
             completion(.Satisfied)
         }

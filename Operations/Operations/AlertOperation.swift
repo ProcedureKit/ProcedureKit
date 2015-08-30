@@ -8,40 +8,34 @@
 
 import UIKit
 
-public protocol PresentingViewController: class {
-    func presentViewController(viewController: UIViewController, animated: Bool, completion: (() -> Void)?)
-}
+public class AlertOperation<F: PresentingViewController>: Operation {
 
-public class AlertOperation: Operation {
-
-    public enum Error: ErrorType {
-        case PresentationViewControllerNotSet
-    }
-
-    private let controller = UIAlertController(title: .None, message: .None, preferredStyle: .Alert)
-    private let presentingController: PresentingViewController?
+    private var ui: UIOperation<UIAlertController, F>
 
     public var title: String? {
         get {
-            return controller.title
+            return ui.controller.title
         }
         set {
-            controller.title = newValue
+            ui.controller.title = newValue
             name = newValue
         }
     }
 
     public var message: String? {
         get {
-            return controller.message
+            return ui.controller.message
         }
         set {
-            controller.message = newValue
+            ui.controller.message = newValue
         }
     }
 
-    public init(presentFromController: PresentingViewController? = UIApplication.sharedApplication().keyWindow?.rootViewController) {
-        self.presentingController = presentFromController
+    public init(presentAlertFrom from: F) {
+
+        ui = UIOperation(controller: UIAlertController(title: .None, message: .None, preferredStyle: .Alert), displayControllerFrom: .Present(from))
+
+
         super.init()
         addCondition(AlertPresentation())
         addCondition(MutuallyExclusive<UIViewController>())
@@ -54,24 +48,14 @@ public class AlertOperation: Operation {
             }
             self?.finish()
         }
-        controller.addAction(action)
+        ui.controller.addAction(action)
     }
 
     public override func execute() {
-        if let presentingController = presentingController {
-
-            if controller.actions.isEmpty {
-                addActionWithTitle(NSLocalizedString("Okay", comment: "Okay"))
-            }
-
-            dispatch_async(Queue.Main.queue) {
-                presentingController.presentViewController(self.controller, animated: true, completion: nil)
-            }
+        if ui.controller.actions.isEmpty {
+            addActionWithTitle(NSLocalizedString("Okay", comment: "Okay"))
         }
-        else {
-            finish(Error.PresentationViewControllerNotSet)
-        }
+        produceOperation(ui)
     }
 }
 
-extension UIViewController: PresentingViewController { }

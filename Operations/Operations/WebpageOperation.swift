@@ -10,38 +10,28 @@ import Foundation
 import SafariServices
 
 @available(iOS 9.0, *)
-class WebpageOperation: Operation {
+public protocol WebpageController: class {
+    weak var delegate: SFSafariViewControllerDelegate? { get set }
+    init(URL: NSURL, entersReaderIfAvailable: Bool)
+}
 
-    let url: NSURL
-    let presentingViewController: UIViewController?
+@available(iOS 9.0, *)
+public class WebpageOperation<F: PresentingViewController>: Operation, SFSafariViewControllerDelegate {
 
-    init(url: NSURL, presentingViewController: UIViewController? = UIApplication.sharedApplication().keyWindow?.rootViewController) {
-        self.url = url
-        self.presentingViewController = presentingViewController
+    let operation: UIOperation<SFSafariViewController, F>
+
+    public init(url: NSURL, displayControllerFrom from: ViewControllerDisplayStyle<F>, sender: AnyObject? = .None, completion: (() -> Void)? = .None) {
+        operation = UIOperation(controller: SFSafariViewController(URL: url, entersReaderIfAvailable: true), displayControllerFrom: from, sender: sender, completion: completion)
         super.init()
         addCondition(MutuallyExclusive<UIViewController>())
     }
 
-    override func execute() {
-        dispatch_async(Queue.Main.queue, showSafariViewController)
+    public override func execute() {
+        operation.controller.delegate = self
+        produceOperation(operation)
     }
-
-    private func showSafariViewController() {
-        if let presentingViewController = presentingViewController {
-            let safari = SFSafariViewController(URL: url, entersReaderIfAvailable: true)
-            safari.delegate = self
-            presentingViewController.presentViewController(safari, animated: true, completion: nil)
-        }
-        else {
-            finish()
-        }
-    }
-}
-
-@available(iOS 9.0, *)
-extension WebpageOperation: SFSafariViewControllerDelegate {
-
-    func safariViewControllerDidFinish(controller: SFSafariViewController) {
+    
+    @objc public func safariViewControllerDidFinish(controller: SFSafariViewController) {
         controller.dismissViewControllerAnimated(true) {
             self.finish()
         }
