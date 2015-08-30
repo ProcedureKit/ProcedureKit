@@ -58,3 +58,54 @@ extension Dictionary {
     }
 }
 
+
+// MARK: - Thread Safety
+
+protocol ReadWriteLock {
+    func read<T>(block: () -> T) -> T
+    mutating func write(block: dispatch_block_t)
+    mutating func write(block: dispatch_block_t, completion: dispatch_block_t?)
+}
+
+struct Lock: ReadWriteLock {
+    let queue = Queue.Default.concurrent("me.danthorpe.Operations.lock")
+
+    func read<T>(block: () -> T) -> T {
+        var result: T!
+        dispatch_sync(queue) {
+            result = block()
+        }
+        return result
+    }
+
+    mutating func write(block: dispatch_block_t) {
+        write(block, completion: .None)
+    }
+
+    func write(block: dispatch_block_t, completion: dispatch_block_t? = .None) {
+        dispatch_barrier_async(queue) {
+            block()
+            if let completion = completion {
+                dispatch_async(Queue.Main.queue, completion)
+            }
+        }
+    }
+}
+
+public class Protector<T> {
+    private var lock: ReadWriteLock = Lock()
+    private var ward: T
+
+    public init(_ ward: T) {
+        self.ward = ward
+    }
+
+    public func read<U>(block: T -> U) -> U {
+        return lock.read { [ward = self.ward] in block(ward) }
+    }
+
+    public func write(block: (inout T) -> Void) {
+        lock.write({ block(&self.ward) })
+    }
+}
+

@@ -1,6 +1,5 @@
 //
 //  PureLayoutDefines.h
-//  v2.0.5
 //  https://github.com/smileyborg/PureLayout
 //
 //  Copyright (c) 2014-2015 Tyler Fox
@@ -40,7 +39,26 @@
 #define __PureLayout_MinSysVer_iOS_8_0                    (TARGET_OS_IPHONE && floor(NSFoundationVersionNumber) > NSFoundationVersionNumber_iOS_7_1)
 #define __PureLayout_MinSysVer_OSX_10_9                   (!TARGET_OS_IPHONE && floor(NSFoundationVersionNumber) > NSFoundationVersionNumber10_8_4)
 
-// Define generic AL-prefixed macros for the types/constants/etc that have slight naming variations across iOS and OS X, which allows the same code to be platform-independent
+// Define some preprocessor macros that allow nullability annotations to be adopted in a backwards-compatible manner.
+#if __has_feature(nullability)
+#   define __PL_ASSUME_NONNULL_BEGIN        NS_ASSUME_NONNULL_BEGIN
+#   define __PL_ASSUME_NONNULL_END          NS_ASSUME_NONNULL_END
+#else
+#   define __PL_ASSUME_NONNULL_BEGIN
+#   define __PL_ASSUME_NONNULL_END
+#endif
+
+// Define some preprocessor macros that allow generics to be adopted in a backwards-compatible manner.
+#if __has_feature(objc_generics)
+#   define __PL_GENERICS(class, ...)        class<__VA_ARGS__>
+#else
+#   define __PL_GENERICS(class, ...)        class
+#endif
+
+// Using generics with NSArray is so common in PureLayout that it gets a dedicated preprocessor macro for better readability.
+#define __NSArray_of(type)                  __PL_GENERICS(NSArray, type)
+
+// Define generic AL-prefixed macros for the types/constants/etc that have slight naming variations across iOS and OS X, which allows the same code to be platform-independent.
 #if TARGET_OS_IPHONE
 #   import <UIKit/UIKit.h>
 #   define ALView                                      UIView
@@ -108,9 +126,9 @@ typedef NS_ENUM(NSInteger, ALDimension) {
 
 /** Constants that represent axes of a view. */
 typedef NS_ENUM(NSInteger, ALAxis) {
-    /** A vertical line through the middle of the view's left and right edges. */
+    /** A vertical line equidistant from the view's left and right edges. */
     ALAxisVertical = NSLayoutAttributeCenterX,
-    /** A horizontal line through the middle of the view's top and bottom edges. */
+    /** A horizontal line equidistant from the view's top and bottom edges. */
     ALAxisHorizontal = NSLayoutAttributeCenterY,
     
     /** A horizontal line at the baseline of the last line of text in the view. (For views that do not draw text, will be equivalent to ALEdgeBottom.) Same as ALAxisLastBaseline. */
@@ -143,9 +161,9 @@ typedef NS_ENUM(NSInteger, ALMargin) {
 
 /** Constants that represent axes of the layout margins of a view. Available in iOS 8.0 and later. */
 typedef NS_ENUM(NSInteger, ALMarginAxis) {
-    /** A vertical line through the middle of the view's left and right margins. */
+    /** A vertical line equidistant from the view's left and right margins. */
     ALMarginAxisVertical = NSLayoutAttributeCenterXWithinMargins,
-    /** A horizontal line through the middle of the view's top and bottom margins. */
+    /** A horizontal line equidistant from the view's top and bottom margins. */
     ALMarginAxisHorizontal = NSLayoutAttributeCenterYWithinMargins
 };
 
@@ -170,9 +188,9 @@ typedef NS_ENUM(NSInteger, ALAttribute) {
     ALAttributeWidth = ALDimensionWidth,
     /** The height of the view. */
     ALAttributeHeight = ALDimensionHeight,
-    /** A vertical line through the middle of the view's left and right edges. */
+    /** A vertical line equidistant from the view's left and right edges. */
     ALAttributeVertical = ALAxisVertical,
-    /** A horizontal line through the middle of the view's top and bottom edges. */
+    /** A horizontal line equidistant from the view's top and bottom edges. */
     ALAttributeHorizontal = ALAxisHorizontal,
     /** A horizontal line at the baseline of the last line of text in the view. (For views that do not draw text, will be equivalent to ALEdgeBottom.) Same as ALAxisLastBaseline. */
     ALAttributeBaseline = ALAxisBaseline,
@@ -193,9 +211,9 @@ typedef NS_ENUM(NSInteger, ALAttribute) {
     ALAttributeMarginLeading = ALMarginLeading,
     /** The trailing margin of the view, based on the view's layoutMargins left/right (depending on language direction) inset. */
     ALAttributeMarginTrailing = ALMarginTrailing,
-    /** A vertical line through the middle of the view's left and right margins. */
+    /** A vertical line equidistant from the view's left and right margins. */
     ALAttributeMarginAxisVertical = ALMarginAxisVertical,
-    /** A horizontal line through the middle of the view's top and bottom margins. */
+    /** A horizontal line equidistant from the view's top and bottom margins. */
     ALAttributeMarginAxisHorizontal = ALMarginAxisHorizontal
 #endif /* __PureLayout_MinBaseSDK_iOS_8_0 */
 };
