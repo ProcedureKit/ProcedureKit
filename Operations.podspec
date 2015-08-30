@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name              = "Operations"
-  s.version           = "0.11.0"
+  s.version           = "0.11.1"
   s.summary           = "Powerful NSOperation subclasses in Swift."
   s.description       = <<-DESC
   
@@ -29,8 +29,8 @@ session Advanced NSOperations: https://developer.apple.com/videos/wwdc/2015/?id=
   end
 
   s.subspec '+Extras' do |ss|
-    ss.dependency 'Operations/Base'    
-    ss.source_files   = 'Operations/Extras/**/*.{swift,m,h}'
+    ss.dependency 'Operations/+AddressBook'
   end
+
 end
 
