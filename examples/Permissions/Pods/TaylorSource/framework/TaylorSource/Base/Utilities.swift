@@ -12,12 +12,12 @@ enum Queue {
 
     private var id: Int {
         switch self {
-        case .Main: return Int(qos_class_main().value)
-        case .UserInteractive: return Int(QOS_CLASS_USER_INTERACTIVE.value)
-        case .UserInitiated: return Int(QOS_CLASS_USER_INITIATED.value)
-        case .Default: return Int(QOS_CLASS_DEFAULT.value)
-        case .Utility: return Int(QOS_CLASS_UTILITY.value)
-        case .Background: return Int(QOS_CLASS_BACKGROUND.value)
+        case .Main: return Int(qos_class_main().rawValue)
+        case .UserInteractive: return Int(QOS_CLASS_USER_INTERACTIVE.rawValue)
+        case .UserInitiated: return Int(QOS_CLASS_USER_INITIATED.rawValue)
+        case .Default: return Int(QOS_CLASS_DEFAULT.rawValue)
+        case .Utility: return Int(QOS_CLASS_UTILITY.rawValue)
+        case .Background: return Int(QOS_CLASS_BACKGROUND.rawValue)
         }
     }
 

@@ -4,5 +4,6 @@ inhibit_all_warnings!
 use_frameworks!
 
 pod 'PureLayout'
-pod 'TaylorSource/YapDatabase'
+pod 'YapDatabaseExtensions', :git => 'https://github.com/danthorpe/YapDatabaseExtensions.git', :branch => 'swift_2.0'
+pod 'TaylorSource/YapDatabase', :git => 'https://github.com/danthorpe/TaylorSource.git', :branch => 'swift_2.0'
 pod 'Operations', :path => '../../'

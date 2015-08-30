@@ -4,11 +4,6 @@
 
 import YapDatabase
 
-public protocol UpdatableView {
-    typealias ProcessChangesType
-    var processChanges: ProcessChangesType { get }
-}
-
 public struct YapDBCellIndex: IndexPathIndexType {
     public let indexPath: NSIndexPath
     public let transaction: YapDatabaseReadTransaction
@@ -41,93 +36,88 @@ public class YapDBFactory<
     }
 }
 
+
 // MARK: - UpdatableView
 
-extension UITableView: UpdatableView {
+extension UITableView {
 
-    public var processChanges: YapDatabaseViewMappings.Changes {
-        return { [weak self] changeset in
-            if let weakSelf = self {
-                weakSelf.beginUpdates()
-                weakSelf.processSectionChanges(changeset.sections)
-                weakSelf.processRowChanges(changeset.items)
-                weakSelf.endUpdates()
+    public func processChanges(changeset: YapDatabaseViewMappings.Changeset) {
+
+        func processSectionChanges(sectionChanges: [YapDatabaseViewSectionChange]) {
+            for change in sectionChanges {
+                let indexes = NSIndexSet(index: Int(change.index))
+                switch change.type {
+                case .Delete:
+                    deleteSections(indexes, withRowAnimation: .Automatic)
+                case .Insert:
+                    insertSections(indexes, withRowAnimation: .Automatic)
+                default:
+                    break
+                }
             }
         }
-    }
 
-    func processSectionChanges(sectionChanges: [YapDatabaseViewSectionChange]) {
-        for change in sectionChanges {
-            let indexes = NSIndexSet(index: Int(change.index))
-            switch change.type {
-            case .Delete:
-                deleteSections(indexes, withRowAnimation: .Automatic)
-            case .Insert:
-                insertSections(indexes, withRowAnimation: .Automatic)
-            default:
-                break
+        func processRowChanges(rowChanges: [YapDatabaseViewRowChange]) {
+            for change in rowChanges {
+                switch change.type {
+                case .Delete:
+                    deleteRowsAtIndexPaths([change.indexPath], withRowAnimation: .Automatic)
+                case .Insert:
+                    insertRowsAtIndexPaths([change.newIndexPath], withRowAnimation: .Automatic)
+                case .Move:
+                    deleteRowsAtIndexPaths([change.indexPath], withRowAnimation: .Automatic)
+                    insertRowsAtIndexPaths([change.newIndexPath], withRowAnimation: .Automatic)
+                case .Update:
+                    reloadRowsAtIndexPaths([change.indexPath], withRowAnimation: .Automatic)
+                }
             }
         }
-    }
 
-    func processRowChanges(rowChanges: [YapDatabaseViewRowChange]) {
-        for change in rowChanges {
-            switch change.type {
-            case .Delete:
-                deleteRowsAtIndexPaths([change.indexPath], withRowAnimation: .Automatic)
-            case .Insert:
-                insertRowsAtIndexPaths([change.newIndexPath], withRowAnimation: .Automatic)
-            case .Move:
-                deleteRowsAtIndexPaths([change.indexPath], withRowAnimation: .Automatic)
-                insertRowsAtIndexPaths([change.newIndexPath], withRowAnimation: .Automatic)
-            case .Update:
-                reloadRowsAtIndexPaths([change.indexPath], withRowAnimation: .Automatic)
-            }
-        }
+        beginUpdates()
+        processSectionChanges(changeset.sections)
+        processRowChanges(changeset.items)
+        endUpdates()
     }
 }
 
-extension UICollectionView: UpdatableView {
+extension UICollectionView {
 
-    public var processChanges: YapDatabaseViewMappings.Changes {
-        return { [weak self] changeset in
-            if let weakSelf = self {
-                weakSelf.performBatchUpdates({
-                    weakSelf.processSectionChanges(changeset.sections)
-                    weakSelf.processItemChanges(changeset.items)
-                }, completion: nil)
+    public func processChanges(changeset: YapDatabaseViewMappings.Changeset) {
+
+        func processSectionChanges(sectionChanges: [YapDatabaseViewSectionChange]) {
+            for change in sectionChanges {
+                let indexes = NSIndexSet(index: Int(change.index))
+                switch change.type {
+                case .Delete:
+                    deleteSections(indexes)
+                case .Insert:
+                    insertSections(indexes)
+                default:
+                    break
+                }
             }
         }
-    }
 
-    func processSectionChanges(sectionChanges: [YapDatabaseViewSectionChange]) {
-        for change in sectionChanges {
-            let indexes = NSIndexSet(index: Int(change.index))
-            switch change.type {
-            case .Delete:
-                deleteSections(indexes)
-            case .Insert:
-                insertSections(indexes)
-            default:
-                break
+        func processItemChanges(itemChanges: [YapDatabaseViewRowChange]) {
+            for change in itemChanges {
+                switch change.type {
+                case .Delete:
+                    deleteItemsAtIndexPaths([change.indexPath])
+                case .Insert:
+                    insertItemsAtIndexPaths([change.newIndexPath])
+                case .Move:
+                    deleteItemsAtIndexPaths([change.indexPath])
+                    insertItemsAtIndexPaths([change.newIndexPath])
+                case .Update:
+                    reloadItemsAtIndexPaths([change.indexPath])
+                }
             }
         }
-    }
 
-    func processItemChanges(itemChanges: [YapDatabaseViewRowChange]) {
-        for change in itemChanges {
-            switch change.type {
-            case .Delete:
-                deleteItemsAtIndexPaths([change.indexPath])
-            case .Insert:
-                insertItemsAtIndexPaths([change.newIndexPath])
-            case .Move:
-                deleteItemsAtIndexPaths([change.indexPath])
-                insertItemsAtIndexPaths([change.newIndexPath])
-            case .Update:
-                reloadItemsAtIndexPaths([change.indexPath])
-            }
-        }
+        performBatchUpdates({
+            processSectionChanges(changeset.sections)
+            processItemChanges(changeset.items)
+        }, completion: nil)
     }
 }
 

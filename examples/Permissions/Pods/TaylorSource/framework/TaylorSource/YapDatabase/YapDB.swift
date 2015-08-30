@@ -23,8 +23,8 @@ public struct Configuration<T> {
     
         let config: Configuration<Event> = Configuration(fetch: events()) { valueFromArchive($0) }
 
-    :param: fetch A YapDB.FetchConfiguration value. This is essentially the View extension with mappings configure block.
-    :param: itemMapper A closure which is used to strongly type data coming out of YapDatabase.
+    - parameter fetch: A YapDB.FetchConfiguration value. This is essentially the View extension with mappings configure block.
+    - parameter itemMapper: A closure which is used to strongly type data coming out of YapDatabase.
     */
     public init(fetch: YapDB.FetchConfiguration, itemMapper i: DataItemMapper) {
         fetchConfiguration = fetch
@@ -45,7 +45,7 @@ It implements SequenceType, and Int based CollectionType.
 
 It has an NSIndexPath based API for accessing items.
 */
-public struct Mapper<T>: SequenceType, CollectionType, Sliceable {
+public struct Mapper<T>: SequenceType, CollectionType {
 
     let readOnlyConnection: YapDatabaseConnection
     var configuration: Configuration<T>
@@ -71,10 +71,6 @@ public struct Mapper<T>: SequenceType, CollectionType, Sliceable {
         return itemAtIndexPath(mappings[i])!
     }
 
-    public subscript(bounds: Range<Int>) -> [T] {
-        return mappings[bounds].map { self.itemAtIndexPath($0)! }
-    }
-
     /**
     Initialiser for Mapper<T>. During initialization, the 
     YapDatabaseViewMappings is created (and registered in the database).
@@ -83,8 +79,8 @@ public struct Mapper<T>: SequenceType, CollectionType, Sliceable {
     
     On said transaction, the mappings object is updated.
     
-    :param: database The YapDatabase instance.
-    :param: configuration A Configuration<T> value.
+    - parameter database: The YapDatabase instance.
+    - parameter configuration: A Configuration<T> value.
     */
     public init(database: YapDatabase, configuration c: Configuration<T>) {
         configuration = c
@@ -113,8 +109,8 @@ public struct Mapper<T>: SequenceType, CollectionType, Sliceable {
     /**
     Returns a closure which will access the item at the index path in a provided read transaction.
     
-    :param: indexPath The NSIndexPath to look up the item.
-    :returns: (YapDatabaseReadTransaction) -> T? closure.
+    - parameter indexPath: The NSIndexPath to look up the item.
+    - returns: (YapDatabaseReadTransaction) -> T? closure.
     */
     public func itemInTransactionAtIndexPath(indexPath: NSIndexPath) -> (YapDatabaseReadTransaction) -> T? {
         return { transaction in self.fetch(inTransaction: transaction, atIndexPath: indexPath) }
@@ -123,8 +119,8 @@ public struct Mapper<T>: SequenceType, CollectionType, Sliceable {
     /**
     Returns a closure which will access the item in a read transaction at the provided index path.
 
-    :param: transaction A YapDatabaseReadTransaction
-    :returns: (NSIndexPath) -> T? closure.
+    - parameter transaction: A YapDatabaseReadTransaction
+    - returns: (NSIndexPath) -> T? closure.
     */
     public func itemAtIndexPathInTransaction(transaction: YapDatabaseReadTransaction) -> (NSIndexPath) -> T? {
         return { indexPath in self.fetch(inTransaction: transaction, atIndexPath: indexPath) }
@@ -133,8 +129,8 @@ public struct Mapper<T>: SequenceType, CollectionType, Sliceable {
     /**
     Gets the item at the index path, using the internal readOnlyTransaction.
 
-    :param: indexPath A NSIndexPath
-    :returns: An optional T
+    - parameter indexPath: A NSIndexPath
+    - returns: An optional T
     */
     public func itemAtIndexPath(indexPath: NSIndexPath) -> T? {
         return readOnlyConnection.read(itemInTransactionAtIndexPath(indexPath))
@@ -143,9 +139,9 @@ public struct Mapper<T>: SequenceType, CollectionType, Sliceable {
     /**
     Gets the item at the index path, using a provided read transaction.
 
-    :param: indexPath A NSIndexPath
-    :param: transaction A YapDatabaseReadTransaction
-    :returns: An optional T
+    - parameter indexPath: A NSIndexPath
+    - parameter transaction: A YapDatabaseReadTransaction
+    - returns: An optional T
     */
     public func itemAtIndexPath(indexPath: NSIndexPath, inTransaction transaction: YapDatabaseReadTransaction) -> T? {
         return fetch(inTransaction: transaction, atIndexPath: indexPath)
@@ -154,9 +150,9 @@ public struct Mapper<T>: SequenceType, CollectionType, Sliceable {
     /**
     Reverse looks up the NSIndexPath for a key in a collection.
 
-    :param: key A String
-    :param: collection A String
-    :returns: An optional NSIndexPath
+    - parameter key: A String
+    - parameter collection: A String
+    - returns: An optional NSIndexPath
     */
     public func indexPathForKey(key: String, inCollection collection: String) -> NSIndexPath? {
         return readOnlyConnection.read { transaction in
@@ -167,9 +163,9 @@ public struct Mapper<T>: SequenceType, CollectionType, Sliceable {
         }
     }
 
-    public func generate() -> GeneratorOf<T> {
-        var mappingsGenerator = mappings.generate()
-        return GeneratorOf {
+    public func generate() -> AnyGenerator<T> {
+        let mappingsGenerator = mappings.generate()
+        return anyGenerator {
             if let indexPath = mappingsGenerator.next() {
                 return self.itemAtIndexPath(indexPath)
             }
@@ -217,8 +213,8 @@ public struct Observer<T> {
     When YapDatabase posts a notification, the Observer posts it's update
     block through a concurrent queue using a dispatch_barrier_async.
     
-    :param: database The YapDatabase instance.
-    :param: update An update block, see extension on YapDatabaseViewMappings.
+    - parameter database: The YapDatabase instance.
+    - parameter update: An update block, see extension on YapDatabaseViewMappings.
     :configuration: A Configuration<T> instance.
     */
     public init(database db: YapDatabase, changes c: YapDatabaseViewMappings.Changes, configuration: Configuration<T>) {
@@ -279,8 +275,8 @@ public struct Observer<T> {
     /**
     Returns a closure which will access the item at the index path in a provided read transaction.
 
-    :param: indexPath The NSIndexPath to look up the item.
-    :returns: (YapDatabaseReadTransaction) -> T? closure.
+    - parameter indexPath: The NSIndexPath to look up the item.
+    - returns: (YapDatabaseReadTransaction) -> T? closure.
     */
     public func itemInTransactionAtIndexPath(indexPath: NSIndexPath) -> (YapDatabaseReadTransaction) -> T? {
         return mapper.itemInTransactionAtIndexPath(indexPath)
@@ -289,8 +285,8 @@ public struct Observer<T> {
     /**
     Returns a closure which will access the item in a read transaction at the provided index path.
 
-    :param: transaction A YapDatabaseReadTransaction
-    :returns: (NSIndexPath) -> T? closure.
+    - parameter transaction: A YapDatabaseReadTransaction
+    - returns: (NSIndexPath) -> T? closure.
     */
     public func itemAtIndexPathInTransaction(transaction: YapDatabaseReadTransaction) -> (NSIndexPath) -> T? {
         return mapper.itemAtIndexPathInTransaction(transaction)
@@ -299,8 +295,8 @@ public struct Observer<T> {
     /**
     Gets the item at the index path, using the internal readOnlyTransaction.
 
-    :param: indexPath A NSIndexPath
-    :returns: An optional T
+    - parameter indexPath: A NSIndexPath
+    - returns: An optional T
     */
     public func itemAtIndexPath(indexPath: NSIndexPath) -> T? {
         return mapper.itemAtIndexPath(indexPath)
@@ -309,9 +305,9 @@ public struct Observer<T> {
     /**
     Gets the item at the index path, using a provided read transaction.
 
-    :param: indexPath A NSIndexPath
-    :param: transaction A YapDatabaseReadTransaction
-    :returns: An optional T
+    - parameter indexPath: A NSIndexPath
+    - parameter transaction: A YapDatabaseReadTransaction
+    - returns: An optional T
     */
     public func itemAtIndexPath(indexPath: NSIndexPath, inTransaction transaction: YapDatabaseReadTransaction) -> T? {
         return mapper.itemAtIndexPath(indexPath, inTransaction: transaction)
@@ -320,9 +316,9 @@ public struct Observer<T> {
     /**
     Reverse looks up the NSIndexPath for a key in a collection.
 
-    :param: key A String
-    :param: collection A String
-    :returns: An optional NSIndexPath
+    - parameter key: A String
+    - parameter collection: A String
+    - returns: An optional NSIndexPath
     */
     public func indexPathForKey(key: String, inCollection collection: String) -> NSIndexPath? {
         return mapper.indexPathForKey(key, inCollection: collection)
@@ -331,9 +327,9 @@ public struct Observer<T> {
 
 extension Observer: SequenceType {
 
-    public func generate() -> GeneratorOf<T> {
-        var mappingsGenerator = mappings.generate()
-        return GeneratorOf { () -> T? in
+    public func generate() -> AnyGenerator<T> {
+        let mappingsGenerator = mappings.generate()
+        return anyGenerator { () -> T? in
             if let indexPath = mappingsGenerator.next() {
                 return self.itemAtIndexPath(indexPath)
             }
@@ -354,13 +350,6 @@ extension Observer: CollectionType {
 
     public subscript(i: Int) -> T {
         return mapper[i]
-    }
-}
-
-extension Observer: Sliceable {
-
-    public subscript(bounds: Range<Int>) -> [T] {
-        return mapper[bounds]
     }
 }
 
@@ -385,10 +374,10 @@ Implements SequenceType with NSIndexPath elements.
 */
 extension YapDatabaseViewMappings: SequenceType {
 
-    public func generate() -> GeneratorOf<NSIndexPath> {
+    public func generate() -> AnyGenerator<NSIndexPath> {
         let countSections = Int(numberOfSections())
         var next = (section: 0, item: 0)
-        return GeneratorOf {
+        return anyGenerator {
             let countItemsInSection = Int(self.numberOfItemsInSection(UInt(next.section)))
             if next.item < countItemsInSection {
                 return NSIndexPath(forItem: next.item++, inSection: next.section)
@@ -423,7 +412,7 @@ extension YapDatabaseViewMappings: CollectionType {
             var (section, item, accumulator, remainder, target) = (0, 0, 0, i, i)
 
             while accumulator < target {
-                var count = Int(numberOfItemsInSection(UInt(section)))
+                let count = Int(numberOfItemsInSection(UInt(section)))
                 if (accumulator + count - 1) < target {
                     accumulator += count
                     remainder -= count
@@ -437,16 +426,6 @@ extension YapDatabaseViewMappings: CollectionType {
             item = remainder
 
             return NSIndexPath(forItem: item, inSection: section)
-        }
-    }
-}
-
-extension YapDatabaseViewMappings: Sliceable {
-
-    public subscript(bounds: Range<Int>) -> [NSIndexPath] {
-        return reduce(bounds, Array<NSIndexPath>()) { (var acc, index) in
-            acc.append(self[index])
-            return acc
         }
     }
 }

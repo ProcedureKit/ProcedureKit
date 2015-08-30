@@ -65,11 +65,13 @@ typedef NS_OPTIONS(NSUInteger, YapDatabasePermittedTransactions) {
 #endif
 
 typedef NS_OPTIONS(NSUInteger, YapDatabaseConnectionFlushMemoryFlags) {
-    YapDatabaseConnectionFlushMemoryFlags_None       = 0,
-    YapDatabaseConnectionFlushMemoryFlags_Caches     = 1 << 0,
-    YapDatabaseConnectionFlushMemoryFlags_Statements = 1 << 1,
-    YapDatabaseConnectionFlushMemoryFlags_All        = (YapDatabaseConnectionFlushMemoryFlags_Caches |
-                                                        YapDatabaseConnectionFlushMemoryFlags_Statements),
+	YapDatabaseConnectionFlushMemoryFlags_None       = 0,
+	YapDatabaseConnectionFlushMemoryFlags_Caches     = 1 << 0,
+	YapDatabaseConnectionFlushMemoryFlags_Statements = 1 << 1,
+	YapDatabaseConnectionFlushMemoryFlags_Internal   = 1 << 2,
+	YapDatabaseConnectionFlushMemoryFlags_All        = (YapDatabaseConnectionFlushMemoryFlags_Caches     |
+	                                                    YapDatabaseConnectionFlushMemoryFlags_Statements |
+	                                                    YapDatabaseConnectionFlushMemoryFlags_Internal   ),
 };
 
 
@@ -565,8 +567,12 @@ NS_ASSUME_NONNULL_BEGIN
  * YapDatabaseConnectionFlushMemoryFlags_Statements:
  *     Flushes all pre-compiled sqlite statements.
  * 
+ * YapDatabaseConnectionFlushMemoryFlags_Internal
+ *     Flushes internal memory used by sqlite instance via sqlite_db_release_memory.
+ *     Generally this means cached database pages.
+ * 
  * YapDatabaseConnectionFlushMemoryFlags_All:
- *     Full flush of all caches and pre-compiled sqlite statements.
+ *     Full flush of everything (caches, statements, internal)
 **/
 - (void)flushMemoryWithFlags:(YapDatabaseConnectionFlushMemoryFlags)flags;
 
@@ -583,8 +589,24 @@ NS_ASSUME_NONNULL_BEGIN
 #endif
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-#pragma mark Vacuum
+#pragma mark Pragma
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Returns the current page_size configuration via "PRAGMA page_size;".
+ *
+ * This allows you to see if sqlite accepted your page_size configuration request.
+**/
+- (NSInteger)pragmaPageSize;
+
+/**
+ * Returns the current memory mapped I/O configuration via "PRAGMA mmap_size;".
+ * 
+ * This allows you to see if sqlite accepted your mmap_size configuration request.
+ * Memory mapping may be disabled by sqlite's compile-time options.
+ * Or it may restrict the mmap_size to something smaller than requested.
+**/
+- (NSInteger)pragmaMMapSize;
 
 /**
  * Upgrade Notice:
@@ -621,6 +643,10 @@ NS_ASSUME_NONNULL_BEGIN
  * }];
 **/
 - (NSString *)pragmaAutoVacuum;
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+#pragma mark Vacuum
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
  * Performs a VACUUM on the sqlite database.
@@ -674,6 +700,79 @@ NS_ASSUME_NONNULL_BEGIN
 **/
 - (void)asyncVacuumWithCompletionQueue:(nullable dispatch_queue_t)completionQueue
                        completionBlock:(nullable dispatch_block_t)completionBlock;
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+#pragma mark Backup
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * This method backs up the database by exporting all the tables to another sqlite database.
+ * 
+ * This method operates as a synchronous ReadWrite "transaction".
+ * That is, it behaves in a similar fashion, and you may treat it as if it is a ReadWrite transaction.
+ * 
+ * The database will be backed up as it exists at the moment this transaction operates.
+ * That is, it will backup everything in the sqlite file, as well as everything in the WAL file.
+ *
+ * For more information on the BACKUP operation, see the sqlite docs:
+ * https://www.sqlite.org/c3ref/backup_finish.html
+ * 
+ * As stated in the sqlite docs, it is your responsibilty to ensure that nothing else is
+ * currently using the backupDatabase.
+**/
+- (NSError *)backupToPath:(NSString *)backupDatabasePath;
+
+/**
+ * This method backs up the database by exporting all the tables to another sqlite database.
+ *
+ * This method operates as an asynchronous readWrite "transaction".
+ * That is, it behaves in a similar fashion, and you may treat it as if it is a ReadWrite transaction.
+ * 
+ * The database will be backed up as it exists at the moment this transaction operates.
+ * That is, it will backup everything in the sqlite file, as well as everything in the WAL file.
+ * 
+ * An optional completion block may be used.
+ * The completionBlock will be invoked on the main thread (dispatch_get_main_queue()).
+ *
+ * For more information on the BACKUP operation, see the sqlite docs:
+ * https://www.sqlite.org/c3ref/backup_finish.html
+ *
+ * As stated in the sqlite docs, it is your responsibilty to ensure that nothing else is
+ * currently using the backupDatabase.
+ *
+ * @return
+ *   A NSProgress instance that may be used to track the backup progress.
+ *   The progress in cancellable, meaning that invoking [progress cancel] will abort the backup operation.
+**/
+- (NSProgress *)asyncBackupToPath:(NSString *)backupDatabasePath
+                  completionBlock:(nullable void (^)(NSError *error))completionBlock;
+
+/**
+ * This method backs up the database by exporting all the tables to another sqlite database.
+ *
+ * This method operates as an asynchronous readWrite "transaction".
+ * That is, it behaves in a similar fashion, and you may treat it as if it is a ReadWrite transaction.
+ *
+ * The database will be backed up as it exists at the moment this transaction operates.
+ * That is, it will backup everything in the sqlite file, as well as everything in the WAL file.
+ *
+ * An optional completion block may be used.
+ * Additionally the dispatch_queue to invoke the completion block may also be specified.
+ * If NULL, dispatch_get_main_queue() is automatically used.
+ *
+ * For more information on the BACKUP operation, see the sqlite docs:
+ * https://www.sqlite.org/c3ref/backup_finish.html
+ *
+ * As stated in the sqlite docs, it is your responsibilty to ensure that nothing else is
+ * currently using the backupDatabase.
+ *
+ * @return
+ *   A NSProgress instance that may be used to track the backup progress.
+ *   The progress in cancellable, meaning that invoking [progress cancel] will abort the backup operation.
+**/
+- (NSProgress *)asyncBackupToPath:(NSString *)backupDatabasePath
+                  completionQueue:(nullable dispatch_queue_t)completionQueue
+                  completionBlock:(nullable void (^)(NSError *))completionBlock;
 
 NS_ASSUME_NONNULL_END
 @end

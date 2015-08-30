@@ -1,1 +1,1 @@
-../../../CocoaLumberjack/Lumberjack/Extensions/DDDispatchQueueLogFormatter.h
+../../../CocoaLumberjack/Classes/Extensions/DDDispatchQueueLogFormatter.h
