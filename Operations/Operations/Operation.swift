@@ -212,6 +212,10 @@ public class Operation: NSOperation {
             state = .Finishing
             
             let combinedErrors = _internalErrors + errors
+            if !combinedErrors.isEmpty {
+                // Allow dependent tasks to be cancelled using NoCancelledCondition
+                cancel()
+            }
             finished(combinedErrors)
             
             observers.forEach { $0.operationDidFinish(self, errors: combinedErrors) }

@@ -42,7 +42,9 @@ public class GroupOperation: Operation {
     }
 
     public override func cancel() {
-        _queue.cancelAllOperations()
+        if !self.cancelled {
+            _queue.cancelAllOperations()
+        }
         super.cancel()
     }
 
