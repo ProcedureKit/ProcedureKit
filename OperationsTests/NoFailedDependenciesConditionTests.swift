@@ -1,5 +1,5 @@
 //
-//  NoCancelledConditionTests.swift
+//  NoFailedDependenciesConditionTests.swift
 //  Operations
 //
 //  Created by Daniel Thorpe on 20/07/2015.
@@ -9,7 +9,7 @@
 import XCTest
 import Operations
 
-class NoCancelledConditionTests: OperationTests {
+class NoFailedDependenciesConditionTests: OperationTests {
 
     func createCancellingOperation(shouldCancel: Bool, expectation: XCTestExpectation) -> TestOperation {
 
@@ -30,7 +30,7 @@ class NoCancelledConditionTests: OperationTests {
 
     func test__operation_with_no_dependencies_still_succeeds() {
         let operation = TestOperation()
-        operation.addCondition(NoCancelledCondition())
+        operation.addCondition(NoFailedDependenciesCondition())
 
         addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
         runOperation(operation)
@@ -45,7 +45,7 @@ class NoCancelledConditionTests: OperationTests {
         addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
         let dependency = createCancellingOperation(false, expectation: expectationWithDescription("Dependency for Test: \(__FUNCTION__)"))
         operation.addDependency(dependency)
-        operation.addCondition(NoCancelledCondition())
+        operation.addCondition(NoFailedDependenciesCondition())
 
         runOperations(operation, dependency)
         waitForExpectationsWithTimeout(3, handler: nil)
@@ -58,7 +58,7 @@ class NoCancelledConditionTests: OperationTests {
         let operation = TestOperation()
         let dependency = createCancellingOperation(true, expectation: expectationWithDescription("Dependency for Test: \(__FUNCTION__)"))
         operation.addDependency(dependency)
-        operation.addCondition(NoCancelledCondition())
+        operation.addCondition(NoFailedDependenciesCondition())
 
         runOperations(operation, dependency)
         waitForExpectationsWithTimeout(3, handler: nil)
@@ -73,7 +73,7 @@ class NoCancelledConditionTests: OperationTests {
         operation.addDependency(dependency1)
         let dependency2 = createCancellingOperation(false, expectation: expectationWithDescription("Dependency 2 for Test: \(__FUNCTION__)"))
         operation.addDependency(dependency2)
-        operation.addCondition(NoCancelledCondition())
+        operation.addCondition(NoFailedDependenciesCondition())
 
         var receivedErrors = [ErrorType]()
         operation.addObserver(BlockObserver { (_ , errors) in
@@ -88,15 +88,16 @@ class NoCancelledConditionTests: OperationTests {
         XCTAssertEqual(receivedErrors.count, 1)
     }
 
-    func test__errored_operation_cancels_dependency() {
+    func test__operation_with_errored_dependency_fails() {
         let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
         let operation = TestOperation()
         let dependency = TestOperation(delay: 0, error: TestOperation.Error.SimulatedError)
         operation.addDependency(dependency)
-        operation.addCondition(NoCancelledCondition())
+        operation.addCondition(NoFailedDependenciesCondition())
 
+        var receivedErrors = [ErrorType]()
         operation.addObserver(BlockObserver { (_ , errors) in
-            XCTAssertEqual(errors.count, 1)
+            receivedErrors = errors
             expectation.fulfill()
         })
 
@@ -104,18 +105,20 @@ class NoCancelledConditionTests: OperationTests {
         waitForExpectationsWithTimeout(3, handler: nil)
 
         XCTAssertFalse(operation.didExecute)
+        XCTAssertEqual(receivedErrors.count, 1)
     }
 
-    func test__errored_group_operation_cancels_dependency() {
+    func test__operation_with_group_dependency_with_errored_child_fails() {
         let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
         let operation = TestOperation()
         let childOperation = TestOperation(delay: 0, error: TestOperation.Error.SimulatedError)
         let dependency = GroupOperation(operations: [childOperation])
         operation.addDependency(dependency)
-        operation.addCondition(NoCancelledCondition())
+        operation.addCondition(NoFailedDependenciesCondition())
 
+        var receivedErrors = [ErrorType]()
         operation.addObserver(BlockObserver { (_ , errors) in
-            XCTAssertEqual(errors.count, 1)
+            receivedErrors = errors
             expectation.fulfill()
         })
 
@@ -123,5 +126,6 @@ class NoCancelledConditionTests: OperationTests {
         waitForExpectationsWithTimeout(3, handler: nil)
 
         XCTAssertFalse(operation.didExecute)
+        XCTAssertEqual(receivedErrors.count, 1)        
     }
 }

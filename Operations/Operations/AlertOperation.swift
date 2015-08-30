@@ -14,6 +14,10 @@ public protocol PresentingViewController: class {
 
 public class AlertOperation: Operation {
 
+    public enum Error: ErrorType {
+        case PresentationViewControllerNotSet
+    }
+
     private let controller = UIAlertController(title: .None, message: .None, preferredStyle: .Alert)
     private let presentingController: PresentingViewController?
 
@@ -65,7 +69,7 @@ public class AlertOperation: Operation {
             }
         }
         else {
-            finish()
+            finish(Error.PresentationViewControllerNotSet)
         }
     }
 }

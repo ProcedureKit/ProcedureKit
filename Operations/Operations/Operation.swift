@@ -32,6 +32,23 @@ public class Operation: NSOperation {
 
         // The operation has finished.
         case Finished
+
+        func canTransitionToState(other: State) -> Bool {
+            switch (self, other) {
+            case (.Initialized, .Pending),
+                (.Pending, .EvaluatingConditions),
+                (.Pending, .Finishing),
+                (.EvaluatingConditions, .Ready),
+                (.Ready, .Executing),
+                (.Ready, .Finishing),
+                (.Executing, .Finishing),
+                (.Finishing, .Finished):
+                return true
+
+            default:
+                return false
+            }
+        }
     }
 
     // use the KVO mechanism to indicate that changes to "state" affect other properties as well
@@ -51,36 +68,56 @@ public class Operation: NSOperation {
         return ["state"]
     }
 
-
     private var _state = State.Initialized
+    private let stateLock = NSLock()
+
+    private var _internalErrors = [ErrorType]()
+
+    private(set) var conditions = [OperationCondition]()
+    private(set) var observers = [OperationObserver]()
 
     private var state: State {
         get {
-            return _state
+            return stateLock.withCriticalScope { _state }
         }
         set (newState) {
             willChangeValueForKey("state")
 
-            switch (_state, newState) {
-            case (.Finished, _):
-                break
-            default:
-                assert(_state != newState, "Attempting to perform illegal cyclic state transition.")
-                _state = newState
+            stateLock.withCriticalScope { () -> Void in
+
+                switch (_state, newState) {
+                case (.Finished, _):
+                    break
+                default:
+                    assert(_state.canTransitionToState(newState), "Attempting to perform illegal cyclic state transition, \(_state) -> \(newState).")
+                    _state = newState
+                }
             }
 
             didChangeValueForKey("state")
         }
     }
 
+    public var errors: [ErrorType] {
+        return _internalErrors
+    }
+
+    public var failed: Bool {
+        return errors.count > 0
+    }
+
     public override var ready: Bool {
-        switch (cancelled, state) {
+        switch state {
 
-        case (true, _):
+        case .Initialized:
             // If the operation is cancelled, isReady should return true
-            return true
+            return cancelled
 
-        case (false, .Pending):
+        case .Pending:
+            // If the operation is cancelled, isReady should return true
+            if cancelled {
+                return true
+            }
 
             if super.ready {
                 evaluateConditions()
@@ -89,11 +126,21 @@ public class Operation: NSOperation {
             // Until conditions have been evaluated, we're not ready
             return false
 
-        case (false, .Ready):
-            return super.ready
+        case .Ready:
+            return super.ready || cancelled
 
         default:
             return false
+        }
+    }
+
+    var userInitiated: Bool {
+        get {
+            return qualityOfService == .UserInitiated
+        }
+        set {
+            assert(state < .Executing, "Cannot modify userInitiated after execution has begun.")
+            qualityOfService = newValue ? .UserInitiated : .Default
         }
     }
 
@@ -124,17 +171,13 @@ public class Operation: NSOperation {
 
     // MARK: - Conditions
 
-    private(set) var conditions = [OperationCondition]()
-
     public func addCondition(condition: OperationCondition) {
         assert(state < .Executing, "Cannot modify conditions after execution has begun, current state: \(state).")
         conditions.append(condition)
     }
 
     // MARK: - Observers
-    
-    private(set) var observers = [OperationObserver]()
-    
+
     public func addObserver(observer: OperationObserver) {
         assert(state < .Executing, "Cannot modify observers after execution has begun, current state: \(state).")
         observers.append(observer)
@@ -160,7 +203,7 @@ public class Operation: NSOperation {
     public override final func main() {
         assert(state == .Ready, "This operation must be performed on an operation queue, current state: \(state).")
 
-        if _internalErrors.isEmpty && cancelled == false {
+        if _internalErrors.isEmpty && !cancelled {
             state = .Executing
             observers.forEach { $0.operationDidStart(self) }
             execute()
@@ -179,8 +222,6 @@ public class Operation: NSOperation {
         
         finish()
     }
-    
-    private var _internalErrors = [ErrorType]()
 
     public func cancelWithError(error: ErrorType? = .None) {
         if let error = error {
@@ -210,15 +251,11 @@ public class Operation: NSOperation {
         if !hasFinishedAlready {
             hasFinishedAlready = true
             state = .Finishing
+
+            _internalErrors.appendContentsOf(errors)
+            finished(_internalErrors)
             
-            let combinedErrors = _internalErrors + errors
-            if !combinedErrors.isEmpty {
-                // Allow dependent tasks to be cancelled using NoCancelledCondition
-                cancel()
-            }
-            finished(combinedErrors)
-            
-            observers.forEach { $0.operationDidFinish(self, errors: combinedErrors) }
+            observers.forEach { $0.operationDidFinish(self, errors: self._internalErrors) }
             
             state = .Finished
         }
@@ -254,7 +291,6 @@ public class Operation: NSOperation {
     }
 }
 
-
 private func <(lhs: Operation.State, rhs: Operation.State) -> Bool {
     return lhs.rawValue < rhs.rawValue
 }
@@ -282,6 +318,22 @@ extension Operation.State: CustomDebugStringConvertible, CustomStringConvertible
     }
 }
 
+public enum OperationError: ErrorType, Equatable {
+    case ConditionFailed
+    case OperationTimedOut(NSTimeInterval)
+}
+
+public func == (a: OperationError, b: OperationError) -> Bool {
+    switch (a, b) {
+    case (.ConditionFailed, .ConditionFailed):
+        return true
+    case let (.OperationTimedOut(aTimeout), .OperationTimedOut(bTimeout)):
+        return aTimeout == bTimeout
+    default:
+        return false
+    }
+}
+
 extension NSOperation {
 
     /// Chain completion blocks
@@ -300,6 +352,15 @@ extension NSOperation {
     /// Add multiple depdendencies to the operation.
     func addDependencies(dependencies: [NSOperation]) {
         for d in dependencies { self.addDependency(d) }
+    }
+}
+
+extension NSLock {
+    func withCriticalScope<T>(@noescape block: () -> T) -> T {
+        lock()
+        let value = block()
+        unlock()
+        return value
     }
 }
 
