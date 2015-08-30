@@ -1,5 +1,5 @@
 //
-//  NoCancelledCondition.swift
+//  NoFailedDependenciesCondition.swift
 //  Operations
 //
 //  Created by Daniel Thorpe on 27/07/2015.
@@ -13,10 +13,11 @@ import Foundation
     operation must succeed. If any dependency fails/cancels,
     the target operation will be fail.
 */
-public struct NoCancelledCondition: OperationCondition {
+public struct NoFailedDependenciesCondition: OperationCondition {
 
     public enum Error: ErrorType, Equatable {
         case CancelledDependencies
+        case FailedDependencies
     }
 
     public let name = "No Cancelled Condition"
@@ -29,10 +30,21 @@ public struct NoCancelledCondition: OperationCondition {
     }
 
     public func evaluateForOperation(operation: Operation, completion: OperationConditionResult -> Void) {
-        let cancelled = (operation.dependencies as! [NSOperation]).filter { $0.cancelled }
+        let dependencies = operation.dependencies as! [NSOperation]
+
+        let cancelled = dependencies.filter { $0.cancelled }
+        let failures = dependencies.filter {
+            if let operation = $0 as? Operation {
+                return operation.failed
+            }
+            return false
+        }
 
         if !cancelled.isEmpty {
             completion(.Failed(Error.CancelledDependencies))
+        }
+        else if !failures.isEmpty {
+            completion(.Failed(Error.FailedDependencies))
         }
         else {
             completion(.Satisfied)
@@ -40,9 +52,11 @@ public struct NoCancelledCondition: OperationCondition {
     }
 }
 
-public func ==(a: NoCancelledCondition.Error, b: NoCancelledCondition.Error) -> Bool {
+public func ==(a: NoFailedDependenciesCondition.Error, b: NoFailedDependenciesCondition.Error) -> Bool {
     switch (a, b) {
     case (.CancelledDependencies, .CancelledDependencies):
+        return true
+    case (.FailedDependencies, .FailedDependencies):
         return true
     default:
         return false
