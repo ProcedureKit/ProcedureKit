@@ -37,6 +37,7 @@ public class Operation: NSOperation {
             switch (self, other) {
             case (.Initialized, .Pending),
                 (.Pending, .EvaluatingConditions),
+                (.Pending, .Finishing),
                 (.EvaluatingConditions, .Ready),
                 (.Ready, .Executing),
                 (.Ready, .Finishing),
@@ -48,10 +49,6 @@ public class Operation: NSOperation {
                 return false
             }
         }
-    }
-
-    private struct ProtectedState {
-        var state: State = .Initialized
     }
 
     // use the KVO mechanism to indicate that changes to "state" affect other properties as well
@@ -71,10 +68,10 @@ public class Operation: NSOperation {
         return ["state"]
     }
 
-    private var protected = Protector(ProtectedState())
-
 
     private var _state = State.Initialized
+    private let stateLock = NSLock()
+
     private var _internalErrors = [ErrorType]()
 
     private(set) var conditions = [OperationCondition]()
@@ -82,19 +79,19 @@ public class Operation: NSOperation {
 
     private var state: State {
         get {
-            return protected.read { $0.state }
+            return stateLock.withCriticalScope { _state }
         }
         set (newState) {
             willChangeValueForKey("state")
 
-            protected.write { (inout protected: ProtectedState) in
+            stateLock.withCriticalScope { () -> Void in
 
-                switch (protected.state, newState) {
+                switch (_state, newState) {
                 case (.Finished, _):
                     break
                 default:
-                    assert(protected.state != newState, "Attempting to perform illegal cyclic state transition.")
-                    protected.state = newState
+                    assert(_state != newState, "Attempting to perform illegal cyclic state transition.")
+                    _state = newState
                 }
             }
 
@@ -323,6 +320,22 @@ extension Operation.State: DebugPrintable, Printable {
     }
 }
 
+public enum OperationError: ErrorType, Equatable {
+    case ConditionFailed
+    case OperationTimedOut(NSTimeInterval)
+}
+
+public func == (a: OperationError, b: OperationError) -> Bool {
+    switch (a, b) {
+    case (.ConditionFailed, .ConditionFailed):
+        return true
+    case let (.OperationTimedOut(aTimeout), .OperationTimedOut(bTimeout)):
+        return aTimeout == bTimeout
+    default:
+        return false
+    }
+}
+
 extension NSOperation {
 
     /// Chain completion blocks
@@ -344,4 +357,12 @@ extension NSOperation {
     }
 }
 
+extension NSLock {
+    func withCriticalScope<T>(@noescape block: () -> T) -> T {
+        lock()
+        let value = block()
+        unlock()
+        return value
+    }
+}
 
