@@ -25,7 +25,7 @@ public class CloudKitOperation<CloudOperation where CloudOperation: CloudKitOper
 
     public let operation: CloudOperation
 
-    public init(operation: CloudOperation, database: CKDatabase = CKContainer.defaultContainer().privateCloudDatabase, completion: dispatch_block_t = { }) {
+    public init(operation: CloudOperation, database: CKDatabase = CKContainer.defaultContainer().privateCloudDatabase) {
         operation.database = database
         self.operation = operation
         super.init()
@@ -42,6 +42,7 @@ public class CloudKitOperation<CloudOperation where CloudOperation: CloudKitOper
 extension CKDatabaseOperation: CloudKitOperationType {
 
     public func begin() {
-        database.addOperation(self)
+        assert(database != nil, "CKDatabase not set on Operation.")
+        database!.addOperation(self)
     }
 }
