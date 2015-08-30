@@ -291,7 +291,6 @@ public class Operation: NSOperation {
     }
 }
 
-
 private func <(lhs: Operation.State, rhs: Operation.State) -> Bool {
     return lhs.rawValue < rhs.rawValue
 }
@@ -319,6 +318,22 @@ extension Operation.State: CustomDebugStringConvertible, CustomStringConvertible
     }
 }
 
+public enum OperationError: ErrorType, Equatable {
+    case ConditionFailed
+    case OperationTimedOut(NSTimeInterval)
+}
+
+public func == (a: OperationError, b: OperationError) -> Bool {
+    switch (a, b) {
+    case (.ConditionFailed, .ConditionFailed):
+        return true
+    case let (.OperationTimedOut(aTimeout), .OperationTimedOut(bTimeout)):
+        return aTimeout == bTimeout
+    default:
+        return false
+    }
+}
+
 extension NSOperation {
 
     /// Chain completion blocks
@@ -337,6 +352,15 @@ extension NSOperation {
     /// Add multiple depdendencies to the operation.
     func addDependencies(dependencies: [NSOperation]) {
         for d in dependencies { self.addDependency(d) }
+    }
+}
+
+extension NSLock {
+    func withCriticalScope<T>(@noescape block: () -> T) -> T {
+        lock()
+        let value = block()
+        unlock()
+        return value
     }
 }
 
