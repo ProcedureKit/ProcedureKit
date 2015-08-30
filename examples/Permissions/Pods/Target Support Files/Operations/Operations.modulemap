@@ -1,0 +1,6 @@
+framework module Operations {
+  umbrella header "Operations-umbrella.h"
+
+  export *
+  module * { export * }
+}

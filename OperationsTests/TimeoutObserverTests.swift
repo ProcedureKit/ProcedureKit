@@ -7,17 +7,13 @@
 //
 
 import XCTest
-
-@testable
 import Operations
 
 class TimeoutObserverTests: OperationTests {
 
     func test__timeout_observer() {
         let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
-
         let operation = TestOperation(delay: 3)
-        operation.addCompletionBlockToTestOperation(operation, withExpectation: expectation)
         operation.addObserver(TimeoutObserver(timeout: 1.0))
 
         delegate = TestQueueDelegate { (_, errors) in

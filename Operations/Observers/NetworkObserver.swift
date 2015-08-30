@@ -8,7 +8,7 @@
 
 import Foundation
 
-internal protocol NetworkActivityIndicatorInterface {
+public protocol NetworkActivityIndicatorInterface {
     var networkActivityIndicatorVisible: Bool { get set }
 }
 
@@ -22,7 +22,7 @@ public class NetworkObserver: OperationObserver {
         self.init(indicator: UIApplication.sharedApplication())
     }
 
-    internal init(indicator: NetworkActivityIndicatorInterface) {
+    public init(indicator: NetworkActivityIndicatorInterface) {
         networkActivityIndicator = indicator
     }
 

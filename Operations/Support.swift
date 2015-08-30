@@ -10,7 +10,7 @@ import Foundation
 
 // MARK: - Queues
 
-enum Queue {
+public enum Queue {
 
     case Main
     case Default
@@ -30,19 +30,31 @@ enum Queue {
         }
     }
 
-    var queue: dispatch_queue_t {
+    public var queue: dispatch_queue_t {
         switch self {
         case .Main: return dispatch_get_main_queue()
         default: return dispatch_get_global_queue(qos_class, 0)
         }
     }
 
-    func serial(named: String) -> dispatch_queue_t {
+    public func serial(named: String) -> dispatch_queue_t {
         return dispatch_queue_create(named, dispatch_queue_attr_make_with_qos_class(DISPATCH_QUEUE_SERIAL, qos_class, QOS_MIN_RELATIVE_PRIORITY))
     }
 
-    func concurrent(named: String) -> dispatch_queue_t {
+    public func concurrent(named: String) -> dispatch_queue_t {
         return dispatch_queue_create(named, dispatch_queue_attr_make_with_qos_class(DISPATCH_QUEUE_CONCURRENT, qos_class, QOS_MIN_RELATIVE_PRIORITY))
+    }
+}
+
+extension Dictionary {
+
+    internal init<Sequence: SequenceType where Sequence.Generator.Element == Value>(sequence: Sequence, keyMapper: Value -> Key?) {
+        self.init()
+        for item in sequence {
+            if let key = keyMapper(item) {
+                self[key] = item
+            }
+        }
     }
 }
 

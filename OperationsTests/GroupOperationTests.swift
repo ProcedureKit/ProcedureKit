@@ -8,8 +8,6 @@
 
 import Foundation
 import XCTest
-
-@testable
 import Operations
 
 class GroupOperationTests: OperationTests {
@@ -49,23 +47,23 @@ class GroupOperationTests: OperationTests {
         XCTAssertTrue(extra.didExecute)
     }
 
-    func test__group_operation_supports_cancellation() {
-        let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
-        let groupedOperation = TestOperation(delay: 5)
-        let operation = GroupOperation(operations: groupedOperation)
-
-        runOperation(operation)
-
-        let after = dispatch_time(DISPATCH_TIME_NOW, Int64(0.2 * Double(NSEC_PER_SEC)))
-        dispatch_after(after, Queue.Main.queue) {
-            operation.cancel()
-            expectation.fulfill()
+    func test__that_group_conditions_are_evaluated_before_the_child_operations() {
+        let operations: [TestOperation] = (0..<3).map { i in
+            let op = TestOperation()
+            op.addCondition(BlockCondition { true })
+            let exp = self.expectationWithDescription("Group Operation, child \(i): \(__FUNCTION__)")
+            self.addCompletionBlockToTestOperation(op, withExpectation: exp)
+            return op
         }
 
-        waitForExpectationsWithTimeout(4, handler: nil)
-        XCTAssertTrue(operation.cancelled)
-        XCTAssertTrue(groupedOperation.cancelled)
-        XCTAssertFalse(groupedOperation.didExecute)
+        let group = GroupOperation(operations: operations)
+        addCompletionBlockToTestOperation(group, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+
+        runOperation(group)
+        waitForExpectationsWithTimeout(5, handler: nil)
+        XCTAssertTrue(group.finished)
     }
 }
+
+
 

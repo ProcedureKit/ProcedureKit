@@ -8,15 +8,15 @@
 
 import Foundation
 
-struct TimeoutObserver: OperationObserver {
+public struct TimeoutObserver: OperationObserver {
 
     private let timeout: NSTimeInterval
 
-    init(timeout: NSTimeInterval) {
+    public init(timeout: NSTimeInterval) {
         self.timeout = timeout
     }
 
-    func operationDidStart(operation: Operation) {
+    public func operationDidStart(operation: Operation) {
         let when = dispatch_time(DISPATCH_TIME_NOW, Int64(timeout * Double(NSEC_PER_SEC)))
 
         dispatch_after(when, Queue.Default.queue) {
@@ -27,11 +27,11 @@ struct TimeoutObserver: OperationObserver {
         }
     }
 
-    func operation(operation: Operation, didProduceOperation newOperation: NSOperation) {
+    public func operation(operation: Operation, didProduceOperation newOperation: NSOperation) {
         // no-op
     }
 
-    func operationDidFinish(operation: Operation, errors: [ErrorType]) {
+    public func operationDidFinish(operation: Operation, errors: [ErrorType]) {
         // no-op
     }
 }

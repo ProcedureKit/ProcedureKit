@@ -8,35 +8,39 @@
 
 import UIKit
 import XCTest
-
-@testable
 import Operations
 
 class TestOperation: Operation {
-    
+
+    enum Error: ErrorType {
+        case SimulatedError
+    }
+
     let numberOfSeconds: Double
     let simulatedError: ErrorType?
+    let producedOperation: NSOperation?
     var didExecute: Bool = false
     
-    init(delay: Int = 1, error: ErrorType? = .None) {
+    init(delay: Int = 1, error: ErrorType? = .None, produced: NSOperation? = .None) {
         numberOfSeconds = Double(delay)
         simulatedError = error
+        producedOperation = produced
+        super.init()
     }
 
     override func execute() {
+
+        if let producedOperation = self.producedOperation {
+            let after = dispatch_time(DISPATCH_TIME_NOW, Int64(numberOfSeconds * Double(0.5) * Double(NSEC_PER_SEC)))
+            dispatch_after(after, Queue.Main.queue) {
+                self.produceOperation(producedOperation)
+            }
+        }
+
         let after = dispatch_time(DISPATCH_TIME_NOW, Int64(numberOfSeconds * Double(NSEC_PER_SEC)))
         dispatch_after(after, Queue.Main.queue) {
             self.didExecute = true
             self.finish(self.simulatedError)
-        }
-    }
-
-    func addCompletionBlockToTestOperation(operation: TestOperation, withExpectation expectation: XCTestExpectation) {
-        operation.completionBlock = { [weak operation] in
-            if let weakOperation = operation {
-                XCTAssertTrue(weakOperation.didExecute)
-                expectation.fulfill()
-            }
         }
     }
 }
@@ -80,6 +84,7 @@ class OperationTests: XCTestCase {
     override func tearDown() {
         queue = nil
         delegate = nil
+        ExclusivityManager.sharedInstance.__tearDownForUnitTesting()
         super.tearDown()
     }
 
@@ -88,15 +93,30 @@ class OperationTests: XCTestCase {
         queue.addOperation(operation)
     }
 
+    func runOperations(operations: Operation...) {
+        queue.delegate = delegate
+        queue.addOperations(operations, waitUntilFinished: false)
+    }
+
+    func addCompletionBlockToTestOperation(operation: Operation, withExpectation expectation: XCTestExpectation) {
+        weak var weakExpectation = expectation
+        operation.addObserver(BlockObserver { (_, _) in
+            weakExpectation?.fulfill()
+        })
+    }
+}
+
+class BasicTests: OperationTests {
+
     func test__queue_delegate_is_notified_when_operation_starts() {
         let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
 
         let operation = TestOperation(delay: 1)
-        operation.addCompletionBlockToTestOperation(operation, withExpectation: expectation)
+        addCompletionBlockToTestOperation(operation, withExpectation: expectation)
 
         runOperation(operation)
         waitForExpectationsWithTimeout(3, handler: nil)
-
+        XCTAssertTrue(operation.didExecute)
         XCTAssertTrue(delegate.did_willAddOperation)
         XCTAssertTrue(delegate.did_operationDidFinish)
     }
@@ -106,10 +126,18 @@ class OperationTests: XCTestCase {
         let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
 
         let operation = TestOperation(delay: 1)
-        operation.addCompletionBlockToTestOperation(operation, withExpectation: expectation)
+        addCompletionBlockToTestOperation(operation, withExpectation: expectation)
 
         queue.addOperation(operation)
         waitForExpectationsWithTimeout(3, handler: nil)
+        XCTAssertTrue(operation.didExecute)        
+    }
+
+    func test__operation_error_is_equatable() {
+        XCTAssertEqual(OperationError.ConditionFailed, OperationError.ConditionFailed)
+        XCTAssertEqual(OperationError.OperationTimedOut(1.0), OperationError.OperationTimedOut(1.0))
+        XCTAssertNotEqual(OperationError.ConditionFailed, OperationError.OperationTimedOut(1.0))
+        XCTAssertNotEqual(OperationError.OperationTimedOut(2.0), OperationError.OperationTimedOut(1.0))
     }
 }
 
@@ -131,9 +159,7 @@ class BlockOperationTests: OperationTests {
     func test__that_block_operation_with_no_block_finishes_immediately() {
         let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
         let operation = BlockOperation()
-        operation.addCompletionBlock {
-            expectation.fulfill()
-        }
+        addCompletionBlockToTestOperation(operation, withExpectation: expectation)
         runOperation(operation)
         waitForExpectationsWithTimeout(3, handler: nil)
         XCTAssertTrue(operation.finished)
