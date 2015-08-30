@@ -53,6 +53,10 @@ public class Operation: NSOperation {
 
 
     private var _state = State.Initialized
+    private var _internalErrors = [ErrorType]()
+
+    private(set) var conditions = [OperationCondition]()
+    private(set) var observers = [OperationObserver]()
 
     private var state: State {
         get {
@@ -73,14 +77,26 @@ public class Operation: NSOperation {
         }
     }
 
+    public var errors: [ErrorType] {
+        return _internalErrors
+    }
+
+    public var failed: Bool {
+        return errors.count > 0
+    }
+
     public override var ready: Bool {
-        switch (cancelled, state) {
+        switch state {
 
-        case (true, _):
+        case .Initialized:
             // If the operation is cancelled, isReady should return true
-            return true
+            return cancelled
 
-        case (false, .Pending):
+        case .Pending:
+            // If the operation is cancelled, isReady should return true
+            if cancelled {
+                return true
+            }
 
             if super.ready {
                 evaluateConditions()
@@ -89,8 +105,8 @@ public class Operation: NSOperation {
             // Until conditions have been evaluated, we're not ready
             return false
 
-        case (false, .Ready):
-            return super.ready
+        case .Ready:
+            return super.ready || cancelled
 
         default:
             return false
@@ -124,17 +140,13 @@ public class Operation: NSOperation {
 
     // MARK: - Conditions
 
-    private(set) var conditions = [OperationCondition]()
-
     public func addCondition(condition: OperationCondition) {
         assert(state < .Executing, "Cannot modify conditions after execution has begun, current state: \(state).")
         conditions.append(condition)
     }
 
     // MARK: - Observers
-    
-    private(set) var observers = [OperationObserver]()
-    
+
     public func addObserver(observer: OperationObserver) {
         assert(state < .Executing, "Cannot modify observers after execution has begun, current state: \(state).")
         observers.append(observer)
@@ -179,8 +191,6 @@ public class Operation: NSOperation {
         
         finish()
     }
-    
-    private var _internalErrors = [ErrorType]()
 
     public func cancelWithError(error: ErrorType? = .None) {
         if let error = error {
@@ -210,11 +220,11 @@ public class Operation: NSOperation {
         if !hasFinishedAlready {
             hasFinishedAlready = true
             state = .Finishing
+
+            _internalErrors.extend(errors)
+            finished(_internalErrors)
             
-            let combinedErrors = _internalErrors + errors
-            finished(combinedErrors)
-            
-            observers.map { $0.operationDidFinish(self, errors: combinedErrors) }
+            observers.map { $0.operationDidFinish(self, errors: self._internalErrors) }
             
             state = .Finished
         }
