@@ -88,5 +88,40 @@ class NoCancelledConditionTests: OperationTests {
         XCTAssertEqual(receivedErrors.count, 1)
     }
 
+    func test__errored_operation_cancels_dependency() {
+        let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
+        let operation = TestOperation()
+        let dependency = TestOperation(delay: 0, error: TestOperation.Error.SimulatedError)
+        operation.addDependency(dependency)
+        operation.addCondition(NoCancelledCondition())
 
+        operation.addObserver(BlockObserver { (_ , errors) in
+            XCTAssertEqual(errors.count, 1)
+            expectation.fulfill()
+        })
+
+        runOperations(operation, dependency)
+        waitForExpectationsWithTimeout(3, handler: nil)
+
+        XCTAssertFalse(operation.didExecute)
+    }
+
+    func test__errored_group_operation_cancels_dependency() {
+        let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
+        let operation = TestOperation()
+        let childOperation = TestOperation(delay: 0, error: TestOperation.Error.SimulatedError)
+        let dependency = GroupOperation(operations: [childOperation])
+        operation.addDependency(dependency)
+        operation.addCondition(NoCancelledCondition())
+
+        operation.addObserver(BlockObserver { (_ , errors) in
+            XCTAssertEqual(errors.count, 1)
+            expectation.fulfill()
+        })
+
+        runOperations(operation, dependency)
+        waitForExpectationsWithTimeout(3, handler: nil)
+
+        XCTAssertFalse(operation.didExecute)
+    }
 }

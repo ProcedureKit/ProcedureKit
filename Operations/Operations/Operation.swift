@@ -117,7 +117,7 @@ public class Operation: NSOperation {
         assert(state == .Pending && cancelled == false, "\(__FUNCTION__) was called out of order.")
         state = .EvaluatingConditions
         OperationConditionEvaluator.evaluate(conditions, operation: self) { errors in
-            self._internalErrors.extend(errors)
+            self._internalErrors.appendContentsOf(errors)
             self.state = .Ready
         }
     }
@@ -162,7 +162,7 @@ public class Operation: NSOperation {
 
         if _internalErrors.isEmpty && cancelled == false {
             state = .Executing
-            observers.map { $0.operationDidStart(self) }
+            observers.forEach { $0.operationDidStart(self) }
             execute()
         }
         else {
@@ -175,7 +175,7 @@ public class Operation: NSOperation {
     They must call a finish methods in order to complete.
     */
     public func execute() {
-        print("\(self.dynamicType) must override `execute()`.", appendNewline: false)
+        print("\(self.dynamicType) must override `execute()`.", terminator: "")
         
         finish()
     }
@@ -191,7 +191,7 @@ public class Operation: NSOperation {
     }
     
     public final func produceOperation(operation: NSOperation) {
-        observers.map { $0.operation(self, didProduceOperation: operation) }
+        observers.forEach { $0.operation(self, didProduceOperation: operation) }
     }
     
     // MARK: Finishing
@@ -212,9 +212,13 @@ public class Operation: NSOperation {
             state = .Finishing
             
             let combinedErrors = _internalErrors + errors
+            if !combinedErrors.isEmpty {
+                // Allow dependent tasks to be cancelled using NoCancelledCondition
+                cancel()
+            }
             finished(combinedErrors)
             
-            observers.map { $0.operationDidFinish(self, errors: combinedErrors) }
+            observers.forEach { $0.operationDidFinish(self, errors: combinedErrors) }
             
             state = .Finished
         }
@@ -295,7 +299,7 @@ extension NSOperation {
     
     /// Add multiple depdendencies to the operation.
     func addDependencies(dependencies: [NSOperation]) {
-        dependencies.map { self.addDependency($0) }
+        for d in dependencies { self.addDependency(d) }
     }
 }
 
