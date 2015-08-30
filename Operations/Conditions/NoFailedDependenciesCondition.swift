@@ -30,7 +30,7 @@ public struct NoFailedDependenciesCondition: OperationCondition {
     }
 
     public func evaluateForOperation(operation: Operation, completion: OperationConditionResult -> Void) {
-        let dependencies = operation.dependencies as! [NSOperation]
+        let dependencies = operation.dependencies
 
         let cancelled = dependencies.filter { $0.cancelled }
         let failures = dependencies.filter {
