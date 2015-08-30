@@ -132,6 +132,13 @@ class BasicTests: OperationTests {
         waitForExpectationsWithTimeout(3, handler: nil)
         XCTAssertTrue(operation.didExecute)        
     }
+
+    func test__operation_error_is_equatable() {
+        XCTAssertEqual(OperationError.ConditionFailed, OperationError.ConditionFailed)
+        XCTAssertEqual(OperationError.OperationTimedOut(1.0), OperationError.OperationTimedOut(1.0))
+        XCTAssertNotEqual(OperationError.ConditionFailed, OperationError.OperationTimedOut(1.0))
+        XCTAssertNotEqual(OperationError.OperationTimedOut(2.0), OperationError.OperationTimedOut(1.0))
+    }
 }
 
 class BlockOperationTests: OperationTests {

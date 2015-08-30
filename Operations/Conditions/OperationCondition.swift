@@ -15,12 +15,6 @@ public enum OperationConditionResult {
     case Failed(ErrorType)
 }
 
-public enum OperationError: ErrorType {
-    case ConditionFailed
-    case OperationTimedOut(NSTimeInterval)
-}
-
-
 public protocol OperationCondition {
 
     var name: String { get }
@@ -91,19 +85,4 @@ extension OperationConditionResult {
         }
     }
 }
-
-extension OperationError: Equatable { }
-
-public func == (a: OperationError, b: OperationError) -> Bool {
-    switch (a, b) {
-    case (.ConditionFailed, .ConditionFailed):
-        return true
-    case let (.OperationTimedOut(aTimeout), .OperationTimedOut(bTimeout)):
-        return aTimeout == bTimeout
-    default:
-        return false
-    }
-}
-
-
 
