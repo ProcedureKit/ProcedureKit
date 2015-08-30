@@ -51,26 +51,26 @@ public struct TableViewDataSourceProvider<
     public init(_ p: DatasourceProvider) {
         provider = p
 
-        if  p.canEditItemAtIndexPath != nil &&
-            p.commitEditActionForItemAtIndexPath != nil &&
-            p.canMoveItemAtIndexPath != nil &&
-            p.commitMoveItemAtIndexPathToIndexPath != nil {
+        if  p.editor.canEditItemAtIndexPath != nil &&
+            p.editor.commitEditActionForItemAtIndexPath != nil &&
+            p.editor.canMoveItemAtIndexPath != nil &&
+            p.editor.commitMoveItemAtIndexPathToIndexPath != nil {
 
                 bridgedTableViewDataSource = TableViewDataSource.Editable(
                     EditableTableViewDataSource(
                         canEditRowAtIndexPath: { (_, indexPath) -> Bool in
-                            p.canEditItemAtIndexPath!(indexPath: indexPath)
+                            p.editor.canEditItemAtIndexPath!(indexPath: indexPath)
                         },
                         commitEditingStyleForRowAtIndexPath: { (_, editingStyle, indexPath) -> Void in
                             if let action = EditableDatasourceAction(editingStyle: editingStyle) {
-                                p.commitEditActionForItemAtIndexPath!(action: action, indexPath: indexPath)
+                                p.editor.commitEditActionForItemAtIndexPath!(action: action, indexPath: indexPath)
                             }
                         },
                         canMoveRowAtIndexPath: { (_, indexPath) -> Bool in
-                            p.canMoveItemAtIndexPath!(indexPath: indexPath)
+                            p.editor.canMoveItemAtIndexPath!(indexPath: indexPath)
                         },
                         moveRowAtIndexPathToIndexPath: { (_, from, to) -> Void in
-                            p.commitMoveItemAtIndexPathToIndexPath!(from: from, to: to)
+                            p.editor.commitMoveItemAtIndexPathToIndexPath!(from: from, to: to)
                         },
                         numberOfSections: { _ -> Int in
                             p.datasource.numberOfSections },

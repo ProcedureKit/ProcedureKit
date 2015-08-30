@@ -46,5 +46,24 @@ class GroupOperationTests: OperationTests {
         XCTAssertTrue(operation.finished)
         XCTAssertTrue(extra.didExecute)
     }
+
+    func test__that_group_conditions_are_evaluated_before_the_child_operations() {
+        let operations: [TestOperation] = (0..<3).map { i in
+            let op = TestOperation()
+            op.addCondition(BlockCondition { true })
+            let exp = self.expectationWithDescription("Group Operation, child \(i): \(__FUNCTION__)")
+            self.addCompletionBlockToTestOperation(op, withExpectation: exp)
+            return op
+        }
+
+        let group = GroupOperation(operations: operations)
+        addCompletionBlockToTestOperation(group, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+
+        runOperation(group)
+        waitForExpectationsWithTimeout(5, handler: nil)
+        XCTAssertTrue(group.finished)
+    }
 }
+
+
 

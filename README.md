@@ -1,6 +1,6 @@
 # Operations
 
-[![Build status](https://badge.buildkite.com/4bc80b0824c6357ae071342271cb503b8994cf0cfa58645849.svg)](https://buildkite.com/blindingskies/operations)
+[![Build status](https://badge.buildkite.com/4bc80b0824c6357ae071342271cb503b8994cf0cfa58645849.svg?branch=master)](https://buildkite.com/blindingskies/operations)
 
 A Swift framework inspired by WWDC 2015 Advanced NSOperations session. See the session video here: https://developer.apple.com/videos/wwdc/2015/?id=226
 
@@ -113,9 +113,7 @@ Requesting permissions from the user can often be a relatively complex task, whi
 
 ```swift
 func getCurrentLocation(completion: CLLocation -> Void) {
-    let location = LocationOperation(handler: completion)
-    location.addCondition(LocationCondition())
-    queue.addOperation(location)
+    queue.addOperation(LocationOperation(handler: completion))
 }
 ```
 

@@ -28,48 +28,65 @@ public class UserConfirmationCondition: OperationCondition {
     public let name: String
     public let isMutuallyExclusive = false
 
-    public let title: String
-    public let message: String?
-    public let action: String
-    public let isDestructive: Bool
-    public let cancelAction: String
-
-    var presentingController: PresentingViewController?
-    var confirmation: Confirmation = .Unknown
+    private let action: String
+    private let isDestructive: Bool
+    private let cancelAction: String
+    private var alert: AlertOperation
+    private var confirmation: Confirmation = .Unknown
+    private var alertOperationErrors = [ErrorType]()
 
     public init(title: String, message: String? = .None, action: String, isDestructive: Bool = true, cancelAction: String = NSLocalizedString("Cancel", comment: "Cancel"), presentingController: PresentingViewController? = .None) {
-        self.name = "UserConfirmationCondition(\(title))"
-        self.title = title
-        self.message = message
         self.action = action
         self.isDestructive = isDestructive
         self.cancelAction = cancelAction
-        self.presentingController = presentingController
+        self.alert = AlertOperation(presentFromController: presentingController)
+        self.alert.title = title
+        self.alert.message = message
+        self.name = "UserConfirmationCondition(\(title))"
     }
 
     public func dependencyForOperation(operation: Operation) -> NSOperation? {
-        let alert = AlertOperation(presentFromController: presentingController)
-        alert.title = title
-        alert.message = message
         alert.addActionWithTitle(action, style: isDestructive ? .Destructive : .Default) { [weak self] _ in
             self?.confirmation = .Confirmed
         }
         alert.addActionWithTitle(cancelAction, style: .Cancel) { [weak self] _ in
             self?.confirmation = .Cancelled
         }
+        alert.addObserver(self)
         return alert
     }
 
     public func evaluateForOperation(operation: Operation, completion: OperationConditionResult -> Void) {
         switch confirmation {
         case .Unknown:
-            // This should never happen, but you never know.
-            completion(.Failed(Error.ConfirmationUnknown))
+            if let alertError = alertOperationErrors.first as? AlertOperation.Error {
+                completion(.Failed(alertError))
+            }
+            else {
+                // This should never happen, but you never know.
+                completion(.Failed(Error.ConfirmationUnknown))
+            }
         case .Cancelled:
             completion(.Failed(Error.ConfirmationCancelled))
         case .Confirmed:
             completion(.Satisfied)
         }
     }
+}
 
+extension UserConfirmationCondition: OperationObserver {
+
+    public func operationDidStart(operation: Operation) {
+        // no-op
+    }
+
+    public func operation(operation: Operation, didProduceOperation newOperation: NSOperation) {
+        // no-op
+    }
+
+    public func operationDidFinish(operation: Operation, errors: [ErrorType]) {
+        if operation == alert {
+            alertOperationErrors = errors
+        }
+    }
 }

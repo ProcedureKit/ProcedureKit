@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name              = "Operations"
-  s.version           = "0.10.1"
+  s.version           = "0.11.0"
   s.summary           = "Powerful NSOperation subclasses in Swift."
   s.description       = <<-DESC
   
@@ -16,7 +16,21 @@ session Advanced NSOperations: https://developer.apple.com/videos/wwdc/2015/?id=
   s.social_media_url  = 'https://twitter.com/danthorpe'
   s.requires_arc      = true
   s.platform          = :ios, '8.0'
-  s.source_files      = 'Operations/**/*.{swift,m,h}'
+  s.default_subspec   = 'Base'
 
+  s.subspec 'Base' do |ss|
+    ss.source_files      = 'Operations/**/*.{swift,m,h}'
+    ss.exclude_files     = 'Operations/Extras/**/*.{swift,m,h}'
+  end
+
+  s.subspec '+AddressBook' do |ss|
+    ss.dependency 'Operations/Base'    
+    ss.source_files   = 'Operations/AddressBook/**/*.{swift,m,h}'
+  end
+
+  s.subspec '+Extras' do |ss|
+    ss.dependency 'Operations/Base'    
+    ss.source_files   = 'Operations/Extras/**/*.{swift,m,h}'
+  end
 end
 
