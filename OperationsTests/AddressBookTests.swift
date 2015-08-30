@@ -17,12 +17,12 @@ class AddressBookSortOrderingTests: XCTestCase {
 
     func test__given_by_last_name__then_rawValue_is_correct() {
         ordering = .ByLastName
-        XCTAssertEqual(ordering.rawValue, numericCast(kABPersonSortByLastName))
+        XCTAssertEqual(ordering.rawValue, numericCast(kABPersonSortByLastName) as UInt32)
     }
 
     func test__given_by_first_name__then_rawValue_is_correct() {
         ordering = .ByFirstName
-        XCTAssertEqual(ordering.rawValue, numericCast(kABPersonSortByFirstName))
+        XCTAssertEqual(ordering.rawValue, numericCast(kABPersonSortByFirstName) as UInt32)
     }
 
     func test__given_by_first_name__then_description_is_correct() {
@@ -56,12 +56,12 @@ class AddressBookCompositeNameFormatTests: XCTestCase {
 
     func test__given_first_name_first__then_rawValue_is_correct() {
         format = .FirstNameFirst
-        XCTAssertEqual(format.rawValue, numericCast(kABPersonCompositeNameFormatFirstNameFirst))
+        XCTAssertEqual(format.rawValue, numericCast(kABPersonCompositeNameFormatFirstNameFirst) as UInt32)
     }
 
     func test__given_last_name_first__then_rawValue_is_correct() {
         format = .LastNameFirst
-        XCTAssertEqual(format.rawValue, numericCast(kABPersonCompositeNameFormatLastNameFirst))
+        XCTAssertEqual(format.rawValue, numericCast(kABPersonCompositeNameFormatLastNameFirst) as UInt32)
     }
 
     func test__given_first_name_first__then_description_is_correct() {
@@ -95,17 +95,17 @@ class AddressBookRecordTypeTests: XCTestCase {
 
     func test__given_source_type__then_rawValue_is_correct() {
         recordKind = .Source
-        XCTAssertEqual(recordKind.rawValue, numericCast(kABSourceType))
+        XCTAssertEqual(recordKind.rawValue, numericCast(kABSourceType) as UInt32)
     }
 
     func test__given_group_type__then_rawValue_is_correct() {
         recordKind = .Group
-        XCTAssertEqual(recordKind.rawValue, numericCast(kABGroupType))
+        XCTAssertEqual(recordKind.rawValue, numericCast(kABGroupType) as UInt32)
     }
 
     func test__given_person_type__then_rawValue_is_correct() {
         recordKind = .Person
-        XCTAssertEqual(recordKind.rawValue, numericCast(kABPersonType))
+        XCTAssertEqual(recordKind.rawValue, numericCast(kABPersonType) as UInt32)
     }
 
     func test__given_source_type__then_description_is_correct() {
@@ -149,37 +149,37 @@ class AddressBookSourceTypeTests: XCTestCase {
 
     func test__given_local_source__then_rawValue_is_correct() {
         sourceKind = .Local
-        XCTAssertEqual(sourceKind.rawValue, numericCast(kABSourceTypeLocal))
+        XCTAssertEqual(sourceKind.rawValue, numericCast(kABSourceTypeLocal) as Int32)
     }
 
     func test__given_exchange_source__then_rawValue_is_correct() {
         sourceKind = .Exchange
-        XCTAssertEqual(sourceKind.rawValue, numericCast(kABSourceTypeExchange))
+        XCTAssertEqual(sourceKind.rawValue, numericCast(kABSourceTypeExchange) as Int32)
     }
 
     func test__given_exchangegal_source__then_rawValue_is_correct() {
         sourceKind = .ExchangeGAL
-        XCTAssertEqual(sourceKind.rawValue, numericCast(kABSourceTypeExchangeGAL))
+        XCTAssertEqual(sourceKind.rawValue, numericCast(kABSourceTypeExchangeGAL) as Int32)
     }
 
     func test__given_mobileme_source__then_rawValue_is_correct() {
         sourceKind = .MobileMe
-        XCTAssertEqual(sourceKind.rawValue, numericCast(kABSourceTypeMobileMe))
+        XCTAssertEqual(sourceKind.rawValue, numericCast(kABSourceTypeMobileMe) as Int32)
     }
 
     func test__given_ldap_source__then_rawValue_is_correct() {
         sourceKind = .LDAP
-        XCTAssertEqual(sourceKind.rawValue, numericCast(kABSourceTypeLDAP))
+        XCTAssertEqual(sourceKind.rawValue, numericCast(kABSourceTypeLDAP) as Int32)
     }
 
     func test__given_carddav_source__then_rawValue_is_correct() {
         sourceKind = .CardDAV
-        XCTAssertEqual(sourceKind.rawValue, numericCast(kABSourceTypeCardDAV))
+        XCTAssertEqual(sourceKind.rawValue, numericCast(kABSourceTypeCardDAV) as Int32)
     }
 
     func test__given_carddavsearch_source__then_rawValue_is_correct() {
         sourceKind = .CardDAVSearch
-        XCTAssertEqual(sourceKind.rawValue, numericCast(kABSourceTypeCardDAVSearch))
+        XCTAssertEqual(sourceKind.rawValue, numericCast(kABSourceTypeCardDAVSearch) as Int32)
     }
 
     func test__given_local_source__then_description_is_correct() {
@@ -257,45 +257,6 @@ class AddressBookSourceTypeTests: XCTestCase {
     }
 }
 
-class AddressBookImageFormatTests: XCTestCase {
-
-    var format: AddressBook.ImageFormat!
-
-    func test__given_originalsize__then_rawValue_is_correct() {
-        format = .OriginalSize
-        XCTAssertEqual(format.rawValue, kABPersonImageFormatOriginalSize)
-    }
-
-    func test__given_thumbnail__then_rawValue_is_correct() {
-        format = .Thumbnail
-        XCTAssertEqual(format.rawValue, kABPersonImageFormatThumbnail)
-    }
-
-    func test__given_originalsize__then_description_is_correct() {
-        format = .OriginalSize
-        XCTAssertEqual(format.description, "OriginalSize")
-    }
-
-    func test__given_thumbnail__then_description_is_correct() {
-        format = .Thumbnail
-        XCTAssertEqual(format.description, "Thumbnail")
-    }
-
-    func test__given_initialized_originalsize__then_is_correct() {
-        format = .OriginalSize
-        XCTAssertEqual(format, AddressBook.ImageFormat(rawValue: kABPersonImageFormatOriginalSize)!)
-    }
-
-    func test__given_initialized_thumbnail__then_is_correct() {
-        format = .Thumbnail
-        XCTAssertEqual(format, AddressBook.ImageFormat(rawValue: kABPersonImageFormatThumbnail)!)
-    }
-
-    func test__given_initialized_with_other_int__then_result_is_nil() {
-        XCTAssertTrue(AddressBook.ImageFormat(rawValue: ABPersonImageFormat(666)) == nil)
-    }
-}
-
 class AddressBooksTests: XCTestCase {
 
     var addressBook: AddressBook!
@@ -319,8 +280,7 @@ class AddressBooksTests: XCTestCase {
     func test__given_denied_authorization__address_book_access_request_returns_error() {
 
         registrar.requestShouldSucceed = false
-        let posedError = NSError(domain: "me.danthorpe.Operations.AddressBook", code: -666, userInfo: nil)
-        registrar.accessError = posedError as! CFErrorRef
+        registrar.accessError = CFErrorCreate(nil, "me.danthorpe.Operations.AddressBook", -666, nil)
 
         addressBook = AddressBook(registrar: registrar)
         addressBook.requestAccess { error in

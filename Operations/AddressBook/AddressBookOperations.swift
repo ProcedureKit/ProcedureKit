@@ -120,7 +120,7 @@ public class AddressBookGetResource: AddressBookOperation {
         let all = allAddressBookPeople()
         return addressBookGroup.map {
             let members: [AddressBookPerson] = $0.members()
-            return all.filter { !contains(members, $0) }
+            return all.filter { !members.contains($0) }
         } ?? all
     }
 
@@ -346,7 +346,7 @@ public class AddressBookMapPeople<T>: AddressBookGetResource {
     }
 
     func mapPeople() -> ErrorType? {
-        results = addressBookPeople().flatMap { flatMap(self.transform($0), { [$0] }) ?? [] }
+        results = addressBookPeople().flatMap { self.transform($0) }
         return .None
     }
 }
@@ -371,7 +371,7 @@ public enum ViewControllerDisplayStyle {
         case .ShowDetail(let from):
             from.showDetailViewController(controller, sender: sender)
 
-        default: break
+
         }
     }
 }
@@ -554,15 +554,15 @@ public struct AddressBookObserverQueue {
 
 extension AddressBookObserverQueue: OperationObserver {
     public func operationDidStart(operation: Operation) {
-        println("Started listening for AddressBook changes.")
+        print("Started listening for AddressBook changes.")
     }
 
     public func operation(operation: Operation, didProduceOperation newOperation: NSOperation) {
-        println("AddressBookObserver produced new Observer?")
+        print("AddressBookObserver produced new Observer?")
     }
 
     public func operationDidFinish(operation: Operation, errors: [ErrorType]) {
-        println("Stopped listening for AddressBook changes.")
+        print("Stopped listening for AddressBook changes.")
     }
 }
 
@@ -616,12 +616,12 @@ public class AddressBookObserver: GroupOperation {
     }
 
     func addressBookDidChange(info: [NSObject: AnyObject]?) {
-        println("Address book did change: \(info)")
+        print("Address book did change: \(info)")
     }
 
     public override func operationDidFinish(operation: NSOperation, withErrors errors: [ErrorType]) {
-        if errors.isEmpty, let current = operation as? Observer {
-            println("Observer did finish")
+        if errors.isEmpty, let _ = operation as? Observer {
+            print("Observer did finish")
             if !cancelled {
                 observer = Observer(addressBookDidChange)
                 addOperation(observer!)

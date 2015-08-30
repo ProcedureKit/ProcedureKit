@@ -170,7 +170,7 @@ public final class AddressBook: AddressBookType {
 
 // MARK: - SortOrdering
 
-    public enum SortOrdering: RawRepresentable, Printable {
+    public enum SortOrdering: RawRepresentable, CustomStringConvertible {
 
         public static var current: SortOrdering {
             return SortOrdering(rawValue: ABPersonGetSortOrdering()) ?? .ByLastName
@@ -211,7 +211,7 @@ public final class AddressBook: AddressBookType {
 
 // MARK: - CompositeNameFormat
 
-    public enum CompositeNameFormat: RawRepresentable, Printable {
+    public enum CompositeNameFormat: RawRepresentable, CustomStringConvertible {
 
         case FirstNameFirst, LastNameFirst
 
@@ -246,7 +246,7 @@ public final class AddressBook: AddressBookType {
 
 // MARK: - RecordKind
 
-    public enum RecordKind: RawRepresentable, Printable {
+    public enum RecordKind: RawRepresentable, CustomStringConvertible {
 
         case Source, Group, Person
 
@@ -289,7 +289,7 @@ public final class AddressBook: AddressBookType {
 
 // MARK: - PersonKind
 
-    public enum PersonKind: RawRepresentable, Printable {
+    public enum PersonKind: RawRepresentable, CustomStringConvertible {
 
         case Person, Organization
 
@@ -326,7 +326,7 @@ public final class AddressBook: AddressBookType {
 
 // MARK: - SourceKind
 
-    public enum SourceKind: RawRepresentable, Printable {
+    public enum SourceKind: RawRepresentable, CustomStringConvertible {
 
         case Local, Exchange, ExchangeGAL, MobileMe, LDAP, CardDAV, CardDAVSearch
 
@@ -393,7 +393,7 @@ public final class AddressBook: AddressBookType {
 
 // MARK: - PropertyKind
 
-    public enum PropertyKind: RawRepresentable, Printable {
+    public enum PropertyKind: RawRepresentable, CustomStringConvertible {
 
         case Invalid, String, Integer, Real, DateTime, Dictionary, MultiString, MultiInteger, MultiReal, MultiDateTime, MultiDictionary
 
@@ -498,43 +498,11 @@ public final class AddressBook: AddressBookType {
 
 // MARK: - ImageFormat
 
-    public enum ImageFormat: RawRepresentable, Printable {
-
-        case OriginalSize, Thumbnail
-
-        public var rawValue: ABPersonImageFormat {
-            switch self {
-            case .OriginalSize:
-                return kABPersonImageFormatOriginalSize
-            case .Thumbnail:
-                return kABPersonImageFormatThumbnail
-            }
-        }
-
-        public var description: String {
-            switch self {
-            case .OriginalSize:
-                return "OriginalSize"
-            case .Thumbnail:
-                return "Thumbnail"
-            }
-        }
-
-        public init?(rawValue: ABPersonImageFormat) {
-            switch rawValue.value {
-            case kABPersonImageFormatOriginalSize.value:
-                self = .OriginalSize
-            case kABPersonImageFormatThumbnail.value:
-                self = .Thumbnail
-            default:
-                return nil
-            }
-        }
-    }
+    public typealias ImageFormat = ABPersonImageFormat
 
 // MARK: - StringMultiValue
 
-    public struct StringMultiValue: MultiValueRepresentable, Equatable, Printable, StringLiteralConvertible {
+    public struct StringMultiValue: MultiValueRepresentable, Equatable, CustomStringConvertible, StringLiteralConvertible {
 
         public static let propertyKind = AddressBook.PropertyKind.String
 
@@ -572,7 +540,7 @@ public final class AddressBook: AddressBookType {
 
 // MARK: - DateMultiValue
 
-    public struct DateMultiValue: MultiValueRepresentable, Comparable, Printable, DebugPrintable {
+    public struct DateMultiValue: MultiValueRepresentable, Comparable, CustomStringConvertible, CustomDebugStringConvertible {
 
         public static let propertyKind = AddressBook.PropertyKind.DateTime
 
@@ -583,11 +551,11 @@ public final class AddressBook: AddressBookType {
         }
 
         public var description: String {
-            return toString(value)
+            return String(value)
         }
 
         public var debugDescription: String {
-            return toDebugString(value)
+            return String(reflecting: value)
         }
 
         public init?(multiValueRepresentation: CFTypeRef) {
@@ -661,8 +629,8 @@ public final class AddressBook: AddressBookType {
 
     public init(registrar: AddressBookPermissionRegistrar = SystemAddressBookRegistrar()) {
         self.registrar = registrar
-        let (addressBook: ABAddressBookRef?, error) = registrar.createAddressBook()
-        if let addressBook: ABAddressBookRef = addressBook {
+        let (addressBook, error) = registrar.createAddressBook()
+        if let addressBook = addressBook {
             self.addressBook = addressBook
         }
         else if let error = error {
@@ -845,7 +813,7 @@ extension AddressBook { // Sources
 // MARK: - Property
 
 public struct AddressBookReadableProperty<Value>: ReadablePropertyType {
-    typealias ValueType = Value
+    public typealias ValueType = Value
 
     public let id: ABPropertyID
     public let reader: ((CFTypeRef) -> ValueType)?
@@ -857,7 +825,7 @@ public struct AddressBookReadableProperty<Value>: ReadablePropertyType {
 }
 
 public struct AddressBookWriteableProperty<Value>: ReadablePropertyType, WriteablePropertyType {
-    typealias ValueType = Value
+    public typealias ValueType = Value
 
     public let id: ABPropertyID
     public let reader: ((CFTypeRef) -> ValueType)?
@@ -872,12 +840,12 @@ public struct AddressBookWriteableProperty<Value>: ReadablePropertyType, Writeab
 
 // MARK: - LabeledValue
 
-public struct LabeledValue<Value: MultiValueRepresentable>: DebugPrintable, Printable {
+public struct LabeledValue<Value: MultiValueRepresentable>: CustomStringConvertible, CustomDebugStringConvertible {
 
     static func read(multiValue: ABMultiValueRef) -> [LabeledValue<Value>] {
         assert(AddressBook.PropertyKind(rawValue: ABMultiValueGetPropertyType(multiValue)) == Value.propertyKind, "ABMultiValueRef has incompatible property kind.")
         let count: Int = ABMultiValueGetCount(multiValue)
-        return reduce(0..<count, [LabeledValue<Value>]()) { (var acc, index) in
+        return (0..<count).reduce([LabeledValue<Value>]()) { (var acc, index) in
             let representation: CFTypeRef = ABMultiValueCopyValueAtIndex(multiValue, index).takeRetainedValue()
             if let value = Value(multiValueRepresentation: representation), label = ABMultiValueCopyLabelAtIndex(multiValue, index)?.takeRetainedValue() as? String {
                 let labeledValue = LabeledValue(label: label, value: value)
@@ -888,7 +856,7 @@ public struct LabeledValue<Value: MultiValueRepresentable>: DebugPrintable, Prin
     }
 
     static func write(labeledValues: [LabeledValue<Value>]) -> ABMultiValueRef {
-        return reduce(labeledValues, ABMultiValueCreateMutable(Value.propertyKind.rawValue).takeRetainedValue() as ABMutableMultiValueRef) { (multiValue, labeledValue) -> ABMutableMultiValueRef in
+        return labeledValues.reduce(ABMultiValueCreateMutable(Value.propertyKind.rawValue).takeRetainedValue() as ABMutableMultiValueRef) { (multiValue, labeledValue) -> ABMutableMultiValueRef in
             ABMultiValueAddValueAndLabel(multiValue, labeledValue.value.multiValueRepresentation, labeledValue.label, nil)
         }
     }
@@ -897,11 +865,11 @@ public struct LabeledValue<Value: MultiValueRepresentable>: DebugPrintable, Prin
     public let value: Value
 
     public var description: String {
-        return "\(label): \(toString(value))"
+        return "\(label): \(String(value))"
     }
 
     public var debugDescription: String {
-        return "\(label): \(toDebugString(value))"
+        return "\(label): \(String(reflecting: value))"
     }
 
     public init(label: String, value: Value) {
@@ -1035,7 +1003,7 @@ public class AddressBookGroup: AddressBookRecord, AddressBookGroupType {
         super.init(storage: storage)
     }
 
-    public func members<P: AddressBook_PersonType where P.Storage == PersonStorage>(_ ordering: AddressBook.SortOrdering? = .None) -> [P] {
+    public func members<P: AddressBook_PersonType where P.Storage == PersonStorage>(ordering: AddressBook.SortOrdering? = .None) -> [P] {
         let result: [ABRecordRef] = {
             if let ordering = ordering {
                 return ABGroupCopyArrayOfAllMembersWithSortOrdering(self.storage, ordering.rawValue)?.takeRetainedValue() as? [ABRecordRef] ?? []
@@ -1114,7 +1082,7 @@ public class AddressBookSource: AddressBookRecord, AddressBookSourceType {
 extension ABPersonImageFormat: Equatable {}
 
 public func ==(a: ABPersonImageFormat, b: ABPersonImageFormat) -> Bool {
-    return a.value == b.value
+    return a.rawValue == b.rawValue
 }
 
 extension CFNumberRef: Equatable {}
