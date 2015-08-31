@@ -1,6 +1,6 @@
 //
-//  OperationsTests.swift
-//  OperationsTests
+//  OperationTests.swift
+//  OperationTests
 //
 //  Created by Daniel Thorpe on 26/06/2015.
 //  Copyright (c) 2015 Daniel Thorpe. All rights reserved.
@@ -21,8 +21,8 @@ class TestOperation: Operation {
     let producedOperation: NSOperation?
     var didExecute: Bool = false
     
-    init(delay: Int = 1, error: ErrorType? = .None, produced: NSOperation? = .None) {
-        numberOfSeconds = Double(delay)
+    init(delay: Double = 0.001, error: ErrorType? = .None, produced: NSOperation? = .None) {
+        numberOfSeconds = delay
         simulatedError = error
         producedOperation = produced
         super.init()
@@ -31,7 +31,7 @@ class TestOperation: Operation {
     override func execute() {
 
         if let producedOperation = self.producedOperation {
-            let after = dispatch_time(DISPATCH_TIME_NOW, Int64(numberOfSeconds * Double(0.5) * Double(NSEC_PER_SEC)))
+            let after = dispatch_time(DISPATCH_TIME_NOW, Int64(numberOfSeconds * Double(0.001) * Double(NSEC_PER_SEC)))
             dispatch_after(after, Queue.Main.queue) {
                 self.produceOperation(producedOperation)
             }
