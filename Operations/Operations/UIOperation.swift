@@ -8,11 +8,16 @@
 
 import Foundation
 
+// MARK: - UI
+
+
 public protocol PresentingViewController: class {
     func presentViewController(viewController: UIViewController, animated: Bool, completion: (() -> Void)?)
 
+    @available(iOS 8.0, *)
     func showViewController(vc: UIViewController, sender: AnyObject?)
 
+    @available(iOS 8.0, *)
     func showDetailViewController(vc: UIViewController, sender: AnyObject?)
 }
 
