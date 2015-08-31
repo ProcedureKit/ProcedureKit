@@ -172,7 +172,7 @@ class DelayOperationTests: OperationTests {
         let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
         let operation = DelayOperation(interval: -9_000_000)
         runOperation(operation)
-        let after = dispatch_time(DISPATCH_TIME_NOW, Int64(0.5 * Double(NSEC_PER_SEC)))
+        let after = dispatch_time(DISPATCH_TIME_NOW, Int64(0.05 * Double(NSEC_PER_SEC)))
         dispatch_after(after, Queue.Main.queue) {
             expectation.fulfill()
         }
@@ -184,7 +184,7 @@ class DelayOperationTests: OperationTests {
         let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
         let operation = DelayOperation(date: NSDate.distantPast() as! NSDate)
         runOperation(operation)
-        let after = dispatch_time(DISPATCH_TIME_NOW, Int64(0.5 * Double(NSEC_PER_SEC)))
+        let after = dispatch_time(DISPATCH_TIME_NOW, Int64(0.05 * Double(NSEC_PER_SEC)))
         dispatch_after(after, Queue.Main.queue) {
             expectation.fulfill()
         }
@@ -196,7 +196,7 @@ class DelayOperationTests: OperationTests {
         var started: NSDate!
         var ended: NSDate!
         let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
-        let interval: NSTimeInterval = 1
+        let interval: NSTimeInterval = 0.5
         let operation = DelayOperation(interval: interval)
         operation.addCompletionBlock {
             ended = NSDate()
@@ -204,7 +204,7 @@ class DelayOperationTests: OperationTests {
         }
         started = NSDate()
         runOperation(operation)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForExpectationsWithTimeout(1, handler: nil)
         XCTAssertTrue(operation.finished)
         let timeTaken = ended.timeIntervalSinceDate(started)
         XCTAssertGreaterThanOrEqual(timeTaken, interval)
