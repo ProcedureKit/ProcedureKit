@@ -23,7 +23,7 @@ class TestableSystemReachability: SystemReachability {
     }
 
     func addObserver(observer: Reachability.ObserverBlockType) -> String {
-        let after = dispatch_time(DISPATCH_TIME_NOW, Int64(Double(0.3) * Double(NSEC_PER_SEC)))
+        let after = dispatch_time(DISPATCH_TIME_NOW, Int64(Double(0.03) * Double(NSEC_PER_SEC)))
         dispatch_after(after, Queue.Default.queue) {
             observer(self.status)
         }
