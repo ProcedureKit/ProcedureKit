@@ -31,7 +31,7 @@ class LocationOperationTests: OperationTests {
         let locationManager = TestableLocationManager(enabled: true, status: .AuthorizedAlways)
         locationManager.returnedLocation = createLocationWithAccuracy(accuracy)
 
-        let operation = LocationOperation(accuracy: accuracy, manager: locationManager) { (location) -> Void in
+        let operation = UserLocationOperation(accuracy: accuracy, manager: locationManager) { (location) -> Void in
             receivedLocation = location
         }
 

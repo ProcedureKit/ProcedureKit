@@ -1,5 +1,5 @@
 //
-//  LocationOperation.swift
+//  LocationOperations.swift
 //  Operations
 //
 //  Created by Daniel Thorpe on 27/07/2015.
@@ -9,14 +9,14 @@
 import Foundation
 import CoreLocation
 
-
+@availability(*, unavailable, renamed="UserLocationOperation")
+public typealias LocationOperation = UserLocationOperation
 
 /**
     An `Operation` subclass to request the user's current
     geographic location.
 */
-
-public class LocationOperation: Operation {
+public class UserLocationOperation: Operation {
     public typealias LocationResponseHandler = (location: CLLocation) -> Void
     private typealias LocationManagerConfiguration = (LocationManager) -> Void
 
@@ -82,7 +82,7 @@ public class LocationOperation: Operation {
     }
 }
 
-extension LocationOperation: CLLocationManagerDelegate {
+extension UserLocationOperation: CLLocationManagerDelegate {
 
     public func locationManager(manager: CLLocationManager!, didUpdateLocations locations: [AnyObject]!) {
         if let locations = locations as? [CLLocation], location = locations.last where location.horizontalAccuracy <= accuracy {
@@ -98,11 +98,13 @@ extension LocationOperation: CLLocationManagerDelegate {
     }
 }
 
-
-public func ==(a: LocationOperation.Error, b: LocationOperation.Error) -> Bool {
+public func ==(a: UserLocationOperation.Error, b: UserLocationOperation.Error) -> Bool {
     switch (a, b) {
     case let (.LocationManagerDidFail(aError), .LocationManagerDidFail(bError)):
         return aError == bError
     default: return false
     }
 }
+
+
+
