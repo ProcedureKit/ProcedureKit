@@ -979,7 +979,7 @@ public class AddressBookPerson: AddressBookRecord, AddressBookPersonType {
         public struct Metadata {
             public static let kind              = AddressBookWriteableProperty<AddressBook.PersonKind>(id: kABPersonKindProperty, reader: reader, writer: writer)
             public static let creationDate      = AddressBookReadableProperty<NSDate>(id: kABPersonCreationDateProperty)
-            public static let modificationDate  = AddressBookReadableProperty<NSDate>(id: kABPersonModificationDateProperty)
+            public static let modificationDate  = AddressBookWriteableProperty<NSDate>(id: kABPersonModificationDateProperty)
         }
 
         public struct Name {
