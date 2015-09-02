@@ -749,6 +749,13 @@ extension AddressBook { // People
         return ABAddressBookGetPersonCount(addressBook)
     }
 
+    public func createPerson(source: AddressBookSource? = .None) -> AddressBookPerson {
+        let unmanaged = source.map { ABPersonCreateInSource($0.storage) } ?? ABPersonCreate()
+        let ref: ABRecordRef = unmanaged.takeUnretainedValue()
+        let person = AddressBookPerson(storage: ref)
+        return person
+    }
+
     public func personWithID<P: AddressBook_PersonType where P.Storage == PersonStorage>(id: ABRecordID) -> P? {
         if let record = ABAddressBookGetPersonWithRecordID(addressBook, id) {
             return P(storage: record.takeUnretainedValue())
