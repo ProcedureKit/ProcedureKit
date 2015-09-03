@@ -607,6 +607,11 @@ public final class AddressBook: AddressBookType {
         public struct Date {
             public static let anniversary = kABPersonAnniversaryLabel as String
         }
+        public struct General {
+            public static let home      = kABHomeLabel as String
+            public static let work      = kABWorkLabel as String
+            public static let other     = kABOtherLabel as String
+        }
         public struct Telephone {
             public static let mobile    = kABPersonPhoneMobileLabel as String
             public static let iPhone    = kABPersonPhoneIPhoneLabel as String
