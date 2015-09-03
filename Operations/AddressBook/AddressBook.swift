@@ -900,8 +900,9 @@ public struct LabeledValue<Value: MultiValueRepresentable>: DebugPrintable, Prin
     }
 
     static func write(labeledValues: [LabeledValue<Value>]) -> ABMultiValueRef {
-        return reduce(labeledValues, ABMultiValueCreateMutable(Value.propertyKind.rawValue).takeRetainedValue() as ABMutableMultiValueRef) { (multiValue, labeledValue) -> ABMutableMultiValueRef in
+        return reduce(labeledValues, ABMultiValueCreateMutable(Value.propertyKind.rawValue).takeRetainedValue() as ABMutableMultiValueRef) { (multiValue, labeledValue) in
             ABMultiValueAddValueAndLabel(multiValue, labeledValue.value.multiValueRepresentation, labeledValue.label, nil)
+            return multiValue
         }
     }
 
