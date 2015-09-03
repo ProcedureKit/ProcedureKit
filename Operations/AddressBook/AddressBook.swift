@@ -25,18 +25,26 @@ and it lacked the necessary hooks for testability.
 
 // MARK: - Protocols
 
+// MARK: - PropertyType
+
 public protocol PropertyType {
     typealias ValueType
     var id: ABPropertyID { get }
 }
 
+// MARK: - ReadablePropertyType
+
 public protocol ReadablePropertyType: PropertyType {
     var reader: ((CFTypeRef) -> ValueType)? { get }
 }
 
+// MARK: - WriteablePropertyType
+
 public protocol WriteablePropertyType: PropertyType {
     var writer: ((ValueType) -> CFTypeRef)? { get }
 }
+
+// MARK: - MultiValueRepresentable
 
 public protocol MultiValueRepresentable {
     static var propertyKind: AddressBook.PropertyKind { get }
@@ -44,15 +52,21 @@ public protocol MultiValueRepresentable {
     init?(multiValueRepresentation: CFTypeRef)
 }
 
+// MARK: - AddressBookPermissionRegistrar
+
 public protocol AddressBookPermissionRegistrar {
     var status: ABAuthorizationStatus { get }
     func createAddressBook() -> (ABAddressBookRef?, AddressBookPermissionRegistrarError?)
     func requestAccessToAddressBook(addressBook: ABAddressBookRef, completion: (AddressBookPermissionRegistrarError?) -> Void)
 }
 
+// MARK: - AddressBookExternalChangeObserver
+
 public protocol AddressBookExternalChangeObserver {
     mutating func endObservingExternalChangesToAddressBook()
 }
+
+// MARK: - AddressBookType
 
 public protocol AddressBookType {
 
@@ -104,6 +118,8 @@ public protocol AddressBookType {
     func sources<S: AddressBook_SourceType where S.Storage == SourceStorage>() -> [S]
 }
 
+// MARK: - StorageType
+
 public protocol StorageType {
     typealias Storage
 
@@ -111,6 +127,8 @@ public protocol StorageType {
 
     init(storage: Storage)
 }
+
+// MARK: - AddressBookRecordType
 
 public protocol AddressBookRecordType: StorageType {
 
@@ -125,20 +143,28 @@ public protocol AddressBookRecordType: StorageType {
     func setValue<P: WriteablePropertyType>(value: P.ValueType?, forProperty property: P) -> ErrorType?
 }
 
+// MARK: - AddressBook_PersonType
+
 public protocol AddressBook_PersonType: AddressBookRecordType {
     typealias GroupStorage
     typealias SourceStorage
 }
+
+// MARK: - AddressBookPersonType
 
 public protocol AddressBookPersonType: AddressBook_PersonType {
 
     var compositeNameFormat: AddressBook.CompositeNameFormat { get }
 }
 
+// MARK: - AddressBook_GroupType
+
 public protocol AddressBook_GroupType: AddressBookRecordType {
     typealias PersonStorage
     typealias SourceStorage
 }
+
+// MARK: - AddressBookGroupType
 
 public protocol AddressBookGroupType: AddressBook_GroupType {
 
@@ -149,10 +175,14 @@ public protocol AddressBookGroupType: AddressBook_GroupType {
     func remove<P: AddressBook_PersonType where P.Storage == PersonStorage>(member: P) -> ErrorType?
 }
 
+// MARK: - AddressBook_SourceType
+
 public protocol AddressBook_SourceType: AddressBookRecordType {
     typealias PersonStorage
     typealias GroupStorage
 }
+
+// MARK: - AddressBookSourceType
 
 public protocol AddressBookSourceType: AddressBook_SourceType {
 
