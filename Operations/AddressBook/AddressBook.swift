@@ -607,6 +607,11 @@ public final class AddressBook: AddressBookType {
         public struct Date {
             public static let anniversary = kABPersonAnniversaryLabel as String
         }
+        public struct General {
+            public static let home      = kABHomeLabel as String
+            public static let work      = kABWorkLabel as String
+            public static let other     = kABOtherLabel as String
+        }
         public struct Telephone {
             public static let mobile    = kABPersonPhoneMobileLabel as String
             public static let iPhone    = kABPersonPhoneIPhoneLabel as String
@@ -749,6 +754,13 @@ extension AddressBook { // People
         return ABAddressBookGetPersonCount(addressBook)
     }
 
+    public func createPerson(source: AddressBookSource? = .None) -> AddressBookPerson {
+        let unmanaged = source.map { ABPersonCreateInSource($0.storage) } ?? ABPersonCreate()
+        let ref: ABRecordRef = unmanaged.takeUnretainedValue()
+        let person = AddressBookPerson(storage: ref)
+        return person
+    }
+
     public func personWithID<P: AddressBook_PersonType where P.Storage == PersonStorage>(id: ABRecordID) -> P? {
         if let record = ABAddressBookGetPersonWithRecordID(addressBook, id) {
             return P(storage: record.takeUnretainedValue())
@@ -888,8 +900,9 @@ public struct LabeledValue<Value: MultiValueRepresentable>: DebugPrintable, Prin
     }
 
     static func write(labeledValues: [LabeledValue<Value>]) -> ABMultiValueRef {
-        return reduce(labeledValues, ABMultiValueCreateMutable(Value.propertyKind.rawValue).takeRetainedValue() as ABMutableMultiValueRef) { (multiValue, labeledValue) -> ABMutableMultiValueRef in
+        return reduce(labeledValues, ABMultiValueCreateMutable(Value.propertyKind.rawValue).takeRetainedValue() as ABMutableMultiValueRef) { (multiValue, labeledValue) in
             ABMultiValueAddValueAndLabel(multiValue, labeledValue.value.multiValueRepresentation, labeledValue.label, nil)
+            return multiValue
         }
     }
 
@@ -972,7 +985,7 @@ public class AddressBookPerson: AddressBookRecord, AddressBookPersonType {
         public struct Metadata {
             public static let kind              = AddressBookWriteableProperty<AddressBook.PersonKind>(id: kABPersonKindProperty, reader: reader, writer: writer)
             public static let creationDate      = AddressBookReadableProperty<NSDate>(id: kABPersonCreationDateProperty)
-            public static let modificationDate  = AddressBookReadableProperty<NSDate>(id: kABPersonModificationDateProperty)
+            public static let modificationDate  = AddressBookWriteableProperty<NSDate>(id: kABPersonModificationDateProperty)
         }
 
         public struct Name {
