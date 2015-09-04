@@ -45,8 +45,8 @@
 		657A4A3D1B77F10F006B3D7A /* RemoteNotificationCondition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 657A4A3C1B77F10F006B3D7A /* RemoteNotificationCondition.swift */; };
 		657A4A3F1B77F9AD006B3D7A /* RemoteNotificationConditionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 657A4A3E1B77F9AD006B3D7A /* RemoteNotificationConditionTests.swift */; };
 		6597EAD61B659D7500129294 /* LocationConditionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6597EAD51B659D7500129294 /* LocationConditionTests.swift */; };
-		6597EAD81B65A8B100129294 /* LocationOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6597EAD71B65A8B100129294 /* LocationOperation.swift */; };
-		6597EADA1B65B3A100129294 /* LocationOperationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6597EAD91B65B3A100129294 /* LocationOperationTests.swift */; };
+		6597EAD81B65A8B100129294 /* LocationOperations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6597EAD71B65A8B100129294 /* LocationOperations.swift */; };
+		6597EADA1B65B3A100129294 /* LocationOperationsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6597EAD91B65B3A100129294 /* LocationOperationsTests.swift */; };
 		6597EADC1B66373500129294 /* NoFailedDependenciesCondition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6597EADB1B66373500129294 /* NoFailedDependenciesCondition.swift */; };
 		6597EADE1B66399700129294 /* NoFailedDependenciesConditionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6597EADD1B66399700129294 /* NoFailedDependenciesConditionTests.swift */; };
 		65B551DC1B626FAA003B0C58 /* LoggingObserverTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65B551DB1B626FAA003B0C58 /* LoggingObserverTests.swift */; };
@@ -130,8 +130,8 @@
 		657A4A3C1B77F10F006B3D7A /* RemoteNotificationCondition.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RemoteNotificationCondition.swift; sourceTree = "<group>"; };
 		657A4A3E1B77F9AD006B3D7A /* RemoteNotificationConditionTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RemoteNotificationConditionTests.swift; sourceTree = "<group>"; };
 		6597EAD51B659D7500129294 /* LocationConditionTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LocationConditionTests.swift; sourceTree = "<group>"; };
-		6597EAD71B65A8B100129294 /* LocationOperation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LocationOperation.swift; sourceTree = "<group>"; };
-		6597EAD91B65B3A100129294 /* LocationOperationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LocationOperationTests.swift; sourceTree = "<group>"; };
+		6597EAD71B65A8B100129294 /* LocationOperations.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LocationOperations.swift; sourceTree = "<group>"; };
+		6597EAD91B65B3A100129294 /* LocationOperationsTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LocationOperationsTests.swift; sourceTree = "<group>"; };
 		6597EADB1B66373500129294 /* NoFailedDependenciesCondition.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NoFailedDependenciesCondition.swift; sourceTree = "<group>"; };
 		6597EADD1B66399700129294 /* NoFailedDependenciesConditionTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NoFailedDependenciesConditionTests.swift; sourceTree = "<group>"; };
 		65B551DB1B626FAA003B0C58 /* LoggingObserverTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoggingObserverTests.swift; sourceTree = "<group>"; };
@@ -260,7 +260,7 @@
 				65D6F57A1B5AF091003D35AD /* GroupOperationTests.swift */,
 				6528035C1B78DB8F00717334 /* HealthConditionTests.swift */,
 				6597EAD51B659D7500129294 /* LocationConditionTests.swift */,
-				6597EAD91B65B3A100129294 /* LocationOperationTests.swift */,
+				6597EAD91B65B3A100129294 /* LocationOperationsTests.swift */,
 				65B551DB1B626FAA003B0C58 /* LoggingObserverTests.swift */,
 				652122D81B5C427F00E26052 /* MutualExclusiveTests.swift */,
 				654308451B648D090081C211 /* NegatedConditionTests.swift */,
@@ -337,7 +337,7 @@
 				65D6F57C1B5B009D003D35AD /* DelayOperation.swift */,
 				650630321B629161005BD9F8 /* GatedOperation.swift */,
 				65D6F5781B5AE925003D35AD /* GroupOperation.swift */,
-				6597EAD71B65A8B100129294 /* LocationOperation.swift */,
+				6597EAD71B65A8B100129294 /* LocationOperations.swift */,
 				65D6F5741B5AC453003D35AD /* Operation.swift */,
 				65DADF621B62D73100EAD25B /* ReachableOperation.swift */,
 				65EA0F381B93CA8B00A0E591 /* UIOperation.swift */,
@@ -473,7 +473,7 @@
 				6514BE5A1B65993F0020A39D /* LocationCondition.swift in Sources */,
 				65D6F5891B5BEAC9003D35AD /* NetworkObserver.swift in Sources */,
 				65C00C2A1B6836D800599903 /* UserNotificationCondition.swift in Sources */,
-				6597EAD81B65A8B100129294 /* LocationOperation.swift in Sources */,
+				6597EAD81B65A8B100129294 /* LocationOperations.swift in Sources */,
 				65CB76FF1B3F284A00791E18 /* OperationQueue.swift in Sources */,
 				65D6F5851B5BE620003D35AD /* BackgroundObserver.swift in Sources */,
 				657729801B3DAA0400B5D153 /* OperationCondition.swift in Sources */,
@@ -525,7 +525,7 @@
 				65D6F57B1B5AF091003D35AD /* GroupOperationTests.swift in Sources */,
 				6597EADE1B66399700129294 /* NoFailedDependenciesConditionTests.swift in Sources */,
 				657A4A3B1B77E7CA006B3D7A /* CalendarConditionTests.swift in Sources */,
-				6597EADA1B65B3A100129294 /* LocationOperationTests.swift in Sources */,
+				6597EADA1B65B3A100129294 /* LocationOperationsTests.swift in Sources */,
 				65DADF651B62D75400EAD25B /* ReachableOperationTests.swift in Sources */,
 				654308461B648D090081C211 /* NegatedConditionTests.swift in Sources */,
 				6558091E1B604FD300CF0722 /* AlertOperationTests.swift in Sources */,
