@@ -106,5 +106,60 @@ public func ==(a: UserLocationOperation.Error, b: UserLocationOperation.Error) -
     }
 }
 
+// MARK: - Geocoding
+
+
+
+public protocol ReverseGeocoderType {
+    func opr_cancel()
+    func opr_reverseGeocodeLocation(location: CLLocation, completion: ([CLPlacemark], NSError?) -> Void)
+}
+
+extension CLGeocoder: ReverseGeocoderType {
+
+    public func opr_cancel() {
+        cancelGeocode()
+    }
+
+    public func opr_reverseGeocodeLocation(location: CLLocation, completion: ([CLPlacemark], NSError?) -> Void) {
+        reverseGeocodeLocation(location) { (results, error) in
+            completion(results as! [CLPlacemark], error as NSError?)
+        }
+    }
+}
+
+public class ReverseGeocodeOperation: Operation {
+
+    public enum Error: ErrorType {
+        case GeocoderError(NSError)
+    }
+
+    public let location: CLLocation
+    internal let geocoder: ReverseGeocoderType
+
+    public private(set) var placemark: CLPlacemark? = .None
+
+    public init(location: CLLocation, geocoder: ReverseGeocoderType = CLGeocoder()) {
+        self.location = location
+        self.geocoder = geocoder
+        super.init()
+        name = "Reverse Geocode"
+        addObserver(NetworkObserver())
+        addObserver(BackgroundObserver())
+    }
+
+    public override func cancel() {
+        geocoder.opr_cancel()
+        super.cancel()
+    }
+
+    public override func execute() {
+        geocoder.opr_reverseGeocodeLocation(location) { (results, error) in
+            self.placemark = results.first
+            self.finish(error.map { Error.GeocoderError($0) })
+        }
+    }
+}
+
 
 
