@@ -27,6 +27,7 @@ public class UserLocationOperation: Operation {
     private let accuracy: CLLocationAccuracy
     private var manager: LocationManager?
     private let handler: LocationResponseHandler
+    public var location: CLLocation? = .None
 
     /**
         This is the true public API, the other public initializer is really just a testing
@@ -37,7 +38,7 @@ public class UserLocationOperation: Operation {
     }
 
     /**
-        This is a testing interface, and will not be public in Swift 2.0, Operations 2.0.
+        This is the Swift 1.2 testing interface, and will not be public in Swift 2.0, Operations 2.0.
         Instead use init(:CLLocationAccuracy, handler: LocationResponseHandler)
     */
     public init(accuracy: CLLocationAccuracy, manager: LocationManager? = .None, handler: LocationResponseHandler) {
@@ -87,6 +88,7 @@ extension UserLocationOperation: CLLocationManagerDelegate {
     public func locationManager(manager: CLLocationManager!, didUpdateLocations locations: [AnyObject]!) {
         if let locations = locations as? [CLLocation], location = locations.last where location.horizontalAccuracy <= accuracy {
             stopLocationUpdates()
+            self.location = location
             handler(location: location)
             finish()
         }
@@ -108,8 +110,6 @@ public func ==(a: UserLocationOperation.Error, b: UserLocationOperation.Error) -
 
 // MARK: - Geocoding
 
-
-
 public protocol ReverseGeocoderType {
     func opr_cancel()
     func opr_reverseGeocodeLocation(location: CLLocation, completion: ([CLPlacemark], NSError?) -> Void)
@@ -130,22 +130,39 @@ extension CLGeocoder: ReverseGeocoderType {
 
 public class ReverseGeocodeOperation: Operation {
 
+    public typealias ReverseGeocodeCompletionHandler = (CLPlacemark) -> Void
+
     public enum Error: ErrorType {
         case GeocoderError(NSError)
     }
 
     public let location: CLLocation
     internal let geocoder: ReverseGeocoderType
+    internal let completion: ReverseGeocodeCompletionHandler?
 
     public private(set) var placemark: CLPlacemark? = .None
 
-    public init(location: CLLocation, geocoder: ReverseGeocoderType = CLGeocoder()) {
+    /**
+        This is the true public API, the other public initializer is really just a testing
+        interface, and will not be public in Swift 2.0, Operations 2.0
+    */
+    public convenience init(location: CLLocation, completion: ReverseGeocodeCompletionHandler? = .None) {
+        self.init(location: location, geocoder: CLGeocoder())
+    }
+
+    /**
+        This is the Swift 1.2 testing interface, and will not be public in Swift 2.0, Operations 2.0.
+        Instead use init(:CLLocationAccuracy, handler: LocationResponseHandler)
+    */
+    public init(location: CLLocation, geocoder: ReverseGeocoderType, completion: ReverseGeocodeCompletionHandler? = .None) {
         self.location = location
         self.geocoder = geocoder
+        self.completion = completion
         super.init()
         name = "Reverse Geocode"
         addObserver(NetworkObserver())
         addObserver(BackgroundObserver())
+        addCondition(MutuallyExclusive<ReverseGeocodeOperation>())
     }
 
     public override func cancel() {
@@ -155,8 +172,69 @@ public class ReverseGeocodeOperation: Operation {
 
     public override func execute() {
         geocoder.opr_reverseGeocodeLocation(location) { (results, error) in
-            self.placemark = results.first
+            if let placemark = results.first {
+                self.placemark = placemark
+                self.completion?(placemark)
+            }
             self.finish(error.map { Error.GeocoderError($0) })
+        }
+    }
+}
+
+public class ReverseGeocodeUserLocationOperation: GroupOperation {
+
+    public typealias ReverseGeocodeUserLocationCompletionHandler = (CLLocation, CLPlacemark) -> Void
+
+    private let geocoder: ReverseGeocoderType
+    private let completion: ReverseGeocodeUserLocationCompletionHandler?
+    private let userLocationOperation: UserLocationOperation
+    private var reverseGeocodeOperation: ReverseGeocodeOperation?
+
+    public var location: CLLocation? {
+        return userLocationOperation.location
+    }
+
+    public var placemark: CLPlacemark? {
+        return reverseGeocodeOperation?.placemark
+    }
+
+    /**
+        This is the true public API, the other public initializer is really just a testing
+        interface, and will not be public in Swift 2.0, Operations 2.0
+    */
+    public convenience init(accuracy: CLLocationAccuracy = kCLLocationAccuracyThreeKilometers, completion: ReverseGeocodeUserLocationCompletionHandler? = .None) {
+        self.init(accuracy: accuracy, manager: .None, geocoder: CLGeocoder(), completion: completion)
+    }
+
+    /**
+        This is the Swift 1.2 testing interface, and will not be public in Swift 2.0, Operations 2.0.
+        Instead use init(:CLLocationAccuracy, handler: LocationResponseHandler)
+    */
+    public init(accuracy: CLLocationAccuracy, manager: LocationManager? = .None, geocoder: ReverseGeocoderType, completion: ReverseGeocodeUserLocationCompletionHandler? = .None) {
+        self.geocoder = geocoder
+        self.completion = completion
+        self.userLocationOperation = UserLocationOperation(accuracy: accuracy, manager: manager) { location in
+            // no-op
+        }
+        super.init(operations: [ userLocationOperation ])
+        name = "Reverse Geocode User Location"
+    }
+
+    public override func cancel() {
+        userLocationOperation.cancel()
+        reverseGeocodeOperation?.cancel()
+        super.cancel()
+    }
+
+    public override func operationDidFinish(operation: NSOperation, withErrors errors: [ErrorType]) {
+        if errors.isEmpty && userLocationOperation == operation && !operation.cancelled {
+            if let location = location {
+                let reverseOp = ReverseGeocodeOperation(location: location, geocoder: geocoder) { [unowned self] placemark in
+                    self.completion?(location, placemark)
+                }
+                addOperation(reverseOp)
+                reverseGeocodeOperation = reverseOp
+            }
         }
     }
 }

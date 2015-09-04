@@ -13,6 +13,17 @@ import Operations
 
 class LocationOperationTests: OperationTests {
 
+    let accuracy: CLLocationAccuracy = 10
+    var locationManager: TestableLocationManager!
+    var location: CLLocation!
+
+    override func setUp() {
+        super.setUp()
+        location = createLocationWithAccuracy(accuracy)
+        locationManager = TestableLocationManager(enabled: true, status: .AuthorizedAlways)
+        locationManager.returnedLocation = location
+    }
+
     func createLocationWithAccuracy(accuracy: CLLocationAccuracy) -> CLLocation {
         return CLLocation(
             coordinate: CLLocationCoordinate2DMake(0.0, 0.0),
@@ -34,12 +45,8 @@ class UserLocationOperationTests: LocationOperationTests {
     func test__location_operation_receives_location() {
 
         var receivedLocation: CLLocation? = .None
-        let accuracy: CLLocationAccuracy = 10
 
-        let locationManager = TestableLocationManager(enabled: true, status: .AuthorizedAlways)
-        locationManager.returnedLocation = createLocationWithAccuracy(accuracy)
-
-        let operation = UserLocationOperation(accuracy: accuracy, manager: locationManager) { (location) -> Void in
+        let operation = UserLocationOperation(accuracy: accuracy, manager: locationManager) { location in
             receivedLocation = location
         }
 
@@ -52,8 +59,8 @@ class UserLocationOperationTests: LocationOperationTests {
         XCTAssertTrue(locationManager.didSetDelegate)
         XCTAssertTrue(locationManager.didStartUpdatingLocation)
         XCTAssertTrue(locationManager.didStopLocationUpdates)
+        XCTAssertEqual(operation.location!, receivedLocation!)
     }
-
 }
 
 
@@ -82,49 +89,47 @@ class TestableReverseGeocoder: ReverseGeocoderType {
 
 class ReverseGeocodeOperationTests: LocationOperationTests {
 
-    var location: CLLocation!
     var placemark: CLPlacemark!
     var geocoder: TestableReverseGeocoder!
-    var operation: ReverseGeocodeOperation!
+    var reverseGeocode: ReverseGeocodeOperation!
 
     override func setUp() {
         super.setUp()
-        location = createLocationWithAccuracy(100.0)
         placemark = createPlacemark(location.coordinate)
         geocoder = TestableReverseGeocoder(placemark: placemark)
-        operation = ReverseGeocodeOperation(location: location, geocoder: geocoder)
+        reverseGeocode = ReverseGeocodeOperation(location: location, geocoder: geocoder)
     }
 
     func test__name_is_correct() {
-        XCTAssertEqual(operation.name!, "Reverse Geocode")
+        XCTAssertEqual(reverseGeocode.name!, "Reverse Geocode")
     }
 
     func test__reverse_geocode_starts_geocoder() {
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
-        runOperation(operation)
+        addCompletionBlockToTestOperation(reverseGeocode, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        runOperation(reverseGeocode)
         waitForExpectationsWithTimeout(3, handler: nil)
 
         XCTAssertTrue(geocoder.didReverseLookup)
-        XCTAssertTrue(operation.finished)
-        XCTAssertEqual(operation.location, location)
-        XCTAssertEqual(operation.placemark!, placemark)
+        XCTAssertTrue(reverseGeocode.finished)
+        XCTAssertEqual(reverseGeocode.location, location)
+        XCTAssertEqual(reverseGeocode.placemark!, placemark)
     }
 
     func test__when_geocode_returns_error_operation_fails() {
         geocoder.error = NSError(domain: kCLErrorDomain, code: CLError.GeocodeFoundNoResult.rawValue, userInfo: nil)
 
         var receivedErrors = [ErrorType]()
-        operation.addObserver(BlockObserver { (_, errors) in
+        reverseGeocode.addObserver(BlockObserver { (_, errors) in
             receivedErrors = errors
         })
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
-        runOperation(operation)
+        addCompletionBlockToTestOperation(reverseGeocode, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        runOperation(reverseGeocode)
         waitForExpectationsWithTimeout(3, handler: nil)
 
         XCTAssertTrue(geocoder.didReverseLookup)
-        XCTAssertTrue(operation.finished)
+        XCTAssertTrue(reverseGeocode.finished)
 
         if let error = receivedErrors.first as? ReverseGeocodeOperation.Error {
             switch error {
@@ -139,17 +144,64 @@ class ReverseGeocodeOperationTests: LocationOperationTests {
 
     func test__reverse_geocode_cancels_when_operation_cancels() {
 
-        operation.addObserver(BlockObserver(startHandler: { op in
+        reverseGeocode.addObserver(BlockObserver(startHandler: { op in
             op.cancel()
         }))
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
-        runOperation(operation)
+        addCompletionBlockToTestOperation(reverseGeocode, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        runOperation(reverseGeocode)
         waitForExpectationsWithTimeout(3, handler: nil)
 
         XCTAssertTrue(geocoder.didCancel)
-        XCTAssertTrue(operation.cancelled)
+        XCTAssertTrue(reverseGeocode.cancelled)
+    }
+
+    func test__completion_handler_receives_placeholder() {
+        var completionBlockDidExecute = false
+        reverseGeocode = ReverseGeocodeOperation(location: location, geocoder: geocoder) { placemark in
+            completionBlockDidExecute = true
+            XCTAssertEqual(self.placemark, placemark)
+        }
+
+        addCompletionBlockToTestOperation(reverseGeocode, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        runOperation(reverseGeocode)
+        waitForExpectationsWithTimeout(3, handler: nil)
+        XCTAssertTrue(completionBlockDidExecute)
     }
 }
 
+class ReverseGeocodeUserLocationOperationTests: ReverseGeocodeOperationTests {
 
+    var reverseGeocodeUserLocation: ReverseGeocodeUserLocationOperation!
+
+    override func setUp() {
+        super.setUp()
+        reverseGeocodeUserLocation = ReverseGeocodeUserLocationOperation(accuracy: accuracy, manager: locationManager, geocoder: geocoder)
+    }
+
+    func test__reverse_geocode_user_location_starts_geocoder() {
+
+        addCompletionBlockToTestOperation(reverseGeocodeUserLocation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        runOperation(reverseGeocodeUserLocation)
+        waitForExpectationsWithTimeout(3, handler: nil)
+
+        XCTAssertTrue(geocoder.didReverseLookup)
+        XCTAssertTrue(reverseGeocodeUserLocation.finished)
+        XCTAssertEqual(reverseGeocodeUserLocation.location!, location)
+        XCTAssertEqual(reverseGeocodeUserLocation.placemark!, placemark)
+    }
+
+    func test__completion_handler_receives_location_and_placeholder() {
+        var completionBlockDidExecute = false
+        reverseGeocodeUserLocation = ReverseGeocodeUserLocationOperation(accuracy: accuracy, manager: locationManager, geocoder: geocoder) { location, placemark in
+            completionBlockDidExecute = true
+            XCTAssertEqual(self.location, location)
+            XCTAssertEqual(self.placemark, placemark)
+        }
+
+        addCompletionBlockToTestOperation(reverseGeocodeUserLocation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        runOperation(reverseGeocodeUserLocation)
+        waitForExpectationsWithTimeout(3, handler: nil)
+        XCTAssertTrue(completionBlockDidExecute)
+    }
+}
