@@ -61,7 +61,7 @@ public struct CloudContainerCondition: OperationCondition {
         self.permissions = permissions
     }
 
-    public init(container: CloudContainer, permissions: CKApplicationPermissions = []) {
+    init(container: CloudContainer, permissions: CKApplicationPermissions = []) {
         self.container = container
         self.permissions = permissions
     }
