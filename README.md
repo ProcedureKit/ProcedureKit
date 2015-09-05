@@ -248,7 +248,7 @@ queue.addOperation(getPeople)
 
 Use an observer or `GroupOperation` to access the results via the map operation’s `results` property.
 
-- [x] `AddressBookDisplayPersonViewController` is an operation which will display a person (provided their record id), from a controller in your app. This operation will perform the necessary address book tasks. It can present the controller using 3 different styles, either `.Present` (i.e. modal), `.Show` (i.e. old style push) or `.ShowDetail`. Here’s an example, taken from a production app:
+- [x] `AddressBookDisplayPersonViewController` is an operation which will display a person (provided their record id), from a controller in your app. This operation will perform the necessary address book tasks. It can present the controller using 3 different styles, either `.Present` (i.e. modal), `.Show` (i.e. old style push) or `.ShowDetail`. Here’s an example:
 
 ```swift
     func displayPersonWithAddressBookRecordID(recordID: ABRecordID) {
@@ -256,7 +256,12 @@ Use an observer or `GroupOperation` to access the results via the map operation�
         controller.allowsActions = true
         controller.allowsEditing = true
         controller.shouldShowLinkedPeople = true
-        let show = AddressBookDisplayPersonViewController(personViewController: controller, personWithID: recordID, displayControllerFrom: .ShowDetail(self), delegate: self)
+        let show = AddressBookDisplayPersonViewController(
+						personViewController: controller, 
+						personWithID: recordID, 
+						displayControllerFrom: .ShowDetail(self), 
+						delegate: self
+				)
         queue.addOperation(show)
     }
 ```
@@ -264,7 +269,11 @@ Use an observer or `GroupOperation` to access the results via the map operation�
 
 ```swift
     @IBAction func didTapAddNewPerson(sender: UIBarButtonItem) {
-        let show = AddressBookDisplayNewPersonViewController(displayControllerFrom: .Present(self), delegate: self, addToGroupWithName: “Special People”)
+        let show = AddressBookDisplayNewPersonViewController(
+					displayControllerFrom: .Present(self), 
+					delegate: self, 
+					addToGroupWithName: “Special People”
+				)
         queue.addOperation(show)
     }
 ```
