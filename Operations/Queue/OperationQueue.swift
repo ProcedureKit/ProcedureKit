@@ -77,11 +77,8 @@ public class OperationQueue: NSOperationQueue {
 
     public override func addOperations(ops: [NSOperation], waitUntilFinished wait: Bool) {
         ops.forEach(addOperation)
-
         if wait {
-            for operation in operations {
-                operation.waitUntilFinished()
-            }
+            ops.forEach { $0.waitUntilFinished() }
         }
     }
 }
