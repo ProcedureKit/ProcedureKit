@@ -19,7 +19,7 @@ public protocol OperationCondition {
 
     var name: String { get }
 
-     var isMutuallyExclusive: Bool { get }
+    var isMutuallyExclusive: Bool { get }
 
     /**
     Some conditions may have the ability to satisfy the condition
