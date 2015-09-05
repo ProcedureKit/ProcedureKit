@@ -186,7 +186,7 @@ This is a brief summary of the current and planned functionality.
 - [x] `MutuallyExclusive` condition e.g. can only one `AlertPresentation` at once.
 - [x] `NegatedCondition` evaluates the reverse of the composed condition.
 - [x] `SilentCondition` suppress any dependencies of the composed condition.
-- [x] `NoCancelledDependencies` requires that all dependencies succeeded.
+- [x] ~~`NoCancelledDependencies`~~ `NoFailedDependenciesCondition` requires that all dependencies succeeded.
 - [x] `BlockObserver` run blocks when the attached operation starts, produces another operation or finishes.
 - [x] `BackgroundObserver` automatically start and stop background tasks if the application enters the background while the attached operation is running.
 - [x] `NetworkObserver` automatically manage the device’s network indicator while the operation is running.
@@ -196,6 +196,7 @@ This is a brief summary of the current and planned functionality.
 - [x] `DelayOperation` inserts a delay into the operation queue.
 - [x] `BlockOperation` run a block inside an `Operation`. Supports unsuccessful finishing.
 - [x] `GatedOperation` only run the composed operation if the provided block evaluates true.
+- [x] `ComposedOperation` run a composed `NSOperation`. This is great for adding conditions or observers to bog-standard `NSOperation`s without having to subclass them. 
 
 ### Features
 
