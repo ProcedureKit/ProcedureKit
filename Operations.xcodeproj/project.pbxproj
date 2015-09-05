@@ -201,13 +201,6 @@
 			name = Permissions;
 			sourceTree = "<group>";
 		};
-		656F21CD1B7E238000849E9F /* Extras */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			name = Extras;
-			sourceTree = "<group>";
-		};
 		657729531B3D9E0E00B5D153 = {
 			isa = PBXGroup;
 			children = (
@@ -234,7 +227,6 @@
 				657729841B3DAAA400B5D153 /* Support.swift */,
 				65E4E14E1B8B9B5F00A8F5DD /* AddressBook */,
 				6577297D1B3DAA0400B5D153 /* Conditions */,
-				656F21CD1B7E238000849E9F /* Extras */,
 				65CB76F61B3F284A00791E18 /* Observers */,
 				65D6F5731B5AC453003D35AD /* Operations */,
 				65CB76FA1B3F284A00791E18 /* Queue */,
