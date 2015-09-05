@@ -31,7 +31,7 @@ public class ReachabilityCondition: OperationCondition {
         self.init(url: url, connectivity: connectivity, reachability: Reachability.sharedInstance)
     }
 
-    public init(url: NSURL, connectivity: Reachability.Connectivity = .AnyConnectionKind, reachability: HostReachability) {
+    init(url: NSURL, connectivity: Reachability.Connectivity = .AnyConnectionKind, reachability: HostReachability) {
         self.url = url
         self.connectivity = connectivity
         self.reachability = reachability
