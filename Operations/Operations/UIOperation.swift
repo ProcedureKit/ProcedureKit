@@ -29,7 +29,18 @@ public enum ViewControllerDisplayStyle<ViewController: PresentingViewController>
     case ShowDetail(ViewController)
     case Present(ViewController)
 
-    func displayController<C where C: UIViewController>(controller: C, sender: AnyObject?, completion: (() -> Void)?) {
+    public var controller: ViewController {
+        switch self {
+        case .Show(let controller):
+            return controller
+        case .ShowDetail(let controller):
+            return controller
+        case .Present(let controller):
+            return controller
+        }
+    }
+
+    public func displayController<C where C: UIViewController>(controller: C, sender: AnyObject?, completion: (() -> Void)?) {
         switch self {
 
         case .Present(let from):
@@ -57,9 +68,9 @@ public enum UIOperationError: ErrorType {
 
 public class UIOperation<C, From where C: UIViewController, From: PresentingViewController>: Operation {
 
-    let controller: C
-    let from: ViewControllerDisplayStyle<From>
-    let sender: AnyObject?
+    public let controller: C
+    public let from: ViewControllerDisplayStyle<From>
+    public let sender: AnyObject?
     let completion: (() -> Void)?
 
     public init(controller: C, displayControllerFrom from: ViewControllerDisplayStyle<From>, sender: AnyObject? = .None, completion: (() -> Void)? = .None) {
