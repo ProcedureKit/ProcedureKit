@@ -9,7 +9,7 @@
 import Foundation
 import CoreLocation
 
-@availability(*, unavailable, renamed="UserLocationOperation")
+@available(*, unavailable, renamed="UserLocationOperation")
 public typealias LocationOperation = UserLocationOperation
 
 /**
@@ -58,7 +58,7 @@ public class UserLocationOperation: Operation {
             manager.opr_startUpdatingLocation()
         }
 
-        if var manager = manager {
+        if let manager = manager {
             configureLocationManager(manager)
         }
         else {
@@ -85,8 +85,8 @@ public class UserLocationOperation: Operation {
 
 extension UserLocationOperation: CLLocationManagerDelegate {
 
-    public func locationManager(manager: CLLocationManager!, didUpdateLocations locations: [AnyObject]!) {
-        if let locations = locations as? [CLLocation], location = locations.last where location.horizontalAccuracy <= accuracy {
+    public func locationManager(manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        if let location = locations.last where location.horizontalAccuracy <= accuracy {
             stopLocationUpdates()
             self.location = location
             handler(location: location)
@@ -94,7 +94,7 @@ extension UserLocationOperation: CLLocationManagerDelegate {
         }
     }
 
-    public func locationManager(manager: CLLocationManager!, didFailWithError error: NSError!) {
+    public func locationManager(manager: CLLocationManager, didFailWithError error: NSError) {
         stopLocationUpdates()
         finish(Error.LocationManagerDidFail(error))
     }
@@ -104,7 +104,6 @@ public func ==(a: UserLocationOperation.Error, b: UserLocationOperation.Error) -
     switch (a, b) {
     case let (.LocationManagerDidFail(aError), .LocationManagerDidFail(bError)):
         return aError == bError
-    default: return false
     }
 }
 
@@ -123,7 +122,7 @@ extension CLGeocoder: ReverseGeocoderType {
 
     public func opr_reverseGeocodeLocation(location: CLLocation, completion: ([CLPlacemark], NSError?) -> Void) {
         reverseGeocodeLocation(location) { (results, error) in
-            completion(results as! [CLPlacemark], error as NSError?)
+            completion(results ?? [], error as NSError?)
         }
     }
 }
