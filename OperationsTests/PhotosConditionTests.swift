@@ -10,7 +10,7 @@
 
 import XCTest
 import Photos
-import Operations
+@testable import Operations
 
 class TestablePhotoLibrary: PhotosManagerType {
 

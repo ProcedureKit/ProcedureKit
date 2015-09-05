@@ -9,7 +9,7 @@
 import XCTest
 import CoreLocation
 import MapKit
-import Operations
+@testable import Operations
 
 class LocationOperationTests: OperationTests {
 

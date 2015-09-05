@@ -7,7 +7,7 @@
 //
 
 import XCTest
-import Operations
+@testable import Operations
 
 class TestableNetworkActivityIndicator: NetworkActivityIndicatorInterface {
     typealias IndicatorVisibilityDidChange = (visibility: Bool) -> Void

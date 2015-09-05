@@ -8,7 +8,8 @@
 
 import XCTest
 import AddressBook
-import Operations
+
+@testable import Operations
 
 class TestableAddressBookRegistrar: AddressBookPermissionRegistrar {
 

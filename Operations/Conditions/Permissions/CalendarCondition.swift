@@ -47,7 +47,7 @@ public struct CalendarCondition: OperationCondition {
         Instead use
             init(type: EKEntityType)
     */
-    public init(type: EKEntityType, authorizationManager: EventKitAuthorizationManagerType) {
+    init(type: EKEntityType, authorizationManager: EventKitAuthorizationManagerType) {
         entityType = type
         manager = authorizationManager
     }

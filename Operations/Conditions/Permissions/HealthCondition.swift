@@ -52,7 +52,7 @@ public struct HealthCondition: OperationCondition {
         self.init(manager: HKHealthStore(), typesToRead: typesToRead, typesToWrite: typesToWrite)
     }
 
-    public init(manager: HealthManagerType, typesToRead: Set<HKSampleType> = Set(), typesToWrite: Set<HKSampleType> = Set()) {
+    init(manager: HealthManagerType, typesToRead: Set<HKSampleType> = Set(), typesToWrite: Set<HKSampleType> = Set()) {
         self.manager = manager
         self.readTypes = typesToRead
         self.shareTypes = typesToWrite

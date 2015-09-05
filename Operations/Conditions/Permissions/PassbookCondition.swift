@@ -37,12 +37,7 @@ public struct PassbookCondition: OperationCondition {
         self.init(library: PassLibrary())
     }
 
-    /**
-        Testing Interface only, use
-
-            init()
-    */
-    public init(library: PassLibraryType) {
+    init(library: PassLibraryType) {
         self.library = library
     }
 

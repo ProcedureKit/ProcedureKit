@@ -17,8 +17,13 @@ public class AddressBookOperation: Operation {
     internal var registrar: AddressBookPermissionRegistrar
     public var addressBook: AddressBook
 
-    public init(registrar r: AddressBookPermissionRegistrar? = .None) {
-        registrar = r ?? SystemAddressBookRegistrar()
+    public override init() {
+        registrar = SystemAddressBookRegistrar()
+        addressBook = AddressBook(registrar: registrar)
+    }
+
+    init(registrar r: AddressBookPermissionRegistrar) {
+        registrar = r
         addressBook = AddressBook(registrar: registrar)
     }
 
@@ -197,8 +202,13 @@ public class AddressBookGetResource: AddressBookOperation {
 
 public class AddressBookGetGroup: AddressBookGetResource {
 
-    public init(registrar r: AddressBookPermissionRegistrar? = .None, name: String) {
-        super.init(registrar: r)
+    public init(name: String) {
+        super.init()
+        groupQuery = .Name(name)
+    }
+
+    init(registrar: AddressBookPermissionRegistrar, name: String) {
+        super.init(registrar: registrar)
         groupQuery = .Name(name)
     }
 }
@@ -258,7 +268,13 @@ public class AddressBookRemoveGroup: AddressBookGetGroup {
 
 public class AddressBookAddPersonToGroup: AddressBookGetResource {
 
-    public init(registrar: AddressBookPermissionRegistrar? = .None, group: String, personID: ABRecordID) {
+    public init(group: String, personID: ABRecordID) {
+        super.init()
+        groupQuery = .Name(group)
+        personQuery = .ID(personID)
+    }
+
+    init(registrar: AddressBookPermissionRegistrar, group: String, personID: ABRecordID) {
         super.init(registrar: registrar)
         groupQuery = .Name(group)
         personQuery = .ID(personID)
@@ -289,7 +305,13 @@ public class AddressBookAddPersonToGroup: AddressBookGetResource {
 
 public class AddressBookRemovePersonFromGroup: AddressBookGetResource {
 
-    public init(registrar: AddressBookPermissionRegistrar? = .None, group: String, personID: ABRecordID) {
+    public init(group: String, personID: ABRecordID) {
+        super.init()
+        groupQuery = .Name(group)
+        personQuery = .ID(personID)
+    }
+
+    init(registrar: AddressBookPermissionRegistrar, group: String, personID: ABRecordID) {
         super.init(registrar: registrar)
         groupQuery = .Name(group)
         personQuery = .ID(personID)
@@ -330,7 +352,15 @@ public class AddressBookMapPeople<T>: AddressBookGetResource {
     let transform: (AddressBookPerson) -> T?
     var results = Array<T>()
 
-    public init(registrar: AddressBookPermissionRegistrar? = .None, inGroupNamed groupName: String? = .None, transform: (AddressBookPerson) -> T?) {
+    public init(inGroupNamed groupName: String? = .None, transform: (AddressBookPerson) -> T?) {
+        self.transform = transform
+        super.init()
+        if let groupName = groupName {
+            groupQuery = .Name(groupName)
+        }
+    }
+
+    init(registrar: AddressBookPermissionRegistrar, inGroupNamed groupName: String? = .None, transform: (AddressBookPerson) -> T?) {
         self.transform = transform
         super.init(registrar: registrar)
         if let groupName = groupName {
@@ -388,7 +418,11 @@ public class AddressBookDisplayPersonViewController<F: PresentingViewController>
     let ui: UIOperation<ABPersonViewController, F>
     let get: AddressBookGetResource
 
-    public init(registrar: AddressBookPermissionRegistrar? = .None, personViewController: ABPersonViewController? = .None, personWithID id: ABRecordID, displayControllerFrom from: ViewControllerDisplayStyle<F>, delegate: ABPersonViewControllerDelegate, sender: AnyObject? = .None) {
+    public convenience init(personViewController: ABPersonViewController? = .None, personWithID id: ABRecordID, displayControllerFrom from: ViewControllerDisplayStyle<F>, delegate: ABPersonViewControllerDelegate, sender: AnyObject? = .None) {
+        self.init(registrar: SystemAddressBookRegistrar(), personViewController: personViewController, personWithID: id, displayControllerFrom: from, delegate: delegate, sender: sender)
+    }
+
+    init(registrar: AddressBookPermissionRegistrar, personViewController: ABPersonViewController? = .None, personWithID id: ABRecordID, displayControllerFrom from: ViewControllerDisplayStyle<F>, delegate: ABPersonViewControllerDelegate, sender: AnyObject? = .None) {
 
         self.ui = UIOperation(controller: personViewController ?? ABPersonViewController(), displayControllerFrom: from, sender: sender)
         self.delegate = delegate
@@ -414,7 +448,11 @@ public class AddressBookDisplayNewPersonViewController<F: PresentingViewControll
     let ui: UIOperation<ABNewPersonViewController, F>
     let get: AddressBookGetResource
 
-    public init(registrar: AddressBookPermissionRegistrar? = .None, displayControllerFrom from: ViewControllerDisplayStyle<F>, delegate: ABNewPersonViewControllerDelegate, sender: AnyObject? = .None, addToGroupWithName groupName: String? = .None) {
+    public convenience init(displayControllerFrom from: ViewControllerDisplayStyle<F>, delegate: ABNewPersonViewControllerDelegate, sender: AnyObject? = .None, addToGroupWithName groupName: String? = .None) {
+        self.init(registrar: SystemAddressBookRegistrar(), displayControllerFrom: from, delegate: delegate, sender: sender, addToGroupWithName: groupName)
+    }
+
+    init(registrar: AddressBookPermissionRegistrar, displayControllerFrom from: ViewControllerDisplayStyle<F>, delegate: ABNewPersonViewControllerDelegate, sender: AnyObject? = .None, addToGroupWithName groupName: String? = .None) {
 
         self.ui = UIOperation(controller: ABNewPersonViewController(), displayControllerFrom: from, sender: sender)
         self.delegate = delegate
@@ -497,6 +535,7 @@ public class AddressBookObserver: GroupOperation {
 
         init(_ block: AddressBookDidChange) {
             addressBookDidChange = block
+            super.init()
         }
 
         deinit {

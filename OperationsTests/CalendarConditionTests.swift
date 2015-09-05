@@ -8,7 +8,7 @@
 
 import XCTest
 import EventKit
-import Operations
+@testable import Operations
 
 class TestableEventKitAuthorizationManager: EventKitAuthorizationManagerType {
 

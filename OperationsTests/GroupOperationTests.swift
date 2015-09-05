@@ -8,7 +8,7 @@
 
 import Foundation
 import XCTest
-import Operations
+@testable import Operations
 
 class GroupOperationTests: OperationTests {
 

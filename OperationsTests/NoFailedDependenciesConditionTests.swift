@@ -7,7 +7,7 @@
 //
 
 import XCTest
-import Operations
+@testable import Operations
 
 class NoFailedDependenciesConditionTests: OperationTests {
 
