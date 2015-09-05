@@ -10,6 +10,12 @@ I want to stress that this code is heavily influenced by Apple. In no way am I a
 
 Rather than just copy Apple’s sample code, I have been re-writing it from scratch, but heavily guided. The main changes I have made, other than some minor bug fixes, have been architectural to enhance the testability of the code. Unfortunately, this makes the public API a little messy for Swift 1.2, but thanks to `@testable` will not be visible in Swift 2.
 
+## Status - 5th Sept, 2015
+
+Until iOS 9 & Swift 2.0 is out of developer preview, releases continue to be for Swift 1.2. The `master` branch is stable releases, and `development` (the default branch) is the bleeding edge. If you want to contribute towards Swift 1.2 features, please direct your Pull Request to the `development` branch.
+
+For Swift 2.0, please use the `swift_2.0` branch, and direct any pull requests to this upstream branch. In terms of features, Swift 2.0 has all the same features, with the addition of  `WebpageOperation`.
+
 ## Usage
 
 `NSOperation` is a class which enables composition of discrete tasks or work for asynchronous execution on an operation queue. It is therefore an abstract class, and `Operation` is a similar abstract class. Therefore, typical usage in your own codebase would be to subclass `Operation` and override `execute`.
@@ -109,11 +115,13 @@ func dismiss() {
 
 In the above example, we're able to compose reusable (and testable!) units of work in order to express relatively complex control logic. Another way to achieve this kind of behaviour might be through FRP techniques, however those are unlikely to yield re-usable types like `UnsavedChangesCondition`, or even `DismissController` if the above was composed inside a custom `GroupOperation`.
 
+## Device & OS Permissions
+
 Requesting permissions from the user can often be a relatively complex task, which almost all apps have to perform at some point. Often developers put requests for these permissions in their AppDelegate, meaning that new users are bombarded with alerts. This isn't a great experience, and Apple expressly suggest only requesting permissions when you need them. However, this is easier said than done. The Operations framework can help however. Lets say we want to get the user's current location.
 
 ```swift
 func getCurrentLocation(completion: CLLocation -> Void) {
-    queue.addOperation(LocationOperation(handler: completion))
+    queue.addOperation(UserLocationOperation(handler: completion))
 }
 ```
 
@@ -157,7 +165,13 @@ it, simply add the following line to your Podfile:
 pod ‘Operations’
 ```
 
-## Current Status
+For Swift 2.0, add the following to your Podfile:
+
+```ruby
+pod ‘Operations’, :git => ‘https://github.com/danthorpe/Operations.git', :branch => ‘swift_2.0’
+```
+
+## Features
 
 This is a brief summary of the current and planned functionality.
 
@@ -187,22 +201,84 @@ This is a brief summary of the current and planned functionality.
 
 - [x] `ReachabilityCondition` requires that the supplied URL is reachable.
 - [x] `ReachableOperation` compose an operation which must complete and requires network reachability. This uses an included system  Reachability object and does not require any extra dependencies. However currently in Swift 1.2, as function pointers are not supported, this uses a polling mechanism with `dispatch_source_timer`. I will probably replace this with more efficient Objective-C soon.
-- [x] `AddressBookCondition` require authorized access to ABAddressBook. Will automatically request access if status is not already determined.
-- [x] `AddressBookOperation` perform task in closure which receives `ABAddressBookRef` instance. Will automatically add `AddressBookCondition`.
 - [x] `CloudCondition` require varying levels of access to a `CKContainer`.
 - [x] `CloudKitOperation` compose a `CKDatabaseOperation` inside an `Operation` with the appropriate `CKDatabase`.
 - [x] `LocationCondition` requires permission to access the user’s location with support for specifying always or when in use permissions.
-- [x] `LocationOperation` access the user’s current location with desired accuracy. 
-- [x] User Notifications
-- [x] Remote Notifications
-- [x] HealthKit
-- [x] Photos
-- [x] Events & Reminders
-- [x] Passbook
-- [ ] Contacts - some initial work is done on the `swift_2.0` branch. However, currently this branch is behind `development` by quite a margin.
-- [ ] Webpage - some initial work is done on a feature branch, again, Swift 2.0 only.
-- [x] User Confirmation Alert - condition an operation with a user confirmation, so that the operation will only be executed if the user confirms it. Great for “delete” operation for example.
+- [x] `UserLocationOperation` access the user’s current location with desired accuracy. 
+- [x] `ReverseGeocodeOperation` perform a reverse geocode lookup of the supplied `CLLocation`.
+- [x] `ReverseGeocodeUserLocationOperation` perform a reverse geocode lookup of user’s current location.  
+- [x] `UserNotificationCondition` require that the user has granted permission to present th
+- [x] `RemoteNotificationCondition` require that the user has granted permissions to receive remote notifications.
+- [x] `HealthCondition` requires permission to read/write the supplied health kit sample types.
+- [x] `PhotosCondition` requires permission to access the user’s photo library.
+- [x] `CalendarCondition` requires permissions to access the user’s calendar events and/or reminders. 
+- [x] `PassbookCondition` requires that the user’s Pass Library is available.
+- [x] `UserConfirmationCondition` requires that the user confirms an action presented to them using a `UIAlertController`. The condition is configurable for title, message and button texts. 
+- [x] `WebpageOperation` given a URL, will present a `SFSafariViewController`.
+- [ ] Contacts - Planned: to match the functionality of AddressBook operations but using Contacts.framework for iOS 9.
 
+### +AddressBook
+
+Available as a subspec (if using CocoaPods) is `ABAddressBook.framework` related operations.
+
+- [x] `AddressBookCondition` require authorized access to ABAddressBook. Will automatically request access if status is not already determined.
+- [x] `AddressBookOperation` is a base operation which creates the address book and requests access.
+- [x] `AddressBookGetResource` is a subclass of `AddressBookOperation` and exposes methods to access resources from the address book. These can include person records and groups. All resources are wrapped inside Swift facades to the underlying opaque AddressBook types.
+- [x] `AddressBookGetGroup` will get the group for a given name.
+- [x] `AddressBookCreateGroup` will create the group for a given name, if it doesn’t already exist.
+- [x] `AddressBookRemoveGroup` will remove the group for a given name.
+- [x] `AddressBookAddPersonToGroup` will add the person with record id to the group with the provided name.
+- [x] `AddressBookRemovePersonFromGroup` will remove the person with record id from the group with the provided name.
+- [x] `AddressBookMapPeople<T>` takes an optional group name, and a mapping transform. It will map all the people in the address book (or in the group) via the transform. This is great if you have your own representation of a Person, and which to import the AddressBook. In such a case, create the following:
+
+```swift
+extension MyPerson {
+    init?(addressBookPerson: AddressBookPerson) {
+        // Create a person, return nil if not possible.
+    }
+}
+```
+
+Then, import people
+
+```swift
+let getPeople = AddressBookMapPeople { MyPerson($0) }
+queue.addOperation(getPeople)
+```
+
+Use an observer or `GroupOperation` to access the results via the map operation’s `results` property.
+
+- [x] `AddressBookDisplayPersonViewController` is an operation which will display a person (provided their record id), from a controller in your app. This operation will perform the necessary address book tasks. It can present the controller using 3 different styles, either `.Present` (i.e. modal), `.Show` (i.e. old style push) or `.ShowDetail`. Here’s an example:
+
+```swift
+    func displayPersonWithAddressBookRecordID(recordID: ABRecordID) {
+        let controller = ABPersonViewController()
+        controller.allowsActions = true
+        controller.allowsEditing = true
+        controller.shouldShowLinkedPeople = true
+        let show = AddressBookDisplayPersonViewController(
+						personViewController: controller, 
+						personWithID: recordID, 
+						displayControllerFrom: .ShowDetail(self), 
+						delegate: self
+				)
+        queue.addOperation(show)
+    }
+```
+- [x] `AddressBookDisplayNewPersonViewController` same as the above, but for showing the standard create new person controller. For example:
+
+```swift
+    @IBAction func didTapAddNewPerson(sender: UIBarButtonItem) {
+        let show = AddressBookDisplayNewPersonViewController(
+					displayControllerFrom: .Present(self), 
+					delegate: self, 
+					addToGroupWithName: “Special People”
+				)
+        queue.addOperation(show)
+    }
+```
+
+- [x] `AddressBookObserverQueue` & `AddressBookObserver` this is a work in progress, but I’m trying to add support for running operations when external changes to the AddressBook are detected.
 
 The framework is well tested, with approximately 70% coverage. This is known as I wrote it much of the foundation bits using Xcode 7 but have back ported it to Swift 1.2.
 
