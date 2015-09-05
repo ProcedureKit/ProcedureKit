@@ -42,7 +42,7 @@ public struct PhotosCondition: OperationCondition {
         self.init(manager: SystemPhotoLibraryAuthenticationManager())
     }
 
-    public init(manager: PhotosManagerType) {
+    init(manager: PhotosManagerType) {
         self.manager = manager
     }
 
