@@ -22,7 +22,7 @@ public class NetworkObserver: OperationObserver {
         self.init(indicator: UIApplication.sharedApplication())
     }
 
-    public init(indicator: NetworkActivityIndicatorInterface) {
+    init(indicator: NetworkActivityIndicatorInterface) {
         networkActivityIndicator = indicator
     }
 
