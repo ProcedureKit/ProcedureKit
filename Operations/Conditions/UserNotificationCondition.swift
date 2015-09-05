@@ -76,7 +76,7 @@ public struct UserNotificationCondition: OperationCondition {
         self.init(settings: settings, behavior: behavior, registrar: UIApplication.sharedApplication())
     }
 
-    public init(settings: UIUserNotificationSettings, behavior: Behavior = .Merge, registrar: UserNotificationRegistrarType) {
+    init(settings: UIUserNotificationSettings, behavior: Behavior = .Merge, registrar: UserNotificationRegistrarType) {
         self.settings = settings
         self.behavior = behavior
         self.registrar = registrar
@@ -125,7 +125,7 @@ public class UserNotificationPermissionOperation: Operation {
         self.init(settings: settings, behavior: behavior, registrar: UIApplication.sharedApplication())
     }
 
-    public init(settings: UIUserNotificationSettings, behavior: UserNotificationCondition.Behavior = .Merge, registrar: UserNotificationRegistrarType) {
+    init(settings: UIUserNotificationSettings, behavior: UserNotificationCondition.Behavior = .Merge, registrar: UserNotificationRegistrarType) {
         self.settings = settings
         self.behavior = behavior
         self.registrar = registrar
