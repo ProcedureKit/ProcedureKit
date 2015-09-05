@@ -83,17 +83,12 @@ public struct LocationCondition: OperationCondition {
         interface, and will not be public in Swift 2.0, Operations 2.0
     */
     public init(usage: Usage = .WhenInUse) {
-        self.usage = usage
-        self.manager = CLLocationManager()
+        self.init(usage: usage, manager: CLLocationManager())
     }
 
-    /**
-        This is a testing interface, and will not be public in Swift 2.0, Operations 2.0.
-        Instead use init(:Usage)
-    */
-    public init(usage: Usage, manager: LocationManager? = .None) {
+    init(usage: Usage, manager: LocationManager) {
         self.usage = usage
-        self.manager = manager ?? CLLocationManager()
+        self.manager = manager
     }
 
     public func dependencyForOperation(operation: Operation) -> NSOperation? {
