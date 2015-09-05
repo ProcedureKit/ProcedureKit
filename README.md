@@ -242,8 +242,8 @@ extension MyPerson {
 Then, import people
 
 ```swift
-let import = AddressBookMapPeople { MyPerson($0) }
-queue.addOperation(import)
+let getPeople = AddressBookMapPeople { MyPerson($0) }
+queue.addOperation(getPeople)
 ```
 
 Use an observer or `GroupOperation` to access the results via the map operation’s `results` property.
