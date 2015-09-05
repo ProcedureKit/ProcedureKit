@@ -1,4 +1,4 @@
-source "https://rubygems.org"
+source 'https://rubygems.org'
 
 gem 'fastlane', '>= 1.16'
 gem 'xcpretty'
