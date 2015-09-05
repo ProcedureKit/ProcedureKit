@@ -64,7 +64,7 @@ extension ExclusivityManager {
 
     /// This should only be used as part of the unit testing
     /// and in v2+ will not be publically accessible
-    public func __tearDownForUnitTesting() {
+    private func __tearDownForUnitTesting() {
         dispatch_sync(queue) {
             for (category, operations) in self.operations {
                 for operation in operations {
