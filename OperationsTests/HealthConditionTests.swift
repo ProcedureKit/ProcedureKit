@@ -10,7 +10,7 @@
 
 import XCTest
 import HealthKit
-import Operations
+@testable import Operations
 
 class TestableHealthManager: HealthManagerType {
 

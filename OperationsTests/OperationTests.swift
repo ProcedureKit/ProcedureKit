@@ -8,7 +8,7 @@
 
 import UIKit
 import XCTest
-import Operations
+@testable import Operations
 
 class TestOperation: Operation {
 

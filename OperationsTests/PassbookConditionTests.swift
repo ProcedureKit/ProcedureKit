@@ -9,7 +9,7 @@
 #if os(iOS)
 
 import XCTest
-import Operations
+@testable import Operations
 
 class TestablePassLibrary: PassLibraryType {
     let enabled: Bool

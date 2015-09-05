@@ -8,7 +8,7 @@
 
 import XCTest
 import CloudKit
-import Operations
+@testable import Operations
 
 class TestableCloudContainer: CloudContainer {
 

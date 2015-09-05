@@ -7,7 +7,7 @@
 //
 
 import XCTest
-import Operations
+@testable import Operations
 
 class TestablePresentingController: PresentingViewController {
     typealias CheckBlockType = (received: UIViewController) -> Void
