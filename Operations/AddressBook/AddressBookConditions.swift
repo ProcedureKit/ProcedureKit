@@ -21,8 +21,12 @@ public struct AddressBookCondition: OperationCondition {
     public let isMutuallyExclusive = false
     private let registrar: AddressBookPermissionRegistrar
 
-    public init(registrar: AddressBookPermissionRegistrar? = .None) {
-        self.registrar = registrar ?? SystemAddressBookRegistrar()
+    public init() {
+        registrar = SystemAddressBookRegistrar()
+    }
+
+    init(registrar: AddressBookPermissionRegistrar) {
+        self.registrar = registrar
     }
 
     public func dependencyForOperation(operation: Operation) -> NSOperation? {
