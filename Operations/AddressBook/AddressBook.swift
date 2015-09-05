@@ -25,18 +25,26 @@ and it lacked the necessary hooks for testability.
 
 // MARK: - Protocols
 
+// MARK: - PropertyType
+
 public protocol PropertyType {
     typealias ValueType
     var id: ABPropertyID { get }
 }
 
+// MARK: - ReadablePropertyType
+
 public protocol ReadablePropertyType: PropertyType {
     var reader: ((CFTypeRef) -> ValueType)? { get }
 }
 
+// MARK: - WriteablePropertyType
+
 public protocol WriteablePropertyType: PropertyType {
     var writer: ((ValueType) -> CFTypeRef)? { get }
 }
+
+// MARK: - MultiValueRepresentable
 
 public protocol MultiValueRepresentable {
     static var propertyKind: AddressBook.PropertyKind { get }
@@ -44,15 +52,21 @@ public protocol MultiValueRepresentable {
     init?(multiValueRepresentation: CFTypeRef)
 }
 
+// MARK: - AddressBookPermissionRegistrar
+
 public protocol AddressBookPermissionRegistrar {
     var status: ABAuthorizationStatus { get }
     func createAddressBook() -> (ABAddressBookRef?, AddressBookPermissionRegistrarError?)
     func requestAccessToAddressBook(addressBook: ABAddressBookRef, completion: (AddressBookPermissionRegistrarError?) -> Void)
 }
 
+// MARK: - AddressBookExternalChangeObserver
+
 public protocol AddressBookExternalChangeObserver {
     mutating func endObservingExternalChangesToAddressBook()
 }
+
+// MARK: - AddressBookType
 
 public protocol AddressBookType {
 
@@ -104,6 +118,8 @@ public protocol AddressBookType {
     func sources<S: AddressBook_SourceType where S.Storage == SourceStorage>() -> [S]
 }
 
+// MARK: - StorageType
+
 public protocol StorageType {
     typealias Storage
 
@@ -111,6 +127,8 @@ public protocol StorageType {
 
     init(storage: Storage)
 }
+
+// MARK: - AddressBookRecordType
 
 public protocol AddressBookRecordType: StorageType {
 
@@ -125,20 +143,28 @@ public protocol AddressBookRecordType: StorageType {
     func setValue<P: WriteablePropertyType>(value: P.ValueType?, forProperty property: P) -> ErrorType?
 }
 
+// MARK: - AddressBook_PersonType
+
 public protocol AddressBook_PersonType: AddressBookRecordType {
     typealias GroupStorage
     typealias SourceStorage
 }
+
+// MARK: - AddressBookPersonType
 
 public protocol AddressBookPersonType: AddressBook_PersonType {
 
     var compositeNameFormat: AddressBook.CompositeNameFormat { get }
 }
 
+// MARK: - AddressBook_GroupType
+
 public protocol AddressBook_GroupType: AddressBookRecordType {
     typealias PersonStorage
     typealias SourceStorage
 }
+
+// MARK: - AddressBookGroupType
 
 public protocol AddressBookGroupType: AddressBook_GroupType {
 
@@ -149,10 +175,14 @@ public protocol AddressBookGroupType: AddressBook_GroupType {
     func remove<P: AddressBook_PersonType where P.Storage == PersonStorage>(member: P) -> ErrorType?
 }
 
+// MARK: - AddressBook_SourceType
+
 public protocol AddressBook_SourceType: AddressBookRecordType {
     typealias PersonStorage
     typealias GroupStorage
 }
+
+// MARK: - AddressBookSourceType
 
 public protocol AddressBookSourceType: AddressBook_SourceType {
 
@@ -607,6 +637,11 @@ public final class AddressBook: AddressBookType {
         public struct Date {
             public static let anniversary = kABPersonAnniversaryLabel as String
         }
+        public struct General {
+            public static let home      = kABHomeLabel as String
+            public static let work      = kABWorkLabel as String
+            public static let other     = kABOtherLabel as String
+        }
         public struct Telephone {
             public static let mobile    = kABPersonPhoneMobileLabel as String
             public static let iPhone    = kABPersonPhoneIPhoneLabel as String
@@ -641,17 +676,21 @@ public final class AddressBook: AddressBookType {
     public typealias GroupStorage = ABRecordRef
     public typealias SourceStorage = ABRecordRef
 
-    enum Error: ErrorType {
+    public enum Error: ErrorType {
+
+        case Save(NSError?)
+        case AddRecord(NSError?)
+        case RemoveRecord(NSError?)
+        case SetValue((id: ABPropertyID, underlyingError: NSError?))
+        case RemoveValue((id: ABPropertyID, underlyingError: NSError?))
+        case AddGroupMember(NSError?)
+        case RemoveGroupMember(NSError?)
+
         case UnderlyingError(NSError)
         case UnknownError
 
         init(error: Unmanaged<CFErrorRef>?) {
-            if let error = error {
-                self = .UnderlyingError(unsafeBitCast(error.takeUnretainedValue(), NSError.self))
-            }
-            else {
-                self = .UnknownError
-            }
+            self = NSError.from(error).map { .UnderlyingError($0) } ?? .UnknownError
         }
     }
 
@@ -688,8 +727,7 @@ extension AddressBook {
         if ABAddressBookSave(addressBook, &error) {
             return .None
         }
-
-        return AddressBook.Error(error: error)
+        return Error.Save(NSError.from(error))
     }
 }
 
@@ -731,7 +769,7 @@ extension AddressBook { // Records
         if ABAddressBookAddRecord(addressBook, record.storage, &error) {
             return .None
         }
-        return AddressBook.Error(error: error)
+        return Error.AddRecord(NSError.from(error))
     }
 
     public func removeRecord<R: AddressBookRecordType where R.Storage == RecordStorage>(record: R) -> ErrorType? {
@@ -739,7 +777,7 @@ extension AddressBook { // Records
         if ABAddressBookRemoveRecord(addressBook, record.storage, &error) {
             return .None
         }
-        return AddressBook.Error(error: error)
+        return Error.RemoveRecord(NSError.from(error))
     }
 }
 
@@ -747,6 +785,13 @@ extension AddressBook { // People
 
     public var numberOfPeople: Int {
         return ABAddressBookGetPersonCount(addressBook)
+    }
+
+    public func createPerson<P: AddressBook_PersonType, S : AddressBookSourceType where P.Storage == PersonStorage, S.Storage == SourceStorage, P.Storage == S.PersonStorage>(source: S? = .None) -> P {
+        if let source = source {
+            return source.newPerson()
+        }
+        return P(storage: ABPersonCreate().takeUnretainedValue())
     }
 
     public func personWithID<P: AddressBook_PersonType where P.Storage == PersonStorage>(id: ABRecordID) -> P? {
@@ -888,8 +933,9 @@ public struct LabeledValue<Value: MultiValueRepresentable>: DebugPrintable, Prin
     }
 
     static func write(labeledValues: [LabeledValue<Value>]) -> ABMultiValueRef {
-        return reduce(labeledValues, ABMultiValueCreateMutable(Value.propertyKind.rawValue).takeRetainedValue() as ABMutableMultiValueRef) { (multiValue, labeledValue) -> ABMutableMultiValueRef in
+        return reduce(labeledValues, ABMultiValueCreateMutable(Value.propertyKind.rawValue).takeRetainedValue() as ABMutableMultiValueRef) { (multiValue, labeledValue) in
             ABMultiValueAddValueAndLabel(multiValue, labeledValue.value.multiValueRepresentation, labeledValue.label, nil)
+            return multiValue
         }
     }
 
@@ -948,14 +994,14 @@ public class AddressBookRecord: AddressBookRecordType, Equatable {
             if ABRecordSetValue(storage, property.id, transformed, &error) {
                 return .None
             }
+            return AddressBook.Error.SetValue(id: property.id, underlyingError: NSError.from(error))
         }
         else {
             if ABRecordRemoveValue(storage, property.id, &error) {
                 return .None
             }
+            return AddressBook.Error.RemoveValue(id: property.id, underlyingError: NSError.from(error))
         }
-
-        return AddressBook.Error(error: error)
     }
 }
 
@@ -972,7 +1018,7 @@ public class AddressBookPerson: AddressBookRecord, AddressBookPersonType {
         public struct Metadata {
             public static let kind              = AddressBookWriteableProperty<AddressBook.PersonKind>(id: kABPersonKindProperty, reader: reader, writer: writer)
             public static let creationDate      = AddressBookReadableProperty<NSDate>(id: kABPersonCreationDateProperty)
-            public static let modificationDate  = AddressBookReadableProperty<NSDate>(id: kABPersonModificationDateProperty)
+            public static let modificationDate  = AddressBookWriteableProperty<NSDate>(id: kABPersonModificationDateProperty)
         }
 
         public struct Name {
@@ -1053,7 +1099,7 @@ public class AddressBookGroup: AddressBookRecord, AddressBookGroupType {
         if ABGroupAddMember(storage, member.storage, &error) {
             return .None
         }
-        return AddressBook.Error(error: error)
+        return AddressBook.Error.AddGroupMember(NSError.from(error))
     }
 
     public func remove<P: AddressBook_PersonType where P.Storage == PersonStorage>(member: P) -> ErrorType? {
@@ -1061,7 +1107,7 @@ public class AddressBookGroup: AddressBookRecord, AddressBookGroupType {
         if ABGroupRemoveMember(storage, member.storage, &error) {
             return .None
         }
-        return AddressBook.Error(error: error)
+        return AddressBook.Error.RemoveGroupMember(NSError.from(error))
     }
 }
 
@@ -1153,7 +1199,12 @@ func writer<T: MultiValueRepresentable>(value: [LabeledValue<T>]) -> CFTypeRef {
     return LabeledValue.write(value)
 }
 
+extension NSError {
 
+    static func from(ref: Unmanaged<CFErrorRef>?) -> NSError? {
+        return ref.map { unsafeBitCast($0.takeUnretainedValue(), NSError.self) }
+    }
+}
 
 
 
