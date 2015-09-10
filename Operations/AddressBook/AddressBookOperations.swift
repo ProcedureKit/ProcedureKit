@@ -15,7 +15,7 @@ import AddressBookUI
 public class AddressBookOperation: Operation {
 
     internal var registrar: AddressBookPermissionRegistrar
-    public var addressBook: AddressBook
+    public var addressBook: AddressBook!
 
     public init(registrar r: AddressBookPermissionRegistrar? = .None) {
         registrar = r ?? SystemAddressBookRegistrar()
@@ -23,7 +23,12 @@ public class AddressBookOperation: Operation {
     }
 
     final func requestAccess() {
-        addressBook.requestAccess(accessRequestDidComplete)
+        if let addressBook = addressBook {
+            addressBook.requestAccess(accessRequestDidComplete)
+        }
+        else {
+            finish(AddressBookPermissionRegistrarError.AddressBookAccessDenied)
+        }
     }
 
     final func accessRequestDidComplete(error: AddressBookPermissionRegistrarError?) {
