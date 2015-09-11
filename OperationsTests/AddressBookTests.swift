@@ -286,7 +286,7 @@ class AddressBooksTests: XCTestCase {
         addressBook.requestAccess { error in
             if let error = error {
                 switch error {
-                case .AddressBookAccessFailed(_):
+                case .AddressBookAccessDenied:
                     break
                 default:
                     XCTFail("Incorrect error received")

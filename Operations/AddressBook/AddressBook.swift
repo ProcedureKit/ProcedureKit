@@ -62,9 +62,7 @@ public protocol AddressBookPermissionRegistrar {
 
 // MARK: - AddressBookExternalChangeObserver
 
-public protocol AddressBookExternalChangeObserver {
-    mutating func endObservingExternalChangesToAddressBook()
-}
+public protocol AddressBookExternalChangeObserver { }
 
 // MARK: - AddressBookType
 
@@ -664,21 +662,17 @@ public final class AddressBook: AddressBookType {
 
     private let registrar: AddressBookPermissionRegistrar
 
-    public let addressBook: ABAddressBookRef
+    public let addressBook: ABAddressBookRef!
 
-    public init(registrar: AddressBookPermissionRegistrar = SystemAddressBookRegistrar()) {
+    public init?(registrar: AddressBookPermissionRegistrar = SystemAddressBookRegistrar()) {
         self.registrar = registrar
-        let (addressBook, error) = registrar.createAddressBook()
+        let (addressBook, _) = registrar.createAddressBook()
         if let addressBook = addressBook {
             self.addressBook = addressBook
         }
-        else if let error = error {
-            // Preparing the way for Swift 2.0 where this 
-            // initializer will potentially throw
-            fatalError("Error creating address book: \(error)")
-        }
         else {
-            fatalError("Unknown error creating address book")
+            self.addressBook = nil
+            return nil
         }
     }
 
@@ -699,34 +693,18 @@ extension AddressBook {
     }
 }
 
+extension OPRAddressBookChangeHandlerContainer: AddressBookExternalChangeObserver {
+
+}
+
 extension AddressBook { // External Changes
-
-    private class ExternalChangeObserver: AddressBookExternalChangeObserver {
-        typealias BlockType = Void -> Void
-        var handler: BlockType?
-
-        init(handler: BlockType) {
-            self.handler = handler
-        }
-
-        deinit {
-            assert(handler == nil, "AddressBook ExternalChangeObserver was not un-registered before being deallocated.")
-        }
-
-        private func endObservingExternalChangesToAddressBook() {
-            handler?()
-            handler = .None
-        }
-    }
 
     public typealias ExternalChangesBlockType = (info: [NSObject: AnyObject]?) -> Void
 
-    @asmname("OPRAddressBookRegisterExternalChangeHandler")
-    private func createHandlerForExternalChangesInAddressBook(addressBookRef: ABAddressBookRef, withCallback callback: ExternalChangesBlockType) -> ExternalChangeObserver.BlockType
-
     public func observeExternalChanges(callback: ExternalChangesBlockType) -> AddressBookExternalChangeObserver {
-        let handler = createHandlerForExternalChangesInAddressBook(addressBook, withCallback: callback)
-        return ExternalChangeObserver(handler: handler)
+        let container = OPRAddressBookChangeHandlerContainer(didChangeHandler: callback)
+        container.registerForChangesInAddressBook(addressBook)
+        return container
     }
 }
 
@@ -1170,7 +1148,7 @@ func writer<T: MultiValueRepresentable>(value: [LabeledValue<T>]) -> CFTypeRef {
 extension NSError {
 
     static func from(ref: Unmanaged<CFErrorRef>?) -> NSError? {
-        return ref.map { unsafeBitCast($0.takeUnretainedValue(), NSError.self) }
+        return ref.map { unsafeBitCast($0.takeRetainedValue(), NSError.self) }
     }
 }
 
@@ -1183,8 +1161,7 @@ extension NSError {
 
 public enum AddressBookPermissionRegistrarError: ErrorType {
     case AddressBookUnknownErrorOccured
-    case AddressBookCreationFailed(CFErrorRef)
-    case AddressBookAccessFailed(CFErrorRef)
+    case AddressBookAccessDenied
 }
 
 public struct SystemAddressBookRegistrar: AddressBookPermissionRegistrar {
@@ -1198,12 +1175,12 @@ public struct SystemAddressBookRegistrar: AddressBookPermissionRegistrar {
         if let addressBook = ABAddressBookCreateWithOptions(nil, &addressBookError) {
             return (addressBook.takeRetainedValue(), .None)
         }
-        else if let error = addressBookError {
-            return (.None, AddressBookPermissionRegistrarError.AddressBookCreationFailed(error.takeUnretainedValue()))
+        else if let error = NSError.from(addressBookError) {
+            if (error.domain == ABAddressBookErrorDomain as String) && error.code == kABOperationNotPermittedByUserError {
+                return (.None, AddressBookPermissionRegistrarError.AddressBookAccessDenied)
+            }
         }
-        else {
-            return (.None, AddressBookPermissionRegistrarError.AddressBookUnknownErrorOccured)
-        }
+        return (.None, AddressBookPermissionRegistrarError.AddressBookUnknownErrorOccured)
     }
 
     public func requestAccessToAddressBook(addressBook: ABAddressBookRef, completion: (AddressBookPermissionRegistrarError?) -> Void) {
@@ -1211,8 +1188,8 @@ public struct SystemAddressBookRegistrar: AddressBookPermissionRegistrar {
             if success {
                 completion(nil)
             }
-            else if let error = error {
-                completion(AddressBookPermissionRegistrarError.AddressBookAccessFailed(error))
+            else if let _ = error {
+                completion(AddressBookPermissionRegistrarError.AddressBookAccessDenied)
             }
             else {
                 completion(AddressBookPermissionRegistrarError.AddressBookUnknownErrorOccured)
