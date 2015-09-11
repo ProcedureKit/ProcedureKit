@@ -666,7 +666,7 @@ public final class AddressBook: AddressBookType {
 
     public init?(registrar: AddressBookPermissionRegistrar = SystemAddressBookRegistrar()) {
         self.registrar = registrar
-        let (addressBook, error) = registrar.createAddressBook()
+        let (addressBook, _) = registrar.createAddressBook()
         if let addressBook = addressBook {
             self.addressBook = addressBook
         }
@@ -1188,7 +1188,7 @@ public struct SystemAddressBookRegistrar: AddressBookPermissionRegistrar {
             if success {
                 completion(nil)
             }
-            else if let error = error {
+            else if let _ = error {
                 completion(AddressBookPermissionRegistrarError.AddressBookAccessDenied)
             }
             else {

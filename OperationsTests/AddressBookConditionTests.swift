@@ -32,7 +32,7 @@ class TestableAddressBookRegistrar: AddressBookPermissionRegistrar {
     func createAddressBook() -> (ABAddressBookRef?, AddressBookPermissionRegistrarError?) {
         didCreateAddressBook = true
 
-        if let error = creationError {
+        if let _ = creationError {
             return (.None, AddressBookPermissionRegistrarError.AddressBookAccessDenied)
         }
         else if let addressBook: CFTypeRef = addressBook {
@@ -49,7 +49,7 @@ class TestableAddressBookRegistrar: AddressBookPermissionRegistrar {
         }
         else {
             status = .Denied
-            if let error = accessError {
+            if let _ = accessError {
                 completion(AddressBookPermissionRegistrarError.AddressBookAccessDenied)
             }
             else {

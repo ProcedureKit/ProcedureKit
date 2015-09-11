@@ -592,8 +592,7 @@ public class AddressBookObserverGroup: GroupOperation {
                 addressBook = accessAddressBook.addressBook
                 addExternalChangeObserver()
             }
-            else if let current = operation as? Observer {
-                println("Observer did finish")
+            else if let _ = operation as? Observer {
                 addExternalChangeObserver()
             }
         }
