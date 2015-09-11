@@ -15,7 +15,7 @@ import AddressBookUI
 public class AddressBookOperation: Operation {
 
     internal var registrar: AddressBookPermissionRegistrar
-    public var addressBook: AddressBook
+    public var addressBook: AddressBook!
 
     public override init() {
         registrar = SystemAddressBookRegistrar()
@@ -28,7 +28,12 @@ public class AddressBookOperation: Operation {
     }
 
     final func requestAccess() {
-        addressBook.requestAccess(accessRequestDidComplete)
+        if let addressBook = addressBook {
+            addressBook.requestAccess(accessRequestDidComplete)
+        }
+        else {
+            finish(AddressBookPermissionRegistrarError.AddressBookAccessDenied)
+        }
     }
 
     final func accessRequestDidComplete(error: AddressBookPermissionRegistrarError?) {
@@ -441,7 +446,6 @@ public class AddressBookDisplayPersonViewController<F: PresentingViewController>
     }
 }
 
-
 public class AddressBookDisplayNewPersonViewController<F: PresentingViewController>: GroupOperation {
 
     let delegate: ABNewPersonViewControllerDelegate
@@ -487,8 +491,8 @@ public struct AddressBookObserverQueue {
     private static let queue = OperationQueue()
     private static var shared = AddressBookObserverQueue()
 
-    public static func start() -> AddressBookObserverQueue {
-        shared.start()
+    public static func start(didChangeBlock: AddressBookObserverGroup.DidChangeBlock) -> AddressBookObserverQueue {
+        shared.start(didChangeBlock)
         return shared
     }
 
@@ -496,18 +500,18 @@ public struct AddressBookObserverQueue {
         shared.stop()
     }
 
-    var observer: AddressBookObserver? = .None
+    var addressBookObserverGroup: AddressBookObserverGroup? = .None
 
     private init() { }
 
-    private mutating func start() {
-        observer = AddressBookObserver()
-        observer?.addObserver(self)
-        AddressBookObserverQueue.queue.addOperation(observer!)
+    private mutating func start(didChangeBlock: AddressBookObserverGroup.DidChangeBlock) {
+        addressBookObserverGroup = AddressBookObserverGroup(block: didChangeBlock)
+        addressBookObserverGroup?.addObserver(self)
+        AddressBookObserverQueue.queue.addOperation(addressBookObserverGroup!)
     }
 
     private mutating func stop() {
-        observer?.cancel()
+        addressBookObserverGroup?.cancel()
     }
 }
 
@@ -525,66 +529,72 @@ extension AddressBookObserverQueue: OperationObserver {
     }
 }
 
-public class AddressBookObserver: GroupOperation {
+public class AddressBookObserverGroup: GroupOperation {
 
-    class Observer: AddressBookOperation {
+    public typealias DidChangeBlock = (info: [NSObject: AnyObject]?) -> Void
+
+    class Observer: Operation {
         typealias AddressBookDidChange = [NSObject: AnyObject]? -> Void
 
+        let addressBook: AddressBook
         let addressBookDidChange: AddressBookDidChange
         var observer: AddressBookExternalChangeObserver?
 
-        init(_ block: AddressBookDidChange) {
-            addressBookDidChange = block
+        init(addressBook: AddressBook, block: AddressBookDidChange) {
+            self.addressBook = addressBook
+            self.addressBookDidChange = block
             super.init()
+            addObserver(BackgroundObserver())
         }
 
-        deinit {
-            observer?.endObservingExternalChangesToAddressBook()
-        }
-
-        override func executeAddressBookTask() -> ErrorType? {
-            if let error = super.executeAddressBookTask() {
-                return error
-            }
+        override func execute() {
             observer = addressBook.observeExternalChanges { info in
                 self.addressBookDidChange(info)
                 self.finish(nil)
             }
-            return .None
-        }
-
-        override func cancel() {
-            observer?.endObservingExternalChangesToAddressBook()
         }
     }
 
+    let didChangeBlock: DidChangeBlock
+    let accessAddressBook: AddressBookOperation
+
+    var addressBook: AddressBook? = .None
     var observer: Observer? = .None
 
-    public init() {
-        super.init(operations: [])
-        addCondition(MutuallyExclusive<AddressBookObserver>())
+    init(block: DidChangeBlock) {
+        didChangeBlock = block
+        accessAddressBook = AddressBookOperation()
+        super.init(operations: [ accessAddressBook ])
+        addCondition(MutuallyExclusive<AddressBookObserverGroup>())
         addCondition(SilentCondition(AddressBookCondition()))
     }
 
-    public override func execute() {
-        observer = Observer(addressBookDidChange)
-        addOperation(observer!)
+    func addExternalChangeObserver() {
+        if !cancelled, let addressBook = addressBook {
+            let observer = Observer(addressBook: addressBook, block: didChangeBlock)
+            addOperation(observer)
+            self.observer = observer
+        }
     }
 
     public override func cancel() {
         observer?.cancel()
+        super.cancel()
     }
 
     func addressBookDidChange(info: [NSObject: AnyObject]?) {
-        print("Address book did change: \(info)")
+        didChangeBlock(info: info)
     }
 
     public override func operationDidFinish(operation: NSOperation, withErrors errors: [ErrorType]) {
-        if errors.isEmpty, let _ = operation as? Observer {
-            print("Observer did finish")
-            if !cancelled {
-                observer = Observer(addressBookDidChange)
-                addOperation(observer!)
+        if errors.isEmpty {
+            if accessAddressBook == operation {
+                addressBook = accessAddressBook.addressBook
+                addExternalChangeObserver()
+            }
+            else if let current = operation as? Observer {
+                println("Observer did finish")
+                addExternalChangeObserver()
             }
         }
     }

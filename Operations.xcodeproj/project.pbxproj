@@ -60,6 +60,8 @@
 		65CB76FE1B3F284A00791E18 /* TimeoutObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65CB76F91B3F284A00791E18 /* TimeoutObserver.swift */; };
 		65CB76FF1B3F284A00791E18 /* OperationQueue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65CB76FB1B3F284A00791E18 /* OperationQueue.swift */; };
 		65CB77011B3F28E800791E18 /* ExclusivityManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65CB77001B3F28E800791E18 /* ExclusivityManager.swift */; };
+		65D2BF741B9CCF7F001F4F09 /* OPRAddressBookChangeHandlerContainer.h in Headers */ = {isa = PBXBuildFile; fileRef = 65D2BF721B9CCF7F001F4F09 /* OPRAddressBookChangeHandlerContainer.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		65D2BF751B9CCF7F001F4F09 /* OPRAddressBookChangeHandlerContainer.m in Sources */ = {isa = PBXBuildFile; fileRef = 65D2BF731B9CCF7F001F4F09 /* OPRAddressBookChangeHandlerContainer.m */; };
 		65D6F5751B5AC453003D35AD /* Operation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D6F5741B5AC453003D35AD /* Operation.swift */; };
 		65D6F5771B5ADEF6003D35AD /* BlockOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D6F5761B5ADEF6003D35AD /* BlockOperation.swift */; };
 		65D6F5791B5AE925003D35AD /* GroupOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D6F5781B5AE925003D35AD /* GroupOperation.swift */; };
@@ -70,7 +72,6 @@
 		65D6F5891B5BEAC9003D35AD /* NetworkObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D6F5881B5BEAC9003D35AD /* NetworkObserver.swift */; };
 		65D6F58B1B5BF264003D35AD /* NetworkObserverTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D6F58A1B5BF264003D35AD /* NetworkObserverTests.swift */; };
 		65D6F58D1B5BFE59003D35AD /* ReachabilityCondition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D6F58C1B5BFE59003D35AD /* ReachabilityCondition.swift */; };
-		65D86DF31B8FBFF800CFEBE5 /* AddressBookExternalChangeCallbacks.m in Sources */ = {isa = PBXBuildFile; fileRef = 65D86DF21B8FBFF800CFEBE5 /* AddressBookExternalChangeCallbacks.m */; };
 		65DADF631B62D73100EAD25B /* ReachableOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65DADF621B62D73100EAD25B /* ReachableOperation.swift */; };
 		65DADF651B62D75400EAD25B /* ReachableOperationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65DADF641B62D75400EAD25B /* ReachableOperationTests.swift */; };
 		65DADF671B62F70300EAD25B /* Reachability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65DADF661B62F70300EAD25B /* Reachability.swift */; };
@@ -148,6 +149,8 @@
 		65CB76F91B3F284A00791E18 /* TimeoutObserver.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TimeoutObserver.swift; sourceTree = "<group>"; };
 		65CB76FB1B3F284A00791E18 /* OperationQueue.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OperationQueue.swift; sourceTree = "<group>"; };
 		65CB77001B3F28E800791E18 /* ExclusivityManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ExclusivityManager.swift; sourceTree = "<group>"; };
+		65D2BF721B9CCF7F001F4F09 /* OPRAddressBookChangeHandlerContainer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OPRAddressBookChangeHandlerContainer.h; path = AddressBook/OPRAddressBookChangeHandlerContainer.h; sourceTree = "<group>"; };
+		65D2BF731B9CCF7F001F4F09 /* OPRAddressBookChangeHandlerContainer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = OPRAddressBookChangeHandlerContainer.m; path = AddressBook/OPRAddressBookChangeHandlerContainer.m; sourceTree = "<group>"; };
 		65D6F5741B5AC453003D35AD /* Operation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Operation.swift; sourceTree = "<group>"; };
 		65D6F5761B5ADEF6003D35AD /* BlockOperation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BlockOperation.swift; sourceTree = "<group>"; };
 		65D6F5781B5AE925003D35AD /* GroupOperation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GroupOperation.swift; sourceTree = "<group>"; };
@@ -158,7 +161,6 @@
 		65D6F5881B5BEAC9003D35AD /* NetworkObserver.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkObserver.swift; sourceTree = "<group>"; };
 		65D6F58A1B5BF264003D35AD /* NetworkObserverTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkObserverTests.swift; sourceTree = "<group>"; };
 		65D6F58C1B5BFE59003D35AD /* ReachabilityCondition.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReachabilityCondition.swift; sourceTree = "<group>"; };
-		65D86DF21B8FBFF800CFEBE5 /* AddressBookExternalChangeCallbacks.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AddressBookExternalChangeCallbacks.m; path = AddressBook/AddressBookExternalChangeCallbacks.m; sourceTree = "<group>"; };
 		65DADF621B62D73100EAD25B /* ReachableOperation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReachableOperation.swift; sourceTree = "<group>"; };
 		65DADF641B62D75400EAD25B /* ReachableOperationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReachableOperationTests.swift; sourceTree = "<group>"; };
 		65DADF661B62F70300EAD25B /* Reachability.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Reachability.swift; sourceTree = "<group>"; };
@@ -349,7 +351,8 @@
 		65E4E14E1B8B9B5F00A8F5DD /* AddressBook */ = {
 			isa = PBXGroup;
 			children = (
-				65D86DF21B8FBFF800CFEBE5 /* AddressBookExternalChangeCallbacks.m */,
+				65D2BF721B9CCF7F001F4F09 /* OPRAddressBookChangeHandlerContainer.h */,
+				65D2BF731B9CCF7F001F4F09 /* OPRAddressBookChangeHandlerContainer.m */,
 				65E4E14F1B8B9B7E00A8F5DD /* AddressBook.swift */,
 				65E4E1531B8BC6BA00A8F5DD /* AddressBookConditions.swift */,
 				65779C051B8C97AA00BE6C9D /* AddressBookOperations.swift */,
@@ -365,6 +368,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				657729631B3D9E0E00B5D153 /* Operations.h in Headers */,
+				65D2BF741B9CCF7F001F4F09 /* OPRAddressBookChangeHandlerContainer.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -507,7 +511,7 @@
 				65E4E1501B8B9B7E00A8F5DD /* AddressBook.swift in Sources */,
 				65CB76FE1B3F284A00791E18 /* TimeoutObserver.swift in Sources */,
 				65D6F5791B5AE925003D35AD /* GroupOperation.swift in Sources */,
-				65D86DF31B8FBFF800CFEBE5 /* AddressBookExternalChangeCallbacks.m in Sources */,
+				65D2BF751B9CCF7F001F4F09 /* OPRAddressBookChangeHandlerContainer.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
