@@ -8,6 +8,9 @@
 
 import Foundation
 
+/**
+An `OperationCondition` which will be satisfied if the block returns true.
+*/
 public struct BlockCondition: OperationCondition {
 
     public typealias ConditionBlockType = () -> Bool
@@ -33,7 +36,6 @@ public struct BlockCondition: OperationCondition {
         completion(condition() ? .Satisfied : .Failed(Error.BlockConditionFailed))
     }
 }
-
 
 extension BlockCondition.Error: Equatable { }
 

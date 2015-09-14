@@ -9,9 +9,9 @@
 import Foundation
 
 /**
-    A condition that specificed that every dependency of the
-    operation must succeed. If any dependency fails/cancels,
-    the target operation will be fail.
+A condition that specificed that every dependency of the
+operation must succeed. If any dependency fails/cancels,
+the target operation will be fail.
 */
 public struct NoFailedDependenciesCondition: OperationCondition {
 

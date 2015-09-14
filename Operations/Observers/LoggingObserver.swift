@@ -9,16 +9,16 @@
 import Foundation
 
 /**
-    Attach a `LoggingObserver to an operation to log when the operation
-    start, produces new operation and finsihed. It doesn't yet report
-    detailed error infomation.
+Attach a `LoggingObserver to an operation to log when the operation
+start, produces new operation and finsihed. It doesn't yet report
+detailed error infomation.
 
-    Any produced `Operation` instances will automatically get their
-    own logger attached.
+Any produced `Operation` instances will automatically get their
+own logger attached.
     
-    - queue: Provide a queue, by detault it uses it's own serial queue.
-    - logger: Provide a logging block. By detault the logger uses `println`
-    however, for custom loggers provide a block which receives a `String`.
+:param: queue, Provide a queue, by detault it uses it's own serial queue.
+:param: logger, Provide a logging block. By detault the logger uses `println`
+however, for custom loggers provide a block which receives a `String`.
 */
 public struct LoggingObserver: OperationObserver {
     public typealias LoggerBlockType = (message: String) -> Void

@@ -8,26 +8,55 @@
 
 import UIKit
 
+/**
+An `Operation` subclass for presenting a configured `UIAlertController`.
+
+Initialize the `AlertOperation` with the controller which is presenting 
+the alert. This "controller" can be a `UIViewController` but, just
+needs to be any type conforming to `PresentingViewController`. This can
+the used to help unit testing.
+
+To configure the `UIAlertController` you can set the `title` and 
+`message`, and call `addActionWithTitle(: style: handler:)` on the 
+operation before adding it to a queue.
+
+For example
+
+    let alert = AlertOperation(presentAlertFrom: self)
+    alert.title = NSLocalizedString("A title!", comment: "A Title!")
+    alert.message = NSLocalizedString("This is a message.", comment: "This is a message.")
+    alert.addActionWithTitle(NSLocalizedString("Ok", comment: "Ok")) { _ in
+        println("Did press ok!")
+    }
+    queue.addOperation(alert)
+*/
 public class AlertOperation<From: PresentingViewController>: Operation {
 
     private var ui: UIOperation<UIAlertController, From>
 
+    /// Access the presented `UIAlertController`.
+    public var alert: UIAlertController {
+        return ui.controller
+    }
+
+    /// The title of the presented `UIAlertController`.
     public var title: String? {
         get {
-            return ui.controller.title
+            return alert.title
         }
         set {
-            ui.controller.title = newValue
+            alert.title = newValue
             name = newValue
         }
     }
 
+    /// The message body of the presented `UIAlertController`.
     public var message: String? {
         get {
-            return ui.controller.message
+            return alert.message
         }
         set {
-            ui.controller.message = newValue
+            alert.message = newValue
         }
     }
 
@@ -38,6 +67,16 @@ public class AlertOperation<From: PresentingViewController>: Operation {
         addCondition(MutuallyExclusive<UIViewController>())
     }
 
+    /**
+    Call to add an action button with a title, style and handler.
+    
+    Do not add actions directly to the `UIAlertController`, as
+    this will prevent the `AlertOperation` from correctly finishing.
+    
+    :param: title, a required String.
+    :param: style, a `UIAlertActionStyle` which defaults to `.Default`.
+    :param: handler, a block which receives the operation, and returns Void.
+    */
     public func addActionWithTitle(title: String, style: UIAlertActionStyle = .Default, handler: AlertOperation -> Void = { _ in }) {
         let action = UIAlertAction(title: title, style: style) { [weak self] _ in
             if let weakSelf = self {
@@ -45,11 +84,11 @@ public class AlertOperation<From: PresentingViewController>: Operation {
             }
             self?.finish()
         }
-        ui.controller.addAction(action)
+        alert.addAction(action)
     }
 
     public override func execute() {
-        if ui.controller.actions.isEmpty {
+        if alert.actions.isEmpty {
             addActionWithTitle(NSLocalizedString("Okay", comment: "Okay"))
         }
         produceOperation(ui)
