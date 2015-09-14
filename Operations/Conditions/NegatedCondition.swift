@@ -13,8 +13,8 @@ public enum NegatedConditionError: ErrorType, Equatable {
 }
 
 /**
-    A simple condition with negates the evaluation of
-    a composed condition.
+A simple condition with negates the evaluation of
+a composed condition.
 */
 public struct NegatedCondition<Condition: OperationCondition>: OperationCondition {
     

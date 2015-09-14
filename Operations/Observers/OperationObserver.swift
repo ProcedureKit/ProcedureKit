@@ -8,6 +8,7 @@
 
 import Foundation
 
+/// A protocol which operation observers must conform to.
 public protocol OperationObserver {
     
     func operationDidStart(operation: Operation)

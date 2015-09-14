@@ -27,19 +27,24 @@ public class UserLocationOperation: Operation {
     private let accuracy: CLLocationAccuracy
     private var manager: LocationManager?
     private let handler: LocationResponseHandler
+
+    /// Access the user's location once it has updated.
     public var location: CLLocation? = .None
 
     /**
-        This is the true public API, the other public initializer is really just a testing
-        interface, and will not be public in Swift 2.0, Operations 2.0
+    This is the true public API, the other public initializer is really just a testing
+    interface, and will not be public in Swift 2.0, Operations 2.0
+    
+    :param: accuracy, the location accuracy which defaults to 3km.
+    :param: handler, a response handler LocationResponseHandler.
     */
-    public convenience init(accuracy: CLLocationAccuracy = kCLLocationAccuracyThreeKilometers, handler: LocationResponseHandler) {
+    public convenience init(accuracy: CLLocationAccuracy = kCLLocationAccuracyThreeKilometers, handler: LocationResponseHandler = { _ in }) {
         self.init(accuracy: accuracy, manager: .None, handler: handler)
     }
 
     /**
-        This is the Swift 1.2 testing interface, and will not be public in Swift 2.0, Operations 2.0.
-        Instead use init(:CLLocationAccuracy, handler: LocationResponseHandler)
+    This is the Swift 1.2 testing interface, and will not be public in Swift 2.0, Operations 2.0.
+    Instead use init(:CLLocationAccuracy, handler: LocationResponseHandler)
     */
     public init(accuracy: CLLocationAccuracy, manager: LocationManager? = .None, handler: LocationResponseHandler) {
         self.accuracy = accuracy
