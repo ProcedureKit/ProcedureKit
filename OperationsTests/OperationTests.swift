@@ -106,13 +106,26 @@ class OperationTests: XCTestCase {
     }
 }
 
+class IdenticalSuccessfulCondition: NSObject, OperationCondition {
+
+    let name = "This is a testing successful condition"
+    let isMutuallyExclusive = false
+
+    func dependencyForOperation(operation: Operation) -> NSOperation? {
+        return nil
+    }
+
+    func evaluateForOperation(operation: Operation, completion: OperationConditionResult -> Void) {
+        completion(.Satisfied)
+    }
+}
+
 class BasicTests: OperationTests {
 
     func test__queue_delegate_is_notified_when_operation_starts() {
-        let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
 
         let operation = TestOperation(delay: 1)
-        addCompletionBlockToTestOperation(operation, withExpectation: expectation)
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
 
         runOperation(operation)
         waitForExpectationsWithTimeout(3, handler: nil)
@@ -123,10 +136,9 @@ class BasicTests: OperationTests {
 
 
     func test__executing_basic_operation() {
-        let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
 
         let operation = TestOperation(delay: 1)
-        addCompletionBlockToTestOperation(operation, withExpectation: expectation)
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
 
         queue.addOperation(operation)
         waitForExpectationsWithTimeout(3, handler: nil)
@@ -138,6 +150,19 @@ class BasicTests: OperationTests {
         XCTAssertEqual(OperationError.OperationTimedOut(1.0), OperationError.OperationTimedOut(1.0))
         XCTAssertNotEqual(OperationError.ConditionFailed, OperationError.OperationTimedOut(1.0))
         XCTAssertNotEqual(OperationError.OperationTimedOut(2.0), OperationError.OperationTimedOut(1.0))
+    }
+
+    func test__operation_two_identical_conditions_evaluate_correctly() {
+        let condition = IdenticalSuccessfulCondition()
+        let operation = TestOperation()
+        operation.addCondition(condition)
+        operation.addCondition(condition)
+
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        queue.addOperation(operation)
+        waitForExpectationsWithTimeout(3, handler: nil)
+
+        XCTAssertTrue(operation.didExecute)
     }
 }
 
