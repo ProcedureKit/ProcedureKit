@@ -10,15 +10,15 @@ import Foundation
 
 
 /**
-    An `Operation` subclass which enables the grouping
-    of other operations. Use `GroupOperation`s to associate
-    related operations together, thereby creating higher
-    levels of abstractions.
+An `Operation` subclass which enables the grouping
+of other operations. Use `GroupOperation`s to associate
+related operations together, thereby creating higher
+levels of abstractions.
 
-    Additionally, `GroupOperation`s are useful as a way
-    of creating Operations which may repeat themselves before
-    subsequent operations can run. For example, authentication
-    operations.
+Additionally, `GroupOperation`s are useful as a way
+of creating Operations which may repeat themselves before
+subsequent operations can run. For example, authentication
+operations.
 */
 public class GroupOperation: Operation {
 
@@ -53,6 +53,10 @@ public class GroupOperation: Operation {
 
     public func addOperation(operation: NSOperation) {
         queue.addOperation(operation)
+    }
+
+    public func addOperations(operations: [NSOperation]) {
+        queue.addOperations(operations, waitUntilFinished: false)
     }
 
     final func aggregateError(error: ErrorType) {
