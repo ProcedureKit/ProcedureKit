@@ -14,6 +14,11 @@ public protocol NetworkActivityIndicatorInterface {
 
 extension UIApplication: NetworkActivityIndicatorInterface { }
 
+/**
+An `OperationObserver` which can be used to manage the network
+activity indicator in iOS. Note that this is not an observer of
+when the network is available. See `ReachableOperation`.
+*/
 public class NetworkObserver: OperationObserver {
 
     let networkActivityIndicator: NetworkActivityIndicatorInterface

@@ -9,9 +9,9 @@
 import Foundation
 
 /**
-    A simple condition which suppresses it's contained condition to not
-    enqueue its dependency. This is useful for verifying access to
-    a resoource without prompting for permission.
+A simple condition which suppresses it's contained condition to not
+enqueue its dependency. This is useful for verifying access to
+a resoource without prompting for permission.
 */
 public struct SilentCondition<Condition: OperationCondition>: OperationCondition {
 

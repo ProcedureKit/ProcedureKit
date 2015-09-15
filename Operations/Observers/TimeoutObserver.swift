@@ -8,6 +8,10 @@
 
 import Foundation
 
+/**
+An operation observer which will automatically cancels (with an error)
+if it doesn't finish before a time interval is expired.
+*/
 public struct TimeoutObserver: OperationObserver {
 
     private let timeout: NSTimeInterval

@@ -18,12 +18,17 @@ public protocol HostReachability {
     func requestReachabilityForURL(url: NSURL, completion: Reachability.ObserverBlockType)
 }
 
+/**
+A `Reachability` class, which performs tasks necessary to manage reachability.
+*/
 public final class Reachability {
 
+    /// The kind of `Reachability` connectivity
     public enum Connectivity {
         case AnyConnectionKind, ViaWWAN, ViaWiFi
     }
 
+    /// The `NetworkStatus`
     public enum NetworkStatus {
         case NotReachable
         case Reachable(Connectivity)
@@ -37,10 +42,22 @@ public final class Reachability {
 
     public static let sharedInstance = Reachability()
 
+    /**
+    Add an observer block which will be executed when the network
+    status changes.
+    
+    :param: observer, a `ObserverBlockType` block
+    :returns: a unique string, which is used to remove the observer.
+    */
     public class func addObserver(observer: ObserverBlockType) -> String {
         return sharedInstance.addObserver(observer)
     }
 
+    /**
+    Removes a reachability observer.
+
+    :param: token, a `String` returned from `addObserver:`
+    */
     public class func removeObserverWithToken(token: String) {
         sharedInstance.removeObserverWithToken(token)
     }
