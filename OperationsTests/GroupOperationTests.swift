@@ -63,6 +63,21 @@ class GroupOperationTests: OperationTests {
         waitForExpectationsWithTimeout(5, handler: nil)
         XCTAssertTrue(group.finished)
     }
+
+    func test__that_adding_multiple_operations_to_a_group_works() {
+        let group = GroupOperation(operations: [])
+        let operations: [TestOperation] = (0..<3).map { _ in TestOperation() }
+        group.addOperations(operations)
+
+        addCompletionBlockToTestOperation(group, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        runOperation(group)
+        waitForExpectationsWithTimeout(3, handler: nil)
+
+        XCTAssertTrue(group.finished)
+        XCTAssertTrue(operations[0].didExecute)
+        XCTAssertTrue(operations[1].didExecute)
+        XCTAssertTrue(operations[2].didExecute)
+    }
 }
 
 

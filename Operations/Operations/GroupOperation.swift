@@ -68,6 +68,10 @@ public class GroupOperation: Operation {
         queue.addOperation(operation)
     }
 
+    public func addOperations(operations: [NSOperation]) {
+        queue.addOperations(operations, waitUntilFinished: false)
+    }
+
     final func aggregateError(error: ErrorType) {
         aggregateErrors.append(error)
     }

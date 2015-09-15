@@ -386,8 +386,8 @@ extension NSOperation {
     }
     
     /// Add multiple depdendencies to the operation.
-    func addDependencies(dependencies: [NSOperation]) {
-        dependencies.map { self.addDependency($0) }
+    public func addDependencies(dependencies: [NSOperation]) {
+        dependencies.map(addDependency)
     }
 }
 
