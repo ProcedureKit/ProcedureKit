@@ -350,8 +350,8 @@ extension NSOperation {
     }
     
     /// Add multiple depdendencies to the operation.
-    func addDependencies(dependencies: [NSOperation]) {
-        for d in dependencies { self.addDependency(d) }
+    public func addDependencies(dependencies: [NSOperation]) {
+        dependencies.forEach { addDependency($0) }
     }
 }
 
