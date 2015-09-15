@@ -40,7 +40,7 @@ public class UserLocationOperation: Operation {
     :param: handler, a response handler LocationResponseHandler.
     */
     public convenience init(accuracy: CLLocationAccuracy = kCLLocationAccuracyThreeKilometers, handler: LocationResponseHandler = { _ in }) {
-        self.init(accuracy: accuracy, manager: .None, handler: handler)
+        self.init(accuracy: accuracy, manager: CLLocationManager(), handler: handler)
     }
 
     init(accuracy: CLLocationAccuracy, manager: LocationManager, handler: LocationResponseHandler) {
