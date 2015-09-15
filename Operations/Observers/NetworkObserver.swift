@@ -14,14 +14,25 @@ public protocol NetworkActivityIndicatorInterface {
 
 extension UIApplication: NetworkActivityIndicatorInterface { }
 
+/**
+An `OperationObserver` which can be used to manage the network
+activity indicator in iOS. Note that this is not an observer of
+when the network is available. See `ReachableOperation`.
+*/
 public class NetworkObserver: OperationObserver {
 
     let networkActivityIndicator: NetworkActivityIndicatorInterface
 
+    /**
+    This is the initializer API for Swift 1.2.
+    */
     public convenience init() {
         self.init(indicator: UIApplication.sharedApplication())
     }
 
+    /**
+    This is a testing interface for Swift 1.2 - use `init()` instead.
+    */
     public init(indicator: NetworkActivityIndicatorInterface) {
         networkActivityIndicator = indicator
     }

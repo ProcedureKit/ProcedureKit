@@ -10,11 +10,9 @@ I want to stress that this code is heavily influenced by Apple. In no way am I a
 
 Rather than just copy Apple’s sample code, I have been re-writing it from scratch, but heavily guided. The main changes I have made, other than some minor bug fixes, have been architectural to enhance the testability of the code. Unfortunately, this makes the public API a little messy for Swift 1.2, but thanks to `@testable` will not be visible in Swift 2.
 
-## Status - 5th Sept, 2015
+## Status - 15th Sept, 2015
 
-Until iOS 9 & Swift 2.0 is out of developer preview, releases continue to be for Swift 1.2. The `master` branch is stable releases, and `development` (the default branch) is the bleeding edge. If you want to contribute towards Swift 1.2 features, please direct your Pull Request to the `development` branch.
-
-For Swift 2.0, please use the `swift_2.0` branch, and direct any pull requests to this upstream branch. In terms of features, Swift 2.0 has all the same features, with the addition of  `WebpageOperation`.
+The Swift 1.2 compatible version of Operations is version 1.0, and the Swift 2.0 compatible version is 2.0.
 
 ## Usage
 
@@ -280,7 +278,3 @@ Use an observer or `GroupOperation` to access the results via the map operation�
 ```
 
 - [x] `AddressBookObserverQueue` & `AddressBookObserver` this is a work in progress, but I’m trying to add support for running operations when external changes to the AddressBook are detected.
-
-The framework is well tested, with approximately 70% coverage. This is known as I wrote it much of the foundation bits using Xcode 7 but have back ported it to Swift 1.2.
-
-Development of a usable Swift 1.2 version is the priority. However, development of the Swift 2.0 version will shortly begin in parallel, and increase in priority. Therefore the versioning of this project will follow this pattern: Swift 1.2: `0.4 -> 1.x` and Swift 2.0: `2.0 -> 2.x`. 

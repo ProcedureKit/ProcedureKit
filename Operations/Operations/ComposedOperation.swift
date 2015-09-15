@@ -8,12 +8,17 @@
 
 import Foundation
 
+/**
+Allows a `NSOperation` to be composed inside an `Operation`. This
+is very handy for applying `Operation` level features such as 
+conditions and observers to `NSOperation` instances.
+*/
 public class ComposedOperation<O: NSOperation>: GatedOperation<O> {
 
     /**
     Designated initializer.
     
-    - parameter o: The operation to compose.
+    :param: operation The operation to compose.
     */
     public init(operation: O) {
         super.init(operation: operation, gate: { true })

@@ -9,8 +9,8 @@
 import Foundation
 
 /**
-    A generic condition for describing operations that
-    cannot be allowed to execute concurrently.
+A generic condition for describing operations that
+cannot be allowed to execute concurrently.
 */
 public struct MutuallyExclusive<T>: OperationCondition {
 
@@ -31,9 +31,7 @@ public struct MutuallyExclusive<T>: OperationCondition {
     }
 }
 
-/**
-    A non-constructible type to be used with `MutuallyExclusive<T>`
-*/
+/// A non-constructible type to be used with `MutuallyExclusive<T>`
 public enum Alert { }
 
 /// A condition to indicate that the associated operation may present an alert

@@ -10,15 +10,15 @@ import Foundation
 
 
 /**
-    An `Operation` subclass which enables the grouping
-    of other operations. Use `GroupOperation`s to associate
-    related operations together, thereby creating higher
-    levels of abstractions.
+An `Operation` subclass which enables the grouping
+of other operations. Use `GroupOperation`s to associate
+related operations together, thereby creating higher
+levels of abstractions.
 
-    Additionally, `GroupOperation`s are useful as a way
-    of creating Operations which may repeat themselves before
-    subsequent operations can run. For example, authentication
-    operations.
+Additionally, `GroupOperation`s are useful as a way
+of creating Operations which may repeat themselves before
+subsequent operations can run. For example, authentication
+operations.
 */
 public class GroupOperation: Operation {
 
@@ -27,6 +27,11 @@ public class GroupOperation: Operation {
     private let finishingOperation = NSBlockOperation(block: {})
     private var aggregateErrors = Array<ErrorType>()
 
+    /**
+    Designated initializer.
+
+    :park: operations, an array of `NSOperation`s.
+    */
     public init(operations ops: [NSOperation]) {
         operations = ops
         super.init()
@@ -38,6 +43,9 @@ public class GroupOperation: Operation {
         self.init(operations: operations)
     }
 
+    /**
+    Cancels all the groups operations.
+    */
     public override func cancel() {
         queue.cancelAllOperations()
         super.cancel()
@@ -51,14 +59,59 @@ public class GroupOperation: Operation {
         queue.addOperation(finishingOperation)
     }
 
+    /**
+    Add an `NSOperation` to the group's queue.
+    
+    :param: operation, an `NSOperation`
+    */
     public func addOperation(operation: NSOperation) {
         queue.addOperation(operation)
+    }
+
+    public func addOperations(operations: [NSOperation]) {
+        queue.addOperations(operations, waitUntilFinished: false)
     }
 
     final func aggregateError(error: ErrorType) {
         aggregateErrors.append(error)
     }
 
+    /**
+    This method is called every time one of the groups child operations
+    finish.
+
+    Over-ride this method to enable the following sort of behavior:
+    
+    ## Error handling. 
+    
+    Typically you will want to have code like this:
+    
+        if !errors.isEmpty {
+            if operation is MyOperation, let error = errors.first as? MyOperation.Error {
+                switch error {
+                case .AnError:
+                  println("Handle the error case")
+                }
+            }
+        }
+    
+    So, if the errors array is not empty, it is important to know which kind of 
+    errors the operation may have encountered, and then implement handling of
+    any that are necessary.
+    
+    Note that if an operation has conditions, which fail, they will be returned
+    as the first errors.
+
+    ## Move results between operations. 
+    
+    Typically we use `GroupOperation` to
+    compose and manage multiple operations into a single unit. This might 
+    often need to move the results of one operation into the next one. So this
+    can be done here.
+
+    :param: operation, an `NSOperation`
+    :param:, errors, an array of `ErrorType`s.
+    */
     public func operationDidFinish(operation: NSOperation, withErrors errors: [ErrorType]) {
         // no-op, subclasses can override for their own functionality.
     }

@@ -16,6 +16,13 @@ public protocol BackgroundTaskApplicationInterface {
 
 extension UIApplication: BackgroundTaskApplicationInterface { }
 
+/**
+An observer which will automatically start & stop a background task if the
+application enters the background.
+
+Attach a `BackgroundObserver` to an operation which must be completed even
+if the app goes in the background.
+*/
 public class BackgroundObserver: NSObject {
 
     public static let backgroundTaskName = "Background Operation Observer"

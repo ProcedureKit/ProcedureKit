@@ -49,7 +49,6 @@ public enum UIOperationError: ErrorType {
     case PresentationViewControllerNotSet
 }
 
-
 public class UIOperation<C, From where C: UIViewController, From: PresentingViewController>: Operation {
 
     let controller: C

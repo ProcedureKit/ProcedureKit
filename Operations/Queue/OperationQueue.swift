@@ -80,12 +80,6 @@ public class OperationQueue: NSOperationQueue {
     public override func addOperations(ops: [AnyObject], waitUntilFinished wait: Bool) {
         if let ops = ops as? [NSOperation] {
             ops.map(addOperation)
-
-            if wait {
-                for operation in operations {
-                    operation.waitUntilFinished()
-                }
-            }
         }
     }
 

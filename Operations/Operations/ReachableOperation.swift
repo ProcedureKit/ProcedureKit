@@ -9,22 +9,33 @@
 import Foundation
 
 /**
-    Compose your `NSOperation` inside a `ReachableOperation` to
-    ensure that it is executed when the desired connectivity is
-    available.
+Compose your `NSOperation` inside a `ReachableOperation` to
+ensure that it is executed when the desired connectivity is
+available.
 
-    If the device is not reachable, the operation will observe
-    the default route reachability, and add your operation as
-    soon as the conditions are met.
+If the device is not reachable, the operation will observe
+the default route reachability, and add your operation as
+soon as the conditions are met.
 */
 public class ReachableOperation<O: NSOperation>: GroupOperation {
 
+    /// The composed operation
     public let operation: O
+
+    /// The required connectivity kind.
     public let connectivity: Reachability.Connectivity
+
     private let reachability: SystemReachability
     private var token: String? = .None
     private var status: Reachability.NetworkStatus? = .None
 
+    /**
+    Composes an operation to ensure that is will definitely be executed as soon as
+    the required kind of connectivity is achieved.
+    
+    :param: operation, any `NSOperation` type.
+    :param: connectivity, a `Reachability.Connectivity` value, defaults to `.AnyConnectionKind`.
+    */
     public convenience init(operation: O, connectivity: Reachability.Connectivity = .AnyConnectionKind) {
         self.init(operation: operation, connectivity: connectivity, reachability: Reachability.sharedInstance)
     }

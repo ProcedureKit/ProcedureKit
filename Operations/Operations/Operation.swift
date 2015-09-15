@@ -8,6 +8,18 @@
 
 import Foundation
 
+/**
+Abstract base Operation class which subclasses `NSOperation`.
+
+Operation builds on `NSOperation` in a few simple ways.
+
+1. For an instance to become `.Ready`, all of its attached
+`OperationCondition`s must be satisfied.
+
+2. It is possible to attach `OperationObserver`s to an instance, 
+to be notified of lifecycle events in the operation.
+
+*/
 public class Operation: NSOperation {
 
     private enum State: Int, Comparable {
@@ -172,6 +184,11 @@ public class Operation: NSOperation {
 
     // MARK: - Conditions
 
+    /**
+    Add a condition to the to the operation, can only be done prior to the operation starting.
+
+    :param: condition type conforming to protocol `OperationCondition`.
+    */
     public func addCondition(condition: OperationCondition) {
         assert(state < .Executing, "Cannot modify conditions after execution has begun, current state: \(state).")
         conditions.append(condition)
@@ -179,11 +196,16 @@ public class Operation: NSOperation {
 
     // MARK: - Observers
 
+    /**
+    Add an observer to the to the operation, can only be done prior to the operation starting.
+
+    :param: observer type conforming to protocol `OperationObserver`.
+    */
     public func addObserver(observer: OperationObserver) {
         assert(state < .Executing, "Cannot modify observers after execution has begun, current state: \(state).")
         observers.append(observer)
     }
-    
+
     public override func addDependency(operation: NSOperation) {
         assert(state <= .Executing, "Dependencies cannot be modified after execution has begun, current state: \(state).")        
         super.addDependency(operation)
@@ -224,6 +246,11 @@ public class Operation: NSOperation {
         finish()
     }
 
+    /**
+    Cancel the operation with an error.
+    
+    :param: error, an optional `ErrorType`.
+    */
     public func cancelWithError(error: ErrorType? = .None) {
         if let error = error {
             _internalErrors.append(error)
@@ -231,7 +258,12 @@ public class Operation: NSOperation {
         
         cancel()
     }
-    
+
+    /**
+    Produce another operation on the same queue that this instance is on.
+
+    :param: operation a `NSOperation` instance.
+    */
     public final func produceOperation(operation: NSOperation) {
         observers.map { $0.operation(self, didProduceOperation: operation) }
     }
@@ -247,6 +279,8 @@ public class Operation: NSOperation {
     /**
     Finish method which must be called eventually after an operation has
     begun executing.
+
+    :param: errors, an array of `ErrorType`, which defaults to empty.
     */
     final public func finish(errors: [ErrorType] = []) {
         if !hasFinishedAlready {
@@ -352,8 +386,8 @@ extension NSOperation {
     }
     
     /// Add multiple depdendencies to the operation.
-    func addDependencies(dependencies: [NSOperation]) {
-        dependencies.map { self.addDependency($0) }
+    public func addDependencies(dependencies: [NSOperation]) {
+        dependencies.map(addDependency)
     }
 }
 
