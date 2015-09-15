@@ -51,7 +51,7 @@ public struct RemoteNotificationCondition: OperationCondition {
         self.init(registrar: UIApplication.sharedApplication())
     }
 
-    public init(registrar: RemoteNotificationRegistrarType) {
+    init(registrar: RemoteNotificationRegistrarType) {
         self.registrar = registrar
     }
 

@@ -7,13 +7,13 @@
 //
 
 import XCTest
-import Operations
+@testable import Operations
 
 class LoggingObserverTests: OperationTests {
 
     func test__logger_receives_messages_when_operation_is_named() {
 
-        var operation = TestOperation()
+        let operation = TestOperation()
         operation.name = "Test Logging Operation"
         addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
 
@@ -33,7 +33,7 @@ class LoggingObserverTests: OperationTests {
 
     func test__logger_outputs_number_of_received_errors() {
 
-        var operation = TestOperation(error: CloudContainerCondition.Error.NotAuthenticated)
+        let operation = TestOperation(error: CloudContainerCondition.Error.NotAuthenticated)
         addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
 
         var receivedMessages = [String]()
@@ -53,7 +53,7 @@ class LoggingObserverTests: OperationTests {
 
         let produced = TestOperation(delay: 0)
         produced.name = "Produced Operation"
-        var operation = TestOperation(error: CloudContainerCondition.Error.NotAuthenticated, produced: produced)
+        let operation = TestOperation(error: CloudContainerCondition.Error.NotAuthenticated, produced: produced)
         operation.name = "Test Operation"
         addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
 
@@ -72,7 +72,6 @@ class LoggingObserverTests: OperationTests {
         XCTAssertEqual(receivedMessages[2], "Produced Operation: did start.")
         XCTAssertEqual(receivedMessages[3], "Produced Operation: finished with no errors.")
         XCTAssertEqual(receivedMessages[4], "Test Operation: finished with 1 error(s).")
-
     }
 }
 

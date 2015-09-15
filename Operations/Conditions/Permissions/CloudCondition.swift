@@ -12,15 +12,9 @@ import CloudKit
 public protocol CloudContainer {
     func verifyPermissions(permissions: CKApplicationPermissions, requestPermissionIfNecessary: Bool, completion: ErrorType? -> Void)
 
-/* Swift 2.0
     func accountStatusWithCompletionHandler(completionHandler: (CKAccountStatus, NSError?) -> Void)
     func statusForApplicationPermission(applicationPermission: CKApplicationPermissions, completionHandler: CKApplicationPermissionBlock)
     func requestApplicationPermission(applicationPermission: CKApplicationPermissions, completionHandler: CKApplicationPermissionBlock)
-*/
-
-    func accountStatusWithCompletionHandler(completionHandler: ((CKAccountStatus, NSError!) -> Void)!)
-    func statusForApplicationPermission(applicationPermission: CKApplicationPermissions, completionHandler: CKApplicationPermissionBlock!)
-    func requestApplicationPermission(applicationPermission: CKApplicationPermissions, completionHandler: CKApplicationPermissionBlock!)
 }
 
 public struct CloudContainerCondition: OperationCondition {
@@ -42,7 +36,7 @@ public struct CloudContainerCondition: OperationCondition {
             self.permissions = permissions
             super.init()
 
-            if permissions & CKApplicationPermissions.PermissionUserDiscoverability != nil {
+            if permissions != [] {
                 // Requesting non-zero permissions will potentially
                 // present a system alert.
                 addCondition(AlertPresentation())
@@ -62,12 +56,12 @@ public struct CloudContainerCondition: OperationCondition {
     let container: CloudContainer
     let permissions: CKApplicationPermissions
 
-    public init(cloudKitContainer: CKContainer, permissions: CKApplicationPermissions = .allZeros) {
+    public init(cloudKitContainer: CKContainer, permissions: CKApplicationPermissions = []) {
         self.container = cloudKitContainer
         self.permissions = permissions
     }
 
-    public init(container: CloudContainer, permissions: CKApplicationPermissions = .allZeros) {
+    init(container: CloudContainer, permissions: CKApplicationPermissions = []) {
         self.container = container
         self.permissions = permissions
     }
@@ -110,7 +104,7 @@ public func ==(a: CloudContainerCondition.Error, b: CloudContainerCondition.Erro
 extension CKContainer: CloudContainer {
 
     public func verifyPermissions(permissions: CKApplicationPermissions, requestPermissionIfNecessary: Bool, completion: ErrorType? -> Void) {
-        verifyAccountStatusForContainer(self, permissions, requestPermissionIfNecessary, completion)
+        verifyAccountStatusForContainer(self, permissions: permissions, shouldRequest: requestPermissionIfNecessary, completion: completion)
     }
 }
 
@@ -120,8 +114,8 @@ public func verifyAccountStatusForContainer(container: CloudContainer, permissio
         switch status {
         
         case .Available:
-            if permissions != nil {
-                verifyPermissionsForContainer(container, permissions, shouldRequest, completion)
+            if permissions != [] {
+                verifyPermissionsForContainer(container, permissions: permissions, shouldRequest: shouldRequest, completion: completion)
             }
             else {
                 completion(.None)
@@ -142,7 +136,7 @@ public func verifyPermissionsForContainer(container: CloudContainer, permissions
         case (.Granted, _):
             completion(.None)
         case (.InitialState, true):
-            requestPermissionsForContainer(container, permissions, completion)
+            requestPermissionsForContainer(container, permissions: permissions, completion: completion)
         case (.InitialState, false):
             completion(CloudContainerCondition.Error.PermissionRequestRequired)
         default:

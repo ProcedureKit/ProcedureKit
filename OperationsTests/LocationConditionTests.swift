@@ -8,7 +8,7 @@
 
 import XCTest
 import CoreLocation
-import Operations
+@testable import Operations
 
 class TestableLocationManager: NSObject, LocationManager {
     let fakeLocationManager = CLLocationManager()

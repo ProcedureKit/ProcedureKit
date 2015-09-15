@@ -438,9 +438,9 @@ static NSString *const ext_key__version_deprecated = @"version";
 	for (i = 0; i < count; i++)
 	{
 		if (i == 0)
-			[query appendFormat:@"?"];
+			[query appendString:@"?"];
 		else
-			[query appendFormat:@", ?"];
+			[query appendString:@", ?"];
 	}
 	
 	[query appendString:@");"];
@@ -804,6 +804,15 @@ static NSString *const ext_key__version_deprecated = @"version";
  * This method is invoked by a YapDatabaseReadWriteTransaction as a post-operation-hook.
 **/
 - (void)handleTouchMetadataForCollectionKey:(YapCollectionKey __unused *)collectionKey withRowid:(int64_t __unused)rowid
+{
+	// Nothing to do for this extension
+}
+
+/**
+ * YapDatabase extension hook.
+ * This method is invoked by a YapDatabaseReadWriteTransaction as a post-operation-hook.
+**/
+- (void)handleTouchRowForCollectionKey:(YapCollectionKey *)collectionKey withRowid:(int64_t)rowid
 {
 	// Nothing to do for this extension
 }

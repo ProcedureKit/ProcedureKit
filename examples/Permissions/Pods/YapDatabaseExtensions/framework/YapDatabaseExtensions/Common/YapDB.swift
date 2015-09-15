@@ -8,7 +8,7 @@ protocol YapDatabaseViewProducer {
     func createDatabaseView() -> YapDatabaseView
 }
 
-protocol YapDatabaseExtensionRegistrar {
+protocol YapDatabaseViewRegistrar {
     func isRegisteredInDatabase(database: YapDatabase) -> Bool
     func registerInDatabase(database: YapDatabase, withConnection: YapDatabaseConnection?)
 }
@@ -20,28 +20,25 @@ extension YapDB {
     Request type, as it defines what will be fetched out of the database. The Fetch
     instance should be used by injecting it into a FetchConfiguration.
     */
-    public enum Fetch: YapDatabaseExtensionRegistrar {
+    public enum Fetch: YapDatabaseViewRegistrar {
 
         case View(YapDB.View)
         case Filter(YapDB.Filter)
         case Search(YapDB.Search)
-        case Index(YapDB.SecondaryIndex)
 
         public var name: String {
             switch self {
             case let .View(view):       return view.name
             case let .Filter(filter):   return filter.name
             case let .Search(search):   return search.name
-            case let .Index(index):     return index.name
             }
         }
 
-        var registrar: YapDatabaseExtensionRegistrar {
+        var registrar: YapDatabaseViewRegistrar {
             switch self {
             case let .View(view):       return view
             case let .Filter(filter):   return filter
             case let .Search(search):   return search
-            case let .Index(index):     return index
             }
         }
 
@@ -80,11 +77,23 @@ extension YapDB {
 
 extension YapDB {
 
-    public class BaseExtension {
+    /**
+    The base class for other YapDatabaseView wrapper types.
+    */
+    public class BaseView {
         let name: String
         let version: String
         let collections: Set<String>?
         let persistent: Bool
+
+        var options: YapDatabaseViewOptions {
+            get {
+                let options = YapDatabaseViewOptions()
+                options.isPersistent = persistent
+                options.allowedCollections = collections.map { YapWhitelistBlacklist(whitelist: $0) }
+                return options
+            }
+        }
 
         init(name n: String, version v: String = "1.0", persistent p: Bool = true, collections c: [String]? = .None) {
             name = n
@@ -103,21 +112,6 @@ extension YapDB {
             return (database.registeredExtension(name) as? YapDatabaseView) != .None
         }
     }
-
-    /**
-    The base class for other YapDatabaseView wrapper types.
-    */
-    public class BaseView: BaseExtension {
-
-        var options: YapDatabaseViewOptions {
-            get {
-                let options = YapDatabaseViewOptions()
-                options.isPersistent = persistent
-                options.allowedCollections = collections.map { YapWhitelistBlacklist(whitelist: $0) }
-                return options
-            }
-        }
-    }
 }
 
 extension YapDB {
@@ -126,7 +120,7 @@ extension YapDB {
     A wrapper around YapDatabaseView. It can be constructed with a name, which is
     the name the extension is registered under, a grouping enum type and a sorting enum type.
     */
-    public class View: BaseView, YapDatabaseViewProducer, YapDatabaseExtensionRegistrar {
+    public class View: BaseView, YapDatabaseViewProducer, YapDatabaseViewRegistrar {
 
         /**
         An enum to make creating YapDatabaseViewGrouping easier. E.g.
@@ -217,7 +211,7 @@ extension YapDB {
     is a YapDB.Fetch type. This allows for filtering of other filters, and 
     even filtering of search results.
     */
-    public class Filter: BaseView, YapDatabaseViewProducer, YapDatabaseExtensionRegistrar {
+    public class Filter: BaseView, YapDatabaseViewProducer, YapDatabaseViewRegistrar {
 
         /**
         An enum to make creating YapDatabaseViewFiltering easier.
@@ -285,7 +279,7 @@ extension YapDB {
     In this case, the parent is a YapDB.Fetch type. This
     allows for searching of other filters, and even searching inside search results.
     */
-    public class Search: BaseView, YapDatabaseViewProducer, YapDatabaseExtensionRegistrar {
+    public class Search: BaseView, YapDatabaseViewProducer, YapDatabaseViewRegistrar {
 
         /**
         An enum to make creating YapDatabaseFullTextSearchHandler easier.
@@ -354,73 +348,6 @@ extension YapDB {
                 }
                 else {
                     database.registerExtension(createDatabaseView(), withName: name)
-                }
-            }
-        }
-    }
-}
-
-
-extension YapDB {
-
-    /**
-    A wrapper around YapDatabaseSecondaryIndex.
-
-    A YapDatabaseSecondaryIndex is an extention (but not a view extension) which
-    is similar to a full text search extension. It features a handler, which must
-    be provided to update a dictionary used to index records.
-    */
-    public class SecondaryIndex: BaseExtension, YapDatabaseExtensionRegistrar {
-
-        public enum Handler {
-            case ByKey(YapDatabaseSecondaryIndexWithKeyBlock)
-            case ByObject(YapDatabaseSecondaryIndexWithObjectBlock)
-            case ByMetadata(YapDatabaseSecondaryIndexWithMetadataBlock)
-            case ByRow(YapDatabaseSecondaryIndexWithRowBlock)
-
-            public var object: YapDatabaseSecondaryIndexHandler {
-                switch self {
-                case let .ByKey(block): return YapDatabaseSecondaryIndexHandler.withKeyBlock(block)
-                case let .ByObject(block): return YapDatabaseSecondaryIndexHandler.withObjectBlock(block)
-                case let .ByMetadata(block): return YapDatabaseSecondaryIndexHandler.withMetadataBlock(block)
-                case let .ByRow(block): return YapDatabaseSecondaryIndexHandler.withRowBlock(block)
-                }
-            }
-        }
-
-        let handler: Handler
-        let columnTypes: [String: YapDatabaseSecondaryIndexType]
-
-        var options: YapDatabaseSecondaryIndexOptions {
-            get {
-                let options = YapDatabaseSecondaryIndexOptions()
-                options.allowedCollections = collections.map { YapWhitelistBlacklist(whitelist: $0) }
-                return options
-            }
-        }
-
-        public init(name n: String, handler h: Handler, columnTypes ct: [String: YapDatabaseSecondaryIndexType], version v: String, persistent p: Bool, collections c: [String]?) {
-            handler = h
-            columnTypes = ct
-            super.init(name: n, version: v, persistent: p, collections: c)
-        }
-
-        func setup() -> YapDatabaseSecondaryIndexSetup {
-            let setup = YapDatabaseSecondaryIndexSetup()
-            for (column, indexType) in columnTypes {
-                setup.addColumn(column, withType: indexType)
-            }
-            return setup
-        }
-
-        public func registerInDatabase(database: YapDatabase, withConnection connection: YapDatabaseConnection?) {
-            if !isRegisteredInDatabase(database) {
-                let secondaryIndex = YapDatabaseSecondaryIndex(setup: setup(), handler: handler.object, versionTag: version, options: options)
-                if let connection = connection {
-                    database.registerExtension(secondaryIndex, withName: name, connection: connection)
-                }
-                else {
-                    database.registerExtension(secondaryIndex, withName: name)
                 }
             }
         }

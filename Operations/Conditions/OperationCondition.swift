@@ -19,7 +19,7 @@ public protocol OperationCondition {
 
     var name: String { get }
 
-     var isMutuallyExclusive: Bool { get }
+    var isMutuallyExclusive: Bool { get }
 
     /**
     Some conditions may have the ability to satisfy the condition
@@ -47,7 +47,7 @@ struct OperationConditionEvaluator {
 
         var results = [OperationConditionResult?](count: conditions.count, repeatedValue: .None)
 
-        for (index, condition) in enumerate(conditions) {
+        for (index, condition) in conditions.enumerate() {
             dispatch_group_enter(group)
             condition.evaluateForOperation(operation) { result in
                 results[index] = result
@@ -57,7 +57,7 @@ struct OperationConditionEvaluator {
 
         dispatch_group_notify(group, Queue.Default.queue) {
 
-            var failures: [ErrorType] = reduce(results, [ErrorType]()) { (var acc, result) in
+            var failures: [ErrorType] = results.reduce([ErrorType]()) { (var acc, result) in
                 if let error = result?.error {
                     acc.append(error)
                 }

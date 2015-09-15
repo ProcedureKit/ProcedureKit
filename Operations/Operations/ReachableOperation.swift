@@ -40,8 +40,7 @@ public class ReachableOperation<O: NSOperation>: GroupOperation {
         self.init(operation: operation, connectivity: connectivity, reachability: Reachability.sharedInstance)
     }
 
-    // Testing interface
-    public init(operation: O, connectivity: Reachability.Connectivity = .AnyConnectionKind, reachability: SystemReachability) {
+    init(operation: O, connectivity: Reachability.Connectivity = .AnyConnectionKind, reachability: SystemReachability) {
         self.operation = operation
         self.connectivity = connectivity
         self.reachability = reachability

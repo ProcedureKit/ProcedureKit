@@ -47,7 +47,7 @@ public struct CalendarCondition: OperationCondition {
         Instead use
             init(type: EKEntityType)
     */
-    public init(type: EKEntityType, authorizationManager: EventKitAuthorizationManagerType) {
+    init(type: EKEntityType, authorizationManager: EventKitAuthorizationManagerType) {
         entityType = type
         manager = authorizationManager
     }
@@ -71,8 +71,6 @@ public func ==(a: CalendarCondition.Error, b: CalendarCondition.Error) -> Bool {
     switch (a, b) {
     case let (.AuthorizationFailed(aStatus), .AuthorizationFailed(bStatus)):
         return aStatus == bStatus
-    default:
-        return false
     }
 }
 

@@ -10,7 +10,7 @@
 
 import XCTest
 import HealthKit
-import Operations
+@testable import Operations
 
 class TestableHealthManager: HealthManagerType {
 
@@ -29,7 +29,7 @@ class TestableHealthManager: HealthManagerType {
 
     func opr_authorizationStatusForType(type: HKObjectType) -> HKAuthorizationStatus {
         if let sampleType = type as? HKSampleType {
-            if contains(allowedForSharing, sampleType) {
+            if allowedForSharing.contains(sampleType) {
                 return .SharingAuthorized
             }
             else {
@@ -58,7 +58,7 @@ class HealthConditionTests: OperationTests {
         let heartRate = HKQuantityType.quantityTypeForIdentifier(HKQuantityTypeIdentifierHeartRate)
         let mass = HKQuantityType.quantityTypeForIdentifier(HKQuantityTypeIdentifierBodyMass)
         let height = HKQuantityType.quantityTypeForIdentifier(HKQuantityTypeIdentifierHeight)
-        return [ heartRate, mass, height ]
+        return [ heartRate!, mass!, height! ]
     }()
 
     func test__condition_succeeds__when_access_is_authorized() {

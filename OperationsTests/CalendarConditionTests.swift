@@ -8,7 +8,7 @@
 
 import XCTest
 import EventKit
-import Operations
+@testable import Operations
 
 class TestableEventKitAuthorizationManager: EventKitAuthorizationManagerType {
 
@@ -44,7 +44,7 @@ class CalendarConditionTests: OperationTests {
 
         let manager = TestableEventKitAuthorizationManager(status: .Authorized)
         let operation = TestOperation()
-        operation.addCondition(CalendarCondition(type: EKEntityTypeEvent, authorizationManager: manager))
+        operation.addCondition(CalendarCondition(type: EKEntityType.Event, authorizationManager: manager))
 
         addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
         runOperation(operation)
@@ -56,7 +56,7 @@ class CalendarConditionTests: OperationTests {
 
         let manager = TestableEventKitAuthorizationManager(status: .Denied)
         let operation = TestOperation()
-        operation.addCondition(CalendarCondition(type: EKEntityTypeEvent, authorizationManager: manager))
+        operation.addCondition(CalendarCondition(type: EKEntityType.Event, authorizationManager: manager))
 
         let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
         var receivedErrors = [ErrorType]()
@@ -72,7 +72,7 @@ class CalendarConditionTests: OperationTests {
         if let error = receivedErrors.first as? CalendarCondition.Error {
             switch error {
             case .AuthorizationFailed(let status):
-                XCTAssertEqual(status, .Denied)
+                XCTAssertEqual(status, EKAuthorizationStatus.Denied)
             }
         }
         else {
@@ -86,7 +86,7 @@ class CalendarConditionTests: OperationTests {
         manager.accessAllowed = true
 
         let operation = TestOperation()
-        operation.addCondition(CalendarCondition(type: EKEntityTypeEvent, authorizationManager: manager))
+        operation.addCondition(CalendarCondition(type: EKEntityType.Event, authorizationManager: manager))
 
         addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
         runOperation(operation)

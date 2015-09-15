@@ -7,7 +7,7 @@
 //
 
 import XCTest
-import Operations
+@testable import Operations
 
 class NoFailedDependenciesConditionTests: OperationTests {
 
@@ -124,7 +124,7 @@ class NoFailedDependenciesConditionTests: OperationTests {
 
         runOperations(operation, dependency)
         waitForExpectationsWithTimeout(3, handler: nil)
-        
+
         XCTAssertFalse(operation.didExecute)
         XCTAssertEqual(receivedErrors.count, 1)        
     }

@@ -1,1 +1,1 @@
-../../../CocoaLumberjack/Lumberjack/DDLog.h
+../../../CocoaLumberjack/Classes/DDLog.h

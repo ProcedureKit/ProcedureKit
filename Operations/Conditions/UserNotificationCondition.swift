@@ -76,7 +76,7 @@ public struct UserNotificationCondition: OperationCondition {
         self.init(settings: settings, behavior: behavior, registrar: UIApplication.sharedApplication())
     }
 
-    public init(settings: UIUserNotificationSettings, behavior: Behavior = .Merge, registrar: UserNotificationRegistrarType) {
+    init(settings: UIUserNotificationSettings, behavior: Behavior = .Merge, registrar: UserNotificationRegistrarType) {
         self.settings = settings
         self.behavior = behavior
         self.registrar = registrar
@@ -108,7 +108,6 @@ public func ==(a: UserNotificationCondition.Error, b: UserNotificationCondition.
     switch (a, b) {
     case let (.SettingsNotSufficient(current: aCurrent, desired: aDesired), .SettingsNotSufficient(current: bCurrent, desired: bDesired)):
         return (aCurrent == bCurrent) && (aDesired == bDesired)
-    default: return false
     }
 }
     
@@ -126,7 +125,7 @@ public class UserNotificationPermissionOperation: Operation {
         self.init(settings: settings, behavior: behavior, registrar: UIApplication.sharedApplication())
     }
 
-    public init(settings: UIUserNotificationSettings, behavior: UserNotificationCondition.Behavior = .Merge, registrar: UserNotificationRegistrarType) {
+    init(settings: UIUserNotificationSettings, behavior: UserNotificationCondition.Behavior = .Merge, registrar: UserNotificationRegistrarType) {
         self.settings = settings
         self.behavior = behavior
         self.registrar = registrar
@@ -163,19 +162,8 @@ public class UserNotificationPermissionOperation: Operation {
 extension UIUserNotificationSettings {
 
     func contains(settings: UIUserNotificationSettings) -> Bool {
-        // This going to be so much easier with Swift 2.0's improved RawOptionSetType
-        // Need to check that our types contain all of the other types
-        // but without access to `contains:`
-        if (types == UIUserNotificationType.allZeros) && (settings.types.rawValue > 0) {
-            return false
-        }
-        if (types & UIUserNotificationType.Alert) && !(settings.types & UIUserNotificationType.Alert) {
-            return false
-        }
-        if (types & UIUserNotificationType.Badge) && !(settings.types & UIUserNotificationType.Badge) {
-            return false
-        }
-        if (types & UIUserNotificationType.Sound) && !(settings.types & UIUserNotificationType.Sound) {
+
+        if !types.contains(settings.types) {
             return false
         }
 
@@ -185,13 +173,13 @@ extension UIUserNotificationSettings {
     }
 
     func settingsByMerging(settings: UIUserNotificationSettings) -> UIUserNotificationSettings {
-        let union = types | settings.types
+        let union = types.union(settings.types)
 
-        let myCategories = categories as? Set<UIUserNotificationCategory> ?? []
+        let myCategories = categories ?? []
         var existingCategoriesByIdentifier = Dictionary(sequence: myCategories) { $0.identifier }
 
-        let newCategories = settings.categories as? Set<UIUserNotificationCategory> ?? []
-        var newCategoriesByIdentifier = Dictionary(sequence: myCategories) { $0.identifier }
+        let newCategories = settings.categories ?? []
+        let newCategoriesByIdentifier = Dictionary(sequence: newCategories) { $0.identifier }
 
         for (newIdentifier, newCategory) in newCategoriesByIdentifier {
             existingCategoriesByIdentifier[newIdentifier] = newCategory
@@ -205,7 +193,7 @@ extension UIUserNotificationSettings {
 extension UIUserNotificationType: BooleanType {
 
     public var boolValue: Bool {
-        return self != .allZeros
+        return self != []
     }
 }
 

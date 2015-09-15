@@ -10,8 +10,6 @@ public struct YapDBDatasource<
     Factory
     where
     Factory: _FactoryType,
-    Factory.ViewType: UpdatableView,
-    Factory.ViewType.ProcessChangesType == YapDatabaseViewMappings.Changes,
     Factory.CellIndexType == YapDBCellIndex,
     Factory.SupplementaryIndexType == YapDBSupplementaryIndex>: DatasourceType, SequenceType, CollectionType {
 
@@ -90,7 +88,7 @@ public struct YapDBDatasource<
 
     // SequenceType
 
-    public func generate() -> GeneratorOf<Factory.ItemType> {
+    public func generate() -> AnyGenerator<Factory.ItemType> {
         return observer.generate()
     }
 

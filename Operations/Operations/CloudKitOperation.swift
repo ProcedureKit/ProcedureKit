@@ -10,7 +10,7 @@ import Foundation
 import CloudKit
 
 public protocol CloudKitOperationType: class {
-    var database: CKDatabase! { get set }
+    var database: CKDatabase? { get set }
     func begin()
 }
 
@@ -25,7 +25,7 @@ public class CloudKitOperation<CloudOperation where CloudOperation: CloudKitOper
 
     public let operation: CloudOperation
 
-    public init(var operation: CloudOperation, database: CKDatabase = CKContainer.defaultContainer().privateCloudDatabase, completion: dispatch_block_t = { }) {
+    public init(operation: CloudOperation, database: CKDatabase = CKContainer.defaultContainer().privateCloudDatabase) {
         operation.database = database
         self.operation = operation
         super.init()
@@ -42,6 +42,7 @@ public class CloudKitOperation<CloudOperation where CloudOperation: CloudKitOper
 extension CKDatabaseOperation: CloudKitOperationType {
 
     public func begin() {
-        database.addOperation(self)
+        assert(database != nil, "CKDatabase not set on Operation.")
+        database!.addOperation(self)
     }
 }

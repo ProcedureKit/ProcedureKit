@@ -1,3 +1,6 @@
+# 2.0.0
+This is the Swift 2.0 compatible version.
+
 # 1.0.0
 1. [[OPR-79](https://github.com/danthorpe/Operations/pull/79)]: Adds more documentation to the types.
 2. [[OPR-83](https://github.com/danthorpe/Operations/pull/83)]: Adds some convenience functions to `NSOperation` and `GroupOperation` for adding multiple dependencies at once, and multiple operations to a group before it is added to a queue.

@@ -235,7 +235,7 @@
 		
 		InvokeFilterBlock = ^(NSString *group, int64_t __unused rowid, YapCollectionKey *ck){
 			
-			return filterBlock(group, ck.collection, ck.key);
+			return filterBlock(databaseTransaction, group, ck.collection, ck.key);
 		};
 	}
 	else if (filteringBlockType == YapDatabaseViewBlockTypeWithObject)
@@ -247,7 +247,7 @@
 			
 			id object = [databaseTransaction objectForCollectionKey:ck withRowid:rowid];
 			
-			return filterBlock(group, ck.collection, ck.key, object);
+			return filterBlock(databaseTransaction, group, ck.collection, ck.key, object);
 		};
 	}
 	else if (filteringBlockType == YapDatabaseViewBlockTypeWithMetadata)
@@ -259,7 +259,7 @@
 			
 			id metadata = [databaseTransaction metadataForCollectionKey:ck withRowid:rowid];
 			
-			return filterBlock(group, ck.collection, ck.key, metadata);
+			return filterBlock(databaseTransaction, group, ck.collection, ck.key, metadata);
 		};
 	}
 	else // if (filteringBlockType == YapDatabaseViewBlockTypeWithRow)
@@ -273,7 +273,7 @@
 			id metadata = nil;
 			[databaseTransaction getObject:&object metadata:&metadata forCollectionKey:ck withRowid:rowid];
 			
-			return filterBlock(group, ck.collection, ck.key, object, metadata);
+			return filterBlock(databaseTransaction, group, ck.collection, ck.key, object, metadata);
 		};
 	}
 	
@@ -437,7 +437,7 @@
 		
 		InvokeFilterBlock = ^(NSString *group, int64_t __unused rowid, YapCollectionKey *ck){
 			
-			return filterBlock(group, ck.collection, ck.key);
+			return filterBlock(databaseTransaction, group, ck.collection, ck.key);
 		};
 	}
 	else if (filteringBlockType == YapDatabaseViewBlockTypeWithObject)
@@ -449,7 +449,7 @@
 			
 			id object = [databaseTransaction objectForCollectionKey:ck withRowid:rowid];
 			
-			return filterBlock(group, ck.collection, ck.key, object);
+			return filterBlock(databaseTransaction, group, ck.collection, ck.key, object);
 		};
 	}
 	else if (filteringBlockType == YapDatabaseViewBlockTypeWithMetadata)
@@ -461,7 +461,7 @@
 			
 			id metadata = [databaseTransaction metadataForCollectionKey:ck withRowid:rowid];
 			
-			return filterBlock(group, ck.collection, ck.key, metadata);
+			return filterBlock(databaseTransaction, group, ck.collection, ck.key, metadata);
 		};
 	}
 	else // if (filteringBlockType == YapDatabaseViewBlockTypeWithRow)
@@ -475,7 +475,7 @@
 			id metadata = nil;
 			[databaseTransaction getObject:&object metadata:&metadata forCollectionKey:ck withRowid:rowid];
 			
-			return filterBlock(group, ck.collection, ck.key, object, metadata);
+			return filterBlock(databaseTransaction, group, ck.collection, ck.key, object, metadata);
 		};
 	}
 	
@@ -646,7 +646,7 @@
 		
 		InvokeFilterBlock = ^(NSString *group, int64_t __unused rowid, YapCollectionKey *ck){
 			
-			return filterBlock(group, ck.collection, ck.key);
+			return filterBlock(databaseTransaction, group, ck.collection, ck.key);
 		};
 	}
 	else if (filteringBlockType == YapDatabaseViewBlockTypeWithObject)
@@ -658,7 +658,7 @@
 			
 			id object = [databaseTransaction objectForCollectionKey:ck withRowid:rowid];
 			
-			return filterBlock(group, ck.collection, ck.key, object);
+			return filterBlock(databaseTransaction, group, ck.collection, ck.key, object);
 		};
 	}
 	else if (filteringBlockType == YapDatabaseViewBlockTypeWithMetadata)
@@ -670,7 +670,7 @@
 			
 			id metadata = [databaseTransaction metadataForCollectionKey:ck withRowid:rowid];
 			
-			return filterBlock(group, ck.collection, ck.key, metadata);
+			return filterBlock(databaseTransaction, group, ck.collection, ck.key, metadata);
 		};
 	}
 	else // if (filteringBlockType == YapDatabaseViewBlockTypeWithRow)
@@ -684,7 +684,7 @@
 			id metadata = nil;
 			[databaseTransaction getObject:&object metadata:&metadata forCollectionKey:ck withRowid:rowid];
 			
-			return filterBlock(group, ck.collection, ck.key, object, metadata);
+			return filterBlock(databaseTransaction, group, ck.collection, ck.key, object, metadata);
 		};
 	}
 	
@@ -806,28 +806,28 @@
 		YapDatabaseViewFilteringWithKeyBlock filterBlock =
 		  (YapDatabaseViewFilteringWithKeyBlock)filteringBlock_generic;
 		
-		passesFilter = filterBlock(group, collection, key);
+		passesFilter = filterBlock(databaseTransaction, group, collection, key);
 	}
 	else if (filteringBlockType == YapDatabaseViewBlockTypeWithObject)
 	{
 		YapDatabaseViewFilteringWithObjectBlock filterBlock =
 		  (YapDatabaseViewFilteringWithObjectBlock)filteringBlock_generic;
 		
-		passesFilter = filterBlock(group, collection, key, object);
+		passesFilter = filterBlock(databaseTransaction, group, collection, key, object);
 	}
 	else if (filteringBlockType == YapDatabaseViewBlockTypeWithMetadata)
 	{
 		YapDatabaseViewFilteringWithMetadataBlock filterBlock =
 		  (YapDatabaseViewFilteringWithMetadataBlock)filteringBlock_generic;
 		
-		passesFilter = filterBlock(group, collection, key, metadata);
+		passesFilter = filterBlock(databaseTransaction, group, collection, key, metadata);
 	}
 	else // if (filteringBlockType == YapDatabaseViewBlockTypeWithRow)
 	{
 		YapDatabaseViewFilteringWithRowBlock filterBlock =
 		  (YapDatabaseViewFilteringWithRowBlock)filteringBlock_generic;
 		
-		passesFilter = filterBlock(group, collection, key, object, metadata);
+		passesFilter = filterBlock(databaseTransaction, group, collection, key, object, metadata);
 	}
 	
 	if (passesFilter)
@@ -911,28 +911,28 @@
 		YapDatabaseViewFilteringWithKeyBlock filterBlock =
 		  (YapDatabaseViewFilteringWithKeyBlock)filteringBlock_generic;
 		
-		passesFilter = filterBlock(group, collection, key);
+		passesFilter = filterBlock(databaseTransaction, group, collection, key);
 	}
 	else if (filteringBlockType == YapDatabaseViewBlockTypeWithObject)
 	{
 		YapDatabaseViewFilteringWithObjectBlock filterBlock =
 		  (YapDatabaseViewFilteringWithObjectBlock)filteringBlock_generic;
 		
-		passesFilter = filterBlock(group, collection, key, object);
+		passesFilter = filterBlock(databaseTransaction, group, collection, key, object);
 	}
 	else if (filteringBlockType == YapDatabaseViewBlockTypeWithMetadata)
 	{
 		YapDatabaseViewFilteringWithMetadataBlock filterBlock =
 		  (YapDatabaseViewFilteringWithMetadataBlock)filteringBlock_generic;
 		
-		passesFilter = filterBlock(group, collection, key, metadata);
+		passesFilter = filterBlock(databaseTransaction, group, collection, key, metadata);
 	}
 	else // if (filteringBlockType == YapDatabaseViewBlockTypeWithRow)
 	{
 		YapDatabaseViewFilteringWithRowBlock filterBlock =
 		  (YapDatabaseViewFilteringWithRowBlock)filteringBlock_generic;
 		
-		passesFilter = filterBlock(group, collection, key, object, metadata);
+		passesFilter = filterBlock(databaseTransaction, group, collection, key, object, metadata);
 	}
 	
 	if (passesFilter)
@@ -1071,14 +1071,14 @@
 		__unsafe_unretained YapDatabaseViewFilteringWithKeyBlock filteringBlock =
 		  (YapDatabaseViewFilteringWithKeyBlock)filteringBlock_generic;
 		
-		passesFilter = filteringBlock(group, collection, key);
+		passesFilter = filteringBlock(databaseTransaction, group, collection, key);
 	}
 	else if (filteringBlockType == YapDatabaseViewBlockTypeWithObject)
 	{
 		__unsafe_unretained YapDatabaseViewFilteringWithObjectBlock filteringBlock =
 		  (YapDatabaseViewFilteringWithObjectBlock)filteringBlock_generic;
 		
-		passesFilter = filteringBlock(group, collection, key, object);
+		passesFilter = filteringBlock(databaseTransaction, group, collection, key, object);
 	}
 	else if (filteringBlockType == YapDatabaseViewBlockTypeWithMetadata)
 	{
@@ -1086,7 +1086,7 @@
 		  (YapDatabaseViewFilteringWithMetadataBlock)filteringBlock_generic;
 		
 		metadata = [databaseTransaction metadataForCollectionKey:collectionKey withRowid:rowid];
-		passesFilter = filteringBlock(group, collection, key, metadata);
+		passesFilter = filteringBlock(databaseTransaction, group, collection, key, metadata);
 	}
 	else // if (filteringBlockType == YapDatabaseViewBlockTypeWithRow)
 	{
@@ -1094,7 +1094,7 @@
 		  (YapDatabaseViewFilteringWithRowBlock)filteringBlock_generic;
 		
 		metadata = [databaseTransaction metadataForCollectionKey:collectionKey withRowid:rowid];
-		passesFilter = filteringBlock(group, collection, key, object, metadata);
+		passesFilter = filteringBlock(databaseTransaction, group, collection, key, object, metadata);
 	}
 	
 	if (passesFilter)
@@ -1240,7 +1240,7 @@
 		__unsafe_unretained YapDatabaseViewFilteringWithKeyBlock filteringBlock =
 		  (YapDatabaseViewFilteringWithKeyBlock)filteringBlock_generic;
 		
-		passesFilter = filteringBlock(group, collection, key);
+		passesFilter = filteringBlock(databaseTransaction, group, collection, key);
 	}
 	else if (filteringBlockType == YapDatabaseViewBlockTypeWithObject)
 	{
@@ -1248,14 +1248,14 @@
 		  (YapDatabaseViewFilteringWithObjectBlock)filteringBlock_generic;
 		
 		object = [databaseTransaction objectForCollectionKey:collectionKey withRowid:rowid];
-		passesFilter = filteringBlock(group, collection, key, object);
+		passesFilter = filteringBlock(databaseTransaction, group, collection, key, object);
 	}
 	else if (filteringBlockType == YapDatabaseViewBlockTypeWithMetadata)
 	{
 		__unsafe_unretained YapDatabaseViewFilteringWithMetadataBlock filteringBlock =
 		  (YapDatabaseViewFilteringWithMetadataBlock)filteringBlock_generic;
 		
-		passesFilter = filteringBlock(group, collection, key, metadata);
+		passesFilter = filteringBlock(databaseTransaction, group, collection, key, metadata);
 	}
 	else // if (filteringBlockType == YapDatabaseViewBlockTypeWithRow)
 	{
@@ -1263,7 +1263,7 @@
 		  (YapDatabaseViewFilteringWithRowBlock)filteringBlock_generic;
 		
 		object = [databaseTransaction objectForCollectionKey:collectionKey withRowid:rowid];
-		passesFilter = filteringBlock(group, collection, key, object, metadata);
+		passesFilter = filteringBlock(databaseTransaction, group, collection, key, object, metadata);
 	}
 	
 	if (passesFilter)

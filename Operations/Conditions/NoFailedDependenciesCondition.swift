@@ -30,7 +30,7 @@ public struct NoFailedDependenciesCondition: OperationCondition {
     }
 
     public func evaluateForOperation(operation: Operation, completion: OperationConditionResult -> Void) {
-        let dependencies = operation.dependencies as! [NSOperation]
+        let dependencies = operation.dependencies
 
         let cancelled = dependencies.filter { $0.cancelled }
         let failures = dependencies.filter {
@@ -54,9 +54,7 @@ public struct NoFailedDependenciesCondition: OperationCondition {
 
 public func ==(a: NoFailedDependenciesCondition.Error, b: NoFailedDependenciesCondition.Error) -> Bool {
     switch (a, b) {
-    case (.CancelledDependencies, .CancelledDependencies):
-        return true
-    case (.FailedDependencies, .FailedDependencies):
+    case (.CancelledDependencies, .CancelledDependencies), (.FailedDependencies, .FailedDependencies):
         return true
     default:
         return false

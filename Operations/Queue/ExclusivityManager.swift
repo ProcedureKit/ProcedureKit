@@ -53,7 +53,7 @@ public class ExclusivityManager {
         let matchingOperations = operations[category]
 
         if  var operationsWithThisCategory = matchingOperations,
-            let index = find(operationsWithThisCategory, operation) {
+            let index = operationsWithThisCategory.indexOf(operation) {
                 operationsWithThisCategory.removeAtIndex(index)
                 operations[category] = operationsWithThisCategory
         }
@@ -64,7 +64,7 @@ extension ExclusivityManager {
 
     /// This should only be used as part of the unit testing
     /// and in v2+ will not be publically accessible
-    public func __tearDownForUnitTesting() {
+    internal func __tearDownForUnitTesting() {
         dispatch_sync(queue) {
             for (category, operations) in self.operations {
                 for operation in operations {

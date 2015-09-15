@@ -40,8 +40,5 @@ public struct BlockCondition: OperationCondition {
 extension BlockCondition.Error: Equatable { }
 
 public func ==(a: BlockCondition.Error, b: BlockCondition.Error) -> Bool {
-    switch (a, b) {
-    case (.BlockConditionFailed, .BlockConditionFailed): return true
-    default: return false
-    }
+    return true // Only one case in the enum
 }

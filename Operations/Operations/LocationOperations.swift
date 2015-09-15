@@ -9,7 +9,7 @@
 import Foundation
 import CoreLocation
 
-@availability(*, unavailable, renamed="UserLocationOperation")
+@available(*, unavailable, renamed="UserLocationOperation")
 public typealias LocationOperation = UserLocationOperation
 
 /**
@@ -32,21 +32,18 @@ public class UserLocationOperation: Operation {
     public var location: CLLocation? = .None
 
     /**
-    This is the true public API, the other public initializer is really just a testing
-    interface, and will not be public in Swift 2.0, Operations 2.0
+    Initialize an operation which will use CLLocationManager to determine
+    the user's current location to the desired accuracy. It will ask for
+    permission if required.
     
     :param: accuracy, the location accuracy which defaults to 3km.
     :param: handler, a response handler LocationResponseHandler.
     */
     public convenience init(accuracy: CLLocationAccuracy = kCLLocationAccuracyThreeKilometers, handler: LocationResponseHandler = { _ in }) {
-        self.init(accuracy: accuracy, manager: .None, handler: handler)
+        self.init(accuracy: accuracy, manager: CLLocationManager(), handler: handler)
     }
 
-    /**
-    This is the Swift 1.2 testing interface, and will not be public in Swift 2.0, Operations 2.0.
-    Instead use init(:CLLocationAccuracy, handler: LocationResponseHandler)
-    */
-    public init(accuracy: CLLocationAccuracy, manager: LocationManager? = .None, handler: LocationResponseHandler) {
+    init(accuracy: CLLocationAccuracy, manager: LocationManager, handler: LocationResponseHandler) {
         self.accuracy = accuracy
         self.manager = manager
         self.handler = handler
@@ -63,7 +60,7 @@ public class UserLocationOperation: Operation {
             manager.opr_startUpdatingLocation()
         }
 
-        if var manager = manager {
+        if let manager = manager {
             configureLocationManager(manager)
         }
         else {
@@ -90,8 +87,8 @@ public class UserLocationOperation: Operation {
 
 extension UserLocationOperation: CLLocationManagerDelegate {
 
-    public func locationManager(manager: CLLocationManager!, didUpdateLocations locations: [AnyObject]!) {
-        if let locations = locations as? [CLLocation], location = locations.last where location.horizontalAccuracy <= accuracy {
+    public func locationManager(manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        if let location = locations.last where location.horizontalAccuracy <= accuracy {
             stopLocationUpdates()
             self.location = location
             handler(location: location)
@@ -99,7 +96,7 @@ extension UserLocationOperation: CLLocationManagerDelegate {
         }
     }
 
-    public func locationManager(manager: CLLocationManager!, didFailWithError error: NSError!) {
+    public func locationManager(manager: CLLocationManager, didFailWithError error: NSError) {
         stopLocationUpdates()
         finish(Error.LocationManagerDidFail(error))
     }
@@ -109,7 +106,6 @@ public func ==(a: UserLocationOperation.Error, b: UserLocationOperation.Error) -
     switch (a, b) {
     case let (.LocationManagerDidFail(aError), .LocationManagerDidFail(bError)):
         return aError == bError
-    default: return false
     }
 }
 
@@ -128,7 +124,7 @@ extension CLGeocoder: ReverseGeocoderType {
 
     public func opr_reverseGeocodeLocation(location: CLLocation, completion: ([CLPlacemark], NSError?) -> Void) {
         reverseGeocodeLocation(location) { (results, error) in
-            completion(results as! [CLPlacemark], error as NSError?)
+            completion(results ?? [], error as NSError?)
         }
     }
 }
@@ -152,14 +148,10 @@ public class ReverseGeocodeOperation: Operation {
         interface, and will not be public in Swift 2.0, Operations 2.0
     */
     public convenience init(location: CLLocation, completion: ReverseGeocodeCompletionHandler? = .None) {
-        self.init(location: location, geocoder: CLGeocoder())
+        self.init(location: location, geocoder: CLGeocoder(), completion: completion)
     }
 
-    /**
-        This is the Swift 1.2 testing interface, and will not be public in Swift 2.0, Operations 2.0.
-        Instead use init(:CLLocationAccuracy, handler: LocationResponseHandler)
-    */
-    public init(location: CLLocation, geocoder: ReverseGeocoderType, completion: ReverseGeocodeCompletionHandler? = .None) {
+    init(location: CLLocation, geocoder: ReverseGeocoderType, completion: ReverseGeocodeCompletionHandler? = .None) {
         self.location = location
         self.geocoder = geocoder
         self.completion = completion
@@ -208,14 +200,10 @@ public class ReverseGeocodeUserLocationOperation: GroupOperation {
         interface, and will not be public in Swift 2.0, Operations 2.0
     */
     public convenience init(accuracy: CLLocationAccuracy = kCLLocationAccuracyThreeKilometers, completion: ReverseGeocodeUserLocationCompletionHandler? = .None) {
-        self.init(accuracy: accuracy, manager: .None, geocoder: CLGeocoder(), completion: completion)
+        self.init(accuracy: accuracy, manager: CLLocationManager(), geocoder: CLGeocoder(), completion: completion)
     }
 
-    /**
-        This is the Swift 1.2 testing interface, and will not be public in Swift 2.0, Operations 2.0.
-        Instead use init(:CLLocationAccuracy, handler: LocationResponseHandler)
-    */
-    public init(accuracy: CLLocationAccuracy, manager: LocationManager? = .None, geocoder: ReverseGeocoderType, completion: ReverseGeocodeUserLocationCompletionHandler? = .None) {
+    init(accuracy: CLLocationAccuracy, manager: LocationManager, geocoder: ReverseGeocoderType, completion: ReverseGeocodeUserLocationCompletionHandler? = .None) {
         self.geocoder = geocoder
         self.completion = completion
         self.userLocationOperation = UserLocationOperation(accuracy: accuracy, manager: manager) { location in

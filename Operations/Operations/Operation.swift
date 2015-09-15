@@ -80,7 +80,6 @@ public class Operation: NSOperation {
         return ["state"]
     }
 
-
     private var _state = State.Initialized
     private let stateLock = NSLock()
 
@@ -102,7 +101,7 @@ public class Operation: NSOperation {
                 case (.Finished, _):
                     break
                 default:
-                    assert(_state != newState, "Attempting to perform illegal cyclic state transition.")
+                    assert(_state.canTransitionToState(newState), "Attempting to perform illegal cyclic state transition, \(_state) -> \(newState).")
                     _state = newState
                 }
             }
@@ -177,7 +176,7 @@ public class Operation: NSOperation {
         assert(state == .Pending && cancelled == false, "\(__FUNCTION__) was called out of order.")
         state = .EvaluatingConditions
         OperationConditionEvaluator.evaluate(conditions, operation: self) { errors in
-            self._internalErrors.extend(errors)
+            self._internalErrors.appendContentsOf(errors)
             self.state = .Ready
         }
     }
@@ -228,7 +227,7 @@ public class Operation: NSOperation {
 
         if _internalErrors.isEmpty && !cancelled {
             state = .Executing
-            observers.map { $0.operationDidStart(self) }
+            observers.forEach { $0.operationDidStart(self) }
             execute()
         }
         else {
@@ -241,7 +240,7 @@ public class Operation: NSOperation {
     They must call a finish methods in order to complete.
     */
     public func execute() {
-        print("\(self.dynamicType) must override `execute()`.")
+        print("\(self.dynamicType) must override `execute()`.", terminator: "")
         
         finish()
     }
@@ -265,7 +264,7 @@ public class Operation: NSOperation {
     :param: operation a `NSOperation` instance.
     */
     public final func produceOperation(operation: NSOperation) {
-        observers.map { $0.operation(self, didProduceOperation: operation) }
+        observers.forEach { $0.operation(self, didProduceOperation: operation) }
     }
     
     // MARK: Finishing
@@ -287,10 +286,10 @@ public class Operation: NSOperation {
             hasFinishedAlready = true
             state = .Finishing
 
-            _internalErrors.extend(errors)
+            _internalErrors.appendContentsOf(errors)
             finished(_internalErrors)
             
-            observers.map { $0.operationDidFinish(self, errors: self._internalErrors) }
+            observers.forEach { $0.operationDidFinish(self, errors: self._internalErrors) }
             
             state = .Finished
         }
@@ -301,7 +300,7 @@ public class Operation: NSOperation {
     */
     final public func finish(error: ErrorType?) {
         if let error = error {
-            finish(errors: [error])
+            finish([error])
         }
         else {
             finish()
@@ -326,7 +325,6 @@ public class Operation: NSOperation {
     }
 }
 
-
 private func <(lhs: Operation.State, rhs: Operation.State) -> Bool {
     return lhs.rawValue < rhs.rawValue
 }
@@ -335,7 +333,7 @@ private func ==(lhs: Operation.State, rhs: Operation.State) -> Bool {
     return lhs.rawValue == rhs.rawValue
 }
 
-extension Operation.State: DebugPrintable, Printable {
+extension Operation.State: CustomDebugStringConvertible, CustomStringConvertible {
 
     var description: String {
         switch self {
@@ -387,7 +385,7 @@ extension NSOperation {
     
     /// Add multiple depdendencies to the operation.
     public func addDependencies(dependencies: [NSOperation]) {
-        dependencies.map(addDependency)
+        dependencies.forEach(addDependency)
     }
 }
 

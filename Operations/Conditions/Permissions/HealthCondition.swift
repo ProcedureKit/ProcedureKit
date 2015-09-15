@@ -52,7 +52,7 @@ public struct HealthCondition: OperationCondition {
         self.init(manager: HKHealthStore(), typesToRead: typesToRead, typesToWrite: typesToWrite)
     }
 
-    public init(manager: HealthManagerType, typesToRead: Set<HKSampleType> = Set(), typesToWrite: Set<HKSampleType> = Set()) {
+    init(manager: HealthManagerType, typesToRead: Set<HKSampleType> = Set(), typesToWrite: Set<HKSampleType> = Set()) {
         self.manager = manager
         self.readTypes = typesToRead
         self.shareTypes = typesToWrite
@@ -75,7 +75,7 @@ public struct HealthCondition: OperationCondition {
         We don't actually test for unauthorized read access, as this
         reveals sensetive information.
         */
-        let unauthorizedShareTypes = filter(shareTypes) { type in
+        let unauthorizedShareTypes = shareTypes.filter { type in
             return self.manager.opr_authorizationStatusForType(type) != .SharingAuthorized
         }
 

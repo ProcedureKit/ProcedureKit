@@ -23,17 +23,11 @@ public class NetworkObserver: OperationObserver {
 
     let networkActivityIndicator: NetworkActivityIndicatorInterface
 
-    /**
-    This is the initializer API for Swift 1.2.
-    */
     public convenience init() {
         self.init(indicator: UIApplication.sharedApplication())
     }
 
-    /**
-    This is a testing interface for Swift 1.2 - use `init()` instead.
-    */
-    public init(indicator: NetworkActivityIndicatorInterface) {
+    init(indicator: NetworkActivityIndicatorInterface) {
         networkActivityIndicator = indicator
     }
 

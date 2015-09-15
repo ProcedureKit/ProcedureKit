@@ -42,7 +42,7 @@ public struct PhotosCondition: OperationCondition {
         self.init(manager: SystemPhotoLibraryAuthenticationManager())
     }
 
-    public init(manager: PhotosManagerType) {
+    init(manager: PhotosManagerType) {
         self.manager = manager
     }
 
@@ -67,8 +67,6 @@ public func ==(a: PhotosCondition.Error, b: PhotosCondition.Error) -> Bool {
     switch (a, b) {
     case let (.AuthorizationNotAuthorized(aStatus), .AuthorizationNotAuthorized(bStatus)):
         return aStatus == bStatus
-    default:
-        return false
     }
 }
 

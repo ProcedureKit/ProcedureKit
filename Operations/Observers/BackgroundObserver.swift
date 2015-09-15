@@ -38,7 +38,7 @@ public class BackgroundObserver: NSObject {
         self.init(app: UIApplication.sharedApplication())
     }
 
-    public init(app: BackgroundTaskApplicationInterface) {
+    init(app: BackgroundTaskApplicationInterface) {
         application = app
 
         super.init()

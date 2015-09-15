@@ -52,7 +52,5 @@ public func ==(a: NegatedConditionError, b: NegatedConditionError) -> Bool {
     switch (a, b) {
     case let (.ConditionSatisfied(aString), .ConditionSatisfied(bString)):
         return aString == bString
-    default:
-        return false
     }
 }

@@ -35,7 +35,7 @@ public class OperationQueue: NSOperationQueue {
             operation.addObserver(observer)
 
             let dependencies = operation.conditions.flatMap {
-                flatMap($0.dependencyForOperation(operation), { [$0] }) ?? []
+                $0.dependencyForOperation(operation)
             }
 
             for dependency in dependencies {
@@ -44,11 +44,9 @@ public class OperationQueue: NSOperationQueue {
             }
 
             // Check for exclusive mutability constraints
-            let concurrencyCategories: [String] = operation.conditions.flatMap {
-                flatMap($0) {
-                    if !$0.isMutuallyExclusive { return .None }
-                    return ["\($0.dynamicType)"]
-                } ?? []
+            let concurrencyCategories: [String] = operation.conditions.flatMap { condition in
+                if condition.isMutuallyExclusive { return .None }
+                return "\(condition.dynamicType)"
             }
 
             if !concurrencyCategories.isEmpty {
@@ -77,11 +75,8 @@ public class OperationQueue: NSOperationQueue {
         super.addOperation(op)
     }
 
-    public override func addOperations(ops: [AnyObject], waitUntilFinished wait: Bool) {
-        if let ops = ops as? [NSOperation] {
-            ops.map(addOperation)
-        }
+    public override func addOperations(ops: [NSOperation], waitUntilFinished wait: Bool) {
+        ops.forEach(addOperation)
     }
-
 }
 

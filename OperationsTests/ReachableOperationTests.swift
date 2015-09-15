@@ -7,14 +7,14 @@
 //
 
 import XCTest
-import Operations
+@testable import Operations
 
 class TestableSystemReachability: SystemReachability {
 
     var observers = Array<Reachability.ObserverBlockType>()
     var status: Reachability.NetworkStatus {
         didSet {
-            observers.map { $0(self.status) }
+            observers.forEach { $0(self.status) }
         }
     }
 

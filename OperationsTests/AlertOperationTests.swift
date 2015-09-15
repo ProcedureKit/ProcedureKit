@@ -7,7 +7,7 @@
 //
 
 import XCTest
-import Operations
+@testable import Operations
 
 class TestablePresentingController: PresentingViewController {
     typealias CheckBlockType = (received: UIViewController) -> Void
@@ -45,13 +45,13 @@ class AlertOperationTests: OperationTests {
     func test__alert_title_works() {
         let alert = AlertOperation(presentAlertFrom: presentingController)
         alert.title = title
-        XCTAssertEqual(alert.title!, title)
+        XCTAssertEqual(alert.title, title)
     }
 
     func test__alert_message_works() {
         let alert = AlertOperation(presentAlertFrom: presentingController)
         alert.message = message
-        XCTAssertEqual(alert.message!, message)
+        XCTAssertEqual(alert.message, message)
     }
 
     func test__alert_operation_presents_alert_controller() {
