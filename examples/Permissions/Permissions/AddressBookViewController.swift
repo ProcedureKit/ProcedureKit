@@ -46,7 +46,7 @@ class AddressBookViewController: PermissionViewController {
         return configureConditionsForState(state, silent: silent)(AddressBookCondition())
     }
 
-    func determineAuthorizationStatus(silently: Bool = true) {
+    func determineAuthorizationStatus(silently silently: Bool = true) {
 
         // Create a simple block operation to set the state.
         let authorized = BlockOperation { (continueWithError: BlockOperation.ContinuationBlockType) in
@@ -87,13 +87,13 @@ class AddressBookViewController: PermissionViewController {
 
     override func performOperation() {
 
-        let countContactsOperation = AddressBookOperation { (addressBook, continueWithError) -> Void in
-            let contacts: NSArray = ABAddressBookCopyArrayOfAllPeople(addressBook).takeRetainedValue()
-            self.numberOfContacts = contacts.count
-            self.state = .Completed
-            continueWithError(error: nil)
-        }
-        countContactsOperation.addCondition(AddressBookCondition())
+        let countContactsOperation = AddressBookOperation()
+        countContactsOperation.addObserver(BlockObserver { op, errors in
+            if errors.isEmpty, let addressBookOperation = op as? AddressBookOperation {
+                self.numberOfContacts = addressBookOperation.addressBook.numberOfPeople
+                self.state = .Completed
+            }
+        })
         queue.addOperation(countContactsOperation)
     }
 }

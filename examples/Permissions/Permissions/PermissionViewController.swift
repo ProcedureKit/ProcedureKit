@@ -36,7 +36,7 @@ class PermissionViewController: UIViewController {
     class InfoInstructionButtonBox: InfoBox {
 
         let instructionLabel = UILabel.newAutoLayoutView()
-        let button = UIButton.buttonWithType(.Custom) as! UIButton
+        let button = UIButton(type: .Custom)
 
         var verticalSpaceBetweenLabels: NSLayoutConstraint!
         var verticalSpaceBetweenButton: NSLayoutConstraint!
@@ -45,7 +45,7 @@ class PermissionViewController: UIViewController {
             super.init(frame: frame)
             addSubview(instructionLabel)
             addSubview(button)
-            removeConstraints(constraints())
+            removeConstraints(constraints)
             informationLabel.autoPinEdgesToSuperviewMarginsExcludingEdge(.Bottom)
             verticalSpaceBetweenLabels = instructionLabel.autoPinEdge(.Top, toEdge: .Bottom, ofView: informationLabel, withOffset: 10)
             instructionLabel.autoPinEdgeToSuperviewMargin(.Leading)
@@ -237,15 +237,15 @@ class PermissionViewController: UIViewController {
 
         let update = BlockOperation { (continueWithError: BlockOperation.ContinuationBlockType) in
             dispatch_async(Queue.Main.queue) {
-                viewsToHide.map { $0.hidden = true }
-                viewsToShow.map { $0.hidden = false }
+                viewsToHide.forEach { $0.hidden = true }
+                viewsToShow.forEach { $0.hidden = false }
                 continueWithError(error: nil)
             }
         }
         update.name = "Update UI for state: \(state)"
 
         let conditions = conditionsForState(state, silent: silent)
-        conditions.map { update.addCondition($0) }
+        conditions.forEach { update.addCondition($0) }
         
         return update
     }

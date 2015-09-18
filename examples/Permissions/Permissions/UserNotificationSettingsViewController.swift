@@ -16,11 +16,11 @@ enum UserNotificationSettings {
     var type: UIUserNotificationType {
         switch self {
         case .Simple:
-            return .Badge | .Alert | .Sound
+            return .Badge
         }
     }
 
-    var categories: Set<NSObject>? {
+    var categories: Set<UIUserNotificationCategory>? {
         return .None
     }
 
@@ -60,7 +60,7 @@ class UserNotificationSettingsViewController: PermissionViewController {
         return configureConditionsForState(state, silent: silent)(condition)
     }
 
-    func determineAuthorizationStatus(silently: Bool = true) {
+    func determineAuthorizationStatus(silently silently: Bool = true) {
         // Create a simple block operation to set the state.
         let authorized = BlockOperation { (continueWithError: BlockOperation.ContinuationBlockType) in
             self.state = .Authorized
@@ -77,8 +77,8 @@ class UserNotificationSettingsViewController: PermissionViewController {
         authorized.addObserver(BlockObserver { (_, errors) in
             if let error = errors.first as? UserNotificationCondition.Error {
                 switch error {
-                case let .SettingsNotSufficient(current: current, desired: desired):
-                    if let current = current {
+                case let .SettingsNotSufficient(current: current, desired: _):
+                    if let _ = current {
                         self.state = .Denied
                     }
                     else {

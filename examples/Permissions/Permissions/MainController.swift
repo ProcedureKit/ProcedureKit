@@ -18,9 +18,11 @@ enum Demo: Int {
         let subtitle: String
     }
 
-    case AddressBook, Location, UserNotificationSettings
+    case AddressBook
+    case Location
+    case UserNotificationSettings // This is a work in progress, so not included yet.
 
-    static let all: [Demo] = [ .AddressBook, .Location, .UserNotificationSettings ]
+    static let all: [Demo] = [ .AddressBook, .Location ]
 
     var info: Info {
         switch self {
@@ -52,12 +54,7 @@ struct ContentsDatasourceProvider: DatasourceProviderType {
     typealias Datasource = StaticDatasource<Factory>
 
     let datasource: Datasource
-
-    var canEditItemAtIndexPath: CanEditItemAtIndexPath?  = .None
-    var commitEditActionForItemAtIndexPath: CommitEditActionForItemAtIndexPath? = .None
-    var editActionForItemAtIndexPath: EditActionForItemAtIndexPath? = .None
-    var canMoveItemAtIndexPath: CanMoveItemAtIndexPath? = .None
-    var commitMoveItemAtIndexPathToIndexPath: CommitMoveItemAtIndexPathToIndexPath? = .None
+    let editor = NoEditor()
 
     init(tableView: UITableView) {
         datasource = Datasource(id: "Contents", factory: Factory(), items: Demo.all)
