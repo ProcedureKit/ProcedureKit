@@ -1,1 +1,1 @@
-../../../TaylorSource/framework/TaylorSource/Base/UICollectionView+TaylorSource.h
+../../../TaylorSource/TaylorSource/Base/UICollectionView+TaylorSource.h

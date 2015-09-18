@@ -10,16 +10,20 @@ public struct YapDBDatasource<
     Factory
     where
     Factory: _FactoryType,
+    Factory.ViewType: UpdatableView,
+    Factory.ViewType.ProcessChangesType == YapDatabaseViewMappings.Changes,
     Factory.CellIndexType == YapDBCellIndex,
     Factory.SupplementaryIndexType == YapDBSupplementaryIndex>: DatasourceType, SequenceType, CollectionType {
 
-    typealias FactoryType = Factory
+    public typealias FactoryType = Factory
 
     public let identifier: String
     public let factory: Factory
     public var title: String? = .None
 
-    private let observer: Observer<Factory.ItemType>
+    public let observer: Observer<Factory.ItemType>
+
+    public var selectionManager = IndexPathSelectionManager()
 
     var mappings: YapDatabaseViewMappings {
         return observer.mappings
@@ -52,9 +56,10 @@ public struct YapDBDatasource<
     }
 
     public func cellForItemInView(view: Factory.ViewType, atIndexPath indexPath: NSIndexPath) -> Factory.CellType {
+        let selected = selectionManager.enabled && selectionManager.contains(indexPath)
         return readOnlyConnection.read { transaction in
             if let item = self.observer.itemAtIndexPath(indexPath, inTransaction: transaction) {
-                let index = YapDBCellIndex(indexPath: indexPath, transaction: transaction)
+                let index = YapDBCellIndex(indexPath: indexPath, transaction: transaction, selected: selected)
                 return self.factory.cellForItem(item, inView: view, atIndex: index)
             }
             fatalError("No item available at index path: \(indexPath)")
@@ -73,10 +78,10 @@ public struct YapDBDatasource<
     /**
     Will return an optional text for the supplementary kind
 
-    :param: view the View which should dequeue the cell.
-    :param: kind the kind of the supplementary element. See SupplementaryElementKind
-    :param: indexPath the NSIndexPath of the item.
-    :return: a TextType?
+    - parameter view: the View which should dequeue the cell.
+    - parameter kind: the kind of the supplementary element. See SupplementaryElementKind
+    - parameter indexPath: the NSIndexPath of the item.
+    - returns: a TextType?
     */
     public func textForSupplementaryElementInView(view: Factory.ViewType, kind: SupplementaryElementKind, atIndexPath indexPath: NSIndexPath) -> Factory.TextType? {
         let group = mappings.groupForSection(UInt(indexPath.section))
@@ -103,7 +108,7 @@ public struct YapDBDatasource<
     }
 
     public subscript(i: Int) -> Factory.ItemType {
-        return observer.mapper[i]
+        return observer[i]
     }
 }
 

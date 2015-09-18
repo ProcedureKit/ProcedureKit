@@ -6,9 +6,8 @@ import UIKit
 
 // MARK: UITableView Support
 
-
 /// A provider of a UITableViewDataSource.
-public protocol UITableViewDataSourceProvider {    
+public protocol UITableViewDataSourceProvider {
     var tableViewDataSource: UITableViewDataSource { get }
 }
 
@@ -27,7 +26,12 @@ This architecture allows for different kinds of DatasourceType(s) to
 be used as the basic for a UITableViewDataSource, without the need
 to implement UITableViewDataSource on any of them.
 */
-public struct TableViewDataSourceProvider<DatasourceProvider where DatasourceProvider: DatasourceProviderType, DatasourceProvider.Datasource.FactoryType.ViewType: UITableViewType, DatasourceProvider.Datasource.FactoryType.TextType == String>: UITableViewDataSourceProvider {
+public struct TableViewDataSourceProvider<
+    DatasourceProvider
+    where
+    DatasourceProvider: DatasourceProviderType,
+    DatasourceProvider.Datasource.FactoryType.ViewType: UITableViewType,
+    DatasourceProvider.Datasource.FactoryType.TextType == String>: UITableViewDataSourceProvider {
 
     typealias TableView = DatasourceProvider.Datasource.FactoryType.ViewType
 
@@ -41,32 +45,70 @@ public struct TableViewDataSourceProvider<DatasourceProvider where DatasourcePro
         return datasource.factory
     }
     
-    let bridgedTableViewDataSource: TableViewDataSource
+    private let bridgedTableViewDataSource: TableViewDataSource
 
     /// Initalizes with a Datasource instance.
     public init(_ p: DatasourceProvider) {
         provider = p
 
-        bridgedTableViewDataSource = TableViewDataSource(
-            numberOfSections: { (view) -> Int in
-                p.datasource.numberOfSections },
-            numberOfRowsInSection: { (view, section) -> Int in
-                p.datasource.numberOfItemsInSection(section) },
-            cellForRowAtIndexPath: { (view, indexPath) -> UITableViewCell in
-                p.datasource.cellForItemInView(view as! TableView, atIndexPath: indexPath) as! UITableViewCell },
-            titleForHeaderInSection: { (view, section) -> String? in
-                p.datasource.textForSupplementaryElementInView(view as! TableView, kind: .Header, atIndexPath: NSIndexPath(forRow: 0, inSection: section)) },
-            titleForFooterInSection: { (view, section) -> String? in
-                p.datasource.textForSupplementaryElementInView(view as! TableView, kind: .Footer, atIndexPath: NSIndexPath(forRow: 0, inSection: section)) }
-        )
+        if  p.editor.canEditItemAtIndexPath != nil &&
+            p.editor.commitEditActionForItemAtIndexPath != nil &&
+            p.editor.canMoveItemAtIndexPath != nil &&
+            p.editor.commitMoveItemAtIndexPathToIndexPath != nil {
+
+                bridgedTableViewDataSource = TableViewDataSource.Editable(
+                    EditableTableViewDataSource(
+                        canEditRowAtIndexPath: { (_, indexPath) -> Bool in
+                            p.editor.canEditItemAtIndexPath!(indexPath: indexPath)
+                        },
+                        commitEditingStyleForRowAtIndexPath: { (_, editingStyle, indexPath) -> Void in
+                            if let action = EditableDatasourceAction(editingStyle: editingStyle) {
+                                p.editor.commitEditActionForItemAtIndexPath!(action: action, indexPath: indexPath)
+                            }
+                        },
+                        canMoveRowAtIndexPath: { (_, indexPath) -> Bool in
+                            p.editor.canMoveItemAtIndexPath!(indexPath: indexPath)
+                        },
+                        moveRowAtIndexPathToIndexPath: { (_, from, to) -> Void in
+                            p.editor.commitMoveItemAtIndexPathToIndexPath!(from: from, to: to)
+                        },
+                        numberOfSections: { _ -> Int in
+                            p.datasource.numberOfSections },
+                        numberOfRowsInSection: { (_, section) -> Int in
+                            p.datasource.numberOfItemsInSection(section) },
+                        cellForRowAtIndexPath: { (view, indexPath) -> UITableViewCell in
+                            p.datasource.cellForItemInView(view as! TableView, atIndexPath: indexPath) as! UITableViewCell },
+                        titleForHeaderInSection: { (view, section) -> String? in
+                            p.datasource.textForSupplementaryElementInView(view as! TableView, kind: .Header, atIndexPath: NSIndexPath(forRow: 0, inSection: section)) },
+                        titleForFooterInSection: { (view, section) -> String? in
+                            p.datasource.textForSupplementaryElementInView(view as! TableView, kind: .Footer, atIndexPath: NSIndexPath(forRow: 0, inSection: section)) }
+                    )
+                )
+        }
+        else {
+            bridgedTableViewDataSource = TableViewDataSource.Readonly(
+                BaseTableViewDataSource(
+                    numberOfSections: { (view) -> Int in
+                        p.datasource.numberOfSections },
+                    numberOfRowsInSection: { (view, section) -> Int in
+                        p.datasource.numberOfItemsInSection(section) },
+                    cellForRowAtIndexPath: { (view, indexPath) -> UITableViewCell in
+                        p.datasource.cellForItemInView(view as! TableView, atIndexPath: indexPath) as! UITableViewCell },
+                    titleForHeaderInSection: { (view, section) -> String? in
+                        p.datasource.textForSupplementaryElementInView(view as! TableView, kind: .Header, atIndexPath: NSIndexPath(forRow: 0, inSection: section)) },
+                    titleForFooterInSection: { (view, section) -> String? in
+                        p.datasource.textForSupplementaryElementInView(view as! TableView, kind: .Footer, atIndexPath: NSIndexPath(forRow: 0, inSection: section)) }
+                )
+            )
+        }
     }
 
     public var tableViewDataSource: UITableViewDataSource {
-        return bridgedTableViewDataSource
+        return bridgedTableViewDataSource.tableViewDataSource
     }
 }
 
-class TableViewDataSource: NSObject, UITableViewDataSource {
+class BaseTableViewDataSource: NSObject, UITableViewDataSource {
 
     private let numberOfSections: (UITableView) -> Int
     private let numberOfRowsInSection: (UITableView, Int) -> Int
@@ -106,6 +148,69 @@ class TableViewDataSource: NSObject, UITableViewDataSource {
 
     func tableView(tableView: UITableView, titleForFooterInSection section: Int) -> String? {
         return titleForFooterInSection(tableView, section)
+    }
+}
+
+class EditableTableViewDataSource: BaseTableViewDataSource {
+
+    private let canEditRowAtIndexPath: (UITableView, NSIndexPath) -> Bool
+    private let commitEditingStyleForRowAtIndexPath: (UITableView, UITableViewCellEditingStyle, NSIndexPath) -> Void
+    private let canMoveRowAtIndexPath: (UITableView, NSIndexPath) -> Bool
+    private let moveRowAtIndexPathToIndexPath: (UITableView, NSIndexPath, NSIndexPath) -> Void
+
+    init(
+        canEditRowAtIndexPath: (UITableView, NSIndexPath) -> Bool,
+        commitEditingStyleForRowAtIndexPath: (UITableView, UITableViewCellEditingStyle, NSIndexPath) -> Void,
+        canMoveRowAtIndexPath: (UITableView, NSIndexPath) -> Bool,
+        moveRowAtIndexPathToIndexPath: (UITableView, NSIndexPath, NSIndexPath) -> Void,
+        // For Base
+        numberOfSections: (UITableView) -> Int,
+        numberOfRowsInSection: (UITableView, Int) -> Int,
+        cellForRowAtIndexPath: (UITableView, NSIndexPath) -> UITableViewCell,
+        titleForHeaderInSection: (UITableView, Int) -> String?,
+        titleForFooterInSection: (UITableView, Int) -> String?) {
+
+            self.canEditRowAtIndexPath = canEditRowAtIndexPath
+            self.commitEditingStyleForRowAtIndexPath = commitEditingStyleForRowAtIndexPath
+            self.canMoveRowAtIndexPath = canMoveRowAtIndexPath
+            self.moveRowAtIndexPathToIndexPath = moveRowAtIndexPathToIndexPath
+
+            super.init(
+                numberOfSections: numberOfSections,
+                numberOfRowsInSection: numberOfRowsInSection,
+                cellForRowAtIndexPath: cellForRowAtIndexPath,
+                titleForHeaderInSection: titleForHeaderInSection,
+                titleForFooterInSection: titleForFooterInSection)
+    }
+
+
+    func tableView(tableView: UITableView, canEditRowAtIndexPath indexPath: NSIndexPath) -> Bool {
+        return canEditRowAtIndexPath(tableView, indexPath)
+    }
+
+    func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
+        commitEditingStyleForRowAtIndexPath(tableView, editingStyle, indexPath)
+    }
+
+    func tableView(tableView: UITableView, canMoveRowAtIndexPath indexPath: NSIndexPath) -> Bool {
+        return canMoveRowAtIndexPath(tableView, indexPath)
+    }
+
+    func tableView(tableView: UITableView, moveRowAtIndexPath sourceIndexPath: NSIndexPath, toIndexPath destinationIndexPath: NSIndexPath) {
+        moveRowAtIndexPathToIndexPath(tableView, sourceIndexPath, destinationIndexPath)
+    }
+}
+
+enum TableViewDataSource {
+
+    case Readonly(BaseTableViewDataSource)
+    case Editable(EditableTableViewDataSource)
+
+    var tableViewDataSource: UITableViewDataSource {
+        switch self {
+        case .Readonly(let tableViewDataSource): return tableViewDataSource
+        case .Editable(let tableViewDataSource): return tableViewDataSource
+        }
     }
 }
 

@@ -26,7 +26,7 @@ extension YapDatabaseReadWriteTransaction {
     :param: indexes An Array<YapDB.Index>
     */
     public func removeAtIndexes(indexes: [YapDB.Index]) {
-        indexes.map(removeAtIndex)
+        indexes.forEach(removeAtIndex)
     }
 
     /**

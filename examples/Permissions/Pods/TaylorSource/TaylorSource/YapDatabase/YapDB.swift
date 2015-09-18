@@ -11,7 +11,7 @@ A struct which owns a data mapper closure, used to map AnyObject? which is
 stored in YapDatabase into strongly typed T? instances.
 */
 public struct Configuration<T> {
-    typealias DataItemMapper = (AnyObject?) -> T?
+    public typealias DataItemMapper = (AnyObject?) -> T?
 
     let fetchConfiguration: YapDB.FetchConfiguration
     let itemMapper: DataItemMapper
@@ -55,13 +55,20 @@ public struct Mapper<T>: SequenceType, CollectionType {
         return configuration.fetchConfiguration.name
     }
 
-    var fetch: (inTransaction: YapDatabaseReadTransaction, atIndexPath: NSIndexPath) -> T? {
-        return { (transaction, indexPath) in
+    var get: (inTransaction: YapDatabaseReadTransaction, atIndexPaths: [NSIndexPath]) -> [T] {
+        return { (transaction, indexPaths) in
             if let viewTransaction = transaction.ext(self.name) as? YapDatabaseViewTransaction {
-                return self.configuration.itemMapper(viewTransaction.objectAtIndexPath(indexPath, withMappings: self.mappings))
+                return indexPaths.flatMap {
+                    self.configuration.itemMapper(viewTransaction.objectAtIndexPath($0, withMappings: self.mappings))
+                }
             }
-            return self.configuration.itemMapper(.None)
+            return []
         }
+    }
+
+    var fetch: (inTransaction: YapDatabaseReadTransaction, atIndexPath: NSIndexPath) -> T? {
+        let get = self.get
+        return { transaction, indexPath in get(inTransaction: transaction, atIndexPaths: [indexPath]).first }
     }
 
     public let startIndex: Int = 0
@@ -69,6 +76,10 @@ public struct Mapper<T>: SequenceType, CollectionType {
 
     public subscript(i: Int) -> T {
         return itemAtIndexPath(mappings[i])!
+    }
+
+    public subscript(bounds: Range<Int>) -> [T] {
+        return mappings[bounds].map { self.itemAtIndexPath($0)! }
     }
 
     /**
@@ -163,6 +174,69 @@ public struct Mapper<T>: SequenceType, CollectionType {
         }
     }
 
+    /**
+    Reverse looks up the [NSIndexPath] for an array of keys in a collection. Only items
+    which are in this mappings are returned. No optional NSIndexPaths are returned,
+    therefore it is not guaranteed that the item index corresponds to the equivalent
+    index path. Only if the length of the resultant array is equal to the length of
+    items is this true.
+
+    :param: items An array, [T] where T: Persistable
+    :returns: An array, [NSIndexPath]
+    */
+    public func indexPathsForKeys(keys: [String], inCollection collection: String) -> [NSIndexPath] {
+        return readOnlyConnection.read { transaction in
+            if let viewTransaction = transaction.ext(self.name) as? YapDatabaseViewTransaction {
+                return keys.flatMap {
+                    viewTransaction.indexPathForKey($0, inCollection: collection, withMappings: self.mappings)
+                }
+            }
+            return []
+        }
+    }
+
+    /**
+    Returns a closure which will access the items at the index paths in a provided read transaction.
+
+    :param: indexPath The NSIndexPath to look up the item.
+    :returns: (YapDatabaseReadTransaction) -> [T] closure.
+    */
+    public func itemsInTransactionAtIndexPaths(indexPaths: [NSIndexPath]) -> (YapDatabaseReadTransaction) -> [T] {
+        return { self.get(inTransaction: $0, atIndexPaths: indexPaths) }
+    }
+
+    /**
+    Returns a closure which will access the items in a read transaction at the provided index paths.
+
+    :param: transaction A YapDatabaseReadTransaction
+    :returns: ([NSIndexPath]) -> [T] closure.
+    */
+    public func itemsAtIndexPathsInTransaction(transaction: YapDatabaseReadTransaction) -> ([NSIndexPath]) -> [T] {
+        return { self.get(inTransaction: transaction, atIndexPaths: $0) }
+    }
+
+    /**
+    Gets the items at the index paths, using the internal readOnlyTransaction.
+
+    :param: indexPaths An [NSIndexPath]
+    :returns: An [T]
+    */
+    public func itemsAtIndexPaths(indexPaths: [NSIndexPath]) -> [T] {
+        return readOnlyConnection.read(itemsInTransactionAtIndexPaths(indexPaths))
+    }
+
+    /**
+    Gets the items at the index paths, using a provided read transaction.
+
+    :param: indexPaths A [NSIndexPath]
+    :param: transaction A YapDatabaseReadTransaction
+    :returns: An [T]
+    */
+    public func itemsAtIndexPaths(indexPaths: [NSIndexPath], inTransaction transaction: YapDatabaseReadTransaction) -> [T] {
+        return get(inTransaction: transaction, atIndexPaths: indexPaths)
+    }
+
+
     public func generate() -> AnyGenerator<T> {
         let mappingsGenerator = mappings.generate()
         return anyGenerator {
@@ -182,25 +256,28 @@ Observer<T> implements SequenceType, and Int based CollectionType.
 */
 public struct Observer<T> {
 
+    private let queue: dispatch_queue_t
+    private var notificationHandler: NotificationCenterHandler!
+
     let database: YapDatabase
     let mapper: Mapper<T>
-    let queue: dispatch_queue_t
     let changes: YapDatabaseViewMappings.Changes
-    var notificationHandler: NotificationCenterHandler!
 
-    var configuration: Configuration<T> {
+    public var shouldProcessChanges = true
+
+    public var configuration: Configuration<T> {
         return mapper.configuration
     }
 
-    var name: String {
+    public var name: String {
         return mapper.name
     }
 
-    var mappings: YapDatabaseViewMappings {
+    public var mappings: YapDatabaseViewMappings {
         return mapper.mappings
     }
 
-    var readOnlyConnection: YapDatabaseConnection {
+    public var readOnlyConnection: YapDatabaseConnection {
         return mapper.readOnlyConnection
     }
 
@@ -215,7 +292,7 @@ public struct Observer<T> {
     
     - parameter database: The YapDatabase instance.
     - parameter update: An update block, see extension on YapDatabaseViewMappings.
-    :configuration: A Configuration<T> instance.
+    - parameter configuration: A Configuration<T> instance.
     */
     public init(database db: YapDatabase, changes c: YapDatabaseViewMappings.Changes, configuration: Configuration<T>) {
         database = db
@@ -236,7 +313,7 @@ public struct Observer<T> {
 
     func processChangesWithBlock(changes: YapDatabaseViewMappings.Changes) -> (NSNotification) -> Void {
         return { _ in
-            if let changeset = self.createChangeset() {
+            if self.shouldProcessChanges, let changeset = self.createChangeset() {
                 self.processChanges {
                     changes(changeset)
                 }
@@ -323,6 +400,61 @@ public struct Observer<T> {
     public func indexPathForKey(key: String, inCollection collection: String) -> NSIndexPath? {
         return mapper.indexPathForKey(key, inCollection: collection)
     }
+
+    /**
+    Reverse looks up the [NSIndexPath] for an array of keys in a collection. Only items
+    which are in this mappings are returned. No optional NSIndexPaths are returned,
+    therefore it is not guaranteed that the item index corresponds to the equivalent
+    index path. Only if the length of the resultant array is equal to the length of
+    items is this true.
+
+    :param: items An array, [T] where T: Persistable
+    :returns: An array, [NSIndexPath]
+    */
+    public func indexPathsForKeys(keys: [String], inCollection collection: String) -> [NSIndexPath] {
+        return mapper.indexPathsForKeys(keys, inCollection: collection)
+    }
+
+    /**
+    Returns a closure which will access the items at the index paths in a provided read transaction.
+
+    :param: indexPath The NSIndexPath to look up the item.
+    :returns: (YapDatabaseReadTransaction) -> [T] closure.
+    */
+    public func itemsInTransactionAtIndexPaths(indexPaths: [NSIndexPath]) -> (YapDatabaseReadTransaction) -> [T] {
+        return mapper.itemsInTransactionAtIndexPaths(indexPaths)
+    }
+
+    /**
+    Returns a closure which will access the items in a read transaction at the provided index paths.
+
+    :param: transaction A YapDatabaseReadTransaction
+    :returns: ([NSIndexPath]) -> [T] closure.
+    */
+    public func itemsAtIndexPathsInTransaction(transaction: YapDatabaseReadTransaction) -> ([NSIndexPath]) -> [T] {
+        return mapper.itemsAtIndexPathsInTransaction(transaction)
+    }
+
+    /**
+    Gets the items at the index paths, using the internal readOnlyTransaction.
+
+    :param: indexPaths An [NSIndexPath]
+    :returns: An [T]
+    */
+    public func itemsAtIndexPaths(indexPaths: [NSIndexPath]) -> [T] {
+        return mapper.itemsAtIndexPaths(indexPaths)
+    }
+
+    /**
+    Gets the items at the index paths, using a provided read transaction.
+
+    :param: indexPaths A [NSIndexPath]
+    :param: transaction A YapDatabaseReadTransaction
+    :returns: An [T]
+    */
+    public func itemsAtIndexPaths(indexPaths: [NSIndexPath], inTransaction transaction: YapDatabaseReadTransaction) -> [T] {
+        return mapper.itemsAtIndexPaths(indexPaths, inTransaction: transaction)
+    }
 }
 
 extension Observer: SequenceType {
@@ -350,6 +482,10 @@ extension Observer: CollectionType {
 
     public subscript(i: Int) -> T {
         return mapper[i]
+    }
+
+    public subscript(bounds: Range<Int>) -> [T] {
+        return mapper[bounds]
     }
 }
 
@@ -426,6 +562,13 @@ extension YapDatabaseViewMappings: CollectionType {
             item = remainder
 
             return NSIndexPath(forItem: item, inSection: section)
+        }
+    }
+
+    public subscript(bounds: Range<Int>) -> [NSIndexPath] {
+        return bounds.reduce(Array<NSIndexPath>()) { (var acc, index) in
+            acc.append(self[index])
+            return acc
         }
     }
 }
