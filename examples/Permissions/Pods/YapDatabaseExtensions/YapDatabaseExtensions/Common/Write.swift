@@ -169,7 +169,9 @@ extension YapDatabaseReadWriteTransaction {
         Objects: SequenceType,
         Objects.Generator.Element == ObjectWithValueMetadata,
         ObjectWithValueMetadata: NSCoding,
-        ObjectWithValueMetadata: ValueMetadataPersistable>(objects: Objects) -> [ObjectWithValueMetadata] {
+        ObjectWithValueMetadata: ValueMetadataPersistable,
+        ObjectWithValueMetadata.MetadataType.ArchiverType: NSCoding,
+        ObjectWithValueMetadata.MetadataType.ArchiverType.ValueType == ObjectWithValueMetadata.MetadataType>(objects: Objects) -> [ObjectWithValueMetadata] {
             return objects.map { self.write($0) }
     }
 
@@ -205,8 +207,9 @@ extension YapDatabaseReadWriteTransaction {
         ValueWithValueMetadata: Saveable,
         ValueWithValueMetadata: ValueMetadataPersistable,
         ValueWithValueMetadata.ArchiverType: NSCoding,
-        ValueWithValueMetadata.ArchiverType.ValueType == ValueWithValueMetadata>(values: Values) -> [ValueWithValueMetadata] {
-
+        ValueWithValueMetadata.ArchiverType.ValueType == ValueWithValueMetadata,
+        ValueWithValueMetadata.MetadataType.ArchiverType: NSCoding,
+        ValueWithValueMetadata.MetadataType.ArchiverType.ValueType == ValueWithValueMetadata.MetadataType>(values: Values) -> [ValueWithValueMetadata] {
             return values.map { self.write($0) }
     }
 
@@ -229,11 +232,6 @@ extension YapDatabaseReadWriteTransaction {
             return values.map { self.write($0) }
     }
 }
-
-
-
-
-
 
 // MARK: - YapDatabaseConnection
 
@@ -277,7 +275,9 @@ extension YapDatabaseConnection {
         ObjectWithValueMetadata
         where
         ObjectWithValueMetadata: NSCoding,
-        ObjectWithValueMetadata: ValueMetadataPersistable>(object: ObjectWithValueMetadata) -> ObjectWithValueMetadata {
+        ObjectWithValueMetadata: ValueMetadataPersistable,
+        ObjectWithValueMetadata.MetadataType.ArchiverType: NSCoding,
+        ObjectWithValueMetadata.MetadataType.ArchiverType.ValueType == ObjectWithValueMetadata.MetadataType>(object: ObjectWithValueMetadata) -> ObjectWithValueMetadata {
             return write { $0.write(object) }
     }
 
