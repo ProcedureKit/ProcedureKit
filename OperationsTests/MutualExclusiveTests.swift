@@ -32,5 +32,21 @@ class MutualExclusiveTests: XCTestCase {
             }
         }
     }
+
+    func test__mutually_exclusive() {
+        let queue = OperationQueue()
+        let op1 = TestOperation(delay: 1.0)
+        op1.addCondition(MutuallyExclusive<TestOperation>())
+        XCTAssertTrue(op1.dependencies.isEmpty)
+
+        let op2 = TestOperation(delay: 1.0)
+        op2.addCondition(MutuallyExclusive<TestOperation>())
+        XCTAssertTrue(op2.dependencies.isEmpty)
+
+        queue.addOperation(op1)
+        queue.addOperation(op2)
+        XCTAssertTrue(op1.dependencies.isEmpty)
+        XCTAssertEqual(op2.dependencies.first, op1)
+    }
 }
 
