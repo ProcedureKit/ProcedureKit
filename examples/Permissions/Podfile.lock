@@ -7,9 +7,9 @@ PODS:
     - CocoaLumberjack/Core
   - CocoaLumberjack/Extensions (2.0.1):
     - CocoaLumberjack/Default
-  - Operations (2.0.0):
-    - Operations/Base (= 2.0.0)
-  - Operations/Base (2.0.0)
+  - Operations (2.0.1):
+    - Operations/Base (= 2.0.1)
+  - Operations/Base (2.0.1)
   - PureLayout (3.0.1)
   - TaylorSource/Base (2.0.0)
   - TaylorSource/YapDatabase (2.0.0):
@@ -38,7 +38,7 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   CocoaLumberjack: 019d1361244274a6138c788c6cb80baabc13fb8f
-  Operations: 390796d9ff14568eae89cf1a1a4e43f5f8983462
+  Operations: 9a0e4551ee122a92d1425b01b9b7a3e7f4c108f5
   PureLayout: f35f5384c9c4e4479df041dbe33ad7577b71ddfb
   TaylorSource: 86484ba9cf9374d51d4c17db1ad21ee5acba1277
   YapDatabase: bcf13bd764ab4961fb48bef937becf964e50063d
