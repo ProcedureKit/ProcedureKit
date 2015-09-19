@@ -122,7 +122,6 @@ class ReverseGeocodeOperationTests: LocationOperationTests {
         waitForExpectationsWithTimeout(3, handler: nil)
 
         XCTAssertTrue(geocoder.didReverseLookup)
-        XCTAssertTrue(reverseGeocode.finished)
         XCTAssertEqual(reverseGeocode.location, location)
         XCTAssertEqual(reverseGeocode.placemark!, placemark)
     }
@@ -141,7 +140,6 @@ class ReverseGeocodeOperationTests: LocationOperationTests {
         waitForExpectationsWithTimeout(3, handler: nil)
 
         XCTAssertTrue(geocoder.didReverseLookup)
-        XCTAssertTrue(reverseGeocode.finished)
 
         if let error = receivedErrors.first as? ReverseGeocodeOperation.Error {
             switch error {
