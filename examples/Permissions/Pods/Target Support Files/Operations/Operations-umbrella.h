@@ -1,5 +1,6 @@
 #import <UIKit/UIKit.h>
 
+#import "OPRAddressBookChangeHandlerContainer.h"
 #import "Operations.h"
 
 FOUNDATION_EXPORT double OperationsVersionNumber;

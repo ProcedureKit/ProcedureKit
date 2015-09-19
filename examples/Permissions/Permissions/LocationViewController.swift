@@ -48,7 +48,7 @@ class LocationViewController: PermissionViewController {
         return configureConditionsForState(state, silent: silent)(LocationCondition())
     }
     
-    func determineAuthorizationStatus(silently: Bool = true) {
+    func determineAuthorizationStatus(silently silently: Bool = true) {
 
         // Create a simple block operation to set the state.
         let authorized = BlockOperation { (continueWithError: BlockOperation.ContinuationBlockType) in
@@ -72,10 +72,10 @@ class LocationViewController: PermissionViewController {
         authorized.addObserver(BlockObserver { (_, errors) in
             if let error = errors.first as? LocationCondition.Error {
                 switch error {
-                case let .AuthenticationStatusNotSufficient(CLAuthorizationStatus.NotDetermined, _):
+                case .AuthenticationStatusNotSufficient(CLAuthorizationStatus.NotDetermined, _):
                     self.state = .Unknown
 
-                case let .AuthenticationStatusNotSufficient(CLAuthorizationStatus.Denied, _):
+                case .AuthenticationStatusNotSufficient(CLAuthorizationStatus.Denied, _):
                     self.state = .Denied
 
                 default:
@@ -92,11 +92,10 @@ class LocationViewController: PermissionViewController {
     }
 
     override func performOperation() {
-        let location = LocationOperation() { location in
+        let location = UserLocationOperation { location in
             self.state = .Completed
             self.location = location
         }
-        location.addCondition(LocationCondition())
         queue.addOperation(location)
     }
 }

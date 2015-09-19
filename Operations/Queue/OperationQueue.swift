@@ -45,7 +45,7 @@ public class OperationQueue: NSOperationQueue {
 
             // Check for exclusive mutability constraints
             let concurrencyCategories: [String] = operation.conditions.flatMap { condition in
-                if condition.isMutuallyExclusive { return .None }
+                if !condition.isMutuallyExclusive { return .None }
                 return "\(condition.dynamicType)"
             }
 

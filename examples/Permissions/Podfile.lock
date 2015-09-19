@@ -7,57 +7,41 @@ PODS:
     - CocoaLumberjack/Core
   - CocoaLumberjack/Extensions (2.0.1):
     - CocoaLumberjack/Default
-  - Operations (0.11.1):
-    - Operations/Base (= 0.11.1)
-  - Operations/Base (0.11.1)
-  - PureLayout (3.0.0)
-  - TaylorSource/Base (0.12.0)
-  - TaylorSource/YapDatabase (0.12.0):
+  - Operations (2.0.1):
+    - Operations/Base (= 2.0.1)
+  - Operations/Base (2.0.1)
+  - PureLayout (3.0.1)
+  - TaylorSource/Base (2.0.0)
+  - TaylorSource/YapDatabase (2.0.0):
     - TaylorSource/Base
-    - YapDatabase (~> 2.6)
-    - YapDatabaseExtensions (~> 1.5.0)
+    - YapDatabase (~> 2.7)
+    - YapDatabaseExtensions (~> 2)
   - YapDatabase (2.7.2):
     - YapDatabase/standard (= 2.7.2)
   - YapDatabase/standard (2.7.2):
     - CocoaLumberjack (~> 2)
-  - YapDatabaseExtensions (1.5.0):
-    - YapDatabase (~> 2.6)
-    - YapDatabaseExtensions/Common (= 1.5.0)
-  - YapDatabaseExtensions/Common (1.5.0):
-    - YapDatabase (~> 2.6)
+  - YapDatabaseExtensions (2.0.1):
+    - YapDatabase (~> 2)
+    - YapDatabaseExtensions/Common (= 2.0.1)
+  - YapDatabaseExtensions/Common (2.0.1):
+    - YapDatabase (~> 2)
 
 DEPENDENCIES:
   - Operations (from `../../`)
   - PureLayout
-  - TaylorSource/YapDatabase (from `https://github.com/danthorpe/TaylorSource.git`,
-    branch `swift_2.0`)
-  - YapDatabaseExtensions (from `https://github.com/danthorpe/YapDatabaseExtensions.git`,
-    branch `swift_2.0`)
+  - TaylorSource/YapDatabase (~> 2)
+  - YapDatabaseExtensions (~> 2)
 
 EXTERNAL SOURCES:
   Operations:
     :path: "../../"
-  TaylorSource:
-    :branch: swift_2.0
-    :git: https://github.com/danthorpe/TaylorSource.git
-  YapDatabaseExtensions:
-    :branch: swift_2.0
-    :git: https://github.com/danthorpe/YapDatabaseExtensions.git
-
-CHECKOUT OPTIONS:
-  TaylorSource:
-    :commit: 743e3facd39734cbb7af5bb33802cff255ccbc7e
-    :git: https://github.com/danthorpe/TaylorSource.git
-  YapDatabaseExtensions:
-    :commit: a9cc88da782baa36a15e803935394500754b4755
-    :git: https://github.com/danthorpe/YapDatabaseExtensions.git
 
 SPEC CHECKSUMS:
   CocoaLumberjack: 019d1361244274a6138c788c6cb80baabc13fb8f
-  Operations: 0bdabfba4e38d4a466b81641d8f38f8af9b2ee3e
-  PureLayout: 270dfee2236f697ab1d5e2771c2e5c248495fa0d
-  TaylorSource: f4998eb260311b23c2e3a82842d4731bec63d20d
+  Operations: 9a0e4551ee122a92d1425b01b9b7a3e7f4c108f5
+  PureLayout: f35f5384c9c4e4479df041dbe33ad7577b71ddfb
+  TaylorSource: 86484ba9cf9374d51d4c17db1ad21ee5acba1277
   YapDatabase: bcf13bd764ab4961fb48bef937becf964e50063d
-  YapDatabaseExtensions: cb880abebf02bf15d1d96c3295945c814fded214
+  YapDatabaseExtensions: 260ba5b2cb2086ca2a073ff54c503b96cdf01207
 
 COCOAPODS: 0.38.2
