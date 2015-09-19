@@ -1,5 +1,9 @@
+# 2.0.2
+1. [[OPR-87](https://github.com/danthorpe/Operations/pull/87)]: Improves the reliability of the reverse geocoder unit tests.
+
 # 2.0.1
 1. [[OPR-62, OPR-86](https://github.com/danthorpe/Operations/pull/86)]: Fixes a bug in Swift 2.0 where two identical conditions would cause a deadlock. Thanks to @mblsha.
+2. [[OPR-85](https://github.com/danthorpe/Operations/pull/85)]: Fixes up the Permissions example project for Swift 2.0. Note that YapDatabase currently has a problem because it has some weak links, which doesn’t work with Bitcode enabled, which is default in Xcode 7. This PR just turned off Bitcode, but if you re-run the Pods, then that change will be over-ridden. What you can do instead, if YapDatabase is still not fixed is to use my fork which has a fix on the `YAP-180` branch.
 
 # 2.0.0
 This is the Swift 2.0 compatible version.
