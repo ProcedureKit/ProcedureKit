@@ -1,3 +1,6 @@
+# 2.0.1
+1. [[OPR-62, OPR-86](https://github.com/danthorpe/Operations/pull/86)]: Fixes a bug in Swift 2.0 where two identical conditions would cause a deadlock. Thanks to @mblsha.
+
 # 2.0.0
 This is the Swift 2.0 compatible version.
 
