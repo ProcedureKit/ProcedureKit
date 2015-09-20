@@ -6,6 +6,8 @@
 //  Copyright © 2015 Daniel Thorpe. All rights reserved.
 //
 
+#if os(iOS)
+
 import XCTest
 @testable import Operations
 
@@ -118,3 +120,4 @@ class UserNotificationConditionTests: OperationTests {
     }
 }
 
+#endif

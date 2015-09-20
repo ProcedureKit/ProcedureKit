@@ -6,7 +6,6 @@
 //  Copyright (c) 2015 Daniel Thorpe. All rights reserved.
 //
 
-import UIKit
 import XCTest
 @testable import Operations
 

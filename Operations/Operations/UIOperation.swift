@@ -6,7 +6,9 @@
 //  Copyright © 2015 Daniel Thorpe. All rights reserved.
 //
 
-import Foundation
+#if os(iOS)
+
+import UIKit
 
 // MARK: - UI
 
@@ -86,3 +88,4 @@ public class UIOperation<C, From where C: UIViewController, From: PresentingView
     }
 }
 
+#endif

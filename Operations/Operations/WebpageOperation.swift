@@ -6,6 +6,8 @@
 //  Copyright © 2015 Daniel Thorpe. All rights reserved.
 //
 
+#if os(iOS)
+
 import Foundation
 import SafariServices
 
@@ -38,3 +40,4 @@ public class WebpageOperation<From: PresentingViewController>: Operation, SFSafa
     }
 }
 
+#endif

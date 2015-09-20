@@ -6,7 +6,9 @@
 //  Copyright © 2015 Daniel Thorpe. All rights reserved.
 //
 
-import Foundation
+#if os(iOS)
+
+import UIKit
 
 public protocol NetworkActivityIndicatorInterface {
     var networkActivityIndicatorVisible: Bool { get set }
@@ -113,3 +115,4 @@ private struct Timer {
     }
 }
 
+#endif

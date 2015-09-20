@@ -6,6 +6,8 @@
 //  Copyright (c) 2015 Daniel Thorpe. All rights reserved.
 //
 
+#if os(iOS)
+
 import UIKit
 
 enum UserConfirmationResult {
@@ -85,3 +87,5 @@ extension UserConfirmationCondition: OperationObserver {
         }
     }
 }
+
+#endif

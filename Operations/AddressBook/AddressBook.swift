@@ -6,6 +6,8 @@
 //  Copyright (c) 2015 Daniel Thorpe. All rights reserved.
 //
 
+#if os(iOS)
+
 import Foundation
 import AddressBook
 
@@ -1198,3 +1200,4 @@ public struct SystemAddressBookRegistrar: AddressBookPermissionRegistrar {
     }
 }
 
+#endif

@@ -15,22 +15,24 @@ session Advanced NSOperations: https://developer.apple.com/videos/wwdc/2015/?id=
   s.module_name       = 'Operations'
   s.social_media_url  = 'https://twitter.com/danthorpe'
   s.requires_arc      = true
-  s.platform          = :ios, '8.0'
   s.default_subspec   = 'Base'
+  s.ios.deployment_target = "8.0"
+  s.osx.deployment_target = "10.10"
 
   s.subspec 'Base' do |ss|
     ss.source_files      = 'Operations/**/*.{swift,m,h}'
     ss.exclude_files     = 'Operations/Extras/**/*.{swift,m,h}'
+    ss.osx.exclude_files = 'Operations/**/*{RemoteNotification,UserConfirmation,AddressBook,LocationCondition,BackgroundObserver,NetworkObserver,AlertOperation,LocationOperation}*'
   end
 
   s.subspec '+AddressBook' do |ss|
     ss.dependency 'Operations/Base'    
     ss.source_files   = 'Operations/AddressBook/**/*.{swift,m,h}'
+    ss.osx.exclude_files = 'Operations/AddressBook/**'
   end
 
   s.subspec '+Extras' do |ss|
     ss.dependency 'Operations/+AddressBook'
   end
-
 end
 

@@ -8,6 +8,7 @@
 
 #if os(iOS)
 
+import UIKit
 import HealthKit
 
 public protocol HealthManagerType {
