@@ -15,28 +15,33 @@ session Advanced NSOperations: https://developer.apple.com/videos/wwdc/2015/?id=
   s.module_name       = 'Operations'
   s.social_media_url  = 'https://twitter.com/danthorpe'
   s.requires_arc      = true
+  s.default_subspec   = 'Base'
   s.ios.deployment_target = "8.0"
   s.osx.deployment_target = "10.10"
 
-  s.source_files      = [
-    'Operations/Conditions/Shared',
-    'Operations/Conditions/iOS',
-    'Operations/Observers/Shared',
-    'Operations/Observers/iOS',
-    'Operations/Operations/Shared',
-    'Operations/Operations/iOS',
-    'Operations/Permissions/Shared',
-    'Operations/Permissions/iOS',
-    'Operations/Queue', 'Operations/*.{swift,h}'
-  ]
-  s.osx.exclude_files = [
-    'Operations/Conditions/iOS',
-    'Operations/Observers/iOS',
-    'Operations/Operations/iOS',
-    'Operations/Permissions/iOS',
-  ]
+  s.subspec 'Base' do |ss|
+    ss.source_files      = [
+      'Operations/Conditions/Shared',
+      'Operations/Conditions/iOS',
+      'Operations/Observers/Shared',
+      'Operations/Observers/iOS',
+      'Operations/Operations/Shared',
+      'Operations/Operations/iOS',
+      'Operations/Permissions/Shared',
+      'Operations/Permissions/iOS',
+      'Operations/Queue', 'Operations/*.{swift,h}'
+    ]
+    ss.osx.exclude_files = [
+      'Operations/Conditions/iOS',
+      'Operations/Observers/iOS',
+      'Operations/Operations/iOS',
+      'Operations/Permissions/iOS',
+    ]
+  end
 
   s.subspec '+AddressBook' do |ss|
+    ss.dependency 'Operations/Base'
+    ss.compiler_flags = '-DOPERATIONS_ADDRESSBOOK_ENABLED'
     ss.source_files      = ['Operations/AddressBook/iOS']
     ss.osx.exclude_files = ['Operations/AddressBook/iOS']
   end

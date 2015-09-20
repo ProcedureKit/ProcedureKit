@@ -33,3 +33,5 @@ DerivedData
 Carthage/Build
 .fastlane/report.xml
 .fastlane/xcodebuild-data
+examples/Permissions/Permissions.xcworkspace
+examples/Permissions/Pods
