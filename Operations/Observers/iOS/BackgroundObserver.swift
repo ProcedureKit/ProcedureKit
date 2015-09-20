@@ -6,8 +6,6 @@
 //  Copyright © 2015 Daniel Thorpe. All rights reserved.
 //
 
-#if os(iOS)
-
 import UIKit
 
 public protocol BackgroundTaskApplicationInterface {
@@ -100,5 +98,3 @@ extension BackgroundObserver: OperationObserver {
         endBackgroundTask()
     }
 }
-
-#endif

@@ -6,8 +6,6 @@
 //  Copyright © 2015 Daniel Thorpe. All rights reserved.
 //
 
-#if os(iOS)
-
 import XCTest
 import SafariServices
 @testable import Operations
@@ -60,5 +58,3 @@ class WebpageOperationTests: OperationTests {
         XCTAssertTrue(didPresentWebpage)
     }
 }
-
-#endif

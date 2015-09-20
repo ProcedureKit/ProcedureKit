@@ -6,8 +6,6 @@
 //  Copyright (c) 2015 Daniel Thorpe. All rights reserved.
 //
 
-#if os(iOS)
-
 import UIKit
 
 public protocol RemoteNotificationRegistrarType {
@@ -132,5 +130,3 @@ public class RemoteNotificationsRegistration: Operation {
 private let RemoteNotificationName = "DidRegisterSettingsNotificationName"
 private let RemoteNotificationTokenKey = "RemoteNotificationTokenKey"
 private let RemoteNotificationErrorKey = "RemoteNotificationErrorKey"
-
-#endif

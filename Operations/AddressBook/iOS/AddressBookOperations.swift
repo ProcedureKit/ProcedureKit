@@ -6,8 +6,6 @@
 //  Copyright (c) 2015 Daniel Thorpe. All rights reserved.
 //
 
-#if os(iOS)
-
 import Foundation
 import AddressBook
 import AddressBookUI
@@ -600,5 +598,3 @@ public class AddressBookObserverGroup: GroupOperation {
         }
     }
 }
-
-#endif

@@ -6,8 +6,6 @@
 //  Copyright (c) 2015 Daniel Thorpe. All rights reserved.
 //
 
-#if os(iOS)
-
 import UIKit
 
 /**
@@ -96,5 +94,3 @@ public class AlertOperation<From: PresentingViewController>: Operation {
         produceOperation(ui)
     }
 }
-
-#endif

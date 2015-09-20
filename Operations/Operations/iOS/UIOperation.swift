@@ -6,8 +6,6 @@
 //  Copyright © 2015 Daniel Thorpe. All rights reserved.
 //
 
-#if os(iOS)
-
 import UIKit
 
 // MARK: - UI
@@ -87,5 +85,3 @@ public class UIOperation<C, From where C: UIViewController, From: PresentingView
         }
     }
 }
-
-#endif

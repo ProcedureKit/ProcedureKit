@@ -6,8 +6,6 @@
 //  Copyright (c) 2015 Daniel Thorpe. All rights reserved.
 //
 
-#if os(iOS)
-
 import Foundation
 import CoreLocation
 
@@ -233,5 +231,3 @@ public class ReverseGeocodeUserLocationOperation: GroupOperation {
         }
     }
 }
-
-#endif

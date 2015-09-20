@@ -6,8 +6,6 @@
 //  Copyright © 2015 Daniel Thorpe. All rights reserved.
 //
 
-#if os(iOS)
-
 import XCTest
 import Photos
 @testable import Operations
@@ -87,6 +85,3 @@ class PhotosConditionTests: OperationTests {
         XCTAssertTrue(manager.didRequestAuthorization)
     }
 }
-
-#endif
-
