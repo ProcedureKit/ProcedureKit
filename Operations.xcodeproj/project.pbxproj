@@ -1231,12 +1231,14 @@
 		65EEC1431BAF40610020A9BD /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				PROJECT_VERSION = 2.0.2;
 			};
 			name = Debug;
 		};
 		65EEC1441BAF40610020A9BD /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				PROJECT_VERSION = 2.0.2;
 			};
 			name = Release;
 		};
