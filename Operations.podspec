@@ -53,6 +53,7 @@ session Advanced NSOperations: https://developer.apple.com/videos/wwdc/2015/?id=
   end
 
   s.subspec 'watchOS' do |ss|
+    ss.platform = :ios, "9.0"
     ss.dependency 'Operations/Features'
     ss.ios.exclude_files = [
       'Operations/Core/iOS/BackgroundObserver.swift',
@@ -60,18 +61,34 @@ session Advanced NSOperations: https://developer.apple.com/videos/wwdc/2015/?id=
       'Operations/Core/iOS/AlertOperation.swift',
       'Operations/Core/iOS/UIOperation.swift',            
       'Operations/Features/Shared/CloudCondition.swift',
+      'Operations/Features/iOS/PhotosCondition.swift',      
       'Operations/Features/iOS/RemoteNotificationCondition.swift',
       'Operations/Features/iOS/UserConfirmationCondition.swift',      
       'Operations/Features/iOS/UserNotificationCondition.swift',
-      'Operations/Features/iOS/HealthCondition.swift',
       'Operations/Features/iOS/LocationCondition.swift',
-      'Operations/Features/iOS/ReachabilityCondition.swift',
-      'Operations/Features/iOS/CloudKitOperation.swift',      
+      'Operations/Features/Shared/ReachabilityCondition.swift',
+      'Operations/Features/Shared/CloudKitOperation.swift',      
       'Operations/Features/iOS/LocationOperation.swift',
-      'Operations/Features/iOS/ReachableOperation.swift',      
+      'Operations/Features/Shared/ReachableOperation.swift',      
       'Operations/Features/iOS/WebpageOperation.swift',
       'Operations/Features/Shared/Reachability.swift',      
     ]
+  end
+  
+  s.subspec 'tvOS' do |ss|
+    ss.platform = :ios, "9.0"
+    ss.dependency 'Operations/Features'
+    ss.ios.exclude_files = [
+      'Operations/Features/Shared/CalendarCondition.swift',
+      'Operations/Features/iOS/PassbookCondition.swift',      
+      'Operations/Features/iOS/PhotosCondition.swift',            
+      'Operations/Features/iOS/RemoteNotificationCondition.swift',
+      'Operations/Features/iOS/UserNotificationCondition.swift',
+      'Operations/Features/iOS/HealthCondition.swift',
+      'Operations/Features/iOS/LocationCondition.swift',
+      'Operations/Features/iOS/LocationOperation.swift',
+      'Operations/Features/iOS/WebpageOperation.swift',
+    ]    
   end
 
 end
