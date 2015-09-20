@@ -17,4 +17,4 @@ FOUNDATION_EXPORT const unsigned char OperationsVersionString[];
 // In this header, you should import all the public headers of your framework using statements like #import <Operations/PublicHeader.h>
 #if TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE
 #import <Operations/OPRAddressBookChangeHandlerContainer.h>
-#endif  // iOS
+#endif  // TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE
