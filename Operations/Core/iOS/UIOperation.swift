@@ -6,10 +6,9 @@
 //  Copyright © 2015 Daniel Thorpe. All rights reserved.
 //
 
-import Foundation
+import UIKit
 
 // MARK: - UI
-
 
 public protocol PresentingViewController: class {
     func presentViewController(viewController: UIViewController, animated: Bool, completion: (() -> Void)?)
