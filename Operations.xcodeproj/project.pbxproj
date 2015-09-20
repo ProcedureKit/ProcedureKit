@@ -85,9 +85,6 @@
 		65882F2E1BAF6083003F74B6 /* WebpageOperationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65882ECE1BAF6052003F74B6 /* WebpageOperationTests.swift */; settings = {ASSET_TAGS = (); }; };
 		65882F2F1BAF6084003F74B6 /* CalendarConditionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65882EC31BAF6052003F74B6 /* CalendarConditionTests.swift */; settings = {ASSET_TAGS = (); }; };
 		65882F301BAF6084003F74B6 /* CloudConditionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65882EC41BAF6052003F74B6 /* CloudConditionTests.swift */; settings = {ASSET_TAGS = (); }; };
-		65882F311BAF6084003F74B6 /* HealthConditionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65882EC51BAF6052003F74B6 /* HealthConditionTests.swift */; settings = {ASSET_TAGS = (); }; };
-		65882F341BAF6084003F74B6 /* PassbookConditionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65882EC81BAF6052003F74B6 /* PassbookConditionTests.swift */; settings = {ASSET_TAGS = (); }; };
-		65882F351BAF6084003F74B6 /* PhotosConditionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65882EC91BAF6052003F74B6 /* PhotosConditionTests.swift */; settings = {ASSET_TAGS = (); }; };
 		65882F361BAF6084003F74B6 /* ReachabilityConditionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65882ECA1BAF6052003F74B6 /* ReachabilityConditionTests.swift */; settings = {ASSET_TAGS = (); }; };
 		65882F371BAF6084003F74B6 /* ReachableOperationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65882ECB1BAF6052003F74B6 /* ReachableOperationTests.swift */; settings = {ASSET_TAGS = (); }; };
 		65882F3B1BAF608A003F74B6 /* AddressBookConditionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65882EC01BAF6052003F74B6 /* AddressBookConditionTests.swift */; settings = {ASSET_TAGS = (); }; };
@@ -1022,13 +1019,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				65882F101BAF6078003F74B6 /* MutualExclusiveTests.swift in Sources */,
-				65882F311BAF6084003F74B6 /* HealthConditionTests.swift in Sources */,
 				65882F111BAF6078003F74B6 /* NegatedConditionTests.swift in Sources */,
 				65882F0D1BAF6078003F74B6 /* GatedOperationTests.swift in Sources */,
 				65882F2F1BAF6084003F74B6 /* CalendarConditionTests.swift in Sources */,
 				65882F131BAF6078003F74B6 /* NoFailedDependenciesConditionTests.swift in Sources */,
-				65882F341BAF6084003F74B6 /* PassbookConditionTests.swift in Sources */,
-				65882F351BAF6084003F74B6 /* PhotosConditionTests.swift in Sources */,
 				65882F301BAF6084003F74B6 /* CloudConditionTests.swift in Sources */,
 				65882F151BAF6078003F74B6 /* SilentConditionTests.swift in Sources */,
 				65882F0F1BAF6078003F74B6 /* LoggingObserverTests.swift in Sources */,
