@@ -377,10 +377,10 @@
 		65882E6D1BAF579A003F74B6 /* Operations */ = {
 			isa = PBXGroup;
 			children = (
-				65EEC21E1BAF4F230020A9BD /* WebpageOperation.swift */,
-				65EEC2181BAF4F230020A9BD /* LocationOperations.swift */,
 				65EEC2221BAF4F230020A9BD /* CloudKitOperation.swift */,
+				65EEC2181BAF4F230020A9BD /* LocationOperations.swift */,
 				65EEC2251BAF4F230020A9BD /* ReachableOperation.swift */,
+				65EEC21E1BAF4F230020A9BD /* WebpageOperation.swift */,
 			);
 			name = Operations;
 			path = iOS;
@@ -546,8 +546,8 @@
 			isa = PBXGroup;
 			children = (
 				65EEC16A1BAF44E80020A9BD /* BackgroundObserver.swift */,
-				65EEC16B1BAF44E80020A9BD /* NetworkObserver.swift */,
 				65EEC16F1BAF44E80020A9BD /* BlockObserver.swift */,
+				65EEC16B1BAF44E80020A9BD /* NetworkObserver.swift */,
 				65EEC1801BAF44E80020A9BD /* TimeoutObserver.swift */,
 			);
 			name = Observers;
