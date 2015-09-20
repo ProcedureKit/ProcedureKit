@@ -60,7 +60,6 @@
 		65882E9D1BAF5BEB003F74B6 /* LoggingObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65EEC1761BAF44E80020A9BD /* LoggingObserver.swift */; };
 		65882E9F1BAF5BFB003F74B6 /* CalendarCondition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65EEC2201BAF4F230020A9BD /* CalendarCondition.swift */; };
 		65882EA11BAF5BFB003F74B6 /* PassbookCondition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65EEC2191BAF4F230020A9BD /* PassbookCondition.swift */; };
-		65882EA21BAF5BFB003F74B6 /* PhotosCondition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65EEC21A1BAF4F230020A9BD /* PhotosCondition.swift */; };
 		65882EA61BAF5BFB003F74B6 /* HealthCondition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65EEC2161BAF4F230020A9BD /* HealthCondition.swift */; };
 		65882EEC1BAF6052003F74B6 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 65882ECF1BAF6052003F74B6 /* Info.plist */; };
 		65882EED1BAF606F003F74B6 /* AlertOperationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65882EB01BAF6052003F74B6 /* AlertOperationTests.swift */; };
@@ -1009,7 +1008,6 @@
 				65882E8D1BAF5BEB003F74B6 /* Support.swift in Sources */,
 				65882E9D1BAF5BEB003F74B6 /* LoggingObserver.swift in Sources */,
 				65882EA61BAF5BFB003F74B6 /* HealthCondition.swift in Sources */,
-				65882EA21BAF5BFB003F74B6 /* PhotosCondition.swift in Sources */,
 				65882E8F1BAF5BEB003F74B6 /* MutuallyExclusive.swift in Sources */,
 				65882E991BAF5BEB003F74B6 /* ComposedOperation.swift in Sources */,
 			);
@@ -2065,6 +2063,7 @@
 				652F5A5B1BAF79BA00BB5F71 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		65882E871BAF5B06003F74B6 /* Build configuration list for PBXNativeTarget "Operations-watchOS" */ = {
 			isa = XCConfigurationList;
