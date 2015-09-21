@@ -6,7 +6,7 @@
 //  Copyright © 2015 Daniel Thorpe. All rights reserved.
 //
 
-import Foundation
+import UIKit
 
 public protocol NetworkActivityIndicatorInterface {
     var networkActivityIndicatorVisible: Bool { get set }

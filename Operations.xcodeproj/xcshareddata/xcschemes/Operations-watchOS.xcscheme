@@ -14,23 +14,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "6577295C1B3D9E0E00B5D153"
+               BlueprintIdentifier = "65882E7F1BAF5B00003F74B6"
                BuildableName = "Operations.framework"
-               BlueprintName = "Operations"
-               ReferencedContainer = "container:Operations.xcodeproj">
-            </BuildableReference>
-         </BuildActionEntry>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "YES"
-            buildForProfiling = "NO"
-            buildForArchiving = "NO"
-            buildForAnalyzing = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "657729671B3D9E0E00B5D153"
-               BuildableName = "OperationsTests.xctest"
-               BlueprintName = "OperationsTests"
+               BlueprintName = "Operations-watchOS"
                ReferencedContainer = "container:Operations.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -40,29 +26,9 @@
       buildConfiguration = "Debug"
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
-      shouldUseLaunchSchemeArgsEnv = "YES"
-      codeCoverageEnabled = "YES">
+      shouldUseLaunchSchemeArgsEnv = "YES">
       <Testables>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "657729671B3D9E0E00B5D153"
-               BuildableName = "OperationsTests.xctest"
-               BlueprintName = "OperationsTests"
-               ReferencedContainer = "container:Operations.xcodeproj">
-            </BuildableReference>
-         </TestableReference>
       </Testables>
-      <MacroExpansion>
-         <BuildableReference
-            BuildableIdentifier = "primary"
-            BlueprintIdentifier = "6577295C1B3D9E0E00B5D153"
-            BuildableName = "Operations.framework"
-            BlueprintName = "Operations"
-            ReferencedContainer = "container:Operations.xcodeproj">
-         </BuildableReference>
-      </MacroExpansion>
       <AdditionalOptions>
       </AdditionalOptions>
    </TestAction>
@@ -79,9 +45,9 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "6577295C1B3D9E0E00B5D153"
+            BlueprintIdentifier = "65882E7F1BAF5B00003F74B6"
             BuildableName = "Operations.framework"
-            BlueprintName = "Operations"
+            BlueprintName = "Operations-watchOS"
             ReferencedContainer = "container:Operations.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
@@ -97,9 +63,9 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "6577295C1B3D9E0E00B5D153"
+            BlueprintIdentifier = "65882E7F1BAF5B00003F74B6"
             BuildableName = "Operations.framework"
-            BlueprintName = "Operations"
+            BlueprintName = "Operations-watchOS"
             ReferencedContainer = "container:Operations.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
