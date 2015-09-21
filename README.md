@@ -283,8 +283,6 @@ Use an observer or `GroupOperation` to access the results via the map operationâ
     }
 ```
 
-- [x] `AddressBookObserverQueue` & `AddressBookObserver` this is a work in progress, but Iâ€™m trying to add support for running operations when external changes to the AddressBook are detected.
-
 
 ## Motivation
 
