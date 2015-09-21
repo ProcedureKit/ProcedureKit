@@ -4,15 +4,11 @@
 
 A Swift framework inspired by WWDC 2015 Advanced NSOperations session. See the session video here: https://developer.apple.com/videos/wwdc/2015/?id=226
 
-## Motivation
+## Status - 21st Sept, 2015
 
-I want to stress that this code is heavily influenced by Apple. In no way am I attempting to assume any sort of credit for this architecture - that goes to [Dave DeLong](https://twitter.com/davedelong) and his team. My motivations are that I want to adopt this code in my own projects, and so require a solid well tested framework which I can integrate with.
+The Swift 1.2 compatible version of Operations is version 1.0. This is no longer under active development, however if you’re still stuck on Swift 1.2, and have a bug, please create ticket and I’ll do a point release.
 
-Rather than just copy Apple’s sample code, I have been re-writing it from scratch, but heavily guided. The main changes I have made, other than some minor bug fixes, have been architectural to enhance the testability of the code. Unfortunately, this makes the public API a little messy for Swift 1.2, but thanks to `@testable` will not be visible in Swift 2.
-
-## Status - 15th Sept, 2015
-
-The Swift 1.2 compatible version of Operations is version 1.0, and the Swift 2.0 compatible version is 2.0.
+Development from now on is using Swift 2.0, for all of Apple’s platforms as of version 2.1, which adds support for OS X and extension compatible frameworks. watchOS 2.0 and tvOS frameworks are built (if using the correct version of Xcode), however, the current version of Cocoapods (0.38.2) doesn’t yet support these platforms correctly. I’ll be looking into Carthage support in the coming week.
 
 ## Usage
 
@@ -21,14 +17,14 @@ The Swift 1.2 compatible version of Operations is version 1.0, and the Swift 2.0
 For example, an operation to save a `Contact` value in `YapDatabase` might be:
 
 ```swift
-public class SaveContactOperation: Operation {
-    public typealias CompletionBlockType = Contact -> Void
+class SaveContactOperation: Operation {
+    typealias CompletionBlockType = Contact -> Void
 
     let connection: YapDatabaseConnection
     let contact: Contact
     let completion: CompletionBlockType?
 
-    public init(connection: YapDatabaseConnection, contact: Contact, completion: CompletionBlockType? = .None) {
+    init(connection: YapDatabaseConnection, contact: Contact, completion: CompletionBlockType? = .None) {
         self.connection = connection
         self.contact = contact
         self.completion = completion
@@ -36,7 +32,7 @@ public class SaveContactOperation: Operation {
         name = “Save Contact: \(contact.displayName)”
     }
 
-    public override func execute() {
+    override func execute() {
         connection.asyncWrite(contact) { (returned: Contact) in
             self.completion?(returned)
             self.finish()
@@ -52,7 +48,7 @@ func deleteContact(contact: Contact) {
     let delete = DeleteContactOperation(connection: readWriteConnection, contact: contact)
     let confirmation = UserConfirmationCondition(
         title: NSLocalizedString("Are you sure?", comment: "Are you sure?"),
-        message: NSLocalizedString("The contact will be removed from all your devices.", comment: "The contact will be removed fromon all your devices."),
+        message: NSLocalizedString("The contact will be removed from all your devices.", comment: "The contact will be removed from all your devices."),
         action: NSLocalizedString("Delete", comment: "Delete"),
         isDestructive: true,
         cancelAction: NSLocalizedString("Cancel", comment: "Cancel"),
@@ -64,7 +60,17 @@ func deleteContact(contact: Contact) {
 
 When this delete operation is added to the queue, the user will be presented with a standard system `UIAlertController` asking if they're sure. Additionally, other `AlertOperation` instances will be prevented from running.
 
-Sometimes, creating an `Operation` subclass is a little heavy handed, and in these situations, we can utilize a `BlockOperation`. For example, let say we want to warn the user before they cancel a "Add New Contact" controller without saving the Contact. 
+The above “save contact” operation looks quite verbose for though for a such a simple task. Luckily in reality we can do this:
+
+```swift
+let save = ComposedOperation(connection.writeOperation(contact))
+save.addObserver(BlockObserver { (_, errors) in
+    print(“Did save contact”)
+})
+queue.addOperation(save)
+```
+
+Because sometimes creating an `Operation` subclass is a little heavy handed. Above we composed an existing `NSOperation` but we can utilize a `BlockOperation`. For example, let say we want to warn the user before they cancel a "Add New Contact" controller without saving the Contact. 
 
 ```swift
 @IBAction didTapCancelButton(button: UIButton) {
@@ -278,3 +284,9 @@ Use an observer or `GroupOperation` to access the results via the map operation�
 ```
 
 - [x] `AddressBookObserverQueue` & `AddressBookObserver` this is a work in progress, but I’m trying to add support for running operations when external changes to the AddressBook are detected.
+
+
+## Motivation
+
+I want to stress that this code is heavily influenced by Apple. In no way am I attempting to assume any sort of credit for this architecture - that goes to [Dave DeLong](https://twitter.com/davedelong) and his team. My motivations are that I want to adopt this code in my own projects, and so require a solid well tested framework which I can integrate with.
+
