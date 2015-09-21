@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name              = "Operations"
-  s.version           = "2.0.2"
+  s.version           = "2.1.0"
   s.summary           = "Powerful NSOperation subclasses in Swift."
   s.description       = <<-DESC
   
@@ -73,33 +73,33 @@ session Advanced NSOperations: https://developer.apple.com/videos/wwdc/2015/?id=
   # 
   # [!] The platform of the target `My Watch App` (iOS 9.0) is not compatible with `Operations/watchOS (2.0.2)`, which does not support `ios`.
   #
-  s.subspec 'watchOS' do |ss|
-    ss.platform = :watchos
-    ss.source_files = [
-      'Operations/Core/Shared', 
-      'Operations/Core/iOS',       
-      'Operations/Features/Shared',
-      'Operations/Features/iOS'      
-    ]
-    ss.exclude_files = [
-      'Operations/Core/iOS/BackgroundObserver.swift',
-      'Operations/Core/iOS/NetworkObserver.swift',
-      'Operations/Core/iOS/AlertOperation.swift',
-      'Operations/Core/iOS/UIOperation.swift',            
-      'Operations/Features/Shared/CloudCondition.swift',
-      'Operations/Features/iOS/PhotosCondition.swift',      
-      'Operations/Features/iOS/RemoteNotificationCondition.swift',
-      'Operations/Features/iOS/UserConfirmationCondition.swift',      
-      'Operations/Features/iOS/UserNotificationCondition.swift',
-      'Operations/Features/iOS/LocationCondition.swift',
-      'Operations/Features/Shared/ReachabilityCondition.swift',
-      'Operations/Features/Shared/CloudKitOperation.swift',      
-      'Operations/Features/iOS/LocationOperations.swift',
-      'Operations/Features/Shared/ReachableOperation.swift',      
-      'Operations/Features/iOS/WebpageOperation.swift',
-      'Operations/Features/Shared/Reachability.swift',      
-    ]
-  end
+  # s.subspec 'watchOS' do |ss|
+  #   ss.platform = :watchos
+  #   ss.source_files = [
+  #     'Operations/Core/Shared',
+  #     'Operations/Core/iOS',
+  #     'Operations/Features/Shared',
+  #     'Operations/Features/iOS'
+  #   ]
+  #   ss.exclude_files = [
+  #     'Operations/Core/iOS/BackgroundObserver.swift',
+  #     'Operations/Core/iOS/NetworkObserver.swift',
+  #     'Operations/Core/iOS/AlertOperation.swift',
+  #     'Operations/Core/iOS/UIOperation.swift',
+  #     'Operations/Features/Shared/CloudCondition.swift',
+  #     'Operations/Features/iOS/PhotosCondition.swift',
+  #     'Operations/Features/iOS/RemoteNotificationCondition.swift',
+  #     'Operations/Features/iOS/UserConfirmationCondition.swift',
+  #     'Operations/Features/iOS/UserNotificationCondition.swift',
+  #     'Operations/Features/iOS/LocationCondition.swift',
+  #     'Operations/Features/Shared/ReachabilityCondition.swift',
+  #     'Operations/Features/Shared/CloudKitOperation.swift',
+  #     'Operations/Features/iOS/LocationOperations.swift',
+  #     'Operations/Features/Shared/ReachableOperation.swift',
+  #     'Operations/Features/iOS/WebpageOperation.swift',
+  #     'Operations/Features/Shared/Reachability.swift',
+  #   ]
+  # end
   
   # Creates a framework suitable for an iOS tvOS app
   #
