@@ -693,21 +693,6 @@ extension AddressBook {
     }
 }
 
-extension OPRAddressBookChangeHandlerContainer: AddressBookExternalChangeObserver {
-
-}
-
-extension AddressBook { // External Changes
-
-    public typealias ExternalChangesBlockType = (info: [NSObject: AnyObject]?) -> Void
-
-    public func observeExternalChanges(callback: ExternalChangesBlockType) -> AddressBookExternalChangeObserver {
-        let container = OPRAddressBookChangeHandlerContainer(didChangeHandler: callback)
-        container.registerForChangesInAddressBook(addressBook)
-        return container
-    }
-}
-
 extension AddressBook { // Records
 
     public func addRecord<R: AddressBookRecordType where R.Storage == RecordStorage>(record: R) -> ErrorType? {

@@ -6,8 +6,6 @@
 //  Copyright © 2015 Daniel Thorpe. All rights reserved.
 //
 
-#if os(iOS)
-
 import XCTest
 import HealthKit
 @testable import Operations
@@ -134,6 +132,4 @@ class HealthConditionTests: OperationTests {
         }
     }
 }
-
-#endif
 
