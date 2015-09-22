@@ -855,7 +855,8 @@ public struct LabeledValue<Value: MultiValueRepresentable>: CustomStringConverti
         let count: Int = ABMultiValueGetCount(multiValue)
         return (0..<count).reduce([LabeledValue<Value>]()) { (var acc, index) in
             let representation: CFTypeRef = ABMultiValueCopyValueAtIndex(multiValue, index).takeRetainedValue()
-            if let value = Value(multiValueRepresentation: representation), label = ABMultiValueCopyLabelAtIndex(multiValue, index)?.takeRetainedValue() as? String {
+            let label = ABMultiValueCopyLabelAtIndex(multiValue, index)?.takeRetainedValue() as? String ?? AddressBook.Labels.General.other
+            if let value = Value(multiValueRepresentation: representation) {
                 let labeledValue = LabeledValue(label: label, value: value)
                 acc.append(labeledValue)
             }
