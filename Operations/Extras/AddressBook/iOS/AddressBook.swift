@@ -855,8 +855,8 @@ public struct LabeledValue<Value: MultiValueRepresentable>: CustomStringConverti
         let count: Int = ABMultiValueGetCount(multiValue)
         return (0..<count).reduce([LabeledValue<Value>]()) { (var acc, index) in
             let representation: CFTypeRef = ABMultiValueCopyValueAtIndex(multiValue, index).takeRetainedValue()
-            let label = ABMultiValueCopyLabelAtIndex(multiValue, index)?.takeRetainedValue() as? String ?? AddressBook.Labels.General.other
-            if let value = Value(multiValueRepresentation: representation) {
+            if let value = Value(multiValueRepresentation: representation), unmanagedLabel = ABMultiValueCopyLabelAtIndex(multiValue, index) {
+                let label = unmanagedLabel.takeRetainedValue() as String
                 let labeledValue = LabeledValue(label: label, value: value)
                 acc.append(labeledValue)
             }
@@ -1015,12 +1015,13 @@ public class AddressBookGroup: AddressBookRecord, AddressBookGroupType {
 
     public func members<P: AddressBook_PersonType where P.Storage == PersonStorage>(ordering: AddressBook.SortOrdering? = .None) -> [P] {
         let result: [ABRecordRef] = {
-            if let ordering = ordering {
-                return ABGroupCopyArrayOfAllMembersWithSortOrdering(self.storage, ordering.rawValue)?.takeRetainedValue() as? [ABRecordRef] ?? []
+            if let ordering = ordering, unmanaged = ABGroupCopyArrayOfAllMembersWithSortOrdering(self.storage, ordering.rawValue) {
+                return unmanaged.takeRetainedValue() as [ABRecordRef]
             }
-            else {
-                return ABGroupCopyArrayOfAllMembers(self.storage)?.takeRetainedValue() as? [ABRecordRef] ?? []
+            else if let unmanaged = ABGroupCopyArrayOfAllMembers(self.storage) {
+                return unmanaged.takeRetainedValue() as [ABRecordRef]
             }
+            return []
         }()
 
         return result.map { P(storage: $0) }
