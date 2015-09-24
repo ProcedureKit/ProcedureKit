@@ -7,6 +7,19 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		651E394C1BB454310013ADE6 /* ContactsOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 651E394B1BB454310013ADE6 /* ContactsOperation.swift */; settings = {ASSET_TAGS = (); }; };
+		651E394D1BB454310013ADE6 /* ContactsOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 651E394B1BB454310013ADE6 /* ContactsOperation.swift */; settings = {ASSET_TAGS = (); }; };
+		651E394E1BB454310013ADE6 /* ContactsOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 651E394B1BB454310013ADE6 /* ContactsOperation.swift */; settings = {ASSET_TAGS = (); }; };
+		651E394F1BB454310013ADE6 /* ContactsOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 651E394B1BB454310013ADE6 /* ContactsOperation.swift */; settings = {ASSET_TAGS = (); }; };
+		651E39501BB454310013ADE6 /* ContactsOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 651E394B1BB454310013ADE6 /* ContactsOperation.swift */; settings = {ASSET_TAGS = (); }; };
+		651E39531BB454BF0013ADE6 /* ContactsCondition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 651E39521BB454BF0013ADE6 /* ContactsCondition.swift */; settings = {ASSET_TAGS = (); }; };
+		651E39541BB454BF0013ADE6 /* ContactsCondition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 651E39521BB454BF0013ADE6 /* ContactsCondition.swift */; settings = {ASSET_TAGS = (); }; };
+		651E39551BB454BF0013ADE6 /* ContactsCondition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 651E39521BB454BF0013ADE6 /* ContactsCondition.swift */; settings = {ASSET_TAGS = (); }; };
+		651E39561BB454BF0013ADE6 /* ContactsCondition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 651E39521BB454BF0013ADE6 /* ContactsCondition.swift */; settings = {ASSET_TAGS = (); }; };
+		651E39571BB454BF0013ADE6 /* ContactsCondition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 651E39521BB454BF0013ADE6 /* ContactsCondition.swift */; settings = {ASSET_TAGS = (); }; };
+		651E395A1BB45E370013ADE6 /* ContactsOperationsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 651E39591BB45E370013ADE6 /* ContactsOperationsTests.swift */; settings = {ASSET_TAGS = (); }; };
+		651E395B1BB45E370013ADE6 /* ContactsOperationsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 651E39591BB45E370013ADE6 /* ContactsOperationsTests.swift */; settings = {ASSET_TAGS = (); }; };
+		651E395C1BB45E370013ADE6 /* ContactsOperationsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 651E39591BB45E370013ADE6 /* ContactsOperationsTests.swift */; settings = {ASSET_TAGS = (); }; };
 		652F5A601BAF7A2800BB5F71 /* ExclusivityManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65EEC1731BAF44E80020A9BD /* ExclusivityManager.swift */; };
 		652F5A611BAF7A2800BB5F71 /* Operation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65EEC17A1BAF44E80020A9BD /* Operation.swift */; };
 		652F5A621BAF7A2800BB5F71 /* OperationCondition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65EEC17B1BAF44E80020A9BD /* OperationCondition.swift */; };
@@ -247,6 +260,9 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		651E394B1BB454310013ADE6 /* ContactsOperation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ContactsOperation.swift; path = Contacts/Shared/ContactsOperation.swift; sourceTree = "<group>"; };
+		651E39521BB454BF0013ADE6 /* ContactsCondition.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ContactsCondition.swift; path = Contacts/Shared/ContactsCondition.swift; sourceTree = "<group>"; };
+		651E39591BB45E370013ADE6 /* ContactsOperationsTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ContactsOperationsTests.swift; path = Contacts/ContactsOperationsTests.swift; sourceTree = "<group>"; };
 		652F5A491BAF79BA00BB5F71 /* Operations.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Operations.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		65882E801BAF5B00003F74B6 /* Operations.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Operations.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		65882EB01BAF6052003F74B6 /* AlertOperationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AlertOperationTests.swift; sourceTree = "<group>"; };
@@ -392,6 +408,23 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		651E39511BB454380013ADE6 /* Contacts */ = {
+			isa = PBXGroup;
+			children = (
+				651E394B1BB454310013ADE6 /* ContactsOperation.swift */,
+				651E39521BB454BF0013ADE6 /* ContactsCondition.swift */,
+			);
+			name = Contacts;
+			sourceTree = "<group>";
+		};
+		651E39581BB45E0C0013ADE6 /* Contacts */ = {
+			isa = PBXGroup;
+			children = (
+				651E39591BB45E370013ADE6 /* ContactsOperationsTests.swift */,
+			);
+			name = Contacts;
+			sourceTree = "<group>";
+		};
 		65882E6C1BAF578E003F74B6 /* Conditions */ = {
 			isa = PBXGroup;
 			children = (
@@ -458,6 +491,7 @@
 			isa = PBXGroup;
 			children = (
 				65882EBF1BAF6052003F74B6 /* AddressBook */,
+				651E39581BB45E0C0013ADE6 /* Contacts */,
 			);
 			path = Extras;
 			sourceTree = "<group>";
@@ -594,6 +628,7 @@
 			isa = PBXGroup;
 			children = (
 				65EEC20D1BAF4F230020A9BD /* AddressBook */,
+				651E39511BB454380013ADE6 /* Contacts */,
 			);
 			name = Extras;
 			path = Operations/Extras;
@@ -977,9 +1012,11 @@
 				652F5A761BAF7A2800BB5F71 /* UIOperation.swift in Sources */,
 				652F5A681BAF7A2800BB5F71 /* NegatedCondition.swift in Sources */,
 				652F5A651BAF7A2800BB5F71 /* Support.swift in Sources */,
+				651E39571BB454BF0013ADE6 /* ContactsCondition.swift in Sources */,
 				652F5A7C1BAF7A2800BB5F71 /* UserConfirmationCondition.swift in Sources */,
 				652F5A751BAF7A2800BB5F71 /* LoggingObserver.swift in Sources */,
 				652F5A671BAF7A2800BB5F71 /* MutuallyExclusive.swift in Sources */,
+				651E39501BB454310013ADE6 /* ContactsOperation.swift in Sources */,
 				652F5A711BAF7A2800BB5F71 /* ComposedOperation.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -996,7 +1033,9 @@
 				65882E9C1BAF5BEB003F74B6 /* GroupOperation.swift in Sources */,
 				65882E951BAF5BEB003F74B6 /* BlockObserver.swift in Sources */,
 				65882E961BAF5BEB003F74B6 /* TimeoutObserver.swift in Sources */,
+				651E39561BB454BF0013ADE6 /* ContactsCondition.swift in Sources */,
 				65882E8E1BAF5BEB003F74B6 /* BlockCondition.swift in Sources */,
+				651E394F1BB454310013ADE6 /* ContactsOperation.swift in Sources */,
 				65882E921BAF5BEB003F74B6 /* SlientCondition.swift in Sources */,
 				65882E911BAF5BEB003F74B6 /* NoFailedDependenciesCondition.swift in Sources */,
 				65882E891BAF5BEB003F74B6 /* Operation.swift in Sources */,
@@ -1027,9 +1066,11 @@
 				65EEC1971BAF44E80020A9BD /* TimeoutObserver.swift in Sources */,
 				65EEC18A1BAF44E80020A9BD /* ExclusivityManager.swift in Sources */,
 				65EEC1951BAF44E80020A9BD /* SlientCondition.swift in Sources */,
+				651E394D1BB454310013ADE6 /* ContactsOperation.swift in Sources */,
 				65EEC1821BAF44E80020A9BD /* BackgroundObserver.swift in Sources */,
 				65EEC2301BAF4F230020A9BD /* RemoteNotificationCondition.swift in Sources */,
 				65EEC1841BAF44E80020A9BD /* UIOperation.swift in Sources */,
+				651E39541BB454BF0013ADE6 /* ContactsCondition.swift in Sources */,
 				65EEC2351BAF4F230020A9BD /* CloudCondition.swift in Sources */,
 				65EEC1851BAF44E80020A9BD /* BlockCondition.swift in Sources */,
 				65EEC2271BAF4F230020A9BD /* AddressBookConditions.swift in Sources */,
@@ -1069,6 +1110,7 @@
 				65882F251BAF6083003F74B6 /* HealthConditionTests.swift in Sources */,
 				65882F031BAF6074003F74B6 /* NegatedConditionTests.swift in Sources */,
 				65882EFF1BAF6074003F74B6 /* GatedOperationTests.swift in Sources */,
+				651E395B1BB45E370013ADE6 /* ContactsOperationsTests.swift in Sources */,
 				65882F3B1BAF608A003F74B6 /* AddressBookConditionTests.swift in Sources */,
 				65882F3C1BAF608A003F74B6 /* AddressBookTests.swift in Sources */,
 				65882F231BAF6083003F74B6 /* CalendarConditionTests.swift in Sources */,
@@ -1105,6 +1147,7 @@
 				65EEC1CC1BAF468D0020A9BD /* GatedOperation.swift in Sources */,
 				65EEC1CB1BAF468D0020A9BD /* DelayOperation.swift in Sources */,
 				65EEC1C91BAF468D0020A9BD /* BlockOperation.swift in Sources */,
+				651E39551BB454BF0013ADE6 /* ContactsCondition.swift in Sources */,
 				65EEC23D1BAF4F610020A9BD /* Reachability.swift in Sources */,
 				65EEC1CD1BAF468D0020A9BD /* GroupOperation.swift in Sources */,
 				65EEC1C61BAF468D0020A9BD /* BlockObserver.swift in Sources */,
@@ -1124,6 +1167,7 @@
 				65EEC23F1BAF4F610020A9BD /* ReachableOperation.swift in Sources */,
 				65EEC1CE1BAF468D0020A9BD /* LoggingObserver.swift in Sources */,
 				65EEC1C01BAF468D0020A9BD /* MutuallyExclusive.swift in Sources */,
+				651E394E1BB454310013ADE6 /* ContactsOperation.swift in Sources */,
 				65EEC1CA1BAF468D0020A9BD /* ComposedOperation.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1132,6 +1176,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				651E395C1BB45E370013ADE6 /* ContactsOperationsTests.swift in Sources */,
 				65882F101BAF6078003F74B6 /* MutualExclusiveTests.swift in Sources */,
 				65882F111BAF6078003F74B6 /* NegatedConditionTests.swift in Sources */,
 				65882F0D1BAF6078003F74B6 /* GatedOperationTests.swift in Sources */,
@@ -1179,9 +1224,11 @@
 				65EEC1FD1BAF4C6F0020A9BD /* NegatedCondition.swift in Sources */,
 				65EEC1FA1BAF4C6F0020A9BD /* Support.swift in Sources */,
 				65EEC20A1BAF4C6F0020A9BD /* LoggingObserver.swift in Sources */,
+				651E39531BB454BF0013ADE6 /* ContactsCondition.swift in Sources */,
 				65EEC1FC1BAF4C6F0020A9BD /* MutuallyExclusive.swift in Sources */,
 				65EEC2431BAF4F780020A9BD /* Reachability.swift in Sources */,
 				65EEC2061BAF4C6F0020A9BD /* ComposedOperation.swift in Sources */,
+				651E394C1BB454310013ADE6 /* ContactsOperation.swift in Sources */,
 				65EEC24C1BAF4FD40020A9BD /* UserConfirmationCondition.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1190,6 +1237,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				651E395A1BB45E370013ADE6 /* ContactsOperationsTests.swift in Sources */,
 				65882EF41BAF606F003F74B6 /* MutualExclusiveTests.swift in Sources */,
 				65882EF51BAF606F003F74B6 /* NegatedConditionTests.swift in Sources */,
 				65882EF11BAF606F003F74B6 /* GatedOperationTests.swift in Sources */,
