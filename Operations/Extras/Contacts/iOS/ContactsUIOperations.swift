@@ -16,7 +16,7 @@ final public class DisplayContactViewController<F: PresentingViewController>: Gr
 
     let from: ViewControllerDisplayStyle<F>
     let sender: AnyObject?
-    let get: ContactsGetContacts
+    let get: GetContacts
     let configuration: ContactViewControllerConfigurationBlock?
 
     var ui: UIOperation<CNContactViewController, F>? = .None
@@ -28,7 +28,7 @@ final public class DisplayContactViewController<F: PresentingViewController>: Gr
     public init(identifier: String, displayControllerFrom from: ViewControllerDisplayStyle<F>, delegate: CNContactViewControllerDelegate, sender: AnyObject? = .None, configuration: ContactViewControllerConfigurationBlock? = .None) {
         self.from = from
         self.sender = sender
-        self.get = ContactsGetContacts(identifier: identifier, keysToFetch: [CNContactViewController.descriptorForRequiredKeys()])
+        self.get = GetContacts(identifier: identifier, keysToFetch: [CNContactViewController.descriptorForRequiredKeys()])
         self.configuration = configuration
         super.init(operations: [ get ])
         name = "Display Contact View Controller"
@@ -62,7 +62,7 @@ final public class DisplayCreateContactViewController<F: PresentingViewControlle
     public init(displayControllerFrom from: ViewControllerDisplayStyle<F>, delegate: CNContactViewControllerDelegate, sender: AnyObject? = .None, addToGroupWithName groupName: String? = .None) {
         self.delegate = delegate
         self.ui = UIOperation(controller: CNContactViewController(forNewContact: .None), displayControllerFrom: from, sender: sender)
-        let op = groupName.map { ContactsGetGroup(groupName: $0) } ?? ContactsOperation()
+        let op = groupName.map { GetContactsGroup(groupName: $0) } ?? ContactsOperation()
         super.init(operations: [op])
         name = "Display Create Contact View Controller"
     }
@@ -70,7 +70,7 @@ final public class DisplayCreateContactViewController<F: PresentingViewControlle
     public override func operationDidFinish(operation: NSOperation, withErrors errors: [ErrorType]) {
         if errors.isEmpty {
             contactViewController.delegate = delegate
-            if let getGroupOperation = operation as? ContactsGetGroup {
+            if let getGroupOperation = operation as? GetContactsGroup {
                 contactViewController.parentGroup = getGroupOperation.group
             }
             addOperation(ui)

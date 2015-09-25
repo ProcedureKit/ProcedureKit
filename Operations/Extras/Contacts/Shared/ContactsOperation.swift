@@ -102,13 +102,13 @@ extension CNGroup {
 public typealias ContactsOperation = _ContactsOperation<CNContactStore>
 
 @available(iOS 9.0, OSX 10.11, *)
-public typealias ContactsGetContacts = _ContactsGetContacts<CNContactStore>
+public typealias GetContacts = _GetContacts<CNContactStore>
 
 @available(iOS 9.0, OSX 10.11, *)
-public typealias ContactsCreateGroup = _ContactsCreateGroup<CNContactStore>
+public typealias CreateContactsGroup = _CreateContactsGroup<CNContactStore>
 
 @available(iOS 9.0, OSX 10.11, *)
-public typealias ContactsGetGroup = _ContactsGetGroup<CNContactStore>
+public typealias GetContactsGroup = _GetContactsGroup<CNContactStore>
 
 
 
@@ -222,10 +222,10 @@ public class _ContactsOperation<Store: ContactStoreType>: _ContactsAccess<Store>
     }
 }
 
-// MARK: - ContactsGetContacts
+// MARK: - GetContacts
 
 @available(iOS 9.0, OSX 10.11, *)
-public class _ContactsGetContacts<Store: ContactStoreType>: _ContactsOperation<Store> {
+public class _GetContacts<Store: ContactStoreType>: _ContactsOperation<Store> {
 
     let predicate: CNContact.Predicate
     let keysToFetch: [CNKeyDescriptor]
@@ -258,7 +258,7 @@ public class _ContactsGetContacts<Store: ContactStoreType>: _ContactsOperation<S
 }
 
 @available(iOS 9.0, OSX 10.11, *)
-public class _ContactsCreateGroup<Store: ContactStoreType>: _ContactsOperation<Store> {
+public class _CreateContactsGroup<Store: ContactStoreType>: _ContactsOperation<Store> {
 
     let groupName: String
 
@@ -279,7 +279,7 @@ public class _ContactsCreateGroup<Store: ContactStoreType>: _ContactsOperation<S
 }
 
 @available(iOS 9.0, OSX 10.11, *)
-public class _ContactsGetGroup<Store: ContactStoreType>: _ContactsOperation<Store> {
+public class _GetContactsGroup<Store: ContactStoreType>: _ContactsOperation<Store> {
 
     let groupName: String
 
