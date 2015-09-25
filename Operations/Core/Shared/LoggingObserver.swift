@@ -47,7 +47,7 @@ public struct LoggingObserver: OperationObserver {
     }
 
     public func operationDidFinish(operation: Operation, errors: [ErrorType]) {
-        let detail = errors.count > 0 ? "\(errors.count) error(s)" : "no errors"
+        let detail = errors.count > 0 ? "error(s): \(errors)" : "no errors"
         log("\(operationName(operation)): finished with \(detail).")
     }
 

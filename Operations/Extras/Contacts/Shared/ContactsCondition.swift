@@ -8,19 +8,20 @@
 
 import Contacts
 
-@available(iOS 9.0, *)
+@available(iOS 9.0, OSX 10.11, *)
 protocol ContactsPermissionRegistrar {
     func opr_authorizationStatusForEntityType(entityType: CNEntityType) -> CNAuthorizationStatus
     func opr_requestAccessForEntityType(entityType: CNEntityType, completion: (Bool, NSError?) -> Void)
 }
 
-public enum ContactsPermissionsError: ErrorType {
+@available(iOS 9.0, OSX 10.11, *)
+public enum ContactsPermissionError: ErrorType {
     case ContactsUnknownErrorOccured
     case ContactsErrorOccured(NSError)
     case ContactsAccessDenied
 }
 
-@available(iOS 9.0, *)
+@available(iOS 9.0, OSX 10.11, *)
 extension CNContactStore: ContactsPermissionRegistrar {
     func opr_authorizationStatusForEntityType(entityType: CNEntityType) -> CNAuthorizationStatus {
         return self.dynamicType.authorizationStatusForEntityType(entityType)
@@ -30,7 +31,7 @@ extension CNContactStore: ContactsPermissionRegistrar {
     }
 }
 
-@available(iOS 9.0, *)
+@available(iOS 9.0, OSX 10.11, *)
 public struct ContactsCondition: OperationCondition {
 
     public enum Error: ErrorType {
@@ -39,7 +40,7 @@ public struct ContactsCondition: OperationCondition {
         case AuthorizationNotDetermined
     }
 
-    public let name = "Address Book"
+    public let name = "Contacts"
     public let isMutuallyExclusive = false
 
     let entityType: CNEntityType

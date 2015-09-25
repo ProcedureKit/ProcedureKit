@@ -20,6 +20,14 @@
 		651E395A1BB45E370013ADE6 /* ContactsOperationsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 651E39591BB45E370013ADE6 /* ContactsOperationsTests.swift */; settings = {ASSET_TAGS = (); }; };
 		651E395B1BB45E370013ADE6 /* ContactsOperationsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 651E39591BB45E370013ADE6 /* ContactsOperationsTests.swift */; settings = {ASSET_TAGS = (); }; };
 		651E395C1BB45E370013ADE6 /* ContactsOperationsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 651E39591BB45E370013ADE6 /* ContactsOperationsTests.swift */; settings = {ASSET_TAGS = (); }; };
+		651E39731BB48C790013ADE6 /* AddressBook.swift in Sources */ = {isa = PBXBuildFile; fileRef = 651E39701BB48C790013ADE6 /* AddressBook.swift */; settings = {ASSET_TAGS = (); }; };
+		651E39741BB48C790013ADE6 /* AddressBookConditions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 651E39711BB48C790013ADE6 /* AddressBookConditions.swift */; settings = {ASSET_TAGS = (); }; };
+		651E39751BB48C790013ADE6 /* AddressBookOperations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 651E39721BB48C790013ADE6 /* AddressBookOperations.swift */; settings = {ASSET_TAGS = (); }; };
+		651E39771BB48C8F0013ADE6 /* AddressBookUIOperations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 651E39761BB48C8F0013ADE6 /* AddressBookUIOperations.swift */; settings = {ASSET_TAGS = (); }; };
+		651E39781BB48CDB0013ADE6 /* AddressBook.swift in Sources */ = {isa = PBXBuildFile; fileRef = 651E39701BB48C790013ADE6 /* AddressBook.swift */; settings = {ASSET_TAGS = (); }; };
+		651E39791BB48CDB0013ADE6 /* AddressBookConditions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 651E39711BB48C790013ADE6 /* AddressBookConditions.swift */; settings = {ASSET_TAGS = (); }; };
+		651E397A1BB48CDB0013ADE6 /* AddressBookOperations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 651E39721BB48C790013ADE6 /* AddressBookOperations.swift */; settings = {ASSET_TAGS = (); }; };
+		651E397E1BB48D970013ADE6 /* ContactsUIOperations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 651E397D1BB48D970013ADE6 /* ContactsUIOperations.swift */; settings = {ASSET_TAGS = (); }; };
 		652F5A601BAF7A2800BB5F71 /* ExclusivityManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65EEC1731BAF44E80020A9BD /* ExclusivityManager.swift */; };
 		652F5A611BAF7A2800BB5F71 /* Operation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65EEC17A1BAF44E80020A9BD /* Operation.swift */; };
 		652F5A621BAF7A2800BB5F71 /* OperationCondition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65EEC17B1BAF44E80020A9BD /* OperationCondition.swift */; };
@@ -201,9 +209,6 @@
 		65EEC2091BAF4C6F0020A9BD /* GroupOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65EEC1751BAF44E80020A9BD /* GroupOperation.swift */; };
 		65EEC20A1BAF4C6F0020A9BD /* LoggingObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65EEC1761BAF44E80020A9BD /* LoggingObserver.swift */; };
 		65EEC20B1BAF4C6F0020A9BD /* UIOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65EEC16C1BAF44E80020A9BD /* UIOperation.swift */; };
-		65EEC2261BAF4F230020A9BD /* AddressBook.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65EEC20F1BAF4F230020A9BD /* AddressBook.swift */; };
-		65EEC2271BAF4F230020A9BD /* AddressBookConditions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65EEC2101BAF4F230020A9BD /* AddressBookConditions.swift */; };
-		65EEC2281BAF4F230020A9BD /* AddressBookOperations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65EEC2111BAF4F230020A9BD /* AddressBookOperations.swift */; };
 		65EEC22B1BAF4F230020A9BD /* HealthCondition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65EEC2161BAF4F230020A9BD /* HealthCondition.swift */; };
 		65EEC22C1BAF4F230020A9BD /* LocationCondition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65EEC2171BAF4F230020A9BD /* LocationCondition.swift */; };
 		65EEC22D1BAF4F230020A9BD /* LocationOperations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65EEC2181BAF4F230020A9BD /* LocationOperations.swift */; };
@@ -263,6 +268,11 @@
 		651E394B1BB454310013ADE6 /* ContactsOperation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ContactsOperation.swift; path = Contacts/Shared/ContactsOperation.swift; sourceTree = "<group>"; };
 		651E39521BB454BF0013ADE6 /* ContactsCondition.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ContactsCondition.swift; path = Contacts/Shared/ContactsCondition.swift; sourceTree = "<group>"; };
 		651E39591BB45E370013ADE6 /* ContactsOperationsTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ContactsOperationsTests.swift; path = Contacts/ContactsOperationsTests.swift; sourceTree = "<group>"; };
+		651E39701BB48C790013ADE6 /* AddressBook.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddressBook.swift; sourceTree = "<group>"; };
+		651E39711BB48C790013ADE6 /* AddressBookConditions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddressBookConditions.swift; sourceTree = "<group>"; };
+		651E39721BB48C790013ADE6 /* AddressBookOperations.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddressBookOperations.swift; sourceTree = "<group>"; };
+		651E39761BB48C8F0013ADE6 /* AddressBookUIOperations.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddressBookUIOperations.swift; sourceTree = "<group>"; };
+		651E397D1BB48D970013ADE6 /* ContactsUIOperations.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ContactsUIOperations.swift; path = Contacts/iOS/ContactsUIOperations.swift; sourceTree = "<group>"; };
 		652F5A491BAF79BA00BB5F71 /* Operations.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Operations.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		65882E801BAF5B00003F74B6 /* Operations.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Operations.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		65882EB01BAF6052003F74B6 /* AlertOperationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AlertOperationTests.swift; sourceTree = "<group>"; };
@@ -325,9 +335,6 @@
 		65EEC1AB1BAF46210020A9BD /* Operations-OSXTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Operations-OSXTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		65EEC1DE1BAF4B230020A9BD /* Operations.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Operations.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		65EEC1E71BAF4B230020A9BD /* Operations-iOS-ExtensionTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Operations-iOS-ExtensionTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
-		65EEC20F1BAF4F230020A9BD /* AddressBook.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddressBook.swift; sourceTree = "<group>"; };
-		65EEC2101BAF4F230020A9BD /* AddressBookConditions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddressBookConditions.swift; sourceTree = "<group>"; };
-		65EEC2111BAF4F230020A9BD /* AddressBookOperations.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddressBookOperations.swift; sourceTree = "<group>"; };
 		65EEC2161BAF4F230020A9BD /* HealthCondition.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HealthCondition.swift; sourceTree = "<group>"; };
 		65EEC2171BAF4F230020A9BD /* LocationCondition.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LocationCondition.swift; sourceTree = "<group>"; };
 		65EEC2181BAF4F230020A9BD /* LocationOperations.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LocationOperations.swift; sourceTree = "<group>"; };
@@ -411,8 +418,8 @@
 		651E39511BB454380013ADE6 /* Contacts */ = {
 			isa = PBXGroup;
 			children = (
-				651E394B1BB454310013ADE6 /* ContactsOperation.swift */,
-				651E39521BB454BF0013ADE6 /* ContactsCondition.swift */,
+				651E397C1BB48D7D0013ADE6 /* iOS */,
+				651E397B1BB48D6F0013ADE6 /* Shared */,
 			);
 			name = Contacts;
 			sourceTree = "<group>";
@@ -423,6 +430,34 @@
 				651E39591BB45E370013ADE6 /* ContactsOperationsTests.swift */,
 			);
 			name = Contacts;
+			sourceTree = "<group>";
+		};
+		651E396F1BB48C790013ADE6 /* iOS */ = {
+			isa = PBXGroup;
+			children = (
+				651E39701BB48C790013ADE6 /* AddressBook.swift */,
+				651E39711BB48C790013ADE6 /* AddressBookConditions.swift */,
+				651E39721BB48C790013ADE6 /* AddressBookOperations.swift */,
+				651E39761BB48C8F0013ADE6 /* AddressBookUIOperations.swift */,
+			);
+			path = iOS;
+			sourceTree = "<group>";
+		};
+		651E397B1BB48D6F0013ADE6 /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				651E39521BB454BF0013ADE6 /* ContactsCondition.swift */,
+				651E394B1BB454310013ADE6 /* ContactsOperation.swift */,
+			);
+			name = Shared;
+			sourceTree = "<group>";
+		};
+		651E397C1BB48D7D0013ADE6 /* iOS */ = {
+			isa = PBXGroup;
+			children = (
+				651E397D1BB48D970013ADE6 /* ContactsUIOperations.swift */,
+			);
+			name = iOS;
 			sourceTree = "<group>";
 		};
 		65882E6C1BAF578E003F74B6 /* Conditions */ = {
@@ -637,19 +672,9 @@
 		65EEC20D1BAF4F230020A9BD /* AddressBook */ = {
 			isa = PBXGroup;
 			children = (
-				65EEC20E1BAF4F230020A9BD /* iOS */,
+				651E396F1BB48C790013ADE6 /* iOS */,
 			);
 			path = AddressBook;
-			sourceTree = "<group>";
-		};
-		65EEC20E1BAF4F230020A9BD /* iOS */ = {
-			isa = PBXGroup;
-			children = (
-				65EEC20F1BAF4F230020A9BD /* AddressBook.swift */,
-				65EEC2101BAF4F230020A9BD /* AddressBookConditions.swift */,
-				65EEC2111BAF4F230020A9BD /* AddressBookOperations.swift */,
-			);
-			path = iOS;
 			sourceTree = "<group>";
 		};
 		65EEC2141BAF4F230020A9BD /* Features */ = {
@@ -1059,32 +1084,34 @@
 				65EEC22D1BAF4F230020A9BD /* LocationOperations.swift in Sources */,
 				65EEC1811BAF44E80020A9BD /* AlertOperation.swift in Sources */,
 				65EEC18E1BAF44E80020A9BD /* MutuallyExclusive.swift in Sources */,
+				651E39771BB48C8F0013ADE6 /* AddressBookUIOperations.swift in Sources */,
 				65EEC18C1BAF44E80020A9BD /* GroupOperation.swift in Sources */,
 				65EEC1831BAF44E80020A9BD /* NetworkObserver.swift in Sources */,
 				65EEC1891BAF44E80020A9BD /* DelayOperation.swift in Sources */,
 				65EEC22B1BAF4F230020A9BD /* HealthCondition.swift in Sources */,
+				651E397E1BB48D970013ADE6 /* ContactsUIOperations.swift in Sources */,
 				65EEC1971BAF44E80020A9BD /* TimeoutObserver.swift in Sources */,
 				65EEC18A1BAF44E80020A9BD /* ExclusivityManager.swift in Sources */,
 				65EEC1951BAF44E80020A9BD /* SlientCondition.swift in Sources */,
 				651E394D1BB454310013ADE6 /* ContactsOperation.swift in Sources */,
 				65EEC1821BAF44E80020A9BD /* BackgroundObserver.swift in Sources */,
 				65EEC2301BAF4F230020A9BD /* RemoteNotificationCondition.swift in Sources */,
+				651E39731BB48C790013ADE6 /* AddressBook.swift in Sources */,
 				65EEC1841BAF44E80020A9BD /* UIOperation.swift in Sources */,
 				651E39541BB454BF0013ADE6 /* ContactsCondition.swift in Sources */,
 				65EEC2351BAF4F230020A9BD /* CloudCondition.swift in Sources */,
 				65EEC1851BAF44E80020A9BD /* BlockCondition.swift in Sources */,
-				65EEC2271BAF4F230020A9BD /* AddressBookConditions.swift in Sources */,
 				65EEC1941BAF44E80020A9BD /* OperationQueue.swift in Sources */,
 				65EEC1961BAF44E80020A9BD /* Support.swift in Sources */,
 				65EEC2331BAF4F230020A9BD /* WebpageOperation.swift in Sources */,
 				65EEC18F1BAF44E80020A9BD /* NegatedCondition.swift in Sources */,
 				65EEC22E1BAF4F230020A9BD /* PassbookCondition.swift in Sources */,
+				651E39751BB48C790013ADE6 /* AddressBookOperations.swift in Sources */,
 				65EEC2321BAF4F230020A9BD /* UserNotificationCondition.swift in Sources */,
 				65EEC1881BAF44E80020A9BD /* ComposedOperation.swift in Sources */,
 				65EEC22F1BAF4F230020A9BD /* PhotosCondition.swift in Sources */,
 				65EEC18B1BAF44E80020A9BD /* GatedOperation.swift in Sources */,
 				65EEC2361BAF4F230020A9BD /* CloudKitOperation.swift in Sources */,
-				65EEC2281BAF4F230020A9BD /* AddressBookOperations.swift in Sources */,
 				65EEC1861BAF44E80020A9BD /* BlockObserver.swift in Sources */,
 				65EEC2391BAF4F230020A9BD /* ReachableOperation.swift in Sources */,
 				65EEC2381BAF4F230020A9BD /* ReachabilityCondition.swift in Sources */,
@@ -1094,7 +1121,7 @@
 				65EEC2341BAF4F230020A9BD /* CalendarCondition.swift in Sources */,
 				65EEC1871BAF44E80020A9BD /* BlockOperation.swift in Sources */,
 				65EEC1901BAF44E80020A9BD /* NoFailedDependenciesCondition.swift in Sources */,
-				65EEC2261BAF4F230020A9BD /* AddressBook.swift in Sources */,
+				651E39741BB48C790013ADE6 /* AddressBookConditions.swift in Sources */,
 				65EEC18D1BAF44E80020A9BD /* LoggingObserver.swift in Sources */,
 				65EEC1921BAF44E80020A9BD /* OperationCondition.swift in Sources */,
 				65EEC2371BAF4F230020A9BD /* Reachability.swift in Sources */,
@@ -1202,6 +1229,7 @@
 				65EEC1F51BAF4C6F0020A9BD /* ExclusivityManager.swift in Sources */,
 				65EEC2081BAF4C6F0020A9BD /* GatedOperation.swift in Sources */,
 				65EEC2421BAF4F780020A9BD /* CloudKitOperation.swift in Sources */,
+				651E397A1BB48CDB0013ADE6 /* AddressBookOperations.swift in Sources */,
 				65EEC2071BAF4C6F0020A9BD /* DelayOperation.swift in Sources */,
 				65EEC2441BAF4F780020A9BD /* ReachabilityCondition.swift in Sources */,
 				65EEC2051BAF4C6F0020A9BD /* BlockOperation.swift in Sources */,
@@ -1228,7 +1256,9 @@
 				65EEC1FC1BAF4C6F0020A9BD /* MutuallyExclusive.swift in Sources */,
 				65EEC2431BAF4F780020A9BD /* Reachability.swift in Sources */,
 				65EEC2061BAF4C6F0020A9BD /* ComposedOperation.swift in Sources */,
+				651E39781BB48CDB0013ADE6 /* AddressBook.swift in Sources */,
 				651E394C1BB454310013ADE6 /* ContactsOperation.swift in Sources */,
+				651E39791BB48CDB0013ADE6 /* AddressBookConditions.swift in Sources */,
 				65EEC24C1BAF4FD40020A9BD /* UserConfirmationCondition.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

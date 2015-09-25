@@ -34,9 +34,16 @@ session Advanced NSOperations: https://developer.apple.com/videos/wwdc/2015/?id=
   end
 
   s.subspec '+AddressBook' do |ss|
-    ss.platform = :ios, "8.0"
     ss.dependency 'Operations/App'
-    ss.source_files   = 'Operations/Extras/AddressBook/iOS'
+    ss.source_files = [
+      'Operations/Extras/AddressBook/iOS',
+      'Operations/Extras/Contacts/Shared',
+      'Operations/Extras/Contacts/iOS'
+    ]
+    ss.osx.exclude_files = [
+      'Operations/Extras/AddressBook/iOS',
+      'Operations/Extras/Contacts/iOS'
+    ]
   end
 
   # Creates a framework suitable for an (iOS or watchOS) Extension
