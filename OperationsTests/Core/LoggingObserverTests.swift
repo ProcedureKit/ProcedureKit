@@ -46,7 +46,7 @@ class LoggingObserverTests: OperationTests {
         waitForExpectationsWithTimeout(3, handler: nil)
 
         XCTAssertEqual(receivedMessages.count, 2)
-        XCTAssertEqual(receivedMessages[1], "\(operation): finished with 1 error(s).")
+        XCTAssertEqual(receivedMessages[1], "\(operation): finished with error(s): [Operations.CloudContainerCondition.Error.NotAuthenticated].")
     }
 
     func test__logger_receives_messages_from_produced_operation() {
@@ -71,7 +71,7 @@ class LoggingObserverTests: OperationTests {
         XCTAssertEqual(receivedMessages[1], "Test Operation: did produce operation: Produced Operation.")
         XCTAssertEqual(receivedMessages[2], "Produced Operation: did start.")
         XCTAssertEqual(receivedMessages[3], "Produced Operation: finished with no errors.")
-        XCTAssertEqual(receivedMessages[4], "Test Operation: finished with 1 error(s).")
+        XCTAssertEqual(receivedMessages[4], "Test Operation: finished with error(s): [Operations.CloudContainerCondition.Error.NotAuthenticated].")
     }
 }
 
