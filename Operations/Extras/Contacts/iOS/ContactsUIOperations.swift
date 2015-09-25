@@ -25,10 +25,10 @@ final public class DisplayContactViewController<F: PresentingViewController>: Gr
         return ui?.controller
     }
 
-    public init(identifier: String, containerId: CNContainer.ID = .Default, displayControllerFrom from: ViewControllerDisplayStyle<F>, delegate: CNContactViewControllerDelegate, sender: AnyObject? = .None, configuration: ContactViewControllerConfigurationBlock? = .None) {
+    public init(identifier: String, displayControllerFrom from: ViewControllerDisplayStyle<F>, delegate: CNContactViewControllerDelegate, sender: AnyObject? = .None, configuration: ContactViewControllerConfigurationBlock? = .None) {
         self.from = from
         self.sender = sender
-        self.get = ContactsGetContacts(identifier: identifier, keysToFetch: [CNContactViewController.descriptorForRequiredKeys()], containerId: containerId)
+        self.get = ContactsGetContacts(identifier: identifier, keysToFetch: [CNContactViewController.descriptorForRequiredKeys()])
         self.configuration = configuration
         super.init(operations: [ get ])
         name = "Display Contact View Controller"

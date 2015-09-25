@@ -115,7 +115,7 @@ public typealias ContactsGetGroup = _ContactsGetGroup<CNContactStore>
 
 // MARK: - Testable Class Interfaces
 
-// MARK: - ContactsOperation
+// MARK: - ContactsAccess
 
 @available(iOS 9.0, OSX 10.11, *)
 public class _ContactsAccess<Store: ContactsPermissionRegistrar>: Operation {
@@ -170,6 +170,8 @@ public class _ContactsAccess<Store: ContactsPermissionRegistrar>: Operation {
         // no-op
     }
 }
+
+// MARK: - ContactsOperation
 
 @available(iOS 9.0, OSX 10.11, *)
 public class _ContactsOperation<Store: ContactStoreType>: _ContactsAccess<Store> {
@@ -234,15 +236,11 @@ public class _ContactsGetContacts<Store: ContactStoreType>: _ContactsOperation<S
         return contacts.first
     }
 
-    public convenience init(identifier: String, keysToFetch: [CNKeyDescriptor], containerId: CNContainer.ID = .Default, entityType: CNEntityType = .Contacts) {
-        self.init(predicate: .WithIdentifiers([identifier]), keysToFetch: keysToFetch, containerId: containerId, entityType: entityType, contactStore: Store())
+    public convenience init(identifier: String, keysToFetch: [CNKeyDescriptor]) {
+        self.init(predicate: .WithIdentifiers([identifier]), keysToFetch: keysToFetch)
     }
 
-    public convenience init(predicate: CNContact.Predicate, keysToFetch: [CNKeyDescriptor], containerId: CNContainer.ID = .Default, entityType: CNEntityType = .Contacts) {
-        self.init(predicate: predicate, keysToFetch: keysToFetch, containerId: containerId, entityType: entityType, contactStore: Store())
-    }
-
-    init(predicate: CNContact.Predicate, keysToFetch: [CNKeyDescriptor], containerId: CNContainer.ID = .Default, entityType: CNEntityType = .Contacts, contactStore: Store) {
+    public init(predicate: CNContact.Predicate, keysToFetch: [CNKeyDescriptor], containerId: CNContainer.ID = .Default, entityType: CNEntityType = .Contacts, contactStore: Store = Store()) {
         self.predicate = predicate
         self.keysToFetch = keysToFetch
         super.init(containerId: containerId, entityType: entityType, contactStore: contactStore)
@@ -264,11 +262,7 @@ public class _ContactsCreateGroup<Store: ContactStoreType>: _ContactsOperation<S
 
     let groupName: String
 
-    public convenience init(groupName: String, containerId: CNContainer.ID = .Default, entityType: CNEntityType = .Contacts) {
-        self.init(groupName: groupName, containerId: containerId, entityType: entityType, contactStore: Store())
-    }
-
-    init(groupName: String, containerId: CNContainer.ID = .Default, entityType: CNEntityType = .Contacts, contactStore: Store) {
+    public init(groupName: String, containerId: CNContainer.ID = .Default, entityType: CNEntityType = .Contacts, contactStore: Store = Store()) {
         self.groupName = groupName
         super.init(containerId: containerId, entityType: entityType, contactStore: contactStore)
     }
@@ -291,12 +285,7 @@ public class _ContactsGetGroup<Store: ContactStoreType>: _ContactsOperation<Stor
 
     public var group: CNGroup? = .None
 
-    public init(groupName: String, containerId: CNContainer.ID = .Default, entityType: CNEntityType = .Contacts) {
-        self.groupName = groupName
-        super.init(entityType: entityType, containerId: containerId, contactStore: Store())
-    }
-
-    init(groupName: String, containerId: CNContainer.ID = .Default, entityType: CNEntityType = .Contacts, contactStore: Store) {
+    public init(groupName: String, containerId: CNContainer.ID = .Default, entityType: CNEntityType = .Contacts, contactStore: Store = Store()) {
         self.groupName = groupName
         super.init(containerId: containerId, entityType: entityType, contactStore: contactStore)
     }
