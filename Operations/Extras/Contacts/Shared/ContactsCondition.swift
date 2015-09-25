@@ -9,49 +9,20 @@
 import Contacts
 
 @available(iOS 9.0, OSX 10.11, *)
-protocol ContactsPermissionRegistrar {
-    func opr_authorizationStatusForEntityType(entityType: CNEntityType) -> CNAuthorizationStatus
-    func opr_requestAccessForEntityType(entityType: CNEntityType, completion: (Bool, NSError?) -> Void)
-}
-
-@available(iOS 9.0, OSX 10.11, *)
-public enum ContactsPermissionError: ErrorType {
-    case ContactsUnknownErrorOccured
-    case ContactsErrorOccured(NSError)
-    case ContactsAccessDenied
-}
-
-@available(iOS 9.0, OSX 10.11, *)
-extension CNContactStore: ContactsPermissionRegistrar {
-    func opr_authorizationStatusForEntityType(entityType: CNEntityType) -> CNAuthorizationStatus {
-        return self.dynamicType.authorizationStatusForEntityType(entityType)
-    }
-    func opr_requestAccessForEntityType(entityType: CNEntityType, completion: (Bool, NSError?) -> Void) {
-        requestAccessForEntityType(entityType, completionHandler: completion)
-    }
-}
-
-@available(iOS 9.0, OSX 10.11, *)
-public struct ContactsCondition: OperationCondition {
-
-    public enum Error: ErrorType {
-        case AuthorizationDenied
-        case AuthorizationRestricted
-        case AuthorizationNotDetermined
-    }
+public struct _ContactsCondition<Store: ContactsPermissionRegistrar>: OperationCondition {
 
     public let name = "Contacts"
     public let isMutuallyExclusive = false
 
     let entityType: CNEntityType
-    let registrar: ContactsPermissionRegistrar
+    let registrar: Store
 
     public init(entityType: CNEntityType = .Contacts) {
         self.entityType = entityType
-        registrar = CNContactStore()
+        registrar = Store()
     }
 
-    init(entityType: CNEntityType = .Contacts, registrar: ContactsPermissionRegistrar) {
+    init(entityType: CNEntityType = .Contacts, registrar: Store) {
         self.entityType = entityType
         self.registrar = registrar
     }
@@ -59,7 +30,7 @@ public struct ContactsCondition: OperationCondition {
     public func dependencyForOperation(operation: Operation) -> NSOperation? {
         switch registrar.opr_authorizationStatusForEntityType(entityType) {
         case .NotDetermined:
-            return ContactsOperation(entityType: entityType, registrar: registrar)
+            return _ContactsAccess(entityType: entityType, contactStore: registrar)
         default:
             return .None
         }
@@ -70,14 +41,14 @@ public struct ContactsCondition: OperationCondition {
         case .Authorized:
             completion(.Satisfied)
         case .Denied:
-            completion(.Failed(Error.AuthorizationDenied))
+            completion(.Failed(ContactsPermissionError.AuthorizationDenied))
         case .Restricted:
-            completion(.Failed(Error.AuthorizationRestricted))
+            completion(.Failed(ContactsPermissionError.AuthorizationRestricted))
         case .NotDetermined:
-            completion(.Failed(Error.AuthorizationNotDetermined))
+            completion(.Failed(ContactsPermissionError.AuthorizationNotDetermined))
         }
     }
 }
 
-
-
+@available(iOS 9.0, OSX 10.11, *)
+public typealias ContactsCondition = _ContactsCondition<CNContactStore>

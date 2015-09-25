@@ -9,53 +9,47 @@
 import Contacts
 import ContactsUI
 
-
-
 @available(iOS 9.0, *)
-public enum DisplayContactWithIntent {
+final public class DisplayContactViewController<F: PresentingViewController>: GroupOperation {
 
-    case Contact(CNContact)
-    case Unknown(CNContact)
-    case New(CNContact?)
+    public typealias ContactViewControllerConfigurationBlock = CNContactViewController -> Void
 
-    var contactViewController: CNContactViewController {
-        switch self {
-        case .Contact(let contact):
-            return CNContactViewController(forContact: contact)
-        case .Unknown(let contact):
-            return CNContactViewController(forUnknownContact: contact)
-        case .New(let contact):
-            return CNContactViewController(forNewContact: contact)
+    let from: ViewControllerDisplayStyle<F>
+    let sender: AnyObject?
+    let get: ContactsGetContacts
+    let configuration: ContactViewControllerConfigurationBlock?
+
+    var ui: UIOperation<CNContactViewController, F>? = .None
+
+    public var contactViewController: CNContactViewController? {
+        return ui?.controller
+    }
+
+    public init(identifier: String, containerId: CNContainer.ID = .Default, displayControllerFrom from: ViewControllerDisplayStyle<F>, delegate: CNContactViewControllerDelegate, sender: AnyObject? = .None, configuration: ContactViewControllerConfigurationBlock? = .None) {
+        self.from = from
+        self.sender = sender
+        self.get = ContactsGetContacts(identifier: identifier, keysToFetch: [CNContactViewController.descriptorForRequiredKeys()], containerId: containerId)
+        self.configuration = configuration
+        super.init(operations: [ get ])
+        name = "Display Contact View Controller"
+    }
+
+    public func createViewControllerForContact(contact: CNContact) -> CNContactViewController {
+        let vc = CNContactViewController(forContact: contact)
+        configuration?(vc)
+        return vc
+    }
+
+    public override func operationDidFinish(operation: NSOperation, withErrors errors: [ErrorType]) {
+        if errors.isEmpty && operation == get, let contact = get.contact {
+            ui = UIOperation(controller: createViewControllerForContact(contact), displayControllerFrom: from, sender: sender)
+            addOperation(ui!)
         }
     }
 }
 
 @available(iOS 9.0, *)
-final public class ContactsDisplayContactViewController<F: PresentingViewController>: ContactsOperation {
-
-    let contact: DisplayContactWithIntent
-    let ui: UIOperation<CNContactViewController, F>
-
-    public var contactViewController: CNContactViewController {
-        return ui.controller
-    }
-
-    public init(contact: DisplayContactWithIntent, displayControllerFrom from: ViewControllerDisplayStyle<F>, delegate: CNContactViewControllerDelegate, sender: AnyObject? = .None) {
-        self.contact = contact
-        self.ui = UIOperation(controller: contact.contactViewController, displayControllerFrom: from, sender: sender)
-        super.init()
-        name = "Display Contact View Controller"
-        contactViewController.delegate = delegate
-    }
-
-    public override func executeContactsTask() throws {
-        contactViewController.contactStore = store
-        produceOperation(ui)
-    }
-}
-
-@available(iOS 9.0, *)
-final public class ContactsDisplayCreateContactViewController<F: PresentingViewController>: GroupOperation {
+final public class DisplayCreateContactViewController<F: PresentingViewController>: GroupOperation {
 
     let store = CNContactStore()
     let delegate: CNContactViewControllerDelegate

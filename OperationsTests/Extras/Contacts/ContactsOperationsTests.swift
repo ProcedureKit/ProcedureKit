@@ -21,6 +21,11 @@ class TestableContactsRegistrar: ContactsPermissionRegistrar {
     var status: CNAuthorizationStatus
     let accessRequestShouldSucceed: Bool
 
+    required init() {
+        self.status = .NotDetermined
+        self.accessRequestShouldSucceed = true
+    }
+
     init(status: CNAuthorizationStatus, accessRequestShouldSucceed: Bool = true) {
         self.status = status
         self.accessRequestShouldSucceed = accessRequestShouldSucceed
@@ -52,7 +57,7 @@ class ContactsOperationsTests: OperationTests {
 
         let registrar = TestableContactsRegistrar(status: .NotDetermined)
         let operation = TestOperation()
-        operation.addCondition(ContactsCondition(registrar: registrar))
+        operation.addCondition(_ContactsCondition(registrar: registrar))
 
         addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
         runOperation(operation)
@@ -67,7 +72,7 @@ class ContactsOperationsTests: OperationTests {
 
         let registrar = TestableContactsRegistrar(status: .Authorized)
         let operation = TestOperation()
-        operation.addCondition(ContactsCondition(registrar: registrar))
+        operation.addCondition(_ContactsCondition(registrar: registrar))
 
         addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
         runOperation(operation)
@@ -81,7 +86,7 @@ class ContactsOperationsTests: OperationTests {
     func test__given_authorization_denied__access_fails() {
         let registrar = TestableContactsRegistrar(status: .NotDetermined, accessRequestShouldSucceed: false)
         let operation = TestOperation()
-        operation.addCondition(ContactsCondition(registrar: registrar))
+        operation.addCondition(_ContactsCondition(registrar: registrar))
 
         addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
         runOperation(operation)
