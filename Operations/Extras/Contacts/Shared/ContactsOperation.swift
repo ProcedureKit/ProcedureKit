@@ -13,8 +13,6 @@ public enum ContactsPermissionError: ErrorType {
     case AuthorizationDenied
     case AuthorizationRestricted
     case AuthorizationNotDetermined
-    case UnknownErrorOccured
-    case ErrorOccured(NSError)
 }
 
 @available(iOS 9.0, OSX 10.11, *)
@@ -161,10 +159,10 @@ public class _ContactsAccess<Store: ContactsPermissionRegistrar>: Operation {
             }
 
         case let (false, .Some(error)):
-            finish(ContactsPermissionError.ErrorOccured(error))
+            finish(ContactsError.ErrorOccured(error))
 
         case (false, _):
-            finish(ContactsPermissionError.UnknownErrorOccured)
+            finish(ContactsError.UnknownErrorOccured)
         }
     }
 
