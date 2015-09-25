@@ -105,9 +105,6 @@ public typealias ContactsOperation = _ContactsOperation<CNContactStore>
 public typealias GetContacts = _GetContacts<CNContactStore>
 
 @available(iOS 9.0, OSX 10.11, *)
-public typealias CreateContactsGroup = _CreateContactsGroup<CNContactStore>
-
-@available(iOS 9.0, OSX 10.11, *)
 public typealias GetContactsGroup = _GetContactsGroup<CNContactStore>
 
 
@@ -258,16 +255,20 @@ public class _GetContacts<Store: ContactStoreType>: _ContactsOperation<Store> {
 }
 
 @available(iOS 9.0, OSX 10.11, *)
-public class _CreateContactsGroup<Store: ContactStoreType>: _ContactsOperation<Store> {
+public class _GetContactsGroup<Store: ContactStoreType>: _ContactsOperation<Store> {
 
     let groupName: String
+    let createIfNecessary: Bool
 
-    public init(groupName: String, containerId: CNContainer.ID = .Default, entityType: CNEntityType = .Contacts, contactStore: Store = Store()) {
+    public var group: CNGroup? = .None
+
+    public init(groupName: String, createIfNecessary: Bool = true, containerId: CNContainer.ID = .Default, entityType: CNEntityType = .Contacts, contactStore: Store = Store()) {
         self.groupName = groupName
+        self.createIfNecessary = createIfNecessary
         super.init(containerId: containerId, entityType: entityType, contactStore: contactStore)
     }
 
-    public override func executeContactsTask() throws {
+    func createGroup() throws {
         let group = CNMutableGroup()
         group.name = groupName
 
@@ -275,28 +276,15 @@ public class _CreateContactsGroup<Store: ContactStoreType>: _ContactsOperation<S
         save.addGroup(group, toContainerWithIdentifier: containerIdentifier)
 
         try store.opr_executeSaveRequest(save)
-    }
-}
 
-@available(iOS 9.0, OSX 10.11, *)
-public class _GetContactsGroup<Store: ContactStoreType>: _ContactsOperation<Store> {
-
-    let groupName: String
-
-    public var group: CNGroup? = .None
-
-    public init(groupName: String, containerId: CNContainer.ID = .Default, entityType: CNEntityType = .Contacts, contactStore: Store = Store()) {
-        self.groupName = groupName
-        super.init(containerId: containerId, entityType: entityType, contactStore: contactStore)
+        self.group = group
     }
 
     public override func executeContactsTask() throws {
-        do {
-            group = try groupsNamed(groupName).first
-            finish()
-        }
-        catch let error {
-            finish(error)
+        group = try groupsNamed(groupName).first
+
+        if createIfNecessary && group != nil {
+            try createGroup()
         }
     }
 }
