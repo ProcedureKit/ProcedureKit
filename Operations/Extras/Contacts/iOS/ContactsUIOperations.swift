@@ -10,9 +10,10 @@ import Contacts
 import ContactsUI
 
 @available(iOS 9.0, *)
-final public class DisplayContactViewController<F: PresentingViewController>: GroupOperation {
+public typealias ContactViewControllerConfigurationBlock = CNContactViewController -> Void
 
-    public typealias ContactViewControllerConfigurationBlock = CNContactViewController -> Void
+@available(iOS 9.0, *)
+final public class DisplayContactViewController<F: PresentingViewController>: GroupOperation {
 
     let from: ViewControllerDisplayStyle<F>
     let sender: AnyObject?
@@ -49,32 +50,29 @@ final public class DisplayContactViewController<F: PresentingViewController>: Gr
 }
 
 @available(iOS 9.0, *)
-final public class DisplayCreateContactViewController<F: PresentingViewController>: GroupOperation {
+final public class DisplayCreateContactViewController<F: PresentingViewController>: Operation {
 
-    let store = CNContactStore()
-    let delegate: CNContactViewControllerDelegate
+    let configuration: ContactViewControllerConfigurationBlock?
     let ui: UIOperation<CNContactViewController, F>
 
     public var contactViewController: CNContactViewController {
         return ui.controller
     }
 
-    public init(displayControllerFrom from: ViewControllerDisplayStyle<F>, delegate: CNContactViewControllerDelegate, sender: AnyObject? = .None, addToGroupWithName groupName: String? = .None) {
-        self.delegate = delegate
-        self.ui = UIOperation(controller: CNContactViewController(forNewContact: .None), displayControllerFrom: from, sender: sender)
-        let op = groupName.map { GetContactsGroup(groupName: $0) } ?? ContactsOperation()
-        super.init(operations: [op])
+    public init(displayControllerFrom from: ViewControllerDisplayStyle<F>, delegate: CNContactViewControllerDelegate, sender: AnyObject? = .None, configuration: ContactViewControllerConfigurationBlock? = .None) {
+
+        let controller = CNContactViewController(forNewContact: .None)
+        controller.contactStore = CNContactStore()
+        controller.delegate = delegate
+        self.ui = UIOperation(controller: controller, displayControllerFrom: from, sender: sender)
+        self.configuration = configuration
+        super.init()
         name = "Display Create Contact View Controller"
     }
 
-    public override func operationDidFinish(operation: NSOperation, withErrors errors: [ErrorType]) {
-        if errors.isEmpty {
-            contactViewController.delegate = delegate
-            if let getGroupOperation = operation as? GetContactsGroup {
-                contactViewController.parentGroup = getGroupOperation.group
-            }
-            addOperation(ui)
-        }
+    public override func execute() {
+        configuration?(contactViewController)
+        produceOperation(ui)
     }
 }
 
