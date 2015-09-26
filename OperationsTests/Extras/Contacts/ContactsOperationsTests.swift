@@ -11,7 +11,11 @@ import Contacts
 
 @testable import Operations
 
-class TestableContactsRegistrar: ContactsPermissionRegistrar {
+class TestableContactsStore: ContactStoreType {
+
+    enum Error: ErrorType {
+        case NotImplemented
+    }
 
     var didAccessStatus = false
     var didRequestAccess = false
@@ -49,13 +53,41 @@ class TestableContactsRegistrar: ContactsPermissionRegistrar {
             completion(false, accessError)
         }
     }
+
+    func opr_defaultContainerIdentifier() -> String {
+        return "not implmented"
+    }
+
+    func opr_unifiedContactWithIdentifier(identifier: String, keysToFetch keys: [CNKeyDescriptor]) throws -> CNContact {
+        throw Error.NotImplemented
+    }
+
+    func opr_unifiedContactsMatchingPredicate(predicate: NSPredicate, keysToFetch keys: [CNKeyDescriptor]) throws -> [CNContact] {
+        throw Error.NotImplemented
+    }
+
+    func opr_groupsMatchingPredicate(predicate: NSPredicate?) throws -> [CNGroup] {
+        throw Error.NotImplemented
+    }
+
+    func opr_containersMatchingPredicate(predicate: NSPredicate?) throws -> [CNContainer] {
+        throw Error.NotImplemented
+    }
+
+    func opr_enumerateContactsWithFetchRequest(fetchRequest: CNContactFetchRequest, usingBlock block: (CNContact, UnsafeMutablePointer<ObjCBool>) -> Void) throws {
+        throw Error.NotImplemented
+    }
+
+    func opr_executeSaveRequest(saveRequest: CNSaveRequest) throws {
+        throw Error.NotImplemented
+    }
 }
 
 class ContactsOperationsTests: OperationTests {
 
     func test__given_authorization_granted__access_succeeds() {
 
-        let registrar = TestableContactsRegistrar(status: .NotDetermined)
+        let registrar = TestableContactsStore(status: .NotDetermined)
         let operation = TestOperation()
         operation.addCondition(_ContactsCondition(registrar: registrar))
 
@@ -70,7 +102,7 @@ class ContactsOperationsTests: OperationTests {
 
     func test__given_authorization_already_granted__access_succeeds() {
 
-        let registrar = TestableContactsRegistrar(status: .Authorized)
+        let registrar = TestableContactsStore(status: .Authorized)
         let operation = TestOperation()
         operation.addCondition(_ContactsCondition(registrar: registrar))
 
@@ -84,7 +116,7 @@ class ContactsOperationsTests: OperationTests {
     }
 
     func test__given_authorization_denied__access_fails() {
-        let registrar = TestableContactsRegistrar(status: .NotDetermined, accessRequestShouldSucceed: false)
+        let registrar = TestableContactsStore(status: .NotDetermined, accessRequestShouldSucceed: false)
         let operation = TestOperation()
         operation.addCondition(_ContactsCondition(registrar: registrar))
 
