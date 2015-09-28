@@ -333,7 +333,10 @@ public class _AddContactsToGroup<Store: ContactStoreType>: _GetContactsGroup<Sto
     }
 }
 
+@available(iOS 9.0, OSX 10.11, *)
+public class _RemoveContactsFromGroup<Store: ContactStoreType>: _GetContactsGroup<Store> {
 
+}
 
 
 
