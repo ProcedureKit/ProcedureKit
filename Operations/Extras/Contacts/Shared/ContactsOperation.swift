@@ -8,112 +8,6 @@
 
 import Contacts
 
-@available(iOS 9.0, OSX 10.11, *)
-public enum ContactsPermissionError: ErrorType {
-    case AuthorizationDenied
-    case AuthorizationRestricted
-    case AuthorizationNotDetermined
-}
-
-@available(iOS 9.0, OSX 10.11, *)
-public enum ContactsError: ErrorType {
-    case UnknownErrorOccured
-    case ErrorOccured(NSError)
-}
-
-@available(iOS 9.0, OSX 10.11, *)
-public protocol ContactsPermissionRegistrar {
-    init()    
-    func opr_authorizationStatusForEntityType(entityType: CNEntityType) -> CNAuthorizationStatus
-    func opr_requestAccessForEntityType(entityType: CNEntityType, completion: (Bool, NSError?) -> Void)
-}
-
-@available(iOS 9.0, OSX 10.11, *)
-public protocol ContactStoreType: ContactsPermissionRegistrar {
-    func opr_defaultContainerIdentifier() -> String
-    func opr_unifiedContactWithIdentifier(identifier: String, keysToFetch keys: [CNKeyDescriptor]) throws -> CNContact
-    func opr_unifiedContactsMatchingPredicate(predicate: NSPredicate, keysToFetch keys: [CNKeyDescriptor]) throws -> [CNContact]
-    func opr_groupsMatchingPredicate(predicate: NSPredicate?) throws -> [CNGroup]
-    func opr_containersMatchingPredicate(predicate: NSPredicate?) throws -> [CNContainer]
-    func opr_enumerateContactsWithFetchRequest(fetchRequest: CNContactFetchRequest, usingBlock block: (CNContact, UnsafeMutablePointer<ObjCBool>) -> Void) throws
-    func opr_executeSaveRequest(saveRequest: CNSaveRequest) throws
-}
-
-@available(iOS 9.0, OSX 10.11, *)
-extension CNContainer {
-    public enum ID {
-        case Default
-        case Identifier(String)
-
-        var identifier: String {
-            switch self {
-            case .Default:
-                return CNContactStore().defaultContainerIdentifier()
-            case .Identifier(let id):
-                return id
-            }
-        }
-    }
-
-    public enum Predicate {
-        case WithIdentifiers([ID])
-        case OfContactWithIdentifier(String)
-        case OfGroupWithIdentifier(String)
-
-        var predicate: NSPredicate {
-            switch self {
-            case .WithIdentifiers(let IDs):
-                return CNContainer.predicateForContainersWithIdentifiers(IDs.map { $0.identifier })
-            case .OfContactWithIdentifier(let contactID):
-                return CNContainer.predicateForContainerOfContactWithIdentifier(contactID)
-            case .OfGroupWithIdentifier(let groupID):
-                return CNContainer.predicateForContainerOfGroupWithIdentifier(groupID)
-            }
-        }
-    }
-}
-
-@available(iOS 9.0, OSX 10.11, *)
-extension CNContact {
-    public enum Predicate {
-        case MatchingName(String)
-        case WithIdentifiers([String])
-        case InGroupWithIdentifier(String)
-        case InContainerWithID(CNContainer.ID)
-
-        var predicate: NSPredicate {
-            switch self {
-            case .MatchingName(let name):
-                return CNContact.predicateForContactsMatchingName(name)
-            case .WithIdentifiers(let identifiers):
-                return CNContact.predicateForContactsWithIdentifiers(identifiers)
-            case .InGroupWithIdentifier(let identifier):
-                return CNContact.predicateForContactsInGroupWithIdentifier(identifier)
-            case .InContainerWithID(let id):
-                return CNContact.predicateForContactsInContainerWithIdentifier(id.identifier)
-            }
-        }
-    }
-}
-
-@available(iOS 9.0, OSX 10.11, *)
-extension CNGroup {
-
-    public enum Predicate {
-        case WithIdentifiers([String])
-        case InContainerWithID(CNContainer.ID)
-
-        var predicate: NSPredicate {
-            switch self {
-            case .WithIdentifiers(let identifiers):
-                return CNGroup.predicateForGroupsWithIdentifiers(identifiers)
-            case .InContainerWithID(let id):
-                return CNGroup.predicateForGroupsInContainerWithIdentifier(id.identifier)
-            }
-        }
-    }
-}
-
 // MARK: - Public Type Interfaces
 
 @available(iOS 9.0, OSX 10.11, *)
@@ -128,6 +22,8 @@ public typealias GetContactsGroup = _GetContactsGroup<SystemContactStore>
 @available(iOS 9.0, OSX 10.11, *)
 public typealias AddContactsToGroup = _AddContactsToGroup<SystemContactStore>
 
+@available(iOS 9.0, OSX 10.11, *)
+public typealias RemoveContactsFromGroup = _RemoveContactsFromGroup<SystemContactStore>
 
 
 // MARK: - Testable Class Interfaces
@@ -228,27 +124,50 @@ public class _ContactsOperation<Store: ContactStoreType>: _ContactsAccess<Store>
         let group = CNMutableGroup()
         group.name = name
 
-        let save = CNSaveRequest()
-        save.addGroup(group, toContainerWithIdentifier: containerIdentifier)
+        let save = Store.SaveRequest()
+        save.opr_addGroup(group, toContainerWithIdentifier: containerIdentifier)
 
         try store.opr_executeSaveRequest(save)
 
         return group
     }
 
+    public func removeGroupWithName(name: String) throws {
+        if let group = try groupsNamed(name).first {
+            let save = Store.SaveRequest()
+            save.opr_deleteGroup(group.mutableCopy() as! CNMutableGroup)
+            try store.opr_executeSaveRequest(save)
+        }
+    }
+    
     public func addContactsWithIdentifiers(contactIDs: [String], toGroupNamed groupName: String) throws {
         guard contactIDs.count > 0 else { return }
 
         let group = try groupsNamed(groupName).first ?? createGroupWithName(groupName)
-        let save = CNSaveRequest()
+        let save = Store.SaveRequest()
 
         let fetch = CNContactFetchRequest(keysToFetch: [CNContactIdentifierKey])
         fetch.predicate = CNContact.predicateForContactsWithIdentifiers(contactIDs)
 
         try store.opr_enumerateContactsWithFetchRequest(fetch) { contact, _ in
-            save.addMember(contact, toGroup: group)
+            save.opr_addMember(contact, toGroup: group)
         }
 
+        try store.opr_executeSaveRequest(save)
+    }
+    
+    public func removeContactsWithIdentifiers(contactIDs: [String], fromGroupNamed groupName: String) throws {
+        guard contactIDs.count > 0, let group = try groupsNamed(groupName).first else { return }
+        
+        let save = Store.SaveRequest()
+        
+        let fetch = CNContactFetchRequest(keysToFetch: [CNContactIdentifierKey])
+        fetch.predicate = CNContact.predicateForContactsWithIdentifiers(contactIDs)
+        
+        try store.opr_enumerateContactsWithFetchRequest(fetch) { contact, _ in
+            save.opr_removeMember(contact, fromGroup: group)
+        }
+        
         try store.opr_executeSaveRequest(save)
     }
 }
@@ -315,6 +234,22 @@ public class _GetContactsGroup<Store: ContactStoreType>: _ContactsOperation<Stor
     }
 }
 
+// MARK: - RemoveContactsGroup
+
+@available(iOS 9.0, OSX 10.11, *)
+public class _RemoveContactsGroup<Store: ContactStoreType>: _GetContactsGroup<Store> {
+
+    public init(groupName: String, containerId: CNContainer.ID = .Default, entityType: CNEntityType = .Contacts, contactStore: Store = Store()) {
+        super.init(groupName: groupName, createIfNecessary: false, containerId: containerId, entityType: entityType, contactStore: contactStore)
+        name = "Remove Contacts Group"
+    }
+    
+    public override func executeContactsTask() throws {
+        try removeGroupWithName(groupName)
+    }
+}
+
+
 // MARK: - AddContactsToGroup
 
 @available(iOS 9.0, OSX 10.11, *)
@@ -324,7 +259,7 @@ public class _AddContactsToGroup<Store: ContactStoreType>: _GetContactsGroup<Sto
     public init(groupName: String, createIfNecessary: Bool = true, contactIDs: [String], containerId: CNContainer.ID = .Default, entityType: CNEntityType = .Contacts, contactStore: Store = Store()) {
         self.contactIDs = contactIDs
         super.init(groupName: groupName, createIfNecessary: createIfNecessary, containerId: containerId, entityType: entityType, contactStore: contactStore)
-        name = "Add Contact to Group: \(groupName)"
+        name = "Add Contacts to Group: \(groupName)"
     }
 
     public override func executeContactsTask() throws {
@@ -333,80 +268,26 @@ public class _AddContactsToGroup<Store: ContactStoreType>: _GetContactsGroup<Sto
     }
 }
 
+// MARK: - RemoveContactsFromGroup
+
 @available(iOS 9.0, OSX 10.11, *)
 public class _RemoveContactsFromGroup<Store: ContactStoreType>: _GetContactsGroup<Store> {
 
-}
-
-
-
-
-
-
-
-// MARK: - Helpers
-
-@available(iOS 9.0, OSX 10.11, *)
-extension ContactStoreType {
-
-    public func flatMapAllContactsWithFetchRequest<T>(fetchRequest: CNContactFetchRequest, transform: CNContact -> T?) throws -> [T] {
-        var result = [T]()
-        try opr_enumerateContactsWithFetchRequest(fetchRequest) { contact, _ in
-            if let tmp = transform(contact) {
-                result.append(tmp)
-            }
-        }
-        return result
+    let contactIDs: [String]
+    public init(groupName: String, contactIDs: [String], containerId: CNContainer.ID = .Default, entityType: CNEntityType = .Contacts, contactStore: Store = Store()) {
+        self.contactIDs = contactIDs
+        super.init(groupName: groupName, createIfNecessary: false, containerId: containerId, entityType: entityType, contactStore: contactStore)
+        name = "Remove Contacts from Group: \(groupName)"
+    }
+    
+    public override func executeContactsTask() throws {
+        try super.executeContactsTask()
+        try addContactsWithIdentifiers(contactIDs, toGroupNamed: groupName)
     }
 }
 
-// MARK: - Conformance
 
-@available(iOS 9.0, OSX 10.11, *)
-public struct SystemContactStore: ContactStoreType {
 
-    let store: CNContactStore
-
-    public init() {
-        store = CNContactStore()
-    }
-
-    public func opr_authorizationStatusForEntityType(entityType: CNEntityType) -> CNAuthorizationStatus {
-        return CNContactStore.authorizationStatusForEntityType(entityType)
-    }
-
-    public func opr_requestAccessForEntityType(entityType: CNEntityType, completion: (Bool, NSError?) -> Void) {
-        store.requestAccessForEntityType(entityType, completionHandler: completion)
-    }
-
-    public func opr_defaultContainerIdentifier() -> String {
-        return store.defaultContainerIdentifier()
-    }
-
-    public func opr_unifiedContactWithIdentifier(identifier: String, keysToFetch keys: [CNKeyDescriptor]) throws -> CNContact {
-        return try store.unifiedContactWithIdentifier(identifier, keysToFetch: keys)
-    }
-
-    public func opr_unifiedContactsMatchingPredicate(predicate: NSPredicate, keysToFetch keys: [CNKeyDescriptor]) throws -> [CNContact] {
-        return try store.unifiedContactsMatchingPredicate(predicate, keysToFetch: keys)
-    }
-
-    public func opr_groupsMatchingPredicate(predicate: NSPredicate?) throws -> [CNGroup] {
-        return try store.groupsMatchingPredicate(predicate)
-    }
-
-    public func opr_containersMatchingPredicate(predicate: NSPredicate?) throws -> [CNContainer] {
-        return try store.containersMatchingPredicate(predicate)
-    }
-
-    public func opr_enumerateContactsWithFetchRequest(fetchRequest: CNContactFetchRequest, usingBlock block: (CNContact, UnsafeMutablePointer<ObjCBool>) -> Void) throws {
-        try store.enumerateContactsWithFetchRequest(fetchRequest, usingBlock: block)
-    }
-
-    public func opr_executeSaveRequest(saveRequest: CNSaveRequest) throws {
-        try store.executeSaveRequest(saveRequest)
-    }
-}
 
 
 
