@@ -104,12 +104,12 @@ public class _ContactsOperation<Store: ContactStoreType>: _ContactsAccess<Store>
 
     // Public API
 
-    public func container() throws -> CNContainer? {
-        return try containersWithPredicate(.WithIdentifiers([containerId])).first
-    }
-
     public func containersWithPredicate(predicate: CNContainer.Predicate) throws -> [CNContainer] {
         return try store.opr_containersMatchingPredicate(predicate.predicate)
+    }
+
+    public func container() throws -> CNContainer? {
+        return try containersWithPredicate(.WithIdentifiers([containerId])).first
     }
 
     public func allGroups() throws -> [CNGroup] {

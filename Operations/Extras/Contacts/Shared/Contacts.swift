@@ -22,13 +22,6 @@ public enum ContactsError: ErrorType {
 }
 
 @available(iOS 9.0, OSX 10.11, *)
-public protocol ContactsPermissionRegistrar {
-    init()
-    func opr_authorizationStatusForEntityType(entityType: CNEntityType) -> CNAuthorizationStatus
-    func opr_requestAccessForEntityType(entityType: CNEntityType, completion: (Bool, NSError?) -> Void)
-}
-
-@available(iOS 9.0, OSX 10.11, *)
 public protocol ContactsSaveRequestType {
     init()
     func opr_addContact(contact: CNMutableContact, toContainerWithIdentifier identifier: String?)
@@ -42,9 +35,12 @@ public protocol ContactsSaveRequestType {
 }
 
 @available(iOS 9.0, OSX 10.11, *)
-public protocol ContactStoreType: ContactsPermissionRegistrar {
+public protocol ContactStoreType {
     typealias SaveRequest: ContactsSaveRequestType
     
+    init()
+    func opr_authorizationStatusForEntityType(entityType: CNEntityType) -> CNAuthorizationStatus
+    func opr_requestAccessForEntityType(entityType: CNEntityType, completion: (Bool, NSError?) -> Void)
     func opr_defaultContainerIdentifier() -> String
     func opr_unifiedContactWithIdentifier(identifier: String, keysToFetch keys: [CNKeyDescriptor]) throws -> CNContact
     func opr_unifiedContactsMatchingPredicate(predicate: NSPredicate, keysToFetch keys: [CNKeyDescriptor]) throws -> [CNContact]

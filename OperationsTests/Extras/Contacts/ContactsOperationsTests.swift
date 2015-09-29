@@ -83,6 +83,29 @@ class TestableContactsStore: ContactStoreType {
     }
 }
 
+class ContactsTests: XCTestCase {
+    
+    func test__container_default_identifier() {
+        XCTAssertEqual(CNContainer.ID.Default.identifier, CNContactStore().defaultContainerIdentifier())
+    }
+    
+//    func test__container_predicate_with_identifiers() {
+//        let id = "operations-container"
+//        let predicate = CNContainer.Predicate.WithIdentifiers([CNContainer.ID.Identifier(id)]).predicate
+//        XCTAssertEqual(predicate, CNContainer.predicateForContainersWithIdentifiers([id]))
+//    }
+    
+    func test__container_predicate_of_contact_with_identifier() {
+        let predicate: CNContainer.Predicate = .OfContactWithIdentifier("contact-1")
+        XCTAssertEqual(predicate.predicate, CNContainer.predicateForContainerOfContactWithIdentifier("contact-1"))
+    }
+    
+    func test__container_predicate_of_group_with_identifier() {
+        let predicate: CNContainer.Predicate = .OfGroupWithIdentifier("group-1")
+        XCTAssertEqual(predicate.predicate, CNContainer.predicateForContainerOfGroupWithIdentifier("group-1"))
+    }
+}
+
 class ContactsOperationsTests: OperationTests {
 
     func test__given_authorization_granted__access_succeeds() {
@@ -129,4 +152,16 @@ class ContactsOperationsTests: OperationTests {
         XCTAssertTrue(registrar.didRequestAccess)
     }
 
+    // Contacts Operation API
+
+//    func test__given_access_all_groups_queries_store_correctly() {
+//        let store = TestableContactsStore(status: .Authorized)
+//        let allGroups = ContactsOperation(contactStore: store)
+//        
+//        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+//        runOperation(operation)
+//        waitForExpectationsWithTimeout(3, handler: nil)
+//        
+//    }
+    
 }
