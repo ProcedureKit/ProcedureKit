@@ -56,13 +56,13 @@ class TestableContactSaveRequest: ContactSaveRequestType {
     }
 
     func opr_addMember(contact: CNContact, toGroup group: CNGroup) {
-        addedMemberToGroup[group.identifier] = addedMemberToGroup[group.identifier] ?? []
-        addedMemberToGroup[group.identifier]!.append(contact)
+        addedMemberToGroup[group.name] = addedMemberToGroup[group.name] ?? []
+        addedMemberToGroup[group.name]!.append(contact)
     }
 
     func opr_removeMember(contact: CNContact, fromGroup group: CNGroup) {
-        removedMemberFromGroup[group.identifier] = removedMemberFromGroup[group.identifier] ?? []
-        removedMemberFromGroup[group.identifier]!.append(contact)
+        removedMemberFromGroup[group.name] = removedMemberFromGroup[group.identifier] ?? []
+        removedMemberFromGroup[group.name]!.append(contact)
     }
 }
 
@@ -76,16 +76,17 @@ class TestableContactsStore: ContactStoreType {
     var didAccessStatus = false
     var didRequestAccess = false
     var didExecuteSaveRequest: TestableContactSaveRequest? = .None
+    var didAccessEnumerateContactsWithFetchRequest: CNContactFetchRequest? = .None
 
     var didAccessDefaultContainerIdentifier = false
     var didAccessUnifiedContactWithIdentifier = false
     var didAccessUnifiedContactsMatchingPredicate = false
     var didAccessGroupsMatchingPredicate = false
     var didAccessContainersMatchingPredicate = false
-    var didAccessEnumerateContactsWithFetchRequest = false
 
     var contactsByIdentifier = Dictionary<String, CNContact>()
     var contactsMatchingPredicate = Dictionary<ContactPredicate, [CNContact]>()
+    var contactsToEnumerate = Array<CNMutableContact>()
     var containersMatchingPredicate = Dictionary<ContainerPredicate, [CNContainer]>()
     var groupsMatchingPredicate = Dictionary<GroupPredicate, [CNGroup]>()
 
@@ -162,8 +163,12 @@ class TestableContactsStore: ContactStoreType {
     }
 
     func opr_enumerateContactsWithFetchRequest(fetchRequest: CNContactFetchRequest, usingBlock block: (CNContact, UnsafeMutablePointer<ObjCBool>) -> Void) throws {
-        didAccessEnumerateContactsWithFetchRequest = true
-        throw Error.NotImplemented
+        didAccessEnumerateContactsWithFetchRequest = fetchRequest
+        var stop: ObjCBool = false
+        for contact in contactsToEnumerate {
+            block(contact, &stop)
+            if stop { break }
+        }
     }
 
     func opr_executeSaveRequest(saveRequest: TestableContactSaveRequest) throws {
@@ -215,6 +220,10 @@ class ContactsTests: OperationTests {
         group.name = groupName
         store.groupsMatchingPredicate[.InContainerWithID(.Default)] = [group]
         return group
+    }
+
+    func setUpForContactEnumerationWithContactIds(contactIds: [String]) {
+        store.contactsToEnumerate = contactIds.map { _ in CNMutableContact() }
     }
 }
 
@@ -436,6 +445,41 @@ class RemoveContactsGroupOperationTests: ContactsTests {
         }
 
         XCTAssertEqual(deletedGroupName, groupName)
+    }
+}
+
+class AddContactsToGroupOperationTests: ContactsTests {
+
+    let groupName = "test group"
+    let contactIds = [ "contact_0", "contact_1", "contact_2" ]
+    let containerId = "test container"
+    var operation: _AddContactsToGroup<TestableContactsStore>!
+
+    func test__add_contacts_to_group_sets_operation_name() {
+        operation = _AddContactsToGroup(groupName: groupName, contactIDs: contactIds, contactStore: store)
+        XCTAssertEqual(operation.name!, "Add Contacts to Group: \(groupName)")
+    }
+
+    func test__add_contacts_to_group_when_group_exists() {
+        let _ = setUpForGroupsWithName(groupName)
+        setUpForContactEnumerationWithContactIds(contactIds)
+        operation = _AddContactsToGroup(groupName: groupName, contactIDs: contactIds, contactStore: store)
+
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        runOperation(operation)
+        waitForExpectationsWithTimeout(3, handler: nil)
+
+        guard let executedSaveRequest = store.didExecuteSaveRequest else {
+            XCTFail("Did not execute a save request.")
+            return
+        }
+
+        guard let addedMembers = executedSaveRequest.addedMemberToGroup[groupName] else {
+            XCTFail("Did not add any members to this group in the save request.")
+            return
+        }
+
+        XCTAssertEqual(store.contactsToEnumerate, addedMembers)
     }
 }
 

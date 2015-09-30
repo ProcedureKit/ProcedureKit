@@ -256,6 +256,7 @@ public class _RemoveContactsGroup<Store: ContactStoreType>: _GetContactsGroup<St
 public class _AddContactsToGroup<Store: ContactStoreType>: _GetContactsGroup<Store> {
 
     let contactIDs: [String]
+
     public init(groupName: String, createIfNecessary: Bool = true, contactIDs: [String], containerId: ContainerID = .Default, entityType: CNEntityType = .Contacts, contactStore: Store = Store()) {
         self.contactIDs = contactIDs
         super.init(groupName: groupName, createIfNecessary: createIfNecessary, containerId: containerId, entityType: entityType, contactStore: contactStore)
