@@ -84,6 +84,8 @@ class TestableContactsStore: ContactStoreType {
     var didAccessContainersMatchingPredicate = false
     var didAccessEnumerateContactsWithFetchRequest = false
 
+    var contactsByIdentifier = Dictionary<String, CNContact>()
+    var contactsMatchingPredicate = Dictionary<ContactPredicate, [CNContact]>()
     var containersMatchingPredicate = Dictionary<ContainerPredicate, [CNContainer]>()
     var groupsMatchingPredicate = Dictionary<GroupPredicate, [CNGroup]>()
 
@@ -129,12 +131,18 @@ class TestableContactsStore: ContactStoreType {
 
     func opr_unifiedContactWithIdentifier(identifier: String, keysToFetch keys: [CNKeyDescriptor]) throws -> CNContact {
         didAccessUnifiedContactWithIdentifier = true
-        throw Error.NotImplemented
+        if let contact = contactsByIdentifier[identifier] {
+            return contact
+        }
+        throw NSError(domain: CNErrorDomain, code: CNErrorCode.RecordDoesNotExist.rawValue, userInfo: nil)
     }
 
     func opr_unifiedContactsMatchingPredicate(predicate: ContactPredicate, keysToFetch keys: [CNKeyDescriptor]) throws -> [CNContact] {
         didAccessUnifiedContactsMatchingPredicate = true
-        throw Error.NotImplemented
+        if let contacts = contactsMatchingPredicate[predicate] {
+            return contacts
+        }
+        throw NSError(domain: CNErrorDomain, code: CNErrorCode.RecordDoesNotExist.rawValue, userInfo: nil)
     }
 
     func opr_groupsMatchingPredicate(predicate: GroupPredicate?) throws -> [CNGroup] {
@@ -163,24 +171,58 @@ class TestableContactsStore: ContactStoreType {
     }
 }
 
-class ContactsTests: XCTestCase {
-    
-    func test__container_default_identifier() {
-        XCTAssertEqual(ContainerID.Default.identifier, CNContactStore().defaultContainerIdentifier())
-    }
-}
-
-class ContactsOperationTests: OperationTests {
+class ContactsTests: OperationTests {
 
     var container = CNContainer()
     var group = CNMutableGroup()
+    var contact = CNMutableContact()
     var store: TestableContactsStore!
-    var operation: _ContactsOperation<TestableContactsStore>!
 
     override func setUp() {
         super.setUp()
         store = TestableContactsStore(status: .Authorized)
+    }
+
+    func setUpForContactWithIdentifier(contactId: String) -> CNContact {
+        store.contactsByIdentifier[contactId] = contact
+        return contact
+    }
+
+    func createContactsForPredicate(predicate: ContactPredicate) -> [CNContact] {
+        switch predicate {
+        case .WithIdentifiers(let identifiers):
+            return identifiers.map { _ in CNContact() }
+        case .MatchingName(let name):
+            return (0..<3).map { i in
+                let contact = CNMutableContact()
+                contact.givenName = "\(name) \(i)"
+                return contact
+            }
+        case .InGroupWithIdentifier(_):
+            return (0..<3).map { _ in CNContact() }
+        case .InContainerWithID(_):
+            return (0..<3).map { _ in CNContact() }
+        }
+    }
+
+    func setUpForContactsWithPredicate(predicate: ContactPredicate) -> [CNContact] {
+        let contacts = createContactsForPredicate(predicate)
+        store.contactsMatchingPredicate[predicate] = contacts
+        return contacts
+    }
+}
+
+class ContactsOperationTests: ContactsTests {
+
+    var operation: _ContactsOperation<TestableContactsStore>!
+
+    override func setUp() {
+        super.setUp()
         operation = _ContactsOperation(contactStore: store)
+    }
+
+    func test__container_default_identifier() {
+        XCTAssertEqual(ContainerID.Default.identifier, CNContactStore().defaultContainerIdentifier())
     }
 
     func test__given_access__container_predicate_with_identifiers() {
@@ -246,6 +288,45 @@ class ContactsOperationTests: OperationTests {
     }
 }
 
+class GetContactsOperationTest: ContactsTests {
+
+    var operation: _GetContacts<TestableContactsStore>!
+
+    func test__get_contact_by_identifier_convenience_initializer() {
+        let contactId = "contact_123"
+        operation = _GetContacts(identifier: contactId, keysToFetch: [])
+        XCTAssertEqual(operation.predicate, ContactPredicate.WithIdentifiers([contactId]))
+    }
+
+    func test__getting_contact_by_identifier() {
+        let contactId = "contact_123"
+        let contact = setUpForContactWithIdentifier(contactId)
+        operation = _GetContacts(predicate: .WithIdentifiers([contactId]), keysToFetch: [], contactStore: store)
+
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        runOperation(operation)
+        waitForExpectationsWithTimeout(3, handler: nil)
+
+        XCTAssertTrue(store.didAccessUnifiedContactWithIdentifier)
+        XCTAssertNotNil(operation.contact)
+        XCTAssertEqual(contact, operation.contact!)
+    }
+
+    func test__getting_contacts_by_name() {
+        let predicate: ContactPredicate = .MatchingName("Dan")
+        let contacts = setUpForContactsWithPredicate(predicate)
+        operation = _GetContacts(predicate: predicate, keysToFetch: [CNContainerNameKey], contactStore: store)
+
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        runOperation(operation)
+        waitForExpectationsWithTimeout(3, handler: nil)
+
+        XCTAssertTrue(store.didAccessUnifiedContactsMatchingPredicate)
+        XCTAssertTrue(operation.contacts.count > 0)
+        XCTAssertEqual(contacts, operation.contacts)
+    }
+}
+
 class ContactsAccessOperationsTests: OperationTests {
 
     func test__given_authorization_granted__access_succeeds() {
@@ -292,3 +373,6 @@ class ContactsAccessOperationsTests: OperationTests {
         XCTAssertTrue(registrar.didRequestAccess)
     }
 }
+
+
+

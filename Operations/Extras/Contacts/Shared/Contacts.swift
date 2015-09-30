@@ -293,9 +293,10 @@ extension GroupPredicate: CustomStringConvertible {
     public var description: String {
         switch self {
         case let .WithIdentifiers(groupIds):
-            return groupIds.joinWithSeparator(" ")
+            let tmp = groupIds.joinWithSeparator(", ")
+            return "groups with identifiers: \(tmp)"
         case let .InContainerWithID(containerId):
-            return containerId.description
+            return "groups in container with id: \(containerId.description)"
         }
     }
 }
@@ -319,4 +320,43 @@ public func ==(a: GroupPredicate, b: GroupPredicate) -> Bool {
     }
 }
 
+@available(iOS 9.0, OSX 10.11, *)
+extension ContactPredicate: CustomStringConvertible {
+    public var description: String {
+        switch self {
+        case .WithIdentifiers(let identifiers):
+            let tmp = identifiers.joinWithSeparator(", ")
+            return "contacts with identifiers: \(tmp)"
+        case .MatchingName(let name):
+            return "contacts matching name: \(name)"
+        case .InContainerWithID(let containerId):
+            return "contacts in container with id: \(containerId)"
+        case .InGroupWithIdentifier(let groupId):
+            return "contacts in group with id: \(groupId)"
+        }
+    }
+}
+
+@available(iOS 9.0, OSX 10.11, *)
+extension ContactPredicate: Hashable {
+    public var hashValue: Int {
+        return description.hashValue
+    }
+}
+
+@available(iOS 9.0, OSX 10.11, *)
+public func ==(a: ContactPredicate, b: ContactPredicate) -> Bool {
+    switch (a, b) {
+    case let (.WithIdentifiers(aIds), .WithIdentifiers(bIds)):
+        return aIds == bIds
+    case let (.MatchingName(aName), .MatchingName(bName)):
+        return aName == bName
+    case let (.InContainerWithID(aId), .InContainerWithID(bId)):
+        return aId == bId
+    case let (.InGroupWithIdentifier(aId), .InGroupWithIdentifier(bId)):
+        return aId == bId
+    default:
+        return false
+    }
+}
 
