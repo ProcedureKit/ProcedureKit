@@ -283,7 +283,7 @@ public class _RemoveContactsFromGroup<Store: ContactStoreType>: _GetContactsGrou
     
     public override func executeContactsTask() throws {
         try super.executeContactsTask()
-        try addContactsWithIdentifiers(contactIDs, toGroupNamed: groupName)
+        try removeContactsWithIdentifiers(contactIDs, fromGroupNamed: groupName)
     }
 }
 

@@ -61,7 +61,7 @@ class TestableContactSaveRequest: ContactSaveRequestType {
     }
 
     func opr_removeMember(contact: CNContact, fromGroup group: CNGroup) {
-        removedMemberFromGroup[group.name] = removedMemberFromGroup[group.identifier] ?? []
+        removedMemberFromGroup[group.name] = removedMemberFromGroup[group.name] ?? []
         removedMemberFromGroup[group.name]!.append(contact)
     }
 }
@@ -480,6 +480,40 @@ class AddContactsToGroupOperationTests: ContactsTests {
         }
 
         XCTAssertEqual(store.contactsToEnumerate, addedMembers)
+    }
+}
+
+class RemoveContactsFromGroupOperationTests: ContactsTests {
+    let groupName = "test group"
+    let contactIds = [ "contact_0", "contact_1", "contact_2" ]
+    let containerId = "test container"
+    var operation: _RemoveContactsFromGroup<TestableContactsStore>!
+
+    func test__remove_contacts_from_group_sets_operation_name() {
+        operation = _RemoveContactsFromGroup(groupName: groupName, contactIDs: contactIds, contactStore: store)
+        XCTAssertEqual(operation.name!, "Remove Contacts from Group: \(groupName)")
+    }
+
+    func test__remove_contacts_from_group() {
+        let _ = setUpForGroupsWithName(groupName)
+        setUpForContactEnumerationWithContactIds(contactIds)
+        operation = _RemoveContactsFromGroup(groupName: groupName, contactIDs: contactIds, contactStore: store)
+
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        runOperation(operation)
+        waitForExpectationsWithTimeout(3, handler: nil)
+
+        guard let executedSaveRequest = store.didExecuteSaveRequest else {
+            XCTFail("Did not execute a save request.")
+            return
+        }
+
+        guard let removedMembers = executedSaveRequest.removedMemberFromGroup[groupName] else {
+            XCTFail("Did not add any members to this group in the save request.")
+            return
+        }
+
+        XCTAssertEqual(store.contactsToEnumerate, removedMembers)
     }
 }
 
