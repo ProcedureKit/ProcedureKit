@@ -84,8 +84,8 @@ class TestableContactsStore: ContactStoreType {
     var didAccessContainersMatchingPredicate = false
     var didAccessEnumerateContactsWithFetchRequest = false
 
-    var containersMatchingPredicate = Dictionary<Container.Predicate, [CNContainer]>()
-    var groupsMatchingPredicate = Dictionary<Group.Predicate, [CNGroup]>()
+    var containersMatchingPredicate = Dictionary<ContainerPredicate, [CNContainer]>()
+    var groupsMatchingPredicate = Dictionary<GroupPredicate, [CNGroup]>()
 
     var requestedEntityType: CNEntityType? = .None
     var accessError: NSError? = .None
@@ -132,12 +132,12 @@ class TestableContactsStore: ContactStoreType {
         throw Error.NotImplemented
     }
 
-    func opr_unifiedContactsMatchingPredicate(predicate: Contact.Predicate, keysToFetch keys: [CNKeyDescriptor]) throws -> [CNContact] {
+    func opr_unifiedContactsMatchingPredicate(predicate: ContactPredicate, keysToFetch keys: [CNKeyDescriptor]) throws -> [CNContact] {
         didAccessUnifiedContactsMatchingPredicate = true
         throw Error.NotImplemented
     }
 
-    func opr_groupsMatchingPredicate(predicate: Group.Predicate?) throws -> [CNGroup] {
+    func opr_groupsMatchingPredicate(predicate: GroupPredicate?) throws -> [CNGroup] {
         didAccessGroupsMatchingPredicate = true
         if let predicate = predicate {
             return groupsMatchingPredicate[predicate] ?? []
@@ -145,7 +145,7 @@ class TestableContactsStore: ContactStoreType {
         return groupsMatchingPredicate.values.flatMap { $0 }
     }
 
-    func opr_containersMatchingPredicate(predicate: Container.Predicate?) throws -> [CNContainer] {
+    func opr_containersMatchingPredicate(predicate: ContainerPredicate?) throws -> [CNContainer] {
         didAccessContainersMatchingPredicate = true
         if let predicate = predicate {
             return containersMatchingPredicate[predicate] ?? []
@@ -166,14 +166,14 @@ class TestableContactsStore: ContactStoreType {
 class ContactsTests: XCTestCase {
     
     func test__container_default_identifier() {
-        XCTAssertEqual(Container.ID.Default.identifier, CNContactStore().defaultContainerIdentifier())
+        XCTAssertEqual(ContainerID.Default.identifier, CNContactStore().defaultContainerIdentifier())
     }
 }
 
 class ContactsOperationTests: OperationTests {
 
     var container = CNContainer()
-    var group = CNGroup()
+    var group = CNMutableGroup()
     var store: TestableContactsStore!
     var operation: _ContactsOperation<TestableContactsStore>!
 
@@ -185,7 +185,7 @@ class ContactsOperationTests: OperationTests {
 
     func test__given_access__container_predicate_with_identifiers() {
 
-        let identifiers: [Container.ID] = [ .Default ]
+        let identifiers: [ContainerID] = [ .Default ]
         store.containersMatchingPredicate[.WithIdentifiers(identifiers)] = [container]
 
         let containers = try! operation.containersWithPredicate(.WithIdentifiers([.Default]))
@@ -233,6 +233,14 @@ class ContactsOperationTests: OperationTests {
     func test__given_access__get_all_groups() {
         store.groupsMatchingPredicate[.WithIdentifiers([ "group_123" ])] = [group]
         let groups = try! operation.allGroups()
+        XCTAssertTrue(store.didAccessGroupsMatchingPredicate)
+        XCTAssertEqual(group, groups.first!)
+    }
+
+    func test__given_access__get_group_named() {
+        group.name = "Test Group"
+        store.groupsMatchingPredicate[.WithIdentifiers([ "group_123" ])] = [group]
+        let groups = try! operation.groupsNamed("Test Group")
         XCTAssertTrue(store.didAccessGroupsMatchingPredicate)
         XCTAssertEqual(group, groups.first!)
     }
