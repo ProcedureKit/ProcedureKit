@@ -28,7 +28,7 @@ class TestableContactSaveRequest: ContactSaveRequestType {
     required init() { }
     
     func opr_addContact(contact: CNMutableContact, toContainerWithIdentifier identifier: String?) {
-        let containerId = identifier ?? "Default"
+        let containerId = identifier ?? ContainerID.Default.identifier
         addedContacts[containerId] = addedContacts[containerId] ?? []
         addedContacts[containerId]!.append(contact)
     }
@@ -42,7 +42,7 @@ class TestableContactSaveRequest: ContactSaveRequestType {
     }
 
     func opr_addGroup(group: CNMutableGroup, toContainerWithIdentifier identifier: String?) {
-        let containerId = identifier ?? "Default"
+        let containerId = identifier ?? ContainerID.Default.identifier
         addedGroups[containerId] = addedGroups[containerId] ?? []
         addedGroups[containerId]!.append(group)
     }
@@ -210,6 +210,12 @@ class ContactsTests: OperationTests {
         store.contactsMatchingPredicate[predicate] = contacts
         return contacts
     }
+
+    func setUpForGroupsWithName(groupName: String) -> CNGroup {
+        group.name = groupName
+        store.groupsMatchingPredicate[.InContainerWithID(.Default)] = [group]
+        return group
+    }
 }
 
 class ContactsOperationTests: ContactsTests {
@@ -292,6 +298,11 @@ class GetContactsOperationTest: ContactsTests {
 
     var operation: _GetContacts<TestableContactsStore>!
 
+    func test__get_contact_sets_operation_name() {
+        operation = _GetContacts(identifier: "contact_123", keysToFetch: [])
+        XCTAssertEqual(operation.name!, "Get Contacts")
+    }
+
     func test__get_contact_by_identifier_convenience_initializer() {
         let contactId = "contact_123"
         operation = _GetContacts(identifier: contactId, keysToFetch: [])
@@ -324,6 +335,64 @@ class GetContactsOperationTest: ContactsTests {
         XCTAssertTrue(store.didAccessUnifiedContactsMatchingPredicate)
         XCTAssertTrue(operation.contacts.count > 0)
         XCTAssertEqual(contacts, operation.contacts)
+    }
+}
+
+class GetContactsGroupOperationTests: ContactsTests {
+
+    let groupName = "test group"
+    let containerId = "test container"
+    var operation: _GetContactsGroup<TestableContactsStore>!
+
+    func test__get_contacts_group_sets_operation_name() {
+        operation = _GetContactsGroup(groupName: groupName, contactStore: store)
+        XCTAssertEqual(operation.name!, "Get Contacts Group")
+    }
+
+    func test__get_contacts_group_sets_create_if_necessary() {
+        operation = _GetContactsGroup(groupName: groupName, contactStore: store)
+        XCTAssertTrue(operation.createIfNecessary)
+    }
+
+    func test__get_contacts_group_sets_group_name_correctly() {
+        operation = _GetContactsGroup(groupName: groupName, contactStore: store)
+        XCTAssertEqual(operation.groupName, groupName)
+    }
+
+    func test__get_contacts_group_retrieves_group() {
+        let group = setUpForGroupsWithName(groupName)
+        operation = _GetContactsGroup(groupName: groupName, contactStore: store)
+
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        runOperation(operation)
+        waitForExpectationsWithTimeout(3, handler: nil)
+
+        XCTAssertTrue(store.didAccessGroupsMatchingPredicate)
+        XCTAssertNil(store.didExecuteSaveRequest)
+        XCTAssertEqual(operation.group!, group)
+    }
+
+    func test__get_contacts_group_creates_group_if_necessary() {
+        operation = _GetContactsGroup(groupName: groupName, containerId: .Identifier(containerId), contactStore: store)
+
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        runOperation(operation)
+        waitForExpectationsWithTimeout(3, handler: nil)
+
+        XCTAssertTrue(store.didAccessGroupsMatchingPredicate)
+
+        guard let executedSaveRequest = store.didExecuteSaveRequest else {
+            XCTFail("Did not execute a save request.")
+            return
+        }
+
+        guard let addedGroup = executedSaveRequest.addedGroups[containerId]?.first else {
+            XCTFail("Did not add a group to the save request.")
+            return
+        }
+
+        XCTAssertEqual(addedGroup.name, groupName)
+        XCTAssertEqual(operation.group!, addedGroup)
     }
 }
 

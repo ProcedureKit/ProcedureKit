@@ -228,7 +228,7 @@ public class _GetContactsGroup<Store: ContactStoreType>: _ContactsOperation<Stor
     public override func executeContactsTask() throws {
         group = try groupsNamed(groupName).first
 
-        if createIfNecessary && group != nil {
+        if createIfNecessary && group == nil {
             group = try createGroupWithName(groupName)
         }
     }
