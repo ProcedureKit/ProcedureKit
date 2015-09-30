@@ -90,13 +90,13 @@ public class _ContactsAccess<Store: ContactStoreType>: Operation {
 @available(iOS 9.0, OSX 10.11, *)
 public class _ContactsOperation<Store: ContactStoreType>: _ContactsAccess<Store> {
 
-    let containerId: CNContainer.ID
+    let containerId: Container.ID
 
     public var containerIdentifier: String {
         return containerId.identifier
     }
 
-    public init(containerId: CNContainer.ID = .Default, entityType: CNEntityType = .Contacts, contactStore: Store = Store()) {
+    public init(containerId: Container.ID = .Default, entityType: CNEntityType = .Contacts, contactStore: Store = Store()) {
         self.containerId = containerId
         super.init(entityType: entityType, contactStore: contactStore)
         name = "Contacts Operation"
@@ -104,8 +104,8 @@ public class _ContactsOperation<Store: ContactStoreType>: _ContactsAccess<Store>
 
     // Public API
 
-    public func containersWithPredicate(predicate: CNContainer.Predicate) throws -> [CNContainer] {
-        return try store.opr_containersMatchingPredicate(predicate.predicate)
+    public func containersWithPredicate(predicate: Container.Predicate) throws -> [CNContainer] {
+        return try store.opr_containersMatchingPredicate(predicate)
     }
 
     public func container() throws -> CNContainer? {
@@ -177,7 +177,7 @@ public class _ContactsOperation<Store: ContactStoreType>: _ContactsAccess<Store>
 @available(iOS 9.0, OSX 10.11, *)
 public class _GetContacts<Store: ContactStoreType>: _ContactsOperation<Store> {
 
-    let predicate: CNContact.Predicate
+    let predicate: Contact.Predicate
     let keysToFetch: [CNKeyDescriptor]
 
     public var contacts = [CNContact]()
@@ -190,7 +190,7 @@ public class _GetContacts<Store: ContactStoreType>: _ContactsOperation<Store> {
         self.init(predicate: .WithIdentifiers([identifier]), keysToFetch: keysToFetch)
     }
 
-    public init(predicate: CNContact.Predicate, keysToFetch: [CNKeyDescriptor], containerId: CNContainer.ID = .Default, entityType: CNEntityType = .Contacts, contactStore: Store = Store()) {
+    public init(predicate: Contact.Predicate, keysToFetch: [CNKeyDescriptor], containerId: Container.ID = .Default, entityType: CNEntityType = .Contacts, contactStore: Store = Store()) {
         self.predicate = predicate
         self.keysToFetch = keysToFetch
         super.init(containerId: containerId, entityType: entityType, contactStore: contactStore)
@@ -203,7 +203,7 @@ public class _GetContacts<Store: ContactStoreType>: _ContactsOperation<Store> {
             let contact = try store.opr_unifiedContactWithIdentifier(identifiers.first!, keysToFetch: keysToFetch)
             contacts = [contact]
         default:
-            contacts = try store.opr_unifiedContactsMatchingPredicate(predicate.predicate, keysToFetch: keysToFetch)
+            contacts = try store.opr_unifiedContactsMatchingPredicate(predicate, keysToFetch: keysToFetch)
         }
     }
 }
@@ -218,7 +218,7 @@ public class _GetContactsGroup<Store: ContactStoreType>: _ContactsOperation<Stor
 
     public var group: CNGroup? = .None
 
-    public init(groupName: String, createIfNecessary: Bool = true, containerId: CNContainer.ID = .Default, entityType: CNEntityType = .Contacts, contactStore: Store = Store()) {
+    public init(groupName: String, createIfNecessary: Bool = true, containerId: Container.ID = .Default, entityType: CNEntityType = .Contacts, contactStore: Store = Store()) {
         self.groupName = groupName
         self.createIfNecessary = createIfNecessary
         super.init(containerId: containerId, entityType: entityType, contactStore: contactStore)
@@ -239,7 +239,7 @@ public class _GetContactsGroup<Store: ContactStoreType>: _ContactsOperation<Stor
 @available(iOS 9.0, OSX 10.11, *)
 public class _RemoveContactsGroup<Store: ContactStoreType>: _GetContactsGroup<Store> {
 
-    public init(groupName: String, containerId: CNContainer.ID = .Default, entityType: CNEntityType = .Contacts, contactStore: Store = Store()) {
+    public init(groupName: String, containerId: Container.ID = .Default, entityType: CNEntityType = .Contacts, contactStore: Store = Store()) {
         super.init(groupName: groupName, createIfNecessary: false, containerId: containerId, entityType: entityType, contactStore: contactStore)
         name = "Remove Contacts Group"
     }
@@ -256,7 +256,7 @@ public class _RemoveContactsGroup<Store: ContactStoreType>: _GetContactsGroup<St
 public class _AddContactsToGroup<Store: ContactStoreType>: _GetContactsGroup<Store> {
 
     let contactIDs: [String]
-    public init(groupName: String, createIfNecessary: Bool = true, contactIDs: [String], containerId: CNContainer.ID = .Default, entityType: CNEntityType = .Contacts, contactStore: Store = Store()) {
+    public init(groupName: String, createIfNecessary: Bool = true, contactIDs: [String], containerId: Container.ID = .Default, entityType: CNEntityType = .Contacts, contactStore: Store = Store()) {
         self.contactIDs = contactIDs
         super.init(groupName: groupName, createIfNecessary: createIfNecessary, containerId: containerId, entityType: entityType, contactStore: contactStore)
         name = "Add Contacts to Group: \(groupName)"
@@ -274,7 +274,7 @@ public class _AddContactsToGroup<Store: ContactStoreType>: _GetContactsGroup<Sto
 public class _RemoveContactsFromGroup<Store: ContactStoreType>: _GetContactsGroup<Store> {
 
     let contactIDs: [String]
-    public init(groupName: String, contactIDs: [String], containerId: CNContainer.ID = .Default, entityType: CNEntityType = .Contacts, contactStore: Store = Store()) {
+    public init(groupName: String, contactIDs: [String], containerId: Container.ID = .Default, entityType: CNEntityType = .Contacts, contactStore: Store = Store()) {
         self.contactIDs = contactIDs
         super.init(groupName: groupName, createIfNecessary: false, containerId: containerId, entityType: entityType, contactStore: contactStore)
         name = "Remove Contacts from Group: \(groupName)"
