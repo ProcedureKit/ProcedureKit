@@ -19,8 +19,8 @@ class TestableContactSaveRequest: ContactSaveRequestType {
     var deletedContacts = [CNMutableContact]()
 
     var addedGroups = [String: [CNMutableGroup]]()
-    var updatedGroups = [String]()
-    var deletedGroups = [String]()
+    var updatedGroups = [CNMutableGroup]()
+    var deletedGroupNames = [String]()
 
     var addedMemberToGroup = [String: [CNContact]]()
     var removedMemberFromGroup = [String: [CNContact]]()
@@ -48,11 +48,11 @@ class TestableContactSaveRequest: ContactSaveRequestType {
     }
 
     func opr_updateGroup(group: CNMutableGroup) {
-        updatedGroups.append(group.identifier)
+        updatedGroups.append(group)
     }
 
     func opr_deleteGroup(group: CNMutableGroup) {
-        deletedGroups.append(group.identifier)
+        deletedGroupNames.append(group.name)
     }
 
     func opr_addMember(contact: CNContact, toGroup group: CNGroup) {
@@ -393,6 +393,49 @@ class GetContactsGroupOperationTests: ContactsTests {
 
         XCTAssertEqual(addedGroup.name, groupName)
         XCTAssertEqual(operation.group!, addedGroup)
+    }
+}
+
+class RemoveContactsGroupOperationTests: ContactsTests {
+
+    let groupName = "test group"
+    let containerId = "test container"
+    var operation: _RemoveContactsGroup<TestableContactsStore>!
+
+    func test__remove_contacts_group_sets_operation_name() {
+        operation = _RemoveContactsGroup(groupName: groupName, contactStore: store)
+        XCTAssertEqual(operation.name!, "Remove Contacts Group")
+    }
+
+    func test__remove_contacts_does_nothing_if_group_does_not_exist() {
+        operation = _RemoveContactsGroup(groupName: groupName, contactStore: store)
+
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        runOperation(operation)
+        waitForExpectationsWithTimeout(3, handler: nil)
+
+        XCTAssertNil(store.didExecuteSaveRequest)
+    }
+
+    func test__remove_contacts_group_removes_group() {
+        let _ = setUpForGroupsWithName(groupName)
+        operation = _RemoveContactsGroup(groupName: groupName, contactStore: store)
+
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        runOperation(operation)
+        waitForExpectationsWithTimeout(3, handler: nil)
+
+        guard let executedSaveRequest = store.didExecuteSaveRequest else {
+            XCTFail("Did not execute a save request.")
+            return
+        }
+
+        guard let deletedGroupName = executedSaveRequest.deletedGroupNames.first else {
+            XCTFail("Did not get the name of the deleted group.")
+            return
+        }
+
+        XCTAssertEqual(deletedGroupName, groupName)
     }
 }
 
