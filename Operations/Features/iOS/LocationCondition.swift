@@ -47,9 +47,9 @@ extension CLLocationManager: LocationManager {
         desiredAccuracy = accuracy
     }
 
-    public func opr_setDelegate(aDelegate: CLLocationManagerDelegate) {
-        delegate = aDelegate
-    }
+//    public func opr_setDelegate(aDelegate: CLLocationManagerDelegate) {
+//        delegate = aDelegate
+//    }
 
     public func opr_startUpdatingLocation() {
         startUpdatingLocation()
