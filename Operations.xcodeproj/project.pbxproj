@@ -141,6 +141,11 @@
 		65882F371BAF6084003F74B6 /* ReachableOperationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65882ECB1BAF6052003F74B6 /* ReachableOperationTests.swift */; };
 		65882F3B1BAF608A003F74B6 /* AddressBookConditionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65882EC01BAF6052003F74B6 /* AddressBookConditionTests.swift */; };
 		65882F3C1BAF608A003F74B6 /* AddressBookTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65882EC11BAF6052003F74B6 /* AddressBookTests.swift */; };
+		659C442D1BBD455D0076D529 /* NetworkOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 659C442C1BBD455D0076D529 /* NetworkOperation.swift */; settings = {ASSET_TAGS = (); }; };
+		659C442E1BBD455D0076D529 /* NetworkOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 659C442C1BBD455D0076D529 /* NetworkOperation.swift */; settings = {ASSET_TAGS = (); }; };
+		659C442F1BBD455D0076D529 /* NetworkOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 659C442C1BBD455D0076D529 /* NetworkOperation.swift */; settings = {ASSET_TAGS = (); }; };
+		659C44301BBD455D0076D529 /* NetworkOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 659C442C1BBD455D0076D529 /* NetworkOperation.swift */; settings = {ASSET_TAGS = (); }; };
+		659C44311BBD455D0076D529 /* NetworkOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 659C442C1BBD455D0076D529 /* NetworkOperation.swift */; settings = {ASSET_TAGS = (); }; };
 		65B505951BB99BBA004C89C2 /* Contacts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65B505941BB99BBA004C89C2 /* Contacts.swift */; settings = {ASSET_TAGS = (); }; };
 		65B505961BB99BBA004C89C2 /* Contacts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65B505941BB99BBA004C89C2 /* Contacts.swift */; settings = {ASSET_TAGS = (); }; };
 		65B505971BB99BBA004C89C2 /* Contacts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65B505941BB99BBA004C89C2 /* Contacts.swift */; settings = {ASSET_TAGS = (); }; };
@@ -309,6 +314,7 @@
 		65882ECD1BAF6052003F74B6 /* UserNotificationConditionTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserNotificationConditionTests.swift; sourceTree = "<group>"; };
 		65882ECE1BAF6052003F74B6 /* WebpageOperationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WebpageOperationTests.swift; sourceTree = "<group>"; };
 		65882ECF1BAF6052003F74B6 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		659C442C1BBD455D0076D529 /* NetworkOperation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = NetworkOperation.swift; path = Operations/Features/Shared/NetworkOperation.swift; sourceTree = SOURCE_ROOT; };
 		65B505941BB99BBA004C89C2 /* Contacts.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Contacts.swift; path = Contacts/Shared/Contacts.swift; sourceTree = "<group>"; };
 		65EEC14A1BAF40CE0020A9BD /* Operations.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Operations.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		65EEC1541BAF40CF0020A9BD /* Operations-iOSTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Operations-iOSTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -490,6 +496,7 @@
 			children = (
 				65EEC2221BAF4F230020A9BD /* CloudKitOperation.swift */,
 				65EEC2181BAF4F230020A9BD /* LocationOperations.swift */,
+				659C442C1BBD455D0076D529 /* NetworkOperation.swift */,
 				65EEC2251BAF4F230020A9BD /* ReachableOperation.swift */,
 				65EEC21E1BAF4F230020A9BD /* WebpageOperation.swift */,
 			);
@@ -1029,6 +1036,7 @@
 				652F5A661BAF7A2800BB5F71 /* BlockCondition.swift in Sources */,
 				65B505991BB99BBA004C89C2 /* Contacts.swift in Sources */,
 				652F5A6E1BAF7A2800BB5F71 /* TimeoutObserver.swift in Sources */,
+				659C44311BBD455D0076D529 /* NetworkOperation.swift in Sources */,
 				652F5A6A1BAF7A2800BB5F71 /* SlientCondition.swift in Sources */,
 				652F5A831BAF7A2800BB5F71 /* ReachableOperation.swift in Sources */,
 				652F5A6B1BAF7A2800BB5F71 /* BackgroundObserver.swift in Sources */,
@@ -1064,6 +1072,7 @@
 				65882E9A1BAF5BEB003F74B6 /* DelayOperation.swift in Sources */,
 				65882E981BAF5BEB003F74B6 /* BlockOperation.swift in Sources */,
 				65882E9C1BAF5BEB003F74B6 /* GroupOperation.swift in Sources */,
+				659C44301BBD455D0076D529 /* NetworkOperation.swift in Sources */,
 				65882E951BAF5BEB003F74B6 /* BlockObserver.swift in Sources */,
 				65882E961BAF5BEB003F74B6 /* TimeoutObserver.swift in Sources */,
 				651E39561BB454BF0013ADE6 /* ContactsCondition.swift in Sources */,
@@ -1097,6 +1106,7 @@
 				65EEC18C1BAF44E80020A9BD /* GroupOperation.swift in Sources */,
 				65EEC1831BAF44E80020A9BD /* NetworkObserver.swift in Sources */,
 				65EEC1891BAF44E80020A9BD /* DelayOperation.swift in Sources */,
+				659C442E1BBD455D0076D529 /* NetworkOperation.swift in Sources */,
 				65EEC22B1BAF4F230020A9BD /* HealthCondition.swift in Sources */,
 				651E397E1BB48D970013ADE6 /* ContactsUIOperations.swift in Sources */,
 				65EEC1971BAF44E80020A9BD /* TimeoutObserver.swift in Sources */,
@@ -1195,6 +1205,7 @@
 				65EEC1C21BAF468D0020A9BD /* NoFailedDependenciesCondition.swift in Sources */,
 				65EEC1BA1BAF468D0020A9BD /* Operation.swift in Sources */,
 				65EEC1BB1BAF468D0020A9BD /* OperationCondition.swift in Sources */,
+				659C442F1BBD455D0076D529 /* NetworkOperation.swift in Sources */,
 				65EEC1BC1BAF468D0020A9BD /* OperationObserver.swift in Sources */,
 				65EEC1BD1BAF468D0020A9BD /* OperationQueue.swift in Sources */,
 				65EEC1C11BAF468D0020A9BD /* NegatedCondition.swift in Sources */,
@@ -1253,6 +1264,7 @@
 				65EEC1FE1BAF4C6F0020A9BD /* NoFailedDependenciesCondition.swift in Sources */,
 				65EEC2041BAF4C6F0020A9BD /* AlertOperation.swift in Sources */,
 				65EEC1F61BAF4C6F0020A9BD /* Operation.swift in Sources */,
+				659C442D1BBD455D0076D529 /* NetworkOperation.swift in Sources */,
 				65EEC2491BAF4FD40020A9BD /* PassbookCondition.swift in Sources */,
 				65EEC1F71BAF4C6F0020A9BD /* OperationCondition.swift in Sources */,
 				65EEC1F81BAF4C6F0020A9BD /* OperationObserver.swift in Sources */,
