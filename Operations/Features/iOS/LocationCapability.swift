@@ -101,7 +101,7 @@ public class _LocationCapability<Registrar: LocationCapabilityRegistrarType>: NS
 
 public typealias Location = _LocationCapability<CLLocationManager>
 
-@available(*, unavailable, renamed="Use AuthorizedFor(Location()).")
+@available(*, unavailable, renamed="AuthorizedFor(Location(.WhenInUse))")
 public typealias LocationCondition = AuthorizedFor<Location>
 
 

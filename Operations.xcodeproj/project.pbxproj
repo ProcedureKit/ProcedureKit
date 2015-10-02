@@ -316,7 +316,6 @@
 		65882EC31BAF6052003F74B6 /* CalendarConditionTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CalendarConditionTests.swift; sourceTree = "<group>"; };
 		65882EC41BAF6052003F74B6 /* CloudConditionTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CloudConditionTests.swift; sourceTree = "<group>"; };
 		65882EC51BAF6052003F74B6 /* HealthConditionTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HealthConditionTests.swift; sourceTree = "<group>"; };
-		65882EC61BAF6052003F74B6 /* LocationConditionTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LocationConditionTests.swift; sourceTree = "<group>"; };
 		65882EC71BAF6052003F74B6 /* LocationOperationsTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LocationOperationsTests.swift; sourceTree = "<group>"; };
 		65882EC81BAF6052003F74B6 /* PassbookConditionTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PassbookConditionTests.swift; sourceTree = "<group>"; };
 		65882EC91BAF6052003F74B6 /* PhotosConditionTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PhotosConditionTests.swift; sourceTree = "<group>"; };
@@ -581,7 +580,6 @@
 				65882EC41BAF6052003F74B6 /* CloudConditionTests.swift */,
 				65882EC51BAF6052003F74B6 /* HealthConditionTests.swift */,
 				651EF48E1BBDCB4900BA962D /* LocationCapabilityTests.swift */,
-				65882EC61BAF6052003F74B6 /* LocationConditionTests.swift */,
 				65882EC71BAF6052003F74B6 /* LocationOperationsTests.swift */,
 				65882EC81BAF6052003F74B6 /* PassbookConditionTests.swift */,
 				65882EC91BAF6052003F74B6 /* PhotosConditionTests.swift */,
