@@ -57,7 +57,13 @@ public class _EventsCapability<Registrar: EventsCapabilityRegistrarType>: NSObje
     }
 
     public func requestAuthorizationWithCompletion(completion: dispatch_block_t) {
-        registrar.opr_requestAccessForRequirement(requirement) { success, error in
+        let status = registrar.opr_authorizationStatusForRequirement(requirement)
+        switch status {
+        case .NotDetermined:
+            registrar.opr_requestAccessForRequirement(requirement) { success, error in
+                completion()
+            }
+        default:
             completion()
         }
     }
@@ -65,6 +71,6 @@ public class _EventsCapability<Registrar: EventsCapabilityRegistrarType>: NSObje
 
 public typealias Calendar = _EventsCapability<EKEventStore>
 
-@available(*, unavailable, renamed="Use AuthorizedFor(Calendar()).")
+@available(*, unavailable, renamed="AuthorizedFor(Calendar(.Event))")
 public typealias CalendarCondition = AuthorizedFor<Calendar>
 

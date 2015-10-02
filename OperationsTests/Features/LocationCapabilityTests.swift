@@ -25,7 +25,7 @@ class TestableLocationRegistrar: NSObject {
     var didSetDelegate = false
 
     var responseStatus: CLAuthorizationStatus = .AuthorizedAlways
-    var didRequestAuthorization: LocationUsage?
+    var didRequestAuthorization: LocationUsage? = .None
 
     required override init() { }
 }
@@ -118,7 +118,7 @@ class LocationCapabilityTests: OperationTests {
         super.tearDown()
     }
 
-    func test__location_capability_name() {
+    func test__name() {
         XCTAssertEqual(capability.name, "Location")
     }
 
@@ -127,14 +127,12 @@ class LocationCapabilityTests: OperationTests {
     }
 
     func test__is_available_queries_registrar() {
-        let isAvailable = capability.isAvailable()
-        XCTAssertTrue(isAvailable)
+        XCTAssertTrue(capability.isAvailable())
         XCTAssertTrue(registrar.didCheckServiceEnabled)
     }
 
     func test__authorization_status_queries_register() {
-        let status = capability.authorizationStatus()
-        XCTAssertEqual(status, CLAuthorizationStatus.NotDetermined)
+        XCTAssertEqual(capability.authorizationStatus(), CLAuthorizationStatus.NotDetermined)
         XCTAssertTrue(registrar.didCheckAuthorizationStatus)
     }
 
