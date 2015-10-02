@@ -96,6 +96,7 @@ public class _UserLocationOperation<Manager: LocationManagerType>: Operation, CL
         self.accuracy = accuracy
         self.completion = completion
         super.init()
+        name = "User Location"
         addCondition(AuthorizedFor(_LocationCapability(.WhenInUse, registrar: manager)))
         addCondition(MutuallyExclusive<CLLocationManager>())
     }
@@ -113,7 +114,7 @@ public class _UserLocationOperation<Manager: LocationManagerType>: Operation, CL
         }
     }
 
-    private func stopLocationUpdates() {
+    internal func stopLocationUpdates() {
         manager.opr_stopLocationUpdates()
     }
 
@@ -146,7 +147,7 @@ extension CLGeocoder: ReverseGeocoderType {
 
     public func opr_reverseGeocodeLocation(location: CLLocation, completion: ([CLPlacemark], NSError?) -> Void) {
         reverseGeocodeLocation(location) { (results, error) in
-            completion(results ?? [], error as NSError?)
+            completion(results ?? [], error)
         }
     }
 }
@@ -226,7 +227,29 @@ public class _ReverseGeocodeUserLocationOperation<Geocoder, Manager where Geocod
         return reverseGeocodeOperation?.placemark
     }
 
-    public init(accuracy: CLLocationAccuracy = kCLLocationAccuracyThreeKilometers, geocoder: Geocoder = Geocoder(), manager: Manager = Manager(), completion: CompletionBlockType = { (_, _) in }) {
+    /**
+    Initialize a group operation which will use a custom geocoder to
+    reverse lookup the device location (using a custom location manager).
+
+    Framework consumers see: ReverseGeocodeUserLocationOperation
+
+    :param: accuracy, the location accuracy.
+    :param: completion, a completion block of CompletionBlockType
+    */
+    public convenience init(accuracy: CLLocationAccuracy = kCLLocationAccuracyThreeKilometers, completion: CompletionBlockType = { _, _ in }) {
+        self.init(geocoder: Geocoder(), manager: Manager(), accuracy: accuracy, completion: completion)
+    }
+
+    /**
+    Initialize a group operation which will use a custom geocoder to
+    reverse lookup the device location (using a custom location manager).
+
+    :param: geocoder, instance of a type which implements ReverseGeocoderType.
+    :param: manager, instance of a type which implements LocationManagerType.
+    :param: accuracy, the location accuracy.
+    :param: completion, a completion block of CompletionBlockType
+    */
+    public init(geocoder: Geocoder, manager: Manager, accuracy: CLLocationAccuracy, completion: CompletionBlockType) {
         self.geocoder = geocoder
         self.completion = completion
         self.userLocationOperation = _UserLocationOperation(manager: manager, accuracy: accuracy, completion: { _ in })

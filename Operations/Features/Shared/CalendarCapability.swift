@@ -1,5 +1,5 @@
 //
-//  CalendarAuthorization.swift
+//  CalendarCapability.swift
 //  Operations
 //
 //  Created by Daniel Thorpe on 01/10/2015.

@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		650F7E7D1BBEA4DD00502428 /* LocationOperationsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65882EC71BAF6052003F74B6 /* LocationOperationsTests.swift */; settings = {ASSET_TAGS = (); }; };
 		651E394C1BB454310013ADE6 /* ContactsOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 651E394B1BB454310013ADE6 /* ContactsOperation.swift */; settings = {ASSET_TAGS = (); }; };
 		651E394D1BB454310013ADE6 /* ContactsOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 651E394B1BB454310013ADE6 /* ContactsOperation.swift */; settings = {ASSET_TAGS = (); }; };
 		651E394E1BB454310013ADE6 /* ContactsOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 651E394B1BB454310013ADE6 /* ContactsOperation.swift */; settings = {ASSET_TAGS = (); }; };
@@ -1203,6 +1204,7 @@
 				65882EFC1BAF6074003F74B6 /* BackgroundObserverTests.swift in Sources */,
 				651EF4901BBDCB4900BA962D /* LocationCapabilityTests.swift in Sources */,
 				65882F001BAF6074003F74B6 /* GroupOperationTests.swift in Sources */,
+				650F7E7D1BBEA4DD00502428 /* LocationOperationsTests.swift in Sources */,
 				65882F2A1BAF6083003F74B6 /* ReachabilityConditionTests.swift in Sources */,
 				65882F061BAF6074003F74B6 /* OperationTests.swift in Sources */,
 				65882F2E1BAF6083003F74B6 /* WebpageOperationTests.swift in Sources */,
