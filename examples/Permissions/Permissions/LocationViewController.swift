@@ -60,8 +60,8 @@ class LocationViewController: PermissionViewController {
             self.state = .Unknown
         }
     }
-    
-    func determineAuthorizationStatus(silently silently: Bool = true) {
+
+    func determineAuthorizationStatus() {
         let status = GetAuthorizationStatus(Capability.Location(), completion: statusDidChange)
         queue.addOperation(status)
     }
