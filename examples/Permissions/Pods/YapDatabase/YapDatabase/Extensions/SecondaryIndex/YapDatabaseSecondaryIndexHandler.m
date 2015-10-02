@@ -1,4 +1,5 @@
 #import "YapDatabaseSecondaryIndexHandler.h"
+#import "YapDatabaseSecondaryIndexPrivate.h"
 
 
 @implementation YapDatabaseSecondaryIndexHandler
@@ -12,7 +13,7 @@
 	
 	YapDatabaseSecondaryIndexHandler *handler = [[YapDatabaseSecondaryIndexHandler alloc] init];
 	handler->block = block;
-	handler->blockType = YapDatabaseSecondaryIndexBlockTypeWithKey;
+	handler->blockType = YapDatabaseBlockTypeWithKey;
 	
 	return handler;
 }
@@ -23,7 +24,7 @@
 	
 	YapDatabaseSecondaryIndexHandler *handler = [[YapDatabaseSecondaryIndexHandler alloc] init];
 	handler->block = block;
-	handler->blockType = YapDatabaseSecondaryIndexBlockTypeWithObject;
+	handler->blockType = YapDatabaseBlockTypeWithObject;
 	
 	return handler;
 }
@@ -34,7 +35,7 @@
 	
 	YapDatabaseSecondaryIndexHandler *handler = [[YapDatabaseSecondaryIndexHandler alloc] init];
 	handler->block = block;
-	handler->blockType = YapDatabaseSecondaryIndexBlockTypeWithMetadata;
+	handler->blockType = YapDatabaseBlockTypeWithMetadata;
 	
 	return handler;
 }
@@ -45,7 +46,7 @@
 	
 	YapDatabaseSecondaryIndexHandler *handler = [[YapDatabaseSecondaryIndexHandler alloc] init];
 	handler->block = block;
-	handler->blockType = YapDatabaseSecondaryIndexBlockTypeWithRow;
+	handler->blockType = YapDatabaseBlockTypeWithRow;
 	
 	return handler;
 }
