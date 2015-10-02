@@ -1,12 +1,11 @@
 //
-//  LocationAuthorization.swift
+//  LocationCapability.swift
 //  Operations
 //
 //  Created by Daniel Thorpe on 01/10/2015.
 //  Copyright © 2015 Dan Thorpe. All rights reserved.
 //
 
-import Foundation
 import CoreLocation
 
 public enum LocationUsage: Int { case WhenInUse = 1, Always }
@@ -67,6 +66,7 @@ public class _LocationCapability<Registrar: LocationCapabilityRegistrarType>: NS
         self.name = "Location"
         self.requirement = requirement
         self.registrar = registrar
+        super.init()
     }
 
     public func isAvailable() -> Bool {
@@ -79,7 +79,7 @@ public class _LocationCapability<Registrar: LocationCapabilityRegistrarType>: NS
 
     public func requestAuthorizationWithCompletion(completion: dispatch_block_t) {
         if !registrar.opr_locationServicesEnabled() {
-                completion()
+            completion()
         }
         else {
             let status = registrar.opr_authorizationStatus()
@@ -100,3 +100,9 @@ public class _LocationCapability<Registrar: LocationCapabilityRegistrarType>: NS
 }
 
 public typealias Location = _LocationCapability<CLLocationManager>
+
+@available(*, unavailable, renamed="Use AuthorizedFor(Location()).")
+public typealias LocationCondition = AuthorizedFor<Location>
+
+
+

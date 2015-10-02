@@ -1,5 +1,5 @@
 //
-//  Authorization.swift
+//  Capability.swift
 //  Operations
 //
 //  Created by Daniel Thorpe on 01/10/2015.
@@ -118,11 +118,4 @@ public struct AuthorizedFor<Capability: CapabilityType>: OperationCondition {
         }
     }
 }
-
-
-
-
-
-
-
 
