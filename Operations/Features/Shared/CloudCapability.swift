@@ -21,7 +21,7 @@ public struct CloudStatus: AuthorizationStatusType {
     }
 
     public func isRequirementMet(requirement: CKApplicationPermissions) -> Bool {
-        guard let _ = error else { return false }
+        guard error != .None else { return false }
         guard case .Available = account else { return false }
 
         switch (requirement, permissions) {
