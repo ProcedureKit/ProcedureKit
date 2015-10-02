@@ -36,6 +36,15 @@ public protocol CapabilityType {
     func requestAuthorizationWithCompletion(completion: dispatch_block_t)
 }
 
+extension Capability {
+
+    public struct VoidStatus: AuthorizationStatusType {
+        public func isRequirementMet(requirement: Void) -> Bool {
+            return true
+        }
+    }
+}
+
 // MARK: - Operations
 
 public class GetAuthorizationStatus<Capability: CapabilityType>: Operation {
@@ -121,5 +130,11 @@ public struct AuthorizedFor<Capability: CapabilityType>: OperationCondition {
             completion(.Failed(CapabilityError<Capability>.AuthorizationNotGranted((status, capability.requirement))))
         }
     }
+}
+
+extension Capability.VoidStatus: Equatable { }
+
+public func ==(a: Capability.VoidStatus, b: Capability.VoidStatus) -> Bool {
+    return true
 }
 
