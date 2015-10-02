@@ -111,6 +111,14 @@ public class _HealthCapability<Registrar: HealthCapabilityRegistrarType>: NSObje
     }
 }
 
+extension Capability {
+    public typealias Health = _HealthCapability<HKHealthStore>
+}
+
+@available(*, unavailable, renamed="AuthorizedFor(Capability.Health())")
+public typealias HealthCondition = AuthorizedFor<Capability.Health>
+
+
 // MARK: - Boring Stuff
 
 extension HealthRequirement: Equatable { }

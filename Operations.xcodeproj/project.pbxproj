@@ -360,7 +360,6 @@
 		65EEC1AB1BAF46210020A9BD /* Operations-OSXTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Operations-OSXTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		65EEC1DE1BAF4B230020A9BD /* Operations.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Operations.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		65EEC1E71BAF4B230020A9BD /* Operations-iOS-ExtensionTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Operations-iOS-ExtensionTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
-		65EEC2161BAF4F230020A9BD /* HealthCondition.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HealthCondition.swift; sourceTree = "<group>"; };
 		65EEC2181BAF4F230020A9BD /* LocationOperations.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LocationOperations.swift; sourceTree = "<group>"; };
 		65EEC2191BAF4F230020A9BD /* PassbookCondition.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PassbookCondition.swift; sourceTree = "<group>"; };
 		65EEC21A1BAF4F230020A9BD /* PhotosCondition.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PhotosCondition.swift; sourceTree = "<group>"; };
@@ -487,10 +486,10 @@
 		6523DA1E1BBDEA23003A3374 /* Capability */ = {
 			isa = PBXGroup;
 			children = (
-				651EF4881BBD9F8800BA962D /* Capability.swift */,
-				6523DA181BBDD21F003A3374 /* LocationCapability.swift */,
 				6523DA1F1BBDEA57003A3374 /* CalendarCapability.swift */,
+				651EF4881BBD9F8800BA962D /* Capability.swift */,
 				650F7E7F1BBEC43F00502428 /* HealthCapability.swift */,
+				6523DA181BBDD21F003A3374 /* LocationCapability.swift */,
 			);
 			name = Capability;
 			path = iOS;
@@ -505,7 +504,6 @@
 				65EEC21B1BAF4F230020A9BD /* RemoteNotificationCondition.swift */,
 				65EEC21C1BAF4F230020A9BD /* UserConfirmationCondition.swift */,
 				65EEC21D1BAF4F230020A9BD /* UserNotificationCondition.swift */,
-				65EEC2161BAF4F230020A9BD /* HealthCondition.swift */,
 				65EEC2241BAF4F230020A9BD /* ReachabilityCondition.swift */,
 			);
 			name = Conditions;
