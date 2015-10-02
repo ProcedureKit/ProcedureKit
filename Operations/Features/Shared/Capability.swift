@@ -40,45 +40,45 @@ public protocol CapabilityType {
 
 public class GetAuthorizationStatus<Capability: CapabilityType>: Operation {
 
-    public typealias Completion = (Bool, Capability.Status) -> Void
+    public typealias StatusResponse = (Bool, Capability.Status)
+    public typealias Completion = StatusResponse -> Void
 
     public var isAvailable: Bool? = .None
     public var status: Capability.Status? = .None
 
     let capability: Capability
-    let completion: Completion?
+    let completion: Completion
 
-    public init(_ capability: Capability, completion: Completion? = .None) {
+    public init(_ capability: Capability, completion: Completion = { _ in }) {
         self.capability = capability
         self.completion = completion
         super.init()
         name = "Get Authorization Status for: \(capability.name)"
     }
 
+    func determineState() -> StatusResponse {
+        isAvailable = capability.isAvailable()
+        status = capability.authorizationStatus()
+        return (isAvailable!, status!)
+    }
+
     public override func execute() {
-        let available = capability.isAvailable()
-        let status = capability.authorizationStatus()
-        self.isAvailable = available
-        self.status = status
-        completion?(available, status)
+        completion(determineState())
         finish()
     }
 }
 
-public class Authorize<Capability: CapabilityType>: Operation {
+public class Authorize<Capability: CapabilityType>: GetAuthorizationStatus<Capability> {
 
-    let capability: Capability
-
-    public init(capability: Capability) {
-        self.capability = capability
-        super.init()
+    public override init(_ capability: Capability, completion: Completion = { _ in }) {
+        super.init(capability, completion: completion)
         name = "Authorize \(capability.requirement) for: \(capability.name)"
         addCondition(AlertPresentation())
     }
 
     public override func execute() {
         capability.requestAuthorizationWithCompletion {
-            self.finish()
+            super.execute()
         }
     }
 }
@@ -103,7 +103,7 @@ public struct AuthorizedFor<Capability: CapabilityType>: OperationCondition {
     }
 
     public func dependencyForOperation(operation: Operation) -> NSOperation? {
-        return Authorize(capability: capability)
+        return Authorize(capability)
     }
 
     public func evaluateForOperation(operation: Operation, completion: OperationConditionResult -> Void) {

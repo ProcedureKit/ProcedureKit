@@ -131,13 +131,13 @@ class AuthorizationTests: OperationTests {
     }
 
     func test__authorize_operation_name() {
-        let operation = Authorize(capability: capability)
+        let operation = Authorize(capability)
         XCTAssertEqual(operation.name!, "Authorize Minimum for: Testable Capability")
     }
 
     func test__authorize() {
 
-        let operation = Authorize(capability: capability)
+        let operation = Authorize(capability)
 
         addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
         runOperation(operation)
