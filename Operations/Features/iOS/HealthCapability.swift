@@ -86,14 +86,14 @@ public class _HealthCapability<Registrar: HealthCapabilityRegistrarType>: NSObje
         return registrar.opr_isHealthDataAvailable()
     }
 
-    public func authorizationStatus() -> HeathCapabilityStatus {
+    public func authorizationStatus(completion: HeathCapabilityStatus -> Void) {
         let status = HeathCapabilityStatus()
 
         for type in requirement.share {
             status[type.identifier] = registrar.opr_authorizationStatusForType(type)
         }
 
-        return status
+        completion(status)
     }
 
     public func requestAuthorizationWithCompletion(completion: dispatch_block_t) {

@@ -52,9 +52,9 @@ class TestableCapability: NSObject, CapabilityType {
         return serviceIsAvailable
     }
 
-    func authorizationStatus() -> Status {
+    func authorizationStatus(completion: Status -> Void) {
         didCheckAuthorizationStatus = true
-        return serviceAuthorizationStatus
+        completion(serviceAuthorizationStatus)
     }
 
     func requestAuthorizationWithCompletion(completion: dispatch_block_t) {

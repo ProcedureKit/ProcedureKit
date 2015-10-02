@@ -89,7 +89,7 @@ class EventsCapabilityTests: XCTestCase {
     }
 
     func test__authorization_status_queries_register() {
-        XCTAssertEqual(capability.authorizationStatus(), EKAuthorizationStatus.NotDetermined)
+        capability.authorizationStatus { XCTAssertEqual($0, EKAuthorizationStatus.NotDetermined) }
         XCTAssertTrue(registrar.didCheckAuthorizationStatus)
     }
 

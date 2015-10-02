@@ -32,7 +32,7 @@ public protocol CapabilityType {
 
     init(_ requirement: Status.Requirement, registrar: Registrar)
     func isAvailable() -> Bool
-    func authorizationStatus() -> Status
+    func authorizationStatus(completion: Status -> Void)
     func requestAuthorizationWithCompletion(completion: dispatch_block_t)
 }
 
@@ -65,14 +65,16 @@ public class GetAuthorizationStatus<Capability: CapabilityType>: Operation {
         name = "Get Authorization Status for: \(capability.name)"
     }
 
-    func determineState() -> StatusResponse {
+    func determineState(completion: StatusResponse -> Void) {
         isAvailable = capability.isAvailable()
-        status = capability.authorizationStatus()
-        return (isAvailable!, status!)
+        capability.authorizationStatus { status in
+            self.status = status
+            completion((self.isAvailable!, self.status!))
+        }
     }
 
     public override func execute() {
-        completion(determineState())
+        determineState(completion)
         finish()
     }
 }
@@ -118,16 +120,18 @@ public struct AuthorizedFor<Capability: CapabilityType>: OperationCondition {
 
     public func evaluateForOperation(operation: Operation, completion: OperationConditionResult -> Void) {
 
-        let status = capability.authorizationStatus()
-
         if !capability.isAvailable() {
             completion(.Failed(CapabilityError<Capability>.NotAvailable))
         }
-        else if status.isRequirementMet(capability.requirement) {
-            completion(.Satisfied)
-        }
         else {
-            completion(.Failed(CapabilityError<Capability>.AuthorizationNotGranted((status, capability.requirement))))
+            capability.authorizationStatus { [requirement = self.capability.requirement] status in
+                if status.isRequirementMet(requirement) {
+                    completion(.Satisfied)
+                }
+                else {
+                    completion(.Failed(CapabilityError<Capability>.AuthorizationNotGranted((status, requirement))))
+                }
+            }
         }
     }
 }

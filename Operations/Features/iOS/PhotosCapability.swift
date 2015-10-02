@@ -51,8 +51,8 @@ public class _PhotosCapability<Registrar: PhotosCapabilityRegistrarType>: NSObje
         return true
     }
 
-    public func authorizationStatus() -> PHAuthorizationStatus {
-        return registrar.opr_authorizationStatus()
+    public func authorizationStatus(completion: PHAuthorizationStatus -> Void) {
+        completion(registrar.opr_authorizationStatus())
     }
 
     public func requestAuthorizationWithCompletion(completion: dispatch_block_t) {

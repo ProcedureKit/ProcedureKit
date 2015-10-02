@@ -73,8 +73,8 @@ public class _LocationCapability<Registrar: LocationCapabilityRegistrarType>: NS
         return registrar.opr_locationServicesEnabled()
     }
 
-    public func authorizationStatus() -> CLAuthorizationStatus {
-        return registrar.opr_authorizationStatus()
+    public func authorizationStatus(completion: CLAuthorizationStatus -> Void) {
+        completion(registrar.opr_authorizationStatus())
     }
 
     public func requestAuthorizationWithCompletion(completion: dispatch_block_t) {

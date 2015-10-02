@@ -132,7 +132,7 @@ class LocationCapabilityTests: OperationTests {
     }
 
     func test__authorization_status_queries_register() {
-        XCTAssertEqual(capability.authorizationStatus(), CLAuthorizationStatus.NotDetermined)
+        capability.authorizationStatus { XCTAssertEqual($0, CLAuthorizationStatus.NotDetermined) }
         XCTAssertTrue(registrar.didCheckAuthorizationStatus)
     }
 

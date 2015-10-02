@@ -37,8 +37,8 @@ public class _PassbookCapability<Registrar: PassbookCapabilityRegistrarType>: NS
         return registrar.opr_isPassKitLibraryAvailable()
     }
 
-    public func authorizationStatus() -> Capability.VoidStatus {
-        return Capability.VoidStatus()
+    public func authorizationStatus(completion: Capability.VoidStatus -> Void) {
+        completion(Capability.VoidStatus())
     }
 
     public func requestAuthorizationWithCompletion(completion: dispatch_block_t) {

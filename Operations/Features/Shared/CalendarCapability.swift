@@ -52,8 +52,8 @@ public class _EventsCapability<Registrar: EventsCapabilityRegistrarType>: NSObje
         return true
     }
 
-    public func authorizationStatus() -> EKAuthorizationStatus {
-        return registrar.opr_authorizationStatusForRequirement(requirement)
+    public func authorizationStatus(completion: EKAuthorizationStatus -> Void) {
+        completion(registrar.opr_authorizationStatusForRequirement(requirement))
     }
 
     public func requestAuthorizationWithCompletion(completion: dispatch_block_t) {

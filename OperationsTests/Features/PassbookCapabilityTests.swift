@@ -51,7 +51,7 @@ class PassbookCapabilityTests: XCTestCase {
     }
 
     func test__authorization_status_queries_register() {
-        XCTAssertEqual(capability.authorizationStatus(), Capability.VoidStatus())
+        capability.authorizationStatus { XCTAssertEqual($0, Capability.VoidStatus()) }
     }
 
     func test__given_service_disabled__requesting_authorization_returns_directly() {
