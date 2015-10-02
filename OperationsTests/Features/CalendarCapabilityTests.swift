@@ -16,11 +16,7 @@ class TestableEventsRegistrar: NSObject {
     var didCheckAuthorizationStatus = false
 
     var responseStatus: EKAuthorizationStatus = .Authorized
-    var accessAllowed: Bool = true {
-        didSet {
-            responseStatus = accessAllowed ? .Authorized : .Denied
-        }
-    }
+    var accessAllowed: Bool = true
     var accessError: NSError? = .None
     var didRequestAuthorization: EKEntityType? = .None
 

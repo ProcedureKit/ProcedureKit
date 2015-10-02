@@ -77,6 +77,8 @@
 		652F5AA01BAF7BB700BB5F71 /* Operations.h in Headers */ = {isa = PBXBuildFile; fileRef = 65EEC1641BAF422C0020A9BD /* Operations.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		652F5AA11BAF7BB800BB5F71 /* Operations.h in Headers */ = {isa = PBXBuildFile; fileRef = 65EEC1641BAF422C0020A9BD /* Operations.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		652F5AA21BAF7BBD00BB5F71 /* Operations.h in Headers */ = {isa = PBXBuildFile; fileRef = 65EEC1641BAF422C0020A9BD /* Operations.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		657B3E871BBEF779003AC518 /* PhotosCapability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 657B3E861BBEF779003AC518 /* PhotosCapability.swift */; settings = {ASSET_TAGS = (); }; };
+		657B3E881BBEF779003AC518 /* PhotosCapability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 657B3E861BBEF779003AC518 /* PhotosCapability.swift */; settings = {ASSET_TAGS = (); }; };
 		6585DACB1BBE805600CE46BE /* AuthorizationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6585DAC91BBE804E00CE46BE /* AuthorizationTests.swift */; settings = {ASSET_TAGS = (); }; };
 		6585DACC1BBE805700CE46BE /* AuthorizationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6585DAC91BBE804E00CE46BE /* AuthorizationTests.swift */; settings = {ASSET_TAGS = (); }; };
 		6585DACD1BBE805800CE46BE /* AuthorizationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6585DAC91BBE804E00CE46BE /* AuthorizationTests.swift */; settings = {ASSET_TAGS = (); }; };
@@ -140,10 +142,10 @@
 		65882F161BAF6078003F74B6 /* TimeoutObserverTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65882EBD1BAF6052003F74B6 /* TimeoutObserverTests.swift */; };
 		65882F181BAF6082003F74B6 /* CloudConditionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65882EC41BAF6052003F74B6 /* CloudConditionTests.swift */; };
 		65882F1C1BAF6082003F74B6 /* PassbookConditionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65882EC81BAF6052003F74B6 /* PassbookConditionTests.swift */; };
-		65882F1D1BAF6082003F74B6 /* PhotosConditionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65882EC91BAF6052003F74B6 /* PhotosConditionTests.swift */; };
+		65882F1D1BAF6082003F74B6 /* PhotosCapabilityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65882EC91BAF6052003F74B6 /* PhotosCapabilityTests.swift */; };
 		65882F241BAF6083003F74B6 /* CloudConditionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65882EC41BAF6052003F74B6 /* CloudConditionTests.swift */; };
 		65882F281BAF6083003F74B6 /* PassbookConditionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65882EC81BAF6052003F74B6 /* PassbookConditionTests.swift */; };
-		65882F291BAF6083003F74B6 /* PhotosConditionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65882EC91BAF6052003F74B6 /* PhotosConditionTests.swift */; };
+		65882F291BAF6083003F74B6 /* PhotosCapabilityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65882EC91BAF6052003F74B6 /* PhotosCapabilityTests.swift */; };
 		65882F2A1BAF6083003F74B6 /* ReachabilityConditionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65882ECA1BAF6052003F74B6 /* ReachabilityConditionTests.swift */; };
 		65882F2B1BAF6083003F74B6 /* ReachableOperationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65882ECB1BAF6052003F74B6 /* ReachableOperationTests.swift */; };
 		65882F2C1BAF6083003F74B6 /* RemoteNotificationConditionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65882ECC1BAF6052003F74B6 /* RemoteNotificationConditionTests.swift */; };
@@ -233,7 +235,6 @@
 		65EEC20A1BAF4C6F0020A9BD /* LoggingObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65EEC1761BAF44E80020A9BD /* LoggingObserver.swift */; };
 		65EEC20B1BAF4C6F0020A9BD /* UIOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65EEC16C1BAF44E80020A9BD /* UIOperation.swift */; };
 		65EEC22E1BAF4F230020A9BD /* PassbookCondition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65EEC2191BAF4F230020A9BD /* PassbookCondition.swift */; };
-		65EEC22F1BAF4F230020A9BD /* PhotosCondition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65EEC21A1BAF4F230020A9BD /* PhotosCondition.swift */; };
 		65EEC2301BAF4F230020A9BD /* RemoteNotificationCondition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65EEC21B1BAF4F230020A9BD /* RemoteNotificationCondition.swift */; };
 		65EEC2311BAF4F230020A9BD /* UserConfirmationCondition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65EEC21C1BAF4F230020A9BD /* UserConfirmationCondition.swift */; };
 		65EEC2321BAF4F230020A9BD /* UserNotificationCondition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65EEC21D1BAF4F230020A9BD /* UserNotificationCondition.swift */; };
@@ -254,7 +255,6 @@
 		65EEC2441BAF4F780020A9BD /* ReachabilityCondition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65EEC2241BAF4F230020A9BD /* ReachabilityCondition.swift */; };
 		65EEC2451BAF4F780020A9BD /* ReachableOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65EEC2251BAF4F230020A9BD /* ReachableOperation.swift */; };
 		65EEC2491BAF4FD40020A9BD /* PassbookCondition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65EEC2191BAF4F230020A9BD /* PassbookCondition.swift */; };
-		65EEC24A1BAF4FD40020A9BD /* PhotosCondition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65EEC21A1BAF4F230020A9BD /* PhotosCondition.swift */; };
 		65EEC24C1BAF4FD40020A9BD /* UserConfirmationCondition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65EEC21C1BAF4F230020A9BD /* UserConfirmationCondition.swift */; };
 /* End PBXBuildFile section */
 
@@ -297,6 +297,7 @@
 		6523DA181BBDD21F003A3374 /* LocationCapability.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LocationCapability.swift; sourceTree = "<group>"; };
 		6523DA1F1BBDEA57003A3374 /* CalendarCapability.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CalendarCapability.swift; path = Operations/Features/Shared/CalendarCapability.swift; sourceTree = SOURCE_ROOT; };
 		652F5A491BAF79BA00BB5F71 /* Operations.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Operations.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		657B3E861BBEF779003AC518 /* PhotosCapability.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PhotosCapability.swift; sourceTree = "<group>"; };
 		6585DAC91BBE804E00CE46BE /* AuthorizationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AuthorizationTests.swift; sourceTree = "<group>"; };
 		65882E801BAF5B00003F74B6 /* Operations.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Operations.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		65882EB01BAF6052003F74B6 /* AlertOperationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AlertOperationTests.swift; sourceTree = "<group>"; };
@@ -320,7 +321,7 @@
 		65882EC51BAF6052003F74B6 /* HealthCapabilityTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HealthCapabilityTests.swift; sourceTree = "<group>"; };
 		65882EC71BAF6052003F74B6 /* LocationOperationsTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LocationOperationsTests.swift; sourceTree = "<group>"; };
 		65882EC81BAF6052003F74B6 /* PassbookConditionTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PassbookConditionTests.swift; sourceTree = "<group>"; };
-		65882EC91BAF6052003F74B6 /* PhotosConditionTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PhotosConditionTests.swift; sourceTree = "<group>"; };
+		65882EC91BAF6052003F74B6 /* PhotosCapabilityTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PhotosCapabilityTests.swift; sourceTree = "<group>"; };
 		65882ECA1BAF6052003F74B6 /* ReachabilityConditionTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReachabilityConditionTests.swift; sourceTree = "<group>"; };
 		65882ECB1BAF6052003F74B6 /* ReachableOperationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReachableOperationTests.swift; sourceTree = "<group>"; };
 		65882ECC1BAF6052003F74B6 /* RemoteNotificationConditionTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RemoteNotificationConditionTests.swift; sourceTree = "<group>"; };
@@ -362,7 +363,6 @@
 		65EEC1E71BAF4B230020A9BD /* Operations-iOS-ExtensionTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Operations-iOS-ExtensionTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		65EEC2181BAF4F230020A9BD /* LocationOperations.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LocationOperations.swift; sourceTree = "<group>"; };
 		65EEC2191BAF4F230020A9BD /* PassbookCondition.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PassbookCondition.swift; sourceTree = "<group>"; };
-		65EEC21A1BAF4F230020A9BD /* PhotosCondition.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PhotosCondition.swift; sourceTree = "<group>"; };
 		65EEC21B1BAF4F230020A9BD /* RemoteNotificationCondition.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RemoteNotificationCondition.swift; sourceTree = "<group>"; };
 		65EEC21C1BAF4F230020A9BD /* UserConfirmationCondition.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserConfirmationCondition.swift; sourceTree = "<group>"; };
 		65EEC21D1BAF4F230020A9BD /* UserNotificationCondition.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserNotificationCondition.swift; sourceTree = "<group>"; };
@@ -490,6 +490,7 @@
 				651EF4881BBD9F8800BA962D /* Capability.swift */,
 				650F7E7F1BBEC43F00502428 /* HealthCapability.swift */,
 				6523DA181BBDD21F003A3374 /* LocationCapability.swift */,
+				657B3E861BBEF779003AC518 /* PhotosCapability.swift */,
 			);
 			name = Capability;
 			path = iOS;
@@ -500,7 +501,6 @@
 			children = (
 				65EEC2211BAF4F230020A9BD /* CloudCondition.swift */,
 				65EEC2191BAF4F230020A9BD /* PassbookCondition.swift */,
-				65EEC21A1BAF4F230020A9BD /* PhotosCondition.swift */,
 				65EEC21B1BAF4F230020A9BD /* RemoteNotificationCondition.swift */,
 				65EEC21C1BAF4F230020A9BD /* UserConfirmationCondition.swift */,
 				65EEC21D1BAF4F230020A9BD /* UserNotificationCondition.swift */,
@@ -583,7 +583,7 @@
 				651EF48E1BBDCB4900BA962D /* LocationCapabilityTests.swift */,
 				65882EC71BAF6052003F74B6 /* LocationOperationsTests.swift */,
 				65882EC81BAF6052003F74B6 /* PassbookConditionTests.swift */,
-				65882EC91BAF6052003F74B6 /* PhotosConditionTests.swift */,
+				65882EC91BAF6052003F74B6 /* PhotosCapabilityTests.swift */,
 				65882ECA1BAF6052003F74B6 /* ReachabilityConditionTests.swift */,
 				65882ECB1BAF6052003F74B6 /* ReachableOperationTests.swift */,
 				65882ECC1BAF6052003F74B6 /* RemoteNotificationConditionTests.swift */,
@@ -1154,9 +1154,9 @@
 				65B505961BB99BBA004C89C2 /* Contacts.swift in Sources */,
 				65EEC2321BAF4F230020A9BD /* UserNotificationCondition.swift in Sources */,
 				65EEC1881BAF44E80020A9BD /* ComposedOperation.swift in Sources */,
-				65EEC22F1BAF4F230020A9BD /* PhotosCondition.swift in Sources */,
 				65EEC18B1BAF44E80020A9BD /* GatedOperation.swift in Sources */,
 				65EEC2361BAF4F230020A9BD /* CloudKitOperation.swift in Sources */,
+				657B3E881BBEF779003AC518 /* PhotosCapability.swift in Sources */,
 				65EEC1861BAF44E80020A9BD /* BlockObserver.swift in Sources */,
 				65EEC2391BAF4F230020A9BD /* ReachableOperation.swift in Sources */,
 				65EEC2381BAF4F230020A9BD /* ReachabilityCondition.swift in Sources */,
@@ -1187,7 +1187,7 @@
 				65882F3C1BAF608A003F74B6 /* AddressBookTests.swift in Sources */,
 				65882F051BAF6074003F74B6 /* NoFailedDependenciesConditionTests.swift in Sources */,
 				65882F281BAF6083003F74B6 /* PassbookConditionTests.swift in Sources */,
-				65882F291BAF6083003F74B6 /* PhotosConditionTests.swift in Sources */,
+				65882F291BAF6083003F74B6 /* PhotosCapabilityTests.swift in Sources */,
 				65882F241BAF6083003F74B6 /* CloudConditionTests.swift in Sources */,
 				65882F071BAF6074003F74B6 /* SilentConditionTests.swift in Sources */,
 				65882F011BAF6074003F74B6 /* LoggingObserverTests.swift in Sources */,
@@ -1275,6 +1275,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				657B3E871BBEF779003AC518 /* PhotosCapability.swift in Sources */,
 				65EEC1F51BAF4C6F0020A9BD /* ExclusivityManager.swift in Sources */,
 				65EEC2081BAF4C6F0020A9BD /* GatedOperation.swift in Sources */,
 				65EEC2421BAF4F780020A9BD /* CloudKitOperation.swift in Sources */,
@@ -1296,7 +1297,6 @@
 				65EEC2491BAF4FD40020A9BD /* PassbookCondition.swift in Sources */,
 				65EEC1F71BAF4C6F0020A9BD /* OperationCondition.swift in Sources */,
 				65EEC1F81BAF4C6F0020A9BD /* OperationObserver.swift in Sources */,
-				65EEC24A1BAF4FD40020A9BD /* PhotosCondition.swift in Sources */,
 				65EEC2411BAF4F780020A9BD /* CloudCondition.swift in Sources */,
 				65EEC1F91BAF4C6F0020A9BD /* OperationQueue.swift in Sources */,
 				65EEC20B1BAF4C6F0020A9BD /* UIOperation.swift in Sources */,
@@ -1325,7 +1325,7 @@
 				65882EF11BAF606F003F74B6 /* GatedOperationTests.swift in Sources */,
 				65882EF71BAF606F003F74B6 /* NoFailedDependenciesConditionTests.swift in Sources */,
 				65882F1C1BAF6082003F74B6 /* PassbookConditionTests.swift in Sources */,
-				65882F1D1BAF6082003F74B6 /* PhotosConditionTests.swift in Sources */,
+				65882F1D1BAF6082003F74B6 /* PhotosCapabilityTests.swift in Sources */,
 				65882F181BAF6082003F74B6 /* CloudConditionTests.swift in Sources */,
 				65882EF91BAF606F003F74B6 /* SilentConditionTests.swift in Sources */,
 				65882EF31BAF606F003F74B6 /* LoggingObserverTests.swift in Sources */,
