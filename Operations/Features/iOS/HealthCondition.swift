@@ -71,7 +71,7 @@ public struct HealthCondition: OperationCondition {
 
         /**
         We don't actually test for unauthorized read access, as this
-        reveals sensetive information.
+        reveals sensitive information.
         */
         let unauthorizedShareTypes = shareTypes.filter { type in
             return self.manager.opr_authorizationStatusForType(type) != .SharingAuthorized

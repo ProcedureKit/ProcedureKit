@@ -74,6 +74,7 @@ public class Authorize<Capability: CapabilityType>: GetAuthorizationStatus<Capab
         super.init(capability, completion: completion)
         name = "Authorize \(capability.requirement) for: \(capability.name)"
         addCondition(AlertPresentation())
+        addCondition(MutuallyExclusive<Capability>())
     }
 
     public override func execute() {
