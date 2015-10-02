@@ -8,6 +8,9 @@
 
 import Foundation
 
+/// Public type for capabilities
+public struct Capability { }
+
 // MARK: CapabilityType
 
 public protocol AuthorizationStatusType {

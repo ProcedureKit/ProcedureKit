@@ -69,8 +69,10 @@ public class _EventsCapability<Registrar: EventsCapabilityRegistrarType>: NSObje
     }
 }
 
-public typealias Calendar = _EventsCapability<EKEventStore>
+extension Capability {
+    public typealias Calendar = _EventsCapability<EKEventStore>
+}
 
-@available(*, unavailable, renamed="AuthorizedFor(Calendar(.Event))")
-public typealias CalendarCondition = AuthorizedFor<Calendar>
+@available(*, unavailable, renamed="AuthorizedFor(Capability.Calendar(.Event))")
+public typealias CalendarCondition = AuthorizedFor<Capability.Calendar>
 
