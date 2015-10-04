@@ -21,13 +21,14 @@ public struct CloudStatus: AuthorizationStatusType {
     }
 
     public func isRequirementMet(requirement: CKApplicationPermissions) -> Bool {
-        guard error != .None else { return false }
-        guard case .Available = account else { return false }
+        if let _ = error {
+            return false
+        }
 
-        switch (requirement, permissions) {
-        case ([], _):
+        switch (requirement, account, permissions) {
+        case ([], .Available, _):
             return true
-        case (_, .Some(.Granted)):
+        case (_, .Available, .Some(.Granted)) where requirement != []:
             return true
         default:
             return false
@@ -124,7 +125,7 @@ public final class CloudContainer: NSObject, CloudContainerRegistrarType {
         return container
     }
 
-    var container = CKContainer.defaultContainer()
+    internal var container = CKContainer.defaultContainer()
 
     public func opr_accountStatusWithCompletionHandler(completionHandler: (CKAccountStatus, NSError?) -> Void) {
         container.accountStatusWithCompletionHandler(completionHandler)

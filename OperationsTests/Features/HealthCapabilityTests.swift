@@ -21,7 +21,6 @@ class TestableHealthRegistrar: NSObject {
     var accessError: NSError? = .None
     var didRequestAccessForRequirement: HealthRequirement? = .None
 
-
     required override init() { }
 
     func addAuthorizationStatusCheckForType(type: HKObjectType) {
