@@ -187,7 +187,7 @@ class AuthorizationTests: OperationTests {
     }
 
     func test__authorized_condition_fails_if_capability_is_not_available() {
-
+        let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
         let operation = TestOperation()
         capability.serviceIsAvailable = false
         let condition = AuthorizedFor(capability)
@@ -195,7 +195,10 @@ class AuthorizationTests: OperationTests {
 
         condition.evaluateForOperation(operation) { result in
             conditionResult = result
+            expectation.fulfill()
         }
+
+        waitForExpectationsWithTimeout(3, handler: nil)
 
         XCTAssertNotNil(conditionResult)
         switch conditionResult! {
@@ -214,6 +217,7 @@ class AuthorizationTests: OperationTests {
     }
 
     func test__authorized_condition_fails_if_requirement_is_not_met() {
+        let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
         let operation = TestOperation()
         capability.requirement = .Maximum
         capability.serviceAuthorizationStatus = .MinimumAuthorized
@@ -223,7 +227,10 @@ class AuthorizationTests: OperationTests {
 
         condition.evaluateForOperation(operation) { result in
             conditionResult = result
+            expectation.fulfill()
         }
+
+        waitForExpectationsWithTimeout(3, handler: nil)
 
         XCTAssertNotNil(conditionResult)
         switch conditionResult! {
@@ -243,6 +250,7 @@ class AuthorizationTests: OperationTests {
     }
 
     func test__authorized_condition_succeeds_when_requirements_are_met() {
+        let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
         let operation = TestOperation()
         capability.serviceAuthorizationStatus = .MinimumAuthorized
 
@@ -251,7 +259,10 @@ class AuthorizationTests: OperationTests {
 
         condition.evaluateForOperation(operation) { result in
             conditionResult = result
+            expectation.fulfill()
         }
+
+        waitForExpectationsWithTimeout(3, handler: nil)
 
         XCTAssertNotNil(conditionResult)
         switch conditionResult! {
@@ -263,6 +274,7 @@ class AuthorizationTests: OperationTests {
     }
 
     func test__authorized_condition_succeeds_when_requirements_are_exceeded() {
+        let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
         let operation = TestOperation()
         capability.serviceAuthorizationStatus = .MaximumAuthorized
 
@@ -271,7 +283,10 @@ class AuthorizationTests: OperationTests {
 
         condition.evaluateForOperation(operation) { result in
             conditionResult = result
+            expectation.fulfill()
         }
+
+        waitForExpectationsWithTimeout(3, handler: nil)
 
         XCTAssertNotNil(conditionResult)
         switch conditionResult! {
