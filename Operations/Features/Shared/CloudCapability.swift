@@ -40,8 +40,6 @@ public protocol CloudContainerRegistrarType: CapabilityRegistrarType {
 
     static func containerWithIdentifier(identifier: String?) -> Self
 
-    var container: CKContainer { get }
-
     func opr_accountStatusWithCompletionHandler(completionHandler: (CKAccountStatus, NSError?) -> Void)
     func opr_statusForApplicationPermission(applicationPermission: CKApplicationPermissions, completionHandler: CKApplicationPermissionBlock)
     func opr_requestApplicationPermission(applicationPermission: CKApplicationPermissions, completionHandler: CKApplicationPermissionBlock)
@@ -113,10 +111,6 @@ public class _CloudCapability<Registrar: CloudContainerRegistrarType>: NSObject,
 
 public class CloudCapability<Registrar: CloudContainerRegistrarType>: _CloudCapability<Registrar> {
 
-    public var container: CKContainer {
-        return registrar.container
-    }
-
     public init(permissions: CKApplicationPermissions = [], containerId: String? = .None) {
         super.init(permissions, registrar: Registrar.containerWithIdentifier(containerId))
     }
@@ -127,28 +121,35 @@ public final class CloudContainer: NSObject, CloudContainerRegistrarType {
     public static func containerWithIdentifier(identifier: String?) -> CloudContainer {
         let container = CloudContainer()
         if let id = identifier {
-            container.container = CKContainer(identifier: id)
+            container.cloudKitContainer = CKContainer(identifier: id)
         }
         return container
     }
 
-    public private(set) var container: CKContainer = CKContainer.defaultContainer()
+    public private(set) var cloudKitContainer: CKContainer = CKContainer.defaultContainer()
 
     public func opr_accountStatusWithCompletionHandler(completionHandler: (CKAccountStatus, NSError?) -> Void) {
-        container.accountStatusWithCompletionHandler(completionHandler)
+        cloudKitContainer.accountStatusWithCompletionHandler(completionHandler)
     }
 
     public func opr_statusForApplicationPermission(applicationPermission: CKApplicationPermissions, completionHandler: CKApplicationPermissionBlock) {
-        container.statusForApplicationPermission(applicationPermission, completionHandler: completionHandler)
+        cloudKitContainer.statusForApplicationPermission(applicationPermission, completionHandler: completionHandler)
     }
 
     public func opr_requestApplicationPermission(applicationPermission: CKApplicationPermissions, completionHandler: CKApplicationPermissionBlock) {
-        container.requestApplicationPermission(applicationPermission, completionHandler: completionHandler)
+        cloudKitContainer.requestApplicationPermission(applicationPermission, completionHandler: completionHandler)
     }
 }
 
 extension Capability {
     public typealias Cloud = CloudCapability<CloudContainer>
+}
+
+extension CloudCapability where Registrar: CloudContainer {
+
+    public var container: CKContainer {
+        return registrar.cloudKitContainer
+    }
 }
 
 @available(*, unavailable, renamed="AuthorizedFor(Cloud())")
