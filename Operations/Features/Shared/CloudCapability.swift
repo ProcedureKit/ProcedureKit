@@ -40,6 +40,8 @@ public protocol CloudContainerRegistrarType: CapabilityRegistrarType {
 
     static func containerWithIdentifier(identifier: String?) -> Self
 
+    var container: CKContainer { get }
+
     func opr_accountStatusWithCompletionHandler(completionHandler: (CKAccountStatus, NSError?) -> Void)
     func opr_statusForApplicationPermission(applicationPermission: CKApplicationPermissions, completionHandler: CKApplicationPermissionBlock)
     func opr_requestApplicationPermission(applicationPermission: CKApplicationPermissions, completionHandler: CKApplicationPermissionBlock)
@@ -110,6 +112,11 @@ public class _CloudCapability<Registrar: CloudContainerRegistrarType>: NSObject,
 }
 
 public class CloudCapability<Registrar: CloudContainerRegistrarType>: _CloudCapability<Registrar> {
+
+    public var container: CKContainer {
+        return registrar.container
+    }
+
     public init(permissions: CKApplicationPermissions = [], containerId: String? = .None) {
         super.init(permissions, registrar: Registrar.containerWithIdentifier(containerId))
     }
@@ -125,7 +132,7 @@ public final class CloudContainer: NSObject, CloudContainerRegistrarType {
         return container
     }
 
-    internal var container = CKContainer.defaultContainer()
+    public private(set) var container: CKContainer = CKContainer.defaultContainer()
 
     public func opr_accountStatusWithCompletionHandler(completionHandler: (CKAccountStatus, NSError?) -> Void) {
         container.accountStatusWithCompletionHandler(completionHandler)
