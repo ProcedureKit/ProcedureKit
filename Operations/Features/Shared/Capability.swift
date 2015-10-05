@@ -86,7 +86,6 @@ public class Authorize<Capability: CapabilityType>: GetAuthorizationStatus<Capab
     public override init(_ capability: Capability, completion: Completion = { _ in }) {
         super.init(capability, completion: completion)
         name = "Authorize \(capability.requirement) for: \(capability.name)"
-        addCondition(AlertPresentation())
         addCondition(MutuallyExclusive<Capability>())
     }
 
