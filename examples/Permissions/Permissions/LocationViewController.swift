@@ -44,7 +44,7 @@ class LocationViewController: PermissionViewController {
         determineAuthorizationStatus()
     }
 
-    func statusDidChange(enabled: Bool, status: CLAuthorizationStatus) {
+    func locationServicesEnabled(enabled: Bool, withAuthorization status: CLAuthorizationStatus) {
         switch (enabled, status) {
         case (false, _):
             print("Location Services are not enabled")
@@ -62,12 +62,12 @@ class LocationViewController: PermissionViewController {
     }
 
     func determineAuthorizationStatus() {
-        let status = GetAuthorizationStatus(Capability.Location(), completion: statusDidChange)
+        let status = GetAuthorizationStatus(Capability.Location(), completion: locationServicesEnabled)
         queue.addOperation(status)
     }
 
     override func requestPermission() {
-        let authorize = Authorize(Capability.Location(), completion: statusDidChange)
+        let authorize = Authorize(Capability.Location(), completion: locationServicesEnabled)
         queue.addOperation(authorize)
     }
 

@@ -74,7 +74,9 @@
         "Operations/Core/iOS/NetworkObserver.swift",
         "Operations/Features/iOS/RemoteNotificationCondition.swift",
         "Operations/Features/iOS/UserNotificationCondition.swift",
-        "Operations/Features/iOS/HealthCondition.swift",
+        "Operations/Features/iOS/LocationCapability.swift",
+        "Operations/Features/iOS/CalendarCapability.swift",
+        "Operations/Features/iOS/HealthCapability.swift",
         "Operations/Features/iOS/ReachabilityCondition.swift",
         "Operations/Features/iOS/LocationOperations.swift",
         "Operations/Features/iOS/WebpageOperation.swift"
