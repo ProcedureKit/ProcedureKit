@@ -155,8 +155,7 @@
  * NSDate *beginningOfMonday = ...   // Monday at 12:00 AM
  * NSDate *beginningOfTuesday =  ... // Tuesday at 12:00 AM
  *
- * YapDatabaseViewBlockType blockType = YapDatabaseViewBlockTypeWithObject;
- * YapDatabaseViewFindWithObjectBlock block = ^(NSString *key, id object){
+ * YapDatabaseViewFindWithObjectBlock block = ^(NSString *collection, NSString *key, id object){
  *
  *     Purchase *purchase = (Purchase *)object;
  *
@@ -232,11 +231,6 @@
  *     If not found, returns NSMakeRange(NSNotFound, 0).
 **/
 - (NSRange)findRangeInGroup:(NSString *)group using:(YapDatabaseViewFind *)find;
-
-- (NSRange)findRangeInGroup:(NSString *)group
-                 usingBlock:(YapDatabaseViewFindBlock)block
-                  blockType:(YapDatabaseViewBlockType)blockType
-__attribute((deprecated("Use method findRangeInGroup:using: instead")));
 
 /**
  * This method uses a binary search algorithm to find an item within the view that matches the given criteria.

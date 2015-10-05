@@ -9,67 +9,102 @@
 import Foundation
 import CoreLocation
 
+
+// MARK: Consumer Interfaces -
+
+// MARK: UserLocationOperation
+
+/// Access the device's current location.
+public typealias UserLocationOperation = _UserLocationOperation<CLLocationManager>
+
+// MARK: ReverseGeocodeOperation
+
+/// Reverse geocode a given CLLocation.
+public typealias ReverseGeocodeOperation = _ReverseGeocodeOperation<CLGeocoder>
+
+// MARK: ReverseGeocodeUserLocationOperation
+
+/// Reverse geocode the device's current location.
+public typealias ReverseGeocodeUserLocationOperation = _ReverseGeocodeUserLocationOperation<CLGeocoder, CLLocationManager>
+
 @available(*, unavailable, renamed="UserLocationOperation")
 public typealias LocationOperation = UserLocationOperation
 
-/**
-    An `Operation` subclass to request the user's current
-    geographic location.
-*/
-public class UserLocationOperation: Operation {
-    public typealias LocationResponseHandler = (location: CLLocation) -> Void
-    private typealias LocationManagerConfiguration = (LocationManager) -> Void
+// MARK: - Implementation Details -
 
-    public enum Error: ErrorType, Equatable {
-        case LocationManagerDidFail(NSError)
+public protocol LocationManagerType: LocationCapabilityRegistrarType {
+    func opr_setDesiredAccuracy(desiredAccuracy: CLLocationAccuracy)
+    func opr_startUpdatingLocation()
+    func opr_stopLocationUpdates()
+}
+
+extension CLLocationManager: LocationManagerType {
+
+    public func opr_setDesiredAccuracy(accuracy: CLLocationAccuracy) {
+        desiredAccuracy = accuracy
     }
 
+    public func opr_startUpdatingLocation() {
+        startUpdatingLocation()
+    }
+
+    public func opr_stopLocationUpdates() {
+        stopUpdatingLocation()
+    }
+}
+
+public enum LocationOperationError: ErrorType, Equatable {
+    case LocationManagerDidFail(NSError)
+    case GeocoderError(NSError)
+}
+
+public class _UserLocationOperation<Manager: LocationManagerType>: Operation, CLLocationManagerDelegate {
+    public typealias CompletionBlockType = CLLocation -> Void
+
+    private let manager: Manager
     private let accuracy: CLLocationAccuracy
-    private var manager: LocationManager?
-    private let handler: LocationResponseHandler
+    private let completion: CompletionBlockType
 
     /// Access the user's location once it has updated.
-    public var location: CLLocation? = .None
+    public private(set) var location: CLLocation? = .None
 
     /**
-    Initialize an operation which will use CLLocationManager to determine
-    the user's current location to the desired accuracy. It will ask for
+    Initialize an operation which will use a custom location manager to
+    determine the user's current location to the desired accuracy. It will ask for
     permission if required.
-    
+
+    Framework consumers should use: UserLocationOperation
+
     :param: accuracy, the location accuracy which defaults to 3km.
-    :param: handler, a response handler LocationResponseHandler.
+    :param: completion, a response handler LocationResponseHandler.
     */
-    public convenience init(accuracy: CLLocationAccuracy = kCLLocationAccuracyThreeKilometers, handler: LocationResponseHandler = { _ in }) {
-        self.init(accuracy: accuracy, manager: CLLocationManager(), handler: handler)
+    public convenience init(accuracy: CLLocationAccuracy = kCLLocationAccuracyThreeKilometers, completion: CompletionBlockType = { _ in }) {
+        self.init(manager: Manager(), accuracy: accuracy, completion: completion)
     }
 
-    init(accuracy: CLLocationAccuracy, manager: LocationManager, handler: LocationResponseHandler) {
-        self.accuracy = accuracy
+    /**
+    Initialize an operation which will use a custom location manager to
+    determine the user's current location to the desired accuracy. It will ask for
+    permission if required.
+
+    :param: manager, instance of a type which implements LocationManagerType.
+    :param: accuracy, the location accuracy.
+    :param: completion, a response handler LocationResponseHandler.
+    */
+    public init(manager: Manager, accuracy: CLLocationAccuracy, completion: CompletionBlockType) {
         self.manager = manager
-        self.handler = handler
+        self.accuracy = accuracy
+        self.completion = completion
         super.init()
-        addCondition(LocationCondition(usage: .WhenInUse, manager: manager))
-        addCondition(MutuallyExclusive<LocationManager>())
+        name = "User Location"
+        addCondition(AuthorizedFor(_LocationCapability(.WhenInUse, registrar: manager)))
+        addCondition(MutuallyExclusive<CLLocationManager>())
     }
 
     public override func execute() {
-
-        let configureLocationManager: LocationManagerConfiguration = { manager in
-            manager.opr_setDesiredAccuracy(self.accuracy)
-            manager.opr_setDelegate(self)
-            manager.opr_startUpdatingLocation()
-        }
-
-        if let manager = manager {
-            configureLocationManager(manager)
-        }
-        else {
-            dispatch_async(Queue.Main.queue) {
-                let manager = CLLocationManager()
-                configureLocationManager(manager)
-                self.manager = manager as LocationManager
-            }
-        }
+        manager.opr_setDesiredAccuracy(accuracy)
+        manager.opr_setDelegate(self)
+        manager.opr_startUpdatingLocation()
     }
 
     public override func cancel() {
@@ -79,39 +114,27 @@ public class UserLocationOperation: Operation {
         }
     }
 
-    private func stopLocationUpdates() {
-        manager?.opr_stopLocationUpdates()
-        manager = .None
+    internal func stopLocationUpdates() {
+        manager.opr_stopLocationUpdates()
     }
-}
 
-extension UserLocationOperation: CLLocationManagerDelegate {
-
-    public func locationManager(manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+    @objc public func locationManager(manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         if let location = locations.last where location.horizontalAccuracy <= accuracy {
             stopLocationUpdates()
             self.location = location
-            handler(location: location)
+            completion(location)
             finish()
         }
     }
 
-    public func locationManager(manager: CLLocationManager, didFailWithError error: NSError) {
+    @objc public func locationManager(manager: CLLocationManager, didFailWithError error: NSError) {
         stopLocationUpdates()
-        finish(Error.LocationManagerDidFail(error))
+        finish(LocationOperationError.LocationManagerDidFail(error))
     }
 }
-
-public func ==(a: UserLocationOperation.Error, b: UserLocationOperation.Error) -> Bool {
-    switch (a, b) {
-    case let (.LocationManagerDidFail(aError), .LocationManagerDidFail(bError)):
-        return aError == bError
-    }
-}
-
-// MARK: - Geocoding
 
 public protocol ReverseGeocoderType {
+    init()
     func opr_cancel()
     func opr_reverseGeocodeLocation(location: CLLocation, completion: ([CLPlacemark], NSError?) -> Void)
 }
@@ -124,34 +147,43 @@ extension CLGeocoder: ReverseGeocoderType {
 
     public func opr_reverseGeocodeLocation(location: CLLocation, completion: ([CLPlacemark], NSError?) -> Void) {
         reverseGeocodeLocation(location) { (results, error) in
-            completion(results ?? [], error as NSError?)
+            completion(results ?? [], error)
         }
     }
 }
 
-public class ReverseGeocodeOperation: Operation {
-
-    public typealias ReverseGeocodeCompletionHandler = (CLPlacemark) -> Void
-
-    public enum Error: ErrorType {
-        case GeocoderError(NSError)
-    }
+public class _ReverseGeocodeOperation<Geocoder: ReverseGeocoderType>: Operation {
+    public typealias CompletionBlockType = CLPlacemark -> Void
 
     public let location: CLLocation
-    internal let geocoder: ReverseGeocoderType
-    internal let completion: ReverseGeocodeCompletionHandler?
+
+    private let geocoder: Geocoder
+    private let completion: CompletionBlockType
 
     public private(set) var placemark: CLPlacemark? = .None
 
     /**
-        This is the true public API, the other public initializer is really just a testing
-        interface, and will not be public in Swift 2.0, Operations 2.0
+    Initialize an operation which will use a custom geocoder to
+    reverse lookup the given location.
+
+    Framework consumers see: ReverseGeocodeOperation
+
+    :param: location, the location to reverse lookup.
+    :param: completion, a completion block of CompletionBlockType
     */
-    public convenience init(location: CLLocation, completion: ReverseGeocodeCompletionHandler? = .None) {
-        self.init(location: location, geocoder: CLGeocoder(), completion: completion)
+    public convenience init(location: CLLocation, completion: CompletionBlockType = { _ in }) {
+        self.init(geocoder: Geocoder(), location: location, completion: completion)
     }
 
-    init(location: CLLocation, geocoder: ReverseGeocoderType, completion: ReverseGeocodeCompletionHandler? = .None) {
+    /**
+    Initialize an operation which will use a custom geocoder to
+    reverse lookup the given location.
+
+    :param: geocoder, instance of a type which implements ReverseGeocoderType.
+    :param: location, the location to reverse lookup.
+    :param: completion, a completion block of CompletionBlockType
+    */
+    public init(geocoder: Geocoder, location: CLLocation, completion: CompletionBlockType) {
         self.location = location
         self.geocoder = geocoder
         self.completion = completion
@@ -162,30 +194,30 @@ public class ReverseGeocodeOperation: Operation {
         addCondition(MutuallyExclusive<ReverseGeocodeOperation>())
     }
 
+    public override func execute() {
+        geocoder.opr_reverseGeocodeLocation(location) { (results, error) in
+            if let placemark = results.first {
+                self.placemark = placemark
+                self.completion(placemark)
+            }
+            self.finish(error.map { LocationOperationError.GeocoderError($0) })
+        }
+    }
+
     public override func cancel() {
         geocoder.opr_cancel()
         super.cancel()
     }
 
-    public override func execute() {
-        geocoder.opr_reverseGeocodeLocation(location) { (results, error) in
-            if let placemark = results.first {
-                self.placemark = placemark
-                self.completion?(placemark)
-            }
-            self.finish(error.map { Error.GeocoderError($0) })
-        }
-    }
 }
 
-public class ReverseGeocodeUserLocationOperation: GroupOperation {
+public class _ReverseGeocodeUserLocationOperation<Geocoder, Manager where Geocoder: ReverseGeocoderType, Manager: LocationManagerType>: GroupOperation {
+    public typealias CompletionBlockType = (CLLocation, CLPlacemark) -> Void
 
-    public typealias ReverseGeocodeUserLocationCompletionHandler = (CLLocation, CLPlacemark) -> Void
-
-    private let geocoder: ReverseGeocoderType
-    private let completion: ReverseGeocodeUserLocationCompletionHandler?
-    private let userLocationOperation: UserLocationOperation
-    private var reverseGeocodeOperation: ReverseGeocodeOperation?
+    private let geocoder: Geocoder
+    private let completion: CompletionBlockType
+    private let userLocationOperation: _UserLocationOperation<Manager>
+    private var reverseGeocodeOperation: _ReverseGeocodeOperation<Geocoder>?
 
     public var location: CLLocation? {
         return userLocationOperation.location
@@ -196,21 +228,34 @@ public class ReverseGeocodeUserLocationOperation: GroupOperation {
     }
 
     /**
-        This is the true public API, the other public initializer is really just a testing
-        interface, and will not be public in Swift 2.0, Operations 2.0
+    Initialize a group operation which will use a custom geocoder to
+    reverse lookup the device location (using a custom location manager).
+
+    Framework consumers see: ReverseGeocodeUserLocationOperation
+
+    :param: accuracy, the location accuracy.
+    :param: completion, a completion block of CompletionBlockType
     */
-    public convenience init(accuracy: CLLocationAccuracy = kCLLocationAccuracyThreeKilometers, completion: ReverseGeocodeUserLocationCompletionHandler? = .None) {
-        self.init(accuracy: accuracy, manager: CLLocationManager(), geocoder: CLGeocoder(), completion: completion)
+    public convenience init(accuracy: CLLocationAccuracy = kCLLocationAccuracyThreeKilometers, completion: CompletionBlockType = { _, _ in }) {
+        self.init(geocoder: Geocoder(), manager: Manager(), accuracy: accuracy, completion: completion)
     }
 
-    init(accuracy: CLLocationAccuracy, manager: LocationManager, geocoder: ReverseGeocoderType, completion: ReverseGeocodeUserLocationCompletionHandler? = .None) {
+    /**
+    Initialize a group operation which will use a custom geocoder to
+    reverse lookup the device location (using a custom location manager).
+
+    :param: geocoder, instance of a type which implements ReverseGeocoderType.
+    :param: manager, instance of a type which implements LocationManagerType.
+    :param: accuracy, the location accuracy.
+    :param: completion, a completion block of CompletionBlockType
+    */
+    public init(geocoder: Geocoder, manager: Manager, accuracy: CLLocationAccuracy, completion: CompletionBlockType) {
         self.geocoder = geocoder
         self.completion = completion
-        self.userLocationOperation = UserLocationOperation(accuracy: accuracy, manager: manager) { location in
-            // no-op
-        }
+        self.userLocationOperation = _UserLocationOperation(manager: manager, accuracy: accuracy, completion: { _ in })
         super.init(operations: [ userLocationOperation ])
         name = "Reverse Geocode User Location"
+        addCondition(MutuallyExclusive<ReverseGeocodeUserLocationOperation>())
     }
 
     public override func cancel() {
@@ -222,13 +267,27 @@ public class ReverseGeocodeUserLocationOperation: GroupOperation {
     public override func operationDidFinish(operation: NSOperation, withErrors errors: [ErrorType]) {
         if errors.isEmpty && userLocationOperation == operation && !operation.cancelled {
             if let location = location {
-                let reverseOp = ReverseGeocodeOperation(location: location, geocoder: geocoder) { [unowned self] placemark in
-                    self.completion?(location, placemark)
+                let reverseOp = _ReverseGeocodeOperation(geocoder: geocoder, location: location) { [unowned self] placemark in
+                    self.completion(location, placemark)
                 }
                 addOperation(reverseOp)
                 reverseGeocodeOperation = reverseOp
             }
         }
+    }
+}
+
+
+// MARK: - Boring Stuff
+
+public func ==(a: LocationOperationError, b: LocationOperationError) -> Bool {
+    switch (a, b) {
+    case let (.LocationManagerDidFail(aError), .LocationManagerDidFail(bError)):
+        return aError == bError
+    case let (.GeocoderError(aError), .GeocoderError(bError)):
+        return aError == bError
+    default:
+        return false
     }
 }
 

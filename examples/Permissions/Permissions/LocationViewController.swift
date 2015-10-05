@@ -44,51 +44,31 @@ class LocationViewController: PermissionViewController {
         determineAuthorizationStatus()
     }
 
-    override func conditionsForState(state: State, silent: Bool) -> [OperationCondition] {
-        return configureConditionsForState(state, silent: silent)(LocationCondition())
-    }
-    
-    func determineAuthorizationStatus(silently silently: Bool = true) {
+    func locationServicesEnabled(enabled: Bool, withAuthorization status: CLAuthorizationStatus) {
+        switch (enabled, status) {
+        case (false, _):
+            print("Location Services are not enabled")
 
-        // Create a simple block operation to set the state.
-        let authorized = BlockOperation { (continueWithError: BlockOperation.ContinuationBlockType) in
+        case (true, .AuthorizedWhenInUse), (true, .AuthorizedAlways):
             self.state = .Authorized
             self.mapView.showsUserLocation = true
-            continueWithError(error: nil)
+
+        case (true, .Restricted), (true, .Denied):
+            self.state = .Denied
+
+        default:
+            self.state = .Unknown
         }
+    }
 
-        authorized.name = "Authorized Access"
-
-        // Condition the operation so that it will only run if we have
-        // permission to access the user's address book.
-        let condition = LocationCondition()
-
-        // Additionally, suppress the automatic request if not authorized.
-        authorized.addCondition(silently ? SilentCondition(condition) : condition)
-
-        // Attach an observer so that we can inspect any condition errors
-        // From here, we can determine the authorization status if not
-        // authorized.
-        authorized.addObserver(BlockObserver { (_, errors) in
-            if let error = errors.first as? LocationCondition.Error {
-                switch error {
-                case .AuthenticationStatusNotSufficient(CLAuthorizationStatus.NotDetermined, _):
-                    self.state = .Unknown
-
-                case .AuthenticationStatusNotSufficient(CLAuthorizationStatus.Denied, _):
-                    self.state = .Denied
-
-                default:
-                    self.state = .Unknown
-                }
-            }
-        })
-
-        queue.addOperation(authorized)
+    func determineAuthorizationStatus() {
+        let status = GetAuthorizationStatus(Capability.Location(), completion: locationServicesEnabled)
+        queue.addOperation(status)
     }
 
     override func requestPermission() {
-        determineAuthorizationStatus(silently: false)
+        let authorize = Authorize(Capability.Location(), completion: locationServicesEnabled)
+        queue.addOperation(authorize)
     }
 
     override func performOperation() {
