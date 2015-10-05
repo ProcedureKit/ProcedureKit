@@ -74,8 +74,10 @@ public class GetAuthorizationStatus<Capability: CapabilityType>: Operation {
     }
 
     public override func execute() {
-        determineState(completion)
-        finish()
+        determineState { response in
+            self.completion(response)
+            self.finish()
+        }
     }
 }
 
