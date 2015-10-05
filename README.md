@@ -131,36 +131,35 @@ func getCurrentLocation(completion: CLLocation -> Void) {
 
 This operation will automatically request the user's permission if the application doesn't already have the required authorization, the default is "when in use".
 
-Perhaps also you want to just test to see if authorization has already been granted, but not ask for it if it hasn't. This can be done using a `BlockOperation` and `SilentCondition`. In Apple’s original sample code from WWDC 2015, there are a number of OperationConditions which express the authorization status for device or OS permissions. Things like, `LocationCondition`, and `HealthCondition`. In version 2.3 of Operations I moved away from this model to unify this functionality into `CapabilityType` protocol. Where previously there were bespoke conditions (and errors) to test the status, there is now a single condition, which is initialized with a `CapabilityType`. For example this operation lets you silently test the current status of the location capabilities.
+Perhaps also you want to just test to see if authorization has already been granted, but not ask for it if it hasn't. In Apple’s original sample code from WWDC 2015, there are a number of `OperationCondition`s which express the authorization status for device or OS permissions. Things like, `LocationCondition`, and `HealthCondition`. However, in version 2.3 of Operations I moved away from this model to unify this functionality into th `CapabilityType` protocol. Where previously there were bespoke conditions (and errors) to test the status, there is now a single condition, which is initialized with a `CapabilityType`. 
+
+For example, where previously you would have written this:
 
 ```swift
-queue.addOperation(GetAuthorizationStatus(Capability.Location(.WhenInUse)) { enabled, status in 
-    switch (enabled, status) {
-        case (false, _):
-           // Location services are not enabled
-        case (true, .NotDetermined):
-           // Location services are enabled, but not currently determined for the app.
-    }
-})
+operation.addCondition(LocationCondition(usage: .WhenInUse))
 ```
 
-To explicitly request permission, use the `Authorize` operation,:
+now you write this:
 
 ```swift
-queue.addOperation(Authorize(Capability.Location(.WhenInUse)) { enabled, status in 
-    switch (enabled, status) {
-        case (false, _):
-           // Location services are not enabled
-        case (true, .NotDetermined):
-           // Location services are enabled, but not currently determined for the app.
-    }
-})
+operation.addCondition(AuthorizedFor(Capability.Location(.WhenInUse)))
 ```
 
-Note that `Authorize` is a subclass, and has exactly the same initializer, meaning that you can implement a function for this.
+As of 2.3 the following capabilities are expressed:
+
+- [x] `Capability.Calendar` - includes support for `EKEntityType` requirements, defaults to `.Event`.
+- [x] `Capability.Cloud` - includes support for default `CKContainer` or with specific identifier, and `.UserDiscoverable` cloud container permissions.
+- [x] `Capability.Health` - improved support for exactly which `HKObjectType`s have read permissions. Please get in touch if you want to use HealthKit with Operations, as I currently don't, and would like some feedback or input on further improvements that can be made for HealthKit.
+- [x] `Capability.Location` - includes support for required usage, either `.WhenInUse` (the default) or `.Always`.
+- [x] `Capability.Passbook` - note here that there is void "status" type, just an availability boolean.
+- [x] `Capability.Photos` 
+
+In addition to a generic operation condition, which can be used as before with `SilentCondition` and `NegatedCondition`. There are also two capability generic operations. `GetAuthorizationStatus` will retrieve the current status of the capability. `Authorize` will explicity request the required permissions for the capability. Both of these operations accept the capability as their first initializer argument without a label, and have a completion block with the same type. Therefore, it is trivial to write a function which can update your controller or UI and use it for both operations.
+
+For example here we can check the status of location services for the app:
 
 ```swift
-func locationStatusDidChange(enabled: Bool, status: CLAuthorizationStatus) {
+func locationServicesEnabled(enabled: Bool, withAuthorization status: CLAuthorizationStatus) {
     switch (enabled, status) {
         case (false, _):
            // Location services are not enabled
@@ -168,15 +167,18 @@ func locationStatusDidChange(enabled: Bool, status: CLAuthorizationStatus) {
            // Location services are enabled, but not currently determined for the app.
     }
 }
+
+func determineAuthorizationStatus() {
+    queue.addOperation(GetAuthorizationStatus(Capability.Location(), completion: locationServicesEnabled))
+}
+
+func requestPermission() {
+    queue.addOperation(Authorize(Capability.Location(), completion: locationServicesEnabled))
+}
 ```
 
-To express the allow permissions in an `OperationCondition`, use `AuthorizedFor` in exactly the same way.
+See the Permissions example project, where the above code is taken from.
 
-```swift
-let operation = MyOperation()
-operation.addCondition(AuthorizedFor(Capability.Location(.WhenInUse)))
-queue.addOperation(operation)
-```
 
 ## Installation
 
