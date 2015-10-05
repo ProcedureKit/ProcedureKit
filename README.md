@@ -222,23 +222,19 @@ This is a brief summary of the current and planned functionality.
 
 ### Features
 
+- [x] `GetAuthorizationStatus` get the current authorization status for the given `CapabilityType`. Supports EventKit, CloudKit, HealthKit, CoreLocation, PassKit, Photos.
+- [x] `Authorize` request the required permissions to access the required `CapabilityType`. Supports EventKit, CloudKit, HealthKit, CoreLocation, PassKit, Photos.
+- [x] `AuthorizedFor` express the required permissions to access the required `CapabilityType` as an `OperationCondition`. Meaning that if the status has not been determined yet, it will trigger authorization. Supports EventKit, CloudKit, HealthKit, CoreLocation, PassKit, Photos.
 - [x] `ReachabilityCondition` requires that the supplied URL is reachable.
 - [x] `ReachableOperation` compose an operation which must complete and requires network reachability. This uses an included system  Reachability object and does not require any extra dependencies. However currently in Swift 1.2, as function pointers are not supported, this uses a polling mechanism with `dispatch_source_timer`. I will probably replace this with more efficient Objective-C soon.
-- [x] `CloudCondition` require varying levels of access to a `CKContainer`.
 - [x] `CloudKitOperation` compose a `CKDatabaseOperation` inside an `Operation` with the appropriate `CKDatabase`.
-- [x] `LocationCondition` requires permission to access the user’s location with support for specifying always or when in use permissions.
 - [x] `UserLocationOperation` access the user’s current location with desired accuracy. 
 - [x] `ReverseGeocodeOperation` perform a reverse geocode lookup of the supplied `CLLocation`.
 - [x] `ReverseGeocodeUserLocationOperation` perform a reverse geocode lookup of user’s current location.  
-- [x] `UserNotificationCondition` require that the user has granted permission to present th
+- [x] `UserNotificationCondition` require that the user has granted permission to present notifications.
 - [x] `RemoteNotificationCondition` require that the user has granted permissions to receive remote notifications.
-- [x] `HealthCondition` requires permission to read/write the supplied health kit sample types.
-- [x] `PhotosCondition` requires permission to access the user’s photo library.
-- [x] `CalendarCondition` requires permissions to access the user’s calendar events and/or reminders. 
-- [x] `PassbookCondition` requires that the user’s Pass Library is available.
 - [x] `UserConfirmationCondition` requires that the user confirms an action presented to them using a `UIAlertController`. The condition is configurable for title, message and button texts. 
 - [x] `WebpageOperation` given a URL, will present a `SFSafariViewController`.
-- [ ] Contacts - Planned: to match the functionality of AddressBook operations but using Contacts.framework for iOS 9.
 
 ### +AddressBook
 
