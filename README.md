@@ -131,34 +131,52 @@ func getCurrentLocation(completion: CLLocation -> Void) {
 
 This operation will automatically request the user's permission if the application doesn't already have the required authorization, the default is "when in use".
 
-Perhaps also you want to just test to see if authorization has already been granted, but not ask for it if it hasn't. This can be done using a `BlockOperation` and `SilentCondition`.
+Perhaps also you want to just test to see if authorization has already been granted, but not ask for it if it hasn't. This can be done using a `BlockOperation` and `SilentCondition`. In Apple’s original sample code from WWDC 2015, there are a number of OperationConditions which express the authorization status for device or OS permissions. Things like, `LocationCondition`, and `HealthCondition`. In version 2.3 of Operations I moved away from this model to unify this functionality into `CapabilityType` protocol. Where previously there were bespoke conditions (and errors) to test the status, there is now a single condition, which is initialized with a `CapabilityType`. For example this operation lets you silently test the current status of the location capabilities.
 
 ```swift
-func determineAuthorizationStatus() {
-    let authorized = BlockOperation { (continueWithError: BlockOperation.ContinuationBlockType) in
-        self.state = .Authorized
-        continueWithError(error: nil)
+queue.addOperation(GetAuthorizationStatus(Capability.Location(.WhenInUse)) { enabled, status in 
+    switch (enabled, status) {
+        case (false, _):
+           // Location services are not enabled
+        case (true, .NotDetermined):
+           // Location services are enabled, but not currently determined for the app.
     }
-    authorized.addCondition(SilentCondition(LocationCondition()))
-    authorized.addObserver(BlockObserver { (_, errors) in
-        if let error = errors.first as? LocationCondition.Error {
-            switch error {
-            case let .AuthenticationStatusNotSufficient(CLAuthorizationStatus.NotDetermined, _):
-                self.state = .Unknown
+})
+```
 
-            case let .AuthenticationStatusNotSufficient(CLAuthorizationStatus.Denied, _):
-                self.state = .Denied
+To explicitly request permission, use the `Authorize` operation,:
 
-            default:
-                self.state = .Unknown
-            }
-        }
-    })
-    queue.addOperation(authorized)
+```swift
+queue.addOperation(Authorize(Capability.Location(.WhenInUse)) { enabled, status in 
+    switch (enabled, status) {
+        case (false, _):
+           // Location services are not enabled
+        case (true, .NotDetermined):
+           // Location services are enabled, but not currently determined for the app.
+    }
+})
+```
+
+Note that `Authorize` is a subclass, and has exactly the same initializer, meaning that you can implement a function for this.
+
+```swift
+func locationStatusDidChange(enabled: Bool, status: CLAuthorizationStatus) {
+    switch (enabled, status) {
+        case (false, _):
+           // Location services are not enabled
+        case (true, .NotDetermined):
+           // Location services are enabled, but not currently determined for the app.
+    }
 }
 ```
 
-There is an example app, Permissions.app in `example/Permissions` which contains more examples of this sort of usage. 
+To express the allow permissions in an `OperationCondition`, use `AuthorizedFor` in exactly the same way.
+
+```swift
+let operation = MyOperation()
+operation.addCondition(AuthorizedFor(Capability.Location(.WhenInUse)))
+queue.addOperation(operation)
+```
 
 ## Installation
 
