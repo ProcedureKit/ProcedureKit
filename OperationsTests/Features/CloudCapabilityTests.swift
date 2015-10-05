@@ -19,10 +19,15 @@ final class TestableCloudContainer: NSObject {
     var accountStatusError: NSError? = .None
     var didGetAccountStatus = false
 
-    var verifyApplicationPermissions: CKApplicationPermissions? = .None
-    var verifiedApplicationPermissionStatus: CKApplicationPermissionStatus = .InitialState
+    var verifyApplicationPermissionStatus: CKApplicationPermissionStatus = .InitialState
     var verifyApplicationPermissionsError: NSError? = .None
+    var verifyApplicationPermissions: CKApplicationPermissions? = .None
     var didVerifyApplicationStatus = false
+
+    var requestApplicationPermissionStatus: CKApplicationPermissionStatus = .Granted
+    var requestApplicationPermissionsError: NSError? = .None
+    var requestApplicationPermissions: CKApplicationPermissions? = .None
+    var didRequestApplicationStatus = false
 
     required override init() { }   
 }
@@ -48,11 +53,13 @@ extension TestableCloudContainer: CloudContainerRegistrarType {
     func opr_statusForApplicationPermission(applicationPermission: CKApplicationPermissions, completionHandler: CKApplicationPermissionBlock) {
         didVerifyApplicationStatus = true
         verifyApplicationPermissions = applicationPermission
-        completionHandler(verifiedApplicationPermissionStatus, verifyApplicationPermissionsError)
+        completionHandler(verifyApplicationPermissionStatus, verifyApplicationPermissionsError)
     }
 
     func opr_requestApplicationPermission(applicationPermission: CKApplicationPermissions, completionHandler: CKApplicationPermissionBlock) {
-
+        didRequestApplicationStatus = true
+        requestApplicationPermissions = applicationPermission
+        completionHandler(requestApplicationPermissionStatus, requestApplicationPermissionsError)
     }
 }
 
@@ -107,6 +114,8 @@ class CloudCapabilitiesTests: XCTestCase {
         XCTAssertTrue(capability.isAvailable())
     }
 
+    // Getting status
+
     func test__given_status_could_not_be_determined__authorization_status_queries_the_registrar() {
         capability.authorizationStatus { status in
             XCTAssertTrue(self.capability.registrar.didGetAccountStatus)
@@ -139,6 +148,45 @@ class CloudCapabilitiesTests: XCTestCase {
             XCTAssertEqual(status.permissions, CKApplicationPermissionStatus.InitialState)
             XCTAssertNil(status.error)
         }
+    }
+
+    func test__no_account_status() {
+        capability.registrar.accountStatus = .NoAccount
+        capability.authorizationStatus { status in
+            XCTAssertTrue(self.capability.registrar.didGetAccountStatus)
+            XCTAssertFalse(self.capability.registrar.didVerifyApplicationStatus)
+            XCTAssertEqual(status.account, CKAccountStatus.NoAccount)
+            XCTAssertNil(status.permissions)
+            XCTAssertNil(status.error)
+        }
+    }
+
+    func test__restricted_account_status() {
+        capability.registrar.accountStatus = .Restricted
+        capability.authorizationStatus { status in
+            XCTAssertTrue(self.capability.registrar.didGetAccountStatus)
+            XCTAssertFalse(self.capability.registrar.didVerifyApplicationStatus)
+            XCTAssertEqual(status.account, CKAccountStatus.Restricted)
+            XCTAssertNil(status.permissions)
+            XCTAssertNil(status.error)
+        }
+    }
+
+    // Requesting authorization
+
+    func test__request_permissions() {
+        let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
+        requirement = [ .UserDiscoverability ]
+        makeDefaultCapability()
+        capability.registrar.accountStatus = .Available
+        capability.requestAuthorizationWithCompletion {
+            XCTAssertTrue(self.capability.registrar.didGetAccountStatus)
+            XCTAssertTrue(self.capability.registrar.didVerifyApplicationStatus)
+            XCTAssertTrue(self.capability.registrar.didRequestApplicationStatus)
+            expectation.fulfill()
+        }
+
+        waitForExpectationsWithTimeout(3, handler: nil)
     }
 
 }
