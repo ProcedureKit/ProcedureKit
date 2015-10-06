@@ -1153,6 +1153,10 @@ public enum AddressBookPermissionRegistrarError: ErrorType {
 
 public struct SystemAddressBookRegistrar: AddressBookPermissionRegistrar {
 
+    public init() {
+        
+    }
+
     public var status: ABAuthorizationStatus {
         return ABAddressBookGetAuthorizationStatus()
     }

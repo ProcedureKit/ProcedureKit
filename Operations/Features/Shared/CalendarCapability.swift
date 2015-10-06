@@ -36,13 +36,12 @@ extension EKAuthorizationStatus: AuthorizationStatusType {
 
 public class _EventsCapability<Registrar: EventsCapabilityRegistrarType>: NSObject, CapabilityType {
 
-    public let name: String
+    public let name = "Events"
     public let requirement: EKEntityType
 
     let registrar: Registrar
 
     public required init(_ requirement: EKEntityType = .Event, registrar: Registrar = Registrar()) {
-        self.name = "Events"
         self.requirement = requirement
         self.registrar = registrar
         super.init()
