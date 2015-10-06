@@ -18,7 +18,7 @@ public class ComposedOperation<O: NSOperation>: GatedOperation<O> {
     /**
     Designated initializer.
     
-    :param: operation The operation to compose.
+    - parameter operation: The composed operation, must be a `NSOperation` subclass.
     */
     public init(operation: O) {
         super.init(operation: operation, gate: { true })
