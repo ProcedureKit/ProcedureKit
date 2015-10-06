@@ -60,6 +60,13 @@ public class AlertOperation<From: PresentingViewController>: Operation {
         }
     }
 
+    /**
+    Creates an `AlertOperation`. It must be constructed with the view
+    controller which the alert will be presented from.
+    
+    - parameter from: a generic type conforming to `PresentingViewController`, 
+    such as an `UIViewController`
+    */
     public init(presentAlertFrom from: From) {
         ui = UIOperation(controller: UIAlertController(title: .None, message: .None, preferredStyle: .Alert), displayControllerFrom: .Present(from))
         super.init()
@@ -73,9 +80,9 @@ public class AlertOperation<From: PresentingViewController>: Operation {
     Do not add actions directly to the `UIAlertController`, as
     this will prevent the `AlertOperation` from correctly finishing.
     
-    :param: title, a required String.
-    :param: style, a `UIAlertActionStyle` which defaults to `.Default`.
-    :param: handler, a block which receives the operation, and returns Void.
+    - parameter title, a required String.
+    - parameter style, a `UIAlertActionStyle` which defaults to `.Default`.
+    - parameter handler, a block which receives the operation, and returns Void.
     */
     public func addActionWithTitle(title: String, style: UIAlertActionStyle = .Default, handler: AlertOperation -> Void = { _ in }) {
         let action = UIAlertAction(title: title, style: style) { [weak self] _ in
@@ -87,6 +94,11 @@ public class AlertOperation<From: PresentingViewController>: Operation {
         alert.addAction(action)
     }
 
+    /**
+    Will add a default "Okay" action (`NSLocalizedString("Okay", comment: "Okay")`)
+    if the alert has no actions. Will then produce the UI operation which presents
+    the alert controller.
+    */
     public override func execute() {
         if alert.actions.isEmpty {
             addActionWithTitle(NSLocalizedString("Okay", comment: "Okay"))
