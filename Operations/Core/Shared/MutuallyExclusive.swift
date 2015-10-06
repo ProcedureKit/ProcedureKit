@@ -14,18 +14,32 @@ cannot be allowed to execute concurrently.
 */
 public struct MutuallyExclusive<T>: OperationCondition {
 
+    /**
+    The name of the condition wraps the name of the generic
+    OperationCondition.
+
+    - parameter name: a String
+    */
     public var name: String {
         return "MutuallyExclusive<\(T.self)>"
     }
 
-    public var isMutuallyExclusive = true
+    /**
+    The mututally exclusivity parameter which is always true.
 
+    - parameter isMutuallyExclusive: a constant Bool, true.
+    */
+    public let isMutuallyExclusive = true
+
+    /// Public constructor
     public init() { }
 
+    /// Conforms to `OperationCondition`, but there are no dependencies, so it returns .None.
     public func dependencyForOperation(operation: Operation) -> NSOperation? {
         return .None
     }
 
+    /// Conforms to `OperationCondition`, but there is no evaluation, so it just completes with `.Satisfied`.
     public func evaluateForOperation(operation: Operation, completion: OperationConditionResult -> Void) {
         completion(.Satisfied)
     }
