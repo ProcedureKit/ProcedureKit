@@ -27,14 +27,14 @@ a composed condition.
 public struct NegatedCondition<Condition: OperationCondition>: OperationCondition {
 
     /**
-    The nested condition.
+    The composed condition.
 
     - parameter condition: a type which conforms to `OperationCondition`
     */
     public let condition: Condition
 
     /**
-    The name of the condition wraps the name of the nested
+    The name of the condition wraps the name of the composed
     OperationCondition.
 
     - parameter name: a String
@@ -45,7 +45,7 @@ public struct NegatedCondition<Condition: OperationCondition>: OperationConditio
 
     /**
     The mututally exclusivity parameter which wraps the
-    nested condition's isMutuallyExclusive property.
+    composed condition's isMutuallyExclusive property.
 
     - parameter isMutuallyExclusive: a constant Bool, true.
     */
@@ -64,7 +64,7 @@ public struct NegatedCondition<Condition: OperationCondition>: OperationConditio
 
     /**
     The dependencies for a negated condition are the same as those of the
-    nested condition.
+    composed condition.
 
     - parameter operation: the `Operation` which is getting evaluated.
     */
@@ -73,7 +73,7 @@ public struct NegatedCondition<Condition: OperationCondition>: OperationConditio
     }
 
     /**
-    The evaluation results are inverted.
+    The evaluation results are those of the composed condition but inverted.
 
     - parameter operation: the `Operation` which is getting evaluated.
     - parameter completion: a block which receives the `OperationConditionResult`.
@@ -90,6 +90,7 @@ public struct NegatedCondition<Condition: OperationCondition>: OperationConditio
     }
 }
 
+/// Equatable conformance for `NegatedConditionError`
 public func ==(a: NegatedConditionError, b: NegatedConditionError) -> Bool {
     switch (a, b) {
     case let (.ConditionSatisfied(aString), .ConditionSatisfied(bString)):
