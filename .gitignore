@@ -33,3 +33,6 @@ DerivedData
 Carthage/Build
 .fastlane/report.xml
 .fastlane/xcodebuild-data
+
+# Jazzy
+docs
