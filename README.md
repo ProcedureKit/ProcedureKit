@@ -4,11 +4,11 @@
 
 A Swift framework inspired by WWDC 2015 Advanced NSOperations session. See the session video here: https://developer.apple.com/videos/wwdc/2015/?id=226
 
-## Status - 21st Sept, 2015
+## Status - 6th Oct, 2015
 
-The Swift 1.2 compatible version of Operations is version 1.0. This is no longer under active development, however if you’re still stuck on Swift 1.2, and have a bug, please create ticket and I’ll do a point release.
+As of version 2.1, Operations is a multi-platform framework, with framework targets for iOS Extensions, iOS Apps, OS X, watchOS and tvOS. Version 2.2 adds initial support for Contacts framework in iOS 9 and El Capitan. It also introduces the concept of CapabilityTypes, meaning that many device permission conditions have been refactored. See the release notes, and below or #97 for details.
 
-Development from now on is using Swift 2.0, for all of Apple’s platforms as of version 2.1, which adds support for OS X and extension compatible frameworks. watchOS 2.0 and tvOS frameworks are built (if using the correct version of Xcode), however, the current version of Cocoapods (0.38.2) doesn’t yet support these platforms correctly. I’ll be looking into Carthage support in the coming week.
+Current development is focused on unifying APIs for AddressBook. This might well cause some disruption to your current code if using the AddressBook operations, hence I’m spreading these changes across two releases. 
 
 ## Usage
 
@@ -131,7 +131,7 @@ func getCurrentLocation(completion: CLLocation -> Void) {
 
 This operation will automatically request the user's permission if the application doesn't already have the required authorization, the default is "when in use".
 
-Perhaps also you want to just test to see if authorization has already been granted, but not ask for it if it hasn't. In Apple’s original sample code from WWDC 2015, there are a number of `OperationCondition`s which express the authorization status for device or OS permissions. Things like, `LocationCondition`, and `HealthCondition`. However, in version 2.3 of Operations I moved away from this model to unify this functionality into th `CapabilityType` protocol. Where previously there were bespoke conditions (and errors) to test the status, there is now a single condition, which is initialized with a `CapabilityType`. 
+Perhaps also you want to just test to see if authorization has already been granted, but not ask for it if it hasn't. In Apple’s original sample code from WWDC 2015, there are a number of `OperationCondition`s which express the authorization status for device or OS permissions. Things like, `LocationCondition`, and `HealthCondition`. However, in version 2.2 of Operations I moved away from this model to unify this functionality into th `CapabilityType` protocol. Where previously there were bespoke conditions (and errors) to test the status, there is now a single condition, which is initialized with a `CapabilityType`. 
 
 For example, where previously you would have written this:
 
@@ -145,7 +145,7 @@ now you write this:
 operation.addCondition(AuthorizedFor(Capability.Location(.WhenInUse)))
 ```
 
-As of 2.3 the following capabilities are expressed:
+As of 2.2 the following capabilities are expressed:
 
 - [x] `Capability.Calendar` - includes support for `EKEntityType` requirements, defaults to `.Event`.
 - [x] `Capability.Cloud` - includes support for default `CKContainer` or with specific identifier, and `.UserDiscoverable` cloud container permissions.

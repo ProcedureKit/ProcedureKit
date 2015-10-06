@@ -4,7 +4,7 @@ inhibit_all_warnings!
 use_frameworks!
 
 pod 'PureLayout'
-pod 'YapDatabase', :git => 'https://github.com/danthorpe/YapDatabase', :branch => 'YAP-180_remove_weak_linking'
+pod 'YapDatabase', :git => 'https://github.com/yapstudios/YapDatabase', :branch => 'master'
 pod 'YapDatabaseExtensions', '~> 2'
 pod 'TaylorSource/YapDatabase', '~> 2'
 pod 'Operations/+AddressBook', :path => '../../'
