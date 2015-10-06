@@ -286,13 +286,15 @@ static NSString *const ext_key_version_deprecated = @"version";
 	// Enumerate the existing rows in the database and populate the indexes
 	
 	__unsafe_unretained YapDatabaseSecondaryIndex *secondaryIndex = secondaryIndexConnection->secondaryIndex;
-	
 	__unsafe_unretained YapWhitelistBlacklist *allowedCollections = secondaryIndex->options.allowedCollections;
 	
-	if (secondaryIndex->blockType == YapDatabaseSecondaryIndexBlockTypeWithKey)
+	YapDatabaseSecondaryIndexHandler *handler = secondaryIndex->handler;
+	YapDatabaseBlockType blockType = handler->blockType;
+	
+	if (blockType == YapDatabaseBlockTypeWithKey)
 	{
 		__unsafe_unretained YapDatabaseSecondaryIndexWithKeyBlock secondaryIndexBlock =
-		    (YapDatabaseSecondaryIndexWithKeyBlock)secondaryIndex->block;
+		    (YapDatabaseSecondaryIndexWithKeyBlock)handler->block;
 		
 		void (^enumBlock)(int64_t rowid, NSString *collection, NSString *key, BOOL *stop);
 		enumBlock = ^(int64_t rowid, NSString *collection, NSString *key, BOOL __unused *stop) {
@@ -321,10 +323,10 @@ static NSString *const ext_key_version_deprecated = @"version";
 			[databaseTransaction _enumerateKeysInAllCollectionsUsingBlock:enumBlock];
 		}
 	}
-	else if (secondaryIndex->blockType == YapDatabaseSecondaryIndexBlockTypeWithObject)
+	else if (blockType == YapDatabaseBlockTypeWithObject)
 	{
 		__unsafe_unretained YapDatabaseSecondaryIndexWithObjectBlock secondaryIndexBlock =
-		    (YapDatabaseSecondaryIndexWithObjectBlock)secondaryIndex->block;
+		    (YapDatabaseSecondaryIndexWithObjectBlock)handler->block;
 		
 		void (^enumBlock)(int64_t rowid, NSString *collection, NSString *key, id object, BOOL *stop);
 		enumBlock = ^(int64_t rowid, NSString *collection, NSString *key, id object, BOOL __unused *stop) {
@@ -354,10 +356,10 @@ static NSString *const ext_key_version_deprecated = @"version";
 			[databaseTransaction _enumerateKeysAndObjectsInAllCollectionsUsingBlock:enumBlock];
 		}
 	}
-	else if (secondaryIndex->blockType == YapDatabaseSecondaryIndexBlockTypeWithMetadata)
+	else if (blockType == YapDatabaseBlockTypeWithMetadata)
 	{
 		__unsafe_unretained YapDatabaseSecondaryIndexWithMetadataBlock secondaryIndexBlock =
-		    (YapDatabaseSecondaryIndexWithMetadataBlock)secondaryIndex->block;
+		    (YapDatabaseSecondaryIndexWithMetadataBlock)handler->block;
 		
 		void (^enumBlock)(int64_t rowid, NSString *collection, NSString *key, id metadata, BOOL *stop);
 		enumBlock = ^(int64_t rowid, NSString *collection, NSString *key, id metadata, BOOL __unused *stop) {
@@ -387,10 +389,10 @@ static NSString *const ext_key_version_deprecated = @"version";
 			[databaseTransaction _enumerateKeysAndMetadataInAllCollectionsUsingBlock:enumBlock];
 		}
 	}
-	else // if (secondaryIndex->blockType == YapDatabaseSecondaryIndexBlockTypeWithRow)
+	else // if (blockType == YapDatabaseBlockTypeWithRow)
 	{
 		__unsafe_unretained YapDatabaseSecondaryIndexWithRowBlock secondaryIndexBlock =
-		    (YapDatabaseSecondaryIndexWithRowBlock)secondaryIndex->block;
+		    (YapDatabaseSecondaryIndexWithRowBlock)handler->block;
 		
 		void (^enumBlock)(int64_t rowid, NSString *collection, NSString *key, id object, id metadata, BOOL *stop);
 		enumBlock = ^(int64_t rowid, NSString *collection, NSString *key, id object, id metadata, BOOL __unused *stop) {
@@ -731,13 +733,13 @@ static NSString *const ext_key_version_deprecated = @"version";
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * YapDatabase extension hook.
- * This method is invoked by a YapDatabaseReadWriteTransaction as a post-operation-hook.
+ * Private helper method for other handleXXX hook methods.
 **/
-- (void)handleInsertObject:(id)object
-          forCollectionKey:(YapCollectionKey *)collectionKey
-              withMetadata:(id)metadata
-                     rowid:(int64_t)rowid
+- (void)_handleChangeWithRowid:(int64_t)rowid
+                 collectionKey:(YapCollectionKey *)collectionKey
+                        object:(id)object
+                      metadata:(id)metadata
+                      isInsert:(BOOL)isInsert
 {
 	YDBLogAutoTrace();
 	
@@ -754,47 +756,73 @@ static NSString *const ext_key_version_deprecated = @"version";
 	
 	// Invoke the block to find out if the object should be included in the index.
 	
-	if (secondaryIndex->blockType == YapDatabaseSecondaryIndexBlockTypeWithKey)
+	YapDatabaseSecondaryIndexHandler *handler = secondaryIndex->handler;
+	YapDatabaseBlockType blockType = handler->blockType;
+	
+	if (blockType == YapDatabaseBlockTypeWithKey)
 	{
 		__unsafe_unretained YapDatabaseSecondaryIndexWithKeyBlock block =
-		    (YapDatabaseSecondaryIndexWithKeyBlock)secondaryIndex->block;
+		    (YapDatabaseSecondaryIndexWithKeyBlock)handler->block;
 		
 		block(secondaryIndexConnection->blockDict, collection, key);
 	}
-	else if (secondaryIndex->blockType == YapDatabaseSecondaryIndexBlockTypeWithObject)
+	else if (blockType == YapDatabaseBlockTypeWithObject)
 	{
 		__unsafe_unretained YapDatabaseSecondaryIndexWithObjectBlock block =
-		    (YapDatabaseSecondaryIndexWithObjectBlock)secondaryIndex->block;
+		    (YapDatabaseSecondaryIndexWithObjectBlock)handler->block;
 		
 		block(secondaryIndexConnection->blockDict, collection, key, object);
 	}
-	else if (secondaryIndex->blockType == YapDatabaseSecondaryIndexBlockTypeWithMetadata)
+	else if (blockType == YapDatabaseBlockTypeWithMetadata)
 	{
 		__unsafe_unretained YapDatabaseSecondaryIndexWithMetadataBlock block =
-		    (YapDatabaseSecondaryIndexWithMetadataBlock)secondaryIndex->block;
+		    (YapDatabaseSecondaryIndexWithMetadataBlock)handler->block;
 		
 		block(secondaryIndexConnection->blockDict, collection, key, metadata);
 	}
 	else
 	{
 		__unsafe_unretained YapDatabaseSecondaryIndexWithRowBlock block =
-		    (YapDatabaseSecondaryIndexWithRowBlock)secondaryIndex->block;
+		    (YapDatabaseSecondaryIndexWithRowBlock)handler->block;
 		
 		block(secondaryIndexConnection->blockDict, collection, key, object, metadata);
 	}
 	
 	if ([secondaryIndexConnection->blockDict count] == 0)
 	{
-		// This was an insert operation, so we don't have to worry about removing anything.
+		// Remove associated values from index (if needed).
+		
+		if (!isInsert)
+		{
+			[self removeRowid:rowid];
+		}
 	}
 	else
 	{
-		// Add values to index.
-		// This was an insert operation, so we know we can insert rather than update.
+		// Add values to index (or update them).
+		// This was an update operation, so we need to insert or update.
 		
-		[self addRowid:rowid isNew:YES];
+		[self addRowid:rowid isNew:isInsert];
 		[secondaryIndexConnection->blockDict removeAllObjects];
 	}
+}
+
+/**
+ * YapDatabase extension hook.
+ * This method is invoked by a YapDatabaseReadWriteTransaction as a post-operation-hook.
+**/
+- (void)handleInsertObject:(id)object
+          forCollectionKey:(YapCollectionKey *)collectionKey
+              withMetadata:(id)metadata
+                     rowid:(int64_t)rowid
+{
+	YDBLogAutoTrace();
+	
+	[self _handleChangeWithRowid:rowid
+	               collectionKey:collectionKey
+	                      object:object
+	                    metadata:metadata
+	                    isInsert:YES];
 }
 
 /**
@@ -809,62 +837,21 @@ static NSString *const ext_key_version_deprecated = @"version";
 	YDBLogAutoTrace();
 	
 	__unsafe_unretained YapDatabaseSecondaryIndex *secondaryIndex = secondaryIndexConnection->secondaryIndex;
+	__unsafe_unretained YapDatabaseSecondaryIndexHandler *handler = secondaryIndex->handler;
 	
-	__unsafe_unretained NSString *collection = collectionKey.collection;
-	__unsafe_unretained NSString *key = collectionKey.key;
+	YapDatabaseBlockInvoke blockInvokeBitMask = YapDatabaseBlockInvokeIfObjectModified |
+	                                            YapDatabaseBlockInvokeIfMetadataModified;
 	
-	__unsafe_unretained YapWhitelistBlacklist *allowedCollections = secondaryIndex->options.allowedCollections;
-	if (allowedCollections && ![allowedCollections isAllowed:collection])
+	if (!(handler->blockInvokeOptions & blockInvokeBitMask))
 	{
 		return;
 	}
 	
-	// Invoke the block to find out if the object should be included in the index.
-	
-	if (secondaryIndex->blockType == YapDatabaseSecondaryIndexBlockTypeWithKey)
-	{
-		__unsafe_unretained YapDatabaseSecondaryIndexWithKeyBlock block =
-		    (YapDatabaseSecondaryIndexWithKeyBlock)secondaryIndex->block;
-		
-		block(secondaryIndexConnection->blockDict, collection, key);
-	}
-	else if (secondaryIndex->blockType == YapDatabaseSecondaryIndexBlockTypeWithObject)
-	{
-		__unsafe_unretained YapDatabaseSecondaryIndexWithObjectBlock block =
-		    (YapDatabaseSecondaryIndexWithObjectBlock)secondaryIndex->block;
-		
-		block(secondaryIndexConnection->blockDict, collection, key, object);
-	}
-	else if (secondaryIndex->blockType == YapDatabaseSecondaryIndexBlockTypeWithMetadata)
-	{
-		__unsafe_unretained YapDatabaseSecondaryIndexWithMetadataBlock block =
-		    (YapDatabaseSecondaryIndexWithMetadataBlock)secondaryIndex->block;
-		
-		block(secondaryIndexConnection->blockDict, collection, key, metadata);
-	}
-	else
-	{
-		__unsafe_unretained YapDatabaseSecondaryIndexWithRowBlock block =
-		    (YapDatabaseSecondaryIndexWithRowBlock)secondaryIndex->block;
-		
-		block(secondaryIndexConnection->blockDict, collection, key, object, metadata);
-	}
-	
-	if ([secondaryIndexConnection->blockDict count] == 0)
-	{
-		// Remove associated values from index (if needed).
-		// This was an update operation, so the rowid may have previously had values in the index.
-		
-		[self removeRowid:rowid];
-	}
-	else
-	{
-		// Add values to index (or update them).
-		// This was an update operation, so we need to insert or update.
-		
-		[self addRowid:rowid isNew:NO];
-		[secondaryIndexConnection->blockDict removeAllObjects];
-	}
+	[self _handleChangeWithRowid:rowid
+	               collectionKey:collectionKey
+	                      object:object
+	                    metadata:metadata
+	                    isInsert:NO];
 }
 
 /**
@@ -876,65 +863,26 @@ static NSString *const ext_key_version_deprecated = @"version";
 	YDBLogAutoTrace();
 	
 	__unsafe_unretained YapDatabaseSecondaryIndex *secondaryIndex = secondaryIndexConnection->secondaryIndex;
+	__unsafe_unretained YapDatabaseSecondaryIndexHandler *handler = secondaryIndex->handler;
 	
-	__unsafe_unretained NSString *collection = collectionKey.collection;
-	__unsafe_unretained NSString *key = collectionKey.key;
+	YapDatabaseBlockInvoke blockInvokeBitMask = YapDatabaseBlockInvokeIfObjectModified;
 	
-	__unsafe_unretained YapWhitelistBlacklist *allowedCollections = secondaryIndex->options.allowedCollections;
-	if (allowedCollections && ![allowedCollections isAllowed:collection])
+	if (!(handler->blockInvokeOptions & blockInvokeBitMask))
 	{
 		return;
 	}
-	
-	// Invoke the block to find out if the object should be included in the index.
 	
 	id metadata = nil;
+	if (handler->blockType & YapDatabaseBlockType_MetadataFlag)
+	{
+		metadata = [databaseTransaction metadataForCollectionKey:collectionKey withRowid:rowid];
+	}
 	
-	if (secondaryIndex->blockType == YapDatabaseSecondaryIndexBlockTypeWithKey ||
-	    secondaryIndex->blockType == YapDatabaseSecondaryIndexBlockTypeWithMetadata)
-	{
-		// Index values are based on the key or object.
-		// Neither have changed, and thus the values haven't changed.
-		
-		return;
-	}
-	else
-	{
-		// Index values are based on object or row (object+metadata).
-		// Invoke block to see what the new values are.
-		
-		if (secondaryIndex->blockType == YapDatabaseSecondaryIndexBlockTypeWithObject)
-		{
-			__unsafe_unretained YapDatabaseSecondaryIndexWithObjectBlock block =
-			  (YapDatabaseSecondaryIndexWithObjectBlock)secondaryIndex->block;
-			
-			block(secondaryIndexConnection->blockDict, collection, key, object);
-		}
-		else
-		{
-			__unsafe_unretained YapDatabaseSecondaryIndexWithRowBlock block =
-			  (YapDatabaseSecondaryIndexWithRowBlock)secondaryIndex->block;
-			
-			metadata = [databaseTransaction metadataForCollectionKey:collectionKey withRowid:rowid];
-			block(secondaryIndexConnection->blockDict, collection, key, object, metadata);
-		}
-		
-		if ([secondaryIndexConnection->blockDict count] == 0)
-		{
-			// Remove associated values from index (if needed).
-			// This was an update operation, so the rowid may have previously had values in the index.
-			
-			[self removeRowid:rowid];
-		}
-		else
-		{
-			// Add values to index (or update them).
-			// This was an update operation, so we need to insert or update.
-			
-			[self addRowid:rowid isNew:NO];
-			[secondaryIndexConnection->blockDict removeAllObjects];
-		}
-	}
+	[self _handleChangeWithRowid:rowid
+	               collectionKey:collectionKey
+	                      object:object
+	                    metadata:metadata
+	                    isInsert:NO];
 }
 
 /**
@@ -946,65 +894,26 @@ static NSString *const ext_key_version_deprecated = @"version";
 	YDBLogAutoTrace();
 	
 	__unsafe_unretained YapDatabaseSecondaryIndex *secondaryIndex = secondaryIndexConnection->secondaryIndex;
+	__unsafe_unretained YapDatabaseSecondaryIndexHandler *handler = secondaryIndex->handler;
 	
-	__unsafe_unretained NSString *collection = collectionKey.collection;
-	__unsafe_unretained NSString *key = collectionKey.key;
+	YapDatabaseBlockInvoke blockInvokeBitMask = YapDatabaseBlockInvokeIfMetadataModified;
 	
-	__unsafe_unretained YapWhitelistBlacklist *allowedCollections = secondaryIndex->options.allowedCollections;
-	if (allowedCollections && ![allowedCollections isAllowed:collection])
+	if (!(handler->blockInvokeOptions & blockInvokeBitMask))
 	{
 		return;
 	}
-	
-	// Invoke the block to find out if the object should be included in the index.
 	
 	id object = nil;
+	if (handler->blockType & YapDatabaseBlockType_ObjectFlag)
+	{
+		object = [databaseTransaction objectForCollectionKey:collectionKey withRowid:rowid];
+	}
 	
-	if (secondaryIndex->blockType == YapDatabaseSecondaryIndexBlockTypeWithKey ||
-	    secondaryIndex->blockType == YapDatabaseSecondaryIndexBlockTypeWithObject)
-	{
-		// Index values are based on the key or object.
-		// Neither have changed, and thus the values haven't changed.
-		
-		return;
-	}
-	else
-	{
-		// Index values are based on metadata or objectAndMetadata.
-		// Invoke block to see what the new values are.
-		
-		if (secondaryIndex->blockType == YapDatabaseSecondaryIndexBlockTypeWithMetadata)
-		{
-			__unsafe_unretained YapDatabaseSecondaryIndexWithMetadataBlock block =
-		        (YapDatabaseSecondaryIndexWithMetadataBlock)secondaryIndex->block;
-			
-			block(secondaryIndexConnection->blockDict, collection, key, metadata);
-		}
-		else
-		{
-			__unsafe_unretained YapDatabaseSecondaryIndexWithRowBlock block =
-		        (YapDatabaseSecondaryIndexWithRowBlock)secondaryIndex->block;
-			
-			object = [databaseTransaction objectForCollectionKey:collectionKey withRowid:rowid];
-			block(secondaryIndexConnection->blockDict, collection, key, object, metadata);
-		}
-		
-		if ([secondaryIndexConnection->blockDict count] == 0)
-		{
-			// Remove associated values from index (if needed).
-			// This was an update operation, so the rowid may have previously had values in the index.
-			
-			[self removeRowid:rowid];
-		}
-		else
-		{
-			// Add values to index (or update them).
-			// This was an update operation, so we need to insert or update.
-			
-			[self addRowid:rowid isNew:NO];
-			[secondaryIndexConnection->blockDict removeAllObjects];
-		}
-	}
+	[self _handleChangeWithRowid:rowid
+	               collectionKey:collectionKey
+	                      object:object
+	                    metadata:metadata
+	                    isInsert:NO];
 }
 
 /**
@@ -1013,7 +922,33 @@ static NSString *const ext_key_version_deprecated = @"version";
 **/
 - (void)handleTouchObjectForCollectionKey:(YapCollectionKey __unused *)collectionKey withRowid:(int64_t __unused)rowid
 {
-	// Nothing to do for this extension
+	__unsafe_unretained YapDatabaseSecondaryIndex *secondaryIndex = secondaryIndexConnection->secondaryIndex;
+	__unsafe_unretained YapDatabaseSecondaryIndexHandler *handler = secondaryIndex->handler;
+	
+	YapDatabaseBlockInvoke blockInvokeBitMask = YapDatabaseBlockInvokeIfObjectTouched;
+	
+	if (!(handler->blockInvokeOptions & blockInvokeBitMask))
+	{
+		return;
+	}
+	
+	id object = nil;
+	if (handler->blockType & YapDatabaseBlockType_ObjectFlag)
+	{
+		object = [databaseTransaction objectForCollectionKey:collectionKey withRowid:rowid];
+	}
+	
+	id metadata = nil;
+	if (handler->blockType & YapDatabaseBlockType_MetadataFlag)
+	{
+		metadata = [databaseTransaction metadataForCollectionKey:collectionKey withRowid:rowid];
+	}
+	
+	[self _handleChangeWithRowid:rowid
+	               collectionKey:collectionKey
+	                      object:object
+	                    metadata:metadata
+	                    isInsert:NO];
 }
 
 /**
@@ -1022,7 +957,33 @@ static NSString *const ext_key_version_deprecated = @"version";
 **/
 - (void)handleTouchMetadataForCollectionKey:(YapCollectionKey __unused *)collectionKey withRowid:(int64_t __unused)rowid
 {
-	// Nothing to do for this extension
+	__unsafe_unretained YapDatabaseSecondaryIndex *secondaryIndex = secondaryIndexConnection->secondaryIndex;
+	__unsafe_unretained YapDatabaseSecondaryIndexHandler *handler = secondaryIndex->handler;
+	
+	YapDatabaseBlockInvoke blockInvokeBitMask = YapDatabaseBlockInvokeIfMetadataTouched;
+	
+	if (!(handler->blockInvokeOptions & blockInvokeBitMask))
+	{
+		return;
+	}
+	
+	id object = nil;
+	if (handler->blockType & YapDatabaseBlockType_ObjectFlag)
+	{
+		object = [databaseTransaction objectForCollectionKey:collectionKey withRowid:rowid];
+	}
+	
+	id metadata = nil;
+	if (handler->blockType & YapDatabaseBlockType_MetadataFlag)
+	{
+		metadata = [databaseTransaction metadataForCollectionKey:collectionKey withRowid:rowid];
+	}
+	
+	[self _handleChangeWithRowid:rowid
+	               collectionKey:collectionKey
+	                      object:object
+	                    metadata:metadata
+	                    isInsert:NO];
 }
 
 /**
@@ -1031,7 +992,34 @@ static NSString *const ext_key_version_deprecated = @"version";
 **/
 - (void)handleTouchRowForCollectionKey:(YapCollectionKey *)collectionKey withRowid:(int64_t)rowid
 {
-	// Nothing to do for this extension
+	__unsafe_unretained YapDatabaseSecondaryIndex *secondaryIndex = secondaryIndexConnection->secondaryIndex;
+	__unsafe_unretained YapDatabaseSecondaryIndexHandler *handler = secondaryIndex->handler;
+	
+	YapDatabaseBlockInvoke blockInvokeBitMask = YapDatabaseBlockInvokeIfObjectTouched |
+	                                            YapDatabaseBlockInvokeIfMetadataTouched;
+	
+	if (!(handler->blockInvokeOptions & blockInvokeBitMask))
+	{
+		return;
+	}
+	
+	id object = nil;
+	if (handler->blockType & YapDatabaseBlockType_ObjectFlag)
+	{
+		object = [databaseTransaction objectForCollectionKey:collectionKey withRowid:rowid];
+	}
+	
+	id metadata = nil;
+	if (handler->blockType & YapDatabaseBlockType_MetadataFlag)
+	{
+		metadata = [databaseTransaction metadataForCollectionKey:collectionKey withRowid:rowid];
+	}
+	
+	[self _handleChangeWithRowid:rowid
+	               collectionKey:collectionKey
+	                      object:object
+	                    metadata:metadata
+	                    isInsert:NO];
 }
 
 /**

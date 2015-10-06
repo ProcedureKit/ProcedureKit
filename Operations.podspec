@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name              = "Operations"
-  s.version           = "2.1.0"
+  s.version           = "2.2.0"
   s.summary           = "Powerful NSOperation subclasses in Swift."
   s.description       = <<-DESC
   
@@ -34,9 +34,16 @@ session Advanced NSOperations: https://developer.apple.com/videos/wwdc/2015/?id=
   end
 
   s.subspec '+AddressBook' do |ss|
-    ss.platform = :ios, "8.0"
     ss.dependency 'Operations/App'
-    ss.source_files   = 'Operations/Extras/AddressBook/iOS'
+    ss.source_files = [
+      'Operations/Extras/AddressBook/iOS',
+      'Operations/Extras/Contacts/Shared',
+      'Operations/Extras/Contacts/iOS'
+    ]
+    ss.osx.exclude_files = [
+      'Operations/Extras/AddressBook/iOS',
+      'Operations/Extras/Contacts/iOS'
+    ]
   end
 
   # Creates a framework suitable for an (iOS or watchOS) Extension
@@ -54,11 +61,11 @@ session Advanced NSOperations: https://developer.apple.com/videos/wwdc/2015/?id=
     ss.exclude_files = [
       'Operations/Core/iOS/BackgroundObserver.swift',
       'Operations/Core/iOS/NetworkObserver.swift',
-      'Operations/Features/Shared/CalendarCondition.swift',
       'Operations/Features/iOS/RemoteNotificationCondition.swift',
       'Operations/Features/iOS/UserNotificationCondition.swift',
-      'Operations/Features/iOS/HealthCondition.swift',
-      'Operations/Features/iOS/LocationCondition.swift',
+      'Operations/Features/iOS/LocationCapability.swift',      
+      'Operations/Features/iOS/CalendarCapability.swift',            
+      'Operations/Features/iOS/HealthCapability.swift',
       'Operations/Features/iOS/ReachabilityCondition.swift',
       'Operations/Features/iOS/LocationOperations.swift',
       'Operations/Features/iOS/WebpageOperation.swift',

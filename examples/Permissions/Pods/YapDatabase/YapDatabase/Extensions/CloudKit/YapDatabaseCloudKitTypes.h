@@ -1,21 +1,12 @@
 #import <Foundation/Foundation.h>
 #import <CloudKit/CloudKit.h>
 
+#import "YapDatabaseExtensionTypes.h"
 #import "YDBCKRecordInfo.h"
 #import "YDBCKMergeInfo.h"
-#import "YapDatabaseTransaction.h"
 
-
-/**
- * Corresponds to the different type of blocks supported by the various extension subclasses.
-**/
-typedef NS_ENUM(NSInteger, YapDatabaseCloudKitBlockType) {
-	YapDatabaseCloudKitBlockTypeWithKey,
-	YapDatabaseCloudKitBlockTypeWithObject,
-	YapDatabaseCloudKitBlockTypeWithMetadata,
-	YapDatabaseCloudKitBlockTypeWithRow
-};
-
+@class YapDatabaseReadTransaction;
+@class YapDatabaseReadWriteTransaction;
 
 /**
  * The RecordHandler is the primary mechanism that is used to tell YapDatabaseCloudKit about CKRecord changes.
@@ -58,8 +49,14 @@ typedef void (^YapDatabaseCloudKitRecordWithRowBlock)
 + (instancetype)withMetadataBlock:(YapDatabaseCloudKitRecordWithMetadataBlock)recordBlock;
 + (instancetype)withRowBlock:(YapDatabaseCloudKitRecordWithRowBlock)recordBlock;
 
-@property (nonatomic, strong, readonly) YapDatabaseCloudKitRecordBlock recordBlock;
-@property (nonatomic, assign, readonly) YapDatabaseCloudKitBlockType recordBlockType;
++ (instancetype)withOptions:(YapDatabaseBlockInvoke)ops keyBlock:(YapDatabaseCloudKitRecordWithKeyBlock)block;
++ (instancetype)withOptions:(YapDatabaseBlockInvoke)ops objectBlock:(YapDatabaseCloudKitRecordWithObjectBlock)block;
++ (instancetype)withOptions:(YapDatabaseBlockInvoke)ops metadataBlock:(YapDatabaseCloudKitRecordWithMetadataBlock)block;
++ (instancetype)withOptions:(YapDatabaseBlockInvoke)ops rowBlock:(YapDatabaseCloudKitRecordWithRowBlock)block;
+
+@property (nonatomic, strong, readonly) YapDatabaseCloudKitRecordBlock block;
+@property (nonatomic, assign, readonly) YapDatabaseBlockType           blockType;
+@property (nonatomic, assign, readonly) YapDatabaseBlockInvoke         blockInvokeOptions;
 
 @end
 

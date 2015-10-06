@@ -19,6 +19,19 @@
 **/
 #define YAP_DATABASE_SECONDARY_INDEX_CLASS_VERSION 1
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+#pragma mark -
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+@interface YapDatabaseSecondaryIndexHandler () {
+@public
+	
+	YapDatabaseSecondaryIndexBlock block;
+	YapDatabaseBlockType           blockType;
+	YapDatabaseBlockInvoke         blockInvokeOptions;
+}
+
+@end
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #pragma mark -
@@ -49,8 +62,7 @@
 	YapDatabaseSecondaryIndexSetup *setup;
 	YapDatabaseSecondaryIndexOptions *options;
 	
-	YapDatabaseSecondaryIndexBlock block;
-	YapDatabaseSecondaryIndexBlockType blockType;
+	YapDatabaseSecondaryIndexHandler *handler;
 	
 	NSString *versionTag;
 	

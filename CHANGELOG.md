@@ -1,4 +1,13 @@
-# Development
+# 2.2.0
+1. [[OPR-91](https://github.com/danthorpe/Operations/pull/91), [OPR-92](https://github.com/danthorpe/Operations/pull/92)]: Fixes a bug in AddressBook when building against iOS 9, where `Unmanaged<T>` could be unwrapped incorrectly.
+2. [[OPR-93](https://github.com/danthorpe/Operations/pull/93), [OPR-95](https://github.com/danthorpe/Operations/pull/95)]: Adds support for Contacts.framework including `ContactsCondition` plus operations for `GetContacts`, `GetContactsGroup`, `RemoveContactsGroup`, `AddContactsToGroup` and `RemoveContactsFromGroup` in addition to a base contacts operation class. Also included are UI operations `DisplayContactViewController` and `DisplayCreateContactViewController`.
+3. [[OPR-97](https://github.com/danthorpe/Operations/pull/97), [OPR-98](https://github.com/danthorpe/Operations/pull/98)]: Refactors how device authorization permissions are checked and requested. Introduces the concept of a `CapabilityType` to govern authorization status and requests. This works in tandem with new operations `GetAuthorizationStatus<Capability>` and `Authorize<Capability>` with an operation condition `AuthorizedFor<Capability>`. The following conditions are now deprecated: `CalendarCondition`, `CloudContainerCondition`, `HealthCondition`, `LocationCondition`, `PassbookCondition`, `PhotosCondition` in favor of `Capability.Calendar`, `Capability.Cloud`, `Capability.Heath`, `Capability.Location`, `Capability.Passbook`, `Capability.Photos` respectively. Replace your condition code like this example:
+
+```swift
+operation.addCondition(AuthorizedFor(Capability.Location(.WhenInUse)))
+```
+
+# 2.1.0
 1. [[OPR-90](https://github.com/danthorpe/Operations/pull/90)]: Multi-platform support. Adds new framework targets to the project for iOS Extension only API framework. This doesn’t have support for BackgroundObserver, or NetworkObserver for example. Use `pod ‘Operations/Extension’` to use it in a Podfile for your iOS Extension target. Also, we have Mac OS X support (no special pod required). And watchOS support - use `pod ‘Operations/watchOS’`.
 
 # 2.0.2

@@ -225,23 +225,17 @@ static NSString *const ext_key__version_deprecated = @"version";
 	
 	// Enumerate the existing rows in the database and populate the indexes
 	
-	__unsafe_unretained YapDatabaseFullTextSearch *fts = ftsConnection->fts;
+	__unsafe_unretained YapDatabaseFullTextSearchHandler *handler = ftsConnection->fts->handler;
 	
-	BOOL needsObject = fts->blockType == YapDatabaseFullTextSearchBlockTypeWithObject ||
-	                   fts->blockType == YapDatabaseFullTextSearchBlockTypeWithRow;
-	
-	BOOL needsMetadata = fts->blockType == YapDatabaseFullTextSearchBlockTypeWithMetadata ||
-	                     fts->blockType == YapDatabaseFullTextSearchBlockTypeWithRow;
-	
-	if (needsObject && needsMetadata)
+	if (handler->blockType == YapDatabaseBlockTypeWithKey)
 	{
-		__unsafe_unretained YapDatabaseFullTextSearchWithRowBlock block =
-		    (YapDatabaseFullTextSearchWithRowBlock)fts->block;
+		__unsafe_unretained YapDatabaseFullTextSearchWithKeyBlock block =
+		    (YapDatabaseFullTextSearchWithKeyBlock)handler->block;
 		
-		[databaseTransaction _enumerateRowsInAllCollectionsUsingBlock:
-		    ^(int64_t rowid, NSString *collection, NSString *key, id object, id metadata, BOOL __unused *stop) {
+		[databaseTransaction _enumerateKeysInAllCollectionsUsingBlock:
+		    ^(int64_t rowid, NSString *collection, NSString *key, BOOL __unused *stop) {
 			
-			block(ftsConnection->blockDict, collection, key, object, metadata);
+			block(ftsConnection->blockDict, collection, key);
 			
 			if ([ftsConnection->blockDict count] > 0)
 			{
@@ -250,10 +244,10 @@ static NSString *const ext_key__version_deprecated = @"version";
 			}
 		}];
 	}
-	else if (needsObject && !needsMetadata)
+	else if (handler->blockType == YapDatabaseBlockTypeWithObject)
 	{
 		__unsafe_unretained YapDatabaseFullTextSearchWithObjectBlock block =
-		    (YapDatabaseFullTextSearchWithObjectBlock)fts->block;
+		    (YapDatabaseFullTextSearchWithObjectBlock)handler->block;
 		
 		[databaseTransaction _enumerateKeysAndObjectsInAllCollectionsUsingBlock:
 		    ^(int64_t rowid, NSString *collection, NSString *key, id object, BOOL __unused *stop) {
@@ -267,10 +261,10 @@ static NSString *const ext_key__version_deprecated = @"version";
 			}
 		}];
 	}
-	else if (!needsObject && needsMetadata)
+	else if (handler->blockType == YapDatabaseBlockTypeWithMetadata)
 	{
 		__unsafe_unretained YapDatabaseFullTextSearchWithMetadataBlock block =
-		    (YapDatabaseFullTextSearchWithMetadataBlock)fts->block;
+		    (YapDatabaseFullTextSearchWithMetadataBlock)handler->block;
 		
 		[databaseTransaction _enumerateKeysAndMetadataInAllCollectionsUsingBlock:
 		    ^(int64_t rowid, NSString *collection, NSString *key, id metadata, BOOL __unused *stop) {
@@ -284,15 +278,15 @@ static NSString *const ext_key__version_deprecated = @"version";
 			}
 		}];
 	}
-	else // if (!needsObject && !needsMetadata)
+	else // if (handler->blockType == YapDatabaseBlockTypeWithRow)
 	{
-		__unsafe_unretained YapDatabaseFullTextSearchWithKeyBlock block =
-		    (YapDatabaseFullTextSearchWithKeyBlock)fts->block;
+		__unsafe_unretained YapDatabaseFullTextSearchWithRowBlock block =
+		    (YapDatabaseFullTextSearchWithRowBlock)handler->block;
 		
-		[databaseTransaction _enumerateKeysInAllCollectionsUsingBlock:
-		    ^(int64_t rowid, NSString *collection, NSString *key, BOOL __unused *stop) {
+		[databaseTransaction _enumerateRowsInAllCollectionsUsingBlock:
+		    ^(int64_t rowid, NSString *collection, NSString *key, id object, id metadata, BOOL __unused *stop) {
 			
-			block(ftsConnection->blockDict, collection, key);
+			block(ftsConnection->blockDict, collection, key, object, metadata);
 			
 			if ([ftsConnection->blockDict count] > 0)
 			{
@@ -538,48 +532,48 @@ static NSString *const ext_key__version_deprecated = @"version";
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * YapDatabase extension hook.
- * This method is invoked by a YapDatabaseReadWriteTransaction as a post-operation-hook.
+ * Private helper method for other handleXXX hook methods.
 **/
-- (void)handleInsertObject:(id)object
-          forCollectionKey:(YapCollectionKey *)collectionKey
-              withMetadata:(id)metadata
-                     rowid:(int64_t)rowid
+- (void)_handleChangeWithRowid:(int64_t)rowid
+                 collectionKey:(YapCollectionKey *)collectionKey
+                        object:(id)object
+                      metadata:(id)metadata
+                      isInsert:(BOOL)isInsert
 {
 	YDBLogAutoTrace();
-	
-	__unsafe_unretained YapDatabaseFullTextSearch *fts = ftsConnection->fts;
 	
 	__unsafe_unretained NSString *collection = collectionKey.collection;
 	__unsafe_unretained NSString *key = collectionKey.key;
 	
 	// Invoke the block to find out if the object should be included in the index.
 	
-	if (fts->blockType == YapDatabaseFullTextSearchBlockTypeWithKey)
+	__unsafe_unretained YapDatabaseFullTextSearchHandler *handler = ftsConnection->fts->handler;
+	
+	if (handler->blockType == YapDatabaseBlockTypeWithKey)
 	{
 		__unsafe_unretained YapDatabaseFullTextSearchWithKeyBlock block =
-		    (YapDatabaseFullTextSearchWithKeyBlock)fts->block;
+		    (YapDatabaseFullTextSearchWithKeyBlock)handler->block;
 		
 		block(ftsConnection->blockDict, collection, key);
 	}
-	else if (fts->blockType == YapDatabaseFullTextSearchBlockTypeWithObject)
+	else if (handler->blockType == YapDatabaseBlockTypeWithObject)
 	{
 		__unsafe_unretained YapDatabaseFullTextSearchWithObjectBlock block =
-		    (YapDatabaseFullTextSearchWithObjectBlock)fts->block;
+		    (YapDatabaseFullTextSearchWithObjectBlock)handler->block;
 		
 		block(ftsConnection->blockDict, collection, key, object);
 	}
-	else if (fts->blockType == YapDatabaseFullTextSearchBlockTypeWithMetadata)
+	else if (handler->blockType == YapDatabaseBlockTypeWithMetadata)
 	{
 		__unsafe_unretained YapDatabaseFullTextSearchWithMetadataBlock block =
-		    (YapDatabaseFullTextSearchWithMetadataBlock)fts->block;
+		    (YapDatabaseFullTextSearchWithMetadataBlock)handler->block;
 		
 		block(ftsConnection->blockDict, collection, key, metadata);
 	}
 	else
 	{
 		__unsafe_unretained YapDatabaseFullTextSearchWithRowBlock block =
-		    (YapDatabaseFullTextSearchWithRowBlock)fts->block;
+		    (YapDatabaseFullTextSearchWithRowBlock)handler->block;
 		
 		block(ftsConnection->blockDict, collection, key, object, metadata);
 	}
@@ -593,9 +587,27 @@ static NSString *const ext_key__version_deprecated = @"version";
 		// Add values to index.
 		// This was an insert operation, so we know we can insert rather than update.
 		
-		[self addRowid:rowid isNew:YES];
+		[self addRowid:rowid isNew:isInsert];
 		[ftsConnection->blockDict removeAllObjects];
 	}
+}
+
+/**
+ * YapDatabase extension hook.
+ * This method is invoked by a YapDatabaseReadWriteTransaction as a post-operation-hook.
+**/
+- (void)handleInsertObject:(id)object
+          forCollectionKey:(YapCollectionKey *)collectionKey
+              withMetadata:(id)metadata
+                     rowid:(int64_t)rowid
+{
+	YDBLogAutoTrace();
+	
+	[self _handleChangeWithRowid:rowid
+	               collectionKey:collectionKey
+	                      object:object
+	                    metadata:metadata
+	                    isInsert:YES];
 }
 
 /**
@@ -609,57 +621,21 @@ static NSString *const ext_key__version_deprecated = @"version";
 {
 	YDBLogAutoTrace();
 	
-	__unsafe_unretained YapDatabaseFullTextSearch *fts = ftsConnection->fts;
+	__unsafe_unretained YapDatabaseFullTextSearchHandler *handler = ftsConnection->fts->handler;
 	
-	__unsafe_unretained NSString *collection = collectionKey.collection;
-	__unsafe_unretained NSString *key = collectionKey.key;
+	YapDatabaseBlockInvoke blockInvokeBitMask = YapDatabaseBlockInvokeIfObjectModified |
+	                                            YapDatabaseBlockInvokeIfMetadataModified;
 	
-	// Invoke the block to find out if the object should be included in the index.
-	
-	if (fts->blockType == YapDatabaseFullTextSearchBlockTypeWithKey)
+	if (!(handler->blockInvokeOptions & blockInvokeBitMask))
 	{
-		__unsafe_unretained YapDatabaseFullTextSearchWithKeyBlock block =
-		    (YapDatabaseFullTextSearchWithKeyBlock)fts->block;
-		
-		block(ftsConnection->blockDict, collection, key);
-	}
-	else if (fts->blockType == YapDatabaseFullTextSearchBlockTypeWithObject)
-	{
-		__unsafe_unretained YapDatabaseFullTextSearchWithObjectBlock block =
-		    (YapDatabaseFullTextSearchWithObjectBlock)fts->block;
-		
-		block(ftsConnection->blockDict, collection, key, object);
-	}
-	else if (fts->blockType == YapDatabaseFullTextSearchBlockTypeWithMetadata)
-	{
-		__unsafe_unretained YapDatabaseFullTextSearchWithMetadataBlock block =
-		    (YapDatabaseFullTextSearchWithMetadataBlock)fts->block;
-		
-		block(ftsConnection->blockDict, collection, key, metadata);
-	}
-	else
-	{
-		__unsafe_unretained YapDatabaseFullTextSearchWithRowBlock block =
-		    (YapDatabaseFullTextSearchWithRowBlock)fts->block;
-		
-		block(ftsConnection->blockDict, collection, key, object, metadata);
+		return;
 	}
 	
-	if ([ftsConnection->blockDict count] == 0)
-	{
-		// Remove associated values from index (if needed).
-		// This was an update operation, so the rowid may have previously had values in the index.
-		
-		[self removeRowid:rowid];
-	}
-	else
-	{
-		// Add values to index (or update them).
-		// This was an update operation, so we need to insert or update.
-		
-		[self addRowid:rowid isNew:NO];
-		[ftsConnection->blockDict removeAllObjects];
-	}
+	[self _handleChangeWithRowid:rowid
+	               collectionKey:collectionKey
+	                      object:object
+	                    metadata:metadata
+	                    isInsert:NO];
 }
 
 /**
@@ -670,60 +646,26 @@ static NSString *const ext_key__version_deprecated = @"version";
 {
 	YDBLogAutoTrace();
 	
-	__unsafe_unretained YapDatabaseFullTextSearch *fts = ftsConnection->fts;
+	__unsafe_unretained YapDatabaseFullTextSearchHandler *handler = ftsConnection->fts->handler;
 	
-	__unsafe_unretained NSString *collection = collectionKey.collection;
-	__unsafe_unretained NSString *key = collectionKey.key;
+	YapDatabaseBlockInvoke blockInvokeBitMask = YapDatabaseBlockInvokeIfObjectModified;
 	
-	// Invoke the block to find out if the object should be included in the index.
-	
-	id metadata = nil;
-	
-	if (fts->blockType == YapDatabaseFullTextSearchBlockTypeWithKey ||
-	    fts->blockType == YapDatabaseFullTextSearchBlockTypeWithMetadata)
+	if (!(handler->blockInvokeOptions & blockInvokeBitMask))
 	{
-		// Index values are based on the key or metadata.
-		// Neither have changed, and thus the values haven't changed.
-		
 		return;
 	}
-	else
+	
+	id metadata = nil;
+	if (handler->blockType & YapDatabaseBlockType_MetadataFlag)
 	{
-		// Index values are based on object or row (object+metadata).
-		// Invoke block to see what the new values are.
-		
-		if (fts->blockType == YapDatabaseFullTextSearchBlockTypeWithObject)
-		{
-			__unsafe_unretained YapDatabaseFullTextSearchWithObjectBlock block =
-		        (YapDatabaseFullTextSearchWithObjectBlock)fts->block;
-			
-			block(ftsConnection->blockDict, collection, key, object);
-		}
-		else
-		{
-			__unsafe_unretained YapDatabaseFullTextSearchWithRowBlock block =
-		        (YapDatabaseFullTextSearchWithRowBlock)fts->block;
-			
-			metadata = [databaseTransaction metadataForCollectionKey:collectionKey withRowid:rowid];
-			block(ftsConnection->blockDict, collection, key, object, metadata);
-		}
-		
-		if ([ftsConnection->blockDict count] == 0)
-		{
-			// Remove associated values from index (if needed).
-			// This was an update operation, so the rowid may have previously had values in the index.
-			
-			[self removeRowid:rowid];
-		}
-		else
-		{
-			// Add values to index (or update them).
-			// This was an update operation, so we need to insert or update.
-			
-			[self addRowid:rowid isNew:NO];
-			[ftsConnection->blockDict removeAllObjects];
-		}
+		metadata = [databaseTransaction metadataForCollectionKey:collectionKey withRowid:rowid];
 	}
+	
+	[self _handleChangeWithRowid:rowid
+	               collectionKey:collectionKey
+	                      object:object
+	                    metadata:metadata
+	                    isInsert:NO];
 }
 
 /**
@@ -734,60 +676,26 @@ static NSString *const ext_key__version_deprecated = @"version";
 {
 	YDBLogAutoTrace();
 	
-	__unsafe_unretained YapDatabaseFullTextSearch *fts = ftsConnection->fts;
+	__unsafe_unretained YapDatabaseFullTextSearchHandler *handler = ftsConnection->fts->handler;
 	
-	__unsafe_unretained NSString *collection = collectionKey.collection;
-	__unsafe_unretained NSString *key = collectionKey.key;
+	YapDatabaseBlockInvoke blockInvokeBitMask = YapDatabaseBlockInvokeIfMetadataModified;
 	
-	// Invoke the block to find out if the object should be included in the index.
-	
-	id object = nil;
-	
-	if (fts->blockType == YapDatabaseFullTextSearchBlockTypeWithKey ||
-	    fts->blockType == YapDatabaseFullTextSearchBlockTypeWithObject)
+	if (!(handler->blockInvokeOptions & blockInvokeBitMask))
 	{
-		// Index values are based on the key or object.
-		// Neither have changed, and thus the values haven't changed.
-		
 		return;
 	}
-	else
+	
+	id object = nil;
+	if (handler->blockType & YapDatabaseBlockType_ObjectFlag)
 	{
-		// Index values are based on metadata or row (object+metadata).
-		// Invoke block to see what the new values are.
-		
-		if (fts->blockType == YapDatabaseFullTextSearchBlockTypeWithMetadata)
-		{
-			__unsafe_unretained YapDatabaseFullTextSearchWithMetadataBlock block =
-		        (YapDatabaseFullTextSearchWithMetadataBlock)fts->block;
-			
-			block(ftsConnection->blockDict, collection, key, metadata);
-		}
-		else
-		{
-			__unsafe_unretained YapDatabaseFullTextSearchWithRowBlock block =
-		        (YapDatabaseFullTextSearchWithRowBlock)fts->block;
-			
-			object = [databaseTransaction objectForCollectionKey:collectionKey withRowid:rowid];
-			block(ftsConnection->blockDict, collection, key, object, metadata);
-		}
-		
-		if ([ftsConnection->blockDict count] == 0)
-		{
-			// Remove associated values from index (if needed).
-			// This was an update operation, so the rowid may have previously had values in the index.
-			
-			[self removeRowid:rowid];
-		}
-		else
-		{
-			// Add values to index (or update them).
-			// This was an update operation, so we need to insert or update.
-			
-			[self addRowid:rowid isNew:NO];
-			[ftsConnection->blockDict removeAllObjects];
-		}
+		object = [databaseTransaction objectForCollectionKey:collectionKey withRowid:rowid];
 	}
+	
+	[self _handleChangeWithRowid:rowid
+	               collectionKey:collectionKey
+	                      object:object
+	                    metadata:metadata
+	                    isInsert:NO];
 }
 
 /**
@@ -796,7 +704,34 @@ static NSString *const ext_key__version_deprecated = @"version";
 **/
 - (void)handleTouchObjectForCollectionKey:(YapCollectionKey __unused *)collectionKey withRowid:(int64_t __unused)rowid
 {
-	// Nothing to do for this extension
+	YDBLogAutoTrace();
+	
+	__unsafe_unretained YapDatabaseFullTextSearchHandler *handler = ftsConnection->fts->handler;
+	
+	YapDatabaseBlockInvoke blockInvokeBitMask = YapDatabaseBlockInvokeIfObjectTouched;
+	
+	if (!(handler->blockInvokeOptions & blockInvokeBitMask))
+	{
+		return;
+	}
+	
+	id object = nil;
+	if (handler->blockType & YapDatabaseBlockType_ObjectFlag)
+	{
+		object = [databaseTransaction objectForCollectionKey:collectionKey withRowid:rowid];
+	}
+	
+	id metadata = nil;
+	if (handler->blockType & YapDatabaseBlockType_MetadataFlag)
+	{
+		metadata = [databaseTransaction metadataForCollectionKey:collectionKey withRowid:rowid];
+	}
+	
+	[self _handleChangeWithRowid:rowid
+	               collectionKey:collectionKey
+	                      object:object
+	                    metadata:metadata
+	                    isInsert:NO];
 }
 
 /**
@@ -805,7 +740,34 @@ static NSString *const ext_key__version_deprecated = @"version";
 **/
 - (void)handleTouchMetadataForCollectionKey:(YapCollectionKey __unused *)collectionKey withRowid:(int64_t __unused)rowid
 {
-	// Nothing to do for this extension
+	YDBLogAutoTrace();
+	
+	__unsafe_unretained YapDatabaseFullTextSearchHandler *handler = ftsConnection->fts->handler;
+	
+	YapDatabaseBlockInvoke blockInvokeBitMask = YapDatabaseBlockInvokeIfMetadataTouched;
+	
+	if (!(handler->blockInvokeOptions & blockInvokeBitMask))
+	{
+		return;
+	}
+	
+	id object = nil;
+	if (handler->blockType & YapDatabaseBlockType_ObjectFlag)
+	{
+		object = [databaseTransaction objectForCollectionKey:collectionKey withRowid:rowid];
+	}
+	
+	id metadata = nil;
+	if (handler->blockType & YapDatabaseBlockType_MetadataFlag)
+	{
+		metadata = [databaseTransaction metadataForCollectionKey:collectionKey withRowid:rowid];
+	}
+	
+	[self _handleChangeWithRowid:rowid
+	               collectionKey:collectionKey
+	                      object:object
+	                    metadata:metadata
+	                    isInsert:NO];
 }
 
 /**
@@ -814,7 +776,35 @@ static NSString *const ext_key__version_deprecated = @"version";
 **/
 - (void)handleTouchRowForCollectionKey:(YapCollectionKey *)collectionKey withRowid:(int64_t)rowid
 {
-	// Nothing to do for this extension
+	YDBLogAutoTrace();
+	
+	__unsafe_unretained YapDatabaseFullTextSearchHandler *handler = ftsConnection->fts->handler;
+	
+	YapDatabaseBlockInvoke blockInvokeBitMask = YapDatabaseBlockInvokeIfObjectTouched |
+	                                            YapDatabaseBlockInvokeIfMetadataTouched;
+	
+	if (!(handler->blockInvokeOptions & blockInvokeBitMask))
+	{
+		return;
+	}
+	
+	id object = nil;
+	if (handler->blockType & YapDatabaseBlockType_ObjectFlag)
+	{
+		object = [databaseTransaction objectForCollectionKey:collectionKey withRowid:rowid];
+	}
+	
+	id metadata = nil;
+	if (handler->blockType & YapDatabaseBlockType_MetadataFlag)
+	{
+		metadata = [databaseTransaction metadataForCollectionKey:collectionKey withRowid:rowid];
+	}
+	
+	[self _handleChangeWithRowid:rowid
+	               collectionKey:collectionKey
+	                      object:object
+	                    metadata:metadata
+	                    isInsert:NO];
 }
 
 /**

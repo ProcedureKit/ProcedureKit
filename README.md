@@ -4,11 +4,11 @@
 
 A Swift framework inspired by WWDC 2015 Advanced NSOperations session. See the session video here: https://developer.apple.com/videos/wwdc/2015/?id=226
 
-## Status - 21st Sept, 2015
+## Status - 6th Oct, 2015
 
-The Swift 1.2 compatible version of Operations is version 1.0. This is no longer under active development, however if you’re still stuck on Swift 1.2, and have a bug, please create ticket and I’ll do a point release.
+As of version 2.1, Operations is a multi-platform framework, with framework targets for iOS Extensions, iOS Apps, OS X, watchOS and tvOS. Version 2.2 adds initial support for Contacts framework in iOS 9 and El Capitan. It also introduces the concept of CapabilityTypes, meaning that many device permission conditions have been refactored. See the release notes, and below or #97 for details.
 
-Development from now on is using Swift 2.0, for all of Apple’s platforms as of version 2.1, which adds support for OS X and extension compatible frameworks. watchOS 2.0 and tvOS frameworks are built (if using the correct version of Xcode), however, the current version of Cocoapods (0.38.2) doesn’t yet support these platforms correctly. I’ll be looking into Carthage support in the coming week.
+Current development is focused on unifying APIs for AddressBook. This might well cause some disruption to your current code if using the AddressBook operations, hence I’m spreading these changes across two releases. 
 
 ## Usage
 
@@ -131,34 +131,54 @@ func getCurrentLocation(completion: CLLocation -> Void) {
 
 This operation will automatically request the user's permission if the application doesn't already have the required authorization, the default is "when in use".
 
-Perhaps also you want to just test to see if authorization has already been granted, but not ask for it if it hasn't. This can be done using a `BlockOperation` and `SilentCondition`.
+Perhaps also you want to just test to see if authorization has already been granted, but not ask for it if it hasn't. In Apple’s original sample code from WWDC 2015, there are a number of `OperationCondition`s which express the authorization status for device or OS permissions. Things like, `LocationCondition`, and `HealthCondition`. However, in version 2.2 of Operations I moved away from this model to unify this functionality into th `CapabilityType` protocol. Where previously there were bespoke conditions (and errors) to test the status, there is now a single condition, which is initialized with a `CapabilityType`. 
+
+For example, where previously you would have written this:
 
 ```swift
-func determineAuthorizationStatus() {
-    let authorized = BlockOperation { (continueWithError: BlockOperation.ContinuationBlockType) in
-        self.state = .Authorized
-        continueWithError(error: nil)
+operation.addCondition(LocationCondition(usage: .WhenInUse))
+```
+
+now you write this:
+
+```swift
+operation.addCondition(AuthorizedFor(Capability.Location(.WhenInUse)))
+```
+
+As of 2.2 the following capabilities are expressed:
+
+- [x] `Capability.Calendar` - includes support for `EKEntityType` requirements, defaults to `.Event`.
+- [x] `Capability.Cloud` - includes support for default `CKContainer` or with specific identifier, and `.UserDiscoverable` cloud container permissions.
+- [x] `Capability.Health` - improved support for exactly which `HKObjectType`s have read permissions. Please get in touch if you want to use HealthKit with Operations, as I currently don't, and would like some feedback or input on further improvements that can be made for HealthKit.
+- [x] `Capability.Location` - includes support for required usage, either `.WhenInUse` (the default) or `.Always`.
+- [x] `Capability.Passbook` - note here that there is void "status" type, just an availability boolean.
+- [x] `Capability.Photos` 
+
+In addition to a generic operation condition, which can be used as before with `SilentCondition` and `NegatedCondition`. There are also two capability generic operations. `GetAuthorizationStatus` will retrieve the current status of the capability. `Authorize` will explicity request the required permissions for the capability. Both of these operations accept the capability as their first initializer argument without a label, and have a completion block with the same type. Therefore, it is trivial to write a function which can update your controller or UI and use it for both operations.
+
+For example here we can check the status of location services for the app:
+
+```swift
+func locationServicesEnabled(enabled: Bool, withAuthorization status: CLAuthorizationStatus) {
+    switch (enabled, status) {
+        case (false, _):
+           // Location services are not enabled
+        case (true, .NotDetermined):
+           // Location services are enabled, but not currently determined for the app.
     }
-    authorized.addCondition(SilentCondition(LocationCondition()))
-    authorized.addObserver(BlockObserver { (_, errors) in
-        if let error = errors.first as? LocationCondition.Error {
-            switch error {
-            case let .AuthenticationStatusNotSufficient(CLAuthorizationStatus.NotDetermined, _):
-                self.state = .Unknown
+}
 
-            case let .AuthenticationStatusNotSufficient(CLAuthorizationStatus.Denied, _):
-                self.state = .Denied
+func determineAuthorizationStatus() {
+    queue.addOperation(GetAuthorizationStatus(Capability.Location(), completion: locationServicesEnabled))
+}
 
-            default:
-                self.state = .Unknown
-            }
-        }
-    })
-    queue.addOperation(authorized)
+func requestPermission() {
+    queue.addOperation(Authorize(Capability.Location(), completion: locationServicesEnabled))
 }
 ```
 
-There is an example app, Permissions.app in `example/Permissions` which contains more examples of this sort of usage. 
+See the Permissions example project, where the above code is taken from.
+
 
 ## Installation
 
@@ -204,23 +224,19 @@ This is a brief summary of the current and planned functionality.
 
 ### Features
 
+- [x] `GetAuthorizationStatus` get the current authorization status for the given `CapabilityType`. Supports EventKit, CloudKit, HealthKit, CoreLocation, PassKit, Photos.
+- [x] `Authorize` request the required permissions to access the required `CapabilityType`. Supports EventKit, CloudKit, HealthKit, CoreLocation, PassKit, Photos.
+- [x] `AuthorizedFor` express the required permissions to access the required `CapabilityType` as an `OperationCondition`. Meaning that if the status has not been determined yet, it will trigger authorization. Supports EventKit, CloudKit, HealthKit, CoreLocation, PassKit, Photos.
 - [x] `ReachabilityCondition` requires that the supplied URL is reachable.
 - [x] `ReachableOperation` compose an operation which must complete and requires network reachability. This uses an included system  Reachability object and does not require any extra dependencies. However currently in Swift 1.2, as function pointers are not supported, this uses a polling mechanism with `dispatch_source_timer`. I will probably replace this with more efficient Objective-C soon.
-- [x] `CloudCondition` require varying levels of access to a `CKContainer`.
 - [x] `CloudKitOperation` compose a `CKDatabaseOperation` inside an `Operation` with the appropriate `CKDatabase`.
-- [x] `LocationCondition` requires permission to access the user’s location with support for specifying always or when in use permissions.
 - [x] `UserLocationOperation` access the user’s current location with desired accuracy. 
 - [x] `ReverseGeocodeOperation` perform a reverse geocode lookup of the supplied `CLLocation`.
 - [x] `ReverseGeocodeUserLocationOperation` perform a reverse geocode lookup of user’s current location.  
-- [x] `UserNotificationCondition` require that the user has granted permission to present th
+- [x] `UserNotificationCondition` require that the user has granted permission to present notifications.
 - [x] `RemoteNotificationCondition` require that the user has granted permissions to receive remote notifications.
-- [x] `HealthCondition` requires permission to read/write the supplied health kit sample types.
-- [x] `PhotosCondition` requires permission to access the user’s photo library.
-- [x] `CalendarCondition` requires permissions to access the user’s calendar events and/or reminders. 
-- [x] `PassbookCondition` requires that the user’s Pass Library is available.
 - [x] `UserConfirmationCondition` requires that the user confirms an action presented to them using a `UIAlertController`. The condition is configurable for title, message and button texts. 
 - [x] `WebpageOperation` given a URL, will present a `SFSafariViewController`.
-- [ ] Contacts - Planned: to match the functionality of AddressBook operations but using Contacts.framework for iOS 9.
 
 ### +AddressBook
 

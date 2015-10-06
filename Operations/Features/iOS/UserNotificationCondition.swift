@@ -128,6 +128,7 @@ public class UserNotificationPermissionOperation: Operation {
         self.behavior = behavior
         self.registrar = registrar
         super.init()
+        name = "User Notification Permissions Operation"
         addCondition(AlertPresentation())
     }
 
