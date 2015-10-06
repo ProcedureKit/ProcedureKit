@@ -80,9 +80,9 @@ public class AlertOperation<From: PresentingViewController>: Operation {
     Do not add actions directly to the `UIAlertController`, as
     this will prevent the `AlertOperation` from correctly finishing.
     
-    - parameter title, a required String.
-    - parameter style, a `UIAlertActionStyle` which defaults to `.Default`.
-    - parameter handler, a block which receives the operation, and returns Void.
+    - parameter title: a required String.
+    - parameter style: a `UIAlertActionStyle` which defaults to `.Default`.
+    - parameter handler: a block which receives the operation, and returns Void.
     */
     public func addActionWithTitle(title: String, style: UIAlertActionStyle = .Default, handler: AlertOperation -> Void = { _ in }) {
         let action = UIAlertAction(title: title, style: style) { [weak self] _ in
