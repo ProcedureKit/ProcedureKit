@@ -30,7 +30,7 @@ public class GroupOperation: Operation {
     /**
     Designated initializer.
 
-    :park: operations, an array of `NSOperation`s.
+    - parameter operations: an array of `NSOperation`s.
     */
     public init(operations ops: [NSOperation]) {
         operations = ops
@@ -39,22 +39,23 @@ public class GroupOperation: Operation {
         queue.delegate = self
     }
 
+    /// Convenience intiializer for direct usage without subclassing.
     public convenience init(operations: NSOperation...) {
         self.init(operations: operations)
     }
 
-    /**
-    Cancels all the groups operations.
-    */
+    /// Cancels all the groups operations.
     public override func cancel() {
         queue.cancelAllOperations()
         super.cancel()
     }
 
+    /**
+    Executes the group by adding the operations to the queue. Then 
+    starting the queue, and adding the finishing operation.
+    */
     public override func execute() {
-        for operation in operations {
-            queue.addOperation(operation)
-        }
+        addOperations(operations)
         queue.suspended = false
         queue.addOperation(finishingOperation)
     }
@@ -62,12 +63,17 @@ public class GroupOperation: Operation {
     /**
     Add an `NSOperation` to the group's queue.
     
-    :param: operation, an `NSOperation`
+    - parameter operation: an `NSOperation` instance.
     */
     public func addOperation(operation: NSOperation) {
         queue.addOperation(operation)
     }
 
+    /**
+    Add multiple operations at once.
+    
+    - parameter operations: an array of `NSOperation` instances.
+    */
     public func addOperations(operations: [NSOperation]) {
         queue.addOperations(operations, waitUntilFinished: false)
     }
@@ -109,8 +115,8 @@ public class GroupOperation: Operation {
     often need to move the results of one operation into the next one. So this
     can be done here.
 
-    :param: operation, an `NSOperation`
-    :param:, errors, an array of `ErrorType`s.
+    - parameter operation: the child `NSOperation` that has just finished.
+    - parameter errors: an array of `ErrorType`s.
     */
     public func operationDidFinish(operation: NSOperation, withErrors errors: [ErrorType]) {
         // no-op, subclasses can override for their own functionality.
@@ -119,6 +125,15 @@ public class GroupOperation: Operation {
 
 extension GroupOperation: OperationQueueDelegate {
 
+    /**
+    The group operation acts as it's own queue's delegate. When an operation is added to the queue,
+    assuming that the finishing operation has not started (or finished), and the operation is not
+    the finishing operation itself, then we add the operation as a dependency to the finishing
+    operation.
+    
+    The purpose of this is to keep the finishing operation as the last child operation that executes
+    when there are no more operations in the group.
+    */
     public func operationQueue(queue: OperationQueue, willAddOperation operation: NSOperation) {
         assert(!finishingOperation.finished && !finishingOperation.executing, "Cannot add new operations to a group after the group has completed.")
 
@@ -127,6 +142,11 @@ extension GroupOperation: OperationQueueDelegate {
         }
     }
 
+    /**
+    The group operation acts as it's own queue's delegate. When an operation finishes, if the
+    operation is the finishing operation, we finish the group operation here. Else, the group is
+    notified (using `operationDidFinish` that a child operation has finished.
+    */
     public func operationQueue(queue: OperationQueue, operationDidFinish operation: NSOperation, withErrors errors: [ErrorType]) {
         aggregateErrors.appendContentsOf(errors)
 
