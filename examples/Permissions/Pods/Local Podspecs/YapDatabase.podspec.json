@@ -16,6 +16,7 @@
     "tag": "2.7.2"
   },
   "module_map": "module.modulemap",
+  "libraries": "c++",
   "default_subspecs": "standard",
   "subspecs": [
     {
