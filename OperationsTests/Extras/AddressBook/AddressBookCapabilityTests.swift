@@ -113,12 +113,6 @@ class AddressBookCapabilityTests: XCTestCase {
 
 }
 
-
-
-
-
-
-
 class AddressBookAuthorizationStatusTests: XCTestCase {
 
     func test__given_status_authorized__requirements_met() {
@@ -137,6 +131,16 @@ class AddressBookAuthorizationStatusTests: XCTestCase {
         XCTAssertFalse(AddressBookAuthorizationStatus.Restricted.isRequirementMet(.Contacts))
     }
 }
+
+
+
+
+
+
+
+
+
+
 
 class CNAuthorizationStatusTests: XCTestCase {
 
@@ -163,25 +167,4 @@ class CNEntityTypeTests: XCTestCase {
         XCTAssertEqual(CNEntityType(entity: AddressBookAuthorizationStatus.EntityType.Contacts), CNEntityType.Contacts)
     }
 }
-
-@available(iOS, deprecated=9.0)
-class ABAuthorizationStatusTests: XCTestCase {
-
-    func test__given_authorized__address_book_authorization_status_is_correct() {
-        XCTAssertEqual(ABAuthorizationStatus.Authorized.addressBookAuthorizationStatus, AddressBookAuthorizationStatus.Authorized)
-    }
-
-    func test__given_not_determined__address_book_authorization_status_is_correct() {
-        XCTAssertEqual(ABAuthorizationStatus.NotDetermined.addressBookAuthorizationStatus, AddressBookAuthorizationStatus.NotDetermined)
-    }
-
-    func test__given_denied__address_book_authorization_status_is_correct() {
-        XCTAssertEqual(ABAuthorizationStatus.Denied.addressBookAuthorizationStatus, AddressBookAuthorizationStatus.Denied)
-    }
-
-    func test__given_restricted__address_book_authorization_status_is_correct() {
-        XCTAssertEqual(ABAuthorizationStatus.Restricted.addressBookAuthorizationStatus, AddressBookAuthorizationStatus.Restricted)
-    }
-}
-
 

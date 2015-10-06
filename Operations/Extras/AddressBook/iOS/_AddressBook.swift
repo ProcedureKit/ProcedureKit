@@ -1189,3 +1189,64 @@ public struct SystemAddressBookRegistrar: AddressBookPermissionRegistrar {
     }
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+public protocol SystemAddressBookType {
+
+    init()
+    func opr_authorizationStatus() -> ABAuthorizationStatus
+    func opr_requestAccessWithCompletion(completion: (Bool, NSError?) -> Void)
+}
+
+@available(iOS, deprecated=9.0)
+public class SystemAddressBook: NSObject, SystemAddressBookType {
+
+    public required override init() {
+        super.init()
+    }
+
+    public func opr_authorizationStatus() -> ABAuthorizationStatus {
+        return ABAddressBookGetAuthorizationStatus()
+    }
+
+    public func opr_requestAccessWithCompletion(completion: (Bool, NSError?) -> Void) {
+
+    }
+}
+
+extension SystemAddressBook: AddressBookRegistrarType {
+
+    public func opr_authorizationStatusForRequirement(entityType: AddressBookAuthorizationStatus.EntityType) -> AddressBookAuthorizationStatus {
+        return opr_authorizationStatus().addressBookAuthorizationStatus
+    }
+
+    public func opr_requestAccessForRequirement(entityType: AddressBookAuthorizationStatus.EntityType, completion: (Bool, NSError?) -> Void) {
+        opr_requestAccessWithCompletion(completion)
+    }
+}
+
+@available(iOS, deprecated=9.0)
+extension ABAuthorizationStatus {
+    var addressBookAuthorizationStatus: AddressBookAuthorizationStatus {
+        switch self {
+        case .NotDetermined: return .NotDetermined
+        case .Restricted: return .Restricted
+        case .Denied: return .Denied
+        case .Authorized: return .Authorized
+        }
+    }
+}
+
+
+

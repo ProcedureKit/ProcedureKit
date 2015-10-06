@@ -77,7 +77,7 @@ public class UnifiedAddressBook: AddressBookRegistrarType {
             registrar = SystemContactStore()
         }
         else {
-            registrar = SystemAddressBookRegistrar()
+            registrar = SystemAddressBook()
         }
     }
 
@@ -90,65 +90,8 @@ public class UnifiedAddressBook: AddressBookRegistrarType {
     }
 }
 
-@available(iOSApplicationExtension 9.0, *)
-extension SystemContactStore: AddressBookRegistrarType {
-
-    public func opr_authorizationStatusForRequirement(entityType: AddressBookAuthorizationStatus.EntityType) -> AddressBookAuthorizationStatus {
-        return opr_authorizationStatusForEntityType(CNEntityType(entity: entityType)).addressBookAuthorizationStatus
-    }
-
-    public func opr_requestAccessForRequirement(entityType: AddressBookAuthorizationStatus.EntityType, completion: (Bool, NSError?) -> Void) {
-        opr_requestAccessForEntityType(CNEntityType(entity: entityType), completion: completion)
-    }
-}
-
-extension SystemAddressBookRegistrar: AddressBookRegistrarType {
-
-    public func opr_authorizationStatusForRequirement(entityType: AddressBookAuthorizationStatus.EntityType) -> AddressBookAuthorizationStatus {
-        return status.addressBookAuthorizationStatus
-    }
-
-    public func opr_requestAccessForRequirement(entityType: AddressBookAuthorizationStatus.EntityType, completion: (Bool, NSError?) -> Void) {
-    }
-}
-
 extension Capability {
     public typealias AddressBook = _AddressBookCapability<UnifiedAddressBook>
 }
-
-
-/// MARK - Helpers
-
-@available(iOS 9.0, OSX 10.11, *)
-extension CNAuthorizationStatus {
-    var addressBookAuthorizationStatus: AddressBookAuthorizationStatus {
-        switch self {
-        case .NotDetermined: return .NotDetermined
-        case .Restricted: return .Restricted
-        case .Denied: return .Denied
-        case .Authorized: return .Authorized
-        }
-    }
-}
-
-@available(iOS 9.0, OSX 10.11, *)
-extension CNEntityType {
-    init(entity: AddressBookAuthorizationStatus.EntityType) {
-        self = .Contacts
-    }
-}
-
-@available(iOS, deprecated=9.0)
-extension ABAuthorizationStatus {
-    var addressBookAuthorizationStatus: AddressBookAuthorizationStatus {
-        switch self {
-        case .NotDetermined: return .NotDetermined
-        case .Restricted: return .Restricted
-        case .Denied: return .Denied
-        case .Authorized: return .Authorized
-        }
-    }
-}
-
 
 

@@ -79,14 +79,15 @@
 		654DF0301BC32CB200854D43 /* AddressBookUIOperations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 654DF00A1BC32C7D00854D43 /* AddressBookUIOperations.swift */; settings = {ASSET_TAGS = (); }; };
 		654DF0311BC32CB500854D43 /* AddressBookUIOperations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 654DF00A1BC32C7D00854D43 /* AddressBookUIOperations.swift */; settings = {ASSET_TAGS = (); }; };
 		654DF0321BC32CB900854D43 /* ContactsUIOperations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 654DF0101BC32C7D00854D43 /* ContactsUIOperations.swift */; settings = {ASSET_TAGS = (); }; };
-		654DF0341BC32DBC00854D43 /* AddressBook.swift in Sources */ = {isa = PBXBuildFile; fileRef = 654DF0331BC32DBC00854D43 /* AddressBook.swift */; settings = {ASSET_TAGS = (); }; };
-		654DF0351BC32DBF00854D43 /* AddressBook.swift in Sources */ = {isa = PBXBuildFile; fileRef = 654DF0331BC32DBC00854D43 /* AddressBook.swift */; settings = {ASSET_TAGS = (); }; };
+		654DF0341BC32DBC00854D43 /* _AddressBook.swift in Sources */ = {isa = PBXBuildFile; fileRef = 654DF0331BC32DBC00854D43 /* _AddressBook.swift */; settings = {ASSET_TAGS = (); }; };
+		654DF0351BC32DBF00854D43 /* _AddressBook.swift in Sources */ = {isa = PBXBuildFile; fileRef = 654DF0331BC32DBC00854D43 /* _AddressBook.swift */; settings = {ASSET_TAGS = (); }; };
 		654DF0371BC32E5A00854D43 /* AddressBookCapability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 654DF0361BC32E5A00854D43 /* AddressBookCapability.swift */; settings = {ASSET_TAGS = (); }; };
 		654DF0381BC32E5A00854D43 /* AddressBookCapability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 654DF0361BC32E5A00854D43 /* AddressBookCapability.swift */; settings = {ASSET_TAGS = (); }; };
 		654DF0391BC32E5A00854D43 /* AddressBookCapability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 654DF0361BC32E5A00854D43 /* AddressBookCapability.swift */; settings = {ASSET_TAGS = (); }; };
 		654DF03B1BC3F45400854D43 /* AddressBookCapabilityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 654DF03A1BC3F45400854D43 /* AddressBookCapabilityTests.swift */; settings = {ASSET_TAGS = (); }; };
 		654DF03C1BC3F45400854D43 /* AddressBookCapabilityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 654DF03A1BC3F45400854D43 /* AddressBookCapabilityTests.swift */; settings = {ASSET_TAGS = (); }; };
 		654DF03D1BC3F45400854D43 /* AddressBookCapabilityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 654DF03A1BC3F45400854D43 /* AddressBookCapabilityTests.swift */; settings = {ASSET_TAGS = (); }; };
+		654DF0421BC41AB400854D43 /* AddressBook_osx.swift in Sources */ = {isa = PBXBuildFile; fileRef = 654DF03E1BC4174700854D43 /* AddressBook_osx.swift */; settings = {ASSET_TAGS = (); }; };
 		65612FE11BC1C3B5007A2316 /* CloudCapabilityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65612FE01BC1C3B5007A2316 /* CloudCapabilityTests.swift */; settings = {ASSET_TAGS = (); }; };
 		65612FE21BC1C3B5007A2316 /* CloudCapabilityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65612FE01BC1C3B5007A2316 /* CloudCapabilityTests.swift */; settings = {ASSET_TAGS = (); }; };
 		65612FE31BC1C3B5007A2316 /* CloudCapabilityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65612FE01BC1C3B5007A2316 /* CloudCapabilityTests.swift */; settings = {ASSET_TAGS = (); }; };
@@ -169,7 +170,6 @@
 		65882F2E1BAF6083003F74B6 /* WebpageOperationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65882ECE1BAF6052003F74B6 /* WebpageOperationTests.swift */; };
 		65882F361BAF6084003F74B6 /* ReachabilityConditionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65882ECA1BAF6052003F74B6 /* ReachabilityConditionTests.swift */; };
 		65882F371BAF6084003F74B6 /* ReachableOperationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65882ECB1BAF6052003F74B6 /* ReachableOperationTests.swift */; };
-		65882F3B1BAF608A003F74B6 /* AddressBookConditionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65882EC01BAF6052003F74B6 /* AddressBookConditionTests.swift */; };
 		65882F3C1BAF608A003F74B6 /* AddressBookTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65882EC11BAF6052003F74B6 /* AddressBookTests.swift */; };
 		659C442D1BBD455D0076D529 /* NetworkOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 659C442C1BBD455D0076D529 /* NetworkOperation.swift */; settings = {ASSET_TAGS = (); }; };
 		659C442E1BBD455D0076D529 /* NetworkOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 659C442C1BBD455D0076D529 /* NetworkOperation.swift */; settings = {ASSET_TAGS = (); }; };
@@ -302,9 +302,10 @@
 		654DF0101BC32C7D00854D43 /* ContactsUIOperations.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContactsUIOperations.swift; sourceTree = "<group>"; };
 		654DF0121BC32C7D00854D43 /* ContactsCondition.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContactsCondition.swift; sourceTree = "<group>"; };
 		654DF0131BC32C7D00854D43 /* ContactsOperation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContactsOperation.swift; sourceTree = "<group>"; };
-		654DF0331BC32DBC00854D43 /* AddressBook.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddressBook.swift; sourceTree = "<group>"; };
+		654DF0331BC32DBC00854D43 /* _AddressBook.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = _AddressBook.swift; sourceTree = "<group>"; };
 		654DF0361BC32E5A00854D43 /* AddressBookCapability.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddressBookCapability.swift; sourceTree = "<group>"; };
 		654DF03A1BC3F45400854D43 /* AddressBookCapabilityTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddressBookCapabilityTests.swift; sourceTree = "<group>"; };
+		654DF03E1BC4174700854D43 /* AddressBook_osx.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddressBook_osx.swift; sourceTree = "<group>"; };
 		65612FE01BC1C3B5007A2316 /* CloudCapabilityTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CloudCapabilityTests.swift; sourceTree = "<group>"; };
 		657B3E861BBEF779003AC518 /* PhotosCapability.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PhotosCapability.swift; sourceTree = "<group>"; };
 		657B3E8C1BBF06DC003AC518 /* PassbookCapability.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PassbookCapability.swift; sourceTree = "<group>"; };
@@ -480,7 +481,7 @@
 		654DF0071BC32C7D00854D43 /* iOS */ = {
 			isa = PBXGroup;
 			children = (
-				654DF0331BC32DBC00854D43 /* AddressBook.swift */,
+				654DF0331BC32DBC00854D43 /* _AddressBook.swift */,
 				654DF0081BC32C7D00854D43 /* AddressBookConditions.swift */,
 				654DF0091BC32C7D00854D43 /* AddressBookOperations.swift */,
 				654DF00A1BC32C7D00854D43 /* AddressBookUIOperations.swift */,
@@ -491,6 +492,7 @@
 		654DF00B1BC32C7D00854D43 /* Shared */ = {
 			isa = PBXGroup;
 			children = (
+				654DF03E1BC4174700854D43 /* AddressBook_osx.swift */,
 				654DF0361BC32E5A00854D43 /* AddressBookCapability.swift */,
 				654DF00D1BC32C7D00854D43 /* Contacts.swift */,
 			);
@@ -1182,7 +1184,7 @@
 				65EEC1921BAF44E80020A9BD /* OperationCondition.swift in Sources */,
 				650F7E801BBEC43F00502428 /* HealthCapability.swift in Sources */,
 				6523DA191BBDD21F003A3374 /* LocationCapability.swift in Sources */,
-				654DF0351BC32DBF00854D43 /* AddressBook.swift in Sources */,
+				654DF0351BC32DBF00854D43 /* _AddressBook.swift in Sources */,
 				65EEC2371BAF4F230020A9BD /* Reachability.swift in Sources */,
 				65EEC2311BAF4F230020A9BD /* UserConfirmationCondition.swift in Sources */,
 			);
@@ -1198,7 +1200,6 @@
 				65882EFF1BAF6074003F74B6 /* GatedOperationTests.swift in Sources */,
 				651E395B1BB45E370013ADE6 /* ContactsOperationsTests.swift in Sources */,
 				6585DACC1BBE805700CE46BE /* AuthorizationTests.swift in Sources */,
-				65882F3B1BAF608A003F74B6 /* AddressBookConditionTests.swift in Sources */,
 				65882F3C1BAF608A003F74B6 /* AddressBookTests.swift in Sources */,
 				65882F051BAF6074003F74B6 /* NoFailedDependenciesConditionTests.swift in Sources */,
 				65882F281BAF6083003F74B6 /* PassbookCapabilityTests.swift in Sources */,
@@ -1257,6 +1258,7 @@
 				65EEC23E1BAF4F610020A9BD /* ReachabilityCondition.swift in Sources */,
 				6523DA211BBDEA57003A3374 /* CalendarCapability.swift in Sources */,
 				65EEC1BE1BAF468D0020A9BD /* Support.swift in Sources */,
+				654DF0421BC41AB400854D43 /* AddressBook_osx.swift in Sources */,
 				654DF0211BC32C9500854D43 /* Contacts.swift in Sources */,
 				65EEC23F1BAF4F610020A9BD /* ReachableOperation.swift in Sources */,
 				65EEC1CE1BAF468D0020A9BD /* LoggingObserver.swift in Sources */,
@@ -1331,7 +1333,7 @@
 				65EEC1FC1BAF4C6F0020A9BD /* MutuallyExclusive.swift in Sources */,
 				65EEC2431BAF4F780020A9BD /* Reachability.swift in Sources */,
 				65EEC2061BAF4C6F0020A9BD /* ComposedOperation.swift in Sources */,
-				654DF0341BC32DBC00854D43 /* AddressBook.swift in Sources */,
+				654DF0341BC32DBC00854D43 /* _AddressBook.swift in Sources */,
 				654DF01B1BC32C7D00854D43 /* ContactsOperation.swift in Sources */,
 				65EEC24C1BAF4FD40020A9BD /* UserConfirmationCondition.swift in Sources */,
 			);
@@ -1857,7 +1859,7 @@
 				INFOPLIST_FILE = "$(SRCROOT)/Operations/Supporting Files/Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
-				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = me.danthorpe.Operations;
@@ -1909,7 +1911,7 @@
 				INFOPLIST_FILE = "$(SRCROOT)/Operations/Supporting Files/Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
-				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				PRODUCT_BUNDLE_IDENTIFIER = me.danthorpe.Operations;
 				PRODUCT_NAME = Operations;
