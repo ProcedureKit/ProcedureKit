@@ -15,20 +15,43 @@ the target operation will be fail.
 */
 public struct NoFailedDependenciesCondition: OperationCondition {
 
+    /// The `ErrorType` returned to indicate the condition failed.
     public enum Error: ErrorType, Equatable {
+
+        /// When some dependencies were cancelled
         case CancelledDependencies
+
+        /// When some dependencies failed with errors
         case FailedDependencies
     }
 
+    /// A constant name for the condition.
     public let name = "No Cancelled Condition"
+
+    /// A constant flag indicating this condition is not mutually exclusive
     public let isMutuallyExclusive = false
 
+    /// Initializer which takes no parameters.
     public init() { }
 
+    /// Conforms to `OperationCondition` but there are no dependent operations.
     public func dependencyForOperation(operation: Operation) -> NSOperation? {
         return .None
     }
 
+    /**
+    Evaluates the operation with respect to the finished status of its dependencies.
+    
+    The condition first checks if any dependencies were cancelled, in which case it 
+    fails with an `NoFailedDependenciesCondition.Error.CancelledDependencies`. Then
+    it checks to see if any dependencies failed due to errors, in which case it
+    fails with an `NoFailedDependenciesCondition.Error.FailedDependencies`.
+    
+    The cancelled or failed operations are no associated with the error.
+
+    - parameter operation: the `Operation` which the condition is attached to.
+    - parameter completion: the completion block which receives a `OperationConditionResult`.
+    */
     public func evaluateForOperation(operation: Operation, completion: OperationConditionResult -> Void) {
         let dependencies = operation.dependencies
 
@@ -52,6 +75,7 @@ public struct NoFailedDependenciesCondition: OperationCondition {
     }
 }
 
+/// Equatable conformance for `NoFailedDependenciesCondition.Error`
 public func ==(a: NoFailedDependenciesCondition.Error, b: NoFailedDependenciesCondition.Error) -> Bool {
     switch (a, b) {
     case (.CancelledDependencies, .CancelledDependencies), (.FailedDependencies, .FailedDependencies):

@@ -656,7 +656,6 @@
 				65EEC1721BAF44E80020A9BD /* DelayOperation.swift */,
 				65EEC1741BAF44E80020A9BD /* GatedOperation.swift */,
 				65EEC1751BAF44E80020A9BD /* GroupOperation.swift */,
-				65EEC1761BAF44E80020A9BD /* LoggingObserver.swift */,
 				65EEC16C1BAF44E80020A9BD /* UIOperation.swift */,
 			);
 			name = Operations;
@@ -692,6 +691,7 @@
 			children = (
 				65EEC16A1BAF44E80020A9BD /* BackgroundObserver.swift */,
 				65EEC16F1BAF44E80020A9BD /* BlockObserver.swift */,
+				65EEC1761BAF44E80020A9BD /* LoggingObserver.swift */,
 				65EEC16B1BAF44E80020A9BD /* NetworkObserver.swift */,
 				65EEC1801BAF44E80020A9BD /* TimeoutObserver.swift */,
 			);

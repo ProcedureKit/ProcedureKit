@@ -25,7 +25,7 @@ public class BlockOperation: Operation {
     /**
     Designated initializer.
     
-    :param: block The closure to run when the operation executes.
+    - parameter block: The closure to run when the operation executes.
     If this block is nil, the operation will immediately finish.
     */
     public init(block: BlockType = { (continueWithError) in continueWithError(error: nil) }) {
@@ -36,7 +36,7 @@ public class BlockOperation: Operation {
     /**
     Convenience initializer.
     
-    :param: block a dispatch block which is run on the main thread.
+    - parameter block: a dispatch block which is run on the main thread.
     */
     public convenience init(mainQueueBlock: dispatch_block_t) {
         self.init(block: { continuation in
@@ -47,6 +47,15 @@ public class BlockOperation: Operation {
         })
     }
 
+    /**
+    Executes the block. The block is passed another block which receives an optional
+    error which is passed to finish.
+    
+    In other words, the operation is initialized with a block which receives a 
+    "continuation" block. The consumer must call this continuation block to finish
+    the operation. Errors can be propagated from the block to the operation by passing
+    them to this continuation block.
+    */
     public override func execute() {
         block { error in self.finish(error) }
     }
