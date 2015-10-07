@@ -85,6 +85,10 @@ public final class Reachability {
         }
     }
 
+    private var recentNetworkStatus: NetworkStatus? {
+        return previousReachabilityFlags.map { self.networkStatusFromFlags($0) }
+    }
+
     private let isPhoneDevice: Bool = {
         #if (arch(i386) || arch(x86_64)) && os(iOS)
             return false
@@ -111,8 +115,10 @@ public final class Reachability {
         return token
     }
 
-    public func addObserverWithToken(token: String, observer: ObserverBlockType) {
-        observers.updateValue(Observer(reachabilityDidChange: observer), forKey: token)
+    public func addObserverWithToken(token: String, observer block: ObserverBlockType) {
+        let observer = Observer(reachabilityDidChange: block)
+        observers.updateValue(observer, forKey: token)
+        didAddObserver(observer)
         startNotifier()
     }
 
@@ -142,8 +148,6 @@ public final class Reachability {
 
     private func startNotifier() {
         if !isRunning {
-            isRunning = true
-
             if let _timer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, timerQueue) {
                 // Fire every 250 milliseconds, with 250 millisecond leeway
                 dispatch_source_set_timer(_timer, dispatch_walltime(nil, 0), 250 * NSEC_PER_MSEC, 250 * NSEC_PER_MSEC)
@@ -151,6 +155,8 @@ public final class Reachability {
                 dispatch_resume(_timer)
                 timer = _timer
             }
+            isRunning = true
+//            print(">> [Reachability]: Started.")
         }
     }
 
@@ -159,8 +165,18 @@ public final class Reachability {
             if let _timer = timer {
                 dispatch_source_cancel(_timer)
                 timer = nil
+                previousReachabilityFlags = .None
             }
             isRunning = false
+//            print(">> [Reachability]: Stopped.")
+        }
+    }
+
+    private func didAddObserver(observer: Observer) {
+        if let networkStatus = recentNetworkStatus {
+            dispatch_async(Queue.Main.queue) {
+                observer.reachabilityDidChange(networkStatus)
+            }
         }
     }
 
