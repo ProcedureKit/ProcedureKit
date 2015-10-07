@@ -33,10 +33,10 @@ public class ReachableOperation<O: NSOperation>: GroupOperation {
     Composes an operation to ensure that is will definitely be executed as soon as
     the required kind of connectivity is achieved.
     
-    :param: operation, any `NSOperation` type.
-    :param: connectivity, a `Reachability.Connectivity` value, defaults to `.AnyConnectionKind`.
+    - parameter [unlabeled] operation: any `NSOperation` type.
+    - parameter connectivity: a `Reachability.Connectivity` value, defaults to `.AnyConnectionKind`.
     */
-    public convenience init(operation: O, connectivity: Reachability.Connectivity = .AnyConnectionKind) {
+    public convenience init(_ operation: O, connectivity: Reachability.Connectivity = .AnyConnectionKind) {
         self.init(operation: operation, connectivity: connectivity, reachability: Reachability.sharedInstance)
     }
 
