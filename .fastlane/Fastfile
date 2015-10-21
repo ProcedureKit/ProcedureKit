@@ -1,5 +1,3 @@
-default_platform :ios
-
 lane :verify do
   verify_xcode  
 end
