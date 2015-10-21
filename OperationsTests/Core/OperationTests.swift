@@ -138,6 +138,14 @@ class BasicTests: OperationTests {
         XCTAssertNotEqual(OperationError.ConditionFailed, OperationError.OperationTimedOut(1.0))
         XCTAssertNotEqual(OperationError.OperationTimedOut(2.0), OperationError.OperationTimedOut(1.0))
     }
+
+    func test__finishing_cancelled_operation() {
+        let operation = TestOperation(delay: 1)
+        operation.cancel()
+        operation.finish()
+        XCTAssertTrue(operation.cancelled)
+        XCTAssertFalse(operation.finished)
+    }
 }
 
 class BlockOperationTests: OperationTests {

@@ -296,7 +296,7 @@ public class Operation: NSOperation {
     - parameter errors: an array of `ErrorType`, which defaults to empty.
     */
     final public func finish(errors: [ErrorType] = []) {
-        if !hasFinishedAlready {
+        if !hasFinishedAlready && !cancelled {
             hasFinishedAlready = true
             state = .Finishing
 
