@@ -1,21 +1,25 @@
 default_platform :ios
 
+lane :verify do
+  verify_xcode  
+end
+
 platform :ios do
 
   desc "Runs the iOS Extension only framework"
   lane :test_extension do
-	xctest scheme: 'Operations-iOS-Extension', 
-    sdk: 'iphonesimulator', 
-    destination: 'platform=iOS Simulator,name=iPhone 6,OS=9.1',
-    derivedDataPath: '.fastlane/xcodebuild-data'
+  	xctest scheme: 'Operations-iOS-Extension', 
+      sdk: 'iphonesimulator', 
+      destination: 'platform=iOS Simulator,name=iPhone 6,OS=9.1',
+      derivedDataPath: '.fastlane/xcodebuild-data'
   end
 
   desc "Runs all the tests"
-  lane :test do
-	xctest scheme: 'Operations-iOS', 
-    sdk: 'iphonesimulator', 
-    destination: 'platform=iOS Simulator,name=iPhone 6,OS=9.1',
-    derivedDataPath: '.fastlane/xcodebuild-data'
+  lane :test_ios do
+  	xctest scheme: 'Operations-iOS', 
+      sdk: 'iphonesimulator', 
+      destination: 'platform=iOS Simulator,name=iPhone 6,OS=9.1',
+      derivedDataPath: '.fastlane/xcodebuild-data'
   end
 
 end
@@ -23,11 +27,16 @@ end
 platform :mac do
 
   desc "Runs all the tests"
-  lane :test do
-	xctest scheme: 'Operations-OSX', 
-    sdk: 'macosx', 
-    destination: 'platform=OS X',
-    derivedDataPath: '.fastlane/xcodebuild-data'
+  lane :test_mac do
+  	xctest scheme: 'Operations-OSX', 
+      sdk: 'macosx', 
+      destination: 'platform=OS X',
+      derivedDataPath: '.fastlane/xcodebuild-data'
   end
+end
 
+after_all do |lane|
+  if lane == :test_ios
+    sh "bash <(curl -s https://codecov.io/bash) -D .fastlane/xcodebuild-data"
+  end
 end
