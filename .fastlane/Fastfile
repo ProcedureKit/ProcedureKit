@@ -6,7 +6,7 @@ platform :ios do
   lane :test_extension do
 	xctest scheme: 'Operations-iOS-Extension', 
     sdk: 'iphonesimulator', 
-    destination: 'platform=iOS Simulator,name=iPhone 6,OS=9.0',
+    destination: 'platform=iOS Simulator,name=iPhone 6,OS=9.1',
     derivedDataPath: '.fastlane/xcodebuild-data'
   end
 
@@ -14,7 +14,7 @@ platform :ios do
   lane :test do
 	xctest scheme: 'Operations-iOS', 
     sdk: 'iphonesimulator', 
-    destination: 'platform=iOS Simulator,name=iPhone 6,OS=9.0',
+    destination: 'platform=iOS Simulator,name=iPhone 6,OS=9.1',
     derivedDataPath: '.fastlane/xcodebuild-data'
   end
 
