@@ -8,7 +8,7 @@
 
 import UIKit
 
-public protocol NetworkActivityIndicatorInterface {
+protocol NetworkActivityIndicatorInterface {
     var networkActivityIndicatorVisible: Bool { get set }
 }
 
@@ -23,6 +23,7 @@ public class NetworkObserver: OperationObserver {
 
     let networkActivityIndicator: NetworkActivityIndicatorInterface
 
+    /// Initializer takes no parameters.
     public convenience init() {
         self.init(indicator: UIApplication.sharedApplication())
     }
@@ -31,6 +32,7 @@ public class NetworkObserver: OperationObserver {
         networkActivityIndicator = indicator
     }
 
+    /// Conforms to `OperationObserver`, will start the network activity indicator.
     public func operationDidStart(operation: Operation) {
         dispatch_async(Queue.Main.queue) {
             NetworkIndicatorController.sharedInstance.networkActivityIndicator = self.networkActivityIndicator
@@ -38,10 +40,12 @@ public class NetworkObserver: OperationObserver {
         }
     }
 
+    /// Conforms to `OperationObserver`, has no opertion for when another operation is produced.
     public func operation(operation: Operation, didProduceOperation newOperation: NSOperation) {
         // no-op
     }
 
+    /// Conforms to `OperationObserver`, will stop the network activity indicator.
     public func operationDidFinish(operation: Operation, errors: [ErrorType]) {
         dispatch_async(Queue.Main.queue) {
             NetworkIndicatorController.sharedInstance.networkActivityIndicator = self.networkActivityIndicator

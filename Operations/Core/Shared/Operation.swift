@@ -110,14 +110,17 @@ public class Operation: NSOperation {
         }
     }
 
+    /// Access the internal errors collected by the Operation
     public var errors: [ErrorType] {
         return _internalErrors
     }
 
+    /// Boolean flag to indicate that the Operation failed due to errors.
     public var failed: Bool {
         return errors.count > 0
     }
 
+    /// Boolean indicator of the readyness of the Operation
     public override var ready: Bool {
         switch state {
 
@@ -156,10 +159,12 @@ public class Operation: NSOperation {
         }
     }
 
+    /// Boolean indicator for whether the Operation is currently executing or not
     public override var executing: Bool {
         return state == .Executing
     }
-    
+
+    /// Boolean indicator for whether the Operation has finished or not
     public override var finished: Bool {
         return state == .Finished
     }
@@ -186,7 +191,7 @@ public class Operation: NSOperation {
     /**
     Add a condition to the to the operation, can only be done prior to the operation starting.
 
-    :param: condition type conforming to protocol `OperationCondition`.
+    - parameter condition: type conforming to protocol `OperationCondition`.
     */
     public func addCondition(condition: OperationCondition) {
         assert(state < .Executing, "Cannot modify conditions after execution has begun, current state: \(state).")
@@ -198,20 +203,28 @@ public class Operation: NSOperation {
     /**
     Add an observer to the to the operation, can only be done prior to the operation starting.
 
-    :param: observer type conforming to protocol `OperationObserver`.
+    - parameter observer: type conforming to protocol `OperationObserver`.
     */
     public func addObserver(observer: OperationObserver) {
         assert(state < .Executing, "Cannot modify observers after execution has begun, current state: \(state).")
         observers.append(observer)
     }
 
+    /**
+    Add another `NSOperation` as a dependency. It is a programmatic error to call this method after the receiver has 
+    already started executing. Therefore, best practice is to add dependencies before adding them to operation
+    queues.
+    
+    - parameter operation: a `NSOperation` instance.
+    */
     public override func addDependency(operation: NSOperation) {
         assert(state <= .Executing, "Dependencies cannot be modified after execution has begun, current state: \(state).")        
         super.addDependency(operation)
     }
 
     // MARK: - Execution and Cancellation
-    
+
+    /// Starts the operation, correctly managing the cancelled state. Cannot be over-ridden
     public override final func start() {
         // NSOperation.start() has important logic which shouldn't be bypassed
         super.start()
@@ -222,6 +235,7 @@ public class Operation: NSOperation {
         }
     }
 
+    /// Triggers execution of the operation's task, correctly managing errors and the cancelled state. Cannot be over-ridden
     public override final func main() {
         assert(state == .Ready, "This operation must be performed on an operation queue, current state: \(state).")
 
@@ -248,7 +262,7 @@ public class Operation: NSOperation {
     /**
     Cancel the operation with an error.
     
-    :param: error, an optional `ErrorType`.
+    - parameter error: an optional `ErrorType`.
     */
     public func cancelWithError(error: ErrorType? = .None) {
         if let error = error {
@@ -261,7 +275,7 @@ public class Operation: NSOperation {
     /**
     Produce another operation on the same queue that this instance is on.
 
-    :param: operation a `NSOperation` instance.
+    - parameter operation: a `NSOperation` instance.
     */
     public final func produceOperation(operation: NSOperation) {
         observers.forEach { $0.operation(self, didProduceOperation: operation) }
@@ -279,7 +293,7 @@ public class Operation: NSOperation {
     Finish method which must be called eventually after an operation has
     begun executing.
 
-    :param: errors, an array of `ErrorType`, which defaults to empty.
+    - parameter errors: an array of `ErrorType`, which defaults to empty.
     */
     final public func finish(errors: [ErrorType] = []) {
         if !hasFinishedAlready {
@@ -295,9 +309,7 @@ public class Operation: NSOperation {
         }
     }
     
-    /**
-    Convenience method to simplify finishing when there is only one error.
-    */
+    /// Convenience method to simplify finishing when there is only one error.
     final public func finish(error: ErrorType?) {
         if let error = error {
             finish([error])
@@ -310,17 +322,22 @@ public class Operation: NSOperation {
     /**
     Subclasses may override `finished(_:)` if they wish to react to the operation
     finishing with errors.
+    
+    - parameter errors: an array of `ErrorType`.
     */
     public func finished(errors: [ErrorType]) {
         // No op.
     }
+
+    /**
+    Public override which deliberately crashes your app, as usage is considered an antipattern
+
+    To promote best practices, where waiting is never the correct thing to do,
+    we will crash the app if this is called. Instead use discrete operations and
+    dependencies, or groups, or semaphores or even NSLocking.
     
+    */
     public override func waitUntilFinished() {
-        /**
-        To promote best practices, where waiting is never the correct thing to do,
-        we will crash the app if this is called. Instead use discrete operations and
-        dependencies, or groups, or semaphores or even NSLocking.
-        */
         fatalError("Waiting on operations is an anti-pattern. Remove this ONLY if you're absolutely sure there is No Other Way™. Post a question in https://github.com/danthorpe/Operations if you are unsure.")
     }
 }
@@ -352,12 +369,17 @@ extension Operation.State: CustomDebugStringConvertible, CustomStringConvertible
     }
 }
 
+/**
+A common error type for Operations. Primarily used to indicate error when
+an Operation's conditions fail.
+*/
 public enum OperationError: ErrorType, Equatable {
     case ConditionFailed
     case OperationTimedOut(NSTimeInterval)
 }
 
-public func == (a: OperationError, b: OperationError) -> Bool {
+/// OperationError is Equatable.
+public func ==(a: OperationError, b: OperationError) -> Bool {
     switch (a, b) {
     case (.ConditionFailed, .ConditionFailed):
         return true
@@ -370,7 +392,11 @@ public func == (a: OperationError, b: OperationError) -> Bool {
 
 extension NSOperation {
 
-    /// Chain completion blocks
+    /** 
+    Chain completion blocks.
+    
+    - parameter block: a Void -> Void block
+    */
     public func addCompletionBlock(block: Void -> Void) {
         if let existing = completionBlock {
             completionBlock = {
@@ -383,7 +409,12 @@ extension NSOperation {
         }
     }
     
-    /// Add multiple depdendencies to the operation.
+    /** 
+    Add multiple depdendencies to the operation. Will add each 
+    dependency in turn.
+
+    - parameter dependencies: and array of `NSOperation` instances.
+    */
     public func addDependencies(dependencies: [NSOperation]) {
         dependencies.forEach(addDependency)
     }

@@ -9,20 +9,20 @@
 import Foundation
 
 /**
-    `DelayOperation` is an operation which waits until a given future
-    date, or a time interval. If the interval is negative, or the date
-    is in the past, the operation finishes.
+`DelayOperation` is an operation which waits until a given future
+date, or a time interval. If the interval is negative, or the date
+is in the past, the operation finishes.
 
-    Note that this operation efficiently uses `dispatch_after` so it 
-    does not block the thread on which it is called.
+Note that this operation efficiently uses `dispatch_after` so it 
+does not block the thread on which it is called.
 
-    Make an operation dependent on a `DelayOperation` in order to 
-    make it execute after a timeout, or in a repeated fashion with a
-    time-out.
+Make an operation dependent on a `DelayOperation` in order to 
+make it execute after a timeout, or in a repeated fashion with a
+time-out.
 */
 public class DelayOperation: Operation {
 
-    private enum Delay {
+    internal enum Delay {
         case Interval(NSTimeInterval)
         case Date(NSDate)
 
@@ -36,16 +36,31 @@ public class DelayOperation: Operation {
 
     private let delay: Delay
 
+    /**
+    Initialize the `DelayOperation` with a time interval.
+    
+    - parameter interval: a `NSTimeInterval`.
+    */
     public init(interval: NSTimeInterval) {
         delay = .Interval(interval)
         super.init()
     }
 
+    /**
+    Initialize the `DelayOperation` with a date.
+
+    - parameter interval: a `NSDate`.
+    */
     public init(date: NSDate) {
         delay = .Date(date)
         super.init()
     }
 
+    /**
+    Executes the operation by using dispatch_after to finish the
+    operation in the future, but only if the time interval is 
+    greater than zero.
+    */
     public override func execute() {
 
         switch delay.interval {

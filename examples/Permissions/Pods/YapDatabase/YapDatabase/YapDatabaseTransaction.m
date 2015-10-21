@@ -4709,12 +4709,6 @@
 		}
 	}
 	
-    YapCollectionKey *cacheKey = [[YapCollectionKey alloc] initWithCollection:collection key:key];
-    for (YapDatabaseExtensionTransaction *extTransaction in [self orderedExtensions])
-    {
-        [extTransaction handleWillReplaceObject:object forCollectionKey:cacheKey withRowid:rowid];
-    }
-    
 	// To use SQLITE_STATIC on our data blob, we use the objc_precise_lifetime attribute.
 	// This ensures the data isn't released until it goes out of scope.
 	
@@ -4726,6 +4720,15 @@
 	
 	sqlite3_stmt *statement = [connection updateObjectForRowidStatement];
 	if (statement == NULL) return;
+	
+	YapCollectionKey *cacheKey = [[YapCollectionKey alloc] initWithCollection:collection key:key];
+	
+	// Be sure to execute pre-hook BEFORE we bind query parameters.
+	
+	for (YapDatabaseExtensionTransaction *extTransaction in [self orderedExtensions])
+	{
+		[extTransaction handleWillReplaceObject:object forCollectionKey:cacheKey withRowid:rowid];
+	}
 	
 	// UPDATE "database2" SET "data" = ? WHERE "rowid" = ?;
 	
@@ -4896,6 +4899,15 @@
 	sqlite3_stmt *statement = [connection updateMetadataForRowidStatement];
 	if (statement == NULL) return;
 	
+	YapCollectionKey *cacheKey = [[YapCollectionKey alloc] initWithCollection:collection key:key];
+	
+	// Be sure to execute pre-hook BEFORE we bind query parameters.
+	
+	for (YapDatabaseExtensionTransaction *extTransaction in [self orderedExtensions])
+	{
+		[extTransaction handleWillReplaceMetadata:metadata forCollectionKey:cacheKey withRowid:rowid];
+	}
+	
 	// UPDATE "database2" SET "metadata" = ? WHERE "rowid" = ?;
 	
 	int const bind_idx_metadata = SQLITE_BIND_START + 0;
@@ -4907,12 +4919,6 @@
 	sqlite3_bind_int64(statement, bind_idx_rowid, rowid);
 	
 	BOOL updated = YES;
-	
-    YapCollectionKey *cacheKey = [[YapCollectionKey alloc] initWithCollection:collection key:key];
-    for (YapDatabaseExtensionTransaction *extTransaction in [self orderedExtensions])
-    {
-        [extTransaction handleWillReplaceMetadata:metadata forCollectionKey:cacheKey withRowid:rowid];
-    }
 
 	int status = sqlite3_step(statement);
 	if (status != SQLITE_DONE)
@@ -5040,6 +5046,19 @@
 	sqlite3_stmt *statement = [connection removeForRowidStatement];
 	if (statement == NULL) return;
 	
+	YapCollectionKey *cacheKey = [[YapCollectionKey alloc] initWithCollection:collection key:key];
+	
+	// Issue #215
+	//
+	// Be sure to execute pre-hook BEFORE we bind query parameters.
+	// Because if the pre-hook deletes any rows in the database, this method would be called again,
+	// and our binding would get erased.
+	
+	for (YapDatabaseExtensionTransaction *extTransaction in [self orderedExtensions])
+	{
+		[extTransaction handleWillRemoveObjectForCollectionKey:cacheKey withRowid:rowid];
+	}
+	
 	// DELETE FROM "database" WHERE "rowid" = ?;
 	
 	int const bind_idx_rowid = SQLITE_BIND_START;
@@ -5047,12 +5066,6 @@
 	sqlite3_bind_int64(statement, bind_idx_rowid, rowid);
 	
 	BOOL removed = YES;
-	
-    YapCollectionKey *cacheKey = [[YapCollectionKey alloc] initWithCollection:collection key:key];
-    for (YapDatabaseExtensionTransaction *extTransaction in [self orderedExtensions])
-    {
-        [extTransaction handleWillRemoveObjectForCollectionKey:cacheKey withRowid:rowid];
-    }
 
 	int status = sqlite3_step(statement);
 	if (status != SQLITE_DONE)
@@ -5241,19 +5254,19 @@
 				return;
 			}
 			
-			for (i = 0; i < foundCount; i++)
-			{
-				int64_t rowid = [[foundRowids objectAtIndex:i] longLongValue];
-				
-				sqlite3_bind_int64(statement, (int)(SQLITE_BIND_START + i), rowid);
-			}
-			
             for (YapDatabaseExtensionTransaction *extTransaction in [self orderedExtensions])
             {
                 [extTransaction handleWillRemoveObjectsForKeys:foundKeys
                                                   inCollection:collection
                                                     withRowids:foundRowids];
             }
+			
+			for (i = 0; i < foundCount; i++)
+			{
+				int64_t rowid = [[foundRowids objectAtIndex:i] longLongValue];
+				
+				sqlite3_bind_int64(statement, (int)(SQLITE_BIND_START + i), rowid);
+			}
             
 			status = sqlite3_step(statement);
 			if (status != SQLITE_DONE)
@@ -5532,13 +5545,6 @@
 				FreeYapDatabaseString(&_collection);
 				return;
 			}
-			
-			for (i = 0; i < foundCount; i++)
-			{
-				int64_t rowid = [[foundRowids objectAtIndex:i] longLongValue];
-				
-				sqlite3_bind_int64(statement, (int)(SQLITE_BIND_START + i), rowid);
-			}
             
             for (YapDatabaseExtensionTransaction *extTransaction in [self orderedExtensions])
             {
@@ -5546,6 +5552,13 @@
                                                   inCollection:collection
                                                     withRowids:foundRowids];
             }
+			
+			for (i = 0; i < foundCount; i++)
+			{
+				int64_t rowid = [[foundRowids objectAtIndex:i] longLongValue];
+				
+				sqlite3_bind_int64(statement, (int)(SQLITE_BIND_START + i), rowid);
+			}
 			
 			status = sqlite3_step(statement);
 			if (status != SQLITE_DONE)

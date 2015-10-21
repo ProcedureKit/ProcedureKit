@@ -7,9 +7,9 @@ PODS:
     - CocoaLumberjack/Core
   - CocoaLumberjack/Extensions (2.0.1):
     - CocoaLumberjack/Default
-  - Operations/+AddressBook (2.1.0):
+  - Operations/+AddressBook (2.2.0):
     - Operations/App
-  - Operations/App (2.1.0)
+  - Operations/App (2.2.0)
   - PureLayout (3.0.1)
   - TaylorSource/Base (2.0.0)
   - TaylorSource/YapDatabase (2.0.0):
@@ -30,27 +30,27 @@ DEPENDENCIES:
   - Operations/+AddressBook (from `../../`)
   - PureLayout
   - TaylorSource/YapDatabase (~> 2)
-  - YapDatabase (from `https://github.com/danthorpe/YapDatabase`, branch `YAP-180_remove_weak_linking`)
+  - YapDatabase (from `https://github.com/yapstudios/YapDatabase`, branch `master`)
   - YapDatabaseExtensions (~> 2)
 
 EXTERNAL SOURCES:
   Operations:
     :path: "../../"
   YapDatabase:
-    :branch: YAP-180_remove_weak_linking
-    :git: https://github.com/danthorpe/YapDatabase
+    :branch: master
+    :git: https://github.com/yapstudios/YapDatabase
 
 CHECKOUT OPTIONS:
   YapDatabase:
-    :commit: 3c9a5e508f02e860af34b2f5f28562181ed9135a
-    :git: https://github.com/danthorpe/YapDatabase
+    :commit: 23461c2ee873db7fdd831097223643e9b53f31fe
+    :git: https://github.com/yapstudios/YapDatabase
 
 SPEC CHECKSUMS:
   CocoaLumberjack: 019d1361244274a6138c788c6cb80baabc13fb8f
-  Operations: 512f6867ec8c0d2c9324da342bc3496498165f19
+  Operations: aa705cc30dc3e1f6625e6a95cd6cb7ebc9a2440e
   PureLayout: f35f5384c9c4e4479df041dbe33ad7577b71ddfb
   TaylorSource: 86484ba9cf9374d51d4c17db1ad21ee5acba1277
-  YapDatabase: 4e6163786209367c87af1cd2842f6b6ab0f32caa
+  YapDatabase: c9bf113e40137e96e67ff65a25cd4bf4bdc0beed
   YapDatabaseExtensions: 260ba5b2cb2086ca2a073ff54c503b96cdf01207
 
 COCOAPODS: 0.38.2
