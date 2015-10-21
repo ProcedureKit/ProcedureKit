@@ -7,48 +7,43 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		650F7E7D1BBEA4DD00502428 /* LocationOperationsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65882EC71BAF6052003F74B6 /* LocationOperationsTests.swift */; settings = {ASSET_TAGS = (); }; };
-		650F7E7E1BBEB30F00502428 /* CalendarCapabilityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65882EC31BAF6052003F74B6 /* CalendarCapabilityTests.swift */; settings = {ASSET_TAGS = (); }; };
-		650F7E801BBEC43F00502428 /* HealthCapability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 650F7E7F1BBEC43F00502428 /* HealthCapability.swift */; settings = {ASSET_TAGS = (); }; };
-		650F7E811BBEC43F00502428 /* HealthCapability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 650F7E7F1BBEC43F00502428 /* HealthCapability.swift */; settings = {ASSET_TAGS = (); }; };
-		650F7E821BBED0CE00502428 /* HealthCapabilityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65882EC51BAF6052003F74B6 /* HealthCapabilityTests.swift */; settings = {ASSET_TAGS = (); }; };
-		651E394C1BB454310013ADE6 /* ContactsOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 651E394B1BB454310013ADE6 /* ContactsOperation.swift */; settings = {ASSET_TAGS = (); }; };
-		651E394D1BB454310013ADE6 /* ContactsOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 651E394B1BB454310013ADE6 /* ContactsOperation.swift */; settings = {ASSET_TAGS = (); }; };
-		651E394E1BB454310013ADE6 /* ContactsOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 651E394B1BB454310013ADE6 /* ContactsOperation.swift */; settings = {ASSET_TAGS = (); }; };
-		651E394F1BB454310013ADE6 /* ContactsOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 651E394B1BB454310013ADE6 /* ContactsOperation.swift */; settings = {ASSET_TAGS = (); }; };
-		651E39501BB454310013ADE6 /* ContactsOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 651E394B1BB454310013ADE6 /* ContactsOperation.swift */; settings = {ASSET_TAGS = (); }; };
-		651E39531BB454BF0013ADE6 /* ContactsCondition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 651E39521BB454BF0013ADE6 /* ContactsCondition.swift */; settings = {ASSET_TAGS = (); }; };
-		651E39541BB454BF0013ADE6 /* ContactsCondition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 651E39521BB454BF0013ADE6 /* ContactsCondition.swift */; settings = {ASSET_TAGS = (); }; };
-		651E39551BB454BF0013ADE6 /* ContactsCondition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 651E39521BB454BF0013ADE6 /* ContactsCondition.swift */; settings = {ASSET_TAGS = (); }; };
-		651E39561BB454BF0013ADE6 /* ContactsCondition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 651E39521BB454BF0013ADE6 /* ContactsCondition.swift */; settings = {ASSET_TAGS = (); }; };
-		651E39571BB454BF0013ADE6 /* ContactsCondition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 651E39521BB454BF0013ADE6 /* ContactsCondition.swift */; settings = {ASSET_TAGS = (); }; };
-		651E395A1BB45E370013ADE6 /* ContactsOperationsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 651E39591BB45E370013ADE6 /* ContactsOperationsTests.swift */; settings = {ASSET_TAGS = (); }; };
-		651E395B1BB45E370013ADE6 /* ContactsOperationsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 651E39591BB45E370013ADE6 /* ContactsOperationsTests.swift */; settings = {ASSET_TAGS = (); }; };
-		651E395C1BB45E370013ADE6 /* ContactsOperationsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 651E39591BB45E370013ADE6 /* ContactsOperationsTests.swift */; settings = {ASSET_TAGS = (); }; };
-		651E39731BB48C790013ADE6 /* AddressBook.swift in Sources */ = {isa = PBXBuildFile; fileRef = 651E39701BB48C790013ADE6 /* AddressBook.swift */; settings = {ASSET_TAGS = (); }; };
-		651E39741BB48C790013ADE6 /* AddressBookConditions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 651E39711BB48C790013ADE6 /* AddressBookConditions.swift */; settings = {ASSET_TAGS = (); }; };
-		651E39751BB48C790013ADE6 /* AddressBookOperations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 651E39721BB48C790013ADE6 /* AddressBookOperations.swift */; settings = {ASSET_TAGS = (); }; };
-		651E39771BB48C8F0013ADE6 /* AddressBookUIOperations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 651E39761BB48C8F0013ADE6 /* AddressBookUIOperations.swift */; settings = {ASSET_TAGS = (); }; };
-		651E39781BB48CDB0013ADE6 /* AddressBook.swift in Sources */ = {isa = PBXBuildFile; fileRef = 651E39701BB48C790013ADE6 /* AddressBook.swift */; settings = {ASSET_TAGS = (); }; };
-		651E39791BB48CDB0013ADE6 /* AddressBookConditions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 651E39711BB48C790013ADE6 /* AddressBookConditions.swift */; settings = {ASSET_TAGS = (); }; };
-		651E397A1BB48CDB0013ADE6 /* AddressBookOperations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 651E39721BB48C790013ADE6 /* AddressBookOperations.swift */; settings = {ASSET_TAGS = (); }; };
-		651E397E1BB48D970013ADE6 /* ContactsUIOperations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 651E397D1BB48D970013ADE6 /* ContactsUIOperations.swift */; settings = {ASSET_TAGS = (); }; };
-		651EF4891BBD9F8800BA962D /* Capability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 651EF4881BBD9F8800BA962D /* Capability.swift */; settings = {ASSET_TAGS = (); }; };
-		651EF48A1BBD9F8800BA962D /* Capability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 651EF4881BBD9F8800BA962D /* Capability.swift */; settings = {ASSET_TAGS = (); }; };
-		651EF48B1BBD9F8800BA962D /* Capability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 651EF4881BBD9F8800BA962D /* Capability.swift */; settings = {ASSET_TAGS = (); }; };
-		651EF48C1BBD9F8800BA962D /* Capability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 651EF4881BBD9F8800BA962D /* Capability.swift */; settings = {ASSET_TAGS = (); }; };
-		651EF48D1BBD9F8800BA962D /* Capability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 651EF4881BBD9F8800BA962D /* Capability.swift */; settings = {ASSET_TAGS = (); }; };
-		651EF4901BBDCB4900BA962D /* LocationCapabilityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 651EF48E1BBDCB4900BA962D /* LocationCapabilityTests.swift */; settings = {ASSET_TAGS = (); }; };
-		6523DA191BBDD21F003A3374 /* LocationCapability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6523DA181BBDD21F003A3374 /* LocationCapability.swift */; settings = {ASSET_TAGS = (); }; };
-		6523DA1A1BBDDE6E003A3374 /* LocationOperations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65EEC2181BAF4F230020A9BD /* LocationOperations.swift */; settings = {ASSET_TAGS = (); }; };
-		6523DA201BBDEA57003A3374 /* CalendarCapability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6523DA1F1BBDEA57003A3374 /* CalendarCapability.swift */; settings = {ASSET_TAGS = (); }; };
-		6523DA211BBDEA57003A3374 /* CalendarCapability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6523DA1F1BBDEA57003A3374 /* CalendarCapability.swift */; settings = {ASSET_TAGS = (); }; };
-		6523DA221BBDEA57003A3374 /* CalendarCapability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6523DA1F1BBDEA57003A3374 /* CalendarCapability.swift */; settings = {ASSET_TAGS = (); }; };
-		6523DA231BBDEA57003A3374 /* CalendarCapability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6523DA1F1BBDEA57003A3374 /* CalendarCapability.swift */; settings = {ASSET_TAGS = (); }; };
-		652814DE1BBF3C2D0015719E /* CloudCapability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65BF92341BBF17F10073AC6C /* CloudCapability.swift */; settings = {ASSET_TAGS = (); }; };
-		652814DF1BBF3C2F0015719E /* CloudCapability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65BF92341BBF17F10073AC6C /* CloudCapability.swift */; settings = {ASSET_TAGS = (); }; };
-		652814E01BBF3C300015719E /* CloudCapability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65BF92341BBF17F10073AC6C /* CloudCapability.swift */; settings = {ASSET_TAGS = (); }; };
-		652814E11BBF3C5B0015719E /* CloudCapability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65BF92341BBF17F10073AC6C /* CloudCapability.swift */; settings = {ASSET_TAGS = (); }; };
+		650F7E7D1BBEA4DD00502428 /* LocationOperationsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65882EC71BAF6052003F74B6 /* LocationOperationsTests.swift */; };
+		650F7E7E1BBEB30F00502428 /* CalendarCapabilityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65882EC31BAF6052003F74B6 /* CalendarCapabilityTests.swift */; };
+		650F7E801BBEC43F00502428 /* HealthCapability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 650F7E7F1BBEC43F00502428 /* HealthCapability.swift */; };
+		650F7E811BBEC43F00502428 /* HealthCapability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 650F7E7F1BBEC43F00502428 /* HealthCapability.swift */; };
+		650F7E821BBED0CE00502428 /* HealthCapabilityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65882EC51BAF6052003F74B6 /* HealthCapabilityTests.swift */; };
+		651E394C1BB454310013ADE6 /* ContactsOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 651E394B1BB454310013ADE6 /* ContactsOperation.swift */; };
+		651E394D1BB454310013ADE6 /* ContactsOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 651E394B1BB454310013ADE6 /* ContactsOperation.swift */; };
+		651E394E1BB454310013ADE6 /* ContactsOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 651E394B1BB454310013ADE6 /* ContactsOperation.swift */; };
+		651E39531BB454BF0013ADE6 /* ContactsCondition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 651E39521BB454BF0013ADE6 /* ContactsCondition.swift */; };
+		651E39541BB454BF0013ADE6 /* ContactsCondition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 651E39521BB454BF0013ADE6 /* ContactsCondition.swift */; };
+		651E39551BB454BF0013ADE6 /* ContactsCondition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 651E39521BB454BF0013ADE6 /* ContactsCondition.swift */; };
+		651E395A1BB45E370013ADE6 /* ContactsOperationsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 651E39591BB45E370013ADE6 /* ContactsOperationsTests.swift */; };
+		651E395B1BB45E370013ADE6 /* ContactsOperationsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 651E39591BB45E370013ADE6 /* ContactsOperationsTests.swift */; };
+		651E395C1BB45E370013ADE6 /* ContactsOperationsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 651E39591BB45E370013ADE6 /* ContactsOperationsTests.swift */; };
+		651E39731BB48C790013ADE6 /* AddressBook.swift in Sources */ = {isa = PBXBuildFile; fileRef = 651E39701BB48C790013ADE6 /* AddressBook.swift */; };
+		651E39741BB48C790013ADE6 /* AddressBookConditions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 651E39711BB48C790013ADE6 /* AddressBookConditions.swift */; };
+		651E39751BB48C790013ADE6 /* AddressBookOperations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 651E39721BB48C790013ADE6 /* AddressBookOperations.swift */; };
+		651E39771BB48C8F0013ADE6 /* AddressBookUIOperations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 651E39761BB48C8F0013ADE6 /* AddressBookUIOperations.swift */; };
+		651E39781BB48CDB0013ADE6 /* AddressBook.swift in Sources */ = {isa = PBXBuildFile; fileRef = 651E39701BB48C790013ADE6 /* AddressBook.swift */; };
+		651E39791BB48CDB0013ADE6 /* AddressBookConditions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 651E39711BB48C790013ADE6 /* AddressBookConditions.swift */; };
+		651E397A1BB48CDB0013ADE6 /* AddressBookOperations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 651E39721BB48C790013ADE6 /* AddressBookOperations.swift */; };
+		651E397E1BB48D970013ADE6 /* ContactsUIOperations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 651E397D1BB48D970013ADE6 /* ContactsUIOperations.swift */; };
+		651EF4891BBD9F8800BA962D /* Capability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 651EF4881BBD9F8800BA962D /* Capability.swift */; };
+		651EF48A1BBD9F8800BA962D /* Capability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 651EF4881BBD9F8800BA962D /* Capability.swift */; };
+		651EF48B1BBD9F8800BA962D /* Capability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 651EF4881BBD9F8800BA962D /* Capability.swift */; };
+		651EF48C1BBD9F8800BA962D /* Capability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 651EF4881BBD9F8800BA962D /* Capability.swift */; };
+		651EF48D1BBD9F8800BA962D /* Capability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 651EF4881BBD9F8800BA962D /* Capability.swift */; };
+		651EF4901BBDCB4900BA962D /* LocationCapabilityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 651EF48E1BBDCB4900BA962D /* LocationCapabilityTests.swift */; };
+		6523DA191BBDD21F003A3374 /* LocationCapability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6523DA181BBDD21F003A3374 /* LocationCapability.swift */; };
+		6523DA1A1BBDDE6E003A3374 /* LocationOperations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65EEC2181BAF4F230020A9BD /* LocationOperations.swift */; };
+		6523DA201BBDEA57003A3374 /* CalendarCapability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6523DA1F1BBDEA57003A3374 /* CalendarCapability.swift */; };
+		6523DA211BBDEA57003A3374 /* CalendarCapability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6523DA1F1BBDEA57003A3374 /* CalendarCapability.swift */; };
+		6523DA221BBDEA57003A3374 /* CalendarCapability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6523DA1F1BBDEA57003A3374 /* CalendarCapability.swift */; };
+		652814DE1BBF3C2D0015719E /* CloudCapability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65BF92341BBF17F10073AC6C /* CloudCapability.swift */; };
+		652814DF1BBF3C2F0015719E /* CloudCapability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65BF92341BBF17F10073AC6C /* CloudCapability.swift */; };
+		652814E01BBF3C300015719E /* CloudCapability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65BF92341BBF17F10073AC6C /* CloudCapability.swift */; };
+		652814E11BBF3C5B0015719E /* CloudCapability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65BF92341BBF17F10073AC6C /* CloudCapability.swift */; };
 		652F5A601BAF7A2800BB5F71 /* ExclusivityManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65EEC1731BAF44E80020A9BD /* ExclusivityManager.swift */; };
 		652F5A611BAF7A2800BB5F71 /* Operation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65EEC17A1BAF44E80020A9BD /* Operation.swift */; };
 		652F5A621BAF7A2800BB5F71 /* OperationCondition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65EEC17B1BAF44E80020A9BD /* OperationCondition.swift */; };
@@ -80,20 +75,20 @@
 		652F5AA01BAF7BB700BB5F71 /* Operations.h in Headers */ = {isa = PBXBuildFile; fileRef = 65EEC1641BAF422C0020A9BD /* Operations.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		652F5AA11BAF7BB800BB5F71 /* Operations.h in Headers */ = {isa = PBXBuildFile; fileRef = 65EEC1641BAF422C0020A9BD /* Operations.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		652F5AA21BAF7BBD00BB5F71 /* Operations.h in Headers */ = {isa = PBXBuildFile; fileRef = 65EEC1641BAF422C0020A9BD /* Operations.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		65612FE11BC1C3B5007A2316 /* CloudCapabilityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65612FE01BC1C3B5007A2316 /* CloudCapabilityTests.swift */; settings = {ASSET_TAGS = (); }; };
-		65612FE21BC1C3B5007A2316 /* CloudCapabilityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65612FE01BC1C3B5007A2316 /* CloudCapabilityTests.swift */; settings = {ASSET_TAGS = (); }; };
-		65612FE31BC1C3B5007A2316 /* CloudCapabilityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65612FE01BC1C3B5007A2316 /* CloudCapabilityTests.swift */; settings = {ASSET_TAGS = (); }; };
-		657B3E871BBEF779003AC518 /* PhotosCapability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 657B3E861BBEF779003AC518 /* PhotosCapability.swift */; settings = {ASSET_TAGS = (); }; };
-		657B3E881BBEF779003AC518 /* PhotosCapability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 657B3E861BBEF779003AC518 /* PhotosCapability.swift */; settings = {ASSET_TAGS = (); }; };
-		657B3E8D1BBF06DC003AC518 /* PassbookCapability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 657B3E8C1BBF06DC003AC518 /* PassbookCapability.swift */; settings = {ASSET_TAGS = (); }; };
-		657B3E8E1BBF06DC003AC518 /* PassbookCapability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 657B3E8C1BBF06DC003AC518 /* PassbookCapability.swift */; settings = {ASSET_TAGS = (); }; };
-		657B3E8F1BBF06DC003AC518 /* PassbookCapability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 657B3E8C1BBF06DC003AC518 /* PassbookCapability.swift */; settings = {ASSET_TAGS = (); }; };
-		65827A2E1BC28F7D00CAEAED /* CapabilityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65827A2D1BC28F7D00CAEAED /* CapabilityTests.swift */; settings = {ASSET_TAGS = (); }; };
-		65827A2F1BC28F7D00CAEAED /* CapabilityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65827A2D1BC28F7D00CAEAED /* CapabilityTests.swift */; settings = {ASSET_TAGS = (); }; };
-		65827A301BC28F7D00CAEAED /* CapabilityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65827A2D1BC28F7D00CAEAED /* CapabilityTests.swift */; settings = {ASSET_TAGS = (); }; };
-		6585DACB1BBE805600CE46BE /* AuthorizationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6585DAC91BBE804E00CE46BE /* AuthorizationTests.swift */; settings = {ASSET_TAGS = (); }; };
-		6585DACC1BBE805700CE46BE /* AuthorizationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6585DAC91BBE804E00CE46BE /* AuthorizationTests.swift */; settings = {ASSET_TAGS = (); }; };
-		6585DACD1BBE805800CE46BE /* AuthorizationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6585DAC91BBE804E00CE46BE /* AuthorizationTests.swift */; settings = {ASSET_TAGS = (); }; };
+		65612FE11BC1C3B5007A2316 /* CloudCapabilityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65612FE01BC1C3B5007A2316 /* CloudCapabilityTests.swift */; };
+		65612FE21BC1C3B5007A2316 /* CloudCapabilityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65612FE01BC1C3B5007A2316 /* CloudCapabilityTests.swift */; };
+		65612FE31BC1C3B5007A2316 /* CloudCapabilityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65612FE01BC1C3B5007A2316 /* CloudCapabilityTests.swift */; };
+		657B3E871BBEF779003AC518 /* PhotosCapability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 657B3E861BBEF779003AC518 /* PhotosCapability.swift */; };
+		657B3E881BBEF779003AC518 /* PhotosCapability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 657B3E861BBEF779003AC518 /* PhotosCapability.swift */; };
+		657B3E8D1BBF06DC003AC518 /* PassbookCapability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 657B3E8C1BBF06DC003AC518 /* PassbookCapability.swift */; };
+		657B3E8E1BBF06DC003AC518 /* PassbookCapability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 657B3E8C1BBF06DC003AC518 /* PassbookCapability.swift */; };
+		657B3E8F1BBF06DC003AC518 /* PassbookCapability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 657B3E8C1BBF06DC003AC518 /* PassbookCapability.swift */; };
+		65827A2E1BC28F7D00CAEAED /* CapabilityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65827A2D1BC28F7D00CAEAED /* CapabilityTests.swift */; };
+		65827A2F1BC28F7D00CAEAED /* CapabilityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65827A2D1BC28F7D00CAEAED /* CapabilityTests.swift */; };
+		65827A301BC28F7D00CAEAED /* CapabilityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65827A2D1BC28F7D00CAEAED /* CapabilityTests.swift */; };
+		6585DACB1BBE805600CE46BE /* AuthorizationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6585DAC91BBE804E00CE46BE /* AuthorizationTests.swift */; };
+		6585DACC1BBE805700CE46BE /* AuthorizationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6585DAC91BBE804E00CE46BE /* AuthorizationTests.swift */; };
+		6585DACD1BBE805800CE46BE /* AuthorizationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6585DAC91BBE804E00CE46BE /* AuthorizationTests.swift */; };
 		65882E881BAF5BEB003F74B6 /* ExclusivityManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65EEC1731BAF44E80020A9BD /* ExclusivityManager.swift */; };
 		65882E891BAF5BEB003F74B6 /* Operation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65EEC17A1BAF44E80020A9BD /* Operation.swift */; };
 		65882E8A1BAF5BEB003F74B6 /* OperationCondition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65EEC17B1BAF44E80020A9BD /* OperationCondition.swift */; };
@@ -164,16 +159,14 @@
 		65882F371BAF6084003F74B6 /* ReachableOperationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65882ECB1BAF6052003F74B6 /* ReachableOperationTests.swift */; };
 		65882F3B1BAF608A003F74B6 /* AddressBookConditionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65882EC01BAF6052003F74B6 /* AddressBookConditionTests.swift */; };
 		65882F3C1BAF608A003F74B6 /* AddressBookTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65882EC11BAF6052003F74B6 /* AddressBookTests.swift */; };
-		659C442D1BBD455D0076D529 /* NetworkOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 659C442C1BBD455D0076D529 /* NetworkOperation.swift */; settings = {ASSET_TAGS = (); }; };
-		659C442E1BBD455D0076D529 /* NetworkOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 659C442C1BBD455D0076D529 /* NetworkOperation.swift */; settings = {ASSET_TAGS = (); }; };
-		659C442F1BBD455D0076D529 /* NetworkOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 659C442C1BBD455D0076D529 /* NetworkOperation.swift */; settings = {ASSET_TAGS = (); }; };
-		659C44301BBD455D0076D529 /* NetworkOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 659C442C1BBD455D0076D529 /* NetworkOperation.swift */; settings = {ASSET_TAGS = (); }; };
-		659C44311BBD455D0076D529 /* NetworkOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 659C442C1BBD455D0076D529 /* NetworkOperation.swift */; settings = {ASSET_TAGS = (); }; };
-		65B505951BB99BBA004C89C2 /* Contacts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65B505941BB99BBA004C89C2 /* Contacts.swift */; settings = {ASSET_TAGS = (); }; };
-		65B505961BB99BBA004C89C2 /* Contacts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65B505941BB99BBA004C89C2 /* Contacts.swift */; settings = {ASSET_TAGS = (); }; };
-		65B505971BB99BBA004C89C2 /* Contacts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65B505941BB99BBA004C89C2 /* Contacts.swift */; settings = {ASSET_TAGS = (); }; };
-		65B505981BB99BBA004C89C2 /* Contacts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65B505941BB99BBA004C89C2 /* Contacts.swift */; settings = {ASSET_TAGS = (); }; };
-		65B505991BB99BBA004C89C2 /* Contacts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65B505941BB99BBA004C89C2 /* Contacts.swift */; settings = {ASSET_TAGS = (); }; };
+		659C442D1BBD455D0076D529 /* NetworkOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 659C442C1BBD455D0076D529 /* NetworkOperation.swift */; };
+		659C442E1BBD455D0076D529 /* NetworkOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 659C442C1BBD455D0076D529 /* NetworkOperation.swift */; };
+		659C442F1BBD455D0076D529 /* NetworkOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 659C442C1BBD455D0076D529 /* NetworkOperation.swift */; };
+		659C44301BBD455D0076D529 /* NetworkOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 659C442C1BBD455D0076D529 /* NetworkOperation.swift */; };
+		659C44311BBD455D0076D529 /* NetworkOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 659C442C1BBD455D0076D529 /* NetworkOperation.swift */; };
+		65B505951BB99BBA004C89C2 /* Contacts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65B505941BB99BBA004C89C2 /* Contacts.swift */; };
+		65B505961BB99BBA004C89C2 /* Contacts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65B505941BB99BBA004C89C2 /* Contacts.swift */; };
+		65B505971BB99BBA004C89C2 /* Contacts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65B505941BB99BBA004C89C2 /* Contacts.swift */; };
 		65EEC1551BAF40CF0020A9BD /* Operations.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65EEC14A1BAF40CE0020A9BD /* Operations.framework */; };
 		65EEC1661BAF422C0020A9BD /* Operations.h in Headers */ = {isa = PBXBuildFile; fileRef = 65EEC1641BAF422C0020A9BD /* Operations.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		65EEC1811BAF44E80020A9BD /* AlertOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65EEC1691BAF44E80020A9BD /* AlertOperation.swift */; };
@@ -934,7 +927,7 @@
 			isa = PBXProject;
 			attributes = {
 				CLASSPREFIX = OPR;
-				LastUpgradeCheck = 0700;
+				LastUpgradeCheck = 0710;
 				ORGANIZATIONNAME = "Dan Thorpe";
 				TargetAttributes = {
 					652F5A481BAF79BA00BB5F71 = {
@@ -1060,7 +1053,6 @@
 				652F5A701BAF7A2800BB5F71 /* BlockOperation.swift in Sources */,
 				652F5A741BAF7A2800BB5F71 /* GroupOperation.swift in Sources */,
 				652F5A661BAF7A2800BB5F71 /* BlockCondition.swift in Sources */,
-				65B505991BB99BBA004C89C2 /* Contacts.swift in Sources */,
 				652F5A6E1BAF7A2800BB5F71 /* TimeoutObserver.swift in Sources */,
 				659C44311BBD455D0076D529 /* NetworkOperation.swift in Sources */,
 				652F5A6A1BAF7A2800BB5F71 /* SlientCondition.swift in Sources */,
@@ -1079,13 +1071,10 @@
 				652F5A761BAF7A2800BB5F71 /* UIOperation.swift in Sources */,
 				651EF48D1BBD9F8800BA962D /* Capability.swift in Sources */,
 				652F5A681BAF7A2800BB5F71 /* NegatedCondition.swift in Sources */,
-				6523DA231BBDEA57003A3374 /* CalendarCapability.swift in Sources */,
 				652F5A651BAF7A2800BB5F71 /* Support.swift in Sources */,
-				651E39571BB454BF0013ADE6 /* ContactsCondition.swift in Sources */,
 				652F5A7C1BAF7A2800BB5F71 /* UserConfirmationCondition.swift in Sources */,
 				652F5A751BAF7A2800BB5F71 /* LoggingObserver.swift in Sources */,
 				652F5A671BAF7A2800BB5F71 /* MutuallyExclusive.swift in Sources */,
-				651E39501BB454310013ADE6 /* ContactsOperation.swift in Sources */,
 				652F5A711BAF7A2800BB5F71 /* ComposedOperation.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1102,9 +1091,7 @@
 				659C44301BBD455D0076D529 /* NetworkOperation.swift in Sources */,
 				65882E951BAF5BEB003F74B6 /* BlockObserver.swift in Sources */,
 				65882E961BAF5BEB003F74B6 /* TimeoutObserver.swift in Sources */,
-				651E39561BB454BF0013ADE6 /* ContactsCondition.swift in Sources */,
 				65882E8E1BAF5BEB003F74B6 /* BlockCondition.swift in Sources */,
-				651E394F1BB454310013ADE6 /* ContactsOperation.swift in Sources */,
 				65882E921BAF5BEB003F74B6 /* SlientCondition.swift in Sources */,
 				6523DA221BBDEA57003A3374 /* CalendarCapability.swift in Sources */,
 				65882E911BAF5BEB003F74B6 /* NoFailedDependenciesCondition.swift in Sources */,
@@ -1120,7 +1107,6 @@
 				65882E8F1BAF5BEB003F74B6 /* MutuallyExclusive.swift in Sources */,
 				651EF48C1BBD9F8800BA962D /* Capability.swift in Sources */,
 				65882E991BAF5BEB003F74B6 /* ComposedOperation.swift in Sources */,
-				65B505981BB99BBA004C89C2 /* Contacts.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1585,6 +1571,8 @@
 		65EEC1431BAF40610020A9BD /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ENABLE_TESTABILITY = YES;
+				ONLY_ACTIVE_ARCH = YES;
 				PROJECT_VERSION = 2.0.2;
 			};
 			name = Debug;

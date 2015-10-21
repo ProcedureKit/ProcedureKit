@@ -1090,12 +1090,6 @@ public class AddressBookSource: AddressBookRecord, AddressBookSourceType {
 
 // MARK: - Equatable
 
-extension ABPersonImageFormat: Equatable {}
-
-public func ==(a: ABPersonImageFormat, b: ABPersonImageFormat) -> Bool {
-    return a.rawValue == b.rawValue
-}
-
 extension CFNumberRef: Equatable {}
 
 public func ==(a: CFNumberRef, b: CFNumberRef) -> Bool {
