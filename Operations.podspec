@@ -73,63 +73,58 @@ session Advanced NSOperations: https://developer.apple.com/videos/wwdc/2015/?id=
   end
 
   # Creates a framework suitable for an iOS watchOS 2 app
-  #
-  # Note that this currently does not work in Cocoapods stable
-  # 0.38.2 because Cocoapods recognizes the Xcode target as a 
-  # iOS platform instead of watchOS. It produces error:
-  # 
-  # [!] The platform of the target `My Watch App` (iOS 9.0) is not compatible with `Operations/watchOS (2.0.2)`, which does not support `ios`.
-  #
-  # s.subspec 'watchOS' do |ss|
-  #   ss.platform = :watchos
-  #   ss.source_files = [
-  #     'Operations/Core/Shared',
-  #     'Operations/Core/iOS',
-  #     'Operations/Features/Shared',
-  #     'Operations/Features/iOS'
-  #   ]
-  #   ss.exclude_files = [
-  #     'Operations/Core/iOS/BackgroundObserver.swift',
-  #     'Operations/Core/iOS/NetworkObserver.swift',
-  #     'Operations/Core/iOS/AlertOperation.swift',
-  #     'Operations/Core/iOS/UIOperation.swift',
-  #     'Operations/Features/Shared/CloudCondition.swift',
-  #     'Operations/Features/iOS/PhotosCondition.swift',
-  #     'Operations/Features/iOS/RemoteNotificationCondition.swift',
-  #     'Operations/Features/iOS/UserConfirmationCondition.swift',
-  #     'Operations/Features/iOS/UserNotificationCondition.swift',
-  #     'Operations/Features/iOS/LocationCondition.swift',
-  #     'Operations/Features/Shared/ReachabilityCondition.swift',
-  #     'Operations/Features/Shared/CloudKitOperation.swift',
-  #     'Operations/Features/iOS/LocationOperations.swift',
-  #     'Operations/Features/Shared/ReachableOperation.swift',
-  #     'Operations/Features/iOS/WebpageOperation.swift',
-  #     'Operations/Features/Shared/Reachability.swift',
-  #   ]
-  # end
+
+  s.subspec 'watchOS' do |ss|
+    ss.platform = :watchos
+    ss.source_files = [
+      'Operations/Core/Shared',
+      'Operations/Core/iOS',
+      'Operations/Features/Shared',
+      'Operations/Features/iOS'
+    ]
+    ss.exclude_files = [
+      'Operations/Core/iOS/BackgroundObserver.swift',
+      'Operations/Core/iOS/NetworkObserver.swift',
+      'Operations/Core/iOS/AlertOperation.swift',
+      'Operations/Core/iOS/UIOperation.swift',
+      'Operations/Features/Shared/CloudCapability.swift',
+      'Operations/Features/iOS/PhotosCapability.swift',
+      'Operations/Features/iOS/RemoteNotificationCondition.swift',
+      'Operations/Features/iOS/UserConfirmationCondition.swift',
+      'Operations/Features/iOS/UserNotificationCondition.swift',
+      'Operations/Features/iOS/LocationCapability.swift',
+      'Operations/Features/Shared/ReachabilityCondition.swift',
+      'Operations/Features/Shared/CloudKitOperation.swift',
+      'Operations/Features/iOS/LocationOperations.swift',
+      'Operations/Features/Shared/ReachableOperation.swift',
+      'Operations/Features/iOS/WebpageOperation.swift',
+      'Operations/Features/Shared/Reachability.swift',
+    ]
+  end
   
-  # Creates a framework suitable for an iOS tvOS app
-  #
-  # s.subspec 'tvOS' do |ss|
-  #   ss.platform = :tvos
-  #   ss.source_files = [
-  #     'Operations/Core/Shared',
-  #     'Operations/Core/iOS',
-  #     'Operations/Features/Shared',
-  #     'Operations/Features/iOS'
-  #   ]
-  #   ss.ios.exclude_files = [
-  #     'Operations/Features/Shared/CalendarCondition.swift',
-  #     'Operations/Features/iOS/PassbookCondition.swift',
-  #     'Operations/Features/iOS/PhotosCondition.swift',
-  #     'Operations/Features/iOS/RemoteNotificationCondition.swift',
-  #     'Operations/Features/iOS/UserNotificationCondition.swift',
-  #     'Operations/Features/iOS/HealthCondition.swift',
-  #     'Operations/Features/iOS/LocationCondition.swift',
-  #     'Operations/Features/iOS/LocationOperations.swift',
-  #     'Operations/Features/iOS/WebpageOperation.swift',
-  #   ]
-  # end
+#  Creates a framework suitable for a tvOS app
+
+  s.subspec 'tvOS' do |ss|
+    ss.platform = :tvos
+    ss.source_files = [
+      'Operations/Core/Shared',
+      'Operations/Core/iOS',
+      'Operations/Features/Shared',
+      'Operations/Features/iOS'
+    ]
+    ss.exclude_files = [
+      'Operations/Features/Shared/CalendarCapability.swift',
+      'Operations/Features/Shared/CloudCapability.swift',      
+      'Operations/Features/iOS/PassbookCapability.swift',
+      'Operations/Features/iOS/PhotosCapability.swift',
+      'Operations/Features/iOS/RemoteNotificationCondition.swift',
+      'Operations/Features/iOS/UserNotificationCondition.swift',
+      'Operations/Features/iOS/HealthCapability.swift',
+      'Operations/Features/iOS/LocationCapability.swift',
+      'Operations/Features/iOS/LocationOperations.swift',
+      'Operations/Features/iOS/WebpageOperation.swift',
+    ]
+  end
 
 end
 
