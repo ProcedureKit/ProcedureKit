@@ -15,11 +15,9 @@
 		651E394C1BB454310013ADE6 /* ContactsOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 651E394B1BB454310013ADE6 /* ContactsOperation.swift */; };
 		651E394D1BB454310013ADE6 /* ContactsOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 651E394B1BB454310013ADE6 /* ContactsOperation.swift */; };
 		651E394E1BB454310013ADE6 /* ContactsOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 651E394B1BB454310013ADE6 /* ContactsOperation.swift */; };
-		651E394F1BB454310013ADE6 /* ContactsOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 651E394B1BB454310013ADE6 /* ContactsOperation.swift */; };
 		651E39531BB454BF0013ADE6 /* ContactsCondition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 651E39521BB454BF0013ADE6 /* ContactsCondition.swift */; };
 		651E39541BB454BF0013ADE6 /* ContactsCondition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 651E39521BB454BF0013ADE6 /* ContactsCondition.swift */; };
 		651E39551BB454BF0013ADE6 /* ContactsCondition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 651E39521BB454BF0013ADE6 /* ContactsCondition.swift */; };
-		651E39561BB454BF0013ADE6 /* ContactsCondition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 651E39521BB454BF0013ADE6 /* ContactsCondition.swift */; };
 		651E395A1BB45E370013ADE6 /* ContactsOperationsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 651E39591BB45E370013ADE6 /* ContactsOperationsTests.swift */; };
 		651E395B1BB45E370013ADE6 /* ContactsOperationsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 651E39591BB45E370013ADE6 /* ContactsOperationsTests.swift */; };
 		651E395C1BB45E370013ADE6 /* ContactsOperationsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 651E39591BB45E370013ADE6 /* ContactsOperationsTests.swift */; };
@@ -169,7 +167,6 @@
 		65B505951BB99BBA004C89C2 /* Contacts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65B505941BB99BBA004C89C2 /* Contacts.swift */; };
 		65B505961BB99BBA004C89C2 /* Contacts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65B505941BB99BBA004C89C2 /* Contacts.swift */; };
 		65B505971BB99BBA004C89C2 /* Contacts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65B505941BB99BBA004C89C2 /* Contacts.swift */; };
-		65B505981BB99BBA004C89C2 /* Contacts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65B505941BB99BBA004C89C2 /* Contacts.swift */; };
 		65EEC1551BAF40CF0020A9BD /* Operations.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65EEC14A1BAF40CE0020A9BD /* Operations.framework */; };
 		65EEC1661BAF422C0020A9BD /* Operations.h in Headers */ = {isa = PBXBuildFile; fileRef = 65EEC1641BAF422C0020A9BD /* Operations.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		65EEC1811BAF44E80020A9BD /* AlertOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65EEC1691BAF44E80020A9BD /* AlertOperation.swift */; };
@@ -1094,9 +1091,7 @@
 				659C44301BBD455D0076D529 /* NetworkOperation.swift in Sources */,
 				65882E951BAF5BEB003F74B6 /* BlockObserver.swift in Sources */,
 				65882E961BAF5BEB003F74B6 /* TimeoutObserver.swift in Sources */,
-				651E39561BB454BF0013ADE6 /* ContactsCondition.swift in Sources */,
 				65882E8E1BAF5BEB003F74B6 /* BlockCondition.swift in Sources */,
-				651E394F1BB454310013ADE6 /* ContactsOperation.swift in Sources */,
 				65882E921BAF5BEB003F74B6 /* SlientCondition.swift in Sources */,
 				6523DA221BBDEA57003A3374 /* CalendarCapability.swift in Sources */,
 				65882E911BAF5BEB003F74B6 /* NoFailedDependenciesCondition.swift in Sources */,
@@ -1112,7 +1107,6 @@
 				65882E8F1BAF5BEB003F74B6 /* MutuallyExclusive.swift in Sources */,
 				651EF48C1BBD9F8800BA962D /* Capability.swift in Sources */,
 				65882E991BAF5BEB003F74B6 /* ComposedOperation.swift in Sources */,
-				65B505981BB99BBA004C89C2 /* Contacts.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
