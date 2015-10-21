@@ -37,6 +37,6 @@ end
 
 after_all do |lane|
   if lane == :test_ios
-    sh "send-coverage.sh"
+    sh "./send-coverage.sh"
   end
 end
