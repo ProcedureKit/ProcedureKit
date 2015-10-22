@@ -76,10 +76,6 @@ public class Operation: NSOperation {
         return ["state"]
     }
 
-    class func keyPathsForValuesAffectingIsCancelled() -> Set<NSObject> {
-        return ["state"]
-    }
-
     private var _state = State.Initialized
     private let stateLock = NSLock()
 
@@ -291,7 +287,7 @@ public class Operation: NSOperation {
 
     /**
     Finish method which must be called eventually after an operation has
-    begun executing.
+    begun executing, unless it is cancelled.
 
     - parameter errors: an array of `ErrorType`, which defaults to empty.
     */
