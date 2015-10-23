@@ -1,9 +1,9 @@
 steps:
   -
-    name: ":fastlane: Verify Xcode"
-    command: .scripts/verify-xcode.sh
+    name: ":bundler: Update Bundler"
+    command: .scripts/update-bundler.sh
     agents:
-      name: "$BUILDKITE_AGENT_META_DATA_NAME"
+      name: "$BUILDKITE_AGENT_META_DATA_NAME"	
   -
     name: ":fastlane: Test iOS Extension Only"
     command: .scripts/test-extension.sh
@@ -22,7 +22,7 @@ steps:
   -
     type: "waiter"
   -
-    name: "Send Coverage"
+    name: ":codecov: Send Coverage"
     command: .scripts/send-coverage.sh
     agents:
       name: "$BUILDKITE_AGENT_META_DATA_NAME"
