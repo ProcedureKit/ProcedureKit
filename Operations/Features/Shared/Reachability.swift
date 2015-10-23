@@ -86,7 +86,7 @@ public final class Reachability {
     }
 
     private var recentNetworkStatus: NetworkStatus? {
-        return previousReachabilityFlags.map { self.networkStatusFromFlags($0) }
+        return previousReachabilityFlags.map { NetworkStatus(flags: $0) }
     }
 
     private let isPhoneDevice: Bool = {
@@ -136,7 +136,7 @@ public final class Reachability {
 
                     var flags: SCNetworkReachabilityFlags = []
                     if SCNetworkReachabilityGetFlags(ref, &flags) {
-                        status = self.networkStatusFromFlags(flags)
+                        status = NetworkStatus(flags: flags)
                     }
                 }
                 completion(status)
@@ -195,85 +195,12 @@ public final class Reachability {
     }
 
     private func reachabilityFlagsDidChange(flags: SCNetworkReachabilityFlags) {
-        let networkStatus = networkStatusFromFlags(flags)
+        let networkStatus = NetworkStatus(flags: flags)
         dispatch_async(Queue.Main.queue) {
             for (_, observer) in self.observers {
                 observer.reachabilityDidChange(networkStatus)
             }
         }
-    }
-
-    private func networkStatusFromFlags(flags: SCNetworkReachabilityFlags) -> NetworkStatus {
-        if isReachableViaWifi(flags) {
-            return .Reachable(.ViaWiFi)
-        }
-        else if isReachableViaWWAN(flags) {
-            return .Reachable(.ViaWWAN)
-        }
-        return .NotReachable
-    }
-
-    private func isReachableViaWifi(flags: SCNetworkReachabilityFlags) -> Bool {
-        if !isReachable(flags) {
-            return false
-        }
-
-        if isConnectionRequiredOrTransient(flags) {
-            return false
-        }
-
-        if isOnWWAN(flags) {
-            return false
-        }
-
-        return true
-    }
-
-    private func isReachableViaWWAN(flags: SCNetworkReachabilityFlags) -> Bool {
-        if !isReachable(flags) {
-            return false
-        }
-
-        return isOnWWAN(flags)
-    }
-
-    private func isOnWWAN(flags: SCNetworkReachabilityFlags) -> Bool {
-        #if os(iOS)
-            return flags.contains(.IsWWAN)
-        #else
-            return false
-        #endif
-    }
-
-    private func isReachable(flags: SCNetworkReachabilityFlags) -> Bool {
-        return flags.contains(.Reachable)
-    }
-    private func isConnectionRequired(flags: SCNetworkReachabilityFlags) -> Bool {
-        return flags.contains(.ConnectionRequired)
-    }
-    private func isInterventionRequired(flags: SCNetworkReachabilityFlags) -> Bool {
-        return flags.contains(.InterventionRequired)
-    }
-    private func isConnectionOnTraffic(flags: SCNetworkReachabilityFlags) -> Bool {
-        return flags.contains(.ConnectionOnTraffic)
-    }
-    private func isConnectionOnDemand(flags: SCNetworkReachabilityFlags) -> Bool {
-        return flags.contains(.ConnectionOnDemand)
-    }
-    func isConnectionOnTrafficOrDemand(flags: SCNetworkReachabilityFlags) -> Bool {
-        return flags.contains(.ConnectionOnTraffic) || flags.contains(.ConnectionOnDemand)
-    }
-    private func isTransientConnection(flags: SCNetworkReachabilityFlags) -> Bool {
-        return flags.contains(.TransientConnection)
-    }
-    private func isLocalAddress(flags: SCNetworkReachabilityFlags) -> Bool {
-        return flags.contains(.IsLocalAddress)
-    }
-    private func isDirect(flags: SCNetworkReachabilityFlags) -> Bool {
-        return flags.contains(.IsDirect)
-    }
-    private func isConnectionRequiredOrTransient(flags: SCNetworkReachabilityFlags) -> Bool {
-        return flags.contains(.ConnectionRequired) || flags.contains(.TransientConnection)
     }
 }
 
@@ -281,20 +208,114 @@ public final class Reachability {
 extension Reachability: SystemReachability {}
 extension Reachability: HostReachability {}
 
-extension Reachability.NetworkStatus: CustomStringConvertible {
+extension Reachability.NetworkStatus: Equatable { }
 
-    public var description: String {
-        switch self {
-        case .NotReachable:
-            return ".NotReachable"
-        case .Reachable(.ViaWiFi):
-            return ".Reachable(.ViaWifi)"
-        case .Reachable(.ViaWWAN):
-            return ".Reachable(.ViaWWAN)"
-        case .Reachable(_):
-            return ".Reachable other"
+public func ==(a: Reachability.NetworkStatus, b: Reachability.NetworkStatus) -> Bool {
+    switch (a, b) {
+    case (.NotReachable, .NotReachable):
+        return true
+    case let (.Reachable(aConnectivity), .Reachable(bConnectivity)):
+        return aConnectivity == bConnectivity
+    default:
+        return false
+    }
+}
+
+extension Reachability.NetworkStatus {
+
+    public init(flags: SCNetworkReachabilityFlags) {
+        if flags.isReachableViaWiFi {
+            self = .Reachable(.ViaWiFi)
+        }
+        else if flags.isReachableViaWWAN {
+            #if os(iOS)
+            self = .Reachable(.ViaWWAN)
+            #else
+            self = .Reachable(.AnyConnectionKind)
+            #endif
+        }
+        else {
+            self = .NotReachable
         }
     }
 }
+
+
+// MARK: - Conformance
+
+extension SCNetworkReachabilityFlags {
+
+    var isReachable: Bool {
+        return contains(.Reachable)
+    }
+
+    var isConnectionRequired: Bool {
+        return contains(.ConnectionRequired)
+    }
+
+    var isInterventionRequired: Bool {
+        return contains(.InterventionRequired)
+    }
+
+    var isConnectionOnTraffic: Bool {
+        return contains(.ConnectionOnTraffic)
+    }
+
+    var isConnectionOnDemand: Bool {
+        return contains(.ConnectionOnDemand)
+    }
+
+    var isConnectionOnTrafficOrDemand: Bool {
+        return isConnectionOnTraffic || isConnectionOnDemand
+    }
+
+    var isTransientConnection: Bool {
+        return contains(.TransientConnection)
+    }
+
+    var isLocalAddress: Bool {
+        return contains(.IsLocalAddress)
+    }
+
+    var isDirect: Bool {
+        return contains(.IsDirect)
+    }
+
+    var isConnectionRequiredOrTransient: Bool {
+        return isConnectionRequired || isTransientConnection
+    }
+
+    var isOnWWAN: Bool {
+        #if os(iOS)
+            return contains(.IsWWAN)
+        #else
+            return false
+        #endif
+    }
+
+    var isReachableViaWWAN: Bool {
+        #if os(iOS)
+            return isReachable && isOnWWAN
+        #else
+            return isReachable
+        #endif
+    }
+
+    var isReachableViaWiFi: Bool {
+        #if os(iOS)
+            return !(!isReachable || isConnectionRequiredOrTransient || isOnWWAN)
+        #else
+            return !(!isReachable || isConnectionRequiredOrTransient)
+        #endif
+    }
+}
+
+
+
+
+
+
+
+
 
 
