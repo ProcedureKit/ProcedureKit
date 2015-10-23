@@ -228,10 +228,11 @@ extension Reachability.NetworkStatus {
             self = .Reachable(.ViaWiFi)
         }
         else if flags.isReachableViaWWAN {
+            #if os(iOS)
             self = .Reachable(.ViaWWAN)
-        }
-        else if flags.isReachable {
+            #else
             self = .Reachable(.AnyConnectionKind)
+            #endif
         }
         else {
             self = .NotReachable
@@ -244,25 +245,68 @@ extension Reachability.NetworkStatus {
 
 extension SCNetworkReachabilityFlags {
 
-    var isReachable: Bool { return contains(.Reachable) }
-    var isConnectionRequired: Bool { return contains(.ConnectionRequired) }
-    var isInterventionRequired: Bool { return contains(.InterventionRequired) }
-    var isConnectionOnTraffic: Bool { return contains(.ConnectionOnTraffic) }
-    var isConnectionOnDemand: Bool { return contains(.ConnectionOnDemand) }
-    var isConnectionOnTrafficOrDemand: Bool { return isConnectionOnTraffic || isConnectionOnDemand }
-    var isTransientConnection: Bool { return contains(.TransientConnection) }
-    var isLocalAddress: Bool { return contains(.IsLocalAddress) }
-    var isDirect: Bool { return contains(.IsDirect) }
-    var isConnectionRequiredOrTransient: Bool { return isConnectionRequired || isTransientConnection }
+    var isReachable: Bool {
+        return contains(.Reachable)
+    }
 
-    var isOnWWAN: Bool { return contains(.IsWWAN) }
+    var isConnectionRequired: Bool {
+        return contains(.ConnectionRequired)
+    }
+
+    var isInterventionRequired: Bool {
+        return contains(.InterventionRequired)
+    }
+
+    var isConnectionOnTraffic: Bool {
+        return contains(.ConnectionOnTraffic)
+    }
+
+    var isConnectionOnDemand: Bool {
+        return contains(.ConnectionOnDemand)
+    }
+
+    var isConnectionOnTrafficOrDemand: Bool {
+        return isConnectionOnTraffic || isConnectionOnDemand
+    }
+
+    var isTransientConnection: Bool {
+        return contains(.TransientConnection)
+    }
+
+    var isLocalAddress: Bool {
+        return contains(.IsLocalAddress)
+    }
+
+    var isDirect: Bool {
+        return contains(.IsDirect)
+    }
+
+    var isConnectionRequiredOrTransient: Bool {
+        return isConnectionRequired || isTransientConnection
+    }
+
+    var isOnWWAN: Bool {
+        #if os(iOS)
+            return contains(.IsWWAN)
+        #else
+            return false
+        #endif
+    }
 
     var isReachableViaWWAN: Bool {
-        return isReachable && isOnWWAN
+        #if os(iOS)
+            return isReachable && isOnWWAN
+        #else
+            return isReachable
+        #endif
     }
 
     var isReachableViaWiFi: Bool {
-        return !(!isReachable || isConnectionRequiredOrTransient || isOnWWAN)
+        #if os(iOS)
+            return !(!isReachable || isConnectionRequiredOrTransient || isOnWWAN)
+        #else
+            return !(!isReachable || isConnectionRequiredOrTransient)
+        #endif
     }
 }
 

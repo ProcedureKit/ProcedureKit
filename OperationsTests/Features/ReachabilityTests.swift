@@ -75,28 +75,34 @@ class SCNetworkReachabilityFlagsTests: XCTestCase {
         XCTAssertTrue(flags.isConnectionRequiredOrTransient)
     }
 
-    @available(iOS 8.0, *)
     func test__flags_isOnWWAN() {
-        flags = .IsWWAN
-        XCTAssertTrue(flags.isOnWWAN)
+        #if os(iOS)
+            flags = .IsWWAN
+            XCTAssertTrue(flags.isOnWWAN)
+        #else
+            flags = .Reachable
+            XCTAssertFalse(flags.isOnWWAN)
+        #endif
     }
 
-    @available(iOS 8.0, *)
     func test__flags_isReachableViaWifi_true_when_Reachable() {
         flags = .Reachable
         XCTAssertTrue(flags.isReachableViaWiFi)
     }
 
-    @available(iOS 8.0, *)
     func test__flags_isReachableViaWiFi_false_when_Reachable_but_ConnectionRequired() {
         flags = [ .Reachable, .ConnectionRequired ]
         XCTAssertFalse(flags.isReachableViaWiFi)
     }
 
-    @available(iOS 8.0, *)
     func test__flags_isReachableViaWWAN() {
-        flags = [ .Reachable, .IsWWAN ]
-        XCTAssertTrue(flags.isReachableViaWWAN)
+        #if os(iOS)
+            flags = [ .Reachable, .IsWWAN ]
+            XCTAssertTrue(flags.isReachableViaWWAN)
+        #else
+            flags = .Reachable
+            XCTAssertTrue(flags.isReachableViaWWAN)
+        #endif
     }
 }
 
@@ -123,13 +129,10 @@ class NetworkStatusTests: XCTestCase {
     }
 
     func test__init_flags__reachable_via_wwan() {
-        flags = [ .Reachable, .IsWWAN ]
-        XCTAssertEqual(Reachability.NetworkStatus(flags: flags), Reachability.NetworkStatus.Reachable(.ViaWWAN))
-    }
-
-    func test__init_flags__reachable() {
-        flags = [ .Reachable, .TransientConnection ]
-        XCTAssertEqual(Reachability.NetworkStatus(flags: flags), Reachability.NetworkStatus.Reachable(.AnyConnectionKind))
+        #if os(iOS)
+            flags = [ .Reachable, .IsWWAN ]
+            XCTAssertEqual(Reachability.NetworkStatus(flags: flags), Reachability.NetworkStatus.Reachable(.ViaWWAN))
+        #endif
     }
 
     func test__init_flags__not_reachable() {
