@@ -78,6 +78,9 @@
 		65612FE11BC1C3B5007A2316 /* CloudCapabilityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65612FE01BC1C3B5007A2316 /* CloudCapabilityTests.swift */; };
 		65612FE21BC1C3B5007A2316 /* CloudCapabilityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65612FE01BC1C3B5007A2316 /* CloudCapabilityTests.swift */; };
 		65612FE31BC1C3B5007A2316 /* CloudCapabilityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65612FE01BC1C3B5007A2316 /* CloudCapabilityTests.swift */; };
+		656E84281BDA934200D10989 /* ReachabilityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 656E84271BDA934200D10989 /* ReachabilityTests.swift */; };
+		656E84291BDA934200D10989 /* ReachabilityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 656E84271BDA934200D10989 /* ReachabilityTests.swift */; };
+		656E842A1BDA934200D10989 /* ReachabilityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 656E84271BDA934200D10989 /* ReachabilityTests.swift */; };
 		657B3E871BBEF779003AC518 /* PhotosCapability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 657B3E861BBEF779003AC518 /* PhotosCapability.swift */; };
 		657B3E881BBEF779003AC518 /* PhotosCapability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 657B3E861BBEF779003AC518 /* PhotosCapability.swift */; };
 		657B3E8D1BBF06DC003AC518 /* PassbookCapability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 657B3E8C1BBF06DC003AC518 /* PassbookCapability.swift */; };
@@ -294,6 +297,7 @@
 		6523DA1F1BBDEA57003A3374 /* CalendarCapability.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CalendarCapability.swift; path = Operations/Features/Shared/CalendarCapability.swift; sourceTree = SOURCE_ROOT; };
 		652F5A491BAF79BA00BB5F71 /* Operations.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Operations.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		65612FE01BC1C3B5007A2316 /* CloudCapabilityTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CloudCapabilityTests.swift; sourceTree = "<group>"; };
+		656E84271BDA934200D10989 /* ReachabilityTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReachabilityTests.swift; sourceTree = "<group>"; };
 		657B3E861BBEF779003AC518 /* PhotosCapability.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PhotosCapability.swift; sourceTree = "<group>"; };
 		657B3E8C1BBF06DC003AC518 /* PassbookCapability.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PassbookCapability.swift; sourceTree = "<group>"; };
 		65827A2D1BC28F7D00CAEAED /* CapabilityTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CapabilityTests.swift; sourceTree = "<group>"; };
@@ -575,6 +579,7 @@
 			children = (
 				6585DAC91BBE804E00CE46BE /* AuthorizationTests.swift */,
 				65882EC31BAF6052003F74B6 /* CalendarCapabilityTests.swift */,
+				65827A2D1BC28F7D00CAEAED /* CapabilityTests.swift */,
 				65612FE01BC1C3B5007A2316 /* CloudCapabilityTests.swift */,
 				65882EC51BAF6052003F74B6 /* HealthCapabilityTests.swift */,
 				651EF48E1BBDCB4900BA962D /* LocationCapabilityTests.swift */,
@@ -582,11 +587,11 @@
 				65882EC81BAF6052003F74B6 /* PassbookCapabilityTests.swift */,
 				65882EC91BAF6052003F74B6 /* PhotosCapabilityTests.swift */,
 				65882ECA1BAF6052003F74B6 /* ReachabilityConditionTests.swift */,
+				656E84271BDA934200D10989 /* ReachabilityTests.swift */,
 				65882ECB1BAF6052003F74B6 /* ReachableOperationTests.swift */,
 				65882ECC1BAF6052003F74B6 /* RemoteNotificationConditionTests.swift */,
 				65882ECD1BAF6052003F74B6 /* UserNotificationConditionTests.swift */,
 				65882ECE1BAF6052003F74B6 /* WebpageOperationTests.swift */,
-				65827A2D1BC28F7D00CAEAED /* CapabilityTests.swift */,
 			);
 			path = Features;
 			sourceTree = "<group>";
@@ -1191,6 +1196,7 @@
 				650F7E7E1BBEB30F00502428 /* CalendarCapabilityTests.swift in Sources */,
 				65882F2B1BAF6083003F74B6 /* ReachableOperationTests.swift in Sources */,
 				65882EFE1BAF6074003F74B6 /* ComposedOperationTests.swift in Sources */,
+				656E84291BDA934200D10989 /* ReachabilityTests.swift in Sources */,
 				65882EFB1BAF6074003F74B6 /* AlertOperationTests.swift in Sources */,
 				65882EFC1BAF6074003F74B6 /* BackgroundObserverTests.swift in Sources */,
 				651EF4901BBDCB4900BA962D /* LocationCapabilityTests.swift in Sources */,
@@ -1260,6 +1266,7 @@
 				65882F361BAF6084003F74B6 /* ReachabilityConditionTests.swift in Sources */,
 				65882F141BAF6078003F74B6 /* OperationTests.swift in Sources */,
 				65827A301BC28F7D00CAEAED /* CapabilityTests.swift in Sources */,
+				656E842A1BDA934200D10989 /* ReachabilityTests.swift in Sources */,
 				6585DACD1BBE805800CE46BE /* AuthorizationTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1314,6 +1321,7 @@
 			files = (
 				651E395A1BB45E370013ADE6 /* ContactsOperationsTests.swift in Sources */,
 				65882EF41BAF606F003F74B6 /* MutualExclusiveTests.swift in Sources */,
+				656E84281BDA934200D10989 /* ReachabilityTests.swift in Sources */,
 				65882EF51BAF606F003F74B6 /* NegatedConditionTests.swift in Sources */,
 				65882EF11BAF606F003F74B6 /* GatedOperationTests.swift in Sources */,
 				65882EF71BAF606F003F74B6 /* NoFailedDependenciesConditionTests.swift in Sources */,
