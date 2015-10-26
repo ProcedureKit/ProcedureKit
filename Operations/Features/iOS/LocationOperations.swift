@@ -25,12 +25,22 @@ public typealias UserLocationOperation = _UserLocationOperation<CLLocationManage
 
 // MARK: ReverseGeocodeOperation
 
-/// Reverse geocode a given CLLocation.
+/**
+Reverse geocode a given CLLocation.
+
+- parameter location: the location to reverse lookup.
+- parameter completion: a completion block of CompletionBlockType
+*/
 public typealias ReverseGeocodeOperation = _ReverseGeocodeOperation<CLGeocoder>
 
 // MARK: ReverseGeocodeUserLocationOperation
 
-/// Reverse geocode the device's current location.
+/**
+Reverse geocode the device's current location.
+
+- parameter accuracy: the location accuracy.
+- parameter completion: a completion block of CompletionBlockType
+*/
 public typealias ReverseGeocodeUserLocationOperation = _ReverseGeocodeUserLocationOperation<CLGeocoder, CLLocationManager>
 
 @available(*, unavailable, renamed="UserLocationOperation")
