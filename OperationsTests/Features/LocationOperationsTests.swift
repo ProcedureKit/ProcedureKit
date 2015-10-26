@@ -80,6 +80,45 @@ class LocationOperationTests: OperationTests {
     }
 }
 
+class LocationOperationErrorTests: XCTestCase {
+
+    var errorA: LocationOperationError!
+    var errorB: LocationOperationError!
+
+    func test__location_operation_error__both_location_manager_did_fail_error() {
+        let underlyingError = NSError(domain: kCLErrorDomain, code: CLError.LocationUnknown.rawValue, userInfo: nil)
+        errorA = .LocationManagerDidFail(underlyingError)
+        errorB = .LocationManagerDidFail(underlyingError)
+        XCTAssertEqual(errorA, errorB)
+    }
+
+    func test__location_operation_error__both_location_manager_did_fail_different_errors() {
+        errorA = .LocationManagerDidFail(NSError(domain: kCLErrorDomain, code: CLError.LocationUnknown.rawValue, userInfo: nil))
+        errorB = .LocationManagerDidFail(NSError(domain: kCLErrorDomain, code: CLError.Network.rawValue, userInfo: nil))
+        XCTAssertNotEqual(errorA, errorB)
+    }
+
+    func test__location_operation_error__both_geocoder_did_fail_error() {
+        let underlyingError = NSError(domain: kCLErrorDomain, code: CLError.GeocodeFoundPartialResult.rawValue, userInfo: nil)
+        errorA = .GeocoderError(underlyingError)
+        errorB = .GeocoderError(underlyingError)
+        XCTAssertEqual(errorA, errorB)
+    }
+
+    func test__location_operation_error__both_geocoder_did_fail_different_errors() {
+        errorA = .GeocoderError(NSError(domain: kCLErrorDomain, code: CLError.GeocodeFoundPartialResult.rawValue, userInfo: nil))
+        errorB = .GeocoderError(NSError(domain: kCLErrorDomain, code: CLError.GeocodeFoundNoResult.rawValue, userInfo: nil))
+        XCTAssertNotEqual(errorA, errorB)
+    }
+
+    func test__location_operation_error_different_not_equal() {
+        let underlyingError = NSError(domain: kCLErrorDomain, code: CLError.LocationUnknown.rawValue, userInfo: nil)
+        errorA = .LocationManagerDidFail(underlyingError)
+        errorB = .GeocoderError(underlyingError)
+        XCTAssertNotEqual(errorA, errorB)
+    }
+}
+
 class UserLocationOperationTests: LocationOperationTests {
 
     func test__operation_name() {
@@ -299,7 +338,8 @@ class ReverseGeocodeUserLocationOperationTests: ReverseGeocodeOperationTests {
     }
 
     func test__completion_handler_receives_location_and_placeholder() {
-
+        let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
+        
         var blockLocation: CLLocation? = .None
         var blockPlacemark: CLPlacemark? = .None
 
@@ -308,7 +348,7 @@ class ReverseGeocodeUserLocationOperationTests: ReverseGeocodeOperationTests {
             blockPlacemark = placemark
         }
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectation)
         runOperation(operation)
         waitForExpectationsWithTimeout(3, handler: nil)
 
