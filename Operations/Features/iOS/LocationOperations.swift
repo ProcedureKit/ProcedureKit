@@ -128,16 +128,20 @@ public class _UserLocationOperation<Manager: LocationManagerType>: Operation, CL
 
     @objc public func locationManager(manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         if let location = locations.last where location.horizontalAccuracy <= accuracy {
-            stopLocationUpdates()
-            self.location = location
-            completion(location)
-            finish()
+            dispatch_async(Queue.Main.queue) {
+                self.stopLocationUpdates()
+                self.location = location
+                self.completion(location)
+                self.finish()
+            }
         }
     }
 
     @objc public func locationManager(manager: CLLocationManager, didFailWithError error: NSError) {
-        stopLocationUpdates()
-        finish(LocationOperationError.LocationManagerDidFail(error))
+        dispatch_async(Queue.Main.queue) {
+            self.stopLocationUpdates()
+            self.finish(LocationOperationError.LocationManagerDidFail(error))
+        }
     }
 }
 
@@ -203,12 +207,17 @@ public class _ReverseGeocodeOperation<Geocoder: ReverseGeocoderType>: Operation 
     }
 
     public override func execute() {
-        geocoder.opr_reverseGeocodeLocation(location) { (results, error) in
-            if let placemark = results.first {
-                self.placemark = placemark
-                self.completion(placemark)
+        geocoder.opr_reverseGeocodeLocation(location) { results, error in
+            dispatch_async(Queue.Main.queue) {
+                if let error = error {
+                    self.finish(LocationOperationError.GeocoderError(error))
+                }
+                else if let placemark = results.first {
+                    self.placemark = placemark
+                    self.completion(placemark)
+                    self.finish()
+                }
             }
-            self.finish(error.map { LocationOperationError.GeocoderError($0) })
         }
     }
 
