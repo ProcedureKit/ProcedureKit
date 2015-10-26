@@ -315,43 +315,6 @@ public final class AddressBook: AddressBookType {
         }
     }
 
-// MARK: - PersonKind
-
-    public enum PersonKind: RawRepresentable, CustomStringConvertible {
-
-        case Person, Organization
-
-        public var rawValue: CFNumberRef {
-            switch self {
-            case .Person:
-                return kABPersonKindPerson
-            case .Organization:
-                return kABPersonKindOrganization
-            }
-        }
-
-        public var description: String {
-            switch self {
-            case .Person:
-                return "Person"
-            case .Organization:
-                return "Organization"
-            }
-        }
-
-        public init?(rawValue: CFNumberRef) {
-            if CFNumberCompare(rawValue, kABPersonKindPerson, nil) == .CompareEqualTo {
-                self = .Person
-            }
-            else if CFNumberCompare(rawValue, kABPersonKindOrganization, nil) == .CompareEqualTo {
-                self = .Organization
-            }
-            else {
-                return nil
-            }
-        }
-    }
-
 // MARK: - SourceKind
 
     public enum SourceKind: RawRepresentable, CustomStringConvertible {
@@ -948,7 +911,6 @@ public class AddressBookPerson: AddressBookRecord, AddressBookPersonType {
     public struct Property {
 
         public struct Metadata {
-            public static let kind              = AddressBookWriteableProperty<AddressBook.PersonKind>(id: kABPersonKindProperty, reader: reader, writer: writer)
             public static let creationDate      = AddressBookReadableProperty<NSDate>(id: kABPersonCreationDateProperty)
             public static let modificationDate  = AddressBookWriteableProperty<NSDate>(id: kABPersonModificationDateProperty)
         }

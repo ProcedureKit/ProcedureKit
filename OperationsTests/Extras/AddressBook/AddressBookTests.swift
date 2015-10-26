@@ -147,7 +147,7 @@ class AddressBookRecordTypeTests: XCTestCase {
 }
 
 @available(iOS, deprecated=9.0)
-class AddressBookSourceTypeTests: XCTestCase {
+class AddressBookSourceKindTests: XCTestCase {
 
     var sourceKind: AddressBook.SourceKind!
 
