@@ -453,7 +453,7 @@ public final class AddressBook: AddressBookType {
         }
 
         public var invalid: Bool {
-            return self != .Invalid
+            return self == .Invalid
         }
 
         public var multiValue: Bool {
