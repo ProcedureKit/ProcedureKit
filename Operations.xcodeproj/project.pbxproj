@@ -170,9 +170,8 @@
 		65B505951BB99BBA004C89C2 /* Contacts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65B505941BB99BBA004C89C2 /* Contacts.swift */; };
 		65B505961BB99BBA004C89C2 /* Contacts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65B505941BB99BBA004C89C2 /* Contacts.swift */; };
 		65B505971BB99BBA004C89C2 /* Contacts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65B505941BB99BBA004C89C2 /* Contacts.swift */; };
-		65CFF8B81BDECD8900350424 /* UIOperationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65CFF8B71BDECD8900350424 /* UIOperationTests.swift */; };
+		65C20E961BDECE48007455E4 /* UIOperationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65CFF8B71BDECD8900350424 /* UIOperationTests.swift */; };
 		65CFF8B91BDECD8900350424 /* UIOperationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65CFF8B71BDECD8900350424 /* UIOperationTests.swift */; };
-		65CFF8BA1BDECD8900350424 /* UIOperationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65CFF8B71BDECD8900350424 /* UIOperationTests.swift */; };
 		65EEC1551BAF40CF0020A9BD /* Operations.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65EEC14A1BAF40CE0020A9BD /* Operations.framework */; };
 		65EEC1661BAF422C0020A9BD /* Operations.h in Headers */ = {isa = PBXBuildFile; fileRef = 65EEC1641BAF422C0020A9BD /* Operations.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		65EEC1811BAF44E80020A9BD /* AlertOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65EEC1691BAF44E80020A9BD /* AlertOperation.swift */; };
@@ -1258,7 +1257,6 @@
 			files = (
 				651E395C1BB45E370013ADE6 /* ContactsOperationsTests.swift in Sources */,
 				65612FE31BC1C3B5007A2316 /* CloudCapabilityTests.swift in Sources */,
-				65CFF8BA1BDECD8900350424 /* UIOperationTests.swift in Sources */,
 				65882F101BAF6078003F74B6 /* MutualExclusiveTests.swift in Sources */,
 				65882F111BAF6078003F74B6 /* NegatedConditionTests.swift in Sources */,
 				65882F0D1BAF6078003F74B6 /* GatedOperationTests.swift in Sources */,
@@ -1337,7 +1335,7 @@
 				65882F1D1BAF6082003F74B6 /* PhotosCapabilityTests.swift in Sources */,
 				65882EF91BAF606F003F74B6 /* SilentConditionTests.swift in Sources */,
 				65882EF31BAF606F003F74B6 /* LoggingObserverTests.swift in Sources */,
-				65CFF8B81BDECD8900350424 /* UIOperationTests.swift in Sources */,
+				65C20E961BDECE48007455E4 /* UIOperationTests.swift in Sources */,
 				65882EFA1BAF606F003F74B6 /* TimeoutObserverTests.swift in Sources */,
 				65882EEF1BAF606F003F74B6 /* BlockConditionTests.swift in Sources */,
 				65882EF01BAF606F003F74B6 /* ComposedOperationTests.swift in Sources */,
