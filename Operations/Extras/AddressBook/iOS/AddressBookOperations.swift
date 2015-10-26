@@ -11,6 +11,7 @@ import AddressBook
 
 // MARK: - Address Book Operation
 
+@available(iOS, deprecated=9.0)
 public class AddressBookOperation: Operation {
 
     internal var registrar: AddressBookPermissionRegistrar
@@ -55,6 +56,7 @@ public class AddressBookOperation: Operation {
     }
 }
 
+@available(iOS, deprecated=9.0)
 public class AddressBookGetResource: AddressBookOperation {
 
     public enum AddressBookError: ErrorType {
@@ -204,6 +206,7 @@ public class AddressBookGetResource: AddressBookOperation {
 
 // MARK: - Group Actions
 
+@available(iOS, deprecated=9.0)
 public class AddressBookGetGroup: AddressBookGetResource {
 
     public init(name: String) {
@@ -217,6 +220,7 @@ public class AddressBookGetGroup: AddressBookGetResource {
     }
 }
 
+@available(iOS, deprecated=9.0)
 public class AddressBookCreateGroup: AddressBookGetGroup {
 
     public override func executeAddressBookTask() -> ErrorType? {
@@ -248,6 +252,7 @@ public class AddressBookCreateGroup: AddressBookGetGroup {
     }
 }
 
+@available(iOS, deprecated=9.0)
 public class AddressBookRemoveGroup: AddressBookGetGroup {
 
     func removeGroup() -> ErrorType? {
@@ -270,6 +275,7 @@ public class AddressBookRemoveGroup: AddressBookGetGroup {
     }
 }
 
+@available(iOS, deprecated=9.0)
 public class AddressBookAddPersonToGroup: AddressBookGetResource {
 
     public init(group: String, personID: ABRecordID) {
@@ -307,6 +313,7 @@ public class AddressBookAddPersonToGroup: AddressBookGetResource {
     }
 }
 
+@available(iOS, deprecated=9.0)
 public class AddressBookRemovePersonFromGroup: AddressBookGetResource {
 
     public init(group: String, personID: ABRecordID) {
@@ -351,6 +358,7 @@ public class AddressBookRemovePersonFromGroup: AddressBookGetResource {
 
 // MARK: - Person Actions
 
+@available(iOS, deprecated=9.0)
 public class AddressBookMapPeople<T>: AddressBookGetResource {
 
     let transform: (AddressBookPerson) -> T?
