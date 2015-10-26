@@ -120,7 +120,6 @@ class BasicTests: OperationTests {
         XCTAssertTrue(delegate.did_operationDidFinish)
     }
 
-
     func test__executing_basic_operation() {
         let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
 
@@ -182,6 +181,32 @@ class BasicTests: OperationTests {
         XCTAssertTrue(dep1.didExecute)
         XCTAssertTrue(dep2.didExecute)
     }
+
+    func test__getting_user_initiated_default_false() {
+        let operation = TestOperation()
+        XCTAssertFalse(operation.userInitiated)
+    }
+
+    func test__setting_user_initiated() {
+        let operation = TestOperation()
+        operation.userInitiated = true
+        XCTAssertTrue(operation.userInitiated)
+    }
+
+    func test__cancel_with_nil_error() {
+        let operation = TestOperation()
+        operation.cancelWithError(.None)
+        XCTAssertTrue(operation.cancelled)
+        XCTAssertEqual(operation.errors.count, 0)
+    }
+
+    func test__cancel_with_error() {
+        let operation = TestOperation()
+        operation.cancelWithError(OperationError.OperationTimedOut(1.0))
+        XCTAssertTrue(operation.cancelled)
+        XCTAssertTrue(operation.failed)
+    }
+
 }
 
 class BlockOperationTests: OperationTests {
