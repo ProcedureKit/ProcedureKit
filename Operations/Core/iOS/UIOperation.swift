@@ -84,9 +84,9 @@ public enum ViewControllerDisplayStyle<ViewController: PresentingViewController>
 
     - parameter controller: a `UIViewController` subclass which will be presented.
     - parameter sender: an optional `AnyObject` used as the sender when showing the view controller
-    - parameter completion: an optional completio block.
+    - parameter completion: an optional completion block, defaults to .None.
     */
-    public func displayController<C where C: UIViewController>(controller: C, sender: AnyObject?, completion: (() -> Void)?) {
+    public func displayController<C where C: UIViewController>(controller: C, sender: AnyObject?, completion: (() -> Void)? = .None) {
         switch self {
 
         case .Present(let from):
