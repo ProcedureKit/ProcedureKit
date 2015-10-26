@@ -110,7 +110,7 @@ class BasicTests: OperationTests {
     func test__queue_delegate_is_notified_when_operation_starts() {
         let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
 
-        let operation = TestOperation(delay: 1)
+        let operation = TestOperation()
         addCompletionBlockToTestOperation(operation, withExpectation: expectation)
 
         runOperation(operation)
@@ -124,12 +124,13 @@ class BasicTests: OperationTests {
     func test__executing_basic_operation() {
         let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
 
-        let operation = TestOperation(delay: 1)
-        addCompletionBlockToTestOperation(operation, withExpectation: expectation)
+        let operation = TestOperation()
 
-        queue.addOperation(operation)
+        addCompletionBlockToTestOperation(operation, withExpectation: expectation)
+        runOperation(operation)
         waitForExpectationsWithTimeout(3, handler: nil)
-        XCTAssertTrue(operation.didExecute)        
+
+        XCTAssertTrue(operation.didExecute)
     }
 
     func test__operation_error_is_equatable() {
@@ -137,6 +138,49 @@ class BasicTests: OperationTests {
         XCTAssertEqual(OperationError.OperationTimedOut(1.0), OperationError.OperationTimedOut(1.0))
         XCTAssertNotEqual(OperationError.ConditionFailed, OperationError.OperationTimedOut(1.0))
         XCTAssertNotEqual(OperationError.OperationTimedOut(2.0), OperationError.OperationTimedOut(1.0))
+    }
+
+    func test__add_multiple_completion_blocks() {
+        let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
+        let operation = TestOperation()
+
+        var completionBlockOneDidRun = false
+        operation.addCompletionBlock {
+            completionBlockOneDidRun = true
+        }
+
+        var completionBlockTwoDidRun = false
+        operation.addCompletionBlock {
+            completionBlockTwoDidRun = true
+        }
+
+        operation.addCompletionBlock {
+            expectation.fulfill()
+        }
+
+        runOperation(operation)
+        waitForExpectationsWithTimeout(3, handler: nil)
+
+        XCTAssertTrue(completionBlockOneDidRun)
+        XCTAssertTrue(completionBlockTwoDidRun)
+    }
+
+    func test__add_multiple_dependencies() {
+        let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
+
+
+        let dep1 = TestOperation()
+        let dep2 = TestOperation()
+
+        let operation = TestOperation()
+        operation.addDependencies([dep1, dep2])
+
+        addCompletionBlockToTestOperation(operation, withExpectation: expectation)
+        runOperations(dep1, dep2, operation)
+        waitForExpectationsWithTimeout(3, handler: nil)
+
+        XCTAssertTrue(dep1.didExecute)
+        XCTAssertTrue(dep2.didExecute)
     }
 }
 
