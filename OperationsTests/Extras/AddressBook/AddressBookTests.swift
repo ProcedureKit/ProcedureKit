@@ -376,6 +376,10 @@ class AddressBookPropertyKindTests: XCTestCase {
         XCTAssertEqual(propertyKind, AddressBook.PropertyKind(rawValue: numericCast(kABMultiDictionaryPropertyType))!)
     }
 
+    func test__given_initialized_with_other_int__then_result_is_nil() {
+        XCTAssertTrue(AddressBook.PropertyKind(rawValue: 666) == nil)
+    }
+
     func test__given_property_kind__then_invalid_is_correct() {
         XCTAssertTrue(AddressBook.PropertyKind.Invalid.invalid)
         XCTAssertFalse(AddressBook.PropertyKind.String.invalid)
@@ -460,6 +464,81 @@ class AddressBookPropertyKindTests: XCTestCase {
     }
 }
 
+@available(iOS, deprecated=9.0)
+class AddressBookStringMultiValueTests: XCTestCase {
+
+    var value = "Testing!"
+    var stringMultiValue: AddressBook.StringMultiValue!
+
+    func test__given_initialized_with_nonstring__result_is_nil() {
+        stringMultiValue = AddressBook.StringMultiValue(multiValueRepresentation: NSDecimalNumber.one())
+        XCTAssertNil(stringMultiValue)
+    }
+
+    func test__given_initialized_with_multiValueRepresentation__value_is_set() {
+        stringMultiValue = AddressBook.StringMultiValue(multiValueRepresentation: value)
+        XCTAssertEqual(stringMultiValue.value, value)
+    }
+
+    func test__given_initialized_with_stringLiteral__value_is_set() {
+        stringMultiValue = AddressBook.StringMultiValue(stringLiteral: value)
+        XCTAssertEqual(stringMultiValue.value, value)
+    }
+
+    func test__given_initialized_with_extendedGraphemeClusterLiteral__value_is_set() {
+        stringMultiValue = AddressBook.StringMultiValue(extendedGraphemeClusterLiteral: value)
+        XCTAssertEqual(stringMultiValue.value, value)
+    }
+
+    func test__given_initialized_with_unicodeScalarLiteral__value_is_set() {
+        stringMultiValue = AddressBook.StringMultiValue(unicodeScalarLiteral: value)
+        XCTAssertEqual(stringMultiValue.value, value)
+    }
+
+    func test__multiValueRepresentation__multiValueRepresentation_is_set() {
+        stringMultiValue = AddressBook.StringMultiValue(multiValueRepresentation: value)
+        XCTAssertEqual(stringMultiValue.multiValueRepresentation as? String, value)
+    }
+
+    func test__multiValueRepresentation__description_is_set() {
+        stringMultiValue = AddressBook.StringMultiValue(multiValueRepresentation: value)
+        XCTAssertEqual(stringMultiValue.description, value)
+    }
+}
+
+@available(iOS, deprecated=9.0)
+class AddressBookDateMultiValueTests: XCTestCase {
+
+    var value = NSDate()
+    var dateMultiValue: AddressBook.DateMultiValue!
+
+    func test__given_initialized_with_nondate__result_is_nil() {
+        dateMultiValue = AddressBook.DateMultiValue(multiValueRepresentation: NSDecimalNumber.one())
+        XCTAssertNil(dateMultiValue)
+    }
+
+    func test__given_initialized_with_multiValueRepresentation__value_is_set() {
+        dateMultiValue = AddressBook.DateMultiValue(multiValueRepresentation: value)
+        XCTAssertEqual(dateMultiValue.value, value)
+    }
+
+    func test__multiValueRepresentation__multiValueRepresentation_is_set() {
+        dateMultiValue = AddressBook.DateMultiValue(multiValueRepresentation: value)
+        XCTAssertEqual(dateMultiValue.multiValueRepresentation as? NSDate, value)
+    }
+
+    func test__multiValueRepresentation__description_is_set() {
+        dateMultiValue = AddressBook.DateMultiValue(multiValueRepresentation: value)
+        XCTAssertEqual(dateMultiValue.description, String(value))
+    }
+
+    func test__multiValueRepresentation__debug_description_is_set() {
+        dateMultiValue = AddressBook.DateMultiValue(multiValueRepresentation: value)
+        XCTAssertEqual(dateMultiValue.debugDescription, String(value))
+    }
+}
+
+@available(iOS, deprecated=9.0)
 class AddressBooksTests: XCTestCase {
 
     var addressBook: AddressBook!
@@ -500,7 +579,46 @@ class AddressBooksTests: XCTestCase {
     }
 }
 
+@available(iOS, deprecated=9.0)
+class AddressBookReadablePropertyTests: XCTestCase {
 
+    func test__init_with_property() {
+        let readable = AddressBookReadableProperty<NSDate>(id: kABPersonCreationDateProperty)
+        XCTAssertEqual(readable.id, kABPersonCreationDateProperty)
+        XCTAssertNil(readable.reader)
+    }
+
+    func test__init_with_property_and_reader() {
+        let readable = AddressBookReadableProperty<NSDate>(id: kABPersonCreationDateProperty, reader: { ref in NSDate() })
+        XCTAssertEqual(readable.id, kABPersonCreationDateProperty)
+        XCTAssertNotNil(readable.reader)
+    }
+}
+
+@available(iOS, deprecated=9.0)
+class AddressBookWritablePropertyTests: XCTestCase {
+
+    func test__init_with_property() {
+        let writable = AddressBookWriteableProperty<NSDate>(id: kABPersonModificationDateProperty)
+        XCTAssertEqual(writable.id, kABPersonModificationDateProperty)
+        XCTAssertNil(writable.reader)
+        XCTAssertNil(writable.writer)
+    }
+
+    func test__init_with_property_and_reader() {
+        let writable = AddressBookWriteableProperty<NSDate>(id: kABPersonModificationDateProperty, reader: { ref in NSDate() })
+        XCTAssertEqual(writable.id, kABPersonModificationDateProperty)
+        XCTAssertNotNil(writable.reader)
+        XCTAssertNil(writable.writer)
+    }
+
+    func test__init_with_property_and_reader_and_writer() {
+        let writable = AddressBookWriteableProperty<NSDate>(id: kABPersonModificationDateProperty, reader: { ref in NSDate() }, writer: { date in "testing" })
+        XCTAssertEqual(writable.id, kABPersonModificationDateProperty)
+        XCTAssertNotNil(writable.reader)
+        XCTAssertNotNil(writable.writer)
+    }
+}
 
 
 

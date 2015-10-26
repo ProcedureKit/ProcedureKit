@@ -557,7 +557,6 @@ public final class AddressBook: AddressBookType {
                 return nil
             }
         }
-
     }
 
 // MARK: - Labels
