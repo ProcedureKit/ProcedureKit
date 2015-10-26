@@ -14,7 +14,13 @@ import CoreLocation
 
 // MARK: UserLocationOperation
 
-/// Access the device's current location.
+/**
+Access the device's current location. It will ask for
+permission if required.
+
+- parameter accuracy: the location accuracy which defaults to 3km.
+- parameter completion: a closure CLLocation -> Void.
+*/
 public typealias UserLocationOperation = _UserLocationOperation<CLLocationManager>
 
 // MARK: ReverseGeocodeOperation
@@ -75,8 +81,8 @@ public class _UserLocationOperation<Manager: LocationManagerType>: Operation, CL
 
     Framework consumers should use: UserLocationOperation
 
-    :param: accuracy, the location accuracy which defaults to 3km.
-    :param: completion, a response handler LocationResponseHandler.
+    - parameter accuracy: the location accuracy which defaults to 3km.
+    - parameter completion: a closure CLLocation -> Void.
     */
     public convenience init(accuracy: CLLocationAccuracy = kCLLocationAccuracyThreeKilometers, completion: CompletionBlockType = { _ in }) {
         self.init(manager: Manager(), accuracy: accuracy, completion: completion)
@@ -87,9 +93,9 @@ public class _UserLocationOperation<Manager: LocationManagerType>: Operation, CL
     determine the user's current location to the desired accuracy. It will ask for
     permission if required.
 
-    :param: manager, instance of a type which implements LocationManagerType.
-    :param: accuracy, the location accuracy.
-    :param: completion, a response handler LocationResponseHandler.
+     - parameter manager: instance of a type which implements LocationManagerType.
+     - parameter accuracy: the location accuracy which defaults to 3km.
+     - parameter completion: a closure CLLocation -> Void.
     */
     public init(manager: Manager, accuracy: CLLocationAccuracy, completion: CompletionBlockType) {
         self.manager = manager
@@ -101,12 +107,14 @@ public class _UserLocationOperation<Manager: LocationManagerType>: Operation, CL
         addCondition(MutuallyExclusive<CLLocationManager>())
     }
 
+    /// Starts updating the location
     public override func execute() {
         manager.opr_setDesiredAccuracy(accuracy)
         manager.opr_setDelegate(self)
         manager.opr_startUpdatingLocation()
     }
 
+    /// Stops updating the location before cancelling the operation
     public override func cancel() {
         dispatch_async(Queue.Main.queue) {
             self.stopLocationUpdates()
@@ -168,8 +176,8 @@ public class _ReverseGeocodeOperation<Geocoder: ReverseGeocoderType>: Operation 
 
     Framework consumers see: ReverseGeocodeOperation
 
-    :param: location, the location to reverse lookup.
-    :param: completion, a completion block of CompletionBlockType
+    - parameter location: the location to reverse lookup.
+    - parameter completion: a completion block of CompletionBlockType
     */
     public convenience init(location: CLLocation, completion: CompletionBlockType = { _ in }) {
         self.init(geocoder: Geocoder(), location: location, completion: completion)
@@ -179,9 +187,9 @@ public class _ReverseGeocodeOperation<Geocoder: ReverseGeocoderType>: Operation 
     Initialize an operation which will use a custom geocoder to
     reverse lookup the given location.
 
-    :param: geocoder, instance of a type which implements ReverseGeocoderType.
-    :param: location, the location to reverse lookup.
-    :param: completion, a completion block of CompletionBlockType
+    - parameter geocoder: instance of a type which implements ReverseGeocoderType.
+    - parameter location: the location to reverse lookup.
+    - parameter completion: a completion block of CompletionBlockType
     */
     public init(geocoder: Geocoder, location: CLLocation, completion: CompletionBlockType) {
         self.location = location
@@ -233,8 +241,8 @@ public class _ReverseGeocodeUserLocationOperation<Geocoder, Manager where Geocod
 
     Framework consumers see: ReverseGeocodeUserLocationOperation
 
-    :param: accuracy, the location accuracy.
-    :param: completion, a completion block of CompletionBlockType
+    - parameter accuracy: the location accuracy.
+    - parameter completion: a completion block of CompletionBlockType
     */
     public convenience init(accuracy: CLLocationAccuracy = kCLLocationAccuracyThreeKilometers, completion: CompletionBlockType = { _, _ in }) {
         self.init(geocoder: Geocoder(), manager: Manager(), accuracy: accuracy, completion: completion)
@@ -244,10 +252,10 @@ public class _ReverseGeocodeUserLocationOperation<Geocoder, Manager where Geocod
     Initialize a group operation which will use a custom geocoder to
     reverse lookup the device location (using a custom location manager).
 
-    :param: geocoder, instance of a type which implements ReverseGeocoderType.
-    :param: manager, instance of a type which implements LocationManagerType.
-    :param: accuracy, the location accuracy.
-    :param: completion, a completion block of CompletionBlockType
+    - parameter geocoder: instance of a type which implements ReverseGeocoderType.
+    - parameter manager: instance of a type which implements LocationManagerType.
+    - parameter accuracy: the location accuracy.
+    - parameter completion: a completion block of CompletionBlockType
     */
     public init(geocoder: Geocoder, manager: Manager, accuracy: CLLocationAccuracy, completion: CompletionBlockType) {
         self.geocoder = geocoder
