@@ -194,6 +194,7 @@ public protocol AddressBookSourceType: AddressBook_SourceType {
 
 // MARK: - Types
 
+@available(iOS, deprecated=9.0)
 public final class AddressBook: AddressBookType {
 
 // MARK: - SortOrdering
