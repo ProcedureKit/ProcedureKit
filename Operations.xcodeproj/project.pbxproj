@@ -1587,14 +1587,14 @@
 			buildSettings = {
 				ENABLE_TESTABILITY = YES;
 				ONLY_ACTIVE_ARCH = YES;
-				PROJECT_VERSION = 2.0.2;
+				PROJECT_VERSION = 2.3.0;
 			};
 			name = Debug;
 		};
 		65EEC1441BAF40610020A9BD /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				PROJECT_VERSION = 2.0.2;
+				PROJECT_VERSION = 2.3.0;
 			};
 			name = Release;
 		};
