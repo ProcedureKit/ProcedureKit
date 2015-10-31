@@ -1,14 +1,15 @@
 # Operations
 
 [![Build status](https://badge.buildkite.com/4bc80b0824c6357ae071342271cb503b8994cf0cfa58645849.svg?branch=master)](https://buildkite.com/blindingskies/operations)
+[![codecov.io](http://codecov.io/github/danthorpe/Operations/coverage.svg?branch=development)](http://codecov.io/github/danthorpe/Operations?branch=development)
 
 A Swift framework inspired by WWDC 2015 Advanced NSOperations session. See the session video here: https://developer.apple.com/videos/wwdc/2015/?id=226
 
-## Status - 6th Oct, 2015
+## Status - 31th Oct, 2015
 
-As of version 2.1, Operations is a multi-platform framework, with framework targets for iOS Extensions, iOS Apps, OS X, watchOS and tvOS. Version 2.2 adds initial support for Contacts framework in iOS 9 and El Capitan. It also introduces the concept of CapabilityTypes, meaning that many device permission conditions have been refactored. See the release notes, and below or #97 for details.
+As of version 2.3, Operations is a multi-platform framework, with CocoaPods support in addition to framework targets for iOS Extensions, iOS Apps, OS X, watchOS and tvOS.
 
-Current development is focused on unifying APIs for AddressBook. This might well cause some disruption to your current code if using the AddressBook operations, hence I’m spreading these changes across two releases. 
+Current development focus is on improving test coverage (broke 60% for v2.3), and improving documentation coverage.
 
 ## Usage
 

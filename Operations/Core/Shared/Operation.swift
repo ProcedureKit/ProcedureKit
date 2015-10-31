@@ -76,10 +76,6 @@ public class Operation: NSOperation {
         return ["state"]
     }
 
-    class func keyPathsForValuesAffectingIsCancelled() -> Set<NSObject> {
-        return ["state"]
-    }
-
     private var _state = State.Initialized
     private let stateLock = NSLock()
 
@@ -149,7 +145,7 @@ public class Operation: NSOperation {
         }
     }
 
-    var userInitiated: Bool {
+    public var userInitiated: Bool {
         get {
             return qualityOfService == .UserInitiated
         }
@@ -291,7 +287,7 @@ public class Operation: NSOperation {
 
     /**
     Finish method which must be called eventually after an operation has
-    begun executing.
+    begun executing, unless it is cancelled.
 
     - parameter errors: an array of `ErrorType`, which defaults to empty.
     */
@@ -348,25 +344,6 @@ private func <(lhs: Operation.State, rhs: Operation.State) -> Bool {
 
 private func ==(lhs: Operation.State, rhs: Operation.State) -> Bool {
     return lhs.rawValue == rhs.rawValue
-}
-
-extension Operation.State: CustomDebugStringConvertible, CustomStringConvertible {
-
-    var description: String {
-        switch self {
-        case .Initialized:          return "Initialized"
-        case .Pending:              return "Pending"
-        case .EvaluatingConditions: return "EvaluatingConditions"
-        case .Ready:                return "Ready"
-        case .Executing:            return "Executing"
-        case .Finishing:            return "Finishing"
-        case .Finished:             return "Finished"
-        }
-    }
-
-    var debugDescription: String {
-        return "state: \(description)"
-    }
 }
 
 /**

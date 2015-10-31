@@ -129,3 +129,33 @@ class NoFailedDependenciesConditionTests: OperationTests {
         XCTAssertEqual(receivedErrors.count, 1)        
     }
 }
+
+class NoFailedDependenciesConditionErrorTests: XCTestCase {
+
+    var errorA: NoFailedDependenciesCondition.Error!
+    var errorB: NoFailedDependenciesCondition.Error!
+
+    func test__both_cancelled_equal() {
+        errorA = .CancelledDependencies
+        errorB = .CancelledDependencies
+        XCTAssertEqual(errorA, errorB)
+    }
+
+    func test__both_failed_equal() {
+        errorA = .FailedDependencies
+        errorB = .FailedDependencies
+        XCTAssertEqual(errorA, errorB)
+    }
+
+    func test__cancelled_and_failed_not_equal() {
+        errorA = .CancelledDependencies
+        errorB = .FailedDependencies
+        XCTAssertNotEqual(errorA, errorB)
+    }
+
+    func test__failed_and_cancelled_not_equal() {
+        errorA = .FailedDependencies
+        errorB = .CancelledDependencies
+        XCTAssertNotEqual(errorA, errorB)
+    }
+}
