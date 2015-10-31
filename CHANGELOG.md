@@ -1,3 +1,12 @@
+# 2.3.0
+1. [[OPR-89](https://github.com/danthorpe/Operations/pull/89)]: Adds support (via subspecs) for watchOS 2 and tvOS apps.
+2. [[OPR-101](https://github.com/danthorpe/Operations/pull/101)]: Fixes a bug where `ReachableOperation` may fail to start in some scenarios.
+3. [[OPR-102](https://github.com/danthorpe/Operations/pull/102)]: Adds more documentation to the finish method of Operation. If it’s possible for an Operation to be cancelled before it’s started, then do not call finish. This is mostly likely a possibility when writing network operations and cancelling groups.
+4. [[OPR-103](https://github.com/danthorpe/Operations/pull/103)]: Adds % of code covered by tests to the README. Service performed by CodeCov.
+5. [[OPR-104](https://github.com/danthorpe/Operations/pull/104)]: Maintenance work on the CI scripts, which have now moved to using a build pipeline which is uploaded to BuildKite and executed all on the same physical box. See [post on danthorpe.me](http://danthorpe.me/posts/uploading-build-pipelines.html).
+6. [[OPR-105](https://github.com/danthorpe/Operations/pull/105)]: Improves the testability and test coverage of the Reachability object.
+7. [[OPR-106](https://github.com/danthorpe/Operations/pull/106)]: Adds more tests to the AddressBook swift wrapper, increases coverage of `Operation`, `NegatedCondition` & `UIOperation`.
+
 # 2.2.1
 1. [[OPR-100](https://github.com/danthorpe/Operations/pull/100)]: Adds documentation to all “Core” elements of the framework. Increases documentation coverage from 8% to 22%. Still pretty bad, but will get there eventually.
 
