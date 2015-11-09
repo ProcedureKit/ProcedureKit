@@ -75,6 +75,11 @@
 		652F5AA01BAF7BB700BB5F71 /* Operations.h in Headers */ = {isa = PBXBuildFile; fileRef = 65EEC1641BAF422C0020A9BD /* Operations.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		652F5AA11BAF7BB800BB5F71 /* Operations.h in Headers */ = {isa = PBXBuildFile; fileRef = 65EEC1641BAF422C0020A9BD /* Operations.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		652F5AA21BAF7BBD00BB5F71 /* Operations.h in Headers */ = {isa = PBXBuildFile; fileRef = 65EEC1641BAF422C0020A9BD /* Operations.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		653E843B1BF0B62E0020FF0E /* Logging.swift in Sources */ = {isa = PBXBuildFile; fileRef = 653E843A1BF0B62E0020FF0E /* Logging.swift */; };
+		653E843C1BF0B62E0020FF0E /* Logging.swift in Sources */ = {isa = PBXBuildFile; fileRef = 653E843A1BF0B62E0020FF0E /* Logging.swift */; };
+		653E843D1BF0B62E0020FF0E /* Logging.swift in Sources */ = {isa = PBXBuildFile; fileRef = 653E843A1BF0B62E0020FF0E /* Logging.swift */; };
+		653E843E1BF0B62E0020FF0E /* Logging.swift in Sources */ = {isa = PBXBuildFile; fileRef = 653E843A1BF0B62E0020FF0E /* Logging.swift */; };
+		653E843F1BF0B62E0020FF0E /* Logging.swift in Sources */ = {isa = PBXBuildFile; fileRef = 653E843A1BF0B62E0020FF0E /* Logging.swift */; };
 		65612FE11BC1C3B5007A2316 /* CloudCapabilityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65612FE01BC1C3B5007A2316 /* CloudCapabilityTests.swift */; };
 		65612FE21BC1C3B5007A2316 /* CloudCapabilityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65612FE01BC1C3B5007A2316 /* CloudCapabilityTests.swift */; };
 		65612FE31BC1C3B5007A2316 /* CloudCapabilityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65612FE01BC1C3B5007A2316 /* CloudCapabilityTests.swift */; };
@@ -298,6 +303,7 @@
 		6523DA181BBDD21F003A3374 /* LocationCapability.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LocationCapability.swift; sourceTree = "<group>"; };
 		6523DA1F1BBDEA57003A3374 /* CalendarCapability.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CalendarCapability.swift; path = Operations/Features/Shared/CalendarCapability.swift; sourceTree = SOURCE_ROOT; };
 		652F5A491BAF79BA00BB5F71 /* Operations.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Operations.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		653E843A1BF0B62E0020FF0E /* Logging.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Logging.swift; path = Shared/Logging.swift; sourceTree = "<group>"; };
 		65612FE01BC1C3B5007A2316 /* CloudCapabilityTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CloudCapabilityTests.swift; sourceTree = "<group>"; };
 		656E84271BDA934200D10989 /* ReachabilityTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReachabilityTests.swift; sourceTree = "<group>"; };
 		657B3E861BBEF779003AC518 /* PhotosCapability.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PhotosCapability.swift; sourceTree = "<group>"; };
@@ -667,6 +673,7 @@
 			isa = PBXGroup;
 			children = (
 				65EEC1731BAF44E80020A9BD /* ExclusivityManager.swift */,
+				653E843A1BF0B62E0020FF0E /* Logging.swift */,
 				65EEC17A1BAF44E80020A9BD /* Operation.swift */,
 				65EEC17B1BAF44E80020A9BD /* OperationCondition.swift */,
 				65EEC17C1BAF44E80020A9BD /* OperationObserver.swift */,
@@ -1069,6 +1076,7 @@
 				652814DE1BBF3C2D0015719E /* CloudCapability.swift in Sources */,
 				652F5A6B1BAF7A2800BB5F71 /* BackgroundObserver.swift in Sources */,
 				652F5A811BAF7A2800BB5F71 /* CloudKitOperation.swift in Sources */,
+				653E843F1BF0B62E0020FF0E /* Logging.swift in Sources */,
 				652F5A691BAF7A2800BB5F71 /* NoFailedDependenciesCondition.swift in Sources */,
 				652F5A611BAF7A2800BB5F71 /* Operation.swift in Sources */,
 				652F5A621BAF7A2800BB5F71 /* OperationCondition.swift in Sources */,
@@ -1103,6 +1111,7 @@
 				65882E8E1BAF5BEB003F74B6 /* BlockCondition.swift in Sources */,
 				65882E921BAF5BEB003F74B6 /* SlientCondition.swift in Sources */,
 				6523DA221BBDEA57003A3374 /* CalendarCapability.swift in Sources */,
+				653E843E1BF0B62E0020FF0E /* Logging.swift in Sources */,
 				65882E911BAF5BEB003F74B6 /* NoFailedDependenciesCondition.swift in Sources */,
 				657B3E8F1BBF06DC003AC518 /* PassbookCapability.swift in Sources */,
 				65882E891BAF5BEB003F74B6 /* Operation.swift in Sources */,
@@ -1147,6 +1156,7 @@
 				65EEC1941BAF44E80020A9BD /* OperationQueue.swift in Sources */,
 				657B3E8E1BBF06DC003AC518 /* PassbookCapability.swift in Sources */,
 				65EEC1961BAF44E80020A9BD /* Support.swift in Sources */,
+				653E843C1BF0B62E0020FF0E /* Logging.swift in Sources */,
 				65EEC2331BAF4F230020A9BD /* WebpageOperation.swift in Sources */,
 				65EEC18F1BAF44E80020A9BD /* NegatedCondition.swift in Sources */,
 				6523DA201BBDEA57003A3374 /* CalendarCapability.swift in Sources */,
@@ -1244,6 +1254,7 @@
 				6523DA211BBDEA57003A3374 /* CalendarCapability.swift in Sources */,
 				65EEC1BE1BAF468D0020A9BD /* Support.swift in Sources */,
 				65EEC23F1BAF4F610020A9BD /* ReachableOperation.swift in Sources */,
+				653E843D1BF0B62E0020FF0E /* Logging.swift in Sources */,
 				65EEC1CE1BAF468D0020A9BD /* LoggingObserver.swift in Sources */,
 				65EEC1C01BAF468D0020A9BD /* MutuallyExclusive.swift in Sources */,
 				651E394E1BB454310013ADE6 /* ContactsOperation.swift in Sources */,
@@ -1301,6 +1312,7 @@
 				65EEC1F61BAF4C6F0020A9BD /* Operation.swift in Sources */,
 				659C442D1BBD455D0076D529 /* NetworkOperation.swift in Sources */,
 				65EEC1F71BAF4C6F0020A9BD /* OperationCondition.swift in Sources */,
+				653E843B1BF0B62E0020FF0E /* Logging.swift in Sources */,
 				657B3E8D1BBF06DC003AC518 /* PassbookCapability.swift in Sources */,
 				65EEC1F81BAF4C6F0020A9BD /* OperationObserver.swift in Sources */,
 				65EEC1F91BAF4C6F0020A9BD /* OperationQueue.swift in Sources */,

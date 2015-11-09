@@ -63,6 +63,13 @@ public class Operation: NSOperation {
         }
     }
 
+    /**
+     Set a shared logger for all `Operation` instances. By default
+     shared logger uses `print()`. To use a custom logger, conform
+     to `LoggerType`.
+    */
+    public static var sharedLogger: LoggerType = DefaultLogger()
+
     // use the KVO mechanism to indicate that changes to "state" affect other properties as well
     class func keyPathsForValuesAffectingIsReady() -> Set<NSObject> {
         return ["state"]
@@ -76,9 +83,9 @@ public class Operation: NSOperation {
         return ["state"]
     }
 
-    private var _state = State.Initialized
     private let stateLock = NSLock()
 
+    private var _state = State.Initialized
     private var _internalErrors = [ErrorType]()
 
     private(set) var conditions = [OperationCondition]()
@@ -98,6 +105,7 @@ public class Operation: NSOperation {
                     break
                 default:
                     assert(_state.canTransitionToState(newState), "Attempting to perform illegal cyclic state transition, \(_state) -> \(newState).")
+                    log.verbose("\(operationName): \(_state) -> \(newState)")
                     _state = newState
                 }
             }
@@ -237,6 +245,7 @@ public class Operation: NSOperation {
 
         if _internalErrors.isEmpty && !cancelled {
             state = .Executing
+            log.info("\(operationName): did start")
             observers.forEach { $0.operationDidStart(self) }
             execute()
         }
@@ -263,8 +272,11 @@ public class Operation: NSOperation {
     public func cancelWithError(error: ErrorType? = .None) {
         if let error = error {
             _internalErrors.append(error)
+            log.warning("\(operationName): did cancel with error: \(error).")
         }
-        
+        else {
+            log.info("\(operationName): did cancel.")
+        }
         cancel()
     }
 
@@ -274,6 +286,7 @@ public class Operation: NSOperation {
     - parameter operation: a `NSOperation` instance.
     */
     public final func produceOperation(operation: NSOperation) {
+        log.info("\(operationName): did produce \(operation.operationName)")
         observers.forEach { $0.operation(self, didProduceOperation: operation) }
     }
     
@@ -298,9 +311,16 @@ public class Operation: NSOperation {
 
             _internalErrors.appendContentsOf(errors)
             finished(_internalErrors)
-            
+
+            if errors.isEmpty {
+                log.info("\(operationName): did finish with no errors.")
+            }
+            else {
+                log.warning("\(operationName): did finish with errors: \(errors).")
+            }
+
             observers.forEach { $0.operationDidFinish(self, errors: self._internalErrors) }
-            
+
             state = .Finished
         }
     }
