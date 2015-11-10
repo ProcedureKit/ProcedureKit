@@ -66,6 +66,14 @@ public extension LoggerType {
         return min(LogManager.globalLogSeverity, severity)
     }
 
+    func prefix(file: String = __FILE__, function: String = __FUNCTION__, line: Int = __LINE__) -> String {
+        guard !file.containsString("Operations") else {
+            return ""
+        }
+        let filename = (file as NSString).lastPathComponent
+        return "[\(filename) \(function):\(line)], "
+    }
+
     /**
      # Default log function
      The default implementation will create a prefix from the file,
@@ -93,16 +101,9 @@ public extension LoggerType {
     */
     func log(message: String, severity: LogSeverity, file: String = __FILE__, function: String = __FUNCTION__, line: Int = __LINE__) {
         if severity >= minimumLogSeverity {
-            let prefix: String = {
-                guard !file.containsString("Operations") else {
-                    return ""
-                }
-                let filename = (file as NSString).lastPathComponent
-                return "[\(filename) \(function):\(line)], "
-            }()
-
+            let _prefix = prefix(file, function: function, line: line)
             dispatch_async(LogManager.queue) {
-                self.logger(message: "\(prefix)\(message)")
+                self.logger(message: "\(_prefix)\(message)")
             }
         }
     }

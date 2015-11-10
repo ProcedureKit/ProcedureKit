@@ -53,6 +53,12 @@ class LoggerTests: XCTestCase {
         log = Logger()
         XCTAssertEqual(log.severity, LogSeverity.Info)
     }
+
+    func test__prefix_uses_last_path_component() {
+        log = Logger()
+        let prefix = log.prefix("this/is/a/file.swift", function: "the_function", line: 100)
+        XCTAssertEqual(prefix, "[file.swift the_function:100], ")
+    }
 }
 
 class LogManagerTests: XCTestCase {
