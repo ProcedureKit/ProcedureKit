@@ -57,7 +57,7 @@ public class GroupOperation: Operation {
     public override func execute() {
         let _operations = operations.flatMap { return $0 as? Operation }
         for op in _operations {
-            op.log.threshold = log.threshold
+            op.log.severity = log.severity
         }
         addOperations(operations)
         queue.suspended = false

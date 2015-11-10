@@ -33,7 +33,7 @@ public struct LoggingObserver: OperationObserver {
     - parameter logger: a logging block. By detault the logger uses `println`
     however, for custom loggers provide a block which receives a `String`.
     */
-    public init(queue: dispatch_queue_t = Queue.Initiated.serial("me.danthorpe.Operations.Logger"), logger: LoggerBlockType = { print($0) }) {
+    public init(queue: dispatch_queue_t = Queue.Initiated.serial("me.danthorpe.Operations.Logger"), logger: LoggerBlockType = { debugPrint($0) }) {
         self.queue = queue
         self.logger = logger
     }

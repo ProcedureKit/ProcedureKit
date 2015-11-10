@@ -16,7 +16,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
 
-        LogManager.globalLogLevelThreshold = .Notice
+        LogManager.globalLogSeverity = .Notice
 
         return true
     }
@@ -40,4 +40,3 @@ extension UIColor {
         return UIApplication.sharedApplication().keyWindow?.tintColor
     }
 }
-

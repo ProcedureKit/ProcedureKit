@@ -76,9 +76,9 @@ public class Operation: NSOperation {
         return ["state"]
     }
 
-    public lazy var log: Logger = LogManager.createLogger()
-
     private let stateLock = NSLock()
+
+    private lazy var _log: LoggerType = Logger()
 
     private var _state = State.Initialized
     private var _internalErrors = [ErrorType]()
@@ -167,6 +167,69 @@ public class Operation: NSOperation {
     /// Boolean indicator for whether the Operation has finished or not
     public override var finished: Bool {
         return state == .Finished
+    }
+
+    // MARK: - Logging
+
+    /** 
+     # Access the logger for this Operation
+     The `log` property can be used as the interface to access the logger.
+     e.g. to output a message with `LogSeverity.Info` from inside
+     the `Operation`, do this:
+    
+        log.info("\(operationName): This is my message")
+    
+     To adjust the instance severity of the LoggerType for the
+     `Operation`, access it via this property too:
+    
+        log.severity = .Verbose
+    
+     Note, that Swift does not allow changing the property
+     types of super classes. See `getLogger()` for info
+     about using a custom logger.
+    */
+    public var log: LoggerType {
+        get { return getLogger() }
+        set { setLogger(newValue) }
+    }
+
+    /**
+      # Custom LoggerType
+     
+     To utilise a custom logger within an `Operation` subclass
+     create an instance variable for your logger, and then
+     override this method to return it. E.g.
+     
+         var _customLogger: CustomLogger // conforms to LoggerType
+         
+         override func getLogger() -> LoggerType {
+             return _customLogger
+         }
+     
+     - see: `setLogger(: LoggerType)`
+     - returns: a `LoggerType`.
+    */
+    public func getLogger() -> LoggerType {
+        return _log
+    }
+
+    /**
+     # Custom LoggerType
+
+     To utilise a custom logger within an `Operation` subclass
+     create an instance variable for your logger, and then
+     override this method to set it it. E.g.
+
+          var _customLogger: CustomLogger // conforms to LoggerType
+
+          override func setLogger(newLogger: LoggerType) {
+               customLogger = CustomLogger(severity: newLogger.severity, logger: newLogger.logger)
+          }
+
+     - see: `getLogger() -> LoggerType`
+     */
+    public func setLogger(newLogger: LoggerType) {
+        _log = Logger(severity: newLogger.severity, logger: newLogger.logger)
     }
 
     /**

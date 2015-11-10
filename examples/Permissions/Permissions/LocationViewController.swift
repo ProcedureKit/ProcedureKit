@@ -68,7 +68,7 @@ class LocationViewController: PermissionViewController {
 
     func determineAuthorizationStatus() {
         let status = GetAuthorizationStatus(Capability.Location(), completion: locationServicesEnabled)
-        status.log.threshold = .Verbose
+        status.log.severity = .Verbose
         queue.addOperation(status)
     }
 
