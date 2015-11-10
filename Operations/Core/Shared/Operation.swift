@@ -63,13 +63,6 @@ public class Operation: NSOperation {
         }
     }
 
-    /**
-     Set a shared logger for all `Operation` instances. By default
-     shared logger uses `print()`. To use a custom logger, conform
-     to `LoggerType`.
-    */
-    public static var sharedLogger: LoggerType = DefaultLogger()
-
     // use the KVO mechanism to indicate that changes to "state" affect other properties as well
     class func keyPathsForValuesAffectingIsReady() -> Set<NSObject> {
         return ["state"]
@@ -82,6 +75,8 @@ public class Operation: NSOperation {
     class func keyPathsForValuesAffectingIsFinished() -> Set<NSObject> {
         return ["state"]
     }
+
+    public lazy var log: Logger = LogManager.createLogger()
 
     private let stateLock = NSLock()
 
@@ -98,6 +93,8 @@ public class Operation: NSOperation {
         set (newState) {
             willChangeValueForKey("state")
 
+            log.verbose("\(operationName): \(_state) -> \(newState)")
+
             stateLock.withCriticalScope { () -> Void in
 
                 switch (_state, newState) {
@@ -105,7 +102,6 @@ public class Operation: NSOperation {
                     break
                 default:
                     assert(_state.canTransitionToState(newState), "Attempting to perform illegal cyclic state transition, \(_state) -> \(newState).")
-                    log.verbose("\(operationName): \(_state) -> \(newState)")
                     _state = newState
                 }
             }

@@ -9,22 +9,46 @@
 import Foundation
 
 public enum LogLevel: Int, Comparable {
-    case Verbose = 0, Info, Warning, Fatal
+    case Verbose = 0, Notice, Info, Warning, Fatal
 }
+
+public typealias LoggerBlockType = (message: String) -> Void
 
 public protocol LoggerType {
 
+    var logger: LoggerBlockType { get }
+
     var threshold: LogLevel { get set }
 
-    init(threshold: LogLevel, info: () -> String?)
+    init(threshold: LogLevel, logger: LoggerBlockType)
 
     func log(message: String, level: LogLevel, file: String, function: String, line: Int)
 }
 
 public extension LoggerType {
 
+    func log(message: String, level: LogLevel, file: String = __FILE__, function: String = __FUNCTION__, line: Int = __LINE__) {
+        if level >= min(LogManager.threshold, threshold) {
+            let prefix: String = {
+                guard !file.containsString("Operations") else {
+                    return ""
+                }
+                let filename = (file as NSString).lastPathComponent
+                return "[\(filename) \(function):\(line)], "
+            }()
+
+            dispatch_async(LogManager.queue) {
+                self.logger(message: "\(prefix)\(message)")
+            }
+        }
+    }
+
     func verbose(message: String, file: String = __FILE__, function: String = __FUNCTION__, line: Int = __LINE__) {
         log(message, level: .Verbose, file: file, function: function, line: line)
+    }
+
+    func notice(message: String, file: String = __FILE__, function: String = __FUNCTION__, line: Int = __LINE__) {
+        log(message, level: .Notice, file: file, function: function, line: line)
     }
 
     func info(message: String, file: String = __FILE__, function: String = __FUNCTION__, line: Int = __LINE__) {
@@ -40,50 +64,48 @@ public extension LoggerType {
     }
 }
 
-struct DefaultLogger: LoggerType {
+public class LogManager {
 
-    let queue = Queue.Initiated.serial("me.danthorpe.Operations.DefaultLogger")
-    let info: () -> String?
+    static var sharedInstance = LogManager()
 
-    var threshold: LogLevel
-
-    init(threshold: LogLevel = .Warning, info: () -> String? = { return .None }) {
-        self.threshold = threshold
-        self.info = info
+    static var queue: dispatch_queue_t {
+        return sharedInstance.queue
     }
 
-    func log(message: String, level: LogLevel, file: String = __FILE__, function: String = __FUNCTION__, line: Int = __LINE__) {
-        #if DEBUG
-            if level >= threshold {
-                let prefix: String
-
-                switch level {
-                case .Verbose:
-                    let filename = (file as NSString).lastPathComponent
-                    let verboseInfo = "[\(filename).\(function):\(line)]"
-                    prefix = info().map { "\(verboseInfo):\($0)" } ?? verboseInfo
-                default:
-                    prefix = info() ?? ""
-                }
-                dispatch_async(queue) {
-                    print("\(prefix) \(message)")
-                }
-            }
-        #endif
+    public static var threshold: LogLevel {
+        get { return sharedInstance.threshold }
+        set { sharedInstance.threshold = newValue }
     }
+
+    public static func createLogger<Logger: LoggerType>(threshold: LogLevel = .Warning, logger: LoggerBlockType = { print($0) }) -> Logger {
+        return Logger(threshold: threshold, logger: logger)
+    }
+
+    let queue = Queue.Utility.serial("me.danthorpe.Operations.Logger")
+    var threshold: LogLevel = .Warning
 }
 
-public extension Operation {
+public class Logger: LoggerType {
 
-    var log: LoggerType {
-        return self.dynamicType.sharedLogger
+    public var threshold: LogLevel
+    public let logger: LoggerBlockType
+
+    public required init(threshold: LogLevel, logger: LoggerBlockType) {
+        self.threshold = threshold
+        self.logger = logger
     }
 }
 
 extension NSOperation {
 
     public var operationName: String {
-        return name ?? "\(self)"
+        get {
+            let _name = name ?? self.description
+            guard !_name.containsString("BlockOperation") else {
+                return "Unnamed Block Operation"
+            }
+            return _name
+        }
     }
 }
 
