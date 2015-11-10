@@ -15,6 +15,8 @@ start, produces new operation and finsihed.
 Any produced `Operation` instances will automatically get their
 own logger attached.
 */
+@available(iOS, deprecated=9, message="Use the log property of Operation directly.")
+@available(OSX, deprecated=10.11, message="Use the log property of Operation directly.")
 public struct LoggingObserver: OperationObserver {
     public typealias LoggerBlockType = (message: String) -> Void
 
