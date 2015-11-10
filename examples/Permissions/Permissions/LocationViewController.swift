@@ -9,6 +9,7 @@
 import Foundation
 import CoreLocation
 import MapKit
+import PureLayout
 import Operations
 
 class LocationViewController: PermissionViewController {
@@ -37,11 +38,15 @@ class LocationViewController: PermissionViewController {
         mapView = MKMapView.newAutoLayoutView()
         operationResults.addSubview(mapView)
         mapView.autoPinEdgesToSuperviewEdgesWithInsets(UIEdgeInsetsZero)
-
     }
 
     override func viewWillAppear(animated: Bool) {
+        super.viewWillAppear(animated)
         determineAuthorizationStatus()
+    }
+
+    override func conditionsForState(state: State, silent: Bool) -> [OperationCondition] {
+        return configureConditionsForState(state, silent: silent)(AuthorizedFor(Capability.Location()))
     }
 
     func locationServicesEnabled(enabled: Bool, withAuthorization status: CLAuthorizationStatus) {
