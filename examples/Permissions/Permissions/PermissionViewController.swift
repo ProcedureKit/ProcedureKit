@@ -208,7 +208,7 @@ class PermissionViewController: UIViewController {
     }
 
     func conditionsForState(state: State, silent: Bool = true) -> [OperationCondition] {
-        // Subclasses should over-ride and call this...
+        // Subclasses should override and call this...
         // return configureConditionsForState(state, silent: silent)(BlockCondition { true })
         fatalError("Requires subclassing otherwise view controller will be left hanging.")
     }

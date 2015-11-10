@@ -28,7 +28,7 @@ public protocol LoggerType {
 public extension LoggerType {
 
     func log(message: String, level: LogLevel, file: String = __FILE__, function: String = __FUNCTION__, line: Int = __LINE__) {
-        if level >= min(LogManager.threshold, threshold) {
+        if level >= min(LogManager.globalLogLevelThreshold, threshold) {
             let prefix: String = {
                 guard !file.containsString("Operations") else {
                     return ""
@@ -72,7 +72,7 @@ public class LogManager {
         return sharedInstance.queue
     }
 
-    public static var threshold: LogLevel {
+    public static var globalLogLevelThreshold: LogLevel {
         get { return sharedInstance.threshold }
         set { sharedInstance.threshold = newValue }
     }
