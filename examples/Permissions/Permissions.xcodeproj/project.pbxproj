@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		58952DFEC8CF48C6C665C71F /* Pods.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 87E0DB0BC2684E40E7B2284B /* Pods.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
+		58952DFEC8CF48C6C665C71F /* Pods.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 87E0DB0BC2684E40E7B2284B /* Pods.framework */; };
 		65343F6A1B6663EF0022968E /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65343F691B6663EF0022968E /* AppDelegate.swift */; };
 		65343F6C1B6663EF0022968E /* MainController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65343F6B1B6663EF0022968E /* MainController.swift */; };
 		65343F6F1B6663EF0022968E /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 65343F6D1B6663EF0022968E /* Main.storyboard */; };
@@ -16,6 +16,8 @@
 		65343F801B6663EF0022968E /* PermissionsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65343F7F1B6663EF0022968E /* PermissionsTests.swift */; };
 		6539CCB41B680C9B00A16D7B /* LocationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6539CCB31B680C9B00A16D7B /* LocationViewController.swift */; };
 		6539CCB61B680F0100A16D7B /* PermissionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6539CCB51B680F0100A16D7B /* PermissionViewController.swift */; };
+		65546D821BF237C90010F6EE /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65546D811BF237C90010F6EE /* MapKit.framework */; };
+		65546D841BF238870010F6EE /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65546D831BF238870010F6EE /* CoreLocation.framework */; };
 		65719F711B7119960012A775 /* UserNotificationSettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65719F701B7119960012A775 /* UserNotificationSettingsViewController.swift */; };
 		65AF540C1B66E9F800562306 /* DemoContentCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 65AF540A1B66E9F800562306 /* DemoContentCell.xib */; };
 		65AF540E1B66F05E00562306 /* AddressBookViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65AF540D1B66F05E00562306 /* AddressBookViewController.swift */; };
@@ -45,6 +47,8 @@
 		65343F7F1B6663EF0022968E /* PermissionsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PermissionsTests.swift; sourceTree = "<group>"; };
 		6539CCB31B680C9B00A16D7B /* LocationViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LocationViewController.swift; sourceTree = "<group>"; };
 		6539CCB51B680F0100A16D7B /* PermissionViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PermissionViewController.swift; sourceTree = "<group>"; };
+		65546D811BF237C90010F6EE /* MapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapKit.framework; path = System/Library/Frameworks/MapKit.framework; sourceTree = SDKROOT; };
+		65546D831BF238870010F6EE /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
 		65719F701B7119960012A775 /* UserNotificationSettingsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserNotificationSettingsViewController.swift; sourceTree = "<group>"; };
 		65AF540B1B66E9F800562306 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/DemoContentCell.xib; sourceTree = "<group>"; };
 		65AF540D1B66F05E00562306 /* AddressBookViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddressBookViewController.swift; sourceTree = "<group>"; };
@@ -57,6 +61,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				65546D841BF238870010F6EE /* CoreLocation.framework in Frameworks */,
+				65546D821BF237C90010F6EE /* MapKit.framework in Frameworks */,
 				58952DFEC8CF48C6C665C71F /* Pods.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -74,6 +80,8 @@
 		2B2465A48B3B6A7314D0E074 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				65546D831BF238870010F6EE /* CoreLocation.framework */,
+				65546D811BF237C90010F6EE /* MapKit.framework */,
 				87E0DB0BC2684E40E7B2284B /* Pods.framework */,
 			);
 			name = Frameworks;
@@ -212,6 +220,7 @@
 				TargetAttributes = {
 					65343F631B6663EF0022968E = {
 						CreatedOnToolsVersion = 6.4;
+						DevelopmentTeam = 8AY49ER4EE;
 					};
 					65343F781B6663EF0022968E = {
 						CreatedOnToolsVersion = 6.4;
@@ -456,6 +465,7 @@
 			baseConfigurationReference = C091FCD562EC35D9D580862B /* Pods.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				INFOPLIST_FILE = Permissions/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "me.danthorpe.$(PRODUCT_NAME:rfc1034identifier)";
@@ -468,6 +478,7 @@
 			baseConfigurationReference = 3BB78B8B81026140E13D0690 /* Pods.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				INFOPLIST_FILE = Permissions/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "me.danthorpe.$(PRODUCT_NAME:rfc1034identifier)";
