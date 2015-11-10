@@ -62,7 +62,7 @@ public class GetAuthorizationStatus<Capability: CapabilityType>: Operation {
         self.capability = capability
         self.completion = completion
         super.init()
-        name = "Get Authorization Status for: \(capability.name)"
+        name = "Get Authorization Status for \(capability.name)"
     }
 
     func determineState(completion: StatusResponse -> Void) {
@@ -85,7 +85,7 @@ public class Authorize<Capability: CapabilityType>: GetAuthorizationStatus<Capab
 
     public override init(_ capability: Capability, completion: Completion = { _ in }) {
         super.init(capability, completion: completion)
-        name = "Authorize \(capability.requirement) for: \(capability.name)"
+        name = "Authorize \(capability.name).\(capability.requirement)"
         addCondition(MutuallyExclusive<Capability>())
     }
 

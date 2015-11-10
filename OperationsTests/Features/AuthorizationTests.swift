@@ -94,7 +94,7 @@ class AuthorizationTests: OperationTests {
 
     func test__get_status_operation_name() {
         let operation = GetAuthorizationStatus(capability)
-        XCTAssertEqual(operation.name!, "Get Authorization Status for: Testable Capability")
+        XCTAssertEqual(operation.name!, "Get Authorization Status for Testable Capability")
     }
 
     func test__get_status_sets_state() {
@@ -145,7 +145,7 @@ class AuthorizationTests: OperationTests {
 
     func test__authorize_operation_name() {
         let operation = Authorize(capability)
-        XCTAssertEqual(operation.name!, "Authorize Minimum for: Testable Capability")
+        XCTAssertEqual(operation.name!, "Authorize Testable Capability.Minimum")
     }
 
     func test__authorize() {

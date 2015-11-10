@@ -332,7 +332,6 @@ class ReverseGeocodeUserLocationOperationTests: ReverseGeocodeOperationTests {
         }
 
         XCTAssertTrue(geocoder.didReverseLookup)
-        XCTAssertTrue(operation.finished)
         XCTAssertEqual(receivedLocation, location)
         XCTAssertEqual(receivedPlacemark, placemark)
     }
@@ -357,7 +356,6 @@ class ReverseGeocodeUserLocationOperationTests: ReverseGeocodeOperationTests {
             return
         }
 
-        XCTAssertTrue(operation.finished)
         XCTAssertEqual(receivedLocation, location)
         XCTAssertEqual(receivedPlacemark, placemark)
     }

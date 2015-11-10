@@ -39,6 +39,7 @@ class AddressBookViewController: PermissionViewController {
     }
 
     override func viewWillAppear(animated: Bool) {
+        super.viewWillAppear(animated)
         determineAuthorizationStatus()
     }
 

@@ -38,6 +38,7 @@ internal class ExclusivityManager {
 
 
     private func _addOperation(operation: Operation, category: String) {
+        operation.log.notice("\(operation.operationName) >>> \(category)")
         var operationsWithThisCategory = operations[category] ?? []
 
         if let last = operationsWithThisCategory.last {
@@ -50,6 +51,7 @@ internal class ExclusivityManager {
     }
 
     private func _removeOperation(operation: Operation, category: String) {
+        operation.log.notice("\(operation.operationName) <<< \(category)")
         let matchingOperations = operations[category]
 
         if  var operationsWithThisCategory = matchingOperations,
