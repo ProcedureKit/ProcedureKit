@@ -229,7 +229,7 @@ public class Operation: NSOperation {
      - see: `getLogger() -> LoggerType`
      */
     public func setLogger(newLogger: LoggerType) {
-        _log = Logger(severity: newLogger.severity, logger: newLogger.logger)
+        _log = Logger(severity: newLogger.severity)
     }
 
     /**

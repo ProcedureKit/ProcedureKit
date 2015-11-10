@@ -46,12 +46,6 @@ public protocol LoggerType {
     var severity: LogSeverity { get set }
 
     /**
-     Initialize the logger with an log level severity and
-     the logger block.
-    */
-    init(severity: LogSeverity, logger: LoggerBlockType)
-
-    /**
      The primary log function. The main job of this method
      is to format the message, and send it to its logger
      block, but only if the level is > the minimum severity.
@@ -180,13 +174,15 @@ public extension LoggerType {
  if customization is required, but it is probably easier to customise the
  logger block.
 */
-public class Logger: LoggerType {
+public class _Logger<Manager: LogManagerType>: LoggerType {
 
     /// The log severity of this logger instance.
     public var severity: LogSeverity
 
     /// The `LoggerBlockType` which receives the message to log
-    public let logger: LoggerBlockType
+    public var logger: LoggerBlockType {
+        return Manager.logger
+    }
 
     /**
      Initialize a new `Logger` instance.
@@ -194,10 +190,18 @@ public class Logger: LoggerType {
      - parameter severity: a `LogSeverity`.
      - parameter logger: a `LoggerBlockType` block.
     */
-    public required init(severity: LogSeverity = LogManager.globalLogSeverity, logger: LoggerBlockType = LogManager.logger) {
+    public required init(severity: LogSeverity = Manager.globalLogSeverity) {
         self.severity = severity
-        self.logger = logger
     }
+}
+
+public typealias Logger = _Logger<LogManager>
+
+public protocol LogManagerType {
+
+    static var globalLogSeverity: LogSeverity { get set }
+
+    static var logger: LoggerBlockType { get set }
 }
 
 /**
@@ -205,7 +209,7 @@ public class Logger: LoggerType {
  The log manager is responsible for holding the shared state required
  for the logger.
 */
-public class LogManager {
+public class LogManager: LogManagerType {
 
     /**
      # Global Log Severity
@@ -224,8 +228,6 @@ public class LogManager {
         get { return sharedInstance.logger }
         set { sharedInstance.logger = newValue }
     }
-
-
 
     static var sharedInstance = LogManager()
 
