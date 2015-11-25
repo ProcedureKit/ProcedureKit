@@ -49,16 +49,21 @@ custom_categories:
     - Authorize
     - CapabilityError
     - AuthorizedFor
+    - Calendar
+    - Cloud		
+    - EventsCapabilityRegistrarType
+    - EKEventStore
+    - EKAuthorizationStatus
     - _EventsCapability
+    - CloudContainerRegistrarType
+    - CloudStatus
+    - CloudCapability
+    - CloudContainerRegistrar
     - _CloudCapability
     - _HealthCapability
     - _LocationCapability
     - _PassbookCapability
     - _PhotosCapability
-    - EventsCapabilityRegistrarType
-    - EKEventStore
-    - CloudCapability
-    - CloudContainer
 
 
   - name: Features
