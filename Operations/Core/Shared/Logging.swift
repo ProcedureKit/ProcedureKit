@@ -22,7 +22,21 @@ import Foundation
  be sent to the logger's block.
 */
 public enum LogSeverity: Int, Comparable {
-    case Verbose = 0, Notice, Info, Warning, Fatal
+
+    /// Chatty
+    case Verbose = 0
+
+    /// Public Service Announcements
+    case Notice
+
+    /// Info Bulletin
+    case Info
+
+    /// Careful, Errors Occurring
+    case Warning
+
+    /// Everything Is On Fire
+    case Fatal
 }
 
 /**
