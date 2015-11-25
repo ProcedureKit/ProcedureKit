@@ -1,0 +1,94 @@
+author_name: Daniel Thorpe
+author_url: http://danthorpe.me
+module_name: Operations
+module_version: 2.3.0
+github_url: https://github.com/danthorpe/Operations
+readme: README.md
+podspec: Operations.podspec
+
+swift_version: 2.1
+xcodebuild-arguments: -scheme,Operations-iOS
+
+custom_categories:
+  - name: Foundations
+    children:
+    - Operation
+    - OperationQueue
+    - OperationCondition
+    - OperationObserver
+    - LogSeverity
+    - LoggerBlockType
+    - LoggerType
+    - Queue
+
+  - name: Building Blocks
+    children:
+    - GroupOperation
+    - BlockOperation
+    - AlertOperation
+    - ComposedOperation
+    - DelayOperation
+    - GatedOperation
+    - UIOperation
+    - MutuallyExclusive
+    - NegatedCondition
+    - SilentCondition
+    - NoFailedDependenciesCondition
+    - BlockCondition
+    - BlockObserver
+    - BackgroundObserver
+    - NetworkObserver
+    - TimeoutObserver
+
+  - name: Device Capabilities
+    children:
+    - CapabilityType
+    - CapabilityRegistrarType
+    - Capability
+    - GetAuthorizationStatus
+    - Authorize
+    - CapabilityError
+    - AuthorizedFor
+    - _EventsCapability
+    - _CloudCapability
+    - _HealthCapability
+    - _LocationCapability
+    - _PassbookCapability
+    - _PhotosCapability
+    - EventsCapabilityRegistrarType
+    - EKEventStore
+    - CloudCapability
+    - CloudContainer
+
+
+  - name: Features
+    children:
+    - ReachableOperation
+    - CloudKitOperation
+    - UserLocationOperation
+    - ReverseGeocodeOperation
+    - ReverseGeocodeUserLocationOperation
+    - NetworkOperation
+    - WebpageOperation
+    - ReachabilityCondition
+    - UserNotificationCondition
+    - RemoteNotificationCondition
+
+  - name: Address Book
+    children:
+    - AddressBook
+    - AddressBookAddPersonToGroup
+    - AddressBookCreateGroup
+    - AddressBookDisplayNewPersonViewController
+    - AddressBookDisplayPersonViewController
+    - AddressBookGetGroup
+    - AddressBookGetResource
+    - AddressBookGroup
+    - AddressBookMapPeople
+    - AddressBookOperation
+    - AddressBookPerson
+    - AddressBookRecord
+    - AddressBookRemoveGroup
+    - AddressBookRemovePersonFromGroup
+    - AddressBookSource
+
