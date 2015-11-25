@@ -72,7 +72,7 @@ extension EKAuthorizationStatus: AuthorizationStatusType {
 }
 
 /**
- The Events capability, generic over an EventsCapabilityRegistrarType. 
+ The Events capability, which is generic over an EventsCapabilityRegistrarType.
  
  Framework consumers should not use this directly, but instead 
  use Capability.Calendar. So that its usage is like this:
@@ -116,7 +116,7 @@ public class _EventsCapability<Registrar: EventsCapabilityRegistrarType>: NSObje
 
     /**
      Get the current authorization status of EventKit from the Registrar.
-     - parameter completion: a Status -> Void closure.
+     - parameter completion: a EKAuthorizationStatus -> Void closure.
      */
     public func authorizationStatus(completion: EKAuthorizationStatus -> Void) {
         completion(registrar.opr_authorizationStatusForRequirement(requirement))
@@ -144,6 +144,8 @@ extension Capability {
     /**
      # Capability.Calendar
      
+     This type represents the app's permission to access EventKit.
+
      For framework consumers - use with GetAuthorizationStatus, Authorize and
      AuthorizedFor. For example
      
@@ -162,7 +164,6 @@ extension Capability {
      or, if the permission hasn't been asked, it will ask for us automatically.
      
      ```swift
-
      // Define the operation
      let operation = ProcessCalendarsOperation()
      
