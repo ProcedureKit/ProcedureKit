@@ -170,18 +170,17 @@ public extension LoggerType {
 }
 
 /**
- # Logger
  This is a simple class which owns a logging block. It can be subclassed
  if customization is required, but it is probably easier to customise the
  logger block.
 */
-public class _Logger<Manager: LogManagerType>: LoggerType {
+class _Logger<Manager: LogManagerType>: LoggerType {
 
     /// The log severity of this logger instance.
-    public var severity: LogSeverity
+    var severity: LogSeverity
 
     /// The `LoggerBlockType` which receives the message to log
-    public var logger: LoggerBlockType {
+    var logger: LoggerBlockType {
         return Manager.logger
     }
 
@@ -191,14 +190,14 @@ public class _Logger<Manager: LogManagerType>: LoggerType {
      - parameter severity: a `LogSeverity`.
      - parameter logger: a `LoggerBlockType` block.
     */
-    public required init(severity: LogSeverity = Manager.globalLogSeverity) {
+    required init(severity: LogSeverity = Manager.globalLogSeverity) {
         self.severity = severity
     }
 }
 
-public typealias Logger = _Logger<LogManager>
+typealias Logger = _Logger<LogManager>
 
-public protocol LogManagerType {
+protocol LogManagerType {
 
     static var globalLogSeverity: LogSeverity { get set }
 
@@ -210,13 +209,13 @@ public protocol LogManagerType {
  The log manager is responsible for holding the shared state required
  for the logger.
 */
-public class LogManager: LogManagerType {
+class LogManager: LogManagerType {
 
     /**
      # Global Log Severity
      Adjust the global log level severity.
     */
-    public static var globalLogSeverity: LogSeverity {
+    static var globalLogSeverity: LogSeverity {
         get { return sharedInstance.severity }
         set { sharedInstance.severity = newValue }
     }
@@ -225,7 +224,7 @@ public class LogManager: LogManagerType {
      # Global logger block
      Set a custom logger block.
     */
-    public static var logger: LoggerBlockType {
+    static var logger: LoggerBlockType {
         get { return sharedInstance.logger }
         set { sharedInstance.logger = newValue }
     }
