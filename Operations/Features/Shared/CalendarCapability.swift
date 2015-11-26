@@ -91,7 +91,7 @@ public class _EventsCapability<Registrar: EventsCapabilityRegistrarType>: NSObje
     /// - returns: a String, the name of the capability
     public let name: String
 
-    /// - returns: a EKEntityType, the required type of the capability
+    /// - returns: the EKEntityType, the required type of the capability
     public let requirement: EKEntityType
 
     let registrar: Registrar
