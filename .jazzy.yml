@@ -13,8 +13,11 @@ custom_categories:
   - name: Foundations
     children:
     - Operation
+    - OperationError
     - OperationQueue
+    - OperationQueueDelegate
     - OperationCondition
+    - OperationConditionResult
     - OperationObserver
     - LogSeverity
     - LoggerBlockType
@@ -30,8 +33,11 @@ custom_categories:
     - DelayOperation
     - GatedOperation
     - UIOperation
+    - PresentingViewController
+    - ViewControllerDisplayStyle
     - MutuallyExclusive
     - NegatedCondition
+    - NegatedConditionError
     - SilentCondition
     - NoFailedDependenciesCondition
     - BlockCondition
@@ -39,15 +45,14 @@ custom_categories:
     - BackgroundObserver
     - NetworkObserver
     - TimeoutObserver
+    - Alert
     - AlertPresentation
 
   - name: Featured
     children:
     - ReachableOperation
+    - CloudKitOperationType
     - CloudKitOperation
-    - UserLocationOperation
-    - ReverseGeocodeOperation
-    - ReverseGeocodeUserLocationOperation
     - NetworkOperation
     - WebpageOperation
     - ReachabilityCondition
@@ -55,6 +60,18 @@ custom_categories:
     - RemoteNotificationCondition
     - URLSessionTaskOperation
     - UserConfirmationCondition
+
+  - name: Location 
+    children:
+    - LocationManagerType
+    - ReverseGeocoderType
+    - LocationOperationError
+    - UserLocationOperation
+    - _UserLocationOperation
+    - ReverseGeocodeOperation
+    - _ReverseGeocodeOperation
+    - ReverseGeocodeUserLocationOperation
+    - _ReverseGeocodeUserLocationOperation
 
   - name: Device Capabilities
     children:
@@ -101,16 +118,19 @@ custom_categories:
 
   - name: Capability.Passbook
     children:
+    - Passbook
     - _PassbookCapability
     - PassbookCapabilityRegistrarType
 
   - name: Capability.Photos
     children:
+    - Photos
     - _PhotosCapability
     - PhotosCapabilityRegistrarType
 
   - name: Address Book
     children:
+    - AddressBookPermissionRegistrarError
     - AddressBook
     - AddressBookAddPersonToGroup
     - AddressBookCreateGroup
@@ -126,4 +146,43 @@ custom_categories:
     - AddressBookRemoveGroup
     - AddressBookRemovePersonFromGroup
     - AddressBookSource
+    - AddressBookExternalChangeObserver
+    - AddressBookGroupType
+    - AddressBookPermissionRegistrar
+    - AddressBookPersonType
+    - AddressBookRecordType
+    - AddressBookSourceType
+    - AddressBookType
+    - AddressBook_GroupType
+    - AddressBook_PersonType
+    - AddressBook_SourceType
+    - AddressBookCondition
+    - AddressBookReadableProperty
+    - AddressBookWriteableProperty
+    - StorageType
+    - MultiValueRepresentable
+    - PropertyType
+    - ReadablePropertyType
+    - WriteablePropertyType
+    - LabeledValue
+    - SystemAddressBookRegistrar
+
+  - name: Contacts
+    children:
+    - ContactPredicate
+    - ContactsError
+    - ContactsPermissionError
+    - ContactSaveRequestType
+    - ContactStoreType
+    - _ContactsCondition
+    - _AddContactsToGroup
+    - _ContactsAccess
+    - _ContactsOperation
+    - _GetContacts
+    - _GetContactsGroup
+    - _RemoveContactsFromGroup
+    - _RemoveContactsGroup
+    - DisplayContactViewController
+    - DisplayCreateContactViewController
+    - SystemContactStore
 
