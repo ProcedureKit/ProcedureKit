@@ -139,7 +139,7 @@ public class _EventsCapability<Registrar: EventsCapabilityRegistrarType>: NSObje
     }
 }
 
-extension Capability {
+public extension Capability {
 
     /**
      # Capability.Calendar
@@ -186,7 +186,7 @@ extension Capability {
      queue.addOperation(operation)
      ```
     */
-    public typealias Calendar = _EventsCapability<EKEventStore>
+    typealias Calendar = _EventsCapability<EKEventStore>
 }
 
 @available(*, unavailable, renamed="AuthorizedFor(Capability.Calendar())")
