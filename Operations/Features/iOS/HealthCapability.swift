@@ -74,8 +74,24 @@ public class HealthCapabilityStatus: NSObject, AuthorizationStatusType {
  the current authorization status and request access.
 */
 public protocol HealthCapabilityRegistrarType: CapabilityRegistrarType {
+
+    /// - returns: a Bool, whether of not health data is available
     func opr_isHealthDataAvailable() -> Bool
+
+    /**
+     Get the current HKAuthorizationStatus.
+
+     - parameter requirement: the HKObjectType
+     - returns: the HKAuthorizationStatus
+     */
     func opr_authorizationStatusForType(type: HKObjectType) -> HKAuthorizationStatus
+
+    /**
+     Request access given a HealthRequirement
+
+     - parameter requirement: the HealthRequirement
+     - parameter completion: a (Bool, NSError?) -> Void closure
+     */
     func opr_requestAuthorizationForRequirement(requirement: HealthRequirement, completion: (Bool, NSError?) -> Void)
 }
 

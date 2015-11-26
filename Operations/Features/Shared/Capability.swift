@@ -86,6 +86,8 @@ public protocol CapabilityType {
  if not needed.
 */
 public protocol AuthorizationStatusType {
+
+    /// A generic type for the requirement
     typealias Requirement
 
     /**
@@ -129,6 +131,8 @@ extension Capability {
      PassKit. In which case, use VoidStatus as the nested Status type.
     */
     public struct VoidStatus: AuthorizationStatusType {
+
+        /// - returns: true, VoidStatus cannot fail to meet requirements.
         public func isRequirementMet(requirement: Void) -> Bool {
             return true
         }
@@ -256,7 +260,10 @@ public enum CapabilityError<Capability: CapabilityType>: ErrorType {
 */
 public struct AuthorizedFor<Capability: CapabilityType>: OperationCondition {
 
+    /// - returns: a String, the name of the condition
     public let name: String
+
+    /// - returns: false, is not mutually exclusive
     public let isMutuallyExclusive = false
 
     let capability: Capability

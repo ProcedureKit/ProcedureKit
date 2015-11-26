@@ -146,8 +146,8 @@ public extension Capability {
      
      This type represents the app's permission to access EventKit.
 
-     For framework consumers - use with GetAuthorizationStatus, Authorize and
-     AuthorizedFor. For example
+     For framework consumers - use with `GetAuthorizationStatus`, `Authorize` and
+     `AuthorizedFor`. For example
      
      Get the current authorization status for accessing the user's calendars:
 
