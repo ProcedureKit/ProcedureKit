@@ -500,8 +500,8 @@
 		6523DA1E1BBDEA23003A3374 /* Capability */ = {
 			isa = PBXGroup;
 			children = (
-				6523DA1F1BBDEA57003A3374 /* CalendarCapability.swift */,
 				651EF4881BBD9F8800BA962D /* Capability.swift */,
+				6523DA1F1BBDEA57003A3374 /* CalendarCapability.swift */,
 				65BF92341BBF17F10073AC6C /* CloudCapability.swift */,
 				650F7E7F1BBEC43F00502428 /* HealthCapability.swift */,
 				6523DA181BBDD21F003A3374 /* LocationCapability.swift */,
