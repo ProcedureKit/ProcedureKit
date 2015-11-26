@@ -191,7 +191,7 @@ public class _LocationCapability<Registrar: LocationCapabilityRegistrarType>: NS
 public extension Capability {
 
     /**
-     # Capability.Location
+     Capability.Location
 
      This type represents the app's permission to access CLLocationManager.
 
@@ -206,9 +206,9 @@ public extension Capability {
      }
      ```
 
-    - see: UserLocationOperation
-    - see: ReverseGeocodeOperation
-    - see: ReverseGeocodeUserLocationOperation     
+    - see: `UserLocationOperation`
+    - see: `ReverseGeocodeOperation`
+    - see: `ReverseGeocodeUserLocationOperation`
 
      */
     typealias Location = _LocationCapability<CLLocationManager>

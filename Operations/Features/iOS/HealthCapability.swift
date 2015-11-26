@@ -40,7 +40,7 @@ public struct HealthRequirement {
  for sets of samples, the authorization status is a mixture.  Therefore
  this type provides key based access to check authorization status.
 */
-public class HeathCapabilityStatus: NSObject, AuthorizationStatusType {
+public class HealthCapabilityStatus: NSObject, AuthorizationStatusType {
     typealias DictionaryType = Dictionary<String, HKAuthorizationStatus>
 
     var _dictionary = DictionaryType()
@@ -159,8 +159,8 @@ public class _HealthCapability<Registrar: HealthCapabilityRegistrarType>: NSObje
      - see: HeathCapabilityStatus
      - parameter completion: a HeathCapabilityStatus -> Void closure.
      */
-    public func authorizationStatus(completion: HeathCapabilityStatus -> Void) {
-        let status = HeathCapabilityStatus()
+    public func authorizationStatus(completion: HealthCapabilityStatus -> Void) {
+        let status = HealthCapabilityStatus()
 
         for type in requirement.share {
             status[type.identifier] = registrar.opr_authorizationStatusForType(type)
@@ -224,7 +224,7 @@ public func ==(a: HealthRequirement, b: HealthRequirement) -> Bool {
 /**
  HealthRequirement conforms to CollectionType
 */
-extension HeathCapabilityStatus: CollectionType {
+extension HealthCapabilityStatus: CollectionType {
 
     /// - returns: the DictionaryType.Index start
     public var startIndex: DictionaryType.Index {

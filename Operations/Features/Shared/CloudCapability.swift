@@ -274,8 +274,8 @@ extension Capability {
      
      This type represents the app's permission to access a particular CKContainer.
      
-     For framework consumers - use with GetAuthorizationStatus, Authorize and
-     AuthorizedFor. 
+     For framework consumers - use with `GetAuthorizationStatus`, `Authorize` and
+     `AuthorizedFor`. 
      
      For example, authorize usage of the default container
      
@@ -288,7 +288,7 @@ extension Capability {
      For example, authorize usage of another container;
      
      ```swift
-     Authorize(Capability.Cloud(containerId: "iCloud.com.myapp.my-container-id)) { available, status in
+     Authorize(Capability.Cloud(containerId: "iCloud.com.myapp.my-container-id")) { available, status in
         // etc
      }
      ```

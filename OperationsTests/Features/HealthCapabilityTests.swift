@@ -65,7 +65,7 @@ class HealthTests: XCTestCase {
 
     var types: Set<HKSampleType>!
     var requirement: HealthRequirement!
-    var status: HeathCapabilityStatus!
+    var status: HealthCapabilityStatus!
 
     func sampleTypes() -> Set<HKSampleType> {
         let heartRate = HKQuantityType.quantityTypeForIdentifier(HKQuantityTypeIdentifierHeartRate)
@@ -78,7 +78,7 @@ class HealthTests: XCTestCase {
         super.setUp()
         types = sampleTypes()
         requirement = HealthRequirement(toShare: types)
-        status = HeathCapabilityStatus()
+        status = HealthCapabilityStatus()
     }
 
     override func tearDown() {

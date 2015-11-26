@@ -39,34 +39,9 @@ custom_categories:
     - BackgroundObserver
     - NetworkObserver
     - TimeoutObserver
+    - AlertPresentation
 
-  - name: Device Capabilities
-    children:
-    - CapabilityType
-    - CapabilityRegistrarType
-    - Capability
-    - GetAuthorizationStatus
-    - Authorize
-    - CapabilityError
-    - AuthorizedFor
-    - Calendar
-    - Cloud		
-    - EventsCapabilityRegistrarType
-    - EKEventStore
-    - EKAuthorizationStatus
-    - _EventsCapability
-    - CloudContainerRegistrarType
-    - CloudStatus
-    - CloudCapability
-    - CloudContainerRegistrar
-    - _CloudCapability
-    - _HealthCapability
-    - _LocationCapability
-    - _PassbookCapability
-    - _PhotosCapability
-
-
-  - name: Features
+  - name: Featured
     children:
     - ReachableOperation
     - CloudKitOperation
@@ -78,6 +53,61 @@ custom_categories:
     - ReachabilityCondition
     - UserNotificationCondition
     - RemoteNotificationCondition
+    - URLSessionTaskOperation
+    - UserConfirmationCondition
+
+  - name: Device Capabilities
+    children:
+    - CapabilityType
+    - AuthorizationStatusType
+    - CapabilityRegistrarType
+    - Capability
+    - GetAuthorizationStatus
+    - Authorize
+    - CapabilityError
+    - AuthorizedFor
+
+  - name: Capability.Calendar
+    children:
+    - Calendar
+    - EventsCapabilityRegistrarType
+    - EKEventStore
+    - EKAuthorizationStatus
+    - _EventsCapability
+
+  - name: Capability.Cloud
+    children:
+    - Cloud		
+    - CloudContainerRegistrarType
+    - CloudStatus
+    - CloudCapability
+    - CloudContainerRegistrar
+    - _CloudCapability
+
+  - name: Capability.Health
+    children:
+    - Health
+    - HealthCapabilityStatus
+    - HealthRequirement
+    - HealthCapabilityRegistrarType
+    - _HealthCapability
+
+  - name: Capability.Location
+    children:
+    - Location
+    - LocationUsage
+    - _LocationCapability
+    - LocationCapabilityRegistrarType
+
+  - name: Capability.Passbook
+    children:
+    - _PassbookCapability
+    - PassbookCapabilityRegistrarType
+
+  - name: Capability.Photos
+    children:
+    - _PhotosCapability
+    - PhotosCapabilityRegistrarType
 
   - name: Address Book
     children:
