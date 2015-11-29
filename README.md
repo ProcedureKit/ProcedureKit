@@ -1,4 +1,4 @@
-![](header.png)
+![](https://raw.githubusercontent.com/danthorpe/Operations/development/header.png)
 
 [![Build status](https://badge.buildkite.com/4bc80b0824c6357ae071342271cb503b8994cf0cfa58645849.svg?branch=master)](https://buildkite.com/blindingskies/operations)
 [![codecov.io](http://codecov.io/github/danthorpe/Operations/coverage.svg?branch=development)](http://codecov.io/github/danthorpe/Operations?branch=development)
@@ -10,11 +10,11 @@
 
 A Swift framework inspired by WWDC 2015 Advanced NSOperations session. See the session video here: https://developer.apple.com/videos/wwdc/2015/?id=226
 
-## Status - 31th Oct, 2015
+## Status - 29th Nov, 2015
 
 As of version 2.3, Operations is a multi-platform framework, with CocoaPods support in addition to framework targets for iOS Extensions, iOS Apps, OS X, watchOS and tvOS.
 
-Current development focus is on improving test coverage (broke 60% for v2.3), and improving documentation coverage.
+Current development focus is on improving test coverage (broke 60% for v2.3), and improving documentation coverage. Documentation is hosted here: [docs.danthorpe.me/operations](http://docs.danthorpe.me/operations/2.4.0/index.html).
 
 ## Usage
 
@@ -137,7 +137,7 @@ func getCurrentLocation(completion: CLLocation -> Void) {
 
 This operation will automatically request the user's permission if the application doesn't already have the required authorization, the default is "when in use".
 
-Perhaps also you want to just test to see if authorization has already been granted, but not ask for it if it hasn't. In Apple’s original sample code from WWDC 2015, there are a number of `OperationCondition`s which express the authorization status for device or OS permissions. Things like, `LocationCondition`, and `HealthCondition`. However, in version 2.2 of Operations I moved away from this model to unify this functionality into th `CapabilityType` protocol. Where previously there were bespoke conditions (and errors) to test the status, there is now a single condition, which is initialized with a `CapabilityType`. 
+Perhaps also you want to just test to see if authorization has already been granted, but not ask for it if it hasn't. In Apple’s original sample code from WWDC 2015, there are a number of `OperationCondition`s which express the authorization status for device or OS permissions. Things like, `LocationCondition`, and `HealthCondition`. However, in version 2.2 of Operations I moved away from this model to unify this functionality into the `CapabilityType` protocol. Where previously there were bespoke conditions (and errors) to test the status, there is now a single condition, which is initialized with a `CapabilityType`. 
 
 For example, where previously you would have written this:
 
@@ -192,13 +192,7 @@ Operations is available through [CocoaPods](http://cocoapods.org). To install
 it, simply add the following line to your Podfile:
 
 ```ruby
-pod ‘Operations’
-```
-
-For Swift 2.0, add the following to your Podfile:
-
-```ruby
-pod ‘Operations’, :git => ‘https://github.com/danthorpe/Operations.git', :branch => ‘swift_2.0’
+pod 'Operations'
 ```
 
 ## Features
