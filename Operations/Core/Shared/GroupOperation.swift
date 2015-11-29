@@ -55,6 +55,10 @@ public class GroupOperation: Operation {
     starting the queue, and adding the finishing operation.
     */
     public override func execute() {
+        let _operations = operations.flatMap { return $0 as? Operation }
+        for op in _operations {
+            op.log.severity = log.severity
+        }
         addOperations(operations)
         queue.suspended = false
         queue.addOperation(finishingOperation)
@@ -66,6 +70,7 @@ public class GroupOperation: Operation {
     - parameter operation: an `NSOperation` instance.
     */
     public func addOperation(operation: NSOperation) {
+        log.info("\(operationName): add operation to group \(operation.operationName)")
         queue.addOperation(operation)
     }
 
@@ -75,6 +80,7 @@ public class GroupOperation: Operation {
     - parameter operations: an array of `NSOperation` instances.
     */
     public func addOperations(operations: [NSOperation]) {
+        log.info("\(operationName): add operations to group \(operations.map { $0.operationName })")
         queue.addOperations(operations, waitUntilFinished: false)
     }
 

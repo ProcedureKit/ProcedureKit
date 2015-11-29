@@ -76,9 +76,11 @@ public class Operation: NSOperation {
         return ["state"]
     }
 
-    private var _state = State.Initialized
     private let stateLock = NSLock()
 
+    private lazy var _log: LoggerType = Logger()
+
+    private var _state = State.Initialized
     private var _internalErrors = [ErrorType]()
 
     private(set) var conditions = [OperationCondition]()
@@ -90,6 +92,8 @@ public class Operation: NSOperation {
         }
         set (newState) {
             willChangeValueForKey("state")
+
+            log.verbose("\(operationName): \(_state) -> \(newState)")
 
             stateLock.withCriticalScope { () -> Void in
 
@@ -145,6 +149,7 @@ public class Operation: NSOperation {
         }
     }
 
+    /// - returns: a Bool indicating whether or not the quality of service is .UserInitiated
     public var userInitiated: Bool {
         get {
             return qualityOfService == .UserInitiated
@@ -163,6 +168,77 @@ public class Operation: NSOperation {
     /// Boolean indicator for whether the Operation has finished or not
     public override var finished: Bool {
         return state == .Finished
+    }
+
+    // MARK: - Logging
+
+    /** 
+     # Access the logger for this Operation
+     The `log` property can be used as the interface to access the logger.
+     e.g. to output a message with `LogSeverity.Info` from inside
+     the `Operation`, do this:
+    
+    ```swift
+    log.info("\(operationName): This is my message")
+    ```
+    
+     To adjust the instance severity of the LoggerType for the
+     `Operation`, access it via this property too:
+    
+    ```swift
+    log.severity = .Verbose
+    ```
+    
+     Note, that Swift does not allow changing the property
+     types of super classes. See `getLogger()` for info
+     about using a custom logger.
+    */
+    public var log: LoggerType {
+        get { return getLogger() }
+        set { setLogger(newValue) }
+    }
+
+    /**
+     # Custom LoggerType
+     
+     To utilise a custom logger within an `Operation` subclass
+     create an instance variable for your logger, and then
+     override this method to return it. E.g.
+     
+     ```swift
+     var _customLogger: CustomLogger // conforms to LoggerType
+
+     override func getLogger() -> LoggerType {
+         return _customLogger
+     }
+     ```
+     
+     - see: `setLogger(: LoggerType)`
+     - returns: a `LoggerType`.
+    */
+    public func getLogger() -> LoggerType {
+        return _log
+    }
+
+    /**
+     # Custom LoggerType
+
+     To utilise a custom logger within an `Operation` subclass
+     create an instance variable for your logger, and then
+     override this method to set it. E.g.
+
+     ```swift
+     var _customLogger: CustomLogger // conforms to LoggerType
+
+     override func setLogger(newLogger: LoggerType) {
+        _customLogger = CustomLogger(severity: newLogger.severity, logger: newLogger.logger)
+     }
+     ```
+
+     - see: `getLogger() -> LoggerType`
+     */
+    public func setLogger(newLogger: LoggerType) {
+        _log = Logger(severity: newLogger.severity)
     }
 
     /**
@@ -237,6 +313,7 @@ public class Operation: NSOperation {
 
         if _internalErrors.isEmpty && !cancelled {
             state = .Executing
+            log.info("\(operationName): did start")
             observers.forEach { $0.operationDidStart(self) }
             execute()
         }
@@ -263,8 +340,11 @@ public class Operation: NSOperation {
     public func cancelWithError(error: ErrorType? = .None) {
         if let error = error {
             _internalErrors.append(error)
+            log.warning("\(operationName): did cancel with error: \(error).")
         }
-        
+        else {
+            log.info("\(operationName): did cancel.")
+        }
         cancel()
     }
 
@@ -274,6 +354,7 @@ public class Operation: NSOperation {
     - parameter operation: a `NSOperation` instance.
     */
     public final func produceOperation(operation: NSOperation) {
+        log.info("\(operationName): did produce \(operation.operationName)")
         observers.forEach { $0.operation(self, didProduceOperation: operation) }
     }
     
@@ -298,9 +379,16 @@ public class Operation: NSOperation {
 
             _internalErrors.appendContentsOf(errors)
             finished(_internalErrors)
-            
+
+            if errors.isEmpty {
+                log.info("\(operationName): did finish with no errors.")
+            }
+            else {
+                log.warning("\(operationName): did finish with errors: \(errors).")
+            }
+
             observers.forEach { $0.operationDidFinish(self, errors: self._internalErrors) }
-            
+
             state = .Finished
         }
     }
@@ -351,7 +439,11 @@ A common error type for Operations. Primarily used to indicate error when
 an Operation's conditions fail.
 */
 public enum OperationError: ErrorType, Equatable {
+
+    /// Indicates that a condition of the Operation failed.
     case ConditionFailed
+
+    /// Indicates that the operation timed out.
     case OperationTimedOut(NSTimeInterval)
 }
 

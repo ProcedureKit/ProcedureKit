@@ -14,7 +14,11 @@ satisfied, indicated by `.Satisfied` or it has failed. In the
 failure case, an `ErrorType` must be associated with the result.
 */
 public enum OperationConditionResult {
+
+    /// Indicates that the condition is satisfied
     case Satisfied
+
+    /// Indicates that the condition failed with an associated error.
     case Failed(ErrorType)
 }
 

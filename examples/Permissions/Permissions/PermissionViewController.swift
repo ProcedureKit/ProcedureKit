@@ -208,8 +208,9 @@ class PermissionViewController: UIViewController {
     }
 
     func conditionsForState(state: State, silent: Bool = true) -> [OperationCondition] {
-        // Subclasses should over-ride and call this...
-        return configureConditionsForState(state, silent: silent)(BlockCondition { true })
+        // Subclasses should override and call this...
+        // return configureConditionsForState(state, silent: silent)(BlockCondition { true })
+        fatalError("Requires subclassing otherwise view controller will be left hanging.")
     }
 
     func viewsForState(state: State) -> [UIView] {
@@ -242,7 +243,7 @@ class PermissionViewController: UIViewController {
                 continueWithError(error: nil)
             }
         }
-        update.name = "Update UI for state: \(state)"
+        update.name = "Update UI for state \(state)"
 
         let conditions = conditionsForState(state, silent: silent)
         conditions.forEach { update.addCondition($0) }

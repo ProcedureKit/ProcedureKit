@@ -15,7 +15,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
 
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
-        // Override point for customization after application launch.
+
+        LogManager.globalLogSeverity = .Notice
+
         return true
     }
 
@@ -38,4 +40,3 @@ extension UIColor {
         return UIApplication.sharedApplication().keyWindow?.tintColor
     }
 }
-

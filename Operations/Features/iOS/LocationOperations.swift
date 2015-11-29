@@ -137,12 +137,15 @@ public class _UserLocationOperation<Manager: LocationManagerType>: Operation, CL
     }
 
     @objc public func locationManager(manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        if let location = locations.last where location.horizontalAccuracy <= accuracy {
-            dispatch_async(Queue.Main.queue) {
-                self.stopLocationUpdates()
-                self.location = location
-                self.completion(location)
-                self.finish()
+        if let location = locations.last {
+            log.info("\(operationName) updated last location: \(location)")
+            if location.horizontalAccuracy <= accuracy {
+                dispatch_async(Queue.Main.queue) {
+                    self.stopLocationUpdates()
+                    self.location = location
+                    self.completion(location)
+                    self.finish()
+                }
             }
         }
     }
@@ -303,9 +306,6 @@ public class _ReverseGeocodeUserLocationOperation<Geocoder, Manager where Geocod
         }
     }
 }
-
-
-// MARK: - Boring Stuff
 
 public func ==(a: LocationOperationError, b: LocationOperationError) -> Bool {
     switch (a, b) {
