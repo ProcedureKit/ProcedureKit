@@ -1,3 +1,22 @@
+# 2.4.0
+1. [[OPR-108](https://github.com/danthorpe/Operations/pull/108)]: Adds an internal logging mechanism to `Operation`. Output log information using the `log` property  of the operation. This property exposes simple log functions. E.g.
+
+   ```swift
+   let operation = MyOperation() // etc
+   operation.log.info(“This is a info message.”)
+   ```
+To use a custom logger, create a type conforming to `LoggerType` and add an instance property to your `Operation` subclass. Then override `getLogger()` and `setLogger(: LoggerType)` to get/set your custom property.
+
+The global severity is set to `.Warning`, however individual operation loggers can override to set it lower, e.g. 
+
+    ```swift
+    operation.log.verbose(“This verbose message will not be logged, as the severity threshold is .Warning”)
+    operation.log.severity = .Verbose
+    operation.log.verbose(“Now it will be logged.”)
+    ```
+2. [[OPR-109](https://github.com/danthorpe/Operations/pull/109)]: Added documentation to all of the Capability (device permissions etc) functionality. Also now uses Jazzy categories configuration to make the generated documentation more easily navigable. Documentation is hosted on here: [docs.danthorpe.me/operations](http://docs.danthorpe.me/operations/2.4.0/index.html).
+
+
 # 2.3.0
 1. [[OPR-89](https://github.com/danthorpe/Operations/pull/89)]: Adds support (via subspecs) for watchOS 2 and tvOS apps.
 2. [[OPR-101](https://github.com/danthorpe/Operations/pull/101)]: Fixes a bug where `ReachableOperation` may fail to start in some scenarios.
