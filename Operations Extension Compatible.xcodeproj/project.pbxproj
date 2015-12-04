@@ -299,11 +299,11 @@
 		6526179C1C11F61700654091 /* WebpageOperationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebpageOperationTests.swift; sourceTree = "<group>"; };
 		6526179D1C11F61700654091 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		652618051C11F75300654091 /* Operations.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Operations.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		6526180F1C11F75300654091 /* iOS OperationsTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "iOS OperationsTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		6526180F1C11F75300654091 /* iOS Extensions OperationsTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "iOS Extensions OperationsTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		652618221C11F77500654091 /* Operations.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Operations.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		6526182B1C11F77500654091 /* tvOS OperationsTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "tvOS OperationsTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		6526182B1C11F77500654091 /* tvOS Extensions OperationsTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "tvOS Extensions OperationsTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		6526183E1C11F78800654091 /* Operations.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Operations.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		652618471C11F78800654091 /* OS X OperationsTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "OS X OperationsTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		652618471C11F78800654091 /* OS X Extensions OperationsTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "OS X Extensions OperationsTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		652618551C11F7DA00654091 /* Extension Compatible.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "Extension Compatible.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -616,11 +616,11 @@
 			isa = PBXGroup;
 			children = (
 				652618051C11F75300654091 /* Operations.framework */,
-				6526180F1C11F75300654091 /* iOS OperationsTests.xctest */,
+				6526180F1C11F75300654091 /* iOS Extensions OperationsTests.xctest */,
 				652618221C11F77500654091 /* Operations.framework */,
-				6526182B1C11F77500654091 /* tvOS OperationsTests.xctest */,
+				6526182B1C11F77500654091 /* tvOS Extensions OperationsTests.xctest */,
 				6526183E1C11F78800654091 /* Operations.framework */,
-				652618471C11F78800654091 /* OS X OperationsTests.xctest */,
+				652618471C11F78800654091 /* OS X Extensions OperationsTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -655,9 +655,9 @@
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
-		652618041C11F75300654091 /* iOS Operations */ = {
+		652618041C11F75300654091 /* iOS Extensions Operations */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 652618171C11F75300654091 /* Build configuration list for PBXNativeTarget "iOS Operations" */;
+			buildConfigurationList = 652618171C11F75300654091 /* Build configuration list for PBXNativeTarget "iOS Extensions Operations" */;
 			buildPhases = (
 				652618001C11F75300654091 /* Sources */,
 				652618011C11F75300654091 /* Frameworks */,
@@ -668,14 +668,14 @@
 			);
 			dependencies = (
 			);
-			name = "iOS Operations";
+			name = "iOS Extensions Operations";
 			productName = "iOS Operations";
 			productReference = 652618051C11F75300654091 /* Operations.framework */;
 			productType = "com.apple.product-type.framework";
 		};
-		6526180E1C11F75300654091 /* iOS OperationsTests */ = {
+		6526180E1C11F75300654091 /* iOS Extensions OperationsTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 6526181A1C11F75300654091 /* Build configuration list for PBXNativeTarget "iOS OperationsTests" */;
+			buildConfigurationList = 6526181A1C11F75300654091 /* Build configuration list for PBXNativeTarget "iOS Extensions OperationsTests" */;
 			buildPhases = (
 				6526180B1C11F75300654091 /* Sources */,
 				6526180C1C11F75300654091 /* Frameworks */,
@@ -686,14 +686,14 @@
 			dependencies = (
 				652618121C11F75300654091 /* PBXTargetDependency */,
 			);
-			name = "iOS OperationsTests";
+			name = "iOS Extensions OperationsTests";
 			productName = "iOS OperationsTests";
-			productReference = 6526180F1C11F75300654091 /* iOS OperationsTests.xctest */;
+			productReference = 6526180F1C11F75300654091 /* iOS Extensions OperationsTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		652618211C11F77500654091 /* tvOS Operations */ = {
+		652618211C11F77500654091 /* tvOS Extensions Operations */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 652618331C11F77500654091 /* Build configuration list for PBXNativeTarget "tvOS Operations" */;
+			buildConfigurationList = 652618331C11F77500654091 /* Build configuration list for PBXNativeTarget "tvOS Extensions Operations" */;
 			buildPhases = (
 				6526181D1C11F77500654091 /* Sources */,
 				6526181E1C11F77500654091 /* Frameworks */,
@@ -704,14 +704,14 @@
 			);
 			dependencies = (
 			);
-			name = "tvOS Operations";
+			name = "tvOS Extensions Operations";
 			productName = "tvOS Operations";
 			productReference = 652618221C11F77500654091 /* Operations.framework */;
 			productType = "com.apple.product-type.framework";
 		};
-		6526182A1C11F77500654091 /* tvOS OperationsTests */ = {
+		6526182A1C11F77500654091 /* tvOS Extensions OperationsTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 652618361C11F77500654091 /* Build configuration list for PBXNativeTarget "tvOS OperationsTests" */;
+			buildConfigurationList = 652618361C11F77500654091 /* Build configuration list for PBXNativeTarget "tvOS Extensions OperationsTests" */;
 			buildPhases = (
 				652618271C11F77500654091 /* Sources */,
 				652618281C11F77500654091 /* Frameworks */,
@@ -722,14 +722,14 @@
 			dependencies = (
 				6526182E1C11F77500654091 /* PBXTargetDependency */,
 			);
-			name = "tvOS OperationsTests";
+			name = "tvOS Extensions OperationsTests";
 			productName = "tvOS OperationsTests";
-			productReference = 6526182B1C11F77500654091 /* tvOS OperationsTests.xctest */;
+			productReference = 6526182B1C11F77500654091 /* tvOS Extensions OperationsTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		6526183D1C11F78800654091 /* OS X Operations */ = {
+		6526183D1C11F78800654091 /* OS X Extensions Operations */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 6526184F1C11F78800654091 /* Build configuration list for PBXNativeTarget "OS X Operations" */;
+			buildConfigurationList = 6526184F1C11F78800654091 /* Build configuration list for PBXNativeTarget "OS X Extensions Operations" */;
 			buildPhases = (
 				652618391C11F78800654091 /* Sources */,
 				6526183A1C11F78800654091 /* Frameworks */,
@@ -740,14 +740,14 @@
 			);
 			dependencies = (
 			);
-			name = "OS X Operations";
+			name = "OS X Extensions Operations";
 			productName = "OS X Operations";
 			productReference = 6526183E1C11F78800654091 /* Operations.framework */;
 			productType = "com.apple.product-type.framework";
 		};
-		652618461C11F78800654091 /* OS X OperationsTests */ = {
+		652618461C11F78800654091 /* OS X Extensions OperationsTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 652618521C11F78800654091 /* Build configuration list for PBXNativeTarget "OS X OperationsTests" */;
+			buildConfigurationList = 652618521C11F78800654091 /* Build configuration list for PBXNativeTarget "OS X Extensions OperationsTests" */;
 			buildPhases = (
 				652618431C11F78800654091 /* Sources */,
 				652618441C11F78800654091 /* Frameworks */,
@@ -758,9 +758,9 @@
 			dependencies = (
 				6526184A1C11F78800654091 /* PBXTargetDependency */,
 			);
-			name = "OS X OperationsTests";
+			name = "OS X Extensions OperationsTests";
 			productName = "OS X OperationsTests";
-			productReference = 652618471C11F78800654091 /* OS X OperationsTests.xctest */;
+			productReference = 652618471C11F78800654091 /* OS X Extensions OperationsTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
 /* End PBXNativeTarget section */
@@ -792,7 +792,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 652616C31C11F48200654091 /* Build configuration list for PBXProject "Extension Compatible Frameworks" */;
+			buildConfigurationList = 652616C31C11F48200654091 /* Build configuration list for PBXProject "Operations Extension Compatible" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
@@ -804,12 +804,12 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				652618041C11F75300654091 /* iOS Operations */,
-				6526180E1C11F75300654091 /* iOS OperationsTests */,
-				652618211C11F77500654091 /* tvOS Operations */,
-				6526182A1C11F77500654091 /* tvOS OperationsTests */,
-				6526183D1C11F78800654091 /* OS X Operations */,
-				652618461C11F78800654091 /* OS X OperationsTests */,
+				652618041C11F75300654091 /* iOS Extensions Operations */,
+				6526180E1C11F75300654091 /* iOS Extensions OperationsTests */,
+				652618211C11F77500654091 /* tvOS Extensions Operations */,
+				6526182A1C11F77500654091 /* tvOS Extensions OperationsTests */,
+				6526183D1C11F78800654091 /* OS X Extensions Operations */,
+				652618461C11F78800654091 /* OS X Extensions OperationsTests */,
 			);
 		};
 /* End PBXProject section */
@@ -1077,17 +1077,17 @@
 /* Begin PBXTargetDependency section */
 		652618121C11F75300654091 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 652618041C11F75300654091 /* iOS Operations */;
+			target = 652618041C11F75300654091 /* iOS Extensions Operations */;
 			targetProxy = 652618111C11F75300654091 /* PBXContainerItemProxy */;
 		};
 		6526182E1C11F77500654091 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 652618211C11F77500654091 /* tvOS Operations */;
+			target = 652618211C11F77500654091 /* tvOS Extensions Operations */;
 			targetProxy = 6526182D1C11F77500654091 /* PBXContainerItemProxy */;
 		};
 		6526184A1C11F78800654091 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 6526183D1C11F78800654091 /* OS X Operations */;
+			target = 6526183D1C11F78800654091 /* OS X Extensions Operations */;
 			targetProxy = 652618491C11F78800654091 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -1688,7 +1688,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		652616C31C11F48200654091 /* Build configuration list for PBXProject "Extension Compatible Frameworks" */ = {
+		652616C31C11F48200654091 /* Build configuration list for PBXProject "Operations Extension Compatible" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				652616C41C11F48200654091 /* Debug */,
@@ -1697,53 +1697,59 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		652618171C11F75300654091 /* Build configuration list for PBXNativeTarget "iOS Operations" */ = {
+		652618171C11F75300654091 /* Build configuration list for PBXNativeTarget "iOS Extensions Operations" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				652618181C11F75300654091 /* Debug */,
 				652618191C11F75300654091 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
-		6526181A1C11F75300654091 /* Build configuration list for PBXNativeTarget "iOS OperationsTests" */ = {
+		6526181A1C11F75300654091 /* Build configuration list for PBXNativeTarget "iOS Extensions OperationsTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				6526181B1C11F75300654091 /* Debug */,
 				6526181C1C11F75300654091 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
-		652618331C11F77500654091 /* Build configuration list for PBXNativeTarget "tvOS Operations" */ = {
+		652618331C11F77500654091 /* Build configuration list for PBXNativeTarget "tvOS Extensions Operations" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				652618341C11F77500654091 /* Debug */,
 				652618351C11F77500654091 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
-		652618361C11F77500654091 /* Build configuration list for PBXNativeTarget "tvOS OperationsTests" */ = {
+		652618361C11F77500654091 /* Build configuration list for PBXNativeTarget "tvOS Extensions OperationsTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				652618371C11F77500654091 /* Debug */,
 				652618381C11F77500654091 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
-		6526184F1C11F78800654091 /* Build configuration list for PBXNativeTarget "OS X Operations" */ = {
+		6526184F1C11F78800654091 /* Build configuration list for PBXNativeTarget "OS X Extensions Operations" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				652618501C11F78800654091 /* Debug */,
 				652618511C11F78800654091 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
-		652618521C11F78800654091 /* Build configuration list for PBXNativeTarget "OS X OperationsTests" */ = {
+		652618521C11F78800654091 /* Build configuration list for PBXNativeTarget "OS X Extensions OperationsTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				652618531C11F78800654091 /* Debug */,
 				652618541C11F78800654091 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

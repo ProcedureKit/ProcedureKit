@@ -9,7 +9,7 @@ platform :ios do
     
     scan(
       project: "Operations Extension Compatible.xcodeproj",
-      scheme: "iOS Operations",
+      scheme: "iOS Extensions Operations",
       output_directory: ".ci/xcodebuild-data/",
       xcargs: "-derivedDataPath .ci/xcodebuild-data/"
     )
@@ -37,7 +37,7 @@ platform :mac do
     
     scan(
       project: "Operations Extension Compatible.xcodeproj",
-      scheme: "OS X Operations",
+      scheme: "OS X Extensions Operations",
       output_directory: ".ci/xcodebuild-data/",
       xcargs: "-derivedDataPath .ci/xcodebuild-data/"
     )
