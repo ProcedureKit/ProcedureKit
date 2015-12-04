@@ -1,3 +1,6 @@
+# 2.4.1
+1. [[OPR-112/113](https://github.com/danthorpe/Operations/pull/113)]: Fixes an issue where building against iOS 9 using Carthage would unleash a tidal wave of warnings related to ABAddressBook. Thanks to [@JaimeWhite](https://github.com/JamieWhite) for bringing this to my attention!
+
 # 2.4.0
 1. [[OPR-108](https://github.com/danthorpe/Operations/pull/108)]: Adds an internal logging mechanism to `Operation`. Output log information using the `log` property  of the operation. This property exposes simple log functions. E.g.
 
