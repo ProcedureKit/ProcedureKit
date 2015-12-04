@@ -17,7 +17,7 @@
                BlueprintIdentifier = "6526183D1C11F78800654091"
                BuildableName = "Operations.framework"
                BlueprintName = "OS X Extensions Operations"
-               ReferencedContainer = "container:Operations Extension Compatible.xcodeproj">
+               ReferencedContainer = "container:Operations_ExtensionCompatible.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -35,7 +35,7 @@
                BlueprintIdentifier = "652618461C11F78800654091"
                BuildableName = "OS X Extensions OperationsTests.xctest"
                BlueprintName = "OS X Extensions OperationsTests"
-               ReferencedContainer = "container:Operations Extension Compatible.xcodeproj">
+               ReferencedContainer = "container:Operations_ExtensionCompatible.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
@@ -45,7 +45,7 @@
             BlueprintIdentifier = "6526183D1C11F78800654091"
             BuildableName = "Operations.framework"
             BlueprintName = "OS X Extensions Operations"
-            ReferencedContainer = "container:Operations Extension Compatible.xcodeproj">
+            ReferencedContainer = "container:Operations_ExtensionCompatible.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
       <AdditionalOptions>
@@ -67,7 +67,7 @@
             BlueprintIdentifier = "6526183D1C11F78800654091"
             BuildableName = "Operations.framework"
             BlueprintName = "OS X Extensions Operations"
-            ReferencedContainer = "container:Operations Extension Compatible.xcodeproj">
+            ReferencedContainer = "container:Operations_ExtensionCompatible.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
       <AdditionalOptions>
@@ -85,7 +85,7 @@
             BlueprintIdentifier = "6526183D1C11F78800654091"
             BuildableName = "Operations.framework"
             BlueprintName = "OS X Extensions Operations"
-            ReferencedContainer = "container:Operations Extension Compatible.xcodeproj">
+            ReferencedContainer = "container:Operations_ExtensionCompatible.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
    </ProfileAction>
