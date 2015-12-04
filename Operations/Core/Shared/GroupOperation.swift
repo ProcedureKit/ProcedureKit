@@ -25,7 +25,7 @@ public class GroupOperation: Operation {
     private let queue = OperationQueue()
     private let operations: [NSOperation]
     private let finishingOperation = NSBlockOperation(block: {})
-    private var aggregateErrors = Array<ErrorType>()
+    public private(set) var aggregateErrors = Array<ErrorType>()
 
     /**
     Designated initializer.
