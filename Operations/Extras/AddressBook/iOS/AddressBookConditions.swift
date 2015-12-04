@@ -9,6 +9,7 @@
 import Foundation
 import AddressBook
 
+@available(iOS, deprecated=9.0)
 public struct AddressBookCondition: OperationCondition {
 
     public enum Error: ErrorType {
