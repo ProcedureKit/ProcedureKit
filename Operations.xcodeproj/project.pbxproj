@@ -10,7 +10,6 @@
 		652617AE1C11F62A00654091 /* Operations.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 652617A31C11F62A00654091 /* Operations.framework */; };
 		652617D71C11F66200654091 /* Operations.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 652617CD1C11F66200654091 /* Operations.framework */; };
 		652617F31C11F72B00654091 /* Operations.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 652617E91C11F72A00654091 /* Operations.framework */; };
-		652618571C11F84800654091 /* Extension Compatible.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 652618561C11F84800654091 /* Extension Compatible.xcconfig */; };
 		652618581C11F8C800654091 /* Operations.h in Headers */ = {isa = PBXBuildFile; fileRef = 652617071C11F5EB00654091 /* Operations.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		652618591C11F8C800654091 /* Operations.h in Headers */ = {isa = PBXBuildFile; fileRef = 652617071C11F5EB00654091 /* Operations.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6526185A1C11F8C900654091 /* Operations.h in Headers */ = {isa = PBXBuildFile; fileRef = 652617071C11F5EB00654091 /* Operations.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -909,7 +908,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				652618571C11F84800654091 /* Extension Compatible.xcconfig in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1242,6 +1240,8 @@
 		652616BD1C11F44000654091 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ENABLE_TESTABILITY = YES;
+				ONLY_ACTIVE_ARCH = YES;
 			};
 			name = Debug;
 		};
