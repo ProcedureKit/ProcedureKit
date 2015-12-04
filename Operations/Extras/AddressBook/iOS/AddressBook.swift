@@ -29,6 +29,8 @@ and it lacked the necessary hooks for testability.
 
 public protocol PropertyType {
     typealias ValueType
+
+    @available(iOS, deprecated=9.0)
     var id: ABPropertyID { get }
 }
 
@@ -55,8 +57,14 @@ public protocol MultiValueRepresentable {
 // MARK: - AddressBookPermissionRegistrar
 
 public protocol AddressBookPermissionRegistrar {
+
+    @available(iOS, deprecated=9.0)
     var status: ABAuthorizationStatus { get }
+
+    @available(iOS, deprecated=9.0)
     func createAddressBook() -> (ABAddressBookRef?, AddressBookPermissionRegistrarError?)
+
+    @available(iOS, deprecated=9.0)
     func requestAccessToAddressBook(addressBook: ABAddressBookRef, completion: (AddressBookPermissionRegistrarError?) -> Void)
 }
 
@@ -87,6 +95,7 @@ public protocol AddressBookType {
 
     var numberOfPeople: Int { get }
 
+    @available(iOS, deprecated=9.0)
     func personWithID<P: AddressBook_PersonType where P.Storage == PersonStorage>(id: ABRecordID) -> P?
 
     func peopleWithName<P: AddressBook_PersonType where P.Storage == PersonStorage>(name: String) -> [P]
@@ -101,6 +110,7 @@ public protocol AddressBookType {
 
     var numberOfGroups: Int { get }
 
+    @available(iOS, deprecated=9.0)
     func groupWithID<G: AddressBook_GroupType where G.Storage == GroupStorage>(id: ABRecordID) -> G?
 
     func groups<G: AddressBook_GroupType where G.Storage == GroupStorage>() -> [G]
@@ -111,6 +121,7 @@ public protocol AddressBookType {
 
     func defaultSource<S: AddressBook_SourceType where S.Storage == SourceStorage>() -> S
 
+    @available(iOS, deprecated=9.0)
     func sourceWithID<S: AddressBook_SourceType where S.Storage == SourceStorage>(id: ABRecordID) -> S?
 
     func sources<S: AddressBook_SourceType where S.Storage == SourceStorage>() -> [S]
@@ -130,6 +141,7 @@ public protocol StorageType {
 
 public protocol AddressBookRecordType: StorageType {
 
+    @available(iOS, deprecated=9.0)
     var id: ABRecordID { get }
 
     var recordKind: AddressBook.RecordKind { get }
@@ -641,6 +653,7 @@ public final class AddressBook: AddressBookType {
 
 }
 
+@available(iOS, deprecated=9.0)
 extension AddressBook {
 
     public func requestAccess(completion: (AddressBookPermissionRegistrarError?) -> Void) {
@@ -656,6 +669,7 @@ extension AddressBook {
     }
 }
 
+@available(iOS, deprecated=9.0)
 extension AddressBook { // Records
 
     public func addRecord<R: AddressBookRecordType where R.Storage == RecordStorage>(record: R) -> ErrorType? {
@@ -675,6 +689,7 @@ extension AddressBook { // Records
     }
 }
 
+@available(iOS, deprecated=9.0)
 extension AddressBook { // People
 
     public var numberOfPeople: Int {
@@ -728,6 +743,7 @@ extension AddressBook { // People
     }
 }
 
+@available(iOS, deprecated=9.0)
 extension AddressBook { // Groups
 
     public var numberOfGroups: Int {
@@ -758,6 +774,7 @@ extension AddressBook { // Groups
     }
 }
 
+@available(iOS, deprecated=9.0)
 extension AddressBook { // Sources
 
     public func defaultSource<S : AddressBook_SourceType where S.Storage == SourceStorage>() -> S {
@@ -783,6 +800,7 @@ extension AddressBook { // Sources
 
 // MARK: - Property
 
+@available(iOS, deprecated=9.0)
 public struct AddressBookReadableProperty<Value>: ReadablePropertyType {
     public typealias ValueType = Value
 
@@ -795,6 +813,7 @@ public struct AddressBookReadableProperty<Value>: ReadablePropertyType {
     }
 }
 
+@available(iOS, deprecated=9.0)
 public struct AddressBookWriteableProperty<Value>: ReadablePropertyType, WriteablePropertyType {
     public typealias ValueType = Value
 
@@ -811,6 +830,7 @@ public struct AddressBookWriteableProperty<Value>: ReadablePropertyType, Writeab
 
 // MARK: - LabeledValue
 
+@available(iOS, deprecated=9.0)
 public struct LabeledValue<Value: MultiValueRepresentable>: CustomStringConvertible, CustomDebugStringConvertible {
 
     static func read(multiValue: ABMultiValueRef) -> [LabeledValue<Value>] {
@@ -853,6 +873,7 @@ public struct LabeledValue<Value: MultiValueRepresentable>: CustomStringConverti
 
 // MARK: - Record
 
+@available(iOS, deprecated=9.0)
 public class AddressBookRecord: AddressBookRecordType, Equatable {
 
     public let storage: ABRecordRef
@@ -900,12 +921,14 @@ public class AddressBookRecord: AddressBookRecordType, Equatable {
     }
 }
 
+@available(iOS, deprecated=9.0)
 public func ==(a: AddressBookRecord, b: AddressBookRecord) -> Bool {
     return a.id == b.id
 }
 
 // MARK: - Person
 
+@available(iOS, deprecated=9.0)
 public class AddressBookPerson: AddressBookRecord, AddressBookPersonType {
 
     public struct Property {
@@ -956,6 +979,7 @@ public class AddressBookPerson: AddressBookRecord, AddressBookPersonType {
 
 // MARK: - Group
 
+@available(iOS, deprecated=9.0)
 public class AddressBookGroup: AddressBookRecord, AddressBookGroupType {
 
     public struct Property {
@@ -1008,6 +1032,7 @@ public class AddressBookGroup: AddressBookRecord, AddressBookGroupType {
 
 // MARK: - Source
 
+@available(iOS, deprecated=9.0)
 public class AddressBookSource: AddressBookRecord, AddressBookSourceType {
 
     public struct Property {
@@ -1080,10 +1105,12 @@ func writer<T: RawRepresentable>(value: T) -> CFTypeRef {
     return value.rawValue as! CFTypeRef
 }
 
+@available(iOS, deprecated=9.0)
 func reader<T: MultiValueRepresentable>(value: CFTypeRef) -> [LabeledValue<T>] {
     return LabeledValue.read(value as ABMultiValueRef)
 }
 
+@available(iOS, deprecated=9.0)
 func writer<T: MultiValueRepresentable>(value: [LabeledValue<T>]) -> CFTypeRef {
     return LabeledValue.write(value)
 }
@@ -1107,6 +1134,7 @@ public enum AddressBookPermissionRegistrarError: ErrorType {
     case AddressBookAccessDenied
 }
 
+@available(iOS, deprecated=9.0)
 public struct SystemAddressBookRegistrar: AddressBookPermissionRegistrar {
 
     public var status: ABAuthorizationStatus {

@@ -45,6 +45,7 @@ To configure the controller, you can do this:
     )
     queue.addOperation(show)
 */
+@available(iOS, deprecated=9.0)
 public class AddressBookDisplayPersonViewController<F: PresentingViewController>: GroupOperation {
 
     let delegate: ABPersonViewControllerDelegate
@@ -74,6 +75,7 @@ public class AddressBookDisplayPersonViewController<F: PresentingViewController>
     }
 }
 
+@available(iOS, deprecated=9.0)
 public class AddressBookDisplayNewPersonViewController<F: PresentingViewController>: GroupOperation {
 
     let delegate: ABNewPersonViewControllerDelegate
