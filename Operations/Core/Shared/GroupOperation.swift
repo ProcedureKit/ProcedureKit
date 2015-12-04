@@ -84,7 +84,7 @@ public class GroupOperation: Operation {
         queue.addOperations(operations, waitUntilFinished: false)
     }
 
-    final func aggregateError(error: ErrorType) {
+    public final func aggregateError(error: ErrorType) {
         aggregateErrors.append(error)
     }
 
