@@ -278,6 +278,7 @@ public class AddressBookRemoveGroup: AddressBookGetGroup {
 @available(iOS, deprecated=9.0)
 public class AddressBookAddPersonToGroup: AddressBookGetResource {
 
+    @available(iOS, deprecated=9.0)    
     public init(group: String, personID: ABRecordID) {
         super.init()
         groupQuery = .Name(group)

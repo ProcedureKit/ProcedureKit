@@ -1,0 +1,10 @@
+framework module Operations {
+  umbrella header "Operations.h"
+
+  export *
+  module * { export * }
+}
+
+module Operations.Swift {
+    header "Operations-Swift.h"
+}
