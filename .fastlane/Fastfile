@@ -8,7 +8,7 @@ platform :ios do
   lane :test_extension do
     
     scan(
-      project: "Extension Compatible Frameworks.xcodeproj",
+      project: "Operations Extension Compatible.xcodeproj",
       scheme: "iOS Operations",
       output_directory: ".ci/xcodebuild-data/",
       xcargs: "-derivedDataPath .ci/xcodebuild-data/"
@@ -36,7 +36,7 @@ platform :mac do
   lane :test_extension do
     
     scan(
-      project: "Extension Compatible Frameworks.xcodeproj",
+      project: "Operations Extension Compatible.xcodeproj",
       scheme: "OS X Operations",
       output_directory: ".ci/xcodebuild-data/",
       xcargs: "-derivedDataPath .ci/xcodebuild-data/"
