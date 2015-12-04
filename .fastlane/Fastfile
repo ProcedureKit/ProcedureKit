@@ -4,31 +4,55 @@ end
 
 platform :ios do
 
-  desc "Runs the iOS Extension only framework"
+  desc "Runs the iOS Extension compatible framework"
   lane :test_extension do
-  	xctest scheme: 'Operations-iOS-Extension', 
-      sdk: 'iphonesimulator', 
-      destination: 'platform=iOS Simulator,name=iPhone 6,OS=9.1',
-      derivedDataPath: '.fastlane/xcodebuild-data'
+    
+    scan(
+      project: "Extension Compatible Frameworks.xcodeproj"
+      scheme: "iOS Operations",
+      output_directory: ".ci/xcodebuild-data/",
+      xcargs: "-derivedDataPath .ci/xcodebuild-data/"
+    )
+
   end
 
   desc "Runs all the tests"
-  lane :test_ios do
-  	xctest scheme: 'Operations-iOS', 
-      sdk: 'iphonesimulator', 
-      destination: 'platform=iOS Simulator,name=iPhone 6,OS=9.1',
-      derivedDataPath: '.fastlane/xcodebuild-data'
+  lane :test do
+    
+    scan(
+      project: "Operations.xcodeproj"
+      scheme: "iOS Operations",
+      output_directory: ".ci/xcodebuild-data/",
+      xcargs: "-derivedDataPath .ci/xcodebuild-data/"
+    )
+
   end
 
 end
 
 platform :mac do
 
+  desc "Runs the OS X Extension compatible framework"
+  lane :test_extension do
+    
+    scan(
+      project: "Extension Compatible Frameworks.xcodeproj"
+      scheme: "OS X Operations",
+      output_directory: ".ci/xcodebuild-data/",
+      xcargs: "-derivedDataPath .ci/xcodebuild-data/"
+    )
+
+  end
+
   desc "Runs all the tests"
-  lane :test_mac do
-  	xctest scheme: 'Operations-OSX', 
-      sdk: 'macosx', 
-      destination: 'platform=OS X',
-      derivedDataPath: '.fastlane/xcodebuild-data'
+  lane :test do
+
+    scan(
+      project: "Operations.xcodeproj"
+      scheme: "OS X Operations",
+      output_directory: ".ci/xcodebuild-data/",
+      xcargs: "-derivedDataPath .ci/xcodebuild-data/"
+    )
+
   end
 end
