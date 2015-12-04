@@ -62,14 +62,11 @@ session Advanced NSOperations: https://developer.apple.com/videos/wwdc/2015/?id=
     ss.exclude_files = [
       'Operations/Core/iOS/BackgroundObserver.swift',
       'Operations/Core/iOS/NetworkObserver.swift',
+      'Operations/Features/iOS/HealthCapability.swift',
+      'Operations/Features/iOS/LocationCapability.swift',
+      'Operations/Features/iOS/LocationOperations.swift',
       'Operations/Features/iOS/RemoteNotificationCondition.swift',
       'Operations/Features/iOS/UserNotificationCondition.swift',
-      'Operations/Features/iOS/LocationCapability.swift',      
-      'Operations/Features/iOS/CalendarCapability.swift',            
-      'Operations/Features/iOS/HealthCapability.swift',
-      'Operations/Features/iOS/ReachabilityCondition.swift',
-      'Operations/Features/iOS/LocationOperations.swift',
-      'Operations/Features/iOS/WebpageOperation.swift',
     ]
   end
 
@@ -88,17 +85,17 @@ session Advanced NSOperations: https://developer.apple.com/videos/wwdc/2015/?id=
       'Operations/Core/iOS/NetworkObserver.swift',
       'Operations/Core/iOS/AlertOperation.swift',
       'Operations/Core/iOS/UIOperation.swift',
-      'Operations/Features/Shared/CloudCapability.swift',
+      'Operations/Features/iOS/LocationCapability.swift',
+      'Operations/Features/iOS/LocationOperations.swift',
       'Operations/Features/iOS/PhotosCapability.swift',
       'Operations/Features/iOS/RemoteNotificationCondition.swift',
       'Operations/Features/iOS/UserConfirmationCondition.swift',
       'Operations/Features/iOS/UserNotificationCondition.swift',
-      'Operations/Features/iOS/LocationCapability.swift',
+      'Operations/Features/iOS/WebpageOperation.swift',
+      'Operations/Features/Shared/CloudCapability.swift',
       'Operations/Features/Shared/ReachabilityCondition.swift',
       'Operations/Features/Shared/CloudKitOperation.swift',
-      'Operations/Features/iOS/LocationOperations.swift',
       'Operations/Features/Shared/ReachableOperation.swift',
-      'Operations/Features/iOS/WebpageOperation.swift',
       'Operations/Features/Shared/Reachability.swift',
     ]
   end
@@ -114,16 +111,16 @@ session Advanced NSOperations: https://developer.apple.com/videos/wwdc/2015/?id=
       'Operations/Features/iOS'
     ]
     ss.exclude_files = [
-      'Operations/Features/Shared/CalendarCapability.swift',
-      'Operations/Features/Shared/CloudCapability.swift',      
+      'Operations/Features/iOS/HealthCapability.swift',
+      'Operations/Features/iOS/LocationCapability.swift',
+      'Operations/Features/iOS/LocationOperations.swift',      
       'Operations/Features/iOS/PassbookCapability.swift',
       'Operations/Features/iOS/PhotosCapability.swift',
       'Operations/Features/iOS/RemoteNotificationCondition.swift',
       'Operations/Features/iOS/UserNotificationCondition.swift',
-      'Operations/Features/iOS/HealthCapability.swift',
-      'Operations/Features/iOS/LocationCapability.swift',
-      'Operations/Features/iOS/LocationOperations.swift',
       'Operations/Features/iOS/WebpageOperation.swift',
+      'Operations/Features/Shared/CalendarCapability.swift',
+      'Operations/Features/Shared/CloudCapability.swift',      
     ]
   end
 

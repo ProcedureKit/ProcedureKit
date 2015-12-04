@@ -9,6 +9,8 @@
 import XCTest
 @testable import Operations
 
+@available(iOS, deprecated=9, message="Use the log property of Operation directly.")
+@available(OSX, deprecated=10.11, message="Use the log property of Operation directly.")
 class LoggingObserverTests: OperationTests {
 
     func test__logger_receives_messages_when_operation_is_named() {

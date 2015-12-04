@@ -14,10 +14,10 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "65EEC1491BAF40CE0020A9BD"
+               BlueprintIdentifier = "652618041C11F75300654091"
                BuildableName = "Operations.framework"
-               BlueprintName = "Operations-iOS"
-               ReferencedContainer = "container:Operations.xcodeproj">
+               BlueprintName = "iOS Extensions Operations"
+               ReferencedContainer = "container:Operations_ExtensionCompatible.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -26,27 +26,26 @@
       buildConfiguration = "Debug"
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
-      shouldUseLaunchSchemeArgsEnv = "YES"
-      codeCoverageEnabled = "YES">
+      shouldUseLaunchSchemeArgsEnv = "YES">
       <Testables>
          <TestableReference
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "65EEC1531BAF40CF0020A9BD"
-               BuildableName = "Operations-iOSTests.xctest"
-               BlueprintName = "Operations-iOSTests"
-               ReferencedContainer = "container:Operations.xcodeproj">
+               BlueprintIdentifier = "6526180E1C11F75300654091"
+               BuildableName = "iOS Extensions OperationsTests.xctest"
+               BlueprintName = "iOS Extensions OperationsTests"
+               ReferencedContainer = "container:Operations_ExtensionCompatible.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "65EEC1491BAF40CE0020A9BD"
+            BlueprintIdentifier = "652618041C11F75300654091"
             BuildableName = "Operations.framework"
-            BlueprintName = "Operations-iOS"
-            ReferencedContainer = "container:Operations.xcodeproj">
+            BlueprintName = "iOS Extensions Operations"
+            ReferencedContainer = "container:Operations_ExtensionCompatible.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
       <AdditionalOptions>
@@ -65,10 +64,10 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "65EEC1491BAF40CE0020A9BD"
+            BlueprintIdentifier = "652618041C11F75300654091"
             BuildableName = "Operations.framework"
-            BlueprintName = "Operations-iOS"
-            ReferencedContainer = "container:Operations.xcodeproj">
+            BlueprintName = "iOS Extensions Operations"
+            ReferencedContainer = "container:Operations_ExtensionCompatible.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
       <AdditionalOptions>
@@ -83,10 +82,10 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "65EEC1491BAF40CE0020A9BD"
+            BlueprintIdentifier = "652618041C11F75300654091"
             BuildableName = "Operations.framework"
-            BlueprintName = "Operations-iOS"
-            ReferencedContainer = "container:Operations.xcodeproj">
+            BlueprintName = "iOS Extensions Operations"
+            ReferencedContainer = "container:Operations_ExtensionCompatible.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
    </ProfileAction>

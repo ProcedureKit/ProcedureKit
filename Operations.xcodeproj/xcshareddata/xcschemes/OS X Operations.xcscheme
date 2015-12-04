@@ -14,9 +14,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "65EEC1DD1BAF4B230020A9BD"
+               BlueprintIdentifier = "652617E81C11F72A00654091"
                BuildableName = "Operations.framework"
-               BlueprintName = "Operations-iOS-Extension"
+               BlueprintName = "OS X Operations"
                ReferencedContainer = "container:Operations.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -33,9 +33,9 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "65EEC1E61BAF4B230020A9BD"
-               BuildableName = "Operations-iOS-ExtensionTests.xctest"
-               BlueprintName = "Operations-iOS-ExtensionTests"
+               BlueprintIdentifier = "652617F11C11F72A00654091"
+               BuildableName = "OS X OperationsTests.xctest"
+               BlueprintName = "OS X OperationsTests"
                ReferencedContainer = "container:Operations.xcodeproj">
             </BuildableReference>
          </TestableReference>
@@ -43,9 +43,9 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "65EEC1DD1BAF4B230020A9BD"
+            BlueprintIdentifier = "652617E81C11F72A00654091"
             BuildableName = "Operations.framework"
-            BlueprintName = "Operations-iOS-Extension"
+            BlueprintName = "OS X Operations"
             ReferencedContainer = "container:Operations.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
@@ -65,9 +65,9 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "65EEC1DD1BAF4B230020A9BD"
+            BlueprintIdentifier = "652617E81C11F72A00654091"
             BuildableName = "Operations.framework"
-            BlueprintName = "Operations-iOS-Extension"
+            BlueprintName = "OS X Operations"
             ReferencedContainer = "container:Operations.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
@@ -83,9 +83,9 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "65EEC1DD1BAF4B230020A9BD"
+            BlueprintIdentifier = "652617E81C11F72A00654091"
             BuildableName = "Operations.framework"
-            BlueprintName = "Operations-iOS-Extension"
+            BlueprintName = "OS X Operations"
             ReferencedContainer = "container:Operations.xcodeproj">
          </BuildableReference>
       </MacroExpansion>

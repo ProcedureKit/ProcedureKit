@@ -14,9 +14,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "652F5A481BAF79BA00BB5F71"
+               BlueprintIdentifier = "652617CC1C11F66200654091"
                BuildableName = "Operations.framework"
-               BlueprintName = "Operations-tvOS"
+               BlueprintName = "tvOS Operations"
                ReferencedContainer = "container:Operations.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -26,15 +26,26 @@
       buildConfiguration = "Debug"
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
-      shouldUseLaunchSchemeArgsEnv = "YES">
+      shouldUseLaunchSchemeArgsEnv = "YES"
+      codeCoverageEnabled = "YES">
       <Testables>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "652617D51C11F66200654091"
+               BuildableName = "tvOS OperationsTests.xctest"
+               BlueprintName = "tvOS OperationsTests"
+               ReferencedContainer = "container:Operations.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "652F5A481BAF79BA00BB5F71"
+            BlueprintIdentifier = "652617CC1C11F66200654091"
             BuildableName = "Operations.framework"
-            BlueprintName = "Operations-tvOS"
+            BlueprintName = "tvOS Operations"
             ReferencedContainer = "container:Operations.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
@@ -54,9 +65,9 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "652F5A481BAF79BA00BB5F71"
+            BlueprintIdentifier = "652617CC1C11F66200654091"
             BuildableName = "Operations.framework"
-            BlueprintName = "Operations-tvOS"
+            BlueprintName = "tvOS Operations"
             ReferencedContainer = "container:Operations.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
@@ -72,9 +83,9 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "652F5A481BAF79BA00BB5F71"
+            BlueprintIdentifier = "652617CC1C11F66200654091"
             BuildableName = "Operations.framework"
-            BlueprintName = "Operations-tvOS"
+            BlueprintName = "tvOS Operations"
             ReferencedContainer = "container:Operations.xcodeproj">
          </BuildableReference>
       </MacroExpansion>

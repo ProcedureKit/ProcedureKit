@@ -14,10 +14,10 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "65EEC1A11BAF46210020A9BD"
+               BlueprintIdentifier = "652618211C11F77500654091"
                BuildableName = "Operations.framework"
-               BlueprintName = "Operations-OSX"
-               ReferencedContainer = "container:Operations.xcodeproj">
+               BlueprintName = "tvOS Extensions Operations"
+               ReferencedContainer = "container:Operations_ExtensionCompatible.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -26,27 +26,26 @@
       buildConfiguration = "Debug"
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
-      shouldUseLaunchSchemeArgsEnv = "YES"
-      codeCoverageEnabled = "YES">
+      shouldUseLaunchSchemeArgsEnv = "YES">
       <Testables>
          <TestableReference
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "65EEC1AA1BAF46210020A9BD"
-               BuildableName = "Operations-OSXTests.xctest"
-               BlueprintName = "Operations-OSXTests"
-               ReferencedContainer = "container:Operations.xcodeproj">
+               BlueprintIdentifier = "6526182A1C11F77500654091"
+               BuildableName = "tvOS Extensions OperationsTests.xctest"
+               BlueprintName = "tvOS Extensions OperationsTests"
+               ReferencedContainer = "container:Operations_ExtensionCompatible.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "65EEC1A11BAF46210020A9BD"
+            BlueprintIdentifier = "652618211C11F77500654091"
             BuildableName = "Operations.framework"
-            BlueprintName = "Operations-OSX"
-            ReferencedContainer = "container:Operations.xcodeproj">
+            BlueprintName = "tvOS Extensions Operations"
+            ReferencedContainer = "container:Operations_ExtensionCompatible.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
       <AdditionalOptions>
@@ -65,10 +64,10 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "65EEC1A11BAF46210020A9BD"
+            BlueprintIdentifier = "652618211C11F77500654091"
             BuildableName = "Operations.framework"
-            BlueprintName = "Operations-OSX"
-            ReferencedContainer = "container:Operations.xcodeproj">
+            BlueprintName = "tvOS Extensions Operations"
+            ReferencedContainer = "container:Operations_ExtensionCompatible.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
       <AdditionalOptions>
@@ -83,10 +82,10 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "65EEC1A11BAF46210020A9BD"
+            BlueprintIdentifier = "652618211C11F77500654091"
             BuildableName = "Operations.framework"
-            BlueprintName = "Operations-OSX"
-            ReferencedContainer = "container:Operations.xcodeproj">
+            BlueprintName = "tvOS Extensions Operations"
+            ReferencedContainer = "container:Operations_ExtensionCompatible.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
    </ProfileAction>
