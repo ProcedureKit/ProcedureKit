@@ -302,7 +302,6 @@
 		652617021C11F5EB00654091 /* ReachabilityCondition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReachabilityCondition.swift; sourceTree = "<group>"; };
 		652617031C11F5EB00654091 /* ReachableOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReachableOperation.swift; sourceTree = "<group>"; };
 		652617051C11F5EB00654091 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		652617061C11F5EB00654091 /* module.modulemap */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.module-map"; path = module.modulemap; sourceTree = "<group>"; };
 		652617071C11F5EB00654091 /* Operations.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Operations.h; sourceTree = "<group>"; };
 		652617081C11F5EB00654091 /* Operations.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Operations.xcconfig; sourceTree = "<group>"; };
 		6526170B1C11F5EB00654091 /* AlertOperationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertOperationTests.swift; sourceTree = "<group>"; };
@@ -572,7 +571,6 @@
 			isa = PBXGroup;
 			children = (
 				652617071C11F5EB00654091 /* Operations.h */,
-				652617061C11F5EB00654091 /* module.modulemap */,
 				652617051C11F5EB00654091 /* Info.plist */,
 				652618561C11F84800654091 /* Extension Compatible.xcconfig */,
 				652617081C11F5EB00654091 /* Operations.xcconfig */,
