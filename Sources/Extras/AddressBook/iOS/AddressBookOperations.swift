@@ -71,7 +71,7 @@ public class AddressBookGetResource: AddressBookOperation {
 
     public enum Query {
 
-        case ID(ABRecordID)
+        case ID(Int32)
         case Name(String)
 
         var name: String? {
@@ -279,13 +279,13 @@ public class AddressBookRemoveGroup: AddressBookGetGroup {
 public class AddressBookAddPersonToGroup: AddressBookGetResource {
 
     @available(iOS, deprecated=9.0)    
-    public init(group: String, personID: ABRecordID) {
+    public init(group: String, personID: Int32) {
         super.init()
         groupQuery = .Name(group)
         personQuery = .ID(personID)
     }
 
-    init(registrar: AddressBookPermissionRegistrar, group: String, personID: ABRecordID) {
+    init(registrar: AddressBookPermissionRegistrar, group: String, personID: Int32) {
         super.init(registrar: registrar)
         groupQuery = .Name(group)
         personQuery = .ID(personID)
@@ -317,13 +317,13 @@ public class AddressBookAddPersonToGroup: AddressBookGetResource {
 @available(iOS, deprecated=9.0)
 public class AddressBookRemovePersonFromGroup: AddressBookGetResource {
 
-    public init(group: String, personID: ABRecordID) {
+    public init(group: String, personID: Int32) {
         super.init()
         groupQuery = .Name(group)
         personQuery = .ID(personID)
     }
 
-    init(registrar: AddressBookPermissionRegistrar, group: String, personID: ABRecordID) {
+    init(registrar: AddressBookPermissionRegistrar, group: String, personID: Int32) {
         super.init(registrar: registrar)
         groupQuery = .Name(group)
         personQuery = .ID(personID)
