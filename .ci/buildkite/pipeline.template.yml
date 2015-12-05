@@ -4,23 +4,23 @@ steps:
     command: .ci/scripts/test-ios
     agents:
       name: "$BUILDKITE_AGENT_META_DATA_NAME"	
-  -
-    name: ":fastlane: Test iOS Extension"
-    command: .ci/scripts/test-ios-extension
-    agents:
-      name: "$BUILDKITE_AGENT_META_DATA_NAME"
-  -
-    type: "waiter"
+  # -
+  #   name: ":fastlane: Test iOS Extension"
+  #   command: .ci/scripts/test-ios-extension
+  #   agents:
+  #     name: "$BUILDKITE_AGENT_META_DATA_NAME"
+  # -
+  #   type: "waiter"
   -
     name: ":fastlane: Test Mac OS X"
     command: .ci/scripts/test-osx
     agents:
       name: "$BUILDKITE_AGENT_META_DATA_NAME"
-  -
-    name: ":fastlane: Test OS X Extension"
-    command: .ci/scripts/test-osx-extension
-    agents:
-      name: "$BUILDKITE_AGENT_META_DATA_NAME"
+  # -
+  #   name: ":fastlane: Test OS X Extension"
+  #   command: .ci/scripts/test-osx-extension
+  #   agents:
+  #     name: "$BUILDKITE_AGENT_META_DATA_NAME"
   -
     type: "waiter"
   -
