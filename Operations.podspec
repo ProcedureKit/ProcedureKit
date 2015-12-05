@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name              = "Operations"
-  s.version           = "2.4.0"
+  s.version           = "2.4.1"
   s.summary           = "Powerful NSOperation subclasses in Swift."
   s.description       = <<-DESC
   
@@ -13,117 +13,100 @@ session Advanced NSOperations: https://developer.apple.com/videos/wwdc/2015/?id=
   s.author            = { "Daniel Thorpe" => "@danthorpe" }
   s.source            = { :git => "https://github.com/danthorpe/Operations.git", :tag => s.version.to_s }
   s.module_name       = 'Operations'
-  s.documentation_url = 'http://docs.danthorpe.me/operations/2.4.0/index.html'
+  s.documentation_url = 'http://docs.danthorpe.me/operations/2.4.1/index.html'
   s.social_media_url  = 'https://twitter.com/danthorpe'
   s.requires_arc      = true
-  s.default_subspec   = 'App'
-  s.ios.deployment_target = "8.0"
-  s.osx.deployment_target = "10.10"
+  s.ios.deployment_target = '8.0'
+  s.watchos.deployment_target = '2.0'
+  s.tvos.deployment_target = '9.0'
+  s.osx.deployment_target = '10.10'
 
-  # Creates a framework suitable for an iOS or Mac OS application
-  s.subspec 'App' do |ss|
+  # Defaul spec is 'Standard'
+  s.default_subspec   = 'Standard'
+
+  # Creates a framework suitable for an iOS, watchOS, tvOS or Mac OS application
+  s.subspec 'Standard' do |ss|
     ss.source_files      = [
-      'Operations/Core/Shared', 
-      'Operations/Core/iOS',       
-      'Operations/Features/Shared',
-      'Operations/Features/iOS'      
+      'Sources/Core/Shared', 
+      'Sources/Core/iOS',       
+      'Sources/Features/Shared',
+      'Sources/Features/iOS'
+    ]
+    ss.watchos.exclude_files = [
+      'Sources/Core/iOS',
+      'Sources/Features/iOS/LocationCapability.swift',
+      'Sources/Features/iOS/LocationOperations.swift',
+      'Sources/Features/iOS/PhotosCapability.swift',
+      'Sources/Features/iOS/RemoteNotificationCondition.swift',
+      'Sources/Features/iOS/UserConfirmationCondition.swift',
+      'Sources/Features/iOS/UserNotificationCondition.swift',
+      'Sources/Features/iOS/WebpageOperation.swift',
+      'Sources/Features/Shared/CloudCapability.swift',
+      'Sources/Features/Shared/ReachabilityCondition.swift',
+      'Sources/Features/Shared/CloudKitOperation.swift',
+      'Sources/Features/Shared/ReachableOperation.swift',
+      'Sources/Features/Shared/Reachability.swift'
+    ]
+    ss.tvos.exclude_files = [
+      'Sources/Features/iOS/HealthCapability.swift',
+      'Sources/Features/iOS/LocationCapability.swift',
+      'Sources/Features/iOS/LocationOperations.swift',      
+      'Sources/Features/iOS/PassbookCapability.swift',
+      'Sources/Features/iOS/PhotosCapability.swift',
+      'Sources/Features/iOS/RemoteNotificationCondition.swift',
+      'Sources/Features/iOS/UserNotificationCondition.swift',
+      'Sources/Features/iOS/WebpageOperation.swift',
+      'Sources/Features/Shared/CalendarCapability.swift',
+      'Sources/Features/Shared/CloudCapability.swift'
     ]
     ss.osx.exclude_files = [
-      'Operations/Core/iOS',
-      'Operations/Features/iOS'
+      'Sources/Core/iOS',
+      'Sources/Features/iOS'
     ]
   end
 
-  s.subspec '+AddressBook' do |ss|
-    ss.dependency 'Operations/App'
-    ss.source_files = [
-      'Operations/Extras/AddressBook/iOS',
-      'Operations/Extras/Contacts/Shared',
-      'Operations/Extras/Contacts/iOS'
-    ]
-    ss.osx.exclude_files = [
-      'Operations/Extras/AddressBook/iOS',
-      'Operations/Extras/Contacts/iOS'
-    ]
-  end
-
-  # Creates a framework suitable for an (iOS or watchOS) Extension
+#  Creates a framework suitable for an (iOS, tvOS or OS X) Extension
   s.subspec 'Extension' do |ss|
+    ss.platforms = { :ios => "8.0", :tvos => "9.0", :osx => "10.10" }
     ss.source_files = [
-      'Operations/Core/Shared', 
-      'Operations/Core/iOS',       
-      'Operations/Features/Shared',
-      'Operations/Features/iOS'      
-    ]  
+      'Sources/Core/Shared',
+      'Sources/Core/iOS',
+      'Sources/Features/Shared',
+      'Sources/Features/iOS'
+    ]
+    ss.exclude_files = [
+      'Sources/Core/iOS/BackgroundObserver.swift',
+      'Sources/Core/iOS/NetworkObserver.swift',
+      'Sources/Features/iOS/HealthCapability.swift',
+      'Sources/Features/iOS/LocationCapability.swift',
+      'Sources/Features/iOS/LocationOperations.swift',
+      'Sources/Features/iOS/RemoteNotificationCondition.swift',
+      'Sources/Features/iOS/UserNotificationCondition.swift'
+    ]
+    ss.tvos.exclude_files = [
+      'Sources/Features/iOS/PassbookCapability.swift',
+      'Sources/Features/iOS/PhotosCapability.swift',
+      'Sources/Features/iOS/WebpageOperation.swift',
+      'Sources/Features/Shared/CalendarCapability.swift'
+    ]
     ss.osx.exclude_files = [
-      'Operations/Core/iOS',
-      'Operations/Features/iOS'
-    ]      
-    ss.exclude_files = [
-      'Operations/Core/iOS/BackgroundObserver.swift',
-      'Operations/Core/iOS/NetworkObserver.swift',
-      'Operations/Features/iOS/RemoteNotificationCondition.swift',
-      'Operations/Features/iOS/UserNotificationCondition.swift',
-      'Operations/Features/iOS/LocationCapability.swift',      
-      'Operations/Features/iOS/CalendarCapability.swift',            
-      'Operations/Features/iOS/HealthCapability.swift',
-      'Operations/Features/iOS/ReachabilityCondition.swift',
-      'Operations/Features/iOS/LocationOperations.swift',
-      'Operations/Features/iOS/WebpageOperation.swift',
+      'Sources/Core/iOS',
+      'Sources/Features/iOS'
     ]
   end
 
-  # Creates a framework suitable for an iOS watchOS 2 app
-
-  s.subspec 'watchOS' do |ss|
-    ss.platform = :watchos
+  # Subspec which includes AddressBook & Contact functionality
+  s.subspec '+AddressBook' do |ss|
+    ss.platforms = { :ios => "8.0", :osx => "10.10" }    
+    ss.dependency 'Operations/Standard'
     ss.source_files = [
-      'Operations/Core/Shared',
-      'Operations/Core/iOS',
-      'Operations/Features/Shared',
-      'Operations/Features/iOS'
+      'Sources/Extras/AddressBook/iOS',
+      'Sources/Extras/Contacts/Shared',
+      'Sources/Extras/Contacts/iOS'
     ]
-    ss.exclude_files = [
-      'Operations/Core/iOS/BackgroundObserver.swift',
-      'Operations/Core/iOS/NetworkObserver.swift',
-      'Operations/Core/iOS/AlertOperation.swift',
-      'Operations/Core/iOS/UIOperation.swift',
-      'Operations/Features/Shared/CloudCapability.swift',
-      'Operations/Features/iOS/PhotosCapability.swift',
-      'Operations/Features/iOS/RemoteNotificationCondition.swift',
-      'Operations/Features/iOS/UserConfirmationCondition.swift',
-      'Operations/Features/iOS/UserNotificationCondition.swift',
-      'Operations/Features/iOS/LocationCapability.swift',
-      'Operations/Features/Shared/ReachabilityCondition.swift',
-      'Operations/Features/Shared/CloudKitOperation.swift',
-      'Operations/Features/iOS/LocationOperations.swift',
-      'Operations/Features/Shared/ReachableOperation.swift',
-      'Operations/Features/iOS/WebpageOperation.swift',
-      'Operations/Features/Shared/Reachability.swift',
-    ]
-  end
-  
-#  Creates a framework suitable for a tvOS app
-
-  s.subspec 'tvOS' do |ss|
-    ss.platform = :tvos
-    ss.source_files = [
-      'Operations/Core/Shared',
-      'Operations/Core/iOS',
-      'Operations/Features/Shared',
-      'Operations/Features/iOS'
-    ]
-    ss.exclude_files = [
-      'Operations/Features/Shared/CalendarCapability.swift',
-      'Operations/Features/Shared/CloudCapability.swift',      
-      'Operations/Features/iOS/PassbookCapability.swift',
-      'Operations/Features/iOS/PhotosCapability.swift',
-      'Operations/Features/iOS/RemoteNotificationCondition.swift',
-      'Operations/Features/iOS/UserNotificationCondition.swift',
-      'Operations/Features/iOS/HealthCapability.swift',
-      'Operations/Features/iOS/LocationCapability.swift',
-      'Operations/Features/iOS/LocationOperations.swift',
-      'Operations/Features/iOS/WebpageOperation.swift',
+    ss.osx.exclude_files = [
+      'Sources/Extras/AddressBook/iOS',
+      'Sources/Extras/Contacts/iOS'
     ]
   end
 

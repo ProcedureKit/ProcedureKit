@@ -10,11 +10,13 @@
 
 A Swift framework inspired by WWDC 2015 Advanced NSOperations session. See the session video here: https://developer.apple.com/videos/wwdc/2015/?id=226
 
-## Status - 29th Nov, 2015
+## Status - 5th Dec, 2015
 
 As of version 2.3, Operations is a multi-platform framework, with CocoaPods support in addition to framework targets for iOS Extensions, iOS Apps, OS X, watchOS and tvOS.
 
-Current development focus is on improving test coverage (broke 60% for v2.3), and improving documentation coverage. Documentation is hosted here: [docs.danthorpe.me/operations](http://docs.danthorpe.me/operations/2.4.0/index.html).
+Current development focus is on improving test coverage (broke 60% for v2.3), and improving documentation coverage. Documentation is hosted here: [docs.danthorpe.me/operations](http://docs.danthorpe.me/operations/2.4.1/index.html).
+
+As part of the bug fixing for 2.4.1, it was discovered that it is not currently possible to install the API Extension compatible framework via Carthage. This boiled down to having two schemes for the same platform, and Carthage doesn’t provide a way to pick. Now, there are two separate projects, one for API extension compatible frameworks only, which doesn’t actually solve the problem. But, there is a [pull request](https://github.com/Carthage/Carthage/pull/892) which should allow all projects to be build. For now, the only semi-automatic way to integrate these flavors is to use Cocoapods: `pod 'Operations/Extension'`. 
 
 ## Usage
 
