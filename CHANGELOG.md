@@ -2,7 +2,9 @@
 1. [[OPR-113](https://github.com/danthorpe/Operations/pull/113)]: Fixes an issue where building against iOS 9 using Carthage would unleash a tidal wave of warnings related to ABAddressBook. Thanks to [@JaimeWhite](https://github.com/JamieWhite) for bringing this to my attention!
 2. [[OPR-114](https://github.com/danthorpe/Operations/pull/114)]: Reorganized the repository into two project files. One create standard frameworks for applications, for iOS, watchOS, tvOS, and OS X. The other creates Extension API compatible frameworks for iOS, tvOS and OS X. At the moment, if you wish to use an API extension compatible framework with Carthage - this is a problem, as Carthage only builds one project, however the is a Pull Request which will fix this. The issue previously was that the `Operations.framework` products would overwrite each other. I’ve tried everything I can think of to make Xcode produce a product which has a different name to its module - but it won’t let me. So.. the best thing to do in this case is use CocoaPods and the Extension subspec.
 3. [[OPR-115](https://github.com/danthorpe/Operations/pull/115)]: Fixes an issue with code coverage after project reorganization.
-4. [[OPR-116](https://github.com/danthorpe/Operations/pull/116)]: Fixes a mistake where `aggregateErrors` was not publicly accessible in `GroupOperation`. Thanks to [@JaimeWhite](https://github.com/JamieWhite) for this.  
+4. [[OPR-116](https://github.com/danthorpe/Operations/pull/116)]: Fixes a mistake where `aggregateErrors` was not publicly accessible in `GroupOperation`. Thanks to [@JaimeWhite](https://github.com/JamieWhite) for this.
+
+Thanks a lot to [@JaimeWhite](https://github.com/JamieWhite) for helping me find and squash some bugs with this release. Greatly appreciated!  
 
 # 2.4.0
 1. [[OPR-108](https://github.com/danthorpe/Operations/pull/108)]: Adds an internal logging mechanism to `Operation`. Output log information using the `log` property  of the operation. This property exposes simple log functions. E.g.
