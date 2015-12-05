@@ -260,7 +260,6 @@
 		6526176E1C11F61700654091 /* ReachabilityCondition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReachabilityCondition.swift; sourceTree = "<group>"; };
 		6526176F1C11F61700654091 /* ReachableOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReachableOperation.swift; sourceTree = "<group>"; };
 		652617711C11F61700654091 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		652617721C11F61700654091 /* module.modulemap */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.module-map"; path = module.modulemap; sourceTree = "<group>"; };
 		652617731C11F61700654091 /* Operations.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Operations.h; sourceTree = "<group>"; };
 		652617741C11F61700654091 /* Operations.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Operations.xcconfig; sourceTree = "<group>"; };
 		652617771C11F61700654091 /* AlertOperationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertOperationTests.swift; sourceTree = "<group>"; };
@@ -356,6 +355,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		6514F2DD1C1327EE00E31DAD /* Support */ = {
+			isa = PBXGroup;
+			children = (
+				6526176D1C11F61700654091 /* Reachability.swift */,
+			);
+			name = Support;
+			sourceTree = "<group>";
+		};
 		652616BF1C11F48200654091 = {
 			isa = PBXGroup;
 			children = (
@@ -511,9 +518,9 @@
 				6526176A1C11F61700654091 /* CloudCapability.swift */,
 				6526176B1C11F61700654091 /* CloudKitOperation.swift */,
 				6526176C1C11F61700654091 /* NetworkOperation.swift */,
-				6526176D1C11F61700654091 /* Reachability.swift */,
 				6526176E1C11F61700654091 /* ReachabilityCondition.swift */,
 				6526176F1C11F61700654091 /* ReachableOperation.swift */,
+				6514F2DD1C1327EE00E31DAD /* Support */,
 			);
 			path = Shared;
 			sourceTree = "<group>";
@@ -522,7 +529,6 @@
 			isa = PBXGroup;
 			children = (
 				652617711C11F61700654091 /* Info.plist */,
-				652617721C11F61700654091 /* module.modulemap */,
 				652617731C11F61700654091 /* Operations.h */,
 				652617741C11F61700654091 /* Operations.xcconfig */,
 				652618551C11F7DA00654091 /* Extension Compatible.xcconfig */,
@@ -792,7 +798,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 652616C31C11F48200654091 /* Build configuration list for PBXProject "Operations Extension Compatible" */;
+			buildConfigurationList = 652616C31C11F48200654091 /* Build configuration list for PBXProject "Operations_ExtensionCompatible" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
@@ -1148,7 +1154,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 9.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -1198,7 +1204,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 9.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
@@ -1688,7 +1694,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		652616C31C11F48200654091 /* Build configuration list for PBXProject "Operations Extension Compatible" */ = {
+		652616C31C11F48200654091 /* Build configuration list for PBXProject "Operations_ExtensionCompatible" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				652616C41C11F48200654091 /* Debug */,
