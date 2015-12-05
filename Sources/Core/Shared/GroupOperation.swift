@@ -25,6 +25,8 @@ public class GroupOperation: Operation {
     private let queue = OperationQueue()
     private let operations: [NSOperation]
     private let finishingOperation = NSBlockOperation(block: {})
+
+    /// - returns: an aggregation of errors [ErrorType]
     public private(set) var aggregateErrors = Array<ErrorType>()
 
     /**
@@ -84,6 +86,12 @@ public class GroupOperation: Operation {
         queue.addOperations(operations, waitUntilFinished: false)
     }
 
+    /**
+     Append an error to the list of aggregate errors. Subclasses can use this
+     to maintain the errors received by operations within the group.
+     
+     - parameter error: an ErrorType to append.
+    */
     public final func aggregateError(error: ErrorType) {
         aggregateErrors.append(error)
     }
