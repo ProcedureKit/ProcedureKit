@@ -790,7 +790,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 652616C31C11F48200654091 /* Build configuration list for PBXProject "Operations Extension Compatible" */;
+			buildConfigurationList = 652616C31C11F48200654091 /* Build configuration list for PBXProject "Operations_ExtensionCompatible" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
@@ -1146,7 +1146,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 9.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -1196,7 +1196,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 9.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
@@ -1686,7 +1686,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		652616C31C11F48200654091 /* Build configuration list for PBXProject "Operations Extension Compatible" */ = {
+		652616C31C11F48200654091 /* Build configuration list for PBXProject "Operations_ExtensionCompatible" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				652616C41C11F48200654091 /* Debug */,
