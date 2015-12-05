@@ -363,7 +363,7 @@ public class AddressBookRemovePersonFromGroup: AddressBookGetResource {
 public class AddressBookMapPeople<T>: AddressBookGetResource {
 
     let transform: (AddressBookPerson) -> T?
-    var results = Array<T>()
+    public private(set) var results = Array<T>()
 
     public init(inGroupNamed groupName: String? = .None, transform: (AddressBookPerson) -> T?) {
         self.transform = transform
