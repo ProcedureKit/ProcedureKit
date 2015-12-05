@@ -24,7 +24,7 @@ session Advanced NSOperations: https://developer.apple.com/videos/wwdc/2015/?id=
   # Defaul spec is 'Standard'
   s.default_subspec   = 'Standard'
 
-  # Creates a framework suitable for an iOS or Mac OS application
+  # Creates a framework suitable for an iOS, watchOS, tvOS or Mac OS application
   s.subspec 'Standard' do |ss|
     ss.source_files      = [
       'Sources/Core/Shared', 
