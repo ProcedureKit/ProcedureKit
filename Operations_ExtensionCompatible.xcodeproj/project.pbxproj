@@ -355,6 +355,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		6514F2DD1C1327EE00E31DAD /* Support */ = {
+			isa = PBXGroup;
+			children = (
+				6526176D1C11F61700654091 /* Reachability.swift */,
+			);
+			name = Support;
+			sourceTree = "<group>";
+		};
 		652616BF1C11F48200654091 = {
 			isa = PBXGroup;
 			children = (
@@ -510,9 +518,9 @@
 				6526176A1C11F61700654091 /* CloudCapability.swift */,
 				6526176B1C11F61700654091 /* CloudKitOperation.swift */,
 				6526176C1C11F61700654091 /* NetworkOperation.swift */,
-				6526176D1C11F61700654091 /* Reachability.swift */,
 				6526176E1C11F61700654091 /* ReachabilityCondition.swift */,
 				6526176F1C11F61700654091 /* ReachableOperation.swift */,
+				6514F2DD1C1327EE00E31DAD /* Support */,
 			);
 			path = Shared;
 			sourceTree = "<group>";
