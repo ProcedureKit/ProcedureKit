@@ -12,6 +12,20 @@ import MapKit
 import PureLayout
 import Operations
 
+class LocationManager: OperationQueue {
+    private static let sharedManager = LocationManager()
+
+    static var lastUserLocation: CLLocation? = .None
+
+    static func currentUserLocation(accuracy: CLLocationAccuracy = kCLLocationAccuracyThreeKilometers, completion: UserLocationOperation.CompletionBlockType) {
+        let op = UserLocationOperation(accuracy: accuracy) { location in
+            lastUserLocation = location
+            completion(location)
+        }
+        sharedManager.addOperation(op)
+    }
+}
+
 class LocationViewController: PermissionViewController {
 
     var mapView: MKMapView!
@@ -83,6 +97,10 @@ class LocationViewController: PermissionViewController {
             self.location = location
         }
         queue.addOperation(location)
+
+        LocationManager.currentUserLocation { location in
+            print("location: \(location)")
+        }
     }
 }
 
