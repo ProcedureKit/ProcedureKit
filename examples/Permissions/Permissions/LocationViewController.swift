@@ -22,6 +22,8 @@ class LocationManager: OperationQueue {
             lastUserLocation = location
             completion(location)
         }
+        // Comment out or modify this to adjust how much info is printed out by UserLocationOperation
+        op.log.severity = .Verbose
         sharedManager.addOperation(op)
     }
 }
@@ -82,7 +84,6 @@ class LocationViewController: PermissionViewController {
 
     func determineAuthorizationStatus() {
         let status = GetAuthorizationStatus(Capability.Location(), completion: locationServicesEnabled)
-        status.log.severity = .Verbose
         queue.addOperation(status)
     }
 
@@ -99,7 +100,7 @@ class LocationViewController: PermissionViewController {
         queue.addOperation(location)
 
         LocationManager.currentUserLocation { location in
-            print("location: \(location)")
+            print("got the location: \(location)")
         }
     }
 }
