@@ -1,7 +1,7 @@
 PODS:
-  - Operations/+AddressBook (2.3.0):
-    - Operations/App
-  - Operations/App (2.3.0)
+  - Operations/+AddressBook (2.4.1):
+    - Operations/Standard
+  - Operations/Standard (2.4.1)
   - PureLayout (3.0.1)
   - TaylorSource (2.0.0):
     - TaylorSource/Base (= 2.0.0)
@@ -17,7 +17,7 @@ EXTERNAL SOURCES:
     :path: "../../"
 
 SPEC CHECKSUMS:
-  Operations: 1bea57770e3ef369c8107a457931b6bf522e9600
+  Operations: 728e069c0c736c321ba1e0ead42dbf2006366773
   PureLayout: f35f5384c9c4e4479df041dbe33ad7577b71ddfb
   TaylorSource: 86484ba9cf9374d51d4c17db1ad21ee5acba1277
 
