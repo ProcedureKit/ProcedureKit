@@ -28,7 +28,7 @@ public class BlockOperation: Operation {
     - parameter block: The closure to run when the operation executes.
     If this block is nil, the operation will immediately finish.
     */
-    public init(block: BlockType = { (continueWithError) in continueWithError(error: nil) }) {
+    public init(block: BlockType = { continueWithError in continueWithError(error: .None) }) {
         self.block = block
         super.init()
     }
