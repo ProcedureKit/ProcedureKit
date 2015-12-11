@@ -241,13 +241,13 @@ class CompletionBlockOperationTests: OperationTests {
 
     func test__block_operation_with_default_block_runs_completion_block_once() {
         let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
-        var numberOfTimsCompletionBlockIsRun = 0
+        var numberOfTimesCompletionBlockIsRun = 0
 
         let operation = BlockOperation()
         operation.log.severity = .Verbose
 
         operation.completionBlock = {
-            numberOfTimsCompletionBlockIsRun += 1
+            numberOfTimesCompletionBlockIsRun += 1
         }
 
         let delay = DelayOperation(interval: 0.1)
@@ -259,7 +259,7 @@ class CompletionBlockOperationTests: OperationTests {
         runOperations(delay, operation)
         waitForExpectationsWithTimeout(3, handler: nil)
 
-        XCTAssertEqual(numberOfTimsCompletionBlockIsRun, 1)
+        XCTAssertEqual(numberOfTimesCompletionBlockIsRun, 1)
     }
 
     func test__nsblockoperation_runs_completion_block_once() {
