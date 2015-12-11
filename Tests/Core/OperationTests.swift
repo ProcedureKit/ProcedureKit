@@ -243,11 +243,21 @@ class CompletionBlockOperationTests: OperationTests {
         let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
         var numberOfTimesCompletionBlockIsRun = 0
 
+//        let operation = BlockOperation { (continuation: BlockOperation.ContinuationBlockType) in
+//            print("** This is the task block on \(String.fromCString(dispatch_queue_get_label(DISPATCH_CURRENT_QUEUE_LABEL)))")
+//            continuation(error: nil)
+//        }
+
+//        let operation = BlockOperation {
+//            print("** This is the task block on \(String.fromCString(dispatch_queue_get_label(DISPATCH_CURRENT_QUEUE_LABEL)))")
+//        }
+
         let operation = BlockOperation()
         operation.log.severity = .Verbose
 
         operation.completionBlock = {
             numberOfTimesCompletionBlockIsRun += 1
+            print("** This is a completion block on \(String.fromCString(dispatch_queue_get_label(DISPATCH_CURRENT_QUEUE_LABEL)))")
         }
 
         let delay = DelayOperation(interval: 0.1)
@@ -268,7 +278,6 @@ class CompletionBlockOperationTests: OperationTests {
         let operation = NSBlockOperation()
 
         operation.completionBlock = {
-            print("*** I'm in a completion block on \(String.fromCString(dispatch_queue_get_label(DISPATCH_CURRENT_QUEUE_LABEL)))")
             expectation.fulfill()
         }
 
