@@ -87,7 +87,7 @@ class OperationTests: XCTestCase {
         super.tearDown()
     }
 
-    func runOperation(operation: Operation) {
+    func runOperation(operation: NSOperation) {
         queue.delegate = delegate
         queue.addOperation(operation)
     }
@@ -143,30 +143,32 @@ class BasicTests: OperationTests {
         let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
         let operation = TestOperation()
 
-        var completionBlockOneDidRun = false
+        var completionBlockOneDidRun = 0
         operation.addCompletionBlock {
-            completionBlockOneDidRun = true
+            completionBlockOneDidRun += 1
         }
 
-        var completionBlockTwoDidRun = false
+        var completionBlockTwoDidRun = 0
         operation.addCompletionBlock {
-            completionBlockTwoDidRun = true
+            completionBlockTwoDidRun += 1
         }
 
+        var finalCompletionBlockDidRun = 0
         operation.addCompletionBlock {
+            finalCompletionBlockDidRun += 1
             expectation.fulfill()
         }
 
         runOperation(operation)
         waitForExpectationsWithTimeout(3, handler: nil)
 
-        XCTAssertTrue(completionBlockOneDidRun)
-        XCTAssertTrue(completionBlockTwoDidRun)
+        XCTAssertEqual(completionBlockOneDidRun, 1)
+        XCTAssertEqual(completionBlockTwoDidRun, 1)
+        XCTAssertEqual(finalCompletionBlockDidRun, 1)
     }
 
     func test__add_multiple_dependencies() {
         let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
-
 
         let dep1 = TestOperation()
         let dep2 = TestOperation()
@@ -206,7 +208,6 @@ class BasicTests: OperationTests {
         XCTAssertTrue(operation.cancelled)
         XCTAssertTrue(operation.failed)
     }
-
 }
 
 class BlockOperationTests: OperationTests {
@@ -231,6 +232,57 @@ class BlockOperationTests: OperationTests {
         runOperation(operation)
         waitForExpectationsWithTimeout(3, handler: nil)
         XCTAssertTrue(operation.finished)
+    }
+}
+
+private var completionBlockObservationContext = 0
+
+class CompletionBlockOperationTests: OperationTests {
+
+    func test__block_operation_with_default_block_runs_completion_block_once() {
+        let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
+        var numberOfTimesCompletionBlockIsRun = 0
+
+//        let operation = BlockOperation { (continuation: BlockOperation.ContinuationBlockType) in
+//            print("** This is the task block on \(String.fromCString(dispatch_queue_get_label(DISPATCH_CURRENT_QUEUE_LABEL)))")
+//            continuation(error: nil)
+//        }
+
+//        let operation = BlockOperation {
+//            print("** This is the task block on \(String.fromCString(dispatch_queue_get_label(DISPATCH_CURRENT_QUEUE_LABEL)))")
+//        }
+
+        let operation = BlockOperation()
+        operation.log.severity = .Verbose
+
+        operation.completionBlock = {
+            numberOfTimesCompletionBlockIsRun += 1
+            print("** This is a completion block on \(String.fromCString(dispatch_queue_get_label(DISPATCH_CURRENT_QUEUE_LABEL)))")
+        }
+
+        let delay = DelayOperation(interval: 0.1)
+        delay.addObserver(BlockObserver { op, errors in
+            expectation.fulfill()
+        })
+        delay.addDependency(operation)
+
+        runOperations(delay, operation)
+        waitForExpectationsWithTimeout(3, handler: nil)
+
+        XCTAssertEqual(numberOfTimesCompletionBlockIsRun, 1)
+    }
+
+    func test__nsblockoperation_runs_completion_block_once() {
+        let _queue = NSOperationQueue()
+        let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
+        let operation = NSBlockOperation()
+
+        operation.completionBlock = {
+            expectation.fulfill()
+        }
+
+        _queue.addOperation(operation)
+        waitForExpectationsWithTimeout(3, handler: nil)
     }
 }
 

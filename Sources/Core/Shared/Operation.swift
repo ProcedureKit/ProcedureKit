@@ -92,20 +92,11 @@ public class Operation: NSOperation {
         }
         set (newState) {
             willChangeValueForKey("state")
-
-            log.verbose("\(operationName): \(_state) -> \(newState)")
-
-            stateLock.withCriticalScope { () -> Void in
-
-                switch (_state, newState) {
-                case (.Finished, _):
-                    break
-                default:
-                    assert(_state.canTransitionToState(newState), "Attempting to perform illegal cyclic state transition, \(_state) -> \(newState).")
-                    _state = newState
-                }
+            stateLock.withCriticalScope {
+                assert(_state.canTransitionToState(newState), "Attempting to perform illegal cyclic state transition, \(_state) -> \(newState).")
+                log.verbose("\(operationName): \(_state) -> \(newState)")
+                _state = newState
             }
-
             didChangeValueForKey("state")
         }
     }
@@ -295,9 +286,10 @@ public class Operation: NSOperation {
     }
 
     // MARK: - Execution and Cancellation
-
+/*
     /// Starts the operation, correctly managing the cancelled state. Cannot be over-ridden
     public override final func start() {
+
         // NSOperation.start() has important logic which shouldn't be bypassed
         super.start()
 
@@ -306,7 +298,7 @@ public class Operation: NSOperation {
             finish()
         }
     }
-
+*/
     /// Triggers execution of the operation's task, correctly managing errors and the cancelled state. Cannot be over-ridden
     public override final func main() {
         assert(state == .Ready, "This operation must be performed on an operation queue, current state: \(state).")
@@ -359,7 +351,7 @@ public class Operation: NSOperation {
     }
     
     // MARK: Finishing
-    
+
     /**
     A private property to ensure we only notify the observers once that the
     operation has finished.

@@ -140,7 +140,7 @@ public class GroupOperation: Operation {
 extension GroupOperation: OperationQueueDelegate {
 
     /**
-    The group operation acts as it's own queue's delegate. When an operation is added to the queue,
+    The group operation acts as its own queue's delegate. When an operation is added to the queue,
     assuming that the finishing operation has not started (or finished), and the operation is not
     the finishing operation itself, then we add the operation as a dependency to the finishing
     operation.
