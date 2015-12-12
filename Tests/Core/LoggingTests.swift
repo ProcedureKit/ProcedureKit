@@ -9,7 +9,6 @@
 import XCTest
 @testable import Operations
 
-
 class TestableLogManager: LogManager {
 
     let expectation: XCTestExpectation
@@ -49,7 +48,7 @@ class LoggerTests: XCTestCase {
     }
 
     func test__init__severity_defaults_to_global_severity() {
-        LogManager.globalLogSeverity = .Info
+        LogManager.severity = .Info
         log = Logger()
         XCTAssertEqual(log.severity, LogSeverity.Info)
     }
@@ -58,6 +57,19 @@ class LoggerTests: XCTestCase {
         log = Logger()
         let meta = log.meta("this/is/a/file.swift", function: "the_function", line: 100)
         XCTAssertEqual(meta, "[file.swift the_function:100], ")
+    }
+
+    func test__disabled_logger_no_message_received() {
+        let logger = LogManager.logger
+        var messageReceived: String? = .None
+        LogManager.logger = { message in
+            messageReceived = message
+        }
+        LogManager.enabled = false
+        let log = Logger()
+        log.fatal("hello")
+        LogManager.logger = logger
+        XCTAssertNil(messageReceived)
     }
 }
 

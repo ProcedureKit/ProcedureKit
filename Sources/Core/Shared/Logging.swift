@@ -80,7 +80,7 @@ internal extension LoggerType {
 
     /// Access the minimum `LogSeverity` severity.
     var minimumLogSeverity: LogSeverity {
-        return min(LogManager.globalLogSeverity, severity)
+        return min(LogManager.severity, severity)
     }
 
     func meta(file: String = __FILE__, function: String = __FUNCTION__, line: Int = __LINE__) -> String {
@@ -124,7 +124,7 @@ public extension LoggerType {
      - parameter line: a `Int`, containing the line number (make it default to __LINE__)
     */
     func log(@autoclosure message: () -> String, severity: LogSeverity, file: String = __FILE__, function: String = __FUNCTION__, line: Int = __LINE__) {
-        if severity >= minimumLogSeverity {
+        if LogManager.enabled && severity >= minimumLogSeverity {
             let _meta = meta(file, function: function, line: line)
             let _message = message()
             dispatch_async(LogManager.queue) {
@@ -217,7 +217,7 @@ class _Logger<Manager: LogManagerType>: LoggerType {
      - parameter severity: a `LogSeverity`.
      - parameter logger: a `LoggerBlockType` block.
     */
-    required init(severity: LogSeverity = Manager.globalLogSeverity) {
+    required init(severity: LogSeverity = Manager.severity) {
         self.severity = severity
     }
 }
@@ -226,7 +226,9 @@ typealias Logger = _Logger<LogManager>
 
 protocol LogManagerType {
 
-    static var globalLogSeverity: LogSeverity { get set }
+    static var enabled: Bool { get set }
+
+    static var severity: LogSeverity { get set }
 
     static var logger: LoggerBlockType { get set }
 }
@@ -239,10 +241,19 @@ protocol LogManagerType {
 public class LogManager: LogManagerType {
 
     /**
+     # Enabled Operation logging
+     Enable or Disable built in logger. Default is enabled.
+     */
+    public static var enabled: Bool {
+        get { return sharedInstance.enabled }
+        set { sharedInstance.enabled = newValue }
+    }
+
+    /**
      # Global Log Severity
      Adjust the global log level severity.
     */
-    public static var globalLogSeverity: LogSeverity {
+    public static var severity: LogSeverity {
         get { return sharedInstance.severity }
         set { sharedInstance.severity = newValue }
     }
@@ -263,6 +274,7 @@ public class LogManager: LogManagerType {
     }
 
     let queue = Queue.Utility.serial("me.danthorpe.Operations.Logger")
+    var enabled: Bool = true
     var severity: LogSeverity = .Warning
     var logger: LoggerBlockType = { print($0) }
 }
