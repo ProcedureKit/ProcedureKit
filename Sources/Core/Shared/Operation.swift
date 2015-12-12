@@ -208,6 +208,7 @@ public class Operation: NSOperation {
      - returns: a `LoggerType`.
     */
     public func getLogger() -> LoggerType {
+        _log.operationName = operationName
         return _log
     }
 
