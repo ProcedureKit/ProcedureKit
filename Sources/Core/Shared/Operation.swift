@@ -306,7 +306,7 @@ public class Operation: NSOperation {
 
         if _internalErrors.isEmpty && !cancelled {
             state = .Executing
-            log.info("\(operationName): did start")
+            log.info("Did start")
             observers.forEach { $0.operationDidStart(self) }
             execute()
         }
@@ -333,10 +333,10 @@ public class Operation: NSOperation {
     public func cancelWithError(error: ErrorType? = .None) {
         if let error = error {
             _internalErrors.append(error)
-            log.warning("\(operationName): did cancel with error: \(error).")
+            log.warning("Did cancel with error: \(error).")
         }
         else {
-            log.info("\(operationName): did cancel.")
+            log.info("Did cancel.")
         }
         cancel()
     }
@@ -347,7 +347,7 @@ public class Operation: NSOperation {
     - parameter operation: a `NSOperation` instance.
     */
     public final func produceOperation(operation: NSOperation) {
-        log.info("\(operationName): did produce \(operation.operationName)")
+        log.info("Did produce \(operation.operationName)")
         observers.forEach { $0.operation(self, didProduceOperation: operation) }
     }
     
@@ -374,10 +374,10 @@ public class Operation: NSOperation {
             finished(_internalErrors)
 
             if errors.isEmpty {
-                log.info("\(operationName): did finish with no errors.")
+                log.info("Did finish with no errors.")
             }
             else {
-                log.warning("\(operationName): did finish with errors: \(errors).")
+                log.warning("Did finish with errors: \(errors).")
             }
 
             observers.forEach { $0.operationDidFinish(self, errors: self._internalErrors) }
