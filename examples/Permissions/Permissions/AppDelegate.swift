@@ -16,7 +16,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
 
-        LogManager.globalLogSeverity = .Notice
+        // Set the global log level like this
+        LogManager.severity = .Notice
 
         return true
     }
