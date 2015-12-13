@@ -58,9 +58,7 @@ public class BlockOperation: Operation {
     them to this continuation block.
     */
     public override func execute() {
-        dispatch_async(Queue.Utility.queue) {
-            self.block { error in self.finish(error) }
-        }
+        block { error in self.finish(error) }
     }
 }
 
