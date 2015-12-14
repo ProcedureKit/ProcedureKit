@@ -12,7 +12,15 @@ import MapKit
 import PureLayout
 import Operations
 
+/*
+Could use this `LocationManager` like this:
+
+```swift
+LocationManager.currentUserLocation { print("Got a location: \($0)") }
+```
+*/
 class LocationManager: OperationQueue {
+
     private static let sharedManager = LocationManager()
 
     static var lastUserLocation: CLLocation? = .None
@@ -98,10 +106,6 @@ class LocationViewController: PermissionViewController {
             self.location = location
         }
         queue.addOperation(location)
-
-        LocationManager.currentUserLocation { location in
-            print("got the location: \(location)")
-        }
     }
 }
 
