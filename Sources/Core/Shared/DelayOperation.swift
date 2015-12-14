@@ -22,7 +22,7 @@ time-out.
 */
 public class DelayOperation: Operation {
 
-    internal enum Delay {
+    internal enum Delay: CustomStringConvertible {
         case Interval(NSTimeInterval)
         case Date(NSDate)
 
@@ -32,18 +32,32 @@ public class DelayOperation: Operation {
             case .Date(let date): return date.timeIntervalSinceNow
             }
         }
+
+        var description: String {
+            switch self {
+            case .Interval(let _interval):
+                return "for \(_interval) seconds"
+            case .Date(let date):
+                return "until \(NSDateFormatter().stringFromDate(date))"
+            }
+        }
     }
 
     private let delay: Delay
+
+    internal init(delay: Delay) {
+        self.delay = delay
+        super.init()
+        name = "Delay \(delay)"
+    }
 
     /**
     Initialize the `DelayOperation` with a time interval.
     
     - parameter interval: a `NSTimeInterval`.
     */
-    public init(interval: NSTimeInterval) {
-        delay = .Interval(interval)
-        super.init()
+    public convenience init(interval: NSTimeInterval) {
+        self.init(delay: .Interval(interval))
     }
 
     /**
@@ -51,9 +65,8 @@ public class DelayOperation: Operation {
 
     - parameter interval: a `NSDate`.
     */
-    public init(date: NSDate) {
-        delay = .Date(date)
-        super.init()
+    public convenience init(date: NSDate) {
+        self.init(delay: .Date(date))
     }
 
     /**

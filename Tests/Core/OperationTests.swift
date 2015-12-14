@@ -335,6 +335,17 @@ class OperationDependencyTests: OperationTests {
 
 class DelayOperationTests: OperationTests {
 
+    func test__delay_operation_with_interval_name() {
+        let delay = DelayOperation(interval: 1)
+        XCTAssertEqual(delay.name, "Delay for 1.0 seconds")
+    }
+
+    func test__delay_operation_with_date_name() {
+        let date = NSDate()
+        let delay = DelayOperation(date: date)
+        XCTAssertEqual(delay.name, "Delay until \(NSDateFormatter().stringFromDate(date))")
+    }
+
     func test__delay_operation_with_negative_time_interval_finishes_immediately() {
         let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
         let operation = DelayOperation(interval: -9_000_000)
