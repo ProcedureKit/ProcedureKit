@@ -48,7 +48,7 @@ class LoggingObserverTests: OperationTests {
         waitForExpectationsWithTimeout(3, handler: nil)
 
         XCTAssertEqual(receivedMessages.count, 2)
-        XCTAssertEqual(receivedMessages[1], "\(operation): finished with error(s): [Operations.BlockCondition.Error.BlockConditionFailed].")
+        XCTAssertEqual(receivedMessages[1], "Test Operation: finished with error(s): [Operations.BlockCondition.Error.BlockConditionFailed].")
     }
 
     func test__logger_receives_messages_from_produced_operation() {

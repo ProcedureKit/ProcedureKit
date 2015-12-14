@@ -25,6 +25,7 @@ class TestOperation: Operation {
         simulatedError = error
         producedOperation = produced
         super.init()
+        name = "Test Operation"
     }
 
     override func execute() {
