@@ -49,6 +49,7 @@ public class Operation: NSOperation {
             switch (self, other) {
             case (.Initialized, .Pending),
                 (.Pending, .EvaluatingConditions),
+                (.Pending, .Ready),
                 (.Pending, .Finishing),
                 (.EvaluatingConditions, .Ready),
                 (.Ready, .Executing),
@@ -126,7 +127,7 @@ public class Operation: NSOperation {
             }
 
             if super.ready {
-                evaluateConditions()
+                return evaluateConditions()
             }
 
             // Until conditions have been evaluated, we're not ready
@@ -241,12 +242,19 @@ public class Operation: NSOperation {
         state = .Pending
     }
 
-    private func evaluateConditions() {
+    private func evaluateConditions() -> Bool {
         assert(state == .Pending && cancelled == false, "\(__FUNCTION__) was called out of order.")
-        state = .EvaluatingConditions
-        OperationConditionEvaluator.evaluate(conditions, operation: self) { errors in
-            self._internalErrors.appendContentsOf(errors)
-            self.state = .Ready
+        if conditions.count > 0 {
+            state = .EvaluatingConditions
+            OperationConditionEvaluator.evaluate(conditions, operation: self) { errors in
+                self._internalErrors.appendContentsOf(errors)
+                self.state = .Ready
+            }
+            return false
+        }
+        else {
+            state = .Ready
+            return true
         }
     }
 
