@@ -95,7 +95,7 @@ public class Operation: NSOperation {
             willChangeValueForKey("state")
             stateLock.withCriticalScope {
                 assert(_state.canTransitionToState(newState), "Attempting to perform illegal cyclic state transition, \(_state) -> \(newState).")
-                log.verbose("\(operationName): \(_state) -> \(newState)")
+                log.verbose("\(_state) -> \(newState)")
                 _state = newState
             }
             didChangeValueForKey("state")
@@ -315,7 +315,7 @@ public class Operation: NSOperation {
 
         if _internalErrors.isEmpty && !cancelled {
             state = .Executing
-            log.info("Did start")
+            log.info("Will Execute")
             observers.forEach { $0.operationDidStart(self) }
             execute()
         }
