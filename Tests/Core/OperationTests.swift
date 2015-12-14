@@ -286,6 +286,53 @@ class CompletionBlockOperationTests: OperationTests {
     }
 }
 
+class OperationDependencyTests: OperationTests {
+
+    func test__dependent_operations_always_run() {
+        queue.maxConcurrentOperationCount = 1
+        let count = 2_000
+        var counter1: Int = 0
+        var counter2: Int = 0
+        var counter3: Int = 0
+
+        for i in 0..<count {
+
+            let op1name = "Operation 1, iteration: \(i)"
+            let op1Expectation = expectationWithDescription(op1name)
+            let op1 = BlockOperation { (continuation: BlockOperation.ContinuationBlockType) in
+                counter1 += 1
+                op1Expectation.fulfill()
+                continuation(error: nil)
+            }
+
+            let op2name = "Operation 2, iteration: \(i)"
+            let op2Expectation = expectationWithDescription(op2name)
+            let op2 = BlockOperation { (continuation: BlockOperation.ContinuationBlockType) in
+                counter2 += 1
+                op2Expectation.fulfill()
+                continuation(error: nil)
+            }
+
+            let op3name = "Operation 3, iteration: \(i)"
+            let op3Expectation = expectationWithDescription(op3name)
+            let op3 = BlockOperation { (continuation: BlockOperation.ContinuationBlockType) in
+                counter3 += 1
+                op3Expectation.fulfill()
+                continuation(error: nil)
+            }
+
+            op2.addDependency(op1)
+            runOperations(op1, op2, op3)
+        }
+
+        waitForExpectationsWithTimeout(3, handler: nil)
+
+        XCTAssertEqual(counter1, count)
+        XCTAssertEqual(counter2, count)
+        XCTAssertEqual(counter3, count)
+    }
+}
+
 class DelayOperationTests: OperationTests {
 
     func test__delay_operation_with_negative_time_interval_finishes_immediately() {
