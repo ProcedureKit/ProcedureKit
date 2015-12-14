@@ -391,4 +391,24 @@ class DelayOperationTests: OperationTests {
     }
 }
 
+class CancellationOperationTests: OperationTests {
+
+    func test__operation_with_dependency_cancelled_before_adding_still_executes() {
+        let delay = DelayOperation(interval: 2)
+        let operation = TestOperation()
+
+        operation.addDependency(delay)
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+
+        delay.log.severity = .Verbose
+        operation.log.severity = .Verbose
+
+        delay.cancel()
+        runOperations(delay, operation)
+
+        waitForExpectationsWithTimeout(5, handler: nil)
+
+        XCTAssertTrue(operation.didExecute)
+    }
+}
 
