@@ -234,6 +234,33 @@ class BlockOperationTests: OperationTests {
         waitForExpectationsWithTimeout(3, handler: nil)
         XCTAssertTrue(operation.finished)
     }
+
+    func test__that_block_operation_does_not_execute_if_cancelled_before_ready() {
+        var blockDidRun = 0
+
+        let delay = DelayOperation(interval: 2)
+
+        let block = BlockOperation { (continuation: BlockOperation.ContinuationBlockType) in
+            blockDidRun += 2
+            continuation(error: nil)
+        }
+
+        let blockToCancel = BlockOperation { (continuation: BlockOperation.ContinuationBlockType) in
+            blockDidRun += 1
+            continuation(error: nil)
+        }
+
+        addCompletionBlockToTestOperation(block, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+
+        block.addDependency(delay)
+        blockToCancel.addDependency(delay)
+
+        runOperations(delay, block, blockToCancel)
+        blockToCancel.cancel()
+        waitForExpectationsWithTimeout(3, handler: nil)
+
+        XCTAssertEqual(blockDidRun, 2)
+    }
 }
 
 private var completionBlockObservationContext = 0

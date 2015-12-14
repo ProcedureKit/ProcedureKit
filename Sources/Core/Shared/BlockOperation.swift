@@ -58,7 +58,9 @@ public class BlockOperation: Operation {
     them to this continuation block.
     */
     public override func execute() {
-        block { error in self.finish(error) }
+        if !cancelled {
+            block { error in self.finish(error) }
+        }
     }
 }
 
