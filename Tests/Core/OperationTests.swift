@@ -428,6 +428,21 @@ class CancellationOperationTests: OperationTests {
 
         XCTAssertFalse(operation.didExecute)
     }
+
+    func test__operation_with_dependency_whole_queue_cancelled() {
+        let delay = DelayOperation(interval: 2)
+        delay.log.severity = .Verbose
+
+        let operation = TestOperation()
+        operation.log.severity = .Verbose
+
+        operation.addDependency(delay)
+
+        runOperations(delay, operation)
+        queue.cancelAllOperations()
+
+        XCTAssertFalse(operation.didExecute)
+    }
 }
 
 
