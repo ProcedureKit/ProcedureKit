@@ -10,8 +10,8 @@ platform :ios do
     scan(
       project: "Operations_ExtensionCompatible.xcodeproj",
       scheme: "iOS Extensions Operations",
-      output_directory: ".ci/xcodebuild-data/",
-      xcargs: "-derivedDataPath .ci/xcodebuild-data/"
+      output_directory: ".ci/xcodebuild-data",
+      xcargs: "-derivedDataPath .ci/xcodebuild-data"
     )
 
   end
@@ -22,8 +22,8 @@ platform :ios do
     scan(
       project: "Operations.xcodeproj",
       scheme: "iOS Operations",
-      output_directory: ".ci/xcodebuild-data/",
-      xcargs: "-derivedDataPath .ci/xcodebuild-data/"
+      output_directory: ".ci/xcodebuild-data",
+      xcargs: "-derivedDataPath .ci/xcodebuild-data"
     )
 
   end
@@ -38,8 +38,8 @@ platform :mac do
     scan(
       project: "Operations_ExtensionCompatible.xcodeproj",
       scheme: "OS X Extensions Operations",
-      output_directory: ".ci/xcodebuild-data/",
-      xcargs: "-derivedDataPath .ci/xcodebuild-data/"
+      output_directory: ".ci/xcodebuild-data",
+      xcargs: "-derivedDataPath .ci/xcodebuild-data"
     )
 
   end
@@ -50,8 +50,8 @@ platform :mac do
     scan(
       project: "Operations.xcodeproj",
       scheme: "OS X Operations",
-      output_directory: ".ci/xcodebuild-data/",
-      xcargs: "-derivedDataPath .ci/xcodebuild-data/"
+      output_directory: ".ci/xcodebuild-data",
+      xcargs: "-derivedDataPath .ci/xcodebuild-data"
     )
 
   end

@@ -31,6 +31,7 @@ public class BlockOperation: Operation {
     public init(block: BlockType = { continuation in continuation(error: nil) }) {
         self.block = block
         super.init()
+        name = "Block Operation"
     }
 
     /**
