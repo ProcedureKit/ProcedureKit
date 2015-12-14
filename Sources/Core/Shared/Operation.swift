@@ -287,19 +287,20 @@ public class Operation: NSOperation {
     }
 
     // MARK: - Execution and Cancellation
-/*
+
     /// Starts the operation, correctly managing the cancelled state. Cannot be over-ridden
     public override final func start() {
+        // Don't call super.start
 
-        // NSOperation.start() has important logic which shouldn't be bypassed
-        super.start()
-
-        // If the operation has been cancelled, we still need to enter the finished state
-        if cancelled {
+        if !cancelled {
+            main()
+        }
+        else {
+            // If the operation has been cancelled, we still need to enter the finished state
             finish()
         }
     }
-*/
+
     /// Triggers execution of the operation's task, correctly managing errors and the cancelled state. Cannot be over-ridden
     public override final func main() {
         assert(state == .Ready, "This operation must be performed on an operation queue, current state: \(state).")
