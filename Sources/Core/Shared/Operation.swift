@@ -344,10 +344,12 @@ public class Operation: NSOperation {
             _internalErrors.append(error)
             log.warning("Did cancel with error: \(error).")
         }
-        else {
-            log.info("Did cancel.")
-        }
-        cancel()
+        super.cancel()
+    }
+
+    public override func cancel() {
+        log.info("Did cancel.")
+        super.cancel()
     }
 
     /**
