@@ -12,6 +12,30 @@ import MapKit
 import PureLayout
 import Operations
 
+/*
+Could use this `LocationManager` like this:
+
+```swift
+LocationManager.currentUserLocation { print("Got a location: \($0)") }
+```
+*/
+class LocationManager: OperationQueue {
+
+    private static let sharedManager = LocationManager()
+
+    static var lastUserLocation: CLLocation? = .None
+
+    static func currentUserLocation(accuracy: CLLocationAccuracy = kCLLocationAccuracyThreeKilometers, completion: UserLocationOperation.CompletionBlockType) {
+        let op = UserLocationOperation(accuracy: accuracy) { location in
+            lastUserLocation = location
+            completion(location)
+        }
+        // Comment out or modify this to adjust how much info is printed out by UserLocationOperation
+        op.log.severity = .Verbose
+        sharedManager.addOperation(op)
+    }
+}
+
 class LocationViewController: PermissionViewController {
 
     var mapView: MKMapView!
@@ -68,7 +92,6 @@ class LocationViewController: PermissionViewController {
 
     func determineAuthorizationStatus() {
         let status = GetAuthorizationStatus(Capability.Location(), completion: locationServicesEnabled)
-        status.log.severity = .Verbose
         queue.addOperation(status)
     }
 
