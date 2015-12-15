@@ -115,6 +115,11 @@ public class _UserLocationOperation<Manager: LocationManagerType>: Operation, CL
         name = "User Location"
         addCondition(AuthorizedFor(_LocationCapability(.WhenInUse, registrar: manager)))
         addCondition(MutuallyExclusive<CLLocationManager>())
+        addObserver(BlockObserver(cancellationHandler: { [weak self] _ in
+            dispatch_async(Queue.Main.queue) {
+                self?.stopLocationUpdates()
+            }
+        }))
     }
 
     /// Starts updating the location
@@ -122,14 +127,6 @@ public class _UserLocationOperation<Manager: LocationManagerType>: Operation, CL
         manager.opr_setDesiredAccuracy(accuracy)
         manager.opr_setDelegate(self)
         manager.opr_startUpdatingLocation()
-    }
-
-    /// Stops updating the location before cancelling the operation
-    public override func cancel() {
-        dispatch_async(Queue.Main.queue) {
-            self.stopLocationUpdates()
-            super.cancel()
-        }
     }
 
     internal func stopLocationUpdates() {
