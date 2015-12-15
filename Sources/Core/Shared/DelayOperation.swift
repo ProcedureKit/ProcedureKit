@@ -59,6 +59,9 @@ public class DelayOperation: Operation {
                 self.finish()
             }
         }
+        addObserver(BlockObserver(cancellationHandler: { _ in
+            dispatch_source_cancel(self.timer)
+        }))
     }
 
     /**
@@ -105,11 +108,6 @@ public class DelayOperation: Operation {
         default:
             finish()
         }
-    }
-
-    public override func cancel() {
-        dispatch_source_cancel(timer)
-        super.cancel()
     }
 }
 
