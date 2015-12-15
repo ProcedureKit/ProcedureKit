@@ -214,6 +214,13 @@ public class _ReverseGeocodeOperation<Geocoder: ReverseGeocoderType>: Operation 
         addObserver(NetworkObserver())
         addObserver(BackgroundObserver())
         addCondition(MutuallyExclusive<ReverseGeocodeOperation>())
+        addObserver(BlockObserver(cancellationHandler: { [weak self] _ in
+            if let geocoder = self?.geocoder {
+                dispatch_async(Queue.Main.queue) {
+                    geocoder.opr_cancel()
+                }
+            }
+        }))
     }
 
     public override func execute() {
@@ -230,12 +237,6 @@ public class _ReverseGeocodeOperation<Geocoder: ReverseGeocoderType>: Operation 
             }
         }
     }
-
-    public override func cancel() {
-        geocoder.opr_cancel()
-        super.cancel()
-    }
-
 }
 
 public class _ReverseGeocodeUserLocationOperation<Geocoder, Manager where Geocoder: ReverseGeocoderType, Manager: LocationManagerType>: GroupOperation {
@@ -283,12 +284,6 @@ public class _ReverseGeocodeUserLocationOperation<Geocoder, Manager where Geocod
         super.init(operations: [ userLocationOperation ])
         name = "Reverse Geocode User Location"
         addCondition(MutuallyExclusive<ReverseGeocodeUserLocationOperation>())
-    }
-
-    public override func cancel() {
-        userLocationOperation.cancel()
-        reverseGeocodeOperation?.cancel()
-        super.cancel()
     }
 
     public override func operationDidFinish(operation: NSOperation, withErrors errors: [ErrorType]) {
