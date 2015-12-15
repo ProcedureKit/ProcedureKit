@@ -25,6 +25,7 @@ class TestOperation: Operation {
         simulatedError = error
         producedOperation = produced
         super.init()
+        name = "Test Operation"
     }
 
     override func execute() {
@@ -233,6 +234,33 @@ class BlockOperationTests: OperationTests {
         waitForExpectationsWithTimeout(3, handler: nil)
         XCTAssertTrue(operation.finished)
     }
+
+    func test__that_block_operation_does_not_execute_if_cancelled_before_ready() {
+        var blockDidRun = 0
+
+        let delay = DelayOperation(interval: 2)
+
+        let block = BlockOperation { (continuation: BlockOperation.ContinuationBlockType) in
+            blockDidRun += 2
+            continuation(error: nil)
+        }
+
+        let blockToCancel = BlockOperation { (continuation: BlockOperation.ContinuationBlockType) in
+            blockDidRun += 1
+            continuation(error: nil)
+        }
+
+        addCompletionBlockToTestOperation(block, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+
+        block.addDependency(delay)
+        blockToCancel.addDependency(delay)
+
+        runOperations(delay, block, blockToCancel)
+        blockToCancel.cancel()
+        waitForExpectationsWithTimeout(3, handler: nil)
+
+        XCTAssertEqual(blockDidRun, 2)
+    }
 }
 
 private var completionBlockObservationContext = 0
@@ -335,6 +363,17 @@ class OperationDependencyTests: OperationTests {
 
 class DelayOperationTests: OperationTests {
 
+    func test__delay_operation_with_interval_name() {
+        let delay = DelayOperation(interval: 1)
+        XCTAssertEqual(delay.name, "Delay for 1.0 seconds")
+    }
+
+    func test__delay_operation_with_date_name() {
+        let date = NSDate()
+        let delay = DelayOperation(date: date)
+        XCTAssertEqual(delay.name, "Delay until \(NSDateFormatter().stringFromDate(date))")
+    }
+
     func test__delay_operation_with_negative_time_interval_finishes_immediately() {
         let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
         let operation = DelayOperation(interval: -9_000_000)
@@ -378,5 +417,60 @@ class DelayOperationTests: OperationTests {
         XCTAssertLessThanOrEqual(timeTaken - interval, 1.0)
     }
 }
+
+class CancellationOperationTests: OperationTests {
+
+    func test__operation_with_dependency_cancelled_before_adding_still_executes() {
+
+        let delay = DelayOperation(interval: 2)
+        delay.log.severity = .Verbose
+
+        let operation = TestOperation()
+        operation.log.severity = .Verbose
+
+        operation.addDependency(delay)
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+
+        delay.cancel()
+
+        runOperations(delay, operation)
+        waitForExpectationsWithTimeout(5, handler: nil)
+
+        XCTAssertTrue(operation.didExecute)
+    }
+
+
+    func test__operation_with_dependency_cancelled_after_adding_does_not_execute() {
+
+        let delay = DelayOperation(interval: 2)
+        delay.log.severity = .Verbose
+
+        let operation = TestOperation()
+        operation.log.severity = .Verbose
+
+        operation.addDependency(delay)
+
+        runOperations(delay, operation)
+        delay.cancel()
+
+        XCTAssertFalse(operation.didExecute)
+    }
+
+    func test__operation_with_dependency_whole_queue_cancelled() {
+        let delay = DelayOperation(interval: 2)
+        delay.log.severity = .Verbose
+
+        let operation = TestOperation()
+        operation.log.severity = .Verbose
+
+        operation.addDependency(delay)
+
+        runOperations(delay, operation)
+        queue.cancelAllOperations()
+
+        XCTAssertFalse(operation.didExecute)
+    }
+}
+
 
 

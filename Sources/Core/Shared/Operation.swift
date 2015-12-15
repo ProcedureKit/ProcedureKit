@@ -45,17 +45,26 @@ public class Operation: NSOperation {
         // The operation has finished.
         case Finished
 
-        func canTransitionToState(other: State) -> Bool {
+        func canTransitionToState(other: State, whenCancelled cancelled: Bool) -> Bool {
             switch (self, other) {
             case (.Initialized, .Pending),
                 (.Pending, .EvaluatingConditions),
-                (.Pending, .Ready),
-                (.Pending, .Finishing),
                 (.EvaluatingConditions, .Ready),
                 (.Ready, .Executing),
                 (.Ready, .Finishing),
                 (.Executing, .Finishing),
                 (.Finishing, .Finished):
+                return true
+
+            case (.Pending, .Ready):
+                // Note that PSOperations only allows this transition when the operation is
+                // cancelled. However, in the case where there are no conditions to evaluate,
+                // Operation immediately becomes .Ready - otherwise there exists a race
+                // condition because the evaluator executes its completion immediately.
+                return true
+
+            case (.Pending, .Finishing) where cancelled:
+                // When an operation is cancelled it can go from pending direct to finishing.
                 return true
 
             default:
@@ -77,6 +86,10 @@ public class Operation: NSOperation {
         return ["state"]
     }
 
+    class func keyPathsForValuesAffectingIsCancelled() -> Set<NSObject> {
+        return ["Cancelled"]
+    }
+
     private let stateLock = NSLock()
 
     private lazy var _log: LoggerType = Logger()
@@ -94,11 +107,20 @@ public class Operation: NSOperation {
         set (newState) {
             willChangeValueForKey("state")
             stateLock.withCriticalScope {
-                assert(_state.canTransitionToState(newState), "Attempting to perform illegal cyclic state transition, \(_state) -> \(newState).")
-                log.verbose("\(operationName): \(_state) -> \(newState)")
+                assert(_state.canTransitionToState(newState, whenCancelled: cancelled), "Attempting to perform illegal cyclic state transition, \(_state) -> \(newState).")
+                log.verbose("\(_state) -> \(newState)")
                 _state = newState
             }
             didChangeValueForKey("state")
+        }
+    }
+
+    private var _cancelled = false {
+        willSet {
+            willChangeValueForKey("Cancelled")
+        }
+        didSet {
+            didChangeValueForKey("Cancelled")
         }
     }
 
@@ -160,6 +182,10 @@ public class Operation: NSOperation {
     /// Boolean indicator for whether the Operation has finished or not
     public override var finished: Bool {
         return state == .Finished
+    }
+
+    public override var cancelled: Bool {
+        return _cancelled
     }
 
     // MARK: - Logging
@@ -315,7 +341,7 @@ public class Operation: NSOperation {
 
         if _internalErrors.isEmpty && !cancelled {
             state = .Executing
-            log.info("Did start")
+            log.info("Will Execute")
             observers.forEach { $0.operationDidStart(self) }
             execute()
         }
@@ -344,10 +370,20 @@ public class Operation: NSOperation {
             _internalErrors.append(error)
             log.warning("Did cancel with error: \(error).")
         }
-        else {
-            log.info("Did cancel.")
-        }
         cancel()
+    }
+
+    public override func cancel() {
+        if !finished {
+
+            log.info("Did cancel.")
+
+            _cancelled = true
+
+            if state > .Ready {
+                finish()
+            }
+        }
     }
 
     /**
