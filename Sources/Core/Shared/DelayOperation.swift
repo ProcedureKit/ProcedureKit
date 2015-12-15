@@ -51,7 +51,8 @@ public class DelayOperation: Operation {
     internal init(delay: Delay, leeway: Int = 1_000_000) {
         self.delay = delay
         self.leeway = UInt64(leeway)
-        self.timer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, Queue.Default.queue)
+        let _timer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, Queue.Default.queue)
+        self.timer = _timer
         super.init()
         name = "Delay \(delay)"
         dispatch_source_set_event_handler(timer) {
@@ -60,7 +61,7 @@ public class DelayOperation: Operation {
             }
         }
         addObserver(BlockObserver(cancellationHandler: { _ in
-            dispatch_source_cancel(self.timer)
+            dispatch_source_cancel(_timer)
         }))
     }
 
