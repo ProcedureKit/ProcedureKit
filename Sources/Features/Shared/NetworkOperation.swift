@@ -29,17 +29,15 @@ public class URLSessionTaskOperation: Operation {
         assert(task.state == .Suspended, "NSURLSessionTask must be suspended, not \(task.state)")
         self.task = task
         super.init()
+        addObserver(BlockObserver(cancellationHandler: { _ in
+            task.cancel()
+        }))
     }
 
     public override func execute() {
         assert(task.state == .Suspended, "NSURLSessionTask resumed outside of \(self)")
         task.addObserver(self, forKeyPath: KeyPath.State.rawValue, options: [], context: &URLSessionTaskOperationKVOContext)
         task.resume()
-    }
-
-    public override func cancel() {
-        task.cancel()
-        super.cancel()
     }
 
     public override func observeValueForKeyPath(keyPath: String?, ofObject object: AnyObject?, change: [String : AnyObject]?, context: UnsafeMutablePointer<Void>) {
