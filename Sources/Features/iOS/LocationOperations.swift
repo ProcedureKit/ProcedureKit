@@ -115,6 +115,11 @@ public class _UserLocationOperation<Manager: LocationManagerType>: Operation, CL
         name = "User Location"
         addCondition(AuthorizedFor(_LocationCapability(.WhenInUse, registrar: manager)))
         addCondition(MutuallyExclusive<CLLocationManager>())
+        addObserver(BlockObserver(cancellationHandler: { [weak self] _ in
+            dispatch_async(Queue.Main.queue) {
+                self?.stopLocationUpdates()
+            }
+        }))
     }
 
     /// Starts updating the location
@@ -122,14 +127,6 @@ public class _UserLocationOperation<Manager: LocationManagerType>: Operation, CL
         manager.opr_setDesiredAccuracy(accuracy)
         manager.opr_setDelegate(self)
         manager.opr_startUpdatingLocation()
-    }
-
-    /// Stops updating the location before cancelling the operation
-    public override func cancel() {
-        dispatch_async(Queue.Main.queue) {
-            self.stopLocationUpdates()
-            super.cancel()
-        }
     }
 
     internal func stopLocationUpdates() {
@@ -217,6 +214,13 @@ public class _ReverseGeocodeOperation<Geocoder: ReverseGeocoderType>: Operation 
         addObserver(NetworkObserver())
         addObserver(BackgroundObserver())
         addCondition(MutuallyExclusive<ReverseGeocodeOperation>())
+        addObserver(BlockObserver(cancellationHandler: { [weak self] _ in
+            if let geocoder = self?.geocoder {
+                dispatch_async(Queue.Main.queue) {
+                    geocoder.opr_cancel()
+                }
+            }
+        }))
     }
 
     public override func execute() {
@@ -233,12 +237,6 @@ public class _ReverseGeocodeOperation<Geocoder: ReverseGeocoderType>: Operation 
             }
         }
     }
-
-    public override func cancel() {
-        geocoder.opr_cancel()
-        super.cancel()
-    }
-
 }
 
 public class _ReverseGeocodeUserLocationOperation<Geocoder, Manager where Geocoder: ReverseGeocoderType, Manager: LocationManagerType>: GroupOperation {
@@ -286,12 +284,6 @@ public class _ReverseGeocodeUserLocationOperation<Geocoder, Manager where Geocod
         super.init(operations: [ userLocationOperation ])
         name = "Reverse Geocode User Location"
         addCondition(MutuallyExclusive<ReverseGeocodeUserLocationOperation>())
-    }
-
-    public override func cancel() {
-        userLocationOperation.cancel()
-        reverseGeocodeOperation?.cancel()
-        super.cancel()
     }
 
     public override func operationDidFinish(operation: NSOperation, withErrors errors: [ErrorType]) {

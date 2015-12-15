@@ -16,27 +16,34 @@ produces a new operation, and finishes.
 public protocol OperationObserver {
 
     /**
-    The operation started.
+     The operation started.
     
-    - parameter operaton: the observed `Operation`.
+     - parameter operaton: the observed `Operation`.
     */
     func operationDidStart(operation: Operation)
 
     /**
-    The operation produced a new `NSOperation` instance which has been added to the 
-    queue. Note that this isn't necessarily an `Operation`, so be careful, if you 
-    intend to automatically start observing it.
+     The operation was cancelled.
+
+     - parameter operaton: the observed `Operation`.
+     */
+    func operationDidCancel(operation: Operation)
+
+    /**
+     The operation produced a new `NSOperation` instance which has been added to the
+     queue. Note that this isn't necessarily an `Operation`, so be careful, if you
+     intend to automatically start observing it.
     
-    - parameter operaton: the observed `Operation`.
-    - parameter newOperation: the produced `NSOperation`
+     - parameter operaton: the observed `Operation`.
+     - parameter newOperation: the produced `NSOperation`
     */
     func operation(operation: Operation, didProduceOperation newOperation: NSOperation)
 
     /**
-    The operation did finish. Any errors that were encountered are collected here.
+     The operation did finish. Any errors that were encountered are collected here.
     
-    - parameter operaton: the observed `Operation`.
-    - parameter errors: an array of `ErrorType`s.
+     - parameter operaton: the observed `Operation`.
+     - parameter errors: an array of `ErrorType`s.
     */
     func operationDidFinish(operation: Operation, errors: [ErrorType])
 }

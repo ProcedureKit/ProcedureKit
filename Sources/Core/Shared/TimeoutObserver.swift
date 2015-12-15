@@ -45,12 +45,13 @@ public struct TimeoutObserver: OperationObserver {
         }
     }
 
+    /// Conforms to `OperationObserver`, executes the optional cancellationHandler.
+    public func operationDidCancel(operation: Operation) { /* No operation */ }
+
     /// Conforms to `OperationObserver`, has no opertion for when another operation is produced.
-    public func operation(operation: Operation, didProduceOperation newOperation: NSOperation) {}
+    public func operation(operation: Operation, didProduceOperation newOperation: NSOperation) { /* No operation */ }
 
     /// Conforms to `OperationObserver`, has no opertion for when the operation finishes
-    public func operationDidFinish(operation: Operation, errors: [ErrorType]) {}
+    public func operationDidFinish(operation: Operation, errors: [ErrorType]) { /* No operation */ }
 }
-
-
 

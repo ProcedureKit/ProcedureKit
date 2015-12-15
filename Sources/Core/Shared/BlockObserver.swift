@@ -15,10 +15,12 @@ produce and finish.
 public struct BlockObserver: OperationObserver {
 
     public typealias StartHandler = Operation -> Void
+    public typealias CancellationHandler = Operation -> Void
     public typealias ProduceHandler = (Operation, NSOperation) -> Void
     public typealias FinishHandler = (Operation, [ErrorType]) -> Void
 
     let startHandler: StartHandler?
+    let cancellationHandler: CancellationHandler?
     let produceHandler: ProduceHandler?
     let finishHandler: FinishHandler?
 
@@ -35,11 +37,13 @@ public struct BlockObserver: OperationObserver {
         })
 
     - parameter startHandler, a optional block of type Operation -> Void
+    - parameter cancellationHandler, a optional block of type Operation -> Void
     - parameter produceHandler, a optional block of type (Operation, NSOperation) -> Void
     - parameter finishHandler, a optional block of type (Operation, [ErrorType]) -> Void
     */
-    public init(startHandler: StartHandler? = .None, produceHandler: ProduceHandler? = .None, finishHandler: FinishHandler? = .None) {
+    public init(startHandler: StartHandler? = .None, cancellationHandler: CancellationHandler? = .None, produceHandler: ProduceHandler? = .None, finishHandler: FinishHandler? = .None) {
         self.startHandler = startHandler
+        self.cancellationHandler = cancellationHandler
         self.produceHandler = produceHandler
         self.finishHandler = finishHandler
     }
@@ -47,6 +51,11 @@ public struct BlockObserver: OperationObserver {
     /// Conforms to `OperationObserver`, executes the optional startHandler.
     public func operationDidStart(operation: Operation) {
         startHandler?(operation)
+    }
+
+    /// Conforms to `OperationObserver`, executes the optional cancellationHandler.
+    public func operationDidCancel(operation: Operation) {
+        cancellationHandler?(operation)
     }
 
     /// Conforms to `OperationObserver`, executes the optional produceHandler.

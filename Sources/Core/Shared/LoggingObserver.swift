@@ -51,6 +51,18 @@ public struct LoggingObserver: OperationObserver {
     }
 
     /**
+     Conforms to `OperationObserver`. The logger is sent a string which uses the
+     `name` parameter of the operation if provived.
+
+     "My Operation: did cancel."
+
+     - parameter operation: the `Operation` which has started.
+     */
+    public func operationDidCancel(operation: Operation) {
+        log("\(operationName(operation)): did cancel.")
+    }
+
+    /**
     Conforms to `OperationObserver`. The logger is sent a string which uses the
     `name` parameter of the operation if provived.
 
