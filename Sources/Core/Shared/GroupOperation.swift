@@ -39,17 +39,14 @@ public class GroupOperation: Operation {
         super.init()
         queue.suspended = true
         queue.delegate = self
+        addObserver(BlockObserver(cancellationHandler: { [weak self] _ in
+            self?.queue.cancelAllOperations()
+        }))
     }
 
     /// Convenience intiializer for direct usage without subclassing.
     public convenience init(operations: NSOperation...) {
         self.init(operations: operations)
-    }
-
-    /// Cancels all the groups operations.
-    public override func cancel() {
-        queue.cancelAllOperations()
-        super.cancel()
     }
 
     /**
