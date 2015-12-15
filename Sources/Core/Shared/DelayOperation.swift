@@ -23,6 +23,7 @@ time-out.
 public class DelayOperation: Operation {
 
     internal enum Delay: CustomStringConvertible {
+
         case Interval(NSTimeInterval)
         case Date(NSDate)
 
@@ -44,29 +45,48 @@ public class DelayOperation: Operation {
     }
 
     private let delay: Delay
+    private let leeway: UInt64
+    private let timer: dispatch_source_t
 
-    internal init(delay: Delay) {
+    internal init(delay: Delay, leeway: Int = 1_000_000) {
         self.delay = delay
+        self.leeway = UInt64(leeway)
+        self.timer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, Queue.Default.queue)
         super.init()
         name = "Delay \(delay)"
+        dispatch_source_set_event_handler(timer) {
+            if !self.cancelled {
+                self.finish()
+            }
+        }
     }
 
     /**
     Initialize the `DelayOperation` with a time interval.
     
-    - parameter interval: a `NSTimeInterval`.
+     - parameter interval: a `NSTimeInterval`.
+     - parameter leeway: an `Int` representing leeway of 
+     nanoseconds for the timer. This defaults to 1_000_000
+     meaning the timer is accurate to milli-second accuracy.
+     This is partly from a energy standpoint as nanosecond
+     accuracy is costly.
     */
-    public convenience init(interval: NSTimeInterval) {
-        self.init(delay: .Interval(interval))
+    public convenience init(interval: NSTimeInterval, leeway: Int = 1_000_000) {
+        self.init(delay: .Interval(interval), leeway: leeway)
     }
 
     /**
     Initialize the `DelayOperation` with a date.
 
-    - parameter interval: a `NSDate`.
+     - parameter interval: a `NSDate`.
+     - parameter leeway: an `Int` representing leeway of
+     nanoseconds for the timer. This defaults to 1_000_000
+     meaning the timer is accurate to milli-second accuracy.
+     This is partly from a energy standpoint as nanosecond
+     accuracy is costly.
     */
-    public convenience init(date: NSDate) {
-        self.init(delay: .Date(date))
+    public convenience init(date: NSDate, leeway: Int = 1_000_000) {
+        self.init(delay: .Date(date), leeway: leeway)
     }
 
     /**
@@ -79,17 +99,17 @@ public class DelayOperation: Operation {
         switch delay.interval {
 
         case (let interval) where interval > 0.0:
-            let after = dispatch_time(DISPATCH_TIME_NOW, Int64(interval * Double(NSEC_PER_SEC)))
-            dispatch_after(after, Queue.Main.queue) {
-                if !self.cancelled {
-                    self.finish()
-                }
-            }
+            dispatch_source_set_timer(timer, dispatch_time(DISPATCH_TIME_NOW, Int64(interval * Double(NSEC_PER_SEC))), DISPATCH_TIME_FOREVER, leeway)
+            dispatch_resume(timer)
+
         default:
             finish()
         }
     }
 
-
+    public override func cancel() {
+        dispatch_source_cancel(timer)
+        super.cancel()
+    }
 }
 
