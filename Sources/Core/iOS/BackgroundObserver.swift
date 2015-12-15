@@ -88,10 +88,13 @@ public class BackgroundObserver: NSObject {
 extension BackgroundObserver: OperationObserver {
 
     /// Conforms to `OperationObserver`, has no opertion for when the operation finishes
-    public func operationDidStart(operation: Operation) {}
+    public func operationDidStart(operation: Operation) { /* No operation */ }
+
+    /// Conforms to `OperationObserver`, executes the optional cancellationHandler.
+    public func operationDidCancel(operation: Operation) { /* No operation */ }
 
     /// Conforms to `OperationObserver`, has no opertion for when another operation is produced.
-    public func operation(operation: Operation, didProduceOperation newOperation: NSOperation) {}
+    public func operation(operation: Operation, didProduceOperation newOperation: NSOperation) { /* No operation */ }
 
     /// Conforms to `OperationObserver`, will end any background task that has been started.
     public func operationDidFinish(operation: Operation, errors: [ErrorType]) {

@@ -40,10 +40,11 @@ public class NetworkObserver: OperationObserver {
         }
     }
 
+    /// Conforms to `OperationObserver`, executes the optional cancellationHandler.
+    public func operationDidCancel(operation: Operation) { /* No operation */ }
+
     /// Conforms to `OperationObserver`, has no opertion for when another operation is produced.
-    public func operation(operation: Operation, didProduceOperation newOperation: NSOperation) {
-        // no-op
-    }
+    public func operation(operation: Operation, didProduceOperation newOperation: NSOperation) { /* No operation */ }
 
     /// Conforms to `OperationObserver`, will stop the network activity indicator.
     public func operationDidFinish(operation: Operation, errors: [ErrorType]) {

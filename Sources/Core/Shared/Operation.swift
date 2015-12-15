@@ -121,6 +121,10 @@ public class Operation: NSOperation {
         }
         didSet {
             didChangeValueForKey("Cancelled")
+
+            if _cancelled && !oldValue {
+                observers.forEach { $0.operationDidCancel(self) }
+            }
         }
     }
 
