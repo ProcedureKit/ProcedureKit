@@ -78,10 +78,10 @@ class AddressBookOperationTests: OperationTests {
         var didSucceed = false
         let operation = AddressBookOperation(registrar: registrar)
         operation.addObserver(BlockObserver(
-            startHandler: { _ in
+            didStart: { _ in
                 didStart = true
             },
-            finishHandler: { (_, errors) in
+            didFinish: { (_, errors) in
                 didSucceed = errors.isEmpty
             }
         ))
@@ -106,10 +106,10 @@ class AddressBookOperationTests: OperationTests {
 
         let operation = AddressBookOperation(registrar: registrar)
         operation.addObserver(BlockObserver(
-            startHandler: { _ in
+            didStart: { _ in
                 didStart = true
             },
-            finishHandler: { (_, errors) in
+            didFinish: { (_, errors) in
                 didSucceed = errors.isEmpty
                 receivedErrors = errors
             }
@@ -172,7 +172,7 @@ class AddressBookConditionTests: OperationTests {
         let operation = TestOperation()
         operation.addCondition(AddressBookCondition(registrar: registrar))
 
-        operation.addObserver(BlockObserver { (_, errors) in
+        operation.addObserver(FinishedObserver { _, errors in
             receivedErrors = errors
         })
 

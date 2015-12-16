@@ -65,12 +65,12 @@ class ReachabilityConditionTests: OperationTests {
         operation.addCondition(condition)
 
         var observedErrors = Array<ErrorType>()
-        operation.addObserver(BlockObserver(finishHandler: { (op, errors) in
+        operation.addObserver(FinishedObserver { op, errors in
             if op == operation {
                 observedErrors = errors
             }
             expectation.fulfill()
-        }))
+        })
 
         runOperation(operation)
 
@@ -94,12 +94,12 @@ class ReachabilityConditionTests: OperationTests {
         operation.addCondition(condition)
 
         var observedErrors = Array<ErrorType>()
-        operation.addObserver(BlockObserver(finishHandler: { (op, errors) in
+        operation.addObserver(FinishedObserver { op, errors in
             if op == operation {
                 observedErrors = errors
             }
             expectation.fulfill()
-        }))
+        })
 
         runOperation(operation)
 

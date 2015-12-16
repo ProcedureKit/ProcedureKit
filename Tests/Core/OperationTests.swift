@@ -281,7 +281,6 @@ class CompletionBlockOperationTests: OperationTests {
 //        }
 
         let operation = BlockOperation()
-        operation.log.severity = .Verbose
 
         operation.completionBlock = {
             numberOfTimesCompletionBlockIsRun += 1
@@ -423,12 +422,9 @@ class CancellationOperationTests: OperationTests {
     func test__operation_with_dependency_cancelled_before_adding_still_executes() {
 
         let delay = DelayOperation(interval: 2)
-        delay.log.severity = .Verbose
-
         let operation = TestOperation()
-        operation.log.severity = .Verbose
-
         operation.addDependency(delay)
+
         addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
 
         delay.cancel()
@@ -443,10 +439,7 @@ class CancellationOperationTests: OperationTests {
     func test__operation_with_dependency_cancelled_after_adding_does_not_execute() {
 
         let delay = DelayOperation(interval: 2)
-        delay.log.severity = .Verbose
-
         let operation = TestOperation()
-
         operation.addDependency(delay)
 
         runOperations(delay, operation)
@@ -457,8 +450,6 @@ class CancellationOperationTests: OperationTests {
 
     func test__operation_with_dependency_whole_queue_cancelled() {
         let delay = DelayOperation(interval: 2)
-        delay.log.severity = .Verbose
-
         let operation = TestOperation()
         operation.addDependency(delay)
 
