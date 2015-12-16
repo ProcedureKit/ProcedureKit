@@ -72,6 +72,12 @@ class MainController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         configure()
+
+        /// This is a little example of using the dependency injection stuff
+        let retrieval = DataRetrieval()
+        let processing = DataProcessing()
+        processing.injectResultFromDependency(retrieval)
+        queue.addOperations(retrieval, processing)
     }
 
     func configure() {
@@ -164,4 +170,40 @@ extension UIStoryboardSegue {
 
     }
 }
+
+
+class DataRetrieval: Operation, ResultOperationType {
+
+    var result: String? = .None
+
+    override init() {
+        super.init()
+        name = "Data Retrieval"
+    }
+
+    override func execute() {
+        result = "Hello World"
+        finish()
+    }
+}
+
+class DataProcessing: Operation, AutomaticInjectionOperationType {
+
+    var requirement: String? = .None
+
+    override init() {
+        super.init()
+        name = "Data Processing"
+    }
+
+    override func execute() {
+        log.severity = .Notice
+        let output = requirement ?? "No requirements provided!"
+        log.info(output)
+        finish()
+    }
+}
+
+
+
 
