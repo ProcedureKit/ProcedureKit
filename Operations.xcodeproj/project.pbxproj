@@ -138,7 +138,6 @@
 		652618EB1C11F99E00654091 /* AddressBookConditions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652616E61C11F5EB00654091 /* AddressBookConditions.swift */; };
 		652618EC1C11F99E00654091 /* AddressBookOperations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652616E71C11F5EB00654091 /* AddressBookOperations.swift */; };
 		652618ED1C11F99E00654091 /* AddressBookUIOperations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652616E81C11F5EB00654091 /* AddressBookUIOperations.swift */; };
-		652618EE1C11F9AA00654091 /* HealthCapability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652616F21C11F5EB00654091 /* HealthCapability.swift */; };
 		652618EF1C11F9AA00654091 /* LocationCapability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652616F31C11F5EB00654091 /* LocationCapability.swift */; };
 		652618F01C11F9AA00654091 /* LocationOperations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652616F41C11F5EB00654091 /* LocationOperations.swift */; };
 		652618F11C11F9AA00654091 /* PassbookCapability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652616F51C11F5EB00654091 /* PassbookCapability.swift */; };
@@ -147,7 +146,6 @@
 		652618F41C11F9AA00654091 /* UserConfirmationCondition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652616F81C11F5EB00654091 /* UserConfirmationCondition.swift */; };
 		652618F51C11F9AA00654091 /* UserNotificationCondition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652616F91C11F5EB00654091 /* UserNotificationCondition.swift */; };
 		652618F61C11F9AA00654091 /* WebpageOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652616FA1C11F5EB00654091 /* WebpageOperation.swift */; };
-		652618F71C11F9AD00654091 /* HealthCapability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652616F21C11F5EB00654091 /* HealthCapability.swift */; };
 		652618FA1C11F9AD00654091 /* PassbookCapability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652616F51C11F5EB00654091 /* PassbookCapability.swift */; };
 		652619061C11F9AF00654091 /* UserConfirmationCondition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652616F81C11F5EB00654091 /* UserConfirmationCondition.swift */; };
 		6526191D1C11FC3D00654091 /* AlertOperationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6526170B1C11F5EB00654091 /* AlertOperationTests.swift */; };
@@ -211,7 +209,6 @@
 		6526196D1C11FE6900654091 /* CalendarCapabilityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652617231C11F5EB00654091 /* CalendarCapabilityTests.swift */; };
 		6526196E1C11FE6900654091 /* CapabilityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652617241C11F5EB00654091 /* CapabilityTests.swift */; };
 		6526196F1C11FE6900654091 /* CloudCapabilityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652617251C11F5EB00654091 /* CloudCapabilityTests.swift */; };
-		652619701C11FE6900654091 /* HealthCapabilityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652617261C11F5EB00654091 /* HealthCapabilityTests.swift */; };
 		652619711C11FE6900654091 /* LocationCapabilityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652617271C11F5EB00654091 /* LocationCapabilityTests.swift */; };
 		652619721C11FE6900654091 /* LocationOperationsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652617281C11F5EB00654091 /* LocationOperationsTests.swift */; };
 		652619731C11FE6900654091 /* PassbookCapabilityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652617291C11F5EB00654091 /* PassbookCapabilityTests.swift */; };
@@ -294,7 +291,6 @@
 		652616ED1C11F5EB00654091 /* Contacts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Contacts.swift; sourceTree = "<group>"; };
 		652616EE1C11F5EB00654091 /* ContactsCondition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactsCondition.swift; sourceTree = "<group>"; };
 		652616EF1C11F5EB00654091 /* ContactsOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactsOperation.swift; sourceTree = "<group>"; };
-		652616F21C11F5EB00654091 /* HealthCapability.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthCapability.swift; sourceTree = "<group>"; };
 		652616F31C11F5EB00654091 /* LocationCapability.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationCapability.swift; sourceTree = "<group>"; };
 		652616F41C11F5EB00654091 /* LocationOperations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationOperations.swift; sourceTree = "<group>"; };
 		652616F51C11F5EB00654091 /* PassbookCapability.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PassbookCapability.swift; sourceTree = "<group>"; };
@@ -337,7 +333,6 @@
 		652617231C11F5EB00654091 /* CalendarCapabilityTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarCapabilityTests.swift; sourceTree = "<group>"; };
 		652617241C11F5EB00654091 /* CapabilityTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CapabilityTests.swift; sourceTree = "<group>"; };
 		652617251C11F5EB00654091 /* CloudCapabilityTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudCapabilityTests.swift; sourceTree = "<group>"; };
-		652617261C11F5EB00654091 /* HealthCapabilityTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthCapabilityTests.swift; sourceTree = "<group>"; };
 		652617271C11F5EB00654091 /* LocationCapabilityTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationCapabilityTests.swift; sourceTree = "<group>"; };
 		652617281C11F5EB00654091 /* LocationOperationsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationOperationsTests.swift; sourceTree = "<group>"; };
 		652617291C11F5EB00654091 /* PassbookCapabilityTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PassbookCapabilityTests.swift; sourceTree = "<group>"; };
@@ -360,6 +355,8 @@
 		65691C9D1C21A29C00AF06B4 /* ResultInjectionTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ResultInjectionTests.swift; sourceTree = "<group>"; };
 		657DBA321C208830001E00F3 /* BlockObserverTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BlockObserverTests.swift; sourceTree = "<group>"; };
 		658158441C20DBAD0086FB2A /* ResultInjection.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ResultInjection.swift; sourceTree = "<group>"; };
+		65A6BA7B1C220F09003A375D /* HealthCapability.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HealthCapability.swift; sourceTree = "<group>"; };
+		65A6BA7E1C220FBD003A375D /* HealthCapabilityTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HealthCapabilityTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -489,6 +486,7 @@
 		652616E21C11F5EB00654091 /* Extras */ = {
 			isa = PBXGroup;
 			children = (
+				65A6BA791C220F09003A375D /* Health */,
 				652616E31C11F5EB00654091 /* AddressBook */,
 				652616E91C11F5EB00654091 /* Contacts */,
 			);
@@ -553,7 +551,6 @@
 		652616F11C11F5EB00654091 /* iOS */ = {
 			isa = PBXGroup;
 			children = (
-				652616F21C11F5EB00654091 /* HealthCapability.swift */,
 				652616F31C11F5EB00654091 /* LocationCapability.swift */,
 				652616F41C11F5EB00654091 /* LocationOperations.swift */,
 				652616F51C11F5EB00654091 /* PassbookCapability.swift */,
@@ -631,6 +628,7 @@
 		6526171B1C11F5EB00654091 /* Extras */ = {
 			isa = PBXGroup;
 			children = (
+				65A6BA7D1C220FBD003A375D /* Health */,
 				6526171C1C11F5EB00654091 /* AddressBook */,
 				6526171F1C11F5EB00654091 /* Contacts */,
 			);
@@ -661,7 +659,6 @@
 				652617231C11F5EB00654091 /* CalendarCapabilityTests.swift */,
 				652617241C11F5EB00654091 /* CapabilityTests.swift */,
 				652617251C11F5EB00654091 /* CloudCapabilityTests.swift */,
-				652617261C11F5EB00654091 /* HealthCapabilityTests.swift */,
 				652617271C11F5EB00654091 /* LocationCapabilityTests.swift */,
 				652617281C11F5EB00654091 /* LocationOperationsTests.swift */,
 				652617291C11F5EB00654091 /* PassbookCapabilityTests.swift */,
@@ -696,6 +693,30 @@
 				652617011C11F5EB00654091 /* Reachability.swift */,
 			);
 			name = Support;
+			sourceTree = "<group>";
+		};
+		65A6BA791C220F09003A375D /* Health */ = {
+			isa = PBXGroup;
+			children = (
+				65A6BA7A1C220F09003A375D /* iOS */,
+			);
+			path = Health;
+			sourceTree = "<group>";
+		};
+		65A6BA7A1C220F09003A375D /* iOS */ = {
+			isa = PBXGroup;
+			children = (
+				65A6BA7B1C220F09003A375D /* HealthCapability.swift */,
+			);
+			path = iOS;
+			sourceTree = "<group>";
+		};
+		65A6BA7D1C220FBD003A375D /* Health */ = {
+			isa = PBXGroup;
+			children = (
+				65A6BA7E1C220FBD003A375D /* HealthCapabilityTests.swift */,
+			);
+			path = Health;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -988,7 +1009,6 @@
 				652618711C11F8FC00654091 /* Support.swift in Sources */,
 				652618B51C11F91200654091 /* ReachabilityCondition.swift in Sources */,
 				652618EF1C11F9AA00654091 /* LocationCapability.swift in Sources */,
-				652618EE1C11F9AA00654091 /* HealthCapability.swift in Sources */,
 				652618CF1C11F93D00654091 /* AlertOperation.swift in Sources */,
 				652618F01C11F9AA00654091 /* LocationOperations.swift in Sources */,
 				652618ED1C11F99E00654091 /* AddressBookUIOperations.swift in Sources */,
@@ -1050,7 +1070,6 @@
 				6526191F1C11FC3D00654091 /* BlockConditionTests.swift in Sources */,
 				6526196D1C11FE6900654091 /* CalendarCapabilityTests.swift in Sources */,
 				652619201C11FC3D00654091 /* ComposedOperationTests.swift in Sources */,
-				652619701C11FE6900654091 /* HealthCapabilityTests.swift in Sources */,
 				652619281C11FC3D00654091 /* NoFailedDependenciesConditionTests.swift in Sources */,
 				652619251C11FC3D00654091 /* MutualExclusiveTests.swift in Sources */,
 				652619291C11FC3D00654091 /* OperationTests.swift in Sources */,
@@ -1097,7 +1116,6 @@
 				652618B81C11F91300654091 /* Capability.swift in Sources */,
 				652618731C11F8FD00654091 /* BlockCondition.swift in Sources */,
 				6526187B1C11F8FD00654091 /* Logging.swift in Sources */,
-				652618F71C11F9AD00654091 /* HealthCapability.swift in Sources */,
 				652618741C11F8FD00654091 /* BlockObserver.swift in Sources */,
 				652618811C11F8FD00654091 /* OperationCondition.swift in Sources */,
 			);

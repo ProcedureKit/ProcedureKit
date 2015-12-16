@@ -65,7 +65,7 @@ session Advanced NSOperations: https://developer.apple.com/videos/wwdc/2015/?id=
     ]
   end
 
-#  Creates a framework suitable for an (iOS, tvOS or OS X) Extension
+  # Creates a framework suitable for an (iOS, tvOS or OS X) Extension
   s.subspec 'Extension' do |ss|
     ss.platforms = { :ios => "8.0", :tvos => "9.0", :osx => "10.10" }
     ss.source_files = [
@@ -95,9 +95,21 @@ session Advanced NSOperations: https://developer.apple.com/videos/wwdc/2015/?id=
     ]
   end
 
+  # Subspec which includes HealthCondition. Note that this
+  # will import HealthKit, which means that when submitting
+  # to the AppStore, special notes regarding the usage of
+  # HealthKit.
+  s.subspec '+HealthKit' do |ss|
+    ss.platforms = { :ios => "8.0", :watchos => "2.0" }
+    ss.dependency 'Operations/Standard'
+    ss.source_files = [
+      'Sources/Extras/Health/iOS'
+    ]
+  end
+
   # Subspec which includes AddressBook & Contact functionality
   s.subspec '+AddressBook' do |ss|
-    ss.platforms = { :ios => "8.0", :osx => "10.10" }    
+    ss.platforms = { :ios => "8.0", :osx => "10.10" }
     ss.dependency 'Operations/Standard'
     ss.source_files = [
       'Sources/Extras/AddressBook/iOS',
@@ -111,4 +123,5 @@ session Advanced NSOperations: https://developer.apple.com/videos/wwdc/2015/?id=
   end
 
 end
+
 
