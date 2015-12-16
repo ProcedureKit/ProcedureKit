@@ -14,24 +14,24 @@ import Foundation
  These protocols and extensions allow the injection of result(s) from
  one operation into another. 
  
- Consider a data processing task, before it can execute, it must have 
- the data to process. Consider this data to be a *requirement*. Unless
- this data is literal (i.e. known at compile time) a good practice is
- to "inject" the data into the data-processing task. This is called 
- dependency injection, and in a text book, it would be best to inject
- the dependency (i.e. data) into the task's constructor.
+ Consider a data processing task. Before it can execute, it must have
+ the data to process; this data is a *requirement* of the operation. 
+ Unless this data is literal (i.e. known at compile time) a good 
+ practice is to "inject" the data into the data-processing task. 
+ This is called dependency injection, and a text book would say it is
+ best to inject the dependency (i.e. data) into the task's constructor.
  
- However, with Operations, we cannot exactly do this, hence (and to 
- avoid the overloaded term "dependency") we are going to refer to this
- data as a requirement.
+ However, with Operations, we cannot exactly do this, and so must set
+ it on the operation after initialization. Also to avoid the overloaded 
+ term "dependency" we are going to refer to this data as a requirement.
  
  In almost all cases the requirement can be the *result* of another
  operation. Even reading data from the disk should be framed in the
- context of an asychonous task suitable for Operation. Therefore in 
+ context of an asychonous task suitable for an Operation. Therefore in
  general we wish to take the result from one operation and set it as
  the requirement on another. This implies an operation dependency. The
- data-processing operation depends upon the completion of the data-
- retrieval operation.
+ data-processing operation depends upon the successful completion of 
+ the data-retrieval operation.
 
  In the most general case, we can achieve this by making the
  data-processing operation conform to `InjectionOperationType`.
@@ -62,9 +62,16 @@ import Foundation
  Note here, that the closure's arguments are generic types, so
  `op` is actually the `processing` operation, and `dep` is the 
  `fetch` operation. They are properly typed, and we are assuming that
- there `data` property is set up accordingly.
+ each `data` property is set up accordingly.
  
  The usage of this closure is why we refer to this as manual injection.
+ 
+ This can be pretty handy if there are many different requirements which
+ need setting from the same dependency. 
+ 
+ Additionally - there is no limitation on how many times this is used. If
+ an operation has requirements from multiple dependencies - call it for
+ each dependency.
 */
 public protocol InjectionOperationType: class { }
 
