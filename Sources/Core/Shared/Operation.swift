@@ -96,7 +96,7 @@ public class Operation: NSOperation {
     private var _internalErrors = [ErrorType]()
 
     private(set) var conditions = [OperationCondition]()
-    private(set) var observers = [OperationObserver]()
+    private(set) var observers = [OperationObserverType]()
 
     private var state: State {
         get {
@@ -121,7 +121,7 @@ public class Operation: NSOperation {
             didChangeValueForKey("Cancelled")
 
             if _cancelled && !oldValue {
-                observers.forEach { $0.operationDidCancel(self) }
+                didCancelObservers.forEach { $0.operationDidCancel(self) }
             }
         }
     }
@@ -235,7 +235,8 @@ public class Operation: NSOperation {
     }
 
     private func evaluateConditions() -> Bool {
-        assert(state == .Pending && cancelled == false, "\(__FUNCTION__) was called out of order.")
+        assert(state == .Pending, "\(__FUNCTION__) was called out of order.")
+        assert(cancelled == false, "\(__FUNCTION__) was called on cancelled operation.")
         if conditions.count > 0 {
             state = .EvaluatingConditions
             OperationConditionEvaluator.evaluate(conditions, operation: self) { errors in
@@ -264,12 +265,28 @@ public class Operation: NSOperation {
 
     // MARK: - Observers
 
+    var didStartObservers: [OperationDidStartObserver] {
+        return observers.flatMap { $0 as? OperationDidStartObserver }
+    }
+
+    var didCancelObservers: [OperationDidCancelObserver] {
+        return observers.flatMap { $0 as? OperationDidCancelObserver }
+    }
+
+    var didProduceOperationObservers: [OperationDidProduceOperationObserver] {
+        return observers.flatMap { $0 as? OperationDidProduceOperationObserver }
+    }
+
+    var didFinishObservers: [OperationDidFinishObserver] {
+        return observers.flatMap { $0 as? OperationDidFinishObserver }
+    }
+
     /**
     Add an observer to the to the operation, can only be done prior to the operation starting.
 
     - parameter observer: type conforming to protocol `OperationObserver`.
     */
-    public func addObserver(observer: OperationObserver) {
+    public func addObserver(observer: OperationObserverType) {
         assert(state < .Executing, "Cannot modify observers after execution has begun, current state: \(state).")
         observers.append(observer)
     }
@@ -308,7 +325,7 @@ public class Operation: NSOperation {
         if _internalErrors.isEmpty && !cancelled {
             state = .Executing
             log.info("Will Execute")
-            observers.forEach { $0.operationDidStart(self) }
+            didStartObservers.forEach { $0.operationDidStart(self) }
             execute()
         }
         else {
@@ -359,7 +376,7 @@ public class Operation: NSOperation {
     */
     public final func produceOperation(operation: NSOperation) {
         log.info("Did produce \(operation.operationName)")
-        observers.forEach { $0.operation(self, didProduceOperation: operation) }
+        didProduceOperationObservers.forEach { $0.operation(self, didProduceOperation: operation) }
     }
     
     // MARK: Finishing
@@ -391,7 +408,7 @@ public class Operation: NSOperation {
                 log.warning("Did finish with errors: \(errors).")
             }
 
-            observers.forEach { $0.operationDidFinish(self, errors: self._internalErrors) }
+            didFinishObservers.forEach { $0.operationDidFinish(self, errors: self._internalErrors) }
 
             state = .Finished
         }
