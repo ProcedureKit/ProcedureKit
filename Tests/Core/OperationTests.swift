@@ -446,7 +446,6 @@ class CancellationOperationTests: OperationTests {
         delay.log.severity = .Verbose
 
         let operation = TestOperation()
-        operation.log.severity = .Verbose
 
         operation.addDependency(delay)
 
@@ -461,8 +460,6 @@ class CancellationOperationTests: OperationTests {
         delay.log.severity = .Verbose
 
         let operation = TestOperation()
-        operation.log.severity = .Verbose
-
         operation.addDependency(delay)
 
         runOperations(delay, operation)

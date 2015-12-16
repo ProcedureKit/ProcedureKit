@@ -30,9 +30,8 @@ class LoggerTests: XCTestCase {
     }
 
     func test__init__severity_defaults_to_global_severity() {
-        LogManager.severity = .Info
         log = Logger()
-        XCTAssertEqual(log.severity, LogSeverity.Info)
+        XCTAssertEqual(log.severity, LogManager.severity)
     }
 
     func test__init__enabled_defaults_to_global_enabled() {
@@ -44,5 +43,12 @@ class LoggerTests: XCTestCase {
         log = Logger()
         let meta = log.meta("this/is/a/file.swift", function: "the_function", line: 100)
         XCTAssertEqual(meta, "[file.swift the_function:100], ")
+    }
+
+    func test__meta_uses_last_path_component_with_operation_name() {
+        log = Logger()
+        log.operationName = "MyOperation"
+        let meta = log.meta("this/is/a/file.swift", function: "the_function", line: 100)
+        XCTAssertEqual(meta, "[file.swift the_function:100], MyOperation: ")
     }
 }
