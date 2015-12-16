@@ -120,3 +120,14 @@ public class OperationQueue: NSOperationQueue {
     }
 }
 
+
+public extension NSOperationQueue {
+
+    /**
+     Add operations to the queue as a variadic parameter
+     - parameters ops: a variadic array of `NSOperation` instances.
+    */
+    func addOperations(ops: NSOperation...) {
+        addOperations(ops, waitUntilFinished: false)
+    }
+}
