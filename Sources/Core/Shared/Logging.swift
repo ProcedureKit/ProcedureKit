@@ -54,10 +54,13 @@ public typealias LoggerBlockType = (message: String) -> Void
 public protocol LoggerType {
 
     /// Access the block which receives the message to log.
-    var logger: LoggerBlockType { get }
+    var logger: LoggerBlockType { get set }
 
     /// Get/Set the instance log level severity
     var severity: LogSeverity { get set }
+
+    /// Enabled/Disable the instance logger
+    var enabled: Bool { get set }
 
     /// Get/Set the name of the operation.
     var operationName: String? { get set }
@@ -124,7 +127,7 @@ public extension LoggerType {
      - parameter line: a `Int`, containing the line number (make it default to __LINE__)
     */
     func log(@autoclosure message: () -> String, severity: LogSeverity, file: String = __FILE__, function: String = __FUNCTION__, line: Int = __LINE__) {
-        if LogManager.enabled && severity >= minimumLogSeverity {
+        if LogManager.enabled && enabled && severity >= minimumLogSeverity {
             let _meta = meta(file, function: function, line: line)
             let _message = message()
             dispatch_async(LogManager.queue) {
@@ -201,24 +204,28 @@ public extension LoggerType {
 */
 class _Logger<Manager: LogManagerType>: LoggerType {
 
-    /// The log severity of this logger instance.
+    /// - returns: a `LoggerBlockType` which receives the message to log
+    var logger: LoggerBlockType
+
+    /// - returns: the log severity of this logger instance.
     var severity: LogSeverity
 
-    /// The `LoggerBlockType` which receives the message to log
-    var logger: LoggerBlockType {
-        return Manager.logger
-    }
+    var enabled: Bool
 
+    /// - returns: a String?, the name of the operation.
     var operationName: String? = .None
 
     /**
      Initialize a new `Logger` instance.
-     
-     - parameter severity: a `LogSeverity`.
+
      - parameter logger: a `LoggerBlockType` block.
+     - parameter severity: a `LogSeverity`.
+     - parameter enabled: a `Bool`.
     */
-    required init(severity: LogSeverity = Manager.severity) {
+    required init(logger: LoggerBlockType = Manager.logger, severity: LogSeverity = Manager.severity, enabled: Bool = Manager.enabled) {
+        self.logger = logger
         self.severity = severity
+        self.enabled = enabled
     }
 }
 
@@ -292,13 +299,7 @@ public extension NSOperation {
      plain reading description.
     */
     var operationName: String {
-        get {
-            let _name = name ?? "\(self)"
-            guard !_name.containsString("BlockOperation") else {
-                return "Block Operation"
-            }
-            return _name
-        }
+        return name ?? "\(self)"
     }
 }
 

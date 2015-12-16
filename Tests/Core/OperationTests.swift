@@ -19,7 +19,7 @@ class TestOperation: Operation {
     let simulatedError: ErrorType?
     let producedOperation: NSOperation?
     var didExecute: Bool = false
-    
+
     init(delay: Double = 0.001, error: ErrorType? = .None, produced: NSOperation? = .None) {
         numberOfSeconds = delay
         simulatedError = error

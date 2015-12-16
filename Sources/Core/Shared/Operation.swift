@@ -92,8 +92,6 @@ public class Operation: NSOperation {
 
     private let stateLock = NSLock()
 
-    private lazy var _log: LoggerType = Logger()
-
     private var _state = State.Initialized
     private var _internalErrors = [ErrorType]()
 
@@ -192,16 +190,14 @@ public class Operation: NSOperation {
         return _cancelled
     }
 
-    // MARK: - Logging
-
-    /** 
+    /**
      # Access the logger for this Operation
      The `log` property can be used as the interface to access the logger.
      e.g. to output a message with `LogSeverity.Info` from inside
      the `Operation`, do this:
     
     ```swift
-    log.info("\(operationName): This is my message")
+    log.info("This is my message")
     ```
     
      To adjust the instance severity of the LoggerType for the
@@ -211,58 +207,24 @@ public class Operation: NSOperation {
     log.severity = .Verbose
     ```
     
-     Note, that Swift does not allow changing the property
-     types of super classes. See `getLogger()` for info
-     about using a custom logger.
-    */
-    public var log: LoggerType {
-        get { return getLogger() }
-        set { setLogger(newValue) }
-    }
-
-    /**
-     # Custom LoggerType
-     
-     To utilise a custom logger within an `Operation` subclass
-     create an instance variable for your logger, and then
-     override this method to return it. E.g.
+     The logger is a very simple type, and all it does beyond 
+     manage the enabled status and severity is send the String to
+     a block on a dedicated serial queue. Therefore to provide custom
+     logging, set the `logger` property:
      
      ```swift
-     var _customLogger: CustomLogger // conforms to LoggerType
-
-     override func getLogger() -> LoggerType {
-         return _customLogger
-     }
+     log.logger = { message in sendMessageToAnalytics(message) }
      ```
      
-     - see: `setLogger(: LoggerType)`
-     - returns: a `LoggerType`.
-    */
-    public func getLogger() -> LoggerType {
-        _log.operationName = operationName
-        return _log
-    }
-
-    /**
-     # Custom LoggerType
-
-     To utilise a custom logger within an `Operation` subclass
-     create an instance variable for your logger, and then
-     override this method to set it. E.g.
-
+     By default, the Logger's logger block is the same as the global
+     LogManager. Therefore to use a custom logger for all Operations:
+     
      ```swift
-     var _customLogger: CustomLogger // conforms to LoggerType
-
-     override func setLogger(newLogger: LoggerType) {
-        _customLogger = CustomLogger(severity: newLogger.severity, logger: newLogger.logger)
-     }
+     LogManager.logger = { message in sendMessageToAnalytics(message) }
      ```
 
-     - see: `getLogger() -> LoggerType`
-     */
-    public func setLogger(newLogger: LoggerType) {
-        _log = Logger(severity: newLogger.severity)
-    }
+    */
+    public lazy var log: LoggerType = Logger()
 
     /**
     Indicates that the Operation can now begin to evaluate readiness conditions,
