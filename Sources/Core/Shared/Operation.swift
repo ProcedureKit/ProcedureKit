@@ -165,13 +165,20 @@ public class Operation: NSOperation {
         }
     }
 
-    /// - returns: a Bool indicating whether or not the quality of service is .UserInitiated
+    /**
+     Modifies the quality of service of the underlying operation.
+
+     - requires: self must not have started yet. i.e. either hasn't been added
+     to a queue, or is waiting on dependencies.
+
+     - returns: a Bool indicating whether or not the quality of service is .UserInitiated
+    */
     public var userInitiated: Bool {
         get {
             return qualityOfService == .UserInitiated
         }
         set {
-            assert(state < .Executing, "Cannot modify userInitiated after execution has begun.")
+            precondition(state < .Executing, "Cannot modify userInitiated after execution has begun.")
             qualityOfService = newValue ? .UserInitiated : .Default
         }
     }
@@ -186,6 +193,7 @@ public class Operation: NSOperation {
         return state == .Finished
     }
 
+    /// Boolean indicator for whether the Operation has cancelled or not
     public override var cancelled: Bool {
         return _cancelled
     }
@@ -256,10 +264,12 @@ public class Operation: NSOperation {
     /**
     Add a condition to the to the operation, can only be done prior to the operation starting.
 
+    - requires: self must not have started yet. i.e. either hasn't been added 
+    to a queue, or is waiting on dependencies.
     - parameter condition: type conforming to protocol `OperationCondition`.
     */
     public func addCondition(condition: OperationCondition) {
-        assert(state < .Executing, "Cannot modify conditions after execution has begun, current state: \(state).")
+        precondition(state < .Executing, "Cannot modify conditions after execution has begun, current state: \(state).")
         conditions.append(condition)
     }
 
@@ -284,10 +294,12 @@ public class Operation: NSOperation {
     /**
     Add an observer to the to the operation, can only be done prior to the operation starting.
 
+     - requires: self must not have started yet. i.e. either hasn't been added
+     to a queue, or is waiting on dependencies.
     - parameter observer: type conforming to protocol `OperationObserver`.
     */
     public func addObserver(observer: OperationObserverType) {
-        assert(state < .Executing, "Cannot modify observers after execution has begun, current state: \(state).")
+        precondition(state < .Executing, "Cannot modify observers after execution has begun, current state: \(state).")
         observers.append(observer)
     }
 
@@ -296,10 +308,12 @@ public class Operation: NSOperation {
     already started executing. Therefore, best practice is to add dependencies before adding them to operation
     queues.
     
+     - requires: self must not have started yet. i.e. either hasn't been added
+     to a queue, or is waiting on dependencies.
     - parameter operation: a `NSOperation` instance.
     */
     public override func addDependency(operation: NSOperation) {
-        assert(state <= .Executing, "Dependencies cannot be modified after execution has begun, current state: \(state).")        
+        precondition(state <= .Executing, "Dependencies cannot be modified after execution has begun, current state: \(state).")
         super.addDependency(operation)
     }
 
