@@ -53,9 +53,7 @@ class LoggingObserverWithError: LoggingObserverTests {
         addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
         runOperation(operation)
         waitForExpectationsWithTimeout(3, handler: nil)
-
-        XCTAssertEqual(receivedMessages.count, 2)
-        XCTAssertEqual(receivedMessages[1], "Test Logging Operation: finished with error(s): [Operations.BlockCondition.Error.BlockConditionFailed].")
+        XCTAssertTrue(receivedMessages.contains("Test Logging Operation: finished with error(s): [Operations.BlockCondition.Error.BlockConditionFailed]."))
     }
 }
 
@@ -74,9 +72,7 @@ class LoggingObserverWithCancellation: LoggingObserverTests {
         runOperation(operation)
         operation.cancel()
         waitForExpectationsWithTimeout(3, handler: nil)
-
-        XCTAssertEqual(receivedMessages.count, 2)
-        XCTAssertEqual(receivedMessages[0], "Test Logging Operation: did cancel.")
+        XCTAssertTrue(receivedMessages.contains("Test Logging Operation: did cancel."))
     }
 }
 
@@ -94,11 +90,7 @@ class LoggingObserverWithProduce: LoggingObserverTests {
         addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
         runOperation(operation)
         waitForExpectationsWithTimeout(3, handler: nil)
-
-        print("*** \(receivedMessages)")
-
-        XCTAssertEqual(receivedMessages.count, 5)
-        XCTAssertEqual(receivedMessages[1], "Test Logging Operation: did produce operation: Test Operation.")
+        XCTAssertTrue(receivedMessages.contains("Test Logging Operation: did produce operation: Test Operation."))
     }
 }
 
