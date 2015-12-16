@@ -19,7 +19,7 @@ class TestOperation: Operation {
     let simulatedError: ErrorType?
     let producedOperation: NSOperation?
     var didExecute: Bool = false
-    
+
     init(delay: Double = 0.001, error: ErrorType? = .None, produced: NSOperation? = .None) {
         numberOfSeconds = delay
         simulatedError = error
@@ -446,7 +446,6 @@ class CancellationOperationTests: OperationTests {
         delay.log.severity = .Verbose
 
         let operation = TestOperation()
-        operation.log.severity = .Verbose
 
         operation.addDependency(delay)
 
@@ -461,8 +460,6 @@ class CancellationOperationTests: OperationTests {
         delay.log.severity = .Verbose
 
         let operation = TestOperation()
-        operation.log.severity = .Verbose
-
         operation.addDependency(delay)
 
         runOperations(delay, operation)
