@@ -99,7 +99,7 @@ session Advanced NSOperations: https://developer.apple.com/videos/wwdc/2015/?id=
   # will import HealthKit, which means that when submitting
   # to the AppStore, special notes regarding the usage of
   # HealthKit.
-  s.subspec '+HealthKit' do |ss|
+  s.subspec '+Health' do |ss|
     ss.platforms = { :ios => "8.0", :watchos => "2.0" }
     ss.dependency 'Operations/Standard'
     ss.source_files = [
