@@ -9,7 +9,7 @@
 import XCTest
 @testable import Operations
 
-class TestOperation: Operation {
+class TestOperation: Operation, ResultOperationType {
 
     enum Error: ErrorType {
         case SimulatedError
@@ -19,6 +19,7 @@ class TestOperation: Operation {
     let simulatedError: ErrorType?
     let producedOperation: NSOperation?
     var didExecute: Bool = false
+    var result: String? = "Hello World"
 
     init(delay: Double = 0.001, error: ErrorType? = .None, produced: NSOperation? = .None) {
         numberOfSeconds = delay

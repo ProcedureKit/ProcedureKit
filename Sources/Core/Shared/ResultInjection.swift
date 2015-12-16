@@ -123,6 +123,19 @@ public protocol AutomaticInjectionOperationType: InjectionOperationType {
     var requirement: Requirement { get set }
 }
 
+/**
+ ErrorType for automatic injection.
+ 
+ In the case where the dependency operation finishes with an error
+ the dependent operaton will be cancelled with a AutomaticInjectionError
+ 
+ The only case indicates this, and composes the errors the
+ dependency finished with.
+*/
+public enum AutomaticInjectionError: ErrorType {
+    case DependencyFinishedWithErrors([ErrorType])
+}
+
 extension AutomaticInjectionOperationType where Self: Operation {
 
     /**
@@ -156,11 +169,14 @@ extension AutomaticInjectionOperationType where Self: Operation {
     */
     public func injectResultFromDependency<T where T: Operation, T: ResultOperationType, T.Result == Requirement>(dep: T) {
         dep.addObserver(BlockObserver(finishHandler: { op, errors in
-            if errors.isEmpty, let dep = op as? T {
-                self.requirement = dep.result
+            if let dep = op as? T {
+                if errors.isEmpty {
+                    self.requirement = dep.result
+                }
+                else {
+                    self.cancelWithError(AutomaticInjectionError.DependencyFinishedWithErrors(errors))
+                }
             }
-            // TODO: How to handle errors here - can't actually throw from this of course as it's async....
-            // might add a `cancelWithErrors(errors: [ErrorType])` method.
         }))
         (self as Operation).addDependency(dep)
     }

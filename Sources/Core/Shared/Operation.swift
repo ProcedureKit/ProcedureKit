@@ -349,12 +349,22 @@ public class Operation: NSOperation {
     - parameter error: an optional `ErrorType`.
     */
     public func cancelWithError(error: ErrorType? = .None) {
-        if let error = error {
-            _internalErrors.append(error)
-            log.warning("Did cancel with error: \(error).")
+        cancelWithErrors(error.map { [$0] } ?? [])
+    }
+
+    /**
+     Cancel the operation with multiple errors.
+
+     - parameter errors: an `[ErrorType]` defaults to empty array.
+     */
+    public func cancelWithErrors(errors: [ErrorType] = []) {
+        if !errors.isEmpty {
+            log.warning("Did cancel with errors: \(errors).")
         }
+        _internalErrors += errors
         cancel()
     }
+
 
     public override func cancel() {
         if !finished {
