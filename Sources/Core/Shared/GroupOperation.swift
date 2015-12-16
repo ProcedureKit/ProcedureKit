@@ -39,9 +39,9 @@ public class GroupOperation: Operation {
         super.init()
         queue.suspended = true
         queue.delegate = self
-        addObserver(BlockObserver(cancellationHandler: { [weak self] _ in
+        addObserver(CancelledObserver { [weak self] _ in
             self?.queue.cancelAllOperations()
-        }))
+        })
     }
 
     /// Convenience intiializer for direct usage without subclassing.

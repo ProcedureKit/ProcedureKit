@@ -29,9 +29,9 @@ public class URLSessionTaskOperation: Operation {
         assert(task.state == .Suspended, "NSURLSessionTask must be suspended, not \(task.state)")
         self.task = task
         super.init()
-        addObserver(BlockObserver(cancellationHandler: { _ in
+        addObserver(CancelledObserver { _ in
             task.cancel()
-        }))
+        })
     }
 
     public override func execute() {

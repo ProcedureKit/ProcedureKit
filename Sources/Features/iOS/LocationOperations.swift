@@ -115,11 +115,11 @@ public class _UserLocationOperation<Manager: LocationManagerType>: Operation, CL
         name = "User Location"
         addCondition(AuthorizedFor(_LocationCapability(.WhenInUse, registrar: manager)))
         addCondition(MutuallyExclusive<CLLocationManager>())
-        addObserver(BlockObserver(cancellationHandler: { [weak self] _ in
+        addObserver(CancelledObserver { [weak self] _ in
             dispatch_async(Queue.Main.queue) {
                 self?.stopLocationUpdates()
             }
-        }))
+        })
     }
 
     /// Starts updating the location
@@ -214,13 +214,13 @@ public class _ReverseGeocodeOperation<Geocoder: ReverseGeocoderType>: Operation 
         addObserver(NetworkObserver())
         addObserver(BackgroundObserver())
         addCondition(MutuallyExclusive<ReverseGeocodeOperation>())
-        addObserver(BlockObserver(cancellationHandler: { [weak self] _ in
+        addObserver(CancelledObserver { [weak self] _ in
             if let geocoder = self?.geocoder {
                 dispatch_async(Queue.Main.queue) {
                     geocoder.opr_cancel()
                 }
             }
-        }))
+        })
     }
 
     public override func execute() {

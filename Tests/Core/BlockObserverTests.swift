@@ -26,7 +26,7 @@ class BlockObserverTests: OperationTests {
     func test__start_handler_is_executed() {
 
         var counter = 0
-        operation.addObserver(BlockObserver(startHandler: { op in
+        operation.addObserver(BlockObserver(didStart: { op in
             counter += 1
         }))
         
@@ -40,7 +40,7 @@ class BlockObserverTests: OperationTests {
     func test__cancellation_handler_is_executed() {
 
         var counter = 0
-        operation.addObserver(BlockObserver(cancellationHandler: { op in
+        operation.addObserver(BlockObserver(didCancel: { op in
             counter += 1
         }))
         
@@ -58,7 +58,7 @@ class BlockObserverTests: OperationTests {
         operation = TestOperation(produced: produced)
 
         var counter = 0
-        operation.addObserver(BlockObserver(produceHandler: { op, pro in
+        operation.addObserver(BlockObserver(didProduce: { op, pro in
             counter += 1
             XCTAssertEqual(produced, pro)
         }))
