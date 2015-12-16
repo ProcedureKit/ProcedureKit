@@ -88,11 +88,11 @@ extension InjectionOperationType where Self: Operation {
      - returns: `self` - so that injections can be chained together.
     */
     public func injectResultFromDependency<T where T: Operation>(dep: T, block: (operation: Self, dependency: T, errors: [ErrorType]) -> Void) -> Self {
-        dep.addObserver(BlockObserver(finishHandler: { op, errors in
+        dep.addObserver(FinishedObserver { op, errors in
             if let dep = op as? T {
                 block(operation: self, dependency: dep, errors: errors)
             }
-        }))
+        })
         (self as Operation).addDependency(dep)
         return self
     }
@@ -168,7 +168,7 @@ extension AutomaticInjectionOperationType where Self: Operation {
 
     */
     public func injectResultFromDependency<T where T: Operation, T: ResultOperationType, T.Result == Requirement>(dep: T) {
-        dep.addObserver(BlockObserver(finishHandler: { op, errors in
+        dep.addObserver(FinishedObserver { op, errors in
             if let dep = op as? T {
                 if errors.isEmpty {
                     self.requirement = dep.result
@@ -177,7 +177,7 @@ extension AutomaticInjectionOperationType where Self: Operation {
                     self.cancelWithError(AutomaticInjectionError.DependencyFinishedWithErrors(errors))
                 }
             }
-        }))
+        })
         (self as Operation).addDependency(dep)
     }
 }
