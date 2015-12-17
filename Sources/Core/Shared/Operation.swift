@@ -269,7 +269,7 @@ public class Operation: NSOperation {
     - parameter condition: type conforming to protocol `OperationCondition`.
     */
     public func addCondition(condition: OperationCondition) {
-        precondition(state < .Executing, "Cannot modify conditions after execution has begun, current state: \(state).")
+        precondition(state < .Ready, "Cannot modify conditions after operations has been ready, current state: \(state).")
         conditions.append(condition)
     }
 
@@ -299,7 +299,7 @@ public class Operation: NSOperation {
     - parameter observer: type conforming to protocol `OperationObserver`.
     */
     public func addObserver(observer: OperationObserverType) {
-        precondition(state < .Executing, "Cannot modify observers after execution has begun, current state: \(state).")
+        precondition(state < .Ready, "Cannot modify observers after operations has been ready, current state: \(state).")
         observers.append(observer)
     }
 
