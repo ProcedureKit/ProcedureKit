@@ -40,15 +40,14 @@ class LoggerTests: XCTestCase {
     }
 
     func test__meta_uses_last_path_component() {
-        log = Logger()
-        let meta = log.meta("this/is/a/file.swift", function: "the_function", line: 100)
+        let meta = LogManager.metadataForFile("this/is/a/file.swift", function: "the_function", line: 100)
         XCTAssertEqual(meta, "[file.swift the_function:100], ")
     }
 
     func test__meta_uses_last_path_component_with_operation_name() {
         log = Logger()
         log.operationName = "MyOperation"
-        let meta = log.meta("this/is/a/file.swift", function: "the_function", line: 100)
-        XCTAssertEqual(meta, "[file.swift the_function:100], MyOperation: ")
+        let message = log.messageWithOperationName("a message")
+        XCTAssertEqual(message, "MyOperation: a message")
     }
 }
