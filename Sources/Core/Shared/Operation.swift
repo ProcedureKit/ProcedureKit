@@ -91,6 +91,7 @@ public class Operation: NSOperation {
     }
 
     private let stateLock = NSLock()
+    private let readyLock = NSRecursiveLock()
 
     private var _state = State.Initialized
     private var _internalErrors = [ErrorType]()
@@ -138,30 +139,32 @@ public class Operation: NSOperation {
 
     /// Boolean indicator of the readyness of the Operation
     public override var ready: Bool {
-        switch state {
+        return readyLock.withCriticalScope {
+            switch state {
+            case .Initialized:
+                // If the operation is cancelled, isReady should return true
+                return cancelled
 
-        case .Initialized:
-            // If the operation is cancelled, isReady should return true
-            return cancelled
+            case .Pending:
+                // If the operation is cancelled, isReady should return true
+                if cancelled {
+                    state = .Ready
+                    return true
+                }
 
-        case .Pending:
-            // If the operation is cancelled, isReady should return true
-            if cancelled {
-                return true
+                if super.ready {
+                    return evaluateConditions()
+                }
+
+                // Until conditions have been evaluated, we're not ready
+                return false
+
+            case .Ready:
+                return super.ready || cancelled
+
+            default:
+                return false
             }
-
-            if super.ready {
-                return evaluateConditions()
-            }
-
-            // Until conditions have been evaluated, we're not ready
-            return false
-
-        case .Ready:
-            return super.ready || cancelled
-
-        default:
-            return false
         }
     }
 
@@ -542,4 +545,14 @@ extension NSLock {
         return value
     }
 }
+
+extension NSRecursiveLock {
+    func withCriticalScope<T>(@noescape block: () -> T) -> T {
+        lock()
+        let value = block()
+        unlock()
+        return value
+    }
+}
+
 
