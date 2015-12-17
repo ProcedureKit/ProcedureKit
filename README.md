@@ -37,7 +37,7 @@ class NumberCrunchingOperation: Operation {
 This is a contrived example, to show two key points:
 
 1. Always override `execute` (instead of `NSOperation`’s `main`)
-2. Always call `finish()`, or `finishWithError() when execution is complete.
+2. Always call `finish()`, or `finishWithError()` when execution is complete.
 
 But, if you are not familiar with `NSOperation` or haven’t yet watched the [WWDC video](https://developer.apple.com/videos/wwdc/2015/?id=226), you might be wondering why? After all, surely this is easier:
 
@@ -52,7 +52,7 @@ TODO: Explain the Operation State Machine
 
 ## Observers & Conditions
 
-Observers and Conditions are components which can be added to an `Operation` instances. There are the building blocks of the “advanced” features this framework provides.
+Observers and Conditions are components which can be added to `Operation` instances. There are the building blocks of the “advanced” features this framework provides.
 
 ### Observers
 
