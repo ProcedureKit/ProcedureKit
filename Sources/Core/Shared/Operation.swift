@@ -30,8 +30,8 @@ public class Operation: NSOperation {
         // Ready to begin evaluating conditions
         case Pending
 
-        // Is evaluating conditions
-        case EvaluatingConditions
+        // Is preparing operation
+        case Preparing
 
         // Conditions have been satisfied, ready to execute
         case Ready
@@ -48,9 +48,9 @@ public class Operation: NSOperation {
         func canTransitionToState(other: State) -> Bool {
             switch (self, other) {
             case (.Initialized, .Pending),
-                (.Pending, .EvaluatingConditions),
+                (.Pending, .Preparing),
                 (.Pending, .Finishing),
-                (.EvaluatingConditions, .Ready),
+                (.Preparing, .Ready),
                 (.Ready, .Executing),
                 (.Ready, .Finishing),
                 (.Executing, .Finishing),
@@ -85,6 +85,8 @@ public class Operation: NSOperation {
 
     private(set) var conditions = [OperationCondition]()
     private(set) var observers = [OperationObserver]()
+    private(set) var resourceProviders = [OperationResourceProvider]()
+    private(set) var namedResources = [String: Any]()
 
     private var state: State {
         get {
@@ -135,7 +137,7 @@ public class Operation: NSOperation {
             }
 
             if super.ready {
-                evaluateConditions()
+                prepare()
             }
 
             // Until conditions have been evaluated, we're not ready
@@ -240,22 +242,41 @@ public class Operation: NSOperation {
     public func setLogger(newLogger: LoggerType) {
         _log = Logger(severity: newLogger.severity)
     }
-
+    
+    // MARK: - Preparing
+    
     /**
-    Indicates that the Operation can now begin to evaluate readiness conditions,
-    if appropriate.
-    */
-    func willEnqueue() {
-        state = .Pending
-    }
-
-    private func evaluateConditions() {
+     Do necessary pre-processing to prepare the operation
+     */
+    private func prepare() {
         assert(state == .Pending && cancelled == false, "\(__FUNCTION__) was called out of order.")
-        state = .EvaluatingConditions
-        OperationConditionEvaluator.evaluate(conditions, operation: self) { errors in
-            self._internalErrors.appendContentsOf(errors)
-            self.state = .Ready
+        state = .Preparing
+        
+        let evaluateConditions = {
+            OperationConditionEvaluator.evaluate(self.conditions, operation: self) { errors in
+                self._internalErrors.appendContentsOf(errors)
+                self.state = .Ready
+            }
         }
+        let collectResources = {
+            OperationResourceCollector.collect(self.resourceProviders, operation: self) { resources in
+                self.namedResources = resources
+                evaluateConditions()
+            }
+        }
+        collectResources()
+    }
+    
+    // MARK: - Resources
+    
+    func addResourceProvider(provider: OperationResourceProvider) {
+        assert(state < .Ready, "Cannot modify resource providers after operation has been ready, current state: \(state).")
+        resourceProviders.append(provider)
+    }
+    
+    func resourceForType<ResourceType: Any>(type: ResourceType.Type) -> ResourceType? {
+        let resourceName = String(type)
+        return namedResources[resourceName] as? ResourceType
     }
 
     // MARK: - Conditions
@@ -295,6 +316,14 @@ public class Operation: NSOperation {
     }
 
     // MARK: - Execution and Cancellation
+    
+    /**
+    Indicates that the Operation can now begin to evaluate readiness conditions,
+    if appropriate.
+    */
+    func willEnqueue() {
+        state = .Pending
+    }
 
     /// Starts the operation, correctly managing the cancelled state. Cannot be over-ridden
     public override final func start() {

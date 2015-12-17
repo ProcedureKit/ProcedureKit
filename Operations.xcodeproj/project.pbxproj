@@ -225,6 +225,8 @@
 		6526197B1C11FE6D00654091 /* AddressBookConditionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6526171D1C11F5EB00654091 /* AddressBookConditionTests.swift */; };
 		6526197C1C11FE6D00654091 /* AddressBookTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6526171E1C11F5EB00654091 /* AddressBookTests.swift */; };
 		6526197D1C11FE6D00654091 /* ContactsOperationsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652617201C11F5EB00654091 /* ContactsOperationsTests.swift */; };
+		BF1E62D81C224CF800728E25 /* OperationResource.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF1E62D71C224CF800728E25 /* OperationResource.swift */; };
+		BF1E62DA1C226CB100728E25 /* OperationResourceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF1E62D91C226CB100728E25 /* OperationResourceTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -347,6 +349,8 @@
 		652617E91C11F72A00654091 /* Operations.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Operations.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		652617F21C11F72A00654091 /* OS X OperationsTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "OS X OperationsTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		652618561C11F84800654091 /* Extension Compatible.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = "Extension Compatible.xcconfig"; sourceTree = "<group>"; };
+		BF1E62D71C224CF800728E25 /* OperationResource.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OperationResource.swift; sourceTree = "<group>"; };
+		BF1E62D91C226CB100728E25 /* OperationResourceTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OperationResourceTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -468,6 +472,7 @@
 				652616DF1C11F5EB00654091 /* SlientCondition.swift */,
 				652616E01C11F5EB00654091 /* Support.swift */,
 				652616E11C11F5EB00654091 /* TimeoutObserver.swift */,
+				BF1E62D71C224CF800728E25 /* OperationResource.swift */,
 			);
 			path = Shared;
 			sourceTree = "<group>";
@@ -608,6 +613,7 @@
 				652617181C11F5EB00654091 /* SilentConditionTests.swift */,
 				652617191C11F5EB00654091 /* TimeoutObserverTests.swift */,
 				6526171A1C11F5EB00654091 /* UIOperationTests.swift */,
+				BF1E62D91C226CB100728E25 /* OperationResourceTests.swift */,
 			);
 			path = Core;
 			sourceTree = "<group>";
@@ -997,6 +1003,7 @@
 				652618EB1C11F99E00654091 /* AddressBookConditions.swift in Sources */,
 				652618EC1C11F99E00654091 /* AddressBookOperations.swift in Sources */,
 				6526186E1C11F8FC00654091 /* OperationObserver.swift in Sources */,
+				BF1E62D81C224CF800728E25 /* OperationResource.swift in Sources */,
 				652618B01C11F91200654091 /* Capability.swift in Sources */,
 				652618D21C11F93D00654091 /* UIOperation.swift in Sources */,
 				6526185F1C11F8FC00654091 /* BlockCondition.swift in Sources */,
@@ -1027,6 +1034,7 @@
 				6526197D1C11FE6D00654091 /* ContactsOperationsTests.swift in Sources */,
 				652619761C11FE6900654091 /* ReachabilityTests.swift in Sources */,
 				6526196E1C11FE6900654091 /* CapabilityTests.swift in Sources */,
+				BF1E62DA1C226CB100728E25 /* OperationResourceTests.swift in Sources */,
 				6526192A1C11FC3D00654091 /* SilentConditionTests.swift in Sources */,
 				6526197A1C11FE6900654091 /* WebpageOperationTests.swift in Sources */,
 				6526191F1C11FC3D00654091 /* BlockConditionTests.swift in Sources */,

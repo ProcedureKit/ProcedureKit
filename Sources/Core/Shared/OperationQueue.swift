@@ -69,10 +69,16 @@ public class OperationQueue: NSOperationQueue {
             )
 
             operation.addObserver(observer)
-
-            let dependencies = operation.conditions.flatMap {
+            
+            let conditionDependencies = operation.conditions.flatMap {
                 $0.dependencyForOperation(operation)
             }
+            
+            let resourceDependencies = operation.resourceProviders.flatMap {
+                $0.dependencyForOperation(operation)
+            }
+
+            let dependencies = conditionDependencies + resourceDependencies
 
             for dependency in dependencies {
                 operation.addDependency(dependency)
