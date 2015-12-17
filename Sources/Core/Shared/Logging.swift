@@ -247,6 +247,9 @@ protocol LogManagerType {
 public class LogManager: LogManagerType {
 
     static func metadataForFile(file: String, function: String, line: Int) -> String {
+        guard !file.containsString("Operations") else {
+            return ""
+        }
         let filename = (file as NSString).lastPathComponent
         return "[\(filename) \(function):\(line)], "
     }
