@@ -29,9 +29,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             case .Verbose:
                 log.verbose(message, file, function, line: line)
             case .Notice:
-                log.info(message, file, function, line: line)
-            case .Info:
                 log.debug(message, file, function, line: line)
+            case .Info:
+                log.info(message, file, function, line: line)
             case .Warning:
                 log.warning(message, file, function, line: line)
             case .Fatal:
