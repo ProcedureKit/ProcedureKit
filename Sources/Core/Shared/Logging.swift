@@ -39,11 +39,13 @@ public enum LogSeverity: Int, Comparable {
     case Fatal
 }
 
+public typealias LoggerInfo = (message: String, severity: LogSeverity, file: String, function: String, line: Int)
+
 /**
  A typealias for a logging block. This is an easy way
  to pipe the message string into another logging system.
 */
-public typealias LoggerBlockType = (message: String, severity: LogSeverity, file: String, function: String, line: Int) -> Void
+public typealias LoggerBlockType = LoggerInfo -> Void
 
 /**
  # LoggerType
@@ -200,13 +202,14 @@ public extension LoggerType {
 */
 class _Logger<Manager: LogManagerType>: LoggerType {
 
-    /// - returns: a `LoggerBlockType` which receives the message to log
-    var logger: LoggerBlockType
-
     /// - returns: the log severity of this logger instance.
     var severity: LogSeverity
 
+    /// - returns: a `Bool` to enable/disable this logger instance. Defaults to true
     var enabled: Bool
+
+    /// - returns: a `LoggerBlockType` which receives the message to log
+    var logger: LoggerBlockType
 
     /// - returns: a String?, the name of the operation.
     var operationName: String? = .None
@@ -218,10 +221,10 @@ class _Logger<Manager: LogManagerType>: LoggerType {
      - parameter severity: a `LogSeverity`.
      - parameter enabled: a `Bool`.
     */
-    required init(logger: LoggerBlockType = Manager.logger, severity: LogSeverity = Manager.severity, enabled: Bool = Manager.enabled) {
-        self.logger = logger
+    required init(severity: LogSeverity = Manager.severity, enabled: Bool = Manager.enabled, logger: LoggerBlockType = Manager.logger) {
         self.severity = severity
         self.enabled = enabled
+        self.logger = logger
     }
 }
 
