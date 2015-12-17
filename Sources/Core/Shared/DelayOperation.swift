@@ -22,7 +22,8 @@ time-out.
 */
 public class DelayOperation: Operation {
 
-    internal enum Delay {
+    internal enum Delay: CustomStringConvertible {
+
         case Interval(NSTimeInterval)
         case Date(NSDate)
 
@@ -32,28 +33,64 @@ public class DelayOperation: Operation {
             case .Date(let date): return date.timeIntervalSinceNow
             }
         }
+
+        var description: String {
+            switch self {
+            case .Interval(let _interval):
+                return "for \(_interval) seconds"
+            case .Date(let date):
+                return "until \(NSDateFormatter().stringFromDate(date))"
+            }
+        }
     }
 
     private let delay: Delay
+    private let leeway: UInt64
+    private let timer: dispatch_source_t
+
+    internal init(delay: Delay, leeway: Int = 1_000_000) {
+        self.delay = delay
+        self.leeway = UInt64(leeway)
+        let _timer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, Queue.Default.queue)
+        self.timer = _timer
+        super.init()
+        name = "Delay \(delay)"
+        dispatch_source_set_event_handler(timer) {
+            if !self.cancelled {
+                self.finish()
+            }
+        }
+        addObserver(CancelledObserver { _ in
+            dispatch_source_cancel(_timer)
+        })
+    }
 
     /**
     Initialize the `DelayOperation` with a time interval.
     
-    - parameter interval: a `NSTimeInterval`.
+     - parameter interval: a `NSTimeInterval`.
+     - parameter leeway: an `Int` representing leeway of 
+     nanoseconds for the timer. This defaults to 1_000_000
+     meaning the timer is accurate to milli-second accuracy.
+     This is partly from a energy standpoint as nanosecond
+     accuracy is costly.
     */
-    public init(interval: NSTimeInterval) {
-        delay = .Interval(interval)
-        super.init()
+    public convenience init(interval: NSTimeInterval, leeway: Int = 1_000_000) {
+        self.init(delay: .Interval(interval), leeway: leeway)
     }
 
     /**
     Initialize the `DelayOperation` with a date.
 
-    - parameter interval: a `NSDate`.
+     - parameter interval: a `NSDate`.
+     - parameter leeway: an `Int` representing leeway of
+     nanoseconds for the timer. This defaults to 1_000_000
+     meaning the timer is accurate to milli-second accuracy.
+     This is partly from a energy standpoint as nanosecond
+     accuracy is costly.
     */
-    public init(date: NSDate) {
-        delay = .Date(date)
-        super.init()
+    public convenience init(date: NSDate, leeway: Int = 1_000_000) {
+        self.init(delay: .Date(date), leeway: leeway)
     }
 
     /**
@@ -66,17 +103,12 @@ public class DelayOperation: Operation {
         switch delay.interval {
 
         case (let interval) where interval > 0.0:
-            let after = dispatch_time(DISPATCH_TIME_NOW, Int64(interval * Double(NSEC_PER_SEC)))
-            dispatch_after(after, Queue.Main.queue) {
-                if !self.cancelled {
-                    self.finish()
-                }
-            }
+            dispatch_source_set_timer(timer, dispatch_time(DISPATCH_TIME_NOW, Int64(interval * Double(NSEC_PER_SEC))), DISPATCH_TIME_FOREVER, leeway)
+            dispatch_resume(timer)
+
         default:
             finish()
         }
     }
-
-
 }
 

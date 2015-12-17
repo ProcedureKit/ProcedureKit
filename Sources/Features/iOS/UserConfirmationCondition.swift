@@ -71,13 +71,11 @@ public class UserConfirmationCondition<From: PresentingViewController>: Operatio
 
 extension UserConfirmationCondition: OperationObserver {
 
-    public func operationDidStart(operation: Operation) {
-        // no-op
-    }
+    public func operationDidStart(operation: Operation) { /* No operation */ }
 
-    public func operation(operation: Operation, didProduceOperation newOperation: NSOperation) {
-        // no-op
-    }
+    public func operationDidCancel(operation: Operation) { /* No operation */ }
+
+    public func operation(operation: Operation, didProduceOperation newOperation: NSOperation) { /* No operation */ }
 
     public func operationDidFinish(operation: Operation, errors: [ErrorType]) {
         if operation == alert {

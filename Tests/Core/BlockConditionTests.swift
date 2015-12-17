@@ -30,10 +30,10 @@ class BlockConditionTests: OperationTests {
         operation.addCondition(BlockCondition { false })
 
         var receivedErrors = [ErrorType]()
-        operation.addObserver(BlockObserver(finishHandler: { (op, errors) in
+        operation.addObserver(FinishedObserver { _, errors in
             receivedErrors = errors
             expectation.fulfill()
-        }))
+        })
 
         runOperation(operation)
         waitForExpectationsWithTimeout(3, handler: nil)

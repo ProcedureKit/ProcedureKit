@@ -54,10 +54,16 @@ public typealias LoggerBlockType = (message: String) -> Void
 public protocol LoggerType {
 
     /// Access the block which receives the message to log.
-    var logger: LoggerBlockType { get }
+    var logger: LoggerBlockType { get set }
 
     /// Get/Set the instance log level severity
     var severity: LogSeverity { get set }
+
+    /// Enabled/Disable the instance logger
+    var enabled: Bool { get set }
+
+    /// Get/Set the name of the operation.
+    var operationName: String? { get set }
 
     /**
      The primary log function. The main job of this method
@@ -70,23 +76,30 @@ public protocol LoggerType {
      - parameter function: a `String`, containing the function (make it default to __FUNCTION__)
      - parameter line: a `Int`, containing the line number (make it default to __LINE__)
     */
-    func log(message: String, severity: LogSeverity, file: String, function: String, line: Int)
+    func log(@autoclosure message: () -> String, severity: LogSeverity, file: String, function: String, line: Int)
 }
 
-public extension LoggerType {
+internal extension LoggerType {
 
     /// Access the minimum `LogSeverity` severity.
     var minimumLogSeverity: LogSeverity {
-        return min(LogManager.globalLogSeverity, severity)
+        return min(LogManager.severity, severity)
     }
 
-    func prefix(file: String = __FILE__, function: String = __FUNCTION__, line: Int = __LINE__) -> String {
+    func meta(file: String = __FILE__, function: String = __FUNCTION__, line: Int = __LINE__) -> String {
+        var result = ""
+        if let name = operationName {
+            result = "\(name): "
+        }
         guard !file.containsString("Operations") else {
-            return ""
+            return result
         }
         let filename = (file as NSString).lastPathComponent
-        return "[\(filename) \(function):\(line)], "
+        return "[\(filename) \(function):\(line)], \(result)"
     }
+}
+
+public extension LoggerType {
 
     /**
      # Default log function
@@ -113,11 +126,12 @@ public extension LoggerType {
      - parameter function: a `String`, containing the function (make it default to __FUNCTION__)
      - parameter line: a `Int`, containing the line number (make it default to __LINE__)
     */
-    func log(message: String, severity: LogSeverity, file: String = __FILE__, function: String = __FUNCTION__, line: Int = __LINE__) {
-        if severity >= minimumLogSeverity {
-            let _prefix = prefix(file, function: function, line: line)
+    func log(@autoclosure message: () -> String, severity: LogSeverity, file: String = __FILE__, function: String = __FUNCTION__, line: Int = __LINE__) {
+        if LogManager.enabled && enabled && severity >= minimumLogSeverity {
+            let _meta = meta(file, function: function, line: line)
+            let _message = message()
             dispatch_async(LogManager.queue) {
-                self.logger(message: "\(_prefix)\(message)")
+                self.logger(message: "\(_meta)\(_message)")
             }
         }
     }
@@ -130,7 +144,7 @@ public extension LoggerType {
      - parameter function: a `String`, containing the function (make it default to __FUNCTION__)
      - parameter line: a `Int`, containing the line number (make it default to __LINE__)
     */
-    func verbose(message: String, file: String = __FILE__, function: String = __FUNCTION__, line: Int = __LINE__) {
+    func verbose(@autoclosure message: () -> String, file: String = __FILE__, function: String = __FUNCTION__, line: Int = __LINE__) {
         log(message, severity: .Verbose, file: file, function: function, line: line)
     }
 
@@ -142,7 +156,7 @@ public extension LoggerType {
      - parameter function: a `String`, containing the function (make it default to __FUNCTION__)
      - parameter line: a `Int`, containing the line number (make it default to __LINE__)
      */
-    func notice(message: String, file: String = __FILE__, function: String = __FUNCTION__, line: Int = __LINE__) {
+    func notice(@autoclosure message: () -> String, file: String = __FILE__, function: String = __FUNCTION__, line: Int = __LINE__) {
         log(message, severity: .Notice, file: file, function: function, line: line)
     }
 
@@ -154,7 +168,7 @@ public extension LoggerType {
      - parameter function: a `String`, containing the function (make it default to __FUNCTION__)
      - parameter line: a `Int`, containing the line number (make it default to __LINE__)
      */
-    func info(message: String, file: String = __FILE__, function: String = __FUNCTION__, line: Int = __LINE__) {
+    func info(@autoclosure message: () -> String, file: String = __FILE__, function: String = __FUNCTION__, line: Int = __LINE__) {
         log(message, severity: .Info, file: file, function: function, line: line)
     }
 
@@ -166,7 +180,7 @@ public extension LoggerType {
      - parameter function: a `String`, containing the function (make it default to __FUNCTION__)
      - parameter line: a `Int`, containing the line number (make it default to __LINE__)
      */
-    func warning(message: String, file: String = __FILE__, function: String = __FUNCTION__, line: Int = __LINE__) {
+    func warning(@autoclosure message: () -> String, file: String = __FILE__, function: String = __FUNCTION__, line: Int = __LINE__) {
         log(message, severity: .Warning, file: file, function: function, line: line)
     }
 
@@ -178,7 +192,7 @@ public extension LoggerType {
      - parameter function: a `String`, containing the function (make it default to __FUNCTION__)
      - parameter line: a `Int`, containing the line number (make it default to __LINE__)
      */
-    func fatal(message: String, file: String = __FILE__, function: String = __FUNCTION__, line: Int = __LINE__) {
+    func fatal(@autoclosure message: () -> String, file: String = __FILE__, function: String = __FUNCTION__, line: Int = __LINE__) {
         log(message, severity: .Fatal, file: file, function: function, line: line)
     }
 }
@@ -190,22 +204,28 @@ public extension LoggerType {
 */
 class _Logger<Manager: LogManagerType>: LoggerType {
 
-    /// The log severity of this logger instance.
+    /// - returns: a `LoggerBlockType` which receives the message to log
+    var logger: LoggerBlockType
+
+    /// - returns: the log severity of this logger instance.
     var severity: LogSeverity
 
-    /// The `LoggerBlockType` which receives the message to log
-    var logger: LoggerBlockType {
-        return Manager.logger
-    }
+    var enabled: Bool
+
+    /// - returns: a String?, the name of the operation.
+    var operationName: String? = .None
 
     /**
      Initialize a new `Logger` instance.
-     
-     - parameter severity: a `LogSeverity`.
+
      - parameter logger: a `LoggerBlockType` block.
+     - parameter severity: a `LogSeverity`.
+     - parameter enabled: a `Bool`.
     */
-    required init(severity: LogSeverity = Manager.globalLogSeverity) {
+    required init(logger: LoggerBlockType = Manager.logger, severity: LogSeverity = Manager.severity, enabled: Bool = Manager.enabled) {
+        self.logger = logger
         self.severity = severity
+        self.enabled = enabled
     }
 }
 
@@ -213,7 +233,9 @@ typealias Logger = _Logger<LogManager>
 
 protocol LogManagerType {
 
-    static var globalLogSeverity: LogSeverity { get set }
+    static var enabled: Bool { get set }
+
+    static var severity: LogSeverity { get set }
 
     static var logger: LoggerBlockType { get set }
 }
@@ -223,13 +245,22 @@ protocol LogManagerType {
  The log manager is responsible for holding the shared state required
  for the logger.
 */
-class LogManager: LogManagerType {
+public class LogManager: LogManagerType {
+
+    /**
+     # Enabled Operation logging
+     Enable or Disable built in logger. Default is enabled.
+     */
+    public static var enabled: Bool {
+        get { return sharedInstance.enabled }
+        set { sharedInstance.enabled = newValue }
+    }
 
     /**
      # Global Log Severity
      Adjust the global log level severity.
     */
-    static var globalLogSeverity: LogSeverity {
+    public static var severity: LogSeverity {
         get { return sharedInstance.severity }
         set { sharedInstance.severity = newValue }
     }
@@ -238,7 +269,7 @@ class LogManager: LogManagerType {
      # Global logger block
      Set a custom logger block.
     */
-    static var logger: LoggerBlockType {
+    public static var logger: LoggerBlockType {
         get { return sharedInstance.logger }
         set { sharedInstance.logger = newValue }
     }
@@ -250,11 +281,12 @@ class LogManager: LogManagerType {
     }
 
     let queue = Queue.Utility.serial("me.danthorpe.Operations.Logger")
+    var enabled: Bool = true
     var severity: LogSeverity = .Warning
     var logger: LoggerBlockType = { print($0) }
 }
 
-extension NSOperation {
+public extension NSOperation {
 
     /**
      Returns a non-optional `String` to use as the name
@@ -266,14 +298,8 @@ extension NSOperation {
      `NSBlockOperation` types, it will return a 
      plain reading description.
     */
-    public var operationName: String {
-        get {
-            let _name = name ?? self.description
-            guard !_name.containsString("BlockOperation") else {
-                return "Unnamed Block Operation"
-            }
-            return _name
-        }
+    var operationName: String {
+        return name ?? "\(self)"
     }
 }
 
