@@ -10,6 +10,108 @@
 
 A Swift framework inspired by WWDC 2015 Advanced NSOperations session. See the session video here: https://developer.apple.com/videos/wwdc/2015/?id=226
 
+## Usage
+
+Operations is a framework which provides advanced features to [`NSOperation`](https://developer.apple.com/library/ios/documentation/Cocoa/Reference/NSOperation_class/) and [`NSOperationQueue`](https://developer.apple.com/library/ios/documentation/Cocoa/Reference/NSOperationQueue_class/index.html#//apple_ref/occ/cl/NSOperationQueue). `NSOperation` and the subclass `Operation` can be used to encapsulate *work* for asynchronous execution on a queue. The *work* is entirely abstract, it is defined by subclassing `Operation` and overriding `execute` to perform the *work*. For example, number crunching, data parsing, data retrieval, view controller presentation, or really anything.
+
+## A Simple Example
+
+Lets assume we have some number crunching to perform, which is in a function `doNumberCrunching()`. We can create an `Operation` subclass to perform this asynchronously on a queue.
+
+```swift
+import Operations
+
+class NumberCrunchingOperation: Operation {
+
+    override func execute() {
+        doNumberCrunching()
+        finish()
+    }
+
+    private func doNumberCrunching() {
+        // etc
+    }
+}
+```
+
+This is a contrived example, to show two key points:
+
+1. Always override `execute` (instead of `NSOperation`’s `main`)
+2. Always call `finish()`, or `finishWithError() when execution is complete.
+
+But, if you are not familiar with `NSOperation` or haven’t yet watched the [WWDC video](https://developer.apple.com/videos/wwdc/2015/?id=226), you might be wondering why? After all, surely this is easier:
+
+```swift
+dispatch_async(queue, doNumberCrunching)
+```
+Well, hopefully this document will show you the benefits of encapsulating work into classes.
+
+## The State Machine
+
+TODO: Explain the Operation State Machine
+
+## Observers & Conditions
+
+Observers and Conditions are components which can be added to an `Operation` instances. There are the building blocks of the “advanced” features this framework provides.
+
+### Observers
+
+Observers are the easiest to understand, they are attached to the `Operation` and execute functions when state changes occur. For example, when the operation starts, cancels, produces another operation, or finishes. The most common example of an observer is a block based observer, which just executes the block it is provided with. For example, we want to run a block when an operation starts:
+
+```swift
+operation.addObserver(StartedObserver { operation in
+    print("Hello!")
+})
+```
+
+The framework provides the following observers:
+
+Name | Usage
+-----|------
+`StartedObserver` | Execute a block when the operation starts. 
+`CancelledObserver` | Execute a block if the operation is cancelled.
+`ProduceOperationObserver` | Execute a block if the operation produces another operation.
+`FinishedObserver` | Execute a block when the operation finishes.
+`TimeoutObserver` | Automatically cancel the operation if it doesn’t finish before the timer runs out.
+`BackgroundObserver` | (iOS only) Automatically start a background task if the application enters the background while the operation is running. The background task is ended when the operation finishes.
+`NetworkObserver` | (iOS only) Activate the system network activity indicator while the operation is running.
+
+### Conditions
+
+Conditions are attached to operations and prevent the operation from executing until they are satisfied. Evaluating the conditions is performed asynchronously. Failures will result in the operation *finishing* with an error. Typically conditions are used to ensure that preconditions are met before the `Operation` is ready to execute. 
+
+In addition, a condition can provide an optional `NSOperation` (or subclass) which is executed prior to any evaluation as a dependency.
+
+This is very powerful as it allows pre-requisites of *work* to be decomposed into smaller units. A really simple example of this could be:
+
+Conditions are types (usually structs) which implement the `OperationCondition` protocol. The framework provides some though, for example `BlockCondition` is a condition which accepts a block which returns a `Bool`.
+
+```swift
+operation.addCondition(BlockCondition {
+    // operation will only be executed if this is true
+    return trueOrFalse 
+})
+```
+
+Name | Usage
+-----|------
+`BlockCondition` | Based on execution of `() -> Bool` block.
+`NegatedCondition` | Based on the negation of a composed condition.
+`NoFailedDependenciesCondition` | Ensures that all dependencies of the operation finished without error and were not cancelled.
+`SilentCondition` | Suppresses the dependent operation of the composed condition.
+`ReachabilityCondition` | Ensures that a network host is reachable.
+`AuthorizedFor` | Ensures that permission to access the provided device capability was granted. For example, location services, see #Capabilities. 
+`RemoteNotificationCondition` | (iOS only) Ensures that the user has agreed to remote notifications.
+`UserConfirmationCondition` | (iOS only) Presents a `UIAlertController` asking the user to confirm some (possibly destructive) action. E.g. Delete All? Are you sure?.
+
+
+
+
+
+
+**This is the prior README**
+
+
 ## Status - 5th Dec, 2015
 
 As of version 2.3, Operations is a multi-platform framework, with CocoaPods support in addition to framework targets for iOS Extensions, iOS Apps, OS X, watchOS and tvOS.
