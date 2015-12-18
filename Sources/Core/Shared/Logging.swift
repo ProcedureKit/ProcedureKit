@@ -39,11 +39,13 @@ public enum LogSeverity: Int, Comparable {
     case Fatal
 }
 
+public typealias LoggerInfo = (message: String, severity: LogSeverity, file: String, function: String, line: Int)
+
 /**
  A typealias for a logging block. This is an easy way
  to pipe the message string into another logging system.
 */
-public typealias LoggerBlockType = (message: String) -> Void
+public typealias LoggerBlockType = LoggerInfo -> Void
 
 /**
  # LoggerType
@@ -85,21 +87,17 @@ internal extension LoggerType {
     var minimumLogSeverity: LogSeverity {
         return min(LogManager.severity, severity)
     }
+}
 
-    func meta(file: String = __FILE__, function: String = __FUNCTION__, line: Int = __LINE__) -> String {
+public extension LoggerType {
+
+    func messageWithOperationName(message: String) -> String {
         var result = ""
         if let name = operationName {
             result = "\(name): "
         }
-        guard !file.containsString("Operations") else {
-            return result
-        }
-        let filename = (file as NSString).lastPathComponent
-        return "[\(filename) \(function):\(line)], \(result)"
+        return "\(result)\(message)"
     }
-}
-
-public extension LoggerType {
 
     /**
      # Default log function
@@ -128,10 +126,10 @@ public extension LoggerType {
     */
     func log(@autoclosure message: () -> String, severity: LogSeverity, file: String = __FILE__, function: String = __FUNCTION__, line: Int = __LINE__) {
         if LogManager.enabled && enabled && severity >= minimumLogSeverity {
-            let _meta = meta(file, function: function, line: line)
-            let _message = message()
+            let _message = messageWithOperationName(message())
             dispatch_async(LogManager.queue) {
-                self.logger(message: "\(_meta)\(_message)")
+                self.logger(message: _message, severity: severity, file: file, function: function, line: line)
+//                self.logger(severity: severity, message: "\(_meta)\(_message)")
             }
         }
     }
@@ -204,13 +202,14 @@ public extension LoggerType {
 */
 class _Logger<Manager: LogManagerType>: LoggerType {
 
-    /// - returns: a `LoggerBlockType` which receives the message to log
-    var logger: LoggerBlockType
-
     /// - returns: the log severity of this logger instance.
     var severity: LogSeverity
 
+    /// - returns: a `Bool` to enable/disable this logger instance. Defaults to true
     var enabled: Bool
+
+    /// - returns: a `LoggerBlockType` which receives the message to log
+    var logger: LoggerBlockType
 
     /// - returns: a String?, the name of the operation.
     var operationName: String? = .None
@@ -222,10 +221,10 @@ class _Logger<Manager: LogManagerType>: LoggerType {
      - parameter severity: a `LogSeverity`.
      - parameter enabled: a `Bool`.
     */
-    required init(logger: LoggerBlockType = Manager.logger, severity: LogSeverity = Manager.severity, enabled: Bool = Manager.enabled) {
-        self.logger = logger
+    required init(severity: LogSeverity = Manager.severity, enabled: Bool = Manager.enabled, logger: LoggerBlockType = Manager.logger) {
         self.severity = severity
         self.enabled = enabled
+        self.logger = logger
     }
 }
 
@@ -246,6 +245,14 @@ protocol LogManagerType {
  for the logger.
 */
 public class LogManager: LogManagerType {
+
+    static func metadataForFile(file: String, function: String, line: Int) -> String {
+        guard !file.containsString("Operations") else {
+            return ""
+        }
+        let filename = (file as NSString).lastPathComponent
+        return "[\(filename) \(function):\(line)], "
+    }
 
     /**
      # Enabled Operation logging
@@ -283,7 +290,9 @@ public class LogManager: LogManagerType {
     let queue = Queue.Utility.serial("me.danthorpe.Operations.Logger")
     var enabled: Bool = true
     var severity: LogSeverity = .Warning
-    var logger: LoggerBlockType = { print($0) }
+    var logger: LoggerBlockType = { message, severity, file, function, line in
+        print("\(LogManager.metadataForFile(file, function: function, line: line))\(message)")
+    }
 }
 
 public extension NSOperation {

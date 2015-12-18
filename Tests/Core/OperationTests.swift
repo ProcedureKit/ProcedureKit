@@ -75,9 +75,10 @@ class OperationTests: XCTestCase {
     
     var queue: OperationQueue!
     var delegate: TestQueueDelegate!
-    
+
     override func setUp() {
         super.setUp()
+        LogManager.severity = .Verbose
         queue = OperationQueue()
         delegate = TestQueueDelegate()
     }
@@ -86,6 +87,7 @@ class OperationTests: XCTestCase {
         queue = nil
         delegate = nil
         ExclusivityManager.sharedInstance.__tearDownForUnitTesting()
+        LogManager.severity = .Warning
         super.tearDown()
     }
 
