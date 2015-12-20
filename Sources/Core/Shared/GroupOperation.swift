@@ -69,7 +69,7 @@ public class GroupOperation: Operation {
     - parameter operation: an `NSOperation` instance.
     */
     public func addOperation(operation: NSOperation) {
-        log.info("Add operation \(operation.operationName) to group.")
+        log.notice("Add operation \(operation.operationName) to group.")
         queue.addOperation(operation)
     }
 
@@ -79,7 +79,7 @@ public class GroupOperation: Operation {
     - parameter operations: an array of `NSOperation` instances.
     */
     public func addOperations(operations: [NSOperation]) {
-        log.info("Add operations to group \(operations.map { $0.operationName })")
+        log.notice("Add operations to group \(operations.map { $0.operationName })")
         queue.addOperations(operations, waitUntilFinished: false)
     }
 

@@ -3,6 +3,7 @@ platform :ios, '8.0'
 inhibit_all_warnings!
 use_frameworks!
 
+pod 'SwiftyBeaver'
 pod 'PureLayout'
 pod 'TaylorSource', '~> 2'
 pod 'Operations/+AddressBook', :path => '../../'

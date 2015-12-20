@@ -108,6 +108,21 @@
       }
     },
     {
+      "name": "+Health",
+      "platforms": {
+        "ios": "8.0",
+        "watchos": "2.0"
+      },
+      "dependencies": {
+        "Operations/Standard": [
+
+        ]
+      },
+      "source_files": [
+        "Sources/Extras/Health/iOS"
+      ]
+    },
+    {
       "name": "+AddressBook",
       "platforms": {
         "ios": "8.0",

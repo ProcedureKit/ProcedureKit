@@ -3,6 +3,7 @@ PODS:
     - Operations/Standard
   - Operations/Standard (2.4.1)
   - PureLayout (3.0.1)
+  - SwiftyBeaver (0.3.0)
   - TaylorSource (2.0.0):
     - TaylorSource/Base (= 2.0.0)
   - TaylorSource/Base (2.0.0)
@@ -10,6 +11,7 @@ PODS:
 DEPENDENCIES:
   - Operations/+AddressBook (from `../../`)
   - PureLayout
+  - SwiftyBeaver
   - TaylorSource (~> 2)
 
 EXTERNAL SOURCES:
@@ -17,8 +19,9 @@ EXTERNAL SOURCES:
     :path: "../../"
 
 SPEC CHECKSUMS:
-  Operations: 728e069c0c736c321ba1e0ead42dbf2006366773
+  Operations: a320e2184fc05935ad9442213316d59cc1fb1888
   PureLayout: f35f5384c9c4e4479df041dbe33ad7577b71ddfb
+  SwiftyBeaver: df7961d4ecb75521ed6a9af40dd3076af1635fdd
   TaylorSource: 86484ba9cf9374d51d4c17db1ad21ee5acba1277
 
 COCOAPODS: 0.39.0

@@ -134,7 +134,7 @@ class UserLocationOperationTests: LocationOperationTests {
         runOperation(operation)
         waitForExpectationsWithTimeout(3, handler: nil)
 
-        guard let receivedLocation = operation.location else {
+        guard let receivedLocation = operation.result else {
             XCTFail("Location not set")
             return
         }
@@ -313,6 +313,13 @@ class ReverseGeocodeOperationTests: LocationOperationTests {
         waitForExpectationsWithTimeout(3, handler: nil)
 
         XCTAssertTrue(completionBlockDidExecute)
+
+        guard let receivedPlacemark = operation.result else {
+            XCTFail("received placemark not given.")
+            return
+        }
+
+        XCTAssertEqual(receivedPlacemark, placemark)
     }
 }
 
@@ -326,7 +333,7 @@ class ReverseGeocodeUserLocationOperationTests: ReverseGeocodeOperationTests {
         runOperation(operation)
         waitForExpectationsWithTimeout(3, handler: nil)
 
-        guard let receivedLocation = operation.location, receivedPlacemark = operation.placemark else {
+        guard let receivedPlacemark = operation.result, receivedLocation = operation.location else {
             XCTFail("Operation did not set state")
             return
         }
