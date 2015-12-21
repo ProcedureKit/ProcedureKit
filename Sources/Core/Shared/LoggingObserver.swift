@@ -33,7 +33,7 @@ public struct LoggingObserver: OperationObserver {
     - parameter logger: a logging block. By detault the logger uses `println`
     however, for custom loggers provide a block which receives a `String`.
     */
-    public init(queue: dispatch_queue_t = Queue.Initiated.serial("me.danthorpe.Operations.Logger"), logger: LoggerBlockType = { debugPrint($0) }) {
+    public init(queue: dispatch_queue_t = Queue.Initiated.serial("me.danthorpe.Operations.Logger"), logger: LoggerBlockType = { print($0) }) {
         self.queue = queue
         self.logger = logger
     }
@@ -47,7 +47,7 @@ public struct LoggingObserver: OperationObserver {
     - parameter operation: the `Operation` which has started.
     */
     public func operationDidStart(operation: Operation) {
-        log("\(operationName(operation)): did start.")
+        log("\(operation.operationName): did start.")
     }
 
     /**
@@ -59,7 +59,7 @@ public struct LoggingObserver: OperationObserver {
      - parameter operation: the `Operation` which has started.
      */
     public func operationDidCancel(operation: Operation) {
-        log("\(operationName(operation)): did cancel.")
+        log("\(operation.operationName): did cancel.")
     }
 
     /**
@@ -77,14 +77,13 @@ public struct LoggingObserver: OperationObserver {
     - parameter newOperation: the `Operation` which has been produced.
     */
     public func operation(operation: Operation, didProduceOperation newOperation: NSOperation) {
-        var detail = "\(newOperation)"
+        let detail = newOperation.operationName
 
         if let newOperation = newOperation as? Operation {
             newOperation.addObserver(LoggingObserver(queue: queue, logger: logger))
-            detail = "\(operationName(newOperation))"
         }
 
-        log("\(operationName(operation)): did produce operation: \(detail).")
+        log("\(operation.operationName): did produce operation: \(detail).")
     }
 
     /**
@@ -103,14 +102,7 @@ public struct LoggingObserver: OperationObserver {
     */
     public func operationDidFinish(operation: Operation, errors: [ErrorType]) {
         let detail = errors.count > 0 ? "error(s): \(errors)" : "no errors"
-        log("\(operationName(operation)): finished with \(detail).")
-    }
-
-    private func operationName(operation: Operation) -> String {
-        if let name = operation.name {
-            return "\(name)"
-        }
-        return "\(operation)"
+        log("\(operation.operationName): finished with \(detail).")
     }
 
     private func log(message: String) {
