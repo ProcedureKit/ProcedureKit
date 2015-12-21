@@ -8,289 +8,120 @@
 
 # Operations
 
-A Swift framework inspired by WWDC 2015 Advanced NSOperations session. See the session video here: https://developer.apple.com/videos/wwdc/2015/?id=226
+A Swift framework inspired by WWDC 2015 Advanced NSOperations session. See the session video [here](https://developer.apple.com/videos/wwdc/2015/?id=226). There is a programming guide available here: [operations.readme.io](https://operations.readme.io). Reference documentation is available here: [docs.danthorpe.me/operations](http://docs.danthorpe.me/operations/2.4.1/index.html).
 
 ## Usage
 
-Operations is a framework which provides advanced features to [`NSOperation`](https://developer.apple.com/library/ios/documentation/Cocoa/Reference/NSOperation_class/) and [`NSOperationQueue`](https://developer.apple.com/library/ios/documentation/Cocoa/Reference/NSOperationQueue_class/index.html#//apple_ref/occ/cl/NSOperationQueue). `NSOperation` and the subclass `Operation` can be used to encapsulate *work* for asynchronous execution on a queue. The *work* is entirely abstract, it is defined by subclassing `Operation` and overriding `execute` to perform the *work*. For example, number crunching, data parsing, data retrieval, view controller presentation, or really anything.
+The [programming guide](https://operations.readme.io/docs) goes into a lot more detail about using this framework. But here are some of the key details.
 
-## A Simple Example
-
-Lets assume we have some number crunching to perform, which is in a function `doNumberCrunching()`. We can create an `Operation` subclass to perform this asynchronously on a queue.
+`Operation` is an `NSOperation` subclass. It is an abstract class which should be subclassed.
 
 ```swift
 import Operations
 
-class NumberCrunchingOperation: Operation {
-
+class MyFirstOperation: Operation {
     override func execute() {
-        doNumberCrunching()
+        guard !cancelled else { return }
+        print("Hello World")
         finish()
-    }
-
-    private func doNumberCrunching() {
-        // etc
     }
 }
 ```
 
-This is a contrived example, to show two key points:
+the key point here are:
 
-1. Always override `execute` (instead of `NSOperation`’s `main`)
-2. Always call `finish()`, or `finishWithError()` when execution is complete.
+1. Subclass `Operation`
+2. Override `execute` but do not call `super.execute()`
+3. Check the `cancelled` property before starting any *work*.
+4. If not cancelled, always call `finish()` after the *work* is done. This could be done asynchronously.
 
-But, if you are not familiar with `NSOperation` or haven’t yet watched the [WWDC video](https://developer.apple.com/videos/wwdc/2015/?id=226), you might be wondering why? After all, surely this is easier:
-
-```swift
-dispatch_async(queue, doNumberCrunching)
-```
-Well, hopefully this document will show you the benefits of encapsulating work into classes.
-
-## The State Machine
-
-TODO: Explain the Operation State Machine
-
-## Observers & Conditions
-
-Observers and Conditions are components which can be added to `Operation` instances. There are the building blocks of the “advanced” features this framework provides.
-
-### Observers
-
-Observers are the easiest to understand, they are attached to the `Operation` and execute functions when state changes occur. For example, when the operation starts, cancels, produces another operation, or finishes. The most common example of an observer is a block based observer, which just executes the block it is provided with. For example, we want to run a block when an operation starts:
+## Observers
+Observers are attached to an `Operation`. They receive callbacks when operation events occur. Unlike the Apple sample code, Operations defines four observer protocols for the four events, *did start*, *did cancel*, *did produce operation* and *did finish*. There are block based types which implement these protocols. For example, to observe when an operation starts:
 
 ```swift
-operation.addObserver(StartedObserver { operation in
-    print("Hello!")
+operation.addObserver(StartedObserver { op in 
+    print("Lets go!")
 })
 ```
 
-The framework provides the following observers:
+The framework provides `BackgroundObserver`, `TimeoutObserver` and `NetworkObserver`.
 
-Name | Usage
------|------
-`StartedObserver` | Execute a block when the operation starts. 
-`CancelledObserver` | Execute a block if the operation is cancelled.
-`ProduceOperationObserver` | Execute a block if the operation produces another operation.
-`FinishedObserver` | Execute a block when the operation finishes.
-`TimeoutObserver` | Automatically cancel the operation if it doesn’t finish before the timer runs out.
-`BackgroundObserver` | (iOS only) Automatically start a background task if the application enters the background while the operation is running. The background task is ended when the operation finishes.
-`NetworkObserver` | (iOS only) Activate the system network activity indicator while the operation is running.
+See the programming guide on [Observers](https://operations.readme.io/docs/observers) for more information.
 
-### Conditions
-
-Conditions are attached to operations and prevent the operation from executing until they are satisfied. Evaluating the conditions is performed asynchronously. Failures will result in the operation *finishing* with an error. Typically conditions are used to ensure that preconditions are met before the `Operation` is ready to execute. 
-
-In addition, a condition can provide an optional `NSOperation` (or subclass) which is executed prior to any evaluation as a dependency.
-
-This is very powerful as it allows pre-requisites of *work* to be decomposed into smaller units. A really simple example of this could be:
-
-Conditions are types (usually structs) which implement the `OperationCondition` protocol. The framework provides some though, for example `BlockCondition` is a condition which accepts a block which returns a `Bool`.
+## Conditions
+Conditions are attached to an `Operation`. Before an operation is ready to execute it will asynchronously *evaluate* all of its conditions. If a conditions fails, the operation finishes with an error instead of executing. For example:
 
 ```swift
-operation.addCondition(BlockCondition {
+operation.addCondition(BlockCondition { 
     // operation will only be executed if this is true
-    return trueOrFalse 
-})
+    return trueOrFalse
+}
+``` 
+
+Conditions can be mutually exclusive which is akin to a lock being held preventing other operations with the same exclusion being executed.
+
+The framework provides `AuthorizedFor`, `BlockCondition`, `MutuallyExclusive`, `NegatedCondition`, `NoFailedDependenciesCondition`, `SilentCondition`, `ReachilityCondition`, `RemoteNotificationCondition`, `UserConfirmationCondition` and `UserNotificationCondition`.
+
+See the programming guide on [Conditions](https://operations.readme.io/docs/conditions) for more information.
+
+## Capabilities
+`CapabilityType` is a protocol which represents the applications authorization to access device or user account abilities. For example, location services, cloud kit contains, calendars etc. The protocol provides a unified model for checking the current authorization status, using `GetAuthorizationStatus`, explicitly requesting access, using `Authorize`, and as a condition with `AuthorizedFor`. For example:
+
+```swift
+class ReminderOperation: Operation {
+    override init() {
+        super.init()
+        name = "Reminder Operation"
+        addCondition(AuthorizedFor(Capability.Calendar(.Reminder)))
+    }
+   
+    override func execute() {
+        // do something with EventKit here
+        finish()
+    }
+}
+```
+The framework provides capabilities: `Capability.Calendar`, `Capability.CloudKit`, `Capability.Health`, `Capability.Location`, `Capability.Passbook` and `Capability.Photos`.
+
+See the programming guide on [Capabilities](https://operations.readme.io/docs/capabilities) for more information.
+
+## Logging
+`Operation` has its own internal logging functionality exposed via a `log` property:
+
+```swift
+class LogExample: Operation {
+   
+    override func execute() {
+        log.info("Hello World!")
+        finish()
+    }
+}
 ```
 
-Name | Usage
------|------
-`BlockCondition` | Based on execution of `() -> Bool` block.
-`NegatedCondition` | Based on the negation of a composed condition.
-`NoFailedDependenciesCondition` | Ensures that all dependencies of the operation finished without error and were not cancelled.
-`SilentCondition` | Suppresses the dependent operation of the composed condition.
-`ReachabilityCondition` | Ensures that a network host is reachable.
-`AuthorizedFor` | Ensures that permission to access the provided device capability was granted. For example, location services, see #Capabilities. 
-`RemoteNotificationCondition` | (iOS only) Ensures that the user has agreed to remote notifications.
-`UserConfirmationCondition` | (iOS only) Presents a `UIAlertController` asking the user to confirm some (possibly destructive) action. E.g. Delete All? Are you sure?.
+See the programming guide for more information: [logging](https://operations.readme.io/docs/logging) and [supporting 3rd party log frameworks](https://operations.readme.io/docs/custom-logging).
+
+## Injecting Results
+State can be seamlessly transitioned between operations automatically. An operation which produces a *result* must conform to `ResultOperationType` and expose state via its `result` property. An operation which consumes state, has a *requirement* which must be set via its `requirement` property. Given conformance to these protocols, operations can be chained together:
+
+```swift
+let retrieval = DataRetrieval()
+let processing = DataProcessing()
+processing.injectResultFromDependency(retrieval)
+queue.addOperations(retrieval, processing)
+```
+
+See the programming guide on [Injecting Results](https://operations.readme.io/docs/injecting-results) for more information.
 
 
-
-
-
-
-**This is the prior README**
-
-
-## Status - 5th Dec, 2015
+## Status - 21st Dec, 2015
 
 As of version 2.3, Operations is a multi-platform framework, with CocoaPods support in addition to framework targets for iOS Extensions, iOS Apps, OS X, watchOS and tvOS.
 
-Current development focus is on improving test coverage (broke 60% for v2.3), and improving documentation coverage. Documentation is hosted here: [docs.danthorpe.me/operations](http://docs.danthorpe.me/operations/2.4.1/index.html).
-
-As part of the bug fixing for 2.4.1, it was discovered that it is not currently possible to install the API Extension compatible framework via Carthage. This boiled down to having two schemes for the same platform, and Carthage doesn’t provide a way to pick. Now, there are two separate projects, one for API extension compatible frameworks only, which doesn’t actually solve the problem. But, there is a [pull request](https://github.com/Carthage/Carthage/pull/892) which should allow all projects to be build. For now, the only semi-automatic way to integrate these flavors is to use Cocoapods: `pod 'Operations/Extension'`. 
-
-## Usage
-
-`NSOperation` is a class which enables composition of discrete tasks or work for asynchronous execution on an operation queue. It is therefore an abstract class, and `Operation` is a similar abstract class. Therefore, typical usage in your own codebase would be to subclass `Operation` and override `execute`.
-
-For example, an operation to save a `Contact` value in `YapDatabase` might be:
-
-```swift
-class SaveContactOperation: Operation {
-    typealias CompletionBlockType = Contact -> Void
-
-    let connection: YapDatabaseConnection
-    let contact: Contact
-    let completion: CompletionBlockType?
-
-    init(connection: YapDatabaseConnection, contact: Contact, completion: CompletionBlockType? = .None) {
-        self.connection = connection
-        self.contact = contact
-        self.completion = completion
-        super.init()
-        name = “Save Contact: \(contact.displayName)”
-    }
-
-    override func execute() {
-        connection.asyncWrite(contact) { (returned: Contact) in
-            self.completion?(returned)
-            self.finish()
-        }
-    }
-}
-```
-
-The power of the `Operations` framework however, comes with attaching conditions and observer to operations. For example, perhaps before the user is allowed to delete a `Contact`, we want them to confirm their intention. We can achieve this using the supplied `UserConfirmationCondition`.
-
-```swift
-func deleteContact(contact: Contact) {
-    let delete = DeleteContactOperation(connection: readWriteConnection, contact: contact)
-    let confirmation = UserConfirmationCondition(
-        title: NSLocalizedString("Are you sure?", comment: "Are you sure?"),
-        message: NSLocalizedString("The contact will be removed from all your devices.", comment: "The contact will be removed from all your devices."),
-        action: NSLocalizedString("Delete", comment: "Delete"),
-        isDestructive: true,
-        cancelAction: NSLocalizedString("Cancel", comment: "Cancel"),
-        presentingController: self)
-    delete.addCondition(confirmation)
-    queue.addOperation(delete)
-}
-```
-
-When this delete operation is added to the queue, the user will be presented with a standard system `UIAlertController` asking if they're sure. Additionally, other `AlertOperation` instances will be prevented from running.
-
-The above “save contact” operation looks quite verbose for though for a such a simple task. Luckily in reality we can do this:
-
-```swift
-let save = ComposedOperation(connection.writeOperation(contact))
-save.addObserver(BlockObserver { (_, errors) in
-    print(“Did save contact”)
-})
-queue.addOperation(save)
-```
-
-Because sometimes creating an `Operation` subclass is a little heavy handed. Above we composed an existing `NSOperation` but we can utilize a `BlockOperation`. For example, let say we want to warn the user before they cancel a "Add New Contact" controller without saving the Contact. 
-
-```swift
-@IBAction didTapCancelButton(button: UIButton) {
-    dismiss()
-}
-
-func dismiss() {
-    // Define a dispatch block for unwinding.
-    let dismiss = {
-        self.performSegueWithIdentifier(SegueIdentifier.UnwindToContacts.rawValue, sender: nil)
-    }
-
-    // Wrap this in a block operation
-    let operation = BlockOperation(mainQueueBlock: dismiss)
-
-    // Attach a condition to check if there are unsaved changes
-    // this is an imaginary conditon - doesn't exist in Operation framework
-    let condition = UnsavedChangesCondition(
-        connection: connection,
-        value: contact,
-        save: save(dismiss),
-        discard: BlockOperation(mainQueueBlock: dismiss),
-        presenter: self
-    )
-    operation.addCondition(condition)
-
-    // Attach an observer to see if the operation failed because
-    // there were no edits from a default Contact - in which case
-    // continue with dismissing the controller.
-    operation.addObserver(BlockObserver { [unowned queue] (_, errors) in
-        if let error = errors.first as? UnsavedChangesConditionError {
-            switch error {
-            case .NoChangesFromDefault:
-                queue.addOperation(BlockOperation(mainQueueBlock: dismiss))
-
-            case .HasUnsavedChanges:
-                break
-            }
-        }
-    })
-
-    queue.addOperation(operation)
-}
-
-```
-
-In the above example, we're able to compose reusable (and testable!) units of work in order to express relatively complex control logic. Another way to achieve this kind of behaviour might be through FRP techniques, however those are unlikely to yield re-usable types like `UnsavedChangesCondition`, or even `DismissController` if the above was composed inside a custom `GroupOperation`.
-
-## Device & OS Permissions
-
-Requesting permissions from the user can often be a relatively complex task, which almost all apps have to perform at some point. Often developers put requests for these permissions in their AppDelegate, meaning that new users are bombarded with alerts. This isn't a great experience, and Apple expressly suggest only requesting permissions when you need them. However, this is easier said than done. The Operations framework can help however. Lets say we want to get the user's current location.
-
-```swift
-func getCurrentLocation(completion: CLLocation -> Void) {
-    queue.addOperation(UserLocationOperation(handler: completion))
-}
-```
-
-This operation will automatically request the user's permission if the application doesn't already have the required authorization, the default is "when in use".
-
-Perhaps also you want to just test to see if authorization has already been granted, but not ask for it if it hasn't. In Apple’s original sample code from WWDC 2015, there are a number of `OperationCondition`s which express the authorization status for device or OS permissions. Things like, `LocationCondition`, and `HealthCondition`. However, in version 2.2 of Operations I moved away from this model to unify this functionality into the `CapabilityType` protocol. Where previously there were bespoke conditions (and errors) to test the status, there is now a single condition, which is initialized with a `CapabilityType`. 
-
-For example, where previously you would have written this:
-
-```swift
-operation.addCondition(LocationCondition(usage: .WhenInUse))
-```
-
-now you write this:
-
-```swift
-operation.addCondition(AuthorizedFor(Capability.Location(.WhenInUse)))
-```
-
-As of 2.2 the following capabilities are expressed:
-
-- [x] `Capability.Calendar` - includes support for `EKEntityType` requirements, defaults to `.Event`.
-- [x] `Capability.Cloud` - includes support for default `CKContainer` or with specific identifier, and `.UserDiscoverable` cloud container permissions.
-- [x] `Capability.Health` - improved support for exactly which `HKObjectType`s have read permissions. Please get in touch if you want to use HealthKit with Operations, as I currently don't, and would like some feedback or input on further improvements that can be made for HealthKit.
-- [x] `Capability.Location` - includes support for required usage, either `.WhenInUse` (the default) or `.Always`.
-- [x] `Capability.Passbook` - note here that there is void "status" type, just an availability boolean.
-- [x] `Capability.Photos` 
-
-In addition to a generic operation condition, which can be used as before with `SilentCondition` and `NegatedCondition`. There are also two capability generic operations. `GetAuthorizationStatus` will retrieve the current status of the capability. `Authorize` will explicity request the required permissions for the capability. Both of these operations accept the capability as their first initializer argument without a label, and have a completion block with the same type. Therefore, it is trivial to write a function which can update your controller or UI and use it for both operations.
-
-For example here we can check the status of location services for the app:
-
-```swift
-func locationServicesEnabled(enabled: Bool, withAuthorization status: CLAuthorizationStatus) {
-    switch (enabled, status) {
-        case (false, _):
-           // Location services are not enabled
-        case (true, .NotDetermined):
-           // Location services are enabled, but not currently determined for the app.
-    }
-}
-
-func determineAuthorizationStatus() {
-    queue.addOperation(GetAuthorizationStatus(Capability.Location(), completion: locationServicesEnabled))
-}
-
-func requestPermission() {
-    queue.addOperation(Authorize(Capability.Location(), completion: locationServicesEnabled))
-}
-```
-
-See the Permissions example project, where the above code is taken from.
-
-
 ## Installation
+
+See the programming guide for detailed [installation instructions](https://operations.readme.io/docs/installing).
+
+### CocoaPods
 
 Operations is available through [CocoaPods](http://cocoapods.org). To install
 it, simply add the following line to your Podfile:
@@ -299,109 +130,9 @@ it, simply add the following line to your Podfile:
 pod 'Operations'
 ```
 
-## Features
+### Carthage
 
-This is a brief summary of the current and planned functionality.
-
-### Foundation
-
-- [x] `Operation` and `OperationQueue` class definitions.
-- [x] `OperationCondition` and evaluator functionality.
-- [x] `OperationObserver` definition and integration.
-
-### Building Blocks
-
-- [x] `MutuallyExclusive` condition e.g. can only one `AlertPresentation` at once.
-- [x] `NegatedCondition` evaluates the reverse of the composed condition.
-- [x] `SilentCondition` suppress any dependencies of the composed condition.
-- [x] ~~`NoCancelledDependencies`~~ `NoFailedDependenciesCondition` requires that all dependencies succeeded.
-- [x] `BlockObserver` run blocks when the attached operation starts, produces another operation or finishes.
-- [x] `BackgroundObserver` automatically start and stop background tasks if the application enters the background while the attached operation is running.
-- [x] `NetworkObserver` automatically manage the device’s network indicator while the operation is running.
-- [x] `TimeoutObserver` automatically cancel the attached operation if the timeout interval is reached.
-- [x] `LoggingObserver` enable simple logging of the lifecycle of the operation and any of it’s produced operations.
-- [x] `GroupOperation` encapsulate multiple operations into their own discrete unit, running on their own queue. Supports internally adding new operations, so can be used for batch processing or greedy operation tasks.
-- [x] `DelayOperation` inserts a delay into the operation queue.
-- [x] `BlockOperation` run a block inside an `Operation`. Supports unsuccessful finishing.
-- [x] `GatedOperation` only run the composed operation if the provided block evaluates true.
-- [x] `ComposedOperation` run a composed `NSOperation`. This is great for adding conditions or observers to bog-standard `NSOperation`s without having to subclass them. 
-
-### Features
-
-- [x] `GetAuthorizationStatus` get the current authorization status for the given `CapabilityType`. Supports EventKit, CloudKit, HealthKit, CoreLocation, PassKit, Photos.
-- [x] `Authorize` request the required permissions to access the required `CapabilityType`. Supports EventKit, CloudKit, HealthKit, CoreLocation, PassKit, Photos.
-- [x] `AuthorizedFor` express the required permissions to access the required `CapabilityType` as an `OperationCondition`. Meaning that if the status has not been determined yet, it will trigger authorization. Supports EventKit, CloudKit, HealthKit, CoreLocation, PassKit, Photos.
-- [x] `ReachabilityCondition` requires that the supplied URL is reachable.
-- [x] `ReachableOperation` compose an operation which must complete and requires network reachability. This uses an included system  Reachability object and does not require any extra dependencies. However currently in Swift 1.2, as function pointers are not supported, this uses a polling mechanism with `dispatch_source_timer`. I will probably replace this with more efficient Objective-C soon.
-- [x] `CloudKitOperation` compose a `CKDatabaseOperation` inside an `Operation` with the appropriate `CKDatabase`.
-- [x] `UserLocationOperation` access the user’s current location with desired accuracy. 
-- [x] `ReverseGeocodeOperation` perform a reverse geocode lookup of the supplied `CLLocation`.
-- [x] `ReverseGeocodeUserLocationOperation` perform a reverse geocode lookup of user’s current location.  
-- [x] `UserNotificationCondition` require that the user has granted permission to present notifications.
-- [x] `RemoteNotificationCondition` require that the user has granted permissions to receive remote notifications.
-- [x] `UserConfirmationCondition` requires that the user confirms an action presented to them using a `UIAlertController`. The condition is configurable for title, message and button texts. 
-- [x] `WebpageOperation` given a URL, will present a `SFSafariViewController`.
-
-### +AddressBook
-
-Available as a subspec (if using CocoaPods) is `ABAddressBook.framework` related operations.
-
-- [x] `AddressBookCondition` require authorized access to ABAddressBook. Will automatically request access if status is not already determined.
-- [x] `AddressBookOperation` is a base operation which creates the address book and requests access.
-- [x] `AddressBookGetResource` is a subclass of `AddressBookOperation` and exposes methods to access resources from the address book. These can include person records and groups. All resources are wrapped inside Swift facades to the underlying opaque AddressBook types.
-- [x] `AddressBookGetGroup` will get the group for a given name.
-- [x] `AddressBookCreateGroup` will create the group for a given name, if it doesn’t already exist.
-- [x] `AddressBookRemoveGroup` will remove the group for a given name.
-- [x] `AddressBookAddPersonToGroup` will add the person with record id to the group with the provided name.
-- [x] `AddressBookRemovePersonFromGroup` will remove the person with record id from the group with the provided name.
-- [x] `AddressBookMapPeople<T>` takes an optional group name, and a mapping transform. It will map all the people in the address book (or in the group) via the transform. This is great if you have your own representation of a Person, and which to import the AddressBook. In such a case, create the following:
-
-```swift
-extension MyPerson {
-    init?(addressBookPerson: AddressBookPerson) {
-        // Create a person, return nil if not possible.
-    }
-}
-```
-
-Then, import people
-
-```swift
-let getPeople = AddressBookMapPeople { MyPerson($0) }
-queue.addOperation(getPeople)
-```
-
-Use an observer or `GroupOperation` to access the results via the map operation’s `results` property.
-
-- [x] `AddressBookDisplayPersonViewController` is an operation which will display a person (provided their record id), from a controller in your app. This operation will perform the necessary address book tasks. It can present the controller using 3 different styles, either `.Present` (i.e. modal), `.Show` (i.e. old style push) or `.ShowDetail`. Here’s an example:
-
-```swift
-    func displayPersonWithAddressBookRecordID(recordID: ABRecordID) {
-        let controller = ABPersonViewController()
-        controller.allowsActions = true
-        controller.allowsEditing = true
-        controller.shouldShowLinkedPeople = true
-        let show = AddressBookDisplayPersonViewController(
-						personViewController: controller, 
-						personWithID: recordID, 
-						displayControllerFrom: .ShowDetail(self), 
-						delegate: self
-				)
-        queue.addOperation(show)
-    }
-```
-- [x] `AddressBookDisplayNewPersonViewController` same as the above, but for showing the standard create new person controller. For example:
-
-```swift
-    @IBAction func didTapAddNewPerson(sender: UIBarButtonItem) {
-        let show = AddressBookDisplayNewPersonViewController(
-					displayControllerFrom: .Present(self), 
-					delegate: self, 
-					addToGroupWithName: “Special People”
-				)
-        queue.addOperation(show)
-    }
-```
+Recently it was discovered that it is not currently possible to install the API Extension compatible framework via Carthage. This boiled down to having two schemes for the same platform, and Carthage doesn’t provide a way to pick. Now, there are two separate projects, one for API extension compatible frameworks only, which doesn’t actually solve the problem. But, there is a [pull request](https://github.com/Carthage/Carthage/pull/892) which should allow all projects to be build. For now, the only semi-automatic way to integrate these flavors is to use Cocoapods: `pod 'Operations/Extension'`. 
 
 
 ## Motivation
