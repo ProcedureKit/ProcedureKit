@@ -8,7 +8,12 @@
 
 # Operations
 
-A Swift framework inspired by WWDC 2015 Advanced NSOperations session. See the session video [here](https://developer.apple.com/videos/wwdc/2015/?id=226). There is a programming guide available here: [operations.readme.io](https://operations.readme.io). Reference documentation is available here: [docs.danthorpe.me/operations](http://docs.danthorpe.me/operations/2.4.1/index.html).
+A Swift framework inspired by WWDC 2015 Advanced NSOperations session.
+
+---|---
+Session video | [developer.apple.com](https://developer.apple.com/videos/wwdc/2015/?id=226)
+Reference documentation | [docs.danthorpe.me/operations](http://docs.danthorpe.me/operations/2.4.1/index.html)
+Programming guide | [operations.readme.io](https://operations.readme.io)
 
 ## Usage
 
@@ -139,7 +144,7 @@ Recently it was discovered that it is not currently possible to install the API 
 
 I want to stress that this code is heavily influenced by Apple. In no way am I attempting to assume any sort of credit for this architecture - that goes to [Dave DeLong](https://twitter.com/davedelong) and his team. My motivations are that I want to adopt this code in my own projects, and so require a solid well tested framework which I can integrate with.
 
-### Other Advanced NSOperations
+### Other *Advanced NSOperations*
 Other developers have created projects based off Apple’a WWDC sample code. Check them out too.
 
 1. [PSOperations](https://github.com/pluralsight/PSOperations)
