@@ -300,12 +300,7 @@ public extension NSOperation {
     /**
      Returns a non-optional `String` to use as the name
      of an Operation. If the `name` property is not
-     set, this resorts to the class description.
-     
-     However, if the name contains "BlockOperation" which
-     is common for arbitrary `BlockOperation` or 
-     `NSBlockOperation` types, it will return a 
-     plain reading description.
+     set, this resorts to the class description.     
     */
     var operationName: String {
         return name ?? "\(self)"
