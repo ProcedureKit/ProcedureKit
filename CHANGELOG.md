@@ -6,7 +6,7 @@ This is a relatively large number of changes with some breaking changes from 2.4
 
 1. [[OPR-140](https://github.com/danthorpe/Operations/pull/140)]: `OperationObserver` has been refactored to refine four different protocols each with a single function, instead of defining four functions itself. 
 
-    The four protocols are for observers for the following events: *did start*, *did cancel*, *did produce operation* and *did finish*. There are now specialized block observers, one for each event.
+    The four protocols are for observing the following events: *did start*, *did cancel*, *did produce operation* and *did finish*. There are now specialized block observers, one for each event.
 
     This change is to reflect that observers are generally focused on a single event, which is more in keeping with a single responsibility principle. I feel this is better than a single type which typically has either three non-operations or consists entirely of optional closures.
 
