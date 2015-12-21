@@ -53,19 +53,24 @@ Conditions are attached to an `Operation`. Before an operation is ready to execu
 
 ```swift
 operation.addCondition(BlockCondition { 
-    // operation will only be executed if this is true
+    // operation will finish with an error if this is false
     return trueOrFalse
 }
 ``` 
 
 Conditions can be mutually exclusive which is akin to a lock being held preventing other operations with the same exclusion being executed.
 
-The framework provides `AuthorizedFor`, `BlockCondition`, `MutuallyExclusive`, `NegatedCondition`, `NoFailedDependenciesCondition`, `SilentCondition`, `ReachilityCondition`, `RemoteNotificationCondition`, `UserConfirmationCondition` and `UserNotificationCondition`.
+The framework provides the following conditions: `AuthorizedFor`, `BlockCondition`, `MutuallyExclusive`, `NegatedCondition`, `NoFailedDependenciesCondition`, `SilentCondition`, `ReachilityCondition`, `RemoteNotificationCondition`, `UserConfirmationCondition` and `UserNotificationCondition`.
 
 See the programming guide on [Conditions](https://operations.readme.io/docs/conditions) for more information.
 
 ## Capabilities
-`CapabilityType` is a protocol which represents the applications authorization to access device or user account abilities. For example, location services, cloud kit contains, calendars etc. The protocol provides a unified model for checking the current authorization status, using `GetAuthorizationStatus`, explicitly requesting access, using `Authorize`, and as a condition with `AuthorizedFor`. For example:
+`CapabilityType` is a protocol which represents the application’s authorization to access device or user account abilities. For example, location services, cloud kit containers, calendars etc. The protocol provides a unified model to 
+1. Check the current authorization status, using `GetAuthorizationStatus`, 
+2. Explicitly request access, using `Authorize`
+3. Both of the above as a condition called `AuthorizedFor`. 
+
+For example:
 
 ```swift
 class ReminderOperation: Operation {
@@ -101,7 +106,7 @@ class LogExample: Operation {
 See the programming guide for more information: [logging](https://operations.readme.io/docs/logging) and [supporting 3rd party log frameworks](https://operations.readme.io/docs/custom-logging).
 
 ## Injecting Results
-State can be seamlessly transitioned between operations automatically. An operation which produces a *result* must conform to `ResultOperationType` and expose state via its `result` property. An operation which consumes state, has a *requirement* which must be set via its `requirement` property. Given conformance to these protocols, operations can be chained together:
+State can be seamlessly transitioned between operations automatically. An operation which produces a *result* can conform to `ResultOperationType` and expose state via its `result` property. An operation which consumes state, can conform to `AutomaticInjectionOperationType` and set its *requirement* via its `requirement` property. Given conformance to these protocols, operations can be chained together:
 
 ```swift
 let retrieval = DataRetrieval()
@@ -111,11 +116,6 @@ queue.addOperations(retrieval, processing)
 ```
 
 See the programming guide on [Injecting Results](https://operations.readme.io/docs/injecting-results) for more information.
-
-
-## Status - 21st Dec, 2015
-
-As of version 2.3, Operations is a multi-platform framework, with CocoaPods support in addition to framework targets for iOS Extensions, iOS Apps, OS X, watchOS and tvOS.
 
 ## Installation
 
@@ -138,4 +138,9 @@ Recently it was discovered that it is not currently possible to install the API 
 ## Motivation
 
 I want to stress that this code is heavily influenced by Apple. In no way am I attempting to assume any sort of credit for this architecture - that goes to [Dave DeLong](https://twitter.com/davedelong) and his team. My motivations are that I want to adopt this code in my own projects, and so require a solid well tested framework which I can integrate with.
+
+### Other Advanced NSOperations
+Other developers have created projects based off Apple’a WWDC sample code. Check them out too.
+
+1. [PSOperations](https://github.com/pluralsight/PSOperations)
 
