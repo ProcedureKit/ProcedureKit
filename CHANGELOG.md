@@ -5,11 +5,11 @@ This is a relatively large number of changes with some breaking changes from 2.4
 ### Breaking changes
 1. [[OPR-140](https://github.com/danthorpe/Operations/pull/140)]: `OperationObserver` has been refactored to refine four different protocols each with a single function, instead of defining four functions itself. 
 
-The four protocols are for observers for the following events: *did start*, *did cancel*, *did produce operation* and *did finish*. Instead of providing these four different functions to the same observer type, there are now specialized block observers for each one. This is more in keeping with single responsibility principle. 
+    The four protocols are for observers for the following events: *did start*, *did cancel*, *did produce operation* and *did finish*. Instead of providing these four different functions to the same observer type, there are now specialized block observers for each one. This is more in keeping with single responsibility principle. 
 
-To observer multiple events with blocks, add multiple observers. Create a bespoke type to observe multiple events with the same type.
+    To observer multiple events with blocks, add multiple observers. Create a bespoke type to observe multiple events with the same type.
 
-`BlockObserver` itself still exists, however its usage is discouraged and it will be removed at a later time. It is recommended that it be replaced with one or more of `StartedObserver`, `CancelledObserver`, `ProducedOperationObserver` or `FinishedObserver`, all of which accept a non-optional block.
+    `BlockObserver` itself still exists, however its usage is discouraged and it will be removed at a later time. It is recommended that it be replaced with one or more of `StartedObserver`, `CancelledObserver`, `ProducedOperationObserver` or `FinishedObserver`, all of which accept a non-optional block.
 
 2. [[OPR-139](https://github.com/danthorpe/Operations/pull/139)]: Removed `Capabiltiy.Health`. Because this capability imports HealthKit, it is flagged by the app review team, and an application may be rejecting for not providing guidance on its usage of HealthKit. Therefore, as the majority of apps probably do not use this capability, I have removed it from the standard application framework. It is available as a subspec through Cocoapods:
 
@@ -17,32 +17,43 @@ To observer multiple events with blocks, add multiple observers. Create a bespok
     pod 'Operations/+Health'
     ```
 
-### Improvements 
+### Improvements
+
 1. [[OPR-121](https://github.com/danthorpe/Operations/issues/121),[OPR-122](https://github.com/danthorpe/Operations/pull/122), [OPR-126](https://github.com/danthorpe/Operations/pull/126), [OPR-138](https://github.com/danthorpe/Operations/pull/138)]: Improves the built in logger. Now, 
     1. the message is enclosed in an  `@autoclosure`. 
     2. there is a default/global severity threshold
     3. there is a global enabled setting.
 
-Thanks to Jon [@jshier](https://github.com/jshier) for raising the initial issue on this one.
-2. [[OPR-128](https://github.com/danthorpe/Operations/pull/128)]: Improves how code coverage is generated. Thanks to Steve [@stevepeak](https://github.com/stevepeak) from [Codecov.io](https://codecov.io) for helping with this.
-3. [[OPR-133](https://github.com/danthorpe/Operations/issues/133), [OPR-134](https://github.com/danthorpe/Operations/pull/134)]: `DelayOperation` and `BlockOperation` have improved response to being cancelled. Thanks to Jon [@jshier](https://github.com/jshier) for raising the initial issue on this one.
+    Thanks to Jon ([@jshier](https://github.com/jshier)) for raising the initial issue on this one.
+    
+2. [[OPR-128](https://github.com/danthorpe/Operations/pull/128)]: Improves how code coverage is generated. Thanks to Steve ([@stevepeak](https://github.com/stevepeak)) from [Codecov.io](https://codecov.io) for helping with this.
+
+3. [[OPR-133](https://github.com/danthorpe/Operations/issues/133), [OPR-134](https://github.com/danthorpe/Operations/pull/134)]: `DelayOperation` and `BlockOperation` have improved response to being cancelled. Thanks to Jon ([@jshier](https://github.com/jshier)) for raising the initial issue on this one.
+
 4. [[OPR-132](https://github.com/danthorpe/Operations/pull/132)]: `BlockObserver` now supports a cancellation handler. However see the notes regarding changes to `OperationObserver` and `BlockObserver` above under breaking changes.
+
 5. [[OPR-135](https://github.com/danthorpe/Operations/issues/135),[OPR-137](https://github.com/danthorpe/Operations/pull/137)]: Result Injection.
 
-It is now possible to inject the results from one operation into another operation as its requirements before it executes. This can be performed with a provided block, or automatically in the one-to-one, result-to-requirement case. See the [programming guide](https://operations.readme.io/docs/injecting-results) for more information.
+    It is now possible to inject the results from one operation into another operation as its requirements before it executes. This can be performed with a provided block, or automatically in the one-to-one, result-to-requirement case. See the [programming guide](https://operations.readme.io/docs/injecting-results) for more information.
 
-Thanks very much to Frank [@difujia](https://github.com/difujia) for the inspiration on this, and Jon [@jshier](https://github.com/jshier) for contributing to the discussion.
+    Thanks very much to Frank ([@difujia](https://github.com/difujia)) for the inspiration on this, and Jon ([@jshier](https://github.com/jshier)) for contributing to the discussion.
 
 6. [[OPR-141](https://github.com/danthorpe/Operations/pull/141)]: `Operation` now uses `precondition` to check the expectations of public APIs. These are called out in the function’s documentation. Thanks to the Swift evolution mailing list & Chris Lattner on this one.
-7. [[OPR-144](https://github.com/danthorpe/Operations/issues/144), [OPR-145](https://github.com/danthorpe/Operations/pull/145)]: Supports adapting the internal logger to use 3rd party logging frameworks. The example project uses [SwiftyBeaver](https://github.com/SwiftyBeaver/SwiftyBeaver) as a logger. Thanks to Steven [@shsteven](https://github.com/shsteven) for raising the issue on this one!
+
+7. [[OPR-144](https://github.com/danthorpe/Operations/issues/144), [OPR-145](https://github.com/danthorpe/Operations/pull/145)]: Supports adapting the internal logger to use 3rd party logging frameworks. The example project uses [SwiftyBeaver](https://github.com/SwiftyBeaver/SwiftyBeaver) as a logger. Thanks to Steven ([@shsteven](https://github.com/shsteven)) for raising the issue on this one!
+
 8. [[OPR-148](https://github.com/danthorpe/Operations/pull/148)]: Location operations now conform to `ResultOperationType` which means their result (`CLLocation`, `CLPlacemark`) can be injected automatically into appropriate consuming operations.
 
-
 ### Bug Fixes
-1. [[OPR-124](https://github.com/danthorpe/Operations/pull/124)]: Fixes a bug where notification names conflicted. Thanks Frank [@difujia](https://github.com/difujia)!
-2. [[OPR-123](https://github.com/danthorpe/Operations/issues/123),[OPR-125](https://github.com/danthorpe/Operations/pull/125), [OPR-130](https://github.com/danthorpe/Operations/pull/130)]: Fixes a bug where a completion block would be executed twice. Thanks again to Frank [@difujia](https://github.com/difujia) for raising the issue.
-3. [[OPR-127](https://github.com/danthorpe/Operations/issues/127), [OPR-131](https://github.com/danthorpe/Operations/pull/131)]: Fixes a bug where an operation could fail to start due to a race condition. Now, if an operation has no conditions, rather than entering a `.EvaluatingConditions` state, it will immediately (i.e. synchronously) become `.Ready`. Thanks to Kevin [@kevinbrewster](https://github.com/kevinbrewster) for raising this issue.
-4. [[OPR-142](https://github.com/danthorpe/Operations/pull/142)]: `Operation` now checks the current state in comparison to `.Ready` before adding conditions or operations. This is unlikely to be a breaking change, as it is not a significant difference. Thanks to Frank [@difujia](https://github.com/difujia) for this one.
+
+1. [[OPR-124](https://github.com/danthorpe/Operations/pull/124)]: Fixes a bug where notification names conflicted. Thanks Frank ([@difujia](https://github.com/difujia)) for this one.
+
+2. [[OPR-123](https://github.com/danthorpe/Operations/issues/123),[OPR-125](https://github.com/danthorpe/Operations/pull/125), [OPR-130](https://github.com/danthorpe/Operations/pull/130)]: Fixes a bug where a completion block would be executed twice. Thanks again to Frank ([@difujia](https://github.com/difujia)) for raising the issue.
+
+3. [[OPR-127](https://github.com/danthorpe/Operations/issues/127), [OPR-131](https://github.com/danthorpe/Operations/pull/131)]: Fixes a bug where an operation could fail to start due to a race condition. Now, if an operation has no conditions, rather than entering a `.EvaluatingConditions` state, it will immediately (i.e. synchronously) become `.Ready`. Thanks to Kevin ([@kevinbrewster](https://github.com/kevinbrewster)) for raising this issue.
+
+4. [[OPR-142](https://github.com/danthorpe/Operations/pull/142)]: `Operation` now checks the current state in comparison to `.Ready` before adding conditions or operations. This is unlikely to be a breaking change, as it is not a significant difference. Thanks to Frank ([@difujia](https://github.com/difujia)) for this one.
+
 5. [[OPR-146](https://github.com/danthorpe/Operations/pull/146)]: Fixes a subtle issue where assessing the readiness could trigger state changes.
 
 
