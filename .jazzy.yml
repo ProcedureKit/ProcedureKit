@@ -6,7 +6,7 @@ github_url: https://github.com/danthorpe/Operations
 readme: README.md
 podspec: Operations.podspec
 
-swift_version: 2.2
+swift_version: 2.1.1
 xcodebuild-arguments: -scheme,Operations-iOS
 
 custom_categories:
