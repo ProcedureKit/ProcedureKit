@@ -8,7 +8,7 @@ This is a relatively large number of changes with some breaking changes from 2.4
 
     The four protocols are for observing the following events: *did start*, *did cancel*, *did produce operation* and *did finish*. There are now specialized block observers, one for each event.
 
-    This change is to reflect that observers are generally focused on a single event, which is more in keeping with a single responsibility principle. I feel this is better than a single type which typically has either three no-op functions or consists entirely of optional closures.
+    This change is to reflect that observers are generally focused on a single event, which is more in keeping with the single responsibility principle. I feel this is better than a single type which typically has either three no-op functions or consists entirely of optional closures.
 
     To observe multiple events using blocks: add multiple observers. Alternatively, create a bespoke type to observe multiple events with the same type.
 
@@ -73,6 +73,9 @@ This is a relatively large number of changes with some breaking changes from 2.4
     Thanks to Frank ([@difujia](https://github.com/difujia)) for this one.
 
 5. [[OPR-146](https://github.com/danthorpe/Operations/pull/146)]: Fixes a subtle issue where assessing the readiness could trigger state changes.
+
+
+Thanks to [@difujia](https://github.com/difujia), [@jshier](https://github.com/jshier), [@kevinbrewster](https://github.com/kevinbrewster), [@shsteven](https://github.com/shsteven) and [@stevepeak](https://github.com/stevepeak) for contributing to this version. :)
 
 
 # 2.4.1
