@@ -8,9 +8,9 @@ This is a relatively large number of changes with some breaking changes from 2.4
 
     The four protocols are for observing the following events: *did start*, *did cancel*, *did produce operation* and *did finish*. There are now specialized block observers, one for each event.
 
-    This change is to reflect that observers are generally focused on a single event, which is more in keeping with a single responsibility principle. I feel this is better than a single type which typically has either three non-operations or consists entirely of optional closures.
+    This change is to reflect that observers are generally focused on a single event, which is more in keeping with a single responsibility principle. I feel this is better than a single type which typically has either three no-op functions or consists entirely of optional closures.
 
-    To observer multiple events with blocks, add multiple observers. Create a bespoke type to observe multiple events with the same type.
+    To observe multiple events using blocks: add multiple observers. Alternatively, create a bespoke type to observe multiple events with the same type.
 
     `BlockObserver` itself still exists, however its usage is discouraged and it will be removed at a later time. It may also be necessary to make syntactic changes to existing code, in which case, I recommend replacing its usage entirely with one or more of `StartedObserver`, `CancelledObserver`, `ProducedOperationObserver` or `FinishedObserver`, all of which accept a non-optional block.
 
