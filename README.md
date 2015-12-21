@@ -138,8 +138,13 @@ pod 'Operations'
 
 ### Carthage
 
-Recently it was discovered that it is not currently possible to install the API Extension compatible framework via Carthage. This boiled down to having two schemes for the same platform, and Carthage doesn’t provide a way to pick. Now, there are two separate projects, one for API extension compatible frameworks only, which doesn’t actually solve the problem. But, there is a [pull request](https://github.com/Carthage/Carthage/pull/892) which should allow all projects to be build. For now, the only semi-automatic way to integrate these flavors is to use Cocoapods: `pod 'Operations/Extension'`. 
+Add the following line to your Cartfile:
 
+```ruby
+github 'danthorpe/Operations'
+```
+
+It was recently discovered that it is not currently possible to install the API extension compatible framework via Carthage. This boiled down to having two schemes for the same platform, and Carthage doesn’t provide a way to pick. As of now, there are two separate projects. One for standard application version, and one for API extension compatible frameworks only. This doesn’t actually solve the problem, but there is a [pull request](https://github.com/Carthage/Carthage/pull/892) which should allow all projects in a repo to be built. For now, the only semi-automatic way to integrate these flavors is to use Cocoapods: `pod 'Operations/Extension'`. 
 
 ## Motivation
 
