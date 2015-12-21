@@ -9,7 +9,7 @@
 import Foundation
 
 /**
- # Flat Map Operation
+ # Map Operation
  
  An `Operation` subclass which accepts a map transform closure. Because it
  conforms to both `ResultOperationType` and `AutomaticInjectionOperationType`
@@ -20,7 +20,7 @@ import Foundation
  it will be executed asynshronously.
 
 */
-public class FlatMapOperation<T, U>: Operation, ResultOperationType, AutomaticInjectionOperationType {
+public class MapOperation<T, U>: Operation, ResultOperationType, AutomaticInjectionOperationType {
 
     /// - returns: the requirement an optional type T
     public var requirement: T? = .None
@@ -28,7 +28,7 @@ public class FlatMapOperation<T, U>: Operation, ResultOperationType, AutomaticIn
     /// - returns: the result, an optional type U
     public var result: U? = .None
 
-    let transform: T -> U?
+    let transform: T -> U
 
     /**
      Initializes an instance with an optional starting requirement, and an
@@ -37,11 +37,9 @@ public class FlatMapOperation<T, U>: Operation, ResultOperationType, AutomaticIn
      - parameter x: the value to the transformed. Note this is optional, as it
      can be injected after initialization, but before execution.
      - parameter transform: a closure which maps a non-optional T to U!. Note
-     that this closure will only be run if the requirement is non-nil, but that
-     it is possible to map a non-nil requirement to a nil result. The result
-     is avaiable as the `result` property of type U?
+     that this closure will only be run if the requirement is non-nil.
     */
-    public init(x: T? = .None, transform: T -> U?) {
+    public init(x: T? = .None, transform: T -> U) {
         self.requirement = x
         self.transform = transform
         super.init()
@@ -66,8 +64,8 @@ extension ResultOperationType where Self: Operation {
      ```
 
     */
-    public func mapOperation<U>(transform: Result -> U) -> FlatMapOperation<Result, U> {
-        let map: FlatMapOperation<Result, U> = FlatMapOperation(transform: transform)
+    public func mapOperation<U>(transform: Result -> U) -> MapOperation<Result, U> {
+        let map: MapOperation<Result, U> = MapOperation(transform: transform)
         map.injectResultFromDependency(self) { operation, dependency, errors in
             if errors.isEmpty {
                 operation.requirement = dependency.result
