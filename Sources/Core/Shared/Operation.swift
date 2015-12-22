@@ -247,7 +247,7 @@ public class Operation: NSOperation {
 
     private func evaluateConditions() -> Bool {
         assert(state == .Pending, "\(__FUNCTION__) was called out of order.")
-        assert(cancelled == false, "\(__FUNCTION__) was called on cancelled operation.")
+        assert(cancelled == false, "\(__FUNCTION__) was called on cancelled operation: \(operationName).")
         if conditions.count > 0 {
             state = .EvaluatingConditions
             OperationConditionEvaluator.evaluate(conditions, operation: self) { errors in

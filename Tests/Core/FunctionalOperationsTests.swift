@@ -34,6 +34,66 @@ class MapOperationTests: OperationTests {
     }
 }
 
+class NumbersOperation: Operation, ResultOperationType {
+
+    var result: [Int] = []
+    var error: ErrorType? = .None
+
+    init(error: ErrorType? = .None) {
+        self.error = error
+        super.init()
+    }
+
+    override func execute() {
+        if let error = error {
+            finish(error)
+        }
+        else {
+            result = [0, 1, 2, 3, 4, 5 , 6 , 7, 8, 9]
+            finish()
+        }
+    }
+}
+
+class FilterOperationTests: OperationTests {
+
+    func test__filter_operation() {
+        let numbers = NumbersOperation()
+        let filtered = numbers.filterOperation { $0 % 2 == 0 }
+
+        addCompletionBlockToTestOperation(filtered, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        runOperations(numbers, filtered)
+        waitForExpectationsWithTimeout(3, handler: nil)
+
+        XCTAssertEqual(filtered.result, [0, 2, 4, 6, 8])
+    }
+
+    func test__filter_operation_with_cancellation() {
+        let delay = DelayOperation(interval: 1)
+        let numbers = NumbersOperation()
+        let filtered = numbers.filterOperation { $0 % 2 == 0 }
+        numbers.addDependency(delay)
+
+        addCompletionBlockToTestOperation(filtered, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        runOperations(delay, numbers, filtered)
+        numbers.cancel()
+        waitForExpectationsWithTimeout(3, handler: nil)
+
+        XCTAssertTrue(filtered.cancelled)
+    }
+
+    func test__filter_with_error() {
+        let numbers = NumbersOperation(error: TestOperation.Error.SimulatedError)
+        let filtered = numbers.filterOperation { $0 % 2 == 0 }
+
+        addCompletionBlockToTestOperation(filtered, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        runOperations(numbers, filtered)
+        waitForExpectationsWithTimeout(3, handler: nil)
+
+        XCTAssertTrue(filtered.cancelled)
+    }
+}
+
 
 
 

@@ -77,3 +77,65 @@ extension ResultOperationType where Self: Operation {
         return map
     }
 }
+
+/**
+ # Filter Operation
+
+ An `Operation` subclass which accepts an include element closure. Because it
+ conforms to both `ResultOperationType` and `AutomaticInjectionOperationType`
+ it can be used to create an array of operations which transform state.
+ 
+ - discussion: Note that the closure is invoked as the operation's *work* on
+ an operation queue. So it should perform synchronous computation, although
+ it will be executed asynshronously.
+
+*/
+public class FilterOperation<Element>: Operation, ResultOperationType, AutomaticInjectionOperationType {
+
+    /// - returns: the requirement an optional type T
+    public var requirement: Array<Element> = []
+
+    /// - returns: the result, an optional type U
+    public var result: Array<Element> = []
+
+    let filter: Element -> Bool
+
+    public init(source: Array<Element> = [], includeElement: Element -> Bool) {
+        self.requirement = source
+        self.filter = includeElement
+        super.init()
+        name = "Filter"
+    }
+
+    public override func execute() {
+        result = requirement.filter(filter)
+        finish()
+    }
+}
+
+extension ResultOperationType where Self: Operation, Result: SequenceType {
+
+    /**
+     Filter the result of an `Operation` which conforms to `ResultOperationType` where 
+     the Result is a SequenceType.
+     
+     ```swift
+     let getLocation = UserLocationOperation()
+     let toString = getLocation.mapResult { $0.map { "\($0)" } ?? "No location received" }
+     queue.addOperations(getLocation, toString)
+     ```
+    */
+    public func filterOperation(includeElement: Result.Generator.Element -> Bool) -> FilterOperation<Result.Generator.Element> {
+        let filter: FilterOperation<Result.Generator.Element> = FilterOperation(includeElement: includeElement)
+        filter.injectResultFromDependency(self) { operation, dependency, errors in
+            if errors.isEmpty {
+                operation.requirement = Array(dependency.result)
+            }
+            else {
+                operation.cancelWithError(AutomaticInjectionError.DependencyFinishedWithErrors(errors))
+            }
+        }
+        return filter
+    }
+}
+

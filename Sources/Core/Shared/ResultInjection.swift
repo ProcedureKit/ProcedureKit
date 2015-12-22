@@ -93,6 +93,11 @@ extension InjectionOperationType where Self: Operation {
                 block(operation: self, dependency: dep, errors: errors)
             }
         })
+        dep.addObserver(CancelledObserver { op in
+            if let _ = op as? T {
+                (self as Operation).cancel()
+            }
+        })
         (self as Operation).addDependency(dep)
         return self
     }
@@ -168,17 +173,14 @@ extension AutomaticInjectionOperationType where Self: Operation {
 
     */
     public func injectResultFromDependency<T where T: Operation, T: ResultOperationType, T.Result == Requirement>(dep: T) {
-        dep.addObserver(FinishedObserver { op, errors in
-            if let dep = op as? T {
-                if errors.isEmpty {
-                    self.requirement = dep.result
-                }
-                else {
-                    self.cancelWithError(AutomaticInjectionError.DependencyFinishedWithErrors(errors))
-                }
+        injectResultFromDependency(dep) { operation, dependency, errors in
+            if errors.isEmpty {
+                self.requirement = dependency.result
             }
-        })
-        (self as Operation).addDependency(dep)
+            else {
+                self.cancelWithError(AutomaticInjectionError.DependencyFinishedWithErrors(errors))
+            }
+        }
     }
 }
 
