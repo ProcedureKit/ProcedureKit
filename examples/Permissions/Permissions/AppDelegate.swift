@@ -8,6 +8,9 @@
 
 import UIKit
 import Operations
+import SwiftyBeaver
+
+let log = SwiftyBeaver.self
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -16,7 +19,27 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
 
-        LogManager.globalLogSeverity = .Notice
+        // Set up Logging with SwiftyBeaver
+
+        let console = ConsoleDestination()
+        log.addDestination(console)
+
+        LogManager.logger = { message, severity, file, function, line in
+            switch severity {
+            case .Verbose:
+                log.verbose(message, file, function, line: line)
+            case .Notice:
+                log.debug(message, file, function, line: line)
+            case .Info:
+                log.info(message, file, function, line: line)
+            case .Warning:
+                log.warning(message, file, function, line: line)
+            case .Fatal:
+                log.error(message, file, function, line: line)
+            }
+        }
+        
+        LogManager.severity = .Info
 
         return true
     }

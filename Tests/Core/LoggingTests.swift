@@ -9,25 +9,6 @@
 import XCTest
 @testable import Operations
 
-
-class TestableLogManager: LogManager {
-
-    let expectation: XCTestExpectation
-    let expectedMessage: String
-
-    var receivedMessage: String? = .None
-
-    init(expectation: XCTestExpectation, message: String) {
-        self.expectation = expectation
-        self.expectedMessage = message
-    }
-
-    func log(message: String) {
-        receivedMessage = message
-        expectation.fulfill()
-    }
-}
-
 class LoggerTests: XCTestCase {
 
     var severity: LogSeverity!
@@ -49,27 +30,88 @@ class LoggerTests: XCTestCase {
     }
 
     func test__init__severity_defaults_to_global_severity() {
-        LogManager.globalLogSeverity = .Info
         log = Logger()
-        XCTAssertEqual(log.severity, LogSeverity.Info)
+        XCTAssertEqual(log.severity, LogManager.severity)
     }
 
-    func test__prefix_uses_last_path_component() {
+    func test__init__enabled_defaults_to_global_enabled() {
         log = Logger()
-        let prefix = log.prefix("this/is/a/file.swift", function: "the_function", line: 100)
-        XCTAssertEqual(prefix, "[file.swift the_function:100], ")
+        XCTAssertTrue(log.enabled)
+    }
+
+    func test__operation_name_with_name_set() {
+        let op = BlockOperation()
+        op.name = "A Block"
+        XCTAssertEqual(op.operationName, "A Block")
+    }
+
+    func test__operation_name_with_name_not_set() {
+        let op = BlockOperation()
+        op.name = nil
+        XCTAssertTrue(op.operationName.containsString("Operations.BlockOperation"))
+    }
+
+    func test__meta_uses_last_path_component() {
+        let meta = LogManager.metadataForFile("this/is/a/file.swift", function: "the_function", line: 100)
+        XCTAssertEqual(meta, "[file.swift the_function:100], ")
+    }
+
+    func test__meta_uses_last_path_component_with_operation_name() {
+        log = Logger()
+        log.operationName = "MyOperation"
+        let message = log.messageWithOperationName("a message")
+        XCTAssertEqual(message, "MyOperation: a message")
     }
 }
 
-class LogManagerTests: XCTestCase {
+class RunAllTheLoggersTests: XCTestCase {
 
-    func test__shared_logger__is_set() {
-        let logger = LogManager.logger
-        LogManager.logger = { message in
-            XCTAssertEqual(message, "hello")
-        }
-        let log = Logger()
-        log.fatal("hello")
-        LogManager.logger = logger
+    var log: Logger!
+
+    override func tearDown() {
+        log = nil
+        super.tearDown()
     }
+
+    func test__verbose() {
+        log = Logger(severity: .Verbose) { message, severity, _, _, _ in
+            XCTAssertEqual(severity, LogSeverity.Verbose)
+            XCTAssertEqual(message, "Hello World")
+        }
+        log.verbose("Hello World")
+    }
+
+    func test__notice() {
+        log = Logger(severity: .Verbose) { message, severity, _, _, _ in
+            XCTAssertEqual(severity, LogSeverity.Notice)
+            XCTAssertEqual(message, "Hello World")
+        }
+        log.notice("Hello World")
+    }
+
+    func test__info() {
+        log = Logger(severity: .Verbose) { message, severity, _, _, _ in
+            XCTAssertEqual(severity, LogSeverity.Info)
+            XCTAssertEqual(message, "Hello World")
+        }
+        log.info("Hello World")
+    }
+
+    func test__warning() {
+        log = Logger(severity: .Verbose) { message, severity, _, _, _ in
+            XCTAssertEqual(severity, LogSeverity.Warning)
+            XCTAssertEqual(message, "Hello World")
+        }
+        log.warning("Hello World")
+    }
+
+    func test__fatal() {
+        log = Logger(severity: .Verbose) { message, severity, _, _, _ in
+            XCTAssertEqual(severity, LogSeverity.Fatal)
+            XCTAssertEqual(message, "Hello World")
+        }
+        log.fatal("Hello World")
+    }
+
+
 }

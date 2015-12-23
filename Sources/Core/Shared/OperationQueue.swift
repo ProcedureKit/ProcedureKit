@@ -56,19 +56,17 @@ public class OperationQueue: NSOperationQueue {
     public override func addOperation(op: NSOperation) {
         if let operation = op as? Operation {
 
-            // Setup an observer to invoke the delegate methods
-            let observer = BlockObserver(
-                produceHandler: { [weak self] in
-                    self?.addOperation($1)
-                },
-                finishHandler: { [weak self] (operation, errors) in
-                    if let q = self {
-                        q.delegate?.operationQueue(q, operationDidFinish: operation, withErrors: errors)
-                    }
-                }
-            )
+            /// Add an observer so that any produced operations are added to the queue
+            operation.addObserver(ProducedOperationObserver { [weak self] in
+                self?.addOperation($1)
+            })
 
-            operation.addObserver(observer)
+            /// Add an observer to invove the did finish delegate method
+            operation.addObserver(FinishedObserver { [weak self] operation, errors in
+                if let q = self {
+                    q.delegate?.operationQueue(q, operationDidFinish: operation, withErrors: errors)
+                }
+            })
 
             let dependencies = operation.conditions.flatMap {
                 $0.dependencyForOperation(operation)
@@ -89,9 +87,9 @@ public class OperationQueue: NSOperationQueue {
                 let manager = ExclusivityManager.sharedInstance
                 manager.addOperation(operation, categories: concurrencyCategories)
 
-                operation.addObserver(BlockObserver(finishHandler: { (operation, _) in
+                operation.addObserver(FinishedObserver { operation, _ in
                     manager.removeOperation(operation, categories: concurrencyCategories)
-                }))
+                })
             }
 
             // Indicate to the operation that it is to be enqueued
@@ -122,3 +120,14 @@ public class OperationQueue: NSOperationQueue {
     }
 }
 
+
+public extension NSOperationQueue {
+
+    /**
+     Add operations to the queue as a variadic parameter
+     - parameters ops: a variadic array of `NSOperation` instances.
+    */
+    func addOperations(ops: NSOperation...) {
+        addOperations(ops, waitUntilFinished: false)
+    }
+}

@@ -60,7 +60,7 @@ class BackgroundObserverTests: OperationTests {
         var backgroundTaskIdentifier: UIBackgroundTaskIdentifier!
         var endedBackgroundTaskIdentifier: UIBackgroundTaskIdentifier!
 
-        let didBeginTask: TestableUIApplication.DidBeginBackgroundTask = { (name, identifier) in
+        let didBeginTask: TestableUIApplication.DidBeginBackgroundTask = { name, identifier in
             if let name = name {
                 backgroundTaskName = name
             }
@@ -76,7 +76,7 @@ class BackgroundObserverTests: OperationTests {
             didBeginTask: didBeginTask,
             didEndTask: didEndTask)
 
-        let operation = TestOperation(delay: 2)
+        let operation = TestOperation(delay: 2, produced: TestOperation())
         operation.addObserver(BackgroundObserver(app: application))
 
         addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
@@ -130,6 +130,5 @@ class BackgroundObserverTests: OperationTests {
         XCTAssertEqual(backgroundTaskName, BackgroundObserver.backgroundTaskName)
         XCTAssertEqual(backgroundTaskIdentifier, endedBackgroundTaskIdentifier)
     }
-
 }
 

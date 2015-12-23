@@ -221,6 +221,13 @@ extension Capability {
         // etc
      }
      ```
+     
+     Capability.Health is not included in the module if installing via
+     Carthage. However, it can be used if installing with CocoaPods
+     
+     ```ruby
+     pod 'Operations/+Health'
+     ```
     */
     public typealias Health = _HealthCapability<HKHealthStore>
 }

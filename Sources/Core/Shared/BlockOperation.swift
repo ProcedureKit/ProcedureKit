@@ -28,9 +28,10 @@ public class BlockOperation: Operation {
     - parameter block: The closure to run when the operation executes.
     If this block is nil, the operation will immediately finish.
     */
-    public init(block: BlockType = { (continueWithError) in continueWithError(error: nil) }) {
+    public init(block: BlockType = { continuation in continuation(error: nil) }) {
         self.block = block
         super.init()
+        name = "Block Operation"
     }
 
     /**
@@ -57,7 +58,9 @@ public class BlockOperation: Operation {
     them to this continuation block.
     */
     public override func execute() {
-        block { error in self.finish(error) }
+        if !cancelled {
+            block { error in self.finish(error) }
+        }
     }
 }
 

@@ -74,25 +74,30 @@ public enum LocationOperationError: ErrorType, Equatable {
     case GeocoderError(NSError)
 }
 
-public class _UserLocationOperation<Manager: LocationManagerType>: Operation, CLLocationManagerDelegate {
+public class _UserLocationOperation<Manager: LocationManagerType>: Operation, CLLocationManagerDelegate, ResultOperationType {
     public typealias CompletionBlockType = CLLocation -> Void
 
     private let manager: Manager
     private let accuracy: CLLocationAccuracy
     private let completion: CompletionBlockType
 
-    /// Access the user's location once it has updated.
+    /// - returns: the CLLocation if available
     public private(set) var location: CLLocation? = .None
 
+    /// - returns: the CLLocation if available
+    public var result: CLLocation? {
+        return location
+    }
+
     /**
-    Initialize an operation which will use a custom location manager to
-    determine the user's current location to the desired accuracy. It will ask for
-    permission if required.
+     Initialize an operation which will use a custom location manager to
+     determine the user's current location to the desired accuracy. It will ask for
+     permission if required.
 
-    Framework consumers should use: UserLocationOperation
+     Framework consumers should use: UserLocationOperation
 
-    - parameter accuracy: the location accuracy which defaults to 3km.
-    - parameter completion: a closure CLLocation -> Void.
+     - parameter accuracy: the location accuracy which defaults to 3km.
+     - parameter completion: a closure CLLocation -> Void.
     */
     public convenience init(accuracy: CLLocationAccuracy = kCLLocationAccuracyThreeKilometers, completion: CompletionBlockType = { _ in }) {
         self.init(manager: Manager(), accuracy: accuracy, completion: completion)
@@ -115,6 +120,11 @@ public class _UserLocationOperation<Manager: LocationManagerType>: Operation, CL
         name = "User Location"
         addCondition(AuthorizedFor(_LocationCapability(.WhenInUse, registrar: manager)))
         addCondition(MutuallyExclusive<CLLocationManager>())
+        addObserver(CancelledObserver { [weak self] _ in
+            dispatch_async(Queue.Main.queue) {
+                self?.stopLocationUpdates()
+            }
+        })
     }
 
     /// Starts updating the location
@@ -124,21 +134,13 @@ public class _UserLocationOperation<Manager: LocationManagerType>: Operation, CL
         manager.opr_startUpdatingLocation()
     }
 
-    /// Stops updating the location before cancelling the operation
-    public override func cancel() {
-        dispatch_async(Queue.Main.queue) {
-            self.stopLocationUpdates()
-            super.cancel()
-        }
-    }
-
     internal func stopLocationUpdates() {
         manager.opr_stopLocationUpdates()
     }
 
     @objc public func locationManager(manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         if let location = locations.last {
-            log.info("\(operationName) updated last location: \(location)")
+            log.info("Updated last location: \(location)")
             if location.horizontalAccuracy <= accuracy {
                 dispatch_async(Queue.Main.queue) {
                     self.stopLocationUpdates()
@@ -177,7 +179,7 @@ extension CLGeocoder: ReverseGeocoderType {
     }
 }
 
-public class _ReverseGeocodeOperation<Geocoder: ReverseGeocoderType>: Operation {
+public class _ReverseGeocodeOperation<Geocoder: ReverseGeocoderType>: Operation, ResultOperationType {
     public typealias CompletionBlockType = CLPlacemark -> Void
 
     public let location: CLLocation
@@ -185,7 +187,13 @@ public class _ReverseGeocodeOperation<Geocoder: ReverseGeocoderType>: Operation 
     private let geocoder: Geocoder
     private let completion: CompletionBlockType
 
+    /// - returns: the CLPlacemark from the geocoder
     public private(set) var placemark: CLPlacemark? = .None
+
+    /// - returns: the CLPlacemark from the geocoder
+    public var result: CLPlacemark? {
+        return placemark
+    }
 
     /**
     Initialize an operation which will use a custom geocoder to
@@ -217,6 +225,13 @@ public class _ReverseGeocodeOperation<Geocoder: ReverseGeocoderType>: Operation 
         addObserver(NetworkObserver())
         addObserver(BackgroundObserver())
         addCondition(MutuallyExclusive<ReverseGeocodeOperation>())
+        addObserver(CancelledObserver { [weak self] _ in
+            if let geocoder = self?.geocoder {
+                dispatch_async(Queue.Main.queue) {
+                    geocoder.opr_cancel()
+                }
+            }
+        })
     }
 
     public override func execute() {
@@ -233,15 +248,9 @@ public class _ReverseGeocodeOperation<Geocoder: ReverseGeocoderType>: Operation 
             }
         }
     }
-
-    public override func cancel() {
-        geocoder.opr_cancel()
-        super.cancel()
-    }
-
 }
 
-public class _ReverseGeocodeUserLocationOperation<Geocoder, Manager where Geocoder: ReverseGeocoderType, Manager: LocationManagerType>: GroupOperation {
+public class _ReverseGeocodeUserLocationOperation<Geocoder, Manager where Geocoder: ReverseGeocoderType, Manager: LocationManagerType>: GroupOperation, ResultOperationType {
     public typealias CompletionBlockType = (CLLocation, CLPlacemark) -> Void
 
     private let geocoder: Geocoder
@@ -249,12 +258,20 @@ public class _ReverseGeocodeUserLocationOperation<Geocoder, Manager where Geocod
     private let userLocationOperation: _UserLocationOperation<Manager>
     private var reverseGeocodeOperation: _ReverseGeocodeOperation<Geocoder>?
 
+    /// - returns: the CLLocation if available
     public var location: CLLocation? {
         return userLocationOperation.location
     }
 
+    /// - returns: the CLPlacemark from the geocoder
     public var placemark: CLPlacemark? {
         return reverseGeocodeOperation?.placemark
+    }
+
+    /// - returns: the CLPlacemark from the geocoder, note that CLPlacemark
+    /// composes the associated CLLocation.
+    public var result: CLPlacemark? {
+        return placemark
     }
 
     /**
@@ -286,12 +303,6 @@ public class _ReverseGeocodeUserLocationOperation<Geocoder, Manager where Geocod
         super.init(operations: [ userLocationOperation ])
         name = "Reverse Geocode User Location"
         addCondition(MutuallyExclusive<ReverseGeocodeUserLocationOperation>())
-    }
-
-    public override func cancel() {
-        userLocationOperation.cancel()
-        reverseGeocodeOperation?.cancel()
-        super.cancel()
     }
 
     public override func operationDidFinish(operation: NSOperation, withErrors errors: [ErrorType]) {

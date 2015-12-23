@@ -1,6 +1,6 @@
 {
   "name": "Operations",
-  "version": "2.3.0",
+  "version": "2.4.1",
   "summary": "Powerful NSOperation subclasses in Swift.",
   "description": "A Swift framework inspired by Apple's WWDC 2015\nsession Advanced NSOperations: https://developer.apple.com/videos/wwdc/2015/?id=226",
   "homepage": "https://github.com/danthorpe/Operations",
@@ -10,131 +10,140 @@
   },
   "source": {
     "git": "https://github.com/danthorpe/Operations.git",
-    "tag": "2.3.0"
+    "tag": "2.4.1"
   },
   "module_name": "Operations",
+  "documentation_url": "http://docs.danthorpe.me/operations/2.4.1/index.html",
   "social_media_url": "https://twitter.com/danthorpe",
   "requires_arc": true,
-  "default_subspecs": "App",
   "platforms": {
     "ios": "8.0",
+    "watchos": "2.0",
+    "tvos": "9.0",
     "osx": "10.10"
   },
+  "default_subspecs": "Standard",
   "subspecs": [
     {
-      "name": "App",
+      "name": "Standard",
       "source_files": [
-        "Operations/Core/Shared",
-        "Operations/Core/iOS",
-        "Operations/Features/Shared",
-        "Operations/Features/iOS"
+        "Sources/Core/Shared",
+        "Sources/Core/iOS",
+        "Sources/Features/Shared",
+        "Sources/Features/iOS"
       ],
-      "osx": {
+      "watchos": {
         "exclude_files": [
-          "Operations/Core/iOS",
-          "Operations/Features/iOS"
-        ]
-      }
-    },
-    {
-      "name": "+AddressBook",
-      "dependencies": {
-        "Operations/App": [
-
+          "Sources/Core/iOS",
+          "Sources/Features/iOS/LocationCapability.swift",
+          "Sources/Features/iOS/LocationOperations.swift",
+          "Sources/Features/iOS/PhotosCapability.swift",
+          "Sources/Features/iOS/RemoteNotificationCondition.swift",
+          "Sources/Features/iOS/UserConfirmationCondition.swift",
+          "Sources/Features/iOS/UserNotificationCondition.swift",
+          "Sources/Features/iOS/WebpageOperation.swift",
+          "Sources/Features/Shared/CloudCapability.swift",
+          "Sources/Features/Shared/ReachabilityCondition.swift",
+          "Sources/Features/Shared/CloudKitOperation.swift",
+          "Sources/Features/Shared/ReachableOperation.swift",
+          "Sources/Features/Shared/Reachability.swift"
         ]
       },
-      "source_files": [
-        "Operations/Extras/AddressBook/iOS",
-        "Operations/Extras/Contacts/Shared",
-        "Operations/Extras/Contacts/iOS"
-      ],
+      "tvos": {
+        "exclude_files": [
+          "Sources/Features/iOS/HealthCapability.swift",
+          "Sources/Features/iOS/LocationCapability.swift",
+          "Sources/Features/iOS/LocationOperations.swift",
+          "Sources/Features/iOS/PassbookCapability.swift",
+          "Sources/Features/iOS/PhotosCapability.swift",
+          "Sources/Features/iOS/RemoteNotificationCondition.swift",
+          "Sources/Features/iOS/UserNotificationCondition.swift",
+          "Sources/Features/iOS/WebpageOperation.swift",
+          "Sources/Features/Shared/CalendarCapability.swift",
+          "Sources/Features/Shared/CloudCapability.swift"
+        ]
+      },
       "osx": {
         "exclude_files": [
-          "Operations/Extras/AddressBook/iOS",
-          "Operations/Extras/Contacts/iOS"
+          "Sources/Core/iOS",
+          "Sources/Features/iOS"
         ]
       }
     },
     {
       "name": "Extension",
+      "platforms": {
+        "ios": "8.0",
+        "tvos": "9.0",
+        "osx": "10.10"
+      },
       "source_files": [
-        "Operations/Core/Shared",
-        "Operations/Core/iOS",
-        "Operations/Features/Shared",
-        "Operations/Features/iOS"
+        "Sources/Core/Shared",
+        "Sources/Core/iOS",
+        "Sources/Features/Shared",
+        "Sources/Features/iOS"
+      ],
+      "exclude_files": [
+        "Sources/Core/iOS/BackgroundObserver.swift",
+        "Sources/Core/iOS/NetworkObserver.swift",
+        "Sources/Features/iOS/HealthCapability.swift",
+        "Sources/Features/iOS/LocationCapability.swift",
+        "Sources/Features/iOS/LocationOperations.swift",
+        "Sources/Features/iOS/RemoteNotificationCondition.swift",
+        "Sources/Features/iOS/UserNotificationCondition.swift"
+      ],
+      "tvos": {
+        "exclude_files": [
+          "Sources/Features/iOS/PassbookCapability.swift",
+          "Sources/Features/iOS/PhotosCapability.swift",
+          "Sources/Features/iOS/WebpageOperation.swift",
+          "Sources/Features/Shared/CalendarCapability.swift"
+        ]
+      },
+      "osx": {
+        "exclude_files": [
+          "Sources/Core/iOS",
+          "Sources/Features/iOS"
+        ]
+      }
+    },
+    {
+      "name": "+Health",
+      "platforms": {
+        "ios": "8.0",
+        "watchos": "2.0"
+      },
+      "dependencies": {
+        "Operations/Standard": [
+
+        ]
+      },
+      "source_files": [
+        "Sources/Extras/Health/iOS"
+      ]
+    },
+    {
+      "name": "+AddressBook",
+      "platforms": {
+        "ios": "8.0",
+        "osx": "10.10"
+      },
+      "dependencies": {
+        "Operations/Standard": [
+
+        ]
+      },
+      "source_files": [
+        "Sources/Extras/AddressBook/iOS",
+        "Sources/Extras/Contacts/Shared",
+        "Sources/Extras/Contacts/iOS"
       ],
       "osx": {
         "exclude_files": [
-          "Operations/Core/iOS",
-          "Operations/Features/iOS"
+          "Sources/Extras/AddressBook/iOS",
+          "Sources/Extras/Contacts/iOS"
         ]
-      },
-      "exclude_files": [
-        "Operations/Core/iOS/BackgroundObserver.swift",
-        "Operations/Core/iOS/NetworkObserver.swift",
-        "Operations/Features/iOS/RemoteNotificationCondition.swift",
-        "Operations/Features/iOS/UserNotificationCondition.swift",
-        "Operations/Features/iOS/LocationCapability.swift",
-        "Operations/Features/iOS/CalendarCapability.swift",
-        "Operations/Features/iOS/HealthCapability.swift",
-        "Operations/Features/iOS/ReachabilityCondition.swift",
-        "Operations/Features/iOS/LocationOperations.swift",
-        "Operations/Features/iOS/WebpageOperation.swift"
-      ]
-    },
-    {
-      "name": "watchOS",
-      "platforms": {
-        "watchos": null
-      },
-      "source_files": [
-        "Operations/Core/Shared",
-        "Operations/Core/iOS",
-        "Operations/Features/Shared",
-        "Operations/Features/iOS"
-      ],
-      "exclude_files": [
-        "Operations/Core/iOS/BackgroundObserver.swift",
-        "Operations/Core/iOS/NetworkObserver.swift",
-        "Operations/Core/iOS/AlertOperation.swift",
-        "Operations/Core/iOS/UIOperation.swift",
-        "Operations/Features/Shared/CloudCapability.swift",
-        "Operations/Features/iOS/PhotosCapability.swift",
-        "Operations/Features/iOS/RemoteNotificationCondition.swift",
-        "Operations/Features/iOS/UserConfirmationCondition.swift",
-        "Operations/Features/iOS/UserNotificationCondition.swift",
-        "Operations/Features/iOS/LocationCapability.swift",
-        "Operations/Features/Shared/ReachabilityCondition.swift",
-        "Operations/Features/Shared/CloudKitOperation.swift",
-        "Operations/Features/iOS/LocationOperations.swift",
-        "Operations/Features/Shared/ReachableOperation.swift",
-        "Operations/Features/iOS/WebpageOperation.swift",
-        "Operations/Features/Shared/Reachability.swift"
-      ]
-    },
-    {
-      "name": "tvOS",
-      "platforms": {
-        "tvos": null
-      },
-      "source_files": [
-        "Operations/Core/Shared",
-        "Operations/Core/iOS",
-        "Operations/Features/Shared",
-        "Operations/Features/iOS"
-      ],
-      "exclude_files": [
-        "Operations/Features/Shared/CalendarCapability.swift",
-        "Operations/Features/Shared/CloudCapability.swift",
-        "Operations/Features/iOS/PassbookCapability.swift",
-        "Operations/Features/iOS/PhotosCapability.swift",
-        "Operations/Features/iOS/RemoteNotificationCondition.swift",
-        "Operations/Features/iOS/UserNotificationCondition.swift",
-        "Operations/Features/iOS/HealthCapability.swift",
-        "Operations/Features/iOS/LocationCapability.swift",
-        "Operations/Features/iOS/LocationOperations.swift",
-        "Operations/Features/iOS/WebpageOperation.swift"
-      ]
+      }
     }
   ]
 }

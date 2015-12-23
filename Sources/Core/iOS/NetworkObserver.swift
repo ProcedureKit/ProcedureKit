@@ -15,11 +15,11 @@ protocol NetworkActivityIndicatorInterface {
 extension UIApplication: NetworkActivityIndicatorInterface { }
 
 /**
-An `OperationObserver` which can be used to manage the network
+An `OperationObserverType` which can be used to manage the network
 activity indicator in iOS. Note that this is not an observer of
 when the network is available. See `ReachableOperation`.
 */
-public class NetworkObserver: OperationObserver {
+public class NetworkObserver: OperationDidStartObserver, OperationDidFinishObserver {
 
     let networkActivityIndicator: NetworkActivityIndicatorInterface
 
@@ -38,11 +38,6 @@ public class NetworkObserver: OperationObserver {
             NetworkIndicatorController.sharedInstance.networkActivityIndicator = self.networkActivityIndicator
             NetworkIndicatorController.sharedInstance.networkActivityDidStart()
         }
-    }
-
-    /// Conforms to `OperationObserver`, has no opertion for when another operation is produced.
-    public func operation(operation: Operation, didProduceOperation newOperation: NSOperation) {
-        // no-op
     }
 
     /// Conforms to `OperationObserver`, will stop the network activity indicator.

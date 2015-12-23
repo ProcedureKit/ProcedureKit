@@ -17,10 +17,10 @@ class NegatedConditionTests: OperationTests {
         operation.addCondition(NegatedCondition(BlockCondition { true }))
 
         var receivedErrors = [ErrorType]()
-        operation.addObserver(BlockObserver(finishHandler: { (_, errors) in
+        operation.addObserver(FinishedObserver { _, errors in
             receivedErrors = errors
             expectation.fulfill()
-        }))
+        })
         
         runOperation(operation)
 
@@ -40,10 +40,10 @@ class NegatedConditionTests: OperationTests {
         let operation = TestOperation()
         operation.addCondition(NegatedCondition(BlockCondition { false }))
 
-        runOperation(operation)
         addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
-        
+        runOperation(operation)
         waitForExpectationsWithTimeout(3, handler: nil)
+
         XCTAssertTrue(operation.didExecute)
         XCTAssertTrue(operation.finished)
         XCTAssertFalse(operation.cancelled)
