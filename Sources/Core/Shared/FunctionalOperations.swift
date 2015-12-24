@@ -107,7 +107,7 @@ public class FilterOperation<Element>: Operation, ResultOperationType, Automatic
         name = "Filter"
     }
 
-    public override func execute() {
+    public final override func execute() {
         result = requirement.filter(filter)
         finish()
     }
@@ -116,7 +116,7 @@ public class FilterOperation<Element>: Operation, ResultOperationType, Automatic
 extension ResultOperationType where Self: Operation, Result: SequenceType {
 
     /**
-     Filter the result of an `Operation` which conforms to `ResultOperationType` where 
+     Filter the result of the receiver `Operation` which conforms to `ResultOperationType` where
      the Result is a SequenceType.
      
      ```swift
@@ -138,4 +138,73 @@ extension ResultOperationType where Self: Operation, Result: SequenceType {
         return filter
     }
 }
+
+/**
+ # Reduce Operation
+ 
+ An `Operation` subclass which accepts an initial value, and a combine closure. Because it
+ conforms to both `ResultOperationType` and `AutomaticInjectionOperationType`
+ it can be used to create an array of operations which transform state.
+ 
+ - discussion: Note that the closure is invoked as the operation's *work* on
+ an operation queue. So it should perform synchronous computation, although
+ it will be executed asynshronously.
+
+*/
+public class ReduceOperation<Element, U>: Operation, ResultOperationType, AutomaticInjectionOperationType {
+
+    /// - returns: the requirement an optional type T
+    public var requirement: Array<Element> = []
+
+    /// - returns: the result, an optional type U
+    public var result: U!
+
+    let initial: U
+    let combine: (U, Element) -> U
+
+    public init(source: Array<Element> = [], initial: U, combine: (U, Element) -> U) {
+        self.requirement = source
+        self.initial = initial
+        self.combine = combine
+        super.init()
+        name = "Reduce"
+    }
+
+    public final override func execute() {
+        result = requirement.reduce(initial, combine: combine)
+        finish()
+    }
+}
+
+extension ResultOperationType where Self: Operation, Result: SequenceType {
+
+    /**
+     Reduce the result of the receiver `Operation` which conforms to `ResultOperationType` where
+     the Result is a SequenceType.
+     
+     ```swift
+     let getStrings = GetStringsOperation()
+     let createParagraph = getStrings.reduceOperation("") { (accumulator: String, str: String) in
+        return "\(accumulator) \(str)"
+     }
+     queue.addOperations(getStrings, createParagraph)
+     ```
+
+    */
+    public func reduceOperation<U>(initial: U, combine: (U, Result.Generator.Element) -> U) -> ReduceOperation<Result.Generator.Element, U> {
+        let reduce: ReduceOperation<Result.Generator.Element, U> = ReduceOperation(initial: initial, combine: combine)
+        reduce.injectResultFromDependency(self) { operation, dependency, errors in
+            if errors.isEmpty {
+                operation.requirement = Array(dependency.result)
+            }
+            else {
+                operation.cancelWithError(AutomaticInjectionError.DependencyFinishedWithErrors(errors))
+            }
+        }
+        return reduce
+    }
+}
+
+
+
 

@@ -71,8 +71,8 @@ class FilterOperationTests: OperationTests {
     func test__filter_operation_with_cancellation() {
         let delay = DelayOperation(interval: 1)
         let numbers = NumbersOperation()
-        let filtered = numbers.filterOperation { $0 % 2 == 0 }
         numbers.addDependency(delay)
+        let filtered = numbers.filterOperation { $0 % 2 == 0 }
 
         addCompletionBlockToTestOperation(filtered, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
         runOperations(delay, numbers, filtered)
@@ -93,6 +93,58 @@ class FilterOperationTests: OperationTests {
         XCTAssertTrue(filtered.cancelled)
     }
 }
+
+class ReduceOperationTests: OperationTests {
+
+    func test__reduce_operation() {
+        let numbers = NumbersOperation()
+        let reduce = numbers.reduceOperation(0) { (sum: Int, element: Int) in
+            return sum + element
+        }
+
+        addCompletionBlockToTestOperation(reduce, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        runOperations(numbers, reduce)
+        waitForExpectationsWithTimeout(3, handler: nil)
+
+        XCTAssertEqual(reduce.result, 45)
+    }
+
+    func test__reduce_operation_with_cancellation() {
+        let delay = DelayOperation(interval: 1)
+        let numbers = NumbersOperation()
+        numbers.addDependency(delay)
+        let reduce = numbers.reduceOperation(0) { (sum: Int, element: Int) in
+            return sum + element
+        }
+
+        addCompletionBlockToTestOperation(reduce, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        runOperations(delay, numbers, reduce)
+        numbers.cancel()
+        waitForExpectationsWithTimeout(3, handler: nil)
+
+        XCTAssertTrue(reduce.cancelled)
+    }
+
+    func test__reduce_with_error() {
+        let numbers = NumbersOperation(error: TestOperation.Error.SimulatedError)
+        let reduce = numbers.reduceOperation(0) { (sum: Int, element: Int) in
+            return sum + element
+        }
+
+        addCompletionBlockToTestOperation(reduce, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        runOperations(numbers, reduce)
+        waitForExpectationsWithTimeout(3, handler: nil)
+
+        XCTAssertTrue(reduce.cancelled)
+    }
+}
+
+
+
+
+
+
+
 
 
 
