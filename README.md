@@ -11,9 +11,9 @@
 A Swift framework inspired by WWDC 2015 Advanced NSOperations session.
 
 Resource | Where to find it
--------|-------
+---------|-----------------
 Session video | [developer.apple.com](https://developer.apple.com/videos/wwdc/2015/?id=226)
-Reference documentation | [docs.danthorpe.me/operations](http://docs.danthorpe.me/operations/2.4.1/index.html)
+Reference documentation | [docs.danthorpe.me/operations](http://docs.danthorpe.me/operations/2.5.0/index.html)
 Programming guide | [operations.readme.io](https://operations.readme.io)
 
 ## Usage
@@ -34,7 +34,7 @@ class MyFirstOperation: Operation {
 }
 ```
 
-the key point here are:
+the key points here are:
 
 1. Subclass `Operation`
 2. Override `execute` but do not call `super.execute()`
@@ -42,7 +42,8 @@ the key point here are:
 4. If not cancelled, always call `finish()` after the *work* is done. This could be done asynchronously.
 
 ## Observers
-Observers are attached to an `Operation`. They receive callbacks when operation events occur. Unlike the Apple sample code, Operations defines four observer protocols for the four events, *did start*, *did cancel*, *did produce operation* and *did finish*. There are block based types which implement these protocols. For example, to observe when an operation starts:
+
+Observers are attached to an `Operation`. They receive callbacks when operation events occur. In a change from Apple's sample code, Operations defines four observer protocols for the four events: *did start*, *did cancel*, *did produce operation* and *did finish*. There are block based types which implement these protocols. For example, to observe when an operation starts:
 
 ```swift
 operation.addObserver(StartedObserver { op in 
@@ -50,12 +51,13 @@ operation.addObserver(StartedObserver { op in
 })
 ```
 
-The framework provides `BackgroundObserver`, `TimeoutObserver` and `NetworkObserver`.
+The framework also provides `BackgroundObserver`, `TimeoutObserver` and `NetworkObserver`.
 
 See the programming guide on [Observers](https://operations.readme.io/docs/observers) for more information.
 
 ## Conditions
-Conditions are attached to an `Operation`. Before an operation is ready to execute it will asynchronously *evaluate* all of its conditions. If a conditions fails, the operation finishes with an error instead of executing. For example:
+
+Conditions are attached to an `Operation`. Before an operation is ready to execute it will asynchronously *evaluate* all of its conditions. If any condition fails, the operation finishes with an error instead of executing. For example:
 
 ```swift
 operation.addCondition(BlockCondition { 
@@ -64,14 +66,16 @@ operation.addCondition(BlockCondition {
 }
 ``` 
 
-Conditions can be mutually exclusive which is akin to a lock being held preventing other operations with the same exclusion being executed.
+Conditions can be mutually exclusive. This is akin to a lock being held preventing other operations with the same exclusion being executed.
 
 The framework provides the following conditions: `AuthorizedFor`, `BlockCondition`, `MutuallyExclusive`, `NegatedCondition`, `NoFailedDependenciesCondition`, `SilentCondition`, `ReachilityCondition`, `RemoteNotificationCondition`, `UserConfirmationCondition` and `UserNotificationCondition`.
 
 See the programming guide on [Conditions](https://operations.readme.io/docs/conditions) for more information.
 
 ## Capabilities
-`CapabilityType` is a protocol which represents the application’s authorization to access device or user account abilities. For example, location services, cloud kit containers, calendars etc. The protocol provides a unified model to 
+
+`CapabilityType` is a protocol which represents the application’s authorization to access device or user account abilities. For example, location services, cloud kit containers, calendars etc. The protocol provides a unified model to:
+ 
 1. Check the current authorization status, using `GetAuthorizationStatus`, 
 2. Explicitly request access, using `Authorize`
 3. Both of the above as a condition called `AuthorizedFor`. 
@@ -92,11 +96,12 @@ class ReminderOperation: Operation {
     }
 }
 ```
-The framework provides capabilities: `Capability.Calendar`, `Capability.CloudKit`, `Capability.Health`, `Capability.Location`, `Capability.Passbook` and `Capability.Photos`.
+The framework provides the following capabilities: `Capability.Calendar`, `Capability.CloudKit`, `Capability.Health`, `Capability.Location`, `Capability.Passbook` and `Capability.Photos`.
 
 See the programming guide on [Capabilities](https://operations.readme.io/docs/capabilities) for more information.
 
 ## Logging
+
 `Operation` has its own internal logging functionality exposed via a `log` property:
 
 ```swift
@@ -109,16 +114,17 @@ class LogExample: Operation {
 }
 ```
 
-See the programming guide for more information: [logging](https://operations.readme.io/docs/logging) and [supporting 3rd party log frameworks](https://operations.readme.io/docs/custom-logging).
+See the programming guide for more information on [logging](https://operations.readme.io/docs/logging) and [supporting 3rd party log frameworks](https://operations.readme.io/docs/custom-logging).
 
 ## Injecting Results
-State can be seamlessly transitioned between operations automatically. An operation which produces a *result* can conform to `ResultOperationType` and expose state via its `result` property. An operation which consumes state, can conform to `AutomaticInjectionOperationType` and set its *requirement* via its `requirement` property. Given conformance to these protocols, operations can be chained together:
+
+State (or data if you prefer) can be seamlessly transitioned between operations automatically. An operation which produces a *result* can conform to `ResultOperationType` and expose state via its `result` property. An operation which consumes state, can conform to `AutomaticInjectionOperationType` and set its *requirement* via its `requirement` property. Given conformance to these protocols, operations can be chained together:
 
 ```swift
-let retrieval = DataRetrieval()
-let processing = DataProcessing()
-processing.injectResultFromDependency(retrieval)
-queue.addOperations(retrieval, processing)
+let getLocation = UserLocationOperation()
+let processLocation = ProcessUserLocation()
+processLocation.injectResultFromDependency(getLocation)
+queue.addOperations(getLocation, processLocation)
 ```
 
 See the programming guide on [Injecting Results](https://operations.readme.io/docs/injecting-results) for more information.

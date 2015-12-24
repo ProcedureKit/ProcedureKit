@@ -93,6 +93,7 @@ public class Operation: NSOperation {
     private let stateLock = NSLock()
     private let readyLock = NSRecursiveLock()
 
+    private lazy var _log: LoggerType = Logger()
     private var _state = State.Initialized
     private var _internalErrors = [ErrorType]()
 
@@ -235,7 +236,15 @@ public class Operation: NSOperation {
      ```
 
     */
-    public lazy var log: LoggerType = Logger()
+    public var log: LoggerType {
+        get {
+            _log.operationName = operationName
+            return _log
+        }
+        set {
+            _log = newValue
+        }
+    }
 
     /**
     Indicates that the Operation can now begin to evaluate readiness conditions,

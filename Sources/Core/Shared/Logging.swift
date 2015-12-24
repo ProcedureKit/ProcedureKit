@@ -92,11 +92,8 @@ internal extension LoggerType {
 public extension LoggerType {
 
     func messageWithOperationName(message: String) -> String {
-        var result = ""
-        if let name = operationName {
-            result = "\(name): "
-        }
-        return "\(result)\(message)"
+        let name = operationName.map { "\($0): " } ?? ""
+        return "\(name)\(message)"
     }
 
     /**
@@ -129,7 +126,6 @@ public extension LoggerType {
             let _message = messageWithOperationName(message())
             dispatch_async(LogManager.queue) {
                 self.logger(message: _message, severity: severity, file: file, function: function, line: line)
-//                self.logger(severity: severity, message: "\(_meta)\(_message)")
             }
         }
     }
@@ -301,11 +297,6 @@ public extension NSOperation {
      Returns a non-optional `String` to use as the name
      of an Operation. If the `name` property is not
      set, this resorts to the class description.
-     
-     However, if the name contains "BlockOperation" which
-     is common for arbitrary `BlockOperation` or 
-     `NSBlockOperation` types, it will return a 
-     plain reading description.
     */
     var operationName: String {
         return name ?? "\(self)"
