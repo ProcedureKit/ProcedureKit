@@ -22,8 +22,8 @@ operations.
 */
 public class GroupOperation: Operation {
 
-    private let queue = OperationQueue()
-    private let operations: [NSOperation]
+    public let queue = OperationQueue()
+    public let operations: [NSOperation]
     private let finishingOperation = NSBlockOperation(block: {})
 
     /// - returns: an aggregation of errors [ErrorType]

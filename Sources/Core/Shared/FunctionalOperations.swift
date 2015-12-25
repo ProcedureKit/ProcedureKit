@@ -205,6 +205,50 @@ extension ResultOperationType where Self: Operation, Result: SequenceType {
     }
 }
 
+public class ResultOperation<Result>: Operation, ResultOperationType {
+
+    public var result: Result! = nil
+
+    public init(result: Result! = nil) {
+        self.result = result
+        super.init()
+        name = "Result"
+    }
+
+    public override func execute() {
+        // no-op
+        finish()
+    }
+}
+
+public class OperationSequence<Result>: ResultOperation<Result>, InjectionOperationType {
+
+    public let operations: [NSOperation]
+
+    public init(operations: [NSOperation] = []) {
+        self.operations = operations
+        super.init(result: nil)
+        name = "Collection"
+    }
+
+}
+
+extension ResultOperationType where Self: Operation {
+
+    public func collect() -> OperationSequence<Result> {
+
+        let seq: OperationSequence<Result> = OperationSequence()
+        seq.injectResultFromDependency(self) { operation, dependency, errors in
+            if errors.isEmpty {
+                operation.result = dependency.result
+            }
+            else {
+                operation.cancelWithError(AutomaticInjectionError.DependencyFinishedWithErrors(errors))
+            }
+        }
+        return seq
+    }
+}
 
 
 
