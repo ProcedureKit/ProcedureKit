@@ -221,23 +221,23 @@ public class ResultOperation<Result>: Operation, ResultOperationType {
     }
 }
 
-public class OperationSequence<Result>: ResultOperation<Result>, InjectionOperationType {
+public class OperationFlow<Result>: ResultOperation<Result>, InjectionOperationType {
 
     public let operations: [NSOperation]
 
     public init(operations: [NSOperation] = []) {
         self.operations = operations
         super.init(result: nil)
-        name = "Collection"
+        name = "Flow"
     }
 
 }
 
 extension ResultOperationType where Self: Operation {
 
-    public func collect() -> OperationSequence<Result> {
+    public func collect() -> OperationFlow<Result> {
 
-        let seq: OperationSequence<Result> = OperationSequence()
+        let seq: OperationFlow<Result> = OperationFlow()
         seq.injectResultFromDependency(self) { operation, dependency, errors in
             if errors.isEmpty {
                 operation.result = dependency.result
