@@ -9,6 +9,29 @@
 import Foundation
 
 /**
+ # Result Operation
+ 
+ Abstract but a concrete class for a ResultOperationType.
+*/
+public class ResultOperation<Result>: Operation, ResultOperationType {
+
+    /// - returns: the Result
+    public var result: Result! = nil
+
+    public init(result: Result! = nil) {
+        self.result = result
+        super.init()
+        name = "Result"
+    }
+
+    public override func execute() {
+        // no-op
+        finish()
+    }
+}
+
+
+/**
  # Map Operation
  
  An `Operation` subclass which accepts a map transform closure. Because it
@@ -20,13 +43,10 @@ import Foundation
  it will be executed asynshronously.
 
 */
-public class MapOperation<T, U>: Operation, ResultOperationType, AutomaticInjectionOperationType {
+public class MapOperation<T, U>: ResultOperation<U>, AutomaticInjectionOperationType {
 
     /// - returns: the requirement an optional type T
-    public var requirement: T? = .None
-
-    /// - returns: the result, an optional type U
-    public var result: U? = .None
+    public var requirement: T! = nil
 
     let transform: T -> U
 
@@ -39,15 +59,19 @@ public class MapOperation<T, U>: Operation, ResultOperationType, AutomaticInject
      - parameter transform: a closure which maps a non-optional T to U!. Note
      that this closure will only be run if the requirement is non-nil.
     */
-    public init(x: T? = .None, transform: T -> U) {
+    public init(x: T! = .None, transform: T -> U) {
         self.requirement = x
         self.transform = transform
-        super.init()
+        super.init(result: nil)
         name = "Map"
     }
 
     public override func execute() {
-        result = requirement.flatMap(transform)
+        guard let requirement = requirement else {
+            finish(AutomaticInjectionError.RequirementNotSatisfied)
+            return
+        }
+        result = transform(requirement)
         finish()
     }
 }
@@ -90,20 +114,17 @@ extension ResultOperationType where Self: Operation {
  it will be executed asynshronously.
 
 */
-public class FilterOperation<Element>: Operation, ResultOperationType, AutomaticInjectionOperationType {
+public class FilterOperation<Element>: ResultOperation<Array<Element>>, AutomaticInjectionOperationType {
 
     /// - returns: the requirement an optional type T
     public var requirement: Array<Element> = []
-
-    /// - returns: the result, an optional type U
-    public var result: Array<Element> = []
 
     let filter: Element -> Bool
 
     public init(source: Array<Element> = [], includeElement: Element -> Bool) {
         self.requirement = source
         self.filter = includeElement
-        super.init()
+        super.init(result: [])
         name = "Filter"
     }
 
@@ -151,13 +172,10 @@ extension ResultOperationType where Self: Operation, Result: SequenceType {
  it will be executed asynshronously.
 
 */
-public class ReduceOperation<Element, U>: Operation, ResultOperationType, AutomaticInjectionOperationType {
+public class ReduceOperation<Element, U>: ResultOperation<U>, AutomaticInjectionOperationType {
 
     /// - returns: the requirement an optional type T
     public var requirement: Array<Element> = []
-
-    /// - returns: the result, an optional type U
-    public var result: U!
 
     let initial: U
     let combine: (U, Element) -> U
@@ -205,39 +223,94 @@ extension ResultOperationType where Self: Operation, Result: SequenceType {
     }
 }
 
-public class ResultOperation<Result>: Operation, ResultOperationType {
 
-    public var result: Result! = nil
 
-    public init(result: Result! = nil) {
-        self.result = result
-        super.init()
-        name = "Result"
-    }
-
-    public override func execute() {
-        // no-op
-        finish()
-    }
-}
-
-public class OperationFlow<Result>: ResultOperation<Result>, InjectionOperationType {
+/**
+ # Operation Flow
+ 
+ OperationFlow is a class which allows for chaining of functional
+ actions (map, filter, reduce) as Operation instances.
+ 
+ This operation collects the intermediate Operation instances in
+ a an array
+*/
+public class OperationFlow<T where T: Operation, T: ResultOperationType>: ResultOperation<T.Result>, InjectionOperationType {
 
     public let operations: [NSOperation]
 
-    public init(operations: [NSOperation] = []) {
+    internal let lastOperation: T!
+
+    internal init(last: T! = nil, operations: [NSOperation] = []) {
+        self.lastOperation = last
         self.operations = operations
         super.init(result: nil)
         name = "Flow"
     }
 
+    public func map<U>(transform: T.Result -> U) -> OperationFlow<ResultOperation<U>> {
+        guard let last = lastOperation else {
+            fatalError("The last operaton was not set.")
+        }
+        var ops = operations
+        let map = MapOperation(transform: transform)
+        map.injectResultFromDependency(last) { operation, dependency, errors in
+            if errors.isEmpty {
+                operation.requirement = dependency.result
+            }
+            else {
+                operation.cancelWithError(AutomaticInjectionError.DependencyFinishedWithErrors(errors))
+            }
+        }
+        ops.append(map)
+        return OperationFlow<ResultOperation<U>>(last: map, operations: ops)
+    }
 }
+
+extension OperationFlow where T.Result: SequenceType {
+
+    public func filter(includeElement: T.Result.Generator.Element -> Bool) -> OperationFlow<ResultOperation<Array<T.Result.Generator.Element>>> {
+        guard let last = lastOperation else {
+            fatalError("The last operaton was not set.")
+        }
+        var ops = operations
+        let filter = FilterOperation(includeElement: includeElement)
+        filter.injectResultFromDependency(last) { operation, dependency, errors in
+            if errors.isEmpty {
+                operation.requirement = Array(dependency.result)
+            }
+            else {
+                operation.cancelWithError(AutomaticInjectionError.DependencyFinishedWithErrors(errors))
+            }
+        }
+        ops.append(filter)
+        return OperationFlow<ResultOperation<Array<T.Result.Generator.Element>>>(last: filter, operations: ops)
+    }
+
+    public func reduce<U>(initial: U, combine: (U, T.Result.Generator.Element) -> U) -> OperationFlow<ResultOperation<U>> {
+        guard let last = lastOperation else {
+            fatalError("The last operaton was not set.")
+        }
+        var ops = operations
+        let reduce = ReduceOperation(initial: initial, combine: combine)
+        reduce.injectResultFromDependency(last) { operation, dependency, errors in
+            if errors.isEmpty {
+                operation.requirement = Array(dependency.result)
+            }
+            else {
+                operation.cancelWithError(AutomaticInjectionError.DependencyFinishedWithErrors(errors))
+            }
+        }
+        ops.append(reduce)
+        return OperationFlow<ResultOperation<U>>(last: reduce, operations: ops)
+    }
+}
+
 
 extension ResultOperationType where Self: Operation {
 
-    public func collect() -> OperationFlow<Result> {
+    public func collect() -> OperationFlow<ResultOperation<Result>> {
 
-        let seq: OperationFlow<Result> = OperationFlow()
+        let seq: OperationFlow<ResultOperation<Result>> = OperationFlow()
         seq.injectResultFromDependency(self) { operation, dependency, errors in
             if errors.isEmpty {
                 operation.result = dependency.result

@@ -139,6 +139,7 @@ public protocol AutomaticInjectionOperationType: InjectionOperationType {
 */
 public enum AutomaticInjectionError: ErrorType {
     case DependencyFinishedWithErrors([ErrorType])
+    case RequirementNotSatisfied
 }
 
 extension AutomaticInjectionOperationType where Self: Operation {
