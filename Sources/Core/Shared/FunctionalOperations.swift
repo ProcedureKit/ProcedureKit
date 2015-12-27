@@ -30,6 +30,25 @@ public class ResultOperation<Result>: Operation, ResultOperationType {
     }
 }
 
+public class BlockResultOperation<Result>: ResultOperation<Result>, InjectionOperationType {
+    private let block: Result -> Void
+
+    public init(block: Result -> Void) {
+        self.block = block
+        super.init()
+        name = "Block Result"
+    }
+
+    public override func execute() {
+        guard let result = result else {
+            finish(AutomaticInjectionError.RequirementNotSatisfied)
+            return
+        }
+        block(result)
+        finish()
+    }
+}
+
 
 /**
  # Map Operation
@@ -246,6 +265,42 @@ public class OperationFlow<T where T: Operation, T: ResultOperationType>: Result
         super.init(result: nil)
         name = "Flow"
     }
+
+    /**
+     Terminates an instance of OperationFlow with a block which receives
+     the final result. It returns the array of operations.
+     
+     Essentially, it should work like this:
+     
+     ```swift
+     let operations = anOp.collection()
+         .map { /* blah blah blah */ }
+         .map { /* blah blah blah */ }
+         .filter { /* blah blah blah */ }
+         .reduce { /* blah blah blah */ }
+         .terminate { result in /* the final result */ }
+     ```
+    */
+    public func terminate(block: T.Result -> Void) -> [NSOperation] {
+        guard let last = lastOperation else {
+            fatalError("The last operaton was not set.")
+        }
+        var ops = operations
+        let block = BlockResultOperation(block: block)
+        block.injectResultFromDependency(last) { operation, dependency, errors in
+            if errors.isEmpty {
+                operation.result = dependency.result
+            }
+            else {
+                operation.cancelWithError(AutomaticInjectionError.DependencyFinishedWithErrors(errors))
+            }
+        }
+        ops.append(block)
+        return ops
+    }
+}
+
+extension OperationFlow {
 
     public func map<U>(transform: T.Result -> U) -> OperationFlow<ResultOperation<U>> {
         guard let last = lastOperation else {
