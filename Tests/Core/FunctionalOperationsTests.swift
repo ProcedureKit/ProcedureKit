@@ -9,6 +9,27 @@
 import XCTest
 @testable import Operations
 
+class NumbersOperation: Operation, ResultOperationType {
+
+    var result: [Int] = []
+    var error: ErrorType? = .None
+
+    init(error: ErrorType? = .None) {
+        self.error = error
+        super.init()
+    }
+
+    override func execute() {
+        if let error = error {
+            finish(error)
+        }
+        else {
+            result = [0, 1, 2, 3, 4, 5 , 6 , 7, 8, 9]
+            finish()
+        }
+    }
+}
+
 class MapOperationTests: OperationTests {
 
     func test__map_operation() {
@@ -31,27 +52,6 @@ class MapOperationTests: OperationTests {
         waitForExpectationsWithTimeout(3, handler: nil)
 
         XCTAssertTrue(destination.cancelled)
-    }
-}
-
-class NumbersOperation: Operation, ResultOperationType {
-
-    var result: [Int] = []
-    var error: ErrorType? = .None
-
-    init(error: ErrorType? = .None) {
-        self.error = error
-        super.init()
-    }
-
-    override func execute() {
-        if let error = error {
-            finish(error)
-        }
-        else {
-            result = [0, 1, 2, 3, 4, 5 , 6 , 7, 8, 9]
-            finish()
-        }
     }
 }
 
@@ -139,7 +139,27 @@ class ReduceOperationTests: OperationTests {
     }
 }
 
+class BlockResultOperationTests: OperationTests {
 
+    func test__block_result_operation() {
+        var _numbers: [Int] = []
+        let numbersOp = NumbersOperation()
+        let blockOp = BlockResultOperation { (numbers: [Int]) in
+            _numbers = numbers
+        }
+        blockOp.injectResultFromDependency(numbersOp) { operation, dependency, _ in
+            operation.result = dependency.result
+        }
+
+        addCompletionBlockToTestOperation(blockOp, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        runOperations(numbersOp, blockOp)
+        waitForExpectationsWithTimeout(3, handler: nil)
+
+        XCTAssertEqual(_numbers, [0, 1, 2, 3, 4, 5 , 6 , 7, 8, 9])
+    }
+
+    
+}
 
 
 
