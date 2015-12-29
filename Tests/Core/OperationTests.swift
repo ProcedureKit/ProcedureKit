@@ -96,7 +96,12 @@ class OperationTests: XCTestCase {
         queue.addOperation(operation)
     }
 
-    func runOperations(operations: Operation...) {
+    func runOperations(operations: [NSOperation]) {
+        queue.delegate = delegate
+        queue.addOperations(operations, waitUntilFinished: false)
+    }
+
+    func runOperations(operations: NSOperation...) {
         queue.delegate = delegate
         queue.addOperations(operations, waitUntilFinished: false)
     }

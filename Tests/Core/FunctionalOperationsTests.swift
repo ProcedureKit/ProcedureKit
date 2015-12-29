@@ -11,12 +11,15 @@ import XCTest
 
 class NumbersOperation: Operation, ResultOperationType {
 
+    typealias Result = Array<Int>
+
     var result: [Int] = []
     var error: ErrorType? = .None
 
     init(error: ErrorType? = .None) {
         self.error = error
         super.init()
+        name = "Numbers Test"
     }
 
     override func execute() {
@@ -139,33 +142,18 @@ class ReduceOperationTests: OperationTests {
     }
 }
 
-class BlockResultOperationTests: OperationTests {
+class ResultOperationTests: OperationTests {
 
-    func test__block_result_operation() {
-        var _numbers: [Int] = []
-        let numbersOp = NumbersOperation()
-        let blockOp = BlockResultOperation { (numbers: [Int]) in
-            _numbers = numbers
-        }
-        blockOp.injectResultFromDependency(numbersOp) { operation, dependency, _ in
-            operation.result = dependency.result
-        }
+    func test__result_executes() {
+        let operation = ResultOperation(result: 0)
 
-        addCompletionBlockToTestOperation(blockOp, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
-        runOperations(numbersOp, blockOp)
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        runOperation(operation)
         waitForExpectationsWithTimeout(3, handler: nil)
 
-        XCTAssertEqual(_numbers, [0, 1, 2, 3, 4, 5 , 6 , 7, 8, 9])
+        XCTAssertTrue(operation.finished)
     }
-
-    
 }
-
-
-
-
-
-
 
 
 
