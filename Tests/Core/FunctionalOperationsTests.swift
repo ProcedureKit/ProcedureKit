@@ -56,6 +56,17 @@ class MapOperationTests: OperationTests {
 
         XCTAssertTrue(destination.cancelled)
     }
+
+    func test__map_operation_with_no_requirement() {
+        let map: MapOperation<String, String> = MapOperation { str in return "\(str) \(str)" }
+
+        addCompletionBlockToTestOperation(map, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        runOperation(map)
+        waitForExpectationsWithTimeout(3, handler: nil)
+
+        XCTAssertTrue(map.finished)
+        XCTAssertEqual(map.errors.count, 1)
+    }
 }
 
 class FilterOperationTests: OperationTests {
