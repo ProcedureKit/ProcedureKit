@@ -140,6 +140,7 @@ public class _UserLocationOperation<Manager: LocationManagerType>: Operation, CL
 
     internal func stopLocationUpdates() {
         manager.opr_stopLocationUpdates()
+        manager.opr_setDelegate(nil)
     }
 
     @objc public func locationManager(manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
