@@ -127,6 +127,10 @@ public class _UserLocationOperation<Manager: LocationManagerType>: Operation, CL
         })
     }
 
+    deinit {
+        stopLocationUpdates()
+    }
+
     /// Starts updating the location
     public override func execute() {
         manager.opr_setDesiredAccuracy(accuracy)
@@ -142,20 +146,24 @@ public class _UserLocationOperation<Manager: LocationManagerType>: Operation, CL
         if let location = locations.last {
             log.info("Updated last location: \(location)")
             if location.horizontalAccuracy <= accuracy {
-                dispatch_async(Queue.Main.queue) {
-                    self.stopLocationUpdates()
-                    self.location = location
-                    self.completion(location)
-                    self.finish()
+                dispatch_async(Queue.Main.queue) { [weak self] in
+                    if let weakSelf = self {
+                        weakSelf.stopLocationUpdates()
+                        weakSelf.location = location
+                        weakSelf.completion(location)
+                        weakSelf.finish()
+                    }
                 }
             }
         }
     }
 
     @objc public func locationManager(manager: CLLocationManager, didFailWithError error: NSError) {
-        dispatch_async(Queue.Main.queue) {
-            self.stopLocationUpdates()
-            self.finish(LocationOperationError.LocationManagerDidFail(error))
+        dispatch_async(Queue.Main.queue) { [weak self] in
+            if let weakSelf = self {
+                weakSelf.stopLocationUpdates()
+                weakSelf.finish(LocationOperationError.LocationManagerDidFail(error))
+            }
         }
     }
 }
@@ -236,14 +244,16 @@ public class _ReverseGeocodeOperation<Geocoder: ReverseGeocoderType>: Operation,
 
     public override func execute() {
         geocoder.opr_reverseGeocodeLocation(location) { results, error in
-            dispatch_async(Queue.Main.queue) {
-                if let error = error {
-                    self.finish(LocationOperationError.GeocoderError(error))
-                }
-                else if let placemark = results.first {
-                    self.placemark = placemark
-                    self.completion(placemark)
-                    self.finish()
+            dispatch_async(Queue.Main.queue) { [weak self] in
+                if let weakSelf = self {
+                    if let error = error {
+                        weakSelf.finish(LocationOperationError.GeocoderError(error))
+                    }
+                    else if let placemark = results.first {
+                        weakSelf.placemark = placemark
+                        weakSelf.completion(placemark)
+                        weakSelf.finish()
+                    }
                 }
             }
         }
