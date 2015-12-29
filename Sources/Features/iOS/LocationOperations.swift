@@ -143,15 +143,17 @@ public class _UserLocationOperation<Manager: LocationManagerType>: Operation, CL
     }
 
     @objc public func locationManager(manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        if let location = locations.last {
+        if !finished, let location = locations.last {
             log.info("Updated last location: \(location)")
             if location.horizontalAccuracy <= accuracy {
                 dispatch_async(Queue.Main.queue) { [weak self] in
                     if let weakSelf = self {
-                        weakSelf.stopLocationUpdates()
-                        weakSelf.location = location
-                        weakSelf.completion(location)
-                        weakSelf.finish()
+                        if !weakSelf.finished {
+                            weakSelf.stopLocationUpdates()
+                            weakSelf.location = location
+                            weakSelf.completion(location)
+                            weakSelf.finish()
+                        }
                     }
                 }
             }
@@ -246,13 +248,15 @@ public class _ReverseGeocodeOperation<Geocoder: ReverseGeocoderType>: Operation,
         geocoder.opr_reverseGeocodeLocation(location) { results, error in
             dispatch_async(Queue.Main.queue) { [weak self] in
                 if let weakSelf = self {
-                    if let error = error {
-                        weakSelf.finish(LocationOperationError.GeocoderError(error))
-                    }
-                    else if let placemark = results.first {
-                        weakSelf.placemark = placemark
-                        weakSelf.completion(placemark)
-                        weakSelf.finish()
+                    if !weakSelf.finished {
+                        if let error = error {
+                            weakSelf.finish(LocationOperationError.GeocoderError(error))
+                        }
+                        else if let placemark = results.first {
+                            weakSelf.placemark = placemark
+                            weakSelf.completion(placemark)
+                            weakSelf.finish()
+                        }
                     }
                 }
             }
