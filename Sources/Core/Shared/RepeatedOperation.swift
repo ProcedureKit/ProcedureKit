@@ -166,7 +166,7 @@ public class RepeatedOperation<T where T: NSOperation>: GroupOperation {
     private var generator: AnyGenerator<T>
     public internal(set) var operation: T? = .None
 
-    public private(set) var count: Int = 0
+    public private(set) var attempts: Int = 0
 
     public init(strategy: WaitStrategy = .Fixed(0.1), maxNumberOfAttempts attempts: Int? = .None, _ generator: AnyGenerator<T>) {
 
@@ -195,7 +195,6 @@ public class RepeatedOperation<T where T: NSOperation>: GroupOperation {
         if let _ = operation as? DelayOperation { return }
         if let _ = operation as? T {
             addNextOperation()
-            count += 1
         }
     }
 
@@ -204,6 +203,7 @@ public class RepeatedOperation<T where T: NSOperation>: GroupOperation {
         if let op = operation, delay = nextDelayOperation() {
             op.addDependency(delay)
             addOperations(delay, op)
+            attempts += 1
         }
     }
 

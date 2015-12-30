@@ -8,13 +8,14 @@
 
 import Foundation
 
-public class RetryOperation<T: NSOperation>: RepeatedOperation<T> {
+public class RetryOperation<T: Operation>: RepeatedOperation<T> {
 
-    public init(strategy: WaitStrategy, maxNumberOfAttempts attempts: Int? = .None, _ op: T) {
-        if let op = op as? Operation {
+    public init(strategy: WaitStrategy = .Fixed(0.1), maxNumberOfAttempts attempts: Int? = .None, _ body: () -> T?) {
+        super.init(strategy: strategy, maxNumberOfAttempts: attempts, anyGenerator {
+            guard let op = body() else { return nil }
             op.addCondition(NoFailedDependenciesCondition())
-        }
-        super.init(strategy: strategy, maxNumberOfAttempts: attempts, anyGenerator { return op })
+            return op
+        })
         name = "Retry Operation"
     }
 

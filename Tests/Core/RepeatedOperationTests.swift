@@ -274,7 +274,7 @@ class NonRepeatableRepeatedOperationTests: OperationTests {
         runOperation(operation)
         waitForExpectationsWithTimeout(3, handler: nil)
 
-        XCTAssertEqual(operation.count, 5)
+        XCTAssertEqual(operation.attempts, 5)
         XCTAssertEqual(operation.aggregateErrors.count, 4)
     }
 
@@ -285,7 +285,7 @@ class NonRepeatableRepeatedOperationTests: OperationTests {
         runOperation(operation)
         waitForExpectationsWithTimeout(3, handler: nil)
 
-        XCTAssertEqual(operation.count, 2)
+        XCTAssertEqual(operation.attempts, 2)
     }
 }
 
@@ -305,7 +305,7 @@ class RepeatableRepeatedOperationTests: OperationTests {
         runOperation(operation)
         waitForExpectationsWithTimeout(3, handler: nil)
 
-        XCTAssertEqual(operation.count, 5)
+        XCTAssertEqual(operation.attempts, 5)
     }
 
     func test__repeated_with_max_number_of_attempts() {
@@ -315,7 +315,7 @@ class RepeatableRepeatedOperationTests: OperationTests {
         runOperation(operation)
         waitForExpectationsWithTimeout(3, handler: nil)
 
-        XCTAssertEqual(operation.count, 2)
+        XCTAssertEqual(operation.attempts, 2)
     }
 }
 
