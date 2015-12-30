@@ -136,6 +136,47 @@ struct FibonacciWaitGenerator: GeneratorType {
     }
 }
 
+/**
+ Define a strategy for waiting a given time interval. The strategy
+ can then create a NSTimeInterval generator. The strategies are:
+ 
+ ### Fixed
+ The fixed strategy is initialized with a time interval. Every
+ interval is this value.
+ - Requires: time interval must be greater than zero
+
+ ### Random
+ The random strategy is initialized with minimum and maximum
+ bounds. These are both NSTimeInterval values. Each value from
+ the generator is a random interval between these bounds.
+ - requires: minimum time interval must be greater than or equal to zero
+ - requires: maximum time interval must be greater than the minimum
+
+ ### Incrementing
+ The incrementing strategy is initialized with an starting or
+ initial interval, and an increment value. Each value adds the
+ increment to the previous value.
+ - requires: initial time interval must be greater than or equal to zero.
+ - notes: a decrementing strategy can be created with a large initial
+    value and negative increments. The value will never be less than
+    zero however.
+
+ ### Exponential
+ The exponential strategy is initialized with a time period, and
+ a maximum value. Successive value of the generator multiply the
+ period by an exponentially increasing factors, but not past the
+ maximum.
+ - requires: time period must be greater than or equal to zero
+ - requires: maximum time interval must be greater than zero
+ - requires: time period must be less than maxium
+ ### Fibonacci
+ Like the exponential strategy except the period is multipled by
+ the Fibonacci numbers instead.
+ - requires: time period must be greater than or equal to zero
+ - requires: maximum time interval must be greater than zero
+ - requires: time period must be less than maxium
+
+*/
 public enum WaitStrategy {
 
     case Fixed(NSTimeInterval)
@@ -144,7 +185,11 @@ public enum WaitStrategy {
     case Exponential((period: NSTimeInterval, maximum: NSTimeInterval))
     case Fibonacci((period: NSTimeInterval, maximum: NSTimeInterval))
 
-    func generate() -> AnyGenerator<NSTimeInterval> {
+    /**
+     Returns a new generator using the strategy.
+     - returns: a `AnyGenerator<NSTimeInterval>` instance.
+    */
+    public func generate() -> AnyGenerator<NSTimeInterval> {
         switch self {
         case .Fixed(let period):
             return anyGenerator(FixedWaitGenerator(period: period))
@@ -166,7 +211,7 @@ public class RepeatedOperation<T where T: NSOperation>: GroupOperation {
     private var generator: AnyGenerator<T>
     public internal(set) var operation: T? = .None
 
-    public private(set) var attempts: Int = 0
+    public private(set) var attempts: Int = 1
 
     public init(strategy: WaitStrategy = .Fixed(0.1), maxNumberOfAttempts attempts: Int? = .None, _ generator: AnyGenerator<T>) {
         operation = generator.next()
