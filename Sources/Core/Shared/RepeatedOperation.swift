@@ -82,9 +82,9 @@ public class RepeatedOperation<Generator: GeneratorType where Generator.Element:
 
     public func addNextOperation() {
         operation = generator.next()
-        if let op = operation, interval = nextDelayOperation() {
-            op.addDependency(interval)
-            addOperations(interval, op)
+        if let op = operation, delay = nextDelayOperation() {
+            op.addDependency(delay)
+            addOperations(delay, op)
         }
     }
 
@@ -92,3 +92,4 @@ public class RepeatedOperation<Generator: GeneratorType where Generator.Element:
         return delay.next().map { DelayOperation(interval: $0) }
     }
 }
+
