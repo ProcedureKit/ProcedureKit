@@ -205,6 +205,9 @@ public enum WaitStrategy {
     }
 }
 
+/**
+
+*/
 public class RepeatedOperation<T where T: NSOperation>: GroupOperation {
 
     private var delay: AnyGenerator<NSTimeInterval>
@@ -221,7 +224,8 @@ public class RepeatedOperation<T where T: NSOperation>: GroupOperation {
 
         switch attempts {
         case .Some(let attempts):
-            delay = anyGenerator(FiniteGenerator(strategy.generate(), limit: attempts))
+            // Subtract 1 to account for the 1st attempt
+            delay = anyGenerator(FiniteGenerator(strategy.generate(), limit: attempts - 1))
         case .None:
             delay = strategy.generate()
         }
