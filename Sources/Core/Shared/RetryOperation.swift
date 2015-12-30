@@ -15,6 +15,7 @@ public class RetryOperation<O: NSOperation>: RepeatedOperation<AnyGenerator<O>> 
             op.addCondition(NoFailedDependenciesCondition())
         }
         super.init(min: min, max: max, limit: limit, generator: anyGenerator { return op })
+        name = "Retry Operation"
     }
 }
 
