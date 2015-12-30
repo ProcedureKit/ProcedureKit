@@ -84,6 +84,15 @@ public class GroupOperation: Operation {
     }
 
     /**
+     Add multiple operations at once.
+
+     - parameter operations: an array of `NSOperation` instances.
+     */
+    public func addOperations(operations: NSOperation...) {
+        addOperations(operations)
+    }
+
+    /**
      Append an error to the list of aggregate errors. Subclasses can use this
      to maintain the errors received by operations within the group.
      
