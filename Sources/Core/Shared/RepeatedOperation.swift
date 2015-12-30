@@ -56,14 +56,14 @@ struct TimeDelayGenerator: GeneratorType {
     }
 }
 
-public class RepeatedOperation<Generator: GeneratorType where Generator.Element: NSOperation>: GroupOperation {
+public class RepeatedOperation<G: GeneratorType where G.Element: NSOperation>: GroupOperation {
 
-    private var delay: TimeDelayGenerator
-    private var generator: Generator
-    public internal(set) var operation: Generator.Element? = .None
+    private var delay: AnyGenerator<NSTimeInterval>
+    private var generator: G
+    public internal(set) var operation: G.Element? = .None
 
-    public init(min: NSTimeInterval = 1, max: MaximumTimeInterval = .Backoff, maxNumberOfAttempts attempts: Int? = .None, generator: Generator) {
-        self.delay = TimeDelayGenerator(min: min, max: max, attempts: attempts)
+    public init(min: NSTimeInterval = 1, max: MaximumTimeInterval = .Backoff, maxNumberOfAttempts attempts: Int? = .None, generator: G) {
+        self.delay = anyGenerator(TimeDelayGenerator(min: min, max: max, attempts: attempts))
         self.generator = generator
         super.init(operations: [])
         name = "Repeated Operation"
@@ -75,7 +75,7 @@ public class RepeatedOperation<Generator: GeneratorType where Generator.Element:
     }
 
     public override func operationDidFinish(operation: NSOperation, withErrors errors: [ErrorType]) {
-        if errors.isEmpty, let _ = operation as? Generator.Element {
+        if errors.isEmpty, let _ = operation as? G.Element {
             addNextOperation()
         }
     }
@@ -93,29 +93,34 @@ public class RepeatedOperation<Generator: GeneratorType where Generator.Element:
     }
 }
 
-public protocol RepeatingOperationType {
+public protocol RepeatingType {
     var shouldRepeat: Bool { get }
 }
 
-public class RepeatingOperationGenerator<O where O: NSOperation, O: RepeatingOperationType>: GeneratorType {
+public class RepeatingGenerator<G: GeneratorType where G.Element: RepeatingType>: GeneratorType {
 
-    private var generator: AnyGenerator<O>
-    private var operation: O?
+    private var generator: G
+    private var current: G.Element?
 
-    public init(_ creator: () -> O?) {
-        generator = anyGenerator(creator)
+    public init(_ generator: G) {
+        self.generator = generator
     }
 
-    public func next() -> O? {
-        if let op = operation {
-            guard op.shouldRepeat else {
+    public func next() -> G.Element? {
+        if let current = current {
+            guard current.shouldRepeat else {
                 return nil
             }
         }
+        current = generator.next()
+        return current
+    }
+}
 
-        operation = generator.next()
+extension RepeatedOperation {
 
-        return operation
+    public convenience init<T: GeneratorType where T.Element: NSOperation, T.Element: RepeatingType>(min: NSTimeInterval = 1, max: MaximumTimeInterval = .Backoff, maxNumberOfAttempts attempts: Int? = .None, generator: T) {
+        self.init(min: min, max: max, maxNumberOfAttempts: attempts, generator: RepeatingGenerator(generator))
     }
 }
 
