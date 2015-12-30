@@ -8,18 +8,18 @@
 
 import Foundation
 
-public class RetryOperation<O: NSOperation>: RepeatedOperation<AnyGenerator<O>> {
+public class RetryOperation<T: NSOperation>: RepeatedOperation<T> {
 
-    public init(min: NSTimeInterval = 1, max: MaximumTimeInterval = .Backoff, maxNumberOfAttempts attempts: Int? = .None, _ op: O) {
+    public init(strategy: WaitStrategy, maxNumberOfAttempts attempts: Int? = .None, _ op: T) {
         if let op = op as? Operation {
             op.addCondition(NoFailedDependenciesCondition())
         }
-        super.init(min: min, max: max, maxNumberOfAttempts: attempts, generator: anyGenerator { return op })
+        super.init(strategy: strategy, maxNumberOfAttempts: attempts, anyGenerator { return op })
         name = "Retry Operation"
     }
 
     public override func operationDidFinish(operation: NSOperation, withErrors errors: [ErrorType]) {
-        if !errors.isEmpty, let _ = operation as? O  {
+        if !errors.isEmpty, let _ = operation as? T  {
             addNextOperation()
         }
     }
