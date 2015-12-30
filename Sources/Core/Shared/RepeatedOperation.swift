@@ -93,3 +93,30 @@ public class RepeatedOperation<Generator: GeneratorType where Generator.Element:
     }
 }
 
+public protocol RepeatingOperationType {
+    var shouldRepeat: Bool { get }
+}
+
+public class RepeatingOperationGenerator<O where O: NSOperation, O: RepeatingOperationType>: GeneratorType {
+
+    private var generator: AnyGenerator<O>
+    private var operation: O?
+
+    public init(_ creator: () -> O?) {
+        generator = anyGenerator(creator)
+    }
+
+    public func next() -> O? {
+        if let op = operation {
+            guard op.shouldRepeat else {
+                return nil
+            }
+        }
+
+        operation = generator.next()
+
+        return operation
+    }
+}
+
+
