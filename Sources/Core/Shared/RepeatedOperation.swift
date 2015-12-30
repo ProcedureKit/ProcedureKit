@@ -169,6 +169,10 @@ public class RepeatedOperation<T where T: NSOperation>: GroupOperation {
     public private(set) var attempts: Int = 0
 
     public init(strategy: WaitStrategy = .Fixed(0.1), maxNumberOfAttempts attempts: Int? = .None, _ generator: AnyGenerator<T>) {
+        operation = generator.next()
+        guard let op = operation else {
+            preconditionFailure("The generator must return an operation to start with.")
+        }
 
         switch attempts {
         case .Some(let attempts):
@@ -178,17 +182,12 @@ public class RepeatedOperation<T where T: NSOperation>: GroupOperation {
         }
 
         self.generator = generator
-        super.init(operations: [])
+        super.init(operations: [op])
         name = "Repeated Operation"
     }
 
     public convenience init<G where G: GeneratorType, G.Element == T>(strategy: WaitStrategy = .Fixed(0.1), maxNumberOfAttempts attempts: Int? = .None, _ generator: G) {
         self.init(strategy: strategy, maxNumberOfAttempts: attempts, anyGenerator(generator))
-    }
-
-    public override func execute() {
-        addNextOperation()
-        super.execute()
     }
 
     public override func operationDidFinish(operation: NSOperation, withErrors errors: [ErrorType]) {
