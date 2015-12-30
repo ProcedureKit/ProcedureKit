@@ -19,7 +19,7 @@ struct TimeDelayGenerator: GeneratorType {
 
         let minimum: NSTimeInterval
         let maximum: MaximumTimeInterval
-        let limit: Int?
+        let attempts: Int?
 
         func interval(count: Int) -> NSTimeInterval {
             switch maximum {
@@ -42,13 +42,13 @@ struct TimeDelayGenerator: GeneratorType {
         self.info = info
     }
 
-    init(min: NSTimeInterval = 1, max: MaximumTimeInterval = .Backoff, limit: Int? = .None) {
-        self.init(info: Info(minimum: min, maximum: max, limit: limit))
+    init(min: NSTimeInterval = 1, max: MaximumTimeInterval = .Backoff, attempts: Int? = .None) {
+        self.init(info: Info(minimum: min, maximum: max, attempts: attempts))
     }
 
     mutating func next() -> NSTimeInterval? {
-        if let limit = info.limit {
-            guard count == limit else {
+        if let maxNumberOfAttempts = info.attempts {
+            guard count == maxNumberOfAttempts else {
                 return nil
             }
         }
@@ -62,8 +62,8 @@ public class RepeatedOperation<Generator: GeneratorType where Generator.Element:
     private var generator: Generator
     public internal(set) var operation: Generator.Element? = .None
 
-    public init(min: NSTimeInterval = 1, max: MaximumTimeInterval = .Backoff, limit: Int? = .None, generator: Generator) {
-        self.delay = TimeDelayGenerator(min: min, max: max, limit: limit)
+    public init(min: NSTimeInterval = 1, max: MaximumTimeInterval = .Backoff, maxNumberOfAttempts attempts: Int? = .None, generator: Generator) {
+        self.delay = TimeDelayGenerator(min: min, max: max, attempts: attempts)
         self.generator = generator
         super.init(operations: [])
         name = "Repeated Operation"
@@ -75,7 +75,7 @@ public class RepeatedOperation<Generator: GeneratorType where Generator.Element:
     }
 
     public override func operationDidFinish(operation: NSOperation, withErrors errors: [ErrorType]) {
-        if errors.isEmpty {
+        if errors.isEmpty, let _ = operation as? Generator.Element {
             addNextOperation()
         }
     }
