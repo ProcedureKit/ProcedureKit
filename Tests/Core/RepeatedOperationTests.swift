@@ -342,14 +342,14 @@ class RepeatableRepeatedOperationTests: OperationTests {
     func test__repeatable_operation() {
 
         var errors: [ErrorType] = []
-        let operation = RepeatedOperation(maxCount: 10) { () -> RepeatableOperation<TestOperation> in
-            let op = RepeatableOperation(TestOperation(error: TestOperation.Error.SimulatedError)) { _ in
-                return errors.count < 3
-            }
+        let operation = RepeatedOperation(maxCount: 10) {() -> RepeatableOperation<TestOperation> in
+
+            let op = TestOperation(error: TestOperation.Error.SimulatedError)
             op.addObserver(FinishedObserver { _, e in
                 errors.appendContentsOf(e)
             })
-            return op
+
+            return RepeatableOperation(op) { _ in errors.count < 3 }
         }
 
         addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
