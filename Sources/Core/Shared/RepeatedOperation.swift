@@ -207,25 +207,79 @@ public enum WaitStrategy {
 
 /**
 
+ ### RepeatedOperation
+
+ This operation must be initialized with a generator which has an
+ element which subclasses `NSOperation`. e.g.
+
+ ```swift
+ let operation = RepeatedOperation(anyGenerator { 
+     return MyOperation() 
+ })
+ ```
+
+ The operation is a `GroupOperation` subclass which works by adding 
+ new instances of the operation to its group. This happens initially 
+ when the group starts, and then again when the child operation finishes.
+
+ After the initial child operation completes, new operations are 
+ added with a delay on the queue. The time interval of the delay 
+ can be configured via the first argument to the `RepeatedOperation`.
+
+ There are two ways to stop the operations from repeating.
+
+ 1. Return `nil` from the generator passed to the initializer
+ 2. Set the 2nd argument, `maxNumberOfAttempts` which is an 
+    optional `Int` defaulting to `.None`.
+
+ The first argument is a `WaitStrategy` which is an enum of various 
+ different mechanisms for defining waiting. See WaitStrategy for more.
+
+ For example, to use exponential back-off, with a maximum of 10 attempts:
+
+ ```swift
+ let operation = RepeatedOperation(
+     strategy: .Exponential((minimum: 1, maximum: 300)), 
+     maxNumberOfAttempts: 10, 
+     anyGenerator {
+         MyOperation()
+     }
+ )
+ ```
+
+ - See: WaitStrategy
+ - See: Repeatable
+
 */
 public class RepeatedOperation<T where T: NSOperation>: GroupOperation {
 
     private var delay: AnyGenerator<NSTimeInterval>
     private var generator: AnyGenerator<T>
+
+    /// - returns: the current operation being executed.
     public internal(set) var operation: T? = .None
 
-    public private(set) var attempts: Int = 1
+    /// - return: the count of operations that have executed.
+    public private(set) var count: Int = 0
 
-    public init(strategy: WaitStrategy = .Fixed(0.1), maxNumberOfAttempts attempts: Int? = .None, _ generator: AnyGenerator<T>) {
+    /**
+     The designated initializer.
+     
+     - parameter strategy: a WaitStrategy which defaults to a 0.1 second fixed interval.
+     - parameter maxCount: an optional Int, which defaults to .None. If not nil, this is
+     the maximum number of operations which will be executed.
+     - parameter: (unnamed) the AnyGenerator<T> generator.
+    */
+    public init(strategy: WaitStrategy = .Fixed(0.1), maxCount max: Int? = .None, _ generator: AnyGenerator<T>) {
         operation = generator.next()
         guard let op = operation else {
             preconditionFailure("The generator must return an operation to start with.")
         }
 
-        switch attempts {
-        case .Some(let attempts):
+        switch max {
+        case .Some(let max):
             // Subtract 1 to account for the 1st attempt
-            delay = anyGenerator(FiniteGenerator(strategy.generate(), limit: attempts - 1))
+            delay = anyGenerator(FiniteGenerator(strategy.generate(), limit: max - 1))
         case .None:
             delay = strategy.generate()
         }
@@ -235,10 +289,47 @@ public class RepeatedOperation<T where T: NSOperation>: GroupOperation {
         name = "Repeated Operation"
     }
 
-    public convenience init<G where G: GeneratorType, G.Element == T>(strategy: WaitStrategy = .Fixed(0.1), maxNumberOfAttempts attempts: Int? = .None, _ generator: G) {
-        self.init(strategy: strategy, maxNumberOfAttempts: attempts, anyGenerator(generator))
+    /**
+     A convenience initializer with generic generator. This is useful where another
+     system can be responsible for vending instances of the custom operation. Typically
+     there may be some state involved in such a Generator. e.g.
+     
+     ```swift
+     class MyOperationGenerator: GeneratorType {
+         func next() -> MyOperation? {
+             // etc
+         }
+     }
+     
+     let operation = RepeatedOperation(MyOperationGenerator())
+     ```
+
+     - parameter strategy: a WaitStrategy which defaults to a 0.1 second fixed interval.
+     - parameter maxCount: an optional Int, which defaults to .None. If not nil, this is
+     the maximum number of operations which will be executed.
+     - parameter: (unnamed) a generic generator which has an Element equal to T.
+     */
+    public convenience init<G where G: GeneratorType, G.Element == T>(strategy: WaitStrategy = .Fixed(0.1), maxCount max: Int? = .None, _ generator: G) {
+        self.init(strategy: strategy, maxCount: max, anyGenerator(generator))
     }
 
+    /// Override of execute, subclasses which override this must call super.
+    public override func execute() {
+        count = 1
+        super.execute()
+    }
+
+    /**
+     Override of operationDidFinish: withErrors:
+     
+     This function ignores errors, and cases where the operation
+     is a `DelayOperation`. If the operation is an instance of `T`
+     it calls `addNextOperation()`.
+     
+     When subclassing, be very careful if downcasting `T` to
+     say `Operation` instead of `MyOperation` (i.e. your specific 
+     operation which should be repeated).
+    */
     public override func operationDidFinish(operation: NSOperation, withErrors errors: [ErrorType]) {
         if let _ = operation as? DelayOperation { return }
         if let _ = operation as? T {
@@ -246,12 +337,25 @@ public class RepeatedOperation<T where T: NSOperation>: GroupOperation {
         }
     }
 
+    /**
+     Adds another instance of the operation to the group.
+     
+     This function will call `next()` on the generator, setting
+     the `operation` parameter. If the operation is not nil,
+     it also will get the next delay operation, which may also
+     be nil. If both operation & delay are not nil, the 
+     dependencies are setup, added to the group and the count is
+     incremented.
+     
+     Subclasses which override, should almost certainly call
+     super.
+    */
     public func addNextOperation() {
         operation = generator.next()
         if let op = operation, delay = nextDelayOperation() {
             op.addDependency(delay)
             addOperations(delay, op)
-            attempts += 1
+            count += 1
         }
     }
 
@@ -260,21 +364,45 @@ public class RepeatedOperation<T where T: NSOperation>: GroupOperation {
     }
 }
 
+/**
+ 
+ ### Repeatable
+ 
+ `Repeatable` is a very simple protocol, which your `NSOperation` subclasses 
+ can conform to. This allows the previous operation to define whether a new 
+ one should be executed. For this special case, `RepeatedOperation` can be 
+ initialized like this:
+
+ ```swift
+ let operation = RepeatedOperation { MyRepeatableOperation() }
+ ```
+
+ - see: RepeatedOperation
+*/
 public protocol Repeatable {
+
+    /**
+     Implement this funtion to return true if a new
+     instance should be added to a RepeatedOperation.
+     
+     - parameter count: the number of instances already executed within
+     the RepeatedOperation.
+     - returns: a Bool, false will end the RepeatedOperation.
+    */
     func shouldRepeat(count: Int) -> Bool
 }
 
-public class RepeatingGenerator<G: GeneratorType where G.Element: Repeatable>: GeneratorType {
+class RepeatingGenerator<G: GeneratorType where G.Element: Repeatable>: GeneratorType {
 
     private var generator: G
     private var count: Int = 0
     private var current: G.Element?
 
-    public init(_ generator: G) {
+    init(_ generator: G) {
         self.generator = generator
     }
 
-    public func next() -> G.Element? {
+    func next() -> G.Element? {
         if let current = current {
             guard current.shouldRepeat(count) else {
                 return nil
@@ -288,8 +416,16 @@ public class RepeatingGenerator<G: GeneratorType where G.Element: Repeatable>: G
 
 extension RepeatedOperation where T: Repeatable {
 
-    public convenience init(strategy: WaitStrategy = .Fixed(0.1), maxNumberOfAttempts attempts: Int? = .None, body: () -> T?) {
-        self.init(strategy: strategy, maxNumberOfAttempts: attempts, RepeatingGenerator(anyGenerator(body)))
+    /**
+     Initialize a RepeatedOperation using a closure with NSOperation subclasses 
+     which conform to Repeatable. This is the neatest initializer.
+     
+     ```swift
+     let operation = RepeatedOperation { MyRepeatableOperation() }
+     ```
+    */
+    public convenience init(strategy: WaitStrategy = .Fixed(0.1), maxCount max: Int? = .None, body: () -> T?) {
+        self.init(strategy: strategy, maxCount: max, RepeatingGenerator(anyGenerator(body)))
     }
 }
 

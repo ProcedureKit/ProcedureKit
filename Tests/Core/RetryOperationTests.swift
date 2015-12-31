@@ -48,6 +48,6 @@ class RetryOperationTests: OperationTests {
         waitForExpectationsWithTimeout(3, handler: nil)
 
         XCTAssertTrue(operation.finished)
-        XCTAssertEqual(operation.attempts, 2)
+        XCTAssertEqual(operation.count, 2)
     }
 }

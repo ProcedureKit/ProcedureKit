@@ -274,18 +274,18 @@ class NonRepeatableRepeatedOperationTests: OperationTests {
         runOperation(operation)
         waitForExpectationsWithTimeout(3, handler: nil)
 
-        XCTAssertEqual(operation.attempts, 5)
+        XCTAssertEqual(operation.count, 5)
         XCTAssertEqual(operation.aggregateErrors.count, 4)
     }
 
     func test__repeated_with_max_number_of_attempts() {
-        let operation = RepeatedOperation(maxNumberOfAttempts: 2, createGenerator(succeedsAfterCount: 5))
+        let operation = RepeatedOperation(maxCount: 2, createGenerator(succeedsAfterCount: 5))
 
         addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
         runOperation(operation)
         waitForExpectationsWithTimeout(3, handler: nil)
 
-        XCTAssertEqual(operation.attempts, 2)
+        XCTAssertEqual(operation.count, 2)
     }
 }
 
@@ -305,17 +305,17 @@ class RepeatableRepeatedOperationTests: OperationTests {
         runOperation(operation)
         waitForExpectationsWithTimeout(3, handler: nil)
 
-        XCTAssertEqual(operation.attempts, 5)
+        XCTAssertEqual(operation.count, 5)
     }
 
     func test__repeated_with_max_number_of_attempts() {
-        let operation = RepeatedOperation(maxNumberOfAttempts: 2) { return RepeatingTestOperation() }
+        let operation = RepeatedOperation(maxCount: 2) { return RepeatingTestOperation() }
 
         addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
         runOperation(operation)
         waitForExpectationsWithTimeout(3, handler: nil)
 
-        XCTAssertEqual(operation.attempts, 2)
+        XCTAssertEqual(operation.count, 2)
     }
 }
 

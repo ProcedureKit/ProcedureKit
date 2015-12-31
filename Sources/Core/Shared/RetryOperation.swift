@@ -10,8 +10,8 @@ import Foundation
 
 public class RetryOperation<T: Operation>: RepeatedOperation<T> {
 
-    public init(strategy: WaitStrategy = .Fixed(0.1), maxNumberOfAttempts attempts: Int? = .None, _ body: () -> T?) {
-        super.init(strategy: strategy, maxNumberOfAttempts: attempts, anyGenerator {
+    public init(strategy: WaitStrategy = .Fixed(0.1), maxCount max: Int? = .None, _ body: () -> T?) {
+        super.init(strategy: strategy, maxCount: max, anyGenerator {
             guard let op = body() else { return nil }
             op.addCondition(NoFailedDependenciesCondition())
             return op
