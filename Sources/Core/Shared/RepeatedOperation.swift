@@ -178,6 +178,7 @@ struct FibonacciWaitGenerator: GeneratorType {
     }
 }
 
+
 /**
  Define a strategy for waiting a given time interval. The strategy
  can then create a NSTimeInterval generator. The strategies are:
@@ -289,7 +290,7 @@ public enum WaitStrategy {
  )
  ```
 
- - See: WaitStrategy
+ - See: Wait
  - See: Repeatable
 
 */
@@ -307,28 +308,39 @@ public class RepeatedOperation<T where T: NSOperation>: GroupOperation {
     /**
      The designated initializer.
      
-     - parameter strategy: a WaitStrategy which defaults to a 0.1 second fixed interval.
+     - parameter delay: a generator of NSTimeInterval values
      - parameter maxCount: an optional Int, which defaults to .None. If not nil, this is
      the maximum number of operations which will be executed.
      - parameter: (unnamed) the AnyGenerator<T> generator.
     */
-    public init(strategy: WaitStrategy = .Fixed(0.1), maxCount max: Int? = .None, _ generator: AnyGenerator<T>) {
+    public init<G where G: GeneratorType, G.Element == NSTimeInterval>(delay: G, maxCount max: Int? = .None, _ generator: AnyGenerator<T>) {
         operation = generator.next()
         guard let op = operation else {
             preconditionFailure("The generator must return an operation to start with.")
         }
 
-        switch max {
-        case .Some(let max):
-            // Subtract 1 to account for the 1st attempt
-            delay = anyGenerator(FiniteGenerator(strategy.generate(), limit: max - 1))
-        case .None:
-            delay = strategy.generate()
-        }
-
+        self.delay = anyGenerator(delay)
         self.generator = generator
         super.init(operations: [op])
         name = "Repeated Operation"
+    }
+
+    /**
+     A convenient initializer.
+
+     - parameter strategy: use the built in wait strategy type, defaults to 0.1 second fixed interval.
+     - parameter maxCount: an optional Int, which defaults to .None. If not nil, this is
+     the maximum number of operations which will be executed.
+     - parameter: (unnamed) the AnyGenerator<T> generator.
+     */
+    public convenience init(strategy: WaitStrategy = .Fixed(0.1), maxCount max: Int? = .None, _ generator: AnyGenerator<T>) {
+        switch max {
+        case .Some(let max):
+            // Subtract 1 to account for the 1st attempt
+            self.init(delay: FiniteGenerator(strategy.generate(), limit: max - 1), maxCount: max, generator)
+        case .None:
+            self.init(delay: strategy.generate(), maxCount: max, generator)
+        }
     }
 
     /**
