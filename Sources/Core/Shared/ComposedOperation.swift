@@ -9,9 +9,9 @@
 import Foundation
 
 /**
-Allows a `NSOperation` to be composed inside an `Operation`. This
-is very handy for applying `Operation` level features such as 
-conditions and observers to `NSOperation` instances.
+ Allows a `NSOperation` to be composed inside an `Operation`. This
+ is very handy for applying `Operation` level features such as
+ conditions and observers to `NSOperation` instances.
 */
 public class ComposedOperation<O: NSOperation>: GatedOperation<O> {
 

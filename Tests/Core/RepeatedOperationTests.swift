@@ -338,6 +338,34 @@ class RepeatableRepeatedOperationTests: OperationTests {
 
         XCTAssertEqual(operation.count, 2)
     }
+
+    func test__repeatable_operation() {
+
+        var errors: [ErrorType] = []
+        let operation = RepeatedOperation(maxCount: 10) { () -> RepeatableOperation<TestOperation> in
+            let op = RepeatableOperation(TestOperation(error: TestOperation.Error.SimulatedError)) { _ in
+                return errors.count < 3
+            }
+            op.addObserver(FinishedObserver { _, e in
+                errors.appendContentsOf(e)
+            })
+            return op
+        }
+
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        runOperation(operation)
+        waitForExpectationsWithTimeout(3, handler: nil)
+
+        XCTAssertEqual(operation.count, 3)
+    }
+
+    func test__repeatable_operation_cancels() {
+        let op = TestOperation()
+        let operation = RepeatableOperation(op) { _ in true }
+        operation.cancel()
+        XCTAssertTrue(operation.cancelled)
+        XCTAssertTrue(op.cancelled)
+    }
 }
 
 

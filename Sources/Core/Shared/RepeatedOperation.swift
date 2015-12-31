@@ -484,3 +484,36 @@ extension RepeatedOperation where T: Repeatable {
     }
 }
 
+public class RepeatableOperation<T: Operation>: Operation, OperationDidFinishObserver, Repeatable {
+
+    let operation: T
+    let shouldRepeatBlock: Int -> Bool
+
+    public init(_ operation: T, shouldRepeat: Int -> Bool) {
+        self.operation = operation
+        self.shouldRepeatBlock = shouldRepeat
+        super.init()
+        name = "Repeatable<\(operation.operationName)>"
+        addObserver(CancelledObserver { [weak operation] _ in
+            (operation as? Operation)?.cancel()
+        })
+    }
+
+    public override func execute() {
+        if !cancelled {
+            operation.addObserver(self)
+            produceOperation(operation)
+        }
+    }
+
+    public func shouldRepeat(count: Int) -> Bool {
+        return shouldRepeatBlock(count)
+    }
+
+    public func operationDidFinish(operation: Operation, errors: [ErrorType]) {
+        if self.operation == operation {
+            finish(errors)
+        }
+    }
+}
+
