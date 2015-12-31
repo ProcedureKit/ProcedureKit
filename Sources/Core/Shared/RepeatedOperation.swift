@@ -8,6 +8,54 @@
 
 import Foundation
 
+func arc4random<T: IntegerLiteralConvertible>(type: T.Type) -> T {
+    var r: T = 0
+    arc4random_buf(&r, Int(sizeof(T)))
+    return r
+}
+
+/**
+ Random Failure Generator
+ 
+ This generator will randomly return nil (instead of the
+ composed generator's `next()`) according to the probability
+ of failure argument.
+ 
+ For example, to simulate 1% failure rate:
+ 
+ ```swift
+ let one = RandomFailGenerator(generator, probability: 0.01)
+ ```
+*/
+public struct RandomFailGenerator<G: GeneratorType>: GeneratorType {
+
+    private var generator: G
+    private let shouldNotFail: () -> Bool
+
+    /**
+     Initialize the generator with another generator and expected 
+     probabilty of failure.
+     
+     - parameter: the generator
+     - parameter probability: the expected probability of failure, defaults to 0.1, or 10%
+    */
+    public init(_ generator: G, probability: Double = 0.1) {
+        self.generator = generator
+        self.shouldNotFail = {
+            let r = (Double(arc4random(UInt64)) / Double(UInt64.max))
+            return r > probability
+        }
+    }
+
+    /// GeneratorType implementation
+    public mutating func next() -> G.Element? {
+        guard shouldNotFail() else {
+            return nil
+        }
+        return generator.next()
+    }
+}
+
 struct FiniteGenerator<G: GeneratorType>: GeneratorType {
 
     private let limit: Int
@@ -27,12 +75,6 @@ struct FiniteGenerator<G: GeneratorType>: GeneratorType {
         count += 1
         return generator.next()
     }
-}
-
-func arc4random<T: IntegerLiteralConvertible>(type: T.Type) -> T {
-    var r: T = 0
-    arc4random_buf(&r, Int(sizeof(T)))
-    return r
 }
 
 struct FixedWaitGenerator: GeneratorType {

@@ -9,6 +9,27 @@
 import XCTest
 @testable import Operations
 
+class RandomFailGeneratorTests: XCTestCase {
+
+    func test__failure_probability_distribution() {
+
+        var generator = RandomFailGenerator(anyGenerator { true })
+
+        let total = 1_000
+        var failures = 0
+        for _ in 0..<total {
+            if let _ = generator.next() { }
+            else {
+                failures += 1
+            }
+        }
+
+        let probabilityFailure = Double(failures) / Double(total)
+
+        XCTAssertEqualWithAccuracy(probabilityFailure, 0.1, accuracy: 0.02)
+    }
+}
+
 class FiniteGeneratorTests: XCTestCase {
 
     var generator: FiniteGenerator<AnyGenerator<Int>>!
