@@ -319,7 +319,14 @@ public class RepeatedOperation<T where T: NSOperation>: GroupOperation {
             preconditionFailure("The generator must return an operation to start with.")
         }
 
-        self.delay = anyGenerator(delay)
+        switch max {
+        case .Some(let max):
+            // Subtract 1 to account for the 1st attempt
+            self.delay = anyGenerator(FiniteGenerator(delay, limit: max - 1))
+        case .None:
+            self.delay = anyGenerator(delay)
+        }
+
         self.generator = generator
         super.init(operations: [op])
         name = "Repeated Operation"
@@ -334,13 +341,7 @@ public class RepeatedOperation<T where T: NSOperation>: GroupOperation {
      - parameter: (unnamed) the AnyGenerator<T> generator.
      */
     public convenience init(strategy: WaitStrategy = .Fixed(0.1), maxCount max: Int? = .None, _ generator: AnyGenerator<T>) {
-        switch max {
-        case .Some(let max):
-            // Subtract 1 to account for the 1st attempt
-            self.init(delay: FiniteGenerator(strategy.generate(), limit: max - 1), maxCount: max, generator)
-        case .None:
-            self.init(delay: strategy.generate(), maxCount: max, generator)
-        }
+        self.init(delay: strategy.generate(), maxCount: max, generator)
     }
 
     /**

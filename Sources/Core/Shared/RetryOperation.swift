@@ -20,13 +20,7 @@ public class RetryOperation<T: Operation>: RepeatedOperation<T> {
     }
 
     public convenience init(strategy: WaitStrategy = .Fixed(0.1), maxCount max: Int? = .None, _ body: () -> T?) {
-        switch max {
-        case .Some(let max):
-            // Subtract 1 to account for the 1st attempt
-            self.init(delay: FiniteGenerator(strategy.generate(), limit: max - 1), maxCount: max, body)
-        case .None:
-            self.init(delay: strategy.generate(), maxCount: max, body)
-        }
+        self.init(delay: strategy.generate(), maxCount: max, body)
     }
 
     public override func operationDidFinish(operation: NSOperation, withErrors errors: [ErrorType]) {
