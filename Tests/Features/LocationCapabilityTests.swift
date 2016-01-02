@@ -42,7 +42,7 @@ extension TestableLocationRegistrar: LocationCapabilityRegistrarType {
         return authorizationStatus
     }
 
-    func opr_setDelegate(aDelegate: CLLocationManagerDelegate) {
+    func opr_setDelegate(aDelegate: CLLocationManagerDelegate?) {
         didSetDelegate = true
         delegate = aDelegate
     }

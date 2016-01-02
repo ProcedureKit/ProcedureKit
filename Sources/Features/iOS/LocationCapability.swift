@@ -38,7 +38,7 @@ public protocol LocationCapabilityRegistrarType: CapabilityRegistrarType {
 
      - parameter aDelegate: a CLLocationManagerDelegate
      */
-    func opr_setDelegate(aDelegate: CLLocationManagerDelegate)
+    func opr_setDelegate(aDelegate: CLLocationManagerDelegate?)
 
     /// - returns: the CLAuthorizationStatus
     func opr_authorizationStatus() -> CLAuthorizationStatus
@@ -68,7 +68,7 @@ extension CLLocationManager: LocationCapabilityRegistrarType {
 
      - parameter aDelegate: a CLLocationManagerDelegate
      */
-    public func opr_setDelegate(aDelegate: CLLocationManagerDelegate) {
+    public func opr_setDelegate(aDelegate: CLLocationManagerDelegate?) {
         self.delegate = aDelegate
     }
 
