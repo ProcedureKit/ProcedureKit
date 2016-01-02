@@ -1,3 +1,6 @@
+# 2.5.1
+1. [[OPR-151](https://github.com/danthorpe/Operations/pull/151), [OPR-155](https://github.com/danthorpe/Operations/pull/155)]: Fixes a bug where `UserLocationOperation` could crash when the LocationManager returns subsequent locations after the operation has finished.
+
 # 2.5.0
 
 This is a relatively large number of changes with some breaking changes from 2.4.*.
