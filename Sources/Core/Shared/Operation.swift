@@ -322,7 +322,7 @@ public class Operation: NSOperation {
     
      - requires: self must not have started yet. i.e. either hasn't been added
      to a queue, or is waiting on dependencies.
-    - parameter operation: a `NSOperation` instance.
+     - parameter operation: a `NSOperation` instance.
     */
     public override func addDependency(operation: NSOperation) {
         precondition(state <= .Executing, "Dependencies cannot be modified after execution has begun, current state: \(state).")

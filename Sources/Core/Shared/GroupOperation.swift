@@ -70,6 +70,9 @@ public class GroupOperation: Operation {
     */
     public func addOperation(operation: NSOperation) {
         log.notice("Add operation \(operation.operationName) to group.")
+        if let op = operation as? Operation {
+            op.log.severity = log.severity
+        }
         queue.addOperation(operation)
     }
 
@@ -80,7 +83,21 @@ public class GroupOperation: Operation {
     */
     public func addOperations(operations: [NSOperation]) {
         log.notice("Add operations to group \(operations.map { $0.operationName })")
+        operations.forEach {
+            if let op = $0 as? Operation {
+                op.log.severity = log.severity
+            }
+        }
         queue.addOperations(operations, waitUntilFinished: false)
+    }
+
+    /**
+     Add multiple operations at once.
+
+     - parameter operations: an array of `NSOperation` instances.
+     */
+    public func addOperations(operations: NSOperation...) {
+        addOperations(operations)
     }
 
     /**
