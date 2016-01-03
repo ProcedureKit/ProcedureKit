@@ -308,10 +308,23 @@ public class Operation: NSOperation {
 
      - requires: self must not have started yet. i.e. either hasn't been added
      to a queue, or is waiting on dependencies.
-    - parameter observer: type conforming to protocol `OperationObserver`.
+     - parameter observer: type conforming to protocol `OperationObserverType`.
     */
     public func addObserver(observer: OperationObserverType) {
         precondition(state < .Ready, "Cannot modify observers after operations has been ready, current state: \(state).")
+        observers.append(observer)
+    }
+
+    /**
+     Add an OperationDidFinishObserver observer. Can be done up until the operation
+     begins .Finishing.
+     
+     - requires: self must not have ended executing yet. i.e. has not yet called
+     `finish()`.
+     - parameter observer: type conforming to protocol `OperationDidFinishObserver`.
+    */
+    public func addObserver(observer: OperationDidFinishObserver) {
+        precondition(state < .Finishing, "Cannot add OperationDidFinishObserver if operation has entered .Finishing state, current state: \(state).")
         observers.append(observer)
     }
 
