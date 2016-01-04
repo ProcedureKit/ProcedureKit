@@ -29,9 +29,16 @@ public class CloudKitOperation<CloudOperation where CloudOperation: CloudKitOper
         operation.database = database
         self.operation = operation
         super.init()
+        name = "CloudKitOperation<\(operation.dynamicType)>"
+    }
+
+    public override func cancel() {
+        operation.cancel()
+        super.cancel()
     }
 
     public override func execute() {
+        guard !cancelled else { return }
         operation.addCompletionBlock {
             self.finish()
         }
