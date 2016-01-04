@@ -72,16 +72,13 @@ public class OperationQueue: NSOperationQueue {
                 $0.dependencyForOperation(operation)
             }
 
-            if let waiter = operation.waitForDependenciesOperation {
-                for conditionDependency in conditionDependencies {
-                    conditionDependency.addDependency(waiter)
-                }
-                addOperation(waiter)
-            }
-
             for conditionDependency in conditionDependencies {
                 operation.addConditionDependency(conditionDependency)
                 addOperation(conditionDependency)
+            }
+
+            if let waiter = operation.waitForDependenciesOperation {
+                addOperation(waiter)
             }
 
             // Check for exclusive mutability constraints

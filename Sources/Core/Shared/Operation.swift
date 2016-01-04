@@ -338,11 +338,9 @@ public class Operation: NSOperation {
     internal func addConditionDependency(operation: NSOperation) {
         precondition(state <= .Executing, "Dependencies cannot be modified after execution has begun, current state: \(state).")
         if let waiter = waitForDependenciesOperation {
-            waiter.addDependency(operation)
+            operation.addDependency(waiter)
         }
-        else {
-            super.addDependency(operation)
-        }
+        super.addDependency(operation)
     }
 
     public override var dependencies: [NSOperation] {
