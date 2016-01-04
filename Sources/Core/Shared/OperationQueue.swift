@@ -81,19 +81,17 @@ public class OperationQueue: NSOperationQueue {
                 addOperation(waiter)
             }
 
-            // Check for exclusive mutability constraints
-            let concurrencyCategories: [String] = operation.conditions.flatMap { condition in
-                if !condition.isMutuallyExclusive { return .None }
-                return "\(condition.dynamicType)"
-            }
-
-            if !concurrencyCategories.isEmpty {
-                let manager = ExclusivityManager.sharedInstance
-                manager.addOperation(operation, categories: concurrencyCategories)
-
-                operation.addObserver(FinishedObserver { operation, _ in
-                    manager.removeOperation(operation, categories: concurrencyCategories)
-                })
+            // Check for mutual exclusion constraints
+            //// TODO: Move this all to before adding any condition dependencies
+            //// to the queue. e.g. line 77.
+            //// This is because the `manager.addOperation()` may call `addDependency`
+            //// which should be done before adding the operation to a queue.
+            let manager = ExclusivityManager.sharedInstance
+            let exclusive = operation.conditions.filter { $0.isMutuallyExclusive }
+            for condition in exclusive {
+                let category = "\(condition.dynamicType)"
+                let mutuallyExclusiveOperation: NSOperation = condition.dependencyForOperation(operation) ?? operation
+                manager.addOperation(mutuallyExclusiveOperation, category: category)
             }
 
             // Indicate to the operation that it is to be enqueued
