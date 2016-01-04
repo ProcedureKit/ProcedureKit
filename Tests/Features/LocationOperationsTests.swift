@@ -159,8 +159,8 @@ class UserLocationOperationTests: LocationOperationTests {
         runOperation(operation)
         waitForExpectationsWithTimeout(3, handler: nil)
 
-        XCTAssertEqual(locationManager.desiredAccuracy!, accuracy)
-        XCTAssertEqual(receivedLocation!.horizontalAccuracy, accuracy)
+        XCTAssertEqual(locationManager.desiredAccuracy, accuracy)
+        XCTAssertEqual(receivedLocation?.horizontalAccuracy, accuracy)
         XCTAssertTrue(locationManager.didSetDelegate)
         XCTAssertTrue(locationManager.didStartUpdatingLocation)
         XCTAssertTrue(locationManager.didStopLocationUpdates)
