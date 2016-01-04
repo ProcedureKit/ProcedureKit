@@ -375,15 +375,13 @@ public class Operation: NSOperation {
 
     public override func removeDependency(operation: NSOperation) {
         precondition(state <= .Executing, "Dependencies cannot be modified after execution has begun, current state: \(state).")
-        if let waiter = waitForDependenciesOperation {
-            waiter.removeDependency(operation)
-            if waiter.dependencies.count == 0 {
-                super.removeDependency(waiter)
-                waitForDependenciesOperation = nil
-            }
+        guard let waiter = waitForDependenciesOperation else {
+            return
         }
-        else {
-            super.removeDependency(operation)
+        waiter.removeDependency(operation)
+        if waiter.dependencies.count == 0 {
+            super.removeDependency(waiter)
+            waitForDependenciesOperation = nil
         }
     }
 
@@ -423,7 +421,6 @@ public class Operation: NSOperation {
     */
     public func execute() {
         print("\(self.dynamicType) must override `execute()`.", terminator: "")
-        
         finish()
     }
 

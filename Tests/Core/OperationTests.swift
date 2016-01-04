@@ -323,6 +323,22 @@ class CompletionBlockOperationTests: OperationTests {
 
 class OperationDependencyTests: OperationTests {
 
+    struct TestCondition: OperationCondition {
+
+        let name = "Test Condition"
+        let isMutuallyExclusive = false
+        let dependency: NSOperation?
+        let condition: () -> Bool
+
+        func dependencyForOperation(operation: Operation) -> NSOperation? {
+            return dependency
+        }
+
+        func evaluateForOperation(operation: Operation, completion: OperationConditionResult -> Void) {
+            completion(condition() ? .Satisfied : .Failed(BlockCondition.Error.BlockConditionFailed))
+        }
+    }
+
     func test__dependent_operations_always_run() {
         queue.maxConcurrentOperationCount = 1
         let count = 2_000
@@ -365,6 +381,78 @@ class OperationDependencyTests: OperationTests {
         XCTAssertEqual(counter1, count)
         XCTAssertEqual(counter2, count)
         XCTAssertEqual(counter3, count)
+    }
+
+    func test__dependencies_execute_before_condition_dependencies() {
+
+        let dependency1 = TestOperation()
+        let dependency2 = TestOperation()
+
+        let condition1 = TestCondition(dependency: BlockOperation {
+            XCTAssertTrue(dependency1.finished)
+            XCTAssertTrue(dependency2.finished)
+        }) { true }
+
+        let condition2 = TestCondition(dependency: BlockOperation {
+            XCTAssertTrue(dependency1.finished)
+            XCTAssertTrue(dependency2.finished)
+        }) { true }
+
+
+        let operation = TestOperation()
+        operation.addDependency(dependency1)
+        operation.addDependency(dependency2)
+        operation.addCondition(condition1)
+        operation.addCondition(condition2)
+
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        runOperations(dependency1, dependency2, operation)
+        waitForExpectationsWithTimeout(3, handler: nil)
+
+        XCTAssertTrue(dependency1.didExecute)
+        XCTAssertTrue(dependency1.finished)
+        XCTAssertTrue(dependency2.didExecute)
+        XCTAssertTrue(dependency2.finished)
+        XCTAssertTrue(operation.didExecute)
+        XCTAssertTrue(operation.finished)
+    }
+
+    func test__dependencies_property_does_not_contain_dependency_waiter() {
+
+        let dependency1 = TestOperation()
+        let dependency2 = TestOperation()
+        let condition1 = TestCondition(dependency: TestOperation()) { true }
+        let condition2 = TestCondition(dependency: TestOperation()) { true }
+
+
+        let operation = TestOperation()
+        operation.addDependency(dependency1)
+        operation.addDependency(dependency2)
+        operation.addCondition(condition1)
+        operation.addCondition(condition2)
+
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        runOperations(dependency1, dependency2, operation)
+        waitForExpectationsWithTimeout(3, handler: nil)
+
+        XCTAssertEqual(operation.dependencies.count, 4)
+        XCTAssertNotNil(operation.waitForDependenciesOperation)
+        XCTAssertFalse(operation.dependencies.contains(operation.waitForDependenciesOperation!))
+    }
+
+    func test__remove_last_dependency_destroys_dependency_waiter() {
+
+        let dependency = TestOperation()
+        let operation = TestOperation()
+        operation.removeDependency(dependency) // Has no impact
+        operation.addDependency(dependency)
+
+        XCTAssertNotNil(operation.waitForDependenciesOperation)
+        XCTAssertEqual(operation.dependencies.count, 1)
+
+        operation.removeDependency(dependency)
+        XCTAssertNil(operation.waitForDependenciesOperation)
+        XCTAssertEqual(operation.dependencies.count, 0)
     }
 }
 
@@ -467,6 +555,10 @@ class CancellationOperationTests: OperationTests {
         XCTAssertFalse(operation.didExecute)
     }
 }
+
+
+
+
 
 
 
