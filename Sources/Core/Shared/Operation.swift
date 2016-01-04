@@ -274,14 +274,14 @@ public class Operation: NSOperation {
     // MARK: - Conditions
 
     /**
-    Add a condition to the to the operation, can only be done prior to the operation starting.
+     Add a condition to the to the operation, can only be done prior to the operation starting.
 
-    - requires: self must not have started yet. i.e. either hasn't been added 
-    to a queue, or is waiting on dependencies.
-    - parameter condition: type conforming to protocol `OperationCondition`.
+     - requires: self must not have started yet. i.e. either hasn't been added
+     to a queue, or is waiting on dependencies.
+     - parameter condition: type conforming to protocol `OperationCondition`.
     */
     public func addCondition(condition: OperationCondition) {
-        precondition(state < .Ready, "Cannot modify conditions after operations has been ready, current state: \(state).")
+        assert(state < .EvaluatingConditions, "Cannot modify conditions after operations has begun evaluating conditions, current state: \(state).")
         conditions.append(condition)
     }
 
@@ -304,14 +304,22 @@ public class Operation: NSOperation {
     }
 
     /**
-    Add an observer to the to the operation, can only be done prior to the operation starting.
+     Add an observer to the to the operation, can only be done
+     prior to the operation starting.
 
      - requires: self must not have started yet. i.e. either hasn't been added
      to a queue, or is waiting on dependencies.
-    - parameter observer: type conforming to protocol `OperationObserver`.
+     - parameter observer: type conforming to protocol `OperationObserverType`.
     */
     public func addObserver(observer: OperationObserverType) {
-        precondition(state < .Ready, "Cannot modify observers after operations has been ready, current state: \(state).")
+        switch observer {
+        case is OperationDidProduceOperationObserver:
+            assert(state < .Executing, "Cannot add OperationDidProduceOperationObserver if operation has entered .Executing state, current state: \(state).")
+        case is OperationDidFinishObserver:
+            assert(state < .Finishing, "Cannot add OperationDidFinishObserver if operation has entered .Finishing state, current state: \(state).")
+        default:
+            assert(state < .Ready, "Cannot modify observers after operations has been ready, current state: \(state).")
+        }
         observers.append(observer)
     }
 
