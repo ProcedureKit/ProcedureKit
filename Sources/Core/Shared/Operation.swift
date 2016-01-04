@@ -343,7 +343,8 @@ public class Operation: NSOperation {
         super.addDependency(operation)
     }
 
-    public override var dependencies: [NSOperation] {
+    /// Public override to get the dependencies
+    public override final var dependencies: [NSOperation] {
         get {
             var _dependencies = super.dependencies
             guard let
@@ -360,20 +361,30 @@ public class Operation: NSOperation {
     }
 
     /**
-    Add another `NSOperation` as a dependency. It is a programmatic error to call this method after the receiver has 
-    already started executing. Therefore, best practice is to add dependencies before adding them to operation
-    queues.
+     Add another `NSOperation` as a dependency. It is a programmatic error to call
+     this method after the receiver has already started executing. Therefore, best 
+     practice is to add dependencies before adding them to operation queues.
     
      - requires: self must not have started yet. i.e. either hasn't been added
      to a queue, or is waiting on dependencies.
      - parameter operation: a `NSOperation` instance.
     */
-    public override func addDependency(operation: NSOperation) {
+    public override final func addDependency(operation: NSOperation) {
         precondition(state <= .Executing, "Dependencies cannot be modified after execution has begun, current state: \(state).")
         (waitForDependenciesOperation ?? createDidFinishDependenciesOperation()).addDependency(operation)
     }
 
-    public override func removeDependency(operation: NSOperation) {
+    /**
+     Remove another `NSOperation` as a dependency. It is a programmatic error to call
+     this method after the receiver has already started executing. Therefore, best 
+     practice is to manage dependencies before adding them to operation
+     queues.
+
+     - requires: self must not have started yet. i.e. either hasn't been added
+     to a queue, or is waiting on dependencies.
+     - parameter operation: a `NSOperation` instance.
+     */
+    public override final func removeDependency(operation: NSOperation) {
         precondition(state <= .Executing, "Dependencies cannot be modified after execution has begun, current state: \(state).")
         guard let waiter = waitForDependenciesOperation else {
             return
