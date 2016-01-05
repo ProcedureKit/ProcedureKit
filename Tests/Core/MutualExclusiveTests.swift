@@ -9,7 +9,7 @@
 import XCTest
 @testable import Operations
 
-class MutualExclusiveTests: XCTestCase {
+class MutualExclusiveTests: OperationTests {
 
     func test__alert_presentation_name() {
         let condition = AlertPresentation()
@@ -49,4 +49,39 @@ class MutualExclusiveTests: XCTestCase {
         XCTAssertEqual(op2.dependencies.first, op1)
     }
 }
+
+class MutuallyExclusiveConditionWithDependencyTests: OperationTests {
+
+    func test__condition_has_dependency_executed_first() {
+        var text = "Star Wars"
+        let condition1 = TestCondition(isMutuallyExclusive: true, dependency: NSBlockOperation {
+            text = "\(text)\nA long time ago"
+        }) {
+            return text ==  "Star Wars\nA long time ago"
+        }
+
+
+        let operation1 = TestOperation()
+        operation1.addCondition(condition1)
+
+        let condition2 = TestCondition(isMutuallyExclusive: true, dependency: BlockOperation {
+            text = "\(text), in a galaxy far, far away."
+        }) {
+            return text == "Star Wars\nA long time ago, in a galaxy far, far away."
+        }
+
+        let operation2 = TestOperation()
+        operation2.addCondition(condition2)
+
+        addCompletionBlockToTestOperation(operation1, withExpectation: expectationWithDescription("Test 1: \(__FUNCTION__)"))
+        addCompletionBlockToTestOperation(operation2, withExpectation: expectationWithDescription("Test 2: \(__FUNCTION__)"))
+
+        runOperations(operation1, operation2)
+        waitForExpectationsWithTimeout(3, handler: nil)
+
+        XCTAssertTrue(operation1.didExecute)
+        XCTAssertTrue(operation2.didExecute)
+    }
+}
+
 
