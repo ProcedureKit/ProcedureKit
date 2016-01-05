@@ -12,9 +12,39 @@ import CloudKit
 
 class CloudKitOperationTests: OperationTests { }
 
+// MARK: CKOperation Tests
 
+class TestCloudOperation: NSOperation, CKOperationType {
+    var container: String? // just a test
+}
 
-class TestDatabaseOperation: NSOperation, CKDatabaseOperationType {
+class CloudOperationTests: CloudKitOperationTests {
+
+    var target: TestCloudOperation!
+    var operation: CloudKitOperation<TestCloudOperation>!
+
+    override func setUp() {
+        super.setUp()
+        target = TestCloudOperation()
+        operation = CloudKitOperation(target)
+    }
+
+    func test__get_countainer() {
+        let container = "I'm a test container!"
+        target.container = container
+        XCTAssertEqual(operation.container, container)
+    }
+
+    func test__set_database() {
+        let container = "I'm a test container!"
+        operation.container = container
+        XCTAssertEqual(target.container, container)
+    }
+}
+
+// MARK: CKDatabaseOperation Tests
+
+class TestDatabaseOperation: TestCloudOperation, CKDatabaseOperationType {
     var database: String? // just a test
 }
 
@@ -42,8 +72,9 @@ class DatabaseOperationTests: CloudKitOperationTests {
     }
 }
 
+// MARK: CKDiscoverAllContactsOperation Tests
 
-class TestDiscoverAllContactsOperation: NSOperation, CKDiscoverAllContactsOperationType {
+class TestDiscoverAllContactsOperation: TestCloudOperation, CKDiscoverAllContactsOperationType {
 
     var result: [CKDiscoveredUserInfo]?
     var error: NSError?
@@ -165,9 +196,9 @@ class DiscoverAllContactsOperationTests: CloudKitOperationTests {
     }
 }
 
+// MARK: CKDiscoverUserInfosOperation Tests
 
-
-class TestDiscoverUserInfosOperation: NSOperation, CKDiscoverUserInfosOperationType {
+class TestDiscoverUserInfosOperation: TestCloudOperation, CKDiscoverUserInfosOperationType {
 
     var emailAddresses: [String]?
     var userRecordIDs: [CKRecordID]?
@@ -275,9 +306,9 @@ class DiscoverUserInfosOperationTests: CloudKitOperationTests {
     }
 }
 
+// MARK: CKFetchNotificationChangesOperation Tests
 
-
-class TestFetchNotificationChangesOperation: NSOperation, CKFetchNotificationChangesOperationType {
+class TestFetchNotificationChangesOperation: TestCloudOperation, CKFetchNotificationChangesOperationType {
 
     var error: NSError?
     var finalPreviousServerChangeToken: CKServerChangeToken?
@@ -392,8 +423,90 @@ class FetchNotificationChangesOperationTests: CloudKitOperationTests {
         XCTAssertTrue(operation.finished)
         XCTAssertEqual(operation.errors.count, 1)
     }
-
 }
+
+// MARK: - CKMarkNotificationsReadOperation Tests
+
+class TestMarkNotificationsReadOperation: TestCloudOperation, CKMarkNotificationsReadOperationType {
+
+    var notificationIDs: [String]
+    var error: NSError?
+
+    var markNotificationsReadCompletionBlock: (([String]?, NSError?) -> Void)?
+
+    init(markIDsToRead: [String] = [], error: NSError? = .None) {
+        self.notificationIDs = markIDsToRead
+        self.error = error
+        super.init()
+    }
+
+    override func main() {
+        markNotificationsReadCompletionBlock?(notificationIDs, error)
+    }
+}
+
+class MarkNotificationsReadOperationTests: CloudKitOperationTests {
+
+    var target: TestMarkNotificationsReadOperation!
+    var operation: CloudKitOperation<TestMarkNotificationsReadOperation>!
+
+    override func setUp() {
+        super.setUp()
+        target = TestMarkNotificationsReadOperation(markIDsToRead: [ "this-is-an-id" ])
+        operation = CloudKitOperation(target)
+    }
+
+    func test__get_notification_id() {
+        target.notificationIDs = [ "this-is-an-id" ]
+        XCTAssertEqual(operation.notificationIDs, [ "this-is-an-id" ])
+    }
+
+    func test__set_notification_id() {
+        operation.notificationIDs = [ "this-is-an-id" ]
+        XCTAssertEqual(operation.notificationIDs, [ "this-is-an-id" ])
+    }
+
+    func test__setting_completion_block() {
+        operation.setMarkNotificationReadCompletionBlock { _ in
+            // etc
+        }
+        XCTAssertNotNil(operation.configure)
+    }
+
+    func test__setting_completion_block_to_nil() {
+        operation.setMarkNotificationReadCompletionBlock(.None)
+        XCTAssertNil(operation.configure)
+    }
+
+    func test__success_with_completion_block() {
+        var receivedNotificationIDs: [String]?
+        operation.setMarkNotificationReadCompletionBlock { notificationID in
+            receivedNotificationIDs = notificationID
+        }
+
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        runOperation(operation)
+        waitForExpectationsWithTimeout(3, handler: nil)
+
+        XCTAssertEqual(receivedNotificationIDs!, [ "this-is-an-id" ])
+    }
+
+    func test__error_with_completion_block() {
+        target.error = NSError(domain: CKErrorDomain, code: CKErrorCode.InternalError.rawValue, userInfo: nil)
+
+        operation.setMarkNotificationReadCompletionBlock { _ in
+            // etc
+        }
+
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        runOperation(operation)
+        waitForExpectationsWithTimeout(3, handler: nil)
+
+        XCTAssertTrue(operation.finished)
+        XCTAssertEqual(operation.errors.count, 1)
+    }
+}
+
 
 
 
