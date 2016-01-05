@@ -323,18 +323,77 @@ public class Operation: NSOperation {
         observers.append(observer)
     }
 
+    // MARK: - Dependencies
+
+    private func createDidFinishDependenciesOperation() -> NSOperation {
+        assert(waitForDependenciesOperation == nil, "Should only ever create the finishing dependency once.")
+        let __op = NSBlockOperation { }
+        super.addDependency(__op)
+        waitForDependenciesOperation = __op
+        return __op
+    }
+
+    internal var waitForDependenciesOperation: NSOperation? = .None
+
+    internal func addConditionDependency(operation: NSOperation) {
+        precondition(state <= .Executing, "Dependencies cannot be modified after execution has begun, current state: \(state).")
+        if let waiter = waitForDependenciesOperation {
+            operation.addDependency(waiter)
+        }
+        super.addDependency(operation)
+    }
+
+    /// Public override to get the dependencies
+    public override final var dependencies: [NSOperation] {
+        get {
+            var _dependencies = super.dependencies
+            guard let
+                waiter = waitForDependenciesOperation,
+                index = _dependencies.indexOf(waiter) else {
+                return _dependencies
+            }
+
+            _dependencies.removeAtIndex(index)
+            _dependencies.appendContentsOf(waiter.dependencies)
+
+            return _dependencies
+        }
+    }
+
     /**
-    Add another `NSOperation` as a dependency. It is a programmatic error to call this method after the receiver has 
-    already started executing. Therefore, best practice is to add dependencies before adding them to operation
-    queues.
+     Add another `NSOperation` as a dependency. It is a programmatic error to call
+     this method after the receiver has already started executing. Therefore, best 
+     practice is to add dependencies before adding them to operation queues.
     
      - requires: self must not have started yet. i.e. either hasn't been added
      to a queue, or is waiting on dependencies.
      - parameter operation: a `NSOperation` instance.
     */
-    public override func addDependency(operation: NSOperation) {
+    public override final func addDependency(operation: NSOperation) {
         precondition(state <= .Executing, "Dependencies cannot be modified after execution has begun, current state: \(state).")
-        super.addDependency(operation)
+        (waitForDependenciesOperation ?? createDidFinishDependenciesOperation()).addDependency(operation)
+    }
+
+    /**
+     Remove another `NSOperation` as a dependency. It is a programmatic error to call
+     this method after the receiver has already started executing. Therefore, best 
+     practice is to manage dependencies before adding them to operation
+     queues.
+
+     - requires: self must not have started yet. i.e. either hasn't been added
+     to a queue, or is waiting on dependencies.
+     - parameter operation: a `NSOperation` instance.
+     */
+    public override final func removeDependency(operation: NSOperation) {
+        precondition(state <= .Executing, "Dependencies cannot be modified after execution has begun, current state: \(state).")
+        guard let waiter = waitForDependenciesOperation else {
+            return
+        }
+        waiter.removeDependency(operation)
+        if waiter.dependencies.count == 0 {
+            super.removeDependency(waiter)
+            waitForDependenciesOperation = nil
+        }
     }
 
     // MARK: - Execution and Cancellation
@@ -373,7 +432,6 @@ public class Operation: NSOperation {
     */
     public func execute() {
         print("\(self.dynamicType) must override `execute()`.", terminator: "")
-        
         finish()
     }
 

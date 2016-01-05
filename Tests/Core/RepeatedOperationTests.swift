@@ -26,7 +26,7 @@ class RandomFailGeneratorTests: XCTestCase {
 
         let probabilityFailure = Double(failures) / Double(total)
 
-        XCTAssertEqualWithAccuracy(probabilityFailure, 0.1, accuracy: 0.02)
+        XCTAssertEqualWithAccuracy(probabilityFailure, 0.1, accuracy: 0.05)
     }
 }
 

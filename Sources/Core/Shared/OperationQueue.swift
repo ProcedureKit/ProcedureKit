@@ -68,13 +68,17 @@ public class OperationQueue: NSOperationQueue {
                 }
             })
 
-            let dependencies = operation.conditions.flatMap {
+            let conditionDependencies = operation.conditions.flatMap {
                 $0.dependencyForOperation(operation)
             }
 
-            for dependency in dependencies {
-                operation.addDependency(dependency)
-                addOperation(dependency)
+            for conditionDependency in conditionDependencies {
+                operation.addConditionDependency(conditionDependency)
+                addOperation(conditionDependency)
+            }
+
+            if let waiter = operation.waitForDependenciesOperation {
+                addOperation(waiter)
             }
 
             // Check for exclusive mutability constraints
