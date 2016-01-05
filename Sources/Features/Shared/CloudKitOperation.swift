@@ -9,7 +9,10 @@
 import Foundation
 import CloudKit
 
-public protocol CKOperationType: class { }
+public protocol CKOperationType: class {
+    typealias Container
+    var container: Container? { get set }
+}
 
 public class CloudKitOperation<T where T: CKOperationType, T: NSOperation>: Operation {
 
@@ -58,7 +61,19 @@ public class CloudKitOperation<T where T: CKOperationType, T: NSOperation>: Oper
     }
 }
 
-// MARK: - CKDiscoverAllContactsOperation
+// MARK: - CKOperationType
+
+extension CKOperation: CKOperationType { }
+
+extension CloudKitOperation where T: CKOperationType {
+
+    public var container: T.Container? {
+        get { return operation.container }
+        set { operation.container = newValue }
+    }
+}
+
+// MARK: - CKDatabaseOperation
 
 public protocol CKDatabaseOperationType: CKOperationType {
     typealias Database
@@ -226,5 +241,48 @@ extension CloudKitOperation where T: CKFetchNotificationChangesOperationType {
     }
 }
 
+// MARK: - CKMarkNotificationsReadOperation
 
+public protocol CKMarkNotificationsReadOperationType: CKOperationType {
+    typealias NotificationID
+    var notificationIDs: [NotificationID] { get set }
+    var markNotificationsReadCompletionBlock: (([NotificationID]?, NSError?) -> Void)? { get set }
+}
 
+extension CKMarkNotificationsReadOperation: CKMarkNotificationsReadOperationType { }
+
+extension CloudKitOperation where T: CKMarkNotificationsReadOperationType {
+
+    public typealias MarkNotificationReadCompletionBlock = [T.NotificationID]? -> Void
+
+    public var notificationIDs: [T.NotificationID] {
+        get { return operation.notificationIDs }
+        set { operation.notificationIDs = newValue }
+    }
+
+    public func setMarkNotificationReadCompletionBlock(block: MarkNotificationReadCompletionBlock?) {
+        guard let block = block else {
+            configure = .None
+            operation.markNotificationsReadCompletionBlock = .None
+            return
+        }
+
+        let previousConfigure = configure
+        configure = { [unowned self] _op in
+            let op = previousConfigure?(_op) ?? _op
+            op.notificationIDs = self.operation.notificationIDs
+            op.markNotificationsReadCompletionBlock = { notificationIDs, error in
+                if let error = error {
+                    self.receivedError(error)
+                }
+                else {
+                    block(notificationIDs)
+                    self.finish()
+                }
+            }
+            return op
+        }
+    }
+}
+
+// MARK: - CKModifyBadgeOperation
