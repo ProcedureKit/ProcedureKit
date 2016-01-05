@@ -134,6 +134,8 @@ class DiscoverAllContactsOperationTests: CloudKitOperationTests {
     }
 }
 
+
+
 class TestDiscoverUserInfosOperation: NSOperation, CKDiscoverUserInfosOperationType {
 
     var emailAddresses: [String]?
@@ -243,6 +245,124 @@ class DiscoverUserInfosOperationTests: CloudKitOperationTests {
 }
 
 
+
+class TestFetchNotificationChangesOperation: NSOperation, CKFetchNotificationChangesOperationType {
+
+    var error: NSError?
+    var finalPreviousServerChangeToken: CKServerChangeToken?
+
+    var previousServerChangeToken: CKServerChangeToken? = .None
+    var resultsLimit: Int = 100
+    var moreComing: Bool = false
+    var notificationChangedBlock: (CKNotification -> Void)? = .None
+    var fetchNotificationChangesCompletionBlock: ((CKServerChangeToken?, NSError?) -> Void)? = .None
+
+    init(token: CKServerChangeToken? = .None, error: NSError? = .None) {
+        self.finalPreviousServerChangeToken = token
+        self.error = error
+        super.init()
+    }
+
+    override func main() {
+        fetchNotificationChangesCompletionBlock?(finalPreviousServerChangeToken, error)
+    }
+}
+
+class FetchNotificationChangesOperationTests: CloudKitOperationTests {
+
+    var target: TestFetchNotificationChangesOperation!
+    var operation: CloudKitOperation<TestFetchNotificationChangesOperation>!
+
+    override func setUp() {
+        super.setUp()
+        target = TestFetchNotificationChangesOperation(token: .None)
+        operation = CloudKitOperation(target)
+    }
+    
+    func test__get_previous_server_change_token() {
+        XCTAssertNil(operation.previousServerChangeToken)
+    }
+
+    func test__set_previous_server_change_token() {
+        operation.previousServerChangeToken = .None
+        XCTAssertNil(operation.previousServerChangeToken)
+    }
+
+    func test__get_results_limit() {
+        target.resultsLimit = 10
+        XCTAssertEqual(operation.resultsLimit, 10)
+    }
+
+    func test__set_results_limits() {
+        operation.resultsLimit = 10
+        XCTAssertEqual(target.resultsLimit, 10)
+    }
+
+    func test__get_more_coming() {
+        target.moreComing = true
+        XCTAssertTrue(operation.moreComing)
+    }
+
+    func test__get_set_notification_charged_block() {
+
+        var didItWork = false
+        operation.notificationChangedBlock = { _ in
+            didItWork = true
+        }
+
+        guard let block = operation.notificationChangedBlock else {
+            XCTFail("Notification Changed Block was not set.")
+            return
+        }
+
+        let note = CKNotification(fromRemoteNotificationDictionary: [:])
+        block(note)
+        XCTAssertTrue(didItWork)
+    }
+
+    func test__setting_completion_block() {
+        operation.setFetchNotificationChangesCompletionBlock { _ in
+            // etc
+        }
+        XCTAssertNotNil(operation.configure)
+    }
+
+    func test__setting_completion_block_to_nil() {
+        operation.setFetchNotificationChangesCompletionBlock(.None)
+        XCTAssertNil(operation.configure)
+    }
+
+    func test__success_with_completion_block() {
+        var didCallCompletionBlock = false
+        operation.setFetchNotificationChangesCompletionBlock { _ in
+            // note: It's not possible to create CKServerChangeToken
+            // so we can't fully test receiving one.
+            didCallCompletionBlock = true
+        }
+
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        runOperation(operation)
+        waitForExpectationsWithTimeout(3, handler: nil)
+
+        XCTAssertTrue(didCallCompletionBlock)
+    }
+
+    func test__error_with_completion_block() {
+        target.error = NSError(domain: CKErrorDomain, code: CKErrorCode.InternalError.rawValue, userInfo: nil)
+
+        operation.setFetchNotificationChangesCompletionBlock { _ in
+            // etc
+        }
+
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        runOperation(operation)
+        waitForExpectationsWithTimeout(3, handler: nil)
+
+        XCTAssertTrue(operation.finished)
+        XCTAssertEqual(operation.errors.count, 1)
+    }
+
+}
 
 
 

@@ -16,7 +16,7 @@ public class CloudKitOperation<T where T: CKOperationType, T: NSOperation>: Oper
     public private(set) var operation: T
     public let recoverFromError: (T, ErrorType) -> T?
 
-    internal private(set) var configure: (T -> Void)?
+    internal private(set) var configure: (T -> T)?
 
     public init(_ op: T, recovery: (T, ErrorType) -> T? = { _, _ in .None }) {
         operation = op
@@ -31,7 +31,7 @@ public class CloudKitOperation<T where T: CKOperationType, T: NSOperation>: Oper
     }
 
     public override func execute() {
-        defer { go() }
+        defer { go(operation) }
         guard let _ = configure else {
             let warning = "A completion block was not set for: \(operation.dynamicType), error handling will not be triggered."
             log.warning(warning)
@@ -42,9 +42,10 @@ public class CloudKitOperation<T where T: CKOperationType, T: NSOperation>: Oper
         }
     }
 
-    private func go() {
-        configure?(operation)
-        produceOperation(operation)
+    private func go(op: T) -> T {
+        let _op = configure?(op) ?? op
+        produceOperation(_op)
+        return _op
     }
 
     func receivedError(error: ErrorType) {
@@ -53,8 +54,7 @@ public class CloudKitOperation<T where T: CKOperationType, T: NSOperation>: Oper
             return
         }
 
-        operation = op
-        go()
+        operation = go(op)
     }
 }
 
@@ -77,7 +77,9 @@ extension CloudKitOperation where T: CKDiscoverAllContactsOperationType {
             return
         }
 
-        configure = { [unowned self] op in
+        let previousConfigure = configure
+        configure = { [unowned self] _op in
+            let op = previousConfigure?(_op) ?? _op
             op.discoverAllContactsCompletionBlock = { userInfo, error in
                 if let error = error {
                     self.receivedError(error)
@@ -87,6 +89,7 @@ extension CloudKitOperation where T: CKDiscoverAllContactsOperationType {
                     self.finish()
                 }
             }
+            return op
         }
     }
 }
@@ -122,7 +125,11 @@ extension CloudKitOperation where T: CKDiscoverUserInfosOperationType {
             return
         }
 
-        configure = { [unowned self] op in
+        let previousConfigure = configure
+        configure = { [unowned self] _op in
+            let op = previousConfigure?(_op) ?? _op
+            op.emailAddresses = self.operation.emailAddresses
+            op.userRecordIDs = self.operation.userRecordIDs
             op.discoverUserInfosCompletionBlock = { userInfoByEmail, userInfoByRecordID, error in
                 if let error = error {
                     self.receivedError(error)
@@ -132,87 +139,75 @@ extension CloudKitOperation where T: CKDiscoverUserInfosOperationType {
                     self.finish()
                 }
             }
+
+            return op
+        }
+    }
+}
+
+// MARK: - CKFetchNotificationChangesOperation
+
+public protocol CKFetchNotificationChangesOperationType: CKOperationType {
+    var previousServerChangeToken: CKServerChangeToken? { get set }
+    var resultsLimit: Int { get set }
+
+    var moreComing: Bool { get }
+    var notificationChangedBlock: ((CKNotification) -> Void)? { get set }
+    var fetchNotificationChangesCompletionBlock: ((CKServerChangeToken?, NSError?) -> Void)? { get set }
+}
+
+extension CKFetchNotificationChangesOperation: CKFetchNotificationChangesOperationType { }
+
+extension CloudKitOperation where T: CKFetchNotificationChangesOperationType {
+
+    public typealias FetchNotificationChangesChangedBlock = CKNotification -> Void
+    public typealias FetchNotificationChangesCompletionBlock = CKServerChangeToken? -> Void
+
+    public var previousServerChangeToken: CKServerChangeToken? {
+        get { return operation.previousServerChangeToken }
+        set { operation.previousServerChangeToken = newValue }
+    }
+
+    public var resultsLimit: Int {
+        get { return operation.resultsLimit }
+        set { operation.resultsLimit = newValue }
+    }
+
+    public var moreComing: Bool {
+        return operation.moreComing
+    }
+
+    public var notificationChangedBlock: ((CKNotification) -> Void)? {
+        get { return operation.notificationChangedBlock }
+        set { operation.notificationChangedBlock = newValue }
+    }
+
+    public func setFetchNotificationChangesCompletionBlock(block: FetchNotificationChangesCompletionBlock?) {
+        guard let block = block else {
+            configure = .None
+            operation.fetchNotificationChangesCompletionBlock = .None
+            return
+        }
+
+        let previousConfigure = configure
+        configure = { [unowned self] _op in
+            let op = previousConfigure?(_op) ?? _op
+            op.previousServerChangeToken = self.operation.previousServerChangeToken
+            op.resultsLimit = self.operation.resultsLimit
+            op.notificationChangedBlock = self.operation.notificationChangedBlock
+            op.fetchNotificationChangesCompletionBlock = { token, error in
+                if let error = error {
+                    self.receivedError(error)
+                }
+                else {
+                    block(token)
+                    self.finish()
+                }
+            }
+            return op
         }
     }
 }
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// MARK: - Deprecated
-
-
-public protocol CloudKitOperationType: class {
-    var database: CKDatabase? { get set }
-    func begin()
-}
-
-/**
-    A very simple wrapper for CloudKit database operations.
-    
-    The database property is set on the operation, and suitable
-    for execution on an `OperationQueue`. This means that 
-    observers and conditions can be attached.
-*/
-public class _CloudKitOperation<CloudOperation where CloudOperation: CloudKitOperationType, CloudOperation: NSOperation>: Operation {
-
-    public let operation: CloudOperation
-
-    public init(operation: CloudOperation, database: CKDatabase = CKContainer.defaultContainer().privateCloudDatabase) {
-        operation.database = database
-        self.operation = operation
-        super.init()
-        name = "CloudKitOperation<\(operation.dynamicType)>"
-    }
-
-    public override func cancel() {
-        operation.cancel()
-        super.cancel()
-    }
-
-    public override func execute() {
-        guard !cancelled else { return }
-        operation.addCompletionBlock {
-            self.finish()
-        }
-        operation.begin()
-    }
-}
-
-extension CKDatabaseOperation: CloudKitOperationType {
-
-    public func begin() {
-        assert(database != nil, "CKDatabase not set on Operation.")
-        database!.addOperation(self)
-    }
-}
