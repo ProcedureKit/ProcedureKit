@@ -286,3 +286,48 @@ extension CloudKitOperation where T: CKMarkNotificationsReadOperationType {
 }
 
 // MARK: - CKModifyBadgeOperation
+
+public protocol CKModifyBadgeOperationType: CKOperationType {
+    var badgeValue: Int { get set }
+    var modifyBadgeCompletionBlock: ((NSError?) -> Void)? { get set }
+}
+
+extension CKModifyBadgeOperation: CKModifyBadgeOperationType { }
+
+extension CloudKitOperation where T: CKModifyBadgeOperationType {
+
+    public typealias ModifyBadgeCompletionBlock = () -> Void
+
+    public var badgeValue: Int {
+        get { return operation.badgeValue }
+        set { operation.badgeValue = newValue }
+    }
+
+    public func setModifyBadgeCompletionBlock(block: ModifyBadgeCompletionBlock?) {
+        guard let block = block else {
+            configure = .None
+            operation.modifyBadgeCompletionBlock = .None
+            return
+        }
+
+        let previousConfigure = configure
+        configure = { [unowned self] _op in
+            let op = previousConfigure?(_op) ?? _op
+            op.badgeValue = self.operation.badgeValue
+            op.modifyBadgeCompletionBlock = { error in
+                if let error = error {
+                    self.receivedError(error)
+                }
+                else {
+                    block()
+                    self.finish()
+                }
+            }
+            return op
+        }
+    }
+}
+
+
+
+
