@@ -507,9 +507,84 @@ class MarkNotificationsReadOperationTests: CloudKitOperationTests {
     }
 }
 
+// MARK: - CKModifyBadgeOperation Tests
 
+class TestModifyBadgeOperation: TestCloudOperation, CKModifyBadgeOperationType {
 
+    var badgeValue: Int
+    var error: NSError?
 
+    var modifyBadgeCompletionBlock: ((NSError?) -> Void)?
 
+    init(value: Int = 0, error: NSError? = .None) {
+        self.badgeValue = value
+        self.error = error
+    }
+
+    override func main() {
+        modifyBadgeCompletionBlock?(error)
+    }
+}
+
+class ModifyBadgeOperationTests: CloudKitOperationTests {
+
+    var target: TestModifyBadgeOperation!
+    var operation: CloudKitOperation<TestModifyBadgeOperation>!
+
+    override func setUp() {
+        super.setUp()
+        target = TestModifyBadgeOperation(value: 9)
+        operation = CloudKitOperation(target)
+    }
+
+    func test__get_badge_value() {
+        XCTAssertEqual(operation.badgeValue, 9)
+    }
+    
+    func test__set_badge_value() {
+        operation.badgeValue = 4
+        XCTAssertEqual(target.badgeValue, 4)
+    }
+
+    func test__setting_completion_block() {
+        operation.setModifyBadgeCompletionBlock { _ in
+            // etc
+        }
+        XCTAssertNotNil(operation.configure)
+    }
+
+    func test__setting_completion_block_to_nil() {
+        operation.setModifyBadgeCompletionBlock(.None)
+        XCTAssertNil(operation.configure)
+    }
+
+    func test__success_with_completion_block() {
+        var blockDidRun = false
+        operation.setModifyBadgeCompletionBlock { notificationID in
+            blockDidRun = true
+        }
+
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        runOperation(operation)
+        waitForExpectationsWithTimeout(3, handler: nil)
+
+        XCTAssertTrue(blockDidRun)
+    }
+
+    func test__error_with_completion_block() {
+        target.error = NSError(domain: CKErrorDomain, code: CKErrorCode.InternalError.rawValue, userInfo: nil)
+
+        operation.setModifyBadgeCompletionBlock { _ in
+            // etc
+        }
+
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        runOperation(operation)
+        waitForExpectationsWithTimeout(3, handler: nil)
+
+        XCTAssertTrue(operation.finished)
+        XCTAssertEqual(operation.errors.count, 1)
+    }
+}
 
 
