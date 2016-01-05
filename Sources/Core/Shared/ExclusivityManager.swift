@@ -13,32 +13,40 @@ internal class ExclusivityManager {
     static let sharedInstance = ExclusivityManager()
 
     private let queue = Queue.Initiated.serial("me.danthorpe.Operations.Exclusivity")
-    private var operations: [String: [Operation]] = [:]
+    private var operations: [String: [NSOperation]] = [:]
 
     private init() {
         // A private initalizer prevents any other part of the app
         // from creating an instance.
     }
 
-    func addOperation(operation: Operation, categories: [String]) {
-        dispatch_sync(queue) {
-            for category in categories {
-                self._addOperation(operation, category: category)
-            }
-        }
-    }
-
-    func removeOperation(operation: Operation, categories: [String]) {
+    func addOperation(operation: NSOperation, category: String) {
         dispatch_async(queue) {
-            for category in categories {
-                self._removeOperation(operation, category: category)
-            }
+            self._addOperation(operation, category: category)
         }
     }
 
+    func removeOperation(operation: NSOperation, category: String) {
+        dispatch_async(queue) {
+            self._removeOperation(operation, category: category)
+        }
+    }
 
-    private func _addOperation(operation: Operation, category: String) {
-        operation.log.verbose(" >>> \(category)")
+    private func _addOperation(operation: NSOperation, category: String) {
+        if let op = operation as? Operation {
+            op.log.verbose(" >>> \(category)")
+            op.addObserver(FinishedObserver { [unowned self] op, _ in
+                self.removeOperation(op, category: category)
+            })
+        }
+        else {
+            operation.addCompletionBlock { [unowned self, weak operation] in
+                if let op = operation {
+                    self.removeOperation(op, category: category)
+                }
+            }
+        }
+
         var operationsWithThisCategory = operations[category] ?? []
 
         if let last = operationsWithThisCategory.last {
@@ -50,14 +58,14 @@ internal class ExclusivityManager {
         operations[category] = operationsWithThisCategory
     }
 
-    private func _removeOperation(operation: Operation, category: String) {
-        operation.log.verbose(" <<< \(category)")
-        let matchingOperations = operations[category]
+    private func _removeOperation(operation: NSOperation, category: String) {
+        if let op = operation as? Operation {
+            op.log.verbose(" <<< \(category)")
+        }
 
-        if  var operationsWithThisCategory = matchingOperations,
-            let index = operationsWithThisCategory.indexOf(operation) {
-                operationsWithThisCategory.removeAtIndex(index)
-                operations[category] = operationsWithThisCategory
+        if var operationsWithThisCategory = operations[category], let index = operationsWithThisCategory.indexOf(operation) {
+            operationsWithThisCategory.removeAtIndex(index)
+            operations[category] = operationsWithThisCategory
         }
     }
 }

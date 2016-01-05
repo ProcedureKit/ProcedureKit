@@ -68,32 +68,29 @@ public class OperationQueue: NSOperationQueue {
                 }
             })
 
+            // Check for mutual exclusion conditions
+            let manager = ExclusivityManager.sharedInstance
+            let exclusive = operation.conditions.filter { $0.isMutuallyExclusive }
+            for condition in exclusive {
+                let category = "\(condition.dynamicType)"
+                let mutuallyExclusiveOperation: NSOperation = condition.dependencyForOperation(operation) ?? operation
+                manager.addOperation(mutuallyExclusiveOperation, category: category)
+            }
+
+            // Get any dependency operations from conditions
             let conditionDependencies = operation.conditions.flatMap {
                 $0.dependencyForOperation(operation)
             }
 
+            // Setup condition dependencies & add to the queue
             for conditionDependency in conditionDependencies {
                 operation.addConditionDependency(conditionDependency)
                 addOperation(conditionDependency)
             }
 
+            // Add the dependency waiter to the queue
             if let waiter = operation.waitForDependenciesOperation {
                 addOperation(waiter)
-            }
-
-            // Check for exclusive mutability constraints
-            let concurrencyCategories: [String] = operation.conditions.flatMap { condition in
-                if !condition.isMutuallyExclusive { return .None }
-                return "\(condition.dynamicType)"
-            }
-
-            if !concurrencyCategories.isEmpty {
-                let manager = ExclusivityManager.sharedInstance
-                manager.addOperation(operation, categories: concurrencyCategories)
-
-                operation.addObserver(FinishedObserver { operation, _ in
-                    manager.removeOperation(operation, categories: concurrencyCategories)
-                })
             }
 
             // Indicate to the operation that it is to be enqueued

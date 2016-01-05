@@ -46,6 +46,22 @@ class TestOperation: Operation, ResultOperationType {
     }
 }
 
+struct TestCondition: OperationCondition {
+
+    let name = "Test Condition"
+    var isMutuallyExclusive = false
+    let dependency: NSOperation?
+    let condition: () -> Bool
+
+    func dependencyForOperation(operation: Operation) -> NSOperation? {
+        return dependency
+    }
+
+    func evaluateForOperation(operation: Operation, completion: OperationConditionResult -> Void) {
+        completion(condition() ? .Satisfied : .Failed(BlockCondition.Error.BlockConditionFailed))
+    }
+}
+
 class TestQueueDelegate: OperationQueueDelegate {
 
     typealias DidFinishOperation = (NSOperation, [ErrorType]) -> Void
@@ -323,22 +339,6 @@ class CompletionBlockOperationTests: OperationTests {
 
 class OperationDependencyTests: OperationTests {
 
-    struct TestCondition: OperationCondition {
-
-        let name = "Test Condition"
-        let isMutuallyExclusive = false
-        let dependency: NSOperation?
-        let condition: () -> Bool
-
-        func dependencyForOperation(operation: Operation) -> NSOperation? {
-            return dependency
-        }
-
-        func evaluateForOperation(operation: Operation, completion: OperationConditionResult -> Void) {
-            completion(condition() ? .Satisfied : .Failed(BlockCondition.Error.BlockConditionFailed))
-        }
-    }
-
     func test__dependent_operations_always_run() {
         queue.maxConcurrentOperationCount = 1
         let count = 2_000
@@ -388,12 +388,12 @@ class OperationDependencyTests: OperationTests {
         let dependency1 = TestOperation()
         let dependency2 = TestOperation()
 
-        let condition1 = TestCondition(dependency: BlockOperation {
+        let condition1 = TestCondition(isMutuallyExclusive: false, dependency: BlockOperation {
             XCTAssertTrue(dependency1.finished)
             XCTAssertTrue(dependency2.finished)
         }) { true }
 
-        let condition2 = TestCondition(dependency: BlockOperation {
+        let condition2 = TestCondition(isMutuallyExclusive: false, dependency: BlockOperation {
             XCTAssertTrue(dependency1.finished)
             XCTAssertTrue(dependency2.finished)
         }) { true }
@@ -421,8 +421,8 @@ class OperationDependencyTests: OperationTests {
 
         let dependency1 = TestOperation()
         let dependency2 = TestOperation()
-        let condition1 = TestCondition(dependency: TestOperation()) { true }
-        let condition2 = TestCondition(dependency: TestOperation()) { true }
+        let condition1 = TestCondition(isMutuallyExclusive: false, dependency: TestOperation()) { true }
+        let condition2 = TestCondition(isMutuallyExclusive: false, dependency: TestOperation()) { true }
 
 
         let operation = TestOperation()
