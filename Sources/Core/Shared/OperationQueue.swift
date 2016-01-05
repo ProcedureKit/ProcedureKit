@@ -68,30 +68,29 @@ public class OperationQueue: NSOperationQueue {
                 }
             })
 
-            let conditionDependencies = operation.conditions.flatMap {
-                $0.dependencyForOperation(operation)
-            }
-
-            for conditionDependency in conditionDependencies {
-                operation.addConditionDependency(conditionDependency)
-                addOperation(conditionDependency)
-            }
-
-            if let waiter = operation.waitForDependenciesOperation {
-                addOperation(waiter)
-            }
-
-            // Check for mutual exclusion constraints
-            //// TODO: Move this all to before adding any condition dependencies
-            //// to the queue. e.g. line 77.
-            //// This is because the `manager.addOperation()` may call `addDependency`
-            //// which should be done before adding the operation to a queue.
+            // Check for mutual exclusion conditions
             let manager = ExclusivityManager.sharedInstance
             let exclusive = operation.conditions.filter { $0.isMutuallyExclusive }
             for condition in exclusive {
                 let category = "\(condition.dynamicType)"
                 let mutuallyExclusiveOperation: NSOperation = condition.dependencyForOperation(operation) ?? operation
                 manager.addOperation(mutuallyExclusiveOperation, category: category)
+            }
+
+            // Get any dependency operations from conditions
+            let conditionDependencies = operation.conditions.flatMap {
+                $0.dependencyForOperation(operation)
+            }
+
+            // Setup condition dependencies & add to the queue
+            for conditionDependency in conditionDependencies {
+                operation.addConditionDependency(conditionDependency)
+                addOperation(conditionDependency)
+            }
+
+            // Add the dependency waiter to the queue
+            if let waiter = operation.waitForDependenciesOperation {
+                addOperation(waiter)
             }
 
             // Indicate to the operation that it is to be enqueued
