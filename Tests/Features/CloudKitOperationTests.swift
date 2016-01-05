@@ -12,6 +12,37 @@ import CloudKit
 
 class CloudKitOperationTests: OperationTests { }
 
+
+
+class TestDatabaseOperation: NSOperation, CKDatabaseOperationType {
+    var database: String? // just a test
+}
+
+class DatabaseOperationTests: CloudKitOperationTests {
+
+    var target: TestDatabaseOperation!
+    var operation: CloudKitOperation<TestDatabaseOperation>!
+
+    override func setUp() {
+        super.setUp()
+        target = TestDatabaseOperation()
+        operation = CloudKitOperation(target)
+    }
+
+    func test__get_database() {
+        let db = "I'm a test database!"
+        target.database = db
+        XCTAssertEqual(operation.database, db)
+    }
+
+    func test__set_database() {
+        let db = "I'm a test database!"
+        operation.database = db
+        XCTAssertEqual(target.database, db)
+    }
+}
+
+
 class TestDiscoverAllContactsOperation: NSOperation, CKDiscoverAllContactsOperationType {
 
     var result: [CKDiscoveredUserInfo]?

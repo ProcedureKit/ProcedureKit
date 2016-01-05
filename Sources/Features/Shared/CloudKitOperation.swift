@@ -60,6 +60,23 @@ public class CloudKitOperation<T where T: CKOperationType, T: NSOperation>: Oper
 
 // MARK: - CKDiscoverAllContactsOperation
 
+public protocol CKDatabaseOperationType: CKOperationType {
+    typealias Database
+    var database: Database? { get set }
+}
+
+extension CKDatabaseOperation: CKDatabaseOperationType { }
+
+extension CloudKitOperation where T: CKDatabaseOperationType {
+
+    public var database: T.Database? {
+        get { return operation.database }
+        set { operation.database = newValue }
+    }
+}
+
+// MARK: - CKDiscoverAllContactsOperation
+
 public protocol CKDiscoverAllContactsOperationType: CKOperationType {
     var discoverAllContactsCompletionBlock: (([CKDiscoveredUserInfo]?, NSError?) -> Void)? { get set }
 }
