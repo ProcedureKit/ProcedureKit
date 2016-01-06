@@ -243,8 +243,8 @@ extension CloudKitOperation where T: CKDiscoverUserInfosOperationType {
         let previousConfigure = configure
         configure = { [unowned self] _op in
             let op = previousConfigure?(_op) ?? _op
-            op.emailAddresses = self.operation.emailAddresses
-            op.userRecordIDs = self.operation.userRecordIDs
+            op.emailAddresses = self.emailAddresses
+            op.userRecordIDs = self.userRecordIDs
             op.discoverUserInfosCompletionBlock = { userInfoByEmail, userInfoByRecordID, error in
                 if let error = error {
                     self.receivedError(error)
@@ -290,9 +290,9 @@ extension CloudKitOperation where T: CKFetchNotificationChangesOperationType {
         let previousConfigure = configure
         configure = { [unowned self] _op in
             let op = previousConfigure?(_op) ?? _op
-            op.previousServerChangeToken = self.operation.previousServerChangeToken
-            op.resultsLimit = self.operation.resultsLimit
-            op.notificationChangedBlock = self.operation.notificationChangedBlock
+            op.previousServerChangeToken = self.previousServerChangeToken
+            op.resultsLimit = self.resultsLimit
+            op.notificationChangedBlock = self.notificationChangedBlock
             op.fetchNotificationChangesCompletionBlock = { token, error in
                 if let error = error {
                     self.receivedError(error)
@@ -335,7 +335,7 @@ extension CloudKitOperation where T: CKMarkNotificationsReadOperationType {
         let previousConfigure = configure
         configure = { [unowned self] _op in
             let op = previousConfigure?(_op) ?? _op
-            op.notificationIDs = self.operation.notificationIDs
+            op.notificationIDs = self.notificationIDs
             op.markNotificationsReadCompletionBlock = { notificationIDs, error in
                 if let error = error {
                     self.receivedError(error)
@@ -378,7 +378,7 @@ extension CloudKitOperation where T: CKModifyBadgeOperationType {
         let previousConfigure = configure
         configure = { [unowned self] _op in
             let op = previousConfigure?(_op) ?? _op
-            op.badgeValue = self.operation.badgeValue
+            op.badgeValue = self.badgeValue
             op.modifyBadgeCompletionBlock = { error in
                 if let error = error {
                     self.receivedError(error)
@@ -434,12 +434,12 @@ extension CloudKitOperation where T: CKFetchRecordChangesOperationType {
         let previousConfigure = configure
         configure = { [unowned self] _op in
             let op = previousConfigure?(_op) ?? _op
-            op.recordZoneID = self.operation.recordZoneID
-            op.previousServerChangeToken = self.operation.previousServerChangeToken
-            op.desiredKeys = self.operation.desiredKeys
-            op.resultsLimit = self.operation.resultsLimit
-            op.recordChangedBlock = self.operation.recordChangedBlock
-            op.recordWithIDWasDeletedBlock = self.operation.recordWithIDWasDeletedBlock
+            op.recordZoneID = self.recordZoneID
+            op.previousServerChangeToken = self.previousServerChangeToken
+            op.desiredKeys = self.desiredKeys
+            op.resultsLimit = self.resultsLimit
+            op.recordChangedBlock = self.recordChangedBlock
+            op.recordWithIDWasDeletedBlock = self.recordWithIDWasDeletedBlock
             op.fetchRecordChangesCompletionBlock = { token, data, error in
                 if let error = error {
                     self.receivedError(error)
@@ -482,7 +482,7 @@ extension CloudKitOperation where T: CKFetchRecordZonesOperationType {
         let previousConfigure = configure
         configure = { [unowned self] _op in
             let op = previousConfigure?(_op) ?? _op
-            op.recordZoneIDs = self.operation.recordZoneIDs
+            op.recordZoneIDs = self.recordZoneIDs
             op.fetchRecordZonesCompletionBlock = { zonesByID, error in
                 if let error = error {
                     self.receivedError(error)
@@ -537,9 +537,10 @@ extension CloudKitOperation where T: CKFetchRecordsOperationType {
         let previousConfigure = configure
         configure = { [unowned self] _op in
             let op = previousConfigure?(_op) ?? _op
-            op.recordIDs = self.operation.recordIDs
-            op.perRecordProgressBlock = self.operation.perRecordProgressBlock
-            op.perRecordCompletionBlock = self.operation.perRecordCompletionBlock
+            op.recordIDs = self.recordIDs
+            op.desiredKeys = self.desiredKeys
+            op.perRecordProgressBlock = self.perRecordProgressBlock
+            op.perRecordCompletionBlock = self.perRecordCompletionBlock
             op.fetchRecordsCompletionBlock = { recordsByID, error in
                 if let error = error {
                     self.receivedError(error)
@@ -582,7 +583,7 @@ extension CloudKitOperation where T: CKFetchSubscriptionsOperationType {
         let previousConfigure = configure
         configure = { [unowned self] _op in
             let op = previousConfigure?(_op) ?? _op
-            op.subscriptionIDs = self.operation.subscriptionIDs
+            op.subscriptionIDs = self.subscriptionIDs
             op.fetchSubscriptionCompletionBlock = { subscriptionsByID, error in
                 if let error = error {
                     self.receivedError(error)
@@ -631,8 +632,8 @@ extension CloudKitOperation where T: CKModifyRecordZonesOperationType {
         let previousConfigure = configure
         configure = { [unowned self] _op in
             let op = previousConfigure?(_op) ?? _op
-            op.recordZonesToSave = self.operation.recordZonesToSave
-            op.recordZoneIDsToDelete = self.operation.recordZoneIDsToDelete
+            op.recordZonesToSave = self.recordZonesToSave
+            op.recordZoneIDsToDelete = self.recordZoneIDsToDelete
             op.modifyRecordZonesCompletionBlock = { saved, deleted, error in
                 if let error = error {
                     self.receivedError(error)
@@ -712,13 +713,13 @@ extension CloudKitOperation where T: CKModifyRecordsOperationType {
         let previousConfigure = configure
         configure = { [unowned self] _op in
             let op = previousConfigure?(_op) ?? _op
-            op.recordsToSave = self.operation.recordsToSave
-            op.recordIDsToDelete = self.operation.recordIDsToDelete
-            op.savePolicy = self.operation.savePolicy
-            op.clientChangeTokenData = self.operation.clientChangeTokenData
-            op.atomic = self.operation.atomic
-            op.perRecordProgressBlock = self.operation.perRecordProgressBlock
-            op.perRecordCompletionBlock = self.operation.perRecordCompletionBlock
+            op.recordsToSave = self.recordsToSave
+            op.recordIDsToDelete = self.recordIDsToDelete
+            op.savePolicy = self.savePolicy
+            op.clientChangeTokenData = self.clientChangeTokenData
+            op.atomic = self.atomic
+            op.perRecordProgressBlock = self.perRecordProgressBlock
+            op.perRecordCompletionBlock = self.perRecordCompletionBlock
             op.modifyRecordsCompletionBlock = { saved, deleted, error in
                 if let error = error {
                     self.receivedError(error)
@@ -767,8 +768,8 @@ extension CloudKitOperation where T: CKModifySubscriptionsOperationType {
         let previousConfigure = configure
         configure = { [unowned self] _op in
             let op = previousConfigure?(_op) ?? _op
-            op.subscriptionsToSave = self.operation.subscriptionsToSave
-            op.subscriptionIDsToDelete = self.operation.subscriptionIDsToDelete
+            op.subscriptionsToSave = self.subscriptionsToSave
+            op.subscriptionIDsToDelete = self.subscriptionIDsToDelete
             op.modifySubscriptionsCompletionBlock = { saved, deleted, error in
                 if let error = error {
                     self.receivedError(error)
@@ -830,10 +831,12 @@ extension CloudKitOperation where T: CKQueryOperationType {
         let previousConfigure = configure
         configure = { [unowned self] _op in
             let op = previousConfigure?(_op) ?? _op
-            op.query = self.operation.query
-            op.cursor = self.operation.cursor
-            op.zoneID = self.operation.zoneID
-            op.recordFetchedBlock = self.operation.recordFetchedBlock
+            op.query = self.query
+            op.cursor = self.cursor
+            op.zoneID = self.zoneID
+            op.desiredKeys = self.desiredKeys
+            op.resultsLimit = self.resultsLimit
+            op.recordFetchedBlock = self.recordFetchedBlock
             op.queryCompletionBlock = { cursor, error in
                 if let error = error {
                     self.receivedError(error)
