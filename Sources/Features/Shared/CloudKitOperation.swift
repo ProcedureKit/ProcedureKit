@@ -592,8 +592,76 @@ extension CloudKitOperation where T: CKFetchSubscriptionsOperationType {
 }
 
 // MARK: - CKModifyRecordZonesOperation
+
+public protocol CKModifyRecordZonesOperationType: CKDatabaseOperationType {
+    var recordZonesToSave: [RecordZone]? { get set }
+    var recordZoneIDsToDelete: [RecordZoneID]? { get set }
+    var modifyRecordZonesCompletionBlock: (([RecordZone]?, [RecordZoneID]?, NSError?) -> Void)? { get set }
+}
+
+extension CKModifyRecordZonesOperation: CKModifyRecordZonesOperationType { }
+
+extension CloudKitOperation where T: CKModifyRecordZonesOperationType {
+
+    public typealias ModifyRecordZonesCompletionBlock = ([T.RecordZone]?, [T.RecordZoneID]?) -> Void
+
+    public var recordZonesToSave: [T.RecordZone]? {
+        get { return operation.recordZonesToSave }
+        set { operation.recordZonesToSave = newValue }
+    }
+
+    public var recordZoneIDsToDelete: [T.RecordZoneID]? {
+        get { return operation.recordZoneIDsToDelete }
+        set { operation.recordZoneIDsToDelete = newValue }
+    }
+
+    public func setModifyRecordZonesCompletionBlock(block: ModifyRecordZonesCompletionBlock?) {
+        guard let block = block else {
+            configure = .None
+            operation.modifyRecordZonesCompletionBlock = .None
+            return
+        }
+
+        let previousConfigure = configure
+        configure = { [unowned self] _op in
+            let op = previousConfigure?(_op) ?? _op
+            op.recordZonesToSave = self.operation.recordZonesToSave
+            op.recordZoneIDsToDelete = self.operation.recordZoneIDsToDelete
+            op.modifyRecordZonesCompletionBlock = { saved, deleted, error in
+                if let error = error {
+                    self.receivedError(error)
+                }
+                else {
+                    block(saved, deleted)
+                    self.finish()
+                }
+            }
+            return op
+        }
+    }
+}
+
+
+
 // MARK: - CKModifyRecordsOperation
 // MARK: - CKModifySubscriptionsOperation
 // MARK: - CKQueryOperation
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
