@@ -22,6 +22,7 @@ class TestCloudOperation: NSOperation, CKOperationType {
     typealias NotificationID = String
     typealias Record = String
     typealias RecordID = String
+    typealias Subscription = String
     typealias DiscoveredUserInfo = String
 
     var container: String? // just a test
@@ -807,6 +808,115 @@ class FetchRecordZonesOperationTests: CloudKitOperationTests {
         XCTAssertEqual(operation.errors.count, 1)
     }
 }
+
+// MARK: - CKFetchRecordsOperation Tests
+
+class TestFetchRecordsOperation: TestDatabaseOperation, CKFetchRecordsOperationType {
+
+    var recordsByID: [RecordID: Record]?
+    var error: NSError?
+
+    var recordIDs: [RecordID]?
+    var desiredKeys: [String]?
+    var perRecordProgressBlock: ((RecordID, Double) -> Void)?
+    var perRecordCompletionBlock: ((Record?, RecordID?, NSError?) -> Void)?
+    var fetchRecordsCompletionBlock: (([RecordID: Record]?, NSError?) -> Void)?
+
+    init(recordsByID: [RecordID: Record]? = .None, error: NSError? = .None) {
+        self.recordsByID = recordsByID
+        self.error = error
+        super.init()
+    }
+
+    override func main() {
+        fetchRecordsCompletionBlock?(recordsByID, error)
+    }
+}
+
+class FetchRecordsOperationTests: CloudKitOperationTests {
+
+    var target: TestFetchRecordsOperation!
+    var operation: CloudKitOperation<TestFetchRecordsOperation>!
+
+    override func setUp() {
+        super.setUp()
+        target = TestFetchRecordsOperation()
+        operation = CloudKitOperation(target)
+    }
+    
+    func test__get_record_ids() {
+        let IDs = [ "an-id", "another-id" ]
+        target.recordIDs = IDs
+        XCTAssertEqual(operation.recordIDs!, IDs)
+    }
+
+    func test__set_record_zone_ids() {
+        let IDs = [ "an-id", "another-id" ]
+        operation.recordIDs = IDs
+        XCTAssertEqual(target.recordIDs!, IDs)
+    }
+
+    func test__get_per_record_progress_block() {
+        target.perRecordProgressBlock = { _, _ in }
+        XCTAssertNotNil(operation.perRecordProgressBlock)
+    }
+
+    func test__set_per_record_progress_block() {
+        operation.perRecordProgressBlock = { _, _ in }
+        XCTAssertNotNil(target.perRecordProgressBlock)
+    }
+
+    func test__get_per_record_completion_block() {
+        target.perRecordCompletionBlock = { _, _, _ in }
+        XCTAssertNotNil(operation.perRecordCompletionBlock)
+    }
+
+    func test__set_per_record_completion_block() {
+        operation.perRecordCompletionBlock = { _, _, _ in }
+        XCTAssertNotNil(target.perRecordCompletionBlock)
+    }
+
+    func test__setting_completion_block() {
+        operation.setFetchRecordsCompletionBlock { _ in
+            // etc
+        }
+        XCTAssertNotNil(operation.configure)
+    }
+
+    func test__setting_completion_block_to_nil() {
+        operation.setFetchRecordsCompletionBlock(.None)
+        XCTAssertNil(operation.configure)
+    }
+
+    func test__success_with_completion_block() {
+        var blockDidRun = false
+        operation.setFetchRecordsCompletionBlock { subscriptionsByID in
+            blockDidRun = true
+        }
+
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        runOperation(operation)
+        waitForExpectationsWithTimeout(3, handler: nil)
+
+        XCTAssertTrue(blockDidRun)
+    }
+
+    func test__error_with_completion_block() {
+        target.error = NSError(domain: CKErrorDomain, code: CKErrorCode.InternalError.rawValue, userInfo: nil)
+
+        operation.setFetchRecordsCompletionBlock { _ in
+            // etc
+        }
+
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        runOperation(operation)
+        waitForExpectationsWithTimeout(3, handler: nil)
+
+        XCTAssertTrue(operation.finished)
+        XCTAssertEqual(operation.errors.count, 1)
+    }
+}
+
 
 
 
