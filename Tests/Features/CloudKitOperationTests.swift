@@ -317,6 +317,39 @@ class DiscoverUserInfosOperationTests: CloudKitOperationTests {
         XCTAssertTrue(operation.finished)
         XCTAssertEqual(operation.errors.count, 1)
     }
+
+    func test__error_with_recovery_block() {
+        target.error = NSError(domain: CKErrorDomain, code: CKErrorCode.InternalError.rawValue, userInfo: nil)
+
+        var receivedError: ErrorType? = .None
+        operation = CloudKitOperation(target) { _, error in
+            receivedError = error
+            return TestDiscoverUserInfosOperation(userInfosByEmailAddress: [:], userInfoByRecordID: [:])
+        }
+
+        operation.emailAddresses = [ "an-email-address" ]
+
+        var userInfosByAddress: [String: TestDiscoverUserInfosOperation.DiscoveredUserInfo]? = .None
+        var userInfosByRecordID: [TestDiscoverUserInfosOperation.RecordID: TestDiscoverUserInfosOperation.DiscoveredUserInfo]? = .None
+
+        operation.setDiscoverUserInfosCompletionBlock { byAddress, byRecordID in
+            userInfosByAddress = byAddress
+            userInfosByRecordID = byRecordID
+        }
+
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        runOperation(operation)
+        waitForExpectationsWithTimeout(3, handler: nil)
+
+        XCTAssertEqual(operation.emailAddresses!, [ "an-email-address" ])
+
+        XCTAssertNotNil(receivedError)
+        XCTAssertNotNil(userInfosByAddress)
+        XCTAssertTrue(userInfosByAddress!.isEmpty)
+
+        XCTAssertNotNil(userInfosByRecordID)
+        XCTAssertTrue(userInfosByRecordID!.isEmpty)
+    }
 }
 
 // MARK: CKFetchNotificationChangesOperation Tests
