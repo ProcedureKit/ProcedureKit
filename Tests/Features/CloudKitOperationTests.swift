@@ -587,4 +587,135 @@ class ModifyBadgeOperationTests: CloudKitOperationTests {
     }
 }
 
+// MARK: - CKFetchRecordChangesOperation Tests
+
+class TestFetchRecordChangesOperation: TestDatabaseOperation, CKFetchRecordChangesOperationType {
+
+    typealias RecordZoneID = String
+    typealias ServerChangeToken = String
+
+    var token: String?
+    var data: NSData?
+    var error: NSError?
+
+    var recordZoneID: RecordZoneID = "zone-id"
+    var previousServerChangeToken: ServerChangeToken? = .None
+    var desiredKeys: [String]? = .None
+    var resultsLimit: Int = 100
+    var recordChangedBlock: ((CKRecord) -> Void)? = .None
+    var recordWithIDWasDeletedBlock: ((CKRecordID) -> Void)? = .None
+    var fetchRecordChangesCompletionBlock: ((ServerChangeToken?, NSData?, NSError?) -> Void)? = .None
+    var moreComing: Bool = false
+
+    init(token: String? = "new-token", data: NSData? = .None, error: NSError? = .None) {
+        self.token = token
+        self.data = data
+        self.error = error
+    }
+
+    override func main() {
+        fetchRecordChangesCompletionBlock?(token, data, error)
+    }
+
+}
+
+class FetchRecordChangesOperationTests: CloudKitOperationTests {
+
+    var target: TestFetchRecordChangesOperation!
+    var operation: CloudKitOperation<TestFetchRecordChangesOperation>!
+
+    override func setUp() {
+        super.setUp()
+        target = TestFetchRecordChangesOperation()
+        operation = CloudKitOperation(target)
+    }
+
+    func test__get_record_zone_id() {
+        XCTAssertEqual(operation.recordZoneID, "zone-id")
+    }
+
+    func test__set_record_zone_id() {
+        operation.recordZoneID = "a-different-zone-id"
+        XCTAssertEqual(target.recordZoneID, "a-different-zone-id")
+    }
+
+    func test__get_desired_keys() {
+        let keys = [ "desired-key-1",  "desired-key-2" ]
+        target.desiredKeys = keys
+        XCTAssertNotNil(operation.desiredKeys)
+        XCTAssertEqual(operation.desiredKeys!, keys)
+    }
+
+    func test__set_desired_keys() {
+        let keys = [ "desired-key-1",  "desired-key-2" ]
+        operation.desiredKeys = keys
+        XCTAssertNotNil(target.desiredKeys)
+        XCTAssertEqual(target.desiredKeys!, keys)
+    }
+
+    func test__get_record_changed_block() {
+        target.recordChangedBlock = { _ in }
+        XCTAssertNotNil(operation.recordChangedBlock)
+    }
+    
+    func test__set_record_changed_block() {
+        operation.recordChangedBlock = { _ in }
+        XCTAssertNotNil(target.recordChangedBlock)
+    }
+
+    func test__get_record_with_id_was_deleted_block() {
+        target.recordWithIDWasDeletedBlock = { _ in }
+        XCTAssertNotNil(operation.recordWithIDWasDeletedBlock)
+    }
+
+    func test__set_record_with_id_was_deleted_block() {
+        operation.recordWithIDWasDeletedBlock = { _ in }
+        XCTAssertNotNil(target.recordWithIDWasDeletedBlock)
+    }
+
+    func test__setting_completion_block() {
+        operation.setFetchRecordChangesCompletionBlock { _ in
+            // etc
+        }
+        XCTAssertNotNil(operation.configure)
+    }
+
+    func test__setting_completion_block_to_nil() {
+        operation.setFetchRecordChangesCompletionBlock(.None)
+        XCTAssertNil(operation.configure)
+    }
+
+    func test__success_with_completion_block() {
+        var blockDidRun = false
+        operation.setFetchRecordChangesCompletionBlock { token, data in
+            blockDidRun = true
+        }
+
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        runOperation(operation)
+        waitForExpectationsWithTimeout(3, handler: nil)
+
+        XCTAssertTrue(blockDidRun)
+    }
+
+    func test__error_with_completion_block() {
+        target.error = NSError(domain: CKErrorDomain, code: CKErrorCode.InternalError.rawValue, userInfo: nil)
+
+        operation.setFetchRecordChangesCompletionBlock { _, _ in
+            // etc
+        }
+
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        runOperation(operation)
+        waitForExpectationsWithTimeout(3, handler: nil)
+
+        XCTAssertTrue(operation.finished)
+        XCTAssertEqual(operation.errors.count, 1)
+    }
+}
+
+
+
+
+
 
