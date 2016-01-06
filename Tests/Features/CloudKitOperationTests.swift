@@ -1002,6 +1002,106 @@ class FetchSubscriptionsOperationTests: CloudKitOperationTests {
     }
 }
 
+// MARK: - CKModifyRecordZonesOperation Tests
+
+class TestModifyRecordZonesOperation: TestDatabaseOperation, CKModifyRecordZonesOperationType {
+
+    var saved: [RecordZone]?
+    var deleted: [RecordZoneID]?
+    var error: NSError?
+
+    var recordZonesToSave: [RecordZone]?
+    var recordZoneIDsToDelete: [RecordZoneID]?
+    var modifyRecordZonesCompletionBlock: (([RecordZone]?, [RecordZoneID]?, NSError?) -> Void)?
+
+    init(saved: [RecordZone]? = .None, deleted: [RecordZoneID]? = .None, error: NSError? = .None) {
+        self.saved = saved
+        self.deleted = deleted
+        self.error = error
+        super.init()
+    }
+
+    override func main() {
+        modifyRecordZonesCompletionBlock?(saved, deleted, error)
+    }
+}
+
+class ModifyRecordZonesOperationTests: CloudKitOperationTests {
+
+    var target: TestModifyRecordZonesOperation!
+    var operation: CloudKitOperation<TestModifyRecordZonesOperation>!
+
+    override func setUp() {
+        super.setUp()
+        target = TestModifyRecordZonesOperation()
+        operation = CloudKitOperation(target)
+    }
+
+    func test__get_zones_to_save() {
+        let zones = [ "a-zone", "another-zone" ]
+        target.recordZonesToSave = zones
+        XCTAssertEqual(operation.recordZonesToSave!, zones)
+    }
+
+    func test__set_zones_to_save() {
+        let zones = [ "a-zone", "another-zone" ]
+        operation.recordZonesToSave = zones
+        XCTAssertEqual(target.recordZonesToSave!, zones)
+    }
+
+    func test__get_zone_ids_to_delete() {
+        let zoneIDs = [ "a-zone-id", "another-zone-id" ]
+        target.recordZoneIDsToDelete = zoneIDs
+        XCTAssertEqual(operation.recordZoneIDsToDelete!, zoneIDs)
+    }
+
+    func test__set_zone_ids_to_delete() {
+        let zoneIDs = [ "a-zone-id", "another-zone-id" ]
+        operation.recordZoneIDsToDelete = zoneIDs
+        XCTAssertEqual(target.recordZoneIDsToDelete!, zoneIDs)
+    }
+
+    func test__setting_completion_block() {
+        operation.setModifyRecordZonesCompletionBlock { _ in
+            // etc
+        }
+        XCTAssertNotNil(operation.configure)
+    }
+
+    func test__setting_completion_block_to_nil() {
+        operation.setModifyRecordZonesCompletionBlock(.None)
+        XCTAssertNil(operation.configure)
+    }
+
+    func test__success_with_completion_block() {
+        var blockDidRun = false
+        operation.setModifyRecordZonesCompletionBlock { subscriptionsByID in
+            blockDidRun = true
+        }
+
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        runOperation(operation)
+        waitForExpectationsWithTimeout(3, handler: nil)
+
+        XCTAssertTrue(blockDidRun)
+    }
+
+    func test__error_with_completion_block() {
+        target.error = NSError(domain: CKErrorDomain, code: CKErrorCode.InternalError.rawValue, userInfo: nil)
+
+        operation.setModifyRecordZonesCompletionBlock { _ in
+            // etc
+        }
+
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        runOperation(operation)
+        waitForExpectationsWithTimeout(3, handler: nil)
+
+        XCTAssertTrue(operation.finished)
+        XCTAssertEqual(operation.errors.count, 1)
+    }
+}
+
 
 
 
