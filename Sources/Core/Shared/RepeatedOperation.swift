@@ -313,7 +313,7 @@ public class RepeatedOperation<T where T: NSOperation>: GroupOperation {
      the maximum number of operations which will be executed.
      - parameter: (unnamed) the AnyGenerator<T> generator.
     */
-    public init<G where G: GeneratorType, G.Element == NSTimeInterval>(delay: G, maxCount max: Int? = .None, _ generator: AnyGenerator<T>) {
+    public init<G where G: GeneratorType, G.Element == NSTimeInterval>(delay: G, maxCount max: Int?, _ generator: AnyGenerator<T>) {
         operation = generator.next()
         guard let op = operation else {
             preconditionFailure("The generator must return an operation to start with.")
@@ -404,13 +404,19 @@ public class RepeatedOperation<T where T: NSOperation>: GroupOperation {
      
      Subclasses which override, should almost certainly call
      super.
+     
+     - parameter shouldAddNext: closure which returns a Bool. Defaults 
+     to return true. Subclasses may inject additional logic here which
+     can prevent another operation from being added.
     */
-    public func addNextOperation() {
+    public func addNextOperation(@autoclosure shouldAddNext: () -> Bool = true) {
         operation = generator.next()
         if let op = operation, delay = nextDelayOperation() {
-            op.addDependency(delay)
-            addOperations(delay, op)
-            count += 1
+            if shouldAddNext() {
+                op.addDependency(delay)
+                addOperations(delay, op)
+                count += 1
+            }
         }
     }
 
@@ -484,11 +490,28 @@ extension RepeatedOperation where T: Repeatable {
     }
 }
 
+/**
+ RepeatableOperation is an Operation subclass which conforms to Repeatable.
+ 
+ It can be used to make an otherwise non-repeatable Operation repeatable. It
+ does this by accepting, in addition to the operation instance, a closure
+ shouldRepeat. This closure can be used to capture state (such as errors).
+ 
+ When conforming to Repeatable, the closure is executed, passing in the 
+ current repeat count.
+*/
 public class RepeatableOperation<T: Operation>: Operation, OperationDidFinishObserver, Repeatable {
 
     let operation: T
     let shouldRepeatBlock: Int -> Bool
 
+    /**
+     Initialize the RepeatableOperation with an operation and
+     shouldRepeat closure.
+     
+     - parameter [unnamed] operation: the operation instance.
+     - parameter shouldRepeat: a closure of type Int -> Bool
+    */
     public init(_ operation: T, shouldRepeat: Int -> Bool) {
         self.operation = operation
         self.shouldRepeatBlock = shouldRepeat
@@ -499,6 +522,7 @@ public class RepeatableOperation<T: Operation>: Operation, OperationDidFinishObs
         })
     }
 
+    /// Override implementation of execute
     public override func execute() {
         if !cancelled {
             operation.addObserver(self)
@@ -506,10 +530,12 @@ public class RepeatableOperation<T: Operation>: Operation, OperationDidFinishObs
         }
     }
 
+    /// Implementation for Repeatable
     public func shouldRepeat(count: Int) -> Bool {
         return shouldRepeatBlock(count)
     }
 
+    /// Implementation for OperationDidFinishObserver
     public func operationDidFinish(operation: Operation, errors: [ErrorType]) {
         if self.operation == operation {
             finish(errors)
