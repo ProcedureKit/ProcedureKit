@@ -313,7 +313,7 @@ public class RepeatedOperation<T where T: NSOperation>: GroupOperation {
      the maximum number of operations which will be executed.
      - parameter: (unnamed) the AnyGenerator<T> generator.
     */
-    public init<G where G: GeneratorType, G.Element == NSTimeInterval>(delay: G, maxCount max: Int? = .None, _ generator: AnyGenerator<T>) {
+    public init<G where G: GeneratorType, G.Element == NSTimeInterval>(delay: G, maxCount max: Int?, _ generator: AnyGenerator<T>) {
         operation = generator.next()
         guard let op = operation else {
             preconditionFailure("The generator must return an operation to start with.")
@@ -404,13 +404,19 @@ public class RepeatedOperation<T where T: NSOperation>: GroupOperation {
      
      Subclasses which override, should almost certainly call
      super.
+     
+     - parameter shouldAddNext: closure which returns a Bool. Defaults 
+     to return true. Subclasses may inject additional logic here which
+     can prevent another operation from being added.
     */
-    public func addNextOperation() {
+    public func addNextOperation(@autoclosure shouldAddNext: () -> Bool = true) {
         operation = generator.next()
         if let op = operation, delay = nextDelayOperation() {
-            op.addDependency(delay)
-            addOperations(delay, op)
-            count += 1
+            if shouldAddNext() {
+                op.addDependency(delay)
+                addOperations(delay, op)
+                count += 1
+            }
         }
     }
 

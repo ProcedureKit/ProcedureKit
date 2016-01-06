@@ -31,18 +31,30 @@ class OperationWhichFailsThenSucceeds: Operation {
 
 class RetryOperationTests: OperationTests {
 
-    var operation: RetryOperation<OperationWhichFailsThenSucceeds>!
+    typealias RetryOp = RetryOperation<OperationWhichFailsThenSucceeds>
+    typealias RetryBlock = RetryOp.ShouldRetryBlock
 
-    func test__retry_operation() {
+    var operation: RetryOp!
+    var numberOfFailures: Int = 0
 
-        var numberOfFailures = 0
-        operation = RetryOperation {
-            let op = OperationWhichFailsThenSucceeds { return numberOfFailures < 2 }
+    override func setUp() {
+        super.setUp()
+        numberOfFailures = 0
+    }
+
+    func producer(threshold: Int) -> () -> OperationWhichFailsThenSucceeds {
+        return { [unowned self] in
+            let op = OperationWhichFailsThenSucceeds { return self.numberOfFailures < threshold }
             op.addObserver(StartedObserver { _ in
-                numberOfFailures += 1
+                self.numberOfFailures += 1
             })
             return op
         }
+    }
+
+    func test__retry_operation() {
+
+        operation = RetryOperation(producer(2))
 
         addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
         runOperation(operation)
@@ -53,15 +65,8 @@ class RetryOperationTests: OperationTests {
     }
 
     func test__retry_operation_where_max_count_is_reached() {
-        var numberOfFailures = 0
-        operation = RetryOperation(maxCount: 5) {
-            let op = OperationWhichFailsThenSucceeds { return numberOfFailures < 9 }
-            op.addObserver(StartedObserver { _ in
-                numberOfFailures += 1
-            })
-            return op
-        }
 
+        operation = RetryOperation(producer(9))
 
         addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
         runOperation(operation)
@@ -69,6 +74,35 @@ class RetryOperationTests: OperationTests {
 
         XCTAssertTrue(operation.finished)
         XCTAssertEqual(operation.count, 5)
+    }
 
+    func test__retry_using_should_retry_block() {
+
+        var retryErrors: [ErrorType]? = .None
+        var retryAggregateErrors: [ErrorType]? = .None
+        var retryCount: Int = 0
+        var didRunBlockCount: Int = 0
+        let retry: RetryBlock = { op, errors, aggregateErrors, count in
+            retryErrors = errors
+            retryAggregateErrors = aggregateErrors
+            retryCount = count
+            didRunBlockCount += 1
+            return true
+        }
+
+        operation = RetryOperation(shouldRetry: retry, producer(3))
+
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        runOperation(operation)
+        waitForExpectationsWithTimeout(3, handler: nil)
+
+        XCTAssertTrue(operation.finished)
+        XCTAssertEqual(operation.count, 3)
+        XCTAssertEqual(didRunBlockCount, 2)
+        XCTAssertNotNil(retryErrors)
+        XCTAssertEqual(retryErrors!.count, 1)
+        XCTAssertNotNil(retryAggregateErrors)
+        XCTAssertEqual(retryAggregateErrors!.count, 2)
+        XCTAssertEqual(retryCount, 2)
     }
 }
