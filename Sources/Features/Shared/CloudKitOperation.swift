@@ -730,6 +730,55 @@ extension CloudKitOperation where T: CKModifyRecordsOperationType {
 }
 
 // MARK: - CKModifySubscriptionsOperation
+
+public protocol CKModifySubscriptionsOperationType: CKDatabaseOperationType {
+    var subscriptionsToSave: [Subscription]? { get set }
+    var subscriptionIDsToDelete: [String]? { get set }
+    var modifySubscriptionsCompletionBlock: (([Subscription]?, [String]?, NSError?) -> Void)? { get set }
+}
+
+extension CKModifySubscriptionsOperation: CKModifySubscriptionsOperationType { }
+
+extension CloudKitOperation where T: CKModifySubscriptionsOperationType {
+
+    public typealias ModifySubscriptionsCompletionBlock = ([T.Subscription]?, [String]?) -> Void
+
+    public var subscriptionsToSave: [T.Subscription]? {
+        get { return operation.subscriptionsToSave }
+        set { operation.subscriptionsToSave = newValue }
+    }
+
+    public var subscriptionIDsToDelete: [String]? {
+        get { return operation.subscriptionIDsToDelete }
+        set { operation.subscriptionIDsToDelete = newValue }
+    }
+
+    public func setModifySubscriptionsCompletionBlock(block: ModifySubscriptionsCompletionBlock?) {
+        guard let block = block else {
+            configure = .None
+            operation.modifySubscriptionsCompletionBlock = .None
+            return
+        }
+
+        let previousConfigure = configure
+        configure = { [unowned self] _op in
+            let op = previousConfigure?(_op) ?? _op
+            op.subscriptionsToSave = self.operation.subscriptionsToSave
+            op.subscriptionIDsToDelete = self.operation.subscriptionIDsToDelete
+            op.modifySubscriptionsCompletionBlock = { saved, deleted, error in
+                if let error = error {
+                    self.receivedError(error)
+                }
+                else {
+                    block(saved, deleted)
+                    self.finish()
+                }
+            }
+            return op
+        }
+    }
+}
+
 // MARK: - CKQueryOperation
 
 
