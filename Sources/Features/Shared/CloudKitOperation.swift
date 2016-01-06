@@ -18,6 +18,8 @@ public protocol CKOperationType: class {
     typealias Subscription
     typealias RecordSavePolicy
     typealias DiscoveredUserInfo
+    typealias Query
+    typealias QueryCursor
 
     typealias RecordZoneID: Hashable
     typealias NotificationID: Hashable
@@ -87,6 +89,8 @@ extension CKOperation: CKOperationType {
     public typealias RecordID = CKRecordID
     public typealias Subscription = CKSubscription
     public typealias RecordSavePolicy = CKRecordSavePolicy
+    public typealias Query = CKQuery
+    public typealias QueryCursor = CKQueryCursor
 }
 
 extension CloudKitOperation where T: CKOperationType {
@@ -780,6 +784,69 @@ extension CloudKitOperation where T: CKModifySubscriptionsOperationType {
 }
 
 // MARK: - CKQueryOperation
+
+public protocol CKQueryOperationType: CKDatabaseOperationType, CKResultsLimit, CKDesiredKeys {
+
+    var query: Query? { get set }
+    var cursor: QueryCursor? { get set }
+    var zoneID: RecordZoneID? { get set }
+    var recordFetchedBlock: ((Record) -> Void)? { get set }
+    var queryCompletionBlock: ((QueryCursor?, NSError?) -> Void)? { get set }
+}
+
+extension CKQueryOperation: CKQueryOperationType { }
+
+extension CloudKitOperation where T: CKQueryOperationType {
+
+    public typealias QueryCompletionBlock = T.QueryCursor? -> Void
+
+    public var query: T.Query? {
+        get { return operation.query }
+        set { operation.query = newValue }
+    }
+
+    public var cursor: T.QueryCursor? {
+        get { return operation.cursor }
+        set { operation.cursor = newValue }
+    }
+
+    public var zoneID: T.RecordZoneID? {
+        get { return operation.zoneID }
+        set { operation.zoneID = newValue }
+    }
+
+    public var recordFetchedBlock: ((T.Record) -> Void)? {
+        get { return operation.recordFetchedBlock }
+        set { operation.recordFetchedBlock = newValue }
+    }
+
+    public func setQueryCompletionBlock(block: QueryCompletionBlock?) {
+        guard let block = block else {
+            configure = .None
+            operation.queryCompletionBlock = .None
+            return
+        }
+
+        let previousConfigure = configure
+        configure = { [unowned self] _op in
+            let op = previousConfigure?(_op) ?? _op
+            op.query = self.operation.query
+            op.cursor = self.operation.cursor
+            op.zoneID = self.operation.zoneID
+            op.recordFetchedBlock = self.operation.recordFetchedBlock
+            op.queryCompletionBlock = { cursor, error in
+                if let error = error {
+                    self.receivedError(error)
+                }
+                else {
+                    block(cursor)
+                    self.finish()
+                }
+            }
+            return op
+        }
+    }
+}
 
 
 
