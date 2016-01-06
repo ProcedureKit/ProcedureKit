@@ -11,6 +11,16 @@ import CloudKit
 
 public protocol CKOperationType: class {
     typealias Container
+    typealias ServerChangeToken
+    typealias Notification
+    typealias RecordZone
+    typealias Record
+    typealias DiscoveredUserInfo
+
+    typealias RecordZoneID: Hashable
+    typealias NotificationID: Hashable
+    typealias RecordID: Hashable
+
     var container: Container? { get set }
 }
 
@@ -63,7 +73,17 @@ public class CloudKitOperation<T where T: CKOperationType, T: NSOperation>: Oper
 
 // MARK: - CKOperationType
 
-extension CKOperation: CKOperationType { }
+extension CKOperation: CKOperationType {
+    public typealias Container = CKContainer
+    public typealias ServerChangeToken = CKServerChangeToken
+    public typealias RecordZone = CKRecordZone
+    public typealias RecordZoneID = CKRecordZoneID
+    public typealias Notification = CKNotification
+    public typealias NotificationID = CKNotificationID
+    public typealias Record = CKRecord
+    public typealias RecordID = CKRecordID
+    public typealias DiscoveredUserInfo = CKDiscoveredUserInfo
+}
 
 extension CloudKitOperation where T: CKOperationType {
 
@@ -80,7 +100,9 @@ public protocol CKDatabaseOperationType: CKOperationType {
     var database: Database? { get set }
 }
 
-extension CKDatabaseOperation: CKDatabaseOperationType { }
+extension CKDatabaseOperation: CKDatabaseOperationType {
+    public typealias Database = CKDatabase
+}
 
 extension CloudKitOperation where T: CKDatabaseOperationType {
 
@@ -93,14 +115,14 @@ extension CloudKitOperation where T: CKDatabaseOperationType {
 // MARK: - CKDiscoverAllContactsOperation
 
 public protocol CKDiscoverAllContactsOperationType: CKOperationType {
-    var discoverAllContactsCompletionBlock: (([CKDiscoveredUserInfo]?, NSError?) -> Void)? { get set }
+    var discoverAllContactsCompletionBlock: (([DiscoveredUserInfo]?, NSError?) -> Void)? { get set }
 }
 
 extension CKDiscoverAllContactsOperation: CKDiscoverAllContactsOperationType { }
 
 extension CloudKitOperation where T: CKDiscoverAllContactsOperationType {
 
-    public typealias DiscoverAllContactsCompletionBlock = [CKDiscoveredUserInfo]? -> Void
+    public typealias DiscoverAllContactsCompletionBlock = [T.DiscoveredUserInfo]? -> Void
 
     public func setDiscoverAllContactsCompletionBlock(block: DiscoverAllContactsCompletionBlock?) {
         guard let block = block else {
@@ -130,22 +152,22 @@ extension CloudKitOperation where T: CKDiscoverAllContactsOperationType {
 
 public protocol CKDiscoverUserInfosOperationType: CKOperationType {
     var emailAddresses: [String]? { get set }
-    var userRecordIDs: [CKRecordID]? { get set }
-    var discoverUserInfosCompletionBlock: (([String: CKDiscoveredUserInfo]?, [CKRecordID: CKDiscoveredUserInfo]?, NSError?) -> Void)? { get set }
+    var userRecordIDs: [RecordID]? { get set }
+    var discoverUserInfosCompletionBlock: (([String: DiscoveredUserInfo]?, [RecordID: DiscoveredUserInfo]?, NSError?) -> Void)? { get set }
 }
 
 extension CKDiscoverUserInfosOperation: CKDiscoverUserInfosOperationType { }
 
 extension CloudKitOperation where T: CKDiscoverUserInfosOperationType {
 
-    public typealias DiscoverUserInfosCompletionBlock = ([String: CKDiscoveredUserInfo]?, [CKRecordID: CKDiscoveredUserInfo]?) -> Void
+    public typealias DiscoverUserInfosCompletionBlock = ([String: T.DiscoveredUserInfo]?, [T.RecordID: T.DiscoveredUserInfo]?) -> Void
 
     public var emailAddresses: [String]? {
         get { return operation.emailAddresses }
         set { operation.emailAddresses = newValue }
     }
 
-    public var userRecordIDs: [CKRecordID]? {
+    public var userRecordIDs: [T.RecordID]? {
         get { return operation.userRecordIDs }
         set { operation.userRecordIDs = newValue }
     }
@@ -180,8 +202,6 @@ extension CloudKitOperation where T: CKDiscoverUserInfosOperationType {
 // MARK: - CKFetchOperationType
 
 public protocol CKFetchOperationType: CKOperationType {
-    typealias ServerChangeToken
-
     var previousServerChangeToken: ServerChangeToken? { get set }
     var resultsLimit: Int { get set }
     var moreComing: Bool { get }
@@ -208,18 +228,18 @@ extension CloudKitOperation where T: CKFetchOperationType {
 
 public protocol CKFetchNotificationChangesOperationType: CKFetchOperationType {
 
-    var notificationChangedBlock: ((CKNotification) -> Void)? { get set }
-    var fetchNotificationChangesCompletionBlock: ((CKServerChangeToken?, NSError?) -> Void)? { get set }
+    var notificationChangedBlock: ((Notification) -> Void)? { get set }
+    var fetchNotificationChangesCompletionBlock: ((ServerChangeToken?, NSError?) -> Void)? { get set }
 }
 
 extension CKFetchNotificationChangesOperation: CKFetchNotificationChangesOperationType { }
 
 extension CloudKitOperation where T: CKFetchNotificationChangesOperationType {
 
-    public typealias FetchNotificationChangesChangedBlock = CKNotification -> Void
-    public typealias FetchNotificationChangesCompletionBlock = CKServerChangeToken? -> Void
+    public typealias FetchNotificationChangesChangedBlock = T.Notification -> Void
+    public typealias FetchNotificationChangesCompletionBlock = T.ServerChangeToken? -> Void
 
-    public var notificationChangedBlock: ((CKNotification) -> Void)? {
+    public var notificationChangedBlock: ((T.Notification) -> Void)? {
         get { return operation.notificationChangedBlock }
         set { operation.notificationChangedBlock = newValue }
     }
@@ -254,7 +274,6 @@ extension CloudKitOperation where T: CKFetchNotificationChangesOperationType {
 // MARK: - CKMarkNotificationsReadOperation
 
 public protocol CKMarkNotificationsReadOperationType: CKOperationType {
-    typealias NotificationID
     var notificationIDs: [NotificationID] { get set }
     var markNotificationsReadCompletionBlock: (([NotificationID]?, NSError?) -> Void)? { get set }
 }
@@ -341,13 +360,11 @@ extension CloudKitOperation where T: CKModifyBadgeOperationType {
 // MARK: - CKFetchRecordChangesOperation
 
 public protocol CKFetchRecordChangesOperationType: CKFetchOperationType, CKDatabaseOperationType {
-    typealias RecordZoneID
-    typealias ServerChangeToken
 
     var recordZoneID: RecordZoneID { get set }
     var desiredKeys: [String]? { get set }
-    var recordChangedBlock: ((CKRecord) -> Void)? { get set }
-    var recordWithIDWasDeletedBlock: ((CKRecordID) -> Void)? { get set }
+    var recordChangedBlock: ((Record) -> Void)? { get set }
+    var recordWithIDWasDeletedBlock: ((RecordID) -> Void)? { get set }
     var fetchRecordChangesCompletionBlock: ((ServerChangeToken?, NSData?, NSError?) -> Void)? { get set }
 }
 
@@ -367,12 +384,12 @@ extension CloudKitOperation where T: CKFetchRecordChangesOperationType {
         set { operation.desiredKeys = newValue }
     }
 
-    public var recordChangedBlock: ((CKRecord) -> Void)? {
+    public var recordChangedBlock: ((T.Record) -> Void)? {
         get { return operation.recordChangedBlock }
         set { operation.recordChangedBlock = newValue }
     }
 
-    public var recordWithIDWasDeletedBlock: ((CKRecordID) -> Void)? {
+    public var recordWithIDWasDeletedBlock: ((T.RecordID) -> Void)? {
         get { return operation.recordWithIDWasDeletedBlock }
         set { operation.recordWithIDWasDeletedBlock = newValue }
     }
@@ -408,6 +425,49 @@ extension CloudKitOperation where T: CKFetchRecordChangesOperationType {
 }
 
 // MARK: - CKFetchRecordZonesOperation
+
+public protocol CKFetchRecordZonesOperationType: CKDatabaseOperationType {
+    var recordZoneIDs: [RecordZoneID]? { get set }
+    var fetchRecordZonesCompletionBlock: (([RecordZoneID: RecordZone]?, NSError?) -> Void)? { get set }
+}
+
+extension CKFetchRecordZonesOperation: CKFetchRecordZonesOperationType { }
+
+extension CloudKitOperation where T: CKFetchRecordZonesOperationType {
+
+    public typealias FetchRecordZonesCompletionBlock = [T.RecordZoneID: T.RecordZone]? -> Void
+
+    public var recordZoneIDs: [T.RecordZoneID]? {
+        get { return operation.recordZoneIDs }
+        set { operation.recordZoneIDs = newValue }
+    }
+
+    public func setFetchRecordZonesCompletionBlock(block: FetchRecordZonesCompletionBlock?) {
+        guard let block = block else {
+            configure = .None
+            operation.fetchRecordZonesCompletionBlock = .None
+            return
+        }
+
+        let previousConfigure = configure
+        configure = { [unowned self] _op in
+            let op = previousConfigure?(_op) ?? _op
+            op.recordZoneIDs = self.operation.recordZoneIDs
+            op.fetchRecordZonesCompletionBlock = { zonesByID, error in
+                if let error = error {
+                    self.receivedError(error)
+                }
+                else {
+                    block(zonesByID)
+                    self.finish()
+                }
+            }
+            return op
+        }
+    }
+}
+
+
 // MARK: - CKFetchRecordsOperation
 // MARK: - CKFetchSubscriptionsOperation
 // MARK: - CKModifyRecordZonesOperation
