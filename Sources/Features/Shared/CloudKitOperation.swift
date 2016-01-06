@@ -16,6 +16,7 @@ public protocol CKOperationType: class {
     typealias RecordZone
     typealias Record
     typealias Subscription
+    typealias RecordSavePolicy
     typealias DiscoveredUserInfo
 
     typealias RecordZoneID: Hashable
@@ -85,6 +86,7 @@ extension CKOperation: CKOperationType {
     public typealias Record = CKRecord
     public typealias RecordID = CKRecordID
     public typealias Subscription = CKSubscription
+    public typealias RecordSavePolicy = CKRecordSavePolicy
 }
 
 extension CloudKitOperation where T: CKOperationType {
@@ -641,9 +643,92 @@ extension CloudKitOperation where T: CKModifyRecordZonesOperationType {
     }
 }
 
-
-
 // MARK: - CKModifyRecordsOperation
+
+public protocol CKModifyRecordsOperationType: CKDatabaseOperationType {
+    var recordsToSave: [Record]? { get set }
+    var recordIDsToDelete: [RecordID]? { get set }
+    var savePolicy: RecordSavePolicy { get set }
+    var clientChangeTokenData: NSData? { get set }
+    var atomic: Bool { get set }
+
+    var perRecordProgressBlock: ((Record, Double) -> Void)? { get set }
+    var perRecordCompletionBlock: ((Record?, NSError?) -> Void)? { get set }
+    var modifyRecordsCompletionBlock: (([Record]?, [RecordID]?, NSError?) -> Void)? { get set }
+}
+
+extension CKModifyRecordsOperation: CKModifyRecordsOperationType { }
+
+extension CloudKitOperation where T: CKModifyRecordsOperationType {
+
+    public typealias ModifyRecordsCompletionBlock = ([T.Record]?, [T.RecordID]?) -> Void
+
+    public var recordsToSave: [T.Record]? {
+        get { return operation.recordsToSave }
+        set { operation.recordsToSave = newValue }
+    }
+
+    public var recordIDsToDelete: [T.RecordID]? {
+        get { return operation.recordIDsToDelete }
+        set { operation.recordIDsToDelete = newValue }
+    }
+
+    public var savePolicy: T.RecordSavePolicy {
+        get { return operation.savePolicy }
+        set { operation.savePolicy = newValue }
+    }
+
+    public var clientChangeTokenData: NSData? {
+        get { return operation.clientChangeTokenData }
+        set { operation.clientChangeTokenData = newValue }
+    }
+
+    public var atomic: Bool {
+        get { return operation.atomic }
+        set { operation.atomic = newValue }
+    }
+
+    public var perRecordProgressBlock: ((T.Record, Double) -> Void)? {
+        get { return operation.perRecordProgressBlock }
+        set { operation.perRecordProgressBlock = newValue }
+    }
+
+    public var perRecordCompletionBlock: ((T.Record?, NSError?) -> Void)? {
+        get { return operation.perRecordCompletionBlock }
+        set { operation.perRecordCompletionBlock = newValue }
+    }
+
+    public func setModifyRecordsCompletionBlock(block: ModifyRecordsCompletionBlock?) {
+        guard let block = block else {
+            configure = .None
+            operation.modifyRecordsCompletionBlock = .None
+            return
+        }
+
+        let previousConfigure = configure
+        configure = { [unowned self] _op in
+            let op = previousConfigure?(_op) ?? _op
+            op.recordsToSave = self.operation.recordsToSave
+            op.recordIDsToDelete = self.operation.recordIDsToDelete
+            op.savePolicy = self.operation.savePolicy
+            op.clientChangeTokenData = self.operation.clientChangeTokenData
+            op.atomic = self.operation.atomic
+            op.perRecordProgressBlock = self.operation.perRecordProgressBlock
+            op.perRecordCompletionBlock = self.operation.perRecordCompletionBlock
+            op.modifyRecordsCompletionBlock = { saved, deleted, error in
+                if let error = error {
+                    self.receivedError(error)
+                }
+                else {
+                    block(saved, deleted)
+                    self.finish()
+                }
+            }
+            return op
+        }
+    }
+}
+
 // MARK: - CKModifySubscriptionsOperation
 // MARK: - CKQueryOperation
 

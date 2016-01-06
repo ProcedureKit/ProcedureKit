@@ -23,6 +23,7 @@ class TestCloudOperation: NSOperation, CKOperationType {
     typealias Record = String
     typealias RecordID = String
     typealias Subscription = String
+    typealias RecordSavePolicy = Int
     typealias DiscoveredUserInfo = String
 
     var container: String? // just a test
@@ -1102,7 +1103,163 @@ class ModifyRecordZonesOperationTests: CloudKitOperationTests {
     }
 }
 
+// MARK: - CKModifyRecordsOperation Tests
 
+class TestModifyRecordsOperation: TestDatabaseOperation, CKModifyRecordsOperationType {
+
+    var saved: [Record]?
+    var deleted: [RecordID]?
+    var error: NSError?
+
+    var recordsToSave: [Record]?
+    var recordIDsToDelete: [RecordID]?
+    var savePolicy: RecordSavePolicy = 0
+    var clientChangeTokenData: NSData?
+    var atomic: Bool = true
+
+    var perRecordProgressBlock: ((Record, Double) -> Void)?
+    var perRecordCompletionBlock: ((Record?, NSError?) -> Void)?
+    var modifyRecordsCompletionBlock: (([Record]?, [RecordID]?, NSError?) -> Void)?
+
+    init(saved: [Record]? = .None, deleted: [RecordID]? = .None, error: NSError? = .None) {
+        self.saved = saved
+        self.deleted = deleted
+        self.error = error
+        super.init()
+    }
+
+    override func main() {
+        modifyRecordsCompletionBlock?(saved, deleted, error)
+    }
+}
+
+class ModifyRecordsOperationTests: CloudKitOperationTests {
+
+    var target: TestModifyRecordsOperation!
+    var operation: CloudKitOperation<TestModifyRecordsOperation>!
+
+    override func setUp() {
+        super.setUp()
+        target = TestModifyRecordsOperation()
+        operation = CloudKitOperation(target)
+    }
+    
+    func test__get_records_to_save() {
+        let records = [ "a-record", "another-record" ]
+        target.recordsToSave = records
+        XCTAssertEqual(operation.recordsToSave!, records)
+    }
+
+    func test__set_records_to_save() {
+        let records = [ "a-record", "another-record" ]
+        operation.recordsToSave = records
+        XCTAssertEqual(target.recordsToSave!, records)
+    }
+
+    func test__get_record_ids_to_delete() {
+        let recordIDs = [ "a-record-id", "another-record-id" ]
+        target.recordIDsToDelete = recordIDs
+        XCTAssertEqual(operation.recordIDsToDelete!, recordIDs)
+    }
+
+    func test__set_record_ids_to_delete() {
+        let recordIDs = [ "a-record-id", "another-record-id" ]
+        operation.recordIDsToDelete = recordIDs
+        XCTAssertEqual(target.recordIDsToDelete!, recordIDs)
+    }
+
+    func test__get_save_policy() {
+        target.savePolicy = 100
+        XCTAssertEqual(operation.savePolicy, 100)
+    }
+
+    func test__set_save_policy() {
+        operation.savePolicy = 100
+        XCTAssertEqual(target.savePolicy, 100)
+    }
+
+    func test__get_client_change_token_data() {
+        let data = "this-is-some-data".dataUsingEncoding(NSUTF8StringEncoding)
+        target.clientChangeTokenData = data
+        XCTAssertEqual(operation.clientChangeTokenData, data)
+    }
+
+    func test__set_client_change_token_data() {
+        let data = "this-is-some-data".dataUsingEncoding(NSUTF8StringEncoding)
+        operation.clientChangeTokenData = data
+        XCTAssertEqual(target.clientChangeTokenData, data)
+    }
+
+    func test__get_atomic() {
+        target.atomic = true
+        XCTAssertTrue(operation.atomic)
+    }
+
+    func test__set_atomic() {
+        operation.atomic = true
+        XCTAssertTrue(target.atomic)
+    }
+
+    func test__get_per_record_progress_block() {
+        target.perRecordProgressBlock = { _, _ in }
+        XCTAssertNotNil(operation.perRecordProgressBlock)
+    }
+
+    func test__set_per_record_progress_block() {
+        operation.perRecordProgressBlock = { _, _ in }
+        XCTAssertNotNil(target.perRecordProgressBlock)
+    }
+
+    func test__get_per_record_completion_block() {
+        target.perRecordCompletionBlock = { _, _ in }
+        XCTAssertNotNil(operation.perRecordCompletionBlock)
+    }
+
+    func test__set_per_record_completion_block() {
+        operation.perRecordCompletionBlock = { _, _ in }
+        XCTAssertNotNil(target.perRecordCompletionBlock)
+    }
+
+    func test__setting_completion_block() {
+        operation.setModifyRecordsCompletionBlock { _ in
+            // etc
+        }
+        XCTAssertNotNil(operation.configure)
+    }
+
+    func test__setting_completion_block_to_nil() {
+        operation.setModifyRecordsCompletionBlock(.None)
+        XCTAssertNil(operation.configure)
+    }
+
+    func test__success_with_completion_block() {
+        var blockDidRun = false
+        operation.setModifyRecordsCompletionBlock { subscriptionsByID in
+            blockDidRun = true
+        }
+
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        runOperation(operation)
+        waitForExpectationsWithTimeout(3, handler: nil)
+
+        XCTAssertTrue(blockDidRun)
+    }
+
+    func test__error_with_completion_block() {
+        target.error = NSError(domain: CKErrorDomain, code: CKErrorCode.InternalError.rawValue, userInfo: nil)
+
+        operation.setModifyRecordsCompletionBlock { _ in
+            // etc
+        }
+
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        runOperation(operation)
+        waitForExpectationsWithTimeout(3, handler: nil)
+
+        XCTAssertTrue(operation.finished)
+        XCTAssertEqual(operation.errors.count, 1)
+    }
+}
 
 
 
