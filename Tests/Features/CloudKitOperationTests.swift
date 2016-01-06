@@ -15,6 +15,15 @@ class CloudKitOperationTests: OperationTests { }
 // MARK: CKOperation Tests
 
 class TestCloudOperation: NSOperation, CKOperationType {
+    typealias ServerChangeToken = String
+    typealias RecordZone = String
+    typealias RecordZoneID = String
+    typealias Notification = String
+    typealias NotificationID = String
+    typealias Record = String
+    typealias RecordID = String
+    typealias DiscoveredUserInfo = String
+
     var container: String? // just a test
 }
 
@@ -76,11 +85,11 @@ class DatabaseOperationTests: CloudKitOperationTests {
 
 class TestDiscoverAllContactsOperation: TestCloudOperation, CKDiscoverAllContactsOperationType {
 
-    var result: [CKDiscoveredUserInfo]?
+    var result: [DiscoveredUserInfo]?
     var error: NSError?
-    var discoverAllContactsCompletionBlock: (([CKDiscoveredUserInfo]?, NSError?) -> Void)? = .None
+    var discoverAllContactsCompletionBlock: (([DiscoveredUserInfo]?, NSError?) -> Void)? = .None
 
-    init(result: [CKDiscoveredUserInfo]? = .None, error: NSError? = .None) {
+    init(result: [DiscoveredUserInfo]? = .None, error: NSError? = .None) {
         self.result = result
         self.error = error
         super.init()
@@ -144,7 +153,7 @@ class DiscoverAllContactsOperationTests: CloudKitOperationTests {
     }
 
     func test__success_with_completion_block() {
-        var result: [CKDiscoveredUserInfo]? = .None
+        var result: [TestDiscoverAllContactsOperation.DiscoveredUserInfo]? = .None
         operation.setDiscoverAllContactsCompletionBlock { userInfos in
             result = userInfos
         }
@@ -181,7 +190,7 @@ class DiscoverAllContactsOperationTests: CloudKitOperationTests {
             return TestDiscoverAllContactsOperation(result: [])
         }
 
-        var result: [CKDiscoveredUserInfo]? = .None
+        var result: [TestDiscoverAllContactsOperation.DiscoveredUserInfo]? = .None
         operation.setDiscoverAllContactsCompletionBlock { userInfos in
             result = userInfos
         }
@@ -201,13 +210,13 @@ class DiscoverAllContactsOperationTests: CloudKitOperationTests {
 class TestDiscoverUserInfosOperation: TestCloudOperation, CKDiscoverUserInfosOperationType {
 
     var emailAddresses: [String]?
-    var userRecordIDs: [CKRecordID]?
-    var userInfosByEmailAddress: [String: CKDiscoveredUserInfo]?
-    var userInfoByRecordID: [CKRecordID: CKDiscoveredUserInfo]?
+    var userRecordIDs: [RecordID]?
+    var userInfosByEmailAddress: [String: DiscoveredUserInfo]?
+    var userInfoByRecordID: [RecordID: DiscoveredUserInfo]?
     var error: NSError?
-    var discoverUserInfosCompletionBlock: (([String: CKDiscoveredUserInfo]?, [CKRecordID: CKDiscoveredUserInfo]?, NSError?) -> Void)?
+    var discoverUserInfosCompletionBlock: (([String: DiscoveredUserInfo]?, [RecordID: DiscoveredUserInfo]?, NSError?) -> Void)?
 
-    init(userInfosByEmailAddress: [String: CKDiscoveredUserInfo]? = .None, userInfoByRecordID: [CKRecordID: CKDiscoveredUserInfo]? = .None, error: NSError? = .None) {
+    init(userInfosByEmailAddress: [String: DiscoveredUserInfo]? = .None, userInfoByRecordID: [RecordID: DiscoveredUserInfo]? = .None, error: NSError? = .None) {
         self.userInfosByEmailAddress = userInfosByEmailAddress
         self.userInfoByRecordID = userInfoByRecordID
         self.error = error
@@ -245,17 +254,17 @@ class DiscoverUserInfosOperationTests: CloudKitOperationTests {
     }
 
     func test__get_user_record_ids() {
-        target.userRecordIDs = [ CKRecordID(recordName: "Hello World") ]
+        target.userRecordIDs = [ "Hello World" ]
         XCTAssertNotNil(operation.userRecordIDs)
         XCTAssertEqual(operation.userRecordIDs!.count, 1)
-        XCTAssertEqual(operation.userRecordIDs!, [ CKRecordID(recordName: "Hello World") ])
+        XCTAssertEqual(operation.userRecordIDs!, [ "Hello World" ])
     }
 
     func test__set_user_record_ids() {
-        operation.userRecordIDs = [ CKRecordID(recordName: "Hello World") ]
+        operation.userRecordIDs = [ "Hello World" ]
         XCTAssertNotNil(target.userRecordIDs)
         XCTAssertEqual(target.userRecordIDs!.count, 1)
-        XCTAssertEqual(target.userRecordIDs!, [ CKRecordID(recordName: "Hello World") ])
+        XCTAssertEqual(target.userRecordIDs!, [ "Hello World" ])
     }
 
     func test__setting_completion_block() {
@@ -271,8 +280,8 @@ class DiscoverUserInfosOperationTests: CloudKitOperationTests {
     }
 
     func test__success_with_completion_block() {
-        var userInfosByAddress: [String: CKDiscoveredUserInfo]? = .None
-        var userInfosByRecordID: [CKRecordID: CKDiscoveredUserInfo]? = .None
+        var userInfosByAddress: [String: TestDiscoverUserInfosOperation.DiscoveredUserInfo]? = .None
+        var userInfosByRecordID: [TestDiscoverUserInfosOperation.RecordID: TestDiscoverUserInfosOperation.DiscoveredUserInfo]? = .None
 
         operation.setDiscoverUserInfosCompletionBlock { byAddress, byRecordID in
             userInfosByAddress = byAddress
@@ -311,15 +320,15 @@ class DiscoverUserInfosOperationTests: CloudKitOperationTests {
 class TestFetchNotificationChangesOperation: TestCloudOperation, CKFetchNotificationChangesOperationType {
 
     var error: NSError?
-    var finalPreviousServerChangeToken: CKServerChangeToken?
+    var finalPreviousServerChangeToken: ServerChangeToken?
 
-    var previousServerChangeToken: CKServerChangeToken? = .None
+    var previousServerChangeToken: ServerChangeToken? = .None
     var resultsLimit: Int = 100
     var moreComing: Bool = false
-    var notificationChangedBlock: (CKNotification -> Void)? = .None
-    var fetchNotificationChangesCompletionBlock: ((CKServerChangeToken?, NSError?) -> Void)? = .None
+    var notificationChangedBlock: (Notification -> Void)? = .None
+    var fetchNotificationChangesCompletionBlock: ((ServerChangeToken?, NSError?) -> Void)? = .None
 
-    init(token: CKServerChangeToken? = .None, error: NSError? = .None) {
+    init(token: ServerChangeToken? = .None, error: NSError? = .None) {
         self.finalPreviousServerChangeToken = token
         self.error = error
         super.init()
@@ -377,7 +386,7 @@ class FetchNotificationChangesOperationTests: CloudKitOperationTests {
             return
         }
 
-        let note = CKNotification(fromRemoteNotificationDictionary: [:])
+        let note = "hello world"
         block(note)
         XCTAssertTrue(didItWork)
     }
@@ -602,8 +611,8 @@ class TestFetchRecordChangesOperation: TestDatabaseOperation, CKFetchRecordChang
     var previousServerChangeToken: ServerChangeToken? = .None
     var desiredKeys: [String]? = .None
     var resultsLimit: Int = 100
-    var recordChangedBlock: ((CKRecord) -> Void)? = .None
-    var recordWithIDWasDeletedBlock: ((CKRecordID) -> Void)? = .None
+    var recordChangedBlock: ((Record) -> Void)? = .None
+    var recordWithIDWasDeletedBlock: ((RecordID) -> Void)? = .None
     var fetchRecordChangesCompletionBlock: ((ServerChangeToken?, NSData?, NSError?) -> Void)? = .None
     var moreComing: Bool = false
 
@@ -611,12 +620,12 @@ class TestFetchRecordChangesOperation: TestDatabaseOperation, CKFetchRecordChang
         self.token = token
         self.data = data
         self.error = error
+        super.init()
     }
 
     override func main() {
         fetchRecordChangesCompletionBlock?(token, data, error)
     }
-
 }
 
 class FetchRecordChangesOperationTests: CloudKitOperationTests {
@@ -714,7 +723,90 @@ class FetchRecordChangesOperationTests: CloudKitOperationTests {
     }
 }
 
+// MARK: - CKFetchRecordZonesOperation Tests
 
+class TestFetchRecordZonesOperation: TestDatabaseOperation, CKFetchRecordZonesOperationType {
+
+    var zonesByID: [RecordZoneID: RecordZone]?
+    var error: NSError?
+
+    var recordZoneIDs: [RecordZoneID]?
+    var fetchRecordZonesCompletionBlock: (([RecordZoneID: RecordZone]?, NSError?) -> Void)?
+
+    init(zonesByID: [RecordZoneID: RecordZone]? = .None, error: NSError? = .None) {
+        self.zonesByID = zonesByID
+        self.error = error
+        super.init()
+    }
+
+    override func main() {
+        fetchRecordZonesCompletionBlock?(zonesByID, error)
+    }
+}
+
+class FetchRecordZonesOperationTests: CloudKitOperationTests {
+
+    var target: TestFetchRecordZonesOperation!
+    var operation: CloudKitOperation<TestFetchRecordZonesOperation>!
+
+    override func setUp() {
+        super.setUp()
+        target = TestFetchRecordZonesOperation()
+        operation = CloudKitOperation(target)
+    }
+
+    func test__get_record_zone_ids() {
+        let zoneIDs = [ "a-zone-id", "another-zone-id" ]
+        target.recordZoneIDs = zoneIDs
+        XCTAssertEqual(operation.recordZoneIDs!, zoneIDs)
+    }
+
+    func test__set_record_zone_ids() {
+        let zoneIDs = [ "a-zone-id", "another-zone-id" ]
+        operation.recordZoneIDs = zoneIDs
+        XCTAssertEqual(target.recordZoneIDs!, zoneIDs)
+    }
+
+    func test__setting_completion_block() {
+        operation.setFetchRecordZonesCompletionBlock { _ in
+            // etc
+        }
+        XCTAssertNotNil(operation.configure)
+    }
+
+    func test__setting_completion_block_to_nil() {
+        operation.setFetchRecordZonesCompletionBlock(.None)
+        XCTAssertNil(operation.configure)
+    }
+
+    func test__success_with_completion_block() {
+        var blockDidRun = false
+        operation.setFetchRecordZonesCompletionBlock { zonesByID in
+            blockDidRun = true
+        }
+
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        runOperation(operation)
+        waitForExpectationsWithTimeout(3, handler: nil)
+
+        XCTAssertTrue(blockDidRun)
+    }
+
+    func test__error_with_completion_block() {
+        target.error = NSError(domain: CKErrorDomain, code: CKErrorCode.InternalError.rawValue, userInfo: nil)
+
+        operation.setFetchRecordZonesCompletionBlock { _ in
+            // etc
+        }
+
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        runOperation(operation)
+        waitForExpectationsWithTimeout(3, handler: nil)
+
+        XCTAssertTrue(operation.finished)
+        XCTAssertEqual(operation.errors.count, 1)
+    }
+}
 
 
 
