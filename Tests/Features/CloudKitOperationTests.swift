@@ -1261,8 +1261,105 @@ class ModifyRecordsOperationTests: CloudKitOperationTests {
     }
 }
 
+// MARK: - CKModifySubscriptionsOperation Tests
 
+class TestModifySubscriptionsOperation: TestDatabaseOperation, CKModifySubscriptionsOperationType {
 
+    var saved: [Subscription]?
+    var deleted: [String]?
+    var error: NSError?
+
+    var subscriptionsToSave: [Subscription]?
+    var subscriptionIDsToDelete: [String]?
+    var modifySubscriptionsCompletionBlock: (([Subscription]?, [String]?, NSError?) -> Void)?
+
+    init(saved: [Subscription]? = .None, deleted: [String]? = .None, error: NSError? = .None) {
+        self.saved = saved
+        self.deleted = deleted
+        self.error = error
+        super.init()
+    }
+
+    override func main() {
+        modifySubscriptionsCompletionBlock?(saved, deleted, error)
+    }
+}
+
+class ModifySubscriptionsOperationTests: CloudKitOperationTests {
+
+    var target: TestModifySubscriptionsOperation!
+    var operation: CloudKitOperation<TestModifySubscriptionsOperation>!
+
+    override func setUp() {
+        super.setUp()
+        target = TestModifySubscriptionsOperation()
+        operation = CloudKitOperation(target)
+    }
+    
+    func test__get_subscriptions_to_save() {
+        let subscriptions = [ "a-subscription", "another-subscription" ]
+        target.subscriptionsToSave = subscriptions
+        XCTAssertEqual(operation.subscriptionsToSave!, subscriptions)
+    }
+
+    func test__set_subscriptions_to_save() {
+        let subscriptions = [ "a-subscription", "another-subscription" ]
+        operation.subscriptionsToSave = subscriptions
+        XCTAssertEqual(target.subscriptionsToSave!, subscriptions)
+    }
+
+    func test__get_subscription_ids_to_delete() {
+        let subscriptionIDs = [ "a-subscription-id", "another-subscription-id" ]
+        target.subscriptionIDsToDelete = subscriptionIDs
+        XCTAssertEqual(operation.subscriptionIDsToDelete!, subscriptionIDs)
+    }
+
+    func test__set_subscription_ids_to_delete() {
+        let subscriptionIDs = [ "a-subscription-id", "another-subscription-id" ]
+        operation.subscriptionIDsToDelete = subscriptionIDs
+        XCTAssertEqual(target.subscriptionIDsToDelete!, subscriptionIDs)
+    }
+
+    func test__setting_completion_block() {
+        operation.setModifySubscriptionsCompletionBlock { _ in
+            // etc
+        }
+        XCTAssertNotNil(operation.configure)
+    }
+
+    func test__setting_completion_block_to_nil() {
+        operation.setModifySubscriptionsCompletionBlock(.None)
+        XCTAssertNil(operation.configure)
+    }
+
+    func test__success_with_completion_block() {
+        var blockDidRun = false
+        operation.setModifySubscriptionsCompletionBlock { subscriptionsByID in
+            blockDidRun = true
+        }
+
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        runOperation(operation)
+        waitForExpectationsWithTimeout(3, handler: nil)
+
+        XCTAssertTrue(blockDidRun)
+    }
+
+    func test__error_with_completion_block() {
+        target.error = NSError(domain: CKErrorDomain, code: CKErrorCode.InternalError.rawValue, userInfo: nil)
+
+        operation.setModifySubscriptionsCompletionBlock { _ in
+            // etc
+        }
+
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        runOperation(operation)
+        waitForExpectationsWithTimeout(3, handler: nil)
+
+        XCTAssertTrue(operation.finished)
+        XCTAssertEqual(operation.errors.count, 1)
+    }
+}
 
 
 
