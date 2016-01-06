@@ -25,6 +25,8 @@ class TestCloudOperation: NSOperation, CKOperationType {
     typealias Subscription = String
     typealias RecordSavePolicy = Int
     typealias DiscoveredUserInfo = String
+    typealias Query = String
+    typealias QueryCursor = String
 
     var container: String? // just a test
 }
@@ -1361,6 +1363,127 @@ class ModifySubscriptionsOperationTests: CloudKitOperationTests {
     }
 }
 
+// MARK: - CKQueryOperation Tests
+
+class TestQueryOperation: TestDatabaseOperation, CKQueryOperationType {
+
+    var error: NSError?
+
+    var query: Query?
+    var cursor: QueryCursor?
+    var zoneID: RecordZoneID?
+    var resultsLimit: Int = 100
+    var desiredKeys: [String]?
+    var recordFetchedBlock: ((Record) -> Void)?
+    var queryCompletionBlock: ((QueryCursor?, NSError?) -> Void)?
+
+    init(error: NSError? = .None) {
+        self.error = error
+        super.init()
+    }
+
+    override func main() {
+        queryCompletionBlock?(cursor, error)
+    }
+}
+
+class QueryOperationTests: CloudKitOperationTests {
+
+    var target: TestQueryOperation!
+    var operation: CloudKitOperation<TestQueryOperation>!
+
+    override func setUp() {
+        super.setUp()
+        target = TestQueryOperation()
+        operation = CloudKitOperation(target)
+    }
+    
+    func test__get_query() {
+        let query = "a-query"
+        target.query = query
+        XCTAssertEqual(operation.query!, query)
+    }
+
+    func test__set_query() {
+        let query = "a-query"
+        operation.query = query
+        XCTAssertEqual(target.query!, query)
+    }
+
+    func test__get_cursor() {
+        let cursor = "a-cursor"
+        target.cursor = cursor
+        XCTAssertEqual(operation.cursor!, cursor)
+    }
+
+    func test__set_cursor() {
+        let cursor = "a-cursor"
+        operation.cursor = cursor
+        XCTAssertEqual(target.cursor!, cursor)
+    }
+
+    func test__get_zone_id() {
+        let zoneID = "a-zone-id"
+        target.zoneID = zoneID
+        XCTAssertEqual(operation.zoneID!, zoneID)
+    }
+
+    func test__set_zone_id() {
+        let zoneID = "a-zone-id"
+        operation.zoneID = zoneID
+        XCTAssertEqual(target.zoneID!, zoneID)
+    }
+
+    func test__get_record_fetched_block() {
+        target.recordFetchedBlock = { _ in }
+        XCTAssertNotNil(operation.recordFetchedBlock)
+    }
+
+    func test__set_record_fetched_block() {
+        operation.recordFetchedBlock = { _ in }
+        XCTAssertNotNil(target.recordFetchedBlock)
+    }
+
+    func test__setting_completion_block() {
+        operation.setQueryCompletionBlock { _ in
+            // etc
+        }
+        XCTAssertNotNil(operation.configure)
+    }
+
+    func test__setting_completion_block_to_nil() {
+        operation.setQueryCompletionBlock(.None)
+        XCTAssertNil(operation.configure)
+    }
+
+    func test__success_with_completion_block() {
+        var blockDidRun = false
+        operation.setQueryCompletionBlock { subscriptionsByID in
+            blockDidRun = true
+        }
+
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        runOperation(operation)
+        waitForExpectationsWithTimeout(3, handler: nil)
+
+        XCTAssertTrue(blockDidRun)
+    }
+
+    func test__error_with_completion_block() {
+        target.error = NSError(domain: CKErrorDomain, code: CKErrorCode.InternalError.rawValue, userInfo: nil)
+
+        operation.setQueryCompletionBlock { _ in
+            // etc
+        }
+
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        runOperation(operation)
+        waitForExpectationsWithTimeout(3, handler: nil)
+
+        XCTAssertTrue(operation.finished)
+        XCTAssertEqual(operation.errors.count, 1)
+    }
+}
 
 
 
