@@ -549,6 +549,48 @@ extension CloudKitOperation where T: CKFetchRecordsOperationType {
 }
 
 // MARK: - CKFetchSubscriptionsOperation
+
+public protocol CKFetchSubscriptionsOperationType: CKDatabaseOperationType {
+    var subscriptionIDs: [String]? { get set }
+    var fetchSubscriptionCompletionBlock: (([String: Subscription]?, NSError?) -> Void)? { get set }
+}
+
+extension CKFetchSubscriptionsOperation: CKFetchSubscriptionsOperationType { }
+
+extension CloudKitOperation where T: CKFetchSubscriptionsOperationType {
+
+    public typealias FetchSubscriptionCompletionBlock = [String: T.Subscription]? -> Void
+
+    public var subscriptionIDs: [String]? {
+        get { return operation.subscriptionIDs }
+        set { operation.subscriptionIDs = newValue }
+    }
+
+    public func setFetchSubscriptionCompletionBlock(block: FetchSubscriptionCompletionBlock?) {
+        guard let block = block else {
+            configure = .None
+            operation.fetchSubscriptionCompletionBlock = .None
+            return
+        }
+
+        let previousConfigure = configure
+        configure = { [unowned self] _op in
+            let op = previousConfigure?(_op) ?? _op
+            op.subscriptionIDs = self.operation.subscriptionIDs
+            op.fetchSubscriptionCompletionBlock = { subscriptionsByID, error in
+                if let error = error {
+                    self.receivedError(error)
+                }
+                else {
+                    block(subscriptionsByID)
+                    self.finish()
+                }
+            }
+            return op
+        }
+    }
+}
+
 // MARK: - CKModifyRecordZonesOperation
 // MARK: - CKModifyRecordsOperation
 // MARK: - CKModifySubscriptionsOperation
