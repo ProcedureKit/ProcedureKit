@@ -917,6 +917,95 @@ class FetchRecordsOperationTests: CloudKitOperationTests {
     }
 }
 
+// MARK: - CKFetchSubscriptionsOperation Tests
+
+class TestFetchSubscriptionsOperation: TestDatabaseOperation, CKFetchSubscriptionsOperationType {
+
+    var subscriptionsByID: [String: Subscription]?
+    var error: NSError?
+
+    var subscriptionIDs: [String]?
+    var fetchSubscriptionCompletionBlock: (([String: Subscription]?, NSError?) -> Void)?
+
+    init(subscriptionsByID: [String: Subscription]? = .None, error: NSError? = .None) {
+        self.subscriptionsByID = subscriptionsByID
+        self.error = error
+        super.init()
+    }
+
+    override func main() {
+        fetchSubscriptionCompletionBlock?(subscriptionsByID, error)
+    }
+}
+
+class FetchSubscriptionsOperationTests: CloudKitOperationTests {
+
+    var target: TestFetchSubscriptionsOperation!
+    var operation: CloudKitOperation<TestFetchSubscriptionsOperation>!
+
+    override func setUp() {
+        super.setUp()
+        target = TestFetchSubscriptionsOperation()
+        operation = CloudKitOperation(target)
+    }
+
+    func test__get_subscription_ids() {
+        let IDs = [ "an-id", "another-id" ]
+        target.subscriptionIDs = IDs
+        XCTAssertEqual(operation.subscriptionIDs!, IDs)
+    }
+
+    func test__set_subscription_ids() {
+        let IDs = [ "an-id", "another-id" ]
+        operation.subscriptionIDs = IDs
+        XCTAssertEqual(target.subscriptionIDs!, IDs)
+    }
+
+    func test__setting_completion_block() {
+        operation.setFetchSubscriptionCompletionBlock { _ in
+            // etc
+        }
+        XCTAssertNotNil(operation.configure)
+    }
+
+    func test__setting_completion_block_to_nil() {
+        operation.setFetchSubscriptionCompletionBlock(.None)
+        XCTAssertNil(operation.configure)
+    }
+
+    func test__success_with_completion_block() {
+        var blockDidRun = false
+        operation.setFetchSubscriptionCompletionBlock { subscriptionsByID in
+            blockDidRun = true
+        }
+
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        runOperation(operation)
+        waitForExpectationsWithTimeout(3, handler: nil)
+
+        XCTAssertTrue(blockDidRun)
+    }
+
+    func test__error_with_completion_block() {
+        target.error = NSError(domain: CKErrorDomain, code: CKErrorCode.InternalError.rawValue, userInfo: nil)
+
+        operation.setFetchSubscriptionCompletionBlock { _ in
+            // etc
+        }
+
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        runOperation(operation)
+        waitForExpectationsWithTimeout(3, handler: nil)
+
+        XCTAssertTrue(operation.finished)
+        XCTAssertEqual(operation.errors.count, 1)
+    }
+}
+
+
+
+
+
 
 
 
