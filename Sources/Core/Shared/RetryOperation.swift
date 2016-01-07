@@ -48,17 +48,11 @@ public class RetryOperation<T: NSOperation>: RepeatedOperation<T> {
     public init<D, G where D: GeneratorType, D.Element == NSTimeInterval, G: GeneratorType, G.Element == T>(delay: D, maxCount max: Int?, shouldRetry: RetryFailureInfo<T> -> Bool, generator: G) {
         retry = RetryGenerator(generator: anyGenerator(generator), shouldRetry: shouldRetry)
         super.init(delay: delay, maxCount: max, generator: retry)
-        name = "Retry Operation <\(operation.dynamicType)>"
+        name = "Retry Operation"
     }
 
     public convenience init<G where G: GeneratorType, G.Element == NSTimeInterval>(delay: G, maxCount max: Int?, shouldRetry: RetryFailureInfo<T> -> Bool, _ body: () -> T?) {
-        self.init(delay: delay, maxCount: max, shouldRetry: shouldRetry, generator: anyGenerator {
-            guard let op = body() else { return nil }
-            if let op = op as? Operation {
-                op.addCondition(NoFailedDependenciesCondition())
-            }
-            return op
-        })
+        self.init(delay: delay, maxCount: max, shouldRetry: shouldRetry, generator: anyGenerator { body() })
     }
 
     public convenience init(strategy: WaitStrategy = .Fixed(0.1), maxCount max: Int? = 5, shouldRetry: RetryFailureInfo<T> -> Bool = { _ in true }, _ body: () -> T) {
