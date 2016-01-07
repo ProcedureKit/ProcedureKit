@@ -300,10 +300,10 @@ public class RepeatedOperation<T where T: NSOperation>: GroupOperation {
     private var generator: AnyGenerator<T>
 
     /// - returns: the current operation being executed.
-    public internal(set) var operation: T? = .None
+    public internal(set) var current: T
 
     /// - return: the count of operations that have executed.
-    public private(set) var count: Int = 0
+    public internal(set) var count: Int = 1
 
     /**
      The designated initializer.
@@ -314,7 +314,14 @@ public class RepeatedOperation<T where T: NSOperation>: GroupOperation {
      - parameter: (unnamed) the AnyGenerator<T> generator.
     */
     public init<D, G where D: GeneratorType, D.Element == NSTimeInterval, G: GeneratorType, G.Element == T>(delay: D, maxCount max: Int?, generator gen: G) {
+
         generator = gen as? AnyGenerator<T> ?? anyGenerator(gen)
+
+        guard let operation = generator.next() else {
+            preconditionFailure("Operation Generator must return an instance initially.")
+        }
+
+        current = operation
 
         switch max {
         case .Some(let max):
@@ -324,7 +331,7 @@ public class RepeatedOperation<T where T: NSOperation>: GroupOperation {
             self.delay = anyGenerator(delay)
         }
 
-        super.init(operations: [])
+        super.init(operations: [operation])
         name = "Repeated Operation"
     }
 
@@ -350,12 +357,6 @@ public class RepeatedOperation<T where T: NSOperation>: GroupOperation {
      */
     public convenience init<G where G: GeneratorType, G.Element == T>(strategy: WaitStrategy = .Fixed(0.1), maxCount max: Int? = .None, generator: G) {
         self.init(delay: strategy.generate(), maxCount: max, generator: generator)
-    }
-
-    /// Override of execute, subclasses which override this must call super.
-    public override func execute() {
-        addNextOperation()
-        super.execute()
     }
 
     /**
@@ -399,7 +400,7 @@ public class RepeatedOperation<T where T: NSOperation>: GroupOperation {
                 op.addDependency(delay)
                 addOperations(delay, op)
                 count += 1
-                operation = op
+                current = op
             }
         }
     }
