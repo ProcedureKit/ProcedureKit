@@ -104,4 +104,33 @@ class RetryOperationTests: OperationTests {
         XCTAssertEqual(retryAggregateErrors!.count, 2)
         XCTAssertEqual(retryCount, 2)
     }
+
+    func test__retry_using_retry_block_returning_false() {
+        var retryErrors: [ErrorType]? = .None
+        var retryAggregateErrors: [ErrorType]? = .None
+        var retryCount: Int = 0
+        var didRunBlockCount: Int = 0
+        let retry = { (info: RetryFailureInfo<OperationWhichFailsThenSucceeds>) -> Bool in
+            retryErrors = info.errors
+            retryAggregateErrors = info.aggregateErrors
+            retryCount = info.count
+            didRunBlockCount += 1
+            return false
+        }
+
+        operation = RetryOperation(shouldRetry: retry, producer(3))
+
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        runOperation(operation)
+        waitForExpectationsWithTimeout(3, handler: nil)
+
+        XCTAssertTrue(operation.finished)
+        XCTAssertEqual(operation.count, 1)
+        XCTAssertEqual(didRunBlockCount, 1)
+        XCTAssertNotNil(retryErrors)
+        XCTAssertEqual(retryErrors!.count, 1)
+        XCTAssertNotNil(retryAggregateErrors)
+        XCTAssertEqual(retryAggregateErrors!.count, 1)
+        XCTAssertEqual(retryCount, 1)
+    }
 }
