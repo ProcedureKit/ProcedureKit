@@ -12,14 +12,13 @@ import XCTest
 class ComposedOperationTests: OperationTests {
 
     func test__composed_operation_is_performed() {
-        let composed = ComposedOperation(operation: TestOperation())
+        let composed: ComposedOperation<TestOperation> = ComposedOperation(TestOperation())
         addCompletionBlockToTestOperation(composed, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
         runOperation(composed)
 
         waitForExpectationsWithTimeout(3, handler: nil)
         XCTAssertTrue(composed.finished)
         XCTAssertTrue(composed.operation.didExecute)
-
     }
 }
 
