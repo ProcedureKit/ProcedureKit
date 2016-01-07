@@ -8,19 +8,15 @@
 
 import Foundation
 
-internal protocol ComposedOperationType: class {
-    typealias Composed: NSOperation
-}
-
-public class ComposedOperation<O: NSOperation>: Operation, OperationDidFinishObserver, ComposedOperationType {
-    typealias Composed = O
+public class ComposedOperation<O: NSOperation>: Operation, OperationDidFinishObserver {
 
     public let operation: O
     private var target: Operation? = nil
 
-    public required init(_ compose: O) {
-        operation = compose
+    public required init(operation: O) {
+        self.operation = operation
         super.init()
+        name = "Composed Operation<\(operation.dynamicType)>"
     }
 
     public override func execute() {
