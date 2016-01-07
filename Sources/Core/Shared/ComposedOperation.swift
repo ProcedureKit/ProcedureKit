@@ -13,14 +13,14 @@ import Foundation
  is very handy for applying `Operation` level features such as
  conditions and observers to `NSOperation` instances.
 */
-public class ComposedOperation<O: NSOperation>: GatedOperation<O> {
+public class ComposedOperation<Composed: NSOperation>: GatedOperation<Composed> {
 
     /**
     Designated initializer.
     
     - parameter operation: The composed operation, must be a `NSOperation` subclass.
     */
-    public init(operation: O) {
+    public init(operation: Composed) {
         super.init(operation: operation, gate: { true })
     }
 }

@@ -28,50 +28,43 @@ public protocol CKOperationType: class {
     var container: Container? { get set }
 }
 
-public class CloudKitOperation<T where T: CKOperationType, T: NSOperation>: Operation {
+public class CloudKitOperation<T where T: CKOperationType, T: NSOperation>: RetryOperation<ComposedOperation<T>> {
+    public typealias Composed = ComposedOperation<T>
+    typealias Config = (previous: Composed?, new: Composed) -> Composed
 
-    public private(set) var operation: T
-    public let recoverFromError: (T, ErrorType) -> T?
+    private var configuration: Config
 
-    internal private(set) var configure: (T -> T)?
-
-    public init(_ op: T, recovery: (T, ErrorType) -> T? = { _, _ in .None }) {
-        operation = op
-        recoverFromError = recovery
-        super.init()
-        name = "CloudKitOperation<\(operation.dynamicType)>"
+    public init<D, G where D: GeneratorType, D.Element == NSTimeInterval, G: GeneratorType, G.Element == Composed>(delay: D, maxCount max: Int?, shouldRetry: RetryFailureInfo<T> -> Bool, generator: G) {
+        configuration = { _, new in return new }
+        let composedRetry: RetryFailureInfo<Composed> -> Bool = { info in
+            // TODO...
+            return true
+        }
+        super.init(delay: delay, maxCount: max, shouldRetry: composedRetry, generator: generator)
+        name = "Cloud Kit Operation <\(operation.dynamicType)>"
     }
 
-    public override func cancel() {
-        operation.cancel()
-        super.cancel()
+    public convenience init<D where D: GeneratorType, D.Element == NSTimeInterval>(@autoclosure(escaping) _ operation: () -> T, delay: D, maxCount max: Int?, shouldRetry: RetryFailureInfo<T> -> Bool) {
+        self.init(delay: delay, maxCount: max, shouldRetry: shouldRetry, generator: anyGenerator { ComposedOperation(operation: operation()) })
     }
 
-    public override func execute() {
-        defer { go(operation) }
-        guard let _ = configure else {
-            let warning = "A completion block was not set for: \(operation.dynamicType), error handling will not be triggered."
-            log.warning(warning)
-            operation.addCompletionBlock {
-                self.finish()
-            }
-            return
+    public convenience init(@autoclosure(escaping) _ operation: () -> T, strategy: WaitStrategy = .Fixed(0.1), maxCount max: Int? = 5, shouldRetry: RetryFailureInfo<T> -> Bool = { _ in true }) {
+        self.init(operation, delay: strategy.generate(), maxCount: max, shouldRetry: shouldRetry)
+    }
+
+    public override func next() -> Composed? {
+        return super.next().map(applyConfiguration)
+    }
+
+    internal func addConfigurationBlock(block: Config) {
+        let configure = configuration
+        configuration = { previous, new in
+            block(previous: previous, new: configure(previous: previous, new: new))
         }
     }
 
-    private func go(op: T) -> T {
-        let _op = configure?(op) ?? op
-        produceOperation(_op)
-        return _op
-    }
-
-    func receivedError(error: ErrorType) {
-        guard let op = recoverFromError(operation, error) else {
-            finish(error)
-            return
-        }
-
-        operation = go(op)
+    internal func applyConfiguration(op: Composed) -> Composed {
+        return configuration(previous: operation, new: op)
     }
 }
 
@@ -93,11 +86,13 @@ extension CKOperation: CKOperationType {
     public typealias QueryCursor = CKQueryCursor
 }
 
+/*
+
 extension CloudKitOperation where T: CKOperationType {
 
     public var container: T.Container? {
-        get { return operation.container }
-        set { operation.container = newValue }
+        get { return operation?.container }
+        set { operation?.container = newValue }
     }
 }
 
@@ -115,8 +110,8 @@ extension CKDatabaseOperation: CKDatabaseOperationType {
 extension CloudKitOperation where T: CKDatabaseOperationType {
 
     public var database: T.Database? {
-        get { return operation.database }
-        set { operation.database = newValue }
+        get { return operation?.database }
+        set { operation?.database = newValue }
     }
 }
 
@@ -129,8 +124,8 @@ public protocol CKPreviousServerChangeToken: CKOperationType {
 extension CloudKitOperation where T: CKPreviousServerChangeToken {
 
     public var previousServerChangeToken: T.ServerChangeToken? {
-        get { return operation.previousServerChangeToken }
-        set { operation.previousServerChangeToken = newValue }
+        get { return operation?.previousServerChangeToken }
+        set { operation?.previousServerChangeToken = newValue }
     }
 }
 
@@ -141,8 +136,8 @@ public protocol CKResultsLimit: CKOperationType {
 extension CloudKitOperation where T: CKResultsLimit {
 
     public var resultsLimit: Int {
-        get { return operation.resultsLimit }
-        set { operation.resultsLimit = newValue }
+        get { return operation?.resultsLimit }
+        set { operation?.resultsLimit = newValue }
     }
 }
 
@@ -153,7 +148,7 @@ public protocol CKMoreComing: CKOperationType {
 extension CloudKitOperation where T: CKMoreComing {
 
     public var moreComing: Bool {
-        return operation.moreComing
+        return operation?.moreComing
     }
 }
 
@@ -164,14 +159,14 @@ public protocol CKDesiredKeys: CKOperationType {
 extension CloudKitOperation where T: CKDesiredKeys {
 
     public var desiredKeys: [String]? {
-        get { return operation.desiredKeys }
-        set { operation.desiredKeys = newValue }
+        get { return operation?.desiredKeys }
+        set { operation?.desiredKeys = newValue }
     }
 }
 
 public typealias CKFetchOperationType = protocol<CKPreviousServerChangeToken, CKResultsLimit, CKMoreComing>
 
-
+*/
 
 // MARK: - CKDiscoverAllContactsOperation
 
@@ -185,27 +180,39 @@ extension CloudKitOperation where T: CKDiscoverAllContactsOperationType {
 
     public typealias DiscoverAllContactsCompletionBlock = [T.DiscoveredUserInfo]? -> Void
 
-    public func setDiscoverAllContactsCompletionBlock(block: DiscoverAllContactsCompletionBlock?) {
+    public func setDiscoverAllContactsCompletionBlock(block: DiscoverAllContactsCompletionBlock) {
+        addConfigurationBlock { previous, new in
+            new.operation.discoverAllContactsCompletionBlock = { userInfo, error in
+                if error == nil {
+                    block(userInfo)
+                }
+            }
+            return new
+        }
+
+
+
+
+
+/*
         guard let block = block else {
-            configure = .None
+            config = .None
             operation.discoverAllContactsCompletionBlock = .None
             return
         }
 
         let previousConfigure = configure
-        configure = { [unowned self] _op in
+        config = { [unowned self] _op in
             let op = previousConfigure?(_op) ?? _op
             op.discoverAllContactsCompletionBlock = { userInfo, error in
-                if let error = error {
-                    self.receivedError(error)
-                }
-                else {
+                if error == nil {
                     block(userInfo)
-                    self.finish()
                 }
+                self.finish(error)
             }
             return op
         }
+*/
     }
 }
 
@@ -222,7 +229,7 @@ extension CKDiscoverUserInfosOperation: CKDiscoverUserInfosOperationType { }
 extension CloudKitOperation where T: CKDiscoverUserInfosOperationType {
 
     public typealias DiscoverUserInfosCompletionBlock = ([String: T.DiscoveredUserInfo]?, [T.RecordID: T.DiscoveredUserInfo]?) -> Void
-
+/*
     public var emailAddresses: [String]? {
         get { return operation.emailAddresses }
         set { operation.emailAddresses = newValue }
@@ -232,33 +239,36 @@ extension CloudKitOperation where T: CKDiscoverUserInfosOperationType {
         get { return operation.userRecordIDs }
         set { operation.userRecordIDs = newValue }
     }
-
+*/
     public func setDiscoverUserInfosCompletionBlock(block: DiscoverUserInfosCompletionBlock?) {
+
+/*
         guard let block = block else {
-            configure = .None
+            config = .None
             operation.discoverUserInfosCompletionBlock = .None
             return
         }
 
         let previousConfigure = configure
-        configure = { [unowned self] _op in
+        config = { [unowned self] _op in
             let op = previousConfigure?(_op) ?? _op
             op.emailAddresses = self.emailAddresses
             op.userRecordIDs = self.userRecordIDs
             op.discoverUserInfosCompletionBlock = { userInfoByEmail, userInfoByRecordID, error in
-                if let error = error {
-                    self.receivedError(error)
-                }
-                else {
+                if let _ = error {
                     block(userInfoByEmail, userInfoByRecordID)
-                    self.finish()
                 }
+                self.finish(error)
             }
 
             return op
         }
+*/
     }
 }
+
+/*
+
 
 // MARK: - CKFetchNotificationChangesOperation
 
@@ -282,25 +292,22 @@ extension CloudKitOperation where T: CKFetchNotificationChangesOperationType {
 
     public func setFetchNotificationChangesCompletionBlock(block: FetchNotificationChangesCompletionBlock?) {
         guard let block = block else {
-            configure = .None
+            config = .None
             operation.fetchNotificationChangesCompletionBlock = .None
             return
         }
 
         let previousConfigure = configure
-        configure = { [unowned self] _op in
+        config = { [unowned self] _op in
             let op = previousConfigure?(_op) ?? _op
             op.previousServerChangeToken = self.previousServerChangeToken
             op.resultsLimit = self.resultsLimit
             op.notificationChangedBlock = self.notificationChangedBlock
             op.fetchNotificationChangesCompletionBlock = { token, error in
-                if let error = error {
-                    self.receivedError(error)
-                }
-                else {
+                if let _ = error {
                     block(token)
-                    self.finish()
                 }
+                self.finish(error)
             }
             return op
         }
@@ -327,23 +334,20 @@ extension CloudKitOperation where T: CKMarkNotificationsReadOperationType {
 
     public func setMarkNotificationReadCompletionBlock(block: MarkNotificationReadCompletionBlock?) {
         guard let block = block else {
-            configure = .None
+            config = .None
             operation.markNotificationsReadCompletionBlock = .None
             return
         }
 
         let previousConfigure = configure
-        configure = { [unowned self] _op in
+        config = { [unowned self] _op in
             let op = previousConfigure?(_op) ?? _op
             op.notificationIDs = self.notificationIDs
             op.markNotificationsReadCompletionBlock = { notificationIDs, error in
-                if let error = error {
-                    self.receivedError(error)
-                }
-                else {
+                if let _ = error {
                     block(notificationIDs)
-                    self.finish()
                 }
+                self.finish(error)
             }
             return op
         }
@@ -370,23 +374,20 @@ extension CloudKitOperation where T: CKModifyBadgeOperationType {
 
     public func setModifyBadgeCompletionBlock(block: ModifyBadgeCompletionBlock?) {
         guard let block = block else {
-            configure = .None
+            config = .None
             operation.modifyBadgeCompletionBlock = .None
             return
         }
 
         let previousConfigure = configure
-        configure = { [unowned self] _op in
+        config = { [unowned self] _op in
             let op = previousConfigure?(_op) ?? _op
             op.badgeValue = self.badgeValue
             op.modifyBadgeCompletionBlock = { error in
-                if let error = error {
-                    self.receivedError(error)
-                }
-                else {
+                if let _ = error {
                     block()
-                    self.finish()
                 }
+                self.finish(error)
             }
             return op
         }
@@ -426,13 +427,13 @@ extension CloudKitOperation where T: CKFetchRecordChangesOperationType {
 
     public func setFetchRecordChangesCompletionBlock(block: FetchRecordChangesCompletionBlock?) {
         guard let block = block else {
-            configure = .None
+            config = .None
             operation.fetchRecordChangesCompletionBlock = .None
             return
         }
 
         let previousConfigure = configure
-        configure = { [unowned self] _op in
+        config = { [unowned self] _op in
             let op = previousConfigure?(_op) ?? _op
             op.recordZoneID = self.recordZoneID
             op.previousServerChangeToken = self.previousServerChangeToken
@@ -441,13 +442,10 @@ extension CloudKitOperation where T: CKFetchRecordChangesOperationType {
             op.recordChangedBlock = self.recordChangedBlock
             op.recordWithIDWasDeletedBlock = self.recordWithIDWasDeletedBlock
             op.fetchRecordChangesCompletionBlock = { token, data, error in
-                if let error = error {
-                    self.receivedError(error)
-                }
-                else {
+                if let _ = error {
                     block(token, data)
-                    self.finish()
                 }
+                self.finish(error)
             }
             return op
         }
@@ -474,23 +472,20 @@ extension CloudKitOperation where T: CKFetchRecordZonesOperationType {
 
     public func setFetchRecordZonesCompletionBlock(block: FetchRecordZonesCompletionBlock?) {
         guard let block = block else {
-            configure = .None
+            config = .None
             operation.fetchRecordZonesCompletionBlock = .None
             return
         }
 
         let previousConfigure = configure
-        configure = { [unowned self] _op in
+        config = { [unowned self] _op in
             let op = previousConfigure?(_op) ?? _op
             op.recordZoneIDs = self.recordZoneIDs
             op.fetchRecordZonesCompletionBlock = { zonesByID, error in
-                if let error = error {
-                    self.receivedError(error)
-                }
-                else {
+                if let _ = error {
                     block(zonesByID)
-                    self.finish()
                 }
+                self.finish(error)
             }
             return op
         }
@@ -529,26 +524,23 @@ extension CloudKitOperation where T: CKFetchRecordsOperationType {
 
     public func setFetchRecordsCompletionBlock(block: FetchRecordsCompletionBlock?) {
         guard let block = block else {
-            configure = .None
+            config = .None
             operation.fetchRecordsCompletionBlock = .None
             return
         }
 
         let previousConfigure = configure
-        configure = { [unowned self] _op in
+        config = { [unowned self] _op in
             let op = previousConfigure?(_op) ?? _op
             op.recordIDs = self.recordIDs
             op.desiredKeys = self.desiredKeys
             op.perRecordProgressBlock = self.perRecordProgressBlock
             op.perRecordCompletionBlock = self.perRecordCompletionBlock
             op.fetchRecordsCompletionBlock = { recordsByID, error in
-                if let error = error {
-                    self.receivedError(error)
-                }
-                else {
+                if let _ = error {
                     block(recordsByID)
-                    self.finish()
                 }
+                self.finish(error)
             }
             return op
         }
@@ -575,23 +567,20 @@ extension CloudKitOperation where T: CKFetchSubscriptionsOperationType {
 
     public func setFetchSubscriptionCompletionBlock(block: FetchSubscriptionCompletionBlock?) {
         guard let block = block else {
-            configure = .None
+            config = .None
             operation.fetchSubscriptionCompletionBlock = .None
             return
         }
 
         let previousConfigure = configure
-        configure = { [unowned self] _op in
+        config = { [unowned self] _op in
             let op = previousConfigure?(_op) ?? _op
             op.subscriptionIDs = self.subscriptionIDs
             op.fetchSubscriptionCompletionBlock = { subscriptionsByID, error in
-                if let error = error {
-                    self.receivedError(error)
-                }
-                else {
+                if let _ = error {
                     block(subscriptionsByID)
-                    self.finish()
                 }
+                self.finish(error)
             }
             return op
         }
@@ -624,24 +613,21 @@ extension CloudKitOperation where T: CKModifyRecordZonesOperationType {
 
     public func setModifyRecordZonesCompletionBlock(block: ModifyRecordZonesCompletionBlock?) {
         guard let block = block else {
-            configure = .None
+            config = .None
             operation.modifyRecordZonesCompletionBlock = .None
             return
         }
 
         let previousConfigure = configure
-        configure = { [unowned self] _op in
+        config = { [unowned self] _op in
             let op = previousConfigure?(_op) ?? _op
             op.recordZonesToSave = self.recordZonesToSave
             op.recordZoneIDsToDelete = self.recordZoneIDsToDelete
             op.modifyRecordZonesCompletionBlock = { saved, deleted, error in
-                if let error = error {
-                    self.receivedError(error)
-                }
-                else {
+                if let _ = error {
                     block(saved, deleted)
-                    self.finish()
                 }
+                self.finish(error)
             }
             return op
         }
@@ -705,13 +691,13 @@ extension CloudKitOperation where T: CKModifyRecordsOperationType {
 
     public func setModifyRecordsCompletionBlock(block: ModifyRecordsCompletionBlock?) {
         guard let block = block else {
-            configure = .None
+            config = .None
             operation.modifyRecordsCompletionBlock = .None
             return
         }
 
         let previousConfigure = configure
-        configure = { [unowned self] _op in
+        config = { [unowned self] _op in
             let op = previousConfigure?(_op) ?? _op
             op.recordsToSave = self.recordsToSave
             op.recordIDsToDelete = self.recordIDsToDelete
@@ -721,13 +707,10 @@ extension CloudKitOperation where T: CKModifyRecordsOperationType {
             op.perRecordProgressBlock = self.perRecordProgressBlock
             op.perRecordCompletionBlock = self.perRecordCompletionBlock
             op.modifyRecordsCompletionBlock = { saved, deleted, error in
-                if let error = error {
-                    self.receivedError(error)
-                }
-                else {
+                if let _ = error {
                     block(saved, deleted)
-                    self.finish()
                 }
+                self.finish(error)
             }
             return op
         }
@@ -760,24 +743,21 @@ extension CloudKitOperation where T: CKModifySubscriptionsOperationType {
 
     public func setModifySubscriptionsCompletionBlock(block: ModifySubscriptionsCompletionBlock?) {
         guard let block = block else {
-            configure = .None
+            config = .None
             operation.modifySubscriptionsCompletionBlock = .None
             return
         }
 
         let previousConfigure = configure
-        configure = { [unowned self] _op in
+        config = { [unowned self] _op in
             let op = previousConfigure?(_op) ?? _op
             op.subscriptionsToSave = self.subscriptionsToSave
             op.subscriptionIDsToDelete = self.subscriptionIDsToDelete
             op.modifySubscriptionsCompletionBlock = { saved, deleted, error in
-                if let error = error {
-                    self.receivedError(error)
-                }
-                else {
+                if let _ = error {
                     block(saved, deleted)
-                    self.finish()
                 }
+                self.finish(error)
             }
             return op
         }
@@ -823,13 +803,13 @@ extension CloudKitOperation where T: CKQueryOperationType {
 
     public func setQueryCompletionBlock(block: QueryCompletionBlock?) {
         guard let block = block else {
-            configure = .None
+            config = .None
             operation.queryCompletionBlock = .None
             return
         }
 
         let previousConfigure = configure
-        configure = { [unowned self] _op in
+        config = { [unowned self] _op in
             let op = previousConfigure?(_op) ?? _op
             op.query = self.query
             op.cursor = self.cursor
@@ -838,13 +818,10 @@ extension CloudKitOperation where T: CKQueryOperationType {
             op.resultsLimit = self.resultsLimit
             op.recordFetchedBlock = self.recordFetchedBlock
             op.queryCompletionBlock = { cursor, error in
-                if let error = error {
-                    self.receivedError(error)
-                }
-                else {
+                if let _ = error {
                     block(cursor)
-                    self.finish()
                 }
+                self.finish(error)
             }
             return op
         }
@@ -853,7 +830,7 @@ extension CloudKitOperation where T: CKQueryOperationType {
 
 
 
-
+*/
 
 
 

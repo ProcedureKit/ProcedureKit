@@ -32,7 +32,6 @@ class OperationWhichFailsThenSucceeds: Operation {
 class RetryOperationTests: OperationTests {
 
     typealias RetryOp = RetryOperation<OperationWhichFailsThenSucceeds>
-    typealias RetryBlock = RetryOp.ShouldRetryBlock
 
     var operation: RetryOp!
     var numberOfFailures: Int = 0
@@ -82,10 +81,10 @@ class RetryOperationTests: OperationTests {
         var retryAggregateErrors: [ErrorType]? = .None
         var retryCount: Int = 0
         var didRunBlockCount: Int = 0
-        let retry: RetryBlock = { op, errors, aggregateErrors, count in
-            retryErrors = errors
-            retryAggregateErrors = aggregateErrors
-            retryCount = count
+        let retry = { (info: RetryFailureInfo<OperationWhichFailsThenSucceeds>) -> Bool in
+            retryErrors = info.errors
+            retryAggregateErrors = info.aggregateErrors
+            retryCount = info.count
             didRunBlockCount += 1
             return true
         }
