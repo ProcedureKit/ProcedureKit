@@ -17,6 +17,12 @@ public class ComposedOperation<O: NSOperation>: Operation, OperationDidFinishObs
         self.operation = operation
         super.init()
         name = "Composed Operation<\(operation.dynamicType)>"
+
+    }
+
+    public override func cancel() {
+        operation.cancel()
+        super.cancel()
     }
 
     public override func execute() {
