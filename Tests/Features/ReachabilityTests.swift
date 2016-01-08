@@ -106,7 +106,6 @@ class SCNetworkReachabilityFlagsTests: XCTestCase {
     }
 }
 
-
 class NetworkStatusTests: XCTestCase {
 
     var flags: SCNetworkReachabilityFlags!
@@ -138,6 +137,36 @@ class NetworkStatusTests: XCTestCase {
     func test__init_flags__not_reachable() {
         flags = [ .ConnectionRequired ]
         XCTAssertEqual(Reachability.NetworkStatus(flags: flags), Reachability.NetworkStatus.NotReachable)
+    }
+}
+
+class TestableNetworkReachability: NetworkReachabilityType {
+
+    func defaultRouteReachability() throws -> String {
+        return "default"
+    }
+}
+
+class ReachabilityManagerTests: XCTestCase {
+
+    var network: TestableNetworkReachability!
+    var manager: ReachabilityManager<TestableNetworkReachability>!
+
+    override func setUp() {
+        super.setUp()
+        network = TestableNetworkReachability()
+        manager = ReachabilityManager(network)
+    }
+
+    func test__add_observer_new_observer_is_added() {
+        let token = manager.addObserver { _ in }
+        XCTAssertNotNil(manager.observersByID[token])
+    }
+
+    func test__remove_observer_observer_is_removed() {
+        let token = manager.addObserver { _ in }
+        manager.removeObserverWithToken(token)
+        XCTAssertNil(manager.observersByID[token])
     }
 }
 

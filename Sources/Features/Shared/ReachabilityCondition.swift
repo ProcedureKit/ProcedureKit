@@ -25,13 +25,13 @@ public class ReachabilityCondition: OperationCondition {
 
     let url: NSURL
     let connectivity: Reachability.Connectivity
-    let reachability: HostReachability
+    let reachability: HostReachabilityType
 
     public convenience init(url: NSURL, connectivity: Reachability.Connectivity = .AnyConnectionKind) {
-        self.init(url: url, connectivity: connectivity, reachability: Reachability.sharedInstance)
+        self.init(url: url, connectivity: connectivity, reachability: Reachability_.sharedInstance)
     }
 
-    init(url: NSURL, connectivity: Reachability.Connectivity = .AnyConnectionKind, reachability: HostReachability) {
+    init(url: NSURL, connectivity: Reachability.Connectivity = .AnyConnectionKind, reachability: HostReachabilityType) {
         self.url = url
         self.connectivity = connectivity
         self.reachability = reachability

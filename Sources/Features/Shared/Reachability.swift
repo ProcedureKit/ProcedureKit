@@ -9,19 +9,7 @@
 import Foundation
 import SystemConfiguration
 
-public protocol SystemReachability {
-    func addObserver(observer: Reachability.ObserverBlockType) -> String
-    func removeObserverWithToken(token: String)
-}
-
-public protocol HostReachability {
-    func requestReachabilityForURL(url: NSURL, completion: Reachability.ObserverBlockType)
-}
-
-/**
-A `Reachability` class, which performs tasks necessary to manage reachability.
-*/
-public final class Reachability {
+public struct Reachability {
 
     /// The kind of `Reachability` connectivity
     public enum Connectivity {
@@ -34,13 +22,153 @@ public final class Reachability {
         case Reachable(Connectivity)
     }
 
+    /// The ObserverBlockType
     public typealias ObserverBlockType = (NetworkStatus) -> Void
 
     struct Observer {
         let reachabilityDidChange: ObserverBlockType
     }
 
-    public static let sharedInstance = Reachability()
+    /**
+     Add an observer block which will be executed when the network
+     status changes.
+
+     - parameter observer, a `ObserverBlockType` block
+     - returns: a unique string, which is used to remove the observer.
+     */
+    public static func addObserver(observer: ObserverBlockType) -> String {
+        return __device_reachability_manager.addObserver(observer)
+    }
+
+    /**
+     Removes a reachability observer.
+
+     - parameter token, a `String` returned from `addObserver:`
+     */
+    public static func removeObserverWithToken(token: String) {
+        return __device_reachability_manager.removeObserverWithToken(token)
+    }
+}
+
+protocol SystemReachabilityType {
+    func addObserver(observer: Reachability.ObserverBlockType) -> String
+    func removeObserverWithToken(token: String)
+}
+
+protocol HostReachabilityType {
+    func requestReachabilityForURL(url: NSURL, completion: Reachability.ObserverBlockType)
+}
+
+protocol NetworkReachabilityType {
+    typealias Reachability
+
+    func defaultRouteReachability() throws -> Reachability
+}
+
+final class ReachabilityManager<NetworkReachability: NetworkReachabilityType> {
+
+    let network: NetworkReachability
+    var observersByID = Dictionary<String,Reachability.Observer>()
+
+    init(_ network: NetworkReachability) {
+        self.network = network
+    }
+
+    func didAddObserver(observer: Reachability.Observer) {
+
+    }
+
+    func didRemoveObserver(observer: Reachability.Observer) {
+
+    }
+}
+
+extension ReachabilityManager: SystemReachabilityType {
+
+    func addObserver(observer: Reachability.ObserverBlockType) -> String {
+        return addObserverWithToken(NSUUID().UUIDString, observer: observer)
+    }
+
+    func addObserverWithToken(token: String, observer block: Reachability.ObserverBlockType) -> String {
+        let observer = Reachability.Observer(reachabilityDidChange: block)
+        observersByID.updateValue(observer, forKey: token)
+        didAddObserver(observer)
+        return token
+    }
+
+    func removeObserverWithToken(token: String) {
+        if let observer = observersByID.removeValueForKey(token) {
+            didRemoveObserver(observer)
+        }
+    }
+}
+
+extension ReachabilityManager: HostReachabilityType {
+
+    func requestReachabilityForURL(url: NSURL, completion: Reachability.ObserverBlockType) {
+        
+    }
+}
+
+
+
+
+class DeviceReachability: NetworkReachabilityType {
+
+    var __defaultRouteReachability: SCNetworkReachability? = .None
+
+    init() {
+
+    }
+
+    func defaultRouteReachability() throws -> SCNetworkReachability {
+
+        if let reachability = __defaultRouteReachability { return reachability }
+
+        var zeroAddress = sockaddr_in()
+        zeroAddress.sin_len = UInt8(sizeofValue(zeroAddress))
+        zeroAddress.sin_family = sa_family_t(AF_INET)
+
+        guard let reachability = withUnsafePointer(&zeroAddress, {
+            SCNetworkReachabilityCreateWithAddress(nil, UnsafePointer($0))
+        }) else { fatalError("Failed to create blar blar") }
+
+        __defaultRouteReachability = reachability
+
+        return reachability
+    }
+
+
+
+}
+
+private let __device_reachability_manager = ReachabilityManager(DeviceReachability())
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/**
+A `Reachability` class, which performs tasks necessary to manage reachability.
+*/
+public final class Reachability_ {
+
+    public typealias Connectivity = Reachability.Connectivity
+    public typealias NetworkStatus = Reachability.NetworkStatus
+    public typealias ObserverBlockType = Reachability.ObserverBlockType
+    typealias Observer = Reachability.Observer
+
+    public static let sharedInstance = Reachability_()
 
     /**
     Add an observer block which will be executed when the network
@@ -205,10 +333,10 @@ public final class Reachability {
 }
 
 
-extension Reachability: SystemReachability {}
-extension Reachability: HostReachability {}
+extension Reachability_: SystemReachabilityType {}
+extension Reachability_: HostReachabilityType {}
 
-extension Reachability.NetworkStatus: Equatable { }
+extension Reachability_.NetworkStatus: Equatable { }
 
 public func ==(a: Reachability.NetworkStatus, b: Reachability.NetworkStatus) -> Bool {
     switch (a, b) {
@@ -221,7 +349,7 @@ public func ==(a: Reachability.NetworkStatus, b: Reachability.NetworkStatus) -> 
     }
 }
 
-extension Reachability.NetworkStatus {
+extension Reachability_.NetworkStatus {
 
     public init(flags: SCNetworkReachabilityFlags) {
         if flags.isReachableViaWiFi {

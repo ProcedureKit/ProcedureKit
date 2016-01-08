@@ -9,7 +9,7 @@
 import XCTest
 @testable import Operations
 
-class TestableSystemReachability: SystemReachability {
+class TestableSystemReachability: SystemReachabilityType {
 
     var observers = Array<Reachability.ObserverBlockType>()
     var status: Reachability.NetworkStatus {

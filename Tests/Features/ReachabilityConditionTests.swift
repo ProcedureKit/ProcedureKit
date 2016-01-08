@@ -9,7 +9,7 @@
 import XCTest
 @testable import Operations
 
-class TestableReachability: HostReachability {
+class TestableReachability: HostReachabilityType {
 
     let status: Reachability.NetworkStatus
 

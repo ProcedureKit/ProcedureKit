@@ -25,7 +25,7 @@ public class ReachableOperation<O: NSOperation>: GroupOperation {
     /// The required connectivity kind.
     public let connectivity: Reachability.Connectivity
 
-    private let reachability: SystemReachability
+    private let reachability: SystemReachabilityType
     private var token: String? = .None
     private var status: Reachability.NetworkStatus? = .None
 
@@ -37,10 +37,10 @@ public class ReachableOperation<O: NSOperation>: GroupOperation {
     - parameter connectivity: a `Reachability.Connectivity` value, defaults to `.AnyConnectionKind`.
     */
     public convenience init(_ operation: O, connectivity: Reachability.Connectivity = .AnyConnectionKind) {
-        self.init(operation: operation, connectivity: connectivity, reachability: Reachability.sharedInstance)
+        self.init(operation: operation, connectivity: connectivity, reachability: Reachability_.sharedInstance)
     }
 
-    init(operation: O, connectivity: Reachability.Connectivity = .AnyConnectionKind, reachability: SystemReachability) {
+    init(operation: O, connectivity: Reachability.Connectivity = .AnyConnectionKind, reachability: SystemReachabilityType) {
         self.operation = operation
         self.connectivity = connectivity
         self.reachability = reachability
