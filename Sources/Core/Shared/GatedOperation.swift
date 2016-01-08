@@ -15,7 +15,7 @@ import Foundation
  Use this class to execute another operation depending on other
  logic. Unlike a `BlockCondition` this will not fail the operation.
 */
-public class GatedOperation<O: NSOperation>: ComposedOperation<O> {
+public class GatedOperation<T: NSOperation>: ComposedOperation<T> {
 
     public typealias GateBlockType = () -> Bool
 
@@ -29,7 +29,7 @@ public class GatedOperation<O: NSOperation>: ComposedOperation<O> {
      - parameter operation: any subclass of `NSOperation`.
      - parameter gate: a block which returns a Bool.
     */
-    public init(operation: O, gate: GateBlockType) {
+    public init(operation: T, gate: GateBlockType) {
         self.gate = gate
         super.init(operation: operation)
     }

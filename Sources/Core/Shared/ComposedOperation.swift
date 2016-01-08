@@ -8,16 +8,17 @@
 
 import Foundation
 
-public class ComposedOperation<O: NSOperation>: Operation, OperationDidFinishObserver {
+public class ComposedOperation<T: NSOperation>: Operation, OperationDidFinishObserver {
 
-    public let operation: O
-    private var target: Operation? = nil
+    public let operation: T
+    public let target: Operation
 
-    public required init(operation: O) {
-        self.operation = operation
+    public required init(operation op: T) {
+        target = op as? Operation ?? GroupOperation(operations: [op])
+        operation = op
         super.init()
         name = "Composed Operation<\(operation.dynamicType)>"
-
+        target.addObserver(self)
     }
 
     public override func cancel() {
@@ -26,13 +27,7 @@ public class ComposedOperation<O: NSOperation>: Operation, OperationDidFinishObs
     }
 
     public override func execute() {
-        addOperation(operation as? Operation ?? GroupOperation(operations: [operation]))
-    }
-
-    internal func addOperation(operation: Operation) {
-        target = operation
-        operation.addObserver(self)
-        produceOperation(operation)
+        produceOperation(target)
     }
 
     public func operationDidFinish(operation: Operation, errors: [ErrorType]) {

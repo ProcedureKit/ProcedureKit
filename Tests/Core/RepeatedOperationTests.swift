@@ -289,7 +289,7 @@ class NonRepeatableRepeatedOperationTests: OperationTests {
     }
 
     func test__repeated_operation_repeats() {
-        let operation = RepeatedOperation(createGenerator(succeedsAfterCount: 5))
+        let operation = RepeatedOperation(generator: createGenerator(succeedsAfterCount: 5))
 
         addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
         runOperation(operation)
@@ -300,7 +300,7 @@ class NonRepeatableRepeatedOperationTests: OperationTests {
     }
 
     func test__repeated_with_max_number_of_attempts() {
-        let operation = RepeatedOperation(maxCount: 2, createGenerator(succeedsAfterCount: 5))
+        let operation = RepeatedOperation(maxCount: 2, generator: createGenerator(succeedsAfterCount: 5))
 
         addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
         runOperation(operation)

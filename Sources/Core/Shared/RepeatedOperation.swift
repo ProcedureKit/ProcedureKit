@@ -300,10 +300,10 @@ public class RepeatedOperation<T where T: NSOperation>: GroupOperation {
     private var generator: AnyGenerator<T>
 
     /// - returns: the current operation being executed.
-    public internal(set) var operation: T? = .None
+    public internal(set) var current: T
 
     /// - return: the count of operations that have executed.
-    public private(set) var count: Int = 0
+    public internal(set) var count: Int = 1
 
     /**
      The designated initializer.
@@ -313,11 +313,15 @@ public class RepeatedOperation<T where T: NSOperation>: GroupOperation {
      the maximum number of operations which will be executed.
      - parameter: (unnamed) the AnyGenerator<T> generator.
     */
-    public init<G where G: GeneratorType, G.Element == NSTimeInterval>(delay: G, maxCount max: Int?, _ generator: AnyGenerator<T>) {
-        operation = generator.next()
-        guard let op = operation else {
-            preconditionFailure("The generator must return an operation to start with.")
+    public init<D, G where D: GeneratorType, D.Element == NSTimeInterval, G: GeneratorType, G.Element == T>(delay: D, maxCount max: Int?, generator gen: G) {
+
+        generator = gen as? AnyGenerator<T> ?? anyGenerator(gen)
+
+        guard let operation = generator.next() else {
+            preconditionFailure("Operation Generator must return an instance initially.")
         }
+
+        current = operation
 
         switch max {
         case .Some(let max):
@@ -327,21 +331,8 @@ public class RepeatedOperation<T where T: NSOperation>: GroupOperation {
             self.delay = anyGenerator(delay)
         }
 
-        self.generator = generator
-        super.init(operations: [op])
+        super.init(operations: [operation])
         name = "Repeated Operation"
-    }
-
-    /**
-     A convenient initializer.
-
-     - parameter strategy: use the built in wait strategy type, defaults to 0.1 second fixed interval.
-     - parameter maxCount: an optional Int, which defaults to .None. If not nil, this is
-     the maximum number of operations which will be executed.
-     - parameter: (unnamed) the AnyGenerator<T> generator.
-     */
-    public convenience init(strategy: WaitStrategy = .Fixed(0.1), maxCount max: Int? = .None, _ generator: AnyGenerator<T>) {
-        self.init(delay: strategy.generate(), maxCount: max, generator)
     }
 
     /**
@@ -364,14 +355,8 @@ public class RepeatedOperation<T where T: NSOperation>: GroupOperation {
      the maximum number of operations which will be executed.
      - parameter: (unnamed) a generic generator which has an Element equal to T.
      */
-    public convenience init<G where G: GeneratorType, G.Element == T>(strategy: WaitStrategy = .Fixed(0.1), maxCount max: Int? = .None, _ generator: G) {
-        self.init(strategy: strategy, maxCount: max, anyGenerator(generator))
-    }
-
-    /// Override of execute, subclasses which override this must call super.
-    public override func execute() {
-        count = 1
-        super.execute()
+    public convenience init<G where G: GeneratorType, G.Element == T>(strategy: WaitStrategy = .Fixed(0.1), maxCount max: Int? = .None, generator: G) {
+        self.init(delay: strategy.generate(), maxCount: max, generator: generator)
     }
 
     /**
@@ -410,14 +395,23 @@ public class RepeatedOperation<T where T: NSOperation>: GroupOperation {
      can prevent another operation from being added.
     */
     public func addNextOperation(@autoclosure shouldAddNext: () -> Bool = true) {
-        operation = generator.next()
-        if let op = operation, delay = nextDelayOperation() {
+        if let op = next(), delay = nextDelayOperation() {
             if shouldAddNext() {
                 op.addDependency(delay)
                 addOperations(delay, op)
                 count += 1
+                current = op
             }
         }
+    }
+
+    /**
+     Returns the next operation from the generator. This is here to
+     allow subclasses to override and configure the operation
+     further before it is added.
+    */
+    public func next() -> T? {
+        return generator.next()
     }
 
     internal func nextDelayOperation() -> DelayOperation? {
@@ -486,7 +480,7 @@ extension RepeatedOperation where T: Repeatable {
      ```
     */
     public convenience init(strategy: WaitStrategy = .Fixed(0.1), maxCount max: Int? = .None, body: () -> T?) {
-        self.init(strategy: strategy, maxCount: max, RepeatingGenerator(anyGenerator(body)))
+        self.init(strategy: strategy, maxCount: max, generator: RepeatingGenerator(anyGenerator(body)))
     }
 }
 

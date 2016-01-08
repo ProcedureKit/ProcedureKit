@@ -8,30 +8,72 @@
 
 import Foundation
 
-public class RetryOperation<T: Operation>: RepeatedOperation<T> {
+public struct RetryFailureInfo<T: NSOperation> {
+    public let operation: T
+    public let errors: [ErrorType]
+    public let aggregateErrors: [ErrorType]
+    public let count: Int
+    public let addOperations: (NSOperation...) -> Void
+}
 
-    public typealias ShouldRetryBlock = (T, errors: [ErrorType], aggreateErrors: [ErrorType], count: Int) -> Bool
+internal class RetryGenerator<T: NSOperation>: GeneratorType {
 
-    let shouldRetryOperation: ShouldRetryBlock
+    var info: RetryFailureInfo<T>? = .None
 
-    public init<G where G: GeneratorType, G.Element == NSTimeInterval>(delay: G, maxCount max: Int?, shouldRetry: ShouldRetryBlock, _ body: () -> T) {
-        self.shouldRetryOperation = shouldRetry
-        super.init(delay: delay, maxCount: max, anyGenerator {
-            let op = body()
-            op.addCondition(NoFailedDependenciesCondition())
-            return op
-        })
+    let shouldRetry: RetryFailureInfo<T> -> Bool
+    private var generator: AnyGenerator<T>
+
+    init(generator: AnyGenerator<T>, shouldRetry: RetryFailureInfo<T> -> Bool) {
+        self.generator = generator
+        self.shouldRetry = shouldRetry
+    }
+
+    func next() -> T? {
+        guard let info = info else {
+            return generator.next()
+        }
+        guard shouldRetry(info) else {
+            return nil
+        }
+
+        return generator.next()
+    }
+}
+
+public class RetryOperation<T: NSOperation>: RepeatedOperation<T> {
+    public typealias FailureInfo = RetryFailureInfo<T>
+
+    let retry: RetryGenerator<T>
+
+    public init<D, G where D: GeneratorType, D.Element == NSTimeInterval, G: GeneratorType, G.Element == T>(delay: D, maxCount max: Int?, shouldRetry: RetryFailureInfo<T> -> Bool, generator: G) {
+        retry = RetryGenerator(generator: anyGenerator(generator), shouldRetry: shouldRetry)
+        super.init(delay: delay, maxCount: max, generator: retry)
         name = "Retry Operation"
     }
 
-    public convenience init(strategy: WaitStrategy = .Fixed(0.1), maxCount max: Int? = 5, shouldRetry: ShouldRetryBlock = {_, _, _, _ in true }, _ body: () -> T) {
+    public convenience init<G where G: GeneratorType, G.Element == NSTimeInterval>(delay: G, maxCount max: Int?, shouldRetry: RetryFailureInfo<T> -> Bool, _ body: () -> T?) {
+        self.init(delay: delay, maxCount: max, shouldRetry: shouldRetry, generator: anyGenerator { body() })
+    }
+
+    public convenience init(strategy: WaitStrategy = .Fixed(0.1), maxCount max: Int? = 5, shouldRetry: RetryFailureInfo<T> -> Bool = { _ in true }, _ body: () -> T) {
         self.init(delay: strategy.generate(), maxCount: max, shouldRetry: shouldRetry, body)
     }
 
     public override func operationDidFinish(operation: NSOperation, withErrors errors: [ErrorType]) {
         if !errors.isEmpty, let op = operation as? T {
-            addNextOperation(shouldRetryOperation(op, errors: errors, aggreateErrors: aggregateErrors, count: count))
+            retry.info = createFailureInfo(op, errors: errors)
+            addNextOperation()
         }
+    }
+
+    internal func createFailureInfo(operation: T, errors: [ErrorType]) -> RetryFailureInfo<T> {
+        return RetryFailureInfo(
+            operation: operation,
+            errors: errors,
+            aggregateErrors: aggregateErrors,
+            count: count,
+            addOperations: addOperations
+        )
     }
 }
 
