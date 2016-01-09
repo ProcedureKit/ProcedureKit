@@ -140,12 +140,38 @@ class NetworkStatusTests: XCTestCase {
     }
 }
 
-class TestableNetworkReachability: NetworkReachabilityType {
+class TestableNetworkReachability {
+    typealias Reachability = String
 
-    func defaultRouteReachability() throws -> String {
-        return "default"
+    var didGetDefaultRouteReachability = false
+    var _defaultRouteReachability: Reachability = "Default"
+
+    var flags: SCNetworkReachabilityFlags = .Reachable
+
+    var didStartNotifier = false
+    var didStopNotifier = false
+
+    weak var delegate: NetworkReachabilityDelegate?
+}
+
+extension TestableNetworkReachability: NetworkReachabilityType {
+
+    func defaultRouteReachability() throws -> Reachability {
+        didGetDefaultRouteReachability = true
+        return _defaultRouteReachability
+    }
+
+    func startNotifierOnQueue(queue: dispatch_queue_t) throws -> Bool {
+        didStartNotifier = true
+        delegate?.reachabilityDidChange(flags)
+        return true
+    }
+
+    func stopNotifier() {
+        didStopNotifier = true
     }
 }
+
 
 class ReachabilityManagerTests: XCTestCase {
 
@@ -159,14 +185,48 @@ class ReachabilityManagerTests: XCTestCase {
     }
 
     func test__add_observer_new_observer_is_added() {
-        let token = manager.addObserver { _ in }
+        let token = try! manager.addObserver { _ in }
         XCTAssertNotNil(manager.observersByID[token])
+        XCTAssertTrue(network.didStartNotifier)
     }
 
     func test__remove_observer_observer_is_removed() {
-        let token = manager.addObserver { _ in }
+        let token = try! manager.addObserver { _ in }
         manager.removeObserverWithToken(token)
         XCTAssertNil(manager.observersByID[token])
+        XCTAssertTrue(network.didStopNotifier)
+        XCTAssertFalse(manager.isRunning)
+    }
+
+    func test__add_observer_starts_notifier() {
+        try! manager.addObserver { _ in }
+        XCTAssertTrue(manager.isRunning)
+    }
+
+    func test__notifier_is_only_stopped_when_last_observer_is_removed() {
+        let token1 = try! manager.addObserver { _ in }
+        XCTAssertTrue(manager.isRunning)
+        XCTAssertTrue(network.didStartNotifier)
+        let token2 = try! manager.addObserver { _ in }
+        manager.removeObserverWithToken(token1)
+        XCTAssertFalse(network.didStopNotifier)
+        manager.removeObserverWithToken(token2)
+        XCTAssertTrue(network.didStopNotifier)
+        XCTAssertFalse(manager.isRunning)
+    }
+
+    func test__add_observer_triggers_observer_callback() {
+        let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
+        var networkStatus: Reachability.NetworkStatus? = .None
+        let _ = try! manager.addObserver { status in
+            networkStatus = status
+            expectation.fulfill()
+        }
+
+        waitForExpectationsWithTimeout(3, handler: nil)
+
+        XCTAssertNotNil(networkStatus)
+        XCTAssertNotEqual(networkStatus, Reachability.NetworkStatus.NotReachable)
     }
 }
 

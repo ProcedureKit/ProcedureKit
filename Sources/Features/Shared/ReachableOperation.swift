@@ -46,7 +46,7 @@ public class ReachableOperation<O: NSOperation>: GroupOperation {
         self.reachability = reachability
         super.init(operations: [])
         name = "Reachable Operation <\(operation.operationName)>"
-        token = reachability.addObserver { status in
+        token = try! reachability.addObserver { status in
             self.status = status
         }
     }
