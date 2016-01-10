@@ -91,6 +91,7 @@ final class ReachabilityManager<NetworkReachability: NetworkReachabilityType>: N
     var network: NetworkReachability
     var observersByID = Dictionary<String,Reachability.Observer>()
     var isRunning = false
+    var previousReachabilityFlags: SCNetworkReachabilityFlags? = .None
 
     init(_ network: NetworkReachability) {
         self.network = network
@@ -111,6 +112,18 @@ final class ReachabilityManager<NetworkReachability: NetworkReachabilityType>: N
     }
 
     func reachabilityDidChange(flags: SCNetworkReachabilityFlags) {
+        if let previous = previousReachabilityFlags {
+            if previous != flags {
+                updateObservers(flags)
+            }
+        }
+        else {
+            updateObservers(flags)
+        }
+        previousReachabilityFlags = flags
+    }
+
+    func updateObservers(flags: SCNetworkReachabilityFlags) {
         let networkStatus = NetworkStatus(flags: flags)
         dispatch_async(Queue.Main.queue) { [observers = observersByID] in
             for (_, observer) in observers {
@@ -143,7 +156,7 @@ extension ReachabilityManager: SystemReachabilityType {
 extension ReachabilityManager: HostReachabilityType {
 
     func requestReachabilityForURL(url: NSURL, completion: Reachability.ObserverBlockType) {
-        
+
     }
 }
 
