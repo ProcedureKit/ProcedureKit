@@ -337,7 +337,7 @@ class CloudOperationTests: CloudKitOperationTests {
     override func setUp() {
         super.setUp()
         target = TestCloudOperation()
-        operation = CloudKitOperation(operation: target, reachability: reachability)
+        operation = CloudKitOperation(target, reachability: reachability)
     }
 
     func test__get_countainer() {
@@ -361,7 +361,7 @@ class DatabaseOperationTests: CloudKitOperationTests {
     override func setUp() {
         super.setUp()
         target = TestDatabaseOperation()
-        operation = CloudKitOperation(operation: target, reachability: reachability)
+        operation = CloudKitOperation(target, reachability: reachability)
     }
 
     func test__get_database() {
@@ -426,7 +426,7 @@ class DiscoverAllContactsOperationTests: CloudKitOperationTests {
     override func setUp() {
         super.setUp()
         target = TestDiscoverAllContactsOperation(result: [])
-        operation = CloudKitOperation(operation: target, reachability: reachability)
+        operation = CloudKitOperation(target, reachability: reachability)
     }
 
     func test__execution_after_cancellation() {
@@ -500,7 +500,7 @@ class DiscoverUserInfosOperationTests: CloudKitOperationTests {
     override func setUp() {
         super.setUp()
         target = TestDiscoverUserInfosOperation(userInfosByEmailAddress: [:], userInfoByRecordID: [:])
-        operation = CloudKitOperation(operation: target, reachability: reachability)
+        operation = CloudKitOperation(target, reachability: reachability)
     }
 
     func test__get_email_addresses() {
@@ -576,7 +576,7 @@ class FetchNotificationChangesOperationTests: CloudKitOperationTests {
         super.setUp()
         token = "i'm a server token"
         target = TestFetchNotificationChangesOperation(token: token)
-        operation = CloudKitOperation(operation: target, reachability: reachability)
+        operation = CloudKitOperation(target, reachability: reachability)
     }
 
     func test__get_set_notification_charged_block() {
@@ -632,7 +632,7 @@ class MarkNotificationsReadOperationTests: CloudKitOperationTests {
         super.setUp()
         toMark = [ "this-is-an-id", "this-is-another-id" ]
         target = TestMarkNotificationsReadOperation(markIDsToRead: toMark)
-        operation = CloudKitOperation(operation: target, reachability: reachability)
+        operation = CloudKitOperation(target, reachability: reachability)
     }
 
     func test__get_notification_id() {
@@ -684,7 +684,7 @@ class ModifyBadgeOperationTests: CloudKitOperationTests {
         super.setUp()
         badge = 9
         target = TestModifyBadgeOperation(value: badge)
-        operation = CloudKitOperation(operation: target, reachability: reachability)
+        operation = CloudKitOperation(target, reachability: reachability)
     }
 
     func test__get_badge_value() {
@@ -734,7 +734,7 @@ class FetchRecordChangesOperationTests: CloudKitOperationTests {
     override func setUp() {
         super.setUp()
         target = TestFetchRecordChangesOperation()
-        operation = CloudKitOperation(operation: target, reachability: reachability)
+        operation = CloudKitOperation(target, reachability: reachability)
     }
 
     func test__get_record_zone_id() {
@@ -806,7 +806,7 @@ class FetchRecordZonesOperationTests: CloudKitOperationTests {
     override func setUp() {
         super.setUp()
         target = TestFetchRecordZonesOperation()
-        operation = CloudKitOperation(operation: target, reachability: reachability)
+        operation = CloudKitOperation(target, reachability: reachability)
     }
 
     func test__get_record_zone_ids() {
@@ -858,7 +858,7 @@ class FetchRecordsOperationTests: CloudKitOperationTests {
     override func setUp() {
         super.setUp()
         target = TestFetchRecordsOperation()
-        operation = CloudKitOperation(operation: target, reachability: reachability)
+        operation = CloudKitOperation(target, reachability: reachability)
     }
 
     func test__get_record_ids() {
@@ -932,7 +932,7 @@ class FetchSubscriptionsOperationTests: CloudKitOperationTests {
     override func setUp() {
         super.setUp()
         target = TestFetchSubscriptionsOperation()
-        operation = CloudKitOperation(operation: target, reachability: reachability)
+        operation = CloudKitOperation(target, reachability: reachability)
     }
 
     func test__get_subscription_ids() {
@@ -984,7 +984,7 @@ class ModifyRecordZonesOperationTests: CloudKitOperationTests {
     override func setUp() {
         super.setUp()
         target = TestModifyRecordZonesOperation()
-        operation = CloudKitOperation(operation: target, reachability: reachability)
+        operation = CloudKitOperation(target, reachability: reachability)
     }
 
     func test__get_zones_to_save() {
@@ -1048,7 +1048,7 @@ class ModifyRecordsOperationTests: CloudKitOperationTests {
     override func setUp() {
         super.setUp()
         target = TestModifyRecordsOperation()
-        operation = CloudKitOperation(operation: target, reachability: reachability)
+        operation = CloudKitOperation(target, reachability: reachability)
     }
 
     func test__get_records_to_save() {
@@ -1164,7 +1164,7 @@ class ModifySubscriptionsOperationTests: CloudKitOperationTests {
     override func setUp() {
         super.setUp()
         target = TestModifySubscriptionsOperation()
-        operation = CloudKitOperation(operation: target, reachability: reachability)
+        operation = CloudKitOperation(target, reachability: reachability)
     }
 
     func test__get_subscriptions_to_save() {
@@ -1228,7 +1228,7 @@ class QueryOperationTests: CloudKitOperationTests {
     override func setUp() {
         super.setUp()
         target = TestQueryOperation()
-        operation = CloudKitOperation(operation: target, reachability: reachability)
+        operation = CloudKitOperation(target, reachability: reachability)
     }
 
     func test__get_query() {
