@@ -42,7 +42,7 @@ public class ReachabilityCondition: OperationCondition {
     }
 
     public func evaluateForOperation(operation: Operation, completion: OperationConditionResult -> Void) {
-        reachability.requestReachabilityForURL(url) { kind in
+        reachability.reachabilityForURL(url) { kind in
             switch (self.connectivity, kind) {
             case (_, .NotReachable):
                 completion(.Failed(Error.NotReachable))

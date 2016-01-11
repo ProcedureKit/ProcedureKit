@@ -17,7 +17,7 @@ class TestableReachability: HostReachabilityType {
         status = networkStatus
     }
 
-    func requestReachabilityForURL(url: NSURL, completion: Reachability.ObserverBlockType) {
+    func reachabilityForURL(url: NSURL, completion: Reachability.ObserverBlockType) {
         completion(status)
     }
 }

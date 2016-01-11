@@ -31,7 +31,7 @@ public struct Reachability {
     }
 
     /// The ObserverBlockType
-    public typealias ObserverBlockType = (NetworkStatus) -> Void
+    public typealias ObserverBlockType = NetworkStatus -> Void
 
     struct Observer {
         let reachabilityDidChange: ObserverBlockType
@@ -64,7 +64,7 @@ protocol SystemReachabilityType {
 }
 
 protocol HostReachabilityType {
-    func requestReachabilityForURL(url: NSURL, completion: Reachability.ObserverBlockType)
+    func reachabilityForURL(url: NSURL, completion: Reachability.ObserverBlockType)
 }
 
 protocol NetworkReachabilityDelegate: class {
@@ -79,6 +79,8 @@ protocol NetworkReachabilityType {
     func startNotifierOnQueue(queue: dispatch_queue_t) throws -> Bool
 
     func stopNotifier()
+
+    func reachabilityFlagsForHostname(host: String) -> SCNetworkReachabilityFlags?
 }
 
 
@@ -155,13 +157,20 @@ extension ReachabilityManager: SystemReachabilityType {
 
 extension ReachabilityManager: HostReachabilityType {
 
-    func requestReachabilityForURL(url: NSURL, completion: Reachability.ObserverBlockType) {
+    func reachabilityForURL(url: NSURL, completion: Reachability.ObserverBlockType) {
 
+        dispatch_async(queue) { [reachabilityFlagsForHostname = network.reachabilityFlagsForHostname] in
+            if let host = url.host, flags = reachabilityFlagsForHostname(host) {
+                completion(Reachability.NetworkStatus(flags: flags))
+            }
+            else {
+                completion(.NotReachable)
+            }
+        }
     }
 }
 
-
-
+// MARK: - Not Testable
 
 class DeviceReachability: NetworkReachabilityType {
 
@@ -190,9 +199,12 @@ class DeviceReachability: NetworkReachabilityType {
         return reachability
     }
 
+    func reachabilityForHost(host: String) -> SCNetworkReachability? {
+        return SCNetworkReachabilityCreateWithName(nil, (host as NSString).UTF8String)
+    }
+
     func getFlagsForReachability(reachability: SCNetworkReachability) -> SCNetworkReachabilityFlags {
         var flags = SCNetworkReachabilityFlags()
-
         guard withUnsafeMutablePointer(&flags, {
             SCNetworkReachabilityGetFlags(reachability, UnsafeMutablePointer($0))
         }) else { return SCNetworkReachabilityFlags() }
@@ -227,10 +239,7 @@ class DeviceReachability: NetworkReachabilityType {
             throw Error.FailedToScheduleNotifier
         }
 
-        dispatch_async(queue) {
-            let flags = self.getFlagsForReachability(reachability)
-            self.delegate!.reachabilityDidChange(flags)
-        }
+        check(reachability, queue: queue)
 
         return true
     }
@@ -240,6 +249,11 @@ class DeviceReachability: NetworkReachabilityType {
             SCNetworkReachabilityUnscheduleFromRunLoop(reachability, CFRunLoopGetCurrent(), kCFRunLoopCommonModes)
             SCNetworkReachabilitySetCallback(reachability, nil, nil)
         }
+    }
+
+    func reachabilityFlagsForHostname(host: String) -> SCNetworkReachabilityFlags? {
+        guard let reachability = reachabilityForHost(host) else { return .None }
+        return getFlagsForReachability(reachability)
     }
 }
 
@@ -362,7 +376,7 @@ public final class Reachability_ {
         stopNotifier()
     }
 
-    public func requestReachabilityForURL(url: NSURL, completion: ObserverBlockType) {
+    public func reachabilityForURL(url: NSURL, completion: ObserverBlockType) {
         if let host = url.host {
             dispatch_async(queue) {
                 var status = NetworkStatus.NotReachable

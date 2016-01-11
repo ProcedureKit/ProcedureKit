@@ -151,6 +151,8 @@ class TestableNetworkReachability {
     var didStartNotifier = false
     var didStopNotifier = false
 
+    var didGetReachabilityFlagsForHostname = false
+
     weak var delegate: NetworkReachabilityDelegate?
 }
 
@@ -169,6 +171,11 @@ extension TestableNetworkReachability: NetworkReachabilityType {
 
     func stopNotifier() {
         didStopNotifier = true
+    }
+
+    func reachabilityFlagsForHostname(host: String) -> SCNetworkReachabilityFlags? {
+        didGetReachabilityFlagsForHostname = true
+        return flags
     }
 }
 
@@ -227,6 +234,51 @@ class ReachabilityManagerTests: XCTestCase {
 
         XCTAssertNotNil(networkStatus)
         XCTAssertNotEqual(networkStatus, Reachability.NetworkStatus.NotReachable)
+    }
+
+    func test__add_observer_only_notifies_observers_when_reachability_changes() {
+        manager.previousReachabilityFlags = [ .ConnectionRequired ]
+        network.flags = [ .Reachable ]
+        var networkStatus: Reachability.NetworkStatus? = .None
+        let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
+        let _ = try! manager.addObserver { status in
+            networkStatus = status
+            expectation.fulfill()
+        }
+
+        waitForExpectationsWithTimeout(3, handler: nil)
+
+        XCTAssertNotNil(networkStatus)
+        XCTAssertNotEqual(networkStatus, Reachability.NetworkStatus.NotReachable)
+    }
+
+    func test__reachability_with_valid_host() {
+        network.flags = .Reachable
+        var networkStatus: Reachability.NetworkStatus? = .None
+        let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
+        manager.reachabilityForURL(NSURL(string: "http://www.apple.com")!) { status in
+            networkStatus = status
+            expectation.fulfill()
+        }
+
+        waitForExpectationsWithTimeout(3, handler: nil)
+
+        XCTAssertNotNil(networkStatus)
+        XCTAssertNotEqual(networkStatus, Reachability.NetworkStatus.NotReachable)
+    }
+
+    func test__reachability_with_invalid_host() {
+        var networkStatus: Reachability.NetworkStatus? = .None
+        let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
+        manager.reachabilityForURL(NSURL(string: "invalid-host")!) { status in
+            networkStatus = status
+            expectation.fulfill()
+        }
+
+        waitForExpectationsWithTimeout(3, handler: nil)
+
+        XCTAssertNotNil(networkStatus)
+        XCTAssertEqual(networkStatus, Reachability.NetworkStatus.NotReachable)
     }
 }
 
