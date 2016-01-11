@@ -42,8 +42,8 @@ public class ReachabilityCondition: OperationCondition {
     }
 
     public func evaluateForOperation(operation: Operation, completion: OperationConditionResult -> Void) {
-        reachability.reachabilityForURL(url) { kind in
-            switch (self.connectivity, kind) {
+        reachability.reachabilityForURL(url) { status in
+            switch (self.connectivity, status) {
             case (_, .NotReachable):
                 completion(.Failed(Error.NotReachable))
             case (.AnyConnectionKind, _), (.ViaWWAN, _):
@@ -63,7 +63,8 @@ public func ==(a: ReachabilityCondition.Error, b: ReachabilityCondition.Error) -
         return true
     case let (.NotReachableWithConnectivity(aConnectivity), .NotReachableWithConnectivity(bConnectivity)):
         return aConnectivity == bConnectivity
-    default: return false
+    default:
+        return false
     }
 }
 
