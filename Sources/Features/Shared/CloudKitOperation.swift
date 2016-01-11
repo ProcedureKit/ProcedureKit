@@ -183,10 +183,10 @@ extension CKQueryOperation: CKQueryOperationType { }
 
 // MARK: - CloudKitOperation
 
-public class CloudKitOperation<T where T: NSOperation, T: CKOperationType>: ComposedOperation<T> {
+public class CloudKitOperation<T where T: NSOperation, T: CKOperationType>: ReachableOperation<T> {
 
-    public required init(_ op: T) {
-        super.init(operation: op)
+    override init(operation: T, connectivity: Reachability.Connectivity = .AnyConnectionKind, reachability: SystemReachabilityType) {
+        super.init(operation: operation, connectivity: connectivity, reachability: reachability)
         name = "CloudKit Operation<\(operation.dynamicType)>"
     }
 }
@@ -200,7 +200,6 @@ extension CloudKitOperation where T: CKOperationType {
         set { operation.container = newValue }
     }
 }
-
 
 // MARK: - CKDatabaseOperation
 
