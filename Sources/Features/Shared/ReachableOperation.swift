@@ -9,94 +9,68 @@
 import Foundation
 
 /**
-Compose your `NSOperation` inside a `ReachableOperation` to
-ensure that it is executed when the desired connectivity is
-available.
-
-If the device is not reachable, the operation will observe
-the default route reachability, and add your operation as
-soon as the conditions are met.
+ Compose your `NSOperation` inside a `ReachableOperation` to
+ ensure that it is executed when the desired connectivity is
+ available.
+ 
+ If the device is not reachable, the operation will observe
+ the default route reachability, and add your operation as
+ soon as the conditions are met.
 */
-public class ReachableOperation<O: NSOperation>: GroupOperation {
-
-    /// The composed operation
-    public let operation: O
-
-    /// The required connectivity kind.
-    public let connectivity: Reachability.Connectivity
+public class ReachableOperation<T: NSOperation>: ComposedOperation<T> {
 
     private let reachability: SystemReachabilityType
     private var token: String? = .None
     private var status: Reachability.NetworkStatus? = .None
 
+    /// The required connectivity kind.
+    public let connectivity: Reachability.Connectivity
+
     /**
-    Composes an operation to ensure that is will definitely be executed as soon as
-    the required kind of connectivity is achieved.
+     Composes an operation to ensure that is will definitely be executed as soon as
+     the required kind of connectivity is achieved.
     
-    - parameter [unlabeled] operation: any `NSOperation` type.
-    - parameter connectivity: a `Reachability.Connectivity` value, defaults to `.AnyConnectionKind`.
+     - parameter [unlabeled] operation: any `NSOperation` type.
+     - parameter connectivity: a `Reachability.Connectivity` value, defaults to `.AnyConnectionKind`.
     */
-    public convenience init(_ operation: O, connectivity: Reachability.Connectivity = .AnyConnectionKind) {
+    public convenience init(_ operation: T, connectivity: Reachability.Connectivity = .AnyConnectionKind) {
         self.init(operation: operation, connectivity: connectivity, reachability: Reachability.sharedInstance)
     }
 
-    init(operation: O, connectivity: Reachability.Connectivity = .AnyConnectionKind, reachability: SystemReachabilityType) {
-        self.operation = operation
+    init(operation: T, connectivity: Reachability.Connectivity = .AnyConnectionKind, reachability: SystemReachabilityType) {
         self.connectivity = connectivity
         self.reachability = reachability
-        super.init(operations: [])
+        super.init(operation: operation)
         name = "Reachable Operation <\(operation.operationName)>"
-        token = try! reachability.addObserver { status in
-            self.status = status
-        }
     }
 
     public override func execute() {
-        addOperation(evaluate())
-        super.execute()
-    }
-
-    private func evaluate() -> NSOperation {
-        if checkStatus() {
-            if let token = token {
-                reachability.removeObserverWithToken(token)
-            }
-            return operation
-        }
-        else {
-            return checkStatusAgain()
-        }
-    }
-
-    private func checkStatus() -> Bool {
-        if let status = status {
-            switch (connectivity, status) {
-            case (_, .NotReachable), (.ViaWiFi, .Reachable(.ViaWWAN)):
-                return false
-            case (.AnyConnectionKind, _), (.ViaWWAN, _), (.ViaWiFi, .Reachable(.ViaWiFi)):
-                return true
-            default:
-                return false
-            }
-        }
-        return false
-    }
-
-    private func checkStatusAgain(delay: NSTimeInterval = 1.0) -> Operation {
-
-        let reevaluate = BlockOperation { [weak self] (continueWithError: BlockOperation.ContinuationBlockType) in
-            let after = dispatch_time(DISPATCH_TIME_NOW, Int64(delay * Double(NSEC_PER_SEC)))
-            dispatch_after(after, Queue.Default.queue) {
-                if let weakSelf = self {
-                    weakSelf.addOperation(weakSelf.evaluate())
+        do {
+            let _execute = super.execute
+            self.token = try reachability.addObserver { [weak self] status in
+                if let weakSelf = self, token = weakSelf.token {
+                    if weakSelf.checkStatus(status) {
+                        weakSelf.reachability.removeObserverWithToken(token)
+                        _execute()
+                    }
                 }
-                continueWithError(error: nil)
             }
         }
+        catch {
+            log.fatal("Reachability Error: \(error)")
+            finish(error)
+        }
+    }
 
-        reevaluate.name = "Reevaluate Network Status"
-        return reevaluate
+    internal func checkStatus(status: Reachability.NetworkStatus) -> Bool {
+        switch (connectivity, status) {
+        case (_, .NotReachable):
+            return false
+        case (.AnyConnectionKind, _), (.ViaWWAN, _), (.ViaWiFi, .Reachable(.ViaWiFi)):
+            return true
+        default:
+            return false
+        }
     }
 }
-
 
