@@ -16,6 +16,17 @@ class GroupOperationTests: OperationTests {
         return (0..<3).map { _ in TestOperation() }
     }
 
+    func test__cancel_group_operation() {
+
+        let operations = createGroupOperations()
+        let operation = GroupOperation(operations: operations)
+        operation.cancel()
+
+        for op in operations {
+            XCTAssertTrue(op.cancelled)
+        }
+    }
+
     func test__group_operations_are_performed_in_order() {
         let group = createGroupOperations()
         let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
@@ -77,6 +88,22 @@ class GroupOperationTests: OperationTests {
         XCTAssertTrue(operations[0].didExecute)
         XCTAssertTrue(operations[1].didExecute)
         XCTAssertTrue(operations[2].didExecute)
+    }
+
+    func test__child_observer_is_called() {
+        let group = createGroupOperations()
+        let operation = GroupOperation(operations: group)
+
+        var childDidFinish: Int = 0
+        operation.addChildObserver { group, op, errors in
+            childDidFinish += 1
+        }
+
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        runOperation(operation)
+        waitForExpectationsWithTimeout(3, handler: nil)
+
+        XCTAssertEqual(childDidFinish, 3)
     }
 }
 
