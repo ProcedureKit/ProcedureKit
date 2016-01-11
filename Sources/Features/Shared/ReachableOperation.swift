@@ -37,7 +37,7 @@ public class ReachableOperation<O: NSOperation>: GroupOperation {
     - parameter connectivity: a `Reachability.Connectivity` value, defaults to `.AnyConnectionKind`.
     */
     public convenience init(_ operation: O, connectivity: Reachability.Connectivity = .AnyConnectionKind) {
-        self.init(operation: operation, connectivity: connectivity, reachability: Reachability_.sharedInstance)
+        self.init(operation: operation, connectivity: connectivity, reachability: Reachability.sharedInstance)
     }
 
     init(operation: O, connectivity: Reachability.Connectivity = .AnyConnectionKind, reachability: SystemReachabilityType) {

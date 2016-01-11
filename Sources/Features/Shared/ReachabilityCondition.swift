@@ -28,7 +28,7 @@ public class ReachabilityCondition: OperationCondition {
     let reachability: HostReachabilityType
 
     public convenience init(url: NSURL, connectivity: Reachability.Connectivity = .AnyConnectionKind) {
-        self.init(url: url, connectivity: connectivity, reachability: Reachability_.sharedInstance)
+        self.init(url: url, connectivity: connectivity, reachability: Reachability.sharedInstance)
     }
 
     init(url: NSURL, connectivity: Reachability.Connectivity = .AnyConnectionKind, reachability: HostReachabilityType) {
