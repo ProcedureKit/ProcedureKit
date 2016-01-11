@@ -33,14 +33,14 @@ public class ReachableOperation<T: NSOperation>: ComposedOperation<T> {
      - parameter [unlabeled] operation: any `NSOperation` type.
      - parameter connectivity: a `Reachability.Connectivity` value, defaults to `.AnyConnectionKind`.
     */
-    public convenience init(_ operation: T, connectivity: Reachability.Connectivity = .AnyConnectionKind) {
-        self.init(operation: operation, connectivity: connectivity, reachability: Reachability.sharedInstance)
+    public convenience init(connectivity: Reachability.Connectivity = .AnyConnectionKind, @autoclosure(escaping) operation: () -> T) {
+        self.init(connectivity: connectivity, reachability: Reachability.sharedInstance, operation: operation)
     }
 
-    init(operation: T, connectivity: Reachability.Connectivity = .AnyConnectionKind, reachability: SystemReachabilityType) {
+    init(connectivity: Reachability.Connectivity = .AnyConnectionKind, reachability: SystemReachabilityType, @autoclosure(escaping) operation creator: () -> T) {
         self.connectivity = connectivity
         self.reachability = reachability
-        super.init(operation: operation)
+        super.init(operation: creator)
         name = "Reachable Operation <\(operation.operationName)>"
     }
 
