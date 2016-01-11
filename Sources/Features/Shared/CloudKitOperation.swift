@@ -49,7 +49,9 @@ public protocol CKDesiredKeys: CKOperationType {
     var desiredKeys: [String]? { get set }
 }
 
-public typealias CKFetchOperationType = protocol<CKPreviousServerChangeToken, CKResultsLimit, CKMoreComing>
+public typealias CKBatchedOperationType = protocol<CKResultsLimit, CKMoreComing>
+
+public typealias CKFetchOperationType = protocol<CKPreviousServerChangeToken, CKBatchedOperationType>
 
 public protocol CKDiscoverAllContactsOperationType: CKOperationType {
     var discoverAllContactsCompletionBlock: (([DiscoveredUserInfo]?, NSError?) -> Void)? { get set }
@@ -185,9 +187,24 @@ extension CKQueryOperation: CKQueryOperationType { }
 
 public class CloudKitOperation<T where T: NSOperation, T: CKOperationType>: ReachableOperation<T> {
 
-    init(_ op: T, connectivity: Reachability.Connectivity = .AnyConnectionKind, reachability: SystemReachabilityType) {
-        super.init(operation: op, connectivity: connectivity, reachability: reachability)
+    internal var _batchProcessingEnabled: Bool = false
+
+    public convenience init(connectivity: Reachability.Connectivity = .AnyConnectionKind, @autoclosure(escaping) _ creator: () -> T) {
+        self.init(connectivity: connectivity, reachability: Reachability.sharedInstance, operation: creator)
+    }
+
+    override init(connectivity: Reachability.Connectivity = .AnyConnectionKind, reachability: SystemReachabilityType, @autoclosure(escaping) operation creator: () -> T) {
+        super.init(connectivity: connectivity, reachability: reachability, operation: creator)
         name = "CloudKit Operation<\(operation.dynamicType)>"
+    }
+
+    internal func updateCreator(block: T -> Void) {
+        let _creator = creator
+        creator = {
+            let op = _creator()
+            block(op)
+            return op
+        }
     }
 }
 
@@ -241,6 +258,34 @@ extension CloudKitOperation where T: CKDesiredKeys {
     public var desiredKeys: [String]? {
         get { return operation.desiredKeys }
         set { operation.desiredKeys = newValue }
+    }
+}
+
+// MARK: - Greedy Batch Processing
+
+extension CloudKitOperation where T: CKBatchedOperationType {
+
+    public var enableBatchProcessing: Bool {
+        get { return _batchProcessingEnabled }
+        set { _batchProcessingEnabled = newValue }
+    }
+
+    internal func setupBatchProcessing() {
+        if let target = target as? GroupOperation {
+            let doBatchProcessing = self.performBatchProcessing
+            target.addChildObserver { group, _, errors in
+                if errors.isEmpty {
+                    doBatchProcessing(group)
+                }
+            }
+        }
+    }
+
+    internal func performBatchProcessing(group: GroupOperation) {
+        guard enableBatchProcessing && moreComing else { return }
+        let op = creator()
+        operation = op
+        group.addOperation(op)
     }
 }
 
@@ -299,11 +344,15 @@ extension CloudKitOperation where T: CKFetchNotificationChangesOperationType {
 
     public var notificationChangedBlock: ((T.Notification) -> Void)? {
         get { return operation.notificationChangedBlock }
-        set { operation.notificationChangedBlock = newValue }
+        set {
+            operation.notificationChangedBlock = newValue
+            updateCreator { $0.notificationChangedBlock = newValue }
+        }
     }
 
     public func setFetchNotificationChangesCompletionBlock(block: FetchNotificationChangesCompletionBlock) {
-        operation.fetchNotificationChangesCompletionBlock = { [unowned target] token, error in
+
+        let completion: (T.ServerChangeToken?, NSError?) -> Void = { [unowned target] token, error in
             if let error = error, target = target as? GroupOperation {
                 target.aggregateError(error)
             }
@@ -311,6 +360,9 @@ extension CloudKitOperation where T: CKFetchNotificationChangesOperationType {
                 block(token)
             }
         }
+        operation.fetchNotificationChangesCompletionBlock = completion
+        updateCreator { $0.fetchNotificationChangesCompletionBlock = completion }
+        setupBatchProcessing()
     }
 }
 
@@ -382,7 +434,7 @@ extension CloudKitOperation where T: CKFetchRecordChangesOperationType {
     }
 
     public func setFetchRecordChangesCompletionBlock(block: FetchRecordChangesCompletionBlock) {
-        operation.fetchRecordChangesCompletionBlock = { [unowned target] token, data, error in
+        let completion: (T.ServerChangeToken?, NSData?, NSError?) -> Void = { [unowned target] token, data, error in
             if let error = error, target = target as? GroupOperation {
                 target.aggregateError(error)
             }
@@ -390,6 +442,10 @@ extension CloudKitOperation where T: CKFetchRecordChangesOperationType {
                 block(token, data)
             }
         }
+
+        operation.fetchRecordChangesCompletionBlock = completion
+        updateCreator { $0.fetchRecordChangesCompletionBlock = completion }
+        setupBatchProcessing()
     }
 }
 
@@ -451,7 +507,6 @@ extension CloudKitOperation where T: CKFetchRecordsOperationType {
 
 // MARK: - CKFetchSubscriptionsOperation
 
-
 extension CloudKitOperation where T: CKFetchSubscriptionsOperationType {
 
     public typealias FetchSubscriptionCompletionBlock = [String: T.Subscription]? -> Void
@@ -474,7 +529,6 @@ extension CloudKitOperation where T: CKFetchSubscriptionsOperationType {
 }
 
 // MARK: - CKModifyRecordZonesOperation
-
 
 extension CloudKitOperation where T: CKModifyRecordZonesOperationType {
 
@@ -503,7 +557,6 @@ extension CloudKitOperation where T: CKModifyRecordZonesOperationType {
 }
 
 // MARK: - CKModifyRecordsOperation
-
 
 extension CloudKitOperation where T: CKModifyRecordsOperationType {
 
@@ -557,7 +610,6 @@ extension CloudKitOperation where T: CKModifyRecordsOperationType {
 }
 
 // MARK: - CKModifySubscriptionsOperation
-
 
 extension CloudKitOperation where T: CKModifySubscriptionsOperationType {
 
@@ -622,4 +674,25 @@ extension CloudKitOperation where T: CKQueryOperationType {
         }
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
