@@ -106,7 +106,6 @@ class SCNetworkReachabilityFlagsTests: XCTestCase {
     }
 }
 
-
 class NetworkStatusTests: XCTestCase {
 
     var flags: SCNetworkReachabilityFlags!
@@ -138,6 +137,148 @@ class NetworkStatusTests: XCTestCase {
     func test__init_flags__not_reachable() {
         flags = [ .ConnectionRequired ]
         XCTAssertEqual(Reachability.NetworkStatus(flags: flags), Reachability.NetworkStatus.NotReachable)
+    }
+}
+
+class TestableNetworkReachability {
+    typealias Reachability = String
+
+    var didGetDefaultRouteReachability = false
+    var _defaultRouteReachability: Reachability = "Default"
+
+    var flags: SCNetworkReachabilityFlags = .Reachable
+
+    var didStartNotifier = false
+    var didStopNotifier = false
+
+    var didGetReachabilityFlagsForHostname = false
+
+    weak var delegate: NetworkReachabilityDelegate?
+}
+
+extension TestableNetworkReachability: NetworkReachabilityType {
+
+    func defaultRouteReachability() throws -> Reachability {
+        didGetDefaultRouteReachability = true
+        return _defaultRouteReachability
+    }
+
+    func startNotifierOnQueue(queue: dispatch_queue_t) throws -> Bool {
+        didStartNotifier = true
+        delegate?.reachabilityDidChange(flags)
+        return true
+    }
+
+    func stopNotifier() {
+        didStopNotifier = true
+    }
+
+    func reachabilityFlagsForHostname(host: String) -> SCNetworkReachabilityFlags? {
+        didGetReachabilityFlagsForHostname = true
+        return flags
+    }
+}
+
+
+class ReachabilityManagerTests: XCTestCase {
+
+    var network: TestableNetworkReachability!
+    var manager: ReachabilityManager<TestableNetworkReachability>!
+
+    override func setUp() {
+        super.setUp()
+        network = TestableNetworkReachability()
+        manager = ReachabilityManager(network)
+    }
+
+    func test__add_observer_new_observer_is_added() {
+        let token = try! manager.addObserver { _ in }
+        XCTAssertNotNil(manager.observersByID[token])
+        XCTAssertTrue(network.didStartNotifier)
+    }
+
+    func test__remove_observer_observer_is_removed() {
+        let token = try! manager.addObserver { _ in }
+        manager.removeObserverWithToken(token)
+        XCTAssertNil(manager.observersByID[token])
+        XCTAssertTrue(network.didStopNotifier)
+        XCTAssertFalse(manager.isRunning)
+    }
+
+    func test__add_observer_starts_notifier() {
+        try! manager.addObserver { _ in }
+        XCTAssertTrue(manager.isRunning)
+    }
+
+    func test__notifier_is_only_stopped_when_last_observer_is_removed() {
+        let token1 = try! manager.addObserver { _ in }
+        XCTAssertTrue(manager.isRunning)
+        XCTAssertTrue(network.didStartNotifier)
+        let token2 = try! manager.addObserver { _ in }
+        manager.removeObserverWithToken(token1)
+        XCTAssertFalse(network.didStopNotifier)
+        manager.removeObserverWithToken(token2)
+        XCTAssertTrue(network.didStopNotifier)
+        XCTAssertFalse(manager.isRunning)
+    }
+
+    func test__add_observer_triggers_observer_callback() {
+        let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
+        var networkStatus: Reachability.NetworkStatus? = .None
+        let _ = try! manager.addObserver { status in
+            networkStatus = status
+            expectation.fulfill()
+        }
+
+        waitForExpectationsWithTimeout(3, handler: nil)
+
+        XCTAssertNotNil(networkStatus)
+        XCTAssertNotEqual(networkStatus, Reachability.NetworkStatus.NotReachable)
+    }
+
+    func test__add_observer_only_notifies_observers_when_reachability_changes() {
+        manager.previousReachabilityFlags = [ .ConnectionRequired ]
+        network.flags = [ .Reachable ]
+        var networkStatus: Reachability.NetworkStatus? = .None
+        let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
+        let _ = try! manager.addObserver { status in
+            networkStatus = status
+            expectation.fulfill()
+        }
+
+        waitForExpectationsWithTimeout(3, handler: nil)
+
+        XCTAssertNotNil(networkStatus)
+        XCTAssertNotEqual(networkStatus, Reachability.NetworkStatus.NotReachable)
+    }
+
+    func test__reachability_with_valid_host() {
+        network.flags = .Reachable
+        var networkStatus: Reachability.NetworkStatus? = .None
+        let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
+        manager.reachabilityForURL(NSURL(string: "http://www.apple.com")!) { status in
+            networkStatus = status
+            expectation.fulfill()
+        }
+
+        waitForExpectationsWithTimeout(3, handler: nil)
+
+        XCTAssertNotNil(networkStatus)
+        XCTAssertNotEqual(networkStatus, Reachability.NetworkStatus.NotReachable)
+    }
+
+    func test__reachability_with_invalid_host() {
+        var networkStatus: Reachability.NetworkStatus? = .None
+        let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
+        manager.reachabilityForURL(NSURL(string: "invalid-host")!) { status in
+            networkStatus = status
+            expectation.fulfill()
+        }
+
+        waitForExpectationsWithTimeout(3, handler: nil)
+
+        XCTAssertNotNil(networkStatus)
+        XCTAssertEqual(networkStatus, Reachability.NetworkStatus.NotReachable)
     }
 }
 
