@@ -79,7 +79,7 @@ class TestFetchNotificationChangesOperation: TestCloudOperation, CKFetchNotifica
 
     var error: NSError?
     var finalPreviousServerChangeToken: ServerChangeToken?
-
+    var changedNotifications: [Notification]? = .None
     var previousServerChangeToken: ServerChangeToken? = .None
     var resultsLimit: Int = 100
     var moreComing: Bool = false
@@ -93,6 +93,11 @@ class TestFetchNotificationChangesOperation: TestCloudOperation, CKFetchNotifica
     }
 
     override func main() {
+        if let changes = changedNotifications, block = notificationChangedBlock {
+            if changes.count > 0 {
+                changes.forEach(block)
+            }
+        }
         fetchNotificationChangesCompletionBlock?(finalPreviousServerChangeToken, error)
     }
 }
@@ -1309,6 +1314,73 @@ class QueryOperationTests: CloudKitOperationTests {
         XCTAssertEqual(operation.errors.count, 1)
     }
 }
+
+class BatchCloudKitOperationTests: CloudKitOperationTests {
+
+    typealias Target = TestFetchNotificationChangesOperation
+
+    var token: String!
+    var error: NSError?
+    var numberOfBatches: Int = 3
+    var count: Int = 0
+    var operation: BatchedCloudKitOperation<Target>!
+
+    override func setUp() {
+        super.setUp()
+        token = "I'm a server token!"
+        error = .None
+        numberOfBatches = 3
+        count = 0
+        operation = BatchedCloudKitOperation(reachability: reachability, operation: createNextOperation)
+    }
+    
+    func createNextOperation() -> Target {
+        let target = Target(token: token, error: error)
+        target.changedNotifications = [ "hello", "world" ]        
+        if count < numberOfBatches - 1 {
+            target.moreComing = true
+        }
+        return target
+    }
+
+    func test__get_set_notification_changed_block() {
+
+        var didItWork = false
+        operation.notificationChangedBlock = { _ in
+            didItWork = true
+        }
+
+        let notification = "hello world"
+        operation.notificationChangedBlock?(notification)
+        XCTAssertTrue(didItWork)
+    }
+
+    func test__batch() {
+        var notifications: [String] = []
+        operation.notificationChangedBlock = { notification in
+            notifications.append(notification)
+        }
+
+        operation.setFetchNotificationChangesCompletionBlock { [unowned self] _ in
+            self.count += 1
+        }
+
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        runOperation(operation)
+        waitForExpectationsWithTimeout(3, handler: nil)
+
+        XCTAssertTrue(operation.finished)
+        XCTAssertEqual(operation.errors.count, 0)
+
+        XCTAssertEqual(count, 3)
+        XCTAssertEqual(notifications, [ "hello", "world", "hello", "world", "hello", "world" ])
+    }
+}
+
+
+
+
+
 
 
 

@@ -613,11 +613,86 @@ extension CloudKitOperation where T: CKQueryOperationType {
     }
 }
 
+// MARK: - BatchedCloudKitOperation
 
+public class BatchedCloudKitOperation<T where T: NSOperation, T: CKBatchedOperationType>: GroupOperation {
 
+    let connectivity: Reachability.Connectivity
+    let reachability: SystemReachabilityType
 
+    let generator: () -> T
 
+    var operation: CloudKitOperation<T>
+    var configure: CloudKitOperation<T> -> Void
+    public var enableBatchProcessing: Bool
 
+    public convenience init(enableBatchProcessing: Bool = true, operation: () -> T) {
+        self.init(enableBatchProcessing: enableBatchProcessing, connectivity: .AnyConnectionKind, reachability: Reachability.sharedInstance, operation: operation)
+    }
+
+    init(enableBatchProcessing: Bool = true, connectivity: Reachability.Connectivity = .AnyConnectionKind, reachability: SystemReachabilityType, operation gen: () -> T) {
+        self.enableBatchProcessing = enableBatchProcessing
+        self.connectivity = connectivity
+        self.reachability = reachability
+        self.generator = gen
+        self.operation = CloudKitOperation(operation: gen(), connectivity: connectivity, reachability: reachability)
+        self.configure = { _ in }
+        super.init(operations: [ ])
+        name = "Batched \(operation.name!)"
+    }
+
+    public override func execute() {
+        configure(operation)
+        addOperation(operation)
+        super.execute()
+    }
+
+    public override func operationDidFinish(operation: NSOperation, withErrors errors: [ErrorType]) {
+        if errors.isEmpty && enableBatchProcessing, let cloudKitOperation = operation as? CloudKitOperation<T> {
+            if cloudKitOperation.operation.moreComing {
+                addNextBatch()
+            }
+        }
+    }
+
+    public func addNextBatch() {
+        let op = generator()
+        let cloudKitOp = CloudKitOperation(operation: op, connectivity: connectivity, reachability: reachability)
+        configure(cloudKitOp)
+        addOperation(cloudKitOp)
+        self.operation = cloudKitOp
+    }
+
+    func addConfigureBlock(block: CloudKitOperation<T> -> Void) {
+        let config = configure
+        configure = { op in
+            config(op)
+            block(op)
+        }
+    }
+}
+
+extension BatchedCloudKitOperation where T: CKFetchNotificationChangesOperationType {
+
+    public typealias FetchNotificationChangesChangedBlock = T.Notification -> Void
+    public typealias FetchNotificationChangesCompletionBlock = T.ServerChangeToken? -> Void
+
+    public var notificationChangedBlock: ((T.Notification) -> Void)? {
+        get { return operation.notificationChangedBlock }
+        set {
+            operation.notificationChangedBlock = newValue
+            addConfigureBlock { op in
+                op.notificationChangedBlock = newValue
+            }
+        }
+    }
+
+    public func setFetchNotificationChangesCompletionBlock(block: FetchNotificationChangesCompletionBlock) {
+        addConfigureBlock { op in
+            op.setFetchNotificationChangesCompletionBlock(block)
+        }
+    }
+}
 
 
 
