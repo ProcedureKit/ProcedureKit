@@ -1315,7 +1315,7 @@ class QueryOperationTests: CloudKitOperationTests {
     }
 }
 
-class BatchCloudKitOperationTests: CloudKitOperationTests {
+class BatchedFetchNotificationChangesOperationTests: CloudKitOperationTests {
 
     typealias Target = TestFetchNotificationChangesOperation
 
@@ -1336,7 +1336,7 @@ class BatchCloudKitOperationTests: CloudKitOperationTests {
     
     func createNextOperation() -> Target {
         let target = Target(token: token, error: error)
-        target.changedNotifications = [ "hello", "world" ]        
+        target.changedNotifications = [ "hello", "world" ]
         if count < numberOfBatches - 1 {
             target.moreComing = true
         }
@@ -1377,6 +1377,64 @@ class BatchCloudKitOperationTests: CloudKitOperationTests {
     }
 }
 
+class BatchedFetchRecordChangesOperationTests: CloudKitOperationTests {
+
+    typealias Target = TestFetchRecordChangesOperation
+
+    var numberOfBatches: Int = 3
+    var count: Int = 0
+    var operation: BatchedCloudKitOperation<Target>!
+
+    override func setUp() {
+        super.setUp()
+        numberOfBatches = 3
+        count = 0
+        operation = BatchedCloudKitOperation(reachability: reachability, operation: createNextOperation)
+    }
+
+    func createNextOperation() -> Target {
+        let target = Target()
+        if count < numberOfBatches - 1 {
+            target.moreComing = true
+        }
+        return target
+    }
+
+    func test__get_set_record_zone_id() {
+        let zoneID = "a-different-zone-id"
+        operation.recordZoneID = zoneID
+        XCTAssertEqual(operation.recordZoneID, zoneID)
+    }
+
+    func test__get_set_record_changed_block() {
+        operation.recordChangedBlock = { _ in }
+        XCTAssertNotNil(operation.recordChangedBlock)
+    }
+
+    func test__get_set_record_with_id_was_deleted_block() {
+        operation.recordWithIDWasDeletedBlock = { _ in }
+        XCTAssertNotNil(operation.recordWithIDWasDeletedBlock)
+    }
+
+    func test__batch() {
+
+        operation.recordZoneID = "a-zone-id"
+        operation.recordChangedBlock = { _ in }
+        operation.recordWithIDWasDeletedBlock = { _ in }
+        operation.setFetchRecordChangesCompletionBlock { [unowned self] _, _ in
+            self.count += 1
+        }
+
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        runOperation(operation)
+        waitForExpectationsWithTimeout(3, handler: nil)
+
+        XCTAssertTrue(operation.finished)
+        XCTAssertEqual(operation.errors.count, 0)
+
+        XCTAssertEqual(count, 3)
+    }
+}
 
 
 

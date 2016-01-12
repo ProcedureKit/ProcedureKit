@@ -672,6 +672,8 @@ public class BatchedCloudKitOperation<T where T: NSOperation, T: CKBatchedOperat
     }
 }
 
+// MARK: - CKFetchNotificationChangesOperation
+
 extension BatchedCloudKitOperation where T: CKFetchNotificationChangesOperationType {
 
     public typealias FetchNotificationChangesChangedBlock = T.Notification -> Void
@@ -681,19 +683,49 @@ extension BatchedCloudKitOperation where T: CKFetchNotificationChangesOperationT
         get { return operation.notificationChangedBlock }
         set {
             operation.notificationChangedBlock = newValue
-            addConfigureBlock { op in
-                op.notificationChangedBlock = newValue
-            }
+            addConfigureBlock { $0.notificationChangedBlock = newValue }
         }
     }
 
     public func setFetchNotificationChangesCompletionBlock(block: FetchNotificationChangesCompletionBlock) {
-        addConfigureBlock { op in
-            op.setFetchNotificationChangesCompletionBlock(block)
-        }
+        addConfigureBlock { $0.setFetchNotificationChangesCompletionBlock(block) }
     }
 }
 
+// MARK: - CKFetchRecordChangesOperation
+
+extension BatchedCloudKitOperation where T: CKFetchRecordChangesOperationType {
+
+    public typealias FetchRecordChangesCompletionBlock = (T.ServerChangeToken?, NSData?) -> Void
+
+    public var recordZoneID: T.RecordZoneID {
+        get { return operation.recordZoneID }
+        set {
+            operation.recordZoneID = newValue
+            addConfigureBlock { $0.recordZoneID = newValue }
+        }
+    }
+
+    public var recordChangedBlock: ((T.Record) -> Void)? {
+        get { return operation.recordChangedBlock }
+        set {
+            operation.recordChangedBlock = newValue
+            addConfigureBlock { $0.recordChangedBlock = newValue }
+        }
+    }
+
+    public var recordWithIDWasDeletedBlock: ((T.RecordID) -> Void)? {
+        get { return operation.recordWithIDWasDeletedBlock }
+        set {
+            operation.recordWithIDWasDeletedBlock = newValue
+            addConfigureBlock { $0.recordWithIDWasDeletedBlock = newValue }
+        }
+    }
+
+    public func setFetchRecordChangesCompletionBlock(block: FetchRecordChangesCompletionBlock) {
+        addConfigureBlock { $0.setFetchRecordChangesCompletionBlock(block) }
+    }
+}
 
 
 
