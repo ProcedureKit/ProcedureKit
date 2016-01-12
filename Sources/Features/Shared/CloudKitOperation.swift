@@ -49,7 +49,7 @@ public protocol CKDesiredKeys: CKOperationType {
     var desiredKeys: [String]? { get set }
 }
 
-public typealias CKBatchedOperationType = protocol<CKResultsLimit, CKMoreComing>
+public protocol CKBatchedOperationType: CKResultsLimit, CKMoreComing { }
 
 public typealias CKFetchOperationType = protocol<CKPreviousServerChangeToken, CKBatchedOperationType>
 
@@ -64,7 +64,6 @@ public protocol CKDiscoverUserInfosOperationType: CKOperationType {
 }
 
 public protocol CKFetchNotificationChangesOperationType: CKFetchOperationType {
-
     var notificationChangedBlock: ((Notification) -> Void)? { get set }
     var fetchNotificationChangesCompletionBlock: ((ServerChangeToken?, NSError?) -> Void)? { get set }
 }
@@ -157,54 +156,31 @@ extension CKDatabaseOperation: CKDatabaseOperationType {
     public typealias Database = CKDatabase
 }
 
-extension CKDiscoverAllContactsOperation: CKDiscoverAllContactsOperationType { }
-
-extension CKDiscoverUserInfosOperation: CKDiscoverUserInfosOperationType { }
-
-extension CKFetchNotificationChangesOperation: CKFetchNotificationChangesOperationType { }
-
-extension CKMarkNotificationsReadOperation: CKMarkNotificationsReadOperationType { }
-
-extension CKModifyBadgeOperation: CKModifyBadgeOperationType { }
-
-extension CKFetchRecordChangesOperation: CKFetchRecordChangesOperationType { }
-
-extension CKFetchRecordZonesOperation: CKFetchRecordZonesOperationType { }
-
-extension CKFetchRecordsOperation: CKFetchRecordsOperationType { }
-
-extension CKFetchSubscriptionsOperation: CKFetchSubscriptionsOperationType { }
-
-extension CKModifyRecordZonesOperation: CKModifyRecordZonesOperationType { }
-
-extension CKModifyRecordsOperation: CKModifyRecordsOperationType { }
-
-extension CKModifySubscriptionsOperation: CKModifySubscriptionsOperationType { }
-
-extension CKQueryOperation: CKQueryOperationType { }
+extension CKDiscoverAllContactsOperation:       CKDiscoverAllContactsOperationType { }
+extension CKDiscoverUserInfosOperation:         CKDiscoverUserInfosOperationType { }
+extension CKFetchNotificationChangesOperation:  CKFetchNotificationChangesOperationType   { }
+extension CKMarkNotificationsReadOperation:     CKMarkNotificationsReadOperationType { }
+extension CKModifyBadgeOperation:               CKModifyBadgeOperationType { }
+extension CKFetchRecordChangesOperation:        CKFetchRecordChangesOperationType { }
+extension CKFetchRecordZonesOperation:          CKFetchRecordZonesOperationType { }
+extension CKFetchRecordsOperation:              CKFetchRecordsOperationType { }
+extension CKFetchSubscriptionsOperation:        CKFetchSubscriptionsOperationType { }
+extension CKModifyRecordZonesOperation:         CKModifyRecordZonesOperationType { }
+extension CKModifyRecordsOperation:             CKModifyRecordsOperationType { }
+extension CKModifySubscriptionsOperation:       CKModifySubscriptionsOperationType { }
+extension CKQueryOperation:                     CKQueryOperationType { }
 
 // MARK: - CloudKitOperation
 
 public class CloudKitOperation<T where T: NSOperation, T: CKOperationType>: ReachableOperation<T> {
 
-    internal var _batchProcessingEnabled: Bool = false
-
-    public convenience init(connectivity: Reachability.Connectivity = .AnyConnectionKind, @autoclosure(escaping) _ creator: () -> T) {
-        self.init(connectivity: connectivity, reachability: Reachability.sharedInstance, operation: creator)
+    public convenience init(_ op: T) {
+        self.init(operation: op, connectivity: .AnyConnectionKind, reachability: Reachability.sharedInstance)
     }
 
-    override init(connectivity: Reachability.Connectivity = .AnyConnectionKind, reachability: SystemReachabilityType, @autoclosure(escaping) operation creator: () -> T) {
-        super.init(connectivity: connectivity, reachability: reachability, operation: creator)
+    override init(operation op: T, connectivity: Reachability.Connectivity = .AnyConnectionKind, reachability: SystemReachabilityType) {
+        super.init(operation: op, connectivity: connectivity, reachability: reachability)
         name = "CloudKit Operation<\(operation.dynamicType)>"
-    }
-
-    internal func updateCreator(block: T -> Void) {
-        let _creator = creator
-        creator = {
-            let op = _creator()
-            block(op)
-            return op
-        }
     }
 }
 
@@ -258,34 +234,6 @@ extension CloudKitOperation where T: CKDesiredKeys {
     public var desiredKeys: [String]? {
         get { return operation.desiredKeys }
         set { operation.desiredKeys = newValue }
-    }
-}
-
-// MARK: - Greedy Batch Processing
-
-extension CloudKitOperation where T: CKBatchedOperationType {
-
-    public var enableBatchProcessing: Bool {
-        get { return _batchProcessingEnabled }
-        set { _batchProcessingEnabled = newValue }
-    }
-
-    internal func setupBatchProcessing() {
-        if let target = target as? GroupOperation {
-            let doBatchProcessing = self.performBatchProcessing
-            target.addChildObserver { group, _, errors in
-                if errors.isEmpty {
-                    doBatchProcessing(group)
-                }
-            }
-        }
-    }
-
-    internal func performBatchProcessing(group: GroupOperation) {
-        guard enableBatchProcessing && moreComing else { return }
-        let op = creator()
-        operation = op
-        group.addOperation(op)
     }
 }
 
@@ -344,15 +292,12 @@ extension CloudKitOperation where T: CKFetchNotificationChangesOperationType {
 
     public var notificationChangedBlock: ((T.Notification) -> Void)? {
         get { return operation.notificationChangedBlock }
-        set {
-            operation.notificationChangedBlock = newValue
-            updateCreator { $0.notificationChangedBlock = newValue }
-        }
+        set { operation.notificationChangedBlock = newValue }
     }
 
     public func setFetchNotificationChangesCompletionBlock(block: FetchNotificationChangesCompletionBlock) {
 
-        let completion: (T.ServerChangeToken?, NSError?) -> Void = { [unowned target] token, error in
+        operation.fetchNotificationChangesCompletionBlock = { [unowned target] token, error in
             if let error = error, target = target as? GroupOperation {
                 target.aggregateError(error)
             }
@@ -360,9 +305,6 @@ extension CloudKitOperation where T: CKFetchNotificationChangesOperationType {
                 block(token)
             }
         }
-        operation.fetchNotificationChangesCompletionBlock = completion
-        updateCreator { $0.fetchNotificationChangesCompletionBlock = completion }
-        setupBatchProcessing()
     }
 }
 
@@ -434,7 +376,7 @@ extension CloudKitOperation where T: CKFetchRecordChangesOperationType {
     }
 
     public func setFetchRecordChangesCompletionBlock(block: FetchRecordChangesCompletionBlock) {
-        let completion: (T.ServerChangeToken?, NSData?, NSError?) -> Void = { [unowned target] token, data, error in
+        operation.fetchRecordChangesCompletionBlock = { [unowned target] token, data, error in
             if let error = error, target = target as? GroupOperation {
                 target.aggregateError(error)
             }
@@ -442,10 +384,6 @@ extension CloudKitOperation where T: CKFetchRecordChangesOperationType {
                 block(token, data)
             }
         }
-
-        operation.fetchRecordChangesCompletionBlock = completion
-        updateCreator { $0.fetchRecordChangesCompletionBlock = completion }
-        setupBatchProcessing()
     }
 }
 

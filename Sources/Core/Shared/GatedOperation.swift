@@ -29,9 +29,9 @@ public class GatedOperation<T: NSOperation>: ComposedOperation<T> {
      - parameter operation: any subclass of `NSOperation`.
      - parameter gate: a block which returns a Bool.
     */
-    public init(operation: T, gate: GateBlockType) {
+    public init(_ op: T, gate: GateBlockType) {
         self.gate = gate
-        super.init(operation: operation)
+        super.init(operation: op)
     }
 
     /**

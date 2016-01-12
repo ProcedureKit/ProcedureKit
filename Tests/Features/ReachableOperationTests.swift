@@ -50,7 +50,7 @@ class ReachableOperationTests: OperationTests {
     override func setUp() {
         super.setUp()
         reachability = TestableSystemReachability()
-        operation = ReachableOperation(reachability: reachability, operation: TestOperation())
+        operation = ReachableOperation(operation: TestOperation(), reachability: reachability)
     }
 
     func test__operation_executes_when_network_is_available() {
@@ -82,14 +82,14 @@ class ReachableOperationTests: OperationTests {
     }
 
     func test__via_wwan_connectivity() {
-        operation = ReachableOperation(connectivity: .ViaWWAN, reachability: reachability, operation: TestOperation())
+        operation = ReachableOperation(operation: TestOperation(), connectivity: .ViaWWAN, reachability: reachability)
         XCTAssertFalse(operation.checkStatus(.NotReachable))
         XCTAssertTrue(operation.checkStatus(.Reachable(.ViaWWAN)))
         XCTAssertTrue(operation.checkStatus(.Reachable(.ViaWiFi)))
     }
 
     func test__via_wifi_connectivity() {
-        operation = ReachableOperation(connectivity: .ViaWiFi, reachability: reachability, operation: TestOperation())
+        operation = ReachableOperation(operation: TestOperation(), connectivity: .ViaWiFi, reachability: reachability)
         XCTAssertFalse(operation.checkStatus(.NotReachable))
         XCTAssertFalse(operation.checkStatus(.Reachable(.ViaWWAN)))
         XCTAssertTrue(operation.checkStatus(.Reachable(.ViaWiFi)))

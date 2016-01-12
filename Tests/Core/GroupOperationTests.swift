@@ -89,22 +89,6 @@ class GroupOperationTests: OperationTests {
         XCTAssertTrue(operations[1].didExecute)
         XCTAssertTrue(operations[2].didExecute)
     }
-
-    func test__child_observer_is_called() {
-        let group = createGroupOperations()
-        let operation = GroupOperation(operations: group)
-
-        var childDidFinish: Int = 0
-        operation.addChildObserver { group, op, errors in
-            childDidFinish += 1
-        }
-
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
-        runOperation(operation)
-        waitForExpectationsWithTimeout(3, handler: nil)
-
-        XCTAssertEqual(childDidFinish, 3)
-    }
 }
 
 

@@ -24,33 +24,10 @@ operations.
 */
 public class GroupOperation: Operation {
 
-    public struct ChildObserver {
-        public typealias BlockType = (GroupOperation, NSOperation, [ErrorType]) -> Void
-
-        private let block: BlockType
-
-        /**
-         Initialize the observer with a block.
-
-         - parameter didStart: the `DidStartBlock`
-         - returns: an observer.
-         */
-        public init(didFinish: BlockType) {
-            self.block = didFinish
-        }
-
-        /// Conforms to `OperationDidFinishObserver`, executes the block
-        func group(group: GroupOperation, childDidFinish operation: NSOperation, withErrors errors: [ErrorType]) {
-            block(group, operation, errors)
-        }
-    }
-
-    private let finishingOperation = NSBlockOperation(block: {})
+    private let finishingOperation = NSBlockOperation { }
 
     public let queue = OperationQueue()
     public let operations: [NSOperation]
-
-    var __observers: [ChildObserver] = []
 
     /// - returns: an aggregation of errors [ErrorType]
     public private(set) var aggregateErrors = Array<ErrorType>()
@@ -65,7 +42,6 @@ public class GroupOperation: Operation {
         super.init()
         queue.suspended = true
         queue.delegate = self
-        queue.addOperation(finishingOperation)
         addOperations(operations)
         addObserver(CancelledObserver { [weak self] _ in
             self?.queue.cancelAllOperations()
@@ -82,6 +58,7 @@ public class GroupOperation: Operation {
      starting the queue, and adding the finishing operation.
     */
     public override func execute() {
+        queue.addOperation(finishingOperation)
         queue.suspended = false
     }
 
@@ -127,14 +104,6 @@ public class GroupOperation: Operation {
     public final func aggregateError(error: ErrorType) {
         log.warning("Aggregating error: \(error)")
         aggregateErrors.append(error)
-    }
-
-    public func addChildObserver(block: ChildObserver.BlockType) {
-        addChildObserver(ChildObserver(didFinish: block))
-    }
-
-    public func addChildObserver(observer: ChildObserver) {
-        __observers.append(observer)
     }
 
     /**
@@ -190,7 +159,8 @@ extension GroupOperation: OperationQueueDelegate {
      when there are no more operations in the group.
     */
     public func operationQueue(queue: OperationQueue, willAddOperation operation: NSOperation) {
-        assert(!finishingOperation.finished && !finishingOperation.executing, "Cannot add new operations to a group after the group has completed.")
+        assert(!finishingOperation.executing, "Cannot add new operations to a group after the group has started to finish.")
+        assert(!finishingOperation.finished, "Cannot add new operations to a group after the group has completed.")
 
         if operation !== finishingOperation {
             finishingOperation.addDependency(operation)
@@ -210,7 +180,6 @@ extension GroupOperation: OperationQueueDelegate {
             finish(aggregateErrors)
         }
         else {
-            __observers.forEach { $0.group(self, childDidFinish: operation, withErrors: errors) }
             operationDidFinish(operation, withErrors: errors)
         }
     }

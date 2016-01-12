@@ -12,7 +12,7 @@ import XCTest
 class ComposedOperationTests: OperationTests {
 
     func test__composed_operation_is_cancelled() {
-        let composed = ComposedOperation(operation: TestOperation())
+        let composed = ComposedOperation(TestOperation())
         composed.cancel()
         XCTAssertTrue(composed.cancelled)
         XCTAssertTrue(composed.operation.cancelled)
@@ -20,7 +20,7 @@ class ComposedOperationTests: OperationTests {
 
     func test__composed_nsoperation_is_performed() {
         var didExecute = false
-        let composed = ComposedOperation(operation: NSBlockOperation {
+        let composed = ComposedOperation(NSBlockOperation {
             didExecute = true
         })
         addCompletionBlockToTestOperation(composed, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
