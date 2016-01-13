@@ -31,11 +31,11 @@ class OperationWhichFailsThenSucceeds: Operation {
 
 class RetryOperationTests: OperationTests {
 
-    typealias Op = OperationWhichFailsThenSucceeds
-    typealias RetryOp = RetryOperation<Op>
-    typealias RetryBlock = RetryGenerator<Op>.Retry
+    typealias Test = OperationWhichFailsThenSucceeds
+    typealias Retry = RetryOperation<Test>
+    typealias Handler = Retry.Handler
 
-    var operation: RetryOp!
+    var operation: Retry!
     var numberOfFailures: Int = 0
 
     override func setUp() {
@@ -43,9 +43,9 @@ class RetryOperationTests: OperationTests {
         numberOfFailures = 0
     }
 
-    func producer(threshold: Int) -> () -> OperationWhichFailsThenSucceeds {
+    func producer(threshold: Int) -> () -> Test? {
         return { [unowned self] in
-            let op = OperationWhichFailsThenSucceeds { return self.numberOfFailures < threshold }
+            let op = Test { return self.numberOfFailures < threshold }
             op.addObserver(StartedObserver { _ in
                 self.numberOfFailures += 1
             })
@@ -55,7 +55,7 @@ class RetryOperationTests: OperationTests {
 
     func test__retry_operation() {
 
-        operation = RetryOperation(producer(2))
+        operation = RetryOperation(anyGenerator(producer(2)))
 
         addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
         runOperation(operation)
@@ -67,7 +67,7 @@ class RetryOperationTests: OperationTests {
 
     func test__retry_operation_where_max_count_is_reached() {
 
-        operation = RetryOperation(producer(9))
+        operation = RetryOperation(anyGenerator(producer(9)))
 
         addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
         runOperation(operation)
@@ -84,7 +84,7 @@ class RetryOperationTests: OperationTests {
         var retryCount: Int = 0
         var didRunBlockCount: Int = 0
 
-        let retry: RetryBlock = { info, delay, operation in
+        let retry: Handler = { info, delay, operation in
             retryErrors = info.errors
             retryAggregateErrors = info.aggregateErrors
             retryCount = info.count
@@ -92,7 +92,7 @@ class RetryOperationTests: OperationTests {
             return (delay, operation)
         }
 
-        operation = RetryOperation(retry: retry, producer(3))
+        operation = RetryOperation(anyGenerator(producer(3)), retry: retry)
 
         addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
         runOperation(operation)
@@ -113,7 +113,7 @@ class RetryOperationTests: OperationTests {
         var retryAggregateErrors: [ErrorType]? = .None
         var retryCount: Int = 0
         var didRunBlockCount: Int = 0
-        let retry: RetryBlock = { info, delay, operation in
+        let retry: Handler = { info, delay, operation in
             retryErrors = info.errors
             retryAggregateErrors = info.aggregateErrors
             retryCount = info.count
@@ -121,7 +121,7 @@ class RetryOperationTests: OperationTests {
             return .None
         }
 
-        operation = RetryOperation(retry: retry, producer(3))
+        operation = RetryOperation(anyGenerator(producer(3)), retry: retry)
 
         addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
         runOperation(operation)

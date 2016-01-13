@@ -8,56 +8,149 @@
 
 import Foundation
 
+/**
+ RetryFailureInfo is a value type which provides 
+ information related to a previously failed 
+ NSOperation which it is generic over. It is used
+ in conjunction with RetryOperation.
+*/
 public struct RetryFailureInfo<T: NSOperation> {
+
+    /// - returns: the failed operation
     public let operation: T
+
+    /// - returns: the errors the operation finished with.
     public let errors: [ErrorType]
+
+    /// - returns: all the aggregate errors of previous attempts
     public let aggregateErrors: [ErrorType]
+
+    /// - returns: the number of attempts made so far
     public let count: Int
+
+    /**
+     This is a block which can be used to add operations
+     to a queue. For example, perhaps it is necessary
+     to retry the task, but only until another operation
+     has completed. This can be done by creating the
+     operation, setting the dependency and adding it using
+     this block, before responding to the RetryOperation.
+     
+     - returns: a block which accects var arg NSOperation instances.
+    */
     public let addOperations: (NSOperation...) -> Void
 }
 
-public class RetryGenerator<T: NSOperation>: GeneratorType {
-    public typealias Retry = (RetryFailureInfo<T>, Delay?, T) -> (Delay?, T)?
+class RetryGenerator<T: NSOperation>: GeneratorType {
+    typealias Handler = RetryOperation<T>.Handler
 
-    internal let shouldRetry: Retry
+    internal let retry: Handler
     internal var info: RetryFailureInfo<T>? = .None
     private var generator: AnyGenerator<(Delay?, T)>
 
-    init(generator: AnyGenerator<(Delay?, T)>, shouldRetry: Retry) {
+    init(generator: AnyGenerator<(Delay?, T)>, retry: Handler) {
         self.generator = generator
-        self.shouldRetry = shouldRetry
+        self.retry = retry
     }
 
-    public func next() -> (Delay?, T)? {
+    func next() -> (Delay?, T)? {
         guard let (delay, next) = generator.next() else { return nil }
         guard let info = info else { return (delay, next) }
-        return shouldRetry(info, delay, next)
+        return retry(info, delay, next)
     }
 }
 
+/**
+ RetryOperation is a subclass of RepeatedOperation. Like RepeatedOperation
+ it is generic over type T, an NSOperation subclass. It can be used to
+ automatically retry another instance of operation T if the first operation
+ finishes with errors.
+ 
+ To support effective error recovery, in addition to a (Delay?, T) generator
+ RetryOperation is initialized with a block. The block will receive failure
+ info, in addition to the next result (if not nil) of the operation generator.
+ The block must return (Delay?, T)?.
+ 
+ Therefore consumers can inspect the failure info, and adjust the Delay, or
+ operation before returning it. To finish, the block can return .None
+*/
 public class RetryOperation<T: NSOperation>: RepeatedOperation<T> {
     public typealias FailureInfo = RetryFailureInfo<T>
-    public typealias Handler = RetryGenerator<T>.Retry
+    public typealias Handler = (RetryFailureInfo<T>, Delay?, T) -> (Delay?, T)?
 
     let retry: RetryGenerator<T>
 
-    public init(maxCount max: Int?, retry block: Handler, generator: AnyGenerator<(Delay?, T)>) {
-        retry = RetryGenerator(generator: generator, shouldRetry: block)
+    /**
+     The designated initializer
+     
+     Creates an operation which will retry executing operations in the face
+     of errors.
+     
+     - parameter maxCount: an optional Int, which defaults to .None. If not nil, this is
+     the maximum number of operations which will be executed.
+     - parameter generator: the generator of (Delay?, T) values.
+     - parameter retry: a Handler block type, can be used to inspect aggregated error to
+     adjust the next delay and Operation.
+
+    */
+    public init(maxCount max: Int?, generator: AnyGenerator<(Delay?, T)>, retry block: Handler) {
+        retry = RetryGenerator(generator: generator, retry: block)
         super.init(maxCount: max, generator: anyGenerator(retry))
         name = "Retry Operation"
     }
 
-    public convenience init<D, G where D: GeneratorType, D.Element == Delay, G: GeneratorType, G.Element == T>(maxCount max: Int?, delay: D, retry: Handler, generator: G) {
+    /**
+     A convenience initializer, which accepts two generators, one for the delay and another for
+     the operation, in addition to a retry handler block
+
+     - parameter maxCount: an optional Int, which defaults to .None. If not nil, this is
+     the maximum number of operations which will be executed.
+     - parameter delay: a generator with Delay element.
+     - parameter generator: a generator with T element.
+     - parameter retry: a Handler block type, can be used to inspect aggregated error to
+     adjust the next delay and Operation.
+
+     */
+    public convenience init<D, G where D: GeneratorType, D.Element == Delay, G: GeneratorType, G.Element == T>(maxCount max: Int?, delay: D, generator: G, retry: Handler) {
         let tuple = TupleGenerator(primary: generator, secondary: delay)
-        self.init(maxCount: max, retry: retry, generator: anyGenerator(tuple))
+        self.init(maxCount: max, generator: anyGenerator(tuple), retry: retry)
     }
 
-    public convenience init<G where G: GeneratorType, G.Element == T>(maxCount max: Int?, strategy: WaitStrategy, retry: Handler, generator: G) {
-        self.init(maxCount: max, delay: GeneratorMap(strategy.generator()) { Delay.By($0) }, retry: retry, generator: generator)
-    }
+    /**
+     A convenience initializer with wait strategy and generic operation generator.
+     This is useful where another system can be responsible for vending instances of
+     the custom operation. Typically there may be some state involved in such a Generator. e.g.
 
-    public convenience init(maxCount max: Int? = 5, strategy: WaitStrategy = .Fixed(0.1), retry: Handler = { (_, delay: Delay?, op: T) in (delay, op) }, _ body: () -> T?) {
-        self.init(maxCount: max, strategy: strategy, retry: retry, generator: anyGenerator { body() })
+     The wait strategy is useful if say, you want to repeat the operations with random
+     delays, or exponential backoff. These standard schemes and be easily expressed.
+
+     ```swift
+     class MyOperationGenerator: GeneratorType {
+         func next() -> MyOperation? {
+              // etc
+         }
+     }
+
+     let operation = RetryOperation(
+         maxCount: 3, 
+         strategy: .Random((0.1, 1.0)),
+         generator: MyOperationGenerator()
+     ) { info, delay, op in
+         // inspect failure info
+         return (delay, op)
+     }
+     ```
+
+     - parameter maxCount: an optional Int, which defaults to 5.
+     - parameter strategy: a WaitStrategy which defaults to a 0.1 second fixed interval.
+     - parameter [unnamed] generator: a generic generator which has an Element equal to T.
+     - parameter retry: a Handler block type, can be used to inspect aggregated error to
+     adjust the next delay and Operation. This defaults to pass through the delay and 
+     operation regardless of error info.
+
+     */
+    public convenience init<G where G: GeneratorType, G.Element == T>(maxCount max: Int? = 5, strategy: WaitStrategy = .Fixed(0.1), _ generator: G, retry: Handler = { ($1, $2) }) {
+        self.init(maxCount: max, delay: GeneratorMap(strategy.generator()) { Delay.By($0) }, generator: generator, retry: retry)
     }
 
     public override func operationDidFinish(operation: NSOperation, withErrors errors: [ErrorType]) {
