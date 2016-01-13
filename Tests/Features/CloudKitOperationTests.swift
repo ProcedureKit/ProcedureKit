@@ -321,7 +321,7 @@ class TestQueryOperation: TestDatabaseOperation, CKQueryOperationType {
 
 
 
-// MARK: - Test Cases
+// MARK: - Internal CKOperation Test Cases
 
 class CloudKitOperationTests: OperationTests {
 
@@ -337,93 +337,145 @@ class CloudKitOperationTests: OperationTests {
 class CloudOperationTests: CloudKitOperationTests {
 
     var target: TestCloudOperation!
-    var operation: CloudKitOperation<TestCloudOperation>!
+    var op: CloudKitOperation<TestCloudOperation>!
+    var operation: CloudKit<TestCloudOperation>!
 
     override func setUp() {
         super.setUp()
         target = TestCloudOperation()
-        operation = CloudKitOperation(operation: target, reachability: reachability)
+        op = CloudKitOperation(operation: target, reachability: reachability)
+        operation = CloudKit(reachability: reachability) { TestCloudOperation() }
     }
 
     func test__get_countainer() {
         let container = "I'm a test container!"
         target.container = container
-        XCTAssertEqual(operation.container, container)
+        XCTAssertEqual(op.container, container)
     }
 
     func test__set_database() {
         let container = "I'm a test container!"
-        operation.container = container
+        op.container = container
         XCTAssertEqual(target.container, container)
+    }
+
+    func test__set_get_countainer() {
+        let container = "I'm a test container!"
+        operation.container = container
+        XCTAssertEqual(operation.container, container)
+    }
+
+    func test__run() {
+
+        let container = "I'm a test container!"
+        operation.container = container
+
+        waitForOperation(operation)
+
+        XCTAssertTrue(operation.finished)
+        XCTAssertEqual(operation.container, container)
     }
 }
 
-class DatabaseOperationTests: CloudKitOperationTests {
+class CloudDatabaseOperationTests: CloudKitOperationTests {
 
     var target: TestDatabaseOperation!
-    var operation: CloudKitOperation<TestDatabaseOperation>!
+    var op: CloudKitOperation<TestDatabaseOperation>!
+    var operation: CloudKit<TestDatabaseOperation>!
 
     override func setUp() {
         super.setUp()
         target = TestDatabaseOperation()
-        operation = CloudKitOperation(operation: target, reachability: reachability)
+        op = CloudKitOperation(operation: target, reachability: reachability)
+        operation = CloudKit(reachability: reachability) { TestDatabaseOperation() }
     }
 
     func test__get_database() {
         let db = "I'm a test database!"
         target.database = db
-        XCTAssertEqual(operation.database, db)
+        XCTAssertEqual(op.database, db)
     }
 
     func test__set_database() {
         let db = "I'm a test database!"
-        operation.database = db
+        op.database = db
         XCTAssertEqual(target.database, db)
     }
 
     func test__get_previous_server_change_token() {
         let token = "i'm a server token"
         target.previousServerChangeToken = token
-        XCTAssertEqual(operation.previousServerChangeToken, token)
+        XCTAssertEqual(op.previousServerChangeToken, token)
     }
 
     func test__set_previous_server_change_token() {
         let token = "i'm a server token"
-        operation.previousServerChangeToken = token
+        op.previousServerChangeToken = token
         XCTAssertEqual(target.previousServerChangeToken, token)
     }
 
     func test__get_results_limit() {
         target.resultsLimit = 10
-        XCTAssertEqual(operation.resultsLimit, 10)
+        XCTAssertEqual(op.resultsLimit, 10)
     }
 
     func test__set_results_limits() {
-        operation.resultsLimit = 10
+        op.resultsLimit = 10
         XCTAssertEqual(target.resultsLimit, 10)
     }
 
-    func test__get_more_coming() {
-        target.moreComing = true
-        XCTAssertTrue(operation.moreComing)
+    func test__set_get_results_limits() {
+        operation.resultsLimit = 10
+        XCTAssertEqual(operation.resultsLimit, 10)
     }
 
     func test__get_desired_keys() {
         let keys = [ "desired-key-1",  "desired-key-2" ]
         target.desiredKeys = keys
-        XCTAssertNotNil(operation.desiredKeys)
-        XCTAssertEqual(operation.desiredKeys!, keys)
+        XCTAssertNotNil(op.desiredKeys)
+        XCTAssertEqual(op.desiredKeys!, keys)
     }
 
     func test__set_desired_keys() {
         let keys = [ "desired-key-1",  "desired-key-2" ]
-        operation.desiredKeys = keys
+        op.desiredKeys = keys
         XCTAssertNotNil(target.desiredKeys)
         XCTAssertEqual(target.desiredKeys!, keys)
     }
+
+    func test__run() {
+
+        operation = CloudKit(reachability: reachability) {
+            let tmp = TestDatabaseOperation()
+            tmp.moreComing = true
+            return tmp
+        }
+
+        let db = "I'm a test database!"
+        operation.database = db
+
+        let token = "i'm a server token"
+        operation.previousServerChangeToken = token
+
+        let limit = 10
+        operation.resultsLimit = limit
+
+        let keys = [ "desired-key-1",  "desired-key-2" ]
+        operation.desiredKeys = keys
+
+
+        waitForOperation(operation)
+
+        XCTAssertTrue(operation.finished)
+        XCTAssertTrue(operation.moreComing)
+        XCTAssertEqual(operation.database, db)
+        XCTAssertEqual(operation.previousServerChangeToken, token)
+        XCTAssertEqual(operation.resultsLimit, limit)
+        XCTAssertEqual(operation.desiredKeys!, keys)
+    }
 }
 
-class DiscoverAllContactsOperationTests: CloudKitOperationTests {
+class Cloud_Internal_DiscoverAllContactsOperationTests: CloudKitOperationTests {
 
     var target: TestDiscoverAllContactsOperation!
     var operation: CloudKitOperation<TestDiscoverAllContactsOperation>!
@@ -436,9 +488,8 @@ class DiscoverAllContactsOperationTests: CloudKitOperationTests {
 
     func test__execution_after_cancellation() {
         operation.cancel()
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
-        runOperation(operation)
-        waitForExpectationsWithTimeout(3, handler: nil)
+
+        waitForOperation(operation)
 
         XCTAssertTrue(operation.finished)
         XCTAssertTrue(operation.cancelled)
@@ -446,9 +497,7 @@ class DiscoverAllContactsOperationTests: CloudKitOperationTests {
 
     func test__successful_execution_without_completion_block() {
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
-        runOperation(operation)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForOperation(operation)
 
         XCTAssertTrue(operation.finished)
     }
@@ -456,9 +505,7 @@ class DiscoverAllContactsOperationTests: CloudKitOperationTests {
     func test__error_without_completion_block() {
         target.error = NSError(domain: CKErrorDomain, code: CKErrorCode.InternalError.rawValue, userInfo: nil)
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
-        runOperation(operation)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForOperation(operation)
 
         XCTAssertTrue(operation.finished)
         XCTAssertEqual(operation.errors.count, 0)
@@ -470,9 +517,7 @@ class DiscoverAllContactsOperationTests: CloudKitOperationTests {
             result = userInfos
         }
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
-        runOperation(operation)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForOperation(operation)
 
         XCTAssertTrue(operation.finished)
         XCTAssertEqual(operation.errors.count, 0)
@@ -488,16 +533,14 @@ class DiscoverAllContactsOperationTests: CloudKitOperationTests {
             // etc
         }
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
-        runOperation(operation)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForOperation(operation)
 
         XCTAssertTrue(operation.finished)
         XCTAssertEqual(operation.errors.count, 1)
     }
 }
 
-class DiscoverUserInfosOperationTests: CloudKitOperationTests {
+class Cloud_Internal_DiscoverUserInfosOperationTests: CloudKitOperationTests {
 
     var target: TestDiscoverUserInfosOperation!
     var operation: CloudKitOperation<TestDiscoverUserInfosOperation>!
@@ -545,9 +588,7 @@ class DiscoverUserInfosOperationTests: CloudKitOperationTests {
             userInfosByRecordID = byRecordID
         }
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
-        runOperation(operation)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForOperation(operation)
 
         XCTAssertTrue(operation.finished)
         XCTAssertEqual(operation.errors.count, 0)
@@ -562,16 +603,14 @@ class DiscoverUserInfosOperationTests: CloudKitOperationTests {
 
         operation.setDiscoverUserInfosCompletionBlock { _, _ in }
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
-        runOperation(operation)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForOperation(operation)
 
         XCTAssertTrue(operation.finished)
         XCTAssertEqual(operation.errors.count, 1)
     }
 }
 
-class FetchNotificationChangesOperationTests: CloudKitOperationTests {
+class Cloud_Internal_FetchNotificationChangesOperationTests: CloudKitOperationTests {
 
     var target: TestFetchNotificationChangesOperation!
     var operation: CloudKitOperation<TestFetchNotificationChangesOperation>!
@@ -602,9 +641,7 @@ class FetchNotificationChangesOperationTests: CloudKitOperationTests {
             receivedToken = token
         }
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
-        runOperation(operation)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForOperation(operation)
 
         XCTAssertTrue(operation.finished)
         XCTAssertEqual(operation.errors.count, 0)
@@ -618,9 +655,7 @@ class FetchNotificationChangesOperationTests: CloudKitOperationTests {
 
         operation.setFetchNotificationChangesCompletionBlock { _ in }
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
-        runOperation(operation)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForOperation(operation)
 
         XCTAssertTrue(operation.finished)
         XCTAssertEqual(operation.errors.count, 1)
@@ -631,7 +666,7 @@ class FetchNotificationChangesOperationTests: CloudKitOperationTests {
     }
 }
 
-class MarkNotificationsReadOperationTests: CloudKitOperationTests {
+class Cloud_Internal_MarkNotificationsReadOperationTests: CloudKitOperationTests {
 
     var target: TestMarkNotificationsReadOperation!
     var operation: CloudKitOperation<TestMarkNotificationsReadOperation>!
@@ -660,9 +695,7 @@ class MarkNotificationsReadOperationTests: CloudKitOperationTests {
             receivedNotificationIDs = notificationID
         }
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
-        runOperation(operation)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForOperation(operation)
 
         XCTAssertTrue(operation.finished)
         XCTAssertEqual(operation.errors.count, 0)
@@ -674,16 +707,14 @@ class MarkNotificationsReadOperationTests: CloudKitOperationTests {
 
         operation.setMarkNotificationReadCompletionBlock { _ in }
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
-        runOperation(operation)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForOperation(operation)
 
         XCTAssertTrue(operation.finished)
         XCTAssertEqual(operation.errors.count, 1)
     }
 }
 
-class ModifyBadgeOperationTests: CloudKitOperationTests {
+class Cloud_Internal_ModifyBadgeOperationTests: CloudKitOperationTests {
 
     var target: TestModifyBadgeOperation!
     var operation: CloudKitOperation<TestModifyBadgeOperation>!
@@ -712,9 +743,7 @@ class ModifyBadgeOperationTests: CloudKitOperationTests {
             blockDidRun = true
         }
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
-        runOperation(operation)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForOperation(operation)
 
         XCTAssertTrue(operation.finished)
         XCTAssertEqual(operation.errors.count, 0)
@@ -726,16 +755,14 @@ class ModifyBadgeOperationTests: CloudKitOperationTests {
 
         operation.setModifyBadgeCompletionBlock { _ in }
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
-        runOperation(operation)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForOperation(operation)
 
         XCTAssertTrue(operation.finished)
         XCTAssertEqual(operation.errors.count, 1)
     }
 }
 
-class FetchRecordChangesOperationTests: CloudKitOperationTests {
+class Cloud_Internal_FetchRecordChangesOperationTests: CloudKitOperationTests {
 
     var target: TestFetchRecordChangesOperation!
     var operation: CloudKitOperation<TestFetchRecordChangesOperation>!
@@ -784,9 +811,7 @@ class FetchRecordChangesOperationTests: CloudKitOperationTests {
             blockDidRun = true
         }
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
-        runOperation(operation)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForOperation(operation)
 
         XCTAssertTrue(operation.finished)
         XCTAssertEqual(operation.errors.count, 0)
@@ -798,16 +823,14 @@ class FetchRecordChangesOperationTests: CloudKitOperationTests {
 
         operation.setFetchRecordChangesCompletionBlock { _, _ in }
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
-        runOperation(operation)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForOperation(operation)
 
         XCTAssertTrue(operation.finished)
         XCTAssertEqual(operation.errors.count, 1)
     }
 }
 
-class FetchRecordZonesOperationTests: CloudKitOperationTests {
+class Cloud_Internal_FetchRecordZonesOperationTests: CloudKitOperationTests {
 
     var target: TestFetchRecordZonesOperation!
     var operation: CloudKitOperation<TestFetchRecordZonesOperation>!
@@ -836,10 +859,7 @@ class FetchRecordZonesOperationTests: CloudKitOperationTests {
             blockDidRun = true
         }
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
-        runOperation(operation)
-        waitForExpectationsWithTimeout(3, handler: nil)
-
+        waitForOperation(operation)
         XCTAssertTrue(operation.finished)
         XCTAssertEqual(operation.errors.count, 0)
         XCTAssertTrue(blockDidRun)
@@ -850,16 +870,13 @@ class FetchRecordZonesOperationTests: CloudKitOperationTests {
 
         operation.setFetchRecordZonesCompletionBlock { _ in }
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
-        runOperation(operation)
-        waitForExpectationsWithTimeout(3, handler: nil)
-
+        waitForOperation(operation)
         XCTAssertTrue(operation.finished)
         XCTAssertEqual(operation.errors.count, 1)
     }
 }
 
-class FetchRecordsOperationTests: CloudKitOperationTests {
+class Cloud_Internal_FetchRecordsOperationTests: CloudKitOperationTests {
 
     var target: TestFetchRecordsOperation!
     var operation: CloudKitOperation<TestFetchRecordsOperation>!
@@ -908,10 +925,7 @@ class FetchRecordsOperationTests: CloudKitOperationTests {
             blockDidRun = true
         }
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
-        runOperation(operation)
-        waitForExpectationsWithTimeout(3, handler: nil)
-
+        waitForOperation(operation)
         XCTAssertTrue(operation.finished)
         XCTAssertEqual(operation.errors.count, 0)
         XCTAssertTrue(blockDidRun)
@@ -924,16 +938,13 @@ class FetchRecordsOperationTests: CloudKitOperationTests {
             // etc
         }
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
-        runOperation(operation)
-        waitForExpectationsWithTimeout(3, handler: nil)
-
+        waitForOperation(operation)
         XCTAssertTrue(operation.finished)
         XCTAssertEqual(operation.errors.count, 1)
     }
 }
 
-class FetchSubscriptionsOperationTests: CloudKitOperationTests {
+class Cloud_Internal_FetchSubscriptionsOperationTests: CloudKitOperationTests {
 
     var target: TestFetchSubscriptionsOperation!
     var operation: CloudKitOperation<TestFetchSubscriptionsOperation>!
@@ -962,10 +973,7 @@ class FetchSubscriptionsOperationTests: CloudKitOperationTests {
             blockDidRun = true
         }
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
-        runOperation(operation)
-        waitForExpectationsWithTimeout(3, handler: nil)
-
+        waitForOperation(operation)
         XCTAssertTrue(operation.finished)
         XCTAssertEqual(operation.errors.count, 0)
         XCTAssertTrue(blockDidRun)
@@ -976,16 +984,13 @@ class FetchSubscriptionsOperationTests: CloudKitOperationTests {
 
         operation.setFetchSubscriptionCompletionBlock { _ in }
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
-        runOperation(operation)
-        waitForExpectationsWithTimeout(3, handler: nil)
-
+        waitForOperation(operation)
         XCTAssertTrue(operation.finished)
         XCTAssertEqual(operation.errors.count, 1)
     }
 }
 
-class ModifyRecordZonesOperationTests: CloudKitOperationTests {
+class Cloud_Internal_ModifyRecordZonesOperationTests: CloudKitOperationTests {
 
     var target: TestModifyRecordZonesOperation!
     var operation: CloudKitOperation<TestModifyRecordZonesOperation>!
@@ -1026,10 +1031,7 @@ class ModifyRecordZonesOperationTests: CloudKitOperationTests {
             blockDidRun = true
         }
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
-        runOperation(operation)
-        waitForExpectationsWithTimeout(3, handler: nil)
-
+        waitForOperation(operation)
         XCTAssertTrue(operation.finished)
         XCTAssertEqual(operation.errors.count, 0)
         XCTAssertTrue(blockDidRun)
@@ -1040,16 +1042,13 @@ class ModifyRecordZonesOperationTests: CloudKitOperationTests {
 
         operation.setModifyRecordZonesCompletionBlock { _ in }
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
-        runOperation(operation)
-        waitForExpectationsWithTimeout(3, handler: nil)
-
+        waitForOperation(operation)
         XCTAssertTrue(operation.finished)
         XCTAssertEqual(operation.errors.count, 1)
     }
 }
 
-class ModifyRecordsOperationTests: CloudKitOperationTests {
+class Cloud_Internal_ModifyRecordsOperationTests: CloudKitOperationTests {
 
     var target: TestModifyRecordsOperation!
     var operation: CloudKitOperation<TestModifyRecordsOperation>!
@@ -1142,10 +1141,7 @@ class ModifyRecordsOperationTests: CloudKitOperationTests {
             blockDidRun = true
         }
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
-        runOperation(operation)
-        waitForExpectationsWithTimeout(3, handler: nil)
-
+        waitForOperation(operation)
         XCTAssertTrue(operation.finished)
         XCTAssertEqual(operation.errors.count, 0)
         XCTAssertTrue(blockDidRun)
@@ -1156,16 +1152,13 @@ class ModifyRecordsOperationTests: CloudKitOperationTests {
 
         operation.setModifyRecordsCompletionBlock { _ in }
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
-        runOperation(operation)
-        waitForExpectationsWithTimeout(3, handler: nil)
-
+        waitForOperation(operation)
         XCTAssertTrue(operation.finished)
         XCTAssertEqual(operation.errors.count, 1)
     }
 }
 
-class ModifySubscriptionsOperationTests: CloudKitOperationTests {
+class Cloud_Internal_ModifySubscriptionsOperationTests: CloudKitOperationTests {
 
     var target: TestModifySubscriptionsOperation!
     var operation: CloudKitOperation<TestModifySubscriptionsOperation>!
@@ -1206,10 +1199,7 @@ class ModifySubscriptionsOperationTests: CloudKitOperationTests {
             blockDidRun = true
         }
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
-        runOperation(operation)
-        waitForExpectationsWithTimeout(3, handler: nil)
-
+        waitForOperation(operation)
         XCTAssertTrue(operation.finished)
         XCTAssertEqual(operation.errors.count, 0)
         XCTAssertTrue(blockDidRun)
@@ -1220,16 +1210,13 @@ class ModifySubscriptionsOperationTests: CloudKitOperationTests {
 
         operation.setModifySubscriptionsCompletionBlock { _ in }
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
-        runOperation(operation)
-        waitForExpectationsWithTimeout(3, handler: nil)
-
+        waitForOperation(operation)
         XCTAssertTrue(operation.finished)
         XCTAssertEqual(operation.errors.count, 1)
     }
 }
 
-class QueryOperationTests: CloudKitOperationTests {
+class Cloud_Internal_QueryOperationTests: CloudKitOperationTests {
 
     var target: TestQueryOperation!
     var operation: CloudKitOperation<TestQueryOperation>!
@@ -1292,10 +1279,7 @@ class QueryOperationTests: CloudKitOperationTests {
             blockDidRun = true
         }
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
-        runOperation(operation)
-        waitForExpectationsWithTimeout(3, handler: nil)
-
+        waitForOperation(operation)
         XCTAssertTrue(operation.finished)
         XCTAssertEqual(operation.errors.count, 0)
         XCTAssertTrue(blockDidRun)
@@ -1306,14 +1290,22 @@ class QueryOperationTests: CloudKitOperationTests {
 
         operation.setQueryCompletionBlock { _ in }
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
-        runOperation(operation)
-        waitForExpectationsWithTimeout(3, handler: nil)
-
+        waitForOperation(operation)
         XCTAssertTrue(operation.finished)
         XCTAssertEqual(operation.errors.count, 1)
     }
 }
+
+
+
+
+
+
+
+
+
+
+/*
 
 class BatchedFetchNotificationChangesOperationTests: CloudKitOperationTests {
 
@@ -1365,10 +1357,7 @@ class BatchedFetchNotificationChangesOperationTests: CloudKitOperationTests {
             self.count += 1
         }
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
-        runOperation(operation)
-        waitForExpectationsWithTimeout(3, handler: nil)
-
+        waitForOperation(operation)
         XCTAssertTrue(operation.finished)
         XCTAssertEqual(operation.errors.count, 0)
 
@@ -1425,10 +1414,7 @@ class BatchedFetchRecordChangesOperationTests: CloudKitOperationTests {
             self.count += 1
         }
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
-        runOperation(operation)
-        waitForExpectationsWithTimeout(3, handler: nil)
-
+        waitForOperation(operation)
         XCTAssertTrue(operation.finished)
         XCTAssertEqual(operation.errors.count, 0)
 
@@ -1436,7 +1422,7 @@ class BatchedFetchRecordChangesOperationTests: CloudKitOperationTests {
     }
 }
 
-
+*/
 
 
 
