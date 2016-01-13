@@ -9,6 +9,8 @@
 import Foundation
 
 
+
+
 /**
 An `Operation` subclass which enables the grouping
 of other operations. Use `GroupOperation`s to associate
@@ -22,9 +24,10 @@ operations.
 */
 public class GroupOperation: Operation {
 
+    private let finishingOperation = NSBlockOperation { }
+
     public let queue = OperationQueue()
     public let operations: [NSOperation]
-    private let finishingOperation = NSBlockOperation(block: {})
 
     /// - returns: an aggregation of errors [ErrorType]
     public private(set) var aggregateErrors = Array<ErrorType>()
@@ -39,6 +42,7 @@ public class GroupOperation: Operation {
         super.init()
         queue.suspended = true
         queue.delegate = self
+        addOperations(operations)
         addObserver(CancelledObserver { [weak self] _ in
             self?.queue.cancelAllOperations()
         })
@@ -54,7 +58,6 @@ public class GroupOperation: Operation {
      starting the queue, and adding the finishing operation.
     */
     public override func execute() {
-        addOperations(operations)
         queue.addOperation(finishingOperation)
         queue.suspended = false
     }
@@ -83,13 +86,15 @@ public class GroupOperation: Operation {
      - parameter operations: an array of `NSOperation` instances.
      */
     public func addOperations(operations: [NSOperation]) {
-        log.notice("Add operations to group \(operations.map { $0.operationName })")
-        operations.forEach {
-            if let op = $0 as? Operation {
-                op.log.severity = log.severity
+        if operations.count > 0 {
+            log.notice("Add operations to group \(operations.map { $0.operationName })")
+            operations.forEach {
+                if let op = $0 as? Operation {
+                    op.log.severity = log.severity
+                }
             }
+            queue.addOperations(operations, waitUntilFinished: false)
         }
-        queue.addOperations(operations, waitUntilFinished: false)
     }
 
     /**
@@ -156,7 +161,8 @@ extension GroupOperation: OperationQueueDelegate {
      when there are no more operations in the group.
     */
     public func operationQueue(queue: OperationQueue, willAddOperation operation: NSOperation) {
-        assert(!finishingOperation.finished && !finishingOperation.executing, "Cannot add new operations to a group after the group has completed.")
+        assert(!finishingOperation.executing, "Cannot add new operations to a group after the group has started to finish.")
+        assert(!finishingOperation.finished, "Cannot add new operations to a group after the group has completed.")
 
         if operation !== finishingOperation {
             finishingOperation.addDependency(operation)

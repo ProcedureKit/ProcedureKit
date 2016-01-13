@@ -10,14 +10,18 @@ import Foundation
 
 public class ComposedOperation<T: NSOperation>: Operation, OperationDidFinishObserver {
 
-    public let operation: T
     public let target: Operation
+    public var operation: T
 
-    public required init(operation op: T) {
-        target = op as? Operation ?? GroupOperation(operations: [op])
-        operation = op
+    public convenience init(_ op: T) {
+        self.init(operation: op)
+    }
+
+    init(operation op: T) {
+        self.target = op as? Operation ?? GroupOperation(operations: [op])
+        self.operation = op
         super.init()
-        name = "Composed Operation<\(operation.dynamicType)>"
+        name = "Composed Operation"
         target.addObserver(self)
     }
 

@@ -10,8 +10,6 @@ import XCTest
 import CloudKit
 @testable import Operations
 
-class CloudKitOperationTests: OperationTests { }
-
 // MARK: Test Operations
 
 class TestCloudOperation: NSOperation, CKOperationType {
@@ -81,7 +79,7 @@ class TestFetchNotificationChangesOperation: TestCloudOperation, CKFetchNotifica
 
     var error: NSError?
     var finalPreviousServerChangeToken: ServerChangeToken?
-
+    var changedNotifications: [Notification]? = .None
     var previousServerChangeToken: ServerChangeToken? = .None
     var resultsLimit: Int = 100
     var moreComing: Bool = false
@@ -95,6 +93,11 @@ class TestFetchNotificationChangesOperation: TestCloudOperation, CKFetchNotifica
     }
 
     override func main() {
+        if let changes = changedNotifications, block = notificationChangedBlock {
+            if changes.count > 0 {
+                changes.forEach(block)
+            }
+        }
         fetchNotificationChangesCompletionBlock?(finalPreviousServerChangeToken, error)
     }
 }
@@ -318,10 +321,18 @@ class TestQueryOperation: TestDatabaseOperation, CKQueryOperationType {
 
 
 
-
-
-
 // MARK: - Test Cases
+
+class CloudKitOperationTests: OperationTests {
+
+    var reachability: TestableSystemReachability!
+
+    override func setUp() {
+        super.setUp()
+        reachability = TestableSystemReachability()
+        reachability.status = .Reachable(.ViaWiFi)
+    }
+}
 
 class CloudOperationTests: CloudKitOperationTests {
 
@@ -331,7 +342,7 @@ class CloudOperationTests: CloudKitOperationTests {
     override func setUp() {
         super.setUp()
         target = TestCloudOperation()
-        operation = CloudKitOperation(target)
+        operation = CloudKitOperation(operation: target, reachability: reachability)
     }
 
     func test__get_countainer() {
@@ -355,7 +366,7 @@ class DatabaseOperationTests: CloudKitOperationTests {
     override func setUp() {
         super.setUp()
         target = TestDatabaseOperation()
-        operation = CloudKitOperation(target)
+        operation = CloudKitOperation(operation: target, reachability: reachability)
     }
 
     func test__get_database() {
@@ -420,7 +431,7 @@ class DiscoverAllContactsOperationTests: CloudKitOperationTests {
     override func setUp() {
         super.setUp()
         target = TestDiscoverAllContactsOperation(result: [])
-        operation = CloudKitOperation(target)
+        operation = CloudKitOperation(operation: target, reachability: reachability)
     }
 
     func test__execution_after_cancellation() {
@@ -494,7 +505,7 @@ class DiscoverUserInfosOperationTests: CloudKitOperationTests {
     override func setUp() {
         super.setUp()
         target = TestDiscoverUserInfosOperation(userInfosByEmailAddress: [:], userInfoByRecordID: [:])
-        operation = CloudKitOperation(target)
+        operation = CloudKitOperation(operation: target, reachability: reachability)
     }
 
     func test__get_email_addresses() {
@@ -562,18 +573,18 @@ class DiscoverUserInfosOperationTests: CloudKitOperationTests {
 
 class FetchNotificationChangesOperationTests: CloudKitOperationTests {
 
-    var token: TestFetchNotificationChangesOperation.ServerChangeToken!
     var target: TestFetchNotificationChangesOperation!
     var operation: CloudKitOperation<TestFetchNotificationChangesOperation>!
+    var token: TestFetchNotificationChangesOperation.ServerChangeToken!
 
     override func setUp() {
         super.setUp()
         token = "i'm a server token"
         target = TestFetchNotificationChangesOperation(token: token)
-        operation = CloudKitOperation(target)
+        operation = CloudKitOperation(operation: target, reachability: reachability)
     }
 
-    func test__get_set_notification_charged_block() {
+    func test__get_set_notification_changed_block() {
 
         var didItWork = false
         operation.notificationChangedBlock = { _ in
@@ -614,19 +625,23 @@ class FetchNotificationChangesOperationTests: CloudKitOperationTests {
         XCTAssertTrue(operation.finished)
         XCTAssertEqual(operation.errors.count, 1)
     }
+
+    func test__batch_operation() {
+
+    }
 }
 
 class MarkNotificationsReadOperationTests: CloudKitOperationTests {
 
-    var toMark: [TestMarkNotificationsReadOperation.NotificationID]!
     var target: TestMarkNotificationsReadOperation!
     var operation: CloudKitOperation<TestMarkNotificationsReadOperation>!
+    var toMark: [TestMarkNotificationsReadOperation.NotificationID]!
 
     override func setUp() {
         super.setUp()
         toMark = [ "this-is-an-id", "this-is-another-id" ]
         target = TestMarkNotificationsReadOperation(markIDsToRead: toMark)
-        operation = CloudKitOperation(target)
+        operation = CloudKitOperation(operation: target, reachability: reachability)
     }
 
     func test__get_notification_id() {
@@ -670,15 +685,15 @@ class MarkNotificationsReadOperationTests: CloudKitOperationTests {
 
 class ModifyBadgeOperationTests: CloudKitOperationTests {
 
-    var badge: Int!
     var target: TestModifyBadgeOperation!
     var operation: CloudKitOperation<TestModifyBadgeOperation>!
+    var badge: Int!
 
     override func setUp() {
         super.setUp()
         badge = 9
         target = TestModifyBadgeOperation(value: badge)
-        operation = CloudKitOperation(target)
+        operation = CloudKitOperation(operation: target, reachability: reachability)
     }
 
     func test__get_badge_value() {
@@ -728,7 +743,7 @@ class FetchRecordChangesOperationTests: CloudKitOperationTests {
     override func setUp() {
         super.setUp()
         target = TestFetchRecordChangesOperation()
-        operation = CloudKitOperation(target)
+        operation = CloudKitOperation(operation: target, reachability: reachability)
     }
 
     func test__get_record_zone_id() {
@@ -800,7 +815,7 @@ class FetchRecordZonesOperationTests: CloudKitOperationTests {
     override func setUp() {
         super.setUp()
         target = TestFetchRecordZonesOperation()
-        operation = CloudKitOperation(target)
+        operation = CloudKitOperation(operation: target, reachability: reachability)
     }
 
     func test__get_record_zone_ids() {
@@ -852,9 +867,9 @@ class FetchRecordsOperationTests: CloudKitOperationTests {
     override func setUp() {
         super.setUp()
         target = TestFetchRecordsOperation()
-        operation = CloudKitOperation(target)
+        operation = CloudKitOperation(operation: target, reachability: reachability)
     }
-    
+
     func test__get_record_ids() {
         let IDs = [ "an-id", "another-id" ]
         target.recordIDs = IDs
@@ -926,7 +941,7 @@ class FetchSubscriptionsOperationTests: CloudKitOperationTests {
     override func setUp() {
         super.setUp()
         target = TestFetchSubscriptionsOperation()
-        operation = CloudKitOperation(target)
+        operation = CloudKitOperation(operation: target, reachability: reachability)
     }
 
     func test__get_subscription_ids() {
@@ -978,7 +993,7 @@ class ModifyRecordZonesOperationTests: CloudKitOperationTests {
     override func setUp() {
         super.setUp()
         target = TestModifyRecordZonesOperation()
-        operation = CloudKitOperation(target)
+        operation = CloudKitOperation(operation: target, reachability: reachability)
     }
 
     func test__get_zones_to_save() {
@@ -1042,9 +1057,9 @@ class ModifyRecordsOperationTests: CloudKitOperationTests {
     override func setUp() {
         super.setUp()
         target = TestModifyRecordsOperation()
-        operation = CloudKitOperation(target)
+        operation = CloudKitOperation(operation: target, reachability: reachability)
     }
-    
+
     func test__get_records_to_save() {
         let records = [ "a-record", "another-record" ]
         target.recordsToSave = records
@@ -1158,9 +1173,9 @@ class ModifySubscriptionsOperationTests: CloudKitOperationTests {
     override func setUp() {
         super.setUp()
         target = TestModifySubscriptionsOperation()
-        operation = CloudKitOperation(target)
+        operation = CloudKitOperation(operation: target, reachability: reachability)
     }
-    
+
     func test__get_subscriptions_to_save() {
         let subscriptions = [ "a-subscription", "another-subscription" ]
         target.subscriptionsToSave = subscriptions
@@ -1222,9 +1237,9 @@ class QueryOperationTests: CloudKitOperationTests {
     override func setUp() {
         super.setUp()
         target = TestQueryOperation()
-        operation = CloudKitOperation(target)
+        operation = CloudKitOperation(operation: target, reachability: reachability)
     }
-    
+
     func test__get_query() {
         let query = "a-query"
         target.query = query
@@ -1299,6 +1314,131 @@ class QueryOperationTests: CloudKitOperationTests {
         XCTAssertEqual(operation.errors.count, 1)
     }
 }
+
+class BatchedFetchNotificationChangesOperationTests: CloudKitOperationTests {
+
+    typealias Target = TestFetchNotificationChangesOperation
+
+    var token: String!
+    var error: NSError?
+    var numberOfBatches: Int = 3
+    var count: Int = 0
+    var operation: BatchedCloudKitOperation<Target>!
+
+    override func setUp() {
+        super.setUp()
+        token = "I'm a server token!"
+        error = .None
+        numberOfBatches = 3
+        count = 0
+        operation = BatchedCloudKitOperation(reachability: reachability, operation: createNextOperation)
+    }
+    
+    func createNextOperation() -> Target {
+        let target = Target(token: token, error: error)
+        target.changedNotifications = [ "hello", "world" ]
+        if count < numberOfBatches - 1 {
+            target.moreComing = true
+        }
+        return target
+    }
+
+    func test__get_set_notification_changed_block() {
+
+        var didItWork = false
+        operation.notificationChangedBlock = { _ in
+            didItWork = true
+        }
+
+        let notification = "hello world"
+        operation.notificationChangedBlock?(notification)
+        XCTAssertTrue(didItWork)
+    }
+
+    func test__batch() {
+        var notifications: [String] = []
+        operation.notificationChangedBlock = { notification in
+            notifications.append(notification)
+        }
+
+        operation.setFetchNotificationChangesCompletionBlock { [unowned self] _ in
+            self.count += 1
+        }
+
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        runOperation(operation)
+        waitForExpectationsWithTimeout(3, handler: nil)
+
+        XCTAssertTrue(operation.finished)
+        XCTAssertEqual(operation.errors.count, 0)
+
+        XCTAssertEqual(count, 3)
+        XCTAssertEqual(notifications, [ "hello", "world", "hello", "world", "hello", "world" ])
+    }
+}
+
+class BatchedFetchRecordChangesOperationTests: CloudKitOperationTests {
+
+    typealias Target = TestFetchRecordChangesOperation
+
+    var numberOfBatches: Int = 3
+    var count: Int = 0
+    var operation: BatchedCloudKitOperation<Target>!
+
+    override func setUp() {
+        super.setUp()
+        numberOfBatches = 3
+        count = 0
+        operation = BatchedCloudKitOperation(reachability: reachability, operation: createNextOperation)
+    }
+
+    func createNextOperation() -> Target {
+        let target = Target()
+        if count < numberOfBatches - 1 {
+            target.moreComing = true
+        }
+        return target
+    }
+
+    func test__get_set_record_zone_id() {
+        let zoneID = "a-different-zone-id"
+        operation.recordZoneID = zoneID
+        XCTAssertEqual(operation.recordZoneID, zoneID)
+    }
+
+    func test__get_set_record_changed_block() {
+        operation.recordChangedBlock = { _ in }
+        XCTAssertNotNil(operation.recordChangedBlock)
+    }
+
+    func test__get_set_record_with_id_was_deleted_block() {
+        operation.recordWithIDWasDeletedBlock = { _ in }
+        XCTAssertNotNil(operation.recordWithIDWasDeletedBlock)
+    }
+
+    func test__batch() {
+
+        operation.recordZoneID = "a-zone-id"
+        operation.recordChangedBlock = { _ in }
+        operation.recordWithIDWasDeletedBlock = { _ in }
+        operation.setFetchRecordChangesCompletionBlock { [unowned self] _, _ in
+            self.count += 1
+        }
+
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        runOperation(operation)
+        waitForExpectationsWithTimeout(3, handler: nil)
+
+        XCTAssertTrue(operation.finished)
+        XCTAssertEqual(operation.errors.count, 0)
+
+        XCTAssertEqual(count, 3)
+    }
+}
+
+
+
+
 
 
 

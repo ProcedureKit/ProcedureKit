@@ -16,6 +16,17 @@ class GroupOperationTests: OperationTests {
         return (0..<3).map { _ in TestOperation() }
     }
 
+    func test__cancel_group_operation() {
+
+        let operations = createGroupOperations()
+        let operation = GroupOperation(operations: operations)
+        operation.cancel()
+
+        for op in operations {
+            XCTAssertTrue(op.cancelled)
+        }
+    }
+
     func test__group_operations_are_performed_in_order() {
         let group = createGroupOperations()
         let expectation = expectationWithDescription("Test: \(__FUNCTION__)")

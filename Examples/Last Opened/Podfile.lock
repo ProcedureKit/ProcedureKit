@@ -1,0 +1,16 @@
+PODS:
+  - Operations (2.5.1):
+    - Operations/Standard (= 2.5.1)
+  - Operations/Standard (2.5.1)
+
+DEPENDENCIES:
+  - Operations (from `../../`)
+
+EXTERNAL SOURCES:
+  Operations:
+    :path: "../../"
+
+SPEC CHECKSUMS:
+  Operations: 3c646c48620ac4b6c624d825d42c1e684ecb6a53
+
+COCOAPODS: 0.39.0

@@ -466,6 +466,7 @@ public class Operation: NSOperation {
             _cancelled = true
 
             if state > .Ready {
+                super.cancel()
                 finish()
             }
         }
