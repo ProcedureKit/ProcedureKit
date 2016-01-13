@@ -56,6 +56,17 @@ public struct RandomFailGenerator<G: GeneratorType>: GeneratorType {
     }
 }
 
+struct FibonacciGenerator: GeneratorType {
+    var currentValue = 0, nextValue = 1
+
+    mutating func next() -> Int? {
+        let result = currentValue
+        currentValue = nextValue
+        nextValue += result
+        return result
+    }
+}
+
 struct FiniteGenerator<G: GeneratorType>: GeneratorType {
 
     private let limit: Int
@@ -77,107 +88,35 @@ struct FiniteGenerator<G: GeneratorType>: GeneratorType {
     }
 }
 
-struct FixedWaitGenerator: GeneratorType {
-    let period: NSTimeInterval
+struct GeneratorMap<G: GeneratorType, T>: GeneratorType {
+    private let transform: G.Element -> T
+    private var generator: G
 
-    init(period: NSTimeInterval) {
-        precondition(period >= 0, "The minimum must be greater than or equal to zero, but it is: \(period)")
-        self.period = period
+
+    init(_ generator: G, transform: G.Element -> T) {
+        self.generator = generator
+        self.transform = transform
     }
 
-    mutating func next() -> NSTimeInterval? {
-        return period
-    }
-}
-
-struct RandomWaitGenerator: GeneratorType {
-    let minimum: NSTimeInterval
-    let maximum: NSTimeInterval
-
-    init(minimum: NSTimeInterval, maximum: NSTimeInterval) {
-        precondition(minimum >= 0, "The minimum must be greater than or equal to zero, but it is: \(minimum)")
-        precondition(maximum > minimum, "The maximum must be greater than minimum.")
-        self.minimum = minimum
-        self.maximum = maximum
-    }
-
-    mutating func next() -> NSTimeInterval? {
-        let r = Double(arc4random(UInt64)) / Double(UInt64.max)
-        return (r * (maximum - minimum)) + minimum
+    mutating func next() -> T? {
+        return generator.next().map(transform)
     }
 }
 
-struct IncrementingWaitGenerator: GeneratorType {
-    let initial: NSTimeInterval
-    let increment: NSTimeInterval
-    var count: Int = 0
+struct TupleGenerator<Primary: GeneratorType, Secondary: GeneratorType>: GeneratorType {
 
-    init(initial: NSTimeInterval, increment: NSTimeInterval) {
-        precondition(initial >= 0, "The initial must be greater than or equal to zero, but it is: \(initial)")
-        self.initial = initial
-        self.increment = increment
+    private var primary: Primary
+    private var secondary: Secondary
+
+    init(primary: Primary, secondary: Secondary) {
+        self.primary = primary
+        self.secondary = secondary
     }
 
-    mutating func next() -> NSTimeInterval? {
-        let interval = initial + (NSTimeInterval(count) * increment)
-        count += 1
-        return max(0, interval)
+    mutating func next() -> (Secondary.Element?, Primary.Element)? {
+        return primary.next().map { ( secondary.next(), $0) }
     }
 }
-
-struct ExponentialWaitGenerator: GeneratorType {
-    let period: NSTimeInterval
-    let maximum: NSTimeInterval
-    var count: Int = 0
-
-    init(period: NSTimeInterval, maximum: NSTimeInterval) {
-        precondition(period >= 0, "The period must be greater than or equal to zero, but it is: \(period)")
-        precondition(maximum > 0, "The maximum must be greater than zero, but it is: \(maximum)")
-        precondition(period < maximum, "The period must be less than the maximum, but it period: \(period) and maximum: \(maximum)")
-        self.period = period
-        self.maximum = maximum
-    }
-
-    mutating func next() -> NSTimeInterval? {
-        let interval = period * pow(2.0, Double(count))
-        count += 1
-        return max(0, min(maximum, interval))
-    }
-}
-
-struct FibonacciGenerator: GeneratorType {
-    var currentValue = 0, nextValue = 1
-
-    mutating func next() -> Int? {
-        let result = currentValue
-        currentValue = nextValue
-        nextValue += result
-        return result
-    }
-}
-
-struct FibonacciWaitGenerator: GeneratorType {
-    let period: NSTimeInterval
-    let maximum: NSTimeInterval
-
-    private var fibonacci = FibonacciGenerator()
-
-    init(period: NSTimeInterval, maximum: NSTimeInterval) {
-        precondition(period >= 0, "The period must be greater than or equal to zero, but it is: \(period)")
-        precondition(maximum > 0, "The maximum must be greater than zero, but it is: \(maximum)")
-        precondition(period < maximum, "The period must be less than the maximum, but it period: \(period) and maximum: \(maximum)")
-        self.period = period
-        self.maximum = maximum
-    }
-
-    mutating func next() -> NSTimeInterval? {
-        return fibonacci.next().map { fib in
-            let interval = period * NSTimeInterval(fib)
-            return max(0, min(maximum, interval))
-        }
-    }
-}
-
 
 /**
  Define a strategy for waiting a given time interval. The strategy
@@ -228,25 +167,51 @@ public enum WaitStrategy {
     case Exponential((period: NSTimeInterval, maximum: NSTimeInterval))
     case Fibonacci((period: NSTimeInterval, maximum: NSTimeInterval))
 
-    /**
-     Returns a new generator using the strategy.
-     - returns: a `AnyGenerator<NSTimeInterval>` instance.
-    */
-    public func generate() -> AnyGenerator<NSTimeInterval> {
-        switch self {
+    internal func generator() -> IntervalGenerator {
+        return IntervalGenerator(self)
+    }
+}
+
+struct IntervalGenerator: GeneratorType {
+
+    let strategy: WaitStrategy
+
+    private var count: Int = 0
+    private lazy var fibonacci = FibonacciGenerator()
+
+    init(_ strategy: WaitStrategy) {
+        self.strategy = strategy
+    }
+
+    mutating func next() -> NSTimeInterval? {
+        switch strategy {
+
         case .Fixed(let period):
-            return anyGenerator(FixedWaitGenerator(period: period))
+            return period
+
         case .Random(let (minimum, maximum)):
-            return anyGenerator(RandomWaitGenerator(minimum: minimum, maximum: maximum))
+            let r = Double(arc4random(UInt64)) / Double(UInt64.max)
+            return (r * (maximum - minimum)) + minimum
+
         case .Incrementing(let (initial, increment)):
-            return anyGenerator(IncrementingWaitGenerator(initial: initial, increment: increment))
+            let interval = initial + (NSTimeInterval(count) * increment)
+            count += 1
+            return max(0, interval)
+
         case .Exponential(let (period, maximum)):
-            return anyGenerator(ExponentialWaitGenerator(period: period, maximum: maximum))
+            let interval = period * pow(2.0, Double(count))
+            count += 1
+            return max(0, min(maximum, interval))
+
         case .Fibonacci(let (period, maximum)):
-            return anyGenerator(FibonacciWaitGenerator(period: period, maximum: maximum))
+            return fibonacci.next().map { fib in
+                let interval = period * NSTimeInterval(fib)
+                return max(0, min(maximum, interval))
+            }
         }
     }
 }
+
 
 /**
 
@@ -296,8 +261,7 @@ public enum WaitStrategy {
 */
 public class RepeatedOperation<T where T: NSOperation>: GroupOperation {
 
-    private var delay: AnyGenerator<NSTimeInterval>
-    private var generator: AnyGenerator<T>
+    private var generator: AnyGenerator<(Delay?, T)>
 
     /// - returns: the current operation being executed.
     public internal(set) var current: T
@@ -307,17 +271,14 @@ public class RepeatedOperation<T where T: NSOperation>: GroupOperation {
 
     /**
      The designated initializer.
-     
-     - parameter delay: a generator of NSTimeInterval values
+
      - parameter maxCount: an optional Int, which defaults to .None. If not nil, this is
      the maximum number of operations which will be executed.
-     - parameter: (unnamed) the AnyGenerator<T> generator.
+     - parameter generator: the AnyGenerator<(Delay?, T)> generator.
     */
-    public init<D, G where D: GeneratorType, D.Element == NSTimeInterval, G: GeneratorType, G.Element == T>(delay: D, maxCount max: Int?, generator gen: G) {
+    public init(maxCount max: Int? = .None, generator gen: AnyGenerator<(Delay?, T)>) {
 
-        generator = gen as? AnyGenerator<T> ?? anyGenerator(gen)
-
-        guard let operation = generator.next() else {
+        guard let (_, operation) = gen.next() else {
             preconditionFailure("Operation Generator must return an instance initially.")
         }
 
@@ -326,13 +287,18 @@ public class RepeatedOperation<T where T: NSOperation>: GroupOperation {
         switch max {
         case .Some(let max):
             // Subtract 1 to account for the 1st attempt
-            self.delay = anyGenerator(FiniteGenerator(delay, limit: max - 1))
+            generator = anyGenerator(FiniteGenerator(gen, limit: max - 1))
         case .None:
-            self.delay = anyGenerator(delay)
+            generator = gen
         }
 
         super.init(operations: [operation])
         name = "Repeated Operation"
+    }
+
+    public convenience init<D, G where D: GeneratorType, D.Element == Delay, G: GeneratorType, G.Element == T>(maxCount max: Int? = .None, delay: D, generator: G) {
+        let tuple = TupleGenerator(primary: generator, secondary: delay)
+        self.init(maxCount: max, generator: anyGenerator(tuple))
     }
 
     /**
@@ -355,8 +321,8 @@ public class RepeatedOperation<T where T: NSOperation>: GroupOperation {
      the maximum number of operations which will be executed.
      - parameter: (unnamed) a generic generator which has an Element equal to T.
      */
-    public convenience init<G where G: GeneratorType, G.Element == T>(strategy: WaitStrategy = .Fixed(0.1), maxCount max: Int? = .None, generator: G) {
-        self.init(delay: strategy.generate(), maxCount: max, generator: generator)
+    public convenience init<G where G: GeneratorType, G.Element == T>(maxCount max: Int? = .None, strategy: WaitStrategy = .Fixed(0.1), generator: G) {
+        self.init(maxCount: max, delay: GeneratorMap(strategy.generator()) { Delay.By($0) }, generator: generator)
     }
 
     /**
@@ -395,10 +361,15 @@ public class RepeatedOperation<T where T: NSOperation>: GroupOperation {
      can prevent another operation from being added.
     */
     public func addNextOperation(@autoclosure shouldAddNext: () -> Bool = true) {
-        if let op = next(), delay = nextDelayOperation() {
+        if let (delay, op) = next() {
             if shouldAddNext() {
-                op.addDependency(delay)
-                addOperations(delay, op)
+                if let delay = delay.map({ DelayOperation(delay: $0) }) {
+                    op.addDependency(delay)
+                    addOperations(delay, op)
+                }
+                else {
+                    addOperation(op)
+                }
                 count += 1
                 current = op
             }
@@ -410,12 +381,8 @@ public class RepeatedOperation<T where T: NSOperation>: GroupOperation {
      allow subclasses to override and configure the operation
      further before it is added.
     */
-    public func next() -> T? {
+    public func next() -> (Delay?, T)? {
         return generator.next()
-    }
-
-    internal func nextDelayOperation() -> DelayOperation? {
-        return delay.next().map { DelayOperation(interval: $0) }
     }
 }
 

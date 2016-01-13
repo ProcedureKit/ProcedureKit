@@ -51,19 +51,32 @@ class FiniteGeneratorTests: XCTestCase {
     }
 }
 
-class FixedWaitGeneratorTests: XCTestCase {
+class WaitStrategyIntervalTests: XCTestCase {
 
     var strategy: WaitStrategy!
-    var generator: AnyGenerator<NSTimeInterval>!
+    var generator: IntervalGenerator!
+
+    func getInterval(count: Int = 0) -> NSTimeInterval? {
+        for _ in 0..<count {
+            guard let _ = generator.next() else {
+                XCTFail("IntervalGenerator never ends.")
+                break
+            }
+        }
+        return generator.next()
+    }
+}
+
+class FixedWaitGeneratorTests: WaitStrategyIntervalTests {
 
     override func setUp() {
         super.setUp()
         strategy = .Fixed(1.0)
-        generator = strategy.generate()
+        generator = strategy.generator()
     }
     
     func test__next_interval() {
-        guard let interval = generator.next() else {
+        guard let interval = getInterval() else {
             XCTFail("FixedWaitGenerator never ends.")
             return
         }
@@ -71,15 +84,12 @@ class FixedWaitGeneratorTests: XCTestCase {
     }
 }
 
-class RandomWaitGeneratorTests: XCTestCase {
-
-    var strategy: WaitStrategy!
-    var generator: AnyGenerator<NSTimeInterval>!
+class RandomWaitGeneratorTests: WaitStrategyIntervalTests {
 
     override func setUp() {
         super.setUp()
         strategy = .Random((minimum: 1.0, maximum: 2.0))
-        generator = strategy.generate()
+        generator = strategy.generator()
     }
 
     func test__next_interval() {
@@ -94,15 +104,12 @@ class RandomWaitGeneratorTests: XCTestCase {
     }
 }
 
-class IncrementingWaitGeneratorTests: XCTestCase {
-
-    var strategy: WaitStrategy!
-    var generator: AnyGenerator<NSTimeInterval>!
+class IncrementingWaitGeneratorTests: WaitStrategyIntervalTests {
 
     override func setUp() {
         super.setUp()
         strategy = .Incrementing((initial: 1.0, increment: 1.0))
-        generator = strategy.generate()
+        generator = strategy.generator()
     }
 
     func test__next_interval() {
@@ -116,25 +123,12 @@ class IncrementingWaitGeneratorTests: XCTestCase {
     }
 }
 
-class ExponentialWaitGeneratorTests: XCTestCase {
-
-    var strategy: WaitStrategy!
-    var generator: AnyGenerator<NSTimeInterval>!
+class ExponentialWaitGeneratorTests: WaitStrategyIntervalTests {
 
     override func setUp() {
         super.setUp()
         strategy = .Exponential((period: 1, maximum: 20))
-        generator = strategy.generate()
-    }
-
-    func getInterval(count: Int) -> NSTimeInterval? {
-        for _ in 0..<count {
-            guard let _ = generator.next() else {
-                XCTFail("ExponentialWaitGenerator never ends.")
-                break
-            }
-        }
-        return generator.next()
+        generator = strategy.generator()
     }
 
     func test__next_0() {
@@ -186,27 +180,14 @@ class ExponentialWaitGeneratorTests: XCTestCase {
     }
 }
 
-class FibonacciWaitGeneratorTests: XCTestCase {
-
-    var strategy: WaitStrategy!
-    var generator: AnyGenerator<NSTimeInterval>!
+class FibonacciWaitGeneratorTests: WaitStrategyIntervalTests {
 
     override func setUp() {
         super.setUp()
         strategy = .Fibonacci((period: 1, maximum: 10))
-        generator = strategy.generate()
+        generator = strategy.generator()
     }
     
-    func getInterval(count: Int) -> NSTimeInterval? {
-        for _ in 0..<count {
-            guard let _ = generator.next() else {
-                XCTFail("FibonacciWaitGenerator never ends.")
-                break
-            }
-        }
-        return generator.next()
-    }
-
     func test__next_0() {
         guard let interval = getInterval(0) else {
             XCTFail("FibonacciWaitGenerator never ends.")
@@ -269,6 +250,35 @@ class FibonacciWaitGeneratorTests: XCTestCase {
             return
         }
         XCTAssertEqual(interval, 10) // max reached
+    }
+}
+
+class RepeatedOperationTests: OperationTests {
+
+    var operation: RepeatedOperation<TestOperation>!
+
+    func test__custom_generator_with_delay() {
+        operation = RepeatedOperation(maxCount: 2, generator: anyGenerator { (Delay.By(0.1), TestOperation() )})
+
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        runOperation(operation)
+        waitForExpectationsWithTimeout(3, handler: nil)
+
+        XCTAssertTrue(operation.finished)
+        XCTAssertEqual(operation.count, 2)
+        XCTAssertEqual(operation.aggregateErrors.count, 0)
+    }
+
+    func test__custom_generator_without_delay() {
+        operation = RepeatedOperation(maxCount: 2, generator: anyGenerator { (.None, TestOperation() )})
+
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        runOperation(operation)
+        waitForExpectationsWithTimeout(3, handler: nil)
+
+        XCTAssertTrue(operation.finished)
+        XCTAssertEqual(operation.count, 2)
+        XCTAssertEqual(operation.aggregateErrors.count, 0)
     }
 }
 
