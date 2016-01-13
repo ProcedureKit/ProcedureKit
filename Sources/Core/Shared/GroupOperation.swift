@@ -42,10 +42,6 @@ public class GroupOperation: Operation {
         super.init()
         queue.suspended = true
         queue.delegate = self
-        addOperations(operations)
-        addObserver(CancelledObserver { [weak self] _ in
-            self?.queue.cancelAllOperations()
-        })
     }
 
     /// Convenience intiializer for direct usage without subclassing.
@@ -53,11 +49,20 @@ public class GroupOperation: Operation {
         self.init(operations: operations)
     }
 
+    /// Override of public method
+    public override func cancel() {
+        queue.cancelAllOperations()
+        queue.suspended = false
+        operations.forEach { $0.cancel() }
+        super.cancel()
+    }
+
     /**
      Executes the group by adding the operations to the queue. Then
      starting the queue, and adding the finishing operation.
     */
     public override func execute() {
+        addOperations(operations)        
         queue.addOperation(finishingOperation)
         queue.suspended = false
     }
@@ -87,7 +92,6 @@ public class GroupOperation: Operation {
      */
     public func addOperations(operations: [NSOperation]) {
         if operations.count > 0 {
-            log.notice("Add operations to group \(operations.map { $0.operationName })")
             operations.forEach {
                 if let op = $0 as? Operation {
                     op.log.severity = log.severity
