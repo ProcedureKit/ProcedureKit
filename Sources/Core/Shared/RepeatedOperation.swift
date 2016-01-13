@@ -217,12 +217,27 @@ struct IntervalGenerator: GeneratorType {
 
  ### RepeatedOperation
 
- This operation must be initialized with a generator which has an
- element which subclasses `NSOperation`. e.g.
+ RepeatedOperation is an GroupOperation subclass which can be used in
+ conjuntion with a GeneratorType to schedule NSOperation subclasses of
+ the same type on a private queue.
+ 
+ This is useful directly for periodically running idempotent operations,
+ and it forms the basis for operations types which can be retried in the
+ event of a failure.
+ 
+ The operations may optionally be scheduled after a delay has passed, or
+ a date in the future has been reached.
+ 
+ At the lowest level, which offers the most flexibility, RepeatedOperation
+ is initialized with a generator. The generator (something conforming to
+ GeneratorType) element type is (Delay?, T), where T is a NSOperation
+ subclass, and Delay is an enum used in conjunction with DelayOperation.
+ 
+ For example:
 
  ```swift
  let operation = RepeatedOperation(anyGenerator { 
-     return MyOperation() 
+     return (.By(0.1), MyOperation())
  })
  ```
 
@@ -230,30 +245,30 @@ struct IntervalGenerator: GeneratorType {
  new instances of the operation to its group. This happens initially 
  when the group starts, and then again when the child operation finishes.
 
- After the initial child operation completes, new operations are 
- added with a delay on the queue. The time interval of the delay 
- can be configured via the first argument to the `RepeatedOperation`.
-
  There are two ways to stop the operations from repeating.
 
  1. Return `nil` from the generator passed to the initializer
- 2. Set the 2nd argument, `maxNumberOfAttempts` which is an 
-    optional `Int` defaulting to `.None`.
+ 2. Set the 1st argument, `maxCount` to a the number of times an 
+     operation will be executed (i.e. it includes the initial 
+     operation). The value defaults to .None which indicates repeating
+     forever.
 
- The first argument is a `WaitStrategy` which is an enum of various 
- different mechanisms for defining waiting. See WaitStrategy for more.
+ Convenience initializers support the combination of a simple () -> T?
+ block with standard wait strategies. See WaitStrategy for more information.
 
  For example, to use exponential back-off, with a maximum of 10 attempts:
 
  ```swift
- let operation = RepeatedOperation(
-     strategy: .Exponential((minimum: 1, maximum: 300)), 
-     maxNumberOfAttempts: 10, 
+ let operation = RepeatedOperation(maxCounts: 10,
+     strategy: .Exponential((minimum: 1, maximum: 300)),
      anyGenerator {
          MyOperation()
      }
  )
  ```
+ 
+ Note that in this case, the generator supplied only needs to return the
+ operation instead of a tuple.
 
  - See: Wait
  - See: Repeatable
@@ -296,15 +311,24 @@ public class RepeatedOperation<T where T: NSOperation>: GroupOperation {
         name = "Repeated Operation"
     }
 
+    /**
+     A convenience initializer, which accepts two generators, one for the delay and another for
+     the operation.
+
+     - parameter maxCount: an optional Int, which defaults to .None. If not nil, this is
+     the maximum number of operations which will be executed.
+     - parameter delay: a generator with Delay element.
+     - parameter generator: a generator with T element.
+     */
     public convenience init<D, G where D: GeneratorType, D.Element == Delay, G: GeneratorType, G.Element == T>(maxCount max: Int? = .None, delay: D, generator: G) {
         let tuple = TupleGenerator(primary: generator, secondary: delay)
         self.init(maxCount: max, generator: anyGenerator(tuple))
     }
 
     /**
-     A convenience initializer with generic generator. This is useful where another
-     system can be responsible for vending instances of the custom operation. Typically
-     there may be some state involved in such a Generator. e.g.
+     A convenience initializer with wait strategy and generic operation generator. 
+     This is useful where another system can be responsible for vending instances of 
+     the custom operation. Typically there may be some state involved in such a Generator. e.g.
      
      ```swift
      class MyOperationGenerator: GeneratorType {
@@ -313,13 +337,23 @@ public class RepeatedOperation<T where T: NSOperation>: GroupOperation {
          }
      }
      
-     let operation = RepeatedOperation(MyOperationGenerator())
+     let operation = RepeatedOperation(generator: MyOperationGenerator())
      ```
 
-     - parameter strategy: a WaitStrategy which defaults to a 0.1 second fixed interval.
+     The wait strategy is useful if say, you want to repeat the operations with random 
+     delays, or exponential backoff. These standard schemes and be easily expressed.
+     
+     ```swift
+     let operation = RepeatedOperation(
+         strategy: .Random((0.1, 1.0)), 
+         generator: MyOperationGenerator()
+     )
+     ```
+
      - parameter maxCount: an optional Int, which defaults to .None. If not nil, this is
      the maximum number of operations which will be executed.
-     - parameter: (unnamed) a generic generator which has an Element equal to T.
+     - parameter strategy: a WaitStrategy which defaults to a 0.1 second fixed interval.
+     - parameter generator: a generic generator which has an Element equal to T.
      */
     public convenience init<G where G: GeneratorType, G.Element == T>(maxCount max: Int? = .None, strategy: WaitStrategy = .Fixed(0.1), generator: G) {
         self.init(maxCount: max, delay: GeneratorMap(strategy.generator()) { Delay.By($0) }, generator: generator)
