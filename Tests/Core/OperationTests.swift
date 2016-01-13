@@ -94,7 +94,6 @@ class OperationTests: XCTestCase {
 
     override func setUp() {
         super.setUp()
-        LogManager.severity = .Verbose
         queue = OperationQueue()
         delegate = TestQueueDelegate()
     }
@@ -103,7 +102,6 @@ class OperationTests: XCTestCase {
         queue = nil
         delegate = nil
         ExclusivityManager.sharedInstance.__tearDownForUnitTesting()
-        LogManager.severity = .Warning
         super.tearDown()
     }
 
@@ -122,12 +120,36 @@ class OperationTests: XCTestCase {
         queue.addOperations(operations, waitUntilFinished: false)
     }
 
+    func waitForOperation(operation: Operation, withExpectationDescription text: String = __FUNCTION__) {
+        addCompletionBlockToTestOperation(operation, withExpectationDescription: text)
+        queue.delegate = delegate
+        queue.addOperation(operation)
+        waitForExpectationsWithTimeout(3, handler: nil)
+    }
+
+    func waitForOperations(operations: Operation..., withExpectationDescription text: String = __FUNCTION__) {
+        for (i, op) in operations.enumerate() {
+            addCompletionBlockToTestOperation(op, withExpectationDescription: "\(i), \(text)")
+        }
+        queue.delegate = delegate
+        queue.addOperations(operations, waitUntilFinished: false)
+        waitForExpectationsWithTimeout(3, handler: nil)
+    }
+
     func addCompletionBlockToTestOperation(operation: Operation, withExpectation expectation: XCTestExpectation) {
         weak var weakExpectation = expectation
         operation.addObserver(BlockObserver { (_, _) in
             weakExpectation?.fulfill()
         })
     }
+
+    func addCompletionBlockToTestOperation(operation: Operation, withExpectationDescription text: String = __FUNCTION__) {
+        let expectation = expectationWithDescription("Test: \(text), \(NSUUID().UUIDString)")
+        operation.addObserver(BlockObserver { _, _ in
+            expectation.fulfill()
+        })
+    }
+
 }
 
 class BasicTests: OperationTests {
