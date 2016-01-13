@@ -81,7 +81,7 @@ public class RetryOperation<T: NSOperation>: RepeatedOperation<T> {
     let retry: RetryGenerator<T>
 
     /**
-     The designated initializer
+     A designated initializer
      
      Creates an operation which will retry executing operations in the face
      of errors.
@@ -100,7 +100,7 @@ public class RetryOperation<T: NSOperation>: RepeatedOperation<T> {
     }
 
     /**
-     A convenience initializer, which accepts two generators, one for the delay and another for
+     A designated initializer, which accepts two generators, one for the delay and another for
      the operation, in addition to a retry handler block
 
      - parameter maxCount: an optional Int, which defaults to .None. If not nil, this is
@@ -111,9 +111,11 @@ public class RetryOperation<T: NSOperation>: RepeatedOperation<T> {
      adjust the next delay and Operation.
 
      */
-    public convenience init<D, G where D: GeneratorType, D.Element == Delay, G: GeneratorType, G.Element == T>(maxCount max: Int?, delay: D, generator: G, retry: Handler) {
+    public init<D, G where D: GeneratorType, D.Element == Delay, G: GeneratorType, G.Element == T>(maxCount max: Int?, delay: D, generator: G, retry block: Handler) {
         let tuple = TupleGenerator(primary: generator, secondary: delay)
-        self.init(maxCount: max, generator: anyGenerator(tuple), retry: retry)
+        retry = RetryGenerator(generator: anyGenerator(tuple), retry: block)
+        super.init(maxCount: max, generator: anyGenerator(retry))
+        name = "Retry Operation"
     }
 
     /**
@@ -150,7 +152,7 @@ public class RetryOperation<T: NSOperation>: RepeatedOperation<T> {
 
      */
     public convenience init<G where G: GeneratorType, G.Element == T>(maxCount max: Int? = 5, strategy: WaitStrategy = .Fixed(0.1), _ generator: G, retry: Handler = { ($1, $2) }) {
-        self.init(maxCount: max, delay: GeneratorMap(strategy.generator()) { Delay.By($0) }, generator: generator, retry: retry)
+        self.init(maxCount: max, delay: MapGenerator(strategy.generator()) { Delay.By($0) }, generator: generator, retry: retry)
     }
 
     public override func operationDidFinish(operation: NSOperation, withErrors errors: [ErrorType]) {
