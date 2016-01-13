@@ -36,6 +36,7 @@ class RetryOperationTests: OperationTests {
     typealias Handler = Retry.Handler
 
     var operation: Retry!
+    var numberOfExecutions: Int = 0
     var numberOfFailures: Int = 0
 
     override func setUp() {
@@ -45,9 +46,13 @@ class RetryOperationTests: OperationTests {
 
     func producer(threshold: Int) -> () -> Test? {
         return { [unowned self] in
+            guard self.numberOfExecutions < 10 else {
+                return nil
+            }
             let op = Test { return self.numberOfFailures < threshold }
             op.addObserver(StartedObserver { _ in
                 self.numberOfFailures += 1
+                self.numberOfExecutions += 1
             })
             return op
         }
@@ -63,6 +68,17 @@ class RetryOperationTests: OperationTests {
 
         XCTAssertTrue(operation.finished)
         XCTAssertEqual(operation.count, 2)
+    }
+
+    func test__retry_operation_where_generator_returns_nil() {
+        operation = RetryOperation(maxCount: 12, strategy: .Fixed(0.01), anyGenerator(producer(11)))
+
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        runOperation(operation)
+        waitForExpectationsWithTimeout(3, handler: nil)
+
+        XCTAssertTrue(operation.finished)
+        XCTAssertEqual(operation.count, 10)
     }
 
     func test__retry_operation_where_max_count_is_reached() {
