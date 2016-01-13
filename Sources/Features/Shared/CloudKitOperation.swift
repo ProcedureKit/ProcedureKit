@@ -173,7 +173,7 @@ extension CKQueryOperation:                     CKQueryOperationType { }
 
 // MARK: Internal CK Operation
 
-class CloudKitOperation<T where T: NSOperation, T: CKOperationType>: ReachableOperation<T> {
+class OPRCKOperation<T where T: NSOperation, T: CKOperationType>: ReachableOperation<T> {
 
     convenience init(_ op: T) {
         self.init(operation: op, connectivity: .AnyConnectionKind, reachability: Reachability.sharedInstance)
@@ -189,14 +189,14 @@ class CloudKitOperation<T where T: NSOperation, T: CKOperationType>: ReachableOp
 
 public class CloudKitRecovery {
 
-    func recoverWithInfo<T where T: NSOperation, T: CKOperationType>(info: RetryFailureInfo<CloudKitOperation<T>>, delay: Delay?, next: CloudKitOperation<T>) -> (Delay?, CloudKitOperation<T>)? {
+    func recoverWithInfo<T where T: NSOperation, T: CKOperationType>(info: RetryFailureInfo<OPRCKOperation<T>>, delay: Delay?, next: OPRCKOperation<T>) -> (Delay?, OPRCKOperation<T>)? {
         return .None
     }
 }
 
 // MARK: - CloudKitOperation
 
-public class CloudKit<T where T: NSOperation, T: CKOperationType>: RetryOperation<CloudKitOperation<T>> {
+public class CloudKitOperation<T where T: NSOperation, T: CKOperationType>: RetryOperation<OPRCKOperation<T>> {
 
     let recovery: CloudKitRecovery
 
@@ -219,7 +219,7 @@ public class CloudKit<T where T: NSOperation, T: CKOperationType>: RetryOperatio
         let delay = MapGenerator(strategy.generator()) { Delay.By($0) }
 
         // Maps the generator to wrap the target operation.
-        let generator = MapGenerator(gen) { CloudKitOperation(operation: $0, connectivity: connectivity, reachability: reachability) }
+        let generator = MapGenerator(gen) { OPRCKOperation(operation: $0, connectivity: connectivity, reachability: reachability) }
 
         // Creates a CloudKitRecovery object
         let _recovery = CloudKitRecovery()
@@ -251,13 +251,13 @@ class CloudKitGenerator<T where T: NSOperation, T: CKOperationType>: GeneratorTy
         self.reachability = reachability
     }
 
-    func next() -> CloudKit<T>? {
+    func next() -> CloudKitOperation<T>? {
         guard more else { return .None }
-        return CloudKit(generator: generator, connectivity: connectivity, reachability: reachability)
+        return CloudKitOperation(generator: generator, connectivity: connectivity, reachability: reachability)
     }
 }
 
-public class BatchedCloudKit<T where T: NSOperation, T: CKBatchedOperationType>: RepeatedOperation<CloudKit<T>> {
+public class BatchedCloudKit<T where T: NSOperation, T: CKBatchedOperationType>: RepeatedOperation<CloudKitOperation<T>> {
 
     public var enableBatchProcessing: Bool
     var generator: CloudKitGenerator<T>
@@ -283,7 +283,7 @@ public class BatchedCloudKit<T where T: NSOperation, T: CKBatchedOperationType>:
     }
 
     public override func operationDidFinish(operation: NSOperation, withErrors errors: [ErrorType]) {
-        if errors.isEmpty, let cloudKitOperation = operation as? CloudKit<T> {
+        if errors.isEmpty, let cloudKitOperation = operation as? CloudKitOperation<T> {
             generator.more = enableBatchProcessing && cloudKitOperation.current.moreComing
         }
         super.operationDidFinish(operation, withErrors: errors)
@@ -297,7 +297,7 @@ public class BatchedCloudKit<T where T: NSOperation, T: CKBatchedOperationType>:
 
 // MARK: - CKOperationType
 
-extension CloudKitOperation where T: CKOperationType {
+extension OPRCKOperation where T: CKOperationType {
 
     internal var container: T.Container? {
         get { return operation.container }
@@ -305,7 +305,7 @@ extension CloudKitOperation where T: CKOperationType {
     }
 }
 
-extension CloudKit where T: CKOperationType {
+extension CloudKitOperation where T: CKOperationType {
 
     public var container: T.Container? {
         get { return operation.container }
@@ -318,7 +318,7 @@ extension CloudKit where T: CKOperationType {
 
 // MARK: - CKDatabaseOperation
 
-extension CloudKitOperation where T: CKDatabaseOperationType {
+extension OPRCKOperation where T: CKDatabaseOperationType {
 
     internal var database: T.Database? {
         get { return operation.database }
@@ -326,7 +326,7 @@ extension CloudKitOperation where T: CKDatabaseOperationType {
     }
 }
 
-extension CloudKit where T: CKDatabaseOperationType {
+extension CloudKitOperation where T: CKDatabaseOperationType {
 
     public var database: T.Database? {
         get { return operation.database }
@@ -339,7 +339,7 @@ extension CloudKit where T: CKDatabaseOperationType {
 
 // MARK: - CKPreviousServerChangeToken
 
-extension CloudKitOperation where T: CKPreviousServerChangeToken {
+extension OPRCKOperation where T: CKPreviousServerChangeToken {
 
     internal var previousServerChangeToken: T.ServerChangeToken? {
         get { return operation.previousServerChangeToken }
@@ -347,7 +347,7 @@ extension CloudKitOperation where T: CKPreviousServerChangeToken {
     }
 }
 
-extension CloudKit where T: CKPreviousServerChangeToken {
+extension CloudKitOperation where T: CKPreviousServerChangeToken {
 
     public var previousServerChangeToken: T.ServerChangeToken? {
         get { return operation.previousServerChangeToken }
@@ -360,7 +360,7 @@ extension CloudKit where T: CKPreviousServerChangeToken {
 
 // MARK: - CKResultsLimit
 
-extension CloudKitOperation where T: CKResultsLimit {
+extension OPRCKOperation where T: CKResultsLimit {
 
     internal var resultsLimit: Int {
         get { return operation.resultsLimit }
@@ -368,7 +368,7 @@ extension CloudKitOperation where T: CKResultsLimit {
     }
 }
 
-extension CloudKit where T: CKResultsLimit {
+extension CloudKitOperation where T: CKResultsLimit {
 
     public var resultsLimit: Int {
         get { return operation.resultsLimit }
@@ -381,14 +381,14 @@ extension CloudKit where T: CKResultsLimit {
 
 // MARK: - CKMoreComing
 
-extension CloudKitOperation where T: CKMoreComing {
+extension OPRCKOperation where T: CKMoreComing {
 
     internal var moreComing: Bool {
         return operation.moreComing
     }
 }
 
-extension CloudKit where T: CKMoreComing {
+extension CloudKitOperation where T: CKMoreComing {
 
     public var moreComing: Bool {
         return operation.moreComing
@@ -397,7 +397,7 @@ extension CloudKit where T: CKMoreComing {
 
 // MARK: - CKDesiredKeys
 
-extension CloudKitOperation where T: CKDesiredKeys {
+extension OPRCKOperation where T: CKDesiredKeys {
 
     internal var desiredKeys: [String]? {
         get { return operation.desiredKeys }
@@ -405,7 +405,7 @@ extension CloudKitOperation where T: CKDesiredKeys {
     }
 }
 
-extension CloudKit where T: CKDesiredKeys {
+extension CloudKitOperation where T: CKDesiredKeys {
 
     public var desiredKeys: [String]? {
         get { return operation.desiredKeys }
@@ -418,7 +418,7 @@ extension CloudKit where T: CKDesiredKeys {
 
 // MARK: - CKDiscoverAllContactsOperation
 
-extension CloudKitOperation where T: CKDiscoverAllContactsOperationType {
+extension OPRCKOperation where T: CKDiscoverAllContactsOperationType {
 
     internal typealias DiscoverAllContactsCompletionBlock = [T.DiscoveredUserInfo]? -> Void
 
@@ -434,7 +434,7 @@ extension CloudKitOperation where T: CKDiscoverAllContactsOperationType {
     }
 }
 
-extension CloudKit where T: CKDiscoverAllContactsOperationType {
+extension CloudKitOperation where T: CKDiscoverAllContactsOperationType {
 
     public typealias DiscoverAllContactsCompletionBlock = [T.DiscoveredUserInfo]? -> Void
 
@@ -445,7 +445,7 @@ extension CloudKit where T: CKDiscoverAllContactsOperationType {
 
 // MARK: - CKDiscoverUserInfosOperation
 
-extension CloudKitOperation where T: CKDiscoverUserInfosOperationType {
+extension OPRCKOperation where T: CKDiscoverUserInfosOperationType {
 
     internal typealias DiscoverUserInfosCompletionBlock = ([String: T.DiscoveredUserInfo]?, [T.RecordID: T.DiscoveredUserInfo]?) -> Void
 
@@ -471,7 +471,7 @@ extension CloudKitOperation where T: CKDiscoverUserInfosOperationType {
     }
 }
 
-extension CloudKit where T: CKDiscoverUserInfosOperationType {
+extension CloudKitOperation where T: CKDiscoverUserInfosOperationType {
 
     public typealias DiscoverUserInfosCompletionBlock = ([String: T.DiscoveredUserInfo]?, [T.RecordID: T.DiscoveredUserInfo]?) -> Void
 
@@ -498,7 +498,7 @@ extension CloudKit where T: CKDiscoverUserInfosOperationType {
 
 // MARK: - CKFetchNotificationChangesOperation
 
-extension CloudKitOperation where T: CKFetchNotificationChangesOperationType {
+extension OPRCKOperation where T: CKFetchNotificationChangesOperationType {
 
     internal typealias FetchNotificationChangesChangedBlock = T.Notification -> Void
     internal typealias FetchNotificationChangesCompletionBlock = T.ServerChangeToken? -> Void
@@ -521,7 +521,7 @@ extension CloudKitOperation where T: CKFetchNotificationChangesOperationType {
     }
 }
 
-extension CloudKit where T: CKFetchNotificationChangesOperationType {
+extension CloudKitOperation where T: CKFetchNotificationChangesOperationType {
 
     public typealias FetchNotificationChangesChangedBlock = T.Notification -> Void
     public typealias FetchNotificationChangesCompletionBlock = T.ServerChangeToken? -> Void
@@ -559,7 +559,7 @@ extension BatchedCloudKit where T: CKFetchNotificationChangesOperationType {
 
 // MARK: - CKMarkNotificationsReadOperation
 
-extension CloudKitOperation where T: CKMarkNotificationsReadOperationType {
+extension OPRCKOperation where T: CKMarkNotificationsReadOperationType {
 
     internal typealias MarkNotificationReadCompletionBlock = [T.NotificationID]? -> Void
 
@@ -580,7 +580,7 @@ extension CloudKitOperation where T: CKMarkNotificationsReadOperationType {
     }
 }
 
-extension CloudKit where T: CKMarkNotificationsReadOperationType {
+extension CloudKitOperation where T: CKMarkNotificationsReadOperationType {
 
     public typealias MarkNotificationReadCompletionBlock = [T.NotificationID]? -> Void
 
@@ -599,7 +599,7 @@ extension CloudKit where T: CKMarkNotificationsReadOperationType {
 
 // MARK: - CKModifyBadgeOperation
 
-extension CloudKitOperation where T: CKModifyBadgeOperationType {
+extension OPRCKOperation where T: CKModifyBadgeOperationType {
 
     internal typealias ModifyBadgeCompletionBlock = () -> Void
 
@@ -620,7 +620,7 @@ extension CloudKitOperation where T: CKModifyBadgeOperationType {
     }
 }
 
-extension CloudKit where T: CKModifyBadgeOperationType {
+extension CloudKitOperation where T: CKModifyBadgeOperationType {
 
     public typealias ModifyBadgeCompletionBlock = () -> Void
 
@@ -639,7 +639,7 @@ extension CloudKit where T: CKModifyBadgeOperationType {
 
 // MARK: - CKFetchRecordChangesOperation
 
-extension CloudKitOperation where T: CKFetchRecordChangesOperationType {
+extension OPRCKOperation where T: CKFetchRecordChangesOperationType {
 
     internal typealias FetchRecordChangesCompletionBlock = (T.ServerChangeToken?, NSData?) -> Void
 
@@ -670,7 +670,7 @@ extension CloudKitOperation where T: CKFetchRecordChangesOperationType {
     }
 }
 
-extension CloudKit where T: CKFetchRecordChangesOperationType {
+extension CloudKitOperation where T: CKFetchRecordChangesOperationType {
 
     public typealias FetchRecordChangesCompletionBlock = (T.ServerChangeToken?, NSData?) -> Void
 
@@ -738,7 +738,7 @@ extension BatchedCloudKit where T: CKFetchRecordChangesOperationType {
 
 // MARK: - CKFetchRecordZonesOperation
 
-extension CloudKitOperation where T: CKFetchRecordZonesOperationType {
+extension OPRCKOperation where T: CKFetchRecordZonesOperationType {
 
     internal typealias FetchRecordZonesCompletionBlock = [T.RecordZoneID: T.RecordZone]? -> Void
 
@@ -759,7 +759,7 @@ extension CloudKitOperation where T: CKFetchRecordZonesOperationType {
     }
 }
 
-extension CloudKit where T: CKFetchRecordZonesOperationType {
+extension CloudKitOperation where T: CKFetchRecordZonesOperationType {
 
     public typealias FetchRecordZonesCompletionBlock = [T.RecordZoneID: T.RecordZone]? -> Void
 
@@ -778,7 +778,7 @@ extension CloudKit where T: CKFetchRecordZonesOperationType {
 
 // MARK: - CKFetchRecordsOperation
 
-extension CloudKitOperation where T: CKFetchRecordsOperationType {
+extension OPRCKOperation where T: CKFetchRecordsOperationType {
 
     internal typealias FetchRecordsCompletionBlock = [T.RecordID: T.Record]? -> Void
 
@@ -809,7 +809,7 @@ extension CloudKitOperation where T: CKFetchRecordsOperationType {
     }
 }
 
-extension CloudKit where T: CKFetchRecordsOperationType {
+extension CloudKitOperation where T: CKFetchRecordsOperationType {
 
     public typealias FetchRecordsCompletionBlock = [T.RecordID: T.Record]? -> Void
 
@@ -844,7 +844,7 @@ extension CloudKit where T: CKFetchRecordsOperationType {
 
 // MARK: - CKFetchSubscriptionsOperation
 
-extension CloudKitOperation where T: CKFetchSubscriptionsOperationType {
+extension OPRCKOperation where T: CKFetchSubscriptionsOperationType {
 
     internal typealias FetchSubscriptionCompletionBlock = [String: T.Subscription]? -> Void
 
@@ -865,7 +865,7 @@ extension CloudKitOperation where T: CKFetchSubscriptionsOperationType {
     }
 }
 
-extension CloudKit where T: CKFetchSubscriptionsOperationType {
+extension CloudKitOperation where T: CKFetchSubscriptionsOperationType {
 
     public typealias FetchSubscriptionCompletionBlock = [String: T.Subscription]? -> Void
 
@@ -884,7 +884,7 @@ extension CloudKit where T: CKFetchSubscriptionsOperationType {
 
 // MARK: - CKModifyRecordZonesOperation
 
-extension CloudKitOperation where T: CKModifyRecordZonesOperationType {
+extension OPRCKOperation where T: CKModifyRecordZonesOperationType {
 
     internal typealias ModifyRecordZonesCompletionBlock = ([T.RecordZone]?, [T.RecordZoneID]?) -> Void
 
@@ -910,7 +910,7 @@ extension CloudKitOperation where T: CKModifyRecordZonesOperationType {
     }
 }
 
-extension CloudKit where T: CKModifyRecordZonesOperationType {
+extension CloudKitOperation where T: CKModifyRecordZonesOperationType {
 
     public typealias ModifyRecordZonesCompletionBlock = ([T.RecordZone]?, [T.RecordZoneID]?) -> Void
 
@@ -937,7 +937,7 @@ extension CloudKit where T: CKModifyRecordZonesOperationType {
 
 // MARK: - CKModifyRecordsOperation
 
-extension CloudKitOperation where T: CKModifyRecordsOperationType {
+extension OPRCKOperation where T: CKModifyRecordsOperationType {
 
     internal typealias ModifyRecordsCompletionBlock = ([T.Record]?, [T.RecordID]?) -> Void
 
@@ -988,7 +988,7 @@ extension CloudKitOperation where T: CKModifyRecordsOperationType {
     }
 }
 
-extension CloudKit where T: CKModifyRecordsOperationType {
+extension CloudKitOperation where T: CKModifyRecordsOperationType {
 
     public typealias ModifyRecordsCompletionBlock = ([T.Record]?, [T.RecordID]?) -> Void
 
@@ -1055,7 +1055,7 @@ extension CloudKit where T: CKModifyRecordsOperationType {
 
 // MARK: - CKModifySubscriptionsOperation
 
-extension CloudKitOperation where T: CKModifySubscriptionsOperationType {
+extension OPRCKOperation where T: CKModifySubscriptionsOperationType {
 
     internal typealias ModifySubscriptionsCompletionBlock = ([T.Subscription]?, [String]?) -> Void
 
@@ -1081,7 +1081,7 @@ extension CloudKitOperation where T: CKModifySubscriptionsOperationType {
     }
 }
 
-extension CloudKit where T: CKModifySubscriptionsOperationType {
+extension CloudKitOperation where T: CKModifySubscriptionsOperationType {
 
     public typealias ModifySubscriptionsCompletionBlock = ([T.Subscription]?, [String]?) -> Void
 
@@ -1108,7 +1108,7 @@ extension CloudKit where T: CKModifySubscriptionsOperationType {
 
 // MARK: - CKQueryOperation
 
-extension CloudKitOperation where T: CKQueryOperationType {
+extension OPRCKOperation where T: CKQueryOperationType {
 
     internal typealias QueryCompletionBlock = T.QueryCursor? -> Void
 
@@ -1144,7 +1144,7 @@ extension CloudKitOperation where T: CKQueryOperationType {
     }
 }
 
-extension CloudKit where T: CKQueryOperationType {
+extension CloudKitOperation where T: CKQueryOperationType {
 
     public typealias QueryCompletionBlock = T.QueryCursor? -> Void
 

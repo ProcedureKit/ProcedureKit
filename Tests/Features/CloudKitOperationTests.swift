@@ -337,14 +337,14 @@ class CloudKitOperationTests: OperationTests {
 class CloudOperationTests: CloudKitOperationTests {
 
     var target: TestCloudOperation!
-    var op: CloudKitOperation<TestCloudOperation>!
-    var operation: CloudKit<TestCloudOperation>!
+    var op: OPRCKOperation<TestCloudOperation>!
+    var operation: CloudKitOperation<TestCloudOperation>!
 
     override func setUp() {
         super.setUp()
         target = TestCloudOperation()
-        op = CloudKitOperation(operation: target, reachability: reachability)
-        operation = CloudKit(reachability: reachability) { TestCloudOperation() }
+        op = OPRCKOperation(operation: target, reachability: reachability)
+        operation = CloudKitOperation(reachability: reachability) { TestCloudOperation() }
     }
 
     func test__get_countainer() {
@@ -380,14 +380,14 @@ class CloudOperationTests: CloudKitOperationTests {
 class CloudDatabaseOperationTests: CloudKitOperationTests {
 
     var target: TestDatabaseOperation!
-    var op: CloudKitOperation<TestDatabaseOperation>!
-    var operation: CloudKit<TestDatabaseOperation>!
+    var op: OPRCKOperation<TestDatabaseOperation>!
+    var operation: CloudKitOperation<TestDatabaseOperation>!
 
     override func setUp() {
         super.setUp()
         target = TestDatabaseOperation()
-        op = CloudKitOperation(operation: target, reachability: reachability)
-        operation = CloudKit(reachability: reachability) { TestDatabaseOperation() }
+        op = OPRCKOperation(operation: target, reachability: reachability)
+        operation = CloudKitOperation(reachability: reachability) { TestDatabaseOperation() }
     }
 
     func test__get_database() {
@@ -445,7 +445,7 @@ class CloudDatabaseOperationTests: CloudKitOperationTests {
 
     func test__run() {
 
-        operation = CloudKit(reachability: reachability) {
+        operation = CloudKitOperation(reachability: reachability) {
             let tmp = TestDatabaseOperation()
             tmp.moreComing = true
             return tmp
@@ -478,12 +478,12 @@ class CloudDatabaseOperationTests: CloudKitOperationTests {
 class Cloud_Internal_DiscoverAllContactsOperationTests: CloudKitOperationTests {
 
     var target: TestDiscoverAllContactsOperation!
-    var operation: CloudKitOperation<TestDiscoverAllContactsOperation>!
+    var operation: OPRCKOperation<TestDiscoverAllContactsOperation>!
 
     override func setUp() {
         super.setUp()
         target = TestDiscoverAllContactsOperation(result: [])
-        operation = CloudKitOperation(operation: target, reachability: reachability)
+        operation = OPRCKOperation(operation: target, reachability: reachability)
     }
 
     func test__execution_after_cancellation() {
@@ -543,12 +543,12 @@ class Cloud_Internal_DiscoverAllContactsOperationTests: CloudKitOperationTests {
 class Cloud_Internal_DiscoverUserInfosOperationTests: CloudKitOperationTests {
 
     var target: TestDiscoverUserInfosOperation!
-    var operation: CloudKitOperation<TestDiscoverUserInfosOperation>!
+    var operation: OPRCKOperation<TestDiscoverUserInfosOperation>!
 
     override func setUp() {
         super.setUp()
         target = TestDiscoverUserInfosOperation(userInfosByEmailAddress: [:], userInfoByRecordID: [:])
-        operation = CloudKitOperation(operation: target, reachability: reachability)
+        operation = OPRCKOperation(operation: target, reachability: reachability)
     }
 
     func test__get_email_addresses() {
@@ -613,14 +613,14 @@ class Cloud_Internal_DiscoverUserInfosOperationTests: CloudKitOperationTests {
 class Cloud_Internal_FetchNotificationChangesOperationTests: CloudKitOperationTests {
 
     var target: TestFetchNotificationChangesOperation!
-    var operation: CloudKitOperation<TestFetchNotificationChangesOperation>!
+    var operation: OPRCKOperation<TestFetchNotificationChangesOperation>!
     var token: TestFetchNotificationChangesOperation.ServerChangeToken!
 
     override func setUp() {
         super.setUp()
         token = "i'm a server token"
         target = TestFetchNotificationChangesOperation(token: token)
-        operation = CloudKitOperation(operation: target, reachability: reachability)
+        operation = OPRCKOperation(operation: target, reachability: reachability)
     }
 
     func test__get_set_notification_changed_block() {
@@ -669,14 +669,14 @@ class Cloud_Internal_FetchNotificationChangesOperationTests: CloudKitOperationTe
 class Cloud_Internal_MarkNotificationsReadOperationTests: CloudKitOperationTests {
 
     var target: TestMarkNotificationsReadOperation!
-    var operation: CloudKitOperation<TestMarkNotificationsReadOperation>!
+    var operation: OPRCKOperation<TestMarkNotificationsReadOperation>!
     var toMark: [TestMarkNotificationsReadOperation.NotificationID]!
 
     override func setUp() {
         super.setUp()
         toMark = [ "this-is-an-id", "this-is-another-id" ]
         target = TestMarkNotificationsReadOperation(markIDsToRead: toMark)
-        operation = CloudKitOperation(operation: target, reachability: reachability)
+        operation = OPRCKOperation(operation: target, reachability: reachability)
     }
 
     func test__get_notification_id() {
@@ -717,14 +717,14 @@ class Cloud_Internal_MarkNotificationsReadOperationTests: CloudKitOperationTests
 class Cloud_Internal_ModifyBadgeOperationTests: CloudKitOperationTests {
 
     var target: TestModifyBadgeOperation!
-    var operation: CloudKitOperation<TestModifyBadgeOperation>!
+    var operation: OPRCKOperation<TestModifyBadgeOperation>!
     var badge: Int!
 
     override func setUp() {
         super.setUp()
         badge = 9
         target = TestModifyBadgeOperation(value: badge)
-        operation = CloudKitOperation(operation: target, reachability: reachability)
+        operation = OPRCKOperation(operation: target, reachability: reachability)
     }
 
     func test__get_badge_value() {
@@ -765,12 +765,12 @@ class Cloud_Internal_ModifyBadgeOperationTests: CloudKitOperationTests {
 class Cloud_Internal_FetchRecordChangesOperationTests: CloudKitOperationTests {
 
     var target: TestFetchRecordChangesOperation!
-    var operation: CloudKitOperation<TestFetchRecordChangesOperation>!
+    var operation: OPRCKOperation<TestFetchRecordChangesOperation>!
 
     override func setUp() {
         super.setUp()
         target = TestFetchRecordChangesOperation()
-        operation = CloudKitOperation(operation: target, reachability: reachability)
+        operation = OPRCKOperation(operation: target, reachability: reachability)
     }
 
     func test__get_record_zone_id() {
@@ -833,12 +833,12 @@ class Cloud_Internal_FetchRecordChangesOperationTests: CloudKitOperationTests {
 class Cloud_Internal_FetchRecordZonesOperationTests: CloudKitOperationTests {
 
     var target: TestFetchRecordZonesOperation!
-    var operation: CloudKitOperation<TestFetchRecordZonesOperation>!
+    var operation: OPRCKOperation<TestFetchRecordZonesOperation>!
 
     override func setUp() {
         super.setUp()
         target = TestFetchRecordZonesOperation()
-        operation = CloudKitOperation(operation: target, reachability: reachability)
+        operation = OPRCKOperation(operation: target, reachability: reachability)
     }
 
     func test__get_record_zone_ids() {
@@ -879,12 +879,12 @@ class Cloud_Internal_FetchRecordZonesOperationTests: CloudKitOperationTests {
 class Cloud_Internal_FetchRecordsOperationTests: CloudKitOperationTests {
 
     var target: TestFetchRecordsOperation!
-    var operation: CloudKitOperation<TestFetchRecordsOperation>!
+    var operation: OPRCKOperation<TestFetchRecordsOperation>!
 
     override func setUp() {
         super.setUp()
         target = TestFetchRecordsOperation()
-        operation = CloudKitOperation(operation: target, reachability: reachability)
+        operation = OPRCKOperation(operation: target, reachability: reachability)
     }
 
     func test__get_record_ids() {
@@ -947,12 +947,12 @@ class Cloud_Internal_FetchRecordsOperationTests: CloudKitOperationTests {
 class Cloud_Internal_FetchSubscriptionsOperationTests: CloudKitOperationTests {
 
     var target: TestFetchSubscriptionsOperation!
-    var operation: CloudKitOperation<TestFetchSubscriptionsOperation>!
+    var operation: OPRCKOperation<TestFetchSubscriptionsOperation>!
 
     override func setUp() {
         super.setUp()
         target = TestFetchSubscriptionsOperation()
-        operation = CloudKitOperation(operation: target, reachability: reachability)
+        operation = OPRCKOperation(operation: target, reachability: reachability)
     }
 
     func test__get_subscription_ids() {
@@ -993,12 +993,12 @@ class Cloud_Internal_FetchSubscriptionsOperationTests: CloudKitOperationTests {
 class Cloud_Internal_ModifyRecordZonesOperationTests: CloudKitOperationTests {
 
     var target: TestModifyRecordZonesOperation!
-    var operation: CloudKitOperation<TestModifyRecordZonesOperation>!
+    var operation: OPRCKOperation<TestModifyRecordZonesOperation>!
 
     override func setUp() {
         super.setUp()
         target = TestModifyRecordZonesOperation()
-        operation = CloudKitOperation(operation: target, reachability: reachability)
+        operation = OPRCKOperation(operation: target, reachability: reachability)
     }
 
     func test__get_zones_to_save() {
@@ -1051,12 +1051,12 @@ class Cloud_Internal_ModifyRecordZonesOperationTests: CloudKitOperationTests {
 class Cloud_Internal_ModifyRecordsOperationTests: CloudKitOperationTests {
 
     var target: TestModifyRecordsOperation!
-    var operation: CloudKitOperation<TestModifyRecordsOperation>!
+    var operation: OPRCKOperation<TestModifyRecordsOperation>!
 
     override func setUp() {
         super.setUp()
         target = TestModifyRecordsOperation()
-        operation = CloudKitOperation(operation: target, reachability: reachability)
+        operation = OPRCKOperation(operation: target, reachability: reachability)
     }
 
     func test__get_records_to_save() {
@@ -1161,12 +1161,12 @@ class Cloud_Internal_ModifyRecordsOperationTests: CloudKitOperationTests {
 class Cloud_Internal_ModifySubscriptionsOperationTests: CloudKitOperationTests {
 
     var target: TestModifySubscriptionsOperation!
-    var operation: CloudKitOperation<TestModifySubscriptionsOperation>!
+    var operation: OPRCKOperation<TestModifySubscriptionsOperation>!
 
     override func setUp() {
         super.setUp()
         target = TestModifySubscriptionsOperation()
-        operation = CloudKitOperation(operation: target, reachability: reachability)
+        operation = OPRCKOperation(operation: target, reachability: reachability)
     }
 
     func test__get_subscriptions_to_save() {
@@ -1219,12 +1219,12 @@ class Cloud_Internal_ModifySubscriptionsOperationTests: CloudKitOperationTests {
 class Cloud_Internal_QueryOperationTests: CloudKitOperationTests {
 
     var target: TestQueryOperation!
-    var operation: CloudKitOperation<TestQueryOperation>!
+    var operation: OPRCKOperation<TestQueryOperation>!
 
     override func setUp() {
         super.setUp()
         target = TestQueryOperation()
-        operation = CloudKitOperation(operation: target, reachability: reachability)
+        operation = OPRCKOperation(operation: target, reachability: reachability)
     }
 
     func test__get_query() {
@@ -1315,7 +1315,7 @@ class BatchedFetchNotificationChangesOperationTests: CloudKitOperationTests {
     var error: NSError?
     var numberOfBatches: Int = 3
     var count: Int = 0
-    var operation: BatchedCloudKitOperation<Target>!
+    var operation: BatchedOPRCKOperation<Target>!
 
     override func setUp() {
         super.setUp()
@@ -1372,7 +1372,7 @@ class BatchedFetchRecordChangesOperationTests: CloudKitOperationTests {
 
     var numberOfBatches: Int = 3
     var count: Int = 0
-    var operation: BatchedCloudKitOperation<Target>!
+    var operation: BatchedOPRCKOperation<Target>!
 
     override func setUp() {
         super.setUp()
