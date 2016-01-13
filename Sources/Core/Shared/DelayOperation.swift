@@ -8,6 +8,35 @@
 
 import Foundation
 
+public enum Delay {
+    case By(NSTimeInterval)
+    case Until(NSDate)
+}
+
+extension Delay: CustomStringConvertible {
+
+    public var description: String {
+        switch self {
+        case .By(let _interval):
+            return "for \(_interval) seconds"
+        case .Until(let date):
+            return "until \(NSDateFormatter().stringFromDate(date))"
+        }
+    }
+}
+
+internal extension Delay {
+
+    var interval: NSTimeInterval {
+        switch self {
+        case .By(let _interval):
+            return _interval
+        case .Until(let date):
+            return date.timeIntervalSinceNow
+        }
+    }
+}
+
 /**
 `DelayOperation` is an operation which waits until a given future
 date, or a time interval. If the interval is negative, or the date
@@ -21,28 +50,6 @@ make it execute after a timeout, or in a repeated fashion with a
 time-out.
 */
 public class DelayOperation: Operation {
-
-    internal enum Delay: CustomStringConvertible {
-
-        case Interval(NSTimeInterval)
-        case Date(NSDate)
-
-        var interval: NSTimeInterval {
-            switch self {
-            case .Interval(let _interval): return _interval
-            case .Date(let date): return date.timeIntervalSinceNow
-            }
-        }
-
-        var description: String {
-            switch self {
-            case .Interval(let _interval):
-                return "for \(_interval) seconds"
-            case .Date(let date):
-                return "until \(NSDateFormatter().stringFromDate(date))"
-            }
-        }
-    }
 
     private let delay: Delay
     private let leeway: UInt64
@@ -76,7 +83,7 @@ public class DelayOperation: Operation {
      accuracy is costly.
     */
     public convenience init(interval: NSTimeInterval, leeway: Int = 1_000_000) {
-        self.init(delay: .Interval(interval), leeway: leeway)
+        self.init(delay: .By(interval), leeway: leeway)
     }
 
     /**
@@ -90,7 +97,7 @@ public class DelayOperation: Operation {
      accuracy is costly.
     */
     public convenience init(date: NSDate, leeway: Int = 1_000_000) {
-        self.init(delay: .Date(date), leeway: leeway)
+        self.init(delay: .Until(date), leeway: leeway)
     }
 
     /**

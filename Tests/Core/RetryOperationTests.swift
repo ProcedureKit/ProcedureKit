@@ -31,9 +31,12 @@ class OperationWhichFailsThenSucceeds: Operation {
 
 class RetryOperationTests: OperationTests {
 
-    typealias RetryOp = RetryOperation<OperationWhichFailsThenSucceeds>
+    typealias Test = OperationWhichFailsThenSucceeds
+    typealias Retry = RetryOperation<Test>
+    typealias Handler = Retry.Handler
 
-    var operation: RetryOp!
+    var operation: Retry!
+    var numberOfExecutions: Int = 0
     var numberOfFailures: Int = 0
 
     override func setUp() {
@@ -41,11 +44,15 @@ class RetryOperationTests: OperationTests {
         numberOfFailures = 0
     }
 
-    func producer(threshold: Int) -> () -> OperationWhichFailsThenSucceeds {
+    func producer(threshold: Int) -> () -> Test? {
         return { [unowned self] in
-            let op = OperationWhichFailsThenSucceeds { return self.numberOfFailures < threshold }
+            guard self.numberOfExecutions < 10 else {
+                return nil
+            }
+            let op = Test { return self.numberOfFailures < threshold }
             op.addObserver(StartedObserver { _ in
                 self.numberOfFailures += 1
+                self.numberOfExecutions += 1
             })
             return op
         }
@@ -53,7 +60,7 @@ class RetryOperationTests: OperationTests {
 
     func test__retry_operation() {
 
-        operation = RetryOperation(producer(2))
+        operation = RetryOperation(anyGenerator(producer(2)))
 
         addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
         runOperation(operation)
@@ -63,9 +70,20 @@ class RetryOperationTests: OperationTests {
         XCTAssertEqual(operation.count, 2)
     }
 
+    func test__retry_operation_where_generator_returns_nil() {
+        operation = RetryOperation(maxCount: 12, strategy: .Fixed(0.01), anyGenerator(producer(11)))
+
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        runOperation(operation)
+        waitForExpectationsWithTimeout(3, handler: nil)
+
+        XCTAssertTrue(operation.finished)
+        XCTAssertEqual(operation.count, 10)
+    }
+
     func test__retry_operation_where_max_count_is_reached() {
 
-        operation = RetryOperation(producer(9))
+        operation = RetryOperation(anyGenerator(producer(9)))
 
         addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
         runOperation(operation)
@@ -81,15 +99,16 @@ class RetryOperationTests: OperationTests {
         var retryAggregateErrors: [ErrorType]? = .None
         var retryCount: Int = 0
         var didRunBlockCount: Int = 0
-        let retry = { (info: RetryFailureInfo<OperationWhichFailsThenSucceeds>) -> Bool in
+
+        let retry: Handler = { info, delay, operation in
             retryErrors = info.errors
             retryAggregateErrors = info.aggregateErrors
             retryCount = info.count
             didRunBlockCount += 1
-            return true
+            return (delay, operation)
         }
 
-        operation = RetryOperation(shouldRetry: retry, producer(3))
+        operation = RetryOperation(anyGenerator(producer(3)), retry: retry)
 
         addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
         runOperation(operation)
@@ -105,20 +124,20 @@ class RetryOperationTests: OperationTests {
         XCTAssertEqual(retryCount, 2)
     }
 
-    func test__retry_using_retry_block_returning_false() {
+    func test__retry_using_retry_block_returning_nil() {
         var retryErrors: [ErrorType]? = .None
         var retryAggregateErrors: [ErrorType]? = .None
         var retryCount: Int = 0
         var didRunBlockCount: Int = 0
-        let retry = { (info: RetryFailureInfo<OperationWhichFailsThenSucceeds>) -> Bool in
+        let retry: Handler = { info, delay, operation in
             retryErrors = info.errors
             retryAggregateErrors = info.aggregateErrors
             retryCount = info.count
             didRunBlockCount += 1
-            return false
+            return .None
         }
 
-        operation = RetryOperation(shouldRetry: retry, producer(3))
+        operation = RetryOperation(anyGenerator(producer(3)), retry: retry)
 
         addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
         runOperation(operation)
