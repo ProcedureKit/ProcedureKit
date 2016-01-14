@@ -1772,11 +1772,64 @@ class CloudKitOperationFetchRecordsTests: CKTests {
     }
 }
 
+class CloudKitOperationFetchSubscriptionsTests: CKTests {
 
+    var subscriptionIDs: [String]!
+    var operation: CloudKitOperation<TestFetchSubscriptionsOperation>!
 
+    override func setUp() {
+        super.setUp()
+        subscriptionIDs = [ "a-subscription-id", "another-subscription-id" ]
+        operation = CloudKitOperation(reachability: reachability) { TestFetchSubscriptionsOperation() }
+        operation.subscriptionIDs = subscriptionIDs
+    }
+    
+    func test__execution_after_cancellation() {
+        operation.cancel()
+        waitForOperation(operation)
 
+        XCTAssertTrue(operation.finished)
+        XCTAssertTrue(operation.cancelled)
+        XCTAssertEqual(operation.subscriptionIDs ?? [], subscriptionIDs)
+    }
 
+    func test__success_without_completion_block() {
+        waitForOperation(operation)
+        XCTAssertTrue(operation.finished)
+    }
 
+    func test__success_with_completion_block() {
+        operation.setFetchSubscriptionCompletionBlock { _ in }
+        waitForOperation(operation)
+        XCTAssertTrue(operation.finished)
+        XCTAssertEqual(operation.errors.count, 0)
+    }
+
+    func test__error_without_completion_block() {
+        operation = CloudKitOperation(reachability: reachability) {
+            let op = TestFetchSubscriptionsOperation()
+            op.error = NSError(domain: CKErrorDomain, code: CKErrorCode.InternalError.rawValue, userInfo: nil)
+            return op
+        }
+
+        waitForOperation(operation)
+        XCTAssertTrue(operation.finished)
+        XCTAssertEqual(operation.errors.count, 0)
+    }
+
+    func test__error_with_completion_block() {
+        operation = CloudKitOperation(reachability: reachability) {
+            let op = TestFetchSubscriptionsOperation()
+            op.error = NSError(domain: CKErrorDomain, code: CKErrorCode.InternalError.rawValue, userInfo: nil)
+            return op
+        }
+        operation.setFetchSubscriptionCompletionBlock { _ in }
+
+        waitForOperation(operation)
+        XCTAssertTrue(operation.finished)
+        XCTAssertEqual(operation.errors.count, 1)
+    }
+}
 
 
 
