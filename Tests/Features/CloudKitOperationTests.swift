@@ -367,12 +367,15 @@ class CloudOperationTests: CloudKitOperationTests {
 
     func test__run() {
 
+        operation = CloudKitOperation(reachability: reachability) { TestCloudOperation() }
+        operation.log.severity = .Verbose
+
         let container = "I'm a test container!"
         operation.container = container
 
         waitForOperation(operation)
 
-        XCTAssertTrue(operation.finished)
+        XCTAssertEqual(operation.count, 1)
         XCTAssertEqual(operation.container, container)
     }
 }
