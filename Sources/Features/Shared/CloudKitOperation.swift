@@ -246,7 +246,7 @@ public class CloudKitOperation<T where T: NSOperation, T: CKOperationType>: Retr
     }
 
     convenience init(connectivity: Reachability.Connectivity = .AnyConnectionKind, reachability: SystemReachabilityType, _ body: () -> T?) {
-        self.init(generator: anyGenerator(body), connectivity: .AnyConnectionKind, reachability: Reachability.sharedInstance)
+        self.init(generator: anyGenerator(body), connectivity: .AnyConnectionKind, reachability: reachability)
     }
 
     init<G where G: GeneratorType, G.Element == T>(generator gen: G, connectivity: Reachability.Connectivity = .AnyConnectionKind, reachability: SystemReachabilityType) {
