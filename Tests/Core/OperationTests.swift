@@ -138,16 +138,17 @@ class OperationTests: XCTestCase {
 
     func addCompletionBlockToTestOperation(operation: Operation, withExpectation expectation: XCTestExpectation) {
         weak var weakExpectation = expectation
-        operation.addObserver(BlockObserver { (_, _) in
+        operation.addObserver(FinishedObserver { (_, _) in
             weakExpectation?.fulfill()
         })
     }
 
-    func addCompletionBlockToTestOperation(operation: Operation, withExpectationDescription text: String = __FUNCTION__) {
+    func addCompletionBlockToTestOperation(operation: Operation, withExpectationDescription text: String = __FUNCTION__) -> XCTestExpectation {
         let expectation = expectationWithDescription("Test: \(text), \(NSUUID().UUIDString)")
-        operation.addObserver(BlockObserver { _, _ in
+        operation.addObserver(FinishedObserver { _, _ in
             expectation.fulfill()
         })
+        return expectation
     }
 
 }

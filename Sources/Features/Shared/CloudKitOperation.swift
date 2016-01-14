@@ -175,7 +175,7 @@ extension CKQueryOperation:                     CKQueryOperationType { }
 
 class OPRCKOperation<T where T: NSOperation, T: CKOperationType>: ReachableOperation<T> {
 
-    convenience init(_ op: T) {
+    convenience init(operation op: T) {
         self.init(operation: op, connectivity: .AnyConnectionKind, reachability: Reachability.sharedInstance)
     }
 

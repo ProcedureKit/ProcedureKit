@@ -334,28 +334,26 @@ class CloudKitOperationTests: OperationTests {
     }
 }
 
-class CloudOperationTests: CloudKitOperationTests {
+class OPRCKOperationTests: CloudKitOperationTests {
 
     var target: TestCloudOperation!
-    var op: OPRCKOperation<TestCloudOperation>!
-    var operation: CloudKitOperation<TestCloudOperation>!
+    var operation: OPRCKOperation<TestCloudOperation>!
 
     override func setUp() {
         super.setUp()
         target = TestCloudOperation()
-        op = OPRCKOperation(operation: target, reachability: reachability)
-        operation = CloudKitOperation(reachability: reachability) { TestCloudOperation() }
+        operation = OPRCKOperation(operation: target)
     }
 
     func test__get_countainer() {
         let container = "I'm a test container!"
         target.container = container
-        XCTAssertEqual(op.container, container)
+        XCTAssertEqual(operation.container, container)
     }
 
     func test__set_database() {
         let container = "I'm a test container!"
-        op.container = container
+        operation.container = container
         XCTAssertEqual(target.container, container)
     }
 
@@ -364,66 +362,50 @@ class CloudOperationTests: CloudKitOperationTests {
         operation.container = container
         XCTAssertEqual(operation.container, container)
     }
-
-    func test__run() {
-
-        operation = CloudKitOperation(reachability: reachability) { TestCloudOperation() }
-        operation.log.severity = .Verbose
-
-        let container = "I'm a test container!"
-        operation.container = container
-
-        waitForOperation(operation)
-
-        XCTAssertEqual(operation.count, 1)
-        XCTAssertEqual(operation.container, container)
-    }
 }
 
-class CloudDatabaseOperationTests: CloudKitOperationTests {
+class OPRCKDatabaseOperationTests: CloudKitOperationTests {
 
     var target: TestDatabaseOperation!
-    var op: OPRCKOperation<TestDatabaseOperation>!
-    var operation: CloudKitOperation<TestDatabaseOperation>!
+    var operation: OPRCKOperation<TestDatabaseOperation>!
 
     override func setUp() {
         super.setUp()
         target = TestDatabaseOperation()
-        op = OPRCKOperation(operation: target, reachability: reachability)
-        operation = CloudKitOperation(reachability: reachability) { TestDatabaseOperation() }
+        operation = OPRCKOperation(operation: target)
     }
 
     func test__get_database() {
         let db = "I'm a test database!"
         target.database = db
-        XCTAssertEqual(op.database, db)
+        XCTAssertEqual(operation.database, db)
     }
 
     func test__set_database() {
         let db = "I'm a test database!"
-        op.database = db
+        operation.database = db
         XCTAssertEqual(target.database, db)
     }
 
     func test__get_previous_server_change_token() {
         let token = "i'm a server token"
         target.previousServerChangeToken = token
-        XCTAssertEqual(op.previousServerChangeToken, token)
+        XCTAssertEqual(operation.previousServerChangeToken, token)
     }
 
     func test__set_previous_server_change_token() {
         let token = "i'm a server token"
-        op.previousServerChangeToken = token
+        operation.previousServerChangeToken = token
         XCTAssertEqual(target.previousServerChangeToken, token)
     }
 
     func test__get_results_limit() {
         target.resultsLimit = 10
-        XCTAssertEqual(op.resultsLimit, 10)
+        XCTAssertEqual(operation.resultsLimit, 10)
     }
 
     func test__set_results_limits() {
-        op.resultsLimit = 10
+        operation.resultsLimit = 10
         XCTAssertEqual(target.resultsLimit, 10)
     }
 
@@ -435,50 +417,19 @@ class CloudDatabaseOperationTests: CloudKitOperationTests {
     func test__get_desired_keys() {
         let keys = [ "desired-key-1",  "desired-key-2" ]
         target.desiredKeys = keys
-        XCTAssertNotNil(op.desiredKeys)
-        XCTAssertEqual(op.desiredKeys!, keys)
+        XCTAssertNotNil(operation.desiredKeys)
+        XCTAssertEqual(operation.desiredKeys!, keys)
     }
 
     func test__set_desired_keys() {
         let keys = [ "desired-key-1",  "desired-key-2" ]
-        op.desiredKeys = keys
+        operation.desiredKeys = keys
         XCTAssertNotNil(target.desiredKeys)
         XCTAssertEqual(target.desiredKeys!, keys)
     }
-
-    func test__run() {
-
-        operation = CloudKitOperation(reachability: reachability) {
-            let tmp = TestDatabaseOperation()
-            tmp.moreComing = true
-            return tmp
-        }
-
-        let db = "I'm a test database!"
-        operation.database = db
-
-        let token = "i'm a server token"
-        operation.previousServerChangeToken = token
-
-        let limit = 10
-        operation.resultsLimit = limit
-
-        let keys = [ "desired-key-1",  "desired-key-2" ]
-        operation.desiredKeys = keys
-
-
-        waitForOperation(operation)
-
-        XCTAssertTrue(operation.finished)
-        XCTAssertTrue(operation.moreComing)
-        XCTAssertEqual(operation.database, db)
-        XCTAssertEqual(operation.previousServerChangeToken, token)
-        XCTAssertEqual(operation.resultsLimit, limit)
-        XCTAssertEqual(operation.desiredKeys!, keys)
-    }
 }
 
-class Cloud_Internal_DiscoverAllContactsOperationTests: CloudKitOperationTests {
+class OPRCKDiscoverAllContactsOperationTests: CloudKitOperationTests {
 
     var target: TestDiscoverAllContactsOperation!
     var operation: OPRCKOperation<TestDiscoverAllContactsOperation>!
@@ -491,25 +442,19 @@ class Cloud_Internal_DiscoverAllContactsOperationTests: CloudKitOperationTests {
 
     func test__execution_after_cancellation() {
         operation.cancel()
-
         waitForOperation(operation)
-
         XCTAssertTrue(operation.finished)
         XCTAssertTrue(operation.cancelled)
     }
 
     func test__successful_execution_without_completion_block() {
-
         waitForOperation(operation)
-
         XCTAssertTrue(operation.finished)
     }
 
     func test__error_without_completion_block() {
         target.error = NSError(domain: CKErrorDomain, code: CKErrorCode.InternalError.rawValue, userInfo: nil)
-
         waitForOperation(operation)
-
         XCTAssertTrue(operation.finished)
         XCTAssertEqual(operation.errors.count, 0)
     }
@@ -521,29 +466,26 @@ class Cloud_Internal_DiscoverAllContactsOperationTests: CloudKitOperationTests {
         }
 
         waitForOperation(operation)
-
         XCTAssertTrue(operation.finished)
         XCTAssertEqual(operation.errors.count, 0)
-
         XCTAssertNotNil(result)
         XCTAssertTrue(result?.isEmpty ?? false)
     }
 
     func test__error_with_completion_block() {
-        target.error = NSError(domain: CKErrorDomain, code: CKErrorCode.InternalError.rawValue, userInfo: nil)
 
+        target.error = NSError(domain: CKErrorDomain, code: CKErrorCode.InternalError.rawValue, userInfo: nil)
         operation.setDiscoverAllContactsCompletionBlock { userInfos in
             // etc
         }
 
         waitForOperation(operation)
-
         XCTAssertTrue(operation.finished)
         XCTAssertEqual(operation.errors.count, 1)
     }
 }
 
-class Cloud_Internal_DiscoverUserInfosOperationTests: CloudKitOperationTests {
+class OPRCKDiscoverUserInfosOperationTests: CloudKitOperationTests {
 
     var target: TestDiscoverUserInfosOperation!
     var operation: OPRCKOperation<TestDiscoverUserInfosOperation>!
@@ -613,7 +555,7 @@ class Cloud_Internal_DiscoverUserInfosOperationTests: CloudKitOperationTests {
     }
 }
 
-class Cloud_Internal_FetchNotificationChangesOperationTests: CloudKitOperationTests {
+class OPRCKFetchNotificationChangesOperationTests: CloudKitOperationTests {
 
     var target: TestFetchNotificationChangesOperation!
     var operation: OPRCKOperation<TestFetchNotificationChangesOperation>!
@@ -663,13 +605,9 @@ class Cloud_Internal_FetchNotificationChangesOperationTests: CloudKitOperationTe
         XCTAssertTrue(operation.finished)
         XCTAssertEqual(operation.errors.count, 1)
     }
-
-    func test__batch_operation() {
-
-    }
 }
 
-class Cloud_Internal_MarkNotificationsReadOperationTests: CloudKitOperationTests {
+class OPRCKMarkNotificationsReadOperationTests: CloudKitOperationTests {
 
     var target: TestMarkNotificationsReadOperation!
     var operation: OPRCKOperation<TestMarkNotificationsReadOperation>!
@@ -717,7 +655,7 @@ class Cloud_Internal_MarkNotificationsReadOperationTests: CloudKitOperationTests
     }
 }
 
-class Cloud_Internal_ModifyBadgeOperationTests: CloudKitOperationTests {
+class OPRCKModifyBadgeOperationTests: CloudKitOperationTests {
 
     var target: TestModifyBadgeOperation!
     var operation: OPRCKOperation<TestModifyBadgeOperation>!
@@ -765,7 +703,7 @@ class Cloud_Internal_ModifyBadgeOperationTests: CloudKitOperationTests {
     }
 }
 
-class Cloud_Internal_FetchRecordChangesOperationTests: CloudKitOperationTests {
+class OPRCKFetchRecordChangesOperationTests: CloudKitOperationTests {
 
     var target: TestFetchRecordChangesOperation!
     var operation: OPRCKOperation<TestFetchRecordChangesOperation>!
@@ -833,7 +771,7 @@ class Cloud_Internal_FetchRecordChangesOperationTests: CloudKitOperationTests {
     }
 }
 
-class Cloud_Internal_FetchRecordZonesOperationTests: CloudKitOperationTests {
+class OPRCKFetchRecordZonesOperationTests: CloudKitOperationTests {
 
     var target: TestFetchRecordZonesOperation!
     var operation: OPRCKOperation<TestFetchRecordZonesOperation>!
@@ -879,7 +817,7 @@ class Cloud_Internal_FetchRecordZonesOperationTests: CloudKitOperationTests {
     }
 }
 
-class Cloud_Internal_FetchRecordsOperationTests: CloudKitOperationTests {
+class OPRCKFetchRecordsOperationTests: CloudKitOperationTests {
 
     var target: TestFetchRecordsOperation!
     var operation: OPRCKOperation<TestFetchRecordsOperation>!
@@ -947,7 +885,7 @@ class Cloud_Internal_FetchRecordsOperationTests: CloudKitOperationTests {
     }
 }
 
-class Cloud_Internal_FetchSubscriptionsOperationTests: CloudKitOperationTests {
+class OPRCKFetchSubscriptionsOperationTests: CloudKitOperationTests {
 
     var target: TestFetchSubscriptionsOperation!
     var operation: OPRCKOperation<TestFetchSubscriptionsOperation>!
@@ -993,7 +931,7 @@ class Cloud_Internal_FetchSubscriptionsOperationTests: CloudKitOperationTests {
     }
 }
 
-class Cloud_Internal_ModifyRecordZonesOperationTests: CloudKitOperationTests {
+class OPRCKModifyRecordZonesOperationTests: CloudKitOperationTests {
 
     var target: TestModifyRecordZonesOperation!
     var operation: OPRCKOperation<TestModifyRecordZonesOperation>!
@@ -1051,7 +989,7 @@ class Cloud_Internal_ModifyRecordZonesOperationTests: CloudKitOperationTests {
     }
 }
 
-class Cloud_Internal_ModifyRecordsOperationTests: CloudKitOperationTests {
+class OPRCKModifyRecordsOperationTests: CloudKitOperationTests {
 
     var target: TestModifyRecordsOperation!
     var operation: OPRCKOperation<TestModifyRecordsOperation>!
@@ -1161,7 +1099,7 @@ class Cloud_Internal_ModifyRecordsOperationTests: CloudKitOperationTests {
     }
 }
 
-class Cloud_Internal_ModifySubscriptionsOperationTests: CloudKitOperationTests {
+class OPRCKModifySubscriptionsOperationTests: CloudKitOperationTests {
 
     var target: TestModifySubscriptionsOperation!
     var operation: OPRCKOperation<TestModifySubscriptionsOperation>!
@@ -1219,7 +1157,7 @@ class Cloud_Internal_ModifySubscriptionsOperationTests: CloudKitOperationTests {
     }
 }
 
-class Cloud_Internal_QueryOperationTests: CloudKitOperationTests {
+class OPRCKQueryOperationTests: CloudKitOperationTests {
 
     var target: TestQueryOperation!
     var operation: OPRCKOperation<TestQueryOperation>!
