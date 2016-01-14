@@ -1972,10 +1972,71 @@ class CloudKitOperationModifyRecordsTests: CKTests {
         XCTAssertTrue(operation.finished)
         XCTAssertEqual(operation.errors.count, 1)
     }
-
 }
 
+class CloudKitOperationModifySubscriptionsTests: CKTests {
 
+    var subscriptionsToSave: [TestModifyRecordZonesOperation.Subscription]!
+    var subscriptionIDsToDelete: [String]!
+    var operation: CloudKitOperation<TestModifySubscriptionsOperation>!
+
+    override func setUp() {
+        super.setUp()
+        subscriptionsToSave = [ "a-subscription", "another-subscription" ]
+        subscriptionIDsToDelete = [ "a-subscription-id", "another-subscription-id" ]
+
+        operation = CloudKitOperation(reachability: reachability) { TestModifySubscriptionsOperation() }
+        operation.subscriptionsToSave = subscriptionsToSave
+        operation.subscriptionIDsToDelete = subscriptionIDsToDelete
+    }
+
+    func test__execution_after_cancellation() {
+        operation.cancel()
+        waitForOperation(operation)
+
+        XCTAssertTrue(operation.finished)
+        XCTAssertTrue(operation.cancelled)
+        XCTAssertEqual(operation.subscriptionsToSave ?? [], subscriptionsToSave)
+        XCTAssertEqual(operation.subscriptionIDsToDelete ?? [], subscriptionIDsToDelete)
+    }
+
+    func test__success_without_completion_block() {
+        waitForOperation(operation)
+        XCTAssertTrue(operation.finished)
+    }
+
+    func test__success_with_completion_block() {
+        operation.setModifySubscriptionsCompletionBlock { _, _ in }
+        waitForOperation(operation)
+        XCTAssertTrue(operation.finished)
+        XCTAssertEqual(operation.errors.count, 0)
+    }
+
+    func test__error_without_completion_block() {
+        operation = CloudKitOperation(reachability: reachability) {
+            let op = TestModifySubscriptionsOperation()
+            op.error = NSError(domain: CKErrorDomain, code: CKErrorCode.InternalError.rawValue, userInfo: nil)
+            return op
+        }
+
+        waitForOperation(operation)
+        XCTAssertTrue(operation.finished)
+        XCTAssertEqual(operation.errors.count, 0)
+    }
+
+    func test__error_with_completion_block() {
+        operation = CloudKitOperation(reachability: reachability) {
+            let op = TestModifySubscriptionsOperation()
+            op.error = NSError(domain: CKErrorDomain, code: CKErrorCode.InternalError.rawValue, userInfo: nil)
+            return op
+        }
+        operation.setModifySubscriptionsCompletionBlock { _, _ in }
+
+        waitForOperation(operation)
+        XCTAssertTrue(operation.finished)
+        XCTAssertEqual(operation.errors.count, 1)
+    }
+}
 
 
 /*
