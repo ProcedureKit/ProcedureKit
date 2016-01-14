@@ -1831,7 +1831,68 @@ class CloudKitOperationFetchSubscriptionsTests: CKTests {
     }
 }
 
+class CloudKitOperationModifyRecordZonesTests: CKTests {
 
+    var zonesToSave: [TestModifyRecordZonesOperation.RecordZone]!
+    var zoneIDsToDelete: [TestModifyRecordZonesOperation.RecordZoneID]!
+    var operation: CloudKitOperation<TestModifyRecordZonesOperation>!
+
+    override func setUp() {
+        super.setUp()
+        zonesToSave = [ "a-record-zone", "another-record-zone" ]
+        zoneIDsToDelete = [ "a-record-zone-id", "another-record-zone-id" ]
+        operation = CloudKitOperation(reachability: reachability) { TestModifyRecordZonesOperation() }
+        operation.recordZonesToSave = zonesToSave
+        operation.recordZoneIDsToDelete = zoneIDsToDelete
+    }
+    
+    func test__execution_after_cancellation() {
+        operation.cancel()
+        waitForOperation(operation)
+
+        XCTAssertTrue(operation.finished)
+        XCTAssertTrue(operation.cancelled)
+        XCTAssertEqual(operation.recordZonesToSave ?? [], zonesToSave)
+        XCTAssertEqual(operation.recordZoneIDsToDelete ?? [], zoneIDsToDelete)
+    }
+
+    func test__success_without_completion_block() {
+        waitForOperation(operation)
+        XCTAssertTrue(operation.finished)
+    }
+
+    func test__success_with_completion_block() {
+        operation.setModifyRecordZonesCompletionBlock { _ in }
+        waitForOperation(operation)
+        XCTAssertTrue(operation.finished)
+        XCTAssertEqual(operation.errors.count, 0)
+    }
+
+    func test__error_without_completion_block() {
+        operation = CloudKitOperation(reachability: reachability) {
+            let op = TestModifyRecordZonesOperation()
+            op.error = NSError(domain: CKErrorDomain, code: CKErrorCode.InternalError.rawValue, userInfo: nil)
+            return op
+        }
+
+        waitForOperation(operation)
+        XCTAssertTrue(operation.finished)
+        XCTAssertEqual(operation.errors.count, 0)
+    }
+
+    func test__error_with_completion_block() {
+        operation = CloudKitOperation(reachability: reachability) {
+            let op = TestModifyRecordZonesOperation()
+            op.error = NSError(domain: CKErrorDomain, code: CKErrorCode.InternalError.rawValue, userInfo: nil)
+            return op
+        }
+        operation.setModifyRecordZonesCompletionBlock { _ in }
+
+        waitForOperation(operation)
+        XCTAssertTrue(operation.finished)
+        XCTAssertEqual(operation.errors.count, 1)
+    }
+}
 
 
 
