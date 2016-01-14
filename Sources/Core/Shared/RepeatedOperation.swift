@@ -274,8 +274,9 @@ struct IntervalGenerator: GeneratorType {
 
 */
 public class RepeatedOperation<T where T: NSOperation>: GroupOperation {
+    public typealias Payload = (Delay?, T)
 
-    private var generator: AnyGenerator<(Delay?, T)>
+    private var generator: AnyGenerator<Payload>
 
     /// - returns: the current operation being executed.
     public internal(set) var current: T
@@ -292,7 +293,7 @@ public class RepeatedOperation<T where T: NSOperation>: GroupOperation {
      the maximum number of operations which will be executed.
      - parameter generator: the AnyGenerator<(Delay?, T)> generator.
     */
-    public init(maxCount max: Int? = .None, generator gen: AnyGenerator<(Delay?, T)>) {
+    public init(maxCount max: Int? = .None, generator gen: AnyGenerator<Payload>) {
 
         guard let (_, operation) = gen.next() else {
             preconditionFailure("Operation Generator must return an instance initially.")
@@ -424,7 +425,7 @@ public class RepeatedOperation<T where T: NSOperation>: GroupOperation {
      allow subclasses to override and configure the operation
      further before it is added.
     */
-    public func next() -> (Delay?, T)? {
+    public func next() -> Payload? {
         return generator.next()
     }
 
