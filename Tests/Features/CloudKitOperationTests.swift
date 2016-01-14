@@ -579,6 +579,11 @@ class OPRCKFetchNotificationChangesOperationTests: CKTests {
         XCTAssertTrue(didItWork)
     }
 
+    func test__get_more_coming() {
+        target.moreComing = true
+        XCTAssertTrue(operation.moreComing)
+    }
+
     func test__success_with_completion_block() {
         var receivedToken: String?
         operation.setFetchNotificationChangesCompletionBlock { token in
@@ -1382,6 +1387,7 @@ class CloudKitOperationFetchNotificationChangesOperationTests: CKTests {
         super.setUp()
         operation = CloudKitOperation(reachability: reachability) {
             let op = TestFetchNotificationChangesOperation(token: "i'm a server token")
+            op.moreComing = true
             op.changedNotifications = [ "Hello", "World" ]
             return op
         }
@@ -1404,6 +1410,7 @@ class CloudKitOperationFetchNotificationChangesOperationTests: CKTests {
         XCTAssertTrue(operation.finished)
         XCTAssertNotNil(operation.notificationChangedBlock)
         XCTAssertEqual(changedNotifications, [ "Hello", "World" ])
+        XCTAssertTrue(operation.moreComing)
     }
 
     func test__success_with_completion_block() {
