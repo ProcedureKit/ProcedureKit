@@ -1298,6 +1298,136 @@ class CloudKitOperationDiscoverAllContractsTests: CKTests {
     }
 }
 
+class CloudKitOperationDiscoverUserInfosOperationTests: CKTests {
+
+    var operation: CloudKitOperation<TestDiscoverUserInfosOperation>!
+
+    override func setUp() {
+        super.setUp()
+        operation = CloudKitOperation(reachability: reachability) { TestDiscoverUserInfosOperation(userInfosByEmailAddress: [:], userInfoByRecordID: [:]) }
+    }
+
+    func test__execution_after_cancellation() {
+        operation.cancel()
+        waitForOperation(operation)
+
+        XCTAssertTrue(operation.finished)
+        XCTAssertTrue(operation.cancelled)
+    }
+
+    func test__success_without_completion_block() {
+
+        let emailAddresses = [ "hello@world.com" ]
+        operation.emailAddresses = emailAddresses
+        let userRecordIDs = [ "Hello World" ]
+        operation.userRecordIDs = userRecordIDs
+
+        waitForOperation(operation)
+        XCTAssertTrue(operation.finished)
+
+        XCTAssertEqual(operation.emailAddresses ?? [], emailAddresses)
+        XCTAssertEqual(operation.userRecordIDs ?? [], userRecordIDs)
+    }
+
+    func test__success_with_completion_block() {
+        var userInfosByAddress: [String: TestDiscoverUserInfosOperation.DiscoveredUserInfo]? = .None
+        var userInfosByRecordID: [TestDiscoverUserInfosOperation.RecordID: TestDiscoverUserInfosOperation.DiscoveredUserInfo]? = .None
+
+        operation.setDiscoverUserInfosCompletionBlock { byAddress, byRecordID in
+            userInfosByAddress = byAddress
+            userInfosByRecordID = byRecordID
+        }
+
+        waitForOperation(operation)
+
+        XCTAssertTrue(operation.finished)
+        XCTAssertEqual(operation.errors.count, 0)
+        XCTAssertNotNil(userInfosByAddress)
+        XCTAssertTrue(userInfosByAddress?.isEmpty ?? false)
+        XCTAssertNotNil(userInfosByRecordID)
+        XCTAssertTrue(userInfosByRecordID?.isEmpty ?? false)
+    }
+
+    func test__error_without_completion_block() {
+        operation = CloudKitOperation(reachability: reachability) {
+            let op = TestDiscoverUserInfosOperation(userInfosByEmailAddress: [:], userInfoByRecordID: [:])
+            op.error = NSError(domain: CKErrorDomain, code: CKErrorCode.InternalError.rawValue, userInfo: nil)
+            return op
+        }
+
+        waitForOperation(operation)
+        XCTAssertTrue(operation.finished)
+        XCTAssertEqual(operation.errors.count, 0)
+    }
+
+    func test__error_with_completion_block() {
+        operation = CloudKitOperation(reachability: reachability) {
+            let op = TestDiscoverUserInfosOperation(userInfosByEmailAddress: [:], userInfoByRecordID: [:])
+            op.error = NSError(domain: CKErrorDomain, code: CKErrorCode.InternalError.rawValue, userInfo: nil)
+            return op
+        }
+        operation.setDiscoverUserInfosCompletionBlock { _ in }
+
+        waitForOperation(operation)
+        XCTAssertTrue(operation.finished)
+        XCTAssertEqual(operation.errors.count, 1)
+    }
+}
+
+class CloudKitOperationFetchNotificationChangesOperationTests: CKTests {
+
+    var operation: CloudKitOperation<TestFetchNotificationChangesOperation>!
+
+    override func setUp() {
+        super.setUp()
+        operation = CloudKitOperation(reachability: reachability) {
+            let op = TestFetchNotificationChangesOperation(token: "i'm a server token")
+            op.changedNotifications = [ "Hello", "World" ]
+            return op
+        }
+    }
+    
+    func test__execution_after_cancellation() {
+        operation.cancel()
+        waitForOperation(operation)
+
+        XCTAssertTrue(operation.finished)
+        XCTAssertTrue(operation.cancelled)
+    }
+
+    func test__success_without_completion_block() {
+
+        var changedNotifications: [TestFetchNotificationChangesOperation.Notification] = []
+        operation.notificationChangedBlock = { changedNotifications.append($0) }
+
+        waitForOperation(operation)
+        XCTAssertTrue(operation.finished)
+        XCTAssertNotNil(operation.notificationChangedBlock)
+        XCTAssertEqual(changedNotifications, [ "Hello", "World" ])
+    }
+
+    func test__success_with_completion_block() {
+
+        operation.notificationChangedBlock = { _ in }
+        operation.setFetchNotificationChangesCompletionBlock { _ in }
+
+        waitForOperation(operation)
+
+        XCTAssertTrue(operation.finished)
+        XCTAssertEqual(operation.errors.count, 0)
+    }
+
+}
+
+
+
+
+
+
+
+
+
+
 class CloudKitOperationFetchRecordChangesTests: CKTests {
 
     var operation: CloudKitOperation<TestFetchRecordChangesOperation>!
@@ -1331,12 +1461,15 @@ class CloudKitOperationFetchRecordChangesTests: CKTests {
         XCTAssertEqual(operation.desiredKeys!, keys)
     }
 
-    func test__success_with_completion_handler() {
+    func test__success_without_completion_block() {
         waitForOperation(operation)
         XCTAssertTrue(operation.finished)
     }
     
-    
+//    func test__success_with_completion_block() {
+//
+//    }
+
 }
 
 
