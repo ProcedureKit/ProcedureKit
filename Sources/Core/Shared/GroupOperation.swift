@@ -179,7 +179,16 @@ extension GroupOperation: OperationQueueDelegate {
      notified (using `operationDidFinish` that a child operation has finished.
     */
     public func operationQueue(queue: OperationQueue, operationDidFinish operation: NSOperation, withErrors errors: [ErrorType]) {
-        aggregateErrors.appendContentsOf(errors)
+        if !errors.isEmpty {
+            switch operation {
+            case is GroupOperation:
+                // If GroupOperations are executed inside GroupOperations
+                // all the errors will be duplicated.
+                break
+            default:
+                aggregateErrors.appendContentsOf(errors)
+            }
+        }
 
         if operation === finishingOperation {
             queue.suspended = true
