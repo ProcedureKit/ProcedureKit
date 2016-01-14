@@ -187,10 +187,44 @@ class OPRCKOperation<T where T: NSOperation, T: CKOperationType>: ReachableOpera
 
 // MARK: - Cloud Kit Error Recovery
 
-public class CloudKitRecovery {
+public class CloudKitRecovery<T where T: NSOperation, T: CKOperationType> {
+    public typealias Handler = (NSError, Delay?, T) -> (Delay?, T)?
 
-    func recoverWithInfo<T where T: NSOperation, T: CKOperationType>(info: RetryFailureInfo<OPRCKOperation<T>>, delay: Delay?, next: OPRCKOperation<T>) -> (Delay?, OPRCKOperation<T>)? {
+    var defaultHandlers: [CKErrorCode: Handler]
+    var customHandlers: [CKErrorCode: Handler]
+
+    init() {
+        defaultHandlers = [:]
+        customHandlers = [:]
+        addDefaultHandlers()
+    }
+
+    func recoverWithInfo(info: RetryFailureInfo<OPRCKOperation<T>>, delay: Delay?, next: OPRCKOperation<T>) -> (Delay?, OPRCKOperation<T>)? {
+
+        // TODO: 
+        // 1. Extract the latest/relevent NSError from the info
+        // 2. Inspect it for CKError to get the CKErrorCode
+        // 3. Lookup error handlers
+        // 4. Prefer custom over default? 
+        // 5. Consider how we might pass the result of the default into the custom
+        // 6. Figure out how to work with OPRCKOperation<T> and handlers which expect T
+        // 7. Execute (and return) the result of the error handler.
+
         return .None
+    }
+
+    func addDefaultHandlers() {
+
+        // TODO:
+        // 1. Add error handlers for as many CKErrorCodes as possible
+    }
+
+    func setDefaultHandlerForCode(code: CKErrorCode, handler: Handler) {
+        defaultHandlers.updateValue(handler, forKey: code)
+    }
+
+    func setCustomHandlerForCode(code: CKErrorCode, handler: Handler) {
+        customHandlers.updateValue(handler, forKey: code)
     }
 }
 
@@ -198,7 +232,9 @@ public class CloudKitRecovery {
 
 public class CloudKitOperation<T where T: NSOperation, T: CKOperationType>: RetryOperation<OPRCKOperation<T>> {
 
-    let recovery: CloudKitRecovery
+    public typealias ErrorHandler = CloudKitRecovery<T>.Handler
+
+    let recovery: CloudKitRecovery<T>
 
     var operation: T {
         return current.operation
@@ -222,16 +258,20 @@ public class CloudKitOperation<T where T: NSOperation, T: CKOperationType>: Retr
         let generator = MapGenerator(gen) { OPRCKOperation(operation: $0, connectivity: connectivity, reachability: reachability) }
 
         // Creates a CloudKitRecovery object
-        let _recovery = CloudKitRecovery()
-        self.recovery = _recovery
+        let _recovery = CloudKitRecovery<T>()
 
         // Creates a Retry Handler using the recovery object
         let handler: Handler = { info, delay, next in
             return _recovery.recoverWithInfo(info, delay: delay, next: next)
         }
 
+        recovery = _recovery
         super.init(maxCount: .None, delay: delay, generator: generator, retry: handler)
         name = "CloudKitOperation<\(T.self)>"
+    }
+
+    public func setErrorHandlerForCode(code: CKErrorCode, handler: ErrorHandler) {
+        recovery.setCustomHandlerForCode(code, handler: handler)
     }
 }
 
