@@ -1145,7 +1145,7 @@ extension OPRCKOperation where T: CKQueryOperationType {
         set { operation.zoneID = newValue }
     }
 
-    var recordFetchedBlock: ((T.Record) -> Void)? {
+    var recordFetchedBlock: CloudKitOperation<T>.QueryRecordFetchedBlock? {
         get { return operation.recordFetchedBlock }
         set { operation.recordFetchedBlock = newValue }
     }
@@ -1164,6 +1164,7 @@ extension OPRCKOperation where T: CKQueryOperationType {
 
 extension CloudKitOperation where T: CKQueryOperationType {
 
+    public typealias QueryRecordFetchedBlock = T.Record -> Void
     public typealias QueryCompletionBlock = T.QueryCursor? -> Void
 
     public var query: T.Query? {
@@ -1190,7 +1191,7 @@ extension CloudKitOperation where T: CKQueryOperationType {
         }
     }
 
-    public var recordFetchedBlock: ((T.Record) -> Void)? {
+    public var recordFetchedBlock: QueryRecordFetchedBlock? {
         get { return operation.recordFetchedBlock }
         set {
             operation.recordFetchedBlock = newValue
