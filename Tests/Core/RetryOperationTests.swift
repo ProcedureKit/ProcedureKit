@@ -100,12 +100,12 @@ class RetryOperationTests: OperationTests {
         var retryCount: Int = 0
         var didRunBlockCount: Int = 0
 
-        let retry: Handler = { info, delay, operation in
+        let retry: Handler = { info, recommended in
             retryErrors = info.errors
             retryAggregateErrors = info.aggregateErrors
             retryCount = info.count
             didRunBlockCount += 1
-            return (delay, operation)
+            return recommended
         }
 
         operation = RetryOperation(anyGenerator(producer(3)), retry: retry)
@@ -129,7 +129,7 @@ class RetryOperationTests: OperationTests {
         var retryAggregateErrors: [ErrorType]? = .None
         var retryCount: Int = 0
         var didRunBlockCount: Int = 0
-        let retry: Handler = { info, delay, operation in
+        let retry: Handler = { info, recommended in
             retryErrors = info.errors
             retryAggregateErrors = info.aggregateErrors
             retryCount = info.count

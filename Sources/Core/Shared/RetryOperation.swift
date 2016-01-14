@@ -42,21 +42,22 @@ public struct RetryFailureInfo<T: NSOperation> {
 }
 
 class RetryGenerator<T: NSOperation>: GeneratorType {
+    typealias Payload = RetryOperation<T>.Payload
     typealias Handler = RetryOperation<T>.Handler
 
     internal let retry: Handler
     internal var info: RetryFailureInfo<T>? = .None
     private var generator: AnyGenerator<(Delay?, T)>
 
-    init(generator: AnyGenerator<(Delay?, T)>, retry: Handler) {
+    init(generator: AnyGenerator<Payload>, retry: Handler) {
         self.generator = generator
         self.retry = retry
     }
 
-    func next() -> (Delay?, T)? {
-        guard let (delay, next) = generator.next() else { return nil }
-        guard let info = info else { return (delay, next) }
-        return retry(info, delay, next)
+    func next() -> Payload? {
+        guard let payload = generator.next() else { return nil }
+        guard let info = info else { return payload }
+        return retry(info, payload)
     }
 }
 
@@ -76,7 +77,7 @@ class RetryGenerator<T: NSOperation>: GeneratorType {
 */
 public class RetryOperation<T: NSOperation>: RepeatedOperation<T> {
     public typealias FailureInfo = RetryFailureInfo<T>
-    public typealias Handler = (RetryFailureInfo<T>, Delay?, T) -> (Delay?, T)?
+    public typealias Handler = (RetryFailureInfo<T>, Payload?) -> Payload?
 
     let retry: RetryGenerator<T>
 
@@ -93,7 +94,7 @@ public class RetryOperation<T: NSOperation>: RepeatedOperation<T> {
      adjust the next delay and Operation.
 
     */
-    public init(maxCount max: Int?, generator: AnyGenerator<(Delay?, T)>, retry block: Handler) {
+    public init(maxCount max: Int?, generator: AnyGenerator<Payload>, retry block: Handler) {
         retry = RetryGenerator(generator: generator, retry: block)
         super.init(maxCount: max, generator: anyGenerator(retry))
         name = "Retry Operation"
@@ -151,7 +152,7 @@ public class RetryOperation<T: NSOperation>: RepeatedOperation<T> {
      operation regardless of error info.
 
      */
-    public convenience init<G where G: GeneratorType, G.Element == T>(maxCount max: Int? = 5, strategy: WaitStrategy = .Fixed(0.1), _ generator: G, retry: Handler = { ($1, $2) }) {
+    public convenience init<G where G: GeneratorType, G.Element == T>(maxCount max: Int? = 5, strategy: WaitStrategy = .Fixed(0.1), _ generator: G, retry: Handler = { $1 }) {
         self.init(maxCount: max, delay: MapGenerator(strategy.generator()) { Delay.By($0) }, generator: generator, retry: retry)
     }
 

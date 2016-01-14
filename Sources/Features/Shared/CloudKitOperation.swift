@@ -188,7 +188,8 @@ class OPRCKOperation<T where T: NSOperation, T: CKOperationType>: ReachableOpera
 // MARK: - Cloud Kit Error Recovery
 
 public class CloudKitRecovery<T where T: NSOperation, T: CKOperationType> {
-    public typealias Handler = (NSError, Delay?, T) -> (Delay?, T)?
+    public typealias Payload = (Delay?, T)
+    public typealias Handler = (NSError, Payload?) -> Payload?
 
     var defaultHandlers: [CKErrorCode: Handler]
     var customHandlers: [CKErrorCode: Handler]
@@ -199,7 +200,7 @@ public class CloudKitRecovery<T where T: NSOperation, T: CKOperationType> {
         addDefaultHandlers()
     }
 
-    func recoverWithInfo(info: RetryFailureInfo<OPRCKOperation<T>>, delay: Delay?, next: OPRCKOperation<T>) -> (Delay?, OPRCKOperation<T>)? {
+    func recoverWithInfo(info: RetryFailureInfo<OPRCKOperation<T>>, recommended: (Delay?, OPRCKOperation<T>)?) -> (Delay?, OPRCKOperation<T>)? {
 
         // TODO: 
         // 1. Extract the latest/relevent NSError from the info
@@ -261,8 +262,8 @@ public class CloudKitOperation<T where T: NSOperation, T: CKOperationType>: Retr
         let _recovery = CloudKitRecovery<T>()
 
         // Creates a Retry Handler using the recovery object
-        let handler: Handler = { info, delay, next in
-            return _recovery.recoverWithInfo(info, delay: delay, next: next)
+        let handler: Handler = { info, payload in
+            return _recovery.recoverWithInfo(info, recommended: payload)
         }
 
         recovery = _recovery
@@ -329,20 +330,6 @@ public class BatchedCloudKitOperation<T where T: NSOperation, T: CKBatchedOperat
         super.operationDidFinish(operation, withErrors: errors)
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
