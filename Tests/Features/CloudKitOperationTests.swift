@@ -1894,7 +1894,86 @@ class CloudKitOperationModifyRecordZonesTests: CKTests {
     }
 }
 
+class CloudKitOperationModifyRecordsTests: CKTests {
 
+    var recordsToSave: [TestModifyRecordZonesOperation.Record]!
+    var recordIDsToDelete: [TestModifyRecordZonesOperation.RecordID]!
+    var policy: TestModifyRecordZonesOperation.RecordSavePolicy = 0
+    var clientChangeToken: NSData!
+    var atomic: Bool = false
+    var operation: CloudKitOperation<TestModifyRecordsOperation>!
+
+    override func setUp() {
+        super.setUp()
+        recordsToSave = [ "a-record", "another-record" ]
+        recordIDsToDelete = [ "a-record-id", "another-record-id" ]
+        policy = 1
+        clientChangeToken = "I'm a client change token".dataUsingEncoding(NSUTF8StringEncoding)
+        atomic = true
+
+        operation = CloudKitOperation(reachability: reachability) { TestModifyRecordsOperation() }
+        operation.recordsToSave = recordsToSave
+        operation.recordIDsToDelete = recordIDsToDelete
+        operation.savePolicy = policy
+        operation.clientChangeTokenData = clientChangeToken
+        operation.atomic = atomic
+    }
+
+    func test__execution_after_cancellation() {
+        operation.cancel()
+        waitForOperation(operation)
+
+        XCTAssertTrue(operation.finished)
+        XCTAssertTrue(operation.cancelled)
+        XCTAssertEqual(operation.recordsToSave ?? [], recordsToSave)
+        XCTAssertEqual(operation.recordIDsToDelete ?? [], recordIDsToDelete)
+        XCTAssertEqual(operation.savePolicy, policy)
+        XCTAssertEqual(operation.clientChangeTokenData, clientChangeToken)
+        XCTAssertEqual(operation.atomic, atomic)
+    }
+
+    func test__success_without_completion_block() {
+        waitForOperation(operation)
+        XCTAssertTrue(operation.finished)
+    }
+
+    func test__success_with_completion_block() {
+        operation.perRecordProgressBlock = { _, _ in }
+        operation.perRecordCompletionBlock = { _, _ in }
+        operation.setModifyRecordsCompletionBlock { _ in }
+        waitForOperation(operation)
+        XCTAssertTrue(operation.finished)
+        XCTAssertEqual(operation.errors.count, 0)
+        XCTAssertNotNil(operation.perRecordProgressBlock)
+        XCTAssertNotNil(operation.perRecordCompletionBlock)
+    }
+
+    func test__error_without_completion_block() {
+        operation = CloudKitOperation(reachability: reachability) {
+            let op = TestModifyRecordsOperation()
+            op.error = NSError(domain: CKErrorDomain, code: CKErrorCode.InternalError.rawValue, userInfo: nil)
+            return op
+        }
+
+        waitForOperation(operation)
+        XCTAssertTrue(operation.finished)
+        XCTAssertEqual(operation.errors.count, 0)
+    }
+
+    func test__error_with_completion_block() {
+        operation = CloudKitOperation(reachability: reachability) {
+            let op = TestModifyRecordsOperation()
+            op.error = NSError(domain: CKErrorDomain, code: CKErrorCode.InternalError.rawValue, userInfo: nil)
+            return op
+        }
+        operation.setModifyRecordsCompletionBlock { _ in }
+
+        waitForOperation(operation)
+        XCTAssertTrue(operation.finished)
+        XCTAssertEqual(operation.errors.count, 1)
+    }
+
+}
 
 
 
