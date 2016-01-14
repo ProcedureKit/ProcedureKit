@@ -320,10 +320,7 @@ class TestQueryOperation: TestDatabaseOperation, CKQueryOperationType {
 
 
 
-
-// MARK: - Internal CKOperation Test Cases
-
-class CloudKitOperationTests: OperationTests {
+class CKTests: OperationTests {
 
     var reachability: TestableSystemReachability!
 
@@ -334,7 +331,9 @@ class CloudKitOperationTests: OperationTests {
     }
 }
 
-class OPRCKOperationTests: CloudKitOperationTests {
+// MARK: - OPRCKOperation Test Cases
+
+class OPRCKOperationTests: CKTests {
 
     var target: TestCloudOperation!
     var operation: OPRCKOperation<TestCloudOperation>!
@@ -364,7 +363,7 @@ class OPRCKOperationTests: CloudKitOperationTests {
     }
 }
 
-class OPRCKDatabaseOperationTests: CloudKitOperationTests {
+class OPRCKDatabaseOperationTests: CKTests {
 
     var target: TestDatabaseOperation!
     var operation: OPRCKOperation<TestDatabaseOperation>!
@@ -429,7 +428,7 @@ class OPRCKDatabaseOperationTests: CloudKitOperationTests {
     }
 }
 
-class OPRCKDiscoverAllContactsOperationTests: CloudKitOperationTests {
+class OPRCKDiscoverAllContactsOperationTests: CKTests {
 
     var target: TestDiscoverAllContactsOperation!
     var operation: OPRCKOperation<TestDiscoverAllContactsOperation>!
@@ -485,7 +484,7 @@ class OPRCKDiscoverAllContactsOperationTests: CloudKitOperationTests {
     }
 }
 
-class OPRCKDiscoverUserInfosOperationTests: CloudKitOperationTests {
+class OPRCKDiscoverUserInfosOperationTests: CKTests {
 
     var target: TestDiscoverUserInfosOperation!
     var operation: OPRCKOperation<TestDiscoverUserInfosOperation>!
@@ -555,7 +554,7 @@ class OPRCKDiscoverUserInfosOperationTests: CloudKitOperationTests {
     }
 }
 
-class OPRCKFetchNotificationChangesOperationTests: CloudKitOperationTests {
+class OPRCKFetchNotificationChangesOperationTests: CKTests {
 
     var target: TestFetchNotificationChangesOperation!
     var operation: OPRCKOperation<TestFetchNotificationChangesOperation>!
@@ -607,7 +606,7 @@ class OPRCKFetchNotificationChangesOperationTests: CloudKitOperationTests {
     }
 }
 
-class OPRCKMarkNotificationsReadOperationTests: CloudKitOperationTests {
+class OPRCKMarkNotificationsReadOperationTests: CKTests {
 
     var target: TestMarkNotificationsReadOperation!
     var operation: OPRCKOperation<TestMarkNotificationsReadOperation>!
@@ -655,7 +654,7 @@ class OPRCKMarkNotificationsReadOperationTests: CloudKitOperationTests {
     }
 }
 
-class OPRCKModifyBadgeOperationTests: CloudKitOperationTests {
+class OPRCKModifyBadgeOperationTests: CKTests {
 
     var target: TestModifyBadgeOperation!
     var operation: OPRCKOperation<TestModifyBadgeOperation>!
@@ -703,7 +702,7 @@ class OPRCKModifyBadgeOperationTests: CloudKitOperationTests {
     }
 }
 
-class OPRCKFetchRecordChangesOperationTests: CloudKitOperationTests {
+class OPRCKFetchRecordChangesOperationTests: CKTests {
 
     var target: TestFetchRecordChangesOperation!
     var operation: OPRCKOperation<TestFetchRecordChangesOperation>!
@@ -771,7 +770,7 @@ class OPRCKFetchRecordChangesOperationTests: CloudKitOperationTests {
     }
 }
 
-class OPRCKFetchRecordZonesOperationTests: CloudKitOperationTests {
+class OPRCKFetchRecordZonesOperationTests: CKTests {
 
     var target: TestFetchRecordZonesOperation!
     var operation: OPRCKOperation<TestFetchRecordZonesOperation>!
@@ -817,7 +816,7 @@ class OPRCKFetchRecordZonesOperationTests: CloudKitOperationTests {
     }
 }
 
-class OPRCKFetchRecordsOperationTests: CloudKitOperationTests {
+class OPRCKFetchRecordsOperationTests: CKTests {
 
     var target: TestFetchRecordsOperation!
     var operation: OPRCKOperation<TestFetchRecordsOperation>!
@@ -885,7 +884,7 @@ class OPRCKFetchRecordsOperationTests: CloudKitOperationTests {
     }
 }
 
-class OPRCKFetchSubscriptionsOperationTests: CloudKitOperationTests {
+class OPRCKFetchSubscriptionsOperationTests: CKTests {
 
     var target: TestFetchSubscriptionsOperation!
     var operation: OPRCKOperation<TestFetchSubscriptionsOperation>!
@@ -931,7 +930,7 @@ class OPRCKFetchSubscriptionsOperationTests: CloudKitOperationTests {
     }
 }
 
-class OPRCKModifyRecordZonesOperationTests: CloudKitOperationTests {
+class OPRCKModifyRecordZonesOperationTests: CKTests {
 
     var target: TestModifyRecordZonesOperation!
     var operation: OPRCKOperation<TestModifyRecordZonesOperation>!
@@ -989,7 +988,7 @@ class OPRCKModifyRecordZonesOperationTests: CloudKitOperationTests {
     }
 }
 
-class OPRCKModifyRecordsOperationTests: CloudKitOperationTests {
+class OPRCKModifyRecordsOperationTests: CKTests {
 
     var target: TestModifyRecordsOperation!
     var operation: OPRCKOperation<TestModifyRecordsOperation>!
@@ -1099,7 +1098,7 @@ class OPRCKModifyRecordsOperationTests: CloudKitOperationTests {
     }
 }
 
-class OPRCKModifySubscriptionsOperationTests: CloudKitOperationTests {
+class OPRCKModifySubscriptionsOperationTests: CKTests {
 
     var target: TestModifySubscriptionsOperation!
     var operation: OPRCKOperation<TestModifySubscriptionsOperation>!
@@ -1157,7 +1156,7 @@ class OPRCKModifySubscriptionsOperationTests: CloudKitOperationTests {
     }
 }
 
-class OPRCKQueryOperationTests: CloudKitOperationTests {
+class OPRCKQueryOperationTests: CKTests {
 
     var target: TestQueryOperation!
     var operation: OPRCKOperation<TestQueryOperation>!
@@ -1236,6 +1235,117 @@ class OPRCKQueryOperationTests: CloudKitOperationTests {
         XCTAssertEqual(operation.errors.count, 1)
     }
 }
+
+// MARK: - CloudKitOperation Test Cases
+
+class CloudKitOperationDiscoverAllContractsTests: CKTests {
+
+    var operation: CloudKitOperation<TestDiscoverAllContactsOperation>!
+
+    override func setUp() {
+        super.setUp()
+        operation = CloudKitOperation(reachability: reachability) { TestDiscoverAllContactsOperation(result: []) }
+    }
+
+    func test__execution_after_cancellation() {
+        operation.cancel()
+        waitForOperation(operation)
+        XCTAssertTrue(operation.finished)
+        XCTAssertTrue(operation.cancelled)
+    }
+
+    func test__success_without_completion_block() {
+        waitForOperation(operation)
+        XCTAssertTrue(operation.finished)
+    }
+
+    func test__success_with_completion_block() {
+        var result: [TestDiscoverAllContactsOperation.DiscoveredUserInfo]? = .None
+        operation.setDiscoverAllContactsCompletionBlock { userInfos in
+            result = userInfos
+        }
+
+        waitForOperation(operation)
+        XCTAssertTrue(operation.finished)
+        XCTAssertEqual(operation.errors.count, 0)
+        XCTAssertNotNil(result)
+        XCTAssertTrue(result?.isEmpty ?? false)
+    }
+
+    func test__error_without_completion_block() {
+        operation = CloudKitOperation(reachability: reachability) {
+            let op = TestDiscoverAllContactsOperation(result: [])
+            op.error = NSError(domain: CKErrorDomain, code: CKErrorCode.InternalError.rawValue, userInfo: nil)
+            return op
+        }
+        waitForOperation(operation)
+        XCTAssertTrue(operation.finished)
+        XCTAssertEqual(operation.errors.count, 0)
+    }
+
+    func test__error_with_completion_block() {
+        operation = CloudKitOperation(reachability: reachability) {
+            let op = TestDiscoverAllContactsOperation(result: [])
+            op.error = NSError(domain: CKErrorDomain, code: CKErrorCode.InternalError.rawValue, userInfo: nil)
+            return op
+        }
+        operation.setDiscoverAllContactsCompletionBlock { _ in }
+
+        waitForOperation(operation)
+
+        XCTAssertTrue(operation.finished)
+        XCTAssertEqual(operation.errors.count, 1)
+    }
+}
+
+class CloudKitOperationFetchRecordChangesTests: CKTests {
+
+    var operation: CloudKitOperation<TestFetchRecordChangesOperation>!
+
+    override func setUp() {
+        super.setUp()
+        operation = CloudKitOperation(reachability: reachability) { TestFetchRecordChangesOperation() }
+    }
+
+    func test__setting_common_properties() {
+
+        let container = "I'm a test container!"
+        let db = "I'm a test database!"
+        let token = "i'm a server token"
+        let resultsLimit = 10
+        let keys = [ "desired-key-1",  "desired-key-2" ]
+
+        operation.container = container
+        operation.database = db
+        operation.previousServerChangeToken = token
+        operation.resultsLimit = resultsLimit
+        operation.desiredKeys = keys
+
+        waitForOperation(operation)
+        XCTAssertTrue(operation.finished)
+
+        XCTAssertEqual(operation.container, container)
+        XCTAssertEqual(operation.database, db)
+        XCTAssertEqual(operation.previousServerChangeToken, token)
+        XCTAssertEqual(operation.resultsLimit, resultsLimit)
+        XCTAssertEqual(operation.desiredKeys!, keys)
+    }
+
+    func test__success_with_completion_handler() {
+        waitForOperation(operation)
+        XCTAssertTrue(operation.finished)
+    }
+    
+    
+}
+
+
+
+
+
+
+
+
 
 
 
