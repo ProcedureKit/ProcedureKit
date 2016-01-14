@@ -1417,9 +1417,90 @@ class CloudKitOperationFetchNotificationChangesOperationTests: CKTests {
         XCTAssertEqual(operation.errors.count, 0)
     }
 
+    func test__error_without_completion_block() {
+        operation = CloudKitOperation(reachability: reachability) {
+            let op = TestFetchNotificationChangesOperation(token: "i'm a server token")
+            op.error = NSError(domain: CKErrorDomain, code: CKErrorCode.InternalError.rawValue, userInfo: nil)
+            return op
+        }
+
+        waitForOperation(operation)
+        XCTAssertTrue(operation.finished)
+        XCTAssertEqual(operation.errors.count, 0)
+    }
+
+    func test__error_with_completion_block() {
+        operation = CloudKitOperation(reachability: reachability) {
+            let op = TestFetchNotificationChangesOperation(token: "i'm a server token")
+            op.error = NSError(domain: CKErrorDomain, code: CKErrorCode.InternalError.rawValue, userInfo: nil)
+            return op
+        }
+        operation.setFetchNotificationChangesCompletionBlock { _ in }
+
+        waitForOperation(operation)
+        XCTAssertTrue(operation.finished)
+        XCTAssertEqual(operation.errors.count, 1)
+    }
 }
 
+class CloudKitOperationMarkNotificationsReadOperationTests: CKTests {
 
+    var notificationIDs: [TestMarkNotificationsReadOperation.NotificationID]!
+    var operation: CloudKitOperation<TestMarkNotificationsReadOperation>!
+
+    override func setUp() {
+        super.setUp()
+        notificationIDs = [ "a-notification-id", "another-notification-id" ]
+        operation = CloudKitOperation(reachability: reachability) { TestMarkNotificationsReadOperation() }
+        operation.notificationIDs = notificationIDs
+    }
+
+    func test__execution_after_cancellation() {
+        operation.cancel()
+        waitForOperation(operation)
+
+        XCTAssertTrue(operation.finished)
+        XCTAssertTrue(operation.cancelled)
+    }
+
+    func test__success_without_completion_block() {
+        waitForOperation(operation)
+        XCTAssertTrue(operation.finished)
+        XCTAssertEqual(operation.notificationIDs, notificationIDs)
+    }
+
+    func test__success_with_completion_block() {
+        operation.setMarkNotificationReadCompletionBlock { _ in }
+        waitForOperation(operation)
+        XCTAssertTrue(operation.finished)
+        XCTAssertEqual(operation.errors.count, 0)
+    }
+
+    func test__error_without_completion_block() {
+        operation = CloudKitOperation(reachability: reachability) {
+            let op = TestMarkNotificationsReadOperation()
+            op.error = NSError(domain: CKErrorDomain, code: CKErrorCode.InternalError.rawValue, userInfo: nil)
+            return op
+        }
+
+        waitForOperation(operation)
+        XCTAssertTrue(operation.finished)
+        XCTAssertEqual(operation.errors.count, 0)
+    }
+
+    func test__error_with_completion_block() {
+        operation = CloudKitOperation(reachability: reachability) {
+            let op = TestMarkNotificationsReadOperation()
+            op.error = NSError(domain: CKErrorDomain, code: CKErrorCode.InternalError.rawValue, userInfo: nil)
+            return op
+        }
+        operation.setMarkNotificationReadCompletionBlock { _ in }
+
+        waitForOperation(operation)
+        XCTAssertTrue(operation.finished)
+        XCTAssertEqual(operation.errors.count, 1)
+    }
+}
 
 
 

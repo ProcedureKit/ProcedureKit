@@ -21,7 +21,7 @@ class TestOperation: Operation, ResultOperationType {
     var didExecute: Bool = false
     var result: String? = "Hello World"
 
-    init(delay: Double = 0.001, error: ErrorType? = .None, produced: NSOperation? = .None) {
+    init(delay: Double = 0.0001, error: ErrorType? = .None, produced: NSOperation? = .None) {
         numberOfSeconds = delay
         simulatedError = error
         producedOperation = produced
