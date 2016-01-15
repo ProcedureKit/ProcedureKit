@@ -1301,6 +1301,102 @@ class CloudKitOperationDiscoverAllContractsTests: CKTests {
         XCTAssertTrue(operation.finished)
         XCTAssertEqual(operation.errors.count, 1)
     }
+
+    func test__error_which_retries_using_retry_after_key() {
+        var shouldError = true
+        operation = CloudKitOperation(reachability: reachability) {
+            let op = TestDiscoverAllContactsOperation(result: [])
+            if shouldError {
+                let userInfo = [CKErrorRetryAfterKey: NSNumber(double: 1.0)]
+                op.error = NSError(
+                    domain: CKErrorDomain,
+                    code: CKErrorCode.ServiceUnavailable.rawValue,
+                    userInfo: userInfo
+                )
+                shouldError = false
+            }
+            return op
+        }
+        operation.setDiscoverAllContactsCompletionBlock { _ in }
+
+        waitForOperation(operation)
+
+        XCTAssertTrue(operation.finished)
+        XCTAssertEqual(operation.errors.count, 1)
+    }
+
+    func test__error_which_retries_without_retry_after_key() {
+        var shouldError = true
+        operation = CloudKitOperation(reachability: reachability) {
+            let op = TestDiscoverAllContactsOperation(result: [])
+            if shouldError {
+                op.error = NSError(
+                    domain: CKErrorDomain,
+                    code: CKErrorCode.ZoneBusy.rawValue,
+                    userInfo: nil
+                )
+                shouldError = false
+            }
+            return op
+        }
+        operation.setDiscoverAllContactsCompletionBlock { _ in }
+
+        waitForOperation(operation)
+
+        XCTAssertTrue(operation.finished)
+        XCTAssertEqual(operation.errors.count, 1)
+    }
+
+    func test__error_which_retries_with_custom_handler() {
+
+        var shouldError = true
+        operation = CloudKitOperation(reachability: reachability) {
+            let op = TestDiscoverAllContactsOperation(result: [])
+            if shouldError {
+                op.error = NSError(
+                    domain: CKErrorDomain,
+                    code: CKErrorCode.LimitExceeded.rawValue,
+                    userInfo: nil
+                )
+                shouldError = false
+            }
+            return op
+        }
+
+        var didRunCustomHandler = false
+        operation.setErrorHandlerForCode(.LimitExceeded) { error, log, suggested in
+            didRunCustomHandler = true
+            return suggested
+        }
+
+        operation.setDiscoverAllContactsCompletionBlock { _ in }
+
+        waitForOperation(operation)
+
+        XCTAssertTrue(operation.finished)
+        XCTAssertEqual(operation.errors.count, 1)
+        XCTAssertTrue(didRunCustomHandler)
+    }
+
+    func test__error_which_is_not_cloud_kit_error() {
+        operation = CloudKitOperation(reachability: reachability) {
+            let op = TestDiscoverAllContactsOperation(result: [])
+            op.error = NSError(
+                domain: CNErrorDomain,
+                code: CNErrorCode.RecordDoesNotExist.rawValue,
+                userInfo: nil
+            )
+            return op
+        }
+
+        operation.setDiscoverAllContactsCompletionBlock { _ in }
+
+        waitForOperation(operation)
+
+        XCTAssertTrue(operation.finished)
+        XCTAssertEqual(operation.errors.count, 1)
+    }
+
 }
 
 class CloudKitOperationDiscoverUserInfosOperationTests: CKTests {
@@ -2282,7 +2378,6 @@ class CloudKitRecoveryTests: CKTests {
 
         XCTAssertEqual(code, CKErrorCode.MissingEntitlement)
     }
-
 }
 
 

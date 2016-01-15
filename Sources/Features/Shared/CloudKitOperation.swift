@@ -208,8 +208,6 @@ public class CloudKitRecovery<T where T: NSOperation, T: CKOperationType> {
 
         guard let (code, error) = cloudKitErrorsFromInfo(info) else { return .None }
 
-        info.log.verbose("Will attempt recovery from error: \(error)")
-
         // We take the payload, if not nil, and return the delay, and configuration block
         let suggestion: ErrorResponse = (payload.0, info.configure )
         var response: ErrorResponse? = .None
