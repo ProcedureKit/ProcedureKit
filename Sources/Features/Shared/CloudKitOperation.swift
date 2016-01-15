@@ -228,12 +228,23 @@ public class CloudKitRecovery<T where T: NSOperation, T: CKOperationType> {
     }
 
     func addDefaultHandlers() {
-        let logNoResponse: Handler = { error, log, _ in
-            log.warning("Will not handle error: \(error)")
+
+        let exit: Handler = { error, log, _ in
+            log.fatal("Exiting due to CloudKit Error: \(error)")
             return .None
         }
 
-        setDefaultHandlerForCode(.InternalError, handler: logNoResponse)
+        setDefaultHandlerForCode(.InternalError, handler: exit)
+        setDefaultHandlerForCode(.MissingEntitlement, handler: exit)
+        setDefaultHandlerForCode(.InvalidArguments, handler: exit)
+        setDefaultHandlerForCode(.ServerRejectedRequest, handler: exit)
+        setDefaultHandlerForCode(.AssetFileNotFound, handler: exit)
+        setDefaultHandlerForCode(.IncompatibleVersion, handler: exit)
+        setDefaultHandlerForCode(.ConstraintViolation, handler: exit)
+        setDefaultHandlerForCode(.BadDatabase, handler: exit)
+        setDefaultHandlerForCode(.QuotaExceeded, handler: exit)
+        setDefaultHandlerForCode(.OperationCancelled, handler: exit)
+
     }
 
     func setDefaultHandlerForCode(code: CKErrorCode, handler: Handler) {
