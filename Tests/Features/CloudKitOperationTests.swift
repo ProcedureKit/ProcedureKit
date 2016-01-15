@@ -2114,7 +2114,7 @@ class CloudKitOperationQueryTests: CKTests {
     }
 }
 
-
+// MARK: - BatchedCloudKitOperation Test Cases
 
 class BatchedFetchNotificationChangesOperationTests: CKTests {
 
@@ -2228,6 +2228,66 @@ class BatchedFetchRecordChangesOperationTests: CKTests {
         XCTAssertEqual(count, 3)
     }
 }
+
+// MARK: - Cloud Kit Error Recovery Test Cases
+
+class CloudKitRecoveryTests: XCTestCase {
+
+    var operation: OPRCKOperation<CKDiscoverUserInfosOperation>!
+    var recovery: CloudKitRecovery<CKDiscoverUserInfosOperation>!
+
+    override func setUp() {
+        super.setUp()
+        operation = OPRCKOperation(operation: CKDiscoverUserInfosOperation(emailAddresses: .None, userRecordIDs: .None))
+        recovery = CloudKitRecovery()
+    }
+
+    func createInfoWithErrors(errors: [ErrorType]) -> RetryFailureInfo<OPRCKOperation<CKDiscoverUserInfosOperation>> {
+        return RetryFailureInfo(
+            operation: operation,
+            errors: errors,
+            aggregateErrors: [],
+            count: 0,
+            addOperations: { operations in }
+        )
+    }
+
+    func test__extract_cloud_kit_errors__with_single_cloud_kit_error() {
+        let errors: [ErrorType] = [
+            NSError(domain: CKErrorDomain, code: CKErrorCode.NotAuthenticated.rawValue, userInfo: nil)
+        ]
+        let info = createInfoWithErrors(errors)
+        let errorsByCode = recovery.cloudKitErrorsFromInfo(info)
+
+        XCTAssertEqual(errorsByCode.count, 1)
+        XCTAssertNotNil(errorsByCode[.NotAuthenticated])
+    }
+
+    func test__extract_cloud_kit_errors__with_mixture_cloud_kit_errors() {
+        let errors: [ErrorType] = [
+            NSError(domain: CKErrorDomain, code: CKErrorCode.NotAuthenticated.rawValue, userInfo: nil),
+            // This is actually a Contacts error code
+            NSError(domain: CNErrorDomain, code: CNErrorCode.RecordDoesNotExist.rawValue, userInfo: nil),
+            NSError(domain: CKErrorDomain, code: CKErrorCode.MissingEntitlement.rawValue, userInfo: nil)
+        ]
+
+        let info = createInfoWithErrors(errors)
+        let errorsByCode = recovery.cloudKitErrorsFromInfo(info)
+
+        XCTAssertEqual(errorsByCode.count, 2)
+        XCTAssertNotNil(errorsByCode[.NotAuthenticated])
+        XCTAssertNotNil(errorsByCode[.MissingEntitlement])
+    }
+
+}
+
+
+
+
+
+
+
+
 
 
 

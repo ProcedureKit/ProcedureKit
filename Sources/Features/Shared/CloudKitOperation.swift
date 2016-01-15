@@ -227,6 +227,16 @@ public class CloudKitRecovery<T where T: NSOperation, T: CKOperationType> {
     func setCustomHandlerForCode(code: CKErrorCode, handler: Handler) {
         customHandlers.updateValue(handler, forKey: code)
     }
+
+    internal func cloudKitErrorsFromInfo(info: RetryFailureInfo<OPRCKOperation<T>>) -> [CKErrorCode: NSError] {
+        return info.errors.reduce([:]) { (var errors, error) in
+            let error = error as NSError
+            if error.domain == CKErrorDomain, let code = CKErrorCode(rawValue: error.code) {
+                errors.updateValue(error, forKey: code)
+            }
+            return errors
+        }
+    }
 }
 
 // MARK: - CloudKitOperation
