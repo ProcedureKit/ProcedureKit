@@ -284,7 +284,7 @@ public class RepeatedOperation<T where T: NSOperation>: GroupOperation {
     /// - return: the count of operations that have executed.
     public internal(set) var count: Int = 1
 
-    private var configure: T -> Void = { _ in }
+    internal private(set) var configure: T -> Void = { _ in }
 
     /**
      The designated initializer.
