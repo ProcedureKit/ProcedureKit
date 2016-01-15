@@ -311,6 +311,10 @@ public class BatchedCloudKitOperation<T where T: NSOperation, T: CKBatchedOperat
         self.init(generator: anyGenerator(body), enableBatchProcessing: enable, connectivity: .AnyConnectionKind, reachability: Reachability.sharedInstance)
     }
 
+    convenience init(enableBatchProcessing enable: Bool = true, connectivity: Reachability.Connectivity = .AnyConnectionKind, reachability: SystemReachabilityType, _ body: () -> T?) {
+        self.init(generator: anyGenerator(body), enableBatchProcessing: enable, connectivity: connectivity, reachability: reachability)
+    }
+
     init<G where G: GeneratorType, G.Element == T>(generator gen: G, enableBatchProcessing enable: Bool = true, connectivity: Reachability.Connectivity = .AnyConnectionKind, reachability: SystemReachabilityType) {
         enableBatchProcessing = enable
         generator = CloudKitOperationGenerator(generator: gen, connectivity: connectivity, reachability: reachability)

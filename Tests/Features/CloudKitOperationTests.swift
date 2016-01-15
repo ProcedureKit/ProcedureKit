@@ -2116,10 +2116,7 @@ class CloudKitOperationQueryTests: CKTests {
 
 
 
-
-/*
-
-class BatchedFetchNotificationChangesOperationTests: CloudKitOperationTests {
+class BatchedFetchNotificationChangesOperationTests: CKTests {
 
     typealias Target = TestFetchNotificationChangesOperation
 
@@ -2127,7 +2124,7 @@ class BatchedFetchNotificationChangesOperationTests: CloudKitOperationTests {
     var error: NSError?
     var numberOfBatches: Int = 3
     var count: Int = 0
-    var operation: BatchedOPRCKOperation<Target>!
+    var operation: BatchedCloudKitOperation<Target>!
 
     override func setUp() {
         super.setUp()
@@ -2135,10 +2132,10 @@ class BatchedFetchNotificationChangesOperationTests: CloudKitOperationTests {
         error = .None
         numberOfBatches = 3
         count = 0
-        operation = BatchedCloudKitOperation(reachability: reachability, operation: createNextOperation)
+        operation = BatchedCloudKitOperation(reachability: reachability, createNextOperation)
     }
     
-    func createNextOperation() -> Target {
+    func createNextOperation() -> Target? {
         let target = Target(token: token, error: error)
         target.changedNotifications = [ "hello", "world" ]
         if count < numberOfBatches - 1 {
@@ -2170,27 +2167,26 @@ class BatchedFetchNotificationChangesOperationTests: CloudKitOperationTests {
         }
 
         waitForOperation(operation)
-        XCTAssertTrue(operation.finished)
-        XCTAssertEqual(operation.errors.count, 0)
 
+        XCTAssertEqual(operation.errors.count, 0)
         XCTAssertEqual(count, 3)
         XCTAssertEqual(notifications, [ "hello", "world", "hello", "world", "hello", "world" ])
     }
 }
 
-class BatchedFetchRecordChangesOperationTests: CloudKitOperationTests {
+class BatchedFetchRecordChangesOperationTests: CKTests {
 
     typealias Target = TestFetchRecordChangesOperation
 
     var numberOfBatches: Int = 3
     var count: Int = 0
-    var operation: BatchedOPRCKOperation<Target>!
+    var operation: BatchedCloudKitOperation<Target>!
 
     override func setUp() {
         super.setUp()
         numberOfBatches = 3
         count = 0
-        operation = BatchedCloudKitOperation(reachability: reachability, operation: createNextOperation)
+        operation = BatchedCloudKitOperation(reachability: reachability, createNextOperation)
     }
 
     func createNextOperation() -> Target {
@@ -2227,15 +2223,11 @@ class BatchedFetchRecordChangesOperationTests: CloudKitOperationTests {
         }
 
         waitForOperation(operation)
-        XCTAssertTrue(operation.finished)
         XCTAssertEqual(operation.errors.count, 0)
 
         XCTAssertEqual(count, 3)
     }
 }
-
-*/
-
 
 
 
