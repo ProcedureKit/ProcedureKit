@@ -88,7 +88,7 @@ struct FiniteGenerator<G: GeneratorType>: GeneratorType {
     }
 }
 
-struct GeneratorMap<G: GeneratorType, T>: GeneratorType {
+struct MapGenerator<G: GeneratorType, T>: GeneratorType {
     private let transform: G.Element -> T
     private var generator: G
 
@@ -212,7 +212,6 @@ struct IntervalGenerator: GeneratorType {
     }
 }
 
-
 /**
 
  ### RepeatedOperation
@@ -275,14 +274,17 @@ struct IntervalGenerator: GeneratorType {
 
 */
 public class RepeatedOperation<T where T: NSOperation>: GroupOperation {
+    public typealias Payload = (Delay?, T)
 
-    private var generator: AnyGenerator<(Delay?, T)>
+    private var generator: AnyGenerator<Payload>
 
     /// - returns: the current operation being executed.
     public internal(set) var current: T
 
     /// - return: the count of operations that have executed.
     public internal(set) var count: Int = 1
+
+    internal private(set) var configure: T -> Void = { _ in }
 
     /**
      The designated initializer.
@@ -291,7 +293,7 @@ public class RepeatedOperation<T where T: NSOperation>: GroupOperation {
      the maximum number of operations which will be executed.
      - parameter generator: the AnyGenerator<(Delay?, T)> generator.
     */
-    public init(maxCount max: Int? = .None, generator gen: AnyGenerator<(Delay?, T)>) {
+    public init(maxCount max: Int? = .None, generator gen: AnyGenerator<Payload>) {
 
         guard let (_, operation) = gen.next() else {
             preconditionFailure("Operation Generator must return an instance initially.")
@@ -307,7 +309,7 @@ public class RepeatedOperation<T where T: NSOperation>: GroupOperation {
             generator = gen
         }
 
-        super.init(operations: [operation])
+        super.init(operations: [])
         name = "Repeated Operation"
     }
 
@@ -356,7 +358,14 @@ public class RepeatedOperation<T where T: NSOperation>: GroupOperation {
      - parameter generator: a generic generator which has an Element equal to T.
      */
     public convenience init<G where G: GeneratorType, G.Element == T>(maxCount max: Int? = .None, strategy: WaitStrategy = .Fixed(0.1), generator: G) {
-        self.init(maxCount: max, delay: GeneratorMap(strategy.generator()) { Delay.By($0) }, generator: generator)
+        self.init(maxCount: max, delay: MapGenerator(strategy.generator()) { Delay.By($0) }, generator: generator)
+    }
+
+    /// Public override of execute which configures and adds the first operation
+    public override func execute() {
+        configure(current)
+        addOperation(current)
+        super.execute()
     }
 
     /**
@@ -397,6 +406,7 @@ public class RepeatedOperation<T where T: NSOperation>: GroupOperation {
     public func addNextOperation(@autoclosure shouldAddNext: () -> Bool = true) {
         if let (delay, op) = next() {
             if shouldAddNext() {
+                configure(op)
                 if let delay = delay.map({ DelayOperation(delay: $0) }) {
                     op.addDependency(delay)
                     addOperations(delay, op)
@@ -415,8 +425,26 @@ public class RepeatedOperation<T where T: NSOperation>: GroupOperation {
      allow subclasses to override and configure the operation
      further before it is added.
     */
-    public func next() -> (Delay?, T)? {
+    public func next() -> Payload? {
         return generator.next()
+    }
+
+    /**
+     Appends a configuration block to the current block. This
+     can be used to configure every instance of the operation
+     before it is added to the queue.
+     
+     Note that configuration block are executed in FIFO order,
+     so it is possible to overwrite previous configurations.
+     
+     - parameter block: a block which receives an instance of T
+    */
+    public func addConfigureBlock(block: T -> Void) {
+        let config = configure
+        configure = { op in
+            config(op)
+            block(op)
+        }
     }
 }
 

@@ -13,7 +13,7 @@ class TestableSystemReachability: SystemReachabilityType {
 
     var error: ErrorType? = .None
     var observers = Array<Reachability.ObserverBlockType>()
-    var status: Reachability.NetworkStatus = .NotReachable {
+    var status: Reachability.NetworkStatus {
         didSet {
             observers.forEach { $0(self.status) }
         }

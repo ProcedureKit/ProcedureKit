@@ -31,6 +31,7 @@ public class ComposedOperation<T: NSOperation>: Operation, OperationDidFinishObs
     }
 
     public override func execute() {
+        target.log.severity = log.severity
         produceOperation(target)
     }
 

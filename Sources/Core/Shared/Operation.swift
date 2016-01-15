@@ -451,7 +451,7 @@ public class Operation: NSOperation {
      */
     public func cancelWithErrors(errors: [ErrorType] = []) {
         if !errors.isEmpty {
-            log.warning("Did cancel with errors: \(errors).")
+            log.verbose("Did cancel with errors: \(errors).")
         }
         _internalErrors += errors
         cancel()
@@ -508,7 +508,7 @@ public class Operation: NSOperation {
                 log.verbose("Did finish with no errors.")
             }
             else {
-                log.warning("Did finish with errors: \(errors).")
+                log.verbose("Did finish with errors: \(errors).")
             }
 
             didFinishObservers.forEach { $0.operationDidFinish(self, errors: self._internalErrors) }

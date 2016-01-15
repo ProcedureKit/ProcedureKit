@@ -39,24 +39,35 @@ public struct RetryFailureInfo<T: NSOperation> {
      - returns: a block which accects var arg NSOperation instances.
     */
     public let addOperations: (NSOperation...) -> Void
+
+    /// - returns: the `RetryOperation`'s log property.
+    public let log: LoggerType
+
+    /** 
+    - returns: the block which is used to configure
+        operation instances before they are added to
+        the queue
+    */
+    public let configure: T -> Void
 }
 
 class RetryGenerator<T: NSOperation>: GeneratorType {
+    typealias Payload = RetryOperation<T>.Payload
     typealias Handler = RetryOperation<T>.Handler
 
     internal let retry: Handler
     internal var info: RetryFailureInfo<T>? = .None
     private var generator: AnyGenerator<(Delay?, T)>
 
-    init(generator: AnyGenerator<(Delay?, T)>, retry: Handler) {
+    init(generator: AnyGenerator<Payload>, retry: Handler) {
         self.generator = generator
         self.retry = retry
     }
 
-    func next() -> (Delay?, T)? {
-        guard let (delay, next) = generator.next() else { return nil }
-        guard let info = info else { return (delay, next) }
-        return retry(info, delay, next)
+    func next() -> Payload? {
+        guard let payload = generator.next() else { return nil }
+        guard let info = info else { return payload }
+        return retry(info, payload)
     }
 }
 
@@ -76,12 +87,12 @@ class RetryGenerator<T: NSOperation>: GeneratorType {
 */
 public class RetryOperation<T: NSOperation>: RepeatedOperation<T> {
     public typealias FailureInfo = RetryFailureInfo<T>
-    public typealias Handler = (RetryFailureInfo<T>, Delay?, T) -> (Delay?, T)?
+    public typealias Handler = (RetryFailureInfo<T>, Payload) -> Payload?
 
     let retry: RetryGenerator<T>
 
     /**
-     The designated initializer
+     A designated initializer
      
      Creates an operation which will retry executing operations in the face
      of errors.
@@ -93,14 +104,14 @@ public class RetryOperation<T: NSOperation>: RepeatedOperation<T> {
      adjust the next delay and Operation.
 
     */
-    public init(maxCount max: Int?, generator: AnyGenerator<(Delay?, T)>, retry block: Handler) {
+    public init(maxCount max: Int? = .None, generator: AnyGenerator<Payload>, retry block: Handler) {
         retry = RetryGenerator(generator: generator, retry: block)
         super.init(maxCount: max, generator: anyGenerator(retry))
         name = "Retry Operation"
     }
 
     /**
-     A convenience initializer, which accepts two generators, one for the delay and another for
+     A designated initializer, which accepts two generators, one for the delay and another for
      the operation, in addition to a retry handler block
 
      - parameter maxCount: an optional Int, which defaults to .None. If not nil, this is
@@ -111,9 +122,11 @@ public class RetryOperation<T: NSOperation>: RepeatedOperation<T> {
      adjust the next delay and Operation.
 
      */
-    public convenience init<D, G where D: GeneratorType, D.Element == Delay, G: GeneratorType, G.Element == T>(maxCount max: Int?, delay: D, generator: G, retry: Handler) {
+    public init<D, G where D: GeneratorType, D.Element == Delay, G: GeneratorType, G.Element == T>(maxCount max: Int? = .None, delay: D, generator: G, retry block: Handler) {
         let tuple = TupleGenerator(primary: generator, secondary: delay)
-        self.init(maxCount: max, generator: anyGenerator(tuple), retry: retry)
+        retry = RetryGenerator(generator: anyGenerator(tuple), retry: block)
+        super.init(maxCount: max, generator: anyGenerator(retry))
+        name = "Retry Operation"
     }
 
     /**
@@ -149,12 +162,15 @@ public class RetryOperation<T: NSOperation>: RepeatedOperation<T> {
      operation regardless of error info.
 
      */
-    public convenience init<G where G: GeneratorType, G.Element == T>(maxCount max: Int? = 5, strategy: WaitStrategy = .Fixed(0.1), _ generator: G, retry: Handler = { ($1, $2) }) {
-        self.init(maxCount: max, delay: GeneratorMap(strategy.generator()) { Delay.By($0) }, generator: generator, retry: retry)
+    public convenience init<G where G: GeneratorType, G.Element == T>(maxCount max: Int? = 5, strategy: WaitStrategy = .Fixed(0.1), _ generator: G, retry: Handler = { $1 }) {
+        self.init(maxCount: max, delay: MapGenerator(strategy.generator()) { Delay.By($0) }, generator: generator, retry: retry)
     }
 
     public override func operationDidFinish(operation: NSOperation, withErrors errors: [ErrorType]) {
-        if !errors.isEmpty, let op = operation as? T {
+        if errors.isEmpty {
+            retry.info = .None
+        }
+        else if let op = operation as? T {
             retry.info = createFailureInfo(op, errors: errors)
             addNextOperation()
         }
@@ -166,7 +182,9 @@ public class RetryOperation<T: NSOperation>: RepeatedOperation<T> {
             errors: errors,
             aggregateErrors: aggregateErrors,
             count: count,
-            addOperations: addOperations
+            addOperations: addOperations,
+            log: log,
+            configure: configure
         )
     }
 }
