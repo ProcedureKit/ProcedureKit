@@ -108,7 +108,7 @@ public class GroupOperation: Operation {
      - parameter error: an ErrorType to append.
     */
     public final func aggregateError(error: ErrorType) {
-        log.warning("Aggregating error: \(error)")
+        log.verbose("Aggregated error: \(error)")
         aggregateErrors.append(error)
     }
 
