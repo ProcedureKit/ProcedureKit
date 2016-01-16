@@ -12,16 +12,28 @@ import Operations
 
 class ViewController: UIViewController {
 
+    let queue = OperationQueue()
+
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
-    }
 
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
-    }
+        // Fetch (all) Record Zones CloudKit Operation
+        let operation = CloudKitOperation { CKFetchRecordZonesOperation.fetchAllRecordZonesOperation() }
 
+        // Add an authorized condition
+        operation.addCondition(AuthorizedFor(Capability.Cloud()))
+
+        // Configure the container & database
+        let container = CKContainer.defaultContainer()
+        operation.container = container
+        operation.database = container.privateCloudDatabase
+
+        operation.setFetchRecordZonesCompletionBlock { zonesByID in
+            print("zones: \(zonesByID)")
+        }
+
+        queue.addOperation(operation)
+    }
 
 }
 
