@@ -13,27 +13,56 @@ import Operations
 class ViewController: UIViewController {
 
     let queue = OperationQueue()
+    let container = CKContainer.defaultContainer()
 
-    override func viewDidLoad() {
-        super.viewDidLoad()
+    override func viewDidAppear(animated: Bool) {
+        super.viewDidAppear(animated)
+
+        let zones = fetchZones()
+        let records = fetchRecords()
+        records.addDependency(zones)
+        queue.addOperations(zones, records)
+    }
+
+    func fetchZones() -> Operation {
 
         // Fetch (all) Record Zones CloudKit Operation
         let operation = CloudKitOperation { CKFetchRecordZonesOperation.fetchAllRecordZonesOperation() }
 
-        // Add an authorized condition
-        operation.addCondition(AuthorizedFor(Capability.Cloud()))
-
         // Configure the container & database
-        let container = CKContainer.defaultContainer()
         operation.container = container
         operation.database = container.privateCloudDatabase
 
         operation.setFetchRecordZonesCompletionBlock { zonesByID in
-            print("zones: \(zonesByID)")
+            if let zonesByID = zonesByID {
+                for (zoneID, zone) in zonesByID {
+                    print("id: \(zoneID), zone: \(zone)")
+                }
+            }
         }
 
-        queue.addOperation(operation)
+        return operation
     }
 
+    func fetchRecords() -> Operation {
+
+        // Discover all contacts operation
+        let operation = CloudKitOperation { CKFetchRecordsOperation.fetchCurrentUserRecordOperation() }
+
+        // Configure the container & database
+        operation.container = container
+        operation.database = container.privateCloudDatabase
+
+        operation.setFetchRecordsCompletionBlock { recordsByID in
+            print("records by id: \(recordsByID)")
+        }
+
+        return operation
+    }
 }
+
+
+
+
+
 
