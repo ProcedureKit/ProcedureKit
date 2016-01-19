@@ -33,12 +33,15 @@ public struct Reachability {
     /// The ObserverBlockType
     public typealias ObserverBlockType = NetworkStatus -> Void
 
+    typealias ReachabilityDidChange = SCNetworkReachabilityFlags -> Void
+
     struct Observer {
         let reachabilityDidChange: ObserverBlockType
     }
 }
 
 protocol SystemReachabilityType {
+    func observe(observer: Reachability.ObserverBlockType)
     func addObserver(observer: Reachability.ObserverBlockType) throws -> String
     func removeObserverWithToken(token: String)
 }
@@ -56,7 +59,7 @@ protocol NetworkReachabilityType {
 
     weak var delegate: NetworkReachabilityDelegate? { get set }
 
-    func startNotifierOnQueue(queue: dispatch_queue_t) throws -> Bool
+    func startNotifierOnQueue(queue: dispatch_queue_t, didChange: Reachability.ReachabilityDidChange) throws -> Bool
 
     func stopNotifier()
 
@@ -82,7 +85,9 @@ final class ReachabilityManager<NetworkReachability: NetworkReachabilityType>: N
 
     func didAddObserver(observer: Reachability.Observer) throws {
         if !isRunning {
-            isRunning = try network.startNotifierOnQueue(queue)
+            isRunning = try network.startNotifierOnQueue(queue) { flags in
+                observer.reachabilityDidChange(NetworkStatus(flags: flags))
+            }
         }
     }
 
@@ -94,6 +99,7 @@ final class ReachabilityManager<NetworkReachability: NetworkReachabilityType>: N
     }
 
     func reachabilityDidChange(flags: SCNetworkReachabilityFlags) {
+
         if let previous = previousReachabilityFlags {
             if previous != flags {
                 updateObservers(flags)
@@ -116,6 +122,10 @@ final class ReachabilityManager<NetworkReachability: NetworkReachabilityType>: N
 }
 
 extension ReachabilityManager: SystemReachabilityType {
+
+    func observe(observer: Reachability.ObserverBlockType) {
+
+    }
 
     func addObserver(observer: Reachability.ObserverBlockType) throws -> String {
         return try addObserverWithToken(NSUUID().UUIDString, observer: observer)
@@ -191,7 +201,9 @@ class DeviceReachability: NetworkReachabilityType {
 
     func defaultRouteReachability() throws -> SCNetworkReachability {
 
-        if let reachability = __defaultRouteReachability { return reachability }
+        if let reachability = __defaultRouteReachability {
+            return reachability
+        }
 
         var zeroAddress = sockaddr_in()
         zeroAddress.sin_len = UInt8(sizeofValue(zeroAddress))
@@ -202,7 +214,6 @@ class DeviceReachability: NetworkReachabilityType {
         }) else { throw Error.FailedToCreateDefaultRouteReachability }
 
         __defaultRouteReachability = reachability
-
         return reachability
     }
 
@@ -223,14 +234,14 @@ class DeviceReachability: NetworkReachabilityType {
         delegate?.reachabilityDidChange(flags)
     }
 
-    func check(reachability: SCNetworkReachability, queue: dispatch_queue_t) {
+    func check(reachability: SCNetworkReachability, queue: dispatch_queue_t, didChange: Reachability.ReachabilityDidChange) {
         dispatch_async(queue) {
             let flags = self.getFlagsForReachability(reachability)
-            self.reachabilityDidChange(flags)
+            didChange(flags)
         }
     }
 
-    func startNotifierOnQueue(queue: dispatch_queue_t) throws -> Bool {
+    func startNotifierOnQueue(queue: dispatch_queue_t, didChange: Reachability.ReachabilityDidChange) throws -> Bool {
         assert(delegate != nil, "Reachability Delegate not set.")
 
         let reachability = try defaultRouteReachability()
@@ -246,7 +257,7 @@ class DeviceReachability: NetworkReachabilityType {
             throw Error.FailedToScheduleNotifier
         }
 
-        check(reachability, queue: queue)
+        check(reachability, queue: queue, didChange: didChange)
 
         return true
     }
