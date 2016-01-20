@@ -163,9 +163,9 @@ extension TestableNetworkReachability: NetworkReachabilityType {
         return _defaultRouteReachability
     }
 
-    func startNotifierOnQueue(queue: dispatch_queue_t) throws -> Bool {
+    func startNotifierOnQueue(queue: dispatch_queue_t, didChange: Operations.Reachability.ReachabilityDidChange) throws -> Bool {
         didStartNotifier = true
-        delegate?.reachabilityDidChange(flags)
+        didChange(flags)
         return true
     }
 
