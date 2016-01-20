@@ -41,7 +41,6 @@ public struct Reachability {
 }
 
 protocol SystemReachabilityType {
-    func observe(observer: Reachability.ObserverBlockType)
     func addObserver(observer: Reachability.ObserverBlockType) throws -> String
     func removeObserverWithToken(token: String)
 }
