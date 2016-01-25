@@ -48,11 +48,13 @@ public class ReachabilityCondition: OperationCondition {
                 completion(.Failed(Error.NotReachable))
             case (.AnyConnectionKind, _), (.ViaWWAN, _):
                 completion(.Satisfied)
+                return false
             case (.ViaWiFi, .Reachable(.ViaWWAN)):
                 completion(.Failed(Error.NotReachableWithConnectivity(self.connectivity)))
             default:
                 completion(.Failed(Error.NotReachable))
             }
+            return true
         }
     }
 }

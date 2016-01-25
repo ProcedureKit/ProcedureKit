@@ -49,11 +49,12 @@ public class ReachableOperation<T: NSOperation>: ComposedOperation<T> {
             let _execute = super.execute
             self.token = try reachability.addObserver { [weak self] status in
                 if let weakSelf = self {
-                    if weakSelf.checkStatus(status), let token = weakSelf.token {
-                        weakSelf.reachability.removeObserverWithToken(token)
+                    if weakSelf.checkStatus(status) {
                         _execute()
+                        return false
                     }
                 }
+                return true
             }
         }
         catch {

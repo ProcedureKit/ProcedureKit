@@ -31,7 +31,7 @@ public struct Reachability {
     }
 
     /// The ObserverBlockType
-    public typealias ObserverBlockType = NetworkStatus -> Void
+    public typealias ObserverBlockType = NetworkStatus -> Bool
 
     typealias ReachabilityDidChange = SCNetworkReachabilityFlags -> Void
 
@@ -64,8 +64,6 @@ protocol NetworkReachabilityType {
 
     func reachabilityFlagsForHostname(host: String) -> SCNetworkReachabilityFlags?
 }
-
-
 
 final class ReachabilityManager<NetworkReachability: NetworkReachabilityType>: NetworkReachabilityDelegate {
 
@@ -112,19 +110,22 @@ final class ReachabilityManager<NetworkReachability: NetworkReachabilityType>: N
 
     func updateObservers(flags: SCNetworkReachabilityFlags) {
         let networkStatus = NetworkStatus(flags: flags)
-        dispatch_async(Queue.Main.queue) { [observers = observersByID] in
-            for (_, observer) in observers {
-                observer.reachabilityDidChange(networkStatus)
+        dispatch_async(Queue.Main.queue) { [weak self, observers = observersByID] in
+            var tokensToRemove: [String] = []
+            for (token, observer) in observers {
+                if !observer.reachabilityDidChange(networkStatus) {
+                    tokensToRemove.append(token)
+                }
+            }
+            
+            for token in tokensToRemove {
+                self?.removeObserverWithToken(token)
             }
         }
     }
 }
 
 extension ReachabilityManager: SystemReachabilityType {
-
-    func observe(observer: Reachability.ObserverBlockType) {
-
-    }
 
     func addObserver(observer: Reachability.ObserverBlockType) throws -> String {
         return try addObserverWithToken(NSUUID().UUIDString, observer: observer)
