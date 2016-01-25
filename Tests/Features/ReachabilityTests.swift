@@ -192,13 +192,13 @@ class ReachabilityManagerTests: XCTestCase {
     }
 
     func test__add_observer_new_observer_is_added() {
-        let token = try! manager.addObserver { _ in }
+        let token = try! manager.addObserver { _ in false }
         XCTAssertNotNil(manager.observersByID[token])
         XCTAssertTrue(network.didStartNotifier)
     }
 
     func test__remove_observer_observer_is_removed() {
-        let token = try! manager.addObserver { _ in }
+        let token = try! manager.addObserver { _ in false }
         manager.removeObserverWithToken(token)
         XCTAssertNil(manager.observersByID[token])
         XCTAssertTrue(network.didStopNotifier)
@@ -206,15 +206,15 @@ class ReachabilityManagerTests: XCTestCase {
     }
 
     func test__add_observer_starts_notifier() {
-        try! manager.addObserver { _ in }
+        try! manager.addObserver { _ in false }
         XCTAssertTrue(manager.isRunning)
     }
 
     func test__notifier_is_only_stopped_when_last_observer_is_removed() {
-        let token1 = try! manager.addObserver { _ in }
+        let token1 = try! manager.addObserver { _ in false }
         XCTAssertTrue(manager.isRunning)
         XCTAssertTrue(network.didStartNotifier)
-        let token2 = try! manager.addObserver { _ in }
+        let token2 = try! manager.addObserver { _ in false }
         manager.removeObserverWithToken(token1)
         XCTAssertFalse(network.didStopNotifier)
         manager.removeObserverWithToken(token2)
@@ -228,6 +228,7 @@ class ReachabilityManagerTests: XCTestCase {
         let _ = try! manager.addObserver { status in
             networkStatus = status
             expectation.fulfill()
+            return false
         }
 
         waitForExpectationsWithTimeout(3, handler: nil)
@@ -244,6 +245,7 @@ class ReachabilityManagerTests: XCTestCase {
         let _ = try! manager.addObserver { status in
             networkStatus = status
             expectation.fulfill()
+            return false
         }
 
         waitForExpectationsWithTimeout(3, handler: nil)
@@ -259,6 +261,7 @@ class ReachabilityManagerTests: XCTestCase {
         manager.reachabilityForURL(NSURL(string: "http://www.apple.com")!) { status in
             networkStatus = status
             expectation.fulfill()
+            return false
         }
 
         waitForExpectationsWithTimeout(3, handler: nil)
@@ -273,6 +276,7 @@ class ReachabilityManagerTests: XCTestCase {
         manager.reachabilityForURL(NSURL(string: "invalid-host")!) { status in
             networkStatus = status
             expectation.fulfill()
+            return false
         }
 
         waitForExpectationsWithTimeout(3, handler: nil)
