@@ -28,7 +28,7 @@ public class ReachabilityCondition: OperationCondition {
     let reachability: HostReachabilityType
 
     public convenience init(url: NSURL, connectivity: Reachability.Connectivity = .AnyConnectionKind) {
-        self.init(url: url, connectivity: connectivity, reachability: Reachability.sharedInstance)
+        self.init(url: url, connectivity: connectivity, reachability: ReachabilityManager(DeviceReachability()))
     }
 
     init(url: NSURL, connectivity: Reachability.Connectivity = .AnyConnectionKind, reachability: HostReachabilityType) {
@@ -44,17 +44,15 @@ public class ReachabilityCondition: OperationCondition {
     public func evaluateForOperation(operation: Operation, completion: OperationConditionResult -> Void) {
         reachability.reachabilityForURL(url) { status in
             switch (self.connectivity, status) {
-            case (_, .NotReachable):
-                completion(.Failed(Error.NotReachable))
-            case (.AnyConnectionKind, _), (.ViaWWAN, _):
+//            case (_, .NotReachable):
+//                completion(.Failed(Error.NotReachable))
+            case (.AnyConnectionKind, .Reachable(_)), (.ViaWWAN, .Reachable(_)):
                 completion(.Satisfied)
-                return false
             case (.ViaWiFi, .Reachable(.ViaWWAN)):
                 completion(.Failed(Error.NotReachableWithConnectivity(self.connectivity)))
             default:
                 completion(.Failed(Error.NotReachable))
             }
-            return true
         }
     }
 }

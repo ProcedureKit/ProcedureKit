@@ -318,7 +318,7 @@ class TestQueryOperation: TestDatabaseOperation, CKQueryOperationType {
 
 
 
-
+/*
 
 class CKTests: OperationTests {
 
@@ -2385,7 +2385,7 @@ class CloudKitRecoveryTests: CKTests {
 
 
 
-
+*/
 
 
 

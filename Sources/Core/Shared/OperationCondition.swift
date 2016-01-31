@@ -109,7 +109,6 @@ struct OperationConditionEvaluator {
     }
 }
 
-
 extension OperationConditionResult {
 
     var error: ErrorType? {

@@ -176,7 +176,7 @@ extension CKQueryOperation:                     CKQueryOperationType { }
 public class OPRCKOperation<T where T: NSOperation, T: CKOperationType>: ReachableOperation<T> {
 
     convenience init(operation op: T) {
-        self.init(operation: op, connectivity: .AnyConnectionKind, reachability: Reachability.sharedInstance)
+        self.init(operation: op, connectivity: .AnyConnectionKind, reachability: ReachabilityManager(DeviceReachability()))
     }
 
     override init(operation op: T, connectivity: Reachability.Connectivity = .AnyConnectionKind, reachability: SystemReachabilityType) {
@@ -287,7 +287,7 @@ public class CloudKitOperation<T where T: NSOperation, T: CKOperationType>: Retr
     }
 
     public convenience init(_ body: () -> T?) {
-        self.init(generator: anyGenerator(body), connectivity: .AnyConnectionKind, reachability: Reachability.sharedInstance)
+        self.init(generator: anyGenerator(body), connectivity: .AnyConnectionKind, reachability: ReachabilityManager(DeviceReachability()))
     }
 
     convenience init(connectivity: Reachability.Connectivity = .AnyConnectionKind, reachability: SystemReachabilityType, _ body: () -> T?) {
@@ -356,7 +356,7 @@ public class BatchedCloudKitOperation<T where T: NSOperation, T: CKBatchedOperat
     }
 
     public convenience init(enableBatchProcessing enable: Bool = true, _ body: () -> T?) {
-        self.init(generator: anyGenerator(body), enableBatchProcessing: enable, connectivity: .AnyConnectionKind, reachability: Reachability.sharedInstance)
+        self.init(generator: anyGenerator(body), enableBatchProcessing: enable, connectivity: .AnyConnectionKind, reachability: ReachabilityManager(DeviceReachability()))
     }
 
     convenience init(enableBatchProcessing enable: Bool = true, connectivity: Reachability.Connectivity = .AnyConnectionKind, reachability: SystemReachabilityType, _ body: () -> T?) {
@@ -382,11 +382,6 @@ public class BatchedCloudKitOperation<T where T: NSOperation, T: CKBatchedOperat
         super.operationDidFinish(operation, withErrors: errors)
     }
 }
-
-
-
-
-
 
 
 // MARK: - CKOperationType
