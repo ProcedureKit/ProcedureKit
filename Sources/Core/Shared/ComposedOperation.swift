@@ -22,6 +22,7 @@ public class ComposedOperation<T: NSOperation>: Operation, OperationDidFinishObs
         self.operation = op
         super.init()
         name = "Composed Operation"
+        target.name = "Composed <\(T.self)>"
         target.addObserver(self)
     }
 

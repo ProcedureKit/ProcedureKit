@@ -34,7 +34,7 @@ public class ReachableOperation<T: NSOperation>: ComposedOperation<T> {
      - parameter connectivity: a `Reachability.Connectivity` value, defaults to `.AnyConnectionKind`.
     */
     public convenience init(_ op: T, connectivity: Reachability.Connectivity = .AnyConnectionKind) {
-        self.init(operation: op, connectivity: connectivity, reachability: Reachability.sharedInstance)
+        self.init(operation: op, connectivity: connectivity, reachability: ReachabilityManager(DeviceReachability()))
     }
 
     init(operation op: T, connectivity: Reachability.Connectivity = .AnyConnectionKind, reachability: SystemReachabilityType) {
@@ -45,32 +45,7 @@ public class ReachableOperation<T: NSOperation>: ComposedOperation<T> {
     }
 
     public override func execute() {
-        do {
-            let _execute = super.execute
-            self.token = try reachability.addObserver { [weak self] status in
-                if let weakSelf = self, token = weakSelf.token {
-                    if weakSelf.checkStatus(status) {
-                        weakSelf.reachability.removeObserverWithToken(token)
-                        _execute()
-                    }
-                }
-            }
-        }
-        catch {
-            log.fatal("Reachability Error: \(error)")
-            finish(error)
-        }
-    }
-
-    internal func checkStatus(status: Reachability.NetworkStatus) -> Bool {
-        switch (connectivity, status) {
-        case (_, .NotReachable):
-            return false
-        case (.AnyConnectionKind, _), (.ViaWWAN, _), (.ViaWiFi, .Reachable(.ViaWiFi)):
-            return true
-        default:
-            return false
-        }
+        reachability.whenConnected(connectivity, block: super.execute)
     }
 }
 
