@@ -137,9 +137,7 @@ class DeviceReachability: NetworkReachabilityType {
 
     func defaultRouteReachability() throws -> SCNetworkReachability {
 
-        if let reachability = __defaultRouteReachability {
-            return reachability
-        }
+        if let reachability = __defaultRouteReachability { return reachability }
 
         var zeroAddress = sockaddr_in()
         zeroAddress.sin_len = UInt8(sizeofValue(zeroAddress))

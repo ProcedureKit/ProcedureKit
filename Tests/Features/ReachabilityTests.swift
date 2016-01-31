@@ -138,6 +138,16 @@ class NetworkStatusTests: XCTestCase {
         flags = [ .ConnectionRequired ]
         XCTAssertEqual(Reachability.NetworkStatus(flags: flags), Reachability.NetworkStatus.NotReachable)
     }
+
+    func test__not_reachable_is_not_connected() {
+        let status: Reachability.NetworkStatus = .NotReachable
+        XCTAssertFalse(status.isConnected(.AnyConnectionKind))
+    }
+
+    func test__reachable_via_wwan_is_not_connected_for_wifi() {
+        let status: Reachability.NetworkStatus = .Reachable(.ViaWWAN)
+        XCTAssertFalse(status.isConnected(.ViaWiFi))
+    }
 }
 
 class TestableNetworkReachability {
