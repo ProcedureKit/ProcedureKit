@@ -281,7 +281,42 @@ class HostReachabilityManagerTests: ReachabilityManagerTests {
     }
 }
 
+class DeviceReachabilityTests: XCTestCase, NetworkReachabilityDelegate {
 
+    let queue: dispatch_queue_t = Queue.Default.serial("me.danthorpe.Operation.Testing")
+    var device: DeviceReachability!
+    var expectation: XCTestExpectation? = .None
+    var delegateDidReceiveFlags: SCNetworkReachabilityFlags? = .None
+
+    override func setUp() {
+        super.setUp()
+        device = DeviceReachability()
+        device.delegate = self
+    }
+
+    func reachabilityDidChange(flags: SCNetworkReachabilityFlags) {
+        delegateDidReceiveFlags = flags
+        expectation?.fulfill()
+    }
+
+    func test__reachabilityForHost() {
+        XCTAssertNotNil(device.reachabilityForHost("https://apple.com"))
+    }
+
+    func test__reachabilityDidChange_informs_delegate() {
+        device.reachabilityDidChange(.Reachable)
+        XCTAssertEqual(delegateDidReceiveFlags ?? .ConnectionRequired, .Reachable)
+    }
+
+    func test__check() {
+        expectation = expectationWithDescription("Test: \(__FUNCTION__)")
+        if let reachability = device.reachabilityForHost("https://apple.com") {
+            device.check(reachability, queue: queue)
+        }
+        waitForExpectationsWithTimeout(3, handler: nil)
+        XCTAssertNotNil(delegateDidReceiveFlags)
+    }
+}
 
 
 
