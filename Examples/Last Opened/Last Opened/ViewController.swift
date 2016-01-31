@@ -29,6 +29,8 @@ class ViewController: UIViewController {
         // Fetch (all) Record Zones CloudKit Operation
         let operation = CloudKitOperation { CKFetchRecordZonesOperation.fetchAllRecordZonesOperation() }
 
+        operation.addCondition(AuthorizedFor(Capability.Cloud()))
+
         // Configure the container & database
         operation.container = container
         operation.database = container.privateCloudDatabase
@@ -36,7 +38,7 @@ class ViewController: UIViewController {
         operation.setFetchRecordZonesCompletionBlock { zonesByID in
             if let zonesByID = zonesByID {
                 for (zoneID, zone) in zonesByID {
-                    print("id: \(zoneID), zone: \(zone)")
+                    print("ID: \(zoneID), Zone: \(zone)")
                 }
             }
         }
@@ -49,12 +51,14 @@ class ViewController: UIViewController {
         // Discover all contacts operation
         let operation = CloudKitOperation { CKFetchRecordsOperation.fetchCurrentUserRecordOperation() }
 
+        operation.addCondition(AuthorizedFor(Capability.Cloud()))
+
         // Configure the container & database
         operation.container = container
         operation.database = container.privateCloudDatabase
 
         operation.setFetchRecordsCompletionBlock { recordsByID in
-            print("records by id: \(recordsByID)")
+            print("Records by id: \(recordsByID)")
         }
 
         return operation
