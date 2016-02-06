@@ -675,7 +675,7 @@ Note, that for the automatic error handling to kick in, the happy path must be s
  could be modified before being returned. Alternatively, return nil to not retry.
 
 */
-public class CloudKitOperation<T where T: NSOperation, T: CKOperationType>: RetryOperation<OPRCKOperation<T>> {
+public final class CloudKitOperation<T where T: NSOperation, T: CKOperationType>: RetryOperation<OPRCKOperation<T>> {
 
     public typealias ErrorHandler = CloudKitRecovery<T>.Handler
 
