@@ -585,6 +585,96 @@ public class CloudKitRecovery<T where T: NSOperation, T: CKOperationType> {
 
 // MARK: - CloudKitOperation
 
+/**
+ # CloudKitOperation
+
+ CloudKitOperation is a generic operation which can be used to configure and schedule
+ the execution of Apple's CKOperation subclasses.
+
+ ## Generics
+
+ CloudKitOperation is generi over the type of the CKOperation. See Apple's documentation
+ on their CloudKit NSOperation classes.
+
+ ## Initialization
+
+ CloudKitOperation is initialized with a block which should return an instance of the
+ required operation. Note that some CKOperation subclasses have static methods to
+ return standard instances. Given Swift's treatment of trailing closure arguments, this
+ means that the following is a pretty standard initialization:
+
+ ```swift
+ let operation = CloudKitOperation { CKFetchRecordZonesOperation.fetchAllRecordZonesOperation() }
+ ```
+
+ This works because, the initializer only takes a trailing closure. The closure receives no arguments 
+ and is only one line, so the return is not needed.
+
+ ## Configuration
+
+ Most CKOperation subclasses need various properties setting before they are added to a queue. Sometimes
+ these can be done via their initializers. However, it is also possible to set the properties directly.
+ This can be done directly onto the CloudKitOperation. For example, given the above:
+
+ ```swift
+ let container = CKContainer.defaultContainer()
+ operation.container = container
+ operation.database = container.privateCloudDatabase
+ ```
+
+ ## Completion
+
+ All CKOperation subclasses have a completion block which should be set. This completion block receives
+ the "results" of the operation, and an `NSError` argument. However, CloudKitOperation features its own
+ semi-automatic error handling system. Therefore, the only completion block needed is one which receives
+ the "results". Essentially, all that is needed is to manage the happy path of the operation. For all
+ CKOperation subclasses, this can be configured directly on the CloudKitOperation instance, using a 
+ pattern of `setOperationKindCompletionBlock { }`. For example, given the above:
+
+```swift
+ operation.setFetchRecordZonesCompletionBlock { zonesByID in
+    // Do something with the zonesByID
+ }
+```
+
+Note, that for the automatic error handling to kick in, the happy path must be set (as above).
+
+ ### Error Handling
+
+ When the completion block is set as above, any errors receives from the CKOperation subclass are 
+ intercepted, and instead of the provided block being executed, the operation finsihes with an error.
+
+ However, CloudKitOperation is a subclass of RetryOperation, which is actually a GroupOperation subclass, 
+ and when a child operation finishes with an error, RetryOperation will consult its error handler, and
+ attempt to retry the operation.
+
+ In the case of CloudKitOperation, the error handler has automatic support for many common error kinds.
+ When the CKOperation receives an error, the CKErrorCode is extrated, and the handler consults a 
+ CloudKitRecovery instance to check for a particular way to handle that error code. In some cases, this will
+ result in a tuple being returned. The tuple is an optional delay, and a new instance of the CKOperation class.
+
+ This is why the initializer takes a block which returns an instance of the CKOperation subclass.
+
+ The delay is used to automatically respect any wait periods returned in the CloudKit NSError object.
+
+ If the error recovery does not have a handler, or the handler returns nil (no tuple), the CloudKitOperation 
+ will finish (with the errors).
+
+ ### Custom Error Handling
+
+ To provide bespoke error handling, further configure the CloudKitOperation by calling setErrorHandlerForCode.
+ For example:
+
+ ```swift
+ operation.setErrorHandlerForCode(.PartialFailure) { error, log, suggested in
+    return suggested
+ }
+ ```
+
+ Note that the error handler receives, the received error, a logger object, and the suggested tuple, which
+ could be modified before being returned. Alternatively, return nil to not retry.
+
+*/
 public class CloudKitOperation<T where T: NSOperation, T: CKOperationType>: RetryOperation<OPRCKOperation<T>> {
 
     public typealias ErrorHandler = CloudKitRecovery<T>.Handler
