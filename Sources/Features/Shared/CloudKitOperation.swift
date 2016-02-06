@@ -593,7 +593,7 @@ public class CloudKitRecovery<T where T: NSOperation, T: CKOperationType> {
 
  ## Generics
 
- CloudKitOperation is generi over the type of the CKOperation. See Apple's documentation
+ CloudKitOperation is generic over the type of the CKOperation. See Apple's documentation
  on their CloudKit NSOperation classes.
 
  ## Initialization
@@ -601,7 +601,7 @@ public class CloudKitRecovery<T where T: NSOperation, T: CKOperationType> {
  CloudKitOperation is initialized with a block which should return an instance of the
  required operation. Note that some CKOperation subclasses have static methods to
  return standard instances. Given Swift's treatment of trailing closure arguments, this
- means that the following is a pretty standard initialization:
+ means that the following is a standard initialization pattern:
 
  ```swift
  let operation = CloudKitOperation { CKFetchRecordZonesOperation.fetchAllRecordZonesOperation() }
@@ -621,6 +621,9 @@ public class CloudKitRecovery<T where T: NSOperation, T: CKOperationType> {
  operation.container = container
  operation.database = container.privateCloudDatabase
  ```
+
+ This will set the container and the database through the CloudKitOperation into the wrapped CKOperation
+ instance.
 
  ## Completion
 
@@ -648,14 +651,18 @@ Note, that for the automatic error handling to kick in, the happy path must be s
  and when a child operation finishes with an error, RetryOperation will consult its error handler, and
  attempt to retry the operation.
 
- In the case of CloudKitOperation, the error handler has automatic support for many common error kinds.
- When the CKOperation receives an error, the CKErrorCode is extrated, and the handler consults a 
- CloudKitRecovery instance to check for a particular way to handle that error code. In some cases, this will
- result in a tuple being returned. The tuple is an optional delay, and a new instance of the CKOperation class.
+ In the case of CloudKitOperation, the error handler, which is configured internally has automatic 
+ support for many common error kinds. When the CKOperation receives an error, the CKErrorCode is extracted, 
+ and the handler consults a CloudKitRecovery instance to check for a particular way to handle that error 
+ code. In some cases, this will result in a tuple being returned. The tuple is an optional Delay, and
+ a new instance of the CKOperation class.
 
- This is why the initializer takes a block which returns an instance of the CKOperation subclass.
+ This is why the initializer takes a block which returns an instance of the CKOperation subclass, rather
+ than just an instance directly. In addition, any configuration set on the operation is captured and
+ applied again to new instances of the CKOperation subclass.
 
- The delay is used to automatically respect any wait periods returned in the CloudKit NSError object.
+ The delay is used to automatically respect any wait periods returned in the CloudKit NSError object. If
+ none are given, a random time delay between 0.1 and 1.0 seconds is used.
 
  If the error recovery does not have a handler, or the handler returns nil (no tuple), the CloudKitOperation 
  will finish (with the errors).
@@ -671,7 +678,7 @@ Note, that for the automatic error handling to kick in, the happy path must be s
  }
  ```
 
- Note that the error handler receives, the received error, a logger object, and the suggested tuple, which
+ Note that the error handler receives the received error, a logger object, and the suggested tuple, which
  could be modified before being returned. Alternatively, return nil to not retry.
 
 */
