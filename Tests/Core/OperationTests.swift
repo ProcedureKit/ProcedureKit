@@ -96,6 +96,7 @@ class OperationTests: XCTestCase {
         super.setUp()
         queue = OperationQueue()
         delegate = TestQueueDelegate()
+        queue.delegate = delegate
     }
 
     override func tearDown() {
@@ -106,17 +107,14 @@ class OperationTests: XCTestCase {
     }
 
     func runOperation(operation: NSOperation) {
-        queue.delegate = delegate
         queue.addOperation(operation)
     }
 
     func runOperations(operations: [NSOperation]) {
-        queue.delegate = delegate
         queue.addOperations(operations, waitUntilFinished: false)
     }
 
     func runOperations(operations: NSOperation...) {
-        queue.delegate = delegate
         queue.addOperations(operations, waitUntilFinished: false)
     }
 
@@ -358,6 +356,17 @@ class CompletionBlockOperationTests: OperationTests {
         _queue.addOperation(operation)
         waitForExpectationsWithTimeout(3, handler: nil)
     }
+    
+    func test__many_completion_blocks_are_executed() {
+        (0..<5000).forEach { i in
+            let expectation = expectationWithDescription("Interation: \(i)")
+            let operation = TestOperation()
+            operation.addCompletionBlock { expectation.fulfill() }
+            operation.addCondition(BlockCondition { false })
+            self.queue.addOperation(operation)
+        }
+        waitForExpectationsWithTimeout(5, handler: nil)
+    }
 }
 
 class OperationDependencyTests: OperationTests {
@@ -578,7 +587,6 @@ class CancellationOperationTests: OperationTests {
         XCTAssertFalse(operation.didExecute)
     }
 }
-
 
 
 
