@@ -154,7 +154,11 @@ public class Operation: NSOperation {
                 }
 
                 if super.ready {
-                    return evaluateConditions()
+                    if conditions.count == 0 {
+                        state = .Ready
+                        return true
+                    }
+                    evaluateConditions()
                 }
 
                 // Until conditions have been evaluated, we're not ready
@@ -254,20 +258,13 @@ public class Operation: NSOperation {
         state = .Pending
     }
 
-    private func evaluateConditions() -> Bool {
+    private func evaluateConditions() {
         assert(state == .Pending, "\(__FUNCTION__) was called out of order.")
         assert(cancelled == false, "\(__FUNCTION__) was called on cancelled operation: \(operationName).")
-        if conditions.count > 0 {
-            state = .EvaluatingConditions
-            OperationConditionEvaluator.evaluate(conditions, operation: self) { errors in
-                self._internalErrors.appendContentsOf(errors)
-                self.state = .Ready
-            }
-            return false
-        }
-        else {
-            state = .Ready
-            return true
+        state = .EvaluatingConditions
+        OperationConditionEvaluator.evaluate(conditions, operation: self) { errors in
+            self._internalErrors.appendContentsOf(errors)
+            self.state = .Ready
         }
     }
 

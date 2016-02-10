@@ -347,25 +347,24 @@ class CompletionBlockOperationTests: OperationTests {
     func test__nsblockoperation_runs_completion_block_once() {
         let _queue = NSOperationQueue()
         let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
-        let operation = NSBlockOperation()
 
-        operation.completionBlock = {
-            expectation.fulfill()
-        }
+        let operation = NSBlockOperation()
+        operation.completionBlock = { expectation.fulfill() }
 
         _queue.addOperation(operation)
         waitForExpectationsWithTimeout(3, handler: nil)
     }
     
     func test__many_completion_blocks_are_executed() {
-        (0..<5000).forEach { i in
-            let expectation = expectationWithDescription("Interation: \(i)")
+        queue.maxConcurrentOperationCount = 2
+        (0..<5_000).forEach { i in
+            let expectation = self.expectationWithDescription("Interation: \(i)")
             let operation = TestOperation()
             operation.addCompletionBlock { expectation.fulfill() }
             operation.addCondition(BlockCondition { false })
             self.queue.addOperation(operation)
         }
-        waitForExpectationsWithTimeout(5, handler: nil)
+        waitForExpectationsWithTimeout(10, handler: nil)
     }
 }
 
