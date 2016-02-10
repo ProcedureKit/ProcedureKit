@@ -1,12 +1,12 @@
 steps:
   -
-    name: ":fastlane: Test iOS Extension"
-    command: .ci/scripts/test-ios-extension
+    name: ":fastlane: Build iOS Extension"
+    command: .ci/scripts/build-ios-extension
     agents:
       name: "$BUILDKITE_AGENT_META_DATA_NAME"
   -
-    name: ":fastlane: Test OS X Extension"
-    command: .ci/scripts/test-osx-extension
+    name: ":fastlane: Build OS X Extension"
+    command: .ci/scripts/build-osx-extension
     agents:
       name: "$BUILDKITE_AGENT_META_DATA_NAME"
   -

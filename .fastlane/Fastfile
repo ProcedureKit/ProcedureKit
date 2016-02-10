@@ -4,10 +4,10 @@ end
 
 platform :ios do
 
-  desc "Runs the iOS Extension compatible framework"
-  lane :test_extension do
+  desc "Builds the iOS Extension compatible framework"
+  lane :build_extension do
     
-    scan(
+    gym(
       project: "Operations_ExtensionCompatible.xcodeproj",
       scheme: "iOS Extensions Operations",
       output_directory: ".ci/xcodebuild-data",
@@ -32,10 +32,10 @@ end
 
 platform :mac do
 
-  desc "Runs the OS X Extension compatible framework"
-  lane :test_extension do
+  desc "Builds the OS X Extension compatible framework"
+  lane :build_extension do
     
-    scan(
+    gym(
       project: "Operations_ExtensionCompatible.xcodeproj",
       scheme: "OS X Extensions Operations",
       output_directory: ".ci/xcodebuild-data",
