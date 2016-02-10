@@ -93,12 +93,7 @@ struct OperationConditionEvaluator {
 
         dispatch_group_notify(group, Queue.Default.queue) {
 
-            var failures: [ErrorType] = results.reduce([ErrorType]()) { (var acc, result) in
-                if let error = result?.error {
-                    acc.append(error)
-                }
-                return acc
-            }
+            var failures: [ErrorType] = results.flatMap { $0?.error }
 
             if operation.cancelled {
                 failures.append(OperationError.ConditionFailed)
