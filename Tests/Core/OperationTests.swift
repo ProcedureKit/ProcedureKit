@@ -356,14 +356,17 @@ class CompletionBlockOperationTests: OperationTests {
     }
     
     func test__many_completion_blocks_are_executed() {
-        queue.maxConcurrentOperationCount = 2
+        LogManager.severity = .Verbose
         (0..<5_000).forEach { i in
-            let expectation = self.expectationWithDescription("Interation: \(i)")
-            let operation = TestOperation()
+            let operationName = "Interation: \(i)"
+            let expectation = self.expectationWithDescription(operationName)
+            let operation = BlockOperation { XCTFail() }
+            operation.name = operationName
             operation.addCompletionBlock { expectation.fulfill() }
             operation.addCondition(BlockCondition { false })
             self.queue.addOperation(operation)
         }
+        LogManager.severity = .Warning
         waitForExpectationsWithTimeout(10, handler: nil)
     }
 }
