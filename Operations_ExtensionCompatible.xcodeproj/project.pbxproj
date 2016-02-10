@@ -242,7 +242,6 @@
 		652617591C11F61700654091 /* Contacts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Contacts.swift; sourceTree = "<group>"; };
 		6526175A1C11F61700654091 /* ContactsCondition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactsCondition.swift; sourceTree = "<group>"; };
 		6526175B1C11F61700654091 /* ContactsOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactsOperation.swift; sourceTree = "<group>"; };
-		6526175E1C11F61700654091 /* HealthCapability.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthCapability.swift; sourceTree = "<group>"; };
 		6526175F1C11F61700654091 /* LocationCapability.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationCapability.swift; sourceTree = "<group>"; };
 		652617601C11F61700654091 /* LocationOperations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationOperations.swift; sourceTree = "<group>"; };
 		652617611C11F61700654091 /* PassbookCapability.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PassbookCapability.swift; sourceTree = "<group>"; };
@@ -497,7 +496,6 @@
 		6526175D1C11F61700654091 /* iOS */ = {
 			isa = PBXGroup;
 			children = (
-				6526175E1C11F61700654091 /* HealthCapability.swift */,
 				6526175F1C11F61700654091 /* LocationCapability.swift */,
 				652617601C11F61700654091 /* LocationOperations.swift */,
 				652617611C11F61700654091 /* PassbookCapability.swift */,
