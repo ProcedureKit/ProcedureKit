@@ -641,7 +641,7 @@ class OPRCKMarkNotificationsReadOperationTests: CKTests {
 
         XCTAssertTrue(operation.finished)
         XCTAssertEqual(operation.errors.count, 0)
-        XCTAssertEqual(receivedNotificationIDs!, toMark)
+        XCTAssertEqual(receivedNotificationIDs ?? ["this is not the id you're looking for"], toMark)
     }
 
     func test__error_with_completion_block() {
