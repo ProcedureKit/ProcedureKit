@@ -89,6 +89,7 @@ public class AlertOperation<From: PresentingViewController>: Operation {
             if let weakSelf = self {
                 handler(weakSelf)
             }
+            self?.ui.finish()
             self?.finish()
         }
         alert.addAction(action)
