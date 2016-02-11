@@ -512,8 +512,12 @@ extension CKQueryOperation: CKQueryOperationType {
 
 // MARK: OPRCKOperation
 
-public class OPRCKOperation<T where T: NSOperation, T: CKOperationType>: ReachableOperation<T> {
-
+public class OPRCKOperation<T where T: NSOperation, T: CKOperationType>: ReachableOperation<T>, ResultOperationType {
+    
+    public typealias Result = T.Result?
+    
+    public var result: Result = nil
+    
     convenience init(operation op: T) {
         self.init(operation: op, connectivity: .AnyConnectionKind, reachability: ReachabilityManager(DeviceReachability()))
     }
@@ -712,9 +716,13 @@ Note, that for the automatic error handling to kick in, the happy path must be s
  could be modified before being returned. Alternatively, return nil to not retry.
 
 */
-public final class CloudKitOperation<T where T: NSOperation, T: CKOperationType>: RetryOperation<OPRCKOperation<T>> {
+public final class CloudKitOperation<T where T: NSOperation, T: CKOperationType>: RetryOperation<OPRCKOperation<T>>, ResultOperationType {
 
     public typealias ErrorHandler = CloudKitRecovery<T>.Handler
+    
+    public typealias Result = T.Result?
+    
+    public var result: Result = nil
 
     let recovery: CloudKitRecovery<T>
 
