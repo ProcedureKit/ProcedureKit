@@ -131,7 +131,8 @@ class UIOperationTests: OperationTests {
         let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
 
         var completionBlockDidRun = false
-        operation = TypeUnderTest(controller: presented, displayControllerFrom: .Present(presenter), sender: .None) {
+        operation = TypeUnderTest(controller: presented, displayControllerFrom: .Present(presenter), sender: .None)
+        operation.addCompletionBlock {
             completionBlockDidRun = true
             expectation.fulfill()
         }

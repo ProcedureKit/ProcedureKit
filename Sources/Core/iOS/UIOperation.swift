@@ -129,7 +129,6 @@ public class UIOperation<C, From where C: UIViewController, From: PresentingView
 
     /// The `AnyObject` sender.
     public let sender: AnyObject?
-    let completion: (() -> Void)?
 
     /**
     Construct a `UIOperation` with the presented view controller, the presenting view controller display 
@@ -145,11 +144,11 @@ public class UIOperation<C, From where C: UIViewController, From: PresentingView
     - parameter sender: an optional `AnyObject` see docs for UIViewController.
     - parameter completion: an optional void block, see docs for UIViewController.
     */
-    public init(controller: C, displayControllerFrom from: ViewControllerDisplayStyle<From>, sender: AnyObject? = .None, completion: (() -> Void)? = .None) {
+    public init(controller: C, displayControllerFrom from: ViewControllerDisplayStyle<From>, sender: AnyObject? = .None) {
         self.controller = controller
         self.from = from
         self.sender = sender
-        self.completion = completion
+        super.init()
     }
 
     /**
@@ -159,7 +158,9 @@ public class UIOperation<C, From where C: UIViewController, From: PresentingView
     */
     public override func execute() {
         dispatch_async(Queue.Main.queue) {
-            self.from.displayController(self.controller, sender: self.sender, completion: self.completion)
+            self.from.displayController(self.controller, sender: self.sender) {
+                self.finish()
+            }
         }
     }
 }
