@@ -355,9 +355,22 @@ class CompletionBlockOperationTests: OperationTests {
         waitForExpectationsWithTimeout(3, handler: nil)
     }
     
+
+//    This unit test is disabled. It highlights
+//    a possible bug, or issue with KVO notifications and/or 
+//    NSOperation not calling `start()` after an operation becomes
+//    Ready.
+//    
+//    The issue which reported this bug is here:
+//    https:github.com/danthorpe/Operations/issues/175
+//    
+//    The PR which investigated it is here: 
+//    https:github.com/danthorpe/Operations/pull/180
+
     func test__many_completion_blocks_are_executed() {
         LogManager.severity = .Verbose
-        (0..<5_000).forEach { i in
+        let batchSize = 8_500
+        (0..<batchSize).forEach { i in
             let operationName = "Interation: \(i)"
             let expectation = self.expectationWithDescription(operationName)
             let operation = BlockOperation { XCTFail() }
