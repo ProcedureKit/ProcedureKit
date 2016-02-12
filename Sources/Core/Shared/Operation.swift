@@ -478,6 +478,7 @@ public class Operation: NSOperation {
     - parameter operation: a `NSOperation` instance.
     */
     public final func produceOperation(operation: NSOperation) {
+        precondition(state > .Initialized, "Cannot produce operation while not being scheduled on a queue.")
         log.verbose("Did produce \(operation.operationName)")
         didProduceOperationObservers.forEach { $0.operation(self, didProduceOperation: operation) }
     }
