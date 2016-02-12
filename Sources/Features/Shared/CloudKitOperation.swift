@@ -55,7 +55,10 @@ public protocol CKOperationType: class {
 
     /// The type of the CloudKit RecordID
     typealias RecordID: Hashable
-
+    
+    /// The type of the operation's result
+    typealias Result
+    
     /// - returns the CloudKit Container
     var container: Container? { get set }
 }
@@ -426,6 +429,9 @@ extension CKOperation: CKOperationType {
 
     /// The QueryCursor is a CKQueryCursor
     public typealias QueryCursor = CKQueryCursor
+    
+    /// An abstract base class does not have a result type
+    public typealias Result = Void
 }
 
 /**
@@ -441,49 +447,77 @@ extension CKDatabaseOperation: CKDatabaseOperationType {
 }
 
 /// Extension to have CKDiscoverAllContactsOperation conform to CKDiscoverAllContactsOperationType
-extension CKDiscoverAllContactsOperation: CKDiscoverAllContactsOperationType { }
+extension CKDiscoverAllContactsOperation: CKDiscoverAllContactsOperationType {
+    typealias Result = [CKDiscoveredUserInfo]?
+}
 
 /// Extension to have CKDiscoverUserInfosOperation conform to CKDiscoverUserInfosOperationType
-extension CKDiscoverUserInfosOperation: CKDiscoverUserInfosOperationType { }
+extension CKDiscoverUserInfosOperation: CKDiscoverUserInfosOperationType {
+    typealias Result = ([String: CKDiscoveredUserInfo]?, [CKRecordID: CKDiscoveredUserInfo]?)
+}
 
 /// Extension to have CKFetchNotificationChangesOperation conform to CKFetchNotificationChangesOperationType
-extension CKFetchNotificationChangesOperation: CKFetchNotificationChangesOperationType   { }
+extension CKFetchNotificationChangesOperation: CKFetchNotificationChangesOperationType {
+    typealias Result = CKServerChangeToken?
+}
 
 /// Extension to have CKMarkNotificationsReadOperation conform to CKMarkNotificationsReadOperationType
-extension CKMarkNotificationsReadOperation: CKMarkNotificationsReadOperationType { }
+extension CKMarkNotificationsReadOperation: CKMarkNotificationsReadOperationType {
+    typealias Result = [CKNotificationID]?
+}
 
 /// Extension to have CKModifyBadgeOperation conform to CKModifyBadgeOperationType
 extension CKModifyBadgeOperation: CKModifyBadgeOperationType { }
 
 /// Extension to have CKFetchRecordChangesOperation conform to CKFetchRecordChangesOperationType
-extension CKFetchRecordChangesOperation: CKFetchRecordChangesOperationType { }
+extension CKFetchRecordChangesOperation: CKFetchRecordChangesOperationType {
+    typealias Result = (CKServerChangeToken?, NSData?)
+}
 
 /// Extension to have CKFetchRecordZonesOperation conform to CKFetchRecordZonesOperationType
-extension CKFetchRecordZonesOperation: CKFetchRecordZonesOperationType { }
+extension CKFetchRecordZonesOperation: CKFetchRecordZonesOperationType {
+    typealias Result = [CKRecordZoneID: CKRecordZone]?
+}
 
 /// Extension to have CKFetchRecordsOperation conform to CKFetchRecordsOperationType
-extension CKFetchRecordsOperation: CKFetchRecordsOperationType { }
+extension CKFetchRecordsOperation: CKFetchRecordsOperationType {
+    typealias Result = [CKRecordID: CKRecord]?
+}
 
 /// Extension to have CKFetchSubscriptionsOperation conform to CKFetchSubscriptionsOperationType
-extension CKFetchSubscriptionsOperation: CKFetchSubscriptionsOperationType { }
+extension CKFetchSubscriptionsOperation: CKFetchSubscriptionsOperationType {
+    typealias Result = [String: CKSubscription]?
+}
 
 /// Extension to have CKModifyRecordZonesOperation conform to CKModifyRecordZonesOperationType
-extension CKModifyRecordZonesOperation: CKModifyRecordZonesOperationType { }
+extension CKModifyRecordZonesOperation: CKModifyRecordZonesOperationType {
+    typealias Result = ([CKRecordZone]?, [CKRecordZoneID]?)
+}
 
 /// Extension to have CKModifyRecordsOperation conform to CKModifyRecordsOperationType
-extension CKModifyRecordsOperation: CKModifyRecordsOperationType { }
+extension CKModifyRecordsOperation: CKModifyRecordsOperationType {
+    typealias Result = ([CKRecord]?, [CKRecordID]?)
+}
 
 /// Extension to have CKModifySubscriptionsOperation conform to CKModifySubscriptionsOperationType
-extension CKModifySubscriptionsOperation: CKModifySubscriptionsOperationType { }
+extension CKModifySubscriptionsOperation: CKModifySubscriptionsOperationType {
+    typealias Result = ([CKSubscription]?, [String]?)
+}
 
 /// Extension to have CKQueryOperation conform to CKQueryOperationType
-extension CKQueryOperation: CKQueryOperationType { }
+extension CKQueryOperation: CKQueryOperationType {
+    typealias Result = CKQueryCursor?
+}
 
 
 // MARK: OPRCKOperation
 
-public class OPRCKOperation<T where T: NSOperation, T: CKOperationType>: ReachableOperation<T> {
-
+public class OPRCKOperation<T where T: NSOperation, T: CKOperationType>: ReachableOperation<T>, ResultOperationType {
+    
+    public typealias Result = T.Result?
+    
+    public var result: Result = nil
+    
     convenience init(operation op: T) {
         self.init(operation: op, connectivity: .AnyConnectionKind, reachability: ReachabilityManager(DeviceReachability()))
     }
@@ -682,9 +716,13 @@ Note, that for the automatic error handling to kick in, the happy path must be s
  could be modified before being returned. Alternatively, return nil to not retry.
 
 */
-public final class CloudKitOperation<T where T: NSOperation, T: CKOperationType>: RetryOperation<OPRCKOperation<T>> {
+public final class CloudKitOperation<T where T: NSOperation, T: CKOperationType>: RetryOperation<OPRCKOperation<T>>, ResultOperationType {
 
     public typealias ErrorHandler = CloudKitRecovery<T>.Handler
+    
+    public typealias Result = T.Result?
+    
+    public var result: Result = nil
 
     let recovery: CloudKitRecovery<T>
 
