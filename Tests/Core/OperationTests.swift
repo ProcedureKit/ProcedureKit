@@ -96,6 +96,7 @@ class OperationTests: XCTestCase {
         super.setUp()
         queue = OperationQueue()
         delegate = TestQueueDelegate()
+        queue.delegate = delegate
     }
 
     override func tearDown() {
@@ -106,17 +107,14 @@ class OperationTests: XCTestCase {
     }
 
     func runOperation(operation: NSOperation) {
-        queue.delegate = delegate
         queue.addOperation(operation)
     }
 
     func runOperations(operations: [NSOperation]) {
-        queue.delegate = delegate
         queue.addOperations(operations, waitUntilFinished: false)
     }
 
     func runOperations(operations: NSOperation...) {
-        queue.delegate = delegate
         queue.addOperations(operations, waitUntilFinished: false)
     }
 
@@ -349,14 +347,40 @@ class CompletionBlockOperationTests: OperationTests {
     func test__nsblockoperation_runs_completion_block_once() {
         let _queue = NSOperationQueue()
         let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
-        let operation = NSBlockOperation()
 
-        operation.completionBlock = {
-            expectation.fulfill()
-        }
+        let operation = NSBlockOperation()
+        operation.completionBlock = { expectation.fulfill() }
 
         _queue.addOperation(operation)
         waitForExpectationsWithTimeout(3, handler: nil)
+    }
+    
+
+//    This unit test is disabled. It highlights
+//    a possible bug, or issue with KVO notifications and/or 
+//    NSOperation not calling `start()` after an operation becomes
+//    Ready.
+//    
+//    The issue which reported this bug is here:
+//    https:github.com/danthorpe/Operations/issues/175
+//    
+//    The PR which investigated it is here: 
+//    https:github.com/danthorpe/Operations/pull/180
+
+    func test__many_completion_blocks_are_executed() {
+        LogManager.severity = .Verbose
+        let batchSize = 8_500
+        (0..<batchSize).forEach { i in
+            let operationName = "Interation: \(i)"
+            let expectation = self.expectationWithDescription(operationName)
+            let operation = BlockOperation { XCTFail() }
+            operation.name = operationName
+            operation.addCompletionBlock { expectation.fulfill() }
+            operation.addCondition(BlockCondition { false })
+            self.queue.addOperation(operation)
+        }
+        LogManager.severity = .Warning
+        waitForExpectationsWithTimeout(10, handler: nil)
     }
 }
 
@@ -578,7 +602,6 @@ class CancellationOperationTests: OperationTests {
         XCTAssertFalse(operation.didExecute)
     }
 }
-
 
 
 

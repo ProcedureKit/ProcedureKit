@@ -75,15 +75,15 @@ public class Operation: NSOperation {
 
     // use the KVO mechanism to indicate that changes to "state" affect other properties as well
     class func keyPathsForValuesAffectingIsReady() -> Set<NSObject> {
-        return ["state"]
+        return ["State"]
     }
 
     class func keyPathsForValuesAffectingIsExecuting() -> Set<NSObject> {
-        return ["state"]
+        return ["State"]
     }
 
     class func keyPathsForValuesAffectingIsFinished() -> Set<NSObject> {
-        return ["state"]
+        return ["State"]
     }
 
     class func keyPathsForValuesAffectingIsCancelled() -> Set<NSObject> {
@@ -105,13 +105,13 @@ public class Operation: NSOperation {
             return stateLock.withCriticalScope { _state }
         }
         set (newState) {
-            willChangeValueForKey("state")
+            willChangeValueForKey("State")
             stateLock.withCriticalScope {
                 assert(_state.canTransitionToState(newState, whenCancelled: cancelled), "Attempting to perform illegal cyclic state transition, \(_state) -> \(newState).")
                 log.verbose("\(_state) -> \(newState)")
                 _state = newState
             }
-            didChangeValueForKey("state")
+            didChangeValueForKey("State")
         }
     }
 
@@ -154,7 +154,11 @@ public class Operation: NSOperation {
                 }
 
                 if super.ready {
-                    return evaluateConditions()
+                    if conditions.count == 0 {
+                        state = .Ready
+                        return true
+                    }
+                    evaluateConditions()
                 }
 
                 // Until conditions have been evaluated, we're not ready
@@ -254,20 +258,13 @@ public class Operation: NSOperation {
         state = .Pending
     }
 
-    private func evaluateConditions() -> Bool {
+    private func evaluateConditions() {
         assert(state == .Pending, "\(__FUNCTION__) was called out of order.")
         assert(cancelled == false, "\(__FUNCTION__) was called on cancelled operation: \(operationName).")
-        if conditions.count > 0 {
-            state = .EvaluatingConditions
-            OperationConditionEvaluator.evaluate(conditions, operation: self) { errors in
-                self._internalErrors.appendContentsOf(errors)
-                self.state = .Ready
-            }
-            return false
-        }
-        else {
-            state = .Ready
-            return true
+        state = .EvaluatingConditions
+        evaluateOperationConditions(conditions, operation: self) { errors in
+            self._internalErrors.appendContentsOf(errors)
+            self.state = .Ready
         }
     }
 
@@ -497,19 +494,19 @@ public class Operation: NSOperation {
 
     - parameter errors: an array of `ErrorType`, which defaults to empty.
     */
-    final public func finish(errors: [ErrorType] = []) {
+    final public func finish(receivedErrors: [ErrorType] = []) {
         if !hasFinishedAlready {
             hasFinishedAlready = true
             state = .Finishing
 
-            _internalErrors.appendContentsOf(errors)
+            _internalErrors.appendContentsOf(receivedErrors)
             finished(_internalErrors)
 
             if errors.isEmpty {
                 log.verbose("Did finish with no errors.")
             }
             else {
-                log.verbose("Did finish with errors: \(errors).")
+                log.verbose("Did finish with errors: \(_internalErrors).")
             }
 
             didFinishObservers.forEach { $0.operationDidFinish(self, errors: self._internalErrors) }
@@ -519,13 +516,8 @@ public class Operation: NSOperation {
     }
     
     /// Convenience method to simplify finishing when there is only one error.
-    final public func finish(error: ErrorType?) {
-        if let error = error {
-            finish([error])
-        }
-        else {
-            finish()
-        }
+    final public func finish(receivedError: ErrorType?) {
+        finish(receivedError.map { [$0]} ?? [])
     }
 
     /**
