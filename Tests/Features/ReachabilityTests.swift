@@ -306,6 +306,15 @@ class DeviceReachabilityTests: XCTestCase, NetworkReachabilityDelegate {
         XCTAssertNotNil(delegateDidReceiveFlags)
     }
 
-
+    func test__creates_default_route_reachability() {
+        do {
+            XCTAssertNil(device.__defaultRouteReachability)
+            let _ = try device.defaultRouteReachability()
+            XCTAssertNotNil(device.__defaultRouteReachability)
+        }
+        catch {
+            XCTFail("Unexpected error thrown: \(error)")
+        }
+    }
 }
 

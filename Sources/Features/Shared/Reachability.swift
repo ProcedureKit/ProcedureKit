@@ -148,8 +148,8 @@ class DeviceReachability: NetworkReachabilityType {
 
     typealias Error = Reachability.Error
 
-    private var __defaultRouteReachability: SCNetworkReachability? = .None
-    private var threadSafeProtector = Protector(false)
+    var __defaultRouteReachability: SCNetworkReachability? = .None
+    var threadSafeProtector = Protector(false)
     weak var delegate: NetworkReachabilityDelegate?
 
     var notifierIsRunning: Bool {
