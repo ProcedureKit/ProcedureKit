@@ -89,6 +89,34 @@ class GroupOperationTests: OperationTests {
         XCTAssertTrue(operations[1].didExecute)
         XCTAssertTrue(operations[2].didExecute)
     }
+
+    func test__group_operation_exits_correctly_when_child_errors() {
+
+        let numberOfOperations = 10
+        let operations = (0..<numberOfOperations).map { i -> Operation in
+            let block = BlockOperation { (completion: BlockOperation.ContinuationBlockType) in
+                let error = NSError(domain: "me.danthorpe.Operations.Tests", code: -9_999, userInfo: nil)
+                completion(error: error)
+            }
+            block.name = "Block \(i)"
+            return block
+        }
+
+        let group = GroupOperation(operations: operations)
+        group.queue.maxConcurrentOperationCount = 10
+        group.log.severity = .Verbose
+
+        let waiter = BlockOperation { }
+        waiter.addDependency(group)
+
+        let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
+        addCompletionBlockToTestOperation(waiter, withExpectation: expectation)
+        runOperations(group, waiter)
+        waitForExpectationsWithTimeout(5.0, handler: nil)
+
+        XCTAssertTrue(group.finished)
+        XCTAssertEqual(group.aggregateErrors.count, numberOfOperations)
+    }
 }
 
 

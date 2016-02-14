@@ -25,7 +25,6 @@ operations.
 public class GroupOperation: Operation {
 
     private let finishingOperation = NSBlockOperation { }
-
     public let queue = OperationQueue()
     public let operations: [NSOperation]
 
@@ -40,6 +39,7 @@ public class GroupOperation: Operation {
     public init(operations ops: [NSOperation]) {
         operations = ops
         super.init()
+        name = "Group Operation"
         queue.suspended = true
         queue.delegate = self
     }
@@ -97,7 +97,7 @@ public class GroupOperation: Operation {
                     op.log.severity = log.severity
                 }
             }
-            queue.addOperations(operations, waitUntilFinished: false)
+            queue.addOperations(operations)
         }
     }
 
@@ -191,8 +191,8 @@ extension GroupOperation: OperationQueueDelegate {
         }
 
         if operation === finishingOperation {
-            queue.suspended = true
             finish(aggregateErrors)
+            queue.suspended = true
         }
         else {
             operationDidFinish(operation, withErrors: errors)
