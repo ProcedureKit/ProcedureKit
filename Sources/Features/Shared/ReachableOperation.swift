@@ -34,7 +34,7 @@ public class ReachableOperation<T: NSOperation>: ComposedOperation<T> {
      - parameter connectivity: a `Reachability.Connectivity` value, defaults to `.AnyConnectionKind`.
     */
     public convenience init(_ op: T, connectivity: Reachability.Connectivity = .AnyConnectionKind) {
-        self.init(operation: op, connectivity: connectivity, reachability: ReachabilityManager(DeviceReachability()))
+        self.init(operation: op, connectivity: connectivity, reachability: ReachabilityManager.sharedInstance)
     }
 
     init(operation op: T, connectivity: Reachability.Connectivity = .AnyConnectionKind, reachability: SystemReachabilityType) {
