@@ -100,9 +100,11 @@ public enum ViewControllerDisplayStyle<ViewController: PresentingViewController>
 
         case .Show(let from):
             from.showViewController(controller, sender: sender)
+            completion?()
 
         case .ShowDetail(let from):
             from.showDetailViewController(controller, sender: sender)
+            completion?()
         }
     }
 }
@@ -149,6 +151,7 @@ public class UIOperation<C, From where C: UIViewController, From: PresentingView
         self.from = from
         self.sender = sender
         super.init()
+        name = "UIOperation<\(C.self)>"
     }
 
     /**
