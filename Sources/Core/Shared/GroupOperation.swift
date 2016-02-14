@@ -28,11 +28,11 @@ public class GroupOperation: Operation {
     public let queue = OperationQueue()
     public let operations: [NSOperation]
 
-    private var threadSafeProtector = Protector(Array<ErrorType>())
+    private var _aggregateErrors = Protector(Array<ErrorType>())
 
     /// - returns: an aggregation of errors [ErrorType]
     public var aggregateErrors: Array<ErrorType> {
-        return threadSafeProtector.read { $0 }
+        return _aggregateErrors.read { $0 }
     }
 
     /**
@@ -113,9 +113,7 @@ public class GroupOperation: Operation {
     */
     public final func aggregateError(error: ErrorType) {
         log.verbose("Aggregated error: \(error)")
-        threadSafeProtector.write({ (inout ward: Array<ErrorType>) in
-            ward.append(error)
-        })
+        _aggregateErrors.append(error)
     }
 
     /**
@@ -192,9 +190,7 @@ extension GroupOperation: OperationQueueDelegate {
                 // all the errors will be duplicated.
                 break
             default:
-                threadSafeProtector.write({ (inout ward: Array<ErrorType>) in
-                    ward.appendContentsOf(errors)
-                })
+                _aggregateErrors.appendContentsOf(errors)
             }
         }
 

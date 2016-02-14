@@ -55,8 +55,27 @@ internal class Protector<T> {
         return lock.read { [unowned self] in block(self.ward) }
     }
 
-    func write(block: (inout T) -> Void, completion: (() -> Void)? = .None) {
+    func write(block: (inout T) -> Void) {
+        lock.write({ block(&self.ward) })
+    }
+
+    func write(block: (inout T) -> Void, completion: (() -> Void)) {
         lock.write({ block(&self.ward) }, completion: completion)
+    }
+}
+
+extension Protector where T: _ArrayType {
+
+    func append(newElement: T.Generator.Element) {
+        write({ (inout ward: T) in
+            ward.append(newElement)
+        })
+    }
+
+    func appendContentsOf<S : SequenceType where S.Generator.Element == T.Generator.Element>(newElements: S) {
+        write({ (inout ward: T) in
+            ward.appendContentsOf(newElements)
+        })
     }
 }
 
