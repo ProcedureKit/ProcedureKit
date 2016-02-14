@@ -16,9 +16,7 @@ public struct Reachability {
         case FailedToCreateDefaultRouteReachability
         case FailedToSetNotifierCallback
         case FailedToSetDispatchQueue
-        case FailedToScheduleNotifier
     }
-
 
     /// The kind of `Reachability` connectivity
     public enum Connectivity {
@@ -33,8 +31,6 @@ public struct Reachability {
 
     /// The ObserverBlockType
     public typealias ObserverBlockType = NetworkStatus -> Void
-
-    typealias ReachabilityDidChange = SCNetworkReachabilityFlags -> Void
 
     struct Observer {
         let connectivity: Connectivity
@@ -72,7 +68,6 @@ protocol HostReachabilityType: ReachabilityManagerType {
 
     func reachabilityForURL(url: NSURL, completion: Reachability.ObserverBlockType)
 }
-
 
 final class ReachabilityManager {
     typealias Status = Reachability.NetworkStatus
