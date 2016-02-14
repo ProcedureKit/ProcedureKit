@@ -16,10 +16,10 @@ class TestablePresentingController: NSObject, PresentingViewController {
     var check: CheckBlockType? = .None
     var expectation: XCTestExpectation? = .None
 
-    func presentViewController(viewController: UIViewController, animated: Bool, completion: (() -> Void)?) {
-        check?(received: viewController)
-        expectation?.fulfill()
+    func presentViewController(vc: UIViewController, animated: Bool, completion: (() -> Void)?) {
+        check?(received: vc)
         completion?()
+        expectation?.fulfill()
     }
 
     func showViewController(vc: UIViewController, sender: AnyObject?) {
