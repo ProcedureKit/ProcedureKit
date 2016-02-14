@@ -25,12 +25,15 @@ operations.
 public class GroupOperation: Operation {
 
     private let finishingOperation = NSBlockOperation { }
-
     public let queue = OperationQueue()
     public let operations: [NSOperation]
 
+    private var _aggregateErrors = Protector(Array<ErrorType>())
+
     /// - returns: an aggregation of errors [ErrorType]
-    public private(set) var aggregateErrors = Array<ErrorType>()
+    public var aggregateErrors: Array<ErrorType> {
+        return _aggregateErrors.read { $0 }
+    }
 
     /**
     Designated initializer.
@@ -40,6 +43,7 @@ public class GroupOperation: Operation {
     public init(operations ops: [NSOperation]) {
         operations = ops
         super.init()
+        name = "Group Operation"
         queue.suspended = true
         queue.delegate = self
     }
@@ -97,7 +101,7 @@ public class GroupOperation: Operation {
                     op.log.severity = log.severity
                 }
             }
-            queue.addOperations(operations, waitUntilFinished: false)
+            queue.addOperations(operations)
         }
     }
 
@@ -109,7 +113,7 @@ public class GroupOperation: Operation {
     */
     public final func aggregateError(error: ErrorType) {
         log.verbose("Aggregated error: \(error)")
-        aggregateErrors.append(error)
+        _aggregateErrors.append(error)
     }
 
     /**
@@ -186,13 +190,13 @@ extension GroupOperation: OperationQueueDelegate {
                 // all the errors will be duplicated.
                 break
             default:
-                aggregateErrors.appendContentsOf(errors)
+                _aggregateErrors.appendContentsOf(errors)
             }
         }
 
         if operation === finishingOperation {
-            queue.suspended = true
             finish(aggregateErrors)
+            queue.suspended = true
         }
         else {
             operationDidFinish(operation, withErrors: errors)

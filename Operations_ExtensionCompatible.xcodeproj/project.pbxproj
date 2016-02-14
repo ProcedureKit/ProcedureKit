@@ -210,6 +210,9 @@
 		6584D25F1C6BF93900306EED /* RetryOperationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6584D24D1C6BF90E00306EED /* RetryOperationTests.swift */; };
 		6584D2601C6BF93A00306EED /* ResultInjectionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6584D24C1C6BF90E00306EED /* ResultInjectionTests.swift */; };
 		6584D2611C6BF93A00306EED /* RetryOperationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6584D24D1C6BF90E00306EED /* RetryOperationTests.swift */; };
+		65BB56DC1C70FAB100DF5211 /* ThreadSafety.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65BB56DB1C70FAB100DF5211 /* ThreadSafety.swift */; };
+		65BB56DD1C70FAB700DF5211 /* ThreadSafety.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65BB56DB1C70FAB100DF5211 /* ThreadSafety.swift */; };
+		65BB56DE1C70FAB800DF5211 /* ThreadSafety.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65BB56DB1C70FAB100DF5211 /* ThreadSafety.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -340,6 +343,7 @@
 		6584D24C1C6BF90E00306EED /* ResultInjectionTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ResultInjectionTests.swift; sourceTree = "<group>"; };
 		6584D24D1C6BF90E00306EED /* RetryOperationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RetryOperationTests.swift; sourceTree = "<group>"; };
 		6584D2631C6BF95700306EED /* HealthCapabilityTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HealthCapabilityTests.swift; sourceTree = "<group>"; };
+		65BB56DB1C70FAB100DF5211 /* ThreadSafety.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ThreadSafety.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -465,6 +469,7 @@
 				6584D2371C6BF86200306EED /* RetryOperation.swift */,
 				6526174B1C11F61700654091 /* SlientCondition.swift */,
 				6526174C1C11F61700654091 /* Support.swift */,
+				65BB56DB1C70FAB100DF5211 /* ThreadSafety.swift */,
 				6526174D1C11F61700654091 /* TimeoutObserver.swift */,
 			);
 			path = Shared;
@@ -960,6 +965,7 @@
 				652619D61C12004C00654091 /* AddressBookUIOperations.swift in Sources */,
 				6526198A1C11FF5200654091 /* NoFailedDependenciesCondition.swift in Sources */,
 				652619CC1C12003F00654091 /* Reachability.swift in Sources */,
+				65BB56DC1C70FAB100DF5211 /* ThreadSafety.swift in Sources */,
 				652619841C11FF5200654091 /* GatedOperation.swift in Sources */,
 				652619CB1C12003F00654091 /* NetworkOperation.swift in Sources */,
 				652619831C11FF5200654091 /* ExclusivityManager.swift in Sources */,
@@ -1049,6 +1055,7 @@
 				652619E21C12015A00654091 /* UserConfirmationCondition.swift in Sources */,
 				652619981C11FF5200654091 /* GatedOperation.swift in Sources */,
 				6584D23C1C6BF87C00306EED /* FunctionalOperations.swift in Sources */,
+				65BB56DD1C70FAB700DF5211 /* ThreadSafety.swift in Sources */,
 				652619DA1C12010300654091 /* UIOperation.swift in Sources */,
 				652619DB1C12012C00654091 /* Capability.swift in Sources */,
 				652619971C11FF5200654091 /* ExclusivityManager.swift in Sources */,
@@ -1113,6 +1120,7 @@
 				652619B81C11FF5300654091 /* Support.swift in Sources */,
 				652619E91C1201AF00654091 /* ReachabilityCondition.swift in Sources */,
 				652619A81C11FF5300654091 /* BlockOperation.swift in Sources */,
+				65BB56DE1C70FAB800DF5211 /* ThreadSafety.swift in Sources */,
 				652619A91C11FF5300654091 /* ComposedOperation.swift in Sources */,
 				6584D2411C6BF89000306EED /* ResultInjection.swift in Sources */,
 				652619E31C1201AF00654091 /* CalendarCapability.swift in Sources */,
