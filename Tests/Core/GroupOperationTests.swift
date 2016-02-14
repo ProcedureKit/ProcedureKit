@@ -92,7 +92,7 @@ class GroupOperationTests: OperationTests {
 
     func test__group_operation_exits_correctly_when_child_errors() {
 
-        let numberOfOperations = 10
+        let numberOfOperations = 10_000
         let operations = (0..<numberOfOperations).map { i -> Operation in
             let block = BlockOperation { (completion: BlockOperation.ContinuationBlockType) in
                 let error = NSError(domain: "me.danthorpe.Operations.Tests", code: -9_999, userInfo: nil)
@@ -103,7 +103,6 @@ class GroupOperationTests: OperationTests {
         }
 
         let group = GroupOperation(operations: operations)
-        group.queue.maxConcurrentOperationCount = 10
         group.log.severity = .Verbose
 
         let waiter = BlockOperation { }
