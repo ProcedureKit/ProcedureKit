@@ -202,24 +202,8 @@ class ReachabilityManagerTests: XCTestCase {
 
 class SystemReachabilityManagerTests: ReachabilityManagerTests {
 
-    func test__whenConnected__delegate_is_set() {
-        manager.whenConnected(.AnyConnectionKind) { }
+    func test__delegate_is_set() {
         XCTAssertNotNil(network.delegate)
-    }
-
-    func test__whenConnected__block_is_set() {
-        manager.whenConnected(.AnyConnectionKind) { }
-        XCTAssertNotNil(manager.whenConnectedBlock)
-    }
-
-    func test__whenConnected__connectivity_is_set() {
-        manager.whenConnected(.ViaWiFi) { }
-        XCTAssertEqual(manager.connectivity, Reachability.Connectivity.ViaWiFi)
-    }
-
-    func test__whenConnected__notifier_on_queue_starts() {
-        manager.whenConnected(.AnyConnectionKind) { }
-        XCTAssertTrue(network.didStartNotifier)
     }
 
     func test__whenConnected__block_is_run() {
@@ -233,11 +217,6 @@ class SystemReachabilityManagerTests: ReachabilityManagerTests {
         waitForExpectationsWithTimeout(3.0, handler: nil)
         XCTAssertTrue(blockDidRun)
         XCTAssertTrue(network.didStopNotifier)
-    }
-
-    func test__network_delegate__returns_if_block_is_not_set() {
-        manager.reachabilityDidChange(.ConnectionAutomatic)
-        XCTAssertFalse(network.didStopNotifier)
     }
 }
 
@@ -294,6 +273,16 @@ class DeviceReachabilityTests: XCTestCase, NetworkReachabilityDelegate {
         device.delegate = self
     }
 
+    func test__notifierIsRunning_true_when_running() {
+        device.notifierIsRunning = true
+        XCTAssertTrue(device.notifierIsRunning)
+    }
+
+    func test__notifierIsRunning_false_when_not_running() {
+        device.notifierIsRunning = false
+        XCTAssertFalse(device.notifierIsRunning)
+    }
+
     func reachabilityDidChange(flags: SCNetworkReachabilityFlags) {
         delegateDidReceiveFlags = flags
         expectation?.fulfill()
@@ -316,5 +305,7 @@ class DeviceReachabilityTests: XCTestCase, NetworkReachabilityDelegate {
         waitForExpectationsWithTimeout(3, handler: nil)
         XCTAssertNotNil(delegateDidReceiveFlags)
     }
+
+
 }
 
