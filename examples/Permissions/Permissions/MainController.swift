@@ -71,7 +71,12 @@ class MainController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        configure()
+
+        let config = configure()
+        let alert = createInfoAlert()
+        config.addDependency(alert)
+
+        queue.addOperations(config, alert)
 
         /// This is a little example of using the dependency injection stuff
         let retrieval = DataRetrieval()
@@ -80,13 +85,24 @@ class MainController: UIViewController {
         queue.addOperations(retrieval, processing)
     }
 
-    func configure() {
+    func createInfoAlert() -> AlertOperation<MainController> {
+        let alert = AlertOperation(presentAlertFrom: self)
+        alert.title = "Permissions"
+        alert.message = "This is a simple little example project which shows how to use Capabilities with the Operations framework."
+        return alert
+    }
+
+    func configure() -> BlockOperation {
         title = NSLocalizedString("Permissions", comment: "Permissions")
         provider = TableViewDataSourceProvider(ContentsDatasourceProvider(tableView: tableView))
-        tableView.dataSource = provider.tableViewDataSource
         tableView.delegate = self
         tableView.estimatedRowHeight = 54.0
         tableView.rowHeight = UITableViewAutomaticDimension
+        let block = BlockOperation {
+            self.tableView.dataSource = self.provider.tableViewDataSource
+            self.tableView.reloadData()
+        }
+        return block
     }
 }
 

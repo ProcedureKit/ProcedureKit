@@ -70,6 +70,7 @@ public class AlertOperation<From: PresentingViewController>: Operation {
     public init(presentAlertFrom from: From) {
         ui = UIOperation(controller: UIAlertController(title: .None, message: .None, preferredStyle: .Alert), displayControllerFrom: .Present(from))
         super.init()
+        name = "Alert<\(From.self)>"
         addCondition(AlertPresentation())
         addCondition(MutuallyExclusive<UIViewController>())
     }
@@ -87,9 +88,9 @@ public class AlertOperation<From: PresentingViewController>: Operation {
     public func addActionWithTitle(title: String, style: UIAlertActionStyle = .Default, handler: AlertOperation -> Void = { _ in }) {
         let action = UIAlertAction(title: title, style: style) { [weak self] _ in
             if let weakSelf = self {
+                weakSelf.finish()
                 handler(weakSelf)
             }
-            self?.finish()
         }
         alert.addAction(action)
     }
@@ -103,6 +104,7 @@ public class AlertOperation<From: PresentingViewController>: Operation {
         if alert.actions.isEmpty {
             addActionWithTitle(NSLocalizedString("Okay", comment: "Okay"))
         }
+        ui.log.severity = log.severity
         produceOperation(ui)
     }
 }
