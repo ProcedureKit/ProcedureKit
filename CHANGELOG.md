@@ -37,6 +37,16 @@ This is release contains a number of changes. Changes to existing behavior will 
 	Technically, this work is a refactor of `CloudKitOperation`, however it’s a major overhaul and best viewed at as completely new.
 
 	`CloudKitOperation` is a subclass of `RetryOperation`, which composes the `CKOperation` subclass inside a `ReachableOperation`.
+	
+	`CloudKitOperation` can be used to schedule `CKOperation` subclasses. It supports configuration of the underlying `CKOperation` instance “through” the outer `CloudKitOperation`, where the configuration applied is stored and re-applied on new instances in the event of retrying.
+	
+	Because it subclasses `RetryOperation`, it supports some standardized error handling for some common `CKErrorCode`s. For example, if Apple’s CloudKit service is unavailable, your operation will be automatically re-tried with the correct delay.
+	
+	`CKOperation` subclasses also all have completion blocks which receives the result and an optional error. `CloudKitOperation`  provides this completion block automatically when the consumer sets the “happy path” completion block. This means, that it is only necessary to set a block which is executed in the case of no error being received.
+	
+	`BatchedCloudKitOperation` is a `RepeatedOperation` subclass which composed `CloutKitOperation` instances. It can only be used with `CKOperation` subclasses which have the notion of batched results.
+	
+	See the class header, example projects, blog posts and (updated) guide for more documentation. This is significant change to the existing class, and should really be viewed as entirely new. Please get in touch if you were previously using `CloudKitOperation` prior to this version, and are now unsure how to proceed. I’m still working on improving the documentation & examples for this class. 
 
 ### Examples & Documentation
 
