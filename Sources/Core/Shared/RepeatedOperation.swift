@@ -217,7 +217,7 @@ struct IntervalGenerator: GeneratorType {
  ### RepeatedOperation
 
  RepeatedOperation is an GroupOperation subclass which can be used in
- conjuntion with a GeneratorType to schedule NSOperation subclasses of
+ conjunction with a GeneratorType to schedule NSOperation subclasses of
  the same type on a private queue.
  
  This is useful directly for periodically running idempotent operations,

@@ -1,3 +1,48 @@
+# 2.6.0
+
+This is release contains a number of changes. Changes to existing behavior will be highlighted.
+
+### New Operations
+
+1. [[OPR-150](https://github.com/danthorpe/Operations/pull/150)]: `MapOperation`, `FilterOperation` and `ReduceOperation` *Advanced*. 
+
+They should be used in conjunction with `ResultOperationType` which was introduced in v2.5.0. Essentially, given an operation conforming to `ResultOperationType`, the result of mapping, filtering, or reducing the receiver’s `result` can be returned as the `result` of another operation, which also conforms to `ResultOperationType`.
+
+It is suggested that this is considered for advanced users only as it’s pretty subtle behavior.
+
+2. [[OPR-154](https://github.com/danthorpe/Operations/pull/154)]: `RepeatedOperation`
+
+`RepeatedOperation` is a `GroupOperation` subclass which can be used in conjunction with a `GeneratorType` to schedule `NSOperation` subclasses of the same type on a private queue.
+ 
+This is useful directly for periodically running idempotent operations, and it forms the basis for operation types which can be retried in the event of a failure.
+ 
+The operations may optionally be scheduled after a delay has passed, or a date in the future has been reached.
+ 
+At the lowest level, which offers the most flexibility, `RepeatedOperation` is initialized with a generator. The generator (something conforming to `GeneratorType`) element type is `(Delay?, T)`, where `T` is a `NSOperation` subclass, and `Delay` is an enum used in conjunction with `DelayOperation`.
+ 
+`RepeatedOperation` can also be initialized with a simple `() -> T?` closure and `WaitStrategy`. The strategy offers standardized delays such as `.Random` and `.ExpoentialBackoff`, and will automatically create the appropriate `Delay`. 
+
+`RepeatedOperation` can be stopped by returning `nil` in the generator, or after a maximum count of operations.
+
+Additionally, `RepeatableOperation` has been added, which composes an `Operation` type, and adds convenience methods to support whether or not another instance should be scheduled based on the previous instance.
+
+### Operation Changes
+
+1. [[OPR-152](https://github.com/danthorpe/Operations/pull/156)]: Adding Conditions & Observers
+
+When adding conditions and observers, we sanity check the state of the operation as appropriate. For adding a Condition, the operation must not have started executing. For adding an Observer, it now depends on the kind, for example, it is possible to add a `OperationDidFinishObserver` right up until the operation enters its `.Finishing` state.
+
+2. [[OPR-147](https://github.com/danthorpe/Operations/pull/157)]: Scheduling of Operations from Conditions
+
+When an Operation has dependencies and also has Conditions attached which also have dependencies, the scheduling of these dependencies is now well defined. Dependencies from Conditions are referred to as *indirect dependencies* versus *direct* for dependencies added normally.
+
+The *indirect dependencies* are now scheduled __after__ *all* the direct dependencies finish. See [original issue](https://github.com/danthorpe/Operations/pull/147) and the [pull request](https://github.com/danthorpe/Operations/pull/157) for further explanation including a diagram of the queue.
+
+ 3. [[OPR-129](https://github.com/danthorpe/Operations/pull/159)]: Dependencies of mutually exclusive Conditions.
+
+If a Condition is mutually exclusive, the `OperationQueue` essentially adds a lock on the associated `Operation`. However, this previously would lead to unexpected scheduling of that condition had a dependency operation. Now, the “lock” is placed on the dependency of the condition instead of the associated operation, but only if it’s not nil. Otherwise, standard behavior is maintained.
+
+
 # 2.5.1
 1. [[OPR-151](https://github.com/danthorpe/Operations/pull/151), [OPR-155](https://github.com/danthorpe/Operations/pull/155)]: Fixes a bug where `UserLocationOperation` could crash when the LocationManager returns subsequent locations after the operation has finished.
 
