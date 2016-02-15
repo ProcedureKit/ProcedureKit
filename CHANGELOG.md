@@ -2,6 +2,8 @@
 
 This is release contains a number of changes. Changes to existing behavior will be highlighted.
 
+A note on quality: test coverage of this project has increased from 64% to 76%. The code which remains untested is either untestable (`fatalError` etc) or due for deletion `AddressBookCondition` etc.
+
 ### New Operations
 
 1. [[OPR-150](https://github.com/danthorpe/Operations/pull/150)]: `MapOperation`, `FilterOperation` and `ReduceOperation` *For advanced usage*. 
