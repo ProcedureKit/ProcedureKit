@@ -70,7 +70,7 @@ This is release contains a number of changes. Changes to existing behavior will 
 
 	The *indirect dependencies* are now scheduled __after__ *all* the direct dependencies finish. See [original issue](https://github.com/danthorpe/Operations/pull/147) and the [pull request](https://github.com/danthorpe/Operations/pull/157) for further explanation including a diagram of the queue.
 
- 3. [[OPR-129](https://github.com/danthorpe/Operations/pull/159)]: Dependencies of mutually exclusive Conditions.
+3. [[OPR-129](https://github.com/danthorpe/Operations/pull/159)]: Dependencies of mutually exclusive Conditions.
 
 	If a Condition is mutually exclusive, the `OperationQueue` essentially adds a lock on the associated `Operation`. However, this previously would lead to unexpected scheduling of that condition had a dependency operation. Now, the “lock” is placed on the dependency of the condition instead of the associated operation, but only if it’s not nil. Otherwise, standard behavior is maintained.
 
