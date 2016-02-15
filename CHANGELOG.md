@@ -10,7 +10,7 @@ They should be used in conjunction with `ResultOperationType` which was introduc
 
 It is suggested that this is considered for advanced users only as it’s pretty subtle behavior.
 
-2. [[OPR-154](https://github.com/danthorpe/Operations/pull/154)]: `RepeatedOperation`
+2. [[OPR-154](https://github.com/danthorpe/Operations/pull/154), [OPR-168](https://github.com/danthorpe/Operations/pull/168)]: `RepeatedOperation`
 
 `RepeatedOperation` is a `GroupOperation` subclass which can be used in conjunction with a `GeneratorType` to schedule `NSOperation` subclasses of the same type on a private queue.
  
@@ -25,6 +25,18 @@ At the lowest level, which offers the most flexibility, `RepeatedOperation` is i
 `RepeatedOperation` can be stopped by returning `nil` in the generator, or after a maximum count of operations.
 
 Additionally, `RepeatableOperation` has been added, which composes an `Operation` type, and adds convenience methods to support whether or not another instance should be scheduled based on the previous instance.
+
+2. [[OPR-154](https://github.com/danthorpe/Operations/pull/154), [OPR-161](https://github.com/danthorpe/Operations/pull/161)]: `RetryOperation`
+
+`RetryOperation` is a subclass of `RepeatedOperation`, except that instead of repeating irrespective of the finishing state of the previous instance, `RetryOperation` only repeats if the previous instance finished with errors.
+
+Additionally, `RetryOperation` is initialized with an “error recovery” block. This block receives various info including the errors from the previous instance, the aggregate errors so far, a `LoggerType` value, plus the *suggested* `(Delay, T?)` tuple. This tuple is the what the `RetryOperation` would execute again without any intervention. The error block allows the consumer to adjust this, either by returning `.None` to not retry at all, or by modifying the return value.
+
+3. [[OPR-160](https://github.com/danthorpe/Operations/pull/160), [OPR-165](https://github.com/danthorpe/Operations/pull/165), [OPR-167](https://github.com/danthorpe/Operations/pull/167)]: `CloudKitOperation` 2.0
+
+Technically, this work is a refactor of `CloudKitOperation`, however it’s a major overhaul and best viewed at as completely new.
+
+`CloudKitOperation` is a subclass of `RetryOperation`, which composes the `CKOperation` subclass inside a `ReachableOperation`.
 
 ### Operation Changes
 
@@ -41,6 +53,18 @@ The *indirect dependencies* are now scheduled __after__ *all* the direct depende
  3. [[OPR-129](https://github.com/danthorpe/Operations/pull/159)]: Dependencies of mutually exclusive Conditions.
 
 If a Condition is mutually exclusive, the `OperationQueue` essentially adds a lock on the associated `Operation`. However, this previously would lead to unexpected scheduling of that condition had a dependency operation. Now, the “lock” is placed on the dependency of the condition instead of the associated operation, but only if it’s not nil. Otherwise, standard behavior is maintained.
+
+4. [[OPR-162](https://github.com/danthorpe/Operations/pull/162)]: Refactor of `ComposedOperation` and `GatedOperation`
+
+Previously, the hierarchy of these two classes was all mixed up. `ComposedOperation` has been re-written to support both `Operation` subclasses and `NSOperation` subclasses. When a `NSOperation` (but not `Operation`) subclass is composed, it is scheduled inside its own `GroupOperation`. However, if composing an `Operation` subclass, instead we “produce” it and use observers to finish the `ComposedOperation` correctly.
+
+Now, `GatedOperation` is a subclass of `ComposedOperation` with the appropriate logic.
+
+5. [[OPR-163](https://github.com/danthorpe/Operations/pull/163)]: Refactor of `ReachableOperation`
+
+`ReachableOperation` now subclasses `ComposedOperation`, and uses `SCNetworkReachablity` callbacks correctly. 
+
+
 
 
 # 2.5.1
