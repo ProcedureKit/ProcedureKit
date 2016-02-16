@@ -1,22 +1,22 @@
 # 2.6.0
 
-This is release contains a number of changes. Changes to existing behavior will be highlighted.
+🚀 This release contains quite a few changes, with over 230 commits with input from 11 contributors! Thanks! 😀🎉
 
-A note on quality: test coverage of this project has increased from 64% to 76%. The code which remains untested is either untestable (`fatalError` etc) or due for deletion `AddressBookCondition` etc.
+A note on quality: test coverage has increased from 64% in v2.5 to 76%. The code which remains untested is either untestable (`fatalError` etc) or is due for deletion or deprecation such as `AddressBookCondition` etc.
 
 ### New Operations
 
 1. [[OPR-150](https://github.com/danthorpe/Operations/pull/150)]: `MapOperation`, `FilterOperation` and `ReduceOperation` *For advanced usage*. 
 
-	They should be used in conjunction with `ResultOperationType` which was introduced in v2.5.0. Essentially, given an operation conforming to `ResultOperationType`, the result of mapping, filtering, or reducing the receiver’s `result` can be returned as the `result` of another operation, which also conforms to `ResultOperationType`.
+	These operations should be used in conjunction with `ResultOperationType` which was introduced in v2.5.0. Essentially, given an receiving operation, conforming to `ResultOperationType`, the result of mapping, filtering, or reducing the receiver’s `result` can be returned as the `result` of another operation, which also conforms to `ResultOperationType`. This means that it can be trivial to map the results of one operation inside another.
 
 	It is suggested that this is considered for advanced users only as it’s pretty subtle behavior.
 
 2. [[OPR-154](https://github.com/danthorpe/Operations/pull/154), [OPR-168](https://github.com/danthorpe/Operations/pull/168)]: `RepeatedOperation`
 
-	`RepeatedOperation` is a `GroupOperation` subclass which can be used in conjunction with a `GeneratorType` to schedule `NSOperation` subclasses of the same type on a private queue.
+	The `RepeatedOperation` is a `GroupOperation` subclass which can be used in conjunction with a generator to schedule `NSOperation` instances. It is useful to remember that `NSOperation` is a “one time only” class, meaning that once an instance finishes, it cannot be re-executed. Therefore, it is necessary to construct repeatable operations using a closure or generator.
  
-	This is useful directly for periodically running idempotent operations, and it forms the basis for operation types which can be retried in the event of a failure.
+	This is useful directly for periodically running idempotent operations. It also forms the basis for operation types which can be retried.
  
 	The operations may optionally be scheduled after a delay has passed, or a date in the future has been reached.
  
@@ -24,9 +24,9 @@ A note on quality: test coverage of this project has increased from 64% to 76%. 
  
 	`RepeatedOperation` can also be initialized with a simple `() -> T?` closure and `WaitStrategy`. The strategy offers standardized delays such as `.Random` and `.ExpoentialBackoff`, and will automatically create the appropriate `Delay`. 
 
-	`RepeatedOperation` can be stopped by returning `nil` in the generator, or after a maximum count of operations.
+	`RepeatedOperation` can be stopped by returning `nil` in the generator, or after a maximum count of operations, or by calling `cancel()`.
 
-	Additionally, `RepeatableOperation` has been added, which composes an `Operation` type, and adds convenience methods to support whether or not another instance should be scheduled based on the previous instance.
+	Additionally, a `RepeatableOperation` has been included, which composes an `Operation` type, and adds convenience methods to support whether or not another instance should be scheduled based on the previous instance.
 
 2. [[OPR-154](https://github.com/danthorpe/Operations/pull/154), [OPR-161](https://github.com/danthorpe/Operations/pull/161), [OPR-168](https://github.com/danthorpe/Operations/pull/168)]: `RetryOperation`
 
@@ -36,15 +36,40 @@ A note on quality: test coverage of this project has increased from 64% to 76%. 
 
 3. [[OPR-160](https://github.com/danthorpe/Operations/pull/160), [OPR-165](https://github.com/danthorpe/Operations/pull/165), [OPR-167](https://github.com/danthorpe/Operations/pull/167)]: `CloudKitOperation` 2.0
 
-	Technically, this work is a refactor of `CloudKitOperation`, however it’s a major overhaul and best viewed at as completely new.
+	Technically, this work is a refactor of `CloudKitOperation`, however, because it’s a major overhaul it is best viewed as completely new.
 
 	`CloudKitOperation` is a subclass of `RetryOperation`, which composes the `CKOperation` subclass inside a `ReachableOperation`.
 	
-	`CloudKitOperation` can be used to schedule `CKOperation` subclasses. It supports configuration of the underlying `CKOperation` instance “through” the outer `CloudKitOperation`, where the configuration applied is stored and re-applied on new instances in the event of retrying.
+	`CloudKitOperation` can be used to schedule `CKOperation` subclasses. It supports configuration of the underlying `CKOperation` instance “through” the outer `CloudKitOperation`, where the configuration applied is stored and re-applied on new instances in the event of retrying. For example, below
 	
-	Because it subclasses `RetryOperation`, it supports some standardized error handling for some common `CKErrorCode`s. For example, if Apple’s CloudKit service is unavailable, your operation will be automatically re-tried with the correct delay.
+	```swift
+    // Modify CloudKit Records
+    let operation = CloudKitOperation { CKModifyRecordsOperation() }
+    
+    // The user must be logged into iCloud 
+    operation.addCondition(AuthorizedFor(Capability.Cloud()))
+    
+    // Configure the container & database
+    operation.container = container
+    operation.database = container.privateCloudDatabase
+    
+    // Set the records to save
+    operation.recordsToSave = [ recordOne, recordTwo ]
+    
+    // Set the policy
+    operation.savePolicy = .ChangedKeys
+    
+    // Set the completion
+    operation.setModifyRecordsCompletionBlock { saved, deleted in
+        // Only need to manage the happy path here
+    }
+	```
 	
-	`CKOperation` subclasses also all have completion blocks which receives the result and an optional error. `CloudKitOperation`  provides this completion block automatically when the consumer sets the “happy path” completion block. This means, that it is only necessary to set a block which is executed in the case of no error being received.
+	In the above example, all the properties set on `operation` are saved into an internal configuration block. This is so that it in the case of retrying after an error, the same configuration is applied to the new `CKOperation` instance returned from the generator. The same could also be achieved by setting these properties inside the initial block, however the completion block above must be called to setup the `CloudKitOperation` correctly. 
+	
+	Thanks to `RetryOperation`, `CloudKitOperation` supports some standardized error handling for common errors. For example, if Apple’s CloudKit service is unavailable, your operation will be automatically re-tried with the correct delay. Error handling can be set for individual `CKErrorCode` values, which can replace the default handlers if desired. 
+	
+	`CKOperation` subclasses also all have completion blocks which receives the result and an optional error. As discussed briefly above, `CloudKitOperation` provides this completion block automatically when the consumer sets the “happy path” completion block. The format of this function is always `set<Name of the CKOperation completion block>()` This means, that it is only necessary to set a block which is executed in the case of no error being received.
 	
 	`BatchedCloudKitOperation` is a `RepeatedOperation` subclass which composed `CloutKitOperation` instances. It can only be used with `CKOperation` subclasses which have the notion of batched results.
 	
