@@ -441,7 +441,9 @@ extension CKDatabaseOperation: CKDatabaseOperationType {
 }
 
 /// Extension to have CKDiscoverAllContactsOperation conform to CKDiscoverAllContactsOperationType
+#if !os(tvOS)
 extension CKDiscoverAllContactsOperation: CKDiscoverAllContactsOperationType { }
+#endif
 
 /// Extension to have CKDiscoverUserInfosOperation conform to CKDiscoverUserInfosOperationType
 extension CKDiscoverUserInfosOperation: CKDiscoverUserInfosOperationType { }
