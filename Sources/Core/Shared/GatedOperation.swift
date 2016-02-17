@@ -9,42 +9,44 @@
 import Foundation
 
 /**
-Allows a `NSOperation` to be composed inside an `Operation`, 
-with a block to act as a gate.
+ Allows a `NSOperation` to be composed inside an `Operation`,
+ with a block to act as a gate.
+ 
+ Use this class to execute another operation depending on other
+ logic. Unlike a `BlockCondition` this will not fail the operation.
 */
-public class GatedOperation<O: NSOperation>: GroupOperation {
+public class GatedOperation<T: NSOperation>: ComposedOperation<T> {
 
     public typealias GateBlockType = () -> Bool
 
-    /// The composed generic operation
-    public let operation: O
     let gate: GateBlockType
 
     /**
-    Return true from the block to have the composed operation
-    be executed, return false and the operation will not
-    be executed.
+     Return true from the block to have the composed operation
+     be executed, return false and the operation will not
+     be executed.
     
-    - parameter operation: any subclass of `NSOperation`.
-    - parameter gate: a block which returns a Bool.
+     - parameter operation: any subclass of `NSOperation`.
+     - parameter gate: a block which returns a Bool.
     */
-    public init(operation: O, gate: GateBlockType) {
-        self.operation = operation
+    public init(_ op: T, gate: GateBlockType) {
         self.gate = gate
-        super.init(operations: [])
+        super.init(operation: op)
     }
 
     /**
-    Executes the block. If the result of executing the gate is
-    true, the operation is added. Then we call super.execute()
-    which will start the group's queue, meaning that the composed
-    operation will start.
+     Executes the block. If the result of executing the gate is
+     true, the composed operation will start. If the gate is
+     false, this operation will finish. Note that if the gate is
+     closed, the operation does not "fail" i.e. finish with errors.
     */
     public override func execute() {
         if gate() {
-            addOperation(operation)
+            super.execute()
         }
-        super.execute()
+        else {
+            finish()
+        }
     }
 }
 

@@ -106,7 +106,6 @@ class SCNetworkReachabilityFlagsTests: XCTestCase {
     }
 }
 
-
 class NetworkStatusTests: XCTestCase {
 
     var flags: SCNetworkReachabilityFlags!
@@ -139,7 +138,183 @@ class NetworkStatusTests: XCTestCase {
         flags = [ .ConnectionRequired ]
         XCTAssertEqual(Reachability.NetworkStatus(flags: flags), Reachability.NetworkStatus.NotReachable)
     }
+
+    func test__not_reachable_is_not_connected() {
+        let status: Reachability.NetworkStatus = .NotReachable
+        XCTAssertFalse(status.isConnected(.AnyConnectionKind))
+    }
+
+    func test__reachable_via_wwan_is_not_connected_for_wifi() {
+        let status: Reachability.NetworkStatus = .Reachable(.ViaWWAN)
+        XCTAssertFalse(status.isConnected(.ViaWiFi))
+    }
+}
+
+class TestableNetworkReachability {
+    typealias Reachability = String
+
+    var didGetDefaultRouteReachability = false
+    var _defaultRouteReachability: Reachability = "Default"
+    var flags: SCNetworkReachabilityFlags? = .Reachable
+    var didStartNotifier = false
+    var didStopNotifier = false
+    var didGetReachabilityFlagsForHostname = false
+
+    weak var delegate: NetworkReachabilityDelegate?
+}
+
+extension TestableNetworkReachability: NetworkReachabilityType {
+
+    func defaultRouteReachability() throws -> Reachability {
+        didGetDefaultRouteReachability = true
+        return _defaultRouteReachability
+    }
+
+    func startNotifierOnQueue(queue: dispatch_queue_t) throws {
+        didStartNotifier = true
+        if let flags = flags {
+            delegate?.reachabilityDidChange(flags)
+        }
+    }
+
+    func stopNotifier() {
+        didStopNotifier = true
+    }
+
+    func reachabilityFlagsForHostname(host: String) -> SCNetworkReachabilityFlags? {
+        didGetReachabilityFlagsForHostname = true
+        return flags
+    }
 }
 
 
+class ReachabilityManagerTests: XCTestCase {
+
+    var network: TestableNetworkReachability!
+    var manager: ReachabilityManager!
+
+    override func setUp() {
+        super.setUp()
+        network = TestableNetworkReachability()
+        manager = ReachabilityManager(network)
+    }
+}
+
+class SystemReachabilityManagerTests: ReachabilityManagerTests {
+
+    func test__delegate_is_set() {
+        XCTAssertNotNil(network.delegate)
+    }
+
+    func test__whenConnected__block_is_run() {
+        var blockDidRun = false
+        let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
+        manager.whenConnected(.AnyConnectionKind) {
+            blockDidRun = true
+            expectation.fulfill()
+        }
+
+        waitForExpectationsWithTimeout(3.0, handler: nil)
+        XCTAssertTrue(blockDidRun)
+        XCTAssertTrue(network.didStopNotifier)
+    }
+}
+
+class HostReachabilityManagerTests: ReachabilityManagerTests {
+
+    func test__reachabilityForURL__with_no_host__not_reachable() {
+        let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
+        var receivedStatus: Reachability.NetworkStatus? = .None
+        manager.reachabilityForURL(NSURL(string: "http://")!) { status in
+            receivedStatus = status
+            expectation.fulfill()
+        }
+
+        waitForExpectationsWithTimeout(3.0, handler: nil)
+        XCTAssertEqual(receivedStatus ?? .Reachable(.AnyConnectionKind), .NotReachable)
+    }
+
+    func test__reachabilityForURL__without_flags__not_reachable() {
+        let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
+        var receivedStatus: Reachability.NetworkStatus? = .None
+        network.flags = .None
+        manager.reachabilityForURL(NSURL(string: "http://apple.com")!) { status in
+            receivedStatus = status
+            expectation.fulfill()
+        }
+
+        waitForExpectationsWithTimeout(3.0, handler: nil)
+        XCTAssertEqual(receivedStatus ?? .Reachable(.AnyConnectionKind), .NotReachable)
+    }
+
+    func test__reachabilityForURL__reachable() {
+        let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
+        var receivedStatus: Reachability.NetworkStatus? = .None
+        manager.reachabilityForURL(NSURL(string: "http://apple.com")!) { status in
+            receivedStatus = status
+            expectation.fulfill()
+        }
+
+        waitForExpectationsWithTimeout(3.0, handler: nil)
+        XCTAssertEqual(receivedStatus ?? .Reachable(.AnyConnectionKind), .Reachable(.ViaWiFi))
+    }
+}
+
+class DeviceReachabilityTests: XCTestCase, NetworkReachabilityDelegate {
+
+    let queue: dispatch_queue_t = Queue.Default.serial("me.danthorpe.Operation.Testing")
+    var device: DeviceReachability!
+    var expectation: XCTestExpectation? = .None
+    var delegateDidReceiveFlags: SCNetworkReachabilityFlags? = .None
+
+    override func setUp() {
+        super.setUp()
+        device = DeviceReachability()
+        device.delegate = self
+    }
+
+    func test__notifierIsRunning_true_when_running() {
+        device.notifierIsRunning = true
+        XCTAssertTrue(device.notifierIsRunning)
+    }
+
+    func test__notifierIsRunning_false_when_not_running() {
+        device.notifierIsRunning = false
+        XCTAssertFalse(device.notifierIsRunning)
+    }
+
+    func reachabilityDidChange(flags: SCNetworkReachabilityFlags) {
+        delegateDidReceiveFlags = flags
+        expectation?.fulfill()
+    }
+
+    func test__reachabilityForHost() {
+        XCTAssertNotNil(device.reachabilityForHost("https://apple.com"))
+    }
+
+    func test__reachabilityDidChange_informs_delegate() {
+        device.reachabilityDidChange(.Reachable)
+        XCTAssertEqual(delegateDidReceiveFlags ?? .ConnectionRequired, .Reachable)
+    }
+
+    func test__check() {
+        expectation = expectationWithDescription("Test: \(__FUNCTION__)")
+        if let reachability = device.reachabilityForHost("https://apple.com") {
+            device.check(reachability, queue: queue)
+        }
+        waitForExpectationsWithTimeout(3, handler: nil)
+        XCTAssertNotNil(delegateDidReceiveFlags)
+    }
+
+    func test__creates_default_route_reachability() {
+        do {
+            XCTAssertNil(device.__defaultRouteReachability)
+            let _ = try device.defaultRouteReachability()
+            XCTAssertNotNil(device.__defaultRouteReachability)
+        }
+        catch {
+            XCTFail("Unexpected error thrown: \(error)")
+        }
+    }
+}
 

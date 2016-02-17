@@ -74,41 +74,31 @@ public protocol OperationCondition {
     func evaluateForOperation(operation: Operation, completion: OperationConditionResult -> Void)
 }
 
+internal func evaluateOperationConditions(conditions: [OperationCondition], operation: Operation, completion: [ErrorType] -> Void) {
 
-struct OperationConditionEvaluator {
+    let group = dispatch_group_create()
 
-    static func evaluate(conditions: [OperationCondition], operation: Operation, completion: [ErrorType] -> Void) {
+    var results = [OperationConditionResult?](count: conditions.count, repeatedValue: .None)
 
-        let group = dispatch_group_create()
-
-        var results = [OperationConditionResult?](count: conditions.count, repeatedValue: .None)
-
-        for (index, condition) in conditions.enumerate() {
-            dispatch_group_enter(group)
-            condition.evaluateForOperation(operation) { result in
-                results[index] = result
-                dispatch_group_leave(group)
-            }
-        }
-
-        dispatch_group_notify(group, Queue.Default.queue) {
-
-            var failures: [ErrorType] = results.reduce([ErrorType]()) { (var acc, result) in
-                if let error = result?.error {
-                    acc.append(error)
-                }
-                return acc
-            }
-
-            if operation.cancelled {
-                failures.append(OperationError.ConditionFailed)
-            }
-
-            completion(failures)
+    for (index, condition) in conditions.enumerate() {
+        dispatch_group_enter(group)
+        condition.evaluateForOperation(operation) { result in
+            results[index] = result
+            dispatch_group_leave(group)
         }
     }
-}
 
+    dispatch_group_notify(group, Queue.Default.queue) {
+
+        var failures: [ErrorType] = results.flatMap { $0?.error }
+
+        if operation.cancelled {
+            failures.append(OperationError.ConditionFailed)
+        }
+
+        completion(failures)
+    }
+}
 
 extension OperationConditionResult {
 

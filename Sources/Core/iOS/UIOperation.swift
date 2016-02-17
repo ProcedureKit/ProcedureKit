@@ -100,9 +100,11 @@ public enum ViewControllerDisplayStyle<ViewController: PresentingViewController>
 
         case .Show(let from):
             from.showViewController(controller, sender: sender)
+            completion?()
 
         case .ShowDetail(let from):
             from.showDetailViewController(controller, sender: sender)
+            completion?()
         }
     }
 }
@@ -129,7 +131,6 @@ public class UIOperation<C, From where C: UIViewController, From: PresentingView
 
     /// The `AnyObject` sender.
     public let sender: AnyObject?
-    let completion: (() -> Void)?
 
     /**
     Construct a `UIOperation` with the presented view controller, the presenting view controller display 
@@ -145,11 +146,12 @@ public class UIOperation<C, From where C: UIViewController, From: PresentingView
     - parameter sender: an optional `AnyObject` see docs for UIViewController.
     - parameter completion: an optional void block, see docs for UIViewController.
     */
-    public init(controller: C, displayControllerFrom from: ViewControllerDisplayStyle<From>, sender: AnyObject? = .None, completion: (() -> Void)? = .None) {
+    public init(controller: C, displayControllerFrom from: ViewControllerDisplayStyle<From>, sender: AnyObject? = .None) {
         self.controller = controller
         self.from = from
         self.sender = sender
-        self.completion = completion
+        super.init()
+        name = "UIOperation<\(C.self)>"
     }
 
     /**
@@ -159,7 +161,9 @@ public class UIOperation<C, From where C: UIViewController, From: PresentingView
     */
     public override func execute() {
         dispatch_async(Queue.Main.queue) {
-            self.from.displayController(self.controller, sender: self.sender, completion: self.completion)
+            self.from.displayController(self.controller, sender: self.sender) {
+                self.finish()
+            }
         }
     }
 }

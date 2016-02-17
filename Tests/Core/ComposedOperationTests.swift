@@ -11,15 +11,38 @@ import XCTest
 
 class ComposedOperationTests: OperationTests {
 
+    func test__composed_operation_is_cancelled() {
+        let composed = ComposedOperation(TestOperation())
+        composed.cancel()
+        XCTAssertTrue(composed.cancelled)
+        XCTAssertTrue(composed.operation.cancelled)
+    }
+
+    func test__composed_nsoperation_is_performed() {
+        var didExecute = false
+        let composed = ComposedOperation(NSBlockOperation {
+            didExecute = true
+        })
+
+        let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
+        addCompletionBlockToTestOperation(composed, withExpectation: expectation)
+        runOperation(composed)
+        waitForExpectationsWithTimeout(3, handler: nil)
+
+        XCTAssertTrue(composed.finished)
+        XCTAssertTrue(didExecute)
+    }
+
     func test__composed_operation_is_performed() {
         let composed = ComposedOperation(operation: TestOperation())
-        addCompletionBlockToTestOperation(composed, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
-        runOperation(composed)
 
+        let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
+        addCompletionBlockToTestOperation(composed, withExpectation: expectation)
+        runOperation(composed)
         waitForExpectationsWithTimeout(3, handler: nil)
+
         XCTAssertTrue(composed.finished)
         XCTAssertTrue(composed.operation.didExecute)
-
     }
 }
 

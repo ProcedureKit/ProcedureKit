@@ -8,23 +8,38 @@
 
 import Foundation
 
-/**
-Allows a `NSOperation` to be composed inside an `Operation`. This
-is very handy for applying `Operation` level features such as 
-conditions and observers to `NSOperation` instances.
-*/
-public class ComposedOperation<O: NSOperation>: GatedOperation<O> {
+public class ComposedOperation<T: NSOperation>: Operation, OperationDidFinishObserver {
 
-    /**
-    Designated initializer.
-    
-    - parameter operation: The composed operation, must be a `NSOperation` subclass.
-    */
-    public init(operation: O) {
-        super.init(operation: operation, gate: { true })
+    public let target: Operation
+    public var operation: T
+
+    public convenience init(_ op: T) {
+        self.init(operation: op)
+    }
+
+    init(operation op: T) {
+        self.target = op as? Operation ?? GroupOperation(operations: [op])
+        self.operation = op
+        super.init()
+        name = "Composed Operation"
+        target.name = "Composed <\(T.self)>"
+        target.addObserver(self)
+    }
+
+    public override func cancel() {
+        operation.cancel()
+        super.cancel()
+    }
+
+    public override func execute() {
+        target.log.severity = log.severity
+        produceOperation(target)
+    }
+
+    public func operationDidFinish(operation: Operation, errors: [ErrorType]) {
+        if operation == target {
+            finish(errors)
+        }
     }
 }
-
-
-
 

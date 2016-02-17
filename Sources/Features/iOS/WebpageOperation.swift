@@ -20,8 +20,8 @@ public class WebpageOperation<From: PresentingViewController>: Operation, SFSafa
 
     let operation: UIOperation<SFSafariViewController, From>
 
-    public init(url: NSURL, displayControllerFrom from: ViewControllerDisplayStyle<From>, sender: AnyObject? = .None, completion: (() -> Void)? = .None) {
-        operation = UIOperation(controller: SFSafariViewController(URL: url, entersReaderIfAvailable: true), displayControllerFrom: from, sender: sender, completion: completion)
+    public init(url: NSURL, displayControllerFrom from: ViewControllerDisplayStyle<From>, sender: AnyObject? = .None) {
+        operation = UIOperation(controller: SFSafariViewController(URL: url, entersReaderIfAvailable: true), displayControllerFrom: from, sender: sender)
         super.init()
         addCondition(MutuallyExclusive<UIViewController>())
     }

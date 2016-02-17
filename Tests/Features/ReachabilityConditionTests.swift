@@ -9,110 +9,116 @@
 import XCTest
 @testable import Operations
 
-class TestableReachability: HostReachability {
-
-    let status: Reachability.NetworkStatus
-
-    init(networkStatus: Reachability.NetworkStatus) {
-        status = networkStatus
-    }
-
-    func requestReachabilityForURL(url: NSURL, completion: Reachability.ObserverBlockType) {
-        completion(status)
-    }
-}
-
 class ReachabilityConditionTests: OperationTests {
+
+    var network: TestableNetworkReachability!
+    var manager: ReachabilityManager!
 
     let url = NSURL(string: "http://apple.com")!
 
+    override func setUp() {
+        super.setUp()
+        network = TestableNetworkReachability()
+        manager = ReachabilityManager(network)
+    }
+
+    func test__condition_name() {
+        let condition = ReachabilityCondition(url: url, reachability: manager)
+        XCTAssertEqual(condition.name, "Reachability")
+    }
+
+    func test__is_mutually_exclusivity() {
+        let condition = ReachabilityCondition(url: url, reachability: manager)
+        XCTAssertFalse(condition.isMutuallyExclusive)
+    }
+
+    func test__url() {
+        let condition = ReachabilityCondition(url: url, reachability: manager)
+        XCTAssertEqual(condition.url, url)
+    }
+
+
     func test__condition_is_satisfied_when_host_is_reachable_via_wifi() {
-        let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
-        let operation = TestOperation(delay: 1)
-        let condition = ReachabilityCondition(url: url, reachability: TestableReachability(networkStatus: .Reachable(.ViaWiFi)))
+
+        let operation = TestOperation()
+        let condition = ReachabilityCondition(url: url, reachability: manager)
         operation.addCondition(condition)
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectation)
-        runOperation(operation)
+        waitForOperation(operation)
 
-        waitForExpectationsWithTimeout(3) { error in
-            XCTAssertTrue(operation.didExecute)
-            XCTAssertTrue(operation.finished)
-        }
+        XCTAssertTrue(operation.didExecute)
+        XCTAssertTrue(operation.finished)
     }
 
-    func test__condition_is_satisfied_when_host_is_reachable_via_wwan() {
-
-        let operation = TestOperation(delay: 1)
-        let condition = ReachabilityCondition(url: url, connectivity: .ViaWWAN, reachability: TestableReachability(networkStatus: .Reachable(.ViaWWAN)))
-        operation.addCondition(condition)
-
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
-        runOperation(operation)
-
-        waitForExpectationsWithTimeout(3) { error in
-            XCTAssertTrue(operation.didExecute)
-            XCTAssertTrue(operation.finished)
-        }
-    }
-
-    func test__condition_fails_when_wifi_is_required_but_only_wwan_available() {
+    func test__condition_fails_with_not_reachable() {
 
         let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
-        let operation = TestOperation(delay: 1)
+        let operation = TestOperation()
+        let condition = ReachabilityCondition(url: url, reachability: manager)
 
-        let condition = ReachabilityCondition(url: url, connectivity: .ViaWiFi, reachability: TestableReachability(networkStatus: .Reachable(.ViaWWAN)))
-        operation.addCondition(condition)
-
-        var observedErrors = Array<ErrorType>()
-        operation.addObserver(FinishedObserver { op, errors in
-            if op == operation {
-                observedErrors = errors
-            }
+        var conditionResult: OperationConditionResult = .Satisfied
+        network.flags = []
+        condition.evaluateForOperation(operation) { result in
+            conditionResult = result
             expectation.fulfill()
-        })
-
-        runOperation(operation)
-
-        waitForExpectationsWithTimeout(3) { _ in
-            XCTAssertFalse(operation.didExecute)            
-            if let error = observedErrors[0] as? ReachabilityCondition.Error {
-                XCTAssertTrue(error == ReachabilityCondition.Error.NotReachableWithConnectivity(.ViaWiFi))
-            }
-            else {
-                XCTFail("No error message was observer")
-            }
         }
+
+        waitForExpectationsWithTimeout(3, handler: nil)
+
+        guard let error = conditionResult.error as? ReachabilityCondition.Error else {
+            XCTFail("Should have an error")
+            return
+        }
+
+        XCTAssertEqual(error, ReachabilityCondition.Error.NotReachable)
     }
 
-    func test__condition_fails_when_no_connectivity() {
+    #if os(iOS)
+    func test__condition_fails_when_wifi_required_but_only_wwan_available() {
 
         let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
-        let operation = TestOperation(delay: 1)
 
-        let condition = ReachabilityCondition(url: url, reachability: TestableReachability(networkStatus: .NotReachable))
-        operation.addCondition(condition)
+        let operation = TestOperation()
+        let condition = ReachabilityCondition(url: url, connectivity: .ViaWiFi, reachability: manager)
+        var conditionResult: OperationConditionResult = .Satisfied
 
-        var observedErrors = Array<ErrorType>()
-        operation.addObserver(FinishedObserver { op, errors in
-            if op == operation {
-                observedErrors = errors
-            }
+        network.flags = [.Reachable, .IsWWAN]
+
+        condition.evaluateForOperation(operation) { result in
+            conditionResult = result
             expectation.fulfill()
-        })
-
-        runOperation(operation)
-
-        waitForExpectationsWithTimeout(3) { _ in
-            if let error = observedErrors[0] as? ReachabilityCondition.Error {
-                XCTAssertTrue(error == ReachabilityCondition.Error.NotReachable)
-            }
-            else {
-                XCTFail("No error message was observer")
-            }
         }
+
+        waitForExpectationsWithTimeout(3, handler: nil)
+
+        guard let error = conditionResult.error as? ReachabilityCondition.Error else {
+            XCTFail("Should have an error")
+            return
+        }
+
+        XCTAssertEqual(error, ReachabilityCondition.Error.NotReachableWithConnectivity(.ViaWiFi))
     }
+    #endif
 }
 
+class ReachabilityConditionErrorTests: XCTestCase {
+
+    func test__equality__both_not_reachable() {
+        XCTAssertEqual(ReachabilityCondition.Error.NotReachable, ReachabilityCondition.Error.NotReachable)
+    }
+
+    func test__equality__both_not_reachable_same_connectivity() {
+        XCTAssertEqual(ReachabilityCondition.Error.NotReachableWithConnectivity(.AnyConnectionKind), ReachabilityCondition.Error.NotReachableWithConnectivity(.AnyConnectionKind))
+    }
+
+    func test__equality__both_not_reachable_different_connectivity() {
+        XCTAssertNotEqual(ReachabilityCondition.Error.NotReachableWithConnectivity(.ViaWWAN), ReachabilityCondition.Error.NotReachableWithConnectivity(.ViaWiFi))
+    }
+
+    func test__equality__different_reachable() {
+        XCTAssertNotEqual(ReachabilityCondition.Error.NotReachable, ReachabilityCondition.Error.NotReachableWithConnectivity(.ViaWiFi))
+    }
+
+}
 
 

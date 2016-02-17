@@ -52,10 +52,9 @@ class AlertOperationTests: OperationTests {
         }
 
         runOperation(alert)
+        waitForExpectationsWithTimeout(2, handler: nil)
 
-        waitForExpectationsWithTimeout(5, handler: nil)
         XCTAssertTrue(didPresentAlert)
     }
-
 }
 

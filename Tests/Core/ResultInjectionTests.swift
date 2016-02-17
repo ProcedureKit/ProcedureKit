@@ -94,6 +94,8 @@ class AutomaticResultInjectionTests: ResultInjectionTests {
                     XCTFail("Incorrect error received")
                     return
                 }
+            default:
+                XCTFail("Incorrect error received")
             }
         })
 

@@ -13,7 +13,7 @@ class GatedOperationTests: OperationTests {
 
     func test__when_gate_is_closed_operation_is_not_performed() {
 
-        let gate = GatedOperation(operation: TestOperation()) { return false }
+        let gate = GatedOperation(TestOperation()) { return false }
         addCompletionBlockToTestOperation(gate, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
 
         runOperation(gate)
@@ -24,7 +24,7 @@ class GatedOperationTests: OperationTests {
     }
 
     func test__when_gate_is_open_operation_is_performed() {
-        let gate = GatedOperation(operation: TestOperation()) { return true }
+        let gate = GatedOperation(TestOperation()) { return true }
         addCompletionBlockToTestOperation(gate, withExpectation: expectationWithDescription("Test: \(__FUNCTION__), Gate"))
         addCompletionBlockToTestOperation(gate.operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__), Operation"))
 

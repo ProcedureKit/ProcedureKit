@@ -2,7 +2,7 @@
 
 [![Build status](https://badge.buildkite.com/4bc80b0824c6357ae071342271cb503b8994cf0cfa58645849.svg?branch=master)](https://buildkite.com/blindingskies/operations)
 [![codecov.io](http://codecov.io/github/danthorpe/Operations/coverage.svg?branch=development)](http://codecov.io/github/danthorpe/Operations?branch=development)
-[![Cocoapods Compatible](https://img.shields.io/cocoapods/v/Operations.svg)](https://img.shields.io/cocoapods/v/Operations.svg)
+[![CocoaPods Compatible](https://img.shields.io/cocoapods/v/Operations.svg)](https://img.shields.io/cocoapods/v/Operations.svg)
 [![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/Carthage/Carthage)
 [![Platform](https://img.shields.io/cocoapods/p/Operations.svg?style=flat)](http://cocoadocs.org/docsets/Operations)
 
@@ -13,7 +13,7 @@ A Swift framework inspired by WWDC 2015 Advanced NSOperations session.
 Resource | Where to find it
 ---------|-----------------
 Session video | [developer.apple.com](https://developer.apple.com/videos/wwdc/2015/?id=226)
-Reference documentation | [docs.danthorpe.me/operations](http://docs.danthorpe.me/operations/2.5.0/index.html)
+Reference documentation | [docs.danthorpe.me/operations](http://docs.danthorpe.me/operations/2.6.0/index.html)
 Programming guide | [operations.readme.io](https://operations.readme.io)
 
 ## Usage

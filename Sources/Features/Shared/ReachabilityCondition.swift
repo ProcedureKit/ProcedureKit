@@ -25,13 +25,13 @@ public class ReachabilityCondition: OperationCondition {
 
     let url: NSURL
     let connectivity: Reachability.Connectivity
-    let reachability: HostReachability
+    let reachability: HostReachabilityType
 
     public convenience init(url: NSURL, connectivity: Reachability.Connectivity = .AnyConnectionKind) {
-        self.init(url: url, connectivity: connectivity, reachability: Reachability.sharedInstance)
+        self.init(url: url, connectivity: connectivity, reachability: ReachabilityManager(DeviceReachability()))
     }
 
-    init(url: NSURL, connectivity: Reachability.Connectivity = .AnyConnectionKind, reachability: HostReachability) {
+    init(url: NSURL, connectivity: Reachability.Connectivity = .AnyConnectionKind, reachability: HostReachabilityType) {
         self.url = url
         self.connectivity = connectivity
         self.reachability = reachability
@@ -42,11 +42,9 @@ public class ReachabilityCondition: OperationCondition {
     }
 
     public func evaluateForOperation(operation: Operation, completion: OperationConditionResult -> Void) {
-        reachability.requestReachabilityForURL(url) { kind in
-            switch (self.connectivity, kind) {
-            case (_, .NotReachable):
-                completion(.Failed(Error.NotReachable))
-            case (.AnyConnectionKind, _), (.ViaWWAN, _):
+        reachability.reachabilityForURL(url) { status in
+            switch (self.connectivity, status) {
+            case (.AnyConnectionKind, .Reachable(_)), (.ViaWWAN, .Reachable(_)):
                 completion(.Satisfied)
             case (.ViaWiFi, .Reachable(.ViaWWAN)):
                 completion(.Failed(Error.NotReachableWithConnectivity(self.connectivity)))
@@ -63,7 +61,8 @@ public func ==(a: ReachabilityCondition.Error, b: ReachabilityCondition.Error) -
         return true
     case let (.NotReachableWithConnectivity(aConnectivity), .NotReachableWithConnectivity(bConnectivity)):
         return aConnectivity == bConnectivity
-    default: return false
+    default:
+        return false
     }
 }
 

@@ -9,19 +9,14 @@
 import Foundation
 import SystemConfiguration
 
-public protocol SystemReachability {
-    func addObserver(observer: Reachability.ObserverBlockType) -> String
-    func removeObserverWithToken(token: String)
-}
+public struct Reachability {
 
-public protocol HostReachability {
-    func requestReachabilityForURL(url: NSURL, completion: Reachability.ObserverBlockType)
-}
-
-/**
-A `Reachability` class, which performs tasks necessary to manage reachability.
-*/
-public final class Reachability {
+    /// Errors which can be thrown or returned.
+    public enum Error: ErrorType {
+        case FailedToCreateDefaultRouteReachability
+        case FailedToSetNotifierCallback
+        case FailedToSetDispatchQueue
+    }
 
     /// The kind of `Reachability` connectivity
     public enum Connectivity {
@@ -34,179 +29,217 @@ public final class Reachability {
         case Reachable(Connectivity)
     }
 
-    public typealias ObserverBlockType = (NetworkStatus) -> Void
+    /// The ObserverBlockType
+    public typealias ObserverBlockType = NetworkStatus -> Void
 
     struct Observer {
-        let reachabilityDidChange: ObserverBlockType
+        let connectivity: Connectivity
+        let whenConnectedBlock: () -> Void
+    }
+}
+
+protocol NetworkReachabilityDelegate: class {
+
+    func reachabilityDidChange(flags: SCNetworkReachabilityFlags)
+}
+
+protocol NetworkReachabilityType {
+
+    weak var delegate: NetworkReachabilityDelegate? { get set }
+
+    func startNotifierOnQueue(queue: dispatch_queue_t) throws
+
+    func stopNotifier()
+
+    func reachabilityFlagsForHostname(host: String) -> SCNetworkReachabilityFlags?
+}
+
+protocol ReachabilityManagerType {
+
+    init(_ network: NetworkReachabilityType)
+}
+
+protocol SystemReachabilityType: ReachabilityManagerType {
+
+    func whenConnected(conn: Reachability.Connectivity, block: () -> Void)
+}
+
+protocol HostReachabilityType: ReachabilityManagerType {
+
+    func reachabilityForURL(url: NSURL, completion: Reachability.ObserverBlockType)
+}
+
+final class ReachabilityManager {
+    typealias Status = Reachability.NetworkStatus
+
+    static let sharedInstance = ReachabilityManager(DeviceReachability())
+
+    let queue = Queue.Utility.serial("me.danthorpe.Operations.Reachability")
+    var network: NetworkReachabilityType
+    var _observers = Protector(Array<Reachability.Observer>())
+
+    var observers: [Reachability.Observer] {
+        return _observers.read { $0 }
     }
 
-    public static let sharedInstance = Reachability()
-
-    /**
-    Add an observer block which will be executed when the network
-    status changes.
-    
-    :param: observer, a `ObserverBlockType` block
-    :returns: a unique string, which is used to remove the observer.
-    */
-    public class func addObserver(observer: ObserverBlockType) -> String {
-        return sharedInstance.addObserver(observer)
+    var numberOfObservers: Int {
+        return observers.count
     }
 
-    /**
-    Removes a reachability observer.
-
-    :param: token, a `String` returned from `addObserver:`
-    */
-    public class func removeObserverWithToken(token: String) {
-        sharedInstance.removeObserverWithToken(token)
+    required init(_ net: NetworkReachabilityType) {
+        network = net
+        network.delegate = self
     }
+}
 
-    // Instance
+extension ReachabilityManager: NetworkReachabilityDelegate {
 
-    private var refs = [String: SCNetworkReachability]()
-    private let queue = Queue.Utility.serial("me.danthorpe.Operations.Reachability")
-    private let defaultRouteReachability: SCNetworkReachability?
-    private var observers = [String: Observer]()
-    private var isRunning = false
-    private var previousReachabilityFlags: SCNetworkReachabilityFlags? = .None
-    private var timer: dispatch_source_t?
-    private lazy var timerQueue: dispatch_queue_t = Queue.Background.concurrent("me.danthorpe.Operations.Reachabiltiy.Timer")
+    func reachabilityDidChange(flags: SCNetworkReachabilityFlags) {
 
-    private var defaultRouteReachabilityFlags: SCNetworkReachabilityFlags? {
-        get {
-            if let ref = defaultRouteReachability {
-                var flags: SCNetworkReachabilityFlags = []
-                if SCNetworkReachabilityGetFlags(ref, &flags) {
-                    return flags
+        let status = Status(flags: flags)
+        let observersToCheck = _observers.read { $0 }
+
+        _observers.write { (inout mutableObservers: Array<Reachability.Observer>) in
+            mutableObservers = observersToCheck.filter { observer in
+                let shouldRemove = status.isConnected(observer.connectivity)
+                if shouldRemove {
+                    dispatch_async(Queue.Main.queue, observer.whenConnectedBlock)
                 }
-            }
-            return .None
-        }
-    }
-
-    private var recentNetworkStatus: NetworkStatus? {
-        return previousReachabilityFlags.map { NetworkStatus(flags: $0) }
-    }
-
-    private let isPhoneDevice: Bool = {
-        #if (arch(i386) || arch(x86_64)) && os(iOS)
-            return false
-        #else
-            return true
-        #endif
-    }()
-
-    private init() {
-
-        defaultRouteReachability = {
-            var zeroAddress = sockaddr_in()
-            zeroAddress.sin_len = UInt8(sizeofValue(zeroAddress))
-            zeroAddress.sin_family = sa_family_t(AF_INET)
-            return withUnsafePointer(&zeroAddress) {
-                SCNetworkReachabilityCreateWithAddress(nil, UnsafePointer($0))
-            }
-        }()
-    }
-
-    public func addObserver(observer: ObserverBlockType) -> String {
-        let token = NSUUID().UUIDString
-        addObserverWithToken(token, observer: observer)
-        return token
-    }
-
-    public func addObserverWithToken(token: String, observer block: ObserverBlockType) {
-        let observer = Observer(reachabilityDidChange: block)
-        observers.updateValue(observer, forKey: token)
-        didAddObserver(observer)
-        startNotifier()
-    }
-
-    public func removeObserverWithToken(token: String) {
-        observers.removeValueForKey(token)
-        stopNotifier()
-    }
-
-    public func requestReachabilityForURL(url: NSURL, completion: ObserverBlockType) {
-        if let host = url.host {
-            dispatch_async(queue) {
-                var status = NetworkStatus.NotReachable
-                if let ref = self.refs[host] ?? SCNetworkReachabilityCreateWithName(nil, (host as NSString).UTF8String) {
-                    self.refs[host] = ref
-
-                    var flags: SCNetworkReachabilityFlags = []
-                    if SCNetworkReachabilityGetFlags(ref, &flags) {
-                        status = NetworkStatus(flags: flags)
-                    }
-                }
-                completion(status)
+                return !shouldRemove
             }
         }
-    }
 
-    // Private
-
-    private func startNotifier() {
-        if !isRunning {
-            if let _timer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, timerQueue) {
-                // Fire every 250 milliseconds, with 250 millisecond leeway
-                dispatch_source_set_timer(_timer, dispatch_walltime(nil, 0), 250 * NSEC_PER_MSEC, 250 * NSEC_PER_MSEC)
-                dispatch_source_set_event_handler(_timer, timerDidFire)
-                dispatch_resume(_timer)
-                timer = _timer
-            }
-            isRunning = true
-//            print(">> [Reachability]: Started.")
+        if numberOfObservers == 0 {
+            network.stopNotifier()
         }
     }
+}
 
-    private func stopNotifier() {
-        if observers.count == 0 {
-            if let _timer = timer {
-                dispatch_source_cancel(_timer)
-                timer = nil
-                previousReachabilityFlags = .None
-            }
-            isRunning = false
-//            print(">> [Reachability]: Stopped.")
-        }
+extension ReachabilityManager: SystemReachabilityType {
+
+    func whenConnected(conn: Reachability.Connectivity, block: () -> Void) {
+        _observers.write({ (inout mutableObservers: [Reachability.Observer]) in
+            mutableObservers.append(Reachability.Observer(connectivity: conn, whenConnectedBlock: block))
+        }, completion: { try! self.network.startNotifierOnQueue(self.queue) })
     }
+}
 
-    private func didAddObserver(observer: Observer) {
-        if let networkStatus = recentNetworkStatus {
-            dispatch_async(Queue.Main.queue) {
-                observer.reachabilityDidChange(networkStatus)
-            }
-        }
-    }
+extension ReachabilityManager: HostReachabilityType {
 
-    private func timerDidFire() {
-        if let currentReachabiltiyFlags = defaultRouteReachabilityFlags {
-            if let previousReachabilityFlags = previousReachabilityFlags {
-                if previousReachabilityFlags != currentReachabiltiyFlags {
-                    reachabilityFlagsDidChange(currentReachabiltiyFlags)
-                }
+    func reachabilityForURL(url: NSURL, completion: Reachability.ObserverBlockType) {
+
+        dispatch_async(queue) { [reachabilityFlagsForHostname = network.reachabilityFlagsForHostname] in
+            if let host = url.host, flags = reachabilityFlagsForHostname(host) {
+                completion(Status(flags: flags))
             }
             else {
-                reachabilityFlagsDidChange(currentReachabiltiyFlags)
-            }
-            previousReachabilityFlags = currentReachabiltiyFlags
-        }
-    }
-
-    private func reachabilityFlagsDidChange(flags: SCNetworkReachabilityFlags) {
-        let networkStatus = NetworkStatus(flags: flags)
-        dispatch_async(Queue.Main.queue) {
-            for (_, observer) in self.observers {
-                observer.reachabilityDidChange(networkStatus)
+                completion(.NotReachable)
             }
         }
     }
 }
 
+class DeviceReachability: NetworkReachabilityType {
 
-extension Reachability: SystemReachability {}
-extension Reachability: HostReachability {}
+    typealias Error = Reachability.Error
+
+    var __defaultRouteReachability: SCNetworkReachability? = .None
+    var threadSafeProtector = Protector(false)
+    weak var delegate: NetworkReachabilityDelegate?
+
+    var notifierIsRunning: Bool {
+        get { return threadSafeProtector.read { $0 } }
+        set {
+            threadSafeProtector.write { (inout isRunning: Bool) in
+                isRunning = newValue
+            }
+        }
+    }
+
+    init() { }
+
+    func defaultRouteReachability() throws -> SCNetworkReachability {
+
+        if let reachability = __defaultRouteReachability { return reachability }
+
+        var zeroAddress = sockaddr_in()
+        zeroAddress.sin_len = UInt8(sizeofValue(zeroAddress))
+        zeroAddress.sin_family = sa_family_t(AF_INET)
+
+        guard let reachability = withUnsafePointer(&zeroAddress, {
+            SCNetworkReachabilityCreateWithAddress(nil, UnsafePointer($0))
+        }) else { throw Error.FailedToCreateDefaultRouteReachability }
+
+        __defaultRouteReachability = reachability
+        return reachability
+    }
+
+    func reachabilityForHost(host: String) -> SCNetworkReachability? {
+        return SCNetworkReachabilityCreateWithName(nil, (host as NSString).UTF8String)
+    }
+
+    func getFlagsForReachability(reachability: SCNetworkReachability) -> SCNetworkReachabilityFlags {
+        var flags = SCNetworkReachabilityFlags()
+        guard withUnsafeMutablePointer(&flags, {
+            SCNetworkReachabilityGetFlags(reachability, UnsafeMutablePointer($0))
+        }) else { return SCNetworkReachabilityFlags() }
+
+        return flags
+    }
+
+    func reachabilityDidChange(flags: SCNetworkReachabilityFlags) {
+        delegate?.reachabilityDidChange(flags)
+    }
+
+    func check(reachability: SCNetworkReachability, queue: dispatch_queue_t) {
+        dispatch_async(queue) { [weak self] in
+            if let delegate = self?.delegate, flags = self?.getFlagsForReachability(reachability) {
+                delegate.reachabilityDidChange(flags)
+            }
+        }
+    }
+
+    func startNotifierOnQueue(queue: dispatch_queue_t) throws {
+        assert(delegate != nil, "Reachability Delegate not set.")
+        let reachability = try defaultRouteReachability()
+        if !notifierIsRunning {
+            notifierIsRunning = true
+            var context = SCNetworkReachabilityContext(version: 0, info: nil, retain: nil, release: nil, copyDescription: nil)
+            context.info = UnsafeMutablePointer(Unmanaged.passUnretained(self).toOpaque())
+
+            guard SCNetworkReachabilitySetCallback(reachability, __device_reachability_callback, &context) else {
+                stopNotifier()
+                throw Error.FailedToSetNotifierCallback
+            }
+
+            guard SCNetworkReachabilitySetDispatchQueue(reachability, queue) else {
+                stopNotifier()
+                throw Error.FailedToSetDispatchQueue
+            }
+        }
+        check(reachability, queue: queue)
+    }
+
+    func stopNotifier() {
+        if let reachability = try? defaultRouteReachability() {
+            SCNetworkReachabilityUnscheduleFromRunLoop(reachability, CFRunLoopGetCurrent(), kCFRunLoopCommonModes)
+            SCNetworkReachabilitySetCallback(reachability, nil, nil)
+        }
+        notifierIsRunning = false
+    }
+
+    func reachabilityFlagsForHostname(host: String) -> SCNetworkReachabilityFlags? {
+        guard let reachability = reachabilityForHost(host) else { return .None }
+        return getFlagsForReachability(reachability)
+    }
+}
+
+private func __device_reachability_callback(reachability: SCNetworkReachability, flags: SCNetworkReachabilityFlags, info: UnsafeMutablePointer<Void>) {
+    let handler = Unmanaged<DeviceReachability>.fromOpaque(COpaquePointer(info)).takeUnretainedValue()
+    dispatch_async(Queue.Default.queue) {
+        handler.delegate?.reachabilityDidChange(flags)
+    }
+}
 
 extension Reachability.NetworkStatus: Equatable { }
 
@@ -238,8 +271,18 @@ extension Reachability.NetworkStatus {
             self = .NotReachable
         }
     }
-}
 
+    func isConnected(target: Reachability.Connectivity) -> Bool {
+        switch (self, target) {
+        case (.NotReachable, _):
+            return false
+        case (.Reachable(.ViaWWAN), .ViaWiFi):
+            return false
+        case (.Reachable(_), _):
+            return true
+        }
+    }
+}
 
 // MARK: - Conformance
 
@@ -265,10 +308,6 @@ extension SCNetworkReachabilityFlags {
         return contains(.ConnectionOnDemand)
     }
 
-    var isConnectionOnTrafficOrDemand: Bool {
-        return isConnectionOnTraffic || isConnectionOnDemand
-    }
-
     var isTransientConnection: Bool {
         return contains(.TransientConnection)
     }
@@ -281,8 +320,16 @@ extension SCNetworkReachabilityFlags {
         return contains(.IsDirect)
     }
 
+    var isConnectionOnTrafficOrDemand: Bool {
+        return isConnectionOnTraffic || isConnectionOnDemand
+    }
+
     var isConnectionRequiredOrTransient: Bool {
         return isConnectionRequired || isTransientConnection
+    }
+
+    var isConnected: Bool {
+        return isReachable && !isConnectionRequired
     }
 
     var isOnWWAN: Bool {
@@ -295,7 +342,7 @@ extension SCNetworkReachabilityFlags {
 
     var isReachableViaWWAN: Bool {
         #if os(iOS)
-            return isReachable && isOnWWAN
+            return isConnected && isOnWWAN
         #else
             return isReachable
         #endif
@@ -303,19 +350,12 @@ extension SCNetworkReachabilityFlags {
 
     var isReachableViaWiFi: Bool {
         #if os(iOS)
-            return !(!isReachable || isConnectionRequiredOrTransient || isOnWWAN)
+            return isConnected && !isOnWWAN
         #else
-            return !(!isReachable || isConnectionRequiredOrTransient)
+            return isConnected
         #endif
     }
 }
-
-
-
-
-
-
-
 
 
 

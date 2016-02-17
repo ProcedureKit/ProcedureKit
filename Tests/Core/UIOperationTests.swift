@@ -16,10 +16,10 @@ class TestablePresentingController: NSObject, PresentingViewController {
     var check: CheckBlockType? = .None
     var expectation: XCTestExpectation? = .None
 
-    func presentViewController(viewController: UIViewController, animated: Bool, completion: (() -> Void)?) {
-        check?(received: viewController)
-        expectation?.fulfill()
+    func presentViewController(vc: UIViewController, animated: Bool, completion: (() -> Void)?) {
+        check?(received: vc)
         completion?()
+        expectation?.fulfill()
     }
 
     func showViewController(vc: UIViewController, sender: AnyObject?) {
@@ -131,7 +131,8 @@ class UIOperationTests: OperationTests {
         let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
 
         var completionBlockDidRun = false
-        operation = TypeUnderTest(controller: presented, displayControllerFrom: .Present(presenter), sender: .None) {
+        operation = TypeUnderTest(controller: presented, displayControllerFrom: .Present(presenter), sender: .None)
+        operation.addCompletionBlock {
             completionBlockDidRun = true
             expectation.fulfill()
         }

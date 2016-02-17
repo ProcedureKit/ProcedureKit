@@ -16,6 +16,17 @@ class GroupOperationTests: OperationTests {
         return (0..<3).map { _ in TestOperation() }
     }
 
+    func test__cancel_group_operation() {
+
+        let operations = createGroupOperations()
+        let operation = GroupOperation(operations: operations)
+        operation.cancel()
+
+        for op in operations {
+            XCTAssertTrue(op.cancelled)
+        }
+    }
+
     func test__group_operations_are_performed_in_order() {
         let group = createGroupOperations()
         let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
@@ -77,6 +88,33 @@ class GroupOperationTests: OperationTests {
         XCTAssertTrue(operations[0].didExecute)
         XCTAssertTrue(operations[1].didExecute)
         XCTAssertTrue(operations[2].didExecute)
+    }
+
+    func test__group_operation_exits_correctly_when_child_errors() {
+
+        let numberOfOperations = 10_000
+        let operations = (0..<numberOfOperations).map { i -> Operation in
+            let block = BlockOperation { (completion: BlockOperation.ContinuationBlockType) in
+                let error = NSError(domain: "me.danthorpe.Operations.Tests", code: -9_999, userInfo: nil)
+                completion(error: error)
+            }
+            block.name = "Block \(i)"
+            return block
+        }
+
+        let group = GroupOperation(operations: operations)
+        group.log.severity = .Verbose
+
+        let waiter = BlockOperation { }
+        waiter.addDependency(group)
+
+        let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
+        addCompletionBlockToTestOperation(waiter, withExpectation: expectation)
+        runOperations(group, waiter)
+        waitForExpectationsWithTimeout(5.0, handler: nil)
+
+        XCTAssertTrue(group.finished)
+        XCTAssertEqual(group.aggregateErrors.count, numberOfOperations)
     }
 }
 
