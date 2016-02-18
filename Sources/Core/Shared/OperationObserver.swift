@@ -27,7 +27,7 @@ public protocol OperationObserverType {
 public extension OperationObserverType {
 
     /**
-     Default implementation just prints out a log.
+     Default implementation is a no-operation.
      
      - parameter operation: the observed `Operation`.
     */
