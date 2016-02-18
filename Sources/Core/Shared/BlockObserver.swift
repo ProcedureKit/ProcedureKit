@@ -88,7 +88,7 @@ public struct ProducedOperationObserver: OperationDidProduceOperationObserver {
 
 /**
  WillFinishObserver is an observer which will execute a
- closure when the operation finishes.
+ closure when the operation is about to finish.
  */
 public struct WillFinishObserver: OperationWillFinishObserver {
     public typealias BlockType = (Operation, [ErrorType]) -> Void
@@ -114,7 +114,7 @@ public struct WillFinishObserver: OperationWillFinishObserver {
 
 /**
  DidFinishObserver is an observer which will execute a
- closure when the operation finishes.
+ closure when the operation did just finish.
  */
 public struct DidFinishObserver: OperationDidFinishObserver {
     public typealias BlockType = (Operation, [ErrorType]) -> Void
