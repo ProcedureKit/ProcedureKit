@@ -166,7 +166,7 @@ public class RetryOperation<T: NSOperation>: RepeatedOperation<T> {
         self.init(maxCount: max, delay: MapGenerator(strategy.generator()) { Delay.By($0) }, generator: generator, retry: retry)
     }
 
-    public override func operationDidFinish(operation: NSOperation, withErrors errors: [ErrorType]) {
+    public override func willFinishOperation(operation: NSOperation, withErrors errors: [ErrorType]) {
         if errors.isEmpty {
             retry.info = .None
         }

@@ -88,7 +88,7 @@ extension InjectionOperationType where Self: Operation {
      - returns: `self` - so that injections can be chained together.
     */
     public func injectResultFromDependency<T where T: Operation>(dep: T, block: (operation: Self, dependency: T, errors: [ErrorType]) -> Void) -> Self {
-        dep.addObserver(FinishedObserver { op, errors in
+        dep.addObserver(DidFinishObserver { op, errors in
             if let dep = op as? T {
                 block(operation: self, dependency: dep, errors: errors)
             }

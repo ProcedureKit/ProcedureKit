@@ -172,7 +172,7 @@ class AddressBookConditionTests: OperationTests {
         let operation = TestOperation()
         operation.addCondition(AddressBookCondition(registrar: registrar))
 
-        operation.addObserver(FinishedObserver { _, errors in
+        operation.addObserver(DidFinishObserver { _, errors in
             receivedErrors = errors
         })
 

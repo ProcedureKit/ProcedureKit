@@ -31,7 +31,16 @@ public protocol OperationQueueDelegate: class {
     - parameter operation: the `NSOperation` instance which finished.
     - parameter errors: an array of `ErrorType`s.
     */
-    func operationQueue(queue: OperationQueue, operationDidFinish operation: NSOperation, withErrors errors: [ErrorType])
+    func operationQueue(queue: OperationQueue, willFinishOperation operation: NSOperation, withErrors errors: [ErrorType])
+
+    /**
+     An operation has finished on the queue.
+
+     - parameter queue: the `OperationQueue`.
+     - parameter operation: the `NSOperation` instance which finished.
+     - parameter errors: an array of `ErrorType`s.
+     */
+    func operationQueue(queue: OperationQueue, didFinishOperation operation: NSOperation, withErrors errors: [ErrorType])
 }
 
 /**
@@ -61,10 +70,17 @@ public class OperationQueue: NSOperationQueue {
                 self?.addOperation($1)
             })
 
-            /// Add an observer to invove the did finish delegate method
-            operation.addObserver(FinishedObserver { [weak self] operation, errors in
+            /// Add an observer to invoke the will finish delegate method
+            operation.addObserver(WillFinishObserver { [weak self] operation, errors in
                 if let q = self {
-                    q.delegate?.operationQueue(q, operationDidFinish: operation, withErrors: errors)
+                    self?.delegate?.operationQueue(q, willFinishOperation: operation, withErrors: errors)
+                }
+            })
+
+            /// Add an observer to invoke the did finish delegate method
+            operation.addObserver(DidFinishObserver { [weak self] operation, errors in
+                if let q = self {
+                    self?.delegate?.operationQueue(q, didFinishOperation: operation, withErrors: errors)
                 }
             })
 
@@ -100,7 +116,7 @@ public class OperationQueue: NSOperationQueue {
 
             op.addCompletionBlock { [weak self, weak op] in
                 if let queue = self, let op = op {
-                    queue.delegate?.operationQueue(queue, operationDidFinish: op, withErrors: [])
+                    queue.delegate?.operationQueue(queue, didFinishOperation: op, withErrors: [])
                 }
             }
         }

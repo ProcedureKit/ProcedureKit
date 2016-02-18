@@ -53,7 +53,7 @@ class LoggingObserverWithError: LoggingObserverTests {
         addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
         runOperation(operation)
         waitForExpectationsWithTimeout(3, handler: nil)
-        XCTAssertTrue(receivedMessages.contains("Test Logging Operation: finished with error(s): [Operations.BlockCondition.Error.BlockConditionFailed]."))
+        XCTAssertTrue(receivedMessages.contains("Test Logging Operation: did finish with error(s): [Operations.BlockCondition.Error.BlockConditionFailed]."))
     }
 }
 

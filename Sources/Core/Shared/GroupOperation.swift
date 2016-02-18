@@ -118,7 +118,7 @@ public class GroupOperation: Operation {
 
     /**
      This method is called every time one of the groups child operations
-     finish.
+     is about to finish.
 
      Over-ride this method to enable the following sort of behavior:
     
@@ -152,9 +152,13 @@ public class GroupOperation: Operation {
      - parameter operation: the child `NSOperation` that has just finished.
      - parameter errors: an array of `ErrorType`s.
     */
-    public func operationDidFinish(operation: NSOperation, withErrors errors: [ErrorType]) {
+    public func willFinishOperation(operation: NSOperation, withErrors errors: [ErrorType]) {
         // no-op, subclasses can override for their own functionality.
     }
+
+    @available(*, unavailable, renamed="willFinishOperation")
+    public func operationDidFinish(operation: NSOperation, withErrors errors: [ErrorType]) { }
+
 }
 
 extension GroupOperation: OperationQueueDelegate {
@@ -182,7 +186,7 @@ extension GroupOperation: OperationQueueDelegate {
      operation is the finishing operation, we finish the group operation here. Else, the group is
      notified (using `operationDidFinish` that a child operation has finished.
     */
-    public func operationQueue(queue: OperationQueue, operationDidFinish operation: NSOperation, withErrors errors: [ErrorType]) {
+    public func operationQueue(queue: OperationQueue, willFinishOperation operation: NSOperation, withErrors errors: [ErrorType]) {
         if !errors.isEmpty {
             switch operation {
             case is GroupOperation:
@@ -194,12 +198,16 @@ extension GroupOperation: OperationQueueDelegate {
             }
         }
 
+        if operation !== finishingOperation {
+            willFinishOperation(operation, withErrors: errors)
+        }
+    }
+
+    public func operationQueue(queue: OperationQueue, didFinishOperation operation: NSOperation, withErrors errors: [ErrorType]) {
+
         if operation === finishingOperation {
             finish(aggregateErrors)
             queue.suspended = true
-        }
-        else {
-            operationDidFinish(operation, withErrors: errors)
         }
     }
 }

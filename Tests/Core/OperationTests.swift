@@ -64,15 +64,18 @@ struct TestCondition: OperationCondition {
 
 class TestQueueDelegate: OperationQueueDelegate {
 
-    typealias DidFinishOperation = (NSOperation, [ErrorType]) -> Void
+    typealias FinishBlockType = (NSOperation, [ErrorType]) -> Void
 
-    let didFinishOperation: DidFinishOperation?
+    let willFinishOperation: FinishBlockType?
+    let didFinishOperation: FinishBlockType?
 
     var did_willAddOperation: Bool = false
+    var did_operationWillFinish: Bool = false
     var did_operationDidFinish: Bool = false
     var did_numberOfErrorThatOperationDidFinish: Int = 0
 
-    init(didFinishOperation: DidFinishOperation? = .None) {
+    init(willFinishOperation: FinishBlockType? = .None, didFinishOperation: FinishBlockType? = .None) {
+        self.willFinishOperation = willFinishOperation
         self.didFinishOperation = didFinishOperation
     }
 
@@ -80,7 +83,13 @@ class TestQueueDelegate: OperationQueueDelegate {
         did_willAddOperation = true
     }
 
-    func operationQueue(queue: OperationQueue, operationDidFinish operation: NSOperation, withErrors errors: [ErrorType]) {
+    func operationQueue(queue: OperationQueue, willFinishOperation operation: NSOperation, withErrors errors: [ErrorType]) {
+        did_operationWillFinish = true
+        did_numberOfErrorThatOperationDidFinish = errors.count
+        willFinishOperation?(operation, errors)
+    }
+
+    func operationQueue(queue: OperationQueue, didFinishOperation operation: NSOperation, withErrors errors: [ErrorType]) {
         did_operationDidFinish = true
         did_numberOfErrorThatOperationDidFinish = errors.count
         didFinishOperation?(operation, errors)
@@ -136,14 +145,14 @@ class OperationTests: XCTestCase {
 
     func addCompletionBlockToTestOperation(operation: Operation, withExpectation expectation: XCTestExpectation) {
         weak var weakExpectation = expectation
-        operation.addObserver(FinishedObserver { (_, _) in
+        operation.addObserver(DidFinishObserver { _, _ in
             weakExpectation?.fulfill()
         })
     }
 
     func addCompletionBlockToTestOperation(operation: Operation, withExpectationDescription text: String = __FUNCTION__) -> XCTestExpectation {
         let expectation = expectationWithDescription("Test: \(text), \(NSUUID().UUIDString)")
-        operation.addObserver(FinishedObserver { _, _ in
+        operation.addObserver(DidFinishObserver { _, _ in
             expectation.fulfill()
         })
         return expectation

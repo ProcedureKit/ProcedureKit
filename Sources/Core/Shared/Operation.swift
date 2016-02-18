@@ -123,7 +123,7 @@ public class Operation: NSOperation {
             didChangeValueForKey("Cancelled")
 
             if _cancelled && !oldValue {
-                didCancelObservers.forEach { $0.operationDidCancel(self) }
+                didCancelObservers.forEach { $0.didCancelOperation(self) }
             }
         }
     }
@@ -296,6 +296,10 @@ public class Operation: NSOperation {
         return observers.flatMap { $0 as? OperationDidProduceOperationObserver }
     }
 
+    var willFinishObservers: [OperationWillFinishObserver] {
+        return observers.flatMap { $0 as? OperationWillFinishObserver }
+    }
+
     var didFinishObservers: [OperationDidFinishObserver] {
         return observers.flatMap { $0 as? OperationDidFinishObserver }
     }
@@ -317,7 +321,10 @@ public class Operation: NSOperation {
         default:
             assert(state < .Ready, "Cannot modify observers after operations has been ready, current state: \(state).")
         }
+        
         observers.append(observer)
+
+        observer.didAttachToOperation(self)
     }
 
     // MARK: - Dependencies
@@ -415,7 +422,7 @@ public class Operation: NSOperation {
         if _internalErrors.isEmpty && !cancelled {
             state = .Executing
             log.verbose("Will Execute")
-            didStartObservers.forEach { $0.operationDidStart(self) }
+            didStartObservers.forEach { $0.didStartOperation(self) }
             execute()
         }
         else {
@@ -503,15 +510,17 @@ public class Operation: NSOperation {
             finished(_internalErrors)
 
             if errors.isEmpty {
-                log.verbose("Did finish with no errors.")
+                log.verbose("Finishing with no errors.")
             }
             else {
-                log.verbose("Did finish with errors: \(_internalErrors).")
+                log.verbose("Finishing with errors: \(_internalErrors).")
             }
 
-            didFinishObservers.forEach { $0.operationDidFinish(self, errors: self._internalErrors) }
+            willFinishObservers.forEach { $0.willFinishOperation(self, errors: self._internalErrors) }
 
             state = .Finished
+
+            didFinishObservers.forEach { $0.didFinishOperation(self, errors: self._internalErrors) }
         }
     }
     

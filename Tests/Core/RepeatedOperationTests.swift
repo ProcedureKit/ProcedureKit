@@ -355,7 +355,7 @@ class RepeatableRepeatedOperationTests: OperationTests {
         let operation = RepeatedOperation(maxCount: 10) {() -> RepeatableOperation<TestOperation> in
 
             let op = TestOperation(error: TestOperation.Error.SimulatedError)
-            op.addObserver(FinishedObserver { _, e in
+            op.addObserver(DidFinishObserver { _, e in
                 errors.appendContentsOf(e)
             })
 

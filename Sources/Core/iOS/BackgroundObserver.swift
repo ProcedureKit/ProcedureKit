@@ -88,7 +88,7 @@ public class BackgroundObserver: NSObject {
 extension BackgroundObserver: OperationDidFinishObserver {
 
     /// Conforms to `OperationDidFinishObserver`, will end any background task that has been started.
-    public func operationDidFinish(operation: Operation, errors: [ErrorType]) {
+    public func didFinishOperation(operation: Operation, errors: [ErrorType]) {
         endBackgroundTask()
     }
 }
