@@ -87,7 +87,7 @@ public struct ProducedOperationObserver: OperationDidProduceOperationObserver {
 
 
 /**
- FinishedObserver is an observer which will execute a
+ WillFinishObserver is an observer which will execute a
  closure when the operation finishes.
  */
 public struct WillFinishObserver: OperationWillFinishObserver {
@@ -113,7 +113,7 @@ public struct WillFinishObserver: OperationWillFinishObserver {
 
 
 /**
- FinishedObserver is an observer which will execute a
+ DidFinishObserver is an observer which will execute a
  closure when the operation finishes.
  */
 public struct DidFinishObserver: OperationDidFinishObserver {
