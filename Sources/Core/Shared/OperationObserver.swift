@@ -31,9 +31,7 @@ public extension OperationObserverType {
      
      - parameter operation: the observed `Operation`.
     */
-    func didAttachToOperation(operation: Operation) {
-        operation.log.verbose("Did attach observer: \(self)")
-    }
+    func didAttachToOperation(operation: Operation) { /* No operation */ }
 }
 
 
