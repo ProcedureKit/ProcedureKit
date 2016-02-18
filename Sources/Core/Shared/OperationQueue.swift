@@ -73,14 +73,14 @@ public class OperationQueue: NSOperationQueue {
             /// Add an observer to invoke the will finish delegate method
             operation.addObserver(WillFinishObserver { [weak self] operation, errors in
                 if let q = self {
-                    self?.delegate?.operationQueue(q, willFinishOperation: operation, withErrors: errors)
+                    q.delegate?.operationQueue(q, willFinishOperation: operation, withErrors: errors)
                 }
             })
 
             /// Add an observer to invoke the did finish delegate method
             operation.addObserver(DidFinishObserver { [weak self] operation, errors in
                 if let q = self {
-                    self?.delegate?.operationQueue(q, didFinishOperation: operation, withErrors: errors)
+                    q.delegate?.operationQueue(q, didFinishOperation: operation, withErrors: errors)
                 }
             })
 
