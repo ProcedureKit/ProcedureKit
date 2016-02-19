@@ -98,8 +98,19 @@ public class Operation: NSOperation {
     private var _internalErrors = [ErrorType]()
 
     private(set) var conditions = [OperationCondition]()
-    private(set) var observers = [OperationObserverType]()
-
+    
+    private var _observers = Protector([OperationObserverType]())
+    private(set) var observers: [OperationObserverType] {
+        get {
+            return _observers.read { $0 }
+        }
+        set {
+            _observers.write { (inout ward: [OperationObserverType]) in
+                ward = newValue
+            }
+        }
+    }
+    
     private var state: State {
         get {
             return stateLock.withCriticalScope { _state }
@@ -313,14 +324,6 @@ public class Operation: NSOperation {
      - parameter observer: type conforming to protocol `OperationObserverType`.
     */
     public func addObserver(observer: OperationObserverType) {
-        switch observer {
-        case is OperationDidProduceOperationObserver:
-            assert(state < .Executing, "Cannot add OperationDidProduceOperationObserver if operation has entered .Executing state, current state: \(state).")
-        case is OperationDidFinishObserver:
-            assert(state < .Finishing, "Cannot add OperationDidFinishObserver if operation has entered .Finishing state, current state: \(state).")
-        default:
-            assert(state < .Ready, "Cannot modify observers after operations has been ready, current state: \(state).")
-        }
         
         observers.append(observer)
 
