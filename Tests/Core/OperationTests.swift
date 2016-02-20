@@ -263,6 +263,15 @@ class BasicTests: OperationTests {
         XCTAssertTrue(operation.cancelled)
         XCTAssertTrue(operation.failed)
     }
+
+    func test__adding_array_of_operations() {
+        let operations = (0..<3).map { _ in BlockOperation {  } }
+        queue.addOperations(operations)
+    }
+
+    func test__adding_variable_argument_of_operations() {
+        queue.addOperations(BlockOperation { }, BlockOperation { })
+    }
 }
 
 class BlockOperationTests: OperationTests {
