@@ -18,7 +18,7 @@ class TimeoutObserverTests: OperationTests {
         operation.addObserver(TimeoutObserver(timeout: 0.1))
 
         var receivedErrors: [ErrorType] = []
-        operation.addObserver(FinishedObserver { _, errors in
+        operation.addObserver(DidFinishObserver { _, errors in
             receivedErrors = errors
         })
 

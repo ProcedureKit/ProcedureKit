@@ -320,7 +320,7 @@ public class _ReverseGeocodeUserLocationOperation<Geocoder, Manager where Geocod
         addCondition(MutuallyExclusive<ReverseGeocodeUserLocationOperation>())
     }
 
-    public override func operationDidFinish(operation: NSOperation, withErrors errors: [ErrorType]) {
+    public override func willFinishOperation(operation: NSOperation, withErrors errors: [ErrorType]) {
         if errors.isEmpty && userLocationOperation == operation && !operation.cancelled {
             if let location = location {
                 let reverseOp = _ReverseGeocodeOperation(geocoder: geocoder, location: location) { [unowned self] placemark in

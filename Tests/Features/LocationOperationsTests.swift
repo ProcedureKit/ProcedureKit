@@ -179,7 +179,7 @@ class UserLocationOperationTests: LocationOperationTests {
         let operation = _UserLocationOperation(manager: locationManager, accuracy: accuracy, completion: { _ in })
 
         var receivedErrors = [ErrorType]()
-        operation.addObserver(FinishedObserver { _, errors in
+        operation.addObserver(DidFinishObserver { _, errors in
             receivedErrors = errors
         })
 
@@ -262,7 +262,7 @@ class ReverseGeocodeOperationTests: LocationOperationTests {
         let operation = _ReverseGeocodeOperation(geocoder: geocoder, location: location, completion: { _ in })
 
         var receivedErrors = [ErrorType]()
-        operation.addObserver(FinishedObserver { _, errors in
+        operation.addObserver(DidFinishObserver { _, errors in
             receivedErrors = errors
         })
 

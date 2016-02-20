@@ -65,7 +65,7 @@ public class AddressBookDisplayPersonViewController<F: PresentingViewController>
         super.init(operations: [ get ])
     }
 
-    public override func operationDidFinish(operation: NSOperation, withErrors errors: [ErrorType]) {
+    public override func willFinishOperation(operation: NSOperation, withErrors errors: [ErrorType]) {
         if errors.isEmpty && get == operation, let person = get.addressBookPerson {
             ui.controller.personViewDelegate = delegate
             ui.controller.displayedPerson = person.storage
@@ -97,7 +97,7 @@ public class AddressBookDisplayNewPersonViewController<F: PresentingViewControll
         super.init(operations: [ get ])
     }
 
-    public override func operationDidFinish(operation: NSOperation, withErrors errors: [ErrorType]) {
+    public override func willFinishOperation(operation: NSOperation, withErrors errors: [ErrorType]) {
         if errors.isEmpty && get == operation {
 
             ui.controller.newPersonViewDelegate = delegate

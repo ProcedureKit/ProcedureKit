@@ -379,7 +379,7 @@ public class RepeatedOperation<T where T: NSOperation>: GroupOperation {
      say `Operation` instead of `MyOperation` (i.e. your specific 
      operation which should be repeated).
     */
-    public override func operationDidFinish(operation: NSOperation, withErrors errors: [ErrorType]) {
+    public override func willFinishOperation(operation: NSOperation, withErrors errors: [ErrorType]) {
         if let _ = operation as? DelayOperation { return }
         if let _ = operation as? T {
             addNextOperation()
@@ -559,7 +559,7 @@ public class RepeatableOperation<T: Operation>: Operation, OperationDidFinishObs
     }
 
     /// Implementation for OperationDidFinishObserver
-    public func operationDidFinish(operation: Operation, errors: [ErrorType]) {
+    public func didFinishOperation(operation: Operation, errors: [ErrorType]) {
         if self.operation == operation {
             finish(errors)
         }

@@ -36,7 +36,7 @@ public class ComposedOperation<T: NSOperation>: Operation, OperationDidFinishObs
         produceOperation(target)
     }
 
-    public func operationDidFinish(operation: Operation, errors: [ErrorType]) {
+    public func didFinishOperation(operation: Operation, errors: [ErrorType]) {
         if operation == target {
             finish(errors)
         }

@@ -30,7 +30,7 @@ class BlockConditionTests: OperationTests {
         operation.addCondition(BlockCondition { false })
 
         var receivedErrors = [ErrorType]()
-        operation.addObserver(FinishedObserver { _, errors in
+        operation.addObserver(DidFinishObserver { _, errors in
             receivedErrors = errors
             expectation.fulfill()
         })

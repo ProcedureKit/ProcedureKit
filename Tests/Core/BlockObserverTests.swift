@@ -70,7 +70,20 @@ class BlockObserverTests: OperationTests {
         XCTAssertEqual(counter, 1)
     }
 
-    func test__finish_handler_is_executed() {
+    func test__will_finish_handler_is_executed() {
+        var counter = 0
+        operation.addObserver(BlockObserver(willFinish: { op, errors in
+            counter += 1
+        }))
+
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        runOperation(operation)
+        waitForExpectationsWithTimeout(3, handler: nil)
+
+        XCTAssertEqual(counter, 1)
+    }
+
+    func test__did_finish_handler_is_executed() {
 
         var counter = 0
         operation.addObserver(BlockObserver { op, errors in

@@ -98,8 +98,19 @@ public class Operation: NSOperation {
     private var _internalErrors = [ErrorType]()
 
     private(set) var conditions = [OperationCondition]()
-    private(set) var observers = [OperationObserverType]()
-
+    
+    private var _observers = Protector([OperationObserverType]())
+    private(set) var observers: [OperationObserverType] {
+        get {
+            return _observers.read { $0 }
+        }
+        set {
+            _observers.write { (inout ward: [OperationObserverType]) in
+                ward = newValue
+            }
+        }
+    }
+    
     private var state: State {
         get {
             return stateLock.withCriticalScope { _state }
@@ -123,7 +134,7 @@ public class Operation: NSOperation {
             didChangeValueForKey("Cancelled")
 
             if _cancelled && !oldValue {
-                didCancelObservers.forEach { $0.operationDidCancel(self) }
+                didCancelObservers.forEach { $0.didCancelOperation(self) }
             }
         }
     }
@@ -296,6 +307,10 @@ public class Operation: NSOperation {
         return observers.flatMap { $0 as? OperationDidProduceOperationObserver }
     }
 
+    var willFinishObservers: [OperationWillFinishObserver] {
+        return observers.flatMap { $0 as? OperationWillFinishObserver }
+    }
+
     var didFinishObservers: [OperationDidFinishObserver] {
         return observers.flatMap { $0 as? OperationDidFinishObserver }
     }
@@ -309,15 +324,10 @@ public class Operation: NSOperation {
      - parameter observer: type conforming to protocol `OperationObserverType`.
     */
     public func addObserver(observer: OperationObserverType) {
-        switch observer {
-        case is OperationDidProduceOperationObserver:
-            assert(state < .Executing, "Cannot add OperationDidProduceOperationObserver if operation has entered .Executing state, current state: \(state).")
-        case is OperationDidFinishObserver:
-            assert(state < .Finishing, "Cannot add OperationDidFinishObserver if operation has entered .Finishing state, current state: \(state).")
-        default:
-            assert(state < .Ready, "Cannot modify observers after operations has been ready, current state: \(state).")
-        }
+        
         observers.append(observer)
+
+        observer.didAttachToOperation(self)
     }
 
     // MARK: - Dependencies
@@ -415,7 +425,7 @@ public class Operation: NSOperation {
         if _internalErrors.isEmpty && !cancelled {
             state = .Executing
             log.verbose("Will Execute")
-            didStartObservers.forEach { $0.operationDidStart(self) }
+            didStartObservers.forEach { $0.didStartOperation(self) }
             execute()
         }
         else {
@@ -503,15 +513,17 @@ public class Operation: NSOperation {
             finished(_internalErrors)
 
             if errors.isEmpty {
-                log.verbose("Did finish with no errors.")
+                log.verbose("Finishing with no errors.")
             }
             else {
-                log.verbose("Did finish with errors: \(_internalErrors).")
+                log.verbose("Finishing with errors: \(_internalErrors).")
             }
 
-            didFinishObservers.forEach { $0.operationDidFinish(self, errors: self._internalErrors) }
+            willFinishObservers.forEach { $0.willFinishOperation(self, errors: self._internalErrors) }
 
             state = .Finished
+
+            didFinishObservers.forEach { $0.didFinishOperation(self, errors: self._internalErrors) }
         }
     }
     

@@ -783,11 +783,11 @@ public class BatchedCloudKitOperation<T where T: NSOperation, T: CKBatchedOperat
         super.init(generator: anyGenerator(tuple))
     }
 
-    public override func operationDidFinish(operation: NSOperation, withErrors errors: [ErrorType]) {
+    public override func willFinishOperation(operation: NSOperation, withErrors errors: [ErrorType]) {
         if errors.isEmpty, let cloudKitOperation = operation as? CloudKitOperation<T> {
             generator.more = enableBatchProcessing && cloudKitOperation.current.moreComing
         }
-        super.operationDidFinish(operation, withErrors: errors)
+        super.willFinishOperation(operation, withErrors: errors)
     }
 }
 
