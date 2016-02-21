@@ -80,21 +80,21 @@ public enum ViewControllerDisplayStyle<ViewController: PresentingViewController>
     A function which will present the view controller from the associated view controller property.
     
     When the style is `.Present`, the controller is not a `UIAlertController`, and
-    wrapInNavigationController is set to true (as it is by default), it is automatically placed as
+    inNavigationController is set to true (as it is by default), it is automatically placed as
     the root controller of a `UINavigationController` which is then presented.
 
     - parameter controller: a `UIViewController` subclass which will be presented.
-    - parameter sender: an optional `AnyObject` used as the sender when showing the view controller
-    - parameter wrapInNavigationController: a bool indicating whether to wrap controller in a
+     - parameter inNavigationController: a Bool indicating whether to wrap controller in a
      UINavigationController when presenting, defaults to true
+    - parameter sender: an optional `AnyObject` used as the sender when showing the view controller
     - parameter completion: an optional completion block, defaults to .None.
     */
-    public func displayController<C where C: UIViewController>(controller: C, sender: AnyObject?, wrapInNavigationController:Bool = true, completion: (() -> Void)? = .None) {
+    public func displayController<C where C: UIViewController>(controller: C, inNavigationController: Bool = true, sender: AnyObject?, completion: (() -> Void)? = .None) {
         switch self {
 
         case .Present(let from):
-            let presented : UIViewController
-            if controller is UIAlertController || wrapInNavigationController == false {
+            let presented: UIViewController
+            if controller is UIAlertController || inNavigationController == false {
                 presented = controller
             }
             else {
@@ -149,15 +149,15 @@ public class UIOperation<C, From where C: UIViewController, From: PresentingView
     
     - parameter controller: the generic `UIViewController` subclass.
     - parameter displayControllerFrom: a ViewControllerDisplayStyle<From> value.
-    - parameter sender: an optional `AnyObject` see docs for UIViewController.
-     - parameter wrapInNavigationController: a bool indicating whether to wrap controller in a
+     - parameter inNavigationController: a Bool indicating whether to wrap controller in a
      UINavigationController when presenting, defaults to true
+    - parameter sender: an optional `AnyObject` see docs for UIViewController.
     */
-    public init(controller: C, displayControllerFrom from: ViewControllerDisplayStyle<From>, sender: AnyObject? = .None, wrapInNavigationController:Bool = true) {
+    public init(controller: C, displayControllerFrom from: ViewControllerDisplayStyle<From>, inNavigationController: Bool = true, sender: AnyObject? = .None) {
         self.controller = controller
         self.from = from
         self.sender = sender
-        self.wrapInNavigationController = wrapInNavigationController
+        self.wrapInNavigationController = inNavigationController
         super.init()
         name = "UIOperation<\(C.self)>"
     }
@@ -169,7 +169,7 @@ public class UIOperation<C, From where C: UIViewController, From: PresentingView
     */
     public override func execute() {
         dispatch_async(Queue.Main.queue) {
-            self.from.displayController(self.controller, sender: self.sender, wrapInNavigationController: self.wrapInNavigationController) {
+            self.from.displayController(self.controller, inNavigationController: self.wrapInNavigationController, sender: self.sender) {
                 self.finish()
             }
         }

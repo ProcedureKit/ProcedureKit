@@ -105,7 +105,7 @@ class ViewControllerDisplayStyleTests: XCTestCase {
         }
         
         style = .Present(controller)
-        style.displayController(other, sender: .None, wrapInNavigationController: false)
+        style.displayController(other, inNavigationController: false, sender: .None)
     }
 
     func test__present_display_alert_controller() {
@@ -186,7 +186,7 @@ class UIOperationTests: OperationTests {
             XCTFail("Should not have received a UINavigationController")
         }
 
-        operation = TypeUnderTest(controller: presented, displayControllerFrom: .Present(presenter), sender: .None, wrapInNavigationController: false)
+        operation = TypeUnderTest(controller: presented, displayControllerFrom: .Present(presenter), inNavigationController: false, sender: .None)
         runOperation(operation)
         waitForExpectationsWithTimeout(3, handler: nil)
     }
