@@ -79,24 +79,28 @@ public enum ViewControllerDisplayStyle<ViewController: PresentingViewController>
     /**
     A function which will present the view controller from the associated view controller property.
     
-    When the style is `.Present`, and the controller is not a `UIAlertController`, it is automatically
-    placed as the root controller of a `UINavigationController` which is then presented.
+    When the style is `.Present`, the controller is not a `UIAlertController`, and
+    wrapInNavigationController is set to true (as it is by default), it is automatically placed as
+    the root controller of a `UINavigationController` which is then presented.
 
     - parameter controller: a `UIViewController` subclass which will be presented.
     - parameter sender: an optional `AnyObject` used as the sender when showing the view controller
+    - parameter wrapInNavigationController: a bool indicating whether to wrap controller in a
+     UINavigationController when presenting, defaults to true
     - parameter completion: an optional completion block, defaults to .None.
     */
-    public func displayController<C where C: UIViewController>(controller: C, sender: AnyObject?, completion: (() -> Void)? = .None) {
+    public func displayController<C where C: UIViewController>(controller: C, sender: AnyObject?, wrapInNavigationController:Bool = true, completion: (() -> Void)? = .None) {
         switch self {
 
         case .Present(let from):
-            if controller is UIAlertController {
-                from.presentViewController(controller, animated: true, completion: completion)
+            let presented : UIViewController
+            if controller is UIAlertController || wrapInNavigationController == false {
+                presented = controller
             }
             else {
-                let nav = UINavigationController(rootViewController: controller)
-                from.presentViewController(nav, animated: true, completion: completion)
+                presented = UINavigationController(rootViewController: controller)
             }
+            from.presentViewController(presented, animated: true, completion: completion)
 
         case .Show(let from):
             from.showViewController(controller, sender: sender)
@@ -131,6 +135,8 @@ public class UIOperation<C, From where C: UIViewController, From: PresentingView
 
     /// The `AnyObject` sender.
     public let sender: AnyObject?
+    
+    public let wrapInNavigationController: Bool
 
     /**
     Construct a `UIOperation` with the presented view controller, the presenting view controller display 
@@ -144,12 +150,14 @@ public class UIOperation<C, From where C: UIViewController, From: PresentingView
     - parameter controller: the generic `UIViewController` subclass.
     - parameter displayControllerFrom: a ViewControllerDisplayStyle<From> value.
     - parameter sender: an optional `AnyObject` see docs for UIViewController.
-    - parameter completion: an optional void block, see docs for UIViewController.
+     - parameter wrapInNavigationController: a bool indicating whether to wrap controller in a
+     UINavigationController when presenting, defaults to true
     */
-    public init(controller: C, displayControllerFrom from: ViewControllerDisplayStyle<From>, sender: AnyObject? = .None) {
+    public init(controller: C, displayControllerFrom from: ViewControllerDisplayStyle<From>, sender: AnyObject? = .None, wrapInNavigationController:Bool = true) {
         self.controller = controller
         self.from = from
         self.sender = sender
+        self.wrapInNavigationController = wrapInNavigationController
         super.init()
         name = "UIOperation<\(C.self)>"
     }
@@ -161,7 +169,7 @@ public class UIOperation<C, From where C: UIViewController, From: PresentingView
     */
     public override func execute() {
         dispatch_async(Queue.Main.queue) {
-            self.from.displayController(self.controller, sender: self.sender) {
+            self.from.displayController(self.controller, sender: self.sender, wrapInNavigationController: self.wrapInNavigationController) {
                 self.finish()
             }
         }
