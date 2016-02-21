@@ -24,7 +24,7 @@ public class NetworkObserver: OperationDidStartObserver, OperationDidFinishObser
     let networkActivityIndicator: NetworkActivityIndicatorInterface
 
     /// - returns: the kind of the observer
-    public let kind: OperationObserverKind = [ .DidStart, .DidFinish ]
+    public let events: OperationObserverEvents = [ .DidStart, .DidFinish ]
 
     /// Initializer takes no parameters.
     public convenience init() {

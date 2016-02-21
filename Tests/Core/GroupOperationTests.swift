@@ -103,7 +103,6 @@ class GroupOperationTests: OperationTests {
         }
 
         let group = GroupOperation(operations: operations)
-        group.log.severity = .Verbose
 
         let waiter = BlockOperation { }
         waiter.addDependency(group)

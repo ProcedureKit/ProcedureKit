@@ -8,15 +8,15 @@
 
 import Foundation
 
-public struct OperationObserverKind: OptionSetType {
+public struct OperationObserverEvents: OptionSetType {
     public let rawValue: Int
 
-    static let DidStart = OperationObserverKind(rawValue: 1 << 1)
-    static let DidCancel = OperationObserverKind(rawValue: 1 << 2)
-    static let DidProduceOperation = OperationObserverKind(rawValue: 1 << 3)
-    static let WillFinish = OperationObserverKind(rawValue: 1 << 4)
-    static let DidFinish = OperationObserverKind(rawValue: 1 << 5)
-    static let All: OperationObserverKind = [ .DidStart, .DidCancel, .DidProduceOperation, .WillFinish, .DidFinish ]
+    static let DidStart = OperationObserverEvents(rawValue: 1 << 1)
+    static let DidProduceOperation = OperationObserverEvents(rawValue: 1 << 2)
+    static let WillFinish = OperationObserverEvents(rawValue: 1 << 3)
+    static let DidFinish = OperationObserverEvents(rawValue: 1 << 4)
+    static let DidCancel = OperationObserverEvents(rawValue: 1 << 5)
+    static let All: OperationObserverEvents = [ .DidStart, .DidProduceOperation, .WillFinish, .DidFinish, .DidCancel ]
 
     public init(rawValue: Int) { self.rawValue = rawValue }
 }
@@ -27,7 +27,7 @@ public struct OperationObserverKind: OptionSetType {
  */
 public protocol OperationObserverType {
 
-    var kind: OperationObserverKind { get }
+    var events: OperationObserverEvents { get }
 
     /**
      Observer gets notified when it is attached to an operation.
@@ -35,15 +35,6 @@ public protocol OperationObserverType {
      - parameter operation: the observed `Operation`.
     */
     func didAttachToOperation(operation: Operation)
-
-    /**
-     Observer gets notified when it will be detached from 
-     the operation. This will happen after all relevant events
-     have been observed.
-
-     - parameter operation: the observed `Operation`.
-     */
-    func willDetachFromOperation(operation: Operation)
 }
 
 
@@ -57,14 +48,6 @@ public extension OperationObserverType {
      - parameter operation: the observed `Operation`.
     */
     func didAttachToOperation(operation: Operation) { /* No operation */ }
-
-    /**
-    Default implementation of willDetachFromOperation
-    is a none-operation.
-
-    - parameter operation: the observed `Operation`.
-    */
-    func willDetachFromOperation(operation: Operation) { /* No operation */ }
 }
 
 
@@ -86,7 +69,7 @@ public protocol OperationDidStartObserver: OperationObserverType {
 public extension OperationDidStartObserver {
 
     /// - returns: the kind of the observer
-    var kind: OperationObserverKind { return .DidStart }
+    var events: OperationObserverEvents { return .DidStart }
 }
 
 
@@ -107,7 +90,7 @@ public protocol OperationDidCancelObserver: OperationObserverType {
 public extension OperationDidCancelObserver {
 
     /// - returns: the kind of the observer
-    var kind: OperationObserverKind { return .DidCancel }
+    var events: OperationObserverEvents { return .DidCancel }
 }
 
 
@@ -133,7 +116,7 @@ public protocol OperationDidProduceOperationObserver: OperationObserverType {
 public extension OperationDidProduceOperationObserver {
 
     /// - returns: the kind of the observer
-    var kind: OperationObserverKind { return .DidProduceOperation }
+    var events: OperationObserverEvents { return .DidProduceOperation }
 }
 
 
@@ -155,7 +138,7 @@ public protocol OperationWillFinishObserver: OperationObserverType {
 public extension OperationWillFinishObserver {
 
     /// - returns: the kind of the observer
-    var kind: OperationObserverKind { return .WillFinish }
+    var events: OperationObserverEvents { return .WillFinish }
 }
 
 
@@ -178,7 +161,7 @@ public protocol OperationDidFinishObserver: OperationObserverType {
 public extension OperationDidFinishObserver {
 
     /// - returns: the kind of the observer
-    var kind: OperationObserverKind { return .DidFinish }
+    var events: OperationObserverEvents { return .DidFinish }
 }
 
 

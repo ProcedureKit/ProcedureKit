@@ -24,7 +24,7 @@ public struct LoggingObserver: OperationObserver {
     let queue: dispatch_queue_t
 
     /// - returns: the kind of the observer
-    public let kind: OperationObserverKind = .All
+    public let events: OperationObserverEvents = .All
 
     /**
     Create a logging observer. Accepts as the final argument a block which receives a
