@@ -20,6 +20,15 @@ public protocol OperationObserverType {
      - parameter operation: the observed `Operation`.
     */
     func didAttachToOperation(operation: Operation)
+
+    /**
+     Observer gets notified when it will be detached from 
+     the operation. This will happen after all relevant events
+     have been observed.
+
+     - parameter operation: the observed `Operation`.
+     */
+    func willDetachFromOperation(operation: Operation)
 }
 
 
@@ -27,11 +36,20 @@ public protocol OperationObserverType {
 public extension OperationObserverType {
 
     /**
-     Default implementation is a no-operation.
+     Default implementation of didAttachToOperation 
+     is a none-operation.
      
      - parameter operation: the observed `Operation`.
     */
     func didAttachToOperation(operation: Operation) { /* No operation */ }
+
+    /**
+    Default implementation of willDetachFromOperation
+    is a none-operation.
+
+    - parameter operation: the observed `Operation`.
+    */
+    func willDetachFromOperation(operation: Operation) { /* No operation */ }
 }
 
 
