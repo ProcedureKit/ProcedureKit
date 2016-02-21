@@ -195,8 +195,14 @@ public struct BlockObserver: OperationObserver {
     let willFinish: WillFinishObserver?
     let didFinish: DidFinishObserver?
 
+    /// - returns: the kind of the observer
+    public let kind: OperationObserverKind
+
     /// - returns: a block which is called when the observer is attached to an operation
     public var didAttachToOperation: DidAttachToOperationBlock? = .None
+
+    /// - returns: a block, called before the observer is detached from the operation.
+    public var willDetachFromOperation: WillDetachFromOperationBlock? = .None
 
     /**
      A `OperationObserver` which accepts three different blocks for start,
@@ -221,6 +227,15 @@ public struct BlockObserver: OperationObserver {
         self.didProduce = didProduce.map { ProducedOperationObserver(didProduce: $0) }
         self.willFinish = willFinish.map { WillFinishObserver(willFinish: $0) }
         self.didFinish = didFinish.map { DidFinishObserver(didFinish: $0) }
+        self.kind = {
+            var kind: OperationObserverKind = []
+            if didStart != nil { kind.insert(.DidStart) }
+            if didCancel != nil { kind.insert(.DidCancel) }
+            if didProduce != nil { kind.insert(.DidProduceOperation) }
+            if willFinish != nil { kind.insert(.WillFinish) }
+            if didFinish != nil { kind.insert(.DidFinish) }
+            return kind
+        }()
     }
 
     /// Conforms to `OperationObserver`, executes the optional startHandler.

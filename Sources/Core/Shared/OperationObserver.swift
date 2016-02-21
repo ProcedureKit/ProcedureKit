@@ -8,11 +8,26 @@
 
 import Foundation
 
+public struct OperationObserverKind: OptionSetType {
+    public let rawValue: Int
+
+    static let DidStart = OperationObserverKind(rawValue: 1 << 1)
+    static let DidCancel = OperationObserverKind(rawValue: 1 << 2)
+    static let DidProduceOperation = OperationObserverKind(rawValue: 1 << 3)
+    static let WillFinish = OperationObserverKind(rawValue: 1 << 4)
+    static let DidFinish = OperationObserverKind(rawValue: 1 << 5)
+    static let All: OperationObserverKind = [ .DidStart, .DidCancel, .DidProduceOperation, .WillFinish, .DidFinish ]
+
+    public init(rawValue: Int) { self.rawValue = rawValue }
+}
+
 /**
  Types which conform to this protocol, can be attached to `Operation` subclasses before
  they are added to a queue.
  */
 public protocol OperationObserverType {
+
+    var kind: OperationObserverKind { get }
 
     /**
      Observer gets notified when it is attached to an operation.
@@ -68,6 +83,11 @@ public protocol OperationDidStartObserver: OperationObserverType {
     func didStartOperation(operation: Operation)
 }
 
+public extension OperationDidStartObserver {
+
+    /// - returns: the kind of the observer
+    var kind: OperationObserverKind { return .DidStart }
+}
 
 
 /**
@@ -82,6 +102,12 @@ public protocol OperationDidCancelObserver: OperationObserverType {
      - parameter operation: the observed `Operation`.
      */
     func didCancelOperation(operation: Operation)
+}
+
+public extension OperationDidCancelObserver {
+
+    /// - returns: the kind of the observer
+    var kind: OperationObserverKind { return .DidCancel }
 }
 
 
@@ -104,6 +130,12 @@ public protocol OperationDidProduceOperationObserver: OperationObserverType {
     func operation(operation: Operation, didProduceOperation newOperation: NSOperation)
 }
 
+public extension OperationDidProduceOperationObserver {
+
+    /// - returns: the kind of the observer
+    var kind: OperationObserverKind { return .DidProduceOperation }
+}
+
 
 
 /**
@@ -118,6 +150,12 @@ public protocol OperationWillFinishObserver: OperationObserverType {
      - parameter errors: an array of `ErrorType`s.
      */
     func willFinishOperation(operation: Operation, errors: [ErrorType])
+}
+
+public extension OperationWillFinishObserver {
+
+    /// - returns: the kind of the observer
+    var kind: OperationObserverKind { return .WillFinish }
 }
 
 
@@ -135,6 +173,12 @@ public protocol OperationDidFinishObserver: OperationObserverType {
      - parameter errors: an array of `ErrorType`s.
      */
     func didFinishOperation(operation: Operation, errors: [ErrorType])
+}
+
+public extension OperationDidFinishObserver {
+
+    /// - returns: the kind of the observer
+    var kind: OperationObserverKind { return .DidFinish }
 }
 
 
