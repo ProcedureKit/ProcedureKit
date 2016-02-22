@@ -115,6 +115,22 @@ class GroupOperationTests: OperationTests {
         XCTAssertTrue(group.finished)
         XCTAssertEqual(group.aggregateErrors.count, numberOfOperations)
     }
+    
+    func test__group_operation_exits_correctly_when_child_group_finishes_with_errors() {
+        let child = GroupOperation(operations: [TestOperation(error: TestOperation.Error.SimulatedError)])
+        let group = GroupOperation(operations: [child])
+        
+        let waiter = BlockOperation { }
+        waiter.addDependency(group)
+        
+        let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
+        addCompletionBlockToTestOperation(waiter, withExpectation: expectation)
+        runOperations(group, waiter)
+        waitForExpectationsWithTimeout(3, handler: nil)
+        
+        XCTAssertTrue(group.finished)
+        XCTAssertEqual(group.aggregateErrors.count, 1)
+    }
 }
 
 
