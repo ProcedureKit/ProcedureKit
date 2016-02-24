@@ -18,8 +18,8 @@ public class ComposedOperation<T: NSOperation>: Operation, OperationDidFinishObs
     }
 
     init(operation op: T) {
-        self.target = op as? Operation ?? GroupOperation(operations: [op])
-        self.operation = op
+        target = op as? Operation ?? GroupOperation(operations: [op])
+        operation = op
         super.init()
         name = "Composed Operation"
         target.name = "Composed <\(T.self)>"
@@ -27,6 +27,7 @@ public class ComposedOperation<T: NSOperation>: Operation, OperationDidFinishObs
     }
 
     public override func cancel() {
+        target.cancel()
         operation.cancel()
         super.cancel()
     }
@@ -37,7 +38,7 @@ public class ComposedOperation<T: NSOperation>: Operation, OperationDidFinishObs
     }
 
     public func didFinishOperation(operation: Operation, errors: [ErrorType]) {
-        if operation == target {
+        if operation === target {
             finish(errors)
         }
     }

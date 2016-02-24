@@ -1286,6 +1286,7 @@ class CloudKitOperationDiscoverAllContractsTests: CKTests {
     }
 
     func test__error_with_completion_block() {
+
         operation = CloudKitOperation(reachability: manager) {
             let op = TestDiscoverAllContactsOperation(result: [])
             op.error = NSError(domain: CKErrorDomain, code: CKErrorCode.InternalError.rawValue, userInfo: nil)
@@ -1296,7 +1297,8 @@ class CloudKitOperationDiscoverAllContractsTests: CKTests {
         waitForOperation(operation)
 
         XCTAssertTrue(operation.finished)
-        XCTAssertEqual(operation.errors.count, 1)
+        XCTAssertEqual(operation.aggregateErrors.count, 1)
+
     }
 
     func test__error_which_retries_using_retry_after_key() {
