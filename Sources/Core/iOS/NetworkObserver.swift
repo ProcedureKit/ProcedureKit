@@ -23,9 +23,6 @@ public class NetworkObserver: OperationDidStartObserver, OperationDidFinishObser
 
     let networkActivityIndicator: NetworkActivityIndicatorInterface
 
-    /// - returns: the kind of the observer
-    public let events: OperationObserverEvents = [ .DidStart, .DidFinish ]
-
     /// Initializer takes no parameters.
     public convenience init() {
         self.init(indicator: UIApplication.sharedApplication())
