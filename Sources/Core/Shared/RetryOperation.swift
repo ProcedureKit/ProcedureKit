@@ -166,7 +166,7 @@ public class RetryOperation<T: NSOperation>: RepeatedOperation<T> {
         let delay = MapGenerator(strategy.generator()) { Delay.By($0) }
         let tuple = TupleGenerator(primary: generator, secondary: delay)
         retry = RetryGenerator(generator: anyGenerator(tuple), retry: block)
-        super.init(maxCount: max, generator: anyGenerator(generator))
+        super.init(maxCount: max, generator: anyGenerator(retry))
         name = "Retry Operation <\(T.self)>"
     }
 

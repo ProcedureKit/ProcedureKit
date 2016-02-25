@@ -118,9 +118,9 @@ class RetryOperationTests: OperationTests {
         XCTAssertEqual(operation.count, 3)
         XCTAssertEqual(didRunBlockCount, 2)
         XCTAssertNotNil(retryErrors)
-        XCTAssertEqual(retryErrors!.count, 1)
+        XCTAssertEqual(retryErrors?.count ?? 0, 1)
         XCTAssertNotNil(retryAggregateErrors)
-        XCTAssertEqual(retryAggregateErrors!.count, 2)
+        XCTAssertEqual(retryAggregateErrors?.count ?? 0, 2)
         XCTAssertEqual(retryCount, 2)
     }
 
@@ -147,9 +147,9 @@ class RetryOperationTests: OperationTests {
         XCTAssertEqual(operation.count, 1)
         XCTAssertEqual(didRunBlockCount, 1)
         XCTAssertNotNil(retryErrors)
-        XCTAssertEqual(retryErrors!.count, 1)
+        XCTAssertEqual(retryErrors?.count ?? 0, 1)
         XCTAssertNotNil(retryAggregateErrors)
-        XCTAssertEqual(retryAggregateErrors!.count, 1)
+        XCTAssertEqual(retryAggregateErrors?.count ?? 0, 1)
         XCTAssertEqual(retryCount, 1)
     }
 }
