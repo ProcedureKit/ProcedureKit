@@ -8,26 +8,11 @@
 
 import Foundation
 
-public struct OperationObserverEvents: OptionSetType {
-    public let rawValue: Int
-
-    static let DidStart = OperationObserverEvents(rawValue: 1 << 1)
-    static let DidProduceOperation = OperationObserverEvents(rawValue: 1 << 2)
-    static let WillFinish = OperationObserverEvents(rawValue: 1 << 3)
-    static let DidFinish = OperationObserverEvents(rawValue: 1 << 4)
-    static let DidCancel = OperationObserverEvents(rawValue: 1 << 5)
-    static let All: OperationObserverEvents = [ .DidStart, .DidProduceOperation, .WillFinish, .DidFinish, .DidCancel ]
-
-    public init(rawValue: Int) { self.rawValue = rawValue }
-}
-
 /**
  Types which conform to this protocol, can be attached to `Operation` subclasses before
  they are added to a queue.
  */
 public protocol OperationObserverType {
-
-    var events: OperationObserverEvents { get }
 
     /**
      Observer gets notified when it is attached to an operation.
@@ -66,12 +51,6 @@ public protocol OperationDidStartObserver: OperationObserverType {
     func didStartOperation(operation: Operation)
 }
 
-public extension OperationDidStartObserver {
-
-    /// - returns: the kind of the observer
-    var events: OperationObserverEvents { return .DidStart }
-}
-
 
 /**
  Types which conform to this protocol, can be attached to `Operation` subclasses before
@@ -86,13 +65,6 @@ public protocol OperationDidCancelObserver: OperationObserverType {
      */
     func didCancelOperation(operation: Operation)
 }
-
-public extension OperationDidCancelObserver {
-
-    /// - returns: the kind of the observer
-    var events: OperationObserverEvents { return .DidCancel }
-}
-
 
 
 /**
@@ -113,13 +85,6 @@ public protocol OperationDidProduceOperationObserver: OperationObserverType {
     func operation(operation: Operation, didProduceOperation newOperation: NSOperation)
 }
 
-public extension OperationDidProduceOperationObserver {
-
-    /// - returns: the kind of the observer
-    var events: OperationObserverEvents { return .DidProduceOperation }
-}
-
-
 
 /**
  Types which confirm to this protocol, can be attached to `Operation` subclasses.
@@ -134,13 +99,6 @@ public protocol OperationWillFinishObserver: OperationObserverType {
      */
     func willFinishOperation(operation: Operation, errors: [ErrorType])
 }
-
-public extension OperationWillFinishObserver {
-
-    /// - returns: the kind of the observer
-    var events: OperationObserverEvents { return .WillFinish }
-}
-
 
 
 /**
@@ -157,13 +115,6 @@ public protocol OperationDidFinishObserver: OperationObserverType {
      */
     func didFinishOperation(operation: Operation, errors: [ErrorType])
 }
-
-public extension OperationDidFinishObserver {
-
-    /// - returns: the kind of the observer
-    var events: OperationObserverEvents { return .DidFinish }
-}
-
 
 
 /**
