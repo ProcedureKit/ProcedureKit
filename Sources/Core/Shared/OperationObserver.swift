@@ -11,12 +11,12 @@ import Foundation
 public struct OperationObserverEvents: OptionSetType {
     public let rawValue: Int
 
-    static let DidStart = OperationObserverEvents(rawValue: 1 << 1)
-    static let DidProduceOperation = OperationObserverEvents(rawValue: 1 << 2)
-    static let WillFinish = OperationObserverEvents(rawValue: 1 << 3)
-    static let DidFinish = OperationObserverEvents(rawValue: 1 << 4)
-    static let DidCancel = OperationObserverEvents(rawValue: 1 << 5)
-    static let All: OperationObserverEvents = [ .DidStart, .DidProduceOperation, .WillFinish, .DidFinish, .DidCancel ]
+    public static let DidStart = OperationObserverEvents(rawValue: 1 << 1)
+    public static let DidProduceOperation = OperationObserverEvents(rawValue: 1 << 2)
+    public static let WillFinish = OperationObserverEvents(rawValue: 1 << 3)
+    public static let DidFinish = OperationObserverEvents(rawValue: 1 << 4)
+    public static let DidCancel = OperationObserverEvents(rawValue: 1 << 5)
+    public static let All: OperationObserverEvents = [ .DidStart, .DidProduceOperation, .WillFinish, .DidFinish, .DidCancel ]
 
     public init(rawValue: Int) { self.rawValue = rawValue }
 }
