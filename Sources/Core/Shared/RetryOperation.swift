@@ -90,7 +90,7 @@ public class RetryOperation<T: NSOperation>: RepeatedOperation<T> {
     public typealias Handler = (RetryFailureInfo<T>, Payload) -> Payload?
 
     let retry: RetryGenerator<T>
-
+    
     /**
      A designated initializer
      
@@ -107,7 +107,7 @@ public class RetryOperation<T: NSOperation>: RepeatedOperation<T> {
     public init(maxCount max: Int? = .None, generator: AnyGenerator<Payload>, retry block: Handler) {
         retry = RetryGenerator(generator: generator, retry: block)
         super.init(maxCount: max, generator: anyGenerator(retry))
-        name = "Retry Operation"
+        name = "Retry Operation <\(T.self)>"
     }
 
     /**
@@ -126,11 +126,11 @@ public class RetryOperation<T: NSOperation>: RepeatedOperation<T> {
         let tuple = TupleGenerator(primary: generator, secondary: delay)
         retry = RetryGenerator(generator: anyGenerator(tuple), retry: block)
         super.init(maxCount: max, generator: anyGenerator(retry))
-        name = "Retry Operation"
+        name = "Retry Operation <\(T.self)>"
     }
 
     /**
-     A convenience initializer with wait strategy and generic operation generator.
+     An initializer with wait strategy and generic operation generator.
      This is useful where another system can be responsible for vending instances of
      the custom operation. Typically there may be some state involved in such a Generator. e.g.
 
@@ -162,8 +162,12 @@ public class RetryOperation<T: NSOperation>: RepeatedOperation<T> {
      operation regardless of error info.
 
      */
-    public convenience init<G where G: GeneratorType, G.Element == T>(maxCount max: Int? = 5, strategy: WaitStrategy = .Fixed(0.1), _ generator: G, retry: Handler = { $1 }) {
-        self.init(maxCount: max, delay: MapGenerator(strategy.generator()) { Delay.By($0) }, generator: generator, retry: retry)
+    public init<G where G: GeneratorType, G.Element == T>(maxCount max: Int? = 5, strategy: WaitStrategy = .Fixed(0.1), _ generator: G, retry block: Handler = { $1 }) {
+        let delay = MapGenerator(strategy.generator()) { Delay.By($0) }
+        let tuple = TupleGenerator(primary: generator, secondary: delay)
+        retry = RetryGenerator(generator: anyGenerator(tuple), retry: block)
+        super.init(maxCount: max, generator: anyGenerator(generator))
+        name = "Retry Operation <\(T.self)>"
     }
 
     public override func willFinishOperation(operation: NSOperation, withErrors errors: [ErrorType]) {
