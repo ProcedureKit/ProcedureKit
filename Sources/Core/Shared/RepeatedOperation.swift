@@ -287,13 +287,7 @@ public class RepeatedOperation<T where T: NSOperation>: GroupOperation {
     internal private(set) var configure: T -> Void = { _ in }
 
     static func createPayloadGeneratorWithMaxCount(max: Int? = .None, generator gen: AnyGenerator<Payload>) -> AnyGenerator<Payload> {
-        switch max {
-        case .Some(let max):
-            // Subtract 1 to account for the 1st attempt
-            return anyGenerator(FiniteGenerator(gen, limit: max - 1))
-        case .None:
-            return gen
-        }
+        return max.map { anyGenerator(FiniteGenerator(gen, limit: $0 - 1)) } ?? gen
     }
     
     /**
