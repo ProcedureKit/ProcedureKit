@@ -286,8 +286,18 @@ public class RepeatedOperation<T where T: NSOperation>: GroupOperation {
 
     internal private(set) var configure: T -> Void = { _ in }
 
+    static func createPayloadGeneratorWithMaxCount(max: Int? = .None, generator gen: AnyGenerator<Payload>) -> AnyGenerator<Payload> {
+        switch max {
+        case .Some(let max):
+            // Subtract 1 to account for the 1st attempt
+            return anyGenerator(FiniteGenerator(gen, limit: max - 1))
+        case .None:
+            return gen
+        }
+    }
+    
     /**
-     The designated initializer.
+     The most basic initializer.
 
      - parameter maxCount: an optional Int, which defaults to .None. If not nil, this is
      the maximum number of operations which will be executed.
@@ -300,21 +310,14 @@ public class RepeatedOperation<T where T: NSOperation>: GroupOperation {
         }
 
         current = operation
-
-        switch max {
-        case .Some(let max):
-            // Subtract 1 to account for the 1st attempt
-            generator = anyGenerator(FiniteGenerator(gen, limit: max - 1))
-        case .None:
-            generator = gen
-        }
-
+        generator = RepeatedOperation<T>.createPayloadGeneratorWithMaxCount(max, generator: gen)
+        
         super.init(operations: [])
-        name = "Repeated Operation"
+        name = "Repeated Operation <\(T.self)>"
     }
 
     /**
-     A convenience initializer, which accepts two generators, one for the delay and another for
+     An initializer, which accepts two generators, one for the delay and another for
      the operation.
 
      - parameter maxCount: an optional Int, which defaults to .None. If not nil, this is
@@ -322,13 +325,23 @@ public class RepeatedOperation<T where T: NSOperation>: GroupOperation {
      - parameter delay: a generator with Delay element.
      - parameter generator: a generator with T element.
      */
-    public convenience init<D, G where D: GeneratorType, D.Element == Delay, G: GeneratorType, G.Element == T>(maxCount max: Int? = .None, delay: D, generator: G) {
-        let tuple = TupleGenerator(primary: generator, secondary: delay)
-        self.init(maxCount: max, generator: anyGenerator(tuple))
+    public init<D, G where D: GeneratorType, D.Element == Delay, G: GeneratorType, G.Element == T>(maxCount max: Int? = .None, delay: D, generator gen: G) {
+
+        var tuple = TupleGenerator(primary: gen, secondary: delay)
+        
+        guard let (_, operation) = tuple.next() else {
+            preconditionFailure("Operation Generator must return an instance initially.")
+        }
+        
+        current = operation
+        generator = RepeatedOperation<T>.createPayloadGeneratorWithMaxCount(max, generator: anyGenerator(tuple))
+
+        super.init(operations: [])
+        name = "Repeated Operation <\(T.self)>"
     }
 
     /**
-     A convenience initializer with wait strategy and generic operation generator. 
+     An initializer with wait strategy and generic operation generator.
      This is useful where another system can be responsible for vending instances of 
      the custom operation. Typically there may be some state involved in such a Generator. e.g.
      
@@ -357,8 +370,20 @@ public class RepeatedOperation<T where T: NSOperation>: GroupOperation {
      - parameter strategy: a WaitStrategy which defaults to a 0.1 second fixed interval.
      - parameter generator: a generic generator which has an Element equal to T.
      */
-    public convenience init<G where G: GeneratorType, G.Element == T>(maxCount max: Int? = .None, strategy: WaitStrategy = .Fixed(0.1), generator: G) {
-        self.init(maxCount: max, delay: MapGenerator(strategy.generator()) { Delay.By($0) }, generator: generator)
+    public init<G where G: GeneratorType, G.Element == T>(maxCount max: Int? = .None, strategy: WaitStrategy = .Fixed(0.1), generator gen: G) {
+
+        let delay = MapGenerator(strategy.generator()) { Delay.By($0) }
+        var tuple = TupleGenerator(primary: gen, secondary: delay)
+        
+        guard let (_, operation) = tuple.next() else {
+            preconditionFailure("Operation Generator must return an instance initially.")
+        }
+        
+        current = operation
+        generator = RepeatedOperation<T>.createPayloadGeneratorWithMaxCount(max, generator: anyGenerator(tuple))
+        
+        super.init(operations: [])
+        name = "Repeated Operation <\(T.self)>"
     }
 
     /// Public override of execute which configures and adds the first operation
