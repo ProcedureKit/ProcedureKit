@@ -527,8 +527,8 @@ extension RepeatedOperation where T: Repeatable {
      let operation = RepeatedOperation { MyRepeatableOperation() }
      ```
     */
-    public convenience init(strategy: WaitStrategy = .Fixed(0.1), maxCount max: Int? = .None, body: () -> T?) {
-        self.init(strategy: strategy, maxCount: max, generator: RepeatingGenerator(anyGenerator(body)))
+    public convenience init(maxCount max: Int? = .None, strategy: WaitStrategy = .Fixed(0.1), body: () -> T?) {
+        self.init(maxCount: max, strategy: strategy, generator: RepeatingGenerator(anyGenerator(body)))
     }
 }
 
