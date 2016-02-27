@@ -495,17 +495,17 @@ public protocol Repeatable {
     func shouldRepeat(count: Int) -> Bool
 }
 
-class RepeatingGenerator<G: GeneratorType where G.Element: Repeatable>: GeneratorType {
+public class RepeatableGenerator<G: GeneratorType where G.Element: Repeatable>: GeneratorType {
 
     private var generator: G
     private var count: Int = 0
     private var current: G.Element?
 
-    init(_ generator: G) {
+    public init(_ generator: G) {
         self.generator = generator
     }
 
-    func next() -> G.Element? {
+    public func next() -> G.Element? {
         if let current = current {
             guard current.shouldRepeat(count) else {
                 return nil
@@ -528,7 +528,7 @@ extension RepeatedOperation where T: Repeatable {
      ```
     */
     public convenience init(maxCount max: Int? = .None, strategy: WaitStrategy = .Fixed(0.1), body: () -> T?) {
-        self.init(maxCount: max, strategy: strategy, generator: RepeatingGenerator(anyGenerator(body)))
+        self.init(maxCount: max, strategy: strategy, generator: RepeatableGenerator(anyGenerator(body)))
     }
 }
 
