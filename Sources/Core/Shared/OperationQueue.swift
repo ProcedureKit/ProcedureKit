@@ -66,8 +66,15 @@ public class OperationQueue: NSOperationQueue {
         if let operation = op as? Operation {
 
             /// Add an observer so that any produced operations are added to the queue
-            operation.addObserver(ProducedOperationObserver { [weak self] in
-                self?.addOperation($1)
+            /// Except for group operations, where any produced operations are added
+            /// to the the group.
+            operation.addObserver(ProducedOperationObserver { [weak self] op, produced in
+                if let group = op as? GroupOperation {
+                    group.addOperation(produced)
+                }
+                else {
+                    self?.addOperation(produced)
+                }
             })
 
             /// Add an observer to invoke the will finish delegate method
