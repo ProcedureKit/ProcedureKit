@@ -159,6 +159,9 @@ public class GroupOperation: Operation {
     @available(*, unavailable, renamed="willFinishOperation")
     public func operationDidFinish(operation: NSOperation, withErrors errors: [ErrorType]) { }
 
+    internal func childOperation(child: NSOperation, didFinishWithErrors errors: [ErrorType]) {
+        _aggregateErrors.appendContentsOf(errors)
+    }
 }
 
 extension GroupOperation: OperationQueueDelegate {
@@ -187,15 +190,9 @@ extension GroupOperation: OperationQueueDelegate {
      notified (using `operationDidFinish` that a child operation has finished.
     */
     public func operationQueue(queue: OperationQueue, willFinishOperation operation: NSOperation, withErrors errors: [ErrorType]) {
+
         if !errors.isEmpty {
-            switch operation {
-            case is GroupOperation:
-                // If GroupOperations are executed inside GroupOperations
-                // all the errors will be duplicated.
-                break
-            default:
-                _aggregateErrors.appendContentsOf(errors)
-            }
+            childOperation(operation, didFinishWithErrors: errors)
         }
 
         if operation !== finishingOperation {

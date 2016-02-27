@@ -115,6 +115,41 @@ class GroupOperationTests: OperationTests {
         XCTAssertTrue(group.finished)
         XCTAssertEqual(group.aggregateErrors.count, numberOfOperations)
     }
+    
+    func test__group_operation_exits_correctly_when_child_group_finishes_with_errors() {
+        let operation = TestOperation(error: TestOperation.Error.SimulatedError)
+        let child = GroupOperation(operations: [operation])
+        let group = GroupOperation(operations: [child])
+        
+        let waiter = BlockOperation { }
+        waiter.addDependency(group)
+        
+        let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
+        addCompletionBlockToTestOperation(waiter, withExpectation: expectation)
+        runOperations(group, waiter)
+        waitForExpectationsWithTimeout(3, handler: nil)
+        
+        XCTAssertTrue(group.finished)
+        XCTAssertEqual(group.aggregateErrors.count, 1)
+    }
+    
+    func test__group_operation_exits_correctly_when_multiple_nested_groups_finish_with_errors() {
+        let operation = TestOperation(error: TestOperation.Error.SimulatedError)
+        let child1 = GroupOperation(operations: [operation])
+        let child = GroupOperation(operations: [child1])
+        let group = GroupOperation(operations: [child])
+        
+        let waiter = BlockOperation { }
+        waiter.addDependency(group)
+        
+        let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
+        addCompletionBlockToTestOperation(waiter, withExpectation: expectation)
+        runOperations(group, waiter)
+        waitForExpectationsWithTimeout(3, handler: nil)
+        
+        XCTAssertTrue(group.finished)
+        XCTAssertEqual(group.aggregateErrors.count, 1)
+    }
 }
 
 

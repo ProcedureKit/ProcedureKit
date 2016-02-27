@@ -482,7 +482,7 @@ extension CKModifySubscriptionsOperation: CKModifySubscriptionsOperationType { }
 extension CKQueryOperation: CKQueryOperationType { }
 
 
-// MARK: OPRCKOperation
+// MARK: - OPRCKOperation
 
 public class OPRCKOperation<T where T: NSOperation, T: CKOperationType>: ReachableOperation<T> {
 
@@ -729,6 +729,12 @@ public final class CloudKitOperation<T where T: NSOperation, T: CKOperationType>
 
     public func setErrorHandlerForCode(code: CKErrorCode, handler: ErrorHandler) {
         recovery.setCustomHandlerForCode(code, handler: handler)
+    }
+    
+    override func childOperation(child: NSOperation, didFinishWithErrors errors: [ErrorType]) {
+        if !(child is OPRCKOperation<T>) {
+            super.childOperation(child, didFinishWithErrors: errors)
+        }
     }
 }
 
