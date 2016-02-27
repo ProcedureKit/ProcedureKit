@@ -344,7 +344,7 @@ class RepeatingTestOperation: TestOperation, Repeatable {
 class RepeatableRepeatedOperationTests: OperationTests {
 
     func test__repeated_operation_repeats() {
-        let operation = RepeatedOperation { return RepeatingTestOperation() }
+        let operation = RepeatedOperation { RepeatingTestOperation() }
 
         addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
         runOperation(operation)
@@ -354,7 +354,7 @@ class RepeatableRepeatedOperationTests: OperationTests {
     }
 
     func test__repeated_with_max_number_of_attempts() {
-        let operation = RepeatedOperation(maxCount: 2) { return RepeatingTestOperation() }
+        let operation = RepeatedOperation(maxCount: 2) { RepeatingTestOperation() }
 
         addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
         runOperation(operation)
@@ -366,7 +366,7 @@ class RepeatableRepeatedOperationTests: OperationTests {
     func test__repeatable_operation() {
 
         var errors: [ErrorType] = []
-        let operation = RepeatedOperation(maxCount: 10) {() -> RepeatableOperation<TestOperation> in
+        let operation = RepeatedOperation(maxCount: 10) { () -> RepeatableOperation<TestOperation> in
 
             let op = TestOperation(error: TestOperation.Error.SimulatedError)
             op.addObserver(DidFinishObserver { _, e in
@@ -391,19 +391,5 @@ class RepeatableRepeatedOperationTests: OperationTests {
         XCTAssertTrue(op.cancelled)
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
