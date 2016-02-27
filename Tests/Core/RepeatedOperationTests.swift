@@ -253,6 +253,8 @@ class FibonacciWaitGeneratorTests: WaitStrategyIntervalTests {
     }
 }
 
+// MARK: - Repeated Operation
+
 class RepeatedOperationTests: OperationTests {
 
     var operation: RepeatedOperation<TestOperation>!
@@ -271,6 +273,18 @@ class RepeatedOperationTests: OperationTests {
 
     func test__custom_generator_without_delay() {
         operation = RepeatedOperation(maxCount: 2, generator: anyGenerator { (.None, TestOperation() )})
+
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        runOperation(operation)
+        waitForExpectationsWithTimeout(3, handler: nil)
+
+        XCTAssertTrue(operation.finished)
+        XCTAssertEqual(operation.count, 2)
+        XCTAssertEqual(operation.aggregateErrors.count, 0)
+    }
+
+    func test__init_separate_delay_generator_and_item_generator() {
+        operation = RepeatedOperation(maxCount: 2, delay: anyGenerator { Delay.By(0.1) }, generator: anyGenerator { TestOperation() })
 
         addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
         runOperation(operation)
