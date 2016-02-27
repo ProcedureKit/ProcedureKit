@@ -58,7 +58,32 @@ class RetryOperationTests: OperationTests {
         }
     }
 
-    func test__retry_operation() {
+    func producerWithDelay(threshold: Int) -> () -> (Delay?, Test)? {
+        return { [unowned self] in
+            guard self.numberOfExecutions < 10 else {
+                return nil
+            }
+            let op = Test { return self.numberOfFailures < threshold }
+            op.addObserver(StartedObserver { _ in
+                self.numberOfFailures += 1
+                self.numberOfExecutions += 1
+                })
+            return (Delay.By(0.001), op)
+        }
+    }
+
+    func test__retry_operation_with_payload_generator() {
+        operation = RetryOperation(generator: anyGenerator(producerWithDelay(2)), retry: { $1 })
+
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        runOperation(operation)
+        waitForExpectationsWithTimeout(3, handler: nil)
+
+        XCTAssertTrue(operation.finished)
+        XCTAssertEqual(operation.count, 2)
+    }
+
+    func test__retry_operation_with_default_delay() {
 
         operation = RetryOperation(anyGenerator(producer(2)))
 
@@ -71,7 +96,7 @@ class RetryOperationTests: OperationTests {
     }
 
     func test__retry_operation_where_generator_returns_nil() {
-        operation = RetryOperation(maxCount: 12, strategy: .Fixed(0.01), anyGenerator(producer(11)))
+        operation = RetryOperation(maxCount: 12, strategy: .Fixed(0.01), anyGenerator(producer(11))) { $1 } // Includes the retry block
 
         addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
         runOperation(operation)
@@ -118,9 +143,9 @@ class RetryOperationTests: OperationTests {
         XCTAssertEqual(operation.count, 3)
         XCTAssertEqual(didRunBlockCount, 2)
         XCTAssertNotNil(retryErrors)
-        XCTAssertEqual(retryErrors!.count, 1)
+        XCTAssertEqual(retryErrors?.count ?? 0, 1)
         XCTAssertNotNil(retryAggregateErrors)
-        XCTAssertEqual(retryAggregateErrors!.count, 2)
+        XCTAssertEqual(retryAggregateErrors?.count ?? 0, 2)
         XCTAssertEqual(retryCount, 2)
     }
 
@@ -147,9 +172,9 @@ class RetryOperationTests: OperationTests {
         XCTAssertEqual(operation.count, 1)
         XCTAssertEqual(didRunBlockCount, 1)
         XCTAssertNotNil(retryErrors)
-        XCTAssertEqual(retryErrors!.count, 1)
+        XCTAssertEqual(retryErrors?.count ?? 0, 1)
         XCTAssertNotNil(retryAggregateErrors)
-        XCTAssertEqual(retryAggregateErrors!.count, 1)
+        XCTAssertEqual(retryAggregateErrors?.count ?? 0, 1)
         XCTAssertEqual(retryCount, 1)
     }
 }
