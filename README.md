@@ -68,7 +68,7 @@ operation.addCondition(BlockCondition {
 
 Conditions can be mutually exclusive. This is akin to a lock being held preventing other operations with the same exclusion being executed.
 
-The framework provides the following conditions: `AuthorizedFor`, `BlockCondition`, `MutuallyExclusive`, `NegatedCondition`, `NoFailedDependenciesCondition`, `SilentCondition`, `ReachilityCondition`, `RemoteNotificationCondition`, `UserConfirmationCondition` and `UserNotificationCondition`.
+The framework provides the following conditions: `AuthorizedFor`, `BlockCondition`, `MutuallyExclusive`, `NegatedCondition`, `NoFailedDependenciesCondition`, `SilentCondition`, `ReachabilityCondition`, `RemoteNotificationCondition`, `UserConfirmationCondition` and `UserNotificationCondition`.
 
 See the programming guide on [Conditions](https://operations.readme.io/docs/conditions) for more information.
 
