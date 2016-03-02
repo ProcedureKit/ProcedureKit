@@ -44,7 +44,7 @@ public class ReachabilityCondition: OperationCondition {
     public func evaluateForOperation(operation: Operation, completion: OperationConditionResult -> Void) {
         reachability.reachabilityForURL(url) { status in
             switch (self.connectivity, status) {
-            case (.AnyConnectionKind, .Reachable(_)), (.ViaWWAN, .Reachable(_)):
+            case (.AnyConnectionKind, .Reachable(_)), (.ViaWWAN, .Reachable(_)), (.ViaWiFi, .Reachable(.ViaWiFi)):
                 completion(.Satisfied)
             case (.ViaWiFi, .Reachable(.ViaWWAN)):
                 completion(.Failed(Error.NotReachableWithConnectivity(self.connectivity)))
