@@ -57,7 +57,6 @@ session Advanced NSOperations: https://developer.apple.com/videos/wwdc/2015/?id=
       'Sources/Features/iOS/UserNotificationCondition.swift',
       'Sources/Features/iOS/WebpageOperation.swift',
       'Sources/Features/Shared/CalendarCapability.swift',
-      'Sources/Features/Shared/CloudCapability.swift'
     ]
     ss.osx.exclude_files = [
       'Sources/Core/iOS',
