@@ -27,11 +27,7 @@ public class ReachabilityCondition: OperationCondition {
     let connectivity: Reachability.Connectivity
     let reachability: HostReachabilityType
 
-    public convenience init(url: NSURL, connectivity: Reachability.Connectivity = .AnyConnectionKind) {
-        self.init(url: url, connectivity: connectivity, reachability: ReachabilityManager(DeviceReachability()))
-    }
-
-    init(url: NSURL, connectivity: Reachability.Connectivity = .AnyConnectionKind, reachability: HostReachabilityType) {
+    public init(url: NSURL, connectivity: Reachability.Connectivity = .AnyConnectionKind, reachability: HostReachabilityType = ReachabilityManager(DeviceReachability())) {
         self.url = url
         self.connectivity = connectivity
         self.reachability = reachability
