@@ -132,19 +132,8 @@ session Advanced NSOperations: https://developer.apple.com/videos/wwdc/2015/?id=
 	
   # Subspec which includes CloudKit functionality
   s.subspec '+CloudKit' do |ss|
-    ss.platforms = { :ios => "8.0", :osx => "10.10" }
+    ss.platforms = { :ios => "8.0", :tvos => "9.0", :osx => "10.10" }
     ss.dependency 'Operations/Standard'
-    ss.source_files = [
-      'Sources/Features/Shared/CloudCapability.swift',
-      'Sources/Features/Shared/CloudKitOperation.swift',			
-    ]
-  end
-	
-  # Subspec which includes CloudKit functionality
-  s.subspec '+CloudKit' do |ss|
-    ss.platforms = { :ios => "8.0", :osx => "10.10" }
-    ss.dependency 'Operations/Standard'
-    ss.frameworks = 'CloudKit'
     ss.source_files = [
       'Sources/Features/Shared/CloudCapability.swift',
       'Sources/Features/Shared/CloudKitOperation.swift',			
