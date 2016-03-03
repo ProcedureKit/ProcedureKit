@@ -1,9 +1,9 @@
 PODS:
-  - Operations/+AddressBook (2.5.1):
+  - Operations/+AddressBook (2.6.0):
     - Operations/Standard
-  - Operations/Standard (2.5.1)
+  - Operations/Standard (2.6.0)
   - PureLayout (3.0.1)
-  - SwiftyBeaver (0.3.3)
+  - SwiftyBeaver (0.3.5)
   - TaylorSource (2.0.0):
     - TaylorSource/Base (= 2.0.0)
   - TaylorSource/Base (2.0.0)
@@ -19,9 +19,9 @@ EXTERNAL SOURCES:
     :path: "../../"
 
 SPEC CHECKSUMS:
-  Operations: 3c646c48620ac4b6c624d825d42c1e684ecb6a53
+  Operations: 18114beb1805651d218ab077f549aea92e757493
   PureLayout: f35f5384c9c4e4479df041dbe33ad7577b71ddfb
-  SwiftyBeaver: 2444a0211ad8b06854915e13539f841517c48909
+  SwiftyBeaver: 2f90c3847586073616566dae043ad99b16866c4e
   TaylorSource: 86484ba9cf9374d51d4c17db1ad21ee5acba1277
 
 COCOAPODS: 0.39.0

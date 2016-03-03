@@ -260,6 +260,7 @@
 		65EE50C61C3C198600152774 /* CloudKitOperationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65EE50C51C3C198600152774 /* CloudKitOperationTests.swift */; };
 		65EE50C71C3C198600152774 /* CloudKitOperationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65EE50C51C3C198600152774 /* CloudKitOperationTests.swift */; };
 		65EE50C81C3C198600152774 /* CloudKitOperationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65EE50C51C3C198600152774 /* CloudKitOperationTests.swift */; };
+		65EED2B51C86C8F0003064B5 /* CloudCapability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652616FE1C11F5EB00654091 /* CloudCapability.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -1194,6 +1195,7 @@
 				652618891C11F8FE00654091 /* BlockOperation.swift in Sources */,
 				6526188A1C11F8FE00654091 /* ComposedOperation.swift in Sources */,
 				6526189A1C11F8FE00654091 /* TimeoutObserver.swift in Sources */,
+				65EED2B51C86C8F0003064B5 /* CloudCapability.swift in Sources */,
 				65C98C741C281EEC00BA76B7 /* FunctionalOperations.swift in Sources */,
 				6526188B1C11F8FE00654091 /* DelayOperation.swift in Sources */,
 				652618D91C11F93F00654091 /* NetworkObserver.swift in Sources */,
