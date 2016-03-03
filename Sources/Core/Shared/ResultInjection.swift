@@ -88,14 +88,14 @@ extension InjectionOperationType where Self: Operation {
      - returns: `self` - so that injections can be chained together.
     */
     public func injectResultFromDependency<T where T: Operation>(dep: T, block: (operation: Self, dependency: T, errors: [ErrorType]) -> Void) -> Self {
-        dep.addObserver(DidFinishObserver { op, errors in
-            if let dep = op as? T {
-                block(operation: self, dependency: dep, errors: errors)
+        dep.addObserver(DidFinishObserver { [weak self] op, errors in
+            if let strongSelf = self, dep = op as? T {
+                block(operation: strongSelf, dependency: dep, errors: errors)
             }
         })
-        dep.addObserver(CancelledObserver { op in
-            if let _ = op as? T {
-                (self as Operation).cancel()
+        dep.addObserver(CancelledObserver { [weak self] op in
+            if let strongSelf = self, _ = op as? T {
+                (strongSelf as Operation).cancel()
             }
         })
         (self as Operation).addDependency(dep)
@@ -174,12 +174,12 @@ extension AutomaticInjectionOperationType where Self: Operation {
 
     */
     public func injectResultFromDependency<T where T: Operation, T: ResultOperationType, T.Result == Requirement>(dep: T) {
-        injectResultFromDependency(dep) { operation, dependency, errors in
+        injectResultFromDependency(dep) { [weak self] operation, dependency, errors in
             if errors.isEmpty {
-                self.requirement = dependency.result
+                self?.requirement = dependency.result
             }
             else {
-                self.cancelWithError(AutomaticInjectionError.DependencyFinishedWithErrors(errors))
+                self?.cancelWithError(AutomaticInjectionError.DependencyFinishedWithErrors(errors))
             }
         }
     }
