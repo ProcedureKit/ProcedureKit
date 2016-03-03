@@ -1,3 +1,9 @@
+# 2.6.1
+
+1. [[OPR-205, OPR-206](https://github.com/danthorpe/Operations/pull/206)]: Fixes a mistake where the Cloud Capability was not available on tvOS platform.
+
+2. Temporary work around for an issue with Carthage versions 0.12 and later. In this version, Carthage now builds all Xcode projects it can find, which in this case is 4 projects because there are two examples. Those example projects use CocoaPods to setup their dependency on the Operations framework, using the "development pod" technique. I would prefer to not include their `Pods/` folder in the repo, however, without it, it becomes necessary to run `pod update` before building - which Carthage (reasonably) does not do. Therefore they fail to build and Carthage exits.
+
 # 2.6.0
 
 🚀 This release contains quite a few changes, with over 230 commits with input from 11 contributors! Thanks! 😀🎉

@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name              = "Operations"
-  s.version           = "2.6.0"
+  s.version           = "2.6.1"
   s.summary           = "Powerful NSOperation subclasses in Swift."
   s.description       = <<-DESC
   
@@ -13,7 +13,7 @@ session Advanced NSOperations: https://developer.apple.com/videos/wwdc/2015/?id=
   s.author            = { "Daniel Thorpe" => "@danthorpe" }
   s.source            = { :git => "https://github.com/danthorpe/Operations.git", :tag => s.version.to_s }
   s.module_name       = 'Operations'
-  s.documentation_url = 'http://docs.danthorpe.me/operations/2.6.0/index.html'
+  s.documentation_url = 'http://docs.danthorpe.me/operations/2.6.1/index.html'
   s.social_media_url  = 'https://twitter.com/danthorpe'
   s.requires_arc      = true
   s.ios.deployment_target = '8.0'
@@ -57,7 +57,6 @@ session Advanced NSOperations: https://developer.apple.com/videos/wwdc/2015/?id=
       'Sources/Features/iOS/UserNotificationCondition.swift',
       'Sources/Features/iOS/WebpageOperation.swift',
       'Sources/Features/Shared/CalendarCapability.swift',
-      'Sources/Features/Shared/CloudCapability.swift'
     ]
     ss.osx.exclude_files = [
       'Sources/Core/iOS',
