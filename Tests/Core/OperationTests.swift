@@ -406,7 +406,7 @@ class OperationDependencyTests: OperationTests {
 
     func test__dependent_operations_always_run() {
         queue.maxConcurrentOperationCount = 1
-        let count = 2_000
+        let count = 1_000
         var counter1: Int = 0
         var counter2: Int = 0
         var counter3: Int = 0
@@ -441,7 +441,7 @@ class OperationDependencyTests: OperationTests {
             runOperations(op1, op2, op3)
         }
 
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForExpectationsWithTimeout(6, handler: nil)
 
         XCTAssertEqual(counter1, count)
         XCTAssertEqual(counter2, count)
