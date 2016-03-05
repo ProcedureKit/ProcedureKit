@@ -3,10 +3,14 @@ steps:
     name: ":muscle: Lint"
     command: .ci/scripts/lint    
   -
-    name: ":fastlane: Test OS X Extension"
+    name: ":raised_hands: Pod Lint"
+    command: .ci/scripts/pod-lint    
+    branches: "release/*"
+  -
+    name: ":mac: Test OS X Extension"
     command: .ci/scripts/test-osx-extension
   -
-    name: ":fastlane: Test Mac OS X"
+    name: ":mac: Test Mac OS X"
     command: .ci/scripts/test-osx
   -
     name: ":fastlane: Test iOS Extension"
