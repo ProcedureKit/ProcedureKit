@@ -3,10 +3,6 @@ steps:
     name: ":muscle: Lint"
     command: .ci/scripts/lint    
   -
-    name: ":raised_hands: Pod Lint"
-    command: .ci/scripts/pod-lint    
-    branches: "release/*"
-  -
     name: ":mac: Test OS X Extension"
     command: .ci/scripts/test-osx-extension
   -
