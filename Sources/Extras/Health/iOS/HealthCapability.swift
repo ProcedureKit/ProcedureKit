@@ -251,26 +251,26 @@ extension HealthCapabilityStatus: CollectionType {
 
     /// - returns: the DictionaryType.Index start
     public var startIndex: DictionaryType.Index {
-        return _dictionary.startIndex
+        return dictionary.startIndex
     }
 
     /// - returns: the DictionaryType.Index end
     public var endIndex: DictionaryType.Index {
-        return _dictionary.endIndex
+        return dictionary.endIndex
     }
 
     /// - returns: the HKAuthorizationStatus by identifier
     public subscript(position: DictionaryType.Index) -> DictionaryType.Generator.Element {
-        return _dictionary[position]
+        return dictionary[position]
     }
 
     /// - returns: a sub sequence for the bounds
     public subscript(bounds: Range<DictionaryType.Index>) -> DictionaryType.SubSequence {
-        return _dictionary[bounds]
+        return dictionary[bounds]
     }
 
     /// - returns: a generator
     public func generate() -> DictionaryType.Generator {
-        return _dictionary.generate()
+        return dictionary.generate()
     }
 }

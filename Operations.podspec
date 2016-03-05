@@ -34,7 +34,7 @@ session Advanced NSOperations: https://developer.apple.com/videos/wwdc/2015/?id=
     ]
     ss.ios.exclude_files = [
       'Sources/Features/Shared/CloudCapability.swift',
-      'Sources/Features/Shared/CloudKitOperation.swift',			
+      'Sources/Features/Shared/CloudKit*.swift',			
       'Sources/Features/iOS/PhotosCapability.swift',
       'Sources/Features/iOS/PassbookCapability.swift'
     ]
@@ -49,7 +49,7 @@ session Advanced NSOperations: https://developer.apple.com/videos/wwdc/2015/?id=
       'Sources/Features/iOS/WebpageOperation.swift',
       'Sources/Features/Shared/CloudCapability.swift',
       'Sources/Features/Shared/ReachabilityCondition.swift',
-      'Sources/Features/Shared/CloudKitOperation.swift',
+      'Sources/Features/Shared/CloudKit*.swift',
       'Sources/Features/Shared/ReachableOperation.swift',
       'Sources/Features/Shared/Reachability.swift'
     ]
@@ -68,7 +68,7 @@ session Advanced NSOperations: https://developer.apple.com/videos/wwdc/2015/?id=
       'Sources/Core/iOS',
       'Sources/Features/iOS',
       'Sources/Features/Shared/CloudCapability.swift',
-      'Sources/Features/Shared/CloudKitOperation.swift'
+      'Sources/Features/Shared/CloudKit*.swift'
     ]
   end
 
@@ -133,9 +133,12 @@ session Advanced NSOperations: https://developer.apple.com/videos/wwdc/2015/?id=
   s.subspec '+CloudKit' do |ss|
     ss.platforms = { :ios => "8.0", :tvos => "9.0", :osx => "10.10" }
     ss.dependency 'Operations/Standard'
+    ss.frameworks = 'CloudKit'    
     ss.source_files = [
       'Sources/Features/Shared/CloudCapability.swift',
-      'Sources/Features/Shared/CloudKitOperation.swift',			
+      'Sources/Features/Shared/CloudKitInterface.swift',
+      'Sources/Features/Shared/CloudKitOperation.swift',
+      'Sources/Features/Shared/CloudKitOperationExtensions.swift'
     ]
   end
 	
@@ -153,7 +156,7 @@ session Advanced NSOperations: https://developer.apple.com/videos/wwdc/2015/?id=
   s.subspec '+Passbook' do |ss|
     ss.platforms = { :ios => "8.0" }
     ss.dependency 'Operations/Standard'
-    ss.frameworks = 'Passbook'
+    ss.frameworks = 'PassKit'
     ss.source_files = [
       'Sources/Features/iOS/PassbookCapability.swift'
     ]
