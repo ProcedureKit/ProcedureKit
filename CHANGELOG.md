@@ -1,3 +1,29 @@
+# 2.7.0
+🚀 This release continues the refinement of the framework. Thanks again to everyone who has contributed!
+
+1. [[OPR-152](https://github.com/danthorpe/Operations/issues/152), [OPR-193](https://github.com/danthorpe/Operations/pull/193), [OPR-195](https://github.com/danthorpe/Operations/pull/195), [OPR-201](https://github.com/danthorpe/Operations/pull/201)]: This is a breaking change which significantly improves Operation observers.
+    1. Observers can be safely added to an Operation at any point in its lifecycle.
+    2. Observers can implement a callback which is executed when there are attached to the operation.
+    3. All the block based observers have labels on their arguments.
+
+    Thanks to [@jshier](https://github.com/jshier) for reporting this one.
+2. [[OPR-193](https://github.com/danthorpe/Operations/pull/196)]: Thanks to [@seancatkinson](https://github.com/seancatkinson) who made improvements to `UIOperation` making it possible to specify whether the controller should be wrapped in a `UINavigationController`.
+3. [[OPR-199](https://github.com/danthorpe/Operations/pull/203)]: Refactored the initializers of `RepeatedOperation` to make it far easier for framework consumers to subclass it - thanks [@jshier](https://github.com/jshier) for reporting this one.
+4. [[OPR-197](https://github.com/danthorpe/Operations/pull/198)]: Fixes a bug where errors from nested `GroupOperation`s were not propagating correctly - thanks to [@bastianschilbe](https://github.com/bastianschilbe) for reporting this one.
+5. [[OPR-204](https://github.com/danthorpe/Operations/pull/204)]: Fixes a typo in the README - thanks to [@Augustyniak](https://github.com/Augustyniak).
+6. [[OPR-214](https://github.com/danthorpe/Operations/pull/214)]: Moves code coverage reporting from Codecov.io to [Coveralls](https://coveralls.io/github/danthorpe/Operations).
+7. [[OPR-164](https://github.com/danthorpe/Operations/pull/164)]: Adds initial support for Swift Package Manager - no idea if this actually works yet though.
+8. [[OPR-212](https://github.com/danthorpe/Operations/pull/212)]: Removes the example projects from the repo. They are now in the [@danthorpe/Examples](https://github.com/danthorpe/Examples) repo. This was done as a safer/better fix for the issue which was resolved in v2.6.1. Essentially because Carthage now builds *all* Xcode projects that it can finds, it will attempt to build any example projects in the repo, and because Carthage does not have the concept of “local dependencies” these example projects are setup using CocoaPods. And I really don’t like to include the `Pods` folder of dependencies in repositories as it just take longer to checkout. So, this was causing Carthage to exit because it couldn’t build these exampled. So, I’ve moved them to a new repo.
+9. [[OPR-216](https://github.com/danthorpe/Operations/pull/216)]: Adds SwiftLint to the project & CI, including fixes for all the issues which were warnings or errors.
+10. [[OPR-192](https://github.com/danthorpe/Operations/pull/192)]: Updates the `.podspec` to have more granular dependencies. For users of `CloudKitOperation` this is a breaking change, and you will need to update your `Podfile`:
+
+    ```ruby
+    pod ‘Operations/+CloudKit’
+    ```
+
+    Thanks to [@itsthejb](https://github.com/itsthejb) for this one.
+
+
 # 2.6.1
 
 1. [[OPR-205, OPR-206](https://github.com/danthorpe/Operations/pull/206)]: Fixes a mistake where the Cloud Capability was not available on tvOS platform.
