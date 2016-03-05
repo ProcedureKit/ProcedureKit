@@ -10,6 +10,12 @@ lane :lint do
     )
 end
 
+lane :podlint do
+
+
+
+end
+
 platform :ios do
 
   desc "Builds the iOS Extension compatible framework"

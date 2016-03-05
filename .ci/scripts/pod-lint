@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 source /usr/local/opt/chruby/share/chruby/chruby.sh
 chruby ruby
-pod lib lint
+bundle exec fastlane podlint
