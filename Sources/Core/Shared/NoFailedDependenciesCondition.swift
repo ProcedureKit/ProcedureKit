@@ -41,12 +41,12 @@ public struct NoFailedDependenciesCondition: OperationCondition {
 
     /**
     Evaluates the operation with respect to the finished status of its dependencies.
-    
-    The condition first checks if any dependencies were cancelled, in which case it 
+
+    The condition first checks if any dependencies were cancelled, in which case it
     fails with an `NoFailedDependenciesCondition.Error.CancelledDependencies`. Then
     it checks to see if any dependencies failed due to errors, in which case it
     fails with an `NoFailedDependenciesCondition.Error.FailedDependencies`.
-    
+
     The cancelled or failed operations are no associated with the error.
 
     - parameter operation: the `Operation` which the condition is attached to.
@@ -76,12 +76,11 @@ public struct NoFailedDependenciesCondition: OperationCondition {
 }
 
 /// Equatable conformance for `NoFailedDependenciesCondition.Error`
-public func ==(a: NoFailedDependenciesCondition.Error, b: NoFailedDependenciesCondition.Error) -> Bool {
-    switch (a, b) {
+public func == (lhs: NoFailedDependenciesCondition.Error, rhs: NoFailedDependenciesCondition.Error) -> Bool {
+    switch (lhs, rhs) {
     case (.CancelledDependencies, .CancelledDependencies), (.FailedDependencies, .FailedDependencies):
         return true
     default:
         return false
     }
 }
-

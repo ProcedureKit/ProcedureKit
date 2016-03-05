@@ -17,7 +17,7 @@ class TestableRemoteNotificationRegistrar: RemoteNotificationRegistrarType {
     init(error: NSError? = .None) {
         self.error = error
     }
-    
+
     func opr_registerForRemoteNotifications() {
         didRegister = true
         if let error = error {
@@ -74,6 +74,3 @@ class RemoteNotificationConditionTests: OperationTests {
         }
     }
 }
-
-
-

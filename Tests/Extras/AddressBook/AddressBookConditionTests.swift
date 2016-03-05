@@ -197,6 +197,3 @@ class AddressBookConditionTests: OperationTests {
     }
 
 }
-
-
-

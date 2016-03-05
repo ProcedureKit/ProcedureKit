@@ -23,7 +23,7 @@ public enum OperationConditionResult {
 }
 
 /**
-Types which conform to `OperationCondition` can be added to `Operation` 
+Types which conform to `OperationCondition` can be added to `Operation`
 subclasses before they are added to an `OperationQueue`. If the condition
 returns an `NSOperation` dependency, the dependency relationship will be
 set and it is added to the queue automatically.
@@ -44,7 +44,7 @@ public protocol OperationCondition {
 
     /**
     A flag to indicate whether this condition is mutually exclusive. Meaning
-    that only one condition can be evaluated at a time. Other `Operation` 
+    that only one condition can be evaluated at a time. Other `Operation`
     instances which have this condition will wait in a `.Pending` state - i.e.
     not get executed.
 
@@ -55,7 +55,7 @@ public protocol OperationCondition {
     /**
     Some conditions may have the ability to satisfy the condition
     if another operation is executed first. Use this method to return
-    an operation that (for example) asks for permission to perform 
+    an operation that (for example) asks for permission to perform
     the operation.
 
     - parameter operation: The `Operation` to which the condition has been added.
@@ -67,7 +67,7 @@ public protocol OperationCondition {
 
     /**
     Evaluate the condition, to see if it has been satisfied.
-    
+
     - parameter operation: the `Operation` which this condition is attached to.
     - parameter completion: a closure which receives an `OperationConditionResult`.
     */
@@ -111,4 +111,3 @@ extension OperationConditionResult {
         }
     }
 }
-

@@ -10,7 +10,7 @@ import Foundation
 
 /**
  # Result Operation
- 
+
  Abstract but a concrete class for a ResultOperationType.
 */
 public class ResultOperation<Result>: Operation, ResultOperationType {
@@ -32,11 +32,11 @@ public class ResultOperation<Result>: Operation, ResultOperationType {
 
 /**
  # Map Operation
- 
+
  An `Operation` subclass which accepts a map transform closure. Because it
  conforms to both `ResultOperationType` and `AutomaticInjectionOperationType`
  it can be used to create an array of operations which transform state.
- 
+
  - discussion: Note that the closure is invoked as the operation's *work* on
  an operation queue. So it should perform synchronous computation, although
  it will be executed asynshronously.
@@ -52,14 +52,14 @@ public class MapOperation<T, U>: ResultOperation<U>, AutomaticInjectionOperation
     /**
      Initializes an instance with an optional starting requirement, and an
      transform block.
-     
+
      - parameter x: the value to the transformed. Note this is optional, as it
      can be injected after initialization, but before execution.
      - parameter transform: a closure which maps a non-optional T to U!. Note
      that this closure will only be run if the requirement is non-nil.
     */
-    public init(x: T! = .None, transform: T -> U) {
-        self.requirement = x
+    public init(input: T! = .None, transform: T -> U) {
+        self.requirement = input
         self.transform = transform
         super.init(result: nil)
         name = "Map"
@@ -79,7 +79,7 @@ extension ResultOperationType where Self: Operation {
 
     /**
      Map the result of an `Operation` which conforms to `ResultOperationType`.
-     
+
      ```swift
      let getLocation = UserLocationOperation()
      let toString = getLocation.mapResult { $0.map { "\($0)" } ?? "No location received" }
@@ -107,7 +107,7 @@ extension ResultOperationType where Self: Operation {
  An `Operation` subclass which accepts an include element closure. Because it
  conforms to both `ResultOperationType` and `AutomaticInjectionOperationType`
  it can be used to create an array of operations which transform state.
- 
+
  - discussion: Note that the closure is invoked as the operation's *work* on
  an operation queue. So it should perform synchronous computation, although
  it will be executed asynshronously.
@@ -138,7 +138,7 @@ extension ResultOperationType where Self: Operation, Result: SequenceType {
     /**
      Filter the result of the receiver `Operation` which conforms to `ResultOperationType` where
      the Result is a SequenceType.
-     
+
      ```swift
      let getLocation = UserLocationOperation()
      let toString = getLocation.mapResult { $0.map { "\($0)" } ?? "No location received" }
@@ -161,11 +161,11 @@ extension ResultOperationType where Self: Operation, Result: SequenceType {
 
 /**
  # Reduce Operation
- 
+
  An `Operation` subclass which accepts an initial value, and a combine closure. Because it
  conforms to both `ResultOperationType` and `AutomaticInjectionOperationType`
  it can be used to create an array of operations which transform state.
- 
+
  - discussion: Note that the closure is invoked as the operation's *work* on
  an operation queue. So it should perform synchronous computation, although
  it will be executed asynshronously.
@@ -198,7 +198,7 @@ extension ResultOperationType where Self: Operation, Result: SequenceType {
     /**
      Reduce the result of the receiver `Operation` which conforms to `ResultOperationType` where
      the Result is a SequenceType.
-     
+
      ```swift
      let getStrings = GetStringsOperation()
      let createParagraph = getStrings.reduceOperation("") { (accumulator: String, str: String) in
@@ -221,6 +221,3 @@ extension ResultOperationType where Self: Operation, Result: SequenceType {
         return reduce
     }
 }
-
-
-

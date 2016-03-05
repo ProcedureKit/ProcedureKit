@@ -93,5 +93,3 @@ class LoggingObserverWithProduce: LoggingObserverTests {
         XCTAssertTrue(receivedMessages.contains("Test Logging Operation: did produce operation: Test Operation."))
     }
 }
-
-

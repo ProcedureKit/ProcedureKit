@@ -241,27 +241,27 @@ class BlockObserverTests: BaseBlockObserverTests {
         operation.addObserver(BlockObserver(didStart: { op in
             counter += 1
         }))
-        
+
         addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
         runOperation(operation)
         waitForExpectationsWithTimeout(3, handler: nil)
-        
+
         XCTAssertEqual(counter, 1)
     }
-    
+
     func test__cancellation_handler_is_executed() {
 
         var counter = 0
         operation.addObserver(BlockObserver(didCancel: { op in
             counter += 1
         }))
-        
+
         addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
         runOperation(operation)
         operation.cancel()
         operation.cancel() // Deliberately call cancel multiple times.
         waitForExpectationsWithTimeout(3, handler: nil)
-        
+
         XCTAssertEqual(counter, 1)
     }
 

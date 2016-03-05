@@ -120,5 +120,3 @@ class ReachabilityConditionErrorTests: XCTestCase {
     }
 
 }
-
-

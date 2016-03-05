@@ -673,7 +673,7 @@ class OPRCKModifyBadgeOperationTests: CKTests {
         target.badgeValue = 4
         XCTAssertEqual(operation.badgeValue, 4)
     }
-    
+
     func test__set_badge_value() {
         operation.badgeValue = 4
         XCTAssertEqual(target.badgeValue, 4)
@@ -731,7 +731,7 @@ class OPRCKFetchRecordChangesOperationTests: CKTests {
         target.recordChangedBlock = { _ in }
         XCTAssertNotNil(operation.recordChangedBlock)
     }
-    
+
     func test__set_record_changed_block() {
         operation.recordChangedBlock = { _ in }
         XCTAssertNotNil(target.recordChangedBlock)
@@ -1487,7 +1487,7 @@ class CloudKitOperationFetchNotificationChangesOperationTests: CKTests {
             return op
         }
     }
-    
+
     func test__execution_after_cancellation() {
         operation.cancel()
         waitForOperation(operation)
@@ -1718,7 +1718,7 @@ class CloudKitOperationFetchRecordChangesTests: CKTests {
         waitForOperation(operation)
         XCTAssertTrue(operation.finished)
     }
-    
+
     func test__success_with_completion_block() {
         operation.setFetchRecordChangesCompletionBlock { _, _ in }
         waitForOperation(operation)
@@ -1763,7 +1763,7 @@ class CloudKitOperationFetchRecordZonesTests: CKTests {
         operation = CloudKitOperation(reachability: manager) { TestFetchRecordZonesOperation() }
         operation.recordZoneIDs = zoneIDs
     }
-    
+
     func test__execution_after_cancellation() {
         operation.cancel()
         waitForOperation(operation)
@@ -1885,7 +1885,7 @@ class CloudKitOperationFetchSubscriptionsTests: CKTests {
         operation = CloudKitOperation(reachability: manager) { TestFetchSubscriptionsOperation() }
         operation.subscriptionIDs = subscriptionIDs
     }
-    
+
     func test__execution_after_cancellation() {
         operation.cancel()
         waitForOperation(operation)
@@ -1947,7 +1947,7 @@ class CloudKitOperationModifyRecordZonesTests: CKTests {
         operation.recordZonesToSave = zonesToSave
         operation.recordZoneIDsToDelete = zoneIDsToDelete
     }
-    
+
     func test__execution_after_cancellation() {
         operation.cancel()
         waitForOperation(operation)
@@ -2229,7 +2229,7 @@ class BatchedFetchNotificationChangesOperationTests: CKTests {
         count = 0
         operation = BatchedCloudKitOperation(reachability: manager, createNextOperation)
     }
-    
+
     func createNextOperation() -> Target? {
         let target = Target(token: token, error: error)
         target.changedNotifications = [ "hello", "world" ]
@@ -2378,10 +2378,3 @@ class CloudKitRecoveryTests: CKTests {
         XCTAssertEqual(code, CKErrorCode.MissingEntitlement)
     }
 }
-
-
-
-
-
-
-

@@ -58,5 +58,3 @@ class WebpageOperationTests: OperationTests {
         XCTAssertTrue(didPresentWebpage)
     }
 }
-
-

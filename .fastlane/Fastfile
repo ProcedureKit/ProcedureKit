@@ -2,6 +2,14 @@ lane :verify do
   verify_xcode  
 end
 
+lane :lint do
+
+    swiftLint(
+        mode: :lint, 
+        config_file: '.swiftlint.yml'
+    )
+end
+
 platform :ios do
 
   desc "Builds the iOS Extension compatible framework"
@@ -24,6 +32,18 @@ platform :ios do
       output_directory: ".ci/xcodebuild-data",
       xcargs: "-derivedDataPath .ci/xcodebuild-data"
     )
+
+  end
+
+  desc "Test the iOS Extension compatible framework"
+  lane :test_extension do
+        
+    scan(
+      project: "Operations_ExtensionCompatible.xcodeproj",
+      scheme: "iOS Extensions Operations",
+      output_directory: ".ci/xcodebuild-data",
+      xcargs: "-derivedDataPath .ci/xcodebuild-data"
+    )    
 
   end
 
@@ -53,4 +73,17 @@ platform :mac do
     )
 
   end
+  
+  desc "Test the OS X Extension compatible framework"
+  lane :test_extension do
+        
+    scan(
+      project: "Operations_ExtensionCompatible.xcodeproj",
+      scheme: "OS X Extensions Operations",
+      output_directory: ".ci/xcodebuild-data",
+      xcargs: "-derivedDataPath .ci/xcodebuild-data"
+    )    
+
+  end  
+  
 end

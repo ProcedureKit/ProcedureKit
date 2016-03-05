@@ -333,8 +333,8 @@ public class _ReverseGeocodeUserLocationOperation<Geocoder, Manager where Geocod
     }
 }
 
-public func ==(a: LocationOperationError, b: LocationOperationError) -> Bool {
-    switch (a, b) {
+public func == (lhs: LocationOperationError, rhs: LocationOperationError) -> Bool {
+    switch (lhs, rhs) {
     case let (.LocationManagerDidFail(aError), .LocationManagerDidFail(bError)):
         return aError == bError
     case let (.GeocoderError(aError), .GeocoderError(bError)):
@@ -343,6 +343,3 @@ public func ==(a: LocationOperationError, b: LocationOperationError) -> Bool {
         return false
     }
 }
-
-
-

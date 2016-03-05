@@ -10,7 +10,7 @@ import XCTest
 @testable import Operations
 
 class SilentConditionTests: XCTestCase {
-    
+
     func test__silent_condition_composes_name_correctly() {
         let condition = BlockCondition { false }
         let silent = SilentCondition(condition)

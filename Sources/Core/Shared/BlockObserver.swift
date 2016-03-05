@@ -24,7 +24,7 @@ public struct StartedObserver: OperationDidStartObserver {
 
     /**
      Initialize the observer with a block.
-     
+
      - parameter didStart: the `DidStartBlock`
      - returns: an observer.
     */
@@ -253,5 +253,3 @@ public struct BlockObserver: OperationObserver {
         didAttachToOperation?(operation: operation)
     }
 }
-
-

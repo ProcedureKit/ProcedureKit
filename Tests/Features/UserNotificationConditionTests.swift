@@ -17,7 +17,7 @@ class TestableUserNotificationRegistrar: UserNotificationRegistrarType {
     init(settings: UIUserNotificationSettings? = .None) {
         currentSettings = settings
     }
-    
+
     func opr_registerUserNotificationSettings(notificationSettings: UIUserNotificationSettings) {
         didRegisterSettings = notificationSettings
         currentSettings = notificationSettings
@@ -34,7 +34,7 @@ class UserNotificationConditionTests: OperationTests {
     func createSimpleSettings() -> UIUserNotificationSettings {
         return UIUserNotificationSettings(forTypes: [.Badge, .Alert], categories: nil)
     }
-    
+
     func createAdvancedSettings() -> UIUserNotificationSettings {
         let action1 = UIMutableUserNotificationAction()
         action1.activationMode = .Background
@@ -42,30 +42,30 @@ class UserNotificationConditionTests: OperationTests {
         action1.identifier = "me.danthorpe.Operations.Tests.UserNotification.Action1"
         action1.destructive = false
         action1.authenticationRequired = false
-        
+
         let action2 = UIMutableUserNotificationAction()
         action2.activationMode = .Background
         action2.title = "Action 2"
         action2.identifier = "me.danthorpe.Operations.Tests.UserNotification.Action2"
         action2.destructive = false
         action2.authenticationRequired = false
-        
+
         let category = UIMutableUserNotificationCategory()
         category.identifier = "me.danthorpe.Operations.Tests.UserNotification.Actions"
         category.setActions([action1, action2], forContext: .Default)
-        
+
         let types: UIUserNotificationType = [.Badge, .Sound, .Alert]
         return UIUserNotificationSettings(forTypes: types, categories: Set(arrayLiteral: category))
     }
-    
+
     func test__condition_fails_when_current_settings_are_empty() {
         let settings = createSimpleSettings()
         let registrar = TestableUserNotificationRegistrar(settings: .None)
         let condition = UserNotificationCondition(settings: settings, behavior: .Merge, registrar: registrar)
-        
+
         let operation = TestOperation()
         operation.addCondition(SilentCondition(condition))
-        
+
         let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
         var receivedErrors = [ErrorType]()
         operation.addObserver(DidFinishObserver { _, errors in
@@ -75,7 +75,7 @@ class UserNotificationConditionTests: OperationTests {
 
         runOperation(operation)
         waitForExpectationsWithTimeout(3, handler: nil)
-        
+
         XCTAssertFalse(operation.didExecute)
         if let error = receivedErrors.first as? UserNotificationCondition.Error {
             XCTAssertTrue(error == UserNotificationCondition.Error.SettingsNotSufficient((current: nil, desired: settings)))
@@ -84,37 +84,36 @@ class UserNotificationConditionTests: OperationTests {
             XCTFail("No error message was observed")
         }
     }
-    
+
     func test__condition_succeeds_when_current_settings_match_desired() {
-        
+
         let settings = createSimpleSettings()
         let registrar = TestableUserNotificationRegistrar(settings: settings)
         let condition = UserNotificationCondition(settings: settings, behavior: .Merge, registrar: registrar)
-        
+
         let operation = TestOperation()
         operation.addCondition(SilentCondition(condition))
 
         addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
         runOperation(operation)
         waitForExpectationsWithTimeout(3, handler: nil)
-        
+
         XCTAssertTrue(operation.didExecute)
     }
-    
+
     func test__permission_is_requested_if_permissions_are_not_enough() {
         let settings = createSimpleSettings()
         let registrar = TestableUserNotificationRegistrar(settings: UIUserNotificationSettings(forTypes: [], categories: nil))
         let condition = UserNotificationCondition(settings: settings, behavior: .Merge, registrar: registrar)
-        
+
         let operation = TestOperation()
         operation.addCondition(condition)
 
         addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
         runOperation(operation)
         waitForExpectationsWithTimeout(300, handler: nil)
-        
+
         XCTAssertEqual(registrar.didRegisterSettings!, settings)
 
     }
 }
-

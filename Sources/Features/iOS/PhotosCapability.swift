@@ -142,4 +142,3 @@ public extension Capability {
 
 @available(*, unavailable, renamed="AuthorizedFor(Capability.Photos())")
 public typealias PhotosCondition = AuthorizedFor<Capability.Photos>
-

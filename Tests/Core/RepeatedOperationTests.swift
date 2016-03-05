@@ -74,7 +74,7 @@ class FixedWaitGeneratorTests: WaitStrategyIntervalTests {
         strategy = .Fixed(1.0)
         generator = strategy.generator()
     }
-    
+
     func test__next_interval() {
         guard let interval = getInterval() else {
             XCTFail("FixedWaitGenerator never ends.")
@@ -187,7 +187,7 @@ class FibonacciWaitGeneratorTests: WaitStrategyIntervalTests {
         strategy = .Fibonacci((period: 1, maximum: 10))
         generator = strategy.generator()
     }
-    
+
     func test__next_0() {
         guard let interval = getInterval(0) else {
             XCTFail("FibonacciWaitGenerator never ends.")
@@ -391,5 +391,3 @@ class RepeatableRepeatedOperationTests: OperationTests {
         XCTAssertTrue(op.cancelled)
     }
 }
-
-

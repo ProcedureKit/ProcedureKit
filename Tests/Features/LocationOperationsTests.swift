@@ -345,7 +345,7 @@ class ReverseGeocodeUserLocationOperationTests: ReverseGeocodeOperationTests {
 
     func test__completion_handler_receives_location_and_placeholder() {
         let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
-        
+
         var blockLocation: CLLocation? = .None
         var blockPlacemark: CLPlacemark? = .None
 
@@ -367,4 +367,3 @@ class ReverseGeocodeUserLocationOperationTests: ReverseGeocodeOperationTests {
         XCTAssertEqual(receivedPlacemark, placemark)
     }
 }
-

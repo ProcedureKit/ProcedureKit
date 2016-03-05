@@ -18,7 +18,7 @@ class TestablePhotosRegistrar: NSObject {
     var responseStatus: PHAuthorizationStatus = .Authorized
     var accessError: NSError? = .None
     var didRequestAuthorization = false
-    
+
     required override init() { }
 }
 
@@ -117,4 +117,3 @@ class PhotosCapabilityTests: XCTestCase {
         XCTAssertTrue(didComplete)
     }
 }
-

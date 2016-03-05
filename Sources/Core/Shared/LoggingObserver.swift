@@ -25,8 +25,8 @@ public struct LoggingObserver: OperationObserver {
 
     /**
     Create a logging observer. Accepts as the final argument a block which receives a
-    `String` message to be logged. By default this just uses `print()`, but construct 
-    with a custom block to send logs to other systems. The block is executed on a 
+    `String` message to be logged. By default this just uses `print()`, but construct
+    with a custom block to send logs to other systems. The block is executed on a
     dispatch queue.
 
     - parameter queue: a queue, by detault it uses it's own serial queue.
@@ -41,9 +41,9 @@ public struct LoggingObserver: OperationObserver {
     /**
     Conforms to `OperationObserver`. The logger is sent a string which uses the
     `name` parameter of the operation if provived.
-    
+
        "My Operation: did start."
-    
+
     - parameter operation: the `Operation` which has started.
     */
     public func didStartOperation(operation: Operation) {
@@ -68,9 +68,9 @@ public struct LoggingObserver: OperationObserver {
 
         "My Operation: did produce operation: My Other Operation."
 
-    If the produced operation is an `Operation`, then a new `LoggingObserver` with 
+    If the produced operation is an `Operation`, then a new `LoggingObserver` with
     same queue and logger will be attached to it as an observer. Meaning that when
-    the produced operation starts/produces/finishes, it will also generate log 
+    the produced operation starts/produces/finishes, it will also generate log
     output.
 
     - parameter operation: the `Operation` producer.
@@ -111,9 +111,9 @@ public struct LoggingObserver: OperationObserver {
     looks like
 
         "My Operation: finsihed with error(s): [My Operation Error]."
-    
+
     or if no errors:
-    
+
         "My Operation: finsihed with no errors."
 
     - parameter operation: the `Operation` that finished.
@@ -130,4 +130,3 @@ public struct LoggingObserver: OperationObserver {
         }
     }
 }
-

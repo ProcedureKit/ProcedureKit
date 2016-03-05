@@ -54,5 +54,3 @@ public struct AddressBookCondition: OperationCondition {
         }
     }
 }
-
-

@@ -32,7 +32,7 @@ public protocol PresentingViewController: class {
     - parameter vc: the `UIViewController` being presented.
     - parameter sender: an optional `AnyObject`, usually this is a `UIControl`.
     */
-    func showViewController(vc: UIViewController, sender: AnyObject?)
+    func showViewController(viewController: UIViewController, sender: AnyObject?)
 
     @available(iOS 8.0, *)
     /**
@@ -41,21 +41,21 @@ public protocol PresentingViewController: class {
     - parameter vc: the `UIViewController` being presented.
     - parameter sender: an optional `AnyObject`, usually this is a `UIControl`.
     */
-    func showDetailViewController(vc: UIViewController, sender: AnyObject?)
+    func showDetailViewController(viewController: UIViewController, sender: AnyObject?)
 }
 
 extension UIViewController: PresentingViewController { }
 
 /**
 A simple enum to convey how a view controller should be presented. The view controller
-which performs the presentation is stored as an associated type, and is generic. So, 
+which performs the presentation is stored as an associated type, and is generic. So,
 to present a detail view controller from a master view controller say, it would be
 used like this
 
     let from: ViewControllerDisplayStyle = .ShowDetail(masterViewController)
     from.displayController(detailViewController, sender: .None, completion: .None)
 
-This enum is used as an argument for the `UIOperation` class which usually is 
+This enum is used as an argument for the `UIOperation` class which usually is
 responsible for creating the view controller which is to be presented.
 */
 public enum ViewControllerDisplayStyle<ViewController: PresentingViewController> {
@@ -78,7 +78,7 @@ public enum ViewControllerDisplayStyle<ViewController: PresentingViewController>
 
     /**
     A function which will present the view controller from the associated view controller property.
-    
+
     When the style is `.Present`, the controller is not a `UIAlertController`, and
     inNavigationController is set to true (as it is by default), it is automatically placed as
     the root controller of a `UINavigationController` which is then presented.
@@ -116,9 +116,9 @@ public enum ViewControllerDisplayStyle<ViewController: PresentingViewController>
 /**
 `UIOperation` is an `Operation` subclass which is responsible for presenting one view controller
 from another view controller. The operation is generic over both of these types. It uses
-standard `UIViewController` presentation APIs. These APIs have been condensed into the 
+standard `UIViewController` presentation APIs. These APIs have been condensed into the
 `PresentingViewController` protocol, meaning that the *presenting* generic type is just something
-conforming to this protocol. This is for testing purposes, don't let it confuse you, the From 
+conforming to this protocol. This is for testing purposes, don't let it confuse you, the From
 generic type is your view controller.
 
 However, note that the presenting view controller is associated into a `ViewControllerDisplayStyle`.
@@ -135,18 +135,18 @@ public class UIOperation<C, From where C: UIViewController, From: PresentingView
 
     /// The `AnyObject` sender.
     public let sender: AnyObject?
-    
+
     public let wrapInNavigationController: Bool
 
     /**
-    Construct a `UIOperation` with the presented view controller, the presenting view controller display 
+    Construct a `UIOperation` with the presented view controller, the presenting view controller display
     style, and optional sender and completion blocks. For example...
-    
+
         let ui = UIOperation(
-            controller: detailViewController, 
+            controller: detailViewController,
             displayControllerFrom: .ShowDetail(myViewController)
         )
-    
+
     - parameter controller: the generic `UIViewController` subclass.
     - parameter displayControllerFrom: a ViewControllerDisplayStyle<From> value.
      - parameter inNavigationController: a Bool indicating whether to wrap controller in a
@@ -164,7 +164,7 @@ public class UIOperation<C, From where C: UIViewController, From: PresentingView
 
     /**
     When the operation executes, on the main queue, it calls `displayController` on the
-    ViewControllerDisplayStyle, which in turn will execute either `presentViewController`, 
+    ViewControllerDisplayStyle, which in turn will execute either `presentViewController`,
     `showViewController`, or `showDetailViewController`.
     */
     public override func execute() {
@@ -175,4 +175,3 @@ public class UIOperation<C, From where C: UIViewController, From: PresentingView
         }
     }
 }
-
