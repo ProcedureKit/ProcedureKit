@@ -15,6 +15,7 @@ Resource | Where to find it
 Session video | [developer.apple.com](https://developer.apple.com/videos/wwdc/2015/?id=226)
 Reference documentation | [docs.danthorpe.me/operations](http://docs.danthorpe.me/operations/2.6.1/index.html)
 Programming guide | [operations.readme.io](https://operations.readme.io)
+Example projects | [danthorpe/Examples](https://github.com/danthorpe/Examples)
 
 ## Usage
 
