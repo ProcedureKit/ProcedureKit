@@ -35,6 +35,18 @@ platform :ios do
 
   end
 
+  desc "Test the iOS Extension compatible framework"
+  lane :test_extension do
+        
+    scan(
+      project: "Operations_ExtensionCompatible.xcodeproj",
+      scheme: "iOS Extensions Operations",
+      output_directory: ".ci/xcodebuild-data",
+      xcargs: "-derivedDataPath .ci/xcodebuild-data"
+    )    
+
+  end
+
 end
 
 platform :mac do
@@ -61,4 +73,56 @@ platform :mac do
     )
 
   end
+  
+  desc "Test the OS X Extension compatible framework"
+  lane :test_extension do
+        
+    scan(
+      project: "Operations_ExtensionCompatible.xcodeproj",
+      scheme: "OS X Extensions Operations",
+      output_directory: ".ci/xcodebuild-data",
+      xcargs: "-derivedDataPath .ci/xcodebuild-data"
+    )    
+
+  end  
+  
+end
+
+platform :tvos do
+
+  desc "Builds the tvOS Extension compatible framework"
+  lane :build_extension do
+    
+    xcodebuild(
+      project: "Operations_ExtensionCompatible.xcodeproj",
+      scheme: "tvOS Extensions Operations",
+      xcargs: "-derivedDataPath .ci/xcodebuild-data"
+    )
+
+  end
+
+  desc "Runs all the tests"
+  lane :test do
+
+    scan(
+      project: "Operations.xcodeproj",
+      scheme: "tvOS Operations",
+      output_directory: ".ci/xcodebuild-data",
+      xcargs: "-derivedDataPath .ci/xcodebuild-data"
+    )
+
+  end
+  
+  desc "Test the tvOS Extension compatible framework"
+  lane :test_extension do
+        
+    scan(
+      project: "Operations_ExtensionCompatible.xcodeproj",
+      scheme: "tvOS Extensions Operations",
+      output_directory: ".ci/xcodebuild-data",
+      xcargs: "-derivedDataPath .ci/xcodebuild-data"
+    )    
+
+  end  
+
 end
