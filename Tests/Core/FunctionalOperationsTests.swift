@@ -166,5 +166,3 @@ class ResultOperationTests: OperationTests {
     }
 }
 
-
-

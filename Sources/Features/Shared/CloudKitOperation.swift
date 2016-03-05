@@ -10,7 +10,7 @@ import Foundation
 import CloudKit
 
 /**
- 
+
  A generic protocol which exposes the types and properties used by
  Apple's CloudKit Operation types.
 
@@ -609,7 +609,7 @@ public class CloudKitRecovery<T where T: NSOperation, T: CKOperationType> {
  let operation = CloudKitOperation { CKFetchRecordZonesOperation.fetchAllRecordZonesOperation() }
  ```
 
- This works because, the initializer only takes a trailing closure. The closure receives no arguments 
+ This works because, the initializer only takes a trailing closure. The closure receives no arguments
  and is only one line, so the return is not needed.
 
  ## Configuration
@@ -633,7 +633,7 @@ public class CloudKitRecovery<T where T: NSOperation, T: CKOperationType> {
  the "results" of the operation, and an `NSError` argument. However, CloudKitOperation features its own
  semi-automatic error handling system. Therefore, the only completion block needed is one which receives
  the "results". Essentially, all that is needed is to manage the happy path of the operation. For all
- CKOperation subclasses, this can be configured directly on the CloudKitOperation instance, using a 
+ CKOperation subclasses, this can be configured directly on the CloudKitOperation instance, using a
  pattern of `setOperationKindCompletionBlock { }`. For example, given the above:
 
 ```swift
@@ -646,16 +646,16 @@ Note, that for the automatic error handling to kick in, the happy path must be s
 
  ### Error Handling
 
- When the completion block is set as above, any errors receives from the CKOperation subclass are 
+ When the completion block is set as above, any errors receives from the CKOperation subclass are
  intercepted, and instead of the provided block being executed, the operation finsihes with an error.
 
- However, CloudKitOperation is a subclass of RetryOperation, which is actually a GroupOperation subclass, 
+ However, CloudKitOperation is a subclass of RetryOperation, which is actually a GroupOperation subclass,
  and when a child operation finishes with an error, RetryOperation will consult its error handler, and
  attempt to retry the operation.
 
- In the case of CloudKitOperation, the error handler, which is configured internally has automatic 
- support for many common error kinds. When the CKOperation receives an error, the CKErrorCode is extracted, 
- and the handler consults a CloudKitRecovery instance to check for a particular way to handle that error 
+ In the case of CloudKitOperation, the error handler, which is configured internally has automatic
+ support for many common error kinds. When the CKOperation receives an error, the CKErrorCode is extracted,
+ and the handler consults a CloudKitRecovery instance to check for a particular way to handle that error
  code. In some cases, this will result in a tuple being returned. The tuple is an optional Delay, and
  a new instance of the CKOperation class.
 
@@ -666,7 +666,7 @@ Note, that for the automatic error handling to kick in, the happy path must be s
  The delay is used to automatically respect any wait periods returned in the CloudKit NSError object. If
  none are given, a random time delay between 0.1 and 1.0 seconds is used.
 
- If the error recovery does not have a handler, or the handler returns nil (no tuple), the CloudKitOperation 
+ If the error recovery does not have a handler, or the handler returns nil (no tuple), the CloudKitOperation
  will finish (with the errors).
 
  ### Custom Error Handling
@@ -730,7 +730,7 @@ public final class CloudKitOperation<T where T: NSOperation, T: CKOperationType>
     public func setErrorHandlerForCode(code: CKErrorCode, handler: ErrorHandler) {
         recovery.setCustomHandlerForCode(code, handler: handler)
     }
-    
+
     override func childOperation(child: NSOperation, didFinishWithErrors errors: [ErrorType]) {
         if !(child is OPRCKOperation<T>) {
             super.childOperation(child, didFinishWithErrors: errors)
@@ -950,7 +950,7 @@ extension CloudKitOperation where T: CKDiscoverAllContactsOperationType {
      Before adding the CloudKitOperation instance to a queue, set a completion block
      to collect the results in the successful case. Setting this completion block also
      ensures that error handling gets triggered.
-     
+
      - parameter block: a DiscoverAllContactsCompletionBlock block
     */
     public func setDiscoverAllContactsCompletionBlock(block: DiscoverAllContactsCompletionBlock) {
@@ -1828,8 +1828,6 @@ extension CloudKitOperation where T: CKQueryOperationType {
         addConfigureBlock { $0.setQueryCompletionBlock(block) }
     }
 }
-
-
 
 
 

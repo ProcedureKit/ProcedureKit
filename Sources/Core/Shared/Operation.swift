@@ -16,7 +16,7 @@ Operation builds on `NSOperation` in a few simple ways.
 1. For an instance to become `.Ready`, all of its attached
 `OperationCondition`s must be satisfied.
 
-2. It is possible to attach `OperationObserver`s to an instance, 
+2. It is possible to attach `OperationObserver`s to an instance,
 to be notified of lifecycle events in the operation.
 
 */
@@ -98,7 +98,7 @@ public class Operation: NSOperation {
     private var _internalErrors = [ErrorType]()
 
     private(set) var conditions = [OperationCondition]()
-    
+
     private var _observers = Protector([OperationObserverType]())
     private(set) var observers: [OperationObserverType] {
         get {
@@ -110,7 +110,7 @@ public class Operation: NSOperation {
             }
         }
     }
-    
+
     private var state: State {
         get {
             return stateLock.withCriticalScope { _state }
@@ -222,30 +222,30 @@ public class Operation: NSOperation {
      The `log` property can be used as the interface to access the logger.
      e.g. to output a message with `LogSeverity.Info` from inside
      the `Operation`, do this:
-    
+
     ```swift
     log.info("This is my message")
     ```
-    
+
      To adjust the instance severity of the LoggerType for the
      `Operation`, access it via this property too:
-    
+
     ```swift
     log.severity = .Verbose
     ```
-    
-     The logger is a very simple type, and all it does beyond 
+
+     The logger is a very simple type, and all it does beyond
      manage the enabled status and severity is send the String to
      a block on a dedicated serial queue. Therefore to provide custom
      logging, set the `logger` property:
-     
+
      ```swift
      log.logger = { message in sendMessageToAnalytics(message) }
      ```
-     
+
      By default, the Logger's logger block is the same as the global
      LogManager. Therefore to use a custom logger for all Operations:
-     
+
      ```swift
      LogManager.logger = { message in sendMessageToAnalytics(message) }
      ```
@@ -324,7 +324,7 @@ public class Operation: NSOperation {
      - parameter observer: type conforming to protocol `OperationObserverType`.
     */
     public func addObserver(observer: OperationObserverType) {
-        
+
         observers.append(observer)
 
         observer.didAttachToOperation(self)
@@ -369,9 +369,9 @@ public class Operation: NSOperation {
 
     /**
      Add another `NSOperation` as a dependency. It is a programmatic error to call
-     this method after the receiver has already started executing. Therefore, best 
+     this method after the receiver has already started executing. Therefore, best
      practice is to add dependencies before adding them to operation queues.
-    
+
      - requires: self must not have started yet. i.e. either hasn't been added
      to a queue, or is waiting on dependencies.
      - parameter operation: a `NSOperation` instance.
@@ -383,7 +383,7 @@ public class Operation: NSOperation {
 
     /**
      Remove another `NSOperation` as a dependency. It is a programmatic error to call
-     this method after the receiver has already started executing. Therefore, best 
+     this method after the receiver has already started executing. Therefore, best
      practice is to manage dependencies before adding them to operation
      queues.
 
@@ -444,7 +444,7 @@ public class Operation: NSOperation {
 
     /**
     Cancel the operation with an error.
-    
+
     - parameter error: an optional `ErrorType`.
     */
     public func cancelWithError(error: ErrorType? = .None) {
@@ -489,7 +489,7 @@ public class Operation: NSOperation {
         log.verbose("Did produce \(operation.operationName)")
         didProduceOperationObservers.forEach { $0.operation(self, didProduceOperation: operation) }
     }
-    
+
     // MARK: Finishing
 
     /**
@@ -526,7 +526,7 @@ public class Operation: NSOperation {
             didFinishObservers.forEach { $0.didFinishOperation(self, errors: self._internalErrors) }
         }
     }
-    
+
     /// Convenience method to simplify finishing when there is only one error.
     final public func finish(receivedError: ErrorType?) {
         finish(receivedError.map { [$0]} ?? [])
@@ -535,7 +535,7 @@ public class Operation: NSOperation {
     /**
     Subclasses may override `finished(_:)` if they wish to react to the operation
     finishing with errors.
-    
+
     - parameter errors: an array of `ErrorType`.
     */
     public func finished(errors: [ErrorType]) {
@@ -548,7 +548,7 @@ public class Operation: NSOperation {
     To promote best practices, where waiting is never the correct thing to do,
     we will crash the app if this is called. Instead use discrete operations and
     dependencies, or groups, or semaphores or even NSLocking.
-    
+
     */
     public override func waitUntilFinished() {
         fatalError("Waiting on operations is an anti-pattern. Remove this ONLY if you're absolutely sure there is No Other Way™. Post a question in https://github.com/danthorpe/Operations if you are unsure.")
@@ -590,9 +590,9 @@ public func ==(a: OperationError, b: OperationError) -> Bool {
 
 extension NSOperation {
 
-    /** 
+    /**
     Chain completion blocks.
-    
+
     - parameter block: a Void -> Void block
     */
     public func addCompletionBlock(block: Void -> Void) {
@@ -606,9 +606,9 @@ extension NSOperation {
             completionBlock = block
         }
     }
-    
-    /** 
-    Add multiple depdendencies to the operation. Will add each 
+
+    /**
+    Add multiple depdendencies to the operation. Will add each
     dependency in turn.
 
     - parameter dependencies: and array of `NSOperation` instances.
@@ -635,5 +635,3 @@ extension NSRecursiveLock {
         return value
     }
 }
-
-

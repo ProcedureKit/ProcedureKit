@@ -66,5 +66,3 @@ public func ==(a: ReachabilityCondition.Error, b: ReachabilityCondition.Error) -
     }
 }
 
-
-

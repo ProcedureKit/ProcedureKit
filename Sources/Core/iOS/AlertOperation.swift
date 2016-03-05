@@ -11,13 +11,13 @@ import UIKit
 /**
 An `Operation` subclass for presenting a configured `UIAlertController`.
 
-Initialize the `AlertOperation` with the controller which is presenting 
+Initialize the `AlertOperation` with the controller which is presenting
 the alert. This "controller" can be a `UIViewController` but, just
 needs to be any type conforming to `PresentingViewController`. This can
 the used to help unit testing.
 
-To configure the `UIAlertController` you can set the `title` and 
-`message`, and call `addActionWithTitle(: style: handler:)` on the 
+To configure the `UIAlertController` you can set the `title` and
+`message`, and call `addActionWithTitle(: style: handler:)` on the
 operation before adding it to a queue.
 
 For example
@@ -63,8 +63,8 @@ public class AlertOperation<From: PresentingViewController>: Operation {
     /**
     Creates an `AlertOperation`. It must be constructed with the view
     controller which the alert will be presented from.
-    
-    - parameter from: a generic type conforming to `PresentingViewController`, 
+
+    - parameter from: a generic type conforming to `PresentingViewController`,
     such as an `UIViewController`
     */
     public init(presentAlertFrom from: From) {
@@ -77,10 +77,10 @@ public class AlertOperation<From: PresentingViewController>: Operation {
 
     /**
     Call to add an action button with a title, style and handler.
-    
+
     Do not add actions directly to the `UIAlertController`, as
     this will prevent the `AlertOperation` from correctly finishing.
-    
+
     - parameter title: a required String.
     - parameter style: a `UIAlertActionStyle` which defaults to `.Default`.
     - parameter handler: a block which receives the operation, and returns Void.
@@ -108,4 +108,3 @@ public class AlertOperation<From: PresentingViewController>: Operation {
         produceOperation(ui)
     }
 }
-

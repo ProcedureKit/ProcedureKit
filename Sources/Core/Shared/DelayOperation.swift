@@ -42,10 +42,10 @@ internal extension Delay {
 date, or a time interval. If the interval is negative, or the date
 is in the past, the operation finishes.
 
-Note that this operation efficiently uses `dispatch_after` so it 
+Note that this operation efficiently uses `dispatch_after` so it
 does not block the thread on which it is called.
 
-Make an operation dependent on a `DelayOperation` in order to 
+Make an operation dependent on a `DelayOperation` in order to
 make it execute after a timeout, or in a repeated fashion with a
 time-out.
 */
@@ -74,9 +74,9 @@ public class DelayOperation: Operation {
 
     /**
     Initialize the `DelayOperation` with a time interval.
-    
+
      - parameter interval: a `NSTimeInterval`.
-     - parameter leeway: an `Int` representing leeway of 
+     - parameter leeway: an `Int` representing leeway of
      nanoseconds for the timer. This defaults to 1_000_000
      meaning the timer is accurate to milli-second accuracy.
      This is partly from a energy standpoint as nanosecond
@@ -102,7 +102,7 @@ public class DelayOperation: Operation {
 
     /**
     Executes the operation by using dispatch_after to finish the
-    operation in the future, but only if the time interval is 
+    operation in the future, but only if the time interval is
     greater than zero.
     */
     public override func execute() {
@@ -118,4 +118,3 @@ public class DelayOperation: Operation {
         }
     }
 }
-

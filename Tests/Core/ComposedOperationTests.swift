@@ -45,4 +45,3 @@ class ComposedOperationTests: OperationTests {
         XCTAssertTrue(composed.operation.didExecute)
     }
 }
-

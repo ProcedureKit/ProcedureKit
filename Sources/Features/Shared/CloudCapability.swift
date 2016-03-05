@@ -10,16 +10,16 @@ import CloudKit
 
 /**
  # Cloud Status
- 
+
  Value represents the current CloudKit status for the user.
- 
- CloudKit has a relatively convoluted status API. 
- 
- First, we must check the user's accout status, i.e. are 
+
+ CloudKit has a relatively convoluted status API.
+
+ First, we must check the user's accout status, i.e. are
  they logged in to iCloud.
- 
+
  Next, we check the status for the application permissions.
- 
+
  Then, we might need to request the application permissions.
 */
 public struct CloudStatus: AuthorizationStatusType {
@@ -70,7 +70,7 @@ public protocol CloudContainerRegistrarType: CapabilityRegistrarType {
 
     /**
      Provide an instance of Self with the given identifier. This is
-     because we need to determined the capability of a specific cloud 
+     because we need to determined the capability of a specific cloud
      kit container.
     */
     static func containerWithIdentifier(identifier: String?) -> Self
@@ -101,7 +101,7 @@ public protocol CloudContainerRegistrarType: CapabilityRegistrarType {
 
 /**
 The Cloud capability, which generic over CloudContainerRegistrarType.
- 
+
  Framework consumers should not use this directly, but instead
  use Capability.Cloud. So that its usage is like this:
 
@@ -132,7 +132,7 @@ public class _CloudCapability<Registrar: CloudContainerRegistrarType>: NSObject,
      Initialize the capability. By default, it requires no extra application permissions.
 
      Note that framework consumers should not initialized this class directly, but instead
-     use Capability.Cloud, which is a typealias of CloudCapability, and has a slightly 
+     use Capability.Cloud, which is a typealias of CloudCapability, and has a slightly
      different initializer to allow supplying the CloudKit container identifier.
 
      - see: Capability.Cloud
@@ -271,14 +271,14 @@ extension Capability {
 
     /**
      # Capability.Cloud
-     
+
      This type represents the app's permission to access a particular CKContainer.
-     
+
      For framework consumers - use with `GetAuthorizationStatus`, `Authorize` and
-     `AuthorizedFor`. 
-     
+     `AuthorizedFor`.
+
      For example, authorize usage of the default container
-     
+
      ```swift
      Authorize(Capability.Cloud()) { available, status in
         // etc
@@ -286,7 +286,7 @@ extension Capability {
      ```
 
      For example, authorize usage of another container;
-     
+
      ```swift
      Authorize(Capability.Cloud(containerId: "iCloud.com.myapp.my-container-id")) { available, status in
         // etc
@@ -306,8 +306,6 @@ extension CloudCapability where Registrar: CloudContainerRegistrar {
 
 @available(*, unavailable, renamed="AuthorizedFor(Cloud())")
 public typealias CloudContainerCondition = AuthorizedFor<Capability.Cloud>
-
-
 
 
 

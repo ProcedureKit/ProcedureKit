@@ -301,7 +301,7 @@ public final class AddressBook: AddressBookType {
                 return numericCast(kABPersonType)
             }
         }
-        
+
         public var description: String {
             switch self {
             case .Source:
@@ -312,7 +312,7 @@ public final class AddressBook: AddressBookType {
                 return "Person"
             }
         }
-        
+
         public init?(rawValue: ABRecordType) {
             let value: Int = numericCast(rawValue)
             switch value {
@@ -1168,4 +1168,3 @@ public struct SystemAddressBookRegistrar: AddressBookPermissionRegistrar {
         }
     }
 }
-

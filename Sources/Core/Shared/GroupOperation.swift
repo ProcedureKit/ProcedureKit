@@ -66,14 +66,14 @@ public class GroupOperation: Operation {
      starting the queue, and adding the finishing operation.
     */
     public override func execute() {
-        addOperations(operations)        
+        addOperations(operations)
         queue.addOperation(finishingOperation)
         queue.suspended = false
     }
 
     /**
      Add an `NSOperation` to the group's queue.
-    
+
      - parameter operation: an `NSOperation` instance.
     */
     public func addOperation(operation: NSOperation) {
@@ -108,7 +108,7 @@ public class GroupOperation: Operation {
     /**
      Append an error to the list of aggregate errors. Subclasses can use this
      to maintain the errors received by operations within the group.
-     
+
      - parameter error: an ErrorType to append.
     */
     public final func aggregateError(error: ErrorType) {
@@ -121,11 +121,11 @@ public class GroupOperation: Operation {
      is about to finish.
 
      Over-ride this method to enable the following sort of behavior:
-    
+
      ## Error handling.
-    
+
      Typically you will want to have code like this:
-    
+
         if !errors.isEmpty {
             if operation is MyOperation, let error = errors.first as? MyOperation.Error {
                 switch error {
@@ -134,16 +134,16 @@ public class GroupOperation: Operation {
                 }
             }
         }
-    
+
      So, if the errors array is not empty, it is important to know which kind of
      errors the operation may have encountered, and then implement handling of
      any that are necessary.
-    
+
      Note that if an operation has conditions, which fail, they will be returned
      as the first errors.
 
      ## Move results between operations.
-    
+
      Typically we use `GroupOperation` to
      compose and manage multiple operations into a single unit. This might
      often need to move the results of one operation into the next one. So this
@@ -171,7 +171,7 @@ extension GroupOperation: OperationQueueDelegate {
      assuming that the finishing operation has not started (or finished), and the operation is not
      the finishing operation itself, then we add the operation as a dependency to the finishing
      operation.
-    
+
      The purpose of this is to keep the finishing operation as the last child operation that executes
      when there are no more operations in the group.
     */
@@ -208,4 +208,3 @@ extension GroupOperation: OperationQueueDelegate {
         }
     }
 }
-

@@ -14,7 +14,7 @@ The error type used to indicate failure.
 public enum NegatedConditionError: ErrorType, Equatable {
 
     /**
-    When the nested condition succeeds, the negated condition fails. 
+    When the nested condition succeeds, the negated condition fails.
     The associated string is the name of the nested conditon.
     */
     case ConditionSatisfied(String)

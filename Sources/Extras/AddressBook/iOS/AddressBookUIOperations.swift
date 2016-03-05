@@ -106,9 +106,8 @@ public class AddressBookDisplayNewPersonViewController<F: PresentingViewControll
             if let group = get.addressBookGroup {
                 ui.controller.parentGroup = group.storage
             }
-            
+
             addOperation(ui)
         }
     }
 }
-

@@ -37,7 +37,7 @@ public protocol ContactSaveRequestType {
 @available(iOS 9.0, OSX 10.11, *)
 public protocol ContactStoreType {
     typealias SaveRequest: ContactSaveRequestType
-    
+
     init()
     func opr_authorizationStatusForEntityType(entityType: CNEntityType) -> CNAuthorizationStatus
     func opr_requestAccessForEntityType(entityType: CNEntityType, completion: (Bool, NSError?) -> Void)
@@ -125,7 +125,7 @@ public enum GroupPredicate {
 
 @available(iOS 9.0, OSX 10.11, *)
 extension ContactStoreType {
-    
+
     public func flatMapAllContactsWithFetchRequest<T>(fetchRequest: CNContactFetchRequest, transform: CNContact -> T?) throws -> [T] {
         var result = [T]()
         try opr_enumerateContactsWithFetchRequest(fetchRequest) { contact, _ in
@@ -141,7 +141,7 @@ extension ContactStoreType {
 
 @available(iOS 9.0, OSX 10.11, *)
 extension CNSaveRequest: ContactSaveRequestType {
-    
+
     public func opr_addContact(contact: CNMutableContact, toContainerWithIdentifier identifier: String?) {
         addContact(contact, toContainerWithIdentifier: identifier)
     }
@@ -152,23 +152,23 @@ extension CNSaveRequest: ContactSaveRequestType {
     public func opr_deleteContact(contact: CNMutableContact) {
         deleteContact(contact)
     }
-    
+
     public func opr_addGroup(group: CNMutableGroup, toContainerWithIdentifier identifier: String?) {
         addGroup(group, toContainerWithIdentifier: identifier)
     }
-    
+
     public func opr_updateGroup(group: CNMutableGroup) {
         updateGroup(group)
     }
-    
+
     public func opr_deleteGroup(group: CNMutableGroup) {
         deleteGroup(group)
     }
-    
+
     public func opr_addMember(contact: CNContact, toGroup group: CNGroup) {
         addMember(contact, toGroup: group)
     }
-    
+
     public func opr_removeMember(contact: CNContact, fromGroup group: CNGroup) {
         removeMember(contact, fromGroup: group)
     }
@@ -177,45 +177,45 @@ extension CNSaveRequest: ContactSaveRequestType {
 @available(iOS 9.0, OSX 10.11, *)
 public struct SystemContactStore: ContactStoreType {
     public typealias SaveRequest = CNSaveRequest
-    
+
     let store: CNContactStore
-    
+
     public init() {
         store = CNContactStore()
     }
-    
+
     public func opr_authorizationStatusForEntityType(entityType: CNEntityType) -> CNAuthorizationStatus {
         return CNContactStore.authorizationStatusForEntityType(entityType)
     }
-    
+
     public func opr_requestAccessForEntityType(entityType: CNEntityType, completion: (Bool, NSError?) -> Void) {
         store.requestAccessForEntityType(entityType, completionHandler: completion)
     }
-    
+
     public func opr_defaultContainerIdentifier() -> String {
         return store.defaultContainerIdentifier()
     }
-    
+
     public func opr_unifiedContactWithIdentifier(identifier: String, keysToFetch keys: [CNKeyDescriptor]) throws -> CNContact {
         return try store.unifiedContactWithIdentifier(identifier, keysToFetch: keys)
     }
-    
+
     public func opr_unifiedContactsMatchingPredicate(predicate: ContactPredicate, keysToFetch keys: [CNKeyDescriptor]) throws -> [CNContact] {
         return try store.unifiedContactsMatchingPredicate(predicate.predicate, keysToFetch: keys)
     }
-    
+
     public func opr_groupsMatchingPredicate(predicate: GroupPredicate?) throws -> [CNGroup] {
         return try store.groupsMatchingPredicate(predicate?.predicate)
     }
-    
+
     public func opr_containersMatchingPredicate(predicate: ContainerPredicate?) throws -> [CNContainer] {
         return try store.containersMatchingPredicate(predicate?.predicate)
     }
-    
+
     public func opr_enumerateContactsWithFetchRequest(fetchRequest: CNContactFetchRequest, usingBlock block: (CNContact, UnsafeMutablePointer<ObjCBool>) -> Void) throws {
         try store.enumerateContactsWithFetchRequest(fetchRequest, usingBlock: block)
     }
-    
+
     public func opr_executeSaveRequest(saveRequest: CNSaveRequest) throws {
         try store.executeSaveRequest(saveRequest)
     }
@@ -359,4 +359,3 @@ public func ==(a: ContactPredicate, b: ContactPredicate) -> Bool {
         return false
     }
 }
-

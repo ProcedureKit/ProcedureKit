@@ -71,4 +71,3 @@ public struct SilentCondition<Condition: OperationCondition>: OperationCondition
         condition.evaluateForOperation(operation, completion: completion)
     }
 }
-

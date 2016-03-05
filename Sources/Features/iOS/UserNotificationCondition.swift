@@ -14,11 +14,11 @@ public protocol UserNotificationRegistrarType {
 }
 
 extension UIApplication: UserNotificationRegistrarType {
-    
+
     public func opr_registerUserNotificationSettings(notificationSettings: UIUserNotificationSettings) {
         registerUserNotificationSettings(notificationSettings)
     }
-    
+
     public func opr_currentUserNotificationSettings() -> UIUserNotificationSettings? {
         return currentUserNotificationSettings() ?? .None
     }
@@ -32,8 +32,8 @@ private let NotificationSettingsKey = "NotificationSettingsKey"
     A condition for verifying that we can present alerts
     to the user via `UILocalNotification` and/or remote
     notifications.
-    
-    In order to use this condition effectively, it is 
+
+    In order to use this condition effectively, it is
     required that you post a notification from inside the
     UIApplication.sharedApplication()'s delegate method.
 
@@ -108,7 +108,7 @@ public func ==(a: UserNotificationCondition.Error, b: UserNotificationCondition.
         return (aCurrent == bCurrent) && (aDesired == bDesired)
     }
 }
-    
+
 public class UserNotificationPermissionOperation: Operation {
 
     enum NotificationObserver: Selector {
@@ -195,4 +195,3 @@ extension UIUserNotificationType: BooleanType {
         return self != []
     }
 }
-

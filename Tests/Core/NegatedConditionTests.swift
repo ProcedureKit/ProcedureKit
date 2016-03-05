@@ -21,7 +21,7 @@ class NegatedConditionTests: OperationTests {
             receivedErrors = errors
             expectation.fulfill()
         })
-        
+
         runOperation(operation)
 
         waitForExpectationsWithTimeout(3, handler: nil)

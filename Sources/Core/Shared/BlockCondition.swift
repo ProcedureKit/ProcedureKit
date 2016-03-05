@@ -28,7 +28,7 @@ public struct BlockCondition: OperationCondition {
 
     /**
     The name of the condition.
-    
+
     - parameter name: a constant String `Block Condition`.
     */
     public let name = "Block Condition"
@@ -43,18 +43,18 @@ public struct BlockCondition: OperationCondition {
     let condition: ConditionBlockType
 
     /**
-    Creates a `BlockCondition` with the supplied block. 
-    
+    Creates a `BlockCondition` with the supplied block.
+
     Example like this..
-    
+
         operation.addCondition(BlockCondition { true })
-    
+
     Alternatively
-    
+
         func checkFlag() -> Bool {
             return toDoSomethingOrNot
         }
-    
+
         operation.addCondition(BlockCondition(block: checkFlag))
 
     - parameter block: a `ConditionBlockType`.
@@ -70,7 +70,7 @@ public struct BlockCondition: OperationCondition {
 
     /**
     Evaluates the condition, it will execute the block.
-    
+
     - parameter operation: the attached `Operation`
     - parameter completion: the evaulation completion block, it is given the result.
     */

@@ -97,7 +97,7 @@ class TestQueueDelegate: OperationQueueDelegate {
 }
 
 class OperationTests: XCTestCase {
-    
+
     var queue: OperationQueue!
     var delegate: TestQueueDelegate!
 
@@ -372,17 +372,17 @@ class CompletionBlockOperationTests: OperationTests {
         _queue.addOperation(operation)
         waitForExpectationsWithTimeout(3, handler: nil)
     }
-    
+
 
 //    This unit test is disabled. It highlights
-//    a possible bug, or issue with KVO notifications and/or 
+//    a possible bug, or issue with KVO notifications and/or
 //    NSOperation not calling `start()` after an operation becomes
 //    Ready.
-//    
+//
 //    The issue which reported this bug is here:
 //    https:github.com/danthorpe/Operations/issues/175
-//    
-//    The PR which investigated it is here: 
+//
+//    The PR which investigated it is here:
 //    https:github.com/danthorpe/Operations/pull/180
 
     func test__many_completion_blocks_are_executed() {
@@ -620,8 +620,6 @@ class CancellationOperationTests: OperationTests {
         XCTAssertFalse(operation.didExecute)
     }
 }
-
-
 
 
 

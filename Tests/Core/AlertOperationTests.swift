@@ -57,4 +57,3 @@ class AlertOperationTests: OperationTests {
         XCTAssertTrue(didPresentAlert)
     }
 }
-

@@ -78,4 +78,3 @@ extension Protector where T: _ArrayType {
         })
     }
 }
-

@@ -128,7 +128,7 @@ extension HKHealthStore: HealthCapabilityRegistrarType {
 
 /**
  The Health capability, which is generic over a HealthCapabilityRegistrarType.
- 
+
  Framework consumers should not use this directly, but instead
  use Capability.Health. So that its usage is like this:
 
@@ -208,7 +208,7 @@ extension Capability {
 
     /**
      # Capability.Heath
-     
+
      This type represents the app's permission to access HealthKit.
 
      For framework consumers - use with GetAuthorizationStatus, Authorize and
@@ -221,10 +221,10 @@ extension Capability {
         // etc
      }
      ```
-     
+
      Capability.Health is not included in the module if installing via
      Carthage. However, it can be used if installing with CocoaPods
-     
+
      ```ruby
      pod 'Operations/+Health'
      ```
@@ -274,5 +274,3 @@ extension HealthCapabilityStatus: CollectionType {
         return _dictionary.generate()
     }
 }
-
-

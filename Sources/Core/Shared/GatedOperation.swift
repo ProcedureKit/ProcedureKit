@@ -11,7 +11,7 @@ import Foundation
 /**
  Allows a `NSOperation` to be composed inside an `Operation`,
  with a block to act as a gate.
- 
+
  Use this class to execute another operation depending on other
  logic. Unlike a `BlockCondition` this will not fail the operation.
 */
@@ -25,7 +25,7 @@ public class GatedOperation<T: NSOperation>: ComposedOperation<T> {
      Return true from the block to have the composed operation
      be executed, return false and the operation will not
      be executed.
-    
+
      - parameter operation: any subclass of `NSOperation`.
      - parameter gate: a block which returns a Bool.
     */
@@ -49,4 +49,3 @@ public class GatedOperation<T: NSOperation>: ComposedOperation<T> {
         }
     }
 }
-

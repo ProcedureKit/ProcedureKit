@@ -278,7 +278,7 @@ public class AddressBookRemoveGroup: AddressBookGetGroup {
 @available(iOS, deprecated=9.0)
 public class AddressBookAddPersonToGroup: AddressBookGetResource {
 
-    @available(iOS, deprecated=9.0)    
+    @available(iOS, deprecated=9.0)
     public init(group: String, personID: Int32) {
         super.init()
         groupQuery = .Name(group)
@@ -352,7 +352,7 @@ public class AddressBookRemovePersonFromGroup: AddressBookGetResource {
         if let error = addressBook.save() {
             return error
         }
-        
+
         return .None
     }
 }
@@ -393,8 +393,6 @@ public class AddressBookMapPeople<T>: AddressBookGetResource {
         return .None
     }
 }
-
-
 
 
 

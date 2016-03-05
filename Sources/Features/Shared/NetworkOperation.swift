@@ -13,7 +13,7 @@ import Foundation
 An Operation which is a simple wrapper around `NSURLSessionTask`.
 
 Note that the task will still need to be configured with a delegate
-as usual. Typically this operation would be used after the task is 
+as usual. Typically this operation would be used after the task is
 setup, so that conditions or observers can be attached.
 
 */

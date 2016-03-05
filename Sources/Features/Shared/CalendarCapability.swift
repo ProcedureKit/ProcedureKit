@@ -17,7 +17,7 @@ public protocol EventsCapabilityRegistrarType: CapabilityRegistrarType {
 
     /**
      Get the current EKAuthorizationStatus.
-     
+
      - parameter requirement: the EKEntityType, e.g. .Events, or .Reminders
      - returns: the EKAuthorizationStatus
     */
@@ -25,7 +25,7 @@ public protocol EventsCapabilityRegistrarType: CapabilityRegistrarType {
 
     /**
      Request access for the given EKEntityType (i.e. the requirement).
-     
+
      - parameter requirement: the EKEntityType, e.g. .Events, or .Reminders
      - parameter completion: a EKEventStoreRequestAccessCompletionHandler
     */
@@ -59,7 +59,7 @@ extension EKAuthorizationStatus: AuthorizationStatusType {
 
     /**
      Determine whether access has been granted given the EKAuthorizationStatus.
-     
+
      - parameter requirement: the required EKEntityType
      - returns: a true Bool for authorized status
     */
@@ -73,17 +73,17 @@ extension EKAuthorizationStatus: AuthorizationStatusType {
 
 /**
  The Events capability, which is generic over an EventsCapabilityRegistrarType.
- 
- Framework consumers should not use this directly, but instead 
+
+ Framework consumers should not use this directly, but instead
  use Capability.Calendar. So that its usage is like this:
- 
+
  ```swift
- 
+
  GetAuthorizationStatus(Capability.Calendar()) { status in
     // check the status etc.
  }
  ```
- 
+
  - see: Capability.Calendar
 */
 public class _EventsCapability<Registrar: EventsCapabilityRegistrarType>: NSObject, CapabilityType {
@@ -143,12 +143,12 @@ public extension Capability {
 
     /**
      # Capability.Calendar
-     
+
      This type represents the app's permission to access EventKit.
 
      For framework consumers - use with `GetAuthorizationStatus`, `Authorize` and
      `AuthorizedFor`. For example
-     
+
      Get the current authorization status for accessing the user's calendars:
 
      ```swift
@@ -156,24 +156,24 @@ public extension Capability {
          // etc
      }
      ```
-     
+
      Lets say we have an operation which performs an action with the user's
      calendars. We need to have permission to access their calendars first.
      We can add an OperationCondition to such an operation, so that if
      the user hasn't granted permission it will fail (we can check the errors),
      or, if the permission hasn't been asked, it will ask for us automatically.
-     
+
      ```swift
      // Define the operation
      let operation = ProcessCalendarsOperation()
-     
+
      // Create & add condition
      let condition = AuthorizedFor(Capability.Calendar())
      operation.addCondition(condition)
-     
+
      // Observe & look out for errors
      operation.addObserver(BlockObserver { _, errors in
-        if !errors.isEmpty, 
+        if !errors.isEmpty,
           let error = errors.first as? CapabilityError<Capability.Calendar> {
              switch error {
                case .AuthorizationNotGranted(status, requirement):
@@ -181,7 +181,7 @@ public extension Capability {
              }
           }
      })
-     
+
      // Add the operation to our queue
      queue.addOperation(operation)
      ```
@@ -191,4 +191,3 @@ public extension Capability {
 
 @available(*, unavailable, renamed="AuthorizedFor(Capability.Calendar())")
 public typealias CalendarCondition = AuthorizedFor<Capability.Calendar>
-

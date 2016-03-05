@@ -344,5 +344,3 @@ public func ==(a: LocationOperationError, b: LocationOperationError) -> Bool {
     }
 }
 
-
-

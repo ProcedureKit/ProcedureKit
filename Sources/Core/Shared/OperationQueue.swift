@@ -10,15 +10,15 @@ import Foundation
 
 /**
 A protocol which the `OperationQueue`'s delegate must conform to. The delegate is informed
-when the queue is about to add an operation, and when operations finish. Because it is a 
+when the queue is about to add an operation, and when operations finish. Because it is a
 delegate protocol, conforming types must be classes, as the queue weakly owns it.
 */
 public protocol OperationQueueDelegate: class {
 
     /**
-    The operation queue will add a new operation. This is for information only, the 
+    The operation queue will add a new operation. This is for information only, the
     delegate cannot affect whether the operation is added, or other control flow.
-    
+
     - paramter queue: the `OperationQueue`.
     - paramter operation: the `NSOperation` instance about to be added.
     */
@@ -26,7 +26,7 @@ public protocol OperationQueueDelegate: class {
 
     /**
     An operation has finished on the queue.
-    
+
     - parameter queue: the `OperationQueue`.
     - parameter operation: the `NSOperation` instance which finished.
     - parameter errors: an array of `ErrorType`s.
@@ -51,7 +51,7 @@ public class OperationQueue: NSOperationQueue {
 
     /**
     The queue's delegate, helpful for reporting activity.
-    
+
     - parameter delegate: a weak `OperationQueueDelegate?`
     */
     public weak var delegate: OperationQueueDelegate? = .None
@@ -59,7 +59,7 @@ public class OperationQueue: NSOperationQueue {
     /**
     Adds the operation to the queue. Subclasses which override this method must call this
     implementation as it is critical to how Operations function.
-    
+
     - parameter op: an `NSOperation` instance.
     */
     public override func addOperation(op: NSOperation) {

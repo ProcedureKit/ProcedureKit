@@ -16,13 +16,13 @@ func arc4random<T: IntegerLiteralConvertible>(type: T.Type) -> T {
 
 /**
  Random Failure Generator
- 
+
  This generator will randomly return nil (instead of the
  composed generator's `next()`) according to the probability
  of failure argument.
- 
+
  For example, to simulate 1% failure rate:
- 
+
  ```swift
  let one = RandomFailGenerator(generator, probability: 0.01)
  ```
@@ -33,9 +33,9 @@ public struct RandomFailGenerator<G: GeneratorType>: GeneratorType {
     private let shouldNotFail: () -> Bool
 
     /**
-     Initialize the generator with another generator and expected 
+     Initialize the generator with another generator and expected
      probabilty of failure.
-     
+
      - parameter: the generator
      - parameter probability: the expected probability of failure, defaults to 0.1, or 10%
     */
@@ -121,7 +121,7 @@ struct TupleGenerator<Primary: GeneratorType, Secondary: GeneratorType>: Generat
 /**
  Define a strategy for waiting a given time interval. The strategy
  can then create a NSTimeInterval generator. The strategies are:
- 
+
  ### Fixed
  The fixed strategy is initialized with a time interval. Every
  interval is this value.
@@ -219,36 +219,36 @@ struct IntervalGenerator: GeneratorType {
  RepeatedOperation is an GroupOperation subclass which can be used in
  conjunction with a GeneratorType to schedule NSOperation subclasses of
  the same type on a private queue.
- 
+
  This is useful directly for periodically running idempotent operations,
  and it forms the basis for operations types which can be retried in the
  event of a failure.
- 
+
  The operations may optionally be scheduled after a delay has passed, or
  a date in the future has been reached.
- 
+
  At the lowest level, which offers the most flexibility, RepeatedOperation
  is initialized with a generator. The generator (something conforming to
  GeneratorType) element type is (Delay?, T), where T is a NSOperation
  subclass, and Delay is an enum used in conjunction with DelayOperation.
- 
+
  For example:
 
  ```swift
- let operation = RepeatedOperation(anyGenerator { 
+ let operation = RepeatedOperation(anyGenerator {
      return (.By(0.1), MyOperation())
  })
  ```
 
- The operation is a `GroupOperation` subclass which works by adding 
- new instances of the operation to its group. This happens initially 
+ The operation is a `GroupOperation` subclass which works by adding
+ new instances of the operation to its group. This happens initially
  when the group starts, and then again when the child operation finishes.
 
  There are two ways to stop the operations from repeating.
 
  1. Return `nil` from the generator passed to the initializer
- 2. Set the 1st argument, `maxCount` to a the number of times an 
-     operation will be executed (i.e. it includes the initial 
+ 2. Set the 1st argument, `maxCount` to a the number of times an
+     operation will be executed (i.e. it includes the initial
      operation). The value defaults to .None which indicates repeating
      forever.
 
@@ -265,7 +265,7 @@ struct IntervalGenerator: GeneratorType {
      }
  )
  ```
- 
+
  Note that in this case, the generator supplied only needs to return the
  operation instead of a tuple.
 
@@ -289,7 +289,7 @@ public class RepeatedOperation<T where T: NSOperation>: GroupOperation {
     static func createPayloadGeneratorWithMaxCount(max: Int? = .None, generator gen: AnyGenerator<Payload>) -> AnyGenerator<Payload> {
         return max.map { anyGenerator(FiniteGenerator(gen, limit: $0 - 1)) } ?? gen
     }
-    
+
     /**
      The most basic initializer.
 
@@ -305,7 +305,7 @@ public class RepeatedOperation<T where T: NSOperation>: GroupOperation {
 
         current = operation
         generator = RepeatedOperation<T>.createPayloadGeneratorWithMaxCount(max, generator: gen)
-        
+
         super.init(operations: [])
         name = "Repeated Operation <\(T.self)>"
     }
@@ -322,11 +322,11 @@ public class RepeatedOperation<T where T: NSOperation>: GroupOperation {
     public init<D, G where D: GeneratorType, D.Element == Delay, G: GeneratorType, G.Element == T>(maxCount max: Int? = .None, delay: D, generator gen: G) {
 
         var tuple = TupleGenerator(primary: gen, secondary: delay)
-        
+
         guard let (_, operation) = tuple.next() else {
             preconditionFailure("Operation Generator must return an instance initially.")
         }
-        
+
         current = operation
         generator = RepeatedOperation<T>.createPayloadGeneratorWithMaxCount(max, generator: anyGenerator(tuple))
 
@@ -336,25 +336,25 @@ public class RepeatedOperation<T where T: NSOperation>: GroupOperation {
 
     /**
      An initializer with wait strategy and generic operation generator.
-     This is useful where another system can be responsible for vending instances of 
+     This is useful where another system can be responsible for vending instances of
      the custom operation. Typically there may be some state involved in such a Generator. e.g.
-     
+
      ```swift
      class MyOperationGenerator: GeneratorType {
          func next() -> MyOperation? {
              // etc
          }
      }
-     
+
      let operation = RepeatedOperation(generator: MyOperationGenerator())
      ```
 
-     The wait strategy is useful if say, you want to repeat the operations with random 
+     The wait strategy is useful if say, you want to repeat the operations with random
      delays, or exponential backoff. These standard schemes and be easily expressed.
-     
+
      ```swift
      let operation = RepeatedOperation(
-         strategy: .Random((0.1, 1.0)), 
+         strategy: .Random((0.1, 1.0)),
          generator: MyOperationGenerator()
      )
      ```
@@ -368,14 +368,14 @@ public class RepeatedOperation<T where T: NSOperation>: GroupOperation {
 
         let delay = MapGenerator(strategy.generator()) { Delay.By($0) }
         var tuple = TupleGenerator(primary: gen, secondary: delay)
-        
+
         guard let (_, operation) = tuple.next() else {
             preconditionFailure("Operation Generator must return an instance initially.")
         }
-        
+
         current = operation
         generator = RepeatedOperation<T>.createPayloadGeneratorWithMaxCount(max, generator: anyGenerator(tuple))
-        
+
         super.init(operations: [])
         name = "Repeated Operation <\(T.self)>"
     }
@@ -389,13 +389,13 @@ public class RepeatedOperation<T where T: NSOperation>: GroupOperation {
 
     /**
      Override of operationDidFinish: withErrors:
-     
+
      This function ignores errors, and cases where the operation
      is a `DelayOperation`. If the operation is an instance of `T`
      it calls `addNextOperation()`.
-     
+
      When subclassing, be very careful if downcasting `T` to
-     say `Operation` instead of `MyOperation` (i.e. your specific 
+     say `Operation` instead of `MyOperation` (i.e. your specific
      operation which should be repeated).
     */
     public override func willFinishOperation(operation: NSOperation, withErrors errors: [ErrorType]) {
@@ -407,18 +407,18 @@ public class RepeatedOperation<T where T: NSOperation>: GroupOperation {
 
     /**
      Adds another instance of the operation to the group.
-     
+
      This function will call `next()` on the generator, setting
      the `operation` parameter. If the operation is not nil,
      it also will get the next delay operation, which may also
-     be nil. If both operation & delay are not nil, the 
+     be nil. If both operation & delay are not nil, the
      dependencies are setup, added to the group and the count is
      incremented.
-     
+
      Subclasses which override, should almost certainly call
      super.
-     
-     - parameter shouldAddNext: closure which returns a Bool. Defaults 
+
+     - parameter shouldAddNext: closure which returns a Bool. Defaults
      to return true. Subclasses may inject additional logic here which
      can prevent another operation from being added.
     */
@@ -452,10 +452,10 @@ public class RepeatedOperation<T where T: NSOperation>: GroupOperation {
      Appends a configuration block to the current block. This
      can be used to configure every instance of the operation
      before it is added to the queue.
-     
+
      Note that configuration block are executed in FIFO order,
      so it is possible to overwrite previous configurations.
-     
+
      - parameter block: a block which receives an instance of T
     */
     public func addConfigureBlock(block: T -> Void) {
@@ -468,12 +468,12 @@ public class RepeatedOperation<T where T: NSOperation>: GroupOperation {
 }
 
 /**
- 
+
  ### Repeatable
- 
- `Repeatable` is a very simple protocol, which your `NSOperation` subclasses 
- can conform to. This allows the previous operation to define whether a new 
- one should be executed. For this special case, `RepeatedOperation` can be 
+
+ `Repeatable` is a very simple protocol, which your `NSOperation` subclasses
+ can conform to. This allows the previous operation to define whether a new
+ one should be executed. For this special case, `RepeatedOperation` can be
  initialized like this:
 
  ```swift
@@ -487,7 +487,7 @@ public protocol Repeatable {
     /**
      Implement this funtion to return true if a new
      instance should be added to a RepeatedOperation.
-     
+
      - parameter count: the number of instances already executed within
      the RepeatedOperation.
      - returns: a Bool, false will end the RepeatedOperation.
@@ -520,9 +520,9 @@ public class RepeatableGenerator<G: GeneratorType where G.Element: Repeatable>: 
 extension RepeatedOperation where T: Repeatable {
 
     /**
-     Initialize a RepeatedOperation using a closure with NSOperation subclasses 
+     Initialize a RepeatedOperation using a closure with NSOperation subclasses
      which conform to Repeatable. This is the neatest initializer.
-     
+
      ```swift
      let operation = RepeatedOperation { MyRepeatableOperation() }
      ```
@@ -534,12 +534,12 @@ extension RepeatedOperation where T: Repeatable {
 
 /**
  RepeatableOperation is an Operation subclass which conforms to Repeatable.
- 
+
  It can be used to make an otherwise non-repeatable Operation repeatable. It
  does this by accepting, in addition to the operation instance, a closure
  shouldRepeat. This closure can be used to capture state (such as errors).
- 
- When conforming to Repeatable, the closure is executed, passing in the 
+
+ When conforming to Repeatable, the closure is executed, passing in the
  current repeat count.
 */
 public class RepeatableOperation<T: Operation>: Operation, OperationDidFinishObserver, Repeatable {
@@ -550,7 +550,7 @@ public class RepeatableOperation<T: Operation>: Operation, OperationDidFinishObs
     /**
      Initialize the RepeatableOperation with an operation and
      shouldRepeat closure.
-     
+
      - parameter [unnamed] operation: the operation instance.
      - parameter shouldRepeat: a closure of type Int -> Bool
     */
@@ -584,4 +584,3 @@ public class RepeatableOperation<T: Operation>: Operation, OperationDidFinishObs
         }
     }
 }
-

@@ -75,4 +75,3 @@ final public class DisplayCreateContactViewController<F: PresentingViewControlle
         produceOperation(ui)
     }
 }
-
