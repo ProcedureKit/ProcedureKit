@@ -27,10 +27,4 @@ steps:
   -
     name: ":fastlane: Test Mac OS X"
     command: .ci/scripts/test-osx    
-  -
-    name: ":fastlane: Test tvOS Extension"
-    command: .ci/scripts/test-tvx-extension
-  -
-    name: ":fastlane: Test tvOS"
-    command: .ci/scripts/test-tvOS
 
