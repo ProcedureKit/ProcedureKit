@@ -49,28 +49,28 @@ To configure the controller, you can do this:
 public class AddressBookDisplayPersonViewController<F: PresentingViewController>: GroupOperation {
 
     let delegate: ABPersonViewControllerDelegate
-    let ui: UIOperation<ABPersonViewController, F>
+    let operation: UIOperation<ABPersonViewController, F>
     let get: AddressBookGetResource
 
-    public convenience init(personViewController: ABPersonViewController? = .None, personWithID id: ABRecordID, displayControllerFrom from: ViewControllerDisplayStyle<F>, delegate: ABPersonViewControllerDelegate, sender: AnyObject? = .None) {
-        self.init(registrar: SystemAddressBookRegistrar(), personViewController: personViewController, personWithID: id, displayControllerFrom: from, delegate: delegate, sender: sender)
+    public convenience init(personViewController: ABPersonViewController? = .None, personWithID personID: ABRecordID, displayControllerFrom from: ViewControllerDisplayStyle<F>, delegate: ABPersonViewControllerDelegate, sender: AnyObject? = .None) {
+        self.init(registrar: SystemAddressBookRegistrar(), personViewController: personViewController, personWithID: personID, displayControllerFrom: from, delegate: delegate, sender: sender)
     }
 
-    init(registrar: AddressBookPermissionRegistrar, personViewController: ABPersonViewController? = .None, personWithID id: ABRecordID, displayControllerFrom from: ViewControllerDisplayStyle<F>, delegate: ABPersonViewControllerDelegate, sender: AnyObject? = .None) {
+    init(registrar: AddressBookPermissionRegistrar, personViewController: ABPersonViewController? = .None, personWithID personID: ABRecordID, displayControllerFrom from: ViewControllerDisplayStyle<F>, delegate: ABPersonViewControllerDelegate, sender: AnyObject? = .None) {
 
-        self.ui = UIOperation(controller: personViewController ?? ABPersonViewController(), displayControllerFrom: from, sender: sender)
+        self.operation = UIOperation(controller: personViewController ?? ABPersonViewController(), displayControllerFrom: from, sender: sender)
         self.delegate = delegate
         self.get = AddressBookGetResource(registrar: registrar)
-        self.get.personQuery = .ID(id)
+        self.get.personQuery = .ID(personID)
         super.init(operations: [ get ])
     }
 
-    public override func willFinishOperation(operation: NSOperation, withErrors errors: [ErrorType]) {
-        if errors.isEmpty && get == operation, let person = get.addressBookPerson {
-            ui.controller.personViewDelegate = delegate
-            ui.controller.displayedPerson = person.storage
-            ui.controller.addressBook = get.addressBook.addressBook
-            addOperation(ui)
+    public override func willFinishOperation(finished: NSOperation, withErrors errors: [ErrorType]) {
+        if errors.isEmpty && get == finished, let person = get.addressBookPerson {
+            operation.controller.personViewDelegate = delegate
+            operation.controller.displayedPerson = person.storage
+            operation.controller.addressBook = get.addressBook.addressBook
+            addOperation(operation)
         }
     }
 }
@@ -79,7 +79,7 @@ public class AddressBookDisplayPersonViewController<F: PresentingViewController>
 public class AddressBookDisplayNewPersonViewController<F: PresentingViewController>: GroupOperation {
 
     let delegate: ABNewPersonViewControllerDelegate
-    let ui: UIOperation<ABNewPersonViewController, F>
+    let operation: UIOperation<ABNewPersonViewController, F>
     let get: AddressBookGetResource
 
     public convenience init(displayControllerFrom from: ViewControllerDisplayStyle<F>, delegate: ABNewPersonViewControllerDelegate, sender: AnyObject? = .None, addToGroupWithName groupName: String? = .None) {
@@ -88,7 +88,7 @@ public class AddressBookDisplayNewPersonViewController<F: PresentingViewControll
 
     init(registrar: AddressBookPermissionRegistrar, displayControllerFrom from: ViewControllerDisplayStyle<F>, delegate: ABNewPersonViewControllerDelegate, sender: AnyObject? = .None, addToGroupWithName groupName: String? = .None) {
 
-        self.ui = UIOperation(controller: ABNewPersonViewController(), displayControllerFrom: from, sender: sender)
+        self.operation = UIOperation(controller: ABNewPersonViewController(), displayControllerFrom: from, sender: sender)
         self.delegate = delegate
         self.get = AddressBookGetResource(registrar: registrar)
         if let groupName = groupName {
@@ -97,18 +97,17 @@ public class AddressBookDisplayNewPersonViewController<F: PresentingViewControll
         super.init(operations: [ get ])
     }
 
-    public override func willFinishOperation(operation: NSOperation, withErrors errors: [ErrorType]) {
-        if errors.isEmpty && get == operation {
+    public override func willFinishOperation(finished: NSOperation, withErrors errors: [ErrorType]) {
+        if errors.isEmpty && get == finished {
 
-            ui.controller.newPersonViewDelegate = delegate
-            ui.controller.addressBook = get.addressBook.addressBook
+            operation.controller.newPersonViewDelegate = delegate
+            operation.controller.addressBook = get.addressBook.addressBook
 
             if let group = get.addressBookGroup {
-                ui.controller.parentGroup = group.storage
+                operation.controller.parentGroup = group.storage
             }
-            
-            addOperation(ui)
+
+            addOperation(operation)
         }
     }
 }
-

@@ -131,4 +131,3 @@ class BackgroundObserverTests: OperationTests {
         XCTAssertEqual(backgroundTaskIdentifier, endedBackgroundTaskIdentifier)
     }
 }
-

@@ -29,7 +29,7 @@ final class TestableCloudContainer: NSObject {
     var requestApplicationPermissions: CKApplicationPermissions? = .None
     var didRequestApplicationStatus = false
 
-    required override init() { }   
+    required override init() { }
 }
 
 extension TestableCloudContainer: CloudContainerRegistrarType {
@@ -198,7 +198,7 @@ class CloudStatusTests: XCTestCase {
     var noRequirement: CKApplicationPermissions = []
     var someRequirement: CKApplicationPermissions = [ .UserDiscoverability ]
     var status: CloudStatus!
-    
+
     func test__status_with_error_does_not_meet_requirement() {
         status = CloudStatus(account: .Available, error: error)
         XCTAssertFalse(status.isRequirementMet(someRequirement))

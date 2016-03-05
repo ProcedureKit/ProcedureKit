@@ -1,0 +1,12 @@
+excluded:
+  - Tests
+use_nested_configs: true
+disabled_rules:
+  - valid_docs
+  - statement_position
+  - line_length
+  - type_name
+file_length:
+  warning: 500
+  error: 1200
+  

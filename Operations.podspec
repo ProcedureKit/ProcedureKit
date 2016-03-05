@@ -32,6 +32,12 @@ session Advanced NSOperations: https://developer.apple.com/videos/wwdc/2015/?id=
       'Sources/Features/Shared',
       'Sources/Features/iOS'
     ]
+    ss.ios.exclude_files = [
+      'Sources/Features/Shared/CloudCapability.swift',
+      'Sources/Features/Shared/CloudKitOperation.swift',			
+      'Sources/Features/iOS/PhotosCapability.swift',
+      'Sources/Features/iOS/PassbookCapability.swift'
+    ]
     ss.watchos.exclude_files = [
       'Sources/Core/iOS',
       'Sources/Features/iOS/LocationCapability.swift',
@@ -60,7 +66,9 @@ session Advanced NSOperations: https://developer.apple.com/videos/wwdc/2015/?id=
     ]
     ss.osx.exclude_files = [
       'Sources/Core/iOS',
-      'Sources/Features/iOS'
+      'Sources/Features/iOS',
+      'Sources/Features/Shared/CloudCapability.swift',
+      'Sources/Features/Shared/CloudKitOperation.swift'
     ]
   end
 
@@ -120,7 +128,36 @@ session Advanced NSOperations: https://developer.apple.com/videos/wwdc/2015/?id=
       'Sources/Extras/Contacts/iOS'
     ]
   end
-
+	
+  # Subspec which includes CloudKit functionality
+  s.subspec '+CloudKit' do |ss|
+    ss.platforms = { :ios => "8.0", :tvos => "9.0", :osx => "10.10" }
+    ss.dependency 'Operations/Standard'
+    ss.source_files = [
+      'Sources/Features/Shared/CloudCapability.swift',
+      'Sources/Features/Shared/CloudKitOperation.swift',			
+    ]
+  end
+	
+  # Subspec which includes Photos functionality
+  s.subspec '+Photos' do |ss|
+    ss.platforms = { :ios => "8.0" }
+    ss.dependency 'Operations/Standard'
+    ss.frameworks = 'Photos'
+    ss.source_files = [
+      'Sources/Features/iOS/PhotosCapability.swift'
+    ]
+  end
+	
+  # Subspec which includes Passbook functionality
+  s.subspec '+Passbook' do |ss|
+    ss.platforms = { :ios => "8.0" }
+    ss.dependency 'Operations/Standard'
+    ss.frameworks = 'Passbook'
+    ss.source_files = [
+      'Sources/Features/iOS/PassbookCapability.swift'
+    ]
+  end
 end
 
 

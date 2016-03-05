@@ -83,5 +83,3 @@ class MutuallyExclusiveConditionWithDependencyTests: OperationTests {
         XCTAssertTrue(operation2.didExecute)
     }
 }
-
-

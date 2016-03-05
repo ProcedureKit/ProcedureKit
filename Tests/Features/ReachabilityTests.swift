@@ -317,4 +317,3 @@ class DeviceReachabilityTests: XCTestCase, NetworkReachabilityDelegate {
         }
     }
 }
-

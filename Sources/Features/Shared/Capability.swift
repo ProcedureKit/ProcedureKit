@@ -11,7 +11,7 @@ import Foundation
 /**
 
  # CapabilityType
- 
+
  This is the high level definition for device/user/system
  capabilities which typically would require the user's
  permission to access. For example, location, calendars,
@@ -33,14 +33,14 @@ public protocol CapabilityType {
      allows for granuality in the capabilities permissions.
      For example, with Location, we either request a "when in use"
      or "always" permission.
-     
+
      - returns: the necessary Status.Requirement
     */
     var requirement: Status.Requirement { get }
 
     /**
      Initialize a new capability with the requirement and a registrar.
-     
+
      Implementations should provide a default registrar - it is here
      to support injection & unit testing.
 
@@ -51,7 +51,7 @@ public protocol CapabilityType {
 
     /**
      Query the capability to see if it's available on the device.
-     
+
      - returns: true Bool value if the capability is available.
     */
     func isAvailable() -> Bool
@@ -60,18 +60,18 @@ public protocol CapabilityType {
      Get the current authorization status of the capability. This
      can be performed asynchronously. The status is returns as the
      argument to a completion block.
-     
+
      - parameter completion: a Status -> Void closure.
     */
     func authorizationStatus(completion: Status -> Void)
 
     /**
      Request authorization with the requirement of the capability.
-     
+
      Again, this is designed to be performed asynchronously. More than
      likely the registrar will present a dialog and wait for the user.
      When control is returned, the completion block should be called.
-     
+
      - parameter completion: a dispatch_block_t closure.
     */
     func requestAuthorizationWithCompletion(completion: dispatch_block_t)
@@ -79,9 +79,9 @@ public protocol CapabilityType {
 
 /**
  A protocol to define the authorization status of a device
- capability. Typically this will be an enum, like 
+ capability. Typically this will be an enum, like
  CLAuthorizationStatus. Note that it is itself generic over
- the Requirement. This allows for another (or existing) enum 
+ the Requirement. This allows for another (or existing) enum
  to be used to define granular levels of permissions. Use Void
  if not needed.
 */
@@ -95,11 +95,11 @@ public protocol AuthorizationStatusType {
      this function should determine whether or not the
      provided Requirement has been met or not. Therefore
      this function should consider the overall authorization
-     state, and if *authorized* - whether the authorization 
+     state, and if *authorized* - whether the authorization
      is enough for the Requirement.
-     
+
      - see: CLAuthorizationStatus extension for example.
-     
+
      - parameter requirement: the necessary Requirement
      - returns: a Bool indicating whether or not the requirements are met.
     */
@@ -158,7 +158,7 @@ public class GetAuthorizationStatus<Capability: CapabilityType>: Operation {
     /**
      After the operation has executed, this property will be set
      either true or false.
-     
+
      - returns: a Bool indicating whether or not the capability is available.
     */
     public var isAvailable: Bool? = .None
@@ -178,7 +178,7 @@ public class GetAuthorizationStatus<Capability: CapabilityType>: Operation {
      Initialize the operation with a CapabilityType and completion. A default
      completion is set which does nothing. The status is also available using
      properties.
-     
+
      - parameter capability: the Capability.
      - parameter completion: the Completion closure.
     */
@@ -210,7 +210,7 @@ public class GetAuthorizationStatus<Capability: CapabilityType>: Operation {
 
  # Authorize Operation
 
- This is a generic operation which will request authorization 
+ This is a generic operation which will request authorization
  for any CapabilityType.
  */
 public class Authorize<Capability: CapabilityType>: GetAuthorizationStatus<Capability> {
@@ -252,8 +252,8 @@ public enum CapabilityError<Capability: CapabilityType>: ErrorType {
 /**
  This is a generic OperationCondition which can be used to allow or
  deny operations to execute depending on the authorization status of a
- capability. 
- 
+ capability.
+
  By default, the condition will add an Authorize operation as a dependency
  which means that potentially the user will be prompted to grant
  authorization. Suppress this from happening with SilentCondition.
@@ -270,19 +270,19 @@ public struct AuthorizedFor<Capability: CapabilityType>: OperationCondition {
 
     /**
      Initialize the condition using a capability. For example
-     
+
      ```swift
      let myOperation = MyOperation() // etc etc
 
      // Present the user with a permission dialog only if the authorization
      // status has not yet been determined.
      // If previously granted - operation will be executed with no dialog.
-     // If previously denied - operation will fail with 
+     // If previously denied - operation will fail with
      // CapabilityError<Capability.Location>.AuthorizationNotGranted
-     
+
      myOperation.addCondition(AuthorizedFor(Capability.Location(.WhenInUse)))
      ```
-     
+
      - parameter capability: the Capability.
     */
     public init(_ capability: Capability) {
@@ -317,7 +317,6 @@ public struct AuthorizedFor<Capability: CapabilityType>: OperationCondition {
 extension Capability.VoidStatus: Equatable { }
 
 /// Equality check for Capability.VoidStatus
-public func ==(a: Capability.VoidStatus, b: Capability.VoidStatus) -> Bool {
+public func == (_: Capability.VoidStatus, _: Capability.VoidStatus) -> Bool {
     return true
 }
-

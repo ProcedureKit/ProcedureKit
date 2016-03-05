@@ -35,4 +35,3 @@ class ReachableOperationTests: OperationTests {
         XCTAssertTrue(operation.operation.didExecute)
     }
 }
-

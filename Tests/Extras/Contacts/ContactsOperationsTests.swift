@@ -26,7 +26,7 @@ class TestableContactSaveRequest: ContactSaveRequestType {
     var removedMemberFromGroup = [String: [CNContact]]()
 
     required init() { }
-    
+
     func opr_addContact(contact: CNMutableContact, toContainerWithIdentifier identifier: String?) {
         let containerId = identifier ?? ContainerID.Default.identifier
         addedContacts[containerId] = addedContacts[containerId] ?? []
@@ -563,6 +563,3 @@ class ContactsAccessOperationsTests: OperationTests {
         XCTAssertTrue(registrar.didRequestAccess)
     }
 }
-
-
-

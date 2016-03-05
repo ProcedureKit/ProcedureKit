@@ -9,6 +9,12 @@
 import Foundation
 import AddressBook
 
+// swiftlint:disable file_length
+// swiftlint:disable type_body_length
+// swiftlint:disable variable_name_min_length
+// swiftlint:disable force_cast
+// swiftlint:disable nesting
+
 // MARK: - AddressBook System Wrapper
 
 /*
@@ -301,7 +307,7 @@ public final class AddressBook: AddressBookType {
                 return numericCast(kABPersonType)
             }
         }
-        
+
         public var description: String {
             switch self {
             case .Source:
@@ -312,7 +318,7 @@ public final class AddressBook: AddressBookType {
                 return "Person"
             }
         }
-        
+
         public init?(rawValue: ABRecordType) {
             let value: Int = numericCast(rawValue)
             switch value {
@@ -529,15 +535,15 @@ public final class AddressBook: AddressBookType {
             }
         }
 
-        public init(stringLiteral value: String){
+        public init(stringLiteral value: String) {
             self.value = value
         }
 
-        public  init(extendedGraphemeClusterLiteral value: String){
+        public  init(extendedGraphemeClusterLiteral value: String) {
             self.value = value
         }
 
-        public  init(unicodeScalarLiteral value: String){
+        public  init(unicodeScalarLiteral value: String) {
             self.value = value
         }
     }
@@ -696,7 +702,7 @@ extension AddressBook { // People
         return ABAddressBookGetPersonCount(addressBook)
     }
 
-    public func createPerson<P: AddressBook_PersonType, S : AddressBookSourceType where P.Storage == PersonStorage, S.Storage == SourceStorage, P.Storage == S.PersonStorage>(source: S? = .None) -> P {
+    public func createPerson<P: AddressBook_PersonType, S: AddressBookSourceType where P.Storage == PersonStorage, S.Storage == SourceStorage, P.Storage == S.PersonStorage>(source: S? = .None) -> P {
         if let source = source {
             return source.newPerson()
         }
@@ -718,7 +724,7 @@ extension AddressBook { // People
         return []
     }
 
-    public func people<P : AddressBook_PersonType where P.Storage == PersonStorage>() -> [P] {
+    public func people<P: AddressBook_PersonType where P.Storage == PersonStorage>() -> [P] {
         if let people = ABAddressBookCopyArrayOfAllPeople(addressBook) {
             let values = people.takeRetainedValue() as [ABRecordRef]
             return values.map { P(storage: $0) }
@@ -726,7 +732,7 @@ extension AddressBook { // People
         return []
     }
 
-    public func peopleInSource<P : AddressBook_PersonType, S : AddressBook_SourceType where P.Storage == PersonStorage, S.Storage == SourceStorage>(source: S) -> [P] {
+    public func peopleInSource<P: AddressBook_PersonType, S: AddressBook_SourceType where P.Storage == PersonStorage, S.Storage == SourceStorage>(source: S) -> [P] {
         if let people = ABAddressBookCopyArrayOfAllPeopleInSource(addressBook, source.storage) {
             let values = people.takeRetainedValue() as [ABRecordRef]
             return values.map { P(storage: $0) }
@@ -734,7 +740,7 @@ extension AddressBook { // People
         return []
     }
 
-    public func peopleInSource<P : AddressBook_PersonType, S : AddressBook_SourceType where P.Storage == PersonStorage, S.Storage == SourceStorage>(source: S, withSortOrdering sortOrdering: AddressBook.SortOrdering) -> [P] {
+    public func peopleInSource<P: AddressBook_PersonType, S: AddressBook_SourceType where P.Storage == PersonStorage, S.Storage == SourceStorage>(source: S, withSortOrdering sortOrdering: AddressBook.SortOrdering) -> [P] {
         if let people = ABAddressBookCopyArrayOfAllPeopleInSourceWithSortOrdering(addressBook, source.storage, sortOrdering.rawValue) {
             let values = people.takeRetainedValue() as [ABRecordRef]
             return values.map { P(storage: $0) }
@@ -765,7 +771,7 @@ extension AddressBook { // Groups
         return []
     }
 
-    public func groupsInSource<G: AddressBook_GroupType, S : AddressBook_SourceType where G.Storage == GroupStorage, S.Storage == SourceStorage>(source: S) -> [G] {
+    public func groupsInSource<G: AddressBook_GroupType, S: AddressBook_SourceType where G.Storage == GroupStorage, S.Storage == SourceStorage>(source: S) -> [G] {
         if let records = ABAddressBookCopyArrayOfAllGroupsInSource(addressBook, source.storage) {
             let values = records.takeRetainedValue() as [ABRecordRef]
             return values.map { G(storage: $0) }
@@ -777,19 +783,19 @@ extension AddressBook { // Groups
 @available(iOS, deprecated=9.0)
 extension AddressBook { // Sources
 
-    public func defaultSource<S : AddressBook_SourceType where S.Storage == SourceStorage>() -> S {
+    public func defaultSource<S: AddressBook_SourceType where S.Storage == SourceStorage>() -> S {
         let source: ABRecordRef = ABAddressBookCopyDefaultSource(addressBook).takeRetainedValue()
         return S(storage: source)
     }
 
-    public func sourceWithID<S : AddressBook_SourceType where S.Storage == SourceStorage>(id: ABRecordID) -> S? {
+    public func sourceWithID<S: AddressBook_SourceType where S.Storage == SourceStorage>(id: ABRecordID) -> S? {
         if let record = ABAddressBookGetSourceWithRecordID(addressBook, id) {
             return S(storage: record.takeUnretainedValue())
         }
         return .None
     }
 
-    public func sources<S : AddressBook_SourceType where S.Storage == SourceStorage>() -> [S] {
+    public func sources<S: AddressBook_SourceType where S.Storage == SourceStorage>() -> [S] {
         if let sources = ABAddressBookCopyArrayOfAllSources(addressBook) {
             let values = sources.takeRetainedValue() as [ABRecordRef]
             return values.map { S(storage: $0) }
@@ -922,8 +928,8 @@ public class AddressBookRecord: AddressBookRecordType, Equatable {
 }
 
 @available(iOS, deprecated=9.0)
-public func ==(a: AddressBookRecord, b: AddressBookRecord) -> Bool {
-    return a.id == b.id
+public func == (lhs: AddressBookRecord, rhs: AddressBookRecord) -> Bool {
+    return lhs.id == rhs.id
 }
 
 // MARK: - Person
@@ -1056,7 +1062,7 @@ public class AddressBookSource: AddressBookRecord, AddressBookSourceType {
         return P(storage: person)
     }
 
-    public func newGroup<G : AddressBook_GroupType where G.Storage == GroupStorage>() -> G {
+    public func newGroup<G: AddressBook_GroupType where G.Storage == GroupStorage>() -> G {
         let group: ABRecordRef = ABGroupCreateInSource(storage).takeRetainedValue()
         return G(storage: group)
     }
@@ -1065,33 +1071,23 @@ public class AddressBookSource: AddressBookRecord, AddressBookSourceType {
 
 
 
-
-
-
-
-
-
-
-
-
-
 // MARK: - Equatable
 
 extension CFNumberRef: Equatable {}
 
-public func ==(a: CFNumberRef, b: CFNumberRef) -> Bool {
-    return CFNumberCompare(a, b, nil) == .CompareEqualTo
+public func == (lhs: CFNumberRef, rhs: CFNumberRef) -> Bool {
+    return CFNumberCompare(lhs, rhs, nil) == .CompareEqualTo
 }
 
-public func ==(a: AddressBook.StringMultiValue, b: AddressBook.StringMultiValue) -> Bool {
-    return a.value == b.value
-}
-
-public func ==(lhs: AddressBook.DateMultiValue, rhs: AddressBook.DateMultiValue) -> Bool {
+public func == (lhs: AddressBook.StringMultiValue, rhs: AddressBook.StringMultiValue) -> Bool {
     return lhs.value == rhs.value
 }
 
-public func <(lhs: AddressBook.DateMultiValue, rhs: AddressBook.DateMultiValue) -> Bool {
+public func == (lhs: AddressBook.DateMultiValue, rhs: AddressBook.DateMultiValue) -> Bool {
+    return lhs.value == rhs.value
+}
+
+public func < (lhs: AddressBook.DateMultiValue, rhs: AddressBook.DateMultiValue) -> Bool {
     return lhs.value.compare(rhs.value) == .OrderedAscending
 }
 
@@ -1169,3 +1165,8 @@ public struct SystemAddressBookRegistrar: AddressBookPermissionRegistrar {
     }
 }
 
+// swiftlint:enable nesting
+// swiftlint:enable force_cast
+// swiftlint:enable variable_name_min_length
+// swiftlint:disable type_body_length
+// swiftlint:disable file_length

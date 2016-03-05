@@ -9,8 +9,8 @@
 import Foundation
 
 /**
- RetryFailureInfo is a value type which provides 
- information related to a previously failed 
+ RetryFailureInfo is a value type which provides
+ information related to a previously failed
  NSOperation which it is generic over. It is used
  in conjunction with RetryOperation.
 */
@@ -35,7 +35,7 @@ public struct RetryFailureInfo<T: NSOperation> {
      has completed. This can be done by creating the
      operation, setting the dependency and adding it using
      this block, before responding to the RetryOperation.
-     
+
      - returns: a block which accects var arg NSOperation instances.
     */
     public let addOperations: (NSOperation...) -> Void
@@ -43,7 +43,7 @@ public struct RetryFailureInfo<T: NSOperation> {
     /// - returns: the `RetryOperation`'s log property.
     public let log: LoggerType
 
-    /** 
+    /**
     - returns: the block which is used to configure
         operation instances before they are added to
         the queue
@@ -76,12 +76,12 @@ class RetryGenerator<T: NSOperation>: GeneratorType {
  it is generic over type T, an NSOperation subclass. It can be used to
  automatically retry another instance of operation T if the first operation
  finishes with errors.
- 
+
  To support effective error recovery, in addition to a (Delay?, T) generator
  RetryOperation is initialized with a block. The block will receive failure
  info, in addition to the next result (if not nil) of the operation generator.
  The block must return (Delay?, T)?.
- 
+
  Therefore consumers can inspect the failure info, and adjust the Delay, or
  operation before returning it. To finish, the block can return .None
 */
@@ -90,13 +90,13 @@ public class RetryOperation<T: NSOperation>: RepeatedOperation<T> {
     public typealias Handler = (RetryFailureInfo<T>, Payload) -> Payload?
 
     let retry: RetryGenerator<T>
-    
+
     /**
      A designated initializer
-     
+
      Creates an operation which will retry executing operations in the face
      of errors.
-     
+
      - parameter maxCount: an optional Int, which defaults to .None. If not nil, this is
      the maximum number of operations which will be executed.
      - parameter generator: the generator of (Delay?, T) values.
@@ -145,7 +145,7 @@ public class RetryOperation<T: NSOperation>: RepeatedOperation<T> {
      }
 
      let operation = RetryOperation(
-         maxCount: 3, 
+         maxCount: 3,
          strategy: .Random((0.1, 1.0)),
          generator: MyOperationGenerator()
      ) { info, delay, op in
@@ -158,7 +158,7 @@ public class RetryOperation<T: NSOperation>: RepeatedOperation<T> {
      - parameter strategy: a WaitStrategy which defaults to a 0.1 second fixed interval.
      - parameter [unnamed] generator: a generic generator which has an Element equal to T.
      - parameter retry: a Handler block type, can be used to inspect aggregated error to
-     adjust the next delay and Operation. This defaults to pass through the delay and 
+     adjust the next delay and Operation. This defaults to pass through the delay and
      operation regardless of error info.
 
      */
@@ -192,4 +192,3 @@ public class RetryOperation<T: NSOperation>: RepeatedOperation<T> {
         )
     }
 }
-

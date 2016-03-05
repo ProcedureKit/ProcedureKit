@@ -135,11 +135,13 @@ public class _ContactsOperation<Store: ContactStoreType>: _ContactsAccess<Store>
     public func removeGroupWithName(name: String) throws {
         if let group = try groupsNamed(name).first {
             let save = Store.SaveRequest()
+            // swiftlint:disable force_cast
             save.opr_deleteGroup(group.mutableCopy() as! CNMutableGroup)
+            // swiftlint:enable force_cast
             try store.opr_executeSaveRequest(save)
         }
     }
-    
+
     public func addContactsWithIdentifiers(contactIDs: [String], toGroupNamed groupName: String) throws {
         guard contactIDs.count > 0 else { return }
 
@@ -155,19 +157,19 @@ public class _ContactsOperation<Store: ContactStoreType>: _ContactsAccess<Store>
 
         try store.opr_executeSaveRequest(save)
     }
-    
+
     public func removeContactsWithIdentifiers(contactIDs: [String], fromGroupNamed groupName: String) throws {
         guard contactIDs.count > 0, let group = try groupsNamed(groupName).first else { return }
-        
+
         let save = Store.SaveRequest()
-        
+
         let fetch = CNContactFetchRequest(keysToFetch: [CNContactIdentifierKey])
         fetch.predicate = CNContact.predicateForContactsWithIdentifiers(contactIDs)
-        
+
         try store.opr_enumerateContactsWithFetchRequest(fetch) { contact, _ in
             save.opr_removeMember(contact, fromGroup: group)
         }
-        
+
         try store.opr_executeSaveRequest(save)
     }
 }
@@ -196,7 +198,7 @@ public class _GetContacts<Store: ContactStoreType>: _ContactsOperation<Store> {
         super.init(containerId: containerId, entityType: entityType, contactStore: contactStore)
         name = "Get Contacts"
     }
-    
+
     public override func executeContactsTask() throws {
         switch predicate {
         case .WithIdentifiers(let identifiers) where identifiers.count == 1:
@@ -222,7 +224,7 @@ public class _GetContactsGroup<Store: ContactStoreType>: _ContactsOperation<Stor
         self.groupName = groupName
         self.createIfNecessary = createIfNecessary
         super.init(containerId: containerId, entityType: entityType, contactStore: contactStore)
-        name = "Get Contacts Group"        
+        name = "Get Contacts Group"
     }
 
     public override func executeContactsTask() throws {
@@ -243,7 +245,7 @@ public class _RemoveContactsGroup<Store: ContactStoreType>: _GetContactsGroup<St
         super.init(groupName: groupName, createIfNecessary: false, containerId: containerId, entityType: entityType, contactStore: contactStore)
         name = "Remove Contacts Group"
     }
-    
+
     public override func executeContactsTask() throws {
         try removeGroupWithName(groupName)
     }
@@ -280,18 +282,9 @@ public class _RemoveContactsFromGroup<Store: ContactStoreType>: _GetContactsGrou
         super.init(groupName: groupName, createIfNecessary: false, containerId: containerId, entityType: entityType, contactStore: contactStore)
         name = "Remove Contacts from Group: \(groupName)"
     }
-    
+
     public override func executeContactsTask() throws {
         try super.executeContactsTask()
         try removeContactsWithIdentifiers(contactIDs, fromGroupNamed: groupName)
     }
 }
-
-
-
-
-
-
-
-
-

@@ -619,13 +619,3 @@ class AddressBookWritablePropertyTests: XCTestCase {
         XCTAssertNotNil(writable.writer)
     }
 }
-
-
-
-
-
-
-
-
-
-

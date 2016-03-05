@@ -1,0 +1,10 @@
+disabled_rules:
+  - valid_docs
+  - statement_position
+  - line_length
+  - type_name    
+  - file_length
+  - type_body_length
+  - variable_name_min_length
+  - force_cast
+  - nesting

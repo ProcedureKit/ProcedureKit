@@ -16,7 +16,7 @@ public protocol OperationObserverType {
 
     /**
      Observer gets notified when it is attached to an operation.
-     
+
      - parameter operation: the observed `Operation`.
     */
     func didAttachToOperation(operation: Operation)
@@ -27,9 +27,9 @@ public protocol OperationObserverType {
 public extension OperationObserverType {
 
     /**
-     Default implementation of didAttachToOperation 
+     Default implementation of didAttachToOperation
      is a none-operation.
-     
+
      - parameter operation: the observed `Operation`.
     */
     func didAttachToOperation(operation: Operation) { /* No operation */ }
@@ -123,4 +123,3 @@ public protocol OperationDidFinishObserver: OperationObserverType {
  produces a new operation, and finishes.
  */
 public protocol OperationObserver: OperationDidStartObserver, OperationDidCancelObserver, OperationDidProduceOperationObserver, OperationWillFinishObserver, OperationDidFinishObserver { }
-

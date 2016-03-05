@@ -111,4 +111,3 @@ private struct Timer {
         isCancelled = true
     }
 }
-

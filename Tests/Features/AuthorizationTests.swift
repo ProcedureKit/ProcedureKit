@@ -324,7 +324,7 @@ class AsyncCapabilityAuthorizationTests: AuthorizationTests {
         XCTAssertTrue(capability.didCheckIsAvailable)
         XCTAssertTrue(capability.didCheckAuthorizationStatus)
         XCTAssertFalse(capability.didRequestAuthorization)
-        XCTAssertTrue(operation.finished)        
+        XCTAssertTrue(operation.finished)
     }
 
     func test__async_get_status_runs_completionBlock() {
@@ -353,7 +353,6 @@ class AsyncCapabilityAuthorizationTests: AuthorizationTests {
         XCTAssertFalse(capability.didRequestAuthorization)
         XCTAssertTrue(operation.finished)
     }
-    
+
 
 }
-

@@ -126,7 +126,7 @@ class NoFailedDependenciesConditionTests: OperationTests {
         waitForExpectationsWithTimeout(3, handler: nil)
 
         XCTAssertFalse(operation.didExecute)
-        XCTAssertEqual(receivedErrors.count, 1)        
+        XCTAssertEqual(receivedErrors.count, 1)
     }
 }
 
