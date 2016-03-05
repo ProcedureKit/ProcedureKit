@@ -39,6 +39,7 @@ public enum Queue {
     /// Backgound QOS is a severly limited class, should not be used for anything when the app is active.
     case Background
 
+    // swiftlint:disable variable_name
     private var qos_class: qos_class_t {
         switch self {
         case .Main: return qos_class_main()
@@ -49,6 +50,7 @@ public enum Queue {
         case .Background: return QOS_CLASS_BACKGROUND
         }
     }
+    // swiftlint:enable variable_name
 
     /**
     Access the appropriate global `dispatch_queue_t`. For `.Main` this

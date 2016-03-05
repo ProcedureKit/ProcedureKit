@@ -620,7 +620,3 @@ class CancellationOperationTests: OperationTests {
         XCTAssertFalse(operation.didExecute)
     }
 }
-
-
-
-

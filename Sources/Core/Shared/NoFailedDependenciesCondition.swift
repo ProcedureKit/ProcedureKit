@@ -76,8 +76,8 @@ public struct NoFailedDependenciesCondition: OperationCondition {
 }
 
 /// Equatable conformance for `NoFailedDependenciesCondition.Error`
-public func ==(a: NoFailedDependenciesCondition.Error, b: NoFailedDependenciesCondition.Error) -> Bool {
-    switch (a, b) {
+public func == (lhs: NoFailedDependenciesCondition.Error, rhs: NoFailedDependenciesCondition.Error) -> Bool {
+    switch (lhs, rhs) {
     case (.CancelledDependencies, .CancelledDependencies), (.FailedDependencies, .FailedDependencies):
         return true
     default:

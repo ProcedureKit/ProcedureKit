@@ -191,5 +191,3 @@ class UIOperationTests: OperationTests {
         waitForExpectationsWithTimeout(3, handler: nil)
     }
 }
-
-

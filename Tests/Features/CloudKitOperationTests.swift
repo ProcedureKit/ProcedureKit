@@ -2378,8 +2378,3 @@ class CloudKitRecoveryTests: CKTests {
         XCTAssertEqual(code, CKErrorCode.MissingEntitlement)
     }
 }
-
-
-
-
-

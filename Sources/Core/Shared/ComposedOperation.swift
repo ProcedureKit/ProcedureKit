@@ -13,13 +13,13 @@ public class ComposedOperation<T: NSOperation>: Operation, OperationDidFinishObs
     public let target: Operation
     public var operation: T
 
-    public convenience init(_ op: T) {
-        self.init(operation: op)
+    public convenience init(_ operation: T) {
+        self.init(operation: operation)
     }
 
-    init(operation op: T) {
-        target = op as? Operation ?? GroupOperation(operations: [op])
-        operation = op
+    init(operation composed: T) {
+        target = composed as? Operation ?? GroupOperation(operations: [composed])
+        operation = composed
         super.init()
         name = "Composed Operation"
         target.name = "Composed <\(T.self)>"

@@ -306,7 +306,3 @@ extension CloudCapability where Registrar: CloudContainerRegistrar {
 
 @available(*, unavailable, renamed="AuthorizedFor(Cloud())")
 public typealias CloudContainerCondition = AuthorizedFor<Capability.Cloud>
-
-
-
-

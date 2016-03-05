@@ -9,6 +9,8 @@
 import Foundation
 import SystemConfiguration
 
+// swiftlint:disable variable_name
+
 public struct Reachability {
 
     /// Errors which can be thrown or returned.
@@ -117,11 +119,13 @@ extension ReachabilityManager: NetworkReachabilityDelegate {
 
 extension ReachabilityManager: SystemReachabilityType {
 
+    // swiftlint:disable force_try
     func whenConnected(conn: Reachability.Connectivity, block: () -> Void) {
         _observers.write({ (inout mutableObservers: [Reachability.Observer]) in
             mutableObservers.append(Reachability.Observer(connectivity: conn, whenConnectedBlock: block))
         }, completion: { try! self.network.startNotifierOnQueue(self.queue) })
     }
+    // swiftlint:enable force_try
 }
 
 extension ReachabilityManager: HostReachabilityType {
@@ -243,8 +247,8 @@ private func __device_reachability_callback(reachability: SCNetworkReachability,
 
 extension Reachability.NetworkStatus: Equatable { }
 
-public func ==(a: Reachability.NetworkStatus, b: Reachability.NetworkStatus) -> Bool {
-    switch (a, b) {
+public func == (lhs: Reachability.NetworkStatus, rhs: Reachability.NetworkStatus) -> Bool {
+    switch (lhs, rhs) {
     case (.NotReachable, .NotReachable):
         return true
     case let (.Reachable(aConnectivity), .Reachable(bConnectivity)):
@@ -357,3 +361,4 @@ extension SCNetworkReachabilityFlags {
     }
 }
 
+// swiftlint:enable variable_name

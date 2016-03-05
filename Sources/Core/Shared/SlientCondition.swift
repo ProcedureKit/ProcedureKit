@@ -47,8 +47,8 @@ public struct SilentCondition<Condition: OperationCondition>: OperationCondition
 
     - parameter [unnamed]: a nested `Condition` type.
     */
-    public init(_ c: Condition) {
-        condition = c
+    public init(_ condition: Condition) {
+        self.condition = condition
     }
 
     /**

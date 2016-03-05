@@ -32,7 +32,7 @@ public protocol PresentingViewController: class {
     - parameter vc: the `UIViewController` being presented.
     - parameter sender: an optional `AnyObject`, usually this is a `UIControl`.
     */
-    func showViewController(vc: UIViewController, sender: AnyObject?)
+    func showViewController(viewController: UIViewController, sender: AnyObject?)
 
     @available(iOS 8.0, *)
     /**
@@ -41,7 +41,7 @@ public protocol PresentingViewController: class {
     - parameter vc: the `UIViewController` being presented.
     - parameter sender: an optional `AnyObject`, usually this is a `UIControl`.
     */
-    func showDetailViewController(vc: UIViewController, sender: AnyObject?)
+    func showDetailViewController(viewController: UIViewController, sender: AnyObject?)
 }
 
 extension UIViewController: PresentingViewController { }

@@ -58,8 +58,8 @@ public struct NegatedCondition<Condition: OperationCondition>: OperationConditio
 
     - parameter [unnamed]: a nested `Condition` type.
     */
-    public init(_ c: Condition) {
-        condition = c
+    public init(_ condition: Condition) {
+        self.condition = condition
     }
 
     /**
@@ -91,8 +91,8 @@ public struct NegatedCondition<Condition: OperationCondition>: OperationConditio
 }
 
 /// Equatable conformance for `NegatedConditionError`
-public func ==(a: NegatedConditionError, b: NegatedConditionError) -> Bool {
-    switch (a, b) {
+public func == (lhs: NegatedConditionError, rhs: NegatedConditionError) -> Bool {
+    switch (lhs, rhs) {
     case let (.ConditionSatisfied(aString), .ConditionSatisfied(bString)):
         return aString == bString
     }

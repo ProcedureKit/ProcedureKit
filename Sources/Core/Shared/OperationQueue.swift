@@ -62,8 +62,9 @@ public class OperationQueue: NSOperationQueue {
 
     - parameter op: an `NSOperation` instance.
     */
-    public override func addOperation(op: NSOperation) {
-        if let operation = op as? Operation {
+    // swiftlint:disable function_body_length
+    public override func addOperation(operation: NSOperation) {
+        if let operation = operation as? Operation {
 
             /// Add an observer so that any produced operations are added to the queue
             /// Except for group operations, where any produced operations are added
@@ -120,17 +121,17 @@ public class OperationQueue: NSOperationQueue {
             operation.willEnqueue()
         }
         else {
-
-            op.addCompletionBlock { [weak self, weak op] in
-                if let queue = self, let op = op {
+            operation.addCompletionBlock { [weak self, weak operation] in
+                if let queue = self, let op = operation {
                     queue.delegate?.operationQueue(queue, didFinishOperation: op, withErrors: [])
                 }
             }
         }
+        // swiftlint:enable function_body_length
 
-        delegate?.operationQueue(self, willAddOperation: op)
+        delegate?.operationQueue(self, willAddOperation: operation)
 
-        super.addOperation(op)
+        super.addOperation(operation)
     }
 
     /**

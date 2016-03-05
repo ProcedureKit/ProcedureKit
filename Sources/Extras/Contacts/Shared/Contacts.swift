@@ -242,8 +242,8 @@ extension ContainerID: Hashable {
 }
 
 @available(iOS 9.0, OSX 10.11, *)
-public func ==(a: ContainerID, b: ContainerID) -> Bool {
-    switch (a, b) {
+public func == (lhs: ContainerID, rhs: ContainerID) -> Bool {
+    switch (lhs, rhs) {
     case (.Default, .Default):
         return true
     case let (.Identifier(aId), .Identifier(bId)):
@@ -275,8 +275,8 @@ extension ContainerPredicate: Hashable {
 }
 
 @available(iOS 9.0, OSX 10.11, *)
-public func ==(a: ContainerPredicate, b: ContainerPredicate) -> Bool {
-    switch (a, b) {
+public func == (lhs: ContainerPredicate, rhs: ContainerPredicate) -> Bool {
+    switch (lhs, rhs) {
     case let (.WithIdentifiers(aIds), .WithIdentifiers(bIds)):
         return aIds == bIds
     case let (.OfContactWithIdentifier(aId), .OfContactWithIdentifier(bId)):
@@ -309,8 +309,8 @@ extension GroupPredicate: Hashable {
 }
 
 @available(iOS 9.0, OSX 10.11, *)
-public func ==(a: GroupPredicate, b: GroupPredicate) -> Bool {
-    switch (a, b) {
+public func == (lhs: GroupPredicate, rhs: GroupPredicate) -> Bool {
+    switch (lhs, rhs) {
     case let (.WithIdentifiers(aIds), .WithIdentifiers(bIds)):
         return aIds == bIds
     case let (.InContainerWithID(aId), .InContainerWithID(bId)):
@@ -345,8 +345,8 @@ extension ContactPredicate: Hashable {
 }
 
 @available(iOS 9.0, OSX 10.11, *)
-public func ==(a: ContactPredicate, b: ContactPredicate) -> Bool {
-    switch (a, b) {
+public func == (lhs: ContactPredicate, rhs: ContactPredicate) -> Bool {
+    switch (lhs, rhs) {
     case let (.WithIdentifiers(aIds), .WithIdentifiers(bIds)):
         return aIds == bIds
     case let (.MatchingName(aName), .MatchingName(bName)):

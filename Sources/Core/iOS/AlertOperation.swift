@@ -32,11 +32,11 @@ For example
 */
 public class AlertOperation<From: PresentingViewController>: Operation {
 
-    private var ui: UIOperation<UIAlertController, From>
+    private var uiOperation: UIOperation<UIAlertController, From>
 
     /// Access the presented `UIAlertController`.
     public var alert: UIAlertController {
-        return ui.controller
+        return uiOperation.controller
     }
 
     /// The title of the presented `UIAlertController`.
@@ -68,7 +68,8 @@ public class AlertOperation<From: PresentingViewController>: Operation {
     such as an `UIViewController`
     */
     public init(presentAlertFrom from: From) {
-        ui = UIOperation(controller: UIAlertController(title: .None, message: .None, preferredStyle: .Alert), displayControllerFrom: .Present(from))
+        let controller = UIAlertController(title: .None, message: .None, preferredStyle: .Alert)
+        uiOperation = UIOperation(controller: controller, displayControllerFrom: .Present(from))
         super.init()
         name = "Alert<\(From.self)>"
         addCondition(AlertPresentation())
@@ -104,7 +105,7 @@ public class AlertOperation<From: PresentingViewController>: Operation {
         if alert.actions.isEmpty {
             addActionWithTitle(NSLocalizedString("Okay", comment: "Okay"))
         }
-        ui.log.severity = log.severity
-        produceOperation(ui)
+        uiOperation.log.severity = log.severity
+        produceOperation(uiOperation)
     }
 }

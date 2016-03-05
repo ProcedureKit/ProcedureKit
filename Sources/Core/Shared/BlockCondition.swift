@@ -81,6 +81,6 @@ public struct BlockCondition: OperationCondition {
 
 extension BlockCondition.Error: Equatable { }
 
-public func ==(a: BlockCondition.Error, b: BlockCondition.Error) -> Bool {
+public func == (_: BlockCondition.Error, _: BlockCondition.Error) -> Bool {
     return true // Only one case in the enum
 }

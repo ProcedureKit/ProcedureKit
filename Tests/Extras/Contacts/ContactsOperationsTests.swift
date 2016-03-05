@@ -563,4 +563,3 @@ class ContactsAccessOperationsTests: OperationTests {
         XCTAssertTrue(registrar.didRequestAccess)
     }
 }
-

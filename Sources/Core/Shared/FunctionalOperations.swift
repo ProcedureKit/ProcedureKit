@@ -58,8 +58,8 @@ public class MapOperation<T, U>: ResultOperation<U>, AutomaticInjectionOperation
      - parameter transform: a closure which maps a non-optional T to U!. Note
      that this closure will only be run if the requirement is non-nil.
     */
-    public init(x: T! = .None, transform: T -> U) {
-        self.requirement = x
+    public init(input: T! = .None, transform: T -> U) {
+        self.requirement = input
         self.transform = transform
         super.init(result: nil)
         name = "Map"
@@ -221,4 +221,3 @@ extension ResultOperationType where Self: Operation, Result: SequenceType {
         return reduce
     }
 }
-

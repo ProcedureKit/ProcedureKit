@@ -165,4 +165,3 @@ class ResultOperationTests: OperationTests {
         XCTAssertTrue(operation.finished)
     }
 }
-

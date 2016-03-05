@@ -20,10 +20,10 @@ final public class DisplayContactViewController<F: PresentingViewController>: Gr
     let get: GetContacts
     let configuration: ContactViewControllerConfigurationBlock?
 
-    var ui: UIOperation<CNContactViewController, F>? = .None
+    var operation: UIOperation<CNContactViewController, F>? = .None
 
     public var contactViewController: CNContactViewController? {
-        return ui?.controller
+        return operation?.controller
     }
 
     public init(identifier: String, displayControllerFrom from: ViewControllerDisplayStyle<F>, delegate: CNContactViewControllerDelegate, sender: AnyObject? = .None, configuration: ContactViewControllerConfigurationBlock? = .None) {
@@ -41,10 +41,10 @@ final public class DisplayContactViewController<F: PresentingViewController>: Gr
         return vc
     }
 
-    public override func willFinishOperation(operation: NSOperation, withErrors errors: [ErrorType]) {
-        if errors.isEmpty && operation == get, let contact = get.contact {
-            ui = UIOperation(controller: createViewControllerForContact(contact), displayControllerFrom: from, sender: sender)
-            addOperation(ui!)
+    public override func willFinishOperation(finished: NSOperation, withErrors errors: [ErrorType]) {
+        if errors.isEmpty && finished == get, let contact = get.contact {
+            operation = UIOperation(controller: createViewControllerForContact(contact), displayControllerFrom: from, sender: sender)
+            addOperation(operation!)
         }
     }
 }
@@ -53,10 +53,10 @@ final public class DisplayContactViewController<F: PresentingViewController>: Gr
 final public class DisplayCreateContactViewController<F: PresentingViewController>: Operation {
 
     let configuration: ContactViewControllerConfigurationBlock?
-    let ui: UIOperation<CNContactViewController, F>
+    let operation: UIOperation<CNContactViewController, F>
 
     public var contactViewController: CNContactViewController {
-        return ui.controller
+        return operation.controller
     }
 
     public init(displayControllerFrom from: ViewControllerDisplayStyle<F>, delegate: CNContactViewControllerDelegate, sender: AnyObject? = .None, configuration: ContactViewControllerConfigurationBlock? = .None) {
@@ -64,7 +64,7 @@ final public class DisplayCreateContactViewController<F: PresentingViewControlle
         let controller = CNContactViewController(forNewContact: .None)
         controller.contactStore = CNContactStore()
         controller.delegate = delegate
-        self.ui = UIOperation(controller: controller, displayControllerFrom: from, sender: sender)
+        self.operation = UIOperation(controller: controller, displayControllerFrom: from, sender: sender)
         self.configuration = configuration
         super.init()
         name = "Display Create Contact View Controller"
@@ -72,6 +72,6 @@ final public class DisplayCreateContactViewController<F: PresentingViewControlle
 
     public override func execute() {
         configuration?(contactViewController)
-        produceOperation(ui)
+        produceOperation(operation)
     }
 }

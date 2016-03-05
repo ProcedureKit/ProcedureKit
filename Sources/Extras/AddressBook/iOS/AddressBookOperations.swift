@@ -22,9 +22,9 @@ public class AddressBookOperation: Operation {
         addressBook = AddressBook(registrar: registrar)
     }
 
-    init(registrar r: AddressBookPermissionRegistrar) {
-        registrar = r
-        addressBook = AddressBook(registrar: registrar)
+    init(registrar: AddressBookPermissionRegistrar) {
+        self.addressBook = AddressBook(registrar: registrar)
+        self.registrar = registrar
     }
 
     final func requestAccess() {
@@ -81,12 +81,14 @@ public class AddressBookGetResource: AddressBookOperation {
             }
         }
 
+        // swiftlint:disable variable_name_min_length
         var id: ABRecordID? {
             switch self {
             case .ID(let id): return id
             default: return .None
             }
         }
+        // swiftlint:enable variable_name_min_length
     }
 
     public var inSource: Source? = .DefaultSource
@@ -393,6 +395,3 @@ public class AddressBookMapPeople<T>: AddressBookGetResource {
         return .None
     }
 }
-
-
-

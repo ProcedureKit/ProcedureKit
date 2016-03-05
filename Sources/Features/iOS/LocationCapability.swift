@@ -216,4 +216,3 @@ public extension Capability {
 
 @available(*, unavailable, renamed="AuthorizedFor(Capability.Location(.WhenInUse))")
 public typealias LocationCondition = AuthorizedFor<Capability.Location>
-

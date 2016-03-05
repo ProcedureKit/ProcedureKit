@@ -317,6 +317,6 @@ public struct AuthorizedFor<Capability: CapabilityType>: OperationCondition {
 extension Capability.VoidStatus: Equatable { }
 
 /// Equality check for Capability.VoidStatus
-public func ==(a: Capability.VoidStatus, b: Capability.VoidStatus) -> Bool {
+public func == (_: Capability.VoidStatus, _: Capability.VoidStatus) -> Bool {
     return true
 }

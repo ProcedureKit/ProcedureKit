@@ -303,6 +303,6 @@ public extension NSOperation {
     }
 }
 
-public func <(lhs: LogSeverity, rhs: LogSeverity) -> Bool {
+public func < (lhs: LogSeverity, rhs: LogSeverity) -> Bool {
     return lhs.rawValue < rhs.rawValue
 }

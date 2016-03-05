@@ -72,7 +72,7 @@ extension Protector where T: _ArrayType {
         })
     }
 
-    func appendContentsOf<S : SequenceType where S.Generator.Element == T.Generator.Element>(newElements: S) {
+    func appendContentsOf<S: SequenceType where S.Generator.Element == T.Generator.Element>(newElements: S) {
         write({ (inout ward: T) in
             ward.appendContentsOf(newElements)
         })

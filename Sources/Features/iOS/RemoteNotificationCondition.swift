@@ -127,6 +127,8 @@ public class RemoteNotificationsRegistration: Operation {
     }
 }
 
+// swiftlint:disable variable_name
 private let RemoteNotificationName = "RemoteNotificationName"
 private let RemoteNotificationTokenKey = "RemoteNotificationTokenKey"
 private let RemoteNotificationErrorKey = "RemoteNotificationErrorKey"
+// swiftlint:enable variable_name

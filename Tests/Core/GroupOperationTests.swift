@@ -151,4 +151,3 @@ class GroupOperationTests: OperationTests {
         XCTAssertEqual(group.aggregateErrors.count, 1)
     }
 }
-

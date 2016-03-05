@@ -135,7 +135,9 @@ public class _ContactsOperation<Store: ContactStoreType>: _ContactsAccess<Store>
     public func removeGroupWithName(name: String) throws {
         if let group = try groupsNamed(name).first {
             let save = Store.SaveRequest()
+            // swiftlint:disable force_cast
             save.opr_deleteGroup(group.mutableCopy() as! CNMutableGroup)
+            // swiftlint:enable force_cast
             try store.opr_executeSaveRequest(save)
         }
     }
@@ -286,10 +288,3 @@ public class _RemoveContactsFromGroup<Store: ContactStoreType>: _GetContactsGrou
         try removeContactsWithIdentifiers(contactIDs, fromGroupNamed: groupName)
     }
 }
-
-
-
-
-
-
-

@@ -55,8 +55,8 @@ public class ReachabilityCondition: OperationCondition {
     }
 }
 
-public func ==(a: ReachabilityCondition.Error, b: ReachabilityCondition.Error) -> Bool {
-    switch (a, b) {
+public func == (lhs: ReachabilityCondition.Error, rhs: ReachabilityCondition.Error) -> Bool {
+    switch (lhs, rhs) {
     case (.NotReachable, .NotReachable):
         return true
     case let (.NotReachableWithConnectivity(aConnectivity), .NotReachableWithConnectivity(bConnectivity)):
@@ -65,4 +65,3 @@ public func ==(a: ReachabilityCondition.Error, b: ReachabilityCondition.Error) -
         return false
     }
 }
-

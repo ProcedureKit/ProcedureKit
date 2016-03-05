@@ -24,9 +24,10 @@ extension UIApplication: UserNotificationRegistrarType {
     }
 }
 
+// swiftlint:disable variable_name
 private let DidRegisterSettingsNotificationName = "DidRegisterSettingsNotificationName"
 private let NotificationSettingsKey = "NotificationSettingsKey"
-
+// swiftlint:enable variable_name
 
 /**
     A condition for verifying that we can present alerts
@@ -102,8 +103,8 @@ public struct UserNotificationCondition: OperationCondition {
     }
 }
 
-public func ==(a: UserNotificationCondition.Error, b: UserNotificationCondition.Error) -> Bool {
-    switch (a, b) {
+public func == (lhs: UserNotificationCondition.Error, rhs: UserNotificationCondition.Error) -> Bool {
+    switch (lhs, rhs) {
     case let (.SettingsNotSufficient(current: aCurrent, desired: aDesired), .SettingsNotSufficient(current: bCurrent, desired: bDesired)):
         return (aCurrent == bCurrent) && (aDesired == bDesired)
     }

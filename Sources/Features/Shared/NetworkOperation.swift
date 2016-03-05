@@ -50,4 +50,6 @@ public class URLSessionTaskOperation: Operation {
     }
 }
 
+// swiftlint:disable variable_name
 private var URLSessionTaskOperationKVOContext = 0
+// swiftlint:enable variable_name
