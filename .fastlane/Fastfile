@@ -2,6 +2,14 @@ lane :verify do
   verify_xcode  
 end
 
+lane :lint do
+
+    swiftLint(
+        mode: :lint, 
+        config_file: '.swiftlint.yml'
+    )
+end
+
 platform :ios do
 
   desc "Builds the iOS Extension compatible framework"

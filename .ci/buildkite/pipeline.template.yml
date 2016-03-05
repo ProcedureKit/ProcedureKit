@@ -18,6 +18,9 @@ steps:
   -
     type: "waiter"
   -
+    name: ":muscle: Lint"
+    command: .ci/scripts/lint    
+  -
     name: ":muscle: Send Coverage"
     command: .ci/scripts/send-coverage
     agents:
