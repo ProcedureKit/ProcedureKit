@@ -25,8 +25,8 @@ public struct LoggingObserver: OperationObserver {
 
     /**
     Create a logging observer. Accepts as the final argument a block which receives a
-    `String` message to be logged. By default this just uses `print()`, but construct 
-    with a custom block to send logs to other systems. The block is executed on a 
+    `String` message to be logged. By default this just uses `print()`, but construct
+    with a custom block to send logs to other systems. The block is executed on a
     dispatch queue.
 
     - parameter queue: a queue, by detault it uses it's own serial queue.
@@ -41,12 +41,12 @@ public struct LoggingObserver: OperationObserver {
     /**
     Conforms to `OperationObserver`. The logger is sent a string which uses the
     `name` parameter of the operation if provived.
-    
+
        "My Operation: did start."
-    
+
     - parameter operation: the `Operation` which has started.
     */
-    public func operationDidStart(operation: Operation) {
+    public func didStartOperation(operation: Operation) {
         log("\(operation.operationName): did start.")
     }
 
@@ -58,7 +58,7 @@ public struct LoggingObserver: OperationObserver {
 
      - parameter operation: the `Operation` which has started.
      */
-    public func operationDidCancel(operation: Operation) {
+    public func didCancelOperation(operation: Operation) {
         log("\(operation.operationName): did cancel.")
     }
 
@@ -68,9 +68,9 @@ public struct LoggingObserver: OperationObserver {
 
         "My Operation: did produce operation: My Other Operation."
 
-    If the produced operation is an `Operation`, then a new `LoggingObserver` with 
+    If the produced operation is an `Operation`, then a new `LoggingObserver` with
     same queue and logger will be attached to it as an observer. Meaning that when
-    the produced operation starts/produces/finishes, it will also generate log 
+    the produced operation starts/produces/finishes, it will also generate log
     output.
 
     - parameter operation: the `Operation` producer.
@@ -87,22 +87,41 @@ public struct LoggingObserver: OperationObserver {
     }
 
     /**
+     Conforms to `OperationObserver`. The logger is sent a string which uses the
+     `name` parameter of the operation if provived. If there were errors, output
+     looks like
+
+     "My Operation: finsihed with error(s): [My Operation Error]."
+
+     or if no errors:
+
+     "My Operation: finsihed with no errors."
+
+     - parameter operation: the `Operation` that finished.
+     - parameter errors: an array of `ErrorType`, not that these will be printed out.
+     */
+    public func willFinishOperation(operation: Operation, errors: [ErrorType]) {
+        let detail = errors.count > 0 ? "error(s): \(errors)" : "no errors"
+        log("\(operation.operationName): will finish with \(detail).")
+    }
+
+    /**
     Conforms to `OperationObserver`. The logger is sent a string which uses the
     `name` parameter of the operation if provived. If there were errors, output
     looks like
 
         "My Operation: finsihed with error(s): [My Operation Error]."
-    
+
     or if no errors:
-    
+
         "My Operation: finsihed with no errors."
 
     - parameter operation: the `Operation` that finished.
     - parameter errors: an array of `ErrorType`, not that these will be printed out.
     */
-    public func operationDidFinish(operation: Operation, errors: [ErrorType]) {
+    public func didFinishOperation(operation: Operation, errors: [ErrorType]) {
         let detail = errors.count > 0 ? "error(s): \(errors)" : "no errors"
-        log("\(operation.operationName): finished with \(detail).")
+        log("\(operation.operationName): did finish with \(detail).")
     }
 
     private func log(message: String) {
@@ -111,4 +130,3 @@ public struct LoggingObserver: OperationObserver {
         }
     }
 }
-

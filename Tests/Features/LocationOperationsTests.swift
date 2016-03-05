@@ -179,7 +179,7 @@ class UserLocationOperationTests: LocationOperationTests {
         let operation = _UserLocationOperation(manager: locationManager, accuracy: accuracy, completion: { _ in })
 
         var receivedErrors = [ErrorType]()
-        operation.addObserver(FinishedObserver { _, errors in
+        operation.addObserver(DidFinishObserver { _, errors in
             receivedErrors = errors
         })
 
@@ -262,7 +262,7 @@ class ReverseGeocodeOperationTests: LocationOperationTests {
         let operation = _ReverseGeocodeOperation(geocoder: geocoder, location: location, completion: { _ in })
 
         var receivedErrors = [ErrorType]()
-        operation.addObserver(FinishedObserver { _, errors in
+        operation.addObserver(DidFinishObserver { _, errors in
             receivedErrors = errors
         })
 
@@ -345,7 +345,7 @@ class ReverseGeocodeUserLocationOperationTests: ReverseGeocodeOperationTests {
 
     func test__completion_handler_receives_location_and_placeholder() {
         let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
-        
+
         var blockLocation: CLLocation? = .None
         var blockPlacemark: CLPlacemark? = .None
 
@@ -367,4 +367,3 @@ class ReverseGeocodeUserLocationOperationTests: ReverseGeocodeOperationTests {
         XCTAssertEqual(receivedPlacemark, placemark)
     }
 }
-

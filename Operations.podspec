@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name              = "Operations"
-  s.version           = "2.6.1"
+  s.version           = "2.7.0"
   s.summary           = "Powerful NSOperation subclasses in Swift."
   s.description       = <<-DESC
   
@@ -13,7 +13,7 @@ session Advanced NSOperations: https://developer.apple.com/videos/wwdc/2015/?id=
   s.author            = { "Daniel Thorpe" => "@danthorpe" }
   s.source            = { :git => "https://github.com/danthorpe/Operations.git", :tag => s.version.to_s }
   s.module_name       = 'Operations'
-  s.documentation_url = 'http://docs.danthorpe.me/operations/2.6.1/index.html'
+  s.documentation_url = 'http://docs.danthorpe.me/operations/2.7.0/index.html'
   s.social_media_url  = 'https://twitter.com/danthorpe'
   s.requires_arc      = true
   s.ios.deployment_target = '8.0'
@@ -32,6 +32,12 @@ session Advanced NSOperations: https://developer.apple.com/videos/wwdc/2015/?id=
       'Sources/Features/Shared',
       'Sources/Features/iOS'
     ]
+    ss.ios.exclude_files = [
+      'Sources/Features/Shared/CloudCapability.swift',
+      'Sources/Features/Shared/CloudKit*.swift',			
+      'Sources/Features/iOS/PhotosCapability.swift',
+      'Sources/Features/iOS/PassbookCapability.swift'
+    ]
     ss.watchos.exclude_files = [
       'Sources/Core/iOS',
       'Sources/Features/iOS/LocationCapability.swift',
@@ -43,7 +49,7 @@ session Advanced NSOperations: https://developer.apple.com/videos/wwdc/2015/?id=
       'Sources/Features/iOS/WebpageOperation.swift',
       'Sources/Features/Shared/CloudCapability.swift',
       'Sources/Features/Shared/ReachabilityCondition.swift',
-      'Sources/Features/Shared/CloudKitOperation.swift',
+      'Sources/Features/Shared/CloudKit*.swift',
       'Sources/Features/Shared/ReachableOperation.swift',
       'Sources/Features/Shared/Reachability.swift'
     ]
@@ -60,7 +66,9 @@ session Advanced NSOperations: https://developer.apple.com/videos/wwdc/2015/?id=
     ]
     ss.osx.exclude_files = [
       'Sources/Core/iOS',
-      'Sources/Features/iOS'
+      'Sources/Features/iOS',
+      'Sources/Features/Shared/CloudCapability.swift',
+      'Sources/Features/Shared/CloudKit*.swift'
     ]
   end
 
@@ -120,7 +128,39 @@ session Advanced NSOperations: https://developer.apple.com/videos/wwdc/2015/?id=
       'Sources/Extras/Contacts/iOS'
     ]
   end
-
+	
+  # Subspec which includes CloudKit functionality
+  s.subspec '+CloudKit' do |ss|
+    ss.platforms = { :ios => "8.0", :tvos => "9.0", :osx => "10.10" }
+    ss.dependency 'Operations/Standard'
+    ss.frameworks = 'CloudKit'    
+    ss.source_files = [
+      'Sources/Features/Shared/CloudCapability.swift',
+      'Sources/Features/Shared/CloudKitInterface.swift',
+      'Sources/Features/Shared/CloudKitOperation.swift',
+      'Sources/Features/Shared/CloudKitOperationExtensions.swift'
+    ]
+  end
+	
+  # Subspec which includes Photos functionality
+  s.subspec '+Photos' do |ss|
+    ss.platforms = { :ios => "8.0" }
+    ss.dependency 'Operations/Standard'
+    ss.frameworks = 'Photos'
+    ss.source_files = [
+      'Sources/Features/iOS/PhotosCapability.swift'
+    ]
+  end
+	
+  # Subspec which includes Passbook functionality
+  s.subspec '+Passbook' do |ss|
+    ss.platforms = { :ios => "8.0" }
+    ss.dependency 'Operations/Standard'
+    ss.frameworks = 'PassKit'
+    ss.source_files = [
+      'Sources/Features/iOS/PassbookCapability.swift'
+    ]
+  end
 end
 
 

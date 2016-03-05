@@ -32,7 +32,7 @@ public protocol PresentingViewController: class {
     - parameter vc: the `UIViewController` being presented.
     - parameter sender: an optional `AnyObject`, usually this is a `UIControl`.
     */
-    func showViewController(vc: UIViewController, sender: AnyObject?)
+    func showViewController(viewController: UIViewController, sender: AnyObject?)
 
     @available(iOS 8.0, *)
     /**
@@ -41,21 +41,21 @@ public protocol PresentingViewController: class {
     - parameter vc: the `UIViewController` being presented.
     - parameter sender: an optional `AnyObject`, usually this is a `UIControl`.
     */
-    func showDetailViewController(vc: UIViewController, sender: AnyObject?)
+    func showDetailViewController(viewController: UIViewController, sender: AnyObject?)
 }
 
 extension UIViewController: PresentingViewController { }
 
 /**
 A simple enum to convey how a view controller should be presented. The view controller
-which performs the presentation is stored as an associated type, and is generic. So, 
+which performs the presentation is stored as an associated type, and is generic. So,
 to present a detail view controller from a master view controller say, it would be
 used like this
 
     let from: ViewControllerDisplayStyle = .ShowDetail(masterViewController)
     from.displayController(detailViewController, sender: .None, completion: .None)
 
-This enum is used as an argument for the `UIOperation` class which usually is 
+This enum is used as an argument for the `UIOperation` class which usually is
 responsible for creating the view controller which is to be presented.
 */
 public enum ViewControllerDisplayStyle<ViewController: PresentingViewController> {
@@ -78,25 +78,29 @@ public enum ViewControllerDisplayStyle<ViewController: PresentingViewController>
 
     /**
     A function which will present the view controller from the associated view controller property.
-    
-    When the style is `.Present`, and the controller is not a `UIAlertController`, it is automatically
-    placed as the root controller of a `UINavigationController` which is then presented.
+
+    When the style is `.Present`, the controller is not a `UIAlertController`, and
+    inNavigationController is set to true (as it is by default), it is automatically placed as
+    the root controller of a `UINavigationController` which is then presented.
 
     - parameter controller: a `UIViewController` subclass which will be presented.
+     - parameter inNavigationController: a Bool indicating whether to wrap controller in a
+     UINavigationController when presenting, defaults to true
     - parameter sender: an optional `AnyObject` used as the sender when showing the view controller
     - parameter completion: an optional completion block, defaults to .None.
     */
-    public func displayController<C where C: UIViewController>(controller: C, sender: AnyObject?, completion: (() -> Void)? = .None) {
+    public func displayController<C where C: UIViewController>(controller: C, inNavigationController: Bool = true, sender: AnyObject?, completion: (() -> Void)? = .None) {
         switch self {
 
         case .Present(let from):
-            if controller is UIAlertController {
-                from.presentViewController(controller, animated: true, completion: completion)
+            let presented: UIViewController
+            if controller is UIAlertController || inNavigationController == false {
+                presented = controller
             }
             else {
-                let nav = UINavigationController(rootViewController: controller)
-                from.presentViewController(nav, animated: true, completion: completion)
+                presented = UINavigationController(rootViewController: controller)
             }
+            from.presentViewController(presented, animated: true, completion: completion)
 
         case .Show(let from):
             from.showViewController(controller, sender: sender)
@@ -112,9 +116,9 @@ public enum ViewControllerDisplayStyle<ViewController: PresentingViewController>
 /**
 `UIOperation` is an `Operation` subclass which is responsible for presenting one view controller
 from another view controller. The operation is generic over both of these types. It uses
-standard `UIViewController` presentation APIs. These APIs have been condensed into the 
+standard `UIViewController` presentation APIs. These APIs have been condensed into the
 `PresentingViewController` protocol, meaning that the *presenting* generic type is just something
-conforming to this protocol. This is for testing purposes, don't let it confuse you, the From 
+conforming to this protocol. This is for testing purposes, don't let it confuse you, the From
 generic type is your view controller.
 
 However, note that the presenting view controller is associated into a `ViewControllerDisplayStyle`.
@@ -132,39 +136,42 @@ public class UIOperation<C, From where C: UIViewController, From: PresentingView
     /// The `AnyObject` sender.
     public let sender: AnyObject?
 
+    public let wrapInNavigationController: Bool
+
     /**
-    Construct a `UIOperation` with the presented view controller, the presenting view controller display 
+    Construct a `UIOperation` with the presented view controller, the presenting view controller display
     style, and optional sender and completion blocks. For example...
-    
+
         let ui = UIOperation(
-            controller: detailViewController, 
+            controller: detailViewController,
             displayControllerFrom: .ShowDetail(myViewController)
         )
-    
+
     - parameter controller: the generic `UIViewController` subclass.
     - parameter displayControllerFrom: a ViewControllerDisplayStyle<From> value.
+     - parameter inNavigationController: a Bool indicating whether to wrap controller in a
+     UINavigationController when presenting, defaults to true
     - parameter sender: an optional `AnyObject` see docs for UIViewController.
-    - parameter completion: an optional void block, see docs for UIViewController.
     */
-    public init(controller: C, displayControllerFrom from: ViewControllerDisplayStyle<From>, sender: AnyObject? = .None) {
+    public init(controller: C, displayControllerFrom from: ViewControllerDisplayStyle<From>, inNavigationController: Bool = true, sender: AnyObject? = .None) {
         self.controller = controller
         self.from = from
         self.sender = sender
+        self.wrapInNavigationController = inNavigationController
         super.init()
         name = "UIOperation<\(C.self)>"
     }
 
     /**
     When the operation executes, on the main queue, it calls `displayController` on the
-    ViewControllerDisplayStyle, which in turn will execute either `presentViewController`, 
+    ViewControllerDisplayStyle, which in turn will execute either `presentViewController`,
     `showViewController`, or `showDetailViewController`.
     */
     public override func execute() {
         dispatch_async(Queue.Main.queue) {
-            self.from.displayController(self.controller, sender: self.sender) {
+            self.from.displayController(self.controller, inNavigationController: self.wrapInNavigationController, sender: self.sender) {
                 self.finish()
             }
         }
     }
 }
-

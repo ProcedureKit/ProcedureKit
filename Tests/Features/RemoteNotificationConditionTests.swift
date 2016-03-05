@@ -17,7 +17,7 @@ class TestableRemoteNotificationRegistrar: RemoteNotificationRegistrarType {
     init(error: NSError? = .None) {
         self.error = error
     }
-    
+
     func opr_registerForRemoteNotifications() {
         didRegister = true
         if let error = error {
@@ -54,7 +54,7 @@ class RemoteNotificationConditionTests: OperationTests {
 
         let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
         var receivedErrors = [ErrorType]()
-        operation.addObserver(FinishedObserver { _, errors in
+        operation.addObserver(DidFinishObserver { _, errors in
             receivedErrors = errors
             expectation.fulfill()
         })
@@ -74,6 +74,3 @@ class RemoteNotificationConditionTests: OperationTests {
         }
     }
 }
-
-
-

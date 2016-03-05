@@ -13,13 +13,13 @@ public class ComposedOperation<T: NSOperation>: Operation, OperationDidFinishObs
     public let target: Operation
     public var operation: T
 
-    public convenience init(_ op: T) {
-        self.init(operation: op)
+    public convenience init(_ operation: T) {
+        self.init(operation: operation)
     }
 
-    init(operation op: T) {
-        self.target = op as? Operation ?? GroupOperation(operations: [op])
-        self.operation = op
+    init(operation composed: T) {
+        target = composed as? Operation ?? GroupOperation(operations: [composed])
+        operation = composed
         super.init()
         name = "Composed Operation"
         target.name = "Composed <\(T.self)>"
@@ -27,6 +27,7 @@ public class ComposedOperation<T: NSOperation>: Operation, OperationDidFinishObs
     }
 
     public override func cancel() {
+        target.cancel()
         operation.cancel()
         super.cancel()
     }
@@ -36,10 +37,9 @@ public class ComposedOperation<T: NSOperation>: Operation, OperationDidFinishObs
         produceOperation(target)
     }
 
-    public func operationDidFinish(operation: Operation, errors: [ErrorType]) {
-        if operation == target {
+    public func didFinishOperation(operation: Operation, errors: [ErrorType]) {
+        if operation === target {
             finish(errors)
         }
     }
 }
-

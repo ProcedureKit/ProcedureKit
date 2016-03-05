@@ -10,7 +10,7 @@ import CoreLocation
 
 /**
  An enum for LocationUsage
- 
+
  There are two methods which request authorization for
  CLLocationManager.
 */
@@ -216,6 +216,3 @@ public extension Capability {
 
 @available(*, unavailable, renamed="AuthorizedFor(Capability.Location(.WhenInUse))")
 public typealias LocationCondition = AuthorizedFor<Capability.Location>
-
-
-

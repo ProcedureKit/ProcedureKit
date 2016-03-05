@@ -62,4 +62,3 @@ class PassbookCapabilityTests: XCTestCase {
         XCTAssertTrue(didComplete)
     }
 }
-

@@ -17,7 +17,7 @@ public struct TimeoutObserver: OperationDidStartObserver {
     private let timeout: NSTimeInterval
 
     /**
-    Initialize the operation observer with a timeout, which will start when 
+    Initialize the operation observer with a timeout, which will start when
     the operation to which it is attached starts.
 
     - parameter timeout: a `NSTimeInterval` value.
@@ -31,10 +31,10 @@ public struct TimeoutObserver: OperationDidStartObserver {
     a block using dispatch_after and the time interval. When the block runs,
     if the operation has not finished and is not cancelled, then it will
     cancel it with an error of `OperationError.OperationTimedOut`
-    
+
     - parameter operation: the `Operation` which will be cancelled if the timeout is reached.
     */
-    public func operationDidStart(operation: Operation) {
+    public func didStartOperation(operation: Operation) {
         let when = dispatch_time(DISPATCH_TIME_NOW, Int64(timeout * Double(NSEC_PER_SEC)))
 
         dispatch_after(when, Queue.Default.queue) {
@@ -45,4 +45,3 @@ public struct TimeoutObserver: OperationDidStartObserver {
         }
     }
 }
-

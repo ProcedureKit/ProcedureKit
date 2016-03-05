@@ -1,7 +1,7 @@
 ![](https://raw.githubusercontent.com/danthorpe/Operations/development/header.png)
 
 [![Build status](https://badge.buildkite.com/4bc80b0824c6357ae071342271cb503b8994cf0cfa58645849.svg?branch=master)](https://buildkite.com/blindingskies/operations)
-[![codecov.io](http://codecov.io/github/danthorpe/Operations/coverage.svg?branch=development)](http://codecov.io/github/danthorpe/Operations?branch=development)
+[![Coverage Status](https://coveralls.io/repos/github/danthorpe/Operations/badge.svg?branch=development)](https://coveralls.io/github/danthorpe/Operations?branch=development)
 [![CocoaPods Compatible](https://img.shields.io/cocoapods/v/Operations.svg)](https://img.shields.io/cocoapods/v/Operations.svg)
 [![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/Carthage/Carthage)
 [![Platform](https://img.shields.io/cocoapods/p/Operations.svg?style=flat)](http://cocoadocs.org/docsets/Operations)
@@ -15,6 +15,7 @@ Resource | Where to find it
 Session video | [developer.apple.com](https://developer.apple.com/videos/wwdc/2015/?id=226)
 Reference documentation | [docs.danthorpe.me/operations](http://docs.danthorpe.me/operations/2.6.1/index.html)
 Programming guide | [operations.readme.io](https://operations.readme.io)
+Example projects | [danthorpe/Examples](https://github.com/danthorpe/Examples)
 
 ## Usage
 
@@ -68,7 +69,7 @@ operation.addCondition(BlockCondition {
 
 Conditions can be mutually exclusive. This is akin to a lock being held preventing other operations with the same exclusion being executed.
 
-The framework provides the following conditions: `AuthorizedFor`, `BlockCondition`, `MutuallyExclusive`, `NegatedCondition`, `NoFailedDependenciesCondition`, `SilentCondition`, `ReachilityCondition`, `RemoteNotificationCondition`, `UserConfirmationCondition` and `UserNotificationCondition`.
+The framework provides the following conditions: `AuthorizedFor`, `BlockCondition`, `MutuallyExclusive`, `NegatedCondition`, `NoFailedDependenciesCondition`, `SilentCondition`, `ReachabilityCondition`, `RemoteNotificationCondition`, `UserConfirmationCondition` and `UserNotificationCondition`.
 
 See the programming guide on [Conditions](https://operations.readme.io/docs/conditions) for more information.
 

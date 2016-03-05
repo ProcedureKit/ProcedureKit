@@ -175,7 +175,7 @@ class HeathCapabilityTests: HealthTests {
     }
 
     func test__authorization_status_queries_register() {
-        capability.authorizationStatus { XCTAssertEqual($0.count, 3) }        
+        capability.authorizationStatus { XCTAssertEqual($0.count, 3) }
         XCTAssertNotNil(registrar.didCheckAuthorizationStatusForTypes)
         XCTAssertEqual(registrar.didCheckAuthorizationStatusForTypes, requirement.share)
     }
@@ -214,4 +214,3 @@ class HeathCapabilityTests: HealthTests {
         XCTAssertTrue(didComplete)
     }
 }
-

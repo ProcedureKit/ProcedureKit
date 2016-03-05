@@ -64,15 +64,18 @@ struct TestCondition: OperationCondition {
 
 class TestQueueDelegate: OperationQueueDelegate {
 
-    typealias DidFinishOperation = (NSOperation, [ErrorType]) -> Void
+    typealias FinishBlockType = (NSOperation, [ErrorType]) -> Void
 
-    let didFinishOperation: DidFinishOperation?
+    let willFinishOperation: FinishBlockType?
+    let didFinishOperation: FinishBlockType?
 
     var did_willAddOperation: Bool = false
+    var did_operationWillFinish: Bool = false
     var did_operationDidFinish: Bool = false
     var did_numberOfErrorThatOperationDidFinish: Int = 0
 
-    init(didFinishOperation: DidFinishOperation? = .None) {
+    init(willFinishOperation: FinishBlockType? = .None, didFinishOperation: FinishBlockType? = .None) {
+        self.willFinishOperation = willFinishOperation
         self.didFinishOperation = didFinishOperation
     }
 
@@ -80,7 +83,13 @@ class TestQueueDelegate: OperationQueueDelegate {
         did_willAddOperation = true
     }
 
-    func operationQueue(queue: OperationQueue, operationDidFinish operation: NSOperation, withErrors errors: [ErrorType]) {
+    func operationQueue(queue: OperationQueue, willFinishOperation operation: NSOperation, withErrors errors: [ErrorType]) {
+        did_operationWillFinish = true
+        did_numberOfErrorThatOperationDidFinish = errors.count
+        willFinishOperation?(operation, errors)
+    }
+
+    func operationQueue(queue: OperationQueue, didFinishOperation operation: NSOperation, withErrors errors: [ErrorType]) {
         did_operationDidFinish = true
         did_numberOfErrorThatOperationDidFinish = errors.count
         didFinishOperation?(operation, errors)
@@ -88,7 +97,7 @@ class TestQueueDelegate: OperationQueueDelegate {
 }
 
 class OperationTests: XCTestCase {
-    
+
     var queue: OperationQueue!
     var delegate: TestQueueDelegate!
 
@@ -136,14 +145,14 @@ class OperationTests: XCTestCase {
 
     func addCompletionBlockToTestOperation(operation: Operation, withExpectation expectation: XCTestExpectation) {
         weak var weakExpectation = expectation
-        operation.addObserver(FinishedObserver { (_, _) in
+        operation.addObserver(DidFinishObserver { _, _ in
             weakExpectation?.fulfill()
         })
     }
 
     func addCompletionBlockToTestOperation(operation: Operation, withExpectationDescription text: String = __FUNCTION__) -> XCTestExpectation {
         let expectation = expectationWithDescription("Test: \(text), \(NSUUID().UUIDString)")
-        operation.addObserver(FinishedObserver { _, _ in
+        operation.addObserver(DidFinishObserver { _, _ in
             expectation.fulfill()
         })
         return expectation
@@ -254,6 +263,15 @@ class BasicTests: OperationTests {
         XCTAssertTrue(operation.cancelled)
         XCTAssertTrue(operation.failed)
     }
+
+    func test__adding_array_of_operations() {
+        let operations = (0..<3).map { _ in BlockOperation {  } }
+        queue.addOperations(operations)
+    }
+
+    func test__adding_variable_argument_of_operations() {
+        queue.addOperations(BlockOperation { }, BlockOperation { })
+    }
 }
 
 class BlockOperationTests: OperationTests {
@@ -354,17 +372,17 @@ class CompletionBlockOperationTests: OperationTests {
         _queue.addOperation(operation)
         waitForExpectationsWithTimeout(3, handler: nil)
     }
-    
+
 
 //    This unit test is disabled. It highlights
-//    a possible bug, or issue with KVO notifications and/or 
+//    a possible bug, or issue with KVO notifications and/or
 //    NSOperation not calling `start()` after an operation becomes
 //    Ready.
-//    
+//
 //    The issue which reported this bug is here:
 //    https:github.com/danthorpe/Operations/issues/175
-//    
-//    The PR which investigated it is here: 
+//
+//    The PR which investigated it is here:
 //    https:github.com/danthorpe/Operations/pull/180
 
     func test__many_completion_blocks_are_executed() {
@@ -388,7 +406,7 @@ class OperationDependencyTests: OperationTests {
 
     func test__dependent_operations_always_run() {
         queue.maxConcurrentOperationCount = 1
-        let count = 2_000
+        let count = 1_000
         var counter1: Int = 0
         var counter2: Int = 0
         var counter3: Int = 0
@@ -423,7 +441,7 @@ class OperationDependencyTests: OperationTests {
             runOperations(op1, op2, op3)
         }
 
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForExpectationsWithTimeout(6, handler: nil)
 
         XCTAssertEqual(counter1, count)
         XCTAssertEqual(counter2, count)
@@ -602,9 +620,3 @@ class CancellationOperationTests: OperationTests {
         XCTAssertFalse(operation.didExecute)
     }
 }
-
-
-
-
-
-

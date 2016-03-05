@@ -124,4 +124,3 @@ class EventsCapabilityTests: XCTestCase {
 
 
 }
-

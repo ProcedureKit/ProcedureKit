@@ -22,9 +22,9 @@ public class AddressBookOperation: Operation {
         addressBook = AddressBook(registrar: registrar)
     }
 
-    init(registrar r: AddressBookPermissionRegistrar) {
-        registrar = r
-        addressBook = AddressBook(registrar: registrar)
+    init(registrar: AddressBookPermissionRegistrar) {
+        self.addressBook = AddressBook(registrar: registrar)
+        self.registrar = registrar
     }
 
     final func requestAccess() {
@@ -81,12 +81,14 @@ public class AddressBookGetResource: AddressBookOperation {
             }
         }
 
+        // swiftlint:disable variable_name_min_length
         var id: ABRecordID? {
             switch self {
             case .ID(let id): return id
             default: return .None
             }
         }
+        // swiftlint:enable variable_name_min_length
     }
 
     public var inSource: Source? = .DefaultSource
@@ -278,7 +280,7 @@ public class AddressBookRemoveGroup: AddressBookGetGroup {
 @available(iOS, deprecated=9.0)
 public class AddressBookAddPersonToGroup: AddressBookGetResource {
 
-    @available(iOS, deprecated=9.0)    
+    @available(iOS, deprecated=9.0)
     public init(group: String, personID: Int32) {
         super.init()
         groupQuery = .Name(group)
@@ -352,7 +354,7 @@ public class AddressBookRemovePersonFromGroup: AddressBookGetResource {
         if let error = addressBook.save() {
             return error
         }
-        
+
         return .None
     }
 }
@@ -393,8 +395,3 @@ public class AddressBookMapPeople<T>: AddressBookGetResource {
         return .None
     }
 }
-
-
-
-
-

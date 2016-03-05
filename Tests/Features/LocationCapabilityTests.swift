@@ -203,6 +203,3 @@ class LocationCapabilityTests: OperationTests {
         XCTAssertTrue(didComplete)
     }
 }
-
-
-

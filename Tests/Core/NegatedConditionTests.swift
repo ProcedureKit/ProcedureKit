@@ -17,11 +17,11 @@ class NegatedConditionTests: OperationTests {
         operation.addCondition(NegatedCondition(BlockCondition { true }))
 
         var receivedErrors = [ErrorType]()
-        operation.addObserver(FinishedObserver { _, errors in
+        operation.addObserver(DidFinishObserver { _, errors in
             receivedErrors = errors
             expectation.fulfill()
         })
-        
+
         runOperation(operation)
 
         waitForExpectationsWithTimeout(3, handler: nil)

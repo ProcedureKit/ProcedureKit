@@ -95,6 +95,19 @@ class ViewControllerDisplayStyleTests: XCTestCase {
         style.displayController(other, sender: .None)
     }
 
+    func test__present_display_controller_navigation_controller_wrapping_can_be_overridden() {
+        controller.check = { received in
+            guard let _ = received as? UINavigationController else {
+                XCTAssertEqual(received, self.other)
+                return
+            }
+            XCTFail("Should not have received a UINavigationController")
+        }
+
+        style = .Present(controller)
+        style.displayController(other, inNavigationController: false, sender: .None)
+    }
+
     func test__present_display_alert_controller() {
         let alert = UIAlertController()
         controller.check = { received in
@@ -126,7 +139,7 @@ class UIOperationTests: OperationTests {
         presented = nil
         super.tearDown()
     }
-    
+
     func test__presents() {
         let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
 
@@ -141,10 +154,40 @@ class UIOperationTests: OperationTests {
         waitForExpectationsWithTimeout(3, handler: nil)
 
         XCTAssertTrue(completionBlockDidRun)
+    }
 
+    func test__presents_with_navigation_controller_wrapping_by_default() {
+        let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
+
+        presenter.check = { [unowned self] received in
+            guard let nav = received as? UINavigationController else {
+                XCTFail("Should have received a UINavigationController")
+                return
+            }
+            XCTAssertEqual(nav.topViewController, self.presented)
+            expectation.fulfill()
+        }
+
+        operation = TypeUnderTest(controller: presented, displayControllerFrom: .Present(presenter), sender: .None)
+        runOperation(operation)
+        waitForExpectationsWithTimeout(3, handler: nil)
+    }
+
+
+    func test__presents_without_navigation_controller_when_wrapping_overridden() {
+        let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
+
+        presenter.check = { [unowned self] received in
+            guard let _ = received as? UINavigationController else {
+                XCTAssertEqual(received, self.presented)
+                expectation.fulfill()
+                return
+            }
+            XCTFail("Should not have received a UINavigationController")
+        }
+
+        operation = TypeUnderTest(controller: presented, displayControllerFrom: .Present(presenter), inNavigationController: false, sender: .None)
+        runOperation(operation)
+        waitForExpectationsWithTimeout(3, handler: nil)
     }
 }
-
-
-
-

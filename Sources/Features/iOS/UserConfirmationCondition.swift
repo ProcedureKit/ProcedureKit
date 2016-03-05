@@ -69,15 +69,9 @@ public class UserConfirmationCondition<From: PresentingViewController>: Operatio
     }
 }
 
-extension UserConfirmationCondition: OperationObserver {
+extension UserConfirmationCondition: OperationDidFinishObserver {
 
-    public func operationDidStart(operation: Operation) { /* No operation */ }
-
-    public func operationDidCancel(operation: Operation) { /* No operation */ }
-
-    public func operation(operation: Operation, didProduceOperation newOperation: NSOperation) { /* No operation */ }
-
-    public func operationDidFinish(operation: Operation, errors: [ErrorType]) {
+    public func didFinishOperation(operation: Operation, errors: [ErrorType]) {
         if operation == alert {
             alertOperationErrors = errors
         }

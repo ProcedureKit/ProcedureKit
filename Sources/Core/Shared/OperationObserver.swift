@@ -12,7 +12,28 @@ import Foundation
  Types which conform to this protocol, can be attached to `Operation` subclasses before
  they are added to a queue.
  */
-public protocol OperationObserverType { }
+public protocol OperationObserverType {
+
+    /**
+     Observer gets notified when it is attached to an operation.
+
+     - parameter operation: the observed `Operation`.
+    */
+    func didAttachToOperation(operation: Operation)
+}
+
+
+
+public extension OperationObserverType {
+
+    /**
+     Default implementation of didAttachToOperation
+     is a none-operation.
+
+     - parameter operation: the observed `Operation`.
+    */
+    func didAttachToOperation(operation: Operation) { /* No operation */ }
+}
 
 
 
@@ -25,11 +46,10 @@ public protocol OperationDidStartObserver: OperationObserverType {
     /**
      The operation started.
 
-     - parameter operaton: the observed `Operation`.
+     - parameter operation: the observed `Operation`.
      */
-    func operationDidStart(operation: Operation)
+    func didStartOperation(operation: Operation)
 }
-
 
 
 /**
@@ -41,11 +61,10 @@ public protocol OperationDidCancelObserver: OperationObserverType {
     /**
      The operation was cancelled.
 
-     - parameter operaton: the observed `Operation`.
+     - parameter operation: the observed `Operation`.
      */
-    func operationDidCancel(operation: Operation)
+    func didCancelOperation(operation: Operation)
 }
-
 
 
 /**
@@ -60,12 +79,26 @@ public protocol OperationDidProduceOperationObserver: OperationObserverType {
      queue. Note that this isn't necessarily an `Operation`, so be careful, if you
      intend to automatically start observing it.
 
-     - parameter operaton: the observed `Operation`.
+     - parameter operation: the observed `Operation`.
      - parameter newOperation: the produced `NSOperation`
      */
     func operation(operation: Operation, didProduceOperation newOperation: NSOperation)
 }
 
+
+/**
+ Types which confirm to this protocol, can be attached to `Operation` subclasses.
+ */
+public protocol OperationWillFinishObserver: OperationObserverType {
+
+    /**
+     The operation will finish. Any errors that were encountered are collected here.
+
+     - parameter operation: the observed `Operation`.
+     - parameter errors: an array of `ErrorType`s.
+     */
+    func willFinishOperation(operation: Operation, errors: [ErrorType])
+}
 
 
 /**
@@ -77,12 +110,11 @@ public protocol OperationDidFinishObserver: OperationObserverType {
     /**
      The operation did finish. Any errors that were encountered are collected here.
 
-     - parameter operaton: the observed `Operation`.
+     - parameter operation: the observed `Operation`.
      - parameter errors: an array of `ErrorType`s.
      */
-    func operationDidFinish(operation: Operation, errors: [ErrorType])
+    func didFinishOperation(operation: Operation, errors: [ErrorType])
 }
-
 
 
 /**
@@ -90,5 +122,4 @@ public protocol OperationDidFinishObserver: OperationObserverType {
  they are added to a queue. They will receive callbacks when the operation starts,
  produces a new operation, and finishes.
  */
-public protocol OperationObserver: OperationDidStartObserver, OperationDidCancelObserver, OperationDidProduceOperationObserver, OperationDidFinishObserver { }
-
+public protocol OperationObserver: OperationDidStartObserver, OperationDidCancelObserver, OperationDidProduceOperationObserver, OperationWillFinishObserver, OperationDidFinishObserver { }

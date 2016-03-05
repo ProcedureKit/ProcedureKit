@@ -43,23 +43,23 @@ public struct HealthRequirement {
 public class HealthCapabilityStatus: NSObject, AuthorizationStatusType {
     typealias DictionaryType = Dictionary<String, HKAuthorizationStatus>
 
-    var _dictionary = DictionaryType()
+    var dictionary = DictionaryType()
 
     /// Access the HKAuthorizationStatus by the share identifier.
     public subscript(key: DictionaryType.Key) -> DictionaryType.Value? {
         get {
-            return _dictionary[key]
+            return dictionary[key]
         }
         set(newStatus) {
-            _dictionary[key] = newStatus
+            dictionary[key] = newStatus
         }
     }
 
 
     /// Determine whether the application permissions have been met.
     public func isRequirementMet(requirement: HealthRequirement) -> Bool {
-        if requirement.shareIdentifiers.isSubsetOf(_dictionary.keys) {
-            let statuses = Set(_dictionary.values)
+        if requirement.shareIdentifiers.isSubsetOf(dictionary.keys) {
+            let statuses = Set(dictionary.values)
             if statuses.count == 1 && statuses.first! == .SharingAuthorized {
                 return true
             }
@@ -128,7 +128,7 @@ extension HKHealthStore: HealthCapabilityRegistrarType {
 
 /**
  The Health capability, which is generic over a HealthCapabilityRegistrarType.
- 
+
  Framework consumers should not use this directly, but instead
  use Capability.Health. So that its usage is like this:
 
@@ -208,7 +208,7 @@ extension Capability {
 
     /**
      # Capability.Heath
-     
+
      This type represents the app's permission to access HealthKit.
 
      For framework consumers - use with GetAuthorizationStatus, Authorize and
@@ -221,10 +221,10 @@ extension Capability {
         // etc
      }
      ```
-     
+
      Capability.Health is not included in the module if installing via
      Carthage. However, it can be used if installing with CocoaPods
-     
+
      ```ruby
      pod 'Operations/+Health'
      ```
@@ -240,8 +240,8 @@ extension HealthRequirement: Equatable { }
 /**
  HealthRequirement is Equatable
 */
-public func ==(a: HealthRequirement, b: HealthRequirement) -> Bool {
-    return (a.share == b.share) && (a.read == b.read)
+public func == (lhs: HealthRequirement, rhs: HealthRequirement) -> Bool {
+    return (lhs.share == rhs.share) && (lhs.read == rhs.read)
 }
 
 /**
@@ -251,28 +251,26 @@ extension HealthCapabilityStatus: CollectionType {
 
     /// - returns: the DictionaryType.Index start
     public var startIndex: DictionaryType.Index {
-        return _dictionary.startIndex
+        return dictionary.startIndex
     }
 
     /// - returns: the DictionaryType.Index end
     public var endIndex: DictionaryType.Index {
-        return _dictionary.endIndex
+        return dictionary.endIndex
     }
 
     /// - returns: the HKAuthorizationStatus by identifier
     public subscript(position: DictionaryType.Index) -> DictionaryType.Generator.Element {
-        return _dictionary[position]
+        return dictionary[position]
     }
 
     /// - returns: a sub sequence for the bounds
     public subscript(bounds: Range<DictionaryType.Index>) -> DictionaryType.SubSequence {
-        return _dictionary[bounds]
+        return dictionary[bounds]
     }
 
     /// - returns: a generator
     public func generate() -> DictionaryType.Generator {
-        return _dictionary.generate()
+        return dictionary.generate()
     }
 }
-
-

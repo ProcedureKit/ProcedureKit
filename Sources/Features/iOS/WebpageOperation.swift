@@ -30,11 +30,10 @@ public class WebpageOperation<From: PresentingViewController>: Operation, SFSafa
         operation.controller.delegate = self
         produceOperation(operation)
     }
-    
+
     @objc public func safariViewControllerDidFinish(controller: SFSafariViewController) {
         controller.dismissViewControllerAnimated(true) {
             self.finish()
         }
     }
 }
-
