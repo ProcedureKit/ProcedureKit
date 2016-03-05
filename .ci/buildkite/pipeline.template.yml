@@ -1,5 +1,13 @@
 steps:
-# iOS tests first on the same agent
+  -
+    name: ":muscle: Lint"
+    command: .ci/scripts/lint    
+  -
+    name: ":fastlane: Test OS X Extension"
+    command: .ci/scripts/test-osx-extension
+  -
+    name: ":fastlane: Test Mac OS X"
+    command: .ci/scripts/test-osx
   -
     name: ":fastlane: Test iOS Extension"
     command: .ci/scripts/test-ios-extension
@@ -17,14 +25,4 @@ steps:
     command: .ci/scripts/send-coverage
     agents:
       name: "$BUILDKITE_AGENT_META_DATA_NAME"
-# The rest can be spread across different agents
-  -
-    name: ":muscle: Lint"
-    command: .ci/scripts/lint    
-  -
-    name: ":fastlane: Test OS X Extension"
-    command: .ci/scripts/test-osx-extension
-  -
-    name: ":fastlane: Test Mac OS X"
-    command: .ci/scripts/test-osx    
 
