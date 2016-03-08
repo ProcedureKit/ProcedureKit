@@ -10,6 +10,7 @@
 
 import Foundation
 
+// swiftlint:disable type_body_length
 /**
 Abstract base Operation class which subclasses `NSOperation`.
 
@@ -183,7 +184,93 @@ public class Operation: NSOperation {
             _log = newValue
         }
     }
+
+    /**
+     Add a condition to the to the operation, can only be done prior to the operation starting.
+
+     - requires: self must not have started yet. i.e. either hasn't been added
+     to a queue, or is waiting on dependencies.
+     - parameter condition: type conforming to protocol `OperationCondition`.
+     */
+    public func addCondition(condition: OperationCondition) {
+        assert(state < .EvaluatingConditions, "Cannot modify conditions after operations has begun evaluating conditions, current state: \(state).")
+        conditions.append(condition)
+    }
+
+    /**
+     Add an observer to the to the operation, can only be done
+     prior to the operation starting.
+
+     - requires: self must not have started yet. i.e. either hasn't been added
+     to a queue, or is waiting on dependencies.
+     - parameter observer: type conforming to protocol `OperationObserverType`.
+     */
+    public func addObserver(observer: OperationObserverType) {
+
+        observers.append(observer)
+
+        observer.didAttachToOperation(self)
+    }
+
+    /**
+     Subclasses should override this method to perform their specialized task.
+     They must call a finish methods in order to complete.
+     */
+    public func execute() {
+        print("\(self.dynamicType) must override `execute()`.", terminator: "")
+        finish()
+    }
+
+    /**
+     Subclasses may override `finished(_:)` if they wish to react to the operation
+     finishing with errors.
+
+     - parameter errors: an array of `ErrorType`.
+     */
+    public func finished(errors: [ErrorType]) {
+        // No op.
+    }
+
+    /**
+     Cancel the operation with an error.
+
+     - parameter error: an optional `ErrorType`.
+     */
+    public func cancelWithError(error: ErrorType? = .None) {
+        cancelWithErrors(error.map { [$0] } ?? [])
+    }
+
+    /**
+     Cancel the operation with multiple errors.
+
+     - parameter errors: an `[ErrorType]` defaults to empty array.
+     */
+    public func cancelWithErrors(errors: [ErrorType] = []) {
+        if !errors.isEmpty {
+            log.verbose("Did cancel with errors: \(errors).")
+        }
+        _internalErrors += errors
+        cancel()
+    }
+
+    // MARK: - Cancellation
+
+    public override func cancel() {
+        if !finished {
+
+            log.verbose("Did cancel.")
+
+            _cancelled = true
+
+            if state > .Ready {
+                super.cancel()
+                finish()
+            }
+        }
+    }
 }
+
+// swiftlint:enable type_body_length
 
 // MARK: - State
 
@@ -240,17 +327,17 @@ public extension Operation {
     }
 
     /// Boolean indicator for whether the Operation is currently executing or not
-    override var executing: Bool {
+    final override var executing: Bool {
         return state == .Executing
     }
 
     /// Boolean indicator for whether the Operation has finished or not
-    override var finished: Bool {
+    final override var finished: Bool {
         return state == .Finished
     }
 
     /// Boolean indicator for whether the Operation has cancelled or not
-    override var cancelled: Bool {
+    final override var cancelled: Bool {
         return _cancelled
     }
 
@@ -287,7 +374,7 @@ public extension Operation {
     }
 
     /// Public override to get the dependencies
-    override final var dependencies: [NSOperation] {
+    final override var dependencies: [NSOperation] {
         get {
             var _dependencies = super.dependencies
             guard let
@@ -312,7 +399,7 @@ public extension Operation {
      to a queue, or is waiting on dependencies.
      - parameter operation: a `NSOperation` instance.
      */
-    override final func addDependency(operation: NSOperation) {
+    final override func addDependency(operation: NSOperation) {
         precondition(state <= .Executing, "Dependencies cannot be modified after execution has begun, current state: \(state).")
         (waitForDependenciesOperation ?? createDidFinishDependenciesOperation()).addDependency(operation)
     }
@@ -327,7 +414,7 @@ public extension Operation {
      to a queue, or is waiting on dependencies.
      - parameter operation: a `NSOperation` instance.
      */
-    override final func removeDependency(operation: NSOperation) {
+    final override func removeDependency(operation: NSOperation) {
         precondition(state <= .Executing, "Dependencies cannot be modified after execution has begun, current state: \(state).")
         guard let waiter = waitForDependenciesOperation else {
             return
@@ -352,18 +439,6 @@ public extension Operation {
             self._internalErrors.appendContentsOf(errors)
             self.state = .Ready
         }
-    }
-
-    /**
-     Add a condition to the to the operation, can only be done prior to the operation starting.
-
-     - requires: self must not have started yet. i.e. either hasn't been added
-     to a queue, or is waiting on dependencies.
-     - parameter condition: type conforming to protocol `OperationCondition`.
-     */
-    func addCondition(condition: OperationCondition) {
-        assert(state < .EvaluatingConditions, "Cannot modify conditions after operations has begun evaluating conditions, current state: \(state).")
-        conditions.append(condition)
     }
 }
 
@@ -401,21 +476,6 @@ public extension Operation {
     internal var didFinishObservers: [OperationDidFinishObserver] {
         return observers.flatMap { $0 as? OperationDidFinishObserver }
     }
-
-    /**
-     Add an observer to the to the operation, can only be done
-     prior to the operation starting.
-
-     - requires: self must not have started yet. i.e. either hasn't been added
-     to a queue, or is waiting on dependencies.
-     - parameter observer: type conforming to protocol `OperationObserverType`.
-     */
-    func addObserver(observer: OperationObserverType) {
-
-        observers.append(observer)
-
-        observer.didAttachToOperation(self)
-    }
 }
 
 // MARK: - Execution
@@ -451,15 +511,6 @@ public extension Operation {
     }
 
     /**
-     Subclasses should override this method to perform their specialized task.
-     They must call a finish methods in order to complete.
-     */
-    func execute() {
-        print("\(self.dynamicType) must override `execute()`.", terminator: "")
-        finish()
-    }
-
-    /**
      Produce another operation on the same queue that this instance is on.
 
      - parameter operation: a `NSOperation` instance.
@@ -468,48 +519,6 @@ public extension Operation {
         precondition(state > .Initialized, "Cannot produce operation while not being scheduled on a queue.")
         log.verbose("Did produce \(operation.operationName)")
         didProduceOperationObservers.forEach { $0.operation(self, didProduceOperation: operation) }
-    }
-}
-
-// MARK: - Cancellation
-
-public extension Operation {
-
-    /**
-     Cancel the operation with an error.
-
-     - parameter error: an optional `ErrorType`.
-     */
-    func cancelWithError(error: ErrorType? = .None) {
-        cancelWithErrors(error.map { [$0] } ?? [])
-    }
-
-    /**
-     Cancel the operation with multiple errors.
-
-     - parameter errors: an `[ErrorType]` defaults to empty array.
-     */
-    func cancelWithErrors(errors: [ErrorType] = []) {
-        if !errors.isEmpty {
-            log.verbose("Did cancel with errors: \(errors).")
-        }
-        _internalErrors += errors
-        cancel()
-    }
-
-
-    override func cancel() {
-        if !finished {
-
-            log.verbose("Did cancel.")
-
-            _cancelled = true
-
-            if state > .Ready {
-                super.cancel()
-                finish()
-            }
-        }
     }
 }
 
@@ -552,16 +561,6 @@ public extension Operation {
     }
 
     /**
-     Subclasses may override `finished(_:)` if they wish to react to the operation
-     finishing with errors.
-
-     - parameter errors: an array of `ErrorType`.
-     */
-    func finished(errors: [ErrorType]) {
-        // No op.
-    }
-
-    /**
      Public override which deliberately crashes your app, as usage is considered an antipattern
 
      To promote best practices, where waiting is never the correct thing to do,
@@ -569,7 +568,7 @@ public extension Operation {
      dependencies, or groups, or semaphores or even NSLocking.
 
      */
-    override func waitUntilFinished() {
+    final override func waitUntilFinished() {
         fatalError("Waiting on operations is an anti-pattern. Remove this ONLY if you're absolutely sure there is No Other Way™. Post a question in https://github.com/danthorpe/Operations if you are unsure.")
     }
 }
