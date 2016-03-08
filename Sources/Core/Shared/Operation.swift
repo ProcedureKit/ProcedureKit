@@ -10,6 +10,7 @@
 
 import Foundation
 
+// swiftlint:disable type_body_length
 /**
 Abstract base Operation class which subclasses `NSOperation`.
 
@@ -268,6 +269,8 @@ public class Operation: NSOperation {
         }
     }
 }
+
+// swiftlint:enable type_body_length
 
 // MARK: - State
 
