@@ -44,6 +44,10 @@ class TestOperation: Operation, ResultOperationType {
             self.finish(self.simulatedError)
         }
     }
+    
+    override func finished(errors: [ErrorType]) {
+        // Subclasses must be able to override this method
+    }
 }
 
 struct TestCondition: OperationCondition {
