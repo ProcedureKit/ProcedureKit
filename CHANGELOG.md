@@ -1,3 +1,7 @@
+# 2.7.1
+
+1. [[OPR-219](https://github.com/danthorpe/Operations/issues/220)]: Fixes an issue after refactoring Operation which would prevent subclasses from overriding `finished(errors: [ErrorType])`.
+
 # 2.7.0
 🚀 This release continues the refinement of the framework. Thanks again to everyone who has contributed!
 
