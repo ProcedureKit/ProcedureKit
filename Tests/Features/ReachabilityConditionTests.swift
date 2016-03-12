@@ -23,17 +23,20 @@ class ReachabilityConditionTests: OperationTests {
     }
 
     func test__condition_name() {
-        let condition = ReachabilityCondition(url: url, reachability: manager)
+        let condition = ReachabilityCondition(url: url)
+        condition.reachability = manager
         XCTAssertEqual(condition.name, "Reachability")
     }
 
     func test__is_mutually_exclusivity() {
-        let condition = ReachabilityCondition(url: url, reachability: manager)
+        let condition = ReachabilityCondition(url: url)
+        condition.reachability = manager
         XCTAssertFalse(condition.isMutuallyExclusive)
     }
 
     func test__url() {
-        let condition = ReachabilityCondition(url: url, reachability: manager)
+        let condition = ReachabilityCondition(url: url)
+        condition.reachability = manager
         XCTAssertEqual(condition.url, url)
     }
 
@@ -41,7 +44,8 @@ class ReachabilityConditionTests: OperationTests {
     func test__condition_is_satisfied_when_host_is_reachable_via_wifi() {
 
         let operation = TestOperation()
-        let condition = ReachabilityCondition(url: url, reachability: manager)
+        let condition = ReachabilityCondition(url: url)
+        condition.reachability = manager
         operation.addCondition(condition)
 
         waitForOperation(operation)
@@ -54,7 +58,8 @@ class ReachabilityConditionTests: OperationTests {
 
         let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
         let operation = TestOperation()
-        let condition = ReachabilityCondition(url: url, reachability: manager)
+        let condition = ReachabilityCondition(url: url)
+        condition.reachability = manager
 
         var conditionResult: OperationConditionResult = .Satisfied
         network.flags = []
@@ -79,7 +84,8 @@ class ReachabilityConditionTests: OperationTests {
         let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
 
         let operation = TestOperation()
-        let condition = ReachabilityCondition(url: url, connectivity: .ViaWiFi, reachability: manager)
+        let condition = ReachabilityCondition(url: url, connectivity: .ViaWiFi)
+        condition.reachability = manager
         var conditionResult: OperationConditionResult = .Satisfied
 
         network.flags = [.Reachable, .IsWWAN]

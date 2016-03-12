@@ -25,16 +25,11 @@ public class ReachabilityCondition: OperationCondition {
 
     let url: NSURL
     let connectivity: Reachability.Connectivity
-    let reachability: HostReachabilityType
+    var reachability: HostReachabilityType = ReachabilityManager(DeviceReachability())
 
-    public convenience init(url: NSURL, connectivity: Reachability.Connectivity = .AnyConnectionKind) {
-        self.init(url: url, connectivity: connectivity, reachability: ReachabilityManager(DeviceReachability()))
-    }
-
-    init(url: NSURL, connectivity: Reachability.Connectivity = .AnyConnectionKind, reachability: HostReachabilityType) {
+    public init(url: NSURL, connectivity: Reachability.Connectivity = .AnyConnectionKind) {
         self.url = url
         self.connectivity = connectivity
-        self.reachability = reachability
     }
 
     public func dependencyForOperation(operation: Operation) -> NSOperation? {
