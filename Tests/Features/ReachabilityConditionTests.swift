@@ -104,6 +104,18 @@ class ReachabilityConditionTests: OperationTests {
 
         XCTAssertEqual(error, ReachabilityCondition.Error.NotReachableWithConnectivity(.ViaWiFi))
     }
+
+    func test__condition_succeeds_when_only_wifi_accepted_and_only_wifi_available() {
+        network.flags = [.Reachable]
+
+        let operation = TestOperation()
+        operation.addCondition(ReachabilityCondition(url: url, connectivity: .ViaWiFi, reachability: manager))
+
+        waitForOperation(operation)
+
+        XCTAssertTrue(operation.didExecute)
+        XCTAssertTrue(operation.finished)
+    }
     #endif
 }
 
