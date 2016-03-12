@@ -19,12 +19,13 @@ import Foundation
 */
 public class ReachableOperation<T: NSOperation>: ComposedOperation<T> {
 
-    private let reachability: SystemReachabilityType
     private var token: String? = .None
     private var status: Reachability.NetworkStatus? = .None
 
     /// The required connectivity kind.
     public let connectivity: Reachability.Connectivity
+
+    internal var reachability: SystemReachabilityType = ReachabilityManager.sharedInstance
 
     /**
      Composes an operation to ensure that is will definitely be executed as soon as
@@ -33,13 +34,8 @@ public class ReachableOperation<T: NSOperation>: ComposedOperation<T> {
      - parameter [unlabeled] operation: any `NSOperation` type.
      - parameter connectivity: a `Reachability.Connectivity` value, defaults to `.AnyConnectionKind`.
     */
-    public convenience init(_ operation: T, connectivity: Reachability.Connectivity = .AnyConnectionKind) {
-        self.init(operation: operation, connectivity: connectivity, reachability: ReachabilityManager.sharedInstance)
-    }
-
-    init(operation: T, connectivity: Reachability.Connectivity = .AnyConnectionKind, reachability: SystemReachabilityType) {
+    public init(_ operation: T, connectivity: Reachability.Connectivity = .AnyConnectionKind) {
         self.connectivity = connectivity
-        self.reachability = reachability
         super.init(operation: operation)
         name = "Reachable Operation <\(operation.operationName)>"
     }

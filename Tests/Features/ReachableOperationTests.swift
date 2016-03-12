@@ -19,7 +19,8 @@ class ReachableOperationTests: OperationTests {
         super.setUp()
         network = TestableNetworkReachability()
         manager = ReachabilityManager(network)
-        operation = ReachableOperation(operation: TestOperation(), reachability: manager)
+        operation = ReachableOperation(TestOperation())
+        operation.reachability = manager
     }
 
     func test__operation_name() {
