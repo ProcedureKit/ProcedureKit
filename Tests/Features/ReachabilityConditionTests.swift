@@ -109,8 +109,9 @@ class ReachabilityConditionTests: OperationTests {
         network.flags = [.Reachable]
 
         let operation = TestOperation()
-        operation.addCondition(ReachabilityCondition(url: url, connectivity: .ViaWiFi, reachability: manager))
-
+        let condition = ReachabilityCondition(url: url, connectivity: .ViaWiFi)
+        condition.reachability = manager
+        operation.addCondition(condition)
         waitForOperation(operation)
 
         XCTAssertTrue(operation.didExecute)

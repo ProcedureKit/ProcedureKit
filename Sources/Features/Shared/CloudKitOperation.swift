@@ -13,12 +13,8 @@ import CloudKit
 
 public class OPRCKOperation<T where T: NSOperation, T: CKOperationType>: ReachableOperation<T> {
 
-    convenience init(operation: T) {
-        self.init(operation: operation, connectivity: .AnyConnectionKind, reachability: ReachabilityManager(DeviceReachability()))
-    }
-
-    override init(operation: T, connectivity: Reachability.Connectivity = .AnyConnectionKind, reachability: SystemReachabilityType) {
-        super.init(operation: operation, connectivity: connectivity, reachability: reachability)
+    override init(_ operation: T, connectivity: Reachability.Connectivity = .AnyConnectionKind) {
+        super.init(operation, connectivity: connectivity)
         name = "OPRCKOperation<\(T.self)>"
     }
 }
@@ -236,7 +232,11 @@ public final class CloudKitOperation<T where T: NSOperation, T: CKOperationType>
         let delay = MapGenerator(strategy.generator()) { Delay.By($0) }
 
         // Maps the generator to wrap the target operation.
-        let generator = MapGenerator(gen) { OPRCKOperation(operation: $0, connectivity: connectivity, reachability: reachability) }
+        let generator = MapGenerator(gen) { operation -> OPRCKOperation<T> in
+            let op = OPRCKOperation(operation, connectivity: connectivity)
+            op.reachability = reachability
+            return op
+        }
 
         // Creates a CloudKitRecovery object
         let _recovery = CloudKitRecovery<T>()
