@@ -299,7 +299,7 @@ public extension NSOperation {
      set, this resorts to the class description.
     */
     var operationName: String {
-        return name ?? "\(self)"
+        return name ?? "Unnamed Operation"
     }
 }
 
