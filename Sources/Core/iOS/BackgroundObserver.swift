@@ -25,8 +25,6 @@ if the app goes in the background.
 */
 public class BackgroundObserver: NSObject {
 
-    static let backgroundTaskName = "Background Operation Observer"
-
     private var identifier: UIBackgroundTaskIdentifier? = .None
     private let application: BackgroundTaskApplicationInterface
 
@@ -41,37 +39,12 @@ public class BackgroundObserver: NSObject {
 
     init(app: BackgroundTaskApplicationInterface) {
         application = app
-
         super.init()
-
-        let nc = NSNotificationCenter.defaultCenter()
-        nc.addObserver(self, selector: "didEnterBackground:", name: UIApplicationDidEnterBackgroundNotification, object: .None)
-        nc.addObserver(self, selector: "didBecomeActive:", name: UIApplicationDidBecomeActiveNotification, object: .None)
-
-        if isInBackground {
-            startBackgroundTask()
-        }
     }
 
-    deinit {
-        NSNotificationCenter.defaultCenter().removeObserver(self)
-    }
-
-    @objc func didEnterBackground(notification: NSNotification) {
-        if isInBackground {
-            startBackgroundTask()
-        }
-    }
-
-    @objc func didBecomeActive(notification: NSNotification) {
-        if !isInBackground {
-            endBackgroundTask()
-        }
-    }
-
-    private func startBackgroundTask() {
+    private func startBackgroundTask(operation: Operation) {
         if identifier == nil {
-            identifier = application.beginBackgroundTaskWithName(self.dynamicType.backgroundTaskName) {
+            identifier = application.beginBackgroundTaskWithName("Background Operation Observer \(operation.operationName)") {
                 self.endBackgroundTask()
             }
         }
@@ -82,6 +55,12 @@ public class BackgroundObserver: NSObject {
             application.endBackgroundTask(id)
             identifier = .None
         }
+    }
+}
+
+extension BackgroundObserver: OperationDidStartObserver {
+    public func didStartOperation(operation: Operation) {
+        startBackgroundTask(operation)
     }
 }
 
