@@ -197,8 +197,10 @@ public class Operation: NSOperation {
     override init() {
         super.init()
         #if os(iOS)
-            if backgroundTaskExecutionEnabled {
-                addObserver(BackgroundObserver())
+            if #available(iOS 8, *) {
+                if backgroundTaskExecutionEnabled {
+                    addObserver(BackgroundObserver())
+                }
             }
         #endif
     }
@@ -396,8 +398,7 @@ public extension Operation {
         get {
             var _dependencies = super.dependencies
             guard let
-                waiter = waitForDependenciesOperation,
-                index = _dependencies.indexOf(waiter) else {
+                waiter = waitForDependenciesOperation, index = _dependencies.indexOf(waiter) else {
                     return _dependencies
             }
 
