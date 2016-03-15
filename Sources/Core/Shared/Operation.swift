@@ -104,15 +104,6 @@ public class Operation: NSOperation {
     private(set) var conditions = [OperationCondition]()
     internal var waitForDependenciesOperation: NSOperation? = .None
 
-    #if os(iOS)
-    public var backgroundTaskExecutionEnabled: Bool = {
-        if #available(iOSApplicationExtension 8, *) {
-            return false
-        }
-        return true
-    }()
-    #endif
-
     private var _cancelled = false {
         willSet {
             willChangeValueForKey("Cancelled")
@@ -192,17 +183,6 @@ public class Operation: NSOperation {
         set {
             _log = newValue
         }
-    }
-
-    override init() {
-        super.init()
-        #if os(iOS)
-            if #available(iOS 8, *) {
-                if backgroundTaskExecutionEnabled {
-                    addObserver(BackgroundObserver())
-                }
-            }
-        #endif
     }
 
     /**
