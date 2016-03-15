@@ -55,10 +55,10 @@ public class GroupOperation: Operation {
 
     /// Override of public method
     public override func cancel() {
+        super.cancel()
         queue.cancelAllOperations()
         queue.suspended = false
         operations.forEach { $0.cancel() }
-        super.cancel()
     }
 
     /**

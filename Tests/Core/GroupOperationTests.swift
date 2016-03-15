@@ -30,11 +30,11 @@ class GroupOperationTests: OperationTests {
     func test__cancel_running_group_operation_race_condition() {
         class SleepingGroupOperation: GroupOperation {
             override func cancel() {
+                super.cancel()
+                sleep(1)
                 queue.cancelAllOperations()
                 queue.suspended = false
                 operations.forEach { $0.cancel() }
-                sleep(1)
-                super.cancel()
             }
         }
         
@@ -44,7 +44,6 @@ class GroupOperationTests: OperationTests {
         let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
         group.addObserver(BlockObserver { observedOperation, errors in
             NSOperationQueue.mainQueue().addOperationWithBlock {
-                // Fails this assertion
                 XCTAssertTrue(observedOperation.cancelled)
                 expectation.fulfill()
             }
@@ -54,7 +53,6 @@ class GroupOperationTests: OperationTests {
         group.cancel()
         
         waitForExpectationsWithTimeout(5, handler: nil)
-        // Fails this assertion too
         XCTAssertTrue(group.cancelled)
     }
 
