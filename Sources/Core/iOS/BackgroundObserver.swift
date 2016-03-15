@@ -8,14 +8,14 @@
 
 import UIKit
 
-@available(iOSApplicationExtension 8, *)
+@available(iOS 8, *)
 public protocol BackgroundTaskApplicationInterface {
     var applicationState: UIApplicationState { get }
     func beginBackgroundTaskWithName(taskName: String?, expirationHandler handler: (() -> Void)?) -> UIBackgroundTaskIdentifier
     func endBackgroundTask(identifier: UIBackgroundTaskIdentifier)
 }
 
-@available(iOSApplicationExtension 8, *)
+@available(iOS 8, *)
 extension UIApplication: BackgroundTaskApplicationInterface { }
 
 /**
@@ -25,7 +25,7 @@ application enters the background.
 Attach a `BackgroundObserver` to an operation which must be completed even
 if the app goes in the background.
 */
-@available(iOSApplicationExtension 8, *)
+@available(iOS 8, *)
 public class BackgroundObserver {
 
     private var identifier: UIBackgroundTaskIdentifier? = .None
