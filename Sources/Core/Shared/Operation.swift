@@ -378,8 +378,7 @@ public extension Operation {
         get {
             var _dependencies = super.dependencies
             guard let
-                waiter = waitForDependenciesOperation,
-                index = _dependencies.indexOf(waiter) else {
+                waiter = waitForDependenciesOperation, index = _dependencies.indexOf(waiter) else {
                     return _dependencies
             }
 

@@ -45,6 +45,43 @@ class TestableUIApplication: BackgroundTaskApplicationInterface {
 
 class BackgroundObserverTests: OperationTests {
 
+    var backgroundTaskName: String!
+    var backgroundTaskIdentifier: UIBackgroundTaskIdentifier!
+    var endedBackgroundTaskIdentifier: UIBackgroundTaskIdentifier!
+
+    var application: TestableUIApplication!
+    var backgroundObserver: BackgroundObserver!
+    
+    override func setUp() {
+        super.setUp()
+        
+        let didBeginTask: TestableUIApplication.DidBeginBackgroundTask = { [unowned self] name, identifier in
+            if let name = name {
+                self.backgroundTaskName = name
+            }
+            self.backgroundTaskIdentifier = identifier
+        }
+        
+        let didEndTask: TestableUIApplication.DidEndBackgroundTask = { [unowned self] identifier in
+            self.endedBackgroundTaskIdentifier = identifier
+        }
+        
+        application = TestableUIApplication(
+            state: UIApplicationState.Active,
+            didBeginTask: didBeginTask,
+            didEndTask: didEndTask
+        )
+        
+        backgroundObserver = BackgroundObserver()
+        backgroundObserver.application = application
+    }
+    
+    override func tearDown() {
+        application = nil
+        backgroundObserver = nil
+        super.tearDown()
+    }
+    
     func applicationEntersBackground(application: TestableUIApplication) {
         application.testableApplicationState = UIApplicationState.Background
         NSNotificationCenter.defaultCenter().postNotificationName(UIApplicationDidEnterBackgroundNotification, object: self)
@@ -56,28 +93,9 @@ class BackgroundObserverTests: OperationTests {
     }
 
     func test__background_observer_starts_background_task() {
-        var backgroundTaskName: String = "Hello world"
-        var backgroundTaskIdentifier: UIBackgroundTaskIdentifier!
-        var endedBackgroundTaskIdentifier: UIBackgroundTaskIdentifier!
-
-        let didBeginTask: TestableUIApplication.DidBeginBackgroundTask = { name, identifier in
-            if let name = name {
-                backgroundTaskName = name
-            }
-            backgroundTaskIdentifier = identifier
-        }
-
-        let didEndTask: TestableUIApplication.DidEndBackgroundTask = { identifier in
-            endedBackgroundTaskIdentifier = identifier
-        }
-
-        let application = TestableUIApplication(
-            state: UIApplicationState.Active,
-            didBeginTask: didBeginTask,
-            didEndTask: didEndTask)
 
         let operation = TestOperation(delay: 2, produced: TestOperation())
-        operation.addObserver(BackgroundObserver(app: application))
+        operation.addObserver(backgroundObserver)
 
         addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
         runOperation(operation)
@@ -88,35 +106,16 @@ class BackgroundObserverTests: OperationTests {
         XCTAssertTrue(operation.finished)
 
         XCTAssertNotNil(backgroundTaskName)
-        XCTAssertEqual(backgroundTaskName, BackgroundObserver.backgroundTaskName)
+        XCTAssertTrue(backgroundTaskName.containsString("Background Task for:"))
         XCTAssertEqual(backgroundTaskIdentifier, endedBackgroundTaskIdentifier)
     }
 
     func test__background_observer_starts_in_background_then_becomes_active() {
-        var backgroundTaskName: String = "Hello world"
-        var backgroundTaskIdentifier: UIBackgroundTaskIdentifier!
-        var endedBackgroundTaskIdentifier: UIBackgroundTaskIdentifier!
-
-        let didBeginTask: TestableUIApplication.DidBeginBackgroundTask = { (name, identifier) in
-            if let name = name {
-                backgroundTaskName = name
-            }
-            backgroundTaskIdentifier = identifier
-        }
-
-        let didEndTask: TestableUIApplication.DidEndBackgroundTask = { identifier in
-            endedBackgroundTaskIdentifier = identifier
-        }
-
-        let application = TestableUIApplication(
-            state: UIApplicationState.Active,
-            didBeginTask: didBeginTask,
-            didEndTask: didEndTask)
 
         applicationEntersBackground(application)
 
         let operation = TestOperation(delay: 2)
-        operation.addObserver(BackgroundObserver(app: application))
+        operation.addObserver(backgroundObserver)
 
         addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
         runOperation(operation)
@@ -127,7 +126,7 @@ class BackgroundObserverTests: OperationTests {
         XCTAssertTrue(operation.finished)
 
         XCTAssertNotNil(backgroundTaskName)
-        XCTAssertEqual(backgroundTaskName, BackgroundObserver.backgroundTaskName)
+        XCTAssertTrue(backgroundTaskName.containsString("Background Task for:"))
         XCTAssertEqual(backgroundTaskIdentifier, endedBackgroundTaskIdentifier)
     }
 }
