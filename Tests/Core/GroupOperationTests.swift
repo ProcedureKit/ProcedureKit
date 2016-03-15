@@ -26,6 +26,37 @@ class GroupOperationTests: OperationTests {
             XCTAssertTrue(op.cancelled)
         }
     }
+    
+    func test__cancel_running_group_operation_race_condition() {
+        class SleepingGroupOperation: GroupOperation {
+            override func cancel() {
+                queue.cancelAllOperations()
+                queue.suspended = false
+                operations.forEach { $0.cancel() }
+                sleep(1)
+                super.cancel()
+            }
+        }
+        
+        let delay = DelayOperation(interval: 10)
+        let group = SleepingGroupOperation(operations: [delay])
+        
+        let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
+        group.addObserver(BlockObserver { observedOperation, errors in
+            NSOperationQueue.mainQueue().addOperationWithBlock {
+                // Fails this assertion
+                XCTAssertTrue(observedOperation.cancelled)
+                expectation.fulfill()
+            }
+        })
+        
+        runOperation(group)
+        group.cancel()
+        
+        waitForExpectationsWithTimeout(5, handler: nil)
+        // Fails this assertion too
+        XCTAssertTrue(group.cancelled)
+    }
 
     func test__group_operations_are_performed_in_order() {
         let group = createGroupOperations()
