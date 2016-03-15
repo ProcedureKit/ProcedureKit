@@ -8,6 +8,21 @@
 
 import Foundation
 
+public enum OperationEvent: Int {
+    case Attached = 0, Started, Cancelled, Finished
+}
+
+extension OperationEvent: CustomStringConvertible {
+    public var description: String {
+        switch self {
+        case .Attached: return "Attached"
+        case .Started: return "Started"
+        case .Cancelled: return "Cancelled"
+        case .Finished: return "Finished"
+        }
+    }
+}
+
 /**
  Types which conform to this protocol, can be attached to `Operation` subclasses before
  they are added to a queue.
