@@ -9,7 +9,7 @@
 import Foundation
 
 public enum OperationEvent: Int {
-    case Attached = 0, Started, Cancelled, Finished
+    case Attached = 0, Started, Cancelled, Produced, Finished
 }
 
 extension OperationEvent: CustomStringConvertible {
@@ -18,6 +18,7 @@ extension OperationEvent: CustomStringConvertible {
         case .Attached: return "Attached"
         case .Started: return "Started"
         case .Cancelled: return "Cancelled"
+        case .Produced: return "Produced"
         case .Finished: return "Finished"
         }
     }
