@@ -50,8 +50,8 @@ public enum PerformanceMetric {
             switch status {
             case .Pending(_):
                 return true
-            case .Finished(let metrics):
-                return metrics.filter { $0.pending }.count > 0
+            default:
+                return false
             }
         }
 
@@ -103,13 +103,10 @@ public enum PerformanceMetric {
     var pending: Bool {
         switch self {
         case .Produced(let child):
-            if case .Pending = child.status {
-                return true
-            }
+            return child.pending
         default:
-            break
+            return false
         }
-        return false
     }
 
     init?(event: OperationEvent, interval: NSTimeInterval) {
@@ -202,10 +199,8 @@ extension OperationProfiler.Reporter: OperationProfilerReporter {
 extension OperationProfiler: OperationProfilerReporter {
 
     public func profiler(profiler: OperationProfiler, finishedWithPerformanceMetrics performanceMetrics: [PerformanceMetric]) {
-        let childIdentifier = profiler.identifier
-
         dispatch_sync(queue) {
-            if let (index, child) = self.indexOfProducedChildPendingWithIdentifier(childIdentifier, metrics: self.metrics) {
+            if let (index, child) = self.indexOfProducedChildPendingWithIdentifier(profiler.identifier, metrics: self.metrics) {
                 self.metrics[index] = .Produced(child.finishWithMetrics(performanceMetrics))
                 self.finish()
             }
