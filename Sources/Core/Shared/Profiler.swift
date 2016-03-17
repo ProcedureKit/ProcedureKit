@@ -204,11 +204,9 @@ extension OperationProfiler: OperationProfilerReporter {
     public func profiler(profiler: OperationProfiler, finishedWithPerformanceMetrics performanceMetrics: [PerformanceMetric]) {
         let childIdentifier = profiler.identifier
 
-        // Update Pending Child with Finished Child
         dispatch_sync(queue) {
             if let (index, child) = self.indexOfProducedChildPendingWithIdentifier(childIdentifier, metrics: self.metrics) {
-                let finished: PerformanceMetric = .Produced(child.finishWithMetrics(performanceMetrics))
-                self.metrics[index] = finished
+                self.metrics[index] = .Produced(child.finishWithMetrics(performanceMetrics))
                 self.finish()
             }
         }
@@ -350,13 +348,6 @@ public extension OperationProfiler {
 
     convenience init(_ reporter: OperationProfilerReporter = OperationProfileLogger()) {
         self.init(reporters: [reporter])
-    }
-}
-
-extension ForwardIndexType {
-
-    var range: Range<Self> {
-        return Range(start: self, end: self)
     }
 }
 
