@@ -15,6 +15,13 @@ public struct OperationIdentity {
     let name: String?
 }
 
+extension OperationIdentity: CustomStringConvertible {
+
+    public var description: String {
+        return name.map { "\($0) #\(identifier)" } ?? "Unnamed Operation #\(identifier)"
+    }
+}
+
 public extension Operation {
 
     var identity: OperationIdentity {
@@ -38,6 +45,24 @@ public enum PerformanceMetric {
         let interval: NSTimeInterval
         let identity: OperationIdentity
         let status: Status
+
+        var pending: Bool {
+            switch status {
+            case .Pending(_):
+                return true
+            case .Finished(let metrics):
+                return metrics.filter { $0.pending }.count > 0
+            }
+        }
+
+        var metrics: [PerformanceMetric]? {
+            switch status {
+            case .Finished(let metrics):
+                return metrics
+            default:
+                return .None
+            }
+        }
 
         func finishWithMetrics(metrics: [PerformanceMetric]) -> Child {
             return Child(interval: interval, identity: identity, status: .Finished(metrics))
@@ -105,7 +130,7 @@ public enum PerformanceMetric {
 }
 
 public protocol OperationProfilerReporter {
-    func profiler(profiler: OperationProfiler, finishedOperation: Operation, withPerformanceMetrics: [PerformanceMetric])
+    func profiler(profiler: OperationProfiler, finishedWithPerformanceMetrics: [PerformanceMetric])
 }
 
 public final class OperationProfiler {
@@ -120,12 +145,13 @@ public final class OperationProfiler {
     let queue = Queue.Utility.serial("me.danthorpe.Operations.Profiler")
 
     let reporter: Reporter
+    var identity: OperationIdentity? = .None
     var metrics: [PerformanceMetric] = []
 
     var finishedOrCancelled = false
 
-    var numberOfPendingProfilers: Int {
-        return metrics.filter { $0.pending }.count
+    var pending: Bool {
+        return metrics.filter { $0.pending }.count > 0
     }
 
     public convenience init(reporters: [OperationProfilerReporter]) {
@@ -155,37 +181,35 @@ public final class OperationProfiler {
         }
     }
 
-    func finishOperation(operation: Operation) {
-        guard finishedOrCancelled else { return }
-        reportOperation(operation)
-    }
-
-    func reportOperation(operation: Operation) {
-        reporter.profiler(self, finishedOperation: operation, withPerformanceMetrics: metrics)
+    func finish() {
+        guard finishedOrCancelled && !pending else { return }
+        reporter.profiler(self, finishedWithPerformanceMetrics: metrics)
     }
 }
 
 extension OperationProfiler.Reporter: OperationProfilerReporter {
 
-    func profiler(profiler: OperationProfiler, finishedOperation operation: Operation, withPerformanceMetrics metrics: [PerformanceMetric]) {
+    func profiler(profiler: OperationProfiler, finishedWithPerformanceMetrics metrics: [PerformanceMetric]) {
         switch self {
         case .Parent(let parent):
-            parent.profiler(profiler, finishedOperation: operation, withPerformanceMetrics: metrics)
+            parent.profiler(profiler, finishedWithPerformanceMetrics: metrics)
         case .Reporters(let reporters):
-            reporters.forEach { $0.profiler(profiler, finishedOperation: operation, withPerformanceMetrics: metrics)  }
+            reporters.forEach { $0.profiler(profiler, finishedWithPerformanceMetrics: metrics)  }
         }
     }
 }
 
 extension OperationProfiler: OperationProfilerReporter {
 
-    public func profiler(profiler: OperationProfiler, finishedOperation: Operation, withPerformanceMetrics performanceMetrics: [PerformanceMetric]) {
-        let identifier = profiler.identifier
+    public func profiler(profiler: OperationProfiler, finishedWithPerformanceMetrics performanceMetrics: [PerformanceMetric]) {
+        let childIdentifier = profiler.identifier
 
         // Update Pending Child with Finished Child
         dispatch_sync(queue) {
-            if let (index, child) = self.indexOfProducedChildPendingWithIdentifier(identifier, metrics: performanceMetrics) {
-                self.metrics.replaceRange(index.range, with: [.Produced(child.finishWithMetrics(performanceMetrics))])
+            if let (index, child) = self.indexOfProducedChildPendingWithIdentifier(childIdentifier, metrics: self.metrics) {
+                let finished: PerformanceMetric = .Produced(child.finishWithMetrics(performanceMetrics))
+                self.metrics[index] = finished
+                self.finish()
             }
         }
     }
@@ -198,7 +222,7 @@ extension OperationProfiler: OperationProfilerReporter {
                     return (index, child)
                 }
             default:
-                continue
+                break
             }
         }
         return .None
@@ -209,6 +233,7 @@ extension OperationProfiler: OperationObserverType {
 
     public func didAttachToOperation(operation: Operation) {
         addMetricNow(forOperation: operation, event: .Attached)
+        identity = operation.identity
     }
 }
 
@@ -224,7 +249,7 @@ extension OperationProfiler: OperationDidCancelObserver {
     public func didCancelOperation(operation: Operation) {
         addMetricNow(forOperation: operation, event: .Cancelled)
         finishedOrCancelled = true
-        finishOperation(operation)
+        finish()
     }
 }
 
@@ -233,7 +258,7 @@ extension OperationProfiler: OperationDidFinishObserver {
     public func didFinishOperation(operation: Operation, errors: [ErrorType]) {
         addMetricNow(forOperation: operation, event: .Finished)
         finishedOrCancelled = true
-        finishOperation(operation)
+        finish()
     }
 }
 
@@ -242,8 +267,8 @@ extension OperationProfiler: OperationDidProduceOperationObserver {
     public func operation(operation: Operation, didProduceOperation newOperation: NSOperation) {
         if let newOperation = newOperation as? Operation {
             let profiler = OperationProfiler(parent: self)
-            newOperation.addObserver(profiler)
             startProfiling(operation: newOperation, fromOperation: operation, withProfilerIdentifier: profiler.identifier)
+            newOperation.addObserver(profiler)
         }
     }
 }
@@ -267,7 +292,22 @@ struct PrintablePerformanceMetric: CustomStringConvertible {
     let metric: PerformanceMetric
 
     var description: String {
-        return "\(createIndentation())+\(metric.interval)\(createSpacing())\(metric.event)"
+        get {
+            var output = "\(createIndentation())+\(metric.interval)\(createSpacing())\(metric.event)"
+            switch metric {
+            case .Produced(let child):
+                if let metrics = child.metrics {
+                    output = "\(output) \(child.identity)"
+                    let printableMetrics = metrics.map { PrintablePerformanceMetric(indentation: indentation+2, spacing: spacing, metric: $0) }
+                    for metric in printableMetrics {
+                        output = "\(output)\n\(metric)"
+                    }
+                }
+            default:
+                break
+            }
+            return output
+        }
     }
 
     init(indentation: Int = 0, spacing: Int = 1, metric: PerformanceMetric) {
@@ -291,13 +331,13 @@ public class _OperationProfileLogger<Manager: LogManagerType>: _Logger<Manager>,
         super.init(severity: severity, enabled: enabled, logger: logger)
     }
 
-    public func profiler(profiler: OperationProfiler, finishedOperation operation: Operation, withPerformanceMetrics metrics: [PerformanceMetric]) {
+    public func profiler(profiler: OperationProfiler, finishedWithPerformanceMetrics metrics: [PerformanceMetric]) {
 
-        operationName = operation.operationName
+        operationName = profiler.identity?.description
         var output = ""
         let printableMetrics = metrics.map { PrintablePerformanceMetric(metric: $0) }
         for metric in printableMetrics {
-            output = "\(output)\n\t\(metric)"
+            output = "\(output)\n\(metric)"
         }
 
         info("finished with perfomance metrics:\(output)")
