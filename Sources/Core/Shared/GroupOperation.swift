@@ -164,6 +164,18 @@ public class GroupOperation: Operation {
     }
 }
 
+public protocol GroupOperationWillAddChildObserver: OperationObserverType {
+
+    func groupOperation(group: GroupOperation, willAddChildOperation child: NSOperation)
+}
+
+extension GroupOperation {
+
+    internal var willAddChildOperationObservers: [GroupOperationWillAddChildObserver] {
+        return observers.flatMap { $0 as? GroupOperationWillAddChildObserver }
+    }
+}
+
 extension GroupOperation: OperationQueueDelegate {
 
     /**
@@ -178,6 +190,8 @@ extension GroupOperation: OperationQueueDelegate {
     public func operationQueue(queue: OperationQueue, willAddOperation operation: NSOperation) {
         assert(!finishingOperation.executing, "Cannot add new operations to a group after the group has started to finish.")
         assert(!finishingOperation.finished, "Cannot add new operations to a group after the group has completed.")
+
+        willAddChildOperationObservers.forEach { $0.groupOperation(self, willAddChildOperation: operation) }
 
         if operation !== finishingOperation {
             finishingOperation.addDependency(operation)
