@@ -164,6 +164,18 @@ public class GroupOperation: Operation {
     }
 }
 
+public protocol GroupOperationWillAddChildObserver: OperationObserverType {
+
+    func groupOperation(group: GroupOperation, willAddChildOperation child: NSOperation)
+}
+
+extension GroupOperation {
+
+    internal var willAddChildOperationObservers: [GroupOperationWillAddChildObserver] {
+        return observers.flatMap { $0 as? GroupOperationWillAddChildObserver }
+    }
+}
+
 extension GroupOperation: OperationQueueDelegate {
 
     /**
@@ -180,6 +192,9 @@ extension GroupOperation: OperationQueueDelegate {
         assert(!finishingOperation.finished, "Cannot add new operations to a group after the group has completed.")
 
         if operation !== finishingOperation {
+
+            willAddChildOperationObservers.forEach { $0.groupOperation(self, willAddChildOperation: operation) }
+
             finishingOperation.addDependency(operation)
         }
     }
@@ -206,5 +221,39 @@ extension GroupOperation: OperationQueueDelegate {
             finish(aggregateErrors)
             queue.suspended = true
         }
+    }
+}
+
+/**
+ WillAddChildObserver is an observer which will execute a
+ closure when the group operation it is attaches to adds a
+ child operation to its queue.
+ */
+public struct WillAddChildObserver: GroupOperationWillAddChildObserver {
+    public typealias BlockType = (group: GroupOperation, child: NSOperation) -> Void
+
+    private let block: BlockType
+
+    /// - returns: a block which is called when the observer is attached to an operation
+    public var didAttachToOperation: DidAttachToOperationBlock? = .None
+
+    /**
+     Initialize the observer with a block.
+
+     - parameter willAddChild: the `WillAddChildObserver.BlockType`
+     - returns: an observer.
+     */
+    public init(willAddChild: BlockType) {
+        self.block = willAddChild
+    }
+
+    /// Conforms to GroupOperationWillAddChildObserver
+    public func groupOperation(group: GroupOperation, willAddChildOperation child: NSOperation) {
+        block(group: group, child: child)
+    }
+
+    /// Base OperationObserverType method
+    public func didAttachToOperation(operation: Operation) {
+        didAttachToOperation?(operation: operation)
     }
 }
