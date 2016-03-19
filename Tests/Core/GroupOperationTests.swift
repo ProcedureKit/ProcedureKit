@@ -179,4 +179,26 @@ class GroupOperationTests: OperationTests {
         XCTAssertTrue(group.finished)
         XCTAssertEqual(group.aggregateErrors.count, 1)
     }
+    
+    func test__will_add_child_observer__gets_called() {
+        let child1 = TestOperation()
+        let group = GroupOperation(operations: [child1])
+        
+        var blockCalledWith: (GroupOperation, NSOperation)? = .None
+        let observer = WillAddChildObserver { group, child in
+            blockCalledWith = (group, child)
+        }
+        group.addObserver(observer)
+        
+        addCompletionBlockToTestOperation(group)
+        runOperation(group)
+        waitForExpectationsWithTimeout(3, handler: nil)
+        
+        guard let (observedGroup, observedChild) = blockCalledWith else {
+            XCTFail("Observer not called"); return
+        }
+        
+        XCTAssertEqual(group, observedGroup)
+        XCTAssertEqual(child1, observedChild)
+    }
 }

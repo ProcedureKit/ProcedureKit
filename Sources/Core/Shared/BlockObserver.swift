@@ -182,7 +182,6 @@ public struct DidFinishObserver: OperationDidFinishObserver {
 @available(*, unavailable, renamed="DidFinishObserver")
 public typealias FinishedObserver = DidFinishObserver
 
-
 /**
  A `OperationObserver` which accepts three different blocks for start,
  produce and finish.

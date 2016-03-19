@@ -89,8 +89,8 @@ public class AlertOperation<From: PresentingViewController>: Operation {
     public func addActionWithTitle(title: String, style: UIAlertActionStyle = .Default, handler: AlertOperation -> Void = { _ in }) {
         let action = UIAlertAction(title: title, style: style) { [weak self] _ in
             if let weakSelf = self {
-                weakSelf.finish()
                 handler(weakSelf)
+                weakSelf.finish()
             }
         }
         alert.addAction(action)
