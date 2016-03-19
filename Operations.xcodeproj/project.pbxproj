@@ -693,13 +693,13 @@
 				652617151C11F5EB00654091 /* NetworkObserverTests.swift */,
 				652617161C11F5EB00654091 /* NoFailedDependenciesConditionTests.swift */,
 				652617171C11F5EB00654091 /* OperationTests.swift */,
+				6565FFE91C98C860008B5248 /* ProfilerTests.swift */,
 				65E4CDE61C33F97900B9F9D8 /* RepeatedOperationTests.swift */,
 				65691C9D1C21A29C00AF06B4 /* ResultInjectionTests.swift */,
 				65AE14961C34865E00F592D2 /* RetryOperationTests.swift */,
 				652617181C11F5EB00654091 /* SilentConditionTests.swift */,
 				652617191C11F5EB00654091 /* TimeoutObserverTests.swift */,
 				6526171A1C11F5EB00654091 /* UIOperationTests.swift */,
-				6565FFE91C98C860008B5248 /* ProfilerTests.swift */,
 			);
 			path = Core;
 			sourceTree = "<group>";

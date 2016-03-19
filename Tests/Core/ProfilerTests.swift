@@ -9,58 +9,50 @@
 import XCTest
 @testable import Operations
 
+class TestableProfileReporter: OperationProfilerReporter {
+    var didProfileResult: ProfileResult? = .None
+
+    func finishedProfilingWithResult(result: ProfileResult) {
+        didProfileResult = result
+    }
+}
+
 class ProfilerTests: OperationTests {
+
+    var reporter: TestableProfileReporter!
 
     override func setUp() {
         super.setUp()
-        LogManager.severity = .Info
+        reporter = TestableProfileReporter()
     }
 
     override func tearDown() {
-        LogManager.severity = .Fatal
+        reporter = nil
+        super.tearDown()
+    }
+}
+
+
+class PendingResultTests: XCTestCase {
+
+    var result: PendingResult! = nil
+
+    override func setUp() {
+        super.setUp()
+        result = PendingResult(created: CFAbsoluteTimeGetCurrent() as NSTimeInterval, identity: .Pending, attached: .Pending, started: .Pending, cancelled: .Pending, finished: .Pending, children: [])
+    }
+
+    override func tearDown() {
+        result = nil
         super.tearDown()
     }
 
-    func test_does_it_work() {
-        let first = TestOperation(delay: 0.1)
-        first.name = "One"
-        first.addObserver(OperationProfiler())
-
-        addCompletionBlockToTestOperation(first)
-        runOperation(first)
-        waitForExpectationsWithTimeout(3, handler: nil)
+    func test_identifier_with_pending_identity() {
+        XCTAssertEqual(result.identifier, "Pending Result Identifier")
     }
 
-    func test_does_it_work_produce_one() {
-        let second = TestOperation(delay: 0.2)
-        second.name = "Two"
-
-        let first = TestOperation(delay: 0.1, produced: second)
-        first.name = "One"
-        first.addObserver(OperationProfiler())
-
-        addCompletionBlockToTestOperation(second)
-        addCompletionBlockToTestOperation(first)
-        runOperation(first)
-        waitForExpectationsWithTimeout(3, handler: nil)
+    func test_identifier_with_identity() {
+        result = result.setIdentity(OperationIdentity(identifier: "Hello World", name: .None))
+        XCTAssertEqual(result.identifier, "Hello World")
     }
-
-    func test_does_it_work_produce_two() {
-        let third = TestOperation(delay: 0.3)
-        third.name = "Three"
-
-        let second = TestOperation(delay: 0.2, produced: third)
-        second.name = "Two"
-
-        let first = TestOperation(delay: 0.1, produced: second)
-        first.name = "One"
-        first.addObserver(OperationProfiler())
-
-        addCompletionBlockToTestOperation(third)
-        addCompletionBlockToTestOperation(second)
-        addCompletionBlockToTestOperation(first)
-        runOperation(first)
-        waitForExpectationsWithTimeout(3, handler: nil)
-    }
-
 }
