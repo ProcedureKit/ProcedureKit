@@ -8,14 +8,12 @@
 
 import UIKit
 
-@available(iOS 8, *)
 public protocol BackgroundTaskApplicationInterface {
     var applicationState: UIApplicationState { get }
     func beginBackgroundTaskWithName(taskName: String?, expirationHandler handler: (() -> Void)?) -> UIBackgroundTaskIdentifier
     func endBackgroundTask(identifier: UIBackgroundTaskIdentifier)
 }
 
-@available(iOS 8, *)
 extension UIApplication: BackgroundTaskApplicationInterface { }
 
 /**
@@ -25,19 +23,55 @@ application enters the background.
 Attach a `BackgroundObserver` to an operation which must be completed even
 if the app goes in the background.
 */
-@available(iOS 8, *)
-public class BackgroundObserver {
+public class BackgroundObserver: NSObject {
+
+    static let backgroundTaskName = "Background Operation Observer"
 
     private var identifier: UIBackgroundTaskIdentifier? = .None
-    internal var application: BackgroundTaskApplicationInterface = UIApplication.sharedApplication()
+    private let application: BackgroundTaskApplicationInterface
 
     private var isInBackground: Bool {
         return application.applicationState == .Background
     }
 
-    private func startBackgroundTaskForOperation(operation: Operation) {
+    /// Initialize a `BackgroundObserver`, takes no parameters.
+    public override convenience init() {
+        self.init(app: UIApplication.sharedApplication())
+    }
+
+    init(app: BackgroundTaskApplicationInterface) {
+        application = app
+
+        super.init()
+
+        let nc = NSNotificationCenter.defaultCenter()
+        nc.addObserver(self, selector: "didEnterBackground:", name: UIApplicationDidEnterBackgroundNotification, object: .None)
+        nc.addObserver(self, selector: "didBecomeActive:", name: UIApplicationDidBecomeActiveNotification, object: .None)
+
+        if isInBackground {
+            startBackgroundTask()
+        }
+    }
+
+    deinit {
+        NSNotificationCenter.defaultCenter().removeObserver(self)
+    }
+
+    @objc func didEnterBackground(notification: NSNotification) {
+        if isInBackground {
+            startBackgroundTask()
+        }
+    }
+
+    @objc func didBecomeActive(notification: NSNotification) {
+        if !isInBackground {
+            endBackgroundTask()
+        }
+    }
+
+    private func startBackgroundTask() {
         if identifier == nil {
-            identifier = application.beginBackgroundTaskWithName("Background Task for: \(operation.operationName)") {
+            identifier = application.beginBackgroundTaskWithName(self.dynamicType.backgroundTaskName) {
                 self.endBackgroundTask()
             }
         }
@@ -48,14 +82,6 @@ public class BackgroundObserver {
             application.endBackgroundTask(id)
             identifier = .None
         }
-    }
-}
-
-extension BackgroundObserver: OperationDidStartObserver {
-
-    /// Conforms to `OperationDidStartObserver`, will start a background task.
-    public func didStartOperation(operation: Operation) {
-        startBackgroundTaskForOperation(operation)
     }
 }
 
