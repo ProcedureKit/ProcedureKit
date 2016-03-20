@@ -311,7 +311,32 @@ class PrintableProfileResultTests: XCTestCase {
         printable = PrintableProfileResult(result: result)
         XCTAssertEqual(printable.description, "+0.1 Attached\n+0.2 Started\n-> Spawned Data Operation #Child 1 with profile results\n  +0.1 Attached\n  +0.2 Started\n  -> Spawned Unnamed Operation #Child 2 with profile results\n    +0.1 Attached\n    +0.2 Started\n    +0.3 Finished\n  +0.3 Finished\n+0.3 Finished\n")
     }
+}
 
+class ProfileLoggerTests: XCTestCase {
+
+    var result: ProfileResult!
+    var reporter: OperationProfileLogger!
+
+    override func setUp() {
+        super.setUp()
+        LogManager.severity = .Notice
+        result = ProfileResult(identity: OperationIdentity(identifier: "Testing", name: "MyOperation"), created: CFAbsoluteTimeGetCurrent() as NSTimeInterval, attached: 0.1, started: 0.2, cancelled: .None, finished: 0.3, children: [])
+    }
+
+    override func tearDown() {
+        result = nil
+        LogManager.severity = .Warning
+        super.tearDown()
+    }
+
+    func test__reporter_logs_name() {
+        reporter = OperationProfileLogger { message, severity, _, _, _ in
+            XCTAssertTrue(message.hasPrefix("MyOperation #Testing finished profiling with results:\n"))
+            XCTAssertEqual(severity, LogSeverity.Info)
+        }
+        reporter.finishedProfilingWithResult(result)
+    }
 
 }
 
