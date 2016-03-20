@@ -191,6 +191,15 @@ public extension LoggerType {
     }
 }
 
+public protocol LogManagerType {
+
+    static var enabled: Bool { get set }
+
+    static var severity: LogSeverity { get set }
+
+    static var logger: LoggerBlockType { get set }
+}
+
 /**
  This is a simple class which owns a logging block. It can be subclassed
  if customization is required, but it is probably easier to customise the
@@ -225,15 +234,6 @@ class _Logger<Manager: LogManagerType>: LoggerType {
 }
 
 typealias Logger = _Logger<LogManager>
-
-protocol LogManagerType {
-
-    static var enabled: Bool { get set }
-
-    static var severity: LogSeverity { get set }
-
-    static var logger: LoggerBlockType { get set }
-}
 
 /**
  # LogManager
@@ -299,7 +299,7 @@ public extension NSOperation {
      set, this resorts to the class description.
     */
     var operationName: String {
-        return name ?? "\(self)"
+        return name ?? "Unnamed Operation"
     }
 }
 

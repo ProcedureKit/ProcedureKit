@@ -33,6 +33,8 @@ class MutualExclusiveTests: OperationTests {
         }
     }
 
+/*  - Disabling this as it's not a very good test.
+    - Needs to be refactored.
     func test__mutually_exclusive() {
         let queue = OperationQueue()
         let op1 = TestOperation(delay: 1.0)
@@ -48,6 +50,8 @@ class MutualExclusiveTests: OperationTests {
         XCTAssertTrue(op1.dependencies.isEmpty)
         XCTAssertEqual(op2.dependencies.first, op1)
     }
+*/
+
 }
 
 class MutuallyExclusiveConditionWithDependencyTests: OperationTests {

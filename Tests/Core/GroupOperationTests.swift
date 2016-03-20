@@ -26,6 +26,35 @@ class GroupOperationTests: OperationTests {
             XCTAssertTrue(op.cancelled)
         }
     }
+    
+    func test__cancel_running_group_operation_race_condition() {
+        class SleepingGroupOperation: GroupOperation {
+            override func cancel() {
+                super.cancel()
+                sleep(1)
+                queue.cancelAllOperations()
+                queue.suspended = false
+                operations.forEach { $0.cancel() }
+            }
+        }
+        
+        let delay = DelayOperation(interval: 10)
+        let group = SleepingGroupOperation(operations: [delay])
+        
+        let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
+        group.addObserver(BlockObserver { observedOperation, errors in
+            NSOperationQueue.mainQueue().addOperationWithBlock {
+                XCTAssertTrue(observedOperation.cancelled)
+                expectation.fulfill()
+            }
+        })
+        
+        runOperation(group)
+        group.cancel()
+        
+        waitForExpectationsWithTimeout(5, handler: nil)
+        XCTAssertTrue(group.cancelled)
+    }
 
     func test__group_operations_are_performed_in_order() {
         let group = createGroupOperations()
@@ -149,5 +178,27 @@ class GroupOperationTests: OperationTests {
 
         XCTAssertTrue(group.finished)
         XCTAssertEqual(group.aggregateErrors.count, 1)
+    }
+    
+    func test__will_add_child_observer__gets_called() {
+        let child1 = TestOperation()
+        let group = GroupOperation(operations: [child1])
+        
+        var blockCalledWith: (GroupOperation, NSOperation)? = .None
+        let observer = WillAddChildObserver { group, child in
+            blockCalledWith = (group, child)
+        }
+        group.addObserver(observer)
+        
+        addCompletionBlockToTestOperation(group)
+        runOperation(group)
+        waitForExpectationsWithTimeout(3, handler: nil)
+        
+        guard let (observedGroup, observedChild) = blockCalledWith else {
+            XCTFail("Observer not called"); return
+        }
+        
+        XCTAssertEqual(group, observedGroup)
+        XCTAssertEqual(child1, observedChild)
     }
 }

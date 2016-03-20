@@ -19,6 +19,7 @@ class TestOperation: Operation, ResultOperationType {
     let simulatedError: ErrorType?
     let producedOperation: NSOperation?
     var didExecute: Bool = false
+    var didFinish: Bool = false
     var result: String? = "Hello World"
 
     init(delay: Double = 0.0001, error: ErrorType? = .None, produced: NSOperation? = .None) {
@@ -46,7 +47,7 @@ class TestOperation: Operation, ResultOperationType {
     }
     
     override func finished(errors: [ErrorType]) {
-        // Subclasses must be able to override this method
+        didFinish = true
     }
 }
 
@@ -107,6 +108,7 @@ class OperationTests: XCTestCase {
 
     override func setUp() {
         super.setUp()
+        LogManager.severity = .Fatal
         queue = OperationQueue()
         delegate = TestQueueDelegate()
         queue.delegate = delegate
@@ -116,6 +118,7 @@ class OperationTests: XCTestCase {
         queue = nil
         delegate = nil
         ExclusivityManager.sharedInstance.__tearDownForUnitTesting()
+        LogManager.severity = .Warning
         super.tearDown()
     }
 
@@ -275,6 +278,12 @@ class BasicTests: OperationTests {
 
     func test__adding_variable_argument_of_operations() {
         queue.addOperations(BlockOperation { }, BlockOperation { })
+    }
+
+    func test__operation_gets_finished_called() {
+        let operation = TestOperation()
+        waitForOperation(operation)
+        XCTAssertTrue(operation.didFinish)
     }
 }
 

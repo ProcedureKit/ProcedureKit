@@ -117,6 +117,9 @@ public class Operation: NSOperation {
         }
     }
 
+    /// - returns: a unique String which can be used to identify the operation instance
+    public let identifier = NSUUID().UUIDString
+
     /// Access the internal errors collected by the Operation
     public var errors: [ErrorType] {
         return _internalErrors
@@ -247,7 +250,7 @@ public class Operation: NSOperation {
      */
     public func cancelWithErrors(errors: [ErrorType] = []) {
         if !errors.isEmpty {
-            log.verbose("Did cancel with errors: \(errors).")
+            log.warning("Did cancel with errors: \(errors).")
         }
         _internalErrors += errors
         cancel()
@@ -544,7 +547,7 @@ public extension Operation {
                 log.verbose("Finishing with no errors.")
             }
             else {
-                log.verbose("Finishing with errors: \(_internalErrors).")
+                log.warning("Finishing with errors: \(_internalErrors).")
             }
 
             willFinishObservers.forEach { $0.willFinishOperation(self, errors: self._internalErrors) }
