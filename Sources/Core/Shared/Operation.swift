@@ -117,6 +117,9 @@ public class Operation: NSOperation {
         }
     }
 
+    /// - returns: a unique String which can be used to identify the operation instance
+    public let identifier = NSUUID().UUIDString
+
     /// Access the internal errors collected by the Operation
     public var errors: [ErrorType] {
         return _internalErrors
