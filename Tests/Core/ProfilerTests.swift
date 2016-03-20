@@ -17,21 +17,6 @@ class TestableProfileReporter: OperationProfilerReporter {
     }
 }
 
-class ProfilerTests: OperationTests {
-
-    var reporter: TestableProfileReporter!
-
-    override func setUp() {
-        super.setUp()
-        reporter = TestableProfileReporter()
-    }
-
-    override func tearDown() {
-        reporter = nil
-        super.tearDown()
-    }
-}
-
 class PendingValueTests: XCTestCase {
 
     func test__equality_pending() {
@@ -159,7 +144,103 @@ class PendingResultTests: XCTestCase {
 
 }
 
+class OperationProfilerTests: OperationTests {
 
+    var now: NSTimeInterval!
+    var reporter: TestableProfileReporter!
+    var profiler: OperationProfiler!
+
+    override func setUp() {
+        super.setUp()
+        now = CFAbsoluteTimeGetCurrent() as NSTimeInterval
+        reporter = TestableProfileReporter()
+        profiler = OperationProfiler(reporter)
+    }
+
+    override func tearDown() {
+            profiler = nil
+        reporter = nil
+        super.tearDown()
+    }
+
+    func validateProfileResult(result: ProfileResult, after: NSTimeInterval) {
+        XCTAssertGreaterThanOrEqual(result.created, after)
+        XCTAssertGreaterThan(result.attached, 0)
+        XCTAssertGreaterThanOrEqual(result.started, result.attached)
+        if let cancelled = result.cancelled {
+            XCTAssertGreaterThanOrEqual(cancelled, result.attached)
+            XCTAssertGreaterThanOrEqual(result.finished ?? 0.0, cancelled)
+        }
+        else if let finished = result.finished {
+            XCTAssertGreaterThanOrEqual(finished, result.started)
+        }
+        else {
+            XCTFail("Profile result neither cancelled nor finished!"); return
+        }
+    }
+
+    func test__profile_simple_operation_which_finishes() {
+        let operation = TestOperation()
+        operation.addObserver(profiler)
+
+        addCompletionBlockToTestOperation(operation)
+        runOperation(operation)
+        waitForExpectationsWithTimeout(3, handler: nil)
+
+        guard let result = reporter.didProfileResult else {
+            XCTFail("Reporter did not receive profile result."); return
+        }
+
+        validateProfileResult(result, after: now)
+        XCTAssertNotNil(result.finished)
+    }
+
+    func test__profile_simple_operation_which_cancels() {
+        let operation = TestOperation(delay: 1.0)
+        operation.addObserver(StartedObserver { op in
+            op.cancel()
+        })
+        operation.addObserver(profiler)
+
+        addCompletionBlockToTestOperation(operation)
+        runOperation(operation)
+        waitForExpectationsWithTimeout(3, handler: nil)
+
+        guard let result = reporter.didProfileResult else {
+            XCTFail("Reporter did not receive profile result."); return
+        }
+
+        validateProfileResult(result, after: now)
+        XCTAssertNotNil(result.cancelled)
+    }
+
+
+    func test__profile_operation__which_produces_child() {
+        let child = TestOperation()
+        addCompletionBlockToTestOperation(child)
+
+        let operation = TestOperation(produced: child)
+        addCompletionBlockToTestOperation(operation)
+
+        operation.addObserver(profiler)
+
+        runOperation(operation)
+        waitForExpectationsWithTimeout(3, handler: nil)
+
+        guard let result = reporter.didProfileResult else {
+            XCTFail("Reporter did not receive profile result."); return
+        }
+
+        validateProfileResult(result, after: now)
+        XCTAssertNotNil(result.finished)
+        XCTAssertEqual(result.children.count, 1)
+        if let childResult = result.children.first {
+            validateProfileResult(childResult, after: now)
+        }
+    }
+
+
+}
 
 
 
