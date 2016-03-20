@@ -10,7 +10,6 @@ import Foundation
 
 protocol ReadWriteLock {
     mutating func read<T>(block: () -> T) -> T
-    mutating func read<T>(block: () throws -> T) rethrows -> T
     mutating func write(block: () -> Void, completion: (() -> Void)?)
 }
 
@@ -29,14 +28,6 @@ struct Lock: ReadWriteLock {
         var object: T!
         dispatch_sync(queue) {
             object = block()
-        }
-        return object
-    }
-
-    mutating func read<T>(block: () throws -> T) rethrows -> T {
-        var object: T!
-        try dispatch_sync(queue) {
-            object = try block()
         }
         return object
     }
@@ -64,10 +55,6 @@ internal class Protector<T> {
         return lock.read { [unowned self] in block(self.ward) }
     }
 
-    func read<U>(block: T throws -> U) throws -> U {
-        return try lock.read { [unowned self] in try block(self.ward) }
-    }
-
     func write(block: (inout T) -> Void) {
         lock.write({ block(&self.ward) })
     }
@@ -90,31 +77,4 @@ extension Protector where T: _ArrayType {
             ward.appendContentsOf(newElements)
         })
     }
-}
-
-public func dispatch_sync(queue: dispatch_queue_t, _ block: () throws -> Void) rethrows {
-    var failure: ErrorType? = .None
-
-    let catcher = {
-        do {
-            try block()
-        }
-        catch {
-            failure = error
-        }
-    }
-
-    dispatch_sync(queue, catcher)
-
-    if let failure = failure {
-        try { throw failure }()
-    }
-}
-
-public func dispatch_sync<T>(queue: dispatch_queue_t, _ block: () throws -> T) rethrows -> T {
-    var result: T!
-    try dispatch_sync(queue) {
-        result = try block()
-    }
-    return result
 }
