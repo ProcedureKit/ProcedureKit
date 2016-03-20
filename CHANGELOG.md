@@ -1,3 +1,44 @@
+# 2.8.0
+🚀 This will be the last minor release for Swift 2.1.1. From here on development of new features will be in Swift 2.2 😀.
+
+Yet again, this release features more contributors - thanks a lot to [@estromlund](https://github.com/estromlund), [@itsthejb](https://github.com/itsthejb), [@MrAlek](https://github.com/MrAlek) and [@felix-dumit](https://github.com/felix-dumit) for finding bugs and fixing them!
+
+Also, I’m pretty happy to report that adoption and usage of this framework has been seeing somewhat of an uptick! According to the states on CocoaPods, we’re seeing almost 2,500 downloads/week and over 120 applications 🎉! The support from the Swift community on this has been pretty amazing so far - thanks everyone 😀🙌!
+
+1. [[OPR-233](https://github.com/danthorpe/Operations/pull/223)]: Thanks to [@estromlund](https://github.com/estromlund) & [@itsthejb](https://github.com/itsthejb) for fixing a bug which would have caused retain cycles when using result injection.
+2. [[OPR-225](https://github.com/danthorpe/Operations/pull/225)]: Adds a unit test to check that `Operation` calls `finished()`. This was a bit of a followup to the fixes in 2.7.1.
+3. [[OPR-208,OPR-209](https://github.com/danthorpe/Operations/pull/209)]: Thanks to [@itsthejb](https://github.com/itsthejb) who remove the `HostReachabilityType` from the arguments of `ReachabilityCondition` which allows it to be more easily consumed. It’s now access via a property in unit tests.
+4. [[OPR-210](https://github.com/danthorpe/Operations/pull/210)]: Thanks to [@itsthejb](https://github.com/itsthejb) (again!) for improving the logic for ReachabilityCondition.
+5. [[OPR-226](https://github.com/danthorpe/Operations/pull/226)]: Some improvements to the unit tests to fix some failures on development.
+6. [[OPR-224](https://github.com/danthorpe/Operations/pull/224)]: Use `.Warning` log severity when logging errors in `Operation`. Thanks again to [@itsthejb](https://github.com/itsthejb) for this one.
+7. [[OPR-227](https://github.com/danthorpe/Operations/pull/227)]: Sets the log severity to `.Fatal` for the unit tests.
+8. [[OPR-229](https://github.com/danthorpe/Operations/pull/229)]: Thanks to [@estromlund](https://github.com/estromlund) for fixing a bug from 2.7.0 where the automatic result injection was done using a `DidFinishObserver` instead of `WillFinishObserver` which was causing some race conditions.
+9. [[OPR-231](https://github.com/danthorpe/Operations/pull/231)]: Removes `self` from the default operation name - which due to the `@autoclosure` nature of the log message could cause locking issues.
+10. [[OPR-234](https://github.com/danthorpe/Operations/pull/234)]: Thanks to [@MrAlek](https://github.com/MrAlek) for fixing a bug (causing a race condition) when cancelling a `GroupOperation`.
+11. [[OPR-236](https://github.com/danthorpe/Operations/pull/236)]: Thanks to [@felix-dumit](https://github.com/felix-dumit) for fixing a bug where an `AlertOperation` would finish before its handler is called.
+12. [[OPR-239](https://github.com/danthorpe/Operations/pull/239)]: Adds `GroupOperationWillAddChildObserver` observer protocol. This is only used by `GroupOperation` and can be use to observer when child operations are about to be added to the group’s queue.
+13. [[OPR-235](https://github.com/danthorpe/Operations/pull/235)]: New Observer: `OperationProfiler`.
+
+    An `OperationProfiler` can be added as an observer to an `Operation` instance. It will report a profile result which contains the timings for the lifecycle events of the operation, from created through attached, started to cancelled or finished.
+    
+    By default, a logging reporter is added, which will print the profile information to the `LogManager`’s logger. This is done like this:
+    
+    ```swift
+    let operation = MyBigNumberCrunchingOperation()
+    operation.addObserver(OperationProfiler())
+    queue.addOperation(operation)
+    ```
+    
+    However, for customized reporting and analysis of profile results, create the profiler with an array of reporters, which are types conforming to the `OperationProfilerReporter` protocol.
+    
+    In most cases doing any kind of profiling of applications in production is not wise and should not be done.
+    
+    However, in some circumstances, especially with applications which have very high active global users, it is necessary to gain a holistic view of an applications performance. Typically these measurements should be tied to networking operations and profiling in back end systems. The `OperationProfiler` has deliberately designed with a view of using custom reporters. The built in logging reporter should only really be used as debugging tool during development.
+    
+    In addition to profiling regular “basic” `Operation` instances. The profiler will also measure spawned operations, and keep track of them from the parent operation’s profiler. Operations can be spawned by calling `produceOperation()` or by using a `GroupOperation`. Regardless, the profiler’s results will reference both as “children” in the same way.
+    
+    WARNING: Use this feature carefully. *If you have not* written a custom reporter class, **there is no need** to add profilers to operations in production.
+
 # 2.7.1
 
 1. [[OPR-219](https://github.com/danthorpe/Operations/issues/220)]: Fixes an issue after refactoring Operation which would prevent subclasses from overriding `finished(errors: [ErrorType])`.
