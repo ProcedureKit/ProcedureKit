@@ -44,11 +44,6 @@ public extension Operation {
     }
 }
 
-enum ProfilerError: ErrorType {
-    case ResultStillPending
-    case ResultNotAvailable
-}
-
 public protocol OperationProfilerReporter {
     func finishedProfilingWithResult(result: ProfileResult)
 }
@@ -84,16 +79,16 @@ func == <T: Equatable>(lhs: PendingValue<T>, rhs: PendingValue<T>) -> Bool {
 }
 
 public struct ProfileResult {
-    let identity: OperationIdentity
-    let created: NSTimeInterval
-    let attached: NSTimeInterval
-    let started: NSTimeInterval
-    let cancelled: NSTimeInterval?
-    let finished: NSTimeInterval?
-    let children: [ProfileResult]
+    public let identity: OperationIdentity
+    public let created: NSTimeInterval
+    public let attached: NSTimeInterval
+    public let started: NSTimeInterval
+    public let cancelled: NSTimeInterval?
+    public let finished: NSTimeInterval?
+    public let children: [ProfileResult]
 }
 
-public struct PendingResult: Identifiable, Equatable, Hashable {
+struct PendingResult {
 
     let created: NSTimeInterval
     let identity: PendingValue<OperationIdentity>
@@ -102,10 +97,6 @@ public struct PendingResult: Identifiable, Equatable, Hashable {
     let cancelled: PendingValue<NSTimeInterval>
     let finished: PendingValue<NSTimeInterval>
     let children: [ProfileResult]
-
-    public var identifier: String {
-        return identity.value?.identifier ?? "Pending Result Identifier"
-    }
 
     var pending: Bool {
         return identity.pending || attached.pending || started.pending || (cancelled.pending && finished.pending)
@@ -158,20 +149,6 @@ public final class OperationProfiler: Identifiable, Equatable, Hashable {
     enum Reporter {
         case Parent(OperationProfiler)
         case Reporters([OperationProfilerReporter])
-    }
-
-    struct State {
-        var result: PendingResult
-        var children: [OperationIdentity]
-
-        static func create() -> State {
-            return State(
-                // Pending Results, including finished children
-                result: PendingResult(created: CFAbsoluteTimeGetCurrent() as NSTimeInterval, identity: .Pending, attached: .Pending, started: .Pending, cancelled: .Pending, finished: .Pending, children: []),
-                // The ientities of pending children
-                children: []
-            )
-        }
     }
 
     public let identifier = NSUUID().UUIDString
