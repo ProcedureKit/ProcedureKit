@@ -31,7 +31,7 @@ Also, I’m pretty happy to report that adoption and usage of this framework has
     
     However, for customized reporting and analysis of profile results, create the profiler with an array of reporters, which are types conforming to the `OperationProfilerReporter` protocol.
     
-    In most cases doing any kind of profiling of applications in production is not wise and should not be done.
+    **In most cases doing any kind of profiling of applications in production is unnecessary and should be avoided.**
     
     However, in some circumstances, especially with applications which have very high active global users, it is necessary to gain a holistic view of an applications performance. Typically these measurements should be tied to networking operations and profiling in back end systems. The `OperationProfiler` has deliberately designed with a view of using custom reporters. The built in logging reporter should only really be used as debugging tool during development.
     
