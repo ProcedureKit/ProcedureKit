@@ -3,7 +3,7 @@
 
 Yet again, this release features more contributors - thanks a lot to [@estromlund](https://github.com/estromlund), [@itsthejb](https://github.com/itsthejb), [@MrAlek](https://github.com/MrAlek) and [@felix-dumit](https://github.com/felix-dumit) for finding bugs and fixing them!
 
-Also, I’m pretty happy to report that adoption and usage of this framework has been seeing somewhat of an uptick! According to the states on CocoaPods, we’re seeing almost 2,500 downloads/week and over 120 applications 🎉! The support from the Swift community on this has been pretty amazing so far - thanks everyone 😀🙌!
+Also, I’m pretty happy to report that adoption and usage of this framework has been seeing somewhat of an uptick! According to the stats on CocoaPods, we’re seeing almost 2,500 downloads/week and over used by over 120 applications 🎉! The support from the Swift community on this has been pretty amazing so far - thanks everyone 😀🙌!
 
 1. [[OPR-233](https://github.com/danthorpe/Operations/pull/223)]: Thanks to [@estromlund](https://github.com/estromlund) & [@itsthejb](https://github.com/itsthejb) for fixing a bug which would have caused retain cycles when using result injection.
 2. [[OPR-225](https://github.com/danthorpe/Operations/pull/225)]: Adds a unit test to check that `Operation` calls `finished()`. This was a bit of a followup to the fixes in 2.7.1.
