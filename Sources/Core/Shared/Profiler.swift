@@ -53,7 +53,7 @@ public protocol OperationProfilerReporter {
     func finishedProfilingWithResult(result: ProfileResult)
 }
 
-enum PendingValue<T> {
+enum PendingValue<T: Equatable>: Equatable {
     case Pending
     case Value(T)
 
@@ -69,6 +69,17 @@ enum PendingValue<T> {
             return value
         }
         return .None
+    }
+}
+
+func == <T: Equatable>(lhs: PendingValue<T>, rhs: PendingValue<T>) -> Bool {
+    switch (lhs, rhs) {
+    case (.Pending, .Pending):
+        return true
+    case let (.Value(lhsValue), .Value(rhsValue)):
+        return lhsValue == rhsValue
+    default:
+        return false
     }
 }
 
@@ -115,22 +126,22 @@ public struct PendingResult: Identifiable, Equatable, Hashable {
         return PendingResult(created: created, identity: .Value(newIdentity), attached: attached, started: started, cancelled: cancelled, finished: finished, children: children)
     }
 
-    func attachedNow(now: NSTimeInterval = CFAbsoluteTimeGetCurrent() as NSTimeInterval) -> PendingResult {
+    func attach(now: NSTimeInterval = CFAbsoluteTimeGetCurrent() as NSTimeInterval) -> PendingResult {
         guard attached.pending else { return self }
         return PendingResult(created: created, identity: identity, attached: .Value(now - created), started: started, cancelled: cancelled, finished: finished, children: children)
     }
 
-    func startedNow(now: NSTimeInterval = CFAbsoluteTimeGetCurrent() as NSTimeInterval) -> PendingResult {
+    func start(now: NSTimeInterval = CFAbsoluteTimeGetCurrent() as NSTimeInterval) -> PendingResult {
         guard started.pending else { return self }
         return PendingResult(created: created, identity: identity, attached: attached, started: .Value(now - created), cancelled: cancelled, finished: finished, children: children)
     }
 
-    func cancelledNow(now: NSTimeInterval = CFAbsoluteTimeGetCurrent() as NSTimeInterval) -> PendingResult {
+    func cancel(now: NSTimeInterval = CFAbsoluteTimeGetCurrent() as NSTimeInterval) -> PendingResult {
         guard cancelled.pending else { return self }
         return PendingResult(created: created, identity: identity, attached: attached, started: started, cancelled: .Value(now - created), finished: finished, children: children)
     }
 
-    func finishedNow(now: NSTimeInterval = CFAbsoluteTimeGetCurrent() as NSTimeInterval) -> PendingResult {
+    func finish(now: NSTimeInterval = CFAbsoluteTimeGetCurrent() as NSTimeInterval) -> PendingResult {
         guard finished.pending else { return self }
         return PendingResult(created: created, identity: identity, attached: attached, started: started, cancelled: cancelled, finished: .Value(now - created), children: children)
     }
@@ -191,14 +202,14 @@ public final class OperationProfiler: Identifiable, Equatable, Hashable {
         dispatch_sync(queue) { [unowned self] in
             switch event {
             case .Attached:
-                self.result = self.result.attachedNow(now)
+                self.result = self.result.attach(now)
             case .Started:
-                self.result = self.result.startedNow(now)
+                self.result = self.result.start(now)
             case .Cancelled:
-                self.result = self.result.cancelledNow(now)
+                self.result = self.result.cancel(now)
                 self.finishedOrCancelled = true
             case .Finished:
-                self.result = self.result.finishedNow(now)
+                self.result = self.result.finish(now)
                 self.finishedOrCancelled = true
             default:
                 break
