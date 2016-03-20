@@ -239,6 +239,79 @@ class OperationProfilerTests: OperationTests {
         }
     }
 
+    func test__profile_group_operation() {
+        let operation = GroupOperation(operations: [ TestOperation(), TestOperation() ])
+        addCompletionBlockToTestOperation(operation)
+
+        operation.addObserver(profiler)
+        runOperation(operation)
+        waitForExpectationsWithTimeout(3, handler: nil)
+
+        guard let result = reporter.didProfileResult else {
+            XCTFail("Reporter did not receive profile result."); return
+        }
+
+        validateProfileResult(result, after: now)
+        XCTAssertNotNil(result.finished)
+        XCTAssertEqual(result.children.count, 2)
+        for child in result.children {
+            validateProfileResult(child, after: now)
+        }
+    }
+}
+
+class PrintableProfileResultTests: XCTestCase {
+
+    var now: NSTimeInterval!
+    var result: ProfileResult!
+    var printable: PrintableProfileResult!
+
+    override func setUp() {
+        super.setUp()
+        now = CFAbsoluteTimeGetCurrent() as NSTimeInterval
+        result = ProfileResult(identity: OperationIdentity(identifier: "Result", name: .None), created: now, attached: 0.1, started: 0.2, cancelled: .None, finished: 0.3, children: [])
+        printable = PrintableProfileResult(result: result)
+    }
+
+    override func tearDown() {
+        now = nil
+        result = nil
+        super.tearDown()
+    }
+
+    func test__add_row_with_interval_text() {
+        let output = printable.addRowWithInterval(1.0, text: "Hello World")
+        XCTAssertEqual(output, "+1.0 Hello World\n")
+    }
+
+    func test__add_row_with_interval_for_event() {
+        let output = printable.addRowWithInterval(1.0, forEvent: .Attached)
+        XCTAssertEqual(output, "+1.0 Attached\n")
+    }
+
+    func test__description__with_whole_result() {
+        XCTAssertEqual(printable.description, "+0.1 Attached\n+0.2 Started\n+0.3 Finished\n")
+    }
+
+    func test__description__with_indentation() {
+        printable = PrintableProfileResult(indentation: 3, result: result)
+        XCTAssertEqual(printable.description, "   +0.1 Attached\n   +0.2 Started\n   +0.3 Finished\n")
+    }
+
+    func test__description__which_cancelled() {
+        result = ProfileResult(identity: OperationIdentity(identifier: "Child", name: .None), created: now, attached: 0.1, started: 0.2, cancelled: 0.25, finished: 0.3, children: [])
+        printable = PrintableProfileResult(result: result)
+        XCTAssertEqual(printable.description, "+0.1 Attached\n+0.2 Started\n+0.25 Cancelled\n+0.3 Finished\n")
+    }
+
+    func test__description__with_children() {
+        let child2 = ProfileResult(identity: OperationIdentity(identifier: "Child 2", name: .None), created: now + 0.5, attached: 0.1, started: 0.2, cancelled: .None, finished: 0.3, children: [])
+        let child1 = ProfileResult(identity: OperationIdentity(identifier: "Child 1", name: "Data Operation"), created: now + 0.2, attached: 0.1, started: 0.2, cancelled: .None, finished: 0.3, children: [child2])
+        result = ProfileResult(identity: OperationIdentity(identifier: "Result", name: .None), created: now, attached: 0.1, started: 0.2, cancelled: .None, finished: 0.3, children: [child1])
+        printable = PrintableProfileResult(result: result)
+        XCTAssertEqual(printable.description, "+0.1 Attached\n+0.2 Started\n-> Spawned Data Operation #Child 1 with profile results\n  +0.1 Attached\n  +0.2 Started\n  -> Spawned Unnamed Operation #Child 2 with profile results\n    +0.1 Attached\n    +0.2 Started\n    +0.3 Finished\n  +0.3 Finished\n+0.3 Finished\n")
+    }
+
 
 }
 

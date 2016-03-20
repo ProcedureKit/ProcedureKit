@@ -14,18 +14,11 @@ public protocol Identifiable {
     var identifier: String { get }
 }
 
-public extension Identifiable {
-
-    var hashValue: Int {
-        return identifier.hashValue
-    }
-}
-
 public func ==<T: Identifiable> (lhs: T, rhs: T) -> Bool {
     return lhs.identifier == rhs.identifier
 }
 
-public struct OperationIdentity: Identifiable, Equatable, Hashable {
+public struct OperationIdentity: Identifiable, Equatable {
     public let identifier: String
     public let name: String?
 }
@@ -144,7 +137,7 @@ struct PendingResult {
     }
 }
 
-public final class OperationProfiler: Identifiable, Equatable, Hashable {
+public final class OperationProfiler: Identifiable, Equatable {
 
     enum Reporter {
         case Parent(OperationProfiler)
