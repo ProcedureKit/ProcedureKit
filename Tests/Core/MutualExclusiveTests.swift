@@ -86,4 +86,17 @@ class MutuallyExclusiveConditionWithDependencyTests: OperationTests {
         XCTAssertTrue(operation1.didExecute)
         XCTAssertTrue(operation2.didExecute)
     }
+
+    func test__mutually_exclusive_operations_can_be_executed() {
+        let operation1 = BlockOperation()
+        operation1.addCondition(MutuallyExclusive<BlockOperation>())
+        let operation2 = BlockOperation()
+        operation2.addCondition(MutuallyExclusive<BlockOperation>())
+
+        addCompletionBlockToTestOperation(operation1, withExpectation: expectationWithDescription("Test 1: \(__FUNCTION__)"))
+        addCompletionBlockToTestOperation(operation2, withExpectation: expectationWithDescription("Test 2: \(__FUNCTION__)"))
+
+        runOperations(operation1, operation2)
+        waitForExpectationsWithTimeout(3, handler: nil)
+    }
 }
