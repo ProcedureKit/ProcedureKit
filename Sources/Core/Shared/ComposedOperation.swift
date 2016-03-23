@@ -13,20 +13,19 @@ public class ComposedOperation<T: NSOperation>: Operation {
     public let target: Operation
     public var operation: T
 
-    public convenience init(_ op: T) {
-        self.init(operation: op)
+    public convenience init(_ composed: T) {
+        self.init(operation: composed)
     }
 
-    init(operation op: T) {
-        self.target = op as? Operation ?? GroupOperation(operations: [op])
-        self.operation = op
+    init(operation composed: T) {
+        self.target = composed as? Operation ?? GroupOperation(operations: [composed])
+        self.operation = composed
         super.init()
         name = "Composed Operation"
         target.name = target.name ?? "Composed <\(T.self)>"
-        target.addObserver(DidFinishObserver {
-            [unowned self] _, errors in
+        target.addObserver(DidFinishObserver { [unowned self] _, errors in
             self.finish(errors)
-            })
+        })
     }
 
     public override func cancel() {
