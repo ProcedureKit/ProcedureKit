@@ -48,7 +48,7 @@ class NetworkObserverTests: OperationTests {
         let operation = TestOperation(delay: 1)
         operation.addObserver(NetworkObserver(indicator: indicator))
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
         runOperation(operation)
 
         waitForExpectationsWithTimeout(3) { error in
@@ -60,7 +60,7 @@ class NetworkObserverTests: OperationTests {
 
     func test__network_indicator_hides_after_short_delay_when_operation_ends() {
 
-        let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
+        let expectation = expectationWithDescription("Test: \(#function)")
         let operation = TestOperation(delay: 1)
         operation.addObserver(NetworkObserver(indicator: indicator))
 

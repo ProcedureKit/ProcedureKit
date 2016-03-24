@@ -13,7 +13,7 @@ class RandomFailGeneratorTests: XCTestCase {
 
     func test__failure_probability_distribution() {
 
-        var generator = RandomFailGenerator(anyGenerator { true })
+        var generator = RandomFailGenerator(AnyGenerator { true })
 
         let total = 1_000
         var failures = 0
@@ -36,7 +36,7 @@ class FiniteGeneratorTests: XCTestCase {
 
     override func setUp() {
         super.setUp()
-        generator = FiniteGenerator(anyGenerator(0.stride(to: 10, by: 1).generate()), limit: 2)
+        generator = FiniteGenerator(AnyGenerator(0.stride(to: 10, by: 1).generate()), limit: 2)
     }
 
     func test__limits_are_reached() {
@@ -260,9 +260,9 @@ class RepeatedOperationTests: OperationTests {
     var operation: RepeatedOperation<TestOperation>!
 
     func test__custom_generator_with_delay() {
-        operation = RepeatedOperation(maxCount: 2, generator: anyGenerator { (Delay.By(0.1), TestOperation() )})
+        operation = RepeatedOperation(maxCount: 2, generator: AnyGenerator { (Delay.By(0.1), TestOperation() )})
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
         runOperation(operation)
         waitForExpectationsWithTimeout(3, handler: nil)
 
@@ -272,9 +272,9 @@ class RepeatedOperationTests: OperationTests {
     }
 
     func test__custom_generator_without_delay() {
-        operation = RepeatedOperation(maxCount: 2, generator: anyGenerator { (.None, TestOperation() )})
+        operation = RepeatedOperation(maxCount: 2, generator: AnyGenerator { (.None, TestOperation() )})
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
         runOperation(operation)
         waitForExpectationsWithTimeout(3, handler: nil)
 
@@ -284,9 +284,9 @@ class RepeatedOperationTests: OperationTests {
     }
 
     func test__init_separate_delay_generator_and_item_generator() {
-        operation = RepeatedOperation(maxCount: 2, delay: anyGenerator { Delay.By(0.1) }, generator: anyGenerator { TestOperation() })
+        operation = RepeatedOperation(maxCount: 2, delay: AnyGenerator { Delay.By(0.1) }, generator: AnyGenerator { TestOperation() })
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
         runOperation(operation)
         waitForExpectationsWithTimeout(3, handler: nil)
 
@@ -300,7 +300,7 @@ class NonRepeatableRepeatedOperationTests: OperationTests {
 
     func createGenerator(succeedsAfterCount target: Int = 1) -> AnyGenerator<TestOperation> {
         var count = 0
-        return anyGenerator { () -> TestOperation? in
+        return AnyGenerator { () -> TestOperation? in
             guard count < target else { return nil }
             defer { count += 1 }
             if count < target - 1 {
@@ -315,7 +315,7 @@ class NonRepeatableRepeatedOperationTests: OperationTests {
     func test__repeated_operation_repeats() {
         let operation = RepeatedOperation(generator: createGenerator(succeedsAfterCount: 5))
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
         runOperation(operation)
         waitForExpectationsWithTimeout(3, handler: nil)
 
@@ -326,7 +326,7 @@ class NonRepeatableRepeatedOperationTests: OperationTests {
     func test__repeated_with_max_number_of_attempts() {
         let operation = RepeatedOperation(maxCount: 2, generator: createGenerator(succeedsAfterCount: 5))
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
         runOperation(operation)
         waitForExpectationsWithTimeout(3, handler: nil)
 
@@ -346,7 +346,7 @@ class RepeatableRepeatedOperationTests: OperationTests {
     func test__repeated_operation_repeats() {
         let operation = RepeatedOperation { RepeatingTestOperation() }
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
         runOperation(operation)
         waitForExpectationsWithTimeout(3, handler: nil)
 
@@ -356,7 +356,7 @@ class RepeatableRepeatedOperationTests: OperationTests {
     func test__repeated_with_max_number_of_attempts() {
         let operation = RepeatedOperation(maxCount: 2) { RepeatingTestOperation() }
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
         runOperation(operation)
         waitForExpectationsWithTimeout(3, handler: nil)
 
@@ -376,7 +376,7 @@ class RepeatableRepeatedOperationTests: OperationTests {
             return RepeatableOperation(op) { _ in errors.count < 3 }
         }
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
         runOperation(operation)
         waitForExpectationsWithTimeout(3, handler: nil)
 

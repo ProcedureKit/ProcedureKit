@@ -79,7 +79,7 @@ class BackgroundObserverTests: OperationTests {
         let operation = TestOperation(delay: 2, produced: TestOperation())
         operation.addObserver(BackgroundObserver(app: application))
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
         runOperation(operation)
         applicationEntersBackground(application)
 
@@ -118,7 +118,7 @@ class BackgroundObserverTests: OperationTests {
         let operation = TestOperation(delay: 2)
         operation.addObserver(BackgroundObserver(app: application))
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
         runOperation(operation)
         applicationBecomesActive(application)
 

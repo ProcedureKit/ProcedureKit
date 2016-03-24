@@ -77,8 +77,8 @@ class MutuallyExclusiveConditionWithDependencyTests: OperationTests {
         let operation2 = TestOperation()
         operation2.addCondition(condition2)
 
-        addCompletionBlockToTestOperation(operation1, withExpectation: expectationWithDescription("Test 1: \(__FUNCTION__)"))
-        addCompletionBlockToTestOperation(operation2, withExpectation: expectationWithDescription("Test 2: \(__FUNCTION__)"))
+        addCompletionBlockToTestOperation(operation1, withExpectation: expectationWithDescription("Test 1: \(#function)"))
+        addCompletionBlockToTestOperation(operation2, withExpectation: expectationWithDescription("Test 2: \(#function)"))
 
         runOperations(operation1, operation2)
         waitForExpectationsWithTimeout(3, handler: nil)

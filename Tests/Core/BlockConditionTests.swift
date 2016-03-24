@@ -16,7 +16,7 @@ class BlockConditionTests: OperationTests {
         let operation = TestOperation()
         operation.addCondition(BlockCondition { true })
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
         runOperation(operation)
 
         waitForExpectationsWithTimeout(3, handler: nil)
@@ -25,7 +25,7 @@ class BlockConditionTests: OperationTests {
 
     func test__operation_with_unsuccess_block_condition_errors() {
 
-        let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
+        let expectation = expectationWithDescription("Test: \(#function)")
         let operation = TestOperation()
         operation.addCondition(BlockCondition { false })
 

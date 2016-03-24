@@ -134,14 +134,14 @@ class OperationTests: XCTestCase {
         queue.addOperations(operations, waitUntilFinished: false)
     }
 
-    func waitForOperation(operation: Operation, withExpectationDescription text: String = __FUNCTION__) {
+    func waitForOperation(operation: Operation, withExpectationDescription text: String = #function) {
         addCompletionBlockToTestOperation(operation, withExpectationDescription: text)
         queue.delegate = delegate
         queue.addOperation(operation)
         waitForExpectationsWithTimeout(3, handler: nil)
     }
 
-    func waitForOperations(operations: Operation..., withExpectationDescription text: String = __FUNCTION__) {
+    func waitForOperations(operations: Operation..., withExpectationDescription text: String = #function) {
         for (i, op) in operations.enumerate() {
             addCompletionBlockToTestOperation(op, withExpectationDescription: "\(i), \(text)")
         }
@@ -157,7 +157,7 @@ class OperationTests: XCTestCase {
         })
     }
 
-    func addCompletionBlockToTestOperation(operation: Operation, withExpectationDescription text: String = __FUNCTION__) -> XCTestExpectation {
+    func addCompletionBlockToTestOperation(operation: Operation, withExpectationDescription text: String = #function) -> XCTestExpectation {
         let expectation = expectationWithDescription("Test: \(text), \(NSUUID().UUIDString)")
         operation.addObserver(DidFinishObserver { _, _ in
             expectation.fulfill()
@@ -170,7 +170,7 @@ class OperationTests: XCTestCase {
 class BasicTests: OperationTests {
 
     func test__queue_delegate_is_notified_when_operation_starts() {
-        let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
+        let expectation = expectationWithDescription("Test: \(#function)")
 
         let operation = TestOperation()
         addCompletionBlockToTestOperation(operation, withExpectation: expectation)
@@ -183,7 +183,7 @@ class BasicTests: OperationTests {
     }
 
     func test__executing_basic_operation() {
-        let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
+        let expectation = expectationWithDescription("Test: \(#function)")
 
         let operation = TestOperation()
 
@@ -202,7 +202,7 @@ class BasicTests: OperationTests {
     }
 
     func test__add_multiple_completion_blocks() {
-        let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
+        let expectation = expectationWithDescription("Test: \(#function)")
         let operation = TestOperation()
 
         var completionBlockOneDidRun = 0
@@ -230,7 +230,7 @@ class BasicTests: OperationTests {
     }
 
     func test__add_multiple_dependencies() {
-        let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
+        let expectation = expectationWithDescription("Test: \(#function)")
 
         let dep1 = TestOperation()
         let dep2 = TestOperation()
@@ -291,7 +291,7 @@ class BlockOperationTests: OperationTests {
 
     func test__that_block_in_block_operation_executes() {
 
-        let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
+        let expectation = expectationWithDescription("Test: \(#function)")
         var didExecuteBlock: Bool = false
         let operation = BlockOperation {
             didExecuteBlock = true
@@ -303,7 +303,7 @@ class BlockOperationTests: OperationTests {
     }
 
     func test__that_block_operation_with_no_block_finishes_immediately() {
-        let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
+        let expectation = expectationWithDescription("Test: \(#function)")
         let operation = BlockOperation()
         addCompletionBlockToTestOperation(operation, withExpectation: expectation)
         runOperation(operation)
@@ -326,7 +326,7 @@ class BlockOperationTests: OperationTests {
             continuation(error: nil)
         }
 
-        addCompletionBlockToTestOperation(block, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        addCompletionBlockToTestOperation(block, withExpectation: expectationWithDescription("Test: \(#function)"))
 
         block.addDependency(delay)
         blockToCancel.addDependency(delay)
@@ -344,7 +344,7 @@ private var completionBlockObservationContext = 0
 class CompletionBlockOperationTests: OperationTests {
 
     func test__block_operation_with_default_block_runs_completion_block_once() {
-        let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
+        let expectation = expectationWithDescription("Test: \(#function)")
         var numberOfTimesCompletionBlockIsRun = 0
 
 //        let operation = BlockOperation { (continuation: BlockOperation.ContinuationBlockType) in
@@ -377,7 +377,7 @@ class CompletionBlockOperationTests: OperationTests {
 
     func test__nsblockoperation_runs_completion_block_once() {
         let _queue = NSOperationQueue()
-        let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
+        let expectation = expectationWithDescription("Test: \(#function)")
 
         let operation = NSBlockOperation()
         operation.completionBlock = { expectation.fulfill() }
@@ -483,7 +483,7 @@ class OperationDependencyTests: OperationTests {
         operation.addCondition(condition1)
         operation.addCondition(condition2)
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
         runOperations(dependency1, dependency2, operation)
         waitForExpectationsWithTimeout(3, handler: nil)
 
@@ -509,7 +509,7 @@ class OperationDependencyTests: OperationTests {
         operation.addCondition(condition1)
         operation.addCondition(condition2)
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
         runOperations(dependency1, dependency2, operation)
         waitForExpectationsWithTimeout(3, handler: nil)
 
@@ -548,7 +548,7 @@ class DelayOperationTests: OperationTests {
     }
 
     func test__delay_operation_with_negative_time_interval_finishes_immediately() {
-        let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
+        let expectation = expectationWithDescription("Test: \(#function)")
         let operation = DelayOperation(interval: -9_000_000)
         runOperation(operation)
         let after = dispatch_time(DISPATCH_TIME_NOW, Int64(0.05 * Double(NSEC_PER_SEC)))
@@ -560,7 +560,7 @@ class DelayOperationTests: OperationTests {
     }
 
     func test__delay_operation_with_distant_past_finishes_immediately() {
-        let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
+        let expectation = expectationWithDescription("Test: \(#function)")
         let operation = DelayOperation(date: NSDate.distantPast())
         runOperation(operation)
         let after = dispatch_time(DISPATCH_TIME_NOW, Int64(0.05 * Double(NSEC_PER_SEC)))
@@ -574,7 +574,7 @@ class DelayOperationTests: OperationTests {
     func test__delay_operation_completes_after_interval() {
         var started: NSDate!
         var ended: NSDate!
-        let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
+        let expectation = expectationWithDescription("Test: \(#function)")
         let interval: NSTimeInterval = 0.5
         let operation = DelayOperation(interval: interval)
         operation.addCompletionBlock {
@@ -599,7 +599,7 @@ class CancellationOperationTests: OperationTests {
         let operation = TestOperation()
         operation.addDependency(delay)
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
 
         delay.cancel()
 
