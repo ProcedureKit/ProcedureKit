@@ -8,26 +8,27 @@
 
 import Foundation
 
-public class ComposedOperation<T: NSOperation>: Operation, OperationDidFinishObserver {
+public class ComposedOperation<T: NSOperation>: Operation {
 
     public let target: Operation
     public var operation: T
 
-    public convenience init(_ operation: T) {
-        self.init(operation: operation)
+    public convenience init(_ composed: T) {
+        self.init(operation: composed)
     }
 
     init(operation composed: T) {
-        target = composed as? Operation ?? GroupOperation(operations: [composed])
-        operation = composed
+        self.target = composed as? Operation ?? GroupOperation(operations: [composed])
+        self.operation = composed
         super.init()
         name = "Composed Operation"
-        target.name = "Composed <\(T.self)>"
-        target.addObserver(self)
+        target.name = target.name ?? "Composed <\(T.self)>"
+        target.addObserver(DidFinishObserver { [unowned self] _, errors in
+            self.finish(errors)
+        })
     }
 
     public override func cancel() {
-        target.cancel()
         operation.cancel()
         super.cancel()
     }
@@ -35,11 +36,5 @@ public class ComposedOperation<T: NSOperation>: Operation, OperationDidFinishObs
     public override func execute() {
         target.log.severity = log.severity
         produceOperation(target)
-    }
-
-    public func didFinishOperation(operation: Operation, errors: [ErrorType]) {
-        if operation === target {
-            finish(errors)
-        }
     }
 }
