@@ -21,7 +21,7 @@ internal class ExclusivityManager {
     }
 
     func addOperation(operation: NSOperation, category: String) {
-        dispatch_async(queue) {
+        dispatch_sync(queue) {
             self._addOperation(operation, category: category)
         }
     }
