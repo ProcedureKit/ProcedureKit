@@ -112,8 +112,15 @@ public func == (lhs: UserNotificationCondition.Error, rhs: UserNotificationCondi
 
 public class UserNotificationPermissionOperation: Operation {
 
-    enum NotificationObserver: Selector {
-        case SettingsDidChange = "notificationSettingsDidChange:"
+    enum NotificationObserver {
+        case SettingsDidChange
+
+        var selector: Selector {
+            switch self {
+            case .SettingsDidChange:
+                return #selector(UserNotificationPermissionOperation.notificationSettingsDidChange(_:))
+            }
+        }
     }
 
     let settings: UIUserNotificationSettings
@@ -136,7 +143,7 @@ public class UserNotificationPermissionOperation: Operation {
     public override func execute() {
         NSNotificationCenter
             .defaultCenter()
-            .addObserver(self, selector: NotificationObserver.SettingsDidChange.rawValue, name: DidRegisterSettingsNotificationName, object: nil)
+            .addObserver(self, selector: NotificationObserver.SettingsDidChange.selector, name: DidRegisterSettingsNotificationName, object: nil)
         dispatch_async(Queue.Main.queue, request)
     }
 

@@ -16,43 +16,43 @@ import CloudKit
 public protocol CKOperationType: class {
 
     /// The type of the CloudKit Container
-    typealias Container
+    associatedtype Container
 
     /// The type of the CloudKit ServerChangeToken
-    typealias ServerChangeToken
+    associatedtype ServerChangeToken
 
     /// The type of the CloudKit Notification
-    typealias Notification
+    associatedtype Notification
 
     /// The type of the CloudKit RecordZone
-    typealias RecordZone
+    associatedtype RecordZone
 
     /// The type of the CloudKit Record
-    typealias Record
+    associatedtype Record
 
     /// The type of the CloudKit Subscription
-    typealias Subscription
+    associatedtype Subscription
 
     /// The type of the CloudKit RecordSavePolicy
-    typealias RecordSavePolicy
+    associatedtype RecordSavePolicy
 
     /// The type of the CloudKit DiscoveredUserInfo
-    typealias DiscoveredUserInfo
+    associatedtype DiscoveredUserInfo
 
     /// The type of the CloudKit Query
-    typealias Query
+    associatedtype Query
 
     /// The type of the CloudKit QueryCursor
-    typealias QueryCursor
+    associatedtype QueryCursor
 
     /// The type of the CloudKit RecordZoneID
-    typealias RecordZoneID: Hashable
+    associatedtype RecordZoneID: Hashable
 
     /// The type of the CloudKit NotificationID
-    typealias NotificationID: Hashable
+    associatedtype NotificationID: Hashable
 
     /// The type of the CloudKit RecordID
-    typealias RecordID: Hashable
+    associatedtype RecordID: Hashable
 
     /// - returns the CloudKit Container
     var container: Container? { get set }
@@ -65,7 +65,7 @@ public protocol CKOperationType: class {
 public protocol CKDatabaseOperationType: CKOperationType {
 
     /// The type of the CloudKit Database
-    typealias Database
+    associatedtype Database
 
     /// - returns: the CloudKit Database
     var database: Database? { get set }

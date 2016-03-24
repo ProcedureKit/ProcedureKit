@@ -109,7 +109,7 @@ extension InjectionOperationType where Self: Operation {
  an operation conforming to `AutomaticInjectionOperationType`.
 */
 public protocol ResultOperationType: class {
-    typealias Result
+    associatedtype Result
 
     /// - returns: the `Result`, note that this can be an `Thing?` if needed.
     var result: Result { get }
@@ -121,7 +121,7 @@ public protocol ResultOperationType: class {
  conforming to `ResultOperationType`.
  */
 public protocol AutomaticInjectionOperationType: InjectionOperationType {
-    typealias Requirement
+    associatedtype Requirement
 
     /// - returns: the `Requirement`, note must be mutable, and
     /// can be `Thing?` if needed.

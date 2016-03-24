@@ -36,7 +36,7 @@ public protocol ContactSaveRequestType {
 
 @available(iOS 9.0, OSX 10.11, *)
 public protocol ContactStoreType {
-    typealias SaveRequest: ContactSaveRequestType
+    associatedtype SaveRequest: ContactSaveRequestType
 
     init()
     func opr_authorizationStatusForEntityType(entityType: CNEntityType) -> CNAuthorizationStatus
