@@ -20,10 +20,10 @@ import Foundation
 public protocol CapabilityType {
 
     /// A type which performs the registration of capability permissions.
-    typealias Registrar: CapabilityRegistrarType
+    associatedtype Registrar: CapabilityRegistrarType
 
     /// A type which indicates the current status of the capability
-    typealias Status: AuthorizationStatusType
+    associatedtype Status: AuthorizationStatusType
 
     /// - returns: a String, the name of the capability
     var name: String { get }
@@ -88,7 +88,7 @@ public protocol CapabilityType {
 public protocol AuthorizationStatusType {
 
     /// A generic type for the requirement
-    typealias Requirement
+    associatedtype Requirement
 
     /**
      Given the current authorization status (i.e. self)

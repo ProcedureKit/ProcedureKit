@@ -1,6 +1,5 @@
 excluded:
   - Tests
-use_nested_configs: true
 disabled_rules:
   - valid_docs
   - statement_position

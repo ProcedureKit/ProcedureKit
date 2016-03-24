@@ -121,7 +121,7 @@ public extension LoggerType {
      - parameter function: a `String`, containing the function (make it default to __FUNCTION__)
      - parameter line: a `Int`, containing the line number (make it default to __LINE__)
     */
-    func log(@autoclosure message: () -> String, severity: LogSeverity, file: String = __FILE__, function: String = __FUNCTION__, line: Int = __LINE__) {
+    func log(@autoclosure message: () -> String, severity: LogSeverity, file: String = #file, function: String = #function, line: Int = #line) {
         if LogManager.enabled && enabled && severity >= minimumLogSeverity {
             let _message = messageWithOperationName(message())
             dispatch_async(LogManager.queue) {
@@ -138,7 +138,7 @@ public extension LoggerType {
      - parameter function: a `String`, containing the function (make it default to __FUNCTION__)
      - parameter line: a `Int`, containing the line number (make it default to __LINE__)
     */
-    func verbose(@autoclosure message: () -> String, file: String = __FILE__, function: String = __FUNCTION__, line: Int = __LINE__) {
+    func verbose(@autoclosure message: () -> String, file: String = #file, function: String = #function, line: Int = #line) {
         log(message, severity: .Verbose, file: file, function: function, line: line)
     }
 
@@ -150,7 +150,7 @@ public extension LoggerType {
      - parameter function: a `String`, containing the function (make it default to __FUNCTION__)
      - parameter line: a `Int`, containing the line number (make it default to __LINE__)
      */
-    func notice(@autoclosure message: () -> String, file: String = __FILE__, function: String = __FUNCTION__, line: Int = __LINE__) {
+    func notice(@autoclosure message: () -> String, file: String = #file, function: String = #function, line: Int = #line) {
         log(message, severity: .Notice, file: file, function: function, line: line)
     }
 
@@ -162,7 +162,7 @@ public extension LoggerType {
      - parameter function: a `String`, containing the function (make it default to __FUNCTION__)
      - parameter line: a `Int`, containing the line number (make it default to __LINE__)
      */
-    func info(@autoclosure message: () -> String, file: String = __FILE__, function: String = __FUNCTION__, line: Int = __LINE__) {
+    func info(@autoclosure message: () -> String, file: String = #file, function: String = #function, line: Int = #line) {
         log(message, severity: .Info, file: file, function: function, line: line)
     }
 
@@ -174,7 +174,7 @@ public extension LoggerType {
      - parameter function: a `String`, containing the function (make it default to __FUNCTION__)
      - parameter line: a `Int`, containing the line number (make it default to __LINE__)
      */
-    func warning(@autoclosure message: () -> String, file: String = __FILE__, function: String = __FUNCTION__, line: Int = __LINE__) {
+    func warning(@autoclosure message: () -> String, file: String = #file, function: String = #function, line: Int = #line) {
         log(message, severity: .Warning, file: file, function: function, line: line)
     }
 
@@ -186,7 +186,7 @@ public extension LoggerType {
      - parameter function: a `String`, containing the function (make it default to __FUNCTION__)
      - parameter line: a `Int`, containing the line number (make it default to __LINE__)
      */
-    func fatal(@autoclosure message: () -> String, file: String = __FILE__, function: String = __FUNCTION__, line: Int = __LINE__) {
+    func fatal(@autoclosure message: () -> String, file: String = #file, function: String = #function, line: Int = #line) {
         log(message, severity: .Fatal, file: file, function: function, line: line)
     }
 }
