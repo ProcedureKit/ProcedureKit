@@ -5,17 +5,24 @@ steps:
   -
     name: ":mac: Test OS X Extension"
     command: .ci/scripts/test-osx-extension
+    agents:
+      swift: "$BUILDKITE_AGENT_META_DATA_SWIFT"
   -
     name: ":mac: Test Mac OS X"
     command: .ci/scripts/test-osx
+    agents:
+      swift: "$BUILDKITE_AGENT_META_DATA_SWIFT"    
   -
     name: ":fastlane: Test iOS Extension"
     command: .ci/scripts/test-ios-extension
+    agents:
+      swift: "$BUILDKITE_AGENT_META_DATA_SWIFT"    
   -
     name: ":fastlane: Test iOS"
     command: .ci/scripts/test-ios
     agents:
-      name: "$BUILDKITE_AGENT_META_DATA_NAME"	
+      swift: "$BUILDKITE_AGENT_META_DATA_SWIFT"    
+      name: "$BUILDKITE_AGENT_META_DATA_NAME"
   -
     type: "waiter"      
   -

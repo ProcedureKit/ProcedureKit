@@ -1,3 +1,10 @@
+# 2.8.1
+
+1. [[OPR-245](https://github.com/danthorpe/Operations/pull/247)]: Thanks to [@difujia](https://github.com/difujia) for spotting and fixing a really clear retain cycle in `ComposedOperation`. Good tip - is to remember that an operation will retain its observers, meaning that if an operation owns another operation, *and* acts as its observer, then it will create a retain cycle. The easy fix is to use block based observers, with a capture list of `[unowned self]`.
+2. [[OPR-246](https://github.com/danthorpe/Operations/pull/248)]: Another bug fix from [@difujia](https://github.com/difujia) for a race condition when adding operation which have mutual exclusive dependencies. My bad! Thanks Frank!
+
+Just a quick note - these bug fixes are both being released now as 2.8.1 for Swift 2.1 & Xcode 7.2. The same fixes will be pulled into the `development` branch which is shortly going to become Swift 2.2, although it isn't yet. Bear with me - as that should happen over the weekend. 
+
 # 2.8.0
 🚀 This will be the last minor release for Swift 2.1.1. From here on development of new features will be in Swift 2.2 😀.
 
