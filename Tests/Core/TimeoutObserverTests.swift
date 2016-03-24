@@ -12,7 +12,7 @@ import XCTest
 class TimeoutObserverTests: OperationTests {
 
     func test__timeout_observer() {
-        let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
+        let expectation = expectationWithDescription("Test: \(#function)")
 
         let operation = TestOperation(delay: 0.5)
         operation.addObserver(TimeoutObserver(timeout: 0.1))

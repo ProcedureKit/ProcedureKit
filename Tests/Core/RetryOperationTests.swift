@@ -73,9 +73,9 @@ class RetryOperationTests: OperationTests {
     }
 
     func test__retry_operation_with_payload_generator() {
-        operation = RetryOperation(generator: anyGenerator(producerWithDelay(2)), retry: { $1 })
+        operation = RetryOperation(generator: AnyGenerator(body: producerWithDelay(2)), retry: { $1 })
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
         runOperation(operation)
         waitForExpectationsWithTimeout(3, handler: nil)
 
@@ -84,10 +84,9 @@ class RetryOperationTests: OperationTests {
     }
 
     func test__retry_operation_with_default_delay() {
+        operation = RetryOperation(AnyGenerator(body: producer(2)))
 
-        operation = RetryOperation(anyGenerator(producer(2)))
-
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
         runOperation(operation)
         waitForExpectationsWithTimeout(3, handler: nil)
 
@@ -96,9 +95,9 @@ class RetryOperationTests: OperationTests {
     }
 
     func test__retry_operation_where_generator_returns_nil() {
-        operation = RetryOperation(maxCount: 12, strategy: .Fixed(0.01), anyGenerator(producer(11))) { $1 } // Includes the retry block
+        operation = RetryOperation(maxCount: 12, strategy: .Fixed(0.01), AnyGenerator(body: producer(11))) { $1 } // Includes the retry block
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
         runOperation(operation)
         waitForExpectationsWithTimeout(3, handler: nil)
 
@@ -107,10 +106,9 @@ class RetryOperationTests: OperationTests {
     }
 
     func test__retry_operation_where_max_count_is_reached() {
+        operation = RetryOperation(AnyGenerator(body: producer(9)))
 
-        operation = RetryOperation(anyGenerator(producer(9)))
-
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
         runOperation(operation)
         waitForExpectationsWithTimeout(3, handler: nil)
 
@@ -133,9 +131,9 @@ class RetryOperationTests: OperationTests {
             return recommended
         }
 
-        operation = RetryOperation(anyGenerator(producer(3)), retry: retry)
+        operation = RetryOperation(AnyGenerator(body: producer(3)), retry: retry)
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
         runOperation(operation)
         waitForExpectationsWithTimeout(3, handler: nil)
 
@@ -162,9 +160,9 @@ class RetryOperationTests: OperationTests {
             return .None
         }
 
-        operation = RetryOperation(anyGenerator(producer(3)), retry: retry)
+        operation = RetryOperation(AnyGenerator(body: producer(3)), retry: retry)
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
         runOperation(operation)
         waitForExpectationsWithTimeout(3, handler: nil)
 

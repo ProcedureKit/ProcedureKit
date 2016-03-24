@@ -175,7 +175,7 @@ class CloudCapabilitiesTests: XCTestCase {
     // Requesting authorization
 
     func test__request_permissions() {
-        let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
+        let expectation = expectationWithDescription("Test: \(#function)")
         requirement = [ .UserDiscoverability ]
         makeDefaultCapability()
         capability.registrar.accountStatus = .Available

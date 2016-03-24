@@ -41,7 +41,7 @@ class GroupOperationTests: OperationTests {
         let delay = DelayOperation(interval: 10)
         let group = SleepingGroupOperation(operations: [delay])
         
-        let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
+        let expectation = expectationWithDescription("Test: \(#function)")
         group.addObserver(BlockObserver { observedOperation, errors in
             NSOperationQueue.mainQueue().addOperationWithBlock {
                 XCTAssertTrue(observedOperation.cancelled)
@@ -58,7 +58,7 @@ class GroupOperationTests: OperationTests {
 
     func test__group_operations_are_performed_in_order() {
         let group = createGroupOperations()
-        let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
+        let expectation = expectationWithDescription("Test: \(#function)")
         let operation = GroupOperation(operations: group)
         operation.addCompletionBlock {
             expectation.fulfill()
@@ -73,7 +73,7 @@ class GroupOperationTests: OperationTests {
     }
 
     func test__adding_operation_to_running_group() {
-        let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
+        let expectation = expectationWithDescription("Test: \(#function)")
         let operation = GroupOperation(operations: TestOperation(), TestOperation())
         operation.addCompletionBlock {
             expectation.fulfill()
@@ -91,13 +91,13 @@ class GroupOperationTests: OperationTests {
         let operations: [TestOperation] = (0..<3).map { i in
             let op = TestOperation()
             op.addCondition(BlockCondition { true })
-            let exp = self.expectationWithDescription("Group Operation, child \(i): \(__FUNCTION__)")
+            let exp = self.expectationWithDescription("Group Operation, child \(i): \(#function)")
             self.addCompletionBlockToTestOperation(op, withExpectation: exp)
             return op
         }
 
         let group = GroupOperation(operations: operations)
-        addCompletionBlockToTestOperation(group, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        addCompletionBlockToTestOperation(group, withExpectation: expectationWithDescription("Test: \(#function)"))
 
         runOperation(group)
         waitForExpectationsWithTimeout(5, handler: nil)
@@ -109,7 +109,7 @@ class GroupOperationTests: OperationTests {
         let operations: [TestOperation] = (0..<3).map { _ in TestOperation() }
         group.addOperations(operations)
 
-        addCompletionBlockToTestOperation(group, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        addCompletionBlockToTestOperation(group, withExpectation: expectationWithDescription("Test: \(#function)"))
         runOperation(group)
         waitForExpectationsWithTimeout(3, handler: nil)
 
@@ -136,7 +136,7 @@ class GroupOperationTests: OperationTests {
         let waiter = BlockOperation { }
         waiter.addDependency(group)
 
-        let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
+        let expectation = expectationWithDescription("Test: \(#function)")
         addCompletionBlockToTestOperation(waiter, withExpectation: expectation)
         runOperations(group, waiter)
         waitForExpectationsWithTimeout(5.0, handler: nil)
@@ -153,7 +153,7 @@ class GroupOperationTests: OperationTests {
         let waiter = BlockOperation { }
         waiter.addDependency(group)
 
-        let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
+        let expectation = expectationWithDescription("Test: \(#function)")
         addCompletionBlockToTestOperation(waiter, withExpectation: expectation)
         runOperations(group, waiter)
         waitForExpectationsWithTimeout(3, handler: nil)
@@ -171,7 +171,7 @@ class GroupOperationTests: OperationTests {
         let waiter = BlockOperation { }
         waiter.addDependency(group)
 
-        let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
+        let expectation = expectationWithDescription("Test: \(#function)")
         addCompletionBlockToTestOperation(waiter, withExpectation: expectation)
         runOperations(group, waiter)
         waitForExpectationsWithTimeout(3, handler: nil)
