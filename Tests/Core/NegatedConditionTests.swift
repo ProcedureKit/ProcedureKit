@@ -12,7 +12,7 @@ import XCTest
 class NegatedConditionTests: OperationTests {
 
     func test__operation_with_successful_block_condition_fails() {
-        let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
+        let expectation = expectationWithDescription("Test: \(#function)")
         let operation = TestOperation()
         operation.addCondition(NegatedCondition(BlockCondition { true }))
 
@@ -40,7 +40,7 @@ class NegatedConditionTests: OperationTests {
         let operation = TestOperation()
         operation.addCondition(NegatedCondition(BlockCondition { false }))
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
         runOperation(operation)
         waitForExpectationsWithTimeout(3, handler: nil)
 

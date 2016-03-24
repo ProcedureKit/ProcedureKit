@@ -36,7 +36,7 @@ class WebpageOperationTests: OperationTests {
         var didPresentWebpage = false
         let operation = WebpageOperation(url: url, displayControllerFrom: .ShowDetail(presentingController))
 
-        presentingController.expectation = expectationWithDescription("Test: \(__FUNCTION__)")
+        presentingController.expectation = expectationWithDescription("Test: \(#function)")
         presentingController.check = { received in
             if let safariViewController = received as? SFSafariViewController {
                 didPresentWebpage = true
