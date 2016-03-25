@@ -18,10 +18,26 @@ custom_categories:
     - OperationQueueDelegate
     - OperationCondition
     - OperationConditionResult
-    - OperationObserver
+    - OperationEvent
+    - OperationObserverType        
+    - OperationDidStartObserver    
+    - OperationDidCancelObserver
+    - OperationDidProduceOperationObserver
+    - GroupOperationWillAddChildObserver    
+    - OperationWillFinishObserver
+    - OperationDidFinishObserver
+    - StartedObserver    
+    - CancelledObserver    
+    - WillAddChildObserver
+    - ProducedOperationObserver     
+    - WillFinishObserver
+    - DidFinishObserver    
+    - OperationObserver    
     - LogSeverity
     - LoggerBlockType
     - LoggerType
+    - OperationProfiler
+    - ProfileResult
     - Queue
 
   - name: Building Blocks
@@ -30,6 +46,7 @@ custom_categories:
     - BlockOperation
     - AlertOperation
     - ComposedOperation
+    - Delay    
     - DelayOperation
     - GatedOperation
     - UIOperation
@@ -51,10 +68,18 @@ custom_categories:
   - name: Featured
     children:
     - ReachableOperation
-    - CloudKitOperationType
-    - CloudKitOperation
     - NetworkOperation
     - WebpageOperation
+    - WaitStrategy
+    - RepeatedOperation
+    - RepeatableOperation
+    - RetryOperation
+    - ResultOperationType
+    - ResultOperation
+    - InjectionOperationType
+    - AutomaticInjectionOperationType    
+    - MapOperation
+    - FilterOperation
     - ReachabilityCondition
     - UserNotificationCondition
     - RemoteNotificationCondition
@@ -90,7 +115,7 @@ custom_categories:
     - EventsCapabilityRegistrarType
     - EKEventStore
     - EKAuthorizationStatus
-    - _EventsCapability
+    - EventsCapability
 
   - name: Capability.Cloud
     children:
@@ -99,7 +124,7 @@ custom_categories:
     - CloudStatus
     - CloudCapability
     - CloudContainerRegistrar
-    - _CloudCapability
+    - CloudCapability
 
   - name: Capability.Health
     children:
@@ -107,26 +132,54 @@ custom_categories:
     - HealthCapabilityStatus
     - HealthRequirement
     - HealthCapabilityRegistrarType
-    - _HealthCapability
+    - HealthCapability
 
   - name: Capability.Location
     children:
     - Location
     - LocationUsage
-    - _LocationCapability
+    - LocationCapability
     - LocationCapabilityRegistrarType
 
   - name: Capability.Passbook
     children:
     - Passbook
-    - _PassbookCapability
+    - PassbookCapability
     - PassbookCapabilityRegistrarType
 
   - name: Capability.Photos
     children:
     - Photos
-    - _PhotosCapability
+    - PhotosCapability
     - PhotosCapabilityRegistrarType
+
+  - name: CloudKit
+    children:
+    - CloudKitOperation
+    - BatchedCloudKitOperation
+    - CloudKitRecovery
+    - OPRCKOperation
+    - CKOperationType    
+    - CKDatabaseOperationType    
+    - CKPreviousServerChangeToken    
+    - CKMoreComing
+    - CKResultsLimit    
+    - CKDesiredKeys
+    - CKBatchedOperationType    
+    - CKDiscoverAllContactsOperationType
+    - CKDiscoverUserInfosOperationType
+    - CKFetchNotificationChangesOperationType
+    - CKFetchRecordChangesOperationType
+    - CKFetchRecordZonesOperationType
+    - CKFetchRecordsOperationType
+    - CKFetchSubscriptionsOperationType
+    - CKMarkNotificationsReadOperationType
+    - CKModifyBadgeOperationType
+    - CKModifyRecordZonesOperationType
+    - CKModifyRecordsOperationType
+    - CKModifySubscriptionsOperationType
+    - CKQueryOperationType
+
 
   - name: Address Book
     children:
