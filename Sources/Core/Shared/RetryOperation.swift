@@ -106,7 +106,7 @@ public class RetryOperation<T: NSOperation>: RepeatedOperation<T> {
     */
     public init(maxCount max: Int? = .None, generator: AnyGenerator<Payload>, retry block: Handler) {
         retry = RetryGenerator(generator: generator, retry: block)
-        super.init(maxCount: max, generator: anyGenerator(retry))
+        super.init(maxCount: max, generator: AnyGenerator(retry))
         name = "Retry Operation <\(T.self)>"
     }
 
@@ -124,8 +124,8 @@ public class RetryOperation<T: NSOperation>: RepeatedOperation<T> {
      */
     public init<D, G where D: GeneratorType, D.Element == Delay, G: GeneratorType, G.Element == T>(maxCount max: Int? = .None, delay: D, generator: G, retry block: Handler) {
         let tuple = TupleGenerator(primary: generator, secondary: delay)
-        retry = RetryGenerator(generator: anyGenerator(tuple), retry: block)
-        super.init(maxCount: max, generator: anyGenerator(retry))
+        retry = RetryGenerator(generator: AnyGenerator(tuple), retry: block)
+        super.init(maxCount: max, generator: AnyGenerator(retry))
         name = "Retry Operation <\(T.self)>"
     }
 
@@ -165,8 +165,8 @@ public class RetryOperation<T: NSOperation>: RepeatedOperation<T> {
     public init<G where G: GeneratorType, G.Element == T>(maxCount max: Int? = 5, strategy: WaitStrategy = .Fixed(0.1), _ generator: G, retry block: Handler = { $1 }) {
         let delay = MapGenerator(strategy.generator()) { Delay.By($0) }
         let tuple = TupleGenerator(primary: generator, secondary: delay)
-        retry = RetryGenerator(generator: anyGenerator(tuple), retry: block)
-        super.init(maxCount: max, generator: anyGenerator(retry))
+        retry = RetryGenerator(generator: AnyGenerator(tuple), retry: block)
+        super.init(maxCount: max, generator: AnyGenerator(retry))
         name = "Retry Operation <\(T.self)>"
     }
 

@@ -50,7 +50,7 @@ class LoggingObserverWithError: LoggingObserverTests {
 
     func test__logger_outputs_number_of_received_errors() {
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
         runOperation(operation)
         waitForExpectationsWithTimeout(3, handler: nil)
         XCTAssertTrue(receivedMessages.contains("Test Logging Operation: did finish with error(s): [Operations.BlockCondition.Error.BlockConditionFailed]."))
@@ -68,7 +68,7 @@ class LoggingObserverWithCancellation: LoggingObserverTests {
 
     func test__logger_outputs_cancellation() {
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
         runOperation(operation)
         operation.cancel()
         waitForExpectationsWithTimeout(3, handler: nil)
@@ -87,7 +87,7 @@ class LoggingObserverWithProduce: LoggingObserverTests {
 
     func test__logger_outputs_cancellation() {
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
         runOperation(operation)
         waitForExpectationsWithTimeout(3, handler: nil)
         XCTAssertTrue(receivedMessages.contains("Test Logging Operation: did produce operation: Test Operation."))

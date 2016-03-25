@@ -80,8 +80,15 @@ public class RemoteNotificationsRegistration: Operation {
         case Error(NSError)
     }
 
-    enum NotificationObserver: Selector {
-        case ReceivedResponse = "didReceiveResponse:"
+    enum NotificationObserver {
+        case ReceivedResponse
+
+        var selector: Selector {
+            switch self {
+            case .ReceivedResponse:
+                return #selector(RemoteNotificationsRegistration.didReceiveResponse(_:))
+            }
+        }
     }
 
     let registrar: RemoteNotificationRegistrarType
@@ -105,7 +112,7 @@ public class RemoteNotificationsRegistration: Operation {
     func register() {
         NSNotificationCenter
             .defaultCenter()
-            .addObserver(self, selector: NotificationObserver.ReceivedResponse.rawValue, name: RemoteNotificationName, object: nil)
+            .addObserver(self, selector: NotificationObserver.ReceivedResponse.selector, name: RemoteNotificationName, object: nil)
 
         registrar.opr_registerForRemoteNotifications()
     }

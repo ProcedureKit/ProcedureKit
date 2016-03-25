@@ -130,7 +130,7 @@ class UserLocationOperationTests: LocationOperationTests {
 
         let operation = _UserLocationOperation(manager: locationManager, accuracy: accuracy, completion: { _ in })
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
         runOperation(operation)
         waitForExpectationsWithTimeout(3, handler: nil)
 
@@ -155,7 +155,7 @@ class UserLocationOperationTests: LocationOperationTests {
             receivedLocation = location
         }
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
         runOperation(operation)
         waitForExpectationsWithTimeout(3, handler: nil)
 
@@ -183,7 +183,7 @@ class UserLocationOperationTests: LocationOperationTests {
             receivedErrors = errors
         })
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
         runOperation(operation)
         waitForExpectationsWithTimeout(3, handler: nil)
 
@@ -247,7 +247,7 @@ class ReverseGeocodeOperationTests: LocationOperationTests {
     func test__reverse_geocode_starts_geocoder() {
         let operation = _ReverseGeocodeOperation(geocoder: geocoder, location: location, completion: { _ in })
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
         runOperation(operation)
         waitForExpectationsWithTimeout(3, handler: nil)
 
@@ -266,7 +266,7 @@ class ReverseGeocodeOperationTests: LocationOperationTests {
             receivedErrors = errors
         })
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
         runOperation(operation)
         waitForExpectationsWithTimeout(3, handler: nil)
 
@@ -293,7 +293,7 @@ class ReverseGeocodeOperationTests: LocationOperationTests {
             op.cancel()
         })
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
         runOperation(operation)
         waitForExpectationsWithTimeout(3, handler: nil)
 
@@ -308,7 +308,7 @@ class ReverseGeocodeOperationTests: LocationOperationTests {
             XCTAssertEqual(self.placemark, placemark)
         }
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
         runOperation(operation)
         waitForExpectationsWithTimeout(3, handler: nil)
 
@@ -329,7 +329,7 @@ class ReverseGeocodeUserLocationOperationTests: ReverseGeocodeOperationTests {
 
         let operation = _ReverseGeocodeUserLocationOperation(geocoder: geocoder, manager: locationManager, accuracy: accuracy, completion: { _, _ in })
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
         runOperation(operation)
         waitForExpectationsWithTimeout(3, handler: nil)
 
@@ -344,7 +344,7 @@ class ReverseGeocodeUserLocationOperationTests: ReverseGeocodeOperationTests {
     }
 
     func test__completion_handler_receives_location_and_placeholder() {
-        let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
+        let expectation = expectationWithDescription("Test: \(#function)")
 
         var blockLocation: CLLocation? = .None
         var blockPlacemark: CLPlacemark? = .None

@@ -70,7 +70,7 @@ extension RepeatedOperation where T: Repeatable {
      ```
      */
     public convenience init(maxCount max: Int? = .None, strategy: WaitStrategy = .Fixed(0.1), body: () -> T?) {
-        self.init(maxCount: max, strategy: strategy, generator: RepeatableGenerator(anyGenerator(body)))
+        self.init(maxCount: max, strategy: strategy, generator: RepeatableGenerator(AnyGenerator(body: body)))
     }
 }
 

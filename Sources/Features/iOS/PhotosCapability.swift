@@ -67,7 +67,7 @@ extension PHAuthorizationStatus: AuthorizationStatusType {
 
  - see: Capability.Photos
  */
-public class _PhotosCapability<Registrar: PhotosCapabilityRegistrarType>: NSObject, CapabilityType {
+public class PhotosCapability: CapabilityType {
 
     /// - returns: a String, the name of the capability
     public let name: String
@@ -75,7 +75,7 @@ public class _PhotosCapability<Registrar: PhotosCapabilityRegistrarType>: NSObje
     /// - returns: the EKEntityType, the required type of the capability
     public let requirement: Void
 
-    let registrar: Registrar
+    internal lazy var registrar: PhotosCapabilityRegistrarType = PHPhotoLibrary()
 
     /**
      Initialize the capability. There is no requirement type
@@ -83,11 +83,9 @@ public class _PhotosCapability<Registrar: PhotosCapabilityRegistrarType>: NSObje
      - parameter requirement: Void - defaults to ()
      - parameter registrar: the registrar to use. Defauls to creating a Registrar.
      */
-    public required init(_ requirement: Void = (), registrar: Registrar = Registrar()) {
+    public required init(_ requirement: Void = ()) {
         self.name = "Photos"
         self.requirement = requirement
-        self.registrar = registrar
-        super.init()
     }
 
     /// - returns: true, Photos is always available
@@ -137,7 +135,7 @@ public extension Capability {
      }
      ```
      */
-    typealias Photos = _PhotosCapability<PHPhotoLibrary>
+    typealias Photos = PhotosCapability
 }
 
 @available(*, unavailable, renamed="AuthorizedFor(Capability.Photos())")

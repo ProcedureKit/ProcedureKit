@@ -208,7 +208,7 @@ class SystemReachabilityManagerTests: ReachabilityManagerTests {
 
     func test__whenConnected__block_is_run() {
         var blockDidRun = false
-        let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
+        let expectation = expectationWithDescription("Test: \(#function)")
         manager.whenConnected(.AnyConnectionKind) {
             blockDidRun = true
             expectation.fulfill()
@@ -223,7 +223,7 @@ class SystemReachabilityManagerTests: ReachabilityManagerTests {
 class HostReachabilityManagerTests: ReachabilityManagerTests {
 
     func test__reachabilityForURL__with_no_host__not_reachable() {
-        let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
+        let expectation = expectationWithDescription("Test: \(#function)")
         var receivedStatus: Reachability.NetworkStatus? = .None
         manager.reachabilityForURL(NSURL(string: "http://")!) { status in
             receivedStatus = status
@@ -235,7 +235,7 @@ class HostReachabilityManagerTests: ReachabilityManagerTests {
     }
 
     func test__reachabilityForURL__without_flags__not_reachable() {
-        let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
+        let expectation = expectationWithDescription("Test: \(#function)")
         var receivedStatus: Reachability.NetworkStatus? = .None
         network.flags = .None
         manager.reachabilityForURL(NSURL(string: "http://apple.com")!) { status in
@@ -248,7 +248,7 @@ class HostReachabilityManagerTests: ReachabilityManagerTests {
     }
 
     func test__reachabilityForURL__reachable() {
-        let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
+        let expectation = expectationWithDescription("Test: \(#function)")
         var receivedStatus: Reachability.NetworkStatus? = .None
         manager.reachabilityForURL(NSURL(string: "http://apple.com")!) { status in
             receivedStatus = status
@@ -298,7 +298,7 @@ class DeviceReachabilityTests: XCTestCase, NetworkReachabilityDelegate {
     }
 
     func test__check() {
-        expectation = expectationWithDescription("Test: \(__FUNCTION__)")
+        expectation = expectationWithDescription("Test: \(#function)")
         if let reachability = device.reachabilityForHost("https://apple.com") {
             device.check(reachability, queue: queue)
         }

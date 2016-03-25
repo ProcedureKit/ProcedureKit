@@ -32,7 +32,7 @@ class NoFailedDependenciesConditionTests: OperationTests {
         let operation = TestOperation()
         operation.addCondition(NoFailedDependenciesCondition())
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
         runOperation(operation)
 
         waitForExpectationsWithTimeout(3, handler: nil)
@@ -42,8 +42,8 @@ class NoFailedDependenciesConditionTests: OperationTests {
     func test__operation_with_sucessful_dependency_succeeds() {
 
         let operation = TestOperation()
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
-        let dependency = createCancellingOperation(false, expectation: expectationWithDescription("Dependency for Test: \(__FUNCTION__)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
+        let dependency = createCancellingOperation(false, expectation: expectationWithDescription("Dependency for Test: \(#function)"))
         operation.addDependency(dependency)
         operation.addCondition(NoFailedDependenciesCondition())
 
@@ -56,7 +56,7 @@ class NoFailedDependenciesConditionTests: OperationTests {
     func test__operation_with_single_cancelled_dependency_doesnt_execute() {
 
         let operation = TestOperation()
-        let dependency = createCancellingOperation(true, expectation: expectationWithDescription("Dependency for Test: \(__FUNCTION__)"))
+        let dependency = createCancellingOperation(true, expectation: expectationWithDescription("Dependency for Test: \(#function)"))
         operation.addDependency(dependency)
         operation.addCondition(NoFailedDependenciesCondition())
 
@@ -67,11 +67,11 @@ class NoFailedDependenciesConditionTests: OperationTests {
     }
 
     func test__operation_with_mixture_fails() {
-        let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
+        let expectation = expectationWithDescription("Test: \(#function)")
         let operation = TestOperation()
-        let dependency1 = createCancellingOperation(true, expectation: expectationWithDescription("Dependency 1 for Test: \(__FUNCTION__)"))
+        let dependency1 = createCancellingOperation(true, expectation: expectationWithDescription("Dependency 1 for Test: \(#function)"))
         operation.addDependency(dependency1)
-        let dependency2 = createCancellingOperation(false, expectation: expectationWithDescription("Dependency 2 for Test: \(__FUNCTION__)"))
+        let dependency2 = createCancellingOperation(false, expectation: expectationWithDescription("Dependency 2 for Test: \(#function)"))
         operation.addDependency(dependency2)
         operation.addCondition(NoFailedDependenciesCondition())
 
@@ -89,7 +89,7 @@ class NoFailedDependenciesConditionTests: OperationTests {
     }
 
     func test__operation_with_errored_dependency_fails() {
-        let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
+        let expectation = expectationWithDescription("Test: \(#function)")
         let operation = TestOperation()
         let dependency = TestOperation(delay: 0, error: TestOperation.Error.SimulatedError)
         operation.addDependency(dependency)
@@ -109,7 +109,7 @@ class NoFailedDependenciesConditionTests: OperationTests {
     }
 
     func test__operation_with_group_dependency_with_errored_child_fails() {
-        let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
+        let expectation = expectationWithDescription("Test: \(#function)")
         let operation = TestOperation()
         let childOperation = TestOperation(delay: 0, error: TestOperation.Error.SimulatedError)
         let dependency = GroupOperation(operations: [childOperation])

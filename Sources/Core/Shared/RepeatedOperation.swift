@@ -137,7 +137,7 @@ public class RepeatedOperation<T where T: NSOperation>: GroupOperation {
     internal private(set) var configure: T -> Void = { _ in }
 
     static func createPayloadGeneratorWithMaxCount(max: Int? = .None, generator gen: AnyGenerator<Payload>) -> AnyGenerator<Payload> {
-        return max.map { anyGenerator(FiniteGenerator(gen, limit: $0 - 1)) } ?? gen
+        return max.map { AnyGenerator(FiniteGenerator(gen, limit: $0 - 1)) } ?? gen
     }
 
     /**
@@ -178,7 +178,7 @@ public class RepeatedOperation<T where T: NSOperation>: GroupOperation {
         }
 
         current = operation
-        generator = RepeatedOperation<T>.createPayloadGeneratorWithMaxCount(max, generator: anyGenerator(tuple))
+        generator = RepeatedOperation<T>.createPayloadGeneratorWithMaxCount(max, generator: AnyGenerator(tuple))
 
         super.init(operations: [])
         name = "Repeated Operation <\(T.self)>"
@@ -224,7 +224,7 @@ public class RepeatedOperation<T where T: NSOperation>: GroupOperation {
         }
 
         current = operation
-        generator = RepeatedOperation<T>.createPayloadGeneratorWithMaxCount(max, generator: anyGenerator(tuple))
+        generator = RepeatedOperation<T>.createPayloadGeneratorWithMaxCount(max, generator: AnyGenerator(tuple))
 
         super.init(operations: [])
         name = "Repeated Operation <\(T.self)>"
