@@ -86,7 +86,7 @@ extension EKAuthorizationStatus: AuthorizationStatusType {
 
  - see: Capability.Calendar
 */
-public class _EventsCapability<Registrar: EventsCapabilityRegistrarType>: NSObject, CapabilityType {
+public class EventsCapability: CapabilityType {
 
     /// - returns: a String, the name of the capability
     public let name: String
@@ -94,7 +94,7 @@ public class _EventsCapability<Registrar: EventsCapabilityRegistrarType>: NSObje
     /// - returns: the EKEntityType, the required type of the capability
     public let requirement: EKEntityType
 
-    let registrar: Registrar
+    internal var registrar: EventsCapabilityRegistrarType = EKEventStore()
 
     /**
      Initialize the capability. By default, it requires access to .Event.
@@ -102,11 +102,9 @@ public class _EventsCapability<Registrar: EventsCapabilityRegistrarType>: NSObje
      - parameter requirement: the required EKEntityType, defaults to .Event
      - parameter registrar: the registrar to use. Defauls to creating a Registrar.
     */
-    public required init(_ requirement: EKEntityType = .Event, registrar: Registrar = Registrar()) {
+    public required init(_ requirement: EKEntityType = .Event) {
         self.name = "Events"
         self.requirement = requirement
-        self.registrar = registrar
-        super.init()
     }
 
     /// - returns: true, EventKit is always available
@@ -186,7 +184,7 @@ public extension Capability {
      queue.addOperation(operation)
      ```
     */
-    typealias Calendar = _EventsCapability<EKEventStore>
+    typealias Calendar = EventsCapability
 }
 
 @available(*, unavailable, renamed="AuthorizedFor(Capability.Calendar())")

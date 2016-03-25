@@ -34,6 +34,8 @@ class TestableCapability: NSObject, CapabilityType {
     let name = "Testable Capability"
     var requirement: Status.Requirement
 
+    var registrar: CapabilityRegistrarType = Registrar()
+
     var isAsynchronous = false
 
     var serviceIsAvailable = true
@@ -45,7 +47,7 @@ class TestableCapability: NSObject, CapabilityType {
     var responseAuthorizationStatus: Status = .MaximumAuthorized
     var didRequestAuthorization = false
 
-    required init(_ requirement: Status.Requirement = .Minimum, registrar: Registrar = Registrar()) {
+    required init(_ requirement: Status.Requirement = .Minimum) {
         self.requirement = requirement
     }
 
