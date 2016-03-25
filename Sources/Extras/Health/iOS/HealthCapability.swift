@@ -142,7 +142,7 @@ extension HKHealthStore: HealthCapabilityRegistrarType {
 
  - see: Capability.Health
 */
-public class _HealthCapability<Registrar: HealthCapabilityRegistrarType>: NSObject, CapabilityType {
+public class HealthCapability: CapabilityType {
 
     /// - returns: a String, the name of the capability
     public let name: String
@@ -150,7 +150,7 @@ public class _HealthCapability<Registrar: HealthCapabilityRegistrarType>: NSObje
     /// - returns: the HealthRequirement, the required type of the capability
     public let requirement: HealthRequirement
 
-    let registrar: Registrar
+    var registrar: HealthCapabilityRegistrarType = HKHealthStore()
 
     /**
      Initialize the capability. Has no default HealthRequirement
@@ -158,11 +158,9 @@ public class _HealthCapability<Registrar: HealthCapabilityRegistrarType>: NSObje
      - parameter requirement: the required HealthRequirement
      - parameter registrar: the registrar to use. Defauls to creating a Registrar.
      */
-    public required init(_ requirement: HealthRequirement, registrar: Registrar = Registrar()) {
+    public required init(_ requirement: HealthRequirement) {
         self.name = "Health"
         self.requirement = requirement
-        self.registrar = registrar
-        super.init()
     }
 
     /// - returns: true if health data is available on this device
@@ -229,7 +227,7 @@ extension Capability {
      pod 'Operations/+Health'
      ```
     */
-    public typealias Health = _HealthCapability<HKHealthStore>
+    public typealias Health = HealthCapability
 }
 
 @available(*, unavailable, renamed="AuthorizedFor(Capability.Health())")
