@@ -218,11 +218,11 @@ public final class CloudKitOperation<T where T: NSOperation, T: CKOperationType>
     }
 
     public convenience init(_ body: () -> T?) {
-        self.init(generator: anyGenerator(body), connectivity: .AnyConnectionKind, reachability: ReachabilityManager(DeviceReachability()))
+        self.init(generator: AnyGenerator(body: body), connectivity: .AnyConnectionKind, reachability: ReachabilityManager(DeviceReachability()))
     }
 
     convenience init(connectivity: Reachability.Connectivity = .AnyConnectionKind, reachability: SystemReachabilityType, _ body: () -> T?) {
-        self.init(generator: anyGenerator(body), connectivity: .AnyConnectionKind, reachability: reachability)
+        self.init(generator: AnyGenerator(body: body), connectivity: .AnyConnectionKind, reachability: reachability)
     }
 
     init<G where G: GeneratorType, G.Element == T>(generator gen: G, connectivity: Reachability.Connectivity = .AnyConnectionKind, reachability: SystemReachabilityType) {
@@ -276,7 +276,7 @@ class CloudKitOperationGenerator<T where T: NSOperation, T: CKOperationType>: Ge
     var more: Bool = true
 
     init<G where G: GeneratorType, G.Element == T>(generator: G, connectivity: Reachability.Connectivity = .AnyConnectionKind, reachability: SystemReachabilityType) {
-        self.generator = anyGenerator(generator)
+        self.generator = AnyGenerator(generator)
         self.connectivity = connectivity
         self.reachability = reachability
     }
@@ -297,11 +297,11 @@ public class BatchedCloudKitOperation<T where T: NSOperation, T: CKBatchedOperat
     }
 
     public convenience init(enableBatchProcessing enable: Bool = true, _ body: () -> T?) {
-        self.init(generator: anyGenerator(body), enableBatchProcessing: enable, connectivity: .AnyConnectionKind, reachability: ReachabilityManager(DeviceReachability()))
+        self.init(generator: AnyGenerator(body: body), enableBatchProcessing: enable, connectivity: .AnyConnectionKind, reachability: ReachabilityManager(DeviceReachability()))
     }
 
     convenience init(enableBatchProcessing enable: Bool = true, connectivity: Reachability.Connectivity = .AnyConnectionKind, reachability: SystemReachabilityType, _ body: () -> T?) {
-        self.init(generator: anyGenerator(body), enableBatchProcessing: enable, connectivity: connectivity, reachability: reachability)
+        self.init(generator: AnyGenerator(body: body), enableBatchProcessing: enable, connectivity: connectivity, reachability: reachability)
     }
 
     init<G where G: GeneratorType, G.Element == T>(generator gen: G, enableBatchProcessing enable: Bool = true, connectivity: Reachability.Connectivity = .AnyConnectionKind, reachability: SystemReachabilityType) {
@@ -313,7 +313,7 @@ public class BatchedCloudKitOperation<T where T: NSOperation, T: CKBatchedOperat
         let delay = MapGenerator(strategy.generator()) { Delay.By($0) }
         let tuple = TupleGenerator(primary: generator, secondary: delay)
 
-        super.init(generator: anyGenerator(tuple))
+        super.init(generator: AnyGenerator(tuple))
     }
 
     public override func willFinishOperation(operation: NSOperation, withErrors errors: [ErrorType]) {

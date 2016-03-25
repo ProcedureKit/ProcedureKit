@@ -39,7 +39,7 @@ class AlertOperationTests: OperationTests {
         alert.title = title
         alert.message = message
 
-        presentingController.expectation = expectationWithDescription("Test: \(__FUNCTION__)")
+        presentingController.expectation = expectationWithDescription("Test: \(#function)")
         presentingController.check = { received in
             if let alertController = received as? UIAlertController {
                 XCTAssertTrue(alertController.title == alert.title)

@@ -104,12 +104,13 @@ class CLAuthorizationStatusTests: XCTestCase {
 class LocationCapabilityTests: OperationTests {
 
     var registrar: TestableLocationRegistrar!
-    var capability: _LocationCapability<TestableLocationRegistrar>!
+    var capability: LocationCapability!
 
     override func setUp() {
         super.setUp()
         registrar = TestableLocationRegistrar()
-        capability = _LocationCapability(.WhenInUse, registrar: registrar)
+        capability = LocationCapability(.WhenInUse)
+        capability.registrar = registrar
     }
 
     override func tearDown() {
@@ -160,7 +161,8 @@ class LocationCapabilityTests: OperationTests {
 
     func test__given_when_in_use_require_always_request_authorization() {
         registrar.authorizationStatus = .AuthorizedWhenInUse
-        capability = _LocationCapability(.Always, registrar: registrar)
+        capability = LocationCapability(.Always)
+        capability.registrar = registrar
         var didComplete = false
         capability.requestAuthorizationWithCompletion {
             didComplete = true
@@ -172,7 +174,7 @@ class LocationCapabilityTests: OperationTests {
     }
 
     func test__given_denied_does_not_request_authorization() {
-        capability.registrar.authorizationStatus = .Denied
+        registrar.authorizationStatus = .Denied
         var didComplete = false
         capability.requestAuthorizationWithCompletion {
             didComplete = true
@@ -183,7 +185,8 @@ class LocationCapabilityTests: OperationTests {
 
     func test__given_already_authorized_always_does_not_request_authorization() {
         registrar.authorizationStatus = .AuthorizedAlways
-        capability = _LocationCapability(.WhenInUse, registrar: registrar)
+        capability = LocationCapability(.WhenInUse)
+        capability.registrar = registrar
         var didComplete = false
         capability.requestAuthorizationWithCompletion {
             didComplete = true
@@ -194,7 +197,8 @@ class LocationCapabilityTests: OperationTests {
 
     func test__given_already_authorized_sufficiently_does_not_request_authorization() {
         registrar.authorizationStatus = .AuthorizedAlways
-        capability = _LocationCapability(.WhenInUse, registrar: registrar)
+        capability = LocationCapability(.WhenInUse)
+        capability.registrar = registrar
         var didComplete = false
         capability.requestAuthorizationWithCompletion {
             didComplete = true

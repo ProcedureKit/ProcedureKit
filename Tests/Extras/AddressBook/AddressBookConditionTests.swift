@@ -86,7 +86,7 @@ class AddressBookOperationTests: OperationTests {
             }
         ))
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
         runOperation(operation)
 
         waitForExpectationsWithTimeout(3, handler: nil)
@@ -115,7 +115,7 @@ class AddressBookOperationTests: OperationTests {
             }
         ))
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
         runOperation(operation)
 
         waitForExpectationsWithTimeout(3, handler: nil)
@@ -156,7 +156,7 @@ class AddressBookConditionTests: OperationTests {
         let operation = TestOperation()
         operation.addCondition(AddressBookCondition(registrar: registrar))
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
         runOperation(operation)
 
         waitForExpectationsWithTimeout(3, handler: nil)
@@ -176,7 +176,7 @@ class AddressBookConditionTests: OperationTests {
             receivedErrors = errors
         })
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
         runOperation(operation)
 
         waitForExpectationsWithTimeout(3, handler: nil)

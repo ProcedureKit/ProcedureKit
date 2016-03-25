@@ -27,12 +27,13 @@ extension TestablePassbookRegistrar: PassbookCapabilityRegistrarType {
 class PassbookCapabilityTests: XCTestCase {
 
     var registrar: TestablePassbookRegistrar!
-    var capability: _PassbookCapability<TestablePassbookRegistrar>!
+    var capability: PassbookCapability!
 
     override func setUp() {
         super.setUp()
         registrar = TestablePassbookRegistrar()
-        capability = _PassbookCapability(registrar: registrar)
+        capability = PassbookCapability()
+        capability.registrar = registrar
     }
 
     override func tearDown() {

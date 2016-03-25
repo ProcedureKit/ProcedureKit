@@ -34,6 +34,8 @@ class TestableCapability: NSObject, CapabilityType {
     let name = "Testable Capability"
     var requirement: Status.Requirement
 
+    var registrar: CapabilityRegistrarType = Registrar()
+
     var isAsynchronous = false
 
     var serviceIsAvailable = true
@@ -45,7 +47,7 @@ class TestableCapability: NSObject, CapabilityType {
     var responseAuthorizationStatus: Status = .MaximumAuthorized
     var didRequestAuthorization = false
 
-    required init(_ requirement: Status.Requirement = .Minimum, registrar: Registrar = Registrar()) {
+    required init(_ requirement: Status.Requirement = .Minimum) {
         self.requirement = requirement
     }
 
@@ -101,7 +103,7 @@ class AuthorizationTests: OperationTests {
 
         let operation = GetAuthorizationStatus(capability)
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
         runOperation(operation)
         waitForExpectationsWithTimeout(3, handler: nil)
 
@@ -127,7 +129,7 @@ class AuthorizationTests: OperationTests {
             completedWithStatus = status
         }
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
         runOperation(operation)
         waitForExpectationsWithTimeout(3, handler: nil)
 
@@ -152,7 +154,7 @@ class AuthorizationTests: OperationTests {
 
         let operation = Authorize(capability)
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
         runOperation(operation)
         waitForExpectationsWithTimeout(3, handler: nil)
 
@@ -187,7 +189,7 @@ class AuthorizationTests: OperationTests {
     }
 
     func test__authorized_condition_fails_if_capability_is_not_available() {
-        let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
+        let expectation = expectationWithDescription("Test: \(#function)")
         let operation = TestOperation()
         capability.serviceIsAvailable = false
         let condition = AuthorizedFor(capability)
@@ -217,7 +219,7 @@ class AuthorizationTests: OperationTests {
     }
 
     func test__authorized_condition_fails_if_requirement_is_not_met() {
-        let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
+        let expectation = expectationWithDescription("Test: \(#function)")
         let operation = TestOperation()
         capability.requirement = .Maximum
         capability.serviceAuthorizationStatus = .MinimumAuthorized
@@ -250,7 +252,7 @@ class AuthorizationTests: OperationTests {
     }
 
     func test__authorized_condition_succeeds_when_requirements_are_met() {
-        let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
+        let expectation = expectationWithDescription("Test: \(#function)")
         let operation = TestOperation()
         capability.serviceAuthorizationStatus = .MinimumAuthorized
 
@@ -274,7 +276,7 @@ class AuthorizationTests: OperationTests {
     }
 
     func test__authorized_condition_succeeds_when_requirements_are_exceeded() {
-        let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
+        let expectation = expectationWithDescription("Test: \(#function)")
         let operation = TestOperation()
         capability.serviceAuthorizationStatus = .MaximumAuthorized
 
@@ -310,7 +312,7 @@ class AsyncCapabilityAuthorizationTests: AuthorizationTests {
 
         let operation = GetAuthorizationStatus(capability)
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
         runOperation(operation)
         waitForExpectationsWithTimeout(3, handler: nil)
 
@@ -337,7 +339,7 @@ class AsyncCapabilityAuthorizationTests: AuthorizationTests {
             completedWithStatus = status
         }
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
         runOperation(operation)
         waitForExpectationsWithTimeout(3, handler: nil)
 

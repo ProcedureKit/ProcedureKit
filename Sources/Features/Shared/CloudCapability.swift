@@ -68,6 +68,10 @@ public struct CloudStatus: AuthorizationStatusType {
 */
 public protocol CloudContainerRegistrarType: CapabilityRegistrarType {
 
+    var containerIdentifier: String? { get }
+
+    var cloudKitContainer: CKContainer! { get }
+
     /**
      Provide an instance of Self with the given identifier. This is
      because we need to determined the capability of a specific cloud
@@ -114,7 +118,7 @@ The Cloud capability, which generic over CloudContainerRegistrarType.
 
  - see: Capability.Cloud
 */
-public class _CloudCapability<Registrar: CloudContainerRegistrarType>: NSObject, CapabilityType {
+public class CloudCapability: NSObject, CapabilityType {
 
     /// - returns: a String, the name of the capability
     public let name: String
@@ -126,8 +130,21 @@ public class _CloudCapability<Registrar: CloudContainerRegistrarType>: NSObject,
         return requirement != []
     }
 
-    let registrar: Registrar
+    internal let containerId: String?
+    internal var storedRegistrar: CloudContainerRegistrarType? = .None
+    internal var registrar: CloudContainerRegistrarType {
+        get {
+            storedRegistrar = storedRegistrar ?? CloudContainerRegistrar.containerWithIdentifier(containerId)
+            return storedRegistrar!
+        }
+    }
 
+    public init(permissions: CKApplicationPermissions = [], containerId: String? = .None) {
+        self.name = "Cloud"
+        self.requirement = permissions
+        self.containerId = containerId
+        super.init()
+    }
     /**
      Initialize the capability. By default, it requires no extra application permissions.
 
@@ -141,10 +158,10 @@ public class _CloudCapability<Registrar: CloudContainerRegistrarType>: NSObject,
      - parameter requirement: the required EKEntityType, defaults to .Event
      - parameter registrar: the registrar to use. Defauls to creating a Registrar.
      */
-    public required init(_ requirement: CKApplicationPermissions = [], registrar: Registrar = Registrar()) {
+    public required init(_ requirement: CKApplicationPermissions = []) {
         self.name = "Cloud"
         self.requirement = requirement
-        self.registrar = registrar
+        self.containerId = .None
         super.init()
     }
 
@@ -200,25 +217,6 @@ public class _CloudCapability<Registrar: CloudContainerRegistrarType>: NSObject,
             }
         }
     }
-
-}
-
-/**
- CloudCapability provides an initializer which allows the consumer to provide a
- cloud kit container identifier.
-*/
-public class CloudCapability<Registrar: CloudContainerRegistrarType>: _CloudCapability<Registrar> {
-
-    /**
-     Initialize the CloudCapability with permissions and optionally a specific
-     CKContainer identifier.
-
-     - parameter permissions: the CKApplicationPermissions, defaults to empty set.
-     - parameter containerId: an String?, defaults to .None which corresponds to the default CKContainer.
-    */
-    public init(permissions: CKApplicationPermissions = [], containerId: String? = .None) {
-        super.init(permissions, registrar: Registrar.containerWithIdentifier(containerId))
-    }
 }
 
 /**
@@ -229,13 +227,16 @@ public final class CloudContainerRegistrar: NSObject, CloudContainerRegistrarTyp
     /// Provide a CloudContainerRegistrar for a CKContainer with the given identifier.
     public static func containerWithIdentifier(identifier: String?) -> CloudContainerRegistrar {
         let container = CloudContainerRegistrar()
+        container.containerIdentifier = identifier
         if let id = identifier {
             container.cloudKitContainer = CKContainer(identifier: id)
         }
         return container
     }
 
-    private(set) var cloudKitContainer: CKContainer = CKContainer.defaultContainer()
+    public private(set) var containerIdentifier: String? = .None
+
+    public private(set) lazy var cloudKitContainer: CKContainer! = CKContainer.defaultContainer()
 
     /**
      Get the account status, a CKAccountStatus.
@@ -293,10 +294,10 @@ extension Capability {
      }
      ```
     */
-    public typealias Cloud = CloudCapability<CloudContainerRegistrar>
+    public typealias Cloud = CloudCapability
 }
 
-extension CloudCapability where Registrar: CloudContainerRegistrar {
+extension CloudCapability {
 
     /// - returns: the `CKContainer`
     public var container: CKContainer {

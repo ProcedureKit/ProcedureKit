@@ -45,8 +45,8 @@ public class BackgroundObserver: NSObject {
         super.init()
 
         let nc = NSNotificationCenter.defaultCenter()
-        nc.addObserver(self, selector: "didEnterBackground:", name: UIApplicationDidEnterBackgroundNotification, object: .None)
-        nc.addObserver(self, selector: "didBecomeActive:", name: UIApplicationDidBecomeActiveNotification, object: .None)
+        nc.addObserver(self, selector: #selector(BackgroundObserver.didEnterBackground(_:)), name: UIApplicationDidEnterBackgroundNotification, object: .None)
+        nc.addObserver(self, selector: #selector(BackgroundObserver.didBecomeActive(_:)), name: UIApplicationDidBecomeActiveNotification, object: .None)
 
         if isInBackground {
             startBackgroundTask()
