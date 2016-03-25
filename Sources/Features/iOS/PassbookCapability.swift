@@ -42,7 +42,7 @@ extension PKPassLibrary: PassbookCapabilityRegistrarType {
 
  - see: Capability.Passbook
 */
-public class _PassbookCapability<Registrar: PassbookCapabilityRegistrarType>: NSObject, CapabilityType {
+public class PassbookCapability: CapabilityType {
 
     /// - returns: a String, the name of the capability
     public let name: String
@@ -50,7 +50,8 @@ public class _PassbookCapability<Registrar: PassbookCapabilityRegistrarType>: NS
     /// - return: there is no requirement, Void.
     public let requirement: Void
 
-    let registrar: Registrar
+    /// - returns: the registrar object
+    internal var registrar: PassbookCapabilityRegistrarType = PKPassLibrary()
 
     /**
      Initialize the capability. There are no requirements, the type is Void
@@ -58,11 +59,9 @@ public class _PassbookCapability<Registrar: PassbookCapabilityRegistrarType>: NS
      - parameter requirement: the required Void, defaults to ()
      - parameter registrar: the registrar to use. Defauls to creating a Registrar.
      */
-    public required init(_ requirement: Void = (), registrar: Registrar = Registrar()) {
+    public required init(_ requirement: Void = ()) {
         self.name = "Passbook"
         self.requirement = requirement
-        self.registrar = registrar
-        super.init()
     }
 
     /// - returns: a true Bool is the Passkit library is available on the device.
@@ -99,7 +98,7 @@ extension Capability {
      }
      ```
      */
-    public typealias Passbook = _PassbookCapability<PKPassLibrary>
+    public typealias Passbook = PassbookCapability
 }
 
 @available(*, unavailable, renamed="AuthorizedFor(Capability.Passbook())")

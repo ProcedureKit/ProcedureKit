@@ -120,7 +120,7 @@ extension CLAuthorizationStatus: AuthorizationStatusType {
 
  - see: Capability.Location
  */
-public class _LocationCapability<Registrar: LocationCapabilityRegistrarType>: NSObject, CLLocationManagerDelegate, CapabilityType {
+public class LocationCapability: NSObject, CLLocationManagerDelegate, CapabilityType {
 
     /// - returns: a String, the name of the capability
     public let name: String
@@ -128,7 +128,7 @@ public class _LocationCapability<Registrar: LocationCapabilityRegistrarType>: NS
     /// - returns: the EKEntityType, the required type of the capability
     public let requirement: LocationUsage
 
-    let registrar: Registrar
+    var registrar: LocationCapabilityRegistrarType = CLLocationManager()
     var authorizationCompletionBlock: dispatch_block_t?
 
     /**
@@ -137,10 +137,9 @@ public class _LocationCapability<Registrar: LocationCapabilityRegistrarType>: NS
      - parameter requirement: the required LocationUsage, defaults to .WhenInUse
      - parameter registrar: the registrar to use. Defauls to creating a Registrar.
      */
-    public required init(_ requirement: LocationUsage = .WhenInUse, registrar: Registrar = Registrar()) {
+    public required init(_ requirement: LocationUsage = .WhenInUse) {
         self.name = "Location"
         self.requirement = requirement
-        self.registrar = registrar
         super.init()
     }
 
@@ -211,7 +210,7 @@ public extension Capability {
     - see: `ReverseGeocodeUserLocationOperation`
 
      */
-    typealias Location = _LocationCapability<CLLocationManager>
+    typealias Location = LocationCapability
 }
 
 @available(*, unavailable, renamed="AuthorizedFor(Capability.Location(.WhenInUse))")

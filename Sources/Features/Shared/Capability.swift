@@ -19,9 +19,6 @@ import Foundation
 */
 public protocol CapabilityType {
 
-    /// A type which performs the registration of capability permissions.
-    associatedtype Registrar: CapabilityRegistrarType
-
     /// A type which indicates the current status of the capability
     associatedtype Status: AuthorizationStatusType
 
@@ -45,9 +42,8 @@ public protocol CapabilityType {
      to support injection & unit testing.
 
      - parameter requirement: the needed Status.Requirement
-     - parameter registrar: the registrar item.
     */
-    init(_ requirement: Status.Requirement, registrar: Registrar)
+    init(_ requirement: Status.Requirement)
 
     /**
      Query the capability to see if it's available on the device.

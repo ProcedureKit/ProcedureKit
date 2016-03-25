@@ -61,12 +61,13 @@ class PHAuthorizationStatusTests: XCTestCase {
 
 class PhotosCapabilityTests: XCTestCase {
     var registrar: TestablePhotosRegistrar!
-    var capability: _PhotosCapability<TestablePhotosRegistrar>!
+    var capability: PhotosCapability!
 
     override func setUp() {
         super.setUp()
         registrar = TestablePhotosRegistrar()
-        capability = _PhotosCapability(registrar: registrar)
+        capability = PhotosCapability()
+        capability.registrar = registrar
     }
 
     override func tearDown() {
@@ -98,7 +99,7 @@ class PhotosCapabilityTests: XCTestCase {
     }
 
     func test__given_denied_does_not_request() {
-        capability.registrar.authorizationStatus = .Denied
+        registrar.authorizationStatus = .Denied
         var didComplete = false
         capability.requestAuthorizationWithCompletion {
             didComplete = true
@@ -108,7 +109,7 @@ class PhotosCapabilityTests: XCTestCase {
     }
 
     func test__given_authorized_does_not_request() {
-        capability.registrar.authorizationStatus = .Authorized
+        registrar.authorizationStatus = .Authorized
         var didComplete = false
         capability.requestAuthorizationWithCompletion {
             didComplete = true

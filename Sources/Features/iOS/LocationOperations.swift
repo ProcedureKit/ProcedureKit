@@ -118,7 +118,9 @@ public class _UserLocationOperation<Manager: LocationManagerType>: Operation, CL
         self.completion = completion
         super.init()
         name = "User Location"
-        addCondition(AuthorizedFor(_LocationCapability(.WhenInUse, registrar: manager)))
+        let capability = Capability.Location(.WhenInUse)
+        capability.registrar = manager
+        addCondition(AuthorizedFor(capability))
         addCondition(MutuallyExclusive<CLLocationManager>())
         addObserver(CancelledObserver { [weak self] _ in
             dispatch_async(Queue.Main.queue) {
