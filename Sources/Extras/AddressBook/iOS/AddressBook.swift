@@ -11,9 +11,11 @@ import AddressBook
 
 // swiftlint:disable file_length
 // swiftlint:disable type_body_length
-// swiftlint:disable variable_name_min_length
+// swiftlint:disable variable_name
 // swiftlint:disable force_cast
 // swiftlint:disable nesting
+// swiftlint:disable cyclomatic_complexity
+
 
 // MARK: - AddressBook System Wrapper
 
@@ -34,7 +36,7 @@ and it lacked the necessary hooks for testability.
 // MARK: - PropertyType
 
 public protocol PropertyType {
-    typealias ValueType
+    associatedtype ValueType
 
     @available(iOS, deprecated=9.0)
     var id: ABPropertyID { get }
@@ -82,10 +84,10 @@ public protocol AddressBookExternalChangeObserver { }
 
 public protocol AddressBookType {
 
-    typealias RecordStorage
-    typealias PersonStorage
-    typealias GroupStorage
-    typealias SourceStorage
+    associatedtype RecordStorage
+    associatedtype PersonStorage
+    associatedtype GroupStorage
+    associatedtype SourceStorage
 
     func requestAccess(completion: (AddressBookPermissionRegistrarError?) -> Void)
 
@@ -136,7 +138,7 @@ public protocol AddressBookType {
 // MARK: - StorageType
 
 public protocol StorageType {
-    typealias Storage
+    associatedtype Storage
 
     var storage: Storage { get }
 
@@ -162,8 +164,8 @@ public protocol AddressBookRecordType: StorageType {
 // MARK: - AddressBook_PersonType
 
 public protocol AddressBook_PersonType: AddressBookRecordType {
-    typealias GroupStorage
-    typealias SourceStorage
+    associatedtype GroupStorage
+    associatedtype SourceStorage
 }
 
 // MARK: - AddressBookPersonType
@@ -176,8 +178,8 @@ public protocol AddressBookPersonType: AddressBook_PersonType {
 // MARK: - AddressBook_GroupType
 
 public protocol AddressBook_GroupType: AddressBookRecordType {
-    typealias PersonStorage
-    typealias SourceStorage
+    associatedtype PersonStorage
+    associatedtype SourceStorage
 }
 
 // MARK: - AddressBookGroupType
@@ -194,8 +196,8 @@ public protocol AddressBookGroupType: AddressBook_GroupType {
 // MARK: - AddressBook_SourceType
 
 public protocol AddressBook_SourceType: AddressBookRecordType {
-    typealias PersonStorage
-    typealias GroupStorage
+    associatedtype PersonStorage
+    associatedtype GroupStorage
 }
 
 // MARK: - AddressBookSourceType
@@ -842,7 +844,8 @@ public struct LabeledValue<Value: MultiValueRepresentable>: CustomStringConverti
     static func read(multiValue: ABMultiValueRef) -> [LabeledValue<Value>] {
         assert(AddressBook.PropertyKind(rawValue: ABMultiValueGetPropertyType(multiValue)) == Value.propertyKind, "ABMultiValueRef has incompatible property kind.")
         let count: Int = ABMultiValueGetCount(multiValue)
-        return (0..<count).reduce([LabeledValue<Value>]()) { (var acc, index) in
+        return (0..<count).reduce([LabeledValue<Value>]()) { (acc, index) in
+            var acc = acc
             let representation: CFTypeRef = ABMultiValueCopyValueAtIndex(multiValue, index).takeRetainedValue()
             if let value = Value(multiValueRepresentation: representation), unmanagedLabel = ABMultiValueCopyLabelAtIndex(multiValue, index) {
                 let label = unmanagedLabel.takeRetainedValue() as String
@@ -1165,8 +1168,9 @@ public struct SystemAddressBookRegistrar: AddressBookPermissionRegistrar {
     }
 }
 
+// swiftlint:enable cyclomatic_complexity
 // swiftlint:enable nesting
 // swiftlint:enable force_cast
-// swiftlint:enable variable_name_min_length
+// swiftlint:enable variable_name
 // swiftlint:disable type_body_length
 // swiftlint:disable file_length

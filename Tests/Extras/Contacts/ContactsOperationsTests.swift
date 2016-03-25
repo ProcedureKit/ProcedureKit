@@ -323,7 +323,7 @@ class GetContactsOperationTest: ContactsTests {
         let contact = setUpForContactWithIdentifier(contactId)
         operation = _GetContacts(predicate: .WithIdentifiers([contactId]), keysToFetch: [], contactStore: store)
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
         runOperation(operation)
         waitForExpectationsWithTimeout(3, handler: nil)
 
@@ -337,7 +337,7 @@ class GetContactsOperationTest: ContactsTests {
         let contacts = setUpForContactsWithPredicate(predicate)
         operation = _GetContacts(predicate: predicate, keysToFetch: [CNContainerNameKey], contactStore: store)
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
         runOperation(operation)
         waitForExpectationsWithTimeout(3, handler: nil)
 
@@ -372,7 +372,7 @@ class GetContactsGroupOperationTests: ContactsTests {
         let group = setUpForGroupsWithName(groupName)
         operation = _GetContactsGroup(groupName: groupName, contactStore: store)
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
         runOperation(operation)
         waitForExpectationsWithTimeout(3, handler: nil)
 
@@ -384,7 +384,7 @@ class GetContactsGroupOperationTests: ContactsTests {
     func test__get_contacts_group_creates_group_if_necessary() {
         operation = _GetContactsGroup(groupName: groupName, containerId: .Identifier(containerId), contactStore: store)
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
         runOperation(operation)
         waitForExpectationsWithTimeout(3, handler: nil)
 
@@ -419,7 +419,7 @@ class RemoveContactsGroupOperationTests: ContactsTests {
     func test__remove_contacts_does_nothing_if_group_does_not_exist() {
         operation = _RemoveContactsGroup(groupName: groupName, contactStore: store)
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
         runOperation(operation)
         waitForExpectationsWithTimeout(3, handler: nil)
 
@@ -430,7 +430,7 @@ class RemoveContactsGroupOperationTests: ContactsTests {
         let _ = setUpForGroupsWithName(groupName)
         operation = _RemoveContactsGroup(groupName: groupName, contactStore: store)
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
         runOperation(operation)
         waitForExpectationsWithTimeout(3, handler: nil)
 
@@ -465,7 +465,7 @@ class AddContactsToGroupOperationTests: ContactsTests {
         setUpForContactEnumerationWithContactIds(contactIds)
         operation = _AddContactsToGroup(groupName: groupName, contactIDs: contactIds, contactStore: store)
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
         runOperation(operation)
         waitForExpectationsWithTimeout(3, handler: nil)
 
@@ -499,7 +499,7 @@ class RemoveContactsFromGroupOperationTests: ContactsTests {
         setUpForContactEnumerationWithContactIds(contactIds)
         operation = _RemoveContactsFromGroup(groupName: groupName, contactIDs: contactIds, contactStore: store)
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
         runOperation(operation)
         waitForExpectationsWithTimeout(3, handler: nil)
 
@@ -525,7 +525,7 @@ class ContactsAccessOperationsTests: OperationTests {
         let operation = TestOperation()
         operation.addCondition(_ContactsCondition(registrar: registrar))
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
         runOperation(operation)
         waitForExpectationsWithTimeout(3, handler: nil)
 
@@ -540,7 +540,7 @@ class ContactsAccessOperationsTests: OperationTests {
         let operation = TestOperation()
         operation.addCondition(_ContactsCondition(registrar: registrar))
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
         runOperation(operation)
         waitForExpectationsWithTimeout(3, handler: nil)
 
@@ -554,7 +554,7 @@ class ContactsAccessOperationsTests: OperationTests {
         let operation = TestOperation()
         operation.addCondition(_ContactsCondition(registrar: registrar))
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
         runOperation(operation)
         waitForExpectationsWithTimeout(3, handler: nil)
 

@@ -435,8 +435,8 @@ public extension Operation {
 public extension Operation {
 
     private func evaluateConditions() {
-        assert(state == .Pending, "\(__FUNCTION__) was called out of order.")
-        assert(cancelled == false, "\(__FUNCTION__) was called on cancelled operation: \(operationName).")
+        assert(state == .Pending, "\(#function) was called out of order.")
+        assert(cancelled == false, "\(#function) was called on cancelled operation: \(operationName).")
         state = .EvaluatingConditions
         evaluateOperationConditions(conditions, operation: self) { errors in
             self._internalErrors.appendContentsOf(errors)

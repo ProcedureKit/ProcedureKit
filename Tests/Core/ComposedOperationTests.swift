@@ -24,7 +24,7 @@ class ComposedOperationTests: OperationTests {
             didExecute = true
         })
 
-        let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
+        let expectation = expectationWithDescription("Test: \(#function)")
         addCompletionBlockToTestOperation(composed, withExpectation: expectation)
         runOperation(composed)
         waitForExpectationsWithTimeout(3, handler: nil)
@@ -36,7 +36,7 @@ class ComposedOperationTests: OperationTests {
     func test__composed_operation_is_performed() {
         let composed = ComposedOperation(operation: TestOperation())
 
-        let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
+        let expectation = expectationWithDescription("Test: \(#function)")
         addCompletionBlockToTestOperation(composed, withExpectation: expectation)
         runOperation(composed)
         waitForExpectationsWithTimeout(3, handler: nil)

@@ -115,7 +115,7 @@ class HeathCapabilityStatusTests: HealthTests {
 
     func test__setting_status_for_types() {
         status[HKQuantityTypeIdentifierHeartRate] = HKAuthorizationStatus.SharingAuthorized
-        XCTAssertEqual(status._dictionary.count, 1)
+        XCTAssertEqual(status.dictionary.count, 1)
     }
 
     func test__reading_status_for_types() {
@@ -147,12 +147,13 @@ class HeathCapabilityStatusTests: HealthTests {
 class HeathCapabilityTests: HealthTests {
 
     var registrar: TestableHealthRegistrar!
-    var capability: _HealthCapability<TestableHealthRegistrar>!
+    var capability: HealthCapability!
 
     override func setUp() {
         super.setUp()
         registrar = TestableHealthRegistrar()
-        capability = _HealthCapability(requirement, registrar: registrar)
+        capability = HealthCapability(requirement)
+        capability.registrar = registrar
     }
 
     override func tearDown() {
@@ -193,7 +194,8 @@ class HeathCapabilityTests: HealthTests {
 
     func test__given_no_requirements__requesting_authorization_returns_directly() {
         requirement = HealthRequirement()
-        capability = _HealthCapability(requirement, registrar: registrar)
+        capability = HealthCapability(requirement)
+        capability.registrar = registrar
 
         var didComplete = false
         capability.requestAuthorizationWithCompletion {

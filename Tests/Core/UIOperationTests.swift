@@ -141,7 +141,7 @@ class UIOperationTests: OperationTests {
     }
 
     func test__presents() {
-        let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
+        let expectation = expectationWithDescription("Test: \(#function)")
 
         var completionBlockDidRun = false
         operation = TypeUnderTest(controller: presented, displayControllerFrom: .Present(presenter), sender: .None)
@@ -157,7 +157,7 @@ class UIOperationTests: OperationTests {
     }
 
     func test__presents_with_navigation_controller_wrapping_by_default() {
-        let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
+        let expectation = expectationWithDescription("Test: \(#function)")
 
         presenter.check = { [unowned self] received in
             guard let nav = received as? UINavigationController else {
@@ -175,7 +175,7 @@ class UIOperationTests: OperationTests {
 
 
     func test__presents_without_navigation_controller_when_wrapping_overridden() {
-        let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
+        let expectation = expectationWithDescription("Test: \(#function)")
 
         presenter.check = { [unowned self] received in
             guard let _ = received as? UINavigationController else {

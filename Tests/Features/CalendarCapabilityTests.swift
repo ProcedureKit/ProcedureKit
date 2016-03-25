@@ -62,12 +62,13 @@ class EKAuthorizationStatusTests: XCTestCase {
 
 class EventsCapabilityTests: XCTestCase {
     var registrar: TestableEventsRegistrar!
-    var capability: _EventsCapability<TestableEventsRegistrar>!
+    var capability: EventsCapability!
 
     override func setUp() {
         super.setUp()
         registrar = TestableEventsRegistrar()
-        capability = _EventsCapability(.Event, registrar: registrar)
+        capability = EventsCapability(.Event)
+        capability.registrar = registrar
     }
 
     override func tearDown() {
@@ -103,7 +104,7 @@ class EventsCapabilityTests: XCTestCase {
     }
 
     func test__given_denied_does_not_request() {
-        capability.registrar.authorizationStatus = .Denied
+        registrar.authorizationStatus = .Denied
         var didComplete = false
         capability.requestAuthorizationWithCompletion {
             didComplete = true
@@ -113,7 +114,7 @@ class EventsCapabilityTests: XCTestCase {
     }
 
     func test__given_authorized_does_not_request() {
-        capability.registrar.authorizationStatus = .Authorized
+        registrar.authorizationStatus = .Authorized
         var didComplete = false
         capability.requestAuthorizationWithCompletion {
             didComplete = true

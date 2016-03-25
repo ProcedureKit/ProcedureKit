@@ -56,7 +56,7 @@ class ReachabilityConditionTests: OperationTests {
 
     func test__condition_fails_with_not_reachable() {
 
-        let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
+        let expectation = expectationWithDescription("Test: \(#function)")
         let operation = TestOperation()
         let condition = ReachabilityCondition(url: url)
         condition.reachability = manager
@@ -81,7 +81,7 @@ class ReachabilityConditionTests: OperationTests {
     #if os(iOS)
     func test__condition_fails_when_wifi_required_but_only_wwan_available() {
 
-        let expectation = expectationWithDescription("Test: \(__FUNCTION__)")
+        let expectation = expectationWithDescription("Test: \(#function)")
 
         let operation = TestOperation()
         let condition = ReachabilityCondition(url: url, connectivity: .ViaWiFi)

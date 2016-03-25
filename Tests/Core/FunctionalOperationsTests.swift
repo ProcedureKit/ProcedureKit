@@ -39,7 +39,7 @@ class MapOperationTests: OperationTests {
         let source = TestOperation()
         let destination = source.mapOperation { $0.map { "\($0) \($0)" } ?? "Nope" }
 
-        addCompletionBlockToTestOperation(destination, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        addCompletionBlockToTestOperation(destination, withExpectation: expectationWithDescription("Test: \(#function)"))
         runOperations(source, destination)
         waitForExpectationsWithTimeout(3, handler: nil)
 
@@ -50,7 +50,7 @@ class MapOperationTests: OperationTests {
         let source = TestOperation(error: TestOperation.Error.SimulatedError)
         let destination = source.mapOperation { $0.map { "\($0) \($0)" } ?? "Nope" }
 
-        addCompletionBlockToTestOperation(destination, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        addCompletionBlockToTestOperation(destination, withExpectation: expectationWithDescription("Test: \(#function)"))
         runOperations(source, destination)
         waitForExpectationsWithTimeout(3, handler: nil)
 
@@ -60,7 +60,7 @@ class MapOperationTests: OperationTests {
     func test__map_operation_with_no_requirement() {
         let map: MapOperation<String, String> = MapOperation { str in return "\(str) \(str)" }
 
-        addCompletionBlockToTestOperation(map, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        addCompletionBlockToTestOperation(map, withExpectation: expectationWithDescription("Test: \(#function)"))
         runOperation(map)
         waitForExpectationsWithTimeout(3, handler: nil)
 
@@ -75,7 +75,7 @@ class FilterOperationTests: OperationTests {
         let numbers = NumbersOperation()
         let filtered = numbers.filterOperation { $0 % 2 == 0 }
 
-        addCompletionBlockToTestOperation(filtered, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        addCompletionBlockToTestOperation(filtered, withExpectation: expectationWithDescription("Test: \(#function)"))
         runOperations(numbers, filtered)
         waitForExpectationsWithTimeout(3, handler: nil)
 
@@ -88,7 +88,7 @@ class FilterOperationTests: OperationTests {
         numbers.addDependency(delay)
         let filtered = numbers.filterOperation { $0 % 2 == 0 }
 
-        addCompletionBlockToTestOperation(filtered, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        addCompletionBlockToTestOperation(filtered, withExpectation: expectationWithDescription("Test: \(#function)"))
         runOperations(delay, numbers, filtered)
         numbers.cancel()
         waitForExpectationsWithTimeout(3, handler: nil)
@@ -100,7 +100,7 @@ class FilterOperationTests: OperationTests {
         let numbers = NumbersOperation(error: TestOperation.Error.SimulatedError)
         let filtered = numbers.filterOperation { $0 % 2 == 0 }
 
-        addCompletionBlockToTestOperation(filtered, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        addCompletionBlockToTestOperation(filtered, withExpectation: expectationWithDescription("Test: \(#function)"))
         runOperations(numbers, filtered)
         waitForExpectationsWithTimeout(3, handler: nil)
 
@@ -116,7 +116,7 @@ class ReduceOperationTests: OperationTests {
             return sum + element
         }
 
-        addCompletionBlockToTestOperation(reduce, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        addCompletionBlockToTestOperation(reduce, withExpectation: expectationWithDescription("Test: \(#function)"))
         runOperations(numbers, reduce)
         waitForExpectationsWithTimeout(3, handler: nil)
 
@@ -131,7 +131,7 @@ class ReduceOperationTests: OperationTests {
             return sum + element
         }
 
-        addCompletionBlockToTestOperation(reduce, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        addCompletionBlockToTestOperation(reduce, withExpectation: expectationWithDescription("Test: \(#function)"))
         runOperations(delay, numbers, reduce)
         numbers.cancel()
         waitForExpectationsWithTimeout(3, handler: nil)
@@ -145,7 +145,7 @@ class ReduceOperationTests: OperationTests {
             return sum + element
         }
 
-        addCompletionBlockToTestOperation(reduce, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        addCompletionBlockToTestOperation(reduce, withExpectation: expectationWithDescription("Test: \(#function)"))
         runOperations(numbers, reduce)
         waitForExpectationsWithTimeout(3, handler: nil)
 
@@ -158,7 +158,7 @@ class ResultOperationTests: OperationTests {
     func test__result_executes() {
         let operation = ResultOperation(result: 0)
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(__FUNCTION__)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
         runOperation(operation)
         waitForExpectationsWithTimeout(3, handler: nil)
 
