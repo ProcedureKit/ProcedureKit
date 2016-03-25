@@ -1,3 +1,8 @@
+# 2.8.2
+1. [[OPR-250](https://github.com/danthorpe/Operations/pull/250)]: Thanks to [@felix-dumit](https://github.com/felix-dumit) for making the cancellation of `GroupOperation` more sensible and consistent. Essentially now the group will cancel after all of its children have cancelled.
+
+This should be the last bug release before v2.9.0 and Swift 2.2 is released.
+
 # 2.8.1
 
 1. [[OPR-245](https://github.com/danthorpe/Operations/pull/247)]: Thanks to [@difujia](https://github.com/difujia) for spotting and fixing a really clear retain cycle in `ComposedOperation`. Good tip - is to remember that an operation will retain its observers, meaning that if an operation owns another operation, *and* acts as its observer, then it will create a retain cycle. The easy fix is to use block based observers, with a capture list of `[unowned self]`.
