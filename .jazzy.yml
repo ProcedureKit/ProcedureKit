@@ -1,12 +1,12 @@
 author_name: Daniel Thorpe
 author_url: http://danthorpe.me
 module_name: Operations
-module_version: 2.8.1
+module_version: 2.9.0
 github_url: https://github.com/danthorpe/Operations
 readme: README.md
 podspec: Operations.podspec
 
-swift_version: 2.1.1
+swift_version: 2.2
 xcodebuild-arguments: -scheme,Operations-iOS
 
 custom_categories:
