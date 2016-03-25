@@ -45,7 +45,7 @@ public class URLSessionTaskOperation: Operation {
 
         if object === task && task.state == .Completed  && keyPath == KeyPath.State.rawValue {
             task.removeObserver(self, forKeyPath: KeyPath.State.rawValue)
-            finish()
+            finish(task.error)
         }
     }
 }
