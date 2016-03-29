@@ -665,4 +665,20 @@ extension NSRecursiveLock {
     }
 }
 
+extension Array where Element: NSOperation {
+
+    internal var splitNSOperationsAndOperations: ([NSOperation], [Operation]) {
+        return reduce(([], [])) { result, element in
+            var (ns, op) = result
+            if let operation = element as? Operation {
+                op.append(operation)
+            }
+            else {
+                ns.append(element)
+            }
+            return (ns, op)
+        }
+    }
+}
+
 // swiftlint:enable file_length
