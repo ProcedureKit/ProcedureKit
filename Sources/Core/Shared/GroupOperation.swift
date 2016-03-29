@@ -8,7 +8,9 @@
 
 import Foundation
 
-
+public enum GroupOperationError: ErrorType {
+    case ParentGroupCancelledWithErrors([ErrorType])
+}
 
 
 /**
@@ -55,10 +57,19 @@ public class GroupOperation: Operation {
 
     /// Override of public method
     public override func cancel() {
-        queue.cancelAllOperations()
         queue.suspended = false
+        queue.cancelAllOperations()
         operations.forEach { $0.cancel() }
         super.cancel()
+    }
+
+    /// Override of public method
+    public override func cancelWithErrors(errors: [ErrorType]) {
+        queue.suspended = false
+        let (nsops, ops) = operations.splitNSOperationsAndOperations
+        nsops.forEach { $0.cancel() }
+        ops.forEach { $0.cancelWithError(GroupOperationError.ParentGroupCancelledWithErrors(errors)) }
+        super.cancelWithErrors(errors)
     }
 
     /**
