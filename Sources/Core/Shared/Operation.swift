@@ -234,6 +234,8 @@ public class Operation: NSOperation {
         // No op.
     }
 
+    // MARK: - Cancellation
+
     /**
      Cancel the operation with an error.
 
@@ -255,8 +257,6 @@ public class Operation: NSOperation {
         _internalErrors += errors
         cancel()
     }
-
-    // MARK: - Cancellation
 
     public override func cancel() {
         if !finished {
@@ -358,8 +358,6 @@ public extension Operation {
 
 public extension Operation {
 
-    // MARK: - Dependencies
-
     private func createDidFinishDependenciesOperation() -> NSOperation {
         assert(waitForDependenciesOperation == nil, "Should only ever create the finishing dependency once.")
         let __op = NSBlockOperation { }
@@ -381,8 +379,7 @@ public extension Operation {
         get {
             var _dependencies = super.dependencies
             guard let
-                waiter = waitForDependenciesOperation,
-                index = _dependencies.indexOf(waiter) else {
+                waiter = waitForDependenciesOperation, index = _dependencies.indexOf(waiter) else {
                     return _dependencies
             }
 
