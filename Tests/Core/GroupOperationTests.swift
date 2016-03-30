@@ -222,16 +222,18 @@ class GroupOperationTests: OperationTests {
         
         XCTAssertEqual(childErrors.count, 1)
         
-        guard let error = childErrors.first as? GroupOperationError else {
+        guard let error = childErrors.first as? OperationError else {
             XCTFail("Incorrect error received"); return
         }
         
         switch error {
-        case let .ParentGroupCancelledWithErrors(parentErrors):
+        case let .ParentOperationCancelledWithErrors(parentErrors):
             guard let parentError = parentErrors.first as? TestOperation.Error else {
                 XCTFail("Incorrect error received"); return
             }            
             XCTAssertEqual(parentError, groupError)
+        default:
+            XCTFail("Incorrect error received"); return
         }
     }
 }

@@ -603,6 +603,9 @@ public enum OperationError: ErrorType, Equatable {
 
     /// Indicates that the operation timed out.
     case OperationTimedOut(NSTimeInterval)
+
+    /// Indicates that a parent operation was cancelled (with errors).
+    case ParentOperationCancelledWithErrors([ErrorType])
 }
 
 /// OperationError is Equatable.
@@ -612,6 +615,9 @@ public func == (lhs: OperationError, rhs: OperationError) -> Bool {
         return true
     case let (.OperationTimedOut(aTimeout), .OperationTimedOut(bTimeout)):
         return aTimeout == bTimeout
+    case let (.ParentOperationCancelledWithErrors(aErrors), .ParentOperationCancelledWithErrors(bErrors)):
+        // Not possible to do a real equality check here.
+        return aErrors.count == bErrors.count
     default:
         return false
     }

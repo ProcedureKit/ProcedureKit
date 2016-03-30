@@ -8,11 +8,6 @@
 
 import Foundation
 
-public enum GroupOperationError: ErrorType {
-    case ParentGroupCancelledWithErrors([ErrorType])
-}
-
-
 /**
 An `Operation` subclass which enables the grouping
 of other operations. Use `GroupOperation`s to associate
@@ -68,7 +63,7 @@ public class GroupOperation: Operation {
         queue.suspended = false
         let (nsops, ops) = operations.splitNSOperationsAndOperations
         nsops.forEach { $0.cancel() }
-        ops.forEach { $0.cancelWithError(GroupOperationError.ParentGroupCancelledWithErrors(errors)) }
+        ops.forEach { $0.cancelWithError(OperationError.ParentOperationCancelledWithErrors(errors)) }
         super.cancelWithErrors(errors)
     }
 
