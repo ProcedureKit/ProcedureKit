@@ -35,6 +35,10 @@ class MyFirstOperation: Operation {
         finish()
     }
 }
+
+let queue = OperationQueue()
+let myOperation = MyFirstOperation()
+queue.addOperation(myOperation)
 ```
 
 the key points here are:
@@ -43,6 +47,7 @@ the key points here are:
 2. Override `execute` but do not call `super.execute()`
 3. Check the `cancelled` property before starting any *work*.
 4. If not cancelled, always call `finish()` after the *work* is done. This could be done asynchronously.
+5. Add operations to instances of `OperationQueue`.
 
 ## Observers
 
