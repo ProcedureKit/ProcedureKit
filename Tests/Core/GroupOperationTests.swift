@@ -201,4 +201,40 @@ class GroupOperationTests: OperationTests {
         XCTAssertEqual(group, observedGroup)
         XCTAssertEqual(child1, observedChild)
     }
+    
+    func test__group_operation_which_cancels_propagates_error_to_children() {
+        
+        let child = TestOperation()
+        
+        var childErrors: [ErrorType] = []
+        child.addObserver(CancelledObserver { op in
+            childErrors = op.errors
+        })
+        
+        let group = GroupOperation(operations: [child])
+        
+        let groupError = TestOperation.Error.SimulatedError
+        group.cancelWithError(groupError)
+        
+        addCompletionBlockToTestOperation(group)
+        runOperation(group)
+        waitForExpectationsWithTimeout(3, handler: nil)
+        
+        XCTAssertEqual(childErrors.count, 1)
+        
+        guard let error = childErrors.first as? OperationError else {
+            XCTFail("Incorrect error received"); return
+        }
+        
+        switch error {
+        case let .ParentOperationCancelledWithErrors(parentErrors):
+            guard let parentError = parentErrors.first as? TestOperation.Error else {
+                XCTFail("Incorrect error received"); return
+            }            
+            XCTAssertEqual(parentError, groupError)
+        default:
+            XCTFail("Incorrect error received"); return
+        }
+    }
 }
+

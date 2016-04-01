@@ -234,6 +234,8 @@ public class Operation: NSOperation {
         // No op.
     }
 
+    // MARK: - Cancellation
+
     /**
      Cancel the operation with an error.
 
@@ -255,8 +257,6 @@ public class Operation: NSOperation {
         _internalErrors += errors
         cancel()
     }
-
-    // MARK: - Cancellation
 
     public override func cancel() {
         if !finished {
@@ -358,8 +358,6 @@ public extension Operation {
 
 public extension Operation {
 
-    // MARK: - Dependencies
-
     private func createDidFinishDependenciesOperation() -> NSOperation {
         assert(waitForDependenciesOperation == nil, "Should only ever create the finishing dependency once.")
         let __op = NSBlockOperation { }
@@ -381,8 +379,7 @@ public extension Operation {
         get {
             var _dependencies = super.dependencies
             guard let
-                waiter = waitForDependenciesOperation,
-                index = _dependencies.indexOf(waiter) else {
+                waiter = waitForDependenciesOperation, index = _dependencies.indexOf(waiter) else {
                     return _dependencies
             }
 
@@ -606,6 +603,9 @@ public enum OperationError: ErrorType, Equatable {
 
     /// Indicates that the operation timed out.
     case OperationTimedOut(NSTimeInterval)
+
+    /// Indicates that a parent operation was cancelled (with errors).
+    case ParentOperationCancelledWithErrors([ErrorType])
 }
 
 /// OperationError is Equatable.
@@ -615,6 +615,9 @@ public func == (lhs: OperationError, rhs: OperationError) -> Bool {
         return true
     case let (.OperationTimedOut(aTimeout), .OperationTimedOut(bTimeout)):
         return aTimeout == bTimeout
+    case let (.ParentOperationCancelledWithErrors(aErrors), .ParentOperationCancelledWithErrors(bErrors)):
+        // Not possible to do a real equality check here.
+        return aErrors.count == bErrors.count
     default:
         return false
     }
@@ -665,6 +668,22 @@ extension NSRecursiveLock {
         let value = block()
         unlock()
         return value
+    }
+}
+
+extension Array where Element: NSOperation {
+
+    internal var splitNSOperationsAndOperations: ([NSOperation], [Operation]) {
+        return reduce(([], [])) { result, element in
+            var (ns, op) = result
+            if let operation = element as? Operation {
+                op.append(operation)
+            }
+            else {
+                ns.append(element)
+            }
+            return (ns, op)
+        }
     }
 }
 

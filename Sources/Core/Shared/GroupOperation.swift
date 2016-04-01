@@ -8,9 +8,6 @@
 
 import Foundation
 
-
-
-
 /**
 An `Operation` subclass which enables the grouping
 of other operations. Use `GroupOperation`s to associate
@@ -55,10 +52,19 @@ public class GroupOperation: Operation {
 
     /// Override of public method
     public override func cancel() {
-        queue.cancelAllOperations()
         queue.suspended = false
+        queue.cancelAllOperations()
         operations.forEach { $0.cancel() }
         super.cancel()
+    }
+
+    /// Override of public method
+    public override func cancelWithErrors(errors: [ErrorType]) {
+        queue.suspended = false
+        let (nsops, ops) = operations.splitNSOperationsAndOperations
+        nsops.forEach { $0.cancel() }
+        ops.forEach { $0.cancelWithError(OperationError.ParentOperationCancelledWithErrors(errors)) }
+        super.cancelWithErrors(errors)
     }
 
     /**
