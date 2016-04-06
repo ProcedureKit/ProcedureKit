@@ -32,6 +32,12 @@ public class GroupOperation: Operation {
         return _aggregateErrors.read { $0 }
     }
 
+    public override var userIntent: Operation.UserIntent {
+        didSet {
+            operations.forEachOperation { $0.userIntent = userIntent }
+        }
+    }
+
     /**
     Designated initializer.
 
@@ -43,6 +49,7 @@ public class GroupOperation: Operation {
         name = "Group Operation"
         queue.suspended = true
         queue.delegate = self
+        userIntent = operations.userIntent
     }
 
     /// Convenience intiializer for direct usage without subclassing.
@@ -102,11 +109,7 @@ public class GroupOperation: Operation {
      */
     public func addOperations(operations: [NSOperation]) {
         if operations.count > 0 {
-            operations.forEach {
-                if let op = $0 as? Operation {
-                    op.log.severity = log.severity
-                }
-            }
+            operations.forEachOperation { $0.log.severity = log.severity }
             queue.addOperations(operations)
         }
     }

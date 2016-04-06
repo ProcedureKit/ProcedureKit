@@ -77,8 +77,8 @@ public class Operation: NSOperation {
     }
 
     /// Type to express the intent of the user in regards to executing an Operation instance
-    public enum UserIntent: Equatable {
-        case Initiated, SideEffect, Background
+    public enum UserIntent: Int {
+        case Background = 0, SideEffect, Initiated
 
         internal var qos: NSQualityOfService {
             switch self {
@@ -644,15 +644,6 @@ public func == (lhs: OperationError, rhs: OperationError) -> Bool {
     }
 }
 
-public func == (lhs: Operation.UserIntent, rhs: Operation.UserIntent) -> Bool {
-    switch (lhs, rhs) {
-    case (.Initiated, .Initiated), (.SideEffect, .SideEffect), (.Background, .Background):
-        return true
-    default:
-        return false
-    }
-}
-
 extension NSOperation {
 
     /**
@@ -713,6 +704,21 @@ extension Array where Element: NSOperation {
                 ns.append(element)
             }
             return (ns, op)
+        }
+    }
+
+    internal var userIntent: Operation.UserIntent {
+        get {
+            let (_, ops) = splitNSOperationsAndOperations
+            return ops.map { $0.userIntent }.maxElement { $0.rawValue < $1.rawValue } ?? .Background
+        }
+    }
+
+    internal func forEachOperation(@noescape body: (Operation) throws -> Void) rethrows {
+        try forEach {
+            if let operation = $0 as? Operation {
+                try body(operation)
+            }
         }
     }
 }
