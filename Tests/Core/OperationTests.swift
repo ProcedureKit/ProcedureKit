@@ -251,29 +251,6 @@ class BasicTests: OperationTests {
         XCTAssertEqual(operation.userIntent, Operation.UserIntent.Background)
     }
 
-    func test__set_user_intent__initiated() {
-        let operation = TestOperation()
-        operation.userIntent = .Initiated
-        XCTAssertEqual(operation.qualityOfService, NSQualityOfService.UserInitiated)
-    }
-
-    func test__set_user_intent__side_effect() {
-        let operation = TestOperation()
-        operation.userIntent = .SideEffect
-        XCTAssertEqual(operation.qualityOfService, NSQualityOfService.UserInitiated)
-    }
-    
-    func test__set_user_intent__initiated_then_background() {
-        let operation = TestOperation()
-        operation.userIntent = .Initiated
-        operation.userIntent = .Background
-        XCTAssertEqual(operation.qualityOfService, NSQualityOfService.Default)
-    }
-    
-    func test__user_intent__equality() {
-        XCTAssertNotEqual(Operation.UserIntent.Initiated, Operation.UserIntent.SideEffect)
-    }
-    
     func test__cancel_with_nil_error() {
         let operation = TestOperation()
         operation.cancelWithError(.None)
@@ -301,6 +278,32 @@ class BasicTests: OperationTests {
         let operation = TestOperation()
         waitForOperation(operation)
         XCTAssertTrue(operation.didFinish)
+    }
+}
+
+class UserIntentOperationTests: OperationTests {
+
+    func test__set_user_intent__initiated() {
+        let operation = TestOperation()
+        operation.userIntent = .Initiated
+        XCTAssertEqual(operation.qualityOfService, NSQualityOfService.UserInitiated)
+    }
+
+    func test__set_user_intent__side_effect() {
+        let operation = TestOperation()
+        operation.userIntent = .SideEffect
+        XCTAssertEqual(operation.qualityOfService, NSQualityOfService.UserInitiated)
+    }
+
+    func test__set_user_intent__initiated_then_background() {
+        let operation = TestOperation()
+        operation.userIntent = .Initiated
+        operation.userIntent = .Background
+        XCTAssertEqual(operation.qualityOfService, NSQualityOfService.Default)
+    }
+
+    func test__user_intent__equality() {
+        XCTAssertNotEqual(Operation.UserIntent.Initiated, Operation.UserIntent.SideEffect)
     }
 }
 
