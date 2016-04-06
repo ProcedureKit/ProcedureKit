@@ -76,7 +76,11 @@ public class Operation: NSOperation {
         }
     }
 
-    /// Type to express the intent of the user in regards to executing an Operation instance
+    /** 
+     Type to express the intent of the user in regards to executing an Operation instance
+     
+     - see: https://developer.apple.com/library/ios/documentation/Performance/Conceptual/EnergyGuide-iOS/PrioritizeWorkWithQoS.html#//apple_ref/doc/uid/TP40015243-CH39
+    */
     public enum UserIntent: Int {
         case Background = 0, SideEffect, Initiated
 
@@ -149,9 +153,6 @@ public class Operation: NSOperation {
      to a queue, or is waiting on dependencies.
      */
     public var userIntent: UserIntent = .Background {
-        willSet {
-            precondition(state < .Executing, "Cannot modify userIntent after execution has begun.")
-        }
         didSet {
             setQualityOfServiceFromUserIntent(userIntent)
         }
