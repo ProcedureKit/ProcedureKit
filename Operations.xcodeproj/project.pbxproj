@@ -680,9 +680,9 @@
 			children = (
 				6526170B1C11F5EB00654091 /* AlertOperationTests.swift */,
 				6526170C1C11F5EB00654091 /* BackgroundObserverTests.swift */,
+				6526170D1C11F5EB00654091 /* BlockConditionTests.swift */,
 				657DBA321C208830001E00F3 /* BlockObserverTests.swift */,
 				6526170E1C11F5EB00654091 /* ComposedOperationTests.swift */,
-				6526170D1C11F5EB00654091 /* BlockConditionTests.swift */,
 				65C98C761C284EA600BA76B7 /* FunctionalOperationsTests.swift */,
 				6526170F1C11F5EB00654091 /* GatedOperationTests.swift */,
 				652617101C11F5EB00654091 /* GroupOperationTests.swift */,
