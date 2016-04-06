@@ -150,7 +150,7 @@ public class Operation: NSOperation {
      */
     public var userIntent: UserIntent = .Background {
         willSet {
-            precondition(state < .Executing, "Cannot modify userInitiated after execution has begun.")
+            precondition(state < .Executing, "Cannot modify userIntent after execution has begun.")
         }
         didSet {
             qualityOfService = userIntent.qos
