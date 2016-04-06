@@ -270,6 +270,10 @@ class BasicTests: OperationTests {
         XCTAssertEqual(operation.qualityOfService, NSQualityOfService.Default)
     }
     
+    func test__user_intent__equality() {
+        XCTAssertNotEqual(Operation.UserIntent.Initiated, Operation.UserIntent.SideEffect)
+    }
+    
     func test__cancel_with_nil_error() {
         let operation = TestOperation()
         operation.cancelWithError(.None)
