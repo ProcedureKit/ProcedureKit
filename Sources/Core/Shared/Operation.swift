@@ -153,7 +153,7 @@ public class Operation: NSOperation {
             precondition(state < .Executing, "Cannot modify userIntent after execution has begun.")
         }
         didSet {
-            qualityOfService = userIntent.qos
+            setQualityOfServiceFromUserIntent(userIntent)
         }
     }
 
@@ -671,6 +671,10 @@ extension NSOperation {
     */
     public func addDependencies(dependencies: [NSOperation]) {
         dependencies.forEach(addDependency)
+    }
+
+    internal func setQualityOfServiceFromUserIntent(userIntent: Operation.UserIntent) {
+        qualityOfService = userIntent.qos
     }
 }
 
