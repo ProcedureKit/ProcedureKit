@@ -236,5 +236,27 @@ class GroupOperationTests: OperationTests {
             XCTFail("Incorrect error received"); return
         }
     }
+    
+    func test__group_operation__gets_user_intent_from_initial_operations() {
+        let test1 = TestOperation()
+        test1.userIntent = .Initiated
+        let test2 = TestOperation()
+        let test3 = NSBlockOperation { }
+        
+        let group = GroupOperation(operations: [ test1, test2, test3 ])
+        XCTAssertEqual(group.userIntent, Operation.UserIntent.Initiated)
+    }
+    
+    func test__group_operation__sets_user_intent_on_child_operations() {
+        let test1 = TestOperation()
+        test1.userIntent = .Initiated
+        let test2 = TestOperation()
+        let test3 = NSBlockOperation { }
+        
+        let group = GroupOperation(operations: [ test1, test2, test3 ])
+        group.userIntent = .SideEffect
+        XCTAssertEqual(test1.userIntent, Operation.UserIntent.SideEffect)
+        XCTAssertEqual(test2.userIntent, Operation.UserIntent.SideEffect)
+    }
 }
 
