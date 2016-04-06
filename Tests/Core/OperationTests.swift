@@ -246,17 +246,30 @@ class BasicTests: OperationTests {
         XCTAssertTrue(dep2.didExecute)
     }
 
-    func test__getting_user_initiated_default_false() {
+    func test__getting_user_indent_default_background() {
         let operation = TestOperation()
-        XCTAssertFalse(operation.userInitiated)
+        XCTAssertEqual(operation.userIntent, Operation.UserIntent.Background)
     }
 
-    func test__setting_user_initiated() {
+    func test__set_user_intent__initiated() {
         let operation = TestOperation()
-        operation.userInitiated = true
-        XCTAssertTrue(operation.userInitiated)
+        operation.userIntent = .Initiated
+        XCTAssertEqual(operation.qualityOfService, NSQualityOfService.UserInitiated)
     }
 
+    func test__set_user_intent__side_effect() {
+        let operation = TestOperation()
+        operation.userIntent = .SideEffect
+        XCTAssertEqual(operation.qualityOfService, NSQualityOfService.UserInitiated)
+    }
+    
+    func test__set_user_intent__initiated_then_background() {
+        let operation = TestOperation()
+        operation.userIntent = .Initiated
+        operation.userIntent = .Background
+        XCTAssertEqual(operation.qualityOfService, NSQualityOfService.Default)
+    }
+    
     func test__cancel_with_nil_error() {
         let operation = TestOperation()
         operation.cancelWithError(.None)
