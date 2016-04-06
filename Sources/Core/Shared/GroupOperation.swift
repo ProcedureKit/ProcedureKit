@@ -34,7 +34,9 @@ public class GroupOperation: Operation {
 
     public override var userIntent: Operation.UserIntent {
         didSet {
-            operations.forEachOperation { $0.userIntent = userIntent }
+            let (nsops, ops) = operations.splitNSOperationsAndOperations
+            nsops.forEach { $0.setQualityOfServiceFromUserIntent(userIntent) }
+            ops.forEach { $0.userIntent = userIntent }
         }
     }
 

@@ -257,6 +257,7 @@ class GroupOperationTests: OperationTests {
         group.userIntent = .SideEffect
         XCTAssertEqual(test1.userIntent, Operation.UserIntent.SideEffect)
         XCTAssertEqual(test2.userIntent, Operation.UserIntent.SideEffect)
+        XCTAssertEqual(test3.qualityOfService, NSQualityOfService.UserInitiated)
     }
 }
 
