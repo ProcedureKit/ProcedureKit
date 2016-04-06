@@ -246,11 +246,6 @@ class BasicTests: OperationTests {
         XCTAssertTrue(dep2.didExecute)
     }
 
-    func test__getting_user_indent_default_background() {
-        let operation = TestOperation()
-        XCTAssertEqual(operation.userIntent, Operation.UserIntent.Background)
-    }
-
     func test__cancel_with_nil_error() {
         let operation = TestOperation()
         operation.cancelWithError(.None)
@@ -282,6 +277,11 @@ class BasicTests: OperationTests {
 }
 
 class UserIntentOperationTests: OperationTests {
+
+    func test__getting_user_intent_default_background() {
+        let operation = TestOperation()
+        XCTAssertEqual(operation.userIntent, Operation.UserIntent.Background)
+    }
 
     func test__set_user_intent__initiated() {
         let operation = TestOperation()
