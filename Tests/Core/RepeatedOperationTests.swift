@@ -11,6 +11,10 @@ import XCTest
 
 class RandomFailGeneratorTests: XCTestCase {
 
+    /*
+     This test is currently disabled as it has become unstable in
+     Xcode 7.3, iOS 9.3, OS X 10.11.4
+    */
     func test__failure_probability_distribution() {
 
         var generator = RandomFailGenerator(AnyGenerator { true })
