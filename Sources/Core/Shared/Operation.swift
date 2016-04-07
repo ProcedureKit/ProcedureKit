@@ -76,6 +76,24 @@ public class Operation: NSOperation {
         }
     }
 
+    /** 
+     Type to express the intent of the user in regards to executing an Operation instance
+     
+     - see: https://developer.apple.com/library/ios/documentation/Performance/Conceptual/EnergyGuide-iOS/PrioritizeWorkWithQoS.html#//apple_ref/doc/uid/TP40015243-CH39
+    */
+    public enum UserIntent: Int {
+        case None = 0, SideEffect, Initiated
+
+        internal var qos: NSQualityOfService {
+            switch self {
+            case .Initiated, .SideEffect:
+                return .UserInitiated
+            default:
+                return .Default
+            }
+        }
+    }
+
     // use the KVO mechanism to indicate that changes to "state" affect other properties as well
     class func keyPathsForValuesAffectingIsReady() -> Set<NSObject> {
         return ["State", "Cancelled"]
@@ -126,6 +144,21 @@ public class Operation: NSOperation {
     }
 
     /**
+     Expresses the user intent in regards to the execution of this Operation.
+
+     Setting this property will set the appropriate quality of service parameter
+     on the Operation.
+
+     - requires: self must not have started yet. i.e. either hasn't been added
+     to a queue, or is waiting on dependencies.
+     */
+    public var userIntent: UserIntent = .None {
+        didSet {
+            setQualityOfServiceFromUserIntent(userIntent)
+        }
+    }
+
+    /**
      Modifies the quality of service of the underlying operation.
 
      - requires: self must not have started yet. i.e. either hasn't been added
@@ -133,6 +166,7 @@ public class Operation: NSOperation {
 
      - returns: a Bool indicating whether or not the quality of service is .UserInitiated
     */
+    @available(*, unavailable, message="This property has been deprecated in favor of userIntent.")
     public var userInitiated: Bool {
         get {
             return qualityOfService == .UserInitiated
@@ -142,7 +176,6 @@ public class Operation: NSOperation {
             qualityOfService = newValue ? .UserInitiated : .Default
         }
     }
-
 
     /**
      # Access the logger for this Operation
@@ -573,17 +606,6 @@ public extension Operation {
     }
 }
 
-
-
-
-
-
-
-
-
-
-
-
 private func < (lhs: Operation.State, rhs: Operation.State) -> Bool {
     return lhs.rawValue < rhs.rawValue
 }
@@ -651,6 +673,10 @@ extension NSOperation {
     public func addDependencies(dependencies: [NSOperation]) {
         dependencies.forEach(addDependency)
     }
+
+    internal func setQualityOfServiceFromUserIntent(userIntent: Operation.UserIntent) {
+        qualityOfService = userIntent.qos
+    }
 }
 
 extension NSLock {
@@ -683,6 +709,21 @@ extension Array where Element: NSOperation {
                 ns.append(element)
             }
             return (ns, op)
+        }
+    }
+
+    internal var userIntent: Operation.UserIntent {
+        get {
+            let (_, ops) = splitNSOperationsAndOperations
+            return ops.map { $0.userIntent }.maxElement { $0.rawValue < $1.rawValue } ?? .None
+        }
+    }
+
+    internal func forEachOperation(@noescape body: (Operation) throws -> Void) rethrows {
+        try forEach {
+            if let operation = $0 as? Operation {
+                try body(operation)
+            }
         }
     }
 }
