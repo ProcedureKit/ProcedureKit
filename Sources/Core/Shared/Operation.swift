@@ -82,7 +82,7 @@ public class Operation: NSOperation {
      - see: https://developer.apple.com/library/ios/documentation/Performance/Conceptual/EnergyGuide-iOS/PrioritizeWorkWithQoS.html#//apple_ref/doc/uid/TP40015243-CH39
     */
     public enum UserIntent: Int {
-        case Background = 0, SideEffect, Initiated
+        case None = 0, SideEffect, Initiated
 
         internal var qos: NSQualityOfService {
             switch self {
@@ -152,7 +152,7 @@ public class Operation: NSOperation {
      - requires: self must not have started yet. i.e. either hasn't been added
      to a queue, or is waiting on dependencies.
      */
-    public var userIntent: UserIntent = .Background {
+    public var userIntent: UserIntent = .None {
         didSet {
             setQualityOfServiceFromUserIntent(userIntent)
         }
@@ -715,7 +715,7 @@ extension Array where Element: NSOperation {
     internal var userIntent: Operation.UserIntent {
         get {
             let (_, ops) = splitNSOperationsAndOperations
-            return ops.map { $0.userIntent }.maxElement { $0.rawValue < $1.rawValue } ?? .Background
+            return ops.map { $0.userIntent }.maxElement { $0.rawValue < $1.rawValue } ?? .None
         }
     }
 

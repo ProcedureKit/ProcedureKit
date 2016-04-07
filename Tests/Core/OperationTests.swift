@@ -280,7 +280,7 @@ class UserIntentOperationTests: OperationTests {
 
     func test__getting_user_intent_default_background() {
         let operation = TestOperation()
-        XCTAssertEqual(operation.userIntent, Operation.UserIntent.Background)
+        XCTAssertEqual(operation.userIntent, Operation.UserIntent.None)
     }
 
     func test__set_user_intent__initiated() {
@@ -298,7 +298,7 @@ class UserIntentOperationTests: OperationTests {
     func test__set_user_intent__initiated_then_background() {
         let operation = TestOperation()
         operation.userIntent = .Initiated
-        operation.userIntent = .Background
+        operation.userIntent = .None
         XCTAssertEqual(operation.qualityOfService, NSQualityOfService.Default)
     }
 
