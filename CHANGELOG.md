@@ -1,3 +1,6 @@
+# 2.8.3
+1. [[OPR-260](https://github.com/danthorpe/Operations/pull/260)]: Thanks to [@estromlund](https://github.com/estromlund) for fixing a bug where network errors were not passed through to the Operation when it finishes.
+
 # 2.8.2
 1. [[OPR-250](https://github.com/danthorpe/Operations/pull/250)]: Thanks to [@felix-dumit](https://github.com/felix-dumit) for making the cancellation of `GroupOperation` more sensible and consistent. Essentially now the group will cancel after all of its children have cancelled.
 
