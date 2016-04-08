@@ -222,6 +222,9 @@
 		65B9E07D1CB85941009161AD /* URLSessionTaskOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65B9E07C1CB85941009161AD /* URLSessionTaskOperation.swift */; };
 		65B9E07E1CB8594F009161AD /* URLSessionTaskOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65B9E07C1CB85941009161AD /* URLSessionTaskOperation.swift */; };
 		65B9E07F1CB8594F009161AD /* URLSessionTaskOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65B9E07C1CB85941009161AD /* URLSessionTaskOperation.swift */; };
+		65B9E0861CB85F55009161AD /* URLSessionTaskOperationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65B9E0841CB85F4E009161AD /* URLSessionTaskOperationTests.swift */; };
+		65B9E0871CB85F55009161AD /* URLSessionTaskOperationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65B9E0841CB85F4E009161AD /* URLSessionTaskOperationTests.swift */; };
+		65B9E0881CB85F56009161AD /* URLSessionTaskOperationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65B9E0841CB85F4E009161AD /* URLSessionTaskOperationTests.swift */; };
 		65BB56DC1C70FAB100DF5211 /* ThreadSafety.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65BB56DB1C70FAB100DF5211 /* ThreadSafety.swift */; };
 		65BB56DD1C70FAB700DF5211 /* ThreadSafety.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65BB56DB1C70FAB100DF5211 /* ThreadSafety.swift */; };
 		65BB56DE1C70FAB800DF5211 /* ThreadSafety.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65BB56DB1C70FAB100DF5211 /* ThreadSafety.swift */; };
@@ -359,6 +362,7 @@
 		6584D24D1C6BF90E00306EED /* RetryOperationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RetryOperationTests.swift; sourceTree = "<group>"; };
 		6584D2631C6BF95700306EED /* HealthCapabilityTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HealthCapabilityTests.swift; sourceTree = "<group>"; };
 		65B9E07C1CB85941009161AD /* URLSessionTaskOperation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = URLSessionTaskOperation.swift; sourceTree = "<group>"; };
+		65B9E0841CB85F4E009161AD /* URLSessionTaskOperationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = URLSessionTaskOperationTests.swift; sourceTree = "<group>"; };
 		65BB56DB1C70FAB100DF5211 /* ThreadSafety.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ThreadSafety.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -682,6 +686,7 @@
 				652617981C11F61700654091 /* ReachabilityTests.swift */,
 				652617991C11F61700654091 /* ReachableOperationTests.swift */,
 				6526179A1C11F61700654091 /* RemoteNotificationConditionTests.swift */,
+				65B9E0841CB85F4E009161AD /* URLSessionTaskOperationTests.swift */,
 				6526179B1C11F61700654091 /* UserNotificationConditionTests.swift */,
 				6526179C1C11F61700654091 /* WebpageOperationTests.swift */,
 			);
@@ -1047,6 +1052,7 @@
 				65261A1B1C1202EF00654091 /* LoggingTests.swift in Sources */,
 				6584D2531C6BF92200306EED /* BlockObserverTests.swift in Sources */,
 				65261A271C1202F300654091 /* CloudCapabilityTests.swift in Sources */,
+				65B9E0861CB85F55009161AD /* URLSessionTaskOperationTests.swift in Sources */,
 				6584D2601C6BF93A00306EED /* ResultInjectionTests.swift in Sources */,
 				65261A2F1C1202F300654091 /* ReachableOperationTests.swift in Sources */,
 				65261A2C1C1202F300654091 /* PhotosCapabilityTests.swift in Sources */,
@@ -1110,6 +1116,7 @@
 				6584D25F1C6BF93900306EED /* RetryOperationTests.swift in Sources */,
 				6584D2541C6BF92200306EED /* BlockObserverTests.swift in Sources */,
 				65261A3F1C12036A00654091 /* NegatedConditionTests.swift in Sources */,
+				65B9E0871CB85F55009161AD /* URLSessionTaskOperationTests.swift in Sources */,
 				65261A3A1C12036A00654091 /* GatedOperationTests.swift in Sources */,
 				65261A3C1C12036A00654091 /* LoggingObserverTests.swift in Sources */,
 				65261A451C12036A00654091 /* UIOperationTests.swift in Sources */,
@@ -1189,6 +1196,7 @@
 				6584D25D1C6BF93800306EED /* RetryOperationTests.swift in Sources */,
 				6584D2551C6BF92300306EED /* BlockObserverTests.swift in Sources */,
 				65261A5E1C12042900654091 /* NegatedConditionTests.swift in Sources */,
+				65B9E0881CB85F56009161AD /* URLSessionTaskOperationTests.swift in Sources */,
 				65261A591C12042900654091 /* GatedOperationTests.swift in Sources */,
 				65261A5B1C12042900654091 /* LoggingObserverTests.swift in Sources */,
 				65261A6E1C12042E00654091 /* ReachabilityConditionTests.swift in Sources */,
