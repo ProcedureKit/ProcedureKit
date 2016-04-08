@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name              = "Operations"
-  s.version           = "2.8.2"
+  s.version           = "2.8.3"
   s.summary           = "Powerful NSOperation subclasses in Swift."
   s.description       = <<-DESC
   
