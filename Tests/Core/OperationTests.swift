@@ -420,7 +420,7 @@ class CompletionBlockOperationTests: OperationTests {
 
     func test__many_completion_blocks_are_executed() {
         LogManager.severity = .Verbose
-        let batchSize = 8_500
+        let batchSize = 10_000
         (0..<batchSize).forEach { i in
             let operationName = "Interation: \(i)"
             let expectation = self.expectationWithDescription(operationName)
