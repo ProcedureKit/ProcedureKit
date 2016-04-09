@@ -94,6 +94,10 @@ public class Operation: NSOperation {
         }
     }
 
+    class func automaticallyNotifiesObserversOfState() -> Bool {
+        return false
+    }
+
     // use the KVO mechanism to indicate that changes to "state" affect other properties as well
     class func keyPathsForValuesAffectingIsReady() -> Set<NSObject> {
         return ["State", "Cancelled"]
