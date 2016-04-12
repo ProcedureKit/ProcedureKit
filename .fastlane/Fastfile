@@ -23,18 +23,6 @@ platform :ios do
 
   end
 
-  desc "Runs all the tests"
-  lane :test do
-    
-    scan(
-      project: "Operations.xcodeproj",
-      scheme: "iOS Operations",
-      output_directory: ".ci/xcodebuild-data",
-      xcargs: "-derivedDataPath .ci/xcodebuild-data"
-    )
-
-  end
-
   desc "Test the iOS Extension compatible framework"
   lane :test_extension do
         
@@ -45,6 +33,26 @@ platform :ios do
       xcargs: "-derivedDataPath .ci/xcodebuild-data"
     )    
 
+  end
+  
+  
+  desc "Runs all the tests"
+  lane :test do
+    
+    scan(
+      project: "Operations.xcodeproj",
+      scheme: "iOS Operations",
+      output_directory: ".ci/xcodebuild-data",
+      xcargs: "-derivedDataPath .ci/xcodebuild-data"
+    )
+    
+    slather(
+	    proj: "Operations.xcodeproj",
+    	scheme: "iOS Operations",
+    	build_directory: ".ci/xcodebuild-data",
+    	use_bundle_exec: true    	
+    )
+	
   end
 
 end
@@ -61,18 +69,6 @@ platform :mac do
     )
 
   end
-
-  desc "Runs all the tests"
-  lane :test do
-
-    scan(
-      project: "Operations.xcodeproj",
-      scheme: "OS X Operations",
-      output_directory: ".ci/xcodebuild-data",
-      xcargs: "-derivedDataPath .ci/xcodebuild-data"
-    )
-
-  end
   
   desc "Test the OS X Extension compatible framework"
   lane :test_extension do
@@ -85,5 +81,17 @@ platform :mac do
     )    
 
   end  
+
+  desc "Runs all the tests"
+  lane :test do
+
+    scan(
+      project: "Operations.xcodeproj",
+      scheme: "OS X Operations",
+      output_directory: ".ci/xcodebuild-data",
+      xcargs: "-derivedDataPath .ci/xcodebuild-data"
+    )
+
+  end
   
 end
