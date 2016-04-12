@@ -86,7 +86,7 @@ public class AlertOperation<From: PresentingViewController>: Operation {
     - parameter style: a `UIAlertActionStyle` which defaults to `.Default`.
     - parameter handler: a block which receives the operation, and returns Void.
     */
-    public func addActionWithTitle(title: String, style: UIAlertActionStyle = .Default, handler: AlertOperation -> Void = { _ in }) {
+    public func addActionWithTitle(title: String, style: UIAlertActionStyle = .Default, handler: AlertOperation -> Void = { _ in }) -> UIAlertAction {
         let action = UIAlertAction(title: title, style: style) { [weak self] _ in
             if let weakSelf = self {
                 handler(weakSelf)
@@ -94,6 +94,7 @@ public class AlertOperation<From: PresentingViewController>: Operation {
             }
         }
         alert.addAction(action)
+        return action
     }
 
     /**
