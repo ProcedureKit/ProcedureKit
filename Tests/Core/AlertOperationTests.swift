@@ -21,14 +21,14 @@ class AlertOperationTests: OperationTests {
     }
     
     func test__alert_style_set_default() {
-        let alert = AlertOperation(presentAlertFrom: presentingController)
-        XCTAssertEqual(alert.preferredStyle, UIAlertControllerStyle.Alert)
+        let op = AlertOperation(presentAlertFrom: presentingController)
+        XCTAssertEqual(op.alert.preferredStyle, UIAlertControllerStyle.Alert)
     }
     
     func test__alert_style_actionSheet() {
         let style = UIAlertControllerStyle.ActionSheet
-        let alert = AlertOperation(presentAlertFrom: presentingController, preferredStyle: style)
-        XCTAssertEqual(alert.preferredStyle, style)
+        let op = AlertOperation(presentAlertFrom: presentingController, preferredStyle: style)
+        XCTAssertEqual(op.alert.preferredStyle, style)
     }
 
     func test__alert_title_works() {
