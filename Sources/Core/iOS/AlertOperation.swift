@@ -67,8 +67,8 @@ public class AlertOperation<From: PresentingViewController>: Operation {
     - parameter from: a generic type conforming to `PresentingViewController`,
     such as an `UIViewController`
     */
-    public init(presentAlertFrom from: From) {
-        let controller = UIAlertController(title: .None, message: .None, preferredStyle: .Alert)
+    public init(presentAlertFrom from: From, preferredStyle: UIAlertControllerStyle = .Alert) {
+        let controller = UIAlertController(title: .None, message: .None, preferredStyle: preferredStyle)
         uiOperation = UIOperation(controller: controller, displayControllerFrom: .Present(from))
         super.init()
         name = "Alert<\(From.self)>"
