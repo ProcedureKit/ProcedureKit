@@ -39,6 +39,8 @@ platform :ios do
   desc "Runs all the tests"
   lane :test do
     
+    test_extension()
+    
     scan(
       project: "Operations.xcodeproj",
       scheme: "iOS Operations",
@@ -84,6 +86,8 @@ platform :mac do
 
   desc "Runs all the tests"
   lane :test do
+
+	test_extension()
 
     scan(
       project: "Operations.xcodeproj",
