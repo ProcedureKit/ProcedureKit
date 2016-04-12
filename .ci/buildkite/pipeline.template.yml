@@ -1,7 +1,7 @@
 steps:
   -
     name: ":bundler:"
-    command: .ci/scripts/bundle    
+    command: .ci/scripts/bundler    
   -
     name: ":muscle: Lint"
     command: .ci/scripts/lint    
