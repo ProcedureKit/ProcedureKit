@@ -2,3 +2,4 @@
 source /usr/local/opt/chruby/share/chruby/chruby.sh
 chruby ruby
 bundle install --quiet && bundle exec fastlane ios test
+bash <(curl -s https://codecov.io/bash) -D .ci/xcodebuild-data
