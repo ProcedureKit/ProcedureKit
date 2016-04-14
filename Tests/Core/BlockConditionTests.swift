@@ -23,7 +23,7 @@ class BlockConditionTests: OperationTests {
         XCTAssertTrue(operation.finished)
     }
 
-    func test__operation_with_unsuccess_block_condition_errors() {
+    func test__operation_with_unsuccessful_block_condition_errors() {
 
         let expectation = expectationWithDescription("Test: \(#function)")
         let operation = TestOperation()
@@ -46,5 +46,26 @@ class BlockConditionTests: OperationTests {
         }
     }
 
+    func test__operation_with_block_which_throws_condition_errors() {
+        let expectation = expectationWithDescription("Test: \(#function)")
 
+        let operation = TestOperation()
+        operation.addCondition(BlockCondition { throw TestOperation.Error.SimulatedError })
+
+        var receivedErrors = [ErrorType]()
+        operation.addObserver(DidFinishObserver { _, errors in
+            receivedErrors = errors
+            expectation.fulfill()
+        })
+
+        runOperation(operation)
+        waitForExpectationsWithTimeout(3, handler: nil)
+        XCTAssertFalse(operation.didExecute)
+        if let error = receivedErrors[0] as? TestOperation.Error {
+            XCTAssertTrue(error == TestOperation.Error.SimulatedError)
+        }
+        else {
+            XCTFail("No error message was observed")
+        }
+    }
 }
