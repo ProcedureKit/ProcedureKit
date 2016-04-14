@@ -117,4 +117,8 @@ class PhotosCapabilityTests: XCTestCase {
         XCTAssertFalse(registrar.didRequestAuthorization)
         XCTAssertTrue(didComplete)
     }
+
+    func test__default_registrar() {
+        XCTAssertNotNil(PhotosCapability().registrar.opr_authorizationStatus())
+    }
 }
