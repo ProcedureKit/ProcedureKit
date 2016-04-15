@@ -35,15 +35,22 @@ public protocol OperationType: NSOperationType {
 
     var identifier: String { get }
     var log: LoggerType { get set }
-    
+
     var errors: [ErrorType] { get }
-    
+
     func execute()
     func finish(_: [ErrorType])
-    func cancel(_: [ErrorType])
+    func cancelWithErrors(_: [ErrorType])
     func produceOperation(operation: NSOperation)
+
 }
 
+public extension OperationType {
+
+    var failed: Bool {
+        return errors.count > 0
+    }
+}
 
 
 
@@ -66,7 +73,7 @@ Operation builds on `NSOperation` in a few simple ways.
 to be notified of lifecycle events in the operation.
 
 */
-public class Operation: NSOperation {
+public class Operation: NSOperation, OperationType {
 
     private enum State: Int, Comparable {
 
@@ -162,7 +169,7 @@ public class Operation: NSOperation {
     private var _internalErrors = [ErrorType]()
     private var _hasFinishedAlready = false
     private var _observers = Protector([OperationObserverType]())
-    private(set) var conditions = [OperationCondition]()
+    private(set) var conditions = [ConditionOperation]()
     internal var waitForDependenciesOperation: NSOperation? = .None
 
     private var _cancelled = false {
@@ -272,6 +279,11 @@ public class Operation: NSOperation {
      - parameter condition: type conforming to protocol `OperationCondition`.
      */
     public func addCondition(condition: OperationCondition) {
+        assert(state < .EvaluatingConditions, "Cannot modify conditions after operations has begun evaluating conditions, current state: \(state).")
+        conditions.append(WrappedOperationCondition(condition))
+    }
+
+    public func addCondition(condition: ConditionOperation) {
         assert(state < .EvaluatingConditions, "Cannot modify conditions after operations has begun evaluating conditions, current state: \(state).")
         conditions.append(condition)
     }
@@ -450,6 +462,27 @@ public extension Operation {
         super.addDependency(operation)
     }
 
+    internal func addConditionEvaluator(evaluator: ConditionEvaluator) {
+        precondition(state <= .Executing, "Dependencies cannot be modified after execution has begun, current state: \(state).")
+
+        // Add an observer to the evaluator to see if any of the conditions failed.
+        evaluator.addObserver(WillFinishObserver { [unowned self] operation, errors in
+            if errors.count > 0 {
+                // If conditions fail, we should cancel the operation
+                self.cancelWithErrors(errors)
+            }
+        })
+
+        // If this operation has any regular direct dependencies
+        // the evaluator waits for them.
+        if let waiter = waitForDependenciesOperation {
+            evaluator.addDependency(waiter)
+        }
+
+        // Add the evaluator as a dependency - so that we wait for it.
+        super.addDependency(evaluator)
+    }
+
     /// Public override to get the dependencies
     final override var dependencies: [NSOperation] {
         get {
@@ -511,10 +544,10 @@ public extension Operation {
         assert(state == .Pending, "\(#function) was called out of order.")
         assert(cancelled == false, "\(#function) was called on cancelled operation: \(operationName).")
         state = .EvaluatingConditions
-        evaluateOperationConditions(conditions, operation: self) { errors in
-            self._internalErrors.appendContentsOf(errors)
-            self.state = .Ready
-        }
+//        evaluateOperationConditions(conditions, operation: self) { errors in
+//            self._internalErrors.appendContentsOf(errors)
+//            self.state = .Ready
+//        }
     }
 }
 

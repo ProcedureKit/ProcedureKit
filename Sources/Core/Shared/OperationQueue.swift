@@ -92,6 +92,7 @@ public class OperationQueue: NSOperationQueue {
                 }
             })
 
+/*
             // Check for mutual exclusion conditions
             let manager = ExclusivityManager.sharedInstance
             let exclusive = operation.conditions.filter { $0.isMutuallyExclusive }
@@ -111,13 +112,30 @@ public class OperationQueue: NSOperationQueue {
                 operation.addConditionDependency(conditionDependency)
                 addOperation(conditionDependency)
             }
+*/
+            /// Process any conditions
+            if operation.conditions.count > 0 {
 
-            // Add the dependency waiter to the queue
+                /// Check for mutual exclusion conditions
+                let manager = ExclusivityManager.sharedInstance
+                let conditions = operation.conditions.filter { $0.isMutuallyExclusive }
+                for condition in conditions {
+                    let category = "\(condition.dynamicType)"
+                    manager.addOperation(condition, category: category)
+                }
+
+                /// Evaluator conditions
+                let evaluator = ConditionEvaluator(operation: operation, conditions: operation.conditions)
+                operation.addConditionEvaluator(evaluator)
+                addOperation(evaluator)
+            }
+
+            /// Add the dependency waiter to the queue
             if let waiter = operation.waitForDependenciesOperation {
                 addOperation(waiter)
             }
 
-            // Indicate to the operation that it is to be enqueued
+            /// Indicate to the operation that it is to be enqueued
             operation.willEnqueue()
         }
         else {
