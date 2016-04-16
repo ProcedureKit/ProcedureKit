@@ -103,8 +103,12 @@ public class Operation: NSOperation {
     private var _hasFinishedAlready = false
     private var _observers = Protector([OperationObserverType]())
 
-    internal private(set) var conditions = Set<ConditionOperation>()
     internal private(set) var directDependencies = Set<NSOperation>()
+    internal private(set) var conditions = Set<ConditionOperation>()
+
+    internal var indirectDependencies: Set<NSOperation> {
+        return Set(conditions.flatMap { $0.directDependencies })
+    }
 
     // Internal operation properties which are used to manage the scheduling of dependencies
     internal private(set) var evaluateConditionsOperation: GroupOperation? = .None
@@ -347,26 +351,18 @@ public extension Operation {
 
 public extension Operation {
 
-    internal class Waiter: NSOperation {
-        internal override func main() {
-            // no op
-        }
-    }
-
-    private func createEvaluateConditionsOperation() -> GroupOperation {
-        assert(evaluateConditionsOperation == nil, "Should only create evaluateConditionsOperation once.")
-
-        // Set the operation on each condition
-        conditions.forEach { $0.operation = self }
-
-        let __op = GroupOperation(operations: Array(conditions))
-        __op.name = "Condition Evaluator for: \(operationName)"
-        super.addDependency(__op)
-        evaluateConditionsOperation = __op
-        return __op
-    }
-
     internal func evaluateConditions() -> GroupOperation {
+
+        func createEvaluateConditionsOperation() -> GroupOperation {
+            // Set the operation on each condition
+            conditions.forEach { $0.operation = self }
+
+            let evaluator = GroupOperation(operations: Array(conditions))
+            evaluator.name = "Condition Evaluator for: \(operationName)"
+            super.addDependency(evaluator)
+            return evaluator
+        }
+
         assert(state <= .Executing, "Dependencies cannot be modified after execution has begun, current state: \(state).")
 
         let evaluator = createEvaluateConditionsOperation()
@@ -405,7 +401,7 @@ public extension Operation {
 
     /// Public override to get the dependencies
     final override var dependencies: [NSOperation] {
-        return Array(directDependencies)
+        return Array(directDependencies.union(indirectDependencies))
     }
 
     /**

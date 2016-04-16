@@ -110,13 +110,13 @@ public class OperationQueue: NSOperationQueue {
                 let evaluator = operation.evaluateConditions()
 
                 // Get the condition dependencies
-                let conditionDependencies = operation.conditions.flatMap { $0.dependencies }
+                let conditionDependencies = operation.conditions.flatMap { $0.directDependencies }
 
                 // If there are dependencies
                 if conditionDependencies.count > 0 {
 
                     // Get the regular direct dependencies
-                    let directDependencies = operation.dependencies
+                    let directDependencies = operation.directDependencies
 
                     // Iterate through the condition dependencies
                     conditionDependencies.forEach {
@@ -142,7 +142,7 @@ public class OperationQueue: NSOperationQueue {
                 addOperation(evaluator)
             }
 
-            /// Indicate to the operation that it is to be enqueued
+            // Indicate to the operation that it is to be enqueued
             operation.willEnqueue()
         }
         else {

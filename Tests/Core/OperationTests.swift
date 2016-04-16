@@ -516,7 +516,7 @@ class OperationDependencyTests: OperationTests {
         XCTAssertTrue(operation.finished)
     }
 
-    func test__dependencies_does_not_contain_waiter_or_evaluator() {
+    func test__dependencies_contains_direct_dependencies_and_indirect_dependencies() {
 
         let dependency1 = TestOperation()
         let dependency2 = TestOperation()
@@ -534,7 +534,7 @@ class OperationDependencyTests: OperationTests {
         runOperations(dependency1, dependency2, operation)
         waitForExpectationsWithTimeout(3, handler: nil)
 
-        XCTAssertEqual(operation.dependencies.count, 2)
+        XCTAssertEqual(operation.dependencies.count, 4)
     }
 
     func test__dependencies_execute_after_previous_mutually_exclusive_operation() {
