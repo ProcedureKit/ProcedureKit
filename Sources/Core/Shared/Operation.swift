@@ -379,11 +379,6 @@ public extension Operation {
             }
         })
 
-        // The evaluator waits for all condition dependencies
-        conditions
-            .flatMap { $0.dependencies }
-            .forEach { evaluator.addDependency($0) }
-
         return evaluator
     }
 
