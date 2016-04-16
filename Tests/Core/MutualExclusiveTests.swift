@@ -33,25 +33,34 @@ class MutualExclusiveTests: OperationTests {
         }
     }
 
-/*  - Disabling this as it's not a very good test.
-    - Needs to be refactored.
-    func test__mutually_exclusive() {
-        let queue = OperationQueue()
-        let op1 = TestOperation(delay: 1.0)
-        op1.addCondition(MutuallyExclusive<TestOperation>())
-        XCTAssertTrue(op1.dependencies.isEmpty)
+    func test__mutually_exclusive_operation_are_run_exclusively() {
+        LogManager.severity = .Verbose
+        var text = "Star Wars"
 
-        let op2 = TestOperation(delay: 1.0)
-        op2.addCondition(MutuallyExclusive<TestOperation>())
-        XCTAssertTrue(op2.dependencies.isEmpty)
+        let operation1 = BlockOperation {
+            text = "\(text)\nA long time ago"
+        }
+        operation1.addCondition(TestCondition(name: "Condition 1", isMutuallyExclusive: true, dependency: .None) {
+            XCTAssertEqual(text, "Star Wars")
+            return true
+        })
 
-        queue.addOperation(op1)
-        queue.addOperation(op2)
-        XCTAssertTrue(op1.dependencies.isEmpty)
-        XCTAssertEqual(op2.dependencies.first, op1)
+        let operation2 = BlockOperation {
+            text = "\(text), in a galaxy far, far away."
+        }
+        operation2.addCondition(TestCondition(name: "Condition 2", isMutuallyExclusive: true, dependency: .None) {
+            XCTAssertEqual(text, "Star Wars\nA long time ago")
+            return true
+        })
+
+        addCompletionBlockToTestOperation(operation1)
+        addCompletionBlockToTestOperation(operation2)
+        runOperations(operation1, operation2)
+        waitForExpectationsWithTimeout(3, handler: nil)
+
+        XCTAssertEqual(text, "Star Wars\nA long time ago, in a galaxy far, far away.")
+        LogManager.severity = .Verbose
     }
-*/
-
 }
 
 class MutuallyExclusiveConditionWithDependencyTests: OperationTests {
@@ -61,7 +70,7 @@ class MutuallyExclusiveConditionWithDependencyTests: OperationTests {
         let condition1 = TestCondition(name: "Condition 1", isMutuallyExclusive: true, dependency: NSBlockOperation {
             text = "\(text)\nA long time ago"
         }) {
-            return text ==  "Star Wars\nA long time ago"
+            return text == "Star Wars\nA long time ago"
         }
 
 
