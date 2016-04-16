@@ -120,7 +120,7 @@ public class OperationQueue: NSOperationQueue {
                 let conditions = operation.conditions.filter { $0.isMutuallyExclusive }
                 for condition in conditions {
                     let category = "\(condition.dynamicType)"
-                    manager.addOperation(condition, category: category)
+                    manager.addOperation(operation, category: category)
                 }
 
                 // Add condition dependencies
