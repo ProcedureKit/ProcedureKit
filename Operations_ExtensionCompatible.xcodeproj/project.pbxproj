@@ -195,6 +195,15 @@
 		65356EBC1C8B3B9D0029E8AF /* CloudKitOperationExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65356EB41C8B3B390029E8AF /* CloudKitOperationExtensions.swift */; };
 		65356EBD1C8B3B9D0029E8AF /* CloudKitInterface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65356EB31C8B3B390029E8AF /* CloudKitInterface.swift */; };
 		65356EBE1C8B3B9D0029E8AF /* CloudKitOperationExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65356EB41C8B3B390029E8AF /* CloudKitOperationExtensions.swift */; };
+		653D402B1CC26F3600893746 /* ConditionOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 653D40291CC26F3600893746 /* ConditionOperation.swift */; };
+		653D402C1CC26F3600893746 /* Profiler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 653D402A1CC26F3600893746 /* Profiler.swift */; };
+		653D402F1CC26F4E00893746 /* ProfilerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 653D402D1CC26F4100893746 /* ProfilerTests.swift */; };
+		653D40301CC26F4F00893746 /* ProfilerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 653D402D1CC26F4100893746 /* ProfilerTests.swift */; };
+		653D40311CC26F5000893746 /* ProfilerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 653D402D1CC26F4100893746 /* ProfilerTests.swift */; };
+		653D40321CC26F5600893746 /* Profiler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 653D402A1CC26F3600893746 /* Profiler.swift */; };
+		653D40331CC26F5700893746 /* Profiler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 653D402A1CC26F3600893746 /* Profiler.swift */; };
+		653D40341CC26F5D00893746 /* ConditionOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 653D40291CC26F3600893746 /* ConditionOperation.swift */; };
+		653D40351CC26F5E00893746 /* ConditionOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 653D40291CC26F3600893746 /* ConditionOperation.swift */; };
 		6584D2381C6BF86200306EED /* FunctionalOperations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6584D2341C6BF86200306EED /* FunctionalOperations.swift */; };
 		6584D2391C6BF86200306EED /* RepeatedOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6584D2351C6BF86200306EED /* RepeatedOperation.swift */; };
 		6584D23A1C6BF86200306EED /* ResultInjection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6584D2361C6BF86200306EED /* ResultInjection.swift */; };
@@ -348,6 +357,9 @@
 		65356EB01C8B3B2C0029E8AF /* Repeatable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Repeatable.swift; sourceTree = "<group>"; };
 		65356EB31C8B3B390029E8AF /* CloudKitInterface.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CloudKitInterface.swift; sourceTree = "<group>"; };
 		65356EB41C8B3B390029E8AF /* CloudKitOperationExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CloudKitOperationExtensions.swift; sourceTree = "<group>"; };
+		653D40291CC26F3600893746 /* ConditionOperation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConditionOperation.swift; sourceTree = "<group>"; };
+		653D402A1CC26F3600893746 /* Profiler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Profiler.swift; sourceTree = "<group>"; };
+		653D402D1CC26F4100893746 /* ProfilerTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProfilerTests.swift; sourceTree = "<group>"; };
 		6584D2341C6BF86200306EED /* FunctionalOperations.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FunctionalOperations.swift; sourceTree = "<group>"; };
 		6584D2351C6BF86200306EED /* RepeatedOperation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RepeatedOperation.swift; sourceTree = "<group>"; };
 		6584D2361C6BF86200306EED /* ResultInjection.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ResultInjection.swift; sourceTree = "<group>"; };
@@ -466,6 +478,7 @@
 				6526173B1C11F61700654091 /* BlockObserver.swift */,
 				6526173C1C11F61700654091 /* BlockOperation.swift */,
 				6526173D1C11F61700654091 /* ComposedOperation.swift */,
+				653D40291CC26F3600893746 /* ConditionOperation.swift */,
 				6526173E1C11F61700654091 /* DelayOperation.swift */,
 				6526173F1C11F61700654091 /* ExclusivityManager.swift */,
 				6584D2341C6BF86200306EED /* FunctionalOperations.swift */,
@@ -481,6 +494,7 @@
 				652617481C11F61700654091 /* OperationCondition.swift */,
 				652617491C11F61700654091 /* OperationObserver.swift */,
 				6526174A1C11F61700654091 /* OperationQueue.swift */,
+				653D402A1CC26F3600893746 /* Profiler.swift */,
 				65356EB01C8B3B2C0029E8AF /* Repeatable.swift */,
 				6584D2351C6BF86200306EED /* RepeatedOperation.swift */,
 				6584D2361C6BF86200306EED /* ResultInjection.swift */,
@@ -630,6 +644,7 @@
 				652617811C11F61700654091 /* NetworkObserverTests.swift */,
 				652617821C11F61700654091 /* NoFailedDependenciesConditionTests.swift */,
 				652617831C11F61700654091 /* OperationTests.swift */,
+				653D402D1CC26F4100893746 /* ProfilerTests.swift */,
 				6584D24B1C6BF90E00306EED /* RepeatedOperationTests.swift */,
 				6584D24C1C6BF90E00306EED /* ResultInjectionTests.swift */,
 				6584D24D1C6BF90E00306EED /* RetryOperationTests.swift */,
@@ -999,6 +1014,7 @@
 				652619D31C12004C00654091 /* AddressBook.swift in Sources */,
 				652619881C11FF5200654091 /* MutuallyExclusive.swift in Sources */,
 				652619871C11FF5200654091 /* LoggingObserver.swift in Sources */,
+				653D402B1CC26F3600893746 /* ConditionOperation.swift in Sources */,
 				652619851C11FF5200654091 /* GroupOperation.swift in Sources */,
 				6526198D1C11FF5200654091 /* OperationObserver.swift in Sources */,
 				6526197E1C11FF5200654091 /* BlockCondition.swift in Sources */,
@@ -1012,6 +1028,7 @@
 				652619C41C12003A00654091 /* UserConfirmationCondition.swift in Sources */,
 				652619CE1C12003F00654091 /* ReachableOperation.swift in Sources */,
 				6584D23B1C6BF86200306EED /* RetryOperation.swift in Sources */,
+				653D402C1CC26F3600893746 /* Profiler.swift in Sources */,
 				6526198C1C11FF5200654091 /* OperationCondition.swift in Sources */,
 				652619CF1C12004900654091 /* ContactsUIOperations.swift in Sources */,
 				652619BA1C11FF5900654091 /* AlertOperation.swift in Sources */,
@@ -1051,6 +1068,7 @@
 				65261A2F1C1202F300654091 /* ReachableOperationTests.swift in Sources */,
 				65261A2C1C1202F300654091 /* PhotosCapabilityTests.swift in Sources */,
 				65261A221C1202EF00654091 /* TimeoutObserverTests.swift in Sources */,
+				653D402F1CC26F4E00893746 /* ProfilerTests.swift in Sources */,
 				6584D2581C6BF92800306EED /* FunctionalOperationsTests.swift in Sources */,
 				65261A241C1202F300654091 /* AuthorizationTests.swift in Sources */,
 				65261A2B1C1202F300654091 /* PassbookCapabilityTests.swift in Sources */,
@@ -1065,6 +1083,7 @@
 				652619A21C11FF5200654091 /* OperationQueue.swift in Sources */,
 				65356EBC1C8B3B9D0029E8AF /* CloudKitOperationExtensions.swift in Sources */,
 				6526199D1C11FF5200654091 /* NegatedCondition.swift in Sources */,
+				653D40321CC26F5600893746 /* Profiler.swift in Sources */,
 				6584D2401C6BF88F00306EED /* ResultInjection.swift in Sources */,
 				6526199F1C11FF5200654091 /* Operation.swift in Sources */,
 				652619A41C11FF5200654091 /* Support.swift in Sources */,
@@ -1088,6 +1107,7 @@
 				6526199C1C11FF5200654091 /* MutuallyExclusive.swift in Sources */,
 				652619DD1C12012C00654091 /* CloudKitOperation.swift in Sources */,
 				6526199B1C11FF5200654091 /* LoggingObserver.swift in Sources */,
+				653D40341CC26F5D00893746 /* ConditionOperation.swift in Sources */,
 				652619991C11FF5200654091 /* GroupOperation.swift in Sources */,
 				652619A11C11FF5200654091 /* OperationObserver.swift in Sources */,
 				652619E01C12012C00654091 /* ReachabilityCondition.swift in Sources */,
@@ -1125,6 +1145,7 @@
 				65261A3E1C12036A00654091 /* MutualExclusiveTests.swift in Sources */,
 				65261A421C12036A00654091 /* OperationTests.swift in Sources */,
 				65261A361C12036A00654091 /* AlertOperationTests.swift in Sources */,
+				653D40301CC26F4F00893746 /* ProfilerTests.swift in Sources */,
 				65261A3B1C12036A00654091 /* GroupOperationTests.swift in Sources */,
 				65261A3D1C12036A00654091 /* LoggingTests.swift in Sources */,
 				65261A491C12036E00654091 /* CloudCapabilityTests.swift in Sources */,
@@ -1162,6 +1183,7 @@
 				65356EBE1C8B3B9D0029E8AF /* CloudKitOperationExtensions.swift in Sources */,
 				65356EBA1C8B3B910029E8AF /* Repeatable.swift in Sources */,
 				652619EA1C1201AF00654091 /* ReachableOperation.swift in Sources */,
+				653D40351CC26F5E00893746 /* ConditionOperation.swift in Sources */,
 				652619B21C11FF5300654091 /* NoFailedDependenciesCondition.swift in Sources */,
 				652619AC1C11FF5300654091 /* GatedOperation.swift in Sources */,
 				652619AB1C11FF5300654091 /* ExclusivityManager.swift in Sources */,
@@ -1174,6 +1196,7 @@
 				6584D2431C6BF89B00306EED /* RetryOperation.swift in Sources */,
 				65356EBD1C8B3B9D0029E8AF /* CloudKitInterface.swift in Sources */,
 				652619E41C1201AF00654091 /* Capability.swift in Sources */,
+				653D40331CC26F5700893746 /* Profiler.swift in Sources */,
 				652619EF1C12020D00654091 /* Contacts.swift in Sources */,
 				652619A61C11FF5300654091 /* BlockCondition.swift in Sources */,
 				652619AE1C11FF5300654091 /* Logging.swift in Sources */,
@@ -1204,6 +1227,7 @@
 				65261A601C12042900654091 /* NoFailedDependenciesConditionTests.swift in Sources */,
 				65261A5D1C12042900654091 /* MutualExclusiveTests.swift in Sources */,
 				65261A611C12042900654091 /* OperationTests.swift in Sources */,
+				653D40311CC26F5000893746 /* ProfilerTests.swift in Sources */,
 				65261A5A1C12042900654091 /* GroupOperationTests.swift in Sources */,
 				65261A5C1C12042900654091 /* LoggingTests.swift in Sources */,
 				65261A681C12042E00654091 /* CloudCapabilityTests.swift in Sources */,
