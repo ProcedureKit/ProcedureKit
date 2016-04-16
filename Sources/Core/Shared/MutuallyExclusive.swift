@@ -20,9 +20,7 @@ public struct MutuallyExclusive<T>: OperationCondition {
 
     - parameter name: a String
     */
-    public var name: String {
-        return "MutuallyExclusive<\(T.self)>"
-    }
+    public var name: String = "MutuallyExclusive<\(T.self)>"
 
     /**
     The mututally exclusivity parameter which is always true.

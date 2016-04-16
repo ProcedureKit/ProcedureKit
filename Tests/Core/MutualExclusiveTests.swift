@@ -38,20 +38,24 @@ class MutualExclusiveTests: OperationTests {
         var text = "Star Wars"
 
         let operation1 = BlockOperation {
+            XCTAssertEqual(text, "Star Wars")
             text = "\(text)\nA long time ago"
         }
-        operation1.addCondition(TestCondition(name: "Condition 1", isMutuallyExclusive: true, dependency: .None) {
-            XCTAssertEqual(text, "Star Wars")
-            return true
-        })
+        operation1.name = "Operation 1"
+        var condition1A = MutuallyExclusive<BlockOperation>(); condition1A.name = "condition 1 A"
+        var condition1B = MutuallyExclusive<BlockOperation>(); condition1B.name = "condition 1 B"
+        operation1.addCondition(condition1A)
+        operation1.addCondition(condition1B)
 
         let operation2 = BlockOperation {
+            XCTAssertEqual(text, "Star Wars\nA long time ago")
             text = "\(text), in a galaxy far, far away."
         }
-        operation2.addCondition(TestCondition(name: "Condition 2", isMutuallyExclusive: true, dependency: .None) {
-            XCTAssertEqual(text, "Star Wars\nA long time ago")
-            return true
-        })
+        operation2.name = "Operation 2"
+        var condition2A = MutuallyExclusive<BlockOperation>(); condition2A.name = "condition 2 A"
+        var condition2B = MutuallyExclusive<BlockOperation>(); condition2B.name = "condition 2 B"
+        operation2.addCondition(condition2A)
+        operation2.addCondition(condition2B)
 
         addCompletionBlockToTestOperation(operation1)
         addCompletionBlockToTestOperation(operation2)
