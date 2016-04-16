@@ -419,8 +419,7 @@ class CompletionBlockOperationTests: OperationTests {
 //    https:github.com/danthorpe/Operations/pull/180
 
     func test__many_completion_blocks_are_executed() {
-        LogManager.severity = .Verbose
-        let batchSize = 8_500
+        let batchSize = 10_000
         (0..<batchSize).forEach { i in
             let operationName = "Interation: \(i)"
             let expectation = self.expectationWithDescription(operationName)
@@ -430,7 +429,6 @@ class CompletionBlockOperationTests: OperationTests {
             operation.addCondition(BlockCondition { false })
             self.queue.addOperation(operation)
         }
-        LogManager.severity = .Warning
         waitForExpectationsWithTimeout(10, handler: nil)
     }
 }
