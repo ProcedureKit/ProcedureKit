@@ -97,16 +97,16 @@ public class OperationQueue: NSOperationQueue {
 
                 /// Check for mutual exclusion conditions
                 let manager = ExclusivityManager.sharedInstance
-                let conditions = operation.conditions.filter { $0.isMutuallyExclusive }
+                let mutuallyExclusiveConditions = operation.conditions.filter { $0.isMutuallyExclusive }
                 var previousMutuallyExclusiveOperations = Set<NSOperation>()
-                for condition in conditions {
+                for condition in mutuallyExclusiveConditions {
                     let category = "\(condition.category)"
                     if let previous = manager.addOperation(operation, category: category) {
                         previousMutuallyExclusiveOperations.insert(previous)
                     }
                 }
 
-                // Create the evaluator
+                // Create the condition evaluator
                 let evaluator = operation.evaluateConditions()
 
                 // Get the condition dependencies
@@ -119,19 +119,19 @@ public class OperationQueue: NSOperationQueue {
                     let directDependencies = operation.dependencies
 
                     // Iterate through the condition dependencies
-                    conditionDependencies.forEach { conditionDependency in
+                    conditionDependencies.forEach {
 
                         // Condition dependencies are executed after
-                        // any previous mutually exclusive operation
-                        conditionDependency.addDependencies(previousMutuallyExclusiveOperations)
+                        // any previous mutually exclusive operation(s)
+                        $0.addDependencies(previousMutuallyExclusiveOperations)
 
                         // Condition dependencies are executed after
-                        // all regular dependencies
-                        conditionDependency.addDependencies(directDependencies)
+                        // all direct dependencies
+                        $0.addDependencies(directDependencies)
 
                         // Only evaluate conditions after all condition
                         // dependencies have finished
-                        evaluator.addDependency(conditionDependency)
+                        evaluator.addDependency($0)
                     }
 
                     // Add condition dependencies
