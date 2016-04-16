@@ -12,55 +12,6 @@ import Foundation
 
 // swiftlint:disable type_body_length
 
-public protocol NSOperationType: class {
-
-    var name: String? { get }
-    var qualityOfService: NSQualityOfService { get set }
-
-    var cancelled: Bool { get }
-    var executing: Bool { get }
-    var finished: Bool { get }
-
-    func start()
-    func main()
-    func cancel()
-
-    var dependencies: [NSOperation] { get }
-
-    func addDependency(operation: NSOperation)
-    func removeDependency(operation: NSOperation)
-}
-
-public protocol OperationType: NSOperationType {
-
-    var identifier: String { get }
-    var log: LoggerType { get set }
-
-    var errors: [ErrorType] { get }
-
-    func execute()
-    func finish(_: [ErrorType])
-    func cancelWithErrors(_: [ErrorType])
-    func produceOperation(operation: NSOperation)
-
-}
-
-public extension OperationType {
-
-    var failed: Bool {
-        return errors.count > 0
-    }
-}
-
-
-
-
-
-
-
-
-
-
 /**
 Abstract base Operation class which subclasses `NSOperation`.
 
@@ -73,7 +24,7 @@ Operation builds on `NSOperation` in a few simple ways.
 to be notified of lifecycle events in the operation.
 
 */
-public class Operation: NSOperation, OperationType {
+public class Operation: NSOperation {
 
     private enum State: Int, Comparable {
 
