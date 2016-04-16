@@ -124,8 +124,9 @@ public class OperationQueue: NSOperationQueue {
                     manager.addOperation(condition, category: category)
                 }
 
-                /// Evaluator conditions
+                /// Evaluate conditions
                 let evaluator = ConditionEvaluator(operation: operation, conditions: operation.conditions)
+
                 operation.addConditionEvaluator(evaluator)
                 addOperation(evaluator)
             }

@@ -83,12 +83,6 @@ public class Operation: NSOperation, OperationType {
         // Ready to begin evaluating conditions
         case Pending
 
-        // Is evaluating conditions
-        case EvaluatingConditions
-
-        // Conditions have been satisfied, ready to execute
-        case Ready
-
         // It is executing
         case Executing
 
@@ -101,24 +95,16 @@ public class Operation: NSOperation, OperationType {
         func canTransitionToState(other: State, whenCancelled cancelled: Bool) -> Bool {
             switch (self, other) {
             case (.Initialized, .Pending),
-                (.Pending, .EvaluatingConditions),
-                (.EvaluatingConditions, .Ready),
-                (.Ready, .Executing),
-                (.Ready, .Finishing),
+                (.Pending, .Executing),
                 (.Executing, .Finishing),
                 (.Finishing, .Finished):
-                return true
-
-            case (.Pending, .Ready):
-                // Note that PSOperations only allows this transition when the operation is
-                // cancelled. However, in the case where there are no conditions to evaluate,
-                // Operation immediately becomes .Ready - otherwise there exists a race
-                // condition because the evaluator executes its completion immediately.
                 return true
 
             case (.Pending, .Finishing) where cancelled:
                 // When an operation is cancelled it can go from pending direct to finishing.
                 return true
+
+
 
             default:
                 return false
@@ -144,11 +130,6 @@ public class Operation: NSOperation, OperationType {
         }
     }
 
-    // use the KVO mechanism to indicate that changes to "state" affect other properties as well
-    class func keyPathsForValuesAffectingIsReady() -> Set<NSObject> {
-        return ["State", "Cancelled"]
-    }
-
     class func keyPathsForValuesAffectingIsExecuting() -> Set<NSObject> {
         return ["State"]
     }
@@ -161,16 +142,17 @@ public class Operation: NSOperation, OperationType {
         return ["Cancelled"]
     }
 
-    private let stateLock = NSLock()
-    private let readyLock = NSRecursiveLock()
+    /// - returns: a unique String which can be used to identify the operation instance
+    public let identifier = NSUUID().UUIDString
 
+    private let stateLock = NSLock()
     private lazy var _log: LoggerType = Logger()
     private var _state = State.Initialized
     private var _internalErrors = [ErrorType]()
     private var _hasFinishedAlready = false
     private var _observers = Protector([OperationObserverType]())
-    private(set) var conditions = [ConditionOperation]()
-    internal var waitForDependenciesOperation: NSOperation? = .None
+    internal private(set) var conditions = [ConditionOperation]()
+    internal private(set) var waitForDependenciesOperation: NSOperation? = .None
 
     private var _cancelled = false {
         willSet {
@@ -184,9 +166,6 @@ public class Operation: NSOperation, OperationType {
             }
         }
     }
-
-    /// - returns: a unique String which can be used to identify the operation instance
-    public let identifier = NSUUID().UUIDString
 
     /// Access the internal errors collected by the Operation
     public var errors: [ErrorType] {
@@ -279,12 +258,12 @@ public class Operation: NSOperation, OperationType {
      - parameter condition: type conforming to protocol `OperationCondition`.
      */
     public func addCondition(condition: OperationCondition) {
-        assert(state < .EvaluatingConditions, "Cannot modify conditions after operations has begun evaluating conditions, current state: \(state).")
+        assert(state < .Executing, "Cannot modify conditions after operation has begun executing, current state: \(state).")
         conditions.append(WrappedOperationCondition(condition))
     }
 
     public func addCondition(condition: ConditionOperation) {
-        assert(state < .EvaluatingConditions, "Cannot modify conditions after operations has begun evaluating conditions, current state: \(state).")
+        assert(state < .Executing, "Cannot modify conditions after operation has begun executing, current state: \(state).")
         conditions.append(condition)
     }
 
@@ -347,16 +326,14 @@ public class Operation: NSOperation, OperationType {
     }
 
     public override func cancel() {
-        if !finished {
+        guard !finished else { return }
+        log.verbose("Did cancel.")
 
-            log.verbose("Did cancel.")
+        _cancelled = true
 
-            _cancelled = true
-
-            if state > .Ready {
-                super.cancel()
-                finish()
-            }
+        if executing {
+            super.cancel()
+            finish()
         }
     }
 }
@@ -379,41 +356,6 @@ public extension Operation {
                 _state = newState
             }
             didChangeValueForKey("State")
-        }
-    }
-
-    /// Boolean indicator of the readyness of the Operation
-    override var ready: Bool {
-        return readyLock.withCriticalScope {
-            switch state {
-            case .Initialized:
-                // If the operation is cancelled, isReady should return true
-                return cancelled
-
-            case .Pending:
-                // If the operation is cancelled, isReady should return true
-                if cancelled {
-                    state = .Ready
-                    return true
-                }
-
-                if super.ready {
-                    if conditions.count == 0 {
-                        state = .Ready
-                        return true
-                    }
-                    evaluateConditions()
-                }
-
-                // Until conditions have been evaluated, we're not ready
-                return false
-
-            case .Ready:
-                return super.ready || cancelled
-
-            default:
-                return false
-            }
         }
     }
 
@@ -536,21 +478,6 @@ public extension Operation {
     }
 }
 
-// MARK: - Conditions
-
-public extension Operation {
-
-    private func evaluateConditions() {
-        assert(state == .Pending, "\(#function) was called out of order.")
-        assert(cancelled == false, "\(#function) was called on cancelled operation: \(operationName).")
-        state = .EvaluatingConditions
-//        evaluateOperationConditions(conditions, operation: self) { errors in
-//            self._internalErrors.appendContentsOf(errors)
-//            self.state = .Ready
-//        }
-    }
-}
-
 // MARK: - Observers
 
 public extension Operation {
@@ -595,21 +522,19 @@ public extension Operation {
     final override func start() {
         // Don't call super.start
 
-        if !cancelled {
-            main()
-        }
-        else {
-            // If the operation has been cancelled, we still need to enter the finished state
+        guard !cancelled else {
             finish()
+            return
         }
+
+        state = .Executing
+        main()
     }
 
     /// Triggers execution of the operation's task, correctly managing errors and the cancelled state. Cannot be over-ridden
     final override func main() {
-        assert(state == .Ready, "This operation must be performed on an operation queue, current state: \(state).")
 
         if _internalErrors.isEmpty && !cancelled {
-            state = .Executing
             log.verbose("Will Execute")
             didStartObservers.forEach { $0.didStartOperation(self) }
             execute()
