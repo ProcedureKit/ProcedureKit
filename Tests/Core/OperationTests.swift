@@ -513,7 +513,7 @@ class OperationDependencyTests: OperationTests {
         XCTAssertTrue(operation.finished)
     }
 
-    func test__dependencies_property_does_not_contain_dependency_waiter() {
+    func test__dependencies_does_not_contain_waiter_or_evaluator() {
 
         let dependency1 = TestOperation()
         let dependency2 = TestOperation()
@@ -526,6 +526,8 @@ class OperationDependencyTests: OperationTests {
         operation.addDependency(dependency2)
         operation.addCondition(condition1)
         operation.addCondition(condition2)
+
+        XCTAssertEqual(operation.dependencies.count, 4)
 
         addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
         runOperations(dependency1, dependency2, operation)

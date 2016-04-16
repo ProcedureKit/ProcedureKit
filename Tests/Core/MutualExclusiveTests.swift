@@ -89,8 +89,11 @@ class MutuallyExclusiveConditionWithDependencyTests: OperationTests {
 
     func test__mutually_exclusive_operations_can_be_executed() {
         let operation1 = BlockOperation()
+        operation1.name = "operation 1"
         operation1.addCondition(MutuallyExclusive<BlockOperation>())
+
         let operation2 = BlockOperation()
+        operation1.name = "operation 2"
         operation2.addCondition(MutuallyExclusive<BlockOperation>())
 
         addCompletionBlockToTestOperation(operation1, withExpectation: expectationWithDescription("Test 1: \(#function)"))

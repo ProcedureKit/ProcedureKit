@@ -55,6 +55,10 @@ public class ConditionOperation: Operation {
     internal func finish(result: ConditionResult) {
         finish(result.error)
     }
+
+    internal func dependenciesNotYetAddedToQueue() -> [NSOperation] {
+        return dependencies.filter { !$0.executing && !$0.finished }
+    }
 }
 
 internal class WrappedOperationCondition: ConditionOperation {
@@ -70,13 +74,5 @@ internal class WrappedOperationCondition: ConditionOperation {
 
     override func evaluate(operation: Operation, completion: CompletionBlockType) {
         condition.evaluateForOperation(operation, completion: completion)
-    }
-}
-
-internal class ConditionEvaluator: GroupOperation {
-
-    init(operation: Operation, conditions: [ConditionOperation]) {
-        conditions.forEach { $0.operation = operation }
-        super.init(operations: conditions)
     }
 }

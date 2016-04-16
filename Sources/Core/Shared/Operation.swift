@@ -152,7 +152,10 @@ public class Operation: NSOperation, OperationType {
     private var _hasFinishedAlready = false
     private var _observers = Protector([OperationObserverType]())
     internal private(set) var conditions = [ConditionOperation]()
+
+    // Internal operation properties which are used to manage the scheduling of dependencies
     internal private(set) var waitForDependenciesOperation: NSOperation? = .None
+    internal private(set) var evaluateConditionsOperation: GroupOperation? = .None
 
     private var _cancelled = false {
         willSet {
@@ -259,7 +262,11 @@ public class Operation: NSOperation, OperationType {
      */
     public func addCondition(condition: OperationCondition) {
         assert(state < .Executing, "Cannot modify conditions after operation has begun executing, current state: \(state).")
-        conditions.append(WrappedOperationCondition(condition))
+        let operation = WrappedOperationCondition(condition)
+        if let dependency = condition.dependencyForOperation(self) {
+            operation.addDependency(dependency)
+        }
+        conditions.append(operation)
     }
 
     public func addCondition(condition: ConditionOperation) {
@@ -396,16 +403,21 @@ public extension Operation {
         return __op
     }
 
-    internal func addConditionDependency(operation: NSOperation) {
-        precondition(state <= .Executing, "Dependencies cannot be modified after execution has begun, current state: \(state).")
-        if let waiter = waitForDependenciesOperation {
-            operation.addDependency(waiter)
-        }
-        super.addDependency(operation)
+    private func createEvaluateConditionsOperation() -> GroupOperation {
+        assert(evaluateConditionsOperation == nil, "Should only create evaluateConditionsOperation once.")
+
+        // Set the operation on each condition
+        conditions.forEach { $0.operation = self }
+        let __op = GroupOperation(operations: conditions)
+        super.addDependency(__op)
+        evaluateConditionsOperation = __op
+        return __op
     }
 
-    internal func addConditionEvaluator(evaluator: ConditionEvaluator) {
-        precondition(state <= .Executing, "Dependencies cannot be modified after execution has begun, current state: \(state).")
+    internal func evaluateConditions() -> GroupOperation {
+        assert(state <= .Executing, "Dependencies cannot be modified after execution has begun, current state: \(state).")
+
+        let evaluator = createEvaluateConditionsOperation()
 
         // Add an observer to the evaluator to see if any of the conditions failed.
         evaluator.addObserver(WillFinishObserver { [unowned self] operation, errors in
@@ -418,24 +430,35 @@ public extension Operation {
         // If this operation has any regular direct dependencies
         // the evaluator waits for them.
         if let waiter = waitForDependenciesOperation {
+            // Ensure that all dependencies from conditions
+            // execute after any dependencies
+            conditions.flatMap({ $0.dependencies }).forEach {
+                $0.addDependency(waiter)
+            }
+
             evaluator.addDependency(waiter)
         }
 
-        // Add the evaluator as a dependency - so that we wait for it.
-        super.addDependency(evaluator)
+        return evaluator
     }
 
     /// Public override to get the dependencies
     final override var dependencies: [NSOperation] {
         get {
             var _dependencies = super.dependencies
-            guard let
-                waiter = waitForDependenciesOperation, index = _dependencies.indexOf(waiter) else {
-                    return _dependencies
+
+            if let operation = waitForDependenciesOperation, index = _dependencies.indexOf(operation) {
+                _dependencies.removeAtIndex(index)
+                _dependencies.appendContentsOf(operation.dependencies)
             }
 
-            _dependencies.removeAtIndex(index)
-            _dependencies.appendContentsOf(waiter.dependencies)
+            if let operation = evaluateConditionsOperation, index = _dependencies.indexOf(operation) {
+                _dependencies.removeAtIndex(index)
+                _dependencies.appendContentsOf(operation.operations)
+            }
+            else {
+                _dependencies.appendContentsOf(conditions.flatMap { $0.dependencies })
+            }
 
             return _dependencies
         }

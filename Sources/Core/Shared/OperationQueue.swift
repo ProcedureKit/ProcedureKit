@@ -92,29 +92,11 @@ public class OperationQueue: NSOperationQueue {
                 }
             })
 
-/*
-            // Check for mutual exclusion conditions
-            let manager = ExclusivityManager.sharedInstance
-            let exclusive = operation.conditions.filter { $0.isMutuallyExclusive }
-            for condition in exclusive {
-                let category = "\(condition.dynamicType)"
-                let mutuallyExclusiveOperation: NSOperation = condition.dependencyForOperation(operation) ?? operation
-                manager.addOperation(mutuallyExclusiveOperation, category: category)
-            }
-
-            // Get any dependency operations from conditions
-            let conditionDependencies = operation.conditions.flatMap {
-                $0.dependencyForOperation(operation)
-            }
-
-            // Setup condition dependencies & add to the queue
-            for conditionDependency in conditionDependencies {
-                operation.addConditionDependency(conditionDependency)
-                addOperation(conditionDependency)
-            }
-*/
             /// Process any conditions
             if operation.conditions.count > 0 {
+
+                // Add condition dependencies
+                addOperations(operation.conditions.flatMap { $0.dependenciesNotYetAddedToQueue() })
 
                 /// Check for mutual exclusion conditions
                 let manager = ExclusivityManager.sharedInstance
@@ -124,11 +106,8 @@ public class OperationQueue: NSOperationQueue {
                     manager.addOperation(condition, category: category)
                 }
 
-                /// Evaluate conditions
-                let evaluator = ConditionEvaluator(operation: operation, conditions: operation.conditions)
-
-                operation.addConditionEvaluator(evaluator)
-                addOperation(evaluator)
+                // Add the evaluator
+                addOperation(operation.evaluateConditions())
             }
 
             /// Add the dependency waiter to the queue
