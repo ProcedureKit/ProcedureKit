@@ -58,7 +58,7 @@ class MutuallyExclusiveConditionWithDependencyTests: OperationTests {
 
     func test__condition_has_dependency_executed_first() {
         var text = "Star Wars"
-        let condition1 = TestCondition(isMutuallyExclusive: true, dependency: NSBlockOperation {
+        let condition1 = TestCondition(name: "Condition 1", isMutuallyExclusive: true, dependency: NSBlockOperation {
             text = "\(text)\nA long time ago"
         }) {
             return text ==  "Star Wars\nA long time ago"
@@ -68,7 +68,7 @@ class MutuallyExclusiveConditionWithDependencyTests: OperationTests {
         let operation1 = TestOperation()
         operation1.addCondition(condition1)
 
-        let condition2 = TestCondition(isMutuallyExclusive: true, dependency: BlockOperation {
+        let condition2 = TestCondition(name: "Condition 1", isMutuallyExclusive: true, dependency: BlockOperation {
             text = "\(text), in a galaxy far, far away."
         }) {
             return text == "Star Wars\nA long time ago, in a galaxy far, far away."

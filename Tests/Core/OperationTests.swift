@@ -53,7 +53,7 @@ class TestOperation: Operation, ResultOperationType {
 
 struct TestCondition: OperationCondition {
 
-    let name = "Test Condition"
+    var name: String = "Test Condition"
     var isMutuallyExclusive = false
     let dependency: NSOperation?
     let condition: () -> Bool
@@ -481,19 +481,23 @@ class OperationDependencyTests: OperationTests {
 
     func test__dependencies_execute_before_condition_dependencies() {
 
-        let dependency1 = TestOperation()
-        let dependency2 = TestOperation()
+        let dependency1 = TestOperation(); dependency1.name = "Dependency 1"
+        let dependency2 = TestOperation(); dependency2.name = "Dependency 2"
 
-        let condition1 = TestCondition(isMutuallyExclusive: false, dependency: BlockOperation {
+        let conditionDependency1 = BlockOperation {
             XCTAssertTrue(dependency1.finished)
             XCTAssertTrue(dependency2.finished)
-        }) { true }
+        }
+        conditionDependency1.name = "Condition 1 Dependency"
+        let condition1 = TestCondition(name: "Condition 1", isMutuallyExclusive: false, dependency: conditionDependency1) { true }
 
-        let condition2 = TestCondition(isMutuallyExclusive: false, dependency: BlockOperation {
+        let conditionDependency2 = BlockOperation {
             XCTAssertTrue(dependency1.finished)
             XCTAssertTrue(dependency2.finished)
-        }) { true }
+        }
+        conditionDependency2.name = "Condition 2 Dependency"
 
+        let condition2 = TestCondition(name: "Condition 2", isMutuallyExclusive: false, dependency: conditionDependency2) { true }
 
         let operation = TestOperation()
         operation.addDependency(dependency1)
@@ -503,7 +507,7 @@ class OperationDependencyTests: OperationTests {
 
         addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
         runOperations(dependency1, dependency2, operation)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForExpectationsWithTimeout(5, handler: nil)
 
         XCTAssertTrue(dependency1.didExecute)
         XCTAssertTrue(dependency1.finished)
@@ -517,8 +521,8 @@ class OperationDependencyTests: OperationTests {
 
         let dependency1 = TestOperation()
         let dependency2 = TestOperation()
-        let condition1 = TestCondition(isMutuallyExclusive: false, dependency: TestOperation()) { true }
-        let condition2 = TestCondition(isMutuallyExclusive: false, dependency: TestOperation()) { true }
+        let condition1 = TestCondition(name: "Condition 1", isMutuallyExclusive: false, dependency: TestOperation()) { true }
+        let condition2 = TestCondition(name: "Condition 2", isMutuallyExclusive: false, dependency: TestOperation()) { true }
 
 
         let operation = TestOperation()

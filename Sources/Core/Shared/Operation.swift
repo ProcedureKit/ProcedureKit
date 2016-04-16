@@ -358,7 +358,7 @@ public extension Operation {
         set (newState) {
             willChangeValueForKey("State")
             stateLock.withCriticalScope {
-                assert(_state.canTransitionToState(newState, whenCancelled: cancelled), "Attempting to perform illegal cyclic state transition, \(_state) -> \(newState).")
+                assert(_state.canTransitionToState(newState, whenCancelled: cancelled), "Attempting to perform illegal cyclic state transition, \(_state) -> \(newState) for operation: \(identity).")
                 log.verbose("\(_state) -> \(newState)")
                 _state = newState
             }
@@ -409,6 +409,7 @@ public extension Operation {
         // Set the operation on each condition
         conditions.forEach { $0.operation = self }
         let __op = GroupOperation(operations: conditions)
+        __op.name = "Condition Evaluator for: \(operationName)"
         super.addDependency(__op)
         evaluateConditionsOperation = __op
         return __op
@@ -427,17 +428,10 @@ public extension Operation {
             }
         })
 
-        // If this operation has any regular direct dependencies
-        // the evaluator waits for them.
-        if let waiter = waitForDependenciesOperation {
-            // Ensure that all dependencies from conditions
-            // execute after any dependencies
-            conditions.flatMap({ $0.dependencies }).forEach {
-                $0.addDependency(waiter)
-            }
-
-            evaluator.addDependency(waiter)
-        }
+        // The evaluator waits for all condition dependencies
+        conditions
+            .flatMap { $0.dependencies }
+            .forEach { evaluator.addDependency($0) }
 
         return evaluator
     }
@@ -550,7 +544,6 @@ public extension Operation {
             return
         }
 
-        state = .Executing
         main()
     }
 
@@ -559,6 +552,7 @@ public extension Operation {
 
         if _internalErrors.isEmpty && !cancelled {
             log.verbose("Will Execute")
+            state = .Executing
             didStartObservers.forEach { $0.didStartOperation(self) }
             execute()
         }

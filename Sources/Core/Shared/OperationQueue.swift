@@ -95,8 +95,25 @@ public class OperationQueue: NSOperationQueue {
             /// Process any conditions
             if operation.conditions.count > 0 {
 
-                // Add condition dependencies
-                addOperations(operation.conditions.flatMap { $0.dependenciesNotYetAddedToQueue() })
+                // Create the evaluator
+                let evaluator = operation.evaluateConditions()
+
+                // Get the condition dependencies not yet added
+                let dependencies = operation.conditions.flatMap { $0.dependenciesNotYetAddedToQueue() }
+
+                // Check to see if we have any regular dependencies
+                if let waiter = operation.waitForDependenciesOperation {
+
+                    // Ensure that condition dependencies are executed after
+                    // all regular dependencies
+                    dependencies.forEach { $0.addDependency(waiter) }
+
+                    // Ensure that all conditions execute after any dependencies
+                    operation.conditions.forEach { $0.addDependency(waiter) }
+
+                    // Finally, make sure that the evaluator execute after any dependencies
+                    evaluator.addDependency(waiter)
+                }
 
                 /// Check for mutual exclusion conditions
                 let manager = ExclusivityManager.sharedInstance
@@ -106,8 +123,11 @@ public class OperationQueue: NSOperationQueue {
                     manager.addOperation(condition, category: category)
                 }
 
+                // Add condition dependencies
+                addOperations(dependencies)
+
                 // Add the evaluator
-                addOperation(operation.evaluateConditions())
+                addOperation(evaluator)
             }
 
             /// Add the dependency waiter to the queue
