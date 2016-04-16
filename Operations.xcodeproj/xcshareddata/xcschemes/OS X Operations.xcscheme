@@ -38,11 +38,6 @@
                BlueprintName = "OS X OperationsTests"
                ReferencedContainer = "container:Operations.xcodeproj">
             </BuildableReference>
-            <SkippedTests>
-               <Test
-                  Identifier = "MutuallyExclusiveConditionWithDependencyTests">
-               </Test>
-            </SkippedTests>
          </TestableReference>
       </Testables>
       <MacroExpansion>
