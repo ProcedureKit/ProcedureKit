@@ -38,11 +38,6 @@
                BlueprintName = "iOS OperationsTests"
                ReferencedContainer = "container:Operations.xcodeproj">
             </BuildableReference>
-            <SkippedTests>
-               <Test
-                  Identifier = "RandomFailGeneratorTests/test__failure_probability_distribution()">
-               </Test>
-            </SkippedTests>
          </TestableReference>
       </Testables>
       <MacroExpansion>
