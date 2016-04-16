@@ -40,7 +40,7 @@
             </BuildableReference>
             <SkippedTests>
                <Test
-                  Identifier = "CompletionBlockOperationTests/test__many_completion_blocks_are_executed()">
+                  Identifier = "MutuallyExclusiveConditionWithDependencyTests">
                </Test>
             </SkippedTests>
          </TestableReference>
