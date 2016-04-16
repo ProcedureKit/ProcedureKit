@@ -31,7 +31,7 @@ public class ConditionOperation: Operation {
 
     public var isMutuallyExclusive: Bool = false
 
-    internal var operation: Operation? = .None
+    internal weak var operation: Operation? = .None
 
     public final override func execute() {
         guard let operation = operation else {
