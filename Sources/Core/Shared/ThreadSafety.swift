@@ -78,3 +78,30 @@ extension Protector where T: _ArrayType {
         })
     }
 }
+
+public func dispatch_sync(queue: dispatch_queue_t, _ block: () throws -> Void) rethrows {
+    var failure: ErrorType? = .None
+
+    let catcher = {
+        do {
+            try block()
+        }
+        catch {
+            failure = error
+        }
+    }
+
+    dispatch_sync(queue, catcher)
+
+    if let failure = failure {
+        try { throw failure }()
+    }
+}
+
+public func dispatch_sync<T>(queue: dispatch_queue_t, _ block: () throws -> T) rethrows -> T {
+    var result: T!
+    try dispatch_sync(queue) {
+        result = try block()
+    }
+    return result
+}

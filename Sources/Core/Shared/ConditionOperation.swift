@@ -33,6 +33,10 @@ public class ConditionOperation: Operation {
 
     internal weak var operation: Operation? = .None
 
+    internal var category: String {
+        return "\(self.dynamicType)"
+    }
+
     public final override func execute() {
         guard let operation = operation else {
             assertionFailure("ConditionOperation executed before operation set.")
@@ -65,6 +69,10 @@ internal class WrappedOperationCondition: ConditionOperation {
 
     let condition: OperationCondition
 
+    override internal var category: String {
+        return "\(condition.dynamicType)"
+    }
+
     init(_ condition: OperationCondition) {
         self.condition = condition
         super.init()
@@ -74,5 +82,12 @@ internal class WrappedOperationCondition: ConditionOperation {
 
     override func evaluate(operation: Operation, completion: CompletionBlockType) {
         condition.evaluateForOperation(operation, completion: completion)
+    }
+}
+
+extension Array where Element: NSOperation {
+
+    internal var conditions: [ConditionOperation] {
+        return flatMap { $0 as? ConditionOperation }
     }
 }

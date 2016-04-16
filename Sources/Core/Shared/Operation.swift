@@ -102,10 +102,11 @@ public class Operation: NSOperation {
     private var _internalErrors = [ErrorType]()
     private var _hasFinishedAlready = false
     private var _observers = Protector([OperationObserverType]())
-    internal private(set) var conditions = [ConditionOperation]()
+
+    internal private(set) var conditions = Set<ConditionOperation>()
+    internal private(set) var directDependencies = Set<NSOperation>()
 
     // Internal operation properties which are used to manage the scheduling of dependencies
-    internal private(set) var waitForDependenciesOperation: NSOperation? = .None
     internal private(set) var evaluateConditionsOperation: GroupOperation? = .None
 
     private var _cancelled = false {
@@ -217,12 +218,12 @@ public class Operation: NSOperation {
         if let dependency = condition.dependencyForOperation(self) {
             operation.addDependency(dependency)
         }
-        conditions.append(operation)
+        conditions.insert(operation)
     }
 
     public func addCondition(condition: ConditionOperation) {
         assert(state < .Executing, "Cannot modify conditions after operation has begun executing, current state: \(state).")
-        conditions.append(condition)
+        conditions.insert(condition)
     }
 
     /**
@@ -346,12 +347,10 @@ public extension Operation {
 
 public extension Operation {
 
-    private func createDidFinishDependenciesOperation() -> NSOperation {
-        assert(waitForDependenciesOperation == nil, "Should only ever create the finishing dependency once.")
-        let __op = NSBlockOperation { }
-        super.addDependency(__op)
-        waitForDependenciesOperation = __op
-        return __op
+    internal class Waiter: NSOperation {
+        internal override func main() {
+            // no op
+        }
     }
 
     private func createEvaluateConditionsOperation() -> GroupOperation {
@@ -359,7 +358,8 @@ public extension Operation {
 
         // Set the operation on each condition
         conditions.forEach { $0.operation = self }
-        let __op = GroupOperation(operations: conditions)
+
+        let __op = GroupOperation(operations: Array(conditions))
         __op.name = "Condition Evaluator for: \(operationName)"
         super.addDependency(__op)
         evaluateConditionsOperation = __op
@@ -379,29 +379,33 @@ public extension Operation {
             }
         })
 
+        directDependencies.forEach {
+            evaluator.addDependency($0)
+        }
+
         return evaluator
+    }
+
+    internal func addDependencyOnPreviousMutuallyExclusiveOperation(operation: Operation) {
+        precondition(state <= .Executing, "Dependencies cannot be modified after execution has begun, current state: \(state).")
+        super.addDependency(operation)
+    }
+
+    internal func addDirectDependency(directDependency: NSOperation) {
+        precondition(state <= .Executing, "Dependencies cannot be modified after execution has begun, current state: \(state).")
+        directDependencies.insert(directDependency)
+        super.addDependency(directDependency)
+    }
+
+    internal func removeDirectDependency(directDependency: NSOperation) {
+        precondition(state <= .Executing, "Dependencies cannot be modified after execution has begun, current state: \(state).")
+        directDependencies.remove(directDependency)
+        super.removeDependency(directDependency)
     }
 
     /// Public override to get the dependencies
     final override var dependencies: [NSOperation] {
-        get {
-            var _dependencies = super.dependencies
-
-            if let operation = waitForDependenciesOperation, index = _dependencies.indexOf(operation) {
-                _dependencies.removeAtIndex(index)
-                _dependencies.appendContentsOf(operation.dependencies)
-            }
-
-            if let operation = evaluateConditionsOperation, index = _dependencies.indexOf(operation) {
-                _dependencies.removeAtIndex(index)
-                _dependencies.appendContentsOf(operation.operations)
-            }
-            else {
-                _dependencies.appendContentsOf(conditions.flatMap { $0.dependencies })
-            }
-
-            return _dependencies
-        }
+        return Array(directDependencies)
     }
 
     /**
@@ -415,7 +419,7 @@ public extension Operation {
      */
     final override func addDependency(operation: NSOperation) {
         precondition(state <= .Executing, "Dependencies cannot be modified after execution has begun, current state: \(state).")
-        (waitForDependenciesOperation ?? createDidFinishDependenciesOperation()).addDependency(operation)
+        addDirectDependency(operation)
     }
 
     /**
@@ -430,14 +434,7 @@ public extension Operation {
      */
     final override func removeDependency(operation: NSOperation) {
         precondition(state <= .Executing, "Dependencies cannot be modified after execution has begun, current state: \(state).")
-        guard let waiter = waitForDependenciesOperation else {
-            return
-        }
-        waiter.removeDependency(operation)
-        if waiter.dependencies.count == 0 {
-            super.removeDependency(waiter)
-            waitForDependenciesOperation = nil
-        }
+        removeDirectDependency(operation)
     }
 }
 
@@ -497,7 +494,7 @@ public extension Operation {
     final override func main() {
 
         if _internalErrors.isEmpty && !cancelled {
-            log.verbose("Will Execute")
+            log.notice("Will Execute")
             state = .Executing
             didStartObservers.forEach { $0.didStartOperation(self) }
             execute()
@@ -514,7 +511,7 @@ public extension Operation {
      */
     final func produceOperation(operation: NSOperation) {
         precondition(state > .Initialized, "Cannot produce operation while not being scheduled on a queue.")
-        log.verbose("Did produce \(operation.operationName)")
+        log.notice("Did produce \(operation.operationName)")
         didProduceOperationObservers.forEach { $0.operation(self, didProduceOperation: operation) }
     }
 }
@@ -538,10 +535,10 @@ public extension Operation {
             finished(_internalErrors)
 
             if errors.isEmpty {
-                log.verbose("Finishing with no errors.")
+                log.notice("Will finish with no errors.")
             }
             else {
-                log.warning("Finishing with errors: \(_internalErrors).")
+                log.warning("Will finish with \(errors.count) errors.")
             }
 
             willFinishObservers.forEach { $0.willFinishOperation(self, errors: self._internalErrors) }
@@ -549,6 +546,13 @@ public extension Operation {
             state = .Finished
 
             didFinishObservers.forEach { $0.didFinishOperation(self, errors: self._internalErrors) }
+
+            if errors.isEmpty {
+                log.notice("Did finish with no errors.")
+            }
+            else {
+                log.warning("Did finish with errors: \(errors).")
+            }
         }
     }
 
@@ -634,7 +638,7 @@ extension NSOperation {
 
     - parameter dependencies: and array of `NSOperation` instances.
     */
-    public func addDependencies(dependencies: [NSOperation]) {
+    public func addDependencies<S where S: SequenceType, S.Generator.Element: NSOperation>(dependencies: S) {
         dependencies.forEach(addDependency)
     }
 

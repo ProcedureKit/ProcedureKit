@@ -95,44 +95,51 @@ public class OperationQueue: NSOperationQueue {
             /// Process any conditions
             if operation.conditions.count > 0 {
 
-                // Create the evaluator
-                let evaluator = operation.evaluateConditions()
-
-                // Get the condition dependencies not yet added
-                let dependencies = operation.conditions.flatMap { $0.dependenciesNotYetAddedToQueue() }
-
-                // Check to see if we have any regular dependencies
-                if let waiter = operation.waitForDependenciesOperation {
-
-                    // Ensure that condition dependencies are executed after
-                    // all regular dependencies
-                    dependencies.forEach { $0.addDependency(waiter) }
-
-                    // Ensure that all conditions execute after any dependencies
-                    operation.conditions.forEach { $0.addDependency(waiter) }
-
-                    // Finally, make sure that the evaluator execute after any dependencies
-                    evaluator.addDependency(waiter)
-                }
-
                 /// Check for mutual exclusion conditions
                 let manager = ExclusivityManager.sharedInstance
                 let conditions = operation.conditions.filter { $0.isMutuallyExclusive }
+                var previousMutuallyExclusiveOperations = Set<NSOperation>()
                 for condition in conditions {
-                    let category = "\(condition.dynamicType)"
-                    manager.addOperation(operation, category: category)
+                    let category = "\(condition.category)"
+                    if let previous = manager.addOperation(operation, category: category) {
+                        previousMutuallyExclusiveOperations.insert(previous)
+                    }
                 }
 
-                // Add condition dependencies
-                addOperations(dependencies)
+                // Create the evaluator
+                let evaluator = operation.evaluateConditions()
+
+                // Get the condition dependencies
+                let conditionDependencies = operation.conditions.flatMap { $0.dependencies }
+
+                // If there are dependencies
+                if conditionDependencies.count > 0 {
+
+                    // Get the regular direct dependencies
+                    let directDependencies = operation.dependencies
+
+                    // Iterate through the condition dependencies
+                    conditionDependencies.forEach { conditionDependency in
+
+                        // Condition dependencies are executed after
+                        // any previous mutually exclusive operation
+                        conditionDependency.addDependencies(previousMutuallyExclusiveOperations)
+
+                        // Condition dependencies are executed after
+                        // all regular dependencies
+                        conditionDependency.addDependencies(directDependencies)
+
+                        // Only evaluate conditions after all condition
+                        // dependencies have finished
+                        evaluator.addDependency(conditionDependency)
+                    }
+
+                    // Add condition dependencies
+                    addOperations(conditionDependencies)
+                }
 
                 // Add the evaluator
                 addOperation(evaluator)
-            }
-
-            /// Add the dependency waiter to the queue
-            if let waiter = operation.waitForDependenciesOperation {
-                addOperation(waiter)
             }
 
             /// Indicate to the operation that it is to be enqueued

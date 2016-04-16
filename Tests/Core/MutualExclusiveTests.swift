@@ -34,7 +34,6 @@ class MutualExclusiveTests: OperationTests {
     }
 
     func test__mutually_exclusive_operation_are_run_exclusively() {
-        LogManager.severity = .Verbose
         var text = "Star Wars"
 
         let operation1 = BlockOperation {
@@ -42,8 +41,8 @@ class MutualExclusiveTests: OperationTests {
             text = "\(text)\nA long time ago"
         }
         operation1.name = "Operation 1"
-        var condition1A = MutuallyExclusive<BlockOperation>(); condition1A.name = "condition 1 A"
-        var condition1B = MutuallyExclusive<BlockOperation>(); condition1B.name = "condition 1 B"
+        let condition1A = MutuallyExclusive<BlockOperation>();
+        let condition1B = MutuallyExclusive<TestOperation>();
         operation1.addCondition(condition1A)
         operation1.addCondition(condition1B)
 
@@ -52,8 +51,8 @@ class MutualExclusiveTests: OperationTests {
             text = "\(text), in a galaxy far, far away."
         }
         operation2.name = "Operation 2"
-        var condition2A = MutuallyExclusive<BlockOperation>(); condition2A.name = "condition 2 A"
-        var condition2B = MutuallyExclusive<BlockOperation>(); condition2B.name = "condition 2 B"
+        let condition2A = MutuallyExclusive<BlockOperation>();
+        let condition2B = MutuallyExclusive<TestOperation>();
         operation2.addCondition(condition2A)
         operation2.addCondition(condition2B)
 
@@ -63,41 +62,53 @@ class MutualExclusiveTests: OperationTests {
         waitForExpectationsWithTimeout(3, handler: nil)
 
         XCTAssertEqual(text, "Star Wars\nA long time ago, in a galaxy far, far away.")
-        LogManager.severity = .Verbose
     }
-}
-
-class MutuallyExclusiveConditionWithDependencyTests: OperationTests {
 
     func test__condition_has_dependency_executed_first() {
         var text = "Star Wars"
-        let condition1 = TestCondition(name: "Condition 1", isMutuallyExclusive: true, dependency: NSBlockOperation {
-            text = "\(text)\nA long time ago"
-        }) {
-            return text == "Star Wars\nA long time ago"
-        }
+        LogManager.severity = .Notice
 
+        let conditionDependency1 = BlockOperation {
+            XCTAssertEqual(text, "Star Wars")
+            text = "\(text)\nA long time ago"
+        }
+        conditionDependency1.name = "Condition 1 Dependency"
+
+        let condition1 = TestCondition(name: "Condition 1", isMutuallyExclusive: true, dependency: conditionDependency1) { true }
 
         let operation1 = TestOperation()
+        operation1.name = "Operation 1"
         operation1.addCondition(condition1)
 
-        let condition2 = TestCondition(name: "Condition 1", isMutuallyExclusive: true, dependency: BlockOperation {
+        let operation1Dependency = TestOperation()
+        operation1Dependency.name = "Dependency 1"
+        operation1.addDependency(operation1Dependency)
+
+        let conditionDependency2 = BlockOperation {
+            XCTAssertEqual(text, "Star Wars\nA long time ago")
             text = "\(text), in a galaxy far, far away."
-        }) {
-            return text == "Star Wars\nA long time ago, in a galaxy far, far away."
         }
+        conditionDependency2.name = "Condition 2 Dependency"
+
+        let condition2 = TestCondition(name: "Condition 2", isMutuallyExclusive: true, dependency: conditionDependency2) { true }
 
         let operation2 = TestOperation()
         operation2.addCondition(condition2)
 
-        addCompletionBlockToTestOperation(operation1, withExpectation: expectationWithDescription("Test 1: \(#function)"))
-        addCompletionBlockToTestOperation(operation2, withExpectation: expectationWithDescription("Test 2: \(#function)"))
+        let operation2Dependency = TestOperation()
+        operation2Dependency.name = "Dependency 2"
+        operation2.addDependency(operation2Dependency)
 
-        runOperations(operation1, operation2)
+        addCompletionBlockToTestOperation(operation1)
+        addCompletionBlockToTestOperation(operation2)
+        addCompletionBlockToTestOperation(operation1Dependency)
+        addCompletionBlockToTestOperation(operation2Dependency)
+        runOperations(operation1, operation2Dependency, operation2, operation1Dependency)
         waitForExpectationsWithTimeout(3, handler: nil)
 
-        XCTAssertTrue(operation1.didExecute)
-        XCTAssertTrue(operation2.didExecute)
+        XCTAssertEqual(text, "Star Wars\nA long time ago, in a galaxy far, far away.")
+
+        LogManager.severity = .Warning
     }
 
     func test__mutually_exclusive_operations_can_be_executed() {
@@ -109,9 +120,8 @@ class MutuallyExclusiveConditionWithDependencyTests: OperationTests {
         operation1.name = "operation 2"
         operation2.addCondition(MutuallyExclusive<BlockOperation>())
 
-        addCompletionBlockToTestOperation(operation1, withExpectation: expectationWithDescription("Test 1: \(#function)"))
-        addCompletionBlockToTestOperation(operation2, withExpectation: expectationWithDescription("Test 2: \(#function)"))
-
+        addCompletionBlockToTestOperation(operation1)
+        addCompletionBlockToTestOperation(operation2)
         runOperations(operation1, operation2)
         waitForExpectationsWithTimeout(3, handler: nil)
     }

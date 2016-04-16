@@ -164,7 +164,6 @@ class OperationTests: XCTestCase {
         })
         return expectation
     }
-
 }
 
 class BasicTests: OperationTests {
@@ -531,30 +530,15 @@ class OperationDependencyTests: OperationTests {
         operation.addCondition(condition1)
         operation.addCondition(condition2)
 
-        XCTAssertEqual(operation.dependencies.count, 4)
-
         addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
         runOperations(dependency1, dependency2, operation)
         waitForExpectationsWithTimeout(3, handler: nil)
 
-        XCTAssertEqual(operation.dependencies.count, 4)
-        XCTAssertNotNil(operation.waitForDependenciesOperation)
-        XCTAssertFalse(operation.dependencies.contains(operation.waitForDependenciesOperation!))
+        XCTAssertEqual(operation.dependencies.count, 2)
     }
 
-    func test__remove_last_dependency_destroys_dependency_waiter() {
-
-        let dependency = TestOperation()
-        let operation = TestOperation()
-        operation.removeDependency(dependency) // Has no impact
-        operation.addDependency(dependency)
-
-        XCTAssertNotNil(operation.waitForDependenciesOperation)
-        XCTAssertEqual(operation.dependencies.count, 1)
-
-        operation.removeDependency(dependency)
-        XCTAssertNil(operation.waitForDependenciesOperation)
-        XCTAssertEqual(operation.dependencies.count, 0)
+    func test__dependencies_execute_after_previous_mutually_exclusive_operation() {
+        
     }
 }
 
