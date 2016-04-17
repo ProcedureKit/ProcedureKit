@@ -20,6 +20,20 @@
                ReferencedContainer = "container:Operations.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "NO"
+            buildForProfiling = "NO"
+            buildForArchiving = "NO"
+            buildForAnalyzing = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "65FD67A51CC3885D009E2C88"
+               BuildableName = "Stress Tests.xctest"
+               BlueprintName = "Stress Tests"
+               ReferencedContainer = "container:Operations.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
       </BuildActionEntries>
    </BuildAction>
    <TestAction
@@ -29,6 +43,16 @@
       shouldUseLaunchSchemeArgsEnv = "YES"
       codeCoverageEnabled = "YES">
       <Testables>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "65FD67A51CC3885D009E2C88"
+               BuildableName = "Stress Tests.xctest"
+               BlueprintName = "Stress Tests"
+               ReferencedContainer = "container:Operations.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
          <TestableReference
             skipped = "NO">
             <BuildableReference

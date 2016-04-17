@@ -286,6 +286,15 @@
 		65EE50C71C3C198600152774 /* CloudKitOperationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65EE50C51C3C198600152774 /* CloudKitOperationTests.swift */; };
 		65EE50C81C3C198600152774 /* CloudKitOperationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65EE50C51C3C198600152774 /* CloudKitOperationTests.swift */; };
 		65EED2B51C86C8F0003064B5 /* CloudCapability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652616FE1C11F5EB00654091 /* CloudCapability.swift */; };
+		65FD67AB1CC3885D009E2C88 /* Operations.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 652617E91C11F72A00654091 /* Operations.framework */; };
+		65FD67B21CC38877009E2C88 /* StressTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65FD67B11CC38877009E2C88 /* StressTests.swift */; };
+		65FD67B41CC38933009E2C88 /* BasicTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65FD67B31CC38933009E2C88 /* BasicTests.swift */; };
+		65FD67B51CC38933009E2C88 /* BasicTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65FD67B31CC38933009E2C88 /* BasicTests.swift */; };
+		65FD67B61CC38933009E2C88 /* BasicTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65FD67B31CC38933009E2C88 /* BasicTests.swift */; };
+		65FD67B71CC38972009E2C88 /* OperationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652617171C11F5EB00654091 /* OperationTests.swift */; };
+		65FD67B91CC389A5009E2C88 /* BlockOperationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65FD67B81CC389A5009E2C88 /* BlockOperationTests.swift */; };
+		65FD67BA1CC389A5009E2C88 /* BlockOperationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65FD67B81CC389A5009E2C88 /* BlockOperationTests.swift */; };
+		65FD67BB1CC389A5009E2C88 /* BlockOperationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65FD67B81CC389A5009E2C88 /* BlockOperationTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -304,6 +313,13 @@
 			remoteInfo = "tvOS Operations";
 		};
 		652617F41C11F72B00654091 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 652616B91C11F44000654091 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 652617E81C11F72A00654091;
+			remoteInfo = "OS X Operations";
+		};
+		65FD67AC1CC3885D009E2C88 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 652616B91C11F44000654091 /* Project object */;
 			proxyType = 1;
@@ -426,6 +442,10 @@
 		65E4CDE11C33427500B9F9D8 /* RepeatedOperation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RepeatedOperation.swift; sourceTree = "<group>"; };
 		65E4CDE61C33F97900B9F9D8 /* RepeatedOperationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RepeatedOperationTests.swift; sourceTree = "<group>"; };
 		65EE50C51C3C198600152774 /* CloudKitOperationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CloudKitOperationTests.swift; sourceTree = "<group>"; };
+		65FD67A61CC3885D009E2C88 /* Stress Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Stress Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		65FD67B11CC38877009E2C88 /* StressTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StressTests.swift; sourceTree = "<group>"; };
+		65FD67B31CC38933009E2C88 /* BasicTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BasicTests.swift; sourceTree = "<group>"; };
+		65FD67B81CC389A5009E2C88 /* BlockOperationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BlockOperationTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -478,6 +498,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				652617F31C11F72B00654091 /* Operations.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		65FD67A31CC3885D009E2C88 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				65FD67AB1CC3885D009E2C88 /* Operations.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -684,8 +712,10 @@
 			children = (
 				6526170B1C11F5EB00654091 /* AlertOperationTests.swift */,
 				6526170C1C11F5EB00654091 /* BackgroundObserverTests.swift */,
+				65FD67B31CC38933009E2C88 /* BasicTests.swift */,
 				6526170D1C11F5EB00654091 /* BlockConditionTests.swift */,
 				657DBA321C208830001E00F3 /* BlockObserverTests.swift */,
+				65FD67B81CC389A5009E2C88 /* BlockOperationTests.swift */,
 				6526170E1C11F5EB00654091 /* ComposedOperationTests.swift */,
 				65C98C761C284EA600BA76B7 /* FunctionalOperationsTests.swift */,
 				6526170F1C11F5EB00654091 /* GatedOperationTests.swift */,
@@ -702,6 +732,7 @@
 				65691C9D1C21A29C00AF06B4 /* ResultInjectionTests.swift */,
 				65AE14961C34865E00F592D2 /* RetryOperationTests.swift */,
 				652617181C11F5EB00654091 /* SilentConditionTests.swift */,
+				65FD67B11CC38877009E2C88 /* StressTests.swift */,
 				652617191C11F5EB00654091 /* TimeoutObserverTests.swift */,
 				6526171A1C11F5EB00654091 /* UIOperationTests.swift */,
 			);
@@ -767,6 +798,7 @@
 				652617D61C11F66200654091 /* tvOS OperationsTests.xctest */,
 				652617E91C11F72A00654091 /* Operations.framework */,
 				652617F21C11F72A00654091 /* OS X OperationsTests.xctest */,
+				65FD67A61CC3885D009E2C88 /* Stress Tests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -971,13 +1003,31 @@
 			productReference = 652617F21C11F72A00654091 /* OS X OperationsTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
+		65FD67A51CC3885D009E2C88 /* Stress Tests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 65FD67B01CC3885D009E2C88 /* Build configuration list for PBXNativeTarget "Stress Tests" */;
+			buildPhases = (
+				65FD67A21CC3885D009E2C88 /* Sources */,
+				65FD67A31CC3885D009E2C88 /* Frameworks */,
+				65FD67A41CC3885D009E2C88 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				65FD67AD1CC3885D009E2C88 /* PBXTargetDependency */,
+			);
+			name = "Stress Tests";
+			productName = "Stress Tests";
+			productReference = 65FD67A61CC3885D009E2C88 /* Stress Tests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
 		652616B91C11F44000654091 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastSwiftUpdateCheck = 0710;
+				LastSwiftUpdateCheck = 0730;
 				LastUpgradeCheck = 0710;
 				TargetAttributes = {
 					652617A21C11F62A00654091 = {
@@ -1001,6 +1051,9 @@
 					652617F11C11F72A00654091 = {
 						CreatedOnToolsVersion = 7.1.1;
 					};
+					65FD67A51CC3885D009E2C88 = {
+						CreatedOnToolsVersion = 7.3;
+					};
 				};
 			};
 			buildConfigurationList = 652616BC1C11F44000654091 /* Build configuration list for PBXProject "Operations" */;
@@ -1022,6 +1075,7 @@
 				652617D51C11F66200654091 /* tvOS OperationsTests */,
 				652617E81C11F72A00654091 /* OS X Operations */,
 				652617F11C11F72A00654091 /* OS X OperationsTests */,
+				65FD67A51CC3885D009E2C88 /* Stress Tests */,
 			);
 		};
 /* End PBXProject section */
@@ -1070,6 +1124,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		652617F01C11F72A00654091 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		65FD67A41CC3885D009E2C88 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -1221,6 +1282,7 @@
 				6526192C1C11FC3D00654091 /* UIOperationTests.swift in Sources */,
 				652619271C11FC3D00654091 /* NetworkObserverTests.swift in Sources */,
 				652619751C11FE6900654091 /* ReachabilityConditionTests.swift in Sources */,
+				65FD67B41CC38933009E2C88 /* BasicTests.swift in Sources */,
 				652619781C11FE6900654091 /* RemoteNotificationConditionTests.swift in Sources */,
 				6526197D1C11FE6D00654091 /* ContactsOperationsTests.swift in Sources */,
 				652619761C11FE6900654091 /* ReachabilityTests.swift in Sources */,
@@ -1250,6 +1312,7 @@
 				65E4CDE71C33F97900B9F9D8 /* RepeatedOperationTests.swift in Sources */,
 				6526192B1C11FC3D00654091 /* TimeoutObserverTests.swift in Sources */,
 				6526196C1C11FE6900654091 /* AuthorizationTests.swift in Sources */,
+				65FD67B91CC389A5009E2C88 /* BlockOperationTests.swift in Sources */,
 				65691C9E1C21A29C00AF06B4 /* ResultInjectionTests.swift in Sources */,
 				652619731C11FE6900654091 /* PassbookCapabilityTests.swift in Sources */,
 			);
@@ -1352,12 +1415,14 @@
 				652619361C11FC3E00654091 /* NegatedConditionTests.swift in Sources */,
 				652619311C11FC3E00654091 /* GatedOperationTests.swift in Sources */,
 				652619331C11FC3E00654091 /* LoggingObserverTests.swift in Sources */,
+				65FD67BA1CC389A5009E2C88 /* BlockOperationTests.swift in Sources */,
 				6526193C1C11FC3E00654091 /* UIOperationTests.swift in Sources */,
 				6565FFEB1C98C860008B5248 /* ProfilerTests.swift in Sources */,
 				652619371C11FC3E00654091 /* NetworkObserverTests.swift in Sources */,
 				652619651C11FD9900654091 /* ReachabilityConditionTests.swift in Sources */,
 				65EE50C71C3C198600152774 /* CloudKitOperationTests.swift in Sources */,
 				652619661C11FD9900654091 /* ReachabilityTests.swift in Sources */,
+				65FD67B51CC38933009E2C88 /* BasicTests.swift in Sources */,
 				6526195E1C11FD9900654091 /* CapabilityTests.swift in Sources */,
 				6526193A1C11FC3E00654091 /* SilentConditionTests.swift in Sources */,
 				657DBA341C208830001E00F3 /* BlockObserverTests.swift in Sources */,
@@ -1439,6 +1504,7 @@
 				652619501C11FCFF00654091 /* CloudCapabilityTests.swift in Sources */,
 				652619411C11FC3F00654091 /* GatedOperationTests.swift in Sources */,
 				652619431C11FC3F00654091 /* LoggingObserverTests.swift in Sources */,
+				65FD67BB1CC389A5009E2C88 /* BlockOperationTests.swift in Sources */,
 				6526194A1C11FC3F00654091 /* SilentConditionTests.swift in Sources */,
 				65691CA01C21A29C00AF06B4 /* ResultInjectionTests.swift in Sources */,
 				6526193F1C11FC3F00654091 /* BlockConditionTests.swift in Sources */,
@@ -1449,6 +1515,7 @@
 				652619451C11FC3F00654091 /* MutualExclusiveTests.swift in Sources */,
 				6526194D1C11FCFF00654091 /* AuthorizationTests.swift in Sources */,
 				652619571C11FCFF00654091 /* ReachabilityTests.swift in Sources */,
+				65FD67B61CC38933009E2C88 /* BasicTests.swift in Sources */,
 				652619491C11FC3F00654091 /* OperationTests.swift in Sources */,
 				652619421C11FC3F00654091 /* GroupOperationTests.swift in Sources */,
 				652619581C11FCFF00654091 /* ReachableOperationTests.swift in Sources */,
@@ -1460,6 +1527,15 @@
 				6526196B1C11FDF300654091 /* ContactsOperationsTests.swift in Sources */,
 				6526194B1C11FC3F00654091 /* TimeoutObserverTests.swift in Sources */,
 				6565FFEC1C98C860008B5248 /* ProfilerTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		65FD67A21CC3885D009E2C88 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				65FD67B21CC38877009E2C88 /* StressTests.swift in Sources */,
+				65FD67B71CC38972009E2C88 /* OperationTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1480,6 +1556,11 @@
 			isa = PBXTargetDependency;
 			target = 652617E81C11F72A00654091 /* OS X Operations */;
 			targetProxy = 652617F41C11F72B00654091 /* PBXContainerItemProxy */;
+		};
+		65FD67AD1CC3885D009E2C88 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 652617E81C11F72A00654091 /* OS X Operations */;
+			targetProxy = 65FD67AC1CC3885D009E2C88 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -2177,6 +2258,96 @@
 			};
 			name = Release;
 		};
+		65FD67AE1CC3885D009E2C88 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COMBINE_HIDPI_IMAGES = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				INFOPLIST_FILE = "$(SRCROOT)/Tests/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = "me.danthorpe.Stress-Tests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		65FD67AF1CC3885D009E2C88 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COMBINE_HIDPI_IMAGES = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				INFOPLIST_FILE = "$(SRCROOT)/Tests/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				PRODUCT_BUNDLE_IDENTIFIER = "me.danthorpe.Stress-Tests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -2251,6 +2422,14 @@
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
+		};
+		65FD67B01CC3885D009E2C88 /* Build configuration list for PBXNativeTarget "Stress Tests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				65FD67AE1CC3885D009E2C88 /* Debug */,
+				65FD67AF1CC3885D009E2C88 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
 		};
 /* End XCConfigurationList section */
 	};

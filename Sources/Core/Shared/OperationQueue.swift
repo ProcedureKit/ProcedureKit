@@ -110,32 +110,29 @@ public class OperationQueue: NSOperationQueue {
                 let evaluator = operation.evaluateConditions()
 
                 // Get the condition dependencies
-                let conditionDependencies = operation.conditions.flatMap { $0.directDependencies }
+                let indirectDependencies = operation.indirectDependencies
 
                 // If there are dependencies
-                if conditionDependencies.count > 0 {
+                if indirectDependencies.count > 0 {
 
-                    // Get the regular direct dependencies
-                    let directDependencies = operation.directDependencies
+                    // Iterate through the indirect dependencies
+                    indirectDependencies.forEach {
 
-                    // Iterate through the condition dependencies
-                    conditionDependencies.forEach {
-
-                        // Condition dependencies are executed after
+                        // Indirect dependencies are executed after
                         // any previous mutually exclusive operation(s)
                         $0.addDependencies(previousMutuallyExclusiveOperations)
 
-                        // Condition dependencies are executed after
+                        // Indirect dependencies are executed after
                         // all direct dependencies
-                        $0.addDependencies(directDependencies)
+                        $0.addDependencies(operation.directDependencies)
 
-                        // Only evaluate conditions after all condition
+                        // Only evaluate conditions after all indirect
                         // dependencies have finished
                         evaluator.addDependency($0)
                     }
 
-                    // Add condition dependencies
-                    addOperations(conditionDependencies)
+                    // Add indirect dependencies
+                    addOperations(indirectDependencies)
                 }
 
                 // Add the evaluator
@@ -177,8 +174,8 @@ public extension NSOperationQueue {
      Add operations to the queue as an array
      - parameters ops: a array of `NSOperation` instances.
      */
-    func addOperations(ops: [NSOperation]) {
-        addOperations(ops, waitUntilFinished: false)
+    func addOperations<S where S: SequenceType, S.Generator.Element: NSOperation>(ops: S) {
+        addOperations(Array(ops), waitUntilFinished: false)
     }
 
     /**
