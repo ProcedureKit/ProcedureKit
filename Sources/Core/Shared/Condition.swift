@@ -8,6 +8,20 @@
 
 import Foundation
 
+public protocol ConditionType {
+
+    var mutuallyExclusive: Bool { get set }
+
+    func evaluate(operation: Operation, completion: ConditionResult -> Void)
+
+}
+
+internal extension ConditionType {
+
+    internal var category: String {
+        return "\(self.dynamicType)"
+    }
+}
 
 /**
  Condition Operation
@@ -26,16 +40,14 @@ import Foundation
  failure by passing an ConditionResult enum back.
 
  */
-public class Condition: Operation {
+public class Condition: Operation, ConditionType, ResultOperationType {
     public typealias CompletionBlockType = ConditionResult -> Void
 
-    public var isMutuallyExclusive: Bool = false
+    public var mutuallyExclusive: Bool = false
 
     internal weak var operation: Operation? = .None
 
-    internal var category: String {
-        return "\(self.dynamicType)"
-    }
+    public var result: ConditionResult! = nil
 
     public final override func execute() {
         guard let operation = operation else {
@@ -56,12 +68,9 @@ public class Condition: Operation {
         completion(.Failed(OperationError.ConditionFailed))
     }
 
-    internal func finish(result: ConditionResult) {
-        finish(result.error)
-    }
-
-    internal func dependenciesNotYetAddedToQueue() -> [NSOperation] {
-        return dependencies.filter { !$0.executing && !$0.finished }
+    internal func finish(conditionResult: ConditionResult) {
+        self.result = conditionResult
+        finish(conditionResult.error)
     }
 }
 
@@ -69,14 +78,14 @@ internal class WrappedOperationCondition: Condition {
 
     let condition: OperationCondition
 
-    override internal var category: String {
+    var category: String {
         return "\(condition.dynamicType)"
     }
 
     init(_ condition: OperationCondition) {
         self.condition = condition
         super.init()
-        isMutuallyExclusive = condition.isMutuallyExclusive
+        mutuallyExclusive = condition.isMutuallyExclusive
         name = condition.name
     }
 

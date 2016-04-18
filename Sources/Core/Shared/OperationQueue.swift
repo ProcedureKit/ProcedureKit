@@ -97,7 +97,7 @@ public class OperationQueue: NSOperationQueue {
 
                 /// Check for mutual exclusion conditions
                 let manager = ExclusivityManager.sharedInstance
-                let mutuallyExclusiveConditions = operation.conditions.filter { $0.isMutuallyExclusive }
+                let mutuallyExclusiveConditions = operation.conditions.filter { $0.mutuallyExclusive }
                 var previousMutuallyExclusiveOperations = Set<NSOperation>()
                 for condition in mutuallyExclusiveConditions {
                     let category = "\(condition.category)"
