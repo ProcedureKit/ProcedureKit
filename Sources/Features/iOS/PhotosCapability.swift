@@ -75,7 +75,7 @@ public class PhotosCapability: CapabilityType {
     /// - returns: the EKEntityType, the required type of the capability
     public let requirement: Void
 
-    internal lazy var registrar: PhotosCapabilityRegistrarType = PHPhotoLibrary()
+    internal lazy var registrar: PhotosCapabilityRegistrarType = PHPhotoLibrary.sharedPhotoLibrary()
 
     /**
      Initialize the capability. There is no requirement type
