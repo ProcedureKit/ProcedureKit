@@ -74,6 +74,50 @@ public class Condition: Operation, ConditionType, ResultOperationType {
     }
 }
 
+/**
+ Class which can be used to compose a Condition, it is designed to be subclassed.
+
+ This can be useful to automatically manage the dependency and automatic
+ injection of the composed condition result for evaluation inside your custom subclass.
+
+ - see: NegatedCondition
+ - see: SilentCondition
+ */
+public class ComposedCondition<C: Condition>: Condition, AutomaticInjectionOperationType {
+
+    /**
+     The composed condition.
+
+     - parameter condition: a the composed `Condition`
+     */
+    public let condition: C
+
+    /// Conformance to `AutomaticInjectionOperationType`
+    public var requirement: ConditionResult! = nil
+
+    /**
+     Initializer which receives a conditon which is to be negated.
+
+     - parameter [unnamed]: a nested `Condition` type.
+     */
+    public init(_ condition: C) {
+        self.condition = condition
+        super.init()
+        mutuallyExclusive = condition.mutuallyExclusive
+        name = condition.name
+        injectResultFromDependency(condition)
+    }
+
+    /// Override of public function
+    public override func evaluate(operation: Operation, completion: CompletionBlockType) {
+        guard let result = requirement else {
+            completion(.Failed(AutomaticInjectionError.RequirementNotSatisfied))
+            return
+        }
+        completion(result)
+    }
+}
+
 internal class WrappedOperationCondition: Condition {
 
     let condition: OperationCondition
