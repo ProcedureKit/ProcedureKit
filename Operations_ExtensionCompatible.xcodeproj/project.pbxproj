@@ -229,6 +229,8 @@
 		6584D25F1C6BF93900306EED /* RetryOperationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6584D24D1C6BF90E00306EED /* RetryOperationTests.swift */; };
 		6584D2601C6BF93A00306EED /* ResultInjectionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6584D24C1C6BF90E00306EED /* ResultInjectionTests.swift */; };
 		6584D2611C6BF93A00306EED /* RetryOperationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6584D24D1C6BF90E00306EED /* RetryOperationTests.swift */; };
+		65A74FC11CC59488008D7193 /* Condition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 653097A91CC4BFB200EC1431 /* Condition.swift */; };
+		65A74FC21CC59488008D7193 /* Condition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 653097A91CC4BFB200EC1431 /* Condition.swift */; };
 		65BB56DC1C70FAB100DF5211 /* ThreadSafety.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65BB56DB1C70FAB100DF5211 /* ThreadSafety.swift */; };
 		65BB56DD1C70FAB700DF5211 /* ThreadSafety.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65BB56DB1C70FAB100DF5211 /* ThreadSafety.swift */; };
 		65BB56DE1C70FAB800DF5211 /* ThreadSafety.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65BB56DB1C70FAB100DF5211 /* ThreadSafety.swift */; };
@@ -1088,6 +1090,7 @@
 				652619DF1C12012C00654091 /* Reachability.swift in Sources */,
 				652619941C11FF5200654091 /* BlockOperation.swift in Sources */,
 				652619DE1C12012C00654091 /* NetworkOperation.swift in Sources */,
+				65A74FC11CC59488008D7193 /* Condition.swift in Sources */,
 				652619951C11FF5200654091 /* ComposedOperation.swift in Sources */,
 				652619A51C11FF5200654091 /* TimeoutObserver.swift in Sources */,
 				652619961C11FF5200654091 /* DelayOperation.swift in Sources */,
@@ -1194,6 +1197,7 @@
 				652619E41C1201AF00654091 /* Capability.swift in Sources */,
 				653D40331CC26F5700893746 /* Profiler.swift in Sources */,
 				652619EF1C12020D00654091 /* Contacts.swift in Sources */,
+				65A74FC21CC59488008D7193 /* Condition.swift in Sources */,
 				652619A61C11FF5300654091 /* BlockCondition.swift in Sources */,
 				652619AE1C11FF5300654091 /* Logging.swift in Sources */,
 				652619A71C11FF5300654091 /* BlockObserver.swift in Sources */,
