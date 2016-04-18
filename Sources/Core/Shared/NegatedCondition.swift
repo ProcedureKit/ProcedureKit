@@ -17,72 +17,27 @@ public enum NegatedConditionError: ErrorType, Equatable {
     When the nested condition succeeds, the negated condition fails.
     The associated string is the name of the nested conditon.
     */
-    case ConditionSatisfied(String)
+    case ConditionSatisfied(String?)
 }
 
 /**
 A simple condition with negates the evaluation of
 a composed condition.
 */
-public struct NegatedCondition<Condition: OperationCondition>: OperationCondition {
+public class NegatedCondition<C: Condition>: ComposedCondition<C> {
 
-    /**
-    The composed condition.
-
-    - parameter condition: a type which conforms to `OperationCondition`
-    */
-    public let condition: Condition
-
-    /**
-    The name of the condition wraps the name of the composed
-    OperationCondition.
-
-    - parameter name: a String
-    */
-    public var name: String {
-        return "Not<\(condition.name)>"
+    /// Public override of initializer.
+    public override init(_ condition: C) {
+        super.init(condition)
+        name = condition.name.map { "Not<\($0)>" }
     }
 
-    /**
-    The mututally exclusivity parameter which wraps the
-    composed condition's isMutuallyExclusive property.
-
-    - parameter isMutuallyExclusive: a constant Bool, true.
-    */
-    public var isMutuallyExclusive: Bool {
-        return condition.isMutuallyExclusive
-    }
-
-    /**
-    Initializer which receives a conditon which is to be negated.
-
-    - parameter [unnamed]: a nested `Condition` type.
-    */
-    public init(_ condition: Condition) {
-        self.condition = condition
-    }
-
-    /**
-    The dependencies for a negated condition are the same as those of the
-    composed condition.
-
-    - parameter operation: the `Operation` which is getting evaluated.
-    */
-    public func dependencyForOperation(operation: Operation) -> NSOperation? {
-        return condition.dependencyForOperation(operation)
-    }
-
-    /**
-    The evaluation results are those of the composed condition but inverted.
-
-    - parameter operation: the `Operation` which is getting evaluated.
-    - parameter completion: a block which receives the `OperationConditionResult`.
-    */
-    public func evaluateForOperation(operation: Operation, completion: OperationConditionResult -> Void) {
-        condition.evaluateForOperation(operation) { [conditionName = condition.name] result in
-            switch result {
+    /// Override of public function
+    public override func evaluate(operation: Operation, completion: CompletionBlockType) {
+        super.evaluate(operation) { [name = self.condition.name] composedResult in
+            switch composedResult {
             case .Satisfied:
-                completion(.Failed(NegatedConditionError.ConditionSatisfied(conditionName)))
+                completion(.Failed(NegatedConditionError.ConditionSatisfied(name)))
             case .Failed(_):
                 completion(.Satisfied)
             }
