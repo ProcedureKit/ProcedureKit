@@ -67,7 +67,7 @@ struct TestCondition: OperationCondition {
     }
 }
 
-class TestConditionOperation: ConditionOperation {
+class TestConditionOperation: Condition {
 
     let evaluate: () throws -> Bool
 
