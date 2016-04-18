@@ -9,9 +9,11 @@
 import Foundation
 
 /**
-An `OperationCondition` which will be satisfied if the block returns true.
+A Condition which will be satisfied if the block returns true. The
+ block may throw an error, or return false, both of which are
+ intepretated as a condition failure.
 */
-public struct BlockCondition: OperationCondition {
+public class BlockCondition: Condition {
 
     /// The block type which returns a Bool.
     public typealias ConditionBlockType = () throws -> Bool
@@ -27,21 +29,7 @@ public struct BlockCondition: OperationCondition {
         case BlockConditionFailed
     }
 
-    /**
-    The name of the condition.
-
-    - parameter name: a constant String `Block Condition`.
-    */
-    public let name = "Block Condition"
-
-    /**
-    The mutual exclusivity of the condition, which is false.
-
-    - parameter isMutuallyExclusive: a constant Bool, false.
-    */
-    public let isMutuallyExclusive = false
-
-    let condition: ConditionBlockType
+    let block: ConditionBlockType
 
     /**
     Creates a `BlockCondition` with the supplied block.
@@ -60,13 +48,11 @@ public struct BlockCondition: OperationCondition {
 
     - parameter block: a `ConditionBlockType`.
     */
-    public init(block: ConditionBlockType) {
-        condition = block
-    }
-
-    /// Conforms to `OperationCondition`, but there are no dependencies, so it returns .None.
-    public func dependencyForOperation(operation: Operation) -> NSOperation? {
-        return .None
+    public init(name: String = "Block Condition", mutuallyExclusive: Bool = false, block: ConditionBlockType) {
+        self.block = block
+        super.init()
+        self.mutuallyExclusive = mutuallyExclusive
+        self.name = name
     }
 
     /**
@@ -77,7 +63,7 @@ public struct BlockCondition: OperationCondition {
     */
     public func evaluateForOperation(operation: Operation, completion: OperationConditionResult -> Void) {
         do {
-            let result = try condition()
+            let result = try block()
             completion(result ? .Satisfied : .Failed(Error.BlockConditionFailed))
         }
         catch {
@@ -90,4 +76,16 @@ extension BlockCondition.Error: Equatable { }
 
 public func == (_: BlockCondition.Error, _: BlockCondition.Error) -> Bool {
     return true // Only one case in the enum
+}
+
+public class TrueCondition: BlockCondition {
+    public init(name: String = "True Condition", mutuallyExclusive: Bool = false) {
+        super.init(name: name, mutuallyExclusive: mutuallyExclusive, block: { true })
+    }
+}
+
+public class FalseCondition: BlockCondition {
+    public init(name: String = "False Condition", mutuallyExclusive: Bool = false) {
+        super.init(name: name, mutuallyExclusive: mutuallyExclusive, block: { false })
+    }
 }
