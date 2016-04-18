@@ -1,13 +1,24 @@
+# 2.9.1
+
+1. [[OPR-282](https://github.com/danthorpe/Operations/pull/282)]: Fixes a bug accessing `PHPhotoLibrary` through `Capability.Photos`.
+2. [[OPR-285](https://github.com/danthorpe/Operations/pull/285)]: Removes CloudKit files from the watchOS target.
+
+This is a patch release to get these fixes released.
+
 # 2.9.0
+
 1. [[OPR-241](https://github.com/danthorpe/Operations/pull/241)]: Makes change for Xcode 7.3 and Swift 2.2.
 2. [[OPR-251](https://github.com/danthorpe/Operations/pull/252)]: Refactors how Capabilities work with their generic registrars.
 
 Got there in the end! Thanks everyone for helping out during the change to Swift 2.2 - by the time Swift 3.0 comes around, I’ll hopefully have a fully automated CI system in place for switching up toolchains/build.
 
 # 2.8.2
+
 1. [[OPR-250](https://github.com/danthorpe/Operations/pull/250)]: Thanks to [@felix-dumit](https://github.com/felix-dumit) for making the cancellation of `GroupOperation` more sensible and consistent. Essentially now the group will cancel after all of its children have cancelled.
 
 This should be the last bug release before v2.9.0 and Swift 2.2 is released.
+
+Also, before v2.10 is released, if you happen to use Operations framework in your app or team, and would agree to having a logo displayed in the README - please [get in touch](https://github.com/danthorpe/Operations/issues/new)!
 
 # 2.8.1
 
