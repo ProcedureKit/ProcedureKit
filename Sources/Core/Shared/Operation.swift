@@ -104,7 +104,7 @@ public class Operation: NSOperation {
     private var _observers = Protector([OperationObserverType]())
 
     internal private(set) var directDependencies = Set<NSOperation>()
-    internal private(set) var conditions = Set<ConditionOperation>()
+    internal private(set) var conditions = Set<Condition>()
 
     internal var indirectDependencies: Set<NSOperation> {
         return Set(conditions.flatMap { $0.directDependencies })
@@ -225,7 +225,7 @@ public class Operation: NSOperation {
         conditions.insert(operation)
     }
 
-    public func addCondition(condition: ConditionOperation) {
+    public func addCondition(condition: Condition) {
         assert(state < .Executing, "Cannot modify conditions after operation has begun executing, current state: \(state).")
         conditions.insert(condition)
     }

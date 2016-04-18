@@ -183,6 +183,7 @@
 		65261A6F1C12042E00654091 /* ReachabilityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652617981C11F61700654091 /* ReachabilityTests.swift */; };
 		65261A701C12042E00654091 /* ReachableOperationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652617991C11F61700654091 /* ReachableOperationTests.swift */; };
 		65261A741C12043200654091 /* ContactsOperationsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6526178C1C11F61700654091 /* ContactsOperationsTests.swift */; };
+		653097AA1CC4BFB200EC1431 /* Condition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 653097A91CC4BFB200EC1431 /* Condition.swift */; };
 		65356EB11C8B3B2C0029E8AF /* Generators.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65356EAF1C8B3B2C0029E8AF /* Generators.swift */; };
 		65356EB21C8B3B2C0029E8AF /* Repeatable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65356EB01C8B3B2C0029E8AF /* Repeatable.swift */; };
 		65356EB51C8B3B390029E8AF /* CloudKitInterface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65356EB31C8B3B390029E8AF /* CloudKitInterface.swift */; };
@@ -195,15 +196,12 @@
 		65356EBC1C8B3B9D0029E8AF /* CloudKitOperationExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65356EB41C8B3B390029E8AF /* CloudKitOperationExtensions.swift */; };
 		65356EBD1C8B3B9D0029E8AF /* CloudKitInterface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65356EB31C8B3B390029E8AF /* CloudKitInterface.swift */; };
 		65356EBE1C8B3B9D0029E8AF /* CloudKitOperationExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65356EB41C8B3B390029E8AF /* CloudKitOperationExtensions.swift */; };
-		653D402B1CC26F3600893746 /* ConditionOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 653D40291CC26F3600893746 /* ConditionOperation.swift */; };
 		653D402C1CC26F3600893746 /* Profiler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 653D402A1CC26F3600893746 /* Profiler.swift */; };
 		653D402F1CC26F4E00893746 /* ProfilerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 653D402D1CC26F4100893746 /* ProfilerTests.swift */; };
 		653D40301CC26F4F00893746 /* ProfilerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 653D402D1CC26F4100893746 /* ProfilerTests.swift */; };
 		653D40311CC26F5000893746 /* ProfilerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 653D402D1CC26F4100893746 /* ProfilerTests.swift */; };
 		653D40321CC26F5600893746 /* Profiler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 653D402A1CC26F3600893746 /* Profiler.swift */; };
 		653D40331CC26F5700893746 /* Profiler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 653D402A1CC26F3600893746 /* Profiler.swift */; };
-		653D40341CC26F5D00893746 /* ConditionOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 653D40291CC26F3600893746 /* ConditionOperation.swift */; };
-		653D40351CC26F5E00893746 /* ConditionOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 653D40291CC26F3600893746 /* ConditionOperation.swift */; };
 		6584D2381C6BF86200306EED /* FunctionalOperations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6584D2341C6BF86200306EED /* FunctionalOperations.swift */; };
 		6584D2391C6BF86200306EED /* RepeatedOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6584D2351C6BF86200306EED /* RepeatedOperation.swift */; };
 		6584D23A1C6BF86200306EED /* ResultInjection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6584D2361C6BF86200306EED /* ResultInjection.swift */; };
@@ -353,11 +351,11 @@
 		6526183E1C11F78800654091 /* Operations.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Operations.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		652618471C11F78800654091 /* OS X Extensions OperationsTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "OS X Extensions OperationsTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		652618551C11F7DA00654091 /* Extension Compatible.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "Extension Compatible.xcconfig"; sourceTree = "<group>"; };
+		653097A91CC4BFB200EC1431 /* Condition.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Condition.swift; sourceTree = "<group>"; };
 		65356EAF1C8B3B2C0029E8AF /* Generators.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Generators.swift; sourceTree = "<group>"; };
 		65356EB01C8B3B2C0029E8AF /* Repeatable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Repeatable.swift; sourceTree = "<group>"; };
 		65356EB31C8B3B390029E8AF /* CloudKitInterface.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CloudKitInterface.swift; sourceTree = "<group>"; };
 		65356EB41C8B3B390029E8AF /* CloudKitOperationExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CloudKitOperationExtensions.swift; sourceTree = "<group>"; };
-		653D40291CC26F3600893746 /* ConditionOperation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConditionOperation.swift; sourceTree = "<group>"; };
 		653D402A1CC26F3600893746 /* Profiler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Profiler.swift; sourceTree = "<group>"; };
 		653D402D1CC26F4100893746 /* ProfilerTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProfilerTests.swift; sourceTree = "<group>"; };
 		6584D2341C6BF86200306EED /* FunctionalOperations.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FunctionalOperations.swift; sourceTree = "<group>"; };
@@ -478,7 +476,7 @@
 				6526173B1C11F61700654091 /* BlockObserver.swift */,
 				6526173C1C11F61700654091 /* BlockOperation.swift */,
 				6526173D1C11F61700654091 /* ComposedOperation.swift */,
-				653D40291CC26F3600893746 /* ConditionOperation.swift */,
+				653097A91CC4BFB200EC1431 /* Condition.swift */,
 				6526173E1C11F61700654091 /* DelayOperation.swift */,
 				6526173F1C11F61700654091 /* ExclusivityManager.swift */,
 				6584D2341C6BF86200306EED /* FunctionalOperations.swift */,
@@ -992,6 +990,7 @@
 				652619801C11FF5200654091 /* BlockOperation.swift in Sources */,
 				6584D2381C6BF86200306EED /* FunctionalOperations.swift in Sources */,
 				652619CA1C12003F00654091 /* CloudKitOperation.swift in Sources */,
+				653097AA1CC4BFB200EC1431 /* Condition.swift in Sources */,
 				652619811C11FF5200654091 /* ComposedOperation.swift in Sources */,
 				652619D11C12004900654091 /* ContactsCondition.swift in Sources */,
 				652619911C11FF5200654091 /* TimeoutObserver.swift in Sources */,
@@ -1014,7 +1013,6 @@
 				652619D31C12004C00654091 /* AddressBook.swift in Sources */,
 				652619881C11FF5200654091 /* MutuallyExclusive.swift in Sources */,
 				652619871C11FF5200654091 /* LoggingObserver.swift in Sources */,
-				653D402B1CC26F3600893746 /* ConditionOperation.swift in Sources */,
 				652619851C11FF5200654091 /* GroupOperation.swift in Sources */,
 				6526198D1C11FF5200654091 /* OperationObserver.swift in Sources */,
 				6526197E1C11FF5200654091 /* BlockCondition.swift in Sources */,
@@ -1107,7 +1105,6 @@
 				6526199C1C11FF5200654091 /* MutuallyExclusive.swift in Sources */,
 				652619DD1C12012C00654091 /* CloudKitOperation.swift in Sources */,
 				6526199B1C11FF5200654091 /* LoggingObserver.swift in Sources */,
-				653D40341CC26F5D00893746 /* ConditionOperation.swift in Sources */,
 				652619991C11FF5200654091 /* GroupOperation.swift in Sources */,
 				652619A11C11FF5200654091 /* OperationObserver.swift in Sources */,
 				652619E01C12012C00654091 /* ReachabilityCondition.swift in Sources */,
@@ -1183,7 +1180,6 @@
 				65356EBE1C8B3B9D0029E8AF /* CloudKitOperationExtensions.swift in Sources */,
 				65356EBA1C8B3B910029E8AF /* Repeatable.swift in Sources */,
 				652619EA1C1201AF00654091 /* ReachableOperation.swift in Sources */,
-				653D40351CC26F5E00893746 /* ConditionOperation.swift in Sources */,
 				652619B21C11FF5300654091 /* NoFailedDependenciesCondition.swift in Sources */,
 				652619AC1C11FF5300654091 /* GatedOperation.swift in Sources */,
 				652619AB1C11FF5300654091 /* ExclusivityManager.swift in Sources */,

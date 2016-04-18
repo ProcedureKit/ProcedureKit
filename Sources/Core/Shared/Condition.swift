@@ -26,7 +26,7 @@ import Foundation
  failure by passing an ConditionResult enum back.
 
  */
-public class ConditionOperation: Operation {
+public class Condition: Operation {
     public typealias CompletionBlockType = ConditionResult -> Void
 
     public var isMutuallyExclusive: Bool = false
@@ -65,7 +65,7 @@ public class ConditionOperation: Operation {
     }
 }
 
-internal class WrappedOperationCondition: ConditionOperation {
+internal class WrappedOperationCondition: Condition {
 
     let condition: OperationCondition
 
@@ -87,7 +87,7 @@ internal class WrappedOperationCondition: ConditionOperation {
 
 extension Array where Element: NSOperation {
 
-    internal var conditions: [ConditionOperation] {
-        return flatMap { $0 as? ConditionOperation }
+    internal var conditions: [Condition] {
+        return flatMap { $0 as? Condition }
     }
 }
