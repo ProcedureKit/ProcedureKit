@@ -138,6 +138,7 @@ class OperationTests: XCTestCase {
     }
 
     override func tearDown() {
+        queue.cancelAllOperations()
         queue = nil
         delegate = nil
         ExclusivityManager.sharedInstance.__tearDownForUnitTesting()
