@@ -18,12 +18,12 @@ class MutualExclusiveTests: OperationTests {
 
     func test__alert_presentation_is_mutually_exclusive() {
         let condition = AlertPresentation()
-        XCTAssertTrue(condition.isMutuallyExclusive)
+        XCTAssertTrue(condition.mutuallyExclusive)
     }
 
     func test__alert_presentation_evaluation_satisfied() {
         let condition = AlertPresentation()
-        condition.evaluateForOperation(TestOperation()) { result in
+        condition.evaluate(TestOperation()) { result in
             switch result {
             case .Satisfied:
                 return XCTAssertTrue(true)
@@ -41,8 +41,8 @@ class MutualExclusiveTests: OperationTests {
             text = "\(text)\nA long time ago"
         }
         operation1.name = "Operation 1"
-        let condition1A = MutuallyExclusive<BlockOperation>();
-        let condition1B = MutuallyExclusive<TestOperation>();
+        let condition1A = MutuallyExclusive<BlockOperation>()
+        let condition1B = MutuallyExclusive<TestOperation>()
         operation1.addCondition(condition1A)
         operation1.addCondition(condition1B)
 
@@ -51,8 +51,8 @@ class MutualExclusiveTests: OperationTests {
             text = "\(text), in a galaxy far, far away."
         }
         operation2.name = "Operation 2"
-        let condition2A = MutuallyExclusive<BlockOperation>();
-        let condition2B = MutuallyExclusive<TestOperation>();
+        let condition2A = MutuallyExclusive<BlockOperation>()
+        let condition2B = MutuallyExclusive<TestOperation>()
         operation2.addCondition(condition2A)
         operation2.addCondition(condition2B)
 

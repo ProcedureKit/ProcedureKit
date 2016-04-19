@@ -21,13 +21,13 @@ class StressTest: OperationTests {
             operation.addCompletionBlock { expectation.fulfill() }
             self.queue.addOperation(operation)
         }
-        waitForExpectationsWithTimeout(10, handler: nil)
+        waitForExpectationsWithTimeout(5, handler: nil)
     }
 
     func test__conditions() {
         let operation = TestOperation()
         (0..<batchSize).forEach { i in
-            operation.addCondition(BlockCondition { true })
+            operation.addCondition(TrueCondition())
         }
         addCompletionBlockToTestOperation(operation)
         waitForOperation(operation)

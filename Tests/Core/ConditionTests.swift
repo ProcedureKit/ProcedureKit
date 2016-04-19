@@ -12,7 +12,8 @@ import XCTest
 class ConditionTests: OperationTests {
     
     func test__single_condition_which_is_satisfied() {
-
+        let operation = TestOperation()
+        operation.addCondition(TrueCondition())
     }
     
     func test__single_condition_which_fails() {

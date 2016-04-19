@@ -12,33 +12,17 @@ import Foundation
 A generic condition for describing operations that
 cannot be allowed to execute concurrently.
 */
-public struct MutuallyExclusive<T>: OperationCondition {
-
-    /**
-    The name of the condition wraps the name of the generic
-    OperationCondition.
-
-    - parameter name: a String
-    */
-    public var name: String = "MutuallyExclusive<\(T.self)>"
-
-    /**
-    The mututally exclusivity parameter which is always true.
-
-    - parameter isMutuallyExclusive: a constant Bool, true.
-    */
-    public let isMutuallyExclusive = true
+public final class MutuallyExclusive<T>: Condition {
 
     /// Public constructor
-    public init() { }
-
-    /// Conforms to `OperationCondition`, but there are no dependencies, so it returns .None.
-    public func dependencyForOperation(operation: Operation) -> NSOperation? {
-        return .None
+    public override init() {
+        super.init()
+        name = "MutuallyExclusive<\(T.self)>"
+        mutuallyExclusive = true
     }
 
-    /// Conforms to `OperationCondition`, but there is no evaluation, so it just completes with `.Satisfied`.
-    public func evaluateForOperation(operation: Operation, completion: OperationConditionResult -> Void) {
+    /// Required public override, but there is no evaluation, so it just completes with `.Satisfied`.
+    public override func evaluate(operation: Operation, completion: CompletionBlockType) {
         completion(.Satisfied)
     }
 }

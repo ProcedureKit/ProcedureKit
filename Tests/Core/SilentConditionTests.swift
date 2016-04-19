@@ -12,8 +12,7 @@ import XCTest
 class SilentConditionTests: XCTestCase {
 
     func test__silent_condition_composes_name_correctly() {
-        let condition = BlockCondition { false }
-        let silent = SilentCondition(condition)
-        XCTAssertEqual(silent.name, "Silent<Block Condition>")
+        let silent = SilentCondition(FalseCondition())
+        XCTAssertEqual(silent.name, "Silent<False Condition>")
     }
 }

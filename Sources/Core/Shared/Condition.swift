@@ -64,7 +64,7 @@ public class Condition: Operation, ConditionType, ResultOperationType {
      - parameter completion: a completion block which receives a ConditionResult argument.
     */
     public func evaluate(operation: Operation, completion: CompletionBlockType) {
-        assertionFailure("ConditionOperation must be subclasses, and \(#function) overridden.")
+        assertionFailure("ConditionOperation must be subclassed, and \(#function) overridden.")
         completion(.Failed(OperationError.ConditionFailed))
     }
 
@@ -95,6 +95,12 @@ public class ComposedCondition<C: Condition>: Condition, AutomaticInjectionOpera
     /// Conformance to `AutomaticInjectionOperationType`
     public var requirement: ConditionResult! = nil
 
+    override var operation: Operation? {
+        didSet {
+            condition.operation = operation
+        }
+    }
+
     /**
      Initializer which receives a conditon which is to be negated.
 
@@ -105,7 +111,9 @@ public class ComposedCondition<C: Condition>: Condition, AutomaticInjectionOpera
         super.init()
         mutuallyExclusive = condition.mutuallyExclusive
         name = condition.name
-        injectResultFromDependency(condition)
+        injectResultFromDependency(condition) { operation, dependency, _ in
+            operation.requirement = dependency.result
+        }
     }
 
     /// Override of public function

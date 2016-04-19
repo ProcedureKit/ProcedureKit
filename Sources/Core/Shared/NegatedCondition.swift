@@ -24,7 +24,7 @@ public enum NegatedConditionError: ErrorType, Equatable {
 A simple condition with negates the evaluation of
 a composed condition.
 */
-public class NegatedCondition<C: Condition>: ComposedCondition<C> {
+public final class NegatedCondition<C: Condition>: ComposedCondition<C> {
 
     /// Public override of initializer.
     public override init(_ condition: C) {

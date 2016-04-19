@@ -635,7 +635,24 @@ extension NSOperation {
     - parameter dependencies: and array of `NSOperation` instances.
     */
     public func addDependencies<S where S: SequenceType, S.Generator.Element: NSOperation>(dependencies: S) {
+        precondition(!executing && !finished, "Cannot modify the dependencies after the operation has started executing.")
         dependencies.forEach(addDependency)
+    }
+
+    /**
+     Remove multiple depdendencies from the operation. Will remove each
+     dependency in turn.
+
+     - parameter dependencies: and array of `NSOperation` instances.
+     */
+    public func removeDependencies<S where S: SequenceType, S.Generator.Element: NSOperation>(dependencies: S) {
+        precondition(!executing && !finished, "Cannot modify the dependencies after the operation has started executing.")
+        dependencies.forEach(addDependency)
+    }
+
+    /// Removes all the depdendencies from the operation.
+    public func removeDependencies() {
+        removeDependencies(dependencies)
     }
 
     internal func setQualityOfServiceFromUserIntent(userIntent: Operation.UserIntent) {

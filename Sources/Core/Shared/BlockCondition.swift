@@ -55,13 +55,7 @@ public class BlockCondition: Condition {
         self.name = name
     }
 
-    /**
-    Evaluates the condition, it will execute the block.
-
-    - parameter operation: the attached `Operation`
-    - parameter completion: the evaulation completion block, it is given the result.
-    */
-    public func evaluateForOperation(operation: Operation, completion: OperationConditionResult -> Void) {
+    public override func evaluate(operation: Operation, completion: CompletionBlockType) {
         do {
             let result = try block()
             completion(result ? .Satisfied : .Failed(Error.BlockConditionFailed))
@@ -79,12 +73,14 @@ public func == (_: BlockCondition.Error, _: BlockCondition.Error) -> Bool {
 }
 
 public class TrueCondition: BlockCondition {
+
     public init(name: String = "True Condition", mutuallyExclusive: Bool = false) {
         super.init(name: name, mutuallyExclusive: mutuallyExclusive, block: { true })
     }
 }
 
 public class FalseCondition: BlockCondition {
+
     public init(name: String = "False Condition", mutuallyExclusive: Bool = false) {
         super.init(name: name, mutuallyExclusive: mutuallyExclusive, block: { false })
     }
