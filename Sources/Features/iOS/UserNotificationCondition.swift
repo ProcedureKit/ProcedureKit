@@ -44,7 +44,7 @@ private let NotificationSettingsKey = "NotificationSettingsKey"
         }
 
 */
-public struct UserNotificationCondition: OperationCondition {
+public final class UserNotificationCondition: Condition {
 
     public enum Behavior {
         // Merge the new settings with the current settings
@@ -64,14 +64,11 @@ public struct UserNotificationCondition: OperationCondition {
             .postNotificationName(DidRegisterSettingsNotificationName, object: nil, userInfo: [NotificationSettingsKey: notificationSettings] )
     }
 
-    public let name = "UserNotification"
-    public let isMutuallyExclusive = false
-
     let settings: UIUserNotificationSettings
     let behavior: Behavior
     let registrar: UserNotificationRegistrarType
 
-    public init(settings: UIUserNotificationSettings, behavior: Behavior = .Merge) {
+    public convenience init(settings: UIUserNotificationSettings, behavior: Behavior = .Merge) {
         self.init(settings: settings, behavior: behavior, registrar: UIApplication.sharedApplication())
     }
 
@@ -79,13 +76,13 @@ public struct UserNotificationCondition: OperationCondition {
         self.settings = settings
         self.behavior = behavior
         self.registrar = registrar
+        super.init()
+        name = "UserNotification"
+        mutuallyExclusive = false
+        addDependency(UserNotificationPermissionOperation(settings: settings, behavior: behavior, registrar: registrar))
     }
 
-    public func dependencyForOperation(operation: Operation) -> NSOperation? {
-        return UserNotificationPermissionOperation(settings: settings, behavior: behavior, registrar: registrar)
-    }
-
-    public func evaluateForOperation(operation: Operation, completion: OperationConditionResult -> Void) {
+    public override func evaluate(operation: Operation, completion: OperationConditionResult -> Void) {
         if let current = registrar.opr_currentUserNotificationSettings() {
 
             switch (current, settings) {
