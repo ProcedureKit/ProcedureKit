@@ -13,7 +13,6 @@ public protocol ConditionType {
     var mutuallyExclusive: Bool { get set }
 
     func evaluate(operation: Operation, completion: ConditionResult -> Void)
-
 }
 
 internal extension ConditionType {
@@ -91,6 +90,10 @@ public class ComposedCondition<C: Condition>: Condition, AutomaticInjectionOpera
      - parameter condition: a the composed `Condition`
      */
     public let condition: C
+
+    override var directDependencies: Set<NSOperation> {
+        return super.directDependencies.union(condition.directDependencies)
+    }
 
     /// Conformance to `AutomaticInjectionOperationType`
     public var requirement: ConditionResult! = nil
