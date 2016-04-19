@@ -18,7 +18,7 @@ extension UIApplication: RemoteNotificationRegistrarType {
     }
 }
 
-public struct RemoteNotificationCondition: OperationCondition {
+public class RemoteNotificationCondition: Condition {
 
     public enum Error: ErrorType {
         case ReceivedError(NSError)
@@ -38,29 +38,25 @@ public struct RemoteNotificationCondition: OperationCondition {
             .postNotificationName(RemoteNotificationName, object: nil, userInfo: [RemoteNotificationErrorKey: error])
     }
 
-    public let name = "Remote Notification"
-    public let isMutuallyExclusive = false
-
-    let registrar: RemoteNotificationRegistrarType
+    internal var registrar: RemoteNotificationRegistrarType = UIApplication.sharedApplication() {
+        didSet {
+            removeDependencies()
+            addDependency(RemoteNotificationsRegistration(registrar: registrar) { _ in })
+        }
+    }
 
     var queue: OperationQueue {
         return RemoteNotificationCondition.queue
     }
 
-    public init() {
-        self.init(registrar: UIApplication.sharedApplication())
+    public override init() {
+        super.init()
+        name = "Remote Notification"
+        mutuallyExclusive = false
+        addDependency(RemoteNotificationsRegistration(registrar: registrar) { _ in })
     }
 
-    init(registrar: RemoteNotificationRegistrarType) {
-        self.registrar = registrar
-    }
-
-
-    public func dependencyForOperation(operation: Operation) -> NSOperation? {
-        return RemoteNotificationsRegistration(registrar: registrar) { _ in }
-    }
-
-    public func evaluateForOperation(operation: Operation, completion: OperationConditionResult -> Void) {
+    public override func evaluate(operation: Operation, completion: OperationConditionResult -> Void) {
         let operation = RemoteNotificationsRegistration(registrar: registrar) { result in
             switch result {
             case .Token(_):
