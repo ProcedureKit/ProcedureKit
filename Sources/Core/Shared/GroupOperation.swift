@@ -54,7 +54,7 @@ public class GroupOperation: Operation {
         userIntent = operations.userIntent
     }
 
-    /// Convenience intiializer for direct usage without subclassing.
+    /// Convenience initializer for direct usage without subclassing.
     public convenience init(operations: NSOperation...) {
         self.init(operations: operations)
     }
