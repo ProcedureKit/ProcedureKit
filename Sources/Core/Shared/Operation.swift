@@ -647,7 +647,7 @@ extension NSOperation {
      */
     public func removeDependencies<S where S: SequenceType, S.Generator.Element: NSOperation>(dependencies: S) {
         precondition(!executing && !finished, "Cannot modify the dependencies after the operation has started executing.")
-        dependencies.forEach(addDependency)
+        dependencies.forEach(removeDependency)
     }
 
     /// Removes all the depdendencies from the operation.
