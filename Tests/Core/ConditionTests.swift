@@ -40,16 +40,19 @@ class ConditionTests: OperationTests {
             XCTAssertTrue(dependency2.finished)
         }
         conditionDependency1.name = "Condition 1 Dependency"
-        let condition1 = TestCondition(name: "Condition 1", isMutuallyExclusive: false, dependency: conditionDependency1) { true }
-        
+        let condition1 = TrueCondition(name: "Condition 1")
+        condition1.addDependency(conditionDependency1)
+
+
         let conditionDependency2 = BlockOperation {
             XCTAssertTrue(dependency1.finished)
             XCTAssertTrue(dependency2.finished)
         }
         conditionDependency2.name = "Condition 2 Dependency"
         
-        let condition2 = TestCondition(name: "Condition 2", isMutuallyExclusive: false, dependency: conditionDependency2) { true }
-        
+        let condition2 = TrueCondition(name: "Condition 2")
+        condition2.addDependency(conditionDependency2)
+
         let operation = TestOperation()
         operation.addDependency(dependency1)
         operation.addDependency(dependency2)
@@ -72,9 +75,10 @@ class ConditionTests: OperationTests {
         
         let dependency1 = TestOperation()
         let dependency2 = TestOperation()
-        let condition1 = TestCondition(name: "Condition 1", isMutuallyExclusive: false, dependency: TestOperation()) { true }
-        let condition2 = TestCondition(name: "Condition 2", isMutuallyExclusive: false, dependency: TestOperation()) { true }
-        
+        let condition1 = TrueCondition(name: "Condition 1")
+        condition1.addDependency(TestOperation())
+        let condition2 = TrueCondition(name: "Condition 2")
+        condition2.addDependency(TestOperation())
         
         let operation = TestOperation()
         operation.addDependency(dependency1)

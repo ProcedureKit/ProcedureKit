@@ -216,6 +216,8 @@ public class Operation: NSOperation {
      to a queue, or is waiting on dependencies.
      - parameter condition: type conforming to protocol `OperationCondition`.
      */
+    @available(iOS, deprecated=8, message="Refactor OperationCondition types as Condition subclasses.")
+    @available(OSX, deprecated=10.10, message="Refactor OperationCondition types as Condition subclasses.")
     public func addCondition(condition: OperationCondition) {
         assert(state < .Executing, "Cannot modify conditions after operation has begun executing, current state: \(state).")
         let operation = WrappedOperationCondition(condition)

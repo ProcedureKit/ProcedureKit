@@ -66,7 +66,6 @@ class MutualExclusiveTests: OperationTests {
 
     func test__condition_has_dependency_executed_first() {
         var text = "Star Wars"
-        LogManager.severity = .Notice
 
         let conditionDependency1 = BlockOperation {
             XCTAssertEqual(text, "Star Wars")
@@ -74,7 +73,8 @@ class MutualExclusiveTests: OperationTests {
         }
         conditionDependency1.name = "Condition 1 Dependency"
 
-        let condition1 = TestCondition(name: "Condition 1", isMutuallyExclusive: true, dependency: conditionDependency1) { true }
+        let condition1 = TrueCondition(name: "Condition 1", mutuallyExclusive: true)
+        condition1.addDependency(conditionDependency1)
 
         let operation1 = TestOperation()
         operation1.name = "Operation 1"
@@ -90,7 +90,8 @@ class MutualExclusiveTests: OperationTests {
         }
         conditionDependency2.name = "Condition 2 Dependency"
 
-        let condition2 = TestCondition(name: "Condition 2", isMutuallyExclusive: true, dependency: conditionDependency2) { true }
+        let condition2 = TrueCondition(name: "Condition 2", mutuallyExclusive: true)
+        condition2.addDependency(conditionDependency2)
 
         let operation2 = TestOperation()
         operation2.addCondition(condition2)
@@ -107,8 +108,6 @@ class MutualExclusiveTests: OperationTests {
         waitForExpectationsWithTimeout(3, handler: nil)
 
         XCTAssertEqual(text, "Star Wars\nA long time ago, in a galaxy far, far away.")
-
-        LogManager.severity = .Warning
     }
 
     func test__mutually_exclusive_operations_can_be_executed() {
