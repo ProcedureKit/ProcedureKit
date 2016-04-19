@@ -254,13 +254,7 @@ public enum CapabilityError<Capability: CapabilityType>: ErrorType {
  which means that potentially the user will be prompted to grant
  authorization. Suppress this from happening with SilentCondition.
 */
-public struct AuthorizedFor<Capability: CapabilityType>: OperationCondition {
-
-    /// - returns: a String, the name of the condition
-    public let name: String
-
-    /// - returns: false, is not mutually exclusive
-    public let isMutuallyExclusive = false
+public class AuthorizedFor<Capability: CapabilityType>: Condition {
 
     let capability: Capability
 
@@ -283,28 +277,26 @@ public struct AuthorizedFor<Capability: CapabilityType>: OperationCondition {
     */
     public init(_ capability: Capability) {
         self.capability = capability
-        self.name = capability.name
-    }
-
-    /// Returns an Authorize operation as a dependency
-    public func dependencyForOperation(operation: Operation) -> NSOperation? {
-        return Authorize(capability)
+        super.init()
+        name = capability.name
+        mutuallyExclusive = false
+        addDependency(Authorize(capability))
     }
 
     /// Evaluated the condition
-    public func evaluateForOperation(operation: Operation, completion: OperationConditionResult -> Void) {
+    public override func evaluate(operation: Operation, completion: OperationConditionResult -> Void) {
 
-        if !capability.isAvailable() {
+        guard capability.isAvailable() else {
             completion(.Failed(CapabilityError<Capability>.NotAvailable))
+            return
         }
-        else {
-            capability.authorizationStatus { [requirement = self.capability.requirement] status in
-                if status.isRequirementMet(requirement) {
-                    completion(.Satisfied)
-                }
-                else {
-                    completion(.Failed(CapabilityError<Capability>.AuthorizationNotGranted((status, requirement))))
-                }
+
+        capability.authorizationStatus { [requirement = self.capability.requirement] status in
+            if status.isRequirementMet(requirement) {
+                completion(.Satisfied)
+            }
+            else {
+                completion(.Failed(CapabilityError<Capability>.AuthorizationNotGranted((status, requirement))))
             }
         }
     }
