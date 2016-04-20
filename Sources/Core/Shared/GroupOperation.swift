@@ -61,19 +61,19 @@ public class GroupOperation: Operation {
 
     /// Override of public method
     public override func cancel() {
+        super.cancel()
         queue.suspended = false
         queue.cancelAllOperations()
         operations.forEach { $0.cancel() }
-        super.cancel()
     }
 
     /// Override of public method
     public override func cancelWithErrors(errors: [ErrorType]) {
+        super.cancelWithErrors(errors)
         queue.suspended = false
         let (nsops, ops) = operations.splitNSOperationsAndOperations
         nsops.forEach { $0.cancel() }
         ops.forEach { $0.cancelWithError(OperationError.ParentOperationCancelledWithErrors(errors)) }
-        super.cancelWithErrors(errors)
     }
 
     /**
