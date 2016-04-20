@@ -126,7 +126,7 @@ public class Operation: NSOperation {
         willSet {
             willChangeValueForKey("Cancelled")
             if !_cancelled && newValue {
-                willCancelObservers.forEach { $0.willCancelOperation(self) }
+                willCancelObservers.forEach { $0.willCancelOperation(self, errors: self.errors) }
             }
         }
         didSet {

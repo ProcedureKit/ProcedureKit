@@ -51,7 +51,7 @@ public typealias StartedObserver = WillExecuteObserver
  closure when the operation cancels.
  */
 public struct WillCancelObserver: OperationWillCancelObserver {
-    public typealias BlockType = (operation: Operation) -> Void
+    public typealias BlockType = (operation: Operation, errors: [ErrorType]) -> Void
 
     private let block: BlockType
 
@@ -69,8 +69,8 @@ public struct WillCancelObserver: OperationWillCancelObserver {
     }
 
     /// Conforms to `OperationWillCancelObserver`, executes the block
-    public func willCancelOperation(operation: Operation) {
-        block(operation: operation)
+    public func willCancelOperation(operation: Operation, errors: [ErrorType]) {
+        block(operation: operation, errors: errors)
     }
 
     /// Base OperationObserverType method
@@ -269,8 +269,8 @@ public struct BlockObserver: OperationObserver {
     }
 
     /// Conforms to `OperationWillCancelObserver`
-    public func willCancelOperation(operation: Operation) {
-        willCancel?.willCancelOperation(operation)
+    public func willCancelOperation(operation: Operation, errors: [ErrorType]) {
+        willCancel?.willCancelOperation(operation, errors: errors)
     }
 
     /// Conforms to `OperationDidCancelObserver`

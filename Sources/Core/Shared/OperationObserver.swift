@@ -79,7 +79,7 @@ public protocol OperationWillCancelObserver: OperationObserverType {
 
      - parameter operation: the observed `Operation`.
      */
-    func willCancelOperation(operation: Operation)
+    func willCancelOperation(operation: Operation, errors: [ErrorType])
 }
 
 
