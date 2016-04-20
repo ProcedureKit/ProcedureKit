@@ -29,7 +29,7 @@ public class URLSessionTaskOperation: Operation {
         assert(task.state == .Suspended, "NSURLSessionTask must be suspended, not \(task.state)")
         self.task = task
         super.init()
-        addObserver(CancelledObserver { _ in
+        addObserver(DidCancelObserver { _ in
             task.cancel()
         })
     }

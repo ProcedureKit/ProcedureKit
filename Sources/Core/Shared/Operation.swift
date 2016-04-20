@@ -125,6 +125,9 @@ public class Operation: NSOperation {
     private var _cancelled = false {
         willSet {
             willChangeValueForKey("Cancelled")
+            if !_cancelled && newValue {
+                willCancelObservers.forEach { $0.willCancelOperation(self) }
+            }
         }
         didSet {
             didChangeValueForKey("Cancelled")
@@ -293,9 +296,7 @@ public class Operation: NSOperation {
 
     public override func cancel() {
         if !finished {
-
             log.verbose("Did cancel.")
-
             _cancelled = true
 
             if state > .Ready {
@@ -490,8 +491,12 @@ public extension Operation {
         }
     }
 
-    internal var didStartObservers: [OperationDidStartObserver] {
-        return observers.flatMap { $0 as? OperationDidStartObserver }
+    internal var willExecuteObservers: [OperationWillExecuteObserver] {
+        return observers.flatMap { $0 as? OperationWillExecuteObserver }
+    }
+
+    internal var willCancelObservers: [OperationWillCancelObserver] {
+        return observers.flatMap { $0 as? OperationWillCancelObserver }
     }
 
     internal var didCancelObservers: [OperationDidCancelObserver] {
@@ -532,15 +537,15 @@ public extension Operation {
     final override func main() {
         assert(state == .Ready, "This operation must be performed on an operation queue, current state: \(state).")
 
-        if _internalErrors.isEmpty && !cancelled {
-            state = .Executing
-            log.verbose("Will Execute")
-            didStartObservers.forEach { $0.didStartOperation(self) }
-            execute()
-        }
-        else {
+        guard _internalErrors.isEmpty && !cancelled else {
             finish()
+            return
         }
+
+        willExecuteObservers.forEach { $0.willExecuteOperation(self) }
+        state = .Executing
+        log.verbose("Will Execute")
+        execute()
     }
 
     /**

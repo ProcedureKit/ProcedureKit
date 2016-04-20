@@ -289,7 +289,7 @@ class ReverseGeocodeOperationTests: LocationOperationTests {
 
         let operation = _ReverseGeocodeOperation(geocoder: geocoder, location: location, completion: { _ in })
 
-        operation.addObserver(StartedObserver { op in
+        operation.addObserver(WillExecuteObserver { op in
             op.cancel()
         })
 

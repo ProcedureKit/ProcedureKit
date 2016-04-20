@@ -197,7 +197,7 @@ class OperationProfilerTests: OperationTests {
 
     func test__profile_simple_operation_which_cancels() {
         let operation = TestOperation(delay: 1.0)
-        operation.addObserver(StartedObserver { op in
+        operation.addObserver(WillExecuteObserver { op in
             op.cancel()
         })
         operation.addObserver(profiler)

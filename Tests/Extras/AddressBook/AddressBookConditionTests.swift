@@ -78,7 +78,7 @@ class AddressBookOperationTests: OperationTests {
         var didSucceed = false
         let operation = AddressBookOperation(registrar: registrar)
         operation.addObserver(BlockObserver(
-            didStart: { _ in
+            willExecute: { _ in
                 didStart = true
             },
             didFinish: { (_, errors) in
@@ -106,7 +106,7 @@ class AddressBookOperationTests: OperationTests {
 
         let operation = AddressBookOperation(registrar: registrar)
         operation.addObserver(BlockObserver(
-            didStart: { _ in
+            willExecute: { _ in
                 didStart = true
             },
             didFinish: { (_, errors) in
