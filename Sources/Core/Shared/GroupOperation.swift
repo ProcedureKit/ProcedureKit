@@ -52,28 +52,24 @@ public class GroupOperation: Operation {
         queue.suspended = true
         queue.delegate = self
         userIntent = operations.userIntent
+        addObserver(WillCancelObserver { [unowned self] operation, errors in
+            if operation === self {
+                self.queue.suspended = false
+                if errors.isEmpty {
+                    self.operations.forEach { $0.cancel() }
+                }
+                else {
+                    let (nsops, ops) = self.operations.splitNSOperationsAndOperations
+                    nsops.forEach { $0.cancel() }
+                    ops.forEach { $0.cancelWithError(OperationError.ParentOperationCancelledWithErrors(errors)) }
+                }
+            }
+        })
     }
 
     /// Convenience initializer for direct usage without subclassing.
     public convenience init(operations: NSOperation...) {
         self.init(operations: operations)
-    }
-
-    /// Override of public method
-    public override func cancel() {
-        super.cancel()
-        queue.suspended = false
-        queue.cancelAllOperations()
-        operations.forEach { $0.cancel() }
-    }
-
-    /// Override of public method
-    public override func cancelWithErrors(errors: [ErrorType]) {
-        super.cancelWithErrors(errors)
-        queue.suspended = false
-        let (nsops, ops) = operations.splitNSOperationsAndOperations
-        nsops.forEach { $0.cancel() }
-        ops.forEach { $0.cancelWithError(OperationError.ParentOperationCancelledWithErrors(errors)) }
     }
 
     /**
