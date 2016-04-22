@@ -181,10 +181,8 @@ class GroupOperationTests: OperationTests {
         }
         group.addObserver(observer)
         
-        addCompletionBlockToTestOperation(group)
-        runOperation(group)
-        waitForExpectationsWithTimeout(3, handler: nil)
-        
+        waitForOperation(group)
+
         guard let (observedGroup, observedChild) = blockCalledWith else {
             XCTFail("Observer not called"); return
         }

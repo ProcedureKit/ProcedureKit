@@ -22,8 +22,10 @@ operations.
 public class GroupOperation: Operation {
 
     private let finishingOperation = NSBlockOperation { }
-    private let queue = OperationQueue()
     private var _aggregateErrors = Protector(Array<ErrorType>())
+
+    /// - returns: the OperationQueue the group runs operations on.
+    public let queue = OperationQueue()
 
     /// - returns: the operations which have been added to the queue
     public private(set) var operations: [NSOperation]
@@ -78,7 +80,7 @@ public class GroupOperation: Operation {
      starting the queue, and adding the finishing operation.
     */
     public override func execute() {
-        addOperations(operations)
+        addOperations(operations.filter { !self.queue.operations.contains($0) })
         queue.addOperation(finishingOperation)
         queue.suspended = false
     }
