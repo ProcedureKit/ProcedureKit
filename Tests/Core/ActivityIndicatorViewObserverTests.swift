@@ -83,8 +83,8 @@ class ActivityIndicatorViewObserverTests: OperationTests {
         let expectation = expectationWithDescription("Test: \(#function)")
 
         operation.addCompletionBlock {
-            // ActivityIndicatorViewObserver will marshalls its invocation of the indicator's `stopAnimating` method
-            // onto the main queue. 
+            // ActivityIndicatorViewObserver will marshall its invocation of 
+            // the indicator's `stopAnimating` method onto the main queue.
             // As such, we need to ensure we don't fulfill this test's expectations
             // until the run loop has had the opportunity to run one additional time.
             dispatch_async(Queue.Main.queue) {
