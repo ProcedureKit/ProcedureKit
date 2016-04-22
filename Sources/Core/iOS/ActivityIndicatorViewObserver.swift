@@ -8,7 +8,13 @@
 
 import UIKit
 
-public protocol ActivityIndicatorViewAnimationInterface {
+/**
+ Conforming types are compatible with `ActivityIndicatorViewObserver`.
+ Its two methods are modeled after `UIActivityIndicatorView`.
+
+ As a convenience, Operations extends `UIActivityIndicatorView` to declare conformance.
+ */
+public protocol ActivityIndicatorViewAnimationInterface: class {
     func startAnimating()
     func stopAnimating()
 }
@@ -24,7 +30,7 @@ extension UIActivityIndicatorView: ActivityIndicatorViewAnimationInterface {}
  */
 public class ActivityIndicatorViewObserver: OperationDidStartObserver, OperationDidFinishObserver {
 
-    private let activityIndicator: ActivityIndicatorViewAnimationInterface
+    private weak var activityIndicator: ActivityIndicatorViewAnimationInterface?
 
     /**
      Initialize the observer with an `ActivityIndicatorViewAnimationInterface`-conforming type.
@@ -33,19 +39,19 @@ public class ActivityIndicatorViewObserver: OperationDidStartObserver, Operation
      - note: The activity indicator's `startAninating` and `stopAnimating` methods 
              are guaranteed to execute on the main queue.
      */
-    public init(activityIndicator: ActivityIndicatorViewAnimationInterface) {
+    public init(_ activityIndicator: ActivityIndicatorViewAnimationInterface) {
         self.activityIndicator = activityIndicator
     }
 
     public func didStartOperation(operation: Operation) {
-        dispatch_async(Queue.Main.queue) {
-            self.activityIndicator.startAnimating()
+        dispatch_async(Queue.Main.queue) { [weak self] in
+            self?.activityIndicator?.startAnimating()
         }
     }
 
     public func didFinishOperation(operation: Operation, errors: [ErrorType]) {
-        dispatch_async(Queue.Main.queue) {
-            self.activityIndicator.stopAnimating()
+        dispatch_async(Queue.Main.queue) { [weak self] in
+            self?.activityIndicator?.stopAnimating()
         }
     }
 }

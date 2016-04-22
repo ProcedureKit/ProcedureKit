@@ -16,20 +16,15 @@ enum AnimationState {
 }
 
 class TestableActivityIndicatorView: ActivityIndicatorViewAnimationInterface {
-    typealias IndicatorAnimationStateDidChangeBlock =  (toState: AnimationState) -> Void
 
-    let animationStateDidChange: IndicatorAnimationStateDidChangeBlock
-
-    init(_ didChange: IndicatorAnimationStateDidChangeBlock) {
-        animationStateDidChange = didChange
-    }
+    var animationStateChanges = [AnimationState]()
 
     func startAnimating() {
-        animationStateDidChange(toState: .Animating)
+        animationStateChanges.append(.Animating)
     }
 
     func stopAnimating() {
-        animationStateDidChange(toState: .NotAnimating)
+        animationStateChanges.append(.NotAnimating)
     }
 }
 
@@ -37,17 +32,13 @@ class TestableActivityIndicatorView: ActivityIndicatorViewAnimationInterface {
 class ActivityIndicatorViewObserverTests: OperationTests {
 
     var operation: TestOperation!
-    var indicator: ActivityIndicatorViewAnimationInterface!
-    var animationStateChanges: [AnimationState]!
+    var indicator: TestableActivityIndicatorView!
 
     override func setUp() {
         super.setUp()
-        animationStateChanges = [AnimationState]()
         operation = TestOperation()
-        indicator = TestableActivityIndicatorView { [unowned self] animationState in
-            self.animationStateChanges.append(animationState)
-        }
-        operation.addObserver(ActivityIndicatorViewObserver(activityIndicator: indicator))
+        indicator = TestableActivityIndicatorView()
+        operation.addObserver(ActivityIndicatorViewObserver(indicator))
     }
 
     override func tearDown() {
@@ -57,25 +48,22 @@ class ActivityIndicatorViewObserverTests: OperationTests {
     }
 
     func test__activity_indicator_starts_animating__when_operation_starts() {
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
+        addCompletionBlockToTestOperation(operation)
 
         var animationStateChangesBeforeWillFinish = 0
         var firstAnimationChangeState: AnimationState? = .None
 
         operation.addObserver(WillFinishObserver { [unowned self] _, _ in
-                animationStateChangesBeforeWillFinish = self.animationStateChanges.count
-                firstAnimationChangeState = self.animationStateChanges.first
+                animationStateChangesBeforeWillFinish = self.indicator.animationStateChanges.count
+                firstAnimationChangeState = self.indicator.animationStateChanges.first
             })
 
-        runOperation(operation)
+        waitForOperation(operation)
+        XCTAssertTrue(self.operation.didExecute)
+        XCTAssertTrue(self.operation.finished)
 
-        waitForExpectationsWithTimeout(3) { error in
-            XCTAssertTrue(self.operation.didExecute)
-            XCTAssertTrue(self.operation.finished)
-
-            XCTAssertEqual(animationStateChangesBeforeWillFinish, 1)
-            XCTAssertTrue(firstAnimationChangeState == .Animating)
-        }
+        XCTAssertEqual(animationStateChangesBeforeWillFinish, 1)
+        XCTAssertTrue(firstAnimationChangeState == .Animating)
     }
 
     func test__activity_indicator_stops_animating__when_operation_stops() {
@@ -98,10 +86,10 @@ class ActivityIndicatorViewObserverTests: OperationTests {
             XCTAssertTrue(self.operation.didExecute)
             XCTAssertTrue(self.operation.finished)
 
-            XCTAssertEqual(self.animationStateChanges.count, 2)
+            XCTAssertEqual(self.indicator.animationStateChanges.count, 2)
 
-            XCTAssertTrue(self.animationStateChanges.first == .Animating)
-            XCTAssertTrue(self.animationStateChanges.last == .NotAnimating)
+            XCTAssertTrue(self.indicator.animationStateChanges.first == .Animating)
+            XCTAssertTrue(self.indicator.animationStateChanges.last == .NotAnimating)
         }
 
     }
