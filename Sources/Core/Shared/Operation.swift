@@ -294,7 +294,7 @@ public class Operation: NSOperation {
         cancel()
     }
 
-    public override func cancel() {
+    public final override func cancel() {
         if !finished {
             log.verbose("Did cancel.")
             _cancelled = true

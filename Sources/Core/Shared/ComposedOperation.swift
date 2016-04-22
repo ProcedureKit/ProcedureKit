@@ -26,16 +26,16 @@ public class ComposedOperation<T: NSOperation>: Operation {
         target.addObserver(DidFinishObserver { [unowned self] _, errors in
             self.finish(errors)
         })
-    }
-
-    public override func cancel() {
-        target.cancel()
-        super.cancel()
-    }
-
-    public override func cancelWithErrors(errors: [ErrorType]) {
-        target.cancelWithError(OperationError.ParentOperationCancelledWithErrors(errors))
-        super.cancelWithErrors(errors)
+        addObserver(WillCancelObserver { [unowned self] operation, errors in
+            if operation === self {
+                if errors.isEmpty {
+                    self.target.cancel()
+                }
+                else {
+                    self.target.cancelWithError(OperationError.ParentOperationCancelledWithErrors(errors))
+                }
+            }
+        })
     }
 
     public override func execute() {
