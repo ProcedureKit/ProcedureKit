@@ -55,7 +55,6 @@ public class GroupOperation: Operation {
         userIntent = operations.userIntent
         addObserver(WillCancelObserver { [unowned self] operation, errors in
             if operation === self {
-                self.queue.suspended = true
                 if errors.isEmpty {
                     self.operations.forEach { $0.cancel() }
                 }
@@ -64,6 +63,7 @@ public class GroupOperation: Operation {
                     nsops.forEach { $0.cancel() }
                     ops.forEach { $0.cancelWithError(OperationError.ParentOperationCancelledWithErrors(errors)) }
                 }
+                self.queue.cancelAllOperations()
             }
         })
     }
