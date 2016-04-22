@@ -126,7 +126,7 @@ public class Operation: NSOperation {
         willSet {
             willChangeValueForKey("Cancelled")
             if !_cancelled && newValue {
-                operationWillCancel()
+                operationWillCancel(errors)
                 willCancelObservers.forEach { $0.willCancelOperation(self, errors: self.errors) }
             }
         }
@@ -270,24 +270,24 @@ public class Operation: NSOperation {
      */
     @available(*, unavailable, renamed="didFinish")
     public func finished(errors: [ErrorType]) {
-        didFinish(errors)
+        operationDidFinish(errors)
     }
 
     /**
-     Subclasses may override `willFinish(_:)` if they wish to
+     Subclasses may override `operationWillFinish(_:)` if they wish to
      react to the operation finishing with errors.
 
      - parameter errors: an array of `ErrorType`.
      */
-    public func willFinish(errors: [ErrorType]) { /* No op */ }
+    public func operationWillFinish(errors: [ErrorType]) { /* No op */ }
 
     /**
-     Subclasses may override `didFinish(_:)` if they wish to
+     Subclasses may override `operationDidFinish(_:)` if they wish to
      react to the operation finishing with errors.
 
      - parameter errors: an array of `ErrorType`.
      */
-    public func didFinish(errors: [ErrorType]) { /* no op */ }
+    public func operationDidFinish(errors: [ErrorType]) { /* no op */ }
 
     // MARK: - Cancellation
 
@@ -314,15 +314,15 @@ public class Operation: NSOperation {
     }
 
     /**
-     Subclasses may override `willCancel(_:)` if they wish to
+     Subclasses may override `operationWillCancel(_:)` if they wish to
      react to the operation finishing with errors.
 
      - parameter errors: an array of `ErrorType`.
      */
-    public func operationWillCancel() { /* No op */ }
+    public func operationWillCancel(errors: [ErrorType]) { /* No op */ }
 
     /**
-     Subclasses may override `didCancel(_:)` if they wish to
+     Subclasses may override `operationDidCancel(_:)` if they wish to
      react to the operation finishing with errors.
 
      - parameter errors: an array of `ErrorType`.
@@ -610,7 +610,7 @@ public extension Operation {
             state = .Finishing
 
             _internalErrors.appendContentsOf(receivedErrors)
-            didFinish(_internalErrors)
+            operationDidFinish(_internalErrors)
 
             if errors.isEmpty {
                 log.verbose("Finishing with no errors.")

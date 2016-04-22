@@ -21,8 +21,8 @@ class TestOperation: Operation, ResultOperationType {
     var didExecute: Bool = false
     var result: String? = "Hello World"
 
-    var willFinishCalled = false
-    var didFinishCalled = false
+    var operationWillFinishCalled = false
+    var operationDidFinishCalled = false
     var operationWillCancelCalled = false
     var operationDidCancelCalled = false
 
@@ -50,15 +50,15 @@ class TestOperation: Operation, ResultOperationType {
         }
     }
 
-    override func willFinish(errors: [ErrorType]) {
-        willFinishCalled = true
+    override func operationWillFinish(errors: [ErrorType]) {
+        operationWillFinishCalled = true
     }
 
-    override func didFinish(errors: [ErrorType]) {
-        didFinishCalled = true
+    override func operationDidFinish(errors: [ErrorType]) {
+        operationDidFinishCalled = true
     }
 
-    override func operationWillCancel() {
+    override func operationWillCancel(errors: [ErrorType]) {
         operationWillCancelCalled = true
     }
 
@@ -282,7 +282,7 @@ class BasicTests: OperationTests {
 
     func test__operation_gets_finished_called() {
         waitForOperation(operation)
-        XCTAssertTrue(operation.didFinishCalled)
+        XCTAssertTrue(operation.operationDidFinishCalled)
     }
 
     func test__operation_will_cancel_called_before_cancelled() {
