@@ -22,6 +22,29 @@ internal extension ConditionType {
     }
 }
 
+/// General Errors used by conditions
+public enum ConditionError: ErrorType, Equatable {
+
+    /// A FalseCondition may use this as the error
+    case FalseCondition
+
+    /**
+     If the block returns false, the operation to
+     which it is attached will fail with this error.
+     */
+    case BlockConditionFailed
+}
+
+public func == (lhs: ConditionError, rhs: ConditionError) -> Bool {
+    switch (lhs, rhs) {
+    case (.FalseCondition, .FalseCondition), (.BlockConditionFailed, .BlockConditionFailed):
+        return true
+    default:
+        return false
+    }
+}
+
+
 /**
  Condition Operation
 
@@ -40,6 +63,7 @@ internal extension ConditionType {
 
  */
 public class Condition: Operation, ConditionType, ResultOperationType {
+
     public typealias CompletionBlockType = ConditionResult -> Void
 
     public var mutuallyExclusive: Bool = false
@@ -72,6 +96,34 @@ public class Condition: Operation, ConditionType, ResultOperationType {
         finish(conditionResult.error)
     }
 }
+
+
+public class TrueCondition: BlockCondition {
+
+    public init(name: String = "True Condition", mutuallyExclusive: Bool = false) {
+        super.init()
+        self.name = name
+        self.mutuallyExclusive = mutuallyExclusive
+    }
+
+    public override func evaluate(operation: Operation, completion: CompletionBlockType) {
+        completion(.Satisfied)
+    }
+}
+
+public class FalseCondition: Condition {
+
+    public init(name: String = "False Condition", mutuallyExclusive: Bool = false) {
+        super.init()
+        self.name = name
+        self.mutuallyExclusive = mutuallyExclusive
+    }
+
+    public override func evaluate(operation: Operation, completion: CompletionBlockType) {
+        completion(.Failed(Error.FalseCondition))
+    }
+}
+
 
 /**
  Class which can be used to compose a Condition, it is designed to be subclassed.

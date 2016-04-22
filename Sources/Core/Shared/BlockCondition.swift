@@ -18,16 +18,7 @@ public class BlockCondition: Condition {
     /// The block type which returns a Bool.
     public typealias ConditionBlockType = () throws -> Bool
 
-    /// The error used to indicate failure, in the case
-    /// of a false return, without a thrown error.
-    public enum Error: ErrorType {
-
-        /**
-        If the block returns false, the operation to
-        which it is attached will fail with this error.
-        */
-        case BlockConditionFailed
-    }
+    public typealias Error = ConditionError
 
     let block: ConditionBlockType
 
@@ -63,25 +54,5 @@ public class BlockCondition: Condition {
         catch {
             completion(.Failed(error))
         }
-    }
-}
-
-extension BlockCondition.Error: Equatable { }
-
-public func == (_: BlockCondition.Error, _: BlockCondition.Error) -> Bool {
-    return true // Only one case in the enum
-}
-
-public class TrueCondition: BlockCondition {
-
-    public init(name: String = "True Condition", mutuallyExclusive: Bool = false) {
-        super.init(name: name, mutuallyExclusive: mutuallyExclusive, block: { true })
-    }
-}
-
-public class FalseCondition: BlockCondition {
-
-    public init(name: String = "False Condition", mutuallyExclusive: Bool = false) {
-        super.init(name: name, mutuallyExclusive: mutuallyExclusive, block: { false })
     }
 }
