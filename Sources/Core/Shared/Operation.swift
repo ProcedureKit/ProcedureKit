@@ -126,6 +126,7 @@ public class Operation: NSOperation {
         willSet {
             willChangeValueForKey("Cancelled")
             if !_cancelled && newValue {
+                operationWillCancel()
                 willCancelObservers.forEach { $0.willCancelOperation(self, errors: self.errors) }
             }
         }
@@ -133,6 +134,7 @@ public class Operation: NSOperation {
             didChangeValueForKey("Cancelled")
 
             if _cancelled && !oldValue {
+                operationDidCancel()
                 didCancelObservers.forEach { $0.didCancelOperation(self) }
             }
         }
@@ -266,9 +268,26 @@ public class Operation: NSOperation {
 
      - parameter errors: an array of `ErrorType`.
      */
+    @available(*, unavailable, renamed="didFinish")
     public func finished(errors: [ErrorType]) {
-        // No op.
+        didFinish(errors)
     }
+
+    /**
+     Subclasses may override `willFinish(_:)` if they wish to
+     react to the operation finishing with errors.
+
+     - parameter errors: an array of `ErrorType`.
+     */
+    public func willFinish(errors: [ErrorType]) { /* No op */ }
+
+    /**
+     Subclasses may override `didFinish(_:)` if they wish to
+     react to the operation finishing with errors.
+
+     - parameter errors: an array of `ErrorType`.
+     */
+    public func didFinish(errors: [ErrorType]) { /* no op */ }
 
     // MARK: - Cancellation
 
@@ -294,11 +313,26 @@ public class Operation: NSOperation {
         cancel()
     }
 
-    public final override func cancel() {
-        if !finished {
-            log.verbose("Did cancel.")
-            _cancelled = true
+    /**
+     Subclasses may override `willCancel(_:)` if they wish to
+     react to the operation finishing with errors.
 
+     - parameter errors: an array of `ErrorType`.
+     */
+    public func operationWillCancel() { /* No op */ }
+
+    /**
+     Subclasses may override `didCancel(_:)` if they wish to
+     react to the operation finishing with errors.
+
+     - parameter errors: an array of `ErrorType`.
+     */
+    public func operationDidCancel() { /* No op */ }
+
+    public override func cancel() {
+        if !finished {
+            _cancelled = true
+            log.verbose("Did cancel.")
             if state > .Ready {
                 super.cancel()
                 finish()
@@ -576,7 +610,7 @@ public extension Operation {
             state = .Finishing
 
             _internalErrors.appendContentsOf(receivedErrors)
-            finished(_internalErrors)
+            didFinish(_internalErrors)
 
             if errors.isEmpty {
                 log.verbose("Finishing with no errors.")
