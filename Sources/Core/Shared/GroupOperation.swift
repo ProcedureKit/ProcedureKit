@@ -22,10 +22,11 @@ operations.
 public class GroupOperation: Operation {
 
     private let finishingOperation = NSBlockOperation { }
-    public let queue = OperationQueue()
-    public let operations: [NSOperation]
-
+    private let queue = OperationQueue()
     private var _aggregateErrors = Protector(Array<ErrorType>())
+
+    /// - returns: the operations which have been added to the queue
+    public private(set) var operations: [NSOperation]
 
     /// - returns: an aggregation of errors [ErrorType]
     public var aggregateErrors: Array<ErrorType> {
@@ -105,10 +106,11 @@ public class GroupOperation: Operation {
 
      - parameter operations: an array of `NSOperation` instances.
      */
-    public func addOperations(operations: [NSOperation]) {
-        if operations.count > 0 {
-            operations.forEachOperation { $0.log.severity = log.severity }
-            queue.addOperations(operations)
+    public func addOperations(additional: [NSOperation]) {
+        if additional.count > 0 {
+            additional.forEachOperation { $0.log.severity = log.severity }
+            queue.addOperations(additional)
+            operations.appendContentsOf(additional)
         }
     }
 
