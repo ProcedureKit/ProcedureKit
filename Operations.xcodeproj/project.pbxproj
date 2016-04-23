@@ -236,6 +236,8 @@
 		6526197B1C11FE6D00654091 /* AddressBookConditionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6526171D1C11F5EB00654091 /* AddressBookConditionTests.swift */; };
 		6526197C1C11FE6D00654091 /* AddressBookTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6526171E1C11F5EB00654091 /* AddressBookTests.swift */; };
 		6526197D1C11FE6D00654091 /* ContactsOperationsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652617201C11F5EB00654091 /* ContactsOperationsTests.swift */; };
+		653D40221CC2591700893746 /* ActivityIndicatorViewObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 653D40211CC2591700893746 /* ActivityIndicatorViewObserver.swift */; };
+		653D40241CC2594800893746 /* ActivityIndicatorViewObserverTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 653D40231CC2594800893746 /* ActivityIndicatorViewObserverTests.swift */; };
 		6565FFE51C98B7AC008B5248 /* Profiler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6565FFE41C98B7AC008B5248 /* Profiler.swift */; };
 		6565FFE61C98B7AC008B5248 /* Profiler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6565FFE41C98B7AC008B5248 /* Profiler.swift */; };
 		6565FFE71C98B7AC008B5248 /* Profiler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6565FFE41C98B7AC008B5248 /* Profiler.swift */; };
@@ -409,6 +411,8 @@
 		652617E91C11F72A00654091 /* Operations.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Operations.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		652617F21C11F72A00654091 /* OS X OperationsTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "OS X OperationsTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		652618561C11F84800654091 /* Extension Compatible.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = "Extension Compatible.xcconfig"; sourceTree = "<group>"; };
+		653D40211CC2591700893746 /* ActivityIndicatorViewObserver.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ActivityIndicatorViewObserver.swift; sourceTree = "<group>"; };
+		653D40231CC2594800893746 /* ActivityIndicatorViewObserverTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ActivityIndicatorViewObserverTests.swift; sourceTree = "<group>"; };
 		6565FFE41C98B7AC008B5248 /* Profiler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Profiler.swift; sourceTree = "<group>"; };
 		6565FFE91C98C860008B5248 /* ProfilerTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProfilerTests.swift; sourceTree = "<group>"; };
 		65691C9D1C21A29C00AF06B4 /* ResultInjectionTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ResultInjectionTests.swift; sourceTree = "<group>"; };
@@ -515,6 +519,7 @@
 		652616C81C11F5EB00654091 /* iOS */ = {
 			isa = PBXGroup;
 			children = (
+				653D40211CC2591700893746 /* ActivityIndicatorViewObserver.swift */,
 				652616C91C11F5EB00654091 /* AlertOperation.swift */,
 				652616CA1C11F5EB00654091 /* BackgroundObserver.swift */,
 				652616CB1C11F5EB00654091 /* NetworkObserver.swift */,
@@ -680,6 +685,7 @@
 		6526170A1C11F5EB00654091 /* Core */ = {
 			isa = PBXGroup;
 			children = (
+				653D40231CC2594800893746 /* ActivityIndicatorViewObserverTests.swift */,
 				6526170B1C11F5EB00654091 /* AlertOperationTests.swift */,
 				6526170C1C11F5EB00654091 /* BackgroundObserverTests.swift */,
 				6526170D1C11F5EB00654091 /* BlockConditionTests.swift */,
@@ -1185,6 +1191,7 @@
 				652618691C11F8FC00654091 /* MutuallyExclusive.swift in Sources */,
 				652618E71C11F98500654091 /* ContactsUIOperations.swift in Sources */,
 				652618681C11F8FC00654091 /* LoggingObserver.swift in Sources */,
+				653D40221CC2591700893746 /* ActivityIndicatorViewObserver.swift in Sources */,
 				652618661C11F8FC00654091 /* GroupOperation.swift in Sources */,
 				652618EB1C11F99E00654091 /* AddressBookConditions.swift in Sources */,
 				652618EC1C11F99E00654091 /* AddressBookOperations.swift in Sources */,
@@ -1214,6 +1221,7 @@
 				652619211C11FC3D00654091 /* GatedOperationTests.swift in Sources */,
 				652619721C11FE6900654091 /* LocationOperationsTests.swift in Sources */,
 				652619791C11FE6900654091 /* UserNotificationConditionTests.swift in Sources */,
+				653D40241CC2594800893746 /* ActivityIndicatorViewObserverTests.swift in Sources */,
 				652619231C11FC3D00654091 /* LoggingObserverTests.swift in Sources */,
 				6526197B1C11FE6D00654091 /* AddressBookConditionTests.swift in Sources */,
 				6526192C1C11FC3D00654091 /* UIOperationTests.swift in Sources */,
