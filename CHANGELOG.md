@@ -9,7 +9,7 @@
 7. [[OPR-292](https://github.com/danthorpe/Operations/pull/282)]: Fixes a bug accessing `PHPhotoLibrary`. Thanks to [@ffittschen](https://github.com/ffittschen) for reporting this bug!
 8. [[OPR-285](https://github.com/danthorpe/Operations/pull/285)]: Fixes the watchOS target which had CloudKit references in it. Thanks to [@vibrazy](https://github.com/vibrazy) and the ASOS team for this one!
 9. [[OPR-290](https://github.com/danthorpe/Operations/pull/289)]: Fixes a typo - thanks [@waywalker](https://github.com/waywalker)!
-10. [[OPR-296](https://github.com/danthorpe/Operations/pull/296)]: Updates the `.gitignore` for Swift Package Manager.
+10. [[OPR-296](https://github.com/danthorpe/Operations/pull/296)]: Updates the `.gitignore` for Swift Package Manager. Thanks to [@abizern](https://github.com/abizern) for contributing.
 11. [[OPR-269](https://github.com/danthorpe/Operations/pull/269)]: Fixes a bug with `NSURLSessionTaskOperation` where it could crash if it is not safely finished. Please report any bugs with this class, as at the moment it is not very well tested.
 
 This is an interim release before some significant breaking changes get merged, for version 3.0.
