@@ -1,3 +1,21 @@
+# 2.10.0
+
+1. [[OPR-256](https://github.com/danthorpe/Operations/pull/256)]: When a `GroupOperation` is cancelled with errors, the child operations in the group are also cancelled with those errors wrapped inside an `OperationError.ParentOperationCancelledWithErrors` error. Thanks to [@felix-dumit](https://github.com/felix-dumit) and [@jshier](https://github.com/jshier) for contributing.
+2. [[OPR-257, OPR-259](https://github.com/danthorpe/Operations/pull/259)]: Improves the README to give much clearer documentation regarding the need for an `OperationQueue` instance, instead of just a regular `NSOperationQueue`. Thanks to [@DavidNix](https://github.com/DavidNix) for raising the initial issue.
+3. [[OPR-265](https://github.com/danthorpe/Operations/pull/265)]: Defines `Operation.UserIntent`. This is a simple type which can be used express the intent of the operation. It allows for explicit user action (`.Initiated`), a side effect of user actions (`.SideEffect`), and `.None` for anything else, which is the default. `Operation` will use this value to set the quality of service (QoS) of the operation. The reason for separating `UserIntent` from the QoS, is that it is not possible to accurately determine the intent from the QoS because an `NSOperation`'s QoS can be modified when it is added to a queue which has a different QoS, or even if it is already on a queue, which has another `NSOperation` with a different QoS added to the same queue. See [the documentation on Quality of Service classes](https://developer.apple.com/library/ios/documentation/Performance/Conceptual/EnergyGuide-iOS/PrioritizeWorkWithQoS.html).
+4. [[OPR-266](https://github.com/danthorpe/Operations/pull/266/commits/dc19369828d5bf555ab9eee4603e73c2b6eedb6b)]: Thanks for [@estromlund](https://github.com/estromlund) for fixing this bug - now network errors are passed into the errors of the network operation.
+5. [[OPR-273](https://github.com/danthorpe/Operations/pull/273)]: `AlertOperation` can now be customized to display action sheet style alerts. Thanks to [@felix-dumit](https://github.com/felix-dumit) for writing this one!
+6. [[OPR-281](https://github.com/danthorpe/Operations/pull/281)]: `BlockOperation` now supports blocks which throw errors. The errors are caught and processed by `Operation` correctly. Thanks to [@ryanjm](https://github.com/ryanjm) for reporting and contributing!
+7. [[OPR-292](https://github.com/danthorpe/Operations/pull/282)]: Fixes a bug accessing `PHPhotoLibrary`. Thanks to [@ffittschen](https://github.com/ffittschen) for reporting this bug!
+8. [[OPR-285](https://github.com/danthorpe/Operations/pull/285)]: Fixes the watchOS target which had CloudKit references in it. Thanks to [@vibrazy](https://github.com/vibrazy) and the ASOS team for this one!
+9. [[OPR-290](https://github.com/danthorpe/Operations/pull/289)]: Fixes a typo - thanks [@waywalker](https://github.com/waywalker)!
+10. [[OPR-296](https://github.com/danthorpe/Operations/pull/296)]: Updates the `.gitignore` for Swift Package Manager.
+11. [[OPR-269](https://github.com/danthorpe/Operations/pull/269)]: Fixes a bug with `NSURLSessionTaskOperation` where it could crash if it is not safely finished. Please report any bugs with this class, as at the moment it is not very well tested.
+
+This is an interim release before some significant breaking changes get merged, for version 3.0.
+
+Thanks a lot for everyone who has contributed!
+
 # 2.9.1
 
 1. [[OPR-282](https://github.com/danthorpe/Operations/pull/282)]: Fixes a bug accessing `PHPhotoLibrary` through `Capability.Photos`.
