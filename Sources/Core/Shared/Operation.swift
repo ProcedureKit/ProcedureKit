@@ -548,7 +548,7 @@ public extension Operation {
      */
     final func produceOperation(operation: NSOperation) {
         precondition(state > .Initialized, "Cannot produce operation while not being scheduled on a queue.")
-        log.notice("Did produce \(operation.operationName)")
+        log.verbose("Did produce \(operation.operationName)")
         didProduceOperationObservers.forEach { $0.operation(self, didProduceOperation: operation) }
     }
 }
@@ -572,7 +572,7 @@ public extension Operation {
             operationDidFinish(_internalErrors)
 
             if errors.isEmpty {
-                log.notice("Will finish with no errors.")
+                log.verbose("Will finish with no errors.")
             }
             else {
                 log.warning("Will finish with \(errors.count) errors.")
@@ -585,7 +585,7 @@ public extension Operation {
             didFinishObservers.forEach { $0.didFinishOperation(self, errors: self._internalErrors) }
 
             if errors.isEmpty {
-                log.notice("Did finish with no errors.")
+                log.verbose("Did finish with no errors.")
             }
             else {
                 log.warning("Did finish with errors: \(errors).")
