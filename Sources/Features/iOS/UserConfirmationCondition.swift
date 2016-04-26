@@ -23,10 +23,7 @@ enum UserConfirmationError: ErrorType {
     Attach this condition to an operation to present an alert
     to the user requesting their confirmation before proceeding.
 */
-public class UserConfirmationCondition<From: PresentingViewController>: OperationCondition {
-
-    public let name: String
-    public let isMutuallyExclusive = false
+public class UserConfirmationCondition<From: PresentingViewController>: Condition {
 
     private let action: String
     private let isDestructive: Bool
@@ -40,23 +37,24 @@ public class UserConfirmationCondition<From: PresentingViewController>: Operatio
         self.isDestructive = isDestructive
         self.cancelAction = cancelAction
         self.alert = AlertOperation(presentAlertFrom: from)
-        self.alert.title = title
-        self.alert.message = message
-        self.name = "UserConfirmationCondition(\(title))"
-    }
+        super.init()
+        name = "UserConfirmationCondition(\(title))"
 
-    public func dependencyForOperation(operation: Operation) -> NSOperation? {
+        alert.title = title
+        alert.message = message
         alert.addActionWithTitle(action, style: isDestructive ? .Destructive : .Default) { [weak self] _ in
             self?.confirmation = .Confirmed
         }
         alert.addActionWithTitle(cancelAction, style: .Cancel) { [weak self] _ in
             self?.confirmation = .Cancelled
         }
-        alert.addObserver(self)
-        return alert
+        alert.addObserver(WillFinishObserver { [weak self] _, errors in
+            self?.alertOperationErrors = errors
+        })
+        addDependency(alert)
     }
 
-    public func evaluateForOperation(operation: Operation, completion: OperationConditionResult -> Void) {
+    public override func evaluate(operation: Operation, completion: OperationConditionResult -> Void) {
         switch confirmation {
         case .Unknown:
             // This should never happen, but you never know.
@@ -65,15 +63,6 @@ public class UserConfirmationCondition<From: PresentingViewController>: Operatio
             completion(.Failed(UserConfirmationError.ConfirmationCancelled))
         case .Confirmed:
             completion(.Satisfied)
-        }
-    }
-}
-
-extension UserConfirmationCondition: OperationDidFinishObserver {
-
-    public func didFinishOperation(operation: Operation, errors: [ErrorType]) {
-        if operation == alert {
-            alertOperationErrors = errors
         }
     }
 }

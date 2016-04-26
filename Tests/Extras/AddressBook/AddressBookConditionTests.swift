@@ -142,6 +142,7 @@ class AddressBookOperationTests: OperationTests {
 class AddressBookConditionTests: OperationTests {
 
     var registrar: TestableAddressBookRegistrar!
+    var condition: AddressBookCondition!
 
     override func setUp() {
         super.setUp()
@@ -149,12 +150,15 @@ class AddressBookConditionTests: OperationTests {
         let posedAddressBook = "I'm posing as an Address Book Ref!"
         registrar.addressBook = posedAddressBook as CFTypeRef
         registrar.requestShouldSucceed = true
+
+        condition = AddressBookCondition()
+        condition.registrar = registrar
     }
 
     func test__given_authorization_granted__condition_succeeds() {
 
         let operation = TestOperation()
-        operation.addCondition(AddressBookCondition(registrar: registrar))
+        operation.addCondition(condition)
 
         addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
         runOperation(operation)
@@ -170,7 +174,7 @@ class AddressBookConditionTests: OperationTests {
         var receivedErrors = [ErrorType]()
 
         let operation = TestOperation()
-        operation.addCondition(AddressBookCondition(registrar: registrar))
+        operation.addCondition(condition)
 
         operation.addObserver(DidFinishObserver { _, errors in
             receivedErrors = errors

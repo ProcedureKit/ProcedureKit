@@ -332,12 +332,11 @@ class ProfileLoggerTests: XCTestCase {
 
     func test__reporter_logs_name() {
         reporter = OperationProfileLogger { message, severity, _, _, _ in
-            XCTAssertTrue(message.hasPrefix("MyOperation #Testing finished profiling with results:\n"))
+            XCTAssertTrue(message.hasPrefix("MyOperation #Testing: finished profiling with results:\n"), "Message did not have correct prefix: \(message)")
             XCTAssertEqual(severity, LogSeverity.Info)
         }
         reporter.finishedProfilingWithResult(result)
     }
-
 }
 
 

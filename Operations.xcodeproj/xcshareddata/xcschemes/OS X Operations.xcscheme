@@ -20,6 +20,20 @@
                ReferencedContainer = "container:Operations.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "NO"
+            buildForProfiling = "NO"
+            buildForArchiving = "NO"
+            buildForAnalyzing = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "65FD67A51CC3885D009E2C88"
+               BuildableName = "Stress Tests.xctest"
+               BlueprintName = "Stress Tests"
+               ReferencedContainer = "container:Operations.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
       </BuildActionEntries>
    </BuildAction>
    <TestAction
@@ -33,16 +47,21 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
+               BlueprintIdentifier = "65FD67A51CC3885D009E2C88"
+               BuildableName = "Stress Tests.xctest"
+               BlueprintName = "Stress Tests"
+               ReferencedContainer = "container:Operations.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
                BlueprintIdentifier = "652617F11C11F72A00654091"
                BuildableName = "OS X OperationsTests.xctest"
                BlueprintName = "OS X OperationsTests"
                ReferencedContainer = "container:Operations.xcodeproj">
             </BuildableReference>
-            <SkippedTests>
-               <Test
-                  Identifier = "CompletionBlockOperationTests/test__many_completion_blocks_are_executed()">
-               </Test>
-            </SkippedTests>
          </TestableReference>
       </Testables>
       <MacroExpansion>

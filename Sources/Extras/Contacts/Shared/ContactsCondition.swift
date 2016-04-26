@@ -9,34 +9,27 @@
 import Contacts
 
 @available(iOS 9.0, OSX 10.11, *)
-public struct _ContactsCondition<Store: ContactStoreType>: OperationCondition {
-
-    public let name = "Contacts"
-    public let isMutuallyExclusive = false
+public class _ContactsCondition<Store: ContactStoreType>: Condition {
 
     let entityType: CNEntityType
     let store: Store
 
-    public init(entityType: CNEntityType = .Contacts) {
-        self.entityType = entityType
-        store = Store()
+    public convenience init(entityType: CNEntityType = .Contacts) {
+        self.init(entityType: entityType, registrar: Store())
     }
 
     init(entityType: CNEntityType = .Contacts, registrar: Store) {
         self.entityType = entityType
         self.store = registrar
-    }
+        super.init()
+        name = "Contacts"
 
-    public func dependencyForOperation(operation: Operation) -> NSOperation? {
-        switch store.opr_authorizationStatusForEntityType(entityType) {
-        case .NotDetermined:
-            return _ContactsAccess(entityType: entityType, contactStore: store)
-        default:
-            return .None
+        if case .NotDetermined = store.opr_authorizationStatusForEntityType(entityType) {
+            addDependency(_ContactsAccess(entityType: entityType, contactStore: store))
         }
     }
 
-    public func evaluateForOperation(operation: Operation, completion: OperationConditionResult -> Void) {
+    public override func evaluate(operation: Operation, completion: OperationConditionResult -> Void) {
         switch store.opr_authorizationStatusForEntityType(entityType) {
         case .Authorized:
             completion(.Satisfied)

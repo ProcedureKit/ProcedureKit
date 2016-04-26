@@ -13,7 +13,7 @@ A condition that specificed that every dependency of the
 operation must succeed. If any dependency fails/cancels,
 the target operation will be fail.
 */
-public struct NoFailedDependenciesCondition: OperationCondition {
+public class NoFailedDependenciesCondition: Condition {
 
     /// The `ErrorType` returned to indicate the condition failed.
     public enum Error: ErrorType, Equatable {
@@ -25,18 +25,11 @@ public struct NoFailedDependenciesCondition: OperationCondition {
         case FailedDependencies
     }
 
-    /// A constant name for the condition.
-    public let name = "No Cancelled Condition"
-
-    /// A constant flag indicating this condition is not mutually exclusive
-    public let isMutuallyExclusive = false
-
     /// Initializer which takes no parameters.
-    public init() { }
-
-    /// Conforms to `OperationCondition` but there are no dependent operations.
-    public func dependencyForOperation(operation: Operation) -> NSOperation? {
-        return .None
+    public override init() {
+        super.init()
+        name = "No Cancelled Condition"
+        mutuallyExclusive = false
     }
 
     /**
@@ -52,7 +45,7 @@ public struct NoFailedDependenciesCondition: OperationCondition {
     - parameter operation: the `Operation` which the condition is attached to.
     - parameter completion: the completion block which receives a `OperationConditionResult`.
     */
-    public func evaluateForOperation(operation: Operation, completion: OperationConditionResult -> Void) {
+    public override func evaluate(operation: Operation, completion: CompletionBlockType) {
         let dependencies = operation.dependencies
 
         let cancelled = dependencies.filter { $0.cancelled }

@@ -14,7 +14,7 @@ class NegatedConditionTests: OperationTests {
     func test__operation_with_successful_block_condition_fails() {
         let expectation = expectationWithDescription("Test: \(#function)")
         let operation = TestOperation()
-        operation.addCondition(NegatedCondition(BlockCondition { true }))
+        operation.addCondition(NegatedCondition(TrueCondition()))
 
         var receivedErrors = [ErrorType]()
         operation.addObserver(DidFinishObserver { _, errors in
@@ -28,7 +28,7 @@ class NegatedConditionTests: OperationTests {
         XCTAssertFalse(operation.didExecute)
         XCTAssertEqual(receivedErrors.count, 1)
         if let error = receivedErrors.first as? NegatedConditionError {
-            XCTAssertTrue(error == .ConditionSatisfied("Block Condition"))
+            XCTAssertTrue(error == .ConditionSatisfied("True Condition"))
         }
         else {
             XCTFail("No error message was observed")
@@ -38,9 +38,9 @@ class NegatedConditionTests: OperationTests {
     func test__operation_with_unsuccessful_block_condition_executes() {
 
         let operation = TestOperation()
-        operation.addCondition(NegatedCondition(BlockCondition { false }))
+        operation.addCondition(NegatedCondition(FalseCondition()))
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
+        addCompletionBlockToTestOperation(operation)
         runOperation(operation)
         waitForExpectationsWithTimeout(3, handler: nil)
 
@@ -56,12 +56,12 @@ class NegatedConditionTests: OperationTests {
 
     func test__negated_condition_is_mutually_exclusive_when_nested_condition_is_mutually_exclusive() {
         let condition = NegatedCondition(MutuallyExclusive<String>())
-        XCTAssertTrue(condition.isMutuallyExclusive)
+        XCTAssertTrue(condition.mutuallyExclusive)
     }
 
     func test__negated_condition_is_not_mutually_exclusive_when_nested_condition_is_not_mutually_exclusive() {
         let condition = NegatedCondition(NoFailedDependenciesCondition())
-        XCTAssertFalse(condition.isMutuallyExclusive)
+        XCTAssertFalse(condition.mutuallyExclusive)
     }
 
 }

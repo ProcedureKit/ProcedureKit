@@ -10,7 +10,7 @@ import Foundation
 import AddressBook
 
 @available(iOS, deprecated=9.0)
-public struct AddressBookCondition: OperationCondition {
+public class AddressBookCondition: Condition {
 
     public enum Error: ErrorType {
         case AuthorizationDenied
@@ -18,28 +18,26 @@ public struct AddressBookCondition: OperationCondition {
         case AuthorizationNotDetermined
     }
 
-    public let name = "Address Book"
-    public let isMutuallyExclusive = false
-    private let registrar: AddressBookPermissionRegistrar
-
-    public init() {
-        registrar = SystemAddressBookRegistrar()
-    }
-
-    init(registrar: AddressBookPermissionRegistrar) {
-        self.registrar = registrar
-    }
-
-    public func dependencyForOperation(operation: Operation) -> NSOperation? {
-        switch registrar.status {
-        case .NotDetermined:
-            return AddressBookOperation(registrar: registrar)
-        default:
-            return .None
+    internal var registrar: AddressBookPermissionRegistrar = SystemAddressBookRegistrar() {
+        didSet {
+            removeDependencies()
+            if case .NotDetermined = registrar.status {
+                addDependency(AddressBookOperation(registrar: registrar))
+            }
         }
     }
 
-    public func evaluateForOperation(operation: Operation, completion: OperationConditionResult -> Void) {
+    public override init() {
+        super.init()
+        name = "Address Book"
+        mutuallyExclusive = false
+
+        if case .NotDetermined = registrar.status {
+            addDependency(AddressBookOperation(registrar: registrar))
+        }
+    }
+
+    public override func evaluate(operation: Operation, completion: OperationConditionResult -> Void) {
         switch registrar.status {
         case .Authorized:
             completion(.Satisfied)

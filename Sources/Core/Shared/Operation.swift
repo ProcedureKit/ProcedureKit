@@ -11,6 +11,7 @@
 import Foundation
 
 // swiftlint:disable type_body_length
+
 /**
 Abstract base Operation class which subclasses `NSOperation`.
 
@@ -33,12 +34,6 @@ public class Operation: NSOperation {
         // Ready to begin evaluating conditions
         case Pending
 
-        // Is evaluating conditions
-        case EvaluatingConditions
-
-        // Conditions have been satisfied, ready to execute
-        case Ready
-
         // It is executing
         case Executing
 
@@ -51,19 +46,9 @@ public class Operation: NSOperation {
         func canTransitionToState(other: State, whenCancelled cancelled: Bool) -> Bool {
             switch (self, other) {
             case (.Initialized, .Pending),
-                (.Pending, .EvaluatingConditions),
-                (.EvaluatingConditions, .Ready),
-                (.Ready, .Executing),
-                (.Ready, .Finishing),
+                (.Pending, .Executing),
                 (.Executing, .Finishing),
                 (.Finishing, .Finished):
-                return true
-
-            case (.Pending, .Ready):
-                // Note that PSOperations only allows this transition when the operation is
-                // cancelled. However, in the case where there are no conditions to evaluate,
-                // Operation immediately becomes .Ready - otherwise there exists a race
-                // condition because the evaluator executes its completion immediately.
                 return true
 
             case (.Pending, .Finishing) where cancelled:
@@ -94,11 +79,6 @@ public class Operation: NSOperation {
         }
     }
 
-    // use the KVO mechanism to indicate that changes to "state" affect other properties as well
-    class func keyPathsForValuesAffectingIsReady() -> Set<NSObject> {
-        return ["State", "Cancelled"]
-    }
-
     class func keyPathsForValuesAffectingIsExecuting() -> Set<NSObject> {
         return ["State"]
     }
@@ -111,16 +91,25 @@ public class Operation: NSOperation {
         return ["Cancelled"]
     }
 
-    private let stateLock = NSLock()
-    private let readyLock = NSRecursiveLock()
+    /// - returns: a unique String which can be used to identify the operation instance
+    public let identifier = NSUUID().UUIDString
 
+    private let stateLock = NSLock()
     private lazy var _log: LoggerType = Logger()
     private var _state = State.Initialized
     private var _internalErrors = [ErrorType]()
     private var _hasFinishedAlready = false
     private var _observers = Protector([OperationObserverType]())
-    private(set) var conditions = [OperationCondition]()
-    internal var waitForDependenciesOperation: NSOperation? = .None
+
+    internal private(set) var directDependencies = Set<NSOperation>()
+    internal private(set) var conditions = Set<Condition>()
+
+    internal var indirectDependencies: Set<NSOperation> {
+        return Set(conditions.flatMap { $0.directDependencies })
+    }
+
+    // Internal operation properties which are used to manage the scheduling of dependencies
+    internal private(set) var evaluateConditionsOperation: GroupOperation? = .None
 
     private var _cancelled = false {
         willSet {
@@ -139,9 +128,6 @@ public class Operation: NSOperation {
             }
         }
     }
-
-    /// - returns: a unique String which can be used to identify the operation instance
-    public let identifier = NSUUID().UUIDString
 
     /// Access the internal errors collected by the Operation
     public var errors: [ErrorType] {
@@ -233,9 +219,20 @@ public class Operation: NSOperation {
      to a queue, or is waiting on dependencies.
      - parameter condition: type conforming to protocol `OperationCondition`.
      */
+    @available(iOS, deprecated=8, message="Refactor OperationCondition types as Condition subclasses.")
+    @available(OSX, deprecated=10.10, message="Refactor OperationCondition types as Condition subclasses.")
     public func addCondition(condition: OperationCondition) {
-        assert(state < .EvaluatingConditions, "Cannot modify conditions after operations has begun evaluating conditions, current state: \(state).")
-        conditions.append(condition)
+        assert(state < .Executing, "Cannot modify conditions after operation has begun executing, current state: \(state).")
+        let operation = WrappedOperationCondition(condition)
+        if let dependency = condition.dependencyForOperation(self) {
+            operation.addDependency(dependency)
+        }
+        conditions.insert(operation)
+    }
+
+    public func addCondition(condition: Condition) {
+        assert(state < .Executing, "Cannot modify conditions after operation has begun executing, current state: \(state).")
+        conditions.insert(condition)
     }
 
     /**
@@ -333,7 +330,7 @@ public class Operation: NSOperation {
         if !finished {
             _cancelled = true
             log.verbose("Did cancel.")
-            if state > .Ready {
+            if executing {
                 super.cancel()
                 finish()
             }
@@ -354,46 +351,11 @@ public extension Operation {
         set (newState) {
             willChangeValueForKey("State")
             stateLock.withCriticalScope {
-                assert(_state.canTransitionToState(newState, whenCancelled: cancelled), "Attempting to perform illegal cyclic state transition, \(_state) -> \(newState).")
+                assert(_state.canTransitionToState(newState, whenCancelled: cancelled), "Attempting to perform illegal cyclic state transition, \(_state) -> \(newState) for operation: \(identity).")
                 log.verbose("\(_state) -> \(newState)")
                 _state = newState
             }
             didChangeValueForKey("State")
-        }
-    }
-
-    /// Boolean indicator of the readyness of the Operation
-    override var ready: Bool {
-        return readyLock.withCriticalScope {
-            switch state {
-            case .Initialized:
-                // If the operation is cancelled, isReady should return true
-                return cancelled
-
-            case .Pending:
-                // If the operation is cancelled, isReady should return true
-                if cancelled {
-                    state = .Ready
-                    return true
-                }
-
-                if super.ready {
-                    if conditions.count == 0 {
-                        state = .Ready
-                        return true
-                    }
-                    evaluateConditions()
-                }
-
-                // Until conditions have been evaluated, we're not ready
-                return false
-
-            case .Ready:
-                return super.ready || cancelled
-
-            default:
-                return false
-            }
         }
     }
 
@@ -426,36 +388,57 @@ public extension Operation {
 
 public extension Operation {
 
-    private func createDidFinishDependenciesOperation() -> NSOperation {
-        assert(waitForDependenciesOperation == nil, "Should only ever create the finishing dependency once.")
-        let __op = NSBlockOperation { }
-        super.addDependency(__op)
-        waitForDependenciesOperation = __op
-        return __op
+    internal func evaluateConditions() -> GroupOperation {
+
+        func createEvaluateConditionsOperation() -> GroupOperation {
+            // Set the operation on each condition
+            conditions.forEach { $0.operation = self }
+
+            let evaluator = GroupOperation(operations: Array(conditions))
+            evaluator.name = "Condition Evaluator for: \(operationName)"
+            super.addDependency(evaluator)
+            return evaluator
+        }
+
+        assert(state <= .Executing, "Dependencies cannot be modified after execution has begun, current state: \(state).")
+
+        let evaluator = createEvaluateConditionsOperation()
+
+        // Add an observer to the evaluator to see if any of the conditions failed.
+        evaluator.addObserver(WillFinishObserver { [unowned self] operation, errors in
+            if errors.count > 0 {
+                // If conditions fail, we should cancel the operation
+                self.cancelWithErrors(errors)
+            }
+        })
+
+        directDependencies.forEach {
+            evaluator.addDependency($0)
+        }
+
+        return evaluator
     }
 
-    internal func addConditionDependency(operation: NSOperation) {
+    internal func addDependencyOnPreviousMutuallyExclusiveOperation(operation: Operation) {
         precondition(state <= .Executing, "Dependencies cannot be modified after execution has begun, current state: \(state).")
-        if let waiter = waitForDependenciesOperation {
-            operation.addDependency(waiter)
-        }
         super.addDependency(operation)
+    }
+
+    internal func addDirectDependency(directDependency: NSOperation) {
+        precondition(state <= .Executing, "Dependencies cannot be modified after execution has begun, current state: \(state).")
+        directDependencies.insert(directDependency)
+        super.addDependency(directDependency)
+    }
+
+    internal func removeDirectDependency(directDependency: NSOperation) {
+        precondition(state <= .Executing, "Dependencies cannot be modified after execution has begun, current state: \(state).")
+        directDependencies.remove(directDependency)
+        super.removeDependency(directDependency)
     }
 
     /// Public override to get the dependencies
     final override var dependencies: [NSOperation] {
-        get {
-            var _dependencies = super.dependencies
-            guard let
-                waiter = waitForDependenciesOperation, index = _dependencies.indexOf(waiter) else {
-                    return _dependencies
-            }
-
-            _dependencies.removeAtIndex(index)
-            _dependencies.appendContentsOf(waiter.dependencies)
-
-            return _dependencies
-        }
+        return Array(directDependencies.union(indirectDependencies))
     }
 
     /**
@@ -469,7 +452,7 @@ public extension Operation {
      */
     final override func addDependency(operation: NSOperation) {
         precondition(state <= .Executing, "Dependencies cannot be modified after execution has begun, current state: \(state).")
-        (waitForDependenciesOperation ?? createDidFinishDependenciesOperation()).addDependency(operation)
+        addDirectDependency(operation)
     }
 
     /**
@@ -484,29 +467,7 @@ public extension Operation {
      */
     final override func removeDependency(operation: NSOperation) {
         precondition(state <= .Executing, "Dependencies cannot be modified after execution has begun, current state: \(state).")
-        guard let waiter = waitForDependenciesOperation else {
-            return
-        }
-        waiter.removeDependency(operation)
-        if waiter.dependencies.count == 0 {
-            super.removeDependency(waiter)
-            waitForDependenciesOperation = nil
-        }
-    }
-}
-
-// MARK: - Conditions
-
-public extension Operation {
-
-    private func evaluateConditions() {
-        assert(state == .Pending, "\(#function) was called out of order.")
-        assert(cancelled == false, "\(#function) was called on cancelled operation: \(operationName).")
-        state = .EvaluatingConditions
-        evaluateOperationConditions(conditions, operation: self) { errors in
-            self._internalErrors.appendContentsOf(errors)
-            self.state = .Ready
-        }
+        removeDirectDependency(operation)
     }
 }
 
@@ -558,18 +519,16 @@ public extension Operation {
     final override func start() {
         // Don't call super.start
 
-        if !cancelled {
-            main()
-        }
-        else {
-            // If the operation has been cancelled, we still need to enter the finished state
+        guard !cancelled else {
             finish()
+            return
         }
+
+        main()
     }
 
     /// Triggers execution of the operation's task, correctly managing errors and the cancelled state. Cannot be over-ridden
     final override func main() {
-        assert(state == .Ready, "This operation must be performed on an operation queue, current state: \(state).")
 
         guard _internalErrors.isEmpty && !cancelled else {
             finish()
@@ -589,7 +548,7 @@ public extension Operation {
      */
     final func produceOperation(operation: NSOperation) {
         precondition(state > .Initialized, "Cannot produce operation while not being scheduled on a queue.")
-        log.verbose("Did produce \(operation.operationName)")
+        log.notice("Did produce \(operation.operationName)")
         didProduceOperationObservers.forEach { $0.operation(self, didProduceOperation: operation) }
     }
 }
@@ -613,10 +572,10 @@ public extension Operation {
             operationDidFinish(_internalErrors)
 
             if errors.isEmpty {
-                log.verbose("Finishing with no errors.")
+                log.notice("Will finish with no errors.")
             }
             else {
-                log.warning("Finishing with errors: \(_internalErrors).")
+                log.warning("Will finish with \(errors.count) errors.")
             }
 
             willFinishObservers.forEach { $0.willFinishOperation(self, errors: self._internalErrors) }
@@ -624,6 +583,13 @@ public extension Operation {
             state = .Finished
 
             didFinishObservers.forEach { $0.didFinishOperation(self, errors: self._internalErrors) }
+
+            if errors.isEmpty {
+                log.notice("Did finish with no errors.")
+            }
+            else {
+                log.warning("Did finish with errors: \(errors).")
+            }
         }
     }
 
@@ -709,8 +675,25 @@ extension NSOperation {
 
     - parameter dependencies: and array of `NSOperation` instances.
     */
-    public func addDependencies(dependencies: [NSOperation]) {
+    public func addDependencies<S where S: SequenceType, S.Generator.Element: NSOperation>(dependencies: S) {
+        precondition(!executing && !finished, "Cannot modify the dependencies after the operation has started executing.")
         dependencies.forEach(addDependency)
+    }
+
+    /**
+     Remove multiple depdendencies from the operation. Will remove each
+     dependency in turn.
+
+     - parameter dependencies: and array of `NSOperation` instances.
+     */
+    public func removeDependencies<S where S: SequenceType, S.Generator.Element: NSOperation>(dependencies: S) {
+        precondition(!executing && !finished, "Cannot modify the dependencies after the operation has started executing.")
+        dependencies.forEach(removeDependency)
+    }
+
+    /// Removes all the depdendencies from the operation.
+    public func removeDependencies() {
+        removeDependencies(dependencies)
     }
 
     internal func setQualityOfServiceFromUserIntent(userIntent: Operation.UserIntent) {
