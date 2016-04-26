@@ -22,10 +22,13 @@ operations.
 public class GroupOperation: Operation {
 
     private let finishingOperation = NSBlockOperation { }
-    public let queue = OperationQueue()
-    public let operations: [NSOperation]
-
     private var _aggregateErrors = Protector(Array<ErrorType>())
+
+    /// - returns: the OperationQueue the group runs operations on.
+    public let queue = OperationQueue()
+
+    /// - returns: the operations which have been added to the queue
+    public private(set) var operations: [NSOperation]
 
     /// - returns: an aggregation of errors [ErrorType]
     public var aggregateErrors: Array<ErrorType> {
@@ -52,6 +55,19 @@ public class GroupOperation: Operation {
         queue.suspended = true
         queue.delegate = self
         userIntent = operations.userIntent
+        addObserver(WillCancelObserver { [unowned self] operation, errors in
+            if operation === self {
+                if errors.isEmpty {
+                    self.operations.forEach { $0.cancel() }
+                }
+                else {
+                    let (nsops, ops) = self.operations.splitNSOperationsAndOperations
+                    nsops.forEach { $0.cancel() }
+                    ops.forEach { $0.cancelWithError(OperationError.ParentOperationCancelledWithErrors(errors)) }
+                }
+                self.queue.cancelAllOperations()
+            }
+        })
     }
 
     /// Convenience initializer for direct usage without subclassing.
@@ -59,29 +75,12 @@ public class GroupOperation: Operation {
         self.init(operations: operations)
     }
 
-    /// Override of public method
-    public override func cancel() {
-        queue.suspended = false
-        queue.cancelAllOperations()
-        operations.forEach { $0.cancel() }
-        super.cancel()
-    }
-
-    /// Override of public method
-    public override func cancelWithErrors(errors: [ErrorType]) {
-        queue.suspended = false
-        let (nsops, ops) = operations.splitNSOperationsAndOperations
-        nsops.forEach { $0.cancel() }
-        ops.forEach { $0.cancelWithError(OperationError.ParentOperationCancelledWithErrors(errors)) }
-        super.cancelWithErrors(errors)
-    }
-
     /**
      Executes the group by adding the operations to the queue. Then
      starting the queue, and adding the finishing operation.
     */
     public override func execute() {
-        addOperations(operations)
+        addOperations(operations.filter { !self.queue.operations.contains($0) })
         queue.addOperation(finishingOperation)
         queue.suspended = false
     }
@@ -109,10 +108,11 @@ public class GroupOperation: Operation {
 
      - parameter operations: an array of `NSOperation` instances.
      */
-    public func addOperations(operations: [NSOperation]) {
-        if operations.count > 0 {
-            operations.forEachOperation { $0.log.severity = log.severity }
-            queue.addOperations(operations)
+    public func addOperations(additional: [NSOperation]) {
+        if additional.count > 0 {
+            additional.forEachOperation { $0.log.severity = log.severity }
+            queue.addOperations(additional)
+            operations.appendContentsOf(additional)
         }
     }
 

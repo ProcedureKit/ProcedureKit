@@ -116,6 +116,32 @@ class BasicTests: OperationTests {
         waitForOperation(operation)
         XCTAssertTrue(operation.didFinish)
     }
+    
+    func test__operation_will_cancel_called_before_cancelled() {
+        var operationWillCancelObserverCalled = false
+        operation.addObserver(WillCancelObserver { _, _ in
+            XCTAssertTrue(self.operation.operationWillCancelCalled)
+            XCTAssertFalse(self.operation.cancelled)
+            XCTAssertFalse(self.operation.operationDidCancelCalled)
+            operationWillCancelObserverCalled = true
+            })
+        operation.cancel()
+        waitForOperation(operation)
+        XCTAssertTrue(operationWillCancelObserverCalled)
+    }
+    
+    func test__operation_did_cancel_called_before_cancelled() {
+        var operationDidCancelObserverCalled = false
+        operation.addObserver(DidCancelObserver { _ in
+            XCTAssertTrue(self.operation.operationWillCancelCalled)
+            XCTAssertTrue(self.operation.cancelled)
+            XCTAssertTrue(self.operation.operationDidCancelCalled)
+            operationDidCancelObserverCalled = true
+            })
+        operation.cancel()
+        waitForOperation(operation)
+        XCTAssertTrue(operationDidCancelObserverCalled)
+    }    
 }
 
 class UserIntentOperationTests: OperationTests {

@@ -112,16 +112,16 @@
 		652618B01C11F91200654091 /* Capability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652616FD1C11F5EB00654091 /* Capability.swift */; };
 		652618B11C11F91200654091 /* CloudCapability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652616FE1C11F5EB00654091 /* CloudCapability.swift */; };
 		652618B21C11F91200654091 /* CloudKitOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652616FF1C11F5EB00654091 /* CloudKitOperation.swift */; };
-		652618B31C11F91200654091 /* NetworkOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652617001C11F5EB00654091 /* NetworkOperation.swift */; };
+		652618B31C11F91200654091 /* URLSessionTaskOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652617001C11F5EB00654091 /* URLSessionTaskOperation.swift */; };
 		652618B41C11F91200654091 /* Reachability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652617011C11F5EB00654091 /* Reachability.swift */; };
 		652618B51C11F91200654091 /* ReachabilityCondition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652617021C11F5EB00654091 /* ReachabilityCondition.swift */; };
 		652618B61C11F91200654091 /* ReachableOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652617031C11F5EB00654091 /* ReachableOperation.swift */; };
 		652618B71C11F91300654091 /* CalendarCapability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652616FC1C11F5EB00654091 /* CalendarCapability.swift */; };
 		652618B81C11F91300654091 /* Capability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652616FD1C11F5EB00654091 /* Capability.swift */; };
-		652618BB1C11F91300654091 /* NetworkOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652617001C11F5EB00654091 /* NetworkOperation.swift */; };
+		652618BB1C11F91300654091 /* URLSessionTaskOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652617001C11F5EB00654091 /* URLSessionTaskOperation.swift */; };
 		652618C01C11F91400654091 /* Capability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652616FD1C11F5EB00654091 /* Capability.swift */; };
 		652618C21C11F91400654091 /* CloudKitOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652616FF1C11F5EB00654091 /* CloudKitOperation.swift */; };
-		652618C31C11F91400654091 /* NetworkOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652617001C11F5EB00654091 /* NetworkOperation.swift */; };
+		652618C31C11F91400654091 /* URLSessionTaskOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652617001C11F5EB00654091 /* URLSessionTaskOperation.swift */; };
 		652618C41C11F91400654091 /* Reachability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652617011C11F5EB00654091 /* Reachability.swift */; };
 		652618C51C11F91400654091 /* ReachabilityCondition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652617021C11F5EB00654091 /* ReachabilityCondition.swift */; };
 		652618C61C11F91400654091 /* ReachableOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652617031C11F5EB00654091 /* ReachableOperation.swift */; };
@@ -129,7 +129,7 @@
 		652618C81C11F91500654091 /* Capability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652616FD1C11F5EB00654091 /* Capability.swift */; };
 		652618C91C11F91500654091 /* CloudCapability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652616FE1C11F5EB00654091 /* CloudCapability.swift */; };
 		652618CA1C11F91500654091 /* CloudKitOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652616FF1C11F5EB00654091 /* CloudKitOperation.swift */; };
-		652618CB1C11F91500654091 /* NetworkOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652617001C11F5EB00654091 /* NetworkOperation.swift */; };
+		652618CB1C11F91500654091 /* URLSessionTaskOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652617001C11F5EB00654091 /* URLSessionTaskOperation.swift */; };
 		652618CC1C11F91500654091 /* Reachability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652617011C11F5EB00654091 /* Reachability.swift */; };
 		652618CD1C11F91500654091 /* ReachabilityCondition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652617021C11F5EB00654091 /* ReachabilityCondition.swift */; };
 		652618CE1C11F91500654091 /* ReachableOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652617031C11F5EB00654091 /* ReachableOperation.swift */; };
@@ -263,6 +263,9 @@
 		65AE14971C34865E00F592D2 /* RetryOperationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65AE14961C34865E00F592D2 /* RetryOperationTests.swift */; };
 		65AE14981C34865E00F592D2 /* RetryOperationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65AE14961C34865E00F592D2 /* RetryOperationTests.swift */; };
 		65AE14991C34865E00F592D2 /* RetryOperationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65AE14961C34865E00F592D2 /* RetryOperationTests.swift */; };
+		65B9E0811CB85C53009161AD /* URLSessionTaskOperationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65B9E0801CB85C53009161AD /* URLSessionTaskOperationTests.swift */; };
+		65B9E0821CB85C53009161AD /* URLSessionTaskOperationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65B9E0801CB85C53009161AD /* URLSessionTaskOperationTests.swift */; };
+		65B9E0831CB85C53009161AD /* URLSessionTaskOperationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65B9E0801CB85C53009161AD /* URLSessionTaskOperationTests.swift */; };
 		65BB56D71C70F29500DF5211 /* ThreadSafety.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65BB56D61C70F29500DF5211 /* ThreadSafety.swift */; };
 		65BB56D81C70F29500DF5211 /* ThreadSafety.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65BB56D61C70F29500DF5211 /* ThreadSafety.swift */; };
 		65BB56D91C70F29500DF5211 /* ThreadSafety.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65BB56D61C70F29500DF5211 /* ThreadSafety.swift */; };
@@ -380,7 +383,7 @@
 		652616FD1C11F5EB00654091 /* Capability.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Capability.swift; sourceTree = "<group>"; };
 		652616FE1C11F5EB00654091 /* CloudCapability.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudCapability.swift; sourceTree = "<group>"; };
 		652616FF1C11F5EB00654091 /* CloudKitOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudKitOperation.swift; sourceTree = "<group>"; };
-		652617001C11F5EB00654091 /* NetworkOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkOperation.swift; sourceTree = "<group>"; };
+		652617001C11F5EB00654091 /* URLSessionTaskOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLSessionTaskOperation.swift; sourceTree = "<group>"; };
 		652617011C11F5EB00654091 /* Reachability.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Reachability.swift; sourceTree = "<group>"; };
 		652617021C11F5EB00654091 /* ReachabilityCondition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReachabilityCondition.swift; sourceTree = "<group>"; };
 		652617031C11F5EB00654091 /* ReachableOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReachableOperation.swift; sourceTree = "<group>"; };
@@ -439,6 +442,7 @@
 		65A6BA7B1C220F09003A375D /* HealthCapability.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HealthCapability.swift; sourceTree = "<group>"; };
 		65A6BA7E1C220FBD003A375D /* HealthCapabilityTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HealthCapabilityTests.swift; sourceTree = "<group>"; };
 		65AE14961C34865E00F592D2 /* RetryOperationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RetryOperationTests.swift; sourceTree = "<group>"; };
+		65B9E0801CB85C53009161AD /* URLSessionTaskOperationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = URLSessionTaskOperationTests.swift; sourceTree = "<group>"; };
 		65BB56D61C70F29500DF5211 /* ThreadSafety.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ThreadSafety.swift; sourceTree = "<group>"; };
 		65C98C711C281EEC00BA76B7 /* FunctionalOperations.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FunctionalOperations.swift; sourceTree = "<group>"; };
 		65C98C761C284EA600BA76B7 /* FunctionalOperationsTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FunctionalOperationsTests.swift; sourceTree = "<group>"; };
@@ -681,7 +685,7 @@
 				6508523A1C8B2E320058F8AA /* CloudKitInterface.swift */,
 				652616FF1C11F5EB00654091 /* CloudKitOperation.swift */,
 				6508523F1C8B2E460058F8AA /* CloudKitOperationExtensions.swift */,
-				652617001C11F5EB00654091 /* NetworkOperation.swift */,
+				652617001C11F5EB00654091 /* URLSessionTaskOperation.swift */,
 				652617021C11F5EB00654091 /* ReachabilityCondition.swift */,
 				652617031C11F5EB00654091 /* ReachableOperation.swift */,
 				6526190B1C11FB3800654091 /* Support */,
@@ -787,6 +791,7 @@
 				6526172C1C11F5EB00654091 /* ReachabilityTests.swift */,
 				6526172D1C11F5EB00654091 /* ReachableOperationTests.swift */,
 				6526172E1C11F5EB00654091 /* RemoteNotificationConditionTests.swift */,
+				65B9E0801CB85C53009161AD /* URLSessionTaskOperationTests.swift */,
 				6526172F1C11F5EB00654091 /* UserNotificationConditionTests.swift */,
 				652617301C11F5EB00654091 /* WebpageOperationTests.swift */,
 			);
@@ -1242,7 +1247,7 @@
 				650852401C8B2E460058F8AA /* CloudKitOperationExtensions.swift in Sources */,
 				652618DB1C11F98000654091 /* Contacts.swift in Sources */,
 				65E4CDE21C33427500B9F9D8 /* RepeatedOperation.swift in Sources */,
-				652618B31C11F91200654091 /* NetworkOperation.swift in Sources */,
+				652618B31C11F91200654091 /* URLSessionTaskOperation.swift in Sources */,
 				652618B61C11F91200654091 /* ReachableOperation.swift in Sources */,
 				6526186B1C11F8FC00654091 /* NoFailedDependenciesCondition.swift in Sources */,
 				652618651C11F8FC00654091 /* GatedOperation.swift in Sources */,
@@ -1307,6 +1312,7 @@
 				6526197C1C11FE6D00654091 /* AddressBookTests.swift in Sources */,
 				6526191E1C11FC3D00654091 /* BackgroundObserverTests.swift in Sources */,
 				65AE14971C34865E00F592D2 /* RetryOperationTests.swift in Sources */,
+				65B9E0811CB85C53009161AD /* URLSessionTaskOperationTests.swift in Sources */,
 				652619221C11FC3D00654091 /* GroupOperationTests.swift in Sources */,
 				652619241C11FC3D00654091 /* LoggingTests.swift in Sources */,
 				652619711C11FE6900654091 /* LocationCapabilityTests.swift in Sources */,
@@ -1342,7 +1348,7 @@
 				652618861C11F8FD00654091 /* TimeoutObserver.swift in Sources */,
 				652618771C11F8FD00654091 /* DelayOperation.swift in Sources */,
 				650852321C8B23580058F8AA /* Repeatable.swift in Sources */,
-				652618BB1C11F91300654091 /* NetworkOperation.swift in Sources */,
+				652618BB1C11F91300654091 /* URLSessionTaskOperation.swift in Sources */,
 				65C98C731C281EEC00BA76B7 /* FunctionalOperations.swift in Sources */,
 				6526187F1C11F8FD00654091 /* NoFailedDependenciesCondition.swift in Sources */,
 				652618791C11F8FD00654091 /* GatedOperation.swift in Sources */,
@@ -1388,7 +1394,7 @@
 				652618D91C11F93F00654091 /* NetworkObserver.swift in Sources */,
 				6508523D1C8B2E320058F8AA /* CloudKitInterface.swift in Sources */,
 				652618C41C11F91400654091 /* Reachability.swift in Sources */,
-				652618C31C11F91400654091 /* NetworkOperation.swift in Sources */,
+				652618C31C11F91400654091 /* URLSessionTaskOperation.swift in Sources */,
 				652618C61C11F91400654091 /* ReachableOperation.swift in Sources */,
 				650852331C8B23580058F8AA /* Repeatable.swift in Sources */,
 				652618931C11F8FE00654091 /* NoFailedDependenciesCondition.swift in Sources */,
@@ -1438,6 +1444,7 @@
 				652619381C11FC3E00654091 /* NoFailedDependenciesConditionTests.swift in Sources */,
 				652619351C11FC3E00654091 /* MutualExclusiveTests.swift in Sources */,
 				65691C9F1C21A29C00AF06B4 /* ResultInjectionTests.swift in Sources */,
+				65B9E0821CB85C53009161AD /* URLSessionTaskOperationTests.swift in Sources */,
 				653097A71CC4B1AE00EC1431 /* ConditionTests.swift in Sources */,
 				652619391C11FC3E00654091 /* OperationTests.swift in Sources */,
 				6526192D1C11FC3E00654091 /* AlertOperationTests.swift in Sources */,
@@ -1474,7 +1481,7 @@
 				652618E61C11F98200654091 /* ContactsOperation.swift in Sources */,
 				652618CC1C11F91500654091 /* Reachability.swift in Sources */,
 				652618E51C11F98200654091 /* ContactsCondition.swift in Sources */,
-				652618CB1C11F91500654091 /* NetworkOperation.swift in Sources */,
+				652618CB1C11F91500654091 /* URLSessionTaskOperation.swift in Sources */,
 				652618CE1C11F91500654091 /* ReachableOperation.swift in Sources */,
 				650852431C8B2E460058F8AA /* CloudKitOperationExtensions.swift in Sources */,
 				658158481C20DBAD0086FB2A /* ResultInjection.swift in Sources */,
@@ -1535,6 +1542,7 @@
 				6526196B1C11FDF300654091 /* ContactsOperationsTests.swift in Sources */,
 				6526194B1C11FC3F00654091 /* TimeoutObserverTests.swift in Sources */,
 				6565FFEC1C98C860008B5248 /* ProfilerTests.swift in Sources */,
+				65B9E0831CB85C53009161AD /* URLSessionTaskOperationTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -122,7 +122,7 @@ public class _UserLocationOperation<Manager: LocationManagerType>: Operation, CL
         capability.registrar = manager
         addCondition(AuthorizedFor(capability))
         addCondition(MutuallyExclusive<CLLocationManager>())
-        addObserver(CancelledObserver { [weak self] _ in
+        addObserver(DidCancelObserver { [weak self] _ in
             dispatch_async(Queue.Main.queue) {
                 self?.stopLocationUpdates()
             }
@@ -238,7 +238,7 @@ public class _ReverseGeocodeOperation<Geocoder: ReverseGeocoderType>: Operation,
         addObserver(NetworkObserver())
         addObserver(BackgroundObserver())
         addCondition(MutuallyExclusive<ReverseGeocodeOperation>())
-        addObserver(CancelledObserver { [weak self] _ in
+        addObserver(DidCancelObserver { [weak self] _ in
             if let geocoder = self?.geocoder {
                 dispatch_async(Queue.Main.queue) {
                     geocoder.opr_cancel()

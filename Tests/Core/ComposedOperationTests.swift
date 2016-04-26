@@ -49,7 +49,7 @@ class ComposedOperationTests: OperationTests {
         let target = TestOperation()
         
         var targetErrors: [ErrorType] = []
-        target.addObserver(CancelledObserver { op in
+        target.addObserver(DidCancelObserver { op in
             targetErrors = op.errors
         })
         

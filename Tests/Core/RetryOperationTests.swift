@@ -50,7 +50,7 @@ class RetryOperationTests: OperationTests {
                 return nil
             }
             let op = Test { return self.numberOfFailures < threshold }
-            op.addObserver(StartedObserver { _ in
+            op.addObserver(WillExecuteObserver { _ in
                 self.numberOfFailures += 1
                 self.numberOfExecutions += 1
             })
@@ -64,7 +64,7 @@ class RetryOperationTests: OperationTests {
                 return nil
             }
             let op = Test { return self.numberOfFailures < threshold }
-            op.addObserver(StartedObserver { _ in
+            op.addObserver(WillExecuteObserver { _ in
                 self.numberOfFailures += 1
                 self.numberOfExecutions += 1
                 })

@@ -28,21 +28,12 @@ class GroupOperationTests: OperationTests {
     }
     
     func test__cancel_running_group_operation_race_condition() {
-        class SleepingGroupOperation: GroupOperation {
-            override func cancel() {
-                super.cancel()
-                sleep(1)
-                queue.cancelAllOperations()
-                queue.suspended = false
-                operations.forEach { $0.cancel() }
-            }
-        }
         
         let delay = DelayOperation(interval: 10)
-        let group = SleepingGroupOperation(operations: [delay])
+        let group = GroupOperation(operations: [delay])
         
         let expectation = expectationWithDescription("Test: \(#function)")
-        group.addObserver(BlockObserver { observedOperation, errors in
+        group.addObserver(DidFinishObserver { observedOperation, errors in
             NSOperationQueue.mainQueue().addOperationWithBlock {
                 XCTAssertTrue(observedOperation.cancelled)
                 expectation.fulfill()
@@ -190,10 +181,8 @@ class GroupOperationTests: OperationTests {
         }
         group.addObserver(observer)
         
-        addCompletionBlockToTestOperation(group)
-        runOperation(group)
-        waitForExpectationsWithTimeout(3, handler: nil)
-        
+        waitForOperation(group)
+
         guard let (observedGroup, observedChild) = blockCalledWith else {
             XCTFail("Observer not called"); return
         }
@@ -207,7 +196,7 @@ class GroupOperationTests: OperationTests {
         let child = TestOperation()
         
         var childErrors: [ErrorType] = []
-        child.addObserver(CancelledObserver { op in
+        child.addObserver(DidCancelObserver { op in
             childErrors = op.errors
         })
         

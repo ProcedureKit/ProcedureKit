@@ -19,8 +19,12 @@ class TestOperation: Operation, ResultOperationType {
     let simulatedError: ErrorType?
     let producedOperation: NSOperation?
     var didExecute: Bool = false
-    var didFinish: Bool = false
     var result: String? = "Hello World"
+
+    var operationWillFinishCalled = false
+    var operationDidFinishCalled = false
+    var operationWillCancelCalled = false
+    var operationDidCancelCalled = false
 
     init(delay: Double = 0.0001, error: ErrorType? = .None, produced: NSOperation? = .None) {
         numberOfSeconds = delay
@@ -45,9 +49,21 @@ class TestOperation: Operation, ResultOperationType {
             self.finish(self.simulatedError)
         }
     }
-    
-    override func finished(errors: [ErrorType]) {
-        didFinish = true
+
+    override func operationWillFinish(errors: [ErrorType]) {
+        operationWillFinishCalled = true
+    }
+
+    override func operationDidFinish(errors: [ErrorType]) {
+        operationDidFinishCalled = true
+    }
+
+    override func operationWillCancel(errors: [ErrorType]) {
+        operationWillCancelCalled = true
+    }
+
+    override func operationDidCancel() {
+        operationDidCancelCalled = true
     }
 }
 
