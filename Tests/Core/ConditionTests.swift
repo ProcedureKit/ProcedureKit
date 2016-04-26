@@ -11,15 +11,20 @@ import XCTest
 
 class ConditionTests: OperationTests {
     
+    var operation: TestOperation!
+    
+    override func setUp() {
+        super.setUp()
+        operation = TestOperation()
+    }
+    
     func test__single_condition_which_is_satisfied() {
-        let operation = TestOperation()
         operation.addCondition(TrueCondition())
         waitForOperation(operation)
         XCTAssertTrue(operation.didExecute)
     }
     
     func test__single_condition_which_fails() {
-        let operation = TestOperation()
         operation.addCondition(FalseCondition())
         waitForOperation(operation)
         XCTAssertFalse(operation.didExecute)
@@ -28,7 +33,6 @@ class ConditionTests: OperationTests {
     }
 
     func test__multiple_conditions_where_all_are_satisfied() {
-        let operation = TestOperation()
         operation.addCondition(TrueCondition())
         operation.addCondition(TrueCondition())
         operation.addCondition(TrueCondition())
@@ -37,7 +41,6 @@ class ConditionTests: OperationTests {
     }
 
     func test__multiple_conditions_where_all_fail() {
-        let operation = TestOperation()
         operation.addCondition(FalseCondition())
         operation.addCondition(FalseCondition())
         operation.addCondition(FalseCondition())
@@ -48,7 +51,6 @@ class ConditionTests: OperationTests {
     }
     
     func test__multiple_conditions_where_one_succeeds() {
-        let operation = TestOperation()
         operation.addCondition(TrueCondition())
         operation.addCondition(FalseCondition())
         operation.addCondition(FalseCondition())
@@ -59,7 +61,6 @@ class ConditionTests: OperationTests {
     }
 
     func test__multiple_conditions_where_one_fails() {
-        let operation = TestOperation()
         operation.addCondition(TrueCondition())
         operation.addCondition(TrueCondition())
         operation.addCondition(FalseCondition())
@@ -70,7 +71,6 @@ class ConditionTests: OperationTests {
     }
     
     func test__single_condition_with_single_condition_which_both_succeed__executes() {
-        let operation = TestOperation()
         let condition = TrueCondition()
         condition.addCondition(TrueCondition())
         operation.addCondition(condition)
@@ -80,10 +80,9 @@ class ConditionTests: OperationTests {
 
     func test__single_condition_which_succeeds_with_single_condition_which_fails__cancelled() {
         LogManager.severity = .Verbose
-        let operation = TestOperation()
+        operation = TestOperation()
         let condition = TrueCondition(name: "Condition 1")
         condition.addCondition(FalseCondition(name: "Nested Condition 1"))
-//        condition.addCondition(FalseCondition())
         operation.addCondition(condition)
         waitForOperation(operation)
         print("*** \(operation.errors)")
@@ -92,7 +91,6 @@ class ConditionTests: OperationTests {
         XCTAssertEqual(operation.errors.count, 2)
         LogManager.severity = .Warning
     }
-    
     
     func test__dependencies_execute_before_condition_dependencies() {
         
@@ -117,7 +115,6 @@ class ConditionTests: OperationTests {
         let condition2 = TrueCondition(name: "Condition 2")
         condition2.addDependency(conditionDependency2)
 
-        let operation = TestOperation()
         operation.addDependency(dependency1)
         operation.addDependency(dependency2)
         operation.addCondition(condition1)
@@ -144,7 +141,6 @@ class ConditionTests: OperationTests {
         let condition2 = TrueCondition(name: "Condition 2")
         condition2.addDependency(TestOperation())
         
-        let operation = TestOperation()
         operation.addDependency(dependency1)
         operation.addDependency(dependency2)
         operation.addCondition(condition1)
@@ -155,9 +151,5 @@ class ConditionTests: OperationTests {
         waitForExpectationsWithTimeout(3, handler: nil)
         
         XCTAssertEqual(operation.dependencies.count, 4)
-    }
-    
-    func test__dependencies_execute_after_previous_mutually_exclusive_operation() {
-        
     }
 }
