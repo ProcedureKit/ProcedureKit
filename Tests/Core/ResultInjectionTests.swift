@@ -80,7 +80,7 @@ class AutomaticResultInjectionTests: ResultInjectionTests {
     func test__processing_cancels_with_errors_if_dependency_errors() {
         retrieval = TestOperation(error: TestOperation.Error.SimulatedError)
         processing.injectResultFromDependency(retrieval)
-        processing.addObserver(CancelledObserver { op in
+        processing.addObserver(DidCancelObserver { op in
             XCTAssertEqual(op.errors.count, 1)
             guard let error = op.errors.first as? AutomaticInjectionError else {
                 XCTFail("Incorrect error received")

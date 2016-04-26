@@ -67,7 +67,7 @@ public class DelayOperation: Operation {
                 self.finish()
             }
         }
-        addObserver(CancelledObserver { _ in
+        addObserver(DidCancelObserver { _ in
             dispatch_source_cancel(_timer)
         })
     }

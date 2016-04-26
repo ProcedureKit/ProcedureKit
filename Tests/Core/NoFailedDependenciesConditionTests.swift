@@ -20,7 +20,7 @@ class NoFailedDependenciesConditionTests: OperationTests {
             addCompletionBlockToTestOperation(operation, withExpectation: expectation)
         }
         else {
-            operation.addObserver(StartedObserver { op in
+            operation.addObserver(WillExecuteObserver { op in
                 op.cancel()
                 expectation.fulfill()
             })

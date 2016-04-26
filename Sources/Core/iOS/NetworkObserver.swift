@@ -19,7 +19,7 @@ An `OperationObserverType` which can be used to manage the network
 activity indicator in iOS. Note that this is not an observer of
 when the network is available. See `ReachableOperation`.
 */
-public class NetworkObserver: OperationDidStartObserver, OperationDidFinishObserver {
+public class NetworkObserver: OperationWillExecuteObserver, OperationDidFinishObserver {
 
     let networkActivityIndicator: NetworkActivityIndicatorInterface
 
@@ -33,7 +33,7 @@ public class NetworkObserver: OperationDidStartObserver, OperationDidFinishObser
     }
 
     /// Conforms to `OperationObserver`, will start the network activity indicator.
-    public func didStartOperation(operation: Operation) {
+    public func willExecuteOperation(operation: Operation) {
         dispatch_async(Queue.Main.queue) {
             NetworkIndicatorController.sharedInstance.networkActivityIndicator = self.networkActivityIndicator
             NetworkIndicatorController.sharedInstance.networkActivityDidStart()

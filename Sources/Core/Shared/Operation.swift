@@ -125,11 +125,16 @@ public class Operation: NSOperation {
     private var _cancelled = false {
         willSet {
             willChangeValueForKey("Cancelled")
+            if !_cancelled && newValue {
+                operationWillCancel(errors)
+                willCancelObservers.forEach { $0.willCancelOperation(self, errors: self.errors) }
+            }
         }
         didSet {
             didChangeValueForKey("Cancelled")
 
             if _cancelled && !oldValue {
+                operationDidCancel()
                 didCancelObservers.forEach { $0.didCancelOperation(self) }
             }
         }
@@ -263,9 +268,26 @@ public class Operation: NSOperation {
 
      - parameter errors: an array of `ErrorType`.
      */
+    @available(*, unavailable, renamed="didFinish")
     public func finished(errors: [ErrorType]) {
-        // No op.
+        operationDidFinish(errors)
     }
+
+    /**
+     Subclasses may override `operationWillFinish(_:)` if they wish to
+     react to the operation finishing with errors.
+
+     - parameter errors: an array of `ErrorType`.
+     */
+    public func operationWillFinish(errors: [ErrorType]) { /* No op */ }
+
+    /**
+     Subclasses may override `operationDidFinish(_:)` if they wish to
+     react to the operation finishing with errors.
+
+     - parameter errors: an array of `ErrorType`.
+     */
+    public func operationDidFinish(errors: [ErrorType]) { /* no op */ }
 
     // MARK: - Cancellation
 
@@ -291,13 +313,26 @@ public class Operation: NSOperation {
         cancel()
     }
 
+    /**
+     Subclasses may override `operationWillCancel(_:)` if they wish to
+     react to the operation finishing with errors.
+
+     - parameter errors: an array of `ErrorType`.
+     */
+    public func operationWillCancel(errors: [ErrorType]) { /* No op */ }
+
+    /**
+     Subclasses may override `operationDidCancel(_:)` if they wish to
+     react to the operation finishing with errors.
+
+     - parameter errors: an array of `ErrorType`.
+     */
+    public func operationDidCancel() { /* No op */ }
+
     public override func cancel() {
         if !finished {
-
-            log.verbose("Did cancel.")
-
             _cancelled = true
-
+            log.verbose("Did cancel.")
             if state > .Ready {
                 super.cancel()
                 finish()
@@ -490,8 +525,12 @@ public extension Operation {
         }
     }
 
-    internal var didStartObservers: [OperationDidStartObserver] {
-        return observers.flatMap { $0 as? OperationDidStartObserver }
+    internal var willExecuteObservers: [OperationWillExecuteObserver] {
+        return observers.flatMap { $0 as? OperationWillExecuteObserver }
+    }
+
+    internal var willCancelObservers: [OperationWillCancelObserver] {
+        return observers.flatMap { $0 as? OperationWillCancelObserver }
     }
 
     internal var didCancelObservers: [OperationDidCancelObserver] {
@@ -532,15 +571,15 @@ public extension Operation {
     final override func main() {
         assert(state == .Ready, "This operation must be performed on an operation queue, current state: \(state).")
 
-        if _internalErrors.isEmpty && !cancelled {
-            state = .Executing
-            log.verbose("Will Execute")
-            didStartObservers.forEach { $0.didStartOperation(self) }
-            execute()
-        }
-        else {
+        guard _internalErrors.isEmpty && !cancelled else {
             finish()
+            return
         }
+
+        willExecuteObservers.forEach { $0.willExecuteOperation(self) }
+        state = .Executing
+        log.verbose("Will Execute")
+        execute()
     }
 
     /**
@@ -571,7 +610,7 @@ public extension Operation {
             state = .Finishing
 
             _internalErrors.appendContentsOf(receivedErrors)
-            finished(_internalErrors)
+            operationDidFinish(_internalErrors)
 
             if errors.isEmpty {
                 log.verbose("Finishing with no errors.")

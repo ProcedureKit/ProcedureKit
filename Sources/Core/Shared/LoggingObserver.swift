@@ -46,8 +46,21 @@ public struct LoggingObserver: OperationObserver {
 
     - parameter operation: the `Operation` which has started.
     */
-    public func didStartOperation(operation: Operation) {
-        log("\(operation.operationName): did start.")
+    public func willExecuteOperation(operation: Operation) {
+        log("\(operation.operationName): will execute.")
+    }
+
+    /**
+     Conforms to `OperationObserver`. The logger is sent a string which uses the
+     `name` parameter of the operation if provived.
+
+     "My Operation: did cancel."
+
+     - parameter operation: the `Operation` which has started.
+     */
+    public func willCancelOperation(operation: Operation, errors: [ErrorType]) {
+        let detail = errors.count > 0 ? "error(s): \(errors)" : "no errors"
+        log("\(operation.operationName): will cancel with \(detail).")
     }
 
     /**
