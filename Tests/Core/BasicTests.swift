@@ -10,28 +10,31 @@ import XCTest
 @testable import Operations
 
 class BasicTests: OperationTests {
+    
+    var operation: TestOperation!
+    
+    override func setUp() {
+        super.setUp()
+        operation = TestOperation()
+    }
+    
+    override func tearDown() {
+        operation = nil
+        super.tearDown()
+    }
 
     func test__queue_delegate_is_notified_when_operation_starts() {
-        let expectation = expectationWithDescription("Test: \(#function)")
 
-        let operation = TestOperation()
-        addCompletionBlockToTestOperation(operation, withExpectation: expectation)
-
-        runOperation(operation)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForOperation(operation)
+        
         XCTAssertTrue(operation.didExecute)
         XCTAssertTrue(delegate.did_willAddOperation)
         XCTAssertTrue(delegate.did_operationDidFinish)
     }
 
     func test__executing_basic_operation() {
-        let expectation = expectationWithDescription("Test: \(#function)")
-
-        let operation = TestOperation()
-
-        addCompletionBlockToTestOperation(operation, withExpectation: expectation)
-        runOperation(operation)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        
+        waitForOperation(operation)
 
         XCTAssertTrue(operation.didExecute)
     }
@@ -45,7 +48,6 @@ class BasicTests: OperationTests {
 
     func test__add_multiple_completion_blocks() {
         let expectation = expectationWithDescription("Test: \(#function)")
-        let operation = TestOperation()
 
         var completionBlockOneDidRun = 0
         operation.addCompletionBlock {
@@ -63,6 +65,7 @@ class BasicTests: OperationTests {
             expectation.fulfill()
         }
 
+        addCompletionBlockToTestOperation(operation)
         runOperation(operation)
         waitForExpectationsWithTimeout(3, handler: nil)
 
@@ -72,31 +75,25 @@ class BasicTests: OperationTests {
     }
 
     func test__add_multiple_dependencies() {
-        let expectation = expectationWithDescription("Test: \(#function)")
 
         let dep1 = TestOperation()
         let dep2 = TestOperation()
 
-        let operation = TestOperation()
         operation.addDependencies([dep1, dep2])
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectation)
-        runOperations(dep1, dep2, operation)
-        waitForExpectationsWithTimeout(3, handler: nil)
-
+        waitForOperations(dep1, dep2, operation)
+        
         XCTAssertTrue(dep1.didExecute)
         XCTAssertTrue(dep2.didExecute)
     }
 
     func test__cancel_with_nil_error() {
-        let operation = TestOperation()
         operation.cancelWithError(.None)
         XCTAssertTrue(operation.cancelled)
         XCTAssertEqual(operation.errors.count, 0)
     }
 
     func test__cancel_with_error() {
-        let operation = TestOperation()
         operation.cancelWithError(OperationError.OperationTimedOut(1.0))
         XCTAssertTrue(operation.cancelled)
         XCTAssertTrue(operation.failed)
@@ -112,9 +109,8 @@ class BasicTests: OperationTests {
     }
 
     func test__operation_gets_finished_called() {
-        let operation = TestOperation()
         waitForOperation(operation)
-        XCTAssertTrue(operation.didFinish)
+        XCTAssertTrue(operation.operationDidFinishCalled)
     }
     
     func test__operation_will_cancel_called_before_cancelled() {

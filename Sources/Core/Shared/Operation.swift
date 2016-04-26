@@ -330,7 +330,7 @@ public class Operation: NSOperation {
         if !finished {
             _cancelled = true
             log.verbose("Did cancel.")
-            if state > .Ready {
+            if executing {
                 super.cancel()
                 finish()
             }
