@@ -98,7 +98,7 @@ public class Condition: Operation, ConditionType, ResultOperationType {
 }
 
 
-public class TrueCondition: BlockCondition {
+public class TrueCondition: Condition {
 
     public init(name: String = "True Condition", mutuallyExclusive: Bool = false) {
         super.init()
@@ -120,7 +120,7 @@ public class FalseCondition: Condition {
     }
 
     public override func evaluate(operation: Operation, completion: CompletionBlockType) {
-        completion(.Failed(Error.FalseCondition))
+        completion(.Failed(ConditionError.FalseCondition))
     }
 }
 
