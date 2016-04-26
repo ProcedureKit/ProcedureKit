@@ -265,7 +265,7 @@ public class Operation: NSOperation {
 
      - parameter errors: an array of `ErrorType`.
      */
-    @available(*, unavailable, renamed="didFinish")
+    @available(*, unavailable, renamed="operationDidFinish")
     public func finished(errors: [ErrorType]) {
         operationDidFinish(errors)
     }
