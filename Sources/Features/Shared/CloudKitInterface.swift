@@ -54,6 +54,9 @@ public protocol CKOperationType: class {
     /// The type of the CloudKit RecordID
     associatedtype RecordID: Hashable
 
+    /// The type of error handler
+    associatedtype Error: CloudKitErrorType
+
     /// - returns the CloudKit Container
     var container: Container? { get set }
 }
@@ -325,9 +328,13 @@ extension CKOperation: CKOperationType {
 
     /// The QueryCursor is a CKQueryCursor
     public typealias QueryCursor = CKQueryCursor
+
+    /// The error info
+    public typealias Error = NSError
 }
 
 extension CKDatabaseOperation: CKDatabaseOperationType {
+
     /// The Database is a CKDatabase
     public typealias Database = CKDatabase
 }

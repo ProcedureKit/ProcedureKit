@@ -25,7 +25,7 @@ public class CloudKitRecovery<T where T: NSOperation, T: CKOperationType> {
     public typealias V = OPRCKOperation<T>
 
     public typealias ErrorResponse = (delay: Delay?, configure: V -> Void)
-    public typealias Handler = (error: NSError, log: LoggerType, suggested: ErrorResponse) -> ErrorResponse?
+    public typealias Handler = (error: T.Error, log: LoggerType, suggested: ErrorResponse) -> ErrorResponse?
 
     typealias Payload = (Delay?, V)
 
@@ -62,10 +62,7 @@ public class CloudKitRecovery<T where T: NSOperation, T: CKOperationType> {
         }
 
         let retry: Handler = { error, log, suggestion in
-            if let interval = (error.userInfo[CKErrorRetryAfterKey] as? NSNumber).map({ $0.doubleValue }) {
-                return (Delay.By(interval), suggestion.configure)
-            }
-            return suggestion
+            return error.retryAfterDelay.map { ($0, suggestion.configure) } ?? suggestion
         }
 
         setDefaultHandlerForCode(.InternalError, handler: exit)
@@ -96,10 +93,10 @@ public class CloudKitRecovery<T where T: NSOperation, T: CKOperationType> {
         customHandlers.updateValue(handler, forKey: code)
     }
 
-    internal func cloudKitErrorsFromInfo(info: RetryFailureInfo<OPRCKOperation<T>>) -> (code: CKErrorCode, error: NSError)? {
-        let mapped: [(CKErrorCode, NSError)] = info.errors.flatMap { error in
+    internal func cloudKitErrorsFromInfo(info: RetryFailureInfo<OPRCKOperation<T>>) -> (code: CKErrorCode, error: T.Error)? {
+        let mapped: [(CKErrorCode, T.Error)] = info.errors.flatMap { error in
             let error = error as NSError
-            if error.domain == CKErrorDomain, let code = CKErrorCode(rawValue: error.code) {
+            if error.domain == CKErrorDomain, let code = CKErrorCode(rawValue: error.code), error = error as? T.Error {
                 return (code, error)
             }
             return .None
