@@ -226,17 +226,20 @@
 		6584D25F1C6BF93900306EED /* RetryOperationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6584D24D1C6BF90E00306EED /* RetryOperationTests.swift */; };
 		6584D2601C6BF93A00306EED /* ResultInjectionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6584D24C1C6BF90E00306EED /* ResultInjectionTests.swift */; };
 		6584D2611C6BF93A00306EED /* RetryOperationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6584D24D1C6BF90E00306EED /* RetryOperationTests.swift */; };
+		65A74FC11CC59488008D7193 /* Condition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 653097A91CC4BFB200EC1431 /* Condition.swift */; };
+		65A74FC21CC59488008D7193 /* Condition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 653097A91CC4BFB200EC1431 /* Condition.swift */; };
 		65B9E07D1CB85941009161AD /* URLSessionTaskOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65B9E07C1CB85941009161AD /* URLSessionTaskOperation.swift */; };
 		65B9E07E1CB8594F009161AD /* URLSessionTaskOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65B9E07C1CB85941009161AD /* URLSessionTaskOperation.swift */; };
 		65B9E07F1CB8594F009161AD /* URLSessionTaskOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65B9E07C1CB85941009161AD /* URLSessionTaskOperation.swift */; };
 		65B9E0861CB85F55009161AD /* URLSessionTaskOperationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65B9E0841CB85F4E009161AD /* URLSessionTaskOperationTests.swift */; };
 		65B9E0871CB85F55009161AD /* URLSessionTaskOperationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65B9E0841CB85F4E009161AD /* URLSessionTaskOperationTests.swift */; };
 		65B9E0881CB85F56009161AD /* URLSessionTaskOperationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65B9E0841CB85F4E009161AD /* URLSessionTaskOperationTests.swift */; };
-		65A74FC11CC59488008D7193 /* Condition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 653097A91CC4BFB200EC1431 /* Condition.swift */; };
-		65A74FC21CC59488008D7193 /* Condition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 653097A91CC4BFB200EC1431 /* Condition.swift */; };
 		65BB56DC1C70FAB100DF5211 /* ThreadSafety.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65BB56DB1C70FAB100DF5211 /* ThreadSafety.swift */; };
 		65BB56DD1C70FAB700DF5211 /* ThreadSafety.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65BB56DB1C70FAB100DF5211 /* ThreadSafety.swift */; };
 		65BB56DE1C70FAB800DF5211 /* ThreadSafety.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65BB56DB1C70FAB100DF5211 /* ThreadSafety.swift */; };
+		65FD6C681CD16980005D2639 /* CloudKitError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65FD6C671CD16980005D2639 /* CloudKitError.swift */; };
+		65FD6C691CD16989005D2639 /* CloudKitError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65FD6C671CD16980005D2639 /* CloudKitError.swift */; };
+		65FD6C6A1CD1698A005D2639 /* CloudKitError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65FD6C671CD16980005D2639 /* CloudKitError.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -376,6 +379,7 @@
 		65B9E07C1CB85941009161AD /* URLSessionTaskOperation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = URLSessionTaskOperation.swift; sourceTree = "<group>"; };
 		65B9E0841CB85F4E009161AD /* URLSessionTaskOperationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = URLSessionTaskOperationTests.swift; sourceTree = "<group>"; };
 		65BB56DB1C70FAB100DF5211 /* ThreadSafety.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ThreadSafety.swift; sourceTree = "<group>"; };
+		65FD6C671CD16980005D2639 /* CloudKitError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CloudKitError.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -597,6 +601,7 @@
 				652617681C11F61700654091 /* CalendarCapability.swift */,
 				652617691C11F61700654091 /* Capability.swift */,
 				6526176A1C11F61700654091 /* CloudCapability.swift */,
+				65FD6C671CD16980005D2639 /* CloudKitError.swift */,
 				65356EB31C8B3B390029E8AF /* CloudKitInterface.swift */,
 				6526176B1C11F61700654091 /* CloudKitOperation.swift */,
 				65356EB41C8B3B390029E8AF /* CloudKitOperationExtensions.swift */,
@@ -1001,6 +1006,7 @@
 				652619811C11FF5200654091 /* ComposedOperation.swift in Sources */,
 				652619D11C12004900654091 /* ContactsCondition.swift in Sources */,
 				652619911C11FF5200654091 /* TimeoutObserver.swift in Sources */,
+				65FD6C681CD16980005D2639 /* CloudKitError.swift in Sources */,
 				652619C21C12003A00654091 /* PhotosCapability.swift in Sources */,
 				65356EB61C8B3B390029E8AF /* CloudKitOperationExtensions.swift in Sources */,
 				652619C91C12003F00654091 /* CloudCapability.swift in Sources */,
@@ -1095,7 +1101,6 @@
 				652619A41C11FF5200654091 /* Support.swift in Sources */,
 				652619DF1C12012C00654091 /* Reachability.swift in Sources */,
 				652619941C11FF5200654091 /* BlockOperation.swift in Sources */,
-				652619DE1C12012C00654091 /* NetworkOperation.swift in Sources */,
 				65A74FC11CC59488008D7193 /* Condition.swift in Sources */,
 				652619951C11FF5200654091 /* ComposedOperation.swift in Sources */,
 				652619A51C11FF5200654091 /* TimeoutObserver.swift in Sources */,
@@ -1115,6 +1120,7 @@
 				6526199C1C11FF5200654091 /* MutuallyExclusive.swift in Sources */,
 				652619DD1C12012C00654091 /* CloudKitOperation.swift in Sources */,
 				6526199B1C11FF5200654091 /* LoggingObserver.swift in Sources */,
+				65FD6C691CD16989005D2639 /* CloudKitError.swift in Sources */,
 				652619991C11FF5200654091 /* GroupOperation.swift in Sources */,
 				652619A11C11FF5200654091 /* OperationObserver.swift in Sources */,
 				652619E01C12012C00654091 /* ReachabilityCondition.swift in Sources */,
@@ -1170,6 +1176,7 @@
 			files = (
 				652619B71C11FF5300654091 /* SlientCondition.swift in Sources */,
 				652619B61C11FF5300654091 /* OperationQueue.swift in Sources */,
+				65FD6C6A1CD1698A005D2639 /* CloudKitError.swift in Sources */,
 				652619E61C1201AF00654091 /* CloudKitOperation.swift in Sources */,
 				652619B11C11FF5300654091 /* NegatedCondition.swift in Sources */,
 				652619B31C11FF5300654091 /* Operation.swift in Sources */,
