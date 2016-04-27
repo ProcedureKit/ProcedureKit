@@ -25,6 +25,7 @@ class TestCloudOperation: NSOperation, CKOperationType {
     typealias DiscoveredUserInfo = String
     typealias Query = String
     typealias QueryCursor = String
+    typealias Error = NSError
 
     var container: String? // just a test
 }
