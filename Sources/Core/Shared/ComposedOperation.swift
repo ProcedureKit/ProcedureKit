@@ -29,8 +29,13 @@ public class ComposedOperation<T: NSOperation>: Operation {
     }
 
     public override func cancel() {
-        operation.cancel()
+        target.cancel()
         super.cancel()
+    }
+
+    public override func cancelWithErrors(errors: [ErrorType]) {
+        target.cancelWithError(OperationError.ParentOperationCancelledWithErrors(errors))
+        super.cancelWithErrors(errors)
     }
 
     public override func execute() {

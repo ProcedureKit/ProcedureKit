@@ -8,9 +8,6 @@
 
 import Foundation
 
-
-
-
 /**
 An `Operation` subclass which enables the grouping
 of other operations. Use `GroupOperation`s to associate
@@ -35,6 +32,14 @@ public class GroupOperation: Operation {
         return _aggregateErrors.read { $0 }
     }
 
+    public override var userIntent: Operation.UserIntent {
+        didSet {
+            let (nsops, ops) = operations.splitNSOperationsAndOperations
+            nsops.forEach { $0.setQualityOfServiceFromUserIntent(userIntent) }
+            ops.forEach { $0.userIntent = userIntent }
+        }
+    }
+
     /**
     Designated initializer.
 
@@ -46,19 +51,29 @@ public class GroupOperation: Operation {
         name = "Group Operation"
         queue.suspended = true
         queue.delegate = self
+        userIntent = operations.userIntent
     }
 
-    /// Convenience intiializer for direct usage without subclassing.
+    /// Convenience initializer for direct usage without subclassing.
     public convenience init(operations: NSOperation...) {
         self.init(operations: operations)
     }
 
     /// Override of public method
     public override func cancel() {
-        queue.cancelAllOperations()
         queue.suspended = false
+        queue.cancelAllOperations()
         operations.forEach { $0.cancel() }
         super.cancel()
+    }
+
+    /// Override of public method
+    public override func cancelWithErrors(errors: [ErrorType]) {
+        queue.suspended = false
+        let (nsops, ops) = operations.splitNSOperationsAndOperations
+        nsops.forEach { $0.cancel() }
+        ops.forEach { $0.cancelWithError(OperationError.ParentOperationCancelledWithErrors(errors)) }
+        super.cancelWithErrors(errors)
     }
 
     /**
@@ -96,11 +111,7 @@ public class GroupOperation: Operation {
      */
     public func addOperations(operations: [NSOperation]) {
         if operations.count > 0 {
-            operations.forEach {
-                if let op = $0 as? Operation {
-                    op.log.severity = log.severity
-                }
-            }
+            operations.forEachOperation { $0.log.severity = log.severity }
             queue.addOperations(operations)
         }
     }

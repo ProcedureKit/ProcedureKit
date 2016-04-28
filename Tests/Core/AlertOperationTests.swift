@@ -19,6 +19,17 @@ class AlertOperationTests: OperationTests {
         super.setUp()
         presentingController = TestablePresentingController()
     }
+    
+    func test__alert_style_set_default() {
+        let op = AlertOperation(presentAlertFrom: presentingController)
+        XCTAssertEqual(op.alert.preferredStyle, UIAlertControllerStyle.Alert)
+    }
+    
+    func test__alert_style_actionSheet() {
+        let style = UIAlertControllerStyle.ActionSheet
+        let op = AlertOperation(presentAlertFrom: presentingController, preferredStyle: style)
+        XCTAssertEqual(op.alert.preferredStyle, style)
+    }
 
     func test__alert_title_works() {
         let alert = AlertOperation(presentAlertFrom: presentingController)

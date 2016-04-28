@@ -42,6 +42,9 @@
                <Test
                   Identifier = "CompletionBlockOperationTests/test__many_completion_blocks_are_executed()">
                </Test>
+               <Test
+                  Identifier = "RandomFailGeneratorTests/test__failure_probability_distribution()">
+               </Test>
             </SkippedTests>
          </TestableReference>
       </Testables>

@@ -14,9 +14,10 @@ An `OperationCondition` which will be satisfied if the block returns true.
 public struct BlockCondition: OperationCondition {
 
     /// The block type which returns a Bool.
-    public typealias ConditionBlockType = () -> Bool
+    public typealias ConditionBlockType = () throws -> Bool
 
-    /// The error used to indicate failure.
+    /// The error used to indicate failure, in the case
+    /// of a false return, without a thrown error.
     public enum Error: ErrorType {
 
         /**
@@ -75,7 +76,13 @@ public struct BlockCondition: OperationCondition {
     - parameter completion: the evaulation completion block, it is given the result.
     */
     public func evaluateForOperation(operation: Operation, completion: OperationConditionResult -> Void) {
-        completion(condition() ? .Satisfied : .Failed(Error.BlockConditionFailed))
+        do {
+            let result = try condition()
+            completion(result ? .Satisfied : .Failed(Error.BlockConditionFailed))
+        }
+        catch {
+            completion(.Failed(error))
+        }
     }
 }
 

@@ -1,5 +1,5 @@
 //
-//  NetworkOperation.swift
+//  URLSessionTaskOperation.swift
 //  Operations
 //
 //  Created by Daniel Thorpe on 01/10/2015.
@@ -25,6 +25,9 @@ public class URLSessionTaskOperation: Operation {
 
     public let task: NSURLSessionTask
 
+    private var removedObserved = false
+    private let lock = NSLock()
+
     public init(task: NSURLSessionTask) {
         assert(task.state == .Suspended, "NSURLSessionTask must be suspended, not \(task.state)")
         self.task = task
@@ -43,9 +46,21 @@ public class URLSessionTaskOperation: Operation {
     public override func observeValueForKeyPath(keyPath: String?, ofObject object: AnyObject?, change: [String : AnyObject]?, context: UnsafeMutablePointer<Void>) {
         guard context == &URLSessionTaskOperationKVOContext else { return }
 
-        if object === task && task.state == .Completed  && keyPath == KeyPath.State.rawValue {
-            task.removeObserver(self, forKeyPath: KeyPath.State.rawValue)
-            finish()
+        lock.withCriticalScope {
+            if object === task && keyPath == KeyPath.State.rawValue && !removedObserved {
+
+                if case .Completed = task.state {
+                    finish(task.error)
+                }
+
+                switch task.state {
+                case .Completed, .Canceling:
+                    task.removeObserver(self, forKeyPath: KeyPath.State.rawValue)
+                    removedObserved = true
+                default:
+                    break
+                }
+            }
         }
     }
 }

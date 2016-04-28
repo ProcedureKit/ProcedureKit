@@ -246,17 +246,6 @@ class BasicTests: OperationTests {
         XCTAssertTrue(dep2.didExecute)
     }
 
-    func test__getting_user_initiated_default_false() {
-        let operation = TestOperation()
-        XCTAssertFalse(operation.userInitiated)
-    }
-
-    func test__setting_user_initiated() {
-        let operation = TestOperation()
-        operation.userInitiated = true
-        XCTAssertTrue(operation.userInitiated)
-    }
-
     func test__cancel_with_nil_error() {
         let operation = TestOperation()
         operation.cancelWithError(.None)
@@ -284,6 +273,37 @@ class BasicTests: OperationTests {
         let operation = TestOperation()
         waitForOperation(operation)
         XCTAssertTrue(operation.didFinish)
+    }
+}
+
+class UserIntentOperationTests: OperationTests {
+
+    func test__getting_user_intent_default_background() {
+        let operation = TestOperation()
+        XCTAssertEqual(operation.userIntent, Operation.UserIntent.None)
+    }
+
+    func test__set_user_intent__initiated() {
+        let operation = TestOperation()
+        operation.userIntent = .Initiated
+        XCTAssertEqual(operation.qualityOfService, NSQualityOfService.UserInitiated)
+    }
+
+    func test__set_user_intent__side_effect() {
+        let operation = TestOperation()
+        operation.userIntent = .SideEffect
+        XCTAssertEqual(operation.qualityOfService, NSQualityOfService.UserInitiated)
+    }
+
+    func test__set_user_intent__initiated_then_background() {
+        let operation = TestOperation()
+        operation.userIntent = .Initiated
+        operation.userIntent = .None
+        XCTAssertEqual(operation.qualityOfService, NSQualityOfService.Default)
+    }
+
+    func test__user_intent__equality() {
+        XCTAssertNotEqual(Operation.UserIntent.Initiated, Operation.UserIntent.SideEffect)
     }
 }
 
