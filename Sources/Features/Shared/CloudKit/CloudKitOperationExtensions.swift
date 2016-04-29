@@ -706,7 +706,8 @@ extension OPRCKOperation where T: CKModifyRecordZonesOperationType {
     func setModifyRecordZonesCompletionBlock(block: CloudKitOperation<T>.ModifyRecordZonesCompletionBlock) {
         operation.modifyRecordZonesCompletionBlock = { [unowned target] saved, deleted, error in
             if let error = error, target = target as? GroupOperation {
-                target.aggregateError(error)
+                let modifyRecordZonesError = ModifyRecordZonesError(error: error, saved: saved, deleted: deleted)
+                target.aggregateError(modifyRecordZonesError)
             }
             else {
                 block(saved, deleted)
@@ -794,7 +795,8 @@ extension OPRCKOperation where T: CKModifyRecordsOperationType {
     func setModifyRecordsCompletionBlock(block: CloudKitOperation<T>.ModifyRecordsCompletionBlock) {
         operation.modifyRecordsCompletionBlock = { [unowned target] saved, deleted, error in
             if let error = error, target = target as? GroupOperation {
-                target.aggregateError(error)
+                let modifyRecordError = ModifyRecordsError(error: error, saved: saved, deleted: deleted)
+                target.aggregateError(modifyRecordError)
             }
             else {
                 block(saved, deleted)

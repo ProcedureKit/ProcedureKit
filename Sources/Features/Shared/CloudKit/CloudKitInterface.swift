@@ -217,6 +217,8 @@ public protocol CKFetchSubscriptionsOperationType: CKDatabaseOperationType {
 /// A generic protocol which exposes the properties used by Apple's CKModifyRecordZonesOperation.
 public protocol CKModifyRecordZonesOperationType: CKDatabaseOperationType {
 
+    associatedtype Error = ModifyRecordZonesError<RecordZone, RecordZoneID>
+
     /// - returns: the record zones to save
     var recordZonesToSave: [RecordZone]? { get set }
 
@@ -229,6 +231,8 @@ public protocol CKModifyRecordZonesOperationType: CKDatabaseOperationType {
 
 // A generic protocol which exposes the properties used by Apple's CKModifyRecordsOperation.
 public protocol CKModifyRecordsOperationType: CKDatabaseOperationType {
+
+    associatedtype Error = ModifyRecordsError<Record, RecordID>
 
     /// - returns: the records to save
     var recordsToSave: [Record]? { get set }
