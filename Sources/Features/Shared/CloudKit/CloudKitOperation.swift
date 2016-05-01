@@ -61,10 +61,6 @@ public class CloudKitRecovery<T where T: NSOperation, T: CKOperationType> {
             return .None
         }
 
-        let retry: Handler = { error, log, suggestion in
-            return error.retryAfterDelay.map { ($0, suggestion.configure) } ?? suggestion
-        }
-
         setDefaultHandlerForCode(.InternalError, handler: exit)
         setDefaultHandlerForCode(.MissingEntitlement, handler: exit)
         setDefaultHandlerForCode(.InvalidArguments, handler: exit)
@@ -75,6 +71,10 @@ public class CloudKitRecovery<T where T: NSOperation, T: CKOperationType> {
         setDefaultHandlerForCode(.BadDatabase, handler: exit)
         setDefaultHandlerForCode(.QuotaExceeded, handler: exit)
         setDefaultHandlerForCode(.OperationCancelled, handler: exit)
+
+        let retry: Handler = { error, log, suggestion in
+            return error.retryAfterDelay.map { ($0, suggestion.configure) } ?? suggestion
+        }
 
         setDefaultHandlerForCode(.NetworkUnavailable, handler: retry)
         setDefaultHandlerForCode(.NetworkFailure, handler: retry)

@@ -32,29 +32,3 @@ extension NSError: CloudKitErrorType {
         return self
     }
 }
-
-public struct ModifyRecordZonesError<RecordZone, RecordZoneID>: CloudKitErrorType {
-
-    public let error: NSError
-    public let saved: [RecordZone]?
-    public let deleted: [RecordZoneID]?
-
-    init(error: NSError, saved: [RecordZone]?, deleted: [RecordZoneID]?) {
-        self.error = error
-        self.saved = saved
-        self.deleted = deleted
-    }
-}
-
-public struct ModifyRecordsError<Record, RecordID>: CloudKitErrorType {
-
-    public let error: NSError
-    public let saved: [Record]?
-    public let deleted: [RecordID]?
-
-    init(error: NSError, saved: [Record]?, deleted: [RecordID]?) {
-        self.error = error
-        self.saved = saved
-        self.deleted = deleted
-    }
-}
