@@ -183,10 +183,7 @@ public class LocationCapability: NSObject, CLLocationManagerDelegate, Capability
      - parameter status: the CLAuthorizationStatus
      */
     @objc public func locationManager(manager: CLLocationManager, didChangeAuthorizationStatus status: CLAuthorizationStatus) {
-        guard status != .NotDetermined else {
-            return
-        }
-
+        guard status != .NotDetermined else { return }
         authorizationCompletionBlock?()
     }
 }
