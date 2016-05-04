@@ -50,6 +50,8 @@ extension TestableLocationRegistrar: LocationCapabilityRegistrarType {
     func opr_requestAuthorizationWithRequirement(requirement: LocationUsage) {
         didRequestAuthorization = requirement
         authorizationStatus = responseStatus
+        // In some cases CLLocationManager will immediately send a .NotDetermined 
+        delegate.locationManager!(fakeLocationManager, didChangeAuthorizationStatus: .NotDetermined)
         delegate.locationManager!(fakeLocationManager, didChangeAuthorizationStatus: responseStatus)
     }
 }
