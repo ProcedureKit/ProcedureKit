@@ -1,3 +1,7 @@
+# 2.10.1
+
+1. [[OPR-305](https://github.com/danthorpe/Operations/pull/305)]: Resolves an issue where `Capability.Location` can finish early. This can happen on subsequent permission challenges if the app is closed while the permission alert is on screen. It appears to be some slightly unexpected behavior of `CLLocationManager` informing its delegate immediately that the status is `.NotDetermined`. Lots of thanks to [J-Swift](https://github.com/J-Swift) for finding, explaining to me, and providing a fix for this issue!  
+
 # 2.10.0
 
 1. [[OPR-256](https://github.com/danthorpe/Operations/pull/256)]: When a `GroupOperation` is cancelled with errors, the child operations in the group are also cancelled with those errors wrapped inside an `OperationError.ParentOperationCancelledWithErrors` error. Thanks to [@felix-dumit](https://github.com/felix-dumit) and [@jshier](https://github.com/jshier) for contributing.
