@@ -142,16 +142,16 @@ extension CloudKitOperation where T: CKDesiredKeys {
 
 public struct DiscoverAllContactsError<DiscoveredUserInfo>: CloudKitErrorType {
 
-    public let error: NSError
+    public let underlyingError: NSError
     public let userInfo: [DiscoveredUserInfo]?
 
     init(error: NSError, userInfo: [DiscoveredUserInfo]?) {
-        self.error = error
+        self.underlyingError = error
         self.userInfo = userInfo
     }
 }
 
-extension OPRCKOperation where T: CKDiscoverAllContactsOperationType {
+extension OPRCKOperation where T: CKDiscoverAllContactsOperationType, T: AssociatedErrorType {
 
     func setDiscoverAllContactsCompletionBlock(block: CloudKitOperation<T>.DiscoverAllContactsCompletionBlock) {
         operation.discoverAllContactsCompletionBlock = { [unowned target] userInfo, error in
@@ -165,7 +165,7 @@ extension OPRCKOperation where T: CKDiscoverAllContactsOperationType {
     }
 }
 
-extension CloudKitOperation where T: CKDiscoverAllContactsOperationType {
+extension CloudKitOperation where T: CKDiscoverAllContactsOperationType, T: AssociatedErrorType {
 
     /// A typealias for the block type used by CloudKitOperation<CKDiscoverAllContactsOperation>
     public typealias DiscoverAllContactsCompletionBlock = [T.DiscoveredUserInfo]? -> Void
@@ -184,7 +184,7 @@ extension CloudKitOperation where T: CKDiscoverAllContactsOperationType {
 
 // MARK: - CKDiscoverUserInfosOperation
 
-extension OPRCKOperation where T: CKDiscoverUserInfosOperationType {
+extension OPRCKOperation where T: CKDiscoverUserInfosOperationType, T: AssociatedErrorType {
 
     var emailAddresses: [String]? {
         get { return operation.emailAddresses }
@@ -199,7 +199,7 @@ extension OPRCKOperation where T: CKDiscoverUserInfosOperationType {
     func setDiscoverUserInfosCompletionBlock(block: CloudKitOperation<T>.DiscoverUserInfosCompletionBlock) {
         operation.discoverUserInfosCompletionBlock = { [unowned target] userInfoByEmail, userInfoByRecordID, error in
             if let error = error, target = target as? GroupOperation {
-                target.aggregateError(error)
+                target.aggregateError(CloudKitError(error: error))
             }
             else {
                 block(userInfoByEmail, userInfoByRecordID)
@@ -208,7 +208,7 @@ extension OPRCKOperation where T: CKDiscoverUserInfosOperationType {
     }
 }
 
-extension CloudKitOperation where T: CKDiscoverUserInfosOperationType {
+extension CloudKitOperation where T: CKDiscoverUserInfosOperationType, T: AssociatedErrorType {
 
     /// A typealias for the block type used by CloudKitOperation<CKDiscoverUserInfosOperation>
     public typealias DiscoverUserInfosCompletionBlock = ([String: T.DiscoveredUserInfo]?, [T.RecordID: T.DiscoveredUserInfo]?) -> Void
@@ -247,16 +247,16 @@ extension CloudKitOperation where T: CKDiscoverUserInfosOperationType {
 
 public struct FetchNotificationChangesError<ServerChangeToken>: CloudKitErrorType {
 
-    public let error: NSError
+    public let underlyingError: NSError
     public let token: ServerChangeToken?
 
     init(error: NSError, token: ServerChangeToken?) {
-        self.error = error
+        self.underlyingError = error
         self.token = token
     }
 }
 
-extension OPRCKOperation where T: CKFetchNotificationChangesOperationType {
+extension OPRCKOperation where T: CKFetchNotificationChangesOperationType, T: AssociatedErrorType {
 
     var notificationChangedBlock: CloudKitOperation<T>.FetchNotificationChangesChangedBlock? {
         get { return operation.notificationChangedBlock }
@@ -332,16 +332,16 @@ extension BatchedCloudKitOperation where T: CKFetchNotificationChangesOperationT
 
 public struct MarkNotificationsReadError<NotificationID>: CloudKitErrorType {
 
-    public let error: NSError
+    public let underlyingError: NSError
     public let marked: [NotificationID]?
 
     init(error: NSError, marked: [NotificationID]?) {
-        self.error = error
+        self.underlyingError = error
         self.marked = marked
     }
 }
 
-extension OPRCKOperation where T: CKMarkNotificationsReadOperationType {
+extension OPRCKOperation where T: CKMarkNotificationsReadOperationType, T: AssociatedErrorType {
 
     var notificationIDs: [T.NotificationID] {
         get { return operation.notificationIDs }
@@ -388,7 +388,7 @@ extension CloudKitOperation where T: CKMarkNotificationsReadOperationType {
 
 // MARK: - CKModifyBadgeOperation
 
-extension OPRCKOperation where T: CKModifyBadgeOperationType {
+extension OPRCKOperation where T: CKModifyBadgeOperationType, T: AssociatedErrorType {
 
     var badgeValue: Int {
         get { return operation.badgeValue }
@@ -398,7 +398,7 @@ extension OPRCKOperation where T: CKModifyBadgeOperationType {
     func setModifyBadgeCompletionBlock(block: CloudKitOperation<T>.ModifyBadgeCompletionBlock) {
         operation.modifyBadgeCompletionBlock = { [unowned target] error in
             if let error = error, target = target as? GroupOperation {
-                target.aggregateError(error)
+                target.aggregateError(CloudKitError(error: error))
             }
             else {
                 block()
@@ -429,18 +429,18 @@ extension CloudKitOperation where T: CKModifyBadgeOperationType {
 
 public struct FetchRecordChangesError<ServerChangeToken>: CloudKitErrorType {
 
-    public let error: NSError
+    public let underlyingError: NSError
     public let token: ServerChangeToken?
     public let data: NSData?
 
     init(error: NSError, token: ServerChangeToken?, data: NSData?) {
-        self.error = error
+        self.underlyingError = error
         self.token = token
         self.data = data
     }
 }
 
-extension OPRCKOperation where T: CKFetchRecordChangesOperationType {
+extension OPRCKOperation where T: CKFetchRecordChangesOperationType, T: AssociatedErrorType {
 
     var recordZoneID: T.RecordZoneID {
         get { return operation.recordZoneID }
@@ -564,16 +564,16 @@ extension BatchedCloudKitOperation where T: CKFetchRecordChangesOperationType {
 
 public struct FetchRecordZonesError<RecordZone, RecordZoneID: Hashable>: CloudKitErrorType {
 
-    public let error: NSError
+    public let underlyingError: NSError
     public let zonesByID: [RecordZoneID: RecordZone]?
 
     init(error: NSError, zonesByID: [RecordZoneID: RecordZone]?) {
-        self.error = error
+        self.underlyingError = error
         self.zonesByID = zonesByID
     }
 }
 
-extension OPRCKOperation where T: CKFetchRecordZonesOperationType {
+extension OPRCKOperation where T: CKFetchRecordZonesOperationType, T: AssociatedErrorType {
 
     var recordZoneIDs: [T.RecordZoneID]? {
         get { return operation.recordZoneIDs }
@@ -622,16 +622,16 @@ extension CloudKitOperation where T: CKFetchRecordZonesOperationType {
 
 public struct FetchRecordsError<Record, RecordID: Hashable>: CloudKitErrorType {
 
-    public let error: NSError
+    public let underlyingError: NSError
     public let recordsByID: [RecordID: Record]?
 
     init(error: NSError, recordsByID: [RecordID: Record]?) {
-        self.error = error
+        self.underlyingError = error
         self.recordsByID = recordsByID
     }
 }
 
-extension OPRCKOperation where T: CKFetchRecordsOperationType {
+extension OPRCKOperation where T: CKFetchRecordsOperationType, T: AssociatedErrorType {
 
     var recordIDs: [T.RecordID]? {
         get { return operation.recordIDs }
@@ -714,16 +714,16 @@ extension CloudKitOperation where T: CKFetchRecordsOperationType {
 
 public struct FetchSubscriptionsError<Subscription>: CloudKitErrorType {
 
-    public let error: NSError
+    public let underlyingError: NSError
     public let subscriptionsByID: [String: Subscription]?
 
     init(error: NSError, subscriptionsByID: [String: Subscription]?) {
-        self.error = error
+        self.underlyingError = error
         self.subscriptionsByID = subscriptionsByID
     }
 }
 
-extension OPRCKOperation where T: CKFetchSubscriptionsOperationType {
+extension OPRCKOperation where T: CKFetchSubscriptionsOperationType, T: AssociatedErrorType {
 
     var subscriptionIDs: [String]? {
         get { return operation.subscriptionIDs }
@@ -772,18 +772,18 @@ extension CloudKitOperation where T: CKFetchSubscriptionsOperationType {
 
 public struct ModifyRecordZonesError<RecordZone, RecordZoneID>: CloudKitErrorType {
 
-    public let error: NSError
+    public let underlyingError: NSError
     public let saved: [RecordZone]?
     public let deleted: [RecordZoneID]?
 
     init(error: NSError, saved: [RecordZone]?, deleted: [RecordZoneID]?) {
-        self.error = error
+        self.underlyingError = error
         self.saved = saved
         self.deleted = deleted
     }
 }
 
-extension OPRCKOperation where T: CKModifyRecordZonesOperationType {
+extension OPRCKOperation where T: CKModifyRecordZonesOperationType, T: AssociatedErrorType {
 
     var recordZonesToSave: [T.RecordZone]? {
         get { return operation.recordZonesToSave }
@@ -846,18 +846,18 @@ extension CloudKitOperation where T: CKModifyRecordZonesOperationType {
 
 public struct ModifyRecordsError<Record, RecordID>: CloudKitErrorType {
 
-    public let error: NSError
+    public let underlyingError: NSError
     public let saved: [Record]?
     public let deleted: [RecordID]?
 
     init(error: NSError, saved: [Record]?, deleted: [RecordID]?) {
-        self.error = error
+        self.underlyingError = error
         self.saved = saved
         self.deleted = deleted
     }
 }
 
-extension OPRCKOperation where T: CKModifyRecordsOperationType {
+extension OPRCKOperation where T: CKModifyRecordsOperationType, T: AssociatedErrorType {
 
     typealias ModifyRecordsCompletionBlock = ([T.Record]?, [T.RecordID]?) -> Void
 
@@ -998,18 +998,18 @@ extension CloudKitOperation where T: CKModifyRecordsOperationType {
 
 public struct ModifySubscriptionsError<Subscription, SubscriptionID>: CloudKitErrorType {
 
-    public let error: NSError
+    public let underlyingError: NSError
     public let saved: [Subscription]?
     public let deleted: [SubscriptionID]?
 
     init(error: NSError, saved: [Subscription]?, deleted: [SubscriptionID]?) {
-        self.error = error
+        self.underlyingError = error
         self.saved = saved
         self.deleted = deleted
     }
 }
 
-extension OPRCKOperation where T: CKModifySubscriptionsOperationType {
+extension OPRCKOperation where T: CKModifySubscriptionsOperationType, T: AssociatedErrorType {
 
     var subscriptionsToSave: [T.Subscription]? {
         get { return operation.subscriptionsToSave }
@@ -1072,16 +1072,16 @@ extension CloudKitOperation where T: CKModifySubscriptionsOperationType {
 
 public struct QueryError<QueryCursor>: CloudKitErrorType {
 
-    public let error: NSError
+    public let underlyingError: NSError
     public let cursor: QueryCursor?
 
     init(error: NSError, cursor: QueryCursor?) {
-        self.error = error
+        self.underlyingError = error
         self.cursor = cursor
     }
 }
 
-extension OPRCKOperation where T: CKQueryOperationType {
+extension OPRCKOperation where T: CKQueryOperationType, T: AssociatedErrorType {
 
     var query: T.Query? {
         get { return operation.query }

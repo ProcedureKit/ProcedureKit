@@ -21,7 +21,7 @@ public class OPRCKOperation<T where T: NSOperation, T: CKOperationType>: Reachab
 
 // MARK: - Cloud Kit Error Recovery
 
-public class CloudKitRecovery<T where T: NSOperation, T: CKOperationType> {
+public class CloudKitRecovery<T where T: NSOperation, T: CKOperationType, T: AssociatedErrorType> {
     public typealias V = OPRCKOperation<T>
 
     public typealias ErrorResponse = (delay: Delay?, configure: V -> Void)
@@ -95,9 +95,8 @@ public class CloudKitRecovery<T where T: NSOperation, T: CKOperationType> {
 
     internal func cloudKitErrorsFromInfo(info: RetryFailureInfo<OPRCKOperation<T>>) -> (code: CKErrorCode, error: T.Error)? {
         let mapped: [(CKErrorCode, T.Error)] = info.errors.flatMap { error in
-            let error = error as NSError
-            if error.domain == CKErrorDomain, let code = CKErrorCode(rawValue: error.code), error = error as? T.Error {
-                return (code, error)
+            if let cloudKitError = error as? T.Error, code = cloudKitError.code {
+                return (code, cloudKitError)
             }
             return .None
         }
@@ -204,7 +203,7 @@ Note, that for the automatic error handling to kick in, the happy path must be s
  could be modified before being returned. Alternatively, return nil to not retry.
 
 */
-public final class CloudKitOperation<T where T: NSOperation, T: CKOperationType>: RetryOperation<OPRCKOperation<T>> {
+public final class CloudKitOperation<T where T: NSOperation, T: CKOperationType, T: AssociatedErrorType>: RetryOperation<OPRCKOperation<T>> {
 
     public typealias ErrorHandler = CloudKitRecovery<T>.Handler
 
@@ -264,7 +263,7 @@ public final class CloudKitOperation<T where T: NSOperation, T: CKOperationType>
 
 // MARK: - BatchedCloudKitOperation
 
-class CloudKitOperationGenerator<T where T: NSOperation, T: CKOperationType>: GeneratorType {
+class CloudKitOperationGenerator<T where T: NSOperation, T: CKOperationType, T: AssociatedErrorType>: GeneratorType {
 
     let connectivity: Reachability.Connectivity
     let reachability: SystemReachabilityType
@@ -284,7 +283,7 @@ class CloudKitOperationGenerator<T where T: NSOperation, T: CKOperationType>: Ge
     }
 }
 
-public class BatchedCloudKitOperation<T where T: NSOperation, T: CKBatchedOperationType>: RepeatedOperation<CloudKitOperation<T>> {
+public class BatchedCloudKitOperation<T where T: NSOperation, T: CKBatchedOperationType, T: AssociatedErrorType>: RepeatedOperation<CloudKitOperation<T>> {
 
     public var enableBatchProcessing: Bool
     var generator: CloudKitOperationGenerator<T>

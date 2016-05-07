@@ -13,7 +13,7 @@ import CloudKit
 public protocol CloudKitErrorType: ErrorType {
 
     /// - returns: the original NSError received from CloudKit
-    var error: NSError { get }
+    var underlyingError: NSError { get }
 
     /// - returns: an operation Delay, used to indicate how long to wait until retry
     var retryAfterDelay: Delay? { get }
@@ -21,14 +21,20 @@ public protocol CloudKitErrorType: ErrorType {
 
 public extension CloudKitErrorType {
 
+    var code: CKErrorCode? {
+        return CKErrorCode(rawValue: underlyingError.code)
+    }
+
     var retryAfterDelay: Delay? {
-        return (error.userInfo[CKErrorRetryAfterKey] as? NSNumber).map { Delay.By($0.doubleValue) }
+        return (underlyingError.userInfo[CKErrorRetryAfterKey] as? NSNumber).map { Delay.By($0.doubleValue) }
     }
 }
 
-extension NSError: CloudKitErrorType {
+public struct CloudKitError: CloudKitErrorType {
 
-    public var error: NSError {
-        return self
+    public let underlyingError: NSError
+
+    init(error: NSError) {
+        underlyingError = error
     }
 }

@@ -25,7 +25,6 @@ class TestCloudOperation: NSOperation, CKOperationType {
     typealias DiscoveredUserInfo = String
     typealias Query = String
     typealias QueryCursor = String
-    typealias Error = NSError
 
     var container: String? // just a test
 }
@@ -38,7 +37,8 @@ class TestDatabaseOperation: TestCloudOperation, CKDatabaseOperationType, CKPrev
     var desiredKeys: [String]? = .None
 }
 
-class TestDiscoverAllContactsOperation: TestCloudOperation, CKDiscoverAllContactsOperationType {
+class TestDiscoverAllContactsOperation: TestCloudOperation, CKDiscoverAllContactsOperationType, AssociatedErrorType {
+    typealias Error = DiscoverAllContactsError<DiscoveredUserInfo>
 
     var result: [DiscoveredUserInfo]?
     var error: NSError?
@@ -55,7 +55,8 @@ class TestDiscoverAllContactsOperation: TestCloudOperation, CKDiscoverAllContact
     }
 }
 
-class TestDiscoverUserInfosOperation: TestCloudOperation, CKDiscoverUserInfosOperationType {
+class TestDiscoverUserInfosOperation: TestCloudOperation, CKDiscoverUserInfosOperationType, AssociatedErrorType {
+    typealias Error = CloudKitError
 
     var emailAddresses: [String]?
     var userRecordIDs: [RecordID]?
@@ -76,7 +77,9 @@ class TestDiscoverUserInfosOperation: TestCloudOperation, CKDiscoverUserInfosOpe
     }
 }
 
-class TestFetchNotificationChangesOperation: TestCloudOperation, CKFetchNotificationChangesOperationType {
+class TestFetchNotificationChangesOperation: TestCloudOperation, CKFetchNotificationChangesOperationType, AssociatedErrorType {
+
+    typealias Error = FetchNotificationChangesError<ServerChangeToken>
 
     var error: NSError?
     var finalPreviousServerChangeToken: ServerChangeToken?
@@ -103,7 +106,9 @@ class TestFetchNotificationChangesOperation: TestCloudOperation, CKFetchNotifica
     }
 }
 
-class TestMarkNotificationsReadOperation: TestCloudOperation, CKMarkNotificationsReadOperationType {
+class TestMarkNotificationsReadOperation: TestCloudOperation, CKMarkNotificationsReadOperationType, AssociatedErrorType {
+
+    typealias Error = MarkNotificationsReadError<String>
 
     var notificationIDs: [String]
     var error: NSError?
@@ -121,7 +126,9 @@ class TestMarkNotificationsReadOperation: TestCloudOperation, CKMarkNotification
     }
 }
 
-class TestModifyBadgeOperation: TestCloudOperation, CKModifyBadgeOperationType {
+class TestModifyBadgeOperation: TestCloudOperation, CKModifyBadgeOperationType, AssociatedErrorType {
+
+    typealias Error = CloudKitError
 
     var badgeValue: Int
     var error: NSError?
@@ -138,10 +145,8 @@ class TestModifyBadgeOperation: TestCloudOperation, CKModifyBadgeOperationType {
     }
 }
 
-class TestFetchRecordChangesOperation: TestDatabaseOperation, CKFetchRecordChangesOperationType {
-
-    typealias RecordZoneID = String
-    typealias ServerChangeToken = String
+class TestFetchRecordChangesOperation: TestDatabaseOperation, CKFetchRecordChangesOperationType, AssociatedErrorType {
+    typealias Error = FetchRecordChangesError<ServerChangeToken>
 
     var token: String?
     var data: NSData?
@@ -164,7 +169,8 @@ class TestFetchRecordChangesOperation: TestDatabaseOperation, CKFetchRecordChang
     }
 }
 
-class TestFetchRecordZonesOperation: TestDatabaseOperation, CKFetchRecordZonesOperationType {
+class TestFetchRecordZonesOperation: TestDatabaseOperation, CKFetchRecordZonesOperationType, AssociatedErrorType {
+    typealias Error = FetchRecordZonesError<RecordZone, RecordZoneID>
 
     var zonesByID: [RecordZoneID: RecordZone]?
     var error: NSError?
@@ -183,7 +189,8 @@ class TestFetchRecordZonesOperation: TestDatabaseOperation, CKFetchRecordZonesOp
     }
 }
 
-class TestFetchRecordsOperation: TestDatabaseOperation, CKFetchRecordsOperationType {
+class TestFetchRecordsOperation: TestDatabaseOperation, CKFetchRecordsOperationType, AssociatedErrorType {
+    typealias Error = FetchRecordsError<Record, RecordID>
 
     var recordsByID: [RecordID: Record]?
     var error: NSError?
@@ -204,7 +211,9 @@ class TestFetchRecordsOperation: TestDatabaseOperation, CKFetchRecordsOperationT
     }
 }
 
-class TestFetchSubscriptionsOperation: TestDatabaseOperation, CKFetchSubscriptionsOperationType {
+class TestFetchSubscriptionsOperation: TestDatabaseOperation, CKFetchSubscriptionsOperationType, AssociatedErrorType {
+
+    typealias Error = FetchSubscriptionsError<Subscription>
 
     var subscriptionsByID: [String: Subscription]?
     var error: NSError?
@@ -223,7 +232,8 @@ class TestFetchSubscriptionsOperation: TestDatabaseOperation, CKFetchSubscriptio
     }
 }
 
-class TestModifyRecordZonesOperation: TestDatabaseOperation, CKModifyRecordZonesOperationType {
+class TestModifyRecordZonesOperation: TestDatabaseOperation, CKModifyRecordZonesOperationType, AssociatedErrorType {
+    typealias Error = ModifyRecordZonesError<RecordZone, RecordZoneID>
 
     var saved: [RecordZone]?
     var deleted: [RecordZoneID]?
@@ -245,7 +255,8 @@ class TestModifyRecordZonesOperation: TestDatabaseOperation, CKModifyRecordZones
     }
 }
 
-class TestModifyRecordsOperation: TestDatabaseOperation, CKModifyRecordsOperationType {
+class TestModifyRecordsOperation: TestDatabaseOperation, CKModifyRecordsOperationType, AssociatedErrorType {
+    typealias Error = ModifyRecordsError<Record, RecordID>
 
     var saved: [Record]?
     var deleted: [RecordID]?
@@ -273,7 +284,9 @@ class TestModifyRecordsOperation: TestDatabaseOperation, CKModifyRecordsOperatio
     }
 }
 
-class TestModifySubscriptionsOperation: TestDatabaseOperation, CKModifySubscriptionsOperationType {
+class TestModifySubscriptionsOperation: TestDatabaseOperation, CKModifySubscriptionsOperationType, AssociatedErrorType {
+
+    typealias Error = ModifySubscriptionsError<Subscription, String>
 
     var saved: [Subscription]?
     var deleted: [String]?
@@ -295,7 +308,8 @@ class TestModifySubscriptionsOperation: TestDatabaseOperation, CKModifySubscript
     }
 }
 
-class TestQueryOperation: TestDatabaseOperation, CKQueryOperationType {
+class TestQueryOperation: TestDatabaseOperation, CKQueryOperationType, AssociatedErrorType {
+    typealias Error = QueryError<QueryCursor>
 
     var error: NSError?
 
@@ -2367,7 +2381,7 @@ class CloudKitRecoveryTests: CKTests {
 
     func test__extract_cloud_kit_errors__with_single_cloud_kit_error() {
         let errors: [ErrorType] = [
-            NSError(domain: CKErrorDomain, code: CKErrorCode.NotAuthenticated.rawValue, userInfo: nil)
+            CloudKitError(error: NSError(domain: CKErrorDomain, code: CKErrorCode.NotAuthenticated.rawValue, userInfo: nil))
         ]
         let info = createInfoWithErrors(errors)
         guard let (code, _) = recovery.cloudKitErrorsFromInfo(info) else {
@@ -2381,8 +2395,8 @@ class CloudKitRecoveryTests: CKTests {
         let errors: [ErrorType] = [
             // This is actually a Contacts error code
             NSError(domain: CNErrorDomain, code: CNErrorCode.RecordDoesNotExist.rawValue, userInfo: nil),
-            NSError(domain: CKErrorDomain, code: CKErrorCode.MissingEntitlement.rawValue, userInfo: nil),
-            NSError(domain: CKErrorDomain, code: CKErrorCode.NotAuthenticated.rawValue, userInfo: nil)
+            CloudKitError(error: NSError(domain: CKErrorDomain, code: CKErrorCode.MissingEntitlement.rawValue, userInfo: nil)),
+            CloudKitError(error: NSError(domain: CKErrorDomain, code: CKErrorCode.NotAuthenticated.rawValue, userInfo: nil))
         ]
 
         let info = createInfoWithErrors(errors)
