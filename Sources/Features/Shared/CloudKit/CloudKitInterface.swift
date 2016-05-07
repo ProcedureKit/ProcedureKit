@@ -58,12 +58,6 @@ public protocol CKOperationType: class {
     var container: Container? { get set }
 }
 
-public protocol AssociatedErrorType {
-
-    /// The type of associated error
-    associatedtype Error: CloudKitErrorType
-}
-
 /**
  A generic protocol which exposes the types and properties used by
  Apple's CloudKit Database Operation types.

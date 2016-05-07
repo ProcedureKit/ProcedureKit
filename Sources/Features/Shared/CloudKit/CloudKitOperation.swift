@@ -21,7 +21,7 @@ public class OPRCKOperation<T where T: NSOperation, T: CKOperationType>: Reachab
 
 // MARK: - Cloud Kit Error Recovery
 
-public class CloudKitRecovery<T where T: NSOperation, T: CKOperationType, T: AssociatedErrorType> {
+public class CloudKitRecovery<T where T: NSOperation, T: CKOperationType, T: AssociatedErrorType, T.Error: CloudKitErrorType> {
     public typealias V = OPRCKOperation<T>
 
     public typealias ErrorResponse = (delay: Delay?, configure: V -> Void)
@@ -203,7 +203,7 @@ Note, that for the automatic error handling to kick in, the happy path must be s
  could be modified before being returned. Alternatively, return nil to not retry.
 
 */
-public final class CloudKitOperation<T where T: NSOperation, T: CKOperationType, T: AssociatedErrorType>: RetryOperation<OPRCKOperation<T>> {
+public final class CloudKitOperation<T where T: NSOperation, T: CKOperationType, T: AssociatedErrorType, T.Error: CloudKitErrorType>: RetryOperation<OPRCKOperation<T>> {
 
     public typealias ErrorHandler = CloudKitRecovery<T>.Handler
 
@@ -263,7 +263,7 @@ public final class CloudKitOperation<T where T: NSOperation, T: CKOperationType,
 
 // MARK: - BatchedCloudKitOperation
 
-class CloudKitOperationGenerator<T where T: NSOperation, T: CKOperationType, T: AssociatedErrorType>: GeneratorType {
+class CloudKitOperationGenerator<T where T: NSOperation, T: CKOperationType, T: AssociatedErrorType, T.Error: CloudKitErrorType>: GeneratorType {
 
     let connectivity: Reachability.Connectivity
     let reachability: SystemReachabilityType
@@ -283,7 +283,7 @@ class CloudKitOperationGenerator<T where T: NSOperation, T: CKOperationType, T: 
     }
 }
 
-public class BatchedCloudKitOperation<T where T: NSOperation, T: CKBatchedOperationType, T: AssociatedErrorType>: RepeatedOperation<CloudKitOperation<T>> {
+public class BatchedCloudKitOperation<T where T: NSOperation, T: CKBatchedOperationType, T: AssociatedErrorType, T.Error: CloudKitErrorType>: RepeatedOperation<CloudKitOperation<T>> {
 
     public var enableBatchProcessing: Bool
     var generator: CloudKitOperationGenerator<T>

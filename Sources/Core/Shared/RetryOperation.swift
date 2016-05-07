@@ -8,6 +8,13 @@
 
 import Foundation
 
+/// A type which has an associated error type
+public protocol AssociatedErrorType {
+
+    /// The type of associated error
+    associatedtype Error: ErrorType
+}
+
 /**
  RetryFailureInfo is a value type which provides
  information related to a previously failed
