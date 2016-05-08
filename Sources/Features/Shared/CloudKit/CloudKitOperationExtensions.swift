@@ -49,7 +49,7 @@ extension BatchedCloudKitOperation where T: CKOperationType {
 
 extension OPRCKOperation where T: CKDatabaseOperationType {
 
-    var database: T.Database? {
+    public var database: T.Database? {
         get { return operation.database }
         set { operation.database = newValue }
     }
@@ -83,7 +83,7 @@ extension BatchedCloudKitOperation where T: CKDatabaseOperationType {
 
 extension OPRCKOperation where T: CKPreviousServerChangeToken {
 
-    var previousServerChangeToken: T.ServerChangeToken? {
+    public var previousServerChangeToken: T.ServerChangeToken? {
         get { return operation.previousServerChangeToken }
         set { operation.previousServerChangeToken = newValue }
     }
@@ -117,7 +117,7 @@ extension BatchedCloudKitOperation where T: CKPreviousServerChangeToken {
 
 extension OPRCKOperation where T: CKResultsLimit {
 
-    var resultsLimit: Int {
+    public var resultsLimit: Int {
         get { return operation.resultsLimit }
         set { operation.resultsLimit = newValue }
     }
@@ -151,7 +151,7 @@ extension BatchedCloudKitOperation where T: CKResultsLimit {
 
 extension OPRCKOperation where T: CKMoreComing {
 
-    var moreComing: Bool {
+    public var moreComing: Bool {
         return operation.moreComing
     }
 }
@@ -176,7 +176,7 @@ extension BatchedCloudKitOperation where T: CKMoreComing {
 
 extension OPRCKOperation where T: CKDesiredKeys {
 
-    var desiredKeys: [String]? {
+    public var desiredKeys: [String]? {
         get { return operation.desiredKeys }
         set { operation.desiredKeys = newValue }
     }
@@ -254,12 +254,12 @@ extension CloudKitOperation where T: CKDiscoverAllContactsOperationType {
 
 extension OPRCKOperation where T: CKDiscoverUserInfosOperationType, T: AssociatedErrorType, T.Error: CloudKitErrorType {
 
-    var emailAddresses: [String]? {
+    public var emailAddresses: [String]? {
         get { return operation.emailAddresses }
         set { operation.emailAddresses = newValue }
     }
 
-    var userRecordIDs: [T.RecordID]? {
+    public var userRecordIDs: [T.RecordID]? {
         get { return operation.userRecordIDs }
         set { operation.userRecordIDs = newValue }
     }
@@ -326,7 +326,7 @@ public struct FetchNotificationChangesError<ServerChangeToken>: CloudKitErrorTyp
 
 extension OPRCKOperation where T: CKFetchNotificationChangesOperationType, T: AssociatedErrorType, T.Error: CloudKitErrorType {
 
-    var notificationChangedBlock: CloudKitOperation<T>.FetchNotificationChangesChangedBlock? {
+    public var notificationChangedBlock: CloudKitOperation<T>.FetchNotificationChangesChangedBlock? {
         get { return operation.notificationChangedBlock }
         set { operation.notificationChangedBlock = newValue }
     }
@@ -411,7 +411,7 @@ public struct MarkNotificationsReadError<NotificationID>: CloudKitErrorType {
 
 extension OPRCKOperation where T: CKMarkNotificationsReadOperationType, T: AssociatedErrorType, T.Error: CloudKitErrorType {
 
-    var notificationIDs: [T.NotificationID] {
+    public var notificationIDs: [T.NotificationID] {
         get { return operation.notificationIDs }
         set { operation.notificationIDs = newValue }
     }
@@ -458,7 +458,7 @@ extension CloudKitOperation where T: CKMarkNotificationsReadOperationType {
 
 extension OPRCKOperation where T: CKModifyBadgeOperationType, T: AssociatedErrorType, T.Error: CloudKitErrorType {
 
-    var badgeValue: Int {
+    public var badgeValue: Int {
         get { return operation.badgeValue }
         set { operation.badgeValue = newValue }
     }
@@ -510,17 +510,17 @@ public struct FetchRecordChangesError<ServerChangeToken>: CloudKitErrorType {
 
 extension OPRCKOperation where T: CKFetchRecordChangesOperationType, T: AssociatedErrorType, T.Error: CloudKitErrorType {
 
-    var recordZoneID: T.RecordZoneID {
+    public var recordZoneID: T.RecordZoneID {
         get { return operation.recordZoneID }
         set { operation.recordZoneID = newValue }
     }
 
-    var recordChangedBlock: CloudKitOperation<T>.FetchRecordChangesRecordChangedBlock? {
+    public var recordChangedBlock: CloudKitOperation<T>.FetchRecordChangesRecordChangedBlock? {
         get { return operation.recordChangedBlock }
         set { operation.recordChangedBlock = newValue }
     }
 
-    var recordWithIDWasDeletedBlock: CloudKitOperation<T>.FetchRecordChangesRecordDeletedBlock? {
+    public var recordWithIDWasDeletedBlock: CloudKitOperation<T>.FetchRecordChangesRecordDeletedBlock? {
         get { return operation.recordWithIDWasDeletedBlock }
         set { operation.recordWithIDWasDeletedBlock = newValue }
     }
@@ -643,7 +643,7 @@ public struct FetchRecordZonesError<RecordZone, RecordZoneID: Hashable>: CloudKi
 
 extension OPRCKOperation where T: CKFetchRecordZonesOperationType, T: AssociatedErrorType, T.Error: CloudKitErrorType {
 
-    var recordZoneIDs: [T.RecordZoneID]? {
+    public var recordZoneIDs: [T.RecordZoneID]? {
         get { return operation.recordZoneIDs }
         set { operation.recordZoneIDs = newValue }
     }
@@ -701,17 +701,17 @@ public struct FetchRecordsError<Record, RecordID: Hashable>: CloudKitErrorType {
 
 extension OPRCKOperation where T: CKFetchRecordsOperationType, T: AssociatedErrorType, T.Error: CloudKitErrorType {
 
-    var recordIDs: [T.RecordID]? {
+    public var recordIDs: [T.RecordID]? {
         get { return operation.recordIDs }
         set { operation.recordIDs = newValue }
     }
 
-    var perRecordProgressBlock: CloudKitOperation<T>.FetchRecordsPerRecordProgressBlock? {
+    public var perRecordProgressBlock: CloudKitOperation<T>.FetchRecordsPerRecordProgressBlock? {
         get { return operation.perRecordProgressBlock }
         set { operation.perRecordProgressBlock = newValue }
     }
 
-    var perRecordCompletionBlock: CloudKitOperation<T>.FetchRecordsPerRecordCompletionBlock? {
+    public var perRecordCompletionBlock: CloudKitOperation<T>.FetchRecordsPerRecordCompletionBlock? {
         get { return operation.perRecordCompletionBlock }
         set { operation.perRecordCompletionBlock = newValue }
     }
@@ -793,7 +793,7 @@ public struct FetchSubscriptionsError<Subscription>: CloudKitErrorType {
 
 extension OPRCKOperation where T: CKFetchSubscriptionsOperationType, T: AssociatedErrorType, T.Error: CloudKitErrorType {
 
-    var subscriptionIDs: [String]? {
+    public var subscriptionIDs: [String]? {
         get { return operation.subscriptionIDs }
         set { operation.subscriptionIDs = newValue }
     }
@@ -853,12 +853,12 @@ public struct ModifyRecordZonesError<RecordZone, RecordZoneID>: CloudKitErrorTyp
 
 extension OPRCKOperation where T: CKModifyRecordZonesOperationType, T: AssociatedErrorType, T.Error: CloudKitErrorType {
 
-    var recordZonesToSave: [T.RecordZone]? {
+    public var recordZonesToSave: [T.RecordZone]? {
         get { return operation.recordZonesToSave }
         set { operation.recordZonesToSave = newValue }
     }
 
-    var recordZoneIDsToDelete: [T.RecordZoneID]? {
+    public var recordZoneIDsToDelete: [T.RecordZoneID]? {
         get { return operation.recordZoneIDsToDelete }
         set { operation.recordZoneIDsToDelete = newValue }
     }
@@ -929,37 +929,37 @@ extension OPRCKOperation where T: CKModifyRecordsOperationType, T: AssociatedErr
 
     typealias ModifyRecordsCompletionBlock = ([T.Record]?, [T.RecordID]?) -> Void
 
-    var recordsToSave: [T.Record]? {
+    public var recordsToSave: [T.Record]? {
         get { return operation.recordsToSave }
         set { operation.recordsToSave = newValue }
     }
 
-    var recordIDsToDelete: [T.RecordID]? {
+    public var recordIDsToDelete: [T.RecordID]? {
         get { return operation.recordIDsToDelete }
         set { operation.recordIDsToDelete = newValue }
     }
 
-    var savePolicy: T.RecordSavePolicy {
+    public var savePolicy: T.RecordSavePolicy {
         get { return operation.savePolicy }
         set { operation.savePolicy = newValue }
     }
 
-    var clientChangeTokenData: NSData? {
+    public var clientChangeTokenData: NSData? {
         get { return operation.clientChangeTokenData }
         set { operation.clientChangeTokenData = newValue }
     }
 
-    var atomic: Bool {
+    public var atomic: Bool {
         get { return operation.atomic }
         set { operation.atomic = newValue }
     }
 
-    var perRecordProgressBlock: CloudKitOperation<T>.ModifyRecordsPerRecordProgressBlock? {
+    public var perRecordProgressBlock: CloudKitOperation<T>.ModifyRecordsPerRecordProgressBlock? {
         get { return operation.perRecordProgressBlock }
         set { operation.perRecordProgressBlock = newValue }
     }
 
-    var perRecordCompletionBlock: CloudKitOperation<T>.ModifyRecordsPerRecordCompletionBlock? {
+    public var perRecordCompletionBlock: CloudKitOperation<T>.ModifyRecordsPerRecordCompletionBlock? {
         get { return operation.perRecordCompletionBlock }
         set { operation.perRecordCompletionBlock = newValue }
     }
@@ -1079,12 +1079,12 @@ public struct ModifySubscriptionsError<Subscription, SubscriptionID>: CloudKitEr
 
 extension OPRCKOperation where T: CKModifySubscriptionsOperationType, T: AssociatedErrorType, T.Error: CloudKitErrorType {
 
-    var subscriptionsToSave: [T.Subscription]? {
+    public var subscriptionsToSave: [T.Subscription]? {
         get { return operation.subscriptionsToSave }
         set { operation.subscriptionsToSave = newValue }
     }
 
-    var subscriptionIDsToDelete: [String]? {
+    public var subscriptionIDsToDelete: [String]? {
         get { return operation.subscriptionIDsToDelete }
         set { operation.subscriptionIDsToDelete = newValue }
     }
@@ -1151,22 +1151,22 @@ public struct QueryError<QueryCursor>: CloudKitErrorType {
 
 extension OPRCKOperation where T: CKQueryOperationType, T: AssociatedErrorType, T.Error: CloudKitErrorType {
 
-    var query: T.Query? {
+    public var query: T.Query? {
         get { return operation.query }
         set { operation.query = newValue }
     }
 
-    var cursor: T.QueryCursor? {
+    public var cursor: T.QueryCursor? {
         get { return operation.cursor }
         set { operation.cursor = newValue }
     }
 
-    var zoneID: T.RecordZoneID? {
+    public var zoneID: T.RecordZoneID? {
         get { return operation.zoneID }
         set { operation.zoneID = newValue }
     }
 
-    var recordFetchedBlock: CloudKitOperation<T>.QueryRecordFetchedBlock? {
+    public var recordFetchedBlock: CloudKitOperation<T>.QueryRecordFetchedBlock? {
         get { return operation.recordFetchedBlock }
         set { operation.recordFetchedBlock = newValue }
     }
