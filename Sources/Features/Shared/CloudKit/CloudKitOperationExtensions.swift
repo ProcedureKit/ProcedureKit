@@ -33,6 +33,18 @@ extension CloudKitOperation where T: CKOperationType {
     }
 }
 
+extension BatchedCloudKitOperation where T: CKOperationType {
+
+    /// - returns: the CloudKit container
+    public var container: T.Container? {
+        get { return operation.container }
+        set {
+            operation.container = newValue
+            addConfigureBlock { $0.container = newValue }
+        }
+    }
+}
+
 // MARK: - CKDatabaseOperation
 
 extension OPRCKOperation where T: CKDatabaseOperationType {
@@ -44,6 +56,18 @@ extension OPRCKOperation where T: CKDatabaseOperationType {
 }
 
 extension CloudKitOperation where T: CKDatabaseOperationType {
+
+    /// - returns: the CloudKit database
+    public var database: T.Database? {
+        get { return operation.database }
+        set {
+            operation.database = newValue
+            addConfigureBlock { $0.database = newValue }
+        }
+    }
+}
+
+extension BatchedCloudKitOperation where T: CKDatabaseOperationType {
 
     /// - returns: the CloudKit database
     public var database: T.Database? {
@@ -77,6 +101,18 @@ extension CloudKitOperation where T: CKPreviousServerChangeToken {
     }
 }
 
+extension BatchedCloudKitOperation where T: CKPreviousServerChangeToken {
+
+    /// - returns: the previous server change token
+    public var previousServerChangeToken: T.ServerChangeToken? {
+        get { return operation.previousServerChangeToken }
+        set {
+            operation.previousServerChangeToken = newValue
+            addConfigureBlock { $0.previousServerChangeToken = newValue }
+        }
+    }
+}
+
 // MARK: - CKResultsLimit
 
 extension OPRCKOperation where T: CKResultsLimit {
@@ -88,6 +124,18 @@ extension OPRCKOperation where T: CKResultsLimit {
 }
 
 extension CloudKitOperation where T: CKResultsLimit {
+
+    /// - returns: the results limit
+    public var resultsLimit: Int {
+        get { return operation.resultsLimit }
+        set {
+            operation.resultsLimit = newValue
+            addConfigureBlock { $0.resultsLimit = newValue }
+        }
+    }
+}
+
+extension BatchedCloudKitOperation where T: CKResultsLimit {
 
     /// - returns: the results limit
     public var resultsLimit: Int {
@@ -116,6 +164,14 @@ extension CloudKitOperation where T: CKMoreComing {
     }
 }
 
+extension BatchedCloudKitOperation where T: CKMoreComing {
+
+    /// - returns: a flag to indicate whether there are more results on the server
+    public var moreComing: Bool {
+        return operation.moreComing
+    }
+}
+
 // MARK: - CKDesiredKeys
 
 extension OPRCKOperation where T: CKDesiredKeys {
@@ -127,6 +183,18 @@ extension OPRCKOperation where T: CKDesiredKeys {
 }
 
 extension CloudKitOperation where T: CKDesiredKeys {
+
+    /// - returns: the desired keys
+    public var desiredKeys: [String]? {
+        get { return operation.desiredKeys }
+        set {
+            operation.desiredKeys = newValue
+            addConfigureBlock { $0.desiredKeys = newValue }
+        }
+    }
+}
+
+extension BatchedCloudKitOperation where T: CKDesiredKeys {
 
     /// - returns: the desired keys
     public var desiredKeys: [String]? {

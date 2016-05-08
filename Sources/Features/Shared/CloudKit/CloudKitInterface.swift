@@ -346,62 +346,62 @@ extension CKDiscoverAllContactsOperation: CKDiscoverAllContactsOperationType, As
 }
 #endif
 
-extension CKDiscoverUserInfosOperation: CKDiscoverUserInfosOperationType {
+extension CKDiscoverUserInfosOperation: CKDiscoverUserInfosOperationType, AssociatedErrorType {
 
     // The associated error type
     public typealias Error = CloudKitError
 }
-extension CKFetchNotificationChangesOperation: CKFetchNotificationChangesOperationType {
+extension CKFetchNotificationChangesOperation: CKFetchNotificationChangesOperationType, AssociatedErrorType {
 
     // The associated error type
     public typealias Error = FetchNotificationChangesError<ServerChangeToken>
 }
-extension CKMarkNotificationsReadOperation: CKMarkNotificationsReadOperationType {
+extension CKMarkNotificationsReadOperation: CKMarkNotificationsReadOperationType, AssociatedErrorType {
 
     // The associated error type
     public typealias Error = MarkNotificationsReadError<NotificationID>
 }
-extension CKModifyBadgeOperation: CKModifyBadgeOperationType {
+extension CKModifyBadgeOperation: CKModifyBadgeOperationType, AssociatedErrorType {
 
     // The associated error type
     public typealias Error = CloudKitError
 }
-extension CKFetchRecordChangesOperation: CKFetchRecordChangesOperationType {
+extension CKFetchRecordChangesOperation: CKFetchRecordChangesOperationType, AssociatedErrorType {
 
     // The associated error type
     public typealias Error = FetchRecordChangesError<ServerChangeToken>
 }
-extension CKFetchRecordZonesOperation: CKFetchRecordZonesOperationType {
+extension CKFetchRecordZonesOperation: CKFetchRecordZonesOperationType, AssociatedErrorType {
 
     // The associated error type
     public typealias Error = FetchRecordZonesError<RecordZone, RecordZoneID>
 }
-extension CKFetchRecordsOperation: CKFetchRecordsOperationType {
+extension CKFetchRecordsOperation: CKFetchRecordsOperationType, AssociatedErrorType {
 
     // The associated error type
     public typealias Error = FetchRecordsError<Record, RecordID>
 }
-extension CKFetchSubscriptionsOperation: CKFetchSubscriptionsOperationType {
+extension CKFetchSubscriptionsOperation: CKFetchSubscriptionsOperationType, AssociatedErrorType {
 
     // The associated error type
     public typealias Error = FetchSubscriptionsError<Subscription>
 }
-extension CKModifyRecordZonesOperation: CKModifyRecordZonesOperationType {
+extension CKModifyRecordZonesOperation: CKModifyRecordZonesOperationType, AssociatedErrorType {
 
     // The associated error type
     public typealias Error = ModifyRecordZonesError<RecordZone, RecordZoneID>
 }
-extension CKModifyRecordsOperation: CKModifyRecordsOperationType {
+extension CKModifyRecordsOperation: CKModifyRecordsOperationType, AssociatedErrorType {
 
     // The associated error type
     public typealias Error = ModifyRecordsError<Record, RecordID>
 }
-extension CKModifySubscriptionsOperation: CKModifySubscriptionsOperationType {
+extension CKModifySubscriptionsOperation: CKModifySubscriptionsOperationType, AssociatedErrorType {
 
     // The associated error type
     public typealias Error = ModifySubscriptionsError<Subscription, String>
 }
-extension CKQueryOperation: CKQueryOperationType {
+extension CKQueryOperation: CKQueryOperationType, AssociatedErrorType {
 
     // The associated error type
     public typealias Error = QueryError<QueryCursor>
