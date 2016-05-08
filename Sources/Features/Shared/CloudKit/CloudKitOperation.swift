@@ -21,11 +21,11 @@ public class OPRCKOperation<T where T: NSOperation, T: CKOperationType>: Reachab
 
 // MARK: - Cloud Kit Error Recovery
 
-public class CloudKitRecovery<T where T: NSOperation, T: CKOperationType> {
+public class CloudKitRecovery<T where T: NSOperation, T: CKOperationType, T: AssociatedErrorType, T.Error: CloudKitErrorType> {
     public typealias V = OPRCKOperation<T>
 
     public typealias ErrorResponse = (delay: Delay?, configure: V -> Void)
-    public typealias Handler = (error: NSError, log: LoggerType, suggested: ErrorResponse) -> ErrorResponse?
+    public typealias Handler = (error: T.Error, log: LoggerType, suggested: ErrorResponse) -> ErrorResponse?
 
     typealias Payload = (Delay?, V)
 
@@ -61,13 +61,6 @@ public class CloudKitRecovery<T where T: NSOperation, T: CKOperationType> {
             return .None
         }
 
-        let retry: Handler = { error, log, suggestion in
-            if let interval = (error.userInfo[CKErrorRetryAfterKey] as? NSNumber).map({ $0.doubleValue }) {
-                return (Delay.By(interval), suggestion.configure)
-            }
-            return suggestion
-        }
-
         setDefaultHandlerForCode(.InternalError, handler: exit)
         setDefaultHandlerForCode(.MissingEntitlement, handler: exit)
         setDefaultHandlerForCode(.InvalidArguments, handler: exit)
@@ -78,6 +71,10 @@ public class CloudKitRecovery<T where T: NSOperation, T: CKOperationType> {
         setDefaultHandlerForCode(.BadDatabase, handler: exit)
         setDefaultHandlerForCode(.QuotaExceeded, handler: exit)
         setDefaultHandlerForCode(.OperationCancelled, handler: exit)
+
+        let retry: Handler = { error, log, suggestion in
+            return error.retryAfterDelay.map { ($0, suggestion.configure) } ?? suggestion
+        }
 
         setDefaultHandlerForCode(.NetworkUnavailable, handler: retry)
         setDefaultHandlerForCode(.NetworkFailure, handler: retry)
@@ -96,11 +93,10 @@ public class CloudKitRecovery<T where T: NSOperation, T: CKOperationType> {
         customHandlers.updateValue(handler, forKey: code)
     }
 
-    internal func cloudKitErrorsFromInfo(info: RetryFailureInfo<OPRCKOperation<T>>) -> (code: CKErrorCode, error: NSError)? {
-        let mapped: [(CKErrorCode, NSError)] = info.errors.flatMap { error in
-            let error = error as NSError
-            if error.domain == CKErrorDomain, let code = CKErrorCode(rawValue: error.code) {
-                return (code, error)
+    internal func cloudKitErrorsFromInfo(info: RetryFailureInfo<OPRCKOperation<T>>) -> (code: CKErrorCode, error: T.Error)? {
+        let mapped: [(CKErrorCode, T.Error)] = info.errors.flatMap { error in
+            if let cloudKitError = error as? T.Error, code = cloudKitError.code {
+                return (code, cloudKitError)
             }
             return .None
         }
@@ -207,13 +203,13 @@ Note, that for the automatic error handling to kick in, the happy path must be s
  could be modified before being returned. Alternatively, return nil to not retry.
 
 */
-public final class CloudKitOperation<T where T: NSOperation, T: CKOperationType>: RetryOperation<OPRCKOperation<T>> {
+public final class CloudKitOperation<T where T: NSOperation, T: CKOperationType, T: AssociatedErrorType, T.Error: CloudKitErrorType>: RetryOperation<OPRCKOperation<T>> {
 
     public typealias ErrorHandler = CloudKitRecovery<T>.Handler
 
-    let recovery: CloudKitRecovery<T>
+    internal var recovery: CloudKitRecovery<T>
 
-    var operation: T {
+    internal var operation: T {
         return current.operation
     }
 
@@ -267,10 +263,11 @@ public final class CloudKitOperation<T where T: NSOperation, T: CKOperationType>
 
 // MARK: - BatchedCloudKitOperation
 
-class CloudKitOperationGenerator<T where T: NSOperation, T: CKOperationType>: GeneratorType {
+class CloudKitOperationGenerator<T where T: NSOperation, T: CKOperationType, T: AssociatedErrorType, T.Error: CloudKitErrorType>: GeneratorType {
 
     let connectivity: Reachability.Connectivity
     let reachability: SystemReachabilityType
+    let recovery: CloudKitRecovery<T>
 
     var generator: AnyGenerator<T>
     var more: Bool = true
@@ -279,15 +276,18 @@ class CloudKitOperationGenerator<T where T: NSOperation, T: CKOperationType>: Ge
         self.generator = AnyGenerator(generator)
         self.connectivity = connectivity
         self.reachability = reachability
+        self.recovery = CloudKitRecovery<T>()
     }
 
     func next() -> CloudKitOperation<T>? {
         guard more else { return .None }
-        return CloudKitOperation(generator: generator, connectivity: connectivity, reachability: reachability)
+        let operation = CloudKitOperation(generator: generator, connectivity: connectivity, reachability: reachability)
+        operation.recovery = recovery
+        return operation
     }
 }
 
-public class BatchedCloudKitOperation<T where T: NSOperation, T: CKBatchedOperationType>: RepeatedOperation<CloudKitOperation<T>> {
+public class BatchedCloudKitOperation<T where T: NSOperation, T: CKBatchedOperationType, T: AssociatedErrorType, T.Error: CloudKitErrorType>: RepeatedOperation<CloudKitOperation<T>> {
 
     public var enableBatchProcessing: Bool
     var generator: CloudKitOperationGenerator<T>
@@ -305,6 +305,7 @@ public class BatchedCloudKitOperation<T where T: NSOperation, T: CKBatchedOperat
     }
 
     init<G where G: GeneratorType, G.Element == T>(generator gen: G, enableBatchProcessing enable: Bool = true, connectivity: Reachability.Connectivity = .AnyConnectionKind, reachability: SystemReachabilityType) {
+
         enableBatchProcessing = enable
         generator = CloudKitOperationGenerator(generator: gen, connectivity: connectivity, reachability: reachability)
 
@@ -321,5 +322,9 @@ public class BatchedCloudKitOperation<T where T: NSOperation, T: CKBatchedOperat
             generator.more = enableBatchProcessing && cloudKitOperation.current.moreComing
         }
         super.willFinishOperation(operation, withErrors: errors)
+    }
+
+    public func setErrorHandlerForCode(code: CKErrorCode, handler: CloudKitOperation<T>.ErrorHandler) {
+        generator.recovery.setCustomHandlerForCode(code, handler: handler)
     }
 }
