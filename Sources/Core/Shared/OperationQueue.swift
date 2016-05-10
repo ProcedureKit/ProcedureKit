@@ -144,7 +144,7 @@ public class OperationQueue: NSOperationQueue {
         }
         else {
             operation.addCompletionBlock { [weak self, weak operation] in
-                if let queue = self, let op = operation {
+                if let queue = self, op = operation {
                     queue.delegate?.operationQueue(queue, didFinishOperation: op, withErrors: [])
                 }
             }
