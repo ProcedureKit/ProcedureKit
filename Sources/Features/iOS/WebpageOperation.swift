@@ -19,9 +19,9 @@ protocol WebpageController: class {
 public class WebpageOperation<From: PresentingViewController>: Operation, SFSafariViewControllerDelegate {
 
     let operation: UIOperation<SFSafariViewController, From>
-
-    public init(url: NSURL, displayControllerFrom from: ViewControllerDisplayStyle<From>, sender: AnyObject? = .None) {
-        operation = UIOperation(controller: SFSafariViewController(URL: url, entersReaderIfAvailable: true), displayControllerFrom: from, sender: sender)
+    
+    public init(url: NSURL, displayControllerFrom from: ViewControllerDisplayStyle<From>, entersReaderIfAvailable: Bool = true, sender: AnyObject? = .None) {
+        operation = UIOperation(controller: SFSafariViewController(URL: url, entersReaderIfAvailable: entersReaderIfAvailable), displayControllerFrom: from, sender: sender)
         super.init()
         addCondition(MutuallyExclusive<UIViewController>())
     }
