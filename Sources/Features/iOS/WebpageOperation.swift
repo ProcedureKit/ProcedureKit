@@ -10,25 +10,19 @@ import Foundation
 import SafariServices
 
 @available(iOS 9.0, *)
-protocol WebpageController: class {
-    weak var delegate: SFSafariViewControllerDelegate? { get set }
-    init(URL: NSURL, entersReaderIfAvailable: Bool)
-}
+public class WebpageOperation<From: PresentingViewController>: GroupOperation, SFSafariViewControllerDelegate {
 
-@available(iOS 9.0, *)
-public class WebpageOperation<From: PresentingViewController>: Operation, SFSafariViewControllerDelegate {
-
-    let operation: UIOperation<SFSafariViewController, From>
+    var operation: UIOperation<SFSafariViewController, From>
     
     public init(url: NSURL, displayControllerFrom from: ViewControllerDisplayStyle<From>, entersReaderIfAvailable: Bool = true, sender: AnyObject? = .None) {
         operation = UIOperation(controller: SFSafariViewController(URL: url, entersReaderIfAvailable: entersReaderIfAvailable), displayControllerFrom: from, sender: sender)
-        super.init()
+        super.init(operations: [operation])
+        
+        addObserver(WillExecuteObserver() { [weak self] _ in
+            self?.operation.controller.delegate = self
+        })
+        
         addCondition(MutuallyExclusive<UIViewController>())
-    }
-
-    public override func execute() {
-        operation.controller.delegate = self
-        produceOperation(operation)
     }
 
     @objc public func safariViewControllerDidFinish(controller: SFSafariViewController) {
