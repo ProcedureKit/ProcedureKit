@@ -44,11 +44,11 @@ class WebpageOperationTests: OperationTests {
                     delegate.safariViewControllerDidFinish?(safariViewController)
                 }
                 else {
-                    XCTFail("Delete not set on the SFSafariViewController.")
+                    XCTFail("Delegate not set on the SFSafariViewController.")
                 }
             }
             else {
-                XCTFail("Did not receive a UIAlertController.")
+                XCTFail("Did not receive a SFSafariViewController.")
             }
         }
 
