@@ -29,7 +29,7 @@ public class WebpageOperation<From: PresentingViewController>: ComposedOperation
         self.init(operation: operation)
         
         self.name = "Open Webpage"
-        
+
         addObserver(WillExecuteObserver() { [weak self] _ in
             self?.operation.controller.delegate = self
         })
