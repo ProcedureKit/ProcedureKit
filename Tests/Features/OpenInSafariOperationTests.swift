@@ -72,7 +72,7 @@ class TestableOpenInSafariOperation<From: PresentingViewController>: OpenInSafar
     var didOpenURLBlock: (() -> Void)?
     
     // For some reason the compiler does not see the init.
-    override init(URL: NSURL, displayControllerFrom from: ViewControllerDisplayStyle<From>? = .None, entersReaderIfAvailable: Bool = false, sender: AnyObject? = .None) {
+    override init(URL: NSURL, displayControllerFrom from: ViewControllerDisplayStyle<From>, entersReaderIfAvailable: Bool = false, sender: AnyObject? = .None) {
         super.init(URL: URL, displayControllerFrom: from, entersReaderIfAvailable: entersReaderIfAvailable, sender: sender)
     }
     
