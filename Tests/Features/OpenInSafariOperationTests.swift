@@ -23,6 +23,7 @@ class OpenInSafariOperationTests: OperationTests {
     func test__operation_presents_safari_view_controller() {
         var didPresentWebpage = false
         let operation = OpenInSafariOperation(URL: URL, displayControllerFrom: .ShowDetail(presentingController))
+        operation.shouldOpenInSafariViewController = { true }
         
         presentingController.expectation = expectationWithDescription("Test: \(#function)")
         presentingController.check = { received in
@@ -47,40 +48,19 @@ class OpenInSafariOperationTests: OperationTests {
     }
     
     func test__operation_did_open_url_in_safari_app() {
-        var didPresentWebpage = false
         let expectation = expectationWithDescription("Test: \(#function)")
         
-        let operation = TestableOpenInSafariOperation(URL: URL, displayControllerFrom: .ShowDetail(presentingController))
-        
-        operation.decideOperation.addObserver(WillFinishObserver() { _, _ in
-            operation.decideOperation.shouldOpenInSafariViewController = false
-        })
-        
-        operation.didOpenURLBlock = { success in
-            didPresentWebpage = true
+        var didOpenURL: NSURL? = .None
+        let operation = OpenInSafariOperation(URL: URL, displayControllerFrom: .ShowDetail(presentingController))
+        operation.shouldOpenInSafariViewController = { false }
+        operation.openURL = {
             expectation.fulfill()
+            didOpenURL = $0
         }
         
         runOperation(operation)
         
         waitForExpectationsWithTimeout(5, handler: nil)
-        XCTAssertTrue(didPresentWebpage)
-    }
-}
-
-class TestableOpenInSafariOperation<From: PresentingViewController>: OpenInSafariOperation<From> {
-    var didOpenURLBlock: (() -> Void)?
-    
-    // For some reason the compiler does not see the init.
-    override init(URL: NSURL, displayControllerFrom from: ViewControllerDisplayStyle<From>, entersReaderIfAvailable: Bool = false, sender: AnyObject? = .None) {
-        super.init(URL: URL, displayControllerFrom: from, entersReaderIfAvailable: entersReaderIfAvailable, sender: sender)
-    }
-    
-    override func willFinishOperation(operation: NSOperation, withErrors errors: [ErrorType]) {
-        if errors.isEmpty && !cancelled, let _ = operation as? OpenURLOperation {
-            didOpenURLBlock?()
-        }
-        
-        super.willFinishOperation(operation, withErrors: errors)
+        XCTAssertTrue(URL == didOpenURL)
     }
 }

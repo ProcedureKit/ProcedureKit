@@ -9,6 +9,16 @@
 import Foundation
 import UIKit
 
+extension UIApplication {
+    internal var isFullscreenPresentation: Bool {
+        if let window = self.keyWindow {
+            return CGRectEqualToRect(window.frame, window.screen.bounds)
+        } else {
+            return true
+        }
+    }
+}
+
 /**
  An Operation that opens a given URL in an SFSafariViewController (if the base iOS SDK supports it) or opens it in the Safari app.
 
@@ -24,12 +34,14 @@ public class OpenInSafariOperation<From: PresentingViewController>: GroupOperati
     public let URL: NSURL
     /// A flag that determines whether the `SFSafariViewController` should open the `URL` in reader mode or not.
     public var entersReaderIfAvailable: Bool
+
+    internal var shouldOpenInSafariViewController: () -> Bool = { UIApplication.sharedApplication().isFullscreenPresentation }
+    internal var openURL: NSURL -> Void = { UIApplication.sharedApplication().openURL($0) }
+
     /// The presenting `ViewControllerDisplayStyle`
     private let displayControllerFrom: ViewControllerDisplayStyle<From>
     /// The `AnyObject` sender.
     private let sender: AnyObject?
-    /// A operation that decides what should happen.
-    let decideOperation = DecideWhereToOpenOperation()
 
     /**
      Initializes an `OpenInSafariOperation` with a base `URL` and some optional customization.
@@ -43,85 +55,20 @@ public class OpenInSafariOperation<From: PresentingViewController>: GroupOperati
      */
     public init(URL: NSURL, displayControllerFrom from: ViewControllerDisplayStyle<From>, entersReaderIfAvailable: Bool = false, sender: AnyObject? = .None) {
         self.URL = URL
-        self.displayControllerFrom = from
         self.entersReaderIfAvailable = entersReaderIfAvailable
+        self.displayControllerFrom = from
         self.sender = sender
-
-        super.init(operations: [decideOperation])
-
-        self.name = "Open in Safari"
+        super.init(operations: [])
+        name = "Open in Safari"
     }
 
-    public override func willFinishOperation(operation: NSOperation, withErrors errors: [ErrorType]) {
-        if errors.isEmpty && !cancelled, let decision = operation as? DecideWhereToOpenOperation {
-            if decision.shouldOpenInSafariViewController {
-                if #available(iOS 9.0, *) {
-                    produceOperation(WebpageOperation(url: URL, displayControllerFrom: displayControllerFrom, sender: sender))
-                }
-            } else {
-                produceOperation(OpenURLOperation(URL: URL))
-            }
-        }
-    }
-}
-
-/**
- An `OpenURLOperation` object represents an `Operation` that opens a given `URL` in the Safari app.
- */
-class OpenURLOperation: Operation {
-
-    /// The `URL` that should be opend.
-    let URL: NSURL
-
-    /**
-     Initializes an `OpenInSafariOperation` with a base `URL`.
-
-     - parameter URL: The `NSURL` object which should be opend.
-     */
-    init(URL: NSURL) {
-        self.URL = URL
-
-        super.init()
-        self.name = "Open URL"
-    }
-
-    override func execute() {
-        UIApplication.sharedApplication().openURL(URL)
-
-        finish()
-    }
-}
-
-/**
- An `DecideWhereToOpenOperation` object represents an `Operation` that decides on some circumstances whether it's parent `OpenInSafariOperation` should open a `URL` in the `SFSafariViewController` or in the Safari app.
- */
-class DecideWhereToOpenOperation: Operation {
-
-    /// The property that tells the parent `OpenInSafariOperation` operation to perform a certain operation.
-    var shouldOpenInSafariViewController: Bool = false
-
-    override func execute() {
-        if UIApplication.isFullscreenPresentation {
-            if #available(iOS 9.0, *) {
-                shouldOpenInSafariViewController = true
-            } else {
-                shouldOpenInSafariViewController = false
-            }
+    public override func execute() {
+        if #available(iOS 9.0, *), shouldOpenInSafariViewController() {
+            addOperation(WebpageOperation(url: self.URL, displayControllerFrom: self.displayControllerFrom, sender: self.sender))
+        } else {
+            addOperation(BlockOperation { [unowned self] in self.openURL(self.URL) })
         }
 
-        finish()
-    }
-}
-
-/// A private extension of UIApplication to check if the current app is opend in a SplitView.
-private extension UIApplication {
-    class var isFullscreenPresentation: Bool {
-        get {
-            if let window = self.sharedApplication().keyWindow {
-                return CGRectEqualToRect(window.frame, window.screen.bounds)
-            } else {
-                return true
-            }
-        }
+        super.execute()
     }
 }
