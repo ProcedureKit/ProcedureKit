@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2E7627401CE7BB550050AB05 /* OpenInSafariOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E76273F1CE7BB550050AB05 /* OpenInSafariOperation.swift */; };
+		2E7627421CE7BB7B0050AB05 /* OpenInSafariOperationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E7627411CE7BB7B0050AB05 /* OpenInSafariOperationTests.swift */; };
 		650852311C8B23580058F8AA /* Repeatable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 650852301C8B23580058F8AA /* Repeatable.swift */; };
 		650852321C8B23580058F8AA /* Repeatable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 650852301C8B23580058F8AA /* Repeatable.swift */; };
 		650852331C8B23580058F8AA /* Repeatable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 650852301C8B23580058F8AA /* Repeatable.swift */; };
@@ -338,6 +340,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		2E76273F1CE7BB550050AB05 /* OpenInSafariOperation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OpenInSafariOperation.swift; sourceTree = "<group>"; };
+		2E7627411CE7BB7B0050AB05 /* OpenInSafariOperationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OpenInSafariOperationTests.swift; sourceTree = "<group>"; };
 		650852301C8B23580058F8AA /* Repeatable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Repeatable.swift; sourceTree = "<group>"; };
 		650852351C8B23950058F8AA /* Generators.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Generators.swift; sourceTree = "<group>"; };
 		652616C91C11F5EB00654091 /* AlertOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertOperation.swift; sourceTree = "<group>"; };
@@ -676,6 +680,7 @@
 				652616F81C11F5EB00654091 /* UserConfirmationCondition.swift */,
 				652616F91C11F5EB00654091 /* UserNotificationCondition.swift */,
 				652616FA1C11F5EB00654091 /* WebpageOperation.swift */,
+				2E76273F1CE7BB550050AB05 /* OpenInSafariOperation.swift */,
 			);
 			path = iOS;
 			sourceTree = "<group>";
@@ -795,6 +800,7 @@
 				65B9E0801CB85C53009161AD /* URLSessionTaskOperationTests.swift */,
 				6526172F1C11F5EB00654091 /* UserNotificationConditionTests.swift */,
 				652617301C11F5EB00654091 /* WebpageOperationTests.swift */,
+				2E7627411CE7BB7B0050AB05 /* OpenInSafariOperationTests.swift */,
 			);
 			path = Features;
 			sourceTree = "<group>";
@@ -1260,6 +1266,7 @@
 				652618B41C11F91200654091 /* Reachability.swift in Sources */,
 				652618DB1C11F98000654091 /* Contacts.swift in Sources */,
 				65E4CDE21C33427500B9F9D8 /* RepeatedOperation.swift in Sources */,
+				2E7627401CE7BB550050AB05 /* OpenInSafariOperation.swift in Sources */,
 				652618B31C11F91200654091 /* URLSessionTaskOperation.swift in Sources */,
 				652618B61C11F91200654091 /* ReachableOperation.swift in Sources */,
 				6526186B1C11F8FC00654091 /* NoFailedDependenciesCondition.swift in Sources */,
@@ -1308,6 +1315,7 @@
 				652619751C11FE6900654091 /* ReachabilityConditionTests.swift in Sources */,
 				65FD67B41CC38933009E2C88 /* BasicTests.swift in Sources */,
 				652619781C11FE6900654091 /* RemoteNotificationConditionTests.swift in Sources */,
+				2E7627421CE7BB7B0050AB05 /* OpenInSafariOperationTests.swift in Sources */,
 				6526197D1C11FE6D00654091 /* ContactsOperationsTests.swift in Sources */,
 				652619761C11FE6900654091 /* ReachabilityTests.swift in Sources */,
 				6526196E1C11FE6900654091 /* CapabilityTests.swift in Sources */,
