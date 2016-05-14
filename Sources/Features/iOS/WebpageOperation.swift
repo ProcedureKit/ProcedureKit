@@ -28,6 +28,8 @@ public class WebpageOperation<From: PresentingViewController>: ComposedOperation
         let operation = UIOperation(controller: SFSafariViewController(URL: url, entersReaderIfAvailable: entersReaderIfAvailable), displayControllerFrom: from, sender: sender)
         self.init(operation: operation)
         
+        self.name = "Open Webpage"
+        
         addObserver(WillExecuteObserver() { [weak self] _ in
             self?.operation.controller.delegate = self
         })
