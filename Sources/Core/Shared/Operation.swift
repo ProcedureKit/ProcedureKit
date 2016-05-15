@@ -530,14 +530,19 @@ public extension Operation {
     /// Triggers execution of the operation's task, correctly managing errors and the cancelled state. Cannot be over-ridden
     final override func main() {
 
+        // Inform observers that the operation will execute
+        willExecuteObservers.forEach { $0.willExecuteOperation(self) }
+
+        // Check to see if the operation has now been cancelled
+        // by an observer
         guard _internalErrors.isEmpty && !cancelled else {
             finish()
             return
         }
 
-        willExecuteObservers.forEach { $0.willExecuteOperation(self) }
         state = .Executing
         log.verbose("Will Execute")
+
         execute()
     }
 
