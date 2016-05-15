@@ -179,6 +179,11 @@ public class ComposedCondition<C: Condition>: Condition, AutomaticInjectionOpera
         }
         completion(result)
     }
+
+    override func removeDirectDependency(directDependency: NSOperation) {
+        condition.removeDirectDependency(directDependency)
+        super.removeDirectDependency(directDependency)
+    }
 }
 
 internal class WrappedOperationCondition: Condition {
