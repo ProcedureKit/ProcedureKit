@@ -55,9 +55,10 @@ internal class ExclusivityManager {
     private func _removeOperation(operation: Operation, category: String) {
         operation.log.verbose("<<< \(category)")
 
-        if var operationsWithThisCategory = operations[category], let index = operationsWithThisCategory.indexOf(operation) {
-            operationsWithThisCategory.removeAtIndex(index)
-            operations[category] = operationsWithThisCategory
+        if let operationsWithThisCategory = operations[category], index = operationsWithThisCategory.indexOf(operation) {
+            var mutableOperationsWithThisCategory = operationsWithThisCategory
+            mutableOperationsWithThisCategory.removeAtIndex(index)
+            operations[category] = mutableOperationsWithThisCategory
         }
     }
 }
