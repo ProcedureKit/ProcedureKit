@@ -30,6 +30,14 @@ public extension CloudKitErrorType {
     }
 }
 
+public protocol BatchModifyErrorType: CloudKitErrorType {
+    associatedtype Save
+    associatedtype Delete
+
+    var saved: [Save]? { get }
+    var deleted: [Delete]? { get }
+}
+
 public struct CloudKitError: CloudKitErrorType {
 
     public let underlyingError: NSError

@@ -206,6 +206,41 @@ extension BatchedCloudKitOperation where T: CKDesiredKeys {
     }
 }
 
+// MARK: - BatchModifyOperationType
+
+extension OPRCKOperation where T: BatchModifyOperationType {
+
+    var toSave: [T.Save]? {
+        get { return operation.toSave }
+        set { operation.toSave = newValue }
+    }
+
+    var toDelete: [T.Delete]? {
+        get { return operation.toDelete }
+        set { operation.toDelete = newValue }
+    }
+}
+
+
+public extension CloudKitOperation where T: BatchModifyOperationType {
+
+    var toSave: [T.Save]? {
+        get { return operation.toSave }
+        set {
+            operation.toSave = newValue
+            addConfigureBlock { $0.toSave = newValue }
+        }
+    }
+
+    var toDelete: [T.Delete]? {
+        get { return operation.toDelete }
+        set {
+            operation.toDelete = newValue
+            addConfigureBlock { $0.toDelete = newValue }
+        }
+    }
+}
+
 // MARK: - CKDiscoverAllContactsOperation
 
 public struct DiscoverAllContactsError<DiscoveredUserInfo>: CloudKitErrorType {
@@ -838,7 +873,7 @@ extension CloudKitOperation where T: CKFetchSubscriptionsOperationType {
 
 // MARK: - CKModifyRecordZonesOperation
 
-public struct ModifyRecordZonesError<RecordZone, RecordZoneID>: CloudKitErrorType {
+public struct ModifyRecordZonesError<RecordZone, RecordZoneID>: CloudKitErrorType, BatchModifyErrorType {
 
     public let underlyingError: NSError
     public let saved: [RecordZone]?
@@ -912,7 +947,7 @@ extension CloudKitOperation where T: CKModifyRecordZonesOperationType {
 
 // MARK: - CKModifyRecordsOperation
 
-public struct ModifyRecordsError<Record, RecordID>: CloudKitErrorType {
+public struct ModifyRecordsError<Record, RecordID>: CloudKitErrorType, BatchModifyErrorType {
 
     public let underlyingError: NSError
     public let saved: [Record]?
@@ -1064,7 +1099,7 @@ extension CloudKitOperation where T: CKModifyRecordsOperationType {
 
 // MARK: - CKModifySubscriptionsOperation
 
-public struct ModifySubscriptionsError<Subscription, SubscriptionID>: CloudKitErrorType {
+public struct ModifySubscriptionsError<Subscription, SubscriptionID>: CloudKitErrorType, BatchModifyErrorType {
 
     public let underlyingError: NSError
     public let saved: [Subscription]?

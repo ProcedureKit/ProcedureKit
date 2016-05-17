@@ -261,6 +261,72 @@ public final class CloudKitOperation<T where T: NSOperation, T: CKOperationType,
     }
 }
 
+// MARK: - Batch Modify Error Handling
+
+public extension CloudKitOperation where T: BatchModifyOperationType, T.Save == T.Error.Save, T.Save: Equatable, T.Delete == T.Error.Delete, T.Delete: Equatable {
+    typealias ToModify = (toSave: [T.Save]?, toDelete: [T.Delete]?)
+    typealias ToModifyResponse = (left: ToModify, right: ToModify)
+
+    func setErrorHandlerForLimitExceeded(handler: (error: T.Error, log: LoggerType, suggested: ToModifyResponse) -> ToModifyResponse = { $2 }) {
+        setErrorHandlerForCode(.LimitExceeded) { [unowned self] error, log, suggested in
+
+            log.warning("Received CloudKit Limit Exceeded error: \(error)")
+
+            // Define variables for right hand side
+            var lhsToSave: [T.Save]? = .None
+            var rhsToSave: [T.Save]? = .None
+
+            let remainingToSave = self.operation.toSave?.filter { error.saved?.contains($0) ?? false }
+            if let toSave = remainingToSave {
+                let numberOfToSave = toSave.count
+                lhsToSave = Array(toSave.prefixUpTo(numberOfToSave/2))
+                rhsToSave = Array(toSave.suffixFrom(numberOfToSave/2))
+            }
+
+            var lhsToDelete: [T.Delete]? = .None
+            var rhsToDelete: [T.Delete]? = .None
+
+            let remainingToDelete = self.operation.toDelete?.filter { error.deleted?.contains($0) ?? false }
+            if let toDelete = remainingToDelete {
+                let numberToDelete = toDelete.count
+                lhsToDelete = Array(toDelete.prefixUpTo(numberToDelete/2))
+                rhsToDelete = Array(toDelete.suffixFrom(numberToDelete/2))
+            }
+
+            let response = handler(error: error, log: log, suggested: (left: (toSave: lhsToSave, toDelete: lhsToDelete), right: (toSave: rhsToSave, toDelete: rhsToDelete)))
+
+            // Create a new operation to bisect the remaining data
+            let lhs: CloudKitOperation<T> = CloudKitOperation { T() }
+
+            lhs.toSave = response.left.toSave
+            lhs.toDelete = response.left.toDelete
+
+            // Setup basic configuration such as container & database
+            lhs.addConfigureBlock(suggested.configure)
+
+            let configure = { (rhs: OPRCKOperation<T>) in
+
+                // Apple the suggest configuration to rhs, will include container, database etc
+                suggested.configure(rhs)
+
+                // Set the properies for the subscriptions to save/delete
+                rhs.toSave = response.right.toSave
+                rhs.toDelete = response.right.toDelete
+
+                // Add the left half as a child of the original operation
+                // which will be retried
+                rhs.addDependency(lhs)
+            }
+
+            // Add the lhs operation as a child of the original operation
+            self.addOperation(lhs)
+
+            return (suggested.delay, configure)
+        }
+    }
+}
+
+
 // MARK: - BatchedCloudKitOperation
 
 class CloudKitOperationGenerator<T where T: NSOperation, T: CKOperationType, T: AssociatedErrorType, T.Error: CloudKitErrorType>: GeneratorType {
