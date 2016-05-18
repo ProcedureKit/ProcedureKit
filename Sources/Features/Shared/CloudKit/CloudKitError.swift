@@ -57,35 +57,45 @@ public struct CloudKitError: CloudKitErrorType {
 
 // MARK: - Batch Modify Error Handling
 
+internal extension BatchModifyOperationType where Save: Equatable, Save == Error.Save, Delete: Equatable, Delete == Error.Delete {
+
+    typealias ToModify = (toSave: [Save]?, toDelete: [Delete]?)
+    typealias ToModifyResponse = (left: ToModify, right: ToModify)
+
+    func bisect(error: Error) -> ToModifyResponse {
+        var left: ToModify = (.None, .None)
+        var right: ToModify = (.None, .None)
+
+        let remainingToSave = toSave?.filter { error.saved?.contains($0) ?? false }
+        if let toSave = remainingToSave {
+            let numberOfToSave = toSave.count
+            left.toSave = Array(toSave.prefixUpTo(numberOfToSave/2))
+            right.toSave = Array(toSave.suffixFrom(numberOfToSave/2))
+        }
+
+        let remainingToDelete = toDelete?.filter { error.deleted?.contains($0) ?? false }
+        if let toDelete = remainingToDelete {
+            let numberToDelete = toDelete.count
+            left.toDelete = Array(toDelete.prefixUpTo(numberToDelete/2))
+            right.toDelete = Array(toDelete.suffixFrom(numberToDelete/2))
+        }
+
+        return (left: left, right: right)
+    }
+}
+
 public extension CloudKitOperation where T: BatchModifyOperationType, T.Save == T.Error.Save, T.Save: Equatable, T.Delete == T.Error.Delete, T.Delete: Equatable {
 
     typealias ToModify = (toSave: [T.Save]?, toDelete: [T.Delete]?)
     typealias ToModifyResponse = (left: ToModify, right: ToModify)
 
     func setErrorHandlerForLimitExceeded(handler: (error: T.Error, log: LoggerType, suggested: ToModifyResponse) -> ToModifyResponse? = { $2 }) {
-        setErrorHandlerForCode(.LimitExceeded) { [unowned self] error, log, suggested in
+        setErrorHandlerForCode(.LimitExceeded) { [unowned self] operation, error, log, suggested in
 
             log.warning("Received CloudKit Limit Exceeded error: \(error)")
 
-            var left: ToModify = (.None, .None)
-            var right: ToModify = (.None, .None)
-
-            let remainingToSave = self.operation.toSave?.filter { error.saved?.contains($0) ?? false }
-            if let toSave = remainingToSave {
-                let numberOfToSave = toSave.count
-                left.toSave = Array(toSave.prefixUpTo(numberOfToSave/2))
-                right.toSave = Array(toSave.suffixFrom(numberOfToSave/2))
-            }
-
-            let remainingToDelete = self.operation.toDelete?.filter { error.deleted?.contains($0) ?? false }
-            if let toDelete = remainingToDelete {
-                let numberToDelete = toDelete.count
-                left.toDelete = Array(toDelete.prefixUpTo(numberToDelete/2))
-                right.toDelete = Array(toDelete.suffixFrom(numberToDelete/2))
-            }
-
             // Execute the handler, and guard against a nil response
-            guard let response = handler(error: error, log: log, suggested: (left: left, right: right)) else {
+            guard let response = handler(error: error, log: log, suggested: operation.bisect(error)) else {
                 return .None
             }
 
@@ -128,7 +138,7 @@ public extension CloudKitOperation where T: BatchProcessOperationType, T.Process
     typealias ToProcessResponse = (left: [T.Process]?, right: [T.Process]?)
 
     func setErrorHandlerForLimitExceeded(handler: (error: T.Error, log: LoggerType, suggested: ToProcessResponse) -> ToProcessResponse? = { $2 }) {
-        setErrorHandlerForCode(.LimitExceeded) { [unowned self] error, log, suggested in
+        setErrorHandlerForCode(.LimitExceeded) { [unowned self] operation, error, log, suggested in
 
             log.warning("Received CloudKit Limit Exceeded error: \(error)")
 

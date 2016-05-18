@@ -1391,7 +1391,7 @@ class CloudKitOperationDiscoverAllContractsTests: CKTests {
         }
 
         var didRunCustomHandler = false
-        operation.setErrorHandlerForCode(.LimitExceeded) { error, log, suggested in
+        operation.setErrorHandlerForCode(.LimitExceeded) { operation, error, log, suggested in
             didRunCustomHandler = true
             return suggested
         }
@@ -1424,6 +1424,22 @@ class CloudKitOperationDiscoverAllContractsTests: CKTests {
         XCTAssertEqual(operation.errors.count, 1)
     }
 
+    func test__get_error_handlers() {
+        operation = CloudKitOperation(reachability: manager) { TestDiscoverAllContactsOperation(result: []) }
+        operation.setErrorHandlerForCode(.InternalError) { $3 }
+        let errorHandlers = operation.errorHandlers
+        XCTAssertEqual(errorHandlers.count, 1)
+        XCTAssertNotNil(errorHandlers[.InternalError])
+    }
+
+    func test__set_error_handlers() {
+        operation = CloudKitOperation(reachability: manager) { TestDiscoverAllContactsOperation(result: []) }
+        let handler: CloudKitOperation<TestDiscoverAllContactsOperation>.ErrorHandler = { $3 }
+        operation.setErrorHandlers([.InternalError: handler])
+        let errorHandlers = operation.errorHandlers
+        XCTAssertEqual(errorHandlers.count, 1)
+        XCTAssertNotNil(errorHandlers[.InternalError])
+    }
 }
 
 class CloudKitOperationDiscoverUserInfosOperationTests: CKTests {

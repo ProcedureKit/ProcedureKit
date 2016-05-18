@@ -25,7 +25,7 @@ public class CloudKitRecovery<T where T: NSOperation, T: CKOperationType, T: Ass
     public typealias V = OPRCKOperation<T>
 
     public typealias ErrorResponse = (delay: Delay?, configure: V -> Void)
-    public typealias Handler = (error: T.Error, log: LoggerType, suggested: ErrorResponse) -> ErrorResponse?
+    public typealias Handler = (operation: T, error: T.Error, log: LoggerType, suggested: ErrorResponse) -> ErrorResponse?
 
     typealias Payload = (Delay?, V)
 
@@ -46,8 +46,8 @@ public class CloudKitRecovery<T where T: NSOperation, T: CKOperationType, T: Ass
         let suggestion: ErrorResponse = (payload.0, info.configure )
         var response: ErrorResponse? = .None
 
-        response = defaultHandlers[code]?(error: error, log: info.log, suggested: suggestion)
-        response = customHandlers[code]?(error: error, log: info.log, suggested: response ?? suggestion)
+        response = defaultHandlers[code]?(operation: info.operation.operation, error: error, log: info.log, suggested: suggestion)
+        response = customHandlers[code]?(operation: info.operation.operation, error: error, log: info.log, suggested: response ?? suggestion)
 
         return response
 
@@ -56,7 +56,7 @@ public class CloudKitRecovery<T where T: NSOperation, T: CKOperationType, T: Ass
 
     func addDefaultHandlers() {
 
-        let exit: Handler = { error, log, _ in
+        let exit: Handler = { _, error, log, _ in
             log.fatal("Exiting due to CloudKit Error: \(error)")
             return .None
         }
@@ -72,7 +72,7 @@ public class CloudKitRecovery<T where T: NSOperation, T: CKOperationType, T: Ass
         setDefaultHandlerForCode(.QuotaExceeded, handler: exit)
         setDefaultHandlerForCode(.OperationCancelled, handler: exit)
 
-        let retry: Handler = { error, log, suggestion in
+        let retry: Handler = { _, error, log, suggestion in
             return error.retryAfterDelay.map { ($0, suggestion.configure) } ?? suggestion
         }
 
