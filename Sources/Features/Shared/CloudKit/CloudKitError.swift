@@ -57,6 +57,14 @@ public struct CloudKitError: CloudKitErrorType {
 
 // MARK: - Batch Modify Error Handling
 
+internal extension Array where Element: Equatable {
+
+    func bisect() -> (left: [Element], right: [Element]) {
+        let half = count / 2
+        return (Array(prefixUpTo(half)), Array(suffixFrom(half)))
+    }
+}
+
 internal extension BatchModifyOperationType where Save: Equatable, Save == Error.Save, Delete: Equatable, Delete == Error.Delete {
 
     typealias ToModify = (toSave: [Save]?, toDelete: [Delete]?)
@@ -67,17 +75,16 @@ internal extension BatchModifyOperationType where Save: Equatable, Save == Error
         var right: ToModify = (.None, .None)
 
         let remainingToSave = toSave?.filter { error.saved?.contains($0) ?? false }
-        if let toSave = remainingToSave {
-            let numberOfToSave = toSave.count
-            left.toSave = Array(toSave.prefixUpTo(numberOfToSave/2))
-            right.toSave = Array(toSave.suffixFrom(numberOfToSave/2))
+        let remainingToDelete = toDelete?.filter { error.deleted?.contains($0) ?? false }
+
+        if let bisectedToSave = remainingToSave.map({ $0.bisect() }) {
+            left.toSave = bisectedToSave.left
+            right.toSave = bisectedToSave.right
         }
 
-        let remainingToDelete = toDelete?.filter { error.deleted?.contains($0) ?? false }
-        if let toDelete = remainingToDelete {
-            let numberToDelete = toDelete.count
-            left.toDelete = Array(toDelete.prefixUpTo(numberToDelete/2))
-            right.toDelete = Array(toDelete.suffixFrom(numberToDelete/2))
+        if let bisectedToDelete = remainingToDelete.map({ $0.bisect() }) {
+            left.toDelete = bisectedToDelete.left
+            right.toDelete = bisectedToDelete.right
         }
 
         return (left: left, right: right)
