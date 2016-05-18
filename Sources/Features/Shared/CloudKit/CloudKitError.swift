@@ -123,6 +123,58 @@ public extension CloudKitOperation where T: BatchModifyOperationType, T.Save == 
     }
 }
 
-public extension CloudKitOperation where T: BatchProcessOperationType {
+public extension CloudKitOperation where T: BatchProcessOperationType, T.Process == T.Error.Process, T.Process: Equatable {
 
+    typealias ToProcessResponse = (left: [T.Process]?, right: [T.Process]?)
+
+    func setErrorHandlerForLimitExceeded(handler: (error: T.Error, log: LoggerType, suggested: ToProcessResponse) -> ToProcessResponse? = { $2 }) {
+        setErrorHandlerForCode(.LimitExceeded) { [unowned self] error, log, suggested in
+
+            log.warning("Received CloudKit Limit Exceeded error: \(error)")
+
+            var left: [T.Process]? = .None
+            var right: [T.Process]? = .None
+
+            let remainingToProcess = self.operation.toProcess?.filter { error.processed?.contains($0) ?? false }
+            if let toProcess = remainingToProcess {
+                let numberOfToSave = toProcess.count
+                left = Array(toProcess.prefixUpTo(numberOfToSave/2))
+                right = Array(toProcess.suffixFrom(numberOfToSave/2))
+            }
+
+            // Execute the handler, and guard against a nil response
+            guard let response = handler(error: error, log: log, suggested: (left: left, right: right)) else {
+                return .None
+            }
+
+            // Create a new operation to bisect the remaining data
+            let lhs: CloudKitOperation<T> = CloudKitOperation { T() }
+
+            lhs.toProcess = response.left
+
+            // Setup basic configuration such as container & database
+            lhs.addConfigureBlock(suggested.configure)
+
+            // Set error handlers
+            lhs.setErrorHandlers(self.errorHandlers)
+            lhs.setErrorHandlerForLimitExceeded(handler)
+
+            let configure = { (rhs: OPRCKOperation<T>) in
+
+                // Set the suggest configuration to rhs, will include container, database etc
+                suggested.configure(rhs)
+
+                // Set the properies for the subscriptions to save/delete
+                rhs.toProcess = response.right
+
+                // Set the left half as dependency
+                rhs.addDependency(lhs)
+            }
+
+            // Add the lhs operation as a child of the original operation
+            self.addOperation(lhs)
+
+            return (suggested.delay, configure)
+        }
+    }
 }

@@ -206,7 +206,28 @@ extension BatchedCloudKitOperation where T: CKDesiredKeys {
     }
 }
 
-// MARK: - CloudKitBatchModifyErrorType
+// MARK: - BatchProcessOperationType
+
+extension OPRCKOperation where T: BatchProcessOperationType {
+
+    var toProcess: [T.Process]? {
+        get { return operation.toProcess }
+        set { operation.toProcess = newValue }
+    }
+}
+
+public extension CloudKitOperation where T: BatchProcessOperationType {
+
+    var toProcess: [T.Process]? {
+        get { return operation.toProcess }
+        set {
+            operation.toProcess = newValue
+            addConfigureBlock { $0.toProcess = newValue }
+        }
+    }
+}
+
+// MARK: - BatchModifyOperationType
 
 extension OPRCKOperation where T: BatchModifyOperationType {
 
@@ -220,7 +241,6 @@ extension OPRCKOperation where T: BatchModifyOperationType {
         set { operation.toDelete = newValue }
     }
 }
-
 
 public extension CloudKitOperation where T: BatchModifyOperationType {
 
