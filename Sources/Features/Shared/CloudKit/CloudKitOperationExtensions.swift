@@ -206,7 +206,7 @@ extension BatchedCloudKitOperation where T: CKDesiredKeys {
     }
 }
 
-// MARK: - BatchModifyOperationType
+// MARK: - CloudKitBatchModifyErrorType
 
 extension OPRCKOperation where T: BatchModifyOperationType {
 
@@ -444,7 +444,7 @@ public struct MarkNotificationsReadError<NotificationID>: CloudKitErrorType {
     }
 }
 
-extension MarkNotificationsReadError: BatchProcessErrorType {
+extension MarkNotificationsReadError: CloudKitBatchProcessErrorType {
 
     public var processed: [NotificationID]? {
         return marked
@@ -880,7 +880,7 @@ extension CloudKitOperation where T: CKFetchSubscriptionsOperationType {
 
 // MARK: - CKModifyRecordZonesOperation
 
-public struct ModifyRecordZonesError<RecordZone, RecordZoneID>: CloudKitErrorType, BatchModifyErrorType {
+public struct ModifyRecordZonesError<RecordZone, RecordZoneID>: CloudKitErrorType, CloudKitBatchModifyErrorType {
 
     public let underlyingError: NSError
     public let saved: [RecordZone]?
@@ -954,7 +954,7 @@ extension CloudKitOperation where T: CKModifyRecordZonesOperationType {
 
 // MARK: - CKModifyRecordsOperation
 
-public struct ModifyRecordsError<Record, RecordID>: CloudKitErrorType, BatchModifyErrorType {
+public struct ModifyRecordsError<Record, RecordID>: CloudKitErrorType, CloudKitBatchModifyErrorType {
 
     public let underlyingError: NSError
     public let saved: [Record]?
@@ -1106,7 +1106,7 @@ extension CloudKitOperation where T: CKModifyRecordsOperationType {
 
 // MARK: - CKModifySubscriptionsOperation
 
-public struct ModifySubscriptionsError<Subscription, SubscriptionID>: CloudKitErrorType, BatchModifyErrorType {
+public struct ModifySubscriptionsError<Subscription, SubscriptionID>: CloudKitErrorType, CloudKitBatchModifyErrorType {
 
     public let underlyingError: NSError
     public let saved: [Subscription]?

@@ -291,6 +291,7 @@ public protocol CKQueryOperationType: CKDatabaseOperationType, CKResultsLimit, C
 
 public protocol BatchProcessOperationType: CKOperationType {
     associatedtype Process
+    associatedtype Error: CloudKitBatchProcessErrorType
 
     var toProcess: [Process]? { get set }
 }
@@ -298,7 +299,7 @@ public protocol BatchProcessOperationType: CKOperationType {
 public protocol BatchModifyOperationType: CKOperationType {
     associatedtype Save
     associatedtype Delete
-    associatedtype Error: BatchModifyErrorType
+    associatedtype Error: CloudKitBatchModifyErrorType
 
     var toSave: [Save]? { get set }
     var toDelete: [Delete]? { get set }

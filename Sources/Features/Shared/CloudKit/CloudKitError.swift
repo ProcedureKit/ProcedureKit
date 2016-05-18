@@ -30,7 +30,7 @@ public extension CloudKitErrorType {
     }
 }
 
-public protocol BatchModifyErrorType: CloudKitErrorType {
+public protocol CloudKitBatchModifyErrorType: CloudKitErrorType {
     associatedtype Save
     associatedtype Delete
 
@@ -38,7 +38,7 @@ public protocol BatchModifyErrorType: CloudKitErrorType {
     var deleted: [Delete]? { get }
 }
 
-public protocol BatchProcessErrorType: CloudKitErrorType {
+public protocol CloudKitBatchProcessErrorType: CloudKitErrorType {
     associatedtype Process
 
     var processed: [Process]? { get }
