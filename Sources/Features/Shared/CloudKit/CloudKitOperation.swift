@@ -213,6 +213,10 @@ public final class CloudKitOperation<T where T: NSOperation, T: CKOperationType,
         return current.operation
     }
 
+    public var errorHandlers: [CKErrorCode: ErrorHandler] {
+        return recovery.customHandlers
+    }
+
     public convenience init(_ body: () -> T?) {
         self.init(generator: AnyGenerator(body: body), connectivity: .AnyConnectionKind, reachability: ReachabilityManager(DeviceReachability()))
     }
@@ -252,6 +256,10 @@ public final class CloudKitOperation<T where T: NSOperation, T: CKOperationType,
 
     public func setErrorHandlerForCode(code: CKErrorCode, handler: ErrorHandler) {
         recovery.setCustomHandlerForCode(code, handler: handler)
+    }
+
+    public func setErrorHandlers(handlers: [CKErrorCode: ErrorHandler]) {
+        recovery.customHandlers = handlers
     }
 
     override func childOperation(child: NSOperation, didFinishWithErrors errors: [ErrorType]) {
@@ -302,6 +310,10 @@ public extension CloudKitOperation where T: BatchModifyOperationType, T.Save == 
 
             // Setup basic configuration such as container & database
             lhs.addConfigureBlock(suggested.configure)
+
+            // Set error handlers
+            lhs.setErrorHandlers(self.errorHandlers)
+            lhs.setErrorHandlerForLimitExceeded(handler)
 
             let configure = { (rhs: OPRCKOperation<T>) in
 
