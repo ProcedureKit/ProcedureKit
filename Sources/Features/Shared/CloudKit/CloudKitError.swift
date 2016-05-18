@@ -102,9 +102,6 @@ public extension CloudKitOperation where T: BatchModifyOperationType, T.Save == 
             // Create a new operation to bisect the remaining data
             let lhs: CloudKitOperation<T> = CloudKitOperation { T() }
 
-            lhs.toSave = response.left.toSave
-            lhs.toDelete = response.left.toDelete
-
             // Setup basic configuration such as container & database
             lhs.addConfigureBlock(suggested.configure)
 
@@ -112,12 +109,17 @@ public extension CloudKitOperation where T: BatchModifyOperationType, T.Save == 
             lhs.setErrorHandlers(self.errorHandlers)
             lhs.setErrorHandlerForLimitExceeded(handler)
 
+            // Set the modifications to perform
+            lhs.toSave = response.left.toSave
+            lhs.toDelete = response.left.toDelete
+
+            // Setup the configuration block for the right hand side.
             let configure = { (rhs: OPRCKOperation<T>) in
 
                 // Set the suggest configuration to rhs, will include container, database etc
                 suggested.configure(rhs)
 
-                // Set the properies for the subscriptions to save/delete
+                // Set the modifications to perform
                 rhs.toSave = response.right.toSave
                 rhs.toDelete = response.right.toDelete
 
@@ -125,7 +127,7 @@ public extension CloudKitOperation where T: BatchModifyOperationType, T.Save == 
                 rhs.addDependency(lhs)
             }
 
-            // Add the lhs operation as a child of the original operation
+            // Add the left half operation as a child of the group
             self.addOperation(lhs)
 
             return (suggested.delay, configure)
