@@ -38,6 +38,12 @@ public protocol BatchModifyErrorType: CloudKitErrorType {
     var deleted: [Delete]? { get }
 }
 
+public protocol BatchProcessErrorType: CloudKitErrorType {
+    associatedtype Process
+
+    var processed: [Process]? { get }
+}
+
 public struct CloudKitError: CloudKitErrorType {
 
     public let underlyingError: NSError
@@ -111,10 +117,12 @@ public extension CloudKitOperation where T: BatchModifyOperationType, T.Save == 
 
             // Add the lhs operation as a child of the original operation
             self.addOperation(lhs)
-            
+
             return (suggested.delay, configure)
         }
     }
 }
 
+public extension CloudKitOperation where T: BatchProcessOperationType {
 
+}

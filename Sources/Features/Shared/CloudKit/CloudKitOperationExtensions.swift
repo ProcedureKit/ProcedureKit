@@ -444,6 +444,13 @@ public struct MarkNotificationsReadError<NotificationID>: CloudKitErrorType {
     }
 }
 
+extension MarkNotificationsReadError: BatchProcessErrorType {
+
+    public var processed: [NotificationID]? {
+        return marked
+    }
+}
+
 extension OPRCKOperation where T: CKMarkNotificationsReadOperationType, T: AssociatedErrorType, T.Error: CloudKitErrorType {
 
     public var notificationIDs: [T.NotificationID] {
