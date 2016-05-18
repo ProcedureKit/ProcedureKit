@@ -317,15 +317,14 @@ public extension CloudKitOperation where T: BatchModifyOperationType, T.Save == 
 
             let configure = { (rhs: OPRCKOperation<T>) in
 
-                // Apple the suggest configuration to rhs, will include container, database etc
+                // Set the suggest configuration to rhs, will include container, database etc
                 suggested.configure(rhs)
 
                 // Set the properies for the subscriptions to save/delete
                 rhs.toSave = response.right.toSave
                 rhs.toDelete = response.right.toDelete
 
-                // Add the left half as a child of the original operation
-                // which will be retried
+                // Set the left half as dependency
                 rhs.addDependency(lhs)
             }
 
