@@ -267,33 +267,32 @@ public extension CloudKitOperation where T: BatchModifyOperationType, T.Save == 
     typealias ToModify = (toSave: [T.Save]?, toDelete: [T.Delete]?)
     typealias ToModifyResponse = (left: ToModify, right: ToModify)
 
-    func setErrorHandlerForLimitExceeded(handler: (error: T.Error, log: LoggerType, suggested: ToModifyResponse) -> ToModifyResponse = { $2 }) {
+    func setErrorHandlerForLimitExceeded(handler: (error: T.Error, log: LoggerType, suggested: ToModifyResponse) -> ToModifyResponse? = { $2 }) {
         setErrorHandlerForCode(.LimitExceeded) { [unowned self] error, log, suggested in
 
             log.warning("Received CloudKit Limit Exceeded error: \(error)")
 
-            // Define variables for right hand side
-            var lhsToSave: [T.Save]? = .None
-            var rhsToSave: [T.Save]? = .None
+            var left: ToModify = (.None, .None)
+            var right: ToModify = (.None, .None)
 
             let remainingToSave = self.operation.toSave?.filter { error.saved?.contains($0) ?? false }
             if let toSave = remainingToSave {
                 let numberOfToSave = toSave.count
-                lhsToSave = Array(toSave.prefixUpTo(numberOfToSave/2))
-                rhsToSave = Array(toSave.suffixFrom(numberOfToSave/2))
+                left.toSave = Array(toSave.prefixUpTo(numberOfToSave/2))
+                right.toSave = Array(toSave.suffixFrom(numberOfToSave/2))
             }
-
-            var lhsToDelete: [T.Delete]? = .None
-            var rhsToDelete: [T.Delete]? = .None
 
             let remainingToDelete = self.operation.toDelete?.filter { error.deleted?.contains($0) ?? false }
             if let toDelete = remainingToDelete {
                 let numberToDelete = toDelete.count
-                lhsToDelete = Array(toDelete.prefixUpTo(numberToDelete/2))
-                rhsToDelete = Array(toDelete.suffixFrom(numberToDelete/2))
+                left.toDelete = Array(toDelete.prefixUpTo(numberToDelete/2))
+                right.toDelete = Array(toDelete.suffixFrom(numberToDelete/2))
             }
 
-            let response = handler(error: error, log: log, suggested: (left: (toSave: lhsToSave, toDelete: lhsToDelete), right: (toSave: rhsToSave, toDelete: rhsToDelete)))
+            // Execute the handler, and guard against a nil response
+            guard let response = handler(error: error, log: log, suggested: (left: left, right: right)) else {
+                return .None
+            }
 
             // Create a new operation to bisect the remaining data
             let lhs: CloudKitOperation<T> = CloudKitOperation { T() }
