@@ -216,17 +216,15 @@ public class ReverseGeocodeOperation: Operation, ResultOperationType {
     public override func execute() {
         geocoder.opr_reverseGeocodeLocation(location) { results, error in
             dispatch_async(Queue.Main.queue) { [weak self] in
-                if let weakSelf = self {
-                    if !weakSelf.finished {
-                        if let error = error {
-                            weakSelf.finish(LocationOperationError.GeocoderError(error))
-                        }
-                        else if let placemark = results.first {
-                            weakSelf.placemark = placemark
-                            weakSelf.completion(placemark)
-                            weakSelf.finish()
-                        }
-                    }
+                guard let weakSelf = self where !weakSelf.finished else { return }
+
+                if let error = error {
+                    weakSelf.finish(LocationOperationError.GeocoderError(error))
+                }
+                else if let placemark = results.first {
+                    weakSelf.placemark = placemark
+                    weakSelf.completion(placemark)
+                    weakSelf.finish()
                 }
             }
         }
@@ -276,18 +274,16 @@ public class ReverseGeocodeUserLocationOperation: GroupOperation, ResultOperatio
     }
 
     public override func willFinishOperation(operation: NSOperation, withErrors errors: [ErrorType]) {
-        if errors.isEmpty && userLocationOperation == operation && !operation.cancelled {
-            if let location = location {
-                let reverseOp = ReverseGeocodeOperation(location: location) { [unowned self] placemark in
-                    self.completion(location, placemark)
-                }
-                if let geocoder = geocoder {
-                    reverseOp.geocoder = geocoder
-                }
-                addOperation(reverseOp)
-                reverseGeocodeOperation = reverseOp
-            }
+        guard let location = location where errors.isEmpty && userLocationOperation == operation && !operation.cancelled else { return }
+
+        let reverseOp = ReverseGeocodeOperation(location: location) { [unowned self] placemark in
+            self.completion(location, placemark)
         }
+        if let geocoder = geocoder {
+            reverseOp.geocoder = geocoder
+        }
+        addOperation(reverseOp)
+        reverseGeocodeOperation = reverseOp
     }
 }
 
