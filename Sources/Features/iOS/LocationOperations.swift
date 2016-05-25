@@ -37,6 +37,13 @@ extension CLLocationManager: LocationManagerType {
     }
 }
 
+internal extension CLLocationManager {
+
+    static func create() -> CLLocationManager {
+        return dispatch_main_sync { CLLocationManager() }
+    }
+}
+
 public enum LocationOperationError: ErrorType, Equatable {
     case LocationManagerDidFail(NSError)
     case GeocoderError(NSError)
@@ -50,9 +57,17 @@ public class UserLocationOperation: Operation, CLLocationManagerDelegate, Result
     private let accuracy: CLLocationAccuracy
     private let completion: CompletionBlockType
 
-    internal lazy var manager: LocationManagerType = {
-        return dispatch_sync(Queue.Main.queue) { CLLocationManager() }
-    }()
+    internal var capability: LocationCapability
+
+    internal lazy var locationManager: LocationManagerType = CLLocationManager.create()
+
+    internal var manager: LocationManagerType {
+        get { return locationManager }
+        set {
+            locationManager = newValue
+            capability.registrar = newValue
+        }
+    }
 
     /// - returns: the CLLocation if available
     public private(set) var location: CLLocation? = .None
@@ -72,9 +87,9 @@ public class UserLocationOperation: Operation, CLLocationManagerDelegate, Result
     public init(accuracy: CLLocationAccuracy = kCLLocationAccuracyThreeKilometers, completion: CompletionBlockType = { _ in }) {
         self.accuracy = accuracy
         self.completion = completion
+        self.capability = Capability.Location(.WhenInUse)
         super.init()
         name = "User Location"
-        let capability = Capability.Location(.WhenInUse)
         capability.registrar = manager
         addCondition(AuthorizedFor(capability))
         addCondition(MutuallyExclusive<CLLocationManager>())
@@ -149,15 +164,20 @@ extension CLGeocoder: ReverseGeocoderType {
     }
 }
 
+internal extension CLGeocoder {
+
+    static func create() -> CLGeocoder {
+        return dispatch_main_sync { CLGeocoder() }
+    }
+}
+
 public class ReverseGeocodeOperation: Operation, ResultOperationType {
 
     public typealias CompletionBlockType = CLPlacemark -> Void
 
     public let location: CLLocation
 
-    internal lazy var geocoder: ReverseGeocoderType = {
-        return dispatch_sync(Queue.Main.queue) { CLGeocoder() }
-    }()
+    internal lazy var geocoder: ReverseGeocoderType = CLGeocoder.create()
 
     private let completion: CompletionBlockType
 
@@ -222,7 +242,7 @@ public class ReverseGeocodeUserLocationOperation: GroupOperation, ResultOperatio
 
     internal let userLocationOperation: UserLocationOperation
     internal var reverseGeocodeOperation: ReverseGeocodeOperation?
-    internal lazy var geocoder: ReverseGeocoderType? = .None
+    internal var geocoder: ReverseGeocoderType? = .None
 
     /// - returns: the CLLocation if available
     public var location: CLLocation? {

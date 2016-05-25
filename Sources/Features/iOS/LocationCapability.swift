@@ -128,9 +128,7 @@ public class LocationCapability: NSObject, CLLocationManagerDelegate, Capability
     /// - returns: the EKEntityType, the required type of the capability
     public let requirement: LocationUsage
 
-    internal lazy var registrar: LocationCapabilityRegistrarType = {
-        return dispatch_sync(Queue.Main.queue) { CLLocationManager() }
-    }()
+    internal lazy var registrar: LocationCapabilityRegistrarType = CLLocationManager.create()
 
     internal var authorizationCompletionBlock: dispatch_block_t? = .None
 
