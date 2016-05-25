@@ -164,19 +164,19 @@ public class LocationCapability: NSObject, CLLocationManagerDelegate, Capability
      - parameter completion: a dispatch_block_t
      */
     public func requestAuthorizationWithCompletion(completion: dispatch_block_t) {
-        if !registrar.opr_locationServicesEnabled() {
+        guard isAvailable() else {
             completion()
+            return
         }
-        else {
-            let status = registrar.opr_authorizationStatus()
-            switch (status, requirement) {
-            case (.NotDetermined, _), (.AuthorizedWhenInUse, .Always):
-                authorizationCompletionBlock = completion
-                registrar.opr_setDelegate(self)
-                registrar.opr_requestAuthorizationWithRequirement(requirement)
-            default:
-                completion()
-            }
+
+        let status = registrar.opr_authorizationStatus()
+        switch (status, requirement) {
+        case (.NotDetermined, _), (.AuthorizedWhenInUse, .Always):
+            authorizationCompletionBlock = completion
+            registrar.opr_setDelegate(self)
+            registrar.opr_requestAuthorizationWithRequirement(requirement)
+        default:
+            completion()
         }
     }
 
