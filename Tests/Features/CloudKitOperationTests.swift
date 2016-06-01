@@ -449,7 +449,6 @@ class OPRCKDiscoverAllContactsOperationTests: CKTests {
         super.setUp()
         target = TestDiscoverAllContactsOperation(result: [])
         operation = OPRCKOperation(target)
-        operation.reachability = manager
     }
 
     func test__execution_after_cancellation() {
@@ -506,7 +505,6 @@ class OPRCKDiscoverUserInfosOperationTests: CKTests {
         super.setUp()
         target = TestDiscoverUserInfosOperation(userInfosByEmailAddress: [:], userInfoByRecordID: [:])
         operation = OPRCKOperation(target)
-        operation.reachability = manager
     }
 
     func test__get_email_addresses() {
@@ -579,7 +577,6 @@ class OPRCKFetchNotificationChangesOperationTests: CKTests {
         token = "i'm a server token"
         target = TestFetchNotificationChangesOperation(token: token)
         operation = OPRCKOperation(target)
-        operation.reachability = manager
     }
 
     func test__get_set_notification_changed_block() {
@@ -637,7 +634,6 @@ class OPRCKMarkNotificationsReadOperationTests: CKTests {
         toMark = [ "this-is-an-id", "this-is-another-id" ]
         target = TestMarkNotificationsReadOperation(markIDsToRead: toMark)
         operation = OPRCKOperation(target)
-        operation.reachability = manager
     }
 
     func test__get_notification_id() {
@@ -686,7 +682,6 @@ class OPRCKModifyBadgeOperationTests: CKTests {
         badge = 9
         target = TestModifyBadgeOperation(value: badge)
         operation = OPRCKOperation(target)
-        operation.reachability = manager
     }
 
     func test__get_badge_value() {
@@ -733,7 +728,6 @@ class OPRCKFetchRecordChangesOperationTests: CKTests {
         super.setUp()
         target = TestFetchRecordChangesOperation()
         operation = OPRCKOperation(target)
-        operation.reachability = manager
     }
 
     func test__get_record_zone_id() {
@@ -802,7 +796,6 @@ class OPRCKFetchRecordZonesOperationTests: CKTests {
         super.setUp()
         target = TestFetchRecordZonesOperation()
         operation = OPRCKOperation(target)
-        operation.reachability = manager
     }
 
     func test__get_record_zone_ids() {
@@ -849,7 +842,6 @@ class OPRCKFetchRecordsOperationTests: CKTests {
         super.setUp()
         target = TestFetchRecordsOperation()
         operation = OPRCKOperation(target)
-        operation.reachability = manager
     }
 
     func test__get_record_ids() {
@@ -918,7 +910,6 @@ class OPRCKFetchSubscriptionsOperationTests: CKTests {
         super.setUp()
         target = TestFetchSubscriptionsOperation()
         operation = OPRCKOperation(target)
-        operation.reachability = manager
     }
 
     func test__get_subscription_ids() {
@@ -965,7 +956,6 @@ class OPRCKModifyRecordZonesOperationTests: CKTests {
         super.setUp()
         target = TestModifyRecordZonesOperation()
         operation = OPRCKOperation(target)
-        operation.reachability = manager
     }
 
     func test__get_zones_to_save() {
@@ -1024,7 +1014,6 @@ class OPRCKModifyRecordsOperationTests: CKTests {
         super.setUp()
         target = TestModifyRecordsOperation()
         operation = OPRCKOperation(target)
-        operation.reachability = manager
     }
 
     func test__get_records_to_save() {
@@ -1135,7 +1124,6 @@ class OPRCKModifySubscriptionsOperationTests: CKTests {
         super.setUp()
         target = TestModifySubscriptionsOperation()
         operation = OPRCKOperation(target)
-        operation.reachability = manager
     }
 
     func test__get_subscriptions_to_save() {
@@ -1194,7 +1182,6 @@ class OPRCKQueryOperationTests: CKTests {
         super.setUp()
         target = TestQueryOperation()
         operation = OPRCKOperation(target)
-        operation.reachability = manager
     }
 
     func test__get_query() {
@@ -1274,7 +1261,7 @@ class CloudKitOperationDiscoverAllContractsTests: CKTests {
 
     override func setUp() {
         super.setUp()
-        operation = CloudKitOperation(reachability: manager) { TestDiscoverAllContactsOperation(result: []) }
+        operation = CloudKitOperation() { TestDiscoverAllContactsOperation(result: []) }
     }
 
     func test__execution_after_cancellation() {
@@ -1303,7 +1290,7 @@ class CloudKitOperationDiscoverAllContractsTests: CKTests {
     }
 
     func test__error_without_completion_block() {
-        operation = CloudKitOperation(reachability: manager) {
+        operation = CloudKitOperation() {
             let op = TestDiscoverAllContactsOperation(result: [])
             op.error = NSError(domain: CKErrorDomain, code: CKErrorCode.InternalError.rawValue, userInfo: nil)
             return op
@@ -1315,7 +1302,7 @@ class CloudKitOperationDiscoverAllContractsTests: CKTests {
 
     func test__error_with_completion_block() {
 
-        operation = CloudKitOperation(reachability: manager) {
+        operation = CloudKitOperation() {
             let op = TestDiscoverAllContactsOperation(result: [])
             op.error = NSError(domain: CKErrorDomain, code: CKErrorCode.InternalError.rawValue, userInfo: nil)
             return op
@@ -1331,7 +1318,7 @@ class CloudKitOperationDiscoverAllContractsTests: CKTests {
 
     func test__error_which_retries_using_retry_after_key() {
         var shouldError = true
-        operation = CloudKitOperation(reachability: manager) {
+        operation = CloudKitOperation() {
             let op = TestDiscoverAllContactsOperation(result: [])
             if shouldError {
                 let userInfo = [CKErrorRetryAfterKey: NSNumber(double: 1.0)]
@@ -1354,7 +1341,7 @@ class CloudKitOperationDiscoverAllContractsTests: CKTests {
 
     func test__error_which_retries_without_retry_after_key() {
         var shouldError = true
-        operation = CloudKitOperation(reachability: manager) {
+        operation = CloudKitOperation() {
             let op = TestDiscoverAllContactsOperation(result: [])
             if shouldError {
                 op.error = NSError(
@@ -1377,7 +1364,7 @@ class CloudKitOperationDiscoverAllContractsTests: CKTests {
     func test__error_which_retries_with_custom_handler() {
 
         var shouldError = true
-        operation = CloudKitOperation(reachability: manager) {
+        operation = CloudKitOperation() {
             let op = TestDiscoverAllContactsOperation(result: [])
             if shouldError {
                 op.error = NSError(
@@ -1406,7 +1393,7 @@ class CloudKitOperationDiscoverAllContractsTests: CKTests {
     }
 
     func test__error_which_is_not_cloud_kit_error() {
-        operation = CloudKitOperation(reachability: manager) {
+        operation = CloudKitOperation() {
             let op = TestDiscoverAllContactsOperation(result: [])
             op.error = NSError(
                 domain: CNErrorDomain,
@@ -1425,7 +1412,7 @@ class CloudKitOperationDiscoverAllContractsTests: CKTests {
     }
 
     func test__get_error_handlers() {
-        operation = CloudKitOperation(reachability: manager) { TestDiscoverAllContactsOperation(result: []) }
+        operation = CloudKitOperation() { TestDiscoverAllContactsOperation(result: []) }
         operation.setErrorHandlerForCode(.InternalError) { $3 }
         let errorHandlers = operation.errorHandlers
         XCTAssertEqual(errorHandlers.count, 1)
@@ -1433,7 +1420,7 @@ class CloudKitOperationDiscoverAllContractsTests: CKTests {
     }
 
     func test__set_error_handlers() {
-        operation = CloudKitOperation(reachability: manager) { TestDiscoverAllContactsOperation(result: []) }
+        operation = CloudKitOperation() { TestDiscoverAllContactsOperation(result: []) }
         let handler: CloudKitOperation<TestDiscoverAllContactsOperation>.ErrorHandler = { $3 }
         operation.setErrorHandlers([.InternalError: handler])
         let errorHandlers = operation.errorHandlers
@@ -1448,7 +1435,7 @@ class CloudKitOperationDiscoverUserInfosOperationTests: CKTests {
 
     override func setUp() {
         super.setUp()
-        operation = CloudKitOperation(reachability: manager) { TestDiscoverUserInfosOperation(userInfosByEmailAddress: [:], userInfoByRecordID: [:]) }
+        operation = CloudKitOperation() { TestDiscoverUserInfosOperation(userInfosByEmailAddress: [:], userInfoByRecordID: [:]) }
     }
 
     func test__execution_after_cancellation() {
@@ -1493,7 +1480,7 @@ class CloudKitOperationDiscoverUserInfosOperationTests: CKTests {
     }
 
     func test__error_without_completion_block() {
-        operation = CloudKitOperation(reachability: manager) {
+        operation = CloudKitOperation() {
             let op = TestDiscoverUserInfosOperation(userInfosByEmailAddress: [:], userInfoByRecordID: [:])
             op.error = NSError(domain: CKErrorDomain, code: CKErrorCode.InternalError.rawValue, userInfo: nil)
             return op
@@ -1505,7 +1492,7 @@ class CloudKitOperationDiscoverUserInfosOperationTests: CKTests {
     }
 
     func test__error_with_completion_block() {
-        operation = CloudKitOperation(reachability: manager) {
+        operation = CloudKitOperation() {
             let op = TestDiscoverUserInfosOperation(userInfosByEmailAddress: [:], userInfoByRecordID: [:])
             op.error = NSError(domain: CKErrorDomain, code: CKErrorCode.InternalError.rawValue, userInfo: nil)
             return op
@@ -1524,7 +1511,7 @@ class CloudKitOperationFetchNotificationChangesOperationTests: CKTests {
 
     override func setUp() {
         super.setUp()
-        operation = CloudKitOperation(reachability: manager) {
+        operation = CloudKitOperation() {
             let op = TestFetchNotificationChangesOperation(token: "i'm a server token")
             op.moreComing = true
             op.changedNotifications = [ "Hello", "World" ]
@@ -1564,7 +1551,7 @@ class CloudKitOperationFetchNotificationChangesOperationTests: CKTests {
     }
 
     func test__error_without_completion_block() {
-        operation = CloudKitOperation(reachability: manager) {
+        operation = CloudKitOperation() {
             let op = TestFetchNotificationChangesOperation(token: "i'm a server token")
             op.error = NSError(domain: CKErrorDomain, code: CKErrorCode.InternalError.rawValue, userInfo: nil)
             return op
@@ -1576,7 +1563,7 @@ class CloudKitOperationFetchNotificationChangesOperationTests: CKTests {
     }
 
     func test__error_with_completion_block() {
-        operation = CloudKitOperation(reachability: manager) {
+        operation = CloudKitOperation() {
             let op = TestFetchNotificationChangesOperation(token: "i'm a server token")
             op.error = NSError(domain: CKErrorDomain, code: CKErrorCode.InternalError.rawValue, userInfo: nil)
             return op
@@ -1597,7 +1584,7 @@ class CloudKitOperationMarkNotificationsReadOperationTests: CKTests {
     override func setUp() {
         super.setUp()
         notificationIDs = [ "a-notification-id", "another-notification-id" ]
-        operation = CloudKitOperation(reachability: manager) { TestMarkNotificationsReadOperation() }
+        operation = CloudKitOperation() { TestMarkNotificationsReadOperation() }
         operation.notificationIDs = notificationIDs
     }
 
@@ -1623,7 +1610,7 @@ class CloudKitOperationMarkNotificationsReadOperationTests: CKTests {
     }
 
     func test__error_without_completion_block() {
-        operation = CloudKitOperation(reachability: manager) {
+        operation = CloudKitOperation() {
             let op = TestMarkNotificationsReadOperation()
             op.error = NSError(domain: CKErrorDomain, code: CKErrorCode.InternalError.rawValue, userInfo: nil)
             return op
@@ -1635,7 +1622,7 @@ class CloudKitOperationMarkNotificationsReadOperationTests: CKTests {
     }
 
     func test__error_with_completion_block() {
-        operation = CloudKitOperation(reachability: manager) {
+        operation = CloudKitOperation() {
             let op = TestMarkNotificationsReadOperation()
             op.error = NSError(domain: CKErrorDomain, code: CKErrorCode.InternalError.rawValue, userInfo: nil)
             return op
@@ -1655,7 +1642,7 @@ class CloudKitOperationModifyBadgeCompletionTests: CKTests {
 
     override func setUp() {
         super.setUp()
-        operation = CloudKitOperation(reachability: manager) { TestModifyBadgeOperation() }
+        operation = CloudKitOperation() { TestModifyBadgeOperation() }
         operation.badgeValue = badgeValue
     }
 
@@ -1681,7 +1668,7 @@ class CloudKitOperationModifyBadgeCompletionTests: CKTests {
     }
 
     func test__error_without_completion_block() {
-        operation = CloudKitOperation(reachability: manager) {
+        operation = CloudKitOperation() {
             let op = TestModifyBadgeOperation()
             op.error = NSError(domain: CKErrorDomain, code: CKErrorCode.InternalError.rawValue, userInfo: nil)
             return op
@@ -1693,7 +1680,7 @@ class CloudKitOperationModifyBadgeCompletionTests: CKTests {
     }
 
     func test__error_with_completion_block() {
-        operation = CloudKitOperation(reachability: manager) {
+        operation = CloudKitOperation() {
             let op = TestModifyBadgeOperation()
             op.error = NSError(domain: CKErrorDomain, code: CKErrorCode.InternalError.rawValue, userInfo: nil)
             return op
@@ -1724,7 +1711,7 @@ class CloudKitOperationFetchRecordChangesTests: CKTests {
         resultsLimit = 10
         keys = [ "desired-key-1",  "desired-key-2" ]
         zoneID = "I'm a zone id"
-        operation = CloudKitOperation(reachability: manager) { TestFetchRecordChangesOperation() }
+        operation = CloudKitOperation() { TestFetchRecordChangesOperation() }
         operation.container = container
         operation.database = db
         operation.previousServerChangeToken = token
@@ -1771,7 +1758,7 @@ class CloudKitOperationFetchRecordChangesTests: CKTests {
     }
 
     func test__error_without_completion_block() {
-        operation = CloudKitOperation(reachability: manager) {
+        operation = CloudKitOperation() {
             let op = TestFetchRecordChangesOperation()
             op.error = NSError(domain: CKErrorDomain, code: CKErrorCode.InternalError.rawValue, userInfo: nil)
             return op
@@ -1783,7 +1770,7 @@ class CloudKitOperationFetchRecordChangesTests: CKTests {
     }
 
     func test__error_with_completion_block() {
-        operation = CloudKitOperation(reachability: manager) {
+        operation = CloudKitOperation() {
             let op = TestFetchRecordChangesOperation()
             op.error = NSError(domain: CKErrorDomain, code: CKErrorCode.InternalError.rawValue, userInfo: nil)
             return op
@@ -1804,7 +1791,7 @@ class CloudKitOperationFetchRecordZonesTests: CKTests {
     override func setUp() {
         super.setUp()
         zoneIDs = [ "a-record-zone", "another-record-zone" ]
-        operation = CloudKitOperation(reachability: manager) { TestFetchRecordZonesOperation() }
+        operation = CloudKitOperation() { TestFetchRecordZonesOperation() }
         operation.recordZoneIDs = zoneIDs
     }
 
@@ -1830,7 +1817,7 @@ class CloudKitOperationFetchRecordZonesTests: CKTests {
     }
 
     func test__error_without_completion_block() {
-        operation = CloudKitOperation(reachability: manager) {
+        operation = CloudKitOperation() {
             let op = TestFetchRecordZonesOperation()
             op.error = NSError(domain: CKErrorDomain, code: CKErrorCode.InternalError.rawValue, userInfo: nil)
             return op
@@ -1842,7 +1829,7 @@ class CloudKitOperationFetchRecordZonesTests: CKTests {
     }
 
     func test__error_with_completion_block() {
-        operation = CloudKitOperation(reachability: manager) {
+        operation = CloudKitOperation() {
             let op = TestFetchRecordZonesOperation()
             op.error = NSError(domain: CKErrorDomain, code: CKErrorCode.InternalError.rawValue, userInfo: nil)
             return op
@@ -1863,7 +1850,7 @@ class CloudKitOperationFetchRecordsTests: CKTests {
     override func setUp() {
         super.setUp()
         recordIDs = [ "a-record-id", "another-record-id" ]
-        operation = CloudKitOperation(reachability: manager) { TestFetchRecordsOperation() }
+        operation = CloudKitOperation() { TestFetchRecordsOperation() }
         operation.recordIDs = recordIDs
     }
 
@@ -1893,7 +1880,7 @@ class CloudKitOperationFetchRecordsTests: CKTests {
     }
 
     func test__error_without_completion_block() {
-        operation = CloudKitOperation(reachability: manager) {
+        operation = CloudKitOperation() {
             let op = TestFetchRecordsOperation()
             op.error = NSError(domain: CKErrorDomain, code: CKErrorCode.InternalError.rawValue, userInfo: nil)
             return op
@@ -1905,7 +1892,7 @@ class CloudKitOperationFetchRecordsTests: CKTests {
     }
 
     func test__error_with_completion_block() {
-        operation = CloudKitOperation(reachability: manager) {
+        operation = CloudKitOperation() {
             let op = TestFetchRecordsOperation()
             op.error = NSError(domain: CKErrorDomain, code: CKErrorCode.InternalError.rawValue, userInfo: nil)
             return op
@@ -1926,7 +1913,7 @@ class CloudKitOperationFetchSubscriptionsTests: CKTests {
     override func setUp() {
         super.setUp()
         subscriptionIDs = [ "a-subscription-id", "another-subscription-id" ]
-        operation = CloudKitOperation(reachability: manager) { TestFetchSubscriptionsOperation() }
+        operation = CloudKitOperation() { TestFetchSubscriptionsOperation() }
         operation.subscriptionIDs = subscriptionIDs
     }
 
@@ -1952,7 +1939,7 @@ class CloudKitOperationFetchSubscriptionsTests: CKTests {
     }
 
     func test__error_without_completion_block() {
-        operation = CloudKitOperation(reachability: manager) {
+        operation = CloudKitOperation() {
             let op = TestFetchSubscriptionsOperation()
             op.error = NSError(domain: CKErrorDomain, code: CKErrorCode.InternalError.rawValue, userInfo: nil)
             return op
@@ -1964,7 +1951,7 @@ class CloudKitOperationFetchSubscriptionsTests: CKTests {
     }
 
     func test__error_with_completion_block() {
-        operation = CloudKitOperation(reachability: manager) {
+        operation = CloudKitOperation() {
             let op = TestFetchSubscriptionsOperation()
             op.error = NSError(domain: CKErrorDomain, code: CKErrorCode.InternalError.rawValue, userInfo: nil)
             return op
@@ -1987,7 +1974,7 @@ class CloudKitOperationModifyRecordZonesTests: CKTests {
         super.setUp()
         zonesToSave = [ "a-record-zone", "another-record-zone" ]
         zoneIDsToDelete = [ "a-record-zone-id", "another-record-zone-id" ]
-        operation = CloudKitOperation(reachability: manager) { TestModifyRecordZonesOperation() }
+        operation = CloudKitOperation() { TestModifyRecordZonesOperation() }
         operation.recordZonesToSave = zonesToSave
         operation.recordZoneIDsToDelete = zoneIDsToDelete
     }
@@ -2015,7 +2002,7 @@ class CloudKitOperationModifyRecordZonesTests: CKTests {
     }
 
     func test__error_without_completion_block() {
-        operation = CloudKitOperation(reachability: manager) {
+        operation = CloudKitOperation() {
             let op = TestModifyRecordZonesOperation()
             op.error = NSError(domain: CKErrorDomain, code: CKErrorCode.InternalError.rawValue, userInfo: nil)
             return op
@@ -2027,7 +2014,7 @@ class CloudKitOperationModifyRecordZonesTests: CKTests {
     }
 
     func test__error_with_completion_block() {
-        operation = CloudKitOperation(reachability: manager) {
+        operation = CloudKitOperation() {
             let op = TestModifyRecordZonesOperation()
             op.error = NSError(domain: CKErrorDomain, code: CKErrorCode.InternalError.rawValue, userInfo: nil)
             return op
@@ -2057,7 +2044,7 @@ class CloudKitOperationModifyRecordsTests: CKTests {
         clientChangeToken = "I'm a client change token".dataUsingEncoding(NSUTF8StringEncoding)
         atomic = true
 
-        operation = CloudKitOperation(reachability: manager) { TestModifyRecordsOperation() }
+        operation = CloudKitOperation() { TestModifyRecordsOperation() }
         operation.recordsToSave = recordsToSave
         operation.recordIDsToDelete = recordIDsToDelete
         operation.savePolicy = policy
@@ -2095,7 +2082,7 @@ class CloudKitOperationModifyRecordsTests: CKTests {
     }
 
     func test__error_without_completion_block() {
-        operation = CloudKitOperation(reachability: manager) {
+        operation = CloudKitOperation() {
             let op = TestModifyRecordsOperation()
             op.error = NSError(domain: CKErrorDomain, code: CKErrorCode.InternalError.rawValue, userInfo: nil)
             return op
@@ -2107,7 +2094,7 @@ class CloudKitOperationModifyRecordsTests: CKTests {
     }
 
     func test__error_with_completion_block() {
-        operation = CloudKitOperation(reachability: manager) {
+        operation = CloudKitOperation() {
             let op = TestModifyRecordsOperation()
             op.error = NSError(domain: CKErrorDomain, code: CKErrorCode.InternalError.rawValue, userInfo: nil)
             return op
@@ -2131,7 +2118,7 @@ class CloudKitOperationModifySubscriptionsTests: CKTests {
         subscriptionsToSave = [ "a-subscription", "another-subscription" ]
         subscriptionIDsToDelete = [ "a-subscription-id", "another-subscription-id" ]
 
-        operation = CloudKitOperation(reachability: manager) { TestModifySubscriptionsOperation() }
+        operation = CloudKitOperation() { TestModifySubscriptionsOperation() }
         operation.subscriptionsToSave = subscriptionsToSave
         operation.subscriptionIDsToDelete = subscriptionIDsToDelete
     }
@@ -2159,7 +2146,7 @@ class CloudKitOperationModifySubscriptionsTests: CKTests {
     }
 
     func test__error_without_completion_block() {
-        operation = CloudKitOperation(reachability: manager) {
+        operation = CloudKitOperation() {
             let op = TestModifySubscriptionsOperation()
             op.error = NSError(domain: CKErrorDomain, code: CKErrorCode.InternalError.rawValue, userInfo: nil)
             return op
@@ -2171,7 +2158,7 @@ class CloudKitOperationModifySubscriptionsTests: CKTests {
     }
 
     func test__error_with_completion_block() {
-        operation = CloudKitOperation(reachability: manager) {
+        operation = CloudKitOperation() {
             let op = TestModifySubscriptionsOperation()
             op.error = NSError(domain: CKErrorDomain, code: CKErrorCode.InternalError.rawValue, userInfo: nil)
             return op
@@ -2196,7 +2183,7 @@ class CloudKitOperationQueryTests: CKTests {
         query = "I'm a query"
         cursor = "I'm a cursor"
         zoneID = "a-zone-id"
-        operation = CloudKitOperation(reachability: manager) { TestQueryOperation() }
+        operation = CloudKitOperation() { TestQueryOperation() }
         operation.query = query
         operation.cursor = cursor
         operation.zoneID = zoneID
@@ -2228,7 +2215,7 @@ class CloudKitOperationQueryTests: CKTests {
     }
 
     func test__error_without_completion_block() {
-        operation = CloudKitOperation(reachability: manager) {
+        operation = CloudKitOperation() {
             let op = TestQueryOperation()
             op.error = NSError(domain: CKErrorDomain, code: CKErrorCode.InternalError.rawValue, userInfo: nil)
             return op
@@ -2240,7 +2227,7 @@ class CloudKitOperationQueryTests: CKTests {
     }
 
     func test__error_with_completion_block() {
-        operation = CloudKitOperation(reachability: manager) {
+        operation = CloudKitOperation() {
             let op = TestQueryOperation()
             op.error = NSError(domain: CKErrorDomain, code: CKErrorCode.InternalError.rawValue, userInfo: nil)
             return op
@@ -2271,7 +2258,7 @@ class BatchedFetchNotificationChangesOperationTests: CKTests {
         error = .None
         numberOfBatches = 3
         count = 0
-        operation = BatchedCloudKitOperation(reachability: manager, createNextOperation)
+        operation = BatchedCloudKitOperation(createNextOperation)
     }
 
     func createNextOperation() -> Target? {
@@ -2325,7 +2312,7 @@ class BatchedFetchRecordChangesOperationTests: CKTests {
         super.setUp()
         numberOfBatches = 3
         count = 0
-        operation = BatchedCloudKitOperation(reachability: manager, createNextOperation)
+        operation = BatchedCloudKitOperation(createNextOperation)
     }
 
     func createNextOperation() -> Target {
@@ -2379,7 +2366,6 @@ class CloudKitRecoveryTests: CKTests {
         super.setUp()
         let target = TestDiscoverUserInfosOperation(userInfosByEmailAddress: [:], userInfoByRecordID: [:])
         operation = OPRCKOperation(target)
-        operation.reachability = manager
         recovery = CloudKitRecovery()
     }
 
