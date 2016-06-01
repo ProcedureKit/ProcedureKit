@@ -11,12 +11,13 @@ import CloudKit
 
 // MARK: - OPRCKOperation
 
-public class OPRCKOperation<T where T: NSOperation, T: CKOperationType>: ReachableOperation<T> {
+public class OPRCKOperation<T where T: NSOperation, T: CKOperationType>: ComposedOperation<T> {
 
-    override init(_ operation: T, connectivity: Reachability.Connectivity = .AnyConnectionKind) {
-        super.init(operation, connectivity: connectivity)
+    override init(operation composed: T) {
+        super.init(operation: composed)
         name = "OPRCKOperation<\(T.self)>"
     }
+    
 }
 
 // MARK: - Cloud Kit Error Recovery
@@ -218,14 +219,10 @@ public final class CloudKitOperation<T where T: NSOperation, T: CKOperationType,
     }
 
     public convenience init(_ body: () -> T?) {
-        self.init(generator: AnyGenerator(body: body), connectivity: .AnyConnectionKind, reachability: ReachabilityManager(DeviceReachability()))
+        self.init(generator: AnyGenerator(body: body))
     }
 
-    convenience init(connectivity: Reachability.Connectivity = .AnyConnectionKind, reachability: SystemReachabilityType, _ body: () -> T?) {
-        self.init(generator: AnyGenerator(body: body), connectivity: .AnyConnectionKind, reachability: reachability)
-    }
-
-    init<G where G: GeneratorType, G.Element == T>(generator gen: G, connectivity: Reachability.Connectivity = .AnyConnectionKind, reachability: SystemReachabilityType) {
+    init<G where G: GeneratorType, G.Element == T>(generator gen: G) {
 
         // Creates a standard random delay between retries
         let strategy: WaitStrategy = .Random((0.1, 1.0))
@@ -233,8 +230,7 @@ public final class CloudKitOperation<T where T: NSOperation, T: CKOperationType,
 
         // Maps the generator to wrap the target operation.
         let generator = MapGenerator(gen) { operation -> OPRCKOperation<T> in
-            let op = OPRCKOperation(operation, connectivity: connectivity)
-            op.reachability = reachability
+            let op = OPRCKOperation(operation: operation)
             return op
         }
 
@@ -273,23 +269,19 @@ public final class CloudKitOperation<T where T: NSOperation, T: CKOperationType,
 
 class CloudKitOperationGenerator<T where T: NSOperation, T: CKOperationType, T: AssociatedErrorType, T.Error: CloudKitErrorType>: GeneratorType {
 
-    let connectivity: Reachability.Connectivity
-    let reachability: SystemReachabilityType
     let recovery: CloudKitRecovery<T>
 
     var generator: AnyGenerator<T>
     var more: Bool = true
 
-    init<G where G: GeneratorType, G.Element == T>(generator: G, connectivity: Reachability.Connectivity = .AnyConnectionKind, reachability: SystemReachabilityType) {
+    init<G where G: GeneratorType, G.Element == T>(generator: G) {
         self.generator = AnyGenerator(generator)
-        self.connectivity = connectivity
-        self.reachability = reachability
         self.recovery = CloudKitRecovery<T>()
     }
 
     func next() -> CloudKitOperation<T>? {
         guard more else { return .None }
-        let operation = CloudKitOperation(generator: generator, connectivity: connectivity, reachability: reachability)
+        let operation = CloudKitOperation(generator: generator)
         operation.recovery = recovery
         return operation
     }
@@ -305,17 +297,13 @@ public class BatchedCloudKitOperation<T where T: NSOperation, T: CKBatchedOperat
     }
 
     public convenience init(enableBatchProcessing enable: Bool = true, _ body: () -> T?) {
-        self.init(generator: AnyGenerator(body: body), enableBatchProcessing: enable, connectivity: .AnyConnectionKind, reachability: ReachabilityManager(DeviceReachability()))
+        self.init(generator: AnyGenerator(body: body), enableBatchProcessing: enable)
     }
 
-    convenience init(enableBatchProcessing enable: Bool = true, connectivity: Reachability.Connectivity = .AnyConnectionKind, reachability: SystemReachabilityType, _ body: () -> T?) {
-        self.init(generator: AnyGenerator(body: body), enableBatchProcessing: enable, connectivity: connectivity, reachability: reachability)
-    }
-
-    init<G where G: GeneratorType, G.Element == T>(generator gen: G, enableBatchProcessing enable: Bool = true, connectivity: Reachability.Connectivity = .AnyConnectionKind, reachability: SystemReachabilityType) {
+    init<G where G: GeneratorType, G.Element == T>(generator gen: G, enableBatchProcessing enable: Bool = true) {
 
         enableBatchProcessing = enable
-        generator = CloudKitOperationGenerator(generator: gen, connectivity: connectivity, reachability: reachability)
+        generator = CloudKitOperationGenerator(generator: gen)
 
         // Creates a standard fixed delay between batches (not reties)
         let strategy: WaitStrategy = .Fixed(0.1)
