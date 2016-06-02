@@ -14,7 +14,7 @@ if it doesn't finish before a time interval is expired.
 */
 public struct TimeoutObserver: OperationWillExecuteObserver {
 
-    private let timeout: NSTimeInterval
+    internal let timeout: NSTimeInterval
 
     /**
     Initialize the operation observer with a timeout, which will start when

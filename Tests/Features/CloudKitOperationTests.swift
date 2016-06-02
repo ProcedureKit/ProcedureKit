@@ -350,28 +350,41 @@ class OPRCKOperationTests: CKTests {
     var target: TestCloudOperation!
     var operation: OPRCKOperation<TestCloudOperation>!
 
+    var timeoutObserver: TimeoutObserver? {
+        return operation.willExecuteObservers.flatMap({ $0 as? TimeoutObserver }).first
+    }
+
     override func setUp() {
         super.setUp()
         target = TestCloudOperation()
         operation = OPRCKOperation(operation: target)
     }
 
-    func test__get_countainer() {
+    func test__get_container() {
         let container = "I'm a test container!"
         target.container = container
         XCTAssertEqual(operation.container, container)
     }
 
-    func test__set_database() {
+    func test__set_container() {
         let container = "I'm a test container!"
         operation.container = container
         XCTAssertEqual(target.container, container)
     }
 
-    func test__set_get_countainer() {
+    func test__set_get_container() {
         let container = "I'm a test container!"
         operation.container = container
         XCTAssertEqual(operation.container, container)
+    }
+
+    func test__timeout() {
+        XCTAssertEqual(timeoutObserver?.timeout ?? 0, 300)
+    }
+
+    func test__no_timeout() {
+        operation = OPRCKOperation(operation: target, timeout: .None)
+        XCTAssertNil(timeoutObserver)
     }
 }
 
