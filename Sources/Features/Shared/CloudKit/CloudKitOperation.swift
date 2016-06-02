@@ -17,7 +17,7 @@ public class OPRCKOperation<T where T: NSOperation, T: CKOperationType>: Compose
         super.init(operation: composed)
         name = "OPRCKOperation<\(T.self)>"
     }
-    
+
 }
 
 // MARK: - Cloud Kit Error Recovery
