@@ -13,11 +13,13 @@ import CloudKit
 
 public class OPRCKOperation<T where T: NSOperation, T: CKOperationType>: ComposedOperation<T> {
 
-    override init(operation composed: T) {
+    init(operation composed: T, timeout: NSTimeInterval? = 300) {
         super.init(operation: composed)
         name = "OPRCKOperation<\(T.self)>"
+        if let observer = timeout.map({ TimeoutObserver(timeout: $0) }) {
+            addObserver(observer)
+        }
     }
-
 }
 
 // MARK: - Cloud Kit Error Recovery
@@ -218,7 +220,7 @@ public final class CloudKitOperation<T where T: NSOperation, T: CKOperationType,
         self.init(generator: AnyGenerator(body: body))
     }
 
-    init<G where G: GeneratorType, G.Element == T>(generator gen: G) {
+    init<G where G: GeneratorType, G.Element == T>(timeout: NSTimeInterval? = 300, generator gen: G) {
 
         // Creates a standard random delay between retries
         let strategy: WaitStrategy = .Random((0.1, 1.0))
@@ -226,16 +228,15 @@ public final class CloudKitOperation<T where T: NSOperation, T: CKOperationType,
 
         // Maps the generator to wrap the target operation.
         let generator = MapGenerator(gen) { operation -> OPRCKOperation<T> in
-            let op = OPRCKOperation(operation: operation)
-            return op
+            return OPRCKOperation(operation: operation, timeout: timeout)
         }
 
         // Creates a CloudKitRecovery object
         let _recovery = CloudKitRecovery<T>()
 
         // Creates a Retry Handler using the recovery object
-        let handler: Handler = { info, payload in
-            guard let (delay, configure) = _recovery.recoverWithInfo(info, payload: payload) else { return .None }
+        let handler: Handler = { [weak _recovery] info, payload in
+            guard let _recovery = _recovery, (delay, configure) = _recovery.recoverWithInfo(info, payload: payload) else { return .None }
             let (_, operation) = payload
             configure(operation)
             return (delay, operation)
@@ -263,17 +264,19 @@ class CloudKitOperationGenerator<T where T: NSOperation, T: CKOperationType, T: 
 
     let recovery: CloudKitRecovery<T>
 
+    var timeout: NSTimeInterval?
     var generator: AnyGenerator<T>
     var more: Bool = true
 
-    init<G where G: GeneratorType, G.Element == T>(generator: G) {
+    init<G where G: GeneratorType, G.Element == T>(timeout: NSTimeInterval? = 300, generator: G) {
+        self.timeout = timeout
         self.generator = AnyGenerator(generator)
         self.recovery = CloudKitRecovery<T>()
     }
 
     func next() -> CloudKitOperation<T>? {
         guard more else { return .None }
-        let operation = CloudKitOperation(generator: generator)
+        let operation = CloudKitOperation(timeout: timeout, generator: generator)
         operation.recovery = recovery
         return operation
     }
@@ -292,10 +295,10 @@ public class BatchedCloudKitOperation<T where T: NSOperation, T: CKBatchedOperat
         self.init(generator: AnyGenerator(body: body), enableBatchProcessing: enable)
     }
 
-    init<G where G: GeneratorType, G.Element == T>(generator gen: G, enableBatchProcessing enable: Bool = true) {
+    init<G where G: GeneratorType, G.Element == T>(timeout: NSTimeInterval? = 300, generator gen: G, enableBatchProcessing enable: Bool = true) {
 
         enableBatchProcessing = enable
-        generator = CloudKitOperationGenerator(generator: gen)
+        generator = CloudKitOperationGenerator(timeout: timeout, generator: gen)
 
         // Creates a standard fixed delay between batches (not reties)
         let strategy: WaitStrategy = .Fixed(0.1)

@@ -353,7 +353,7 @@ class OPRCKOperationTests: CKTests {
     override func setUp() {
         super.setUp()
         target = TestCloudOperation()
-        operation = OPRCKOperation(target)
+        operation = OPRCKOperation(operation: target)
     }
 
     func test__get_countainer() {
@@ -383,7 +383,7 @@ class OPRCKDatabaseOperationTests: CKTests {
     override func setUp() {
         super.setUp()
         target = TestDatabaseOperation()
-        operation = OPRCKOperation(target)
+        operation = OPRCKOperation(operation: target)
     }
 
     func test__get_database() {
@@ -448,7 +448,7 @@ class OPRCKDiscoverAllContactsOperationTests: CKTests {
     override func setUp() {
         super.setUp()
         target = TestDiscoverAllContactsOperation(result: [])
-        operation = OPRCKOperation(target)
+        operation = OPRCKOperation(operation: target)
     }
 
     func test__execution_after_cancellation() {
@@ -504,7 +504,7 @@ class OPRCKDiscoverUserInfosOperationTests: CKTests {
     override func setUp() {
         super.setUp()
         target = TestDiscoverUserInfosOperation(userInfosByEmailAddress: [:], userInfoByRecordID: [:])
-        operation = OPRCKOperation(target)
+        operation = OPRCKOperation(operation: target)
     }
 
     func test__get_email_addresses() {
@@ -576,7 +576,7 @@ class OPRCKFetchNotificationChangesOperationTests: CKTests {
         super.setUp()
         token = "i'm a server token"
         target = TestFetchNotificationChangesOperation(token: token)
-        operation = OPRCKOperation(target)
+        operation = OPRCKOperation(operation: target)
     }
 
     func test__get_set_notification_changed_block() {
@@ -633,7 +633,7 @@ class OPRCKMarkNotificationsReadOperationTests: CKTests {
         super.setUp()
         toMark = [ "this-is-an-id", "this-is-another-id" ]
         target = TestMarkNotificationsReadOperation(markIDsToRead: toMark)
-        operation = OPRCKOperation(target)
+        operation = OPRCKOperation(operation: target)
     }
 
     func test__get_notification_id() {
@@ -681,7 +681,7 @@ class OPRCKModifyBadgeOperationTests: CKTests {
         super.setUp()
         badge = 9
         target = TestModifyBadgeOperation(value: badge)
-        operation = OPRCKOperation(target)
+        operation = OPRCKOperation(operation: target)
     }
 
     func test__get_badge_value() {
@@ -727,7 +727,7 @@ class OPRCKFetchRecordChangesOperationTests: CKTests {
     override func setUp() {
         super.setUp()
         target = TestFetchRecordChangesOperation()
-        operation = OPRCKOperation(target)
+        operation = OPRCKOperation(operation: target)
     }
 
     func test__get_record_zone_id() {
@@ -795,7 +795,7 @@ class OPRCKFetchRecordZonesOperationTests: CKTests {
     override func setUp() {
         super.setUp()
         target = TestFetchRecordZonesOperation()
-        operation = OPRCKOperation(target)
+        operation = OPRCKOperation(operation: target)
     }
 
     func test__get_record_zone_ids() {
@@ -841,7 +841,7 @@ class OPRCKFetchRecordsOperationTests: CKTests {
     override func setUp() {
         super.setUp()
         target = TestFetchRecordsOperation()
-        operation = OPRCKOperation(target)
+        operation = OPRCKOperation(operation: target)
     }
 
     func test__get_record_ids() {
@@ -909,7 +909,7 @@ class OPRCKFetchSubscriptionsOperationTests: CKTests {
     override func setUp() {
         super.setUp()
         target = TestFetchSubscriptionsOperation()
-        operation = OPRCKOperation(target)
+        operation = OPRCKOperation(operation: target)
     }
 
     func test__get_subscription_ids() {
@@ -955,7 +955,7 @@ class OPRCKModifyRecordZonesOperationTests: CKTests {
     override func setUp() {
         super.setUp()
         target = TestModifyRecordZonesOperation()
-        operation = OPRCKOperation(target)
+        operation = OPRCKOperation(operation: target)
     }
 
     func test__get_zones_to_save() {
@@ -1013,7 +1013,7 @@ class OPRCKModifyRecordsOperationTests: CKTests {
     override func setUp() {
         super.setUp()
         target = TestModifyRecordsOperation()
-        operation = OPRCKOperation(target)
+        operation = OPRCKOperation(operation: target)
     }
 
     func test__get_records_to_save() {
@@ -1123,7 +1123,7 @@ class OPRCKModifySubscriptionsOperationTests: CKTests {
     override func setUp() {
         super.setUp()
         target = TestModifySubscriptionsOperation()
-        operation = OPRCKOperation(target)
+        operation = OPRCKOperation(operation: target)
     }
 
     func test__get_subscriptions_to_save() {
@@ -1181,7 +1181,7 @@ class OPRCKQueryOperationTests: CKTests {
     override func setUp() {
         super.setUp()
         target = TestQueryOperation()
-        operation = OPRCKOperation(target)
+        operation = OPRCKOperation(operation: target)
     }
 
     func test__get_query() {
@@ -2348,7 +2348,7 @@ class CloudKitRecoveryTests: CKTests {
     override func setUp() {
         super.setUp()
         let target = TestDiscoverUserInfosOperation(userInfosByEmailAddress: [:], userInfoByRecordID: [:])
-        operation = OPRCKOperation(target)
+        operation = OPRCKOperation(operation: target)
         recovery = CloudKitRecovery()
     }
 
