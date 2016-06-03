@@ -186,3 +186,26 @@ public extension NSOperationQueue {
         addOperations(ops)
     }
 }
+
+
+public extension OperationQueue {
+    
+    private static let sharedMainQueue = MainQueue()
+
+    /**
+     Override NSOperationQueue's mainQueue() to return the main queue as an OperationQueue
+     
+     - returns: The main queue
+     */
+    public override class func mainQueue()->OperationQueue {
+        return sharedMainQueue
+    }
+}
+
+/// OperationQueue wrapper around the main queue
+private class MainQueue: OperationQueue {
+    override init() {
+        super.init()
+        underlyingQueue = dispatch_get_main_queue()
+    }
+}
