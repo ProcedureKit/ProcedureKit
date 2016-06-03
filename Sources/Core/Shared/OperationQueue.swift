@@ -207,5 +207,6 @@ private class MainQueue: OperationQueue {
     override init() {
         super.init()
         underlyingQueue = dispatch_get_main_queue()
+        maxConcurrentOperationCount = 1
     }
 }
