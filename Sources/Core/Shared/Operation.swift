@@ -61,6 +61,35 @@ public class Operation: NSOperation {
         }
     }
 
+    public class Errors {
+        public var all = Array<ErrorType>()
+        public var handled = Array<ErrorType>()
+
+        public var count: Int {
+            return all.count
+        }
+
+        public var isEmpty: Bool {
+            return all.isEmpty
+        }
+
+        public var first: ErrorType? {
+            return all.first
+        }
+
+        var didFinishWithErrors: Bool {
+            return count > 0 && count != handled.count
+        }
+
+        public func addErrors(errors: [ErrorType]) {
+            all += errors
+        }
+
+        public func handledErrors(errors: [ErrorType]) {
+            handled += errors
+        }
+    }
+
     /**
      Type to express the intent of the user in regards to executing an Operation instance
 
@@ -97,7 +126,7 @@ public class Operation: NSOperation {
     private let stateLock = NSLock()
     private lazy var _log: LoggerType = Logger()
     private var _state = State.Initialized
-    private var _internalErrors = [ErrorType]()
+    private var _internalErrors = Protector(Errors())
     private var _hasFinishedAlready = false
     private var _observers = Protector([OperationObserverType]())
 
@@ -115,8 +144,8 @@ public class Operation: NSOperation {
         willSet {
             willChangeValueForKey("Cancelled")
             if !_cancelled && newValue {
-                operationWillCancel(errors)
-                willCancelObservers.forEach { $0.willCancelOperation(self, errors: self.errors) }
+                operationWillCancel(errors.all)
+                willCancelObservers.forEach { $0.willCancelOperation(self, errors: self.errors.all) }
             }
         }
         didSet {
@@ -129,10 +158,16 @@ public class Operation: NSOperation {
         }
     }
 
-    /// Access the internal errors collected by the Operation
-    public var errors: [ErrorType] {
-        return _internalErrors
+    /// Access the Errors object
+    public var errors: Errors {
+        return _internalErrors.read { $0 }
     }
+
+    /// Access the internal errors collected by the Operation
+//    public var errors: [ErrorType] {
+//        return _internalErrors.read { $0.all }
+//    }
+
 
     /**
      Expresses the user intent in regards to the execution of this Operation.
@@ -302,11 +337,11 @@ public class Operation: NSOperation {
 
      - parameter errors: an `[ErrorType]` defaults to empty array.
      */
-    public func cancelWithErrors(errors: [ErrorType] = []) {
-        if !errors.isEmpty {
-            log.warning("Did cancel with errors: \(errors).")
+    public func cancelWithErrors(err: [ErrorType] = []) {
+        if !err.isEmpty {
+            log.warning("Did cancel with errors: \(err).")
         }
-        _internalErrors += errors
+        errors.addErrors(err)
         cancel()
     }
 
@@ -535,7 +570,7 @@ public extension Operation {
 
         // Check to see if the operation has now been cancelled
         // by an observer
-        guard _internalErrors.isEmpty && !cancelled else {
+        guard errors.isEmpty && !cancelled else {
             finish()
             return
         }
@@ -573,8 +608,8 @@ public extension Operation {
             _hasFinishedAlready = true
             state = .Finishing
 
-            _internalErrors.appendContentsOf(receivedErrors)
-            operationDidFinish(_internalErrors)
+            errors.addErrors(receivedErrors)
+            operationDidFinish(errors.all)
 
             if errors.isEmpty {
                 log.verbose("Will finish with no errors.")
@@ -583,11 +618,11 @@ public extension Operation {
                 log.warning("Will finish with \(errors.count) errors.")
             }
 
-            willFinishObservers.forEach { $0.willFinishOperation(self, errors: self._internalErrors) }
+            willFinishObservers.forEach { $0.willFinishOperation(self, errors: self.errors.all) }
 
             state = .Finished
 
-            didFinishObservers.forEach { $0.didFinishOperation(self, errors: self._internalErrors) }
+            didFinishObservers.forEach { $0.didFinishOperation(self, errors: self.errors.all) }
 
             if errors.isEmpty {
                 log.verbose("Did finish with no errors.")
