@@ -74,8 +74,8 @@ internal extension BatchModifyOperationType where Save: Equatable, Save == Error
         var left: ToModify = (.None, .None)
         var right: ToModify = (.None, .None)
 
-        let remainingToSave = toSave?.filter { error.saved?.contains($0) ?? false }
-        let remainingToDelete = toDelete?.filter { error.deleted?.contains($0) ?? false }
+        let remainingToSave = toSave?.filter { !(error.saved?.contains($0) ?? false) }
+        let remainingToDelete = toDelete?.filter { !(error.deleted?.contains($0) ?? false) }
 
         if let bisectedToSave = remainingToSave.map({ $0.bisect() }) {
             left.toSave = bisectedToSave.left
