@@ -65,6 +65,7 @@ class RetryGenerator<T: NSOperation>: GeneratorType {
     internal let retry: Handler
     internal var info: RetryFailureInfo<T>? = .None
     private var generator: AnyGenerator<(Delay?, T)>
+    internal var lastOperationErrors : [ErrorType] = []
 
     init(generator: AnyGenerator<Payload>, retry: Handler) {
         self.generator = generator
@@ -74,7 +75,9 @@ class RetryGenerator<T: NSOperation>: GeneratorType {
     func next() -> Payload? {
         guard let payload = generator.next() else { return nil }
         guard let info = info else { return payload }
-        return retry(info, payload)
+        let result = retry(info, payload)
+        lastOperationErrors = result?.adjustedErrors ?? info.errors
+        return result?.0
     }
 }
 
@@ -93,8 +96,9 @@ class RetryGenerator<T: NSOperation>: GeneratorType {
  operation before returning it. To finish, the block can return .None
 */
 public class RetryOperation<T: NSOperation>: RepeatedOperation<T> {
+    public typealias RetryPayload = ((Delay?, T), adjustedErrors: [ErrorType])
     public typealias FailureInfo = RetryFailureInfo<T>
-    public typealias Handler = (RetryFailureInfo<T>, Payload) -> Payload?
+    public typealias Handler = (RetryFailureInfo<T>, Payload) -> RetryPayload?
 
     let retry: RetryGenerator<T>
 
@@ -169,7 +173,7 @@ public class RetryOperation<T: NSOperation>: RepeatedOperation<T> {
      operation regardless of error info.
 
      */
-    public init<G where G: GeneratorType, G.Element == T>(maxCount max: Int? = 5, strategy: WaitStrategy = .Fixed(0.1), _ generator: G, retry block: Handler = { $1 }) {
+    public init<G where G: GeneratorType, G.Element == T>(maxCount max: Int? = 5, strategy: WaitStrategy = .Fixed(0.1), _ generator: G, retry block: Handler = { ($1, adjustedErrors: $0.errors) }) {
         let delay = MapGenerator(strategy.generator()) { Delay.By($0) }
         let tuple = TupleGenerator(primary: generator, secondary: delay)
         retry = RetryGenerator(generator: AnyGenerator(tuple), retry: block)
@@ -184,6 +188,7 @@ public class RetryOperation<T: NSOperation>: RepeatedOperation<T> {
         else if let op = operation as? T {
             retry.info = createFailureInfo(op, errors: errors)
             addNextOperation()
+            commitErrors(retry.lastOperationErrors)
         }
     }
 

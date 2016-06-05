@@ -73,7 +73,7 @@ class RetryOperationTests: OperationTests {
     }
 
     func test__retry_operation_with_payload_generator() {
-        operation = RetryOperation(generator: AnyGenerator(body: producerWithDelay(2)), retry: { $1 })
+        operation = RetryOperation(generator: AnyGenerator(body: producerWithDelay(2)), retry: { ($1, adjustedErrors: $0.errors) })
 
         addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
         runOperation(operation)
@@ -95,7 +95,7 @@ class RetryOperationTests: OperationTests {
     }
 
     func test__retry_operation_where_generator_returns_nil() {
-        operation = RetryOperation(maxCount: 12, strategy: .Fixed(0.01), AnyGenerator(body: producer(11))) { $1 } // Includes the retry block
+        operation = RetryOperation(maxCount: 12, strategy: .Fixed(0.01), AnyGenerator(body: producer(11))) { ($1, adjustedErrors: $0.errors) } // Includes the retry block
 
         addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
         runOperation(operation)
@@ -128,7 +128,7 @@ class RetryOperationTests: OperationTests {
             retryAggregateErrors = info.aggregateErrors
             retryCount = info.count
             didRunBlockCount += 1
-            return recommended
+            return (recommended, adjustedErrors: info.errors)
         }
 
         operation = RetryOperation(AnyGenerator(body: producer(3)), retry: retry)
