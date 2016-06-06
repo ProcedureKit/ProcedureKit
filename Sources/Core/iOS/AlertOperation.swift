@@ -35,7 +35,7 @@ public class AlertOperation<From: PresentingViewController>: Operation {
     private var uiOperation: UIOperation<UIAlertController, From>
 
     /// Access the presented `UIAlertController`.
-    public var alert: UIAlertController {
+    private var alert: UIAlertController {
         return uiOperation.controller
     }
 
