@@ -54,6 +54,15 @@ class AlertOperationTests: OperationTests {
         alert.addActionWithTitle("OK")
         XCTAssertNotNil(alert.actions)
     }
+    
+    func test__alert_preferred_action_works() {
+        let alert = AlertOperation(presentAlertFrom: presentingController)
+        let action = alert.addActionWithTitle("OK", style: .Default)
+        alert.addActionWithTitle("Cancel", style: .Cancel)
+        
+        alert.preferredAction = action
+        XCTAssertNotNil(alert.preferredAction)
+    }
 
     func test__alert_operation_presents_alert_controller() {
 

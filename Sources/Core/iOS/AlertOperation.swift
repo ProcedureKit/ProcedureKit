@@ -103,7 +103,7 @@ public class AlertOperation<From: PresentingViewController>: Operation {
         }
 
         set {
-            alert.preferredAction = preferredAction
+            alert.preferredAction = newValue
         }
     }
 
