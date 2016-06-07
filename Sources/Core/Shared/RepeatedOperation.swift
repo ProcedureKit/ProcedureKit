@@ -315,4 +315,13 @@ public class RepeatedOperation<T where T: NSOperation>: GroupOperation {
             block(operation)
         }
     }
+
+    /**
+     Replace the current configuration block
+
+     - parameter block: a block which receives an instance of T
+     */
+    public func replaceConfigureBlock(block: T -> Void) {
+        configure = block
+    }
 }

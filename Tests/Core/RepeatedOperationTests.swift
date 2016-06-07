@@ -298,6 +298,23 @@ class RepeatedOperationTests: OperationTests {
         XCTAssertEqual(operation.count, 2)
         XCTAssertEqual(operation.aggregateErrors.count, 0)
     }
+
+    func test__replace_configure_block() {
+
+        operation = RepeatedOperation(maxCount: 2, generator: AnyGenerator { (.None, TestOperation() )})
+
+        operation.addConfigureBlock { _ in
+            XCTFail("Configure block should have been replaced.")
+        }
+
+        var didRunConfigureBlock = false
+        operation.replaceConfigureBlock { _ in
+            didRunConfigureBlock = true
+        }
+
+        operation.configure(TestOperation())
+        XCTAssertTrue(didRunConfigureBlock)
+    }
 }
 
 class NonRepeatableRepeatedOperationTests: OperationTests {
