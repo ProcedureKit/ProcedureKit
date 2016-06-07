@@ -272,7 +272,7 @@ class RepeatedOperationTests: OperationTests {
 
         XCTAssertTrue(operation.finished)
         XCTAssertEqual(operation.count, 2)
-        XCTAssertEqual(operation.aggregateErrors.count, 0)
+        XCTAssertEqual(operation.failedErrors.count, 0)
     }
 
     func test__custom_generator_without_delay() {
@@ -284,7 +284,7 @@ class RepeatedOperationTests: OperationTests {
 
         XCTAssertTrue(operation.finished)
         XCTAssertEqual(operation.count, 2)
-        XCTAssertEqual(operation.aggregateErrors.count, 0)
+        XCTAssertEqual(operation.failedErrors.count, 0)
     }
 
     func test__init_separate_delay_generator_and_item_generator() {
@@ -296,7 +296,7 @@ class RepeatedOperationTests: OperationTests {
 
         XCTAssertTrue(operation.finished)
         XCTAssertEqual(operation.count, 2)
-        XCTAssertEqual(operation.aggregateErrors.count, 0)
+        XCTAssertEqual(operation.failedErrors.count, 0)
     }
 }
 
@@ -324,7 +324,7 @@ class NonRepeatableRepeatedOperationTests: OperationTests {
         waitForExpectationsWithTimeout(3, handler: nil)
 
         XCTAssertEqual(operation.count, 5)
-        XCTAssertEqual(operation.aggregateErrors.count, 4)
+        XCTAssertEqual(operation.failedErrors.count, 4)
     }
 
     func test__repeated_with_max_number_of_attempts() {

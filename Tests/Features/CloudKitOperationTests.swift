@@ -1325,7 +1325,7 @@ class CloudKitOperationDiscoverAllContractsTests: CKTests {
         waitForOperation(operation)
 
         XCTAssertTrue(operation.finished)
-        XCTAssertEqual(operation.aggregateErrors.count, 1)
+        XCTAssertEqual(operation.failedErrors.count, 1)
 
     }
 
@@ -2369,7 +2369,7 @@ class CloudKitRecoveryTests: CKTests {
         return RetryFailureInfo(
             operation: operation,
             errors: errors,
-            aggregateErrors: [],
+            historicalErrors: .None,
             count: 0,
             addOperations: { _ in },
             log: self.operation.log,

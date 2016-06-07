@@ -238,9 +238,28 @@ public class RepeatedOperation<T where T: NSOperation>: GroupOperation {
     }
 
     /**
-     Override of operationDidFinish: withErrors:
+     Override of willFinishOperation
 
-     This function ignores errors, and cases where the operation
+     This function ignores errors cases where the operation
+     is a `DelayOperation`. If the operation is an instance of `T`
+     it calls `addNextOperation()`.
+
+     When subclassing, be very careful if downcasting `T` to
+     say `Operation` instead of `MyOperation` (i.e. your specific
+     operation which should be repeated).
+     */
+    public override func recoveredFromErrors(errors: [ErrorType], inOperation operation: NSOperation) -> Bool {
+        guard let _ = operation as? T else {
+            return super.recoveredFromErrors(errors, inOperation: operation)
+        }
+        addNextOperation()
+        return super.recoveredFromErrors(errors, inOperation: operation)
+    }
+
+    /**
+     Override of willFinishOperation
+
+     This function ignores cases where the operation
      is a `DelayOperation`. If the operation is an instance of `T`
      it calls `addNextOperation()`.
 
@@ -248,11 +267,9 @@ public class RepeatedOperation<T where T: NSOperation>: GroupOperation {
      say `Operation` instead of `MyOperation` (i.e. your specific
      operation which should be repeated).
     */
-    public override func willFinishOperation(operation: NSOperation, withErrors errors: [ErrorType]) {
-        if let _ = operation as? DelayOperation { return }
-        if let _ = operation as? T {
-            addNextOperation()
-        }
+    public override func willFinishOperation(operation: NSOperation) {
+        guard let _ = operation as? T else { return }
+        addNextOperation()
     }
 
     /**

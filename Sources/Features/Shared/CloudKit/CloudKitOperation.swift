@@ -251,9 +251,9 @@ public final class CloudKitOperation<T where T: NSOperation, T: CKOperationType,
         recovery.setCustomHandlerForCode(code, handler: handler)
     }
 
-    override func childOperation(child: NSOperation, didFinishWithErrors errors: [ErrorType]) {
+    override func childOperation(child: NSOperation, didFailWithErrors errors: [ErrorType]) {
         if !(child is OPRCKOperation<T>) {
-            super.childOperation(child, didFinishWithErrors: errors)
+            super.childOperation(child, didFailWithErrors: errors)
         }
     }
 }
@@ -308,11 +308,11 @@ public class BatchedCloudKitOperation<T where T: NSOperation, T: CKBatchedOperat
         super.init(generator: AnyGenerator(tuple))
     }
 
-    public override func willFinishOperation(operation: NSOperation, withErrors errors: [ErrorType]) {
-        if errors.isEmpty, let cloudKitOperation = operation as? CloudKitOperation<T> {
+    public override func willFinishOperation(operation: NSOperation) {
+        if let cloudKitOperation = operation as? CloudKitOperation<T> {
             generator.more = enableBatchProcessing && cloudKitOperation.current.moreComing
         }
-        super.willFinishOperation(operation, withErrors: errors)
+        super.willFinishOperation(operation)
     }
 
     public func setErrorHandlerForCode(code: CKErrorCode, handler: CloudKitOperation<T>.ErrorHandler) {

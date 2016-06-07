@@ -119,13 +119,13 @@ class RetryOperationTests: OperationTests {
     func test__retry_using_should_retry_block() {
 
         var retryErrors: [ErrorType]? = .None
-        var retryAggregateErrors: [ErrorType]? = .None
+        var retryHistoricalError: GroupOperation.Errors? = .None
         var retryCount: Int = 0
         var didRunBlockCount: Int = 0
 
         let retry: Handler = { info, recommended in
             retryErrors = info.errors
-            retryAggregateErrors = info.aggregateErrors
+            retryHistoricalError = info.historicalErrors
             retryCount = info.count
             didRunBlockCount += 1
             return recommended
@@ -142,19 +142,19 @@ class RetryOperationTests: OperationTests {
         XCTAssertEqual(didRunBlockCount, 2)
         XCTAssertNotNil(retryErrors)
         XCTAssertEqual(retryErrors?.count ?? 0, 1)
-        XCTAssertNotNil(retryAggregateErrors)
-        XCTAssertEqual(retryAggregateErrors?.count ?? 0, 2)
+        XCTAssertNotNil(retryHistoricalError)
+        XCTAssertEqual(retryHistoricalError?.failed.count ?? 0, 2)
         XCTAssertEqual(retryCount, 2)
     }
 
     func test__retry_using_retry_block_returning_nil() {
         var retryErrors: [ErrorType]? = .None
-        var retryAggregateErrors: [ErrorType]? = .None
+        var retryHistoricalError: GroupOperation.Errors? = .None
         var retryCount: Int = 0
         var didRunBlockCount: Int = 0
         let retry: Handler = { info, recommended in
             retryErrors = info.errors
-            retryAggregateErrors = info.aggregateErrors
+            retryHistoricalError = info.historicalErrors
             retryCount = info.count
             didRunBlockCount += 1
             return .None
@@ -171,8 +171,8 @@ class RetryOperationTests: OperationTests {
         XCTAssertEqual(didRunBlockCount, 1)
         XCTAssertNotNil(retryErrors)
         XCTAssertEqual(retryErrors?.count ?? 0, 1)
-        XCTAssertNotNil(retryAggregateErrors)
-        XCTAssertEqual(retryAggregateErrors?.count ?? 0, 1)
+        XCTAssertNotNil(retryHistoricalError)
+        XCTAssertEqual(retryHistoricalError?.failed.count ?? 0, 2)
         XCTAssertEqual(retryCount, 1)
     }
 }

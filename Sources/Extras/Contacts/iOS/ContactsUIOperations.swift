@@ -41,8 +41,8 @@ final public class DisplayContactViewController<F: PresentingViewController>: Gr
         return vc
     }
 
-    public override func willFinishOperation(finished: NSOperation, withErrors errors: [ErrorType]) {
-        if errors.isEmpty && finished == get, let contact = get.contact {
+    public override func willFinishOperation(finished: NSOperation) {
+        if finished == get, let contact = get.contact {
             operation = UIOperation(controller: createViewControllerForContact(contact), displayControllerFrom: from, sender: sender)
             addOperation(operation!)
         }

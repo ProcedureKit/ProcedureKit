@@ -29,8 +29,8 @@ public struct RetryFailureInfo<T: NSOperation> {
     /// - returns: the errors the operation finished with.
     public let errors: [ErrorType]
 
-    /// - returns: all the aggregate errors of previous attempts
-    public let aggregateErrors: [ErrorType]
+    /// - returns: the previous errors of previous attempts
+    public let historicalErrors: GroupOperation.Errors?
 
     /// - returns: the number of attempts made so far
     public let count: Int
@@ -177,21 +177,18 @@ public class RetryOperation<T: NSOperation>: RepeatedOperation<T> {
         name = "Retry Operation <\(T.self)>"
     }
 
-    public override func willFinishOperation(operation: NSOperation, withErrors errors: [ErrorType]) {
-        if errors.isEmpty {
-            retry.info = .None
-        }
-        else if let op = operation as? T {
-            retry.info = createFailureInfo(op, errors: errors)
-            addNextOperation()
-        }
+    public override func recoveredFromErrors(errors: [ErrorType], inOperation operation: NSOperation) -> Bool {
+        guard let op = operation as? T else { return false }
+        retry.info = createFailureInfo(op, errors: errors)
+        addNextOperation()
+        return true
     }
 
     internal func createFailureInfo(operation: T, errors: [ErrorType]) -> RetryFailureInfo<T> {
         return RetryFailureInfo(
             operation: operation,
             errors: errors,
-            aggregateErrors: aggregateErrors,
+            historicalErrors: internalErrors,
             count: count,
             addOperations: addOperations,
             log: log,
