@@ -22,7 +22,6 @@ operations.
 public class GroupOperation: Operation {
 
     private let finishingOperation = NSBlockOperation { }
-
     private var _aggregateErrors = Protector(Array<ErrorType>())
 
     /// - returns: the OperationQueue the group runs operations on.

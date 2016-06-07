@@ -197,7 +197,7 @@ class GroupOperationTests: OperationTests {
         
         var childErrors: [ErrorType] = []
         child.addObserver(DidCancelObserver { op in
-            childErrors = op.errors.all
+            childErrors = op.errors
         })
         
         let group = GroupOperation(operations: [child])
