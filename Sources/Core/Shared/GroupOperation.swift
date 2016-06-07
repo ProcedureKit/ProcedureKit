@@ -129,50 +129,53 @@ public class GroupOperation: Operation {
     }
 
     /**
-     This method is called every time one of the groups child operations
-     is about to finish.
+     This method is called when a child operation in the group will finish with errors.
+     
+     Often an operation will finish with errors become some of its pre-requisites were not
+     met. Errors of this nature should be recoverable. This can be done by re-trying the
+     original operation, but with another operation which fulfil the pre-requisites as a
+     dependency.
 
-     Over-ride this method to enable the following sort of behavior:
+     If the errors were handled, return true from this method, else return false.
+     
+     Errors which are not handled will result in the Group finishing with errors.
 
-     ## Error handling.
+     - parameter errors: an [ErrorType], the errors of the child operation
+     - parameter operation: the child operation which is finishing
+     - returns: a Boolean, return true if the errors were handled, else return false.
+     */
+    public func handleErrors(errors: [ErrorType], fromOperation operation: NSOperation) -> Bool {
+        return false
+    }
 
-     Typically you will want to have code like this:
+    /**
+     This method is only called when a child operation finishes without any errors.
 
-        if !errors.isEmpty {
-            if operation is MyOperation, let error = errors.first as? MyOperation.Error {
-                switch error {
-                case .AnError:
-                  println("Handle the error case")
-                }
-            }
-        }
-
-     So, if the errors array is not empty, it is important to know which kind of
-     errors the operation may have encountered, and then implement handling of
-     any that are necessary.
-
-     Note that if an operation has conditions, which fail, they will be returned
-     as the first errors.
-
-     ## Move results between operations.
-
-     Typically we use `GroupOperation` to
-     compose and manage multiple operations into a single unit. This might
-     often need to move the results of one operation into the next one. So this
-     can be done here.
-
-     - parameter operation: the child `NSOperation` that has just finished.
-     - parameter errors: an array of `ErrorType`s.
+     - parameter operation: the child operation which will finish without errors
     */
+    public func willFinishOperation(operation: NSOperation) {
+        // no-op
+    }
+
+    @available(*, unavailable, message="Rewrite your GroupOperation subclass as this method is no longer used.")
     public func willFinishOperation(operation: NSOperation, withErrors errors: [ErrorType]) {
-        // no-op, subclasses can override for their own functionality.
+        var message = "Attention!!\n"
+        message += "Rewrite your GroupOperation subclass as this method is no longer used.\n"
+        message += "Override willFinishOperation(_: NSOperation) to manage scheduling of child operations."
+        message += "Override handleErrors(_: [ErrorType], fromOperation: NSOperation) to do error handling."
+        message += "See code documentation for more details."
+        assert(true, message)
     }
 
     @available(*, unavailable, renamed="willFinishOperation")
     public func operationDidFinish(operation: NSOperation, withErrors errors: [ErrorType]) { }
 
-    internal func childOperation(child: NSOperation, didFinishWithErrors errors: [ErrorType]) {
+    internal func childOperation(child: NSOperation, didFinishWithUnhandledErrors errors: [ErrorType]) {
         _aggregateErrors.appendContentsOf(errors)
+    }
+
+    internal func didHandleErrors(handledError: [ErrorType], fromChildOperation child: NSOperation) {
+
     }
 }
 
@@ -219,11 +222,15 @@ extension GroupOperation: OperationQueueDelegate {
     public func operationQueue(queue: OperationQueue, willFinishOperation operation: NSOperation, withErrors errors: [ErrorType]) {
 
         if !errors.isEmpty {
-            childOperation(operation, didFinishWithErrors: errors)
+            if handleErrors(errors, fromOperation: operation) {
+                didHandleErrors(errors, fromChildOperation: operation)
+            }
+            else {
+                childOperation(operation, didFinishWithUnhandledErrors: errors)
+            }
         }
-
-        if operation !== finishingOperation {
-            willFinishOperation(operation, withErrors: errors)
+        else if operation !== finishingOperation {
+            willFinishOperation(operation)
         }
     }
 
