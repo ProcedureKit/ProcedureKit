@@ -1401,7 +1401,7 @@ class CloudKitOperationDiscoverAllContractsTests: CKTests {
         waitForOperation(operation)
 
         XCTAssertTrue(operation.finished)
-        XCTAssertEqual(operation.errors.count, 1)
+        XCTAssertEqual(operation.errors.count, 0) // TODO: Modify to check handled vs non-handled errors
         XCTAssertTrue(didRunCustomHandler)
     }
 

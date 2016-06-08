@@ -243,7 +243,8 @@ public final class CloudKitOperation<T where T: NSOperation, T: CKOperationType,
             guard let _recovery = _recovery, (delay, configure) = _recovery.recoverWithInfo(info, payload: payload) else { return .None }
             let (_, operation) = payload
             configure(operation)
-            return (delay, operation)
+            // TODO: If CloudKitRecovery returned a non-nil _recovery, consider the errors handled
+            return ((delay, operation), adjustedErrors: [] /* TODO: <--- this should be the errors, set as handled */ )
         }
 
         recovery = _recovery

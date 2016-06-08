@@ -23,6 +23,7 @@ public class GroupOperation: Operation {
 
     private let finishingOperation = NSBlockOperation { }
     private var _aggregateErrors = Protector(Array<ErrorType>())
+    private var _uncommittedErrors = Protector(Array<ErrorType>())
 
     /// - returns: the OperationQueue the group runs operations on.
     public let queue = OperationQueue()
@@ -32,7 +33,9 @@ public class GroupOperation: Operation {
 
     /// - returns: an aggregation of errors [ErrorType]
     public var aggregateErrors: Array<ErrorType> {
-        return _aggregateErrors.read { $0 }
+        var currentErrors = _aggregateErrors.read { $0 }
+        currentErrors.appendContentsOf(_uncommittedErrors.read { $0 })
+        return currentErrors
     }
 
     public override var userIntent: Operation.UserIntent {
@@ -124,7 +127,7 @@ public class GroupOperation: Operation {
     */
     public final func aggregateError(error: ErrorType) {
         log.warning("Aggregated error: \(error)")
-        _aggregateErrors.append(error)
+        _uncommittedErrors.append(error)
     }
 
     /**
@@ -171,7 +174,25 @@ public class GroupOperation: Operation {
     public func operationDidFinish(operation: NSOperation, withErrors errors: [ErrorType]) { }
 
     internal func childOperation(child: NSOperation, didFinishWithErrors errors: [ErrorType]) {
-        _aggregateErrors.appendContentsOf(errors)
+        _uncommittedErrors.appendContentsOf(errors)
+    }
+}
+
+extension GroupOperation {
+    
+    // Commits errors, replacing any uncomitted errors
+    // This can be used by GroupOperation subclasses to override errors set by a previous operation
+    // For example, in RetryOperation this is used to allow the RetryGenerator to indicate that the next
+    // operation is "handling" the previous errors.
+    
+    public func commitErrors(errors: [ErrorType]) {
+        log.warning("Committing errors, replacing uncommitted errors. Committing: \(errors)")
+        _aggregateErrors.write { (aggregateErrors) in
+            aggregateErrors.appendContentsOf(errors)
+        }
+        _uncommittedErrors.write { (lastOpErrors) in
+            lastOpErrors.removeAll()
+        }
     }
 }
 
@@ -227,8 +248,11 @@ extension GroupOperation: OperationQueueDelegate {
     }
 
     public func operationQueue(queue: OperationQueue, didFinishOperation operation: NSOperation, withErrors errors: [ErrorType]) {
-
+        
         if operation === finishingOperation {
+            
+            // NOTE: could combine the uncommitted into aggregate here, but the aggregateErrors accessor does this for us
+            
             finish(aggregateErrors)
             queue.suspended = true
         }
