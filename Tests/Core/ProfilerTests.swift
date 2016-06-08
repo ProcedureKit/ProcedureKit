@@ -241,11 +241,9 @@ class OperationProfilerTests: OperationTests {
 
     func test__profile_group_operation() {
         let operation = GroupOperation(operations: [ TestOperation(), TestOperation() ])
-        addCompletionBlockToTestOperation(operation)
-
         operation.addObserver(profiler)
-        runOperation(operation)
-        waitForExpectationsWithTimeout(3, handler: nil)
+
+        waitForOperation(operation)
 
         guard let result = reporter.didProfileResult else {
             XCTFail("Reporter did not receive profile result."); return
