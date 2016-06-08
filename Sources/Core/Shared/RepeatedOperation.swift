@@ -51,6 +51,7 @@ import Foundation
 */
 public enum WaitStrategy {
 
+    case Immediate
     case Fixed(NSTimeInterval)
     case Random((minimum: NSTimeInterval, maximum: NSTimeInterval))
     case Incrementing((initial: NSTimeInterval, increment: NSTimeInterval))
