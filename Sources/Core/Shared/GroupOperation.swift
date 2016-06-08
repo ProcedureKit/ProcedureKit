@@ -259,8 +259,11 @@ public extension GroupOperation {
     }
 
     final func recoveredFromOperationErrors(operation: NSOperation) {
-        protectedErrors.write { (inout tmp: Errors) in
-            tmp.attemptedRecovery.removeValueForKey(operation)
+        if let _ = internalErrors.attemptedRecovery[operation] {
+            log.verbose("successfully recovered from errors in \(operation)")
+            protectedErrors.write { (inout tmp: Errors) in
+                tmp.attemptedRecovery.removeValueForKey(operation)
+            }
         }
     }
 
