@@ -249,10 +249,9 @@ public class RepeatedOperation<T where T: NSOperation>: GroupOperation {
      operation which should be repeated).
      */
     public override func recoveredFromErrors(errors: [ErrorType], inOperation operation: NSOperation) -> Bool {
-        guard let _ = operation as? T else {
-            return super.recoveredFromErrors(errors, inOperation: operation)
+        if operation === current {
+            addNextOperation()
         }
-        addNextOperation()
         return super.recoveredFromErrors(errors, inOperation: operation)
     }
 
@@ -268,8 +267,9 @@ public class RepeatedOperation<T where T: NSOperation>: GroupOperation {
      operation which should be repeated).
     */
     public override func willFinishOperation(operation: NSOperation) {
-        guard let _ = operation as? T else { return }
-        addNextOperation()
+        if operation === current {
+            addNextOperation()
+        }
     }
 
     /**

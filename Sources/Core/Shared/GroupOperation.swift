@@ -253,6 +253,7 @@ extension GroupOperation: OperationQueueDelegate {
         if !errors.isEmpty {
             if recoveredFromErrors(errors, inOperation: operation) {
                 childOperation(operation, didRecoverFromErrors: errors)
+                log.verbose("recovered from \(errors.count) errors, \(recoveredErrors.count) in total so far.")
             }
             else {
                 childOperation(operation, didFailWithErrors: errors)

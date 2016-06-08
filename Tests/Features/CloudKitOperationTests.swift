@@ -2369,7 +2369,7 @@ class CloudKitRecoveryTests: CKTests {
         return RetryFailureInfo(
             operation: operation,
             errors: errors,
-            historicalErrors: .None,
+            historicalErrors: GroupOperation.Errors(),
             count: 0,
             addOperations: { _ in },
             log: self.operation.log,

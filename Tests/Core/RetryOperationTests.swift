@@ -60,20 +60,22 @@ class RetryOperationTests: OperationTests {
 
     func producerWithDelay(threshold: Int) -> () -> (Delay?, Test)? {
         return { [unowned self] in
-            guard self.numberOfExecutions < 10 else {
-                return nil
-            }
+            guard self.numberOfExecutions < 10 else { return nil }
+
             let op = Test { return self.numberOfFailures < threshold }
+
             op.addObserver(WillExecuteObserver { _ in
                 self.numberOfFailures += 1
                 self.numberOfExecutions += 1
-                })
+            })
+
             return (Delay.By(0.001), op)
         }
     }
 
     func test__retry_operation_with_payload_generator() {
         operation = RetryOperation(generator: AnyGenerator(body: producerWithDelay(2)), retry: { $1 })
+        operation.log.severity = .Verbose
 
         addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
         runOperation(operation)
@@ -119,13 +121,13 @@ class RetryOperationTests: OperationTests {
     func test__retry_using_should_retry_block() {
 
         var retryErrors: [ErrorType]? = .None
-        var retryHistoricalError: GroupOperation.Errors? = .None
+        var retryHistoricalErrors: GroupOperation.Errors? = .None
         var retryCount: Int = 0
         var didRunBlockCount: Int = 0
 
         let retry: Handler = { info, recommended in
             retryErrors = info.errors
-            retryHistoricalError = info.historicalErrors
+            retryHistoricalErrors = info.historicalErrors
             retryCount = info.count
             didRunBlockCount += 1
             return recommended
@@ -133,46 +135,53 @@ class RetryOperationTests: OperationTests {
 
         operation = RetryOperation(AnyGenerator(body: producer(3)), retry: retry)
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
-        runOperation(operation)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForOperation(operation)
 
         XCTAssertTrue(operation.finished)
         XCTAssertEqual(operation.count, 3)
         XCTAssertEqual(didRunBlockCount, 2)
         XCTAssertNotNil(retryErrors)
         XCTAssertEqual(retryErrors?.count ?? 0, 1)
-        XCTAssertNotNil(retryHistoricalError)
-        XCTAssertEqual(retryHistoricalError?.failed.count ?? 0, 2)
+        XCTAssertNotNil(retryHistoricalErrors)
+        XCTAssertEqual(retryHistoricalErrors?.recovered.count ?? 0, 1)
+        XCTAssertEqual(retryHistoricalErrors?.failed.count ?? 100, 0)
         XCTAssertEqual(retryCount, 2)
     }
 
     func test__retry_using_retry_block_returning_nil() {
         var retryErrors: [ErrorType]? = .None
-        var retryHistoricalError: GroupOperation.Errors? = .None
+        var retryHistoricalErrors: GroupOperation.Errors? = .None
         var retryCount: Int = 0
         var didRunBlockCount: Int = 0
         let retry: Handler = { info, recommended in
+            print("info: \(info)")
             retryErrors = info.errors
-            retryHistoricalError = info.historicalErrors
+            retryHistoricalErrors = info.historicalErrors
             retryCount = info.count
             didRunBlockCount += 1
             return .None
         }
 
         operation = RetryOperation(AnyGenerator(body: producer(3)), retry: retry)
+        operation.log.severity = .Verbose
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
-        runOperation(operation)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForOperation(operation)
 
         XCTAssertTrue(operation.finished)
         XCTAssertEqual(operation.count, 1)
         XCTAssertEqual(didRunBlockCount, 1)
         XCTAssertNotNil(retryErrors)
         XCTAssertEqual(retryErrors?.count ?? 0, 1)
-        XCTAssertNotNil(retryHistoricalError)
-        XCTAssertEqual(retryHistoricalError?.failed.count ?? 0, 2)
+        XCTAssertNotNil(retryHistoricalErrors)
+        // It's important to note that when the retry handler is invoked
+        // it has not had the current error infomation added to the
+        // historical error info
+        XCTAssertEqual(retryHistoricalErrors?.recovered.count ?? 100, 0)
+        XCTAssertEqual(retryHistoricalErrors?.failed.count ?? 100, 0)
         XCTAssertEqual(retryCount, 1)
+        // Note also, that "recoveredErrors" are really errors where
+        // recovery has been attempted - it was not necessarily successful
+        XCTAssertEqual(operation.recoveredErrors.count ?? 0, 1)
+        XCTAssertEqual(operation.failedErrors.count ?? 100, 0)
     }
 }
