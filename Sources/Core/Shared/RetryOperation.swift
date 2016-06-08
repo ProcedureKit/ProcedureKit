@@ -182,7 +182,7 @@ public class RetryOperation<T: NSOperation>: RepeatedOperation<T> {
      to support retry only when there is a failure.
     */
     public override func willAttemptRecoveryFromErrors(errors: [ErrorType], inOperation operation: NSOperation) -> Bool {
-        log.verbose("will attempt \(count) recovery from errors: \(errors)")
+        log.verbose("will attempt \(count) recovery from errors: \(errors) in operation: \(operation)")
         guard let op = operation as? T where operation === current else { return false }
         retry.info = createFailureInfo(op, errors: errors)
         super.willAttemptRecoveryFromErrors(errors, inOperation: operation)
