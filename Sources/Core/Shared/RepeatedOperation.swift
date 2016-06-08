@@ -290,6 +290,7 @@ public class RepeatedOperation<T where T: NSOperation>: GroupOperation {
     */
     public func addNextOperation(@autoclosure shouldAddNext: () -> Bool = true) {
         if shouldAddNext(), let (delay, op) = next() {
+            log.verbose("will add next operation: \(op)")
             configure(op)
             if let delay = delay.map({ DelayOperation(delay: $0) }) {
                 op.addDependency(delay)
