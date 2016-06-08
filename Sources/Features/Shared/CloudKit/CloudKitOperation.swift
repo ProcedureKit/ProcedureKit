@@ -250,12 +250,6 @@ public final class CloudKitOperation<T where T: NSOperation, T: CKOperationType,
     public func setErrorHandlerForCode(code: CKErrorCode, handler: ErrorHandler) {
         recovery.setCustomHandlerForCode(code, handler: handler)
     }
-
-    override func childOperation(child: NSOperation, didEncounterFatalErrors errors: [ErrorType]) {
-        if !(child is OPRCKOperation<T>) {
-            super.childOperation(child, didEncounterFatalErrors: errors)
-        }
-    }
 }
 
 // MARK: - BatchedCloudKitOperation
