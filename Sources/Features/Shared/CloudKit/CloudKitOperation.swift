@@ -216,14 +216,13 @@ public final class CloudKitOperation<T where T: NSOperation, T: CKOperationType,
         return current.operation
     }
 
-    public convenience init(_ body: () -> T?) {
-        self.init(generator: AnyGenerator(body: body))
+    public convenience init(timeout: NSTimeInterval? = 300, strategy: WaitStrategy = .Random((0.1, 1.0)), _ body: () -> T?) {
+        self.init(timeout: timeout, strategy: strategy, generator: AnyGenerator(body: body))
     }
 
-    init<G where G: GeneratorType, G.Element == T>(timeout: NSTimeInterval? = 300, generator gen: G) {
+    init<G where G: GeneratorType, G.Element == T>(timeout: NSTimeInterval? = 300, strategy: WaitStrategy = .Random((0.1, 1.0)), generator gen: G) {
 
-        // Creates a standard random delay between retries
-        let strategy: WaitStrategy = .Random((0.1, 1.0))
+        // Creates a delay between retries
         let delay = MapGenerator(strategy.generator()) { Delay.By($0) }
 
         // Maps the generator to wrap the target operation.
