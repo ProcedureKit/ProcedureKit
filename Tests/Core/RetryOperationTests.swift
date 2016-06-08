@@ -110,9 +110,7 @@ class RetryOperationTests: OperationTests {
     func test__retry_operation_where_max_count_is_reached() {
         operation = RetryOperation(AnyGenerator(body: producer(9)))
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
-        runOperation(operation)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForOperation(operation)
 
         XCTAssertTrue(operation.finished)
         XCTAssertEqual(operation.count, 5)
@@ -121,7 +119,7 @@ class RetryOperationTests: OperationTests {
     func test__retry_using_should_retry_block() {
 
         var retryErrors: [ErrorType]? = .None
-        var retryHistoricalErrors: GroupOperation.Errors? = .None
+        var retryHistoricalErrors: [ErrorType]? = .None
         var retryCount: Int = 0
         var didRunBlockCount: Int = 0
 
@@ -143,14 +141,13 @@ class RetryOperationTests: OperationTests {
         XCTAssertNotNil(retryErrors)
         XCTAssertEqual(retryErrors?.count ?? 0, 1)
         XCTAssertNotNil(retryHistoricalErrors)
-        XCTAssertEqual(retryHistoricalErrors?.recovered.count ?? 0, 1)
-        XCTAssertEqual(retryHistoricalErrors?.failed.count ?? 100, 0)
+        XCTAssertEqual(retryHistoricalErrors?.count ?? 0, 1)
         XCTAssertEqual(retryCount, 2)
     }
 
     func test__retry_using_retry_block_returning_nil() {
         var retryErrors: [ErrorType]? = .None
-        var retryHistoricalErrors: GroupOperation.Errors? = .None
+        var retryHistoricalErrors: [ErrorType]? = .None
         var retryCount: Int = 0
         var didRunBlockCount: Int = 0
         let retry: Handler = { info, recommended in
@@ -176,12 +173,11 @@ class RetryOperationTests: OperationTests {
         // It's important to note that when the retry handler is invoked
         // it has not had the current error infomation added to the
         // historical error info
-        XCTAssertEqual(retryHistoricalErrors?.recovered.count ?? 100, 0)
-        XCTAssertEqual(retryHistoricalErrors?.failed.count ?? 100, 0)
+        XCTAssertEqual(retryHistoricalErrors?.count ?? 100, 0)
         XCTAssertEqual(retryCount, 1)
         // Note also, that "recoveredErrors" are really errors where
         // recovery has been attempted - it was not necessarily successful
-        XCTAssertEqual(operation.recoveredErrors.count ?? 0, 1)
-        XCTAssertEqual(operation.failedErrors.count ?? 100, 0)
+        XCTAssertEqual(operation.allErrors.count ?? 0, 1)
+        XCTAssertEqual(operation.fatalErrors.count ?? 100, 0)
     }
 }

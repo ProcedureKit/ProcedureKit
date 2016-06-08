@@ -205,7 +205,7 @@ public class RetryOperation<T: NSOperation>: RepeatedOperation<T> {
         return RetryFailureInfo(
             operation: operation,
             errors: errors,
-            historicalErrors: [],
+            historicalErrors: internalErrors.previousAttempts,
             count: count,
             addOperations: addOperations,
             log: log,

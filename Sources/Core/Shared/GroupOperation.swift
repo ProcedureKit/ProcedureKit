@@ -26,10 +26,14 @@ public class GroupOperation: Operation, OperationQueueDelegate {
         var fatal = Array<ErrorType>()
         var attemptedRecovery: ErrorsByOperation = [:]
 
+        var previousAttempts: [ErrorType] {
+            return Array(FlattenSequence(attemptedRecovery.values))
+        }
+
         var all: [ErrorType] {
             get {
                 var tmp: [ErrorType] = fatal
-                tmp.appendContentsOf(FlattenSequence(attemptedRecovery.values))
+                tmp.appendContentsOf(previousAttempts)
                 return tmp
             }
         }
