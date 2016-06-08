@@ -128,6 +128,9 @@ public class RepeatedOperation<T where T: NSOperation>: GroupOperation {
 
     private var generator: AnyGenerator<Payload>
 
+    /// - returns: the previous operation which was executed.
+    public internal(set) var previous: T? = .None
+
     /// - returns: the current operation being executed.
     public internal(set) var current: T
 
@@ -248,11 +251,9 @@ public class RepeatedOperation<T where T: NSOperation>: GroupOperation {
      say `Operation` instead of `MyOperation` (i.e. your specific
      operation which should be repeated).
      */
-    public override func recoveredFromErrors(errors: [ErrorType], inOperation operation: NSOperation) -> Bool {
-        if operation === current {
-            addNextOperation()
-        }
-        return super.recoveredFromErrors(errors, inOperation: operation)
+    public override func willAttemptRecoveryFromErrors(errors: [ErrorType], inOperation operation: NSOperation) -> Bool {
+        addNextOperation(operation === current)
+        return super.willAttemptRecoveryFromErrors(errors, inOperation: operation)
     }
 
     /**
@@ -267,9 +268,7 @@ public class RepeatedOperation<T where T: NSOperation>: GroupOperation {
      operation which should be repeated).
     */
     public override func willFinishOperation(operation: NSOperation) {
-        if operation === current {
-            addNextOperation()
-        }
+        addNextOperation(operation === current)
     }
 
     /**
@@ -290,19 +289,18 @@ public class RepeatedOperation<T where T: NSOperation>: GroupOperation {
      can prevent another operation from being added.
     */
     public func addNextOperation(@autoclosure shouldAddNext: () -> Bool = true) {
-        if let (delay, op) = next() {
-            if shouldAddNext() {
-                configure(op)
-                if let delay = delay.map({ DelayOperation(delay: $0) }) {
-                    op.addDependency(delay)
-                    addOperations(delay, op)
-                }
-                else {
-                    addOperation(op)
-                }
-                count += 1
-                current = op
+        if shouldAddNext(), let (delay, op) = next() {
+            configure(op)
+            if let delay = delay.map({ DelayOperation(delay: $0) }) {
+                op.addDependency(delay)
+                addOperations(delay, op)
             }
+            else {
+                addOperation(op)
+            }
+            count += 1
+            previous = current
+            current = op
         }
     }
 

@@ -251,9 +251,9 @@ public final class CloudKitOperation<T where T: NSOperation, T: CKOperationType,
         recovery.setCustomHandlerForCode(code, handler: handler)
     }
 
-    override func childOperation(child: NSOperation, didFailWithErrors errors: [ErrorType]) {
+    override func childOperation(child: NSOperation, didEncounterFatalErrors errors: [ErrorType]) {
         if !(child is OPRCKOperation<T>) {
-            super.childOperation(child, didFailWithErrors: errors)
+            super.childOperation(child, didEncounterFatalErrors: errors)
         }
     }
 }

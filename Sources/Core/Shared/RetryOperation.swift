@@ -30,7 +30,7 @@ public struct RetryFailureInfo<T: NSOperation> {
     public let errors: [ErrorType]
 
     /// - returns: the previous errors of previous attempts
-    public let historicalErrors: GroupOperation.Errors
+    public let historicalErrors: [ErrorType]
 
     /// - returns: the number of attempts made so far
     public let count: Int
@@ -181,11 +181,11 @@ public class RetryOperation<T: NSOperation>: RepeatedOperation<T> {
      RetryOperation calls the RepeatedOperation addNextOperation() API
      to support retry only when there is a failure.
     */
-    public override func recoveredFromErrors(errors: [ErrorType], inOperation operation: NSOperation) -> Bool {
+    public override func willAttemptRecoveryFromErrors(errors: [ErrorType], inOperation operation: NSOperation) -> Bool {
         log.verbose("will attempt \(count) recovery from errors: \(errors)")
         guard let op = operation as? T where operation === current else { return false }
         retry.info = createFailureInfo(op, errors: errors)
-        super.recoveredFromErrors(errors, inOperation: operation)
+        super.willAttemptRecoveryFromErrors(errors, inOperation: operation)
         return true
     }
 
@@ -205,11 +205,18 @@ public class RetryOperation<T: NSOperation>: RepeatedOperation<T> {
         return RetryFailureInfo(
             operation: operation,
             errors: errors,
-            historicalErrors: internalErrors,
+            historicalErrors: [],
             count: count,
             addOperations: addOperations,
             log: log,
             configure: configure
         )
+    }
+
+    public override func operationQueue(queue: OperationQueue, willFinishOperation operation: NSOperation, withErrors errors: [ErrorType]) {
+        if errors.isEmpty, let previous = previous where operation === current {
+            recoveredFromOperationErrors(previous)
+        }
+        super.operationQueue(queue, willFinishOperation: operation, withErrors: errors)
     }
 }

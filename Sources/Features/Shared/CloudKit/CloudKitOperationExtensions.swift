@@ -224,7 +224,7 @@ extension OPRCKOperation where T: CKDiscoverAllContactsOperationType, T: Associa
     func setDiscoverAllContactsCompletionBlock(block: CloudKitOperation<T>.DiscoverAllContactsCompletionBlock) {
         operation.discoverAllContactsCompletionBlock = { [unowned target] userInfo, error in
             if let error = error, target = target as? GroupOperation {
-                target.didFailWithError(DiscoverAllContactsError(error: error, userInfo: userInfo))
+                target.addFatalError(DiscoverAllContactsError(error: error, userInfo: userInfo))
             }
             else {
                 block(userInfo)
@@ -267,7 +267,7 @@ extension OPRCKOperation where T: CKDiscoverUserInfosOperationType, T: Associate
     func setDiscoverUserInfosCompletionBlock(block: CloudKitOperation<T>.DiscoverUserInfosCompletionBlock) {
         operation.discoverUserInfosCompletionBlock = { [unowned target] userInfoByEmail, userInfoByRecordID, error in
             if let error = error, target = target as? GroupOperation {
-                target.didFailWithError(CloudKitError(error: error))
+                target.addFatalError(CloudKitError(error: error))
             }
             else {
                 block(userInfoByEmail, userInfoByRecordID)
@@ -335,7 +335,7 @@ extension OPRCKOperation where T: CKFetchNotificationChangesOperationType, T: As
 
         operation.fetchNotificationChangesCompletionBlock = { [unowned target] token, error in
             if let error = error, target = target as? GroupOperation {
-                target.didFailWithError(FetchNotificationChangesError(error: error, token: token))
+                target.addFatalError(FetchNotificationChangesError(error: error, token: token))
             }
             else {
                 block(token)
@@ -419,7 +419,7 @@ extension OPRCKOperation where T: CKMarkNotificationsReadOperationType, T: Assoc
     func setMarkNotificationReadCompletionBlock(block: CloudKitOperation<T>.MarkNotificationReadCompletionBlock) {
         operation.markNotificationsReadCompletionBlock = { [unowned target] notificationIDs, error in
             if let error = error, target = target as? GroupOperation {
-                target.didFailWithError(MarkNotificationsReadError(error: error, marked: notificationIDs))
+                target.addFatalError(MarkNotificationsReadError(error: error, marked: notificationIDs))
             }
             else {
                 block(notificationIDs)
@@ -466,7 +466,7 @@ extension OPRCKOperation where T: CKModifyBadgeOperationType, T: AssociatedError
     func setModifyBadgeCompletionBlock(block: CloudKitOperation<T>.ModifyBadgeCompletionBlock) {
         operation.modifyBadgeCompletionBlock = { [unowned target] error in
             if let error = error, target = target as? GroupOperation {
-                target.didFailWithError(CloudKitError(error: error))
+                target.addFatalError(CloudKitError(error: error))
             }
             else {
                 block()
@@ -528,7 +528,7 @@ extension OPRCKOperation where T: CKFetchRecordChangesOperationType, T: Associat
     func setFetchRecordChangesCompletionBlock(block: CloudKitOperation<T>.FetchRecordChangesCompletionBlock) {
         operation.fetchRecordChangesCompletionBlock = { [unowned target] token, data, error in
             if let error = error, target = target as? GroupOperation {
-                target.didFailWithError(FetchRecordChangesError(error: error, token: token, data: data))
+                target.addFatalError(FetchRecordChangesError(error: error, token: token, data: data))
             }
             else {
                 block(token, data)
@@ -651,7 +651,7 @@ extension OPRCKOperation where T: CKFetchRecordZonesOperationType, T: Associated
     func setFetchRecordZonesCompletionBlock(block: CloudKitOperation<T>.FetchRecordZonesCompletionBlock) {
         operation.fetchRecordZonesCompletionBlock = { [unowned target] zonesByID, error in
             if let error = error, target = target as? GroupOperation {
-                target.didFailWithError(FetchRecordZonesError(error: error, zonesByID: zonesByID))
+                target.addFatalError(FetchRecordZonesError(error: error, zonesByID: zonesByID))
             }
             else {
                 block(zonesByID)
@@ -719,7 +719,7 @@ extension OPRCKOperation where T: CKFetchRecordsOperationType, T: AssociatedErro
     func setFetchRecordsCompletionBlock(block: CloudKitOperation<T>.FetchRecordsCompletionBlock) {
         operation.fetchRecordsCompletionBlock = { [unowned target] recordsByID, error in
             if let error = error, target = target as? GroupOperation {
-                target.didFailWithError(FetchRecordsError(error: error, recordsByID: recordsByID))
+                target.addFatalError(FetchRecordsError(error: error, recordsByID: recordsByID))
             }
             else {
                 block(recordsByID)
@@ -801,7 +801,7 @@ extension OPRCKOperation where T: CKFetchSubscriptionsOperationType, T: Associat
     func setFetchSubscriptionCompletionBlock(block: CloudKitOperation<T>.FetchSubscriptionCompletionBlock) {
         operation.fetchSubscriptionCompletionBlock = { [unowned target] subscriptionsByID, error in
             if let error = error, target = target as? GroupOperation {
-                target.didFailWithError(FetchSubscriptionsError(error: error, subscriptionsByID: subscriptionsByID))
+                target.addFatalError(FetchSubscriptionsError(error: error, subscriptionsByID: subscriptionsByID))
             }
             else {
                 block(subscriptionsByID)
@@ -866,7 +866,7 @@ extension OPRCKOperation where T: CKModifyRecordZonesOperationType, T: Associate
     func setModifyRecordZonesCompletionBlock(block: CloudKitOperation<T>.ModifyRecordZonesCompletionBlock) {
         operation.modifyRecordZonesCompletionBlock = { [unowned target] saved, deleted, error in
             if let error = error, target = target as? GroupOperation {
-                target.didFailWithError(ModifyRecordZonesError(error: error, saved: saved, deleted: deleted))
+                target.addFatalError(ModifyRecordZonesError(error: error, saved: saved, deleted: deleted))
             }
             else {
                 block(saved, deleted)
@@ -967,7 +967,7 @@ extension OPRCKOperation where T: CKModifyRecordsOperationType, T: AssociatedErr
     func setModifyRecordsCompletionBlock(block: CloudKitOperation<T>.ModifyRecordsCompletionBlock) {
         operation.modifyRecordsCompletionBlock = { [unowned target] saved, deleted, error in
             if let error = error, target = target as? GroupOperation {
-                target.didFailWithError(ModifyRecordsError(error: error, saved: saved, deleted: deleted))
+                target.addFatalError(ModifyRecordsError(error: error, saved: saved, deleted: deleted))
             }
             else {
                 block(saved, deleted)
@@ -1092,7 +1092,7 @@ extension OPRCKOperation where T: CKModifySubscriptionsOperationType, T: Associa
     func setModifySubscriptionsCompletionBlock(block: CloudKitOperation<T>.ModifySubscriptionsCompletionBlock) {
         operation.modifySubscriptionsCompletionBlock = { [unowned target] saved, deleted, error in
             if let error = error, target = target as? GroupOperation {
-                target.didFailWithError(ModifySubscriptionsError(error: error, saved: saved, deleted: deleted))
+                target.addFatalError(ModifySubscriptionsError(error: error, saved: saved, deleted: deleted))
             }
             else {
                 block(saved, deleted)
@@ -1174,7 +1174,7 @@ extension OPRCKOperation where T: CKQueryOperationType, T: AssociatedErrorType, 
     func setQueryCompletionBlock(block: CloudKitOperation<T>.QueryCompletionBlock) {
         operation.queryCompletionBlock = { [unowned target] cursor, error in
             if let error = error, target = target as? GroupOperation {
-                target.didFailWithError(QueryError(error: error, cursor: cursor))
+                target.addFatalError(QueryError(error: error, cursor: cursor))
             }
             else {
                 block(cursor)
