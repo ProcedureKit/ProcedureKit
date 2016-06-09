@@ -66,7 +66,7 @@ public class Operation: NSOperation {
 
      - see: https://developer.apple.com/library/ios/documentation/Performance/Conceptual/EnergyGuide-iOS/PrioritizeWorkWithQoS.html#//apple_ref/doc/uid/TP40015243-CH39
     */
-    public enum UserIntent: Int {
+    @objc public enum UserIntent: Int {
         case None = 0, SideEffect, Initiated
 
         internal var qos: NSQualityOfService {
