@@ -133,7 +133,7 @@ class GroupOperationTests: OperationTests {
         waitForExpectationsWithTimeout(5.0, handler: nil)
 
         XCTAssertTrue(group.finished)
-        XCTAssertEqual(group.allErrors.count, numberOfOperations)
+        XCTAssertEqual(group.errors.count, numberOfOperations)
     }
 
     func test__group_operation_exits_correctly_when_child_group_finishes_with_errors() {
@@ -150,7 +150,7 @@ class GroupOperationTests: OperationTests {
         waitForExpectationsWithTimeout(3, handler: nil)
 
         XCTAssertTrue(group.finished)
-        XCTAssertEqual(group.allErrors.count, 1)
+        XCTAssertEqual(group.errors.count, 1)
     }
 
     func test__group_operation_exits_correctly_when_multiple_nested_groups_finish_with_errors() {
@@ -168,7 +168,7 @@ class GroupOperationTests: OperationTests {
         waitForExpectationsWithTimeout(3, handler: nil)
 
         XCTAssertTrue(group.finished)
-        XCTAssertEqual(group.allErrors.count, 1)
+        XCTAssertEqual(group.errors.count, 1)
     }
     
     func test__will_add_child_observer__gets_called() {

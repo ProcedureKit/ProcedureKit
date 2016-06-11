@@ -170,14 +170,8 @@ class RetryOperationTests: OperationTests {
         XCTAssertNotNil(retryErrors)
         XCTAssertEqual(retryErrors?.count ?? 0, 1)
         XCTAssertNotNil(retryHistoricalErrors)
-        // It's important to note that when the retry handler is invoked
-        // it has not had the current error infomation added to the
-        // historical error info
         XCTAssertEqual(retryHistoricalErrors?.count ?? 100, 0)
         XCTAssertEqual(retryCount, 1)
-        // Note also, that "recoveredErrors" are really errors where
-        // recovery has been attempted - it was not necessarily successful
-        XCTAssertEqual(operation.allErrors.count ?? 0, 1)
-        XCTAssertEqual(operation.fatalErrors.count ?? 100, 0)
+        XCTAssertEqual(operation.errors.count ?? 0, 1)
     }
 }

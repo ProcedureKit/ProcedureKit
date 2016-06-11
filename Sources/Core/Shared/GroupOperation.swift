@@ -227,7 +227,7 @@ public class GroupOperation: Operation, OperationQueueDelegate {
     public func operationQueue(queue: OperationQueue, didFinishOperation operation: NSOperation, withErrors errors: [ErrorType]) {
 
         if operation === finishingOperation {
-            finish(allErrors)
+            finish(fatalErrors)
             queue.suspended = true
         }
     }
@@ -239,26 +239,30 @@ public extension GroupOperation {
         return protectedErrors.read { $0 }
     }
 
-    public var fatalErrors: [ErrorType] {
+    /// - returns: the errors which could not be recovered from
+    var fatalErrors: [ErrorType] {
         return internalErrors.fatal
     }
 
-    public var allErrors: [ErrorType] {
-        return internalErrors.all
-    }
-
-
+    /**
+     Appends a fatal error.
+     - parameter error: an ErrorType
+    */
     final func addFatalError(error: ErrorType) {
         addFatalErrors([error])
     }
 
+    /**
+     Appends an array of fatal errors.
+     - parameter errors: an [ErrorType]
+     */
     final func addFatalErrors(errors: [ErrorType]) {
         protectedErrors.write { (inout tmp: Errors) in
             tmp.fatal.appendContentsOf(errors)
         }
     }
 
-    final func recoveredFromOperationErrors(operation: NSOperation) {
+    internal func didRecoverFromOperationErrors(operation: NSOperation) {
         if let _ = internalErrors.attemptedRecovery[operation] {
             log.verbose("successfully recovered from errors in \(operation)")
             protectedErrors.write { (inout tmp: Errors) in
@@ -267,12 +271,24 @@ public extension GroupOperation {
         }
     }
 
-    @available(*, unavailable, renamed="failedErrors")
+    internal func didNotRecoverFromOperationErrors(operation: NSOperation) {
+        log.verbose("failed to recover from errors in \(operation)")
+        protectedErrors.write { (inout tmp: Errors) in
+            if let errors = tmp.attemptedRecovery.removeValueForKey(operation) {
+                tmp.fatal.appendContentsOf(errors)
+            }
+        }
+    }
+}
+
+public extension GroupOperation {
+
+    @available(*, unavailable, renamed="fatalErrors")
     var aggregateErrors: [ErrorType] {
         return fatalErrors
     }
 
-    @available(*, unavailable, renamed="didFailWithError")
+    @available(*, unavailable, renamed="addFatalError")
     final func aggregateError(error: ErrorType) {
         addFatalError(error)
     }

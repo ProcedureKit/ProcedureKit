@@ -1325,7 +1325,7 @@ class CloudKitOperationDiscoverAllContractsTests: CKTests {
         waitForOperation(operation)
 
         XCTAssertTrue(operation.finished)
-        XCTAssertEqual(operation.allErrors.count, 1)
+        XCTAssertEqual(operation.errors.count, 1)
     }
 
     func test__error_which_retries_using_retry_after_key() {
@@ -1343,12 +1343,13 @@ class CloudKitOperationDiscoverAllContractsTests: CKTests {
             }
             return op
         }
+        operation.log.severity = .Verbose
         operation.setDiscoverAllContactsCompletionBlock { _ in }
 
         waitForOperation(operation)
 
         XCTAssertTrue(operation.finished)
-        XCTAssertEqual(operation.errors.count, 1)
+        XCTAssertFalse(operation.failed)
     }
 
     func test__error_which_retries_without_retry_after_key() {
@@ -1365,12 +1366,13 @@ class CloudKitOperationDiscoverAllContractsTests: CKTests {
             }
             return op
         }
+        operation.log.severity = .Verbose
         operation.setDiscoverAllContactsCompletionBlock { _ in }
 
         waitForOperation(operation)
 
         XCTAssertTrue(operation.finished)
-        XCTAssertEqual(operation.errors.count, 1)
+        XCTAssertFalse(operation.failed)
     }
 
     func test__error_which_retries_with_custom_handler() {

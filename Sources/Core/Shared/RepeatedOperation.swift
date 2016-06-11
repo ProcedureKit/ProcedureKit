@@ -289,21 +289,23 @@ public class RepeatedOperation<T where T: NSOperation>: GroupOperation {
      to return true. Subclasses may inject additional logic here which
      can prevent another operation from being added.
     */
-    public func addNextOperation(@autoclosure shouldAddNext: () -> Bool = true) {
-        if shouldAddNext(), let (delay, op) = next() {
-            log.verbose("will add next operation: \(op)")
-            configure(op)
-            if let delay = delay.map({ DelayOperation(delay: $0) }) {
-                op.addDependency(delay)
-                addOperations(delay, op)
-            }
-            else {
-                addOperation(op)
-            }
-            count += 1
-            previous = current
-            current = op
+    public func addNextOperation(@autoclosure shouldAddNext: () -> Bool = true) -> Bool {
+        guard shouldAddNext(), let (delay, op) = next() else { return false }
+
+        log.verbose("will add next operation: \(op)")
+        configure(op)
+        if let delay = delay.map({ DelayOperation(delay: $0) }) {
+            op.addDependency(delay)
+            addOperations(delay, op)
         }
+        else {
+            addOperation(op)
+        }
+        count += 1
+        previous = current
+        current = op
+
+        return true
     }
 
     /**

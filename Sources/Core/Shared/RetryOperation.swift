@@ -178,27 +178,21 @@ public class RetryOperation<T: NSOperation>: RepeatedOperation<T> {
     }
 
     /**
-     RetryOperation calls the RepeatedOperation addNextOperation() API
-     to support retry only when there is a failure.
-    */
+     Sets up the retry info object (used by the RetryGenerator), then
+     calls the super implementation, returning true.
+     */
     public override func willAttemptRecoveryFromErrors(errors: [ErrorType], inOperation operation: NSOperation) -> Bool {
         log.verbose("will attempt \(count) recovery from errors: \(errors) in operation: \(operation)")
         guard let op = operation as? T where operation === current else { return false }
         retry.info = createFailureInfo(op, errors: errors)
-        super.willAttemptRecoveryFromErrors(errors, inOperation: operation)
-        return true
+        return addNextOperation(operation === current)
     }
 
     /**
      RetryOperation suppress any retries when the target operation succeeded.
-     However, it still calls super for situations where the finished operation
-     is not the current operation
      */
     public override func willFinishOperation(operation: NSOperation) {
-        guard operation === current else {
-            super.willFinishOperation(operation)
-            return
-        }
+        // no-op
     }
 
     internal func createFailureInfo(operation: T, errors: [ErrorType]) -> RetryFailureInfo<T> {
@@ -213,9 +207,16 @@ public class RetryOperation<T: NSOperation>: RepeatedOperation<T> {
         )
     }
 
+    internal override func childOperation(child: NSOperation, didAttemptRecoveryFromErrors errors: [ErrorType]) {
+        if let previous = previous where child === current {
+            didNotRecoverFromOperationErrors(previous)
+        }
+        super.childOperation(child, didAttemptRecoveryFromErrors: errors)
+    }
+
     public override func operationQueue(queue: OperationQueue, willFinishOperation operation: NSOperation, withErrors errors: [ErrorType]) {
         if errors.isEmpty, let previous = previous where operation === current {
-            recoveredFromOperationErrors(previous)
+            didRecoverFromOperationErrors(previous)
         }
         super.operationQueue(queue, willFinishOperation: operation, withErrors: errors)
     }
