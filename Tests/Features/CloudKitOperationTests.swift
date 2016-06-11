@@ -1343,7 +1343,6 @@ class CloudKitOperationDiscoverAllContractsTests: CKTests {
             }
             return op
         }
-        operation.log.severity = .Verbose
         operation.setDiscoverAllContactsCompletionBlock { _ in }
 
         waitForOperation(operation)
@@ -1366,7 +1365,6 @@ class CloudKitOperationDiscoverAllContractsTests: CKTests {
             }
             return op
         }
-        operation.log.severity = .Verbose
         operation.setDiscoverAllContactsCompletionBlock { _ in }
 
         waitForOperation(operation)

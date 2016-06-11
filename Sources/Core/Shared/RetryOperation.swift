@@ -185,7 +185,7 @@ public class RetryOperation<T: NSOperation>: RepeatedOperation<T> {
         log.verbose("will attempt \(count) recovery from errors: \(errors) in operation: \(operation)")
         guard let op = operation as? T where operation === current else { return false }
         retry.info = createFailureInfo(op, errors: errors)
-        return addNextOperation(operation === current)
+        return addNextOperation()
     }
 
     /**

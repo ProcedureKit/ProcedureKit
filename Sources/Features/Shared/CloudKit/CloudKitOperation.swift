@@ -50,7 +50,7 @@ public class CloudKitRecovery<T where T: NSOperation, T: CKOperationType, T: Ass
         var response: ErrorResponse? = .None
 
         response = defaultHandlers[code]?(error: error, log: info.log, suggested: suggestion)
-        response = customHandlers[code]?(error: error, log: info.log, suggested: response ?? suggestion)
+        response = customHandlers[code]?(error: error, log: info.log, suggested: response ?? suggestion) ?? response
 
         return response
 
