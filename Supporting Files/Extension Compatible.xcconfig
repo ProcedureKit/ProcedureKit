@@ -9,3 +9,4 @@
 #include "Operations.xcconfig"
 
 APPLICATION_EXTENSION_API_ONLY = YES
+PRODUCT_NAME = Operations_Extension_API_Compatible

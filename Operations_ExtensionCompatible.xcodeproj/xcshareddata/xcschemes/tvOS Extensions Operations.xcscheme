@@ -15,7 +15,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "652618211C11F77500654091"
-               BuildableName = "Operations.framework"
+               BuildableName = "Operations_Extension_API_Compatible.framework"
                BlueprintName = "tvOS Extensions Operations"
                ReferencedContainer = "container:Operations_ExtensionCompatible.xcodeproj">
             </BuildableReference>
@@ -49,7 +49,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "652618211C11F77500654091"
-            BuildableName = "Operations.framework"
+            BuildableName = "Operations_Extension_API_Compatible.framework"
             BlueprintName = "tvOS Extensions Operations"
             ReferencedContainer = "container:Operations_ExtensionCompatible.xcodeproj">
          </BuildableReference>
@@ -71,7 +71,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "652618211C11F77500654091"
-            BuildableName = "Operations.framework"
+            BuildableName = "Operations_Extension_API_Compatible.framework"
             BlueprintName = "tvOS Extensions Operations"
             ReferencedContainer = "container:Operations_ExtensionCompatible.xcodeproj">
          </BuildableReference>
@@ -89,7 +89,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "652618211C11F77500654091"
-            BuildableName = "Operations.framework"
+            BuildableName = "Operations_Extension_API_Compatible.framework"
             BlueprintName = "tvOS Extensions Operations"
             ReferencedContainer = "container:Operations_ExtensionCompatible.xcodeproj">
          </BuildableReference>
