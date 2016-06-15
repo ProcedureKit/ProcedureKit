@@ -3,12 +3,12 @@ steps:
     name: ":muscle: Lint"
     command: .ci/scripts/lint
     agents:
-      swift: "$BUILDKITE_AGENT_META_DATA_SWIFT"
+      swift: "2.3"
   -
     name: ":mac: Test Mac OS X"
     command: .ci/scripts/test-osx
     agents:
-      swift: "$BUILDKITE_AGENT_META_DATA_SWIFT"
+      swift: "2.3"
   -
     name: ":fastlane: Test iOS"
     command: .ci/scripts/test-ios
@@ -16,5 +16,5 @@ steps:
       FL_SLATHER_BUILDKITE_ENABLED: true
       FL_SLATHER_COVERALLS_ENABLED: true
     agents:
-      swift: "$BUILDKITE_AGENT_META_DATA_SWIFT"
+      swift: "2.3"
 
