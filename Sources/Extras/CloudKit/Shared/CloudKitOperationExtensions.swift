@@ -1011,9 +1011,9 @@ extension OPRCKOperation where T: CKModifyRecordsOperationType, T: AssociatedErr
         set { operation.clientChangeTokenData = newValue }
     }
 
-    public var atomic: Bool {
-        get { return operation.atomic }
-        set { operation.atomic = newValue }
+    public var isAtomic: Bool {
+        get { return operation.isAtomic }
+        set { operation.isAtomic = newValue }
     }
 
     public var perRecordProgressBlock: CloudKitOperation<T>.ModifyRecordsPerRecordProgressBlock? {
@@ -1086,11 +1086,11 @@ extension CloudKitOperation where T: CKModifyRecordsOperationType {
     }
 
     /// - returns: a flag to indicate atomicity
-    public var atomic: Bool {
-        get { return operation.atomic }
+    public var isAtomic: Bool {
+        get { return operation.isAtomic }
         set {
-            operation.atomic = newValue
-            addConfigureBlock { $0.atomic = newValue }
+            operation.isAtomic = newValue
+            addConfigureBlock { $0.isAtomic = newValue }
         }
     }
 

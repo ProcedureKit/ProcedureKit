@@ -169,7 +169,7 @@ public final class OperationProfiler: Identifiable, Equatable {
     }
 
     func addMetricNow(now: NSTimeInterval = CFAbsoluteTimeGetCurrent() as NSTimeInterval, forEvent event: OperationEvent) {
-        dispatch_sync(queue) { [unowned self] in
+        Dispatch.dispatch_sync(queue) { [unowned self] in
             switch event {
             case .Attached:
                 self.result = self.result.attach(now)
@@ -192,7 +192,7 @@ public final class OperationProfiler: Identifiable, Equatable {
         if let operation = operation as? Operation {
             let profiler = OperationProfiler(parent: self)
             operation.addObserver(profiler)
-            dispatch_sync(queue) { [unowned self] in
+            Dispatch.dispatch_sync(queue) { [unowned self] in
                 self.children.append(operation.identity)
             }
         }
@@ -219,7 +219,7 @@ extension OperationProfiler.Reporter: OperationProfilerReporter {
 extension OperationProfiler: OperationProfilerReporter {
 
     public func finishedProfilingWithResult(result: ProfileResult) {
-        dispatch_sync(queue) { [unowned self] in
+        Dispatch.dispatch_sync(queue) { [unowned self] in
             if let index = self.children.indexOf(result.identity) {
                 self.result = self.result.addChild(result)
                 self.children.removeAtIndex(index)
@@ -232,7 +232,7 @@ extension OperationProfiler: OperationProfilerReporter {
 extension OperationProfiler: OperationObserverType {
 
     public func didAttachToOperation(operation: Operation) {
-        dispatch_sync(queue) { [unowned self] in
+        Dispatch.dispatch_sync(queue) { [unowned self] in
             self.result = self.result.setIdentity(operation.identity)
         }
         addMetricNow(forEvent: .Attached)
