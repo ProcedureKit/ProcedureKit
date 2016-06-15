@@ -29,8 +29,8 @@ public struct RetryFailureInfo<T: NSOperation> {
     /// - returns: the errors the operation finished with.
     public let errors: [ErrorType]
 
-    /// - returns: all the aggregate errors of previous attempts
-    public let aggregateErrors: [ErrorType]
+    /// - returns: the previous errors of previous attempts
+    public let historicalErrors: [ErrorType]
 
     /// - returns: the number of attempts made so far
     public let count: Int
@@ -177,25 +177,47 @@ public class RetryOperation<T: NSOperation>: RepeatedOperation<T> {
         name = "Retry Operation <\(T.self)>"
     }
 
-    public override func willFinishOperation(operation: NSOperation, withErrors errors: [ErrorType]) {
-        if errors.isEmpty {
-            retry.info = .None
-        }
-        else if let op = operation as? T {
-            retry.info = createFailureInfo(op, errors: errors)
-            addNextOperation()
-        }
+    /**
+     Sets up the retry info object (used by the RetryGenerator), then
+     calls the super implementation, returning true.
+     */
+    public override func willAttemptRecoveryFromErrors(errors: [ErrorType], inOperation operation: NSOperation) -> Bool {
+        log.verbose("will attempt \(count) recovery from errors: \(errors) in operation: \(operation)")
+        guard let op = operation as? T where operation === current else { return false }
+        retry.info = createFailureInfo(op, errors: errors)
+        return addNextOperation()
+    }
+
+    /**
+     RetryOperation suppress any retries when the target operation succeeded.
+     */
+    public override func willFinishOperation(operation: NSOperation) {
+        // no-op
     }
 
     internal func createFailureInfo(operation: T, errors: [ErrorType]) -> RetryFailureInfo<T> {
         return RetryFailureInfo(
             operation: operation,
             errors: errors,
-            aggregateErrors: aggregateErrors,
+            historicalErrors: internalErrors.previousAttempts,
             count: count,
             addOperations: addOperations,
             log: log,
             configure: configure
         )
+    }
+
+    internal override func child(child: NSOperation, didAttemptRecoveryFromErrors errors: [ErrorType]) {
+        if let previous = previous where child === current {
+            didNotRecoverFromOperationErrors(previous)
+        }
+        super.child(child, didAttemptRecoveryFromErrors: errors)
+    }
+
+    public override func operationQueue(queue: OperationQueue, willFinishOperation operation: NSOperation, withErrors errors: [ErrorType]) {
+        if errors.isEmpty, let previous = previous where operation === current {
+            didRecoverFromOperationErrors(previous)
+        }
+        super.operationQueue(queue, willFinishOperation: operation, withErrors: errors)
     }
 }

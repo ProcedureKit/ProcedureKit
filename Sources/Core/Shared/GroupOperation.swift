@@ -19,21 +19,34 @@ of creating Operations which may repeat themselves before
 subsequent operations can run. For example, authentication
 operations.
 */
-public class GroupOperation: Operation {
+public class GroupOperation: Operation, OperationQueueDelegate {
+
+    typealias ErrorsByOperation = [NSOperation: [ErrorType]]
+    internal struct Errors {
+        var fatal = Array<ErrorType>()
+        var attemptedRecovery: ErrorsByOperation = [:]
+
+        var previousAttempts: [ErrorType] {
+            return Array(FlattenSequence(attemptedRecovery.values))
+        }
+
+        var all: [ErrorType] {
+            get {
+                var tmp: [ErrorType] = fatal
+                tmp.appendContentsOf(previousAttempts)
+                return tmp
+            }
+        }
+    }
 
     private let finishingOperation = NSBlockOperation { }
-    private var _aggregateErrors = Protector(Array<ErrorType>())
+    private var protectedErrors = Protector(Errors())
 
     /// - returns: the OperationQueue the group runs operations on.
     public let queue = OperationQueue()
 
     /// - returns: the operations which have been added to the queue
     public private(set) var operations: [NSOperation]
-
-    /// - returns: an aggregation of errors [ErrorType]
-    public var aggregateErrors: Array<ErrorType> {
-        return _aggregateErrors.read { $0 }
-    }
 
     public override var userIntent: Operation.UserIntent {
         didSet {
@@ -117,77 +130,58 @@ public class GroupOperation: Operation {
     }
 
     /**
-     Append an error to the list of aggregate errors. Subclasses can use this
-     to maintain the errors received by operations within the group.
+     This method is called when a child operation in the group will finish with errors.
 
-     - parameter error: an ErrorType to append.
-    */
-    public final func aggregateError(error: ErrorType) {
-        log.warning("Aggregated error: \(error)")
-        _aggregateErrors.append(error)
+     Often an operation will finish with errors become some of its pre-requisites were not
+     met. Errors of this nature should be recoverable. This can be done by re-trying the
+     original operation, but with another operation which fulfil the pre-requisites as a
+     dependency.
+
+     If the errors were recovered from, return true from this method, else return false.
+
+     Errors which are not handled will result in the Group finishing with errors.
+
+     - parameter errors: an [ErrorType], the errors of the child operation
+     - parameter operation: the child operation which is finishing
+     - returns: a Boolean, return true if the errors were handled, else return false.
+     */
+    public func willAttemptRecoveryFromErrors(errors: [ErrorType], inOperation operation: NSOperation) -> Bool {
+        return false
     }
 
     /**
-     This method is called every time one of the groups child operations
-     is about to finish.
+     This method is only called when a child operation finishes without any errors.
 
-     Over-ride this method to enable the following sort of behavior:
-
-     ## Error handling.
-
-     Typically you will want to have code like this:
-
-        if !errors.isEmpty {
-            if operation is MyOperation, let error = errors.first as? MyOperation.Error {
-                switch error {
-                case .AnError:
-                  println("Handle the error case")
-                }
-            }
-        }
-
-     So, if the errors array is not empty, it is important to know which kind of
-     errors the operation may have encountered, and then implement handling of
-     any that are necessary.
-
-     Note that if an operation has conditions, which fail, they will be returned
-     as the first errors.
-
-     ## Move results between operations.
-
-     Typically we use `GroupOperation` to
-     compose and manage multiple operations into a single unit. This might
-     often need to move the results of one operation into the next one. So this
-     can be done here.
-
-     - parameter operation: the child `NSOperation` that has just finished.
-     - parameter errors: an array of `ErrorType`s.
+     - parameter operation: the child operation which will finish without errors
     */
+    public func willFinishOperation(operation: NSOperation) {
+        // no-op
+    }
+
+    @available(*, unavailable, message="Rewrite your GroupOperation subclass as this method is no longer used.")
     public func willFinishOperation(operation: NSOperation, withErrors errors: [ErrorType]) {
-        // no-op, subclasses can override for their own functionality.
+        var message = "Attention!!\n"
+        message += "Rewrite your GroupOperation subclass as this method is no longer used.\n"
+        message += "Override willFinishOperation(_: NSOperation) to manage scheduling of child operations."
+        message += "Override willAttemptRecoveryFromErrors(_: [ErrorType], inOperation: NSOperation) to do error handling."
+        message += "See code documentation for more details."
+        assert(true, message)
     }
 
     @available(*, unavailable, renamed="willFinishOperation")
     public func operationDidFinish(operation: NSOperation, withErrors errors: [ErrorType]) { }
 
-    internal func childOperation(child: NSOperation, didFinishWithErrors errors: [ErrorType]) {
-        _aggregateErrors.appendContentsOf(errors)
+    internal func child(child: NSOperation, didEncounterFatalErrors errors: [ErrorType]) {
+        addFatalErrors(errors)
     }
-}
 
-public protocol GroupOperationWillAddChildObserver: OperationObserverType {
-
-    func groupOperation(group: GroupOperation, willAddChildOperation child: NSOperation)
-}
-
-extension GroupOperation {
-
-    internal var willAddChildOperationObservers: [GroupOperationWillAddChildObserver] {
-        return observers.flatMap { $0 as? GroupOperationWillAddChildObserver }
+    internal func child(child: NSOperation, didAttemptRecoveryFromErrors errors: [ErrorType]) {
+        protectedErrors.write { (inout tmp: Errors) in
+            tmp.attemptedRecovery[child] = errors
+        }
     }
-}
 
-extension GroupOperation: OperationQueueDelegate {
+    // MARK: - OperationQueueDelegate
 
     /**
      The group operation acts as its own queue's delegate. When an operation is added to the queue,
@@ -197,7 +191,7 @@ extension GroupOperation: OperationQueueDelegate {
 
      The purpose of this is to keep the finishing operation as the last child operation that executes
      when there are no more operations in the group.
-    */
+     */
     public func operationQueue(queue: OperationQueue, willAddOperation operation: NSOperation) {
         assert(!finishingOperation.executing, "Cannot add new operations to a group after the group has started to finish.")
         assert(!finishingOperation.finished, "Cannot add new operations to a group after the group has completed.")
@@ -214,24 +208,101 @@ extension GroupOperation: OperationQueueDelegate {
      The group operation acts as it's own queue's delegate. When an operation finishes, if the
      operation is the finishing operation, we finish the group operation here. Else, the group is
      notified (using `operationDidFinish` that a child operation has finished.
-    */
+     */
     public func operationQueue(queue: OperationQueue, willFinishOperation operation: NSOperation, withErrors errors: [ErrorType]) {
 
         if !errors.isEmpty {
-            childOperation(operation, didFinishWithErrors: errors)
+            if willAttemptRecoveryFromErrors(errors, inOperation: operation) {
+                child(operation, didAttemptRecoveryFromErrors: errors)
+            }
+            else {
+                child(operation, didEncounterFatalErrors: errors)
+            }
         }
-
-        if operation !== finishingOperation {
-            willFinishOperation(operation, withErrors: errors)
+        else if operation !== finishingOperation {
+            willFinishOperation(operation)
         }
     }
 
     public func operationQueue(queue: OperationQueue, didFinishOperation operation: NSOperation, withErrors errors: [ErrorType]) {
 
         if operation === finishingOperation {
-            finish(aggregateErrors)
+            finish(fatalErrors)
             queue.suspended = true
         }
+    }
+}
+
+public extension GroupOperation {
+
+    internal var internalErrors: Errors {
+        return protectedErrors.read { $0 }
+    }
+
+    /// - returns: the errors which could not be recovered from
+    var fatalErrors: [ErrorType] {
+        return internalErrors.fatal
+    }
+
+    /**
+     Appends a fatal error.
+     - parameter error: an ErrorType
+    */
+    final func addFatalError(error: ErrorType) {
+        addFatalErrors([error])
+    }
+
+    /**
+     Appends an array of fatal errors.
+     - parameter errors: an [ErrorType]
+     */
+    final func addFatalErrors(errors: [ErrorType]) {
+        protectedErrors.write { (inout tmp: Errors) in
+            tmp.fatal.appendContentsOf(errors)
+        }
+    }
+
+    internal func didRecoverFromOperationErrors(operation: NSOperation) {
+        if let _ = internalErrors.attemptedRecovery[operation] {
+            log.verbose("successfully recovered from errors in \(operation)")
+            protectedErrors.write { (inout tmp: Errors) in
+                tmp.attemptedRecovery.removeValueForKey(operation)
+            }
+        }
+    }
+
+    internal func didNotRecoverFromOperationErrors(operation: NSOperation) {
+        log.verbose("failed to recover from errors in \(operation)")
+        protectedErrors.write { (inout tmp: Errors) in
+            if let errors = tmp.attemptedRecovery.removeValueForKey(operation) {
+                tmp.fatal.appendContentsOf(errors)
+            }
+        }
+    }
+}
+
+public extension GroupOperation {
+
+    @available(*, unavailable, renamed="fatalErrors")
+    var aggregateErrors: [ErrorType] {
+        return fatalErrors
+    }
+
+    @available(*, unavailable, renamed="addFatalError")
+    final func aggregateError(error: ErrorType) {
+        addFatalError(error)
+    }
+}
+
+public protocol GroupOperationWillAddChildObserver: OperationObserverType {
+
+    func groupOperation(group: GroupOperation, willAddChildOperation child: NSOperation)
+}
+
+extension GroupOperation {
+
+    internal var willAddChildOperationObservers: [GroupOperationWillAddChildObserver] {
+        return observers.flatMap { $0 as? GroupOperationWillAddChildObserver }
     }
 }
 

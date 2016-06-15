@@ -322,15 +322,13 @@ public class _ReverseGeocodeUserLocationOperation<Geocoder, Manager where Geocod
         addCondition(MutuallyExclusive<ReverseGeocodeUserLocationOperation>())
     }
 
-    public override func willFinishOperation(operation: NSOperation, withErrors errors: [ErrorType]) {
-        if errors.isEmpty && userLocationOperation == operation && !operation.cancelled {
-            if let location = location {
-                let reverseOp = _ReverseGeocodeOperation(geocoder: geocoder, location: location) { [unowned self] placemark in
-                    self.completion(location, placemark)
-                }
-                addOperation(reverseOp)
-                reverseGeocodeOperation = reverseOp
+    public override func willFinishOperation(operation: NSOperation) {
+        if userLocationOperation == operation && !operation.cancelled, let location = location {
+            let reverseOp = _ReverseGeocodeOperation(geocoder: geocoder, location: location) { [unowned self] placemark in
+                self.completion(location, placemark)
             }
+            addOperation(reverseOp)
+            reverseGeocodeOperation = reverseOp
         }
     }
 }
