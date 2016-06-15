@@ -63,10 +63,10 @@ private class NetworkIndicatorController {
     }
 
     private func updateIndicatorVisibility() {
-        if activityCount > 0 {
+        if activityCount > 0 && networkActivityIndicator.networkActivityIndicatorVisible == false {
             networkIndicatorShouldShow(true)
         }
-        else {
+        else if activityCount == 0 {
             visibilityTimer = Timer(interval: 1.0) {
                 self.networkIndicatorShouldShow(false)
             }

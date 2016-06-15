@@ -80,4 +80,63 @@ class NetworkObserverTests: OperationTests {
             XCTAssertFalse(self.visibilityChanges[1])
         }
     }
+
+    func test__network_indicator_changes_once_when_multiple_operations_start() {
+
+        let operation1 = TestOperation(delay: 1)
+        operation1.addObserver(NetworkObserver(indicator: indicator))
+
+        let operation2 = TestOperation(delay: 1)
+        operation2.addObserver(NetworkObserver(indicator: indicator))
+
+        addCompletionBlockToTestOperation(operation1, withExpectation: expectationWithDescription("Test: \(#function)"))
+        addCompletionBlockToTestOperation(operation2, withExpectation: expectationWithDescription("Test: \(#function)"))
+
+        runOperations(operation1, operation2)
+
+        waitForExpectationsWithTimeout(3) { error in
+            XCTAssertTrue(operation1.didExecute)
+            XCTAssertTrue(operation1.finished)
+            XCTAssertTrue(operation2.didExecute)
+            XCTAssertTrue(operation2.finished)
+            XCTAssertTrue(self.visibilityChanges[0])
+            XCTAssertEqual(self.visibilityChanges.count, 1)
+        }
+    }
+
+    func test__network_indicator_hides_once_multiple_operations_end() {
+
+        let operation1 = TestOperation(delay: 1)
+        operation1.addObserver(NetworkObserver(indicator: indicator))
+
+        let operation2 = TestOperation(delay: 1)
+        operation2.addObserver(NetworkObserver(indicator: indicator))
+
+        let expectation1 = expectationWithDescription("Test: \(#function)")
+        operation1.addCompletionBlock {
+            let after = dispatch_time(DISPATCH_TIME_NOW, Int64(1.5 * Double(NSEC_PER_SEC)))
+            dispatch_after(after, Queue.Main.queue) {
+                expectation1.fulfill()
+            }
+        }
+        let expectation2 = expectationWithDescription("Test: \(#function)")
+        operation2.addCompletionBlock {
+            let after = dispatch_time(DISPATCH_TIME_NOW, Int64(1.5 * Double(NSEC_PER_SEC)))
+            dispatch_after(after, Queue.Main.queue) {
+                expectation2.fulfill()
+            }
+        }
+
+        runOperations(operation1, operation2)
+
+        waitForExpectationsWithTimeout(3) { error in
+            XCTAssertTrue(operation1.didExecute)
+            XCTAssertTrue(operation1.finished)
+            XCTAssertTrue(operation2.didExecute)
+            XCTAssertTrue(operation2.finished)
+            XCTAssertTrue(self.visibilityChanges[0])
+            XCTAssertFalse(self.visibilityChanges[1])
+            XCTAssertEqual(self.visibilityChanges.count, 2)
+        }
+    }
 }
