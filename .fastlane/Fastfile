@@ -47,7 +47,7 @@ platform :ios do
       output_directory: ".ci/xcodebuild-data",
       xcargs: "-derivedDataPath .ci/xcodebuild-data"
     )
-    	
+
   end
 
 end
