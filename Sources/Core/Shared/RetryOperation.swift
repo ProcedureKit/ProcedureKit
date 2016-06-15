@@ -207,11 +207,11 @@ public class RetryOperation<T: NSOperation>: RepeatedOperation<T> {
         )
     }
 
-    internal override func childOperation(child: NSOperation, didAttemptRecoveryFromErrors errors: [ErrorType]) {
+    internal override func child(child: NSOperation, didAttemptRecoveryFromErrors errors: [ErrorType]) {
         if let previous = previous where child === current {
             didNotRecoverFromOperationErrors(previous)
         }
-        super.childOperation(child, didAttemptRecoveryFromErrors: errors)
+        super.child(child, didAttemptRecoveryFromErrors: errors)
     }
 
     public override func operationQueue(queue: OperationQueue, willFinishOperation operation: NSOperation, withErrors errors: [ErrorType]) {
