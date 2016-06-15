@@ -171,11 +171,11 @@ public class GroupOperation: Operation, OperationQueueDelegate {
     @available(*, unavailable, renamed="willFinishOperation")
     public func operationDidFinish(operation: NSOperation, withErrors errors: [ErrorType]) { }
 
-    internal func childOperation(child: NSOperation, didEncounterFatalErrors errors: [ErrorType]) {
+    internal func child(child: NSOperation, didEncounterFatalErrors errors: [ErrorType]) {
         addFatalErrors(errors)
     }
 
-    internal func childOperation(child: NSOperation, didAttemptRecoveryFromErrors errors: [ErrorType]) {
+    internal func child(child: NSOperation, didAttemptRecoveryFromErrors errors: [ErrorType]) {
         protectedErrors.write { (inout tmp: Errors) in
             tmp.attemptedRecovery[child] = errors
         }
@@ -213,10 +213,10 @@ public class GroupOperation: Operation, OperationQueueDelegate {
 
         if !errors.isEmpty {
             if willAttemptRecoveryFromErrors(errors, inOperation: operation) {
-                childOperation(operation, didAttemptRecoveryFromErrors: errors)
+                child(operation, didAttemptRecoveryFromErrors: errors)
             }
             else {
-                childOperation(operation, didEncounterFatalErrors: errors)
+                child(operation, didEncounterFatalErrors: errors)
             }
         }
         else if operation !== finishingOperation {
