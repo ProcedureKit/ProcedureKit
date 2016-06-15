@@ -806,7 +806,6 @@
 				65EE50C51C3C198600152774 /* CloudKitOperationTests.swift */,
 				652617271C11F5EB00654091 /* LocationCapabilityTests.swift */,
 				652617281C11F5EB00654091 /* LocationOperationsTests.swift */,
-				2E7627411CE7BB7B0050AB05 /* OpenInSafariOperationTests.swift */,
 				652617291C11F5EB00654091 /* PassbookCapabilityTests.swift */,
 				6526172A1C11F5EB00654091 /* PhotosCapabilityTests.swift */,
 				6526172B1C11F5EB00654091 /* ReachabilityConditionTests.swift */,
