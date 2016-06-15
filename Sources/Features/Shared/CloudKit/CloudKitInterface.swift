@@ -244,7 +244,7 @@ public protocol CKModifyRecordsOperationType: CKDatabaseOperationType {
     var clientChangeTokenData: NSData? { get set }
 
     /// - returns: a flag for atomic changes
-    var atomic: Bool { get set }
+    var isAtomic: Bool { get set }
 
     /// - returns: a per record progress block
     var perRecordProgressBlock: ((Record, Double) -> Void)? { get set }

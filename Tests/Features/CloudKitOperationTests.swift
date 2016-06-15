@@ -266,7 +266,7 @@ class TestModifyRecordsOperation: TestDatabaseOperation, CKModifyRecordsOperatio
     var recordIDsToDelete: [RecordID]?
     var savePolicy: RecordSavePolicy = 0
     var clientChangeTokenData: NSData?
-    var atomic: Bool = true
+    var isAtomic: Bool = true
 
     var perRecordProgressBlock: ((Record, Double) -> Void)?
     var perRecordCompletionBlock: ((Record?, NSError?) -> Void)?
@@ -1076,13 +1076,13 @@ class OPRCKModifyRecordsOperationTests: CKTests {
     }
 
     func test__get_atomic() {
-        target.atomic = true
-        XCTAssertTrue(operation.atomic)
+        target.isAtomic = true
+        XCTAssertTrue(operation.isAtomic)
     }
 
     func test__set_atomic() {
-        operation.atomic = true
-        XCTAssertTrue(target.atomic)
+        operation.isAtomic = true
+        XCTAssertTrue(target.isAtomic)
     }
 
     func test__get_per_record_progress_block() {
@@ -2099,7 +2099,7 @@ class CloudKitOperationModifyRecordsTests: CKTests {
         operation.recordIDsToDelete = recordIDsToDelete
         operation.savePolicy = policy
         operation.clientChangeTokenData = clientChangeToken
-        operation.atomic = atomic
+        operation.isAtomic = atomic
     }
 
     func test__execution_after_cancellation() {
@@ -2112,7 +2112,7 @@ class CloudKitOperationModifyRecordsTests: CKTests {
         XCTAssertEqual(operation.recordIDsToDelete ?? [], recordIDsToDelete)
         XCTAssertEqual(operation.savePolicy, policy)
         XCTAssertEqual(operation.clientChangeTokenData, clientChangeToken)
-        XCTAssertEqual(operation.atomic, atomic)
+        XCTAssertEqual(operation.isAtomic, atomic)
     }
 
     func test__success_without_completion_block() {
