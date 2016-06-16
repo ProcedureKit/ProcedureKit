@@ -8,7 +8,7 @@
 
 import Foundation
 
-public class ComposedOperation<T: NSOperation>: Operation {
+public class ComposedOperation<T: Operation>: Operation {
 
     public let target: Operation
     public var operation: T
@@ -32,7 +32,7 @@ public class ComposedOperation<T: NSOperation>: Operation {
                     self.target.cancel()
                 }
                 else {
-                    self.target.cancelWithError(OperationError.ParentOperationCancelledWithErrors(errors))
+                    self.target.cancelWithError(OperationError.parentOperationCancelledWithErrors(errors))
                 }
             }
         })

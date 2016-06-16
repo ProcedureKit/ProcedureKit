@@ -11,7 +11,7 @@ import AddressBook
 
 @testable import Operations
 
-@available(iOS, deprecated=9.0)
+@available(iOS, deprecated:9.0)
 class TestableAddressBookRegistrar: AddressBookPermissionRegistrar {
 
     var didAccessStatus = false
@@ -23,51 +23,51 @@ class TestableAddressBookRegistrar: AddressBookPermissionRegistrar {
 
     var addressBook: CFTypeRef! = nil
 
-    var creationError: CFErrorRef! = nil
-    var accessError: CFErrorRef! = nil
+    var creationError: CFError! = nil
+    var accessError: CFError! = nil
 
     init(status: ABAuthorizationStatus) {
         self.status = status
     }
 
-    func createAddressBook() -> (ABAddressBookRef?, AddressBookPermissionRegistrarError?) {
+    func createAddressBook() -> (ABAddressBook?, AddressBookPermissionRegistrarError?) {
         didCreateAddressBook = true
 
         if let _ = creationError {
-            return (.None, AddressBookPermissionRegistrarError.AddressBookAccessDenied)
+            return (.none, AddressBookPermissionRegistrarError.addressBookAccessDenied)
         }
         else if let addressBook: CFTypeRef = addressBook {
-            return (addressBook as ABAddressBookRef, .None)
+            return (addressBook as ABAddressBookRef, .none)
         }
-        return (.None, AddressBookPermissionRegistrarError.AddressBookUnknownErrorOccured)
+        return (.none, AddressBookPermissionRegistrarError.addressBookUnknownErrorOccured)
     }
 
-    func requestAccessToAddressBook(addressBook: ABAddressBookRef, completion: (AddressBookPermissionRegistrarError?) -> Void) {
+    func requestAccessToAddressBook(_ addressBook: ABAddressBook, completion: (AddressBookPermissionRegistrarError?) -> Void) {
         didRequestAccess = true
         if requestShouldSucceed {
-            status = .Authorized
+            status = .authorized
             completion(nil)
         }
         else {
-            status = .Denied
+            status = .denied
             if let _ = accessError {
-                completion(AddressBookPermissionRegistrarError.AddressBookAccessDenied)
+                completion(AddressBookPermissionRegistrarError.addressBookAccessDenied)
             }
             else {
-                completion(AddressBookPermissionRegistrarError.AddressBookUnknownErrorOccured)
+                completion(AddressBookPermissionRegistrarError.addressBookUnknownErrorOccured)
             }
         }
     }
 }
 
-@available(iOS, deprecated=9.0)
+@available(iOS, deprecated:9.0)
 class AddressBookOperationTests: OperationTests {
 
     var registrar: TestableAddressBookRegistrar!
 
     override func setUp() {
         super.setUp()
-        registrar = TestableAddressBookRegistrar(status: .Authorized)
+        registrar = TestableAddressBookRegistrar(status: .authorized)
         let posedAddressBook = "I'm posing as an Address Book Ref!"
         registrar.addressBook = posedAddressBook as CFTypeRef
     }
@@ -86,10 +86,10 @@ class AddressBookOperationTests: OperationTests {
             }
         ))
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectation(withDescription: "Test: \(#function)"))
         runOperation(operation)
 
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForExpectations(withTimeout: 3, handler: nil)
 
         XCTAssertTrue(didStart)
         XCTAssertTrue(registrar.didRequestAccess)
@@ -99,9 +99,9 @@ class AddressBookOperationTests: OperationTests {
     func test__given_authorization_denied__access_fails() {
         var didStart = false
         var didSucceed = false
-        var receivedErrors = [ErrorType]()
+        var receivedErrors = [ErrorProtocol]()
 
-        registrar.status = .NotDetermined
+        registrar.status = .notDetermined
         registrar.requestShouldSucceed = false
 
         let operation = AddressBookOperation(registrar: registrar)
@@ -115,10 +115,10 @@ class AddressBookOperationTests: OperationTests {
             }
         ))
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectation(withDescription: "Test: \(#function)"))
         runOperation(operation)
 
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForExpectations(withTimeout: 3, handler: nil)
 
         XCTAssertTrue(didStart)
         XCTAssertTrue(registrar.didRequestAccess)
@@ -126,7 +126,7 @@ class AddressBookOperationTests: OperationTests {
 
         if let error = receivedErrors.first as? AddressBookPermissionRegistrarError {
             switch error {
-            case .AddressBookUnknownErrorOccured:
+            case .addressBookUnknownErrorOccured:
                 break
             default:
                 XCTFail("Incorrect AddressBookPermissionRegistrarError type received")
@@ -138,7 +138,7 @@ class AddressBookOperationTests: OperationTests {
     }
 }
 
-@available(iOS, deprecated=9.0)
+@available(iOS, deprecated:9.0)
 class AddressBookConditionTests: OperationTests {
 
     var registrar: TestableAddressBookRegistrar!
@@ -146,7 +146,7 @@ class AddressBookConditionTests: OperationTests {
 
     override func setUp() {
         super.setUp()
-        registrar = TestableAddressBookRegistrar(status: .NotDetermined)
+        registrar = TestableAddressBookRegistrar(status: .notDetermined)
         let posedAddressBook = "I'm posing as an Address Book Ref!"
         registrar.addressBook = posedAddressBook as CFTypeRef
         registrar.requestShouldSucceed = true
@@ -160,10 +160,10 @@ class AddressBookConditionTests: OperationTests {
         let operation = TestOperation()
         operation.addCondition(condition)
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectation(withDescription: "Test: \(#function)"))
         runOperation(operation)
 
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForExpectations(withTimeout: 3, handler: nil)
         XCTAssertTrue(registrar.didRequestAccess)
         XCTAssertTrue(operation.didExecute)
     }
@@ -171,7 +171,7 @@ class AddressBookConditionTests: OperationTests {
     func test__given_authorization_denied__condition_fails() {
         registrar.requestShouldSucceed = false
 
-        var receivedErrors = [ErrorType]()
+        var receivedErrors = [ErrorProtocol]()
 
         let operation = TestOperation()
         operation.addCondition(condition)
@@ -180,16 +180,16 @@ class AddressBookConditionTests: OperationTests {
             receivedErrors = errors
         })
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectation(withDescription: "Test: \(#function)"))
         runOperation(operation)
 
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForExpectations(withTimeout: 3, handler: nil)
         XCTAssertTrue(registrar.didRequestAccess)
         XCTAssertFalse(operation.didExecute)
 
-        if let error = receivedErrors.first as? AddressBookCondition.Error {
+        if let error = receivedErrors.first as? AddressBookCondition.Operations.Error {
             switch error {
-            case .AuthorizationDenied:
+            case .authorizationDenied:
                 break
             default:
                 XCTFail("Incorrect AddressBookCondition.Error type received")

@@ -87,7 +87,7 @@ extension InjectionOperationType where Self: Operation {
      operation, and an array of `ErrorType`, and returns Void.
      - returns: `self` - so that injections can be chained together.
     */
-    public func injectResultFromDependency<T where T: Operation>(dep: T, block: (operation: Self, dependency: T, errors: [ErrorType]) -> Void) -> Self {
+    public func injectResultFromDependency<T where T: Operation>(_ dep: T, block: (operation: Self, dependency: T, errors: [ErrorProtocol]) -> Void) -> Self {
         dep.addObserver(WillFinishObserver { [weak self] op, errors in
             if let strongSelf = self, dep = op as? T {
                 block(operation: strongSelf, dependency: dep, errors: errors)
@@ -137,9 +137,9 @@ public protocol AutomaticInjectionOperationType: InjectionOperationType {
  The only case indicates this, and composes the errors the
  dependency finished with.
 */
-public enum AutomaticInjectionError: ErrorType {
-    case DependencyFinishedWithErrors([ErrorType])
-    case RequirementNotSatisfied
+public enum AutomaticInjectionError: ErrorProtocol {
+    case dependencyFinishedWithErrors([ErrorProtocol])
+    case requirementNotSatisfied
 }
 
 extension AutomaticInjectionOperationType where Self: Operation {
@@ -173,13 +173,13 @@ extension AutomaticInjectionOperationType where Self: Operation {
      ```
 
     */
-    public func injectResultFromDependency<T where T: Operation, T: ResultOperationType, T.Result == Requirement>(dep: T) {
+    public func injectResultFromDependency<T where T: Operation, T: ResultOperationType, T.Result == Requirement>(_ dep: T) {
         injectResultFromDependency(dep) { [weak self] operation, dependency, errors in
             if errors.isEmpty {
                 self?.requirement = dependency.result
             }
             else {
-                self?.cancelWithError(AutomaticInjectionError.DependencyFinishedWithErrors(errors))
+                self?.cancelWithError(AutomaticInjectionError.dependencyFinishedWithErrors(errors))
             }
         }
     }

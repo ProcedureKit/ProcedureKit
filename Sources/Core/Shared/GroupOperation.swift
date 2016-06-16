@@ -21,17 +21,17 @@ operations.
 */
 public class GroupOperation: Operation {
 
-    private let finishingOperation = NSBlockOperation { }
-    private var _aggregateErrors = Protector(Array<ErrorType>())
+    private let finishingOperation = Foundation.BlockOperation { }
+    private var _aggregateErrors = Protector(Array<ErrorProtocol>())
 
     /// - returns: the OperationQueue the group runs operations on.
     public let queue = OperationQueue()
 
     /// - returns: the operations which have been added to the queue
-    public private(set) var operations: [NSOperation]
+    public private(set) var operations: [Foundation.Operation]
 
     /// - returns: an aggregation of errors [ErrorType]
-    public var aggregateErrors: Array<ErrorType> {
+    public var aggregateErrors: Array<ErrorProtocol> {
         return _aggregateErrors.read { $0 }
     }
 
@@ -48,11 +48,11 @@ public class GroupOperation: Operation {
 
     - parameter operations: an array of `NSOperation`s.
     */
-    public init(operations ops: [NSOperation]) {
+    public init(operations ops: [Foundation.Operation]) {
         operations = ops
         super.init()
         name = "Group Operation"
-        queue.suspended = true
+        queue.isSuspended = true
         queue.delegate = self
         userIntent = operations.userIntent
         addObserver(WillCancelObserver { [unowned self] operation, errors in
@@ -63,7 +63,7 @@ public class GroupOperation: Operation {
                 else {
                     let (nsops, ops) = self.operations.splitNSOperationsAndOperations
                     nsops.forEach { $0.cancel() }
-                    ops.forEach { $0.cancelWithError(OperationError.ParentOperationCancelledWithErrors(errors)) }
+                    ops.forEach { $0.cancelWithError(OperationError.parentOperationCancelledWithErrors(errors)) }
                 }
                 self.queue.cancelAllOperations()
             }
@@ -71,7 +71,7 @@ public class GroupOperation: Operation {
     }
 
     /// Convenience initializer for direct usage without subclassing.
-    public convenience init(operations: NSOperation...) {
+    public convenience init(operations: Foundation.Operation...) {
         self.init(operations: operations)
     }
 
@@ -82,7 +82,7 @@ public class GroupOperation: Operation {
     public override func execute() {
         addOperations(operations.filter { !self.queue.operations.contains($0) })
         queue.addOperation(finishingOperation)
-        queue.suspended = false
+        queue.isSuspended = false
     }
 
     /**
@@ -90,7 +90,7 @@ public class GroupOperation: Operation {
 
      - parameter operation: an `NSOperation` instance.
     */
-    public func addOperation(operation: NSOperation) {
+    public func addOperation(_ operation: Foundation.Operation) {
         addOperations(operation)
     }
 
@@ -99,7 +99,7 @@ public class GroupOperation: Operation {
 
      - parameter operations: an array of `NSOperation` instances.
      */
-    public func addOperations(operations: NSOperation...) {
+    public func addOperations(_ operations: Foundation.Operation...) {
         addOperations(operations)
     }
 
@@ -108,11 +108,11 @@ public class GroupOperation: Operation {
 
      - parameter operations: an array of `NSOperation` instances.
      */
-    public func addOperations(additional: [NSOperation]) {
+    public func addOperations(_ additional: [Foundation.Operation]) {
         if additional.count > 0 {
             additional.forEachOperation { $0.log.severity = log.severity }
             queue.addOperations(additional)
-            operations.appendContentsOf(additional)
+            operations.append(contentsOf: additional)
         }
     }
 
@@ -122,7 +122,7 @@ public class GroupOperation: Operation {
 
      - parameter error: an ErrorType to append.
     */
-    public final func aggregateError(error: ErrorType) {
+    public final func aggregateError(_ error: ErrorProtocol) {
         log.warning("Aggregated error: \(error)")
         _aggregateErrors.append(error)
     }
@@ -163,21 +163,21 @@ public class GroupOperation: Operation {
      - parameter operation: the child `NSOperation` that has just finished.
      - parameter errors: an array of `ErrorType`s.
     */
-    public func willFinishOperation(operation: NSOperation, withErrors errors: [ErrorType]) {
+    public func willFinishOperation(_ operation: Foundation.Operation, withErrors errors: [ErrorProtocol]) {
         // no-op, subclasses can override for their own functionality.
     }
 
-    @available(*, unavailable, renamed="willFinishOperation")
-    public func operationDidFinish(operation: NSOperation, withErrors errors: [ErrorType]) { }
+    @available(*, unavailable, renamed:"willFinishOperation")
+    public func operationDidFinish(_ operation: Foundation.Operation, withErrors errors: [ErrorProtocol]) { }
 
-    internal func childOperation(child: NSOperation, didFinishWithErrors errors: [ErrorType]) {
+    internal func childOperation(_ child: Foundation.Operation, didFinishWithErrors errors: [ErrorProtocol]) {
         _aggregateErrors.appendContentsOf(errors)
     }
 }
 
 public protocol GroupOperationWillAddChildObserver: OperationObserverType {
 
-    func groupOperation(group: GroupOperation, willAddChildOperation child: NSOperation)
+    func groupOperation(_ group: GroupOperation, willAddChildOperation child: Foundation.Operation)
 }
 
 extension GroupOperation {
@@ -198,9 +198,9 @@ extension GroupOperation: OperationQueueDelegate {
      The purpose of this is to keep the finishing operation as the last child operation that executes
      when there are no more operations in the group.
     */
-    public func operationQueue(queue: OperationQueue, willAddOperation operation: NSOperation) {
-        assert(!finishingOperation.executing, "Cannot add new operations to a group after the group has started to finish.")
-        assert(!finishingOperation.finished, "Cannot add new operations to a group after the group has completed.")
+    public func operationQueue(_ queue: OperationQueue, willAddOperation operation: Foundation.Operation) {
+        assert(!finishingOperation.isExecuting, "Cannot add new operations to a group after the group has started to finish.")
+        assert(!finishingOperation.isFinished, "Cannot add new operations to a group after the group has completed.")
 
         if operation !== finishingOperation {
 
@@ -215,7 +215,7 @@ extension GroupOperation: OperationQueueDelegate {
      operation is the finishing operation, we finish the group operation here. Else, the group is
      notified (using `operationDidFinish` that a child operation has finished.
     */
-    public func operationQueue(queue: OperationQueue, willFinishOperation operation: NSOperation, withErrors errors: [ErrorType]) {
+    public func operationQueue(_ queue: OperationQueue, willFinishOperation operation: Foundation.Operation, withErrors errors: [ErrorProtocol]) {
 
         if !errors.isEmpty {
             childOperation(operation, didFinishWithErrors: errors)
@@ -226,11 +226,11 @@ extension GroupOperation: OperationQueueDelegate {
         }
     }
 
-    public func operationQueue(queue: OperationQueue, didFinishOperation operation: NSOperation, withErrors errors: [ErrorType]) {
+    public func operationQueue(_ queue: OperationQueue, didFinishOperation operation: Foundation.Operation, withErrors errors: [ErrorProtocol]) {
 
         if operation === finishingOperation {
             finish(aggregateErrors)
-            queue.suspended = true
+            queue.isSuspended = true
         }
     }
 }
@@ -241,12 +241,12 @@ extension GroupOperation: OperationQueueDelegate {
  child operation to its queue.
  */
 public struct WillAddChildObserver: GroupOperationWillAddChildObserver {
-    public typealias BlockType = (group: GroupOperation, child: NSOperation) -> Void
+    public typealias BlockType = (group: GroupOperation, child: Foundation.Operation) -> Void
 
     private let block: BlockType
 
     /// - returns: a block which is called when the observer is attached to an operation
-    public var didAttachToOperation: DidAttachToOperationBlock? = .None
+    public var didAttachToOperation: DidAttachToOperationBlock? = .none
 
     /**
      Initialize the observer with a block.
@@ -259,12 +259,12 @@ public struct WillAddChildObserver: GroupOperationWillAddChildObserver {
     }
 
     /// Conforms to GroupOperationWillAddChildObserver
-    public func groupOperation(group: GroupOperation, willAddChildOperation child: NSOperation) {
+    public func groupOperation(_ group: GroupOperation, willAddChildOperation child: Foundation.Operation) {
         block(group: group, child: child)
     }
 
     /// Base OperationObserverType method
-    public func didAttachToOperation(operation: Operation) {
+    public func didAttachToOperation(_ operation: Operation) {
         didAttachToOperation?(operation: operation)
     }
 }

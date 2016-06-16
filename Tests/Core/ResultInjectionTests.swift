@@ -9,9 +9,9 @@
 import XCTest
 @testable import Operations
 
-class DataProcessing: Operation, AutomaticInjectionOperationType {
+class DataProcessing: Operations.Operation, AutomaticInjectionOperationType {
 
-    var requirement: String? = .None
+    var requirement: String? = .none
 
     override init() {
         super.init()
@@ -44,13 +44,13 @@ class ManualResultInjectionTests: ResultInjectionTests {
             XCTAssertEqual(dep.result, "Hello World")
         }
 
-        addCompletionBlockToTestOperation(processing, withExpectation: expectationWithDescription("Test: \(#function)"))
+        addCompletionBlockToTestOperation(processing, withExpectation: expectation(withDescription: "Test: \(#function)"))
         runOperations(retrieval, processing)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForExpectations(withTimeout: 3, handler: nil)
     }
 
     func test__block_passes_through_errors() {
-        retrieval = TestOperation(error: TestOperation.Error.SimulatedError)
+        retrieval = TestOperation(error: TestOperation.Error.simulatedError)
         processing.injectResultFromDependency(retrieval) { op, dep, errors in
             XCTAssertEqual(errors.count, 1)
             guard let _ = errors.first as? TestOperation.Error else {
@@ -59,9 +59,9 @@ class ManualResultInjectionTests: ResultInjectionTests {
             }
         }
 
-        addCompletionBlockToTestOperation(processing, withExpectation: expectationWithDescription("Test: \(#function)"))
+        addCompletionBlockToTestOperation(processing, withExpectation: expectation(withDescription: "Test: \(#function)"))
         runOperations(retrieval, processing)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForExpectations(withTimeout: 3, handler: nil)
     }
 }
 
@@ -70,15 +70,15 @@ class AutomaticResultInjectionTests: ResultInjectionTests {
     func test__requirement_is_injected() {
         processing.injectResultFromDependency(retrieval)
 
-        addCompletionBlockToTestOperation(processing, withExpectation: expectationWithDescription("Test: \(#function)"))
+        addCompletionBlockToTestOperation(processing, withExpectation: expectation(withDescription: "Test: \(#function)"))
         runOperations(retrieval, processing)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForExpectations(withTimeout: 3, handler: nil)
 
         XCTAssertEqual(processing.requirement, retrieval.result)
     }
 
     func test__processing_cancels_with_errors_if_dependency_errors() {
-        retrieval = TestOperation(error: TestOperation.Error.SimulatedError)
+        retrieval = TestOperation(error: TestOperation.Error.simulatedError)
         processing.injectResultFromDependency(retrieval)
         processing.addObserver(DidCancelObserver { op in
             XCTAssertEqual(op.errors.count, 1)
@@ -88,7 +88,7 @@ class AutomaticResultInjectionTests: ResultInjectionTests {
             }
 
             switch error {
-            case .DependencyFinishedWithErrors(let errors):
+            case .dependencyFinishedWithErrors(let errors):
                 XCTAssertEqual(errors.count, 1)
                 guard let _ = errors.first as? TestOperation.Error else {
                     XCTFail("Incorrect error received")
@@ -99,10 +99,10 @@ class AutomaticResultInjectionTests: ResultInjectionTests {
             }
         })
 
-        addCompletionBlockToTestOperation(processing, withExpectation: expectationWithDescription("Test: \(#function)"))
+        addCompletionBlockToTestOperation(processing, withExpectation: expectation(withDescription: "Test: \(#function)"))
         runOperations(retrieval, processing)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForExpectations(withTimeout: 3, handler: nil)
 
-        XCTAssertTrue(processing.cancelled)
+        XCTAssertTrue(processing.isCancelled)
     }
 }

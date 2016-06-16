@@ -9,29 +9,29 @@
 import Contacts
 
 @available(iOS 9.0, OSX 10.11, *)
-public enum ContactsPermissionError: ErrorType {
-    case AuthorizationDenied
-    case AuthorizationRestricted
-    case AuthorizationNotDetermined
+public enum ContactsPermissionError: ErrorProtocol {
+    case authorizationDenied
+    case authorizationRestricted
+    case authorizationNotDetermined
 }
 
 @available(iOS 9.0, OSX 10.11, *)
-public enum ContactsError: ErrorType {
-    case UnknownErrorOccured
-    case ErrorOccured(NSError)
+public enum ContactsError: ErrorProtocol {
+    case unknownErrorOccured
+    case errorOccured(NSError)
 }
 
 @available(iOS 9.0, OSX 10.11, *)
 public protocol ContactSaveRequestType {
     init()
-    func opr_addContact(contact: CNMutableContact, toContainerWithIdentifier identifier: String?)
-    func opr_updateContact(contact: CNMutableContact)
-    func opr_deleteContact(contact: CNMutableContact)
-    func opr_addGroup(group: CNMutableGroup, toContainerWithIdentifier identifier: String?)
-    func opr_updateGroup(group: CNMutableGroup)
-    func opr_deleteGroup(group: CNMutableGroup)
-    func opr_addMember(contact: CNContact, toGroup group: CNGroup)
-    func opr_removeMember(contact: CNContact, fromGroup group: CNGroup)
+    func opr_addContact(_ contact: CNMutableContact, toContainerWithIdentifier identifier: String?)
+    func opr_updateContact(_ contact: CNMutableContact)
+    func opr_deleteContact(_ contact: CNMutableContact)
+    func opr_addGroup(_ group: CNMutableGroup, toContainerWithIdentifier identifier: String?)
+    func opr_updateGroup(_ group: CNMutableGroup)
+    func opr_deleteGroup(_ group: CNMutableGroup)
+    func opr_addMember(_ contact: CNContact, toGroup group: CNGroup)
+    func opr_removeMember(_ contact: CNContact, fromGroup group: CNGroup)
 }
 
 @available(iOS 9.0, OSX 10.11, *)
@@ -39,25 +39,25 @@ public protocol ContactStoreType {
     associatedtype SaveRequest: ContactSaveRequestType
 
     init()
-    func opr_authorizationStatusForEntityType(entityType: CNEntityType) -> CNAuthorizationStatus
-    func opr_requestAccessForEntityType(entityType: CNEntityType, completion: (Bool, NSError?) -> Void)
+    func opr_authorizationStatusForEntityType(_ entityType: CNEntityType) -> CNAuthorizationStatus
+    func opr_requestAccessForEntityType(_ entityType: CNEntityType, completion: (Bool, NSError?) -> Void)
     func opr_defaultContainerIdentifier() -> String
-    func opr_unifiedContactWithIdentifier(identifier: String, keysToFetch keys: [CNKeyDescriptor]) throws -> CNContact
-    func opr_unifiedContactsMatchingPredicate(predicate: ContactPredicate, keysToFetch keys: [CNKeyDescriptor]) throws -> [CNContact]
-    func opr_groupsMatchingPredicate(predicate: GroupPredicate?) throws -> [CNGroup]
-    func opr_containersMatchingPredicate(predicate: ContainerPredicate?) throws -> [CNContainer]
-    func opr_enumerateContactsWithFetchRequest(fetchRequest: CNContactFetchRequest, usingBlock block: (CNContact, UnsafeMutablePointer<ObjCBool>) -> Void) throws
-    func opr_executeSaveRequest(saveRequest: SaveRequest) throws
+    func opr_unifiedContactWithIdentifier(_ identifier: String, keysToFetch keys: [CNKeyDescriptor]) throws -> CNContact
+    func opr_unifiedContactsMatchingPredicate(_ predicate: ContactPredicate, keysToFetch keys: [CNKeyDescriptor]) throws -> [CNContact]
+    func opr_groupsMatchingPredicate(_ predicate: GroupPredicate?) throws -> [CNGroup]
+    func opr_containersMatchingPredicate(_ predicate: ContainerPredicate?) throws -> [CNContainer]
+    func opr_enumerateContactsWithFetchRequest(_ fetchRequest: CNContactFetchRequest, usingBlock block: (CNContact, UnsafeMutablePointer<ObjCBool>) -> Void) throws
+    func opr_executeSaveRequest(_ saveRequest: SaveRequest) throws
 }
 
 @available(iOS 9.0, OSX 10.11, *)
 public enum ContainerID {
-    case Default
+    case `default`
     case Identifier(String)
 
     var identifier: String {
         switch self {
-        case .Default:
+        case .default:
             return CNContactStore().defaultContainerIdentifier()
         case .Identifier(let id):
             return id
@@ -67,39 +67,39 @@ public enum ContainerID {
 
 @available(iOS 9.0, OSX 10.11, *)
 public enum ContainerPredicate {
-    case WithIdentifiers([ContainerID])
-    case OfContactWithIdentifier(String)
-    case OfGroupWithIdentifier(String)
+    case withIdentifiers([ContainerID])
+    case ofContactWithIdentifier(String)
+    case ofGroupWithIdentifier(String)
 
-    var predicate: NSPredicate {
+    var predicate: Predicate {
         switch self {
-        case .WithIdentifiers(let IDs):
-            return CNContainer.predicateForContainersWithIdentifiers(IDs.map { $0.identifier })
-        case .OfContactWithIdentifier(let contactID):
-            return CNContainer.predicateForContainerOfContactWithIdentifier(contactID)
-        case .OfGroupWithIdentifier(let groupID):
-            return CNContainer.predicateForContainerOfGroupWithIdentifier(groupID)
+        case .withIdentifiers(let IDs):
+            return CNContainer.predicateForContainers(withIdentifiers: IDs.map { $0.identifier })
+        case .ofContactWithIdentifier(let contactID):
+            return CNContainer.predicateForContainerOfContact(withIdentifier: contactID)
+        case .ofGroupWithIdentifier(let groupID):
+            return CNContainer.predicateForContainerOfGroup(withIdentifier: groupID)
         }
     }
 }
 
 @available(iOS 9.0, OSX 10.11, *)
 public enum ContactPredicate {
-    case MatchingName(String)
-    case WithIdentifiers([String])
-    case InGroupWithIdentifier(String)
-    case InContainerWithID(ContainerID)
+    case matchingName(String)
+    case withIdentifiers([String])
+    case inGroupWithIdentifier(String)
+    case inContainerWithID(ContainerID)
 
-    var predicate: NSPredicate {
+    var predicate: Predicate {
         switch self {
-        case .MatchingName(let name):
-            return CNContact.predicateForContactsMatchingName(name)
-        case .WithIdentifiers(let identifiers):
-            return CNContact.predicateForContactsWithIdentifiers(identifiers)
-        case .InGroupWithIdentifier(let identifier):
-            return CNContact.predicateForContactsInGroupWithIdentifier(identifier)
-        case .InContainerWithID(let id):
-            return CNContact.predicateForContactsInContainerWithIdentifier(id.identifier)
+        case .matchingName(let name):
+            return CNContact.predicateForContacts(matchingName: name)
+        case .withIdentifiers(let identifiers):
+            return CNContact.predicateForContacts(withIdentifiers: identifiers)
+        case .inGroupWithIdentifier(let identifier):
+            return CNContact.predicateForContactsInGroup(withIdentifier: identifier)
+        case .inContainerWithID(let id):
+            return CNContact.predicateForContactsInContainer(withIdentifier: id.identifier)
         }
     }
 }
@@ -107,15 +107,15 @@ public enum ContactPredicate {
 
 @available(iOS 9.0, OSX 10.11, *)
 public enum GroupPredicate {
-    case WithIdentifiers([String])
-    case InContainerWithID(ContainerID)
+    case withIdentifiers([String])
+    case inContainerWithID(ContainerID)
 
-    var predicate: NSPredicate {
+    var predicate: Predicate {
         switch self {
-        case .WithIdentifiers(let identifiers):
-            return CNGroup.predicateForGroupsWithIdentifiers(identifiers)
-        case .InContainerWithID(let id):
-            return CNGroup.predicateForGroupsInContainerWithIdentifier(id.identifier)
+        case .withIdentifiers(let identifiers):
+            return CNGroup.predicateForGroups(withIdentifiers: identifiers)
+        case .inContainerWithID(let id):
+            return CNGroup.predicateForGroupsInContainer(withIdentifier: id.identifier)
         }
     }
 }
@@ -126,7 +126,7 @@ public enum GroupPredicate {
 @available(iOS 9.0, OSX 10.11, *)
 extension ContactStoreType {
 
-    public func flatMapAllContactsWithFetchRequest<T>(fetchRequest: CNContactFetchRequest, transform: CNContact -> T?) throws -> [T] {
+    public func flatMapAllContactsWithFetchRequest<T>(_ fetchRequest: CNContactFetchRequest, transform: (CNContact) -> T?) throws -> [T] {
         var result = [T]()
         try opr_enumerateContactsWithFetchRequest(fetchRequest) { contact, _ in
             if let tmp = transform(contact) {
@@ -142,35 +142,35 @@ extension ContactStoreType {
 @available(iOS 9.0, OSX 10.11, *)
 extension CNSaveRequest: ContactSaveRequestType {
 
-    public func opr_addContact(contact: CNMutableContact, toContainerWithIdentifier identifier: String?) {
-        addContact(contact, toContainerWithIdentifier: identifier)
+    public func opr_addContact(_ contact: CNMutableContact, toContainerWithIdentifier identifier: String?) {
+        add(contact, toContainerWithIdentifier: identifier)
     }
 
-    public func opr_updateContact(contact: CNMutableContact) {
-        updateContact(contact)
+    public func opr_updateContact(_ contact: CNMutableContact) {
+        update(contact)
     }
-    public func opr_deleteContact(contact: CNMutableContact) {
-        deleteContact(contact)
-    }
-
-    public func opr_addGroup(group: CNMutableGroup, toContainerWithIdentifier identifier: String?) {
-        addGroup(group, toContainerWithIdentifier: identifier)
+    public func opr_deleteContact(_ contact: CNMutableContact) {
+        delete(contact)
     }
 
-    public func opr_updateGroup(group: CNMutableGroup) {
-        updateGroup(group)
+    public func opr_addGroup(_ group: CNMutableGroup, toContainerWithIdentifier identifier: String?) {
+        add(group, toContainerWithIdentifier: identifier)
     }
 
-    public func opr_deleteGroup(group: CNMutableGroup) {
-        deleteGroup(group)
+    public func opr_updateGroup(_ group: CNMutableGroup) {
+        update(group)
     }
 
-    public func opr_addMember(contact: CNContact, toGroup group: CNGroup) {
-        addMember(contact, toGroup: group)
+    public func opr_deleteGroup(_ group: CNMutableGroup) {
+        delete(group)
     }
 
-    public func opr_removeMember(contact: CNContact, fromGroup group: CNGroup) {
-        removeMember(contact, fromGroup: group)
+    public func opr_addMember(_ contact: CNContact, toGroup group: CNGroup) {
+        addMember(contact, to: group)
+    }
+
+    public func opr_removeMember(_ contact: CNContact, fromGroup group: CNGroup) {
+        removeMember(contact, from: group)
     }
 }
 
@@ -184,40 +184,40 @@ public struct SystemContactStore: ContactStoreType {
         store = CNContactStore()
     }
 
-    public func opr_authorizationStatusForEntityType(entityType: CNEntityType) -> CNAuthorizationStatus {
-        return CNContactStore.authorizationStatusForEntityType(entityType)
+    public func opr_authorizationStatusForEntityType(_ entityType: CNEntityType) -> CNAuthorizationStatus {
+        return CNContactStore.authorizationStatus(for: entityType)
     }
 
-    public func opr_requestAccessForEntityType(entityType: CNEntityType, completion: (Bool, NSError?) -> Void) {
-        store.requestAccessForEntityType(entityType, completionHandler: completion)
+    public func opr_requestAccessForEntityType(_ entityType: CNEntityType, completion: (Bool, NSError?) -> Void) {
+        store.requestAccess(for: entityType, completionHandler: completion)
     }
 
     public func opr_defaultContainerIdentifier() -> String {
         return store.defaultContainerIdentifier()
     }
 
-    public func opr_unifiedContactWithIdentifier(identifier: String, keysToFetch keys: [CNKeyDescriptor]) throws -> CNContact {
-        return try store.unifiedContactWithIdentifier(identifier, keysToFetch: keys)
+    public func opr_unifiedContactWithIdentifier(_ identifier: String, keysToFetch keys: [CNKeyDescriptor]) throws -> CNContact {
+        return try store.unifiedContact(withIdentifier: identifier, keysToFetch: keys)
     }
 
-    public func opr_unifiedContactsMatchingPredicate(predicate: ContactPredicate, keysToFetch keys: [CNKeyDescriptor]) throws -> [CNContact] {
-        return try store.unifiedContactsMatchingPredicate(predicate.predicate, keysToFetch: keys)
+    public func opr_unifiedContactsMatchingPredicate(_ predicate: ContactPredicate, keysToFetch keys: [CNKeyDescriptor]) throws -> [CNContact] {
+        return try store.unifiedContacts(matching: predicate.predicate, keysToFetch: keys)
     }
 
-    public func opr_groupsMatchingPredicate(predicate: GroupPredicate?) throws -> [CNGroup] {
-        return try store.groupsMatchingPredicate(predicate?.predicate)
+    public func opr_groupsMatchingPredicate(_ predicate: GroupPredicate?) throws -> [CNGroup] {
+        return try store.groups(matching: predicate?.predicate)
     }
 
-    public func opr_containersMatchingPredicate(predicate: ContainerPredicate?) throws -> [CNContainer] {
-        return try store.containersMatchingPredicate(predicate?.predicate)
+    public func opr_containersMatchingPredicate(_ predicate: ContainerPredicate?) throws -> [CNContainer] {
+        return try store.containers(matching: predicate?.predicate)
     }
 
-    public func opr_enumerateContactsWithFetchRequest(fetchRequest: CNContactFetchRequest, usingBlock block: (CNContact, UnsafeMutablePointer<ObjCBool>) -> Void) throws {
-        try store.enumerateContactsWithFetchRequest(fetchRequest, usingBlock: block)
+    public func opr_enumerateContactsWithFetchRequest(_ fetchRequest: CNContactFetchRequest, usingBlock block: (CNContact, UnsafeMutablePointer<ObjCBool>) -> Void) throws {
+        try store.enumerateContacts(with: fetchRequest, usingBlock: block)
     }
 
-    public func opr_executeSaveRequest(saveRequest: CNSaveRequest) throws {
-        try store.executeSaveRequest(saveRequest)
+    public func opr_executeSaveRequest(_ saveRequest: CNSaveRequest) throws {
+        try store.execute(saveRequest)
     }
 }
 
@@ -228,7 +228,7 @@ public struct SystemContactStore: ContactStoreType {
 extension ContainerID: CustomStringConvertible {
     public var description: String {
         switch self {
-        case .Default: return "Default Identifier"
+        case .default: return "Default Identifier"
         case .Identifier(let id): return id
         }
     }
@@ -244,7 +244,7 @@ extension ContainerID: Hashable {
 @available(iOS 9.0, OSX 10.11, *)
 public func == (lhs: ContainerID, rhs: ContainerID) -> Bool {
     switch (lhs, rhs) {
-    case (.Default, .Default):
+    case (.default, .default):
         return true
     case let (.Identifier(aId), .Identifier(bId)):
         return aId == bId
@@ -257,11 +257,11 @@ public func == (lhs: ContainerID, rhs: ContainerID) -> Bool {
 extension ContainerPredicate: CustomStringConvertible {
     public var description: String {
         switch self {
-        case let .WithIdentifiers(identifiers):
+        case let .withIdentifiers(identifiers):
             return "Container with identifiers: \(identifiers)"
-        case let .OfContactWithIdentifier(contactId):
+        case let .ofContactWithIdentifier(contactId):
             return "Container with contact id: \(contactId)"
-        case let .OfGroupWithIdentifier(groupId):
+        case let .ofGroupWithIdentifier(groupId):
             return "Container with group id: \(groupId)"
         }
     }
@@ -277,11 +277,11 @@ extension ContainerPredicate: Hashable {
 @available(iOS 9.0, OSX 10.11, *)
 public func == (lhs: ContainerPredicate, rhs: ContainerPredicate) -> Bool {
     switch (lhs, rhs) {
-    case let (.WithIdentifiers(aIds), .WithIdentifiers(bIds)):
+    case let (.withIdentifiers(aIds), .withIdentifiers(bIds)):
         return aIds == bIds
-    case let (.OfContactWithIdentifier(aId), .OfContactWithIdentifier(bId)):
+    case let (.ofContactWithIdentifier(aId), .ofContactWithIdentifier(bId)):
         return aId == bId
-    case let (.OfGroupWithIdentifier(aId), .OfGroupWithIdentifier(bId)):
+    case let (.ofGroupWithIdentifier(aId), .ofGroupWithIdentifier(bId)):
         return aId == bId
     default:
         return false
@@ -292,10 +292,10 @@ public func == (lhs: ContainerPredicate, rhs: ContainerPredicate) -> Bool {
 extension GroupPredicate: CustomStringConvertible {
     public var description: String {
         switch self {
-        case let .WithIdentifiers(groupIds):
-            let tmp = groupIds.joinWithSeparator(", ")
+        case let .withIdentifiers(groupIds):
+            let tmp = groupIds.joined(separator: ", ")
             return "groups with identifiers: \(tmp)"
-        case let .InContainerWithID(containerId):
+        case let .inContainerWithID(containerId):
             return "groups in container with id: \(containerId.description)"
         }
     }
@@ -311,9 +311,9 @@ extension GroupPredicate: Hashable {
 @available(iOS 9.0, OSX 10.11, *)
 public func == (lhs: GroupPredicate, rhs: GroupPredicate) -> Bool {
     switch (lhs, rhs) {
-    case let (.WithIdentifiers(aIds), .WithIdentifiers(bIds)):
+    case let (.withIdentifiers(aIds), .withIdentifiers(bIds)):
         return aIds == bIds
-    case let (.InContainerWithID(aId), .InContainerWithID(bId)):
+    case let (.inContainerWithID(aId), .inContainerWithID(bId)):
         return aId == bId
     default:
         return false
@@ -324,14 +324,14 @@ public func == (lhs: GroupPredicate, rhs: GroupPredicate) -> Bool {
 extension ContactPredicate: CustomStringConvertible {
     public var description: String {
         switch self {
-        case .WithIdentifiers(let identifiers):
-            let tmp = identifiers.joinWithSeparator(", ")
+        case .withIdentifiers(let identifiers):
+            let tmp = identifiers.joined(separator: ", ")
             return "contacts with identifiers: \(tmp)"
-        case .MatchingName(let name):
+        case .matchingName(let name):
             return "contacts matching name: \(name)"
-        case .InContainerWithID(let containerId):
+        case .inContainerWithID(let containerId):
             return "contacts in container with id: \(containerId)"
-        case .InGroupWithIdentifier(let groupId):
+        case .inGroupWithIdentifier(let groupId):
             return "contacts in group with id: \(groupId)"
         }
     }
@@ -347,13 +347,13 @@ extension ContactPredicate: Hashable {
 @available(iOS 9.0, OSX 10.11, *)
 public func == (lhs: ContactPredicate, rhs: ContactPredicate) -> Bool {
     switch (lhs, rhs) {
-    case let (.WithIdentifiers(aIds), .WithIdentifiers(bIds)):
+    case let (.withIdentifiers(aIds), .withIdentifiers(bIds)):
         return aIds == bIds
-    case let (.MatchingName(aName), .MatchingName(bName)):
+    case let (.matchingName(aName), .matchingName(bName)):
         return aName == bName
-    case let (.InContainerWithID(aId), .InContainerWithID(bId)):
+    case let (.inContainerWithID(aId), .inContainerWithID(bId)):
         return aId == bId
-    case let (.InGroupWithIdentifier(aId), .InGroupWithIdentifier(bId)):
+    case let (.inGroupWithIdentifier(aId), .inGroupWithIdentifier(bId)):
         return aId == bId
     default:
         return false

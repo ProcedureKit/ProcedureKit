@@ -11,9 +11,9 @@ import CloudKit
 
 // MARK: - OPRCKOperation
 
-public class OPRCKOperation<T where T: NSOperation, T: CKOperationType>: ComposedOperation<T> {
+public class OPRCKOperation<T where T: Operation, T: CKOperationType>: ComposedOperation<T> {
 
-    init(operation composed: T, timeout: NSTimeInterval? = 300) {
+    init(operation composed: T, timeout: TimeInterval? = 300) {
         super.init(operation: composed)
         name = "OPRCKOperation<\(T.self)>"
         if let observer = timeout.map({ TimeoutObserver(timeout: $0) }) {
@@ -24,10 +24,10 @@ public class OPRCKOperation<T where T: NSOperation, T: CKOperationType>: Compose
 
 // MARK: - Cloud Kit Error Recovery
 
-public class CloudKitRecovery<T where T: NSOperation, T: CKOperationType, T: AssociatedErrorType, T.Error: CloudKitErrorType> {
+public class CloudKitRecovery<T where T: Operation, T: CKOperationType, T: AssociatedErrorType, T.Error: CloudKitErrorType> {
     public typealias V = OPRCKOperation<T>
 
-    public typealias ErrorResponse = (delay: Delay?, configure: V -> Void)
+    public typealias ErrorResponse = (delay: Delay?, configure: (V) -> Void)
     public typealias Handler = (error: T.Error, log: LoggerType, suggested: ErrorResponse) -> ErrorResponse?
 
     typealias Payload = (Delay?, V)
@@ -41,13 +41,13 @@ public class CloudKitRecovery<T where T: NSOperation, T: CKOperationType, T: Ass
         addDefaultHandlers()
     }
 
-    internal func recoverWithInfo(info: RetryFailureInfo<V>, payload: Payload) -> ErrorResponse? {
+    internal func recoverWithInfo(_ info: RetryFailureInfo<V>, payload: Payload) -> ErrorResponse? {
 
-        guard let (code, error) = cloudKitErrorsFromInfo(info) else { return .None }
+        guard let (code, error) = cloudKitErrorsFromInfo(info) else { return .none }
 
         // We take the payload, if not nil, and return the delay, and configuration block
         let suggestion: ErrorResponse = (payload.0, info.configure )
-        var response: ErrorResponse? = .None
+        var response: ErrorResponse? = .none
 
         response = defaultHandlers[code]?(error: error, log: info.log, suggested: suggestion)
         response = customHandlers[code]?(error: error, log: info.log, suggested: response ?? suggestion)
@@ -61,47 +61,47 @@ public class CloudKitRecovery<T where T: NSOperation, T: CKOperationType, T: Ass
 
         let exit: Handler = { error, log, _ in
             log.fatal("Exiting due to CloudKit Error: \(error)")
-            return .None
+            return .none
         }
 
-        setDefaultHandlerForCode(.InternalError, handler: exit)
-        setDefaultHandlerForCode(.MissingEntitlement, handler: exit)
-        setDefaultHandlerForCode(.InvalidArguments, handler: exit)
-        setDefaultHandlerForCode(.ServerRejectedRequest, handler: exit)
-        setDefaultHandlerForCode(.AssetFileNotFound, handler: exit)
-        setDefaultHandlerForCode(.IncompatibleVersion, handler: exit)
-        setDefaultHandlerForCode(.ConstraintViolation, handler: exit)
-        setDefaultHandlerForCode(.BadDatabase, handler: exit)
-        setDefaultHandlerForCode(.QuotaExceeded, handler: exit)
-        setDefaultHandlerForCode(.OperationCancelled, handler: exit)
+        setDefaultHandlerForCode(.internalError, handler: exit)
+        setDefaultHandlerForCode(.missingEntitlement, handler: exit)
+        setDefaultHandlerForCode(.invalidArguments, handler: exit)
+        setDefaultHandlerForCode(.serverRejectedRequest, handler: exit)
+        setDefaultHandlerForCode(.assetFileNotFound, handler: exit)
+        setDefaultHandlerForCode(.incompatibleVersion, handler: exit)
+        setDefaultHandlerForCode(.constraintViolation, handler: exit)
+        setDefaultHandlerForCode(.badDatabase, handler: exit)
+        setDefaultHandlerForCode(.quotaExceeded, handler: exit)
+        setDefaultHandlerForCode(.operationCancelled, handler: exit)
 
         let retry: Handler = { error, log, suggestion in
             return error.retryAfterDelay.map { ($0, suggestion.configure) } ?? suggestion
         }
 
-        setDefaultHandlerForCode(.NetworkUnavailable, handler: retry)
-        setDefaultHandlerForCode(.NetworkFailure, handler: retry)
-        setDefaultHandlerForCode(.ServiceUnavailable, handler: retry)
-        setDefaultHandlerForCode(.RequestRateLimited, handler: retry)
-        setDefaultHandlerForCode(.AssetFileModified, handler: retry)
-        setDefaultHandlerForCode(.BatchRequestFailed, handler: retry)
-        setDefaultHandlerForCode(.ZoneBusy, handler: retry)
+        setDefaultHandlerForCode(.networkUnavailable, handler: retry)
+        setDefaultHandlerForCode(.networkFailure, handler: retry)
+        setDefaultHandlerForCode(.serviceUnavailable, handler: retry)
+        setDefaultHandlerForCode(.requestRateLimited, handler: retry)
+        setDefaultHandlerForCode(.assetFileModified, handler: retry)
+        setDefaultHandlerForCode(.batchRequestFailed, handler: retry)
+        setDefaultHandlerForCode(.zoneBusy, handler: retry)
     }
 
-    func setDefaultHandlerForCode(code: CKErrorCode, handler: Handler) {
+    func setDefaultHandlerForCode(_ code: CKErrorCode, handler: Handler) {
         defaultHandlers.updateValue(handler, forKey: code)
     }
 
-    func setCustomHandlerForCode(code: CKErrorCode, handler: Handler) {
+    func setCustomHandlerForCode(_ code: CKErrorCode, handler: Handler) {
         customHandlers.updateValue(handler, forKey: code)
     }
 
-    internal func cloudKitErrorsFromInfo(info: RetryFailureInfo<OPRCKOperation<T>>) -> (code: CKErrorCode, error: T.Error)? {
+    internal func cloudKitErrorsFromInfo(_ info: RetryFailureInfo<OPRCKOperation<T>>) -> (code: CKErrorCode, error: T.Error)? {
         let mapped: [(CKErrorCode, T.Error)] = info.errors.flatMap { error in
             if let cloudKitError = error as? T.Error, code = cloudKitError.code {
                 return (code, cloudKitError)
             }
-            return .None
+            return .none
         }
         return mapped.first
     }
@@ -206,7 +206,7 @@ Note, that for the automatic error handling to kick in, the happy path must be s
  could be modified before being returned. Alternatively, return nil to not retry.
 
 */
-public final class CloudKitOperation<T where T: NSOperation, T: CKOperationType, T: AssociatedErrorType, T.Error: CloudKitErrorType>: RetryOperation<OPRCKOperation<T>> {
+public final class CloudKitOperation<T where T: Operation, T: CKOperationType, T: AssociatedErrorType, T.Error: CloudKitErrorType>: RetryOperation<OPRCKOperation<T>> {
 
     public typealias ErrorHandler = CloudKitRecovery<T>.Handler
 
@@ -217,14 +217,14 @@ public final class CloudKitOperation<T where T: NSOperation, T: CKOperationType,
     }
 
     public convenience init(_ body: () -> T?) {
-        self.init(generator: AnyGenerator(body: body))
+        self.init(generator: AnyIterator(body))
     }
 
-    init<G where G: GeneratorType, G.Element == T>(timeout: NSTimeInterval? = 300, generator gen: G) {
+    init<G where G: IteratorProtocol, G.Element == T>(timeout: TimeInterval? = 300, generator gen: G) {
 
         // Creates a standard random delay between retries
-        let strategy: WaitStrategy = .Random((0.1, 1.0))
-        let delay = MapGenerator(strategy.generator()) { Delay.By($0) }
+        let strategy: WaitStrategy = .random((0.1, 1.0))
+        let delay = MapGenerator(strategy.generator()) { Delay.by($0) }
 
         // Maps the generator to wrap the target operation.
         let generator = MapGenerator(gen) { operation -> OPRCKOperation<T> in
@@ -236,7 +236,7 @@ public final class CloudKitOperation<T where T: NSOperation, T: CKOperationType,
 
         // Creates a Retry Handler using the recovery object
         let handler: Handler = { [weak _recovery] info, payload in
-            guard let _recovery = _recovery, (delay, configure) = _recovery.recoverWithInfo(info, payload: payload) else { return .None }
+            guard let _recovery = _recovery, (delay, configure) = _recovery.recoverWithInfo(info, payload: payload) else { return .none }
             let (_, operation) = payload
             configure(operation)
             return (delay, operation)
@@ -247,11 +247,11 @@ public final class CloudKitOperation<T where T: NSOperation, T: CKOperationType,
         name = "CloudKitOperation<\(T.self)>"
     }
 
-    public func setErrorHandlerForCode(code: CKErrorCode, handler: ErrorHandler) {
+    public func setErrorHandlerForCode(_ code: CKErrorCode, handler: ErrorHandler) {
         recovery.setCustomHandlerForCode(code, handler: handler)
     }
 
-    override func childOperation(child: NSOperation, didFinishWithErrors errors: [ErrorType]) {
+    override func childOperation(_ child: Foundation.Operation, didFinishWithErrors errors: [ErrorProtocol]) {
         if !(child is OPRCKOperation<T>) {
             super.childOperation(child, didFinishWithErrors: errors)
         }
@@ -260,29 +260,29 @@ public final class CloudKitOperation<T where T: NSOperation, T: CKOperationType,
 
 // MARK: - BatchedCloudKitOperation
 
-class CloudKitOperationGenerator<T where T: NSOperation, T: CKOperationType, T: AssociatedErrorType, T.Error: CloudKitErrorType>: GeneratorType {
+class CloudKitOperationGenerator<T where T: Operation, T: CKOperationType, T: AssociatedErrorType, T.Error: CloudKitErrorType>: IteratorProtocol {
 
     let recovery: CloudKitRecovery<T>
 
-    var timeout: NSTimeInterval?
-    var generator: AnyGenerator<T>
+    var timeout: TimeInterval?
+    var generator: AnyIterator<T>
     var more: Bool = true
 
-    init<G where G: GeneratorType, G.Element == T>(timeout: NSTimeInterval? = 300, generator: G) {
+    init<G where G: IteratorProtocol, G.Element == T>(timeout: TimeInterval? = 300, generator: G) {
         self.timeout = timeout
-        self.generator = AnyGenerator(generator)
+        self.generator = AnyIterator(generator)
         self.recovery = CloudKitRecovery<T>()
     }
 
     func next() -> CloudKitOperation<T>? {
-        guard more else { return .None }
+        guard more else { return .none }
         let operation = CloudKitOperation(timeout: timeout, generator: generator)
         operation.recovery = recovery
         return operation
     }
 }
 
-public class BatchedCloudKitOperation<T where T: NSOperation, T: CKBatchedOperationType, T: AssociatedErrorType, T.Error: CloudKitErrorType>: RepeatedOperation<CloudKitOperation<T>> {
+public class BatchedCloudKitOperation<T where T: Operation, T: CKBatchedOperationType, T: AssociatedErrorType, T.Error: CloudKitErrorType>: RepeatedOperation<CloudKitOperation<T>> {
 
     public var enableBatchProcessing: Bool
     var generator: CloudKitOperationGenerator<T>
@@ -292,30 +292,30 @@ public class BatchedCloudKitOperation<T where T: NSOperation, T: CKBatchedOperat
     }
 
     public convenience init(enableBatchProcessing enable: Bool = true, _ body: () -> T?) {
-        self.init(generator: AnyGenerator(body: body), enableBatchProcessing: enable)
+        self.init(generator: AnyIterator(body), enableBatchProcessing: enable)
     }
 
-    init<G where G: GeneratorType, G.Element == T>(timeout: NSTimeInterval? = 300, generator gen: G, enableBatchProcessing enable: Bool = true) {
+    init<G where G: IteratorProtocol, G.Element == T>(timeout: TimeInterval? = 300, generator gen: G, enableBatchProcessing enable: Bool = true) {
 
         enableBatchProcessing = enable
         generator = CloudKitOperationGenerator(timeout: timeout, generator: gen)
 
         // Creates a standard fixed delay between batches (not reties)
-        let strategy: WaitStrategy = .Fixed(0.1)
-        let delay = MapGenerator(strategy.generator()) { Delay.By($0) }
+        let strategy: WaitStrategy = .fixed(0.1)
+        let delay = MapGenerator(strategy.generator()) { Delay.by($0) }
         let tuple = TupleGenerator(primary: generator, secondary: delay)
 
-        super.init(generator: AnyGenerator(tuple))
+        super.init(generator: AnyIterator(tuple))
     }
 
-    public override func willFinishOperation(operation: NSOperation, withErrors errors: [ErrorType]) {
+    public override func willFinishOperation(_ operation: Foundation.Operation, withErrors errors: [ErrorProtocol]) {
         if errors.isEmpty, let cloudKitOperation = operation as? CloudKitOperation<T> {
             generator.more = enableBatchProcessing && cloudKitOperation.current.moreComing
         }
         super.willFinishOperation(operation, withErrors: errors)
     }
 
-    public func setErrorHandlerForCode(code: CKErrorCode, handler: CloudKitOperation<T>.ErrorHandler) {
+    public func setErrorHandlerForCode(_ code: CKErrorCode, handler: CloudKitOperation<T>.ErrorHandler) {
         generator.recovery.setCustomHandlerForCode(code, handler: handler)
     }
 }

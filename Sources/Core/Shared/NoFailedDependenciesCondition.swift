@@ -16,13 +16,13 @@ the target operation will be fail.
 public class NoFailedDependenciesCondition: Condition {
 
     /// The `ErrorType` returned to indicate the condition failed.
-    public enum Error: ErrorType, Equatable {
+    public enum Error: ErrorProtocol, Equatable {
 
         /// When some dependencies were cancelled
-        case CancelledDependencies
+        case cancelledDependencies
 
         /// When some dependencies failed with errors
-        case FailedDependencies
+        case failedDependencies
     }
 
     /// Initializer which takes no parameters.
@@ -45,10 +45,10 @@ public class NoFailedDependenciesCondition: Condition {
     - parameter operation: the `Operation` which the condition is attached to.
     - parameter completion: the completion block which receives a `OperationConditionResult`.
     */
-    public override func evaluate(operation: Operation, completion: CompletionBlockType) {
+    public override func evaluate(_ operation: Operation, completion: CompletionBlockType) {
         let dependencies = operation.dependencies
 
-        let cancelled = dependencies.filter { $0.cancelled }
+        let cancelled = dependencies.filter { $0.isCancelled }
         let failures = dependencies.filter {
             if let operation = $0 as? Operation {
                 return operation.failed
@@ -57,13 +57,13 @@ public class NoFailedDependenciesCondition: Condition {
         }
 
         if !cancelled.isEmpty {
-            completion(.Failed(Error.CancelledDependencies))
+            completion(.failed(Error.cancelledDependencies))
         }
         else if !failures.isEmpty {
-            completion(.Failed(Error.FailedDependencies))
+            completion(.failed(Error.failedDependencies))
         }
         else {
-            completion(.Satisfied)
+            completion(.satisfied)
         }
     }
 }
@@ -71,7 +71,7 @@ public class NoFailedDependenciesCondition: Condition {
 /// Equatable conformance for `NoFailedDependenciesCondition.Error`
 public func == (lhs: NoFailedDependenciesCondition.Error, rhs: NoFailedDependenciesCondition.Error) -> Bool {
     switch (lhs, rhs) {
-    case (.CancelledDependencies, .CancelledDependencies), (.FailedDependencies, .FailedDependencies):
+    case (.cancelledDependencies, .cancelledDependencies), (.failedDependencies, .failedDependencies):
         return true
     default:
         return false

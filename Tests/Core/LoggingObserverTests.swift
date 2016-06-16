@@ -9,8 +9,8 @@
 import XCTest
 @testable import Operations
 
-@available(iOS, deprecated=9, message="Use the log property of Operation directly.")
-@available(OSX, deprecated=10.11, message="Use the log property of Operation directly.")
+@available(iOS, deprecated:9, message:"Use the log property of Operation directly.")
+@available(OSX, deprecated:10.11, message:"Use the log property of Operation directly.")
 class LoggingObserverTests: OperationTests {
 
     var operation: TestOperation!
@@ -29,7 +29,7 @@ class LoggingObserverTests: OperationTests {
         receivedMessages.removeAll()
     }
 
-    func configureOperation(op: TestOperation) {
+    func configureOperation(_ op: TestOperation) {
         operation = op
         operation.name = "Test Logging Operation"
         observer = LoggingObserver { [unowned self] message in
@@ -39,26 +39,26 @@ class LoggingObserverTests: OperationTests {
     }
 }
 
-@available(iOS, deprecated=9, message="Use the log property of Operation directly.")
-@available(OSX, deprecated=10.11, message="Use the log property of Operation directly.")
+@available(iOS, deprecated:9, message:"Use the log property of Operation directly.")
+@available(OSX, deprecated:10.11, message:"Use the log property of Operation directly.")
 class LoggingObserverWithError: LoggingObserverTests {
 
     override func setUp() {
         super.setUp()
-        configureOperation(TestOperation(error: BlockCondition.Error.BlockConditionFailed))
+        configureOperation(TestOperation(error: BlockCondition.Error.blockConditionFailed))
     }
 
     func test__logger_outputs_number_of_received_errors() {
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectation(withDescription: "Test: \(#function)"))
         runOperation(operation)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForExpectations(withTimeout: 3, handler: nil)
         XCTAssertTrue(receivedMessages.contains("Test Logging Operation: did finish with error(s): [Operations.ConditionError.BlockConditionFailed]."), "log message: \(receivedMessages)")
     }
 }
 
-@available(iOS, deprecated=9, message="Use the log property of Operation directly.")
-@available(OSX, deprecated=10.11, message="Use the log property of Operation directly.")
+@available(iOS, deprecated:9, message:"Use the log property of Operation directly.")
+@available(OSX, deprecated:10.11, message:"Use the log property of Operation directly.")
 class LoggingObserverWithCancellation: LoggingObserverTests {
 
     override func setUp() {
@@ -68,16 +68,16 @@ class LoggingObserverWithCancellation: LoggingObserverTests {
 
     func test__logger_outputs_cancellation() {
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectation(withDescription: "Test: \(#function)"))
         runOperation(operation)
         operation.cancel()
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForExpectations(withTimeout: 3, handler: nil)
         XCTAssertTrue(receivedMessages.contains("Test Logging Operation: did cancel."))
     }
 }
 
-@available(iOS, deprecated=9, message="Use the log property of Operation directly.")
-@available(OSX, deprecated=10.11, message="Use the log property of Operation directly.")
+@available(iOS, deprecated:9, message:"Use the log property of Operation directly.")
+@available(OSX, deprecated:10.11, message:"Use the log property of Operation directly.")
 class LoggingObserverWithProduce: LoggingObserverTests {
 
     override func setUp() {
@@ -87,9 +87,9 @@ class LoggingObserverWithProduce: LoggingObserverTests {
 
     func test__logger_outputs_cancellation() {
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectation(withDescription: "Test: \(#function)"))
         runOperation(operation)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForExpectations(withTimeout: 3, handler: nil)
         XCTAssertTrue(receivedMessages.contains("Test Logging Operation: did produce operation: Test Operation."))
     }
 }

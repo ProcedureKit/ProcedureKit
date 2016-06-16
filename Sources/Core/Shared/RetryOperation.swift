@@ -12,7 +12,7 @@ import Foundation
 public protocol AssociatedErrorType {
 
     /// The type of associated error
-    associatedtype Error: ErrorType
+    associatedtype Error: ErrorProtocol
 }
 
 /**
@@ -21,16 +21,16 @@ public protocol AssociatedErrorType {
  NSOperation which it is generic over. It is used
  in conjunction with RetryOperation.
 */
-public struct RetryFailureInfo<T: NSOperation> {
+public struct RetryFailureInfo<T: Operation> {
 
     /// - returns: the failed operation
     public let operation: T
 
     /// - returns: the errors the operation finished with.
-    public let errors: [ErrorType]
+    public let errors: [ErrorProtocol]
 
     /// - returns: all the aggregate errors of previous attempts
-    public let aggregateErrors: [ErrorType]
+    public let aggregateErrors: [ErrorProtocol]
 
     /// - returns: the number of attempts made so far
     public let count: Int
@@ -45,7 +45,7 @@ public struct RetryFailureInfo<T: NSOperation> {
 
      - returns: a block which accects var arg NSOperation instances.
     */
-    public let addOperations: (NSOperation...) -> Void
+    public let addOperations: (Foundation.Operation...) -> Void
 
     /// - returns: the `RetryOperation`'s log property.
     public let log: LoggerType
@@ -55,18 +55,18 @@ public struct RetryFailureInfo<T: NSOperation> {
         operation instances before they are added to
         the queue
     */
-    public let configure: T -> Void
+    public let configure: (T) -> Void
 }
 
-class RetryGenerator<T: NSOperation>: GeneratorType {
+class RetryGenerator<T: Operation>: IteratorProtocol {
     typealias Payload = RetryOperation<T>.Payload
     typealias Handler = RetryOperation<T>.Handler
 
     internal let retry: Handler
-    internal var info: RetryFailureInfo<T>? = .None
-    private var generator: AnyGenerator<(Delay?, T)>
+    internal var info: RetryFailureInfo<T>? = .none
+    private var generator: AnyIterator<(Delay?, T)>
 
-    init(generator: AnyGenerator<Payload>, retry: Handler) {
+    init(generator: AnyIterator<Payload>, retry: Handler) {
         self.generator = generator
         self.retry = retry
     }
@@ -92,7 +92,7 @@ class RetryGenerator<T: NSOperation>: GeneratorType {
  Therefore consumers can inspect the failure info, and adjust the Delay, or
  operation before returning it. To finish, the block can return .None
 */
-public class RetryOperation<T: NSOperation>: RepeatedOperation<T> {
+public class RetryOperation<T: Operation>: RepeatedOperation<T> {
     public typealias FailureInfo = RetryFailureInfo<T>
     public typealias Handler = (RetryFailureInfo<T>, Payload) -> Payload?
 
@@ -111,9 +111,9 @@ public class RetryOperation<T: NSOperation>: RepeatedOperation<T> {
      adjust the next delay and Operation.
 
     */
-    public init(maxCount max: Int? = .None, generator: AnyGenerator<Payload>, retry block: Handler) {
+    public init(maxCount max: Int? = .none, generator: AnyIterator<Payload>, retry block: Handler) {
         retry = RetryGenerator(generator: generator, retry: block)
-        super.init(maxCount: max, generator: AnyGenerator(retry))
+        super.init(maxCount: max, generator: AnyIterator(retry))
         name = "Retry Operation <\(T.self)>"
     }
 
@@ -129,10 +129,10 @@ public class RetryOperation<T: NSOperation>: RepeatedOperation<T> {
      adjust the next delay and Operation.
 
      */
-    public init<D, G where D: GeneratorType, D.Element == Delay, G: GeneratorType, G.Element == T>(maxCount max: Int? = .None, delay: D, generator: G, retry block: Handler) {
+    public init<D, G where D: IteratorProtocol, D.Element == Delay, G: IteratorProtocol, G.Element == T>(maxCount max: Int? = .none, delay: D, generator: G, retry block: Handler) {
         let tuple = TupleGenerator(primary: generator, secondary: delay)
-        retry = RetryGenerator(generator: AnyGenerator(tuple), retry: block)
-        super.init(maxCount: max, generator: AnyGenerator(retry))
+        retry = RetryGenerator(generator: AnyIterator(tuple), retry: block)
+        super.init(maxCount: max, generator: AnyIterator(retry))
         name = "Retry Operation <\(T.self)>"
     }
 
@@ -169,17 +169,17 @@ public class RetryOperation<T: NSOperation>: RepeatedOperation<T> {
      operation regardless of error info.
 
      */
-    public init<G where G: GeneratorType, G.Element == T>(maxCount max: Int? = 5, strategy: WaitStrategy = .Fixed(0.1), _ generator: G, retry block: Handler = { $1 }) {
-        let delay = MapGenerator(strategy.generator()) { Delay.By($0) }
+    public init<G where G: IteratorProtocol, G.Element == T>(maxCount max: Int? = 5, strategy: WaitStrategy = .fixed(0.1), _ generator: G, retry block: Handler = { $1 }) {
+        let delay = MapGenerator(strategy.generator()) { Delay.by($0) }
         let tuple = TupleGenerator(primary: generator, secondary: delay)
-        retry = RetryGenerator(generator: AnyGenerator(tuple), retry: block)
-        super.init(maxCount: max, generator: AnyGenerator(retry))
+        retry = RetryGenerator(generator: AnyIterator(tuple), retry: block)
+        super.init(maxCount: max, generator: AnyIterator(retry))
         name = "Retry Operation <\(T.self)>"
     }
 
-    public override func willFinishOperation(operation: NSOperation, withErrors errors: [ErrorType]) {
+    public override func willFinishOperation(_ operation: Foundation.Operation, withErrors errors: [ErrorProtocol]) {
         if errors.isEmpty {
-            retry.info = .None
+            retry.info = .none
         }
         else if let op = operation as? T {
             retry.info = createFailureInfo(op, errors: errors)
@@ -187,7 +187,7 @@ public class RetryOperation<T: NSOperation>: RepeatedOperation<T> {
         }
     }
 
-    internal func createFailureInfo(operation: T, errors: [ErrorType]) -> RetryFailureInfo<T> {
+    internal func createFailureInfo(_ operation: T, errors: [ErrorProtocol]) -> RetryFailureInfo<T> {
         return RetryFailureInfo(
             operation: operation,
             errors: errors,

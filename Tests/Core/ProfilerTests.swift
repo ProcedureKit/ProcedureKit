@@ -10,9 +10,9 @@ import XCTest
 @testable import Operations
 
 class TestableProfileReporter: OperationProfilerReporter {
-    var didProfileResult: ProfileResult? = .None
+    var didProfileResult: ProfileResult? = .none
 
-    func finishedProfilingWithResult(result: ProfileResult) {
+    func finishedProfilingWithResult(_ result: ProfileResult) {
         didProfileResult = result
     }
 }
@@ -26,9 +26,9 @@ class PendingValueTests: XCTestCase {
 
 class PendingResultTests: XCTestCase {
 
-    let created = CFAbsoluteTimeGetCurrent() as NSTimeInterval
-    var elapsed: NSTimeInterval!
-    var now: NSTimeInterval!
+    let created = CFAbsoluteTimeGetCurrent() as TimeInterval
+    var elapsed: TimeInterval!
+    var now: TimeInterval!
     var child: ProfileResult!
     var identity: OperationIdentity!
     var result: PendingResult!
@@ -37,8 +37,8 @@ class PendingResultTests: XCTestCase {
         super.setUp()
         elapsed = 10.0
         now = created + 10.0
-        child = ProfileResult(identity: OperationIdentity(identifier: "Child", name: .None), created: 0, attached: 1, started: 2, cancelled: .None, finished: 3, children: [])
-        identity = OperationIdentity(identifier: "Hello World", name: .None)
+        child = ProfileResult(identity: OperationIdentity(identifier: "Child", name: .none), created: 0, attached: 1, started: 2, cancelled: .none, finished: 3, children: [])
+        identity = OperationIdentity(identifier: "Hello World", name: .none)
         result = PendingResult(created: created, identity: .Pending, attached: .Pending, started: .Pending, cancelled: .Pending, finished: .Pending, children: [])
     }
 
@@ -69,7 +69,7 @@ class PendingResultTests: XCTestCase {
     }
 
     func test__set_identity__when_already_set() {
-        result = result.setIdentity(identity).setIdentity(OperationIdentity(identifier: "Goodbye!", name: .None))
+        result = result.setIdentity(identity).setIdentity(OperationIdentity(identifier: "Goodbye!", name: .none))
         XCTAssertEqual(result.identity.value?.identifier, "Hello World")
     }
 
@@ -80,7 +80,7 @@ class PendingResultTests: XCTestCase {
 
     func test__attach__when_already_set() {
         result = result.attach()
-        XCTAssertNotEqual(result.attached, PendingValue<NSTimeInterval>.Pending)
+        XCTAssertNotEqual(result.attached, PendingValue<TimeInterval>.Pending)
         XCTAssertEqual(result.attached, result.attach(0.0).attached)
     }
 
@@ -91,7 +91,7 @@ class PendingResultTests: XCTestCase {
 
     func test__start__when_already_set() {
         result = result.start()
-        XCTAssertNotEqual(result.started, PendingValue<NSTimeInterval>.Pending)
+        XCTAssertNotEqual(result.started, PendingValue<TimeInterval>.Pending)
         XCTAssertEqual(result.started, result.start(0.0).started)
     }
 
@@ -102,7 +102,7 @@ class PendingResultTests: XCTestCase {
 
     func test__cancel__when_already_set() {
         result = result.cancel()
-        XCTAssertNotEqual(result.cancelled, PendingValue<NSTimeInterval>.Pending)
+        XCTAssertNotEqual(result.cancelled, PendingValue<TimeInterval>.Pending)
         XCTAssertEqual(result.cancelled, result.cancel(0.0).cancelled)
     }
 
@@ -113,7 +113,7 @@ class PendingResultTests: XCTestCase {
 
     func test__finish__when_already_set() {
         result = result.finish()
-        XCTAssertNotEqual(result.finished, PendingValue<NSTimeInterval>.Pending)
+        XCTAssertNotEqual(result.finished, PendingValue<TimeInterval>.Pending)
         XCTAssertEqual(result.finished, result.finish(0.0).finished)
     }
 
@@ -146,13 +146,13 @@ class PendingResultTests: XCTestCase {
 
 class OperationProfilerTests: OperationTests {
 
-    var now: NSTimeInterval!
+    var now: TimeInterval!
     var reporter: TestableProfileReporter!
     var profiler: OperationProfiler!
 
     override func setUp() {
         super.setUp()
-        now = CFAbsoluteTimeGetCurrent() as NSTimeInterval
+        now = CFAbsoluteTimeGetCurrent() as TimeInterval
         reporter = TestableProfileReporter()
         profiler = OperationProfiler(reporter)
     }
@@ -163,7 +163,7 @@ class OperationProfilerTests: OperationTests {
         super.tearDown()
     }
 
-    func validateProfileResult(result: ProfileResult, after: NSTimeInterval) {
+    func validateProfileResult(_ result: ProfileResult, after: TimeInterval) {
         XCTAssertGreaterThanOrEqual(result.created, after)
         XCTAssertGreaterThan(result.attached, 0)
         XCTAssertGreaterThanOrEqual(result.started, result.attached)
@@ -185,7 +185,7 @@ class OperationProfilerTests: OperationTests {
 
         addCompletionBlockToTestOperation(operation)
         runOperation(operation)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForExpectations(withTimeout: 3, handler: nil)
 
         guard let result = reporter.didProfileResult else {
             XCTFail("Reporter did not receive profile result."); return
@@ -204,7 +204,7 @@ class OperationProfilerTests: OperationTests {
 
         addCompletionBlockToTestOperation(operation)
         runOperation(operation)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForExpectations(withTimeout: 3, handler: nil)
 
         guard let result = reporter.didProfileResult else {
             XCTFail("Reporter did not receive profile result."); return
@@ -225,7 +225,7 @@ class OperationProfilerTests: OperationTests {
         operation.addObserver(profiler)
 
         runOperation(operation)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForExpectations(withTimeout: 3, handler: nil)
 
         guard let result = reporter.didProfileResult else {
             XCTFail("Reporter did not receive profile result."); return
@@ -245,7 +245,7 @@ class OperationProfilerTests: OperationTests {
 
         operation.addObserver(profiler)
         runOperation(operation)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForExpectations(withTimeout: 3, handler: nil)
 
         guard let result = reporter.didProfileResult else {
             XCTFail("Reporter did not receive profile result."); return
@@ -262,14 +262,14 @@ class OperationProfilerTests: OperationTests {
 
 class PrintableProfileResultTests: XCTestCase {
 
-    var now: NSTimeInterval!
+    var now: TimeInterval!
     var result: ProfileResult!
     var printable: PrintableProfileResult!
 
     override func setUp() {
         super.setUp()
-        now = CFAbsoluteTimeGetCurrent() as NSTimeInterval
-        result = ProfileResult(identity: OperationIdentity(identifier: "Result", name: .None), created: now, attached: 0.1, started: 0.2, cancelled: .None, finished: 0.3, children: [])
+        now = CFAbsoluteTimeGetCurrent() as TimeInterval
+        result = ProfileResult(identity: OperationIdentity(identifier: "Result", name: .none), created: now, attached: 0.1, started: 0.2, cancelled: .none, finished: 0.3, children: [])
         printable = PrintableProfileResult(result: result)
     }
 
@@ -285,7 +285,7 @@ class PrintableProfileResultTests: XCTestCase {
     }
 
     func test__add_row_with_interval_for_event() {
-        let output = printable.addRowWithInterval(1.0, forEvent: .Attached)
+        let output = printable.addRowWithInterval(1.0, forEvent: .attached)
         XCTAssertEqual(output, "+1.0 Attached\n")
     }
 
@@ -299,15 +299,15 @@ class PrintableProfileResultTests: XCTestCase {
     }
 
     func test__description__which_cancelled() {
-        result = ProfileResult(identity: OperationIdentity(identifier: "Child", name: .None), created: now, attached: 0.1, started: 0.2, cancelled: 0.25, finished: 0.3, children: [])
+        result = ProfileResult(identity: OperationIdentity(identifier: "Child", name: .none), created: now, attached: 0.1, started: 0.2, cancelled: 0.25, finished: 0.3, children: [])
         printable = PrintableProfileResult(result: result)
         XCTAssertEqual(printable.description, "+0.1 Attached\n+0.2 Started\n+0.25 Cancelled\n+0.3 Finished\n")
     }
 
     func test__description__with_children() {
-        let child2 = ProfileResult(identity: OperationIdentity(identifier: "Child 2", name: .None), created: now + 0.5, attached: 0.1, started: 0.2, cancelled: .None, finished: 0.3, children: [])
-        let child1 = ProfileResult(identity: OperationIdentity(identifier: "Child 1", name: "Data Operation"), created: now + 0.2, attached: 0.1, started: 0.2, cancelled: .None, finished: 0.3, children: [child2])
-        result = ProfileResult(identity: OperationIdentity(identifier: "Result", name: .None), created: now, attached: 0.1, started: 0.2, cancelled: .None, finished: 0.3, children: [child1])
+        let child2 = ProfileResult(identity: OperationIdentity(identifier: "Child 2", name: .none), created: now + 0.5, attached: 0.1, started: 0.2, cancelled: .none, finished: 0.3, children: [])
+        let child1 = ProfileResult(identity: OperationIdentity(identifier: "Child 1", name: "Data Operation"), created: now + 0.2, attached: 0.1, started: 0.2, cancelled: .none, finished: 0.3, children: [child2])
+        result = ProfileResult(identity: OperationIdentity(identifier: "Result", name: .none), created: now, attached: 0.1, started: 0.2, cancelled: .none, finished: 0.3, children: [child1])
         printable = PrintableProfileResult(result: result)
         XCTAssertEqual(printable.description, "+0.1 Attached\n+0.2 Started\n-> Spawned Data Operation #Child 1 with profile results\n  +0.1 Attached\n  +0.2 Started\n  -> Spawned Unnamed Operation #Child 2 with profile results\n    +0.1 Attached\n    +0.2 Started\n    +0.3 Finished\n  +0.3 Finished\n+0.3 Finished\n")
     }
@@ -320,20 +320,20 @@ class ProfileLoggerTests: XCTestCase {
 
     override func setUp() {
         super.setUp()
-        LogManager.severity = .Notice
-        result = ProfileResult(identity: OperationIdentity(identifier: "Testing", name: "MyOperation"), created: CFAbsoluteTimeGetCurrent() as NSTimeInterval, attached: 0.1, started: 0.2, cancelled: .None, finished: 0.3, children: [])
+        LogManager.severity = .notice
+        result = ProfileResult(identity: OperationIdentity(identifier: "Testing", name: "MyOperation"), created: CFAbsoluteTimeGetCurrent() as TimeInterval, attached: 0.1, started: 0.2, cancelled: .none, finished: 0.3, children: [])
     }
 
     override func tearDown() {
         result = nil
-        LogManager.severity = .Warning
+        LogManager.severity = .warning
         super.tearDown()
     }
 
     func test__reporter_logs_name() {
         reporter = OperationProfileLogger { message, severity, _, _, _ in
             XCTAssertTrue(message.hasPrefix("MyOperation #Testing: finished profiling with results:\n"), "Message did not have correct prefix: \(message)")
-            XCTAssertEqual(severity, LogSeverity.Info)
+            XCTAssertEqual(severity, LogSeverity.info)
         }
         reporter.finishedProfilingWithResult(result)
     }

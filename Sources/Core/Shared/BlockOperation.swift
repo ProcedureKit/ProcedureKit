@@ -17,7 +17,7 @@ argument to finish with the supplied error.
 */
 public class BlockOperation: Operation {
 
-    public typealias ContinuationBlockType = (error: ErrorType?) -> Void
+    public typealias ContinuationBlockType = (error: ErrorProtocol?) -> Void
     public typealias BlockType = (continueWithError: ContinuationBlockType) -> Void
 
     private let block: BlockType
@@ -39,9 +39,9 @@ public class BlockOperation: Operation {
 
     - parameter block: a dispatch block which is run on the main thread.
     */
-    public convenience init(mainQueueBlock: dispatch_block_t) {
+    public convenience init(mainQueueBlock: () -> Void) {
         self.init(block: { continuation in
-            dispatch_async(Queue.Main.queue) {
+            Queue.main.queue.async {
                 mainQueueBlock()
                 continuation(error: nil)
             }
@@ -58,7 +58,7 @@ public class BlockOperation: Operation {
     them to this continuation block.
     */
     public override func execute() {
-        if !cancelled {
+        if !isCancelled {
             block { error in self.finish(error) }
         }
     }

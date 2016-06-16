@@ -10,7 +10,7 @@ import Foundation
 import CloudKit
 
 /// An error type for CloudKit errors.
-public protocol CloudKitErrorType: ErrorType {
+public protocol CloudKitErrorType: ErrorProtocol {
 
     /// - returns: the original NSError received from CloudKit
     var underlyingError: NSError { get }
@@ -26,7 +26,7 @@ public extension CloudKitErrorType {
     }
 
     var retryAfterDelay: Delay? {
-        return (underlyingError.userInfo[CKErrorRetryAfterKey] as? NSNumber).map { Delay.By($0.doubleValue) }
+        return (underlyingError.userInfo[CKErrorRetryAfterKey] as? NSNumber).map { Delay.by($0.doubleValue) }
     }
 }
 

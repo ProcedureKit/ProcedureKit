@@ -16,20 +16,20 @@ failure case, an `ErrorType` must be associated with the result.
 public enum ConditionResult {
 
     /// Indicates that the condition is satisfied
-    case Satisfied
+    case satisfied
 
     /// Indicates that the condition failed with an associated error.
-    case Failed(ErrorType)
+    case failed(ErrorProtocol)
 }
 
 internal extension ConditionResult {
 
-    var error: ErrorType? {
+    var error: ErrorProtocol? {
         switch self {
-        case .Failed(let error):
+        case .failed(let error):
             return error
         default:
-            return .None
+            return .none
         }
     }
 }
@@ -77,7 +77,7 @@ public protocol OperationCondition {
     - note: Only a single operation may be returned.
 
     */
-    func dependencyForOperation(operation: Operation) -> NSOperation?
+    func dependencyForOperation(_ operation: Operation) -> Foundation.Operation?
 
     /**
     Evaluate the condition, to see if it has been satisfied.
@@ -85,29 +85,29 @@ public protocol OperationCondition {
     - parameter operation: the `Operation` which this condition is attached to.
     - parameter completion: a closure which receives an `OperationConditionResult`.
     */
-    func evaluateForOperation(operation: Operation, completion: OperationConditionResult -> Void)
+    func evaluateForOperation(_ operation: Operation, completion: (OperationConditionResult) -> Void)
 }
 
-internal func evaluateOperationConditions(conditions: [OperationCondition], operation: Operation, completion: [ErrorType] -> Void) {
+internal func evaluateOperationConditions(_ conditions: [OperationCondition], operation: Operation, completion: ([ErrorProtocol]) -> Void) {
 
-    let group = dispatch_group_create()
+    let group = DispatchGroup()
 
-    var results = [OperationConditionResult?](count: conditions.count, repeatedValue: .None)
+    var results = [OperationConditionResult?](repeating: .none, count: conditions.count)
 
-    for (index, condition) in conditions.enumerate() {
-        dispatch_group_enter(group)
+    for (index, condition) in conditions.enumerated() {
+        group.enter()
         condition.evaluateForOperation(operation) { result in
             results[index] = result
-            dispatch_group_leave(group)
+            group.leave()
         }
     }
 
-    dispatch_group_notify(group, Queue.Default.queue) {
+    group.notify(queue: Queue.default.queue) {
 
-        var failures: [ErrorType] = results.flatMap { $0?.error }
+        var failures: [ErrorProtocol] = results.flatMap { $0?.error }
 
-        if operation.cancelled {
-            failures.append(OperationError.ConditionFailed)
+        if operation.isCancelled {
+            failures.append(OperationError.conditionFailed)
         }
 
         completion(failures)

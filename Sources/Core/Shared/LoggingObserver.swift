@@ -15,13 +15,13 @@ start, produces new operation and finsihed.
 Any produced `Operation` instances will automatically get their
 own logger attached.
 */
-@available(iOS, deprecated=9, message="Use the log property of Operation directly.")
-@available(OSX, deprecated=10.11, message="Use the log property of Operation directly.")
+@available(iOS, deprecated:9, message:"Use the log property of Operation directly.")
+@available(OSX, deprecated:10.11, message:"Use the log property of Operation directly.")
 public struct LoggingObserver: OperationObserver {
     public typealias LoggerBlockType = (message: String) -> Void
 
     let logger: LoggerBlockType
-    let queue: dispatch_queue_t
+    let queue: DispatchQueue
 
     /**
     Create a logging observer. Accepts as the final argument a block which receives a
@@ -33,7 +33,7 @@ public struct LoggingObserver: OperationObserver {
     - parameter logger: a logging block. By detault the logger uses `println`
     however, for custom loggers provide a block which receives a `String`.
     */
-    public init(queue: dispatch_queue_t = Queue.Initiated.serial("me.danthorpe.Operations.Logger"), logger: LoggerBlockType = { print($0) }) {
+    public init(queue: DispatchQueue = Queue.initiated.serial("me.danthorpe.Operations.Logger"), logger: LoggerBlockType = { print($0) }) {
         self.queue = queue
         self.logger = logger
     }
@@ -46,7 +46,7 @@ public struct LoggingObserver: OperationObserver {
 
     - parameter operation: the `Operation` which has started.
     */
-    public func willExecuteOperation(operation: Operation) {
+    public func willExecuteOperation(_ operation: Operation) {
         log("\(operation.operationName): will execute.")
     }
 
@@ -58,7 +58,7 @@ public struct LoggingObserver: OperationObserver {
 
      - parameter operation: the `Operation` which has started.
      */
-    public func willCancelOperation(operation: Operation, errors: [ErrorType]) {
+    public func willCancelOperation(_ operation: Operation, errors: [ErrorProtocol]) {
         let detail = errors.count > 0 ? "error(s): \(errors)" : "no errors"
         log("\(operation.operationName): will cancel with \(detail).")
     }
@@ -71,7 +71,7 @@ public struct LoggingObserver: OperationObserver {
 
      - parameter operation: the `Operation` which has started.
      */
-    public func didCancelOperation(operation: Operation) {
+    public func didCancelOperation(_ operation: Operation) {
         log("\(operation.operationName): did cancel.")
     }
 
@@ -89,7 +89,7 @@ public struct LoggingObserver: OperationObserver {
     - parameter operation: the `Operation` producer.
     - parameter newOperation: the `Operation` which has been produced.
     */
-    public func operation(operation: Operation, didProduceOperation newOperation: NSOperation) {
+    public func operation(_ operation: Operation, didProduceOperation newOperation: Foundation.Operation) {
         let detail = newOperation.operationName
 
         if let newOperation = newOperation as? Operation {
@@ -113,7 +113,7 @@ public struct LoggingObserver: OperationObserver {
      - parameter operation: the `Operation` that finished.
      - parameter errors: an array of `ErrorType`, not that these will be printed out.
      */
-    public func willFinishOperation(operation: Operation, errors: [ErrorType]) {
+    public func willFinishOperation(_ operation: Operation, errors: [ErrorProtocol]) {
         let detail = errors.count > 0 ? "error(s): \(errors)" : "no errors"
         log("\(operation.operationName): will finish with \(detail).")
     }
@@ -132,13 +132,13 @@ public struct LoggingObserver: OperationObserver {
     - parameter operation: the `Operation` that finished.
     - parameter errors: an array of `ErrorType`, not that these will be printed out.
     */
-    public func didFinishOperation(operation: Operation, errors: [ErrorType]) {
+    public func didFinishOperation(_ operation: Operation, errors: [ErrorProtocol]) {
         let detail = errors.count > 0 ? "error(s): \(errors)" : "no errors"
         log("\(operation.operationName): did finish with \(detail).")
     }
 
-    private func log(message: String) {
-        dispatch_async(queue) {
+    private func log(_ message: String) {
+        queue.async {
             self.logger(message: message)
         }
     }

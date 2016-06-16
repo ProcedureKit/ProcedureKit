@@ -22,32 +22,41 @@ main queue use like this:
 public enum Queue {
 
     /// The main queue
-    case Main
+    case main
 
     /// The default QOS
-    case Default
+    case `default`
 
     /// Use for user initiated tasks which do not impact the UI. Such as data processing.
-    case Initiated
+    case initiated
 
     /// Use for user initiated tasks which do impact the UI - e.g. a rendering pipeline.
-    case Interactive
+    case interactive
 
     /// Use for non-user initiated task.
-    case Utility
+    case utility
 
     /// Backgound QOS is a severly limited class, should not be used for anything when the app is active.
-    case Background
+    case background
 
     // swiftlint:disable variable_name
-    private var qos_class: qos_class_t {
+    private var qos_attributes: DispatchQueueAttributes {
         switch self {
-        case .Main: return qos_class_main()
-        case .Default: return QOS_CLASS_DEFAULT
-        case .Initiated: return QOS_CLASS_USER_INITIATED
-        case .Interactive: return QOS_CLASS_USER_INTERACTIVE
-        case .Utility: return QOS_CLASS_UTILITY
-        case .Background: return QOS_CLASS_BACKGROUND
+        case .initiated: return DispatchQueueAttributes.qosUserInitiated
+        case .interactive: return DispatchQueueAttributes.qosUserInteractive
+        case .utility: return DispatchQueueAttributes.qosUtility
+        case .background: return DispatchQueueAttributes.qosBackground
+        default: return DispatchQueueAttributes.qosDefault
+        }
+    }
+
+    private var qos_global_attributes: DispatchQueue.GlobalAttributes {
+        switch self {
+        case .initiated: return .qosUserInitiated
+        case .interactive: return .qosUserInteractive
+        case .utility: return .qosUtility
+        case .background: return .qosBackground
+        default: return .qosDefault
         }
     }
     // swiftlint:enable variable_name
@@ -59,10 +68,10 @@ public enum Queue {
 
     - parameter queue: the corresponding global dispatch_queue_t
     */
-    public var queue: dispatch_queue_t {
+    public var queue: DispatchQueue {
         switch self {
-        case .Main: return dispatch_get_main_queue()
-        default: return dispatch_get_global_queue(qos_class, 0)
+        case .main: return .main
+        default: return .global(attributes: qos_global_attributes)
         }
     }
 
@@ -76,8 +85,8 @@ public enum Queue {
             print("I'm on a utility serial queue.")
         }
     */
-    public func serial(named: String) -> dispatch_queue_t {
-        return dispatch_queue_create(named, dispatch_queue_attr_make_with_qos_class(DISPATCH_QUEUE_SERIAL, qos_class, QOS_MIN_RELATIVE_PRIORITY))
+    public func serial(_ named: String) -> DispatchQueue {
+        return DispatchQueue(label: named, attributes: [.serial, qos_attributes])
     }
 
     /**
@@ -90,14 +99,55 @@ public enum Queue {
             print("I'm on a initiated concurrent queue.")
         }
     */
-    public func concurrent(named: String) -> dispatch_queue_t {
-        return dispatch_queue_create(named, dispatch_queue_attr_make_with_qos_class(DISPATCH_QUEUE_CONCURRENT, qos_class, QOS_MIN_RELATIVE_PRIORITY))
+    public func concurrent(_ named: String) -> DispatchQueue {
+        return DispatchQueue(label: named, attributes: [.concurrent, qos_attributes])
     }
 }
 
+public extension DispatchQueue {
+
+    /**
+     Provides a throwing Void block with a rethrowing API.
+     - parameter block: a throwing block returning Void.
+    */
+//    func sync(execute block: () throws -> Void) rethrows {
+//        var failure: ErrorProtocol? = .none
+//
+//        let catcher = {
+//            do {
+//                try block()
+//            }
+//            catch {
+//                failure = error
+//            }
+//        }
+//
+//        sync(execute: catcher)
+//
+//        if let failure = failure {
+//            try { throw failure }()
+//        }
+//    }
+
+    /**
+     Provides a throwing T block with a rethrowing API.
+     - parameter block: a throwing block returning T.
+     */
+    func sync<T>(execute block: () throws -> T) rethrows -> T {
+        var result: T!
+        try sync {
+            result = try block()
+        }
+        return result
+    }
+}
+
+
+
+
 extension Dictionary {
 
-    internal init<Sequence: SequenceType where Sequence.Generator.Element == Value>(sequence: Sequence, keyMapper: Value -> Key?) {
+    internal init<Sequence: Swift.Sequence where Sequence.Iterator.Element == Value>(sequence: Sequence, keyMapper: (Value) -> Key?) {
         self.init()
         for item in sequence {
             if let key = keyMapper(item) {

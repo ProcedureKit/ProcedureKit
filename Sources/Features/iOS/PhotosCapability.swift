@@ -22,7 +22,7 @@ public protocol PhotosCapabilityRegistrarType: CapabilityRegistrarType {
      Request authorization to photos.
      - parameter handler: a PHAuthorizationStatus -> Void closure
     */
-    func opr_requestAuthorization(handler: PHAuthorizationStatus -> Void)
+    func opr_requestAuthorization(_ handler: (PHAuthorizationStatus) -> Void)
 }
 
 extension PHPhotoLibrary: PhotosCapabilityRegistrarType {
@@ -36,7 +36,7 @@ extension PHPhotoLibrary: PhotosCapabilityRegistrarType {
      Request authorization to photos.
      - parameter handler: a PHAuthorizationStatus -> Void closure
      */
-    public func opr_requestAuthorization(handler: PHAuthorizationStatus -> Void) {
+    public func opr_requestAuthorization(_ handler: (PHAuthorizationStatus) -> Void) {
         PHPhotoLibrary.requestAuthorization(handler)
     }
 }
@@ -44,8 +44,8 @@ extension PHPhotoLibrary: PhotosCapabilityRegistrarType {
 extension PHAuthorizationStatus: AuthorizationStatusType {
 
     /// - returns: true if authorization was granted. There are no requirements.
-    public func isRequirementMet(requirement: Void) -> Bool {
-        if case .Authorized = self {
+    public func isRequirementMet(_ requirement: Void) -> Bool {
+        if case .authorized = self {
             return true
         }
         return false
@@ -75,7 +75,7 @@ public class PhotosCapability: CapabilityType {
     /// - returns: the EKEntityType, the required type of the capability
     public let requirement: Void
 
-    internal lazy var registrar: PhotosCapabilityRegistrarType = PHPhotoLibrary.sharedPhotoLibrary()
+    internal lazy var registrar: PhotosCapabilityRegistrarType = PHPhotoLibrary.shared()
 
     /**
      Initialize the capability. There is no requirement type
@@ -97,7 +97,7 @@ public class PhotosCapability: CapabilityType {
      Get the current authorization status of Photos from the Registrar.
      - parameter completion: a PHAuthorizationStatus -> Void closure.
      */
-    public func authorizationStatus(completion: PHAuthorizationStatus -> Void) {
+    public func authorizationStatus(_ completion: (PHAuthorizationStatus) -> Void) {
         completion(registrar.opr_authorizationStatus())
     }
 
@@ -105,9 +105,9 @@ public class PhotosCapability: CapabilityType {
      Request authorization to Photos from the Registrar.
      - parameter completion: a dispatch_block_t
      */
-    public func requestAuthorizationWithCompletion(completion: dispatch_block_t) {
+    public func requestAuthorizationWithCompletion(_ completion: () -> Void) {
         switch registrar.opr_authorizationStatus() {
-        case .NotDetermined:
+        case .notDetermined:
             registrar.opr_requestAuthorization { _ in
                 completion()
             }
@@ -137,6 +137,3 @@ public extension Capability {
      */
     typealias Photos = PhotosCapability
 }
-
-@available(*, unavailable, renamed="AuthorizedFor(Capability.Photos())")
-public typealias PhotosCondition = AuthorizedFor<Capability.Photos>

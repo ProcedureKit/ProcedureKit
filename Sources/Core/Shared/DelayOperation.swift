@@ -9,32 +9,37 @@
 import Foundation
 
 public enum Delay {
-    case By(NSTimeInterval)
-    case Until(NSDate)
+    case by(TimeInterval)
+    case until(Date)
 }
 
 extension Delay: CustomStringConvertible {
 
     public var description: String {
         switch self {
-        case .By(let _interval):
+        case .by(let _interval):
             return "for \(_interval) seconds"
-        case .Until(let date):
-            return "until \(NSDateFormatter().stringFromDate(date))"
+        case .until(let date):
+            return "until \(DateFormatter().string(from: date))"
         }
     }
 }
 
 internal extension Delay {
 
-    var interval: NSTimeInterval {
+    var timeInterval: TimeInterval {
         switch self {
-        case .By(let _interval):
+        case .by(let _interval):
             return _interval
-        case .Until(let date):
+        case .until(let date):
             return date.timeIntervalSinceNow
         }
     }
+
+    var dispatchTimeInterval: DispatchTimeInterval {
+        return .nanoseconds(Int(timeInterval * Double(NSEC_PER_SEC)))
+    }
+
 }
 
 /**
@@ -52,23 +57,22 @@ time-out.
 public class DelayOperation: Operation {
 
     private let delay: Delay
-    private let leeway: UInt64
-    private let timer: dispatch_source_t
+    private let leeway: DispatchTimeInterval
+    private let timer: DispatchSourceTimer
 
     internal init(delay: Delay, leeway: Int = 1_000_000) {
         self.delay = delay
-        self.leeway = UInt64(leeway)
-        let _timer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, Queue.Default.queue)
-        self.timer = _timer
+        self.leeway = .nanoseconds(Int(UInt64(leeway) * NSEC_PER_SEC))
+        self.timer = DispatchSource.timer()
         super.init()
         name = "Delay \(delay)"
-        dispatch_source_set_event_handler(timer) {
-            if !self.cancelled {
+        timer.setEventHandler { [unowned self] _ in
+            if !self.isCancelled {
                 self.finish()
             }
         }
-        addObserver(DidCancelObserver { _ in
-            dispatch_source_cancel(_timer)
+        addObserver(DidCancelObserver { [unowned self] _ in
+            self.timer.cancel()
         })
     }
 
@@ -82,8 +86,8 @@ public class DelayOperation: Operation {
      This is partly from a energy standpoint as nanosecond
      accuracy is costly.
     */
-    public convenience init(interval: NSTimeInterval, leeway: Int = 1_000_000) {
-        self.init(delay: .By(interval), leeway: leeway)
+    public convenience init(interval: TimeInterval, leeway: Int = 1_000_000) {
+        self.init(delay: .by(interval), leeway: leeway)
     }
 
     /**
@@ -96,8 +100,8 @@ public class DelayOperation: Operation {
      This is partly from a energy standpoint as nanosecond
      accuracy is costly.
     */
-    public convenience init(date: NSDate, leeway: Int = 1_000_000) {
-        self.init(delay: .Until(date), leeway: leeway)
+    public convenience init(date: Date, leeway: Int = 1_000_000) {
+        self.init(delay: .until(date), leeway: leeway)
     }
 
     /**
@@ -107,11 +111,12 @@ public class DelayOperation: Operation {
     */
     public override func execute() {
 
-        switch delay.interval {
+        switch delay.timeInterval {
 
         case (let interval) where interval > 0.0:
-            dispatch_source_set_timer(timer, dispatch_time(DISPATCH_TIME_NOW, Int64(interval * Double(NSEC_PER_SEC))), DISPATCH_TIME_FOREVER, leeway)
-            dispatch_resume(timer)
+
+            timer.scheduleRepeating(deadline: DispatchTime.now(), interval: delay.timeInterval, leeway: leeway)
+            timer.resume()
 
         default:
             finish()

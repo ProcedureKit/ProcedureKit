@@ -16,30 +16,30 @@ class BlockConditionTests: OperationTests {
         let operation = TestOperation()
         operation.addCondition(BlockCondition { true })
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectation(withDescription: "Test: \(#function)"))
         runOperation(operation)
 
-        waitForExpectationsWithTimeout(3, handler: nil)
-        XCTAssertTrue(operation.finished)
+        waitForExpectations(withTimeout: 3, handler: nil)
+        XCTAssertTrue(operation.isFinished)
     }
 
     func test__operation_with_unsuccessful_block_condition_errors() {
 
-        let expectation = expectationWithDescription("Test: \(#function)")
+        let expectation = self.expectation(withDescription: "Test: \(#function)")
         let operation = TestOperation()
         operation.addCondition(BlockCondition { false })
 
-        var receivedErrors = [ErrorType]()
+        var receivedErrors = [ErrorProtocol]()
         operation.addObserver(DidFinishObserver { _, errors in
             receivedErrors = errors
             expectation.fulfill()
         })
 
         runOperation(operation)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForExpectations(withTimeout: 3, handler: nil)
         XCTAssertFalse(operation.didExecute)
-        if let error = receivedErrors[0] as? BlockCondition.Error {
-            XCTAssertTrue(error == BlockCondition.Error.BlockConditionFailed)
+        if let error = receivedErrors[0] as? BlockCondition.Operations.Error {
+            XCTAssertTrue(error == BlockCondition.Error.blockConditionFailed)
         }
         else {
             XCTFail("No error message was observed")
@@ -47,22 +47,22 @@ class BlockConditionTests: OperationTests {
     }
 
     func test__operation_with_block_which_throws_condition_errors() {
-        let expectation = expectationWithDescription("Test: \(#function)")
+        let expectation = self.expectation(withDescription: "Test: \(#function)")
 
         let operation = TestOperation()
-        operation.addCondition(BlockCondition { throw TestOperation.Error.SimulatedError })
+        operation.addCondition(BlockCondition { throw TestOperation.Error.simulatedError })
 
-        var receivedErrors = [ErrorType]()
+        var receivedErrors = [ErrorProtocol]()
         operation.addObserver(DidFinishObserver { _, errors in
             receivedErrors = errors
             expectation.fulfill()
         })
 
         runOperation(operation)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForExpectations(withTimeout: 3, handler: nil)
         XCTAssertFalse(operation.didExecute)
         if let error = receivedErrors[0] as? TestOperation.Error {
-            XCTAssertTrue(error == TestOperation.Error.SimulatedError)
+            XCTAssertTrue(error == TestOperation.Error.simulatedError)
         }
         else {
             XCTFail("No error message was observed")

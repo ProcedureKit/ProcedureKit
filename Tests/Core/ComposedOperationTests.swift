@@ -14,53 +14,53 @@ class ComposedOperationTests: OperationTests {
     func test__composed_operation_is_cancelled() {
         let composed = ComposedOperation(TestOperation())
         composed.cancel()
-        XCTAssertTrue(composed.cancelled)
-        XCTAssertTrue(composed.operation.cancelled)
+        XCTAssertTrue(composed.isCancelled)
+        XCTAssertTrue(composed.operation.isCancelled)
     }
 
     func test__composed_nsoperation_is_performed() {
         var didExecute = false
-        let composed = ComposedOperation(NSBlockOperation {
+        let composed = ComposedOperation(Foundation.BlockOperation {
             didExecute = true
         })
 
-        let expectation = expectationWithDescription("Test: \(#function)")
+        let expectation = self.expectation(withDescription: "Test: \(#function)")
         addCompletionBlockToTestOperation(composed, withExpectation: expectation)
         runOperation(composed)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForExpectations(withTimeout: 3, handler: nil)
 
-        XCTAssertTrue(composed.finished)
+        XCTAssertTrue(composed.isFinished)
         XCTAssertTrue(didExecute)
     }
 
     func test__composed_operation_is_performed() {
         let composed = ComposedOperation(operation: TestOperation())
 
-        let expectation = expectationWithDescription("Test: \(#function)")
+        let expectation = self.expectation(withDescription: "Test: \(#function)")
         addCompletionBlockToTestOperation(composed, withExpectation: expectation)
         runOperation(composed)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForExpectations(withTimeout: 3, handler: nil)
 
-        XCTAssertTrue(composed.finished)
+        XCTAssertTrue(composed.isFinished)
         XCTAssertTrue(composed.operation.didExecute)
     }
     
     func test__composed_operation_which_cancels_propagates_error_to_target() {
         let target = TestOperation()
         
-        var targetErrors: [ErrorType] = []
+        var targetErrors: [ErrorProtocol] = []
         target.addObserver(DidCancelObserver { op in
             targetErrors = op.errors
         })
         
         let operation = ComposedOperation(target)
         
-        let operationError = TestOperation.Error.SimulatedError
+        let operationError = TestOperation.Error.simulatedError
         operation.cancelWithError(operationError)
 
         addCompletionBlockToTestOperation(operation)
         runOperation(operation)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForExpectations(withTimeout: 3, handler: nil)
         
         XCTAssertEqual(targetErrors.count, 1)
         
@@ -69,7 +69,7 @@ class ComposedOperationTests: OperationTests {
         }
         
         switch error {
-        case let .ParentOperationCancelledWithErrors(parentErrors):
+        case let .parentOperationCancelledWithErrors(parentErrors):
             guard let parentError = parentErrors.first as? TestOperation.Error else {
                 XCTFail("Incorrect error received"); return
             }

@@ -9,7 +9,7 @@
 import XCTest
 @testable import Operations
 
-class OperationWhichFailsThenSucceeds: Operation {
+class OperationWhichFailsThenSucceeds: Operations.Operation {
 
     let shouldFail: () -> Bool
 
@@ -21,7 +21,7 @@ class OperationWhichFailsThenSucceeds: Operation {
 
     override func execute() {
         if shouldFail() {
-            finish(TestOperation.Error.SimulatedError)
+            finish(TestOperation.Error.simulatedError)
         }
         else {
             finish()
@@ -44,7 +44,7 @@ class RetryOperationTests: OperationTests {
         numberOfFailures = 0
     }
 
-    func producer(threshold: Int) -> () -> Test? {
+    func producer(_ threshold: Int) -> () -> Test? {
         return { [unowned self] in
             guard self.numberOfExecutions < 10 else {
                 return nil
@@ -58,7 +58,7 @@ class RetryOperationTests: OperationTests {
         }
     }
 
-    func producerWithDelay(threshold: Int) -> () -> (Delay?, Test)? {
+    func producerWithDelay(_ threshold: Int) -> () -> (Delay?, Test)? {
         return { [unowned self] in
             guard self.numberOfExecutions < 10 else {
                 return nil
@@ -68,58 +68,58 @@ class RetryOperationTests: OperationTests {
                 self.numberOfFailures += 1
                 self.numberOfExecutions += 1
                 })
-            return (Delay.By(0.001), op)
+            return (Delay.by(0.001), op)
         }
     }
 
     func test__retry_operation_with_payload_generator() {
-        operation = RetryOperation(generator: AnyGenerator(body: producerWithDelay(2)), retry: { $1 })
+        operation = RetryOperation(generator: AnyIterator(body: producerWithDelay(2)), retry: { $1 })
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectation(withDescription: "Test: \(#function)"))
         runOperation(operation)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForExpectations(withTimeout: 3, handler: nil)
 
-        XCTAssertTrue(operation.finished)
+        XCTAssertTrue(operation.isFinished)
         XCTAssertEqual(operation.count, 2)
     }
 
     func test__retry_operation_with_default_delay() {
-        operation = RetryOperation(AnyGenerator(body: producer(2)))
+        operation = RetryOperation(AnyIterator(body: producer(2)))
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectation(withDescription: "Test: \(#function)"))
         runOperation(operation)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForExpectations(withTimeout: 3, handler: nil)
 
-        XCTAssertTrue(operation.finished)
+        XCTAssertTrue(operation.isFinished)
         XCTAssertEqual(operation.count, 2)
     }
 
     func test__retry_operation_where_generator_returns_nil() {
-        operation = RetryOperation(maxCount: 12, strategy: .Fixed(0.01), AnyGenerator(body: producer(11))) { $1 } // Includes the retry block
+        operation = RetryOperation(maxCount: 12, strategy: .fixed(0.01), AnyIterator(body: producer(11))) { $1 } // Includes the retry block
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectation(withDescription: "Test: \(#function)"))
         runOperation(operation)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForExpectations(withTimeout: 3, handler: nil)
 
-        XCTAssertTrue(operation.finished)
+        XCTAssertTrue(operation.isFinished)
         XCTAssertEqual(operation.count, 10)
     }
 
     func test__retry_operation_where_max_count_is_reached() {
-        operation = RetryOperation(AnyGenerator(body: producer(9)))
+        operation = RetryOperation(AnyIterator(body: producer(9)))
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectation(withDescription: "Test: \(#function)"))
         runOperation(operation)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForExpectations(withTimeout: 3, handler: nil)
 
-        XCTAssertTrue(operation.finished)
+        XCTAssertTrue(operation.isFinished)
         XCTAssertEqual(operation.count, 5)
     }
 
     func test__retry_using_should_retry_block() {
 
-        var retryErrors: [ErrorType]? = .None
-        var retryAggregateErrors: [ErrorType]? = .None
+        var retryErrors: [ErrorProtocol]? = .none
+        var retryAggregateErrors: [ErrorProtocol]? = .none
         var retryCount: Int = 0
         var didRunBlockCount: Int = 0
 
@@ -131,13 +131,13 @@ class RetryOperationTests: OperationTests {
             return recommended
         }
 
-        operation = RetryOperation(AnyGenerator(body: producer(3)), retry: retry)
+        operation = RetryOperation(AnyIterator(body: producer(3)), retry: retry)
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectation(withDescription: "Test: \(#function)"))
         runOperation(operation)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForExpectations(withTimeout: 3, handler: nil)
 
-        XCTAssertTrue(operation.finished)
+        XCTAssertTrue(operation.isFinished)
         XCTAssertEqual(operation.count, 3)
         XCTAssertEqual(didRunBlockCount, 2)
         XCTAssertNotNil(retryErrors)
@@ -148,8 +148,8 @@ class RetryOperationTests: OperationTests {
     }
 
     func test__retry_using_retry_block_returning_nil() {
-        var retryErrors: [ErrorType]? = .None
-        var retryAggregateErrors: [ErrorType]? = .None
+        var retryErrors: [ErrorProtocol]? = .none
+        var retryAggregateErrors: [ErrorProtocol]? = .none
         var retryCount: Int = 0
         var didRunBlockCount: Int = 0
         let retry: Handler = { info, recommended in
@@ -157,16 +157,16 @@ class RetryOperationTests: OperationTests {
             retryAggregateErrors = info.aggregateErrors
             retryCount = info.count
             didRunBlockCount += 1
-            return .None
+            return .none
         }
 
-        operation = RetryOperation(AnyGenerator(body: producer(3)), retry: retry)
+        operation = RetryOperation(AnyIterator(body: producer(3)), retry: retry)
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectation(withDescription: "Test: \(#function)"))
         runOperation(operation)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForExpectations(withTimeout: 3, handler: nil)
 
-        XCTAssertTrue(operation.finished)
+        XCTAssertTrue(operation.isFinished)
         XCTAssertEqual(operation.count, 1)
         XCTAssertEqual(didRunBlockCount, 1)
         XCTAssertNotNil(retryErrors)

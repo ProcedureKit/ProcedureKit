@@ -13,24 +13,24 @@ class BlockOperationTests: OperationTests {
 
     func test__that_block_in_block_operation_executes() {
 
-        let expectation = expectationWithDescription("Test: \(#function)")
+        let expectation = self.expectation(withDescription: "Test: \(#function)")
         var didExecuteBlock: Bool = false
-        let operation = BlockOperation {
+        let operation = Operations.BlockOperation {
             didExecuteBlock = true
             expectation.fulfill()
         }
         runOperation(operation)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForExpectations(withTimeout: 3, handler: nil)
         XCTAssertTrue(didExecuteBlock)
     }
 
     func test__that_block_operation_with_no_block_finishes_immediately() {
-        let expectation = expectationWithDescription("Test: \(#function)")
-        let operation = BlockOperation()
+        let expectation = self.expectation(withDescription: "Test: \(#function)")
+        let operation = Operations.BlockOperation()
         addCompletionBlockToTestOperation(operation, withExpectation: expectation)
         runOperation(operation)
-        waitForExpectationsWithTimeout(3, handler: nil)
-        XCTAssertTrue(operation.finished)
+        waitForExpectations(withTimeout: 3, handler: nil)
+        XCTAssertTrue(operation.isFinished)
     }
 
     func test__that_block_operation_does_not_execute_if_cancelled_before_ready() {
@@ -38,24 +38,24 @@ class BlockOperationTests: OperationTests {
 
         let delay = DelayOperation(interval: 2)
 
-        let block = BlockOperation { (continuation: BlockOperation.ContinuationBlockType) in
+        let block = Operations.BlockOperation { (continuation: Operations.BlockOperation.ContinuationBlockType) in
             blockDidRun += 2
             continuation(error: nil)
         }
 
-        let blockToCancel = BlockOperation { (continuation: BlockOperation.ContinuationBlockType) in
+        let blockToCancel = Operations.BlockOperation { (continuation: Operations.BlockOperation.ContinuationBlockType) in
             blockDidRun += 1
             continuation(error: nil)
         }
 
-        addCompletionBlockToTestOperation(block, withExpectation: expectationWithDescription("Test: \(#function)"))
+        addCompletionBlockToTestOperation(block, withExpectation: expectation(withDescription: "Test: \(#function)"))
 
         block.addDependency(delay)
         blockToCancel.addDependency(delay)
 
         runOperations(delay, block, blockToCancel)
         blockToCancel.cancel()
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForExpectations(withTimeout: 3, handler: nil)
         
         XCTAssertEqual(blockDidRun, 2)
     }

@@ -26,8 +26,8 @@ class BaseBlockObserverTests: OperationTests {
 
 class StartedObserverTests: BaseBlockObserverTests {
 
-    var called_didAttachToOperation: Operation? = .None
-    var called_didStartOperation: Operation? = .None
+    var called_didAttachToOperation: Operations.Operation? = .none
+    var called_didStartOperation: Operations.Operation? = .none
     var observer: WillExecuteObserver!
 
     override func setUp() {
@@ -50,7 +50,7 @@ class StartedObserverTests: BaseBlockObserverTests {
 
         addCompletionBlockToTestOperation(operation)
         runOperation(operation)
-        waitForExpectationsWithTimeout(3.0, handler: nil)
+        waitForExpectations(withTimeout: 3.0, handler: nil)
 
         XCTAssertEqual(called_didStartOperation, operation)
     }
@@ -58,8 +58,8 @@ class StartedObserverTests: BaseBlockObserverTests {
 
 class CancelledObserverTests: BaseBlockObserverTests {
 
-    var called_didAttachToOperation: Operation? = .None
-    var called_didCancelOperation: Operation? = .None
+    var called_didAttachToOperation: Operations.Operation? = .none
+    var called_didCancelOperation: Operations.Operation? = .none
     var observer: DidCancelObserver!
 
     override func setUp() {
@@ -81,7 +81,7 @@ class CancelledObserverTests: BaseBlockObserverTests {
         operation.addObserver(observer)
         operation.cancel()
         XCTAssertEqual(called_didCancelOperation, operation)
-        XCTAssertTrue(operation.cancelled)
+        XCTAssertTrue(operation.isCancelled)
     }
 
     func test__cancel_after_adding_to_queue() {
@@ -90,23 +90,23 @@ class CancelledObserverTests: BaseBlockObserverTests {
         addCompletionBlockToTestOperation(operation)
         runOperation(operation)
         operation.cancel()
-        waitForExpectationsWithTimeout(3.0, handler: nil)
+        waitForExpectations(withTimeout: 3.0, handler: nil)
 
         XCTAssertEqual(called_didCancelOperation, operation)
-        XCTAssertTrue(operation.cancelled)
+        XCTAssertTrue(operation.isCancelled)
     }
 }
 
 class ProducedOperationObserverTests: BaseBlockObserverTests {
 
-    var called_didAttachToOperation: Operation? = .None
-    var called_didProduceOperation: (Operation, NSOperation)? = .None
+    var called_didAttachToOperation: Operations.Operation? = .none
+    var called_didProduceOperation: (Operations.Operation, Foundation.Operation)? = .none
     var observer: ProducedOperationObserver!
-    var produced: NSBlockOperation!
+    var produced: Foundation.BlockOperation!
 
     override func setUp() {
         super.setUp()
-        produced = NSBlockOperation { }
+        produced = Foundation.BlockOperation { }
         operation = TestOperation(produced: produced)
         observer = ProducedOperationObserver { [unowned self] op, produced in
             self.called_didProduceOperation = (op, produced)
@@ -126,7 +126,7 @@ class ProducedOperationObserverTests: BaseBlockObserverTests {
 
         addCompletionBlockToTestOperation(operation)
         runOperation(operation)
-        waitForExpectationsWithTimeout(3.0, handler: nil)
+        waitForExpectations(withTimeout: 3.0, handler: nil)
 
         XCTAssertEqual(called_didProduceOperation?.0, operation)
         XCTAssertEqual(called_didProduceOperation?.1, produced)
@@ -135,8 +135,8 @@ class ProducedOperationObserverTests: BaseBlockObserverTests {
 
 class WillFinishObserverTests: BaseBlockObserverTests {
 
-    var called_didAttachToOperation: Operation? = .None
-    var called_willFinish: (Operation, [ErrorType])? = .None
+    var called_didAttachToOperation: Operations.Operation? = .none
+    var called_willFinish: (Operations.Operation, [ErrorProtocol])? = .none
     var observer: WillFinishObserver!
 
     override func setUp() {
@@ -159,19 +159,19 @@ class WillFinishObserverTests: BaseBlockObserverTests {
 
         addCompletionBlockToTestOperation(operation)
         runOperation(operation)
-        waitForExpectationsWithTimeout(3.0, handler: nil)
+        waitForExpectations(withTimeout: 3.0, handler: nil)
 
         XCTAssertEqual(called_willFinish?.0, operation)
         XCTAssertTrue(called_willFinish?.1.isEmpty ?? false)
     }
 
     func test__will_finish_block_with_errors() {
-        operation = TestOperation(error: TestOperation.Error.SimulatedError)
+        operation = TestOperation(error: TestOperation.Error.simulatedError)
         operation.addObserver(observer)
 
         addCompletionBlockToTestOperation(operation)
         runOperation(operation)
-        waitForExpectationsWithTimeout(3.0, handler: nil)
+        waitForExpectations(withTimeout: 3.0, handler: nil)
 
         XCTAssertEqual(called_willFinish?.0, operation)
         XCTAssertEqual(called_willFinish?.1.count ?? 0, 1)
@@ -180,8 +180,8 @@ class WillFinishObserverTests: BaseBlockObserverTests {
 
 class DidFinishObserverTests: BaseBlockObserverTests {
 
-    var called_didAttachToOperation: Operation? = .None
-    var called_didFinish: (Operation, [ErrorType])? = .None
+    var called_didAttachToOperation: Operations.Operation? = .none
+    var called_didFinish: (Operations.Operation, [ErrorProtocol])? = .none
     var observer: DidFinishObserver!
 
     override func setUp() {
@@ -204,19 +204,19 @@ class DidFinishObserverTests: BaseBlockObserverTests {
 
         addCompletionBlockToTestOperation(operation)
         runOperation(operation)
-        waitForExpectationsWithTimeout(3.0, handler: nil)
+        waitForExpectations(withTimeout: 3.0, handler: nil)
 
         XCTAssertEqual(called_didFinish?.0, operation)
         XCTAssertTrue(called_didFinish?.1.isEmpty ?? false)
     }
 
     func test__will_finish_block_with_errors() {
-        operation = TestOperation(error: TestOperation.Error.SimulatedError)
+        operation = TestOperation(error: TestOperation.Error.simulatedError)
         operation.addObserver(observer)
 
         addCompletionBlockToTestOperation(operation)
         runOperation(operation)
-        waitForExpectationsWithTimeout(3.0, handler: nil)
+        waitForExpectations(withTimeout: 3.0, handler: nil)
 
         XCTAssertEqual(called_didFinish?.0, operation)
         XCTAssertEqual(called_didFinish?.1.count ?? 0, 1)
@@ -226,7 +226,7 @@ class DidFinishObserverTests: BaseBlockObserverTests {
 class BlockObserverTests: BaseBlockObserverTests {
 
     func test__did_attach_block_is_called() {
-        var called_didAttachToOperation: Operation? = .None
+        var called_didAttachToOperation: Operations.Operation? = .none
         var observer = BlockObserver { _, _ in }
         observer.didAttachToOperation = { op in
             called_didAttachToOperation = op
@@ -242,9 +242,9 @@ class BlockObserverTests: BaseBlockObserverTests {
             counter += 1
         }))
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectation(withDescription: "Test: \(#function)"))
         runOperation(operation)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForExpectations(withTimeout: 3, handler: nil)
 
         XCTAssertEqual(counter, 1)
     }
@@ -256,11 +256,11 @@ class BlockObserverTests: BaseBlockObserverTests {
             counter += 1
         }))
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectation(withDescription: "Test: \(#function)"))
         runOperation(operation)
         operation.cancel()
         operation.cancel() // Deliberately call cancel multiple times.
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForExpectations(withTimeout: 3, handler: nil)
 
         XCTAssertEqual(counter, 1)
     }
@@ -275,9 +275,9 @@ class BlockObserverTests: BaseBlockObserverTests {
             XCTAssertEqual(produced, pro)
         }))
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectation(withDescription: "Test: \(#function)"))
         runOperation(operation)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForExpectations(withTimeout: 3, handler: nil)
 
         XCTAssertEqual(counter, 1)
     }
@@ -288,9 +288,9 @@ class BlockObserverTests: BaseBlockObserverTests {
             counter += 1
         }))
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectation(withDescription: "Test: \(#function)"))
         runOperation(operation)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForExpectations(withTimeout: 3, handler: nil)
 
         XCTAssertEqual(counter, 1)
     }
@@ -302,9 +302,9 @@ class BlockObserverTests: BaseBlockObserverTests {
             counter += 1
         })
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectation(withDescription: "Test: \(#function)"))
         runOperation(operation)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForExpectations(withTimeout: 3, handler: nil)
 
         XCTAssertEqual(counter, 1)
     }

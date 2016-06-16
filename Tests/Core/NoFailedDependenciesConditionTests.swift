@@ -11,7 +11,7 @@ import XCTest
 
 class NoFailedDependenciesConditionTests: OperationTests {
 
-    func createCancellingOperation(shouldCancel: Bool, expectation: XCTestExpectation) -> TestOperation {
+    func createCancellingOperation(_ shouldCancel: Bool, expectation: XCTestExpectation) -> TestOperation {
 
         let operation = TestOperation()
         operation.name = shouldCancel ? "Cancelled Dependency" : "Successful Dependency"
@@ -32,90 +32,90 @@ class NoFailedDependenciesConditionTests: OperationTests {
         let operation = TestOperation()
         operation.addCondition(NoFailedDependenciesCondition())
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectation(withDescription: "Test: \(#function)"))
         runOperation(operation)
 
-        waitForExpectationsWithTimeout(3, handler: nil)
-        XCTAssertTrue(operation.finished)
+        waitForExpectations(withTimeout: 3, handler: nil)
+        XCTAssertTrue(operation.isFinished)
     }
 
     func test__operation_with_sucessful_dependency_succeeds() {
 
         let operation = TestOperation()
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
-        let dependency = createCancellingOperation(false, expectation: expectationWithDescription("Dependency for Test: \(#function)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectation(withDescription: "Test: \(#function)"))
+        let dependency = createCancellingOperation(false, expectation: expectation(withDescription: "Dependency for Test: \(#function)"))
         operation.addDependency(dependency)
         operation.addCondition(NoFailedDependenciesCondition())
 
         runOperations(operation, dependency)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForExpectations(withTimeout: 3, handler: nil)
 
-        XCTAssertTrue(operation.finished)
+        XCTAssertTrue(operation.isFinished)
     }
 
     func test__operation_with_single_cancelled_dependency_doesnt_execute() {
 
         let operation = TestOperation()
-        let dependency = createCancellingOperation(true, expectation: expectationWithDescription("Dependency for Test: \(#function)"))
+        let dependency = createCancellingOperation(true, expectation: expectation(withDescription: "Dependency for Test: \(#function)"))
         operation.addDependency(dependency)
         operation.addCondition(NoFailedDependenciesCondition())
 
         runOperations(operation, dependency)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForExpectations(withTimeout: 3, handler: nil)
 
         XCTAssertFalse(operation.didExecute)
     }
 
     func test__operation_with_mixture_fails() {
-        let expectation = expectationWithDescription("Test: \(#function)")
+        let expectation = self.expectation(withDescription: "Test: \(#function)")
         let operation = TestOperation()
-        let dependency1 = createCancellingOperation(true, expectation: expectationWithDescription("Dependency 1 for Test: \(#function)"))
+        let dependency1 = createCancellingOperation(true, expectation: self.expectation(withDescription: "Dependency 1 for Test: \(#function)"))
         operation.addDependency(dependency1)
-        let dependency2 = createCancellingOperation(false, expectation: expectationWithDescription("Dependency 2 for Test: \(#function)"))
+        let dependency2 = createCancellingOperation(false, expectation: self.expectation(withDescription: "Dependency 2 for Test: \(#function)"))
         operation.addDependency(dependency2)
         operation.addCondition(NoFailedDependenciesCondition())
 
-        var receivedErrors = [ErrorType]()
+        var receivedErrors = [ErrorProtocol]()
         operation.addObserver(BlockObserver { (_ , errors) in
             receivedErrors = errors
             expectation.fulfill()
         })
 
         runOperations(operation, dependency1, dependency2)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForExpectations(withTimeout: 3, handler: nil)
 
         XCTAssertFalse(operation.didExecute)
         XCTAssertEqual(receivedErrors.count, 1)
     }
 
     func test__operation_with_errored_dependency_fails() {
-        let expectation = expectationWithDescription("Test: \(#function)")
+        let expectation = self.expectation(withDescription: "Test: \(#function)")
         let operation = TestOperation()
-        let dependency = TestOperation(delay: 0, error: TestOperation.Error.SimulatedError)
+        let dependency = TestOperation(delay: 0, error: TestOperation.Error.simulatedError)
         operation.addDependency(dependency)
         operation.addCondition(NoFailedDependenciesCondition())
 
-        var receivedErrors = [ErrorType]()
+        var receivedErrors = [ErrorProtocol]()
         operation.addObserver(BlockObserver { (_ , errors) in
             receivedErrors = errors
             expectation.fulfill()
         })
 
         runOperations(operation, dependency)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForExpectations(withTimeout: 3, handler: nil)
 
         XCTAssertFalse(operation.didExecute)
         XCTAssertEqual(receivedErrors.count, 1)
     }
 
     func test__operation_with_group_dependency_with_errored_child_fails() {
-        LogManager.severity = .Verbose
-        let expectation = expectationWithDescription("Test: \(#function)")
+        LogManager.severity = .verbose
+        let expectation = self.expectation(withDescription: "Test: \(#function)")
 
         let operation = TestOperation()
         operation.name = "Target Operation"
 
-        let child = TestOperation(delay: 0, error: TestOperation.Error.SimulatedError)
+        let child = TestOperation(delay: 0, error: TestOperation.Error.simulatedError)
         child.name = "Child Operation"
 
         let dependency = GroupOperation(operations: [child])
@@ -124,47 +124,47 @@ class NoFailedDependenciesConditionTests: OperationTests {
         operation.addDependency(dependency)
         operation.addCondition(NoFailedDependenciesCondition())
 
-        var receivedErrors = [ErrorType]()
+        var receivedErrors = [ErrorProtocol]()
         operation.addObserver(BlockObserver { (_ , errors) in
             receivedErrors = errors
             expectation.fulfill()
         })
 
         runOperations(operation, dependency)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForExpectations(withTimeout: 3, handler: nil)
 
         XCTAssertFalse(operation.didExecute)
         XCTAssertEqual(receivedErrors.count, 1)
-        LogManager.severity = .Warning
+        LogManager.severity = .warning
     }
 }
 
 class NoFailedDependenciesConditionErrorTests: XCTestCase {
 
-    var errorA: NoFailedDependenciesCondition.Error!
-    var errorB: NoFailedDependenciesCondition.Error!
+    var errorA: NoFailedDependenciesCondition.Operations.Error!
+    var errorB: NoFailedDependenciesCondition.Operations.Error!
 
     func test__both_cancelled_equal() {
-        errorA = .CancelledDependencies
-        errorB = .CancelledDependencies
+        errorA = .cancelledDependencies
+        errorB = .cancelledDependencies
         XCTAssertEqual(errorA, errorB)
     }
 
     func test__both_failed_equal() {
-        errorA = .FailedDependencies
-        errorB = .FailedDependencies
+        errorA = .failedDependencies
+        errorB = .failedDependencies
         XCTAssertEqual(errorA, errorB)
     }
 
     func test__cancelled_and_failed_not_equal() {
-        errorA = .CancelledDependencies
-        errorB = .FailedDependencies
+        errorA = .cancelledDependencies
+        errorB = .failedDependencies
         XCTAssertNotEqual(errorA, errorB)
     }
 
     func test__failed_and_cancelled_not_equal() {
-        errorA = .FailedDependencies
-        errorB = .CancelledDependencies
+        errorA = .failedDependencies
+        errorB = .cancelledDependencies
         XCTAssertNotEqual(errorA, errorB)
     }
 }

@@ -16,14 +16,14 @@ class TestableCapability: NSObject, CapabilityType {
 
     enum Status: AuthorizationStatusType {
         enum Requirement {
-            case Minimum, Maximum
+            case minimum, maximum
         }
 
-        case NotDetermined, Restricted, Denied, MinimumAuthorized, MaximumAuthorized
+        case notDetermined, restricted, denied, minimumAuthorized, maximumAuthorized
 
-        func isRequirementMet(requirement: Requirement) -> Bool {
+        func isRequirementMet(_ requirement: Requirement) -> Bool {
             switch (requirement, self) {
-            case (.Minimum, .MinimumAuthorized), (_, MaximumAuthorized):
+            case (.minimum, .minimumAuthorized), (_, maximumAuthorized):
                 return true
             default:
                 return false
@@ -41,13 +41,13 @@ class TestableCapability: NSObject, CapabilityType {
     var serviceIsAvailable = true
     var didCheckIsAvailable = false
 
-    var serviceAuthorizationStatus: Status = .NotDetermined
+    var serviceAuthorizationStatus: Status = .notDetermined
     var didCheckAuthorizationStatus = false
 
-    var responseAuthorizationStatus: Status = .MaximumAuthorized
+    var responseAuthorizationStatus: Status = .maximumAuthorized
     var didRequestAuthorization = false
 
-    required init(_ requirement: Status.Requirement = .Minimum) {
+    required init(_ requirement: Status.Requirement = .minimum) {
         self.requirement = requirement
     }
 
@@ -56,10 +56,10 @@ class TestableCapability: NSObject, CapabilityType {
         return serviceIsAvailable
     }
 
-    func authorizationStatus(completion: Status -> Void) {
+    func authorizationStatus(_ completion: (Status) -> Void) {
         didCheckAuthorizationStatus = true
         if isAsynchronous {
-            dispatch_async(Queue.Initiated.queue) {
+            Queue.initiated.queue.async {
                 completion(self.serviceAuthorizationStatus)
             }
         }
@@ -68,11 +68,11 @@ class TestableCapability: NSObject, CapabilityType {
         }
     }
 
-    func requestAuthorizationWithCompletion(completion: dispatch_block_t) {
+    func requestAuthorizationWithCompletion(_ completion: dispatch_block_t) {
         didRequestAuthorization = true
         serviceAuthorizationStatus = responseAuthorizationStatus
         if isAsynchronous {
-            dispatch_async(Queue.Initiated.queue, completion)
+            Queue.initiated.queue.async(execute: completion)
         }
         else {
             completion()
@@ -103,9 +103,9 @@ class AuthorizationTests: OperationTests {
 
         let operation = GetAuthorizationStatus(capability)
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectation(withDescription: "Test: \(#function)"))
         runOperation(operation)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForExpectations(withTimeout: 3, handler: nil)
 
         guard let enabled = operation.isAvailable, status = operation.status else {
             XCTFail("Operation state was not set.")
@@ -113,7 +113,7 @@ class AuthorizationTests: OperationTests {
         }
 
         XCTAssertTrue(enabled)
-        XCTAssertEqual(status, TestableCapability.Status.NotDetermined)
+        XCTAssertEqual(status, TestableCapability.Status.notDetermined)
         XCTAssertTrue(capability.didCheckIsAvailable)
         XCTAssertTrue(capability.didCheckAuthorizationStatus)
         XCTAssertFalse(capability.didRequestAuthorization)
@@ -121,17 +121,17 @@ class AuthorizationTests: OperationTests {
 
     func test__get_status_runs_completionBlock() {
 
-        var completedWithEnabled: Bool? = .None
-        var completedWithStatus: TestableCapability.Status? = .None
+        var completedWithEnabled: Bool? = .none
+        var completedWithStatus: TestableCapability.Status? = .none
 
         let operation = GetAuthorizationStatus(capability) { enabled, status in
             completedWithEnabled = enabled
             completedWithStatus = status
         }
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectation(withDescription: "Test: \(#function)"))
         runOperation(operation)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForExpectations(withTimeout: 3, handler: nil)
 
         guard let enabled = completedWithEnabled, status = completedWithStatus else {
             XCTFail("Completion block was not executed")
@@ -139,7 +139,7 @@ class AuthorizationTests: OperationTests {
         }
 
         XCTAssertTrue(enabled)
-        XCTAssertEqual(status, TestableCapability.Status.NotDetermined)
+        XCTAssertEqual(status, TestableCapability.Status.notDetermined)
         XCTAssertTrue(capability.didCheckIsAvailable)
         XCTAssertTrue(capability.didCheckAuthorizationStatus)
         XCTAssertFalse(capability.didRequestAuthorization)
@@ -154,9 +154,9 @@ class AuthorizationTests: OperationTests {
 
         let operation = Authorize(capability)
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectation(withDescription: "Test: \(#function)"))
         runOperation(operation)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForExpectations(withTimeout: 3, handler: nil)
 
         XCTAssertTrue(capability.didRequestAuthorization)
     }
@@ -189,25 +189,25 @@ class AuthorizationTests: OperationTests {
     }
 
     func test__authorized_condition_fails_if_capability_is_not_available() {
-        let expectation = expectationWithDescription("Test: \(#function)")
+        let expectation = self.expectation(withDescription: "Test: \(#function)")
         let operation = TestOperation()
         capability.serviceIsAvailable = false
         let condition = AuthorizedFor(capability)
-        var conditionResult: OperationConditionResult? = .None
+        var conditionResult: OperationConditionResult? = .none
 
         condition.evaluate(operation) { result in
             conditionResult = result
             expectation.fulfill()
         }
 
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForExpectations(withTimeout: 3, handler: nil)
 
         XCTAssertNotNil(conditionResult)
         switch conditionResult! {
-        case .Failed(let error):
+        case .failed(let error):
             if let error = error as? CapabilityError<TestableCapability> {
                 switch error {
-                case .NotAvailable:
+                case .notAvailable:
                     break
                 default:
                     XCTFail("Incorrect failure error.")
@@ -219,29 +219,29 @@ class AuthorizationTests: OperationTests {
     }
 
     func test__authorized_condition_fails_if_requirement_is_not_met() {
-        let expectation = expectationWithDescription("Test: \(#function)")
+        let expectation = self.expectation(withDescription: "Test: \(#function)")
         let operation = TestOperation()
-        capability.requirement = .Maximum
-        capability.serviceAuthorizationStatus = .MinimumAuthorized
+        capability.requirement = .maximum
+        capability.serviceAuthorizationStatus = .minimumAuthorized
 
         let condition = AuthorizedFor(capability)
-        var conditionResult: OperationConditionResult? = .None
+        var conditionResult: OperationConditionResult? = .none
 
         condition.evaluate(operation) { result in
             conditionResult = result
             expectation.fulfill()
         }
 
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForExpectations(withTimeout: 3, handler: nil)
 
         XCTAssertNotNil(conditionResult)
         switch conditionResult! {
-        case .Failed(let error):
+        case .failed(let error):
             if let error = error as? CapabilityError<TestableCapability> {
                 switch error {
-                case let .AuthorizationNotGranted(status, requirement):
-                    XCTAssertEqual(status, TestableCapability.Status.MinimumAuthorized)
-                    XCTAssertEqual(requirement!, TestableCapability.Status.Requirement.Maximum)
+                case let .authorizationNotGranted(status, requirement):
+                    XCTAssertEqual(status, TestableCapability.Status.minimumAuthorized)
+                    XCTAssertEqual(requirement!, TestableCapability.Status.Requirement.maximum)
                 default:
                     XCTFail("Incorrect failure error.")
                 }
@@ -252,23 +252,23 @@ class AuthorizationTests: OperationTests {
     }
 
     func test__authorized_condition_succeeds_when_requirements_are_met() {
-        let expectation = expectationWithDescription("Test: \(#function)")
+        let expectation = self.expectation(withDescription: "Test: \(#function)")
         let operation = TestOperation()
-        capability.serviceAuthorizationStatus = .MinimumAuthorized
+        capability.serviceAuthorizationStatus = .minimumAuthorized
 
         let condition = AuthorizedFor(capability)
-        var conditionResult: OperationConditionResult? = .None
+        var conditionResult: OperationConditionResult? = .none
 
         condition.evaluate(operation) { result in
             conditionResult = result
             expectation.fulfill()
         }
 
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForExpectations(withTimeout: 3, handler: nil)
 
         XCTAssertNotNil(conditionResult)
         switch conditionResult! {
-        case .Satisfied:
+        case .satisfied:
             break
         default:
             XCTFail("Incorrect condition result.")
@@ -276,23 +276,23 @@ class AuthorizationTests: OperationTests {
     }
 
     func test__authorized_condition_succeeds_when_requirements_are_exceeded() {
-        let expectation = expectationWithDescription("Test: \(#function)")
+        let expectation = self.expectation(withDescription: "Test: \(#function)")
         let operation = TestOperation()
-        capability.serviceAuthorizationStatus = .MaximumAuthorized
+        capability.serviceAuthorizationStatus = .maximumAuthorized
 
         let condition = AuthorizedFor(capability)
-        var conditionResult: OperationConditionResult? = .None
+        var conditionResult: OperationConditionResult? = .none
 
         condition.evaluate(operation) { result in
             conditionResult = result
             expectation.fulfill()
         }
 
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForExpectations(withTimeout: 3, handler: nil)
 
         XCTAssertNotNil(conditionResult)
         switch conditionResult! {
-        case .Satisfied:
+        case .satisfied:
             break
         default:
             XCTFail("Incorrect condition result.")
@@ -312,9 +312,9 @@ class AsyncCapabilityAuthorizationTests: AuthorizationTests {
 
         let operation = GetAuthorizationStatus(capability)
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectation(withDescription: "Test: \(#function)"))
         runOperation(operation)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForExpectations(withTimeout: 3, handler: nil)
 
         guard let enabled = operation.isAvailable, status = operation.status else {
             XCTFail("Operation state was not set.")
@@ -322,26 +322,26 @@ class AsyncCapabilityAuthorizationTests: AuthorizationTests {
         }
 
         XCTAssertTrue(enabled)
-        XCTAssertEqual(status, TestableCapability.Status.NotDetermined)
+        XCTAssertEqual(status, TestableCapability.Status.notDetermined)
         XCTAssertTrue(capability.didCheckIsAvailable)
         XCTAssertTrue(capability.didCheckAuthorizationStatus)
         XCTAssertFalse(capability.didRequestAuthorization)
-        XCTAssertTrue(operation.finished)
+        XCTAssertTrue(operation.isFinished)
     }
 
     func test__async_get_status_runs_completionBlock() {
 
-        var completedWithEnabled: Bool? = .None
-        var completedWithStatus: TestableCapability.Status? = .None
+        var completedWithEnabled: Bool? = .none
+        var completedWithStatus: TestableCapability.Status? = .none
 
         let operation = GetAuthorizationStatus(capability) { enabled, status in
             completedWithEnabled = enabled
             completedWithStatus = status
         }
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectation(withDescription: "Test: \(#function)"))
         runOperation(operation)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForExpectations(withTimeout: 3, handler: nil)
 
         guard let enabled = completedWithEnabled, status = completedWithStatus else {
             XCTFail("Completion block was not executed")
@@ -349,11 +349,11 @@ class AsyncCapabilityAuthorizationTests: AuthorizationTests {
         }
 
         XCTAssertTrue(enabled)
-        XCTAssertEqual(status, TestableCapability.Status.NotDetermined)
+        XCTAssertEqual(status, TestableCapability.Status.notDetermined)
         XCTAssertTrue(capability.didCheckIsAvailable)
         XCTAssertTrue(capability.didCheckAuthorizationStatus)
         XCTAssertFalse(capability.didRequestAuthorization)
-        XCTAssertTrue(operation.finished)
+        XCTAssertTrue(operation.isFinished)
     }
 
 

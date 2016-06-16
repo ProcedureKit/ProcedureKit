@@ -47,7 +47,7 @@ public class MapOperation<T, U>: ResultOperation<U>, AutomaticInjectionOperation
     /// - returns: the requirement an optional type T
     public var requirement: T! = nil
 
-    let transform: T -> U
+    let transform: (T) -> U
 
     /**
      Initializes an instance with an optional starting requirement, and an
@@ -58,7 +58,7 @@ public class MapOperation<T, U>: ResultOperation<U>, AutomaticInjectionOperation
      - parameter transform: a closure which maps a non-optional T to U!. Note
      that this closure will only be run if the requirement is non-nil.
     */
-    public init(input: T! = .None, transform: T -> U) {
+    public init(input: T! = .none, transform: (T) -> U) {
         self.requirement = input
         self.transform = transform
         super.init(result: nil)
@@ -67,7 +67,7 @@ public class MapOperation<T, U>: ResultOperation<U>, AutomaticInjectionOperation
 
     public override func execute() {
         guard let requirement = requirement else {
-            finish(AutomaticInjectionError.RequirementNotSatisfied)
+            finish(AutomaticInjectionError.requirementNotSatisfied)
             return
         }
         result = transform(requirement)
@@ -87,14 +87,14 @@ extension ResultOperationType where Self: Operation {
      ```
 
     */
-    public func mapOperation<U>(transform: Result -> U) -> MapOperation<Result, U> {
+    public func mapOperation<U>(_ transform: (Result) -> U) -> MapOperation<Result, U> {
         let map: MapOperation<Result, U> = MapOperation(transform: transform)
         map.injectResultFromDependency(self) { operation, dependency, errors in
             if errors.isEmpty {
                 operation.requirement = dependency.result
             }
             else {
-                operation.cancelWithError(AutomaticInjectionError.DependencyFinishedWithErrors(errors))
+                operation.cancelWithError(AutomaticInjectionError.dependencyFinishedWithErrors(errors))
             }
         }
         return map
@@ -118,9 +118,9 @@ public class FilterOperation<Element>: ResultOperation<Array<Element>>, Automati
     /// - returns: the requirement an optional type T
     public var requirement: Array<Element> = []
 
-    let filter: Element -> Bool
+    let filter: (Element) -> Bool
 
-    public init(source: Array<Element> = [], includeElement: Element -> Bool) {
+    public init(source: Array<Element> = [], includeElement: (Element) -> Bool) {
         self.requirement = source
         self.filter = includeElement
         super.init(result: [])
@@ -133,7 +133,7 @@ public class FilterOperation<Element>: ResultOperation<Array<Element>>, Automati
     }
 }
 
-extension ResultOperationType where Self: Operation, Result: SequenceType {
+extension ResultOperationType where Self: Operation, Result: Sequence {
 
     /**
      Filter the result of the receiver `Operation` which conforms to `ResultOperationType` where
@@ -145,14 +145,14 @@ extension ResultOperationType where Self: Operation, Result: SequenceType {
      queue.addOperations(getLocation, toString)
      ```
     */
-    public func filterOperation(includeElement: Result.Generator.Element -> Bool) -> FilterOperation<Result.Generator.Element> {
-        let filter: FilterOperation<Result.Generator.Element> = FilterOperation(includeElement: includeElement)
+    public func filterOperation(_ includeElement: (Result.Iterator.Element) -> Bool) -> FilterOperation<Result.Iterator.Element> {
+        let filter: FilterOperation<Result.Iterator.Element> = FilterOperation(includeElement: includeElement)
         filter.injectResultFromDependency(self) { operation, dependency, errors in
             if errors.isEmpty {
                 operation.requirement = Array(dependency.result)
             }
             else {
-                operation.cancelWithError(AutomaticInjectionError.DependencyFinishedWithErrors(errors))
+                operation.cancelWithError(AutomaticInjectionError.dependencyFinishedWithErrors(errors))
             }
         }
         return filter
@@ -193,7 +193,7 @@ public class ReduceOperation<Element, U>: ResultOperation<U>, AutomaticInjection
     }
 }
 
-extension ResultOperationType where Self: Operation, Result: SequenceType {
+extension ResultOperationType where Self: Operation, Result: Sequence {
 
     /**
      Reduce the result of the receiver `Operation` which conforms to `ResultOperationType` where
@@ -208,14 +208,14 @@ extension ResultOperationType where Self: Operation, Result: SequenceType {
      ```
 
     */
-    public func reduceOperation<U>(initial: U, combine: (U, Result.Generator.Element) -> U) -> ReduceOperation<Result.Generator.Element, U> {
-        let reduce: ReduceOperation<Result.Generator.Element, U> = ReduceOperation(initial: initial, combine: combine)
+    public func reduceOperation<U>(_ initial: U, combine: (U, Result.Iterator.Element) -> U) -> ReduceOperation<Result.Iterator.Element, U> {
+        let reduce: ReduceOperation<Result.Iterator.Element, U> = ReduceOperation(initial: initial, combine: combine)
         reduce.injectResultFromDependency(self) { operation, dependency, errors in
             if errors.isEmpty {
                 operation.requirement = Array(dependency.result)
             }
             else {
-                operation.cancelWithError(AutomaticInjectionError.DependencyFinishedWithErrors(errors))
+                operation.cancelWithError(AutomaticInjectionError.dependencyFinishedWithErrors(errors))
             }
         }
         return reduce

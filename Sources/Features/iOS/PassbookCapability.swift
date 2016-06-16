@@ -70,12 +70,12 @@ public class PassbookCapability: CapabilityType {
     }
 
     /// Tests the authorization status - always VoidStatus
-    public func authorizationStatus(completion: Capability.VoidStatus -> Void) {
+    public func authorizationStatus(_ completion: (Capability.VoidStatus) -> Void) {
         completion(Capability.VoidStatus())
     }
 
     /// requests authorization - a no-op, will just execute the completion block.
-    public func requestAuthorizationWithCompletion(completion: dispatch_block_t) {
+    public func requestAuthorizationWithCompletion(_ completion: () -> Void) {
         completion()
     }
 }
@@ -100,6 +100,3 @@ extension Capability {
      */
     public typealias Passbook = PassbookCapability
 }
-
-@available(*, unavailable, renamed="AuthorizedFor(Capability.Passbook())")
-public typealias PassbookCondition = AuthorizedFor<Capability.Passbook>

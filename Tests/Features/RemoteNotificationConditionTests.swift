@@ -14,7 +14,7 @@ class TestableRemoteNotificationRegistrar: RemoteNotificationRegistrarType {
     var didRegister = false
     let error: NSError?
 
-    init(error: NSError? = .None) {
+    init(error: NSError? = .none) {
         self.error = error
     }
 
@@ -24,7 +24,7 @@ class TestableRemoteNotificationRegistrar: RemoteNotificationRegistrarType {
             RemoteNotificationCondition.didFailToRegisterForRemoteNotifications(error)
         }
         else {
-            let data = "I'm a token!".dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: true)
+            let data = "I'm a token!".data(using: String.Encoding.utf8, allowLossyConversion: true)
             RemoteNotificationCondition.didReceiveNotificationToken(data!)
         }
     }
@@ -63,20 +63,20 @@ class RemoteNotificationConditionTests: OperationTests {
         let operation = TestOperation()
         operation.addCondition(condition)
 
-        let expectation = expectationWithDescription("Test: \(#function)")
-        var receivedErrors = [ErrorType]()
+        let expectation = self.expectation(withDescription: "Test: \(#function)")
+        var receivedErrors = [ErrorProtocol]()
         operation.addObserver(DidFinishObserver { _, errors in
             receivedErrors = errors
             expectation.fulfill()
         })
 
         runOperation(operation)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForExpectations(withTimeout: 3, handler: nil)
 
         XCTAssertFalse(operation.didExecute)
-        if let error = receivedErrors.first as? RemoteNotificationCondition.Error {
+        if let error = receivedErrors.first as? RemoteNotificationCondition.Operations.Error {
             switch error {
-            case .ReceivedError(_):
+            case .receivedError(_):
                 break // expected.
             }
         }

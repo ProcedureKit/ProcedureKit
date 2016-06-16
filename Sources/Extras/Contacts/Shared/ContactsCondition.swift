@@ -14,31 +14,31 @@ public class _ContactsCondition<Store: ContactStoreType>: Condition {
     let entityType: CNEntityType
     let store: Store
 
-    public convenience init(entityType: CNEntityType = .Contacts) {
+    public convenience init(entityType: CNEntityType = .contacts) {
         self.init(entityType: entityType, registrar: Store())
     }
 
-    init(entityType: CNEntityType = .Contacts, registrar: Store) {
+    init(entityType: CNEntityType = .contacts, registrar: Store) {
         self.entityType = entityType
         self.store = registrar
         super.init()
         name = "Contacts"
 
-        if case .NotDetermined = store.opr_authorizationStatusForEntityType(entityType) {
+        if case .notDetermined = store.opr_authorizationStatusForEntityType(entityType) {
             addDependency(_ContactsAccess(entityType: entityType, contactStore: store))
         }
     }
 
-    public override func evaluate(operation: Operation, completion: OperationConditionResult -> Void) {
+    public override func evaluate(_ operation: Operation, completion: (OperationConditionResult) -> Void) {
         switch store.opr_authorizationStatusForEntityType(entityType) {
-        case .Authorized:
-            completion(.Satisfied)
-        case .Denied:
-            completion(.Failed(ContactsPermissionError.AuthorizationDenied))
-        case .Restricted:
-            completion(.Failed(ContactsPermissionError.AuthorizationRestricted))
-        case .NotDetermined:
-            completion(.Failed(ContactsPermissionError.AuthorizationNotDetermined))
+        case .authorized:
+            completion(.satisfied)
+        case .denied:
+            completion(.failed(ContactsPermissionError.authorizationDenied))
+        case .restricted:
+            completion(.failed(ContactsPermissionError.authorizationRestricted))
+        case .notDetermined:
+            completion(.failed(ContactsPermissionError.authorizationNotDetermined))
         }
     }
 }

@@ -25,7 +25,7 @@ public class NetworkObserver: OperationWillExecuteObserver, OperationDidFinishOb
 
     /// Initializer takes no parameters.
     public convenience init() {
-        self.init(indicator: UIApplication.sharedApplication())
+        self.init(indicator: UIApplication.shared())
     }
 
     init(indicator: NetworkActivityIndicatorInterface) {
@@ -33,16 +33,16 @@ public class NetworkObserver: OperationWillExecuteObserver, OperationDidFinishOb
     }
 
     /// Conforms to `OperationObserver`, will start the network activity indicator.
-    public func willExecuteOperation(operation: Operation) {
-        dispatch_async(Queue.Main.queue) {
+    public func willExecuteOperation(_ operation: Operation) {
+        Queue.main.queue.async {
             NetworkIndicatorController.sharedInstance.networkActivityIndicator = self.networkActivityIndicator
             NetworkIndicatorController.sharedInstance.networkActivityDidStart()
         }
     }
 
     /// Conforms to `OperationObserver`, will stop the network activity indicator.
-    public func didFinishOperation(operation: Operation, errors: [ErrorType]) {
-        dispatch_async(Queue.Main.queue) {
+    public func didFinishOperation(_ operation: Operation, errors: [ErrorProtocol]) {
+        Queue.main.queue.async {
             NetworkIndicatorController.sharedInstance.networkActivityIndicator = self.networkActivityIndicator
             NetworkIndicatorController.sharedInstance.networkActivityDidEnd()
         }
@@ -56,7 +56,7 @@ private class NetworkIndicatorController {
     private var activityCount = 0
     private var visibilityTimer: Timer?
 
-    var networkActivityIndicator: NetworkActivityIndicatorInterface = UIApplication.sharedApplication()
+    var networkActivityIndicator: NetworkActivityIndicatorInterface = UIApplication.shared()
 
     private init() {
         // Prevents use outside of the shared instance.
@@ -73,22 +73,22 @@ private class NetworkIndicatorController {
         }
     }
 
-    private func networkIndicatorShouldShow(shouldShow: Bool) {
+    private func networkIndicatorShouldShow(_ shouldShow: Bool) {
         visibilityTimer?.cancel()
-        visibilityTimer = .None
+        visibilityTimer = .none
         networkActivityIndicator.networkActivityIndicatorVisible = shouldShow
     }
 
     // Public API
 
     func networkActivityDidStart() {
-        assert(NSThread.isMainThread(), "Altering network activity indicator state can only be done on the main thread.")
+        assert(Thread.isMainThread(), "Altering network activity indicator state can only be done on the main thread.")
         activityCount += 1
         updateIndicatorVisibility()
     }
 
     func networkActivityDidEnd() {
-        assert(NSThread.isMainThread(), "Altering network activity indicator state can only be done on the main thread.")
+        assert(Thread.isMainThread(), "Altering network activity indicator state can only be done on the main thread.")
         activityCount -= 1
         updateIndicatorVisibility()
     }
@@ -98,9 +98,9 @@ private struct Timer {
 
     private var isCancelled = false
 
-    init(interval: NSTimeInterval, handler: dispatch_block_t) {
-        let after = dispatch_time(DISPATCH_TIME_NOW, Int64(interval * Double(NSEC_PER_SEC)))
-        dispatch_after(after, Queue.Main.queue) {
+    init(interval: TimeInterval, handler: () -> Void) {
+        let after = DispatchTime.now() + Double(Int64(interval * Double(NSEC_PER_SEC))) / Double(NSEC_PER_SEC)
+        Queue.main.queue.after(when: after) {
             if self.isCancelled != true {
                 handler()
             }

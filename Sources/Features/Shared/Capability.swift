@@ -59,7 +59,7 @@ public protocol CapabilityType {
 
      - parameter completion: a Status -> Void closure.
     */
-    func authorizationStatus(completion: Status -> Void)
+    func authorizationStatus(_ completion: (Status) -> Void)
 
     /**
      Request authorization with the requirement of the capability.
@@ -70,7 +70,7 @@ public protocol CapabilityType {
 
      - parameter completion: a dispatch_block_t closure.
     */
-    func requestAuthorizationWithCompletion(completion: dispatch_block_t)
+    func requestAuthorizationWithCompletion(_ completion: () -> Void)
 }
 
 /**
@@ -99,7 +99,7 @@ public protocol AuthorizationStatusType {
      - parameter requirement: the necessary Requirement
      - returns: a Bool indicating whether or not the requirements are met.
     */
-    func isRequirementMet(requirement: Requirement) -> Bool
+    func isRequirementMet(_ requirement: Requirement) -> Bool
 }
 
 /**
@@ -129,7 +129,7 @@ extension Capability {
     public struct VoidStatus: AuthorizationStatusType {
 
         /// - returns: true, VoidStatus cannot fail to meet requirements.
-        public func isRequirementMet(requirement: Void) -> Bool {
+        public func isRequirementMet(_ requirement: Void) -> Bool {
             return true
         }
     }
@@ -149,7 +149,7 @@ public class GetAuthorizationStatus<Capability: CapabilityType>: Operation {
     public typealias StatusResponse = (Bool, Capability.Status)
 
     /// the Completion is a closure which receives a StatusResponse
-    public typealias Completion = StatusResponse -> Void
+    public typealias Completion = (StatusResponse) -> Void
 
     /**
      After the operation has executed, this property will be set
@@ -157,7 +157,7 @@ public class GetAuthorizationStatus<Capability: CapabilityType>: Operation {
 
      - returns: a Bool indicating whether or not the capability is available.
     */
-    public var isAvailable: Bool? = .None
+    public var isAvailable: Bool? = .none
 
     /**
      After the operation has executed, this property will be set
@@ -165,7 +165,7 @@ public class GetAuthorizationStatus<Capability: CapabilityType>: Operation {
 
      - returns: a StatusResponse of the current status.
      */
-    public var status: Capability.Status? = .None
+    public var status: Capability.Status? = .none
 
     let capability: Capability
     let completion: Completion
@@ -185,7 +185,7 @@ public class GetAuthorizationStatus<Capability: CapabilityType>: Operation {
         name = "Get Authorization Status for \(capability.name)"
     }
 
-    func determineState(completion: StatusResponse -> Void) {
+    func determineState(_ completion: (StatusResponse) -> Void) {
         isAvailable = capability.isAvailable()
         capability.authorizationStatus { status in
             self.status = status
@@ -236,13 +236,13 @@ public class Authorize<Capability: CapabilityType>: GetAuthorizationStatus<Capab
 /**
  An generic ErrorType used by the AuthorizedFor condition.
 */
-public enum CapabilityError<Capability: CapabilityType>: ErrorType {
+public enum CapabilityError<Capability: CapabilityType>: ErrorProtocol {
 
     /// If the capability is not available
-    case NotAvailable
+    case notAvailable
 
     /// If authorization for the capability was not granted.
-    case AuthorizationNotGranted((Capability.Status, Capability.Status.Requirement?))
+    case authorizationNotGranted((Capability.Status, Capability.Status.Requirement?))
 }
 
 /**
@@ -284,19 +284,19 @@ public class AuthorizedFor<Capability: CapabilityType>: Condition {
     }
 
     /// Evaluated the condition
-    public override func evaluate(operation: Operation, completion: OperationConditionResult -> Void) {
+    public override func evaluate(_ operation: Operation, completion: (OperationConditionResult) -> Void) {
 
         guard capability.isAvailable() else {
-            completion(.Failed(CapabilityError<Capability>.NotAvailable))
+            completion(.failed(CapabilityError<Capability>.notAvailable))
             return
         }
 
         capability.authorizationStatus { [requirement = self.capability.requirement] status in
             if status.isRequirementMet(requirement) {
-                completion(.Satisfied)
+                completion(.satisfied)
             }
             else {
-                completion(.Failed(CapabilityError<Capability>.AuthorizationNotGranted((status, requirement))))
+                completion(.failed(CapabilityError<Capability>.authorizationNotGranted((status, requirement))))
             }
         }
     }

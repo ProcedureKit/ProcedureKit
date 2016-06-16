@@ -17,10 +17,10 @@ import Foundation
  the default route reachability, and add your operation as
  soon as the conditions are met.
 */
-public class ReachableOperation<T: NSOperation>: ComposedOperation<T> {
+public class ReachableOperation<T: Operation>: ComposedOperation<T> {
 
-    private var token: String? = .None
-    private var status: Reachability.NetworkStatus? = .None
+    private var token: String? = .none
+    private var status: Reachability.NetworkStatus? = .none
 
     /// The required connectivity kind.
     public let connectivity: Reachability.Connectivity
@@ -34,7 +34,7 @@ public class ReachableOperation<T: NSOperation>: ComposedOperation<T> {
      - parameter [unlabeled] operation: any `NSOperation` type.
      - parameter connectivity: a `Reachability.Connectivity` value, defaults to `.AnyConnectionKind`.
     */
-    public init(_ operation: T, connectivity: Reachability.Connectivity = .AnyConnectionKind) {
+    public init(_ operation: T, connectivity: Reachability.Connectivity = .anyConnectionKind) {
         self.connectivity = connectivity
         super.init(operation: operation)
         name = "Reachable Operation <\(operation.operationName)>"
