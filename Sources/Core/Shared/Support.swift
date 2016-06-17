@@ -103,7 +103,7 @@ public enum Queue {
         return DispatchQueue(label: named, attributes: [.concurrent, qos_attributes])
     }
 }
-
+/*
 public extension DispatchQueue {
 
     /**
@@ -137,7 +137,7 @@ public extension DispatchQueue {
 		return try block()
     }
 }
-
+*/
 
 
 
