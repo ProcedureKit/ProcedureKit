@@ -134,11 +134,7 @@ public extension DispatchQueue {
      - parameter block: a throwing block returning T.
      */
     func sync<T>(execute block: () throws -> T) rethrows -> T {
-        var result: T!
-        try sync {
-            result = try block()
-        }
-        return result
+		return try block()
     }
 }
 
