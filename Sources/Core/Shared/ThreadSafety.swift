@@ -29,7 +29,7 @@ struct Lock: ReadWriteLock {
     }
 
     mutating func write(_ block: () -> Void, completion: (() -> Void)?) {
-        queue.async {
+		queue.async(flags: .barrier) {
             block()
             if let completion = completion {
                 Queue.main.queue.async(execute: completion)
