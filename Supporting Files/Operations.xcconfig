@@ -9,6 +9,8 @@
 
 OPERATIONS_VERSION = 2.10.1
 
+SWIFT_VERSION = 3.0
+
 DEFINES_MODULE = YES
 INFOPLIST_FILE = $(SRCROOT)/Supporting Files/Info.plist
 PRODUCT_BUNDLE_IDENTIFIER = me.danthorpe.Operations

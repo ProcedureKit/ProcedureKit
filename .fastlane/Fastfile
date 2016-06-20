@@ -47,14 +47,7 @@ platform :ios do
       output_directory: ".ci/xcodebuild-data",
       xcargs: "-derivedDataPath .ci/xcodebuild-data"
     )
-    
-    slather(
-	    proj: "Operations.xcodeproj",
-    	scheme: "iOS Operations",
-    	build_directory: ".ci/xcodebuild-data",
-    	use_bundle_exec: true    	
-    )
-	
+
   end
 
 end
