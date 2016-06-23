@@ -133,7 +133,6 @@ public struct RepeatedPayload<T where T: NSOperation> {
 
 */
 public class RepeatedOperation<T where T: NSOperation>: GroupOperation {
-//    public typealias Payload = (Delay?, ConfigureBlock?, T)
     public typealias Payload = RepeatedPayload<T>
 
     private var generator: AnyGenerator<Payload>
