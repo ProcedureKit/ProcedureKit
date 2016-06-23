@@ -105,3 +105,10 @@ public func dispatch_sync<T>(queue: dispatch_queue_t, _ block: () throws -> T) r
     }
     return result
 }
+
+internal func dispatch_main_sync<T>(block: () throws -> T) rethrows -> T {
+    guard Queue.isMainQueue else {
+        return try dispatch_sync(Queue.Main.queue, block)
+    }
+    return try block()
+}

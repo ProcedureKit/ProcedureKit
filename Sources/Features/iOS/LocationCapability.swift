@@ -128,8 +128,9 @@ public class LocationCapability: NSObject, CLLocationManagerDelegate, Capability
     /// - returns: the EKEntityType, the required type of the capability
     public let requirement: LocationUsage
 
-    var registrar: LocationCapabilityRegistrarType = CLLocationManager()
-    var authorizationCompletionBlock: dispatch_block_t?
+    internal lazy var registrar: LocationCapabilityRegistrarType = CLLocationManager.create()
+
+    internal var authorizationCompletionBlock: dispatch_block_t? = .None
 
     /**
      Initialize the capability. By default, it requires access .WhenInUse.
@@ -161,19 +162,19 @@ public class LocationCapability: NSObject, CLLocationManagerDelegate, Capability
      - parameter completion: a dispatch_block_t
      */
     public func requestAuthorizationWithCompletion(completion: dispatch_block_t) {
-        if !registrar.opr_locationServicesEnabled() {
+        guard isAvailable() else {
             completion()
+            return
         }
-        else {
-            let status = registrar.opr_authorizationStatus()
-            switch (status, requirement) {
-            case (.NotDetermined, _), (.AuthorizedWhenInUse, .Always):
-                authorizationCompletionBlock = completion
-                registrar.opr_setDelegate(self)
-                registrar.opr_requestAuthorizationWithRequirement(requirement)
-            default:
-                completion()
-            }
+
+        let status = registrar.opr_authorizationStatus()
+        switch (status, requirement) {
+        case (.NotDetermined, _), (.AuthorizedWhenInUse, .Always):
+            authorizationCompletionBlock = completion
+            registrar.opr_setDelegate(self)
+            registrar.opr_requestAuthorizationWithRequirement(requirement)
+        default:
+            completion()
         }
     }
 
