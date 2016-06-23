@@ -63,6 +63,14 @@ public enum WaitStrategy {
     }
 }
 
+public struct RepeatedPayload<T where T: NSOperation> {
+    public typealias ConfigureBlock = T -> Void
+
+    public let delay: Delay?
+    public let operation: T
+    public let configure: ConfigureBlock?
+}
+
 /**
 
  ### RepeatedOperation
@@ -125,7 +133,7 @@ public enum WaitStrategy {
 
 */
 public class RepeatedOperation<T where T: NSOperation>: GroupOperation {
-    public typealias Payload = (Delay?, T)
+    public typealias Payload = RepeatedPayload<T>
 
     private var generator: AnyGenerator<Payload>
 
@@ -138,7 +146,7 @@ public class RepeatedOperation<T where T: NSOperation>: GroupOperation {
     /// - return: the count of operations that have executed.
     public internal(set) var count: Int = 1
 
-    internal private(set) var configure: T -> Void = { _ in }
+    internal private(set) var configure: Payload.ConfigureBlock = { _ in }
 
     static func createPayloadGeneratorWithMaxCount(max: Int? = .None, generator gen: AnyGenerator<Payload>) -> AnyGenerator<Payload> {
         return max.map { AnyGenerator(FiniteGenerator(gen, limit: $0 - 1)) } ?? gen
@@ -153,11 +161,11 @@ public class RepeatedOperation<T where T: NSOperation>: GroupOperation {
     */
     public init(maxCount max: Int? = .None, generator gen: AnyGenerator<Payload>) {
 
-        guard let (_, operation) = gen.next() else {
+        guard let payload = gen.next() else {
             preconditionFailure("Operation Generator must return an instance initially.")
         }
 
-        current = operation
+        current = payload.operation
         generator = RepeatedOperation<T>.createPayloadGeneratorWithMaxCount(max, generator: gen)
 
         super.init(operations: [])
@@ -175,14 +183,15 @@ public class RepeatedOperation<T where T: NSOperation>: GroupOperation {
      */
     public init<D, G where D: GeneratorType, D.Element == Delay, G: GeneratorType, G.Element == T>(maxCount max: Int? = .None, delay: D, generator gen: G) {
 
-        var tuple = TupleGenerator(primary: gen, secondary: delay)
+        let tuple = TupleGenerator(primary: gen, secondary: delay)
+        var mapped = MapGenerator(tuple) { RepeatedPayload(delay: $0.0, operation: $0.1, configure: .None) }
 
-        guard let (_, operation) = tuple.next() else {
+        guard let payload = mapped.next() else {
             preconditionFailure("Operation Generator must return an instance initially.")
         }
 
-        current = operation
-        generator = RepeatedOperation<T>.createPayloadGeneratorWithMaxCount(max, generator: AnyGenerator(tuple))
+        current = payload.operation
+        generator = RepeatedOperation<T>.createPayloadGeneratorWithMaxCount(max, generator: AnyGenerator(mapped))
 
         super.init(operations: [])
         name = "Repeated Operation <\(T.self)>"
@@ -221,15 +230,15 @@ public class RepeatedOperation<T where T: NSOperation>: GroupOperation {
     public init<G where G: GeneratorType, G.Element == T>(maxCount max: Int? = .None, strategy: WaitStrategy = .Fixed(0.1), generator gen: G) {
 
         let delay = MapGenerator(strategy.generator()) { Delay.By($0) }
-        var tuple = TupleGenerator(primary: gen, secondary: delay)
+        let tuple = TupleGenerator(primary: gen, secondary: delay)
+        var mapped = MapGenerator(tuple) { RepeatedPayload(delay: $0.0, operation: $0.1, configure: .None) }
 
-        guard let (_, operation) = tuple.next() else {
+        guard let payload = mapped.next() else {
             preconditionFailure("Operation Generator must return an instance initially.")
         }
 
-        current = operation
-        generator = RepeatedOperation<T>.createPayloadGeneratorWithMaxCount(max, generator: AnyGenerator(tuple))
-
+        current = payload.operation
+        generator = RepeatedOperation<T>.createPayloadGeneratorWithMaxCount(max, generator: AnyGenerator(mapped))
         super.init(operations: [])
         name = "Repeated Operation <\(T.self)>"
     }
@@ -290,20 +299,25 @@ public class RepeatedOperation<T where T: NSOperation>: GroupOperation {
      can prevent another operation from being added.
     */
     public func addNextOperation(@autoclosure shouldAddNext: () -> Bool = true) -> Bool {
-        guard shouldAddNext(), let (delay, op) = next() else { return false }
+        guard shouldAddNext(), let payload = next() else { return false }
 
-        log.verbose("will add next operation: \(op)")
-        configure(op)
-        if let delay = delay.map({ DelayOperation(delay: $0) }) {
-            op.addDependency(delay)
-            addOperations(delay, op)
+        log.verbose("will add next operation: \(payload.operation)")
+
+        if let newConfigureBlock = payload.configure {
+            replaceConfigureBlock(newConfigureBlock)
+        }
+
+        configure(payload.operation)
+        if let delay = payload.delay.map({ DelayOperation(delay: $0) }) {
+            payload.operation.addDependency(delay)
+            addOperations(delay, payload.operation)
         }
         else {
-            addOperation(op)
+            addOperation(payload.operation)
         }
         count += 1
         previous = current
-        current = op
+        current = payload.operation
 
         return true
     }
@@ -327,7 +341,7 @@ public class RepeatedOperation<T where T: NSOperation>: GroupOperation {
 
      - parameter block: a block which receives an instance of T
     */
-    public func addConfigureBlock(block: T -> Void) {
+    public func addConfigureBlock(block: Payload.ConfigureBlock) {
         let config = configure
         configure = { operation in
             config(operation)
@@ -340,7 +354,8 @@ public class RepeatedOperation<T where T: NSOperation>: GroupOperation {
 
      - parameter block: a block which receives an instance of T
      */
-    public func replaceConfigureBlock(block: T -> Void) {
+    public func replaceConfigureBlock(block: Payload.ConfigureBlock) {
         configure = block
+        log.verbose("did replace configure block.")
     }
 }
