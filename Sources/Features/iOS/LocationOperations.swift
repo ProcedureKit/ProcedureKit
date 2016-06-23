@@ -273,15 +273,17 @@ public class ReverseGeocodeUserLocationOperation: GroupOperation, ResultOperatio
         addCondition(MutuallyExclusive<ReverseGeocodeUserLocationOperation>())
     }
 
-    public override func willFinishOperation(operation: NSOperation, withErrors errors: [ErrorType]) {
-        guard let location = location where errors.isEmpty && userLocationOperation == operation && !operation.cancelled else { return }
+    public override func willFinishOperation(operation: NSOperation) {
+        guard userLocationOperation == operation && !operation.cancelled, let location = location else { return }
 
         let reverseOp = ReverseGeocodeOperation(location: location) { [unowned self] placemark in
             self.completion(location, placemark)
         }
+
         if let geocoder = geocoder {
             reverseOp.geocoder = geocoder
         }
+
         addOperation(reverseOp)
         reverseGeocodeOperation = reverseOp
     }

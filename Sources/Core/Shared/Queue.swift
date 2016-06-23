@@ -118,4 +118,3 @@ public enum Queue {
 }
 
 internal let mainQueueScheduler = Queue.Scheduler(queue: Queue.Main.queue)
-
