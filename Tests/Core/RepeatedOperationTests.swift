@@ -264,7 +264,7 @@ class RepeatedOperationTests: OperationTests {
     var operation: RepeatedOperation<TestOperation>!
 
     func test__custom_generator_with_delay() {
-        operation = RepeatedOperation(maxCount: 2, generator: AnyGenerator { (Delay.By(0.1), TestOperation() )})
+        operation = RepeatedOperation(maxCount: 2, generator: AnyGenerator { RepeatedPayload(delay: Delay.By(0.1), operation: TestOperation(), configure: .None) })
 
         waitForOperation(operation)
 
@@ -274,7 +274,7 @@ class RepeatedOperationTests: OperationTests {
     }
 
     func test__custom_generator_without_delay() {
-        operation = RepeatedOperation(maxCount: 2, generator: AnyGenerator { (.None, TestOperation() )})
+        operation = RepeatedOperation(maxCount: 2, generator: AnyGenerator { RepeatedPayload(delay: .None, operation: TestOperation(), configure: .None) })
 
         waitForOperation(operation)
 

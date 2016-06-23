@@ -58,7 +58,7 @@ class RetryOperationTests: OperationTests {
         }
     }
 
-    func producerWithDelay(threshold: Int) -> () -> (Delay?, Test)? {
+    func producerWithDelay(threshold: Int) -> () -> RepeatedPayload<Test>? {
         return { [unowned self] in
             guard self.numberOfExecutions < 10 else { return nil }
 
@@ -69,7 +69,7 @@ class RetryOperationTests: OperationTests {
                 self.numberOfExecutions += 1
             })
 
-            return (Delay.By(0.001), op)
+            return RepeatedPayload(delay: Delay.By(0.0001), operation: op, configure: .None)
         }
     }
 
@@ -145,13 +145,45 @@ class RetryOperationTests: OperationTests {
         XCTAssertEqual(retryCount, 2)
     }
 
+    func test__retry_using_should_retry_block_with_configure() {
+
+        var retryErrors: [ErrorType]? = .None
+        var retryHistoricalErrors: [ErrorType]? = .None
+        var retryCount: Int = 0
+        var didRunBlockCount: Int = 0
+        var didRunResetConfigurationBlock = false
+
+        let retry: Handler = { info, recommended in
+            retryErrors = info.errors
+            retryHistoricalErrors = info.historicalErrors
+            retryCount = info.count
+            didRunBlockCount += 1
+            return RepeatedPayload(delay: recommended.delay, operation: recommended.operation) { _ in
+                didRunResetConfigurationBlock = true
+            }
+        }
+
+        operation = RetryOperation(AnyGenerator(body: producer(3)), retry: retry)
+
+        waitForOperation(operation)
+
+        XCTAssertTrue(operation.finished)
+        XCTAssertEqual(operation.count, 3)
+        XCTAssertTrue(didRunResetConfigurationBlock)
+        XCTAssertEqual(didRunBlockCount, 2)
+        XCTAssertNotNil(retryErrors)
+        XCTAssertEqual(retryErrors?.count ?? 0, 1)
+        XCTAssertNotNil(retryHistoricalErrors)
+        XCTAssertEqual(retryHistoricalErrors?.count ?? 0, 1)
+        XCTAssertEqual(retryCount, 2)
+    }
+
     func test__retry_using_retry_block_returning_nil() {
         var retryErrors: [ErrorType]? = .None
         var retryHistoricalErrors: [ErrorType]? = .None
         var retryCount: Int = 0
         var didRunBlockCount: Int = 0
         let retry: Handler = { info, recommended in
-            print("info: \(info)")
             retryErrors = info.errors
             retryHistoricalErrors = info.historicalErrors
             retryCount = info.count
@@ -160,7 +192,6 @@ class RetryOperationTests: OperationTests {
         }
 
         operation = RetryOperation(AnyGenerator(body: producer(3)), retry: retry)
-        operation.log.severity = .Verbose
 
         waitForOperation(operation)
 
