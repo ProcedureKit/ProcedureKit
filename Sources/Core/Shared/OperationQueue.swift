@@ -67,15 +67,8 @@ public class OperationQueue: NSOperationQueue {
         if let operation = operation as? Operation {
 
             /// Add an observer so that any produced operations are added to the queue
-            /// Except for group operations, where any produced operations are added
-            /// to the the group.
             operation.addObserver(ProducedOperationObserver { [weak self] op, produced in
-                if let group = op as? GroupOperation {
-                    group.addOperation(produced)
-                }
-                else {
-                    self?.addOperation(produced)
-                }
+                self?.addOperation(produced)
             })
 
             /// Add an observer to invoke the will finish delegate method
@@ -184,5 +177,29 @@ public extension NSOperationQueue {
     */
     func addOperations(ops: NSOperation...) {
         addOperations(ops)
+    }
+}
+
+
+public extension OperationQueue {
+
+    private static let sharedMainQueue = MainQueue()
+
+    /**
+     Override NSOperationQueue's mainQueue() to return the main queue as an OperationQueue
+
+     - returns: The main queue
+     */
+    public override class func mainQueue() -> OperationQueue {
+        return sharedMainQueue
+    }
+}
+
+/// OperationQueue wrapper around the main queue
+private class MainQueue: OperationQueue {
+    override init() {
+        super.init()
+        underlyingQueue = dispatch_get_main_queue()
+        maxConcurrentOperationCount = 1
     }
 }

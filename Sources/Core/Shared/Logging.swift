@@ -21,7 +21,7 @@ import Foundation
  is greater than the minimum severity the message string will
  be sent to the logger's block.
 */
-public enum LogSeverity: Int, Comparable {
+@objc public enum LogSeverity: Int, Comparable {
 
     /// Chatty
     case Verbose = 0

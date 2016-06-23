@@ -22,13 +22,13 @@ class AlertOperationTests: OperationTests {
     
     func test__alert_style_set_default() {
         let op = AlertOperation(presentAlertFrom: presentingController)
-        XCTAssertEqual(op.alert.preferredStyle, UIAlertControllerStyle.Alert)
+        XCTAssertEqual(op.preferredStyle, UIAlertControllerStyle.Alert)
     }
     
     func test__alert_style_actionSheet() {
         let style = UIAlertControllerStyle.ActionSheet
         let op = AlertOperation(presentAlertFrom: presentingController, preferredStyle: style)
-        XCTAssertEqual(op.alert.preferredStyle, style)
+        XCTAssertEqual(op.preferredStyle, style)
     }
 
     func test__alert_title_works() {
@@ -41,6 +41,27 @@ class AlertOperationTests: OperationTests {
         let alert = AlertOperation(presentAlertFrom: presentingController)
         alert.message = message
         XCTAssertEqual(alert.message, message)
+    }
+    
+    func test__alert_add_textfield_works() {
+        let alert = AlertOperation(presentAlertFrom: presentingController)
+        alert.addTextFieldWithConfigurationHandler(nil)
+        XCTAssertNotNil(alert.textFields)
+    }
+    
+    func test__alert_actions_works() {
+        let alert = AlertOperation(presentAlertFrom: presentingController)
+        alert.addActionWithTitle("OK")
+        XCTAssertNotNil(alert.actions)
+    }
+    
+    func test__alert_preferred_action_works() {
+        let alert = AlertOperation(presentAlertFrom: presentingController)
+        let action = alert.addActionWithTitle("OK", style: .Default)
+        alert.addActionWithTitle("Cancel", style: .Cancel)
+        
+        alert.preferredAction = action
+        XCTAssertNotNil(alert.preferredAction)
     }
 
     func test__alert_operation_presents_alert_controller() {

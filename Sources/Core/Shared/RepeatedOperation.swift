@@ -51,6 +51,7 @@ import Foundation
 */
 public enum WaitStrategy {
 
+    case Immediate
     case Fixed(NSTimeInterval)
     case Random((minimum: NSTimeInterval, maximum: NSTimeInterval))
     case Incrementing((initial: NSTimeInterval, increment: NSTimeInterval))
@@ -127,6 +128,9 @@ public class RepeatedOperation<T where T: NSOperation>: GroupOperation {
     public typealias Payload = (Delay?, T)
 
     private var generator: AnyGenerator<Payload>
+
+    /// - returns: the previous operation which was executed.
+    public internal(set) var previous: T? = .None
 
     /// - returns: the current operation being executed.
     public internal(set) var current: T
@@ -238,9 +242,25 @@ public class RepeatedOperation<T where T: NSOperation>: GroupOperation {
     }
 
     /**
-     Override of operationDidFinish: withErrors:
+     Override of willFinishOperation
 
-     This function ignores errors, and cases where the operation
+     This function ignores errors cases where the operation
+     is a `DelayOperation`. If the operation is an instance of `T`
+     it calls `addNextOperation()`.
+
+     When subclassing, be very careful if downcasting `T` to
+     say `Operation` instead of `MyOperation` (i.e. your specific
+     operation which should be repeated).
+     */
+    public override func willAttemptRecoveryFromErrors(errors: [ErrorType], inOperation operation: NSOperation) -> Bool {
+        addNextOperation(operation === current)
+        return super.willAttemptRecoveryFromErrors(errors, inOperation: operation)
+    }
+
+    /**
+     Override of willFinishOperation
+
+     This function ignores cases where the operation
      is a `DelayOperation`. If the operation is an instance of `T`
      it calls `addNextOperation()`.
 
@@ -248,11 +268,8 @@ public class RepeatedOperation<T where T: NSOperation>: GroupOperation {
      say `Operation` instead of `MyOperation` (i.e. your specific
      operation which should be repeated).
     */
-    public override func willFinishOperation(operation: NSOperation, withErrors errors: [ErrorType]) {
-        if let _ = operation as? DelayOperation { return }
-        if let _ = operation as? T {
-            addNextOperation()
-        }
+    public override func willFinishOperation(operation: NSOperation) {
+        addNextOperation(operation === current)
     }
 
     /**
@@ -272,21 +289,23 @@ public class RepeatedOperation<T where T: NSOperation>: GroupOperation {
      to return true. Subclasses may inject additional logic here which
      can prevent another operation from being added.
     */
-    public func addNextOperation(@autoclosure shouldAddNext: () -> Bool = true) {
-        if let (delay, op) = next() {
-            if shouldAddNext() {
-                configure(op)
-                if let delay = delay.map({ DelayOperation(delay: $0) }) {
-                    op.addDependency(delay)
-                    addOperations(delay, op)
-                }
-                else {
-                    addOperation(op)
-                }
-                count += 1
-                current = op
-            }
+    public func addNextOperation(@autoclosure shouldAddNext: () -> Bool = true) -> Bool {
+        guard shouldAddNext(), let (delay, op) = next() else { return false }
+
+        log.verbose("will add next operation: \(op)")
+        configure(op)
+        if let delay = delay.map({ DelayOperation(delay: $0) }) {
+            op.addDependency(delay)
+            addOperations(delay, op)
         }
+        else {
+            addOperation(op)
+        }
+        count += 1
+        previous = current
+        current = op
+
+        return true
     }
 
     /**

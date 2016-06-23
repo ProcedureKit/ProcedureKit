@@ -266,37 +266,31 @@ class RepeatedOperationTests: OperationTests {
     func test__custom_generator_with_delay() {
         operation = RepeatedOperation(maxCount: 2, generator: AnyGenerator { (Delay.By(0.1), TestOperation() )})
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
-        runOperation(operation)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForOperation(operation)
 
         XCTAssertTrue(operation.finished)
         XCTAssertEqual(operation.count, 2)
-        XCTAssertEqual(operation.aggregateErrors.count, 0)
+        XCTAssertEqual(operation.errors.count, 0)
     }
 
     func test__custom_generator_without_delay() {
         operation = RepeatedOperation(maxCount: 2, generator: AnyGenerator { (.None, TestOperation() )})
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
-        runOperation(operation)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForOperation(operation)
 
         XCTAssertTrue(operation.finished)
         XCTAssertEqual(operation.count, 2)
-        XCTAssertEqual(operation.aggregateErrors.count, 0)
+        XCTAssertEqual(operation.errors.count, 0)
     }
 
     func test__init_separate_delay_generator_and_item_generator() {
         operation = RepeatedOperation(maxCount: 2, delay: AnyGenerator { Delay.By(0.1) }, generator: AnyGenerator { TestOperation() })
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
-        runOperation(operation)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForOperation(operation)
 
         XCTAssertTrue(operation.finished)
         XCTAssertEqual(operation.count, 2)
-        XCTAssertEqual(operation.aggregateErrors.count, 0)
+        XCTAssertEqual(operation.errors.count, 0)
     }
 }
 
@@ -324,7 +318,7 @@ class NonRepeatableRepeatedOperationTests: OperationTests {
         waitForExpectationsWithTimeout(3, handler: nil)
 
         XCTAssertEqual(operation.count, 5)
-        XCTAssertEqual(operation.aggregateErrors.count, 4)
+        XCTAssertEqual(operation.errors.count, 4)
     }
 
     func test__repeated_with_max_number_of_attempts() {
