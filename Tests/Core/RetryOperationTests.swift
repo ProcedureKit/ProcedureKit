@@ -58,7 +58,7 @@ class RetryOperationTests: OperationTests {
         }
     }
 
-    func producerWithDelay(threshold: Int) -> () -> (Delay?, Test)? {
+    func producerWithDelay(threshold: Int) -> () -> RepeatedPayload<Test>? {
         return { [unowned self] in
             guard self.numberOfExecutions < 10 else { return nil }
 
@@ -69,7 +69,7 @@ class RetryOperationTests: OperationTests {
                 self.numberOfExecutions += 1
             })
 
-            return (Delay.By(0.001), op)
+            return RepeatedPayload(delay: Delay.By(0.0001), operation: op, configure: .None)
         }
     }
 

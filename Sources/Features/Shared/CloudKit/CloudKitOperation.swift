@@ -30,7 +30,7 @@ public class CloudKitRecovery<T where T: NSOperation, T: CKOperationType, T: Ass
     public typealias ErrorResponse = (delay: Delay?, configure: V -> Void)
     public typealias Handler = (error: T.Error, log: LoggerType, suggested: ErrorResponse) -> ErrorResponse?
 
-    typealias Payload = (Delay?, V)
+    typealias Payload = RepeatedPayload<V>
 
     var defaultHandlers: [CKErrorCode: Handler]
     var customHandlers: [CKErrorCode: Handler]
@@ -46,7 +46,7 @@ public class CloudKitRecovery<T where T: NSOperation, T: CKOperationType, T: Ass
         guard let (code, error) = cloudKitErrorsFromInfo(info) else { return .None }
 
         // We take the payload, if not nil, and return the delay, and configuration block
-        let suggestion: ErrorResponse = (payload.0, info.configure )
+        let suggestion: ErrorResponse = (payload.delay, info.configure)
         var response: ErrorResponse? = .None
 
         response = defaultHandlers[code]?(error: error, log: info.log, suggested: suggestion)
@@ -235,10 +235,8 @@ public final class CloudKitOperation<T where T: NSOperation, T: CKOperationType,
 
         // Creates a Retry Handler using the recovery object
         let handler: Handler = { [weak _recovery] info, payload in
-            guard let _recovery = _recovery, (delay, configure) = _recovery.recoverWithInfo(info, payload: payload) else { return .None }
-            let (_, operation) = payload
-            configure(operation)
-            return (delay, operation)
+            guard let recovery = _recovery, (delay, configure) = recovery.recoverWithInfo(info, payload: payload) else { return .None }
+            return RepeatedPayload(delay: delay, operation: payload.operation, configure: configure)
         }
 
         recovery = _recovery
@@ -297,8 +295,8 @@ public class BatchedCloudKitOperation<T where T: NSOperation, T: CKBatchedOperat
         let strategy: WaitStrategy = .Fixed(0.1)
         let delay = MapGenerator(strategy.generator()) { Delay.By($0) }
         let tuple = TupleGenerator(primary: generator, secondary: delay)
-
-        super.init(generator: AnyGenerator(tuple))
+        let mapped = MapGenerator(tuple) { RepeatedPayload(delay: $0.0, operation: $0.1, configure: .None) }
+        super.init(generator: AnyGenerator(mapped))
     }
 
     public override func willFinishOperation(operation: NSOperation) {
