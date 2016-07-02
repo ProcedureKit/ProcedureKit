@@ -1302,6 +1302,7 @@
 		652616C51C11F48200654091 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
 			};
 			name = Release;
 		};
