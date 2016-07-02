@@ -28,7 +28,7 @@ public class CloudKitRecovery<T where T: NSOperation, T: CKOperationType, T: Ass
     public typealias V = OPRCKOperation<T>
 
     public typealias ErrorResponse = (delay: Delay?, configure: V -> Void)
-    public typealias Handler = (error: T.Error, log: LoggerType, suggested: ErrorResponse) -> ErrorResponse?
+    public typealias Handler = (operation: T, error: T.Error, log: LoggerType, suggested: ErrorResponse) -> ErrorResponse?
 
     typealias Payload = RepeatedPayload<V>
 
@@ -42,24 +42,24 @@ public class CloudKitRecovery<T where T: NSOperation, T: CKOperationType, T: Ass
     }
 
     internal func recoverWithInfo(info: RetryFailureInfo<V>, payload: Payload) -> ErrorResponse? {
-
         guard let (code, error) = cloudKitErrorsFromInfo(info) else { return .None }
 
         // We take the payload, if not nil, and return the delay, and configuration block
         let suggestion: ErrorResponse = (payload.delay, info.configure)
-        var response: ErrorResponse? = .None
 
-        response = defaultHandlers[code]?(error: error, log: info.log, suggested: suggestion)
-        response = customHandlers[code]?(error: error, log: info.log, suggested: response ?? suggestion) ?? response
+        guard let
+            handler = customHandlers[code] ?? defaultHandlers[code],
+            response = handler(operation: info.operation.operation, error: error, log: info.log, suggested: suggestion)
+        else {
+            return .None
+        }
 
         return response
-
-        // 5. Consider how we might pass the result of the default into the custom
     }
 
     func addDefaultHandlers() {
 
-        let exit: Handler = { error, log, _ in
+        let exit: Handler = { _, error, log, _ in
             log.fatal("Exiting due to CloudKit Error: \(error)")
             return .None
         }
@@ -75,7 +75,7 @@ public class CloudKitRecovery<T where T: NSOperation, T: CKOperationType, T: Ass
         setDefaultHandlerForCode(.QuotaExceeded, handler: exit)
         setDefaultHandlerForCode(.OperationCancelled, handler: exit)
 
-        let retry: Handler = { error, log, suggestion in
+        let retry: Handler = { _, error, log, suggestion in
             return error.retryAfterDelay.map { ($0, suggestion.configure) } ?? suggestion
         }
 
@@ -216,6 +216,10 @@ public final class CloudKitOperation<T where T: NSOperation, T: CKOperationType,
         return current.operation
     }
 
+    public var errorHandlers: [CKErrorCode: ErrorHandler] {
+        return recovery.customHandlers
+    }
+
     public convenience init(timeout: NSTimeInterval? = 300, strategy: WaitStrategy = .Random((0.1, 1.0)), _ body: () -> T?) {
         self.init(timeout: timeout, strategy: strategy, generator: AnyGenerator(body: body))
     }
@@ -246,6 +250,10 @@ public final class CloudKitOperation<T where T: NSOperation, T: CKOperationType,
 
     public func setErrorHandlerForCode(code: CKErrorCode, handler: ErrorHandler) {
         recovery.setCustomHandlerForCode(code, handler: handler)
+    }
+
+    public func setErrorHandlers(handlers: [CKErrorCode: ErrorHandler]) {
+        recovery.customHandlers = handlers
     }
 }
 

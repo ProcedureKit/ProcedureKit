@@ -380,8 +380,8 @@ class OPRCKOperationTests: CKTests {
 
     func test__timeout() {
         XCTAssertEqual(timeoutObserver?.timeout ?? 0, 300)
-    }
 
+    }
     func test__no_timeout() {
         operation = OPRCKOperation(operation: target, timeout: .None)
         XCTAssertNil(timeoutObserver)
@@ -1333,7 +1333,7 @@ class CloudKitOperationDiscoverAllContractsTests: CKTests {
         operation = CloudKitOperation(strategy: .Immediate) {
             let op = TestDiscoverAllContactsOperation(result: [])
             if shouldError {
-                let userInfo = [CKErrorRetryAfterKey: NSNumber(double: 1.0)]
+                let userInfo = [CKErrorRetryAfterKey: NSNumber(double: 0.001)]
                 op.error = NSError(
                     domain: CKErrorDomain,
                     code: CKErrorCode.ServiceUnavailable.rawValue,
@@ -1343,6 +1343,7 @@ class CloudKitOperationDiscoverAllContractsTests: CKTests {
             }
             return op
         }
+        operation.log.severity = .Verbose
         operation.setDiscoverAllContactsCompletionBlock { _ in }
 
         waitForOperation(operation)
@@ -1390,7 +1391,7 @@ class CloudKitOperationDiscoverAllContractsTests: CKTests {
         }
 
         var didRunCustomHandler = false
-        operation.setErrorHandlerForCode(.LimitExceeded) { error, log, suggested in
+        operation.setErrorHandlerForCode(.LimitExceeded) { operation, error, log, suggested in
             didRunCustomHandler = true
             return suggested
         }
@@ -1421,6 +1422,23 @@ class CloudKitOperationDiscoverAllContractsTests: CKTests {
 
         XCTAssertTrue(operation.finished)
         XCTAssertEqual(operation.errors.count, 1)
+    }
+
+    func test__get_error_handlers() {
+        operation = CloudKitOperation { TestDiscoverAllContactsOperation(result: []) }
+        operation.setErrorHandlerForCode(.InternalError) { $3 }
+        let errorHandlers = operation.errorHandlers
+        XCTAssertEqual(errorHandlers.count, 1)
+        XCTAssertNotNil(errorHandlers[.InternalError])
+    }
+
+    func test__set_error_handlers() {
+        operation = CloudKitOperation { TestDiscoverAllContactsOperation(result: []) }
+        let handler: CloudKitOperation<TestDiscoverAllContactsOperation>.ErrorHandler = { $3 }
+        operation.setErrorHandlers([.InternalError: handler])
+        let errorHandlers = operation.errorHandlers
+        XCTAssertEqual(errorHandlers.count, 1)
+        XCTAssertNotNil(errorHandlers[.InternalError])
     }
 }
 

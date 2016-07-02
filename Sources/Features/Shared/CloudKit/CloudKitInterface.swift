@@ -288,6 +288,23 @@ public protocol CKQueryOperationType: CKDatabaseOperationType, CKResultsLimit, C
     var queryCompletionBlock: ((QueryCursor?, NSError?) -> Void)? { get set }
 }
 
+
+public protocol BatchProcessOperationType: CKOperationType {
+    associatedtype Process
+    associatedtype Error: CloudKitBatchProcessErrorType
+
+    var toProcess: [Process]? { get set }
+}
+
+public protocol BatchModifyOperationType: CKOperationType {
+    associatedtype Save
+    associatedtype Delete
+    associatedtype Error: CloudKitBatchModifyErrorType
+
+    var toSave: [Save]? { get set }
+    var toDelete: [Delete]? { get set }
+}
+
 /// An extension to make CKOperation to conform to the CKOperationType.
 extension CKOperation: CKOperationType {
 
@@ -351,56 +368,102 @@ extension CKDiscoverUserInfosOperation: CKDiscoverUserInfosOperationType, Associ
     // The associated error type
     public typealias Error = CloudKitError
 }
+
 extension CKFetchNotificationChangesOperation: CKFetchNotificationChangesOperationType, AssociatedErrorType {
 
     // The associated error type
     public typealias Error = FetchNotificationChangesError<ServerChangeToken>
 }
-extension CKMarkNotificationsReadOperation: CKMarkNotificationsReadOperationType, AssociatedErrorType {
+
+extension CKMarkNotificationsReadOperation: CKMarkNotificationsReadOperationType, AssociatedErrorType, BatchProcessOperationType {
 
     // The associated error type
     public typealias Error = MarkNotificationsReadError<NotificationID>
+
+    public var toProcess: [CKNotificationID]? {
+        get { return notificationIDs }
+        set { notificationIDs = newValue ?? [] }
+    }
 }
+
 extension CKModifyBadgeOperation: CKModifyBadgeOperationType, AssociatedErrorType {
 
     // The associated error type
     public typealias Error = CloudKitError
 }
+
 extension CKFetchRecordChangesOperation: CKFetchRecordChangesOperationType, AssociatedErrorType {
 
     // The associated error type
     public typealias Error = FetchRecordChangesError<ServerChangeToken>
 }
+
 extension CKFetchRecordZonesOperation: CKFetchRecordZonesOperationType, AssociatedErrorType {
 
     // The associated error type
     public typealias Error = FetchRecordZonesError<RecordZone, RecordZoneID>
 }
+
 extension CKFetchRecordsOperation: CKFetchRecordsOperationType, AssociatedErrorType {
 
     // The associated error type
     public typealias Error = FetchRecordsError<Record, RecordID>
 }
+
 extension CKFetchSubscriptionsOperation: CKFetchSubscriptionsOperationType, AssociatedErrorType {
 
     // The associated error type
     public typealias Error = FetchSubscriptionsError<Subscription>
 }
-extension CKModifyRecordZonesOperation: CKModifyRecordZonesOperationType, AssociatedErrorType {
+
+extension CKModifyRecordZonesOperation: CKModifyRecordZonesOperationType, AssociatedErrorType, BatchModifyOperationType {
 
     // The associated error type
     public typealias Error = ModifyRecordZonesError<RecordZone, RecordZoneID>
+
+    public var toSave: [RecordZone]? {
+        get { return recordZonesToSave }
+        set { recordZonesToSave = newValue }
+    }
+
+    public var toDelete: [RecordZoneID]? {
+        get { return recordZoneIDsToDelete }
+        set { recordZoneIDsToDelete = newValue }
+    }
 }
-extension CKModifyRecordsOperation: CKModifyRecordsOperationType, AssociatedErrorType {
+
+extension CKModifyRecordsOperation: CKModifyRecordsOperationType, AssociatedErrorType, BatchModifyOperationType {
 
     // The associated error type
     public typealias Error = ModifyRecordsError<Record, RecordID>
+
+    public var toSave: [Record]? {
+        get { return recordsToSave }
+        set { recordsToSave = newValue }
+    }
+
+    public var toDelete: [RecordID]? {
+        get { return recordIDsToDelete }
+        set { recordIDsToDelete = newValue }
+    }
 }
-extension CKModifySubscriptionsOperation: CKModifySubscriptionsOperationType, AssociatedErrorType {
+
+extension CKModifySubscriptionsOperation: CKModifySubscriptionsOperationType, AssociatedErrorType, BatchModifyOperationType {
 
     // The associated error type
     public typealias Error = ModifySubscriptionsError<Subscription, String>
+
+    public var toSave: [Subscription]? {
+        get { return subscriptionsToSave }
+        set { subscriptionsToSave = newValue }
+    }
+
+    public var toDelete: [String]? {
+        get { return subscriptionIDsToDelete }
+        set { subscriptionIDsToDelete = newValue }
+    }
 }
+
 extension CKQueryOperation: CKQueryOperationType, AssociatedErrorType {
 
     // The associated error type
