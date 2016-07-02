@@ -37,7 +37,8 @@ class StressTest: OperationTests {
     func test__conditions_with_single_dependency() {
         let operation = TestOperation()
         (0..<batchSize).forEach { i in
-            let condition = TestCondition(name: "Condition \(i)", isMutuallyExclusive: false, dependency: TestOperation(), condition: { true })
+            let condition = TestConditionOperation(dependencies: [TestOperation()]) { true }
+            condition.name = "Condition \(i)"
             operation.addCondition(condition)
         }
         addCompletionBlockToTestOperation(operation)
