@@ -42,6 +42,14 @@ class TaskOperationTests: OperationTests {
         guard let error = operation.errors.first as? TaskOperation.Error else { XCTFail(); return }
         XCTAssertEqual(error, TaskOperation.Error.LaunchPathNotSet)
     }
+
+    func test__error_equality() {
+        XCTAssertEqual(TaskOperation.Error.TerminationReason(.Exit), TaskOperation.Error.TerminationReason(.Exit))
+        XCTAssertEqual(TaskOperation.Error.TerminationReason(.UncaughtSignal), TaskOperation.Error.TerminationReason(.UncaughtSignal))
+        XCTAssertNotEqual(TaskOperation.Error.TerminationReason(.Exit), TaskOperation.Error.TerminationReason(.UncaughtSignal))
+        XCTAssertNotEqual(TaskOperation.Error.TerminationReason(.UncaughtSignal), TaskOperation.Error.TerminationReason(.Exit))
+        XCTAssertNotEqual(TaskOperation.Error.LaunchPathNotSet, TaskOperation.Error.TerminationReason(.Exit))
+    }
 }
 
 
