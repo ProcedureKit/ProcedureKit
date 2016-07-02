@@ -295,7 +295,7 @@ class RepeatedOperationTests: OperationTests {
 
     func test__replace_configure_block() {
 
-        operation = RepeatedOperation(maxCount: 2, generator: AnyGenerator { (.None, TestOperation() )})
+        operation = RepeatedOperation(maxCount: 2, generator: AnyGenerator { RepeatedPayload(delay: .None, operation: TestOperation(), configure: .None) })
 
         operation.addConfigureBlock { _ in
             XCTFail("Configure block should have been replaced.")

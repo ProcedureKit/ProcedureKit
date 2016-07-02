@@ -1333,7 +1333,7 @@ class CloudKitOperationDiscoverAllContractsTests: CKTests {
         operation = CloudKitOperation(strategy: .Immediate) {
             let op = TestDiscoverAllContactsOperation(result: [])
             if shouldError {
-                let userInfo = [CKErrorRetryAfterKey: NSNumber(double: 1.0)]
+                let userInfo = [CKErrorRetryAfterKey: NSNumber(double: 0.001)]
                 op.error = NSError(
                     domain: CKErrorDomain,
                     code: CKErrorCode.ServiceUnavailable.rawValue,
@@ -1343,6 +1343,7 @@ class CloudKitOperationDiscoverAllContractsTests: CKTests {
             }
             return op
         }
+        operation.log.severity = .Verbose
         operation.setDiscoverAllContactsCompletionBlock { _ in }
 
         waitForOperation(operation)

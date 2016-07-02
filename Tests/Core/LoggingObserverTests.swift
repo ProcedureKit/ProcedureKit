@@ -49,10 +49,7 @@ class LoggingObserverWithError: LoggingObserverTests {
     }
 
     func test__logger_outputs_number_of_received_errors() {
-
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
-        runOperation(operation)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForOperation(operation)
         XCTAssertTrue(receivedMessages.contains("Test Logging Operation: did finish with error(s): [Operations.ConditionError.BlockConditionFailed]."), "log message: \(receivedMessages)")
     }
 }

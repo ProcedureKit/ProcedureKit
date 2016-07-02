@@ -42,19 +42,19 @@ public class CloudKitRecovery<T where T: NSOperation, T: CKOperationType, T: Ass
     }
 
     internal func recoverWithInfo(info: RetryFailureInfo<V>, payload: Payload) -> ErrorResponse? {
-
         guard let (code, error) = cloudKitErrorsFromInfo(info) else { return .None }
 
         // We take the payload, if not nil, and return the delay, and configuration block
         let suggestion: ErrorResponse = (payload.delay, info.configure)
-        var response: ErrorResponse? = .None
 
-        response = defaultHandlers[code]?(operation: info.operation.operation, error: error, log: info.log, suggested: suggestion)
-        response = customHandlers[code]?(operation: info.operation.operation, error: error, log: info.log, suggested: response ?? suggestion)
+        guard let
+            handler = customHandlers[code] ?? defaultHandlers[code],
+            response = handler(operation: info.operation.operation, error: error, log: info.log, suggested: suggestion)
+        else {
+            return .None
+        }
 
         return response
-
-        // 5. Consider how we might pass the result of the default into the custom
     }
 
     func addDefaultHandlers() {

@@ -184,10 +184,16 @@ public class RetryOperation<T: NSOperation>: RepeatedOperation<T> {
      calls the super implementation, returning true.
      */
     public override func willAttemptRecoveryFromErrors(errors: [ErrorType], inOperation operation: NSOperation) -> Bool {
-        log.verbose("will attempt \(count) recovery from errors: \(errors) in operation: \(operation)")
-        guard let op = operation as? T where operation === current else { return false }
+        var returnValue = false
+        defer {
+            let message = returnValue ? "will attempt" : "will not attempt"
+            log.verbose("\(message) \(count) recovery from errors: \(errors) in operation: \(operation)")
+        }
+
+        guard let op = operation as? T where operation === current else { return returnValue }
         retry.info = createFailureInfo(op, errors: errors)
-        return addNextOperation()
+        returnValue = addNextOperation()
+        return returnValue
     }
 
     /**
