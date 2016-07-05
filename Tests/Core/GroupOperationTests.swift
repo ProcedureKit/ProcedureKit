@@ -258,5 +258,107 @@ class GroupOperationTests: OperationTests {
         XCTAssertEqual(group.operations.count, 1)
         XCTAssertEqual(group.operations[0], child1)
     }
+
+    func test__group_operation__does_not_finish_before_child_blockoperations_are_finished() {
+        for _ in 0..<100 {
+            let child1 = BlockOperation { sleep(5) }
+            let child2 = BlockOperation { sleep(5) }
+            let group = GroupOperation(operations: [ child1, child2 ])
+
+            weak var expectation = expectationWithDescription("Test: \(#function)")
+            group.addCompletionBlock {
+                let child1Finished = child1.finished
+                let child2Finished = child2.finished
+                dispatch_async(Queue.Main.queue, {
+                    guard let expectation = expectation else { return }
+                    XCTAssertTrue(child1Finished)
+                    XCTAssertTrue(child2Finished)
+                    expectation.fulfill()
+                })
+            }
+
+            runOperation(group)
+            group.cancel()
+
+            waitForExpectationsWithTimeout(5, handler: nil)
+            XCTAssertTrue(group.cancelled)
+        }
+    }
+
+    func test__group_operation__does_not_finish_before_child_groupoperations_are_finished() {
+        for _ in 0..<100 {
+            let child1 = GroupOperation(operations: [BlockOperation { sleep(5) }])
+            let child2 = GroupOperation(operations: [BlockOperation { sleep(5) }])
+            let group = GroupOperation(operations: [ child1, child2 ])
+
+            weak var expectation = expectationWithDescription("Test: \(#function)")
+            group.addCompletionBlock {
+                let child1Finished = child1.finished
+                let child2Finished = child2.finished
+                dispatch_async(Queue.Main.queue, {
+                    guard let expectation = expectation else { return }
+                    XCTAssertTrue(child1Finished)
+                    XCTAssertTrue(child2Finished)
+                    expectation.fulfill()
+                })
+            }
+
+            runOperation(group)
+            group.cancel()
+
+            waitForExpectationsWithTimeout(5, handler: nil)
+            XCTAssertTrue(group.cancelled)
+        }
+    }
+
+    func test__group_operation__execute_is_called_when_cancelled_before_running() {
+        class TestGroupOperation: GroupOperation {
+            private(set) var didExecute: Bool = false
+
+            override func execute() {
+                didExecute = true
+                super.execute()
+            }
+        }
+
+        let child = TestOperation()
+        let group = TestGroupOperation(operations: [child])
+
+        group.cancel()
+        XCTAssertFalse(group.didExecute)
+
+        waitForOperation(group)
+
+        XCTAssertTrue(group.cancelled)
+        XCTAssertTrue(group.didExecute)
+        XCTAssertTrue(group.finished)
+    }
+
+    func test__group_operation_cancellation__queue_is_empty_when_finished() {
+        (0..<100).forEach { i in
+            weak var didFinishExpectation = expectationWithDescription("Test: \(#function), DidFinish GroupOperation: \(i)")
+            let child1 = TestOperation(delay: 1.0)
+            let child2 = TestOperation(delay: 1.0)
+            let group = GroupOperation(operations: [child1, child2])
+            group.addCompletionBlock {
+                let child1Finished = child1.finished
+                let child2Finished = child2.finished
+                dispatch_async(Queue.Main.queue, {
+                    guard let didFinishExpectation = didFinishExpectation else { return }
+                    XCTAssertTrue(child1Finished)
+                    XCTAssertTrue(child2Finished)
+                    didFinishExpectation.fulfill()
+                })
+            }
+
+            runOperation(group)
+            group.cancel()
+
+            waitForExpectationsWithTimeout(5, handler: nil)
+
+            XCTAssertEqual(group.queue.operations.count, 0)
+            XCTAssertTrue(group.queue.suspended)
+        }
+    }
 }
 
