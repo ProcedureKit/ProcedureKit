@@ -248,5 +248,15 @@ class GroupOperationTests: OperationTests {
         XCTAssertEqual(test2.userIntent, Operation.UserIntent.SideEffect)
         XCTAssertEqual(test3.qualityOfService, NSQualityOfService.UserInitiated)
     }
+
+    func test__group_operation__initial_operations_only_added_once_to_operations_array() {
+        let child1 = TestOperation()
+        let group = GroupOperation(operations: [child1])
+
+        waitForOperation(group)
+
+        XCTAssertEqual(group.operations.count, 1)
+        XCTAssertEqual(group.operations[0], child1)
+    }
 }
 

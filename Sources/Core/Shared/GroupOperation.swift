@@ -93,7 +93,7 @@ public class GroupOperation: Operation, OperationQueueDelegate {
      starting the queue, and adding the finishing operation.
     */
     public override func execute() {
-        addOperations(operations.filter { !self.queue.operations.contains($0) })
+        _addOperations(operations.filter { !self.queue.operations.contains($0) }, addToOperationsArray: false)
         queue.addOperation(finishingOperation)
         queue.suspended = false
     }
@@ -122,10 +122,16 @@ public class GroupOperation: Operation, OperationQueueDelegate {
      - parameter operations: an array of `NSOperation` instances.
      */
     public func addOperations(additional: [NSOperation]) {
+        _addOperations(additional, addToOperationsArray: true)
+    }
+
+    private func _addOperations(additional: [NSOperation], addToOperationsArray: Bool = true) {
         if additional.count > 0 {
             additional.forEachOperation { $0.log.severity = log.severity }
             queue.addOperations(additional)
-            operations.appendContentsOf(additional)
+            if addToOperationsArray {
+                operations.appendContentsOf(additional)
+            }
         }
     }
 
