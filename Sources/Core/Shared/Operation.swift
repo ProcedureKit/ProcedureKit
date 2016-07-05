@@ -382,8 +382,6 @@ public class Operation: NSOperation {
             didChangeValueForKey(NSOperationKeyPaths.Cancelled.rawValue)
         }
     }
-        }
-    }
 }
 
 // swiftlint:enable type_body_length
