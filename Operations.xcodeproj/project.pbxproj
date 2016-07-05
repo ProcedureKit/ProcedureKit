@@ -312,6 +312,9 @@
 		65FD67B91CC389A5009E2C88 /* BlockOperationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65FD67B81CC389A5009E2C88 /* BlockOperationTests.swift */; };
 		65FD67BA1CC389A5009E2C88 /* BlockOperationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65FD67B81CC389A5009E2C88 /* BlockOperationTests.swift */; };
 		65FD67BB1CC389A5009E2C88 /* BlockOperationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65FD67B81CC389A5009E2C88 /* BlockOperationTests.swift */; };
+		EEBEC4F11D2C35F500769018 /* KVONotificationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEBEC4F01D2C35F500769018 /* KVONotificationTests.swift */; };
+		EEBEC4F21D2C35F500769018 /* KVONotificationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEBEC4F01D2C35F500769018 /* KVONotificationTests.swift */; };
+		EEBEC4F31D2C35F500769018 /* KVONotificationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEBEC4F01D2C35F500769018 /* KVONotificationTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -471,6 +474,7 @@
 		65FD67B11CC38877009E2C88 /* StressTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StressTests.swift; sourceTree = "<group>"; };
 		65FD67B31CC38933009E2C88 /* BasicTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BasicTests.swift; sourceTree = "<group>"; };
 		65FD67B81CC389A5009E2C88 /* BlockOperationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BlockOperationTests.swift; sourceTree = "<group>"; };
+		EEBEC4F01D2C35F500769018 /* KVONotificationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KVONotificationTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -746,6 +750,7 @@
 				65C98C761C284EA600BA76B7 /* FunctionalOperationsTests.swift */,
 				6526170F1C11F5EB00654091 /* GatedOperationTests.swift */,
 				652617101C11F5EB00654091 /* GroupOperationTests.swift */,
+				EEBEC4F01D2C35F500769018 /* KVONotificationTests.swift */,
 				652617111C11F5EB00654091 /* LoggingObserverTests.swift */,
 				652617121C11F5EB00654091 /* LoggingTests.swift */,
 				652617131C11F5EB00654091 /* MutualExclusiveTests.swift */,
@@ -1340,6 +1345,7 @@
 				652619201C11FC3D00654091 /* ComposedOperationTests.swift in Sources */,
 				652619281C11FC3D00654091 /* NoFailedDependenciesConditionTests.swift in Sources */,
 				6565FFEA1C98C860008B5248 /* ProfilerTests.swift in Sources */,
+				EEBEC4F11D2C35F500769018 /* KVONotificationTests.swift in Sources */,
 				65C98C771C284EA600BA76B7 /* FunctionalOperationsTests.swift in Sources */,
 				652619251C11FC3D00654091 /* MutualExclusiveTests.swift in Sources */,
 				652619291C11FC3D00654091 /* OperationTests.swift in Sources */,
@@ -1480,6 +1486,7 @@
 				6526192F1C11FC3E00654091 /* BlockConditionTests.swift in Sources */,
 				652619301C11FC3E00654091 /* ComposedOperationTests.swift in Sources */,
 				652619381C11FC3E00654091 /* NoFailedDependenciesConditionTests.swift in Sources */,
+				EEBEC4F21D2C35F500769018 /* KVONotificationTests.swift in Sources */,
 				652619351C11FC3E00654091 /* MutualExclusiveTests.swift in Sources */,
 				65691C9F1C21A29C00AF06B4 /* ResultInjectionTests.swift in Sources */,
 				65B9E0821CB85C53009161AD /* URLSessionTaskOperationTests.swift in Sources */,
@@ -1571,6 +1578,7 @@
 				65C98C791C284EA600BA76B7 /* FunctionalOperationsTests.swift in Sources */,
 				652619451C11FC3F00654091 /* MutualExclusiveTests.swift in Sources */,
 				6526194D1C11FCFF00654091 /* AuthorizationTests.swift in Sources */,
+				EEBEC4F31D2C35F500769018 /* KVONotificationTests.swift in Sources */,
 				652619571C11FCFF00654091 /* ReachabilityTests.swift in Sources */,
 				65FD67B61CC38933009E2C88 /* BasicTests.swift in Sources */,
 				652619491C11FC3F00654091 /* OperationTests.swift in Sources */,

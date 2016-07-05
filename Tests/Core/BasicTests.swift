@@ -466,10 +466,3 @@ private class TestHandlesFinishOperation: Operation {
     }
 }
 
-extension CollectionType {
-    /// Returns the element at the specified index if it is within bounds, otherwise nil.
-    func get(safe index: Index) -> Generator.Element? {
-        return indices.contains(index) ? self[index] : nil
-    }
-}
-}
