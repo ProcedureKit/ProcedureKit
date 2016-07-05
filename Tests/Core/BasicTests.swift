@@ -353,4 +353,123 @@ class CancellationOperationTests: OperationTests {
         
         XCTAssertFalse(operation.didExecute)
     }
+
+    func test__operation_with_long_running_dependency_cancels_and_finishes_without_waiting_on_dependency() {
+        /*
+         "In OS X v10.6 and later, if you cancel an operation while it is waiting 
+         on the completion of one or more dependent operations, those dependencies 
+         are thereafter ignored and the value of this property is updated to reflect 
+         that it is now ready to run. This behavior gives an operation queue the 
+         chance to flush cancelled operations out of its queue more quickly."
+ 
+         See: https://developer.apple.com/library/mac/documentation/Cocoa/Reference/NSOperation_class/
+
+         NSOperation.cancel() does this automatically, so calling super.cancel() in 
+         Operation.cancel() takes care of this.
+         
+         If the call to super.cancel() is removed at some point, and this behavior is 
+         not duplicated, the outcome of cancelling will still be correct, but 
+         performance will be less optimal.
+         
+        */
+        let delaySeconds = 3.0
+        let delayCompleteSignal = dispatch_semaphore_create(0)
+        let delay = DelayOperation(interval: delaySeconds)
+        delay.addCompletionBlock {
+            dispatch_semaphore_signal(delayCompleteSignal)
+        }
+        let operation = TestOperation()
+        operation.addDependency(delay)
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
+        XCTAssertFalse(operation.ready)
+
+        runOperations(delay, operation)
+        operation.cancel()
+
+        waitForExpectationsWithTimeout(delaySeconds - 1.0, handler: nil)
+        XCTAssertFalse(operation.didExecute)
+        guard dispatch_semaphore_wait(delayCompleteSignal, dispatch_time(DISPATCH_TIME_NOW, Int64(5 * Double( NSEC_PER_SEC )))) == 0 else {
+            XCTFail("Delay operation did not complete")
+            return
+        }
+    }
+
+    func test__operation_cancelled_before_running_is_not_set_to_finished_until_started() {
+        let operation = TestOperation()
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
+        operation.cancel()
+
+        XCTAssertTrue(operation.cancelled)
+        XCTAssertTrue(operation.operationDidCancelCalled)
+        XCTAssertFalse(operation.didExecute)
+        XCTAssertFalse(operation.operationWillFinishCalled)
+        XCTAssertFalse(operation.operationDidFinishCalled)
+        XCTAssertFalse(operation.finished)
+
+        runOperation(operation)
+        waitForExpectationsWithTimeout(5, handler: nil)
+
+        XCTAssertTrue(operation.operationDidFinishCalled)
+        XCTAssertTrue(operation.finished)
+    }
+
+    func test__operation_with_disableAutomaticFinishing_doesnt_finish_automatically_when_cancelled() {
+        let operation = TestHandlesFinishOperation()
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
+        runOperation(operation)
+        operation.cancel()
+
+        XCTAssertTrue(operation.cancelled)
+        XCTAssertFalse(operation.finished)
+
+        sleep(1)
+
+        XCTAssertFalse(operation.finished)
+
+        operation.triggerFinish()
+        waitForExpectationsWithTimeout(3, handler: nil)
+
+        XCTAssertTrue(operation.finished)
+    }
+
+    func test__operation_with_disableAutomaticFinishing_cancelled_before_running_doesnt_finish_automatically_when_started() {
+        let operation = TestHandlesFinishOperation()
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
+        operation.cancel()
+        runOperation(operation)
+
+        XCTAssertTrue(operation.cancelled)
+        XCTAssertFalse(operation.finished)
+
+        sleep(1)
+
+        XCTAssertFalse(operation.finished)
+
+        operation.triggerFinish()
+        waitForExpectationsWithTimeout(3, handler: nil)
+
+        XCTAssertTrue(operation.finished)
+    }
+}
+
+private class TestHandlesFinishOperation: Operation {
+    override init() {
+        super.init(disableAutomaticFinishing: true)
+    }
+    
+    override func execute() {
+        // deliberately does not finish
+    }
+    
+    func triggerFinish() {
+        self.finish()
+    }
+}
+
+extension CollectionType {
+    /// Returns the element at the specified index if it is within bounds, otherwise nil.
+    func get(safe index: Index) -> Generator.Element? {
+        return indices.contains(index) ? self[index] : nil
+    }
+}
 }
