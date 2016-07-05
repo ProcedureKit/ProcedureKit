@@ -94,6 +94,7 @@ public class Operation: NSOperation {
     private var _internalErrors = [ErrorType]()
     private var _hasFinishedAlready = false
     private var _observers = Protector([OperationObserverType]())
+    private var _disableAutomaticFinishing = false
 
     internal private(set) var directDependencies = Set<NSOperation>()
     internal private(set) var conditions = Set<Condition>()
@@ -190,6 +191,50 @@ public class Operation: NSOperation {
         }
     }
 
+    // MARK: - Initialization
+
+    public override init() {
+        super.init()
+    }
+
+    // MARK: - Disable Automatic Finishing
+
+    /**
+     Ability to override Operation's built-in finishing behavior, if a
+     subclass requires full control over when finish() is called.
+         
+     Used for GroupOperation to implement proper .Finished state-handling
+     (only finishing after all child operations have finished).
+     
+     The default behavior of Operation is to automatically call finish()
+     when:
+        (a) it's cancelled, whether that occurs:
+            - prior to the Operation starting
+              (in which case, Operation will skip calling execute())
+            - on another thread at the same time that the operation is 
+              executing
+        (b) when willExecuteObservers log errors
+     
+     To ensure that an Operation subclass does not finish until the 
+     subclass calls finish():
+     call `super.init(disableAutomaticFinishing: true)` in the init.
+         
+     IMPORTANT: If disableAutomaticFinishing == TRUE, the subclass is 
+     responsible for calling finish() in *ALL* cases, including when the
+     operation is cancelled.
+     
+    */
+    public init(disableAutomaticFinishing: Bool) {
+        self._disableAutomaticFinishing = disableAutomaticFinishing
+        super.init()
+    }
+
+    private var disableAutomaticFinishing: Bool {
+        return _disableAutomaticFinishing
+    }
+
+    // MARK: - Add Condition
+
     /**
      Add a condition to the to the operation, can only be done prior to the operation starting.
 
@@ -213,6 +258,8 @@ public class Operation: NSOperation {
         conditions.insert(condition)
     }
 
+    // MARK: - Add Observer
+    
     /**
      Add an observer to the to the operation, can only be done
      prior to the operation starting.
@@ -228,6 +275,8 @@ public class Operation: NSOperation {
         observer.didAttachToOperation(self)
     }
 
+    // MARK: - Execution
+    
     /**
      Subclasses should override this method to perform their specialized task.
      They must call a finish methods in order to complete.
@@ -324,7 +373,7 @@ public class Operation: NSOperation {
             // Call super.cancel() to trigger .isReady state change on cancel
             // as well as isReady KVO notification.
             super.cancel()
-            if executing {
+            if executing && !disableAutomaticFinishing {
                 finish()
             }
             return true
@@ -516,7 +565,7 @@ public extension Operation {
     final override func start() {
         // Don't call super.start
 
-        guard !cancelled else {
+        guard !cancelled || disableAutomaticFinishing else {
             finish()
             return
         }
@@ -529,16 +578,24 @@ public extension Operation {
 
         // Inform observers that the operation will execute
         willExecuteObservers.forEach { $0.willExecuteOperation(self) }
+        
+        let doExecute = stateLock.withCriticalScope { () -> Bool in
+            // Check to see if the operation has now been cancelled
+            // by an observer
+            guard (_internalErrors.isEmpty && !cancelled) || disableAutomaticFinishing else {
+                finish()
+                return false
+            }
 
-        // Check to see if the operation has now been cancelled
-        // by an observer
-        guard _internalErrors.isEmpty && !cancelled else {
-            finish()
-            return
+            // Transition to the .isExecuting state, and explicitly send the required KVO change notifications
+            willChangeValueForKey(NSOperationKeyPaths.Executing.rawValue)
+            state = .Executing
+            log.verbose("Will Execute")
+            didChangeValueForKey(NSOperationKeyPaths.Executing.rawValue)
+            return true
         }
 
-        state = .Executing
-        log.verbose("Will Execute")
+        guard doExecute else { return }
 
         execute()
     }
