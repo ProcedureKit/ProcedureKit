@@ -578,6 +578,12 @@ public extension Operation {
         willExecuteObservers.forEach { $0.willExecuteOperation(self) }
         
         let doExecute = stateLock.withCriticalScope { () -> Bool in
+            assert(!executing, "Operation is attempting to execute, but is already executing.")
+            
+            // Check to see if the operation has now been finished 
+            // by an observer (or anything else)
+            guard state <= .Pending else { return false }
+            
             // Check to see if the operation has now been cancelled
             // by an observer
             guard (_internalErrors.isEmpty && !cancelled) || disableAutomaticFinishing else {

@@ -466,3 +466,33 @@ private class TestHandlesFinishOperation: Operation {
     }
 }
 
+class FinishingOperationTests: OperationTests {
+
+    func test__operation_with_disableAutomaticFinishing_manual_cancel_and_finish_on_willexecute_does_not_result_in_invalid_state_transition_finished_to_executing() {
+        class TestOperation_CancelsAndManuallyFinishesOnWillExecute: Operation {
+            override init() {
+                super.init(disableAutomaticFinishing: true) // <-- disableAutomaticFinishing
+                addObserver(WillExecuteObserver { [weak self] _ in
+                    guard let strongSelf = self else { return }
+                    strongSelf.cancel()
+                    strongSelf.finish() // manually finishes after cancelling
+                })
+            }
+            override func execute() {
+                finish()
+            }
+        }
+        
+        LogManager.severity = .Verbose
+        LogManager.enabled = true
+        let operation = TestOperation_CancelsAndManuallyFinishesOnWillExecute()
+        
+        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
+        runOperation(operation)
+        waitForExpectationsWithTimeout(3, handler: nil)
+        
+        // Test initially failed with:
+        // assertion failed: Attempting to perform illegal cyclic state transition, Finished -> Executing for operation: Unnamed Operation #UUID.: file Operations/Sources/Core/Shared/Operation.swift, line 399
+        // This will crash the test execution if it happens.
+    }
+}
