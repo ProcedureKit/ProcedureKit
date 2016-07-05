@@ -63,7 +63,9 @@ public class GroupOperation: Operation, OperationQueueDelegate {
     */
     public init(operations ops: [NSOperation]) {
         operations = ops
-        super.init()
+        // GroupOperation handles calling finish() on cancellation once all of its children have cancelled and finished
+        // and its finishingOperation has finished.
+        super.init(disableAutomaticFinishing: true) // Override default Operation finishing behavior
         name = "Group Operation"
         queue.suspended = true
         queue.delegate = self
@@ -126,11 +128,18 @@ public class GroupOperation: Operation, OperationQueueDelegate {
     }
 
     private func _addOperations(additional: [NSOperation], addToOperationsArray: Bool = true) {
-        if additional.count > 0 {
-            additional.forEachOperation { $0.log.severity = log.severity }
-            queue.addOperations(additional)
-            if addToOperationsArray {
-                operations.appendContentsOf(additional)
+        stateLock.withCriticalScope {
+            if additional.count > 0 {
+                assert(!finishingOperation.executing, "Cannot add new operations to a group after the group has started to finish.")
+                assert(!finishingOperation.finished, "Cannot add new operations to a group after the group has completed.")
+                if cancelled {
+                    additional.forEachOperation { $0.cancel() }
+                }
+                additional.forEachOperation { $0.log.severity = log.severity }
+                queue.addOperations(additional)
+                if addToOperationsArray {
+                    operations.appendContentsOf(additional)
+                }
             }
         }
     }
