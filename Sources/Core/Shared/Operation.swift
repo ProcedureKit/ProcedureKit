@@ -79,22 +79,16 @@ public class Operation: NSOperation {
         }
     }
 
-    class func keyPathsForValuesAffectingIsExecuting() -> Set<NSObject> {
-        return ["State"]
-    }
-
-    class func keyPathsForValuesAffectingIsFinished() -> Set<NSObject> {
-        return ["State"]
-    }
-
-    class func keyPathsForValuesAffectingIsCancelled() -> Set<NSObject> {
-        return ["Cancelled"]
+    private enum NSOperationKeyPaths: String {
+        case Cancelled = "isCancelled"
+        case Executing = "isExecuting"
+        case Finished = "isFinished"
     }
 
     /// - returns: a unique String which can be used to identify the operation instance
     public let identifier = NSUUID().UUIDString
 
-    private let stateLock = NSLock()
+    internal let stateLock = NSRecursiveLock()
     private lazy var _log: LoggerType = Logger()
     private var _state = State.Initialized
     private var _internalErrors = [ErrorType]()
@@ -111,27 +105,11 @@ public class Operation: NSOperation {
     // Internal operation properties which are used to manage the scheduling of dependencies
     internal private(set) var evaluateConditionsOperation: GroupOperation? = .None
 
-    private var _cancelled = false {
-        willSet {
-            willChangeValueForKey("Cancelled")
-            if !_cancelled && newValue {
-                operationWillCancel(errors)
-                willCancelObservers.forEach { $0.willCancelOperation(self, errors: self.errors) }
-            }
-        }
-        didSet {
-            didChangeValueForKey("Cancelled")
-
-            if _cancelled && !oldValue {
-                operationDidCancel()
-                didCancelObservers.forEach { $0.didCancelOperation(self) }
-            }
-        }
-    }
+    private var _cancelled = false  // should always be set by .cancel()
 
     /// Access the internal errors collected by the Operation
     public var errors: [ErrorType] {
-        return _internalErrors
+        return stateLock.withCriticalScope { _internalErrors }
     }
 
     /**
@@ -303,11 +281,15 @@ public class Operation: NSOperation {
      - parameter errors: an `[ErrorType]` defaults to empty array.
      */
     public func cancelWithErrors(errors: [ErrorType] = []) {
-        if !errors.isEmpty {
-            log.warning("Did cancel with errors: \(errors).")
+        stateLock.withCriticalScope {
+            assert(state != .Finishing, "Operation cannot be cancelled after while it is finishing.")
+            assert(state != .Finished, "Operation cannot be cancelled after it has already finished.")
+            if !errors.isEmpty {
+                log.warning("Did cancel with errors: \(errors).")
+            }
+            _internalErrors += errors
+            cancel()
         }
-        _internalErrors += errors
-        cancel()
     }
 
     /**
@@ -327,13 +309,30 @@ public class Operation: NSOperation {
     public func operationDidCancel() { /* No op */ }
 
     public override func cancel() {
-        if !finished {
+        let didCancel = stateLock.withCriticalScope { _ -> Bool in
+            guard state <= .Executing && !_cancelled else { return false }
+
+            willChangeValueForKey(NSOperationKeyPaths.Cancelled.rawValue)
+            operationWillCancel(errors)
+            willCancelObservers.forEach { $0.willCancelOperation(self, errors: self.errors) }
+
             _cancelled = true
+            operationDidCancel()
+            didCancelObservers.forEach { $0.didCancelOperation(self) }
             log.verbose("Did cancel.")
+
+            // Call super.cancel() to trigger .isReady state change on cancel
+            // as well as isReady KVO notification.
+            super.cancel()
             if executing {
-                super.cancel()
                 finish()
             }
+            return true
+        }
+        if didCancel {
+            didChangeValueForKey(NSOperationKeyPaths.Cancelled.rawValue)
+        }
+    }
         }
     }
 }
@@ -349,13 +348,11 @@ public extension Operation {
             return stateLock.withCriticalScope { _state }
         }
         set (newState) {
-            willChangeValueForKey("State")
             stateLock.withCriticalScope {
                 assert(_state.canTransitionToState(newState, whenCancelled: cancelled), "Attempting to perform illegal cyclic state transition, \(_state) -> \(newState) for operation: \(identity).")
                 log.verbose("\(_state) -> \(newState)")
                 _state = newState
             }
-            didChangeValueForKey("State")
         }
     }
 
@@ -371,7 +368,7 @@ public extension Operation {
 
     /// Boolean indicator for whether the Operation has cancelled or not
     final override var cancelled: Bool {
-        return _cancelled
+        return stateLock.withCriticalScope { _cancelled }
     }
 
     /// Boolean flag to indicate that the Operation failed due to errors.
@@ -569,13 +566,22 @@ public extension Operation {
      - parameter errors: an array of `ErrorType`, which defaults to empty.
      */
     final func finish(receivedErrors: [ErrorType] = []) {
-        if !_hasFinishedAlready {
+        let didFinish = stateLock.withCriticalScope { () -> Bool in
+            guard !_hasFinishedAlready else { return false }
             _hasFinishedAlready = true
+
+            var changedExecutingState = false
+            if executing {
+                changedExecutingState = true
+                willChangeValueForKey(NSOperationKeyPaths.Executing.rawValue)
+            }
             state = .Finishing
+            if changedExecutingState {
+                didChangeValueForKey(NSOperationKeyPaths.Executing.rawValue)
+            }
 
             _internalErrors.appendContentsOf(receivedErrors)
-            operationDidFinish(_internalErrors)
-
+        
             if errors.isEmpty {
                 log.verbose("Will finish with no errors.")
             }
@@ -583,10 +589,13 @@ public extension Operation {
                 log.warning("Will finish with \(errors.count) errors.")
             }
 
+            operationWillFinish(_internalErrors)
+            willChangeValueForKey(NSOperationKeyPaths.Finished.rawValue)
             willFinishObservers.forEach { $0.willFinishOperation(self, errors: self._internalErrors) }
 
             state = .Finished
 
+            operationDidFinish(_internalErrors)
             didFinishObservers.forEach { $0.didFinishOperation(self, errors: self._internalErrors) }
 
             if errors.isEmpty {
@@ -595,6 +604,10 @@ public extension Operation {
             else {
                 log.warning("Did finish with errors: \(errors).")
             }
+            return true
+        }
+        if didFinish {
+            didChangeValueForKey(NSOperationKeyPaths.Finished.rawValue)
         }
     }
 
