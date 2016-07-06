@@ -421,5 +421,46 @@ class GroupOperationTests: OperationTests {
         XCTAssertTrue(group.operations.contains(child))
         XCTAssertTrue(group.operations.contains(childProducedOperation))
     }
+    
+    func test__group_operation_ignores_queue_delegate_calls_from_other_queues() {
+        class PoorlyWrittenGroupOperationSubclass: GroupOperation {
+            private var subclassQueue = OperationQueue()
+            override init(operations: [NSOperation]) {
+                super.init(operations: operations)
+                subclassQueue.delegate = self
+            }
+            override func execute() {
+                let operation = TestOperation()
+                subclassQueue.addOperation(operation)
+                subclassQueue.suspended = false
+                super.execute()
+            }
+            // since GroupOperation already satisfies OperationQueueDelegate, this compiles
+        }
+        
+        weak var didFinishExpectation = expectationWithDescription("Test: \(#function), DidFinish GroupOperation")
+        let childOperation = TestOperation()
+        let groupOperation = PoorlyWrittenGroupOperationSubclass(operations: [childOperation])
+        var addedOperationFromOtherQueue = false
+        
+        groupOperation.addObserver(WillAddChildObserver{ (group, child) in
+            if child !== childOperation {
+                addedOperationFromOtherQueue = true
+            }
+        })
+        
+        groupOperation.addCompletionBlock {
+            dispatch_async(Queue.Main.queue, {
+                guard let didFinishExpectation = didFinishExpectation else { return }
+                didFinishExpectation.fulfill()
+            })
+        }
+        
+        runOperation(groupOperation)
+        
+        waitForExpectationsWithTimeout(5, handler: nil)
+        
+        XCTAssertFalse(addedOperationFromOtherQueue)
+    }
 }
 

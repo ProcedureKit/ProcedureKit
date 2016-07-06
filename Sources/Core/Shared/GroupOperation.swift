@@ -208,6 +208,8 @@ public class GroupOperation: Operation, OperationQueueDelegate {
      when there are no more operations in the group.
      */
     public func operationQueue(queue: OperationQueue, willAddOperation operation: NSOperation) {
+        guard queue === self.queue else { return }
+
         assert(!finishingOperation.executing, "Cannot add new operations to a group after the group has started to finish.")
         assert(!finishingOperation.finished, "Cannot add new operations to a group after the group has completed.")
 
@@ -225,6 +227,7 @@ public class GroupOperation: Operation, OperationQueueDelegate {
      notified (using `operationDidFinish` that a child operation has finished.
      */
     public func operationQueue(queue: OperationQueue, willFinishOperation operation: NSOperation, withErrors errors: [ErrorType]) {
+        guard queue === self.queue else { return }
 
         if !errors.isEmpty {
             if willAttemptRecoveryFromErrors(errors, inOperation: operation) {
@@ -240,6 +243,7 @@ public class GroupOperation: Operation, OperationQueueDelegate {
     }
 
     public func operationQueue(queue: OperationQueue, didFinishOperation operation: NSOperation, withErrors errors: [ErrorType]) {
+        guard queue === self.queue else { return }
 
         if operation === finishingOperation {
             finish(fatalErrors)
@@ -248,6 +252,7 @@ public class GroupOperation: Operation, OperationQueueDelegate {
     }
 
     public func operationQueue(queue: OperationQueue, willProduceOperation operation: NSOperation) {
+        guard queue === self.queue else { return }
 
         // ensure that produced operations are added to GroupOperation's
         // internal operations array (and cancelled if appropriate)
