@@ -246,6 +246,19 @@ public class GroupOperation: Operation, OperationQueueDelegate {
             queue.suspended = true
         }
     }
+
+    public func operationQueue(queue: OperationQueue, willProduceOperation operation: NSOperation) {
+
+        // ensure that produced operations are added to GroupOperation's
+        // internal operations array (and cancelled if appropriate)
+        print("will produce operation: \(operation.operationName)")
+        stateLock.withCriticalScope {
+            if cancelled {
+                operation.cancel()
+            }
+            operations.append(operation)
+        }
+    }
 }
 
 public extension GroupOperation {

@@ -316,6 +316,33 @@ class GroupOperationTests: OperationTests {
             XCTAssertTrue(group.cancelled)
         }
     }
+    
+    func test__group_operation_does_not_finish_before_child_produced_operations_are_finished() {
+        
+        weak var didFinishExpectation = expectationWithDescription("Test: \(#function), DidFinish GroupOperation")
+        let child = TestOperation(delay: 0.1)
+        child.name = "ChildOperation"
+        let childProducedOperation = TestOperation(delay: 0.5)
+        childProducedOperation.name = "ChildProducedOperation"
+        let group = GroupOperation(operations: [child])
+        child.addObserver(WillExecuteObserver { operation in
+            operation.produceOperation(childProducedOperation)
+        })
+        
+        group.addCompletionBlock {
+            dispatch_async(Queue.Main.queue, {
+                guard let didFinishExpectation = didFinishExpectation else { return }
+                didFinishExpectation.fulfill()
+            })
+        }
+        
+        runOperation(group)
+        
+        waitForExpectationsWithTimeout(5, handler: nil)
+        
+        XCTAssertTrue(group.finished)
+        XCTAssertTrue(childProducedOperation.finished)
+    }
 
     func test__group_operation__execute_is_called_when_cancelled_before_running() {
         class TestGroupOperation: GroupOperation {
@@ -365,6 +392,34 @@ class GroupOperationTests: OperationTests {
             XCTAssertEqual(group.queue.operations.count, 0)
             XCTAssertTrue(group.queue.suspended)
         }
+    }
+    
+    func test__group_operation_operations_array_receives_operations_produced_by_children() {
+        
+        weak var didFinishExpectation = expectationWithDescription("Test: \(#function), DidFinish GroupOperation")
+        let child = TestOperation(delay: 0.1)
+        child.name = "ChildOperation"
+        let childProducedOperation = TestOperation(delay: 0.2)
+        childProducedOperation.name = "ChildProducedOperation"
+        let group = GroupOperation(operations: [child])
+        child.addObserver(WillExecuteObserver { operation in
+            operation.produceOperation(childProducedOperation)
+        })
+        
+        group.addCompletionBlock {
+            dispatch_async(Queue.Main.queue, {
+                guard let didFinishExpectation = didFinishExpectation else { return }
+                didFinishExpectation.fulfill()
+            })
+        }
+        
+        runOperation(group)
+        
+        waitForExpectationsWithTimeout(5, handler: nil)
+        
+        XCTAssertEqual(group.operations.count, 2)
+        XCTAssertTrue(group.operations.contains(child))
+        XCTAssertTrue(group.operations.contains(childProducedOperation))
     }
 }
 
