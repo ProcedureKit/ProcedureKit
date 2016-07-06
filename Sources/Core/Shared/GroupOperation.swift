@@ -70,8 +70,9 @@ public class GroupOperation: Operation, OperationQueueDelegate {
         queue.suspended = true
         queue.delegate = self
         userIntent = operations.userIntent
-        addObserver(WillCancelObserver { [unowned self] operation, errors in
+        addObserver(DidCancelObserver { [unowned self] operation in
             if operation === self {
+                let errors = operation.errors
                 if errors.isEmpty {
                     self.operations.forEach { $0.cancel() }
                 }
