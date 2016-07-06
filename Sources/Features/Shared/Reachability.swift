@@ -245,7 +245,8 @@ class DeviceReachability: NetworkReachabilityType {
 
 private func __device_reachability_callback(_ reachability: SCNetworkReachability, flags: SCNetworkReachabilityFlags, info: UnsafeMutablePointer<Void>?) {
     guard let info = info else { return }
-    let handler = Unmanaged<DeviceReachability>.fromOpaque(OpaquePointer(info)).takeUnretainedValue()
+	
+	let handler = Unmanaged<DeviceReachability>.fromOpaque(UnsafePointer(info)).takeUnretainedValue()
     Queue.default.queue.async {
         handler.delegate?.reachabilityDidChange(flags)
     }
@@ -344,7 +345,7 @@ extension SCNetworkReachabilityFlags {
 
     var isOnWWAN: Bool {
         #if os(iOS)
-            return contains(.iswwan)
+            return contains(.isWWAN)
         #else
             return false
         #endif

@@ -166,7 +166,7 @@ public class ComposedCondition<C: Condition>: Condition, AutomaticInjectionOpera
         super.init()
         mutuallyExclusive = condition.mutuallyExclusive
         name = condition.name
-        injectResultFromDependency(condition) { operation, dependency, _ in
+        let _ = injectResultFromDependency(condition) { operation, dependency, _ in
             operation.requirement = dependency.result
         }
     }

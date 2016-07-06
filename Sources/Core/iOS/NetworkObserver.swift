@@ -82,19 +82,19 @@ private class NetworkIndicatorController {
     // Public API
 
     func networkActivityDidStart() {
-        assert(Thread.isMainThread(), "Altering network activity indicator state can only be done on the main thread.")
+        assert(Thread.isMainThread, "Altering network activity indicator state can only be done on the main thread.")
         activityCount += 1
         updateIndicatorVisibility()
     }
 
     func networkActivityDidEnd() {
-        assert(Thread.isMainThread(), "Altering network activity indicator state can only be done on the main thread.")
+        assert(Thread.isMainThread, "Altering network activity indicator state can only be done on the main thread.")
         activityCount -= 1
         updateIndicatorVisibility()
     }
 }
 
-private struct Timer {
+private class Timer {
 
     private var isCancelled = false
 
@@ -107,7 +107,7 @@ private struct Timer {
         }
     }
 
-    mutating func cancel() {
+    func cancel() {
         isCancelled = true
     }
 }

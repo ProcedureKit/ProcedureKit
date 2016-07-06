@@ -28,13 +28,13 @@ public class RemoteNotificationCondition: Condition {
 
     public static func didReceiveNotificationToken(_ token: Data) {
         NotificationCenter
-            .default()
+            .default
             .post(name: Notification.Name(rawValue: RemoteNotificationName), object: nil, userInfo: [RemoteNotificationTokenKey: token])
     }
 
     public static func didFailToRegisterForRemoteNotifications(_ error: NSError) {
         NotificationCenter
-            .default()
+            .default
             .post(name: Notification.Name(rawValue: RemoteNotificationName), object: nil, userInfo: [RemoteNotificationErrorKey: error])
     }
 
@@ -107,14 +107,14 @@ public class RemoteNotificationsRegistration: Operation {
 
     func register() {
         NotificationCenter
-            .default()
-            .addObserver(self, selector: NotificationObserver.receivedResponse.selector, name: RemoteNotificationName, object: nil)
+            .default
+            .addObserver(self, selector: NotificationObserver.receivedResponse.selector, name: NSNotification.Name(rawValue: RemoteNotificationName), object: nil)
 
         registrar.opr_registerForRemoteNotifications()
     }
 
     func didReceiveResponse(_ notification: Notification) {
-        NotificationCenter.default().removeObserver(self)
+        NotificationCenter.default.removeObserver(self)
 
         if let token = (notification as NSNotification).userInfo?[RemoteNotificationTokenKey] as? Data {
             handler(.token(token))

@@ -44,7 +44,7 @@ public class BackgroundObserver: NSObject {
 
         super.init()
 
-        let nc = NotificationCenter.default()
+        let nc = NotificationCenter.default
         nc.addObserver(self, selector: #selector(BackgroundObserver.didEnterBackground(_:)), name: NSNotification.Name.UIApplicationDidEnterBackground, object: .none)
         nc.addObserver(self, selector: #selector(BackgroundObserver.didBecomeActive(_:)), name: NSNotification.Name.UIApplicationDidBecomeActive, object: .none)
 
@@ -54,7 +54,7 @@ public class BackgroundObserver: NSObject {
     }
 
     deinit {
-        NotificationCenter.default().removeObserver(self)
+        NotificationCenter.default.removeObserver(self)
     }
 
     @objc func didEnterBackground(_ notification: Notification) {

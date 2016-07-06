@@ -60,7 +60,7 @@ public final class UserNotificationCondition: Condition {
 
     public static func didRegisterUserNotificationSettings(_ notificationSettings: UIUserNotificationSettings) {
         NotificationCenter
-            .default()
+            .default
             .post(name: Notification.Name(rawValue: DidRegisterSettingsNotificationName), object: nil, userInfo: [NotificationSettingsKey: notificationSettings] )
     }
 
@@ -139,8 +139,8 @@ public class UserNotificationPermissionOperation: Operation {
 
     public override func execute() {
         NotificationCenter
-            .default()
-            .addObserver(self, selector: NotificationObserver.settingsDidChange.selector, name: DidRegisterSettingsNotificationName, object: nil)
+            .default
+            .addObserver(self, selector: NotificationObserver.settingsDidChange.selector, name: NSNotification.Name(rawValue: DidRegisterSettingsNotificationName), object: nil)
         Queue.main.queue.async(execute: request)
     }
 
@@ -158,7 +158,7 @@ public class UserNotificationPermissionOperation: Operation {
     }
 
     func notificationSettingsDidChange(_ aNotification: Notification) {
-        NotificationCenter.default().removeObserver(self)
+        NotificationCenter.default.removeObserver(self)
         self.finish()
     }
 }

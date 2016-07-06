@@ -18,7 +18,7 @@ public class ComposedOperation<T: Operation>: Operation {
     }
 
     init(operation composed: T) {
-        self.target = composed as? Operation ?? GroupOperation(operations: [composed])
+        self.target = composed ?? GroupOperation(operations: [composed])
         self.operation = composed
         super.init()
         name = "Composed Operation"

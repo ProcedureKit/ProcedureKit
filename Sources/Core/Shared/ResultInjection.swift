@@ -174,7 +174,7 @@ extension AutomaticInjectionOperationType where Self: Operation {
 
     */
     public func injectResultFromDependency<T where T: Operation, T: ResultOperationType, T.Result == Requirement>(_ dep: T) {
-        injectResultFromDependency(dep) { [weak self] operation, dependency, errors in
+        let _ = injectResultFromDependency(dep) { [weak self] operation, dependency, errors in
             if errors.isEmpty {
                 self?.requirement = dependency.result
             }

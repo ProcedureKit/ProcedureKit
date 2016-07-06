@@ -197,7 +197,7 @@ public extension OperationQueue {
 
      - returns: The main queue
      */
-    public override class func main() -> OperationQueue {
+    public class func main() -> OperationQueue {
         return sharedMainQueue
     }
 }
