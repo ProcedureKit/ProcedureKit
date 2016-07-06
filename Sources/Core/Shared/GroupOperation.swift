@@ -81,7 +81,6 @@ public class GroupOperation: Operation, OperationQueueDelegate {
                     nsops.forEach { $0.cancel() }
                     ops.forEach { $0.cancelWithError(OperationError.ParentOperationCancelledWithErrors(errors)) }
                 }
-                self.queue.cancelAllOperations()
             }
         })
     }

@@ -259,10 +259,10 @@ class GroupOperationTests: OperationTests {
         XCTAssertEqual(group.operations[0], child1)
     }
 
-    func test__group_operation__does_not_finish_before_child_blockoperations_are_finished() {
+    func test__group_operation__does_not_finish_before_child_operations_have_finished() {
         for _ in 0..<100 {
-            let child1 = BlockOperation { sleep(5) }
-            let child2 = BlockOperation { sleep(5) }
+            let child1 = TestOperation(delay: 1.0)
+            let child2 = TestOperation(delay: 1.0)
             let group = GroupOperation(operations: [ child1, child2 ])
 
             weak var expectation = expectationWithDescription("Test: \(#function)")
@@ -287,8 +287,14 @@ class GroupOperationTests: OperationTests {
 
     func test__group_operation__does_not_finish_before_child_groupoperations_are_finished() {
         for _ in 0..<100 {
-            let child1 = GroupOperation(operations: [BlockOperation { sleep(5) }])
-            let child2 = GroupOperation(operations: [BlockOperation { sleep(5) }])
+            let child1 = GroupOperation(operations: [BlockOperation { (continuation: BlockOperation.ContinuationBlockType) in
+                sleep(5)
+                continuation(error: nil)
+            }])
+            let child2 = GroupOperation(operations: [BlockOperation { (continuation: BlockOperation.ContinuationBlockType) in
+                sleep(5)
+                continuation(error: nil)
+            }])
             let group = GroupOperation(operations: [ child1, child2 ])
 
             weak var expectation = expectationWithDescription("Test: \(#function)")
