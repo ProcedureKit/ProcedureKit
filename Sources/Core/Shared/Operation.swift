@@ -92,7 +92,8 @@ public class Operation: NSOperation {
     private lazy var _log: LoggerType = Logger()
     private var _state = State.Initialized
     private var _internalErrors = [ErrorType]()
-    private var _hasFinishedAlready = false
+    private var _isHandlingFinish = false
+    private var _isHandlingCancel = false
     private var _observers = Protector([OperationObserverType]())
     private var _disableAutomaticFinishing = false
 
@@ -358,28 +359,43 @@ public class Operation: NSOperation {
     public func operationDidCancel() { /* No op */ }
 
     public override func cancel() {
-        let didCancel = stateLock.withCriticalScope { _ -> Bool in
+        let willCancel = stateLock.withCriticalScope { _ -> Bool in
+            // Do not cancel if already finished or finishing, or cancelled
             guard state <= .Executing && !_cancelled else { return false }
-
-            willChangeValueForKey(NSOperationKeyPaths.Cancelled.rawValue)
-            operationWillCancel(errors)
-            willCancelObservers.forEach { $0.willCancelOperation(self, errors: self.errors) }
-
-            _cancelled = true
-            operationDidCancel()
-            didCancelObservers.forEach { $0.didCancelOperation(self) }
-            log.verbose("Did cancel.")
-
-            // Call super.cancel() to trigger .isReady state change on cancel
-            // as well as isReady KVO notification.
-            super.cancel()
-            if executing && !disableAutomaticFinishing {
-                finish()
-            }
+            // Only a single call to cancel should continue
+            guard !_isHandlingCancel else { return false }
+            _isHandlingCancel = true
             return true
         }
-        if didCancel {
-            didChangeValueForKey(NSOperationKeyPaths.Cancelled.rawValue)
+
+        guard willCancel else { return }
+
+        operationWillCancel(errors)
+        willChangeValueForKey(NSOperationKeyPaths.Cancelled.rawValue)
+        willCancelObservers.forEach { $0.willCancelOperation(self, errors: self.errors) }
+
+        stateLock.withCriticalScope {
+            _cancelled = true
+        }
+
+        operationDidCancel()
+        didCancelObservers.forEach { $0.didCancelOperation(self) }
+        log.verbose("Did cancel.")
+        didChangeValueForKey(NSOperationKeyPaths.Cancelled.rawValue)
+
+        // Call super.cancel() to trigger .isReady state change on cancel
+        // as well as isReady KVO notification.
+        super.cancel()
+
+        let willFinish = stateLock.withCriticalScope { () -> Bool in
+            let willFinish = executing && !disableAutomaticFinishing
+            if willFinish {
+                _isHandlingFinish = true
+            }
+            return willFinish
+        }
+        if willFinish {
+            _finish([], fromCancel: true)
         }
     }
 }
@@ -627,49 +643,69 @@ public extension Operation {
      - parameter errors: an array of `ErrorType`, which defaults to empty.
      */
     final func finish(receivedErrors: [ErrorType] = []) {
-        let didFinish = stateLock.withCriticalScope { () -> Bool in
-            guard !_hasFinishedAlready else { return false }
-            _hasFinishedAlready = true
+        _finish(receivedErrors, fromCancel: false)
+    }
 
-            var changedExecutingState = false
-            if executing {
-                changedExecutingState = true
-                willChangeValueForKey(NSOperationKeyPaths.Executing.rawValue)
-            }
-            state = .Finishing
-            if changedExecutingState {
-                didChangeValueForKey(NSOperationKeyPaths.Executing.rawValue)
-            }
-
-            _internalErrors.appendContentsOf(receivedErrors)
-        
-            if errors.isEmpty {
-                log.verbose("Will finish with no errors.")
-            }
-            else {
-                log.warning("Will finish with \(errors.count) errors.")
-            }
-
-            operationWillFinish(_internalErrors)
-            willChangeValueForKey(NSOperationKeyPaths.Finished.rawValue)
-            willFinishObservers.forEach { $0.willFinishOperation(self, errors: self._internalErrors) }
-
-            state = .Finished
-
-            operationDidFinish(_internalErrors)
-            didFinishObservers.forEach { $0.didFinishOperation(self, errors: self._internalErrors) }
-
-            if errors.isEmpty {
-                log.verbose("Did finish with no errors.")
-            }
-            else {
-                log.warning("Did finish with errors: \(errors).")
-            }
+    private final func _finish(receivedErrors: [ErrorType], fromCancel: Bool = false) {
+        let willFinish = stateLock.withCriticalScope { _ -> Bool in
+            // Do not finish if already finished or finishing
+            guard state <= .Finishing else { return false }
+            // Only a single call to _finish should continue
+            // (.cancel() sets _isHandlingFinish and fromCancel=true, if appropriate.)
+            guard !_isHandlingFinish || fromCancel else { return false }
+            _isHandlingFinish = true
             return true
         }
-        if didFinish {
-            didChangeValueForKey(NSOperationKeyPaths.Finished.rawValue)
+
+        guard willFinish else { return }
+
+        // NOTE:
+        // - The stateLock should only be held when necessary, and should not
+        //   be held when notifying observers (whether via KVO or Operation's
+        //   observers) or deadlock can result.
+
+        let changedExecutingState = executing
+        if changedExecutingState {
+            willChangeValueForKey(NSOperationKeyPaths.Executing.rawValue)
         }
+
+        stateLock.withCriticalScope {
+            state = .Finishing
+        }
+
+        if changedExecutingState {
+            didChangeValueForKey(NSOperationKeyPaths.Executing.rawValue)
+        }
+
+        let errors = stateLock.withCriticalScope { () -> [ErrorType] in
+            _internalErrors.appendContentsOf(receivedErrors)
+            return _internalErrors
+        }
+
+        if errors.isEmpty {
+            log.verbose("Will finish with no errors.")
+        }
+        else {
+            log.warning("Will finish with \(errors.count) errors.")
+        }
+
+        operationWillFinish(errors)
+        willChangeValueForKey(NSOperationKeyPaths.Finished.rawValue)
+        willFinishObservers.forEach { $0.willFinishOperation(self, errors: errors) }
+
+        state = .Finished
+
+        operationDidFinish(errors)
+        didFinishObservers.forEach { $0.didFinishOperation(self, errors: errors) }
+
+        if errors.isEmpty {
+            log.verbose("Did finish with no errors.")
+        }
+        else {
+            log.warning("Did finish with errors: \(errors).")
+        }
+
+        didChangeValueForKey(NSOperationKeyPaths.Finished.rawValue)
     }
 
     /// Convenience method to simplify finishing when there is only one error.

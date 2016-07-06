@@ -185,6 +185,32 @@ class OperationKVOTests: OperationTests {
         waitForExpectationsWithTimeout(5, handler: nil)
     }
 
+    private func verifyKVO_cancelledNotifications(observedKVO: [NSOperationKVOObserver.KVONotification]) -> (success: Bool, isReadyIndex: Int?, failureMessage: String?) {
+        // ensure that the observedKVO contains:
+        // "isReady", with at least one "isCancelled" before it
+        if let isReadyIndex = observedKVO.indexOf({ $0.keyPath == NSOperationKVOObserver.KeyPath.Ready.rawValue }) {
+            var foundIsCancelled = false
+            guard isReadyIndex > 0 else {
+                return (success: false, isReadyIndex: isReadyIndex, failureMessage: "Found isReady KVO notification, but no isCancelled beforehand.")
+            }
+            for idx in (0..<isReadyIndex) {
+                if observedKVO[idx].keyPath == NSOperationKVOObserver.KeyPath.Cancelled.rawValue {
+                    foundIsCancelled = true
+                    break
+                }
+            }
+            if foundIsCancelled {
+                return (success: true, isReadyIndex: isReadyIndex, failureMessage: nil)
+            }
+            else {
+                return (success: false, isReadyIndex: isReadyIndex, failureMessage: "Found isReady KVO notification, but no isCancelled beforehand.")
+            }
+        }
+        else {
+            return (success: false, isReadyIndex: nil, failureMessage: "Did not find isReady KVO notification")
+        }
+    }
+
     func test__nsoperation_kvo__operation_cancel_from_initialized() {
         let operation = TestOperation()
         let kvoObserver = NSOperationKVOObserver(operation: operation)
@@ -193,11 +219,11 @@ class OperationKVOTests: OperationTests {
         let observedKVO = kvoObserver.observedKVOFor(NSOperationKVOObserver.KeyPathSets.State)
         // NOTE: To fully match NSOperation, this should be 2 KVO notifications, in the order: isCancelled, isReady
         // Because Operation handles cancelled status internally *and* calls super.cancel (to trigger Ready status change),
-        // a total of 3 KVO notifications are generated in the order: isCancelled, isReady, isCancelled
-        // The following tests the first two only.
+        // a total of 3 KVO notifications are generated in the order: isCancelled, isCancelled, isReady
         XCTAssertGreaterThanOrEqual(observedKVO.count, 2)
-        XCTAssertEqual(observedKVO.get(safe: 0)?.keyPath, NSOperationKVOObserver.KeyPath.Cancelled.rawValue)
-        XCTAssertEqual(observedKVO.get(safe: 1)?.keyPath, NSOperationKVOObserver.KeyPath.Ready.rawValue)
+        let cancelledVerifyResult = verifyKVO_cancelledNotifications(observedKVO)
+        XCTAssertTrue(cancelledVerifyResult.success, cancelledVerifyResult.failureMessage!)
+        XCTAssertLessThanOrEqual(cancelledVerifyResult.isReadyIndex ?? 0, 3)
     }
 
     func test__nsoperation_kvo__groupoperation_cancel_from_initialized() {
@@ -209,11 +235,11 @@ class OperationKVOTests: OperationTests {
         let observedKVO = kvoObserver.observedKVOFor(NSOperationKVOObserver.KeyPathSets.State)
         // NOTE: To fully match NSOperation, this should be 2 KVO notifications, in the order: isCancelled, isReady
         // Because Operation handles cancelled status internally *and* calls super.cancel (to trigger Ready status change),
-        // a total of 3 KVO notifications are generated in the order: isCancelled, isReady, isCancelled
-        // The following tests the first two only.
+        // a total of 3 KVO notifications are generated in the order: isCancelled, isCancelled, isReady
         XCTAssertGreaterThanOrEqual(observedKVO.count, 2)
-        XCTAssertEqual(observedKVO.get(safe: 0)?.keyPath, NSOperationKVOObserver.KeyPath.Cancelled.rawValue)
-        XCTAssertEqual(observedKVO.get(safe: 1)?.keyPath, NSOperationKVOObserver.KeyPath.Ready.rawValue)
+        let cancelledVerifyResult = verifyKVO_cancelledNotifications(observedKVO)
+        XCTAssertTrue(cancelledVerifyResult.success, cancelledVerifyResult.failureMessage!)
+        XCTAssertLessThanOrEqual(cancelledVerifyResult.isReadyIndex ?? 0, 3)
     }
 
     func test__nsoperation_kvo__groupoperation_child_cancel_from_initialized() {
@@ -225,11 +251,11 @@ class OperationKVOTests: OperationTests {
         let observedKVO = kvoObserver.observedKVOFor(NSOperationKVOObserver.KeyPathSets.State)
         // NOTE: To fully match NSOperation, this should be 2 KVO notifications, in the order: isCancelled, isReady
         // Because Operation handles cancelled status internally *and* calls super.cancel (to trigger Ready status change),
-        // a total of 3 KVO notifications are generated in the order: isCancelled, isReady, isCancelled
-        // The following tests the first two only.
+        // a total of 3 KVO notifications are generated in the order: isCancelled, isCancelled, isReady
         XCTAssertGreaterThanOrEqual(observedKVO.count, 2)
-        XCTAssertEqual(observedKVO.get(safe: 0)?.keyPath, NSOperationKVOObserver.KeyPath.Cancelled.rawValue)
-        XCTAssertEqual(observedKVO.get(safe: 1)?.keyPath, NSOperationKVOObserver.KeyPath.Ready.rawValue)
+        let cancelledVerifyResult = verifyKVO_cancelledNotifications(observedKVO)
+        XCTAssertTrue(cancelledVerifyResult.success, cancelledVerifyResult.failureMessage!)
+        XCTAssertLessThanOrEqual(cancelledVerifyResult.isReadyIndex ?? 0, 3)
     }
 
     func test__nsoperation_kvo__nsoperation_cancel_from_initialized() {
@@ -259,9 +285,10 @@ class OperationKVOTests: OperationTests {
 
         XCTAssertGreaterThanOrEqual(observedKVO.count, 3)
 
-        // first two KVO notifications should be isCancelled and isReady
-        XCTAssertEqual(observedKVO.get(safe: 0)?.keyPath, NSOperationKVOObserver.KeyPath.Cancelled.rawValue)
-        XCTAssertEqual(observedKVO.get(safe: 1)?.keyPath, NSOperationKVOObserver.KeyPath.Ready.rawValue)
+        // first three KVO notifications should contain isCancelled and isReady (in that order)
+        let cancelledVerifyResult = verifyKVO_cancelledNotifications(observedKVO)
+        XCTAssertTrue(cancelledVerifyResult.success, cancelledVerifyResult.failureMessage!)
+        XCTAssertLessThanOrEqual(cancelledVerifyResult.isReadyIndex ?? 0, 3)
 
         // it is valid, but not necessary, for a cancelled operation to transition through isExecuting
 
@@ -289,9 +316,10 @@ class OperationKVOTests: OperationTests {
 
         XCTAssertGreaterThanOrEqual(observedKVO.count, 3)
 
-        // first two KVO notifications should be isCancelled and isReady
-        XCTAssertEqual(observedKVO.get(safe: 0)?.keyPath, NSOperationKVOObserver.KeyPath.Cancelled.rawValue)
-        XCTAssertEqual(observedKVO.get(safe: 1)?.keyPath, NSOperationKVOObserver.KeyPath.Ready.rawValue)
+        // first three KVO notifications should contain isCancelled and isReady (in that order)
+        let cancelledVerifyResult = verifyKVO_cancelledNotifications(observedKVO)
+        XCTAssertTrue(cancelledVerifyResult.success, cancelledVerifyResult.failureMessage!)
+        XCTAssertLessThanOrEqual(cancelledVerifyResult.isReadyIndex ?? 0, 3)
 
         // it is valid, but not necessary, for a cancelled operation to transition through isExecuting
 
