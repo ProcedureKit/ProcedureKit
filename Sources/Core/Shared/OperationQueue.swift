@@ -41,12 +41,12 @@ public protocol OperationQueueDelegate: class {
      - parameter errors: an array of `ErrorType`s.
      */
     func operationQueue(queue: OperationQueue, didFinishOperation operation: NSOperation, withErrors errors: [ErrorType])
-    
+
     /**
      The operation queue will add a new operation via produceOperation().
      This is for information only, the delegate cannot affect whether the operation
      is added, or other control flow.
-     
+
      - paramter queue: the `OperationQueue`.
      - paramter operation: the `NSOperation` instance about to be added.
      */

@@ -238,19 +238,19 @@ class _Logger<Manager: LogManagerType>: LoggerType {
  current Logger (parentLogger) configuration at the time it is created.
  */
 class _LoggerOperationContext: LoggerType {
-    
+
     /// - returns: the log severity of this logger instance.
     var severity: LogSeverity
-    
+
     /// - returns: a `Bool` to enable/disable this logger instance. Defaults to true
     var enabled: Bool
-    
+
     /// - returns: a `LoggerBlockType` which receives the message to log
     var logger: LoggerBlockType
-    
+
     /// - returns: a String?, the name of the operation.
     var operationName: String? = .None
-    
+
     init(parentLogger: LoggerType, operationName: String) {
         self.operationName = operationName
         self.severity = parentLogger.severity
@@ -330,12 +330,12 @@ public class LogManager: LogManagerType {
 
     var logger: LoggerBlockType {
         get {
-            return logger_lock.read{ () -> LoggerBlockType in
+            return loggerLock.read { () -> LoggerBlockType in
                 return self._logger
             }
         }
         set {
-            logger_lock.write {
+            loggerLock.write {
                 self._logger = newValue
             }
         }
@@ -352,7 +352,7 @@ public class LogManager: LogManagerType {
     /// Private protected properties
     private var _severity: Protector<LogSeverity>
     private var _enabled: Protector<Bool>
-    private var logger_lock: ReadWriteLock = Lock()
+    private var loggerLock: ReadWriteLock = Lock()
     private var _logger: LoggerBlockType
 }
 

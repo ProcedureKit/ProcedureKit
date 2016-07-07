@@ -8,6 +8,8 @@
 
 import Foundation
 
+// swiftlint:disable file_length
+
 /**
 An `Operation` subclass which enables the grouping
 of other operations. Use `GroupOperation`s to associate
@@ -256,7 +258,7 @@ public class GroupOperation: Operation, OperationQueueDelegate {
         if operation !== finishingOperation {
             groupFinishLock.withCriticalScope {
                 assert(!isGroupFinishing, "Cannot add new operations to a group after the group has started to finish.")
-                
+
                 willAddChildOperationObservers.forEach { $0.groupOperation(self, willAddChildOperation: operation) }
 
                 canFinishOperation.addDependency(operation)
@@ -424,9 +426,9 @@ private extension GroupOperation {
      - a CanFinishOperation which manages handling GroupOperation internal state and has every child
        operation as a dependency
      - a finishingOperation, which has the CanFinishOperation as a dependency
-     
-     The purpose of this is to handle the possibility that GroupOperation.addOperation() or 
-     GroupOperation.queue.addOperation() are called right after all current child operations have 
+
+     The purpose of this is to handle the possibility that GroupOperation.addOperation() or
+     GroupOperation.queue.addOperation() are called right after all current child operations have
      completed (i.e. after the CanFinishOperation has been set to ready), but *prior* to being able
      to process that the GroupOperation is finishing (i.e. prior to the CanFinishOperation executing and
      acquiring the GroupOperation.groupFinishLock to set state).
@@ -434,7 +436,7 @@ private extension GroupOperation {
     private class CanFinishOperation: NSOperation {
         private weak var parent: GroupOperation?
         private var _finished = false
-        
+
         init(parentGroupOperation: GroupOperation) {
             self.parent = parentGroupOperation
             super.init()
@@ -470,7 +472,7 @@ private extension GroupOperation {
                         // GroupOperation's new CanFinishOperation.
 
                         let newCanFinishOp = GroupOperation.CanFinishOperation(parentGroupOperation: parent)
-                        
+
                         nonFinishedOperations.forEach { op in
                             newCanFinishOp.addDependency(op)
                         }

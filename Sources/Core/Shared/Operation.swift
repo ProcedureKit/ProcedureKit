@@ -206,27 +206,27 @@ public class Operation: NSOperation {
     /**
      Ability to override Operation's built-in finishing behavior, if a
      subclass requires full control over when finish() is called.
-         
+
      Used for GroupOperation to implement proper .Finished state-handling
      (only finishing after all child operations have finished).
-     
+
      The default behavior of Operation is to automatically call finish()
      when:
         (a) it's cancelled, whether that occurs:
             - prior to the Operation starting
               (in which case, Operation will skip calling execute())
-            - on another thread at the same time that the operation is 
+            - on another thread at the same time that the operation is
               executing
         (b) when willExecuteObservers log errors
-     
-     To ensure that an Operation subclass does not finish until the 
+
+     To ensure that an Operation subclass does not finish until the
      subclass calls finish():
      call `super.init(disableAutomaticFinishing: true)` in the init.
-         
-     IMPORTANT: If disableAutomaticFinishing == TRUE, the subclass is 
+
+     IMPORTANT: If disableAutomaticFinishing == TRUE, the subclass is
      responsible for calling finish() in *ALL* cases, including when the
      operation is cancelled.
-     
+
     */
     public init(disableAutomaticFinishing: Bool) {
         self._disableAutomaticFinishing = disableAutomaticFinishing
@@ -263,7 +263,7 @@ public class Operation: NSOperation {
     }
 
     // MARK: - Add Observer
-    
+
     /**
      Add an observer to the to the operation, can only be done
      prior to the operation starting.
@@ -280,7 +280,7 @@ public class Operation: NSOperation {
     }
 
     // MARK: - Execution
-    
+
     /**
      Subclasses should override this method to perform their specialized task.
      They must call a finish methods in order to complete.
@@ -595,18 +595,18 @@ public extension Operation {
 
         // Inform observers that the operation will execute
         willExecuteObservers.forEach { $0.willExecuteOperation(self) }
-        
+
         let nextState = stateLock.withCriticalScope { () -> (Operation.State?) in
             assert(!executing, "Operation is attempting to execute, but is already executing.")
             guard !_isTransitioningToExecuting else {
                 assertionFailure("Operation is attempting to execute twice, concurrently.")
                 return nil
             }
-            
-            // Check to see if the operation has now been finished 
+
+            // Check to see if the operation has now been finished
             // by an observer (or anything else)
             guard state <= .Pending else { return nil }
-            
+
             // Check to see if the operation has now been cancelled
             // by an observer
             guard (_internalErrors.isEmpty && !cancelled) || disableAutomaticFinishing else {
@@ -623,7 +623,7 @@ public extension Operation {
             _finish([], fromCancel: true)
             return
         }
-        
+
         guard nextState == .Executing else { return }
 
         willChangeValueForKey(NSOperationKeyPaths.Executing.rawValue)
@@ -631,10 +631,10 @@ public extension Operation {
         let nextState2 = stateLock.withCriticalScope { () -> (Operation.State?) in
             // Re-check state, since it could have changed on another thread (ex. via finish)
             guard state <= .Pending else { return nil }
-            
+
             state = .Executing
             _isTransitioningToExecuting = false
-            
+
             if cancelled && !disableAutomaticFinishing && !_isHandlingFinish {
                 // Operation was cancelled, automatic finishing is enabled,
                 // but cancel is not (yet/ever?) handling the finish.
@@ -645,17 +645,17 @@ public extension Operation {
             }
             return .Executing
         }
-        
+
         // Always send the closing didChangeValueForKey
         didChangeValueForKey(NSOperationKeyPaths.Executing.rawValue)
-        
+
         guard nextState2 != .Finishing else {
             _finish([], fromCancel: true)
             return
         }
 
         guard nextState2 == .Executing else { return }
-        
+
         log.verbose("Will Execute")
 
         execute()
