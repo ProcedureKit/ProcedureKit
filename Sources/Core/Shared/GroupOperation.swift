@@ -41,12 +41,25 @@ public class GroupOperation: Operation, OperationQueueDelegate {
 
     private let finishingOperation = NSBlockOperation { }
     private var protectedErrors = Protector(Errors())
+    private var canFinishOperation: GroupOperation.CanFinishOperation!
+    private var isGroupFinishing = false
+    private let groupFinishLock = NSRecursiveLock()
 
     /// - returns: the OperationQueue the group runs operations on.
     public let queue = OperationQueue()
 
     /// - returns: the operations which have been added to the queue
-    public private(set) var operations: [NSOperation]
+    public private(set) var operations: [NSOperation] {
+        get {
+            return _operations.read { $0 }
+        }
+        set {
+            _operations.write { (inout ward: [NSOperation]) in
+                ward = newValue
+            }
+        }
+    }
+    private var _operations: Protector<[NSOperation]>
 
     public override var userIntent: Operation.UserIntent {
         didSet {
@@ -62,10 +75,11 @@ public class GroupOperation: Operation, OperationQueueDelegate {
     - parameter operations: an array of `NSOperation`s.
     */
     public init(operations ops: [NSOperation]) {
-        operations = ops
+        _operations = Protector<[NSOperation]>(ops)
         // GroupOperation handles calling finish() on cancellation once all of its children have cancelled and finished
         // and its finishingOperation has finished.
         super.init(disableAutomaticFinishing: true) // Override default Operation finishing behavior
+        canFinishOperation = GroupOperation.CanFinishOperation(parentGroupOperation: self)
         name = "Group Operation"
         queue.suspended = true
         queue.delegate = self
@@ -96,6 +110,7 @@ public class GroupOperation: Operation, OperationQueueDelegate {
     */
     public override func execute() {
         _addOperations(operations.filter { !self.queue.operations.contains($0) }, addToOperationsArray: false)
+        queue._addCanFinishOperation(canFinishOperation, finishingOperation: finishingOperation)
         queue.addOperation(finishingOperation)
         queue.suspended = false
     }
@@ -128,18 +143,43 @@ public class GroupOperation: Operation, OperationQueueDelegate {
     }
 
     private func _addOperations(additional: [NSOperation], addToOperationsArray: Bool = true) {
-        stateLock.withCriticalScope {
-            if additional.count > 0 {
-                assert(!finishingOperation.executing, "Cannot add new operations to a group after the group has started to finish.")
-                assert(!finishingOperation.finished, "Cannot add new operations to a group after the group has completed.")
-                if cancelled {
+
+        if additional.count > 0 {
+
+            let addedOperations = groupFinishLock.withCriticalScope { () -> Bool in
+                guard !isGroupFinishing else { return false }
+
+                var handledCancelled = false
+                if self.cancelled {
                     additional.forEachOperation { $0.cancel() }
+                    handledCancelled = true
                 }
-                additional.forEachOperation { $0.log.severity = log.severity }
-                queue.addOperations(additional)
+                let logSeverity = self.log.severity
+                additional.forEachOperation { $0.log.severity = logSeverity }
+
+                self.queue.addOperations(additional)
+
                 if addToOperationsArray {
-                    operations.appendContentsOf(additional)
+                    self._operations.appendContentsOf(additional)
                 }
+
+                if !handledCancelled && self.cancelled {
+                    // It is possible that the cancellation happened before adding the
+                    // additional operations to the operations array.
+                    // Thus, ensure that all additional operations are cancelled.
+                    additional.forEachOperation { if !$0.cancelled { $0.cancel() } }
+                }
+                return true
+            }
+
+            guard addedOperations else {
+                if !finishingOperation.finished {
+                    assertionFailure("Cannot add new operations to a group after the group has started to finish.")
+                }
+                else {
+                    assertionFailure("Cannot add new operations to a group after the group has completed.")
+                }
+                return
             }
         }
     }
@@ -200,12 +240,12 @@ public class GroupOperation: Operation, OperationQueueDelegate {
 
     /**
      The group operation acts as its own queue's delegate. When an operation is added to the queue,
-     assuming that the finishing operation has not started (or finished), and the operation is not
-     the finishing operation itself, then we add the operation as a dependency to the finishing
-     operation.
+     assuming that the finishing operation has not started (or finished), the operation is not
+     the finishing operation itself, and the CanFinishOperation has not yet started,
+     then we add the operation as a dependency to the CanFinishOperation.
 
      The purpose of this is to keep the finishing operation as the last child operation that executes
-     when there are no more operations in the group.
+     when there are no more operations in the group, and to safely handle GroupOperation state changes.
      */
     public func operationQueue(queue: OperationQueue, willAddOperation operation: NSOperation) {
         guard queue === self.queue else { return }
@@ -214,10 +254,13 @@ public class GroupOperation: Operation, OperationQueueDelegate {
         assert(!finishingOperation.finished, "Cannot add new operations to a group after the group has completed.")
 
         if operation !== finishingOperation {
+            groupFinishLock.withCriticalScope {
+                assert(!isGroupFinishing, "Cannot add new operations to a group after the group has started to finish.")
+                
+                willAddChildOperationObservers.forEach { $0.groupOperation(self, willAddChildOperation: operation) }
 
-            willAddChildOperationObservers.forEach { $0.groupOperation(self, willAddChildOperation: operation) }
-
-            finishingOperation.addDependency(operation)
+                canFinishOperation.addDependency(operation)
+            }
         }
     }
 
@@ -254,14 +297,16 @@ public class GroupOperation: Operation, OperationQueueDelegate {
     public func operationQueue(queue: OperationQueue, willProduceOperation operation: NSOperation) {
         guard queue === self.queue else { return }
 
-        // ensure that produced operations are added to GroupOperation's
+        // Ensure that produced operations are added to GroupOperation's
         // internal operations array (and cancelled if appropriate)
-        print("will produce operation: \(operation.operationName)")
-        stateLock.withCriticalScope {
+
+        groupFinishLock.withCriticalScope {
+            assert(!finishingOperation.finished, "Cannot produce new operations within a group after the group has completed.")
+            assert(!isGroupFinishing, "Cannot produce new operations within a group after the group has started to finish.")
+            _operations.append(operation)
             if cancelled {
-                operation.cancel()
+                if !operation.cancelled { operation.cancel() }
             }
-            operations.append(operation)
         }
     }
 }
@@ -370,5 +415,96 @@ public struct WillAddChildObserver: GroupOperationWillAddChildObserver {
     /// Base OperationObserverType method
     public func didAttachToOperation(operation: Operation) {
         didAttachToOperation?(operation: operation)
+    }
+}
+
+private extension GroupOperation {
+    /**
+     The group operation handles thread-safe addition of operations by utilizing two final operations:
+     - a CanFinishOperation which manages handling GroupOperation internal state and has every child
+       operation as a dependency
+     - a finishingOperation, which has the CanFinishOperation as a dependency
+     
+     The purpose of this is to handle the possibility that GroupOperation.addOperation() or 
+     GroupOperation.queue.addOperation() are called right after all current child operations have 
+     completed (i.e. after the CanFinishOperation has been set to ready), but *prior* to being able
+     to process that the GroupOperation is finishing (i.e. prior to the CanFinishOperation executing and
+     acquiring the GroupOperation.groupFinishLock to set state).
+     */
+    private class CanFinishOperation: NSOperation {
+        private weak var parent: GroupOperation?
+        private var _finished = false
+        
+        init(parentGroupOperation: GroupOperation) {
+            self.parent = parentGroupOperation
+            super.init()
+        }
+        override func start() {
+            main()
+        }
+        override func main() {
+            execute()
+        }
+        func execute() {
+            if let parent = parent {
+
+                // All operations that were added as a side-effect of anything up to
+                // WillFinishObservers of prior operations should have been executed.
+                //
+                // Handle an edge case caused by concurrent calls to GroupOperation.addOperations()
+
+                parent.groupFinishLock.withCriticalScope {
+
+                    // Check whether new operations were added prior to the lock
+                    // by checking for child operations that are not finished.
+
+                    let nonFinishedOperations = parent.operations.filter({ !$0.finished })
+                    if !nonFinishedOperations.isEmpty {
+
+                        // Child operations were added after this CanFinishOperation became
+                        // ready, but before it executed or before the lock could be acquired.
+                        //
+                        // The GroupOperation should wait for these child operations to finish
+                        // before finishing. Add the oustanding child operations as
+                        // dependencies to a new CanFinishOperation, and add that as the
+                        // GroupOperation's new CanFinishOperation.
+
+                        let newCanFinishOp = GroupOperation.CanFinishOperation(parentGroupOperation: parent)
+                        
+                        nonFinishedOperations.forEach { op in
+                            newCanFinishOp.addDependency(op)
+                        }
+
+                        parent.canFinishOperation = newCanFinishOp
+
+                        parent.queue._addCanFinishOperation(newCanFinishOp, finishingOperation: parent.finishingOperation)
+                    }
+                    else {
+                        // There are no additional operations to handle.
+                        // Ensure that no new operations can be added.
+                        parent.isGroupFinishing = true
+                    }
+                }
+            }
+
+            willChangeValueForKey("isFinished")
+            _finished = true
+            didChangeValueForKey("isFinished")
+        }
+        override var executing: Bool {
+            return false
+        }
+        override var finished: Bool {
+            return _finished
+        }
+    }
+}
+
+private extension OperationQueue {
+    private func _addCanFinishOperation(canFinishOperation: GroupOperation.CanFinishOperation, finishingOperation: NSOperation) {
+        // Do not add observers (not needed - CanFinishOperation is an implementation detail of GroupOperation)
+        // Do not add conditions (CanFinishOperation has none)
+        finishingOperation.addDependency(canFinishOperation)
+        super.addOperation(canFinishOperation)
     }
 }
