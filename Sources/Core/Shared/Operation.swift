@@ -88,7 +88,7 @@ public class Operation: NSOperation {
     /// - returns: a unique String which can be used to identify the operation instance
     public let identifier = NSUUID().UUIDString
 
-    internal let stateLock = NSRecursiveLock()
+    private let stateLock = NSRecursiveLock()
     private var _log = Protector<LoggerType>(Logger())
     private var _state = State.Initialized
     private var _internalErrors = [ErrorType]()
