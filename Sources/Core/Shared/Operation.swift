@@ -92,6 +92,7 @@ public class Operation: NSOperation {
     private lazy var _log: LoggerType = Logger()
     private var _state = State.Initialized
     private var _internalErrors = [ErrorType]()
+    private var _isTransitioningToExecuting = false
     private var _isHandlingFinish = false
     private var _isHandlingCancel = false
     private var _observers = Protector([OperationObserverType]())
@@ -338,8 +339,8 @@ public class Operation: NSOperation {
                 log.warning("Did cancel with errors: \(errors).")
             }
             _internalErrors += errors
-            cancel()
         }
+        cancel()
     }
 
     /**
@@ -388,7 +389,7 @@ public class Operation: NSOperation {
         super.cancel()
 
         let willFinish = stateLock.withCriticalScope { () -> Bool in
-            let willFinish = executing && !disableAutomaticFinishing
+            let willFinish = executing && !disableAutomaticFinishing && !_isHandlingFinish
             if willFinish {
                 _isHandlingFinish = true
             }
@@ -593,29 +594,67 @@ public extension Operation {
         // Inform observers that the operation will execute
         willExecuteObservers.forEach { $0.willExecuteOperation(self) }
         
-        let doExecute = stateLock.withCriticalScope { () -> Bool in
+        let nextState = stateLock.withCriticalScope { () -> (Operation.State?) in
             assert(!executing, "Operation is attempting to execute, but is already executing.")
+            guard !_isTransitioningToExecuting else {
+                assertionFailure("Operation is attempting to execute twice, concurrently.")
+                return nil
+            }
             
             // Check to see if the operation has now been finished 
             // by an observer (or anything else)
-            guard state <= .Pending else { return false }
+            guard state <= .Pending else { return nil }
             
             // Check to see if the operation has now been cancelled
             // by an observer
             guard (_internalErrors.isEmpty && !cancelled) || disableAutomaticFinishing else {
-                finish()
-                return false
+                _isHandlingFinish = true
+                return Operation.State.Finishing
             }
 
             // Transition to the .isExecuting state, and explicitly send the required KVO change notifications
-            willChangeValueForKey(NSOperationKeyPaths.Executing.rawValue)
-            state = .Executing
-            log.verbose("Will Execute")
-            didChangeValueForKey(NSOperationKeyPaths.Executing.rawValue)
-            return true
+            _isTransitioningToExecuting = true
+            return Operation.State.Executing
         }
 
-        guard doExecute else { return }
+        guard nextState != .Finishing else {
+            _finish([], fromCancel: true)
+            return
+        }
+        
+        guard nextState == .Executing else { return }
+
+        willChangeValueForKey(NSOperationKeyPaths.Executing.rawValue)
+
+        let nextState2 = stateLock.withCriticalScope { () -> (Operation.State?) in
+            // Re-check state, since it could have changed on another thread (ex. via finish)
+            guard state <= .Pending else { return nil }
+            
+            state = .Executing
+            _isTransitioningToExecuting = false
+            
+            if cancelled && !disableAutomaticFinishing && !_isHandlingFinish {
+                // Operation was cancelled, automatic finishing is enabled,
+                // but cancel is not (yet/ever?) handling the finish.
+                // Because cancel could have already passed the check for executing,
+                // handle calling finish here.
+                _isHandlingFinish = true
+                return .Finishing
+            }
+            return .Executing
+        }
+        
+        // Always send the closing didChangeValueForKey
+        didChangeValueForKey(NSOperationKeyPaths.Executing.rawValue)
+        
+        guard nextState2 != .Finishing else {
+            _finish([], fromCancel: true)
+            return
+        }
+
+        guard nextState2 == .Executing else { return }
+        
+        log.verbose("Will Execute")
 
         execute()
     }
