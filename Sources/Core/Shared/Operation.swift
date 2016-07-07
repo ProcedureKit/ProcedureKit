@@ -89,7 +89,7 @@ public class Operation: NSOperation {
     public let identifier = NSUUID().UUIDString
 
     internal let stateLock = NSRecursiveLock()
-    private lazy var _log: LoggerType = Logger()
+    private var _log = Protector<LoggerType>(Logger())
     private var _state = State.Initialized
     private var _internalErrors = [ErrorType]()
     private var _isTransitioningToExecuting = false
@@ -185,11 +185,13 @@ public class Operation: NSOperation {
     */
     public var log: LoggerType {
         get {
-            _log.operationName = operationName
-            return _log
+            let operationName = self.operationName
+            return _log.read { _LoggerOperationContext(parentLogger: $0, operationName: operationName) }
         }
         set {
-            _log = newValue
+            _log.write { (inout ward: LoggerType) in
+                ward = newValue
+            }
         }
     }
 
