@@ -114,8 +114,8 @@ public class OperationQueue: NSOperationQueue {
             operation.addObserver(ProducedOperationObserver { [weak self] op, produced in
                 if let q = self {
                     q.delegate?.operationQueue(q, willProduceOperation: produced)
+                    q.addOperation(produced)
                 }
-                self?.addOperation(produced)
             })
 
             /// Add an observer to invoke the will finish delegate method

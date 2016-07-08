@@ -96,7 +96,7 @@ public class Operation: NSOperation {
     private var _isHandlingFinish = false
     private var _isHandlingCancel = false
     private var _observers = Protector([OperationObserverType]())
-    private var _disableAutomaticFinishing = false
+    private let disableAutomaticFinishing: Bool
 
     internal private(set) var directDependencies = Set<NSOperation>()
     internal private(set) var conditions = Set<Condition>()
@@ -198,6 +198,7 @@ public class Operation: NSOperation {
     // MARK: - Initialization
 
     public override init() {
+        self.disableAutomaticFinishing = false
         super.init()
     }
 
@@ -229,12 +230,8 @@ public class Operation: NSOperation {
 
     */
     public init(disableAutomaticFinishing: Bool) {
-        self._disableAutomaticFinishing = disableAutomaticFinishing
+        self.disableAutomaticFinishing = disableAutomaticFinishing
         super.init()
-    }
-
-    private var disableAutomaticFinishing: Bool {
-        return _disableAutomaticFinishing
     }
 
     // MARK: - Add Condition
@@ -335,8 +332,6 @@ public class Operation: NSOperation {
      */
     public func cancelWithErrors(errors: [ErrorType] = []) {
         stateLock.withCriticalScope {
-            assert(state != .Finishing, "Operation cannot be cancelled after while it is finishing.")
-            assert(state != .Finished, "Operation cannot be cancelled after it has already finished.")
             if !errors.isEmpty {
                 log.warning("Did cancel with errors: \(errors).")
             }
@@ -734,17 +729,15 @@ public extension Operation {
         willChangeValueForKey(NSOperationKeyPaths.Finished.rawValue)
         willFinishObservers.forEach { $0.willFinishOperation(self, errors: errors) }
 
-        state = .Finished
+        stateLock.withCriticalScope {
+            state = .Finished
+        }
 
         operationDidFinish(errors)
         didFinishObservers.forEach { $0.didFinishOperation(self, errors: errors) }
 
-        if errors.isEmpty {
-            log.verbose("Did finish with no errors.")
-        }
-        else {
-            log.warning("Did finish with errors: \(errors).")
-        }
+        let message = errors.isEmpty ? "errors: \(errors)" : "no errors"
+        log.verbose("Did finish with \(message)")
 
         didChangeValueForKey(NSOperationKeyPaths.Finished.rawValue)
     }
