@@ -46,6 +46,7 @@ public class GroupOperation: Operation, OperationQueueDelegate {
     private var canFinishOperation: GroupOperation.CanFinishOperation!
     private var isGroupFinishing = false
     private let groupFinishLock = NSRecursiveLock()
+    private var isAddingOperationsGroup = dispatch_group_create()
 
     /// - returns: the OperationQueue the group runs operations on.
     public let queue = OperationQueue()
@@ -148,33 +149,13 @@ public class GroupOperation: Operation, OperationQueueDelegate {
 
         if additional.count > 0 {
 
-            let addedOperations = groupFinishLock.withCriticalScope { () -> Bool in
+            let shouldAddOperations = groupFinishLock.withCriticalScope { () -> Bool in
                 guard !isGroupFinishing else { return false }
-
-                var handledCancelled = false
-                if self.cancelled {
-                    additional.forEachOperation { $0.cancel() }
-                    handledCancelled = true
-                }
-                let logSeverity = self.log.severity
-                additional.forEachOperation { $0.log.severity = logSeverity }
-
-                self.queue.addOperations(additional)
-
-                if addToOperationsArray {
-                    self._operations.appendContentsOf(additional)
-                }
-
-                if !handledCancelled && self.cancelled {
-                    // It is possible that the cancellation happened before adding the
-                    // additional operations to the operations array.
-                    // Thus, ensure that all additional operations are cancelled.
-                    additional.forEachOperation { if !$0.cancelled { $0.cancel() } }
-                }
+                dispatch_group_enter(isAddingOperationsGroup)
                 return true
             }
 
-            guard addedOperations else {
+            guard shouldAddOperations else {
                 if !finishingOperation.finished {
                     assertionFailure("Cannot add new operations to a group after the group has started to finish.")
                 }
@@ -182,6 +163,31 @@ public class GroupOperation: Operation, OperationQueueDelegate {
                     assertionFailure("Cannot add new operations to a group after the group has completed.")
                 }
                 return
+            }
+
+            var handledCancelled = false
+            if self.cancelled {
+                additional.forEachOperation { $0.cancel() }
+                handledCancelled = true
+            }
+            let logSeverity = self.log.severity
+            additional.forEachOperation { $0.log.severity = logSeverity }
+
+            self.queue.addOperations(additional)
+
+            if addToOperationsArray {
+                self._operations.appendContentsOf(additional)
+            }
+
+            if !handledCancelled && self.cancelled {
+                // It is possible that the cancellation happened before adding the
+                // additional operations to the operations array.
+                // Thus, ensure that all additional operations are cancelled.
+                additional.forEachOperation { if !$0.cancelled { $0.cancel() } }
+            }
+
+            groupFinishLock.withCriticalScope {
+                dispatch_group_leave(isAddingOperationsGroup)
             }
         }
     }
@@ -256,12 +262,23 @@ public class GroupOperation: Operation, OperationQueueDelegate {
         assert(!finishingOperation.finished, "Cannot add new operations to a group after the group has completed.")
 
         if operation !== finishingOperation {
+            let shouldContinue = groupFinishLock.withCriticalScope { () -> Bool in
+                guard !isGroupFinishing else {
+                    assertionFailure("Cannot add new operations to a group after the group has started to finish.")
+                    return false
+                }
+                dispatch_group_enter(isAddingOperationsGroup)
+                return true
+            }
+            
+            guard shouldContinue else { return }
+
+            willAddChildOperationObservers.forEach { $0.groupOperation(self, willAddChildOperation: operation) }
+
+            canFinishOperation.addDependency(operation)
+            
             groupFinishLock.withCriticalScope {
-                assert(!isGroupFinishing, "Cannot add new operations to a group after the group has started to finish.")
-
-                willAddChildOperationObservers.forEach { $0.groupOperation(self, willAddChildOperation: operation) }
-
-                canFinishOperation.addDependency(operation)
+                dispatch_group_leave(isAddingOperationsGroup)
             }
         }
     }
@@ -302,13 +319,25 @@ public class GroupOperation: Operation, OperationQueueDelegate {
         // Ensure that produced operations are added to GroupOperation's
         // internal operations array (and cancelled if appropriate)
 
-        groupFinishLock.withCriticalScope {
+        let shouldContinue = groupFinishLock.withCriticalScope { () -> Bool in
             assert(!finishingOperation.finished, "Cannot produce new operations within a group after the group has completed.")
-            assert(!isGroupFinishing, "Cannot produce new operations within a group after the group has started to finish.")
-            _operations.append(operation)
-            if cancelled {
-                if !operation.cancelled { operation.cancel() }
+            guard !isGroupFinishing else {
+                assertionFailure("Cannot produce new operations within a group after the group has started to finish.")
+                return false
             }
+            dispatch_group_enter(isAddingOperationsGroup)
+            return true
+        }
+
+        guard shouldContinue else { return }
+
+        _operations.append(operation)
+        if cancelled {
+            if !operation.cancelled { operation.cancel() }
+        }
+
+        groupFinishLock.withCriticalScope {
+            dispatch_group_leave(isAddingOperationsGroup)
         }
     }
 }
@@ -455,7 +484,19 @@ private extension GroupOperation {
                 //
                 // Handle an edge case caused by concurrent calls to GroupOperation.addOperations()
 
-                parent.groupFinishLock.withCriticalScope {
+                let isWaiting = parent.groupFinishLock.withCriticalScope { () -> Bool in
+
+                    // Is anything currently adding operations?
+                    guard dispatch_group_wait(parent.isAddingOperationsGroup, DISPATCH_TIME_NOW) == 0 else {
+                        // Operations are actively being added to the group
+                        // Wait for this to complete before proceeding.
+                        dispatch_group_notify(parent.isAddingOperationsGroup,
+                            dispatch_get_global_queue(NSQualityOfServiceToDispatchQOS(self.qualityOfService), 0),
+                            { [unowned self] in
+                            self.execute()
+                        })
+                        return true
+                    }
 
                     // Check whether new operations were added prior to the lock
                     // by checking for child operations that are not finished.
@@ -486,12 +527,23 @@ private extension GroupOperation {
                         // Ensure that no new operations can be added.
                         parent.isGroupFinishing = true
                     }
+                    return false
                 }
+
+                guard !isWaiting else { return }
             }
 
             willChangeValueForKey("isFinished")
             _finished = true
             didChangeValueForKey("isFinished")
+        }
+        private func NSQualityOfServiceToDispatchQOS(qualityOfService: NSQualityOfService) -> qos_class_t {
+            let mapping = [NSQualityOfService.Background: QOS_CLASS_BACKGROUND,
+                           NSQualityOfService.Default: QOS_CLASS_DEFAULT,
+                           NSQualityOfService.UserInitiated: QOS_CLASS_USER_INITIATED,
+                           NSQualityOfService.UserInteractive: QOS_CLASS_USER_INTERACTIVE,
+                           NSQualityOfService.Utility: QOS_CLASS_UTILITY]
+            return mapping[qualityOfService] ?? QOS_CLASS_DEFAULT
         }
         override var executing: Bool {
             return false
