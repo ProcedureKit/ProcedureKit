@@ -79,12 +79,6 @@ public class Operation: NSOperation {
         }
     }
 
-    private enum NSOperationKeyPaths: String {
-        case Cancelled = "isCancelled"
-        case Executing = "isExecuting"
-        case Finished = "isFinished"
-    }
-
     /// - returns: a unique String which can be used to identify the operation instance
     public let identifier = NSUUID().UUIDString
 
@@ -369,7 +363,7 @@ public class Operation: NSOperation {
         guard willCancel else { return }
 
         operationWillCancel(errors)
-        willChangeValueForKey(NSOperationKeyPaths.Cancelled.rawValue)
+        willChangeValueForKey(NSOperation.KeyPath.Cancelled.rawValue)
         willCancelObservers.forEach { $0.willCancelOperation(self, errors: self.errors) }
 
         stateLock.withCriticalScope {
@@ -379,7 +373,7 @@ public class Operation: NSOperation {
         operationDidCancel()
         didCancelObservers.forEach { $0.didCancelOperation(self) }
         log.verbose("Did cancel.")
-        didChangeValueForKey(NSOperationKeyPaths.Cancelled.rawValue)
+        didChangeValueForKey(NSOperation.KeyPath.Cancelled.rawValue)
 
         // Call super.cancel() to trigger .isReady state change on cancel
         // as well as isReady KVO notification.
@@ -621,7 +615,7 @@ public extension Operation {
 
         guard nextState == .Executing else { return }
 
-        willChangeValueForKey(NSOperationKeyPaths.Executing.rawValue)
+        willChangeValueForKey(NSOperation.KeyPath.Executing.rawValue)
 
         let nextState2 = stateLock.withCriticalScope { () -> (Operation.State?) in
             // Re-check state, since it could have changed on another thread (ex. via finish)
@@ -642,7 +636,7 @@ public extension Operation {
         }
 
         // Always send the closing didChangeValueForKey
-        didChangeValueForKey(NSOperationKeyPaths.Executing.rawValue)
+        didChangeValueForKey(NSOperation.KeyPath.Executing.rawValue)
 
         guard nextState2 != .Finishing else {
             _finish([], fromCancel: true)
@@ -702,7 +696,7 @@ public extension Operation {
 
         let changedExecutingState = executing
         if changedExecutingState {
-            willChangeValueForKey(NSOperationKeyPaths.Executing.rawValue)
+            willChangeValueForKey(NSOperation.KeyPath.Executing.rawValue)
         }
 
         stateLock.withCriticalScope {
@@ -710,7 +704,7 @@ public extension Operation {
         }
 
         if changedExecutingState {
-            didChangeValueForKey(NSOperationKeyPaths.Executing.rawValue)
+            didChangeValueForKey(NSOperation.KeyPath.Executing.rawValue)
         }
 
         let errors = stateLock.withCriticalScope { () -> [ErrorType] in
@@ -726,7 +720,7 @@ public extension Operation {
         }
 
         operationWillFinish(errors)
-        willChangeValueForKey(NSOperationKeyPaths.Finished.rawValue)
+        willChangeValueForKey(NSOperation.KeyPath.Finished.rawValue)
         willFinishObservers.forEach { $0.willFinishOperation(self, errors: errors) }
 
         stateLock.withCriticalScope {
@@ -739,7 +733,7 @@ public extension Operation {
         let message = errors.isEmpty ? "errors: \(errors)" : "no errors"
         log.verbose("Did finish with \(message)")
 
-        didChangeValueForKey(NSOperationKeyPaths.Finished.rawValue)
+        didChangeValueForKey(NSOperation.KeyPath.Finished.rawValue)
     }
 
     /// Convenience method to simplify finishing when there is only one error.
@@ -847,6 +841,14 @@ extension NSOperation {
 
     internal func setQualityOfServiceFromUserIntent(userIntent: Operation.UserIntent) {
         qualityOfService = userIntent.qos
+    }
+}
+
+private extension NSOperation {
+    enum KeyPath: String {
+        case Cancelled = "isCancelled"
+        case Executing = "isExecuting"
+        case Finished = "isFinished"
     }
 }
 
