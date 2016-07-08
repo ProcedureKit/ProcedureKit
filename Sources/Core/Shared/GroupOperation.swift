@@ -179,7 +179,7 @@ public class GroupOperation: Operation, OperationQueueDelegate {
                 _operations.appendContentsOf(additional)
             }
 
-            if !handledCancelled && self.cancelled {
+            if !handledCancelled && cancelled {
                 // It is possible that the cancellation happened before adding the
                 // additional operations to the operations array.
                 // Thus, ensure that all additional operations are cancelled.
