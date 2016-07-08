@@ -248,12 +248,12 @@ public class GroupOperation: Operation, OperationQueueDelegate {
 
     /**
      The group operation acts as its own queue's delegate. When an operation is added to the queue,
-     assuming that the finishing operation has not started (or finished), the operation is not
-     the finishing operation itself, and the CanFinishOperation has not yet started,
-     then we add the operation as a dependency to the CanFinishOperation.
+     assuming that the group operation is not yet finishing or finished, then we add the operation
+     as a dependency to an internal "barrier" operation that separates executing from finishing state.
 
-     The purpose of this is to keep the finishing operation as the last child operation that executes
-     when there are no more operations in the group, and to safely handle GroupOperation state changes.
+     The purpose of this is to keep the internal operation as a final child operation that executes
+     when there are no more operations in the group operation, safely handling the transition of
+     group operation state.
      */
     public func operationQueue(queue: OperationQueue, willAddOperation operation: NSOperation) {
         guard queue === self.queue else { return }
@@ -332,8 +332,8 @@ public class GroupOperation: Operation, OperationQueueDelegate {
         guard shouldContinue else { return }
 
         _operations.append(operation)
-        if cancelled {
-            if !operation.cancelled { operation.cancel() }
+        if cancelled && !operation.cancelled {
+            operation.cancel()
         }
 
         groupFinishLock.withCriticalScope {
