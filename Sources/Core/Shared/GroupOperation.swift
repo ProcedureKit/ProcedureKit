@@ -166,17 +166,17 @@ public class GroupOperation: Operation, OperationQueueDelegate {
             }
 
             var handledCancelled = false
-            if self.cancelled {
+            if cancelled {
                 additional.forEachOperation { $0.cancel() }
                 handledCancelled = true
             }
-            let logSeverity = self.log.severity
+            let logSeverity = log.severity
             additional.forEachOperation { $0.log.severity = logSeverity }
 
-            self.queue.addOperations(additional)
+            queue.addOperations(additional)
 
             if addToOperationsArray {
-                self._operations.appendContentsOf(additional)
+                _operations.appendContentsOf(additional)
             }
 
             if !handledCancelled && self.cancelled {
