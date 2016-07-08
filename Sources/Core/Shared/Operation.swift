@@ -222,6 +222,17 @@ public class Operation: NSOperation {
      responsible for calling finish() in *ALL* cases, including when the
      operation is cancelled.
 
+     You can react to cancellation using WillCancelObserver/DidCancelObserver
+     and/or checking periodically during execute with something like:
+
+     ```swift
+     guard !cancelled else {
+        // do any necessary clean-up
+        finish()    // always call finish if automatic finishing is disabled
+        return
+     }
+     ```
+
     */
     public init(disableAutomaticFinishing: Bool) {
         self.disableAutomaticFinishing = disableAutomaticFinishing
