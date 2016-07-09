@@ -221,15 +221,8 @@ public class GroupOperation: Operation, OperationQueueDelegate {
         // no-op
     }
 
-    @available(*, unavailable, message="Rewrite your GroupOperation subclass as this method is no longer used.")
-    public func willFinishOperation(operation: NSOperation, withErrors errors: [ErrorType]) {
-        var message = "Attention!!\n"
-        message += "Rewrite your GroupOperation subclass as this method is no longer used.\n"
-        message += "Override willFinishOperation(_: NSOperation) to manage scheduling of child operations."
-        message += "Override willAttemptRecoveryFromErrors(_: [ErrorType], inOperation: NSOperation) to do error handling."
-        message += "See code documentation for more details."
-        assert(true, message)
-    }
+    @available(*, unavailable, message="Refactor your GroupOperation subclass as this method is no longer used.\n Override willFinishOperation(_: NSOperation) to manage scheduling of child operations. Override willAttemptRecoveryFromErrors(_: [ErrorType], inOperation: NSOperation) to do error handling. See code documentation for more details.")
+    public func willFinishOperation(operation: NSOperation, withErrors errors: [ErrorType]) { }
 
     @available(*, unavailable, renamed="willFinishOperation")
     public func operationDidFinish(operation: NSOperation, withErrors errors: [ErrorType]) { }
