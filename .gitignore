@@ -41,3 +41,4 @@ docs
 # Swift Package Manager
 /.build
 /Packages
+.DS_Store

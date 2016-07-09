@@ -168,14 +168,14 @@ class AuthorizationTests: OperationTests {
 
     func test__authorized_condition_exclusivity() {
         let condition = AuthorizedFor(capability)
-        XCTAssertFalse(condition.isMutuallyExclusive)
+        XCTAssertFalse(condition.mutuallyExclusive)
     }
 
     func test__authorized_condition_returns_correct_dependency() {
-        let operation = TestOperation()
+
         let condition = AuthorizedFor(capability)
 
-        guard let dependency = condition.dependencyForOperation(operation) else {
+        guard let dependency = condition.dependencies.first else {
             XCTFail("Condition did not return a dependency")
             return
         }
@@ -195,7 +195,7 @@ class AuthorizationTests: OperationTests {
         let condition = AuthorizedFor(capability)
         var conditionResult: OperationConditionResult? = .None
 
-        condition.evaluateForOperation(operation) { result in
+        condition.evaluate(operation) { result in
             conditionResult = result
             expectation.fulfill()
         }
@@ -227,7 +227,7 @@ class AuthorizationTests: OperationTests {
         let condition = AuthorizedFor(capability)
         var conditionResult: OperationConditionResult? = .None
 
-        condition.evaluateForOperation(operation) { result in
+        condition.evaluate(operation) { result in
             conditionResult = result
             expectation.fulfill()
         }
@@ -259,7 +259,7 @@ class AuthorizationTests: OperationTests {
         let condition = AuthorizedFor(capability)
         var conditionResult: OperationConditionResult? = .None
 
-        condition.evaluateForOperation(operation) { result in
+        condition.evaluate(operation) { result in
             conditionResult = result
             expectation.fulfill()
         }
@@ -283,7 +283,7 @@ class AuthorizationTests: OperationTests {
         let condition = AuthorizedFor(capability)
         var conditionResult: OperationConditionResult? = .None
 
-        condition.evaluateForOperation(operation) { result in
+        condition.evaluate(operation) { result in
             conditionResult = result
             expectation.fulfill()
         }

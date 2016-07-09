@@ -133,6 +133,9 @@ struct IntervalGenerator: GeneratorType {
     mutating func next() -> NSTimeInterval? {
         switch strategy {
 
+        case .Immediate:
+            return 0
+
         case .Fixed(let period):
             return period
 

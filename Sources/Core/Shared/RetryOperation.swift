@@ -8,6 +8,13 @@
 
 import Foundation
 
+/// A type which has an associated error type
+public protocol AssociatedErrorType {
+
+    /// The type of associated error
+    associatedtype Error: ErrorType
+}
+
 /**
  RetryFailureInfo is a value type which provides
  information related to a previously failed
@@ -22,8 +29,8 @@ public struct RetryFailureInfo<T: NSOperation> {
     /// - returns: the errors the operation finished with.
     public let errors: [ErrorType]
 
-    /// - returns: all the aggregate errors of previous attempts
-    public let aggregateErrors: [ErrorType]
+    /// - returns: the previous errors of previous attempts
+    public let historicalErrors: [ErrorType]
 
     /// - returns: the number of attempts made so far
     public let count: Int
@@ -57,7 +64,7 @@ class RetryGenerator<T: NSOperation>: GeneratorType {
 
     internal let retry: Handler
     internal var info: RetryFailureInfo<T>? = .None
-    private var generator: AnyGenerator<(Delay?, T)>
+    private var generator: AnyGenerator<Payload>
 
     init(generator: AnyGenerator<Payload>, retry: Handler) {
         self.generator = generator
@@ -124,7 +131,8 @@ public class RetryOperation<T: NSOperation>: RepeatedOperation<T> {
      */
     public init<D, G where D: GeneratorType, D.Element == Delay, G: GeneratorType, G.Element == T>(maxCount max: Int? = .None, delay: D, generator: G, retry block: Handler) {
         let tuple = TupleGenerator(primary: generator, secondary: delay)
-        retry = RetryGenerator(generator: AnyGenerator(tuple), retry: block)
+        let mapped = MapGenerator(tuple) { RepeatedPayload(delay: $0.0, operation: $0.1, configure: .None) }
+        retry = RetryGenerator(generator: AnyGenerator(mapped), retry: block)
         super.init(maxCount: max, generator: AnyGenerator(retry))
         name = "Retry Operation <\(T.self)>"
     }
@@ -165,30 +173,59 @@ public class RetryOperation<T: NSOperation>: RepeatedOperation<T> {
     public init<G where G: GeneratorType, G.Element == T>(maxCount max: Int? = 5, strategy: WaitStrategy = .Fixed(0.1), _ generator: G, retry block: Handler = { $1 }) {
         let delay = MapGenerator(strategy.generator()) { Delay.By($0) }
         let tuple = TupleGenerator(primary: generator, secondary: delay)
-        retry = RetryGenerator(generator: AnyGenerator(tuple), retry: block)
+        let mapped = MapGenerator(tuple) { RepeatedPayload(delay: $0.0, operation: $0.1, configure: .None) }
+        retry = RetryGenerator(generator: AnyGenerator(mapped), retry: block)
         super.init(maxCount: max, generator: AnyGenerator(retry))
         name = "Retry Operation <\(T.self)>"
     }
 
-    public override func willFinishOperation(operation: NSOperation, withErrors errors: [ErrorType]) {
-        if errors.isEmpty {
-            retry.info = .None
+    /**
+     Sets up the retry info object (used by the RetryGenerator), then
+     calls the super implementation, returning true.
+     */
+    public override func willAttemptRecoveryFromErrors(errors: [ErrorType], inOperation operation: NSOperation) -> Bool {
+        var returnValue = false
+        defer {
+            let message = returnValue ? "will attempt" : "will not attempt"
+            log.verbose("\(message) \(count) recovery from errors: \(errors) in operation: \(operation)")
         }
-        else if let op = operation as? T {
-            retry.info = createFailureInfo(op, errors: errors)
-            addNextOperation()
-        }
+
+        guard let op = operation as? T where operation === current else { return returnValue }
+        retry.info = createFailureInfo(op, errors: errors)
+        returnValue = addNextOperation()
+        return returnValue
+    }
+
+    /**
+     RetryOperation suppress any retries when the target operation succeeded.
+     */
+    public override func willFinishOperation(operation: NSOperation) {
+        // no-op
     }
 
     internal func createFailureInfo(operation: T, errors: [ErrorType]) -> RetryFailureInfo<T> {
         return RetryFailureInfo(
             operation: operation,
             errors: errors,
-            aggregateErrors: aggregateErrors,
+            historicalErrors: internalErrors.previousAttempts,
             count: count,
             addOperations: addOperations,
             log: log,
             configure: configure
         )
+    }
+
+    internal override func child(child: NSOperation, didAttemptRecoveryFromErrors errors: [ErrorType]) {
+        if let previous = previous where child === current {
+            didNotRecoverFromOperationErrors(previous)
+        }
+        super.child(child, didAttemptRecoveryFromErrors: errors)
+    }
+
+    public override func operationQueue(queue: OperationQueue, willFinishOperation operation: NSOperation, withErrors errors: [ErrorType]) {
+        if errors.isEmpty, let previous = previous where operation === current {
+            didRecoverFromOperationErrors(previous)
+        }
+        super.operationQueue(queue, willFinishOperation: operation, withErrors: errors)
     }
 }

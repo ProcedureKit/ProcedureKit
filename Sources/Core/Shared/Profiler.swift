@@ -239,9 +239,9 @@ extension OperationProfiler: OperationObserverType {
     }
 }
 
-extension OperationProfiler: OperationDidStartObserver {
+extension OperationProfiler: OperationWillExecuteObserver {
 
-    public func didStartOperation(operation: Operation) {
+    public func willExecuteOperation(operation: Operation) {
         addMetricNow(forEvent: .Started)
     }
 }

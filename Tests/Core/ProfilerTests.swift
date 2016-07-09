@@ -197,7 +197,7 @@ class OperationProfilerTests: OperationTests {
 
     func test__profile_simple_operation_which_cancels() {
         let operation = TestOperation(delay: 1.0)
-        operation.addObserver(StartedObserver { op in
+        operation.addObserver(WillExecuteObserver { op in
             op.cancel()
         })
         operation.addObserver(profiler)
@@ -241,11 +241,9 @@ class OperationProfilerTests: OperationTests {
 
     func test__profile_group_operation() {
         let operation = GroupOperation(operations: [ TestOperation(), TestOperation() ])
-        addCompletionBlockToTestOperation(operation)
-
         operation.addObserver(profiler)
-        runOperation(operation)
-        waitForExpectationsWithTimeout(3, handler: nil)
+
+        waitForOperation(operation)
 
         guard let result = reporter.didProfileResult else {
             XCTFail("Reporter did not receive profile result."); return
@@ -332,12 +330,11 @@ class ProfileLoggerTests: XCTestCase {
 
     func test__reporter_logs_name() {
         reporter = OperationProfileLogger { message, severity, _, _, _ in
-            XCTAssertTrue(message.hasPrefix("MyOperation #Testing finished profiling with results:\n"))
+            XCTAssertTrue(message.hasPrefix("MyOperation #Testing: finished profiling with results:\n"), "Message did not have correct prefix: \(message)")
             XCTAssertEqual(severity, LogSeverity.Info)
         }
         reporter.finishedProfilingWithResult(result)
     }
-
 }
 
 

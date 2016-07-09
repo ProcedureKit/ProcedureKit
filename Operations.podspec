@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name              = "Operations"
-  s.version           = "2.10.1"
+  s.version           = "3.0.0"
   s.summary           = "Powerful NSOperation subclasses in Swift."
   s.description       = <<-DESC
   
@@ -26,7 +26,7 @@ session Advanced NSOperations: https://developer.apple.com/videos/wwdc/2015/?id=
 
   # Creates a framework suitable for an iOS, watchOS, tvOS or Mac OS application
   s.subspec 'Standard' do |ss|
-    ss.source_files      = [
+    ss.source_files = [
       'Sources/Core/Shared', 
       'Sources/Core/iOS',       
       'Sources/Features/Shared',
@@ -34,12 +34,13 @@ session Advanced NSOperations: https://developer.apple.com/videos/wwdc/2015/?id=
     ]
     ss.ios.exclude_files = [
       'Sources/Features/Shared/CloudCapability.swift',
-      'Sources/Features/Shared/CloudKit*.swift',			
+      'Sources/Features/Shared/CloudKit',
       'Sources/Features/iOS/PhotosCapability.swift',
       'Sources/Features/iOS/PassbookCapability.swift'
     ]
     ss.watchos.exclude_files = [
       'Sources/Core/iOS',
+      'Sources/Features/Shared/CloudKit',      
       'Sources/Features/iOS/LocationCapability.swift',
       'Sources/Features/iOS/LocationOperations.swift',
       'Sources/Features/iOS/PhotosCapability.swift',
@@ -47,13 +48,13 @@ session Advanced NSOperations: https://developer.apple.com/videos/wwdc/2015/?id=
       'Sources/Features/iOS/UserConfirmationCondition.swift',
       'Sources/Features/iOS/UserNotificationCondition.swift',
       'Sources/Features/iOS/WebpageOperation.swift',
-      'Sources/Features/Shared/CloudCapability.swift',
+      'Sources/Features/iOS/OpenInSafariOperation.swift',
       'Sources/Features/Shared/ReachabilityCondition.swift',
-      'Sources/Features/Shared/CloudKit*.swift',
       'Sources/Features/Shared/ReachableOperation.swift',
       'Sources/Features/Shared/Reachability.swift'
     ]
     ss.tvos.exclude_files = [
+      'Sources/Features/Shared/CloudKit',    
       'Sources/Features/iOS/HealthCapability.swift',
       'Sources/Features/iOS/LocationCapability.swift',
       'Sources/Features/iOS/LocationOperations.swift',      
@@ -62,13 +63,13 @@ session Advanced NSOperations: https://developer.apple.com/videos/wwdc/2015/?id=
       'Sources/Features/iOS/RemoteNotificationCondition.swift',
       'Sources/Features/iOS/UserNotificationCondition.swift',
       'Sources/Features/iOS/WebpageOperation.swift',
-      'Sources/Features/Shared/CalendarCapability.swift',
+      'Sources/Features/iOS/OpenInSafariOperation.swift',      
+      'Sources/Features/Shared/CalendarCapability.swift'
     ]
     ss.osx.exclude_files = [
       'Sources/Core/iOS',
       'Sources/Features/iOS',
-      'Sources/Features/Shared/CloudCapability.swift',
-      'Sources/Features/Shared/CloudKit*.swift'
+      'Sources/Features/Shared/CloudKit'
     ]
   end
 
@@ -87,6 +88,7 @@ session Advanced NSOperations: https://developer.apple.com/videos/wwdc/2015/?id=
       'Sources/Features/iOS/HealthCapability.swift',
       'Sources/Features/iOS/LocationCapability.swift',
       'Sources/Features/iOS/LocationOperations.swift',
+      'Sources/Features/iOS/OpenInSafariOperation.swift',      
       'Sources/Features/iOS/RemoteNotificationCondition.swift',
       'Sources/Features/iOS/UserNotificationCondition.swift'
     ]
@@ -94,6 +96,7 @@ session Advanced NSOperations: https://developer.apple.com/videos/wwdc/2015/?id=
       'Sources/Features/iOS/PassbookCapability.swift',
       'Sources/Features/iOS/PhotosCapability.swift',
       'Sources/Features/iOS/WebpageOperation.swift',
+      'Sources/Features/iOS/OpenInSafariOperation.swift',      
       'Sources/Features/Shared/CalendarCapability.swift'
     ]
     ss.osx.exclude_files = [
@@ -135,10 +138,7 @@ session Advanced NSOperations: https://developer.apple.com/videos/wwdc/2015/?id=
     ss.dependency 'Operations/Standard'
     ss.frameworks = 'CloudKit'    
     ss.source_files = [
-      'Sources/Features/Shared/CloudCapability.swift',
-      'Sources/Features/Shared/CloudKitInterface.swift',
-      'Sources/Features/Shared/CloudKitOperation.swift',
-      'Sources/Features/Shared/CloudKitOperationExtensions.swift'
+      'Sources/Features/Shared/CloudKit'
     ]
   end
 	

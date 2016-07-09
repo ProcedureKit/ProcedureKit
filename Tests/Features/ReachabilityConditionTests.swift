@@ -31,7 +31,7 @@ class ReachabilityConditionTests: OperationTests {
     func test__is_mutually_exclusivity() {
         let condition = ReachabilityCondition(url: url)
         condition.reachability = manager
-        XCTAssertFalse(condition.isMutuallyExclusive)
+        XCTAssertFalse(condition.mutuallyExclusive)
     }
 
     func test__url() {
@@ -63,7 +63,7 @@ class ReachabilityConditionTests: OperationTests {
 
         var conditionResult: OperationConditionResult = .Satisfied
         network.flags = []
-        condition.evaluateForOperation(operation) { result in
+        condition.evaluate(operation) { result in
             conditionResult = result
             expectation.fulfill()
         }
@@ -90,7 +90,7 @@ class ReachabilityConditionTests: OperationTests {
 
         network.flags = [.Reachable, .IsWWAN]
 
-        condition.evaluateForOperation(operation) { result in
+        condition.evaluate(operation) { result in
             conditionResult = result
             expectation.fulfill()
         }

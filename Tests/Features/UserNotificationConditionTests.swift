@@ -66,18 +66,11 @@ class UserNotificationConditionTests: OperationTests {
         let operation = TestOperation()
         operation.addCondition(SilentCondition(condition))
 
-        let expectation = expectationWithDescription("Test: \(#function)")
-        var receivedErrors = [ErrorType]()
-        operation.addObserver(DidFinishObserver { _, errors in
-            receivedErrors = errors
-            expectation.fulfill()
-        })
-
-        runOperation(operation)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForOperation(operation)
 
         XCTAssertFalse(operation.didExecute)
-        if let error = receivedErrors.first as? UserNotificationCondition.Error {
+        XCTAssertTrue(operation.cancelled)
+        if let error = operation.errors.first as? UserNotificationCondition.Error {
             XCTAssertTrue(error == UserNotificationCondition.Error.SettingsNotSufficient((current: nil, desired: settings)))
         }
         else {
@@ -94,9 +87,7 @@ class UserNotificationConditionTests: OperationTests {
         let operation = TestOperation()
         operation.addCondition(SilentCondition(condition))
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
-        runOperation(operation)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForOperation(operation)
 
         XCTAssertTrue(operation.didExecute)
     }
@@ -109,11 +100,9 @@ class UserNotificationConditionTests: OperationTests {
         let operation = TestOperation()
         operation.addCondition(condition)
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
-        runOperation(operation)
-        waitForExpectationsWithTimeout(300, handler: nil)
+        waitForOperation(operation)
 
         XCTAssertEqual(registrar.didRegisterSettings!, settings)
-
     }
+
 }

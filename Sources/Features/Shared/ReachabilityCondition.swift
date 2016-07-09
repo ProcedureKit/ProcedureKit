@@ -13,15 +13,12 @@ A condition that performs a single-shot reachability check.
 Reachability is evaluated once when the operation it is
 attached to is asked about its readiness.
 */
-public class ReachabilityCondition: OperationCondition {
+public class ReachabilityCondition: Condition {
 
     public enum Error: ErrorType, Equatable {
         case NotReachable
         case NotReachableWithConnectivity(Reachability.Connectivity)
     }
-
-    public let name = "Reachability"
-    public let isMutuallyExclusive = false
 
     let url: NSURL
     let connectivity: Reachability.Connectivity
@@ -30,13 +27,11 @@ public class ReachabilityCondition: OperationCondition {
     public init(url: NSURL, connectivity: Reachability.Connectivity = .AnyConnectionKind) {
         self.url = url
         self.connectivity = connectivity
+        super.init()
+        name = "Reachability"
     }
 
-    public func dependencyForOperation(operation: Operation) -> NSOperation? {
-        return .None
-    }
-
-    public func evaluateForOperation(operation: Operation, completion: OperationConditionResult -> Void) {
+    public override func evaluate(operation: Operation, completion: OperationConditionResult -> Void) {
         reachability.reachabilityForURL(url) { status in
             switch (self.connectivity, status) {
             case (.AnyConnectionKind, .Reachable(_)), (.ViaWWAN, .Reachable(_)), (.ViaWiFi, .Reachable(.ViaWiFi)):

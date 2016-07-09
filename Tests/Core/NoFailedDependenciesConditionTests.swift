@@ -20,7 +20,7 @@ class NoFailedDependenciesConditionTests: OperationTests {
             addCompletionBlockToTestOperation(operation, withExpectation: expectation)
         }
         else {
-            operation.addObserver(StartedObserver { op in
+            operation.addObserver(WillExecuteObserver { op in
                 op.cancel()
                 expectation.fulfill()
             })
@@ -109,10 +109,18 @@ class NoFailedDependenciesConditionTests: OperationTests {
     }
 
     func test__operation_with_group_dependency_with_errored_child_fails() {
+        LogManager.severity = .Verbose
         let expectation = expectationWithDescription("Test: \(#function)")
+
         let operation = TestOperation()
-        let childOperation = TestOperation(delay: 0, error: TestOperation.Error.SimulatedError)
-        let dependency = GroupOperation(operations: [childOperation])
+        operation.name = "Target Operation"
+
+        let child = TestOperation(delay: 0, error: TestOperation.Error.SimulatedError)
+        child.name = "Child Operation"
+
+        let dependency = GroupOperation(operations: [child])
+        dependency.name = "Dependency"
+
         operation.addDependency(dependency)
         operation.addCondition(NoFailedDependenciesCondition())
 
@@ -127,6 +135,7 @@ class NoFailedDependenciesConditionTests: OperationTests {
 
         XCTAssertFalse(operation.didExecute)
         XCTAssertEqual(receivedErrors.count, 1)
+        LogManager.severity = .Warning
     }
 }
 

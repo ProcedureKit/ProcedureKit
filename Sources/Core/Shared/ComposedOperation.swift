@@ -8,9 +8,8 @@
 
 import Foundation
 
-public class ComposedOperation<T: NSOperation>: Operation {
+public class ComposedOperation<T: NSOperation>: GroupOperation {
 
-    public let target: Operation
     public var operation: T
 
     public convenience init(_ composed: T) {
@@ -18,28 +17,17 @@ public class ComposedOperation<T: NSOperation>: Operation {
     }
 
     init(operation composed: T) {
-        self.target = composed as? Operation ?? GroupOperation(operations: [composed])
         self.operation = composed
-        super.init()
-        name = "Composed Operation"
-        target.name = target.name ?? "Composed <\(T.self)>"
-        target.addObserver(DidFinishObserver { [unowned self] _, errors in
-            self.finish(errors)
+        super.init(operations: [composed])
+        name = "Composed <\(T.self)>"
+        addObserver(WillCancelObserver { [unowned self] operation, errors in
+            guard operation === self else { return }
+            if !errors.isEmpty, let op =  self.operation as? Operation {
+                op.cancelWithError(OperationError.ParentOperationCancelledWithErrors(errors))
+            }
+            else {
+                self.operation.cancel()
+            }
         })
-    }
-
-    public override func cancel() {
-        target.cancel()
-        super.cancel()
-    }
-
-    public override func cancelWithErrors(errors: [ErrorType]) {
-        target.cancelWithError(OperationError.ParentOperationCancelledWithErrors(errors))
-        super.cancelWithErrors(errors)
-    }
-
-    public override func execute() {
-        target.log.severity = log.severity
-        produceOperation(target)
     }
 }

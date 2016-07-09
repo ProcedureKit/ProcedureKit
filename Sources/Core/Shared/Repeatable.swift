@@ -101,9 +101,9 @@ public class RepeatableOperation<T: Operation>: Operation, OperationDidFinishObs
         self.shouldRepeatBlock = shouldRepeat
         super.init()
         name = "Repeatable<\(operation.operationName)>"
-        addObserver(CancelledObserver { [weak operation] _ in
+        addObserver(DidCancelObserver { [weak operation] _ in
             (operation as? Operation)?.cancel()
-            })
+        })
     }
 
     /// Override implementation of execute

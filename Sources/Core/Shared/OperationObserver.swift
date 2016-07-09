@@ -57,14 +57,29 @@ public extension OperationObserverType {
  Types which conform to this protocol, can be attached to `Operation` subclasses before
  they are added to a queue. They will receive a callback when the operation starts.
  */
-public protocol OperationDidStartObserver: OperationObserverType {
+public protocol OperationWillExecuteObserver: OperationObserverType {
 
     /**
-     The operation started.
+     The operation will execute.
 
      - parameter operation: the observed `Operation`.
      */
-    func didStartOperation(operation: Operation)
+    func willExecuteOperation(operation: Operation)
+}
+
+
+/**
+ Types which conform to this protocol, can be attached to `Operation` subclasses before
+ they are added to a queue. They will receive a callback when the operation cancels.
+ */
+public protocol OperationWillCancelObserver: OperationObserverType {
+
+    /**
+     The operation will cancel.
+
+     - parameter operation: the observed `Operation`.
+     */
+    func willCancelOperation(operation: Operation, errors: [ErrorType])
 }
 
 
@@ -75,7 +90,7 @@ public protocol OperationDidStartObserver: OperationObserverType {
 public protocol OperationDidCancelObserver: OperationObserverType {
 
     /**
-     The operation was cancelled.
+     The operation did cancel.
 
      - parameter operation: the observed `Operation`.
      */
@@ -138,4 +153,4 @@ public protocol OperationDidFinishObserver: OperationObserverType {
  they are added to a queue. They will receive callbacks when the operation starts,
  produces a new operation, and finishes.
  */
-public protocol OperationObserver: OperationDidStartObserver, OperationDidCancelObserver, OperationDidProduceOperationObserver, OperationWillFinishObserver, OperationDidFinishObserver { }
+public protocol OperationObserver: OperationWillExecuteObserver, OperationWillCancelObserver, OperationDidCancelObserver, OperationDidProduceOperationObserver, OperationWillFinishObserver, OperationDidFinishObserver { }

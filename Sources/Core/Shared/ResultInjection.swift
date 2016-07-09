@@ -93,7 +93,7 @@ extension InjectionOperationType where Self: Operation {
                 block(operation: strongSelf, dependency: dep, errors: errors)
             }
         })
-        dep.addObserver(CancelledObserver { [weak self] op in
+        dep.addObserver(DidCancelObserver { [weak self] op in
             if let strongSelf = self, _ = op as? T {
                 (strongSelf as Operation).cancel()
             }

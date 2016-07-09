@@ -28,11 +28,11 @@ class StartedObserverTests: BaseBlockObserverTests {
 
     var called_didAttachToOperation: Operation? = .None
     var called_didStartOperation: Operation? = .None
-    var observer: StartedObserver!
+    var observer: WillExecuteObserver!
 
     override func setUp() {
         super.setUp()
-        observer = StartedObserver { [unowned self] op in
+        observer = WillExecuteObserver { [unowned self] op in
             self.called_didStartOperation = op
         }
         observer.didAttachToOperation = { [unowned self] op in
@@ -60,11 +60,11 @@ class CancelledObserverTests: BaseBlockObserverTests {
 
     var called_didAttachToOperation: Operation? = .None
     var called_didCancelOperation: Operation? = .None
-    var observer: CancelledObserver!
+    var observer: DidCancelObserver!
 
     override func setUp() {
         super.setUp()
-        observer = CancelledObserver { [unowned self] op in
+        observer = DidCancelObserver { [unowned self] op in
             self.called_didCancelOperation = op
         }
         observer.didAttachToOperation = { [unowned self] op in
@@ -238,7 +238,7 @@ class BlockObserverTests: BaseBlockObserverTests {
     func test__start_handler_is_executed() {
 
         var counter = 0
-        operation.addObserver(BlockObserver(didStart: { op in
+        operation.addObserver(BlockObserver(willExecute: { op in
             counter += 1
         }))
 

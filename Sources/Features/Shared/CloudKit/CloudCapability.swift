@@ -139,7 +139,7 @@ public class CloudCapability: NSObject, CapabilityType {
         }
     }
 
-    public init(permissions: CKApplicationPermissions = [], containerId: String? = .None) {
+    public init(permissions: CKApplicationPermissions, containerId: String? = .None) {
         self.name = "Cloud"
         self.requirement = permissions
         self.containerId = containerId

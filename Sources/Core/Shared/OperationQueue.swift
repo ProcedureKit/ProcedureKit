@@ -41,6 +41,16 @@ public protocol OperationQueueDelegate: class {
      - parameter errors: an array of `ErrorType`s.
      */
     func operationQueue(queue: OperationQueue, didFinishOperation operation: NSOperation, withErrors errors: [ErrorType])
+
+    /**
+     The operation queue will add a new operation via produceOperation().
+     This is for information only, the delegate cannot affect whether the operation
+     is added, or other control flow.
+
+     - paramter queue: the `OperationQueue`.
+     - paramter operation: the `NSOperation` instance about to be added.
+     */
+    func operationQueue(queue: OperationQueue, willProduceOperation operation: NSOperation)
 }
 
 /**
@@ -49,12 +59,46 @@ is achieved via the overridden functionality of `addOperation`.
 */
 public class OperationQueue: NSOperationQueue {
 
+    #if swift(>=3.0)
+        // (SR-192 is fixed in Swift 3)
+    #else
+    deinit {
+        // Swift < 3 FIX:
+        // (SR-192): Weak properties are not thread safe when reading
+        // https://bugs.swift.org/browse/SR-192
+        //
+        // Cannot surround native deinitialization of _delegate with a lock,
+        // so avoid the issue by setting it to nil here.
+        delegate = nil
+    }
+    #endif
+
     /**
     The queue's delegate, helpful for reporting activity.
 
     - parameter delegate: a weak `OperationQueueDelegate?`
     */
+    #if swift(>=3.0)
     public weak var delegate: OperationQueueDelegate? = .None
+    #else
+    // Swift < 3 FIX:
+    // (SR-192): Weak properties are not thread safe when reading
+    // https://bugs.swift.org/browse/SR-192
+    //
+    // Surround access of delegate with a lock to avoid the issue.
+    public weak var delegate: OperationQueueDelegate? {
+        get {
+            return delegateLock.withCriticalScope { _delegate }
+        }
+        set (newDelegate) {
+            delegateLock.withCriticalScope {
+                _delegate = newDelegate
+            }
+        }
+    }
+    private weak var _delegate: OperationQueueDelegate? = .None
+    private let delegateLock = NSLock()
+    #endif
 
     /**
     Adds the operation to the queue. Subclasses which override this method must call this
@@ -67,14 +111,10 @@ public class OperationQueue: NSOperationQueue {
         if let operation = operation as? Operation {
 
             /// Add an observer so that any produced operations are added to the queue
-            /// Except for group operations, where any produced operations are added
-            /// to the the group.
             operation.addObserver(ProducedOperationObserver { [weak self] op, produced in
-                if let group = op as? GroupOperation {
-                    group.addOperation(produced)
-                }
-                else {
-                    self?.addOperation(produced)
+                if let q = self {
+                    q.delegate?.operationQueue(q, willProduceOperation: produced)
+                    q.addOperation(produced)
                 }
             })
 
@@ -92,29 +132,51 @@ public class OperationQueue: NSOperationQueue {
                 }
             })
 
-            // Check for mutual exclusion conditions
-            let manager = ExclusivityManager.sharedInstance
-            let exclusive = operation.conditions.filter { $0.isMutuallyExclusive }
-            for condition in exclusive {
-                let category = "\(condition.dynamicType)"
-                let mutuallyExclusiveOperation: NSOperation = condition.dependencyForOperation(operation) ?? operation
-                manager.addOperation(mutuallyExclusiveOperation, category: category)
-            }
+            /// Process any conditions
+            if operation.conditions.count > 0 {
 
-            // Get any dependency operations from conditions
-            let conditionDependencies = operation.conditions.flatMap {
-                $0.dependencyForOperation(operation)
-            }
+                /// Check for mutual exclusion conditions
+                let manager = ExclusivityManager.sharedInstance
+                let mutuallyExclusiveConditions = operation.conditions.filter { $0.mutuallyExclusive }
+                var previousMutuallyExclusiveOperations = Set<NSOperation>()
+                for condition in mutuallyExclusiveConditions {
+                    let category = "\(condition.category)"
+                    if let previous = manager.addOperation(operation, category: category) {
+                        previousMutuallyExclusiveOperations.insert(previous)
+                    }
+                }
 
-            // Setup condition dependencies & add to the queue
-            for conditionDependency in conditionDependencies {
-                operation.addConditionDependency(conditionDependency)
-                addOperation(conditionDependency)
-            }
+                // Create the condition evaluator
+                let evaluator = operation.evaluateConditions()
 
-            // Add the dependency waiter to the queue
-            if let waiter = operation.waitForDependenciesOperation {
-                addOperation(waiter)
+                // Get the condition dependencies
+                let indirectDependencies = operation.indirectDependencies
+
+                // If there are dependencies
+                if indirectDependencies.count > 0 {
+
+                    // Iterate through the indirect dependencies
+                    indirectDependencies.forEach {
+
+                        // Indirect dependencies are executed after
+                        // any previous mutually exclusive operation(s)
+                        $0.addDependencies(previousMutuallyExclusiveOperations)
+
+                        // Indirect dependencies are executed after
+                        // all direct dependencies
+                        $0.addDependencies(operation.directDependencies)
+
+                        // Only evaluate conditions after all indirect
+                        // dependencies have finished
+                        evaluator.addDependency($0)
+                    }
+
+                    // Add indirect dependencies
+                    addOperations(indirectDependencies)
+                }
+
+                // Add the evaluator
+                addOperation(evaluator)
             }
 
             // Indicate to the operation that it is to be enqueued
@@ -122,7 +184,7 @@ public class OperationQueue: NSOperationQueue {
         }
         else {
             operation.addCompletionBlock { [weak self, weak operation] in
-                if let queue = self, let op = operation {
+                if let queue = self, op = operation {
                     queue.delegate?.operationQueue(queue, didFinishOperation: op, withErrors: [])
                 }
             }
@@ -152,8 +214,8 @@ public extension NSOperationQueue {
      Add operations to the queue as an array
      - parameters ops: a array of `NSOperation` instances.
      */
-    func addOperations(ops: [NSOperation]) {
-        addOperations(ops, waitUntilFinished: false)
+    func addOperations<S where S: SequenceType, S.Generator.Element: NSOperation>(ops: S) {
+        addOperations(Array(ops), waitUntilFinished: false)
     }
 
     /**
@@ -162,5 +224,29 @@ public extension NSOperationQueue {
     */
     func addOperations(ops: NSOperation...) {
         addOperations(ops)
+    }
+}
+
+
+public extension OperationQueue {
+
+    private static let sharedMainQueue = MainQueue()
+
+    /**
+     Override NSOperationQueue's mainQueue() to return the main queue as an OperationQueue
+
+     - returns: The main queue
+     */
+    public override class func mainQueue() -> OperationQueue {
+        return sharedMainQueue
+    }
+}
+
+/// OperationQueue wrapper around the main queue
+private class MainQueue: OperationQueue {
+    override init() {
+        super.init()
+        underlyingQueue = dispatch_get_main_queue()
+        maxConcurrentOperationCount = 1
     }
 }

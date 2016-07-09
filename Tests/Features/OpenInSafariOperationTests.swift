@@ -1,41 +1,30 @@
 //
-//  WebpageOperationTests.swift
+//  OpenInSafariOperationTests.swift
 //  Operations
 //
-//  Created by Daniel Thorpe on 30/08/2015.
-//  Copyright © 2015 Daniel Thorpe. All rights reserved.
+//  Created by Andreas Braun on 14.05.16.
+//
 //
 
 import XCTest
 import SafariServices
 @testable import Operations
 
-@available(iOS 9.0, *)
-class TestableSafariViewController: SFSafariViewController {
-
-    var controllerDidDismiss = false
-
-    override func dismissViewControllerAnimated(flag: Bool, completion: (() -> Void)?) {
-        controllerDidDismiss = true
-        super.dismissViewControllerAnimated(flag, completion: completion)
-    }
-}
-
-@available(iOS 9.0, *)
-class WebpageOperationTests: OperationTests {
-
-    let url = NSURL(string: "https://github.com")!
+class OpenInSafariOperationTests: OperationTests {
+    
+    let URL = NSURL(string: "https://github.com")!
     var presentingController: TestablePresentingController!
-
+    
     override func setUp() {
         super.setUp()
         presentingController = TestablePresentingController()
     }
-
+    
     func test__operation_presents_safari_view_controller() {
         var didPresentWebpage = false
-        let operation = WebpageOperation(url: url, displayControllerFrom: .ShowDetail(presentingController))
-
+        let operation = OpenInSafariOperation(URL: URL, displayControllerFrom: .ShowDetail(presentingController))
+        operation.shouldOpenInSafariViewController = { true }
+        
         presentingController.expectation = expectationWithDescription("Test: \(#function)")
         presentingController.check = { received in
             if let safariViewController = received as? SFSafariViewController {
@@ -51,10 +40,27 @@ class WebpageOperationTests: OperationTests {
                 XCTFail("Did not receive a SFSafariViewController.")
             }
         }
-
+        
         runOperation(operation)
-
+        
         waitForExpectationsWithTimeout(5, handler: nil)
         XCTAssertTrue(didPresentWebpage)
+    }
+    
+    func test__operation_did_open_url_in_safari_app() {
+        let expectation = expectationWithDescription("Test: \(#function)")
+        
+        var didOpenURL: NSURL? = .None
+        let operation = OpenInSafariOperation(URL: URL, displayControllerFrom: .ShowDetail(presentingController))
+        operation.shouldOpenInSafariViewController = { false }
+        operation.openURL = {
+            expectation.fulfill()
+            didOpenURL = $0
+        }
+        
+        runOperation(operation)
+        
+        waitForExpectationsWithTimeout(5, handler: nil)
+        XCTAssertTrue(URL == didOpenURL)
     }
 }

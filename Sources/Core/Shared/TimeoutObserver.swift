@@ -12,9 +12,9 @@ import Foundation
 An operation observer which will automatically cancels (with an error)
 if it doesn't finish before a time interval is expired.
 */
-public struct TimeoutObserver: OperationDidStartObserver {
+public struct TimeoutObserver: OperationWillExecuteObserver {
 
-    private let timeout: NSTimeInterval
+    internal let timeout: NSTimeInterval
 
     /**
     Initialize the operation observer with a timeout, which will start when
@@ -34,7 +34,7 @@ public struct TimeoutObserver: OperationDidStartObserver {
 
     - parameter operation: the `Operation` which will be cancelled if the timeout is reached.
     */
-    public func didStartOperation(operation: Operation) {
+    public func willExecuteOperation(operation: Operation) {
         let when = dispatch_time(DISPATCH_TIME_NOW, Int64(timeout * Double(NSEC_PER_SEC)))
 
         dispatch_after(when, Queue.Default.queue) {
