@@ -361,7 +361,7 @@ public class Operation: NSOperation {
      */
     public func operationDidCancel() { /* No op */ }
 
-    public override func cancel() {
+    public final override func cancel() {
         let willCancel = stateLock.withCriticalScope { _ -> Bool in
             // Do not cancel if already finished or finishing, or cancelled
             guard state <= .Executing && !_cancelled else { return false }
