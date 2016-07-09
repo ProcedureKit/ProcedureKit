@@ -113,7 +113,7 @@ public class GroupOperation: Operation, OperationQueueDelegate {
     */
     public override func execute() {
         _addOperations(operations.filter { !self.queue.operations.contains($0) }, addToOperationsArray: false)
-        queue._addCanFinishOperation(canFinishOperation, finishingOperation: finishingOperation)
+        _addCanFinishOperation(canFinishOperation)
         queue.addOperation(finishingOperation)
         queue.suspended = false
     }
@@ -465,12 +465,27 @@ private extension GroupOperation {
     private class CanFinishOperation: NSOperation {
         private weak var parent: GroupOperation?
         private var _finished = false
+        private var _executing = false
 
         init(parentGroupOperation: GroupOperation) {
             self.parent = parentGroupOperation
             super.init()
         }
         override func start() {
+
+            // Override NSOperation.start() because this operation may have to
+            // finish asynchronously (if it has to register to be notified when
+            // operations are no longer being added concurrently).
+            //
+            // Since we override start(), it is important to send NSOperation
+            // isExecuting / isFinished KVO notifications.
+            //
+            // (Otherwise, the operation may not be released, there may be
+            // problems with dependencies, with the queue's handling of
+            // maxConcurrentOperationCount, etc.)
+
+            executing = true
+
             main()
         }
         override func main() {
@@ -490,19 +505,20 @@ private extension GroupOperation {
                     guard dispatch_group_wait(parent.isAddingOperationsGroup, DISPATCH_TIME_NOW) == 0 else {
                         // Operations are actively being added to the group
                         // Wait for this to complete before proceeding.
-                        dispatch_group_notify(parent.isAddingOperationsGroup,
-                            dispatch_get_global_queue(NSQualityOfServiceToDispatchQOS(self.qualityOfService), 0),
-                            { [unowned self] in
-                            self.execute()
-                        })
+                        //
+                        // Register to dispatch a new call to execute() in the future, after the
+                        // wait completes (i.e. after concurrent calls to GroupOperation.addOperations()
+                        // have completed), and return from this call to execute() without finishing
+                        // the operation.
+                        dispatch_group_notify(parent.isAddingOperationsGroup, Queue(qos: qualityOfService).queue, execute)
                         return true
                     }
 
                     // Check whether new operations were added prior to the lock
                     // by checking for child operations that are not finished.
 
-                    let nonFinishedOperations = parent.operations.filter({ !$0.finished })
-                    if !nonFinishedOperations.isEmpty {
+                    let activeOperations = parent.operations.filter({ !$0.finished })
+                    if !activeOperations.isEmpty {
 
                         // Child operations were added after this CanFinishOperation became
                         // ready, but before it executed or before the lock could be acquired.
@@ -514,13 +530,13 @@ private extension GroupOperation {
 
                         let newCanFinishOp = GroupOperation.CanFinishOperation(parentGroupOperation: parent)
 
-                        nonFinishedOperations.forEach { op in
+                        activeOperations.forEach { op in
                             newCanFinishOp.addDependency(op)
                         }
 
                         parent.canFinishOperation = newCanFinishOp
 
-                        parent.queue._addCanFinishOperation(newCanFinishOp, finishingOperation: parent.finishingOperation)
+                        parent._addCanFinishOperation(newCanFinishOp)
                     }
                     else {
                         // There are no additional operations to handle.
@@ -533,32 +549,42 @@ private extension GroupOperation {
                 guard !isWaiting else { return }
             }
 
-            willChangeValueForKey("isFinished")
-            _finished = true
-            didChangeValueForKey("isFinished")
+            executing = false
+            finished = true
         }
-        private func NSQualityOfServiceToDispatchQOS(qualityOfService: NSQualityOfService) -> qos_class_t {
-            let mapping = [NSQualityOfService.Background: QOS_CLASS_BACKGROUND,
-                           NSQualityOfService.Default: QOS_CLASS_DEFAULT,
-                           NSQualityOfService.UserInitiated: QOS_CLASS_USER_INITIATED,
-                           NSQualityOfService.UserInteractive: QOS_CLASS_USER_INTERACTIVE,
-                           NSQualityOfService.Utility: QOS_CLASS_UTILITY]
-            return mapping[qualityOfService] ?? QOS_CLASS_DEFAULT
+        override private(set) var executing: Bool {
+            get {
+                return _executing
+            }
+            set {
+                willChangeValueForKey("isExecuting")
+                _executing = newValue
+                didChangeValueForKey("isExecuting")
+            }
         }
-        override var executing: Bool {
-            return false
+        override private(set) var finished: Bool {
+            get {
+                return _finished
+            }
+            set {
+                willChangeValueForKey("isFinished")
+                _finished = newValue
+                didChangeValueForKey("isFinished")
+            }
         }
-        override var finished: Bool {
-            return _finished
-        }
+    }
+
+    private func _addCanFinishOperation(canFinishOperation: GroupOperation.CanFinishOperation) {
+        finishingOperation.addDependency(canFinishOperation)
+        queue._addCanFinishOperation(canFinishOperation)
     }
 }
 
 private extension OperationQueue {
-    private func _addCanFinishOperation(canFinishOperation: GroupOperation.CanFinishOperation, finishingOperation: NSOperation) {
+    private func _addCanFinishOperation(canFinishOperation: GroupOperation.CanFinishOperation) {
         // Do not add observers (not needed - CanFinishOperation is an implementation detail of GroupOperation)
         // Do not add conditions (CanFinishOperation has none)
-        finishingOperation.addDependency(canFinishOperation)
+        // Call NSOperationQueue.addOperation() directly
         super.addOperation(canFinishOperation)
     }
 }
