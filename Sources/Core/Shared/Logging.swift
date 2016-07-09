@@ -233,6 +233,32 @@ class _Logger<Manager: LogManagerType>: LoggerType {
     }
 }
 
+/**
+ This is a simple class which owns a logging block and a copy of the
+ current Logger (parentLogger) configuration at the time it is created.
+ */
+class _LoggerOperationContext: LoggerType {
+
+    /// - returns: the log severity of this logger instance.
+    var severity: LogSeverity
+
+    /// - returns: a `Bool` to enable/disable this logger instance. Defaults to true
+    var enabled: Bool
+
+    /// - returns: a `LoggerBlockType` which receives the message to log
+    var logger: LoggerBlockType
+
+    /// - returns: a String?, the name of the operation.
+    var operationName: String? = .None
+
+    init(parentLogger: LoggerType, operationName: String) {
+        self.operationName = operationName
+        self.severity = parentLogger.severity
+        self.enabled = parentLogger.enabled
+        self.logger = parentLogger.logger
+    }
+}
+
 typealias Logger = _Logger<LogManager>
 
 /**
@@ -284,11 +310,50 @@ public class LogManager: LogManagerType {
     }
 
     let queue = Queue.Utility.serial("me.danthorpe.Operations.Logger")
-    var enabled: Bool = true
-    var severity: LogSeverity = .Warning
-    var logger: LoggerBlockType = { message, severity, file, function, line in
-        print("\(LogManager.metadataForFile(file, function: function, line: line))\(message)")
+    var enabled: Bool {
+        get { return _enabled.read { $0 } }
+        set {
+            _enabled.write { (value) in
+                value = newValue
+            }
+        }
     }
+
+    var severity: LogSeverity {
+        get { return _severity.read { $0 } }
+        set {
+            _severity.write { (value) in
+                value = newValue
+            }
+        }
+    }
+
+    var logger: LoggerBlockType {
+        get {
+            return loggerLock.read { () -> LoggerBlockType in
+                return self._logger
+            }
+        }
+        set {
+            loggerLock.write {
+                self._logger = newValue
+            }
+        }
+    }
+
+    init() {
+        _enabled = Protector<Bool>(true)
+        _severity = Protector<LogSeverity>(.Warning)
+        _logger = { message, severity, file, function, line in
+            print("\(LogManager.metadataForFile(file, function: function, line: line))\(message)")
+        }
+    }
+
+    /// Private protected properties
+    private var _severity: Protector<LogSeverity>
+    private var _enabled: Protector<Bool>
+    private var loggerLock: ReadWriteLock = Lock()
+    private var _logger: LoggerBlockType
 }
 
 public extension NSOperation {

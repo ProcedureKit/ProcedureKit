@@ -20,11 +20,13 @@ public class AddressBookOperation: Operation {
     public override init() {
         registrar = SystemAddressBookRegistrar()
         addressBook = AddressBook(registrar: registrar)
+        super.init()
     }
 
     init(registrar: AddressBookPermissionRegistrar) {
         self.addressBook = AddressBook(registrar: registrar)
         self.registrar = registrar
+        super.init()
     }
 
     final func requestAccess() {

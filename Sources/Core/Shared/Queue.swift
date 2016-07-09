@@ -115,6 +115,50 @@ public enum Queue {
     public func concurrent(named: String) -> dispatch_queue_t {
         return dispatch_queue_create(named, dispatch_queue_attr_make_with_qos_class(DISPATCH_QUEUE_CONCURRENT, qos_class, QOS_MIN_RELATIVE_PRIORITY))
     }
+
+    /**
+     Initialize a Queue with a given NSQualityOfService.
+     
+     - parameter qos: a NSQualityOfService value
+     - returns: a Queue with an equivalent quality of service
+     */
+    public init(qos: NSQualityOfService) {
+        switch qos {
+        case .Background:
+            self = .Background
+        case .Default:
+            self = .Default
+        case .UserInitiated:
+            self = .Initiated
+        case .UserInteractive:
+            self = .Interactive
+        case .Utility:
+            self = .Utility
+        }
+    }
+
+    /**
+     Initialize a Queue with a given GCD quality of service class.
+     
+     - parameter qos: a qos_class_t value
+     - returns: a Queue with an equivalent quality of service
+     */
+    public init(qos: qos_class_t) {
+        switch qos {
+        case qos_class_main():
+            self = .Main
+        case QOS_CLASS_BACKGROUND:
+            self = .Background
+        case QOS_CLASS_USER_INITIATED:
+            self = .Initiated
+        case QOS_CLASS_USER_INTERACTIVE:
+            self = .Interactive
+        case QOS_CLASS_UTILITY:
+            self = .Utility
+        default:
+            self = .Default
+        }
+    }
 }
 
 internal let mainQueueScheduler = Queue.Scheduler(queue: Queue.Main.queue)
