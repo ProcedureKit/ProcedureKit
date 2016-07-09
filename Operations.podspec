@@ -48,6 +48,7 @@ session Advanced NSOperations: https://developer.apple.com/videos/wwdc/2015/?id=
       'Sources/Features/iOS/UserConfirmationCondition.swift',
       'Sources/Features/iOS/UserNotificationCondition.swift',
       'Sources/Features/iOS/WebpageOperation.swift',
+      'Sources/Features/iOS/OpenInSafariOperation.swift',
       'Sources/Features/Shared/ReachabilityCondition.swift',
       'Sources/Features/Shared/ReachableOperation.swift',
       'Sources/Features/Shared/Reachability.swift'
@@ -62,6 +63,7 @@ session Advanced NSOperations: https://developer.apple.com/videos/wwdc/2015/?id=
       'Sources/Features/iOS/RemoteNotificationCondition.swift',
       'Sources/Features/iOS/UserNotificationCondition.swift',
       'Sources/Features/iOS/WebpageOperation.swift',
+      'Sources/Features/iOS/OpenInSafariOperation.swift',      
       'Sources/Features/Shared/CalendarCapability.swift'
     ]
     ss.osx.exclude_files = [
@@ -86,6 +88,7 @@ session Advanced NSOperations: https://developer.apple.com/videos/wwdc/2015/?id=
       'Sources/Features/iOS/HealthCapability.swift',
       'Sources/Features/iOS/LocationCapability.swift',
       'Sources/Features/iOS/LocationOperations.swift',
+      'Sources/Features/iOS/OpenInSafariOperation.swift',      
       'Sources/Features/iOS/RemoteNotificationCondition.swift',
       'Sources/Features/iOS/UserNotificationCondition.swift'
     ]
@@ -93,6 +96,7 @@ session Advanced NSOperations: https://developer.apple.com/videos/wwdc/2015/?id=
       'Sources/Features/iOS/PassbookCapability.swift',
       'Sources/Features/iOS/PhotosCapability.swift',
       'Sources/Features/iOS/WebpageOperation.swift',
+      'Sources/Features/iOS/OpenInSafariOperation.swift',      
       'Sources/Features/Shared/CalendarCapability.swift'
     ]
     ss.osx.exclude_files = [
