@@ -299,7 +299,7 @@ public class RepeatedOperation<T where T: NSOperation>: GroupOperation {
      can prevent another operation from being added.
     */
     public func addNextOperation(@autoclosure shouldAddNext: () -> Bool = true) -> Bool {
-        guard shouldAddNext(), let payload = next() else { return false }
+        guard !cancelled && shouldAddNext(), let payload = next() else { return false }
 
         log.verbose("will add next operation: \(payload.operation)")
 

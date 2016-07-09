@@ -116,6 +116,7 @@ class TestQueueDelegate: OperationQueueDelegate {
     var did_willAddOperation: Bool = false
     var did_operationWillFinish: Bool = false
     var did_operationDidFinish: Bool = false
+    var did_willProduceOperation: Bool = false
     var did_numberOfErrorThatOperationDidFinish: Int = 0
 
     init(willFinishOperation: FinishBlockType? = .None, didFinishOperation: FinishBlockType? = .None) {
@@ -137,6 +138,10 @@ class TestQueueDelegate: OperationQueueDelegate {
         did_operationDidFinish = true
         did_numberOfErrorThatOperationDidFinish = errors.count
         didFinishOperation?(operation, errors)
+    }
+    
+    func operationQueue(queue: OperationQueue, willProduceOperation operation: NSOperation) {
+        did_willProduceOperation = true
     }
 }
 

@@ -79,27 +79,18 @@ public class Operation: NSOperation {
         }
     }
 
-    class func keyPathsForValuesAffectingIsExecuting() -> Set<NSObject> {
-        return ["State"]
-    }
-
-    class func keyPathsForValuesAffectingIsFinished() -> Set<NSObject> {
-        return ["State"]
-    }
-
-    class func keyPathsForValuesAffectingIsCancelled() -> Set<NSObject> {
-        return ["Cancelled"]
-    }
-
     /// - returns: a unique String which can be used to identify the operation instance
     public let identifier = NSUUID().UUIDString
 
-    private let stateLock = NSLock()
-    private lazy var _log: LoggerType = Logger()
+    private let stateLock = NSRecursiveLock()
+    private var _log = Protector<LoggerType>(Logger())
     private var _state = State.Initialized
     private var _internalErrors = [ErrorType]()
-    private var _hasFinishedAlready = false
+    private var _isTransitioningToExecuting = false
+    private var _isHandlingFinish = false
+    private var _isHandlingCancel = false
     private var _observers = Protector([OperationObserverType]())
+    private let disableAutomaticFinishing: Bool
 
     internal private(set) var directDependencies = Set<NSOperation>()
     internal private(set) var conditions = Set<Condition>()
@@ -111,27 +102,11 @@ public class Operation: NSOperation {
     // Internal operation properties which are used to manage the scheduling of dependencies
     internal private(set) var evaluateConditionsOperation: GroupOperation? = .None
 
-    private var _cancelled = false {
-        willSet {
-            willChangeValueForKey("Cancelled")
-            if !_cancelled && newValue {
-                operationWillCancel(errors)
-                willCancelObservers.forEach { $0.willCancelOperation(self, errors: self.errors) }
-            }
-        }
-        didSet {
-            didChangeValueForKey("Cancelled")
-
-            if _cancelled && !oldValue {
-                operationDidCancel()
-                didCancelObservers.forEach { $0.didCancelOperation(self) }
-            }
-        }
-    }
+    private var _cancelled = false  // should always be set by .cancel()
 
     /// Access the internal errors collected by the Operation
     public var errors: [ErrorType] {
-        return _internalErrors
+        return stateLock.withCriticalScope { _internalErrors }
     }
 
     /**
@@ -204,13 +179,67 @@ public class Operation: NSOperation {
     */
     public var log: LoggerType {
         get {
-            _log.operationName = operationName
-            return _log
+            let operationName = self.operationName
+            return _log.read { _LoggerOperationContext(parentLogger: $0, operationName: operationName) }
         }
         set {
-            _log = newValue
+            _log.write { (inout ward: LoggerType) in
+                ward = newValue
+            }
         }
     }
+
+    // MARK: - Initialization
+
+    public override init() {
+        self.disableAutomaticFinishing = false
+        super.init()
+    }
+
+    // MARK: - Disable Automatic Finishing
+
+    /**
+     Ability to override Operation's built-in finishing behavior, if a
+     subclass requires full control over when finish() is called.
+
+     Used for GroupOperation to implement proper .Finished state-handling
+     (only finishing after all child operations have finished).
+
+     The default behavior of Operation is to automatically call finish()
+     when:
+        (a) it's cancelled, whether that occurs:
+            - prior to the Operation starting
+              (in which case, Operation will skip calling execute())
+            - on another thread at the same time that the operation is
+              executing
+        (b) when willExecuteObservers log errors
+
+     To ensure that an Operation subclass does not finish until the
+     subclass calls finish():
+     call `super.init(disableAutomaticFinishing: true)` in the init.
+
+     IMPORTANT: If disableAutomaticFinishing == TRUE, the subclass is
+     responsible for calling finish() in *ALL* cases, including when the
+     operation is cancelled.
+
+     You can react to cancellation using WillCancelObserver/DidCancelObserver
+     and/or checking periodically during execute with something like:
+
+     ```swift
+     guard !cancelled else {
+        // do any necessary clean-up
+        finish()    // always call finish if automatic finishing is disabled
+        return
+     }
+     ```
+
+    */
+    public init(disableAutomaticFinishing: Bool) {
+        self.disableAutomaticFinishing = disableAutomaticFinishing
+        super.init()
+    }
+
+    // MARK: - Add Condition
 
     /**
      Add a condition to the to the operation, can only be done prior to the operation starting.
@@ -235,6 +264,8 @@ public class Operation: NSOperation {
         conditions.insert(condition)
     }
 
+    // MARK: - Add Observer
+
     /**
      Add an observer to the to the operation, can only be done
      prior to the operation starting.
@@ -249,6 +280,8 @@ public class Operation: NSOperation {
 
         observer.didAttachToOperation(self)
     }
+
+    // MARK: - Execution
 
     /**
      Subclasses should override this method to perform their specialized task.
@@ -303,10 +336,12 @@ public class Operation: NSOperation {
      - parameter errors: an `[ErrorType]` defaults to empty array.
      */
     public func cancelWithErrors(errors: [ErrorType] = []) {
-        if !errors.isEmpty {
-            log.warning("Did cancel with errors: \(errors).")
+        stateLock.withCriticalScope {
+            if !errors.isEmpty {
+                log.warning("Did cancel with errors: \(errors).")
+            }
+            _internalErrors += errors
         }
-        _internalErrors += errors
         cancel()
     }
 
@@ -327,13 +362,43 @@ public class Operation: NSOperation {
     public func operationDidCancel() { /* No op */ }
 
     public override func cancel() {
-        if !finished {
+        let willCancel = stateLock.withCriticalScope { _ -> Bool in
+            // Do not cancel if already finished or finishing, or cancelled
+            guard state <= .Executing && !_cancelled else { return false }
+            // Only a single call to cancel should continue
+            guard !_isHandlingCancel else { return false }
+            _isHandlingCancel = true
+            return true
+        }
+
+        guard willCancel else { return }
+
+        operationWillCancel(errors)
+        willChangeValueForKey(NSOperation.KeyPath.Cancelled.rawValue)
+        willCancelObservers.forEach { $0.willCancelOperation(self, errors: self.errors) }
+
+        stateLock.withCriticalScope {
             _cancelled = true
-            log.verbose("Did cancel.")
-            if executing {
-                super.cancel()
-                finish()
+        }
+
+        operationDidCancel()
+        didCancelObservers.forEach { $0.didCancelOperation(self) }
+        log.verbose("Did cancel.")
+        didChangeValueForKey(NSOperation.KeyPath.Cancelled.rawValue)
+
+        // Call super.cancel() to trigger .isReady state change on cancel
+        // as well as isReady KVO notification.
+        super.cancel()
+
+        let willFinish = stateLock.withCriticalScope { () -> Bool in
+            let willFinish = executing && !disableAutomaticFinishing && !_isHandlingFinish
+            if willFinish {
+                _isHandlingFinish = true
             }
+            return willFinish
+        }
+        if willFinish {
+            _finish([], fromCancel: true)
         }
     }
 }
@@ -349,13 +414,11 @@ public extension Operation {
             return stateLock.withCriticalScope { _state }
         }
         set (newState) {
-            willChangeValueForKey("State")
             stateLock.withCriticalScope {
                 assert(_state.canTransitionToState(newState, whenCancelled: cancelled), "Attempting to perform illegal cyclic state transition, \(_state) -> \(newState) for operation: \(identity).")
                 log.verbose("\(_state) -> \(newState)")
                 _state = newState
             }
-            didChangeValueForKey("State")
         }
     }
 
@@ -371,7 +434,7 @@ public extension Operation {
 
     /// Boolean indicator for whether the Operation has cancelled or not
     final override var cancelled: Bool {
-        return _cancelled
+        return stateLock.withCriticalScope { _cancelled }
     }
 
     /// Boolean flag to indicate that the Operation failed due to errors.
@@ -519,7 +582,7 @@ public extension Operation {
     final override func start() {
         // Don't call super.start
 
-        guard !cancelled else {
+        guard !cancelled || disableAutomaticFinishing else {
             finish()
             return
         }
@@ -533,14 +596,66 @@ public extension Operation {
         // Inform observers that the operation will execute
         willExecuteObservers.forEach { $0.willExecuteOperation(self) }
 
-        // Check to see if the operation has now been cancelled
-        // by an observer
-        guard _internalErrors.isEmpty && !cancelled else {
-            finish()
+        let nextState = stateLock.withCriticalScope { () -> (Operation.State?) in
+            assert(!executing, "Operation is attempting to execute, but is already executing.")
+            guard !_isTransitioningToExecuting else {
+                assertionFailure("Operation is attempting to execute twice, concurrently.")
+                return nil
+            }
+
+            // Check to see if the operation has now been finished
+            // by an observer (or anything else)
+            guard state <= .Pending else { return nil }
+
+            // Check to see if the operation has now been cancelled
+            // by an observer
+            guard (_internalErrors.isEmpty && !cancelled) || disableAutomaticFinishing else {
+                _isHandlingFinish = true
+                return Operation.State.Finishing
+            }
+
+            // Transition to the .isExecuting state, and explicitly send the required KVO change notifications
+            _isTransitioningToExecuting = true
+            return Operation.State.Executing
+        }
+
+        guard nextState != .Finishing else {
+            _finish([], fromCancel: true)
             return
         }
 
-        state = .Executing
+        guard nextState == .Executing else { return }
+
+        willChangeValueForKey(NSOperation.KeyPath.Executing.rawValue)
+
+        let nextState2 = stateLock.withCriticalScope { () -> (Operation.State?) in
+            // Re-check state, since it could have changed on another thread (ex. via finish)
+            guard state <= .Pending else { return nil }
+
+            state = .Executing
+            _isTransitioningToExecuting = false
+
+            if cancelled && !disableAutomaticFinishing && !_isHandlingFinish {
+                // Operation was cancelled, automatic finishing is enabled,
+                // but cancel is not (yet/ever?) handling the finish.
+                // Because cancel could have already passed the check for executing,
+                // handle calling finish here.
+                _isHandlingFinish = true
+                return .Finishing
+            }
+            return .Executing
+        }
+
+        // Always send the closing didChangeValueForKey
+        didChangeValueForKey(NSOperation.KeyPath.Executing.rawValue)
+
+        guard nextState2 != .Finishing else {
+            _finish([], fromCancel: true)
+            return
+        }
+
+        guard nextState2 == .Executing else { return }
+
         log.verbose("Will Execute")
 
         execute()
@@ -569,33 +684,67 @@ public extension Operation {
      - parameter errors: an array of `ErrorType`, which defaults to empty.
      */
     final func finish(receivedErrors: [ErrorType] = []) {
-        if !_hasFinishedAlready {
-            _hasFinishedAlready = true
-            state = .Finishing
+        _finish(receivedErrors, fromCancel: false)
+    }
 
-            _internalErrors.appendContentsOf(receivedErrors)
-            operationDidFinish(_internalErrors)
-
-            if errors.isEmpty {
-                log.verbose("Will finish with no errors.")
-            }
-            else {
-                log.warning("Will finish with \(errors.count) errors.")
-            }
-
-            willFinishObservers.forEach { $0.willFinishOperation(self, errors: self._internalErrors) }
-
-            state = .Finished
-
-            didFinishObservers.forEach { $0.didFinishOperation(self, errors: self._internalErrors) }
-
-            if errors.isEmpty {
-                log.verbose("Did finish with no errors.")
-            }
-            else {
-                log.warning("Did finish with errors: \(errors).")
-            }
+    private final func _finish(receivedErrors: [ErrorType], fromCancel: Bool = false) {
+        let willFinish = stateLock.withCriticalScope { _ -> Bool in
+            // Do not finish if already finished or finishing
+            guard state <= .Finishing else { return false }
+            // Only a single call to _finish should continue
+            // (.cancel() sets _isHandlingFinish and fromCancel=true, if appropriate.)
+            guard !_isHandlingFinish || fromCancel else { return false }
+            _isHandlingFinish = true
+            return true
         }
+
+        guard willFinish else { return }
+
+        // NOTE:
+        // - The stateLock should only be held when necessary, and should not
+        //   be held when notifying observers (whether via KVO or Operation's
+        //   observers) or deadlock can result.
+
+        let changedExecutingState = executing
+        if changedExecutingState {
+            willChangeValueForKey(NSOperation.KeyPath.Executing.rawValue)
+        }
+
+        stateLock.withCriticalScope {
+            state = .Finishing
+        }
+
+        if changedExecutingState {
+            didChangeValueForKey(NSOperation.KeyPath.Executing.rawValue)
+        }
+
+        let errors = stateLock.withCriticalScope { () -> [ErrorType] in
+            _internalErrors.appendContentsOf(receivedErrors)
+            return _internalErrors
+        }
+
+        if errors.isEmpty {
+            log.verbose("Will finish with no errors.")
+        }
+        else {
+            log.warning("Will finish with \(errors.count) errors.")
+        }
+
+        operationWillFinish(errors)
+        willChangeValueForKey(NSOperation.KeyPath.Finished.rawValue)
+        willFinishObservers.forEach { $0.willFinishOperation(self, errors: errors) }
+
+        stateLock.withCriticalScope {
+            state = .Finished
+        }
+
+        operationDidFinish(errors)
+        didFinishObservers.forEach { $0.didFinishOperation(self, errors: errors) }
+
+        let message = errors.isEmpty ? "errors: \(errors)" : "no errors"
+        log.verbose("Did finish with \(message)")
+
+        didChangeValueForKey(NSOperation.KeyPath.Finished.rawValue)
     }
 
     /// Convenience method to simplify finishing when there is only one error.
@@ -703,6 +852,14 @@ extension NSOperation {
 
     internal func setQualityOfServiceFromUserIntent(userIntent: Operation.UserIntent) {
         qualityOfService = userIntent.qos
+    }
+}
+
+private extension NSOperation {
+    enum KeyPath: String {
+        case Cancelled = "isCancelled"
+        case Executing = "isExecuting"
+        case Finished = "isFinished"
     }
 }
 
