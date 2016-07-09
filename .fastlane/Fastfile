@@ -72,6 +72,7 @@ platform :mac do
       project: "Operations_ExtensionCompatible.xcodeproj",
       scheme: "OS X Extensions Operations",
       output_directory: ".ci/xcodebuild-data",
+      destination: "platform=macOS",
       xcargs: "-derivedDataPath .ci/xcodebuild-data"
     )    
 
@@ -86,6 +87,7 @@ platform :mac do
       project: "Operations.xcodeproj",
       scheme: "OS X Operations",
       output_directory: ".ci/xcodebuild-data",
+      destination: "platform=macOS",      
       xcargs: "-derivedDataPath .ci/xcodebuild-data"
     )
 
