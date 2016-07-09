@@ -42,3 +42,4 @@ docs
 /.build
 /Packages
 .DS_Store
+.ci/xcodebuild-data/*
