@@ -106,3 +106,73 @@ class AutomaticResultInjectionTests: ResultInjectionTests {
         XCTAssertTrue(processing.cancelled)
     }
 }
+
+class ExecuteTests: OperationTests {
+
+    class TestExecutor {
+        var error: ErrorType? = .None
+        var didExecute = false
+        var didCancel = false
+
+        func execute() throws {
+            didExecute = true
+            if let e = error { throw e }
+        }
+
+        func cancel() {
+            didCancel = true
+        }
+    }
+
+    class GetStringExecutor: TestExecutor, Executor {
+        var result: String = "Hello, World!"
+        var requirement: Void = Void()
+    }
+
+    class DoubleStringExecutor: TestExecutor, Executor {
+        var requirement: String = "yup"
+        var result: String = "nope"
+        override func execute() throws {
+            try super.execute()
+            result = "\(requirement) \(requirement)"
+        }
+    }
+
+    func test__add_single_executor() {
+        let operation = Execute(GetStringExecutor())
+        waitForOperation(operation)
+        XCTAssertTrue(operation.executor.didExecute)
+        XCTAssertFalse(operation.executor.didCancel)
+        XCTAssertEqual(operation.executor.result, "Hello, World!")
+    }
+
+    func test__require_result_injection() {
+        let get = Execute(GetStringExecutor())
+        let double = Execute(DoubleStringExecutor())
+        let operation = Execute(DoubleStringExecutor())
+        double.requireResultFromDependency(get)
+        operation.requireResultFromDependency(double)
+        waitForOperations(get, double, operation)
+        XCTAssertTrue(operation.executor.didExecute)
+        XCTAssertFalse(operation.executor.didCancel)
+        XCTAssertEqual(operation.executor.result, "Hello, World! Hello, World! Hello, World! Hello, World!")
+    }
+
+    func test__executor_which_throws_error() {
+        let executor = GetStringExecutor()
+        executor.error = TestOperation.Error.SimulatedError
+
+        let operation = Execute(executor)
+        waitForOperation(operation)
+        XCTAssertTrue(operation.failed)
+        XCTAssertEqual(operation.errors.count, 1)
+    }
+
+    func test__executor_which_gets_cancelled() {
+        let operation = Execute(GetStringExecutor())
+        operation.cancel()
+        waitForOperation(operation)
+        XCTAssertFalse(operation.executor.didExecute)
+        XCTAssertTrue(operation.executor.didCancel)
+    }
+}
