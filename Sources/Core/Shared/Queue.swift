@@ -118,7 +118,7 @@ public enum Queue {
 
     /**
      Initialize a Queue with a given NSQualityOfService.
-     
+
      - parameter qos: a NSQualityOfService value
      - returns: a Queue with an equivalent quality of service
      */
@@ -139,7 +139,7 @@ public enum Queue {
 
     /**
      Initialize a Queue with a given GCD quality of service class.
-     
+
      - parameter qos: a qos_class_t value
      - returns: a Queue with an equivalent quality of service
      */
