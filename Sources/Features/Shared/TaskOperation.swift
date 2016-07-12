@@ -50,7 +50,7 @@ public class TaskOperation: Operation {
 
     /**
      Initializes TaskOperation with an NSTask.
-     
+
      - parameter task: the NSTask
      - parameter taskDidExitCleanly: a TaskDidExitCleanly closure with a default.
     */
