@@ -210,21 +210,7 @@ public class Operation: NSOperation {
     public override final var completionBlock: (() -> Void)? {
         get { return _completionBlockObserver?.block }
         set {
-            _observers.write { (inout observers: [OperationObserverType]) in
-                // Remove any previously added completion observer
-                if let completionObserver = self._completionBlockObserver, index = observers.indexOf({ $0 is CompletionBlockObserver && ($0 as! CompletionBlockObserver) === completionObserver }) { // swiftlint:disable:this force_cast
-                    observers.removeAtIndex(index)
-                }
-                // Add a new one if provided
-                if let completionBlock = newValue {
-                    let observer = CompletionBlockObserver(block: completionBlock)
-                    observers.append(observer)
-                    self._completionBlockObserver = observer
-                }
-                else {
-                    self._completionBlockObserver = nil
-                }
-            }
+            _completionBlockObserver = newValue.map { CompletionBlockObserver(block: $0) }
         }
     }
 
@@ -609,7 +595,12 @@ public extension Operation {
     }
 
     internal var didFinishObservers: [OperationDidFinishObserver] {
-        return observers.flatMap { $0 as? OperationDidFinishObserver }
+        var _didFinishObservers = observers.flatMap { $0 as? OperationDidFinishObserver }
+        guard let completionBlockObserver = _completionBlockObserver as? OperationDidFinishObserver else {
+            return _didFinishObservers
+        }
+        _didFinishObservers.append(completionBlockObserver)
+        return _didFinishObservers
     }
 }
 

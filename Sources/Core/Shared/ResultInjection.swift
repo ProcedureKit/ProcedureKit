@@ -214,13 +214,13 @@ extension AutomaticInjectionOperationType where Self: Operation {
 /// Protocol for non-Operation types to conform to yet enjoy scheduling in Operation
 public protocol Executor: ResultOperationType, AutomaticInjectionOperationType {
 
-    /** 
+    /**
      Will be called to execute the _work_. When the work is finished, the
-     finish block should be invoked. If any errors were encounted pass 
-     them into the finish block. If the work produces a result, the value 
+     finish block should be invoked. If any errors were encounted pass
+     them into the finish block. If the work produces a result, the value
      should be made available at the `result` property before invoking the
      finish block.
-     
+
      - parameter finish: a closure which receives an ErrorType?
     */
     func execute(finish: ErrorType? -> Void)
