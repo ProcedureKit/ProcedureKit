@@ -26,6 +26,19 @@ to be notified of lifecycle events in the operation.
 */
 public class Operation: NSOperation {
 
+    private class CompletionBlockObserver: NSObject, OperationDidFinishObserver {
+        typealias CompletionBlock = () -> Void
+        let block: CompletionBlock
+        init(block: CompletionBlock) {
+            self.block = block
+            super.init()
+        }
+
+        private func didFinishOperation(operation: Operation, errors: [ErrorType]) {
+            block()
+        }
+    }
+
     private enum State: Int, Comparable {
 
         // The initial state
@@ -83,6 +96,8 @@ public class Operation: NSOperation {
     public let identifier = NSUUID().UUIDString
 
     private let stateLock = NSRecursiveLock()
+    private let disableAutomaticFinishing: Bool
+
     private var _log = Protector<LoggerType>(Logger())
     private var _state = State.Initialized
     private var _internalErrors = [ErrorType]()
@@ -90,7 +105,7 @@ public class Operation: NSOperation {
     private var _isHandlingFinish = false
     private var _isHandlingCancel = false
     private var _observers = Protector([OperationObserverType]())
-    private let disableAutomaticFinishing: Bool
+    private var _completionBlockObserver: CompletionBlockObserver? = .None
 
     internal private(set) var directDependencies = Set<NSOperation>()
     internal private(set) var conditions = Set<Condition>()
@@ -185,6 +200,30 @@ public class Operation: NSOperation {
         set {
             _log.write { (inout ward: LoggerType) in
                 ward = newValue
+            }
+        }
+    }
+
+    // MARK: - Completion Block
+
+    /// - returns: a completion block which is executed *after* the operation finishes.
+    public override final var completionBlock: (() -> Void)? {
+        get { return _completionBlockObserver?.block }
+        set {
+            _observers.write { (inout observers: [OperationObserverType]) in
+                // Remove any previously added completion observer
+                if let completionObserver = self._completionBlockObserver, index = observers.indexOf({ $0 is CompletionBlockObserver && ($0 as! CompletionBlockObserver) === completionObserver }) { // swiftlint:disable:this force_cast
+                    observers.removeAtIndex(index)
+                }
+                // Add a new one if provided
+                if let completionBlock = newValue {
+                    let observer = CompletionBlockObserver(block: completionBlock)
+                    observers.append(observer)
+                    self._completionBlockObserver = observer
+                }
+                else {
+                    self._completionBlockObserver = nil
+                }
             }
         }
     }
