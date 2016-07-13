@@ -114,9 +114,9 @@ class ExecuteTests: OperationTests {
         var didExecute = false
         var didCancel = false
 
-        func execute() throws {
+        func execute(finish: ErrorType? -> Void) {
             didExecute = true
-            if let e = error { throw e }
+            finish(error)
         }
 
         func cancel() {
@@ -132,9 +132,9 @@ class ExecuteTests: OperationTests {
     class DoubleStringExecutor: TestExecutor, Executor {
         var requirement: String = "yup"
         var result: String = "nope"
-        override func execute() throws {
-            try super.execute()
+        override func execute(finish: ErrorType? -> Void) {
             result = "\(requirement) \(requirement)"
+            super.execute(finish)
         }
     }
 

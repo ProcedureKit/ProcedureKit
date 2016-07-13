@@ -214,8 +214,16 @@ extension AutomaticInjectionOperationType where Self: Operation {
 /// Protocol for non-Operation types to conform to yet enjoy scheduling in Operation
 public protocol Executor: ResultOperationType, AutomaticInjectionOperationType {
 
-    /// Will be called to execute the _work_. If an error is encountered, it should throw
-    func execute() throws
+    /** 
+     Will be called to execute the _work_. When the work is finished, the
+     finish block should be invoked. If any errors were encounted pass 
+     them into the finish block. If the work produces a result, the value 
+     should be made available at the `result` property before invoking the
+     finish block.
+     
+     - parameter finish: a closure which receives an ErrorType?
+    */
+    func execute(finish: ErrorType? -> Void)
 
     /// Will be called to signal that the _work_ should be cancelled.
     func cancel()
@@ -262,9 +270,6 @@ public final class Execute<E: Executor>: Operation, ResultOperationType, Automat
     }
 
     public final override func execute() {
-        var e: ErrorType? = .None
-        defer { finish(e) }
-        do { try executor.execute() }
-        catch { e = error }
+        executor.execute(finish)
     }
 }
