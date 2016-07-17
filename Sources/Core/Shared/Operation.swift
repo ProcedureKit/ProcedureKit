@@ -741,7 +741,7 @@ public extension Operation {
         operationDidFinish(errors)
         didFinishObservers.forEach { $0.didFinishOperation(self, errors: errors) }
 
-        let message = errors.isEmpty ? "errors: \(errors)" : "no errors"
+        let message = !errors.isEmpty ? "errors: \(errors)" : "no errors"
         log.verbose("Did finish with \(message)")
 
         didChangeValueForKey(NSOperation.KeyPath.Finished.rawValue)

@@ -338,13 +338,13 @@ public class GroupOperation: Operation, OperationQueueDelegate {
                 dispatch_group_enter(isAddingOperationsGroup)
                 return true
             }
-            
+
             guard shouldContinue else { return }
 
             willAddChildOperationObservers.forEach { $0.groupOperation(self, willAddChildOperation: operation) }
 
             canFinishOperation.addDependency(operation)
-            
+
             groupFinishLock.withCriticalScope {
                 dispatch_group_leave(isAddingOperationsGroup)
             }
