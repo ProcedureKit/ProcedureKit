@@ -304,10 +304,10 @@ class PrintableProfileResultTests: XCTestCase {
 
     func test__description__with_children() {
         let child2 = ProfileResult(identity: OperationIdentity(identifier: "Child 2", name: .None), created: now + 0.5, attached: 0.1, started: 0.2, cancelled: .None, finished: 0.3, children: [])
-        let child1 = ProfileResult(identity: OperationIdentity(identifier: "Child 1", name: "Data Operation"), created: now + 0.2, attached: 0.1, started: 0.2, cancelled: .None, finished: 0.3, children: [child2])
+        let child1 = ProfileResult(identity: OperationIdentity(identifier: "Child 1", name: "Data OldOperation"), created: now + 0.2, attached: 0.1, started: 0.2, cancelled: .None, finished: 0.3, children: [child2])
         result = ProfileResult(identity: OperationIdentity(identifier: "Result", name: .None), created: now, attached: 0.1, started: 0.2, cancelled: .None, finished: 0.3, children: [child1])
         printable = PrintableProfileResult(result: result)
-        XCTAssertEqual(printable.description, "+0.1 Attached\n+0.2 Started\n-> Spawned Data Operation #Child 1 with profile results\n  +0.1 Attached\n  +0.2 Started\n  -> Spawned Unnamed Operation #Child 2 with profile results\n    +0.1 Attached\n    +0.2 Started\n    +0.3 Finished\n  +0.3 Finished\n+0.3 Finished\n")
+        XCTAssertEqual(printable.description, "+0.1 Attached\n+0.2 Started\n-> Spawned Data OldOperation #Child 1 with profile results\n  +0.1 Attached\n  +0.2 Started\n  -> Spawned Unnamed OldOperation #Child 2 with profile results\n    +0.1 Attached\n    +0.2 Started\n    +0.3 Finished\n  +0.3 Finished\n+0.3 Finished\n")
     }
 }
 

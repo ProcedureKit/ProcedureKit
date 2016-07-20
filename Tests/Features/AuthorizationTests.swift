@@ -108,7 +108,7 @@ class AuthorizationTests: OperationTests {
         waitForExpectationsWithTimeout(3, handler: nil)
 
         guard let enabled = operation.isAvailable, status = operation.status else {
-            XCTFail("Operation state was not set.")
+            XCTFail("OldOperation state was not set.")
             return
         }
 
@@ -317,7 +317,7 @@ class AsyncCapabilityAuthorizationTests: AuthorizationTests {
         waitForExpectationsWithTimeout(3, handler: nil)
 
         guard let enabled = operation.isAvailable, status = operation.status else {
-            XCTFail("Operation state was not set.")
+            XCTFail("OldOperation state was not set.")
             return
         }
 

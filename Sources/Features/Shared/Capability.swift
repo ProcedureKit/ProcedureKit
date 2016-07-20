@@ -137,13 +137,13 @@ extension Capability {
 
 /**
 
- # Get Authorization Status Operation
+ # Get Authorization Status OldOperation
 
  This is a generic operation which will get the current authorization
  status for any CapabilityType.
 
 */
-public class GetAuthorizationStatus<Capability: CapabilityType>: Operation {
+public class GetAuthorizationStatus<Capability: CapabilityType>: OldOperation {
 
     /// the StatusResponse is a tuple for the capabilities availability and status
     public typealias StatusResponse = (Bool, Capability.Status)
@@ -193,7 +193,7 @@ public class GetAuthorizationStatus<Capability: CapabilityType>: Operation {
         }
     }
 
-    /// The execute function required by Operation
+    /// The execute function required by OldOperation
     public override func execute() {
         determineState { response in
             self.completion(response)
@@ -204,7 +204,7 @@ public class GetAuthorizationStatus<Capability: CapabilityType>: Operation {
 
 /**
 
- # Authorize Operation
+ # Authorize OldOperation
 
  This is a generic operation which will request authorization
  for any CapabilityType.
@@ -225,7 +225,7 @@ public class Authorize<Capability: CapabilityType>: GetAuthorizationStatus<Capab
         addCondition(MutuallyExclusive<Capability>())
     }
 
-    /// The execute function required by Operation
+    /// The execute function required by OldOperation
     public override func execute() {
         capability.requestAuthorizationWithCompletion {
             super.execute()
@@ -284,7 +284,7 @@ public class AuthorizedFor<Capability: CapabilityType>: Condition {
     }
 
     /// Evaluated the condition
-    public override func evaluate(operation: Operation, completion: OperationConditionResult -> Void) {
+    public override func evaluate(operation: OldOperation, completion: OperationConditionResult -> Void) {
 
         guard capability.isAvailable() else {
             completion(.Failed(CapabilityError<Capability>.NotAvailable))

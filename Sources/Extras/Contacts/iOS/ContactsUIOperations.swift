@@ -50,7 +50,7 @@ final public class DisplayContactViewController<F: PresentingViewController>: Gr
 }
 
 @available(iOS 9.0, *)
-final public class DisplayCreateContactViewController<F: PresentingViewController>: Operation {
+final public class DisplayCreateContactViewController<F: PresentingViewController>: OldOperation {
 
     let configuration: ContactViewControllerConfigurationBlock?
     let operation: UIOperation<CNContactViewController, F>

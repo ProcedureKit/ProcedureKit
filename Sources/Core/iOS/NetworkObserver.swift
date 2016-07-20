@@ -33,7 +33,7 @@ public class NetworkObserver: OperationWillExecuteObserver, OperationDidFinishOb
     }
 
     /// Conforms to `OperationObserver`, will start the network activity indicator.
-    public func willExecuteOperation(operation: Operation) {
+    public func willExecuteOperation(operation: OldOperation) {
         dispatch_async(Queue.Main.queue) {
             NetworkIndicatorController.sharedInstance.networkActivityIndicator = self.networkActivityIndicator
             NetworkIndicatorController.sharedInstance.networkActivityDidStart()
@@ -41,7 +41,7 @@ public class NetworkObserver: OperationWillExecuteObserver, OperationDidFinishOb
     }
 
     /// Conforms to `OperationObserver`, will stop the network activity indicator.
-    public func didFinishOperation(operation: Operation, errors: [ErrorType]) {
+    public func didFinishOperation(operation: OldOperation, errors: [ErrorType]) {
         dispatch_async(Queue.Main.queue) {
             NetworkIndicatorController.sharedInstance.networkActivityIndicator = self.networkActivityIndicator
             NetworkIndicatorController.sharedInstance.networkActivityDidEnd()

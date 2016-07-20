@@ -12,11 +12,11 @@ import Foundation
 Attach a `LoggingObserver to an operation to log when the operation
 start, produces new operation and finsihed.
 
-Any produced `Operation` instances will automatically get their
+Any produced `OldOperation` instances will automatically get their
 own logger attached.
 */
-@available(iOS, deprecated=9, message="Use the log property of Operation directly.")
-@available(OSX, deprecated=10.11, message="Use the log property of Operation directly.")
+@available(iOS, deprecated=9, message="Use the log property of OldOperation directly.")
+@available(OSX, deprecated=10.11, message="Use the log property of OldOperation directly.")
 public struct LoggingObserver: OperationObserver {
     public typealias LoggerBlockType = (message: String) -> Void
 
@@ -42,11 +42,11 @@ public struct LoggingObserver: OperationObserver {
     Conforms to `OperationObserver`. The logger is sent a string which uses the
     `name` parameter of the operation if provived.
 
-       "My Operation: did start."
+       "My OldOperation: did start."
 
-    - parameter operation: the `Operation` which has started.
+    - parameter operation: the `OldOperation` which has started.
     */
-    public func willExecuteOperation(operation: Operation) {
+    public func willExecuteOperation(operation: OldOperation) {
         log("\(operation.operationName): will execute.")
     }
 
@@ -54,11 +54,11 @@ public struct LoggingObserver: OperationObserver {
      Conforms to `OperationObserver`. The logger is sent a string which uses the
      `name` parameter of the operation if provived.
 
-     "My Operation: did cancel."
+     "My OldOperation: did cancel."
 
-     - parameter operation: the `Operation` which has started.
+     - parameter operation: the `OldOperation` which has started.
      */
-    public func willCancelOperation(operation: Operation, errors: [ErrorType]) {
+    public func willCancelOperation(operation: OldOperation, errors: [ErrorType]) {
         let detail = errors.count > 0 ? "error(s): \(errors)" : "no errors"
         log("\(operation.operationName): will cancel with \(detail).")
     }
@@ -67,11 +67,11 @@ public struct LoggingObserver: OperationObserver {
      Conforms to `OperationObserver`. The logger is sent a string which uses the
      `name` parameter of the operation if provived.
 
-     "My Operation: did cancel."
+     "My OldOperation: did cancel."
 
-     - parameter operation: the `Operation` which has started.
+     - parameter operation: the `OldOperation` which has started.
      */
-    public func didCancelOperation(operation: Operation) {
+    public func didCancelOperation(operation: OldOperation) {
         log("\(operation.operationName): did cancel.")
     }
 
@@ -79,20 +79,20 @@ public struct LoggingObserver: OperationObserver {
     Conforms to `OperationObserver`. The logger is sent a string which uses the
     `name` parameter of the operation if provived.
 
-        "My Operation: did produce operation: My Other Operation."
+        "My OldOperation: did produce operation: My Other OldOperation."
 
-    If the produced operation is an `Operation`, then a new `LoggingObserver` with
+    If the produced operation is an `OldOperation`, then a new `LoggingObserver` with
     same queue and logger will be attached to it as an observer. Meaning that when
     the produced operation starts/produces/finishes, it will also generate log
     output.
 
-    - parameter operation: the `Operation` producer.
-    - parameter newOperation: the `Operation` which has been produced.
+    - parameter operation: the `OldOperation` producer.
+    - parameter newOperation: the `OldOperation` which has been produced.
     */
-    public func operation(operation: Operation, didProduceOperation newOperation: NSOperation) {
+    public func operation(operation: OldOperation, didProduceOperation newOperation: NSOperation) {
         let detail = newOperation.operationName
 
-        if let newOperation = newOperation as? Operation {
+        if let newOperation = newOperation as? OldOperation {
             newOperation.addObserver(LoggingObserver(queue: queue, logger: logger))
         }
 
@@ -104,16 +104,16 @@ public struct LoggingObserver: OperationObserver {
      `name` parameter of the operation if provived. If there were errors, output
      looks like
 
-     "My Operation: finsihed with error(s): [My Operation Error]."
+     "My OldOperation: finsihed with error(s): [My OldOperation Error]."
 
      or if no errors:
 
-     "My Operation: finsihed with no errors."
+     "My OldOperation: finsihed with no errors."
 
-     - parameter operation: the `Operation` that finished.
+     - parameter operation: the `OldOperation` that finished.
      - parameter errors: an array of `ErrorType`, not that these will be printed out.
      */
-    public func willFinishOperation(operation: Operation, errors: [ErrorType]) {
+    public func willFinishOperation(operation: OldOperation, errors: [ErrorType]) {
         let detail = errors.count > 0 ? "error(s): \(errors)" : "no errors"
         log("\(operation.operationName): will finish with \(detail).")
     }
@@ -123,16 +123,16 @@ public struct LoggingObserver: OperationObserver {
     `name` parameter of the operation if provived. If there were errors, output
     looks like
 
-        "My Operation: finsihed with error(s): [My Operation Error]."
+        "My OldOperation: finsihed with error(s): [My OldOperation Error]."
 
     or if no errors:
 
-        "My Operation: finsihed with no errors."
+        "My OldOperation: finsihed with no errors."
 
-    - parameter operation: the `Operation` that finished.
+    - parameter operation: the `OldOperation` that finished.
     - parameter errors: an array of `ErrorType`, not that these will be printed out.
     */
-    public func didFinishOperation(operation: Operation, errors: [ErrorType]) {
+    public func didFinishOperation(operation: OldOperation, errors: [ErrorType]) {
         let detail = errors.count > 0 ? "error(s): \(errors)" : "no errors"
         log("\(operation.operationName): did finish with \(detail).")
     }

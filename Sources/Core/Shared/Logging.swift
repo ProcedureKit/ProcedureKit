@@ -277,7 +277,7 @@ public class LogManager: LogManagerType {
     }
 
     /**
-     # Enabled Operation logging
+     # Enabled OldOperation logging
      Enable or Disable built in logger. Default is enabled.
      */
     public static var enabled: Bool {
@@ -360,11 +360,11 @@ public extension NSOperation {
 
     /**
      Returns a non-optional `String` to use as the name
-     of an Operation. If the `name` property is not
+     of an OldOperation. If the `name` property is not
      set, this resorts to the class description.
     */
     var operationName: String {
-        return name ?? "Unnamed Operation"
+        return name ?? "Unnamed OldOperation"
     }
 }
 

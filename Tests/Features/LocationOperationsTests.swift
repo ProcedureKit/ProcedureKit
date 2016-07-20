@@ -345,7 +345,7 @@ class ReverseGeocodeUserLocationOperationTests: ReverseGeocodeOperationTests {
         waitForExpectationsWithTimeout(3, handler: nil)
 
         guard let receivedPlacemark = operation.result, receivedLocation = operation.location else {
-            XCTFail("Operation did not set state")
+            XCTFail("OldOperation did not set state")
             return
         }
 

@@ -9,11 +9,11 @@
 import Foundation
 
 /**
- # Result Operation
+ # Result OldOperation
 
  Abstract but a concrete class for a ResultOperationType.
 */
-public class ResultOperation<Result>: Operation, ResultOperationType {
+public class ResultOperation<Result>: OldOperation, ResultOperationType {
 
     /// - returns: the Result
     public var result: Result! = nil
@@ -31,9 +31,9 @@ public class ResultOperation<Result>: Operation, ResultOperationType {
 }
 
 /**
- # Map Operation
+ # Map OldOperation
 
- An `Operation` subclass which accepts a map transform closure. Because it
+ An `OldOperation` subclass which accepts a map transform closure. Because it
  conforms to both `ResultOperationType` and `AutomaticInjectionOperationType`
  it can be used to create an array of operations which transform state.
 
@@ -75,10 +75,10 @@ public class MapOperation<T, U>: ResultOperation<U>, AutomaticInjectionOperation
     }
 }
 
-extension ResultOperationType where Self: Operation {
+extension ResultOperationType where Self: OldOperation {
 
     /**
-     Map the result of an `Operation` which conforms to `ResultOperationType`.
+     Map the result of an `OldOperation` which conforms to `ResultOperationType`.
 
      ```swift
      let getLocation = UserLocationOperation()
@@ -102,9 +102,9 @@ extension ResultOperationType where Self: Operation {
 }
 
 /**
- # Filter Operation
+ # Filter OldOperation
 
- An `Operation` subclass which accepts an include element closure. Because it
+ An `OldOperation` subclass which accepts an include element closure. Because it
  conforms to both `ResultOperationType` and `AutomaticInjectionOperationType`
  it can be used to create an array of operations which transform state.
 
@@ -133,10 +133,10 @@ public class FilterOperation<Element>: ResultOperation<Array<Element>>, Automati
     }
 }
 
-extension ResultOperationType where Self: Operation, Result: SequenceType {
+extension ResultOperationType where Self: OldOperation, Result: SequenceType {
 
     /**
-     Filter the result of the receiver `Operation` which conforms to `ResultOperationType` where
+     Filter the result of the receiver `OldOperation` which conforms to `ResultOperationType` where
      the Result is a SequenceType.
 
      ```swift
@@ -160,9 +160,9 @@ extension ResultOperationType where Self: Operation, Result: SequenceType {
 }
 
 /**
- # Reduce Operation
+ # Reduce OldOperation
 
- An `Operation` subclass which accepts an initial value, and a combine closure. Because it
+ An `OldOperation` subclass which accepts an initial value, and a combine closure. Because it
  conforms to both `ResultOperationType` and `AutomaticInjectionOperationType`
  it can be used to create an array of operations which transform state.
 
@@ -193,10 +193,10 @@ public class ReduceOperation<Element, U>: ResultOperation<U>, AutomaticInjection
     }
 }
 
-extension ResultOperationType where Self: Operation, Result: SequenceType {
+extension ResultOperationType where Self: OldOperation, Result: SequenceType {
 
     /**
-     Reduce the result of the receiver `Operation` which conforms to `ResultOperationType` where
+     Reduce the result of the receiver `OldOperation` which conforms to `ResultOperationType` where
      the Result is a SequenceType.
 
      ```swift

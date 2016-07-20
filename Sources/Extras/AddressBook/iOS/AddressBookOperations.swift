@@ -9,10 +9,10 @@
 import Foundation
 import AddressBook
 
-// MARK: - Address Book Operation
+// MARK: - Address Book OldOperation
 
 @available(iOS, deprecated=9.0)
-public class AddressBookOperation: Operation {
+public class AddressBookOperation: OldOperation {
 
     internal var registrar: AddressBookPermissionRegistrar
     public var addressBook: AddressBook!

@@ -46,7 +46,7 @@ public class BlockCondition: Condition {
         self.name = name
     }
 
-    public override func evaluate(operation: Operation, completion: CompletionBlockType) {
+    public override func evaluate(operation: OldOperation, completion: CompletionBlockType) {
         do {
             let result = try block()
             completion(result ? .Satisfied : .Failed(Error.BlockConditionFailed))

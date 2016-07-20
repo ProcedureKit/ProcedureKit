@@ -12,7 +12,7 @@ public protocol ConditionType {
 
     var mutuallyExclusive: Bool { get set }
 
-    func evaluate(operation: Operation, completion: ConditionResult -> Void)
+    func evaluate(operation: OldOperation, completion: ConditionResult -> Void)
 }
 
 internal extension ConditionType {
@@ -46,15 +46,15 @@ public func == (lhs: ConditionError, rhs: ConditionError) -> Bool {
 
 
 /**
- Condition Operation
+ Condition OldOperation
 
  Conditions are a core feature of this framework. Multiple
- instances can be attached to an `Operation` subclass, whereby they
+ instances can be attached to an `OldOperation` subclass, whereby they
  are evaluated to determine whether or not the target operation is
  executed.
 
- ConditionOperation is also an Operation subclass, which means that it
- also benefits from all the features of Operation, namely dependencies,
+ ConditionOperation is also an OldOperation subclass, which means that it
+ also benefits from all the features of OldOperation, namely dependencies,
  observers, and yes, conditions. This means that your conditions could
  have conditions. This allows for expressing incredibly rich control logic.
 
@@ -62,13 +62,13 @@ public func == (lhs: ConditionError, rhs: ConditionError) -> Bool {
  failure by passing an ConditionResult enum back.
 
  */
-public class Condition: Operation, ConditionType, ResultOperationType {
+public class Condition: OldOperation, ConditionType, ResultOperationType {
 
     public typealias CompletionBlockType = ConditionResult -> Void
 
     public var mutuallyExclusive: Bool = false
 
-    internal weak var operation: Operation? = .None
+    internal weak var operation: OldOperation? = .None
 
     public var result: ConditionResult! = nil
 
@@ -83,10 +83,10 @@ public class Condition: Operation, ConditionType, ResultOperationType {
 
     /**
      Subclasses must override this method, but should not call super.
-     - parameter operation: the Operation instance the condition was attached to
+     - parameter operation: the OldOperation instance the condition was attached to
      - parameter completion: a completion block which receives a ConditionResult argument.
     */
-    public func evaluate(operation: Operation, completion: CompletionBlockType) {
+    public func evaluate(operation: OldOperation, completion: CompletionBlockType) {
         assertionFailure("ConditionOperation must be subclassed, and \(#function) overridden.")
         completion(.Failed(OperationError.ConditionFailed))
     }
@@ -106,7 +106,7 @@ public class TrueCondition: Condition {
         self.mutuallyExclusive = mutuallyExclusive
     }
 
-    public override func evaluate(operation: Operation, completion: CompletionBlockType) {
+    public override func evaluate(operation: OldOperation, completion: CompletionBlockType) {
         completion(.Satisfied)
     }
 }
@@ -119,7 +119,7 @@ public class FalseCondition: Condition {
         self.mutuallyExclusive = mutuallyExclusive
     }
 
-    public override func evaluate(operation: Operation, completion: CompletionBlockType) {
+    public override func evaluate(operation: OldOperation, completion: CompletionBlockType) {
         completion(.Failed(ConditionError.FalseCondition))
     }
 }
@@ -150,7 +150,7 @@ public class ComposedCondition<C: Condition>: Condition, AutomaticInjectionOpera
     /// Conformance to `AutomaticInjectionOperationType`
     public var requirement: ConditionResult! = nil
 
-    override var operation: Operation? {
+    override var operation: OldOperation? {
         didSet {
             condition.operation = operation
         }
@@ -172,7 +172,7 @@ public class ComposedCondition<C: Condition>: Condition, AutomaticInjectionOpera
     }
 
     /// Override of public function
-    public override func evaluate(operation: Operation, completion: CompletionBlockType) {
+    public override func evaluate(operation: OldOperation, completion: CompletionBlockType) {
         guard let result = requirement else {
             completion(.Failed(AutomaticInjectionError.RequirementNotSatisfied))
             return
@@ -201,7 +201,7 @@ internal class WrappedOperationCondition: Condition {
         name = condition.name
     }
 
-    override func evaluate(operation: Operation, completion: CompletionBlockType) {
+    override func evaluate(operation: OldOperation, completion: CompletionBlockType) {
         condition.evaluateForOperation(operation, completion: completion)
     }
 }

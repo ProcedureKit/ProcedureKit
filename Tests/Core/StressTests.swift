@@ -54,14 +54,14 @@ class StressTest: OperationTests {
         //
         // Affects: Swift < 3
         // Fixed in: Swift 3.0+
-        // Without the code fix (marked with SR-192) in OperationQueue.swift, 
+        // Without the code fix (marked with SR-192) in OldOperationQueue.swift, 
         // this test will crash with EXC_BAD_ACCESS, or sometimes other errors.
         //
         class TestDelegate: OperationQueueDelegate {
-            func operationQueue(queue: OperationQueue, willAddOperation operation: NSOperation) { /* do nothing */ }
-            func operationQueue(queue: OperationQueue, willFinishOperation operation: NSOperation, withErrors errors: [ErrorType]) { /* do nothing */ }
-            func operationQueue(queue: OperationQueue, didFinishOperation operation: NSOperation, withErrors errors: [ErrorType]) { /* do nothing */ }
-            func operationQueue(queue: OperationQueue, willProduceOperation operation: NSOperation) { /* do nothing */ }
+            func operationQueue(queue: OldOperationQueue, willAddOperation operation: NSOperation) { /* do nothing */ }
+            func operationQueue(queue: OldOperationQueue, willFinishOperation operation: NSOperation, withErrors errors: [ErrorType]) { /* do nothing */ }
+            func operationQueue(queue: OldOperationQueue, didFinishOperation operation: NSOperation, withErrors errors: [ErrorType]) { /* do nothing */ }
+            func operationQueue(queue: OldOperationQueue, willProduceOperation operation: NSOperation) { /* do nothing */ }
         }
         
         let expectation = expectationWithDescription("Test: \(#function)")
@@ -70,7 +70,7 @@ class StressTest: OperationTests {
         dispatch_async(Queue.Initiated.queue) {
             let group = dispatch_group_create()
             for _ in 0..<1000000 {
-                let testQueue = OperationQueue()
+                let testQueue = OldOperationQueue()
                 testQueue.delegate = TestDelegate()
                 dispatch_group_async(group, dispatch_get_global_queue(0, 0), {
                     let _ = testQueue.delegate
@@ -153,7 +153,7 @@ class StressTest: OperationTests {
         (1...batches).forEach { batch in
             autoreleasepool {
                 let batchStartTime = CFAbsoluteTimeGetCurrent()
-                let queue = OperationQueue()
+                let queue = OldOperationQueue()
                 queue.suspended = false
                 let finishCount = Counter()
                 let operationDispatchGroup = dispatch_group_create()
@@ -209,7 +209,7 @@ class StressTest: OperationTests {
         (1...batches).forEach { batch in
             autoreleasepool {
                 let batchStartTime = CFAbsoluteTimeGetCurrent()
-                let queue = OperationQueue()
+                let queue = OldOperationQueue()
                 queue.suspended = false
                 let operationDispatchGroup = dispatch_group_create()
                 weak var didFinishAllOperationsExpectation = expectationWithDescription("Test: \(#function), Finished All Operations, batch \(batch)")
@@ -240,7 +240,7 @@ class StressTest: OperationTests {
         let batchTimeout = Double(batchSize) / 333.0
         print ("\(#function): Parameters: batch size: \(batchSize); batches: \(batches)")
         
-        final class TestOperation3: Operation, Repeatable {
+        final class TestOperation3: OldOperation, Repeatable {
             init(number: Int) {
                 super.init()
                 name = "TestOperation3_\(number)"
@@ -261,7 +261,7 @@ class StressTest: OperationTests {
         (1...batches).forEach { batch in
             autoreleasepool {
                 let batchStartTime = CFAbsoluteTimeGetCurrent()
-                let queue = OperationQueue()
+                let queue = OldOperationQueue()
                 queue.suspended = false
                 let operationDispatchGroup = dispatch_group_create()
                 weak var didCreateAllOperationsExpectation = expectationWithDescription("Test: \(#function), Finished Creating Operations, batch \(batch)")

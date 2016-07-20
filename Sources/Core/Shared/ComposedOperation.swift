@@ -22,7 +22,7 @@ public class ComposedOperation<T: NSOperation>: GroupOperation {
         name = "Composed <\(T.self)>"
         addObserver(WillCancelObserver { [unowned self] operation, errors in
             guard operation === self else { return }
-            if !errors.isEmpty, let op =  self.operation as? Operation {
+            if !errors.isEmpty, let op =  self.operation as? OldOperation {
                 op.cancelWithError(OperationError.ParentOperationCancelledWithErrors(errors))
             }
             else {

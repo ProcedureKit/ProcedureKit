@@ -25,7 +25,7 @@ extension OperationEvent: CustomStringConvertible {
 }
 
 /**
- Types which conform to this protocol, can be attached to `Operation` subclasses before
+ Types which conform to this protocol, can be attached to `OldOperation` subclasses before
  they are added to a queue.
  */
 public protocol OperationObserverType {
@@ -33,9 +33,9 @@ public protocol OperationObserverType {
     /**
      Observer gets notified when it is attached to an operation.
 
-     - parameter operation: the observed `Operation`.
+     - parameter operation: the observed `OldOperation`.
     */
-    func didAttachToOperation(operation: Operation)
+    func didAttachToOperation(operation: OldOperation)
 }
 
 
@@ -46,15 +46,15 @@ public extension OperationObserverType {
      Default implementation of didAttachToOperation
      is a none-operation.
 
-     - parameter operation: the observed `Operation`.
+     - parameter operation: the observed `OldOperation`.
     */
-    func didAttachToOperation(operation: Operation) { /* No operation */ }
+    func didAttachToOperation(operation: OldOperation) { /* No operation */ }
 }
 
 
 
 /**
- Types which conform to this protocol, can be attached to `Operation` subclasses before
+ Types which conform to this protocol, can be attached to `OldOperation` subclasses before
  they are added to a queue. They will receive a callback when the operation starts.
  */
 public protocol OperationWillExecuteObserver: OperationObserverType {
@@ -62,14 +62,14 @@ public protocol OperationWillExecuteObserver: OperationObserverType {
     /**
      The operation will execute.
 
-     - parameter operation: the observed `Operation`.
+     - parameter operation: the observed `OldOperation`.
      */
-    func willExecuteOperation(operation: Operation)
+    func willExecuteOperation(operation: OldOperation)
 }
 
 
 /**
- Types which conform to this protocol, can be attached to `Operation` subclasses before
+ Types which conform to this protocol, can be attached to `OldOperation` subclasses before
  they are added to a queue. They will receive a callback when the operation cancels.
  */
 public protocol OperationWillCancelObserver: OperationObserverType {
@@ -77,14 +77,14 @@ public protocol OperationWillCancelObserver: OperationObserverType {
     /**
      The operation will cancel.
 
-     - parameter operation: the observed `Operation`.
+     - parameter operation: the observed `OldOperation`.
      */
-    func willCancelOperation(operation: Operation, errors: [ErrorType])
+    func willCancelOperation(operation: OldOperation, errors: [ErrorType])
 }
 
 
 /**
- Types which conform to this protocol, can be attached to `Operation` subclasses before
+ Types which conform to this protocol, can be attached to `OldOperation` subclasses before
  they are added to a queue. They will receive a callback when the operation cancels.
  */
 public protocol OperationDidCancelObserver: OperationObserverType {
@@ -92,14 +92,14 @@ public protocol OperationDidCancelObserver: OperationObserverType {
     /**
      The operation did cancel.
 
-     - parameter operation: the observed `Operation`.
+     - parameter operation: the observed `OldOperation`.
      */
-    func didCancelOperation(operation: Operation)
+    func didCancelOperation(operation: OldOperation)
 }
 
 
 /**
- Types which conform to this protocol, can be attached to `Operation` subclasses before
+ Types which conform to this protocol, can be attached to `OldOperation` subclasses before
  they are added to a queue. They will receive a callback when the operation produces
  another operation.
  */
@@ -107,33 +107,33 @@ public protocol OperationDidProduceOperationObserver: OperationObserverType {
 
     /**
      The operation produced a new `NSOperation` instance which has been added to the
-     queue. Note that this isn't necessarily an `Operation`, so be careful, if you
+     queue. Note that this isn't necessarily an `OldOperation`, so be careful, if you
      intend to automatically start observing it.
 
-     - parameter operation: the observed `Operation`.
+     - parameter operation: the observed `OldOperation`.
      - parameter newOperation: the produced `NSOperation`
      */
-    func operation(operation: Operation, didProduceOperation newOperation: NSOperation)
+    func operation(operation: OldOperation, didProduceOperation newOperation: NSOperation)
 }
 
 
 /**
- Types which confirm to this protocol, can be attached to `Operation` subclasses.
+ Types which confirm to this protocol, can be attached to `OldOperation` subclasses.
  */
 public protocol OperationWillFinishObserver: OperationObserverType {
 
     /**
      The operation will finish. Any errors that were encountered are collected here.
 
-     - parameter operation: the observed `Operation`.
+     - parameter operation: the observed `OldOperation`.
      - parameter errors: an array of `ErrorType`s.
      */
-    func willFinishOperation(operation: Operation, errors: [ErrorType])
+    func willFinishOperation(operation: OldOperation, errors: [ErrorType])
 }
 
 
 /**
- Types which conform to this protocol, can be attached to `Operation` subclasses before
+ Types which conform to this protocol, can be attached to `OldOperation` subclasses before
  they are added to a queue. They will receive a callback when the operation finishes.
  */
 public protocol OperationDidFinishObserver: OperationObserverType {
@@ -141,15 +141,15 @@ public protocol OperationDidFinishObserver: OperationObserverType {
     /**
      The operation did finish. Any errors that were encountered are collected here.
 
-     - parameter operation: the observed `Operation`.
+     - parameter operation: the observed `OldOperation`.
      - parameter errors: an array of `ErrorType`s.
      */
-    func didFinishOperation(operation: Operation, errors: [ErrorType])
+    func didFinishOperation(operation: OldOperation, errors: [ErrorType])
 }
 
 
 /**
- Types which conform to this protocol, can be attached to `Operation` subclasses before
+ Types which conform to this protocol, can be attached to `OldOperation` subclasses before
  they are added to a queue. They will receive callbacks when the operation starts,
  produces a new operation, and finishes.
  */

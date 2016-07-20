@@ -11,7 +11,7 @@ import Foundation
 // swiftlint:disable file_length
 
 /**
-An `Operation` subclass which enables the grouping
+An `OldOperation` subclass which enables the grouping
 of other operations. Use `GroupOperation`s to associate
 related operations together, thereby creating higher
 levels of abstractions.
@@ -21,7 +21,7 @@ of creating Operations which may repeat themselves before
 subsequent operations can run. For example, authentication
 operations.
 */
-public class GroupOperation: Operation, OperationQueueDelegate {
+public class GroupOperation: OldOperation, OperationQueueDelegate {
 
     typealias ErrorsByOperation = [NSOperation: [ErrorType]]
     internal struct Errors {
@@ -48,8 +48,8 @@ public class GroupOperation: Operation, OperationQueueDelegate {
     private let groupFinishLock = NSRecursiveLock()
     private var isAddingOperationsGroup = dispatch_group_create()
 
-    /// - returns: the OperationQueue the group runs operations on.
-    public let queue = OperationQueue()
+    /// - returns: the OldOperationQueue the group runs operations on.
+    public let queue = OldOperationQueue()
 
     /// - returns: the operations which have been added to the queue
     public private(set) var operations: [NSOperation] {
@@ -64,7 +64,7 @@ public class GroupOperation: Operation, OperationQueueDelegate {
     }
     private var _operations: Protector<[NSOperation]>
 
-    public override var userIntent: Operation.UserIntent {
+    public override var userIntent: OldOperation.UserIntent {
         didSet {
             let (nsops, ops) = operations.splitNSOperationsAndOperations
             nsops.forEach { $0.setQualityOfServiceFromUserIntent(userIntent) }
@@ -81,9 +81,9 @@ public class GroupOperation: Operation, OperationQueueDelegate {
         _operations = Protector<[NSOperation]>(ops)
         // GroupOperation handles calling finish() on cancellation once all of its children have cancelled and finished
         // and its finishingOperation has finished.
-        super.init(disableAutomaticFinishing: true) // Override default Operation finishing behavior
+        super.init(disableAutomaticFinishing: true) // Override default OldOperation finishing behavior
         canFinishOperation = GroupOperation.CanFinishOperation(parentGroupOperation: self)
-        name = "Group Operation"
+        name = "Group OldOperation"
         queue.suspended = true
         queue.delegate = self
         userIntent = operations.userIntent
@@ -248,7 +248,7 @@ public class GroupOperation: Operation, OperationQueueDelegate {
      when there are no more operations in the group operation, safely handling the transition of
      group operation state.
      */
-    public func operationQueue(queue: OperationQueue, willAddOperation operation: NSOperation) {
+    public func operationQueue(queue: OldOperationQueue, willAddOperation operation: NSOperation) {
         guard queue === self.queue else { return }
 
         assert(!finishingOperation.executing, "Cannot add new operations to a group after the group has started to finish.")
@@ -281,7 +281,7 @@ public class GroupOperation: Operation, OperationQueueDelegate {
      operation is the finishing operation, we finish the group operation here. Else, the group is
      notified (using `operationDidFinish` that a child operation has finished.
      */
-    public func operationQueue(queue: OperationQueue, willFinishOperation operation: NSOperation, withErrors errors: [ErrorType]) {
+    public func operationQueue(queue: OldOperationQueue, willFinishOperation operation: NSOperation, withErrors errors: [ErrorType]) {
         guard queue === self.queue else { return }
 
         if !errors.isEmpty {
@@ -297,7 +297,7 @@ public class GroupOperation: Operation, OperationQueueDelegate {
         }
     }
 
-    public func operationQueue(queue: OperationQueue, didFinishOperation operation: NSOperation, withErrors errors: [ErrorType]) {
+    public func operationQueue(queue: OldOperationQueue, didFinishOperation operation: NSOperation, withErrors errors: [ErrorType]) {
         guard queue === self.queue else { return }
 
         if operation === finishingOperation {
@@ -306,7 +306,7 @@ public class GroupOperation: Operation, OperationQueueDelegate {
         }
     }
 
-    public func operationQueue(queue: OperationQueue, willProduceOperation operation: NSOperation) {
+    public func operationQueue(queue: OldOperationQueue, willProduceOperation operation: NSOperation) {
         guard queue === self.queue else { return }
 
         // Ensure that produced operations are added to GroupOperation's
@@ -437,7 +437,7 @@ public struct WillAddChildObserver: GroupOperationWillAddChildObserver {
     }
 
     /// Base OperationObserverType method
-    public func didAttachToOperation(operation: Operation) {
+    public func didAttachToOperation(operation: OldOperation) {
         didAttachToOperation?(operation: operation)
     }
 }
@@ -573,7 +573,7 @@ private extension GroupOperation {
     }
 }
 
-private extension OperationQueue {
+private extension OldOperationQueue {
     private func _addCanFinishOperation(canFinishOperation: GroupOperation.CanFinishOperation) {
         // Do not add observers (not needed - CanFinishOperation is an implementation detail of GroupOperation)
         // Do not add conditions (CanFinishOperation has none)

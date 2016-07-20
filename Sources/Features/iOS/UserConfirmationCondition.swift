@@ -54,7 +54,7 @@ public class UserConfirmationCondition<From: PresentingViewController>: Conditio
         addDependency(alert)
     }
 
-    public override func evaluate(operation: Operation, completion: OperationConditionResult -> Void) {
+    public override func evaluate(operation: OldOperation, completion: OperationConditionResult -> Void) {
         switch confirmation {
         case .Unknown:
             // This should never happen, but you never know.

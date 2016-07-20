@@ -1,5 +1,5 @@
 //
-//  Operation.swift
+//  OldOperation.swift
 //  YapDB
 //
 //  Created by Daniel Thorpe on 25/06/2015.
@@ -13,9 +13,9 @@ import Foundation
 // swiftlint:disable type_body_length
 
 /**
-Abstract base Operation class which subclasses `NSOperation`.
+Abstract base OldOperation class which subclasses `NSOperation`.
 
-Operation builds on `NSOperation` in a few simple ways.
+OldOperation builds on `NSOperation` in a few simple ways.
 
 1. For an instance to become `.Ready`, all of its attached
 `OperationCondition`s must be satisfied.
@@ -24,7 +24,7 @@ Operation builds on `NSOperation` in a few simple ways.
 to be notified of lifecycle events in the operation.
 
 */
-public class Operation: NSOperation {
+public class OldOperation: NSOperation {
 
     private enum State: Int, Comparable {
 
@@ -62,7 +62,7 @@ public class Operation: NSOperation {
     }
 
     /**
-     Type to express the intent of the user in regards to executing an Operation instance
+     Type to express the intent of the user in regards to executing an OldOperation instance
 
      - see: https://developer.apple.com/library/ios/documentation/Performance/Conceptual/EnergyGuide-iOS/PrioritizeWorkWithQoS.html#//apple_ref/doc/uid/TP40015243-CH39
     */
@@ -104,16 +104,16 @@ public class Operation: NSOperation {
 
     private var _cancelled = false  // should always be set by .cancel()
 
-    /// Access the internal errors collected by the Operation
+    /// Access the internal errors collected by the OldOperation
     public var errors: [ErrorType] {
         return stateLock.withCriticalScope { _internalErrors }
     }
 
     /**
-     Expresses the user intent in regards to the execution of this Operation.
+     Expresses the user intent in regards to the execution of this OldOperation.
 
      Setting this property will set the appropriate quality of service parameter
-     on the Operation.
+     on the OldOperation.
 
      - requires: self must not have started yet. i.e. either hasn't been added
      to a queue, or is waiting on dependencies.
@@ -144,17 +144,17 @@ public class Operation: NSOperation {
     }
 
     /**
-     # Access the logger for this Operation
+     # Access the logger for this OldOperation
      The `log` property can be used as the interface to access the logger.
      e.g. to output a message with `LogSeverity.Info` from inside
-     the `Operation`, do this:
+     the `OldOperation`, do this:
 
     ```swift
     log.info("This is my message")
     ```
 
      To adjust the instance severity of the LoggerType for the
-     `Operation`, access it via this property too:
+     `OldOperation`, access it via this property too:
 
     ```swift
     log.severity = .Verbose
@@ -205,16 +205,16 @@ public class Operation: NSOperation {
      Used for GroupOperation to implement proper .Finished state-handling
      (only finishing after all child operations have finished).
 
-     The default behavior of Operation is to automatically call finish()
+     The default behavior of OldOperation is to automatically call finish()
      when:
         (a) it's cancelled, whether that occurs:
-            - prior to the Operation starting
-              (in which case, Operation will skip calling execute())
+            - prior to the OldOperation starting
+              (in which case, OldOperation will skip calling execute())
             - on another thread at the same time that the operation is
               executing
         (b) when willExecuteObservers log errors
 
-     To ensure that an Operation subclass does not finish until the
+     To ensure that an OldOperation subclass does not finish until the
      subclass calls finish():
      call `super.init(disableAutomaticFinishing: true)` in the init.
 
@@ -407,7 +407,7 @@ public class Operation: NSOperation {
 
 // MARK: - State
 
-public extension Operation {
+public extension OldOperation {
 
     private var state: State {
         get {
@@ -422,22 +422,22 @@ public extension Operation {
         }
     }
 
-    /// Boolean indicator for whether the Operation is currently executing or not
+    /// Boolean indicator for whether the OldOperation is currently executing or not
     final override var executing: Bool {
         return state == .Executing
     }
 
-    /// Boolean indicator for whether the Operation has finished or not
+    /// Boolean indicator for whether the OldOperation has finished or not
     final override var finished: Bool {
         return state == .Finished
     }
 
-    /// Boolean indicator for whether the Operation has cancelled or not
+    /// Boolean indicator for whether the OldOperation has cancelled or not
     final override var cancelled: Bool {
         return stateLock.withCriticalScope { _cancelled }
     }
 
-    /// Boolean flag to indicate that the Operation failed due to errors.
+    /// Boolean flag to indicate that the OldOperation failed due to errors.
     var failed: Bool {
         return errors.count > 0
     }
@@ -449,7 +449,7 @@ public extension Operation {
 
 // MARK: - Dependencies
 
-public extension Operation {
+public extension OldOperation {
 
     internal func evaluateConditions() -> GroupOperation {
 
@@ -482,7 +482,7 @@ public extension Operation {
         return evaluator
     }
 
-    internal func addDependencyOnPreviousMutuallyExclusiveOperation(operation: Operation) {
+    internal func addDependencyOnPreviousMutuallyExclusiveOperation(operation: OldOperation) {
         precondition(state <= .Executing, "Dependencies cannot be modified after execution has begun, current state: \(state).")
         super.addDependency(operation)
     }
@@ -536,7 +536,7 @@ public extension Operation {
 
 // MARK: - Observers
 
-public extension Operation {
+public extension OldOperation {
 
     private(set) var observers: [OperationObserverType] {
         get {
@@ -576,7 +576,7 @@ public extension Operation {
 
 // MARK: - Execution
 
-public extension Operation {
+public extension OldOperation {
 
     /// Starts the operation, correctly managing the cancelled state. Cannot be over-ridden
     final override func start() {
@@ -596,10 +596,10 @@ public extension Operation {
         // Inform observers that the operation will execute
         willExecuteObservers.forEach { $0.willExecuteOperation(self) }
 
-        let nextState = stateLock.withCriticalScope { () -> (Operation.State?) in
-            assert(!executing, "Operation is attempting to execute, but is already executing.")
+        let nextState = stateLock.withCriticalScope { () -> (OldOperation.State?) in
+            assert(!executing, "OldOperation is attempting to execute, but is already executing.")
             guard !_isTransitioningToExecuting else {
-                assertionFailure("Operation is attempting to execute twice, concurrently.")
+                assertionFailure("OldOperation is attempting to execute twice, concurrently.")
                 return nil
             }
 
@@ -611,12 +611,12 @@ public extension Operation {
             // by an observer
             guard (_internalErrors.isEmpty && !cancelled) || disableAutomaticFinishing else {
                 _isHandlingFinish = true
-                return Operation.State.Finishing
+                return OldOperation.State.Finishing
             }
 
             // Transition to the .isExecuting state, and explicitly send the required KVO change notifications
             _isTransitioningToExecuting = true
-            return Operation.State.Executing
+            return OldOperation.State.Executing
         }
 
         guard nextState != .Finishing else {
@@ -628,7 +628,7 @@ public extension Operation {
 
         willChangeValueForKey(NSOperation.KeyPath.Executing.rawValue)
 
-        let nextState2 = stateLock.withCriticalScope { () -> (Operation.State?) in
+        let nextState2 = stateLock.withCriticalScope { () -> (OldOperation.State?) in
             // Re-check state, since it could have changed on another thread (ex. via finish)
             guard state <= .Pending else { return nil }
 
@@ -636,7 +636,7 @@ public extension Operation {
             _isTransitioningToExecuting = false
 
             if cancelled && !disableAutomaticFinishing && !_isHandlingFinish {
-                // Operation was cancelled, automatic finishing is enabled,
+                // OldOperation was cancelled, automatic finishing is enabled,
                 // but cancel is not (yet/ever?) handling the finish.
                 // Because cancel could have already passed the check for executing,
                 // handle calling finish here.
@@ -675,7 +675,7 @@ public extension Operation {
 
 // MARK: - Finishing
 
-public extension Operation {
+public extension OldOperation {
 
     /**
      Finish method which must be called eventually after an operation has
@@ -765,11 +765,11 @@ public extension Operation {
     }
 }
 
-private func < (lhs: Operation.State, rhs: Operation.State) -> Bool {
+private func < (lhs: OldOperation.State, rhs: OldOperation.State) -> Bool {
     return lhs.rawValue < rhs.rawValue
 }
 
-private func == (lhs: Operation.State, rhs: Operation.State) -> Bool {
+private func == (lhs: OldOperation.State, rhs: OldOperation.State) -> Bool {
     return lhs.rawValue == rhs.rawValue
 }
 
@@ -779,7 +779,7 @@ an Operation's conditions fail.
 */
 public enum OperationError: ErrorType, Equatable {
 
-    /// Indicates that a condition of the Operation failed.
+    /// Indicates that a condition of the OldOperation failed.
     case ConditionFailed
 
     /// Indicates that the operation timed out.
@@ -850,7 +850,7 @@ extension NSOperation {
         removeDependencies(dependencies)
     }
 
-    internal func setQualityOfServiceFromUserIntent(userIntent: Operation.UserIntent) {
+    internal func setQualityOfServiceFromUserIntent(userIntent: OldOperation.UserIntent) {
         qualityOfService = userIntent.qos
     }
 }
@@ -883,10 +883,10 @@ extension NSRecursiveLock {
 
 extension Array where Element: NSOperation {
 
-    internal var splitNSOperationsAndOperations: ([NSOperation], [Operation]) {
+    internal var splitNSOperationsAndOperations: ([NSOperation], [OldOperation]) {
         return reduce(([], [])) { result, element in
             var (ns, op) = result
-            if let operation = element as? Operation {
+            if let operation = element as? OldOperation {
                 op.append(operation)
             }
             else {
@@ -896,16 +896,16 @@ extension Array where Element: NSOperation {
         }
     }
 
-    internal var userIntent: Operation.UserIntent {
+    internal var userIntent: OldOperation.UserIntent {
         get {
             let (_, ops) = splitNSOperationsAndOperations
             return ops.map { $0.userIntent }.maxElement { $0.rawValue < $1.rawValue } ?? .None
         }
     }
 
-    internal func forEachOperation(@noescape body: (Operation) throws -> Void) rethrows {
+    internal func forEachOperation(@noescape body: (OldOperation) throws -> Void) rethrows {
         try forEach {
-            if let operation = $0 as? Operation {
+            if let operation = $0 as? OldOperation {
                 try body(operation)
             }
         }

@@ -9,7 +9,7 @@
 import Foundation
 
 /**
- TaskOperation is a simple Operation subclass which wraps NSTask
+ TaskOperation is a simple OldOperation subclass which wraps NSTask
 
  Construct the operation with a configured NSTask instance, when
  the operation is executed, the task will be launched. When the
@@ -23,7 +23,7 @@ import Foundation
  block to the initializer.
 
  */
-public class TaskOperation: Operation {
+public class TaskOperation: OldOperation {
 
     /// Error type for TaskOperation
     public enum Error: ErrorType, Equatable {

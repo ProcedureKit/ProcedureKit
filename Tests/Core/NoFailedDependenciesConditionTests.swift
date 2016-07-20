@@ -113,10 +113,10 @@ class NoFailedDependenciesConditionTests: OperationTests {
         let expectation = expectationWithDescription("Test: \(#function)")
 
         let operation = TestOperation()
-        operation.name = "Target Operation"
+        operation.name = "Target OldOperation"
 
         let child = TestOperation(delay: 0, error: TestOperation.Error.SimulatedError)
-        child.name = "Child Operation"
+        child.name = "Child OldOperation"
 
         let dependency = GroupOperation(operations: [child])
         dependency.name = "Dependency"

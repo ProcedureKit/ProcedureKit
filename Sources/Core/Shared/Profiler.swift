@@ -26,11 +26,11 @@ public struct OperationIdentity: Identifiable, Equatable {
 extension OperationIdentity: CustomStringConvertible {
 
     public var description: String {
-        return name.map { "\($0) #\(identifier)" } ?? "Unnamed Operation #\(identifier)"
+        return name.map { "\($0) #\(identifier)" } ?? "Unnamed OldOperation #\(identifier)"
     }
 }
 
-public extension Operation {
+public extension OldOperation {
 
     var identity: OperationIdentity {
         return OperationIdentity(identifier: identifier, name: name)
@@ -189,7 +189,7 @@ public final class OperationProfiler: Identifiable, Equatable {
     }
 
     func addChildOperation(operation: NSOperation, now: NSTimeInterval = CFAbsoluteTimeGetCurrent() as NSTimeInterval) {
-        if let operation = operation as? Operation {
+        if let operation = operation as? OldOperation {
             let profiler = OperationProfiler(parent: self)
             operation.addObserver(profiler)
             dispatch_sync(queue) { [unowned self] in
@@ -231,7 +231,7 @@ extension OperationProfiler: OperationProfilerReporter {
 
 extension OperationProfiler: OperationObserverType {
 
-    public func didAttachToOperation(operation: Operation) {
+    public func didAttachToOperation(operation: OldOperation) {
         dispatch_sync(queue) { [unowned self] in
             self.result = self.result.setIdentity(operation.identity)
         }
@@ -241,28 +241,28 @@ extension OperationProfiler: OperationObserverType {
 
 extension OperationProfiler: OperationWillExecuteObserver {
 
-    public func willExecuteOperation(operation: Operation) {
+    public func willExecuteOperation(operation: OldOperation) {
         addMetricNow(forEvent: .Started)
     }
 }
 
 extension OperationProfiler: OperationDidCancelObserver {
 
-    public func didCancelOperation(operation: Operation) {
+    public func didCancelOperation(operation: OldOperation) {
         addMetricNow(forEvent: .Cancelled)
     }
 }
 
 extension OperationProfiler: OperationDidFinishObserver {
 
-    public func didFinishOperation(operation: Operation, errors: [ErrorType]) {
+    public func didFinishOperation(operation: OldOperation, errors: [ErrorType]) {
         addMetricNow(forEvent: .Finished)
     }
 }
 
 extension OperationProfiler: OperationDidProduceOperationObserver {
 
-    public func operation(operation: Operation, didProduceOperation newOperation: NSOperation) {
+    public func operation(operation: OldOperation, didProduceOperation newOperation: NSOperation) {
         addChildOperation(newOperation)
     }
 }

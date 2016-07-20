@@ -24,7 +24,7 @@ class ReachableOperationTests: OperationTests {
     }
 
     func test__operation_name() {
-        XCTAssertEqual(operation.operationName, "Reachable Operation <Test Operation>")
+        XCTAssertEqual(operation.operationName, "Reachable OldOperation <Test OldOperation>")
     }
 
     func test__connectivity() {

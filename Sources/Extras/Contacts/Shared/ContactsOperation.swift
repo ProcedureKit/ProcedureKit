@@ -31,7 +31,7 @@ public typealias RemoveContactsFromGroup = _RemoveContactsFromGroup<SystemContac
 // MARK: - ContactsAccess
 
 @available(iOS 9.0, OSX 10.11, *)
-public class _ContactsAccess<Store: ContactStoreType>: Operation {
+public class _ContactsAccess<Store: ContactStoreType>: OldOperation {
 
     let entityType: CNEntityType
     public let store: Store
@@ -99,7 +99,7 @@ public class _ContactsOperation<Store: ContactStoreType>: _ContactsAccess<Store>
     public init(containerId: ContainerID = .Default, entityType: CNEntityType = .Contacts, contactStore: Store = Store()) {
         self.containerId = containerId
         super.init(entityType: entityType, contactStore: contactStore)
-        name = "Contacts Operation"
+        name = "Contacts OldOperation"
     }
 
     // Public API

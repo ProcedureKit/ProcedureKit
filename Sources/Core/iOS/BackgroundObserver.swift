@@ -25,7 +25,7 @@ if the app goes in the background.
 */
 public class BackgroundObserver: NSObject {
 
-    static let backgroundTaskName = "Background Operation Observer"
+    static let backgroundTaskName = "Background OldOperation Observer"
 
     private var identifier: UIBackgroundTaskIdentifier? = .None
     private let application: BackgroundTaskApplicationInterface
@@ -88,7 +88,7 @@ public class BackgroundObserver: NSObject {
 extension BackgroundObserver: OperationDidFinishObserver {
 
     /// Conforms to `OperationDidFinishObserver`, will end any background task that has been started.
-    public func didFinishOperation(operation: Operation, errors: [ErrorType]) {
+    public func didFinishOperation(operation: OldOperation, errors: [ErrorType]) {
         endBackgroundTask()
     }
 }

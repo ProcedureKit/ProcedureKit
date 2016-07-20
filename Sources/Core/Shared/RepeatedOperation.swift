@@ -162,14 +162,14 @@ public class RepeatedOperation<T where T: NSOperation>: GroupOperation {
     public init(maxCount max: Int? = .None, generator gen: AnyGenerator<Payload>) {
 
         guard let payload = gen.next() else {
-            preconditionFailure("Operation Generator must return an instance initially.")
+            preconditionFailure("OldOperation Generator must return an instance initially.")
         }
 
         current = payload.operation
         generator = RepeatedOperation<T>.createPayloadGeneratorWithMaxCount(max, generator: gen)
 
         super.init(operations: [])
-        name = "Repeated Operation <\(T.self)>"
+        name = "Repeated OldOperation <\(T.self)>"
     }
 
     /**
@@ -187,14 +187,14 @@ public class RepeatedOperation<T where T: NSOperation>: GroupOperation {
         var mapped = MapGenerator(tuple) { RepeatedPayload(delay: $0.0, operation: $0.1, configure: .None) }
 
         guard let payload = mapped.next() else {
-            preconditionFailure("Operation Generator must return an instance initially.")
+            preconditionFailure("OldOperation Generator must return an instance initially.")
         }
 
         current = payload.operation
         generator = RepeatedOperation<T>.createPayloadGeneratorWithMaxCount(max, generator: AnyGenerator(mapped))
 
         super.init(operations: [])
-        name = "Repeated Operation <\(T.self)>"
+        name = "Repeated OldOperation <\(T.self)>"
     }
 
     /**
@@ -234,13 +234,13 @@ public class RepeatedOperation<T where T: NSOperation>: GroupOperation {
         var mapped = MapGenerator(tuple) { RepeatedPayload(delay: $0.0, operation: $0.1, configure: .None) }
 
         guard let payload = mapped.next() else {
-            preconditionFailure("Operation Generator must return an instance initially.")
+            preconditionFailure("OldOperation Generator must return an instance initially.")
         }
 
         current = payload.operation
         generator = RepeatedOperation<T>.createPayloadGeneratorWithMaxCount(max, generator: AnyGenerator(mapped))
         super.init(operations: [])
-        name = "Repeated Operation <\(T.self)>"
+        name = "Repeated OldOperation <\(T.self)>"
     }
 
     /// Public override of execute which configures and adds the first operation
@@ -258,7 +258,7 @@ public class RepeatedOperation<T where T: NSOperation>: GroupOperation {
      it calls `addNextOperation()`.
 
      When subclassing, be very careful if downcasting `T` to
-     say `Operation` instead of `MyOperation` (i.e. your specific
+     say `OldOperation` instead of `MyOperation` (i.e. your specific
      operation which should be repeated).
      */
     public override func willAttemptRecoveryFromErrors(errors: [ErrorType], inOperation operation: NSOperation) -> Bool {
@@ -274,7 +274,7 @@ public class RepeatedOperation<T where T: NSOperation>: GroupOperation {
      it calls `addNextOperation()`.
 
      When subclassing, be very careful if downcasting `T` to
-     say `Operation` instead of `MyOperation` (i.e. your specific
+     say `OldOperation` instead of `MyOperation` (i.e. your specific
      operation which should be repeated).
     */
     public override func willFinishOperation(operation: NSOperation) {

@@ -9,7 +9,7 @@
 import Foundation
 
 /**
- Allows a `NSOperation` to be composed inside an `Operation`,
+ Allows a `NSOperation` to be composed inside an `OldOperation`,
  with a block to act as a gate.
 
  Use this class to execute another operation depending on other

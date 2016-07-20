@@ -27,7 +27,7 @@ import Foundation
 
  In almost all cases the requirement can be the *result* of another
  operation. Even reading data from the disk should be framed in the
- context of an asychonous task suitable for an Operation. Therefore in
+ context of an asychonous task suitable for an OldOperation. Therefore in
  general we wish to take the result from one operation and set it as
  the requirement on another. This implies an operation dependency. The
  data-processing operation depends upon the successful completion of
@@ -37,7 +37,7 @@ import Foundation
  data-processing operation conform to `InjectionOperationType`.
 
  ```swift
- class DataProcessing: Operation, InjectionOperationType {
+ class DataProcessing: OldOperation, InjectionOperationType {
     // etc
  }
  ```
@@ -75,19 +75,19 @@ import Foundation
 */
 public protocol InjectionOperationType: class { }
 
-extension InjectionOperationType where Self: Operation {
+extension InjectionOperationType where Self: OldOperation {
 
     /**
      Access the completed dependency operation before `self` is
      started. This can be useful for transfering results/data between
      operations.
 
-     - parameters dep: any `Operation` subclass.
+     - parameters dep: any `OldOperation` subclass.
      - parameters block: a closure which receives `self`, the dependent
      operation, and an array of `ErrorType`, and returns Void.
      - returns: `self` - so that injections can be chained together.
     */
-    public func injectResultFromDependency<T where T: Operation>(dep: T, block: (operation: Self, dependency: T, errors: [ErrorType]) -> Void) -> Self {
+    public func injectResultFromDependency<T where T: OldOperation>(dep: T, block: (operation: Self, dependency: T, errors: [ErrorType]) -> Void) -> Self {
         dep.addObserver(WillFinishObserver { [weak self] op, errors in
             if let strongSelf = self, dep = op as? T {
                 block(operation: strongSelf, dependency: dep, errors: errors)
@@ -95,10 +95,10 @@ extension InjectionOperationType where Self: Operation {
         })
         dep.addObserver(DidCancelObserver { [weak self] op in
             if let strongSelf = self, _ = op as? T {
-                (strongSelf as Operation).cancel()
+                (strongSelf as OldOperation).cancel()
             }
         })
-        (self as Operation).addDependency(dep)
+        (self as OldOperation).addDependency(dep)
         return self
     }
 }
@@ -142,7 +142,7 @@ public enum AutomaticInjectionError: ErrorType {
     case RequirementNotSatisfied
 }
 
-extension AutomaticInjectionOperationType where Self: Operation {
+extension AutomaticInjectionOperationType where Self: OldOperation {
 
     /**
      Inject the result from one operation as the requirement of
@@ -150,13 +150,13 @@ extension AutomaticInjectionOperationType where Self: Operation {
      data processing operation classes:
 
      ```swift
-     class DataRetrieval: Operation, ResultOperationType {
+     class DataRetrieval: OldOperation, ResultOperationType {
         var result: NSData? = .None
 
         // etc etc
      }
 
-     class DataProcessing: Operation, AutomaticInjectionOperationType {
+     class DataProcessing: OldOperation, AutomaticInjectionOperationType {
         var requirement: NSData? = .None
 
         // etc etc
@@ -175,7 +175,7 @@ extension AutomaticInjectionOperationType where Self: Operation {
      - parameter dep: an operation of type T
      - returns: the receiver
     */
-    public func injectResultFromDependency<T where T: Operation, T: ResultOperationType, T.Result == Requirement>(dep: T) -> Self {
+    public func injectResultFromDependency<T where T: OldOperation, T: ResultOperationType, T.Result == Requirement>(dep: T) -> Self {
         return injectResultFromDependency(dep) { [weak self] operation, dependency, errors in
             if errors.isEmpty {
                 self?.requirement = dependency.result
@@ -202,7 +202,7 @@ extension AutomaticInjectionOperationType where Self: Operation {
      - parameter dep: an operation of type T
      - returns: the receiver
     */
-    public func requireResultFromDependency<T where T: Operation, T: ResultOperationType, T.Result == Requirement>(dep: T) -> Self {
+    public func requireResultFromDependency<T where T: OldOperation, T: ResultOperationType, T.Result == Requirement>(dep: T) -> Self {
         if conditions.filter({ return $0 is NoFailedDependenciesCondition }).count < 1 {
             addCondition(NoFailedDependenciesCondition())
         }
@@ -211,7 +211,7 @@ extension AutomaticInjectionOperationType where Self: Operation {
 }
 
 
-/// Protocol for non-Operation types to conform to yet enjoy scheduling in Operation
+/// Protocol for non-OldOperation types to conform to yet enjoy scheduling in OldOperation
 public protocol Executor: ResultOperationType, AutomaticInjectionOperationType {
 
     /** 
@@ -230,7 +230,7 @@ public protocol Executor: ResultOperationType, AutomaticInjectionOperationType {
 }
 
 /**
- Execute is an Operation which is intended to compose other types which _perform work_. These
+ Execute is an OldOperation which is intended to compose other types which _perform work_. These
  types must conform to Executor protocol, and essentially expose API to trigger execution of
  the work, support cancellation, and extend protocols for result injection.
 
@@ -238,7 +238,7 @@ public protocol Executor: ResultOperationType, AutomaticInjectionOperationType {
  call execute on the Executor, and catch any thrown errors. If the operation is cancelled, it
  will call cancel on the executor.
  */
-public final class Execute<E: Executor>: Operation, ResultOperationType, AutomaticInjectionOperationType {
+public final class Execute<E: Executor>: OldOperation, ResultOperationType, AutomaticInjectionOperationType {
 
     /// - returns: executor, the instance of the Executor
     public let executor: E

@@ -75,16 +75,16 @@ extension RepeatedOperation where T: Repeatable {
 }
 
 /**
- RepeatableOperation is an Operation subclass which conforms to Repeatable.
+ RepeatableOperation is an OldOperation subclass which conforms to Repeatable.
 
- It can be used to make an otherwise non-repeatable Operation repeatable. It
+ It can be used to make an otherwise non-repeatable OldOperation repeatable. It
  does this by accepting, in addition to the operation instance, a closure
  shouldRepeat. This closure can be used to capture state (such as errors).
 
  When conforming to Repeatable, the closure is executed, passing in the
  current repeat count.
  */
-public class RepeatableOperation<T: Operation>: Operation, OperationDidFinishObserver, Repeatable {
+public class RepeatableOperation<T: OldOperation>: OldOperation, OperationDidFinishObserver, Repeatable {
 
     let operation: T
     let shouldRepeatBlock: Int -> Bool
@@ -102,7 +102,7 @@ public class RepeatableOperation<T: Operation>: Operation, OperationDidFinishObs
         super.init()
         name = "Repeatable<\(operation.operationName)>"
         addObserver(DidCancelObserver { [weak operation] _ in
-            (operation as? Operation)?.cancel()
+            (operation as? OldOperation)?.cancel()
         })
     }
 
@@ -120,7 +120,7 @@ public class RepeatableOperation<T: Operation>: Operation, OperationDidFinishObs
     }
 
     /// Implementation for OperationDidFinishObserver
-    public func didFinishOperation(operation: Operation, errors: [ErrorType]) {
+    public func didFinishOperation(operation: OldOperation, errors: [ErrorType]) {
         if self.operation == operation {
             finish(errors)
         }

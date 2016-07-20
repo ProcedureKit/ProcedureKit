@@ -37,7 +37,7 @@ public class ReachableOperation<T: NSOperation>: ComposedOperation<T> {
     public init(_ operation: T, connectivity: Reachability.Connectivity = .AnyConnectionKind) {
         self.connectivity = connectivity
         super.init(operation: operation)
-        name = "Reachable Operation <\(operation.operationName)>"
+        name = "Reachable OldOperation <\(operation.operationName)>"
     }
 
     public override func execute() {

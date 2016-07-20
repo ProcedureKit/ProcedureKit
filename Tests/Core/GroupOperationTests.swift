@@ -82,7 +82,7 @@ class GroupOperationTests: OperationTests {
         let operations: [TestOperation] = (0..<3).map { i in
             let op = TestOperation()
             op.addCondition(BlockCondition { true })
-            let exp = self.expectationWithDescription("Group Operation, child \(i): \(#function)")
+            let exp = self.expectationWithDescription("Group OldOperation, child \(i): \(#function)")
             self.addCompletionBlockToTestOperation(op, withExpectation: exp)
             return op
         }
@@ -113,7 +113,7 @@ class GroupOperationTests: OperationTests {
     func test__group_operation_exits_correctly_when_child_errors() {
 
         let numberOfOperations = 10_000
-        let operations = (0..<numberOfOperations).map { i -> Operation in
+        let operations = (0..<numberOfOperations).map { i -> OldOperation in
             let block = BlockOperation { (completion: BlockOperation.ContinuationBlockType) in
                 let error = NSError(domain: "me.danthorpe.Operations.Tests", code: -9_999, userInfo: nil)
                 completion(error: error)
@@ -233,7 +233,7 @@ class GroupOperationTests: OperationTests {
         let test3 = NSBlockOperation { }
         
         let group = GroupOperation(operations: [ test1, test2, test3 ])
-        XCTAssertEqual(group.userIntent, Operation.UserIntent.Initiated)
+        XCTAssertEqual(group.userIntent, OldOperation.UserIntent.Initiated)
     }
     
     func test__group_operation__sets_user_intent_on_child_operations() {
@@ -244,8 +244,8 @@ class GroupOperationTests: OperationTests {
         
         let group = GroupOperation(operations: [ test1, test2, test3 ])
         group.userIntent = .SideEffect
-        XCTAssertEqual(test1.userIntent, Operation.UserIntent.SideEffect)
-        XCTAssertEqual(test2.userIntent, Operation.UserIntent.SideEffect)
+        XCTAssertEqual(test1.userIntent, OldOperation.UserIntent.SideEffect)
+        XCTAssertEqual(test2.userIntent, OldOperation.UserIntent.SideEffect)
         XCTAssertEqual(test3.qualityOfService, NSQualityOfService.UserInitiated)
     }
 
@@ -424,7 +424,7 @@ class GroupOperationTests: OperationTests {
     
     func test__group_operation_ignores_queue_delegate_calls_from_other_queues() {
         class PoorlyWrittenGroupOperationSubclass: GroupOperation {
-            private var subclassQueue = OperationQueue()
+            private var subclassQueue = OldOperationQueue()
             override init(operations: [NSOperation]) {
                 super.init(operations: operations)
                 subclassQueue.delegate = self

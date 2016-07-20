@@ -9,13 +9,13 @@
 import Foundation
 
 /**
-An `Operation` subclass to compose a block. The block type receives
+An `OldOperation` subclass to compose a block. The block type receives
 a "continuation block" as its only argument. The block provided must
 call this block to correctly finish the operation. It can be called
 with a nil error argument to finish with no errors. Or an `ErrorType`
 argument to finish with the supplied error.
 */
-public class BlockOperation: Operation {
+public class BlockOperation: OldOperation {
 
     public typealias ContinuationBlockType = (error: ErrorType?) -> Void
     public typealias BlockType = (continueWithError: ContinuationBlockType) -> Void
@@ -31,7 +31,7 @@ public class BlockOperation: Operation {
     public init(block: BlockType = { continuation in continuation(error: nil) }) {
         self.block = block
         super.init()
-        name = "Block Operation"
+        name = "Block OldOperation"
     }
 
     /**

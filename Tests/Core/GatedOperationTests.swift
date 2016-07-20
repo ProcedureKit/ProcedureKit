@@ -26,7 +26,7 @@ class GatedOperationTests: OperationTests {
     func test__when_gate_is_open_operation_is_performed() {
         let gate = GatedOperation(TestOperation()) { return true }
         addCompletionBlockToTestOperation(gate, withExpectation: expectationWithDescription("Test: \(#function), Gate"))
-        addCompletionBlockToTestOperation(gate.operation, withExpectation: expectationWithDescription("Test: \(#function), Operation"))
+        addCompletionBlockToTestOperation(gate.operation, withExpectation: expectationWithDescription("Test: \(#function), OldOperation"))
 
         runOperation(gate)
 

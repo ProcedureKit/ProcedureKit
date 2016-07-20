@@ -24,7 +24,7 @@ public class RemoteNotificationCondition: Condition {
         case ReceivedError(NSError)
     }
 
-    static let queue = OperationQueue()
+    static let queue = OldOperationQueue()
 
     public static func didReceiveNotificationToken(token: NSData) {
         NSNotificationCenter
@@ -45,7 +45,7 @@ public class RemoteNotificationCondition: Condition {
         }
     }
 
-    var queue: OperationQueue {
+    var queue: OldOperationQueue {
         return RemoteNotificationCondition.queue
     }
 
@@ -56,7 +56,7 @@ public class RemoteNotificationCondition: Condition {
         addDependency(RemoteNotificationsRegistration(registrar: registrar) { _ in })
     }
 
-    public override func evaluate(operation: Operation, completion: OperationConditionResult -> Void) {
+    public override func evaluate(operation: OldOperation, completion: OperationConditionResult -> Void) {
         let operation = RemoteNotificationsRegistration(registrar: registrar) { result in
             switch result {
             case .Token(_):
@@ -69,7 +69,7 @@ public class RemoteNotificationCondition: Condition {
     }
 }
 
-public class RemoteNotificationsRegistration: Operation {
+public class RemoteNotificationsRegistration: OldOperation {
 
     public enum RegistrationResult {
         case Token(NSData)

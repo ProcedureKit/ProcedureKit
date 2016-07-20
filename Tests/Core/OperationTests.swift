@@ -9,7 +9,7 @@
 import XCTest
 @testable import Operations
 
-class TestOperation: Operation, ResultOperationType {
+class TestOperation: OldOperation, ResultOperationType {
 
     enum Error: ErrorType {
         case SimulatedError
@@ -31,7 +31,7 @@ class TestOperation: Operation, ResultOperationType {
         simulatedError = error
         producedOperation = produced
         super.init()
-        name = "Test Operation"
+        name = "Test OldOperation"
     }
 
     override func execute() {
@@ -74,11 +74,11 @@ struct TestCondition: OperationCondition {
     let dependency: NSOperation?
     let condition: () -> Bool
 
-    func dependencyForOperation(operation: Operation) -> NSOperation? {
+    func dependencyForOperation(operation: OldOperation) -> NSOperation? {
         return dependency
     }
 
-    func evaluateForOperation(operation: Operation, completion: OperationConditionResult -> Void) {
+    func evaluateForOperation(operation: OldOperation, completion: OperationConditionResult -> Void) {
         completion(condition() ? .Satisfied : .Failed(BlockCondition.Error.BlockConditionFailed))
     }
 }
@@ -95,7 +95,7 @@ class TestConditionOperation: Condition {
         }
     }
 
-    override func evaluate(operation: Operation, completion: CompletionBlockType) {
+    override func evaluate(operation: OldOperation, completion: CompletionBlockType) {
         do {
             let success = try evaluate()
             completion(success ? .Satisfied : .Failed(OperationError.ConditionFailed))
@@ -124,36 +124,36 @@ class TestQueueDelegate: OperationQueueDelegate {
         self.didFinishOperation = didFinishOperation
     }
 
-    func operationQueue(queue: OperationQueue, willAddOperation operation: NSOperation) {
+    func operationQueue(queue: OldOperationQueue, willAddOperation operation: NSOperation) {
         did_willAddOperation = true
     }
 
-    func operationQueue(queue: OperationQueue, willFinishOperation operation: NSOperation, withErrors errors: [ErrorType]) {
+    func operationQueue(queue: OldOperationQueue, willFinishOperation operation: NSOperation, withErrors errors: [ErrorType]) {
         did_operationWillFinish = true
         did_numberOfErrorThatOperationDidFinish = errors.count
         willFinishOperation?(operation, errors)
     }
 
-    func operationQueue(queue: OperationQueue, didFinishOperation operation: NSOperation, withErrors errors: [ErrorType]) {
+    func operationQueue(queue: OldOperationQueue, didFinishOperation operation: NSOperation, withErrors errors: [ErrorType]) {
         did_operationDidFinish = true
         did_numberOfErrorThatOperationDidFinish = errors.count
         didFinishOperation?(operation, errors)
     }
     
-    func operationQueue(queue: OperationQueue, willProduceOperation operation: NSOperation) {
+    func operationQueue(queue: OldOperationQueue, willProduceOperation operation: NSOperation) {
         did_willProduceOperation = true
     }
 }
 
 class OperationTests: XCTestCase {
 
-    var queue: OperationQueue!
+    var queue: OldOperationQueue!
     var delegate: TestQueueDelegate!
 
     override func setUp() {
         super.setUp()
         LogManager.severity = .Fatal
-        queue = OperationQueue()
+        queue = OldOperationQueue()
         delegate = TestQueueDelegate()
         queue.delegate = delegate
     }
@@ -179,14 +179,14 @@ class OperationTests: XCTestCase {
         queue.addOperations(operations, waitUntilFinished: false)
     }
 
-    func waitForOperation(operation: Operation, withExpectationDescription text: String = #function) {
+    func waitForOperation(operation: OldOperation, withExpectationDescription text: String = #function) {
         addCompletionBlockToTestOperation(operation, withExpectationDescription: text)
         queue.delegate = delegate
         queue.addOperation(operation)
         waitForExpectationsWithTimeout(3, handler: nil)
     }
 
-    func waitForOperations(operations: Operation..., withExpectationDescription text: String = #function) {
+    func waitForOperations(operations: OldOperation..., withExpectationDescription text: String = #function) {
         for (i, op) in operations.enumerate() {
             addCompletionBlockToTestOperation(op, withExpectationDescription: "\(i), \(text)")
         }
@@ -195,14 +195,14 @@ class OperationTests: XCTestCase {
         waitForExpectationsWithTimeout(3, handler: nil)
     }
 
-    func addCompletionBlockToTestOperation(operation: Operation, withExpectation expectation: XCTestExpectation) {
+    func addCompletionBlockToTestOperation(operation: OldOperation, withExpectation expectation: XCTestExpectation) {
         weak var weakExpectation = expectation
         operation.addObserver(DidFinishObserver { _, _ in
             weakExpectation?.fulfill()
         })
     }
 
-    func addCompletionBlockToTestOperation(operation: Operation, withExpectationDescription text: String = #function) -> XCTestExpectation {
+    func addCompletionBlockToTestOperation(operation: OldOperation, withExpectationDescription text: String = #function) -> XCTestExpectation {
         let expectation = expectationWithDescription("Test: \(text), \(NSUUID().UUIDString)")
         operation.addObserver(DidFinishObserver { _, _ in
             expectation.fulfill()
