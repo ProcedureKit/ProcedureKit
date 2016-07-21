@@ -15,7 +15,7 @@ class StressTest: OperationTests {
     let batches = 1
     let batchSize = 10_000
 
-    func test__completion_blocks() {
+    func disable_test__completion_blocks() {
         (0..<batchSize).forEach { i in
             let expectation = self.expectation(description: "Interation: \(i)")
             let operation = OldBlockOperation { }
