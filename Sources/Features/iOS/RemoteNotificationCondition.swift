@@ -24,7 +24,7 @@ public class RemoteNotificationCondition: Condition {
         case receivedError(NSError)
     }
 
-    static let queue = OldOperationQueue()
+    static let queue = ProcedureQueue()
 
     public static func didReceiveNotificationToken(_ token: Data) {
         NotificationCenter.default
@@ -43,7 +43,7 @@ public class RemoteNotificationCondition: Condition {
         }
     }
 
-    var queue: OldOperationQueue {
+    var queue: ProcedureQueue {
         return RemoteNotificationCondition.queue
     }
 

@@ -1,5 +1,5 @@
 //
-//  OldOperationQueue.swift
+//  ProcedureQueue.swift
 //  Operations
 //
 //  Created by Daniel Thorpe on 26/06/2015.
@@ -9,7 +9,7 @@
 import Foundation
 
 /**
-A protocol which the `OldOperationQueue`'s delegate must conform to. The delegate is informed
+A protocol which the `ProcedureQueue`'s delegate must conform to. The delegate is informed
 when the queue is about to add an operation, and when operations finish. Because it is a
 delegate protocol, conforming types must be classes, as the queue weakly owns it.
 */
@@ -19,45 +19,45 @@ public protocol OperationQueueDelegate: class {
     The operation queue will add a new operation. This is for information only, the
     delegate cannot affect whether the operation is added, or other control flow.
 
-    - paramter queue: the `OldOperationQueue`.
+    - paramter queue: the `ProcedureQueue`.
     - paramter operation: the `NSOperation` instance about to be added.
     */
-    func operationQueue(_ queue: OldOperationQueue, willAddOperation operation: Operation)
+    func operationQueue(_ queue: ProcedureQueue, willAddOperation operation: Operation)
 
     /**
     An operation has finished on the queue.
 
-    - parameter queue: the `OldOperationQueue`.
+    - parameter queue: the `ProcedureQueue`.
     - parameter operation: the `NSOperation` instance which finished.
     - parameter errors: an array of `ErrorType`s.
     */
-    func operationQueue(_ queue: OldOperationQueue, willFinishOperation operation: Operation, withErrors errors: [ErrorProtocol])
+    func operationQueue(_ queue: ProcedureQueue, willFinishOperation operation: Operation, withErrors errors: [ErrorProtocol])
 
     /**
      An operation has finished on the queue.
 
-     - parameter queue: the `OldOperationQueue`.
+     - parameter queue: the `ProcedureQueue`.
      - parameter operation: the `NSOperation` instance which finished.
      - parameter errors: an array of `ErrorType`s.
      */
-    func operationQueue(_ queue: OldOperationQueue, didFinishOperation operation: Operation, withErrors errors: [ErrorProtocol])
+    func operationQueue(_ queue: ProcedureQueue, didFinishOperation operation: Operation, withErrors errors: [ErrorProtocol])
 
     /**
      The operation queue will add a new operation via produceOperation().
      This is for information only, the delegate cannot affect whether the operation
      is added, or other control flow.
 
-     - paramter queue: the `OldOperationQueue`.
+     - paramter queue: the `ProcedureQueue`.
      - paramter operation: the `NSOperation` instance about to be added.
      */
-    func operationQueue(_ queue: OldOperationQueue, willProduceOperation operation: Operation)
+    func operationQueue(_ queue: ProcedureQueue, willProduceOperation operation: Operation)
 }
 
 /**
 An `NSOperationQueue` subclass which supports the features of Operations. All functionality
 is achieved via the overridden functionality of `addOperation`.
 */
-public class OldOperationQueue: OperationQueue {
+public class ProcedureQueue: OperationQueue {
 
     #if swift(>=3.0)
         // (SR-192 is fixed in Swift 3)
@@ -228,24 +228,24 @@ public extension OperationQueue {
 }
 
 
-public extension OldOperationQueue {
+public extension ProcedureQueue {
 
     private static let sharedMainQueue = MainQueue()
 
     /**
-     Override NSOperationQueue's mainQueue() to return the main queue as an OldOperationQueue
+     Override NSOperationQueue's mainQueue() to return the main queue as an ProcedureQueue
 
      - returns: The main queue
      */
-    public override class var main: OldOperationQueue { return sharedMainQueue }
+    public override class var main: ProcedureQueue { return sharedMainQueue }
 //
-//    public override class func mainQueue() -> OldOperationQueue {
+//    public override class func mainQueue() -> ProcedureQueue {
 //        return sharedMainQueue
 //    }
 }
 
-/// OldOperationQueue wrapper around the main queue
-private class MainQueue: OldOperationQueue {
+/// ProcedureQueue wrapper around the main queue
+private class MainQueue: ProcedureQueue {
     override init() {
         super.init()
         underlyingQueue = DispatchQueue.main

@@ -54,14 +54,14 @@ class StressTest: OperationTests {
         //
         // Affects: Swift < 3
         // Fixed in: Swift 3.0+
-        // Without the code fix (marked with SR-192) in OldOperationQueue.swift, 
+        // Without the code fix (marked with SR-192) in ProcedureQueue.swift, 
         // this test will crash with EXC_BAD_ACCESS, or sometimes other errors.
         //
         class TestDelegate: OperationQueueDelegate {
-            func operationQueue(_ queue: OldOperationQueue, willAddOperation operation: Operation) { /* do nothing */ }
-            func operationQueue(_ queue: OldOperationQueue, willFinishOperation operation: Operation, withErrors errors: [ErrorProtocol]) { /* do nothing */ }
-            func operationQueue(_ queue: OldOperationQueue, didFinishOperation operation: Operation, withErrors errors: [ErrorProtocol]) { /* do nothing */ }
-            func operationQueue(_ queue: OldOperationQueue, willProduceOperation operation: Operation) { /* do nothing */ }
+            func operationQueue(_ queue: ProcedureQueue, willAddOperation operation: Operation) { /* do nothing */ }
+            func operationQueue(_ queue: ProcedureQueue, willFinishOperation operation: Operation, withErrors errors: [ErrorProtocol]) { /* do nothing */ }
+            func operationQueue(_ queue: ProcedureQueue, didFinishOperation operation: Operation, withErrors errors: [ErrorProtocol]) { /* do nothing */ }
+            func operationQueue(_ queue: ProcedureQueue, willProduceOperation operation: Operation) { /* do nothing */ }
         }
         
         let expectation = self.expectation(description: "Test: \(#function)")
@@ -70,7 +70,7 @@ class StressTest: OperationTests {
         (Queue.initiated.queue).async {
             let group = DispatchGroup()
             for _ in 0..<1000000 {
-                let testQueue = OldOperationQueue()
+                let testQueue = ProcedureQueue()
                 testQueue.delegate = TestDelegate()
                 
                 Queue.default.queue.async(group: group) {
@@ -158,7 +158,7 @@ class StressTest: OperationTests {
         (1...batches).forEach { batch in
             autoreleasepool {
                 let batchStartTime = CFAbsoluteTimeGetCurrent()
-                let queue = OldOperationQueue()
+                let queue = ProcedureQueue()
                 queue.isSuspended = false
                 let finishCount = Counter()
                 let operationDispatchGroup = DispatchGroup()
@@ -214,7 +214,7 @@ class StressTest: OperationTests {
         (1...batches).forEach { batch in
             autoreleasepool {
                 let batchStartTime = CFAbsoluteTimeGetCurrent()
-                let queue = OldOperationQueue()
+                let queue = ProcedureQueue()
                 queue.isSuspended = false
                 let operationDispatchGroup = DispatchGroup()
                 weak var didFinishAllOperationsExpectation = expectation(description: "Test: \(#function), Finished All Operations, batch \(batch)")
@@ -266,7 +266,7 @@ class StressTest: OperationTests {
         (1...batches).forEach { batch in
             autoreleasepool {
                 let batchStartTime = CFAbsoluteTimeGetCurrent()
-                let queue = OldOperationQueue()
+                let queue = ProcedureQueue()
                 queue.isSuspended = false
                 let operationDispatchGroup = DispatchGroup()
                 weak var didCreateAllOperationsExpectation = expectation(description: "Test: \(#function), Finished Creating Operations, batch \(batch)")

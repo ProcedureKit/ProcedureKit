@@ -38,7 +38,7 @@ public typealias OperationConditionResult = ConditionResult
 
 /**
 Types which conform to `OperationCondition` can be added to `Procedure`
-subclasses before they are added to an `OldOperationQueue`. If the condition
+subclasses before they are added to an `ProcedureQueue`. If the condition
 returns an `NSOperation` dependency, the dependency relationship will be
 set and it is added to the queue automatically.
 

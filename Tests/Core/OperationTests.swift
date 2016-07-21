@@ -124,36 +124,36 @@ class TestQueueDelegate: OperationQueueDelegate {
         self.didFinishOperation = didFinishOperation
     }
 
-    func operationQueue(_ queue: OldOperationQueue, willAddOperation operation: Operation) {
+    func operationQueue(_ queue: ProcedureQueue, willAddOperation operation: Operation) {
         did_willAddOperation = true
     }
 
-    func operationQueue(_ queue: OldOperationQueue, willFinishOperation operation: Operation, withErrors errors: [ErrorProtocol]) {
+    func operationQueue(_ queue: ProcedureQueue, willFinishOperation operation: Operation, withErrors errors: [ErrorProtocol]) {
         did_operationWillFinish = true
         did_numberOfErrorThatOperationDidFinish = errors.count
         willFinishOperation?(operation, errors)
     }
 
-    func operationQueue(_ queue: OldOperationQueue, didFinishOperation operation: Operation, withErrors errors: [ErrorProtocol]) {
+    func operationQueue(_ queue: ProcedureQueue, didFinishOperation operation: Operation, withErrors errors: [ErrorProtocol]) {
         did_operationDidFinish = true
         did_numberOfErrorThatOperationDidFinish = errors.count
         didFinishOperation?(operation, errors)
     }
     
-    func operationQueue(_ queue: OldOperationQueue, willProduceOperation operation: Operation) {
+    func operationQueue(_ queue: ProcedureQueue, willProduceOperation operation: Operation) {
         did_willProduceOperation = true
     }
 }
 
 class OperationTests: XCTestCase {
 
-    var queue: OldOperationQueue!
+    var queue: ProcedureQueue!
     var delegate: TestQueueDelegate!
 
     override func setUp() {
         super.setUp()
         LogManager.severity = .fatal
-        queue = OldOperationQueue()
+        queue = ProcedureQueue()
         delegate = TestQueueDelegate()
         queue.delegate = delegate
     }

@@ -424,7 +424,7 @@ class GroupOperationTests: OperationTests {
     
     func test__group_operation_ignores_queue_delegate_calls_from_other_queues() {
         class PoorlyWrittenGroupOperationSubclass: GroupOperation {
-            private var subclassQueue = OldOperationQueue()
+            private var subclassQueue = ProcedureQueue()
             override init(operations: [Operation]) {
                 super.init(operations: operations)
                 subclassQueue.delegate = self

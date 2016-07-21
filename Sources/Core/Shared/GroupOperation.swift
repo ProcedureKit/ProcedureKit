@@ -48,8 +48,8 @@ public class GroupOperation: Procedure, OperationQueueDelegate {
     private let groupFinishLock = RecursiveLock()
     private var isAddingOperationsGroup = DispatchGroup()
 
-    /// - returns: the OldOperationQueue the group runs operations on.
-    public let queue = OldOperationQueue()
+    /// - returns: the ProcedureQueue the group runs operations on.
+    public let queue = ProcedureQueue()
 
     /// - returns: the operations which have been added to the queue
     public private(set) var operations: [Operation] {
@@ -248,7 +248,7 @@ public class GroupOperation: Procedure, OperationQueueDelegate {
      when there are no more operations in the group operation, safely handling the transition of
      group operation state.
      */
-    public func operationQueue(_ queue: OldOperationQueue, willAddOperation operation: Operation) {
+    public func operationQueue(_ queue: ProcedureQueue, willAddOperation operation: Operation) {
         guard queue === self.queue else { return }
 
         assert(!finishingOperation.isExecuting, "Cannot add new operations to a group after the group has started to finish.")
@@ -281,7 +281,7 @@ public class GroupOperation: Procedure, OperationQueueDelegate {
      operation is the finishing operation, we finish the group operation here. Else, the group is
      notified (using `operationDidFinish` that a child operation has finished.
      */
-    public func operationQueue(_ queue: OldOperationQueue, willFinishOperation operation: Operation, withErrors errors: [ErrorProtocol]) {
+    public func operationQueue(_ queue: ProcedureQueue, willFinishOperation operation: Operation, withErrors errors: [ErrorProtocol]) {
         guard queue === self.queue else { return }
 
         if !errors.isEmpty {
@@ -297,7 +297,7 @@ public class GroupOperation: Procedure, OperationQueueDelegate {
         }
     }
 
-    public func operationQueue(_ queue: OldOperationQueue, didFinishOperation operation: Operation, withErrors errors: [ErrorProtocol]) {
+    public func operationQueue(_ queue: ProcedureQueue, didFinishOperation operation: Operation, withErrors errors: [ErrorProtocol]) {
         guard queue === self.queue else { return }
 
         if operation === finishingOperation {
@@ -306,7 +306,7 @@ public class GroupOperation: Procedure, OperationQueueDelegate {
         }
     }
 
-    public func operationQueue(_ queue: OldOperationQueue, willProduceOperation operation: Operation) {
+    public func operationQueue(_ queue: ProcedureQueue, willProduceOperation operation: Operation) {
         guard queue === self.queue else { return }
 
         // Ensure that produced operations are added to GroupOperation's
@@ -573,7 +573,7 @@ private extension GroupOperation {
     }
 }
 
-private extension OldOperationQueue {
+private extension ProcedureQueue {
     private func _addCanFinishOperation(_ canFinishOperation: GroupOperation.CanFinishOperation) {
         // Do not add observers (not needed - CanFinishOperation is an implementation detail of GroupOperation)
         // Do not add conditions (CanFinishOperation has none)
