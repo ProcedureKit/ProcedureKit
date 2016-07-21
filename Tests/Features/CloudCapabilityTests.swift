@@ -132,7 +132,7 @@ class CloudCapabilitiesTests: XCTestCase {
     func test__given_status_could_not_be_determined__authorization_status_queries_the_registrar() {
         capability.authorizationStatus { status in
             XCTAssertTrue(self.container.didGetAccountStatus)
-            XCTAssertEqual(status.account, CKAccountStatus.CouldNotDetermine)
+            XCTAssertEqual(status.account, CKAccountStatus.couldNotDetermine)
             XCTAssertNil(status.permissions)
             XCTAssertNil(status.error)
         }
@@ -143,7 +143,7 @@ class CloudCapabilitiesTests: XCTestCase {
         capability.authorizationStatus { status in
             XCTAssertTrue(self.container.didGetAccountStatus)
             XCTAssertFalse(self.container.didVerifyApplicationStatus)
-            XCTAssertEqual(status.account, CKAccountStatus.Available)
+            XCTAssertEqual(status.account, CKAccountStatus.available)
             XCTAssertNil(status.permissions)
             XCTAssertNil(status.error)
         }
@@ -156,9 +156,9 @@ class CloudCapabilitiesTests: XCTestCase {
         capability.authorizationStatus { status in
             XCTAssertTrue(self.container.didGetAccountStatus)
             XCTAssertTrue(self.container.didVerifyApplicationStatus)
-            XCTAssertEqual(status.account, CKAccountStatus.Available)
+            XCTAssertEqual(status.account, CKAccountStatus.available)
             XCTAssertNotNil(status.permissions)
-            XCTAssertEqual(status.permissions, CKApplicationPermissionStatus.InitialState)
+            XCTAssertEqual(status.permissions, CKApplicationPermissionStatus.initialState)
             XCTAssertNil(status.error)
         }
     }
@@ -168,7 +168,7 @@ class CloudCapabilitiesTests: XCTestCase {
         capability.authorizationStatus { status in
             XCTAssertTrue(self.container.didGetAccountStatus)
             XCTAssertFalse(self.container.didVerifyApplicationStatus)
-            XCTAssertEqual(status.account, CKAccountStatus.NoAccount)
+            XCTAssertEqual(status.account, CKAccountStatus.noAccount)
             XCTAssertNil(status.permissions)
             XCTAssertNil(status.error)
         }
@@ -179,7 +179,7 @@ class CloudCapabilitiesTests: XCTestCase {
         capability.authorizationStatus { status in
             XCTAssertTrue(self.container.didGetAccountStatus)
             XCTAssertFalse(self.container.didVerifyApplicationStatus)
-            XCTAssertEqual(status.account, CKAccountStatus.Restricted)
+            XCTAssertEqual(status.account, CKAccountStatus.restricted)
             XCTAssertNil(status.permissions)
             XCTAssertNil(status.error)
         }
@@ -213,27 +213,27 @@ class CloudStatusTests: XCTestCase {
     var status: CloudStatus!
 
     func test__status_with_error_does_not_meet_requirement() {
-        status = CloudStatus(account: .Available, error: error)
+        status = CloudStatus(account: .available, error: error)
         XCTAssertFalse(status.isRequirementMet(someRequirement))
     }
 
     func test__status_with_error_does_not_meet_empty_requirement() {
-        status = CloudStatus(account: .Available, error: error)
+        status = CloudStatus(account: .available, error: error)
         XCTAssertFalse(status.isRequirementMet(noRequirement))
     }
 
     func test__given_available_empty_requirements_status_met() {
-        status = CloudStatus(account: .Available)
+        status = CloudStatus(account: .available)
         XCTAssertTrue(status.isRequirementMet(noRequirement))
     }
 
     func test__given_available_requirements_no_permissions_status_not_met() {
-        status = CloudStatus(account: .Available)
+        status = CloudStatus(account: .available)
         XCTAssertFalse(status.isRequirementMet(someRequirement))
     }
 
     func test__given_available_requirements_permissions_granted_status_met() {
-        status = CloudStatus(account: .Available, permissions: .Granted)
+        status = CloudStatus(account: .available, permissions: .granted)
         XCTAssertTrue(status.isRequirementMet(someRequirement))
     }
 

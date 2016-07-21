@@ -34,7 +34,7 @@ class WebpageOperationTests: OperationTests {
 
     func test__operation_presents_safari_view_controller() {
         var didPresentWebpage = false
-        let operation = WebpageOperation(url: url, displayControllerFrom: .ShowDetail(presentingController))
+        let operation = WebpageOperation(url: url, displayControllerFrom: .showDetail(presentingController))
 
         presentingController.expectation = expectation(description: "Test: \(#function)")
         presentingController.check = { received in

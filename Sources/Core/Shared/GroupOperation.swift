@@ -29,7 +29,7 @@ public class GroupOperation: OldOperation, OperationQueueDelegate {
         var attemptedRecovery: ErrorsByOperation = [:]
 
         var previousAttempts: [ErrorProtocol] {
-            return Array(FlattenSequence(attemptedRecovery.values))
+            return Array(attemptedRecovery.values.flatten())
         }
 
         var all: [ErrorProtocol] {
@@ -495,7 +495,7 @@ private extension GroupOperation {
                 let isWaiting = parent.groupFinishLock.withCriticalScope { () -> Bool in
 
                     // Is anything currently adding operations?
-                    guard parent.isAddingOperationsGroup.wait(timeout: DispatchTime.now()) == 0 else {
+                    guard parent.isAddingOperationsGroup.wait(timeout: .now()) == .Success else {
                         // Operations are actively being added to the group
                         // Wait for this to complete before proceeding.
                         //

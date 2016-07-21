@@ -90,7 +90,7 @@ class RetryGenerator<T: Operation>: IteratorProtocol {
  The block must return (Delay?, T)?.
 
  Therefore consumers can inspect the failure info, and adjust the Delay, or
- operation before returning it. To finish, the block can return .None
+ operation before returning it. To finish, the block can return .none
 */
 public class RetryOperation<T: Operation>: RepeatedOperation<T> {
     public typealias FailureInfo = RetryFailureInfo<T>
@@ -104,7 +104,7 @@ public class RetryOperation<T: Operation>: RepeatedOperation<T> {
      Creates an operation which will retry executing operations in the face
      of errors.
 
-     - parameter maxCount: an optional Int, which defaults to .None. If not nil, this is
+     - parameter maxCount: an optional Int, which defaults to .none. If not nil, this is
      the maximum number of operations which will be executed.
      - parameter generator: the generator of (Delay?, T) values.
      - parameter retry: a Handler block type, can be used to inspect aggregated error to
@@ -121,7 +121,7 @@ public class RetryOperation<T: Operation>: RepeatedOperation<T> {
      A designated initializer, which accepts two generators, one for the delay and another for
      the operation, in addition to a retry handler block
 
-     - parameter maxCount: an optional Int, which defaults to .None. If not nil, this is
+     - parameter maxCount: an optional Int, which defaults to .none. If not nil, this is
      the maximum number of operations which will be executed.
      - parameter delay: a generator with Delay element.
      - parameter generator: a generator with T element.

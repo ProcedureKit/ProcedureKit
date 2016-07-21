@@ -14,13 +14,13 @@ class ComposedOperationTests: OperationTests {
     func test__composed_operation_is_cancelled() {
         let composed = ComposedOperation(TestOperation())
         composed.cancel()
-        XCTAssertTrue(composed.cancelled)
-        XCTAssertTrue(composed.operation.cancelled)
+        XCTAssertTrue(composed.isCancelled)
+        XCTAssertTrue(composed.operation.isCancelled)
     }
 
     func test__composed_nsoperation_is_performed() {
         var didExecute = false
-        let composed = ComposedOperation(BlockOperation {
+        let composed = ComposedOperation(OldBlockOperation {
             didExecute = true
         })
 
@@ -29,7 +29,7 @@ class ComposedOperationTests: OperationTests {
         runOperation(composed)
         waitForExpectations(timeout: 3, handler: nil)
 
-        XCTAssertTrue(composed.finished)
+        XCTAssertTrue(composed.isFinished)
         XCTAssertTrue(didExecute)
     }
 
@@ -41,7 +41,7 @@ class ComposedOperationTests: OperationTests {
         runOperation(composed)
         waitForExpectations(timeout: 3, handler: nil)
 
-        XCTAssertTrue(composed.finished)
+        XCTAssertTrue(composed.isFinished)
         XCTAssertTrue(composed.operation.didExecute)
     }
     
@@ -69,7 +69,7 @@ class ComposedOperationTests: OperationTests {
         }
         
         switch error {
-        case let .ParentOperationCancelledWithErrors(parentErrors):
+        case let .parentOperationCancelledWithErrors(parentErrors):
             guard let parentError = parentErrors.first as? TestOperation.Error else {
                 XCTFail("Incorrect error received"); return
             }

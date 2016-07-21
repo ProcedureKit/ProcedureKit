@@ -16,7 +16,7 @@ class LoggerTests: XCTestCase {
 
     override func setUp() {
         super.setUp()
-        severity = .Notice
+        severity = .notice
         log = Logger(severity: severity)
     }
 
@@ -40,15 +40,15 @@ class LoggerTests: XCTestCase {
     }
 
     func test__operation_name_with_name_set() {
-        let op = BlockOperation()
+        let op = OldBlockOperation()
         op.name = "A Block"
         XCTAssertEqual(op.operationName, "A Block")
     }
 
     func test__operation_name_with_name_not_set() {
-        let op = BlockOperation()
+        let op = OldBlockOperation()
         op.name = nil
-        XCTAssertTrue(op.operationName.containsString("Unnamed OldOperation"))
+        XCTAssertTrue(op.operationName.contains("Unnamed OldOperation"))
     }
 
     func test__meta_uses_last_path_component() {
@@ -74,40 +74,40 @@ class RunAllTheLoggersTests: XCTestCase {
     }
 
     func test__verbose() {
-        log = Logger(severity: .Verbose) { message, severity, _, _, _ in
-            XCTAssertEqual(severity, LogSeverity.Verbose)
+        log = Logger(severity: .verbose) { message, severity, _, _, _ in
+            XCTAssertEqual(severity, LogSeverity.verbose)
             XCTAssertEqual(message, "Hello World")
         }
         log.verbose("Hello World")
     }
 
     func test__notice() {
-        log = Logger(severity: .Verbose) { message, severity, _, _, _ in
-            XCTAssertEqual(severity, LogSeverity.Notice)
+        log = Logger(severity: .verbose) { message, severity, _, _, _ in
+            XCTAssertEqual(severity, LogSeverity.notice)
             XCTAssertEqual(message, "Hello World")
         }
         log.notice("Hello World")
     }
 
     func test__info() {
-        log = Logger(severity: .Verbose) { message, severity, _, _, _ in
-            XCTAssertEqual(severity, LogSeverity.Info)
+        log = Logger(severity: .verbose) { message, severity, _, _, _ in
+            XCTAssertEqual(severity, LogSeverity.info)
             XCTAssertEqual(message, "Hello World")
         }
         log.info("Hello World")
     }
 
     func test__warning() {
-        log = Logger(severity: .Verbose) { message, severity, _, _, _ in
-            XCTAssertEqual(severity, LogSeverity.Warning)
+        log = Logger(severity: .verbose) { message, severity, _, _, _ in
+            XCTAssertEqual(severity, LogSeverity.warning)
             XCTAssertEqual(message, "Hello World")
         }
         log.warning("Hello World")
     }
 
     func test__fatal() {
-        log = Logger(severity: .Verbose) { message, severity, _, _, _ in
-            XCTAssertEqual(severity, LogSeverity.Fatal)
+        log = Logger(severity: .verbose) { message, severity, _, _, _ in
+            XCTAssertEqual(severity, LogSeverity.fatal)
             XCTAssertEqual(message, "Hello World")
         }
         log.fatal("Hello World")

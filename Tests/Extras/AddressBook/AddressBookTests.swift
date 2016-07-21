@@ -17,32 +17,32 @@ class AddressBookSortOrderingTests: XCTestCase {
     var ordering: AddressBook.SortOrdering!
 
     func test__given_by_last_name__then_rawValue_is_correct() {
-        ordering = .ByLastName
+        ordering = .byLastName
         XCTAssertEqual(ordering.rawValue, numericCast(kABPersonSortByLastName) as UInt32)
     }
 
     func test__given_by_first_name__then_rawValue_is_correct() {
-        ordering = .ByFirstName
+        ordering = .byFirstName
         XCTAssertEqual(ordering.rawValue, numericCast(kABPersonSortByFirstName) as UInt32)
     }
 
     func test__given_by_first_name__then_description_is_correct() {
-        ordering = .ByFirstName
+        ordering = .byFirstName
         XCTAssertEqual(ordering.description, "ByFirstName")
     }
 
     func test__given_by_last_name__then_description_is_correct() {
-        ordering = .ByLastName
+        ordering = .byLastName
         XCTAssertEqual(ordering.description, "ByLastName")
     }
 
     func test__given_initialized_by_last_name__then_is_correct() {
-        ordering = .ByLastName
+        ordering = .byLastName
         XCTAssertEqual(ordering, AddressBook.SortOrdering(rawValue: numericCast(kABPersonSortByLastName))!)
     }
 
     func test__given_initialized_by_first_name__then_is_correct() {
-        ordering = .ByFirstName
+        ordering = .byFirstName
         XCTAssertEqual(ordering, AddressBook.SortOrdering(rawValue: numericCast(kABPersonSortByFirstName))!)
     }
 
@@ -57,32 +57,32 @@ class AddressBookCompositeNameFormatTests: XCTestCase {
     var format: AddressBook.CompositeNameFormat!
 
     func test__given_first_name_first__then_rawValue_is_correct() {
-        format = .FirstNameFirst
+        format = .firstNameFirst
         XCTAssertEqual(format.rawValue, numericCast(kABPersonCompositeNameFormatFirstNameFirst) as UInt32)
     }
 
     func test__given_last_name_first__then_rawValue_is_correct() {
-        format = .LastNameFirst
+        format = .lastNameFirst
         XCTAssertEqual(format.rawValue, numericCast(kABPersonCompositeNameFormatLastNameFirst) as UInt32)
     }
 
     func test__given_first_name_first__then_description_is_correct() {
-        format = .FirstNameFirst
+        format = .firstNameFirst
         XCTAssertEqual(format.description, "FirstNameFirst")
     }
 
     func test__given_last_name_first__then_description_is_correct() {
-        format = .LastNameFirst
+        format = .lastNameFirst
         XCTAssertEqual(format.description, "LastNameFirst")
     }
 
     func test__given_initialized_first_name_first__then_is_correct() {
-        format = .FirstNameFirst
+        format = .firstNameFirst
         XCTAssertEqual(format, AddressBook.CompositeNameFormat(rawValue: numericCast(kABPersonCompositeNameFormatFirstNameFirst))!)
     }
 
     func test__given_initialized_last_name_first__then_is_correct() {
-        format = .LastNameFirst
+        format = .lastNameFirst
         XCTAssertEqual(format, AddressBook.CompositeNameFormat(rawValue: numericCast(kABPersonCompositeNameFormatLastNameFirst))!)
     }
 
@@ -97,47 +97,47 @@ class AddressBookRecordTypeTests: XCTestCase {
     var recordKind: AddressBook.RecordKind!
 
     func test__given_source_type__then_rawValue_is_correct() {
-        recordKind = .Source
+        recordKind = .source
         XCTAssertEqual(recordKind.rawValue, numericCast(kABSourceType) as UInt32)
     }
 
     func test__given_group_type__then_rawValue_is_correct() {
-        recordKind = .Group
+        recordKind = .group
         XCTAssertEqual(recordKind.rawValue, numericCast(kABGroupType) as UInt32)
     }
 
     func test__given_person_type__then_rawValue_is_correct() {
-        recordKind = .Person
+        recordKind = .person
         XCTAssertEqual(recordKind.rawValue, numericCast(kABPersonType) as UInt32)
     }
 
     func test__given_source_type__then_description_is_correct() {
-        recordKind = .Source
+        recordKind = .source
         XCTAssertEqual(recordKind.description, "Source")
     }
 
     func test__given_group_type__then_description_is_correct() {
-        recordKind = .Group
+        recordKind = .group
         XCTAssertEqual(recordKind.description, "Group")
     }
 
     func test__given_person_type__then_description_is_correct() {
-        recordKind = .Person
+        recordKind = .person
         XCTAssertEqual(recordKind.description, "Person")
     }
 
     func test__given_initialized_source__then_is_correct() {
-        recordKind = .Source
+        recordKind = .source
         XCTAssertEqual(recordKind, AddressBook.RecordKind(rawValue: numericCast(kABSourceType))!)
     }
 
     func test__given_initialized_group__then_is_correct() {
-        recordKind = .Group
+        recordKind = .group
         XCTAssertEqual(recordKind, AddressBook.RecordKind(rawValue: numericCast(kABGroupType))!)
     }
 
     func test__given_initialized_person__then_is_correct() {
-        recordKind = .Person
+        recordKind = .person
         XCTAssertEqual(recordKind, AddressBook.RecordKind(rawValue: numericCast(kABPersonType))!)
     }
 
@@ -152,107 +152,107 @@ class AddressBookSourceKindTests: XCTestCase {
     var sourceKind: AddressBook.SourceKind!
 
     func test__given_local_source__then_rawValue_is_correct() {
-        sourceKind = .Local
+        sourceKind = .local
         XCTAssertEqual(sourceKind.rawValue, numericCast(kABSourceTypeLocal) as Int32)
     }
 
     func test__given_exchange_source__then_rawValue_is_correct() {
-        sourceKind = .Exchange
+        sourceKind = .exchange
         XCTAssertEqual(sourceKind.rawValue, numericCast(kABSourceTypeExchange) as Int32)
     }
 
     func test__given_exchangegal_source__then_rawValue_is_correct() {
-        sourceKind = .ExchangeGAL
+        sourceKind = .exchangeGAL
         XCTAssertEqual(sourceKind.rawValue, numericCast(kABSourceTypeExchangeGAL) as Int32)
     }
 
     func test__given_mobileme_source__then_rawValue_is_correct() {
-        sourceKind = .MobileMe
+        sourceKind = .mobileMe
         XCTAssertEqual(sourceKind.rawValue, numericCast(kABSourceTypeMobileMe) as Int32)
     }
 
     func test__given_ldap_source__then_rawValue_is_correct() {
-        sourceKind = .LDAP
+        sourceKind = .ldap
         XCTAssertEqual(sourceKind.rawValue, numericCast(kABSourceTypeLDAP) as Int32)
     }
 
     func test__given_carddav_source__then_rawValue_is_correct() {
-        sourceKind = .CardDAV
+        sourceKind = .cardDAV
         XCTAssertEqual(sourceKind.rawValue, numericCast(kABSourceTypeCardDAV) as Int32)
     }
 
     func test__given_carddavsearch_source__then_rawValue_is_correct() {
-        sourceKind = .CardDAVSearch
+        sourceKind = .cardDAVSearch
         XCTAssertEqual(sourceKind.rawValue, numericCast(kABSourceTypeCardDAVSearch) as Int32)
     }
 
     func test__given_local_source__then_description_is_correct() {
-        sourceKind = .Local
+        sourceKind = .local
         XCTAssertEqual(sourceKind.description, "Local")
     }
 
     func test__given_exchange_source__then_description_is_correct() {
-        sourceKind = .Exchange
+        sourceKind = .exchange
         XCTAssertEqual(sourceKind.description, "Exchange")
     }
 
     func test__given_exchangegal_source__then_description_is_correct() {
-        sourceKind = .ExchangeGAL
+        sourceKind = .exchangeGAL
         XCTAssertEqual(sourceKind.description, "ExchangeGAL")
     }
 
     func test__given_mobileme_source__then_description_is_correct() {
-        sourceKind = .MobileMe
+        sourceKind = .mobileMe
         XCTAssertEqual(sourceKind.description, "MobileMe")
     }
 
     func test__given_ldap_source__then_description_is_correct() {
-        sourceKind = .LDAP
+        sourceKind = .ldap
         XCTAssertEqual(sourceKind.description, "LDAP")
     }
 
     func test__given_carddav_source__then_description_is_correct() {
-        sourceKind = .CardDAV
+        sourceKind = .cardDAV
         XCTAssertEqual(sourceKind.description, "CardDAV")
     }
 
     func test__given_carddavsearch_source__then_description_is_correct() {
-        sourceKind = .CardDAVSearch
+        sourceKind = .cardDAVSearch
         XCTAssertEqual(sourceKind.description, "CardDAVSearch")
     }
 
     func test__given_initialized_local__then_is_correct() {
-        sourceKind = .Local
+        sourceKind = .local
         XCTAssertEqual(sourceKind, AddressBook.SourceKind(rawValue: numericCast(kABSourceTypeLocal))!)
     }
 
     func test__given_initialized_exchange__then_is_correct() {
-        sourceKind = .Exchange
+        sourceKind = .exchange
         XCTAssertEqual(sourceKind, AddressBook.SourceKind(rawValue: numericCast(kABSourceTypeExchange))!)
     }
 
     func test__given_initialized_exchangegal__then_is_correct() {
-        sourceKind = .ExchangeGAL
+        sourceKind = .exchangeGAL
         XCTAssertEqual(sourceKind, AddressBook.SourceKind(rawValue: numericCast(kABSourceTypeExchangeGAL))!)
     }
 
     func test__given_initialized_mobileme__then_is_correct() {
-        sourceKind = .MobileMe
+        sourceKind = .mobileMe
         XCTAssertEqual(sourceKind, AddressBook.SourceKind(rawValue: numericCast(kABSourceTypeMobileMe))!)
     }
 
     func test__given_initialized_ldap__then_is_correct() {
-        sourceKind = .LDAP
+        sourceKind = .ldap
         XCTAssertEqual(sourceKind, AddressBook.SourceKind(rawValue: numericCast(kABSourceTypeLDAP))!)
     }
 
     func test__given_initialized_carddav__then_is_correct() {
-        sourceKind = .CardDAV
+        sourceKind = .cardDAV
         XCTAssertEqual(sourceKind, AddressBook.SourceKind(rawValue: numericCast(kABSourceTypeCardDAV))!)
     }
 
     func test__given_initialized_carddavsearch__then_is_correct() {
-        sourceKind = .CardDAVSearch
+        sourceKind = .cardDAVSearch
         XCTAssertEqual(sourceKind, AddressBook.SourceKind(rawValue: numericCast(kABSourceTypeCardDAVSearch))!)
     }
 
@@ -272,52 +272,52 @@ class AddressBookPropertyKindTests: XCTestCase {
     }
 
     func test__given_string_property_kind__then_rawValue_is_correct() {
-        propertyKind = .String
+        propertyKind = .string
         XCTAssertEqual(propertyKind.rawValue, numericCast(kABStringPropertyType) as ABPropertyType)
     }
 
     func test__given_integer_property_kind__then_rawValue_is_correct() {
-        propertyKind = .Integer
+        propertyKind = .integer
         XCTAssertEqual(propertyKind.rawValue, numericCast(kABIntegerPropertyType) as ABPropertyType)
     }
 
     func test__given_real_property_kind__then_rawValue_is_correct() {
-        propertyKind = .Real
+        propertyKind = .real
         XCTAssertEqual(propertyKind.rawValue, numericCast(kABRealPropertyType) as ABPropertyType)
     }
 
     func test__given_datetime_property_kind__then_rawValue_is_correct() {
-        propertyKind = .DateTime
+        propertyKind = .dateTime
         XCTAssertEqual(propertyKind.rawValue, numericCast(kABDateTimePropertyType) as ABPropertyType)
     }
 
     func test__given_dictionary_property_kind__then_rawValue_is_correct() {
-        propertyKind = .Dictionary
+        propertyKind = .dictionary
         XCTAssertEqual(propertyKind.rawValue, numericCast(kABDictionaryPropertyType) as ABPropertyType)
     }
 
     func test__given_multistring_property_kind__then_rawValue_is_correct() {
-        propertyKind = .MultiString
+        propertyKind = .multiString
         XCTAssertEqual(propertyKind.rawValue, numericCast(kABMultiStringPropertyType) as ABPropertyType)
     }
 
     func test__given_multiinteger_property_kind__then_rawValue_is_correct() {
-        propertyKind = .MultiInteger
+        propertyKind = .multiInteger
         XCTAssertEqual(propertyKind.rawValue, numericCast(kABMultiIntegerPropertyType) as ABPropertyType)
     }
 
     func test__given_multireal_property_kind__then_rawValue_is_correct() {
-        propertyKind = .MultiReal
+        propertyKind = .multiReal
         XCTAssertEqual(propertyKind.rawValue, numericCast(kABMultiRealPropertyType) as ABPropertyType)
     }
 
     func test__given_multidatetime_property_kind__then_rawValue_is_correct() {
-        propertyKind = .MultiDateTime
+        propertyKind = .multiDateTime
         XCTAssertEqual(propertyKind.rawValue, numericCast(kABMultiDateTimePropertyType) as ABPropertyType)
     }
 
     func test__given_multidictionary_property_kind__then_rawValue_is_correct() {
-        propertyKind = .MultiDictionary
+        propertyKind = .multiDictionary
         XCTAssertEqual(propertyKind.rawValue, numericCast(kABMultiDictionaryPropertyType) as ABPropertyType)
     }
 
@@ -327,52 +327,52 @@ class AddressBookPropertyKindTests: XCTestCase {
     }
 
     func test__given_initialized_string__then_is_correct() {
-        propertyKind = .String
+        propertyKind = .string
         XCTAssertEqual(propertyKind, AddressBook.PropertyKind(rawValue: numericCast(kABStringPropertyType))!)
     }
 
     func test__given_initialized_integer__then_is_correct() {
-        propertyKind = .Integer
+        propertyKind = .integer
         XCTAssertEqual(propertyKind, AddressBook.PropertyKind(rawValue: numericCast(kABIntegerPropertyType))!)
     }
 
     func test__given_initialized_real__then_is_correct() {
-        propertyKind = .Real
+        propertyKind = .real
         XCTAssertEqual(propertyKind, AddressBook.PropertyKind(rawValue: numericCast(kABRealPropertyType))!)
     }
 
     func test__given_initialized_datetime__then_is_correct() {
-        propertyKind = .DateTime
+        propertyKind = .dateTime
         XCTAssertEqual(propertyKind, AddressBook.PropertyKind(rawValue: numericCast(kABDateTimePropertyType))!)
     }
 
     func test__given_initialized_dictionary__then_is_correct() {
-        propertyKind = .Dictionary
+        propertyKind = .dictionary
         XCTAssertEqual(propertyKind, AddressBook.PropertyKind(rawValue: numericCast(kABDictionaryPropertyType))!)
     }
 
     func test__given_initialized_multistring__then_is_correct() {
-        propertyKind = .MultiString
+        propertyKind = .multiString
         XCTAssertEqual(propertyKind, AddressBook.PropertyKind(rawValue: numericCast(kABMultiStringPropertyType))!)
     }
 
     func test__given_initialized_multiinteger__then_is_correct() {
-        propertyKind = .MultiInteger
+        propertyKind = .multiInteger
         XCTAssertEqual(propertyKind, AddressBook.PropertyKind(rawValue: numericCast(kABMultiIntegerPropertyType))!)
     }
 
     func test__given_initialized_multireal__then_is_correct() {
-        propertyKind = .MultiReal
+        propertyKind = .multiReal
         XCTAssertEqual(propertyKind, AddressBook.PropertyKind(rawValue: numericCast(kABMultiRealPropertyType))!)
     }
 
     func test__given_initialized_multidatetime__then_is_correct() {
-        propertyKind = .MultiDateTime
+        propertyKind = .multiDateTime
         XCTAssertEqual(propertyKind, AddressBook.PropertyKind(rawValue: numericCast(kABMultiDateTimePropertyType))!)
     }
 
     func test__given_initialized_multidictionary__then_is_correct() {
-        propertyKind = .MultiDictionary
+        propertyKind = .multiDictionary
         XCTAssertEqual(propertyKind, AddressBook.PropertyKind(rawValue: numericCast(kABMultiDictionaryPropertyType))!)
     }
 
@@ -382,30 +382,30 @@ class AddressBookPropertyKindTests: XCTestCase {
 
     func test__given_property_kind__then_invalid_is_correct() {
         XCTAssertTrue(AddressBook.PropertyKind.Invalid.invalid)
-        XCTAssertFalse(AddressBook.PropertyKind.String.invalid)
-        XCTAssertFalse(AddressBook.PropertyKind.Integer.invalid)
-        XCTAssertFalse(AddressBook.PropertyKind.Real.invalid)
-        XCTAssertFalse(AddressBook.PropertyKind.DateTime.invalid)
-        XCTAssertFalse(AddressBook.PropertyKind.Dictionary.invalid)
-        XCTAssertFalse(AddressBook.PropertyKind.MultiString.invalid)
-        XCTAssertFalse(AddressBook.PropertyKind.MultiInteger.invalid)
-        XCTAssertFalse(AddressBook.PropertyKind.MultiReal.invalid)
-        XCTAssertFalse(AddressBook.PropertyKind.MultiDateTime.invalid)
-        XCTAssertFalse(AddressBook.PropertyKind.MultiDictionary.invalid)
+        XCTAssertFalse(AddressBook.PropertyKind.string.invalid)
+        XCTAssertFalse(AddressBook.PropertyKind.integer.invalid)
+        XCTAssertFalse(AddressBook.PropertyKind.real.invalid)
+        XCTAssertFalse(AddressBook.PropertyKind.dateTime.invalid)
+        XCTAssertFalse(AddressBook.PropertyKind.dictionary.invalid)
+        XCTAssertFalse(AddressBook.PropertyKind.multiString.invalid)
+        XCTAssertFalse(AddressBook.PropertyKind.multiInteger.invalid)
+        XCTAssertFalse(AddressBook.PropertyKind.multiReal.invalid)
+        XCTAssertFalse(AddressBook.PropertyKind.multiDateTime.invalid)
+        XCTAssertFalse(AddressBook.PropertyKind.multiDictionary.invalid)
     }
 
     func test__given_property_kind__then_multivalue_is_correct() {
         XCTAssertFalse(AddressBook.PropertyKind.Invalid.multiValue)
-        XCTAssertFalse(AddressBook.PropertyKind.String.multiValue)
-        XCTAssertFalse(AddressBook.PropertyKind.Integer.multiValue)
-        XCTAssertFalse(AddressBook.PropertyKind.Real.multiValue)
-        XCTAssertFalse(AddressBook.PropertyKind.DateTime.multiValue)
-        XCTAssertFalse(AddressBook.PropertyKind.Dictionary.multiValue)
-        XCTAssertTrue(AddressBook.PropertyKind.MultiString.multiValue)
-        XCTAssertTrue(AddressBook.PropertyKind.MultiInteger.multiValue)
-        XCTAssertTrue(AddressBook.PropertyKind.MultiReal.multiValue)
-        XCTAssertTrue(AddressBook.PropertyKind.MultiDateTime.multiValue)
-        XCTAssertTrue(AddressBook.PropertyKind.MultiDictionary.multiValue)
+        XCTAssertFalse(AddressBook.PropertyKind.string.multiValue)
+        XCTAssertFalse(AddressBook.PropertyKind.integer.multiValue)
+        XCTAssertFalse(AddressBook.PropertyKind.real.multiValue)
+        XCTAssertFalse(AddressBook.PropertyKind.dateTime.multiValue)
+        XCTAssertFalse(AddressBook.PropertyKind.dictionary.multiValue)
+        XCTAssertTrue(AddressBook.PropertyKind.multiString.multiValue)
+        XCTAssertTrue(AddressBook.PropertyKind.multiInteger.multiValue)
+        XCTAssertTrue(AddressBook.PropertyKind.multiReal.multiValue)
+        XCTAssertTrue(AddressBook.PropertyKind.multiDateTime.multiValue)
+        XCTAssertTrue(AddressBook.PropertyKind.multiDictionary.multiValue)
     }
 
     func test__given_invalid_property_kind__then_description_is_correct() {
@@ -414,52 +414,52 @@ class AddressBookPropertyKindTests: XCTestCase {
     }
 
     func test__given_string_property_kind__then_description_is_correct() {
-        propertyKind = .String
+        propertyKind = .string
         XCTAssertEqual(propertyKind.description, "String")
     }
 
     func test__given_integer_property_kind__then_description_is_correct() {
-        propertyKind = .Integer
+        propertyKind = .integer
         XCTAssertEqual(propertyKind.description, "Integer")
     }
 
     func test__given_real_property_kind__then_description_is_correct() {
-        propertyKind = .Real
+        propertyKind = .real
         XCTAssertEqual(propertyKind.description, "Real")
     }
 
     func test__given_datetime_property_kind__then_description_is_correct() {
-        propertyKind = .DateTime
+        propertyKind = .dateTime
         XCTAssertEqual(propertyKind.description, "DateTime")
     }
 
     func test__given_dictionary_property_kind__then_description_is_correct() {
-        propertyKind = .Dictionary
+        propertyKind = .dictionary
         XCTAssertEqual(propertyKind.description, "Dictionary")
     }
 
     func test__given_multistring_property_kind__then_description_is_correct() {
-        propertyKind = .MultiString
+        propertyKind = .multiString
         XCTAssertEqual(propertyKind.description, "MultiString")
     }
 
     func test__given_multiinteger_property_kind__then_description_is_correct() {
-        propertyKind = .MultiInteger
+        propertyKind = .multiInteger
         XCTAssertEqual(propertyKind.description, "MultiInteger")
     }
 
     func test__given_multireal_property_kind__then_description_is_correct() {
-        propertyKind = .MultiReal
+        propertyKind = .multiReal
         XCTAssertEqual(propertyKind.description, "MultiReal")
     }
 
     func test__given_multidatetime_property_kind__then_description_is_correct() {
-        propertyKind = .MultiDateTime
+        propertyKind = .multiDateTime
         XCTAssertEqual(propertyKind.description, "MultiDateTime")
     }
 
     func test__given_multidictionary_property_kind__then_description_is_correct() {
-        propertyKind = .MultiDictionary
+        propertyKind = .multiDictionary
         XCTAssertEqual(propertyKind.description, "MultiDictionary")
     }
 }
@@ -471,7 +471,7 @@ class AddressBookStringMultiValueTests: XCTestCase {
     var stringMultiValue: AddressBook.StringMultiValue!
 
     func test__given_initialized_with_nonstring__result_is_nil() {
-        stringMultiValue = AddressBook.StringMultiValue(multiValueRepresentation: NSDecimalNumber.one())
+        stringMultiValue = AddressBook.StringMultiValue(multiValueRepresentation: NSDecimalNumber.one)
         XCTAssertNil(stringMultiValue)
     }
 
@@ -513,7 +513,7 @@ class AddressBookDateMultiValueTests: XCTestCase {
     var dateMultiValue: AddressBook.DateMultiValue!
 
     func test__given_initialized_with_nondate__result_is_nil() {
-        dateMultiValue = AddressBook.DateMultiValue(multiValueRepresentation: NSDecimalNumber.one())
+        dateMultiValue = AddressBook.DateMultiValue(multiValueRepresentation: NSDecimalNumber.one)
         XCTAssertNil(dateMultiValue)
     }
 
@@ -568,7 +568,7 @@ class AddressBooksTests: XCTestCase {
         addressBook.requestAccess { error in
             if let error = error {
                 switch error {
-                case .AddressBookAccessDenied:
+                case .addressBookAccessDenied:
                     break
                 default:
                     XCTFail("Incorrect error received")

@@ -102,7 +102,7 @@ class OperationKVOTests: OperationTests {
             return observedKVO.reduce([:]) { (accu: [String: Int], element) in
                 let keyPath = element.keyPath
                 var accu = accu
-                accu[keyPath] = ((accu[keyPath]?)! + 1) ?? 1
+                accu[keyPath] = (accu[keyPath] ?? 0) + 1
                 return accu
             }
         }
@@ -180,7 +180,7 @@ class OperationKVOTests: OperationTests {
         XCTAssertEqual(observedKVO.count, 1)
         XCTAssertEqual(observedKVO.get(safe: 0)?.keyPath, NSOperationKVOObserver.KeyPath.Executing.rawValue)
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function); Did Complete OldOperation"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectation(description: "Test: \(#function); Did Complete OldOperation"))
         operation.finish()
         waitForExpectations(timeout: 5, handler: nil)
     }
@@ -259,7 +259,7 @@ class OperationKVOTests: OperationTests {
     }
 
     func test__nsoperation_kvo__nsoperation_cancel_from_initialized() {
-        let operation = BlockOperation { }
+        let operation = OldBlockOperation { }
         let kvoObserver = NSOperationKVOObserver(operation: operation)
         operation.cancel()
 
@@ -388,7 +388,7 @@ class OperationKVOTests: OperationTests {
     }
 }
 
-extension Collection {
+extension Array {
     /// Returns the element at the specified index if it is within bounds, otherwise nil.
     func get(safe index: Index) -> Iterator.Element? {
         return indices.contains(index) ? self[index] : nil

@@ -241,7 +241,7 @@ public struct BlockObserver: OperationObserver {
      A `OperationObserver` which accepts three different blocks for start,
      produce and finish.
 
-     The arguments all default to `.None` which means that the most
+     The arguments all default to `.none` which means that the most
      typical use case for observing when the operation finishes. e.g.
 
      operation.addObserver(BlockObserver { _, errors in

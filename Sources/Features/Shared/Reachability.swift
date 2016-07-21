@@ -197,7 +197,7 @@ class DeviceReachability: NetworkReachabilityType {
 
     func check(_ reachability: SCNetworkReachability, queue: DispatchQueue) {
         queue.async { [weak self] in
-            if let delegate = self?.delegate, flags = self?.getFlagsForReachability(reachability) {
+            if let delegate = self?.delegate, let flags = self?.getFlagsForReachability(reachability) {
                 delegate.reachabilityDidChange(flags)
             }
         }
@@ -226,7 +226,7 @@ class DeviceReachability: NetworkReachabilityType {
 
     func stopNotifier() {
         if let reachability = try? defaultRouteReachability() {
-            SCNetworkReachabilityUnscheduleFromRunLoop(reachability, CFRunLoopGetCurrent(), CFRunLoopMode.commonModes)
+            SCNetworkReachabilityUnscheduleFromRunLoop(reachability, CFRunLoopGetCurrent(), CFRunLoopMode.commonModes.rawValue)
             SCNetworkReachabilitySetCallback(reachability, nil, nil)
         }
         notifierIsRunning = false
@@ -238,8 +238,10 @@ class DeviceReachability: NetworkReachabilityType {
     }
 }
 
-private func __device_reachability_callback(_ reachability: SCNetworkReachability, flags: SCNetworkReachabilityFlags, info: UnsafeMutablePointer<Void>) {
-    let handler = Unmanaged<DeviceReachability>.fromOpaque(OpaquePointer(info)).takeUnretainedValue()
+private func __device_reachability_callback(_ reachability: SCNetworkReachability, flags: SCNetworkReachabilityFlags, info: UnsafeMutablePointer<Void>?) {
+    guard let info = info else { return }
+
+    let handler = Unmanaged<DeviceReachability>.fromOpaque(info).takeUnretainedValue()
     Queue.default.queue.async {
         handler.delegate?.reachabilityDidChange(flags)
     }

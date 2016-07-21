@@ -21,7 +21,7 @@ class OperationWhichFailsThenSucceeds: OldOperation {
 
     override func execute() {
         if shouldFail() {
-            finish(TestOperation.Error.SimulatedError)
+            finish(TestOperation.Error.simulatedError)
         }
         else {
             finish()
@@ -69,50 +69,50 @@ class RetryOperationTests: OperationTests {
                 self.numberOfExecutions += 1
             })
 
-            return RepeatedPayload(delay: Delay.By(0.0001), operation: op, configure: .None)
+            return RepeatedPayload(delay: Delay.by(0.0001), operation: op, configure: .none)
         }
     }
 
     func test__retry_operation_with_payload_generator() {
-        operation = RetryOperation(generator: AnyIterator(body: producerWithDelay(2)), retry: { $1 })
-        operation.log.severity = .Verbose
+        operation = RetryOperation(generator: AnyIterator(producerWithDelay(2)), retry: { $1 })
+        operation.log.severity = .verbose
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectation(description: "Test: \(#function)"))
         runOperation(operation)
         waitForExpectations(timeout: 3, handler: nil)
 
-        XCTAssertTrue(operation.finished)
+        XCTAssertTrue(operation.isFinished)
         XCTAssertEqual(operation.count, 2)
     }
 
     func test__retry_operation_with_default_delay() {
-        operation = RetryOperation(AnyIterator(body: producer(2)))
+        operation = RetryOperation(AnyIterator(producer(2)))
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectation(description: "Test: \(#function)"))
         runOperation(operation)
         waitForExpectations(timeout: 3, handler: nil)
 
-        XCTAssertTrue(operation.finished)
+        XCTAssertTrue(operation.isFinished)
         XCTAssertEqual(operation.count, 2)
     }
 
     func test__retry_operation_where_generator_returns_nil() {
-        operation = RetryOperation(maxCount: 12, strategy: .Fixed(0.01), AnyIterator(body: producer(11))) { $1 } // Includes the retry block
+        operation = RetryOperation(maxCount: 12, strategy: .fixed(0.01), AnyIterator(producer(11))) { $1 } // Includes the retry block
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectation(description: "Test: \(#function)"))
         runOperation(operation)
         waitForExpectations(timeout: 3, handler: nil)
 
-        XCTAssertTrue(operation.finished)
+        XCTAssertTrue(operation.isFinished)
         XCTAssertEqual(operation.count, 10)
     }
 
     func test__retry_operation_where_max_count_is_reached() {
-        operation = RetryOperation(AnyIterator(body: producer(9)))
+        operation = RetryOperation(AnyIterator(producer(9)))
 
         waitForOperation(operation)
 
-        XCTAssertTrue(operation.finished)
+        XCTAssertTrue(operation.isFinished)
         XCTAssertEqual(operation.count, 5)
     }
 
@@ -131,11 +131,11 @@ class RetryOperationTests: OperationTests {
             return recommended
         }
 
-        operation = RetryOperation(AnyIterator(body: producer(3)), retry: retry)
+        operation = RetryOperation(AnyIterator(producer(3)), retry: retry)
 
         waitForOperation(operation)
 
-        XCTAssertTrue(operation.finished)
+        XCTAssertTrue(operation.isFinished)
         XCTAssertEqual(operation.count, 3)
         XCTAssertEqual(didRunBlockCount, 2)
         XCTAssertNotNil(retryErrors)
@@ -163,11 +163,11 @@ class RetryOperationTests: OperationTests {
             }
         }
 
-        operation = RetryOperation(AnyIterator(body: producer(3)), retry: retry)
+        operation = RetryOperation(AnyIterator(producer(3)), retry: retry)
 
         waitForOperation(operation)
 
-        XCTAssertTrue(operation.finished)
+        XCTAssertTrue(operation.isFinished)
         XCTAssertEqual(operation.count, 3)
         XCTAssertTrue(didRunResetConfigurationBlock)
         XCTAssertEqual(didRunBlockCount, 2)
@@ -188,14 +188,14 @@ class RetryOperationTests: OperationTests {
             retryHistoricalErrors = info.historicalErrors
             retryCount = info.count
             didRunBlockCount += 1
-            return .None
+            return .none
         }
 
-        operation = RetryOperation(AnyIterator(body: producer(3)), retry: retry)
+        operation = RetryOperation(AnyIterator(producer(3)), retry: retry)
 
         waitForOperation(operation)
 
-        XCTAssertTrue(operation.finished)
+        XCTAssertTrue(operation.isFinished)
         XCTAssertEqual(operation.count, 1)
         XCTAssertEqual(didRunBlockCount, 1)
         XCTAssertNotNil(retryErrors)

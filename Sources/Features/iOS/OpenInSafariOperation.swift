@@ -66,7 +66,7 @@ public class OpenInSafariOperation<From: PresentingViewController>: GroupOperati
         if #available(iOS 9.0, *), shouldOpenInSafariViewController() {
             addOperation(WebpageOperation(url: self.URL, displayControllerFrom: self.displayControllerFrom, sender: self.sender))
         } else {
-            addOperation(BlockOperation { [unowned self] in self.openURL(self.URL) })
+            addOperation(OldBlockOperation { [unowned self] in self.openURL(self.URL) })
         }
 
         super.execute()

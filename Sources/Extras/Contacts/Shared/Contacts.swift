@@ -53,13 +53,13 @@ public protocol ContactStoreType {
 @available(iOS 9.0, OSX 10.11, *)
 public enum ContainerID {
     case `default`
-    case Identifier(String)
+    case identifier(String)
 
     var identifier: String {
         switch self {
         case .default:
             return CNContactStore().defaultContainerIdentifier()
-        case .Identifier(let id):
+        case .identifier(let id):
             return id
         }
     }
@@ -229,7 +229,7 @@ extension ContainerID: CustomStringConvertible {
     public var description: String {
         switch self {
         case .default: return "Default Identifier"
-        case .Identifier(let id): return id
+        case .identifier(let id): return id
         }
     }
 }
@@ -246,7 +246,7 @@ public func == (lhs: ContainerID, rhs: ContainerID) -> Bool {
     switch (lhs, rhs) {
     case (.default, .default):
         return true
-    case let (.Identifier(aId), .Identifier(bId)):
+    case let (.identifier(aId), .identifier(bId)):
         return aId == bId
     default:
         return false

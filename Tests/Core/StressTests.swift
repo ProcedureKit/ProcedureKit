@@ -17,8 +17,8 @@ class StressTest: OperationTests {
 
     func test__completion_blocks() {
         (0..<batchSize).forEach { i in
-            let expectation = self.expectationWithDescription("Interation: \(i)")
-            let operation = BlockOperation { }
+            let expectation = self.expectation(description: "Interation: \(i)")
+            let operation = OldBlockOperation { }
             operation.addCompletionBlock { expectation.fulfill() }
             self.queue.addOperation(operation)
         }
@@ -64,7 +64,7 @@ class StressTest: OperationTests {
             func operationQueue(queue: OldOperationQueue, willProduceOperation operation: NSOperation) { /* do nothing */ }
         }
         
-        let expectation = expectationWithDescription("Test: \(#function)")
+        let expectation = expectation(description: "Test: \(#function)")
         var success = false
         
         dispatch_async(Queue.Initiated.queue) {
@@ -110,13 +110,13 @@ class StressTest: OperationTests {
                 let cancelCount = Counter()
                 let finishCount = Counter()
                 let operationDispatchGroup = dispatch_group_create()
-                weak var didFinishAllOperationsExpectation = expectationWithDescription("Test: \(#function), Finished All Operations, batch \(batch)")
+                weak var didFinishAllOperationsExpectation = expectation(description: "Test: \(#function), Finished All Operations, batch \(batch)")
 
                 (0..<batchSize).forEach { i in
                     dispatch_group_enter(operationDispatchGroup)
                     let operationFinishCount = Counter()
                     let operationCancelCount = Counter()
-                    let operation = BlockOperation { usleep(500) }
+                    let operation = OldBlockOperation { usleep(500) }
                     operation.addObserver(DidCancelObserver(didCancel: { (operation) in
                         operationCancelCount.increment_barrier()
                         cancelCount.increment()
@@ -157,7 +157,7 @@ class StressTest: OperationTests {
                 queue.suspended = false
                 let finishCount = Counter()
                 let operationDispatchGroup = dispatch_group_create()
-                weak var didFinishAllOperationsExpectation = expectationWithDescription("Test: \(#function), Finished All Operations, batch \(batch)")
+                weak var didFinishAllOperationsExpectation = expectation(description: "Test: \(#function), Finished All Operations, batch \(batch)")
 
                 (0..<batchSize).forEach { _ in
                     dispatch_group_enter(operationDispatchGroup)
@@ -212,7 +212,7 @@ class StressTest: OperationTests {
                 let queue = OldOperationQueue()
                 queue.suspended = false
                 let operationDispatchGroup = dispatch_group_create()
-                weak var didFinishAllOperationsExpectation = expectationWithDescription("Test: \(#function), Finished All Operations, batch \(batch)")
+                weak var didFinishAllOperationsExpectation = expectation(description: "Test: \(#function), Finished All Operations, batch \(batch)")
 
                 (0..<batchSize).forEach { i in
                     dispatch_group_enter(operationDispatchGroup)
@@ -264,8 +264,8 @@ class StressTest: OperationTests {
                 let queue = OldOperationQueue()
                 queue.suspended = false
                 let operationDispatchGroup = dispatch_group_create()
-                weak var didCreateAllOperationsExpectation = expectationWithDescription("Test: \(#function), Finished Creating Operations, batch \(batch)")
-                weak var didFinishAllOperationsExpectation = expectationWithDescription("Test: \(#function), Finished All Operations, batch \(batch)")
+                weak var didCreateAllOperationsExpectation = expectation(description: "Test: \(#function), Finished Creating Operations, batch \(batch)")
+                weak var didFinishAllOperationsExpectation = expectation(description: "Test: \(#function), Finished All Operations, batch \(batch)")
                 
                 let batchSize = self.batchSize
                 dispatch_async(Queue.Default.queue) {
@@ -309,7 +309,7 @@ class StressTest: OperationTests {
                 let child1FinishCount = Counter()
                 let child2FinishCount = Counter()
                 let operationDispatchGroup = dispatch_group_create()
-                weak var didFinishAllOperationsExpectation = expectationWithDescription("Test: \(#function), Finished All Operations, batch \(batch)")
+                weak var didFinishAllOperationsExpectation = expectation(description: "Test: \(#function), Finished All Operations, batch \(batch)")
                 
                 (0..<batchSize).forEach { i in
                     dispatch_group_enter(operationDispatchGroup)
@@ -319,8 +319,8 @@ class StressTest: OperationTests {
                     let group = GroupOperation(operations: [ child1, child2 ])
 
                     group.addCompletionBlock {
-                        let child1Finished = child1.finished
-                        let child2Finished = child2.finished
+                        let child1Finished = child1.isFinished
+                        let child2Finished = child2.isFinished
                         if child1Finished { child1FinishCount.increment_barrier() }
                         if child2Finished { child2FinishCount.increment_barrier() }
                         dispatch_group_leave(operationDispatchGroup)

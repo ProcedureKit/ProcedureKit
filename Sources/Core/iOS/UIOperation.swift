@@ -53,7 +53,7 @@ to present a detail view controller from a master view controller say, it would 
 used like this
 
     let from: ViewControllerDisplayStyle = .ShowDetail(masterViewController)
-    from.displayController(detailViewController, sender: .None, completion: .None)
+    from.displayController(detailViewController, sender: .none, completion: .none)
 
 This enum is used as an argument for the `UIOperation` class which usually is
 responsible for creating the view controller which is to be presented.
@@ -87,7 +87,7 @@ public enum ViewControllerDisplayStyle<ViewController: PresentingViewController>
      - parameter inNavigationController: a Bool indicating whether to wrap controller in a
      UINavigationController when presenting, defaults to true
     - parameter sender: an optional `AnyObject` used as the sender when showing the view controller
-    - parameter completion: an optional completion block, defaults to .None.
+    - parameter completion: an optional completion block, defaults to .none.
     */
     public func displayController<C where C: UIViewController>(_ controller: C, inNavigationController: Bool = true, sender: AnyObject?, completion: (() -> Void)? = .none) {
         switch self {

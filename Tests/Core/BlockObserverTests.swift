@@ -26,8 +26,8 @@ class BaseBlockObserverTests: OperationTests {
 
 class StartedObserverTests: BaseBlockObserverTests {
 
-    var called_didAttachToOperation: OldOperation? = .None
-    var called_didStartOperation: OldOperation? = .None
+    var called_didAttachToOperation: OldOperation? = .none
+    var called_didStartOperation: OldOperation? = .none
     var observer: WillExecuteObserver!
 
     override func setUp() {
@@ -58,8 +58,8 @@ class StartedObserverTests: BaseBlockObserverTests {
 
 class CancelledObserverTests: BaseBlockObserverTests {
 
-    var called_didAttachToOperation: OldOperation? = .None
-    var called_didCancelOperation: OldOperation? = .None
+    var called_didAttachToOperation: OldOperation? = .none
+    var called_didCancelOperation: OldOperation? = .none
     var observer: DidCancelObserver!
 
     override func setUp() {
@@ -81,7 +81,7 @@ class CancelledObserverTests: BaseBlockObserverTests {
         operation.addObserver(observer)
         operation.cancel()
         XCTAssertEqual(called_didCancelOperation, operation)
-        XCTAssertTrue(operation.cancelled)
+        XCTAssertTrue(operation.isCancelled)
     }
 
     func test__cancel_after_adding_to_queue() {
@@ -93,20 +93,20 @@ class CancelledObserverTests: BaseBlockObserverTests {
         waitForExpectations(timeout: 3.0, handler: nil)
 
         XCTAssertEqual(called_didCancelOperation, operation)
-        XCTAssertTrue(operation.cancelled)
+        XCTAssertTrue(operation.isCancelled)
     }
 }
 
 class ProducedOperationObserverTests: BaseBlockObserverTests {
 
-    var called_didAttachToOperation: OldOperation? = .None
-    var called_didProduceOperation: (OldOperation, NSOperation)? = .None
+    var called_didAttachToOperation: OldOperation? = .none
+    var called_didProduceOperation: (OldOperation, Operation)? = .none
     var observer: ProducedOperationObserver!
-    var produced: BlockOperation!
+    var produced: OldBlockOperation!
 
     override func setUp() {
         super.setUp()
-        produced = BlockOperation { }
+        produced = OldBlockOperation { }
         operation = TestOperation(produced: produced)
         observer = ProducedOperationObserver { [unowned self] op, produced in
             self.called_didProduceOperation = (op, produced)
@@ -135,8 +135,8 @@ class ProducedOperationObserverTests: BaseBlockObserverTests {
 
 class WillFinishObserverTests: BaseBlockObserverTests {
 
-    var called_didAttachToOperation: OldOperation? = .None
-    var called_willFinish: (OldOperation, [ErrorType])? = .None
+    var called_didAttachToOperation: OldOperation? = .none
+    var called_willFinish: (OldOperation, [ErrorProtocol])? = .none
     var observer: WillFinishObserver!
 
     override func setUp() {
@@ -180,8 +180,8 @@ class WillFinishObserverTests: BaseBlockObserverTests {
 
 class DidFinishObserverTests: BaseBlockObserverTests {
 
-    var called_didAttachToOperation: OldOperation? = .None
-    var called_didFinish: (OldOperation, [ErrorType])? = .None
+    var called_didAttachToOperation: OldOperation? = .none
+    var called_didFinish: (OldOperation, [ErrorProtocol])? = .none
     var observer: DidFinishObserver!
 
     override func setUp() {
@@ -226,7 +226,7 @@ class DidFinishObserverTests: BaseBlockObserverTests {
 class BlockObserverTests: BaseBlockObserverTests {
 
     func test__did_attach_block_is_called() {
-        var called_didAttachToOperation: OldOperation? = .None
+        var called_didAttachToOperation: OldOperation? = .none
         var observer = BlockObserver { _, _ in }
         observer.didAttachToOperation = { op in
             called_didAttachToOperation = op
@@ -242,7 +242,7 @@ class BlockObserverTests: BaseBlockObserverTests {
             counter += 1
         }))
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectation(description: "Test: \(#function)"))
         runOperation(operation)
         waitForExpectations(timeout: 3, handler: nil)
 
@@ -256,7 +256,7 @@ class BlockObserverTests: BaseBlockObserverTests {
             counter += 1
         }))
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectation(description: "Test: \(#function)"))
         runOperation(operation)
         operation.cancel()
         operation.cancel() // Deliberately call cancel multiple times.
@@ -275,7 +275,7 @@ class BlockObserverTests: BaseBlockObserverTests {
             XCTAssertEqual(produced, pro)
         }))
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectation(description: "Test: \(#function)"))
         runOperation(operation)
         waitForExpectations(timeout: 3, handler: nil)
 
@@ -288,7 +288,7 @@ class BlockObserverTests: BaseBlockObserverTests {
             counter += 1
         }))
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectation(description: "Test: \(#function)"))
         runOperation(operation)
         waitForExpectations(timeout: 3, handler: nil)
 
@@ -302,7 +302,7 @@ class BlockObserverTests: BaseBlockObserverTests {
             counter += 1
         })
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectation(description: "Test: \(#function)"))
         runOperation(operation)
         waitForExpectations(timeout: 3, handler: nil)
 

@@ -32,17 +32,17 @@ class NoFailedDependenciesConditionTests: OperationTests {
         let operation = TestOperation()
         operation.addCondition(NoFailedDependenciesCondition())
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectation(description: "Test: \(#function)"))
         runOperation(operation)
 
         waitForExpectations(timeout: 3, handler: nil)
-        XCTAssertTrue(operation.finished)
+        XCTAssertTrue(operation.isFinished)
     }
 
     func test__operation_with_sucessful_dependency_succeeds() {
 
         let operation = TestOperation()
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectation(description: "Test: \(#function)"))
         let dependency = createCancellingOperation(false, expectation: expectation(description: "Dependency for Test: \(#function)"))
         operation.addDependency(dependency)
         operation.addCondition(NoFailedDependenciesCondition())
@@ -50,7 +50,7 @@ class NoFailedDependenciesConditionTests: OperationTests {
         runOperations(operation, dependency)
         waitForExpectations(timeout: 3, handler: nil)
 
-        XCTAssertTrue(operation.finished)
+        XCTAssertTrue(operation.isFinished)
     }
 
     func test__operation_with_single_cancelled_dependency_doesnt_execute() {
@@ -109,7 +109,7 @@ class NoFailedDependenciesConditionTests: OperationTests {
     }
 
     func test__operation_with_group_dependency_with_errored_child_fails() {
-        LogManager.severity = .Verbose
+        LogManager.severity = .verbose
         let expectation = self.expectation(description: "Test: \(#function)")
 
         let operation = TestOperation()
@@ -135,7 +135,7 @@ class NoFailedDependenciesConditionTests: OperationTests {
 
         XCTAssertFalse(operation.didExecute)
         XCTAssertEqual(receivedErrors.count, 1)
-        LogManager.severity = .Warning
+        LogManager.severity = .warning
     }
 }
 
@@ -145,26 +145,26 @@ class NoFailedDependenciesConditionErrorTests: XCTestCase {
     var errorB: NoFailedDependenciesCondition.Error!
 
     func test__both_cancelled_equal() {
-        errorA = .CancelledDependencies
-        errorB = .CancelledDependencies
+        errorA = .cancelledDependencies
+        errorB = .cancelledDependencies
         XCTAssertEqual(errorA, errorB)
     }
 
     func test__both_failed_equal() {
-        errorA = .FailedDependencies
-        errorB = .FailedDependencies
+        errorA = .failedDependencies
+        errorB = .failedDependencies
         XCTAssertEqual(errorA, errorB)
     }
 
     func test__cancelled_and_failed_not_equal() {
-        errorA = .CancelledDependencies
-        errorB = .FailedDependencies
+        errorA = .cancelledDependencies
+        errorB = .failedDependencies
         XCTAssertNotEqual(errorA, errorB)
     }
 
     func test__failed_and_cancelled_not_equal() {
-        errorA = .FailedDependencies
-        errorB = .CancelledDependencies
+        errorA = .failedDependencies
+        errorB = .cancelledDependencies
         XCTAssertNotEqual(errorA, errorB)
     }
 }

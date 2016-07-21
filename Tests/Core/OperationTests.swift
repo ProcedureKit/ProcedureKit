@@ -38,13 +38,13 @@ class TestOperation: OldOperation, ResultOperationType {
 
         if let producedOperation = self.producedOperation {
             let after = DispatchTime.now() + Double(Int64(numberOfSeconds * Double(0.001) * Double(NSEC_PER_SEC))) / Double(NSEC_PER_SEC)
-            (Queue.Main.queue).after(when: after) {
+            (Queue.main.queue).after(when: after) {
                 self.produceOperation(producedOperation)
             }
         }
 
         let after = DispatchTime.now() + Double(Int64(numberOfSeconds * Double(NSEC_PER_SEC))) / Double(NSEC_PER_SEC)
-        (Queue.Main.queue).after(when: after) {
+        (Queue.main.queue).after(when: after) {
             self.didExecute = true
             self.finish(self.simulatedError)
         }
@@ -79,11 +79,11 @@ struct TestCondition: OperationCondition {
     }
 
     func evaluateForOperation(_ operation: OldOperation, completion: (OperationConditionResult) -> Void) {
-        completion(condition() ? .Satisfied : .Failed(BlockCondition.Error.BlockConditionFailed))
+        completion(condition() ? .satisfied : .failed(BlockCondition.Error.blockConditionFailed))
     }
 }
 
-class TestConditionOperation: Condition {
+class TestConditionOperation: Operations.Condition {
 
     let evaluate: () throws -> Bool
 
@@ -98,10 +98,10 @@ class TestConditionOperation: Condition {
     override func evaluate(_ operation: OldOperation, completion: CompletionBlockType) {
         do {
             let success = try evaluate()
-            completion(success ? .Satisfied : .Failed(OperationError.ConditionFailed))
+            completion(success ? .satisfied : .failed(OperationError.conditionFailed))
         }
         catch {
-            completion(.Failed(error))
+            completion(.failed(error))
         }
     }
 }
@@ -152,7 +152,7 @@ class OperationTests: XCTestCase {
 
     override func setUp() {
         super.setUp()
-        LogManager.severity = .Fatal
+        LogManager.severity = .fatal
         queue = OldOperationQueue()
         delegate = TestQueueDelegate()
         queue.delegate = delegate
@@ -163,7 +163,7 @@ class OperationTests: XCTestCase {
         queue = nil
         delegate = nil
         ExclusivityManager.sharedInstance.__tearDownForUnitTesting()
-        LogManager.severity = .Warning
+        LogManager.severity = .warning
         super.tearDown()
     }
 
@@ -187,7 +187,7 @@ class OperationTests: XCTestCase {
     }
 
     func waitForOperations(_ operations: OldOperation..., withExpectationDescription text: String = #function) {
-        for (i, op) in operations.enumerate() {
+        for (i, op) in operations.enumerated() {
             addCompletionBlockToTestOperation(op, withExpectationDescription: "\(i), \(text)")
         }
         queue.delegate = delegate

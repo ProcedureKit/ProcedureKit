@@ -16,10 +16,10 @@ class TestableHealthRegistrar: NSObject {
     var didCheckHealthDataAvailable = false
 
     var allowedForSharing: Set<HKSampleType> = Set()
-    var didCheckAuthorizationStatusForTypes: Set<HKObjectType>? = .None
+    var didCheckAuthorizationStatusForTypes: Set<HKObjectType>? = .none
 
-    var accessError: NSError? = .None
-    var didRequestAccessForRequirement: HealthRequirement? = .None
+    var accessError: NSError? = .none
+    var didRequestAccessForRequirement: HealthRequirement? = .none
 
     required override init() { }
 

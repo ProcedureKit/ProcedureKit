@@ -16,11 +16,11 @@ class BlockConditionTests: OperationTests {
         let operation = TestOperation()
         operation.addCondition(BlockCondition { true })
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectation(description: "Test: \(#function)"))
         runOperation(operation)
 
         waitForExpectations(timeout: 3, handler: nil)
-        XCTAssertTrue(operation.finished)
+        XCTAssertTrue(operation.isFinished)
     }
 
     func test__operation_with_unsuccessful_block_condition_errors() {
@@ -39,7 +39,7 @@ class BlockConditionTests: OperationTests {
         waitForExpectations(timeout: 3, handler: nil)
         XCTAssertFalse(operation.didExecute)
         if let error = receivedErrors[0] as? BlockCondition.Error {
-            XCTAssertTrue(error == BlockCondition.Error.BlockConditionFailed)
+            XCTAssertTrue(error == BlockCondition.Error.blockConditionFailed)
         }
         else {
             XCTFail("No error message was observed")
@@ -50,7 +50,7 @@ class BlockConditionTests: OperationTests {
         let expectation = self.expectation(description: "Test: \(#function)")
 
         let operation = TestOperation()
-        operation.addCondition(BlockCondition { throw TestOperation.Error.SimulatedError })
+        operation.addCondition(BlockCondition { throw TestOperation.Error.simulatedError })
 
         var receivedErrors = [ErrorProtocol]()
         operation.addObserver(DidFinishObserver { _, errors in

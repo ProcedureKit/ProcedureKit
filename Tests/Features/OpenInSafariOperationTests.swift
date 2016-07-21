@@ -22,7 +22,7 @@ class OpenInSafariOperationTests: OperationTests {
     
     func test__operation_presents_safari_view_controller() {
         var didPresentWebpage = false
-        let operation = OpenInSafariOperation(URL: URL, displayControllerFrom: .ShowDetail(presentingController))
+        let operation = OpenInSafariOperation(URL: URL, displayControllerFrom: .showDetail(presentingController))
         operation.shouldOpenInSafariViewController = { true }
         
         presentingController.expectation = expectation(description: "Test: \(#function)")
@@ -51,7 +51,7 @@ class OpenInSafariOperationTests: OperationTests {
         let expectation = self.expectation(description: "Test: \(#function)")
         
         var didOpenURL: Foundation.URL? = .none
-        let operation = OpenInSafariOperation(URL: URL, displayControllerFrom: .ShowDetail(presentingController))
+        let operation = OpenInSafariOperation(URL: URL, displayControllerFrom: .showDetail(presentingController))
         operation.shouldOpenInSafariViewController = { false }
         operation.openURL = {
             expectation.fulfill()

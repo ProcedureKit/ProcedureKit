@@ -85,7 +85,7 @@ class PhotosCapabilityTests: XCTestCase {
     }
 
     func test__authorization_status_queries_register() {
-        capability.authorizationStatus { XCTAssertEqual($0, PHAuthorizationStatus.NotDetermined) }
+        capability.authorizationStatus { XCTAssertEqual($0, PHAuthorizationStatus.notDetermined) }
         XCTAssertTrue(registrar.didCheckAuthorizationStatus)
     }
 

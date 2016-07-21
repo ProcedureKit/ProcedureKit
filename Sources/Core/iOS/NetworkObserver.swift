@@ -98,10 +98,10 @@ private struct Timer {
 
     private var isCancelled = false
 
-    init(interval: TimeInterval, handler: ()->()) {
-        let after = DispatchTime.now() + Double(Int64(interval * Double(NSEC_PER_SEC))) / Double(NSEC_PER_SEC)
-        Queue.main.queue.after(when: after) {
-            if self.isCancelled != true {
+    init(interval: TimeInterval, handler: () -> ()) {
+        let after = DispatchTime.now() + interval
+        Queue.main.queue.after(when: after) { [isCancelled] in
+            if isCancelled != true {
                 handler()
             }
         }

@@ -108,7 +108,7 @@ public struct RepeatedPayload<T where T: Operation> {
  1. Return `nil` from the generator passed to the initializer
  2. Set the 1st argument, `maxCount` to a the number of times an
      operation will be executed (i.e. it includes the initial
-     operation). The value defaults to .None which indicates repeating
+     operation). The value defaults to .none which indicates repeating
      forever.
 
  Convenience initializers support the combination of a simple () -> T?
@@ -155,7 +155,7 @@ public class RepeatedOperation<T where T: Operation>: GroupOperation {
     /**
      The most basic initializer.
 
-     - parameter maxCount: an optional Int, which defaults to .None. If not nil, this is
+     - parameter maxCount: an optional Int, which defaults to .none. If not nil, this is
      the maximum number of operations which will be executed.
      - parameter generator: the AnyGenerator<(Delay?, T)> generator.
     */
@@ -176,7 +176,7 @@ public class RepeatedOperation<T where T: Operation>: GroupOperation {
      An initializer, which accepts two generators, one for the delay and another for
      the operation.
 
-     - parameter maxCount: an optional Int, which defaults to .None. If not nil, this is
+     - parameter maxCount: an optional Int, which defaults to .none. If not nil, this is
      the maximum number of operations which will be executed.
      - parameter delay: a generator with Delay element.
      - parameter generator: a generator with T element.
@@ -222,7 +222,7 @@ public class RepeatedOperation<T where T: Operation>: GroupOperation {
      )
      ```
 
-     - parameter maxCount: an optional Int, which defaults to .None. If not nil, this is
+     - parameter maxCount: an optional Int, which defaults to .none. If not nil, this is
      the maximum number of operations which will be executed.
      - parameter strategy: a WaitStrategy which defaults to a 0.1 second fixed interval.
      - parameter generator: a generic generator which has an Element equal to T.

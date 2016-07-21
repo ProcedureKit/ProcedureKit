@@ -22,7 +22,7 @@ class AlertOperationTests: OperationTests {
     
     func test__alert_style_set_default() {
         let op = AlertOperation(presentAlertFrom: presentingController)
-        XCTAssertEqual(op.preferredStyle, UIAlertControllerStyle.Alert)
+        XCTAssertEqual(op.preferredStyle, UIAlertControllerStyle.alert)
     }
     
     func test__alert_style_actionSheet() {
@@ -57,8 +57,8 @@ class AlertOperationTests: OperationTests {
     
     func test__alert_preferred_action_works() {
         let alert = AlertOperation(presentAlertFrom: presentingController)
-        let action = alert.addActionWithTitle("OK", style: .Default)
-        alert.addActionWithTitle("Cancel", style: .Cancel)
+        let action = alert.addActionWithTitle("OK", style: .default)
+        alert.addActionWithTitle("Cancel", style: .cancel)
         
         alert.preferredAction = action
         XCTAssertNotNil(alert.preferredAction)

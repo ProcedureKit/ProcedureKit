@@ -10,7 +10,7 @@ import XCTest
 @testable import Operations
 
 class TestableProfileReporter: OperationProfilerReporter {
-    var didProfileResult: ProfileResult? = .None
+    var didProfileResult: ProfileResult? = .none
 
     func finishedProfilingWithResult(_ result: ProfileResult) {
         didProfileResult = result
@@ -37,8 +37,8 @@ class PendingResultTests: XCTestCase {
         super.setUp()
         elapsed = 10.0
         now = created + 10.0
-        child = ProfileResult(identity: OperationIdentity(identifier: "Child", name: .None), created: 0, attached: 1, started: 2, cancelled: .None, finished: 3, children: [])
-        identity = OperationIdentity(identifier: "Hello World", name: .None)
+        child = ProfileResult(identity: OperationIdentity(identifier: "Child", name: .none), created: 0, attached: 1, started: 2, cancelled: .none, finished: 3, children: [])
+        identity = OperationIdentity(identifier: "Hello World", name: .none)
         result = PendingResult(created: created, identity: .Pending, attached: .Pending, started: .Pending, cancelled: .Pending, finished: .Pending, children: [])
     }
 
@@ -69,7 +69,7 @@ class PendingResultTests: XCTestCase {
     }
 
     func test__set_identity__when_already_set() {
-        result = result.setIdentity(identity).setIdentity(OperationIdentity(identifier: "Goodbye!", name: .None))
+        result = result.setIdentity(identity).setIdentity(OperationIdentity(identifier: "Goodbye!", name: .none))
         XCTAssertEqual(result.identity.value?.identifier, "Hello World")
     }
 
@@ -267,7 +267,7 @@ class PrintableProfileResultTests: XCTestCase {
     override func setUp() {
         super.setUp()
         now = CFAbsoluteTimeGetCurrent() as TimeInterval
-        result = ProfileResult(identity: OperationIdentity(identifier: "Result", name: .None), created: now, attached: 0.1, started: 0.2, cancelled: .None, finished: 0.3, children: [])
+        result = ProfileResult(identity: OperationIdentity(identifier: "Result", name: .none), created: now, attached: 0.1, started: 0.2, cancelled: .none, finished: 0.3, children: [])
         printable = PrintableProfileResult(result: result)
     }
 
@@ -283,7 +283,7 @@ class PrintableProfileResultTests: XCTestCase {
     }
 
     func test__add_row_with_interval_for_event() {
-        let output = printable.addRowWithInterval(1.0, forEvent: .Attached)
+        let output = printable.addRowWithInterval(1.0, forEvent: .attached)
         XCTAssertEqual(output, "+1.0 Attached\n")
     }
 
@@ -297,15 +297,15 @@ class PrintableProfileResultTests: XCTestCase {
     }
 
     func test__description__which_cancelled() {
-        result = ProfileResult(identity: OperationIdentity(identifier: "Child", name: .None), created: now, attached: 0.1, started: 0.2, cancelled: 0.25, finished: 0.3, children: [])
+        result = ProfileResult(identity: OperationIdentity(identifier: "Child", name: .none), created: now, attached: 0.1, started: 0.2, cancelled: 0.25, finished: 0.3, children: [])
         printable = PrintableProfileResult(result: result)
         XCTAssertEqual(printable.description, "+0.1 Attached\n+0.2 Started\n+0.25 Cancelled\n+0.3 Finished\n")
     }
 
     func test__description__with_children() {
-        let child2 = ProfileResult(identity: OperationIdentity(identifier: "Child 2", name: .None), created: now + 0.5, attached: 0.1, started: 0.2, cancelled: .None, finished: 0.3, children: [])
-        let child1 = ProfileResult(identity: OperationIdentity(identifier: "Child 1", name: "Data OldOperation"), created: now + 0.2, attached: 0.1, started: 0.2, cancelled: .None, finished: 0.3, children: [child2])
-        result = ProfileResult(identity: OperationIdentity(identifier: "Result", name: .None), created: now, attached: 0.1, started: 0.2, cancelled: .None, finished: 0.3, children: [child1])
+        let child2 = ProfileResult(identity: OperationIdentity(identifier: "Child 2", name: .none), created: now + 0.5, attached: 0.1, started: 0.2, cancelled: .none, finished: 0.3, children: [])
+        let child1 = ProfileResult(identity: OperationIdentity(identifier: "Child 1", name: "Data OldOperation"), created: now + 0.2, attached: 0.1, started: 0.2, cancelled: .none, finished: 0.3, children: [child2])
+        result = ProfileResult(identity: OperationIdentity(identifier: "Result", name: .none), created: now, attached: 0.1, started: 0.2, cancelled: .none, finished: 0.3, children: [child1])
         printable = PrintableProfileResult(result: result)
         XCTAssertEqual(printable.description, "+0.1 Attached\n+0.2 Started\n-> Spawned Data OldOperation #Child 1 with profile results\n  +0.1 Attached\n  +0.2 Started\n  -> Spawned Unnamed OldOperation #Child 2 with profile results\n    +0.1 Attached\n    +0.2 Started\n    +0.3 Finished\n  +0.3 Finished\n+0.3 Finished\n")
     }
@@ -318,20 +318,20 @@ class ProfileLoggerTests: XCTestCase {
 
     override func setUp() {
         super.setUp()
-        LogManager.severity = .Notice
-        result = ProfileResult(identity: OperationIdentity(identifier: "Testing", name: "MyOperation"), created: CFAbsoluteTimeGetCurrent() as NSTimeInterval, attached: 0.1, started: 0.2, cancelled: .None, finished: 0.3, children: [])
+        LogManager.severity = .notice
+        result = ProfileResult(identity: OperationIdentity(identifier: "Testing", name: "MyOperation"), created: CFAbsoluteTimeGetCurrent() as TimeInterval, attached: 0.1, started: 0.2, cancelled: .none, finished: 0.3, children: [])
     }
 
     override func tearDown() {
         result = nil
-        LogManager.severity = .Warning
+        LogManager.severity = .warning
         super.tearDown()
     }
 
     func test__reporter_logs_name() {
         reporter = OperationProfileLogger { message, severity, _, _, _ in
             XCTAssertTrue(message.hasPrefix("MyOperation #Testing: finished profiling with results:\n"), "Message did not have correct prefix: \(message)")
-            XCTAssertEqual(severity, LogSeverity.Info)
+            XCTAssertEqual(severity, LogSeverity.info)
         }
         reporter.finishedProfilingWithResult(result)
     }

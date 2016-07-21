@@ -151,13 +151,13 @@ extension AutomaticInjectionOperationType where Self: OldOperation {
 
      ```swift
      class DataRetrieval: OldOperation, ResultOperationType {
-        var result: NSData? = .None
+        var result: NSData? = .none
 
         // etc etc
      }
 
      class DataProcessing: OldOperation, AutomaticInjectionOperationType {
-        var requirement: NSData? = .None
+        var requirement: NSData? = .none
 
         // etc etc
      }

@@ -25,7 +25,7 @@ class MutualExclusiveTests: OperationTests {
         let condition = AlertPresentation()
         condition.evaluate(TestOperation()) { result in
             switch result {
-            case .Satisfied:
+            case .satisfied:
                 return XCTAssertTrue(true)
             default:
                 return XCTFail("Alert presentation condition should evaluate true.")
@@ -36,22 +36,22 @@ class MutualExclusiveTests: OperationTests {
     func test__mutually_exclusive_operation_are_run_exclusively() {
         var text = "Star Wars"
 
-        let operation1 = BlockOperation {
+        let operation1 = OldBlockOperation {
             XCTAssertEqual(text, "Star Wars")
             text = "\(text)\nA long time ago"
         }
         operation1.name = "OldOperation 1"
-        let condition1A = MutuallyExclusive<BlockOperation>()
+        let condition1A = MutuallyExclusive<OldBlockOperation>()
         let condition1B = MutuallyExclusive<TestOperation>()
         operation1.addCondition(condition1A)
         operation1.addCondition(condition1B)
 
-        let operation2 = BlockOperation {
+        let operation2 = OldBlockOperation {
             XCTAssertEqual(text, "Star Wars\nA long time ago")
             text = "\(text), in a galaxy far, far away."
         }
         operation2.name = "OldOperation 2"
-        let condition2A = MutuallyExclusive<BlockOperation>()
+        let condition2A = MutuallyExclusive<OldBlockOperation>()
         let condition2B = MutuallyExclusive<TestOperation>()
         operation2.addCondition(condition2A)
         operation2.addCondition(condition2B)
@@ -67,7 +67,7 @@ class MutualExclusiveTests: OperationTests {
     func test__condition_has_dependency_executed_first() {
         var text = "Star Wars"
 
-        let conditionDependency1 = BlockOperation {
+        let conditionDependency1 = OldBlockOperation {
             XCTAssertEqual(text, "Star Wars")
             text = "\(text)\nA long time ago"
         }
@@ -84,7 +84,7 @@ class MutualExclusiveTests: OperationTests {
         operation1Dependency.name = "Dependency 1"
         operation1.addDependency(operation1Dependency)
 
-        let conditionDependency2 = BlockOperation {
+        let conditionDependency2 = OldBlockOperation {
             XCTAssertEqual(text, "Star Wars\nA long time ago")
             text = "\(text), in a galaxy far, far away."
         }
@@ -111,13 +111,13 @@ class MutualExclusiveTests: OperationTests {
     }
 
     func test__mutually_exclusive_operations_can_be_executed() {
-        let operation1 = BlockOperation()
+        let operation1 = OldBlockOperation()
         operation1.name = "operation 1"
-        operation1.addCondition(MutuallyExclusive<BlockOperation>())
+        operation1.addCondition(MutuallyExclusive<OldBlockOperation>())
 
-        let operation2 = BlockOperation()
+        let operation2 = OldBlockOperation()
         operation1.name = "operation 2"
-        operation2.addCondition(MutuallyExclusive<BlockOperation>())
+        operation2.addCondition(MutuallyExclusive<OldBlockOperation>())
 
         addCompletionBlockToTestOperation(operation1)
         addCompletionBlockToTestOperation(operation2)

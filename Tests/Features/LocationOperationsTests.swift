@@ -87,34 +87,34 @@ class LocationOperationErrorTests: XCTestCase {
 
     func test__location_operation_error__both_location_manager_did_fail_error() {
         let underlyingError = NSError(domain: kCLErrorDomain, code: CLError.locationUnknown.rawValue, userInfo: nil)
-        errorA = .LocationManagerDidFail(underlyingError)
-        errorB = .LocationManagerDidFail(underlyingError)
+        errorA = .locationManagerDidFail(underlyingError)
+        errorB = .locationManagerDidFail(underlyingError)
         XCTAssertEqual(errorA, errorB)
     }
 
     func test__location_operation_error__both_location_manager_did_fail_different_errors() {
-        errorA = .LocationManagerDidFail(NSError(domain: kCLErrorDomain, code: CLError.LocationUnknown.rawValue, userInfo: nil))
-        errorB = .LocationManagerDidFail(NSError(domain: kCLErrorDomain, code: CLError.Network.rawValue, userInfo: nil))
+        errorA = .locationManagerDidFail(NSError(domain: kCLErrorDomain, code: CLError.locationUnknown.rawValue, userInfo: nil))
+        errorB = .locationManagerDidFail(NSError(domain: kCLErrorDomain, code: CLError.network.rawValue, userInfo: nil))
         XCTAssertNotEqual(errorA, errorB)
     }
 
     func test__location_operation_error__both_geocoder_did_fail_error() {
         let underlyingError = NSError(domain: kCLErrorDomain, code: CLError.geocodeFoundPartialResult.rawValue, userInfo: nil)
-        errorA = .GeocoderError(underlyingError)
-        errorB = .GeocoderError(underlyingError)
+        errorA = .geocoderError(underlyingError)
+        errorB = .geocoderError(underlyingError)
         XCTAssertEqual(errorA, errorB)
     }
 
     func test__location_operation_error__both_geocoder_did_fail_different_errors() {
-        errorA = .GeocoderError(NSError(domain: kCLErrorDomain, code: CLError.GeocodeFoundPartialResult.rawValue, userInfo: nil))
-        errorB = .GeocoderError(NSError(domain: kCLErrorDomain, code: CLError.GeocodeFoundNoResult.rawValue, userInfo: nil))
+        errorA = .geocoderError(NSError(domain: kCLErrorDomain, code: CLError.geocodeFoundPartialResult.rawValue, userInfo: nil))
+        errorB = .geocoderError(NSError(domain: kCLErrorDomain, code: CLError.geocodeFoundNoResult.rawValue, userInfo: nil))
         XCTAssertNotEqual(errorA, errorB)
     }
 
     func test__location_operation_error_different_not_equal() {
         let underlyingError = NSError(domain: kCLErrorDomain, code: CLError.locationUnknown.rawValue, userInfo: nil)
-        errorA = .LocationManagerDidFail(underlyingError)
-        errorB = .GeocoderError(underlyingError)
+        errorA = .locationManagerDidFail(underlyingError)
+        errorB = .geocoderError(underlyingError)
         XCTAssertNotEqual(errorA, errorB)
     }
 }
@@ -131,7 +131,7 @@ class UserLocationOperationTests: LocationOperationTests {
         let operation = UserLocationOperation(accuracy: accuracy)
         operation.manager = locationManager
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectation(description: "Test: \(#function)"))
         runOperation(operation)
         waitForExpectations(timeout: 3, handler: nil)
 
@@ -157,7 +157,7 @@ class UserLocationOperationTests: LocationOperationTests {
         }
         operation.manager = locationManager
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectation(description: "Test: \(#function)"))
         runOperation(operation)
         waitForExpectations(timeout: 3, handler: nil)
 
@@ -187,7 +187,7 @@ class UserLocationOperationTests: LocationOperationTests {
             receivedErrors = errors
         })
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectation(description: "Test: \(#function)"))
         runOperation(operation)
         waitForExpectations(timeout: 3, handler: nil)
 
@@ -197,8 +197,8 @@ class UserLocationOperationTests: LocationOperationTests {
         }
 
         switch error {
-        case .LocationManagerDidFail(let underlyingError):
-            XCTAssertEqual(underlyingError.code, CLError.LocationUnknown.rawValue)
+        case .locationManagerDidFail(let underlyingError):
+            XCTAssertEqual(underlyingError.code, CLError.locationUnknown.rawValue)
         default:
             XCTFail("Received incorrect LocationOperationError: \(error)")
         }
@@ -253,7 +253,7 @@ class ReverseGeocodeOperationTests: LocationOperationTests {
         let operation = ReverseGeocodeOperation(location: location, completion: { _ in })
         operation.geocoder = geocoder
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectation(description: "Test: \(#function)"))
         runOperation(operation)
         waitForExpectations(timeout: 3, handler: nil)
 
@@ -273,7 +273,7 @@ class ReverseGeocodeOperationTests: LocationOperationTests {
             receivedErrors = errors
         })
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectation(description: "Test: \(#function)"))
         runOperation(operation)
         waitForExpectations(timeout: 3, handler: nil)
 
@@ -285,8 +285,8 @@ class ReverseGeocodeOperationTests: LocationOperationTests {
         XCTAssertTrue(geocoder.didReverseLookup)
 
         switch error {
-        case .GeocoderError(let underlyingError):
-            XCTAssertEqual(underlyingError.code, CLError.GeocodeFoundNoResult.rawValue)
+        case .geocoderError(let underlyingError):
+            XCTAssertEqual(underlyingError.code, CLError.geocodeFoundNoResult.rawValue)
         default:
             XCTFail("Received incorrect LocationOperationError: \(error)")
         }
@@ -301,12 +301,12 @@ class ReverseGeocodeOperationTests: LocationOperationTests {
             op.cancel()
         })
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectation(description: "Test: \(#function)"))
         runOperation(operation)
         waitForExpectations(timeout: 3, handler: nil)
 
         XCTAssertTrue(geocoder.didCancel)
-        XCTAssertTrue(operation.cancelled)
+        XCTAssertTrue(operation.isCancelled)
     }
 
     func test__completion_handler_receives_placeholder() {
@@ -317,7 +317,7 @@ class ReverseGeocodeOperationTests: LocationOperationTests {
         }
         operation.geocoder = geocoder
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectation(description: "Test: \(#function)"))
         runOperation(operation)
         waitForExpectations(timeout: 3, handler: nil)
 
@@ -340,7 +340,7 @@ class ReverseGeocodeUserLocationOperationTests: ReverseGeocodeOperationTests {
         operation.userLocationOperation.manager = locationManager
         operation.geocoder = geocoder
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectation(description: "Test: \(#function)"))
         runOperation(operation)
         waitForExpectations(timeout: 3, handler: nil)
 

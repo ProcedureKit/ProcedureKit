@@ -28,7 +28,7 @@ class NegatedConditionTests: OperationTests {
         XCTAssertFalse(operation.didExecute)
         XCTAssertEqual(receivedErrors.count, 1)
         if let error = receivedErrors.first as? NegatedConditionError {
-            XCTAssertTrue(error == .ConditionSatisfied("True Condition"))
+            XCTAssertTrue(error == .conditionSatisfied("True Condition"))
         }
         else {
             XCTFail("No error message was observed")
@@ -45,8 +45,8 @@ class NegatedConditionTests: OperationTests {
         waitForExpectations(timeout: 3, handler: nil)
 
         XCTAssertTrue(operation.didExecute)
-        XCTAssertTrue(operation.finished)
-        XCTAssertFalse(operation.cancelled)
+        XCTAssertTrue(operation.isFinished)
+        XCTAssertFalse(operation.isCancelled)
     }
 
     func test__negated_condition_name() {

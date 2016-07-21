@@ -61,7 +61,7 @@ class UserNotificationConditionTests: OperationTests {
     func test__condition_fails_when_current_settings_are_empty() {
         let settings = createSimpleSettings()
         let registrar = TestableUserNotificationRegistrar(settings: .none)
-        let condition = UserNotificationCondition(settings: settings, behavior: .Merge, registrar: registrar)
+        let condition = UserNotificationCondition(settings: settings, behavior: .merge, registrar: registrar)
 
         let operation = TestOperation()
         operation.addCondition(SilentCondition(condition))
@@ -69,9 +69,9 @@ class UserNotificationConditionTests: OperationTests {
         waitForOperation(operation)
 
         XCTAssertFalse(operation.didExecute)
-        XCTAssertTrue(operation.cancelled)
+        XCTAssertTrue(operation.isCancelled)
         if let error = operation.errors.first as? UserNotificationCondition.Error {
-            XCTAssertTrue(error == UserNotificationCondition.Error.SettingsNotSufficient((current: nil, desired: settings)))
+            XCTAssertTrue(error == UserNotificationCondition.Error.settingsNotSufficient((current: nil, desired: settings)))
         }
         else {
             XCTFail("No error message was observed")
@@ -82,7 +82,7 @@ class UserNotificationConditionTests: OperationTests {
 
         let settings = createSimpleSettings()
         let registrar = TestableUserNotificationRegistrar(settings: settings)
-        let condition = UserNotificationCondition(settings: settings, behavior: .Merge, registrar: registrar)
+        let condition = UserNotificationCondition(settings: settings, behavior: .merge, registrar: registrar)
 
         let operation = TestOperation()
         operation.addCondition(SilentCondition(condition))
@@ -95,7 +95,7 @@ class UserNotificationConditionTests: OperationTests {
     func test__permission_is_requested_if_permissions_are_not_enough() {
         let settings = createSimpleSettings()
         let registrar = TestableUserNotificationRegistrar(settings: UIUserNotificationSettings(types: [], categories: nil))
-        let condition = UserNotificationCondition(settings: settings, behavior: .Merge, registrar: registrar)
+        let condition = UserNotificationCondition(settings: settings, behavior: .merge, registrar: registrar)
 
         let operation = TestOperation()
         operation.addCondition(condition)

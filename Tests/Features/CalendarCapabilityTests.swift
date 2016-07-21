@@ -41,22 +41,22 @@ class EKAuthorizationStatusTests: XCTestCase {
 
     func test__given_status_not_determined__requirements_not_met() {
         let status = EKAuthorizationStatus.notDetermined
-        XCTAssertFalse(status.isRequirementMet(.Event))
+        XCTAssertFalse(status.isRequirementMet(.event))
     }
 
     func test__given_status_restricted__requirements_not_met() {
         let status = EKAuthorizationStatus.restricted
-        XCTAssertFalse(status.isRequirementMet(.Event))
+        XCTAssertFalse(status.isRequirementMet(.event))
     }
 
     func test__given_status_denied__requirements_not_met() {
         let status = EKAuthorizationStatus.denied
-        XCTAssertFalse(status.isRequirementMet(.Event))
+        XCTAssertFalse(status.isRequirementMet(.event))
     }
 
     func test__given_status_authorized__requirements_met() {
         let status = EKAuthorizationStatus.authorized
-        XCTAssertTrue(status.isRequirementMet(.Event))
+        XCTAssertTrue(status.isRequirementMet(.event))
     }
 }
 
@@ -67,7 +67,7 @@ class EventsCapabilityTests: XCTestCase {
     override func setUp() {
         super.setUp()
         registrar = TestableEventsRegistrar()
-        capability = EventsCapability(.Event)
+        capability = EventsCapability(.event)
         capability.registrar = registrar
     }
 
@@ -82,7 +82,7 @@ class EventsCapabilityTests: XCTestCase {
     }
 
     func test__requirement_is_set() {
-        XCTAssertEqual(capability.requirement, EKEntityType.Event)
+        XCTAssertEqual(capability.requirement, EKEntityType.event)
     }
 
     func test__is_available_always() {
@@ -90,7 +90,7 @@ class EventsCapabilityTests: XCTestCase {
     }
 
     func test__authorization_status_queries_register() {
-        capability.authorizationStatus { XCTAssertEqual($0, EKAuthorizationStatus.NotDetermined) }
+        capability.authorizationStatus { XCTAssertEqual($0, EKAuthorizationStatus.notDetermined) }
         XCTAssertTrue(registrar.didCheckAuthorizationStatus)
     }
 

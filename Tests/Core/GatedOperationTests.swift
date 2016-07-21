@@ -14,26 +14,26 @@ class GatedOperationTests: OperationTests {
     func test__when_gate_is_closed_operation_is_not_performed() {
 
         let gate = GatedOperation(TestOperation()) { return false }
-        addCompletionBlockToTestOperation(gate, withExpectation: expectationWithDescription("Test: \(#function)"))
+        addCompletionBlockToTestOperation(gate, withExpectation: expectation(description: "Test: \(#function)"))
 
         runOperation(gate)
 
         waitForExpectations(timeout: 5, handler: nil)
-        XCTAssertTrue(gate.finished)
+        XCTAssertTrue(gate.isFinished)
         XCTAssertFalse(gate.operation.didExecute)
     }
 
     func test__when_gate_is_open_operation_is_performed() {
         let gate = GatedOperation(TestOperation()) { return true }
-        addCompletionBlockToTestOperation(gate, withExpectation: expectationWithDescription("Test: \(#function), Gate"))
-        addCompletionBlockToTestOperation(gate.operation, withExpectation: expectationWithDescription("Test: \(#function), OldOperation"))
+        addCompletionBlockToTestOperation(gate, withExpectation: expectation(description: "Test: \(#function), Gate"))
+        addCompletionBlockToTestOperation(gate.operation, withExpectation: expectation(description: "Test: \(#function), OldOperation"))
 
         runOperation(gate)
 
         waitForExpectations(timeout: 5, handler: nil)
-        XCTAssertTrue(gate.finished)
+        XCTAssertTrue(gate.isFinished)
         XCTAssertTrue(gate.operation.didExecute)
-        XCTAssertTrue(gate.operation.finished)
+        XCTAssertTrue(gate.operation.isFinished)
     }
 
 }

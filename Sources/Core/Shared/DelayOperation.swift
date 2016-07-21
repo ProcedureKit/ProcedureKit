@@ -52,12 +52,12 @@ time-out.
 public class DelayOperation: OldOperation {
 
     private let delay: Delay
-    private let leeway: UInt64
+    private let leeway: DispatchTimeInterval
     private let timer: DispatchSourceTimer
 
     internal init(delay: Delay, leeway: Int = 1_000_000) {
         self.delay = delay
-        self.leeway = UInt64(leeway)
+        self.leeway = .nanoseconds(leeway)
         let _timer = DispatchSource.timer(flags: DispatchSource.TimerFlags(rawValue: UInt(0)), queue: Queue.default.queue)
         self.timer = _timer
         super.init()
@@ -110,7 +110,7 @@ public class DelayOperation: OldOperation {
         switch delay.interval {
 
         case (let interval) where interval > 0.0:
-            timer.setTimer(start: DispatchTime.now() + Double(Int64(interval * Double(NSEC_PER_SEC))) / Double(NSEC_PER_SEC), interval: DispatchTime.distantFuture, leeway: leeway)
+            timer.scheduleOneshot(deadline: .now() + interval, leeway: leeway)
             timer.resume()
 
         default:

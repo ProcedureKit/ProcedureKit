@@ -22,7 +22,7 @@ class TaskOperationTests: OperationTests {
     func test__task_runs() {
         operation = TaskOperation(task: create())
         waitForOperation(operation)
-        XCTAssertTrue(operation.finished)
+        XCTAssertTrue(operation.isFinished)
         XCTAssertFalse(operation.failed)
     }
 
@@ -30,14 +30,14 @@ class TaskOperationTests: OperationTests {
         operation = TaskOperation(task: create("/bin/ls"))
         operation.cancel()
         waitForOperation(operation)
-        XCTAssertTrue(operation.finished)
-        XCTAssertTrue(operation.cancelled)
+        XCTAssertTrue(operation.isFinished)
+        XCTAssertTrue(operation.isCancelled)
     }
 
     func test__task_finishes_with_error_if_launch_path_not_set() {
         operation = TaskOperation(task: NSTask())
         waitForOperation(operation)
-        XCTAssertTrue(operation.finished)
+        XCTAssertTrue(operation.isFinished)
         XCTAssertTrue(operation.failed)
         guard let error = operation.errors.first as? TaskOperation.Error else { XCTFail(); return }
         XCTAssertEqual(error, TaskOperation.Error.LaunchPathNotSet)

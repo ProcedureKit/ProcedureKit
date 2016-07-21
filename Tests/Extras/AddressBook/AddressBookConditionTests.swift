@@ -34,12 +34,12 @@ class TestableAddressBookRegistrar: AddressBookPermissionRegistrar {
         didCreateAddressBook = true
 
         if let _ = creationError {
-            return (.None, AddressBookPermissionRegistrarError.AddressBookAccessDenied)
+            return (.none, AddressBookPermissionRegistrarError.addressBookAccessDenied)
         }
         else if let addressBook: CFTypeRef = addressBook {
-            return (addressBook as ABAddressBookRef, .None)
+            return (addressBook as ABAddressBook, .none)
         }
-        return (.None, AddressBookPermissionRegistrarError.AddressBookUnknownErrorOccured)
+        return (.none, AddressBookPermissionRegistrarError.addressBookUnknownErrorOccured)
     }
 
     func requestAccessToAddressBook(_ addressBook: ABAddressBook, completion: (AddressBookPermissionRegistrarError?) -> Void) {
@@ -51,10 +51,10 @@ class TestableAddressBookRegistrar: AddressBookPermissionRegistrar {
         else {
             status = .denied
             if let _ = accessError {
-                completion(AddressBookPermissionRegistrarError.AddressBookAccessDenied)
+                completion(AddressBookPermissionRegistrarError.addressBookAccessDenied)
             }
             else {
-                completion(AddressBookPermissionRegistrarError.AddressBookUnknownErrorOccured)
+                completion(AddressBookPermissionRegistrarError.addressBookUnknownErrorOccured)
             }
         }
     }
@@ -86,7 +86,7 @@ class AddressBookOperationTests: OperationTests {
             }
         ))
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectation(description: "Test: \(#function)"))
         runOperation(operation)
 
         waitForExpectations(timeout: 3, handler: nil)
@@ -115,7 +115,7 @@ class AddressBookOperationTests: OperationTests {
             }
         ))
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectation(description: "Test: \(#function)"))
         runOperation(operation)
 
         waitForExpectations(timeout: 3, handler: nil)
@@ -126,7 +126,7 @@ class AddressBookOperationTests: OperationTests {
 
         if let error = receivedErrors.first as? AddressBookPermissionRegistrarError {
             switch error {
-            case .AddressBookUnknownErrorOccured:
+            case .addressBookUnknownErrorOccured:
                 break
             default:
                 XCTFail("Incorrect AddressBookPermissionRegistrarError type received")
@@ -160,7 +160,7 @@ class AddressBookConditionTests: OperationTests {
         let operation = TestOperation()
         operation.addCondition(condition)
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectation(description: "Test: \(#function)"))
         runOperation(operation)
 
         waitForExpectations(timeout: 3, handler: nil)
@@ -180,7 +180,7 @@ class AddressBookConditionTests: OperationTests {
             receivedErrors = errors
         })
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectation(description: "Test: \(#function)"))
         runOperation(operation)
 
         waitForExpectations(timeout: 3, handler: nil)
@@ -189,7 +189,7 @@ class AddressBookConditionTests: OperationTests {
 
         if let error = receivedErrors.first as? AddressBookCondition.Error {
             switch error {
-            case .AuthorizationDenied:
+            case .authorizationDenied:
                 break
             default:
                 XCTFail("Incorrect AddressBookCondition.Error type received")

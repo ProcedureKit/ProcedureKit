@@ -21,7 +21,7 @@ internal class ExclusivityManager {
     }
 
     func addOperation(_ operation: OldOperation, category: String) -> Operation? {
-        return dispatch_sync(queue) { self._addOperation(operation, category: category) }
+        return dispatch_sync(queue: queue) { self._addOperation(operation, category: category) }
     }
 
     func removeOperation(_ operation: OldOperation, category: String) {
@@ -55,7 +55,7 @@ internal class ExclusivityManager {
     private func _removeOperation(_ operation: OldOperation, category: String) {
         operation.log.verbose("<<< \(category)")
 
-        if let operationsWithThisCategory = operations[category], index = operationsWithThisCategory.index(of: operation) {
+        if let operationsWithThisCategory = operations[category], let index = operationsWithThisCategory.index(of: operation) {
             var mutableOperationsWithThisCategory = operationsWithThisCategory
             mutableOperationsWithThisCategory.remove(at: index)
             operations[category] = mutableOperationsWithThisCategory

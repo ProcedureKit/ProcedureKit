@@ -45,7 +45,7 @@ class LoggingObserverWithError: LoggingObserverTests {
 
     override func setUp() {
         super.setUp()
-        configureOperation(TestOperation(error: BlockCondition.Error.BlockConditionFailed))
+        configureOperation(TestOperation(error: BlockCondition.Error.blockConditionFailed))
     }
 
     func test__logger_outputs_number_of_received_errors() {
@@ -65,7 +65,7 @@ class LoggingObserverWithCancellation: LoggingObserverTests {
 
     func test__logger_outputs_cancellation() {
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectation(description: "Test: \(#function)"))
         runOperation(operation)
         operation.cancel()
         waitForExpectations(timeout: 3, handler: nil)
@@ -84,7 +84,7 @@ class LoggingObserverWithProduce: LoggingObserverTests {
 
     func test__logger_outputs_cancellation() {
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectation(description: "Test: \(#function)"))
         runOperation(operation)
         waitForExpectations(timeout: 3, handler: nil)
         XCTAssertTrue(receivedMessages.contains("Test Logging OldOperation: did produce operation: Test OldOperation."))

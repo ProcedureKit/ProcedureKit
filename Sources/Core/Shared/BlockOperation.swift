@@ -1,5 +1,5 @@
 //
-//  BlockOperation.swift
+//  OldBlockOperation.swift
 //  Operations
 //
 //  Created by Daniel Thorpe on 18/07/2015.
@@ -15,7 +15,7 @@ call this block to correctly finish the operation. It can be called
 with a nil error argument to finish with no errors. Or an `ErrorType`
 argument to finish with the supplied error.
 */
-public class BlockOperation: OldOperation {
+public class OldBlockOperation: OldOperation {
 
     public typealias ContinuationBlockType = (error: ErrorProtocol?) -> Void
     public typealias BlockType = (continueWithError: ContinuationBlockType) -> Void
@@ -31,7 +31,7 @@ public class BlockOperation: OldOperation {
     public init(block: BlockType = { continuation in continuation(error: nil) }) {
         self.block = block
         super.init()
-        name = "Block OldOperation"
+        name = "OldBlockOperation"
     }
 
     /**

@@ -79,13 +79,13 @@ class BackgroundObserverTests: OperationTests {
         let operation = TestOperation(delay: 2, produced: TestOperation())
         operation.addObserver(BackgroundObserver(app: application))
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectation(description: "Test: \(#function)"))
         runOperation(operation)
         applicationEntersBackground(application)
 
         waitForExpectations(timeout: 5, handler: nil)
         XCTAssertTrue(operation.didExecute)
-        XCTAssertTrue(operation.finished)
+        XCTAssertTrue(operation.isFinished)
 
         XCTAssertNotNil(backgroundTaskName)
         XCTAssertEqual(backgroundTaskName, BackgroundObserver.backgroundTaskName)
@@ -118,13 +118,13 @@ class BackgroundObserverTests: OperationTests {
         let operation = TestOperation(delay: 2)
         operation.addObserver(BackgroundObserver(app: application))
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectation(description: "Test: \(#function)"))
         runOperation(operation)
         applicationBecomesActive(application)
 
         waitForExpectations(timeout: 5, handler: nil)
         XCTAssertTrue(operation.didExecute)
-        XCTAssertTrue(operation.finished)
+        XCTAssertTrue(operation.isFinished)
 
         XCTAssertNotNil(backgroundTaskName)
         XCTAssertEqual(backgroundTaskName, BackgroundObserver.backgroundTaskName)

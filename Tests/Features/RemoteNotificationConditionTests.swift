@@ -76,7 +76,7 @@ class RemoteNotificationConditionTests: OperationTests {
         XCTAssertFalse(operation.didExecute)
         if let error = receivedErrors.first as? RemoteNotificationCondition.Error {
             switch error {
-            case .ReceivedError(_):
+            case .receivedError(_):
                 break // expected.
             }
         }

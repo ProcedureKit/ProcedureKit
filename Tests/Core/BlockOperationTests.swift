@@ -15,7 +15,7 @@ class BlockOperationTests: OperationTests {
 
         let expectation = self.expectation(description: "Test: \(#function)")
         var didExecuteBlock: Bool = false
-        let operation = BlockOperation {
+        let operation = OldBlockOperation {
             didExecuteBlock = true
             expectation.fulfill()
         }
@@ -26,7 +26,7 @@ class BlockOperationTests: OperationTests {
 
     func test__that_block_operation_with_no_block_finishes_immediately() {
         let expectation = self.expectation(description: "Test: \(#function)")
-        let operation = BlockOperation()
+        let operation = OldBlockOperation()
         addCompletionBlockToTestOperation(operation, withExpectation: expectation)
         runOperation(operation)
         waitForExpectations(timeout: 3, handler: nil)
@@ -38,17 +38,17 @@ class BlockOperationTests: OperationTests {
 
         let delay = DelayOperation(interval: 2)
 
-        let block = BlockOperation { (continuation: BlockOperation.ContinuationBlockType) in
+        let block = OldBlockOperation { (continuation: OldBlockOperation.ContinuationBlockType) in
             blockDidRun += 2
             continuation(error: nil)
         }
 
-        let blockToCancel = BlockOperation { (continuation: BlockOperation.ContinuationBlockType) in
+        let blockToCancel = OldBlockOperation { (continuation: OldBlockOperation.ContinuationBlockType) in
             blockDidRun += 1
             continuation(error: nil)
         }
 
-        addCompletionBlockToTestOperation(block, withExpectation: expectationWithDescription("Test: \(#function)"))
+        addCompletionBlockToTestOperation(block, withExpectation: expectation(description: "Test: \(#function)"))
 
         block.addDependency(delay)
         blockToCancel.addDependency(delay)

@@ -28,7 +28,7 @@ class ConditionTests: OperationTests {
         operation.addCondition(FalseCondition())
         waitForOperation(operation)
         XCTAssertFalse(operation.didExecute)
-        XCTAssertTrue(operation.cancelled)
+        XCTAssertTrue(operation.isCancelled)
         XCTAssertEqual(operation.errors.count, 1)
     }
 
@@ -46,7 +46,7 @@ class ConditionTests: OperationTests {
         operation.addCondition(FalseCondition())
         waitForOperation(operation)
         XCTAssertFalse(operation.didExecute)
-        XCTAssertTrue(operation.cancelled)
+        XCTAssertTrue(operation.isCancelled)
         XCTAssertEqual(operation.errors.count, 3)
     }
     
@@ -56,7 +56,7 @@ class ConditionTests: OperationTests {
         operation.addCondition(FalseCondition())
         waitForOperation(operation)
         XCTAssertFalse(operation.didExecute)
-        XCTAssertTrue(operation.cancelled)
+        XCTAssertTrue(operation.isCancelled)
         XCTAssertEqual(operation.errors.count, 2)
     }
 
@@ -66,7 +66,7 @@ class ConditionTests: OperationTests {
         operation.addCondition(FalseCondition())
         waitForOperation(operation)
         XCTAssertFalse(operation.didExecute)
-        XCTAssertTrue(operation.cancelled)
+        XCTAssertTrue(operation.isCancelled)
         XCTAssertEqual(operation.errors.count, 1)
     }
     
@@ -79,7 +79,7 @@ class ConditionTests: OperationTests {
     }
 
     func test__single_condition_which_succeeds_with_single_condition_which_fails__cancelled() {
-        LogManager.severity = .Verbose
+        LogManager.severity = .verbose
         operation = TestOperation()
         let condition = TrueCondition(name: "Condition 1")
         condition.addCondition(FalseCondition(name: "Nested Condition 1"))
@@ -87,9 +87,9 @@ class ConditionTests: OperationTests {
         waitForOperation(operation)
         print("*** \(operation.errors)")
         XCTAssertFalse(operation.didExecute)
-        XCTAssertTrue(operation.cancelled)
+        XCTAssertTrue(operation.isCancelled)
         XCTAssertEqual(operation.errors.count, 2)
-        LogManager.severity = .Warning
+        LogManager.severity = .warning
     }
     
     func test__dependencies_execute_before_condition_dependencies() {
@@ -97,18 +97,18 @@ class ConditionTests: OperationTests {
         let dependency1 = TestOperation(); dependency1.name = "Dependency 1"
         let dependency2 = TestOperation(); dependency2.name = "Dependency 2"
         
-        let conditionDependency1 = BlockOperation {
-            XCTAssertTrue(dependency1.finished)
-            XCTAssertTrue(dependency2.finished)
+        let conditionDependency1 = OldBlockOperation {
+            XCTAssertTrue(dependency1.isFinished)
+            XCTAssertTrue(dependency2.isFinished)
         }
         conditionDependency1.name = "Condition 1 Dependency"
         let condition1 = TrueCondition(name: "Condition 1")
         condition1.addDependency(conditionDependency1)
 
 
-        let conditionDependency2 = BlockOperation {
-            XCTAssertTrue(dependency1.finished)
-            XCTAssertTrue(dependency2.finished)
+        let conditionDependency2 = OldBlockOperation {
+            XCTAssertTrue(dependency1.isFinished)
+            XCTAssertTrue(dependency2.isFinished)
         }
         conditionDependency2.name = "Condition 2 Dependency"
         
@@ -120,16 +120,16 @@ class ConditionTests: OperationTests {
         operation.addCondition(condition1)
         operation.addCondition(condition2)
         
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectation(description: "Test: \(#function)"))
         runOperations(dependency1, dependency2, operation)
         waitForExpectations(timeout: 5, handler: nil)
         
         XCTAssertTrue(dependency1.didExecute)
-        XCTAssertTrue(dependency1.finished)
+        XCTAssertTrue(dependency1.isFinished)
         XCTAssertTrue(dependency2.didExecute)
-        XCTAssertTrue(dependency2.finished)
+        XCTAssertTrue(dependency2.isFinished)
         XCTAssertTrue(operation.didExecute)
-        XCTAssertTrue(operation.finished)
+        XCTAssertTrue(operation.isFinished)
     }
     
     func test__dependencies_contains_direct_dependencies_and_indirect_dependencies() {
@@ -146,7 +146,7 @@ class ConditionTests: OperationTests {
         operation.addCondition(condition1)
         operation.addCondition(condition2)
         
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectation(description: "Test: \(#function)"))
         runOperations(dependency1, dependency2, operation)
         waitForExpectations(timeout: 3, handler: nil)
         

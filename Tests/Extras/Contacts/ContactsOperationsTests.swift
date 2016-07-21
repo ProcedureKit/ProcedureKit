@@ -28,7 +28,7 @@ class TestableContactSaveRequest: ContactSaveRequestType {
     required init() { }
 
     func opr_addContact(_ contact: CNMutableContact, toContainerWithIdentifier identifier: String?) {
-        let containerId = identifier ?? ContainerID.Default.identifier
+        let containerId = identifier ?? ContainerID.default.identifier
         addedContacts[containerId] = addedContacts[containerId] ?? []
         addedContacts[containerId]!.append(contact)
     }
@@ -42,7 +42,7 @@ class TestableContactSaveRequest: ContactSaveRequestType {
     }
 
     func opr_addGroup(_ group: CNMutableGroup, toContainerWithIdentifier identifier: String?) {
-        let containerId = identifier ?? ContainerID.Default.identifier
+        let containerId = identifier ?? ContainerID.default.identifier
         addedGroups[containerId] = addedGroups[containerId] ?? []
         addedGroups[containerId]!.append(group)
     }
@@ -195,17 +195,17 @@ class ContactsTests: OperationTests {
 
     func createContactsForPredicate(_ predicate: ContactPredicate) -> [CNContact] {
         switch predicate {
-        case .WithIdentifiers(let identifiers):
+        case .withIdentifiers(let identifiers):
             return identifiers.map { _ in CNContact() }
-        case .MatchingName(let name):
+        case .matchingName(let name):
             return (0..<3).map { i in
                 let contact = CNMutableContact()
                 contact.givenName = "\(name) \(i)"
                 return contact
             }
-        case .InGroupWithIdentifier(_):
+        case .inGroupWithIdentifier(_):
             return (0..<3).map { _ in CNContact() }
-        case .InContainerWithID(_):
+        case .inContainerWithID(_):
             return (0..<3).map { _ in CNContact() }
         }
     }
@@ -218,7 +218,7 @@ class ContactsTests: OperationTests {
 
     func setUpForGroupsWithName(_ groupName: String) -> CNGroup {
         group.name = groupName
-        store.groupsMatchingPredicate[.InContainerWithID(.Default)] = [group]
+        store.groupsMatchingPredicate[.inContainerWithID(.default)] = [group]
         return group
     }
 
@@ -237,15 +237,15 @@ class ContactsOperationTests: ContactsTests {
     }
 
     func test__container_default_identifier() {
-        XCTAssertEqual(ContainerID.Default.identifier, CNContactStore().defaultContainerIdentifier())
+        XCTAssertEqual(ContainerID.default.identifier, CNContactStore().defaultContainerIdentifier())
     }
 
     func test__given_access__container_predicate_with_identifiers() {
 
-        let identifiers: [ContainerID] = [ .Default ]
-        store.containersMatchingPredicate[.WithIdentifiers(identifiers)] = [container]
+        let identifiers: [ContainerID] = [ .default ]
+        store.containersMatchingPredicate[.withIdentifiers(identifiers)] = [container]
 
-        let containers = try! operation.containersWithPredicate(.WithIdentifiers([.Default]))
+        let containers = try! operation.containersWithPredicate(.withIdentifiers([.default]))
 
         XCTAssertTrue(store.didAccessContainersMatchingPredicate)
         XCTAssertEqual(container, containers.first!)
@@ -254,9 +254,9 @@ class ContactsOperationTests: ContactsTests {
     func test__given_access__container_of_contact_with_identifier() {
 
         let contactId = "contact_123"
-        store.containersMatchingPredicate[.OfContactWithIdentifier(contactId)] = [container]
+        store.containersMatchingPredicate[.ofContactWithIdentifier(contactId)] = [container]
 
-        let containers = try! operation.containersWithPredicate(.OfContactWithIdentifier(contactId))
+        let containers = try! operation.containersWithPredicate(.ofContactWithIdentifier(contactId))
 
         XCTAssertTrue(store.didAccessContainersMatchingPredicate)
         XCTAssertEqual(container, containers.first!)
@@ -264,31 +264,31 @@ class ContactsOperationTests: ContactsTests {
 
     func test__given_access__container_of_group_with_identifier() {
         let groupId = "group_123"
-        store.containersMatchingPredicate[.OfGroupWithIdentifier(groupId)] = [container]
+        store.containersMatchingPredicate[.ofGroupWithIdentifier(groupId)] = [container]
 
-        let containers = try! operation.containersWithPredicate(.OfGroupWithIdentifier(groupId))
+        let containers = try! operation.containersWithPredicate(.ofGroupWithIdentifier(groupId))
 
         XCTAssertTrue(store.didAccessContainersMatchingPredicate)
         XCTAssertEqual(container, containers.first!)
     }
 
     func test__given_access__get_container() {
-        store.containersMatchingPredicate[ .WithIdentifiers([.Default]) ] = [container]
+        store.containersMatchingPredicate[ .withIdentifiers([.default]) ] = [container]
         let _container = try! operation.container()
         XCTAssertTrue(_container != nil)
         XCTAssertEqual(_container, container)
     }
 
     func test__given_access__get_container_with_identifier() {
-        store.containersMatchingPredicate[.WithIdentifiers([ .Identifier("container_123") ])] = [container]
-        operation = _ContactsOperation(containerId: .Identifier("container_123"), contactStore: store)
+        store.containersMatchingPredicate[.withIdentifiers([ .identifier("container_123") ])] = [container]
+        operation = _ContactsOperation(containerId: .identifier("container_123"), contactStore: store)
         let _container = try! operation.container()
         XCTAssertTrue(_container != nil)
         XCTAssertEqual(_container, container)
     }
 
     func test__given_access__get_all_groups() {
-        store.groupsMatchingPredicate[.WithIdentifiers([ "group_123" ])] = [group]
+        store.groupsMatchingPredicate[.withIdentifiers([ "group_123" ])] = [group]
         let groups = try! operation.allGroups()
         XCTAssertTrue(store.didAccessGroupsMatchingPredicate)
         XCTAssertEqual(group, groups.first!)
@@ -296,7 +296,7 @@ class ContactsOperationTests: ContactsTests {
 
     func test__given_access__get_group_named() {
         group.name = "Test Group"
-        store.groupsMatchingPredicate[.WithIdentifiers([ "group_123" ])] = [group]
+        store.groupsMatchingPredicate[.withIdentifiers([ "group_123" ])] = [group]
         let groups = try! operation.groupsNamed("Test Group")
         XCTAssertTrue(store.didAccessGroupsMatchingPredicate)
         XCTAssertEqual(group, groups.first!)
@@ -315,15 +315,15 @@ class GetContactsOperationTest: ContactsTests {
     func test__get_contact_by_identifier_convenience_initializer() {
         let contactId = "contact_123"
         operation = _GetContacts(identifier: contactId, keysToFetch: [])
-        XCTAssertEqual(operation.predicate, ContactPredicate.WithIdentifiers([contactId]))
+        XCTAssertEqual(operation.predicate, ContactPredicate.withIdentifiers([contactId]))
     }
 
     func test__getting_contact_by_identifier() {
         let contactId = "contact_123"
         let contact = setUpForContactWithIdentifier(contactId)
-        operation = _GetContacts(predicate: .WithIdentifiers([contactId]), keysToFetch: [], contactStore: store)
+        operation = _GetContacts(predicate: .withIdentifiers([contactId]), keysToFetch: [], contactStore: store)
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectation(description: "Test: \(#function)"))
         runOperation(operation)
         waitForExpectations(timeout: 3, handler: nil)
 
@@ -333,11 +333,11 @@ class GetContactsOperationTest: ContactsTests {
     }
 
     func test__getting_contacts_by_name() {
-        let predicate: ContactPredicate = .MatchingName("Dan")
+        let predicate: ContactPredicate = .matchingName("Dan")
         let contacts = setUpForContactsWithPredicate(predicate)
         operation = _GetContacts(predicate: predicate, keysToFetch: [CNContainerNameKey], contactStore: store)
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectation(description: "Test: \(#function)"))
         runOperation(operation)
         waitForExpectations(timeout: 3, handler: nil)
 
@@ -372,7 +372,7 @@ class GetContactsGroupOperationTests: ContactsTests {
         let group = setUpForGroupsWithName(groupName)
         operation = _GetContactsGroup(groupName: groupName, contactStore: store)
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectation(description: "Test: \(#function)"))
         runOperation(operation)
         waitForExpectations(timeout: 3, handler: nil)
 
@@ -382,9 +382,9 @@ class GetContactsGroupOperationTests: ContactsTests {
     }
 
     func test__get_contacts_group_creates_group_if_necessary() {
-        operation = _GetContactsGroup(groupName: groupName, containerId: .Identifier(containerId), contactStore: store)
+        operation = _GetContactsGroup(groupName: groupName, containerId: .identifier(containerId), contactStore: store)
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectation(description: "Test: \(#function)"))
         runOperation(operation)
         waitForExpectations(timeout: 3, handler: nil)
 
@@ -419,7 +419,7 @@ class RemoveContactsGroupOperationTests: ContactsTests {
     func test__remove_contacts_does_nothing_if_group_does_not_exist() {
         operation = _RemoveContactsGroup(groupName: groupName, contactStore: store)
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectation(description: "Test: \(#function)"))
         runOperation(operation)
         waitForExpectations(timeout: 3, handler: nil)
 
@@ -430,7 +430,7 @@ class RemoveContactsGroupOperationTests: ContactsTests {
         let _ = setUpForGroupsWithName(groupName)
         operation = _RemoveContactsGroup(groupName: groupName, contactStore: store)
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectation(description: "Test: \(#function)"))
         runOperation(operation)
         waitForExpectations(timeout: 3, handler: nil)
 
@@ -465,7 +465,7 @@ class AddContactsToGroupOperationTests: ContactsTests {
         setUpForContactEnumerationWithContactIds(contactIds)
         operation = _AddContactsToGroup(groupName: groupName, contactIDs: contactIds, contactStore: store)
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectation(description: "Test: \(#function)"))
         runOperation(operation)
         waitForExpectations(timeout: 3, handler: nil)
 
@@ -499,7 +499,7 @@ class RemoveContactsFromGroupOperationTests: ContactsTests {
         setUpForContactEnumerationWithContactIds(contactIds)
         operation = _RemoveContactsFromGroup(groupName: groupName, contactIDs: contactIds, contactStore: store)
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectation(description: "Test: \(#function)"))
         runOperation(operation)
         waitForExpectations(timeout: 3, handler: nil)
 
@@ -525,7 +525,7 @@ class ContactsAccessOperationsTests: OperationTests {
         let operation = TestOperation()
         operation.addCondition(_ContactsCondition(registrar: registrar))
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectation(description: "Test: \(#function)"))
         runOperation(operation)
         waitForExpectations(timeout: 3, handler: nil)
 
@@ -540,7 +540,7 @@ class ContactsAccessOperationsTests: OperationTests {
         let operation = TestOperation()
         operation.addCondition(_ContactsCondition(registrar: registrar))
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectation(description: "Test: \(#function)"))
         runOperation(operation)
         waitForExpectations(timeout: 3, handler: nil)
 
@@ -554,7 +554,7 @@ class ContactsAccessOperationsTests: OperationTests {
         let operation = TestOperation()
         operation.addCondition(_ContactsCondition(registrar: registrar))
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectation(description: "Test: \(#function)"))
         runOperation(operation)
         waitForExpectations(timeout: 3, handler: nil)
 
