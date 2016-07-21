@@ -26,7 +26,7 @@
 		6526185B1C11F8C900654091 /* Operations.h in Headers */ = {isa = PBXBuildFile; fileRef = 652617071C11F5EB00654091 /* Operations.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6526185F1C11F8FC00654091 /* BlockCondition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652616CE1C11F5EB00654091 /* BlockCondition.swift */; };
 		652618601C11F8FC00654091 /* BlockObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652616CF1C11F5EB00654091 /* BlockObserver.swift */; };
-		652618611C11F8FC00654091 /* BlockOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652616D01C11F5EB00654091 /* BlockOperation.swift */; };
+		652618611C11F8FC00654091 /* BlockProcedure.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652616D01C11F5EB00654091 /* BlockProcedure.swift */; };
 		652618621C11F8FC00654091 /* ComposedOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652616D11C11F5EB00654091 /* ComposedOperation.swift */; };
 		652618631C11F8FC00654091 /* DelayOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652616D21C11F5EB00654091 /* DelayOperation.swift */; };
 		652618641C11F8FC00654091 /* ExclusivityManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652616D31C11F5EB00654091 /* ExclusivityManager.swift */; };
@@ -37,16 +37,16 @@
 		652618691C11F8FC00654091 /* MutuallyExclusive.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652616D81C11F5EB00654091 /* MutuallyExclusive.swift */; };
 		6526186A1C11F8FC00654091 /* NegatedCondition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652616D91C11F5EB00654091 /* NegatedCondition.swift */; };
 		6526186B1C11F8FC00654091 /* NoFailedDependenciesCondition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652616DA1C11F5EB00654091 /* NoFailedDependenciesCondition.swift */; };
-		6526186C1C11F8FC00654091 /* Operation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652616DB1C11F5EB00654091 /* Operation.swift */; };
+		6526186C1C11F8FC00654091 /* Procedure.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652616DB1C11F5EB00654091 /* Procedure.swift */; };
 		6526186D1C11F8FC00654091 /* OperationCondition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652616DC1C11F5EB00654091 /* OperationCondition.swift */; };
 		6526186E1C11F8FC00654091 /* OperationObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652616DD1C11F5EB00654091 /* OperationObserver.swift */; };
-		6526186F1C11F8FC00654091 /* OperationQueue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652616DE1C11F5EB00654091 /* OperationQueue.swift */; };
+		6526186F1C11F8FC00654091 /* ProcedureQueue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652616DE1C11F5EB00654091 /* ProcedureQueue.swift */; };
 		652618701C11F8FC00654091 /* SlientCondition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652616DF1C11F5EB00654091 /* SlientCondition.swift */; };
 		652618711C11F8FC00654091 /* Support.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652616E01C11F5EB00654091 /* Support.swift */; };
 		652618721C11F8FC00654091 /* TimeoutObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652616E11C11F5EB00654091 /* TimeoutObserver.swift */; };
 		652618731C11F8FD00654091 /* BlockCondition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652616CE1C11F5EB00654091 /* BlockCondition.swift */; };
 		652618741C11F8FD00654091 /* BlockObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652616CF1C11F5EB00654091 /* BlockObserver.swift */; };
-		652618751C11F8FD00654091 /* BlockOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652616D01C11F5EB00654091 /* BlockOperation.swift */; };
+		652618751C11F8FD00654091 /* BlockProcedure.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652616D01C11F5EB00654091 /* BlockProcedure.swift */; };
 		652618761C11F8FD00654091 /* ComposedOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652616D11C11F5EB00654091 /* ComposedOperation.swift */; };
 		652618771C11F8FD00654091 /* DelayOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652616D21C11F5EB00654091 /* DelayOperation.swift */; };
 		652618781C11F8FD00654091 /* ExclusivityManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652616D31C11F5EB00654091 /* ExclusivityManager.swift */; };
@@ -57,16 +57,16 @@
 		6526187D1C11F8FD00654091 /* MutuallyExclusive.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652616D81C11F5EB00654091 /* MutuallyExclusive.swift */; };
 		6526187E1C11F8FD00654091 /* NegatedCondition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652616D91C11F5EB00654091 /* NegatedCondition.swift */; };
 		6526187F1C11F8FD00654091 /* NoFailedDependenciesCondition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652616DA1C11F5EB00654091 /* NoFailedDependenciesCondition.swift */; };
-		652618801C11F8FD00654091 /* Operation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652616DB1C11F5EB00654091 /* Operation.swift */; };
+		652618801C11F8FD00654091 /* Procedure.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652616DB1C11F5EB00654091 /* Procedure.swift */; };
 		652618811C11F8FD00654091 /* OperationCondition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652616DC1C11F5EB00654091 /* OperationCondition.swift */; };
 		652618821C11F8FD00654091 /* OperationObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652616DD1C11F5EB00654091 /* OperationObserver.swift */; };
-		652618831C11F8FD00654091 /* OperationQueue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652616DE1C11F5EB00654091 /* OperationQueue.swift */; };
+		652618831C11F8FD00654091 /* ProcedureQueue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652616DE1C11F5EB00654091 /* ProcedureQueue.swift */; };
 		652618841C11F8FD00654091 /* SlientCondition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652616DF1C11F5EB00654091 /* SlientCondition.swift */; };
 		652618851C11F8FD00654091 /* Support.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652616E01C11F5EB00654091 /* Support.swift */; };
 		652618861C11F8FD00654091 /* TimeoutObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652616E11C11F5EB00654091 /* TimeoutObserver.swift */; };
 		652618871C11F8FE00654091 /* BlockCondition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652616CE1C11F5EB00654091 /* BlockCondition.swift */; };
 		652618881C11F8FE00654091 /* BlockObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652616CF1C11F5EB00654091 /* BlockObserver.swift */; };
-		652618891C11F8FE00654091 /* BlockOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652616D01C11F5EB00654091 /* BlockOperation.swift */; };
+		652618891C11F8FE00654091 /* BlockProcedure.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652616D01C11F5EB00654091 /* BlockProcedure.swift */; };
 		6526188A1C11F8FE00654091 /* ComposedOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652616D11C11F5EB00654091 /* ComposedOperation.swift */; };
 		6526188B1C11F8FE00654091 /* DelayOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652616D21C11F5EB00654091 /* DelayOperation.swift */; };
 		6526188C1C11F8FE00654091 /* ExclusivityManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652616D31C11F5EB00654091 /* ExclusivityManager.swift */; };
@@ -77,16 +77,16 @@
 		652618911C11F8FE00654091 /* MutuallyExclusive.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652616D81C11F5EB00654091 /* MutuallyExclusive.swift */; };
 		652618921C11F8FE00654091 /* NegatedCondition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652616D91C11F5EB00654091 /* NegatedCondition.swift */; };
 		652618931C11F8FE00654091 /* NoFailedDependenciesCondition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652616DA1C11F5EB00654091 /* NoFailedDependenciesCondition.swift */; };
-		652618941C11F8FE00654091 /* Operation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652616DB1C11F5EB00654091 /* Operation.swift */; };
+		652618941C11F8FE00654091 /* Procedure.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652616DB1C11F5EB00654091 /* Procedure.swift */; };
 		652618951C11F8FE00654091 /* OperationCondition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652616DC1C11F5EB00654091 /* OperationCondition.swift */; };
 		652618961C11F8FE00654091 /* OperationObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652616DD1C11F5EB00654091 /* OperationObserver.swift */; };
-		652618971C11F8FE00654091 /* OperationQueue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652616DE1C11F5EB00654091 /* OperationQueue.swift */; };
+		652618971C11F8FE00654091 /* ProcedureQueue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652616DE1C11F5EB00654091 /* ProcedureQueue.swift */; };
 		652618981C11F8FE00654091 /* SlientCondition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652616DF1C11F5EB00654091 /* SlientCondition.swift */; };
 		652618991C11F8FE00654091 /* Support.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652616E01C11F5EB00654091 /* Support.swift */; };
 		6526189A1C11F8FE00654091 /* TimeoutObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652616E11C11F5EB00654091 /* TimeoutObserver.swift */; };
 		6526189B1C11F8FF00654091 /* BlockCondition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652616CE1C11F5EB00654091 /* BlockCondition.swift */; };
 		6526189C1C11F8FF00654091 /* BlockObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652616CF1C11F5EB00654091 /* BlockObserver.swift */; };
-		6526189D1C11F8FF00654091 /* BlockOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652616D01C11F5EB00654091 /* BlockOperation.swift */; };
+		6526189D1C11F8FF00654091 /* BlockProcedure.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652616D01C11F5EB00654091 /* BlockProcedure.swift */; };
 		6526189E1C11F8FF00654091 /* ComposedOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652616D11C11F5EB00654091 /* ComposedOperation.swift */; };
 		6526189F1C11F8FF00654091 /* DelayOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652616D21C11F5EB00654091 /* DelayOperation.swift */; };
 		652618A01C11F8FF00654091 /* ExclusivityManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652616D31C11F5EB00654091 /* ExclusivityManager.swift */; };
@@ -97,10 +97,10 @@
 		652618A51C11F8FF00654091 /* MutuallyExclusive.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652616D81C11F5EB00654091 /* MutuallyExclusive.swift */; };
 		652618A61C11F8FF00654091 /* NegatedCondition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652616D91C11F5EB00654091 /* NegatedCondition.swift */; };
 		652618A71C11F8FF00654091 /* NoFailedDependenciesCondition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652616DA1C11F5EB00654091 /* NoFailedDependenciesCondition.swift */; };
-		652618A81C11F8FF00654091 /* Operation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652616DB1C11F5EB00654091 /* Operation.swift */; };
+		652618A81C11F8FF00654091 /* Procedure.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652616DB1C11F5EB00654091 /* Procedure.swift */; };
 		652618A91C11F8FF00654091 /* OperationCondition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652616DC1C11F5EB00654091 /* OperationCondition.swift */; };
 		652618AA1C11F8FF00654091 /* OperationObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652616DD1C11F5EB00654091 /* OperationObserver.swift */; };
-		652618AB1C11F8FF00654091 /* OperationQueue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652616DE1C11F5EB00654091 /* OperationQueue.swift */; };
+		652618AB1C11F8FF00654091 /* ProcedureQueue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652616DE1C11F5EB00654091 /* ProcedureQueue.swift */; };
 		652618AC1C11F8FF00654091 /* SlientCondition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652616DF1C11F5EB00654091 /* SlientCondition.swift */; };
 		652618AD1C11F8FF00654091 /* Support.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652616E01C11F5EB00654091 /* Support.swift */; };
 		652618AE1C11F8FF00654091 /* TimeoutObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652616E11C11F5EB00654091 /* TimeoutObserver.swift */; };
@@ -359,7 +359,7 @@
 		652616CC1C11F5EB00654091 /* UIOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIOperation.swift; sourceTree = "<group>"; };
 		652616CE1C11F5EB00654091 /* BlockCondition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = BlockCondition.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		652616CF1C11F5EB00654091 /* BlockObserver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = BlockObserver.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
-		652616D01C11F5EB00654091 /* BlockOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlockOperation.swift; sourceTree = "<group>"; };
+		652616D01C11F5EB00654091 /* BlockProcedure.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlockProcedure.swift; sourceTree = "<group>"; };
 		652616D11C11F5EB00654091 /* ComposedOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComposedOperation.swift; sourceTree = "<group>"; };
 		652616D21C11F5EB00654091 /* DelayOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DelayOperation.swift; sourceTree = "<group>"; };
 		652616D31C11F5EB00654091 /* ExclusivityManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExclusivityManager.swift; sourceTree = "<group>"; };
@@ -370,10 +370,10 @@
 		652616D81C11F5EB00654091 /* MutuallyExclusive.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MutuallyExclusive.swift; sourceTree = "<group>"; };
 		652616D91C11F5EB00654091 /* NegatedCondition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NegatedCondition.swift; sourceTree = "<group>"; };
 		652616DA1C11F5EB00654091 /* NoFailedDependenciesCondition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoFailedDependenciesCondition.swift; sourceTree = "<group>"; };
-		652616DB1C11F5EB00654091 /* Operation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Operation.swift; sourceTree = "<group>"; };
+		652616DB1C11F5EB00654091 /* Procedure.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Procedure.swift; sourceTree = "<group>"; };
 		652616DC1C11F5EB00654091 /* OperationCondition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OperationCondition.swift; sourceTree = "<group>"; };
 		652616DD1C11F5EB00654091 /* OperationObserver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OperationObserver.swift; sourceTree = "<group>"; };
-		652616DE1C11F5EB00654091 /* OperationQueue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OperationQueue.swift; sourceTree = "<group>"; };
+		652616DE1C11F5EB00654091 /* ProcedureQueue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProcedureQueue.swift; sourceTree = "<group>"; };
 		652616DF1C11F5EB00654091 /* SlientCondition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlientCondition.swift; sourceTree = "<group>"; };
 		652616E01C11F5EB00654091 /* Support.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Support.swift; sourceTree = "<group>"; };
 		652616E11C11F5EB00654091 /* TimeoutObserver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeoutObserver.swift; sourceTree = "<group>"; };
@@ -586,7 +586,7 @@
 			children = (
 				652616CE1C11F5EB00654091 /* BlockCondition.swift */,
 				652616CF1C11F5EB00654091 /* BlockObserver.swift */,
-				652616D01C11F5EB00654091 /* BlockOperation.swift */,
+				652616D01C11F5EB00654091 /* BlockProcedure.swift */,
 				652616D11C11F5EB00654091 /* ComposedOperation.swift */,
 				653D401C1CC184AF00893746 /* Condition.swift */,
 				652616D21C11F5EB00654091 /* DelayOperation.swift */,
@@ -600,10 +600,10 @@
 				652616D81C11F5EB00654091 /* MutuallyExclusive.swift */,
 				652616D91C11F5EB00654091 /* NegatedCondition.swift */,
 				652616DA1C11F5EB00654091 /* NoFailedDependenciesCondition.swift */,
-				652616DB1C11F5EB00654091 /* Operation.swift */,
+				652616DB1C11F5EB00654091 /* Procedure.swift */,
 				652616DC1C11F5EB00654091 /* OperationCondition.swift */,
 				652616DD1C11F5EB00654091 /* OperationObserver.swift */,
-				652616DE1C11F5EB00654091 /* OperationQueue.swift */,
+				652616DE1C11F5EB00654091 /* ProcedureQueue.swift */,
 				6565FFE41C98B7AC008B5248 /* Profiler.swift */,
 				65A592981D1C28E5001F9229 /* Queue.swift */,
 				650852301C8B23580058F8AA /* Repeatable.swift */,
@@ -1261,13 +1261,13 @@
 				652618701C11F8FC00654091 /* SlientCondition.swift in Sources */,
 				652618F61C11F9AA00654091 /* WebpageOperation.swift in Sources */,
 				65BB56D71C70F29500DF5211 /* ThreadSafety.swift in Sources */,
-				6526186F1C11F8FC00654091 /* OperationQueue.swift in Sources */,
+				6526186F1C11F8FC00654091 /* ProcedureQueue.swift in Sources */,
 				652618DD1C11F98000654091 /* ContactsOperation.swift in Sources */,
 				650852311C8B23580058F8AA /* Repeatable.swift in Sources */,
 				652618D01C11F93D00654091 /* BackgroundObserver.swift in Sources */,
 				6526186A1C11F8FC00654091 /* NegatedCondition.swift in Sources */,
 				659A54F21CD3285000D9D311 /* CloudKitOperation.swift in Sources */,
-				6526186C1C11F8FC00654091 /* Operation.swift in Sources */,
+				6526186C1C11F8FC00654091 /* Procedure.swift in Sources */,
 				652618F51C11F9AA00654091 /* UserNotificationCondition.swift in Sources */,
 				652618F21C11F9AA00654091 /* PhotosCapability.swift in Sources */,
 				652618711C11F8FC00654091 /* Support.swift in Sources */,
@@ -1277,7 +1277,7 @@
 				652618F01C11F9AA00654091 /* LocationOperations.swift in Sources */,
 				659A54F11CD3285000D9D311 /* CloudKitInterface.swift in Sources */,
 				652618ED1C11F99E00654091 /* AddressBookUIOperations.swift in Sources */,
-				652618611C11F8FC00654091 /* BlockOperation.swift in Sources */,
+				652618611C11F8FC00654091 /* BlockProcedure.swift in Sources */,
 				659A54F31CD3285000D9D311 /* CloudKitOperationExtensions.swift in Sources */,
 				652618621C11F8FC00654091 /* ComposedOperation.swift in Sources */,
 				652618AF1C11F91200654091 /* CalendarCapability.swift in Sources */,
@@ -1384,11 +1384,11 @@
 				652618841C11F8FD00654091 /* SlientCondition.swift in Sources */,
 				653D401E1CC184AF00893746 /* Condition.swift in Sources */,
 				65E4CDDE1C33422100B9F9D8 /* RetryOperation.swift in Sources */,
-				652618831C11F8FD00654091 /* OperationQueue.swift in Sources */,
+				652618831C11F8FD00654091 /* ProcedureQueue.swift in Sources */,
 				6526187E1C11F8FD00654091 /* NegatedCondition.swift in Sources */,
-				652618801C11F8FD00654091 /* Operation.swift in Sources */,
+				652618801C11F8FD00654091 /* Procedure.swift in Sources */,
 				652618851C11F8FD00654091 /* Support.swift in Sources */,
-				652618751C11F8FD00654091 /* BlockOperation.swift in Sources */,
+				652618751C11F8FD00654091 /* BlockProcedure.swift in Sources */,
 				652618761C11F8FD00654091 /* ComposedOperation.swift in Sources */,
 				652618B71C11F91300654091 /* CalendarCapability.swift in Sources */,
 				652618861C11F8FD00654091 /* TimeoutObserver.swift in Sources */,
@@ -1422,16 +1422,16 @@
 			buildActionMask = 2147483647;
 			files = (
 				652618981C11F8FE00654091 /* SlientCondition.swift in Sources */,
-				652618971C11F8FE00654091 /* OperationQueue.swift in Sources */,
+				652618971C11F8FE00654091 /* ProcedureQueue.swift in Sources */,
 				652618D81C11F93F00654091 /* BackgroundObserver.swift in Sources */,
 				652618921C11F8FE00654091 /* NegatedCondition.swift in Sources */,
-				652618941C11F8FE00654091 /* Operation.swift in Sources */,
+				652618941C11F8FE00654091 /* Procedure.swift in Sources */,
 				652618991C11F8FE00654091 /* Support.swift in Sources */,
 				652618C51C11F91400654091 /* ReachabilityCondition.swift in Sources */,
 				650852381C8B23950058F8AA /* Generators.swift in Sources */,
 				652618D71C11F93F00654091 /* AlertOperation.swift in Sources */,
 				65BB56D91C70F29500DF5211 /* ThreadSafety.swift in Sources */,
-				652618891C11F8FE00654091 /* BlockOperation.swift in Sources */,
+				652618891C11F8FE00654091 /* BlockProcedure.swift in Sources */,
 				6526188A1C11F8FE00654091 /* ComposedOperation.swift in Sources */,
 				6526189A1C11F8FE00654091 /* TimeoutObserver.swift in Sources */,
 				65C98C741C281EEC00BA76B7 /* FunctionalOperations.swift in Sources */,
@@ -1514,13 +1514,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				652618AC1C11F8FF00654091 /* SlientCondition.swift in Sources */,
-				652618AB1C11F8FF00654091 /* OperationQueue.swift in Sources */,
+				652618AB1C11F8FF00654091 /* ProcedureQueue.swift in Sources */,
 				652618A61C11F8FF00654091 /* NegatedCondition.swift in Sources */,
 				65A5929C1D1C28E5001F9229 /* Queue.swift in Sources */,
-				652618A81C11F8FF00654091 /* Operation.swift in Sources */,
+				652618A81C11F8FF00654091 /* Procedure.swift in Sources */,
 				652618AD1C11F8FF00654091 /* Support.swift in Sources */,
 				652618CD1C11F91500654091 /* ReachabilityCondition.swift in Sources */,
-				6526189D1C11F8FF00654091 /* BlockOperation.swift in Sources */,
+				6526189D1C11F8FF00654091 /* BlockProcedure.swift in Sources */,
 				65BB56DA1C70F29500DF5211 /* ThreadSafety.swift in Sources */,
 				6526189E1C11F8FF00654091 /* ComposedOperation.swift in Sources */,
 				652618C71C11F91500654091 /* CalendarCapability.swift in Sources */,
