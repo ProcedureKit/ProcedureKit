@@ -77,10 +77,10 @@ class StressTest: OperationTests {
                     let _ = testQueue.delegate
                 }
                 Queue.default.queue.async(group: group) {
-                    let _ = testQueue.delegate
+                    let _ =  testQueue.delegate
                 }
             }
-            group.wait(timeout: .distantFuture)
+            let _ = group.wait(timeout: .distantFuture)
             success = true
             expectation.fulfill()
         }
@@ -91,9 +91,13 @@ class StressTest: OperationTests {
     
     class Counter {
         private(set) var count: Int32 = 0
+        
+        @discardableResult
         func increment() -> Int32 {
             return OSAtomicIncrement32(&count)
         }
+        
+        @discardableResult
         func increment_barrier() -> Int32 {
             return OSAtomicIncrement32Barrier(&count)
         }

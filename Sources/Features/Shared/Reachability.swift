@@ -162,6 +162,7 @@ class DeviceReachability: NetworkReachabilityType {
 
     init() { }
 
+    @discardableResult
     func defaultRouteReachability() throws -> SCNetworkReachability {
 
         if let reachability = __defaultRouteReachability { return reachability }

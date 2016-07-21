@@ -262,7 +262,7 @@ public class RepeatedOperation<T where T: Operation>: GroupOperation {
      operation which should be repeated).
      */
     public override func willAttemptRecoveryFromErrors(_ errors: [ErrorProtocol], inOperation operation: Operation) -> Bool {
-        let _ = addNextOperation(operation === current)
+        addNextOperation(operation === current)
         return super.willAttemptRecoveryFromErrors(errors, inOperation: operation)
     }
 
@@ -278,7 +278,7 @@ public class RepeatedOperation<T where T: Operation>: GroupOperation {
      operation which should be repeated).
     */
     public override func willFinishOperation(_ operation: Operation) {
-        let _ = addNextOperation(operation === current)
+        addNextOperation(operation === current)
     }
 
     /**
@@ -298,6 +298,7 @@ public class RepeatedOperation<T where T: Operation>: GroupOperation {
      to return true. Subclasses may inject additional logic here which
      can prevent another operation from being added.
     */
+    @discardableResult
     public func addNextOperation(_ shouldAddNext: @autoclosure () -> Bool = true) -> Bool {
         guard !isCancelled && shouldAddNext(), let payload = next() else { return false }
 

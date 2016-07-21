@@ -215,7 +215,8 @@ class ContactsTests: OperationTests {
         store.contactsMatchingPredicate[predicate] = contacts
         return contacts
     }
-
+    
+    @discardableResult
     func setUpForGroupsWithName(_ groupName: String) -> CNGroup {
         group.name = groupName
         store.groupsMatchingPredicate[.inContainerWithID(.default)] = [group]
@@ -427,7 +428,7 @@ class RemoveContactsGroupOperationTests: ContactsTests {
     }
 
     func test__remove_contacts_group_removes_group() {
-        let _ = setUpForGroupsWithName(groupName)
+        setUpForGroupsWithName(groupName)
         operation = _RemoveContactsGroup(groupName: groupName, contactStore: store)
 
         addCompletionBlockToTestOperation(operation, withExpectation: expectation(description: "Test: \(#function)"))
@@ -461,7 +462,7 @@ class AddContactsToGroupOperationTests: ContactsTests {
     }
 
     func test__add_contacts_to_group_when_group_exists() {
-        let _ = setUpForGroupsWithName(groupName)
+        setUpForGroupsWithName(groupName)
         setUpForContactEnumerationWithContactIds(contactIds)
         operation = _AddContactsToGroup(groupName: groupName, contactIDs: contactIds, contactStore: store)
 
@@ -495,7 +496,7 @@ class RemoveContactsFromGroupOperationTests: ContactsTests {
     }
 
     func test__remove_contacts_from_group() {
-        let _ = setUpForGroupsWithName(groupName)
+        setUpForGroupsWithName(groupName)
         setUpForContactEnumerationWithContactIds(contactIds)
         operation = _RemoveContactsFromGroup(groupName: groupName, contactIDs: contactIds, contactStore: store)
 

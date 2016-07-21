@@ -87,6 +87,7 @@ extension InjectionOperationType where Self: OldOperation {
      operation, and an array of `ErrorType`, and returns Void.
      - returns: `self` - so that injections can be chained together.
     */
+    @discardableResult
     public func injectResultFromDependency<T where T: OldOperation>(_ dep: T, block: (operation: Self, dependency: T, errors: [ErrorProtocol]) -> Void) -> Self {
         dep.addObserver(WillFinishObserver { [weak self] op, errors in
             if let strongSelf = self, let dep = op as? T {
@@ -175,6 +176,7 @@ extension AutomaticInjectionOperationType where Self: OldOperation {
      - parameter dep: an operation of type T
      - returns: the receiver
     */
+    @discardableResult
     public func injectResultFromDependency<T where T: OldOperation, T: ResultOperationType, T.Result == Requirement>(_ dep: T) -> Self {
         return injectResultFromDependency(dep) { [weak self] operation, dependency, errors in
             if errors.isEmpty {
@@ -202,6 +204,7 @@ extension AutomaticInjectionOperationType where Self: OldOperation {
      - parameter dep: an operation of type T
      - returns: the receiver
     */
+    @discardableResult
     public func requireResultFromDependency<T where T: OldOperation, T: ResultOperationType, T.Result == Requirement>(_ dep: T) -> Self {
         if conditions.filter({ return $0 is NoFailedDependenciesCondition }).count < 1 {
             addCondition(NoFailedDependenciesCondition())

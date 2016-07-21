@@ -65,7 +65,7 @@ class BasicTests: OperationTests {
             expectation.fulfill()
         }
 
-        let _ = addCompletionBlockToTestOperation(operation)
+        addCompletionBlockToTestOperation(operation)
         runOperation(operation)
         waitForExpectations(timeout: 3, handler: nil)
 

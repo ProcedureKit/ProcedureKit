@@ -89,7 +89,7 @@ extension ResultOperationType where Self: OldOperation {
     */
     public func mapOperation<U>(_ transform: (Result) -> U) -> MapOperation<Result, U> {
         let map: MapOperation<Result, U> = MapOperation(transform: transform)
-        let _ = map.injectResultFromDependency(self) { operation, dependency, errors in
+        map.injectResultFromDependency(self) { operation, dependency, errors in
             if errors.isEmpty {
                 operation.requirement = dependency.result
             }
@@ -147,7 +147,7 @@ extension ResultOperationType where Self: OldOperation, Result: Sequence {
     */
     public func filterOperation(_ includeElement: (Result.Iterator.Element) -> Bool) -> FilterOperation<Result.Iterator.Element> {
         let filter: FilterOperation<Result.Iterator.Element> = FilterOperation(includeElement: includeElement)
-        let _ = filter.injectResultFromDependency(self) { operation, dependency, errors in
+        filter.injectResultFromDependency(self) { operation, dependency, errors in
             if errors.isEmpty {
                 operation.requirement = Array(dependency.result)
             }
@@ -210,7 +210,7 @@ extension ResultOperationType where Self: OldOperation, Result: Sequence {
     */
     public func reduceOperation<U>(_ initial: U, combine: (U, Result.Iterator.Element) -> U) -> ReduceOperation<Result.Iterator.Element, U> {
         let reduce: ReduceOperation<Result.Iterator.Element, U> = ReduceOperation(initial: initial, combine: combine)
-        let _ = reduce.injectResultFromDependency(self) { operation, dependency, errors in
+        reduce.injectResultFromDependency(self) { operation, dependency, errors in
             if errors.isEmpty {
                 operation.requirement = Array(dependency.result)
             }

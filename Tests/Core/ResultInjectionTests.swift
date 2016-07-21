@@ -40,7 +40,7 @@ class ResultInjectionTests: OperationTests {
 class ManualResultInjectionTests: ResultInjectionTests {
 
     func test__block_is_executed() {
-        processing.injectResultFromDependency(retrieval) { op, dep, errors in
+        let _ = processing.injectResultFromDependency(retrieval) { op, dep, errors in
             XCTAssertEqual(dep.result, "Hello World")
         }
 
@@ -51,7 +51,7 @@ class ManualResultInjectionTests: ResultInjectionTests {
 
     func test__block_passes_through_errors() {
         retrieval = TestOperation(error: TestOperation.Error.simulatedError)
-        processing.injectResultFromDependency(retrieval) { op, dep, errors in
+        let _ = processing.injectResultFromDependency(retrieval) { op, dep, errors in
             XCTAssertEqual(errors.count, 1)
             guard let _ = errors.first as? TestOperation.Error else {
                 XCTFail("Incorrect error received")
@@ -68,7 +68,7 @@ class ManualResultInjectionTests: ResultInjectionTests {
 class AutomaticResultInjectionTests: ResultInjectionTests {
 
     func test__requirement_is_injected() {
-        processing.injectResultFromDependency(retrieval)
+        let _ = processing.injectResultFromDependency(retrieval)
 
         addCompletionBlockToTestOperation(processing, withExpectation: expectation(description: "Test: \(#function)"))
         runOperations(retrieval, processing)
@@ -79,7 +79,7 @@ class AutomaticResultInjectionTests: ResultInjectionTests {
 
     func test__processing_cancels_with_errors_if_dependency_errors() {
         retrieval = TestOperation(error: TestOperation.Error.simulatedError)
-        processing.injectResultFromDependency(retrieval)
+        let _ = processing.injectResultFromDependency(retrieval)
         processing.addObserver(DidCancelObserver { op in
             XCTAssertEqual(op.errors.count, 1)
             guard let error = op.errors.first as? AutomaticInjectionError else {

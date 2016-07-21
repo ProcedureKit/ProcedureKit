@@ -65,6 +65,7 @@ public class AlertOperation<From: PresentingViewController>: OldOperation {
      - parameter style: a `UIAlertActionStyle` which defaults to `.Default`.
      - parameter handler: a block which receives the operation, and returns Void.
      */
+    @discardableResult
     public func addActionWithTitle(_ title: String, style: UIAlertActionStyle = .default, handler: (AlertOperation) -> Void = { _ in }) -> UIAlertAction {
         let action = UIAlertAction(title: title, style: style) { [weak self] _ in
             if let weakSelf = self {
@@ -178,7 +179,7 @@ public class AlertOperation<From: PresentingViewController>: OldOperation {
     */
     public override func execute() {
         if alert.actions.isEmpty {
-            let _ = addActionWithTitle(NSLocalizedString("Okay", comment: "Okay"))
+            addActionWithTitle(NSLocalizedString("Okay", comment: "Okay"))
         }
         uiOperation.log.severity = log.severity
         produceOperation(uiOperation)

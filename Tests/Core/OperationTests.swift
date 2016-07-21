@@ -180,7 +180,7 @@ class OperationTests: XCTestCase {
     }
 
     func waitForOperation(_ operation: OldOperation, withExpectationDescription text: String = #function) {
-        let _ = addCompletionBlockToTestOperation(operation, withExpectationDescription: text)
+        addCompletionBlockToTestOperation(operation, withExpectationDescription: text)
         queue.delegate = delegate
         queue.addOperation(operation)
         waitForExpectations(timeout: 3, handler: nil)
@@ -188,7 +188,7 @@ class OperationTests: XCTestCase {
 
     func waitForOperations(_ operations: OldOperation..., withExpectationDescription text: String = #function) {
         for (i, op) in operations.enumerated() {
-            let _ = addCompletionBlockToTestOperation(op, withExpectationDescription: "\(i), \(text)")
+            addCompletionBlockToTestOperation(op, withExpectationDescription: "\(i), \(text)")
         }
         queue.delegate = delegate
         queue.addOperations(operations, waitUntilFinished: false)
@@ -202,6 +202,7 @@ class OperationTests: XCTestCase {
         })
     }
 
+    @discardableResult
     func addCompletionBlockToTestOperation(_ operation: OldOperation, withExpectationDescription text: String = #function) -> XCTestExpectation {
         let expectation = self.expectation(description: "Test: \(text), \(UUID().uuidString)")
         operation.addObserver(DidFinishObserver { _, _ in
