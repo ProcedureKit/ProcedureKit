@@ -11,13 +11,13 @@ import XCTest
 
 class TestOperation: OldOperation, ResultOperationType {
 
-    enum Error: ErrorType {
-        case SimulatedError
+    enum Error: ErrorProtocol {
+        case simulatedError
     }
 
     let numberOfSeconds: Double
-    let simulatedError: ErrorType?
-    let producedOperation: NSOperation?
+    let simulatedError: ErrorProtocol?
+    let producedOperation: Operation?
     var didExecute: Bool = false
     var result: String? = "Hello World"
 
@@ -26,7 +26,7 @@ class TestOperation: OldOperation, ResultOperationType {
     var operationWillCancelCalled = false
     var operationDidCancelCalled = false
 
-    init(delay: Double = 0.0001, error: ErrorType? = .None, produced: NSOperation? = .None) {
+    init(delay: Double = 0.0001, error: ErrorProtocol? = .none, produced: Operation? = .none) {
         numberOfSeconds = delay
         simulatedError = error
         producedOperation = produced
@@ -37,28 +37,28 @@ class TestOperation: OldOperation, ResultOperationType {
     override func execute() {
 
         if let producedOperation = self.producedOperation {
-            let after = dispatch_time(DISPATCH_TIME_NOW, Int64(numberOfSeconds * Double(0.001) * Double(NSEC_PER_SEC)))
-            dispatch_after(after, Queue.Main.queue) {
+            let after = DispatchTime.now() + Double(Int64(numberOfSeconds * Double(0.001) * Double(NSEC_PER_SEC))) / Double(NSEC_PER_SEC)
+            (Queue.Main.queue).after(when: after) {
                 self.produceOperation(producedOperation)
             }
         }
 
-        let after = dispatch_time(DISPATCH_TIME_NOW, Int64(numberOfSeconds * Double(NSEC_PER_SEC)))
-        dispatch_after(after, Queue.Main.queue) {
+        let after = DispatchTime.now() + Double(Int64(numberOfSeconds * Double(NSEC_PER_SEC))) / Double(NSEC_PER_SEC)
+        (Queue.Main.queue).after(when: after) {
             self.didExecute = true
             self.finish(self.simulatedError)
         }
     }
 
-    override func operationWillFinish(errors: [ErrorType]) {
+    override func operationWillFinish(_ errors: [ErrorProtocol]) {
         operationWillFinishCalled = true
     }
 
-    override func operationDidFinish(errors: [ErrorType]) {
+    override func operationDidFinish(_ errors: [ErrorProtocol]) {
         operationDidFinishCalled = true
     }
 
-    override func operationWillCancel(errors: [ErrorType]) {
+    override func operationWillCancel(_ errors: [ErrorProtocol]) {
         operationWillCancelCalled = true
     }
 
@@ -71,14 +71,14 @@ struct TestCondition: OperationCondition {
 
     var name: String = "Test Condition"
     var isMutuallyExclusive = false
-    let dependency: NSOperation?
+    let dependency: Operation?
     let condition: () -> Bool
 
-    func dependencyForOperation(operation: OldOperation) -> NSOperation? {
+    func dependencyForOperation(_ operation: OldOperation) -> Operation? {
         return dependency
     }
 
-    func evaluateForOperation(operation: OldOperation, completion: OperationConditionResult -> Void) {
+    func evaluateForOperation(_ operation: OldOperation, completion: (OperationConditionResult) -> Void) {
         completion(condition() ? .Satisfied : .Failed(BlockCondition.Error.BlockConditionFailed))
     }
 }
@@ -87,7 +87,7 @@ class TestConditionOperation: Condition {
 
     let evaluate: () throws -> Bool
 
-    init(dependencies: [NSOperation]? = .None, evaluate: () throws -> Bool) {
+    init(dependencies: [Operation]? = .none, evaluate: () throws -> Bool) {
         self.evaluate = evaluate
         super.init()
         if let dependencies = dependencies {
@@ -95,7 +95,7 @@ class TestConditionOperation: Condition {
         }
     }
 
-    override func evaluate(operation: OldOperation, completion: CompletionBlockType) {
+    override func evaluate(_ operation: OldOperation, completion: CompletionBlockType) {
         do {
             let success = try evaluate()
             completion(success ? .Satisfied : .Failed(OperationError.ConditionFailed))
@@ -108,7 +108,7 @@ class TestConditionOperation: Condition {
 
 class TestQueueDelegate: OperationQueueDelegate {
 
-    typealias FinishBlockType = (NSOperation, [ErrorType]) -> Void
+    typealias FinishBlockType = (Operation, [ErrorProtocol]) -> Void
 
     let willFinishOperation: FinishBlockType?
     let didFinishOperation: FinishBlockType?
@@ -119,28 +119,28 @@ class TestQueueDelegate: OperationQueueDelegate {
     var did_willProduceOperation: Bool = false
     var did_numberOfErrorThatOperationDidFinish: Int = 0
 
-    init(willFinishOperation: FinishBlockType? = .None, didFinishOperation: FinishBlockType? = .None) {
+    init(willFinishOperation: FinishBlockType? = .none, didFinishOperation: FinishBlockType? = .none) {
         self.willFinishOperation = willFinishOperation
         self.didFinishOperation = didFinishOperation
     }
 
-    func operationQueue(queue: OldOperationQueue, willAddOperation operation: NSOperation) {
+    func operationQueue(_ queue: OldOperationQueue, willAddOperation operation: Operation) {
         did_willAddOperation = true
     }
 
-    func operationQueue(queue: OldOperationQueue, willFinishOperation operation: NSOperation, withErrors errors: [ErrorType]) {
+    func operationQueue(_ queue: OldOperationQueue, willFinishOperation operation: Operation, withErrors errors: [ErrorProtocol]) {
         did_operationWillFinish = true
         did_numberOfErrorThatOperationDidFinish = errors.count
         willFinishOperation?(operation, errors)
     }
 
-    func operationQueue(queue: OldOperationQueue, didFinishOperation operation: NSOperation, withErrors errors: [ErrorType]) {
+    func operationQueue(_ queue: OldOperationQueue, didFinishOperation operation: Operation, withErrors errors: [ErrorProtocol]) {
         did_operationDidFinish = true
         did_numberOfErrorThatOperationDidFinish = errors.count
         didFinishOperation?(operation, errors)
     }
     
-    func operationQueue(queue: OldOperationQueue, willProduceOperation operation: NSOperation) {
+    func operationQueue(_ queue: OldOperationQueue, willProduceOperation operation: Operation) {
         did_willProduceOperation = true
     }
 }
@@ -167,43 +167,43 @@ class OperationTests: XCTestCase {
         super.tearDown()
     }
 
-    func runOperation(operation: NSOperation) {
+    func runOperation(_ operation: Operation) {
         queue.addOperation(operation)
     }
 
-    func runOperations(operations: [NSOperation]) {
+    func runOperations(_ operations: [Operation]) {
         queue.addOperations(operations, waitUntilFinished: false)
     }
 
-    func runOperations(operations: NSOperation...) {
+    func runOperations(_ operations: Operation...) {
         queue.addOperations(operations, waitUntilFinished: false)
     }
 
-    func waitForOperation(operation: OldOperation, withExpectationDescription text: String = #function) {
+    func waitForOperation(_ operation: OldOperation, withExpectationDescription text: String = #function) {
         addCompletionBlockToTestOperation(operation, withExpectationDescription: text)
         queue.delegate = delegate
         queue.addOperation(operation)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForExpectations(timeout: 3, handler: nil)
     }
 
-    func waitForOperations(operations: OldOperation..., withExpectationDescription text: String = #function) {
+    func waitForOperations(_ operations: OldOperation..., withExpectationDescription text: String = #function) {
         for (i, op) in operations.enumerate() {
             addCompletionBlockToTestOperation(op, withExpectationDescription: "\(i), \(text)")
         }
         queue.delegate = delegate
         queue.addOperations(operations, waitUntilFinished: false)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForExpectations(timeout: 3, handler: nil)
     }
 
-    func addCompletionBlockToTestOperation(operation: OldOperation, withExpectation expectation: XCTestExpectation) {
+    func addCompletionBlockToTestOperation(_ operation: OldOperation, withExpectation expectation: XCTestExpectation) {
         weak var weakExpectation = expectation
         operation.addObserver(DidFinishObserver { _, _ in
             weakExpectation?.fulfill()
         })
     }
 
-    func addCompletionBlockToTestOperation(operation: OldOperation, withExpectationDescription text: String = #function) -> XCTestExpectation {
-        let expectation = expectationWithDescription("Test: \(text), \(NSUUID().UUIDString)")
+    func addCompletionBlockToTestOperation(_ operation: OldOperation, withExpectationDescription text: String = #function) -> XCTestExpectation {
+        let expectation = self.expectation(description: "Test: \(text), \(UUID().uuidString)")
         operation.addObserver(DidFinishObserver { _, _ in
             expectation.fulfill()
         })

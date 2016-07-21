@@ -12,7 +12,7 @@ internal class ExclusivityManager {
 
     static let sharedInstance = ExclusivityManager()
 
-    private let queue = Queue.Initiated.serial("me.danthorpe.Operations.Exclusivity")
+    private let queue = Queue.initiated.serial("me.danthorpe.Operations.Exclusivity")
     private var operations: [String: [OldOperation]] = [:]
 
     private init() {
@@ -20,17 +20,17 @@ internal class ExclusivityManager {
         // from creating an instance.
     }
 
-    func addOperation(operation: OldOperation, category: String) -> NSOperation? {
+    func addOperation(_ operation: OldOperation, category: String) -> Operation? {
         return dispatch_sync(queue) { self._addOperation(operation, category: category) }
     }
 
-    func removeOperation(operation: OldOperation, category: String) {
-        dispatch_async(queue) {
+    func removeOperation(_ operation: OldOperation, category: String) {
+        queue.async {
             self._removeOperation(operation, category: category)
         }
     }
 
-    private func _addOperation(operation: OldOperation, category: String) -> NSOperation? {
+    private func _addOperation(_ operation: OldOperation, category: String) -> Operation? {
         operation.log.verbose(">>> \(category)")
 
         operation.addObserver(DidFinishObserver { [unowned self] op, _ in
@@ -52,12 +52,12 @@ internal class ExclusivityManager {
         return previous
     }
 
-    private func _removeOperation(operation: OldOperation, category: String) {
+    private func _removeOperation(_ operation: OldOperation, category: String) {
         operation.log.verbose("<<< \(category)")
 
-        if let operationsWithThisCategory = operations[category], index = operationsWithThisCategory.indexOf(operation) {
+        if let operationsWithThisCategory = operations[category], index = operationsWithThisCategory.index(of: operation) {
             var mutableOperationsWithThisCategory = operationsWithThisCategory
-            mutableOperationsWithThisCategory.removeAtIndex(index)
+            mutableOperationsWithThisCategory.remove(at: index)
             operations[category] = mutableOperationsWithThisCategory
         }
     }
@@ -68,7 +68,7 @@ extension ExclusivityManager {
     /// This should only be used as part of the unit testing
     /// and in v2+ will not be publically accessible
     internal func __tearDownForUnitTesting() {
-        dispatch_sync(queue) {
+        queue.sync {
             for (category, operations) in self.operations {
                 for operation in operations {
                     operation.cancel()

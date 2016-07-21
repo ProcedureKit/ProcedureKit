@@ -8,7 +8,7 @@
 
 import Foundation
 
-public class ComposedOperation<T: NSOperation>: GroupOperation {
+public class ComposedOperation<T: Operation>: GroupOperation {
 
     public var operation: T
 
@@ -23,7 +23,7 @@ public class ComposedOperation<T: NSOperation>: GroupOperation {
         addObserver(WillCancelObserver { [unowned self] operation, errors in
             guard operation === self else { return }
             if !errors.isEmpty, let op =  self.operation as? OldOperation {
-                op.cancelWithError(OperationError.ParentOperationCancelledWithErrors(errors))
+                op.cancelWithError(OperationError.parentOperationCancelledWithErrors(errors))
             }
             else {
                 self.operation.cancel()

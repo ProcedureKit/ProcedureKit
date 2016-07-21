@@ -22,7 +22,7 @@ public protocol PresentingViewController: class {
     - parameter animated: a `Bool` flag to indicate whether the presentation should be animated.
     - parameter completion: a completion block which may be nil.
     */
-    func presentViewController(viewController: UIViewController, animated: Bool, completion: (() -> Void)?)
+    func presentViewController(_ viewController: UIViewController, animated: Bool, completion: (() -> Void)?)
 
 
     @available(iOS 8.0, *)
@@ -32,7 +32,7 @@ public protocol PresentingViewController: class {
     - parameter vc: the `UIViewController` being presented.
     - parameter sender: an optional `AnyObject`, usually this is a `UIControl`.
     */
-    func showViewController(viewController: UIViewController, sender: AnyObject?)
+    func showViewController(_ viewController: UIViewController, sender: AnyObject?)
 
     @available(iOS 8.0, *)
     /**
@@ -41,7 +41,7 @@ public protocol PresentingViewController: class {
     - parameter vc: the `UIViewController` being presented.
     - parameter sender: an optional `AnyObject`, usually this is a `UIControl`.
     */
-    func showDetailViewController(viewController: UIViewController, sender: AnyObject?)
+    func showDetailViewController(_ viewController: UIViewController, sender: AnyObject?)
 }
 
 extension UIViewController: PresentingViewController { }
@@ -60,18 +60,18 @@ responsible for creating the view controller which is to be presented.
 */
 public enum ViewControllerDisplayStyle<ViewController: PresentingViewController> {
 
-    case Show(ViewController)
-    case ShowDetail(ViewController)
-    case Present(ViewController)
+    case show(ViewController)
+    case showDetail(ViewController)
+    case present(ViewController)
 
     /// Access the associated view controller.
     public var controller: ViewController {
         switch self {
-        case .Show(let controller):
+        case .show(let controller):
             return controller
-        case .ShowDetail(let controller):
+        case .showDetail(let controller):
             return controller
-        case .Present(let controller):
+        case .present(let controller):
             return controller
         }
     }
@@ -89,10 +89,10 @@ public enum ViewControllerDisplayStyle<ViewController: PresentingViewController>
     - parameter sender: an optional `AnyObject` used as the sender when showing the view controller
     - parameter completion: an optional completion block, defaults to .None.
     */
-    public func displayController<C where C: UIViewController>(controller: C, inNavigationController: Bool = true, sender: AnyObject?, completion: (() -> Void)? = .None) {
+    public func displayController<C where C: UIViewController>(_ controller: C, inNavigationController: Bool = true, sender: AnyObject?, completion: (() -> Void)? = .none) {
         switch self {
 
-        case .Present(let from):
+        case .present(let from):
             let presented: UIViewController
             if controller is UIAlertController || inNavigationController == false {
                 presented = controller
@@ -102,11 +102,11 @@ public enum ViewControllerDisplayStyle<ViewController: PresentingViewController>
             }
             from.presentViewController(presented, animated: true, completion: completion)
 
-        case .Show(let from):
+        case .show(let from):
             from.showViewController(controller, sender: sender)
             completion?()
 
-        case .ShowDetail(let from):
+        case .showDetail(let from):
             from.showDetailViewController(controller, sender: sender)
             completion?()
         }
@@ -153,7 +153,7 @@ public class UIOperation<C, From where C: UIViewController, From: PresentingView
      UINavigationController when presenting, defaults to true
     - parameter sender: an optional `AnyObject` see docs for UIViewController.
     */
-    public init(controller: C, displayControllerFrom from: ViewControllerDisplayStyle<From>, inNavigationController: Bool = true, sender: AnyObject? = .None) {
+    public init(controller: C, displayControllerFrom from: ViewControllerDisplayStyle<From>, inNavigationController: Bool = true, sender: AnyObject? = .none) {
         self.controller = controller
         self.from = from
         self.sender = sender
@@ -168,7 +168,7 @@ public class UIOperation<C, From where C: UIViewController, From: PresentingView
     `showViewController`, or `showDetailViewController`.
     */
     public override func execute() {
-        dispatch_async(Queue.Main.queue) {
+        Queue.main.queue.async {
             self.from.displayController(self.controller, inNavigationController: self.wrapInNavigationController, sender: self.sender) {
                 self.finish()
             }

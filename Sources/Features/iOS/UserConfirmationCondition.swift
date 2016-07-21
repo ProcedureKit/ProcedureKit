@@ -9,14 +9,14 @@
 import UIKit
 
 enum UserConfirmationResult {
-    case Unknown
-    case Confirmed
-    case Cancelled
+    case unknown
+    case confirmed
+    case cancelled
 }
 
-enum UserConfirmationError: ErrorType {
-    case ConfirmationUnknown
-    case ConfirmationCancelled
+enum UserConfirmationError: ErrorProtocol {
+    case confirmationUnknown
+    case confirmationCancelled
 }
 
 /**
@@ -29,10 +29,10 @@ public class UserConfirmationCondition<From: PresentingViewController>: Conditio
     private let isDestructive: Bool
     private let cancelAction: String
     private var alert: AlertOperation<From>
-    private var confirmation: UserConfirmationResult = .Unknown
-    private var alertOperationErrors = [ErrorType]()
+    private var confirmation: UserConfirmationResult = .unknown
+    private var alertOperationErrors = [ErrorProtocol]()
 
-    public init(title: String, message: String? = .None, action: String, isDestructive: Bool = true, cancelAction: String = NSLocalizedString("Cancel", comment: "Cancel"), presentConfirmationFrom from: From) {
+    public init(title: String, message: String? = .none, action: String, isDestructive: Bool = true, cancelAction: String = NSLocalizedString("Cancel", comment: "Cancel"), presentConfirmationFrom from: From) {
         self.action = action
         self.isDestructive = isDestructive
         self.cancelAction = cancelAction
@@ -42,11 +42,11 @@ public class UserConfirmationCondition<From: PresentingViewController>: Conditio
 
         alert.title = title
         alert.message = message
-        alert.addActionWithTitle(action, style: isDestructive ? .Destructive : .Default) { [weak self] _ in
-            self?.confirmation = .Confirmed
+        alert.addActionWithTitle(action, style: isDestructive ? .destructive : .default) { [weak self] _ in
+            self?.confirmation = .confirmed
         }
-        alert.addActionWithTitle(cancelAction, style: .Cancel) { [weak self] _ in
-            self?.confirmation = .Cancelled
+        alert.addActionWithTitle(cancelAction, style: .cancel) { [weak self] _ in
+            self?.confirmation = .cancelled
         }
         alert.addObserver(WillFinishObserver { [weak self] _, errors in
             self?.alertOperationErrors = errors
@@ -54,15 +54,15 @@ public class UserConfirmationCondition<From: PresentingViewController>: Conditio
         addDependency(alert)
     }
 
-    public override func evaluate(operation: OldOperation, completion: OperationConditionResult -> Void) {
+    public override func evaluate(_ operation: OldOperation, completion: (OperationConditionResult) -> Void) {
         switch confirmation {
-        case .Unknown:
+        case .unknown:
             // This should never happen, but you never know.
-            completion(.Failed(UserConfirmationError.ConfirmationUnknown))
-        case .Cancelled:
-            completion(.Failed(UserConfirmationError.ConfirmationCancelled))
-        case .Confirmed:
-            completion(.Satisfied)
+            completion(.failed(UserConfirmationError.confirmationUnknown))
+        case .cancelled:
+            completion(.failed(UserConfirmationError.confirmationCancelled))
+        case .confirmed:
+            completion(.satisfied)
         }
     }
 }

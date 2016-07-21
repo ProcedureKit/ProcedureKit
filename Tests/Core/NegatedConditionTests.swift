@@ -12,11 +12,11 @@ import XCTest
 class NegatedConditionTests: OperationTests {
 
     func test__operation_with_successful_block_condition_fails() {
-        let expectation = expectationWithDescription("Test: \(#function)")
+        let expectation = self.expectation(description: "Test: \(#function)")
         let operation = TestOperation()
         operation.addCondition(NegatedCondition(TrueCondition()))
 
-        var receivedErrors = [ErrorType]()
+        var receivedErrors = [ErrorProtocol]()
         operation.addObserver(DidFinishObserver { _, errors in
             receivedErrors = errors
             expectation.fulfill()
@@ -24,7 +24,7 @@ class NegatedConditionTests: OperationTests {
 
         runOperation(operation)
 
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForExpectations(timeout: 3, handler: nil)
         XCTAssertFalse(operation.didExecute)
         XCTAssertEqual(receivedErrors.count, 1)
         if let error = receivedErrors.first as? NegatedConditionError {
@@ -42,7 +42,7 @@ class NegatedConditionTests: OperationTests {
 
         addCompletionBlockToTestOperation(operation)
         runOperation(operation)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForExpectations(timeout: 3, handler: nil)
 
         XCTAssertTrue(operation.didExecute)
         XCTAssertTrue(operation.finished)

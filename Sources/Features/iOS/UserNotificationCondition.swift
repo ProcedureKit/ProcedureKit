@@ -9,18 +9,18 @@
 import UIKit
 
 public protocol UserNotificationRegistrarType {
-    func opr_registerUserNotificationSettings(notificationSettings: UIUserNotificationSettings)
+    func opr_registerUserNotificationSettings(_ notificationSettings: UIUserNotificationSettings)
     func opr_currentUserNotificationSettings() -> UIUserNotificationSettings?
 }
 
 extension UIApplication: UserNotificationRegistrarType {
 
-    public func opr_registerUserNotificationSettings(notificationSettings: UIUserNotificationSettings) {
+    public func opr_registerUserNotificationSettings(_ notificationSettings: UIUserNotificationSettings) {
         registerUserNotificationSettings(notificationSettings)
     }
 
     public func opr_currentUserNotificationSettings() -> UIUserNotificationSettings? {
-        return currentUserNotificationSettings() ?? .None
+        return currentUserNotificationSettings() ?? .none
     }
 }
 
@@ -48,31 +48,30 @@ public final class UserNotificationCondition: Condition {
 
     public enum Behavior {
         // Merge the new settings with the current settings
-        case Merge
+        case merge
         // Replace the current settings with the new settings
-        case Replace
+        case replace
     }
 
-    public enum Error: ErrorType, Equatable {
+    public enum Error: ErrorProtocol, Equatable {
         public typealias UserSettingsPair = (current: UIUserNotificationSettings?, desired: UIUserNotificationSettings)
-        case SettingsNotSufficient(UserSettingsPair)
+        case settingsNotSufficient(UserSettingsPair)
     }
 
-    public static func didRegisterUserNotificationSettings(notificationSettings: UIUserNotificationSettings) {
-        NSNotificationCenter
-            .defaultCenter()
-            .postNotificationName(DidRegisterSettingsNotificationName, object: nil, userInfo: [NotificationSettingsKey: notificationSettings] )
+    public static func didRegisterUserNotificationSettings(_ notificationSettings: UIUserNotificationSettings) {
+        NotificationCenter.default
+            .post(name: Notification.Name(rawValue: DidRegisterSettingsNotificationName), object: nil, userInfo: [NotificationSettingsKey: notificationSettings] )
     }
 
     let settings: UIUserNotificationSettings
     let behavior: Behavior
     let registrar: UserNotificationRegistrarType
 
-    public convenience init(settings: UIUserNotificationSettings, behavior: Behavior = .Merge) {
-        self.init(settings: settings, behavior: behavior, registrar: UIApplication.sharedApplication())
+    public convenience init(settings: UIUserNotificationSettings, behavior: Behavior = .merge) {
+        self.init(settings: settings, behavior: behavior, registrar: UIApplication.shared())
     }
 
-    init(settings: UIUserNotificationSettings, behavior: Behavior = .Merge, registrar: UserNotificationRegistrarType) {
+    init(settings: UIUserNotificationSettings, behavior: Behavior = .merge, registrar: UserNotificationRegistrarType) {
         self.settings = settings
         self.behavior = behavior
         self.registrar = registrar
@@ -82,27 +81,27 @@ public final class UserNotificationCondition: Condition {
         addDependency(UserNotificationPermissionOperation(settings: settings, behavior: behavior, registrar: registrar))
     }
 
-    public override func evaluate(operation: OldOperation, completion: OperationConditionResult -> Void) {
+    public override func evaluate(_ operation: OldOperation, completion: (OperationConditionResult) -> Void) {
         if let current = registrar.opr_currentUserNotificationSettings() {
 
             switch (current, settings) {
 
             case let (current, settings) where current.contains(settings):
-                completion(.Satisfied)
+                completion(.satisfied)
 
             default:
-                completion(.Failed(Error.SettingsNotSufficient((current, settings))))
+                completion(.failed(Error.settingsNotSufficient((current, settings))))
             }
         }
         else {
-            completion(.Failed(Error.SettingsNotSufficient((.None, settings))))
+            completion(.failed(Error.settingsNotSufficient((.none, settings))))
         }
     }
 }
 
 public func == (lhs: UserNotificationCondition.Error, rhs: UserNotificationCondition.Error) -> Bool {
     switch (lhs, rhs) {
-    case let (.SettingsNotSufficient(current: aCurrent, desired: aDesired), .SettingsNotSufficient(current: bCurrent, desired: bDesired)):
+    case let (.settingsNotSufficient(current: aCurrent, desired: aDesired), .settingsNotSufficient(current: bCurrent, desired: bDesired)):
         return (aCurrent == bCurrent) && (aDesired == bDesired)
     }
 }
@@ -110,11 +109,11 @@ public func == (lhs: UserNotificationCondition.Error, rhs: UserNotificationCondi
 public class UserNotificationPermissionOperation: OldOperation {
 
     enum NotificationObserver {
-        case SettingsDidChange
+        case settingsDidChange
 
         var selector: Selector {
             switch self {
-            case .SettingsDidChange:
+            case .settingsDidChange:
                 return #selector(UserNotificationPermissionOperation.notificationSettingsDidChange(_:))
             }
         }
@@ -124,11 +123,11 @@ public class UserNotificationPermissionOperation: OldOperation {
     let behavior: UserNotificationCondition.Behavior
     let registrar: UserNotificationRegistrarType
 
-    public convenience init(settings: UIUserNotificationSettings, behavior: UserNotificationCondition.Behavior = .Merge) {
-        self.init(settings: settings, behavior: behavior, registrar: UIApplication.sharedApplication())
+    public convenience init(settings: UIUserNotificationSettings, behavior: UserNotificationCondition.Behavior = .merge) {
+        self.init(settings: settings, behavior: behavior, registrar: UIApplication.shared())
     }
 
-    init(settings: UIUserNotificationSettings, behavior: UserNotificationCondition.Behavior = .Merge, registrar: UserNotificationRegistrarType) {
+    init(settings: UIUserNotificationSettings, behavior: UserNotificationCondition.Behavior = .merge, registrar: UserNotificationRegistrarType) {
         self.settings = settings
         self.behavior = behavior
         self.registrar = registrar
@@ -138,17 +137,16 @@ public class UserNotificationPermissionOperation: OldOperation {
     }
 
     public override func execute() {
-        NSNotificationCenter
-            .defaultCenter()
-            .addObserver(self, selector: NotificationObserver.SettingsDidChange.selector, name: DidRegisterSettingsNotificationName, object: nil)
-        dispatch_async(Queue.Main.queue, request)
+        NotificationCenter.default
+            .addObserver(self, selector: NotificationObserver.settingsDidChange.selector, name: NSNotification.Name(rawValue: DidRegisterSettingsNotificationName), object: nil)
+        Queue.main.queue.async(execute: request)
     }
 
     func request() {
         var settingsToRegister = settings
         if let current = registrar.opr_currentUserNotificationSettings() {
             switch (current, behavior) {
-            case (let currentSettings, .Merge):
+            case (let currentSettings, .merge):
                 settingsToRegister = currentSettings.settingsByMerging(settings)
             default:
                 break
@@ -157,15 +155,15 @@ public class UserNotificationPermissionOperation: OldOperation {
         registrar.opr_registerUserNotificationSettings(settingsToRegister)
     }
 
-    func notificationSettingsDidChange(aNotification: NSNotification) {
-        NSNotificationCenter.defaultCenter().removeObserver(self)
+    func notificationSettingsDidChange(_ aNotification: Notification) {
+        NotificationCenter.default.removeObserver(self)
         self.finish()
     }
 }
 
 extension UIUserNotificationSettings {
 
-    func contains(settings: UIUserNotificationSettings) -> Bool {
+    func contains(_ settings: UIUserNotificationSettings) -> Bool {
 
         if !types.contains(settings.types) {
             return false
@@ -173,10 +171,10 @@ extension UIUserNotificationSettings {
 
         let myCategories = categories ?? []
         let otherCategories = settings.categories ?? []
-        return myCategories.isSupersetOf(otherCategories)
+        return myCategories.isSuperset(of: otherCategories)
     }
 
-    func settingsByMerging(settings: UIUserNotificationSettings) -> UIUserNotificationSettings {
+    func settingsByMerging(_ settings: UIUserNotificationSettings) -> UIUserNotificationSettings {
         let union = types.union(settings.types)
 
         let myCategories = categories ?? []
@@ -190,11 +188,11 @@ extension UIUserNotificationSettings {
         }
 
         let mergedCategories = Set(existingCategoriesByIdentifier.values)
-        return UIUserNotificationSettings(forTypes: union, categories: mergedCategories)
+        return UIUserNotificationSettings(types: union, categories: mergedCategories)
     }
 }
 
-extension UIUserNotificationType: BooleanType {
+extension UIUserNotificationType: Boolean {
 
     public var boolValue: Bool {
         return self != []

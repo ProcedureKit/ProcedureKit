@@ -24,8 +24,8 @@ public class WebpageOperation<From: PresentingViewController>: ComposedOperation
      - parameter entersReaderIfAvailable: an optional flag that tells the `SFSafariViewController` to open the webpage in a reader mode if available.
      - parameter sender: an `AnyObject` sender.
      */
-    public convenience init(url: NSURL, displayControllerFrom from: ViewControllerDisplayStyle<From>, entersReaderIfAvailable: Bool = true, sender: AnyObject? = .None) {
-        let operation = UIOperation(controller: SFSafariViewController(URL: url, entersReaderIfAvailable: entersReaderIfAvailable), displayControllerFrom: from, sender: sender)
+    public convenience init(url: URL, displayControllerFrom from: ViewControllerDisplayStyle<From>, entersReaderIfAvailable: Bool = true, sender: AnyObject? = .none) {
+        let operation = UIOperation(controller: SFSafariViewController(url: url, entersReaderIfAvailable: entersReaderIfAvailable), displayControllerFrom: from, sender: sender)
         self.init(operation: operation)
 
         addObserver(WillExecuteObserver { [weak self] _ in
@@ -40,8 +40,8 @@ public class WebpageOperation<From: PresentingViewController>: ComposedOperation
         super.init(operation: composed)
     }
 
-    @objc public func safariViewControllerDidFinish(controller: SFSafariViewController) {
-        controller.dismissViewControllerAnimated(true) {
+    @objc public func safariViewControllerDidFinish(_ controller: SFSafariViewController) {
+        controller.dismiss(animated: true) {
             self.finish()
         }
     }

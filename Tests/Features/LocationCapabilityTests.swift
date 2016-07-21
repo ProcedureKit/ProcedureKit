@@ -18,13 +18,13 @@ class TestableLocationRegistrar: NSObject {
     var servicesEnabled = true
     var didCheckServiceEnabled = false
 
-    var authorizationStatus: CLAuthorizationStatus = .NotDetermined
+    var authorizationStatus: CLAuthorizationStatus = .notDetermined
     var didCheckAuthorizationStatus = false
 
     weak var delegate: CLLocationManagerDelegate!
     var didSetDelegate = false
 
-    var responseStatus: CLAuthorizationStatus = .AuthorizedAlways
+    var responseStatus: CLAuthorizationStatus = .authorizedAlways
     var didRequestAuthorization: LocationUsage? = .None
 
     required override init() { }
@@ -42,17 +42,17 @@ extension TestableLocationRegistrar: LocationCapabilityRegistrarType {
         return authorizationStatus
     }
 
-    func opr_setDelegate(aDelegate: CLLocationManagerDelegate?) {
+    func opr_setDelegate(_ aDelegate: CLLocationManagerDelegate?) {
         didSetDelegate = true
         delegate = aDelegate
     }
 
-    func opr_requestAuthorizationWithRequirement(requirement: LocationUsage) {
+    func opr_requestAuthorizationWithRequirement(_ requirement: LocationUsage) {
         didRequestAuthorization = requirement
         authorizationStatus = responseStatus
         // In some cases CLLocationManager will immediately send a .NotDetermined 
-        delegate.locationManager!(fakeLocationManager, didChangeAuthorizationStatus: .NotDetermined)
-        delegate.locationManager!(fakeLocationManager, didChangeAuthorizationStatus: responseStatus)
+        delegate.locationManager!(fakeLocationManager, didChangeAuthorization: .notDetermined)
+        delegate.locationManager!(fakeLocationManager, didChangeAuthorization: responseStatus)
     }
 }
 
@@ -68,37 +68,37 @@ class CLLocationManagerTests: XCTestCase, CLLocationManagerDelegate {
 class CLAuthorizationStatusTests: XCTestCase {
 
     func test__given_status_not_determined__requirements_not_met() {
-        let status = CLAuthorizationStatus.NotDetermined
+        let status = CLAuthorizationStatus.notDetermined
         XCTAssertFalse(status.isRequirementMet(.WhenInUse))
     }
 
     func test__given_status_restricted__requirements_not_met() {
-        let status = CLAuthorizationStatus.Restricted
+        let status = CLAuthorizationStatus.restricted
         XCTAssertFalse(status.isRequirementMet(.WhenInUse))
     }
 
     func test__given_status_denied__requirements_not_met() {
-        let status = CLAuthorizationStatus.Denied
+        let status = CLAuthorizationStatus.denied
         XCTAssertFalse(status.isRequirementMet(.WhenInUse))
     }
 
     func test__given_status_authorized_when_in_use__requirement_always_not_met() {
-        let status = CLAuthorizationStatus.AuthorizedWhenInUse
+        let status = CLAuthorizationStatus.authorizedWhenInUse
         XCTAssertFalse(status.isRequirementMet(.Always))
     }
 
     func test__given_status_authorized_when_in_use__requirement_when_in_use_met() {
-        let status = CLAuthorizationStatus.AuthorizedWhenInUse
+        let status = CLAuthorizationStatus.authorizedWhenInUse
         XCTAssertTrue(status.isRequirementMet(.WhenInUse))
     }
 
     func test__given_status_authorized_always__requirement_when_in_use_met() {
-        let status = CLAuthorizationStatus.AuthorizedAlways
+        let status = CLAuthorizationStatus.authorizedAlways
         XCTAssertTrue(status.isRequirementMet(.WhenInUse))
     }
 
     func test__given_status_authorized_always__requirement_always_met() {
-        let status = CLAuthorizationStatus.AuthorizedAlways
+        let status = CLAuthorizationStatus.authorizedAlways
         XCTAssertTrue(status.isRequirementMet(.Always))
     }
 }
@@ -162,7 +162,7 @@ class LocationCapabilityTests: OperationTests {
     }
 
     func test__given_when_in_use_require_always_request_authorization() {
-        registrar.authorizationStatus = .AuthorizedWhenInUse
+        registrar.authorizationStatus = .authorizedWhenInUse
         capability = LocationCapability(.Always)
         capability.registrar = registrar
         var didComplete = false
@@ -176,7 +176,7 @@ class LocationCapabilityTests: OperationTests {
     }
 
     func test__given_denied_does_not_request_authorization() {
-        registrar.authorizationStatus = .Denied
+        registrar.authorizationStatus = .denied
         var didComplete = false
         capability.requestAuthorizationWithCompletion {
             didComplete = true
@@ -186,7 +186,7 @@ class LocationCapabilityTests: OperationTests {
     }
 
     func test__given_already_authorized_always_does_not_request_authorization() {
-        registrar.authorizationStatus = .AuthorizedAlways
+        registrar.authorizationStatus = .authorizedAlways
         capability = LocationCapability(.WhenInUse)
         capability.registrar = registrar
         var didComplete = false
@@ -198,7 +198,7 @@ class LocationCapabilityTests: OperationTests {
     }
 
     func test__given_already_authorized_sufficiently_does_not_request_authorization() {
-        registrar.authorizationStatus = .AuthorizedAlways
+        registrar.authorizationStatus = .authorizedAlways
         capability = LocationCapability(.WhenInUse)
         capability.registrar = registrar
         var didComplete = false

@@ -13,21 +13,21 @@ import XCTest
 class TestablePresentingController: NSObject, PresentingViewController {
     typealias CheckBlockType = (received: UIViewController) -> Void
 
-    var check: CheckBlockType? = .None
-    var expectation: XCTestExpectation? = .None
+    var check: CheckBlockType? = .none
+    var expectation: XCTestExpectation? = .none
 
-    func presentViewController(vc: UIViewController, animated: Bool, completion: (() -> Void)?) {
+    func presentViewController(_ vc: UIViewController, animated: Bool, completion: (() -> Void)?) {
         check?(received: vc)
         completion?()
         expectation?.fulfill()
     }
 
-    func showViewController(vc: UIViewController, sender: AnyObject?) {
+    func showViewController(_ vc: UIViewController, sender: AnyObject?) {
         check?(received: vc)
         expectation?.fulfill()
     }
 
-    func showDetailViewController(vc: UIViewController, sender: AnyObject?) {
+    func showDetailViewController(_ vc: UIViewController, sender: AnyObject?) {
         check?(received: vc)
         expectation?.fulfill()
     }
@@ -141,7 +141,7 @@ class UIOperationTests: OperationTests {
     }
 
     func test__presents() {
-        let expectation = expectationWithDescription("Test: \(#function)")
+        let expectation = self.expectation(description: "Test: \(#function)")
 
         var completionBlockDidRun = false
         operation = TypeUnderTest(controller: presented, displayControllerFrom: .Present(presenter), sender: .None)
@@ -151,13 +151,13 @@ class UIOperationTests: OperationTests {
         }
 
         runOperation(operation)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForExpectations(timeout: 3, handler: nil)
 
         XCTAssertTrue(completionBlockDidRun)
     }
 
     func test__presents_with_navigation_controller_wrapping_by_default() {
-        let expectation = expectationWithDescription("Test: \(#function)")
+        let expectation = self.expectation(description: "Test: \(#function)")
 
         presenter.check = { [unowned self] received in
             guard let nav = received as? UINavigationController else {
@@ -170,12 +170,12 @@ class UIOperationTests: OperationTests {
 
         operation = TypeUnderTest(controller: presented, displayControllerFrom: .Present(presenter), sender: .None)
         runOperation(operation)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForExpectations(timeout: 3, handler: nil)
     }
 
 
     func test__presents_without_navigation_controller_when_wrapping_overridden() {
-        let expectation = expectationWithDescription("Test: \(#function)")
+        let expectation = self.expectation(description: "Test: \(#function)")
 
         presenter.check = { [unowned self] received in
             guard let _ = received as? UINavigationController else {
@@ -188,6 +188,6 @@ class UIOperationTests: OperationTests {
 
         operation = TypeUnderTest(controller: presented, displayControllerFrom: .Present(presenter), inNavigationController: false, sender: .None)
         runOperation(operation)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForExpectations(timeout: 3, handler: nil)
     }
 }

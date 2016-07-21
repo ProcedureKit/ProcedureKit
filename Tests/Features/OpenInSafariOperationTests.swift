@@ -12,7 +12,7 @@ import SafariServices
 
 class OpenInSafariOperationTests: OperationTests {
     
-    let URL = NSURL(string: "https://github.com")!
+    let URL = Foundation.URL(string: "https://github.com")!
     var presentingController: TestablePresentingController!
     
     override func setUp() {
@@ -25,7 +25,7 @@ class OpenInSafariOperationTests: OperationTests {
         let operation = OpenInSafariOperation(URL: URL, displayControllerFrom: .ShowDetail(presentingController))
         operation.shouldOpenInSafariViewController = { true }
         
-        presentingController.expectation = expectationWithDescription("Test: \(#function)")
+        presentingController.expectation = expectation(description: "Test: \(#function)")
         presentingController.check = { received in
             if let safariViewController = received as? SFSafariViewController {
                 didPresentWebpage = true
@@ -43,14 +43,14 @@ class OpenInSafariOperationTests: OperationTests {
         
         runOperation(operation)
         
-        waitForExpectationsWithTimeout(5, handler: nil)
+        waitForExpectations(timeout: 5, handler: nil)
         XCTAssertTrue(didPresentWebpage)
     }
     
     func test__operation_did_open_url_in_safari_app() {
-        let expectation = expectationWithDescription("Test: \(#function)")
+        let expectation = self.expectation(description: "Test: \(#function)")
         
-        var didOpenURL: NSURL? = .None
+        var didOpenURL: Foundation.URL? = .none
         let operation = OpenInSafariOperation(URL: URL, displayControllerFrom: .ShowDetail(presentingController))
         operation.shouldOpenInSafariViewController = { false }
         operation.openURL = {
@@ -60,7 +60,7 @@ class OpenInSafariOperationTests: OperationTests {
         
         runOperation(operation)
         
-        waitForExpectationsWithTimeout(5, handler: nil)
+        waitForExpectations(timeout: 5, handler: nil)
         XCTAssertTrue(URL == didOpenURL)
     }
 }

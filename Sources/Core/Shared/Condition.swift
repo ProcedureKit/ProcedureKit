@@ -12,7 +12,7 @@ public protocol ConditionType {
 
     var mutuallyExclusive: Bool { get set }
 
-    func evaluate(operation: OldOperation, completion: ConditionResult -> Void)
+    func evaluate(_ operation: OldOperation, completion: (ConditionResult) -> Void)
 }
 
 internal extension ConditionType {
@@ -23,21 +23,21 @@ internal extension ConditionType {
 }
 
 /// General Errors used by conditions
-public enum ConditionError: ErrorType, Equatable {
+public enum ConditionError: ErrorProtocol, Equatable {
 
     /// A FalseCondition may use this as the error
-    case FalseCondition
+    case falseCondition
 
     /**
      If the block returns false, the operation to
      which it is attached will fail with this error.
      */
-    case BlockConditionFailed
+    case blockConditionFailed
 }
 
 public func == (lhs: ConditionError, rhs: ConditionError) -> Bool {
     switch (lhs, rhs) {
-    case (.FalseCondition, .FalseCondition), (.BlockConditionFailed, .BlockConditionFailed):
+    case (.falseCondition, .falseCondition), (.blockConditionFailed, .blockConditionFailed):
         return true
     default:
         return false
@@ -64,11 +64,11 @@ public func == (lhs: ConditionError, rhs: ConditionError) -> Bool {
  */
 public class Condition: OldOperation, ConditionType, ResultOperationType {
 
-    public typealias CompletionBlockType = ConditionResult -> Void
+    public typealias CompletionBlockType = (ConditionResult) -> Void
 
     public var mutuallyExclusive: Bool = false
 
-    internal weak var operation: OldOperation? = .None
+    internal weak var operation: OldOperation? = .none
 
     public var result: ConditionResult! = nil
 
@@ -86,12 +86,12 @@ public class Condition: OldOperation, ConditionType, ResultOperationType {
      - parameter operation: the OldOperation instance the condition was attached to
      - parameter completion: a completion block which receives a ConditionResult argument.
     */
-    public func evaluate(operation: OldOperation, completion: CompletionBlockType) {
+    public func evaluate(_ operation: OldOperation, completion: CompletionBlockType) {
         assertionFailure("ConditionOperation must be subclassed, and \(#function) overridden.")
-        completion(.Failed(OperationError.ConditionFailed))
+        completion(.failed(OperationError.conditionFailed))
     }
 
-    internal func finish(conditionResult: ConditionResult) {
+    internal func finish(_ conditionResult: ConditionResult) {
         self.result = conditionResult
         finish(conditionResult.error)
     }
@@ -106,8 +106,8 @@ public class TrueCondition: Condition {
         self.mutuallyExclusive = mutuallyExclusive
     }
 
-    public override func evaluate(operation: OldOperation, completion: CompletionBlockType) {
-        completion(.Satisfied)
+    public override func evaluate(_ operation: OldOperation, completion: CompletionBlockType) {
+        completion(.satisfied)
     }
 }
 
@@ -119,8 +119,8 @@ public class FalseCondition: Condition {
         self.mutuallyExclusive = mutuallyExclusive
     }
 
-    public override func evaluate(operation: OldOperation, completion: CompletionBlockType) {
-        completion(.Failed(ConditionError.FalseCondition))
+    public override func evaluate(_ operation: OldOperation, completion: CompletionBlockType) {
+        completion(.failed(ConditionError.falseCondition))
     }
 }
 
@@ -143,7 +143,7 @@ public class ComposedCondition<C: Condition>: Condition, AutomaticInjectionOpera
      */
     public let condition: C
 
-    override var directDependencies: Set<NSOperation> {
+    override var directDependencies: Set<Operation> {
         return super.directDependencies.union(condition.directDependencies)
     }
 
@@ -172,15 +172,15 @@ public class ComposedCondition<C: Condition>: Condition, AutomaticInjectionOpera
     }
 
     /// Override of public function
-    public override func evaluate(operation: OldOperation, completion: CompletionBlockType) {
+    public override func evaluate(_ operation: OldOperation, completion: CompletionBlockType) {
         guard let result = requirement else {
-            completion(.Failed(AutomaticInjectionError.RequirementNotSatisfied))
+            completion(.failed(AutomaticInjectionError.requirementNotSatisfied))
             return
         }
         completion(result)
     }
 
-    override func removeDirectDependency(directDependency: NSOperation) {
+    override func removeDirectDependency(_ directDependency: Operation) {
         condition.removeDirectDependency(directDependency)
         super.removeDirectDependency(directDependency)
     }
@@ -201,12 +201,12 @@ internal class WrappedOperationCondition: Condition {
         name = condition.name
     }
 
-    override func evaluate(operation: OldOperation, completion: CompletionBlockType) {
+    override func evaluate(_ operation: OldOperation, completion: CompletionBlockType) {
         condition.evaluateForOperation(operation, completion: completion)
     }
 }
 
-extension Array where Element: NSOperation {
+extension Array where Element: Operation {
 
     internal var conditions: [Condition] {
         return flatMap { $0 as? Condition }

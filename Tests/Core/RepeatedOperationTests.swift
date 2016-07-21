@@ -17,7 +17,7 @@ class RandomFailGeneratorTests: XCTestCase {
     */
     func test__failure_probability_distribution() {
 
-        var generator = RandomFailGenerator(AnyGenerator { true })
+        var generator = RandomFailGenerator(AnyIterator { true })
 
         let total = 1_000
         var failures = 0
@@ -40,11 +40,11 @@ class FiniteGeneratorTests: XCTestCase {
 
     override func setUp() {
         super.setUp()
-        generator = FiniteGenerator(AnyGenerator(0.stride(to: 10, by: 1).generate()), limit: 2)
+        generator = FiniteGenerator(AnyIterator(0.stride(to: 10, by: 1).generate()), limit: 2)
     }
 
     func test__limits_are_reached() {
-        guard let _ = generator.next(), _ = generator.next() else {
+        guard let _ = generator.next(), let _ = generator.next() else {
             XCTFail("Should return values up to a limit.")
             return
         }
@@ -60,7 +60,7 @@ class WaitStrategyIntervalTests: XCTestCase {
     var strategy: WaitStrategy!
     var generator: IntervalGenerator!
 
-    func getInterval(count: Int = 0) -> NSTimeInterval? {
+    func getInterval(_ count: Int = 0) -> TimeInterval? {
         for _ in 0..<count {
             guard let _ = generator.next() else {
                 XCTFail("IntervalGenerator never ends.")
@@ -122,7 +122,7 @@ class IncrementingWaitGeneratorTests: WaitStrategyIntervalTests {
                 XCTFail("IncrementingWaitGenerator never ends.")
                 return
             }
-            XCTAssertEqual(interval, NSTimeInterval(i + 1))
+            XCTAssertEqual(interval, TimeInterval(i + 1))
         }
     }
 }
@@ -264,7 +264,7 @@ class RepeatedOperationTests: OperationTests {
     var operation: RepeatedOperation<TestOperation>!
 
     func test__custom_generator_with_delay() {
-        operation = RepeatedOperation(maxCount: 2, generator: AnyGenerator { RepeatedPayload(delay: Delay.By(0.1), operation: TestOperation(), configure: .None) })
+        operation = RepeatedOperation(maxCount: 2, generator: AnyIterator { RepeatedPayload(delay: Delay.By(0.1), operation: TestOperation(), configure: .None) })
 
         waitForOperation(operation)
 
@@ -274,7 +274,7 @@ class RepeatedOperationTests: OperationTests {
     }
 
     func test__custom_generator_without_delay() {
-        operation = RepeatedOperation(maxCount: 2, generator: AnyGenerator { RepeatedPayload(delay: .None, operation: TestOperation(), configure: .None) })
+        operation = RepeatedOperation(maxCount: 2, generator: AnyIterator { RepeatedPayload(delay: .None, operation: TestOperation(), configure: .None) })
 
         waitForOperation(operation)
 
@@ -284,7 +284,7 @@ class RepeatedOperationTests: OperationTests {
     }
 
     func test__init_separate_delay_generator_and_item_generator() {
-        operation = RepeatedOperation(maxCount: 2, delay: AnyGenerator { Delay.By(0.1) }, generator: AnyGenerator { TestOperation() })
+        operation = RepeatedOperation(maxCount: 2, delay: AnyIterator { Delay.By(0.1) }, generator: AnyIterator { TestOperation() })
 
         waitForOperation(operation)
 
@@ -295,7 +295,7 @@ class RepeatedOperationTests: OperationTests {
 
     func test__replace_configure_block() {
 
-        operation = RepeatedOperation(maxCount: 2, generator: AnyGenerator { RepeatedPayload(delay: .None, operation: TestOperation(), configure: .None) })
+        operation = RepeatedOperation(maxCount: 2, generator: AnyIterator { RepeatedPayload(delay: .None, operation: TestOperation(), configure: .None) })
 
         operation.addConfigureBlock { _ in
             XCTFail("Configure block should have been replaced.")
@@ -313,13 +313,13 @@ class RepeatedOperationTests: OperationTests {
 
 class NonRepeatableRepeatedOperationTests: OperationTests {
 
-    func createGenerator(succeedsAfterCount target: Int = 1) -> AnyGenerator<TestOperation> {
+    func createGenerator(succeedsAfterCount target: Int = 1) -> AnyIterator<TestOperation> {
         var count = 0
-        return AnyGenerator { () -> TestOperation? in
+        return AnyIterator { () -> TestOperation? in
             guard count < target else { return nil }
             defer { count += 1 }
             if count < target - 1 {
-                return TestOperation(error: TestOperation.Error.SimulatedError)
+                return TestOperation(error: TestOperation.Error.simulatedError)
             }
             else {
                 return TestOperation()
@@ -332,7 +332,7 @@ class NonRepeatableRepeatedOperationTests: OperationTests {
 
         addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
         runOperation(operation)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForExpectations(timeout: 3, handler: nil)
 
         XCTAssertEqual(operation.count, 5)
         XCTAssertEqual(operation.errors.count, 4)
@@ -343,7 +343,7 @@ class NonRepeatableRepeatedOperationTests: OperationTests {
 
         addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
         runOperation(operation)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForExpectations(timeout: 3, handler: nil)
 
         XCTAssertEqual(operation.count, 2)
     }
@@ -351,7 +351,7 @@ class NonRepeatableRepeatedOperationTests: OperationTests {
 
 class RepeatingTestOperation: TestOperation, Repeatable {
 
-    func shouldRepeat(count: Int) -> Bool {
+    func shouldRepeat(_ count: Int) -> Bool {
         return count < 5
     }
 }
@@ -363,7 +363,7 @@ class RepeatableRepeatedOperationTests: OperationTests {
 
         addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
         runOperation(operation)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForExpectations(timeout: 3, handler: nil)
 
         XCTAssertEqual(operation.count, 5)
     }
@@ -373,14 +373,14 @@ class RepeatableRepeatedOperationTests: OperationTests {
 
         addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
         runOperation(operation)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForExpectations(timeout: 3, handler: nil)
 
         XCTAssertEqual(operation.count, 2)
     }
 
     func test__repeatable_operation() {
 
-        var errors: [ErrorType] = []
+        var errors: [ErrorProtocol] = []
         let operation = RepeatedOperation(maxCount: 10) { () -> RepeatableOperation<TestOperation> in
 
             let op = TestOperation(error: TestOperation.Error.SimulatedError)
@@ -393,7 +393,7 @@ class RepeatableRepeatedOperationTests: OperationTests {
 
         addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
         runOperation(operation)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForExpectations(timeout: 3, handler: nil)
 
         XCTAssertEqual(operation.count, 3)
     }

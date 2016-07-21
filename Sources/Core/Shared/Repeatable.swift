@@ -34,10 +34,10 @@ public protocol Repeatable {
      the RepeatedOperation.
      - returns: a Bool, false will end the RepeatedOperation.
      */
-    func shouldRepeat(count: Int) -> Bool
+    func shouldRepeat(_ count: Int) -> Bool
 }
 
-public class RepeatableGenerator<G: GeneratorType where G.Element: Repeatable>: GeneratorType {
+public class RepeatableGenerator<G: IteratorProtocol where G.Element: Repeatable>: IteratorProtocol {
 
     private var generator: G
     private var count: Int = 0
@@ -69,8 +69,8 @@ extension RepeatedOperation where T: Repeatable {
      let operation = RepeatedOperation { MyRepeatableOperation() }
      ```
      */
-    public convenience init(maxCount max: Int? = .None, strategy: WaitStrategy = .Fixed(0.1), body: () -> T?) {
-        self.init(maxCount: max, strategy: strategy, generator: RepeatableGenerator(AnyGenerator(body: body)))
+    public convenience init(maxCount max: Int? = .none, strategy: WaitStrategy = .fixed(0.1), body: () -> T?) {
+        self.init(maxCount: max, strategy: strategy, generator: RepeatableGenerator(AnyIterator(body)))
     }
 }
 
@@ -87,7 +87,7 @@ extension RepeatedOperation where T: Repeatable {
 public class RepeatableOperation<T: OldOperation>: OldOperation, OperationDidFinishObserver, Repeatable {
 
     let operation: T
-    let shouldRepeatBlock: Int -> Bool
+    let shouldRepeatBlock: (Int) -> Bool
 
     /**
      Initialize the RepeatableOperation with an operation and
@@ -96,7 +96,7 @@ public class RepeatableOperation<T: OldOperation>: OldOperation, OperationDidFin
      - parameter [unnamed] operation: the operation instance.
      - parameter shouldRepeat: a closure of type Int -> Bool
      */
-    public init(_ operation: T, shouldRepeat: Int -> Bool) {
+    public init(_ operation: T, shouldRepeat: (Int) -> Bool) {
         self.operation = operation
         self.shouldRepeatBlock = shouldRepeat
         super.init()
@@ -108,19 +108,19 @@ public class RepeatableOperation<T: OldOperation>: OldOperation, OperationDidFin
 
     /// Override implementation of execute
     public override func execute() {
-        if !cancelled {
+        if !isCancelled {
             operation.addObserver(self)
             produceOperation(operation)
         }
     }
 
     /// Implementation for Repeatable
-    public func shouldRepeat(count: Int) -> Bool {
+    public func shouldRepeat(_ count: Int) -> Bool {
         return shouldRepeatBlock(count)
     }
 
     /// Implementation for OperationDidFinishObserver
-    public func didFinishOperation(operation: OldOperation, errors: [ErrorType]) {
+    public func didFinishOperation(_ operation: OldOperation, errors: [ErrorProtocol]) {
         if self.operation == operation {
             finish(errors)
         }

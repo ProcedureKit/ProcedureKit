@@ -26,7 +26,7 @@ class AlertOperationTests: OperationTests {
     }
     
     func test__alert_style_actionSheet() {
-        let style = UIAlertControllerStyle.ActionSheet
+        let style = UIAlertControllerStyle.actionSheet
         let op = AlertOperation(presentAlertFrom: presentingController, preferredStyle: style)
         XCTAssertEqual(op.preferredStyle, style)
     }
@@ -71,7 +71,7 @@ class AlertOperationTests: OperationTests {
         alert.title = title
         alert.message = message
 
-        presentingController.expectation = expectationWithDescription("Test: \(#function)")
+        presentingController.expectation = expectation(description: "Test: \(#function)")
         presentingController.check = { received in
             if let alertController = received as? UIAlertController {
                 XCTAssertTrue(alertController.title == alert.title)
@@ -84,7 +84,7 @@ class AlertOperationTests: OperationTests {
         }
 
         runOperation(alert)
-        waitForExpectationsWithTimeout(2, handler: nil)
+        waitForExpectations(timeout: 2, handler: nil)
 
         XCTAssertTrue(didPresentAlert)
     }

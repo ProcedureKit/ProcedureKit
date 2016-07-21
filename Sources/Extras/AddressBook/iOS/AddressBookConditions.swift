@@ -9,19 +9,19 @@
 import Foundation
 import AddressBook
 
-@available(iOS, deprecated=9.0)
+@available(iOS, deprecated: 9.0)
 public class AddressBookCondition: Condition {
 
-    public enum Error: ErrorType {
-        case AuthorizationDenied
-        case AuthorizationRestricted
-        case AuthorizationNotDetermined
+    public enum Error: ErrorProtocol {
+        case authorizationDenied
+        case authorizationRestricted
+        case authorizationNotDetermined
     }
 
     internal var registrar: AddressBookPermissionRegistrar = SystemAddressBookRegistrar() {
         didSet {
             removeDependencies()
-            if case .NotDetermined = registrar.status {
+            if case .notDetermined = registrar.status {
                 addDependency(AddressBookOperation(registrar: registrar))
             }
         }
@@ -32,23 +32,23 @@ public class AddressBookCondition: Condition {
         name = "Address Book"
         mutuallyExclusive = false
 
-        if case .NotDetermined = registrar.status {
+        if case .notDetermined = registrar.status {
             addDependency(AddressBookOperation(registrar: registrar))
         }
     }
 
-    public override func evaluate(operation: OldOperation, completion: OperationConditionResult -> Void) {
+    public override func evaluate(_ operation: OldOperation, completion: (OperationConditionResult) -> Void) {
         switch registrar.status {
-        case .Authorized:
-            completion(.Satisfied)
-        case .Denied:
-            completion(.Failed(Error.AuthorizationDenied))
-        case .Restricted:
-            completion(.Failed(Error.AuthorizationRestricted))
-        case .NotDetermined:
+        case .authorized:
+            completion(.satisfied)
+        case .denied:
+            completion(.failed(Error.authorizationDenied))
+        case .restricted:
+            completion(.failed(Error.authorizationRestricted))
+        case .notDetermined:
             // This could be possible, because the condition may have been
             // suppressed with a `SilentCondition`.
-            completion(.Failed(Error.AuthorizationNotDetermined))
+            completion(.failed(Error.authorizationNotDetermined))
         }
     }
 }

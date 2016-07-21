@@ -20,7 +20,7 @@ public struct WillExecuteObserver: OperationWillExecuteObserver {
     private let block: BlockType
 
     /// - returns: a block which is called when the observer is attached to an operation
-    public var didAttachToOperation: DidAttachToOperationBlock? = .None
+    public var didAttachToOperation: DidAttachToOperationBlock? = .none
 
     /**
      Initialize the observer with a block.
@@ -33,17 +33,17 @@ public struct WillExecuteObserver: OperationWillExecuteObserver {
     }
 
     /// Conforms to `OperationWillStartObserver`, executes the block
-    public func willExecuteOperation(operation: OldOperation) {
+    public func willExecuteOperation(_ operation: OldOperation) {
         block(operation: operation)
     }
 
     /// Base OperationObserverType method
-    public func didAttachToOperation(operation: OldOperation) {
+    public func didAttachToOperation(_ operation: OldOperation) {
         didAttachToOperation?(operation: operation)
     }
 }
 
-@available(*, unavailable, renamed="WillExecuteObserver")
+@available(*, unavailable, renamed: "WillExecuteObserver")
 public typealias StartedObserver = WillExecuteObserver
 
 /**
@@ -51,12 +51,12 @@ public typealias StartedObserver = WillExecuteObserver
  closure when the operation cancels.
  */
 public struct WillCancelObserver: OperationWillCancelObserver {
-    public typealias BlockType = (operation: OldOperation, errors: [ErrorType]) -> Void
+    public typealias BlockType = (operation: OldOperation, errors: [ErrorProtocol]) -> Void
 
     private let block: BlockType
 
     /// - returns: a block which is called when the observer is attached to an operation
-    public var didAttachToOperation: DidAttachToOperationBlock? = .None
+    public var didAttachToOperation: DidAttachToOperationBlock? = .none
 
     /**
      Initialize the observer with a block.
@@ -69,12 +69,12 @@ public struct WillCancelObserver: OperationWillCancelObserver {
     }
 
     /// Conforms to `OperationWillCancelObserver`, executes the block
-    public func willCancelOperation(operation: OldOperation, errors: [ErrorType]) {
+    public func willCancelOperation(_ operation: OldOperation, errors: [ErrorProtocol]) {
         block(operation: operation, errors: errors)
     }
 
     /// Base OperationObserverType method
-    public func didAttachToOperation(operation: OldOperation) {
+    public func didAttachToOperation(_ operation: OldOperation) {
         didAttachToOperation?(operation: operation)
     }
 }
@@ -90,7 +90,7 @@ public struct DidCancelObserver: OperationDidCancelObserver {
     private let block: BlockType
 
     /// - returns: a block which is called when the observer is attached to an operation
-    public var didAttachToOperation: DidAttachToOperationBlock? = .None
+    public var didAttachToOperation: DidAttachToOperationBlock? = .none
 
     /**
      Initialize the observer with a block.
@@ -103,17 +103,17 @@ public struct DidCancelObserver: OperationDidCancelObserver {
     }
 
     /// Conforms to `OperationDidCancelObserver`, executes the block
-    public func didCancelOperation(operation: OldOperation) {
+    public func didCancelOperation(_ operation: OldOperation) {
         block(operation: operation)
     }
 
     /// Base OperationObserverType method
-    public func didAttachToOperation(operation: OldOperation) {
+    public func didAttachToOperation(_ operation: OldOperation) {
         didAttachToOperation?(operation: operation)
     }
 }
 
-@available(*, unavailable, renamed="DidCancelObserver")
+@available(*, unavailable, renamed: "DidCancelObserver")
 public typealias CancelledObserver = DidCancelObserver
 
 
@@ -122,12 +122,12 @@ public typealias CancelledObserver = DidCancelObserver
  closure when the operation produces another observer.
  */
 public struct ProducedOperationObserver: OperationDidProduceOperationObserver {
-    public typealias BlockType = (operation: OldOperation, produced: NSOperation) -> Void
+    public typealias BlockType = (operation: OldOperation, produced: Operation) -> Void
 
     private let block: BlockType
 
     /// - returns: a block which is called when the observer is attached to an operation
-    public var didAttachToOperation: DidAttachToOperationBlock? = .None
+    public var didAttachToOperation: DidAttachToOperationBlock? = .none
 
     /**
      Initialize the observer with a block.
@@ -140,12 +140,12 @@ public struct ProducedOperationObserver: OperationDidProduceOperationObserver {
     }
 
     /// Conforms to `OperationDidProduceOperationObserver`, executes the block
-    public func operation(operation: OldOperation, didProduceOperation newOperation: NSOperation) {
+    public func operation(_ operation: OldOperation, didProduceOperation newOperation: Operation) {
         block(operation: operation, produced: newOperation)
     }
 
     /// Base OperationObserverType method
-    public func didAttachToOperation(operation: OldOperation) {
+    public func didAttachToOperation(_ operation: OldOperation) {
         didAttachToOperation?(operation: operation)
     }
 }
@@ -156,12 +156,12 @@ public struct ProducedOperationObserver: OperationDidProduceOperationObserver {
  closure when the operation is about to finish.
  */
 public struct WillFinishObserver: OperationWillFinishObserver {
-    public typealias BlockType = (operation: OldOperation, errors: [ErrorType]) -> Void
+    public typealias BlockType = (operation: OldOperation, errors: [ErrorProtocol]) -> Void
 
     private let block: BlockType
 
     /// - returns: a block which is called when the observer is attached to an operation
-    public var didAttachToOperation: DidAttachToOperationBlock? = .None
+    public var didAttachToOperation: DidAttachToOperationBlock? = .none
 
     /**
      Initialize the observer with a block.
@@ -174,12 +174,12 @@ public struct WillFinishObserver: OperationWillFinishObserver {
     }
 
     /// Conforms to `OperationWillFinishObserver`, executes the block
-    public func willFinishOperation(operation: OldOperation, errors: [ErrorType]) {
+    public func willFinishOperation(_ operation: OldOperation, errors: [ErrorProtocol]) {
         block(operation: operation, errors: errors)
     }
 
     /// Base OperationObserverType method
-    public func didAttachToOperation(operation: OldOperation) {
+    public func didAttachToOperation(_ operation: OldOperation) {
         didAttachToOperation?(operation: operation)
     }
 }
@@ -190,12 +190,12 @@ public struct WillFinishObserver: OperationWillFinishObserver {
  closure when the operation did just finish.
  */
 public struct DidFinishObserver: OperationDidFinishObserver {
-    public typealias BlockType = (operation: OldOperation, errors: [ErrorType]) -> Void
+    public typealias BlockType = (operation: OldOperation, errors: [ErrorProtocol]) -> Void
 
     private let block: BlockType
 
     /// - returns: a block which is called when the observer is attached to an operation
-    public var didAttachToOperation: DidAttachToOperationBlock? = .None
+    public var didAttachToOperation: DidAttachToOperationBlock? = .none
 
     /**
      Initialize the observer with a block.
@@ -208,17 +208,17 @@ public struct DidFinishObserver: OperationDidFinishObserver {
     }
 
     /// Conforms to `OperationDidFinishObserver`, executes the block
-    public func didFinishOperation(operation: OldOperation, errors: [ErrorType]) {
+    public func didFinishOperation(_ operation: OldOperation, errors: [ErrorProtocol]) {
         block(operation: operation, errors: errors)
     }
 
     /// Base OperationObserverType method
-    public func didAttachToOperation(operation: OldOperation) {
+    public func didAttachToOperation(_ operation: OldOperation) {
         didAttachToOperation?(operation: operation)
     }
 }
 
-@available(*, unavailable, renamed="DidFinishObserver")
+@available(*, unavailable, renamed: "DidFinishObserver")
 public typealias FinishedObserver = DidFinishObserver
 
 /**
@@ -235,7 +235,7 @@ public struct BlockObserver: OperationObserver {
     let didFinish: DidFinishObserver?
 
     /// - returns: a block which is called when the observer is attached to an operation
-    public var didAttachToOperation: DidAttachToOperationBlock? = .None
+    public var didAttachToOperation: DidAttachToOperationBlock? = .none
 
     /**
      A `OperationObserver` which accepts three different blocks for start,
@@ -254,7 +254,7 @@ public struct BlockObserver: OperationObserver {
      - parameter produceHandler, a optional block of type (OldOperation, NSOperation) -> Void
      - parameter finishHandler, a optional block of type (OldOperation, [ErrorType]) -> Void
      */
-    public init(willExecute: WillExecuteObserver.BlockType? = .None, willCancel: WillCancelObserver.BlockType? = .None, didCancel: DidCancelObserver.BlockType? = .None, didProduce: ProducedOperationObserver.BlockType? = .None, willFinish: WillFinishObserver.BlockType? = .None, didFinish: DidFinishObserver.BlockType? = .None) {
+    public init(willExecute: WillExecuteObserver.BlockType? = .none, willCancel: WillCancelObserver.BlockType? = .none, didCancel: DidCancelObserver.BlockType? = .none, didProduce: ProducedOperationObserver.BlockType? = .none, willFinish: WillFinishObserver.BlockType? = .none, didFinish: DidFinishObserver.BlockType? = .none) {
         self.willExecute = willExecute.map { WillExecuteObserver(willExecute: $0) }
         self.willCancel = willCancel.map { WillCancelObserver(willCancel: $0) }
         self.didCancel = didCancel.map { DidCancelObserver(didCancel: $0) }
@@ -264,37 +264,37 @@ public struct BlockObserver: OperationObserver {
     }
 
     /// Conforms to `OperationWillExecuteObserver`
-    public func willExecuteOperation(operation: OldOperation) {
+    public func willExecuteOperation(_ operation: OldOperation) {
         willExecute?.willExecuteOperation(operation)
     }
 
     /// Conforms to `OperationWillCancelObserver`
-    public func willCancelOperation(operation: OldOperation, errors: [ErrorType]) {
+    public func willCancelOperation(_ operation: OldOperation, errors: [ErrorProtocol]) {
         willCancel?.willCancelOperation(operation, errors: errors)
     }
 
     /// Conforms to `OperationDidCancelObserver`
-    public func didCancelOperation(operation: OldOperation) {
+    public func didCancelOperation(_ operation: OldOperation) {
         didCancel?.didCancelOperation(operation)
     }
 
     /// Conforms to `OperationDidProduceOperationObserver`
-    public func operation(operation: OldOperation, didProduceOperation newOperation: NSOperation) {
+    public func operation(_ operation: OldOperation, didProduceOperation newOperation: Operation) {
         didProduce?.operation(operation, didProduceOperation: newOperation)
     }
 
     /// Conforms to `OperationWillFinishObserver`
-    public func willFinishOperation(operation: OldOperation, errors: [ErrorType]) {
+    public func willFinishOperation(_ operation: OldOperation, errors: [ErrorProtocol]) {
         willFinish?.willFinishOperation(operation, errors: errors)
     }
 
     /// Conforms to `OperationDidFinishObserver`
-    public func didFinishOperation(operation: OldOperation, errors: [ErrorType]) {
+    public func didFinishOperation(_ operation: OldOperation, errors: [ErrorProtocol]) {
         didFinish?.didFinishOperation(operation, errors: errors)
     }
 
     /// Base OperationObserverType method
-    public func didAttachToOperation(operation: OldOperation) {
+    public func didAttachToOperation(_ operation: OldOperation) {
         didAttachToOperation?(operation: operation)
     }
 }

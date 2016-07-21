@@ -37,7 +37,7 @@ class OperationKVOTests: OperationTests {
 
     class NSOperationKVOObserver: NSObject {
 
-        let operation: NSOperation
+        let operation: Operation
         private var removedObserved = false
         private var isFinishedBlock: (() -> Void)?
 
@@ -58,12 +58,12 @@ class OperationKVOTests: OperationTests {
 
         struct KVONotification {
             let keyPath: String
-            let time: NSTimeInterval
+            let time: TimeInterval
         }
         private var orderOfKVONotifications = Protector<[KVONotification]>([])
 
 
-        init(operation: NSOperation, isFinishedBlock: (() -> Void)? = nil) {
+        init(operation: Operation, isFinishedBlock: (() -> Void)? = nil) {
             self.operation = operation
             self.isFinishedBlock = isFinishedBlock
             super.init()
@@ -92,7 +92,7 @@ class OperationKVOTests: OperationTests {
             return orderOfKVONotifications.read { array in return array }
         }
 
-        func observedKVOFor(keyPaths: Set<String>) -> [KVONotification] {
+        func observedKVOFor(_ keyPaths: Set<String>) -> [KVONotification] {
             return observedKVO.filter({ (notification) -> Bool in
                 keyPaths.contains(notification.keyPath)
             })
@@ -102,29 +102,29 @@ class OperationKVOTests: OperationTests {
             return observedKVO.reduce([:]) { (accu: [String: Int], element) in
                 let keyPath = element.keyPath
                 var accu = accu
-                accu[keyPath] = accu[keyPath]?.successor() ?? 1
+                accu[keyPath] = ((accu[keyPath]?)! + 1) ?? 1
                 return accu
             }
         }
 
-        override func observeValueForKeyPath(keyPath: String?, ofObject object: AnyObject?, change: [String : AnyObject]?, context: UnsafeMutablePointer<Void>) {
+        override func observeValue(forKeyPath keyPath: String?, of object: AnyObject?, change: [NSKeyValueChangeKey : AnyObject]?, context: UnsafeMutablePointer<Void>?) {
 
             guard context == &TestKVOOperationKVOContext else {
-                super.observeValueForKeyPath(keyPath, ofObject: object, change: change, context: context)
+                super.observeValue(forKeyPath: keyPath, of: object, change: change, context: context)
                 return
             }
             guard object === operation else { return }
             guard let keyPath = keyPath else { return }
-            if let isFinishedBlock = self.isFinishedBlock where keyPath == KeyPath.Finished.rawValue {
+            if let isFinishedBlock = self.isFinishedBlock, keyPath == KeyPath.Finished.rawValue {
                 orderOfKVONotifications.write( { (array) -> Void in
-                    array.append(KVONotification(keyPath: keyPath, time: NSDate().timeIntervalSinceReferenceDate))
+                    array.append(KVONotification(keyPath: keyPath, time: Date().timeIntervalSinceReferenceDate))
                     }, completion: {
                         isFinishedBlock()   // write completion is executed on main queue
                 })
             }
             else {
                 orderOfKVONotifications.write { (array) -> Void in
-                    array.append(KVONotification(keyPath: keyPath, time: NSDate().timeIntervalSinceReferenceDate))
+                    array.append(KVONotification(keyPath: keyPath, time: Date().timeIntervalSinceReferenceDate))
                 }
             }
         }
@@ -168,12 +168,12 @@ class OperationKVOTests: OperationTests {
                 // do not finish
             }
         }
-        let didExecuteExpectation = expectationWithDescription("Test: \(#function); DidExecute")
+        let didExecuteExpectation = expectation(description: "Test: \(#function); DidExecute")
         let operation = NoFinishOperation(didExecuteExpectation: didExecuteExpectation)
         let kvoObserver = NSOperationKVOObserver(operation: operation)
         runOperation(operation) // trigger state transition from .Initializing -> .Executing via the queue
 
-        waitForExpectationsWithTimeout(5, handler: nil)
+        waitForExpectations(timeout: 5, handler: nil)
 
         let observedKVO = kvoObserver.observedKVOFor(NSOperationKVOObserver.KeyPathSets.State)
         // should be a single KVO notification for NSOperation keyPath "isExecuting" for this internal state transition
@@ -182,13 +182,13 @@ class OperationKVOTests: OperationTests {
 
         addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function); Did Complete OldOperation"))
         operation.finish()
-        waitForExpectationsWithTimeout(5, handler: nil)
+        waitForExpectations(timeout: 5, handler: nil)
     }
 
-    private func verifyKVO_cancelledNotifications(observedKVO: [NSOperationKVOObserver.KVONotification]) -> (success: Bool, isReadyIndex: Int?, failureMessage: String?) {
+    private func verifyKVO_cancelledNotifications(_ observedKVO: [NSOperationKVOObserver.KVONotification]) -> (success: Bool, isReadyIndex: Int?, failureMessage: String?) {
         // ensure that the observedKVO contains:
         // "isReady", with at least one "isCancelled" before it
-        if let isReadyIndex = observedKVO.indexOf({ $0.keyPath == NSOperationKVOObserver.KeyPath.Ready.rawValue }) {
+        if let isReadyIndex = observedKVO.index(where: { $0.keyPath == NSOperationKVOObserver.KeyPath.Ready.rawValue }) {
             var foundIsCancelled = false
             guard isReadyIndex > 0 else {
                 return (success: false, isReadyIndex: isReadyIndex, failureMessage: "Found isReady KVO notification, but no isCancelled beforehand.")
@@ -259,7 +259,7 @@ class OperationKVOTests: OperationTests {
     }
 
     func test__nsoperation_kvo__nsoperation_cancel_from_initialized() {
-        let operation = NSBlockOperation { }
+        let operation = BlockOperation { }
         let kvoObserver = NSOperationKVOObserver(operation: operation)
         operation.cancel()
 
@@ -270,7 +270,7 @@ class OperationKVOTests: OperationTests {
     }
 
     func test__nsoperation_kvo__operation_cancelled_to_completion() {
-        weak var expectationIsFinishedKVO = expectationWithDescription("Test: \(#function); Did Receive isFinished KVO Notification")
+        weak var expectationIsFinishedKVO = expectation(description: "Test: \(#function); Did Receive isFinished KVO Notification")
         let operation = TestOperation()
         let kvoObserver = NSOperationKVOObserver(operation: operation,
                                                  isFinishedBlock: {
@@ -300,7 +300,7 @@ class OperationKVOTests: OperationTests {
     }
 
     func test__nsoperation_kvo__groupoperation_cancelled_to_completion() {
-        weak var expectationIsFinishedKVO = expectationWithDescription("Test: \(#function); Did Receive isFinished KVO Notification")
+        weak var expectationIsFinishedKVO = expectation(description: "Test: \(#function); Did Receive isFinished KVO Notification")
         let child = TestOperation(delay: 1.0)
         let group = GroupOperation(operations: [child])
         let kvoObserver = NSOperationKVOObserver(operation: group,
@@ -331,7 +331,7 @@ class OperationKVOTests: OperationTests {
     }
 
     func test__nsoperation_kvo__operation_execute_to_completion() {
-        weak var expectationIsFinishedKVO = expectationWithDescription("Test: \(#function); Did Receive isFinished KVO Notification")
+        weak var expectationIsFinishedKVO = expectation(description: "Test: \(#function); Did Receive isFinished KVO Notification")
         let operation = TestOperation()
         let kvoObserver = NSOperationKVOObserver(operation: operation,
                                                  isFinishedBlock: {
@@ -348,7 +348,7 @@ class OperationKVOTests: OperationTests {
     }
 
     func test__nsoperation_kvo__groupoperation_execute_to_completion() {
-        weak var expectationIsFinishedKVO = expectationWithDescription("Test: \(#function); Did Receive isFinished KVO Notification")
+        weak var expectationIsFinishedKVO = expectation(description: "Test: \(#function); Did Receive isFinished KVO Notification")
         let child = TestOperation(delay: 1.0)
         let group = GroupOperation(operations: [child])
         let kvoObserver = NSOperationKVOObserver(operation: group,
@@ -366,7 +366,7 @@ class OperationKVOTests: OperationTests {
     }
 
     func test__nsoperation_kvo__operation_execute_with_dependencies_to_completion() {
-        weak var expectationIsFinishedKVO = expectationWithDescription("Test: \(#function); Did Receive isFinished KVO Notification")
+        weak var expectationIsFinishedKVO = expectation(description: "Test: \(#function); Did Receive isFinished KVO Notification")
         let delay = DelayOperation(interval: 0.1)
         let operation = TestOperation()
         let kvoObserver = NSOperationKVOObserver(operation: operation,
@@ -388,9 +388,9 @@ class OperationKVOTests: OperationTests {
     }
 }
 
-extension CollectionType {
+extension Collection {
     /// Returns the element at the specified index if it is within bounds, otherwise nil.
-    func get(safe index: Index) -> Generator.Element? {
+    func get(safe index: Index) -> Iterator.Element? {
         return indices.contains(index) ? self[index] : nil
     }
 }

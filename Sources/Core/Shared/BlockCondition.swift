@@ -46,13 +46,13 @@ public class BlockCondition: Condition {
         self.name = name
     }
 
-    public override func evaluate(operation: OldOperation, completion: CompletionBlockType) {
+    public override func evaluate(_ operation: OldOperation, completion: CompletionBlockType) {
         do {
             let result = try block()
-            completion(result ? .Satisfied : .Failed(Error.BlockConditionFailed))
+            completion(result ? .satisfied : .failed(Error.blockConditionFailed))
         }
         catch {
-            completion(.Failed(error))
+            completion(.failed(error))
         }
     }
 }

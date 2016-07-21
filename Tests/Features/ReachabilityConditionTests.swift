@@ -14,7 +14,7 @@ class ReachabilityConditionTests: OperationTests {
     var network: TestableNetworkReachability!
     var manager: ReachabilityManager!
 
-    let url = NSURL(string: "http://apple.com")!
+    let url = URL(string: "http://apple.com")!
 
     override func setUp() {
         super.setUp()
@@ -56,7 +56,7 @@ class ReachabilityConditionTests: OperationTests {
 
     func test__condition_fails_with_not_reachable() {
 
-        let expectation = expectationWithDescription("Test: \(#function)")
+        let expectation = self.expectation(description: "Test: \(#function)")
         let operation = TestOperation()
         let condition = ReachabilityCondition(url: url)
         condition.reachability = manager
@@ -68,7 +68,7 @@ class ReachabilityConditionTests: OperationTests {
             expectation.fulfill()
         }
 
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForExpectations(timeout: 3, handler: nil)
 
         guard let error = conditionResult.error as? ReachabilityCondition.Error else {
             XCTFail("Should have an error")
@@ -81,21 +81,21 @@ class ReachabilityConditionTests: OperationTests {
     #if os(iOS)
     func test__condition_fails_when_wifi_required_but_only_wwan_available() {
 
-        let expectation = expectationWithDescription("Test: \(#function)")
+        let expectation = self.expectation(description: "Test: \(#function)")
 
         let operation = TestOperation()
         let condition = ReachabilityCondition(url: url, connectivity: .ViaWiFi)
         condition.reachability = manager
         var conditionResult: OperationConditionResult = .Satisfied
 
-        network.flags = [.Reachable, .IsWWAN]
+        network.flags = [.reachable, .isWWAN]
 
         condition.evaluate(operation) { result in
             conditionResult = result
             expectation.fulfill()
         }
 
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForExpectations(timeout: 3, handler: nil)
 
         guard let error = conditionResult.error as? ReachabilityCondition.Error else {
             XCTFail("Should have an error")
@@ -106,7 +106,7 @@ class ReachabilityConditionTests: OperationTests {
     }
 
     func test__condition_succeeds_when_only_wifi_accepted_and_only_wifi_available() {
-        network.flags = [.Reachable]
+        network.flags = [.reachable]
 
         let operation = TestOperation()
         let condition = ReachabilityCondition(url: url, connectivity: .ViaWiFi)

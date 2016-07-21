@@ -10,7 +10,7 @@ import Foundation
 import CloudKit
 
 /// An error type for CloudKit errors.
-public protocol CloudKitErrorType: ErrorType {
+public protocol CloudKitErrorType: ErrorProtocol {
 
     /// - returns: the original NSError received from CloudKit
     var underlyingError: NSError { get }
@@ -26,7 +26,7 @@ public extension CloudKitErrorType {
     }
 
     var retryAfterDelay: Delay? {
-        return (underlyingError.userInfo[CKErrorRetryAfterKey] as? NSNumber).map { Delay.By($0.doubleValue) }
+        return (underlyingError.userInfo[CKErrorRetryAfterKey] as? NSNumber).map { Delay.by($0.doubleValue) }
     }
 }
 
@@ -61,7 +61,7 @@ internal extension Array where Element: Equatable {
 
     func bisect() -> (left: [Element], right: [Element]) {
         let half = count / 2
-        return (Array(prefixUpTo(half)), Array(suffixFrom(half)))
+        return (Array(prefix(upTo: half)), Array(suffix(from: half)))
     }
 }
 
@@ -70,9 +70,9 @@ internal extension BatchModifyOperationType where Save: Equatable, Save == Error
     typealias ToModify = (toSave: [Save]?, toDelete: [Delete]?)
     typealias ToModifyResponse = (left: ToModify, right: ToModify)
 
-    func bisect(error: Error) -> ToModifyResponse {
-        var left: ToModify = (.None, .None)
-        var right: ToModify = (.None, .None)
+    func bisect(_ error: Error) -> ToModifyResponse {
+        var left: ToModify = (.none, .none)
+        var right: ToModify = (.none, .none)
 
         let remainingToSave = toSave?.filter { !(error.saved?.contains($0) ?? false) }
         let remainingToDelete = toDelete?.filter { !(error.deleted?.contains($0) ?? false) }
@@ -96,14 +96,14 @@ public extension CloudKitOperation where T: BatchModifyOperationType, T.Save == 
     typealias ToModify = (toSave: [T.Save]?, toDelete: [T.Delete]?)
     typealias ToModifyResponse = (left: ToModify, right: ToModify)
 
-    func setErrorHandlerForLimitExceeded(handler: (error: T.Error, log: LoggerType, suggested: ToModifyResponse) -> ToModifyResponse? = { $2 }) {
-        setErrorHandlerForCode(.LimitExceeded) { [unowned self] operation, error, log, suggested in
+    func setErrorHandlerForLimitExceeded(_ handler: (error: T.Error, log: LoggerType, suggested: ToModifyResponse) -> ToModifyResponse? = { $2 }) {
+        setErrorHandlerForCode(.limitExceeded) { [unowned self] operation, error, log, suggested in
 
             log.warning("Received CloudKit Limit Exceeded error: \(error)")
 
             // Execute the handler, and guard against a nil response
             guard let response = handler(error: error, log: log, suggested: operation.bisect(error)) else {
-                return .None
+                return .none
             }
 
             // Create a new operation to bisect the remaining data
@@ -146,24 +146,24 @@ public extension CloudKitOperation where T: BatchProcessOperationType, T.Process
 
     typealias ToProcessResponse = (left: [T.Process]?, right: [T.Process]?)
 
-    func setErrorHandlerForLimitExceeded(handler: (error: T.Error, log: LoggerType, suggested: ToProcessResponse) -> ToProcessResponse? = { $2 }) {
-        setErrorHandlerForCode(.LimitExceeded) { [unowned self] operation, error, log, suggested in
+    func setErrorHandlerForLimitExceeded(_ handler: (error: T.Error, log: LoggerType, suggested: ToProcessResponse) -> ToProcessResponse? = { $2 }) {
+        setErrorHandlerForCode(.limitExceeded) { [unowned self] operation, error, log, suggested in
 
             log.warning("Received CloudKit Limit Exceeded error: \(error)")
 
-            var left: [T.Process]? = .None
-            var right: [T.Process]? = .None
+            var left: [T.Process]? = .none
+            var right: [T.Process]? = .none
 
             let remainingToProcess = self.operation.toProcess?.filter { error.processed?.contains($0) ?? false }
             if let toProcess = remainingToProcess {
                 let numberOfToSave = toProcess.count
-                left = Array(toProcess.prefixUpTo(numberOfToSave/2))
-                right = Array(toProcess.suffixFrom(numberOfToSave/2))
+                left = Array(toProcess.prefix(upTo: numberOfToSave/2))
+                right = Array(toProcess.suffix(from: numberOfToSave/2))
             }
 
             // Execute the handler, and guard against a nil response
             guard let response = handler(error: error, log: log, suggested: (left: left, right: right)) else {
-                return .None
+                return .none
             }
 
             // Create a new operation to bisect the remaining data

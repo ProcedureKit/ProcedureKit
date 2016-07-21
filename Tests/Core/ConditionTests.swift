@@ -122,7 +122,7 @@ class ConditionTests: OperationTests {
         
         addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
         runOperations(dependency1, dependency2, operation)
-        waitForExpectationsWithTimeout(5, handler: nil)
+        waitForExpectations(timeout: 5, handler: nil)
         
         XCTAssertTrue(dependency1.didExecute)
         XCTAssertTrue(dependency1.finished)
@@ -148,7 +148,7 @@ class ConditionTests: OperationTests {
         
         addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
         runOperations(dependency1, dependency2, operation)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForExpectations(timeout: 3, handler: nil)
         
         XCTAssertEqual(operation.dependencies.count, 4)
     }

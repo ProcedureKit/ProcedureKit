@@ -21,7 +21,7 @@ public protocol EventsCapabilityRegistrarType: CapabilityRegistrarType {
      - parameter requirement: the EKEntityType, e.g. .Events, or .Reminders
      - returns: the EKAuthorizationStatus
     */
-    func opr_authorizationStatusForRequirement(requirement: EKEntityType) -> EKAuthorizationStatus
+    func opr_authorizationStatusForRequirement(_ requirement: EKEntityType) -> EKAuthorizationStatus
 
     /**
      Request access for the given EKEntityType (i.e. the requirement).
@@ -29,7 +29,7 @@ public protocol EventsCapabilityRegistrarType: CapabilityRegistrarType {
      - parameter requirement: the EKEntityType, e.g. .Events, or .Reminders
      - parameter completion: a EKEventStoreRequestAccessCompletionHandler
     */
-    func opr_requestAccessForRequirement(requirement: EKEntityType, completion: EKEventStoreRequestAccessCompletionHandler)
+    func opr_requestAccessForRequirement(_ requirement: EKEntityType, completion: EKEventStoreRequestAccessCompletionHandler)
 }
 
 extension EKEventStore: EventsCapabilityRegistrarType {
@@ -40,8 +40,8 @@ extension EKEventStore: EventsCapabilityRegistrarType {
      - parameter requirement: the EKEntityType, e.g. .Events, or .Reminders
      - returns: the EKAuthorizationStatus
      */
-    public func opr_authorizationStatusForRequirement(requirement: EKEntityType) -> EKAuthorizationStatus {
-        return EKEventStore.authorizationStatusForEntityType(requirement)
+    public func opr_authorizationStatusForRequirement(_ requirement: EKEntityType) -> EKAuthorizationStatus {
+        return EKEventStore.authorizationStatus(for: requirement)
     }
 
     /**
@@ -50,8 +50,8 @@ extension EKEventStore: EventsCapabilityRegistrarType {
      - parameter requirement: the EKEntityType, e.g. .Events, or .Reminders
      - parameter completion: a EKEventStoreRequestAccessCompletionHandler
      */
-    public func opr_requestAccessForRequirement(requirement: EKEntityType, completion: EKEventStoreRequestAccessCompletionHandler) {
-        requestAccessToEntityType(requirement, completion: completion)
+    public func opr_requestAccessForRequirement(_ requirement: EKEntityType, completion: EKEventStoreRequestAccessCompletionHandler) {
+        requestAccess(to: requirement, completion: completion)
     }
 }
 
@@ -63,8 +63,8 @@ extension EKAuthorizationStatus: AuthorizationStatusType {
      - parameter requirement: the required EKEntityType
      - returns: a true Bool for authorized status
     */
-    public func isRequirementMet(requirement: EKEntityType) -> Bool {
-        if case .Authorized = self {
+    public func isRequirementMet(_ requirement: EKEntityType) -> Bool {
+        if case .authorized = self {
             return true
         }
         return false
@@ -102,7 +102,7 @@ public class EventsCapability: CapabilityType {
      - parameter requirement: the required EKEntityType, defaults to .Event
      - parameter registrar: the registrar to use. Defauls to creating a Registrar.
     */
-    public required init(_ requirement: EKEntityType = .Event) {
+    public required init(_ requirement: EKEntityType = .event) {
         self.name = "Events"
         self.requirement = requirement
     }
@@ -116,7 +116,7 @@ public class EventsCapability: CapabilityType {
      Get the current authorization status of EventKit from the Registrar.
      - parameter completion: a EKAuthorizationStatus -> Void closure.
      */
-    public func authorizationStatus(completion: EKAuthorizationStatus -> Void) {
+    public func authorizationStatus(_ completion: (EKAuthorizationStatus) -> Void) {
         completion(registrar.opr_authorizationStatusForRequirement(requirement))
     }
 
@@ -124,10 +124,10 @@ public class EventsCapability: CapabilityType {
      Request authorization to EventKit from the Registrar.
      - parameter completion: a dispatch_block_t
      */
-    public func requestAuthorizationWithCompletion(completion: dispatch_block_t) {
+    public func requestAuthorizationWithCompletion(_ completion: ()->()) {
         let status = registrar.opr_authorizationStatusForRequirement(requirement)
         switch status {
-        case .NotDetermined:
+        case .notDetermined:
             registrar.opr_requestAccessForRequirement(requirement) { success, error in
                 completion()
             }
@@ -187,5 +187,5 @@ public extension Capability {
     typealias Calendar = EventsCapability
 }
 
-@available(*, unavailable, renamed="AuthorizedFor(Capability.Calendar())")
-public typealias CalendarCondition = AuthorizedFor<Capability.Calendar>
+//@available(*, unavailable, renamed: "AuthorizedFor(Capability.Calendar())")
+//public typealias CalendarCondition = AuthorizedFor<Capability.Calendar>

@@ -13,24 +13,24 @@ class BlockOperationTests: OperationTests {
 
     func test__that_block_in_block_operation_executes() {
 
-        let expectation = expectationWithDescription("Test: \(#function)")
+        let expectation = self.expectation(description: "Test: \(#function)")
         var didExecuteBlock: Bool = false
         let operation = BlockOperation {
             didExecuteBlock = true
             expectation.fulfill()
         }
         runOperation(operation)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForExpectations(timeout: 3, handler: nil)
         XCTAssertTrue(didExecuteBlock)
     }
 
     func test__that_block_operation_with_no_block_finishes_immediately() {
-        let expectation = expectationWithDescription("Test: \(#function)")
+        let expectation = self.expectation(description: "Test: \(#function)")
         let operation = BlockOperation()
         addCompletionBlockToTestOperation(operation, withExpectation: expectation)
         runOperation(operation)
-        waitForExpectationsWithTimeout(3, handler: nil)
-        XCTAssertTrue(operation.finished)
+        waitForExpectations(timeout: 3, handler: nil)
+        XCTAssertTrue(operation.isFinished)
     }
 
     func test__that_block_operation_does_not_execute_if_cancelled_before_ready() {
@@ -55,7 +55,7 @@ class BlockOperationTests: OperationTests {
 
         runOperations(delay, block, blockToCancel)
         blockToCancel.cancel()
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForExpectations(timeout: 3, handler: nil)
         
         XCTAssertEqual(blockDidRun, 2)
     }

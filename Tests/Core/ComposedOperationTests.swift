@@ -20,14 +20,14 @@ class ComposedOperationTests: OperationTests {
 
     func test__composed_nsoperation_is_performed() {
         var didExecute = false
-        let composed = ComposedOperation(NSBlockOperation {
+        let composed = ComposedOperation(BlockOperation {
             didExecute = true
         })
 
-        let expectation = expectationWithDescription("Test: \(#function)")
+        let expectation = self.expectation(description: "Test: \(#function)")
         addCompletionBlockToTestOperation(composed, withExpectation: expectation)
         runOperation(composed)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForExpectations(timeout: 3, handler: nil)
 
         XCTAssertTrue(composed.finished)
         XCTAssertTrue(didExecute)
@@ -36,10 +36,10 @@ class ComposedOperationTests: OperationTests {
     func test__composed_operation_is_performed() {
         let composed = ComposedOperation(operation: TestOperation())
 
-        let expectation = expectationWithDescription("Test: \(#function)")
+        let expectation = self.expectation(description: "Test: \(#function)")
         addCompletionBlockToTestOperation(composed, withExpectation: expectation)
         runOperation(composed)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForExpectations(timeout: 3, handler: nil)
 
         XCTAssertTrue(composed.finished)
         XCTAssertTrue(composed.operation.didExecute)
@@ -48,19 +48,19 @@ class ComposedOperationTests: OperationTests {
     func test__composed_operation_which_cancels_propagates_error_to_target() {
         let target = TestOperation()
         
-        var targetErrors: [ErrorType] = []
+        var targetErrors: [ErrorProtocol] = []
         target.addObserver(DidCancelObserver { op in
             targetErrors = op.errors
         })
         
         let operation = ComposedOperation(target)
         
-        let operationError = TestOperation.Error.SimulatedError
+        let operationError = TestOperation.Error.simulatedError
         operation.cancelWithError(operationError)
 
         addCompletionBlockToTestOperation(operation)
         runOperation(operation)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForExpectations(timeout: 3, handler: nil)
         
         XCTAssertEqual(targetErrors.count, 1)
         

@@ -12,7 +12,7 @@ import UIKit
 extension UIApplication {
     internal var isFullscreenPresentation: Bool {
         if let window = self.keyWindow {
-            return CGRectEqualToRect(window.frame, window.screen.bounds)
+            return window.frame.equalTo(window.screen.bounds)
         } else {
             return true
         }
@@ -31,12 +31,12 @@ extension UIApplication {
 
 public class OpenInSafariOperation<From: PresentingViewController>: GroupOperation {
     /// The URL to open.
-    public let URL: NSURL
+    public let URL: Foundation.URL
     /// A flag that determines whether the `SFSafariViewController` should open the `URL` in reader mode or not.
     public var entersReaderIfAvailable: Bool
 
-    internal var shouldOpenInSafariViewController: () -> Bool = { UIApplication.sharedApplication().isFullscreenPresentation }
-    internal var openURL: NSURL -> Void = { UIApplication.sharedApplication().openURL($0) }
+    internal var shouldOpenInSafariViewController: () -> Bool = { UIApplication.shared().isFullscreenPresentation }
+    internal var openURL: (Foundation.URL) -> Void = { UIApplication.shared().openURL($0) }
 
     /// The presenting `ViewControllerDisplayStyle`
     private let displayControllerFrom: ViewControllerDisplayStyle<From>
@@ -53,7 +53,7 @@ public class OpenInSafariOperation<From: PresentingViewController>: GroupOperati
 
      - returns: An `OpenInSafariOperation` object initialized with a `URL` and some optional custom settings.
      */
-    public init(URL: NSURL, displayControllerFrom from: ViewControllerDisplayStyle<From>, entersReaderIfAvailable: Bool = false, sender: AnyObject? = .None) {
+    public init(URL: Foundation.URL, displayControllerFrom from: ViewControllerDisplayStyle<From>, entersReaderIfAvailable: Bool = false, sender: AnyObject? = .none) {
         self.URL = URL
         self.entersReaderIfAvailable = entersReaderIfAvailable
         self.displayControllerFrom = from

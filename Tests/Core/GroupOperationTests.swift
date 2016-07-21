@@ -32,9 +32,9 @@ class GroupOperationTests: OperationTests {
         let delay = DelayOperation(interval: 10)
         let group = GroupOperation(operations: [delay])
         
-        let expectation = expectationWithDescription("Test: \(#function)")
+        let expectation = self.expectation(description: "Test: \(#function)")
         group.addObserver(DidFinishObserver { observedOperation, errors in
-            NSOperationQueue.mainQueue().addOperationWithBlock {
+            OperationQueue.mainQueue().addOperationWithBlock {
                 XCTAssertTrue(observedOperation.cancelled)
                 expectation.fulfill()
             }
@@ -43,20 +43,20 @@ class GroupOperationTests: OperationTests {
         runOperation(group)
         group.cancel()
         
-        waitForExpectationsWithTimeout(5, handler: nil)
+        waitForExpectations(timeout: 5, handler: nil)
         XCTAssertTrue(group.cancelled)
     }
 
     func test__group_operations_are_performed_in_order() {
         let group = createGroupOperations()
-        let expectation = expectationWithDescription("Test: \(#function)")
+        let expectation = self.expectation(description: "Test: \(#function)")
         let operation = GroupOperation(operations: group)
         operation.addCompletionBlock {
             expectation.fulfill()
         }
 
         runOperation(operation)
-        waitForExpectationsWithTimeout(4, handler: nil)
+        waitForExpectations(timeout: 4, handler: nil)
         XCTAssertTrue(operation.finished)
         for op in group {
             XCTAssertTrue(op.didExecute)
@@ -64,7 +64,7 @@ class GroupOperationTests: OperationTests {
     }
 
     func test__adding_operation_to_running_group() {
-        let expectation = expectationWithDescription("Test: \(#function)")
+        let expectation = self.expectation(description: "Test: \(#function)")
         let operation = GroupOperation(operations: TestOperation(), TestOperation())
         operation.addCompletionBlock {
             expectation.fulfill()
@@ -73,7 +73,7 @@ class GroupOperationTests: OperationTests {
         runOperation(operation)
         operation.addOperation(extra)
 
-        waitForExpectationsWithTimeout(5, handler: nil)
+        waitForExpectations(timeout: 5, handler: nil)
         XCTAssertTrue(operation.finished)
         XCTAssertTrue(extra.didExecute)
     }
@@ -82,7 +82,7 @@ class GroupOperationTests: OperationTests {
         let operations: [TestOperation] = (0..<3).map { i in
             let op = TestOperation()
             op.addCondition(BlockCondition { true })
-            let exp = self.expectationWithDescription("Group OldOperation, child \(i): \(#function)")
+            let exp = self.expectation(description: "Group OldOperation, child \(i): \(#function)")
             self.addCompletionBlockToTestOperation(op, withExpectation: exp)
             return op
         }
@@ -91,7 +91,7 @@ class GroupOperationTests: OperationTests {
         addCompletionBlockToTestOperation(group, withExpectation: expectationWithDescription("Test: \(#function)"))
 
         runOperation(group)
-        waitForExpectationsWithTimeout(5, handler: nil)
+        waitForExpectations(timeout: 5, handler: nil)
         XCTAssertTrue(group.finished)
     }
 
@@ -102,7 +102,7 @@ class GroupOperationTests: OperationTests {
 
         addCompletionBlockToTestOperation(group, withExpectation: expectationWithDescription("Test: \(#function)"))
         runOperation(group)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForExpectations(timeout: 3, handler: nil)
 
         XCTAssertTrue(group.finished)
         XCTAssertTrue(operations[0].didExecute)
@@ -127,34 +127,34 @@ class GroupOperationTests: OperationTests {
         let waiter = BlockOperation { }
         waiter.addDependency(group)
 
-        let expectation = expectationWithDescription("Test: \(#function)")
+        let expectation = self.expectation(description: "Test: \(#function)")
         addCompletionBlockToTestOperation(waiter, withExpectation: expectation)
         runOperations(group, waiter)
-        waitForExpectationsWithTimeout(5.0, handler: nil)
+        waitForExpectations(timeout: 5.0, handler: nil)
 
         XCTAssertTrue(group.finished)
         XCTAssertEqual(group.errors.count, numberOfOperations)
     }
 
     func test__group_operation_exits_correctly_when_child_group_finishes_with_errors() {
-        let operation = TestOperation(error: TestOperation.Error.SimulatedError)
+        let operation = TestOperation(error: TestOperation.Error.simulatedError)
         let child = GroupOperation(operations: [operation])
         let group = GroupOperation(operations: [child])
 
         let waiter = BlockOperation { }
         waiter.addDependency(group)
 
-        let expectation = expectationWithDescription("Test: \(#function)")
+        let expectation = self.expectation(description: "Test: \(#function)")
         addCompletionBlockToTestOperation(waiter, withExpectation: expectation)
         runOperations(group, waiter)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForExpectations(timeout: 3, handler: nil)
 
         XCTAssertTrue(group.finished)
         XCTAssertEqual(group.errors.count, 1)
     }
 
     func test__group_operation_exits_correctly_when_multiple_nested_groups_finish_with_errors() {
-        let operation = TestOperation(error: TestOperation.Error.SimulatedError)
+        let operation = TestOperation(error: TestOperation.Error.simulatedError)
         let child1 = GroupOperation(operations: [operation])
         let child = GroupOperation(operations: [child1])
         let group = GroupOperation(operations: [child])
@@ -162,10 +162,10 @@ class GroupOperationTests: OperationTests {
         let waiter = BlockOperation { }
         waiter.addDependency(group)
 
-        let expectation = expectationWithDescription("Test: \(#function)")
+        let expectation = self.expectation(description: "Test: \(#function)")
         addCompletionBlockToTestOperation(waiter, withExpectation: expectation)
         runOperations(group, waiter)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForExpectations(timeout: 3, handler: nil)
 
         XCTAssertTrue(group.finished)
         XCTAssertEqual(group.errors.count, 1)
@@ -195,19 +195,19 @@ class GroupOperationTests: OperationTests {
         
         let child = TestOperation()
         
-        var childErrors: [ErrorType] = []
+        var childErrors: [ErrorProtocol] = []
         child.addObserver(DidCancelObserver { op in
             childErrors = op.errors
         })
         
         let group = GroupOperation(operations: [child])
         
-        let groupError = TestOperation.Error.SimulatedError
+        let groupError = TestOperation.Error.simulatedError
         group.cancelWithError(groupError)
         
         addCompletionBlockToTestOperation(group)
         runOperation(group)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForExpectations(timeout: 3, handler: nil)
         
         XCTAssertEqual(childErrors.count, 1)
         
@@ -230,7 +230,7 @@ class GroupOperationTests: OperationTests {
         let test1 = TestOperation()
         test1.userIntent = .Initiated
         let test2 = TestOperation()
-        let test3 = NSBlockOperation { }
+        let test3 = BlockOperation { }
         
         let group = GroupOperation(operations: [ test1, test2, test3 ])
         XCTAssertEqual(group.userIntent, OldOperation.UserIntent.Initiated)
@@ -240,13 +240,13 @@ class GroupOperationTests: OperationTests {
         let test1 = TestOperation()
         test1.userIntent = .Initiated
         let test2 = TestOperation()
-        let test3 = NSBlockOperation { }
+        let test3 = BlockOperation { }
         
         let group = GroupOperation(operations: [ test1, test2, test3 ])
         group.userIntent = .SideEffect
         XCTAssertEqual(test1.userIntent, OldOperation.UserIntent.SideEffect)
         XCTAssertEqual(test2.userIntent, OldOperation.UserIntent.SideEffect)
-        XCTAssertEqual(test3.qualityOfService, NSQualityOfService.UserInitiated)
+        XCTAssertEqual(test3.qualityOfService, QualityOfService.userInitiated)
     }
 
     func test__group_operation__initial_operations_only_added_once_to_operations_array() {
@@ -265,7 +265,7 @@ class GroupOperationTests: OperationTests {
             let child2 = TestOperation(delay: 1.0)
             let group = GroupOperation(operations: [ child1, child2 ])
 
-            weak var expectation = expectationWithDescription("Test: \(#function)")
+            weak var expectation = self.expectation(description: "Test: \(#function)")
             group.addCompletionBlock {
                 let child1Finished = child1.finished
                 let child2Finished = child2.finished
@@ -280,7 +280,7 @@ class GroupOperationTests: OperationTests {
             runOperation(group)
             group.cancel()
 
-            waitForExpectationsWithTimeout(5, handler: nil)
+            waitForExpectations(timeout: 5, handler: nil)
             XCTAssertTrue(group.cancelled)
         }
     }
@@ -297,7 +297,7 @@ class GroupOperationTests: OperationTests {
             }])
             let group = GroupOperation(operations: [ child1, child2 ])
 
-            weak var expectation = expectationWithDescription("Test: \(#function)")
+            weak var expectation = self.expectation(description: "Test: \(#function)")
             group.addCompletionBlock {
                 let child1Finished = child1.finished
                 let child2Finished = child2.finished
@@ -312,14 +312,14 @@ class GroupOperationTests: OperationTests {
             runOperation(group)
             group.cancel()
 
-            waitForExpectationsWithTimeout(5, handler: nil)
+            waitForExpectations(timeout: 5, handler: nil)
             XCTAssertTrue(group.cancelled)
         }
     }
     
     func test__group_operation_does_not_finish_before_child_produced_operations_are_finished() {
         
-        weak var didFinishExpectation = expectationWithDescription("Test: \(#function), DidFinish GroupOperation")
+        weak var didFinishExpectation = expectation(description: "Test: \(#function), DidFinish GroupOperation")
         let child = TestOperation(delay: 0.1)
         child.name = "ChildOperation"
         let childProducedOperation = TestOperation(delay: 0.5)
@@ -330,7 +330,7 @@ class GroupOperationTests: OperationTests {
         })
         
         group.addCompletionBlock {
-            dispatch_async(Queue.Main.queue, {
+            (Queue.Main.queue).async(execute: {
                 guard let didFinishExpectation = didFinishExpectation else { return }
                 didFinishExpectation.fulfill()
             })
@@ -338,7 +338,7 @@ class GroupOperationTests: OperationTests {
         
         runOperation(group)
         
-        waitForExpectationsWithTimeout(5, handler: nil)
+        waitForExpectations(timeout: 5, handler: nil)
         
         XCTAssertTrue(group.finished)
         XCTAssertTrue(childProducedOperation.finished)
@@ -369,7 +369,7 @@ class GroupOperationTests: OperationTests {
 
     func test__group_operation_cancellation__queue_is_empty_when_finished() {
         (0..<100).forEach { i in
-            weak var didFinishExpectation = expectationWithDescription("Test: \(#function), DidFinish GroupOperation: \(i)")
+            weak var didFinishExpectation = expectation(description: "Test: \(#function), DidFinish GroupOperation: \(i)")
             let child1 = TestOperation(delay: 1.0)
             let child2 = TestOperation(delay: 1.0)
             let group = GroupOperation(operations: [child1, child2])
@@ -387,7 +387,7 @@ class GroupOperationTests: OperationTests {
             runOperation(group)
             group.cancel()
 
-            waitForExpectationsWithTimeout(5, handler: nil)
+            waitForExpectations(timeout: 5, handler: nil)
 
             XCTAssertEqual(group.queue.operations.count, 0)
             XCTAssertTrue(group.queue.suspended)
@@ -396,7 +396,7 @@ class GroupOperationTests: OperationTests {
     
     func test__group_operation_operations_array_receives_operations_produced_by_children() {
         
-        weak var didFinishExpectation = expectationWithDescription("Test: \(#function), DidFinish GroupOperation")
+        weak var didFinishExpectation = expectation(description: "Test: \(#function), DidFinish GroupOperation")
         let child = TestOperation(delay: 0.1)
         child.name = "ChildOperation"
         let childProducedOperation = TestOperation(delay: 0.2)
@@ -407,7 +407,7 @@ class GroupOperationTests: OperationTests {
         })
         
         group.addCompletionBlock {
-            dispatch_async(Queue.Main.queue, {
+            (Queue.Main.queue).async(execute: {
                 guard let didFinishExpectation = didFinishExpectation else { return }
                 didFinishExpectation.fulfill()
             })
@@ -415,7 +415,7 @@ class GroupOperationTests: OperationTests {
         
         runOperation(group)
         
-        waitForExpectationsWithTimeout(5, handler: nil)
+        waitForExpectations(timeout: 5, handler: nil)
         
         XCTAssertEqual(group.operations.count, 2)
         XCTAssertTrue(group.operations.contains(child))
@@ -425,7 +425,7 @@ class GroupOperationTests: OperationTests {
     func test__group_operation_ignores_queue_delegate_calls_from_other_queues() {
         class PoorlyWrittenGroupOperationSubclass: GroupOperation {
             private var subclassQueue = OldOperationQueue()
-            override init(operations: [NSOperation]) {
+            override init(operations: [Operation]) {
                 super.init(operations: operations)
                 subclassQueue.delegate = self
             }
@@ -438,7 +438,7 @@ class GroupOperationTests: OperationTests {
             // since GroupOperation already satisfies OperationQueueDelegate, this compiles
         }
         
-        weak var didFinishExpectation = expectationWithDescription("Test: \(#function), DidFinish GroupOperation")
+        weak var didFinishExpectation = expectation(description: "Test: \(#function), DidFinish GroupOperation")
         let childOperation = TestOperation()
         let groupOperation = PoorlyWrittenGroupOperationSubclass(operations: [childOperation])
         var addedOperationFromOtherQueue = false
@@ -450,7 +450,7 @@ class GroupOperationTests: OperationTests {
         })
         
         groupOperation.addCompletionBlock {
-            dispatch_async(Queue.Main.queue, {
+            (Queue.Main.queue).async(execute: {
                 guard let didFinishExpectation = didFinishExpectation else { return }
                 didFinishExpectation.fulfill()
             })
@@ -458,7 +458,7 @@ class GroupOperationTests: OperationTests {
         
         runOperation(groupOperation)
         
-        waitForExpectationsWithTimeout(5, handler: nil)
+        waitForExpectations(timeout: 5, handler: nil)
         
         XCTAssertFalse(addedOperationFromOtherQueue)
     }

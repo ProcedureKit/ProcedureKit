@@ -14,9 +14,9 @@ class NumbersOperation: OldOperation, ResultOperationType {
     typealias Result = Array<Int>
 
     var result: [Int] = []
-    var error: ErrorType? = .None
+    var error: ErrorProtocol? = .none
 
-    init(error: ErrorType? = .None) {
+    init(error: ErrorProtocol? = .none) {
         self.error = error
         super.init()
         name = "Numbers Test"
@@ -41,18 +41,18 @@ class MapOperationTests: OperationTests {
 
         addCompletionBlockToTestOperation(destination, withExpectation: expectationWithDescription("Test: \(#function)"))
         runOperations(source, destination)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForExpectations(timeout: 3, handler: nil)
 
         XCTAssertEqual(destination.result, "Hello World Hello World")
     }
 
     func test__map_operation_with_error() {
-        let source = TestOperation(error: TestOperation.Error.SimulatedError)
+        let source = TestOperation(error: TestOperation.Error.simulatedError)
         let destination = source.mapOperation { $0.map { "\($0) \($0)" } ?? "Nope" }
 
         addCompletionBlockToTestOperation(destination, withExpectation: expectationWithDescription("Test: \(#function)"))
         runOperations(source, destination)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForExpectations(timeout: 3, handler: nil)
 
         XCTAssertTrue(destination.cancelled)
     }
@@ -62,7 +62,7 @@ class MapOperationTests: OperationTests {
 
         addCompletionBlockToTestOperation(map, withExpectation: expectationWithDescription("Test: \(#function)"))
         runOperation(map)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForExpectations(timeout: 3, handler: nil)
 
         XCTAssertTrue(map.finished)
         XCTAssertEqual(map.errors.count, 1)
@@ -77,7 +77,7 @@ class FilterOperationTests: OperationTests {
 
         addCompletionBlockToTestOperation(filtered, withExpectation: expectationWithDescription("Test: \(#function)"))
         runOperations(numbers, filtered)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForExpectations(timeout: 3, handler: nil)
 
         XCTAssertEqual(filtered.result, [0, 2, 4, 6, 8])
     }
@@ -91,18 +91,18 @@ class FilterOperationTests: OperationTests {
         addCompletionBlockToTestOperation(filtered, withExpectation: expectationWithDescription("Test: \(#function)"))
         runOperations(delay, numbers, filtered)
         numbers.cancel()
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForExpectations(timeout: 3, handler: nil)
 
         XCTAssertTrue(filtered.cancelled)
     }
 
     func test__filter_with_error() {
-        let numbers = NumbersOperation(error: TestOperation.Error.SimulatedError)
+        let numbers = NumbersOperation(error: TestOperation.Error.simulatedError)
         let filtered = numbers.filterOperation { $0 % 2 == 0 }
 
         addCompletionBlockToTestOperation(filtered, withExpectation: expectationWithDescription("Test: \(#function)"))
         runOperations(numbers, filtered)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForExpectations(timeout: 3, handler: nil)
 
         XCTAssertTrue(filtered.cancelled)
     }
@@ -118,7 +118,7 @@ class ReduceOperationTests: OperationTests {
 
         addCompletionBlockToTestOperation(reduce, withExpectation: expectationWithDescription("Test: \(#function)"))
         runOperations(numbers, reduce)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForExpectations(timeout: 3, handler: nil)
 
         XCTAssertEqual(reduce.result, 45)
     }
@@ -134,20 +134,20 @@ class ReduceOperationTests: OperationTests {
         addCompletionBlockToTestOperation(reduce, withExpectation: expectationWithDescription("Test: \(#function)"))
         runOperations(delay, numbers, reduce)
         numbers.cancel()
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForExpectations(timeout: 3, handler: nil)
 
         XCTAssertTrue(reduce.cancelled)
     }
 
     func test__reduce_with_error() {
-        let numbers = NumbersOperation(error: TestOperation.Error.SimulatedError)
+        let numbers = NumbersOperation(error: TestOperation.Error.simulatedError)
         let reduce = numbers.reduceOperation(0) { (sum: Int, element: Int) in
             return sum + element
         }
 
         addCompletionBlockToTestOperation(reduce, withExpectation: expectationWithDescription("Test: \(#function)"))
         runOperations(numbers, reduce)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForExpectations(timeout: 3, handler: nil)
 
         XCTAssertTrue(reduce.cancelled)
     }
@@ -160,7 +160,7 @@ class ResultOperationTests: OperationTests {
 
         addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
         runOperation(operation)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForExpectations(timeout: 3, handler: nil)
 
         XCTAssertTrue(operation.finished)
     }

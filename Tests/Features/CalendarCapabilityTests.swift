@@ -12,25 +12,25 @@ import EventKit
 
 class TestableEventsRegistrar: NSObject {
 
-    var authorizationStatus: EKAuthorizationStatus = .NotDetermined
+    var authorizationStatus: EKAuthorizationStatus = .notDetermined
     var didCheckAuthorizationStatus = false
 
-    var responseStatus: EKAuthorizationStatus = .Authorized
+    var responseStatus: EKAuthorizationStatus = .authorized
     var accessAllowed: Bool = true
-    var accessError: NSError? = .None
-    var didRequestAuthorization: EKEntityType? = .None
+    var accessError: NSError? = .none
+    var didRequestAuthorization: EKEntityType? = .none
 
     required override init() { }
 }
 
 extension TestableEventsRegistrar: EventsCapabilityRegistrarType {
 
-    func opr_authorizationStatusForRequirement(requirement: EKEntityType) -> EKAuthorizationStatus {
+    func opr_authorizationStatusForRequirement(_ requirement: EKEntityType) -> EKAuthorizationStatus {
         didCheckAuthorizationStatus = true
         return authorizationStatus
     }
 
-    func opr_requestAccessForRequirement(requirement: EKEntityType, completion: EKEventStoreRequestAccessCompletionHandler) {
+    func opr_requestAccessForRequirement(_ requirement: EKEntityType, completion: EKEventStoreRequestAccessCompletionHandler) {
         didRequestAuthorization = requirement
         authorizationStatus = responseStatus
         completion(accessAllowed, accessError)
@@ -40,22 +40,22 @@ extension TestableEventsRegistrar: EventsCapabilityRegistrarType {
 class EKAuthorizationStatusTests: XCTestCase {
 
     func test__given_status_not_determined__requirements_not_met() {
-        let status = EKAuthorizationStatus.NotDetermined
+        let status = EKAuthorizationStatus.notDetermined
         XCTAssertFalse(status.isRequirementMet(.Event))
     }
 
     func test__given_status_restricted__requirements_not_met() {
-        let status = EKAuthorizationStatus.Restricted
+        let status = EKAuthorizationStatus.restricted
         XCTAssertFalse(status.isRequirementMet(.Event))
     }
 
     func test__given_status_denied__requirements_not_met() {
-        let status = EKAuthorizationStatus.Denied
+        let status = EKAuthorizationStatus.denied
         XCTAssertFalse(status.isRequirementMet(.Event))
     }
 
     func test__given_status_authorized__requirements_met() {
-        let status = EKAuthorizationStatus.Authorized
+        let status = EKAuthorizationStatus.authorized
         XCTAssertTrue(status.isRequirementMet(.Event))
     }
 }
@@ -99,12 +99,12 @@ class EventsCapabilityTests: XCTestCase {
         capability.requestAuthorizationWithCompletion {
             didComplete = true
         }
-        XCTAssertEqual(registrar.didRequestAuthorization!, EKEntityType.Event)
+        XCTAssertEqual(registrar.didRequestAuthorization!, EKEntityType.event)
         XCTAssertTrue(didComplete)
     }
 
     func test__given_denied_does_not_request() {
-        registrar.authorizationStatus = .Denied
+        registrar.authorizationStatus = .denied
         var didComplete = false
         capability.requestAuthorizationWithCompletion {
             didComplete = true
@@ -114,7 +114,7 @@ class EventsCapabilityTests: XCTestCase {
     }
 
     func test__given_authorized_does_not_request() {
-        registrar.authorizationStatus = .Authorized
+        registrar.authorizationStatus = .authorized
         var didComplete = false
         capability.requestAuthorizationWithCompletion {
             didComplete = true

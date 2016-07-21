@@ -23,46 +23,46 @@ operations.
 */
 public class GroupOperation: OldOperation, OperationQueueDelegate {
 
-    typealias ErrorsByOperation = [NSOperation: [ErrorType]]
+    typealias ErrorsByOperation = [Operation: [ErrorProtocol]]
     internal struct Errors {
-        var fatal = Array<ErrorType>()
+        var fatal = Array<ErrorProtocol>()
         var attemptedRecovery: ErrorsByOperation = [:]
 
-        var previousAttempts: [ErrorType] {
+        var previousAttempts: [ErrorProtocol] {
             return Array(FlattenSequence(attemptedRecovery.values))
         }
 
-        var all: [ErrorType] {
+        var all: [ErrorProtocol] {
             get {
-                var tmp: [ErrorType] = fatal
-                tmp.appendContentsOf(previousAttempts)
+                var tmp: [ErrorProtocol] = fatal
+                tmp.append(contentsOf: previousAttempts)
                 return tmp
             }
         }
     }
 
-    private let finishingOperation = NSBlockOperation { }
+    private let finishingOperation = Foundation.BlockOperation { }
     private var protectedErrors = Protector(Errors())
     private var canFinishOperation: GroupOperation.CanFinishOperation!
     private var isGroupFinishing = false
-    private let groupFinishLock = NSRecursiveLock()
-    private var isAddingOperationsGroup = dispatch_group_create()
+    private let groupFinishLock = RecursiveLock()
+    private var isAddingOperationsGroup = DispatchGroup()
 
     /// - returns: the OldOperationQueue the group runs operations on.
     public let queue = OldOperationQueue()
 
     /// - returns: the operations which have been added to the queue
-    public private(set) var operations: [NSOperation] {
+    public private(set) var operations: [Operation] {
         get {
             return _operations.read { $0 }
         }
         set {
-            _operations.write { (inout ward: [NSOperation]) in
+            _operations.write { (ward: inout [Operation]) in
                 ward = newValue
             }
         }
     }
-    private var _operations: Protector<[NSOperation]>
+    private var _operations: Protector<[Operation]>
 
     public override var userIntent: OldOperation.UserIntent {
         didSet {
@@ -77,14 +77,14 @@ public class GroupOperation: OldOperation, OperationQueueDelegate {
 
     - parameter operations: an array of `NSOperation`s.
     */
-    public init(operations ops: [NSOperation]) {
-        _operations = Protector<[NSOperation]>(ops)
+    public init(operations ops: [Operation]) {
+        _operations = Protector<[Operation]>(ops)
         // GroupOperation handles calling finish() on cancellation once all of its children have cancelled and finished
         // and its finishingOperation has finished.
         super.init(disableAutomaticFinishing: true) // Override default OldOperation finishing behavior
         canFinishOperation = GroupOperation.CanFinishOperation(parentGroupOperation: self)
         name = "Group OldOperation"
-        queue.suspended = true
+        queue.isSuspended = true
         queue.delegate = self
         userIntent = operations.userIntent
         addObserver(DidCancelObserver { [unowned self] operation in
@@ -96,14 +96,14 @@ public class GroupOperation: OldOperation, OperationQueueDelegate {
                 else {
                     let (nsops, ops) = self.operations.splitNSOperationsAndOperations
                     nsops.forEach { $0.cancel() }
-                    ops.forEach { $0.cancelWithError(OperationError.ParentOperationCancelledWithErrors(errors)) }
+                    ops.forEach { $0.cancelWithError(OperationError.parentOperationCancelledWithErrors(errors)) }
                 }
             }
         })
     }
 
     /// Convenience initializer for direct usage without subclassing.
-    public convenience init(operations: NSOperation...) {
+    public convenience init(operations: Operation...) {
         self.init(operations: operations)
     }
 
@@ -115,7 +115,7 @@ public class GroupOperation: OldOperation, OperationQueueDelegate {
         _addOperations(operations.filter { !self.queue.operations.contains($0) }, addToOperationsArray: false)
         _addCanFinishOperation(canFinishOperation)
         queue.addOperation(finishingOperation)
-        queue.suspended = false
+        queue.isSuspended = false
     }
 
     /**
@@ -123,7 +123,7 @@ public class GroupOperation: OldOperation, OperationQueueDelegate {
 
      - parameter operation: an `NSOperation` instance.
     */
-    public func addOperation(operation: NSOperation) {
+    public func addOperation(_ operation: Operation) {
         addOperations(operation)
     }
 
@@ -132,7 +132,7 @@ public class GroupOperation: OldOperation, OperationQueueDelegate {
 
      - parameter operations: an array of `NSOperation` instances.
      */
-    public func addOperations(operations: NSOperation...) {
+    public func addOperations(_ operations: Operation...) {
         addOperations(operations)
     }
 
@@ -141,22 +141,22 @@ public class GroupOperation: OldOperation, OperationQueueDelegate {
 
      - parameter operations: an array of `NSOperation` instances.
      */
-    public func addOperations(additional: [NSOperation]) {
+    public func addOperations(_ additional: [Operation]) {
         _addOperations(additional, addToOperationsArray: true)
     }
 
-    private func _addOperations(additional: [NSOperation], addToOperationsArray: Bool = true) {
+    private func _addOperations(_ additional: [Operation], addToOperationsArray: Bool = true) {
 
         if additional.count > 0 {
 
             let shouldAddOperations = groupFinishLock.withCriticalScope { () -> Bool in
                 guard !isGroupFinishing else { return false }
-                dispatch_group_enter(isAddingOperationsGroup)
+                isAddingOperationsGroup.enter()
                 return true
             }
 
             guard shouldAddOperations else {
-                if !finishingOperation.finished {
+                if !finishingOperation.isFinished {
                     assertionFailure("Cannot add new operations to a group after the group has started to finish.")
                 }
                 else {
@@ -166,7 +166,7 @@ public class GroupOperation: OldOperation, OperationQueueDelegate {
             }
 
             var handledCancelled = false
-            if cancelled {
+            if isCancelled {
                 additional.forEachOperation { $0.cancel() }
                 handledCancelled = true
             }
@@ -179,15 +179,15 @@ public class GroupOperation: OldOperation, OperationQueueDelegate {
                 _operations.appendContentsOf(additional)
             }
 
-            if !handledCancelled && cancelled {
+            if !handledCancelled && isCancelled {
                 // It is possible that the cancellation happened before adding the
                 // additional operations to the operations array.
                 // Thus, ensure that all additional operations are cancelled.
-                additional.forEachOperation { if !$0.cancelled { $0.cancel() } }
+                additional.forEachOperation { if !$0.isCancelled { $0.cancel() } }
             }
 
             groupFinishLock.withCriticalScope {
-                dispatch_group_leave(isAddingOperationsGroup)
+                isAddingOperationsGroup.leave()
             }
         }
     }
@@ -208,7 +208,7 @@ public class GroupOperation: OldOperation, OperationQueueDelegate {
      - parameter operation: the child operation which is finishing
      - returns: a Boolean, return true if the errors were handled, else return false.
      */
-    public func willAttemptRecoveryFromErrors(errors: [ErrorType], inOperation operation: NSOperation) -> Bool {
+    public func willAttemptRecoveryFromErrors(_ errors: [ErrorProtocol], inOperation operation: Operation) -> Bool {
         return false
     }
 
@@ -217,22 +217,22 @@ public class GroupOperation: OldOperation, OperationQueueDelegate {
 
      - parameter operation: the child operation which will finish without errors
     */
-    public func willFinishOperation(operation: NSOperation) {
+    public func willFinishOperation(_ operation: Operation) {
         // no-op
     }
 
-    @available(*, unavailable, message="Refactor your GroupOperation subclass as this method is no longer used.\n Override willFinishOperation(_: NSOperation) to manage scheduling of child operations. Override willAttemptRecoveryFromErrors(_: [ErrorType], inOperation: NSOperation) to do error handling. See code documentation for more details.")
-    public func willFinishOperation(operation: NSOperation, withErrors errors: [ErrorType]) { }
+    @available(*, unavailable, message: "Refactor your GroupOperation subclass as this method is no longer used.\n Override willFinishOperation(_: NSOperation) to manage scheduling of child operations. Override willAttemptRecoveryFromErrors(_: [ErrorType], inOperation: NSOperation) to do error handling. See code documentation for more details.")
+    public func willFinishOperation(_ operation: Operation, withErrors errors: [ErrorProtocol]) { }
 
-    @available(*, unavailable, renamed="willFinishOperation")
-    public func operationDidFinish(operation: NSOperation, withErrors errors: [ErrorType]) { }
+    @available(*, unavailable, renamed: "willFinishOperation")
+    public func operationDidFinish(_ operation: Operation, withErrors errors: [ErrorProtocol]) { }
 
-    internal func child(child: NSOperation, didEncounterFatalErrors errors: [ErrorType]) {
+    internal func child(_ child: Operation, didEncounterFatalErrors errors: [ErrorProtocol]) {
         addFatalErrors(errors)
     }
 
-    internal func child(child: NSOperation, didAttemptRecoveryFromErrors errors: [ErrorType]) {
-        protectedErrors.write { (inout tmp: Errors) in
+    internal func child(_ child: Operation, didAttemptRecoveryFromErrors errors: [ErrorProtocol]) {
+        protectedErrors.write { (tmp: inout Errors) in
             tmp.attemptedRecovery[child] = errors
         }
     }
@@ -248,11 +248,11 @@ public class GroupOperation: OldOperation, OperationQueueDelegate {
      when there are no more operations in the group operation, safely handling the transition of
      group operation state.
      */
-    public func operationQueue(queue: OldOperationQueue, willAddOperation operation: NSOperation) {
+    public func operationQueue(_ queue: OldOperationQueue, willAddOperation operation: Operation) {
         guard queue === self.queue else { return }
 
-        assert(!finishingOperation.executing, "Cannot add new operations to a group after the group has started to finish.")
-        assert(!finishingOperation.finished, "Cannot add new operations to a group after the group has completed.")
+        assert(!finishingOperation.isExecuting, "Cannot add new operations to a group after the group has started to finish.")
+        assert(!finishingOperation.isFinished, "Cannot add new operations to a group after the group has completed.")
 
         if operation !== finishingOperation {
             let shouldContinue = groupFinishLock.withCriticalScope { () -> Bool in
@@ -260,7 +260,7 @@ public class GroupOperation: OldOperation, OperationQueueDelegate {
                     assertionFailure("Cannot add new operations to a group after the group has started to finish.")
                     return false
                 }
-                dispatch_group_enter(isAddingOperationsGroup)
+                isAddingOperationsGroup.enter()
                 return true
             }
 
@@ -271,7 +271,7 @@ public class GroupOperation: OldOperation, OperationQueueDelegate {
             canFinishOperation.addDependency(operation)
 
             groupFinishLock.withCriticalScope {
-                dispatch_group_leave(isAddingOperationsGroup)
+                isAddingOperationsGroup.leave()
             }
         }
     }
@@ -281,7 +281,7 @@ public class GroupOperation: OldOperation, OperationQueueDelegate {
      operation is the finishing operation, we finish the group operation here. Else, the group is
      notified (using `operationDidFinish` that a child operation has finished.
      */
-    public func operationQueue(queue: OldOperationQueue, willFinishOperation operation: NSOperation, withErrors errors: [ErrorType]) {
+    public func operationQueue(_ queue: OldOperationQueue, willFinishOperation operation: Operation, withErrors errors: [ErrorProtocol]) {
         guard queue === self.queue else { return }
 
         if !errors.isEmpty {
@@ -297,40 +297,40 @@ public class GroupOperation: OldOperation, OperationQueueDelegate {
         }
     }
 
-    public func operationQueue(queue: OldOperationQueue, didFinishOperation operation: NSOperation, withErrors errors: [ErrorType]) {
+    public func operationQueue(_ queue: OldOperationQueue, didFinishOperation operation: Operation, withErrors errors: [ErrorProtocol]) {
         guard queue === self.queue else { return }
 
         if operation === finishingOperation {
             finish(fatalErrors)
-            queue.suspended = true
+            queue.isSuspended = true
         }
     }
 
-    public func operationQueue(queue: OldOperationQueue, willProduceOperation operation: NSOperation) {
+    public func operationQueue(_ queue: OldOperationQueue, willProduceOperation operation: Operation) {
         guard queue === self.queue else { return }
 
         // Ensure that produced operations are added to GroupOperation's
         // internal operations array (and cancelled if appropriate)
 
         let shouldContinue = groupFinishLock.withCriticalScope { () -> Bool in
-            assert(!finishingOperation.finished, "Cannot produce new operations within a group after the group has completed.")
+            assert(!finishingOperation.isFinished, "Cannot produce new operations within a group after the group has completed.")
             guard !isGroupFinishing else {
                 assertionFailure("Cannot produce new operations within a group after the group has started to finish.")
                 return false
             }
-            dispatch_group_enter(isAddingOperationsGroup)
+            isAddingOperationsGroup.enter()
             return true
         }
 
         guard shouldContinue else { return }
 
         _operations.append(operation)
-        if cancelled && !operation.cancelled {
+        if isCancelled && !operation.isCancelled {
             operation.cancel()
         }
 
         groupFinishLock.withCriticalScope {
-            dispatch_group_leave(isAddingOperationsGroup)
+            isAddingOperationsGroup.leave()
         }
     }
 }
@@ -342,7 +342,7 @@ public extension GroupOperation {
     }
 
     /// - returns: the errors which could not be recovered from
-    var fatalErrors: [ErrorType] {
+    var fatalErrors: [ErrorProtocol] {
         return internalErrors.fatal
     }
 
@@ -350,7 +350,7 @@ public extension GroupOperation {
      Appends a fatal error.
      - parameter error: an ErrorType
     */
-    final func addFatalError(error: ErrorType) {
+    final func addFatalError(_ error: ErrorProtocol) {
         addFatalErrors([error])
     }
 
@@ -358,26 +358,26 @@ public extension GroupOperation {
      Appends an array of fatal errors.
      - parameter errors: an [ErrorType]
      */
-    final func addFatalErrors(errors: [ErrorType]) {
-        protectedErrors.write { (inout tmp: Errors) in
-            tmp.fatal.appendContentsOf(errors)
+    final func addFatalErrors(_ errors: [ErrorProtocol]) {
+        protectedErrors.write { (tmp: inout Errors) in
+            tmp.fatal.append(contentsOf: errors)
         }
     }
 
-    internal func didRecoverFromOperationErrors(operation: NSOperation) {
+    internal func didRecoverFromOperationErrors(_ operation: Operation) {
         if let _ = internalErrors.attemptedRecovery[operation] {
             log.verbose("successfully recovered from errors in \(operation)")
-            protectedErrors.write { (inout tmp: Errors) in
-                tmp.attemptedRecovery.removeValueForKey(operation)
+            protectedErrors.write { (tmp: inout Errors) in
+                tmp.attemptedRecovery.removeValue(forKey: operation)
             }
         }
     }
 
-    internal func didNotRecoverFromOperationErrors(operation: NSOperation) {
+    internal func didNotRecoverFromOperationErrors(_ operation: Operation) {
         log.verbose("failed to recover from errors in \(operation)")
-        protectedErrors.write { (inout tmp: Errors) in
-            if let errors = tmp.attemptedRecovery.removeValueForKey(operation) {
-                tmp.fatal.appendContentsOf(errors)
+        protectedErrors.write { (tmp: inout Errors) in
+            if let errors = tmp.attemptedRecovery.removeValue(forKey: operation) {
+                tmp.fatal.append(contentsOf: errors)
             }
         }
     }
@@ -385,20 +385,20 @@ public extension GroupOperation {
 
 public extension GroupOperation {
 
-    @available(*, unavailable, renamed="fatalErrors")
-    var aggregateErrors: [ErrorType] {
+    @available(*, unavailable, renamed: "fatalErrors")
+    var aggregateErrors: [ErrorProtocol] {
         return fatalErrors
     }
 
-    @available(*, unavailable, renamed="addFatalError")
-    final func aggregateError(error: ErrorType) {
+    @available(*, unavailable, renamed: "addFatalError")
+    final func aggregateError(_ error: ErrorProtocol) {
         addFatalError(error)
     }
 }
 
 public protocol GroupOperationWillAddChildObserver: OperationObserverType {
 
-    func groupOperation(group: GroupOperation, willAddChildOperation child: NSOperation)
+    func groupOperation(_ group: GroupOperation, willAddChildOperation child: Operation)
 }
 
 extension GroupOperation {
@@ -414,12 +414,12 @@ extension GroupOperation {
  child operation to its queue.
  */
 public struct WillAddChildObserver: GroupOperationWillAddChildObserver {
-    public typealias BlockType = (group: GroupOperation, child: NSOperation) -> Void
+    public typealias BlockType = (group: GroupOperation, child: Operation) -> Void
 
     private let block: BlockType
 
     /// - returns: a block which is called when the observer is attached to an operation
-    public var didAttachToOperation: DidAttachToOperationBlock? = .None
+    public var didAttachToOperation: DidAttachToOperationBlock? = .none
 
     /**
      Initialize the observer with a block.
@@ -432,12 +432,12 @@ public struct WillAddChildObserver: GroupOperationWillAddChildObserver {
     }
 
     /// Conforms to GroupOperationWillAddChildObserver
-    public func groupOperation(group: GroupOperation, willAddChildOperation child: NSOperation) {
+    public func groupOperation(_ group: GroupOperation, willAddChildOperation child: Operation) {
         block(group: group, child: child)
     }
 
     /// Base OperationObserverType method
-    public func didAttachToOperation(operation: OldOperation) {
+    public func didAttachToOperation(_ operation: OldOperation) {
         didAttachToOperation?(operation: operation)
     }
 }
@@ -455,7 +455,7 @@ private extension GroupOperation {
      to process that the GroupOperation is finishing (i.e. prior to the CanFinishOperation executing and
      acquiring the GroupOperation.groupFinishLock to set state).
      */
-    private class CanFinishOperation: NSOperation {
+    private class CanFinishOperation: Operation {
         private weak var parent: GroupOperation?
         private var _finished = false
         private var _executing = false
@@ -477,7 +477,7 @@ private extension GroupOperation {
             // problems with dependencies, with the queue's handling of
             // maxConcurrentOperationCount, etc.)
 
-            executing = true
+            isExecuting = true
 
             main()
         }
@@ -495,7 +495,7 @@ private extension GroupOperation {
                 let isWaiting = parent.groupFinishLock.withCriticalScope { () -> Bool in
 
                     // Is anything currently adding operations?
-                    guard dispatch_group_wait(parent.isAddingOperationsGroup, DISPATCH_TIME_NOW) == 0 else {
+                    guard parent.isAddingOperationsGroup.wait(timeout: DispatchTime.now()) == 0 else {
                         // Operations are actively being added to the group
                         // Wait for this to complete before proceeding.
                         //
@@ -503,14 +503,14 @@ private extension GroupOperation {
                         // wait completes (i.e. after concurrent calls to GroupOperation.addOperations()
                         // have completed), and return from this call to execute() without finishing
                         // the operation.
-                        dispatch_group_notify(parent.isAddingOperationsGroup, Queue(qos: qualityOfService).queue, execute)
+                        parent.isAddingOperationsGroup.notify(queue: Queue(qos: qualityOfService).queue, execute: execute)
                         return true
                     }
 
                     // Check whether new operations were added prior to the lock
                     // by checking for child operations that are not finished.
 
-                    let activeOperations = parent.operations.filter({ !$0.finished })
+                    let activeOperations = parent.operations.filter({ !$0.isFinished })
                     if !activeOperations.isEmpty {
 
                         // Child operations were added after this CanFinishOperation became
@@ -542,39 +542,39 @@ private extension GroupOperation {
                 guard !isWaiting else { return }
             }
 
-            executing = false
-            finished = true
+            isExecuting = false
+            isFinished = true
         }
-        override private(set) var executing: Bool {
+        override private(set) var isExecuting: Bool {
             get {
                 return _executing
             }
             set {
-                willChangeValueForKey("isExecuting")
+                willChangeValue(forKey: "isExecuting")
                 _executing = newValue
-                didChangeValueForKey("isExecuting")
+                didChangeValue(forKey: "isExecuting")
             }
         }
-        override private(set) var finished: Bool {
+        override private(set) var isFinished: Bool {
             get {
                 return _finished
             }
             set {
-                willChangeValueForKey("isFinished")
+                willChangeValue(forKey: "isFinished")
                 _finished = newValue
-                didChangeValueForKey("isFinished")
+                didChangeValue(forKey: "isFinished")
             }
         }
     }
 
-    private func _addCanFinishOperation(canFinishOperation: GroupOperation.CanFinishOperation) {
+    private func _addCanFinishOperation(_ canFinishOperation: GroupOperation.CanFinishOperation) {
         finishingOperation.addDependency(canFinishOperation)
         queue._addCanFinishOperation(canFinishOperation)
     }
 }
 
 private extension OldOperationQueue {
-    private func _addCanFinishOperation(canFinishOperation: GroupOperation.CanFinishOperation) {
+    private func _addCanFinishOperation(_ canFinishOperation: GroupOperation.CanFinishOperation) {
         // Do not add observers (not needed - CanFinishOperation is an implementation detail of GroupOperation)
         // Do not add conditions (CanFinishOperation has none)
         // Call NSOperationQueue.addOperation() directly

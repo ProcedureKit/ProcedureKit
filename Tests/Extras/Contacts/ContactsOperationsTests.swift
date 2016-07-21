@@ -27,40 +27,40 @@ class TestableContactSaveRequest: ContactSaveRequestType {
 
     required init() { }
 
-    func opr_addContact(contact: CNMutableContact, toContainerWithIdentifier identifier: String?) {
+    func opr_addContact(_ contact: CNMutableContact, toContainerWithIdentifier identifier: String?) {
         let containerId = identifier ?? ContainerID.Default.identifier
         addedContacts[containerId] = addedContacts[containerId] ?? []
         addedContacts[containerId]!.append(contact)
     }
 
-    func opr_updateContact(contact: CNMutableContact) {
+    func opr_updateContact(_ contact: CNMutableContact) {
         updatedContacts.append(contact)
     }
 
-    func opr_deleteContact(contact: CNMutableContact) {
+    func opr_deleteContact(_ contact: CNMutableContact) {
         deletedContacts.append(contact)
     }
 
-    func opr_addGroup(group: CNMutableGroup, toContainerWithIdentifier identifier: String?) {
+    func opr_addGroup(_ group: CNMutableGroup, toContainerWithIdentifier identifier: String?) {
         let containerId = identifier ?? ContainerID.Default.identifier
         addedGroups[containerId] = addedGroups[containerId] ?? []
         addedGroups[containerId]!.append(group)
     }
 
-    func opr_updateGroup(group: CNMutableGroup) {
+    func opr_updateGroup(_ group: CNMutableGroup) {
         updatedGroups.append(group)
     }
 
-    func opr_deleteGroup(group: CNMutableGroup) {
+    func opr_deleteGroup(_ group: CNMutableGroup) {
         deletedGroupNames.append(group.name)
     }
 
-    func opr_addMember(contact: CNContact, toGroup group: CNGroup) {
+    func opr_addMember(_ contact: CNContact, toGroup group: CNGroup) {
         addedMemberToGroup[group.name] = addedMemberToGroup[group.name] ?? []
         addedMemberToGroup[group.name]!.append(contact)
     }
 
-    func opr_removeMember(contact: CNContact, fromGroup group: CNGroup) {
+    func opr_removeMember(_ contact: CNContact, fromGroup group: CNGroup) {
         removedMemberFromGroup[group.name] = removedMemberFromGroup[group.name] ?? []
         removedMemberFromGroup[group.name]!.append(contact)
     }
@@ -69,14 +69,14 @@ class TestableContactSaveRequest: ContactSaveRequestType {
 @available(iOS 9.0, OSX 10.11, *)
 class TestableContactsStore: ContactStoreType {
 
-    enum Error: ErrorType {
-        case NotImplemented
+    enum Error: ErrorProtocol {
+        case notImplemented
     }
 
     var didAccessStatus = false
     var didRequestAccess = false
-    var didExecuteSaveRequest: TestableContactSaveRequest? = .None
-    var didAccessEnumerateContactsWithFetchRequest: CNContactFetchRequest? = .None
+    var didExecuteSaveRequest: TestableContactSaveRequest? = .none
+    var didAccessEnumerateContactsWithFetchRequest: CNContactFetchRequest? = .none
 
     var didAccessDefaultContainerIdentifier = false
     var didAccessUnifiedContactWithIdentifier = false
@@ -90,14 +90,14 @@ class TestableContactsStore: ContactStoreType {
     var containersMatchingPredicate = Dictionary<ContainerPredicate, [CNContainer]>()
     var groupsMatchingPredicate = Dictionary<GroupPredicate, [CNGroup]>()
 
-    var requestedEntityType: CNEntityType? = .None
-    var accessError: NSError? = .None
+    var requestedEntityType: CNEntityType? = .none
+    var accessError: NSError? = .none
 
     var status: CNAuthorizationStatus
     let accessRequestShouldSucceed: Bool
 
     required init() {
-        self.status = .NotDetermined
+        self.status = .notDetermined
         self.accessRequestShouldSucceed = true
     }
 
@@ -106,21 +106,21 @@ class TestableContactsStore: ContactStoreType {
         self.accessRequestShouldSucceed = accessRequestShouldSucceed
     }
 
-    func opr_authorizationStatusForEntityType(entityType: CNEntityType) -> CNAuthorizationStatus {
+    func opr_authorizationStatusForEntityType(_ entityType: CNEntityType) -> CNAuthorizationStatus {
         didAccessStatus = true
         requestedEntityType = entityType
         return status
     }
 
-    func opr_requestAccessForEntityType(entityType: CNEntityType, completion: (Bool, NSError?) -> Void) {
+    func opr_requestAccessForEntityType(_ entityType: CNEntityType, completion: (Bool, NSError?) -> Void) {
         didRequestAccess = true
         requestedEntityType = entityType
         if accessRequestShouldSucceed {
-            status = .Authorized
-            completion(true, .None)
+            status = .authorized
+            completion(true, .none)
         }
         else {
-            status = .Denied
+            status = .denied
             completion(false, accessError)
         }
     }
@@ -130,23 +130,23 @@ class TestableContactsStore: ContactStoreType {
         return "not implmented"
     }
 
-    func opr_unifiedContactWithIdentifier(identifier: String, keysToFetch keys: [CNKeyDescriptor]) throws -> CNContact {
+    func opr_unifiedContactWithIdentifier(_ identifier: String, keysToFetch keys: [CNKeyDescriptor]) throws -> CNContact {
         didAccessUnifiedContactWithIdentifier = true
         if let contact = contactsByIdentifier[identifier] {
             return contact
         }
-        throw NSError(domain: CNErrorDomain, code: CNErrorCode.RecordDoesNotExist.rawValue, userInfo: nil)
+        throw NSError(domain: CNErrorDomain, code: CNErrorCode.recordDoesNotExist.rawValue, userInfo: nil)
     }
 
-    func opr_unifiedContactsMatchingPredicate(predicate: ContactPredicate, keysToFetch keys: [CNKeyDescriptor]) throws -> [CNContact] {
+    func opr_unifiedContactsMatchingPredicate(_ predicate: ContactPredicate, keysToFetch keys: [CNKeyDescriptor]) throws -> [CNContact] {
         didAccessUnifiedContactsMatchingPredicate = true
         if let contacts = contactsMatchingPredicate[predicate] {
             return contacts
         }
-        throw NSError(domain: CNErrorDomain, code: CNErrorCode.RecordDoesNotExist.rawValue, userInfo: nil)
+        throw NSError(domain: CNErrorDomain, code: CNErrorCode.recordDoesNotExist.rawValue, userInfo: nil)
     }
 
-    func opr_groupsMatchingPredicate(predicate: GroupPredicate?) throws -> [CNGroup] {
+    func opr_groupsMatchingPredicate(_ predicate: GroupPredicate?) throws -> [CNGroup] {
         didAccessGroupsMatchingPredicate = true
         if let predicate = predicate {
             return groupsMatchingPredicate[predicate] ?? []
@@ -154,7 +154,7 @@ class TestableContactsStore: ContactStoreType {
         return groupsMatchingPredicate.values.flatMap { $0 }
     }
 
-    func opr_containersMatchingPredicate(predicate: ContainerPredicate?) throws -> [CNContainer] {
+    func opr_containersMatchingPredicate(_ predicate: ContainerPredicate?) throws -> [CNContainer] {
         didAccessContainersMatchingPredicate = true
         if let predicate = predicate {
             return containersMatchingPredicate[predicate] ?? []
@@ -162,7 +162,7 @@ class TestableContactsStore: ContactStoreType {
         return containersMatchingPredicate.values.flatMap { $0 }
     }
 
-    func opr_enumerateContactsWithFetchRequest(fetchRequest: CNContactFetchRequest, usingBlock block: (CNContact, UnsafeMutablePointer<ObjCBool>) -> Void) throws {
+    func opr_enumerateContactsWithFetchRequest(_ fetchRequest: CNContactFetchRequest, usingBlock block: (CNContact, UnsafeMutablePointer<ObjCBool>) -> Void) throws {
         didAccessEnumerateContactsWithFetchRequest = fetchRequest
         var stop: ObjCBool = false
         for contact in contactsToEnumerate {
@@ -171,7 +171,7 @@ class TestableContactsStore: ContactStoreType {
         }
     }
 
-    func opr_executeSaveRequest(saveRequest: TestableContactSaveRequest) throws {
+    func opr_executeSaveRequest(_ saveRequest: TestableContactSaveRequest) throws {
         didExecuteSaveRequest = saveRequest
     }
 }
@@ -185,15 +185,15 @@ class ContactsTests: OperationTests {
 
     override func setUp() {
         super.setUp()
-        store = TestableContactsStore(status: .Authorized)
+        store = TestableContactsStore(status: .authorized)
     }
 
-    func setUpForContactWithIdentifier(contactId: String) -> CNContact {
+    func setUpForContactWithIdentifier(_ contactId: String) -> CNContact {
         store.contactsByIdentifier[contactId] = contact
         return contact
     }
 
-    func createContactsForPredicate(predicate: ContactPredicate) -> [CNContact] {
+    func createContactsForPredicate(_ predicate: ContactPredicate) -> [CNContact] {
         switch predicate {
         case .WithIdentifiers(let identifiers):
             return identifiers.map { _ in CNContact() }
@@ -210,19 +210,19 @@ class ContactsTests: OperationTests {
         }
     }
 
-    func setUpForContactsWithPredicate(predicate: ContactPredicate) -> [CNContact] {
+    func setUpForContactsWithPredicate(_ predicate: ContactPredicate) -> [CNContact] {
         let contacts = createContactsForPredicate(predicate)
         store.contactsMatchingPredicate[predicate] = contacts
         return contacts
     }
 
-    func setUpForGroupsWithName(groupName: String) -> CNGroup {
+    func setUpForGroupsWithName(_ groupName: String) -> CNGroup {
         group.name = groupName
         store.groupsMatchingPredicate[.InContainerWithID(.Default)] = [group]
         return group
     }
 
-    func setUpForContactEnumerationWithContactIds(contactIds: [String]) {
+    func setUpForContactEnumerationWithContactIds(_ contactIds: [String]) {
         store.contactsToEnumerate = contactIds.map { _ in CNMutableContact() }
     }
 }
@@ -325,7 +325,7 @@ class GetContactsOperationTest: ContactsTests {
 
         addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
         runOperation(operation)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForExpectations(timeout: 3, handler: nil)
 
         XCTAssertTrue(store.didAccessUnifiedContactWithIdentifier)
         XCTAssertNotNil(operation.contact)
@@ -339,7 +339,7 @@ class GetContactsOperationTest: ContactsTests {
 
         addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
         runOperation(operation)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForExpectations(timeout: 3, handler: nil)
 
         XCTAssertTrue(store.didAccessUnifiedContactsMatchingPredicate)
         XCTAssertTrue(operation.contacts.count > 0)
@@ -374,7 +374,7 @@ class GetContactsGroupOperationTests: ContactsTests {
 
         addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
         runOperation(operation)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForExpectations(timeout: 3, handler: nil)
 
         XCTAssertTrue(store.didAccessGroupsMatchingPredicate)
         XCTAssertNil(store.didExecuteSaveRequest)
@@ -386,7 +386,7 @@ class GetContactsGroupOperationTests: ContactsTests {
 
         addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
         runOperation(operation)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForExpectations(timeout: 3, handler: nil)
 
         XCTAssertTrue(store.didAccessGroupsMatchingPredicate)
 
@@ -421,7 +421,7 @@ class RemoveContactsGroupOperationTests: ContactsTests {
 
         addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
         runOperation(operation)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForExpectations(timeout: 3, handler: nil)
 
         XCTAssertNil(store.didExecuteSaveRequest)
     }
@@ -432,7 +432,7 @@ class RemoveContactsGroupOperationTests: ContactsTests {
 
         addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
         runOperation(operation)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForExpectations(timeout: 3, handler: nil)
 
         guard let executedSaveRequest = store.didExecuteSaveRequest else {
             XCTFail("Did not execute a save request.")
@@ -467,7 +467,7 @@ class AddContactsToGroupOperationTests: ContactsTests {
 
         addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
         runOperation(operation)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForExpectations(timeout: 3, handler: nil)
 
         guard let executedSaveRequest = store.didExecuteSaveRequest else {
             XCTFail("Did not execute a save request.")
@@ -501,7 +501,7 @@ class RemoveContactsFromGroupOperationTests: ContactsTests {
 
         addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
         runOperation(operation)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForExpectations(timeout: 3, handler: nil)
 
         guard let executedSaveRequest = store.didExecuteSaveRequest else {
             XCTFail("Did not execute a save request.")
@@ -521,13 +521,13 @@ class ContactsAccessOperationsTests: OperationTests {
 
     func test__given_authorization_granted__access_succeeds() {
 
-        let registrar = TestableContactsStore(status: .NotDetermined)
+        let registrar = TestableContactsStore(status: .notDetermined)
         let operation = TestOperation()
         operation.addCondition(_ContactsCondition(registrar: registrar))
 
         addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
         runOperation(operation)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForExpectations(timeout: 3, handler: nil)
 
         XCTAssertTrue(operation.didExecute)
         XCTAssertTrue(registrar.didAccessStatus)
@@ -536,13 +536,13 @@ class ContactsAccessOperationsTests: OperationTests {
 
     func test__given_authorization_already_granted__access_succeeds() {
 
-        let registrar = TestableContactsStore(status: .Authorized)
+        let registrar = TestableContactsStore(status: .authorized)
         let operation = TestOperation()
         operation.addCondition(_ContactsCondition(registrar: registrar))
 
         addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
         runOperation(operation)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForExpectations(timeout: 3, handler: nil)
 
         XCTAssertTrue(operation.didExecute)
         XCTAssertTrue(registrar.didAccessStatus)
@@ -550,13 +550,13 @@ class ContactsAccessOperationsTests: OperationTests {
     }
 
     func test__given_authorization_denied__access_fails() {
-        let registrar = TestableContactsStore(status: .NotDetermined, accessRequestShouldSucceed: false)
+        let registrar = TestableContactsStore(status: .notDetermined, accessRequestShouldSucceed: false)
         let operation = TestOperation()
         operation.addCondition(_ContactsCondition(registrar: registrar))
 
         addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
         runOperation(operation)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForExpectations(timeout: 3, handler: nil)
 
         XCTAssertFalse(operation.didExecute)
         XCTAssertTrue(registrar.didAccessStatus)

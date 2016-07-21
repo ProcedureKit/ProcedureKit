@@ -44,7 +44,7 @@ class RetryOperationTests: OperationTests {
         numberOfFailures = 0
     }
 
-    func producer(threshold: Int) -> () -> Test? {
+    func producer(_ threshold: Int) -> () -> Test? {
         return { [unowned self] in
             guard self.numberOfExecutions < 10 else {
                 return nil
@@ -58,7 +58,7 @@ class RetryOperationTests: OperationTests {
         }
     }
 
-    func producerWithDelay(threshold: Int) -> () -> RepeatedPayload<Test>? {
+    func producerWithDelay(_ threshold: Int) -> () -> RepeatedPayload<Test>? {
         return { [unowned self] in
             guard self.numberOfExecutions < 10 else { return nil }
 
@@ -74,41 +74,41 @@ class RetryOperationTests: OperationTests {
     }
 
     func test__retry_operation_with_payload_generator() {
-        operation = RetryOperation(generator: AnyGenerator(body: producerWithDelay(2)), retry: { $1 })
+        operation = RetryOperation(generator: AnyIterator(body: producerWithDelay(2)), retry: { $1 })
         operation.log.severity = .Verbose
 
         addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
         runOperation(operation)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForExpectations(timeout: 3, handler: nil)
 
         XCTAssertTrue(operation.finished)
         XCTAssertEqual(operation.count, 2)
     }
 
     func test__retry_operation_with_default_delay() {
-        operation = RetryOperation(AnyGenerator(body: producer(2)))
+        operation = RetryOperation(AnyIterator(body: producer(2)))
 
         addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
         runOperation(operation)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForExpectations(timeout: 3, handler: nil)
 
         XCTAssertTrue(operation.finished)
         XCTAssertEqual(operation.count, 2)
     }
 
     func test__retry_operation_where_generator_returns_nil() {
-        operation = RetryOperation(maxCount: 12, strategy: .Fixed(0.01), AnyGenerator(body: producer(11))) { $1 } // Includes the retry block
+        operation = RetryOperation(maxCount: 12, strategy: .Fixed(0.01), AnyIterator(body: producer(11))) { $1 } // Includes the retry block
 
         addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
         runOperation(operation)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForExpectations(timeout: 3, handler: nil)
 
         XCTAssertTrue(operation.finished)
         XCTAssertEqual(operation.count, 10)
     }
 
     func test__retry_operation_where_max_count_is_reached() {
-        operation = RetryOperation(AnyGenerator(body: producer(9)))
+        operation = RetryOperation(AnyIterator(body: producer(9)))
 
         waitForOperation(operation)
 
@@ -118,8 +118,8 @@ class RetryOperationTests: OperationTests {
 
     func test__retry_using_should_retry_block() {
 
-        var retryErrors: [ErrorType]? = .None
-        var retryHistoricalErrors: [ErrorType]? = .None
+        var retryErrors: [ErrorProtocol]? = .none
+        var retryHistoricalErrors: [ErrorProtocol]? = .none
         var retryCount: Int = 0
         var didRunBlockCount: Int = 0
 
@@ -131,7 +131,7 @@ class RetryOperationTests: OperationTests {
             return recommended
         }
 
-        operation = RetryOperation(AnyGenerator(body: producer(3)), retry: retry)
+        operation = RetryOperation(AnyIterator(body: producer(3)), retry: retry)
 
         waitForOperation(operation)
 
@@ -147,8 +147,8 @@ class RetryOperationTests: OperationTests {
 
     func test__retry_using_should_retry_block_with_configure() {
 
-        var retryErrors: [ErrorType]? = .None
-        var retryHistoricalErrors: [ErrorType]? = .None
+        var retryErrors: [ErrorProtocol]? = .none
+        var retryHistoricalErrors: [ErrorProtocol]? = .none
         var retryCount: Int = 0
         var didRunBlockCount: Int = 0
         var didRunResetConfigurationBlock = false
@@ -163,7 +163,7 @@ class RetryOperationTests: OperationTests {
             }
         }
 
-        operation = RetryOperation(AnyGenerator(body: producer(3)), retry: retry)
+        operation = RetryOperation(AnyIterator(body: producer(3)), retry: retry)
 
         waitForOperation(operation)
 
@@ -179,8 +179,8 @@ class RetryOperationTests: OperationTests {
     }
 
     func test__retry_using_retry_block_returning_nil() {
-        var retryErrors: [ErrorType]? = .None
-        var retryHistoricalErrors: [ErrorType]? = .None
+        var retryErrors: [ErrorProtocol]? = .none
+        var retryHistoricalErrors: [ErrorProtocol]? = .none
         var retryCount: Int = 0
         var didRunBlockCount: Int = 0
         let retry: Handler = { info, recommended in
@@ -191,7 +191,7 @@ class RetryOperationTests: OperationTests {
             return .None
         }
 
-        operation = RetryOperation(AnyGenerator(body: producer(3)), retry: retry)
+        operation = RetryOperation(AnyIterator(body: producer(3)), retry: retry)
 
         waitForOperation(operation)
 

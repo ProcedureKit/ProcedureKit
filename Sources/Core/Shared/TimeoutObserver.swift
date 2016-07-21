@@ -14,7 +14,7 @@ if it doesn't finish before a time interval is expired.
 */
 public struct TimeoutObserver: OperationWillExecuteObserver {
 
-    internal let timeout: NSTimeInterval
+    internal let timeout: TimeInterval
 
     /**
     Initialize the operation observer with a timeout, which will start when
@@ -22,7 +22,7 @@ public struct TimeoutObserver: OperationWillExecuteObserver {
 
     - parameter timeout: a `NSTimeInterval` value.
     */
-    public init(timeout: NSTimeInterval) {
+    public init(timeout: TimeInterval) {
         self.timeout = timeout
     }
 
@@ -34,12 +34,12 @@ public struct TimeoutObserver: OperationWillExecuteObserver {
 
     - parameter operation: the `OldOperation` which will be cancelled if the timeout is reached.
     */
-    public func willExecuteOperation(operation: OldOperation) {
-        let when = dispatch_time(DISPATCH_TIME_NOW, Int64(timeout * Double(NSEC_PER_SEC)))
+    public func willExecuteOperation(_ operation: OldOperation) {
+        let when = DispatchTime.now() + Double(Int64(timeout * Double(NSEC_PER_SEC))) / Double(NSEC_PER_SEC)
 
-        dispatch_after(when, Queue.Default.queue) {
-            if !operation.finished && !operation.cancelled {
-                let error = OperationError.OperationTimedOut(self.timeout)
+        Queue.default.queue.after(when: when) {
+            if !operation.isFinished && !operation.isCancelled {
+                let error = OperationError.operationTimedOut(self.timeout)
                 operation.cancelWithError(error)
             }
         }

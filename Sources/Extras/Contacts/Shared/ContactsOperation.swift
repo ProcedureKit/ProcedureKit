@@ -36,7 +36,7 @@ public class _ContactsAccess<Store: ContactStoreType>: OldOperation {
     let entityType: CNEntityType
     public let store: Store
 
-    init(entityType: CNEntityType = .Contacts, contactStore: Store = Store()) {
+    init(entityType: CNEntityType = .contacts, contactStore: Store = Store()) {
         self.entityType = entityType
         self.store = contactStore
         super.init()
@@ -49,18 +49,18 @@ public class _ContactsAccess<Store: ContactStoreType>: OldOperation {
 
     final func requestAccess() {
         switch store.opr_authorizationStatusForEntityType(entityType) {
-        case .NotDetermined:
+        case .notDetermined:
             store.opr_requestAccessForEntityType(entityType, completion: requestAccessDidComplete)
-        case .Authorized:
-            requestAccessDidComplete(true, error: .None)
-        case .Denied:
-            finish(ContactsPermissionError.AuthorizationDenied)
-        case .Restricted:
-            finish(ContactsPermissionError.AuthorizationRestricted)
+        case .authorized:
+            requestAccessDidComplete(true, error: .none)
+        case .denied:
+            finish(ContactsPermissionError.authorizationDenied)
+        case .restricted:
+            finish(ContactsPermissionError.authorizationRestricted)
         }
     }
 
-    final func requestAccessDidComplete(success: Bool, error: NSError?) {
+    final func requestAccessDidComplete(_ success: Bool, error: NSError?) {
         switch (success, error) {
 
         case (true, _):
@@ -72,11 +72,11 @@ public class _ContactsAccess<Store: ContactStoreType>: OldOperation {
                 finish(error)
             }
 
-        case let (false, .Some(error)):
-            finish(ContactsError.ErrorOccured(error))
+        case let (false, .some(error)):
+            finish(ContactsError.errorOccured(error))
 
         case (false, _):
-            finish(ContactsError.UnknownErrorOccured)
+            finish(ContactsError.unknownErrorOccured)
         }
     }
 
@@ -96,7 +96,7 @@ public class _ContactsOperation<Store: ContactStoreType>: _ContactsAccess<Store>
         return containerId.identifier
     }
 
-    public init(containerId: ContainerID = .Default, entityType: CNEntityType = .Contacts, contactStore: Store = Store()) {
+    public init(containerId: ContainerID = .default, entityType: CNEntityType = .contacts, contactStore: Store = Store()) {
         self.containerId = containerId
         super.init(entityType: entityType, contactStore: contactStore)
         name = "Contacts OldOperation"
@@ -104,23 +104,23 @@ public class _ContactsOperation<Store: ContactStoreType>: _ContactsAccess<Store>
 
     // Public API
 
-    public func containersWithPredicate(predicate: ContainerPredicate) throws -> [CNContainer] {
+    public func containersWithPredicate(_ predicate: ContainerPredicate) throws -> [CNContainer] {
         return try store.opr_containersMatchingPredicate(predicate)
     }
 
     public func container() throws -> CNContainer? {
-        return try containersWithPredicate(.WithIdentifiers([containerId])).first
+        return try containersWithPredicate(.withIdentifiers([containerId])).first
     }
 
     public func allGroups() throws -> [CNGroup] {
-        return try store.opr_groupsMatchingPredicate(.None)
+        return try store.opr_groupsMatchingPredicate(.none)
     }
 
-    public func groupsNamed(groupName: String) throws -> [CNGroup] {
+    public func groupsNamed(_ groupName: String) throws -> [CNGroup] {
         return try allGroups().filter { $0.name == groupName }
     }
 
-    public func createGroupWithName(name: String) throws -> CNGroup {
+    public func createGroupWithName(_ name: String) throws -> CNGroup {
         let group = CNMutableGroup()
         group.name = name
 
@@ -132,7 +132,7 @@ public class _ContactsOperation<Store: ContactStoreType>: _ContactsAccess<Store>
         return group
     }
 
-    public func removeGroupWithName(name: String) throws {
+    public func removeGroupWithName(_ name: String) throws {
         if let group = try groupsNamed(name).first {
             let save = Store.SaveRequest()
             // swiftlint:disable force_cast
@@ -142,14 +142,14 @@ public class _ContactsOperation<Store: ContactStoreType>: _ContactsAccess<Store>
         }
     }
 
-    public func addContactsWithIdentifiers(contactIDs: [String], toGroupNamed groupName: String) throws {
+    public func addContactsWithIdentifiers(_ contactIDs: [String], toGroupNamed groupName: String) throws {
         guard contactIDs.count > 0 else { return }
 
         let group = try groupsNamed(groupName).first ?? createGroupWithName(groupName)
         let save = Store.SaveRequest()
 
         let fetch = CNContactFetchRequest(keysToFetch: [CNContactIdentifierKey])
-        fetch.predicate = CNContact.predicateForContactsWithIdentifiers(contactIDs)
+        fetch.predicate = CNContact.predicateForContacts(withIdentifiers: contactIDs)
 
         try store.opr_enumerateContactsWithFetchRequest(fetch) { contact, _ in
             save.opr_addMember(contact, toGroup: group)
@@ -158,13 +158,13 @@ public class _ContactsOperation<Store: ContactStoreType>: _ContactsAccess<Store>
         try store.opr_executeSaveRequest(save)
     }
 
-    public func removeContactsWithIdentifiers(contactIDs: [String], fromGroupNamed groupName: String) throws {
+    public func removeContactsWithIdentifiers(_ contactIDs: [String], fromGroupNamed groupName: String) throws {
         guard contactIDs.count > 0, let group = try groupsNamed(groupName).first else { return }
 
         let save = Store.SaveRequest()
 
         let fetch = CNContactFetchRequest(keysToFetch: [CNContactIdentifierKey])
-        fetch.predicate = CNContact.predicateForContactsWithIdentifiers(contactIDs)
+        fetch.predicate = CNContact.predicateForContacts(withIdentifiers: contactIDs)
 
         try store.opr_enumerateContactsWithFetchRequest(fetch) { contact, _ in
             save.opr_removeMember(contact, fromGroup: group)
@@ -189,10 +189,10 @@ public class _GetContacts<Store: ContactStoreType>: _ContactsOperation<Store> {
     }
 
     public convenience init(identifier: String, keysToFetch: [CNKeyDescriptor]) {
-        self.init(predicate: .WithIdentifiers([identifier]), keysToFetch: keysToFetch)
+        self.init(predicate: .withIdentifiers([identifier]), keysToFetch: keysToFetch)
     }
 
-    public init(predicate: ContactPredicate, keysToFetch: [CNKeyDescriptor], containerId: ContainerID = .Default, entityType: CNEntityType = .Contacts, contactStore: Store = Store()) {
+    public init(predicate: ContactPredicate, keysToFetch: [CNKeyDescriptor], containerId: ContainerID = .default, entityType: CNEntityType = .contacts, contactStore: Store = Store()) {
         self.predicate = predicate
         self.keysToFetch = keysToFetch
         super.init(containerId: containerId, entityType: entityType, contactStore: contactStore)
@@ -201,7 +201,7 @@ public class _GetContacts<Store: ContactStoreType>: _ContactsOperation<Store> {
 
     public override func executeContactsTask() throws {
         switch predicate {
-        case .WithIdentifiers(let identifiers) where identifiers.count == 1:
+        case .withIdentifiers(let identifiers) where identifiers.count == 1:
             let contact = try store.opr_unifiedContactWithIdentifier(identifiers.first!, keysToFetch: keysToFetch)
             contacts = [contact]
         default:
@@ -218,9 +218,9 @@ public class _GetContactsGroup<Store: ContactStoreType>: _ContactsOperation<Stor
     let groupName: String
     let createIfNecessary: Bool
 
-    public var group: CNGroup? = .None
+    public var group: CNGroup? = .none
 
-    public init(groupName: String, createIfNecessary: Bool = true, containerId: ContainerID = .Default, entityType: CNEntityType = .Contacts, contactStore: Store = Store()) {
+    public init(groupName: String, createIfNecessary: Bool = true, containerId: ContainerID = .default, entityType: CNEntityType = .contacts, contactStore: Store = Store()) {
         self.groupName = groupName
         self.createIfNecessary = createIfNecessary
         super.init(containerId: containerId, entityType: entityType, contactStore: contactStore)
@@ -241,7 +241,7 @@ public class _GetContactsGroup<Store: ContactStoreType>: _ContactsOperation<Stor
 @available(iOS 9.0, OSX 10.11, *)
 public class _RemoveContactsGroup<Store: ContactStoreType>: _GetContactsGroup<Store> {
 
-    public init(groupName: String, containerId: ContainerID = .Default, entityType: CNEntityType = .Contacts, contactStore: Store = Store()) {
+    public init(groupName: String, containerId: ContainerID = .default, entityType: CNEntityType = .contacts, contactStore: Store = Store()) {
         super.init(groupName: groupName, createIfNecessary: false, containerId: containerId, entityType: entityType, contactStore: contactStore)
         name = "Remove Contacts Group"
     }
@@ -259,7 +259,7 @@ public class _AddContactsToGroup<Store: ContactStoreType>: _GetContactsGroup<Sto
 
     let contactIDs: [String]
 
-    public init(groupName: String, createIfNecessary: Bool = true, contactIDs: [String], containerId: ContainerID = .Default, entityType: CNEntityType = .Contacts, contactStore: Store = Store()) {
+    public init(groupName: String, createIfNecessary: Bool = true, contactIDs: [String], containerId: ContainerID = .default, entityType: CNEntityType = .contacts, contactStore: Store = Store()) {
         self.contactIDs = contactIDs
         super.init(groupName: groupName, createIfNecessary: createIfNecessary, containerId: containerId, entityType: entityType, contactStore: contactStore)
         name = "Add Contacts to Group: \(groupName)"
@@ -277,7 +277,7 @@ public class _AddContactsToGroup<Store: ContactStoreType>: _GetContactsGroup<Sto
 public class _RemoveContactsFromGroup<Store: ContactStoreType>: _GetContactsGroup<Store> {
 
     let contactIDs: [String]
-    public init(groupName: String, contactIDs: [String], containerId: ContainerID = .Default, entityType: CNEntityType = .Contacts, contactStore: Store = Store()) {
+    public init(groupName: String, contactIDs: [String], containerId: ContainerID = .default, entityType: CNEntityType = .contacts, contactStore: Store = Store()) {
         self.contactIDs = contactIDs
         super.init(groupName: groupName, createIfNecessary: false, containerId: containerId, entityType: entityType, contactStore: contactStore)
         name = "Remove Contacts from Group: \(groupName)"

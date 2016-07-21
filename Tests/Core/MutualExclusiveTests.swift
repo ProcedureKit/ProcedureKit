@@ -59,7 +59,7 @@ class MutualExclusiveTests: OperationTests {
         addCompletionBlockToTestOperation(operation1)
         addCompletionBlockToTestOperation(operation2)
         runOperations(operation1, operation2)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForExpectations(timeout: 3, handler: nil)
 
         XCTAssertEqual(text, "Star Wars\nA long time ago, in a galaxy far, far away.")
     }
@@ -105,7 +105,7 @@ class MutualExclusiveTests: OperationTests {
         addCompletionBlockToTestOperation(operation1Dependency)
         addCompletionBlockToTestOperation(operation2Dependency)
         runOperations(operation1, operation2Dependency, operation2, operation1Dependency)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForExpectations(timeout: 3, handler: nil)
 
         XCTAssertEqual(text, "Star Wars\nA long time ago, in a galaxy far, far away.")
     }
@@ -122,6 +122,6 @@ class MutualExclusiveTests: OperationTests {
         addCompletionBlockToTestOperation(operation1)
         addCompletionBlockToTestOperation(operation2)
         runOperations(operation1, operation2)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForExpectations(timeout: 3, handler: nil)
     }
 }

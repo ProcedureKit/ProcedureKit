@@ -51,7 +51,7 @@ class NetworkObserverTests: OperationTests {
         addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
         runOperation(operation)
 
-        waitForExpectationsWithTimeout(3) { error in
+        waitForExpectations(timeout: 3) { error in
             XCTAssertTrue(operation.didExecute)
             XCTAssertTrue(operation.finished)
             XCTAssertTrue(self.visibilityChanges[0])
@@ -60,7 +60,7 @@ class NetworkObserverTests: OperationTests {
 
     func test__network_indicator_hides_after_short_delay_when_operation_ends() {
 
-        let expectation = expectationWithDescription("Test: \(#function)")
+        let expectation = self.expectation(description: "Test: \(#function)")
         let operation = TestOperation(delay: 1)
         operation.addObserver(NetworkObserver(indicator: indicator))
 
@@ -73,7 +73,7 @@ class NetworkObserverTests: OperationTests {
 
         runOperation(operation)
 
-        waitForExpectationsWithTimeout(3) { error in
+        waitForExpectations(timeout: 3) { error in
             XCTAssertTrue(operation.didExecute)
             XCTAssertTrue(operation.finished)
             XCTAssertTrue(self.visibilityChanges[0])
@@ -94,7 +94,7 @@ class NetworkObserverTests: OperationTests {
 
         runOperations(operation1, operation2)
 
-        waitForExpectationsWithTimeout(3) { error in
+        waitForExpectations(timeout: 3) { error in
             XCTAssertTrue(operation1.didExecute)
             XCTAssertTrue(operation1.finished)
             XCTAssertTrue(operation2.didExecute)
@@ -112,14 +112,14 @@ class NetworkObserverTests: OperationTests {
         let operation2 = TestOperation(delay: 1)
         operation2.addObserver(NetworkObserver(indicator: indicator))
 
-        let expectation1 = expectationWithDescription("Test: \(#function)")
+        let expectation1 = expectation(description: "Test: \(#function)")
         operation1.addCompletionBlock {
             let after = dispatch_time(DISPATCH_TIME_NOW, Int64(1.5 * Double(NSEC_PER_SEC)))
             dispatch_after(after, Queue.Main.queue) {
                 expectation1.fulfill()
             }
         }
-        let expectation2 = expectationWithDescription("Test: \(#function)")
+        let expectation2 = expectation(description: "Test: \(#function)")
         operation2.addCompletionBlock {
             let after = dispatch_time(DISPATCH_TIME_NOW, Int64(1.5 * Double(NSEC_PER_SEC)))
             dispatch_after(after, Queue.Main.queue) {
@@ -129,7 +129,7 @@ class NetworkObserverTests: OperationTests {
 
         runOperations(operation1, operation2)
 
-        waitForExpectationsWithTimeout(3) { error in
+        waitForExpectations(timeout: 3) { error in
             XCTAssertTrue(operation1.didExecute)
             XCTAssertTrue(operation1.finished)
             XCTAssertTrue(operation2.didExecute)

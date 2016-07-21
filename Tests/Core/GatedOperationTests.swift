@@ -18,7 +18,7 @@ class GatedOperationTests: OperationTests {
 
         runOperation(gate)
 
-        waitForExpectationsWithTimeout(5, handler: nil)
+        waitForExpectations(timeout: 5, handler: nil)
         XCTAssertTrue(gate.finished)
         XCTAssertFalse(gate.operation.didExecute)
     }
@@ -30,7 +30,7 @@ class GatedOperationTests: OperationTests {
 
         runOperation(gate)
 
-        waitForExpectationsWithTimeout(5, handler: nil)
+        waitForExpectations(timeout: 5, handler: nil)
         XCTAssertTrue(gate.finished)
         XCTAssertTrue(gate.operation.didExecute)
         XCTAssertTrue(gate.operation.finished)
