@@ -87,6 +87,6 @@ class LoggingObserverWithProduce: LoggingObserverTests {
         addCompletionBlockToTestOperation(operation, withExpectation: expectation(description: "Test: \(#function)"))
         runOperation(operation)
         waitForExpectations(timeout: 3, handler: nil)
-        XCTAssertTrue(receivedMessages.contains("Test Logging OldOperation: did produce operation: Test OldOperation."))
+        XCTAssertTrue(receivedMessages.contains("Test Logging OldOperation: did produce operation: Test OldOperation."), "log message: \(receivedMessages)")
     }
 }
