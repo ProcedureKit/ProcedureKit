@@ -24,11 +24,11 @@ class ReachableOperationTests: OperationTests {
     }
 
     func test__operation_name() {
-        XCTAssertEqual(operation.operationName, "Reachable Operation <Test Operation>")
+        XCTAssertEqual(operation.operationName, "Reachable Procedure <Test Procedure>")
     }
 
     func test__connectivity() {
-        XCTAssertEqual(operation.connectivity, Reachability.Connectivity.AnyConnectionKind)
+        XCTAssertEqual(operation.connectivity, Reachability.Connectivity.anyConnectionKind)
     }
 
     func test__operation_executes_when_network_is_available() {

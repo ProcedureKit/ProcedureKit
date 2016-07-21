@@ -9,7 +9,7 @@
 import UIKit
 
 /**
-An `Operation` subclass for presenting a configured `UIAlertController`.
+An `Procedure` subclass for presenting a configured `UIAlertController`.
 
 Initialize the `AlertOperation` with the controller which is presenting
 the alert. This "controller" can be a `UIViewController` but, just
@@ -30,7 +30,7 @@ For example
     }
     queue.addOperation(alert)
 */
-public class AlertOperation<From: PresentingViewController>: Operation {
+public class AlertOperation<From: PresentingViewController>: Procedure {
 
     private var uiOperation: UIOperation<UIAlertController, From>
 
@@ -46,9 +46,9 @@ public class AlertOperation<From: PresentingViewController>: Operation {
     - parameter from: a generic type conforming to `PresentingViewController`,
     such as an `UIViewController`
     */
-    public init(presentAlertFrom from: From, preferredStyle: UIAlertControllerStyle = .Alert) {
-        let controller = UIAlertController(title: .None, message: .None, preferredStyle: preferredStyle)
-        uiOperation = UIOperation(controller: controller, displayControllerFrom: .Present(from))
+    public init(presentAlertFrom from: From, preferredStyle: UIAlertControllerStyle = .alert) {
+        let controller = UIAlertController(title: .none, message: .none, preferredStyle: preferredStyle)
+        uiOperation = UIOperation(controller: controller, displayControllerFrom: .present(from))
         super.init()
         name = "Alert<\(From.self)>"
         addCondition(AlertPresentation())
@@ -65,7 +65,8 @@ public class AlertOperation<From: PresentingViewController>: Operation {
      - parameter style: a `UIAlertActionStyle` which defaults to `.Default`.
      - parameter handler: a block which receives the operation, and returns Void.
      */
-    public func addActionWithTitle(title: String, style: UIAlertActionStyle = .Default, handler: AlertOperation -> Void = { _ in }) -> UIAlertAction {
+    @discardableResult
+    public func addActionWithTitle(_ title: String, style: UIAlertActionStyle = .default, handler: (AlertOperation) -> Void = { _ in }) -> UIAlertAction {
         let action = UIAlertAction(title: title, style: style) { [weak self] _ in
             if let weakSelf = self {
                 handler(weakSelf)
@@ -116,8 +117,8 @@ public class AlertOperation<From: PresentingViewController>: Operation {
 
      - parameter configurationHandler: A block for configuring the text field prior to displaying the alert. This block has no return value and takes a single parameter corresponding to the text field object. Use that parameter to change the text field properties.
      */
-    public func addTextFieldWithConfigurationHandler(configurationHandler: ((UITextField) -> Void)?) {
-        alert.addTextFieldWithConfigurationHandler(configurationHandler)
+    public func addTextFieldWithConfigurationHandler(_ configurationHandler: ((UITextField) -> Void)?) {
+        alert.addTextField(configurationHandler: configurationHandler)
     }
 
     /**

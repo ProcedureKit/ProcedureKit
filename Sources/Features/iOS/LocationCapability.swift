@@ -17,10 +17,10 @@ import CoreLocation
 public enum LocationUsage: Int {
 
     /// Request access only when the app is in use
-    case WhenInUse = 1
+    case whenInUse = 1
 
     /// Request access always
-    case Always
+    case always
 }
 
 /**
@@ -38,7 +38,7 @@ public protocol LocationCapabilityRegistrarType: CapabilityRegistrarType {
 
      - parameter aDelegate: a CLLocationManagerDelegate
      */
-    func opr_setDelegate(aDelegate: CLLocationManagerDelegate?)
+    func opr_setDelegate(_ aDelegate: CLLocationManagerDelegate?)
 
     /// - returns: the CLAuthorizationStatus
     func opr_authorizationStatus() -> CLAuthorizationStatus
@@ -48,7 +48,7 @@ public protocol LocationCapabilityRegistrarType: CapabilityRegistrarType {
 
      - parameter requirement: the LocationUsage
      */
-    func opr_requestAuthorizationWithRequirement(requirement: LocationUsage)
+    func opr_requestAuthorizationWithRequirement(_ requirement: LocationUsage)
 }
 
 extension CLLocationManager: LocationCapabilityRegistrarType {
@@ -68,7 +68,7 @@ extension CLLocationManager: LocationCapabilityRegistrarType {
 
      - parameter aDelegate: a CLLocationManagerDelegate
      */
-    public func opr_setDelegate(aDelegate: CLLocationManagerDelegate?) {
+    public func opr_setDelegate(_ aDelegate: CLLocationManagerDelegate?) {
         self.delegate = aDelegate
     }
 
@@ -77,11 +77,11 @@ extension CLLocationManager: LocationCapabilityRegistrarType {
 
      - parameter requirement: the LocationUsage
      */
-    public func opr_requestAuthorizationWithRequirement(requirement: LocationUsage) {
+    public func opr_requestAuthorizationWithRequirement(_ requirement: LocationUsage) {
         switch requirement {
-        case .WhenInUse:
+        case .whenInUse:
             requestWhenInUseAuthorization()
-        case .Always:
+        case .always:
             requestAlwaysAuthorization()
         }
     }
@@ -95,9 +95,9 @@ extension CLAuthorizationStatus: AuthorizationStatusType {
      - parameter requirement: the required LocationUsage
      - returns: a true Bool for authorized status
      */
-    public func isRequirementMet(requirement: LocationUsage) -> Bool {
+    public func isRequirementMet(_ requirement: LocationUsage) -> Bool {
         switch (requirement, self) {
-        case (.WhenInUse, .AuthorizedWhenInUse), (_, .AuthorizedAlways):
+        case (.whenInUse, .authorizedWhenInUse), (_, .authorizedAlways):
             return true
         default:
             return false
@@ -130,7 +130,7 @@ public class LocationCapability: NSObject, CLLocationManagerDelegate, Capability
 
     internal lazy var registrar: LocationCapabilityRegistrarType = CLLocationManager.create()
 
-    internal var authorizationCompletionBlock: dispatch_block_t? = .None
+    internal var authorizationCompletionBlock: (() -> ())? = .none
 
     /**
      Initialize the capability. By default, it requires access .WhenInUse.
@@ -138,7 +138,7 @@ public class LocationCapability: NSObject, CLLocationManagerDelegate, Capability
      - parameter requirement: the required LocationUsage, defaults to .WhenInUse
      - parameter registrar: the registrar to use. Defauls to creating a Registrar.
      */
-    public required init(_ requirement: LocationUsage = .WhenInUse) {
+    public required init(_ requirement: LocationUsage = .whenInUse) {
         self.name = "Location"
         self.requirement = requirement
         super.init()
@@ -153,7 +153,7 @@ public class LocationCapability: NSObject, CLLocationManagerDelegate, Capability
      Get the current authorization status of Location services from the Registrar.
      - parameter completion: a CLAuthorizationStatus -> Void closure.
      */
-    public func authorizationStatus(completion: CLAuthorizationStatus -> Void) {
+    public func authorizationStatus(_ completion: (CLAuthorizationStatus) -> Void) {
         completion(registrar.opr_authorizationStatus())
     }
 
@@ -161,7 +161,7 @@ public class LocationCapability: NSObject, CLLocationManagerDelegate, Capability
      Request authorization to Location services from the Registrar.
      - parameter completion: a dispatch_block_t
      */
-    public func requestAuthorizationWithCompletion(completion: dispatch_block_t) {
+    public func requestAuthorizationWithCompletion(_ completion: ()->()) {
         guard isAvailable() else {
             completion()
             return
@@ -169,7 +169,7 @@ public class LocationCapability: NSObject, CLLocationManagerDelegate, Capability
 
         let status = registrar.opr_authorizationStatus()
         switch (status, requirement) {
-        case (.NotDetermined, _), (.AuthorizedWhenInUse, .Always):
+        case (.notDetermined, _), (.authorizedWhenInUse, .always):
             authorizationCompletionBlock = completion
             registrar.opr_setDelegate(self)
             registrar.opr_requestAuthorizationWithRequirement(requirement)
@@ -183,8 +183,8 @@ public class LocationCapability: NSObject, CLLocationManagerDelegate, Capability
      - parameter manager: a CLLocationManager
      - parameter status: the CLAuthorizationStatus
      */
-    @objc public func locationManager(manager: CLLocationManager, didChangeAuthorizationStatus status: CLAuthorizationStatus) {
-        guard status != .NotDetermined else { return }
+    @objc public func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
+        guard status != .notDetermined else { return }
         authorizationCompletionBlock?()
     }
 }
@@ -215,5 +215,5 @@ public extension Capability {
     typealias Location = LocationCapability
 }
 
-@available(*, unavailable, renamed="AuthorizedFor(Capability.Location(.WhenInUse))")
-public typealias LocationCondition = AuthorizedFor<Capability.Location>
+//@available(*, unavailable, renamed: "AuthorizedFor(Capability.Location(.WhenInUse))")
+//public typealias LocationCondition = AuthorizedFor<Capability.Location>

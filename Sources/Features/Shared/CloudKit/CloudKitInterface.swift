@@ -11,7 +11,7 @@ import CloudKit
 
 /**
  A generic protocol which exposes the types and properties used by
- Apple's CloudKit Operation types.
+ Apple's CloudKit Procedure types.
  */
 public protocol CKOperationType: class {
 
@@ -60,7 +60,7 @@ public protocol CKOperationType: class {
 
 /**
  A generic protocol which exposes the types and properties used by
- Apple's CloudKit Database Operation types.
+ Apple's CloudKit Database Procedure types.
  */
 public protocol CKDatabaseOperationType: CKOperationType {
 
@@ -172,7 +172,7 @@ public protocol CKFetchRecordChangesOperationType: CKDatabaseOperationType, CKFe
     var recordWithIDWasDeletedBlock: ((RecordID) -> Void)? { get set }
 
     /// - returns: the completion for fetching records
-    var fetchRecordChangesCompletionBlock: ((ServerChangeToken?, NSData?, NSError?) -> Void)? { get set }
+    var fetchRecordChangesCompletionBlock: ((ServerChangeToken?, Data?, NSError?) -> Void)? { get set }
 }
 
 /// A generic protocol which exposes the properties used by Apple's CKFetchRecordZonesOperation.
@@ -241,7 +241,7 @@ public protocol CKModifyRecordsOperationType: CKDatabaseOperationType {
     var savePolicy: RecordSavePolicy { get set }
 
     /// - returns: the client change token data
-    var clientChangeTokenData: NSData? { get set }
+    var clientChangeTokenData: Data? { get set }
 
     /// - returns: a flag for atomic changes
     var atomic: Bool { get set }

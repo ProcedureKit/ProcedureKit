@@ -20,32 +20,30 @@ extension UIApplication: RemoteNotificationRegistrarType {
 
 public class RemoteNotificationCondition: Condition {
 
-    public enum Error: ErrorType {
-        case ReceivedError(NSError)
+    public enum Error: ErrorProtocol {
+        case receivedError(NSError)
     }
 
-    static let queue = OperationQueue()
+    static let queue = ProcedureQueue()
 
-    public static func didReceiveNotificationToken(token: NSData) {
-        NSNotificationCenter
-            .defaultCenter()
-            .postNotificationName(RemoteNotificationName, object: nil, userInfo: [RemoteNotificationTokenKey: token])
+    public static func didReceiveNotificationToken(_ token: Data) {
+        NotificationCenter.default
+            .post(name: Notification.Name(rawValue: RemoteNotificationName), object: nil, userInfo: [RemoteNotificationTokenKey: token])
     }
 
-    public static func didFailToRegisterForRemoteNotifications(error: NSError) {
-        NSNotificationCenter
-            .defaultCenter()
-            .postNotificationName(RemoteNotificationName, object: nil, userInfo: [RemoteNotificationErrorKey: error])
+    public static func didFailToRegisterForRemoteNotifications(_ error: NSError) {
+        NotificationCenter.default
+            .post(name: Notification.Name(rawValue: RemoteNotificationName), object: nil, userInfo: [RemoteNotificationErrorKey: error])
     }
 
-    internal var registrar: RemoteNotificationRegistrarType = UIApplication.sharedApplication() {
+    internal var registrar: RemoteNotificationRegistrarType = UIApplication.shared() {
         didSet {
             removeDependencies()
             addDependency(RemoteNotificationsRegistration(registrar: registrar) { _ in })
         }
     }
 
-    var queue: OperationQueue {
+    var queue: ProcedureQueue {
         return RemoteNotificationCondition.queue
     }
 
@@ -56,45 +54,45 @@ public class RemoteNotificationCondition: Condition {
         addDependency(RemoteNotificationsRegistration(registrar: registrar) { _ in })
     }
 
-    public override func evaluate(operation: Operation, completion: OperationConditionResult -> Void) {
+    public override func evaluate(_ operation: Procedure, completion: (OperationConditionResult) -> Void) {
         let operation = RemoteNotificationsRegistration(registrar: registrar) { result in
             switch result {
-            case .Token(_):
-                completion(.Satisfied)
-            case .Error(let error):
-                completion(.Failed(Error.ReceivedError(error)))
+            case .token(_):
+                completion(.satisfied)
+            case .error(let error):
+                completion(.failed(Error.receivedError(error)))
             }
         }
         queue.addOperation(operation)
     }
 }
 
-public class RemoteNotificationsRegistration: Operation {
+public class RemoteNotificationsRegistration: Procedure {
 
     public enum RegistrationResult {
-        case Token(NSData)
-        case Error(NSError)
+        case token(Data)
+        case error(NSError)
     }
 
     enum NotificationObserver {
-        case ReceivedResponse
+        case receivedResponse
 
         var selector: Selector {
             switch self {
-            case .ReceivedResponse:
+            case .receivedResponse:
                 return #selector(RemoteNotificationsRegistration.didReceiveResponse(_:))
             }
         }
     }
 
     let registrar: RemoteNotificationRegistrarType
-    let handler: RegistrationResult -> Void
+    let handler: (RegistrationResult) -> Void
 
-    public convenience init(handler: RegistrationResult -> Void) {
-        self.init(registrar: UIApplication.sharedApplication(), handler: handler)
+    public convenience init(handler: (RegistrationResult) -> Void) {
+        self.init(registrar: UIApplication.shared(), handler: handler)
     }
 
-    public init(registrar: RemoteNotificationRegistrarType, handler: RegistrationResult -> Void) {
+    public init(registrar: RemoteNotificationRegistrarType, handler: (RegistrationResult) -> Void) {
         self.registrar = registrar
         self.handler = handler
         super.init()
@@ -102,25 +100,24 @@ public class RemoteNotificationsRegistration: Operation {
     }
 
     public override func execute() {
-        dispatch_async(Queue.Main.queue, register)
+        Queue.main.queue.async(execute: register)
     }
 
     func register() {
-        NSNotificationCenter
-            .defaultCenter()
-            .addObserver(self, selector: NotificationObserver.ReceivedResponse.selector, name: RemoteNotificationName, object: nil)
+        NotificationCenter.default
+            .addObserver(self, selector: NotificationObserver.receivedResponse.selector, name: NSNotification.Name(rawValue: RemoteNotificationName), object: nil)
 
         registrar.opr_registerForRemoteNotifications()
     }
 
-    func didReceiveResponse(notification: NSNotification) {
-        NSNotificationCenter.defaultCenter().removeObserver(self)
+    func didReceiveResponse(_ notification: Notification) {
+        NotificationCenter.default.removeObserver(self)
 
-        if let token = notification.userInfo?[RemoteNotificationTokenKey] as? NSData {
-            handler(.Token(token))
+        if let token = (notification as NSNotification).userInfo?[RemoteNotificationTokenKey] as? Data {
+            handler(.token(token))
         }
-        else if let error = notification.userInfo?[RemoteNotificationErrorKey] as? NSError {
-            handler(.Error(error))
+        else if let error = (notification as NSNotification).userInfo?[RemoteNotificationErrorKey] as? NSError {
+            handler(.error(error))
         }
         else {
             fatalError("Received a notification with neither a token nor error.")

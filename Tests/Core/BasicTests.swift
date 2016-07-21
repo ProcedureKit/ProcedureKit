@@ -40,14 +40,14 @@ class BasicTests: OperationTests {
     }
 
     func test__operation_error_is_equatable() {
-        XCTAssertEqual(OperationError.ConditionFailed, OperationError.ConditionFailed)
-        XCTAssertEqual(OperationError.OperationTimedOut(1.0), OperationError.OperationTimedOut(1.0))
-        XCTAssertNotEqual(OperationError.ConditionFailed, OperationError.OperationTimedOut(1.0))
-        XCTAssertNotEqual(OperationError.OperationTimedOut(2.0), OperationError.OperationTimedOut(1.0))
+        XCTAssertEqual(OperationError.conditionFailed, OperationError.conditionFailed)
+        XCTAssertEqual(OperationError.operationTimedOut(1.0), OperationError.operationTimedOut(1.0))
+        XCTAssertNotEqual(OperationError.conditionFailed, OperationError.operationTimedOut(1.0))
+        XCTAssertNotEqual(OperationError.operationTimedOut(2.0), OperationError.operationTimedOut(1.0))
     }
 
     func test__add_multiple_completion_blocks() {
-        let expectation = expectationWithDescription("Test: \(#function)")
+        let expectation = self.expectation(description: "Test: \(#function)")
 
         var completionBlockOneDidRun = 0
         operation.addCompletionBlock {
@@ -67,7 +67,7 @@ class BasicTests: OperationTests {
 
         addCompletionBlockToTestOperation(operation)
         runOperation(operation)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForExpectations(timeout: 3, handler: nil)
 
         XCTAssertEqual(completionBlockOneDidRun, 1)
         XCTAssertEqual(completionBlockTwoDidRun, 1)
@@ -88,24 +88,24 @@ class BasicTests: OperationTests {
     }
 
     func test__cancel_with_nil_error() {
-        operation.cancelWithError(.None)
-        XCTAssertTrue(operation.cancelled)
+        operation.cancelWithError(.none)
+        XCTAssertTrue(operation.isCancelled)
         XCTAssertEqual(operation.errors.count, 0)
     }
 
     func test__cancel_with_error() {
-        operation.cancelWithError(OperationError.OperationTimedOut(1.0))
-        XCTAssertTrue(operation.cancelled)
+        operation.cancelWithError(OperationError.operationTimedOut(1.0))
+        XCTAssertTrue(operation.isCancelled)
         XCTAssertTrue(operation.failed)
     }
 
     func test__adding_array_of_operations() {
-        let operations = (0..<3).map { _ in BlockOperation {  } }
+        let operations = (0..<3).map { _ in BlockProcedure {  } }
         queue.addOperations(operations)
     }
 
     func test__adding_variable_argument_of_operations() {
-        queue.addOperations(BlockOperation { }, BlockOperation { })
+        queue.addOperations(BlockProcedure { }, BlockProcedure { })
     }
 
     func test__operation_gets_finished_called() {
@@ -117,7 +117,7 @@ class BasicTests: OperationTests {
         var operationWillCancelObserverCalled = false
         operation.addObserver(WillCancelObserver { _, _ in
             XCTAssertTrue(self.operation.operationWillCancelCalled)
-            XCTAssertFalse(self.operation.cancelled)
+            XCTAssertFalse(self.operation.isCancelled)
             XCTAssertFalse(self.operation.operationDidCancelCalled)
             operationWillCancelObserverCalled = true
             })
@@ -130,7 +130,7 @@ class BasicTests: OperationTests {
         var operationDidCancelObserverCalled = false
         operation.addObserver(DidCancelObserver { _ in
             XCTAssertTrue(self.operation.operationWillCancelCalled)
-            XCTAssertTrue(self.operation.cancelled)
+            XCTAssertTrue(self.operation.isCancelled)
             XCTAssertTrue(self.operation.operationDidCancelCalled)
             operationDidCancelObserverCalled = true
             })
@@ -144,44 +144,43 @@ class UserIntentOperationTests: OperationTests {
 
     func test__getting_user_intent_default_background() {
         let operation = TestOperation()
-        XCTAssertEqual(operation.userIntent, Operation.UserIntent.None)
+        XCTAssertEqual(operation.userIntent, Procedure.UserIntent.none)
     }
 
     func test__set_user_intent__initiated() {
         let operation = TestOperation()
-        operation.userIntent = .Initiated
-        XCTAssertEqual(operation.qualityOfService, NSQualityOfService.UserInitiated)
+        operation.userIntent = .initiated
+        XCTAssertEqual(operation.qualityOfService, QualityOfService.userInitiated)
     }
 
     func test__set_user_intent__side_effect() {
         let operation = TestOperation()
-        operation.userIntent = .SideEffect
-        XCTAssertEqual(operation.qualityOfService, NSQualityOfService.UserInitiated)
+        operation.userIntent = .sideEffect
+        XCTAssertEqual(operation.qualityOfService, QualityOfService.userInitiated)
     }
 
     func test__set_user_intent__initiated_then_background() {
         let operation = TestOperation()
-        operation.userIntent = .Initiated
-        operation.userIntent = .None
-        XCTAssertEqual(operation.qualityOfService, NSQualityOfService.Default)
+        operation.userIntent = .initiated
+        operation.userIntent = .none
+        XCTAssertEqual(operation.qualityOfService, QualityOfService.default)
     }
 
     func test__user_intent__equality() {
-        XCTAssertNotEqual(Operation.UserIntent.Initiated, Operation.UserIntent.SideEffect)
+        XCTAssertNotEqual(Procedure.UserIntent.initiated, Procedure.UserIntent.sideEffect)
     }
 }
 
 class CompletionBlockOperationTests: OperationTests {
 
     func test__block_operation_with_default_block_runs_completion_block_once() {
-        let expectation = expectationWithDescription("Test: \(#function)")
+        let expectation = self.expectation(description: "Test: \(#function)")
         var numberOfTimesCompletionBlockIsRun = 0
 
-        let operation = BlockOperation()
+        let operation = BlockProcedure()
 
         operation.completionBlock = {
             numberOfTimesCompletionBlockIsRun += 1
-            print("** This is a completion block on \(String.fromCString(dispatch_queue_get_label(DISPATCH_CURRENT_QUEUE_LABEL)))")
         }
 
         let delay = DelayOperation(interval: 0.1)
@@ -191,20 +190,20 @@ class CompletionBlockOperationTests: OperationTests {
         delay.addDependency(operation)
 
         runOperations(delay, operation)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForExpectations(timeout: 3, handler: nil)
 
         XCTAssertEqual(numberOfTimesCompletionBlockIsRun, 1)
     }
 
     func test__nsblockoperation_runs_completion_block_once() {
-        let _queue = NSOperationQueue()
-        let expectation = expectationWithDescription("Test: \(#function)")
+        let _queue = OperationQueue()
+        let expectation = self.expectation(description: "Test: \(#function)")
 
-        let operation = NSBlockOperation()
+        let operation = BlockOperation()
         operation.completionBlock = { expectation.fulfill() }
 
         _queue.addOperation(operation)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForExpectations(timeout: 3, handler: nil)
     }
 }
 
@@ -219,25 +218,25 @@ class OperationDependencyTests: OperationTests {
 
         for i in 0..<count {
 
-            let op1name = "Operation 1, iteration: \(i)"
-            let op1Expectation = expectationWithDescription(op1name)
-            let op1 = BlockOperation { (continuation: BlockOperation.ContinuationBlockType) in
+            let op1name = "Procedure 1, iteration: \(i)"
+            let op1Expectation = expectation(description: op1name)
+            let op1 = BlockProcedure { (continuation: BlockProcedure.ContinuationBlockType) in
                 counter1 += 1
                 op1Expectation.fulfill()
                 continuation(error: nil)
             }
 
-            let op2name = "Operation 2, iteration: \(i)"
-            let op2Expectation = expectationWithDescription(op2name)
-            let op2 = BlockOperation { (continuation: BlockOperation.ContinuationBlockType) in
+            let op2name = "Procedure 2, iteration: \(i)"
+            let op2Expectation = expectation(description: op2name)
+            let op2 = BlockProcedure { (continuation: BlockProcedure.ContinuationBlockType) in
                 counter2 += 1
                 op2Expectation.fulfill()
                 continuation(error: nil)
             }
 
-            let op3name = "Operation 3, iteration: \(i)"
-            let op3Expectation = expectationWithDescription(op3name)
-            let op3 = BlockOperation { (continuation: BlockOperation.ContinuationBlockType) in
+            let op3name = "Procedure 3, iteration: \(i)"
+            let op3Expectation = expectation(description: op3name)
+            let op3 = BlockProcedure { (continuation: BlockProcedure.ContinuationBlockType) in
                 counter3 += 1
                 op3Expectation.fulfill()
                 continuation(error: nil)
@@ -247,7 +246,7 @@ class OperationDependencyTests: OperationTests {
             runOperations(op1, op2, op3)
         }
 
-        waitForExpectationsWithTimeout(6, handler: nil)
+        waitForExpectations(timeout: 6, handler: nil)
 
         XCTAssertEqual(counter1, count)
         XCTAssertEqual(counter2, count)
@@ -263,50 +262,50 @@ class DelayOperationTests: OperationTests {
     }
 
     func test__delay_operation_with_date_name() {
-        let date = NSDate()
+        let date = Date()
         let delay = DelayOperation(date: date)
-        XCTAssertEqual(delay.name, "Delay until \(NSDateFormatter().stringFromDate(date))")
+        XCTAssertEqual(delay.name, "Delay until \(DateFormatter().string(from: date))")
     }
 
     func test__delay_operation_with_negative_time_interval_finishes_immediately() {
-        let expectation = expectationWithDescription("Test: \(#function)")
+        let expectation = self.expectation(description: "Test: \(#function)")
         let operation = DelayOperation(interval: -9_000_000)
         runOperation(operation)
-        let after = dispatch_time(DISPATCH_TIME_NOW, Int64(0.05 * Double(NSEC_PER_SEC)))
-        dispatch_after(after, Queue.Main.queue) {
+        let after = DispatchTime.now() + Double(Int64(0.05 * Double(NSEC_PER_SEC))) / Double(NSEC_PER_SEC)
+        (Queue.main.queue).after(when: after) {
             expectation.fulfill()
         }
-        waitForExpectationsWithTimeout(1, handler: nil)
-        XCTAssertTrue(operation.finished)
+        waitForExpectations(timeout: 1, handler: nil)
+        XCTAssertTrue(operation.isFinished)
     }
 
     func test__delay_operation_with_distant_past_finishes_immediately() {
-        let expectation = expectationWithDescription("Test: \(#function)")
-        let operation = DelayOperation(date: NSDate.distantPast())
+        let expectation = self.expectation(description: "Test: \(#function)")
+        let operation = DelayOperation(date: Date.distantPast)
         runOperation(operation)
-        let after = dispatch_time(DISPATCH_TIME_NOW, Int64(0.05 * Double(NSEC_PER_SEC)))
-        dispatch_after(after, Queue.Main.queue) {
+        let after = DispatchTime.now() + Double(Int64(0.05 * Double(NSEC_PER_SEC))) / Double(NSEC_PER_SEC)
+        (Queue.main.queue).after(when: after) {
             expectation.fulfill()
         }
-        waitForExpectationsWithTimeout(1, handler: nil)
-        XCTAssertTrue(operation.finished)
+        waitForExpectations(timeout: 1, handler: nil)
+        XCTAssertTrue(operation.isFinished)
     }
 
     func test__delay_operation_completes_after_interval() {
-        var started: NSDate!
-        var ended: NSDate!
-        let expectation = expectationWithDescription("Test: \(#function)")
-        let interval: NSTimeInterval = 0.5
+        var started: Date!
+        var ended: Date!
+        let expectation = self.expectation(description: "Test: \(#function)")
+        let interval: TimeInterval = 0.5
         let operation = DelayOperation(interval: interval)
         operation.addCompletionBlock {
-            ended = NSDate()
+            ended = Date()
             expectation.fulfill()
         }
-        started = NSDate()
+        started = Date()
         runOperation(operation)
-        waitForExpectationsWithTimeout(1, handler: nil)
-        XCTAssertTrue(operation.finished)
-        let timeTaken = ended.timeIntervalSinceDate(started)
+        waitForExpectations(timeout: 1, handler: nil)
+        XCTAssertTrue(operation.isFinished)
+        let timeTaken = ended.timeIntervalSince(started)
         XCTAssertGreaterThanOrEqual(timeTaken, interval)
         XCTAssertLessThanOrEqual(timeTaken - interval, 1.0)
     }
@@ -320,12 +319,12 @@ class CancellationOperationTests: OperationTests {
         let operation = TestOperation()
         operation.addDependency(delay)
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectation(description: "Test: \(#function)"))
 
         delay.cancel()
 
         runOperations(delay, operation)
-        waitForExpectationsWithTimeout(5, handler: nil)
+        waitForExpectations(timeout: 5, handler: nil)
 
         XCTAssertTrue(operation.didExecute)
     }
@@ -365,7 +364,7 @@ class CancellationOperationTests: OperationTests {
          See: https://developer.apple.com/library/mac/documentation/Cocoa/Reference/NSOperation_class/
 
          NSOperation.cancel() does this automatically, so calling super.cancel() in 
-         Operation.cancel() takes care of this.
+         Procedure.cancel() takes care of this.
          
          If the call to super.cancel() is removed at some point, and this behavior is 
          not duplicated, the outcome of cancelling will still be correct, but 
@@ -373,22 +372,22 @@ class CancellationOperationTests: OperationTests {
          
         */
         let delaySeconds = 3.0
-        let delayCompleteSignal = dispatch_semaphore_create(0)
+        let delayCompleteSignal = DispatchSemaphore(value: 0)
         let delay = DelayOperation(interval: delaySeconds)
         delay.addCompletionBlock {
-            dispatch_semaphore_signal(delayCompleteSignal)
+            delayCompleteSignal.signal()
         }
         let operation = TestOperation()
         operation.addDependency(delay)
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
-        XCTAssertFalse(operation.ready)
+        addCompletionBlockToTestOperation(operation, withExpectation: expectation(description: "Test: \(#function)"))
+        XCTAssertFalse(operation.isReady)
 
         runOperations(delay, operation)
         operation.cancel()
 
-        waitForExpectationsWithTimeout(delaySeconds - 1.0, handler: nil)
+        waitForExpectations(timeout: delaySeconds - 1.0, handler: nil)
         XCTAssertFalse(operation.didExecute)
-        guard dispatch_semaphore_wait(delayCompleteSignal, dispatch_time(DISPATCH_TIME_NOW, Int64(5 * Double( NSEC_PER_SEC )))) == 0 else {
+        guard delayCompleteSignal.wait(timeout: .now() + 5) == .Success else {
             XCTFail("Delay operation did not complete")
             return
         }
@@ -396,63 +395,63 @@ class CancellationOperationTests: OperationTests {
 
     func test__operation_cancelled_before_running_is_not_set_to_finished_until_started() {
         let operation = TestOperation()
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectation(description: "Test: \(#function)"))
         operation.cancel()
 
-        XCTAssertTrue(operation.cancelled)
+        XCTAssertTrue(operation.isCancelled)
         XCTAssertTrue(operation.operationDidCancelCalled)
         XCTAssertFalse(operation.didExecute)
         XCTAssertFalse(operation.operationWillFinishCalled)
         XCTAssertFalse(operation.operationDidFinishCalled)
-        XCTAssertFalse(operation.finished)
+        XCTAssertFalse(operation.isFinished)
 
         runOperation(operation)
-        waitForExpectationsWithTimeout(5, handler: nil)
+        waitForExpectations(timeout: 5, handler: nil)
 
         XCTAssertTrue(operation.operationDidFinishCalled)
-        XCTAssertTrue(operation.finished)
+        XCTAssertTrue(operation.isFinished)
     }
 
     func test__operation_with_disableAutomaticFinishing_doesnt_finish_automatically_when_cancelled() {
         let operation = TestHandlesFinishOperation()
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectation(description: "Test: \(#function)"))
         runOperation(operation)
         operation.cancel()
 
-        XCTAssertTrue(operation.cancelled)
-        XCTAssertFalse(operation.finished)
+        XCTAssertTrue(operation.isCancelled)
+        XCTAssertFalse(operation.isFinished)
 
         sleep(1)
 
-        XCTAssertFalse(operation.finished)
+        XCTAssertFalse(operation.isFinished)
 
         operation.triggerFinish()
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForExpectations(timeout: 3, handler: nil)
 
-        XCTAssertTrue(operation.finished)
+        XCTAssertTrue(operation.isFinished)
     }
 
     func test__operation_with_disableAutomaticFinishing_cancelled_before_running_doesnt_finish_automatically_when_started() {
         let operation = TestHandlesFinishOperation()
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectation(description: "Test: \(#function)"))
         operation.cancel()
         runOperation(operation)
 
-        XCTAssertTrue(operation.cancelled)
-        XCTAssertFalse(operation.finished)
+        XCTAssertTrue(operation.isCancelled)
+        XCTAssertFalse(operation.isFinished)
 
         sleep(1)
 
-        XCTAssertFalse(operation.finished)
+        XCTAssertFalse(operation.isFinished)
 
         operation.triggerFinish()
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForExpectations(timeout: 3, handler: nil)
 
-        XCTAssertTrue(operation.finished)
+        XCTAssertTrue(operation.isFinished)
     }
 }
 
-private class TestHandlesFinishOperation: Operation {
+private class TestHandlesFinishOperation: Procedure {
     override init() {
         super.init(disableAutomaticFinishing: true)
     }
@@ -469,7 +468,7 @@ private class TestHandlesFinishOperation: Operation {
 class FinishingOperationTests: OperationTests {
 
     func test__operation_with_disableAutomaticFinishing_manual_cancel_and_finish_on_willexecute_does_not_result_in_invalid_state_transition_finished_to_executing() {
-        class TestOperation_CancelsAndManuallyFinishesOnWillExecute: Operation {
+        class TestOperation_CancelsAndManuallyFinishesOnWillExecute: Procedure {
             override init() {
                 super.init(disableAutomaticFinishing: true) // <-- disableAutomaticFinishing
                 addObserver(WillExecuteObserver { [weak self] _ in
@@ -483,16 +482,16 @@ class FinishingOperationTests: OperationTests {
             }
         }
         
-        LogManager.severity = .Verbose
+        LogManager.severity = .verbose
         LogManager.enabled = true
         let operation = TestOperation_CancelsAndManuallyFinishesOnWillExecute()
         
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
+        addCompletionBlockToTestOperation(operation, withExpectation: expectation(description: "Test: \(#function)"))
         runOperation(operation)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForExpectations(timeout: 3, handler: nil)
         
         // Test initially failed with:
-        // assertion failed: Attempting to perform illegal cyclic state transition, Finished -> Executing for operation: Unnamed Operation #UUID.: file Operations/Sources/Core/Shared/Operation.swift, line 399
+        // assertion failed: Attempting to perform illegal cyclic state transition, Finished -> Executing for operation: Unnamed Procedure #UUID.: file Operations/Sources/Core/Shared/Procedure.swift, line 399
         // This will crash the test execution if it happens.
     }
 }

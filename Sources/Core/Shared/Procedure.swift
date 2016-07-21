@@ -1,5 +1,5 @@
 //
-//  Operation.swift
+//  Procedure.swift
 //  YapDB
 //
 //  Created by Daniel Thorpe on 25/06/2015.
@@ -13,9 +13,9 @@ import Foundation
 // swiftlint:disable type_body_length
 
 /**
-Abstract base Operation class which subclasses `NSOperation`.
+Abstract base Procedure class which subclasses `NSOperation`.
 
-Operation builds on `NSOperation` in a few simple ways.
+Procedure builds on `NSOperation` in a few simple ways.
 
 1. For an instance to become `.Ready`, all of its attached
 `OperationCondition`s must be satisfied.
@@ -24,34 +24,34 @@ Operation builds on `NSOperation` in a few simple ways.
 to be notified of lifecycle events in the operation.
 
 */
-public class Operation: NSOperation {
+public class Procedure: Operation {
 
     private enum State: Int, Comparable {
 
         // The initial state
-        case Initialized
+        case initialized
 
         // Ready to begin evaluating conditions
-        case Pending
+        case pending
 
         // It is executing
-        case Executing
+        case executing
 
         // Execution has completed, but not yet notified queue
-        case Finishing
+        case finishing
 
         // The operation has finished.
-        case Finished
+        case finished
 
-        func canTransitionToState(other: State, whenCancelled cancelled: Bool) -> Bool {
+        func canTransitionToState(_ other: State, whenCancelled cancelled: Bool) -> Bool {
             switch (self, other) {
-            case (.Initialized, .Pending),
-                (.Pending, .Executing),
-                (.Executing, .Finishing),
-                (.Finishing, .Finished):
+            case (.initialized, .pending),
+                (.pending, .executing),
+                (.executing, .finishing),
+                (.finishing, .finished):
                 return true
 
-            case (.Pending, .Finishing) where cancelled:
+            case (.pending, .finishing) where cancelled:
                 // When an operation is cancelled it can go from pending direct to finishing.
                 return true
 
@@ -62,63 +62,63 @@ public class Operation: NSOperation {
     }
 
     /**
-     Type to express the intent of the user in regards to executing an Operation instance
+     Type to express the intent of the user in regards to executing an Procedure instance
 
      - see: https://developer.apple.com/library/ios/documentation/Performance/Conceptual/EnergyGuide-iOS/PrioritizeWorkWithQoS.html#//apple_ref/doc/uid/TP40015243-CH39
     */
     @objc public enum UserIntent: Int {
-        case None = 0, SideEffect, Initiated
+        case none = 0, sideEffect, initiated
 
-        internal var qos: NSQualityOfService {
+        internal var qos: QualityOfService {
             switch self {
-            case .Initiated, .SideEffect:
-                return .UserInitiated
+            case .initiated, .sideEffect:
+                return .userInitiated
             default:
-                return .Default
+                return .default
             }
         }
     }
 
     /// - returns: a unique String which can be used to identify the operation instance
-    public let identifier = NSUUID().UUIDString
+    public let identifier = UUID().uuidString
 
-    private let stateLock = NSRecursiveLock()
+    private let stateLock = RecursiveLock()
     private var _log = Protector<LoggerType>(Logger())
-    private var _state = State.Initialized
-    private var _internalErrors = [ErrorType]()
+    private var _state = State.initialized
+    private var _internalErrors = [ErrorProtocol]()
     private var _isTransitioningToExecuting = false
     private var _isHandlingFinish = false
     private var _isHandlingCancel = false
     private var _observers = Protector([OperationObserverType]())
     private let disableAutomaticFinishing: Bool
 
-    internal private(set) var directDependencies = Set<NSOperation>()
+    internal private(set) var directDependencies = Set<Operation>()
     internal private(set) var conditions = Set<Condition>()
 
-    internal var indirectDependencies: Set<NSOperation> {
+    internal var indirectDependencies: Set<Operation> {
         return Set(conditions.flatMap { $0.directDependencies })
     }
 
     // Internal operation properties which are used to manage the scheduling of dependencies
-    internal private(set) var evaluateConditionsOperation: GroupOperation? = .None
+    internal private(set) var evaluateConditionsOperation: GroupOperation? = .none
 
     private var _cancelled = false  // should always be set by .cancel()
 
-    /// Access the internal errors collected by the Operation
-    public var errors: [ErrorType] {
+    /// Access the internal errors collected by the Procedure
+    public var errors: [ErrorProtocol] {
         return stateLock.withCriticalScope { _internalErrors }
     }
 
     /**
-     Expresses the user intent in regards to the execution of this Operation.
+     Expresses the user intent in regards to the execution of this Procedure.
 
      Setting this property will set the appropriate quality of service parameter
-     on the Operation.
+     on the Procedure.
 
      - requires: self must not have started yet. i.e. either hasn't been added
      to a queue, or is waiting on dependencies.
      */
-    public var userIntent: UserIntent = .None {
+    public var userIntent: UserIntent = .none {
         didSet {
             setQualityOfServiceFromUserIntent(userIntent)
         }
@@ -132,29 +132,29 @@ public class Operation: NSOperation {
 
      - returns: a Bool indicating whether or not the quality of service is .UserInitiated
     */
-    @available(*, unavailable, message="This property has been deprecated in favor of userIntent.")
+    @available(*, unavailable, message: "This property has been deprecated in favor of userIntent.")
     public var userInitiated: Bool {
         get {
-            return qualityOfService == .UserInitiated
+            return qualityOfService == .userInitiated
         }
         set {
-            precondition(state < .Executing, "Cannot modify userInitiated after execution has begun.")
-            qualityOfService = newValue ? .UserInitiated : .Default
+            precondition(state < .executing, "Cannot modify userInitiated after execution has begun.")
+            qualityOfService = newValue ? .userInitiated : .default
         }
     }
 
     /**
-     # Access the logger for this Operation
+     # Access the logger for this Procedure
      The `log` property can be used as the interface to access the logger.
      e.g. to output a message with `LogSeverity.Info` from inside
-     the `Operation`, do this:
+     the `Procedure`, do this:
 
     ```swift
     log.info("This is my message")
     ```
 
      To adjust the instance severity of the LoggerType for the
-     `Operation`, access it via this property too:
+     `Procedure`, access it via this property too:
 
     ```swift
     log.severity = .Verbose
@@ -183,7 +183,7 @@ public class Operation: NSOperation {
             return _log.read { _LoggerOperationContext(parentLogger: $0, operationName: operationName) }
         }
         set {
-            _log.write { (inout ward: LoggerType) in
+            _log.write { (ward: inout LoggerType) in
                 ward = newValue
             }
         }
@@ -205,16 +205,16 @@ public class Operation: NSOperation {
      Used for GroupOperation to implement proper .Finished state-handling
      (only finishing after all child operations have finished).
 
-     The default behavior of Operation is to automatically call finish()
+     The default behavior of Procedure is to automatically call finish()
      when:
         (a) it's cancelled, whether that occurs:
-            - prior to the Operation starting
-              (in which case, Operation will skip calling execute())
+            - prior to the Procedure starting
+              (in which case, Procedure will skip calling execute())
             - on another thread at the same time that the operation is
               executing
         (b) when willExecuteObservers log errors
 
-     To ensure that an Operation subclass does not finish until the
+     To ensure that an Procedure subclass does not finish until the
      subclass calls finish():
      call `super.init(disableAutomaticFinishing: true)` in the init.
 
@@ -248,10 +248,10 @@ public class Operation: NSOperation {
      to a queue, or is waiting on dependencies.
      - parameter condition: type conforming to protocol `OperationCondition`.
      */
-    @available(iOS, deprecated=8, message="Refactor OperationCondition types as Condition subclasses.")
-    @available(OSX, deprecated=10.10, message="Refactor OperationCondition types as Condition subclasses.")
-    public func addCondition(condition: OperationCondition) {
-        assert(state < .Executing, "Cannot modify conditions after operation has begun executing, current state: \(state).")
+    @available(iOS, deprecated: 8, message: "Refactor OperationCondition types as Condition subclasses.")
+    @available(OSX, deprecated: 10.10, message: "Refactor OperationCondition types as Condition subclasses.")
+    public func addCondition(_ condition: OperationCondition) {
+        assert(state < .executing, "Cannot modify conditions after operation has begun executing, current state: \(state).")
         let operation = WrappedOperationCondition(condition)
         if let dependency = condition.dependencyForOperation(self) {
             operation.addDependency(dependency)
@@ -259,8 +259,8 @@ public class Operation: NSOperation {
         conditions.insert(operation)
     }
 
-    public func addCondition(condition: Condition) {
-        assert(state < .Executing, "Cannot modify conditions after operation has begun executing, current state: \(state).")
+    public func addCondition(_ condition: Condition) {
+        assert(state < .executing, "Cannot modify conditions after operation has begun executing, current state: \(state).")
         conditions.insert(condition)
     }
 
@@ -274,7 +274,7 @@ public class Operation: NSOperation {
      to a queue, or is waiting on dependencies.
      - parameter observer: type conforming to protocol `OperationObserverType`.
      */
-    public func addObserver(observer: OperationObserverType) {
+    public func addObserver(_ observer: OperationObserverType) {
 
         observers.append(observer)
 
@@ -298,8 +298,8 @@ public class Operation: NSOperation {
 
      - parameter errors: an array of `ErrorType`.
      */
-    @available(*, unavailable, renamed="operationDidFinish")
-    public func finished(errors: [ErrorType]) {
+    @available(*, unavailable, renamed: "operationDidFinish")
+    public func finished(_ errors: [ErrorProtocol]) {
         operationDidFinish(errors)
     }
 
@@ -309,7 +309,7 @@ public class Operation: NSOperation {
 
      - parameter errors: an array of `ErrorType`.
      */
-    public func operationWillFinish(errors: [ErrorType]) { /* No op */ }
+    public func operationWillFinish(_ errors: [ErrorProtocol]) { /* No op */ }
 
     /**
      Subclasses may override `operationDidFinish(_:)` if they wish to
@@ -317,7 +317,7 @@ public class Operation: NSOperation {
 
      - parameter errors: an array of `ErrorType`.
      */
-    public func operationDidFinish(errors: [ErrorType]) { /* no op */ }
+    public func operationDidFinish(_ errors: [ErrorProtocol]) { /* no op */ }
 
     // MARK: - Cancellation
 
@@ -326,7 +326,7 @@ public class Operation: NSOperation {
 
      - parameter error: an optional `ErrorType`.
      */
-    public func cancelWithError(error: ErrorType? = .None) {
+    public func cancelWithError(_ error: ErrorProtocol? = .none) {
         cancelWithErrors(error.map { [$0] } ?? [])
     }
 
@@ -335,7 +335,7 @@ public class Operation: NSOperation {
 
      - parameter errors: an `[ErrorType]` defaults to empty array.
      */
-    public func cancelWithErrors(errors: [ErrorType] = []) {
+    public func cancelWithErrors(_ errors: [ErrorProtocol] = []) {
         stateLock.withCriticalScope {
             if !errors.isEmpty {
                 log.warning("Did cancel with errors: \(errors).")
@@ -351,7 +351,7 @@ public class Operation: NSOperation {
 
      - parameter errors: an array of `ErrorType`.
      */
-    public func operationWillCancel(errors: [ErrorType]) { /* No op */ }
+    public func operationWillCancel(_ errors: [ErrorProtocol]) { /* No op */ }
 
     /**
      Subclasses may override `operationDidCancel(_:)` if they wish to
@@ -364,7 +364,7 @@ public class Operation: NSOperation {
     public final override func cancel() {
         let willCancel = stateLock.withCriticalScope { _ -> Bool in
             // Do not cancel if already finished or finishing, or cancelled
-            guard state <= .Executing && !_cancelled else { return false }
+            guard state <= .executing && !_cancelled else { return false }
             // Only a single call to cancel should continue
             guard !_isHandlingCancel else { return false }
             _isHandlingCancel = true
@@ -374,7 +374,7 @@ public class Operation: NSOperation {
         guard willCancel else { return }
 
         operationWillCancel(errors)
-        willChangeValueForKey(NSOperation.KeyPath.Cancelled.rawValue)
+        willChangeValue(forKey: Operation.KeyPath.Cancelled.rawValue)
         willCancelObservers.forEach { $0.willCancelOperation(self, errors: self.errors) }
 
         stateLock.withCriticalScope {
@@ -384,14 +384,14 @@ public class Operation: NSOperation {
         operationDidCancel()
         didCancelObservers.forEach { $0.didCancelOperation(self) }
         log.verbose("Did cancel.")
-        didChangeValueForKey(NSOperation.KeyPath.Cancelled.rawValue)
+        didChangeValue(forKey: Operation.KeyPath.Cancelled.rawValue)
 
         // Call super.cancel() to trigger .isReady state change on cancel
         // as well as isReady KVO notification.
         super.cancel()
 
         let willFinish = stateLock.withCriticalScope { () -> Bool in
-            let willFinish = executing && !disableAutomaticFinishing && !_isHandlingFinish
+            let willFinish = isExecuting && !disableAutomaticFinishing && !_isHandlingFinish
             if willFinish {
                 _isHandlingFinish = true
             }
@@ -407,7 +407,7 @@ public class Operation: NSOperation {
 
 // MARK: - State
 
-public extension Operation {
+public extension Procedure {
 
     private var state: State {
         get {
@@ -415,41 +415,41 @@ public extension Operation {
         }
         set (newState) {
             stateLock.withCriticalScope {
-                assert(_state.canTransitionToState(newState, whenCancelled: cancelled), "Attempting to perform illegal cyclic state transition, \(_state) -> \(newState) for operation: \(identity).")
+                assert(_state.canTransitionToState(newState, whenCancelled: isCancelled), "Attempting to perform illegal cyclic state transition, \(_state) -> \(newState) for operation: \(identity).")
                 log.verbose("\(_state) -> \(newState)")
                 _state = newState
             }
         }
     }
 
-    /// Boolean indicator for whether the Operation is currently executing or not
-    final override var executing: Bool {
-        return state == .Executing
+    /// Boolean indicator for whether the Procedure is currently executing or not
+    final override var isExecuting: Bool {
+        return state == .executing
     }
 
-    /// Boolean indicator for whether the Operation has finished or not
-    final override var finished: Bool {
-        return state == .Finished
+    /// Boolean indicator for whether the Procedure has finished or not
+    final override var isFinished: Bool {
+        return state == .finished
     }
 
-    /// Boolean indicator for whether the Operation has cancelled or not
-    final override var cancelled: Bool {
+    /// Boolean indicator for whether the Procedure has cancelled or not
+    final override var isCancelled: Bool {
         return stateLock.withCriticalScope { _cancelled }
     }
 
-    /// Boolean flag to indicate that the Operation failed due to errors.
+    /// Boolean flag to indicate that the Procedure failed due to errors.
     var failed: Bool {
         return errors.count > 0
     }
 
     internal func willEnqueue() {
-        state = .Pending
+        state = .pending
     }
 }
 
 // MARK: - Dependencies
 
-public extension Operation {
+public extension Procedure {
 
     internal func evaluateConditions() -> GroupOperation {
 
@@ -463,7 +463,7 @@ public extension Operation {
             return evaluator
         }
 
-        assert(state <= .Executing, "Dependencies cannot be modified after execution has begun, current state: \(state).")
+        assert(state <= .executing, "Dependencies cannot be modified after execution has begun, current state: \(state).")
 
         let evaluator = createEvaluateConditionsOperation()
 
@@ -482,25 +482,25 @@ public extension Operation {
         return evaluator
     }
 
-    internal func addDependencyOnPreviousMutuallyExclusiveOperation(operation: Operation) {
-        precondition(state <= .Executing, "Dependencies cannot be modified after execution has begun, current state: \(state).")
+    internal func addDependencyOnPreviousMutuallyExclusiveOperation(_ operation: Procedure) {
+        precondition(state <= .executing, "Dependencies cannot be modified after execution has begun, current state: \(state).")
         super.addDependency(operation)
     }
 
-    internal func addDirectDependency(directDependency: NSOperation) {
-        precondition(state <= .Executing, "Dependencies cannot be modified after execution has begun, current state: \(state).")
+    internal func addDirectDependency(_ directDependency: Operation) {
+        precondition(state <= .executing, "Dependencies cannot be modified after execution has begun, current state: \(state).")
         directDependencies.insert(directDependency)
         super.addDependency(directDependency)
     }
 
-    internal func removeDirectDependency(directDependency: NSOperation) {
-        precondition(state <= .Executing, "Dependencies cannot be modified after execution has begun, current state: \(state).")
+    internal func removeDirectDependency(_ directDependency: Operation) {
+        precondition(state <= .executing, "Dependencies cannot be modified after execution has begun, current state: \(state).")
         directDependencies.remove(directDependency)
         super.removeDependency(directDependency)
     }
 
     /// Public override to get the dependencies
-    final override var dependencies: [NSOperation] {
+    final override var dependencies: [Operation] {
         return Array(directDependencies.union(indirectDependencies))
     }
 
@@ -513,8 +513,8 @@ public extension Operation {
      to a queue, or is waiting on dependencies.
      - parameter operation: a `NSOperation` instance.
      */
-    final override func addDependency(operation: NSOperation) {
-        precondition(state <= .Executing, "Dependencies cannot be modified after execution has begun, current state: \(state).")
+    final override func addDependency(_ operation: Operation) {
+        precondition(state <= .executing, "Dependencies cannot be modified after execution has begun, current state: \(state).")
         addDirectDependency(operation)
     }
 
@@ -528,22 +528,22 @@ public extension Operation {
      to a queue, or is waiting on dependencies.
      - parameter operation: a `NSOperation` instance.
      */
-    final override func removeDependency(operation: NSOperation) {
-        precondition(state <= .Executing, "Dependencies cannot be modified after execution has begun, current state: \(state).")
+    final override func removeDependency(_ operation: Operation) {
+        precondition(state <= .executing, "Dependencies cannot be modified after execution has begun, current state: \(state).")
         removeDirectDependency(operation)
     }
 }
 
 // MARK: - Observers
 
-public extension Operation {
+public extension Procedure {
 
     private(set) var observers: [OperationObserverType] {
         get {
             return _observers.read { $0 }
         }
         set {
-            _observers.write { (inout ward: [OperationObserverType]) in
+            _observers.write { (ward: inout [OperationObserverType]) in
                 ward = newValue
             }
         }
@@ -576,13 +576,13 @@ public extension Operation {
 
 // MARK: - Execution
 
-public extension Operation {
+public extension Procedure {
 
     /// Starts the operation, correctly managing the cancelled state. Cannot be over-ridden
     final override func start() {
         // Don't call super.start
 
-        guard !cancelled || disableAutomaticFinishing else {
+        guard !isCancelled || disableAutomaticFinishing else {
             finish()
             return
         }
@@ -596,65 +596,65 @@ public extension Operation {
         // Inform observers that the operation will execute
         willExecuteObservers.forEach { $0.willExecuteOperation(self) }
 
-        let nextState = stateLock.withCriticalScope { () -> (Operation.State?) in
-            assert(!executing, "Operation is attempting to execute, but is already executing.")
+        let nextState = stateLock.withCriticalScope { () -> (Procedure.State?) in
+            assert(!isExecuting, "Procedure is attempting to execute, but is already executing.")
             guard !_isTransitioningToExecuting else {
-                assertionFailure("Operation is attempting to execute twice, concurrently.")
+                assertionFailure("Procedure is attempting to execute twice, concurrently.")
                 return nil
             }
 
             // Check to see if the operation has now been finished
             // by an observer (or anything else)
-            guard state <= .Pending else { return nil }
+            guard state <= .pending else { return nil }
 
             // Check to see if the operation has now been cancelled
             // by an observer
-            guard (_internalErrors.isEmpty && !cancelled) || disableAutomaticFinishing else {
+            guard (_internalErrors.isEmpty && !isCancelled) || disableAutomaticFinishing else {
                 _isHandlingFinish = true
-                return Operation.State.Finishing
+                return Procedure.State.finishing
             }
 
             // Transition to the .isExecuting state, and explicitly send the required KVO change notifications
             _isTransitioningToExecuting = true
-            return Operation.State.Executing
+            return Procedure.State.executing
         }
 
-        guard nextState != .Finishing else {
+        guard nextState != .finishing else {
             _finish([], fromCancel: true)
             return
         }
 
-        guard nextState == .Executing else { return }
+        guard nextState == .executing else { return }
 
-        willChangeValueForKey(NSOperation.KeyPath.Executing.rawValue)
+        willChangeValue(forKey: Operation.KeyPath.Executing.rawValue)
 
-        let nextState2 = stateLock.withCriticalScope { () -> (Operation.State?) in
+        let nextState2 = stateLock.withCriticalScope { () -> (Procedure.State?) in
             // Re-check state, since it could have changed on another thread (ex. via finish)
-            guard state <= .Pending else { return nil }
+            guard state <= .pending else { return nil }
 
-            state = .Executing
+            state = .executing
             _isTransitioningToExecuting = false
 
-            if cancelled && !disableAutomaticFinishing && !_isHandlingFinish {
-                // Operation was cancelled, automatic finishing is enabled,
+            if isCancelled && !disableAutomaticFinishing && !_isHandlingFinish {
+                // Procedure was cancelled, automatic finishing is enabled,
                 // but cancel is not (yet/ever?) handling the finish.
                 // Because cancel could have already passed the check for executing,
                 // handle calling finish here.
                 _isHandlingFinish = true
-                return .Finishing
+                return .finishing
             }
-            return .Executing
+            return .executing
         }
 
         // Always send the closing didChangeValueForKey
-        didChangeValueForKey(NSOperation.KeyPath.Executing.rawValue)
+        didChangeValue(forKey: Operation.KeyPath.Executing.rawValue)
 
-        guard nextState2 != .Finishing else {
+        guard nextState2 != .finishing else {
             _finish([], fromCancel: true)
             return
         }
 
-        guard nextState2 == .Executing else { return }
+        guard nextState2 == .executing else { return }
 
         log.verbose("Will Execute")
 
@@ -666,8 +666,8 @@ public extension Operation {
 
      - parameter operation: a `NSOperation` instance.
      */
-    final func produceOperation(operation: NSOperation) {
-        precondition(state > .Initialized, "Cannot produce operation while not being scheduled on a queue.")
+    final func produceOperation(_ operation: Operation) {
+        precondition(state > .initialized, "Cannot produce operation while not being scheduled on a queue.")
         log.verbose("Did produce \(operation.operationName)")
         didProduceOperationObservers.forEach { $0.operation(self, didProduceOperation: operation) }
     }
@@ -675,7 +675,7 @@ public extension Operation {
 
 // MARK: - Finishing
 
-public extension Operation {
+public extension Procedure {
 
     /**
      Finish method which must be called eventually after an operation has
@@ -683,14 +683,14 @@ public extension Operation {
 
      - parameter errors: an array of `ErrorType`, which defaults to empty.
      */
-    final func finish(receivedErrors: [ErrorType] = []) {
+    final func finish(_ receivedErrors: [ErrorProtocol] = []) {
         _finish(receivedErrors, fromCancel: false)
     }
 
-    private final func _finish(receivedErrors: [ErrorType], fromCancel: Bool = false) {
+    private final func _finish(_ receivedErrors: [ErrorProtocol], fromCancel: Bool = false) {
         let willFinish = stateLock.withCriticalScope { _ -> Bool in
             // Do not finish if already finished or finishing
-            guard state <= .Finishing else { return false }
+            guard state <= .finishing else { return false }
             // Only a single call to _finish should continue
             // (.cancel() sets _isHandlingFinish and fromCancel=true, if appropriate.)
             guard !_isHandlingFinish || fromCancel else { return false }
@@ -705,21 +705,21 @@ public extension Operation {
         //   be held when notifying observers (whether via KVO or Operation's
         //   observers) or deadlock can result.
 
-        let changedExecutingState = executing
+        let changedExecutingState = isExecuting
         if changedExecutingState {
-            willChangeValueForKey(NSOperation.KeyPath.Executing.rawValue)
+            willChangeValue(forKey: Operation.KeyPath.Executing.rawValue)
         }
 
         stateLock.withCriticalScope {
-            state = .Finishing
+            state = .finishing
         }
 
         if changedExecutingState {
-            didChangeValueForKey(NSOperation.KeyPath.Executing.rawValue)
+            didChangeValue(forKey: Operation.KeyPath.Executing.rawValue)
         }
 
-        let errors = stateLock.withCriticalScope { () -> [ErrorType] in
-            _internalErrors.appendContentsOf(receivedErrors)
+        let errors = stateLock.withCriticalScope { () -> [ErrorProtocol] in
+            _internalErrors.append(contentsOf: receivedErrors)
             return _internalErrors
         }
 
@@ -731,11 +731,11 @@ public extension Operation {
         }
 
         operationWillFinish(errors)
-        willChangeValueForKey(NSOperation.KeyPath.Finished.rawValue)
+        willChangeValue(forKey: Operation.KeyPath.Finished.rawValue)
         willFinishObservers.forEach { $0.willFinishOperation(self, errors: errors) }
 
         stateLock.withCriticalScope {
-            state = .Finished
+            state = .finished
         }
 
         operationDidFinish(errors)
@@ -744,11 +744,11 @@ public extension Operation {
         let message = !errors.isEmpty ? "errors: \(errors)" : "no errors"
         log.verbose("Did finish with \(message)")
 
-        didChangeValueForKey(NSOperation.KeyPath.Finished.rawValue)
+        didChangeValue(forKey: Operation.KeyPath.Finished.rawValue)
     }
 
     /// Convenience method to simplify finishing when there is only one error.
-    final func finish(receivedError: ErrorType?) {
+    final func finish(_ receivedError: ErrorProtocol?) {
         finish(receivedError.map { [$0]} ?? [])
     }
 
@@ -765,11 +765,11 @@ public extension Operation {
     }
 }
 
-private func < (lhs: Operation.State, rhs: Operation.State) -> Bool {
+private func < (lhs: Procedure.State, rhs: Procedure.State) -> Bool {
     return lhs.rawValue < rhs.rawValue
 }
 
-private func == (lhs: Operation.State, rhs: Operation.State) -> Bool {
+private func == (lhs: Procedure.State, rhs: Procedure.State) -> Bool {
     return lhs.rawValue == rhs.rawValue
 }
 
@@ -777,26 +777,26 @@ private func == (lhs: Operation.State, rhs: Operation.State) -> Bool {
 A common error type for Operations. Primarily used to indicate error when
 an Operation's conditions fail.
 */
-public enum OperationError: ErrorType, Equatable {
+public enum OperationError: ErrorProtocol, Equatable {
 
-    /// Indicates that a condition of the Operation failed.
-    case ConditionFailed
+    /// Indicates that a condition of the Procedure failed.
+    case conditionFailed
 
     /// Indicates that the operation timed out.
-    case OperationTimedOut(NSTimeInterval)
+    case operationTimedOut(TimeInterval)
 
     /// Indicates that a parent operation was cancelled (with errors).
-    case ParentOperationCancelledWithErrors([ErrorType])
+    case parentOperationCancelledWithErrors([ErrorProtocol])
 }
 
 /// OperationError is Equatable.
 public func == (lhs: OperationError, rhs: OperationError) -> Bool {
     switch (lhs, rhs) {
-    case (.ConditionFailed, .ConditionFailed):
+    case (.conditionFailed, .conditionFailed):
         return true
-    case let (.OperationTimedOut(aTimeout), .OperationTimedOut(bTimeout)):
+    case let (.operationTimedOut(aTimeout), .operationTimedOut(bTimeout)):
         return aTimeout == bTimeout
-    case let (.ParentOperationCancelledWithErrors(aErrors), .ParentOperationCancelledWithErrors(bErrors)):
+    case let (.parentOperationCancelledWithErrors(aErrors), .parentOperationCancelledWithErrors(bErrors)):
         // Not possible to do a real equality check here.
         return aErrors.count == bErrors.count
     default:
@@ -804,14 +804,14 @@ public func == (lhs: OperationError, rhs: OperationError) -> Bool {
     }
 }
 
-extension NSOperation {
+extension Operation {
 
     /**
     Chain completion blocks.
 
     - parameter block: a Void -> Void block
     */
-    public func addCompletionBlock(block: Void -> Void) {
+    public func addCompletionBlock(_ block: (Void) -> Void) {
         if let existing = completionBlock {
             completionBlock = {
                 existing()
@@ -829,8 +829,8 @@ extension NSOperation {
 
     - parameter dependencies: and array of `NSOperation` instances.
     */
-    public func addDependencies<S where S: SequenceType, S.Generator.Element: NSOperation>(dependencies: S) {
-        precondition(!executing && !finished, "Cannot modify the dependencies after the operation has started executing.")
+    public func addDependencies<S where S: Sequence, S.Iterator.Element: Operation>(_ dependencies: S) {
+        precondition(!isExecuting && !isFinished, "Cannot modify the dependencies after the operation has started executing.")
         dependencies.forEach(addDependency)
     }
 
@@ -840,8 +840,8 @@ extension NSOperation {
 
      - parameter dependencies: and array of `NSOperation` instances.
      */
-    public func removeDependencies<S where S: SequenceType, S.Generator.Element: NSOperation>(dependencies: S) {
-        precondition(!executing && !finished, "Cannot modify the dependencies after the operation has started executing.")
+    public func removeDependencies<S where S: Sequence, S.Iterator.Element: Operation>(_ dependencies: S) {
+        precondition(!isExecuting && !isFinished, "Cannot modify the dependencies after the operation has started executing.")
         dependencies.forEach(removeDependency)
     }
 
@@ -850,12 +850,12 @@ extension NSOperation {
         removeDependencies(dependencies)
     }
 
-    internal func setQualityOfServiceFromUserIntent(userIntent: Operation.UserIntent) {
+    internal func setQualityOfServiceFromUserIntent(_ userIntent: Procedure.UserIntent) {
         qualityOfService = userIntent.qos
     }
 }
 
-private extension NSOperation {
+private extension Operation {
     enum KeyPath: String {
         case Cancelled = "isCancelled"
         case Executing = "isExecuting"
@@ -863,8 +863,8 @@ private extension NSOperation {
     }
 }
 
-extension NSLock {
-    func withCriticalScope<T>(@noescape block: () -> T) -> T {
+extension Foundation.Lock {
+    func withCriticalScope<T>(_ block: @noescape () -> T) -> T {
         lock()
         let value = block()
         unlock()
@@ -872,8 +872,8 @@ extension NSLock {
     }
 }
 
-extension NSRecursiveLock {
-    func withCriticalScope<T>(@noescape block: () -> T) -> T {
+extension RecursiveLock {
+    func withCriticalScope<T>(_ block: @noescape () -> T) -> T {
         lock()
         let value = block()
         unlock()
@@ -881,12 +881,12 @@ extension NSRecursiveLock {
     }
 }
 
-extension Array where Element: NSOperation {
+extension Array where Element: Operation {
 
-    internal var splitNSOperationsAndOperations: ([NSOperation], [Operation]) {
+    internal var splitNSOperationsAndOperations: ([Operation], [Procedure]) {
         return reduce(([], [])) { result, element in
             var (ns, op) = result
-            if let operation = element as? Operation {
+            if let operation = element as? Procedure {
                 op.append(operation)
             }
             else {
@@ -896,16 +896,16 @@ extension Array where Element: NSOperation {
         }
     }
 
-    internal var userIntent: Operation.UserIntent {
+    internal var userIntent: Procedure.UserIntent {
         get {
             let (_, ops) = splitNSOperationsAndOperations
-            return ops.map { $0.userIntent }.maxElement { $0.rawValue < $1.rawValue } ?? .None
+            return ops.map { $0.userIntent }.max { $0.rawValue < $1.rawValue } ?? .none
         }
     }
 
-    internal func forEachOperation(@noescape body: (Operation) throws -> Void) rethrows {
+    internal func forEachOperation(body: @noescape (Procedure) throws -> Void) rethrows {
         try forEach {
-            if let operation = $0 as? Operation {
+            if let operation = $0 as? Procedure {
                 try body(operation)
             }
         }

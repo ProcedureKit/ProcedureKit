@@ -10,7 +10,7 @@ import Contacts
 import ContactsUI
 
 @available(iOS 9.0, *)
-public typealias ContactViewControllerConfigurationBlock = CNContactViewController -> Void
+public typealias ContactViewControllerConfigurationBlock = (CNContactViewController) -> Void
 
 @available(iOS 9.0, *)
 final public class DisplayContactViewController<F: PresentingViewController>: GroupOperation {
@@ -20,13 +20,13 @@ final public class DisplayContactViewController<F: PresentingViewController>: Gr
     let get: GetContacts
     let configuration: ContactViewControllerConfigurationBlock?
 
-    var operation: UIOperation<CNContactViewController, F>? = .None
+    var operation: UIOperation<CNContactViewController, F>? = .none
 
     public var contactViewController: CNContactViewController? {
         return operation?.controller
     }
 
-    public init(identifier: String, displayControllerFrom from: ViewControllerDisplayStyle<F>, delegate: CNContactViewControllerDelegate, sender: AnyObject? = .None, configuration: ContactViewControllerConfigurationBlock? = .None) {
+    public init(identifier: String, displayControllerFrom from: ViewControllerDisplayStyle<F>, delegate: CNContactViewControllerDelegate, sender: AnyObject? = .none, configuration: ContactViewControllerConfigurationBlock? = .none) {
         self.from = from
         self.sender = sender
         self.get = GetContacts(identifier: identifier, keysToFetch: [CNContactViewController.descriptorForRequiredKeys()])
@@ -35,13 +35,13 @@ final public class DisplayContactViewController<F: PresentingViewController>: Gr
         name = "Display Contact View Controller"
     }
 
-    public func createViewControllerForContact(contact: CNContact) -> CNContactViewController {
-        let vc = CNContactViewController(forContact: contact)
+    public func createViewControllerForContact(_ contact: CNContact) -> CNContactViewController {
+        let vc = CNContactViewController(for: contact)
         configuration?(vc)
         return vc
     }
 
-    public override func willFinishOperation(finished: NSOperation) {
+    public override func willFinishOperation(_ finished: Operation) {
         if finished == get, let contact = get.contact {
             operation = UIOperation(controller: createViewControllerForContact(contact), displayControllerFrom: from, sender: sender)
             addOperation(operation!)
@@ -50,7 +50,7 @@ final public class DisplayContactViewController<F: PresentingViewController>: Gr
 }
 
 @available(iOS 9.0, *)
-final public class DisplayCreateContactViewController<F: PresentingViewController>: Operation {
+final public class DisplayCreateContactViewController<F: PresentingViewController>: Procedure {
 
     let configuration: ContactViewControllerConfigurationBlock?
     let operation: UIOperation<CNContactViewController, F>
@@ -59,9 +59,9 @@ final public class DisplayCreateContactViewController<F: PresentingViewControlle
         return operation.controller
     }
 
-    public init(displayControllerFrom from: ViewControllerDisplayStyle<F>, delegate: CNContactViewControllerDelegate, sender: AnyObject? = .None, configuration: ContactViewControllerConfigurationBlock? = .None) {
+    public init(displayControllerFrom from: ViewControllerDisplayStyle<F>, delegate: CNContactViewControllerDelegate, sender: AnyObject? = .none, configuration: ContactViewControllerConfigurationBlock? = .none) {
 
-        let controller = CNContactViewController(forNewContact: .None)
+        let controller = CNContactViewController(forNewContact: .none)
         controller.contactStore = CNContactStore()
         controller.delegate = delegate
         self.operation = UIOperation(controller: controller, displayControllerFrom: from, sender: sender)

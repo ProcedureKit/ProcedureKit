@@ -11,20 +11,20 @@ import CoreLocation
 
 // MARK: Consumer Interfaces -
 
-@available(*, unavailable, renamed="UserLocationOperation")
+@available(*, unavailable, renamed: "UserLocationOperation")
 public typealias LocationOperation = UserLocationOperation
 
 // MARK: - Implementation Details -
 
 public protocol LocationManagerType: LocationCapabilityRegistrarType {
-    func opr_setDesiredAccuracy(desiredAccuracy: CLLocationAccuracy)
+    func opr_setDesiredAccuracy(_ desiredAccuracy: CLLocationAccuracy)
     func opr_startUpdatingLocation()
     func opr_stopLocationUpdates()
 }
 
 extension CLLocationManager: LocationManagerType {
 
-    public func opr_setDesiredAccuracy(accuracy: CLLocationAccuracy) {
+    public func opr_setDesiredAccuracy(_ accuracy: CLLocationAccuracy) {
         desiredAccuracy = accuracy
     }
 
@@ -44,15 +44,15 @@ internal extension CLLocationManager {
     }
 }
 
-public enum LocationOperationError: ErrorType, Equatable {
-    case LocationManagerDidFail(NSError)
-    case GeocoderError(NSError)
+public enum LocationOperationError: ErrorProtocol, Equatable {
+    case locationManagerDidFail(NSError)
+    case geocoderError(NSError)
 }
 
 // MARK: - UserLocationOperation
 
-public class UserLocationOperation: Operation, CLLocationManagerDelegate, ResultOperationType {
-    public typealias CompletionBlockType = CLLocation -> Void
+public class UserLocationOperation: Procedure, CLLocationManagerDelegate, ResultOperationType {
+    public typealias CompletionBlockType = (CLLocation) -> Void
 
     private let accuracy: CLLocationAccuracy
     private let completion: CompletionBlockType
@@ -70,7 +70,7 @@ public class UserLocationOperation: Operation, CLLocationManagerDelegate, Result
     }
 
     /// - returns: the CLLocation if available
-    public private(set) var location: CLLocation? = .None
+    public private(set) var location: CLLocation? = .none
 
     /// - returns: the CLLocation if available
     public var result: CLLocation? {
@@ -87,14 +87,14 @@ public class UserLocationOperation: Operation, CLLocationManagerDelegate, Result
     public init(accuracy: CLLocationAccuracy = kCLLocationAccuracyThreeKilometers, completion: CompletionBlockType = { _ in }) {
         self.accuracy = accuracy
         self.completion = completion
-        self.capability = Capability.Location(.WhenInUse)
+        self.capability = Capability.Location(.whenInUse)
         super.init()
         name = "User Location"
         capability.registrar = manager
         addCondition(AuthorizedFor(capability))
         addCondition(MutuallyExclusive<CLLocationManager>())
         addObserver(DidCancelObserver { [weak self] _ in
-            dispatch_async(Queue.Main.queue) {
+            Queue.main.queue.async {
                 self?.stopLocationUpdates()
             }
         })
@@ -116,13 +116,13 @@ public class UserLocationOperation: Operation, CLLocationManagerDelegate, Result
         manager.opr_setDelegate(nil)
     }
 
-    @objc public func locationManager(manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        if !finished, let location = locations.last {
+    @objc public func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        if !isFinished, let location = locations.last {
             log.info("Updated last location: \(location)")
             if location.horizontalAccuracy <= accuracy {
-                dispatch_async(Queue.Main.queue) { [weak self] in
+                Queue.main.queue.async { [weak self] in
                     if let weakSelf = self {
-                        if !weakSelf.finished {
+                        if !weakSelf.isFinished {
                             weakSelf.stopLocationUpdates()
                             weakSelf.location = location
                             weakSelf.completion(location)
@@ -134,11 +134,11 @@ public class UserLocationOperation: Operation, CLLocationManagerDelegate, Result
         }
     }
 
-    @objc public func locationManager(manager: CLLocationManager, didFailWithError error: NSError) {
-        dispatch_async(Queue.Main.queue) { [weak self] in
+    @objc public func locationManager(_ manager: CLLocationManager, didFailWithError error: NSError) {
+        Queue.main.queue.async { [weak self] in
             if let weakSelf = self {
                 weakSelf.stopLocationUpdates()
-                weakSelf.finish(LocationOperationError.LocationManagerDidFail(error))
+                weakSelf.finish(LocationOperationError.locationManagerDidFail(error))
             }
         }
     }
@@ -148,7 +148,7 @@ public class UserLocationOperation: Operation, CLLocationManagerDelegate, Result
 
 public protocol ReverseGeocoderType {
     func opr_cancel()
-    func opr_reverseGeocodeLocation(location: CLLocation, completion: ([CLPlacemark], NSError?) -> Void)
+    func opr_reverseGeocodeLocation(_ location: CLLocation, completion: ([CLPlacemark], NSError?) -> Void)
 }
 
 extension CLGeocoder: ReverseGeocoderType {
@@ -157,7 +157,7 @@ extension CLGeocoder: ReverseGeocoderType {
         cancelGeocode()
     }
 
-    public func opr_reverseGeocodeLocation(location: CLLocation, completion: ([CLPlacemark], NSError?) -> Void) {
+    public func opr_reverseGeocodeLocation(_ location: CLLocation, completion: ([CLPlacemark], NSError?) -> Void) {
         reverseGeocodeLocation(location) { (results, error) in
             completion(results ?? [], error)
         }
@@ -171,9 +171,9 @@ internal extension CLGeocoder {
     }
 }
 
-public class ReverseGeocodeOperation: Operation, ResultOperationType {
+public class ReverseGeocodeOperation: Procedure, ResultOperationType {
 
-    public typealias CompletionBlockType = CLPlacemark -> Void
+    public typealias CompletionBlockType = (CLPlacemark) -> Void
 
     public let location: CLLocation
 
@@ -182,7 +182,7 @@ public class ReverseGeocodeOperation: Operation, ResultOperationType {
     private let completion: CompletionBlockType
 
     /// - returns: the CLPlacemark from the geocoder
-    public private(set) var placemark: CLPlacemark? = .None
+    public private(set) var placemark: CLPlacemark? = .none
 
     /// - returns: the CLPlacemark from the geocoder
     public var result: CLPlacemark? {
@@ -206,7 +206,7 @@ public class ReverseGeocodeOperation: Operation, ResultOperationType {
         addCondition(MutuallyExclusive<ReverseGeocodeOperation>())
         addObserver(DidCancelObserver { [weak self] _ in
             if let geocoder = self?.geocoder {
-                dispatch_async(Queue.Main.queue) {
+                Queue.main.queue.async {
                     geocoder.opr_cancel()
                 }
             }
@@ -215,11 +215,11 @@ public class ReverseGeocodeOperation: Operation, ResultOperationType {
 
     public override func execute() {
         geocoder.opr_reverseGeocodeLocation(location) { results, error in
-            dispatch_async(Queue.Main.queue) { [weak self] in
-                guard let weakSelf = self where !weakSelf.finished else { return }
+            Queue.main.queue.async { [weak self] in
+                guard let weakSelf = self, !weakSelf.isFinished else { return }
 
                 if let error = error {
-                    weakSelf.finish(LocationOperationError.GeocoderError(error))
+                    weakSelf.finish(LocationOperationError.geocoderError(error))
                 }
                 else if let placemark = results.first {
                     weakSelf.placemark = placemark
@@ -240,7 +240,7 @@ public class ReverseGeocodeUserLocationOperation: GroupOperation, ResultOperatio
 
     internal let userLocationOperation: UserLocationOperation
     internal var reverseGeocodeOperation: ReverseGeocodeOperation?
-    internal var geocoder: ReverseGeocoderType? = .None
+    internal var geocoder: ReverseGeocoderType? = .none
 
     /// - returns: the CLLocation if available
     public var location: CLLocation? {
@@ -273,8 +273,8 @@ public class ReverseGeocodeUserLocationOperation: GroupOperation, ResultOperatio
         addCondition(MutuallyExclusive<ReverseGeocodeUserLocationOperation>())
     }
 
-    public override func willFinishOperation(operation: NSOperation) {
-        guard userLocationOperation == operation && !operation.cancelled, let location = location else { return }
+    public override func willFinishOperation(_ operation: Operation) {
+        guard userLocationOperation == operation && !operation.isCancelled, let location = location else { return }
 
         let reverseOp = ReverseGeocodeOperation(location: location) { [unowned self] placemark in
             self.completion(location, placemark)
@@ -291,9 +291,9 @@ public class ReverseGeocodeUserLocationOperation: GroupOperation, ResultOperatio
 
 public func == (lhs: LocationOperationError, rhs: LocationOperationError) -> Bool {
     switch (lhs, rhs) {
-    case let (.LocationManagerDidFail(aError), .LocationManagerDidFail(bError)):
+    case let (.locationManagerDidFail(aError), .locationManagerDidFail(bError)):
         return aError == bError
-    case let (.GeocoderError(aError), .GeocoderError(bError)):
+    case let (.geocoderError(aError), .geocoderError(bError)):
         return aError == bError
     default:
         return false

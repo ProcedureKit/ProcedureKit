@@ -13,21 +13,21 @@ import XCTest
 class TestablePresentingController: NSObject, PresentingViewController {
     typealias CheckBlockType = (received: UIViewController) -> Void
 
-    var check: CheckBlockType? = .None
-    var expectation: XCTestExpectation? = .None
+    var check: CheckBlockType? = .none
+    var expectation: XCTestExpectation? = .none
 
-    func presentViewController(vc: UIViewController, animated: Bool, completion: (() -> Void)?) {
+    func presentViewController(_ vc: UIViewController, animated: Bool, completion: (() -> Void)?) {
         check?(received: vc)
         completion?()
         expectation?.fulfill()
     }
 
-    func showViewController(vc: UIViewController, sender: AnyObject?) {
+    func showViewController(_ vc: UIViewController, sender: AnyObject?) {
         check?(received: vc)
         expectation?.fulfill()
     }
 
-    func showDetailViewController(vc: UIViewController, sender: AnyObject?) {
+    func showDetailViewController(_ vc: UIViewController, sender: AnyObject?) {
         check?(received: vc)
         expectation?.fulfill()
     }
@@ -50,17 +50,17 @@ class ViewControllerDisplayStyleTests: XCTestCase {
     }
 
     func test__show_style_returns_controller() {
-        style = .Show(controller)
+        style = .show(controller)
         XCTAssertEqual(controller, style.controller)
     }
 
     func test__show_details_style_returns_controller() {
-        style = .ShowDetail(controller)
+        style = .showDetail(controller)
         XCTAssertEqual(controller, style.controller)
     }
 
     func test__present_style_returns_controller() {
-        style = .Present(controller)
+        style = .present(controller)
         XCTAssertEqual(controller, style.controller)
     }
 
@@ -69,8 +69,8 @@ class ViewControllerDisplayStyleTests: XCTestCase {
             XCTAssertEqual(received, self.other)
         }
 
-        style = .Show(controller)
-        style.displayController(other, sender: .None)
+        style = .show(controller)
+        style.displayController(other, sender: .none)
     }
 
     func test__show_detail_display_controller() {
@@ -78,8 +78,8 @@ class ViewControllerDisplayStyleTests: XCTestCase {
             XCTAssertEqual(received, self.other)
         }
 
-        style = .ShowDetail(controller)
-        style.displayController(other, sender: .None)
+        style = .showDetail(controller)
+        style.displayController(other, sender: .none)
     }
 
     func test__present_display_controller() {
@@ -91,8 +91,8 @@ class ViewControllerDisplayStyleTests: XCTestCase {
             XCTAssertEqual(nav.topViewController, self.other)
         }
 
-        style = .Present(controller)
-        style.displayController(other, sender: .None)
+        style = .present(controller)
+        style.displayController(other, sender: .none)
     }
 
     func test__present_display_controller_navigation_controller_wrapping_can_be_overridden() {
@@ -104,8 +104,8 @@ class ViewControllerDisplayStyleTests: XCTestCase {
             XCTFail("Should not have received a UINavigationController")
         }
 
-        style = .Present(controller)
-        style.displayController(other, inNavigationController: false, sender: .None)
+        style = .present(controller)
+        style.displayController(other, inNavigationController: false, sender: .none)
     }
 
     func test__present_display_alert_controller() {
@@ -114,8 +114,8 @@ class ViewControllerDisplayStyleTests: XCTestCase {
             XCTAssertEqual(received, alert)
         }
 
-        style = .Present(controller)
-        style.displayController(alert, sender: .None)
+        style = .present(controller)
+        style.displayController(alert, sender: .none)
     }
 }
 
@@ -141,23 +141,23 @@ class UIOperationTests: OperationTests {
     }
 
     func test__presents() {
-        let expectation = expectationWithDescription("Test: \(#function)")
+        let expectation = self.expectation(description: "Test: \(#function)")
 
         var completionBlockDidRun = false
-        operation = TypeUnderTest(controller: presented, displayControllerFrom: .Present(presenter), sender: .None)
+        operation = TypeUnderTest(controller: presented, displayControllerFrom: .present(presenter), sender: .none)
         operation.addCompletionBlock {
             completionBlockDidRun = true
             expectation.fulfill()
         }
 
         runOperation(operation)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForExpectations(timeout: 3, handler: nil)
 
         XCTAssertTrue(completionBlockDidRun)
     }
 
     func test__presents_with_navigation_controller_wrapping_by_default() {
-        let expectation = expectationWithDescription("Test: \(#function)")
+        let expectation = self.expectation(description: "Test: \(#function)")
 
         presenter.check = { [unowned self] received in
             guard let nav = received as? UINavigationController else {
@@ -168,14 +168,14 @@ class UIOperationTests: OperationTests {
             expectation.fulfill()
         }
 
-        operation = TypeUnderTest(controller: presented, displayControllerFrom: .Present(presenter), sender: .None)
+        operation = TypeUnderTest(controller: presented, displayControllerFrom: .present(presenter), sender: .none)
         runOperation(operation)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForExpectations(timeout: 3, handler: nil)
     }
 
 
     func test__presents_without_navigation_controller_when_wrapping_overridden() {
-        let expectation = expectationWithDescription("Test: \(#function)")
+        let expectation = self.expectation(description: "Test: \(#function)")
 
         presenter.check = { [unowned self] received in
             guard let _ = received as? UINavigationController else {
@@ -186,8 +186,8 @@ class UIOperationTests: OperationTests {
             XCTFail("Should not have received a UINavigationController")
         }
 
-        operation = TypeUnderTest(controller: presented, displayControllerFrom: .Present(presenter), inNavigationController: false, sender: .None)
+        operation = TypeUnderTest(controller: presented, displayControllerFrom: .present(presenter), inNavigationController: false, sender: .none)
         runOperation(operation)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForExpectations(timeout: 3, handler: nil)
     }
 }

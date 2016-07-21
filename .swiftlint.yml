@@ -5,6 +5,7 @@ disabled_rules:
   - statement_position
   - line_length
   - type_name
+  - conditional_binding_cascade
 file_length:
   warning: 500
   error: 1200

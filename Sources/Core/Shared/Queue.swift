@@ -21,55 +21,48 @@ import Foundation
  */
 public enum Queue {
 
-    internal final class Scheduler {
-
-        private var once: dispatch_once_t = 0
-        private var key: UInt8 = 0
-        private var context: UInt8 = 0
-
-        init(queue: dispatch_queue_t) {
-            dispatch_once(&once) {
-                dispatch_queue_set_specific(queue, &self.key, &self.context, nil)
-            }
-        }
-
-        var isScheduleQueue: Bool {
-            return dispatch_get_specific(&self.key) == &self.context
-        }
-    }
-
     /// returns: a Bool to indicate if the current queue is the main queue
     public static var isMainQueue: Bool {
-        return mainQueueScheduler.isScheduleQueue
+        setKeyOnMainQueue
+        return DispatchQueue.getSpecific(key: mainQueueKey) == 0
     }
 
     /// The main queue
-    case Main
+    case main
 
     /// The default QOS
-    case Default
+    case `default`
 
     /// Use for user initiated tasks which do not impact the UI. Such as data processing.
-    case Initiated
+    case initiated
 
     /// Use for user initiated tasks which do impact the UI - e.g. a rendering pipeline.
-    case Interactive
+    case interactive
 
     /// Use for non-user initiated task.
-    case Utility
+    case utility
 
     /// Backgound QOS is a severly limited class, should not be used for anything when the app is active.
-    case Background
+    case background
 
     // swiftlint:disable variable_name
-    private var qos_class: qos_class_t {
+    private var qos_attributes: DispatchQueueAttributes {
         switch self {
-        case .Main: return qos_class_main()
-        case .Default: return QOS_CLASS_DEFAULT
-        case .Initiated: return QOS_CLASS_USER_INITIATED
-        case .Interactive: return QOS_CLASS_USER_INTERACTIVE
-        case .Utility: return QOS_CLASS_UTILITY
-        case .Background: return QOS_CLASS_BACKGROUND
+        case .initiated: return .qosUserInitiated
+        case .interactive: return .qosUserInteractive
+        case .utility: return .qosUtility
+        case .background: return .qosBackground
+        default: return .qosDefault
+        }
+    }
+
+    private var qos_global_attributes: DispatchQueue.GlobalAttributes {
+        switch self {
+        case .initiated: return .qosUserInitiated
+        case .interactive: return .qosUserInteractive
+        case .utility: return .qosUtility
+        case .background: return .qosBackground
+        default: return .qosDefault
         }
     }
     // swiftlint:enable variable_name
@@ -81,10 +74,10 @@ public enum Queue {
 
      - parameter queue: the corresponding global dispatch_queue_t
      */
-    public var queue: dispatch_queue_t {
+    public var queue: DispatchQueue {
         switch self {
-        case .Main: return dispatch_get_main_queue()
-        default: return dispatch_get_global_queue(qos_class, 0)
+        case .main: return .main
+        default: return .global(attributes: qos_global_attributes)
         }
     }
 
@@ -93,13 +86,13 @@ public enum Queue {
 
      Use like this:
 
-     let queue = Queue.Utility.serial("me.danthorpe.Operation.eg")
+     let queue = Queue.Utility.serial("me.danthorpe.Procedure.eg")
      dispatch_async(queue) {
      print("I'm on a utility serial queue.")
      }
      */
-    public func serial(named: String) -> dispatch_queue_t {
-        return dispatch_queue_create(named, dispatch_queue_attr_make_with_qos_class(DISPATCH_QUEUE_SERIAL, qos_class, QOS_MIN_RELATIVE_PRIORITY))
+    public func serial(_ named: String) -> DispatchQueue {
+        return DispatchQueue(label: named, attributes: [.serial, qos_attributes])
     }
 
     /**
@@ -107,58 +100,59 @@ public enum Queue {
 
      Use like this:
 
-     let queue = Queue.Initiated.concurrent("me.danthorpe.Operation.eg")
+     let queue = Queue.Initiated.concurrent("me.danthorpe.Procedure.eg")
      dispatch_barrier_async(queue) {
      print("I'm on a initiated concurrent queue.")
      }
      */
-    public func concurrent(named: String) -> dispatch_queue_t {
-        return dispatch_queue_create(named, dispatch_queue_attr_make_with_qos_class(DISPATCH_QUEUE_CONCURRENT, qos_class, QOS_MIN_RELATIVE_PRIORITY))
+    public func concurrent(_ named: String) -> DispatchQueue {
+        return DispatchQueue(label: named, attributes: [.concurrent, qos_attributes])
     }
 
     /**
-     Initialize a Queue with a given NSQualityOfService.
+     Initialize a Queue with a given QualityOfService.
 
-     - parameter qos: a NSQualityOfService value
+     - parameter qos: a QualityOfService value
      - returns: a Queue with an equivalent quality of service
      */
-    public init(qos: NSQualityOfService) {
+    public init(qos: QualityOfService) {
         switch qos {
-        case .Background:
-            self = .Background
-        case .Default:
-            self = .Default
-        case .UserInitiated:
-            self = .Initiated
-        case .UserInteractive:
-            self = .Interactive
-        case .Utility:
-            self = .Utility
+        case .background:
+            self = .background
+        case .default:
+            self = .default
+        case .userInitiated:
+            self = .initiated
+        case .userInteractive:
+            self = .interactive
+        case .utility:
+            self = .utility
         }
     }
 
     /**
      Initialize a Queue with a given GCD quality of service class.
 
-     - parameter qos: a qos_class_t value
+     - parameter qos: a DispatchQoS value
      - returns: a Queue with an equivalent quality of service
      */
-    public init(qos: qos_class_t) {
-        switch qos {
-        case qos_class_main():
-            self = .Main
-        case QOS_CLASS_BACKGROUND:
-            self = .Background
-        case QOS_CLASS_USER_INITIATED:
-            self = .Initiated
-        case QOS_CLASS_USER_INTERACTIVE:
-            self = .Interactive
-        case QOS_CLASS_UTILITY:
-            self = .Utility
+    public init(qos: DispatchQoS) {
+        switch qos.qosClass {
+        case .background:
+            self = .background
+        case .userInitiated:
+            self = .initiated
+        case .userInteractive:
+            self = .interactive
+        case .utility:
+            self = .utility
         default:
-            self = .Default
+            self = .default
         }
     }
 }
 
-internal let mainQueueScheduler = Queue.Scheduler(queue: Queue.Main.queue)
+internal let mainQueueKey = DispatchSpecificKey<Int8>()
+internal let setKeyOnMainQueue: () = {
+    DispatchQueue.main.setSpecific(key: mainQueueKey, value: 0)
+}()

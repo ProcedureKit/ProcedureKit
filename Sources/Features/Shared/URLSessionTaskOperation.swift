@@ -10,26 +10,26 @@ import Foundation
 
 
 /**
-An Operation which is a simple wrapper around `NSURLSessionTask`.
+An Procedure which is a simple wrapper around `NSURLSessionTask`.
 
 Note that the task will still need to be configured with a delegate
 as usual. Typically this operation would be used after the task is
 setup, so that conditions or observers can be attached.
 
 */
-public class URLSessionTaskOperation: Operation {
+public class URLSessionTaskOperation: Procedure {
 
     enum KeyPath: String {
         case State = "state"
     }
 
-    public let task: NSURLSessionTask
+    public let task: URLSessionTask
 
     private var removedObserved = false
-    private let lock = NSLock()
+    private let lock = Foundation.Lock()
 
-    public init(task: NSURLSessionTask) {
-        assert(task.state == .Suspended, "NSURLSessionTask must be suspended, not \(task.state)")
+    public init(task: URLSessionTask) {
+        assert(task.state == .suspended, "NSURLSessionTask must be suspended, not \(task.state)")
         self.task = task
         super.init()
         addObserver(DidCancelObserver { _ in
@@ -38,23 +38,23 @@ public class URLSessionTaskOperation: Operation {
     }
 
     public override func execute() {
-        assert(task.state == .Suspended, "NSURLSessionTask resumed outside of \(self)")
+        assert(task.state == .suspended, "NSURLSessionTask resumed outside of \(self)")
         task.addObserver(self, forKeyPath: KeyPath.State.rawValue, options: [], context: &URLSessionTaskOperationKVOContext)
         task.resume()
     }
 
-    public override func observeValueForKeyPath(keyPath: String?, ofObject object: AnyObject?, change: [String : AnyObject]?, context: UnsafeMutablePointer<Void>) {
+    public override func observeValue(forKeyPath keyPath: String?, of object: AnyObject?, change: [NSKeyValueChangeKey : AnyObject]?, context: UnsafeMutablePointer<Void>?) {
         guard context == &URLSessionTaskOperationKVOContext else { return }
 
         lock.withCriticalScope {
             if object === task && keyPath == KeyPath.State.rawValue && !removedObserved {
 
-                if case .Completed = task.state {
+                if case .completed = task.state {
                     finish(task.error)
                 }
 
                 switch task.state {
-                case .Completed, .Canceling:
+                case .completed, .canceling:
                     task.removeObserver(self, forKeyPath: KeyPath.State.rawValue)
                     removedObserved = true
                 default:
