@@ -102,11 +102,11 @@ class ProducedOperationObserverTests: BaseBlockObserverTests {
     var called_didAttachToOperation: OldOperation? = .none
     var called_didProduceOperation: (OldOperation, Operation)? = .none
     var observer: ProducedOperationObserver!
-    var produced: OldBlockOperation!
+    var produced: BlockOperation!
 
     override func setUp() {
         super.setUp()
-        produced = OldBlockOperation { }
+        produced = BlockOperation { }
         operation = TestOperation(produced: produced)
         observer = ProducedOperationObserver { [unowned self] op, produced in
             self.called_didProduceOperation = (op, produced)
