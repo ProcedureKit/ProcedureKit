@@ -97,7 +97,7 @@ public class CloudKitRecovery<T where T: Operation, T: CKOperationType, T: Assoc
 
     internal func cloudKitErrorsFromInfo(_ info: RetryFailureInfo<OPRCKOperation<T>>) -> (code: CKErrorCode, error: T.Error)? {
         let mapped: [(CKErrorCode, T.Error)] = info.errors.flatMap { error in
-            if let cloudKitError = error as? T.Error, code = cloudKitError.code {
+            if let cloudKitError = error as? T.Error, let code = cloudKitError.code {
                 return (code, cloudKitError)
             }
             return .none

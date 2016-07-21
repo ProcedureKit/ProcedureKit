@@ -50,7 +50,7 @@ class LoggingObserverWithError: LoggingObserverTests {
 
     func test__logger_outputs_number_of_received_errors() {
         waitForOperation(operation)
-        XCTAssertTrue(receivedMessages.contains("Test Logging OldOperation: did finish with error(s): [Operations.ConditionError.BlockConditionFailed]."), "log message: \(receivedMessages)")
+        XCTAssertTrue(receivedMessages.contains("Test Logging OldOperation: did finish with error(s): [Operations.ConditionError.blockConditionFailed]."), "log message: \(receivedMessages)")
     }
 }
 

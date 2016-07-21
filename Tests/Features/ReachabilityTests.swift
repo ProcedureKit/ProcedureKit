@@ -80,7 +80,7 @@ class SCNetworkReachabilityFlagsTests: XCTestCase {
             flags = .isWWAN
             XCTAssertTrue(flags.isOnWWAN)
         #else
-            flags = .Reachable
+            flags = .reachable
             XCTAssertFalse(flags.isOnWWAN)
         #endif
     }
@@ -100,7 +100,7 @@ class SCNetworkReachabilityFlagsTests: XCTestCase {
             flags = [ .reachable, .isWWAN ]
             XCTAssertTrue(flags.isReachableViaWWAN)
         #else
-            flags = .Reachable
+            flags = .reachable
             XCTAssertTrue(flags.isReachableViaWWAN)
         #endif
     }

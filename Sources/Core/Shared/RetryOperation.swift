@@ -190,7 +190,7 @@ public class RetryOperation<T: Operation>: RepeatedOperation<T> {
             log.verbose("\(message) \(count) recovery from errors: \(errors) in operation: \(operation)")
         }
 
-        guard let op = operation as? T where operation === current else { return returnValue }
+        guard let op = operation as? T, operation === current else { return returnValue }
         retry.info = createFailureInfo(op, errors: errors)
         returnValue = addNextOperation()
         return returnValue
@@ -216,14 +216,14 @@ public class RetryOperation<T: Operation>: RepeatedOperation<T> {
     }
 
     internal override func child(_ child: Operation, didAttemptRecoveryFromErrors errors: [ErrorProtocol]) {
-        if let previous = previous where child === current {
+        if let previous = previous, child === current {
             didNotRecoverFromOperationErrors(previous)
         }
         super.child(child, didAttemptRecoveryFromErrors: errors)
     }
 
     public override func operationQueue(_ queue: OldOperationQueue, willFinishOperation operation: Operation, withErrors errors: [ErrorProtocol]) {
-        if errors.isEmpty, let previous = previous where operation === current {
+        if errors.isEmpty, let previous = previous, operation === current {
             didRecoverFromOperationErrors(previous)
         }
         super.operationQueue(queue, willFinishOperation: operation, withErrors: errors)

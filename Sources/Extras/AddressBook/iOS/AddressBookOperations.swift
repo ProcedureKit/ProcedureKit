@@ -349,7 +349,7 @@ public class AddressBookRemovePersonFromGroup: AddressBookGetResource {
             return AddressBookError.failedToGetPerson(personQuery)
         }
 
-        if let group = addressBookGroup, person = addressBookPerson, error = group.remove(person) {
+        if let group = addressBookGroup, let person = addressBookPerson, let error = group.remove(person) {
             return error
         }
 

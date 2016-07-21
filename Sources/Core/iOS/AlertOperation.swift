@@ -178,7 +178,7 @@ public class AlertOperation<From: PresentingViewController>: OldOperation {
     */
     public override func execute() {
         if alert.actions.isEmpty {
-            addActionWithTitle(NSLocalizedString("Okay", comment: "Okay"))
+            let _ = addActionWithTitle(NSLocalizedString("Okay", comment: "Okay"))
         }
         uiOperation.log.severity = log.severity
         produceOperation(uiOperation)

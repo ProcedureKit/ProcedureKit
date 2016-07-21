@@ -216,7 +216,7 @@ public class ReverseGeocodeOperation: OldOperation, ResultOperationType {
     public override func execute() {
         geocoder.opr_reverseGeocodeLocation(location) { results, error in
             Queue.main.queue.async { [weak self] in
-                guard let weakSelf = self where !weakSelf.isFinished else { return }
+                guard let weakSelf = self, !weakSelf.isFinished else { return }
 
                 if let error = error {
                     weakSelf.finish(LocationOperationError.geocoderError(error))

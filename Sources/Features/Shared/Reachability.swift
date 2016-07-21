@@ -133,7 +133,7 @@ extension ReachabilityManager: HostReachabilityType {
     func reachabilityForURL(_ url: URL, completion: Reachability.ObserverBlockType) {
 
         queue.async { [reachabilityFlagsForHostname = network.reachabilityFlagsForHostname] in
-            if let host = url.host, flags = reachabilityFlagsForHostname(host) {
+            if let host = url.host, let flags = reachabilityFlagsForHostname(host) {
                 completion(Status(flags: flags))
             }
             else {
@@ -270,7 +270,7 @@ extension Reachability.NetworkStatus {
             #if os(iOS)
             self = .reachable(.viaWWAN)
             #else
-            self = .Reachable(.AnyConnectionKind)
+            self = .reachable(.anyConnectionKind)
             #endif
         }
         else {

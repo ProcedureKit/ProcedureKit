@@ -147,7 +147,7 @@ class AuthorizationTests: OperationTests {
 
     func test__authorize_operation_name() {
         let operation = Authorize(capability)
-        XCTAssertEqual(operation.name!, "Authorize Testable Capability.Minimum")
+        XCTAssertEqual(operation.name!, "Authorize Testable Capability.minimum")
     }
 
     func test__authorize() {

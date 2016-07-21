@@ -26,13 +26,13 @@ import Foundation
 public class TaskOperation: OldOperation {
 
     /// Error type for TaskOperation
-    public enum Error: ErrorType, Equatable {
-        case LaunchPathNotSet
-        case TerminationReason(NSTaskTerminationReason)
+    public enum Error: ErrorProtocol, Equatable {
+        case launchPathNotSet
+        case terminationReason(Task.TerminationReason)
     }
 
     /// Closure type for testing if the task did exit cleanly
-    public typealias TaskDidExitCleanly = Int -> Bool
+    public typealias TaskDidExitCleanly = (Int) -> Bool
 
     /// The default closure for checking the exit status
     public static let defaultTaskDidExitCleanly: TaskDidExitCleanly = { status in
@@ -42,8 +42,8 @@ public class TaskOperation: OldOperation {
         }
     }
 
-    /// - returns task: the NSTask
-    public let task: NSTask
+    /// - returns task: the Task
+    public let task: Task
 
     /// - returns taskDidExitCleanly: the closure for exiting cleanly.
     public let taskDidExitCleanly: TaskDidExitCleanly
@@ -54,19 +54,19 @@ public class TaskOperation: OldOperation {
      - parameter task: the NSTask
      - parameter taskDidExitCleanly: a TaskDidExitCleanly closure with a default.
     */
-    public init(task: NSTask, taskDidExitCleanly: TaskDidExitCleanly = TaskOperation.defaultTaskDidExitCleanly) {
+    public init(task: Task, taskDidExitCleanly: TaskDidExitCleanly = TaskOperation.defaultTaskDidExitCleanly) {
         self.task = task
         self.taskDidExitCleanly = taskDidExitCleanly
         super.init()
         addObserver(WillCancelObserver { [unowned self] (operation, errors) in
-            guard let op = operation as? TaskOperation where operation === self && op.task.running else { return }
+            guard let op = operation as? TaskOperation, operation === self && op.task.isRunning else { return }
             op.task.terminate()
         })
     }
 
     public override func execute() {
         guard let _ = task.launchPath else {
-            finish(Error.LaunchPathNotSet)
+            finish(Error.launchPathNotSet)
             return
         }
 
@@ -78,7 +78,7 @@ public class TaskOperation: OldOperation {
                 self.finish()
             }
             else {
-                self.finish(Error.TerminationReason(task.terminationReason))
+                self.finish(Error.terminationReason(task.terminationReason))
             }
         }
 
@@ -88,9 +88,9 @@ public class TaskOperation: OldOperation {
 
 public func == (lhs: TaskOperation.Error, rhs: TaskOperation.Error) -> Bool {
     switch (lhs, rhs) {
-    case (.LaunchPathNotSet, .LaunchPathNotSet):
+    case (.launchPathNotSet, .launchPathNotSet):
         return true
-    case let (.TerminationReason(lhsReason), .TerminationReason(rhsReason)):
+    case let (.terminationReason(lhsReason), .terminationReason(rhsReason)):
         return lhsReason == rhsReason
     default:
         return false

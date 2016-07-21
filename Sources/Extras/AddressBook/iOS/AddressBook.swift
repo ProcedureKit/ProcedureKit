@@ -847,7 +847,7 @@ public struct LabeledValue<Value: MultiValueRepresentable>: CustomStringConverti
         return (0..<count).reduce([LabeledValue<Value>]()) { (acc, index) in
             var acc = acc
             let representation: CFTypeRef = ABMultiValueCopyValueAtIndex(multiValue, index).takeRetainedValue()
-            if let value = Value(multiValueRepresentation: representation), unmanagedLabel = ABMultiValueCopyLabelAtIndex(multiValue, index) {
+            if let value = Value(multiValueRepresentation: representation), let unmanagedLabel = ABMultiValueCopyLabelAtIndex(multiValue, index) {
                 let label = unmanagedLabel.takeRetainedValue() as String
                 let labeledValue = LabeledValue(label: label, value: value)
                 acc.append(labeledValue)
@@ -1010,7 +1010,7 @@ public class AddressBookGroup: AddressBookRecord, AddressBookGroupType {
 
     public func members<P: AddressBook_PersonType where P.Storage == PersonStorage>(_ ordering: AddressBook.SortOrdering? = .none) -> [P] {
         let result: [ABRecord] = {
-            if let ordering = ordering, unmanaged = ABGroupCopyArrayOfAllMembersWithSortOrdering(self.storage, ordering.rawValue) {
+            if let ordering = ordering, let unmanaged = ABGroupCopyArrayOfAllMembersWithSortOrdering(self.storage, ordering.rawValue) {
                 return unmanaged.takeRetainedValue() as [ABRecord]
             }
             else if let unmanaged = ABGroupCopyArrayOfAllMembers(self.storage) {

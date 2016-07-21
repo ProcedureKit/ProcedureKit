@@ -10,7 +10,7 @@ import Foundation
 
 func arc4random<T: IntegerLiteralConvertible>(_ type: T.Type) -> T {
     var r: T = 0
-    arc4random_buf(&r, Int(sizeof(T)))
+    arc4random_buf(&r, Int(sizeof(T.self)))
     return r
 }
 
@@ -42,7 +42,7 @@ public struct RandomFailGenerator<G: IteratorProtocol>: IteratorProtocol {
     public init(_ generator: G, probability: Double = 0.1) {
         self.generator = generator
         self.shouldNotFail = {
-            let r = (Double(arc4random(UInt64)) / Double(UInt64.max))
+            let r = (Double(arc4random(UInt64.self)) / Double(UInt64.max))
             return r > probability
         }
     }
@@ -140,7 +140,7 @@ struct IntervalGenerator: IteratorProtocol {
             return period
 
         case .random(let (minimum, maximum)):
-            let r = Double(arc4random(UInt64)) / Double(UInt64.max)
+            let r = Double(arc4random(UInt64.self)) / Double(UInt64.max)
             return (r * (maximum - minimum)) + minimum
 
         case .incrementing(let (initial, increment)):

@@ -96,10 +96,10 @@ struct PendingResult {
     }
 
     func createResult() -> ProfileResult? {
-        guard !pending, let
-            identity = identity.value,
-            attached = attached.value,
-            started = started.value
+        guard !pending,
+            let identity = identity.value,
+            let attached = attached.value,
+            let started = started.value
         else { return .none }
 
         return ProfileResult(identity: identity, created: created, attached: attached, started: started, cancelled: cancelled.value, finished: finished.value, children: children)

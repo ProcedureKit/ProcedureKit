@@ -42,10 +42,10 @@ public class UserConfirmationCondition<From: PresentingViewController>: Conditio
 
         alert.title = title
         alert.message = message
-        alert.addActionWithTitle(action, style: isDestructive ? .destructive : .default) { [weak self] _ in
+        let _ = alert.addActionWithTitle(action, style: isDestructive ? .destructive : .default) { [weak self] _ in
             self?.confirmation = .confirmed
         }
-        alert.addActionWithTitle(cancelAction, style: .cancel) { [weak self] _ in
+        let _ = alert.addActionWithTitle(cancelAction, style: .cancel) { [weak self] _ in
             self?.confirmation = .cancelled
         }
         alert.addObserver(WillFinishObserver { [weak self] _, errors in

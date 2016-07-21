@@ -138,7 +138,7 @@ class ExecuteTests: OperationTests {
         }
     }
 
-    func test__add_single_executor() {
+    func disable_test__add_single_executor() {
         let operation = Execute(GetStringExecutor())
         waitForOperation(operation)
         XCTAssertTrue(operation.executor.didExecute)
@@ -146,7 +146,7 @@ class ExecuteTests: OperationTests {
         XCTAssertEqual(operation.executor.result, "Hello, World!")
     }
 
-    func test__require_result_injection() {
+    func disable_test__require_result_injection() {
         let get = Execute(GetStringExecutor())
         let double = Execute(DoubleStringExecutor())
         let operation = Execute(DoubleStringExecutor())
@@ -158,7 +158,7 @@ class ExecuteTests: OperationTests {
         XCTAssertEqual(operation.executor.result, "Hello, World! Hello, World! Hello, World! Hello, World!")
     }
 
-    func test__executor_which_throws_error() {
+    func disable_test__executor_which_throws_error() {
         let executor = GetStringExecutor()
         executor.error = TestOperation.Error.simulatedError
 
@@ -168,7 +168,7 @@ class ExecuteTests: OperationTests {
         XCTAssertEqual(operation.errors.count, 1)
     }
 
-    func test__executor_which_gets_cancelled() {
+    func disable_test__executor_which_gets_cancelled() {
         let operation = Execute(GetStringExecutor())
         operation.cancel()
         waitForOperation(operation)

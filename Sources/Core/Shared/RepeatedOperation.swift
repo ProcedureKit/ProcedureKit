@@ -262,7 +262,7 @@ public class RepeatedOperation<T where T: Operation>: GroupOperation {
      operation which should be repeated).
      */
     public override func willAttemptRecoveryFromErrors(_ errors: [ErrorProtocol], inOperation operation: Operation) -> Bool {
-        addNextOperation(operation === current)
+        let _ = addNextOperation(operation === current)
         return super.willAttemptRecoveryFromErrors(errors, inOperation: operation)
     }
 
@@ -278,7 +278,7 @@ public class RepeatedOperation<T where T: Operation>: GroupOperation {
      operation which should be repeated).
     */
     public override func willFinishOperation(_ operation: Operation) {
-        addNextOperation(operation === current)
+        let _ = addNextOperation(operation === current)
     }
 
     /**

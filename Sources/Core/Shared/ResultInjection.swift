@@ -89,12 +89,12 @@ extension InjectionOperationType where Self: OldOperation {
     */
     public func injectResultFromDependency<T where T: OldOperation>(_ dep: T, block: (operation: Self, dependency: T, errors: [ErrorProtocol]) -> Void) -> Self {
         dep.addObserver(WillFinishObserver { [weak self] op, errors in
-            if let strongSelf = self, dep = op as? T {
+            if let strongSelf = self, let dep = op as? T {
                 block(operation: strongSelf, dependency: dep, errors: errors)
             }
         })
         dep.addObserver(DidCancelObserver { [weak self] op in
-            if let strongSelf = self, _ = op as? T {
+            if let strongSelf = self, let _ = op as? T {
                 (strongSelf as OldOperation).cancel()
             }
         })

@@ -259,7 +259,7 @@ class OperationKVOTests: OperationTests {
     }
 
     func test__nsoperation_kvo__nsoperation_cancel_from_initialized() {
-        let operation = OldBlockOperation { }
+        let operation = BlockOperation { }
         let kvoObserver = NSOperationKVOObserver(operation: operation)
         operation.cancel()
 

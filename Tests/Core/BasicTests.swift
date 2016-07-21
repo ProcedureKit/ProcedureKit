@@ -65,7 +65,7 @@ class BasicTests: OperationTests {
             expectation.fulfill()
         }
 
-        addCompletionBlockToTestOperation(operation)
+        let _ = addCompletionBlockToTestOperation(operation)
         runOperation(operation)
         waitForExpectations(timeout: 3, handler: nil)
 
@@ -199,7 +199,7 @@ class CompletionBlockOperationTests: OperationTests {
         let _queue = OperationQueue()
         let expectation = self.expectation(description: "Test: \(#function)")
 
-        let operation = OldBlockOperation()
+        let operation = BlockOperation()
         operation.completionBlock = { expectation.fulfill() }
 
         _queue.addOperation(operation)
@@ -387,7 +387,7 @@ class CancellationOperationTests: OperationTests {
 
         waitForExpectations(timeout: delaySeconds - 1.0, handler: nil)
         XCTAssertFalse(operation.didExecute)
-        guard delayCompleteSignal.wait(timeout: .now() + .nanoseconds(5)) == .Success else {
+        guard delayCompleteSignal.wait(timeout: .now() + 5) == .Success else {
             XCTFail("Delay operation did not complete")
             return
         }
