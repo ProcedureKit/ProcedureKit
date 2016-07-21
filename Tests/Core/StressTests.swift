@@ -245,7 +245,7 @@ class StressTest: OperationTests {
         let batchTimeout = Double(batchSize) / 333.0
         print ("\(#function): Parameters: batch size: \(batchSize); batches: \(batches)")
         
-        final class TestOperation3: OldOperation, Repeatable {
+        final class TestOperation3: Procedure, Repeatable {
             init(number: Int) {
                 super.init()
                 name = "TestOperation3_\(number)"

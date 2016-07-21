@@ -20,7 +20,7 @@ extension UIApplication {
 }
 
 /**
- An OldOperation that opens a given URL in an SFSafariViewController (if the base iOS SDK supports it) or opens it in the Safari app.
+ An Procedure that opens a given URL in an SFSafariViewController (if the base iOS SDK supports it) or opens it in the Safari app.
 
  It implements the following behaviour:
 

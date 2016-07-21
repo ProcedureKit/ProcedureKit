@@ -137,13 +137,13 @@ extension Capability {
 
 /**
 
- # Get Authorization Status OldOperation
+ # Get Authorization Status Procedure
 
  This is a generic operation which will get the current authorization
  status for any CapabilityType.
 
 */
-public class GetAuthorizationStatus<Capability: CapabilityType>: OldOperation {
+public class GetAuthorizationStatus<Capability: CapabilityType>: Procedure {
 
     /// the StatusResponse is a tuple for the capabilities availability and status
     public typealias StatusResponse = (Bool, Capability.Status)
@@ -193,7 +193,7 @@ public class GetAuthorizationStatus<Capability: CapabilityType>: OldOperation {
         }
     }
 
-    /// The execute function required by OldOperation
+    /// The execute function required by Procedure
     public override func execute() {
         determineState { response in
             self.completion(response)
@@ -204,7 +204,7 @@ public class GetAuthorizationStatus<Capability: CapabilityType>: OldOperation {
 
 /**
 
- # Authorize OldOperation
+ # Authorize Procedure
 
  This is a generic operation which will request authorization
  for any CapabilityType.
@@ -225,7 +225,7 @@ public class Authorize<Capability: CapabilityType>: GetAuthorizationStatus<Capab
         addCondition(MutuallyExclusive<Capability>())
     }
 
-    /// The execute function required by OldOperation
+    /// The execute function required by Procedure
     public override func execute() {
         capability.requestAuthorizationWithCompletion {
             super.execute()
@@ -284,7 +284,7 @@ public class AuthorizedFor<Capability: CapabilityType>: Condition {
     }
 
     /// Evaluated the condition
-    public override func evaluate(_ operation: OldOperation, completion: (OperationConditionResult) -> Void) {
+    public override func evaluate(_ operation: Procedure, completion: (OperationConditionResult) -> Void) {
 
         guard capability.isAvailable() else {
             completion(.failed(CapabilityError<Capability>.notAvailable))

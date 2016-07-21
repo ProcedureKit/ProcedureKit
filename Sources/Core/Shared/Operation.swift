@@ -1,5 +1,5 @@
 //
-//  OldOperation.swift
+//  Procedure.swift
 //  YapDB
 //
 //  Created by Daniel Thorpe on 25/06/2015.
@@ -13,9 +13,9 @@ import Foundation
 // swiftlint:disable type_body_length
 
 /**
-Abstract base OldOperation class which subclasses `NSOperation`.
+Abstract base Procedure class which subclasses `NSOperation`.
 
-OldOperation builds on `NSOperation` in a few simple ways.
+Procedure builds on `NSOperation` in a few simple ways.
 
 1. For an instance to become `.Ready`, all of its attached
 `OperationCondition`s must be satisfied.
@@ -24,7 +24,7 @@ OldOperation builds on `NSOperation` in a few simple ways.
 to be notified of lifecycle events in the operation.
 
 */
-public class OldOperation: Operation {
+public class Procedure: Operation {
 
     private enum State: Int, Comparable {
 
@@ -62,7 +62,7 @@ public class OldOperation: Operation {
     }
 
     /**
-     Type to express the intent of the user in regards to executing an OldOperation instance
+     Type to express the intent of the user in regards to executing an Procedure instance
 
      - see: https://developer.apple.com/library/ios/documentation/Performance/Conceptual/EnergyGuide-iOS/PrioritizeWorkWithQoS.html#//apple_ref/doc/uid/TP40015243-CH39
     */
@@ -104,16 +104,16 @@ public class OldOperation: Operation {
 
     private var _cancelled = false  // should always be set by .cancel()
 
-    /// Access the internal errors collected by the OldOperation
+    /// Access the internal errors collected by the Procedure
     public var errors: [ErrorProtocol] {
         return stateLock.withCriticalScope { _internalErrors }
     }
 
     /**
-     Expresses the user intent in regards to the execution of this OldOperation.
+     Expresses the user intent in regards to the execution of this Procedure.
 
      Setting this property will set the appropriate quality of service parameter
-     on the OldOperation.
+     on the Procedure.
 
      - requires: self must not have started yet. i.e. either hasn't been added
      to a queue, or is waiting on dependencies.
@@ -144,17 +144,17 @@ public class OldOperation: Operation {
     }
 
     /**
-     # Access the logger for this OldOperation
+     # Access the logger for this Procedure
      The `log` property can be used as the interface to access the logger.
      e.g. to output a message with `LogSeverity.Info` from inside
-     the `OldOperation`, do this:
+     the `Procedure`, do this:
 
     ```swift
     log.info("This is my message")
     ```
 
      To adjust the instance severity of the LoggerType for the
-     `OldOperation`, access it via this property too:
+     `Procedure`, access it via this property too:
 
     ```swift
     log.severity = .Verbose
@@ -205,16 +205,16 @@ public class OldOperation: Operation {
      Used for GroupOperation to implement proper .Finished state-handling
      (only finishing after all child operations have finished).
 
-     The default behavior of OldOperation is to automatically call finish()
+     The default behavior of Procedure is to automatically call finish()
      when:
         (a) it's cancelled, whether that occurs:
-            - prior to the OldOperation starting
-              (in which case, OldOperation will skip calling execute())
+            - prior to the Procedure starting
+              (in which case, Procedure will skip calling execute())
             - on another thread at the same time that the operation is
               executing
         (b) when willExecuteObservers log errors
 
-     To ensure that an OldOperation subclass does not finish until the
+     To ensure that an Procedure subclass does not finish until the
      subclass calls finish():
      call `super.init(disableAutomaticFinishing: true)` in the init.
 
@@ -407,7 +407,7 @@ public class OldOperation: Operation {
 
 // MARK: - State
 
-public extension OldOperation {
+public extension Procedure {
 
     private var state: State {
         get {
@@ -422,22 +422,22 @@ public extension OldOperation {
         }
     }
 
-    /// Boolean indicator for whether the OldOperation is currently executing or not
+    /// Boolean indicator for whether the Procedure is currently executing or not
     final override var isExecuting: Bool {
         return state == .executing
     }
 
-    /// Boolean indicator for whether the OldOperation has finished or not
+    /// Boolean indicator for whether the Procedure has finished or not
     final override var isFinished: Bool {
         return state == .finished
     }
 
-    /// Boolean indicator for whether the OldOperation has cancelled or not
+    /// Boolean indicator for whether the Procedure has cancelled or not
     final override var isCancelled: Bool {
         return stateLock.withCriticalScope { _cancelled }
     }
 
-    /// Boolean flag to indicate that the OldOperation failed due to errors.
+    /// Boolean flag to indicate that the Procedure failed due to errors.
     var failed: Bool {
         return errors.count > 0
     }
@@ -449,7 +449,7 @@ public extension OldOperation {
 
 // MARK: - Dependencies
 
-public extension OldOperation {
+public extension Procedure {
 
     internal func evaluateConditions() -> GroupOperation {
 
@@ -482,7 +482,7 @@ public extension OldOperation {
         return evaluator
     }
 
-    internal func addDependencyOnPreviousMutuallyExclusiveOperation(_ operation: OldOperation) {
+    internal func addDependencyOnPreviousMutuallyExclusiveOperation(_ operation: Procedure) {
         precondition(state <= .executing, "Dependencies cannot be modified after execution has begun, current state: \(state).")
         super.addDependency(operation)
     }
@@ -536,7 +536,7 @@ public extension OldOperation {
 
 // MARK: - Observers
 
-public extension OldOperation {
+public extension Procedure {
 
     private(set) var observers: [OperationObserverType] {
         get {
@@ -576,7 +576,7 @@ public extension OldOperation {
 
 // MARK: - Execution
 
-public extension OldOperation {
+public extension Procedure {
 
     /// Starts the operation, correctly managing the cancelled state. Cannot be over-ridden
     final override func start() {
@@ -596,10 +596,10 @@ public extension OldOperation {
         // Inform observers that the operation will execute
         willExecuteObservers.forEach { $0.willExecuteOperation(self) }
 
-        let nextState = stateLock.withCriticalScope { () -> (OldOperation.State?) in
-            assert(!isExecuting, "OldOperation is attempting to execute, but is already executing.")
+        let nextState = stateLock.withCriticalScope { () -> (Procedure.State?) in
+            assert(!isExecuting, "Procedure is attempting to execute, but is already executing.")
             guard !_isTransitioningToExecuting else {
-                assertionFailure("OldOperation is attempting to execute twice, concurrently.")
+                assertionFailure("Procedure is attempting to execute twice, concurrently.")
                 return nil
             }
 
@@ -611,12 +611,12 @@ public extension OldOperation {
             // by an observer
             guard (_internalErrors.isEmpty && !isCancelled) || disableAutomaticFinishing else {
                 _isHandlingFinish = true
-                return OldOperation.State.finishing
+                return Procedure.State.finishing
             }
 
             // Transition to the .isExecuting state, and explicitly send the required KVO change notifications
             _isTransitioningToExecuting = true
-            return OldOperation.State.executing
+            return Procedure.State.executing
         }
 
         guard nextState != .finishing else {
@@ -628,7 +628,7 @@ public extension OldOperation {
 
         willChangeValue(forKey: Operation.KeyPath.Executing.rawValue)
 
-        let nextState2 = stateLock.withCriticalScope { () -> (OldOperation.State?) in
+        let nextState2 = stateLock.withCriticalScope { () -> (Procedure.State?) in
             // Re-check state, since it could have changed on another thread (ex. via finish)
             guard state <= .pending else { return nil }
 
@@ -636,7 +636,7 @@ public extension OldOperation {
             _isTransitioningToExecuting = false
 
             if isCancelled && !disableAutomaticFinishing && !_isHandlingFinish {
-                // OldOperation was cancelled, automatic finishing is enabled,
+                // Procedure was cancelled, automatic finishing is enabled,
                 // but cancel is not (yet/ever?) handling the finish.
                 // Because cancel could have already passed the check for executing,
                 // handle calling finish here.
@@ -675,7 +675,7 @@ public extension OldOperation {
 
 // MARK: - Finishing
 
-public extension OldOperation {
+public extension Procedure {
 
     /**
      Finish method which must be called eventually after an operation has
@@ -765,11 +765,11 @@ public extension OldOperation {
     }
 }
 
-private func < (lhs: OldOperation.State, rhs: OldOperation.State) -> Bool {
+private func < (lhs: Procedure.State, rhs: Procedure.State) -> Bool {
     return lhs.rawValue < rhs.rawValue
 }
 
-private func == (lhs: OldOperation.State, rhs: OldOperation.State) -> Bool {
+private func == (lhs: Procedure.State, rhs: Procedure.State) -> Bool {
     return lhs.rawValue == rhs.rawValue
 }
 
@@ -779,7 +779,7 @@ an Operation's conditions fail.
 */
 public enum OperationError: ErrorProtocol, Equatable {
 
-    /// Indicates that a condition of the OldOperation failed.
+    /// Indicates that a condition of the Procedure failed.
     case conditionFailed
 
     /// Indicates that the operation timed out.
@@ -850,7 +850,7 @@ extension Operation {
         removeDependencies(dependencies)
     }
 
-    internal func setQualityOfServiceFromUserIntent(_ userIntent: OldOperation.UserIntent) {
+    internal func setQualityOfServiceFromUserIntent(_ userIntent: Procedure.UserIntent) {
         qualityOfService = userIntent.qos
     }
 }
@@ -883,10 +883,10 @@ extension RecursiveLock {
 
 extension Array where Element: Operation {
 
-    internal var splitNSOperationsAndOperations: ([Operation], [OldOperation]) {
+    internal var splitNSOperationsAndOperations: ([Operation], [Procedure]) {
         return reduce(([], [])) { result, element in
             var (ns, op) = result
-            if let operation = element as? OldOperation {
+            if let operation = element as? Procedure {
                 op.append(operation)
             }
             else {
@@ -896,16 +896,16 @@ extension Array where Element: Operation {
         }
     }
 
-    internal var userIntent: OldOperation.UserIntent {
+    internal var userIntent: Procedure.UserIntent {
         get {
             let (_, ops) = splitNSOperationsAndOperations
             return ops.map { $0.userIntent }.max { $0.rawValue < $1.rawValue } ?? .none
         }
     }
 
-    internal func forEachOperation(body: @noescape (OldOperation) throws -> Void) rethrows {
+    internal func forEachOperation(body: @noescape (Procedure) throws -> Void) rethrows {
         try forEach {
-            if let operation = $0 as? OldOperation {
+            if let operation = $0 as? Procedure {
                 try body(operation)
             }
         }

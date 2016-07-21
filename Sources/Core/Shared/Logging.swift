@@ -277,7 +277,7 @@ public class LogManager: LogManagerType {
     }
 
     /**
-     # Enabled OldOperation logging
+     # Enabled Procedure logging
      Enable or Disable built in logger. Default is enabled.
      */
     public static var enabled: Bool {
@@ -360,11 +360,11 @@ public extension Operation {
 
     /**
      Returns a non-optional `String` to use as the name
-     of an OldOperation. If the `name` property is not
+     of an Procedure. If the `name` property is not
      set, this resorts to the class description.
     */
     var operationName: String {
-        return name ?? "Unnamed OldOperation"
+        return name ?? "Unnamed Procedure"
     }
 }
 

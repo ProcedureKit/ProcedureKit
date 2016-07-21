@@ -108,7 +108,7 @@ public class OldOperationQueue: OperationQueue {
     */
     // swiftlint:disable function_body_length
     public override func addOperation(_ operation: Operation) {
-        if let operation = operation as? OldOperation {
+        if let operation = operation as? Procedure {
 
             /// Add an observer so that any produced operations are added to the queue
             operation.addObserver(ProducedOperationObserver { [weak self] op, produced in

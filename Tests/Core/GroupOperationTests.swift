@@ -82,7 +82,7 @@ class GroupOperationTests: OperationTests {
         let operations: [TestOperation] = (0..<3).map { i in
             let op = TestOperation()
             op.addCondition(BlockCondition { true })
-            let exp = self.expectation(description: "Group OldOperation, child \(i): \(#function)")
+            let exp = self.expectation(description: "Group Procedure, child \(i): \(#function)")
             self.addCompletionBlockToTestOperation(op, withExpectation: exp)
             return op
         }
@@ -113,7 +113,7 @@ class GroupOperationTests: OperationTests {
     func test__group_operation_exits_correctly_when_child_errors() {
 
         let numberOfOperations = 10_000
-        let operations = (0..<numberOfOperations).map { i -> OldOperation in
+        let operations = (0..<numberOfOperations).map { i -> Procedure in
             let block = OldBlockOperation { (completion: OldBlockOperation.ContinuationBlockType) in
                 let error = NSError(domain: "me.danthorpe.Operations.Tests", code: -9_999, userInfo: nil)
                 completion(error: error)
@@ -233,7 +233,7 @@ class GroupOperationTests: OperationTests {
         let test3 = OldBlockOperation { }
         
         let group = GroupOperation(operations: [ test1, test2, test3 ])
-        XCTAssertEqual(group.userIntent, OldOperation.UserIntent.initiated)
+        XCTAssertEqual(group.userIntent, Procedure.UserIntent.initiated)
     }
     
     func test__group_operation__sets_user_intent_on_child_operations() {
@@ -244,8 +244,8 @@ class GroupOperationTests: OperationTests {
         
         let group = GroupOperation(operations: [ test1, test2, test3 ])
         group.userIntent = .sideEffect
-        XCTAssertEqual(test1.userIntent, OldOperation.UserIntent.sideEffect)
-        XCTAssertEqual(test2.userIntent, OldOperation.UserIntent.sideEffect)
+        XCTAssertEqual(test1.userIntent, Procedure.UserIntent.sideEffect)
+        XCTAssertEqual(test2.userIntent, Procedure.UserIntent.sideEffect)
         XCTAssertEqual(test3.qualityOfService, QualityOfService.userInitiated)
     }
 

@@ -48,7 +48,7 @@ class LoggerTests: XCTestCase {
     func test__operation_name_with_name_not_set() {
         let op = OldBlockOperation()
         op.name = nil
-        XCTAssertTrue(op.operationName.contains("Unnamed OldOperation"))
+        XCTAssertTrue(op.operationName.contains("Unnamed Procedure"))
     }
 
     func test__meta_uses_last_path_component() {

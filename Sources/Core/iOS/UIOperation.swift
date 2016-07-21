@@ -114,7 +114,7 @@ public enum ViewControllerDisplayStyle<ViewController: PresentingViewController>
 }
 
 /**
-`UIOperation` is an `OldOperation` subclass which is responsible for presenting one view controller
+`UIOperation` is an `Procedure` subclass which is responsible for presenting one view controller
 from another view controller. The operation is generic over both of these types. It uses
 standard `UIViewController` presentation APIs. These APIs have been condensed into the
 `PresentingViewController` protocol, meaning that the *presenting* generic type is just something
@@ -125,7 +125,7 @@ However, note that the presenting view controller is associated into a `ViewCont
 This enum lets you define how the view controller should be presented. Either, "show", "show detail" or
 "present".
 */
-public class UIOperation<C, From where C: UIViewController, From: PresentingViewController>: OldOperation {
+public class UIOperation<C, From where C: UIViewController, From: PresentingViewController>: Procedure {
 
     /// The controller which will be presented.
     public let controller: C

@@ -9,7 +9,7 @@
 import UIKit
 
 /**
-An `OldOperation` subclass for presenting a configured `UIAlertController`.
+An `Procedure` subclass for presenting a configured `UIAlertController`.
 
 Initialize the `AlertOperation` with the controller which is presenting
 the alert. This "controller" can be a `UIViewController` but, just
@@ -30,7 +30,7 @@ For example
     }
     queue.addOperation(alert)
 */
-public class AlertOperation<From: PresentingViewController>: OldOperation {
+public class AlertOperation<From: PresentingViewController>: Procedure {
 
     private var uiOperation: UIOperation<UIAlertController, From>
 

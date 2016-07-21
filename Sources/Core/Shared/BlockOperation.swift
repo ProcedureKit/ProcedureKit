@@ -9,13 +9,13 @@
 import Foundation
 
 /**
-An `OldOperation` subclass to compose a block. The block type receives
+An `Procedure` subclass to compose a block. The block type receives
 a "continuation block" as its only argument. The block provided must
 call this block to correctly finish the operation. It can be called
 with a nil error argument to finish with no errors. Or an `ErrorType`
 argument to finish with the supplied error.
 */
-public class OldBlockOperation: OldOperation {
+public class OldBlockOperation: Procedure {
 
     public typealias ContinuationBlockType = (error: ErrorProtocol?) -> Void
     public typealias BlockType = (continueWithError: ContinuationBlockType) -> Void

@@ -40,7 +40,7 @@ class MutualExclusiveTests: OperationTests {
             XCTAssertEqual(text, "Star Wars")
             text = "\(text)\nA long time ago"
         }
-        operation1.name = "OldOperation 1"
+        operation1.name = "Procedure 1"
         let condition1A = MutuallyExclusive<OldBlockOperation>()
         let condition1B = MutuallyExclusive<TestOperation>()
         operation1.addCondition(condition1A)
@@ -50,7 +50,7 @@ class MutualExclusiveTests: OperationTests {
             XCTAssertEqual(text, "Star Wars\nA long time ago")
             text = "\(text), in a galaxy far, far away."
         }
-        operation2.name = "OldOperation 2"
+        operation2.name = "Procedure 2"
         let condition2A = MutuallyExclusive<OldBlockOperation>()
         let condition2B = MutuallyExclusive<TestOperation>()
         operation2.addCondition(condition2A)
@@ -77,7 +77,7 @@ class MutualExclusiveTests: OperationTests {
         condition1.addDependency(conditionDependency1)
 
         let operation1 = TestOperation()
-        operation1.name = "OldOperation 1"
+        operation1.name = "Procedure 1"
         operation1.addCondition(condition1)
 
         let operation1Dependency = TestOperation()

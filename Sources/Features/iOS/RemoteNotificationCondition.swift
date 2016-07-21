@@ -54,7 +54,7 @@ public class RemoteNotificationCondition: Condition {
         addDependency(RemoteNotificationsRegistration(registrar: registrar) { _ in })
     }
 
-    public override func evaluate(_ operation: OldOperation, completion: (OperationConditionResult) -> Void) {
+    public override func evaluate(_ operation: Procedure, completion: (OperationConditionResult) -> Void) {
         let operation = RemoteNotificationsRegistration(registrar: registrar) { result in
             switch result {
             case .token(_):
@@ -67,7 +67,7 @@ public class RemoteNotificationCondition: Condition {
     }
 }
 
-public class RemoteNotificationsRegistration: OldOperation {
+public class RemoteNotificationsRegistration: Procedure {
 
     public enum RegistrationResult {
         case token(Data)

@@ -9,7 +9,7 @@
 import XCTest
 @testable import Operations
 
-class TestOperation: OldOperation, ResultOperationType {
+class TestOperation: Procedure, ResultOperationType {
 
     enum Error: ErrorProtocol {
         case simulatedError
@@ -31,7 +31,7 @@ class TestOperation: OldOperation, ResultOperationType {
         simulatedError = error
         producedOperation = produced
         super.init()
-        name = "Test OldOperation"
+        name = "Test Procedure"
     }
 
     override func execute() {
@@ -74,11 +74,11 @@ struct TestCondition: OperationCondition {
     let dependency: Operation?
     let condition: () -> Bool
 
-    func dependencyForOperation(_ operation: OldOperation) -> Operation? {
+    func dependencyForOperation(_ operation: Procedure) -> Operation? {
         return dependency
     }
 
-    func evaluateForOperation(_ operation: OldOperation, completion: (OperationConditionResult) -> Void) {
+    func evaluateForOperation(_ operation: Procedure, completion: (OperationConditionResult) -> Void) {
         completion(condition() ? .satisfied : .failed(BlockCondition.Error.blockConditionFailed))
     }
 }
@@ -95,7 +95,7 @@ class TestConditionOperation: Operations.Condition {
         }
     }
 
-    override func evaluate(_ operation: OldOperation, completion: CompletionBlockType) {
+    override func evaluate(_ operation: Procedure, completion: CompletionBlockType) {
         do {
             let success = try evaluate()
             completion(success ? .satisfied : .failed(OperationError.conditionFailed))
@@ -179,14 +179,14 @@ class OperationTests: XCTestCase {
         queue.addOperations(operations, waitUntilFinished: false)
     }
 
-    func waitForOperation(_ operation: OldOperation, withExpectationDescription text: String = #function) {
+    func waitForOperation(_ operation: Procedure, withExpectationDescription text: String = #function) {
         addCompletionBlockToTestOperation(operation, withExpectationDescription: text)
         queue.delegate = delegate
         queue.addOperation(operation)
         waitForExpectations(timeout: 3, handler: nil)
     }
 
-    func waitForOperations(_ operations: OldOperation..., withExpectationDescription text: String = #function) {
+    func waitForOperations(_ operations: Procedure..., withExpectationDescription text: String = #function) {
         for (i, op) in operations.enumerated() {
             addCompletionBlockToTestOperation(op, withExpectationDescription: "\(i), \(text)")
         }
@@ -195,7 +195,7 @@ class OperationTests: XCTestCase {
         waitForExpectations(timeout: 3, handler: nil)
     }
 
-    func addCompletionBlockToTestOperation(_ operation: OldOperation, withExpectation expectation: XCTestExpectation) {
+    func addCompletionBlockToTestOperation(_ operation: Procedure, withExpectation expectation: XCTestExpectation) {
         weak var weakExpectation = expectation
         operation.addObserver(DidFinishObserver { _, _ in
             weakExpectation?.fulfill()
@@ -203,7 +203,7 @@ class OperationTests: XCTestCase {
     }
 
     @discardableResult
-    func addCompletionBlockToTestOperation(_ operation: OldOperation, withExpectationDescription text: String = #function) -> XCTestExpectation {
+    func addCompletionBlockToTestOperation(_ operation: Procedure, withExpectationDescription text: String = #function) -> XCTestExpectation {
         let expectation = self.expectation(description: "Test: \(text), \(UUID().uuidString)")
         operation.addObserver(DidFinishObserver { _, _ in
             expectation.fulfill()

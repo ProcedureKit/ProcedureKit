@@ -86,7 +86,7 @@ public enum Queue {
 
      Use like this:
 
-     let queue = Queue.Utility.serial("me.danthorpe.OldOperation.eg")
+     let queue = Queue.Utility.serial("me.danthorpe.Procedure.eg")
      dispatch_async(queue) {
      print("I'm on a utility serial queue.")
      }
@@ -100,7 +100,7 @@ public enum Queue {
 
      Use like this:
 
-     let queue = Queue.Initiated.concurrent("me.danthorpe.OldOperation.eg")
+     let queue = Queue.Initiated.concurrent("me.danthorpe.Procedure.eg")
      dispatch_barrier_async(queue) {
      print("I'm on a initiated concurrent queue.")
      }

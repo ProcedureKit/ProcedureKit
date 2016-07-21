@@ -9,7 +9,7 @@
 import XCTest
 @testable import Operations
 
-class DataProcessing: OldOperation, AutomaticInjectionOperationType {
+class DataProcessing: Procedure, AutomaticInjectionOperationType {
 
     var requirement: String? = .none
 

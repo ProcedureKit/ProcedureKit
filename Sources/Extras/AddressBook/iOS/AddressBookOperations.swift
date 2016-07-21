@@ -12,7 +12,7 @@ import AddressBook
 // MARK: - Address Book Operation
 
 @available(iOS, deprecated: 9.0)
-public class AddressBookOperation: OldOperation {
+public class AddressBookOperation: Procedure {
 
     internal var registrar: AddressBookPermissionRegistrar
     public var addressBook: AddressBook!

@@ -108,13 +108,13 @@ public class RetryOperation<T: Operation>: RepeatedOperation<T> {
      the maximum number of operations which will be executed.
      - parameter generator: the generator of (Delay?, T) values.
      - parameter retry: a Handler block type, can be used to inspect aggregated error to
-     adjust the next delay and OldOperation.
+     adjust the next delay and Procedure.
 
     */
     public init(maxCount max: Int? = .none, generator: AnyIterator<Payload>, retry block: Handler) {
         retry = RetryGenerator(generator: generator, retry: block)
         super.init(maxCount: max, generator: AnyIterator(retry))
-        name = "Retry OldOperation <\(T.self)>"
+        name = "Retry Procedure <\(T.self)>"
     }
 
     /**
@@ -126,7 +126,7 @@ public class RetryOperation<T: Operation>: RepeatedOperation<T> {
      - parameter delay: a generator with Delay element.
      - parameter generator: a generator with T element.
      - parameter retry: a Handler block type, can be used to inspect aggregated error to
-     adjust the next delay and OldOperation.
+     adjust the next delay and Procedure.
 
      */
     public init<D, G where D: IteratorProtocol, D.Element == Delay, G: IteratorProtocol, G.Element == T>(maxCount max: Int? = .none, delay: D, generator: G, retry block: Handler) {
@@ -134,7 +134,7 @@ public class RetryOperation<T: Operation>: RepeatedOperation<T> {
         let mapped = MapGenerator(tuple) { RepeatedPayload(delay: $0.0, operation: $0.1, configure: .none) }
         retry = RetryGenerator(generator: AnyIterator(mapped), retry: block)
         super.init(maxCount: max, generator: AnyIterator(retry))
-        name = "Retry OldOperation <\(T.self)>"
+        name = "Retry Procedure <\(T.self)>"
     }
 
     /**
@@ -166,7 +166,7 @@ public class RetryOperation<T: Operation>: RepeatedOperation<T> {
      - parameter strategy: a WaitStrategy which defaults to a 0.1 second fixed interval.
      - parameter [unnamed] generator: a generic generator which has an Element equal to T.
      - parameter retry: a Handler block type, can be used to inspect aggregated error to
-     adjust the next delay and OldOperation. This defaults to pass through the delay and
+     adjust the next delay and Procedure. This defaults to pass through the delay and
      operation regardless of error info.
 
      */
@@ -176,7 +176,7 @@ public class RetryOperation<T: Operation>: RepeatedOperation<T> {
         let mapped = MapGenerator(tuple) { RepeatedPayload(delay: $0.0, operation: $0.1, configure: .none) }
         retry = RetryGenerator(generator: AnyIterator(mapped), retry: block)
         super.init(maxCount: max, generator: AnyIterator(retry))
-        name = "Retry OldOperation <\(T.self)>"
+        name = "Retry Procedure <\(T.self)>"
     }
 
     /**

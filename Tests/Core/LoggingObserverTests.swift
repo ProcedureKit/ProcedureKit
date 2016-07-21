@@ -9,8 +9,8 @@
 import XCTest
 @testable import Operations
 
-@available(iOS, deprecated: 9, message: "Use the log property of OldOperation directly.")
-@available(OSX, deprecated: 10.11, message: "Use the log property of OldOperation directly.")
+@available(iOS, deprecated: 9, message: "Use the log property of Procedure directly.")
+@available(OSX, deprecated: 10.11, message: "Use the log property of Procedure directly.")
 class LoggingObserverTests: OperationTests {
 
     var operation: TestOperation!
@@ -31,7 +31,7 @@ class LoggingObserverTests: OperationTests {
 
     func configureOperation(_ op: TestOperation) {
         operation = op
-        operation.name = "Test Logging OldOperation"
+        operation.name = "Test Logging Procedure"
         observer = LoggingObserver { [unowned self] message in
             self.receivedMessages.append(message)
         }
@@ -39,8 +39,8 @@ class LoggingObserverTests: OperationTests {
     }
 }
 
-@available(iOS, deprecated: 9, message: "Use the log property of OldOperation directly.")
-@available(OSX, deprecated: 10.11, message: "Use the log property of OldOperation directly.")
+@available(iOS, deprecated: 9, message: "Use the log property of Procedure directly.")
+@available(OSX, deprecated: 10.11, message: "Use the log property of Procedure directly.")
 class LoggingObserverWithError: LoggingObserverTests {
 
     override func setUp() {
@@ -50,12 +50,12 @@ class LoggingObserverWithError: LoggingObserverTests {
 
     func test__logger_outputs_number_of_received_errors() {
         waitForOperation(operation)
-        XCTAssertTrue(receivedMessages.contains("Test Logging OldOperation: did finish with error(s): [Operations.ConditionError.blockConditionFailed]."), "log message: \(receivedMessages)")
+        XCTAssertTrue(receivedMessages.contains("Test Logging Procedure: did finish with error(s): [Operations.ConditionError.blockConditionFailed]."), "log message: \(receivedMessages)")
     }
 }
 
-@available(iOS, deprecated: 9, message: "Use the log property of OldOperation directly.")
-@available(OSX, deprecated: 10.11, message: "Use the log property of OldOperation directly.")
+@available(iOS, deprecated: 9, message: "Use the log property of Procedure directly.")
+@available(OSX, deprecated: 10.11, message: "Use the log property of Procedure directly.")
 class LoggingObserverWithCancellation: LoggingObserverTests {
 
     override func setUp() {
@@ -69,12 +69,12 @@ class LoggingObserverWithCancellation: LoggingObserverTests {
         runOperation(operation)
         operation.cancel()
         waitForExpectations(timeout: 3, handler: nil)
-        XCTAssertTrue(receivedMessages.contains("Test Logging OldOperation: did cancel."))
+        XCTAssertTrue(receivedMessages.contains("Test Logging Procedure: did cancel."))
     }
 }
 
-@available(iOS, deprecated: 9, message: "Use the log property of OldOperation directly.")
-@available(OSX, deprecated: 10.11, message: "Use the log property of OldOperation directly.")
+@available(iOS, deprecated: 9, message: "Use the log property of Procedure directly.")
+@available(OSX, deprecated: 10.11, message: "Use the log property of Procedure directly.")
 class LoggingObserverWithProduce: LoggingObserverTests {
 
     override func setUp() {
@@ -87,6 +87,6 @@ class LoggingObserverWithProduce: LoggingObserverTests {
         addCompletionBlockToTestOperation(operation, withExpectation: expectation(description: "Test: \(#function)"))
         runOperation(operation)
         waitForExpectations(timeout: 3, handler: nil)
-        XCTAssertTrue(receivedMessages.contains("Test Logging OldOperation: did produce operation: Test OldOperation."), "log message: \(receivedMessages)")
+        XCTAssertTrue(receivedMessages.contains("Test Logging Procedure: did produce operation: Test Procedure."), "log message: \(receivedMessages)")
     }
 }

@@ -37,7 +37,7 @@ internal extension ConditionResult {
 public typealias OperationConditionResult = ConditionResult
 
 /**
-Types which conform to `OperationCondition` can be added to `OldOperation`
+Types which conform to `OperationCondition` can be added to `Procedure`
 subclasses before they are added to an `OldOperationQueue`. If the condition
 returns an `NSOperation` dependency, the dependency relationship will be
 set and it is added to the queue automatically.
@@ -58,7 +58,7 @@ public protocol OperationCondition {
 
     /**
     A flag to indicate whether this condition is mutually exclusive. Meaning
-    that only one condition can be evaluated at a time. Other `OldOperation`
+    that only one condition can be evaluated at a time. Other `Procedure`
     instances which have this condition will wait in a `.Pending` state - i.e.
     not get executed.
 
@@ -72,23 +72,23 @@ public protocol OperationCondition {
     an operation that (for example) asks for permission to perform
     the operation.
 
-    - parameter operation: The `OldOperation` to which the condition has been added.
+    - parameter operation: The `Procedure` to which the condition has been added.
     - returns: An `NSOperation`, if a dependency should be automatically added.
     - note: Only a single operation may be returned.
 
     */
-    func dependencyForOperation(_ operation: OldOperation) -> Operation?
+    func dependencyForOperation(_ operation: Procedure) -> Operation?
 
     /**
     Evaluate the condition, to see if it has been satisfied.
 
-    - parameter operation: the `OldOperation` which this condition is attached to.
+    - parameter operation: the `Procedure` which this condition is attached to.
     - parameter completion: a closure which receives an `OperationConditionResult`.
     */
-    func evaluateForOperation(_ operation: OldOperation, completion: (OperationConditionResult) -> Void)
+    func evaluateForOperation(_ operation: Procedure, completion: (OperationConditionResult) -> Void)
 }
 
-internal func evaluateOperationConditions(_ conditions: [OperationCondition], operation: OldOperation, completion: ([ErrorProtocol]) -> Void) {
+internal func evaluateOperationConditions(_ conditions: [OperationCondition], operation: Procedure, completion: ([ErrorProtocol]) -> Void) {
 
     let group = DispatchGroup()
 

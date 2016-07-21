@@ -11,7 +11,7 @@ import CloudKit
 
 /**
  A generic protocol which exposes the types and properties used by
- Apple's CloudKit OldOperation types.
+ Apple's CloudKit Procedure types.
  */
 public protocol CKOperationType: class {
 
@@ -60,7 +60,7 @@ public protocol CKOperationType: class {
 
 /**
  A generic protocol which exposes the types and properties used by
- Apple's CloudKit Database OldOperation types.
+ Apple's CloudKit Database Procedure types.
  */
 public protocol CKDatabaseOperationType: CKOperationType {
 

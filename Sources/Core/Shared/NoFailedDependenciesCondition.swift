@@ -42,15 +42,15 @@ public class NoFailedDependenciesCondition: Condition {
 
     The cancelled or failed operations are no associated with the error.
 
-    - parameter operation: the `OldOperation` which the condition is attached to.
+    - parameter operation: the `Procedure` which the condition is attached to.
     - parameter completion: the completion block which receives a `OperationConditionResult`.
     */
-    public override func evaluate(_ operation: OldOperation, completion: CompletionBlockType) {
+    public override func evaluate(_ operation: Procedure, completion: CompletionBlockType) {
         let dependencies = operation.dependencies
 
         let cancelled = dependencies.filter { $0.isCancelled }
         let failures = dependencies.filter {
-            if let operation = $0 as? OldOperation {
+            if let operation = $0 as? Procedure {
                 return operation.failed
             }
             return false

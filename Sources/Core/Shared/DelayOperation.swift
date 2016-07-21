@@ -49,7 +49,7 @@ Make an operation dependent on a `DelayOperation` in order to
 make it execute after a timeout, or in a repeated fashion with a
 time-out.
 */
-public class DelayOperation: OldOperation {
+public class DelayOperation: Procedure {
 
     private let delay: Delay
     private let leeway: DispatchTimeInterval

@@ -22,7 +22,7 @@ public class ComposedOperation<T: Operation>: GroupOperation {
         name = "Composed <\(T.self)>"
         addObserver(WillCancelObserver { [unowned self] operation, errors in
             guard operation === self else { return }
-            if !errors.isEmpty, let op =  self.operation as? OldOperation {
+            if !errors.isEmpty, let op =  self.operation as? Procedure {
                 op.cancelWithError(OperationError.parentOperationCancelledWithErrors(errors))
             }
             else {

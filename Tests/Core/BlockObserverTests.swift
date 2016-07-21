@@ -26,8 +26,8 @@ class BaseBlockObserverTests: OperationTests {
 
 class StartedObserverTests: BaseBlockObserverTests {
 
-    var called_didAttachToOperation: OldOperation? = .none
-    var called_didStartOperation: OldOperation? = .none
+    var called_didAttachToOperation: Procedure? = .none
+    var called_didStartOperation: Procedure? = .none
     var observer: WillExecuteObserver!
 
     override func setUp() {
@@ -58,8 +58,8 @@ class StartedObserverTests: BaseBlockObserverTests {
 
 class CancelledObserverTests: BaseBlockObserverTests {
 
-    var called_didAttachToOperation: OldOperation? = .none
-    var called_didCancelOperation: OldOperation? = .none
+    var called_didAttachToOperation: Procedure? = .none
+    var called_didCancelOperation: Procedure? = .none
     var observer: DidCancelObserver!
 
     override func setUp() {
@@ -99,8 +99,8 @@ class CancelledObserverTests: BaseBlockObserverTests {
 
 class ProducedOperationObserverTests: BaseBlockObserverTests {
 
-    var called_didAttachToOperation: OldOperation? = .none
-    var called_didProduceOperation: (OldOperation, Operation)? = .none
+    var called_didAttachToOperation: Procedure? = .none
+    var called_didProduceOperation: (Procedure, Operation)? = .none
     var observer: ProducedOperationObserver!
     var produced: BlockOperation!
 
@@ -135,8 +135,8 @@ class ProducedOperationObserverTests: BaseBlockObserverTests {
 
 class WillFinishObserverTests: BaseBlockObserverTests {
 
-    var called_didAttachToOperation: OldOperation? = .none
-    var called_willFinish: (OldOperation, [ErrorProtocol])? = .none
+    var called_didAttachToOperation: Procedure? = .none
+    var called_willFinish: (Procedure, [ErrorProtocol])? = .none
     var observer: WillFinishObserver!
 
     override func setUp() {
@@ -180,8 +180,8 @@ class WillFinishObserverTests: BaseBlockObserverTests {
 
 class DidFinishObserverTests: BaseBlockObserverTests {
 
-    var called_didAttachToOperation: OldOperation? = .none
-    var called_didFinish: (OldOperation, [ErrorProtocol])? = .none
+    var called_didAttachToOperation: Procedure? = .none
+    var called_didFinish: (Procedure, [ErrorProtocol])? = .none
     var observer: DidFinishObserver!
 
     override func setUp() {
@@ -226,7 +226,7 @@ class DidFinishObserverTests: BaseBlockObserverTests {
 class BlockObserverTests: BaseBlockObserverTests {
 
     func test__did_attach_block_is_called() {
-        var called_didAttachToOperation: OldOperation? = .none
+        var called_didAttachToOperation: Procedure? = .none
         var observer = BlockObserver { _, _ in }
         observer.didAttachToOperation = { op in
             called_didAttachToOperation = op

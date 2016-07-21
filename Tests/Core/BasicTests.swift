@@ -144,7 +144,7 @@ class UserIntentOperationTests: OperationTests {
 
     func test__getting_user_intent_default_background() {
         let operation = TestOperation()
-        XCTAssertEqual(operation.userIntent, OldOperation.UserIntent.none)
+        XCTAssertEqual(operation.userIntent, Procedure.UserIntent.none)
     }
 
     func test__set_user_intent__initiated() {
@@ -167,7 +167,7 @@ class UserIntentOperationTests: OperationTests {
     }
 
     func test__user_intent__equality() {
-        XCTAssertNotEqual(OldOperation.UserIntent.initiated, OldOperation.UserIntent.sideEffect)
+        XCTAssertNotEqual(Procedure.UserIntent.initiated, Procedure.UserIntent.sideEffect)
     }
 }
 
@@ -218,7 +218,7 @@ class OperationDependencyTests: OperationTests {
 
         for i in 0..<count {
 
-            let op1name = "OldOperation 1, iteration: \(i)"
+            let op1name = "Procedure 1, iteration: \(i)"
             let op1Expectation = expectation(description: op1name)
             let op1 = OldBlockOperation { (continuation: OldBlockOperation.ContinuationBlockType) in
                 counter1 += 1
@@ -226,7 +226,7 @@ class OperationDependencyTests: OperationTests {
                 continuation(error: nil)
             }
 
-            let op2name = "OldOperation 2, iteration: \(i)"
+            let op2name = "Procedure 2, iteration: \(i)"
             let op2Expectation = expectation(description: op2name)
             let op2 = OldBlockOperation { (continuation: OldBlockOperation.ContinuationBlockType) in
                 counter2 += 1
@@ -234,7 +234,7 @@ class OperationDependencyTests: OperationTests {
                 continuation(error: nil)
             }
 
-            let op3name = "OldOperation 3, iteration: \(i)"
+            let op3name = "Procedure 3, iteration: \(i)"
             let op3Expectation = expectation(description: op3name)
             let op3 = OldBlockOperation { (continuation: OldBlockOperation.ContinuationBlockType) in
                 counter3 += 1
@@ -364,7 +364,7 @@ class CancellationOperationTests: OperationTests {
          See: https://developer.apple.com/library/mac/documentation/Cocoa/Reference/NSOperation_class/
 
          NSOperation.cancel() does this automatically, so calling super.cancel() in 
-         OldOperation.cancel() takes care of this.
+         Procedure.cancel() takes care of this.
          
          If the call to super.cancel() is removed at some point, and this behavior is 
          not duplicated, the outcome of cancelling will still be correct, but 
@@ -451,7 +451,7 @@ class CancellationOperationTests: OperationTests {
     }
 }
 
-private class TestHandlesFinishOperation: OldOperation {
+private class TestHandlesFinishOperation: Procedure {
     override init() {
         super.init(disableAutomaticFinishing: true)
     }
@@ -468,7 +468,7 @@ private class TestHandlesFinishOperation: OldOperation {
 class FinishingOperationTests: OperationTests {
 
     func test__operation_with_disableAutomaticFinishing_manual_cancel_and_finish_on_willexecute_does_not_result_in_invalid_state_transition_finished_to_executing() {
-        class TestOperation_CancelsAndManuallyFinishesOnWillExecute: OldOperation {
+        class TestOperation_CancelsAndManuallyFinishesOnWillExecute: Procedure {
             override init() {
                 super.init(disableAutomaticFinishing: true) // <-- disableAutomaticFinishing
                 addObserver(WillExecuteObserver { [weak self] _ in
@@ -491,7 +491,7 @@ class FinishingOperationTests: OperationTests {
         waitForExpectations(timeout: 3, handler: nil)
         
         // Test initially failed with:
-        // assertion failed: Attempting to perform illegal cyclic state transition, Finished -> Executing for operation: Unnamed OldOperation #UUID.: file Operations/Sources/Core/Shared/OldOperation.swift, line 399
+        // assertion failed: Attempting to perform illegal cyclic state transition, Finished -> Executing for operation: Unnamed Procedure #UUID.: file Operations/Sources/Core/Shared/Procedure.swift, line 399
         // This will crash the test execution if it happens.
     }
 }

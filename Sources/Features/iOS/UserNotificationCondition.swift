@@ -81,7 +81,7 @@ public final class UserNotificationCondition: Condition {
         addDependency(UserNotificationPermissionOperation(settings: settings, behavior: behavior, registrar: registrar))
     }
 
-    public override func evaluate(_ operation: OldOperation, completion: (OperationConditionResult) -> Void) {
+    public override func evaluate(_ operation: Procedure, completion: (OperationConditionResult) -> Void) {
         if let current = registrar.opr_currentUserNotificationSettings() {
 
             switch (current, settings) {
@@ -106,7 +106,7 @@ public func == (lhs: UserNotificationCondition.Error, rhs: UserNotificationCondi
     }
 }
 
-public class UserNotificationPermissionOperation: OldOperation {
+public class UserNotificationPermissionOperation: Procedure {
 
     enum NotificationObserver {
         case settingsDidChange
@@ -132,7 +132,7 @@ public class UserNotificationPermissionOperation: OldOperation {
         self.behavior = behavior
         self.registrar = registrar
         super.init()
-        name = "User Notification Permissions OldOperation"
+        name = "User Notification Permissions Procedure"
         addCondition(AlertPresentation())
     }
 

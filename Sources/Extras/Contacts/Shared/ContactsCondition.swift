@@ -29,7 +29,7 @@ public class _ContactsCondition<Store: ContactStoreType>: Condition {
         }
     }
 
-    public override func evaluate(_ operation: OldOperation, completion: (OperationConditionResult) -> Void) {
+    public override func evaluate(_ operation: Procedure, completion: (OperationConditionResult) -> Void) {
         switch store.opr_authorizationStatusForEntityType(entityType) {
         case .authorized:
             completion(.satisfied)

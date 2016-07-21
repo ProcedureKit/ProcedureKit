@@ -262,7 +262,7 @@ class HostReachabilityManagerTests: ReachabilityManagerTests {
 
 class DeviceReachabilityTests: XCTestCase, NetworkReachabilityDelegate {
 
-    let queue: DispatchQueue = Queue.default.serial("me.danthorpe.OldOperation.Testing")
+    let queue: DispatchQueue = Queue.default.serial("me.danthorpe.Procedure.Testing")
     var device: DeviceReachability!
     var expectation: XCTestExpectation? = .none
     var delegateDidReceiveFlags: SCNetworkReachabilityFlags? = .none

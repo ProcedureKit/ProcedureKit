@@ -11,7 +11,7 @@ import Foundation
 // swiftlint:disable file_length
 
 /**
-An `OldOperation` subclass which enables the grouping
+An `Procedure` subclass which enables the grouping
 of other operations. Use `GroupOperation`s to associate
 related operations together, thereby creating higher
 levels of abstractions.
@@ -21,7 +21,7 @@ of creating Operations which may repeat themselves before
 subsequent operations can run. For example, authentication
 operations.
 */
-public class GroupOperation: OldOperation, OperationQueueDelegate {
+public class GroupOperation: Procedure, OperationQueueDelegate {
 
     typealias ErrorsByOperation = [Operation: [ErrorProtocol]]
     internal struct Errors {
@@ -64,7 +64,7 @@ public class GroupOperation: OldOperation, OperationQueueDelegate {
     }
     private var _operations: Protector<[Operation]>
 
-    public override var userIntent: OldOperation.UserIntent {
+    public override var userIntent: Procedure.UserIntent {
         didSet {
             let (nsops, ops) = operations.splitNSOperationsAndOperations
             nsops.forEach { $0.setQualityOfServiceFromUserIntent(userIntent) }
@@ -81,9 +81,9 @@ public class GroupOperation: OldOperation, OperationQueueDelegate {
         _operations = Protector<[Operation]>(ops)
         // GroupOperation handles calling finish() on cancellation once all of its children have cancelled and finished
         // and its finishingOperation has finished.
-        super.init(disableAutomaticFinishing: true) // Override default OldOperation finishing behavior
+        super.init(disableAutomaticFinishing: true) // Override default Procedure finishing behavior
         canFinishOperation = GroupOperation.CanFinishOperation(parentGroupOperation: self)
-        name = "Group OldOperation"
+        name = "Group Procedure"
         queue.isSuspended = true
         queue.delegate = self
         userIntent = operations.userIntent
@@ -437,7 +437,7 @@ public struct WillAddChildObserver: GroupOperationWillAddChildObserver {
     }
 
     /// Base OperationObserverType method
-    public func didAttachToOperation(_ operation: OldOperation) {
+    public func didAttachToOperation(_ operation: Procedure) {
         didAttachToOperation?(operation: operation)
     }
 }

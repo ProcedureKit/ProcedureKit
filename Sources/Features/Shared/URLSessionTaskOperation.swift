@@ -10,14 +10,14 @@ import Foundation
 
 
 /**
-An OldOperation which is a simple wrapper around `NSURLSessionTask`.
+An Procedure which is a simple wrapper around `NSURLSessionTask`.
 
 Note that the task will still need to be configured with a delegate
 as usual. Typically this operation would be used after the task is
 setup, so that conditions or observers can be attached.
 
 */
-public class URLSessionTaskOperation: OldOperation {
+public class URLSessionTaskOperation: Procedure {
 
     enum KeyPath: String {
         case State = "state"

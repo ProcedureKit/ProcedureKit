@@ -22,7 +22,7 @@ public final class MutuallyExclusive<T>: Condition {
     }
 
     /// Required public override, but there is no evaluation, so it just completes with `.Satisfied`.
-    public override func evaluate(_ operation: OldOperation, completion: CompletionBlockType) {
+    public override func evaluate(_ operation: Procedure, completion: CompletionBlockType) {
         completion(.satisfied)
     }
 }

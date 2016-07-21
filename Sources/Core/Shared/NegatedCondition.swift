@@ -33,7 +33,7 @@ public final class NegatedCondition<C: Condition>: ComposedCondition<C> {
     }
 
     /// Override of public function
-    public override func evaluate(_ operation: OldOperation, completion: CompletionBlockType) {
+    public override func evaluate(_ operation: Procedure, completion: CompletionBlockType) {
         super.evaluate(operation) { [name = self.condition.name] composedResult in
             switch composedResult {
             case .satisfied:

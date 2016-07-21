@@ -32,9 +32,9 @@ public struct TimeoutObserver: OperationWillExecuteObserver {
     if the operation has not finished and is not cancelled, then it will
     cancel it with an error of `OperationError.OperationTimedOut`
 
-    - parameter operation: the `OldOperation` which will be cancelled if the timeout is reached.
+    - parameter operation: the `Procedure` which will be cancelled if the timeout is reached.
     */
-    public func willExecuteOperation(_ operation: OldOperation) {
+    public func willExecuteOperation(_ operation: Procedure) {
         let when = DispatchTime.now() + Double(Int64(timeout * Double(NSEC_PER_SEC))) / Double(NSEC_PER_SEC)
 
         Queue.default.queue.after(when: when) {

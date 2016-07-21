@@ -257,7 +257,7 @@ class FibonacciWaitGeneratorTests: WaitStrategyIntervalTests {
     }
 }
 
-// MARK: - Repeated OldOperation
+// MARK: - Repeated Procedure
 
 class RepeatedOperationTests: OperationTests {
 

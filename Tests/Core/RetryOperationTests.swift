@@ -9,14 +9,14 @@
 import XCTest
 @testable import Operations
 
-class OperationWhichFailsThenSucceeds: OldOperation {
+class OperationWhichFailsThenSucceeds: Procedure {
 
     let shouldFail: () -> Bool
 
     init(shouldFail: () -> Bool) {
         self.shouldFail = shouldFail
         super.init()
-        name = "OldOperation Which Fails But Then Succeeds"
+        name = "Procedure Which Fails But Then Succeeds"
     }
 
     override func execute() {
