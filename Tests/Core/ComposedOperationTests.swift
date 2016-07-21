@@ -20,7 +20,7 @@ class ComposedOperationTests: OperationTests {
 
     func test__composed_nsoperation_is_performed() {
         var didExecute = false
-        let composed = ComposedOperation(OldBlockOperation {
+        let composed = ComposedOperation(BlockProcedure {
             didExecute = true
         })
 

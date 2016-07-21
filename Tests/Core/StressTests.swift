@@ -18,7 +18,7 @@ class StressTest: OperationTests {
     func disable_test__completion_blocks() {
         (0..<batchSize).forEach { i in
             let expectation = self.expectation(description: "Interation: \(i)")
-            let operation = OldBlockOperation { }
+            let operation = BlockProcedure { }
             operation.addCompletionBlock { expectation.fulfill() }
             self.queue.addOperation(operation)
         }
@@ -121,7 +121,7 @@ class StressTest: OperationTests {
                     operationDispatchGroup.enter()
                     let operationFinishCount = Counter()
                     let operationCancelCount = Counter()
-                    let operation = OldBlockOperation { usleep(500) }
+                    let operation = BlockProcedure { usleep(500) }
                     operation.addObserver(DidCancelObserver(didCancel: { (operation) in
                         operationCancelCount.increment_barrier()
                         cancelCount.increment()

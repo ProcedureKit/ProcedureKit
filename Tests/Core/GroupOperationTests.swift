@@ -114,7 +114,7 @@ class GroupOperationTests: OperationTests {
 
         let numberOfOperations = 10_000
         let operations = (0..<numberOfOperations).map { i -> Procedure in
-            let block = OldBlockOperation { (completion: OldBlockOperation.ContinuationBlockType) in
+            let block = BlockProcedure { (completion: BlockProcedure.ContinuationBlockType) in
                 let error = NSError(domain: "me.danthorpe.Operations.Tests", code: -9_999, userInfo: nil)
                 completion(error: error)
             }
@@ -124,7 +124,7 @@ class GroupOperationTests: OperationTests {
 
         let group = GroupOperation(operations: operations)
 
-        let waiter = OldBlockOperation { }
+        let waiter = BlockProcedure { }
         waiter.addDependency(group)
 
         let expectation = self.expectation(description: "Test: \(#function)")
@@ -141,7 +141,7 @@ class GroupOperationTests: OperationTests {
         let child = GroupOperation(operations: [operation])
         let group = GroupOperation(operations: [child])
 
-        let waiter = OldBlockOperation { }
+        let waiter = BlockProcedure { }
         waiter.addDependency(group)
 
         let expectation = self.expectation(description: "Test: \(#function)")
@@ -159,7 +159,7 @@ class GroupOperationTests: OperationTests {
         let child = GroupOperation(operations: [child1])
         let group = GroupOperation(operations: [child])
 
-        let waiter = OldBlockOperation { }
+        let waiter = BlockProcedure { }
         waiter.addDependency(group)
 
         let expectation = self.expectation(description: "Test: \(#function)")
@@ -230,7 +230,7 @@ class GroupOperationTests: OperationTests {
         let test1 = TestOperation()
         test1.userIntent = .initiated
         let test2 = TestOperation()
-        let test3 = OldBlockOperation { }
+        let test3 = BlockProcedure { }
         
         let group = GroupOperation(operations: [ test1, test2, test3 ])
         XCTAssertEqual(group.userIntent, Procedure.UserIntent.initiated)
@@ -240,7 +240,7 @@ class GroupOperationTests: OperationTests {
         let test1 = TestOperation()
         test1.userIntent = .initiated
         let test2 = TestOperation()
-        let test3 = OldBlockOperation { }
+        let test3 = BlockProcedure { }
         
         let group = GroupOperation(operations: [ test1, test2, test3 ])
         group.userIntent = .sideEffect
@@ -287,11 +287,11 @@ class GroupOperationTests: OperationTests {
 
     func test__group_operation__does_not_finish_before_child_groupoperations_are_finished() {
         for _ in 0..<100 {
-            let child1 = GroupOperation(operations: [OldBlockOperation { (continuation: OldBlockOperation.ContinuationBlockType) in
+            let child1 = GroupOperation(operations: [BlockProcedure { (continuation: BlockProcedure.ContinuationBlockType) in
                 sleep(5)
                 continuation(error: nil)
             }])
-            let child2 = GroupOperation(operations: [OldBlockOperation { (continuation: OldBlockOperation.ContinuationBlockType) in
+            let child2 = GroupOperation(operations: [BlockProcedure { (continuation: BlockProcedure.ContinuationBlockType) in
                 sleep(5)
                 continuation(error: nil)
             }])

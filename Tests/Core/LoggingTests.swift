@@ -40,13 +40,13 @@ class LoggerTests: XCTestCase {
     }
 
     func test__operation_name_with_name_set() {
-        let op = OldBlockOperation()
+        let op = BlockProcedure()
         op.name = "A Block"
         XCTAssertEqual(op.operationName, "A Block")
     }
 
     func test__operation_name_with_name_not_set() {
-        let op = OldBlockOperation()
+        let op = BlockProcedure()
         op.name = nil
         XCTAssertTrue(op.operationName.contains("Unnamed Procedure"))
     }

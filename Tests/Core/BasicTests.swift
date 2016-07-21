@@ -100,12 +100,12 @@ class BasicTests: OperationTests {
     }
 
     func test__adding_array_of_operations() {
-        let operations = (0..<3).map { _ in OldBlockOperation {  } }
+        let operations = (0..<3).map { _ in BlockProcedure {  } }
         queue.addOperations(operations)
     }
 
     func test__adding_variable_argument_of_operations() {
-        queue.addOperations(OldBlockOperation { }, OldBlockOperation { })
+        queue.addOperations(BlockProcedure { }, BlockProcedure { })
     }
 
     func test__operation_gets_finished_called() {
@@ -177,7 +177,7 @@ class CompletionBlockOperationTests: OperationTests {
         let expectation = self.expectation(description: "Test: \(#function)")
         var numberOfTimesCompletionBlockIsRun = 0
 
-        let operation = OldBlockOperation()
+        let operation = BlockProcedure()
 
         operation.completionBlock = {
             numberOfTimesCompletionBlockIsRun += 1
@@ -220,7 +220,7 @@ class OperationDependencyTests: OperationTests {
 
             let op1name = "Procedure 1, iteration: \(i)"
             let op1Expectation = expectation(description: op1name)
-            let op1 = OldBlockOperation { (continuation: OldBlockOperation.ContinuationBlockType) in
+            let op1 = BlockProcedure { (continuation: BlockProcedure.ContinuationBlockType) in
                 counter1 += 1
                 op1Expectation.fulfill()
                 continuation(error: nil)
@@ -228,7 +228,7 @@ class OperationDependencyTests: OperationTests {
 
             let op2name = "Procedure 2, iteration: \(i)"
             let op2Expectation = expectation(description: op2name)
-            let op2 = OldBlockOperation { (continuation: OldBlockOperation.ContinuationBlockType) in
+            let op2 = BlockProcedure { (continuation: BlockProcedure.ContinuationBlockType) in
                 counter2 += 1
                 op2Expectation.fulfill()
                 continuation(error: nil)
@@ -236,7 +236,7 @@ class OperationDependencyTests: OperationTests {
 
             let op3name = "Procedure 3, iteration: \(i)"
             let op3Expectation = expectation(description: op3name)
-            let op3 = OldBlockOperation { (continuation: OldBlockOperation.ContinuationBlockType) in
+            let op3 = BlockProcedure { (continuation: BlockProcedure.ContinuationBlockType) in
                 counter3 += 1
                 op3Expectation.fulfill()
                 continuation(error: nil)

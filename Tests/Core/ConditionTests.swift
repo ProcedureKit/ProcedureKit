@@ -97,7 +97,7 @@ class ConditionTests: OperationTests {
         let dependency1 = TestOperation(); dependency1.name = "Dependency 1"
         let dependency2 = TestOperation(); dependency2.name = "Dependency 2"
         
-        let conditionDependency1 = OldBlockOperation {
+        let conditionDependency1 = BlockProcedure {
             XCTAssertTrue(dependency1.isFinished)
             XCTAssertTrue(dependency2.isFinished)
         }
@@ -106,7 +106,7 @@ class ConditionTests: OperationTests {
         condition1.addDependency(conditionDependency1)
 
 
-        let conditionDependency2 = OldBlockOperation {
+        let conditionDependency2 = BlockProcedure {
             XCTAssertTrue(dependency1.isFinished)
             XCTAssertTrue(dependency2.isFinished)
         }

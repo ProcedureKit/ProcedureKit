@@ -36,22 +36,22 @@ class MutualExclusiveTests: OperationTests {
     func test__mutually_exclusive_operation_are_run_exclusively() {
         var text = "Star Wars"
 
-        let operation1 = OldBlockOperation {
+        let operation1 = BlockProcedure {
             XCTAssertEqual(text, "Star Wars")
             text = "\(text)\nA long time ago"
         }
         operation1.name = "Procedure 1"
-        let condition1A = MutuallyExclusive<OldBlockOperation>()
+        let condition1A = MutuallyExclusive<BlockProcedure>()
         let condition1B = MutuallyExclusive<TestOperation>()
         operation1.addCondition(condition1A)
         operation1.addCondition(condition1B)
 
-        let operation2 = OldBlockOperation {
+        let operation2 = BlockProcedure {
             XCTAssertEqual(text, "Star Wars\nA long time ago")
             text = "\(text), in a galaxy far, far away."
         }
         operation2.name = "Procedure 2"
-        let condition2A = MutuallyExclusive<OldBlockOperation>()
+        let condition2A = MutuallyExclusive<BlockProcedure>()
         let condition2B = MutuallyExclusive<TestOperation>()
         operation2.addCondition(condition2A)
         operation2.addCondition(condition2B)
@@ -67,7 +67,7 @@ class MutualExclusiveTests: OperationTests {
     func test__condition_has_dependency_executed_first() {
         var text = "Star Wars"
 
-        let conditionDependency1 = OldBlockOperation {
+        let conditionDependency1 = BlockProcedure {
             XCTAssertEqual(text, "Star Wars")
             text = "\(text)\nA long time ago"
         }
@@ -84,7 +84,7 @@ class MutualExclusiveTests: OperationTests {
         operation1Dependency.name = "Dependency 1"
         operation1.addDependency(operation1Dependency)
 
-        let conditionDependency2 = OldBlockOperation {
+        let conditionDependency2 = BlockProcedure {
             XCTAssertEqual(text, "Star Wars\nA long time ago")
             text = "\(text), in a galaxy far, far away."
         }
@@ -111,13 +111,13 @@ class MutualExclusiveTests: OperationTests {
     }
 
     func test__mutually_exclusive_operations_can_be_executed() {
-        let operation1 = OldBlockOperation()
+        let operation1 = BlockProcedure()
         operation1.name = "operation 1"
-        operation1.addCondition(MutuallyExclusive<OldBlockOperation>())
+        operation1.addCondition(MutuallyExclusive<BlockProcedure>())
 
-        let operation2 = OldBlockOperation()
+        let operation2 = BlockProcedure()
         operation1.name = "operation 2"
-        operation2.addCondition(MutuallyExclusive<OldBlockOperation>())
+        operation2.addCondition(MutuallyExclusive<BlockProcedure>())
 
         addCompletionBlockToTestOperation(operation1)
         addCompletionBlockToTestOperation(operation2)
