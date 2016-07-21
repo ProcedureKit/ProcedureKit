@@ -15,31 +15,31 @@ attached to is asked about its readiness.
 */
 public class ReachabilityCondition: Condition {
 
-    public enum Error: ErrorType, Equatable {
-        case NotReachable
-        case NotReachableWithConnectivity(Reachability.Connectivity)
+    public enum Error: ErrorProtocol, Equatable {
+        case notReachable
+        case notReachableWithConnectivity(Reachability.Connectivity)
     }
 
-    let url: NSURL
+    let url: URL
     let connectivity: Reachability.Connectivity
     var reachability: HostReachabilityType = ReachabilityManager(DeviceReachability())
 
-    public init(url: NSURL, connectivity: Reachability.Connectivity = .AnyConnectionKind) {
+    public init(url: URL, connectivity: Reachability.Connectivity = .anyConnectionKind) {
         self.url = url
         self.connectivity = connectivity
         super.init()
         name = "Reachability"
     }
 
-    public override func evaluate(operation: Operation, completion: OperationConditionResult -> Void) {
+    public override func evaluate(_ operation: Procedure, completion: (OperationConditionResult) -> Void) {
         reachability.reachabilityForURL(url) { status in
             switch (self.connectivity, status) {
-            case (.AnyConnectionKind, .Reachable(_)), (.ViaWWAN, .Reachable(_)), (.ViaWiFi, .Reachable(.ViaWiFi)):
-                completion(.Satisfied)
-            case (.ViaWiFi, .Reachable(.ViaWWAN)):
-                completion(.Failed(Error.NotReachableWithConnectivity(self.connectivity)))
+            case (.anyConnectionKind, .reachable(_)), (.viaWWAN, .reachable(_)), (.viaWiFi, .reachable(.viaWiFi)):
+                completion(.satisfied)
+            case (.viaWiFi, .reachable(.viaWWAN)):
+                completion(.failed(Error.notReachableWithConnectivity(self.connectivity)))
             default:
-                completion(.Failed(Error.NotReachable))
+                completion(.failed(Error.notReachable))
             }
         }
     }
@@ -47,9 +47,9 @@ public class ReachabilityCondition: Condition {
 
 public func == (lhs: ReachabilityCondition.Error, rhs: ReachabilityCondition.Error) -> Bool {
     switch (lhs, rhs) {
-    case (.NotReachable, .NotReachable):
+    case (.notReachable, .notReachable):
         return true
-    case let (.NotReachableWithConnectivity(aConnectivity), .NotReachableWithConnectivity(bConnectivity)):
+    case let (.notReachableWithConnectivity(aConnectivity), .notReachableWithConnectivity(bConnectivity)):
         return aConnectivity == bConnectivity
     default:
         return false

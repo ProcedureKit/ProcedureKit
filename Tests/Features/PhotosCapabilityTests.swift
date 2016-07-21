@@ -12,11 +12,11 @@ import Photos
 
 class TestablePhotosRegistrar: NSObject {
 
-    var authorizationStatus: PHAuthorizationStatus = .NotDetermined
+    var authorizationStatus: PHAuthorizationStatus = .notDetermined
     var didCheckAuthorizationStatus = false
 
-    var responseStatus: PHAuthorizationStatus = .Authorized
-    var accessError: NSError? = .None
+    var responseStatus: PHAuthorizationStatus = .authorized
+    var accessError: NSError? = .none
     var didRequestAuthorization = false
 
     required override init() { }
@@ -29,7 +29,7 @@ extension TestablePhotosRegistrar: PhotosCapabilityRegistrarType {
         return authorizationStatus
     }
 
-    func opr_requestAuthorization(handler: PHAuthorizationStatus -> Void) {
+    func opr_requestAuthorization(_ handler: (PHAuthorizationStatus) -> Void) {
         didRequestAuthorization = true
         authorizationStatus = responseStatus
         handler(authorizationStatus)
@@ -39,22 +39,22 @@ extension TestablePhotosRegistrar: PhotosCapabilityRegistrarType {
 class PHAuthorizationStatusTests: XCTestCase {
 
     func test__given_not_determined_requirement_not_met() {
-        let status = PHAuthorizationStatus.NotDetermined
+        let status = PHAuthorizationStatus.notDetermined
         XCTAssertFalse(status.isRequirementMet())
     }
 
     func test__given_restricted_requirement_not_met() {
-        let status = PHAuthorizationStatus.Restricted
+        let status = PHAuthorizationStatus.restricted
         XCTAssertFalse(status.isRequirementMet())
     }
 
     func test__given_denied_requirement_not_met() {
-        let status = PHAuthorizationStatus.Denied
+        let status = PHAuthorizationStatus.denied
         XCTAssertFalse(status.isRequirementMet())
     }
 
     func test__given_authorized_requirement_met() {
-        let status = PHAuthorizationStatus.Authorized
+        let status = PHAuthorizationStatus.authorized
         XCTAssertTrue(status.isRequirementMet())
     }
 }
@@ -85,7 +85,7 @@ class PhotosCapabilityTests: XCTestCase {
     }
 
     func test__authorization_status_queries_register() {
-        capability.authorizationStatus { XCTAssertEqual($0, PHAuthorizationStatus.NotDetermined) }
+        capability.authorizationStatus { XCTAssertEqual($0, PHAuthorizationStatus.notDetermined) }
         XCTAssertTrue(registrar.didCheckAuthorizationStatus)
     }
 
@@ -99,7 +99,7 @@ class PhotosCapabilityTests: XCTestCase {
     }
 
     func test__given_denied_does_not_request() {
-        registrar.authorizationStatus = .Denied
+        registrar.authorizationStatus = .denied
         var didComplete = false
         capability.requestAuthorizationWithCompletion {
             didComplete = true
@@ -109,7 +109,7 @@ class PhotosCapabilityTests: XCTestCase {
     }
 
     func test__given_authorized_does_not_request() {
-        registrar.authorizationStatus = .Authorized
+        registrar.authorizationStatus = .authorized
         var didComplete = false
         capability.requestAuthorizationWithCompletion {
             didComplete = true

@@ -8,9 +8,9 @@
 
 import Foundation
 
-func arc4random<T: IntegerLiteralConvertible>(type: T.Type) -> T {
+func arc4random<T: IntegerLiteralConvertible>(_ type: T.Type) -> T {
     var r: T = 0
-    arc4random_buf(&r, Int(sizeof(T)))
+    arc4random_buf(&r, Int(sizeof(T.self)))
     return r
 }
 
@@ -27,7 +27,7 @@ func arc4random<T: IntegerLiteralConvertible>(type: T.Type) -> T {
  let one = RandomFailGenerator(generator, probability: 0.01)
  ```
  */
-public struct RandomFailGenerator<G: GeneratorType>: GeneratorType {
+public struct RandomFailGenerator<G: IteratorProtocol>: IteratorProtocol {
 
     private var generator: G
     private let shouldNotFail: () -> Bool
@@ -42,7 +42,7 @@ public struct RandomFailGenerator<G: GeneratorType>: GeneratorType {
     public init(_ generator: G, probability: Double = 0.1) {
         self.generator = generator
         self.shouldNotFail = {
-            let r = (Double(arc4random(UInt64)) / Double(UInt64.max))
+            let r = (Double(arc4random(UInt64.self)) / Double(UInt64.max))
             return r > probability
         }
     }
@@ -56,7 +56,7 @@ public struct RandomFailGenerator<G: GeneratorType>: GeneratorType {
     }
 }
 
-struct FibonacciGenerator: GeneratorType {
+struct FibonacciGenerator: IteratorProtocol {
     var currentValue = 0, nextValue = 1
 
     mutating func next() -> Int? {
@@ -67,7 +67,7 @@ struct FibonacciGenerator: GeneratorType {
     }
 }
 
-struct FiniteGenerator<G: GeneratorType>: GeneratorType {
+struct FiniteGenerator<G: IteratorProtocol>: IteratorProtocol {
 
     private let limit: Int
     private var generator: G
@@ -88,12 +88,12 @@ struct FiniteGenerator<G: GeneratorType>: GeneratorType {
     }
 }
 
-struct MapGenerator<G: GeneratorType, T>: GeneratorType {
-    private let transform: G.Element -> T
+struct MapGenerator<G: IteratorProtocol, T>: IteratorProtocol {
+    private let transform: (G.Element) -> T
     private var generator: G
 
 
-    init(_ generator: G, transform: G.Element -> T) {
+    init(_ generator: G, transform: (G.Element) -> T) {
         self.generator = generator
         self.transform = transform
     }
@@ -103,7 +103,7 @@ struct MapGenerator<G: GeneratorType, T>: GeneratorType {
     }
 }
 
-struct TupleGenerator<Primary: GeneratorType, Secondary: GeneratorType>: GeneratorType {
+struct TupleGenerator<Primary: IteratorProtocol, Secondary: IteratorProtocol>: IteratorProtocol {
 
     private var primary: Primary
     private var secondary: Secondary
@@ -119,7 +119,7 @@ struct TupleGenerator<Primary: GeneratorType, Secondary: GeneratorType>: Generat
 }
 
 
-struct IntervalGenerator: GeneratorType {
+struct IntervalGenerator: IteratorProtocol {
 
     let strategy: WaitStrategy
 
@@ -130,32 +130,32 @@ struct IntervalGenerator: GeneratorType {
         self.strategy = strategy
     }
 
-    mutating func next() -> NSTimeInterval? {
+    mutating func next() -> TimeInterval? {
         switch strategy {
 
-        case .Immediate:
+        case .immediate:
             return 0
 
-        case .Fixed(let period):
+        case .fixed(let period):
             return period
 
-        case .Random(let (minimum, maximum)):
-            let r = Double(arc4random(UInt64)) / Double(UInt64.max)
+        case .random(let (minimum, maximum)):
+            let r = Double(arc4random(UInt64.self)) / Double(UInt64.max)
             return (r * (maximum - minimum)) + minimum
 
-        case .Incrementing(let (initial, increment)):
-            let interval = initial + (NSTimeInterval(count) * increment)
+        case .incrementing(let (initial, increment)):
+            let interval = initial + (TimeInterval(count) * increment)
             count += 1
             return max(0, interval)
 
-        case .Exponential(let (period, maximum)):
+        case .exponential(let (period, maximum)):
             let interval = period * pow(2.0, Double(count))
             count += 1
             return max(0, min(maximum, interval))
 
-        case .Fibonacci(let (period, maximum)):
+        case .fibonacci(let (period, maximum)):
             return fibonacci.next().map { fib in
-                let interval = period * NSTimeInterval(fib)
+                let interval = period * TimeInterval(fib)
                 return max(0, min(maximum, interval))
             }
         }

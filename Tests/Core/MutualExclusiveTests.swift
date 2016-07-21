@@ -25,7 +25,7 @@ class MutualExclusiveTests: OperationTests {
         let condition = AlertPresentation()
         condition.evaluate(TestOperation()) { result in
             switch result {
-            case .Satisfied:
+            case .satisfied:
                 return XCTAssertTrue(true)
             default:
                 return XCTFail("Alert presentation condition should evaluate true.")
@@ -36,22 +36,22 @@ class MutualExclusiveTests: OperationTests {
     func test__mutually_exclusive_operation_are_run_exclusively() {
         var text = "Star Wars"
 
-        let operation1 = BlockOperation {
+        let operation1 = BlockProcedure {
             XCTAssertEqual(text, "Star Wars")
             text = "\(text)\nA long time ago"
         }
-        operation1.name = "Operation 1"
-        let condition1A = MutuallyExclusive<BlockOperation>()
+        operation1.name = "Procedure 1"
+        let condition1A = MutuallyExclusive<BlockProcedure>()
         let condition1B = MutuallyExclusive<TestOperation>()
         operation1.addCondition(condition1A)
         operation1.addCondition(condition1B)
 
-        let operation2 = BlockOperation {
+        let operation2 = BlockProcedure {
             XCTAssertEqual(text, "Star Wars\nA long time ago")
             text = "\(text), in a galaxy far, far away."
         }
-        operation2.name = "Operation 2"
-        let condition2A = MutuallyExclusive<BlockOperation>()
+        operation2.name = "Procedure 2"
+        let condition2A = MutuallyExclusive<BlockProcedure>()
         let condition2B = MutuallyExclusive<TestOperation>()
         operation2.addCondition(condition2A)
         operation2.addCondition(condition2B)
@@ -59,7 +59,7 @@ class MutualExclusiveTests: OperationTests {
         addCompletionBlockToTestOperation(operation1)
         addCompletionBlockToTestOperation(operation2)
         runOperations(operation1, operation2)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForExpectations(timeout: 3, handler: nil)
 
         XCTAssertEqual(text, "Star Wars\nA long time ago, in a galaxy far, far away.")
     }
@@ -67,7 +67,7 @@ class MutualExclusiveTests: OperationTests {
     func test__condition_has_dependency_executed_first() {
         var text = "Star Wars"
 
-        let conditionDependency1 = BlockOperation {
+        let conditionDependency1 = BlockProcedure {
             XCTAssertEqual(text, "Star Wars")
             text = "\(text)\nA long time ago"
         }
@@ -77,14 +77,14 @@ class MutualExclusiveTests: OperationTests {
         condition1.addDependency(conditionDependency1)
 
         let operation1 = TestOperation()
-        operation1.name = "Operation 1"
+        operation1.name = "Procedure 1"
         operation1.addCondition(condition1)
 
         let operation1Dependency = TestOperation()
         operation1Dependency.name = "Dependency 1"
         operation1.addDependency(operation1Dependency)
 
-        let conditionDependency2 = BlockOperation {
+        let conditionDependency2 = BlockProcedure {
             XCTAssertEqual(text, "Star Wars\nA long time ago")
             text = "\(text), in a galaxy far, far away."
         }
@@ -105,23 +105,23 @@ class MutualExclusiveTests: OperationTests {
         addCompletionBlockToTestOperation(operation1Dependency)
         addCompletionBlockToTestOperation(operation2Dependency)
         runOperations(operation1, operation2Dependency, operation2, operation1Dependency)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForExpectations(timeout: 3, handler: nil)
 
         XCTAssertEqual(text, "Star Wars\nA long time ago, in a galaxy far, far away.")
     }
 
     func test__mutually_exclusive_operations_can_be_executed() {
-        let operation1 = BlockOperation()
+        let operation1 = BlockProcedure()
         operation1.name = "operation 1"
-        operation1.addCondition(MutuallyExclusive<BlockOperation>())
+        operation1.addCondition(MutuallyExclusive<BlockProcedure>())
 
-        let operation2 = BlockOperation()
+        let operation2 = BlockProcedure()
         operation1.name = "operation 2"
-        operation2.addCondition(MutuallyExclusive<BlockOperation>())
+        operation2.addCondition(MutuallyExclusive<BlockProcedure>())
 
         addCompletionBlockToTestOperation(operation1)
         addCompletionBlockToTestOperation(operation2)
         runOperations(operation1, operation2)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForExpectations(timeout: 3, handler: nil)
     }
 }

@@ -16,91 +16,91 @@ class SCNetworkReachabilityFlagsTests: XCTestCase {
     var flags: SCNetworkReachabilityFlags!
 
     func test__flags_is_reachable() {
-        flags = .Reachable
+        flags = .reachable
         XCTAssertTrue(flags.isReachable)
     }
 
     func test__flags_isConnectionRequired() {
-        flags = .ConnectionRequired
+        flags = .connectionRequired
         XCTAssertTrue(flags.isConnectionRequired)
     }
 
     func test__flags_isInterventionRequired() {
-        flags = .InterventionRequired
+        flags = .interventionRequired
         XCTAssertTrue(flags.isInterventionRequired)
     }
 
     func test__flags_isConnectionOnTraffic() {
-        flags = .ConnectionOnTraffic
+        flags = .connectionOnTraffic
         XCTAssertTrue(flags.isConnectionOnTraffic)
     }
 
     func test__flags_isConnectionOnDemand() {
-        flags = .ConnectionOnDemand
+        flags = .connectionOnDemand
         XCTAssertTrue(flags.isConnectionOnDemand)
     }
 
     func test__flags_isConnectionOnTrafficOrDemand_when_onTraffic() {
-        flags = .ConnectionOnTraffic
+        flags = .connectionOnTraffic
         XCTAssertTrue(flags.isConnectionOnTrafficOrDemand)
     }
 
     func test__flags_isConnectionOnTrafficOrDemand_when_onDemand() {
-        flags = .ConnectionOnDemand
+        flags = .connectionOnDemand
         XCTAssertTrue(flags.isConnectionOnTrafficOrDemand)
     }
 
     func test__flags_isTransientConnection() {
-        flags = .TransientConnection
+        flags = .transientConnection
         XCTAssertTrue(flags.isTransientConnection)
     }
 
     func test__flags_isLocalAddress() {
-        flags = .IsLocalAddress
+        flags = .isLocalAddress
         XCTAssertTrue(flags.isLocalAddress)
     }
 
     func test__flags_isDirect() {
-        flags = .IsDirect
+        flags = .isDirect
         XCTAssertTrue(flags.isDirect)
     }
 
     func test__flags_isConnectionRequiredOrTransient_whenRequired() {
-        flags = .ConnectionRequired
+        flags = .connectionRequired
         XCTAssertTrue(flags.isConnectionRequiredOrTransient)
     }
 
     func test__flags_isConnectionRequiredOrTransient_whenTransient() {
-        flags = .TransientConnection
+        flags = .transientConnection
         XCTAssertTrue(flags.isConnectionRequiredOrTransient)
     }
 
     func test__flags_isOnWWAN() {
         #if os(iOS)
-            flags = .IsWWAN
+            flags = .isWWAN
             XCTAssertTrue(flags.isOnWWAN)
         #else
-            flags = .Reachable
+            flags = .reachable
             XCTAssertFalse(flags.isOnWWAN)
         #endif
     }
 
     func test__flags_isReachableViaWifi_true_when_Reachable() {
-        flags = .Reachable
+        flags = .reachable
         XCTAssertTrue(flags.isReachableViaWiFi)
     }
 
     func test__flags_isReachableViaWiFi_false_when_Reachable_but_ConnectionRequired() {
-        flags = [ .Reachable, .ConnectionRequired ]
+        flags = [ .reachable, .connectionRequired ]
         XCTAssertFalse(flags.isReachableViaWiFi)
     }
 
     func test__flags_isReachableViaWWAN() {
         #if os(iOS)
-            flags = [ .Reachable, .IsWWAN ]
+            flags = [ .reachable, .isWWAN ]
             XCTAssertTrue(flags.isReachableViaWWAN)
         #else
-            flags = .Reachable
+            flags = .reachable
             XCTAssertTrue(flags.isReachableViaWWAN)
         #endif
     }
@@ -111,42 +111,42 @@ class NetworkStatusTests: XCTestCase {
     var flags: SCNetworkReachabilityFlags!
 
     func test__equality() {
-        XCTAssertEqual(Reachability.NetworkStatus.Reachable(.AnyConnectionKind), Reachability.NetworkStatus.Reachable(.AnyConnectionKind))
-        XCTAssertEqual(Reachability.NetworkStatus.Reachable(.ViaWiFi), Reachability.NetworkStatus.Reachable(.ViaWiFi))
-        XCTAssertEqual(Reachability.NetworkStatus.Reachable(.ViaWWAN), Reachability.NetworkStatus.Reachable(.ViaWWAN))
-        XCTAssertEqual(Reachability.NetworkStatus.NotReachable, Reachability.NetworkStatus.NotReachable)
-        XCTAssertNotEqual(Reachability.NetworkStatus.Reachable(.AnyConnectionKind), Reachability.NetworkStatus.Reachable(.ViaWiFi))
-        XCTAssertNotEqual(Reachability.NetworkStatus.Reachable(.ViaWiFi), Reachability.NetworkStatus.Reachable(.ViaWWAN))
-        XCTAssertNotEqual(Reachability.NetworkStatus.Reachable(.ViaWWAN), Reachability.NetworkStatus.Reachable(.ViaWiFi))
-        XCTAssertNotEqual(Reachability.NetworkStatus.NotReachable, Reachability.NetworkStatus.Reachable(.AnyConnectionKind))
+        XCTAssertEqual(Reachability.NetworkStatus.reachable(.anyConnectionKind), Reachability.NetworkStatus.reachable(.anyConnectionKind))
+        XCTAssertEqual(Reachability.NetworkStatus.reachable(.viaWiFi), Reachability.NetworkStatus.reachable(.viaWiFi))
+        XCTAssertEqual(Reachability.NetworkStatus.reachable(.viaWWAN), Reachability.NetworkStatus.reachable(.viaWWAN))
+        XCTAssertEqual(Reachability.NetworkStatus.notReachable, Reachability.NetworkStatus.notReachable)
+        XCTAssertNotEqual(Reachability.NetworkStatus.reachable(.anyConnectionKind), Reachability.NetworkStatus.reachable(.viaWiFi))
+        XCTAssertNotEqual(Reachability.NetworkStatus.reachable(.viaWiFi), Reachability.NetworkStatus.reachable(.viaWWAN))
+        XCTAssertNotEqual(Reachability.NetworkStatus.reachable(.viaWWAN), Reachability.NetworkStatus.reachable(.viaWiFi))
+        XCTAssertNotEqual(Reachability.NetworkStatus.notReachable, Reachability.NetworkStatus.reachable(.anyConnectionKind))
 
     }
 
     func test__init_flags__reachable_via_wifi() {
-        flags = [ .Reachable ]
-        XCTAssertEqual(Reachability.NetworkStatus(flags: flags), Reachability.NetworkStatus.Reachable(.ViaWiFi))
+        flags = [ .reachable ]
+        XCTAssertEqual(Reachability.NetworkStatus(flags: flags), Reachability.NetworkStatus.reachable(.viaWiFi))
     }
 
     func test__init_flags__reachable_via_wwan() {
         #if os(iOS)
-            flags = [ .Reachable, .IsWWAN ]
-            XCTAssertEqual(Reachability.NetworkStatus(flags: flags), Reachability.NetworkStatus.Reachable(.ViaWWAN))
+            flags = [ .reachable, .isWWAN ]
+            XCTAssertEqual(Reachability.NetworkStatus(flags: flags), Reachability.NetworkStatus.reachable(.viaWWAN))
         #endif
     }
 
     func test__init_flags__not_reachable() {
-        flags = [ .ConnectionRequired ]
-        XCTAssertEqual(Reachability.NetworkStatus(flags: flags), Reachability.NetworkStatus.NotReachable)
+        flags = [ .connectionRequired ]
+        XCTAssertEqual(Reachability.NetworkStatus(flags: flags), Reachability.NetworkStatus.notReachable)
     }
 
     func test__not_reachable_is_not_connected() {
-        let status: Reachability.NetworkStatus = .NotReachable
-        XCTAssertFalse(status.isConnected(.AnyConnectionKind))
+        let status: Reachability.NetworkStatus = .notReachable
+        XCTAssertFalse(status.isConnected(.anyConnectionKind))
     }
 
     func test__reachable_via_wwan_is_not_connected_for_wifi() {
-        let status: Reachability.NetworkStatus = .Reachable(.ViaWWAN)
-        XCTAssertFalse(status.isConnected(.ViaWiFi))
+        let status: Reachability.NetworkStatus = .reachable(.viaWWAN)
+        XCTAssertFalse(status.isConnected(.viaWiFi))
     }
 }
 
@@ -155,7 +155,7 @@ class TestableNetworkReachability {
 
     var didGetDefaultRouteReachability = false
     var _defaultRouteReachability: Reachability = "Default"
-    var flags: SCNetworkReachabilityFlags? = .Reachable
+    var flags: SCNetworkReachabilityFlags? = .reachable
     var didStartNotifier = false
     var didStopNotifier = false
     var didGetReachabilityFlagsForHostname = false
@@ -170,7 +170,7 @@ extension TestableNetworkReachability: NetworkReachabilityType {
         return _defaultRouteReachability
     }
 
-    func startNotifierOnQueue(queue: dispatch_queue_t) throws {
+    func startNotifierOnQueue(_ queue: DispatchQueue) throws {
         didStartNotifier = true
         if let flags = flags {
             delegate?.reachabilityDidChange(flags)
@@ -181,7 +181,7 @@ extension TestableNetworkReachability: NetworkReachabilityType {
         didStopNotifier = true
     }
 
-    func reachabilityFlagsForHostname(host: String) -> SCNetworkReachabilityFlags? {
+    func reachabilityFlagsForHostname(_ host: String) -> SCNetworkReachabilityFlags? {
         didGetReachabilityFlagsForHostname = true
         return flags
     }
@@ -208,13 +208,13 @@ class SystemReachabilityManagerTests: ReachabilityManagerTests {
 
     func test__whenConnected__block_is_run() {
         var blockDidRun = false
-        let expectation = expectationWithDescription("Test: \(#function)")
-        manager.whenConnected(.AnyConnectionKind) {
+        let expectation = self.expectation(description: "Test: \(#function)")
+        manager.whenConnected(.anyConnectionKind) {
             blockDidRun = true
             expectation.fulfill()
         }
 
-        waitForExpectationsWithTimeout(3.0, handler: nil)
+        waitForExpectations(timeout: 3.0, handler: nil)
         XCTAssertTrue(blockDidRun)
         XCTAssertTrue(network.didStopNotifier)
     }
@@ -223,49 +223,49 @@ class SystemReachabilityManagerTests: ReachabilityManagerTests {
 class HostReachabilityManagerTests: ReachabilityManagerTests {
 
     func test__reachabilityForURL__with_no_host__not_reachable() {
-        let expectation = expectationWithDescription("Test: \(#function)")
-        var receivedStatus: Reachability.NetworkStatus? = .None
-        manager.reachabilityForURL(NSURL(string: "http://")!) { status in
+        let expectation = self.expectation(description: "Test: \(#function)")
+        var receivedStatus: Reachability.NetworkStatus? = .none
+        manager.reachabilityForURL(URL(string: "http://")!) { status in
             receivedStatus = status
             expectation.fulfill()
         }
 
-        waitForExpectationsWithTimeout(3.0, handler: nil)
-        XCTAssertEqual(receivedStatus ?? .Reachable(.AnyConnectionKind), .NotReachable)
+        waitForExpectations(timeout: 3.0, handler: nil)
+        XCTAssertEqual(receivedStatus ?? .reachable(.anyConnectionKind), .notReachable)
     }
 
     func test__reachabilityForURL__without_flags__not_reachable() {
-        let expectation = expectationWithDescription("Test: \(#function)")
-        var receivedStatus: Reachability.NetworkStatus? = .None
-        network.flags = .None
-        manager.reachabilityForURL(NSURL(string: "http://apple.com")!) { status in
+        let expectation = self.expectation(description: "Test: \(#function)")
+        var receivedStatus: Reachability.NetworkStatus? = .none
+        network.flags = .none
+        manager.reachabilityForURL(URL(string: "http://apple.com")!) { status in
             receivedStatus = status
             expectation.fulfill()
         }
 
-        waitForExpectationsWithTimeout(3.0, handler: nil)
-        XCTAssertEqual(receivedStatus ?? .Reachable(.AnyConnectionKind), .NotReachable)
+        waitForExpectations(timeout: 3.0, handler: nil)
+        XCTAssertEqual(receivedStatus ?? .reachable(.anyConnectionKind), .notReachable)
     }
 
     func test__reachabilityForURL__reachable() {
-        let expectation = expectationWithDescription("Test: \(#function)")
-        var receivedStatus: Reachability.NetworkStatus? = .None
-        manager.reachabilityForURL(NSURL(string: "http://apple.com")!) { status in
+        let expectation = self.expectation(description: "Test: \(#function)")
+        var receivedStatus: Reachability.NetworkStatus? = .none
+        manager.reachabilityForURL(URL(string: "http://apple.com")!) { status in
             receivedStatus = status
             expectation.fulfill()
         }
 
-        waitForExpectationsWithTimeout(3.0, handler: nil)
-        XCTAssertEqual(receivedStatus ?? .Reachable(.AnyConnectionKind), .Reachable(.ViaWiFi))
+        waitForExpectations(timeout: 3.0, handler: nil)
+        XCTAssertEqual(receivedStatus ?? .reachable(.anyConnectionKind), .reachable(.viaWiFi))
     }
 }
 
 class DeviceReachabilityTests: XCTestCase, NetworkReachabilityDelegate {
 
-    let queue: dispatch_queue_t = Queue.Default.serial("me.danthorpe.Operation.Testing")
+    let queue: DispatchQueue = Queue.default.serial("me.danthorpe.Procedure.Testing")
     var device: DeviceReachability!
-    var expectation: XCTestExpectation? = .None
-    var delegateDidReceiveFlags: SCNetworkReachabilityFlags? = .None
+    var expectation: XCTestExpectation? = .none
+    var delegateDidReceiveFlags: SCNetworkReachabilityFlags? = .none
 
     override func setUp() {
         super.setUp()
@@ -283,7 +283,7 @@ class DeviceReachabilityTests: XCTestCase, NetworkReachabilityDelegate {
         XCTAssertFalse(device.notifierIsRunning)
     }
 
-    func reachabilityDidChange(flags: SCNetworkReachabilityFlags) {
+    func reachabilityDidChange(_ flags: SCNetworkReachabilityFlags) {
         delegateDidReceiveFlags = flags
         expectation?.fulfill()
     }
@@ -293,23 +293,23 @@ class DeviceReachabilityTests: XCTestCase, NetworkReachabilityDelegate {
     }
 
     func test__reachabilityDidChange_informs_delegate() {
-        device.reachabilityDidChange(.Reachable)
-        XCTAssertEqual(delegateDidReceiveFlags ?? .ConnectionRequired, .Reachable)
+        device.reachabilityDidChange(.reachable)
+        XCTAssertEqual(delegateDidReceiveFlags ?? .connectionRequired, .reachable)
     }
 
     func test__check() {
-        expectation = expectationWithDescription("Test: \(#function)")
+        expectation = self.expectation(description: "Test: \(#function)")
         if let reachability = device.reachabilityForHost("https://apple.com") {
             device.check(reachability, queue: queue)
         }
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForExpectations(timeout: 3, handler: nil)
         XCTAssertNotNil(delegateDidReceiveFlags)
     }
 
     func test__creates_default_route_reachability() {
         do {
             XCTAssertNil(device.__defaultRouteReachability)
-            let _ = try device.defaultRouteReachability()
+            try device.defaultRouteReachability()
             XCTAssertNotNil(device.__defaultRouteReachability)
         }
         catch {

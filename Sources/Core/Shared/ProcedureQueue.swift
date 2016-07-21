@@ -1,5 +1,5 @@
 //
-//  OperationQueue.swift
+//  ProcedureQueue.swift
 //  Operations
 //
 //  Created by Daniel Thorpe on 26/06/2015.
@@ -9,7 +9,7 @@
 import Foundation
 
 /**
-A protocol which the `OperationQueue`'s delegate must conform to. The delegate is informed
+A protocol which the `ProcedureQueue`'s delegate must conform to. The delegate is informed
 when the queue is about to add an operation, and when operations finish. Because it is a
 delegate protocol, conforming types must be classes, as the queue weakly owns it.
 */
@@ -19,45 +19,45 @@ public protocol OperationQueueDelegate: class {
     The operation queue will add a new operation. This is for information only, the
     delegate cannot affect whether the operation is added, or other control flow.
 
-    - paramter queue: the `OperationQueue`.
+    - paramter queue: the `ProcedureQueue`.
     - paramter operation: the `NSOperation` instance about to be added.
     */
-    func operationQueue(queue: OperationQueue, willAddOperation operation: NSOperation)
+    func operationQueue(_ queue: ProcedureQueue, willAddOperation operation: Operation)
 
     /**
     An operation has finished on the queue.
 
-    - parameter queue: the `OperationQueue`.
+    - parameter queue: the `ProcedureQueue`.
     - parameter operation: the `NSOperation` instance which finished.
     - parameter errors: an array of `ErrorType`s.
     */
-    func operationQueue(queue: OperationQueue, willFinishOperation operation: NSOperation, withErrors errors: [ErrorType])
+    func operationQueue(_ queue: ProcedureQueue, willFinishOperation operation: Operation, withErrors errors: [ErrorProtocol])
 
     /**
      An operation has finished on the queue.
 
-     - parameter queue: the `OperationQueue`.
+     - parameter queue: the `ProcedureQueue`.
      - parameter operation: the `NSOperation` instance which finished.
      - parameter errors: an array of `ErrorType`s.
      */
-    func operationQueue(queue: OperationQueue, didFinishOperation operation: NSOperation, withErrors errors: [ErrorType])
+    func operationQueue(_ queue: ProcedureQueue, didFinishOperation operation: Operation, withErrors errors: [ErrorProtocol])
 
     /**
      The operation queue will add a new operation via produceOperation().
      This is for information only, the delegate cannot affect whether the operation
      is added, or other control flow.
 
-     - paramter queue: the `OperationQueue`.
+     - paramter queue: the `ProcedureQueue`.
      - paramter operation: the `NSOperation` instance about to be added.
      */
-    func operationQueue(queue: OperationQueue, willProduceOperation operation: NSOperation)
+    func operationQueue(_ queue: ProcedureQueue, willProduceOperation operation: Operation)
 }
 
 /**
 An `NSOperationQueue` subclass which supports the features of Operations. All functionality
 is achieved via the overridden functionality of `addOperation`.
 */
-public class OperationQueue: NSOperationQueue {
+public class ProcedureQueue: OperationQueue {
 
     #if swift(>=3.0)
         // (SR-192 is fixed in Swift 3)
@@ -79,7 +79,7 @@ public class OperationQueue: NSOperationQueue {
     - parameter delegate: a weak `OperationQueueDelegate?`
     */
     #if swift(>=3.0)
-    public weak var delegate: OperationQueueDelegate? = .None
+    public weak var delegate: OperationQueueDelegate? = .none
     #else
     // Swift < 3 FIX:
     // (SR-192): Weak properties are not thread safe when reading
@@ -96,8 +96,8 @@ public class OperationQueue: NSOperationQueue {
             }
         }
     }
-    private weak var _delegate: OperationQueueDelegate? = .None
-    private let delegateLock = NSLock()
+    private weak var _delegate: OperationQueueDelegate? = .none
+    private let delegateLock = Foundation.Lock()
     #endif
 
     /**
@@ -107,8 +107,8 @@ public class OperationQueue: NSOperationQueue {
     - parameter op: an `NSOperation` instance.
     */
     // swiftlint:disable function_body_length
-    public override func addOperation(operation: NSOperation) {
-        if let operation = operation as? Operation {
+    public override func addOperation(_ operation: Operation) {
+        if let operation = operation as? Procedure {
 
             /// Add an observer so that any produced operations are added to the queue
             operation.addObserver(ProducedOperationObserver { [weak self] op, produced in
@@ -138,7 +138,7 @@ public class OperationQueue: NSOperationQueue {
                 /// Check for mutual exclusion conditions
                 let manager = ExclusivityManager.sharedInstance
                 let mutuallyExclusiveConditions = operation.conditions.filter { $0.mutuallyExclusive }
-                var previousMutuallyExclusiveOperations = Set<NSOperation>()
+                var previousMutuallyExclusiveOperations = Set<Operation>()
                 for condition in mutuallyExclusiveConditions {
                     let category = "\(condition.category)"
                     if let previous = manager.addOperation(operation, category: category) {
@@ -184,7 +184,7 @@ public class OperationQueue: NSOperationQueue {
         }
         else {
             operation.addCompletionBlock { [weak self, weak operation] in
-                if let queue = self, op = operation {
+                if let queue = self, let op = operation {
                     queue.delegate?.operationQueue(queue, didFinishOperation: op, withErrors: [])
                 }
             }
@@ -202,19 +202,19 @@ public class OperationQueue: NSOperationQueue {
     - parameter ops: an array of `NSOperation` instances.
     - parameter wait: a Bool flag which is ignored.
     */
-    public override func addOperations(ops: [NSOperation], waitUntilFinished wait: Bool) {
+    public override func addOperations(_ ops: [Operation], waitUntilFinished wait: Bool) {
         ops.forEach(addOperation)
     }
 }
 
 
-public extension NSOperationQueue {
+public extension OperationQueue {
 
     /**
      Add operations to the queue as an array
      - parameters ops: a array of `NSOperation` instances.
      */
-    func addOperations<S where S: SequenceType, S.Generator.Element: NSOperation>(ops: S) {
+    func addOperations<S where S: Sequence, S.Iterator.Element: Operation>(_ ops: S) {
         addOperations(Array(ops), waitUntilFinished: false)
     }
 
@@ -222,31 +222,33 @@ public extension NSOperationQueue {
      Add operations to the queue as a variadic parameter
      - parameters ops: a variadic array of `NSOperation` instances.
     */
-    func addOperations(ops: NSOperation...) {
+    func addOperations(_ ops: Operation...) {
         addOperations(ops)
     }
 }
 
 
-public extension OperationQueue {
+public extension ProcedureQueue {
 
     private static let sharedMainQueue = MainQueue()
 
     /**
-     Override NSOperationQueue's mainQueue() to return the main queue as an OperationQueue
+     Override NSOperationQueue's mainQueue() to return the main queue as an ProcedureQueue
 
      - returns: The main queue
      */
-    public override class func mainQueue() -> OperationQueue {
-        return sharedMainQueue
-    }
+    public override class var main: ProcedureQueue { return sharedMainQueue }
+//
+//    public override class func mainQueue() -> ProcedureQueue {
+//        return sharedMainQueue
+//    }
 }
 
-/// OperationQueue wrapper around the main queue
-private class MainQueue: OperationQueue {
+/// ProcedureQueue wrapper around the main queue
+private class MainQueue: ProcedureQueue {
     override init() {
         super.init()
-        underlyingQueue = dispatch_get_main_queue()
+        underlyingQueue = DispatchQueue.main
         maxConcurrentOperationCount = 1
     }
 }

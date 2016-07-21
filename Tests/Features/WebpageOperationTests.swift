@@ -15,16 +15,16 @@ class TestableSafariViewController: SFSafariViewController {
 
     var controllerDidDismiss = false
 
-    override func dismissViewControllerAnimated(flag: Bool, completion: (() -> Void)?) {
+    override func dismiss(animated flag: Bool, completion: (() -> Void)?) {
         controllerDidDismiss = true
-        super.dismissViewControllerAnimated(flag, completion: completion)
+        super.dismiss(animated: flag, completion: completion)
     }
 }
 
 @available(iOS 9.0, *)
 class WebpageOperationTests: OperationTests {
 
-    let url = NSURL(string: "https://github.com")!
+    let url = URL(string: "https://github.com")!
     var presentingController: TestablePresentingController!
 
     override func setUp() {
@@ -34,9 +34,9 @@ class WebpageOperationTests: OperationTests {
 
     func test__operation_presents_safari_view_controller() {
         var didPresentWebpage = false
-        let operation = WebpageOperation(url: url, displayControllerFrom: .ShowDetail(presentingController))
+        let operation = WebpageOperation(url: url, displayControllerFrom: .showDetail(presentingController))
 
-        presentingController.expectation = expectationWithDescription("Test: \(#function)")
+        presentingController.expectation = expectation(description: "Test: \(#function)")
         presentingController.check = { received in
             if let safariViewController = received as? SFSafariViewController {
                 didPresentWebpage = true
@@ -54,7 +54,7 @@ class WebpageOperationTests: OperationTests {
 
         runOperation(operation)
 
-        waitForExpectationsWithTimeout(5, handler: nil)
+        waitForExpectations(timeout: 5, handler: nil)
         XCTAssertTrue(didPresentWebpage)
     }
 }

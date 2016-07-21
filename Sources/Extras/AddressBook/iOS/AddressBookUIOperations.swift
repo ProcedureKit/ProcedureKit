@@ -45,18 +45,18 @@ To configure the controller, you can do this:
     )
     queue.addOperation(show)
 */
-@available(iOS, deprecated=9.0)
+@available(iOS, deprecated: 9.0)
 public class AddressBookDisplayPersonViewController<F: PresentingViewController>: GroupOperation {
 
     let delegate: ABPersonViewControllerDelegate
     let operation: UIOperation<ABPersonViewController, F>
     let get: AddressBookGetResource
 
-    public convenience init(personViewController: ABPersonViewController? = .None, personWithID personID: ABRecordID, displayControllerFrom from: ViewControllerDisplayStyle<F>, delegate: ABPersonViewControllerDelegate, sender: AnyObject? = .None) {
+    public convenience init(personViewController: ABPersonViewController? = .none, personWithID personID: ABRecordID, displayControllerFrom from: ViewControllerDisplayStyle<F>, delegate: ABPersonViewControllerDelegate, sender: AnyObject? = .none) {
         self.init(registrar: SystemAddressBookRegistrar(), personViewController: personViewController, personWithID: personID, displayControllerFrom: from, delegate: delegate, sender: sender)
     }
 
-    init(registrar: AddressBookPermissionRegistrar, personViewController: ABPersonViewController? = .None, personWithID personID: ABRecordID, displayControllerFrom from: ViewControllerDisplayStyle<F>, delegate: ABPersonViewControllerDelegate, sender: AnyObject? = .None) {
+    init(registrar: AddressBookPermissionRegistrar, personViewController: ABPersonViewController? = .none, personWithID personID: ABRecordID, displayControllerFrom from: ViewControllerDisplayStyle<F>, delegate: ABPersonViewControllerDelegate, sender: AnyObject? = .none) {
 
         self.operation = UIOperation(controller: personViewController ?? ABPersonViewController(), displayControllerFrom: from, sender: sender)
         self.delegate = delegate
@@ -65,7 +65,7 @@ public class AddressBookDisplayPersonViewController<F: PresentingViewController>
         super.init(operations: [ get ])
     }
 
-    public override func willFinishOperation(finished: NSOperation) {
+    public override func willFinishOperation(_ finished: Operation) {
         if get == finished, let person = get.addressBookPerson {
             operation.controller.personViewDelegate = delegate
             operation.controller.displayedPerson = person.storage
@@ -75,18 +75,18 @@ public class AddressBookDisplayPersonViewController<F: PresentingViewController>
     }
 }
 
-@available(iOS, deprecated=9.0)
+@available(iOS, deprecated: 9.0)
 public class AddressBookDisplayNewPersonViewController<F: PresentingViewController>: GroupOperation {
 
     let delegate: ABNewPersonViewControllerDelegate
     let operation: UIOperation<ABNewPersonViewController, F>
     let get: AddressBookGetResource
 
-    public convenience init(displayControllerFrom from: ViewControllerDisplayStyle<F>, delegate: ABNewPersonViewControllerDelegate, sender: AnyObject? = .None, addToGroupWithName groupName: String? = .None) {
+    public convenience init(displayControllerFrom from: ViewControllerDisplayStyle<F>, delegate: ABNewPersonViewControllerDelegate, sender: AnyObject? = .none, addToGroupWithName groupName: String? = .none) {
         self.init(registrar: SystemAddressBookRegistrar(), displayControllerFrom: from, delegate: delegate, sender: sender, addToGroupWithName: groupName)
     }
 
-    init(registrar: AddressBookPermissionRegistrar, displayControllerFrom from: ViewControllerDisplayStyle<F>, delegate: ABNewPersonViewControllerDelegate, sender: AnyObject? = .None, addToGroupWithName groupName: String? = .None) {
+    init(registrar: AddressBookPermissionRegistrar, displayControllerFrom from: ViewControllerDisplayStyle<F>, delegate: ABNewPersonViewControllerDelegate, sender: AnyObject? = .none, addToGroupWithName groupName: String? = .none) {
 
         self.operation = UIOperation(controller: ABNewPersonViewController(), displayControllerFrom: from, sender: sender)
         self.delegate = delegate
@@ -97,7 +97,7 @@ public class AddressBookDisplayNewPersonViewController<F: PresentingViewControll
         super.init(operations: [ get ])
     }
 
-    public override func willFinishOperation(finished: NSOperation) {
+    public override func willFinishOperation(_ finished: Operation) {
         if get == finished {
 
             operation.controller.newPersonViewDelegate = delegate

@@ -1,5 +1,5 @@
 //
-//  BlockOperation.swift
+//  BlockProcedure.swift
 //  Operations
 //
 //  Created by Daniel Thorpe on 18/07/2015.
@@ -9,15 +9,15 @@
 import Foundation
 
 /**
-An `Operation` subclass to compose a block. The block type receives
+An `Procedure` subclass to compose a block. The block type receives
 a "continuation block" as its only argument. The block provided must
 call this block to correctly finish the operation. It can be called
 with a nil error argument to finish with no errors. Or an `ErrorType`
 argument to finish with the supplied error.
 */
-public class BlockOperation: Operation {
+public class BlockProcedure: Procedure {
 
-    public typealias ContinuationBlockType = (error: ErrorType?) -> Void
+    public typealias ContinuationBlockType = (error: ErrorProtocol?) -> Void
     public typealias BlockType = (continueWithError: ContinuationBlockType) -> Void
 
     private let block: BlockType
@@ -31,7 +31,7 @@ public class BlockOperation: Operation {
     public init(block: BlockType = { continuation in continuation(error: nil) }) {
         self.block = block
         super.init()
-        name = "Block Operation"
+        name = "BlockProcedure"
     }
 
     /**
@@ -39,9 +39,9 @@ public class BlockOperation: Operation {
 
     - parameter block: a dispatch block which is run on the main thread.
     */
-    public convenience init(mainQueueBlock: dispatch_block_t) {
+    public convenience init(mainQueueBlock: ()->()) {
         self.init(block: { continuation in
-            dispatch_async(Queue.Main.queue) {
+            Queue.main.queue.async {
                 mainQueueBlock()
                 continuation(error: nil)
             }
@@ -58,7 +58,7 @@ public class BlockOperation: Operation {
     them to this continuation block.
     */
     public override func execute() {
-        if !cancelled {
+        if !isCancelled {
             block { error in self.finish(error) }
         }
     }

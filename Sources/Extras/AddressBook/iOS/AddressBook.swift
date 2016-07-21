@@ -38,7 +38,7 @@ and it lacked the necessary hooks for testability.
 public protocol PropertyType {
     associatedtype ValueType
 
-    @available(iOS, deprecated=9.0)
+    @available(iOS, deprecated: 9.0)
     var id: ABPropertyID { get }
 }
 
@@ -66,14 +66,14 @@ public protocol MultiValueRepresentable {
 
 public protocol AddressBookPermissionRegistrar {
 
-    @available(iOS, deprecated=9.0)
+    @available(iOS, deprecated: 9.0)
     var status: ABAuthorizationStatus { get }
 
-    @available(iOS, deprecated=9.0)
-    func createAddressBook() -> (ABAddressBookRef?, AddressBookPermissionRegistrarError?)
+    @available(iOS, deprecated: 9.0)
+    func createAddressBook() -> (ABAddressBook?, AddressBookPermissionRegistrarError?)
 
-    @available(iOS, deprecated=9.0)
-    func requestAccessToAddressBook(addressBook: ABAddressBookRef, completion: (AddressBookPermissionRegistrarError?) -> Void)
+    @available(iOS, deprecated: 9.0)
+    func requestAccessToAddressBook(_ addressBook: ABAddressBook, completion: (AddressBookPermissionRegistrarError?) -> Void)
 }
 
 // MARK: - AddressBookExternalChangeObserver
@@ -89,48 +89,48 @@ public protocol AddressBookType {
     associatedtype GroupStorage
     associatedtype SourceStorage
 
-    func requestAccess(completion: (AddressBookPermissionRegistrarError?) -> Void)
+    func requestAccess(_ completion: (AddressBookPermissionRegistrarError?) -> Void)
 
-    func save() -> ErrorType?
+    func save() -> ErrorProtocol?
 
     // Records
 
-    func addRecord<R: AddressBookRecordType where R.Storage == RecordStorage>(record: R) -> ErrorType?
+    func addRecord<R: AddressBookRecordType where R.Storage == RecordStorage>(_ record: R) -> ErrorProtocol?
 
-    func removeRecord<R: AddressBookRecordType where R.Storage == RecordStorage>(record: R) -> ErrorType?
+    func removeRecord<R: AddressBookRecordType where R.Storage == RecordStorage>(_ record: R) -> ErrorProtocol?
 
     // People
 
     var numberOfPeople: Int { get }
 
-    @available(iOS, deprecated=9.0)
-    func personWithID<P: AddressBook_PersonType where P.Storage == PersonStorage>(id: ABRecordID) -> P?
+    @available(iOS, deprecated: 9.0)
+    func personWithID<P: AddressBook_PersonType where P.Storage == PersonStorage>(_ id: ABRecordID) -> P?
 
-    func peopleWithName<P: AddressBook_PersonType where P.Storage == PersonStorage>(name: String) -> [P]
+    func peopleWithName<P: AddressBook_PersonType where P.Storage == PersonStorage>(_ name: String) -> [P]
 
     func people<P: AddressBook_PersonType where P.Storage == PersonStorage>() -> [P]
 
-    func peopleInSource<P: AddressBook_PersonType, S: AddressBook_SourceType where P.Storage == PersonStorage, S.Storage == SourceStorage>(source: S) -> [P]
+    func peopleInSource<P: AddressBook_PersonType, S: AddressBook_SourceType where P.Storage == PersonStorage, S.Storage == SourceStorage>(_ source: S) -> [P]
 
-    func peopleInSource<P: AddressBook_PersonType, S: AddressBook_SourceType where P.Storage == PersonStorage, S.Storage == SourceStorage>(source: S, withSortOrdering sortOrdering: AddressBook.SortOrdering) -> [P]
+    func peopleInSource<P: AddressBook_PersonType, S: AddressBook_SourceType where P.Storage == PersonStorage, S.Storage == SourceStorage>(_ source: S, withSortOrdering sortOrdering: AddressBook.SortOrdering) -> [P]
 
     // Groups
 
     var numberOfGroups: Int { get }
 
-    @available(iOS, deprecated=9.0)
-    func groupWithID<G: AddressBook_GroupType where G.Storage == GroupStorage>(id: ABRecordID) -> G?
+    @available(iOS, deprecated: 9.0)
+    func groupWithID<G: AddressBook_GroupType where G.Storage == GroupStorage>(_ id: ABRecordID) -> G?
 
     func groups<G: AddressBook_GroupType where G.Storage == GroupStorage>() -> [G]
 
-    func groupsInSource<G: AddressBook_GroupType, S: AddressBook_SourceType where G.Storage == GroupStorage, S.Storage == SourceStorage>(source: S) -> [G]
+    func groupsInSource<G: AddressBook_GroupType, S: AddressBook_SourceType where G.Storage == GroupStorage, S.Storage == SourceStorage>(_ source: S) -> [G]
 
     // Sources
 
     func defaultSource<S: AddressBook_SourceType where S.Storage == SourceStorage>() -> S
 
-    @available(iOS, deprecated=9.0)
-    func sourceWithID<S: AddressBook_SourceType where S.Storage == SourceStorage>(id: ABRecordID) -> S?
+    @available(iOS, deprecated: 9.0)
+    func sourceWithID<S: AddressBook_SourceType where S.Storage == SourceStorage>(_ id: ABRecordID) -> S?
 
     func sources<S: AddressBook_SourceType where S.Storage == SourceStorage>() -> [S]
 }
@@ -149,7 +149,7 @@ public protocol StorageType {
 
 public protocol AddressBookRecordType: StorageType {
 
-    @available(iOS, deprecated=9.0)
+    @available(iOS, deprecated: 9.0)
     var id: ABRecordID { get }
 
     var recordKind: AddressBook.RecordKind { get }
@@ -158,7 +158,7 @@ public protocol AddressBookRecordType: StorageType {
 
     func value<P: ReadablePropertyType>(forProperty property: P) -> P.ValueType?
 
-    func setValue<P: WriteablePropertyType>(value: P.ValueType?, forProperty property: P) -> ErrorType?
+    func setValue<P: WriteablePropertyType>(_ value: P.ValueType?, forProperty property: P) -> ErrorProtocol?
 }
 
 // MARK: - AddressBook_PersonType
@@ -186,11 +186,11 @@ public protocol AddressBook_GroupType: AddressBookRecordType {
 
 public protocol AddressBookGroupType: AddressBook_GroupType {
 
-    func members<P: AddressBook_PersonType where P.Storage == PersonStorage>(ordering: AddressBook.SortOrdering?) -> [P]
+    func members<P: AddressBook_PersonType where P.Storage == PersonStorage>(_ ordering: AddressBook.SortOrdering?) -> [P]
 
-    func add<P: AddressBook_PersonType where P.Storage == PersonStorage>(member: P) -> ErrorType?
+    func add<P: AddressBook_PersonType where P.Storage == PersonStorage>(_ member: P) -> ErrorProtocol?
 
-    func remove<P: AddressBook_PersonType where P.Storage == PersonStorage>(member: P) -> ErrorType?
+    func remove<P: AddressBook_PersonType where P.Storage == PersonStorage>(_ member: P) -> ErrorProtocol?
 }
 
 // MARK: - AddressBook_SourceType
@@ -214,7 +214,7 @@ public protocol AddressBookSourceType: AddressBook_SourceType {
 
 // MARK: - Types
 
-@available(iOS, deprecated=9.0)
+@available(iOS, deprecated: 9.0)
 public final class AddressBook: AddressBookType {
 
 // MARK: - SortOrdering
@@ -222,25 +222,25 @@ public final class AddressBook: AddressBookType {
     public enum SortOrdering: RawRepresentable, CustomStringConvertible {
 
         public static var current: SortOrdering {
-            return SortOrdering(rawValue: ABPersonGetSortOrdering()) ?? .ByLastName
+            return SortOrdering(rawValue: ABPersonGetSortOrdering()) ?? .byLastName
         }
 
-        case ByLastName, ByFirstName
+        case byLastName, byFirstName
 
         public var rawValue: ABPersonSortOrdering {
             switch self {
-            case .ByLastName:
+            case .byLastName:
                 return numericCast(kABPersonSortByLastName)
-            case .ByFirstName:
+            case .byFirstName:
                 return numericCast(kABPersonSortByFirstName)
             }
         }
 
         public var description: String {
             switch self {
-            case .ByFirstName:
+            case .byFirstName:
                 return "ByFirstName"
-            case .ByLastName:
+            case .byLastName:
                 return "ByLastName"
             }
         }
@@ -249,9 +249,9 @@ public final class AddressBook: AddressBookType {
             let value: Int = numericCast(rawValue)
             switch value {
             case kABPersonSortByFirstName:
-                self = .ByFirstName
+                self = .byFirstName
             case kABPersonSortByLastName:
-                self = .ByLastName
+                self = .byLastName
             default:
                 return nil
             }
@@ -262,21 +262,21 @@ public final class AddressBook: AddressBookType {
 
     public enum CompositeNameFormat: RawRepresentable, CustomStringConvertible {
 
-        case FirstNameFirst, LastNameFirst
+        case firstNameFirst, lastNameFirst
 
         public var rawValue: ABPersonCompositeNameFormat {
             switch self {
-            case .FirstNameFirst:
+            case .firstNameFirst:
                 return numericCast(kABPersonCompositeNameFormatFirstNameFirst)
-            case .LastNameFirst:
+            case .lastNameFirst:
                 return numericCast(kABPersonCompositeNameFormatLastNameFirst)
             }
         }
 
         public var description: String {
             switch self {
-            case .FirstNameFirst: return "FirstNameFirst"
-            case .LastNameFirst: return "LastNameFirst"
+            case .firstNameFirst: return "FirstNameFirst"
+            case .lastNameFirst: return "LastNameFirst"
             }
         }
 
@@ -284,9 +284,9 @@ public final class AddressBook: AddressBookType {
             let value: Int = numericCast(rawValue)
             switch value {
             case kABPersonCompositeNameFormatFirstNameFirst:
-                self = .FirstNameFirst
+                self = .firstNameFirst
             case kABPersonCompositeNameFormatLastNameFirst:
-                self = .LastNameFirst
+                self = .lastNameFirst
             default:
                 return nil
             }
@@ -297,26 +297,26 @@ public final class AddressBook: AddressBookType {
 
     public enum RecordKind: RawRepresentable, CustomStringConvertible {
 
-        case Source, Group, Person
+        case source, group, person
 
         public var rawValue: ABRecordType {
             switch self {
-            case .Source:
+            case .source:
                 return numericCast(kABSourceType)
-            case .Group:
+            case .group:
                 return numericCast(kABGroupType)
-            case .Person:
+            case .person:
                 return numericCast(kABPersonType)
             }
         }
 
         public var description: String {
             switch self {
-            case .Source:
+            case .source:
                 return "Source"
-            case .Group:
+            case .group:
                 return "Group"
-            case .Person:
+            case .person:
                 return "Person"
             }
         }
@@ -325,11 +325,11 @@ public final class AddressBook: AddressBookType {
             let value: Int = numericCast(rawValue)
             switch value {
             case kABSourceType:
-                self = .Source
+                self = .source
             case kABGroupType:
-                self = .Group
+                self = .group
             case kABPersonType:
-                self = .Person
+                self = .person
             default:
                 return nil
             }
@@ -340,42 +340,42 @@ public final class AddressBook: AddressBookType {
 
     public enum SourceKind: RawRepresentable, CustomStringConvertible {
 
-        case Local, Exchange, ExchangeGAL, MobileMe, LDAP, CardDAV, CardDAVSearch
+        case local, exchange, exchangeGAL, mobileMe, ldap, cardDAV, cardDAVSearch
 
         public var rawValue: ABSourceType {
             switch self {
-            case .Local:
+            case .local:
                 return numericCast(kABSourceTypeLocal)
-            case .Exchange:
+            case .exchange:
                 return numericCast(kABSourceTypeExchange)
-            case .ExchangeGAL:
+            case .exchangeGAL:
                 return numericCast(kABSourceTypeExchangeGAL)
-            case .MobileMe:
+            case .mobileMe:
                 return numericCast(kABSourceTypeMobileMe)
-            case .LDAP:
+            case .ldap:
                 return numericCast(kABSourceTypeLDAP)
-            case .CardDAV:
+            case .cardDAV:
                 return numericCast(kABSourceTypeCardDAV)
-            case .CardDAVSearch:
+            case .cardDAVSearch:
                 return numericCast(kABSourceTypeCardDAVSearch)
             }
         }
 
         public var description: String {
             switch self {
-            case .Local:
+            case .local:
                 return "Local"
-            case .Exchange:
+            case .exchange:
                 return "Exchange"
-            case .ExchangeGAL:
+            case .exchangeGAL:
                 return "ExchangeGAL"
-            case .MobileMe:
+            case .mobileMe:
                 return "MobileMe"
-            case .LDAP:
+            case .ldap:
                 return "LDAP"
-            case .CardDAV:
+            case .cardDAV:
                 return "CardDAV"
-            case .CardDAVSearch:
+            case .cardDAVSearch:
                 return "CardDAVSearch"
             }
         }
@@ -384,19 +384,19 @@ public final class AddressBook: AddressBookType {
             let value: Int = numericCast(rawValue)
             switch value {
             case kABSourceTypeLocal:
-                self = .Local
+                self = .local
             case kABSourceTypeExchange:
-                self = .Exchange
+                self = .exchange
             case kABSourceTypeExchangeGAL:
-                self = .ExchangeGAL
+                self = .exchangeGAL
             case kABSourceTypeMobileMe:
-                self = .MobileMe
+                self = .mobileMe
             case kABSourceTypeLDAP:
-                self = .LDAP
+                self = .ldap
             case kABSourceTypeCardDAV:
-                self = .CardDAV
+                self = .cardDAV
             case kABSourceTypeCardDAVSearch:
-                self = .CardDAVSearch
+                self = .cardDAVSearch
             default:
                 return nil
             }
@@ -407,31 +407,31 @@ public final class AddressBook: AddressBookType {
 
     public enum PropertyKind: RawRepresentable, CustomStringConvertible {
 
-        case Invalid, String, Integer, Real, DateTime, Dictionary, MultiString, MultiInteger, MultiReal, MultiDateTime, MultiDictionary
+        case Invalid, string, integer, real, dateTime, dictionary, multiString, multiInteger, multiReal, multiDateTime, multiDictionary
 
         public var rawValue: ABPropertyType {
             switch self {
             case .Invalid:
                 return numericCast(kABInvalidPropertyType)
-            case .String:
+            case .string:
                 return numericCast(kABStringPropertyType)
-            case .Integer:
+            case .integer:
                 return numericCast(kABIntegerPropertyType)
-            case .Real:
+            case .real:
                 return numericCast(kABRealPropertyType)
-            case .DateTime:
+            case .dateTime:
                 return numericCast(kABDateTimePropertyType)
-            case .Dictionary:
+            case .dictionary:
                 return numericCast(kABDictionaryPropertyType)
-            case .MultiString:
+            case .multiString:
                 return numericCast(kABMultiStringPropertyType)
-            case .MultiInteger:
+            case .multiInteger:
                 return numericCast(kABMultiIntegerPropertyType)
-            case .MultiReal:
+            case .multiReal:
                 return numericCast(kABMultiRealPropertyType)
-            case .MultiDateTime:
+            case .multiDateTime:
                 return numericCast(kABMultiDateTimePropertyType)
-            case .MultiDictionary:
+            case .multiDictionary:
                 return numericCast(kABMultiDictionaryPropertyType)
             }
         }
@@ -442,7 +442,7 @@ public final class AddressBook: AddressBookType {
 
         public var multiValue: Bool {
             switch self {
-            case .MultiString, .MultiInteger, .MultiReal, .MultiDateTime, .MultiDictionary:
+            case .multiString, .multiInteger, .multiReal, .multiDateTime, .multiDictionary:
                 return true
             default:
                 return false
@@ -453,25 +453,25 @@ public final class AddressBook: AddressBookType {
             switch self {
             case .Invalid:
                 return "Invalid"
-            case .String:
+            case .string:
                 return "String"
-            case .Integer:
+            case .integer:
                 return "Integer"
-            case .Real:
+            case .real:
                 return "Real"
-            case .DateTime:
+            case .dateTime:
                 return "DateTime"
-            case .Dictionary:
+            case .dictionary:
                 return "Dictionary"
-            case .MultiString:
+            case .multiString:
                 return "MultiString"
-            case .MultiInteger:
+            case .multiInteger:
                 return "MultiInteger"
-            case .MultiReal:
+            case .multiReal:
                 return "MultiReal"
-            case .MultiDateTime:
+            case .multiDateTime:
                 return "MultiDateTime"
-            case .MultiDictionary:
+            case .multiDictionary:
                 return "MultiDictionary"
             }
         }
@@ -482,25 +482,25 @@ public final class AddressBook: AddressBookType {
             case kABInvalidPropertyType:
                 self = .Invalid
             case kABStringPropertyType:
-                self = .String
+                self = .string
             case kABIntegerPropertyType:
-                self = .Integer
+                self = .integer
             case kABRealPropertyType:
-                self = .Real
+                self = .real
             case kABDateTimePropertyType:
-                self = .DateTime
+                self = .dateTime
             case kABDictionaryPropertyType:
-                self = .Dictionary
+                self = .dictionary
             case kABMultiStringPropertyType:
-                self = .MultiString
+                self = .multiString
             case kABMultiIntegerPropertyType:
-                self = .MultiInteger
+                self = .multiInteger
             case kABMultiRealPropertyType:
-                self = .MultiReal
+                self = .multiReal
             case kABMultiDateTimePropertyType:
-                self = .MultiDateTime
+                self = .multiDateTime
             case kABMultiDictionaryPropertyType:
-                self = .MultiDictionary
+                self = .multiDictionary
             default:
                 return nil
             }
@@ -516,7 +516,7 @@ public final class AddressBook: AddressBookType {
 
     public struct StringMultiValue: MultiValueRepresentable, Equatable, CustomStringConvertible, StringLiteralConvertible {
 
-        public static let propertyKind = AddressBook.PropertyKind.String
+        public static let propertyKind = AddressBook.PropertyKind.string
 
         public var value: String
 
@@ -554,9 +554,9 @@ public final class AddressBook: AddressBookType {
 
     public struct DateMultiValue: MultiValueRepresentable, Comparable, CustomStringConvertible, CustomDebugStringConvertible {
 
-        public static let propertyKind = AddressBook.PropertyKind.DateTime
+        public static let propertyKind = AddressBook.PropertyKind.dateTime
 
-        public var value: NSDate
+        public var value: Date
 
         public var multiValueRepresentation: CFTypeRef {
             return value
@@ -571,7 +571,7 @@ public final class AddressBook: AddressBookType {
         }
 
         public init?(multiValueRepresentation: CFTypeRef) {
-            if let value = multiValueRepresentation as? NSDate {
+            if let value = multiValueRepresentation as? Date {
                 self.value = value
             }
             else {
@@ -620,32 +620,32 @@ public final class AddressBook: AddressBookType {
 
 // MARK: - Main Type
 
-    public typealias RecordStorage = ABRecordRef
-    public typealias PersonStorage = ABRecordRef
-    public typealias GroupStorage = ABRecordRef
-    public typealias SourceStorage = ABRecordRef
+    public typealias RecordStorage = ABRecord
+    public typealias PersonStorage = ABRecord
+    public typealias GroupStorage = ABRecord
+    public typealias SourceStorage = ABRecord
 
-    public enum Error: ErrorType {
+    public enum Error: ErrorProtocol {
 
-        case Save(NSError?)
-        case AddRecord(NSError?)
-        case RemoveRecord(NSError?)
-        case SetValue((id: ABPropertyID, underlyingError: NSError?))
-        case RemoveValue((id: ABPropertyID, underlyingError: NSError?))
-        case AddGroupMember(NSError?)
-        case RemoveGroupMember(NSError?)
+        case save(NSError?)
+        case addRecord(NSError?)
+        case removeRecord(NSError?)
+        case setValue((id: ABPropertyID, underlyingError: NSError?))
+        case removeValue((id: ABPropertyID, underlyingError: NSError?))
+        case addGroupMember(NSError?)
+        case removeGroupMember(NSError?)
 
-        case UnderlyingError(NSError)
-        case UnknownError
+        case underlyingError(NSError)
+        case unknownError
 
-        init(error: Unmanaged<CFErrorRef>?) {
-            self = NSError.from(error).map { .UnderlyingError($0) } ?? .UnknownError
+        init(error: Unmanaged<CFError>?) {
+            self = NSError.from(error).map { .underlyingError($0) } ?? .unknownError
         }
     }
 
     private let registrar: AddressBookPermissionRegistrar
 
-    public let addressBook: ABAddressBookRef!
+    public let addressBook: ABAddressBook!
 
     public init?(registrar: AddressBookPermissionRegistrar = SystemAddressBookRegistrar()) {
         self.registrar = registrar
@@ -661,66 +661,66 @@ public final class AddressBook: AddressBookType {
 
 }
 
-@available(iOS, deprecated=9.0)
+@available(iOS, deprecated: 9.0)
 extension AddressBook {
 
-    public func requestAccess(completion: (AddressBookPermissionRegistrarError?) -> Void) {
+    public func requestAccess(_ completion: (AddressBookPermissionRegistrarError?) -> Void) {
         registrar.requestAccessToAddressBook(addressBook, completion: completion)
     }
 
-    public func save() -> ErrorType? {
-        var error: Unmanaged<CFErrorRef>? = .None
+    public func save() -> ErrorProtocol? {
+        var error: Unmanaged<CFError>? = .none
         if ABAddressBookSave(addressBook, &error) {
-            return .None
+            return .none
         }
-        return Error.Save(NSError.from(error))
+        return Error.save(NSError.from(error))
     }
 }
 
-@available(iOS, deprecated=9.0)
+@available(iOS, deprecated: 9.0)
 extension AddressBook { // Records
 
-    public func addRecord<R: AddressBookRecordType where R.Storage == RecordStorage>(record: R) -> ErrorType? {
-        var error: Unmanaged<CFErrorRef>? = .None
+    public func addRecord<R: AddressBookRecordType where R.Storage == RecordStorage>(_ record: R) -> ErrorProtocol? {
+        var error: Unmanaged<CFError>? = .none
         if ABAddressBookAddRecord(addressBook, record.storage, &error) {
-            return .None
+            return .none
         }
-        return Error.AddRecord(NSError.from(error))
+        return Error.addRecord(NSError.from(error))
     }
 
-    public func removeRecord<R: AddressBookRecordType where R.Storage == RecordStorage>(record: R) -> ErrorType? {
-        var error: Unmanaged<CFErrorRef>? = .None
+    public func removeRecord<R: AddressBookRecordType where R.Storage == RecordStorage>(_ record: R) -> ErrorProtocol? {
+        var error: Unmanaged<CFError>? = .none
         if ABAddressBookRemoveRecord(addressBook, record.storage, &error) {
-            return .None
+            return .none
         }
-        return Error.RemoveRecord(NSError.from(error))
+        return Error.removeRecord(NSError.from(error))
     }
 }
 
-@available(iOS, deprecated=9.0)
+@available(iOS, deprecated: 9.0)
 extension AddressBook { // People
 
     public var numberOfPeople: Int {
         return ABAddressBookGetPersonCount(addressBook)
     }
 
-    public func createPerson<P: AddressBook_PersonType, S: AddressBookSourceType where P.Storage == PersonStorage, S.Storage == SourceStorage, P.Storage == S.PersonStorage>(source: S? = .None) -> P {
+    public func createPerson<P: AddressBook_PersonType, S: AddressBookSourceType where P.Storage == PersonStorage, S.Storage == SourceStorage, P.Storage == S.PersonStorage>(_ source: S? = .none) -> P {
         if let source = source {
             return source.newPerson()
         }
         return P(storage: ABPersonCreate().takeUnretainedValue())
     }
 
-    public func personWithID<P: AddressBook_PersonType where P.Storage == PersonStorage>(id: ABRecordID) -> P? {
+    public func personWithID<P: AddressBook_PersonType where P.Storage == PersonStorage>(_ id: ABRecordID) -> P? {
         if let record = ABAddressBookGetPersonWithRecordID(addressBook, id) {
             return P(storage: record.takeUnretainedValue())
         }
-        return .None
+        return .none
     }
 
-    public func peopleWithName<P: AddressBook_PersonType where P.Storage == PersonStorage>(name: String) -> [P] {
+    public func peopleWithName<P: AddressBook_PersonType where P.Storage == PersonStorage>(_ name: String) -> [P] {
         if let people = ABAddressBookCopyPeopleWithName(addressBook, name) {
-            let values = people.takeRetainedValue() as [ABRecordRef]
+            let values = people.takeRetainedValue() as [ABRecord]
             return values.map { P(storage: $0) }
         }
         return []
@@ -728,78 +728,78 @@ extension AddressBook { // People
 
     public func people<P: AddressBook_PersonType where P.Storage == PersonStorage>() -> [P] {
         if let people = ABAddressBookCopyArrayOfAllPeople(addressBook) {
-            let values = people.takeRetainedValue() as [ABRecordRef]
+            let values = people.takeRetainedValue() as [ABRecord]
             return values.map { P(storage: $0) }
         }
         return []
     }
 
-    public func peopleInSource<P: AddressBook_PersonType, S: AddressBook_SourceType where P.Storage == PersonStorage, S.Storage == SourceStorage>(source: S) -> [P] {
+    public func peopleInSource<P: AddressBook_PersonType, S: AddressBook_SourceType where P.Storage == PersonStorage, S.Storage == SourceStorage>(_ source: S) -> [P] {
         if let people = ABAddressBookCopyArrayOfAllPeopleInSource(addressBook, source.storage) {
-            let values = people.takeRetainedValue() as [ABRecordRef]
+            let values = people.takeRetainedValue() as [ABRecord]
             return values.map { P(storage: $0) }
         }
         return []
     }
 
-    public func peopleInSource<P: AddressBook_PersonType, S: AddressBook_SourceType where P.Storage == PersonStorage, S.Storage == SourceStorage>(source: S, withSortOrdering sortOrdering: AddressBook.SortOrdering) -> [P] {
+    public func peopleInSource<P: AddressBook_PersonType, S: AddressBook_SourceType where P.Storage == PersonStorage, S.Storage == SourceStorage>(_ source: S, withSortOrdering sortOrdering: AddressBook.SortOrdering) -> [P] {
         if let people = ABAddressBookCopyArrayOfAllPeopleInSourceWithSortOrdering(addressBook, source.storage, sortOrdering.rawValue) {
-            let values = people.takeRetainedValue() as [ABRecordRef]
+            let values = people.takeRetainedValue() as [ABRecord]
             return values.map { P(storage: $0) }
         }
         return []
     }
 }
 
-@available(iOS, deprecated=9.0)
+@available(iOS, deprecated: 9.0)
 extension AddressBook { // Groups
 
     public var numberOfGroups: Int {
         return ABAddressBookGetGroupCount(addressBook)
     }
 
-    public func groupWithID<G: AddressBook_GroupType where G.Storage == GroupStorage>(id: ABRecordID) -> G? {
+    public func groupWithID<G: AddressBook_GroupType where G.Storage == GroupStorage>(_ id: ABRecordID) -> G? {
         if let record = ABAddressBookGetGroupWithRecordID(addressBook, id) {
             return G(storage: record.takeUnretainedValue())
         }
-        return .None
+        return .none
     }
 
     public func groups<G: AddressBook_GroupType where G.Storage == GroupStorage>() -> [G] {
         if let records = ABAddressBookCopyArrayOfAllGroups(addressBook) {
-            let values = records.takeRetainedValue() as [ABRecordRef]
+            let values = records.takeRetainedValue() as [ABRecord]
             return values.map { G(storage: $0) }
         }
         return []
     }
 
-    public func groupsInSource<G: AddressBook_GroupType, S: AddressBook_SourceType where G.Storage == GroupStorage, S.Storage == SourceStorage>(source: S) -> [G] {
+    public func groupsInSource<G: AddressBook_GroupType, S: AddressBook_SourceType where G.Storage == GroupStorage, S.Storage == SourceStorage>(_ source: S) -> [G] {
         if let records = ABAddressBookCopyArrayOfAllGroupsInSource(addressBook, source.storage) {
-            let values = records.takeRetainedValue() as [ABRecordRef]
+            let values = records.takeRetainedValue() as [ABRecord]
             return values.map { G(storage: $0) }
         }
         return []
     }
 }
 
-@available(iOS, deprecated=9.0)
+@available(iOS, deprecated: 9.0)
 extension AddressBook { // Sources
 
     public func defaultSource<S: AddressBook_SourceType where S.Storage == SourceStorage>() -> S {
-        let source: ABRecordRef = ABAddressBookCopyDefaultSource(addressBook).takeRetainedValue()
+        let source: ABRecord = ABAddressBookCopyDefaultSource(addressBook).takeRetainedValue()
         return S(storage: source)
     }
 
-    public func sourceWithID<S: AddressBook_SourceType where S.Storage == SourceStorage>(id: ABRecordID) -> S? {
+    public func sourceWithID<S: AddressBook_SourceType where S.Storage == SourceStorage>(_ id: ABRecordID) -> S? {
         if let record = ABAddressBookGetSourceWithRecordID(addressBook, id) {
             return S(storage: record.takeUnretainedValue())
         }
-        return .None
+        return .none
     }
 
     public func sources<S: AddressBook_SourceType where S.Storage == SourceStorage>() -> [S] {
         if let sources = ABAddressBookCopyArrayOfAllSources(addressBook) {
-            let values = sources.takeRetainedValue() as [ABRecordRef]
+            let values = sources.takeRetainedValue() as [ABRecord]
             return values.map { S(storage: $0) }
         }
         return []
@@ -808,20 +808,20 @@ extension AddressBook { // Sources
 
 // MARK: - Property
 
-@available(iOS, deprecated=9.0)
+@available(iOS, deprecated: 9.0)
 public struct AddressBookReadableProperty<Value>: ReadablePropertyType {
     public typealias ValueType = Value
 
     public let id: ABPropertyID
     public let reader: ((CFTypeRef) -> ValueType)?
 
-    public init(id: ABPropertyID, reader: ((CFTypeRef) -> ValueType)? = .None) {
+    public init(id: ABPropertyID, reader: ((CFTypeRef) -> ValueType)? = .none) {
         self.id = id
         self.reader = reader
     }
 }
 
-@available(iOS, deprecated=9.0)
+@available(iOS, deprecated: 9.0)
 public struct AddressBookWriteableProperty<Value>: ReadablePropertyType, WriteablePropertyType {
     public typealias ValueType = Value
 
@@ -829,7 +829,7 @@ public struct AddressBookWriteableProperty<Value>: ReadablePropertyType, Writeab
     public let reader: ((CFTypeRef) -> ValueType)?
     public let writer: ((ValueType) -> CFTypeRef)?
 
-    public init(id: ABPropertyID, reader: ((CFTypeRef) -> ValueType)? = .None, writer: ((ValueType) -> CFTypeRef)? = .None) {
+    public init(id: ABPropertyID, reader: ((CFTypeRef) -> ValueType)? = .none, writer: ((ValueType) -> CFTypeRef)? = .none) {
         self.id = id
         self.reader = reader
         self.writer = writer
@@ -838,16 +838,16 @@ public struct AddressBookWriteableProperty<Value>: ReadablePropertyType, Writeab
 
 // MARK: - LabeledValue
 
-@available(iOS, deprecated=9.0)
+@available(iOS, deprecated: 9.0)
 public struct LabeledValue<Value: MultiValueRepresentable>: CustomStringConvertible, CustomDebugStringConvertible {
 
-    static func read(multiValue: ABMultiValueRef) -> [LabeledValue<Value>] {
+    static func read(_ multiValue: ABMultiValue) -> [LabeledValue<Value>] {
         assert(AddressBook.PropertyKind(rawValue: ABMultiValueGetPropertyType(multiValue)) == Value.propertyKind, "ABMultiValueRef has incompatible property kind.")
         let count: Int = ABMultiValueGetCount(multiValue)
         return (0..<count).reduce([LabeledValue<Value>]()) { (acc, index) in
             var acc = acc
             let representation: CFTypeRef = ABMultiValueCopyValueAtIndex(multiValue, index).takeRetainedValue()
-            if let value = Value(multiValueRepresentation: representation), unmanagedLabel = ABMultiValueCopyLabelAtIndex(multiValue, index) {
+            if let value = Value(multiValueRepresentation: representation), let unmanagedLabel = ABMultiValueCopyLabelAtIndex(multiValue, index) {
                 let label = unmanagedLabel.takeRetainedValue() as String
                 let labeledValue = LabeledValue(label: label, value: value)
                 acc.append(labeledValue)
@@ -856,8 +856,8 @@ public struct LabeledValue<Value: MultiValueRepresentable>: CustomStringConverti
         }
     }
 
-    static func write(labeledValues: [LabeledValue<Value>]) -> ABMultiValueRef {
-        return labeledValues.reduce(ABMultiValueCreateMutable(Value.propertyKind.rawValue).takeRetainedValue() as ABMutableMultiValueRef) { (multiValue, labeledValue) in
+    static func write(_ labeledValues: [LabeledValue<Value>]) -> ABMultiValue {
+        return labeledValues.reduce(ABMultiValueCreateMutable(Value.propertyKind.rawValue).takeRetainedValue() as ABMutableMultiValue) { (multiValue, labeledValue) in
             ABMultiValueAddValueAndLabel(multiValue, labeledValue.value.multiValueRepresentation, labeledValue.label, nil)
             return multiValue
         }
@@ -882,10 +882,10 @@ public struct LabeledValue<Value: MultiValueRepresentable>: CustomStringConverti
 
 // MARK: - Record
 
-@available(iOS, deprecated=9.0)
+@available(iOS, deprecated: 9.0)
 public class AddressBookRecord: AddressBookRecordType, Equatable {
 
-    public let storage: ABRecordRef
+    public let storage: ABRecord
 
     public var id: ABRecordID {
         return ABRecordGetRecordID(storage)
@@ -896,11 +896,11 @@ public class AddressBookRecord: AddressBookRecordType, Equatable {
     }
 
     public var compositeName: String {
-        assert(recordKind != .Source, "compositeName is not defined for Source records")
+        assert(recordKind != .source, "compositeName is not defined for Source records")
         return ABRecordCopyCompositeName(storage).takeRetainedValue() as String
     }
 
-    public required init(storage: ABRecordRef) {
+    public required init(storage: ABRecord) {
         self.storage = storage
     }
 
@@ -909,42 +909,42 @@ public class AddressBookRecord: AddressBookRecordType, Equatable {
             let value: CFTypeRef = unmanaged.takeRetainedValue()
             return property.reader?(value) ?? value as! P.ValueType
         }
-        return .None
+        return .none
     }
 
-    public func setValue<P: WriteablePropertyType>(value: P.ValueType?, forProperty property: P) -> ErrorType? {
-        var error: Unmanaged<CFErrorRef>? = .None
+    public func setValue<P: WriteablePropertyType>(_ value: P.ValueType?, forProperty property: P) -> ErrorProtocol? {
+        var error: Unmanaged<CFError>? = .none
         if let value = value {
             let transformed: CFTypeRef = property.writer?(value) ?? value as! CFTypeRef
             if ABRecordSetValue(storage, property.id, transformed, &error) {
-                return .None
+                return .none
             }
-            return AddressBook.Error.SetValue(id: property.id, underlyingError: NSError.from(error))
+            return AddressBook.Error.setValue(id: property.id, underlyingError: NSError.from(error))
         }
         else {
             if ABRecordRemoveValue(storage, property.id, &error) {
-                return .None
+                return .none
             }
-            return AddressBook.Error.RemoveValue(id: property.id, underlyingError: NSError.from(error))
+            return AddressBook.Error.removeValue(id: property.id, underlyingError: NSError.from(error))
         }
     }
 }
 
-@available(iOS, deprecated=9.0)
+@available(iOS, deprecated: 9.0)
 public func == (lhs: AddressBookRecord, rhs: AddressBookRecord) -> Bool {
     return lhs.id == rhs.id
 }
 
 // MARK: - Person
 
-@available(iOS, deprecated=9.0)
+@available(iOS, deprecated: 9.0)
 public class AddressBookPerson: AddressBookRecord, AddressBookPersonType {
 
     public struct Property {
 
         public struct Metadata {
-            public static let creationDate      = AddressBookReadableProperty<NSDate>(id: kABPersonCreationDateProperty)
-            public static let modificationDate  = AddressBookWriteableProperty<NSDate>(id: kABPersonModificationDateProperty)
+            public static let creationDate      = AddressBookReadableProperty<Date>(id: kABPersonCreationDateProperty)
+            public static let modificationDate  = AddressBookWriteableProperty<Date>(id: kABPersonModificationDateProperty)
         }
 
         public struct Name {
@@ -973,48 +973,48 @@ public class AddressBookPerson: AddressBookRecord, AddressBookPersonType {
         public static let notes             = AddressBookWriteableProperty<String>(id: kABPersonNoteProperty)
     }
 
-    public typealias GroupStorage = ABRecordRef
-    public typealias SourceStorage = ABRecordRef
+    public typealias GroupStorage = ABRecord
+    public typealias SourceStorage = ABRecord
 
     public var compositeNameFormat: AddressBook.CompositeNameFormat {
         return AddressBook.CompositeNameFormat(rawValue: ABPersonGetCompositeNameFormatForRecord(storage))!
     }
 
-    public required init(storage: ABRecordRef) {
-        precondition(AddressBook.RecordKind(rawValue: ABRecordGetRecordType(storage)) == .Person, "ABRecordRef \(storage) is not a Person.")
+    public required init(storage: ABRecord) {
+        precondition(AddressBook.RecordKind(rawValue: ABRecordGetRecordType(storage)) == .person, "ABRecordRef \(storage) is not a Person.")
         super.init(storage: storage)
     }
 }
 
 // MARK: - Group
 
-@available(iOS, deprecated=9.0)
+@available(iOS, deprecated: 9.0)
 public class AddressBookGroup: AddressBookRecord, AddressBookGroupType {
 
     public struct Property {
         public static let name = AddressBookWriteableProperty<String>(id: kABGroupNameProperty)
     }
 
-    public typealias PersonStorage = ABRecordRef
-    public typealias SourceStorage = ABRecordRef
+    public typealias PersonStorage = ABRecord
+    public typealias SourceStorage = ABRecord
 
     public convenience init() {
-        let storage: ABRecordRef = ABGroupCreate().takeRetainedValue()
+        let storage: ABRecord = ABGroupCreate().takeRetainedValue()
         self.init(storage: storage)
     }
 
-    public required init(storage: ABRecordRef) {
-        precondition(AddressBook.RecordKind(rawValue: ABRecordGetRecordType(storage)) == .Group, "ABRecordRef \(storage) is not a Group.")
+    public required init(storage: ABRecord) {
+        precondition(AddressBook.RecordKind(rawValue: ABRecordGetRecordType(storage)) == .group, "ABRecordRef \(storage) is not a Group.")
         super.init(storage: storage)
     }
 
-    public func members<P: AddressBook_PersonType where P.Storage == PersonStorage>(ordering: AddressBook.SortOrdering? = .None) -> [P] {
-        let result: [ABRecordRef] = {
-            if let ordering = ordering, unmanaged = ABGroupCopyArrayOfAllMembersWithSortOrdering(self.storage, ordering.rawValue) {
-                return unmanaged.takeRetainedValue() as [ABRecordRef]
+    public func members<P: AddressBook_PersonType where P.Storage == PersonStorage>(_ ordering: AddressBook.SortOrdering? = .none) -> [P] {
+        let result: [ABRecord] = {
+            if let ordering = ordering, let unmanaged = ABGroupCopyArrayOfAllMembersWithSortOrdering(self.storage, ordering.rawValue) {
+                return unmanaged.takeRetainedValue() as [ABRecord]
             }
             else if let unmanaged = ABGroupCopyArrayOfAllMembers(self.storage) {
-                return unmanaged.takeRetainedValue() as [ABRecordRef]
+                return unmanaged.takeRetainedValue() as [ABRecord]
             }
             return []
         }()
@@ -1022,51 +1022,51 @@ public class AddressBookGroup: AddressBookRecord, AddressBookGroupType {
         return result.map { P(storage: $0) }
     }
 
-    public func add<P: AddressBook_PersonType where P.Storage == PersonStorage>(member: P) -> ErrorType? {
-        var error: Unmanaged<CFErrorRef>? = .None
+    public func add<P: AddressBook_PersonType where P.Storage == PersonStorage>(_ member: P) -> ErrorProtocol? {
+        var error: Unmanaged<CFError>? = .none
         if ABGroupAddMember(storage, member.storage, &error) {
-            return .None
+            return .none
         }
-        return AddressBook.Error.AddGroupMember(NSError.from(error))
+        return AddressBook.Error.addGroupMember(NSError.from(error))
     }
 
-    public func remove<P: AddressBook_PersonType where P.Storage == PersonStorage>(member: P) -> ErrorType? {
-        var error: Unmanaged<CFErrorRef>? = .None
+    public func remove<P: AddressBook_PersonType where P.Storage == PersonStorage>(_ member: P) -> ErrorProtocol? {
+        var error: Unmanaged<CFError>? = .none
         if ABGroupRemoveMember(storage, member.storage, &error) {
-            return .None
+            return .none
         }
-        return AddressBook.Error.RemoveGroupMember(NSError.from(error))
+        return AddressBook.Error.removeGroupMember(NSError.from(error))
     }
 }
 
 // MARK: - Source
 
-@available(iOS, deprecated=9.0)
+@available(iOS, deprecated: 9.0)
 public class AddressBookSource: AddressBookRecord, AddressBookSourceType {
 
     public struct Property {
         public static let kind = AddressBookReadableProperty<AddressBook.SourceKind>(id: kABSourceTypeProperty, reader: reader)
     }
 
-    public typealias PersonStorage = ABRecordRef
-    public typealias GroupStorage = ABRecordRef
+    public typealias PersonStorage = ABRecord
+    public typealias GroupStorage = ABRecord
 
     public var sourceKind: AddressBook.SourceKind {
         return value(forProperty: AddressBookSource.Property.kind)!
     }
 
-    public required init(storage: ABRecordRef) {
-        precondition(AddressBook.RecordKind(rawValue: ABRecordGetRecordType(storage)) == .Source, "ABRecordRef \(storage) is not a Source.")
+    public required init(storage: ABRecord) {
+        precondition(AddressBook.RecordKind(rawValue: ABRecordGetRecordType(storage)) == .source, "ABRecordRef \(storage) is not a Source.")
         super.init(storage: storage)
     }
 
     public func newPerson<P: AddressBook_PersonType where P.Storage == PersonStorage>() -> P {
-        let person: ABRecordRef = ABPersonCreateInSource(storage).takeRetainedValue()
+        let person: ABRecord = ABPersonCreateInSource(storage).takeRetainedValue()
         return P(storage: person)
     }
 
     public func newGroup<G: AddressBook_GroupType where G.Storage == GroupStorage>() -> G {
-        let group: ABRecordRef = ABGroupCreateInSource(storage).takeRetainedValue()
+        let group: ABRecord = ABGroupCreateInSource(storage).takeRetainedValue()
         return G(storage: group)
     }
 }
@@ -1076,10 +1076,10 @@ public class AddressBookSource: AddressBookRecord, AddressBookSourceType {
 
 // MARK: - Equatable
 
-extension CFNumberRef: Equatable {}
+extension CFNumber: Equatable {}
 
-public func == (lhs: CFNumberRef, rhs: CFNumberRef) -> Bool {
-    return CFNumberCompare(lhs, rhs, nil) == .CompareEqualTo
+public func == (lhs: CFNumber, rhs: CFNumber) -> Bool {
+    return CFNumberCompare(lhs, rhs, nil) == .compareEqualTo
 }
 
 public func == (lhs: AddressBook.StringMultiValue, rhs: AddressBook.StringMultiValue) -> Bool {
@@ -1091,33 +1091,33 @@ public func == (lhs: AddressBook.DateMultiValue, rhs: AddressBook.DateMultiValue
 }
 
 public func < (lhs: AddressBook.DateMultiValue, rhs: AddressBook.DateMultiValue) -> Bool {
-    return lhs.value.compare(rhs.value) == .OrderedAscending
+    return lhs.value.compare(rhs.value) == .orderedAscending
 }
 
 // MARK: - Helpers
 
-func reader<T: RawRepresentable>(value: CFTypeRef) -> T {
+func reader<T: RawRepresentable>(_ value: CFTypeRef) -> T {
     return T(rawValue: value as! T.RawValue)!
 }
 
-func writer<T: RawRepresentable>(value: T) -> CFTypeRef {
+func writer<T: RawRepresentable>(_ value: T) -> CFTypeRef {
     return value.rawValue as! CFTypeRef
 }
 
-@available(iOS, deprecated=9.0)
-func reader<T: MultiValueRepresentable>(value: CFTypeRef) -> [LabeledValue<T>] {
-    return LabeledValue.read(value as ABMultiValueRef)
+@available(iOS, deprecated: 9.0)
+func reader<T: MultiValueRepresentable>(_ value: CFTypeRef) -> [LabeledValue<T>] {
+    return LabeledValue.read(value as ABMultiValue)
 }
 
-@available(iOS, deprecated=9.0)
-func writer<T: MultiValueRepresentable>(value: [LabeledValue<T>]) -> CFTypeRef {
+@available(iOS, deprecated: 9.0)
+func writer<T: MultiValueRepresentable>(_ value: [LabeledValue<T>]) -> CFTypeRef {
     return LabeledValue.write(value)
 }
 
 extension NSError {
 
-    static func from(ref: Unmanaged<CFErrorRef>?) -> NSError? {
-        return ref.map { unsafeBitCast($0.takeRetainedValue(), NSError.self) }
+    static func from(_ ref: Unmanaged<CFError>?) -> NSError? {
+        return ref.map { unsafeBitCast($0.takeRetainedValue(), to: NSError.self) }
     }
 }
 
@@ -1128,41 +1128,41 @@ extension NSError {
 
 
 
-public enum AddressBookPermissionRegistrarError: ErrorType {
-    case AddressBookUnknownErrorOccured
-    case AddressBookAccessDenied
+public enum AddressBookPermissionRegistrarError: ErrorProtocol {
+    case addressBookUnknownErrorOccured
+    case addressBookAccessDenied
 }
 
-@available(iOS, deprecated=9.0)
+@available(iOS, deprecated: 9.0)
 public struct SystemAddressBookRegistrar: AddressBookPermissionRegistrar {
 
     public var status: ABAuthorizationStatus {
         return ABAddressBookGetAuthorizationStatus()
     }
 
-    public func createAddressBook() -> (ABAddressBookRef?, AddressBookPermissionRegistrarError?) {
-        var addressBookError: Unmanaged<CFErrorRef>? = .None
+    public func createAddressBook() -> (ABAddressBook?, AddressBookPermissionRegistrarError?) {
+        var addressBookError: Unmanaged<CFError>? = .none
         if let addressBook = ABAddressBookCreateWithOptions(nil, &addressBookError) {
-            return (addressBook.takeRetainedValue(), .None)
+            return (addressBook.takeRetainedValue(), .none)
         }
         else if let error = NSError.from(addressBookError) {
             if (error.domain == ABAddressBookErrorDomain as String) && error.code == kABOperationNotPermittedByUserError {
-                return (.None, AddressBookPermissionRegistrarError.AddressBookAccessDenied)
+                return (.none, AddressBookPermissionRegistrarError.addressBookAccessDenied)
             }
         }
-        return (.None, AddressBookPermissionRegistrarError.AddressBookUnknownErrorOccured)
+        return (.none, AddressBookPermissionRegistrarError.addressBookUnknownErrorOccured)
     }
 
-    public func requestAccessToAddressBook(addressBook: ABAddressBookRef, completion: (AddressBookPermissionRegistrarError?) -> Void) {
+    public func requestAccessToAddressBook(_ addressBook: ABAddressBook, completion: (AddressBookPermissionRegistrarError?) -> Void) {
         ABAddressBookRequestAccessWithCompletion(addressBook) { (success, error) in
             if success {
                 completion(nil)
             }
             else if let _ = error {
-                completion(AddressBookPermissionRegistrarError.AddressBookAccessDenied)
+                completion(AddressBookPermissionRegistrarError.addressBookAccessDenied)
             }
             else {
-                completion(AddressBookPermissionRegistrarError.AddressBookUnknownErrorOccured)
+                completion(AddressBookPermissionRegistrarError.addressBookUnknownErrorOccured)
             }
         }
     }

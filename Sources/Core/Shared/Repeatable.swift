@@ -34,10 +34,10 @@ public protocol Repeatable {
      the RepeatedOperation.
      - returns: a Bool, false will end the RepeatedOperation.
      */
-    func shouldRepeat(count: Int) -> Bool
+    func shouldRepeat(_ count: Int) -> Bool
 }
 
-public class RepeatableGenerator<G: GeneratorType where G.Element: Repeatable>: GeneratorType {
+public class RepeatableGenerator<G: IteratorProtocol where G.Element: Repeatable>: IteratorProtocol {
 
     private var generator: G
     private var count: Int = 0
@@ -69,25 +69,25 @@ extension RepeatedOperation where T: Repeatable {
      let operation = RepeatedOperation { MyRepeatableOperation() }
      ```
      */
-    public convenience init(maxCount max: Int? = .None, strategy: WaitStrategy = .Fixed(0.1), body: () -> T?) {
-        self.init(maxCount: max, strategy: strategy, generator: RepeatableGenerator(AnyGenerator(body: body)))
+    public convenience init(maxCount max: Int? = .none, strategy: WaitStrategy = .fixed(0.1), body: () -> T?) {
+        self.init(maxCount: max, strategy: strategy, generator: RepeatableGenerator(AnyIterator(body)))
     }
 }
 
 /**
- RepeatableOperation is an Operation subclass which conforms to Repeatable.
+ RepeatableOperation is an Procedure subclass which conforms to Repeatable.
 
- It can be used to make an otherwise non-repeatable Operation repeatable. It
+ It can be used to make an otherwise non-repeatable Procedure repeatable. It
  does this by accepting, in addition to the operation instance, a closure
  shouldRepeat. This closure can be used to capture state (such as errors).
 
  When conforming to Repeatable, the closure is executed, passing in the
  current repeat count.
  */
-public class RepeatableOperation<T: Operation>: Operation, OperationDidFinishObserver, Repeatable {
+public class RepeatableOperation<T: Procedure>: Procedure, OperationDidFinishObserver, Repeatable {
 
     let operation: T
-    let shouldRepeatBlock: Int -> Bool
+    let shouldRepeatBlock: (Int) -> Bool
 
     /**
      Initialize the RepeatableOperation with an operation and
@@ -96,31 +96,31 @@ public class RepeatableOperation<T: Operation>: Operation, OperationDidFinishObs
      - parameter [unnamed] operation: the operation instance.
      - parameter shouldRepeat: a closure of type Int -> Bool
      */
-    public init(_ operation: T, shouldRepeat: Int -> Bool) {
+    public init(_ operation: T, shouldRepeat: (Int) -> Bool) {
         self.operation = operation
         self.shouldRepeatBlock = shouldRepeat
         super.init()
         name = "Repeatable<\(operation.operationName)>"
         addObserver(DidCancelObserver { [weak operation] _ in
-            (operation as? Operation)?.cancel()
+            (operation as? Procedure)?.cancel()
         })
     }
 
     /// Override implementation of execute
     public override func execute() {
-        if !cancelled {
+        if !isCancelled {
             operation.addObserver(self)
             produceOperation(operation)
         }
     }
 
     /// Implementation for Repeatable
-    public func shouldRepeat(count: Int) -> Bool {
+    public func shouldRepeat(_ count: Int) -> Bool {
         return shouldRepeatBlock(count)
     }
 
     /// Implementation for OperationDidFinishObserver
-    public func didFinishOperation(operation: Operation, errors: [ErrorType]) {
+    public func didFinishOperation(_ operation: Procedure, errors: [ErrorProtocol]) {
         if self.operation == operation {
             finish(errors)
         }
