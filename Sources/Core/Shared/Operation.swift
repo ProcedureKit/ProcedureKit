@@ -26,6 +26,19 @@ to be notified of lifecycle events in the operation.
 */
 public class Operation: NSOperation {
 
+    private class CompletionBlockObserver: NSObject, OperationDidFinishObserver {
+        typealias CompletionBlock = () -> Void
+        let block: CompletionBlock
+        init(block: CompletionBlock) {
+            self.block = block
+            super.init()
+        }
+
+        private func didFinishOperation(operation: Operation, errors: [ErrorType]) {
+            block()
+        }
+    }
+
     private enum State: Int, Comparable {
 
         // The initial state
@@ -83,6 +96,8 @@ public class Operation: NSOperation {
     public let identifier = NSUUID().UUIDString
 
     private let stateLock = NSRecursiveLock()
+    private let disableAutomaticFinishing: Bool
+
     private var _log = Protector<LoggerType>(Logger())
     private var _state = State.Initialized
     private var _internalErrors = [ErrorType]()
@@ -90,7 +105,7 @@ public class Operation: NSOperation {
     private var _isHandlingFinish = false
     private var _isHandlingCancel = false
     private var _observers = Protector([OperationObserverType]())
-    private let disableAutomaticFinishing: Bool
+    private var _completionBlockObserver: CompletionBlockObserver? = .None
 
     internal private(set) var directDependencies = Set<NSOperation>()
     internal private(set) var conditions = Set<Condition>()
@@ -186,6 +201,16 @@ public class Operation: NSOperation {
             _log.write { (inout ward: LoggerType) in
                 ward = newValue
             }
+        }
+    }
+
+    // MARK: - Completion Block
+
+    /// - returns: a completion block which is executed *after* the operation finishes.
+    public override final var completionBlock: (() -> Void)? {
+        get { return _completionBlockObserver?.block }
+        set {
+            _completionBlockObserver = newValue.map { CompletionBlockObserver(block: $0) }
         }
     }
 
@@ -570,7 +595,12 @@ public extension Operation {
     }
 
     internal var didFinishObservers: [OperationDidFinishObserver] {
-        return observers.flatMap { $0 as? OperationDidFinishObserver }
+        var _didFinishObservers = observers.flatMap { $0 as? OperationDidFinishObserver }
+        guard let completionBlockObserver = _completionBlockObserver as? OperationDidFinishObserver else {
+            return _didFinishObservers
+        }
+        _didFinishObservers.append(completionBlockObserver)
+        return _didFinishObservers
     }
 }
 
