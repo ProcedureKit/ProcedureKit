@@ -148,7 +148,7 @@ public class GroupOperation: Operation, OperationQueueDelegate {
 
     - parameter operations: an array of `NSOperation`s.
     */
-    public init(operations ops: [NSOperation]) {
+    public init(underlyingQueue: dispatch_queue_t? = .None, operations ops: [NSOperation]) {
         _operations = Protector<[NSOperation]>(ops)
         // GroupOperation handles calling finish() on cancellation once all of its children have cancelled and finished
         // and its finishingOperation has finished.
@@ -157,6 +157,7 @@ public class GroupOperation: Operation, OperationQueueDelegate {
         name = "Group Operation"
         queue.suspended = true
         queue.delegate = self
+        queue.underlyingQueue = underlyingQueue
         userIntent = operations.userIntent
         addObserver(DidCancelObserver { [unowned self] operation in
             if operation === self {

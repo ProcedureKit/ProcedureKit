@@ -425,8 +425,8 @@ class GroupOperationTests: OperationTests {
     func test__group_operation_ignores_queue_delegate_calls_from_other_queues() {
         class PoorlyWrittenGroupOperationSubclass: GroupOperation {
             private var subclassQueue = OperationQueue()
-            override init(operations: [NSOperation]) {
-                super.init(operations: operations)
+            override init(underlyingQueue: dispatch_queue_t? = .None, operations: [NSOperation]) {
+                super.init(underlyingQueue: underlyingQueue, operations: operations)
                 subclassQueue.delegate = self
             }
             override func execute() {
