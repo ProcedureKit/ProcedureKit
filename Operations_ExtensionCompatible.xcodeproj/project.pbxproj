@@ -181,6 +181,12 @@
 		653DE86D1D45177300AB644C /* BlockProcedure.swift in Sources */ = {isa = PBXBuildFile; fileRef = 653DE86A1D45177300AB644C /* BlockProcedure.swift */; };
 		653DE86E1D45177300AB644C /* Procedure.swift in Sources */ = {isa = PBXBuildFile; fileRef = 653DE86B1D45177300AB644C /* Procedure.swift */; };
 		653DE86F1D45177300AB644C /* ProcedureQueue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 653DE86C1D45177300AB644C /* ProcedureQueue.swift */; };
+		6558B3B61D451AB900729551 /* BlockProcedure.swift in Sources */ = {isa = PBXBuildFile; fileRef = 653DE86A1D45177300AB644C /* BlockProcedure.swift */; };
+		6558B3B71D451AB900729551 /* Procedure.swift in Sources */ = {isa = PBXBuildFile; fileRef = 653DE86B1D45177300AB644C /* Procedure.swift */; };
+		6558B3B81D451AB900729551 /* ProcedureQueue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 653DE86C1D45177300AB644C /* ProcedureQueue.swift */; };
+		6558B3B91D451ABA00729551 /* BlockProcedure.swift in Sources */ = {isa = PBXBuildFile; fileRef = 653DE86A1D45177300AB644C /* BlockProcedure.swift */; };
+		6558B3BA1D451ABA00729551 /* Procedure.swift in Sources */ = {isa = PBXBuildFile; fileRef = 653DE86B1D45177300AB644C /* Procedure.swift */; };
+		6558B3BB1D451ABA00729551 /* ProcedureQueue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 653DE86C1D45177300AB644C /* ProcedureQueue.swift */; };
 		6584D2381C6BF86200306EED /* FunctionalOperations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6584D2341C6BF86200306EED /* FunctionalOperations.swift */; };
 		6584D2391C6BF86200306EED /* RepeatedOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6584D2351C6BF86200306EED /* RepeatedOperation.swift */; };
 		6584D23A1C6BF86200306EED /* ResultInjection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6584D2361C6BF86200306EED /* ResultInjection.swift */; };
@@ -1104,6 +1110,7 @@
 				652619A31C11FF5200654091 /* SlientCondition.swift in Sources */,
 				6526199D1C11FF5200654091 /* NegatedCondition.swift in Sources */,
 				653D40321CC26F5600893746 /* Profiler.swift in Sources */,
+				6558B3B61D451AB900729551 /* BlockProcedure.swift in Sources */,
 				6584D2401C6BF88F00306EED /* ResultInjection.swift in Sources */,
 				652619A41C11FF5200654091 /* Support.swift in Sources */,
 				659A55021CD328B900D9D311 /* CloudKitOperation.swift in Sources */,
@@ -1113,6 +1120,7 @@
 				65A74FC11CC59488008D7193 /* Condition.swift in Sources */,
 				652619951C11FF5200654091 /* ComposedOperation.swift in Sources */,
 				659A55031CD328B900D9D311 /* CloudKitOperationExtensions.swift in Sources */,
+				6558B3B71D451AB900729551 /* Procedure.swift in Sources */,
 				652619A51C11FF5200654091 /* TimeoutObserver.swift in Sources */,
 				652619961C11FF5200654091 /* DelayOperation.swift in Sources */,
 				6526199E1C11FF5200654091 /* NoFailedDependenciesCondition.swift in Sources */,
@@ -1130,6 +1138,7 @@
 				65356EB81C8B3B910029E8AF /* Repeatable.swift in Sources */,
 				6526199C1C11FF5200654091 /* MutuallyExclusive.swift in Sources */,
 				6526199B1C11FF5200654091 /* LoggingObserver.swift in Sources */,
+				6558B3B81D451AB900729551 /* ProcedureQueue.swift in Sources */,
 				652619991C11FF5200654091 /* GroupOperation.swift in Sources */,
 				652619A11C11FF5200654091 /* OperationObserver.swift in Sources */,
 				652619E01C12012C00654091 /* ReachabilityCondition.swift in Sources */,
@@ -1187,6 +1196,8 @@
 				65A592A01D1C2DF6001F9229 /* Queue.swift in Sources */,
 				652619B81C11FF5300654091 /* Support.swift in Sources */,
 				652619E91C1201AF00654091 /* ReachabilityCondition.swift in Sources */,
+				6558B3BB1D451ABA00729551 /* ProcedureQueue.swift in Sources */,
+				6558B3B91D451ABA00729551 /* BlockProcedure.swift in Sources */,
 				65BB56DE1C70FAB800DF5211 /* ThreadSafety.swift in Sources */,
 				652619A91C11FF5300654091 /* ComposedOperation.swift in Sources */,
 				6584D2411C6BF89000306EED /* ResultInjection.swift in Sources */,
@@ -1211,6 +1222,7 @@
 				65B9E07F1CB8594F009161AD /* URLSessionTaskOperation.swift in Sources */,
 				652619AF1C11FF5300654091 /* LoggingObserver.swift in Sources */,
 				652619AD1C11FF5300654091 /* GroupOperation.swift in Sources */,
+				6558B3BA1D451ABA00729551 /* Procedure.swift in Sources */,
 				65356EB91C8B3B910029E8AF /* Generators.swift in Sources */,
 				652619B51C11FF5300654091 /* OperationObserver.swift in Sources */,
 				6584D2431C6BF89B00306EED /* RetryOperation.swift in Sources */,
