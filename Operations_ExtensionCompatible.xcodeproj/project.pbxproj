@@ -1295,6 +1295,7 @@
 /* Begin XCBuildConfiguration section */
 		652616C41C11F48200654091 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 652618551C11F7DA00654091 /* Extension Compatible.xcconfig */;
 			buildSettings = {
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
@@ -1318,6 +1319,7 @@
 		};
 		652616C51C11F48200654091 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 652618551C11F7DA00654091 /* Extension Compatible.xcconfig */;
 			buildSettings = {
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
@@ -1340,7 +1342,6 @@
 		};
 		652618181C11F75300654091 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 652618551C11F7DA00654091 /* Extension Compatible.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				APPLICATION_EXTENSION_API_ONLY = YES;
@@ -1397,7 +1398,6 @@
 		};
 		652618191C11F75300654091 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 652618551C11F7DA00654091 /* Extension Compatible.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				APPLICATION_EXTENSION_API_ONLY = YES;
@@ -1538,7 +1538,6 @@
 		};
 		652618341C11F77500654091 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 652618551C11F7DA00654091 /* Extension Compatible.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				APPLICATION_EXTENSION_API_ONLY = YES;
@@ -1593,7 +1592,6 @@
 		};
 		652618351C11F77500654091 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 652618551C11F7DA00654091 /* Extension Compatible.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				APPLICATION_EXTENSION_API_ONLY = YES;
@@ -1728,7 +1726,6 @@
 		};
 		652618501C11F78800654091 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 652618551C11F7DA00654091 /* Extension Compatible.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				APPLICATION_EXTENSION_API_ONLY = YES;
@@ -1785,7 +1782,6 @@
 		};
 		652618511C11F78800654091 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 652618551C11F7DA00654091 /* Extension Compatible.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				APPLICATION_EXTENSION_API_ONLY = YES;
