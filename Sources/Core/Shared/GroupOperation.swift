@@ -47,9 +47,9 @@ public class GroupOperation: Operation, OperationQueueDelegate {
     private var isGroupFinishing = false
     private let groupFinishLock = NSRecursiveLock()
     private var isAddingOperationsGroup = dispatch_group_create()
-
-    /// - returns: the OperationQueue the group runs operations on.
-    public let queue = OperationQueue()
+    private var groupSuspendLock = NSLock()
+    private var isGroupSuspended = false
+    internal let queue = OperationQueue()   // internal for testing
 
     /// - returns: the operations which have been added to the queue
     public private(set) var operations: [NSOperation] {
@@ -73,11 +73,82 @@ public class GroupOperation: Operation, OperationQueueDelegate {
     }
 
     /**
+     The maximum number of child operations that can execute at the same time.
+
+     The value in this property affects only the operations that the current GroupOperation has
+     executing at the same time. Other operation queues and GroupOperations can also execute
+     their maximum number of operations in parallel.
+
+     Reducing the number of concurrent operations does not affect any operations that are
+     currently executing.
+
+     Specifying the value NSOperationQueueDefaultMaxConcurrentOperationCount (which is recommended)
+     causes the system to set the maximum number of operations based on system conditions.
+
+     The default value of this property is NSOperationQueueDefaultMaxConcurrentOperationCount.
+    */
+    public final var maxConcurrentOperationCount: Int {
+        get {
+            return queue.maxConcurrentOperationCount
+        }
+        set {
+            queue.maxConcurrentOperationCount = newValue
+        }
+    }
+
+    /**
+     A Boolean value indicating whether the Group is actively scheduling operations for execution.
+
+     When the value of this property is false, the GroupOperation actively starts child operations
+     that are ready to execute once the GroupOperation has been executed.
+
+     Setting this property to true prevents the GroupOperation from starting any child operations,
+     but already executing child operations continue to execute.
+
+     You may continue to add operations to a GroupOperation that is suspended but those operations
+     are not scheduled for execution until you change this property to false.
+
+     The default value of this property is false.
+    */
+    public final var suspended: Bool {
+        get {
+            return groupSuspendLock.withCriticalScope { isGroupSuspended }
+        }
+        set {
+            groupSuspendLock.withCriticalScope {
+                isGroupSuspended = newValue
+                queue.suspended = newValue
+            }
+        }
+    }
+
+    /**
+     The default service level to apply to the GroupOperation and its child operations.
+
+     This property specifies the service level applied to the GroupOperation itself, and to
+     operation objects added to the GroupOperation.
+
+     If the added operation object has an explicit service level set, that value is used instead.
+
+     For more, see the NSOperation and NSOperationQueue documentation for `qualityOfService`.
+    */
+    @available(OSX 10.10, iOS 8.0, tvOS 8.0, watchOS 2.0, *)
+    public final override var qualityOfService: NSQualityOfService {
+        get {
+            return queue.qualityOfService
+        }
+        set {
+            super.qualityOfService = newValue
+            queue.qualityOfService = newValue
+        }
+    }
+
+    /**
     Designated initializer.
 
     - parameter operations: an array of `NSOperation`s.
     */
-    public init(operations ops: [NSOperation]) {
+    public init(underlyingQueue: dispatch_queue_t? = .None, operations ops: [NSOperation]) {
         _operations = Protector<[NSOperation]>(ops)
         // GroupOperation handles calling finish() on cancellation once all of its children have cancelled and finished
         // and its finishingOperation has finished.
@@ -86,6 +157,7 @@ public class GroupOperation: Operation, OperationQueueDelegate {
         name = "Group Operation"
         queue.suspended = true
         queue.delegate = self
+        queue.underlyingQueue = underlyingQueue
         userIntent = operations.userIntent
         addObserver(DidCancelObserver { [unowned self] operation in
             if operation === self {
@@ -115,7 +187,11 @@ public class GroupOperation: Operation, OperationQueueDelegate {
         _addOperations(operations.filter { !self.queue.operations.contains($0) }, addToOperationsArray: false)
         _addCanFinishOperation(canFinishOperation)
         queue.addOperation(finishingOperation)
-        queue.suspended = false
+        groupSuspendLock.withCriticalScope {
+            if !isGroupSuspended {
+                queue.suspended = false
+            }
+        }
     }
 
     /**
