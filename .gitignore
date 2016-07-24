@@ -32,8 +32,11 @@ DerivedData
 # Carthage/Checkouts
 
 Carthage/Build
+.fastlane/README.md
 .fastlane/report.xml
 .fastlane/xcodebuild-data
+fastlane*
+.ci/xcodebuild-data
 
 # Jazzy
 docs

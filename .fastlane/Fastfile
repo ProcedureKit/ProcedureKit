@@ -12,17 +12,6 @@ end
 
 platform :ios do
 
-  desc "Builds the iOS Extension compatible framework"
-  lane :build_extension do
-    
-    xcodebuild(
-      project: "Operations_ExtensionCompatible.xcodeproj",
-      scheme: "iOS Extensions Operations",
-      xcargs: "-derivedDataPath .ci/xcodebuild-data"
-    )
-
-  end
-
   desc "Test the iOS Extension compatible framework"
   lane :test_extension do
         
@@ -47,30 +36,12 @@ platform :ios do
       output_directory: ".ci/xcodebuild-data",
       xcargs: "-derivedDataPath .ci/xcodebuild-data"
     )
-    
-    slather(
-	    proj: "Operations.xcodeproj",
-    	scheme: "iOS Operations",
-    	build_directory: ".ci/xcodebuild-data",
-    	use_bundle_exec: true    	
-    )
-	
+
   end
 
 end
 
 platform :mac do
-
-  desc "Builds the OS X Extension compatible framework"
-  lane :build_extension do
-    
-    xcodebuild(
-      project: "Operations_ExtensionCompatible.xcodeproj",
-      scheme: "OS X Extensions Operations",
-      xcargs: "-derivedDataPath .ci/xcodebuild-data"
-    )
-
-  end
   
   desc "Test the OS X Extension compatible framework"
   lane :test_extension do
@@ -78,6 +49,7 @@ platform :mac do
     scan(
       project: "Operations_ExtensionCompatible.xcodeproj",
       scheme: "OS X Extensions Operations",
+      destination: "platform=macOS",
       output_directory: ".ci/xcodebuild-data",
       xcargs: "-derivedDataPath .ci/xcodebuild-data"
     )    
@@ -92,6 +64,7 @@ platform :mac do
     scan(
       project: "Operations.xcodeproj",
       scheme: "OS X Operations",
+      destination: "platform=macOS",
       output_directory: ".ci/xcodebuild-data",
       xcargs: "-derivedDataPath .ci/xcodebuild-data"
     )

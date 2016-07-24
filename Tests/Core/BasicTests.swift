@@ -211,7 +211,7 @@ class OperationDependencyTests: OperationTests {
 
     func test__dependent_operations_always_run() {
         queue.maxConcurrentOperationCount = 1
-        let count = 1_000
+        let count = 1_00
         var counter1: Int = 0
         var counter2: Int = 0
         var counter3: Int = 0
