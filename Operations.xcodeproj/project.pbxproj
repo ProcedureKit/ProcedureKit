@@ -377,8 +377,8 @@
 		652616DF1C11F5EB00654091 /* SlientCondition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlientCondition.swift; sourceTree = "<group>"; };
 		652616E01C11F5EB00654091 /* Support.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Support.swift; sourceTree = "<group>"; };
 		652616E11C11F5EB00654091 /* TimeoutObserver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeoutObserver.swift; sourceTree = "<group>"; };
-		652616E51C11F5EB00654091 /* AddressBook.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = AddressBook.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
-		652616E61C11F5EB00654091 /* AddressBookConditions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = AddressBookConditions.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
+		652616E51C11F5EB00654091 /* AddressBook.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = AddressBook.swift; sourceTree = "<group>"; };
+		652616E61C11F5EB00654091 /* AddressBookConditions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = AddressBookConditions.swift; sourceTree = "<group>"; };
 		652616E71C11F5EB00654091 /* AddressBookOperations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = AddressBookOperations.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		652616E81C11F5EB00654091 /* AddressBookUIOperations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressBookUIOperations.swift; sourceTree = "<group>"; };
 		652616EB1C11F5EB00654091 /* ContactsUIOperations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactsUIOperations.swift; sourceTree = "<group>"; };

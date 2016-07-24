@@ -15,7 +15,6 @@
 		6526185E1C11F8D800654091 /* Operations.h in Headers */ = {isa = PBXBuildFile; fileRef = 652617731C11F61700654091 /* Operations.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6526197E1C11FF5200654091 /* BlockCondition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6526173A1C11F61700654091 /* BlockCondition.swift */; };
 		6526197F1C11FF5200654091 /* BlockObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6526173B1C11F61700654091 /* BlockObserver.swift */; };
-		652619801C11FF5200654091 /* BlockOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6526173C1C11F61700654091 /* BlockOperation.swift */; };
 		652619811C11FF5200654091 /* ComposedOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6526173D1C11F61700654091 /* ComposedOperation.swift */; };
 		652619821C11FF5200654091 /* DelayOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6526173E1C11F61700654091 /* DelayOperation.swift */; };
 		652619831C11FF5200654091 /* ExclusivityManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6526173F1C11F61700654091 /* ExclusivityManager.swift */; };
@@ -26,16 +25,13 @@
 		652619881C11FF5200654091 /* MutuallyExclusive.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652617441C11F61700654091 /* MutuallyExclusive.swift */; };
 		652619891C11FF5200654091 /* NegatedCondition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652617451C11F61700654091 /* NegatedCondition.swift */; };
 		6526198A1C11FF5200654091 /* NoFailedDependenciesCondition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652617461C11F61700654091 /* NoFailedDependenciesCondition.swift */; };
-		6526198B1C11FF5200654091 /* Operation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652617471C11F61700654091 /* Operation.swift */; };
 		6526198C1C11FF5200654091 /* OperationCondition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652617481C11F61700654091 /* OperationCondition.swift */; };
 		6526198D1C11FF5200654091 /* OperationObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652617491C11F61700654091 /* OperationObserver.swift */; };
-		6526198E1C11FF5200654091 /* OperationQueue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6526174A1C11F61700654091 /* OperationQueue.swift */; };
 		6526198F1C11FF5200654091 /* SlientCondition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6526174B1C11F61700654091 /* SlientCondition.swift */; };
 		652619901C11FF5200654091 /* Support.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6526174C1C11F61700654091 /* Support.swift */; };
 		652619911C11FF5200654091 /* TimeoutObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6526174D1C11F61700654091 /* TimeoutObserver.swift */; };
 		652619921C11FF5200654091 /* BlockCondition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6526173A1C11F61700654091 /* BlockCondition.swift */; };
 		652619931C11FF5200654091 /* BlockObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6526173B1C11F61700654091 /* BlockObserver.swift */; };
-		652619941C11FF5200654091 /* BlockOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6526173C1C11F61700654091 /* BlockOperation.swift */; };
 		652619951C11FF5200654091 /* ComposedOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6526173D1C11F61700654091 /* ComposedOperation.swift */; };
 		652619961C11FF5200654091 /* DelayOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6526173E1C11F61700654091 /* DelayOperation.swift */; };
 		652619971C11FF5200654091 /* ExclusivityManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6526173F1C11F61700654091 /* ExclusivityManager.swift */; };
@@ -46,16 +42,13 @@
 		6526199C1C11FF5200654091 /* MutuallyExclusive.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652617441C11F61700654091 /* MutuallyExclusive.swift */; };
 		6526199D1C11FF5200654091 /* NegatedCondition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652617451C11F61700654091 /* NegatedCondition.swift */; };
 		6526199E1C11FF5200654091 /* NoFailedDependenciesCondition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652617461C11F61700654091 /* NoFailedDependenciesCondition.swift */; };
-		6526199F1C11FF5200654091 /* Operation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652617471C11F61700654091 /* Operation.swift */; };
 		652619A01C11FF5200654091 /* OperationCondition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652617481C11F61700654091 /* OperationCondition.swift */; };
 		652619A11C11FF5200654091 /* OperationObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652617491C11F61700654091 /* OperationObserver.swift */; };
-		652619A21C11FF5200654091 /* OperationQueue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6526174A1C11F61700654091 /* OperationQueue.swift */; };
 		652619A31C11FF5200654091 /* SlientCondition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6526174B1C11F61700654091 /* SlientCondition.swift */; };
 		652619A41C11FF5200654091 /* Support.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6526174C1C11F61700654091 /* Support.swift */; };
 		652619A51C11FF5200654091 /* TimeoutObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6526174D1C11F61700654091 /* TimeoutObserver.swift */; };
 		652619A61C11FF5300654091 /* BlockCondition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6526173A1C11F61700654091 /* BlockCondition.swift */; };
 		652619A71C11FF5300654091 /* BlockObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6526173B1C11F61700654091 /* BlockObserver.swift */; };
-		652619A81C11FF5300654091 /* BlockOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6526173C1C11F61700654091 /* BlockOperation.swift */; };
 		652619A91C11FF5300654091 /* ComposedOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6526173D1C11F61700654091 /* ComposedOperation.swift */; };
 		652619AA1C11FF5300654091 /* DelayOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6526173E1C11F61700654091 /* DelayOperation.swift */; };
 		652619AB1C11FF5300654091 /* ExclusivityManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6526173F1C11F61700654091 /* ExclusivityManager.swift */; };
@@ -66,10 +59,8 @@
 		652619B01C11FF5300654091 /* MutuallyExclusive.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652617441C11F61700654091 /* MutuallyExclusive.swift */; };
 		652619B11C11FF5300654091 /* NegatedCondition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652617451C11F61700654091 /* NegatedCondition.swift */; };
 		652619B21C11FF5300654091 /* NoFailedDependenciesCondition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652617461C11F61700654091 /* NoFailedDependenciesCondition.swift */; };
-		652619B31C11FF5300654091 /* Operation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652617471C11F61700654091 /* Operation.swift */; };
 		652619B41C11FF5300654091 /* OperationCondition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652617481C11F61700654091 /* OperationCondition.swift */; };
 		652619B51C11FF5300654091 /* OperationObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652617491C11F61700654091 /* OperationObserver.swift */; };
-		652619B61C11FF5300654091 /* OperationQueue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6526174A1C11F61700654091 /* OperationQueue.swift */; };
 		652619B71C11FF5300654091 /* SlientCondition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6526174B1C11F61700654091 /* SlientCondition.swift */; };
 		652619B81C11FF5300654091 /* Support.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6526174C1C11F61700654091 /* Support.swift */; };
 		652619B91C11FF5300654091 /* TimeoutObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6526174D1C11F61700654091 /* TimeoutObserver.swift */; };
@@ -187,6 +178,9 @@
 		653D40311CC26F5000893746 /* ProfilerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 653D402D1CC26F4100893746 /* ProfilerTests.swift */; };
 		653D40321CC26F5600893746 /* Profiler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 653D402A1CC26F3600893746 /* Profiler.swift */; };
 		653D40331CC26F5700893746 /* Profiler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 653D402A1CC26F3600893746 /* Profiler.swift */; };
+		653DE86D1D45177300AB644C /* BlockProcedure.swift in Sources */ = {isa = PBXBuildFile; fileRef = 653DE86A1D45177300AB644C /* BlockProcedure.swift */; };
+		653DE86E1D45177300AB644C /* Procedure.swift in Sources */ = {isa = PBXBuildFile; fileRef = 653DE86B1D45177300AB644C /* Procedure.swift */; };
+		653DE86F1D45177300AB644C /* ProcedureQueue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 653DE86C1D45177300AB644C /* ProcedureQueue.swift */; };
 		6584D2381C6BF86200306EED /* FunctionalOperations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6584D2341C6BF86200306EED /* FunctionalOperations.swift */; };
 		6584D2391C6BF86200306EED /* RepeatedOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6584D2351C6BF86200306EED /* RepeatedOperation.swift */; };
 		6584D23A1C6BF86200306EED /* ResultInjection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6584D2361C6BF86200306EED /* ResultInjection.swift */; };
@@ -276,7 +270,6 @@
 		652617381C11F61700654091 /* UIOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIOperation.swift; sourceTree = "<group>"; };
 		6526173A1C11F61700654091 /* BlockCondition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlockCondition.swift; sourceTree = "<group>"; };
 		6526173B1C11F61700654091 /* BlockObserver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlockObserver.swift; sourceTree = "<group>"; };
-		6526173C1C11F61700654091 /* BlockOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlockOperation.swift; sourceTree = "<group>"; };
 		6526173D1C11F61700654091 /* ComposedOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComposedOperation.swift; sourceTree = "<group>"; };
 		6526173E1C11F61700654091 /* DelayOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DelayOperation.swift; sourceTree = "<group>"; };
 		6526173F1C11F61700654091 /* ExclusivityManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExclusivityManager.swift; sourceTree = "<group>"; };
@@ -287,10 +280,8 @@
 		652617441C11F61700654091 /* MutuallyExclusive.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MutuallyExclusive.swift; sourceTree = "<group>"; };
 		652617451C11F61700654091 /* NegatedCondition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NegatedCondition.swift; sourceTree = "<group>"; };
 		652617461C11F61700654091 /* NoFailedDependenciesCondition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoFailedDependenciesCondition.swift; sourceTree = "<group>"; };
-		652617471C11F61700654091 /* Operation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Operation.swift; sourceTree = "<group>"; };
 		652617481C11F61700654091 /* OperationCondition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OperationCondition.swift; sourceTree = "<group>"; };
 		652617491C11F61700654091 /* OperationObserver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OperationObserver.swift; sourceTree = "<group>"; };
-		6526174A1C11F61700654091 /* OperationQueue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OperationQueue.swift; sourceTree = "<group>"; };
 		6526174B1C11F61700654091 /* SlientCondition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlientCondition.swift; sourceTree = "<group>"; };
 		6526174C1C11F61700654091 /* Support.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Support.swift; sourceTree = "<group>"; };
 		6526174D1C11F61700654091 /* TimeoutObserver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeoutObserver.swift; sourceTree = "<group>"; };
@@ -364,6 +355,9 @@
 		65356EB01C8B3B2C0029E8AF /* Repeatable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Repeatable.swift; sourceTree = "<group>"; };
 		653D402A1CC26F3600893746 /* Profiler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Profiler.swift; sourceTree = "<group>"; };
 		653D402D1CC26F4100893746 /* ProfilerTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProfilerTests.swift; sourceTree = "<group>"; };
+		653DE86A1D45177300AB644C /* BlockProcedure.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BlockProcedure.swift; sourceTree = "<group>"; };
+		653DE86B1D45177300AB644C /* Procedure.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Procedure.swift; sourceTree = "<group>"; };
+		653DE86C1D45177300AB644C /* ProcedureQueue.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProcedureQueue.swift; sourceTree = "<group>"; };
 		6584D2341C6BF86200306EED /* FunctionalOperations.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FunctionalOperations.swift; sourceTree = "<group>"; };
 		6584D2351C6BF86200306EED /* RepeatedOperation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RepeatedOperation.swift; sourceTree = "<group>"; };
 		6584D2361C6BF86200306EED /* ResultInjection.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ResultInjection.swift; sourceTree = "<group>"; };
@@ -488,7 +482,7 @@
 			children = (
 				6526173A1C11F61700654091 /* BlockCondition.swift */,
 				6526173B1C11F61700654091 /* BlockObserver.swift */,
-				6526173C1C11F61700654091 /* BlockOperation.swift */,
+				653DE86A1D45177300AB644C /* BlockProcedure.swift */,
 				6526173D1C11F61700654091 /* ComposedOperation.swift */,
 				653097A91CC4BFB200EC1431 /* Condition.swift */,
 				6526173E1C11F61700654091 /* DelayOperation.swift */,
@@ -502,10 +496,10 @@
 				652617441C11F61700654091 /* MutuallyExclusive.swift */,
 				652617451C11F61700654091 /* NegatedCondition.swift */,
 				652617461C11F61700654091 /* NoFailedDependenciesCondition.swift */,
-				652617471C11F61700654091 /* Operation.swift */,
 				652617481C11F61700654091 /* OperationCondition.swift */,
 				652617491C11F61700654091 /* OperationObserver.swift */,
-				6526174A1C11F61700654091 /* OperationQueue.swift */,
+				653DE86B1D45177300AB644C /* Procedure.swift */,
+				653DE86C1D45177300AB644C /* ProcedureQueue.swift */,
 				653D402A1CC26F3600893746 /* Profiler.swift */,
 				65A5929D1D1C2DF6001F9229 /* Queue.swift */,
 				65356EB01C8B3B2C0029E8AF /* Repeatable.swift */,
@@ -908,13 +902,15 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 0710;
-				LastUpgradeCheck = 0720;
+				LastUpgradeCheck = 0800;
 				TargetAttributes = {
 					652618041C11F75300654091 = {
 						CreatedOnToolsVersion = 7.1.1;
+						LastSwiftMigration = 0800;
 					};
 					6526180E1C11F75300654091 = {
 						CreatedOnToolsVersion = 7.1.1;
+						LastSwiftMigration = 0800;
 					};
 					652618211C11F77500654091 = {
 						CreatedOnToolsVersion = 7.1.1;
@@ -1006,26 +1002,26 @@
 				652619D41C12004C00654091 /* AddressBookConditions.swift in Sources */,
 				652619D21C12004900654091 /* ContactsOperation.swift in Sources */,
 				6584D23A1C6BF86200306EED /* ResultInjection.swift in Sources */,
-				6526198E1C11FF5200654091 /* OperationQueue.swift in Sources */,
 				65356EB11C8B3B2C0029E8AF /* Generators.swift in Sources */,
 				659A54FC1CD328A700D9D311 /* CloudKitInterface.swift in Sources */,
 				652619891C11FF5200654091 /* NegatedCondition.swift in Sources */,
-				6526198B1C11FF5200654091 /* Operation.swift in Sources */,
 				652619901C11FF5200654091 /* Support.swift in Sources */,
 				652619EB1C1201C800654091 /* CalendarCapability.swift in Sources */,
 				659A54FD1CD328A700D9D311 /* CloudKitOperation.swift in Sources */,
-				652619801C11FF5200654091 /* BlockOperation.swift in Sources */,
 				6584D2381C6BF86200306EED /* FunctionalOperations.swift in Sources */,
 				653097AA1CC4BFB200EC1431 /* Condition.swift in Sources */,
 				652619811C11FF5200654091 /* ComposedOperation.swift in Sources */,
 				652619D11C12004900654091 /* ContactsCondition.swift in Sources */,
 				652619911C11FF5200654091 /* TimeoutObserver.swift in Sources */,
 				652619C21C12003A00654091 /* PhotosCapability.swift in Sources */,
+				653DE86D1D45177300AB644C /* BlockProcedure.swift in Sources */,
 				65356EB21C8B3B2C0029E8AF /* Repeatable.swift in Sources */,
 				652619821C11FF5200654091 /* DelayOperation.swift in Sources */,
 				652619D61C12004C00654091 /* AddressBookUIOperations.swift in Sources */,
 				6526198A1C11FF5200654091 /* NoFailedDependenciesCondition.swift in Sources */,
 				652619CC1C12003F00654091 /* Reachability.swift in Sources */,
+				653DE86F1D45177300AB644C /* ProcedureQueue.swift in Sources */,
+				653DE86E1D45177300AB644C /* Procedure.swift in Sources */,
 				65BB56DC1C70FAB100DF5211 /* ThreadSafety.swift in Sources */,
 				65A5929E1D1C2DF6001F9229 /* Queue.swift in Sources */,
 				659A54FA1CD328A700D9D311 /* CloudCapability.swift in Sources */,
@@ -1106,16 +1102,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				652619A31C11FF5200654091 /* SlientCondition.swift in Sources */,
-				652619A21C11FF5200654091 /* OperationQueue.swift in Sources */,
 				6526199D1C11FF5200654091 /* NegatedCondition.swift in Sources */,
 				653D40321CC26F5600893746 /* Profiler.swift in Sources */,
 				6584D2401C6BF88F00306EED /* ResultInjection.swift in Sources */,
-				6526199F1C11FF5200654091 /* Operation.swift in Sources */,
 				652619A41C11FF5200654091 /* Support.swift in Sources */,
 				659A55021CD328B900D9D311 /* CloudKitOperation.swift in Sources */,
 				652619DF1C12012C00654091 /* Reachability.swift in Sources */,
 				659A55001CD328B900D9D311 /* CloudKitError.swift in Sources */,
-				652619941C11FF5200654091 /* BlockOperation.swift in Sources */,
 				659A54FF1CD328B900D9D311 /* CloudCapability.swift in Sources */,
 				65A74FC11CC59488008D7193 /* Condition.swift in Sources */,
 				652619951C11FF5200654091 /* ComposedOperation.swift in Sources */,
@@ -1190,13 +1183,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				652619B71C11FF5300654091 /* SlientCondition.swift in Sources */,
-				652619B61C11FF5300654091 /* OperationQueue.swift in Sources */,
 				652619B11C11FF5300654091 /* NegatedCondition.swift in Sources */,
 				65A592A01D1C2DF6001F9229 /* Queue.swift in Sources */,
-				652619B31C11FF5300654091 /* Operation.swift in Sources */,
 				652619B81C11FF5300654091 /* Support.swift in Sources */,
 				652619E91C1201AF00654091 /* ReachabilityCondition.swift in Sources */,
-				652619A81C11FF5300654091 /* BlockOperation.swift in Sources */,
 				65BB56DE1C70FAB800DF5211 /* ThreadSafety.swift in Sources */,
 				652619A91C11FF5300654091 /* ComposedOperation.swift in Sources */,
 				6584D2411C6BF89000306EED /* ResultInjection.swift in Sources */,
@@ -1294,7 +1284,22 @@
 		652616C41C11F48200654091 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
 				ONLY_ACTIVE_ARCH = YES;
 			};
 			name = Debug;
@@ -1302,6 +1307,21 @@
 		652616C51C11F48200654091 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
 			};
 			name = Release;
@@ -1356,6 +1376,7 @@
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 3.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
@@ -1404,6 +1425,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 3.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 				VERSIONING_SYSTEM = "apple-generic";
@@ -1456,6 +1478,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 3.0;
 			};
 			name = Debug;
 		};
@@ -1496,6 +1519,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "me.danthorpe.iOS-OperationsTests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
+				SWIFT_VERSION = 3.0;
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
