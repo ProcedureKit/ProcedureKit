@@ -36,7 +36,7 @@ class GatedOperationTests: OperationTests {
         XCTAssertTrue(gate.operation.finished)
     }
 
-    func test__wheen_composed_is_dependency_and_gate_is_open__dependent_is_performed_after_composed() {
+    func test__when_composed_is_dependency_and_gate_is_open__dependent_is_performed_after_composed() {
         let operation = TestOperation()
         let composed = TestOperation()
         operation.addDependency(composed)
