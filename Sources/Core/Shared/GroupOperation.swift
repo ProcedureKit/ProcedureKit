@@ -222,49 +222,48 @@ public class GroupOperation: Operation, OperationQueueDelegate {
     }
 
     private func _addOperations(additional: [NSOperation], addToOperationsArray: Bool = true) {
+        guard additional.count > 0 else { return }
 
-        if additional.count > 0 {
+        let shouldAddOperations = groupFinishLock.withCriticalScope { () -> Bool in
+            guard !isGroupFinishing else { return false }
+            dispatch_group_enter(isAddingOperationsGroup)
+            return true
+        }
 
-            let shouldAddOperations = groupFinishLock.withCriticalScope { () -> Bool in
-                guard !isGroupFinishing else { return false }
-                dispatch_group_enter(isAddingOperationsGroup)
-                return true
+        guard shouldAddOperations else {
+            if !finishingOperation.finished {
+                assertionFailure("Cannot add new operations to a group after the group has started to finish.")
             }
-
-            guard shouldAddOperations else {
-                if !finishingOperation.finished {
-                    assertionFailure("Cannot add new operations to a group after the group has started to finish.")
-                }
-                else {
-                    assertionFailure("Cannot add new operations to a group after the group has completed.")
-                }
-                return
+            else {
+                assertionFailure("Cannot add new operations to a group after the group has completed.")
             }
+            return
+        }
 
-            var handledCancelled = false
-            if cancelled {
-                additional.forEachOperation { $0.cancel() }
-                handledCancelled = true
-            }
-            let logSeverity = log.severity
-            additional.forEachOperation { $0.log.severity = logSeverity }
+        var handledCancelled = false
+        if cancelled {
+            additional.forEachOperation { $0.cancel() }
+            handledCancelled = true
+        }
 
-            queue.addOperations(additional)
+        let logSeverity = log.severity
+        additional.forEachOperation { $0.log.severity = logSeverity }
 
-            if addToOperationsArray {
-                _operations.appendContentsOf(additional)
-            }
+        queue.addOperations(additional)
 
-            if !handledCancelled && cancelled {
-                // It is possible that the cancellation happened before adding the
-                // additional operations to the operations array.
-                // Thus, ensure that all additional operations are cancelled.
-                additional.forEachOperation { if !$0.cancelled { $0.cancel() } }
-            }
+        if addToOperationsArray {
+            _operations.appendContentsOf(additional)
+        }
 
-            groupFinishLock.withCriticalScope {
-                dispatch_group_leave(isAddingOperationsGroup)
-            }
+        if !handledCancelled && cancelled {
+            // It is possible that the cancellation happened before adding the
+            // additional operations to the operations array.
+            // Thus, ensure that all additional operations are cancelled.
+            additional.forEachOperation { if !$0.cancelled { $0.cancel() } }
+        }
+
+        groupFinishLock.withCriticalScope {
+            dispatch_group_leave(isAddingOperationsGroup)
         }
     }
 
