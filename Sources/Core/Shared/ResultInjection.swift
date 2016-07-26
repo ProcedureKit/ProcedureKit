@@ -177,19 +177,25 @@ extension AutomaticInjectionOperationType where Self: Operation {
     */
     public func injectResultFromDependency<T where T: Operation, T: ResultOperationType, T.Result == Requirement>(dep: T) -> Self {
         return injectResultFromDependency(dep) { [weak self] operation, dependency, errors in
-            if errors.isEmpty {
-                self?.requirement = dependency.result
+
+            guard let strongSelf = self where strongSelf === operation else { return }
+
+            guard errors.isEmpty else {
+                strongSelf.cancelWithError(AutomaticInjectionError.DependencyFinishedWithErrors(errors))
+                return
             }
-            else {
-                self?.cancelWithError(AutomaticInjectionError.DependencyFinishedWithErrors(errors))
-            }
+
+            strongSelf.requirement = dependency.result
         }
     }
 
     /**
      Inject the result from the dependency as the requirement of the receiver.
-     Additionally this method requires that the dependency must not fail or be
-     cancelled.
+
+     This operation is available when the depndency is an operation which has a
+     result which an optional version of the receivers requirement. This works
+     especially when if your receiver can be initialized with a default value
+     of its requirement which is then set before it executes.
 
     ```swift
      return operation
@@ -202,74 +208,22 @@ extension AutomaticInjectionOperationType where Self: Operation {
      - parameter dep: an operation of type T
      - returns: the receiver
     */
-    public func requireResultFromDependency<T where T: Operation, T: ResultOperationType, T.Result == Requirement>(dep: T) -> Self {
-        if conditions.filter({ return $0 is NoFailedDependenciesCondition }).count < 1 {
-            addCondition(NoFailedDependenciesCondition())
-        }
-        return injectResultFromDependency(dep)
-    }
-}
+    public func requireResultFromDependency<T where T: Operation, T: ResultOperationType, T.Result == Optional<Requirement>>(dep: T) -> Self {
+        return injectResultFromDependency(dep) { [weak self] operation, dependency, errors in
 
+            guard let strongSelf = self where strongSelf === operation else { return }
 
-/// Protocol for non-Operation types to conform to yet enjoy scheduling in Operation
-public protocol Executor: ResultOperationType, AutomaticInjectionOperationType {
-
-    /**
-     Will be called to execute the _work_. When the work is finished, the
-     finish block should be invoked. If any errors were encounted pass
-     them into the finish block. If the work produces a result, the value
-     should be made available at the `result` property before invoking the
-     finish block.
-
-     - parameter finish: a closure which receives an ErrorType?
-    */
-    func execute(finish: ErrorType? -> Void)
-
-    /// Will be called to signal that the _work_ should be cancelled.
-    func cancel()
-}
-
-/**
- Execute is an Operation which is intended to compose other types which _perform work_. These
- types must conform to Executor protocol, and essentially expose API to trigger execution of
- the work, support cancellation, and extend protocols for result injection.
-
- Execute is initialized with an instance of such a class. When the operation is ready, it will
- call execute on the Executor, and catch any thrown errors. If the operation is cancelled, it
- will call cancel on the executor.
- */
-public final class Execute<E: Executor>: Operation, ResultOperationType, AutomaticInjectionOperationType {
-
-    /// - returns: executor, the instance of the Executor
-    public let executor: E
-
-    /// - returns: the Executor.Result
-    public var result: E.Result {
-        return executor.result
-    }
-
-    /// - returns: the Executor.Requirement
-    public var requirement: E.Requirement {
-        get { return executor.requirement }
-        set { executor.requirement = newValue }
-    }
-
-    /**
-     Initialize the operation with the executor.
-
-     - parametere [unnamed]: an instance of Executor
-    */
-    public init(_ executor: E) {
-        self.executor = executor
-        super.init()
-        addObserver(DidCancelObserver { [unowned self] operation in
-            if self === operation {
-                self.executor.cancel()
+            guard errors.isEmpty else {
+                strongSelf.cancelWithError(AutomaticInjectionError.DependencyFinishedWithErrors(errors))
+                return
             }
-        })
-    }
 
-    public final override func execute() {
-        executor.execute(finish)
+            guard let requirement = dependency.result else {
+                strongSelf.cancelWithError(AutomaticInjectionError.RequirementNotSatisfied)
+                return
+            }
+
+            strongSelf.requirement = requirement
+        }
     }
 }
