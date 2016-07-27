@@ -152,4 +152,19 @@ class ConditionTests: OperationTests {
         
         XCTAssertEqual(operation.dependencies.count, 4)
     }
+
+    func test__target_and_condition_have_same_dependency() {
+        let dependency = TestOperation()
+        let condition = TrueCondition(name: "Condition")
+        condition.addDependency(dependency)
+
+        let operation = TestOperation()
+        operation.addCondition(condition)
+        operation.addDependency(dependency)
+
+        waitForOperations(operation, dependency)
+
+        XCTAssertTrue(dependency.didExecute)
+        XCTAssertTrue(operation.didExecute)
+    }
 }
