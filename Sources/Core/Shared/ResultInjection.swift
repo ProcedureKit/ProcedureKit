@@ -198,11 +198,7 @@ extension AutomaticInjectionOperationType where Self: Operation {
      of its requirement which is then set before it executes.
 
     ```swift
-     return operation
-        .requireResultFromDependency(foo)
-        .requireResultFromDependency(bar)
-        .requireResultFromDependency(baz)
-        .requireResultFromDependency(bat)
+     return operation.requireResultFromDependency(foo)
      ```
 
      - parameter dep: an operation of type T
