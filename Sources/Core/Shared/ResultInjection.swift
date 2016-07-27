@@ -176,16 +176,14 @@ extension AutomaticInjectionOperationType where Self: Operation {
      - returns: the receiver
     */
     public func injectResultFromDependency<T where T: Operation, T: ResultOperationType, T.Result == Requirement>(dep: T) -> Self {
-        return injectResultFromDependency(dep) { [weak self] operation, dependency, errors in
-
-            guard let strongSelf = self where strongSelf === operation else { return }
+        return injectResultFromDependency(dep) { operation, dependency, errors in
 
             guard errors.isEmpty else {
-                strongSelf.cancelWithError(AutomaticInjectionError.DependencyFinishedWithErrors(errors))
+                operation.cancelWithError(AutomaticInjectionError.DependencyFinishedWithErrors(errors))
                 return
             }
 
-            strongSelf.requirement = dependency.result
+            operation.requirement = dependency.result
         }
     }
 
@@ -205,21 +203,19 @@ extension AutomaticInjectionOperationType where Self: Operation {
      - returns: the receiver
     */
     public func requireResultFromDependency<T where T: Operation, T: ResultOperationType, T.Result == Optional<Requirement>>(dep: T) -> Self {
-        return injectResultFromDependency(dep) { [weak self] operation, dependency, errors in
-
-            guard let strongSelf = self where strongSelf === operation else { return }
+        return injectResultFromDependency(dep) { operation, dependency, errors in
 
             guard errors.isEmpty else {
-                strongSelf.cancelWithError(AutomaticInjectionError.DependencyFinishedWithErrors(errors))
+                operation.cancelWithError(AutomaticInjectionError.DependencyFinishedWithErrors(errors))
                 return
             }
 
             guard let requirement = dependency.result else {
-                strongSelf.cancelWithError(AutomaticInjectionError.RequirementNotSatisfied)
+                operation.cancelWithError(AutomaticInjectionError.RequirementNotSatisfied)
                 return
             }
 
-            strongSelf.requirement = requirement
+            operation.requirement = requirement
         }
     }
 }
