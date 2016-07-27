@@ -96,7 +96,10 @@ public class Operation: NSOperation {
     internal private(set) var conditions = Set<Condition>()
 
     internal var indirectDependencies: Set<NSOperation> {
-        return Set(conditions.flatMap { $0.directDependencies })
+        return Set(conditions
+            .flatMap { $0.directDependencies }
+            .filter { !directDependencies.contains($0) }
+        )
     }
 
     // Internal operation properties which are used to manage the scheduling of dependencies
