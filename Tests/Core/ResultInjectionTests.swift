@@ -70,9 +70,7 @@ class AutomaticResultInjectionTests: ResultInjectionTests {
     func test__requirement_is_injected() {
         processing.injectResultFromDependency(retrieval)
 
-        addCompletionBlockToTestOperation(processing, withExpectation: expectationWithDescription("Test: \(#function)"))
-        runOperations(retrieval, processing)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForOperations(retrieval, processing)
 
         XCTAssertEqual(processing.requirement, retrieval.result)
     }
@@ -99,80 +97,90 @@ class AutomaticResultInjectionTests: ResultInjectionTests {
             }
         })
 
-        addCompletionBlockToTestOperation(processing, withExpectation: expectationWithDescription("Test: \(#function)"))
-        runOperations(retrieval, processing)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForOperations(retrieval, processing)
 
         XCTAssertTrue(processing.cancelled)
     }
 }
 
-class ExecuteTests: OperationTests {
+class RequiredResultInjectionTests: ResultInjectionTests {
 
-    class TestExecutor {
-        var error: ErrorType? = .None
-        var didExecute = false
-        var didCancel = false
+    class Printing: Operation, AutomaticInjectionOperationType {
+        var requirement: String = "Default Requirement"
 
-        func execute(finish: ErrorType? -> Void) {
-            didExecute = true
-            finish(error)
-        }
-
-        func cancel() {
-            didCancel = true
+        override func execute() {
+            log.info(requirement)
+            finish()
         }
     }
 
-    class GetStringExecutor: TestExecutor, Executor {
-        var result: String = "Hello, World!"
-        var requirement: Void = Void()
+    var printing: Printing!
+
+    override func setUp() {
+        super.setUp()
+        printing = Printing()
     }
 
-    class DoubleStringExecutor: TestExecutor, Executor {
-        var requirement: String = "yup"
-        var result: String = "nope"
-        override func execute(finish: ErrorType? -> Void) {
-            result = "\(requirement) \(requirement)"
-            super.execute(finish)
-        }
+    func test__requirement_is_injected() {
+
+        printing.requireResultFromDependency(retrieval)
+
+        waitForOperations(retrieval, printing)
+
+        XCTAssertEqual(printing.requirement, retrieval.result ?? "not what we expect")
     }
 
-    func test__add_single_executor() {
-        let operation = Execute(GetStringExecutor())
-        waitForOperation(operation)
-        XCTAssertTrue(operation.executor.didExecute)
-        XCTAssertFalse(operation.executor.didCancel)
-        XCTAssertEqual(operation.executor.result, "Hello, World!")
+    func test__cancels_with_errors_if_dependency_errors() {
+        retrieval = TestOperation(error: TestOperation.Error.SimulatedError)
+        printing.requireResultFromDependency(retrieval)
+        printing.addObserver(DidCancelObserver { op in
+            XCTAssertEqual(op.errors.count, 1)
+            guard let error = op.errors.first as? AutomaticInjectionError else {
+                XCTFail("Incorrect error received")
+                return
+            }
+
+            switch error {
+            case .DependencyFinishedWithErrors(let errors):
+                XCTAssertEqual(errors.count, 1)
+                guard let _ = errors.first as? TestOperation.Error else {
+                    XCTFail("Incorrect error received")
+                    return
+                }
+            default:
+                XCTFail("Incorrect error received")
+            }
+        })
+
+        waitForOperations(retrieval, processing)
+
+        XCTAssertTrue(printing.cancelled)
     }
 
-    func test__require_result_injection() {
-        let get = Execute(GetStringExecutor())
-        let double = Execute(DoubleStringExecutor())
-        let operation = Execute(DoubleStringExecutor())
-        double.requireResultFromDependency(get)
-        operation.requireResultFromDependency(double)
-        waitForOperations(get, double, operation)
-        XCTAssertTrue(operation.executor.didExecute)
-        XCTAssertFalse(operation.executor.didCancel)
-        XCTAssertEqual(operation.executor.result, "Hello, World! Hello, World! Hello, World! Hello, World!")
+    func test__cancels_with_errors_if_dependency_not_available() {
+        retrieval.result = nil
+        printing.requireResultFromDependency(retrieval)
+        printing.addObserver(DidCancelObserver { op in
+            XCTAssertEqual(op.errors.count, 1)
+            guard let error = op.errors.first as? AutomaticInjectionError else {
+                XCTFail("Incorrect error received")
+                return
+            }
+
+            switch error {
+            case .RequirementNotSatisfied:
+                break
+            default:
+                XCTFail("Incorrect error received")
+            }
+        })
+
+        waitForOperations(retrieval, processing)
+
+        XCTAssertTrue(printing.cancelled)
     }
 
-    func test__executor_which_throws_error() {
-        let executor = GetStringExecutor()
-        executor.error = TestOperation.Error.SimulatedError
 
-        let operation = Execute(executor)
-        waitForOperation(operation)
-        XCTAssertTrue(operation.failed)
-        XCTAssertEqual(operation.errors.count, 1)
-    }
-
-    func test__executor_which_gets_cancelled() {
-        let operation = Execute(GetStringExecutor())
-        operation.cancel()
-        waitForOperation(operation)
-        XCTAssertFalse(operation.executor.didExecute)
-        XCTAssertTrue(operation.executor.didCancel)
-    }
 }
+
+
