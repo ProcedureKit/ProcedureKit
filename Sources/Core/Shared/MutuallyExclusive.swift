@@ -26,9 +26,3 @@ public final class MutuallyExclusive<T>: Condition {
         completion(.Satisfied)
     }
 }
-
-/// A non-constructible type to be used with `MutuallyExclusive<T>`
-public enum Alert { }
-
-/// A condition to indicate that the associated operation may present an alert
-public typealias AlertPresentation = MutuallyExclusive<Alert>

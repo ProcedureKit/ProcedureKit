@@ -11,24 +11,24 @@ import XCTest
 
 class MutualExclusiveTests: OperationTests {
 
-    func test__alert_presentation_name() {
-        let condition = AlertPresentation()
-        XCTAssertEqual(condition.name, "MutuallyExclusive<Alert>")
+    func test__mutual_eclusive_name() {
+        let condition = MutuallyExclusive<Operation>()
+        XCTAssertEqual(condition.name, "MutuallyExclusive<Operation>")
     }
 
     func test__alert_presentation_is_mutually_exclusive() {
-        let condition = AlertPresentation()
+        let condition = MutuallyExclusive<Operation>()
         XCTAssertTrue(condition.mutuallyExclusive)
     }
 
     func test__alert_presentation_evaluation_satisfied() {
-        let condition = AlertPresentation()
+        let condition = MutuallyExclusive<Operation>()
         condition.evaluate(TestOperation()) { result in
             switch result {
             case .Satisfied:
                 return XCTAssertTrue(true)
             default:
-                return XCTFail("Alert presentation condition should evaluate true.")
+                return XCTFail("Condition should evaluate true.")
             }
         }
     }

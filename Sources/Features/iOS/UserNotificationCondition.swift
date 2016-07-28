@@ -134,7 +134,7 @@ public class UserNotificationPermissionOperation: Operation {
         self.registrar = registrar
         super.init()
         name = "User Notification Permissions Operation"
-        addCondition(AlertPresentation())
+        addCondition(MutuallyExclusive<UserNotificationPermissionOperation>())
     }
 
     public override func execute() {
