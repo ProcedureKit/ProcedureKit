@@ -51,7 +51,6 @@ public class AlertOperation<From: PresentingViewController>: Operation {
         uiOperation = UIOperation(controller: controller, displayControllerFrom: .Present(from))
         super.init()
         name = "Alert<\(From.self)>"
-        addCondition(AlertPresentation())
         addCondition(MutuallyExclusive<UIViewController>())
     }
 
