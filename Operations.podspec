@@ -33,14 +33,18 @@ session Advanced NSOperations: https://developer.apple.com/videos/wwdc/2015/?id=
       'Sources/Features/iOS'
     ]
     ss.ios.exclude_files = [
-      'Sources/Features/Shared/CloudCapability.swift',
       'Sources/Features/Shared/CloudKit',
+      'Sources/Features/Shared/TaskOperation.swift',      
       'Sources/Features/iOS/PhotosCapability.swift',
       'Sources/Features/iOS/PassbookCapability.swift'
     ]
     ss.watchos.exclude_files = [
       'Sources/Core/iOS',
-      'Sources/Features/Shared/CloudKit',      
+      'Sources/Features/Shared/CloudKit',
+      'Sources/Features/Shared/ReachabilityCondition.swift',
+      'Sources/Features/Shared/ReachableOperation.swift',
+      'Sources/Features/Shared/Reachability.swift',
+      'Sources/Features/Shared/TaskOperation.swift',      
       'Sources/Features/iOS/LocationCapability.swift',
       'Sources/Features/iOS/LocationOperations.swift',
       'Sources/Features/iOS/PhotosCapability.swift',
@@ -48,13 +52,12 @@ session Advanced NSOperations: https://developer.apple.com/videos/wwdc/2015/?id=
       'Sources/Features/iOS/UserConfirmationCondition.swift',
       'Sources/Features/iOS/UserNotificationCondition.swift',
       'Sources/Features/iOS/WebpageOperation.swift',
-      'Sources/Features/iOS/OpenInSafariOperation.swift',
-      'Sources/Features/Shared/ReachabilityCondition.swift',
-      'Sources/Features/Shared/ReachableOperation.swift',
-      'Sources/Features/Shared/Reachability.swift'
+      'Sources/Features/iOS/OpenInSafariOperation.swift'
     ]
     ss.tvos.exclude_files = [
       'Sources/Features/Shared/CloudKit',    
+      'Sources/Features/Shared/CalendarCapability.swift',      
+      'Sources/Features/Shared/TaskOperation.swift',                  
       'Sources/Features/iOS/HealthCapability.swift',
       'Sources/Features/iOS/LocationCapability.swift',
       'Sources/Features/iOS/LocationOperations.swift',      
@@ -63,8 +66,7 @@ session Advanced NSOperations: https://developer.apple.com/videos/wwdc/2015/?id=
       'Sources/Features/iOS/RemoteNotificationCondition.swift',
       'Sources/Features/iOS/UserNotificationCondition.swift',
       'Sources/Features/iOS/WebpageOperation.swift',
-      'Sources/Features/iOS/OpenInSafariOperation.swift',      
-      'Sources/Features/Shared/CalendarCapability.swift'
+      'Sources/Features/iOS/OpenInSafariOperation.swift'
     ]
     ss.osx.exclude_files = [
       'Sources/Core/iOS',
