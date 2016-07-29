@@ -79,17 +79,14 @@ class ConditionTests: OperationTests {
     }
 
     func test__single_condition_which_succeeds_with_single_condition_which_fails__cancelled() {
-        LogManager.severity = .Verbose
         operation = TestOperation()
         let condition = TrueCondition(name: "Condition 1")
         condition.addCondition(FalseCondition(name: "Nested Condition 1"))
         operation.addCondition(condition)
         waitForOperation(operation)
-        print("*** \(operation.errors)")
         XCTAssertFalse(operation.didExecute)
         XCTAssertTrue(operation.cancelled)
         XCTAssertEqual(operation.errors.count, 2)
-        LogManager.severity = .Warning
     }
     
     func test__dependencies_execute_before_condition_dependencies() {
@@ -166,6 +163,31 @@ class ConditionTests: OperationTests {
 
         XCTAssertTrue(dependency.didExecute)
         XCTAssertTrue(operation.didExecute)
+    }
+
+    func test__given_operation_is_direct_dependency_and_indirect_of_different_operations() {
+        // See OPR-386
+        let dependency = TestOperation(); dependency.name = "Dependency"
+
+        let condition1 = TrueCondition(); condition1.name = "Condition 1"
+        condition1.addDependency(dependency)
+
+        let operation1 = TestOperation(); operation1.name = "Operation 1"
+        operation1.addCondition(condition1)
+        operation1.addDependency(dependency)
+
+        let condition2 = TrueCondition(); condition2.name = "Condition 2"
+        condition2.addDependency(dependency)
+
+        let operation2 = TestOperation(); operation2.name = "Operation 2"
+        operation2.addCondition(condition2)
+        operation2.addDependency(operation1)
+
+        waitForOperations(operation1, dependency, operation2)
+
+        XCTAssertTrue(dependency.didExecute)
+        XCTAssertTrue(operation1.didExecute)
+        XCTAssertTrue(operation2.didExecute)
     }
 
     func test__ignored_failing_condition_does_not_result_in_operation_failure() {
