@@ -167,4 +167,37 @@ class ConditionTests: OperationTests {
         XCTAssertTrue(dependency.didExecute)
         XCTAssertTrue(operation.didExecute)
     }
+
+    func test__ignored_failing_condition_does_not_result_in_operation_failure() {
+        let operation1 = TestOperation()
+        let operation2 = TestOperation()
+        operation1.addCondition(IgnoredCondition(FalseCondition()))
+        operation2.addCondition(FalseCondition())
+        waitForOperations(operation1, operation2)
+        XCTAssertTrue(operation1.didExecute)
+        XCTAssertFalse(operation1.failed)
+        XCTAssertFalse(operation2.didExecute)
+        XCTAssertTrue(operation2.failed)
+    }
+
+    func test__ignored_satisfied_condition_does_not_result_in_operation_failure() {
+        let operation1 = TestOperation()
+        let operation2 = TestOperation()
+        operation1.addCondition(IgnoredCondition(TrueCondition()))
+        operation2.addCondition(TrueCondition())
+        waitForOperations(operation1, operation2)
+        XCTAssertTrue(operation1.didExecute)
+        XCTAssertFalse(operation1.failed)
+        XCTAssertTrue(operation2.didExecute)
+        XCTAssertFalse(operation2.failed)
+    }
+
+    func test__ignored_ignored_condition_does_not_result_in_operation_failure() {
+        let operation = TestOperation()
+        operation.addCondition(IgnoredCondition(IgnoredCondition(FalseCondition())))
+        waitForOperation(operation)
+        XCTAssertTrue(operation.didExecute)
+        XCTAssertFalse(operation.failed)
+    }
 }
+
