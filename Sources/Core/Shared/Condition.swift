@@ -19,7 +19,7 @@ public enum ConditionResult {
     case Satisfied
 
     /// Indicates that the condition failed, but can be ignored
-    case Ignored(ErrorType)
+    case Ignored
 
     /// Indicates that the condition failed with an associated error.
     case Failed(ErrorType)
@@ -225,8 +225,8 @@ public class IgnoredCondition<C: Condition>: ComposedCondition<C> {
     /// Override of public function
     public override func evaluate(operation: Operation, completion: CompletionBlockType) {
         super.evaluate(operation) { composedResult in
-            if case let .Failed(error) = composedResult {
-                completion(.Ignored(error))
+            if case .Failed(_) = composedResult {
+                completion(.Ignored)
             }
             else {
                 completion(composedResult)
