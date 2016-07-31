@@ -29,11 +29,13 @@ public class CloudKitRecovery<T where T: NSOperation, T: CKOperationType, T: Ass
 
     public typealias ErrorResponse = (delay: Delay?, configure: V -> Void)
     public typealias Handler = (operation: T, error: T.Error, log: LoggerType, suggested: ErrorResponse) -> ErrorResponse?
+    public typealias PrepareForRetryHandler = (addConfigureBlock: (V -> Void) -> Void) -> Void
 
     typealias Payload = RepeatedPayload<V>
 
     var defaultHandlers: [CKErrorCode: Handler]
     var customHandlers: [CKErrorCode: Handler]
+    var prepareForRetryHandler: PrepareForRetryHandler?
 
     init() {
         defaultHandlers = [:]
@@ -47,11 +49,20 @@ public class CloudKitRecovery<T where T: NSOperation, T: CKOperationType, T: Ass
         // We take the payload, if not nil, and return the delay, and configuration block
         let suggestion: ErrorResponse = (payload.delay, info.configure)
 
-        guard let
-            handler = customHandlers[code] ?? defaultHandlers[code],
-            response = handler(operation: info.operation.operation, error: error, log: info.log, suggested: suggestion)
+        guard let handler = customHandlers[code] ?? defaultHandlers[code],
+              var response = handler(operation: info.operation.operation, error: error, log: info.log, suggested: suggestion)
         else {
             return .None
+        }
+
+        if let prepareForRetryHandler = prepareForRetryHandler {
+            prepareForRetryHandler(addConfigureBlock: { (block) in
+                let config = response.configure
+                response.configure = { operation in
+                    config(operation)
+                    block(operation)
+                }
+            })
         }
 
         return response
@@ -94,6 +105,10 @@ public class CloudKitRecovery<T where T: NSOperation, T: CKOperationType, T: Ass
 
     func setCustomHandlerForCode(code: CKErrorCode, handler: Handler) {
         customHandlers.updateValue(handler, forKey: code)
+    }
+
+    func setPrepareForRetryHandler(handler: PrepareForRetryHandler?) {
+        prepareForRetryHandler = handler
     }
 
     internal func cloudKitErrorsFromInfo(info: RetryFailureInfo<OPRCKOperation<T>>) -> (code: CKErrorCode, error: T.Error)? {
@@ -254,6 +269,10 @@ public final class CloudKitOperation<T where T: NSOperation, T: CKOperationType,
 
     public func setErrorHandlers(handlers: [CKErrorCode: ErrorHandler]) {
         recovery.customHandlers = handlers
+    }
+
+    public func setPrepareForRetryHandler(handler: (addConfigureBlock: (OPRCKOperation<T> -> Void) -> Void) -> Void) {
+        recovery.setPrepareForRetryHandler(handler)
     }
 }
 

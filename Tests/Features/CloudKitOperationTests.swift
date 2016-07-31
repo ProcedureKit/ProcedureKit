@@ -1268,6 +1268,7 @@ class OPRCKQueryOperationTests: CKTests {
 
 // MARK: - CloudKitOperation Test Cases
 
+// Note: This also tests the error-handling/retry code.
 class CloudKitOperationDiscoverAllContractsTests: CKTests {
 
     var operation: CloudKitOperation<TestDiscoverAllContactsOperation>!
@@ -1439,6 +1440,45 @@ class CloudKitOperationDiscoverAllContractsTests: CKTests {
         let errorHandlers = operation.errorHandlers
         XCTAssertEqual(errorHandlers.count, 1)
         XCTAssertNotNil(errorHandlers[.InternalError])
+    }
+
+    func test__set_prepare_for_retry_handler__with_error_which_retries_with_default_retry_handler() {
+        var userInfosByAddress: [String: TestDiscoverUserInfosOperation.DiscoveredUserInfo]? = .None
+        var userInfosByRecordID: [TestDiscoverUserInfosOperation.RecordID: TestDiscoverUserInfosOperation.DiscoveredUserInfo]? = .None
+
+        var shouldError = true
+        let operation: CloudKitOperation<TestDiscoverUserInfosOperation> =
+            CloudKitOperation(strategy: .Immediate) {
+            let op = TestDiscoverUserInfosOperation(userInfosByEmailAddress: [:], userInfoByRecordID: [:])
+            if shouldError {
+                op.error = NSError(
+                    domain: CKErrorDomain,
+                    code: CKErrorCode.ZoneBusy.rawValue,
+                    userInfo: nil
+                )
+                shouldError = false
+            }
+            return op
+        }
+        operation.setDiscoverUserInfosCompletionBlock { _, _ in }
+        operation.setPrepareForRetryHandler { addConfigureBlock in
+            addConfigureBlock { retryOperation in
+                // retry operation gets a new completion block that stores the result values
+                retryOperation.setDiscoverUserInfosCompletionBlock { byAddress, byRecordID in
+                    userInfosByAddress = byAddress
+                    userInfosByRecordID = byRecordID
+                }
+            }
+        }
+
+        waitForOperation(operation)
+
+        XCTAssertTrue(operation.finished)
+        XCTAssertEqual(operation.errors.count, 0)
+        XCTAssertNotNil(userInfosByAddress)
+        XCTAssertTrue(userInfosByAddress?.isEmpty ?? false)
+        XCTAssertNotNil(userInfosByRecordID)
+        XCTAssertTrue(userInfosByRecordID?.isEmpty ?? false)
     }
 }
 
