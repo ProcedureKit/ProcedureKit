@@ -54,7 +54,7 @@ class WebpageOperationTests: OperationTests {
 
         runOperation(operation)
 
-        waitForExpectationsWithTimeout(5, handler: nil)
+        waitForExpectationsWithTimeout(3, handler: nil)
         XCTAssertTrue(didPresentWebpage)
     }
 }
