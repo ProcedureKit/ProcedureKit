@@ -79,7 +79,8 @@ class ConditionTests: OperationTests {
     }
 
     func test__single_condition_which_succeeds_with_single_condition_which_fails__cancelled() {
-        operation = TestOperation()
+        operation = TestOperation(); operation.name = "Operation 1"
+        operation.log.severity = .Verbose
         let condition = TrueCondition(name: "Condition 1")
         condition.addCondition(FalseCondition(name: "Nested Condition 1"))
         operation.addCondition(condition)
@@ -191,14 +192,15 @@ class ConditionTests: OperationTests {
     }
 
     func test__ignored_failing_condition_does_not_result_in_operation_failure() {
-        let operation1 = TestOperation()
-        let operation2 = TestOperation()
+        let operation1 = TestOperation(); operation1.name = "Operation 1"
+        let operation2 = TestOperation(); operation2.name = "Operation 2"
         operation1.addCondition(IgnoredCondition(FalseCondition()))
         operation2.addCondition(FalseCondition())
         waitForOperations(operation1, operation2)
-        XCTAssertTrue(operation1.didExecute)
-        XCTAssertFalse(operation1.failed)
+        XCTAssertFalse(operation1.didExecute)
         XCTAssertFalse(operation2.didExecute)
+
+        XCTAssertFalse(operation1.failed)
         XCTAssertTrue(operation2.failed)
     }
 
@@ -209,8 +211,9 @@ class ConditionTests: OperationTests {
         operation2.addCondition(TrueCondition())
         waitForOperations(operation1, operation2)
         XCTAssertTrue(operation1.didExecute)
-        XCTAssertFalse(operation1.failed)
         XCTAssertTrue(operation2.didExecute)
+
+        XCTAssertFalse(operation1.failed)
         XCTAssertFalse(operation2.failed)
     }
 
@@ -218,7 +221,7 @@ class ConditionTests: OperationTests {
         let operation = TestOperation()
         operation.addCondition(IgnoredCondition(IgnoredCondition(FalseCondition())))
         waitForOperation(operation)
-        XCTAssertTrue(operation.didExecute)
+        XCTAssertFalse(operation.didExecute)
         XCTAssertFalse(operation.failed)
     }
 }
