@@ -2406,6 +2406,40 @@ class BatchedFetchRecordChangesOperationTests: CKTests {
 
         XCTAssertEqual(count, 3)
     }
+
+    func test__set_prepare_for_next_operation_handler() {
+
+        var currentServerChangeToken: String? = "initial"
+
+        operation.previousServerChangeToken = currentServerChangeToken
+        operation.operation.token = "0" // set token to return on completion
+        operation.recordZoneID = "a-zone-id"
+        operation.recordChangedBlock = { _ in }
+        operation.recordWithIDWasDeletedBlock = { _ in }
+        operation.setFetchRecordChangesCompletionBlock { [unowned self] newServerChangeToken, _ in
+            currentServerChangeToken = newServerChangeToken
+            self.count += 1
+        }
+
+        operation.setPrepareForNextOperationHandler { addConfigureBlock in
+            addConfigureBlock { retryOperation in
+                retryOperation.previousServerChangeToken = currentServerChangeToken
+                // simulate the next server change token
+                if let currentServerChangeToken = currentServerChangeToken {
+                    retryOperation.operation.token = "\(currentServerChangeToken).\(self.count)"
+                }
+                else {
+                    retryOperation.operation.token = "firstTokenAfterNil"
+                }
+            }
+        }
+
+        waitForOperation(operation)
+        XCTAssertEqual(operation.errors.count, 0)
+
+        XCTAssertEqual(count, 3)
+        XCTAssertEqual(currentServerChangeToken, "0.1.2")
+    }
 }
 
 // MARK: - Cloud Kit Error Recovery Test Cases

@@ -280,11 +280,16 @@ public final class CloudKitOperation<T where T: NSOperation, T: CKOperationType,
 
 class CloudKitOperationGenerator<T where T: NSOperation, T: CKOperationType, T: AssociatedErrorType, T.Error: CloudKitErrorType>: GeneratorType {
 
+    typealias PrepareForNextOperationHandler = (addConfigureBlock: (CloudKitOperation<T> -> Void) -> Void) -> Void
+
     let recovery: CloudKitRecovery<T>
 
     var timeout: NSTimeInterval?
     var generator: AnyGenerator<T>
     var more: Bool = true
+
+    var prepareForNextOperationHandler: PrepareForNextOperationHandler?
+    var lastOperationConfigure: (CloudKitOperation<T> -> Void) = { _ in }
 
     init<G where G: GeneratorType, G.Element == T>(timeout: NSTimeInterval? = 300, generator: G) {
         self.timeout = timeout
@@ -298,9 +303,16 @@ class CloudKitOperationGenerator<T where T: NSOperation, T: CKOperationType, T: 
         operation.recovery = recovery
         return operation
     }
+
+    func setPrepareForNextOperationHandler(handler: PrepareForNextOperationHandler?) {
+        prepareForNextOperationHandler = handler
+    }
 }
 
 public class BatchedCloudKitOperation<T where T: NSOperation, T: CKBatchedOperationType, T: AssociatedErrorType, T.Error: CloudKitErrorType>: RepeatedOperation<CloudKitOperation<T>> {
+
+    typealias PayLoad = RepeatedPayload<CloudKitOperation<T>>
+    typealias ConfigurationHandler = (CloudKitOperation<T>) -> PayLoad.ConfigureBlock?
 
     public var enableBatchProcessing: Bool
     var generator: CloudKitOperationGenerator<T>
@@ -316,24 +328,54 @@ public class BatchedCloudKitOperation<T where T: NSOperation, T: CKBatchedOperat
     init<G where G: GeneratorType, G.Element == T>(timeout: NSTimeInterval? = 300, generator gen: G, enableBatchProcessing enable: Bool = true) {
 
         enableBatchProcessing = enable
-        generator = CloudKitOperationGenerator(timeout: timeout, generator: gen)
+
+        // Creates a CloudKitOperationGenerator object
+        let _generator = CloudKitOperationGenerator(timeout: timeout, generator: gen)
+
+        // Creates a Configuration Handler for next operations using the CloudKitOperationGenerator
+        let newConfigurationHandler: ConfigurationHandler = { [weak _generator] (nextOperation) -> PayLoad.ConfigureBlock? in
+            guard let generator = _generator,
+                let prepareForNextOperationHandler = generator.prepareForNextOperationHandler
+            else {
+                return .None
+            }
+
+            var configure: PayLoad.ConfigureBlock = generator.lastOperationConfigure
+            prepareForNextOperationHandler(addConfigureBlock: { (block) in
+                let config = configure
+                configure = { operation in
+                    config(operation)
+                    block(operation)
+                }
+            })
+            return configure
+        }
+
+        generator = _generator
 
         // Creates a standard fixed delay between batches (not reties)
         let strategy: WaitStrategy = .Fixed(0.1)
         let delay = MapGenerator(strategy.generator()) { Delay.By($0) }
         let tuple = TupleGenerator(primary: generator, secondary: delay)
-        let mapped = MapGenerator(tuple) { RepeatedPayload(delay: $0.0, operation: $0.1, configure: .None) }
+        let mapped = MapGenerator(tuple) { RepeatedPayload(delay: $0.0, operation: $0.1, configure: newConfigurationHandler($0.1)) }
         super.init(generator: AnyGenerator(mapped))
     }
 
     public override func willFinishOperation(operation: NSOperation) {
         if let cloudKitOperation = operation as? CloudKitOperation<T> {
             generator.more = enableBatchProcessing && cloudKitOperation.current.moreComing
+            generator.lastOperationConfigure = self.configure
         }
         super.willFinishOperation(operation)
     }
 
     public func setErrorHandlerForCode(code: CKErrorCode, handler: CloudKitOperation<T>.ErrorHandler) {
         generator.recovery.setCustomHandlerForCode(code, handler: handler)
+    }
+
+    // A handler block which receives a closure that can be used to add configuration blocks to the next
+    // CloudKitOperation<T> (i.e. when the current CloudKitOperation returns with moreComing == true)
+    public func setPrepareForNextOperationHandler(handler: (addConfigureBlock: (CloudKitOperation<T> -> Void) -> Void) -> Void) {
+        generator.setPrepareForNextOperationHandler(handler)
     }
 }
