@@ -2422,14 +2422,14 @@ class BatchedFetchRecordChangesOperationTests: CKTests {
         }
 
         operation.setPrepareForNextOperationHandler { addConfigureBlock in
-            addConfigureBlock { retryOperation in
-                retryOperation.previousServerChangeToken = currentServerChangeToken
+            addConfigureBlock { nextOperation in
+                nextOperation.previousServerChangeToken = currentServerChangeToken
                 // simulate the next server change token
                 if let currentServerChangeToken = currentServerChangeToken {
-                    retryOperation.operation.token = "\(currentServerChangeToken).\(self.count)"
+                    nextOperation.operation.token = "\(currentServerChangeToken).\(self.count)"
                 }
                 else {
-                    retryOperation.operation.token = "firstTokenAfterNil"
+                    nextOperation.operation.token = "firstTokenAfterNil"
                 }
             }
         }
