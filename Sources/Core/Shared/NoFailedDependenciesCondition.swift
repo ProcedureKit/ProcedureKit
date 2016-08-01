@@ -43,7 +43,7 @@ public class NoFailedDependenciesCondition: Condition {
     public init(ignoreCancellations: Bool = false) {
         cancellationOptions = ignoreCancellations ? .Ignore : .Fail
         super.init()
-        name = "No Cancelled Condition"
+        name = "No Failed Dependencies"
         mutuallyExclusive = false
     }
 
