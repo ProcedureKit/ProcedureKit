@@ -51,7 +51,7 @@ class NegatedConditionTests: OperationTests {
 
     func test__negated_condition_name() {
         let condition = NegatedCondition(NoFailedDependenciesCondition())
-        XCTAssertEqual(condition.name, "Not<No Cancelled Condition>")
+        XCTAssertEqual(condition.name, "Not<No Failed Dependencies>")
     }
 
     func test__negated_condition_is_mutually_exclusive_when_nested_condition_is_mutually_exclusive() {
