@@ -131,7 +131,7 @@ class NoFailedDependenciesConditionTests: OperationTests {
         let dependency = createCancellingOperation(true)
         operation.addDependency(dependency)
 
-        operation.addCondition(NoFailedDependenciesCondition(options: .IgnoreCancel))
+        operation.addCondition(NoFailedDependenciesCondition(ignoreCancellations: true))
 
         waitForOperations(operation, dependency)
 
@@ -152,7 +152,7 @@ class NoFailedDependenciesConditionTests: OperationTests {
         let dependency3 = TestOperation()
         operation.addDependency(dependency3)
 
-        operation.addCondition(NoFailedDependenciesCondition(options: .IgnoreCancel))
+        operation.addCondition(NoFailedDependenciesCondition(ignoreCancellations: true))
 
         waitForOperations(operation, dependency1, dependency2, dependency3)
 
@@ -175,7 +175,7 @@ class NoFailedDependenciesConditionTests: OperationTests {
         let dependency3 = TestOperation()
         operation.addDependency(dependency3)
 
-        operation.addCondition(NoFailedDependenciesCondition(options: .IgnoreCancel))
+        operation.addCondition(NoFailedDependenciesCondition(ignoreCancellations: true))
 
         waitForOperations(operation, dependency1, dependency2, dependency3)
 

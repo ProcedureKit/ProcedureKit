@@ -26,22 +26,22 @@ public class NoFailedDependenciesCondition: Condition {
     }
 
     /// Options on how to handle cancellation
-    public enum Options {
+    enum CancellationOptions {
 
         /// Indicates that cancelled dependencies
         /// would trigger a failed condition
-        case FailCancel
+        case Fail
 
         /// Indicates that cancelled dependencies
         /// would trigger an ignored condition
-        case IgnoreCancel
+        case Ignore
     }
 
-    let options: Options
+    let cancellationOptions: CancellationOptions
 
     /// Initializer which takes no parameters.
-    public init(options: Options = .FailCancel) {
-        self.options = options
+    public init(ignoreCancellations: Bool = false) {
+        cancellationOptions = ignoreCancellations ? .Ignore : .Fail
         super.init()
         name = "No Cancelled Condition"
         mutuallyExclusive = false
@@ -70,12 +70,12 @@ public class NoFailedDependenciesCondition: Condition {
             return false
         }
 
-        switch options {
+        switch cancellationOptions {
         case _ where !failures.isEmpty:
             completion(.Failed(Error.FailedDependencies))
-        case .FailCancel where !cancelled.isEmpty:
+        case .Fail where !cancelled.isEmpty:
             completion(.Failed(Error.CancelledDependencies))
-        case .IgnoreCancel where !cancelled.isEmpty:
+        case .Ignore where !cancelled.isEmpty:
             completion(.Ignored)
         default:
             completion(.Satisfied)
