@@ -27,15 +27,15 @@ public class OPRCKOperation<T where T: NSOperation, T: CKOperationType>: Compose
 public class CloudKitRecovery<T where T: NSOperation, T: CKOperationType, T: AssociatedErrorType, T.Error: CloudKitErrorType> {
     public typealias V = OPRCKOperation<T>
 
-    public typealias ErrorResponse = (delay: Delay?, configure: V -> Void)
+    public typealias ConfigureOperationBlock = V -> Void
+    public typealias ErrorResponse = (delay: Delay?, configure: ConfigureOperationBlock)
     public typealias Handler = (operation: T, error: T.Error, log: LoggerType, suggested: ErrorResponse) -> ErrorResponse?
-    public typealias PrepareForRetryHandler = (addConfigureBlock: (V -> Void) -> Void) -> Void
 
     typealias Payload = RepeatedPayload<V>
 
     var defaultHandlers: [CKErrorCode: Handler]
     var customHandlers: [CKErrorCode: Handler]
-    var prepareForRetryHandler: PrepareForRetryHandler?
+    private var finallyConfigureRetryOperationBlock: ConfigureOperationBlock?
 
     init() {
         defaultHandlers = [:]
@@ -55,14 +55,14 @@ public class CloudKitRecovery<T where T: NSOperation, T: CKOperationType, T: Ass
             return .None
         }
 
-        if let prepareForRetryHandler = prepareForRetryHandler {
-            prepareForRetryHandler(addConfigureBlock: { (block) in
-                let config = response.configure
-                response.configure = { operation in
-                    config(operation)
-                    block(operation)
-                }
-            })
+        // The error handler responded with a suggested delay and configuration block.
+        // If a finallyConfigureRetryOperationBlock is specified, add it to the configuration block.
+        if let finallyConfigureRetryOperationBlock = finallyConfigureRetryOperationBlock {
+            let config = response.configure
+            response.configure = { operation in
+                config(operation)
+                finallyConfigureRetryOperationBlock(operation)
+            }
         }
 
         return response
@@ -107,8 +107,8 @@ public class CloudKitRecovery<T where T: NSOperation, T: CKOperationType, T: Ass
         customHandlers.updateValue(handler, forKey: code)
     }
 
-    func setPrepareForRetryHandler(handler: PrepareForRetryHandler?) {
-        prepareForRetryHandler = handler
+    func setFinallyConfigureRetryOperationBlock(block: ConfigureOperationBlock?) {
+        finallyConfigureRetryOperationBlock = block
     }
 
     internal func cloudKitErrorsFromInfo(info: RetryFailureInfo<OPRCKOperation<T>>) -> (code: CKErrorCode, error: T.Error)? {
@@ -271,8 +271,29 @@ public final class CloudKitOperation<T where T: NSOperation, T: CKOperationType,
         recovery.customHandlers = handlers
     }
 
-    public func setPrepareForRetryHandler(handler: (addConfigureBlock: (OPRCKOperation<T> -> Void) -> Void) -> Void) {
-        recovery.setPrepareForRetryHandler(handler)
+    // When an error occurs, CloudKitOperation executes the appropriate error handler (as long as the completion block is set).
+    // (By default, certain errors are automatically handled with a retry attempt, such as common network errors.)
+    //
+    // If the error handler specifies that the operation should retry, it also specifies a configuration block for the operation.
+    // After the configuration block returned by the error handler configures the operation, the finallyConfigureRetryOperationBlock
+    // will be passed the new ("retry") operation so it can further modify its properties.
+    //
+    // For example:
+    //      - CKFetchDatabaseChangesOperation, for updating:
+    //          - `previousServerChangeToken`
+    //              - with the last changeToken received by the changeTokenUpdatedBlock prior to the error
+    //                (assuming you have persisted the information received prior to the last changeToken update)
+    //
+    //      - CKFetchRecordZoneChangesOperation, for updating:
+    //          - `recordZoneIDs`
+    //              - to remove zones that were completely fetched prior to the error
+    //                (assuming you have persisted the fetched data)
+    //          - `optionsByRecordZoneID`
+    //              - to update the previousServerChangeToken for zones that were partially fetched prior to the error
+    //                (assuming you have persisted the successfully-fetched data)
+    //
+    public func setFinallyConfigureRetryOperationBlock(block: (retryOperation: OPRCKOperation<T>) -> Void) {
+        recovery.setFinallyConfigureRetryOperationBlock(block)
     }
 }
 
@@ -280,7 +301,7 @@ public final class CloudKitOperation<T where T: NSOperation, T: CKOperationType,
 
 class CloudKitOperationGenerator<T where T: NSOperation, T: CKOperationType, T: AssociatedErrorType, T.Error: CloudKitErrorType>: GeneratorType {
 
-    typealias PrepareForNextOperationHandler = (addConfigureBlock: (CloudKitOperation<T> -> Void) -> Void) -> Void
+    typealias ConfigureBlock = CloudKitOperation<T> -> Void
 
     let recovery: CloudKitRecovery<T>
 
@@ -288,8 +309,8 @@ class CloudKitOperationGenerator<T where T: NSOperation, T: CKOperationType, T: 
     var generator: AnyGenerator<T>
     var more: Bool = true
 
-    var prepareForNextOperationHandler: PrepareForNextOperationHandler?
-    var lastOperationConfigure: (CloudKitOperation<T> -> Void) = { _ in }
+    var configureNextOperationBlock: ConfigureBlock?
+    var lastOperationConfigure: ConfigureBlock = { _ in }
 
     init<G where G: GeneratorType, G.Element == T>(timeout: NSTimeInterval? = 300, generator: G) {
         self.timeout = timeout
@@ -304,8 +325,8 @@ class CloudKitOperationGenerator<T where T: NSOperation, T: CKOperationType, T: 
         return operation
     }
 
-    func setPrepareForNextOperationHandler(handler: PrepareForNextOperationHandler?) {
-        prepareForNextOperationHandler = handler
+    func setConfigureNextOperationBlock(block: ConfigureBlock?) {
+        configureNextOperationBlock = block
     }
 }
 
@@ -333,21 +354,16 @@ public class BatchedCloudKitOperation<T where T: NSOperation, T: CKBatchedOperat
         let _generator = CloudKitOperationGenerator(timeout: timeout, generator: gen)
 
         // Creates a Configuration Handler for next operations using the CloudKitOperationGenerator
-        let newConfigurationHandler: ConfigurationHandler = { [weak _generator] (nextOperation) -> PayLoad.ConfigureBlock? in
-            guard let generator = _generator,
-                let prepareForNextOperationHandler = generator.prepareForNextOperationHandler
-            else {
+        let newConfigurationHandler: ConfigurationHandler = { [unowned _generator] (nextOperation) -> PayLoad.ConfigureBlock? in
+            guard let configureNextOperationBlock = _generator.configureNextOperationBlock else {
                 return .None
             }
 
-            var configure: PayLoad.ConfigureBlock = generator.lastOperationConfigure
-            prepareForNextOperationHandler(addConfigureBlock: { (block) in
-                let config = configure
-                configure = { operation in
-                    config(operation)
-                    block(operation)
-                }
-            })
+            let lastOperationConfigure: PayLoad.ConfigureBlock = _generator.lastOperationConfigure
+            let configure: PayLoad.ConfigureBlock = { operation in
+                lastOperationConfigure(operation)
+                configureNextOperationBlock(operation)
+            }
             return configure
         }
 
@@ -364,7 +380,7 @@ public class BatchedCloudKitOperation<T where T: NSOperation, T: CKBatchedOperat
     public override func willFinishOperation(operation: NSOperation) {
         if let cloudKitOperation = operation as? CloudKitOperation<T> {
             generator.more = enableBatchProcessing && cloudKitOperation.current.moreComing
-            generator.lastOperationConfigure = self.configure
+            generator.lastOperationConfigure = configure
         }
         super.willFinishOperation(operation)
     }
@@ -373,9 +389,16 @@ public class BatchedCloudKitOperation<T where T: NSOperation, T: CKBatchedOperat
         generator.recovery.setCustomHandlerForCode(code, handler: handler)
     }
 
-    // A handler block which receives a closure that can be used to add configuration blocks to the next
-    // CloudKitOperation<T> (i.e. when the current CloudKitOperation returns with moreComing == true)
-    public func setPrepareForNextOperationHandler(handler: (addConfigureBlock: (CloudKitOperation<T> -> Void) -> Void) -> Void) {
-        generator.setPrepareForNextOperationHandler(handler)
+    // Set a block that can configure the next internal CloudKitOperation (i.e. if moreComing == true)
+    // The operation passed-into the block will be the next operation, *already configured like the previous operation*.
+    // Use this block to make any additional required changes.
+    //
+    // For example:
+    //      - BatchedCloudKitOperation<CKFetchNotificationChangesOperation>, for updating:
+    //          - `previousServerChangeToken`
+    //              - with the last changeToken received by the fetchNotificationChangesCompletionBlock
+    //
+    public func setConfigureNextOperationBlock(block: (nextOperation: CloudKitOperation<T>) -> Void) {
+        generator.setConfigureNextOperationBlock(block)
     }
 }

@@ -1447,8 +1447,7 @@ class CloudKitOperationDiscoverAllContractsTests: CKTests {
         var userInfosByRecordID: [TestDiscoverUserInfosOperation.RecordID: TestDiscoverUserInfosOperation.DiscoveredUserInfo]? = .None
 
         var shouldError = true
-        let operation: CloudKitOperation<TestDiscoverUserInfosOperation> =
-            CloudKitOperation(strategy: .Immediate) {
+        let operation: CloudKitOperation<TestDiscoverUserInfosOperation> = CloudKitOperation(strategy: .Immediate) {
             let op = TestDiscoverUserInfosOperation(userInfosByEmailAddress: [:], userInfoByRecordID: [:])
             if shouldError {
                 op.error = NSError(
@@ -1461,13 +1460,11 @@ class CloudKitOperationDiscoverAllContractsTests: CKTests {
             return op
         }
         operation.setDiscoverUserInfosCompletionBlock { _, _ in }
-        operation.setPrepareForRetryHandler { addConfigureBlock in
-            addConfigureBlock { retryOperation in
-                // retry operation gets a new completion block that stores the result values
-                retryOperation.setDiscoverUserInfosCompletionBlock { byAddress, byRecordID in
-                    userInfosByAddress = byAddress
-                    userInfosByRecordID = byRecordID
-                }
+        operation.setFinallyConfigureRetryOperationBlock { retryOperation in
+            // retry operation gets a new completion block that stores the result values
+            retryOperation.setDiscoverUserInfosCompletionBlock { byAddress, byRecordID in
+                userInfosByAddress = byAddress
+                userInfosByRecordID = byRecordID
             }
         }
 
@@ -2421,16 +2418,14 @@ class BatchedFetchRecordChangesOperationTests: CKTests {
             self.count += 1
         }
 
-        operation.setPrepareForNextOperationHandler { addConfigureBlock in
-            addConfigureBlock { nextOperation in
-                nextOperation.previousServerChangeToken = currentServerChangeToken
-                // simulate the next server change token
-                if let currentServerChangeToken = currentServerChangeToken {
-                    nextOperation.operation.token = "\(currentServerChangeToken).\(self.count)"
-                }
-                else {
-                    nextOperation.operation.token = "firstTokenAfterNil"
-                }
+        operation.setConfigureNextOperationBlock { nextOperation in
+            nextOperation.previousServerChangeToken = currentServerChangeToken
+            // simulate the next server change token
+            if let currentServerChangeToken = currentServerChangeToken {
+                nextOperation.operation.token = "\(currentServerChangeToken).\(self.count)"
+            }
+            else {
+                nextOperation.operation.token = "firstTokenAfterNil"
             }
         }
 
