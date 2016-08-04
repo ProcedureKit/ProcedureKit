@@ -1,7 +1,7 @@
 author: Daniel Thorpe
 author_url: http://danthorpe.me
 module: Operations
-module_version: 3.0.0
+module_version: 3.1.0
 github_url: https://github.com/danthorpe/Operations
 readme: README.md
 podspec: Operations.podspec
