@@ -1,14 +1,13 @@
 author: Daniel Thorpe
 author_url: http://danthorpe.me
+github_url: https://github.com/danthorpe/Operations
 module: Operations
 module_version: 3.1.0
-github_url: https://github.com/danthorpe/Operations
 readme: README.md
 podspec: Operations.podspec
-
 swift_version: 2.2
 sdk: iphoneos
-xcodebuild_arguments: -scheme,Operations-iOS
+xcodebuild_arguments: -project,Operations.xcodeproj,-scheme,iOS Operations
 
 exclude:
   - Tests
@@ -20,18 +19,22 @@ custom_categories:
     - OperationError
     - OperationQueue
     - OperationQueueDelegate
-    - OperationCondition
-    - OperationConditionResult
+    - Condition
+    - ConditionResult
+    - ConditionType
+    - ConditionError
     - OperationEvent
     - OperationObserverType        
-    - OperationDidStartObserver    
+    - OperationWillExecuteObserver
+    - OperationWillCancelObserver    
     - OperationDidCancelObserver
     - OperationDidProduceOperationObserver
     - GroupOperationWillAddChildObserver    
     - OperationWillFinishObserver
     - OperationDidFinishObserver
-    - StartedObserver    
-    - CancelledObserver    
+    - WillExecuteObserver    
+    - WillCancelObserver 
+    - DidCancelObserver   
     - WillAddChildObserver
     - ProducedOperationObserver     
     - WillFinishObserver
@@ -56,23 +59,24 @@ custom_categories:
     - UIOperation
     - PresentingViewController
     - ViewControllerDisplayStyle
+    - ComposedCondition    
+    - TrueCondition
+    - FalseCondition    
     - MutuallyExclusive
     - NegatedCondition
     - NegatedConditionError
     - SilentCondition
     - NoFailedDependenciesCondition
     - BlockCondition
+    - IgnoredCondition
     - BlockObserver
     - BackgroundObserver
     - NetworkObserver
     - TimeoutObserver
-    - Alert
-    - AlertPresentation
 
   - name: Featured
     children:
     - ReachableOperation
-    - NetworkOperation
     - WebpageOperation
     - WaitStrategy
     - RepeatedOperation
@@ -87,6 +91,7 @@ custom_categories:
     - ReachabilityCondition
     - UserNotificationCondition
     - RemoteNotificationCondition
+    - TaskOperation
     - URLSessionTaskOperation
     - UserConfirmationCondition
 
@@ -96,11 +101,8 @@ custom_categories:
     - ReverseGeocoderType
     - LocationOperationError
     - UserLocationOperation
-    - _UserLocationOperation
     - ReverseGeocodeOperation
-    - _ReverseGeocodeOperation
     - ReverseGeocodeUserLocationOperation
-    - _ReverseGeocodeUserLocationOperation
 
   - name: Device Capabilities
     children:
@@ -128,7 +130,6 @@ custom_categories:
     - CloudStatus
     - CloudCapability
     - CloudContainerRegistrar
-    - CloudCapability
 
   - name: Capability.Health
     children:
@@ -183,7 +184,6 @@ custom_categories:
     - CKModifyRecordsOperationType
     - CKModifySubscriptionsOperationType
     - CKQueryOperationType
-
 
   - name: Address Book
     children:
