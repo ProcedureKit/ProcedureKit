@@ -1,3 +1,73 @@
+# 3.1.0
+
+## Improvements to Result Injection
+
+I’ve made some changes to make working with _result injection_ easier.
+
+1. [OPR-362](https://github.com/danthorpe/Operations/pull/362), [OPR-363](https://github.com/danthorpe/Operations/pull/363), [OPR-378](https://github.com/danthorpe/Operations/pull/378)
+    These changes simplify the core implementation of how result injection works, no longer using any closure capture. Additionally, if the `Requirement` is equal to `Result?`, the framework provides a new API, for _requiring_ that the result is available. For example:
+    
+    ```swift
+    class Foo: Operation, ResultOperationType {
+        var result: String?
+        // etc
+    }
+    
+    class Bar: Operation, AutomaticInjectionOperationType {
+        var requirement: String = “default value”
+        // etc
+    }
+    
+    let foo = Foo()
+    let bar = Bar()
+    bar.requireResultFromDependency(foo)
+    ```
+    
+    Now, if `foo` finishes with a nil `result` value, `bar` will be automatically cancelled with an `AutomaticInjectionError.RequirementNotSatisfied` error. And it’s no longer necessary to `guard let` unwrap the requirement in the `execute()` method.
+    
+    This works well in situations where the `requirement` property is not an optional, but can be set with a default value.
+   
+## Improvements to Conditions
+
+I’ve made some changes to improve working with `Condition`s. The focus here has been to support more subtle/complex dependency graphs, and suppressing errors resulting from failed conditions. 
+
+2. [OPR-379](https://github.com/danthorpe/Operations/pull/379), [OPR-386](https://github.com/danthorpe/Operations/pull/386) Fixes some unexpected behaviour where indirect dependencies (i.e. dependencies of a condition) which are also direct dependencies got added to the queue more than once. This was fixed more generally to avoid adding operations which are already enqueued.
+3. [OPR-385](https://github.com/danthorpe/Operations/pull/385), [OPR-390](https://github.com/danthorpe/Operations/pull/390), [OPR-397](https://github.com/danthorpe/Operations/pull/397) Adds support for ignoring condition failures
+
+    In some situations, it can be beneficial for an operation to not collect an error if an attached condition fails. To support this, `ConditionResult` now has an `.Ignored` case, which can be used to just cancel the attached `Operation` but without an error.
+    
+    To make this easier, a new condition, `IgnoredCondition` is provided which composes another condition. It will ignore any failures of the composed condition.
+    
+    In addition, `NoFailedDependenciesCondition` now supports an initialiser where it will ignore any dependencies which are also ignored, rather than failing for cancelations. This can be used like this:
+    
+    ```swift
+    dependency.addCondition(IgnoredCondition(myCondition))
+    operation.addDependency(dependency)
+    operation.addCondition(NoFailedDependenciesCondition(ignoreCancellations: true))
+    ``` 
+    
+    Note that the `ignoreCancellations` argument defaults to false to maintain previous behaviour. Thanks to [@aurelcobb](https://github.com/aurelcobb) for raising this issue.
+
+## API Changes
+
+2. [OPR-361](https://github.com/danthorpe/Operations/pull/361) `GroupOperation`’s queue is now private.
+
+Given the way that `GroupOperation` works, critically that it acts as its queue’s delegate, this change restricts the ability for that contract to be broken. Specifically, the queue is now private, but its properties are exposed via properties of the group.
+
+Additionally, the default initialiser of `GroupOperation` now takes an optional `dispatch_queue_t` argument. This dispatch queue is set as the `NSOperationQueue`’s `underlyingQueue` property, and effectively allows the class user to set a target dispatch queue. By default this is `nil`.
+
+This change will require changes to subclasses which override the default initialiser.
+
+Thanks to [@swiftlyfalling](https://github.com/swiftlyfalling) for these changes.
+	
+   
+## Bug Fixes
+
+3. [OPR-377](https://github.com/danthorpe/Operations/pull/377) GatedOperation will now cancel its composed operation if the gate is closed.
+4. [OPR-365](https://github.com/danthorpe/Operations/pull/365) Fixes a log message error. Thanks to [@DeFrenZ](https://github.com/DeFrenZ) for this one.
+5. [OPR-382](https://github.com/danthorpe/Operations/pull/382) Fixes an issue where `TaskOperation` was included in non-macOS platforms via CocoaPods.
+
+
 # 3.0.0
 
 🚀🙌 After a significant period of testing, Version 3.0.0 is finally here! Checkout the details below:
