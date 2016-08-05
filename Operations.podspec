@@ -33,7 +33,7 @@ session Advanced NSOperations: https://developer.apple.com/videos/wwdc/2015/?id=
     ]
     ss.ios.exclude_files = [
       'Sources/Features/Shared/CloudKit',
-      'Sources/Features/Shared/TaskOperation.swift',      
+      'Sources/Features/Shared/TaskOperation.swift',
       'Sources/Features/iOS/PhotosCapability.swift',
       'Sources/Features/iOS/PassbookCapability.swift'
     ]
@@ -86,11 +86,12 @@ session Advanced NSOperations: https://developer.apple.com/videos/wwdc/2015/?id=
     ss.exclude_files = [
       'Sources/Core/iOS/BackgroundObserver.swift',
       'Sources/Core/iOS/NetworkObserver.swift',
+      'Sources/Features/Shared/TaskOperation.swift',
       'Sources/Features/iOS/HealthCapability.swift',
       'Sources/Features/iOS/LocationCapability.swift',
       'Sources/Features/iOS/LocationOperations.swift',
       'Sources/Features/iOS/OpenInSafariOperation.swift',      
-      'Sources/Features/iOS/RemoteNotificationCondition.swift',
+      'Sources/Features/iOS/RemoteNotificationCondition.swift',      
       'Sources/Features/iOS/UserNotificationCondition.swift'
     ]
     ss.tvos.exclude_files = [
