@@ -52,13 +52,13 @@ I’ve made some changes to improve working with `Condition`s. The focus here ha
 
 2. [OPR-361](https://github.com/danthorpe/Operations/pull/361) `GroupOperation`’s queue is now private.
 
-Given the way that `GroupOperation` works, critically that it acts as its queue’s delegate, this change restricts the ability for that contract to be broken. Specifically, the queue is now private, but its properties are exposed via properties of the group.
+    Given the way that `GroupOperation` works, critically that it acts as its queue’s delegate, this change restricts the ability for that contract to be broken. Specifically, the queue is now private, but its properties are exposed via properties of the group.
 
-Additionally, the default initialiser of `GroupOperation` now takes an optional `dispatch_queue_t` argument. This dispatch queue is set as the `NSOperationQueue`’s `underlyingQueue` property, and effectively allows the class user to set a target dispatch queue. By default this is `nil`.
+    Additionally, the default initialiser of `GroupOperation` now takes an optional `dispatch_queue_t` argument. This dispatch queue is set as the `NSOperationQueue`’s `underlyingQueue` property, and effectively allows the class user to set a target dispatch queue. By default this is `nil`.
 
-This change will require changes to subclasses which override the default initialiser.
+    This change will require changes to subclasses which override the default initialiser.
 
-Thanks to [@swiftlyfalling](https://github.com/swiftlyfalling) for these changes.
+    Thanks to [@swiftlyfalling](https://github.com/swiftlyfalling) for these changes.
 	
    
 ## Bug Fixes

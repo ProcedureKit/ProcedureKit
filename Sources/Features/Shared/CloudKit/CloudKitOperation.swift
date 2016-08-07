@@ -332,92 +332,92 @@ class CloudKitOperationGenerator<T where T: NSOperation, T: CKOperationType, T: 
 
 /**
  # BatchedCloudKitOperation
- 
+
  BatchedCloudKitOperation is a generic operation which can be used to configure and schedule
  the execution of a batch of an Apple CKOperation subclass that returns "moreComing".
- 
+
  Internally, BatchedCloudKitOperation composes CloudKitOperations. Its job is to repeat
  instances of CloudKitOperation while moreComing == true.
- 
+
  ## Initialization
- 
+
  BatchedCloudKitOperation is initialized just like CloudKitOperation.
- 
+
  For supported CKOperations, it is possible to swap CloudKitOperation for BatchedCloudKitOperation:
- 
+
  ```swift
  // this:
  let operation = CloudKitOperation { CKFetchRecordChangesOperation() }
  // becomes:
  let operation = BatchedCloudKitOperation { CKFetchRecordChangesOperation() }
  ```
- 
+
  ## Configuration
- 
+
  Most CKOperation subclasses need various properties setting before they are added to a queue. Sometimes
  these can be done via their initializers. However, it is also possible to set the properties directly.
  This can be done directly onto the BatchedCloudKitOperation, just like CloudKitOperation.
- 
+
  For example, given the above:
- 
+
  ```swift
  let container = CKContainer.defaultContainer()
  operation.container = container
  operation.database = container.privateCloudDatabase
  ```
- 
+
  This will set the container and the database through the BatchedCloudKitOperation into each underlying
  CloudKitOperation-wrapped CKOperation instance in the batch.
- 
+
  ### Configuring Follow-Up Operations in the Batch
- 
+
  For most batched CKOperations, you will want/need to change some state for the "next" operation.
  You can do this using setConfigureNextOperationBlock().
- 
+
  For example, given the above:
- 
+
  ```swift
  operation.setConfigureNextOperationBlock { nextOperation in
     // the next operation must receive an updated serverChangeToken from the last operation
     nextOperation.previousServerChangeToken = lastServerChangeToken
  }
  ```
- 
+
  where `lastServerChangeToken` is the serverChangeToken most recently received by the operation's
  `fetchRecordChangesCompletionBlock`. (See the following section on completion.)
- 
+
  ## Completion
- 
+
  Since BatchedCloudKitOperation composes CloudKitOperations, you must follow the same guidelines from
  CloudKitOperation to always set the completion block.
- 
+
  For example, given the above:
- 
+
  ```swift
  operation.setFetchRecordChangesCompletionBlock { serverChangeToken, clientChangeTokenData in
  // Do something, such as storing the new serverChangeToken
  }
  ```
- 
+
  For CloudKitOperation's automatic error handling to kick in, the happy path must be set (as above).
- 
+
  **IMPORTANT:**
- 
+
  Because BatchedCloudKitOperation composes CloudKitOperations, your completion handler **may be called
  multiple times** (i.e. once for each underlying CloudKitOperation that is completed in the batch).
- 
+
  Therefore, you MUST ensure that your completion handler does not make assumptions about the completion
  status of the BatchedCloudKitOperation.
- 
+
  If you need to handle the completion of the BatchedCloudKitOperation itself, use a Will/DidFinishObserver.
- 
+
  ### Error Handling
- 
+
  See the documentation for CloudKitOperation Error Handling.
- 
+
  BatchedCloudKitOperation provides a convenience setErrorHandlerForCode method, which sets the error
  handling for every CloudKitOperation in the batch.
- 
+
  */
 public class BatchedCloudKitOperation<T where T: NSOperation, T: CKBatchedOperationType, T: AssociatedErrorType, T.Error: CloudKitErrorType>: RepeatedOperation<CloudKitOperation<T>> {
 
