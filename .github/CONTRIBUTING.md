@@ -16,6 +16,20 @@ Additionally, frequently asked questions are collected in the Wiki.
 ## Reporting Bugs
 A great way to contribute to the project is to send a detailed issue when you encounter a problem. A well written and detailed bug report is always welcome.
 
+Please include verbose log output. Verbose logging can be enabled globally:
+
+```swift
+LogManager.severity = .Verbose
+```
+
+or for a single operation:
+
+```swift
+operation.log.severity = .Verbose
+```
+
+this will print out lifecycle event, and is very useful for debugging scheduling issues.
+
 ## Developer's Certificate of Origin 1.1
 
 By making a contribution to this project, I certify that:
