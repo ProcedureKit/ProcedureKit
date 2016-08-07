@@ -14,4 +14,4 @@ This code is not exhaustive or complete. It serves to distill our common underst
 
 —
 
-*This code of conduct is largely copied from the [Alamofire Foundation’s code of conduct](https://github.com/Alamofire/Foundation/blob/master/CONDUCT.md). We greatly admire their work, and thank them for their inspiring contribution to our community.
+*This code of conduct is largely copied from the [Alamofire Foundation’s code of conduct](https://github.com/Alamofire/Foundation/blob/master/CONDUCT.md). We greatly admire their work, and thank them for their inspiring contribution to our community.*
