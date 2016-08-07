@@ -1,0 +1,179 @@
+{
+	"author": "Daniel Thorpe",
+	"author_url": "http://danthorpe.me",
+	"github_url": "https://github.com/danthorpe/Operations",
+	"module": "Operations",
+	"module_version": "3.1.0",
+	"readme": "README.md",
+	"swift_version": "2.2",	
+	"xcodebuild_arguments": [
+		"-project", "Operations.xcodeproj", 
+		"-scheme", "iOS Operations"
+	],
+	"exclude": ["Tests"],
+	"custom_categories": [{
+		"name": "Core",
+		"children": [
+			"Operation",
+			"OperationQueue",
+			"Condition",
+			"OperationObserverType"        	
+		]
+	}, {
+		"name": "Operations",
+		"children": [
+			"BlockOperation",
+			"DelayOperation",
+			"MapOperation",
+			"FilterOperation",
+			"ReduceOperation",
+			"GroupOperation",
+			"ComposedOperation",
+			"GatedOperation",
+			"RepeatedOperation",
+			"RepeatableOperation",
+			"RetryOperation",
+			"ReachableOperation",			
+			"AlertOperation",			
+			"UIOperation",
+			"UserLocationOperation",
+			"ReverseGeocodeOperation",
+			"ReverseGeocodeUserLocationOperation",
+			"WebpageOperation",
+			"OpenInSafariOperation",
+			"TaskOperation",
+			"URLSessionTaskOperation"
+		]	
+	}, {
+		"name": "Conditions",
+		"children": [
+			"TrueCondition",
+			"FalseCondition",
+			"ComposedCondition",
+			"BlockCondition",
+			"IgnoredCondition",
+			"NegatedCondition",
+			"SilentCondition",
+			"MutuallyExclusive",
+			"NoFailedDependenciesCondition",
+			"ReachabilityCondition",
+			"RemoteNotificationCondition",
+			"UserConfirmationCondition"
+		]	
+	}, {
+		"name": "Observers",
+		"children": [
+			"OperationWillExecuteObserver",
+			"OperationWillCancelObserver",
+			"OperationDidCancelObserver",
+			"OperationDidProduceOperationObserver",
+			"OperationWillFinishObserver",
+			"OperationDidFinishObserver",
+			"OperationObserver",
+			"DidAttachToOperationBlock",
+			"WillExecuteObserver",
+			"WillCancelObserver",
+			"DidCancelObserver",
+			"ProducedOperationObserver",
+			"WillFinishObserver",
+			"DidFinishObserver",
+			"BlockObserver",
+			"TimeoutObserver",
+			"BackgroundObserver",
+			"NetworkObserver"
+		]	
+	}, {
+		"name": "Capabilities",
+		"children": [
+			"CapabilityType",
+			"AuthorizationStatusType",
+			"CapabilityRegistrarType",
+			"Capability",
+			"GetAuthorizationStatus",
+			"Authorize",
+			"AuthorizedFor",
+			"CapabilityError",
+			"EventsCapabilityRegistrarType",
+			"EventsCapability",
+			"PassbookCapabilityRegistrarType",
+			"PassbookCapability",
+			"PhotosCapabilityRegistrarType",
+			"PhotosCapability",
+			"LocationUsage",
+			"LocationCapabilityRegistrarType",
+			"LocationCapability"
+		]	
+	}, {
+		"name": "CloudKit",
+		"children": [
+			"CloudStatus",
+			"CloudContainerRegistrarType",
+			"CloudCapability",
+			"CloudContainerRegistrar",
+			"CloudKitErrorType",
+			"CloudKitBatchModifyErrorType",
+			"CloudKitBatchProcessErrorType",
+			"CloudKitError",									
+			"CKOperationType",
+			"CKDatabaseOperationType",
+			"CKPreviousServerChangeToken",
+			"CKResultsLimit",
+			"CKMoreComing",
+			"CKDesiredKeys",
+			"CKBatchedOperationType",
+			"CKFetchOperationType",
+			"CKDiscoverAllContactsOperationType",
+			"CKDiscoverUserInfosOperationType",
+			"CKFetchNotificationChangesOperationType",
+			"CKMarkNotificationsReadOperationType",
+			"CKModifyBadgeOperationType",
+			"CKFetchRecordChangesOperationType",
+			"CKFetchRecordZonesOperationType",
+			"CKFetchRecordsOperationType",
+			"CKFetchSubscriptionsOperationType",
+			"CKModifyRecordZonesOperationType",
+			"CKModifyRecordsOperationType",
+			"CKModifySubscriptionsOperationType",
+			"CKQueryOperationType",
+			"BatchProcessOperationType",
+			"BatchModifyOperationType",
+			"OPRCKOperation",
+			"CloudKitRecovery",
+			"CloudKitOperation",
+			"BatchedCloudKitOperation",
+			"DiscoverAllContactsError",
+			"FetchNotificationChangesError",
+			"MarkNotificationsReadError",
+			"FetchRecordChangesError",
+			"FetchRecordZonesError",
+			"FetchRecordsError",
+			"FetchSubscriptionsError",
+			"ModifyRecordZonesError",
+			"ModifyRecordsError",
+			"ModifySubscriptionsError",
+			"QueryError"
+		]	
+	}, {
+		"name": "Address Book",
+		"children": [
+			"AddressBook",
+			"AddressBookAddPersonToGroup",
+			"AddressBookCondition",
+			"AddressBookCreateGroup",
+			"AddressBookDisplayNewPersonViewController",
+			"AddressBookDisplayPersonViewController",
+			"AddressBookGetGroup",
+			"AddressBookGetResource",
+			"AddressBookGroup",
+			"AddressBookMapPeople",
+			"AddressBookOperation",
+			"AddressBookPerson",
+			"AddressBookRecord",
+			"AddressBookRemoveGroup",
+			"AddressBookRemovePersonFromGroup",
+			"AddressBookSource"  	
+		]	
+	}
+    	
+    ]
+}
