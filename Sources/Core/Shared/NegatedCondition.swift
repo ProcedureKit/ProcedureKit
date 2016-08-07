@@ -38,6 +38,8 @@ public final class NegatedCondition<C: Condition>: ComposedCondition<C> {
             switch composedResult {
             case .Satisfied:
                 completion(.Failed(NegatedConditionError.ConditionSatisfied(name)))
+            case .Ignored(_):
+                completion(composedResult)
             case .Failed(_):
                 completion(.Satisfied)
             }

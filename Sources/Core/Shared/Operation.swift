@@ -96,7 +96,10 @@ public class Operation: NSOperation {
     internal private(set) var conditions = Set<Condition>()
 
     internal var indirectDependencies: Set<NSOperation> {
-        return Set(conditions.flatMap { $0.directDependencies })
+        return Set(conditions
+            .flatMap { $0.directDependencies }
+            .filter { !directDependencies.contains($0) }
+        )
     }
 
     // Internal operation properties which are used to manage the scheduling of dependencies
@@ -451,14 +454,76 @@ public extension Operation {
 
 public extension Operation {
 
-    internal func evaluateConditions() -> GroupOperation {
+    internal enum ConditionEvaluation {
+        case Pending, Satisfied, Ignored
+        case Failed([ErrorType])
 
-        func createEvaluateConditionsOperation() -> GroupOperation {
+        var errors: [ErrorType] {
+            if case let .Failed(errors) = self {
+                return errors
+            }
+            return []
+        }
+
+        func evaluate(condition: Condition, withErrors errors: [ErrorType]) -> ConditionEvaluation {
+            guard let result = condition.result else {
+                if errors.isEmpty { return self }
+                else { return .Failed(errors) }
+            }
+
+            switch (self, result) {
+            case let (_, .Failed(conditionError)):
+                var errors = self.errors
+                errors.append(conditionError)
+                return .Failed(errors)
+            case (.Failed(_), _):
+                return self
+            case (_, .Ignored):
+                return .Ignored
+            case (.Pending, .Satisfied):
+                return .Satisfied
+            default:
+                return self
+            }
+        }
+    }
+
+    internal class EvaluateConditions: GroupOperation, ResultOperationType {
+
+        let requirement: [Condition]
+        internal var result: ConditionEvaluation = .Pending
+
+        init(conditions: Set<Condition>) {
+            let ops = Array(conditions)
+            requirement = ops
+            super.init(operations: ops)
+        }
+
+        internal override func operationWillFinish(errors: [ErrorType]) {
+            process(errors)
+        }
+
+        internal override func operationWillCancel(errors: [ErrorType]) {
+            process(errors)
+        }
+
+        private func process(errors: [ErrorType]) {
+            result = requirement.reduce(.Pending) { evaluation, condition in
+                log.verbose("evaluating \(evaluation) with \(condition.result)")
+                return evaluation.evaluate(condition, withErrors: errors)
+            }
+        }
+    }
+
+    internal func evaluateConditions() -> Operation {
+
+        func createEvaluateConditionsOperation() -> Operation {
             // Set the operation on each condition
             conditions.forEach { $0.operation = self }
 
-            let evaluator = GroupOperation(operations: Array(conditions))
-            evaluator.name = "Condition Evaluator for: \(operationName)"
+            let evaluator = EvaluateConditions(conditions: conditions)
+            evaluator.name = "\(operationName) Evaluate Conditions"
+
             super.addDependency(evaluator)
             return evaluator
         }
@@ -469,7 +534,13 @@ public extension Operation {
 
         // Add an observer to the evaluator to see if any of the conditions failed.
         evaluator.addObserver(WillFinishObserver { [unowned self] operation, errors in
-            if errors.count > 0 {
+            guard let evaluation = operation as? EvaluateConditions else { return }
+            switch evaluation.result {
+            case .Pending, .Satisfied:
+                break
+            case .Ignored:
+                self.cancel()
+            case .Failed(let errors):
                 // If conditions fail, we should cancel the operation
                 self.cancelWithErrors(errors)
             }
@@ -741,7 +812,7 @@ public extension Operation {
         operationDidFinish(errors)
         didFinishObservers.forEach { $0.didFinishOperation(self, errors: errors) }
 
-        let message = errors.isEmpty ? "errors: \(errors)" : "no errors"
+        let message = !errors.isEmpty ? "errors: \(errors)" : "no errors"
         log.verbose("Did finish with \(message)")
 
         didChangeValueForKey(NSOperation.KeyPath.Finished.rawValue)

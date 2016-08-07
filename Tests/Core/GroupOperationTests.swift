@@ -425,8 +425,8 @@ class GroupOperationTests: OperationTests {
     func test__group_operation_ignores_queue_delegate_calls_from_other_queues() {
         class PoorlyWrittenGroupOperationSubclass: GroupOperation {
             private var subclassQueue = OperationQueue()
-            override init(operations: [NSOperation]) {
-                super.init(operations: operations)
+            override init(underlyingQueue: dispatch_queue_t? = .None, operations: [NSOperation]) {
+                super.init(underlyingQueue: underlyingQueue, operations: operations)
                 subclassQueue.delegate = self
             }
             override func execute() {
@@ -461,6 +461,203 @@ class GroupOperationTests: OperationTests {
         waitForExpectationsWithTimeout(5, handler: nil)
         
         XCTAssertFalse(addedOperationFromOtherQueue)
+    }
+
+    func test__group_operation_suspended() {
+        let group = GroupOperation(operations: [])
+        let firstOperation = BlockOperation(block: { [unowned group] continuation in
+            group.suspended = true
+            continuation(error: nil)
+        })
+        let secondOperation = TestOperation(delay: 0.0)
+        secondOperation.addDependency(firstOperation)
+
+        weak var firstOpDidFinishExpectation = expectationWithDescription("Test: \(#function); firstOperation Did Finish")
+        firstOperation.addObserver(DidFinishObserver { operation, errors in
+            NSOperationQueue.mainQueue().addOperationWithBlock {
+                guard let firstOpDidFinishExpectation = firstOpDidFinishExpectation else { return }
+                firstOpDidFinishExpectation.fulfill()
+            }
+        })
+
+        group.addOperations([firstOperation, secondOperation])
+
+        runOperation(group)
+
+        waitForExpectationsWithTimeout(3, handler: nil)
+        XCTAssertTrue(group.suspended)
+        XCTAssertFalse(group.finished)
+        XCTAssertTrue(firstOperation.finished)
+        XCTAssertFalse(secondOperation.finished)
+
+        weak var groupDidFinishExpectation = expectationWithDescription("Test: \(#function); group operation Did Finish")
+        group.addObserver(DidFinishObserver { observedOperation, errors in
+            NSOperationQueue.mainQueue().addOperationWithBlock {
+                guard let groupDidFinishExpectation = groupDidFinishExpectation else { return }
+                groupDidFinishExpectation.fulfill()
+            }
+        })
+
+        group.suspended = false
+
+        waitForExpectationsWithTimeout(3, handler: nil)
+        XCTAssertFalse(group.suspended)
+        XCTAssertTrue(group.finished)
+        XCTAssertTrue(firstOperation.finished)
+        XCTAssertTrue(secondOperation.finished)
+    }
+    
+    func test__group_operation_suspended_before_execute() {
+        let child = TestOperation(delay: 0.0)
+        let group = GroupOperation(operations: [child])
+        group.suspended = true
+
+        let childOperationWillExecuteGroup = dispatch_group_create()
+        dispatch_group_enter(childOperationWillExecuteGroup)
+        child.addObserver(WillExecuteObserver { operation in
+            dispatch_group_leave(childOperationWillExecuteGroup)
+        })
+
+        let groupOperationWillExecuteGroup = dispatch_group_create()
+        dispatch_group_enter(groupOperationWillExecuteGroup)
+        group.addObserver(WillExecuteObserver { operation in
+            dispatch_group_leave(groupOperationWillExecuteGroup)
+        })
+
+        weak var expectation = expectationWithDescription("Test: \(#function); DidFinish Group")
+        group.addObserver(DidFinishObserver { observedOperation, errors in
+            NSOperationQueue.mainQueue().addOperationWithBlock {
+                guard let expectation = expectation else { return }
+                expectation.fulfill()
+            }
+        })
+
+        runOperation(group)
+
+        let groupExecuteWait = dispatch_time(DISPATCH_TIME_NOW, Int64(3.0 * Double(NSEC_PER_SEC)))
+        XCTAssertEqual(dispatch_group_wait(groupOperationWillExecuteGroup, groupExecuteWait), 0, "Group Operation has not yet executed.")
+
+        let childWait = dispatch_time(DISPATCH_TIME_NOW, Int64(1.5 * Double(NSEC_PER_SEC)))
+        XCTAssertNotEqual(dispatch_group_wait(childOperationWillExecuteGroup, childWait), 0, "Child operation executed when GroupOperation was suspended.")
+
+        XCTAssertFalse(child.finished)
+        XCTAssertFalse(group.finished)
+
+        group.suspended = false
+
+        waitForExpectationsWithTimeout(3, handler: nil)
+        XCTAssertTrue(child.finished)
+        XCTAssertTrue(group.finished)
+    }
+}
+
+class GroupOperationMaxConcurrentOperationCountTests: OperationTests {
+
+    private class ConcurrencyRegistrar {
+        private let _sharedRunningOperations = Protector([NSOperation]())
+        private let _maxConcurrentOperationsDetectedCount = Protector(Int(0))
+        var maxConcurrentOperationsDetectedCount: Int {
+            get {
+                return _maxConcurrentOperationsDetectedCount.read { $0 }
+            }
+        }
+        private func recordOperationsCount(currentOperationsCount: Int) {
+            _maxConcurrentOperationsDetectedCount.write { (inout ward: Int) in
+                if currentOperationsCount > ward {
+                    ward = currentOperationsCount
+                }
+            }
+        }
+        func registerRunning(op: NSOperation) {
+            _sharedRunningOperations.write { (inout ward: [NSOperation]) in
+                ward.append(op)
+                self.recordOperationsCount(ward.count)
+            }
+        }
+        func deregisterRunning(op: NSOperation) {
+            _sharedRunningOperations.write { (inout ward: [NSOperation]) in
+                if let foundOperation = ward.indexOf(op) {
+                    ward.removeAtIndex(foundOperation)
+                }
+            }
+        }
+        func atLeastOneOperationIsRunning(otherThan exception: NSOperation? = nil) -> Bool {
+            return _sharedRunningOperations.read { ward -> Bool in
+                for op in ward {
+                    if op !== exception {
+                        return true
+                    }
+                }
+                return false
+            }
+        }
+    }
+    private class RegistersWhenRunningOperation: Operation {
+        private weak var concurrencyRegistrar: ConcurrencyRegistrar?
+        private let microsecondsToSleep: useconds_t
+        init(microsecondsToSleep: useconds_t, registrar: ConcurrencyRegistrar) {
+            self.concurrencyRegistrar = registrar
+            self.microsecondsToSleep = microsecondsToSleep
+            super.init()
+        }
+        override func execute() {
+            concurrencyRegistrar?.registerRunning(self)
+            usleep(microsecondsToSleep)
+            concurrencyRegistrar?.deregisterRunning(self)
+            finish()
+        }
+    }
+
+    func test__group_operation_maxConcurrentOperationCount_1() {
+        let childDelayMicroseconds: useconds_t = 500000 // 0.5 seconds
+        let concurrency = ConcurrencyRegistrar()
+        let children = (0..<3).map { _ in RegistersWhenRunningOperation(microsecondsToSleep: childDelayMicroseconds, registrar: concurrency) }
+        let group = GroupOperation(operations: children)
+        group.maxConcurrentOperationCount = 1
+
+        weak var expectation = expectationWithDescription("Test: \(#function); DidFinish Group")
+        group.addObserver(DidFinishObserver { observedOperation, errors in
+            NSOperationQueue.mainQueue().addOperationWithBlock {
+                guard let expectation = expectation else { return }
+                expectation.fulfill()
+            }
+        })
+
+        let startTime = CFAbsoluteTimeGetCurrent()
+        runOperation(group)
+        waitForExpectationsWithTimeout(4, handler: nil)
+        let endTime = CFAbsoluteTimeGetCurrent()
+        let duration = Double(endTime) - Double(startTime)
+
+        XCTAssertEqual(concurrency.maxConcurrentOperationsDetectedCount, 1)
+        for i in children.enumerate() {
+            XCTAssertTrue(i.element.finished, "Child operation [\(i.index)] did not finish")
+        }
+        XCTAssertGreaterThanOrEqual(duration, Double(useconds_t(children.count) * childDelayMicroseconds) / 1000000.0)
+    }
+
+    func test__group_operation_maxConcurrentOperationCount_2() {
+        let childDelayMicroseconds: useconds_t = 500000 // 0.5 seconds
+        let concurrency = ConcurrencyRegistrar()
+        let children = (0..<3).map { _ in RegistersWhenRunningOperation(microsecondsToSleep: childDelayMicroseconds, registrar: concurrency) }
+        let group = GroupOperation(operations: children)
+        group.maxConcurrentOperationCount = 2
+
+        weak var expectation = expectationWithDescription("Test: \(#function); DidFinish Group")
+        group.addObserver(DidFinishObserver { observedOperation, errors in
+            NSOperationQueue.mainQueue().addOperationWithBlock {
+                guard let expectation = expectation else { return }
+                expectation.fulfill()
+            }
+        })
+
+        runOperation(group)
+        waitForExpectationsWithTimeout(4, handler: nil)
+
+        XCTAssertEqual(concurrency.maxConcurrentOperationsDetectedCount, 2)
+        for i in children.enumerate() {
+            XCTAssertTrue(i.element.finished, "Child operation [\(i.index)] did not finish")
+        }
     }
 }
 

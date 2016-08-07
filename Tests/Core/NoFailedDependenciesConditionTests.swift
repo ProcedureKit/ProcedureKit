@@ -11,18 +11,14 @@ import XCTest
 
 class NoFailedDependenciesConditionTests: OperationTests {
 
-    func createCancellingOperation(shouldCancel: Bool, expectation: XCTestExpectation) -> TestOperation {
+    func createCancellingOperation(shouldCancel: Bool) -> TestOperation {
 
         let operation = TestOperation()
         operation.name = shouldCancel ? "Cancelled Dependency" : "Successful Dependency"
 
-        if !shouldCancel {
-            addCompletionBlockToTestOperation(operation, withExpectation: expectation)
-        }
-        else {
+        if shouldCancel {
             operation.addObserver(WillExecuteObserver { op in
                 op.cancel()
-                expectation.fulfill()
             })
         }
         return operation
@@ -32,23 +28,20 @@ class NoFailedDependenciesConditionTests: OperationTests {
         let operation = TestOperation()
         operation.addCondition(NoFailedDependenciesCondition())
 
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
-        runOperation(operation)
+        waitForOperation(operation)
 
-        waitForExpectationsWithTimeout(3, handler: nil)
         XCTAssertTrue(operation.finished)
     }
 
     func test__operation_with_sucessful_dependency_succeeds() {
 
         let operation = TestOperation()
-        addCompletionBlockToTestOperation(operation, withExpectation: expectationWithDescription("Test: \(#function)"))
-        let dependency = createCancellingOperation(false, expectation: expectationWithDescription("Dependency for Test: \(#function)"))
+
+        let dependency = createCancellingOperation(false)
         operation.addDependency(dependency)
         operation.addCondition(NoFailedDependenciesCondition())
 
-        runOperations(operation, dependency)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForOperations(operation, dependency)
 
         XCTAssertTrue(operation.finished)
     }
@@ -56,41 +49,41 @@ class NoFailedDependenciesConditionTests: OperationTests {
     func test__operation_with_single_cancelled_dependency_doesnt_execute() {
 
         let operation = TestOperation()
-        let dependency = createCancellingOperation(true, expectation: expectationWithDescription("Dependency for Test: \(#function)"))
+        let dependency = createCancellingOperation(true)
         operation.addDependency(dependency)
         operation.addCondition(NoFailedDependenciesCondition())
 
-        runOperations(operation, dependency)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForOperations(operation, dependency)
 
         XCTAssertFalse(operation.didExecute)
     }
 
     func test__operation_with_mixture_fails() {
-        let expectation = expectationWithDescription("Test: \(#function)")
         let operation = TestOperation()
-        let dependency1 = createCancellingOperation(true, expectation: expectationWithDescription("Dependency 1 for Test: \(#function)"))
+
+        let dependency1 = createCancellingOperation(true)
         operation.addDependency(dependency1)
-        let dependency2 = createCancellingOperation(false, expectation: expectationWithDescription("Dependency 2 for Test: \(#function)"))
+
+        let dependency2 = createCancellingOperation(false)
         operation.addDependency(dependency2)
+
         operation.addCondition(NoFailedDependenciesCondition())
 
         var receivedErrors = [ErrorType]()
         operation.addObserver(BlockObserver { (_ , errors) in
             receivedErrors = errors
-            expectation.fulfill()
         })
 
-        runOperations(operation, dependency1, dependency2)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForOperations(operation, dependency1, dependency2)
 
         XCTAssertFalse(operation.didExecute)
         XCTAssertEqual(receivedErrors.count, 1)
     }
 
     func test__operation_with_errored_dependency_fails() {
-        let expectation = expectationWithDescription("Test: \(#function)")
+
         let operation = TestOperation()
+
         let dependency = TestOperation(delay: 0, error: TestOperation.Error.SimulatedError)
         operation.addDependency(dependency)
         operation.addCondition(NoFailedDependenciesCondition())
@@ -98,19 +91,15 @@ class NoFailedDependenciesConditionTests: OperationTests {
         var receivedErrors = [ErrorType]()
         operation.addObserver(BlockObserver { (_ , errors) in
             receivedErrors = errors
-            expectation.fulfill()
         })
 
-        runOperations(operation, dependency)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForOperations(operation, dependency)
 
         XCTAssertFalse(operation.didExecute)
         XCTAssertEqual(receivedErrors.count, 1)
     }
 
     func test__operation_with_group_dependency_with_errored_child_fails() {
-        LogManager.severity = .Verbose
-        let expectation = expectationWithDescription("Test: \(#function)")
 
         let operation = TestOperation()
         operation.name = "Target Operation"
@@ -127,15 +116,72 @@ class NoFailedDependenciesConditionTests: OperationTests {
         var receivedErrors = [ErrorType]()
         operation.addObserver(BlockObserver { (_ , errors) in
             receivedErrors = errors
-            expectation.fulfill()
         })
 
-        runOperations(operation, dependency)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForOperations(operation, dependency)
 
         XCTAssertFalse(operation.didExecute)
         XCTAssertEqual(receivedErrors.count, 1)
-        LogManager.severity = .Warning
+    }
+
+    func test__operation_with_ignore_cancellations() {
+
+        let operation = TestOperation()
+
+        let dependency = createCancellingOperation(true)
+        operation.addDependency(dependency)
+
+        operation.addCondition(NoFailedDependenciesCondition(ignoreCancellations: true))
+
+        waitForOperations(operation, dependency)
+
+        XCTAssertFalse(operation.didExecute)
+        XCTAssertFalse(operation.failed)
+    }
+
+    func test__operation_with_failures_and_cancellations_with_ignore_cancellations() {
+
+        let operation = TestOperation()
+
+        let dependency1 = createCancellingOperation(true)
+        operation.addDependency(dependency1)
+
+        let dependency2 = TestOperation(error: TestOperation.Error.SimulatedError)
+        operation.addDependency(dependency2)
+
+        let dependency3 = TestOperation()
+        operation.addDependency(dependency3)
+
+        operation.addCondition(NoFailedDependenciesCondition(ignoreCancellations: true))
+
+        waitForOperations(operation, dependency1, dependency2, dependency3)
+
+        XCTAssertFalse(operation.didExecute)
+        XCTAssertTrue(operation.failed)
+        XCTAssertEqual(operation.errors.count, 1)
+    }
+
+
+    func test__operation_with_failures_with_ignore_cancellations() {
+
+        let operation = TestOperation()
+
+        let dependency1 = TestOperation(error: TestOperation.Error.SimulatedError)
+        operation.addDependency(dependency1)
+
+        let dependency2 = TestOperation(error: TestOperation.Error.SimulatedError)
+        operation.addDependency(dependency2)
+
+        let dependency3 = TestOperation()
+        operation.addDependency(dependency3)
+
+        operation.addCondition(NoFailedDependenciesCondition(ignoreCancellations: true))
+
+        waitForOperations(operation, dependency1, dependency2, dependency3)
+
+        XCTAssertFalse(operation.didExecute)
+        XCTAssertTrue(operation.failed)
+        XCTAssertEqual(operation.errors.count, 1)
     }
 }
 

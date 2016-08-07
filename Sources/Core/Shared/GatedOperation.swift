@@ -32,6 +32,7 @@ public class GatedOperation<T: NSOperation>: ComposedOperation<T> {
     public init(_ operation: T, gate: GateBlockType) {
         self.gate = gate
         super.init(operation: operation)
+        name = "Gated <\(T.self)>"
     }
 
     /**
@@ -41,11 +42,10 @@ public class GatedOperation<T: NSOperation>: ComposedOperation<T> {
      closed, the operation does not "fail" i.e. finish with errors.
     */
     public override func execute() {
-        if gate() {
-            super.execute()
-        }
-        else {
-            finish()
+        defer { super.execute() }
+        guard gate() else {
+            operation.cancel()
+            return
         }
     }
 }

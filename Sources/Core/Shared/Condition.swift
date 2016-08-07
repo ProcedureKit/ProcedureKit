@@ -8,6 +8,35 @@
 
 import Foundation
 
+/**
+ The result of an OperationCondition. Either the condition is
+ satisfied, indicated by `.Satisfied` or it has failed. In the
+ failure case, an `ErrorType` must be associated with the result.
+ */
+public enum ConditionResult {
+
+    /// Indicates that the condition is satisfied
+    case Satisfied
+
+    /// Indicates that the condition failed, but can be ignored
+    case Ignored
+
+    /// Indicates that the condition failed with an associated error.
+    case Failed(ErrorType)
+}
+
+internal extension ConditionResult {
+
+    var error: ErrorType? {
+        switch self {
+        case .Failed(let error):
+            return error
+        default:
+            return .None
+        }
+    }
+}
+
 public protocol ConditionType {
 
     var mutuallyExclusive: Bool { get set }
@@ -97,7 +126,6 @@ public class Condition: Operation, ConditionType, ResultOperationType {
     }
 }
 
-
 public class TrueCondition: Condition {
 
     public init(name: String = "True Condition", mutuallyExclusive: Bool = false) {
@@ -123,7 +151,6 @@ public class FalseCondition: Condition {
         completion(.Failed(ConditionError.FalseCondition))
     }
 }
-
 
 /**
  Class which can be used to compose a Condition, it is designed to be subclassed.
@@ -183,6 +210,28 @@ public class ComposedCondition<C: Condition>: Condition, AutomaticInjectionOpera
     override func removeDirectDependency(directDependency: NSOperation) {
         condition.removeDirectDependency(directDependency)
         super.removeDirectDependency(directDependency)
+    }
+}
+
+public class IgnoredCondition<C: Condition>: ComposedCondition<C> {
+
+
+    /// Public override of initializer.
+    public override init(_ condition: C) {
+        super.init(condition)
+        name = condition.name.map { "Ignored<\($0)>" }
+    }
+
+    /// Override of public function
+    public override func evaluate(operation: Operation, completion: CompletionBlockType) {
+        super.evaluate(operation) { composedResult in
+            if case .Failed(_) = composedResult {
+                completion(.Ignored)
+            }
+            else {
+                completion(composedResult)
+            }
+        }
     }
 }
 

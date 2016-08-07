@@ -172,15 +172,50 @@ extension AutomaticInjectionOperationType where Self: Operation {
      queue.addOperations(fetch, processing)
      ```
 
+     - parameter dep: an operation of type T
+     - returns: the receiver
     */
-    public func injectResultFromDependency<T where T: Operation, T: ResultOperationType, T.Result == Requirement>(dep: T) {
-        injectResultFromDependency(dep) { [weak self] operation, dependency, errors in
-            if errors.isEmpty {
-                self?.requirement = dependency.result
+    public func injectResultFromDependency<T where T: Operation, T: ResultOperationType, T.Result == Requirement>(dep: T) -> Self {
+        return injectResultFromDependency(dep) { operation, dependency, errors in
+
+            guard errors.isEmpty else {
+                operation.cancelWithError(AutomaticInjectionError.DependencyFinishedWithErrors(errors))
+                return
             }
-            else {
-                self?.cancelWithError(AutomaticInjectionError.DependencyFinishedWithErrors(errors))
+
+            operation.requirement = dependency.result
+        }
+    }
+
+    /**
+     Inject the result from the dependency as the requirement of the receiver.
+
+     This operation is available when the depndency is an operation which has a
+     result which an optional version of the receivers requirement. This works
+     especially when if your receiver can be initialized with a default value
+     of its requirement which is then set before it executes.
+
+    ```swift
+     return operation.requireResultFromDependency(foo)
+     ```
+
+     - parameter dep: an operation of type T
+     - returns: the receiver
+    */
+    public func requireResultFromDependency<T where T: Operation, T: ResultOperationType, T.Result == Optional<Requirement>>(dep: T) -> Self {
+        return injectResultFromDependency(dep) { operation, dependency, errors in
+
+            guard errors.isEmpty else {
+                operation.cancelWithError(AutomaticInjectionError.DependencyFinishedWithErrors(errors))
+                return
             }
+
+            guard let requirement = dependency.result else {
+                operation.cancelWithError(AutomaticInjectionError.RequirementNotSatisfied)
+                return
+            }
+
+            operation.requirement = requirement
         }
     }
 }

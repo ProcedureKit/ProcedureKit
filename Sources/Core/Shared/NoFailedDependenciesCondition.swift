@@ -25,10 +25,25 @@ public class NoFailedDependenciesCondition: Condition {
         case FailedDependencies
     }
 
+    /// Options on how to handle cancellation
+    enum CancellationOptions {
+
+        /// Indicates that cancelled dependencies
+        /// would trigger a failed condition
+        case Fail
+
+        /// Indicates that cancelled dependencies
+        /// would trigger an ignored condition
+        case Ignore
+    }
+
+    let cancellationOptions: CancellationOptions
+
     /// Initializer which takes no parameters.
-    public override init() {
+    public init(ignoreCancellations: Bool = false) {
+        cancellationOptions = ignoreCancellations ? .Ignore : .Fail
         super.init()
-        name = "No Cancelled Condition"
+        name = "No Failed Dependencies"
         mutuallyExclusive = false
     }
 
@@ -47,7 +62,6 @@ public class NoFailedDependenciesCondition: Condition {
     */
     public override func evaluate(operation: Operation, completion: CompletionBlockType) {
         let dependencies = operation.dependencies
-
         let cancelled = dependencies.filter { $0.cancelled }
         let failures = dependencies.filter {
             if let operation = $0 as? Operation {
@@ -56,13 +70,14 @@ public class NoFailedDependenciesCondition: Condition {
             return false
         }
 
-        if !cancelled.isEmpty {
-            completion(.Failed(Error.CancelledDependencies))
-        }
-        else if !failures.isEmpty {
+        switch cancellationOptions {
+        case _ where !failures.isEmpty:
             completion(.Failed(Error.FailedDependencies))
-        }
-        else {
+        case .Fail where !cancelled.isEmpty:
+            completion(.Failed(Error.CancelledDependencies))
+        case .Ignore where !cancelled.isEmpty:
+            completion(.Ignored)
+        default:
             completion(.Satisfied)
         }
     }

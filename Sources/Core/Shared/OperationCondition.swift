@@ -8,32 +8,6 @@
 
 import Foundation
 
-/**
-The result of an OperationCondition. Either the condition is
-satisfied, indicated by `.Satisfied` or it has failed. In the
-failure case, an `ErrorType` must be associated with the result.
-*/
-public enum ConditionResult {
-
-    /// Indicates that the condition is satisfied
-    case Satisfied
-
-    /// Indicates that the condition failed with an associated error.
-    case Failed(ErrorType)
-}
-
-internal extension ConditionResult {
-
-    var error: ErrorType? {
-        switch self {
-        case .Failed(let error):
-            return error
-        default:
-            return .None
-        }
-    }
-}
-
 public typealias OperationConditionResult = ConditionResult
 
 /**

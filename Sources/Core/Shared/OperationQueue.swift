@@ -110,6 +110,8 @@ public class OperationQueue: NSOperationQueue {
     public override func addOperation(operation: NSOperation) {
         if let operation = operation as? Operation {
 
+            operation.log.verbose("Adding to queue")
+
             /// Add an observer so that any produced operations are added to the queue
             operation.addObserver(ProducedOperationObserver { [weak self] op, produced in
                 if let q = self {
@@ -155,8 +157,11 @@ public class OperationQueue: NSOperationQueue {
                 // If there are dependencies
                 if indirectDependencies.count > 0 {
 
+                    // Filter out the indirect dependencies which have already been added to the queue
+                    let indirectDependenciesToProcess = indirectDependencies.filter { !self.operations.contains($0) }
+
                     // Iterate through the indirect dependencies
-                    indirectDependencies.forEach {
+                    indirectDependenciesToProcess.forEach {
 
                         // Indirect dependencies are executed after
                         // any previous mutually exclusive operation(s)
@@ -172,7 +177,7 @@ public class OperationQueue: NSOperationQueue {
                     }
 
                     // Add indirect dependencies
-                    addOperations(indirectDependencies)
+                    addOperations(indirectDependenciesToProcess)
                 }
 
                 // Add the evaluator
