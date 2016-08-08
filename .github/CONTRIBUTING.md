@@ -34,15 +34,15 @@ this will print out lifecycle event, and is very useful for debugging scheduling
 Before contributing code, create an issue to engage with core contributors about the feature or changes you wish to make.
 
 1. Install SwiftLint
-    The project uses [SwiftLint](https://github.com/realm/SwiftLint) to maintain a consistent Swift style. Linting occurs during an Xcode build phase, at which time white space issues is automatically cleaned up.
+    The project uses [SwiftLint](https://github.com/realm/SwiftLint) to maintain a consistent Swift style. Linting occurs during an Xcode build phase, at which time white space issues are automatically corrected.
     
     ```
     brew install swiftlint
     ```    
 2. Write unit tests 
-    We are aiming for maximum test coverage, but most importantly want to always increase coverage which is currently ~ 75%. Please ask (in your GitHub issue) if you are unsure how to write unit tests for features you are adding.
+    We are aiming for maximum test coverage. Most importantly, we want to always increase coverage which is currently ~ 75%. Please ask (in your GitHub issue) if you are unsure how to write unit tests for features you are adding.
 3. Write documentation
-    Add source code documentation in English for any public interfaces. Try to follow the tone of the existing documentation. Please ask (in your GitHub issue) for clarity on how to write documentation.
+    Add source code documentation in English for any public interfaces. Try to follow the tone of the existing documentation. Please ask (in your GitHub issue) for clarity on how to write documentation if you are unsure.
 4. Prefix your commit messages
     Use the GitHub ticket number, browse the commit history for examples.
 
