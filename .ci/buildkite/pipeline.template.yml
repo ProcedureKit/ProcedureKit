@@ -19,7 +19,7 @@ steps:
       swift: "2.2"
   -
     name: "ProcedureKit: macOS"
-    command: .ci/scripts/setup && $(which bundle) exec fastlane mac test
+    command: "bundle exec fastlane mac test"
     agents:
       swift: "3.0"
 
