@@ -8,11 +8,13 @@ steps:
     name: "Cloud: iOS"
     command: "source /usr/local/opt/chruby/share/chruby/chruby.sh && chruby ruby && bundle install --quiet && bundle exec fastlane ios test_ios_cloud"
     agents:
+      iOS-Simulator: true    
       swift: "3.0"
   -
     name: "Cloud: tvOS"
     command: "source /usr/local/opt/chruby/share/chruby/chruby.sh && chruby ruby && bundle install --quiet && bundle exec fastlane ios test_tvos_cloud"
     agents:
+      iOS-Simulator: true    
       swift: "3.0"
 #  -
 #    name: "Cloud: watchOS"

@@ -3,5 +3,6 @@ steps:
     name: "TV"
     command: "source /usr/local/opt/chruby/share/chruby/chruby.sh && chruby ruby && bundle install --quiet && bundle exec fastlane ios test_tv"
     agents:
+      iOS-Simulator: true    
       swift: "3.0"
 

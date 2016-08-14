@@ -2,8 +2,6 @@ steps:
   -
     name: "Lint"
     command: .ci/scripts/lint
-    agents:
-      swift: "2.2"
   -
     name: "Operations: Test Mac OS X"
     command: .ci/scripts/operations-test-osx
