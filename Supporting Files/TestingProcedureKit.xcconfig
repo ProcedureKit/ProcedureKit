@@ -1,0 +1,10 @@
+//
+//  ProcedureKit
+//
+//  Copyright © 2016 ProcedureKit. All rights reserved.
+//
+
+PRODUCT_BUNDLE_IDENTIFIER = run.kit.procedure.TestingProcedureKit
+PRODUCT_NAME = TestingProcedureKit
+
+
