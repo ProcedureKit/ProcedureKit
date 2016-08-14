@@ -29,8 +29,7 @@ platform :ios do
     scan(
       project: "Operations_ExtensionCompatible.xcodeproj",
       scheme: "iOS Extensions Operations",
-      output_directory: ".ci/xcodebuild-data",
-      xcargs: "-derivedDataPath .ci/xcodebuild-data"
+      output_directory: ".ci/xcodebuild-data"
     )    
 
   end
@@ -44,8 +43,7 @@ platform :ios do
     scan(
       project: "Operations.xcodeproj",
       scheme: "iOS Operations",
-      output_directory: ".ci/xcodebuild-data",
-      xcargs: "-derivedDataPath .ci/xcodebuild-data"
+      output_directory: ".ci/xcodebuild-data"
     )
     
     slather(
