@@ -14,9 +14,9 @@ steps:
     command: "source /usr/local/opt/chruby/share/chruby/chruby.sh && chruby ruby && bundle install --quiet && bundle exec fastlane ios test_tvos_cloud"
     agents:
       swift: "3.0"
-  -
-    name: "Cloud: watchOS"
-    command: "source /usr/local/opt/chruby/share/chruby/chruby.sh && chruby ruby && bundle install --quiet && bundle exec fastlane ios build_watchos_cloud"
-    agents:
-      swift: "3.0"
+#  -
+#    name: "Cloud: watchOS"
+#    command: "source /usr/local/opt/chruby/share/chruby/chruby.sh && chruby ruby && bundle install --quiet && bundle exec fastlane ios build_watchos_cloud"
+#    agents:
+#      swift: "3.0"
 
