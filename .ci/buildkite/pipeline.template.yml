@@ -19,7 +19,7 @@ steps:
       swift: "2.2"
   -
     name: "ProcedureKit: macOS"
-    command: "./ci/scripts/setup && bundle exec fastlane mac test"
+    command: "chruby ruby && bundle install --quiet && bundle exec fastlane mac test"
     agents:
       swift: "3.0"
 
