@@ -1,20 +1,25 @@
 steps:
   -
-    name: ":muscle: Lint"
+    name: "Lint"
     command: .ci/scripts/lint
     agents:
-      swift: "$BUILDKITE_AGENT_META_DATA_SWIFT"
+      swift: "2.3"
   -
-    name: ":mac: Test Mac OS X"
+    name: "Operations: Test Mac OS X"
     command: .ci/scripts/test-osx
     agents:
-      swift: "$BUILDKITE_AGENT_META_DATA_SWIFT"
+      swift: "2.3"
   -
-    name: ":fastlane: Test iOS"
+    name: "Operations: Test iOS"
     command: .ci/scripts/test-ios
     env:
       FL_SLATHER_BUILDKITE_ENABLED: true
       FL_SLATHER_COVERALLS_ENABLED: true
     agents:
-      swift: "$BUILDKITE_AGENT_META_DATA_SWIFT"
+      swift: "2.3"
+  -
+    name: "ProcedureKit: macOS"
+    command: bundle install --quiet && bundle exec fastlane mac procedurekit_test
+    agents:
+      swift: "3.0"
 

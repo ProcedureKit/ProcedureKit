@@ -61,8 +61,8 @@ end
 
 platform :mac do
 
-  desc "Builds the OS X Extension compatible framework"
-  lane :build_extension do
+  desc "Operations: Builds the OS X Extension compatible framework"
+  lane :operations_build_extension do
     
     xcodebuild(
       project: "Operations_ExtensionCompatible.xcodeproj",
@@ -72,8 +72,8 @@ platform :mac do
 
   end
   
-  desc "Test the OS X Extension compatible framework"
-  lane :test_extension do
+  desc "Operations: Test the OS X Extension compatible framework"
+  lane :operations_test_extension do
         
     scan(
       project: "Operations_ExtensionCompatible.xcodeproj",
@@ -84,8 +84,8 @@ platform :mac do
 
   end  
 
-  desc "Runs all the tests"
-  lane :test do
+  desc "Operations: Runs all the tests"
+  lane :operations_test do
 
 	test_extension()
 
@@ -96,6 +96,18 @@ platform :mac do
       xcargs: "-derivedDataPath .ci/xcodebuild-data"
     )
 
+  end
+  
+  desc "ProcedureKit: Test macOS"
+  lane :procedurekit_test do
+
+    scan(
+      project: "ProcedureKit.xcodeproj",
+      scheme: "ProcedureKit",
+      destination: "platform=macOS",
+      output_directory: ".ci/xcodebuild-data",
+      xcargs: "-derivedDataPath .ci/xcodebuild-data"
+    )
   end
   
 end
