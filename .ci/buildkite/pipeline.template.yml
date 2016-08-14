@@ -19,13 +19,13 @@ steps:
       swift: "2.2"
   -
     name: ":buildkite: ProcedureKit"
-    command: .ci/buildkite/procedurekit.yml | buildkite-agent pipeline upload
+    command: buildkite-agent pipeline upload .ci/buildkite/procedurekit.yml
   -
     name: ":buildkite: ProcedureKitMobile"
-    command: .ci/buildkite/procedurekitmobile.yml | buildkite-agent pipeline upload
+    command: buildkite-agent pipeline upload .ci/buildkite/procedurekitmobile.yml
   -
     name: ":buildkite: ProcedureKitMac"
-    command: .ci/buildkite/procedurekitmac.yml | buildkite-agent pipeline upload
+    command: buildkite-agent pipeline upload .ci/buildkite/procedurekitmac.yml
   -
     name: ":buildkite: ProcedureKitCloud"
-    command: .ci/buildkite/procedurekitcloud.yml | buildkite-agent pipeline upload
+    command: buildkite-agent pipeline upload .ci/buildkite/procedurekitcloud.yml
