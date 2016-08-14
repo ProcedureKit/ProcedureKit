@@ -5,6 +5,7 @@
 //
 
 import XCTest
+import ProcedureKit
 import TestingProcedureKit
 @testable import ProcedureKitMobile
 

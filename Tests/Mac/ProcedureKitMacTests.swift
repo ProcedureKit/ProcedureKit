@@ -7,7 +7,7 @@
 import XCTest
 import ProcedureKit
 import TestingProcedureKit
-@testable import ProcedureKitTV
+@testable import ProcedureKitMac
 
 class TestSuiteRuns: XCTestCase {
 
