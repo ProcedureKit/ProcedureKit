@@ -14,23 +14,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "653C9FC01D6097A40070B7A2"
-               BuildableName = "ProcedureKitMobile.framework"
-               BlueprintName = "ProcedureKitMobile"
-               ReferencedContainer = "container:ProcedureKit.xcodeproj">
-            </BuildableReference>
-         </BuildActionEntry>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "NO"
-            buildForProfiling = "NO"
-            buildForArchiving = "NO"
-            buildForAnalyzing = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "653C9FC81D6097A40070B7A2"
-               BuildableName = "ProcedureKitMobileTests.xctest"
-               BlueprintName = "ProcedureKitMobileTests"
+               BlueprintIdentifier = "653CA0591D60AA990070B7A2"
+               BuildableName = "ProcedureKitCloud.framework"
+               BlueprintName = "ProcedureKitCloud"
                ReferencedContainer = "container:ProcedureKit.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -47,9 +33,9 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "653C9FC81D6097A40070B7A2"
-               BuildableName = "ProcedureKitMobileTests.xctest"
-               BlueprintName = "ProcedureKitMobileTests"
+               BlueprintIdentifier = "653CA0611D60AA990070B7A2"
+               BuildableName = "ProcedureKitCloudTests.xctest"
+               BlueprintName = "ProcedureKitCloudTests"
                ReferencedContainer = "container:ProcedureKit.xcodeproj">
             </BuildableReference>
          </TestableReference>
@@ -57,9 +43,9 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "653C9FC01D6097A40070B7A2"
-            BuildableName = "ProcedureKitMobile.framework"
-            BlueprintName = "ProcedureKitMobile"
+            BlueprintIdentifier = "653CA0591D60AA990070B7A2"
+            BuildableName = "ProcedureKitCloud.framework"
+            BlueprintName = "ProcedureKitCloud"
             ReferencedContainer = "container:ProcedureKit.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
@@ -79,9 +65,9 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "653C9FC01D6097A40070B7A2"
-            BuildableName = "ProcedureKitMobile.framework"
-            BlueprintName = "ProcedureKitMobile"
+            BlueprintIdentifier = "653CA0591D60AA990070B7A2"
+            BuildableName = "ProcedureKitCloud.framework"
+            BlueprintName = "ProcedureKitCloud"
             ReferencedContainer = "container:ProcedureKit.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
@@ -97,9 +83,9 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "653C9FC01D6097A40070B7A2"
-            BuildableName = "ProcedureKitMobile.framework"
-            BlueprintName = "ProcedureKitMobile"
+            BlueprintIdentifier = "653CA0591D60AA990070B7A2"
+            BuildableName = "ProcedureKitCloud.framework"
+            BlueprintName = "ProcedureKitCloud"
             ReferencedContainer = "container:ProcedureKit.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
