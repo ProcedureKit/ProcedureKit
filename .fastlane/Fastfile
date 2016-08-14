@@ -104,7 +104,7 @@ platform :mac do
     scan(
       project: "ProcedureKit.xcodeproj",
       scheme: "ProcedureKit",
-      destination: "platform=macOS",
+      destination: "platform=OS X",
       output_directory: ".ci/xcodebuild-data",
       xcargs: "-derivedDataPath .ci/xcodebuild-data"
     )
