@@ -77,7 +77,7 @@ platform :ios do
     )
   end
 
-  desc "iOS: ProcedureKit"
+  desc "ProcedureKit: iOS"
   lane :test_ios do
 
     scan(
@@ -87,7 +87,7 @@ platform :ios do
     )
   end
 
-  desc "tvOS: ProcedureKit"
+  desc "ProcedureKit: tvOS"
   lane :test_tvos do
 
     scan(
@@ -97,7 +97,9 @@ platform :ios do
     )
   end
 
-  desc "iOS: ProcedureKitMobile"
+
+
+  desc "ProcedureKitMobile: iOS"
   lane :test_ios_mobile do
 
     scan(
@@ -107,7 +109,7 @@ platform :ios do
     )
   end
 
-  desc "iOS: ProcedureKitMobile"
+  desc "ProcedureKitMobile: tvOS"
   lane :test_tvos_mobile do
 
     scan(
@@ -117,7 +119,19 @@ platform :ios do
     )
   end
 
-  desc "iOS: ProcedureKitCloud"
+
+  desc "ProcedureKitTV"
+  lane :test_tv do
+
+    scan(
+      project: "ProcedureKit.xcodeproj",
+      scheme: "ProcedureKitTV",
+      destination: "platform=tvOS Simulator"
+    )
+  end
+
+
+  desc "ProcedureKitCloud: iOS"
   lane :test_ios_cloud do
 
     scan(
@@ -127,7 +141,7 @@ platform :ios do
     )
   end
 
-  desc "tvOS: ProcedureKitCloud"
+  desc "ProcedureKitCloud: tvOS"
   lane :test_tvos_cloud do
 
     scan(
@@ -137,7 +151,7 @@ platform :ios do
     )
   end
 
-  desc "watchOS: ProcedureKitCloud"
+  desc "ProcedureKitCloud: watchOS"
   lane :build_watchos_cloud do
 
     gym(
@@ -146,7 +160,6 @@ platform :ios do
       destination: "platform=watchOS Simulator"
     )
   end
-
 
 end
 
