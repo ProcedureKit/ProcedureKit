@@ -3,12 +3,12 @@ steps:
     name: "Lint"
     command: .ci/scripts/lint
     agents:
-      swift: "2.3"
+      swift: "2.2"
   -
     name: "Operations: Test Mac OS X"
     command: .ci/scripts/test-osx
     agents:
-      swift: "2.3"
+      swift: "2.2"
   -
     name: "Operations: Test iOS"
     command: .ci/scripts/test-ios
@@ -16,7 +16,7 @@ steps:
       FL_SLATHER_BUILDKITE_ENABLED: true
       FL_SLATHER_COVERALLS_ENABLED: true
     agents:
-      swift: "2.3"
+      swift: "2.2"
   -
     name: "ProcedureKit: macOS"
     command: bundle install --quiet && bundle exec fastlane mac procedurekit_test
