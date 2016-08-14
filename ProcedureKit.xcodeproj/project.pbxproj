@@ -2374,6 +2374,7 @@
 				653CA06C1D60AA9A0070B7A2 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		653CA0701D60AA9A0070B7A2 /* Build configuration list for PBXNativeTarget "ProcedureKitCloudTests" */ = {
 			isa = XCConfigurationList;
@@ -2382,6 +2383,7 @@
 				653CA06E1D60AA9A0070B7A2 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		65CFC5E81D608A1A00CAD875 /* Build configuration list for PBXProject "ProcedureKit" */ = {
 			isa = XCConfigurationList;
