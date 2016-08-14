@@ -57,36 +57,95 @@ platform :ios do
 	
   end
   
+  desc "watchOS: ProcedureKit"
+  lane :build_watchos do
+
+    gym(
+      project: "ProcedureKit.xcodeproj",
+      scheme: "ProcedureKit",
+      destination: "platform=watchOS Simulator"
+    )
+  end
+
+  desc "watchOS: ProcedureKitMobile"
+  lane :build_watchos_mobile do
+
+    gym(
+      project: "ProcedureKit.xcodeproj",
+      scheme: "ProcedureKitMobile",
+      destination: "platform=watchOS Simulator"
+    )
+  end
+
   desc "iOS: ProcedureKit"
-  lane :test do
+  lane :test_ios do
 
     scan(
       project: "ProcedureKit.xcodeproj",
       scheme: "ProcedureKit",
-      destination: "platform=iOS"
+      destination: "platform=iOS Simulator"
+    )
+  end
+
+  desc "tvOS: ProcedureKit"
+  lane :test_tvos do
+
+    scan(
+      project: "ProcedureKit.xcodeproj",
+      scheme: "ProcedureKit",
+      destination: "platform=tvOS Simulator"
     )
   end
 
   desc "iOS: ProcedureKitMobile"
-  lane :test_mobile do
+  lane :test_ios_mobile do
 
     scan(
       project: "ProcedureKit.xcodeproj",
       scheme: "ProcedureKitMobile",
-      destination: "platform=iOS"
+      destination: "platform=iOS Simulator"
+    )
+  end
+
+  desc "iOS: ProcedureKitMobile"
+  lane :test_tvos_mobile do
+
+    scan(
+      project: "ProcedureKit.xcodeproj",
+      scheme: "ProcedureKitMobile",
+      destination: "platform=tvOS Simulator"
     )
   end
 
   desc "iOS: ProcedureKitCloud"
-  lane :test_cloud do
+  lane :test_ios_cloud do
 
     scan(
       project: "ProcedureKit.xcodeproj",
       scheme: "ProcedureKitCloud",
-      destination: "platform=iOS"
+      destination: "platform=iOS Simulator"
     )
   end
 
+  desc "tvOS: ProcedureKitCloud"
+  lane :test_tvos_cloud do
+
+    scan(
+      project: "ProcedureKit.xcodeproj",
+      scheme: "ProcedureKitCloud",
+      destination: "platform=tvOS Simulator"
+    )
+  end
+
+  desc "watchOS: ProcedureKitCloud"
+  lane :build_watchos_cloud do
+
+    gym(
+      project: "ProcedureKit.xcodeproj",
+      scheme: "ProcedureKitCloud",
+      destination: "platform=watchOS Simulator"
+    )
+  end
 
 
 end
