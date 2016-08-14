@@ -13,7 +13,7 @@ end
 platform :ios do
 
   desc "Builds the iOS Extension compatible framework"
-  lane :build_extension do
+  lane :operations_build_extension do
     
     xcodebuild(
       project: "Operations_ExtensionCompatible.xcodeproj",
@@ -24,7 +24,7 @@ platform :ios do
   end
 
   desc "Test the iOS Extension compatible framework"
-  lane :test_extension do
+  lane :operations_test_extension do
         
     scan(
       project: "Operations_ExtensionCompatible.xcodeproj",
@@ -37,9 +37,9 @@ platform :ios do
   
   
   desc "Runs all the tests"
-  lane :test do
+  lane :operations_test do
     
-    test_extension()
+    operations_test_extension()
     
     scan(
       project: "Operations.xcodeproj",
@@ -56,6 +56,38 @@ platform :ios do
     )
 	
   end
+  
+  desc "iOS: ProcedureKit"
+  lane :test do
+
+    scan(
+      project: "ProcedureKit.xcodeproj",
+      scheme: "ProcedureKit",
+      destination: "platform=iOS"
+    )
+  end
+
+  desc "iOS: ProcedureKitMobile"
+  lane :test_mobile do
+
+    scan(
+      project: "ProcedureKit.xcodeproj",
+      scheme: "ProcedureKitMobile",
+      destination: "platform=iOS"
+    )
+  end
+
+  desc "iOS: ProcedureKitCloud"
+  lane :test_cloud do
+
+    scan(
+      project: "ProcedureKit.xcodeproj",
+      scheme: "ProcedureKitCloud",
+      destination: "platform=iOS"
+    )
+  end
+
+
 
 end
 
@@ -98,7 +130,7 @@ platform :mac do
 
   end
   
-  desc "ProcedureKit: Test macOS"
+  desc "macOS: ProcedureKit"
   lane :test do
 
     scan(
@@ -107,5 +139,26 @@ platform :mac do
       destination: "platform=OS X"
     )
   end
+
+  desc "macOS: ProcedureKitMac"
+  lane :test_mac do
+
+    scan(
+      project: "ProcedureKit.xcodeproj",
+      scheme: "ProcedureKitMac",
+      destination: "platform=OS X"
+    )
+  end
+
+  desc "macOS: ProcedureKitCloud"
+  lane :test_cloud do
+
+    scan(
+      project: "ProcedureKit.xcodeproj",
+      scheme: "ProcedureKitCloud",
+      destination: "platform=OS X"
+    )
+  end
+
   
 end
