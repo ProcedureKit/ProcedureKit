@@ -39,6 +39,16 @@
                ReferencedContainer = "container:ProcedureKit.xcodeproj">
             </BuildableReference>
          </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "653CA0171D60A34E0070B7A2"
+               BuildableName = "Stress Tests.xctest"
+               BlueprintName = "Stress Tests"
+               ReferencedContainer = "container:ProcedureKit.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
       <MacroExpansion>
          <BuildableReference
