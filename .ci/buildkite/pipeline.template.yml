@@ -6,12 +6,12 @@ steps:
       swift: "2.2"
   -
     name: "Operations: Test Mac OS X"
-    command: .ci/scripts/test-osx
+    command: .ci/scripts/operations-test-osx
     agents:
       swift: "2.2"
   -
     name: "Operations: Test iOS"
-    command: .ci/scripts/test-ios
+    command: .ci/scripts/operations-test-ios
     env:
       FL_SLATHER_BUILDKITE_ENABLED: true
       FL_SLATHER_COVERALLS_ENABLED: true
@@ -19,7 +19,7 @@ steps:
       swift: "2.2"
   -
     name: "ProcedureKit: macOS"
-    command: .ci/scripts/setup && bundle exec fastlane mac procedurekit_test
+    command: .ci/scripts/test-mac    
     agents:
       swift: "3.0"
 
