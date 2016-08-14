@@ -4,7 +4,7 @@
 //  Copyright © 2016 ProcedureKit. All rights reserved.
 //
 
-#import <Cocoa/Cocoa.h>
+@import Cocoa;
 
 //! Project version number for ProcedureKitMac.
 FOUNDATION_EXPORT double ProcedureKitMacVersionNumber;

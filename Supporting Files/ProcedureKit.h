@@ -4,7 +4,7 @@
 //  Copyright © 2016 ProcedureKit. All rights reserved.
 //
 
-#import <Foundation/Foundation.h>
+@import Foundation;
 
 //! Project version number for ProcedureKit.
 FOUNDATION_EXPORT double ProcedureKitVersionNumber;

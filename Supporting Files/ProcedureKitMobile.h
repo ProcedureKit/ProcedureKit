@@ -4,7 +4,7 @@
 //  Copyright © 2016 ProcedureKit. All rights reserved.
 //
 
-#import <UIKit/UIKit.h>
+@import UIKit;
 
 //! Project version number for ProcedureKitMobile.
 FOUNDATION_EXPORT double ProcedureKitMobileVersionNumber;
