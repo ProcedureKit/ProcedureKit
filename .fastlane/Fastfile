@@ -99,7 +99,7 @@ platform :mac do
   end
   
   desc "ProcedureKit: Test macOS"
-  lane :procedurekit_test do
+  lane :test do
 
     scan(
       project: "ProcedureKit.xcodeproj",
