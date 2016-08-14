@@ -87,7 +87,7 @@ platform :mac do
   desc "Operations: Runs all the tests"
   lane :operations_test do
 
-	test_extension()
+	operations_test_extension()
 
     scan(
       project: "Operations.xcodeproj",
