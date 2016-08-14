@@ -4,8 +4,8 @@
 //  Copyright © 2016 ProcedureKit. All rights reserved.
 //
 
-PRODUCT_BUNDLE_IDENTIFIER_framework = run.kit.procedure.ProcedureKit.iOS
-PRODUCT_BUNDLE_IDENTIFIER_xctest = test.run.kit.procedure.ProcedureKit.iOS
+PRODUCT_BUNDLE_IDENTIFIER_framework = run.kit.procedure.ProcedureKit.Mobile
+PRODUCT_BUNDLE_IDENTIFIER_xctest = test.run.kit.procedure.ProcedureKit.Mobile
 PRODUCT_BUNDLE_IDENTIFIER = $(PRODUCT_BUNDLE_IDENTIFIER_$(WRAPPER_EXTENSION))
 
 PRODUCT_NAME_framework = ProcedureKitMobile
