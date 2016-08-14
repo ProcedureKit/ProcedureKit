@@ -1,0 +1,43 @@
+//
+//  ProcedureKit
+//
+//  Copyright © 2016 ProcedureKit. All rights reserved.
+//
+
+#include "Version.xcconfig"
+
+// Metadata
+INFOPLIST_FILE_framework = $(SRCROOT)/Supporting Files/Info.plist
+INFOPLIST_FILE_xctest = $(SRCROOT)/Tests/Info.plist
+INFOPLIST_FILE = $(INFOPLIST_FILE_$(WRAPPER_EXTENSION))
+
+PRODUCT_BUNDLE_IDENTIFIER_framework = run.kit.procedure.ProcedureKit
+PRODUCT_BUNDLE_IDENTIFIER_xctest = run.kit.procedure.ProcedureKitTests
+PRODUCT_BUNDLE_IDENTIFIER = $(PRODUCT_BUNDLE_IDENTIFIER_$(WRAPPER_EXTENSION))
+
+PRODUCT_NAME_framework = ProcedureKit
+PRODUCT_NAME_xctest = ProcedureKitTests
+PRODUCT_NAME = $(PRODUCT_NAME_$(WRAPPER_EXTENSION))
+
+APPLICATION_EXTENSION_API_ONLY = YES
+
+// Build Settings
+SUPPORTED_PLATFORMS = macosx iphoneos appletvos watchos appletvsimulator iphonesimulator watchsimulator
+
+// Code Signing
+CODE_SIGN_IDENTITY = -
+
+// Deployment
+DEFINES_MODULE = YES
+
+MACOSX_DEPLOYMENT_TARGET = 10.11
+IPHONEOS_DEPLOYMENT_TARGET = 9.0
+TVOS_DEPLOYMENT_TARGET = 9.2
+WATCHOS_DEPLOYMENT_TARGET = 2.2
+
+LD_RUNPATH_SEARCH_PATHS_framework = @executable_path/../Frameworks @loader_path/Frameworks
+LD_RUNPATH_SEARCH_PATHS_xctest = @loader_path/Frameworks @executable_path/Frameworks @loader_path/../Frameworks @executable_path/../Frameworks
+LD_RUNPATH_SEARCH_PATHS = $(LD_RUNPATH_SEARCH_PATHS_$(WRAPPER_EXTENSION))
+
+
+
