@@ -1,7 +1,7 @@
 steps:
   -
     name: "ProcedureKitMobile"
-    command: "source /usr/local/opt/chruby/share/chruby/chruby.sh && chruby ruby && bundle install --quiet && bundle exec fastlane ios test_ios"
+    command: "source /usr/local/opt/chruby/share/chruby/chruby.sh && chruby ruby && bundle install --quiet && bundle exec fastlane ios test_mobile"
     agents:
       swift: "3.0"
 
