@@ -18,6 +18,9 @@
 		653CA00F1D609F9E0070B7A2 /* ProcedureKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65CFC5F01D608A5500CAD875 /* ProcedureKit.framework */; };
 		653CA0121D609FA90070B7A2 /* TestingProcedureKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65CFC6161D60900000CAD875 /* TestingProcedureKit.framework */; };
 		653CA0161D609FEE0070B7A2 /* ProcedureKitTVTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 653CA0151D609FEE0070B7A2 /* ProcedureKitTVTests.swift */; };
+		653CA01F1D60A34E0070B7A2 /* TestingProcedureKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65CFC6161D60900000CAD875 /* TestingProcedureKit.framework */; };
+		653CA0201D60A34E0070B7A2 /* ProcedureKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65CFC5F01D608A5500CAD875 /* ProcedureKit.framework */; };
+		653CA0291D60A4440070B7A2 /* ProcedureKitStressTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 653CA0281D60A4440070B7A2 /* ProcedureKitStressTests.swift */; };
 		65CFC5FA1D608A5500CAD875 /* ProcedureKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65CFC5F01D608A5500CAD875 /* ProcedureKit.framework */; };
 		65CFC60B1D608AA700CAD875 /* ProcedureKit.h in Headers */ = {isa = PBXBuildFile; fileRef = 65CFC60A1D608AA700CAD875 /* ProcedureKit.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		65CFC61F1D60904700CAD875 /* TestingProcedureKit.h in Headers */ = {isa = PBXBuildFile; fileRef = 65CFC61E1D60904700CAD875 /* TestingProcedureKit.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -68,6 +71,20 @@
 			remoteGlobalIDString = 65CFC6151D60900000CAD875;
 			remoteInfo = TestingProcedureKit;
 		};
+		653CA0191D60A34E0070B7A2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 65CFC5E51D608A1A00CAD875 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 65CFC6151D60900000CAD875;
+			remoteInfo = TestingProcedureKit;
+		};
+		653CA01B1D60A34E0070B7A2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 65CFC5E51D608A1A00CAD875 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 65CFC5EF1D608A5500CAD875;
+			remoteInfo = ProcedureKit;
+		};
 		65CFC5FB1D608A5500CAD875 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 65CFC5E51D608A1A00CAD875 /* Project object */;
@@ -103,6 +120,9 @@
 		653CA00A1D609EDA0070B7A2 /* ProcedureKitTV.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ProcedureKitTV.h; path = "Supporting Files/ProcedureKitTV.h"; sourceTree = "<group>"; };
 		653CA00B1D609EDA0070B7A2 /* ProcedureKitTV.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = ProcedureKitTV.xcconfig; path = "Supporting Files/ProcedureKitTV.xcconfig"; sourceTree = "<group>"; };
 		653CA0151D609FEE0070B7A2 /* ProcedureKitTVTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ProcedureKitTVTests.swift; path = Tests/TV/ProcedureKitTVTests.swift; sourceTree = "<group>"; };
+		653CA0251D60A34E0070B7A2 /* Stress Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Stress Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		653CA0261D60A34F0070B7A2 /* ProcedureKitTests copy-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "ProcedureKitTests copy-Info.plist"; path = "/Users/daniel/Documents/danthorpe/ProcedureKit/ProcedureKitTests copy-Info.plist"; sourceTree = "<absolute>"; };
+		653CA0281D60A4440070B7A2 /* ProcedureKitStressTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ProcedureKitStressTests.swift; path = "Tests/Stress Tests/ProcedureKitStressTests.swift"; sourceTree = "<group>"; };
 		65CFC5F01D608A5500CAD875 /* ProcedureKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ProcedureKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		65CFC5F91D608A5500CAD875 /* ProcedureKitTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ProcedureKitTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		65CFC60A1D608AA700CAD875 /* ProcedureKit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ProcedureKit.h; path = "Supporting Files/ProcedureKit.h"; sourceTree = "<group>"; };
@@ -146,6 +166,15 @@
 			files = (
 				653CA0121D609FA90070B7A2 /* TestingProcedureKit.framework in Frameworks */,
 				653C9FFC1D609E660070B7A2 /* ProcedureKitTV.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		653CA01E1D60A34E0070B7A2 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				653CA01F1D60A34E0070B7A2 /* TestingProcedureKit.framework in Frameworks */,
+				653CA0201D60A34E0070B7A2 /* ProcedureKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -228,18 +257,28 @@
 			name = TV;
 			sourceTree = "<group>";
 		};
+		653CA0271D60A4010070B7A2 /* Stress Tests */ = {
+			isa = PBXGroup;
+			children = (
+				653CA0281D60A4440070B7A2 /* ProcedureKitStressTests.swift */,
+			);
+			name = "Stress Tests";
+			sourceTree = "<group>";
+		};
 		65CFC5E41D608A1A00CAD875 = {
 			isa = PBXGroup;
 			children = (
 				653C9FD81D6097D00070B7A2 /* ProcedureKit */,
 				653C9FE41D60993E0070B7A2 /* Testing */,
 				653C9FD91D6097E20070B7A2 /* Tests */,
+				653CA0271D60A4010070B7A2 /* Stress Tests */,
 				653C9FE31D60992E0070B7A2 /* Mobile */,
 				653C9FE51D60995C0070B7A2 /* Mobile Tests */,
 				653CA0141D609FD40070B7A2 /* TV */,
 				653CA0131D609FB20070B7A2 /* TV Tests */,
 				65CFC60C1D608AAA00CAD875 /* Supporting Files */,
 				65CFC5F11D608A5500CAD875 /* Products */,
+				653CA0261D60A34F0070B7A2 /* ProcedureKitTests copy-Info.plist */,
 			);
 			sourceTree = "<group>";
 		};
@@ -253,6 +292,7 @@
 				653C9FC91D6097A40070B7A2 /* ProcedureKit-iOSTests.xctest */,
 				653C9FF31D609E650070B7A2 /* ProcedureKitTV.framework */,
 				653C9FFB1D609E660070B7A2 /* ProcedureKitTVTests.xctest */,
+				653CA0251D60A34E0070B7A2 /* Stress Tests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -388,6 +428,25 @@
 			productReference = 653C9FFB1D609E660070B7A2 /* ProcedureKitTVTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
+		653CA0171D60A34E0070B7A2 /* Stress Tests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 653CA0221D60A34E0070B7A2 /* Build configuration list for PBXNativeTarget "Stress Tests" */;
+			buildPhases = (
+				653CA01C1D60A34E0070B7A2 /* Sources */,
+				653CA01E1D60A34E0070B7A2 /* Frameworks */,
+				653CA0211D60A34E0070B7A2 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				653CA0181D60A34E0070B7A2 /* PBXTargetDependency */,
+				653CA01A1D60A34E0070B7A2 /* PBXTargetDependency */,
+			);
+			name = "Stress Tests";
+			productName = ProcedureKitTests;
+			productReference = 653CA0251D60A34E0070B7A2 /* Stress Tests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		65CFC5EF1D608A5500CAD875 /* ProcedureKit */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 65CFC6061D608A5500CAD875 /* Build configuration list for PBXNativeTarget "ProcedureKit" */;
@@ -406,9 +465,9 @@
 			productReference = 65CFC5F01D608A5500CAD875 /* ProcedureKit.framework */;
 			productType = "com.apple.product-type.framework";
 		};
-		65CFC5F81D608A5500CAD875 /* ProcedureKitTests */ = {
+		65CFC5F81D608A5500CAD875 /* Tests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 65CFC6071D608A5500CAD875 /* Build configuration list for PBXNativeTarget "ProcedureKitTests" */;
+			buildConfigurationList = 65CFC6071D608A5500CAD875 /* Build configuration list for PBXNativeTarget "Tests" */;
 			buildPhases = (
 				65CFC5F51D608A5500CAD875 /* Sources */,
 				65CFC5F61D608A5500CAD875 /* Frameworks */,
@@ -420,7 +479,7 @@
 				65CFC6221D60911400CAD875 /* PBXTargetDependency */,
 				65CFC5FC1D608A5500CAD875 /* PBXTargetDependency */,
 			);
-			name = ProcedureKitTests;
+			name = Tests;
 			productName = ProcedureKitTests;
 			productReference = 65CFC5F91D608A5500CAD875 /* ProcedureKitTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
@@ -502,7 +561,8 @@
 			targets = (
 				65CFC5EF1D608A5500CAD875 /* ProcedureKit */,
 				65CFC6151D60900000CAD875 /* TestingProcedureKit */,
-				65CFC5F81D608A5500CAD875 /* ProcedureKitTests */,
+				65CFC5F81D608A5500CAD875 /* Tests */,
+				653CA0171D60A34E0070B7A2 /* Stress Tests */,
 				653C9FC01D6097A40070B7A2 /* ProcedureKitMobile */,
 				653C9FC81D6097A40070B7A2 /* ProcedureKitMobileTests */,
 				653C9FF21D609E650070B7A2 /* ProcedureKitTV */,
@@ -534,6 +594,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		653C9FF91D609E660070B7A2 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		653CA0211D60A34E0070B7A2 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -594,6 +661,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		653CA01C1D60A34E0070B7A2 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				653CA0291D60A4440070B7A2 /* ProcedureKitStressTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		65CFC5EB1D608A5500CAD875 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -648,6 +723,16 @@
 			isa = PBXTargetDependency;
 			target = 65CFC6151D60900000CAD875 /* TestingProcedureKit */;
 			targetProxy = 653CA0101D609FA50070B7A2 /* PBXContainerItemProxy */;
+		};
+		653CA0181D60A34E0070B7A2 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 65CFC6151D60900000CAD875 /* TestingProcedureKit */;
+			targetProxy = 653CA0191D60A34E0070B7A2 /* PBXContainerItemProxy */;
+		};
+		653CA01A1D60A34E0070B7A2 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 65CFC5EF1D608A5500CAD875 /* ProcedureKit */;
+			targetProxy = 653CA01B1D60A34E0070B7A2 /* PBXContainerItemProxy */;
 		};
 		65CFC5FC1D608A5500CAD875 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -1061,6 +1146,101 @@
 			};
 			name = Release;
 		};
+		653CA0231D60A34E0070B7A2 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVES = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COMBINE_HIDPI_IMAGES = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				INFOPLIST_FILE = "ProcedureKitTests copy-Info.plist";
+				MTL_ENABLE_DEBUG_INFO = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = run.kit.procedure.ProcedureKitStressTests;
+				PRODUCT_MODULE_NAME = ProcedureKitStressTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 3.0;
+			};
+			name = Debug;
+		};
+		653CA0241D60A34E0070B7A2 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVES = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COMBINE_HIDPI_IMAGES = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				INFOPLIST_FILE = "ProcedureKitTests copy-Info.plist";
+				MTL_ENABLE_DEBUG_INFO = NO;
+				PRODUCT_BUNDLE_IDENTIFIER = run.kit.procedure.ProcedureKitStressTests;
+				PRODUCT_MODULE_NAME = ProcedureKitStressTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
+				SWIFT_VERSION = 3.0;
+			};
+			name = Release;
+		};
 		65CFC5E91D608A1A00CAD875 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 65CFC60E1D608AE200CAD875 /* ProcedureKit.xcconfig */;
@@ -1414,6 +1594,15 @@
 			);
 			defaultConfigurationIsVisible = 0;
 		};
+		653CA0221D60A34E0070B7A2 /* Build configuration list for PBXNativeTarget "Stress Tests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				653CA0231D60A34E0070B7A2 /* Debug */,
+				653CA0241D60A34E0070B7A2 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		65CFC5E81D608A1A00CAD875 /* Build configuration list for PBXProject "ProcedureKit" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -1432,7 +1621,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		65CFC6071D608A5500CAD875 /* Build configuration list for PBXNativeTarget "ProcedureKitTests" */ = {
+		65CFC6071D608A5500CAD875 /* Build configuration list for PBXNativeTarget "Tests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				65CFC6041D608A5500CAD875 /* Debug */,

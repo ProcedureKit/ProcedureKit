@@ -29,7 +29,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "653C9FC81D6097A40070B7A2"
-               BuildableName = "ProcedureKitMobileTests.xctest"
+               BuildableName = "ProcedureKit-iOSTests.xctest"
                BlueprintName = "ProcedureKitMobileTests"
                ReferencedContainer = "container:ProcedureKit.xcodeproj">
             </BuildableReference>
@@ -47,7 +47,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "653C9FC81D6097A40070B7A2"
-               BuildableName = "ProcedureKitMobileTests.xctest"
+               BuildableName = "ProcedureKit-iOSTests.xctest"
                BlueprintName = "ProcedureKitMobileTests"
                ReferencedContainer = "container:ProcedureKit.xcodeproj">
             </BuildableReference>
