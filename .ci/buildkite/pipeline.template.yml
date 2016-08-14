@@ -19,7 +19,7 @@ steps:
       swift: "2.2"
   -
     name: "ProcedureKit: macOS"
-    command: bundle install --quiet && bundle exec fastlane mac procedurekit_test
+    command: .ci/scripts/setup && bundle exec fastlane mac procedurekit_test
     agents:
       swift: "3.0"
 
