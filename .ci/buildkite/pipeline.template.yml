@@ -18,28 +18,14 @@ steps:
     agents:
       swift: "2.2"
   -
-    name: "ProcedureKit: macOS"
-    command: "source /usr/local/opt/chruby/share/chruby/chruby.sh && chruby ruby && bundle install --quiet && bundle exec fastlane mac test"
-    agents:
-      swift: "3.0"
+    name: ":buildkite: ProcedureKit"
+    command: .ci/buildkite/procedurekit.yml | buildkite-agent pipeline upload
   -
-    name: "ProcedureKit: iOS"
-    command: "source /usr/local/opt/chruby/share/chruby/chruby.sh && chruby ruby && bundle install --quiet && bundle exec fastlane ios test"
-    agents:
-      swift: "3.0"
+    name: ":buildkite: ProcedureKitMobile"
+    command: .ci/buildkite/procedurekitmobile.yml | buildkite-agent pipeline upload
   -
-    name: "ProcedureKitMac"
-    command: "source /usr/local/opt/chruby/share/chruby/chruby.sh && chruby ruby && bundle install --quiet && bundle exec fastlane mac test_mac"
-    agents:
-      swift: "3.0"
+    name: ":buildkite: ProcedureKitMac"
+    command: .ci/buildkite/procedurekitmac.yml | buildkite-agent pipeline upload
   -
-    name: "ProcedureKitCloud: macOS"
-    command: "source /usr/local/opt/chruby/share/chruby/chruby.sh && chruby ruby && bundle install --quiet && bundle exec fastlane mac test_cloud"
-    agents:
-      swift: "3.0"
-  -
-    name: "ProcedureKitCloud: iOS"
-    command: "source /usr/local/opt/chruby/share/chruby/chruby.sh && chruby ruby && bundle install --quiet && bundle exec fastlane ios test_cloud"
-    agents:
-      swift: "3.0"
-
+    name: ":buildkite: ProcedureKitCloud"
+    command: .ci/buildkite/procedurekitcloud.yml | buildkite-agent pipeline upload
