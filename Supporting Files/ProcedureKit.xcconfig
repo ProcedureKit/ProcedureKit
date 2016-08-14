@@ -35,5 +35,9 @@ IPHONEOS_DEPLOYMENT_TARGET = 9.0
 TVOS_DEPLOYMENT_TARGET = 9.2
 WATCHOS_DEPLOYMENT_TARGET = 2.2
 
+LD_RUNPATH_SEARCH_PATHS_framework = @executable_path/../Frameworks @loader_path/Frameworks
+LD_RUNPATH_SEARCH_PATHS_xctest = @loader_path/Frameworks @executable_path/Frameworks @loader_path/../Frameworks @executable_path/../Frameworks
+LD_RUNPATH_SEARCH_PATHS = $(LD_RUNPATH_SEARCH_PATHS_$(WRAPPER_EXTENSION))
+
 
 
