@@ -65,8 +65,7 @@ platform :ios do
     gym(
       project: "ProcedureKit.xcodeproj",
       scheme: "ProcedureKit",
-      destination: "platform=watchOS Simulator",
-      xcargs: "DEVELOPMENT_TEAM=8YR9FZ6395"
+      destination: "platform=watchOS Simulator"
     )
   end
 
@@ -76,8 +75,7 @@ platform :ios do
     gym(
       project: "ProcedureKit.xcodeproj",
       scheme: "ProcedureKitMobile",
-      destination: "platform=watchOS Simulator",
-      xcargs: "DEVELOPMENT_TEAM=8YR9FZ6395"
+      destination: "platform=watchOS Simulator"
     )
   end
 
@@ -89,8 +87,7 @@ platform :ios do
     scan(
       project: "ProcedureKit.xcodeproj",
       scheme: "ProcedureKit",
-      destination: "platform=iOS Simulator",
-      xcargs: "DEVELOPMENT_TEAM=8YR9FZ6395"
+      destination: "platform=iOS Simulator"
     )
   end
 
@@ -100,8 +97,7 @@ platform :ios do
     scan(
       project: "ProcedureKit.xcodeproj",
       scheme: "ProcedureKit",
-      destination: "platform=tvOS Simulator",
-      xcargs: "DEVELOPMENT_TEAM=8YR9FZ6395"
+      destination: "platform=tvOS Simulator"
     )
   end
 
@@ -113,8 +109,7 @@ platform :ios do
     scan(
       project: "ProcedureKit.xcodeproj",
       scheme: "ProcedureKitMobile",
-      destination: "platform=iOS Simulator",
-      xcargs: "DEVELOPMENT_TEAM=8YR9FZ6395"
+      destination: "platform=iOS Simulator"
     )
   end
 
@@ -124,8 +119,7 @@ platform :ios do
     scan(
       project: "ProcedureKit.xcodeproj",
       scheme: "ProcedureKitMobile",
-      destination: "platform=tvOS Simulator",
-      xcargs: "DEVELOPMENT_TEAM=8YR9FZ6395"
+      destination: "platform=tvOS Simulator"
     )
   end
 

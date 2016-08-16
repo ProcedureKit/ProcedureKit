@@ -16,18 +16,18 @@ steps:
     agents:
       swift: "2.2"
   -
-    name: "PK: macOS"
+    name: "ProcedureKit: macOS"
     command: "source /usr/local/opt/chruby/share/chruby/chruby.sh && chruby ruby && bundle install --quiet && bundle exec fastlane mac test"
     agents:
       swift: "3.0"
   -
-    name: "PK: iOS"
+    name: "ProcedureKit: iOS"
     command: "source /usr/local/opt/chruby/share/chruby/chruby.sh && chruby ruby && bundle install --quiet && bundle exec fastlane ios test_ios"
     agents:
       iOS-Simulator: true
       swift: "3.0"
   -
-    name: "PK: tvOS"
+    name: "ProcedureKit: tvOS"
     command: "source /usr/local/opt/chruby/share/chruby/chruby.sh && chruby ruby && bundle install --quiet && bundle exec fastlane ios test_tvos"
     agents:
       iOS-Simulator: true
