@@ -104,7 +104,7 @@ platform :ios do
 
 
   desc "ProcedureKitMobile: iOS"
-  lane :test_modile_ios do
+  lane :test_mobile_ios do
 
     scan(
       project: "ProcedureKit.xcodeproj",
@@ -125,7 +125,7 @@ platform :ios do
 
 
   desc "ProcedureKitTV"
-  lane :test_tv do
+  lane :test_tv_tvos do
 
     scan(
       project: "ProcedureKit.xcodeproj",
