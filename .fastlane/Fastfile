@@ -13,7 +13,7 @@ end
 platform :ios do
 
   desc "Builds the iOS Extension compatible framework"
-  lane :build_extension do
+  lane :operations_build_extension do
     
     xcodebuild(
       project: "Operations_ExtensionCompatible.xcodeproj",
@@ -24,28 +24,26 @@ platform :ios do
   end
 
   desc "Test the iOS Extension compatible framework"
-  lane :test_extension do
+  lane :operations_test_extension do
         
     scan(
       project: "Operations_ExtensionCompatible.xcodeproj",
       scheme: "iOS Extensions Operations",
-      output_directory: ".ci/xcodebuild-data",
-      xcargs: "-derivedDataPath .ci/xcodebuild-data"
+      output_directory: ".ci/xcodebuild-data"
     )    
 
   end
   
   
   desc "Runs all the tests"
-  lane :test do
+  lane :operations_test do
     
-    test_extension()
+    operations_test_extension()
     
     scan(
       project: "Operations.xcodeproj",
       scheme: "iOS Operations",
-      output_directory: ".ci/xcodebuild-data",
-      xcargs: "-derivedDataPath .ci/xcodebuild-data"
+      output_directory: ".ci/xcodebuild-data"
     )
     
     slather(
@@ -57,12 +55,122 @@ platform :ios do
 	
   end
 
+
+
+
+
+  desc "watchOS: ProcedureKit"
+  lane :build_watchos do
+
+    gym(
+      project: "ProcedureKit.xcodeproj",
+      scheme: "ProcedureKit",
+      destination: "platform=watchOS Simulator"
+    )
+  end
+
+  desc "watchOS: ProcedureKitMobile"
+  lane :build_watchos_mobile do
+
+    gym(
+      project: "ProcedureKit.xcodeproj",
+      scheme: "ProcedureKitMobile",
+      destination: "platform=watchOS Simulator"
+    )
+  end
+
+
+
+  desc "ProcedureKit: iOS"
+  lane :test_ios do
+
+    scan(
+      project: "ProcedureKit.xcodeproj",
+      scheme: "ProcedureKit",
+      destination: "platform=iOS Simulator"
+    )
+  end
+
+  desc "ProcedureKit: tvOS"
+  lane :test_tvos do
+
+    scan(
+      project: "ProcedureKit.xcodeproj",
+      scheme: "ProcedureKit",
+      destination: "platform=tvOS Simulator"
+    )
+  end
+
+
+
+  desc "ProcedureKitMobile: iOS"
+  lane :test_mobile_ios do
+
+    scan(
+      project: "ProcedureKit.xcodeproj",
+      scheme: "ProcedureKitMobile",
+      destination: "platform=iOS Simulator"
+    )
+  end
+
+  desc "ProcedureKitMobile: tvOS"
+  lane :test_mobile_tvos do
+
+    scan(
+      project: "ProcedureKit.xcodeproj",
+      scheme: "ProcedureKitMobile",
+      destination: "platform=tvOS Simulator"
+    )
+  end
+
+
+  desc "ProcedureKitTV"
+  lane :test_tv_tvos do
+
+    scan(
+      project: "ProcedureKit.xcodeproj",
+      scheme: "ProcedureKitTV",
+      destination: "platform=tvOS Simulator"
+    )
+  end
+
+
+  desc "ProcedureKitCloud: iOS"
+  lane :test_ios_cloud do
+
+    scan(
+      project: "ProcedureKit.xcodeproj",
+      scheme: "ProcedureKitCloud",
+      destination: "platform=iOS Simulator"
+    )
+  end
+
+  desc "ProcedureKitCloud: tvOS"
+  lane :test_tvos_cloud do
+
+    scan(
+      project: "ProcedureKit.xcodeproj",
+      scheme: "ProcedureKitCloud",
+      destination: "platform=tvOS Simulator"
+    )
+  end
+
+  desc "ProcedureKitCloud: watchOS"
+  lane :build_watchos_cloud do
+
+    gym(
+      project: "ProcedureKit.xcodeproj",
+      scheme: "ProcedureKitCloud",
+      destination: "platform=watchOS Simulator"
+    )
+  end
+
 end
 
 platform :mac do
 
-  desc "Builds the OS X Extension compatible framework"
-  lane :build_extension do
+  desc "Operations: Builds the OS X Extension compatible framework"
+  lane :operations_build_extension do
     
     xcodebuild(
       project: "Operations_ExtensionCompatible.xcodeproj",
@@ -72,30 +180,65 @@ platform :mac do
 
   end
   
-  desc "Test the OS X Extension compatible framework"
-  lane :test_extension do
+  desc "Operations: Test the OS X Extension compatible framework"
+  lane :operations_test_extension do
         
     scan(
       project: "Operations_ExtensionCompatible.xcodeproj",
       scheme: "OS X Extensions Operations",
       output_directory: ".ci/xcodebuild-data",
-      xcargs: "-derivedDataPath .ci/xcodebuild-data"
+      derived_data_path: ".ci/xcodebuild-data"
     )    
 
   end  
 
-  desc "Runs all the tests"
-  lane :test do
+  desc "Operations: Runs all the tests"
+  lane :operations_test do
 
-	test_extension()
+	operations_test_extension()
 
     scan(
       project: "Operations.xcodeproj",
       scheme: "OS X Operations",
       output_directory: ".ci/xcodebuild-data",
-      xcargs: "-derivedDataPath .ci/xcodebuild-data"
+      derived_data_path: ".ci/xcodebuild-data"
     )
 
   end
+  
+  
+  
+  
+  desc "macOS: ProcedureKit"
+  lane :test do
+
+    scan(
+      project: "ProcedureKit.xcodeproj",
+      scheme: "ProcedureKit",
+      device: "My Mac"
+    )
+
+  end
+
+  desc "macOS: ProcedureKitMac"
+  lane :test_mac do
+
+    scan(
+      project: "ProcedureKit.xcodeproj",
+      scheme: "ProcedureKitMac",
+      destination: "platform=OS X"
+    )
+  end
+
+  desc "macOS: ProcedureKitCloud"
+  lane :test_cloud do
+
+    scan(
+      project: "ProcedureKit.xcodeproj",
+      scheme: "ProcedureKitCloud",
+      destination: "platform=OS X"
+    )
+  end
+
   
 end

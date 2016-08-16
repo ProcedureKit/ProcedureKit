@@ -1,20 +1,61 @@
 steps:
   -
-    name: ":muscle: Lint"
+    name: "Lint"
     command: .ci/scripts/lint
-    agents:
-      swift: "$BUILDKITE_AGENT_META_DATA_SWIFT"
   -
-    name: ":mac: Test Mac OS X"
-    command: .ci/scripts/test-osx
+    name: "ProcedureKit: macOS"
+    command: "source /usr/local/opt/chruby/share/chruby/chruby.sh && chruby ruby && bundle install --quiet && bundle exec fastlane mac test"
     agents:
-      swift: "$BUILDKITE_AGENT_META_DATA_SWIFT"
+      swift: "3.0"
   -
-    name: ":fastlane: Test iOS"
-    command: .ci/scripts/test-ios
-    env:
-      FL_SLATHER_BUILDKITE_ENABLED: true
-      FL_SLATHER_COVERALLS_ENABLED: true
+    name: "ProcedureKit: iOS"
+    command: "source /usr/local/opt/chruby/share/chruby/chruby.sh && chruby ruby && bundle install --quiet && bundle exec fastlane ios test_ios"
     agents:
-      swift: "$BUILDKITE_AGENT_META_DATA_SWIFT"
-
+      iOS-Simulator: true
+      swift: "3.0"
+  -
+    name: "ProcedureKit: tvOS"
+    command: "source /usr/local/opt/chruby/share/chruby/chruby.sh && chruby ruby && bundle install --quiet && bundle exec fastlane ios test_tvos"
+    agents:
+      iOS-Simulator: true
+      swift: "3.0"
+  -
+    name: "Mac: macOS"
+    command: "source /usr/local/opt/chruby/share/chruby/chruby.sh && chruby ruby && bundle install --quiet && bundle exec fastlane mac test_mac"
+    agents:
+      swift: "3.0"      
+#  -
+#    name: "Mobile: iOS"
+#    command: "source /usr/local/opt/chruby/share/chruby/chruby.sh && chruby ruby && bundle install --quiet && bundle exec fastlane ios test_mobile_ios"
+#    agents:
+#      iOS-Simulator: true    
+#      swift: "3.0"
+#  -
+#    name: "Mobile: tvOS"
+#    command: "source /usr/local/opt/chruby/share/chruby/chruby.sh && chruby ruby && bundle install --quiet && bundle exec fastlane ios test_mobile_tvos"
+#    agents:
+#      iOS-Simulator: true    
+#      swift: "3.0"
+#  -
+#    name: "TV: tvOS"
+#    command: "source /usr/local/opt/chruby/share/chruby/chruby.sh && chruby ruby && bundle install --quiet && bundle exec fastlane ios test_tv_tvos"
+#    agents:
+#      iOS-Simulator: true    
+#      swift: "3.0"
+  -
+    name: "Cloud: macOS"
+    command: "source /usr/local/opt/chruby/share/chruby/chruby.sh && chruby ruby && bundle install --quiet && bundle exec fastlane mac test_cloud"
+    agents:
+      swift: "3.0"
+  -
+    name: "Cloud: iOS"
+    command: "source /usr/local/opt/chruby/share/chruby/chruby.sh && chruby ruby && bundle install --quiet && bundle exec fastlane ios test_ios_cloud"
+    agents:
+      iOS-Simulator: true    
+      swift: "3.0"
+  -
+    name: "Cloud: tvOS"
+    command: "source /usr/local/opt/chruby/share/chruby/chruby.sh && chruby ruby && bundle install --quiet && bundle exec fastlane ios test_tvos_cloud"
+    agents:
+      iOS-Simulator: true    
+      swift: "3.0"      

@@ -1,0 +1,19 @@
+steps:
+  -
+    name: "Mobile: iOS"
+    command: "source /usr/local/opt/chruby/share/chruby/chruby.sh && chruby ruby && bundle install --quiet && bundle exec fastlane ios test_ios_mobile"
+    agents:
+      iOS-Simulator: true    
+      swift: "3.0"
+  -
+    name: "Mobile: tvOS"
+    command: "source /usr/local/opt/chruby/share/chruby/chruby.sh && chruby ruby && bundle install --quiet && bundle exec fastlane ios test_tvos_mobile"
+    agents:
+      iOS-Simulator: true    
+      swift: "3.0"
+#  -
+#    name: "Mobile: watchOS"
+#    command: "source /usr/local/opt/chruby/share/chruby/chruby.sh && chruby ruby && bundle install --quiet && bundle exec fastlane ios build_tvos_mobile"
+#    agents:
+#      swift: "3.0"
+

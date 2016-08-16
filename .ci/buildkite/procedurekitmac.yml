@@ -1,0 +1,7 @@
+steps:
+  -
+    name: "Mac"
+    command: "source /usr/local/opt/chruby/share/chruby/chruby.sh && chruby ruby && bundle install --quiet && bundle exec fastlane mac test_mac"
+    agents:
+      swift: "3.0"
+
