@@ -3,19 +3,6 @@ steps:
     name: "Lint"
     command: .ci/scripts/lint
   -
-    name: "Operations: Test Mac OS X"
-    command: .ci/scripts/operations-test-osx
-    agents:
-      swift: "2.2"
-  -
-    name: "Operations: Test iOS"
-    command: .ci/scripts/operations-test-ios
-    env:
-      FL_SLATHER_BUILDKITE_ENABLED: true
-      FL_SLATHER_COVERALLS_ENABLED: true
-    agents:
-      swift: "2.2"
-  -
     name: "ProcedureKit: macOS"
     command: "source /usr/local/opt/chruby/share/chruby/chruby.sh && chruby ruby && bundle install --quiet && bundle exec fastlane mac test"
     agents:
