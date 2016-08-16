@@ -66,7 +66,7 @@ platform :ios do
       project: "ProcedureKit.xcodeproj",
       scheme: "ProcedureKit",
       destination: "platform=watchOS Simulator",
-      xcargs: "DEVELOPMENT_TEAM = 8YR9FZ6395"
+      xcargs: "DEVELOPMENT_TEAM=8YR9FZ6395"
     )
   end
 
@@ -77,7 +77,7 @@ platform :ios do
       project: "ProcedureKit.xcodeproj",
       scheme: "ProcedureKitMobile",
       destination: "platform=watchOS Simulator",
-      xcargs: "DEVELOPMENT_TEAM = 8YR9FZ6395"
+      xcargs: "DEVELOPMENT_TEAM=8YR9FZ6395"
     )
   end
 
@@ -90,7 +90,7 @@ platform :ios do
       project: "ProcedureKit.xcodeproj",
       scheme: "ProcedureKit",
       destination: "platform=iOS Simulator",
-      xcargs: "DEVELOPMENT_TEAM = 8YR9FZ6395"
+      xcargs: "DEVELOPMENT_TEAM=8YR9FZ6395"
     )
   end
 
@@ -101,7 +101,7 @@ platform :ios do
       project: "ProcedureKit.xcodeproj",
       scheme: "ProcedureKit",
       destination: "platform=tvOS Simulator",
-      xcargs: "DEVELOPMENT_TEAM = 8YR9FZ6395"
+      xcargs: "DEVELOPMENT_TEAM=8YR9FZ6395"
     )
   end
 
@@ -114,7 +114,7 @@ platform :ios do
       project: "ProcedureKit.xcodeproj",
       scheme: "ProcedureKitMobile",
       destination: "platform=iOS Simulator",
-      xcargs: "DEVELOPMENT_TEAM = 8YR9FZ6395"
+      xcargs: "DEVELOPMENT_TEAM=8YR9FZ6395"
     )
   end
 
@@ -125,7 +125,7 @@ platform :ios do
       project: "ProcedureKit.xcodeproj",
       scheme: "ProcedureKitMobile",
       destination: "platform=tvOS Simulator",
-      xcargs: "DEVELOPMENT_TEAM = 8YR9FZ6395"
+      xcargs: "DEVELOPMENT_TEAM=8YR9FZ6395"
     )
   end
 
@@ -137,7 +137,7 @@ platform :ios do
       project: "ProcedureKit.xcodeproj",
       scheme: "ProcedureKitTV",
       destination: "platform=tvOS Simulator",
-      xcargs: "DEVELOPMENT_TEAM = 8YR9FZ6395"
+      xcargs: "DEVELOPMENT_TEAM=8YR9FZ6395"
     )
   end
 
@@ -149,7 +149,7 @@ platform :ios do
       project: "ProcedureKit.xcodeproj",
       scheme: "ProcedureKitCloud",
       destination: "platform=iOS Simulator",
-      xcargs: "DEVELOPMENT_TEAM = 8YR9FZ6395"
+      xcargs: "DEVELOPMENT_TEAM=8YR9FZ6395"
     )
   end
 
@@ -160,7 +160,7 @@ platform :ios do
       project: "ProcedureKit.xcodeproj",
       scheme: "ProcedureKitCloud",
       destination: "platform=tvOS Simulator",
-      xcargs: "DEVELOPMENT_TEAM = 8YR9FZ6395"
+      xcargs: "DEVELOPMENT_TEAM=8YR9FZ6395"
     )
   end
 
@@ -171,7 +171,7 @@ platform :ios do
       project: "ProcedureKit.xcodeproj",
       scheme: "ProcedureKitCloud",
       destination: "platform=watchOS Simulator",
-      xcargs: "DEVELOPMENT_TEAM = 8YR9FZ6395"
+      xcargs: "DEVELOPMENT_TEAM=8YR9FZ6395"
     )
   end
 
@@ -225,9 +225,9 @@ platform :mac do
     scan(
       project: "ProcedureKit.xcodeproj",
       scheme: "ProcedureKit",
-      destination: "platform=OS X",
-      xcargs: "DEVELOPMENT_TEAM = 8YR9FZ6395"
+      device: "My Mac"
     )
+
   end
 
   desc "macOS: ProcedureKitMac"
@@ -237,7 +237,7 @@ platform :mac do
       project: "ProcedureKit.xcodeproj",
       scheme: "ProcedureKitMac",
       destination: "platform=OS X",
-      xcargs: "DEVELOPMENT_TEAM = 8YR9FZ6395"
+      xcargs: "DEVELOPMENT_TEAM=8YR9FZ6395"
     )
   end
 
@@ -248,7 +248,7 @@ platform :mac do
       project: "ProcedureKit.xcodeproj",
       scheme: "ProcedureKitCloud",
       destination: "platform=OS X",
-      xcargs: "DEVELOPMENT_TEAM = 8YR9FZ6395"
+      xcargs: "DEVELOPMENT_TEAM=8YR9FZ6395"
     )
   end
 

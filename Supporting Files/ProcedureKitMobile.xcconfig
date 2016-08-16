@@ -13,5 +13,3 @@ PRODUCT_NAME_xctest = ProcedureKitMobileTests
 PRODUCT_NAME = $(PRODUCT_NAME_$(WRAPPER_EXTENSION))
 
 SUPPORTED_PLATFORMS = iphoneos watchos iphonesimulator watchsimulator
-
-CODE_SIGN_IDENTITY = iPhone Developer
