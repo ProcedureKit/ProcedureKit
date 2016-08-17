@@ -21,6 +21,8 @@ PRODUCT_NAME = $(PRODUCT_NAME_$(WRAPPER_EXTENSION))
 
 APPLICATION_EXTENSION_API_ONLY = YES
 
+SWIFT_VERSION = 3.0
+
 // Build Settings
 SUPPORTED_PLATFORMS = macosx iphoneos appletvos watchos appletvsimulator iphonesimulator watchsimulator
 
