@@ -309,6 +309,34 @@ public protocol CKFetchRecordsOperationType: CKDatabaseOperationType, CKDesiredK
     var fetchRecordsCompletionBlock: (([RecordID: Record]?, NSError?) -> Void)? { get set }
 }
 
+/// A generic protocol which exposes the properties used by Apple's CKFetchRecordZoneChangesOperation.
+public protocol CKFetchRecordZoneChangesOperationType: CKDatabaseOperationType, CKFetchAllChanges {
+
+    /// The type of the CloudKit FetchRecordZoneChangesOptions
+    associatedtype FetchRecordZoneChangesOptions
+
+    /// - returns: the record zone IDs which will fetch changes
+    var recordZoneIDs: [RecordZoneID] { get set }
+
+    /// - returns: the per-record-zone options
+    var optionsByRecordZoneID: [RecordZoneID : FetchRecordZoneChangesOptions]? { get set }
+
+    /// - returns: a block for when a record is changed
+    var recordChangedBlock: ((Record) -> Void)? { get set }
+
+    /// - returns: a block for when a recordID is deleted (receives the recordID and the recordType)
+    var recordWithIDWasDeletedBlock: ((RecordID, String) -> Void)? { get set }
+
+    /// - returns: a block for when a recordZone changeToken update is sent
+    var recordZoneChangeTokensUpdatedBlock: ((RecordZoneID, ServerChangeToken?, NSData?) -> Void)? { get set }
+
+    /// - returns: a block for when a recordZone fetch is complete
+    var recordZoneFetchCompletionBlock: ((RecordZoneID, ServerChangeToken?, NSData?, Bool, NSError?) -> Void)? { get set }
+
+    /// - returns: the completion for fetching records (i.e. for the entire operation)
+    var fetchRecordZoneChangesCompletionBlock: ((NSError?) -> Void)? { get set }
+}
+
 /// A generic protocol which exposes the properties used by Apple's CKFetchSubscriptionsOperation.
 public protocol CKFetchSubscriptionsOperationType: CKDatabaseOperationType {
 
@@ -571,6 +599,16 @@ extension CKFetchRecordsOperation: CKFetchRecordsOperationType, AssociatedErrorT
 
     // The associated error type
     public typealias Error = FetchRecordsError<Record, RecordID>
+}
+
+@available(iOS 10.0, OSX 10.12, tvOS 10.0, watchOS 3.0, *)
+extension CKFetchRecordZoneChangesOperation: CKFetchRecordZoneChangesOperationType, AssociatedErrorType {
+
+    // The associated error type
+    public typealias Error = FetchRecordZoneChangesError
+
+    /// The type of the CloudKit FetchRecordZoneChangesOptions
+    public typealias FetchRecordZoneChangesOptions = CKFetchRecordZoneChangesOptions
 }
 
 extension CKFetchSubscriptionsOperation: CKFetchSubscriptionsOperationType, AssociatedErrorType {

@@ -1303,6 +1303,136 @@ extension CloudKitOperation where T: CKFetchRecordsOperationType {
     }
 }
 
+// MARK: - CKFetchRecordZoneChangesOperation (iOS 10+, macOS 10.12+, tvOS 10.0+, watchOS 3.0+)
+
+public struct FetchRecordZoneChangesError: CloudKitErrorType {
+
+    public let underlyingError: NSError
+
+    init(error: NSError) {
+        self.underlyingError = error
+    }
+}
+
+extension OPRCKOperation where T: CKFetchRecordZoneChangesOperationType, T: AssociatedErrorType, T.Error: CloudKitErrorType {
+
+    /// - returns: the record zone IDs which will fetch changes
+    public var recordZoneIDs: [T.RecordZoneID] {
+        get { return operation.recordZoneIDs }
+        set { operation.recordZoneIDs = newValue }
+    }
+
+    /// - returns: the per-record-zone options
+    public var optionsByRecordZoneID: [T.RecordZoneID : T.FetchRecordZoneChangesOptions]? {
+        get { return operation.optionsByRecordZoneID }
+        set { operation.optionsByRecordZoneID = newValue }
+    }
+
+    /// - returns: a block for when a record is changed
+    public var recordChangedBlock: CloudKitOperation<T>.FetchRecordZoneChangesRecordChangedBlock? {
+        get { return operation.recordChangedBlock }
+        set { operation.recordChangedBlock = newValue }
+    }
+
+    /// - returns: a block for when a recordID is deleted (receives the recordID and the recordType)
+    public var recordWithIDWasDeletedBlock: CloudKitOperation<T>.FetchRecordZoneChangesRecordWithIDWasDeletedBlock? {
+        get { return operation.recordWithIDWasDeletedBlock }
+        set { operation.recordWithIDWasDeletedBlock = newValue }
+    }
+
+    /// - returns: a block for when a recordZone changeToken update is sent
+    public var recordZoneChangeTokensUpdatedBlock: CloudKitOperation<T>.FetchRecordZoneChangesRecordZoneChangeTokensUpdatedBlock? {
+        get { return operation.recordZoneChangeTokensUpdatedBlock }
+        set { operation.recordZoneChangeTokensUpdatedBlock = newValue }
+    }
+
+    /// - returns: the completion for fetching records (i.e. for the entire operation)
+    func setFetchRecordZoneChangesCompletionBlock(block: CloudKitOperation<T>.FetchRecordZoneChangesCompletionBlock) {
+        operation.fetchRecordZoneChangesCompletionBlock = { [unowned self] error in
+            if let error = error {
+                self.addFatalError(FetchRecordZoneChangesError(error: error))
+            }
+            else {
+                block()
+            }
+        }
+    }
+}
+
+extension CloudKitOperation where T: CKFetchRecordZoneChangesOperationType {
+
+    /// A typealias for the block types used by CloudKitOperation<CKFetchRecordZoneChangesOperationType>
+    public typealias FetchRecordZoneChangesRecordChangedBlock = T.Record -> Void
+
+    /// A typealias for the block types used by CloudKitOperation<CKFetchRecordZoneChangesOperationType>
+    public typealias FetchRecordZoneChangesRecordWithIDWasDeletedBlock = (T.RecordID, String) -> Void
+
+    /// A typealias for the block types used by CloudKitOperation<CKFetchRecordZoneChangesOperationType>
+    public typealias FetchRecordZoneChangesRecordZoneChangeTokensUpdatedBlock = (T.RecordZoneID, T.ServerChangeToken?, NSData?) -> Void
+
+    /// A typealias for the block types used by CloudKitOperation<CKFetchRecordZoneChangesOperationType>
+    public typealias FetchRecordChangesCompletionRecordZoneFetchCompletionBlock = (T.RecordZoneID, T.ServerChangeToken?, NSData?, Bool, NSError?) -> Void
+
+    /// A typealias for the block types used by CloudKitOperation<CKFetchRecordZoneChangesOperationType>
+    public typealias FetchRecordZoneChangesCompletionBlock = (Void) -> Void
+
+    /// - returns: the record zone IDs which will fetch changes
+    public var recordZoneIDs: [T.RecordZoneID] {
+        get { return operation.recordZoneIDs }
+        set {
+            operation.recordZoneIDs = newValue
+            addConfigureBlock { $0.recordZoneIDs = newValue }
+        }
+    }
+
+    /// - returns: the per-record-zone options
+    var optionsByRecordZoneID: [T.RecordZoneID : T.FetchRecordZoneChangesOptions]? {
+        get { return operation.optionsByRecordZoneID }
+        set {
+            operation.optionsByRecordZoneID = newValue
+            addConfigureBlock { $0.optionsByRecordZoneID = newValue }
+        }
+    }
+
+    /// - returns: a block for when a record is changed
+    var recordChangedBlock: FetchRecordZoneChangesRecordChangedBlock? {
+        get { return operation.recordChangedBlock }
+        set {
+            operation.recordChangedBlock = newValue
+            addConfigureBlock { $0.recordChangedBlock = newValue }
+        }
+    }
+
+    /// - returns: a block for when a recordID is deleted (receives the recordID and the recordType)
+    var recordWithIDWasDeletedBlock: FetchRecordZoneChangesRecordWithIDWasDeletedBlock? {
+        get { return operation.recordWithIDWasDeletedBlock }
+        set {
+            operation.recordWithIDWasDeletedBlock = newValue
+            addConfigureBlock { $0.recordWithIDWasDeletedBlock = newValue }
+        }
+    }
+
+    /// - returns: a block for when a recordZone changeToken update is sent
+    var recordZoneChangeTokensUpdatedBlock: FetchRecordZoneChangesRecordZoneChangeTokensUpdatedBlock? {
+        get { return operation.recordZoneChangeTokensUpdatedBlock }
+        set {
+            operation.recordZoneChangeTokensUpdatedBlock = newValue
+            addConfigureBlock { $0.recordZoneChangeTokensUpdatedBlock = newValue }
+        }
+    }
+
+    /**
+     Before adding the CloudKitOperation instance to a queue, set a completion block
+     to collect the results in the successful case. Setting this completion block also
+     ensures that error handling gets triggered.
+
+     - parameter block: a FetchRecordZoneChangesCompletionBlock block
+     */
+    public func setFetchRecordZoneChangesCompletionBlock(block: FetchRecordZoneChangesCompletionBlock) {
+        addConfigureBlock { $0.setFetchRecordZoneChangesCompletionBlock(block) }
+    }
+}
+
 // MARK: - CKFetchSubscriptionsOperation
 
 public struct FetchSubscriptionsError<Subscription>: CloudKitErrorType {
