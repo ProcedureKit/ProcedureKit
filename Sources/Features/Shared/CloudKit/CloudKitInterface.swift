@@ -208,6 +208,19 @@ public protocol CKDiscoverUserInfosOperationType: CKOperationType {
     var discoverUserInfosCompletionBlock: (([String: DiscoveredUserInfo]?, [RecordID: DiscoveredUserInfo]?, NSError?) -> Void)? { get set }
 }
 
+/// A generic protocol which exposes the properties used by Apple's CKDiscoverUserIdentitiesOperation.
+public protocol CKDiscoverUserIdentitiesOperationType: CKOperationType {
+
+    /// - returns: the user identity lookup info used in discovery
+    var userIdentityLookupInfos: [UserIdentityLookupInfo] { get set }
+
+    /// - returns: the block used to return discovered user identities
+    var userIdentityDiscoveredBlock: ((UserIdentity, UserIdentityLookupInfo) -> Void)? { get set }
+
+    /// - returns: the completion block used for discovering user identities
+    var discoverUserIdentitiesCompletionBlock: ((NSError?) -> Void)? { get set }
+}
+
 /// A generic protocol which exposes the properties used by Apple's CKFetchNotificationChangesOperation.
 public protocol CKFetchNotificationChangesOperationType: CKFetchOperationType {
 
@@ -484,6 +497,13 @@ extension CKDiscoverAllUserIdentitiesOperation: CKDiscoverAllUserIdentitiesOpera
 }
 
 extension CKDiscoverUserInfosOperation: CKDiscoverUserInfosOperationType, AssociatedErrorType {
+
+    // The associated error type
+    public typealias Error = CloudKitError
+}
+
+@available(iOS 10.0, OSX 10.12, tvOS 10.0, watchOS 3.0, *)
+extension CKDiscoverUserIdentitiesOperation: CKDiscoverUserIdentitiesOperationType, AssociatedErrorType {
 
     // The associated error type
     public typealias Error = CloudKitError

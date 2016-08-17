@@ -668,6 +668,70 @@ extension CloudKitOperation where T: CKDiscoverUserInfosOperationType {
     }
 }
 
+// MARK: - CKDiscoverUserIdentitiesOperation
+
+extension OPRCKOperation where T: CKDiscoverUserIdentitiesOperationType, T: AssociatedErrorType, T.Error: CloudKitErrorType {
+
+    public var userIdentityLookupInfos: [T.UserIdentityLookupInfo] {
+        get { return operation.userIdentityLookupInfos }
+        set { operation.userIdentityLookupInfos = newValue }
+    }
+
+    public var userIdentityDiscoveredBlock: CloudKitOperation<T>.DiscoverUserIdentitiesUserIdentityDiscoveredBlock? {
+        get { return operation.userIdentityDiscoveredBlock }
+        set { operation.userIdentityDiscoveredBlock = newValue }
+    }
+
+    func setDiscoverUserIdentitiesCompletionBlock(block: CloudKitOperation<T>.DiscoverUserIdentitiesCompletionBlock) {
+        operation.discoverUserIdentitiesCompletionBlock = { [unowned self] error in
+            if let error = error {
+                self.addFatalError(CloudKitError(error: error))
+            }
+            else {
+                block()
+            }
+        }
+    }
+}
+
+extension CloudKitOperation where T: CKDiscoverUserIdentitiesOperationType {
+
+    /// A typealias for the block type used by CloudKitOperation<CKDiscoverUserIdentitiesOperationType>
+    public typealias DiscoverUserIdentitiesUserIdentityDiscoveredBlock = (T.UserIdentity, T.UserIdentityLookupInfo) -> Void
+
+    /// A typealias for the block type used by CloudKitOperation<CKDiscoverUserIdentitiesOperationType>
+    public typealias DiscoverUserIdentitiesCompletionBlock = () -> Void
+
+    /// - returns: the user identity lookup info used in discovery
+    public var userIdentityLookupInfos: [T.UserIdentityLookupInfo] {
+        get { return operation.userIdentityLookupInfos }
+        set {
+            operation.userIdentityLookupInfos = newValue
+            addConfigureBlock { $0.userIdentityLookupInfos = newValue }
+        }
+    }
+
+    /// - returns: the block used to return discovered user identities
+    var userIdentityDiscoveredBlock: DiscoverUserIdentitiesUserIdentityDiscoveredBlock? {
+        get { return operation.userIdentityDiscoveredBlock }
+        set {
+            operation.userIdentityDiscoveredBlock = newValue
+            addConfigureBlock { $0.userIdentityDiscoveredBlock = newValue }
+        }
+    }
+
+    /**
+     Before adding the CloudKitOperation instance to a queue, set a completion block
+     to collect the results in the successful case. Setting this completion block also
+     ensures that error handling gets triggered.
+
+     - parameter block: a DiscoverUserIdentitiesCompletionBlock block
+     */
+    public func setDiscoverUserIdentitiesCompletionBlock(block: DiscoverUserIdentitiesCompletionBlock) {
+        addConfigureBlock { $0.setDiscoverUserIdentitiesCompletionBlock(block) }
+    }
+}
+
 // MARK: - CKFetchNotificationChangesOperation
 
 public struct FetchNotificationChangesError<ServerChangeToken>: CloudKitErrorType {
