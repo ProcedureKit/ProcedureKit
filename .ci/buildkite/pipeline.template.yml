@@ -4,7 +4,7 @@ steps:
     command: .ci/scripts/lint
   -
     name: "ProcedureKit: macOS"
-    command: "source /usr/local/opt/chruby/share/chruby/chruby.sh && chruby ruby && bundle install --quiet && bundle exec fastlane mac test"
+    command: "source /usr/local/opt/chruby/share/chruby/chruby.sh && chruby ruby && bundle install --quiet && bundle exec scan --project ProcedureKit.xcodeproj --scheme ProcedureKit --destination \"platform=macOS\" clean build test"
     agents:
       swift: "3.0"
   -
