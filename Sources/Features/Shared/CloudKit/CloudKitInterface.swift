@@ -251,6 +251,22 @@ public protocol CKModifyBadgeOperationType: CKOperationType {
     var modifyBadgeCompletionBlock: ((NSError?) -> Void)? { get set }
 }
 
+/// A generic protocol which exposes the properties used by Apple's CKFetchDatabaseChangesOperationType.
+public protocol CKFetchDatabaseChangesOperationType: CKDatabaseOperationType, CKFetchAllChanges, CKPreviousServerChangeToken, CKResultsLimit {
+
+    /// - returns: a block for when a the changeToken is updated
+    var changeTokenUpdatedBlock: ((ServerChangeToken) -> Void)? { get set }
+
+    /// - returns: a block for when a recordZone was changed
+    var recordZoneWithIDChangedBlock: ((RecordZoneID) -> Void)? { get set }
+
+    /// - returns: a block for when a recordZone was deleted
+    var recordZoneWithIDWasDeletedBlock: ((RecordZoneID) -> Void)? { get set }
+
+    /// - returns: the completion for fetching database changes
+    var fetchDatabaseChangesCompletionBlock: ((ServerChangeToken?, Bool, NSError?) -> Void)? { get set }
+}
+
 /// A generic protocol which exposes the properties used by Apple's CKFetchRecordChangesOperation.
 public protocol CKFetchRecordChangesOperationType: CKDatabaseOperationType, CKFetchOperationType, CKDesiredKeys {
 
@@ -530,6 +546,13 @@ extension CKModifyBadgeOperation: CKModifyBadgeOperationType, AssociatedErrorTyp
 
     // The associated error type
     public typealias Error = CloudKitError
+}
+
+@available(iOS 10.0, OSX 10.12, tvOS 10.0, watchOS 3.0, *)
+extension CKFetchDatabaseChangesOperation: CKFetchDatabaseChangesOperationType, AssociatedErrorType {
+
+    // The associated error type
+    public typealias Error = FetchDatabaseChangesError<ServerChangeToken>
 }
 
 extension CKFetchRecordChangesOperation: CKFetchRecordChangesOperationType, AssociatedErrorType {

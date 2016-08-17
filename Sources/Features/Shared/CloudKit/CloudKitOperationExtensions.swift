@@ -921,6 +921,103 @@ extension CloudKitOperation where T: CKModifyBadgeOperationType {
     }
 }
 
+// MARK: - CKFetchDatabaseChangesOperation (iOS 10+, macOS 10.12+, tvOS 10.0+, watchOS 3.0+)
+
+public struct FetchDatabaseChangesError<ServerChangeToken>: CloudKitErrorType {
+
+    public let underlyingError: NSError
+    public let token: ServerChangeToken?
+    public let moreComing: Bool
+
+    init(error: NSError, token: ServerChangeToken?, moreComing: Bool) {
+        self.underlyingError = error
+        self.token = token
+        self.moreComing = moreComing
+    }
+}
+
+extension OPRCKOperation where T: CKFetchDatabaseChangesOperationType, T: AssociatedErrorType, T.Error: CloudKitErrorType {
+
+    public var recordZoneWithIDChangedBlock: CloudKitOperation<T>.FetchDatabaseChangesRecordZoneWithIDChangedBlock? {
+        get { return operation.recordZoneWithIDChangedBlock }
+        set { operation.recordZoneWithIDChangedBlock = newValue }
+    }
+
+    public var recordZoneWithIDWasDeletedBlock: CloudKitOperation<T>.FetchDatabaseChangesRecordZoneWithIDWasDeletedBlock? {
+        get { return operation.recordZoneWithIDWasDeletedBlock }
+        set { operation.recordZoneWithIDWasDeletedBlock = newValue }
+    }
+
+    public var changeTokenUpdatedBlock: CloudKitOperation<T>.FetchDatabaseChangesChangeTokenUpdatedBlock? {
+        get { return operation.changeTokenUpdatedBlock }
+        set { operation.changeTokenUpdatedBlock = newValue }
+    }
+
+    func setFetchDatabaseChangesCompletionBlock(block: CloudKitOperation<T>.FetchDatabaseChangesCompletionBlock) {
+        operation.fetchDatabaseChangesCompletionBlock = { [unowned self] (serverChangeToken, moreComing, error) in
+            if let error = error {
+                self.addFatalError(FetchDatabaseChangesError(error: error, token: serverChangeToken, moreComing: moreComing))
+            }
+            else {
+                block(serverChangeToken: serverChangeToken, moreComing: moreComing)
+            }
+        }
+    }
+}
+
+extension CloudKitOperation where T: CKFetchDatabaseChangesOperationType {
+
+    /// A typealias for the block types used by CloudKitOperation<CKFetchDatabaseChangesOperationType>
+    public typealias FetchDatabaseChangesRecordZoneWithIDChangedBlock = (T.RecordZoneID) -> Void
+
+    /// A typealias for the block types used by CloudKitOperation<CKFetchDatabaseChangesOperationType>
+    public typealias FetchDatabaseChangesRecordZoneWithIDWasDeletedBlock = (T.RecordZoneID) -> Void
+
+    /// A typealias for the block types used by CloudKitOperation<CKFetchDatabaseChangesOperationType>
+    public typealias FetchDatabaseChangesChangeTokenUpdatedBlock = (T.ServerChangeToken) -> Void
+
+    /// A typealias for the block types used by CloudKitOperation<CKFetchDatabaseChangesOperationType>
+    public typealias FetchDatabaseChangesCompletionBlock = (serverChangeToken: T.ServerChangeToken?, moreComing: Bool) -> Void
+
+    /// - returns: a block for when a record is changed
+    var recordZoneWithIDChangedBlock: FetchDatabaseChangesRecordZoneWithIDChangedBlock? {
+        get { return operation.recordZoneWithIDChangedBlock }
+        set {
+            operation.recordZoneWithIDChangedBlock = newValue
+            addConfigureBlock { $0.recordZoneWithIDChangedBlock = newValue }
+        }
+    }
+
+    /// - returns: a block for when a recordID is deleted (receives the recordID and the recordType)
+    var recordZoneWithIDWasDeletedBlock: FetchDatabaseChangesRecordZoneWithIDWasDeletedBlock? {
+        get { return operation.recordZoneWithIDWasDeletedBlock }
+        set {
+            operation.recordZoneWithIDWasDeletedBlock = newValue
+            addConfigureBlock { $0.recordZoneWithIDWasDeletedBlock = newValue }
+        }
+    }
+
+    /// - returns: a block for when a recordZone changeToken update is sent
+    var changeTokenUpdatedBlock: FetchDatabaseChangesChangeTokenUpdatedBlock? {
+        get { return operation.changeTokenUpdatedBlock }
+        set {
+            operation.changeTokenUpdatedBlock = newValue
+            addConfigureBlock { $0.changeTokenUpdatedBlock = newValue }
+        }
+    }
+
+    /**
+     Before adding the CloudKitOperation instance to a queue, set a completion block
+     to collect the results in the successful case. Setting this completion block also
+     ensures that error handling gets triggered.
+
+     - parameter block: a FetchDatabaseChangesCompletionBlock block
+     */
+    public func setFetchDatabaseChangesCompletionBlock(block: FetchDatabaseChangesCompletionBlock) {
+        addConfigureBlock { $0.setFetchDatabaseChangesCompletionBlock(block) }
+    }
+}
+
 // MARK: - CKFetchRecordChangesOperation
 
 public struct FetchRecordChangesError<ServerChangeToken>: CloudKitErrorType {
