@@ -356,6 +356,19 @@ public protocol CKFetchShareMetadataOperationType: CKOperationType {
     var fetchShareMetadataCompletionBlock: ((NSError?) -> Void)? { get set }
 }
 
+/// A generic protocol which exposes the properties used by Apple's CKFetchShareParticipantsOperation.
+public protocol CKFetchShareParticipantsOperationType: CKOperationType {
+
+    /// - returns: the user identity lookup infos
+    var userIdentityLookupInfos: [UserIdentityLookupInfo] { get set }
+
+    /// - returns: the share participant fetched block
+    var shareParticipantFetchedBlock: ((ShareParticipant) -> Void)? { get set }
+
+    /// - returns: the fetch share participants completion block
+    var fetchShareParticipantsCompletionBlock: ((NSError?) -> Void)? { get set }
+}
+
 /// A generic protocol which exposes the properties used by Apple's CKFetchSubscriptionsOperation.
 public protocol CKFetchSubscriptionsOperationType: CKDatabaseOperationType {
 
@@ -632,6 +645,13 @@ extension CKFetchRecordZoneChangesOperation: CKFetchRecordZoneChangesOperationTy
 
 @available(iOS 10.0, OSX 10.12, tvOS 10.0, watchOS 3.0, *)
 extension CKFetchShareMetadataOperation: CKFetchShareMetadataOperationType, AssociatedErrorType {
+
+    // The associated error type
+    public typealias Error = CloudKitError
+}
+
+@available(iOS 10.0, OSX 10.12, tvOS 10.0, watchOS 3.0, *)
+extension CKFetchShareParticipantsOperation: CKFetchShareParticipantsOperationType, AssociatedErrorType {
 
     // The associated error type
     public typealias Error = CloudKitError

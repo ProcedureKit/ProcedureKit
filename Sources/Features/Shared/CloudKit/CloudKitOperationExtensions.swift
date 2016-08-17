@@ -1525,6 +1525,70 @@ extension CloudKitOperation where T: CKFetchShareMetadataOperationType {
     }
 }
 
+// MARK: - CKFetchShareParticipantsOperation
+
+extension OPRCKOperation where T: CKFetchShareParticipantsOperationType, T: AssociatedErrorType, T.Error: CloudKitErrorType {
+
+    public var userIdentityLookupInfos: [T.UserIdentityLookupInfo] {
+        get { return operation.userIdentityLookupInfos }
+        set { operation.userIdentityLookupInfos = newValue }
+    }
+
+    public var shareParticipantFetchedBlock: CloudKitOperation<T>.FetchShareParticipantsParticipantFetchedBlock? {
+        get { return operation.shareParticipantFetchedBlock }
+        set { operation.shareParticipantFetchedBlock = newValue }
+    }
+
+    func setFetchShareParticipantsCompletionBlock(block: CloudKitOperation<T>.FetchShareParticipantsCompletionBlock) {
+        operation.fetchShareParticipantsCompletionBlock = { [unowned self] error in
+            if let error = error {
+                self.addFatalError(CloudKitError(error: error))
+            }
+            else {
+                block()
+            }
+        }
+    }
+}
+
+extension CloudKitOperation where T: CKFetchShareParticipantsOperationType {
+
+    /// A typealias for the block types used by CloudKitOperation<CKFetchShareMetadataOperationType>
+    public typealias FetchShareParticipantsParticipantFetchedBlock = (T.ShareParticipant) -> Void
+
+    /// A typealias for the block types used by CloudKitOperation<CKFetchShareMetadataOperationType>
+    public typealias FetchShareParticipantsCompletionBlock = (Void) -> Void
+
+    /// - returns: the user identity lookup infos
+    public var userIdentityLookupInfos: [T.UserIdentityLookupInfo] {
+        get { return operation.userIdentityLookupInfos }
+        set {
+            operation.userIdentityLookupInfos = newValue
+            addConfigureBlock { $0.userIdentityLookupInfos = newValue }
+        }
+    }
+
+    /// - returns: the share participant fetched block
+    var shareParticipantFetchedBlock: FetchShareParticipantsParticipantFetchedBlock? {
+        get { return operation.shareParticipantFetchedBlock }
+        set {
+            operation.shareParticipantFetchedBlock = newValue
+            addConfigureBlock { $0.shareParticipantFetchedBlock = newValue }
+        }
+    }
+
+    /**
+     Before adding the CloudKitOperation instance to a queue, set a completion block
+     to collect the results in the successful case. Setting this completion block also
+     ensures that error handling gets triggered.
+
+     - parameter block: a FetchShareParticipantsCompletionBlock block
+     */
+    public func setFetchShareParticipantsCompletionBlock(block: FetchShareParticipantsCompletionBlock) {
+        addConfigureBlock { $0.setFetchShareParticipantsCompletionBlock(block) }
+    }
+}
+
 // MARK: - CKFetchSubscriptionsOperation
 
 public struct FetchSubscriptionsError<Subscription>: CloudKitErrorType {
