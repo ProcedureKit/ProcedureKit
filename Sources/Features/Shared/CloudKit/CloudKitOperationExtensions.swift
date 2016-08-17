@@ -1433,6 +1433,98 @@ extension CloudKitOperation where T: CKFetchRecordZoneChangesOperationType {
     }
 }
 
+// MARK: - CKFetchShareMetadataOperation
+
+extension OPRCKOperation where T: CKFetchShareMetadataOperationType, T: AssociatedErrorType, T.Error: CloudKitErrorType {
+
+    public var shareURLs: [NSURL] {
+        get { return operation.shareURLs }
+        set { operation.shareURLs = newValue }
+    }
+
+    public var shouldFetchRootRecord: Bool {
+        get { return operation.shouldFetchRootRecord }
+        set { operation.shouldFetchRootRecord = newValue }
+    }
+
+    public var rootRecordDesiredKeys: [String]? {
+        get { return operation.rootRecordDesiredKeys }
+        set { operation.rootRecordDesiredKeys = newValue }
+    }
+
+    public var perShareMetadataBlock: CloudKitOperation<T>.FetchShareMetadataPerShareMetadataBlock? {
+        get { return operation.perShareMetadataBlock }
+        set { operation.perShareMetadataBlock = newValue }
+    }
+
+    func setFetchShareMetadataCompletionBlock(block: CloudKitOperation<T>.FetchShareMetadataCompletionBlock) {
+        operation.fetchShareMetadataCompletionBlock = { [unowned self] error in
+            if let error = error {
+                self.addFatalError(CloudKitError(error: error))
+            }
+            else {
+                block()
+            }
+        }
+    }
+}
+
+extension CloudKitOperation where T: CKFetchShareMetadataOperationType {
+
+    /// A typealias for the block types used by CloudKitOperation<CKFetchShareMetadataOperationType>
+    public typealias FetchShareMetadataPerShareMetadataBlock = (NSURL, T.ShareMetadata?, NSError?) -> Void
+
+    /// A typealias for the block types used by CloudKitOperation<CKFetchShareMetadataOperationType>
+    public typealias FetchShareMetadataCompletionBlock = (Void) -> Void
+
+    /// - returns: the share URLs
+    public var shareURLs: [NSURL] {
+        get { return operation.shareURLs }
+        set {
+            operation.shareURLs = newValue
+            addConfigureBlock { $0.shareURLs = newValue }
+        }
+    }
+
+    /// - returns: whether to fetch the share root record
+    var shouldFetchRootRecord: Bool {
+        get { return operation.shouldFetchRootRecord }
+        set {
+            operation.shouldFetchRootRecord = newValue
+            addConfigureBlock { $0.shouldFetchRootRecord = newValue }
+        }
+    }
+
+    /// - returns: the share root record desired keys
+    var rootRecordDesiredKeys: [String]? {
+        get { return operation.rootRecordDesiredKeys }
+        set {
+            operation.rootRecordDesiredKeys = newValue
+            addConfigureBlock { $0.rootRecordDesiredKeys = newValue }
+        }
+    }
+
+    /// - returns: the per share metadata block
+    var perShareMetadataBlock: FetchShareMetadataPerShareMetadataBlock? {
+        get { return operation.perShareMetadataBlock }
+        set {
+            operation.perShareMetadataBlock = newValue
+            addConfigureBlock { $0.perShareMetadataBlock = newValue }
+        }
+    }
+
+    /**
+     Before adding the CloudKitOperation instance to a queue, set a completion block
+     to collect the results in the successful case. Setting this completion block also
+     ensures that error handling gets triggered.
+
+     - parameter block: a FetchShareMetadataCompletionBlock block
+     */
+    public func setFetchShareMetadataCompletionBlock(block: FetchShareMetadataCompletionBlock) {
+        addConfigureBlock { $0.setFetchShareMetadataCompletionBlock(block) }
+    }
+}
+
 // MARK: - CKFetchSubscriptionsOperation
 
 public struct FetchSubscriptionsError<Subscription>: CloudKitErrorType {

@@ -337,6 +337,25 @@ public protocol CKFetchRecordZoneChangesOperationType: CKDatabaseOperationType, 
     var fetchRecordZoneChangesCompletionBlock: ((NSError?) -> Void)? { get set }
 }
 
+/// A generic protocol which exposes the properties used by Apple's CKFetchShareMetadataOperation.
+public protocol CKFetchShareMetadataOperationType: CKOperationType {
+
+    /// - returns: the share URLs
+    var shareURLs: [NSURL] { get set }
+
+    /// - returns: whether to fetch the share root record
+    var shouldFetchRootRecord: Bool { get set }
+
+    /// - returns: the share root record desired keys
+    var rootRecordDesiredKeys: [String]? { get set }
+
+    /// - returns: the per share metadata block
+    var perShareMetadataBlock: ((NSURL, ShareMetadata?, NSError?) -> Void)? { get set }
+
+    /// - returns: the fetch share metadata completion block
+    var fetchShareMetadataCompletionBlock: ((NSError?) -> Void)? { get set }
+}
+
 /// A generic protocol which exposes the properties used by Apple's CKFetchSubscriptionsOperation.
 public protocol CKFetchSubscriptionsOperationType: CKDatabaseOperationType {
 
@@ -609,6 +628,13 @@ extension CKFetchRecordZoneChangesOperation: CKFetchRecordZoneChangesOperationTy
 
     /// The type of the CloudKit FetchRecordZoneChangesOptions
     public typealias FetchRecordZoneChangesOptions = CKFetchRecordZoneChangesOptions
+}
+
+@available(iOS 10.0, OSX 10.12, tvOS 10.0, watchOS 3.0, *)
+extension CKFetchShareMetadataOperation: CKFetchShareMetadataOperationType, AssociatedErrorType {
+
+    // The associated error type
+    public typealias Error = CloudKitError
 }
 
 extension CKFetchSubscriptionsOperation: CKFetchSubscriptionsOperationType, AssociatedErrorType {
