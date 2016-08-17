@@ -215,6 +215,7 @@ platform :mac do
     scan(
       project: "ProcedureKit.xcodeproj",
       scheme: "ProcedureKit",
+      clean: true,
       device: "My Mac"
     )
 
