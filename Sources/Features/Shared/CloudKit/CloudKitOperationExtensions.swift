@@ -557,6 +557,56 @@ extension CloudKitOperation where T: CKDiscoverAllContactsOperationType {
     }
 }
 
+// MARK: - CKDiscoverAllUserIdentitiesOperation
+
+extension OPRCKOperation where T: CKDiscoverAllUserIdentitiesOperationType, T: AssociatedErrorType, T.Error: CloudKitErrorType {
+
+    public var userIdentityDiscoveredBlock: CloudKitOperation<T>.DiscoverAllUserIdentitiesUserIdentityDiscoveredBlock? {
+        get { return operation.userIdentityDiscoveredBlock }
+        set { operation.userIdentityDiscoveredBlock = newValue }
+    }
+
+    func setDiscoverAllUserIdentitiesCompletionBlock(block: CloudKitOperation<T>.DiscoverAllUserIdentitiesCompletionBlock) {
+        operation.discoverAllUserIdentitiesCompletionBlock = { [unowned self] error in
+            if let error = error {
+                self.addFatalError(CloudKitError(error: error))
+            }
+            else {
+                block()
+            }
+        }
+    }
+}
+
+extension CloudKitOperation where T: CKDiscoverAllUserIdentitiesOperationType {
+
+    /// A typealias for the block type used by CloudKitOperation<CKDiscoverAllUserIdentitiesOperationType>
+    public typealias DiscoverAllUserIdentitiesUserIdentityDiscoveredBlock = (T.UserIdentity) -> Void
+
+    /// A typealias for the block type used by CloudKitOperation<CKDiscoverAllUserIdentitiesOperationType>
+    public typealias DiscoverAllUserIdentitiesCompletionBlock = () -> Void
+
+    /// - returns: a block for when a recordZone changeToken update is sent
+    var userIdentityDiscoveredBlock: DiscoverAllUserIdentitiesUserIdentityDiscoveredBlock? {
+        get { return operation.userIdentityDiscoveredBlock }
+        set {
+            operation.userIdentityDiscoveredBlock = newValue
+            addConfigureBlock { $0.userIdentityDiscoveredBlock = newValue }
+        }
+    }
+
+    /**
+     Before adding the CloudKitOperation instance to a queue, set a completion block
+     to collect the results in the successful case. Setting this completion block also
+     ensures that error handling gets triggered.
+
+     - parameter block: a DiscoverAllContactsCompletionBlock block
+     */
+    public func setDiscoverAllUserIdentitiesCompletionBlock(block: DiscoverAllUserIdentitiesCompletionBlock) {
+        addConfigureBlock { $0.setDiscoverAllUserIdentitiesCompletionBlock(block) }
+    }
+}
+
 // MARK: - CKDiscoverUserInfosOperation
 
 extension OPRCKOperation where T: CKDiscoverUserInfosOperationType, T: AssociatedErrorType, T.Error: CloudKitErrorType {
