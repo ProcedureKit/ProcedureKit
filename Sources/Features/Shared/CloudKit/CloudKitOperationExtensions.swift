@@ -326,6 +326,40 @@ extension BatchedCloudKitOperation where T: CKMoreComing {
     }
 }
 
+// MARK: - CKFetchAllChanges
+
+extension OPRCKOperation where T: CKFetchAllChanges {
+
+    public var fetchAllChanges: Bool {
+        get { return operation.fetchAllChanges }
+        set { operation.fetchAllChanges = newValue }
+    }
+}
+
+extension CloudKitOperation where T: CKFetchAllChanges {
+
+    /// - returns: the previous server change token
+    public var fetchAllChanges: Bool {
+        get { return operation.fetchAllChanges }
+        set {
+            operation.fetchAllChanges = newValue
+            addConfigureBlock { $0.fetchAllChanges = newValue }
+        }
+    }
+}
+
+extension BatchedCloudKitOperation where T: CKFetchAllChanges {
+
+    /// - returns: the previous server change token
+    public var fetchAllChanges: Bool {
+        get { return operation.fetchAllChanges }
+        set {
+            operation.fetchAllChanges = newValue
+            addConfigureBlock { $0.fetchAllChanges = newValue }
+        }
+    }
+}
+
 // MARK: - CKDesiredKeys
 
 extension OPRCKOperation where T: CKDesiredKeys {

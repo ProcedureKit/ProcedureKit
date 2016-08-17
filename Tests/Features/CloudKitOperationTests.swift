@@ -55,6 +55,10 @@ class TestDatabaseOperation: TestCloudOperation, CKDatabaseOperationType, CKPrev
     var desiredKeys: [String]? = .None
 }
 
+class TestFetchAllChangesOperation: TestCloudOperation, CKFetchAllChanges {
+    var fetchAllChanges: Bool = true
+}
+
 class TestDiscoverAllContactsOperation: TestCloudOperation, CKDiscoverAllContactsOperationType, AssociatedErrorType {
     typealias Error = DiscoverAllContactsError<DiscoveredUserInfo>
 
@@ -592,6 +596,45 @@ class OPRCKDatabaseOperationTests: CKTests {
         operation.desiredKeys = keys
         XCTAssertNotNil(target.desiredKeys)
         XCTAssertEqual(target.desiredKeys!, keys)
+    }
+}
+
+class OPRCKFetchAllChangesTests: CKTests {
+    
+    var target: TestFetchAllChangesOperation!
+    var operation: OPRCKOperation<TestFetchAllChangesOperation>!
+    
+    override func setUp() {
+        super.setUp()
+        target = TestFetchAllChangesOperation()
+        operation = OPRCKOperation(operation: target)
+    }
+    
+    func test__get_fetch_all_changes() {
+        var fetchAllChanges = false
+        target.fetchAllChanges = fetchAllChanges
+        XCTAssertEqual(operation.fetchAllChanges, fetchAllChanges)
+        fetchAllChanges = true
+        target.fetchAllChanges = fetchAllChanges
+        XCTAssertEqual(operation.fetchAllChanges, fetchAllChanges)
+    }
+    
+    func test__set_fetch_all_changes() {
+        var fetchAllChanges = false
+        operation.fetchAllChanges = fetchAllChanges
+        XCTAssertEqual(target.fetchAllChanges, fetchAllChanges)
+        fetchAllChanges = true
+        operation.fetchAllChanges = fetchAllChanges
+        XCTAssertEqual(target.fetchAllChanges, fetchAllChanges)
+    }
+    
+    func test__set_get_fetch_all_changes() {
+        var fetchAllChanges = false
+        operation.fetchAllChanges = fetchAllChanges
+        XCTAssertEqual(operation.fetchAllChanges, fetchAllChanges)
+        fetchAllChanges = true
+        operation.fetchAllChanges = fetchAllChanges
+        XCTAssertEqual(operation.fetchAllChanges, fetchAllChanges)
     }
 }
 

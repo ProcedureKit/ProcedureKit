@@ -145,6 +145,13 @@ public protocol CKMoreComing: CKOperationType {
     var moreComing: Bool { get }
 }
 
+/// A generic protocol which exposes the properties used by Apple's CloudKit Operation's which have a flag to fetch all changes.
+public protocol CKFetchAllChanges: CKOperationType {
+
+    /// - returns: whether there are more results on the server
+    var fetchAllChanges: Bool { get set }
+}
+
 /// A generic protocol which exposes the properties used by Apple's CloudKit Operation's which have desired keys.
 public protocol CKDesiredKeys: CKOperationType {
 
