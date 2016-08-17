@@ -449,6 +449,70 @@ public extension CloudKitOperation where T: BatchModifyOperationType {
     }
 }
 
+// MARK: - CKAcceptSharesOperation
+
+extension OPRCKOperation where T: CKAcceptSharesOperationType, T: AssociatedErrorType, T.Error: CloudKitErrorType {
+
+    public var shareMetadatas: [T.ShareMetadata] {
+        get { return operation.shareMetadatas }
+        set { operation.shareMetadatas = newValue }
+    }
+
+    public var perShareCompletionBlock: CloudKitOperation<T>.AcceptSharesPerShareCompletionBlock? {
+        get { return operation.perShareCompletionBlock }
+        set { operation.perShareCompletionBlock = newValue }
+    }
+
+    func setAcceptSharesCompletionBlock(block: CloudKitOperation<T>.AcceptSharesCompletionBlock) {
+        operation.acceptSharesCompletionBlock = { [unowned self] error in
+            if let error = error {
+                self.addFatalError(CloudKitError(error: error))
+            }
+            else {
+                block()
+            }
+        }
+    }
+}
+
+extension CloudKitOperation where T: CKAcceptSharesOperationType {
+
+    /// A typealias for the block type used by CloudKitOperation<CKAcceptSharesOperationType>
+    public typealias AcceptSharesPerShareCompletionBlock = (T.ShareMetadata, T.Share?, NSError?) -> Void
+
+    /// A typealias for the block type used by CloudKitOperation<CKAcceptSharesOperationType>
+    public typealias AcceptSharesCompletionBlock = () -> Void
+
+    /// - returns: the share metadatas
+    var shareMetadatas: [T.ShareMetadata] {
+        get { return operation.shareMetadatas }
+        set {
+            operation.shareMetadatas = newValue
+            addConfigureBlock { $0.shareMetadatas = newValue }
+        }
+    }
+
+    /// - returns: the block used to return accepted shares
+    var perShareCompletionBlock: AcceptSharesPerShareCompletionBlock? {
+        get { return operation.perShareCompletionBlock }
+        set {
+            operation.perShareCompletionBlock = newValue
+            addConfigureBlock { $0.perShareCompletionBlock = newValue }
+        }
+    }
+
+    /**
+     Before adding the CloudKitOperation instance to a queue, set a completion block
+     to collect the results in the successful case. Setting this completion block also
+     ensures that error handling gets triggered.
+
+     - parameter block: an AcceptSharesCompletionBlock block
+     */
+    public func setAcceptSharesCompletionBlock(block: AcceptSharesCompletionBlock) {
+        addConfigureBlock { $0.setAcceptSharesCompletionBlock(block) }
+    }
+}
+
 // MARK: - CKDiscoverAllContactsOperation
 
 public struct DiscoverAllContactsError<DiscoveredUserInfo>: CloudKitErrorType {

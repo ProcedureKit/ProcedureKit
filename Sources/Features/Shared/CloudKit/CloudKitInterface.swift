@@ -172,6 +172,19 @@ public protocol CKDiscoverAllContactsOperationType: CKOperationType {
     var discoverAllContactsCompletionBlock: (([DiscoveredUserInfo]?, NSError?) -> Void)? { get set }
 }
 
+/// A generic protocol which exposes the properties used by Apple's CKAcceptSharesOperation.
+public protocol CKAcceptSharesOperationType: CKOperationType {
+
+    /// - returns: the share metadatas
+    var shareMetadatas: [ShareMetadata] { get set }
+
+    /// - returns: the block used to return accepted shares
+    var perShareCompletionBlock: ((ShareMetadata, Share?, NSError?) -> Void)? { get set }
+
+    /// - returns: the completion block used for accepting shares
+    var acceptSharesCompletionBlock: ((NSError?) -> Void)? { get set }
+}
+
 /// A generic protocol which exposes the properties used by Apple's CKDiscoverUserInfosOperation.
 public protocol CKDiscoverUserInfosOperationType: CKOperationType {
 
@@ -435,6 +448,13 @@ extension CKDatabaseOperation: CKDatabaseOperationType {
 
     /// The Database is a CKDatabase
     public typealias Database = CKDatabase
+}
+
+@available(iOS 10.0, OSX 10.12, tvOS 10.0, watchOS 3.0, *)
+extension CKAcceptSharesOperation: CKAcceptSharesOperationType, AssociatedErrorType {
+
+    // The associated error type
+    public typealias Error = CloudKitError
 }
 
 /// Extension to have CKDiscoverAllContactsOperation conform to CKDiscoverAllContactsOperationType
