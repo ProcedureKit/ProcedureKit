@@ -26,7 +26,25 @@ class TestCloudOperation: NSOperation, CKOperationType {
     typealias Query = String
     typealias QueryCursor = String
 
+    typealias UserIdentity = String
+    typealias UserIdentityLookupInfo = String
+    typealias Share = String
+    typealias ShareMetadata = String
+    typealias ShareParticipant = String
+
     var container: String? // just a test
+    var allowsCellularAccess: Bool = true
+    
+    //@available(iOS 9.3, tvOS 9.3, OSX 10.12, watchOS 2.3, *)
+    var operationID: String = ""
+    var longLived: Bool = false
+    
+    typealias CKOperationLongLivedOperationWasPersistedBlock = () -> Void
+    var longLivedOperationWasPersistedBlock: CKOperationLongLivedOperationWasPersistedBlock = { }
+    
+    //@available(iOS 10.0, tvOS 10.0, OSX 10.12, watchOS 3.0, *)
+    var timeoutIntervalForRequest: NSTimeInterval = 0
+    var timeoutIntervalForResource: NSTimeInterval = 0
 }
 
 class TestDatabaseOperation: TestCloudOperation, CKDatabaseOperationType, CKPreviousServerChangeToken, CKResultsLimit, CKMoreComing, CKDesiredKeys {
@@ -360,6 +378,7 @@ class OPRCKOperationTests: CKTests {
         operation = OPRCKOperation(operation: target)
     }
 
+    // .container
     func test__get_container() {
         let container = "I'm a test container!"
         target.container = container
@@ -378,6 +397,129 @@ class OPRCKOperationTests: CKTests {
         XCTAssertEqual(operation.container, container)
     }
 
+    // .allowsCellularAccess
+    func test__get_allowsCellularAccess() {
+        let allowsCellularAccess = true
+        target.allowsCellularAccess = allowsCellularAccess
+        XCTAssertEqual(operation.allowsCellularAccess, allowsCellularAccess)
+    }
+    
+    func test__set_allowsCellularAccess() {
+        let allowsCellularAccess = true
+        operation.allowsCellularAccess = allowsCellularAccess
+        XCTAssertEqual(target.allowsCellularAccess, allowsCellularAccess)
+    }
+    
+    func test__set_get_allowsCellularAccess() {
+        let allowsCellularAccess = true
+        operation.allowsCellularAccess = allowsCellularAccess
+        XCTAssertEqual(operation.allowsCellularAccess, allowsCellularAccess)
+    }
+    
+    // .operationID
+    @available(iOS 9.3, tvOS 9.3, OSX 10.12, watchOS 2.3, *)
+    func test__get_operationID() {
+        let operationID = "testOperationID"
+        target.operationID = operationID
+        XCTAssertEqual(operation.operationID, operationID)
+    }
+    
+    // .longLived
+    @available(iOS 9.3, tvOS 9.3, OSX 10.12, watchOS 2.3, *)
+    func test__get_longLived() {
+        let longLived = true
+        target.longLived = longLived
+        XCTAssertEqual(operation.longLived, longLived)
+    }
+    
+    @available(iOS 9.3, tvOS 9.3, OSX 10.12, watchOS 2.3, *)
+    func test__set_longLived() {
+        let longLived = true
+        operation.longLived = longLived
+        XCTAssertEqual(target.longLived, longLived)
+    }
+    
+    @available(iOS 9.3, tvOS 9.3, OSX 10.12, watchOS 2.3, *)
+    func test__set_get_longLived() {
+        let longLived = true
+        operation.longLived = longLived
+        XCTAssertEqual(operation.longLived, longLived)
+    }
+    
+    #if swift(>=3.0) // TEMPORARY FIX: Swift 2.3 compiler crash (see: CloudKitInterface.swift)
+        // .longLivedOperationWasPersistedBlock
+        @available(iOS 9.3, tvOS 9.3, OSX 10.12, watchOS 2.3, *)
+        func test__get_longLivedOperationWasPersistedBlock() {
+            var setByBlock = false
+            let block: CKOperationLongLivedOperationWasPersistedBlock = { setByBlock = true }
+            target.longLived = block
+            operation.longLivedOperationWasPersistedBlock()
+            XCTAssertTrue(setByBlock)
+        }
+        
+        @available(iOS 9.3, tvOS 9.3, OSX 10.12, watchOS 2.3, *)
+        func test__set_longLivedOperationWasPersistedBlock() {
+            var setByBlock = false
+            let block: CKOperationLongLivedOperationWasPersistedBlock = { setByBlock = true }
+            operation.longLived = block
+            target.longLivedOperationWasPersistedBlock()
+            XCTAssertTrue(setByBlock)
+        }
+    
+        @available(iOS 9.3, tvOS 9.3, OSX 10.12, watchOS 2.3, *)
+        func test__set_get_longLivedOperationWasPersistedBlock() {
+            var setByBlock = false
+            let block: CKOperationLongLivedOperationWasPersistedBlock = { setByBlock = true }
+            operation.longLived = block
+            operation.longLivedOperationWasPersistedBlock()
+            XCTAssertTrue(setByBlock)
+        }
+    #endif
+    
+    // .timeoutIntervalForRequest
+    @available(iOS 10.0, tvOS 10.0, OSX 10.12, watchOS 3.0, *)
+    func test__get_timeoutIntervalForRequest() {
+        let timeoutIntervalForRequest: NSTimeInterval = 42
+        target.timeoutIntervalForRequest = timeoutIntervalForRequest
+        XCTAssertEqual(operation.timeoutIntervalForRequest, timeoutIntervalForRequest)
+    }
+    
+    @available(iOS 10.0, tvOS 10.0, OSX 10.12, watchOS 3.0, *)
+    func test__set_timeoutIntervalForRequest() {
+        let timeoutIntervalForRequest: NSTimeInterval = 42
+        operation.timeoutIntervalForRequest = timeoutIntervalForRequest
+        XCTAssertEqual(target.timeoutIntervalForRequest, timeoutIntervalForRequest)
+    }
+    
+    @available(iOS 10.0, tvOS 10.0, OSX 10.12, watchOS 3.0, *)
+    func test__set_get_timeoutIntervalForRequest() {
+        let timeoutIntervalForRequest: NSTimeInterval = 42
+        operation.timeoutIntervalForRequest = timeoutIntervalForRequest
+        XCTAssertEqual(operation.timeoutIntervalForRequest, timeoutIntervalForRequest)
+    }
+    
+    // .timeoutIntervalForResource
+    @available(iOS 10.0, tvOS 10.0, OSX 10.12, watchOS 3.0, *)
+    func test__get_timeoutIntervalForResource() {
+        let timeoutIntervalForResource: NSTimeInterval = 42
+        target.timeoutIntervalForResource = timeoutIntervalForResource
+        XCTAssertEqual(operation.timeoutIntervalForResource, timeoutIntervalForResource)
+    }
+    
+    @available(iOS 10.0, tvOS 10.0, OSX 10.12, watchOS 3.0, *)
+    func test__set_timeoutIntervalForResource() {
+        let timeoutIntervalForResource: NSTimeInterval = 42
+        operation.timeoutIntervalForResource = timeoutIntervalForResource
+        XCTAssertEqual(target.timeoutIntervalForResource, timeoutIntervalForResource)
+    }
+    
+    @available(iOS 10.0, tvOS 10.0, OSX 10.12, watchOS 3.0, *)
+    func test__set_get_timeoutIntervalForResource() {
+        let timeoutIntervalForResource: NSTimeInterval = 42
+        operation.timeoutIntervalForResource = timeoutIntervalForResource
+        XCTAssertEqual(operation.timeoutIntervalForResource, timeoutIntervalForResource)
+    }
+    
     func test__timeout() {
         XCTAssertEqual(timeoutObserver?.timeout ?? 0, 300)
 

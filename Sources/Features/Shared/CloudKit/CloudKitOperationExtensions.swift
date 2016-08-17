@@ -19,6 +19,42 @@ extension OPRCKOperation where T: CKOperationType {
         get { return operation.container }
         set { operation.container = newValue }
     }
+
+    var allowsCellularAccess: Bool {
+        get { return operation.allowsCellularAccess }
+        set { operation.allowsCellularAccess = newValue }
+    }
+
+    @available(iOS 9.3, tvOS 9.3, OSX 10.12, watchOS 2.3, *)
+    var operationID: String {
+        get { return operation.operationID }
+    }
+
+    @available(iOS 9.3, tvOS 9.3, OSX 10.12, watchOS 2.3, *)
+    var longLived: Bool {
+        get { return operation.longLived }
+        set { operation.longLived = newValue }
+    }
+
+    #if swift(>=3.0) // TEMPORARY FIX: Swift 2.3 compiler crash (see: CloudKitInterface.swift)
+        @available(iOS 9.3, tvOS 9.3, OSX 10.12, watchOS 2.3, *)
+        var longLivedOperationWasPersistedBlock: () -> Swift.Void {
+            get { return operation.longLivedOperationWasPersistedBlock }
+            set { operation.longLivedOperationWasPersistedBlock = newValue }
+        }
+    #endif
+
+    @available(iOS 10.0, tvOS 10.0, OSX 10.12, watchOS 3.0, *)
+    var timeoutIntervalForRequest: NSTimeInterval  {
+        get { return operation.timeoutIntervalForRequest }
+        set { operation.timeoutIntervalForRequest = newValue }
+    }
+
+    @available(iOS 10.0, tvOS 10.0, OSX 10.12, watchOS 3.0, *)
+    var timeoutIntervalForResource: NSTimeInterval {
+        get { return operation.timeoutIntervalForResource }
+        set { operation.timeoutIntervalForResource = newValue }
+    }
 }
 
 extension CloudKitOperation where T: CKOperationType {
@@ -31,6 +67,65 @@ extension CloudKitOperation where T: CKOperationType {
             addConfigureBlock { $0.container = newValue }
         }
     }
+
+    /// - returns whether to use cellular data access, if WiFi is unavailable (CKOperation default is true)
+    public var allowsCellularAccess: Bool {
+        get { return operation.allowsCellularAccess }
+        set {
+            operation.allowsCellularAccess = newValue
+            addConfigureBlock { $0.allowsCellularAccess = newValue }
+        }
+    }
+
+    /// - returns a unique identifier for a long-lived CKOperation
+    @available(iOS 9.3, tvOS 9.3, OSX 10.12, watchOS 2.3, *)
+    public var operationID: String {
+        get { return operation.operationID }
+    }
+
+    /// - returns whether the operation is long-lived
+    @available(iOS 9.3, tvOS 9.3, OSX 10.12, watchOS 2.3, *)
+    public var longLived: Bool {
+        get { return operation.longLived }
+        set {
+            operation.longLived = newValue
+            addConfigureBlock { $0.longLived = newValue }
+        }
+    }
+
+    #if swift(>=3.0) // TEMPORARY FIX: Swift 2.3 compiler crash (see: CloudKitInterface.swift)
+        /// - returns the block to execute when the server starts storing callbacks for this long-lived CKOperation
+        @available(iOS 9.3, tvOS 9.3, OSX 10.12, watchOS 2.3, *)
+        var longLivedOperationWasPersistedBlock: () -> Swift.Void {
+            get { return operation.longLivedOperationWasPersistedBlock }
+            set {
+                operation.longLivedOperationWasPersistedBlock = newValue
+                addConfigureBlock { $0.longLivedOperationWasPersistedBlock = newValue }
+            }
+        }
+    #endif
+
+    /// If non-zero, overrides the timeout interval for any network requests issued by this operation.
+    /// See NSURLSessionConfiguration.timeoutIntervalForRequest
+    @available(iOS 10.0, tvOS 10.0, OSX 10.12, watchOS 3.0, *)
+    var timeoutIntervalForRequest: NSTimeInterval  {
+        get { return operation.timeoutIntervalForRequest }
+        set {
+            operation.timeoutIntervalForRequest = newValue
+            addConfigureBlock { $0.timeoutIntervalForRequest = newValue }
+        }
+    }
+
+    /// If non-zero, overrides the timeout interval for any network resources retrieved by this operation.
+    /// See NSURLSessionConfiguration.timeoutIntervalForResource
+    @available(iOS 10.0, tvOS 10.0, OSX 10.12, watchOS 3.0, *)
+    var timeoutIntervalForResource: NSTimeInterval {
+        get { return operation.timeoutIntervalForResource }
+        set {
+            operation.timeoutIntervalForResource = newValue
+            addConfigureBlock { $0.timeoutIntervalForResource = newValue }
+        }
+    }
 }
 
 extension BatchedCloudKitOperation where T: CKOperationType {
@@ -41,6 +136,65 @@ extension BatchedCloudKitOperation where T: CKOperationType {
         set {
             operation.container = newValue
             addConfigureBlock { $0.container = newValue }
+        }
+    }
+
+    /// - returns whether to use cellular data access, if WiFi is unavailable (CKOperation default is true)
+    public var allowsCellularAccess: Bool {
+        get { return operation.allowsCellularAccess }
+        set {
+            operation.allowsCellularAccess = newValue
+            addConfigureBlock { $0.allowsCellularAccess = newValue }
+        }
+    }
+
+    /// - returns a unique identifier for a long-lived CKOperation
+    @available(iOS 9.3, tvOS 9.3, OSX 10.12, watchOS 2.3, *)
+    public var operationID: String {
+        get { return operation.operationID }
+    }
+
+    /// - returns whether the operation is long-lived
+    @available(iOS 9.3, tvOS 9.3, OSX 10.12, watchOS 2.3, *)
+    public var longLived: Bool {
+        get { return operation.longLived }
+        set {
+            operation.longLived = newValue
+            addConfigureBlock { $0.longLived = newValue }
+        }
+    }
+
+    #if swift(>=3.0) // TEMPORARY FIX: Swift 2.3 compiler crash (see: CloudKitInterface.swift)
+        /// - returns the block to execute when the server starts storing callbacks for this long-lived CKOperation
+        @available(iOS 9.3, tvOS 9.3, OSX 10.12, watchOS 2.3, *)
+        var longLivedOperationWasPersistedBlock: () -> Swift.Void {
+            get { return operation.longLivedOperationWasPersistedBlock }
+            set {
+                operation.longLivedOperationWasPersistedBlock = newValue
+                addConfigureBlock { $0.longLivedOperationWasPersistedBlock = newValue }
+            }
+        }
+    #endif
+
+    /// If non-zero, overrides the timeout interval for any network requests issued by this operation.
+    /// See NSURLSessionConfiguration.timeoutIntervalForRequest
+    @available(iOS 10.0, tvOS 10.0, OSX 10.12, watchOS 3.0, *)
+    var timeoutIntervalForRequest: NSTimeInterval  {
+        get { return operation.timeoutIntervalForRequest }
+        set {
+            operation.timeoutIntervalForRequest = newValue
+            addConfigureBlock { $0.timeoutIntervalForRequest = newValue }
+        }
+    }
+
+    /// If non-zero, overrides the timeout interval for any network resources retrieved by this operation.
+    /// See NSURLSessionConfiguration.timeoutIntervalForResource
+    @available(iOS 10.0, tvOS 10.0, OSX 10.12, watchOS 3.0, *)
+    var timeoutIntervalForResource: NSTimeInterval {
+        get { return operation.timeoutIntervalForResource }
+        set {
+            operation.timeoutIntervalForResource = newValue
+            addConfigureBlock { $0.timeoutIntervalForResource = newValue }
         }
     }
 }

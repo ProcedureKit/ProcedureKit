@@ -54,8 +54,57 @@ public protocol CKOperationType: class {
     /// The type of the CloudKit RecordID
     associatedtype RecordID: Hashable
 
+    /// The type of the CloudKit UserIdentity
+    associatedtype UserIdentity
+
+    /// The type of the CloudKit UserIdentityLookupInfo
+    associatedtype UserIdentityLookupInfo
+
+    /// The type of the CloudKit Share
+    associatedtype Share
+
+    /// The type of the CloudKit ShareMetadata
+    associatedtype ShareMetadata
+
+    /// The type of the CloudKit ShareParticipant
+    associatedtype ShareParticipant
+
     /// - returns the CloudKit Container
     var container: Container? { get set }
+
+    /// - returns whether to use cellular data access, if WiFi is unavailable (CKOperation default is true)
+    var allowsCellularAccess: Bool { get set }
+
+    /// - returns a unique identifier for a long-lived CKOperation
+    @available(iOS 9.3, tvOS 9.3, OSX 10.12, watchOS 2.3, *)
+    var operationID: String { get }
+
+    /// - returns whether the operation is long-lived
+    @available(iOS 9.3, tvOS 9.3, OSX 10.12, watchOS 2.3, *)
+    var longLived: Bool { get set }
+
+    /// The type of the CKOperation longLivedOperationWasPersistedBlock
+    associatedtype CKOperationLongLivedOperationWasPersistedBlock
+
+    #if swift(>=3.0) // TEMPORARY FIX: Swift 2.3 compiler crash
+        // The Swift 2.3 compiler (as of Xcode 8 beta 4) crashes with a fatal error caused by
+        // the following declaration & the extension CKOperation: CKOperationType { }
+        // The Swift 3.0 compiler has no issue. As of now, no workaround is available besides using Swift 3.0.
+        //
+        /// - returns the block to execute when the server starts storing callbacks for this long-lived CKOperation
+        @available(iOS 9.3, tvOS 9.3, OSX 10.12, watchOS 2.3, *)
+        var longLivedOperationWasPersistedBlock: CKOperationLongLivedOperationWasPersistedBlock { get set }
+    #endif
+
+    /// If non-zero, overrides the timeout interval for any network requests issued by this operation.
+    /// See NSURLSessionConfiguration.timeoutIntervalForRequest
+    @available(iOS 10.0, tvOS 10.0, OSX 10.12, watchOS 3.0, *)
+    var timeoutIntervalForRequest: NSTimeInterval { get set }
+
+    /// If non-zero, overrides the timeout interval for any network resources retrieved by this operation.
+    /// See NSURLSessionConfiguration.timeoutIntervalForResource
+    @available(iOS 10.0, tvOS 10.0, OSX 10.12, watchOS 3.0, *)
+    var timeoutIntervalForResource: NSTimeInterval { get set }
 }
 
 /**
@@ -315,6 +364,10 @@ extension CKOperation: CKOperationType {
     public typealias ServerChangeToken = CKServerChangeToken
 
     /// The DiscoveredUserInfo is a CKDiscoveredUserInfo
+    @available(iOS, introduced=8.0, deprecated=10.0, message="Replaced by CKUserIdentity")
+    @available(OSX, introduced=10.10, deprecated=10.12, message="Replaced by CKUserIdentity")
+    @available(tvOS, introduced=8.0, deprecated=10.0, message="Replaced by CKUserIdentity")
+    @available(watchOS, introduced=2.0, deprecated=3.0, message="Replaced by CKUserIdentity")
     public typealias DiscoveredUserInfo = CKDiscoveredUserInfo
 
     /// The RecordZone is a CKRecordZone
@@ -346,6 +399,29 @@ extension CKOperation: CKOperationType {
 
     /// The QueryCursor is a CKQueryCursor
     public typealias QueryCursor = CKQueryCursor
+
+    /// The UserIdentity is a CKUserIdentity
+    @available(iOS 10.0, OSX 10.12, tvOS 10.0, watchOS 3.0, *)
+    public typealias UserIdentity = CKUserIdentity
+
+    /// The UserIdentityLookupInfo is a CKUserIdentityLookupInfo
+    @available(iOS 10.0, OSX 10.12, tvOS 10.0, watchOS 3.0, *)
+    public typealias UserIdentityLookupInfo = CKUserIdentityLookupInfo
+
+    /// The Share is a CKShare
+    @available(iOS 10.0, OSX 10.12, tvOS 10.0, watchOS 3.0, *)
+    public typealias Share = CKShare
+
+    /// The ShareMetadata is a CKShareMetadata
+    @available(iOS 10.0, OSX 10.12, tvOS 10.0, watchOS 3.0, *)
+    public typealias ShareMetadata = CKShareMetadata
+
+    /// The ShareParticipant is a CKShareParticipant
+    @available(iOS 10.0, OSX 10.12, tvOS 10.0, watchOS 3.0, *)
+    public typealias ShareParticipant = CKShareParticipant
+
+    /// The CKOperationLongLivedOperationWasPersistedBlock is () -> Void
+    public typealias CKOperationLongLivedOperationWasPersistedBlock = () -> Void
 }
 
 extension CKDatabaseOperation: CKDatabaseOperationType {
