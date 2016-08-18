@@ -1549,6 +1549,254 @@ class OPRCKFetchRecordsOperationTests: CKTests {
     }
 }
 
+class OPRCKFetchRecordZoneChangesOperationTests: CKTests {
+    
+    var target: TestFetchRecordZoneChangesOperation!
+    var operation: OPRCKOperation<TestFetchRecordZoneChangesOperation>!
+    
+    override func setUp() {
+        super.setUp()
+        target = TestFetchRecordZoneChangesOperation()
+        operation = OPRCKOperation(operation: target)
+    }
+    
+    func test__get_record_zone_ids() {
+        let zoneIDs = ["zone-id"]
+        target.recordZoneIDs = zoneIDs
+        XCTAssertEqual(operation.recordZoneIDs, zoneIDs)
+    }
+    
+    func test__set_record_zone_id() {
+        let zoneIDs = ["a-different-zone-id"]
+        operation.recordZoneIDs = zoneIDs
+        XCTAssertEqual(target.recordZoneIDs, zoneIDs)
+    }
+    
+    func test__get_optionsByRecordZoneID() {
+        let optionsByRecordZoneID = ["zone-id": "testoption"]
+        target.optionsByRecordZoneID = optionsByRecordZoneID
+        XCTAssertNotNil(operation.optionsByRecordZoneID)
+        XCTAssertEqual(operation.optionsByRecordZoneID ?? [:], optionsByRecordZoneID)
+    }
+    
+    func test__set_optionsByRecordZoneID() {
+        let optionsByRecordZoneID = ["zone-id": "a-different-test-option"]
+        operation.optionsByRecordZoneID = optionsByRecordZoneID
+        XCTAssertNotNil(target.optionsByRecordZoneID)
+        XCTAssertEqual(target.optionsByRecordZoneID ?? [:], optionsByRecordZoneID)
+    }
+    
+    func test__get_record_changed_block() {
+        target.recordChangedBlock = { _ in }
+        XCTAssertNotNil(operation.recordChangedBlock)
+    }
+    
+    func test__set_record_changed_block() {
+        operation.recordChangedBlock = { _ in }
+        XCTAssertNotNil(target.recordChangedBlock)
+    }
+    
+    func test__get_record_with_id_was_deleted_block() {
+        target.recordWithIDWasDeletedBlock = { _ in }
+        XCTAssertNotNil(operation.recordWithIDWasDeletedBlock)
+    }
+    
+    func test__set_record_with_id_was_deleted_block() {
+        operation.recordWithIDWasDeletedBlock = { _ in }
+        XCTAssertNotNil(target.recordWithIDWasDeletedBlock)
+    }
+
+    func test__get_record_zone_change_tokens_updated_block() {
+        target.recordZoneChangeTokensUpdatedBlock = { _ in }
+        XCTAssertNotNil(operation.recordZoneChangeTokensUpdatedBlock)
+    }
+    
+    func test__set_record_zone_change_tokens_updated_block() {
+        operation.recordZoneChangeTokensUpdatedBlock = { _ in }
+        XCTAssertNotNil(target.recordZoneChangeTokensUpdatedBlock)
+    }
+    
+    func test__success_with_completion_block() {
+        var blockDidRun = false
+        operation.setFetchRecordZoneChangesCompletionBlock { _ in
+            blockDidRun = true
+        }
+        
+        waitForOperation(operation)
+        
+        XCTAssertTrue(operation.finished)
+        XCTAssertEqual(operation.errors.count, 0)
+        XCTAssertTrue(blockDidRun)
+    }
+    
+    func test__error_with_completion_block() {
+        var blockDidRun = false
+        target.setSimulationOutputError(NSError(domain: CKErrorDomain, code: CKErrorCode.InternalError.rawValue, userInfo: nil))
+        
+        operation.setFetchRecordZoneChangesCompletionBlock {
+            blockDidRun = true
+        }
+        
+        waitForOperation(operation)
+        
+        XCTAssertTrue(operation.finished)
+        XCTAssertEqual(operation.errors.count, 1)
+        XCTAssertFalse(blockDidRun)
+    }
+}
+
+class OPRCKFetchShareMetadataOperationTests: CKTests {
+    
+    var target: TestFetchShareMetadataOperation!
+    var operation: OPRCKOperation<TestFetchShareMetadataOperation>!
+    
+    override func setUp() {
+        super.setUp()
+        target = TestFetchShareMetadataOperation()
+        operation = OPRCKOperation(operation: target)
+    }
+    
+    func test__get_share_urls() {
+        let shareURLs = [ NSURL(string: "http://example.com")! ]
+        target.shareURLs = shareURLs
+        XCTAssertEqual(operation.shareURLs, shareURLs)
+    }
+    
+    func test__set_share_urls() {
+        let shareURLs = [ NSURL(string: "http://example.com")! ]
+        operation.shareURLs = shareURLs
+        XCTAssertEqual(target.shareURLs, shareURLs)
+    }
+    
+    func test__get_should_fetch_root_record() {
+        let shouldFetchRootRecord = true
+        target.shouldFetchRootRecord = shouldFetchRootRecord
+        XCTAssertEqual(operation.shouldFetchRootRecord, shouldFetchRootRecord)
+    }
+    
+    func test__set_should_fetch_root_record() {
+        let shouldFetchRootRecord = true
+        operation.shouldFetchRootRecord = shouldFetchRootRecord
+        XCTAssertEqual(target.shouldFetchRootRecord, shouldFetchRootRecord)
+    }
+    
+    func test__get_root_record_desired_keys() {
+        let rootRecordDesiredKeys = ["recordKeyExample"]
+        target.rootRecordDesiredKeys = rootRecordDesiredKeys
+        XCTAssertNotNil(operation.rootRecordDesiredKeys)
+        XCTAssertEqual(operation.rootRecordDesiredKeys ?? [], rootRecordDesiredKeys)
+    }
+    
+    func test__set_root_record_desired_keys() {
+        let rootRecordDesiredKeys = ["recordKeyExample"]
+        operation.rootRecordDesiredKeys = rootRecordDesiredKeys
+        XCTAssertNotNil(target.rootRecordDesiredKeys)
+        XCTAssertEqual(target.rootRecordDesiredKeys ?? [], rootRecordDesiredKeys)
+    }
+    
+    func test__get_per_share_metadata_block() {
+        target.perShareMetadataBlock = { _, _, _ in }
+        XCTAssertNotNil(operation.perShareMetadataBlock)
+    }
+    
+    func test__set_per_share_metadata_block() {
+        operation.perShareMetadataBlock = { _, _, _ in }
+        XCTAssertNotNil(target.perShareMetadataBlock)
+    }
+    
+    func test__success_with_completion_block() {
+        var blockDidRun = false
+        operation.setFetchShareMetadataCompletionBlock {
+            blockDidRun = true
+        }
+        
+        waitForOperation(operation)
+        
+        XCTAssertTrue(operation.finished)
+        XCTAssertEqual(operation.errors.count, 0)
+        XCTAssertTrue(blockDidRun)
+    }
+    
+    func test__error_with_completion_block() {
+        var blockDidRun = false
+        target.error = NSError(domain: CKErrorDomain, code: CKErrorCode.InternalError.rawValue, userInfo: nil)
+        
+        operation.setFetchShareMetadataCompletionBlock {
+            blockDidRun = true
+        }
+        
+        waitForOperation(operation)
+        
+        XCTAssertTrue(operation.finished)
+        XCTAssertEqual(operation.errors.count, 1)
+        XCTAssertFalse(blockDidRun)
+    }
+}
+
+class OPRCKFetchShareParticipantsOperationTests: CKTests {
+    
+    var target: TestFetchShareParticipantsOperation!
+    var operation: OPRCKOperation<TestFetchShareParticipantsOperation>!
+    
+    override func setUp() {
+        super.setUp()
+        target = TestFetchShareParticipantsOperation()
+        operation = OPRCKOperation(operation: target)
+    }
+    
+    func test__get_user_identity_lookup_infos() {
+        target.userIdentityLookupInfos = [ "hello@world.com" ]
+        XCTAssertNotNil(operation.userIdentityLookupInfos)
+        XCTAssertEqual(operation.userIdentityLookupInfos.count, 1)
+        XCTAssertEqual(operation.userIdentityLookupInfos, [ "hello@world.com" ])
+    }
+    
+    func test__set_user_identity_lookup_infos() {
+        operation.userIdentityLookupInfos = [ "hello@world.com" ]
+        XCTAssertNotNil(target.userIdentityLookupInfos)
+        XCTAssertEqual(target.userIdentityLookupInfos.count, 1)
+        XCTAssertEqual(target.userIdentityLookupInfos, [ "hello@world.com" ])
+    }
+    
+    func test__get_share_participant_fetched_block() {
+        target.shareParticipantFetchedBlock = { _ in }
+        XCTAssertNotNil(operation.shareParticipantFetchedBlock)
+    }
+    
+    func test__set_share_participant_fetched_block() {
+        operation.shareParticipantFetchedBlock = { _ in }
+        XCTAssertNotNil(target.shareParticipantFetchedBlock)
+    }
+    
+    func test__success_with_completion_block() {
+        var blockDidRun = false
+        operation.setFetchShareParticipantsCompletionBlock {
+            blockDidRun = true
+        }
+        
+        waitForOperation(operation)
+        
+        XCTAssertTrue(operation.finished)
+        XCTAssertEqual(operation.errors.count, 0)
+        XCTAssertTrue(blockDidRun)
+    }
+    
+    func test__error_with_completion_block() {
+        var blockDidRun = false
+        target.error = NSError(domain: CKErrorDomain, code: CKErrorCode.InternalError.rawValue, userInfo: nil)
+        
+        operation.setFetchShareParticipantsCompletionBlock {
+            blockDidRun = true
+        }
+        
+        waitForOperation(operation)
+        
+        XCTAssertTrue(operation.finished)
+        XCTAssertEqual(operation.errors.count, 1)
+        XCTAssertFalse(blockDidRun)
+    }
+}
+
 class OPRCKFetchSubscriptionsOperationTests: CKTests {
 
     var target: TestFetchSubscriptionsOperation!
