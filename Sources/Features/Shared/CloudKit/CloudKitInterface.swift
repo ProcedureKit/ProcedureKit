@@ -9,6 +9,8 @@
 import Foundation
 import CloudKit
 
+// swiftlint:disable file_length
+
 /**
  A generic protocol which exposes the types and properties used by
  Apple's CloudKit Operation types.
@@ -736,3 +738,5 @@ extension CKQueryOperation: CKQueryOperationType, AssociatedErrorType {
     // The associated error type
     public typealias Error = QueryError<QueryCursor>
 }
+
+// swiftlint:enable file_length
