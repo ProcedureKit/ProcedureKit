@@ -59,6 +59,25 @@ class TestFetchAllChangesOperation: TestCloudOperation, CKFetchAllChanges {
     var fetchAllChanges: Bool = true
 }
 
+class TestAcceptSharesOperation: TestCloudOperation, CKAcceptSharesOperationType, AssociatedErrorType {
+    typealias Error = DiscoverAllContactsError<DiscoveredUserInfo>
+
+    var error: NSError?
+
+    var shareMetadatas: [ShareMetadata] = []
+    var perShareCompletionBlock: ((ShareMetadata, Share?, NSError?) -> Void)? = .None
+    var acceptSharesCompletionBlock: ((NSError?) -> Void)? = .None
+
+    init(error: NSError? = .None) {
+        self.error = error
+        super.init()
+    }
+
+    override func main() {
+        acceptSharesCompletionBlock?(error)
+    }
+}
+
 class TestDiscoverAllContactsOperation: TestCloudOperation, CKDiscoverAllContactsOperationType, AssociatedErrorType {
     typealias Error = DiscoverAllContactsError<DiscoveredUserInfo>
 
@@ -74,6 +93,24 @@ class TestDiscoverAllContactsOperation: TestCloudOperation, CKDiscoverAllContact
 
     override func main() {
         discoverAllContactsCompletionBlock?(result, error)
+    }
+}
+
+class TestDiscoverAllUserIdentitiesOperation: TestCloudOperation, CKDiscoverAllUserIdentitiesOperationType, AssociatedErrorType {
+    typealias Error = CloudKitError
+
+    var error: NSError?
+    
+    var userIdentityDiscoveredBlock: ((UserIdentity) -> Void)? = .None
+    var discoverAllUserIdentitiesCompletionBlock: ((NSError?) -> Void)? = .None
+    
+    init(error: NSError? = .None) {
+        self.error = error
+        super.init()
+    }
+    
+    override func main() {
+        discoverAllUserIdentitiesCompletionBlock?(error)
     }
 }
 
@@ -96,6 +133,25 @@ class TestDiscoverUserInfosOperation: TestCloudOperation, CKDiscoverUserInfosOpe
 
     override func main() {
         discoverUserInfosCompletionBlock?(userInfosByEmailAddress, userInfoByRecordID, error)
+    }
+}
+
+class TestDiscoverUserIdentitiesOperation: TestCloudOperation, CKDiscoverUserIdentitiesOperationType, AssociatedErrorType {
+    typealias Error = CloudKitError
+    
+    var error: NSError?
+    
+    var userIdentityLookupInfos: [UserIdentityLookupInfo] = []
+    var userIdentityDiscoveredBlock: ((UserIdentity, UserIdentityLookupInfo) -> Void)? = .None
+    var discoverUserIdentitiesCompletionBlock: ((NSError?) -> Void)? = .None
+    
+    init(error: NSError? = .None) {
+        self.error = error
+        super.init()
+    }
+    
+    override func main() {
+        discoverUserIdentitiesCompletionBlock?(error)
     }
 }
 
@@ -167,6 +223,31 @@ class TestModifyBadgeOperation: TestCloudOperation, CKModifyBadgeOperationType, 
     }
 }
 
+class TestFetchDatabaseChangesOperation: TestDatabaseOperation, CKFetchDatabaseChangesOperationType, AssociatedErrorType {
+    typealias Error = FetchDatabaseChangesError<ServerChangeToken>
+
+    var token: String?
+    // var moreComing: Bool
+    var error: NSError?
+
+    var fetchAllChanges: Bool = true
+    var recordZoneWithIDChangedBlock: ((RecordZoneID) -> Void)? = .None
+    var recordZoneWithIDWasDeletedBlock: ((RecordZoneID) -> Void)? = .None
+    var changeTokenUpdatedBlock: ((ServerChangeToken) -> Void)? = .None
+    var fetchDatabaseChangesCompletionBlock: ((ServerChangeToken?, Bool, NSError?) -> Void)? = .None
+    
+    init(token: String? = "new-token", moreComing: Bool = false, error: NSError? = .None) {
+        self.token = token
+        self.error = error
+        super.init()
+        self.moreComing = moreComing
+    }
+
+    override func main() {
+        fetchDatabaseChangesCompletionBlock?(token, moreComing, error)
+    }
+}
+
 class TestFetchRecordChangesOperation: TestDatabaseOperation, CKFetchRecordChangesOperationType, AssociatedErrorType {
     typealias Error = FetchRecordChangesError<ServerChangeToken>
 
@@ -230,6 +311,79 @@ class TestFetchRecordsOperation: TestDatabaseOperation, CKFetchRecordsOperationT
 
     override func main() {
         fetchRecordsCompletionBlock?(recordsByID, error)
+    }
+}
+
+class TestFetchRecordZoneChangesOperation: TestDatabaseOperation, CKFetchRecordZoneChangesOperationType, AssociatedErrorType {
+    typealias Error = FetchRecordZoneChangesError
+    typealias FetchRecordZoneChangesOptions = String
+    
+    typealias ResponseSimulationBlock = ((TestFetchRecordZoneChangesOperation) -> NSError?)
+    var responseSimulationBlock: ResponseSimulationBlock? = .None
+    func setSimulationOutputError(error: NSError) {
+        responseSimulationBlock = { operation in
+            return error
+        }
+    }
+    
+    var fetchAllChanges: Bool = true
+    var recordZoneIDs: [RecordZoneID] = ["zone-id"]
+    var optionsByRecordZoneID: [RecordZoneID : FetchRecordZoneChangesOptions]? = .None
+    
+    var recordChangedBlock: ((Record) -> Void)? = .None
+    var recordWithIDWasDeletedBlock: ((RecordID, String) -> Void)? = .None
+    var recordZoneChangeTokensUpdatedBlock: ((RecordZoneID, ServerChangeToken?, NSData?) -> Void)? = .None
+    var recordZoneFetchCompletionBlock: ((RecordZoneID, ServerChangeToken?, NSData?, Bool, NSError?) -> Void)? = .None
+    var fetchRecordZoneChangesCompletionBlock: ((NSError?) -> Void)? = .None
+    
+    init(responseSimulationBlock: ResponseSimulationBlock? = .None) {
+        self.responseSimulationBlock = responseSimulationBlock
+        super.init()
+    }
+    
+    override func main() {
+        let outputError = responseSimulationBlock?(self)
+        fetchRecordZoneChangesCompletionBlock?(outputError)
+    }
+}
+
+class TestFetchShareMetadataOperation: TestCloudOperation, CKFetchShareMetadataOperationType, AssociatedErrorType {
+    typealias Error = CloudKitError
+    
+    var error: NSError?
+    
+    var shareURLs: [NSURL] = []
+    var shouldFetchRootRecord: Bool = false
+    var rootRecordDesiredKeys: [String]? = .None
+    var perShareMetadataBlock: ((NSURL, ShareMetadata?, NSError?) -> Void)? = .None
+    var fetchShareMetadataCompletionBlock: ((NSError?) -> Void)? = .None
+    
+    init(error: NSError? = .None) {
+        self.error = error
+        super.init()
+    }
+    
+    override func main() {
+        fetchShareMetadataCompletionBlock?(error)
+    }
+}
+
+class TestFetchShareParticipantsOperation: TestCloudOperation, CKFetchShareParticipantsOperationType, AssociatedErrorType {
+    typealias Error = CloudKitError
+    
+    var error: NSError?
+    
+    var userIdentityLookupInfos: [UserIdentityLookupInfo] = []
+    var shareParticipantFetchedBlock: ((ShareParticipant) -> Void)? = .None
+    var fetchShareParticipantsCompletionBlock: ((NSError?) -> Void)? = .None
+    
+    init(error: NSError? = .None) {
+        self.error = error
+        super.init()
+    }
+    
+    override func main() {
+        fetchShareParticipantsCompletionBlock?(error)
     }
 }
 
