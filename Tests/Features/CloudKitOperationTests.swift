@@ -2889,6 +2889,130 @@ class CloudKitOperationModifyBadgeCompletionTests: CKTests {
     }
 }
 
+class CloudKitOperationFetchDatabaseChangesTests: CKTests {
+    
+    var container: TestFetchDatabaseChangesOperation.Container!
+    var db: TestFetchDatabaseChangesOperation.Database!
+    
+    var token: TestFetchDatabaseChangesOperation.ServerChangeToken!
+    var resultsLimit: Int = 0
+    var fetchAllChanges: Bool!
+    
+    var operation: CloudKitOperation<TestFetchDatabaseChangesOperation>!
+    
+    var setByBlock_recordZoneWithIDChangedBlock: Bool!
+    var setByBlock_recordZoneWithIDWasDeletedBlock: Bool!
+    var setByBlock_changeTokenUpdatedBlock: Bool!
+    
+    override func setUp() {
+        super.setUp()
+        container = "I'm a test container!"
+        db = "I'm a test database!"
+        
+        token = "I'm a server token"
+        resultsLimit = 10
+        fetchAllChanges = false
+        
+        setByBlock_recordZoneWithIDChangedBlock = false
+        setByBlock_recordZoneWithIDWasDeletedBlock = false
+        setByBlock_changeTokenUpdatedBlock = false
+        
+        operation = CloudKitOperation(strategy: .Immediate) { TestFetchDatabaseChangesOperation() }
+        operation.container = container
+        operation.database = db
+        operation.previousServerChangeToken = token
+        operation.resultsLimit = resultsLimit
+        operation.fetchAllChanges = fetchAllChanges
+        
+        operation.recordZoneWithIDChangedBlock = { [unowned self] _ in
+            self.setByBlock_recordZoneWithIDChangedBlock = true
+        }
+        operation.recordZoneWithIDWasDeletedBlock = { [unowned self] _ in
+            self.setByBlock_recordZoneWithIDWasDeletedBlock = true
+        }
+        operation.changeTokenUpdatedBlock = { [unowned self] _ in
+            self.setByBlock_changeTokenUpdatedBlock = true
+        }
+    }
+    
+    func test__setting_common_properties() {
+        
+        waitForOperation(operation)
+        XCTAssertTrue(operation.finished)
+        
+        XCTAssertEqual(operation.container, container)
+        XCTAssertEqual(operation.database, db)
+        XCTAssertEqual(operation.previousServerChangeToken, token)
+        XCTAssertEqual(operation.resultsLimit, resultsLimit)
+        XCTAssertEqual(operation.fetchAllChanges, fetchAllChanges)
+        
+        XCTAssertNotNil(operation.recordZoneWithIDChangedBlock)
+        operation.recordZoneWithIDChangedBlock?("recordZoneID")
+        XCTAssertTrue(setByBlock_recordZoneWithIDChangedBlock)
+        
+        XCTAssertNotNil(operation.recordZoneWithIDWasDeletedBlock)
+        operation.recordZoneWithIDWasDeletedBlock?("recordZoneID")
+        XCTAssertTrue(setByBlock_recordZoneWithIDWasDeletedBlock)
+        
+        XCTAssertNotNil(operation.changeTokenUpdatedBlock)
+        operation.changeTokenUpdatedBlock?("serverChangeToken")
+        XCTAssertTrue(setByBlock_changeTokenUpdatedBlock)
+    }
+    
+    func test__execution_after_cancellation() {
+        operation.cancel()
+        waitForOperation(operation)
+        
+        XCTAssertTrue(operation.finished)
+        XCTAssertTrue(operation.cancelled)
+    }
+    
+    func test__success_without_completion_block() {
+        waitForOperation(operation)
+        XCTAssertTrue(operation.finished)
+    }
+    
+    func test__success_with_completion_block() {
+        var didExecuteBlock = false
+        operation.setFetchDatabaseChangesCompletionBlock { _, _ in
+            didExecuteBlock = true
+        }
+        waitForOperation(operation)
+        XCTAssertTrue(operation.finished)
+        XCTAssertEqual(operation.errors.count, 0)
+        XCTAssertTrue(didExecuteBlock)
+    }
+    
+    func test__error_without_completion_block() {
+        operation = CloudKitOperation(strategy: .Immediate) {
+            let op = TestFetchDatabaseChangesOperation()
+            op.error = NSError(domain: CKErrorDomain, code: CKErrorCode.InternalError.rawValue, userInfo: nil)
+            return op
+        }
+        
+        waitForOperation(operation)
+        XCTAssertTrue(operation.finished)
+        XCTAssertEqual(operation.errors.count, 0)
+    }
+    
+    func test__error_with_completion_block() {
+        operation = CloudKitOperation(strategy: .Immediate) {
+            let op = TestFetchDatabaseChangesOperation()
+            op.error = NSError(domain: CKErrorDomain, code: CKErrorCode.InternalError.rawValue, userInfo: nil)
+            return op
+        }
+        var didExecuteBlock = false
+        operation.setFetchDatabaseChangesCompletionBlock { _, _ in
+            didExecuteBlock = true
+        }
+        
+        waitForOperation(operation)
+        XCTAssertTrue(operation.finished)
+        XCTAssertEqual(operation.errors.count, 1)
+        XCTAssertFalse(didExecuteBlock)
+    }
+}
+
 class CloudKitOperationFetchRecordChangesTests: CKTests {
 
     var container: TestFetchRecordChangesOperation.Container!
@@ -3098,6 +3222,322 @@ class CloudKitOperationFetchRecordsTests: CKTests {
         waitForOperation(operation)
         XCTAssertTrue(operation.finished)
         XCTAssertEqual(operation.errors.count, 1)
+    }
+}
+
+class CloudKitOperationFetchRecordZoneChangesTests: CKTests {
+    
+    var container: TestFetchRecordZoneChangesOperation.Container!
+    var db: TestFetchRecordZoneChangesOperation.Database!
+    
+    var zoneIDs: [TestFetchRecordZoneChangesOperation.RecordZoneID]!
+    var optionsByRecordZoneID: [TestFetchRecordZoneChangesOperation.RecordZoneID : TestFetchRecordZoneChangesOperation.FetchRecordZoneChangesOptions]!
+    var fetchAllChanges: Bool!
+    
+    var responseSimulationBlock: TestFetchRecordZoneChangesOperation.ResponseSimulationBlock? = .None
+    
+    var operation: CloudKitOperation<TestFetchRecordZoneChangesOperation>!
+    
+    var setByBlock_recordChangedBlock: Bool!
+    var setByBlock_recordWithIDWasDeletedBlock: Bool!
+    var setByBlock_recordZoneChangeTokensUpdatedBlock: Bool!
+    
+    override func setUp() {
+        super.setUp()
+        container = "I'm a test container!"
+        db = "I'm a test database!"
+
+        zoneIDs = ["I'm a zone id"]
+        optionsByRecordZoneID = ["I'm a zone id": "I'm an option"]
+        fetchAllChanges = false
+
+        responseSimulationBlock = { _ -> NSError? in
+            return nil
+        }
+        
+        setByBlock_recordChangedBlock = false
+        setByBlock_recordWithIDWasDeletedBlock = false
+        setByBlock_recordZoneChangeTokensUpdatedBlock = false
+
+        operation = CloudKitOperation(strategy: .Immediate) { TestFetchRecordZoneChangesOperation() }
+        operation.container = container
+        operation.database = db
+        operation.recordZoneIDs = zoneIDs
+        operation.fetchAllChanges = fetchAllChanges
+        operation.optionsByRecordZoneID = optionsByRecordZoneID
+        operation.recordChangedBlock = { [unowned self] _ in
+            self.setByBlock_recordChangedBlock = true
+        }
+        operation.recordWithIDWasDeletedBlock = { [unowned self] _ in
+            self.setByBlock_recordWithIDWasDeletedBlock = true
+        }
+        operation.recordZoneChangeTokensUpdatedBlock = { [unowned self] _, _, _ in
+            self.setByBlock_recordZoneChangeTokensUpdatedBlock = true
+        }
+    }
+    
+    func test__setting_common_properties() {
+        
+        waitForOperation(operation)
+        XCTAssertTrue(operation.finished)
+        
+        XCTAssertEqual(operation.container, container)
+        XCTAssertEqual(operation.database, db)
+        XCTAssertEqual(operation.recordZoneIDs, zoneIDs)
+        XCTAssertNotNil(operation.optionsByRecordZoneID)
+        XCTAssertEqual(operation.optionsByRecordZoneID ?? [:], optionsByRecordZoneID)
+        XCTAssertEqual(operation.fetchAllChanges, fetchAllChanges)
+        
+        XCTAssertNotNil(operation.recordChangedBlock)
+        operation.recordChangedBlock?("record")
+        XCTAssertTrue(setByBlock_recordChangedBlock)
+        
+        XCTAssertNotNil(operation.recordWithIDWasDeletedBlock)
+        operation.recordWithIDWasDeletedBlock?("recordID", "recordType")
+        XCTAssertTrue(setByBlock_recordWithIDWasDeletedBlock)
+        
+        XCTAssertNotNil(operation.recordZoneChangeTokensUpdatedBlock)
+        operation.recordZoneChangeTokensUpdatedBlock?("recordZoneID", "serverChangeToken", nil)
+        XCTAssertTrue(setByBlock_recordZoneChangeTokensUpdatedBlock)
+    }
+    
+    func test__execution_after_cancellation() {
+        operation.cancel()
+        waitForOperation(operation)
+        
+        XCTAssertTrue(operation.finished)
+        XCTAssertTrue(operation.cancelled)
+    }
+    
+    func test__success_without_completion_block() {
+        waitForOperation(operation)
+        XCTAssertTrue(operation.finished)
+    }
+    
+    func test__success_with_completion_block() {
+        var didExecuteBlock = false
+        operation.setFetchRecordZoneChangesCompletionBlock {
+            didExecuteBlock = true
+        }
+        waitForOperation(operation)
+        XCTAssertTrue(operation.finished)
+        XCTAssertEqual(operation.errors.count, 0)
+        XCTAssertTrue(didExecuteBlock)
+    }
+    
+    func test__error_without_completion_block() {
+        operation = CloudKitOperation(strategy: .Immediate) {
+            let op = TestFetchRecordZoneChangesOperation()
+            op.setSimulationOutputError(NSError(domain: CKErrorDomain, code: CKErrorCode.InternalError.rawValue, userInfo: nil))
+            return op
+        }
+        
+        waitForOperation(operation)
+        XCTAssertTrue(operation.finished)
+        XCTAssertEqual(operation.errors.count, 0)
+    }
+    
+    func test__error_with_completion_block() {
+        operation = CloudKitOperation(strategy: .Immediate) {
+            let op = TestFetchRecordZoneChangesOperation()
+            op.setSimulationOutputError(NSError(domain: CKErrorDomain, code: CKErrorCode.InternalError.rawValue, userInfo: nil))
+            return op
+        }
+        var didExecuteBlock = false
+        operation.setFetchRecordZoneChangesCompletionBlock {
+            didExecuteBlock = true
+        }
+        
+        waitForOperation(operation)
+        XCTAssertTrue(operation.finished)
+        XCTAssertEqual(operation.errors.count, 1)
+        XCTAssertFalse(didExecuteBlock)
+    }
+}
+
+class CloudKitOperationFetchShareMetadataOperationTests: CKTests {
+    
+    var container: TestFetchShareMetadataOperation.Container!
+    var shareURLs: [NSURL]!
+    var shouldFetchRootRecord: Bool!
+    var rootRecordDesiredKeys: [String]!
+    var setByBlock_perShareMetadataBlock: Bool!
+    
+    var operation: CloudKitOperation<TestFetchShareMetadataOperation>!
+    
+    override func setUp() {
+        super.setUp()
+        container = "I'm a test container!"
+        shareURLs = [ NSURL(string: "http://www.example.com")! ]
+        shouldFetchRootRecord = true
+        rootRecordDesiredKeys = [ "exampleRecordKey" ]
+        setByBlock_perShareMetadataBlock = false
+        
+        operation = CloudKitOperation(strategy: .Immediate) { TestFetchShareMetadataOperation() }
+        operation.container = container
+        operation.shareURLs = shareURLs
+        operation.shouldFetchRootRecord = shouldFetchRootRecord
+        operation.rootRecordDesiredKeys = rootRecordDesiredKeys
+        operation.perShareMetadataBlock = { [unowned self] _, _, _ in
+            self.setByBlock_perShareMetadataBlock = true
+        }
+    }
+    
+    func test__setting_common_properties() {
+        
+        waitForOperation(operation)
+        XCTAssertTrue(operation.finished)
+        
+        XCTAssertEqual(operation.container, container)
+        XCTAssertEqual(operation.shareURLs, shareURLs)
+        XCTAssertEqual(operation.shouldFetchRootRecord, shouldFetchRootRecord)
+        XCTAssertEqual(operation.rootRecordDesiredKeys ?? [], rootRecordDesiredKeys)
+        
+        XCTAssertNotNil(operation.perShareMetadataBlock)
+        operation.perShareMetadataBlock?(shareURLs[0], "shareMetadata", nil)
+        XCTAssertTrue(setByBlock_perShareMetadataBlock)
+    }
+    
+    func test__execution_after_cancellation() {
+        operation.cancel()
+        waitForOperation(operation)
+        
+        XCTAssertTrue(operation.finished)
+        XCTAssertTrue(operation.cancelled)
+    }
+    
+    func test__success_without_completion_block() {
+        waitForOperation(operation)
+        XCTAssertTrue(operation.finished)
+    }
+    
+    func test__success_with_completion_block() {
+        var didExecuteBlock = false
+        operation.setFetchShareMetadataCompletionBlock {
+            didExecuteBlock = true
+        }
+        waitForOperation(operation)
+        XCTAssertTrue(operation.finished)
+        XCTAssertEqual(operation.errors.count, 0)
+        XCTAssertTrue(didExecuteBlock)
+    }
+    
+    func test__error_without_completion_block() {
+        operation = CloudKitOperation(strategy: .Immediate) {
+            let op = TestFetchShareMetadataOperation()
+            op.error = NSError(domain: CKErrorDomain, code: CKErrorCode.InternalError.rawValue, userInfo: nil)
+            return op
+        }
+        
+        waitForOperation(operation)
+        XCTAssertTrue(operation.finished)
+        XCTAssertEqual(operation.errors.count, 0)
+    }
+    
+    func test__error_with_completion_block() {
+        operation = CloudKitOperation(strategy: .Immediate) {
+            let op = TestFetchShareMetadataOperation()
+            op.error = NSError(domain: CKErrorDomain, code: CKErrorCode.InternalError.rawValue, userInfo: nil)
+            return op
+        }
+        var didExecuteBlock = false
+        operation.setFetchShareMetadataCompletionBlock {
+            didExecuteBlock = true
+        }
+        
+        waitForOperation(operation)
+        XCTAssertTrue(operation.finished)
+        XCTAssertEqual(operation.errors.count, 1)
+        XCTAssertFalse(didExecuteBlock)
+    }
+}
+
+class CloudKitOperationFetchShareParticipantsOperationTests: CKTests {
+    
+    var container: TestFetchShareParticipantsOperation.Container!
+    var userIdentityLookupInfos: [TestFetchShareParticipantsOperation.UserIdentityLookupInfo]!
+    var setByBlock_shareParticipantFetchedBlock: Bool!
+    
+    var operation: CloudKitOperation<TestFetchShareParticipantsOperation>!
+    
+    override func setUp() {
+        super.setUp()
+        container = "I'm a test container!"
+        userIdentityLookupInfos = [ "hello@world.com" ]
+        setByBlock_shareParticipantFetchedBlock = false
+        
+        operation = CloudKitOperation(strategy: .Immediate) { TestFetchShareParticipantsOperation() }
+        operation.container = container
+        operation.userIdentityLookupInfos = userIdentityLookupInfos
+        operation.shareParticipantFetchedBlock = { [unowned self] _ in
+            self.setByBlock_shareParticipantFetchedBlock = true
+        }
+    }
+    
+    func test__setting_common_properties() {
+        
+        waitForOperation(operation)
+        XCTAssertTrue(operation.finished)
+        
+        XCTAssertEqual(operation.container, container)
+        XCTAssertEqual(operation.userIdentityLookupInfos, userIdentityLookupInfos)
+        
+        XCTAssertNotNil(operation.shareParticipantFetchedBlock)
+        operation.shareParticipantFetchedBlock?("sharedParticipant")
+        XCTAssertTrue(setByBlock_shareParticipantFetchedBlock)
+    }
+    
+    func test__execution_after_cancellation() {
+        operation.cancel()
+        waitForOperation(operation)
+        
+        XCTAssertTrue(operation.finished)
+        XCTAssertTrue(operation.cancelled)
+    }
+    
+    func test__success_without_completion_block() {
+        waitForOperation(operation)
+        XCTAssertTrue(operation.finished)
+    }
+    
+    func test__success_with_completion_block() {
+        var didExecuteBlock = false
+        operation.setFetchShareParticipantsCompletionBlock {
+            didExecuteBlock = true
+        }
+        waitForOperation(operation)
+        XCTAssertTrue(operation.finished)
+        XCTAssertEqual(operation.errors.count, 0)
+        XCTAssertTrue(didExecuteBlock)
+    }
+    
+    func test__error_without_completion_block() {
+        operation = CloudKitOperation(strategy: .Immediate) {
+            let op = TestFetchShareParticipantsOperation()
+            op.error = NSError(domain: CKErrorDomain, code: CKErrorCode.InternalError.rawValue, userInfo: nil)
+            return op
+        }
+        
+        waitForOperation(operation)
+        XCTAssertTrue(operation.finished)
+        XCTAssertEqual(operation.errors.count, 0)
+    }
+    
+    func test__error_with_completion_block() {
+        operation = CloudKitOperation(strategy: .Immediate) {
+            let op = TestFetchShareParticipantsOperation()
+            op.error = NSError(domain: CKErrorDomain, code: CKErrorCode.InternalError.rawValue, userInfo: nil)
+            return op
+        }
+        var didExecuteBlock = false
+        operation.setFetchShareParticipantsCompletionBlock {
+            didExecuteBlock = true
+        }
+        
+        waitForOperation(operation)
+        XCTAssertTrue(operation.finished)
+        XCTAssertEqual(operation.errors.count, 1)
+        XCTAssertFalse(didExecuteBlock)
     }
 }
 
