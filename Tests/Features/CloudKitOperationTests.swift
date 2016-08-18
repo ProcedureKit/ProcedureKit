@@ -2151,6 +2151,95 @@ class OPRCKQueryOperationTests: CKTests {
 
 // MARK: - CloudKitOperation Test Cases
 
+class CloudKitOperationAcceptSharesOperationTests: CKTests {
+    
+    var container: TestAcceptSharesOperation.Container!
+    var shareMetadatas: [TestAcceptSharesOperation.ShareMetadata]!
+    var setByBlock_perShareCompletionBlock: Bool!
+    
+    var operation: CloudKitOperation<TestAcceptSharesOperation>!
+    
+    override func setUp() {
+        super.setUp()
+        container = "I'm a test container!"
+        shareMetadatas = [ "hello@world.com" ]
+        setByBlock_perShareCompletionBlock = false
+        
+        operation = CloudKitOperation(strategy: .Immediate) { TestAcceptSharesOperation() }
+        operation.container = container
+        operation.shareMetadatas = shareMetadatas
+        operation.perShareCompletionBlock = { [unowned self] _, _, _ in
+            self.setByBlock_perShareCompletionBlock = true
+        }
+    }
+    
+    func test__setting_common_properties() {
+        
+        waitForOperation(operation)
+        XCTAssertTrue(operation.finished)
+        
+        XCTAssertEqual(operation.container, container)
+        XCTAssertEqual(operation.shareMetadatas, shareMetadatas)
+        
+        XCTAssertNotNil(operation.perShareCompletionBlock)
+        operation.perShareCompletionBlock?("shareMetadata", "acceptedShare", nil)
+        XCTAssertTrue(setByBlock_perShareCompletionBlock)
+    }
+    
+    func test__execution_after_cancellation() {
+        operation.cancel()
+        waitForOperation(operation)
+        
+        XCTAssertTrue(operation.finished)
+        XCTAssertTrue(operation.cancelled)
+    }
+    
+    func test__success_without_completion_block() {
+        waitForOperation(operation)
+        XCTAssertTrue(operation.finished)
+    }
+    
+    func test__success_with_completion_block() {
+        var didExecuteBlock = false
+        operation.setAcceptSharesCompletionBlock {
+            didExecuteBlock = true
+        }
+        waitForOperation(operation)
+        XCTAssertTrue(operation.finished)
+        XCTAssertEqual(operation.errors.count, 0)
+        XCTAssertTrue(didExecuteBlock)
+    }
+    
+    func test__error_without_completion_block() {
+        operation = CloudKitOperation(strategy: .Immediate) {
+            let op = TestAcceptSharesOperation()
+            op.error = NSError(domain: CKErrorDomain, code: CKErrorCode.InternalError.rawValue, userInfo: nil)
+            return op
+        }
+        
+        waitForOperation(operation)
+        XCTAssertTrue(operation.finished)
+        XCTAssertEqual(operation.errors.count, 0)
+    }
+    
+    func test__error_with_completion_block() {
+        operation = CloudKitOperation(strategy: .Immediate) {
+            let op = TestAcceptSharesOperation()
+            op.error = NSError(domain: CKErrorDomain, code: CKErrorCode.InternalError.rawValue, userInfo: nil)
+            return op
+        }
+        var didExecuteBlock = false
+        operation.setAcceptSharesCompletionBlock {
+            didExecuteBlock = true
+        }
+        
+        waitForOperation(operation)
+        XCTAssertTrue(operation.finished)
+        XCTAssertEqual(operation.errors.count, 1)
+        XCTAssertFalse(didExecuteBlock)
+    }
+}
+
 // Note: This also tests the error-handling/retry code.
 class CloudKitOperationDiscoverAllContractsTests: CKTests {
 
@@ -2362,6 +2451,91 @@ class CloudKitOperationDiscoverAllContractsTests: CKTests {
     }
 }
 
+class CloudKitOperationDiscoverAllUserIdentitiesOperationTests: CKTests {
+    
+    var container: TestDiscoverAllUserIdentitiesOperation.Container!
+    var setByBlock_userIdentityDiscoveredBlock: Bool!
+    
+    var operation: CloudKitOperation<TestDiscoverAllUserIdentitiesOperation>!
+    
+    override func setUp() {
+        super.setUp()
+        container = "I'm a test container!"
+        setByBlock_userIdentityDiscoveredBlock = false
+        
+        operation = CloudKitOperation(strategy: .Immediate) { TestDiscoverAllUserIdentitiesOperation() }
+        operation.container = container
+        operation.userIdentityDiscoveredBlock = { [unowned self] _ in
+            self.setByBlock_userIdentityDiscoveredBlock = true
+        }
+    }
+    
+    func test__setting_common_properties() {
+        
+        waitForOperation(operation)
+        XCTAssertTrue(operation.finished)
+        
+        XCTAssertEqual(operation.container, container)
+        
+        XCTAssertNotNil(operation.userIdentityDiscoveredBlock)
+        operation.userIdentityDiscoveredBlock?("userIdentity")
+        XCTAssertTrue(setByBlock_userIdentityDiscoveredBlock)
+    }
+    
+    func test__execution_after_cancellation() {
+        operation.cancel()
+        waitForOperation(operation)
+        
+        XCTAssertTrue(operation.finished)
+        XCTAssertTrue(operation.cancelled)
+    }
+    
+    func test__success_without_completion_block() {
+        waitForOperation(operation)
+        XCTAssertTrue(operation.finished)
+    }
+    
+    func test__success_with_completion_block() {
+        var didExecuteBlock = false
+        operation.setDiscoverAllUserIdentitiesCompletionBlock {
+            didExecuteBlock = true
+        }
+        waitForOperation(operation)
+        XCTAssertTrue(operation.finished)
+        XCTAssertEqual(operation.errors.count, 0)
+        XCTAssertTrue(didExecuteBlock)
+    }
+    
+    func test__error_without_completion_block() {
+        operation = CloudKitOperation(strategy: .Immediate) {
+            let op = TestDiscoverAllUserIdentitiesOperation()
+            op.error = NSError(domain: CKErrorDomain, code: CKErrorCode.InternalError.rawValue, userInfo: nil)
+            return op
+        }
+        
+        waitForOperation(operation)
+        XCTAssertTrue(operation.finished)
+        XCTAssertEqual(operation.errors.count, 0)
+    }
+    
+    func test__error_with_completion_block() {
+        operation = CloudKitOperation(strategy: .Immediate) {
+            let op = TestDiscoverAllUserIdentitiesOperation()
+            op.error = NSError(domain: CKErrorDomain, code: CKErrorCode.InternalError.rawValue, userInfo: nil)
+            return op
+        }
+        var didExecuteBlock = false
+        operation.setDiscoverAllUserIdentitiesCompletionBlock {
+            didExecuteBlock = true
+        }
+        
+        waitForOperation(operation)
+        XCTAssertTrue(operation.finished)
+        XCTAssertEqual(operation.errors.count, 1)
+        XCTAssertFalse(didExecuteBlock)
+    }
+}
+
 class CloudKitOperationDiscoverUserInfosOperationTests: CKTests {
 
     var operation: CloudKitOperation<TestDiscoverUserInfosOperation>!
@@ -2435,6 +2609,95 @@ class CloudKitOperationDiscoverUserInfosOperationTests: CKTests {
         waitForOperation(operation)
         XCTAssertTrue(operation.finished)
         XCTAssertEqual(operation.errors.count, 1)
+    }
+}
+
+class CloudKitOperationDiscoverUserIdentitiesOperationTests: CKTests {
+    
+    var container: TestDiscoverUserIdentitiesOperation.Container!
+    var userIdentityLookupInfos: [TestDiscoverUserIdentitiesOperation.UserIdentityLookupInfo]!
+    var setByBlock_userIdentityDiscoveredBlock: Bool!
+    
+    var operation: CloudKitOperation<TestDiscoverUserIdentitiesOperation>!
+    
+    override func setUp() {
+        super.setUp()
+        container = "I'm a test container!"
+        userIdentityLookupInfos = [ "hello@world.com" ]
+        setByBlock_userIdentityDiscoveredBlock = false
+        
+        operation = CloudKitOperation(strategy: .Immediate) { TestDiscoverUserIdentitiesOperation() }
+        operation.container = container
+        operation.userIdentityLookupInfos = userIdentityLookupInfos
+        operation.userIdentityDiscoveredBlock = { [unowned self] _, _ in
+            self.setByBlock_userIdentityDiscoveredBlock = true
+        }
+    }
+    
+    func test__setting_common_properties() {
+        
+        waitForOperation(operation)
+        XCTAssertTrue(operation.finished)
+        
+        XCTAssertEqual(operation.container, container)
+        XCTAssertEqual(operation.userIdentityLookupInfos, userIdentityLookupInfos)
+        
+        XCTAssertNotNil(operation.userIdentityDiscoveredBlock)
+        operation.userIdentityDiscoveredBlock?("userIdentity", "lookupInfo")
+        XCTAssertTrue(setByBlock_userIdentityDiscoveredBlock)
+    }
+    
+    func test__execution_after_cancellation() {
+        operation.cancel()
+        waitForOperation(operation)
+        
+        XCTAssertTrue(operation.finished)
+        XCTAssertTrue(operation.cancelled)
+    }
+    
+    func test__success_without_completion_block() {
+        waitForOperation(operation)
+        XCTAssertTrue(operation.finished)
+    }
+    
+    func test__success_with_completion_block() {
+        var didExecuteBlock = false
+        operation.setDiscoverUserIdentitiesCompletionBlock {
+            didExecuteBlock = true
+        }
+        waitForOperation(operation)
+        XCTAssertTrue(operation.finished)
+        XCTAssertEqual(operation.errors.count, 0)
+        XCTAssertTrue(didExecuteBlock)
+    }
+    
+    func test__error_without_completion_block() {
+        operation = CloudKitOperation(strategy: .Immediate) {
+            let op = TestDiscoverUserIdentitiesOperation()
+            op.error = NSError(domain: CKErrorDomain, code: CKErrorCode.InternalError.rawValue, userInfo: nil)
+            return op
+        }
+        
+        waitForOperation(operation)
+        XCTAssertTrue(operation.finished)
+        XCTAssertEqual(operation.errors.count, 0)
+    }
+    
+    func test__error_with_completion_block() {
+        operation = CloudKitOperation(strategy: .Immediate) {
+            let op = TestDiscoverUserIdentitiesOperation()
+            op.error = NSError(domain: CKErrorDomain, code: CKErrorCode.InternalError.rawValue, userInfo: nil)
+            return op
+        }
+        var didExecuteBlock = false
+        operation.setDiscoverUserIdentitiesCompletionBlock {
+            didExecuteBlock = true
+        }
+        
+        waitForOperation(operation)
+        XCTAssertTrue(operation.finished)
+        XCTAssertEqual(operation.errors.count, 1)
+        XCTAssertFalse(didExecuteBlock)
     }
 }
 
