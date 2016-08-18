@@ -507,8 +507,13 @@ extension CKOperation: CKOperationType {
     /// The RecordID is a CKRecordID
     public typealias RecordID = CKRecordID
 
-    /// The Subscription is a CKSubscription
-    public typealias Subscription = CKSubscription
+    #if !os(watchOS)
+        /// The Subscription is a CKSubscription
+        public typealias Subscription = CKSubscription
+    #else
+        // CKSubscription is unsupported on watchOS
+        public typealias Subscription = Void
+    #endif
 
     /// The RecordSavePolicy is a CKRecordSavePolicy
     public typealias RecordSavePolicy = CKRecordSavePolicy
@@ -668,11 +673,13 @@ extension CKFetchShareParticipantsOperation: CKFetchShareParticipantsOperationTy
     public typealias Error = CloudKitError
 }
 
+#if !os(watchOS)
 extension CKFetchSubscriptionsOperation: CKFetchSubscriptionsOperationType, AssociatedErrorType {
 
     // The associated error type
     public typealias Error = FetchSubscriptionsError<Subscription>
 }
+#endif
 
 extension CKModifyRecordZonesOperation: CKModifyRecordZonesOperationType, AssociatedErrorType, BatchModifyOperationType {
 
@@ -706,6 +713,7 @@ extension CKModifyRecordsOperation: CKModifyRecordsOperationType, AssociatedErro
     }
 }
 
+#if !os(watchOS)
 extension CKModifySubscriptionsOperation: CKModifySubscriptionsOperationType, AssociatedErrorType, BatchModifyOperationType {
 
     // The associated error type
@@ -721,6 +729,7 @@ extension CKModifySubscriptionsOperation: CKModifySubscriptionsOperationType, As
         set { subscriptionIDsToDelete = newValue }
     }
 }
+#endif
 
 extension CKQueryOperation: CKQueryOperationType, AssociatedErrorType {
 
