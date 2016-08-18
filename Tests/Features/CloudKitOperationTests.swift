@@ -792,6 +792,86 @@ class OPRCKFetchAllChangesTests: CKTests {
     }
 }
 
+class OPRCKAcceptSharesOperationTests: CKTests {
+    
+    var target: TestAcceptSharesOperation!
+    var operation: OPRCKOperation<TestAcceptSharesOperation>!
+    
+    override func setUp() {
+        super.setUp()
+        target = TestAcceptSharesOperation()
+        operation = OPRCKOperation(operation: target)
+    }
+    
+    func test__get_share_metadatas() {
+        target.shareMetadatas = [ "hello@world.com" ]
+        XCTAssertNotNil(operation.shareMetadatas)
+        XCTAssertEqual(operation.shareMetadatas.count, 1)
+        XCTAssertEqual(operation.shareMetadatas, [ "hello@world.com" ])
+    }
+    
+    func test__set_share_metadatas() {
+        operation.shareMetadatas = [ "hello@world.com" ]
+        XCTAssertNotNil(target.shareMetadatas)
+        XCTAssertEqual(target.shareMetadatas.count, 1)
+        XCTAssertEqual(target.shareMetadatas, [ "hello@world.com" ])
+    }
+    
+    func test__get_per_share_completion_block() {
+        target.perShareCompletionBlock = { _ in }
+        XCTAssertNotNil(operation.perShareCompletionBlock)
+    }
+    
+    func test__set_per_share_completion_block() {
+        operation.perShareCompletionBlock = { _ in }
+        XCTAssertNotNil(target.perShareCompletionBlock)
+    }
+    
+    func test__execution_after_cancellation() {
+        operation.cancel()
+        waitForOperation(operation)
+        XCTAssertTrue(operation.finished)
+        XCTAssertTrue(operation.cancelled)
+    }
+    
+    func test__successful_execution_without_completion_block() {
+        waitForOperation(operation)
+        XCTAssertTrue(operation.finished)
+    }
+    
+    func test__error_without_completion_block() {
+        target.error = NSError(domain: CKErrorDomain, code: CKErrorCode.InternalError.rawValue, userInfo: nil)
+        waitForOperation(operation)
+        XCTAssertTrue(operation.finished)
+        XCTAssertEqual(operation.errors.count, 0)
+    }
+    
+    func test__success_with_completion_block() {
+        var didExecuteBlock: Bool = false
+        operation.setAcceptSharesCompletionBlock {
+            didExecuteBlock = true
+        }
+        
+        waitForOperation(operation)
+        XCTAssertTrue(operation.finished)
+        XCTAssertEqual(operation.errors.count, 0)
+        XCTAssertTrue(didExecuteBlock)
+    }
+    
+    func test__error_with_completion_block() {
+        var didExecuteBlock: Bool = false
+        target.error = NSError(domain: CKErrorDomain, code: CKErrorCode.InternalError.rawValue, userInfo: nil)
+        operation.setAcceptSharesCompletionBlock {
+            didExecuteBlock = true
+        }
+        
+        waitForOperation(operation)
+        XCTAssertTrue(operation.finished)
+        XCTAssertEqual(operation.errors.count, 1)
+        XCTAssertFalse(didExecuteBlock)
+    }
+}
+
 class OPRCKDiscoverAllContactsOperationTests: CKTests {
 
     var target: TestDiscoverAllContactsOperation!
@@ -845,6 +925,72 @@ class OPRCKDiscoverAllContactsOperationTests: CKTests {
         waitForOperation(operation)
         XCTAssertTrue(operation.finished)
         XCTAssertEqual(operation.errors.count, 1)
+    }
+}
+
+class OPRCKDiscoverAllUserIdentitiesOperationTests: CKTests {
+    
+    var target: TestDiscoverAllUserIdentitiesOperation!
+    var operation: OPRCKOperation<TestDiscoverAllUserIdentitiesOperation>!
+    
+    override func setUp() {
+        super.setUp()
+        target = TestDiscoverAllUserIdentitiesOperation()
+        operation = OPRCKOperation(operation: target)
+    }
+    
+    func test__get_user_identity_discovered_block() {
+        target.userIdentityDiscoveredBlock = { _ in }
+        XCTAssertNotNil(operation.userIdentityDiscoveredBlock)
+    }
+    
+    func test__set_user_identity_discovered_block() {
+        operation.userIdentityDiscoveredBlock = { _ in }
+        XCTAssertNotNil(target.userIdentityDiscoveredBlock)
+    }
+    
+    func test__execution_after_cancellation() {
+        operation.cancel()
+        waitForOperation(operation)
+        XCTAssertTrue(operation.finished)
+        XCTAssertTrue(operation.cancelled)
+    }
+    
+    func test__successful_execution_without_completion_block() {
+        waitForOperation(operation)
+        XCTAssertTrue(operation.finished)
+    }
+    
+    func test__error_without_completion_block() {
+        target.error = NSError(domain: CKErrorDomain, code: CKErrorCode.InternalError.rawValue, userInfo: nil)
+        waitForOperation(operation)
+        XCTAssertTrue(operation.finished)
+        XCTAssertEqual(operation.errors.count, 0)
+    }
+    
+    func test__success_with_completion_block() {
+        var didExecuteBlock: Bool = false
+        operation.setDiscoverAllUserIdentitiesCompletionBlock {
+            didExecuteBlock = true
+        }
+        
+        waitForOperation(operation)
+        XCTAssertTrue(operation.finished)
+        XCTAssertEqual(operation.errors.count, 0)
+        XCTAssertTrue(didExecuteBlock)
+    }
+    
+    func test__error_with_completion_block() {
+        var didExecuteBlock: Bool = false
+        target.error = NSError(domain: CKErrorDomain, code: CKErrorCode.InternalError.rawValue, userInfo: nil)
+        operation.setDiscoverAllUserIdentitiesCompletionBlock {
+            didExecuteBlock = true
+        }
+        
+        waitForOperation(operation)
+        XCTAssertTrue(operation.finished)
+        XCTAssertEqual(operation.errors.count, 1)
+        XCTAssertFalse(didExecuteBlock)
     }
 }
 
@@ -915,6 +1061,86 @@ class OPRCKDiscoverUserInfosOperationTests: CKTests {
 
         XCTAssertTrue(operation.finished)
         XCTAssertEqual(operation.errors.count, 1)
+    }
+}
+
+class OPRCKDiscoverUserIdentitiesOperationTests: CKTests {
+    
+    var target: TestDiscoverUserIdentitiesOperation!
+    var operation: OPRCKOperation<TestDiscoverUserIdentitiesOperation>!
+    
+    override func setUp() {
+        super.setUp()
+        target = TestDiscoverUserIdentitiesOperation()
+        operation = OPRCKOperation(operation: target)
+    }
+    
+    func test__get_user_identity_lookup_infos() {
+        target.userIdentityLookupInfos = [ "hello@world.com" ]
+        XCTAssertNotNil(operation.userIdentityLookupInfos)
+        XCTAssertEqual(operation.userIdentityLookupInfos.count, 1)
+        XCTAssertEqual(operation.userIdentityLookupInfos, [ "hello@world.com" ])
+    }
+    
+    func test__set_user_identity_lookup_infos() {
+        operation.userIdentityLookupInfos = [ "hello@world.com" ]
+        XCTAssertNotNil(target.userIdentityLookupInfos)
+        XCTAssertEqual(target.userIdentityLookupInfos.count, 1)
+        XCTAssertEqual(target.userIdentityLookupInfos, [ "hello@world.com" ])
+    }
+    
+    func test__get_user_identity_discovered_block() {
+        target.userIdentityDiscoveredBlock = { _, _ in }
+        XCTAssertNotNil(operation.userIdentityDiscoveredBlock)
+    }
+    
+    func test__set_user_identity_discovered_block() {
+        operation.userIdentityDiscoveredBlock = { _, _ in }
+        XCTAssertNotNil(target.userIdentityDiscoveredBlock)
+    }
+    
+    func test__execution_after_cancellation() {
+        operation.cancel()
+        waitForOperation(operation)
+        XCTAssertTrue(operation.finished)
+        XCTAssertTrue(operation.cancelled)
+    }
+    
+    func test__successful_execution_without_completion_block() {
+        waitForOperation(operation)
+        XCTAssertTrue(operation.finished)
+    }
+    
+    func test__error_without_completion_block() {
+        target.error = NSError(domain: CKErrorDomain, code: CKErrorCode.InternalError.rawValue, userInfo: nil)
+        waitForOperation(operation)
+        XCTAssertTrue(operation.finished)
+        XCTAssertEqual(operation.errors.count, 0)
+    }
+    
+    func test__success_with_completion_block() {
+        var didExecuteBlock: Bool = false
+        operation.setDiscoverUserIdentitiesCompletionBlock {
+            didExecuteBlock = true
+        }
+        
+        waitForOperation(operation)
+        XCTAssertTrue(operation.finished)
+        XCTAssertEqual(operation.errors.count, 0)
+        XCTAssertTrue(didExecuteBlock)
+    }
+    
+    func test__error_with_completion_block() {
+        var didExecuteBlock: Bool = false
+        target.error = NSError(domain: CKErrorDomain, code: CKErrorCode.InternalError.rawValue, userInfo: nil)
+        operation.setDiscoverUserIdentitiesCompletionBlock {
+            didExecuteBlock = true
+        }
+        
+        waitForOperation(operation)
+        XCTAssertTrue(operation.finished)
+        XCTAssertEqual(operation.errors.count, 1)
+        XCTAssertFalse(didExecuteBlock)
     }
 }
 
@@ -1068,6 +1294,76 @@ class OPRCKModifyBadgeOperationTests: CKTests {
 
         XCTAssertTrue(operation.finished)
         XCTAssertEqual(operation.errors.count, 1)
+    }
+}
+
+class OPRCKFetchDatabaseChangesOperationTests: CKTests {
+    
+    var target: TestFetchDatabaseChangesOperation!
+    var operation: OPRCKOperation<TestFetchDatabaseChangesOperation>!
+    
+    override func setUp() {
+        super.setUp()
+        target = TestFetchDatabaseChangesOperation()
+        operation = OPRCKOperation(operation: target)
+    }
+
+    func test__get_record_zone_with_id_changed_block() {
+        target.recordZoneWithIDChangedBlock = { _ in }
+        XCTAssertNotNil(operation.recordZoneWithIDChangedBlock)
+    }
+    
+    func test__set_record_zone_with_id_changed_block() {
+        operation.recordZoneWithIDChangedBlock = { _ in }
+        XCTAssertNotNil(target.recordZoneWithIDChangedBlock)
+    }
+    
+    func test__get_record_zone_with_id_was_deleted_block() {
+        target.recordZoneWithIDWasDeletedBlock = { _ in }
+        XCTAssertNotNil(operation.recordZoneWithIDWasDeletedBlock)
+    }
+    
+    func test__set_record_zone_with_id_was_deleted_block() {
+        operation.recordZoneWithIDWasDeletedBlock = { _ in }
+        XCTAssertNotNil(target.recordZoneWithIDWasDeletedBlock)
+    }
+    
+    func test__get_change_token_updated_block() {
+        target.changeTokenUpdatedBlock = { _ in }
+        XCTAssertNotNil(operation.changeTokenUpdatedBlock)
+    }
+    
+    func test__set_change_token_updated_block() {
+        operation.changeTokenUpdatedBlock = { _ in }
+        XCTAssertNotNil(target.changeTokenUpdatedBlock)
+    }
+    
+    func test__success_with_completion_block() {
+        var blockDidRun = false
+        operation.setFetchDatabaseChangesCompletionBlock { _, _ in
+            blockDidRun = true
+        }
+        
+        waitForOperation(operation)
+        
+        XCTAssertTrue(operation.finished)
+        XCTAssertEqual(operation.errors.count, 0)
+        XCTAssertTrue(blockDidRun)
+    }
+    
+    func test__error_with_completion_block() {
+        var blockDidRun = false
+        target.error = NSError(domain: CKErrorDomain, code: CKErrorCode.InternalError.rawValue, userInfo: nil)
+        
+        operation.setFetchDatabaseChangesCompletionBlock { _, _ in
+            blockDidRun = true
+        }
+        
+        waitForOperation(operation)
+        
+        XCTAssertTrue(operation.finished)
+        XCTAssertEqual(operation.errors.count, 1)
+        XCTAssertFalse(blockDidRun)
     }
 }
 
