@@ -558,6 +558,9 @@ extension CKAcceptSharesOperation: CKAcceptSharesOperationType, AssociatedErrorT
 
 /// Extension to have CKDiscoverAllContactsOperation conform to CKDiscoverAllContactsOperationType
 #if !os(tvOS)
+@available(iOS, introduced=8.0, deprecated=10.0, message="Use CKDiscoverAllUserIdentitiesOperation instead")
+@available(OSX, introduced=10.10, deprecated=10.12, message="Use CKDiscoverAllUserIdentitiesOperation instead")
+@available(watchOS, introduced=2.0, deprecated=3.0, message="Use CKDiscoverAllUserIdentitiesOperation instead")
 extension CKDiscoverAllContactsOperation: CKDiscoverAllContactsOperationType, AssociatedErrorType {
 
     // The associated error type
@@ -572,6 +575,10 @@ extension CKDiscoverAllUserIdentitiesOperation: CKDiscoverAllUserIdentitiesOpera
     public typealias Error = CloudKitError
 }
 
+@available(iOS, introduced=8.0, deprecated=10.0, message="Use CKDiscoverUserIdentitiesOperation instead")
+@available(OSX, introduced=10.10, deprecated=10.12, message="Use CKDiscoverUserIdentitiesOperation instead")
+@available(tvOS, introduced=8.0, deprecated=10.0, message="Use CKDiscoverUserIdentitiesOperation instead")
+@available(watchOS, introduced=2.0, deprecated=3.0, message="Use CKDiscoverUserIdentitiesOperation instead")
 extension CKDiscoverUserInfosOperation: CKDiscoverUserInfosOperationType, AssociatedErrorType {
 
     // The associated error type
@@ -615,6 +622,10 @@ extension CKFetchDatabaseChangesOperation: CKFetchDatabaseChangesOperationType, 
     public typealias Error = FetchDatabaseChangesError<ServerChangeToken>
 }
 
+@available(iOS, introduced=8.0, deprecated=10.0, message="Use CKFetchRecordZoneChangesOperation instead")
+@available(OSX, introduced=10.10, deprecated=10.12, message="Use CKFetchRecordZoneChangesOperation instead")
+@available(tvOS, introduced=8.0, deprecated=10.0, message="Use CKFetchRecordZoneChangesOperation instead")
+@available(watchOS, introduced=2.0, deprecated=3.0, message="Use CKFetchRecordZoneChangesOperation instead")
 extension CKFetchRecordChangesOperation: CKFetchRecordChangesOperationType, AssociatedErrorType {
 
     // The associated error type
