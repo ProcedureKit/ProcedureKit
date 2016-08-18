@@ -571,12 +571,14 @@ extension CKDiscoverAllContactsOperation: CKDiscoverAllContactsOperationType, As
 }
 #endif
 
-@available(iOS 10.0, OSX 10.12, tvOS 10.0, watchOS 3.0, *)
+#if !os(tvOS)
+@available(iOS 10.0, OSX 10.12, watchOS 3.0, *)
 extension CKDiscoverAllUserIdentitiesOperation: CKDiscoverAllUserIdentitiesOperationType, AssociatedErrorType {
 
     // The associated error type
     public typealias Error = CloudKitError
 }
+#endif
 
 @available(iOS, introduced=8.0, deprecated=10.0, message="Use CKDiscoverUserIdentitiesOperation instead")
 @available(OSX, introduced=10.10, deprecated=10.12, message="Use CKDiscoverUserIdentitiesOperation instead")
