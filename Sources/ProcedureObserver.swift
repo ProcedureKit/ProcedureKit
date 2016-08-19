@@ -119,3 +119,30 @@ public protocol DidFinishProcedureObserver: ProcedureObserver {
     func didFinish(procedure: Procedure, errors: [Error])
 }
 
+
+// MARK: - Unavilable & Renamed
+
+@available(*, unavailable, renamed:"ProcedureObserver")
+public protocol OperationObserverType { }
+
+@available(*, unavailable, renamed:"WillExecuteProcedureObserver")
+public protocol OperationWillExecuteObserver { }
+
+@available(*, unavailable, renamed:"WillCancelProcedureObserver")
+public protocol OperationWillCancelObserver { }
+
+@available(*, unavailable, renamed:"DidCancelProcedureObserver")
+public protocol OperationDidCancelObserver { }
+
+@available(*, unavailable, renamed:"DidProduceOperationProcedureObserver")
+public protocol OperationDidProduceOperationObserver { }
+
+@available(*, unavailable, renamed:"WillFinishProcedureObserver")
+public protocol OperationWillFinishObserver { }
+
+@available(*, unavailable, renamed:"DidFinishProcedureObserver")
+public protocol OperationDidFinishObserver { }
+
+@available(*, unavailable, message:"This protocol has now been removed and can be replaced with the required combination of ProcedureObserver protocols.")
+public protocol OperationObserver { }
+
