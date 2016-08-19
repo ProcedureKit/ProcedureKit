@@ -19,3 +19,13 @@ public protocol ProcedureObserver {
      */
     func didAttachTo(procedure: Procedure)
 }
+
+public extension ProcedureObserver {
+
+    /**
+     Default implementation does nothing.
+
+     - parameter procedure: the observed `Procedure`.
+     */
+    func didAttachTo(procedure: Procedure) { }
+}
