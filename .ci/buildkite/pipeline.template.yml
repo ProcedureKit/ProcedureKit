@@ -20,23 +20,6 @@ steps:
       iOS-Simulator: true
       swift: "3.0"
   -
-    name: "Mac: macOS"
-    command: "source /usr/local/opt/chruby/share/chruby/chruby.sh && chruby ruby && bundle install --quiet && bundle exec fastlane mac test_mac"
-    agents:
-      swift: "3.0"      
-  -
-    name: "Mobile: iOS"
-    command: "source /usr/local/opt/chruby/share/chruby/chruby.sh && chruby ruby && bundle install --quiet && bundle exec fastlane ios test_mobile_ios"
-    agents:
-      iOS-Simulator: true    
-      swift: "3.0"
-  -
-    name: "TV: tvOS"
-    command: "source /usr/local/opt/chruby/share/chruby/chruby.sh && chruby ruby && bundle install --quiet && bundle exec fastlane ios test_tv_tvos"
-    agents:
-      iOS-Simulator: true    
-      swift: "3.0"
-  -
     name: "Cloud: macOS"
     command: "source /usr/local/opt/chruby/share/chruby/chruby.sh && chruby ruby && bundle install --quiet && bundle exec fastlane mac test_cloud"
     agents:
@@ -52,4 +35,21 @@ steps:
     command: "source /usr/local/opt/chruby/share/chruby/chruby.sh && chruby ruby && bundle install --quiet && bundle exec fastlane ios test_tvos_cloud"
     agents:
       iOS-Simulator: true    
+      swift: "3.0"            
+  -
+    name: "Mac"
+    command: "source /usr/local/opt/chruby/share/chruby/chruby.sh && chruby ruby && bundle install --quiet && bundle exec fastlane mac test_mac"
+    agents:
       swift: "3.0"      
+  -
+    name: "Mobile"
+    command: "source /usr/local/opt/chruby/share/chruby/chruby.sh && chruby ruby && bundle install --quiet && bundle exec fastlane ios test_mobile_ios"
+    agents:
+      iOS-Simulator: true    
+      swift: "3.0"
+  -
+    name: "TV"
+    command: "source /usr/local/opt/chruby/share/chruby/chruby.sh && chruby ruby && bundle install --quiet && bundle exec fastlane ios test_tv_tvos"
+    agents:
+      iOS-Simulator: true    
+      swift: "3.0"
