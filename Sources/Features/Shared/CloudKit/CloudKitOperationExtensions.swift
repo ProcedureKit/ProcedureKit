@@ -38,7 +38,7 @@ extension OPRCKOperation where T: CKOperationType {
 
     #if swift(>=3.0) // TEMPORARY FIX: Swift 2.3 compiler crash (see: CloudKitInterface.swift)
         @available(iOS 9.3, tvOS 9.3, OSX 10.12, watchOS 2.3, *)
-        var longLivedOperationWasPersistedBlock: () -> Swift.Void {
+        var longLivedOperationWasPersistedBlock: () -> Void {
             get { return operation.longLivedOperationWasPersistedBlock }
             set { operation.longLivedOperationWasPersistedBlock = newValue }
         }
@@ -96,7 +96,7 @@ extension CloudKitOperation where T: CKOperationType {
     #if swift(>=3.0) // TEMPORARY FIX: Swift 2.3 compiler crash (see: CloudKitInterface.swift)
         /// - returns the block to execute when the server starts storing callbacks for this long-lived CKOperation
         @available(iOS 9.3, tvOS 9.3, OSX 10.12, watchOS 2.3, *)
-        var longLivedOperationWasPersistedBlock: () -> Swift.Void {
+        public var longLivedOperationWasPersistedBlock: () -> Void {
             get { return operation.longLivedOperationWasPersistedBlock }
             set {
                 operation.longLivedOperationWasPersistedBlock = newValue
@@ -108,7 +108,7 @@ extension CloudKitOperation where T: CKOperationType {
     /// If non-zero, overrides the timeout interval for any network requests issued by this operation.
     /// See NSURLSessionConfiguration.timeoutIntervalForRequest
     @available(iOS 10.0, tvOS 10.0, OSX 10.12, watchOS 3.0, *)
-    var timeoutIntervalForRequest: NSTimeInterval  {
+    public var timeoutIntervalForRequest: NSTimeInterval  {
         get { return operation.timeoutIntervalForRequest }
         set {
             operation.timeoutIntervalForRequest = newValue
@@ -119,7 +119,7 @@ extension CloudKitOperation where T: CKOperationType {
     /// If non-zero, overrides the timeout interval for any network resources retrieved by this operation.
     /// See NSURLSessionConfiguration.timeoutIntervalForResource
     @available(iOS 10.0, tvOS 10.0, OSX 10.12, watchOS 3.0, *)
-    var timeoutIntervalForResource: NSTimeInterval {
+    public var timeoutIntervalForResource: NSTimeInterval {
         get { return operation.timeoutIntervalForResource }
         set {
             operation.timeoutIntervalForResource = newValue
@@ -167,7 +167,7 @@ extension BatchedCloudKitOperation where T: CKOperationType {
     #if swift(>=3.0) // TEMPORARY FIX: Swift 2.3 compiler crash (see: CloudKitInterface.swift)
         /// - returns the block to execute when the server starts storing callbacks for this long-lived CKOperation
         @available(iOS 9.3, tvOS 9.3, OSX 10.12, watchOS 2.3, *)
-        var longLivedOperationWasPersistedBlock: () -> Swift.Void {
+        public var longLivedOperationWasPersistedBlock: () -> Void {
             get { return operation.longLivedOperationWasPersistedBlock }
             set {
                 operation.longLivedOperationWasPersistedBlock = newValue
@@ -179,7 +179,7 @@ extension BatchedCloudKitOperation where T: CKOperationType {
     /// If non-zero, overrides the timeout interval for any network requests issued by this operation.
     /// See NSURLSessionConfiguration.timeoutIntervalForRequest
     @available(iOS 10.0, tvOS 10.0, OSX 10.12, watchOS 3.0, *)
-    var timeoutIntervalForRequest: NSTimeInterval  {
+    public var timeoutIntervalForRequest: NSTimeInterval  {
         get { return operation.timeoutIntervalForRequest }
         set {
             operation.timeoutIntervalForRequest = newValue
@@ -190,7 +190,7 @@ extension BatchedCloudKitOperation where T: CKOperationType {
     /// If non-zero, overrides the timeout interval for any network resources retrieved by this operation.
     /// See NSURLSessionConfiguration.timeoutIntervalForResource
     @available(iOS 10.0, tvOS 10.0, OSX 10.12, watchOS 3.0, *)
-    var timeoutIntervalForResource: NSTimeInterval {
+    public var timeoutIntervalForResource: NSTimeInterval {
         get { return operation.timeoutIntervalForResource }
         set {
             operation.timeoutIntervalForResource = newValue
@@ -484,7 +484,7 @@ extension CloudKitOperation where T: CKAcceptSharesOperationType {
     public typealias AcceptSharesCompletionBlock = () -> Void
 
     /// - returns: the share metadatas
-    var shareMetadatas: [T.ShareMetadata] {
+    public var shareMetadatas: [T.ShareMetadata] {
         get { return operation.shareMetadatas }
         set {
             operation.shareMetadatas = newValue
@@ -493,7 +493,7 @@ extension CloudKitOperation where T: CKAcceptSharesOperationType {
     }
 
     /// - returns: the block used to return accepted shares
-    var perShareCompletionBlock: AcceptSharesPerShareCompletionBlock? {
+    public var perShareCompletionBlock: AcceptSharesPerShareCompletionBlock? {
         get { return operation.perShareCompletionBlock }
         set {
             operation.perShareCompletionBlock = newValue
@@ -587,7 +587,7 @@ extension CloudKitOperation where T: CKDiscoverAllUserIdentitiesOperationType {
     public typealias DiscoverAllUserIdentitiesCompletionBlock = () -> Void
 
     /// - returns: a block for when a recordZone changeToken update is sent
-    var userIdentityDiscoveredBlock: DiscoverAllUserIdentitiesUserIdentityDiscoveredBlock? {
+    public var userIdentityDiscoveredBlock: DiscoverAllUserIdentitiesUserIdentityDiscoveredBlock? {
         get { return operation.userIdentityDiscoveredBlock }
         set {
             operation.userIdentityDiscoveredBlock = newValue
@@ -712,7 +712,7 @@ extension CloudKitOperation where T: CKDiscoverUserIdentitiesOperationType {
     }
 
     /// - returns: the block used to return discovered user identities
-    var userIdentityDiscoveredBlock: DiscoverUserIdentitiesUserIdentityDiscoveredBlock? {
+    public var userIdentityDiscoveredBlock: DiscoverUserIdentitiesUserIdentityDiscoveredBlock? {
         get { return operation.userIdentityDiscoveredBlock }
         set {
             operation.userIdentityDiscoveredBlock = newValue
@@ -980,7 +980,7 @@ extension CloudKitOperation where T: CKFetchDatabaseChangesOperationType {
     public typealias FetchDatabaseChangesCompletionBlock = (serverChangeToken: T.ServerChangeToken?, moreComing: Bool) -> Void
 
     /// - returns: a block for when a record is changed
-    var recordZoneWithIDChangedBlock: FetchDatabaseChangesRecordZoneWithIDChangedBlock? {
+    public var recordZoneWithIDChangedBlock: FetchDatabaseChangesRecordZoneWithIDChangedBlock? {
         get { return operation.recordZoneWithIDChangedBlock }
         set {
             operation.recordZoneWithIDChangedBlock = newValue
@@ -989,7 +989,7 @@ extension CloudKitOperation where T: CKFetchDatabaseChangesOperationType {
     }
 
     /// - returns: a block for when a recordID is deleted (receives the recordID and the recordType)
-    var recordZoneWithIDWasDeletedBlock: FetchDatabaseChangesRecordZoneWithIDWasDeletedBlock? {
+    public var recordZoneWithIDWasDeletedBlock: FetchDatabaseChangesRecordZoneWithIDWasDeletedBlock? {
         get { return operation.recordZoneWithIDWasDeletedBlock }
         set {
             operation.recordZoneWithIDWasDeletedBlock = newValue
@@ -998,7 +998,7 @@ extension CloudKitOperation where T: CKFetchDatabaseChangesOperationType {
     }
 
     /// - returns: a block for when a recordZone changeToken update is sent
-    var changeTokenUpdatedBlock: FetchDatabaseChangesChangeTokenUpdatedBlock? {
+    public var changeTokenUpdatedBlock: FetchDatabaseChangesChangeTokenUpdatedBlock? {
         get { return operation.changeTokenUpdatedBlock }
         set {
             operation.changeTokenUpdatedBlock = newValue
@@ -1386,7 +1386,7 @@ extension CloudKitOperation where T: CKFetchRecordZoneChangesOperationType {
     }
 
     /// - returns: the per-record-zone options
-    var optionsByRecordZoneID: [T.RecordZoneID : T.FetchRecordZoneChangesOptions]? {
+    public var optionsByRecordZoneID: [T.RecordZoneID : T.FetchRecordZoneChangesOptions]? {
         get { return operation.optionsByRecordZoneID }
         set {
             operation.optionsByRecordZoneID = newValue
@@ -1395,7 +1395,7 @@ extension CloudKitOperation where T: CKFetchRecordZoneChangesOperationType {
     }
 
     /// - returns: a block for when a record is changed
-    var recordChangedBlock: FetchRecordZoneChangesRecordChangedBlock? {
+    public var recordChangedBlock: FetchRecordZoneChangesRecordChangedBlock? {
         get { return operation.recordChangedBlock }
         set {
             operation.recordChangedBlock = newValue
@@ -1404,7 +1404,7 @@ extension CloudKitOperation where T: CKFetchRecordZoneChangesOperationType {
     }
 
     /// - returns: a block for when a recordID is deleted (receives the recordID and the recordType)
-    var recordWithIDWasDeletedBlock: FetchRecordZoneChangesRecordWithIDWasDeletedBlock? {
+    public var recordWithIDWasDeletedBlock: FetchRecordZoneChangesRecordWithIDWasDeletedBlock? {
         get { return operation.recordWithIDWasDeletedBlock }
         set {
             operation.recordWithIDWasDeletedBlock = newValue
@@ -1413,7 +1413,7 @@ extension CloudKitOperation where T: CKFetchRecordZoneChangesOperationType {
     }
 
     /// - returns: a block for when a recordZone changeToken update is sent
-    var recordZoneChangeTokensUpdatedBlock: FetchRecordZoneChangesRecordZoneChangeTokensUpdatedBlock? {
+    public var recordZoneChangeTokensUpdatedBlock: FetchRecordZoneChangesRecordZoneChangeTokensUpdatedBlock? {
         get { return operation.recordZoneChangeTokensUpdatedBlock }
         set {
             operation.recordZoneChangeTokensUpdatedBlock = newValue
@@ -1487,7 +1487,7 @@ extension CloudKitOperation where T: CKFetchShareMetadataOperationType {
     }
 
     /// - returns: whether to fetch the share root record
-    var shouldFetchRootRecord: Bool {
+    public var shouldFetchRootRecord: Bool {
         get { return operation.shouldFetchRootRecord }
         set {
             operation.shouldFetchRootRecord = newValue
@@ -1496,7 +1496,7 @@ extension CloudKitOperation where T: CKFetchShareMetadataOperationType {
     }
 
     /// - returns: the share root record desired keys
-    var rootRecordDesiredKeys: [String]? {
+    public var rootRecordDesiredKeys: [String]? {
         get { return operation.rootRecordDesiredKeys }
         set {
             operation.rootRecordDesiredKeys = newValue
@@ -1505,7 +1505,7 @@ extension CloudKitOperation where T: CKFetchShareMetadataOperationType {
     }
 
     /// - returns: the per share metadata block
-    var perShareMetadataBlock: FetchShareMetadataPerShareMetadataBlock? {
+    public var perShareMetadataBlock: FetchShareMetadataPerShareMetadataBlock? {
         get { return operation.perShareMetadataBlock }
         set {
             operation.perShareMetadataBlock = newValue
@@ -1569,7 +1569,7 @@ extension CloudKitOperation where T: CKFetchShareParticipantsOperationType {
     }
 
     /// - returns: the share participant fetched block
-    var shareParticipantFetchedBlock: FetchShareParticipantsParticipantFetchedBlock? {
+    public var shareParticipantFetchedBlock: FetchShareParticipantsParticipantFetchedBlock? {
         get { return operation.shareParticipantFetchedBlock }
         set {
             operation.shareParticipantFetchedBlock = newValue
