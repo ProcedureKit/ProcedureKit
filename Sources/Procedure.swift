@@ -69,7 +69,7 @@ open class Procedure: Operation {
     private var _isTransitioningToExecuting = false
     private var _isHandlingFinish = false
     private var _isHandlingCancel = false
-//    private var _observers = Protector([OperationObserverType]())
+    private var _observers = Protector([ProcedureObserver]())
     private var _cancelled = false  // should always be set by .cancel()
 
     internal private(set) var directDependencies = Set<Operation>()
