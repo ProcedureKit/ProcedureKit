@@ -20,7 +20,7 @@ public protocol ProcedureQueueDelegate: class {
      - paramter queue: the `ProcedureQueue`.
      - paramter operation: the `Operation` instance about to be added.
      */
-    func procedureQueue(_ queue: ProcedureQueue, willAddOperation procedure: Operation)
+    func procedureQueue(_ queue: ProcedureQueue, willAddOperation operation: Operation)
 
     /**
      An operation has finished on the queue.
@@ -92,31 +92,32 @@ open class ProcedureQueue: OperationQueue {
     // swiftlint:disable function_body_length
     public func add(operation: Operation) {
         if let procedure = operation as? Procedure {
-/* --> Observers
-            procedure.log.verbose("Adding to queue")
+
+//            procedure.log.verbose("Adding to queue")
 
             /// Add an observer so that any produced operations are added to the queue
-            procedure.addObserver(ProducedOperationObserver { [weak self] op, produced in
-                if let q = self {
-                    q.delegate?.operationQueue(q, willProduceOperation: produced)
-                    q.addOperation(produced)
+            procedure.add(observer: DidProduceOperationObserver { [weak self] (_, produced) in
+                if let queue = self {
+                    queue.delegate?.procedureQueue(queue, willProduceOperation: produced)
+                    queue.add(operation: produced)
                 }
             })
 
             /// Add an observer to invoke the will finish delegate method
-            procedure.addObserver(WillFinishObserver { [weak self] operation, errors in
-                if let q = self {
-                    q.delegate?.operationQueue(q, willFinishOperation: operation, withErrors: errors)
+            procedure.add(observer: WillFinishObserver { [weak self] procedure, errors in
+                if let queue = self {
+                    queue.delegate?.procedureQueue(queue, willFinishOperation: procedure, withErrors: errors)
                 }
             })
 
             /// Add an observer to invoke the did finish delegate method
-            procedure.addObserver(DidFinishObserver { [weak self] operation, errors in
-                if let q = self {
-                    q.delegate?.operationQueue(q, didFinishOperation: operation, withErrors: errors)
+            procedure.add(observer: DidFinishObserver { [weak self] procedure, errors in
+                if let queue = self {
+                    queue.delegate?.procedureQueue(queue, didFinishOperation: procedure, withErrors: errors)
                 }
             })
-
+/* -- > Conditions
+             
             /// Process any conditions
             if procedure.conditions.count > 0 {
 

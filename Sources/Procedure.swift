@@ -93,6 +93,19 @@ open class Procedure: Operation {
         super.init()
     }
 
+
+    // MARK: - Add Observer
+
+    /**
+     Add an observer to the to the procedure.
+
+     - parameter observer: type conforming to protocol `ProcedureObserver`.
+     */
+    public func add(observer: ProcedureObserver) {
+
+        observer.didAttach(to: self)
+    }
+
 }
 
 // swiftlint:enable type_body_length

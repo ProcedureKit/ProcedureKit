@@ -17,7 +17,7 @@ public protocol ProcedureObserver {
 
      - parameter procedure: the observed `Procedure`.
      */
-    func didAttachTo(procedure: Procedure)
+    func didAttach(to procedure: Procedure)
 }
 
 public extension ProcedureObserver {
@@ -27,7 +27,7 @@ public extension ProcedureObserver {
 
      - parameter procedure: the observed `Procedure`.
      */
-    func didAttachTo(procedure: Procedure) { }
+    func didAttach(to procedure: Procedure) { }
 }
 
 /**
@@ -41,7 +41,7 @@ public protocol WillExecuteProcedureObserver: ProcedureObserver {
 
      - parameter procedure: the observed `Procedure`.
      */
-    func willExecute(procedure: Procedure)
+    func will(execute procedure: Procedure)
 }
 
 /**
@@ -56,7 +56,7 @@ public protocol WillCancelProcedureObserver: ProcedureObserver {
      - parameter procedure: the observed `Procedure`.
      - parameter errors: an array of [Error] types.
      */
-    func willCancel(procedure: Procedure, errors: [Error])
+    func will(cancel procedure: Procedure, errors: [Error])
 }
 
 /**
@@ -70,7 +70,7 @@ public protocol DidCancelProcedureObserver: ProcedureObserver {
 
      - parameter procedure: the observed `Procedure`.
      */
-    func didCancel(procedure: Procedure)
+    func did(cancel procedure: Procedure)
 }
 
 /**
@@ -87,7 +87,7 @@ public protocol DidProduceOperationProcedureObserver: ProcedureObserver {
      - parameter procedure: the observed `Procedure`.
      - parameter newOperation: the produced `Operation`
      */
-    func procedure(_ procedure: Procedure, didProduceOperation newOperation: Operation)
+    func procedure(_ procedure: Procedure, didProduce newOperation: Operation)
 }
 
 /**
@@ -101,7 +101,7 @@ public protocol WillFinishProcedureObserver: ProcedureObserver {
      - parameter procedure: the observed `Procedure`.
      - parameter errors: an array of `Error`s.
      */
-    func willFinish(procedure: Procedure, errors: [Error])
+    func will(finish procedure: Procedure, withErrors errors: [Error])
 }
 
 /**
@@ -116,33 +116,33 @@ public protocol DidFinishProcedureObserver: ProcedureObserver {
      - parameter procedure: the observed `Procedure`.
      - parameter errors: an array of `ErrorType`s.
      */
-    func didFinish(procedure: Procedure, errors: [Error])
+    func did(finish procedure: Procedure, withErrors errors: [Error])
 }
 
 
 // MARK: - Unavilable & Renamed
 
-@available(*, unavailable, renamed:"ProcedureObserver")
+@available(*, unavailable, renamed: "ProcedureObserver")
 public protocol OperationObserverType { }
 
-@available(*, unavailable, renamed:"WillExecuteProcedureObserver")
+@available(*, unavailable, renamed: "WillExecuteProcedureObserver")
 public protocol OperationWillExecuteObserver { }
 
-@available(*, unavailable, renamed:"WillCancelProcedureObserver")
+@available(*, unavailable, renamed: "WillCancelProcedureObserver")
 public protocol OperationWillCancelObserver { }
 
-@available(*, unavailable, renamed:"DidCancelProcedureObserver")
+@available(*, unavailable, renamed: "DidCancelProcedureObserver")
 public protocol OperationDidCancelObserver { }
 
-@available(*, unavailable, renamed:"DidProduceOperationProcedureObserver")
+@available(*, unavailable, renamed: "DidProduceOperationProcedureObserver")
 public protocol OperationDidProduceOperationObserver { }
 
-@available(*, unavailable, renamed:"WillFinishProcedureObserver")
+@available(*, unavailable, renamed: "WillFinishProcedureObserver")
 public protocol OperationWillFinishObserver { }
 
-@available(*, unavailable, renamed:"DidFinishProcedureObserver")
+@available(*, unavailable, renamed: "DidFinishProcedureObserver")
 public protocol OperationDidFinishObserver { }
 
-@available(*, unavailable, message:"This protocol has now been removed and can be replaced with the required combination of ProcedureObserver protocols.")
+@available(*, unavailable, message: "This protocol has now been removed and can be replaced with the required combination of ProcedureObserver protocols.")
 public protocol OperationObserver { }
 
