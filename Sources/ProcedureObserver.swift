@@ -15,9 +15,9 @@ public protocol ProcedureObserver {
     /**
      Observer gets notified when it is attached to a procedure.
 
-     - parameter procedure: the observed `Procedure`.
+     - parameter procedure: the observed procedure, P.
      */
-    func didAttach(to procedure: Procedure)
+    func didAttach<P: Procedure>(to procedure: P)
 }
 
 public extension ProcedureObserver {
@@ -27,7 +27,7 @@ public extension ProcedureObserver {
 
      - parameter procedure: the observed `Procedure`.
      */
-    func didAttach(to procedure: Procedure) { }
+    func didAttach<P: Procedure>(to procedure: P) { }
 }
 
 /**
@@ -36,12 +36,14 @@ public extension ProcedureObserver {
  */
 public protocol WillExecuteProcedureObserver: ProcedureObserver {
 
+    associatedtype P: Procedure
+
     /**
      The procedure will execute.
 
      - parameter procedure: the observed `Procedure`.
      */
-    func will(execute procedure: Procedure)
+    func will(execute procedure: P)
 }
 
 /**
@@ -50,13 +52,15 @@ public protocol WillExecuteProcedureObserver: ProcedureObserver {
  */
 public protocol WillCancelProcedureObserver: ProcedureObserver {
 
+    associatedtype P: Procedure
+
     /**
      The procedure will cancel.
 
      - parameter procedure: the observed `Procedure`.
      - parameter errors: an array of [Error] types.
      */
-    func will(cancel procedure: Procedure, errors: [Error])
+    func will(cancel procedure: P, errors: [Error])
 }
 
 /**
@@ -65,12 +69,14 @@ public protocol WillCancelProcedureObserver: ProcedureObserver {
  */
 public protocol DidCancelProcedureObserver: ProcedureObserver {
 
+    associatedtype P: Procedure
+
     /**
      The procedure did cancel.
 
      - parameter procedure: the observed `Procedure`.
      */
-    func did(cancel procedure: Procedure)
+    func did(cancel procedure: P)
 }
 
 /**
@@ -78,6 +84,8 @@ public protocol DidCancelProcedureObserver: ProcedureObserver {
  will receive a callback when the Procedure produces another operation.
  */
 public protocol DidProduceOperationProcedureObserver: ProcedureObserver {
+
+    associatedtype P: Procedure
 
     /**
      The procedure produced a new `Operation` instance which has been added to the
@@ -87,7 +95,7 @@ public protocol DidProduceOperationProcedureObserver: ProcedureObserver {
      - parameter procedure: the observed `Procedure`.
      - parameter newOperation: the produced `Operation`
      */
-    func procedure(_ procedure: Procedure, didProduce newOperation: Operation)
+    func procedure(_ procedure: P, didProduce newOperation: Operation)
 }
 
 /**
@@ -95,13 +103,15 @@ public protocol DidProduceOperationProcedureObserver: ProcedureObserver {
  */
 public protocol WillFinishProcedureObserver: ProcedureObserver {
 
+    associatedtype P: Procedure
+
     /**
      The procedure will finish. Any errors that were encountered are collected here.
 
      - parameter procedure: the observed `Procedure`.
      - parameter errors: an array of `Error`s.
      */
-    func will(finish procedure: Procedure, withErrors errors: [Error])
+    func will(finish procedure: P, withErrors errors: [Error])
 }
 
 /**
@@ -110,13 +120,15 @@ public protocol WillFinishProcedureObserver: ProcedureObserver {
  */
 public protocol DidFinishProcedureObserver: ProcedureObserver {
 
+    associatedtype P: Procedure
+
     /**
      The procedure did finish. Any errors that were encountered are collected here.
 
      - parameter procedure: the observed `Procedure`.
      - parameter errors: an array of `ErrorType`s.
      */
-    func did(finish procedure: Procedure, withErrors errors: [Error])
+    func did(finish procedure: P, withErrors errors: [Error])
 }
 
 

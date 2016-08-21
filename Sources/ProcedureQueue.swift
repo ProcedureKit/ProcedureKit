@@ -6,15 +6,45 @@
 
 import Foundation
 
+public protocol OperationQueueDelegate: class {
+
+    /**
+     The operation queue will add a new operation. This is for information only, the
+     delegate cannot affect whether the operation is added, or other control flow.
+
+     - paramter queue: the `OperationQueue`.
+     - paramter operation: the `Operation` instance about to be added.
+     */
+    func operationQueue(queue: OperationQueue, willAddOperation operation: Operation)
+
+    /**
+     An operation will finish on the queue.
+
+     - parameter queue: the `OperationQueue`.
+     - parameter operation: the `Operation` instance which finished.
+     - parameter errors: an array of `Error`s.
+     */
+    func operationQueue(queue: OperationQueue, willFinishOperation operation: Operation)
+
+    /**
+     An operation did finish on the queue.
+
+     - parameter queue: the `OperationQueue`.
+     - parameter operation: the `Operation` instance which finished.
+     - parameter errors: an array of `Error`s.
+     */
+    func operationQueue(queue: OperationQueue, didFinishOperation operation: Operation)
+}
+
 /**
  A protocol which the `OperationQueue`'s delegate must conform to. The delegate is informed
  when the queue is about to add an operation/procedure, and when they finish. Because it is a
  delegate protocol, conforming types must be classes, as the queue weakly owns it.
  */
-public protocol ProcedureQueueDelegate: class {
+public protocol ProcedureQueueDelegate: OperationQueueDelegate {
 
     /**
-     The operation queue will add a new operation. This is for information only, the
+     The procedure queue will add a new operation. This is for information only, the
      delegate cannot affect whether the operation is added, or other control flow.
 
      - paramter queue: the `ProcedureQueue`.
@@ -23,7 +53,7 @@ public protocol ProcedureQueueDelegate: class {
     func procedureQueue(_ queue: ProcedureQueue, willAddOperation operation: Operation)
 
     /**
-     An operation has finished on the queue.
+     An operation will finish on the queue.
 
      - parameter queue: the `ProcedureQueue`.
      - parameter operation: the `Operation` instance which finished.
@@ -90,8 +120,7 @@ open class ProcedureQueue: OperationQueue {
      - parameter op: an `Operation` instance.
      */
     // swiftlint:disable function_body_length
-    public func add(operation: Operation) {
-        if let procedure = operation as? Procedure {
+    public func add<P: Procedure>(operation procedure: P) where P: Operation {
 
 //            procedure.log.verbose("Adding to queue")
 
@@ -171,22 +200,28 @@ open class ProcedureQueue: OperationQueue {
             // Indicate to the operation that it is to be enqueued
             procedure.willEnqueue()
 */
-        }
-        else {
 
-            operation.addCompletionBlock { [weak self, weak operation] in
-                if let queue = self, let op = operation {
-                    queue.delegate?.procedureQueue(queue, didFinishOperation: op, withErrors: [])
-                }
+        delegate?.procedureQueue(self, willAddOperation: procedure)
+
+        super.addOperation(procedure)
+    }
+
+    // swiftlint:enable function_body_length
+
+    public func add(operation: Operation) {
+
+        operation.addCompletionBlock { [weak self, weak operation] in
+            if let queue = self, let operation = operation {
+                queue.delegate?.operationQueue(queue: queue, didFinishOperation: operation)
             }
         }
 
-        delegate?.procedureQueue(self, willAddOperation: operation)
+        delegate?.operationQueue(queue: self, willAddOperation: operation)
 
         super.addOperation(operation)
     }
 
-    // swiftlint:enable function_body_length
+
 
     /**
      Adds the operations to the queue.

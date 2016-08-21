@@ -6,19 +6,19 @@
 
 import Foundation
 
-public typealias DidAttachToProcedureBlock = (Procedure) -> Void
-
 /// Protocol for block based procedure observers
 public protocol BlockProcedureObserver: ProcedureObserver {
 
+    associatedtype P: Procedure
+
     /// - returns: an optional DidAttachToProcedureBlock
-    var didAttachToProcedure: DidAttachToProcedureBlock? { get }
+    var didAttachToProcedure: ((P) -> Void)? { get }
 }
 
 public extension BlockProcedureObserver {
 
     /// Default implementation of ProcedureObserver method
-    public func didAttach(to procedure: Procedure) {
+    public func didAttach(to procedure: P) {
         didAttachToProcedure?(procedure)
     }
 }
@@ -27,13 +27,13 @@ public extension BlockProcedureObserver {
  WillExecuteObserver is an observer which will execute a
  closure when the operation starts.
  */
-public struct WillExecuteObserver: BlockProcedureObserver, WillExecuteProcedureObserver {
-    public typealias Block = (Procedure) -> Void
+public struct WillExecuteObserver<P: Procedure>: BlockProcedureObserver, WillExecuteProcedureObserver {
+    public typealias Block = (P) -> Void
 
     private let block: Block
 
     /// - returns: a block which is called when the observer is attached to an operation
-    public var didAttachToProcedure: DidAttachToProcedureBlock? = nil
+    public var didAttachToProcedure: ((P) -> Void)? = nil
 
     /**
      Initialize the observer with a block.
@@ -46,7 +46,7 @@ public struct WillExecuteObserver: BlockProcedureObserver, WillExecuteProcedureO
     }
 
     /// Conforms to `WillExecuteProcedureObserver`, executes the block
-    public func will(execute procedure: Procedure) {
+    public func will(execute procedure: P) {
         block(procedure)
     }
 }
@@ -55,13 +55,13 @@ public struct WillExecuteObserver: BlockProcedureObserver, WillExecuteProcedureO
  WillCancelObserver is an observer which will execute a
  closure when the operation cancels.
  */
-public struct WillCancelObserver: BlockProcedureObserver, WillCancelProcedureObserver {
-    public typealias Block = (Operation, [Error]) -> Void
+public struct WillCancelObserver<P: Procedure>: BlockProcedureObserver, WillCancelProcedureObserver {
+    public typealias Block = (P, [Error]) -> Void
 
     private let block: Block
 
     /// - returns: a block which is called when the observer is attached to an operation
-    public var didAttachToProcedure: DidAttachToProcedureBlock? = nil
+    public var didAttachToProcedure: ((P) -> Void)? = nil
 
     /**
      Initialize the observer with a block.
@@ -74,7 +74,7 @@ public struct WillCancelObserver: BlockProcedureObserver, WillCancelProcedureObs
     }
 
     /// Conforms to `WillCancelProcedureObserver`, executes the block
-    public func will(cancel procedure: Procedure, errors: [Error]) {
+    public func will(cancel procedure: P, errors: [Error]) {
         block(procedure, errors)
     }
 }
@@ -83,13 +83,13 @@ public struct WillCancelObserver: BlockProcedureObserver, WillCancelProcedureObs
  DidCancelObserver is an observer which will execute a
  closure when the operation cancels.
  */
-public struct DidCancelObserver: BlockProcedureObserver, DidCancelProcedureObserver {
-    public typealias Block = (Procedure) -> Void
+public struct DidCancelObserver<P: Procedure>: BlockProcedureObserver, DidCancelProcedureObserver {
+    public typealias Block = (P) -> Void
 
     private let block: Block
 
     /// - returns: a block which is called when the observer is attached to an operation
-    public var didAttachToProcedure: DidAttachToProcedureBlock? = nil
+    public var didAttachToProcedure: ((P) -> Void)? = nil
 
     /**
      Initialize the observer with a block.
@@ -102,7 +102,7 @@ public struct DidCancelObserver: BlockProcedureObserver, DidCancelProcedureObser
     }
 
     /// Conforms to `OperationDidCancelObserver`, executes the block
-    public func did(cancel procedure: Procedure) {
+    public func did(cancel procedure: P) {
         block(procedure)
     }
 }
@@ -111,13 +111,13 @@ public struct DidCancelObserver: BlockProcedureObserver, DidCancelProcedureObser
  DidProduceOperationObserver is an observer which will execute a
  closure when the operation produces another observer.
  */
-public struct DidProduceOperationObserver: BlockProcedureObserver, DidProduceOperationProcedureObserver {
-    public typealias Block = (Procedure, Operation) -> Void
+public struct DidProduceOperationObserver<P: Procedure>: BlockProcedureObserver, DidProduceOperationProcedureObserver {
+    public typealias Block = (P, Operation) -> Void
 
     private let block: Block
 
     /// - returns: a block which is called when the observer is attached to an operation
-    public var didAttachToProcedure: DidAttachToProcedureBlock? = nil
+    public var didAttachToProcedure: ((P) -> Void)? = nil
 
     /**
      Initialize the observer with a block.
@@ -130,25 +130,22 @@ public struct DidProduceOperationObserver: BlockProcedureObserver, DidProduceOpe
     }
 
     /// Conforms to `OperationDidProduceOperationObserver`, executes the block
-    public func procedure(_ procedure: Procedure, didProduce newOperation: Operation) {
+    public func procedure(_ procedure: P, didProduce newOperation: Operation) {
         block(procedure, newOperation)
     }
 }
-
-@available(*, unavailable, renamed: "DidProduceOperationObserver")
-public typealias ProducedOperationObserver = DidProduceOperationObserver
 
 /**
  WillFinishObserver is an observer which will execute a
  closure when the operation is about to finish.
  */
-public struct WillFinishObserver: BlockProcedureObserver, WillFinishProcedureObserver {
-    public typealias Block = (Procedure, [Error]) -> Void
+public struct WillFinishObserver<P: Procedure>: BlockProcedureObserver, WillFinishProcedureObserver {
+    public typealias Block = (P, [Error]) -> Void
 
     private let block: Block
 
     /// - returns: a block which is called when the observer is attached to an operation
-    public var didAttachToProcedure: DidAttachToProcedureBlock? = nil
+    public var didAttachToProcedure: ((P) -> Void)? = nil
 
     /**
      Initialize the observer with a block.
@@ -161,7 +158,7 @@ public struct WillFinishObserver: BlockProcedureObserver, WillFinishProcedureObs
     }
 
     /// Conforms to `OperationWillFinishObserver`, executes the block
-    public func will(finish procedure: Procedure, withErrors errors: [Error]) {
+    public func will(finish procedure: P, withErrors errors: [Error]) {
         block(procedure, errors)
     }
 }
@@ -170,13 +167,13 @@ public struct WillFinishObserver: BlockProcedureObserver, WillFinishProcedureObs
  DidFinishObserver is an observer which will execute a
  closure when the operation did just finish.
  */
-public struct DidFinishObserver: BlockProcedureObserver, DidFinishProcedureObserver {
-    public typealias Block = (Procedure, [Error]) -> Void
+public struct DidFinishObserver<P: Procedure>: BlockProcedureObserver, DidFinishProcedureObserver {
+    public typealias Block = (P, [Error]) -> Void
 
     private let block: Block
 
     /// - returns: a block which is called when the observer is attached to an operation
-    public var didAttachToProcedure: DidAttachToProcedureBlock? = nil
+    public var didAttachToProcedure: ((P) -> Void)? = nil
 
     /**
      Initialize the observer with a block.
@@ -189,7 +186,7 @@ public struct DidFinishObserver: BlockProcedureObserver, DidFinishProcedureObser
     }
 
     /// Conforms to `OperationDidFinishObserver`, executes the block
-    public func did(finish procedure: Procedure, withErrors errors: [Error]) {
+    public func did(finish procedure: P, withErrors errors: [Error]) {
         block(procedure, errors)
     }
 }
@@ -198,27 +195,27 @@ public struct DidFinishObserver: BlockProcedureObserver, DidFinishProcedureObser
 
 public extension Procedure {
 
-    func addWillExecuteBlockObserver(block: WillExecuteObserver.Block) {
+    func addWillExecuteBlockObserver(block: WillExecuteObserver<Self>.Block) {
         add(observer: WillExecuteObserver(willExecute: block))
     }
 
-    func addWillCancelBlockObserver(block: WillCancelObserver.Block) {
+    func addWillCancelBlockObserver(block: WillCancelObserver<Self>.Block) {
         add(observer: WillCancelObserver(willCancel: block))
     }
 
-    func addDidCancelBlockObserver(block: DidCancelObserver.Block) {
+    func addDidCancelBlockObserver(block: DidCancelObserver<Self>.Block) {
         add(observer: DidCancelObserver(didCancel: block))
     }
 
-    func addDidProduceOperationBlockObserver(block: DidProduceOperationObserver.Block) {
+    func addDidProduceOperationBlockObserver(block: DidProduceOperationObserver<Self>.Block) {
         add(observer: DidProduceOperationObserver(didProduce: block))
     }
 
-    func addWillFinishBlockObserver(block: WillFinishObserver.Block) {
+    func addWillFinishBlockObserver(block: WillFinishObserver<Self>.Block) {
         add(observer: WillFinishObserver(willFinish: block))
     }
 
-    func addDidFinishBlockObserver(block: DidFinishObserver.Block) {
+    func addDidFinishBlockObserver(block: DidFinishObserver<Self>.Block) {
         add(observer: DidFinishObserver(didFinish: block))
     }
 }
