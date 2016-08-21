@@ -129,6 +129,7 @@ open class AbstractProcedure: Operation, ProcedureProcotol {
         }
     }
 
+
     // Errors
 
     private var _errors = [Error]()
@@ -187,10 +188,103 @@ open class AbstractProcedure: Operation, ProcedureProcotol {
         state = .pending
     }
 
+    /// Starts the operation, correctly managing the cancelled state. Cannot be over-ridden
+    public final override func start() {
+        // Don't call super.start
+
+        guard !isCancelled || isAutomaticFinishingDisabled else {
+            finish()
+            return
+        }
+
+        main()
+    }
+
+    /// Triggers execution of the operation's task, correctly managing errors and the cancelled state. Cannot be over-ridden
+    public final override func main() {
+
+        // Prevent concurrent execution
+        func getNextState() -> State? {
+            return _stateLock.withCriticalScope {
+
+                // Check to see if the procedure is already attempting to execute
+                assert(!isExecuting, "Procedure is attempting to execute, but is already executing.")
+                guard !_isTransitioningToExecuting else {
+                    assertionFailure("Procedure is attempting to execute twice, concurrently.")
+                    return nil
+                }
+
+                // Check to see if the procedure has now been finished
+                // by an observer (or anything else)
+                guard state <= .pending else { return nil }
+
+                // Check to see if the procedure has now been cancelled
+                // by an observer
+                guard (_errors.isEmpty && !isCancelled) || isAutomaticFinishingDisabled else {
+                    _isHandlingFinish = true
+                    return .finishing
+                }
+
+                // Transition to the .isExecuting state, and explicitly send the required KVO change notifications
+                _isTransitioningToExecuting = true
+                return .executing
+            }
+        }
+
+        // Check the state again, as it could have changed in another queue via finish
+        func getNextStateAgain() -> State? {
+            return _stateLock.withCriticalScope {
+                guard state <= .pending else { return nil }
+
+                state = .executing
+                _isTransitioningToExecuting = false
+
+                if isCancelled && !isAutomaticFinishingDisabled && !_isHandlingFinish {
+                    // Procedure was cancelled, automatic finishing is enabled,
+                    // but cancel is not (yet/ever?) handling the finish.
+                    // Because cancel could have already passed the check for executing,
+                    // handle calling finish here.
+                    _isHandlingFinish = true
+                    return .finishing
+                }
+                return .executing
+            }
+        }
+
+        observers.forEach { $0.will(execute: self) }
+
+        let nextState = getNextState()
+
+        guard nextState != .finishing else {
+            // TODO - finish from cancel true
+            return
+        }
+
+        guard nextState == .executing else { return }
+
+        willChangeValue(forKey: .executing)
+
+        let nextState2 = getNextStateAgain()
+
+        didChangeValue(forKey: .executing)
+
+        guard nextState2 != .finishing else {
+            // TODO - finish from cancel true
+            return
+        }
+
+        guard nextState2 == .executing else { return }
+
+        // TODO - log
+
+        execute()
+    }
+
     public func execute() {
         print("\(self) must override `execute()`.")
         finish()
     }
+
 
 
     // MARK: Cancellation
@@ -241,30 +335,6 @@ open class AbstractProcedure: Operation, ProcedureProcotol {
 
 }
 
-
-// MARK: - Execution
-
-public extension AbstractProcedure {
-
-
-    /// Starts the operation, correctly managing the cancelled state. Cannot be over-ridden
-    final override func start() {
-        // Don't call super.start
-
-        guard !isCancelled || isAutomaticFinishingDisabled else {
-            finish()
-            return
-        }
-
-        main()
-    }
-
-    /// Triggers execution of the operation's task, correctly managing errors and the cancelled state. Cannot be over-ridden
-    final override func main() {
-        // TODO
-        execute()
-    }
-}
 
 // MARK: - Finishing
 
