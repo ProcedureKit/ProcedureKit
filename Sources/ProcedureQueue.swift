@@ -96,26 +96,26 @@ open class ProcedureQueue: OperationQueue {
 //            procedure.log.verbose("Adding to queue")
 
             /// Add an observer so that any produced operations are added to the queue
-            procedure.add(observer: DidProduceOperationObserver { [weak self] (_, produced) in
+            procedure.addDidProduceOperationBlockObserver { [weak self] (_, produced) in
                 if let queue = self {
                     queue.delegate?.procedureQueue(queue, willProduceOperation: produced)
                     queue.add(operation: produced)
                 }
-            })
+            }
 
             /// Add an observer to invoke the will finish delegate method
-            procedure.add(observer: WillFinishObserver { [weak self] procedure, errors in
+            procedure.addWillFinishBlockObserver { [weak self] procedure, errors in
                 if let queue = self {
-                    queue.delegate?.procedureQueue(queue, willFinishOperation: procedure, withErrors: errors)
+                    self?.delegate?.procedureQueue(queue, willFinishOperation: procedure, withErrors: errors)
                 }
-            })
+            }
 
             /// Add an observer to invoke the did finish delegate method
-            procedure.add(observer: DidFinishObserver { [weak self] procedure, errors in
+            procedure.addDidFinishBlockObserver { [weak self] procedure, errors in
                 if let queue = self {
                     queue.delegate?.procedureQueue(queue, didFinishOperation: procedure, withErrors: errors)
                 }
-            })
+            }
 /* -- > Conditions
              
             /// Process any conditions

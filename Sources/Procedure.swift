@@ -60,17 +60,39 @@ open class Procedure: Operation {
         }
     }
 
+    // State
+
     private let stateLock = NSRecursiveLock()
     private let disableAutomaticFinishing: Bool
-
-//    private var _log = Protector<LoggerType>(Logger())
-    private var _state = State.initialized
-    private var _internalErrors = [Error]()
     private var _isTransitioningToExecuting = false
+    private var _state = State.initialized
     private var _isHandlingFinish = false
     private var _isHandlingCancel = false
-    private var _observers = Protector([ProcedureObserver]())
     private var _cancelled = false  // should always be set by .cancel()
+
+
+
+
+
+
+    fileprivate var _internalErrors = [Error]()
+
+
+
+    private var _observers = Protector([ProcedureObserver]())
+
+    fileprivate(set) var observers: [ProcedureObserver] {
+        get { return _observers.read { $0 } }
+        set {
+            _observers.write { (ward: inout [ProcedureObserver]) in
+                ward = newValue
+            }
+        }
+    }
+
+
+
+
 
     internal private(set) var directDependencies = Set<Operation>()
 //    internal private(set) var conditions = Set<Condition>()
@@ -85,6 +107,7 @@ open class Procedure: Operation {
 
 
 
+//    private var _log = Protector<LoggerType>(Logger())
 
     // MARK: - Initialization
 
@@ -93,17 +116,47 @@ open class Procedure: Operation {
         super.init()
     }
 
+}
 
-    // MARK: - Add Observer
+
+// MARK: Observers
+
+public extension Procedure {
 
     /**
      Add an observer to the to the procedure.
 
      - parameter observer: type conforming to protocol `ProcedureObserver`.
      */
-    public func add(observer: ProcedureObserver) {
+    func add(observer: ProcedureObserver) {
+
+        observers.append(observer)
 
         observer.didAttach(to: self)
+    }
+
+    internal var willExecuteObservers: [WillExecuteProcedureObserver] {
+        return observers.flatMap { $0 as? WillExecuteProcedureObserver }
+    }
+
+    internal var willCancelObservers: [WillCancelProcedureObserver] {
+        return observers.flatMap { $0 as? WillCancelProcedureObserver }
+    }
+
+    internal var didCancelObservers: [DidCancelProcedureObserver] {
+        return observers.flatMap { $0 as? DidCancelProcedureObserver }
+    }
+
+    internal var didProduceOperationObservers: [DidProduceOperationProcedureObserver] {
+        return observers.flatMap { $0 as? DidProduceOperationProcedureObserver }
+    }
+
+    internal var willFinishObservers: [WillFinishProcedureObserver] {
+        return observers.flatMap { $0 as? WillFinishProcedureObserver }
+    }
+
+    internal var didFinishObservers: [DidFinishProcedureObserver] {
+        return observers.flatMap { $0 as? DidFinishProcedureObserver }
     }
 
 }

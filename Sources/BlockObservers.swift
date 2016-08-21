@@ -194,3 +194,34 @@ public struct DidFinishObserver: BlockProcedureObserver, DidFinishProcedureObser
     }
 }
 
+
+
+public extension Procedure {
+
+    func addWillExecuteBlockObserver(block: WillExecuteObserver.Block) {
+        add(observer: WillExecuteObserver(willExecute: block))
+    }
+
+    func addWillCancelBlockObserver(block: WillCancelObserver.Block) {
+        add(observer: WillCancelObserver(willCancel: block))
+    }
+
+    func addDidCancelBlockObserver(block: DidCancelObserver.Block) {
+        add(observer: DidCancelObserver(didCancel: block))
+    }
+
+    func addDidProduceOperationBlockObserver(block: DidProduceOperationObserver.Block) {
+        add(observer: DidProduceOperationObserver(didProduce: block))
+    }
+
+    func addWillFinishBlockObserver(block: WillFinishObserver.Block) {
+        add(observer: WillFinishObserver(willFinish: block))
+    }
+
+    func addDidFinishBlockObserver(block: DidFinishObserver.Block) {
+        add(observer: DidFinishObserver(didFinish: block))
+    }
+}
+
+
+
