@@ -173,21 +173,21 @@ open class ProcedureQueue: OperationQueue {
 */
         }
         else {
-/*
+
             operation.addCompletionBlock { [weak self, weak operation] in
-                if let queue = self, op = operation {
-                    queue.delegate?.operationQueue(queue, didFinishOperation: op, withErrors: [])
+                if let queue = self, let op = operation {
+                    queue.delegate?.procedureQueue(queue, didFinishOperation: op, withErrors: [])
                 }
             }
-*/
         }
-        // swiftlint:enable function_body_length
 
         delegate?.procedureQueue(self, willAddOperation: operation)
 
         super.addOperation(operation)
     }
-    
+
+    // swiftlint:enable function_body_length
+
     /**
      Adds the operations to the queue.
      
