@@ -24,7 +24,7 @@ open class AbstractProcedure: Operation, Procedure {
         case finishing
         case finished
 
-        func canTransitionToState(other: State, whenCancelled cancelled: Bool) -> Bool {
+        func canTransition(to other: State, whenCancelled isCancelled: Bool) -> Bool {
             switch (self, other) {
             case (.initialized, .pending),
                  (.pending, .executing),
@@ -32,7 +32,7 @@ open class AbstractProcedure: Operation, Procedure {
                  (.finishing, .finished):
                 return true
 
-            case (.pending, .finishing) where cancelled:
+            case (.pending, .finishing) where isCancelled:
                 // When an operation is cancelled it can go from pending direct to finishing.
                 return true
 
@@ -60,22 +60,50 @@ open class AbstractProcedure: Operation, Procedure {
         }
     }
 
-    // State
+
 
     private var _isTransitioningToExecuting = false
-    private var _state = State.initialized
     private var _isHandlingFinish = false
     private var _isHandlingCancel = false
-    private var _cancelled = false  // should always be set by .cancel()
+    private var _isCancelled = false  // should always be set by .cancel()
     private var _internalErrors = [Error]()
 
-    fileprivate let stateLock = NSRecursiveLock()
+
     fileprivate let isAutomaticFinishingDisabled: Bool
 
+    // State
 
+    private let _stateLock = NSRecursiveLock()
+    private var _state = State.initialized
 
+    fileprivate var state: State {
+        get {
+            return _stateLock.withCriticalScope { _state }
+        }
+        set(newState) {
+            _stateLock.withCriticalScope {
+                assert(_state.canTransition(to: newState, whenCancelled: isCancelled), "Attempting to perform illegal cyclic state transition, \(_state) -> \(newState).")
+//                assert(_state.canTransition(to: newState, whenCancelled: isCancelled), "Attempting to perform illegal cyclic state transition, \(_state) -> \(newState) for operation: \(identity).")
+//                log.verbose("\(_state) -> \(newState)")
+                _state = newState
+            }
+        }
+    }
 
+    /// Boolean indicator for whether the Operation is currently executing or not
+    final public override var isExecuting: Bool {
+        return state == .executing
+    }
 
+    /// Boolean indicator for whether the Operation has finished or not
+    final public override var isFinished: Bool {
+        return state == .finished
+    }
+
+    /// Boolean indicator for whether the Operation has cancelled or not
+    final public override var isCancelled: Bool {
+        return _stateLock.withCriticalScope { _isCancelled }
+    }
 
 
     private var _observers = Protector([ProcedureObserver]())
@@ -118,8 +146,7 @@ open class AbstractProcedure: Operation, Procedure {
     // MARK: - Execution
 
     public func willEnqueue() {
-        // TODO
-//        state = .pending
+        state = .pending
     }
 
     public func execute() {
@@ -138,21 +165,6 @@ open class AbstractProcedure: Operation, Procedure {
 // MARK: - State
 
 public extension AbstractProcedure {
-
-    /// Boolean indicator for whether the Operation is currently executing or not
-    final override var isExecuting: Bool {
-        return false // TODO
-    }
-
-    /// Boolean indicator for whether the Operation has finished or not
-    final override var isFinished: Bool {
-        return false // TODO
-    }
-
-    /// Boolean indicator for whether the Operation has cancelled or not
-    final override var isCancelled: Bool {
-        return false // TODO
-    }
 
     /// Boolean flag to indicate that the Operation failed due to errors.
     var failed: Bool {
