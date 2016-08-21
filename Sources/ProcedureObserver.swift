@@ -98,23 +98,24 @@ public extension ProcedureObserver {
 @available(*, unavailable, renamed: "ProcedureObserver")
 public protocol OperationObserverType { }
 
-@available(*, unavailable, renamed: "WillExecuteProcedureObserver")
+@available(*, unavailable, renamed: "ProcedureObserver")
 public protocol OperationWillExecuteObserver { }
 
-@available(*, unavailable, renamed: "WillCancelProcedureObserver")
+@available(*, unavailable, renamed: "ProcedureObserver")
 public protocol OperationWillCancelObserver { }
 
-@available(*, unavailable, renamed: "DidCancelProcedureObserver")
+@available(*, unavailable, renamed: "ProcedureObserver")
 public protocol OperationDidCancelObserver { }
 
-@available(*, unavailable, renamed: "DidProduceOperationProcedureObserver")
+@available(*, unavailable, renamed: "ProcedureObserver")
 public protocol OperationDidProduceOperationObserver { }
 
-@available(*, unavailable, renamed: "WillFinishProcedureObserver")
+@available(*, unavailable, renamed: "ProcedureObserver")
 public protocol OperationWillFinishObserver { }
 
-@available(*, unavailable, renamed: "DidFinishProcedureObserver")
+@available(*, unavailable, renamed: "ProcedureObserver")
 public protocol OperationDidFinishObserver { }
 
-@available(*, unavailable, message: "This protocol has now been removed and can be replaced with the required combination of ProcedureObserver protocols.")
+@available(*, unavailable, renamed: "ProcedureObserver")
 public protocol OperationObserver { }
+
