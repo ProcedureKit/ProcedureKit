@@ -75,7 +75,7 @@ open class Procedure: Operation {
 
 
 
-    fileprivate var _internalErrors = [Error]()
+    private var _internalErrors = [Error]()
 
 
 

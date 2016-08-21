@@ -86,5 +86,3 @@ extension Protector where T: RangeReplaceableCollection {
         }
     }
 }
-
-

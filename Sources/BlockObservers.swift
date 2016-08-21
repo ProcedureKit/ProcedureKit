@@ -197,7 +197,7 @@ public struct DidFinishObserver: BlockProcedureObserver, DidFinishProcedureObser
 
 
 public extension Procedure {
-    
+
     func addWillExecuteBlockObserver(block: WillExecuteObserver.Block) {
         add(observer: WillExecuteObserver(willExecute: block))
     }
@@ -222,6 +222,3 @@ public extension Procedure {
         add(observer: DidFinishObserver(didFinish: block))
     }
 }
-
-
-

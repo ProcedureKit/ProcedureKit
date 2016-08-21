@@ -117,7 +117,7 @@ open class ProcedureQueue: OperationQueue {
                 }
             }
 /* -- > Conditions
-             
+
             /// Process any conditions
             if procedure.conditions.count > 0 {
 
@@ -190,7 +190,7 @@ open class ProcedureQueue: OperationQueue {
 
     /**
      Adds the operations to the queue.
-     
+
      - parameter ops: an array of `NSOperation` instances.
      - parameter wait: a Bool flag which is ignored.
      */
@@ -199,8 +199,8 @@ open class ProcedureQueue: OperationQueue {
     }
 
     /// Overrides and wraps the Swift 3 interface
-    open override func addOperation(_ op: Operation) {
-        add(operation: op)
+    open override func addOperation(_ operation: Operation) {
+        add(operation: operation)
     }
 }
 
@@ -224,6 +224,3 @@ public extension OperationQueue {
         add(operations: operations)
     }
 }
-
-
-

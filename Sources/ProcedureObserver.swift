@@ -31,7 +31,7 @@ public extension ProcedureObserver {
 }
 
 /**
- Types which conform to this protocol, can be attached to `Procedure` subclasses. They 
+ Types which conform to this protocol, can be attached to `Procedure` subclasses. They
  will receive a callback when the operation starts.
  */
 public protocol WillExecuteProcedureObserver: ProcedureObserver {
@@ -45,7 +45,7 @@ public protocol WillExecuteProcedureObserver: ProcedureObserver {
 }
 
 /**
- Types which conform to this protocol, can be attached to `Procedure` subclasses. They 
+ Types which conform to this protocol, can be attached to `Procedure` subclasses. They
  will receive a callback when the operation cancels.
  */
 public protocol WillCancelProcedureObserver: ProcedureObserver {
@@ -60,7 +60,7 @@ public protocol WillCancelProcedureObserver: ProcedureObserver {
 }
 
 /**
- Types which conform to this protocol, can be attached to `Procedure` subclasses. They 
+ Types which conform to this protocol, can be attached to `Procedure` subclasses. They
  will receive a callback when the operation cancels.
  */
 public protocol DidCancelProcedureObserver: ProcedureObserver {
@@ -74,7 +74,7 @@ public protocol DidCancelProcedureObserver: ProcedureObserver {
 }
 
 /**
- Types which conform to this protocol, can be attached to `Procedure` subclasses. They 
+ Types which conform to this protocol, can be attached to `Procedure` subclasses. They
  will receive a callback when the Procedure produces another operation.
  */
 public protocol DidProduceOperationProcedureObserver: ProcedureObserver {
@@ -105,7 +105,7 @@ public protocol WillFinishProcedureObserver: ProcedureObserver {
 }
 
 /**
- Types which conform to this protocol, can be attached to `Operation` subclasses. They 
+ Types which conform to this protocol, can be attached to `Operation` subclasses. They
  will receive a callback when the procedure finishes.
  */
 public protocol DidFinishProcedureObserver: ProcedureObserver {
@@ -145,4 +145,3 @@ public protocol OperationDidFinishObserver { }
 
 @available(*, unavailable, message: "This protocol has now been removed and can be replaced with the required combination of ProcedureObserver protocols.")
 public protocol OperationObserver { }
-
