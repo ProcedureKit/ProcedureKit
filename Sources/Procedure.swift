@@ -20,13 +20,27 @@ public protocol ProcedureProcotol {
 
     func execute()
 
-//    func cancel()
+    func cancel()
 
-//    func cancel(withError: Error?)
+    func cancel(withError: Error?)
 
-//    func cancel(withErrors: [Error])
+    func cancel(withErrors: [Error])
 
     func finish(withErrors: [Error])
 
+    // Observers
+
     func add<Observer: ProcedureObserver>(observer: Observer) where Observer.Procedure == Self
+
+    func procedureWillCancel(withErrors: [Error])
+
+    func procedureDidCancel(withErrors: [Error])
+
+}
+
+public extension ProcedureProcotol {
+
+    public func procedureWillCancel(withErrors: [Error]) { }
+
+    public func procedureDidCancel(withErrors: [Error]) { }
 }

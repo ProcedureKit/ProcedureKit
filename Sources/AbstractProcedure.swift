@@ -75,8 +75,9 @@ open class AbstractProcedure: Operation, ProcedureProcotol {
 
     // State
 
-    private let _stateLock = NSRecursiveLock()
+
     private var _state = State.initialized
+    private let _stateLock = NSRecursiveLock()
 
     fileprivate var state: State {
         get {
@@ -107,7 +108,26 @@ open class AbstractProcedure: Operation, ProcedureProcotol {
         return _stateLock.withCriticalScope { _isCancelled }
     }
 
+    private var shouldCancel: Bool {
+        return _stateLock.withCriticalScope {
+            // Do not cancel if already finished or finishing, or cancelled
+            guard state <= .executing && !_isCancelled else { return false }
+            // Only a single call to cancel should continue
+            guard !_isHandlingCancel else { return false }
+            _isHandlingCancel = true
+            return true
+        }
+    }
 
+    private var shouldFinish: Bool {
+        return _stateLock.withCriticalScope {
+            let shouldFinish = isExecuting && !isAutomaticFinishingDisabled && !_isHandlingFinish
+            if shouldFinish {
+                _isHandlingFinish = true
+            }
+            return shouldFinish
+        }
+    }
 
     // Errors
 
@@ -173,9 +193,50 @@ open class AbstractProcedure: Operation, ProcedureProcotol {
     }
 
 
+    // MARK: Cancellation
+
+
+    public func cancel(withError error: Error?) {
+        cancel(withErrors: error.map { [$0] } ?? [])
+    }
+
+    public func cancel(withErrors errors: [Error]) {
+        _stateLock.withCriticalScope {
+            if !errors.isEmpty {
+                // TODO
+            }
+            _errors += errors
+        }
+        cancel()
+    }
+
+    public final override func cancel() {
+
+        guard shouldCancel else { return }
+
+        procedureWillCancel(withErrors: errors)
+        willChangeValue(forKey: .cancelled)
+        observers.forEach { $0.will(cancel: self, withErrors: errors) }
+
+        _stateLock.withCriticalScope { _isCancelled = true }
+
+        procedureDidCancel(withErrors: errors)
+        observers.forEach { $0.did(cancel: self, withErrors: errors) }
+        // TODO - log
+        didChangeValue(forKey: .cancelled)
+
+        // Call super to trigger .isReady state change on cancel
+        // as well as isReady KVO notification
+        super.cancel()
+
+        if shouldFinish {
+            // TODO - finish from cancel
+        }
+    }
 
 
 
+    // Observers
 
 
 }
@@ -240,5 +301,23 @@ public extension AbstractProcedure {
 }
 
 // swiftlint:enable type_body_length
+
+fileprivate extension Operation {
+
+    enum KeyPath: String {
+        case cancelled = "isCancelled"
+        case executing = "isExecuting"
+        case finished = "isFinished"
+    }
+
+    fileprivate func willChangeValue(forKey key: KeyPath) {
+        willChangeValue(forKey: key.rawValue)
+    }
+
+    fileprivate func didChangeValue(forKey key: KeyPath) {
+        didChangeValue(forKey: key.rawValue)
+    }
+}
+
 
 // swiftlint:enable file_length
