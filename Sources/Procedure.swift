@@ -8,23 +8,25 @@ import Foundation
 
 public protocol Procedure {
 
-    var executing: Bool { get }
+    var isExecuting: Bool { get }
 
-    var finished: Bool { get }
+    var isFinished: Bool { get }
 
-    var cancelled: Bool { get }
+    var isCancelled: Bool { get }
 
 //    var errors: [Error] { get }
 
-//    func willEnqueue()
+    func willEnqueue()
 
-//    func execute()
+    func execute()
 
 //    func cancel()
 
 //    func cancel(withError: Error?)
 
 //    func cancel(withErrors: [Error])
+
+    func finish(withErrors: [Error])
 
     func add(observer: ProcedureObserver)
 }

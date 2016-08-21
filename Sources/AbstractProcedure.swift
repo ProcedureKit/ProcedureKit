@@ -62,20 +62,19 @@ open class AbstractProcedure: Operation, Procedure {
 
     // State
 
-    private let stateLock = NSRecursiveLock()
-    private let disableAutomaticFinishing: Bool
     private var _isTransitioningToExecuting = false
     private var _state = State.initialized
     private var _isHandlingFinish = false
     private var _isHandlingCancel = false
     private var _cancelled = false  // should always be set by .cancel()
-
-
-
-
-
-
     private var _internalErrors = [Error]()
+
+    fileprivate let stateLock = NSRecursiveLock()
+    fileprivate let isAutomaticFinishingDisabled: Bool
+
+
+
+
 
 
 
@@ -112,12 +111,93 @@ open class AbstractProcedure: Operation, Procedure {
     // MARK: - Initialization
 
     public override init() {
-        self.disableAutomaticFinishing = false
+        self.isAutomaticFinishingDisabled = false
         super.init()
     }
 
+    // MARK: - Execution
+
+    public func willEnqueue() {
+        // TODO
+//        state = .pending
+    }
+
+    public func execute() {
+        print("\(self) must override `execute()`.")
+        finish()
+    }
+
+
+
+
+
+
+
 }
 
+// MARK: - State
+
+public extension AbstractProcedure {
+
+    /// Boolean indicator for whether the Operation is currently executing or not
+    final override var isExecuting: Bool {
+        return false // TODO
+    }
+
+    /// Boolean indicator for whether the Operation has finished or not
+    final override var isFinished: Bool {
+        return false // TODO
+    }
+
+    /// Boolean indicator for whether the Operation has cancelled or not
+    final override var isCancelled: Bool {
+        return false // TODO
+    }
+
+    /// Boolean flag to indicate that the Operation failed due to errors.
+    var failed: Bool {
+        return false // TODO
+    }
+}
+
+// MARK: - Execution
+
+public extension AbstractProcedure {
+
+
+    /// Starts the operation, correctly managing the cancelled state. Cannot be over-ridden
+    final override func start() {
+        // Don't call super.start
+
+        guard !isCancelled || isAutomaticFinishingDisabled else {
+            finish()
+            return
+        }
+
+        main()
+    }
+
+    /// Triggers execution of the operation's task, correctly managing errors and the cancelled state. Cannot be over-ridden
+    final override func main() {
+        // TODO
+        execute()
+    }
+}
+
+// MARK: - Finishing
+
+public extension AbstractProcedure {
+
+    /**
+     Finish method which must be called eventually after an operation has
+     begun executing, unless it is cancelled.
+
+     - parameter errors: an array of `Error`, which defaults to empty.
+     */
+    final func finish(withErrors errors: [Error] = []) {
+        // TODO
+    }
+}
 
 // MARK: Observers
 
