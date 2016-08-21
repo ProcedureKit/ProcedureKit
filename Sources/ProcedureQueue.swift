@@ -120,7 +120,7 @@ open class ProcedureQueue: OperationQueue {
      - parameter op: an `Operation` instance.
      */
     // swiftlint:disable function_body_length
-    public func add<P: Procedure>(operation procedure: P) where P: Operation {
+    public func add<Procedure: ProcedureProcotol>(operation procedure: Procedure) where Procedure: Operation {
 
 //            procedure.log.verbose("Adding to queue")
 

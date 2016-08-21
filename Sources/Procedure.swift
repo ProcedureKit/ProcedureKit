@@ -6,7 +6,7 @@
 
 import Foundation
 
-public protocol Procedure {
+public protocol ProcedureProcotol {
 
     var isExecuting: Bool { get }
 
@@ -28,5 +28,5 @@ public protocol Procedure {
 
     func finish(withErrors: [Error])
 
-    func add(observer: ProcedureObserver)
+    func add<Observer: ProcedureObserver>(observer: Observer) where Observer.Procedure == Self
 }

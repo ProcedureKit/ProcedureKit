@@ -10,7 +10,7 @@ import Foundation.NSOperation
 
 // swiftlint:disable type_body_length
 
-open class AbstractProcedure: Operation, Procedure {
+open class AbstractProcedure: Operation, ProcedureProcotol {
 
     private enum State: Int, Comparable {
 
@@ -66,10 +66,12 @@ open class AbstractProcedure: Operation, Procedure {
     private var _isHandlingFinish = false
     private var _isHandlingCancel = false
     private var _isCancelled = false  // should always be set by .cancel()
-    private var _internalErrors = [Error]()
 
 
     fileprivate let isAutomaticFinishingDisabled: Bool
+
+
+
 
     // State
 
@@ -106,12 +108,28 @@ open class AbstractProcedure: Operation, Procedure {
     }
 
 
-    private var _observers = Protector([ProcedureObserver]())
 
-    fileprivate(set) var observers: [ProcedureObserver] {
+    // Errors
+
+    private var _errors = [Error]()
+
+    public var errors: [Error] {
+        return _stateLock.withCriticalScope { _errors }
+    }
+
+    public var failed: Bool {
+        return errors.count > 0
+    }
+
+
+    // Observers
+
+    private var _observers = Protector([AnyObserver<AbstractProcedure>]())
+
+    fileprivate(set) var observers: [AnyObserver<AbstractProcedure>] {
         get { return _observers.read { $0 } }
         set {
-            _observers.write { (ward: inout [ProcedureObserver]) in
+            _observers.write { (ward: inout [AnyObserver<AbstractProcedure>]) in
                 ward = newValue
             }
         }
@@ -162,15 +180,6 @@ open class AbstractProcedure: Operation, Procedure {
 
 }
 
-// MARK: - State
-
-public extension AbstractProcedure {
-
-    /// Boolean flag to indicate that the Operation failed due to errors.
-    var failed: Bool {
-        return false // TODO
-    }
-}
 
 // MARK: - Execution
 
@@ -220,36 +229,13 @@ public extension AbstractProcedure {
 
      - parameter observer: type conforming to protocol `ProcedureObserver`.
      */
-    func add(observer: ProcedureObserver) {
+    func add<Observer: ProcedureObserver>(observer: Observer) where Observer.Procedure == AbstractProcedure {
 
-        observers.append(observer)
+        observers.append(AnyObserver(base: observer))
 
         observer.didAttach(to: self)
     }
 
-//    internal var willExecuteObservers: [WillExecuteProcedureObserver] {
-//        return observers.flatMap { $0 as? WillExecuteProcedureObserver }
-//    }
-//
-//    internal var willCancelObservers: [WillCancelProcedureObserver] {
-//        return observers.flatMap { $0 as? WillCancelProcedureObserver }
-//    }
-//
-//    internal var didCancelObservers: [DidCancelProcedureObserver] {
-//        return observers.flatMap { $0 as? DidCancelProcedureObserver }
-//    }
-//
-//    internal var didProduceOperationObservers: [DidProduceOperationProcedureObserver] {
-//        return observers.flatMap { $0 as? DidProduceOperationProcedureObserver }
-//    }
-//
-//    internal var willFinishObservers: [WillFinishProcedureObserver] {
-//        return observers.flatMap { $0 as? WillFinishProcedureObserver }
-//    }
-//
-//    internal var didFinishObservers: [DidFinishProcedureObserver] {
-//        return observers.flatMap { $0 as? DidFinishProcedureObserver }
-//    }
 
 }
 
