@@ -93,7 +93,7 @@ public class Operation: NSOperation {
     private let disableAutomaticFinishing: Bool
 
     internal private(set) var directDependencies = Set<NSOperation>()
-    internal private(set) var conditions = Set<Condition>()
+    public private(set) var conditions = Set<Condition>()
 
     internal var indirectDependencies: Set<NSOperation> {
         return Set(conditions
