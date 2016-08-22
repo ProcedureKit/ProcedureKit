@@ -118,4 +118,3 @@ public protocol OperationDidFinishObserver { }
 
 @available(*, unavailable, renamed: "ProcedureObserver")
 public protocol OperationObserver { }
-
