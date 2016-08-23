@@ -1,3 +1,8 @@
+# 3.1.1
+
+1. [OPR-410](https://github.com/danthorpe/Operations/pull/410) Thanks to [@paulpires](https://github.com/paulpires) for fixing a bug in the `ReachabilityManager`.
+2. [OPR-412](https://github.com/danthorpe/Operations/pull/412) Makes the `condition` property of `Operation` publicly accessible.
+
 # 3.1.0
 
 ## Improvements to Result Injection
