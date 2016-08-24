@@ -533,16 +533,16 @@ public extension Operation {
         let evaluator = createEvaluateConditionsOperation()
 
         // Add an observer to the evaluator to see if any of the conditions failed.
-        evaluator.addObserver(WillFinishObserver { [unowned self] operation, errors in
+        evaluator.addObserver(WillFinishObserver { [weak self] operation, errors in
             guard let evaluation = operation as? EvaluateConditions else { return }
             switch evaluation.result {
             case .Pending, .Satisfied:
                 break
             case .Ignored:
-                self.cancel()
+                self?.cancel()
             case .Failed(let errors):
                 // If conditions fail, we should cancel the operation
-                self.cancelWithErrors(errors)
+                self?.cancelWithErrors(errors)
             }
         })
 
