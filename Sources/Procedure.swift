@@ -280,19 +280,19 @@ open class Procedure: Operation, ProcedureProcotol {
         execute()
     }
 
-    public func execute() {
+    open func execute() {
         print("\(self) must override `execute()`.")
         finish()
     }
 
-
+    public final func produce(operation: Operation) {
+        precondition(state > .initialized, "Cannot produce operation will not being scheduled on a queue")
+        // TODO - log
+        observers.forEach { $0.procedure(self, didProduce: operation) }
+    }
 
     // MARK: Cancellation
 
-
-    public func cancel(withError error: Error?) {
-        cancel(withErrors: error.map { [$0] } ?? [])
-    }
 
     public func cancel(withErrors errors: [Error]) {
         _stateLock.withCriticalScope {
