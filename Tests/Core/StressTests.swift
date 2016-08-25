@@ -16,18 +16,24 @@ class StressTest: OperationTests {
     let batchSize = 10_000
 
     func test__completion_blocks() {
+        let operationDispatchGroup = dispatch_group_create()
+        weak var didCompleteAllOperationsExpectation = expectationWithDescription("Test: \(#function), Completed All Operations")
+
         (0..<batchSize).forEach { i in
-            weak var expectation = self.expectationWithDescription("Interation: \(i)")
+            dispatch_group_enter(operationDispatchGroup)
+
             let operation = BlockOperation { }
             operation.addCompletionBlock {
-                dispatch_sync(Queue.Main.queue, {
-                    guard let expectation = expectation else { print("Test: \(#function): Finished expectation after timeout"); return }
-                    expectation.fulfill()
-                })
+                dispatch_group_leave(operationDispatchGroup)
             }
             self.queue.addOperation(operation)
         }
-        waitForExpectationsWithTimeout(12, handler: nil)
+        
+        dispatch_group_notify(operationDispatchGroup, dispatch_get_main_queue(), {
+            guard let didCompleteAllOperationsExpectation = didCompleteAllOperationsExpectation else { print("Test: \(#function): Completed all operations after timeout"); return }
+            didCompleteAllOperationsExpectation.fulfill()
+        })
+        waitForExpectationsWithTimeout(5, handler: nil)
     }
 
     func test__conditions() {
