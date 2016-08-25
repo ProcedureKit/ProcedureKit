@@ -198,14 +198,21 @@ class OperationTests: XCTestCase {
     func addCompletionBlockToTestOperation(operation: Operation, withExpectation expectation: XCTestExpectation) {
         weak var weakExpectation = expectation
         operation.addObserver(DidFinishObserver { _, _ in
-            weakExpectation?.fulfill()
+            dispatch_async(Queue.Main.queue, {
+                guard let expectation = weakExpectation else { return }
+                expectation.fulfill()
+            })
         })
     }
 
     func addCompletionBlockToTestOperation(operation: Operation, withExpectationDescription text: String = #function) -> XCTestExpectation {
         let expectation = expectationWithDescription("Test: \(text), \(NSUUID().UUIDString)")
+        weak var weakExpectation = expectation
         operation.addObserver(DidFinishObserver { _, _ in
-            expectation.fulfill()
+            dispatch_async(Queue.Main.queue, {
+                guard let expectation = weakExpectation else { return }
+                expectation.fulfill()
+            })
         })
         return expectation
     }
