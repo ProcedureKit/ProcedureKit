@@ -103,7 +103,7 @@ public class Condition: Operation, ConditionType, ResultOperationType {
 
     public final override func execute() {
         guard let operation = operation else {
-            assertionFailure("ConditionOperation executed before operation set.")
+            log.verbose("ConditionOperation finishing before evaluation because operation == .None.")
             finish()
             return
         }

@@ -63,11 +63,14 @@ class RemoteNotificationConditionTests: OperationTests {
         let operation = TestOperation()
         operation.addCondition(condition)
 
-        let expectation = expectationWithDescription("Test: \(#function)")
+        weak var expectation = expectationWithDescription("Test: \(#function)")
         var receivedErrors = [ErrorType]()
         operation.addObserver(DidFinishObserver { _, errors in
             receivedErrors = errors
-            expectation.fulfill()
+            dispatch_async(Queue.Main.queue, {
+                guard let expectation = expectation else { print("Test: \(#function): Finished expectation after timeout"); return }
+                expectation.fulfill()
+            })
         })
 
         runOperation(operation)

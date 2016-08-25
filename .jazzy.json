@@ -3,7 +3,7 @@
 	"author_url": "http://danthorpe.me",
 	"github_url": "https://github.com/danthorpe/Operations",
 	"module": "Operations",
-	"module_version": "3.1.0",
+	"module_version": "3.1.1",
 	"readme": "README.md",
 	"swift_version": "2.2",	
 	"xcodebuild_arguments": [
