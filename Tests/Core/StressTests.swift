@@ -27,7 +27,7 @@ class StressTest: OperationTests {
             }
             self.queue.addOperation(operation)
         }
-        waitForExpectationsWithTimeout(5, handler: nil)
+        waitForExpectationsWithTimeout(12, handler: nil)
     }
 
     func test__conditions() {
