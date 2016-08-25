@@ -179,20 +179,20 @@ class OperationTests: XCTestCase {
         queue.addOperations(operations, waitUntilFinished: false)
     }
 
-    func waitForOperation(operation: Operation, withExpectationDescription text: String = #function) {
+    func waitForOperation(operation: Operation, withTimeout timeout: NSTimeInterval = 3, withExpectationDescription text: String = #function) {
         addCompletionBlockToTestOperation(operation, withExpectationDescription: text)
         queue.delegate = delegate
         queue.addOperation(operation)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForExpectationsWithTimeout(timeout, handler: nil)
     }
 
-    func waitForOperations(operations: Operation..., withExpectationDescription text: String = #function) {
+    func waitForOperations(operations: Operation..., withTimeout timeout: NSTimeInterval = 3, withExpectationDescription text: String = #function) {
         for (i, op) in operations.enumerate() {
             addCompletionBlockToTestOperation(op, withExpectationDescription: "\(i), \(text)")
         }
         queue.delegate = delegate
         queue.addOperations(operations, waitUntilFinished: false)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForExpectationsWithTimeout(timeout, handler: nil)
     }
 
     func addCompletionBlockToTestOperation(operation: Operation, withExpectation expectation: XCTestExpectation) {
