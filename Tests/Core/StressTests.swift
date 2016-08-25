@@ -418,5 +418,66 @@ class StressTest: OperationTests {
             }
         }
     }
+
+    func test__operation_cancel_with_errors_thread_safety() {
+        // NOTES:
+        //      Previously, this test would fail due to the following race condition:
+        //
+        //      - Operation.main() decides the `.nextState` should be `.Finishing` because
+        //        `_internalErrors` is not empty (for example, from a failed condition
+        //        or a call to `Operation.cancelWithErrors()`), and calls `finish()`.
+        //      - Operation.finish() attempts to set `.state = .Finishing`.
+        //      - The call to Operation.cancelWithErrors() still has not been completed
+        //        in another thread (and still has not set `_cancelled = true`).
+        //
+        //      In this case, there can be an attempt to transition from
+        //      .state `.Pending` => `.Finishing` while `cancelled == false`,
+        //      which is invalid. This will assert.
+        //
+        //      This was caused by setting `_internalErrors` prior to setting `_cancelled = true`.
+        //
+        //      It was fixed by setting `_internalErrors` at the same time as setting `_cancelled = true`
+        //      (and guarded by the same acquisition of the lock).
+        //
+        //      This test should now pass without error.
+        
+        struct TestError: ErrorType { }
+        
+        let batchTimeout = Double(batchSize) / 333.0
+        print ("\(#function): Parameters: batch size: \(batchSize); batches: \(batches)")
+        
+        (1...batches).forEach { batch in
+            autoreleasepool {
+                let batchStartTime = CFAbsoluteTimeGetCurrent()
+                let queue = OperationQueue()
+                queue.suspended = false
+                let operationDispatchGroup = dispatch_group_create()
+                weak var didFinishAllOperationsExpectation = expectationWithDescription("Test: \(#function), Finished All Operations, batch \(batch)")
+                
+                (0..<batchSize).forEach { i in
+                    dispatch_group_enter(operationDispatchGroup)
+                    
+                    let operation = TestOperation()
+                    operation.name = "TestOperation_\(i)"
+                    
+                    operation.addObserver(DidFinishObserver(didFinish: { (operation, errors) in
+                        dispatch_group_leave(operationDispatchGroup)
+                    }))
+                    
+                    queue.addOperation(operation)
+                    operation.cancelWithErrors([TestError()])
+                }
+                
+                dispatch_group_notify(operationDispatchGroup, dispatch_get_main_queue(), {
+                    guard let didFinishAllOperationsExpectation = didFinishAllOperationsExpectation else { print("Test: \(#function): Finished operations after timeout"); return }
+                    didFinishAllOperationsExpectation.fulfill()
+                })
+                waitForExpectationsWithTimeout(batchTimeout, handler: nil)
+                let batchFinishTime = CFAbsoluteTimeGetCurrent()
+                let batchDuration = batchFinishTime - batchStartTime
+                print ("\(#function): Finished batch: \(batch), in \(batchDuration) seconds")
+            }
+        }
+    }
 }
 
