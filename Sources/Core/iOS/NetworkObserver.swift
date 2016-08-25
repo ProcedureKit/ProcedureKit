@@ -94,7 +94,7 @@ private class NetworkIndicatorController {
     }
 }
 
-private struct Timer {
+internal class Timer {     // internal for testing
 
     private var isCancelled = false
 
@@ -107,7 +107,7 @@ private struct Timer {
         }
     }
 
-    mutating func cancel() {
+    func cancel() {
         isCancelled = true
     }
 }
