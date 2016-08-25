@@ -24,20 +24,9 @@ internal class ExclusivityManager {
         return dispatch_sync(queue) { self._addOperation(operation, category: category) }
     }
 
-    func removeOperation(operation: Operation, category: String) {
-        dispatch_async(queue) {
-            self._removeOperation(operation, category: category)
-        }
-    }
-
     private func _addOperation(operation: Operation, category: String) -> NSOperation? {
-        operation.log.verbose(">>> \(category)")
 
-        operation.addObserver(DidFinishObserver { [unowned self] op, _ in
-            self.removeOperation(op, category: category)
-        })
-
-        var operationsWithThisCategory = operations[category] ?? []
+        let operationsWithThisCategory = operations[category] ?? []
 
         let previous = operationsWithThisCategory.last
 
@@ -45,20 +34,38 @@ internal class ExclusivityManager {
             operation.addDependencyOnPreviousMutuallyExclusiveOperation(previous)
         }
 
-        operationsWithThisCategory.append(operation)
+        // This observer will add the operation to the category
+        operation.addObserver(WillExecuteObserver(willExecute: addOperationToCategory(category)))
 
-        operations[category] = operationsWithThisCategory
+        // This observer will remove the operation from the category
+        operation.addObserver(DidFinishObserver(didFinish: removeOperationFromCategory(category)))
 
         return previous
     }
 
-    private func _removeOperation(operation: Operation, category: String) {
-        operation.log.verbose("<<< \(category)")
+    private func addOperationToCategory(category: String) -> Operation -> Void {
+        return { [unowned self] operation in
+            dispatch_sync(self.queue) {
+                operation.log.verbose(">>> \(category)")
+                var operationsWithThisCategory = self.operations[category] ?? []
+                operationsWithThisCategory.append(operation)
+                self.operations[category] = operationsWithThisCategory
+            }
+        }
+    }
 
-        if let operationsWithThisCategory = operations[category], index = operationsWithThisCategory.indexOf(operation) {
-            var mutableOperationsWithThisCategory = operationsWithThisCategory
-            mutableOperationsWithThisCategory.removeAtIndex(index)
-            operations[category] = mutableOperationsWithThisCategory
+    private func removeOperationFromCategory(category: String) -> (Operation, [ErrorType]) -> Void {
+        return { [unowned self] operation, _ in
+            dispatch_async(self.queue) {
+
+                if let operationsWithThisCategory = self.operations[category], index = operationsWithThisCategory.indexOf(operation) {
+                    var mutableOperationsWithThisCategory = operationsWithThisCategory
+                    mutableOperationsWithThisCategory.removeAtIndex(index)
+                    self.operations[category] = mutableOperationsWithThisCategory
+                }
+
+                operation.log.verbose("<<< \(category)")
+            }
         }
     }
 }
@@ -70,9 +77,10 @@ extension ExclusivityManager {
     internal func __tearDownForUnitTesting() {
         dispatch_sync(queue) {
             for (category, operations) in self.operations {
+                let remove = self.removeOperationFromCategory(category)
                 for operation in operations {
                     operation.cancel()
-                    self._removeOperation(operation, category: category)
+                    remove(operation, [])
                 }
             }
         }

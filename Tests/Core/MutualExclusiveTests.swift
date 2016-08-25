@@ -100,12 +100,7 @@ class MutualExclusiveTests: OperationTests {
         operation2Dependency.name = "Dependency 2"
         operation2.addDependency(operation2Dependency)
 
-        addCompletionBlockToTestOperation(operation1)
-        addCompletionBlockToTestOperation(operation2)
-        addCompletionBlockToTestOperation(operation1Dependency)
-        addCompletionBlockToTestOperation(operation2Dependency)
-        runOperations(operation1, operation2Dependency, operation2, operation1Dependency)
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForOperations(operation1, operation2, operation1Dependency, operation2Dependency)
 
         XCTAssertEqual(text, "Star Wars\nA long time ago, in a galaxy far, far away.")
     }
