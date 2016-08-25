@@ -139,4 +139,21 @@ class NetworkObserverTests: OperationTests {
             XCTAssertEqual(self.visibilityChanges.count, 2)
         }
     }
+    
+    func test__network_indicator_timer_cancellation_prevents_handler_from_running() {
+        // Test for: https://github.com/ProcedureKit/ProcedureKit/issues/344
+        let interval = 0.4
+        var ranHandler = false
+        var timer = Timer(interval: interval) {
+            ranHandler = true
+        }
+        timer.cancel()
+        let expectation = expectationWithDescription("Test: \(#function)")
+        let after = dispatch_time(DISPATCH_TIME_NOW, Int64((interval + 0.1) * Double(NSEC_PER_SEC)))
+        dispatch_after(after, Queue.Main.queue) {
+            expectation.fulfill()
+        }
+        waitForExpectationsWithTimeout(3, handler: nil)
+        XCTAssertFalse(ranHandler)
+    }
 }
