@@ -22,7 +22,7 @@ class StressTest: OperationTests {
         (0..<batchSize).forEach { i in
             dispatch_group_enter(operationDispatchGroup)
 
-            let operation = BlockOperation { }
+            let operation = BlockOperation(block: { continuation in continuation(error: nil) })
             operation.addCompletionBlock {
                 dispatch_group_leave(operationDispatchGroup)
             }
