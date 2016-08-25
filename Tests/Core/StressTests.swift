@@ -16,12 +16,23 @@ class StressTest: OperationTests {
     let batchSize = 10_000
 
     func test__completion_blocks() {
+        let operationDispatchGroup = dispatch_group_create()
+        weak var didCompleteAllOperationsExpectation = expectationWithDescription("Test: \(#function), Completed All Operations")
+
         (0..<batchSize).forEach { i in
-            let expectation = self.expectationWithDescription("Interation: \(i)")
-            let operation = BlockOperation { }
-            operation.addCompletionBlock { expectation.fulfill() }
+            dispatch_group_enter(operationDispatchGroup)
+
+            let operation = BlockOperation(block: { continuation in continuation(error: nil) })
+            operation.addCompletionBlock {
+                dispatch_group_leave(operationDispatchGroup)
+            }
             self.queue.addOperation(operation)
         }
+        
+        dispatch_group_notify(operationDispatchGroup, dispatch_get_main_queue(), {
+            guard let didCompleteAllOperationsExpectation = didCompleteAllOperationsExpectation else { print("Test: \(#function): Completed all operations after timeout"); return }
+            didCompleteAllOperationsExpectation.fulfill()
+        })
         waitForExpectationsWithTimeout(5, handler: nil)
     }
 
@@ -30,8 +41,7 @@ class StressTest: OperationTests {
         (0..<batchSize).forEach { i in
             operation.addCondition(TrueCondition())
         }
-        addCompletionBlockToTestOperation(operation)
-        waitForOperation(operation)
+        waitForOperation(operation, withTimeout: 10)
         XCTAssertTrue(operation.didExecute)
     }
 
@@ -42,8 +52,7 @@ class StressTest: OperationTests {
             condition.name = "Condition \(i)"
             operation.addCondition(condition)
         }
-        addCompletionBlockToTestOperation(operation)
-        waitForOperation(operation)
+        waitForOperation(operation, withTimeout: 10)
         XCTAssertTrue(operation.didExecute)
     }
     
@@ -64,7 +73,7 @@ class StressTest: OperationTests {
             func operationQueue(queue: OperationQueue, willProduceOperation operation: NSOperation) { /* do nothing */ }
         }
         
-        let expectation = expectationWithDescription("Test: \(#function)")
+        weak var expectation = expectationWithDescription("Test: \(#function)")
         var success = false
         
         dispatch_async(Queue.Initiated.queue) {
@@ -81,7 +90,10 @@ class StressTest: OperationTests {
             }
             dispatch_group_wait(group,DISPATCH_TIME_FOREVER)
             success = true
-            expectation.fulfill()
+            dispatch_async(Queue.Main.queue, {
+                guard let expectation = expectation else { print("Test: \(#function): Finished expectation after timeout"); return }
+                expectation.fulfill()
+            })
         }
         
         waitForExpectationsWithTimeout(60, handler: nil)
