@@ -41,8 +41,7 @@ class StressTest: OperationTests {
         (0..<batchSize).forEach { i in
             operation.addCondition(TrueCondition())
         }
-        addCompletionBlockToTestOperation(operation)
-        waitForOperation(operation)
+        waitForOperation(operation, withTimeout: 10)
         XCTAssertTrue(operation.didExecute)
     }
 
@@ -53,8 +52,7 @@ class StressTest: OperationTests {
             condition.name = "Condition \(i)"
             operation.addCondition(condition)
         }
-        addCompletionBlockToTestOperation(operation)
-        waitForOperation(operation)
+        waitForOperation(operation, withTimeout: 10)
         XCTAssertTrue(operation.didExecute)
     }
     
