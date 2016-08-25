@@ -17,9 +17,14 @@ class StressTest: OperationTests {
 
     func test__completion_blocks() {
         (0..<batchSize).forEach { i in
-            let expectation = self.expectationWithDescription("Interation: \(i)")
+            weak var expectation = self.expectationWithDescription("Interation: \(i)")
             let operation = BlockOperation { }
-            operation.addCompletionBlock { expectation.fulfill() }
+            operation.addCompletionBlock {
+                dispatch_sync(Queue.Main.queue, {
+                    guard let expectation = expectation else { print("Test: \(#function): Finished expectation after timeout"); return }
+                    expectation.fulfill()
+                })
+            }
             self.queue.addOperation(operation)
         }
         waitForExpectationsWithTimeout(5, handler: nil)
@@ -64,7 +69,7 @@ class StressTest: OperationTests {
             func operationQueue(queue: OperationQueue, willProduceOperation operation: NSOperation) { /* do nothing */ }
         }
         
-        let expectation = expectationWithDescription("Test: \(#function)")
+        weak var expectation = expectationWithDescription("Test: \(#function)")
         var success = false
         
         dispatch_async(Queue.Initiated.queue) {
@@ -81,7 +86,10 @@ class StressTest: OperationTests {
             }
             dispatch_group_wait(group,DISPATCH_TIME_FOREVER)
             success = true
-            expectation.fulfill()
+            dispatch_async(Queue.Main.queue, {
+                guard let expectation = expectation else { print("Test: \(#function): Finished expectation after timeout"); return }
+                expectation.fulfill()
+            })
         }
         
         waitForExpectationsWithTimeout(60, handler: nil)
