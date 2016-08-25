@@ -25,14 +25,17 @@ class BlockConditionTests: OperationTests {
 
     func test__operation_with_unsuccessful_block_condition_errors() {
 
-        let expectation = expectationWithDescription("Test: \(#function)")
+        weak var expectation = expectationWithDescription("Test: \(#function)")
         let operation = TestOperation()
         operation.addCondition(BlockCondition { false })
 
         var receivedErrors = [ErrorType]()
         operation.addObserver(DidFinishObserver { _, errors in
             receivedErrors = errors
-            expectation.fulfill()
+            dispatch_async(Queue.Main.queue, {
+                guard let expectation = expectation else { print("Test: \(#function): Finished expectation after timeout"); return }
+                expectation.fulfill()
+            })
         })
 
         runOperation(operation)
@@ -47,7 +50,7 @@ class BlockConditionTests: OperationTests {
     }
 
     func test__operation_with_block_which_throws_condition_errors() {
-        let expectation = expectationWithDescription("Test: \(#function)")
+        weak var expectation = expectationWithDescription("Test: \(#function)")
 
         let operation = TestOperation()
         operation.addCondition(BlockCondition { throw TestOperation.Error.SimulatedError })
@@ -55,7 +58,10 @@ class BlockConditionTests: OperationTests {
         var receivedErrors = [ErrorType]()
         operation.addObserver(DidFinishObserver { _, errors in
             receivedErrors = errors
-            expectation.fulfill()
+            dispatch_async(Queue.Main.queue, {
+                guard let expectation = expectation else { print("Test: \(#function): Finished expectation after timeout"); return }
+                expectation.fulfill()
+            })
         })
 
         runOperation(operation)

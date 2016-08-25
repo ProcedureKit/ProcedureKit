@@ -316,4 +316,10 @@ class DeviceReachabilityTests: XCTestCase, NetworkReachabilityDelegate {
             XCTFail("Unexpected error thrown: \(error)")
         }
     }
+    
+    func test__stopNotifier_unschedules_reachability_callbacks_queue() {
+        do { try device.startNotifierOnQueue(queue) } catch { XCTFail() }
+        device.stopNotifier()
+        do { try device.startNotifierOnQueue(queue) } catch { XCTFail() }
+    }
 }
