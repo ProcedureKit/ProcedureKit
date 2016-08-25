@@ -227,45 +227,47 @@ class OperationDependencyTests: OperationTests {
         var counter1: Int = 0
         var counter2: Int = 0
         var counter3: Int = 0
+        
+        weak var didExecuteAllOperationsExpectation = expectationWithDescription("Test: \(#function), All Operations Executed")
+        let operationDispatchGroup = dispatch_group_create()
 
         for i in 0..<count {
 
             let op1name = "Operation 1, iteration: \(i)"
-            weak var op1Expectation = expectationWithDescription(op1name)
+            dispatch_group_enter(operationDispatchGroup)
             let op1 = BlockOperation { (continuation: BlockOperation.ContinuationBlockType) in
                 counter1 += 1
-                dispatch_async(Queue.Main.queue, {
-                    guard let op1Expectation = op1Expectation else { print("Test: \(#function): Finished expectation \"op1Expectation\" after timeout"); return }
-                    op1Expectation.fulfill()
-                })
+                dispatch_group_leave(operationDispatchGroup)
                 continuation(error: nil)
             }
+            op1.name = op1name
 
             let op2name = "Operation 2, iteration: \(i)"
-            weak var op2Expectation = expectationWithDescription(op2name)
+            dispatch_group_enter(operationDispatchGroup)
             let op2 = BlockOperation { (continuation: BlockOperation.ContinuationBlockType) in
                 counter2 += 1
-                dispatch_async(Queue.Main.queue, {
-                    guard let op2Expectation = op2Expectation else { print("Test: \(#function): Finished expectation \"op2Expectation\" after timeout"); return }
-                    op2Expectation.fulfill()
-                })
+                dispatch_group_leave(operationDispatchGroup)
                 continuation(error: nil)
             }
+            op2.name = op2name
 
             let op3name = "Operation 3, iteration: \(i)"
-            weak var op3Expectation = expectationWithDescription(op3name)
+            dispatch_group_enter(operationDispatchGroup)
             let op3 = BlockOperation { (continuation: BlockOperation.ContinuationBlockType) in
                 counter3 += 1
-                dispatch_async(Queue.Main.queue, {
-                    guard let op3Expectation = op3Expectation else { print("Test: \(#function): Finished expectation \"op3Expectation\" after timeout"); return }
-                    op3Expectation.fulfill()
-                })
+                dispatch_group_leave(operationDispatchGroup)
                 continuation(error: nil)
             }
+            op3.name = op3name
 
             op2.addDependency(op1)
             runOperations(op1, op2, op3)
         }
+
+        dispatch_group_notify(operationDispatchGroup, dispatch_get_main_queue(), {
+            guard let didExecuteAllOperationsExpectation = didExecuteAllOperationsExpectation else { print("Test: \(#function): Finished executing operations after timeout"); return }
+            didExecuteAllOperationsExpectation.fulfill()
+        })
 
         waitForExpectationsWithTimeout(6, handler: nil)
 
