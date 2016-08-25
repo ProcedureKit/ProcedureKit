@@ -7,9 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		652618101C11F75300654091 /* Operations.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 652618051C11F75300654091 /* Operations.framework */; };
-		6526182C1C11F77500654091 /* Operations.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 652618221C11F77500654091 /* Operations.framework */; };
-		652618481C11F78800654091 /* Operations.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6526183E1C11F78800654091 /* Operations.framework */; };
+		652618101C11F75300654091 /* Operations_Extension_API_Compatible.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 652618051C11F75300654091 /* Operations_Extension_API_Compatible.framework */; };
+		6526182C1C11F77500654091 /* Operations_Extension_API_Compatible.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 652618221C11F77500654091 /* Operations_Extension_API_Compatible.framework */; };
+		652618481C11F78800654091 /* Operations_Extension_API_Compatible.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6526183E1C11F78800654091 /* Operations_Extension_API_Compatible.framework */; };
 		6526185C1C11F8D700654091 /* Operations.h in Headers */ = {isa = PBXBuildFile; fileRef = 652617731C11F61700654091 /* Operations.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6526185D1C11F8D800654091 /* Operations.h in Headers */ = {isa = PBXBuildFile; fileRef = 652617731C11F61700654091 /* Operations.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6526185E1C11F8D800654091 /* Operations.h in Headers */ = {isa = PBXBuildFile; fileRef = 652617731C11F61700654091 /* Operations.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -352,11 +352,11 @@
 		6526179B1C11F61700654091 /* UserNotificationConditionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserNotificationConditionTests.swift; sourceTree = "<group>"; };
 		6526179C1C11F61700654091 /* WebpageOperationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebpageOperationTests.swift; sourceTree = "<group>"; };
 		6526179D1C11F61700654091 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		652618051C11F75300654091 /* Operations.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Operations.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		652618051C11F75300654091 /* Operations_Extension_API_Compatible.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Operations_Extension_API_Compatible.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		6526180F1C11F75300654091 /* iOS Extensions OperationsTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "iOS Extensions OperationsTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
-		652618221C11F77500654091 /* Operations.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Operations.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		652618221C11F77500654091 /* Operations_Extension_API_Compatible.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Operations_Extension_API_Compatible.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		6526182B1C11F77500654091 /* tvOS Extensions OperationsTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "tvOS Extensions OperationsTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
-		6526183E1C11F78800654091 /* Operations.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Operations.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		6526183E1C11F78800654091 /* Operations_Extension_API_Compatible.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Operations_Extension_API_Compatible.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		652618471C11F78800654091 /* OS X Extensions OperationsTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "OS X Extensions OperationsTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		652618551C11F7DA00654091 /* Extension Compatible.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "Extension Compatible.xcconfig"; sourceTree = "<group>"; };
 		653097A91CC4BFB200EC1431 /* Condition.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Condition.swift; sourceTree = "<group>"; };
@@ -398,7 +398,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				652618101C11F75300654091 /* Operations.framework in Frameworks */,
+				652618101C11F75300654091 /* Operations_Extension_API_Compatible.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -413,7 +413,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6526182C1C11F77500654091 /* Operations.framework in Frameworks */,
+				6526182C1C11F77500654091 /* Operations_Extension_API_Compatible.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -428,7 +428,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				652618481C11F78800654091 /* Operations.framework in Frameworks */,
+				652618481C11F78800654091 /* Operations_Extension_API_Compatible.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -717,11 +717,11 @@
 		652618061C11F75300654091 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				652618051C11F75300654091 /* Operations.framework */,
+				652618051C11F75300654091 /* Operations_Extension_API_Compatible.framework */,
 				6526180F1C11F75300654091 /* iOS Extensions OperationsTests.xctest */,
-				652618221C11F77500654091 /* Operations.framework */,
+				652618221C11F77500654091 /* Operations_Extension_API_Compatible.framework */,
 				6526182B1C11F77500654091 /* tvOS Extensions OperationsTests.xctest */,
-				6526183E1C11F78800654091 /* Operations.framework */,
+				6526183E1C11F78800654091 /* Operations_Extension_API_Compatible.framework */,
 				652618471C11F78800654091 /* OS X Extensions OperationsTests.xctest */,
 			);
 			name = Products;
@@ -808,7 +808,7 @@
 			);
 			name = "iOS Extensions Operations";
 			productName = "iOS Operations";
-			productReference = 652618051C11F75300654091 /* Operations.framework */;
+			productReference = 652618051C11F75300654091 /* Operations_Extension_API_Compatible.framework */;
 			productType = "com.apple.product-type.framework";
 		};
 		6526180E1C11F75300654091 /* iOS Extensions OperationsTests */ = {
@@ -844,7 +844,7 @@
 			);
 			name = "tvOS Extensions Operations";
 			productName = "tvOS Operations";
-			productReference = 652618221C11F77500654091 /* Operations.framework */;
+			productReference = 652618221C11F77500654091 /* Operations_Extension_API_Compatible.framework */;
 			productType = "com.apple.product-type.framework";
 		};
 		6526182A1C11F77500654091 /* tvOS Extensions OperationsTests */ = {
@@ -880,7 +880,7 @@
 			);
 			name = "OS X Extensions Operations";
 			productName = "OS X Operations";
-			productReference = 6526183E1C11F78800654091 /* Operations.framework */;
+			productReference = 6526183E1C11F78800654091 /* Operations_Extension_API_Compatible.framework */;
 			productType = "com.apple.product-type.framework";
 		};
 		652618461C11F78800654091 /* OS X Extensions OperationsTests */ = {
