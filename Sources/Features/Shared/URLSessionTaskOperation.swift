@@ -23,11 +23,69 @@ public class URLSessionTaskOperation: Operation {
         case State = "state"
     }
 
-    public let task: NSURLSessionTask
+    public private(set) var task: NSURLSessionTask!
 
-    private var removedObserved = false
-    private let lock = NSLock()
+    public static func dataTask(fromSession session: NSURLSession, withURL url: NSURL, completionHandler: (NSData?, NSURLResponse?, NSError?) -> Void) -> URLSessionTaskOperation {
+        let op = URLSessionTaskOperation()
+        let task = session.dataTaskWithURL(url) { (data, response, error) in
+            completionHandler(data, response, error)
+            op.finish(error)
+        }
+        assert(task.state == .Suspended, "NSURLSessionTask must be suspended, not \(task.state)")
+        op.task = task
+        op.addObserver(DidCancelObserver { _ in
+            task.cancel()
+        })
+        return op
+    }
 
+    public static func dataTask(fromSession session: NSURLSession, withRequest request: NSURLRequest, completionHandler: (NSData?, NSURLResponse?, NSError?) -> Void) -> URLSessionTaskOperation {
+        let op = URLSessionTaskOperation()
+        let task = session.dataTaskWithRequest(request) { (data, response, error) in
+            completionHandler(data, response, error)
+            op.finish(error)
+        }
+        assert(task.state == .Suspended, "NSURLSessionTask must be suspended, not \(task.state)")
+        op.task = task
+        op.addObserver(DidCancelObserver { _ in
+            task.cancel()
+        })
+        return op
+    }
+
+    public static func downloadTask(fromSession session: NSURLSession, withURL url: NSURL, completionHandler: (NSURL?, NSURLResponse?, NSError?) -> Void) -> URLSessionTaskOperation {
+        let op = URLSessionTaskOperation()
+        let task = session.downloadTaskWithURL(url) { (location, response, error) in
+            completionHandler(location, response, error)
+            op.finish(error)
+        }
+        assert(task.state == .Suspended, "NSURLSessionTask must be suspended, not \(task.state)")
+        op.task = task
+        op.addObserver(DidCancelObserver { _ in
+            task.cancel()
+        })
+        return op
+    }
+
+    public static func downloadTask(fromSession session: NSURLSession, withRequest request: NSURLRequest, completionHandler: (NSURL?, NSURLResponse?, NSError?) -> Void) -> URLSessionTaskOperation {
+        let op = URLSessionTaskOperation()
+        let task = session.downloadTaskWithRequest(request) { (location, response, error) in
+            completionHandler(location, response, error)
+            op.finish(error)
+        }
+        assert(task.state == .Suspended, "NSURLSessionTask must be suspended, not \(task.state)")
+        op.task = task
+        op.addObserver(DidCancelObserver { _ in
+            task.cancel()
+        })
+        return op
+    }
+
+    private override init () {
+        super.init()
+    }
+
+    @available(*, unavailable, message="URLSessionTaskOperation has been refactored to utilize factory methods that create the task and the operation.")
     public init(task: NSURLSessionTask) {
         assert(task.state == .Suspended, "NSURLSessionTask must be suspended, not \(task.state)")
         self.task = task
@@ -39,32 +97,7 @@ public class URLSessionTaskOperation: Operation {
 
     public override func execute() {
         assert(task.state == .Suspended, "NSURLSessionTask resumed outside of \(self)")
-        task.addObserver(self, forKeyPath: KeyPath.State.rawValue, options: [], context: &URLSessionTaskOperationKVOContext)
         task.resume()
-    }
-
-    public override func observeValueForKeyPath(keyPath: String?, ofObject object: AnyObject?, change: [String : AnyObject]?, context: UnsafeMutablePointer<Void>) {
-        guard context == &URLSessionTaskOperationKVOContext else { return }
-
-        lock.withCriticalScope {
-            if object === task && keyPath == KeyPath.State.rawValue && !removedObserved {
-
-                if case .Completed = task.state {
-                    finish(task.error)
-                }
-
-                switch task.state {
-                case .Completed, .Canceling:
-                    task.removeObserver(self, forKeyPath: KeyPath.State.rawValue)
-                    removedObserved = true
-                default:
-                    break
-                }
-            }
-        }
     }
 }
 
-// swiftlint:disable variable_name
-private var URLSessionTaskOperationKVOContext = 0
-// swiftlint:enable variable_name
