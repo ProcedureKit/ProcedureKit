@@ -129,21 +129,21 @@ open class Procedure: Operation, ProcedureProcotol {
 
     // MARK: Log
 
-    private var _log = Protector<AnyLogger>(AnyLogger(Logger()))
+    private var _log = Protector<LoggerProtocol>(Logger())
 
     /**
      Access the logger for this Operation
 
      The `log` property can be used as the interface to access the logger.
      e.g. to output a message with `LogSeverity.Info` from inside
-     the `Operation`, do this:
+     the `Procedure`, do this:
 
      ```swift
      log.info("This is my message")
      ```
 
      To adjust the instance severity of the LoggerType for the
-     `Operation`, access it via this property too:
+     `Procedure`, access it via this property too:
 
      ```swift
      log.severity = .Verbose
@@ -166,13 +166,13 @@ open class Procedure: Operation, ProcedureProcotol {
      ```
 
      */
-    public var log: AnyLogger {
+    public var log: LoggerProtocol {
         get {
             let operationName = self.operationName
-            return _log.read { AnyLogger(AnyLoggerContext(logger: $0, operationName: operationName)) }
+            return _log.read { LoggerContext(parent: $0, operationName: operationName) }
         }
         set {
-            _log.write { ( ward: inout AnyLogger) in
+            _log.write { ( ward: inout LoggerProtocol) in
                 ward = newValue
             }
         }

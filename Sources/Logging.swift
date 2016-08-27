@@ -174,8 +174,6 @@ public class LogManager: LogManagerProtocol {
  */
 public protocol LoggerProtocol {
 
-    associatedtype Manager: LogManagerProtocol
-
     /// Access the block which receives the message to log.
     var logger: LoggerBlockType { get set }
 
@@ -207,7 +205,7 @@ public extension LoggerProtocol {
 
     /// Access the minimum `LogSeverity` severity.
     internal var minimumLogSeverity: LogSeverity {
-        return min(Manager.severity, severity)
+        return min(LogManager.severity, severity)
     }
 
     internal func messageWithOperationName(_ message: String) -> String {
@@ -242,7 +240,7 @@ public extension LoggerProtocol {
      - parameter line: a `Int`, containing the line number (make it default to #line)
      */
     func log(message: @autoclosure () -> String, severity: LogSeverity, file: String = #file, function: String = #function, line: Int = #line) {
-        guard Manager.enabled && enabled && severity >= minimumLogSeverity else { return }
+        guard LogManager.enabled && enabled && severity >= minimumLogSeverity else { return }
         let _message = messageWithOperationName(message())
         LogManager.queue.async {
             self.logger(message: _message, severity: severity, file: file, function: function, line: line)
@@ -310,123 +308,25 @@ public extension LoggerProtocol {
     }
 }
 
-// MARK: - AnyLogger
+internal struct LoggerContext: LoggerProtocol {
 
-private class AnyLogger_<M: LogManagerProtocol>: LoggerProtocol {
-    typealias Manager = M
+    public var severity: LogSeverity
 
-    var severity: LogSeverity {
-        get { _abstractMethod(); return .fatal }
-        set { _abstractMethod() }
-    }
+    public var enabled: Bool
 
-    var enabled: Bool {
-        get { _abstractMethod(); return false }
-        set { _abstractMethod() }
-    }
-
-    var logger: LoggerBlockType {
-        get { _abstractMethod(); return { _ in } }
-        set { _abstractMethod() }
-    }
-
-    var operationName: String? {
-        get { _abstractMethod(); return nil }
-        set { _abstractMethod() }
-    }
-}
-
-private final class AnyLoggerBox<Base: LoggerProtocol>: AnyLogger_<Base.Manager> {
-    private var base: Base! = nil
-
-    override var severity: LogSeverity {
-        get { return base.severity }
-        set { base.severity = newValue }
-    }
-
-    override var enabled: Bool {
-        get { return base.enabled }
-        set { base.enabled = newValue }
-    }
-
-    override var logger: LoggerBlockType {
-        get { return base.logger }
-        set { base.logger = newValue }
-    }
-
-    override var operationName: String? {
-        get { return base.operationName }
-        set { base.operationName = newValue }
-    }
-
-    fileprivate init(_ base: Base) {
-        self.base = base
-    }
-}
-
-public struct _AnyLogger<M: LogManagerProtocol>: LoggerProtocol {
-    public typealias Manager = M
-
-    private typealias ErasedLogger = AnyLogger_<M>
-    private var box: ErasedLogger!
-
-    public var severity: LogSeverity {
-        get { return box.severity }
-        set { box.severity = newValue }
-    }
-
-    public var enabled: Bool {
-        get { return box.enabled }
-        set { box.enabled = newValue }
-    }
-
-    public var logger: LoggerBlockType {
-        get { return box.logger }
-        set { box.logger = newValue }
-    }
-
-    public var operationName: String? {
-        get { return box.operationName }
-        set { box.operationName = newValue }
-    }
-
-    public init<Base: LoggerProtocol>(_ base: Base) where M == Base.Manager {
-        box = AnyLoggerBox(base)
-    }
-}
-
-public typealias AnyLogger = _AnyLogger<LogManager>
-
-public struct AnyLoggerContext<M: LogManagerProtocol>: LoggerProtocol {
-    public typealias Manager = M
-
-    private var any: _AnyLogger<M>
-
-    public var severity: LogSeverity {
-        get { return any.severity }
-        set { any.severity = newValue }
-    }
-
-    public var enabled: Bool {
-        get { return any.enabled }
-        set { any.enabled = newValue }
-    }
-
-    public var logger: LoggerBlockType {
-        get { return any.logger }
-        set { any.logger = newValue }
-    }
+    public var logger: LoggerBlockType
 
     public var operationName: String? = nil
 
-    public init<Base: LoggerProtocol>(logger base: Base, operationName name: String) where M == Base.Manager {
-        any = _AnyLogger(base)
+    public init(parent: LoggerProtocol, operationName name: String) {
+        severity = parent.severity
+        enabled = parent.enabled
+        logger = parent.logger
         operationName = name
     }
 }
 
-
-internal class _Logger<M: LogManagerProtocol>: LoggerProtocol {
+internal struct _Logger<M: LogManagerProtocol>: LoggerProtocol {
 
     typealias Manager = M
 
@@ -438,7 +338,7 @@ internal class _Logger<M: LogManagerProtocol>: LoggerProtocol {
 
     var operationName: String? = nil
 
-    required init(severity: LogSeverity = Manager.severity, enabled: Bool = Manager.enabled, logger: LoggerBlockType = Manager.logger) {
+    init(severity: LogSeverity = Manager.severity, enabled: Bool = Manager.enabled, logger: LoggerBlockType = Manager.logger) {
         self.severity = severity
         self.enabled = enabled
         self.logger = logger
