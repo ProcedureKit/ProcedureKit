@@ -167,6 +167,50 @@ open class Procedure: Operation, ProcedureProcotol {
         super.init()
     }
 
+    // MARK: - Disable Automatic Finishing
+
+    /**
+     Ability to override Operation's built-in finishing behavior, if a
+     subclass requires full control over when finish() is called.
+
+     Used for GroupOperation to implement proper .Finished state-handling
+     (only finishing after all child operations have finished).
+
+     The default behavior of Operation is to automatically call finish()
+     when:
+     (a) it's cancelled, whether that occurs:
+     - prior to the Operation starting
+     (in which case, Operation will skip calling execute())
+     - on another thread at the same time that the operation is
+     executing
+     (b) when willExecuteObservers log errors
+
+     To ensure that an Operation subclass does not finish until the
+     subclass calls finish():
+     call `super.init(disableAutomaticFinishing: true)` in the init.
+
+     IMPORTANT: If disableAutomaticFinishing == TRUE, the subclass is
+     responsible for calling finish() in *ALL* cases, including when the
+     operation is cancelled.
+
+     You can react to cancellation using WillCancelObserver/DidCancelObserver
+     and/or checking periodically during execute with something like:
+
+     ```swift
+     guard !cancelled else {
+     // do any necessary clean-up
+     finish()    // always call finish if automatic finishing is disabled
+     return
+     }
+     ```
+
+     */
+    public init(disableAutomaticFinishing: Bool) {
+        self.isAutomaticFinishingDisabled = disableAutomaticFinishing
+        super.init()
+    }
+
+
     // MARK: - Execution
 
     public func willEnqueue() {
@@ -408,9 +452,6 @@ open class Procedure: Operation, ProcedureProcotol {
 
         didChangeValue(forKey: .finished)
     }
-
-
-    // Observers
 
     /**
      Public override which deliberately crashes your app, as usage is considered an antipattern
