@@ -8,42 +8,42 @@ import Foundation
 import XCTest
 import ProcedureKit
 
-class ProcedureTestCase: XCTestCase {
+open class ProcedureKitTestCase: XCTestCase {
 
-    var queue: ProcedureQueue!
-    var delegate: QueueTestDelegate!
+    public var queue: ProcedureQueue!
+    public var delegate: QueueTestDelegate!
+    public var procedure: TestProcedure!
 
-    override func setUp() {
+    open override func setUp() {
         super.setUp()
         queue = ProcedureQueue()
         delegate = QueueTestDelegate()
         queue.delegate = delegate
+        procedure = TestProcedure()
     }
 
-    override func tearDown() {
+    open override func tearDown() {
+        procedure.cancel()
         queue.cancelAllOperations()
         delegate = nil
         queue = nil
+        procedure = nil
         super.tearDown()
     }
 
-    func run(operation: Operation) {
-        run(operations: operation)
+    public func run(operation: Operation) {
+        run(operations: [operation])
     }
 
-    func run(operations: Operation...) {
+    public func run(operations: Operation...) {
         run(operations: operations)
     }
 
-    func run(operations: [Operation]) {
+    public func run(operations: [Operation]) {
         queue.addOperations(operations, waitUntilFinished: false)
     }
 
-    func wait(for procedure: Procedure, withTimeout timeout: TimeInterval = 3, withExpectationDescription expectationDescription: String = #function) {
-        wait(for: procedure, withTimeout: timeout, withExpectationDescription: expectationDescription)
-    }
-
-    func wait(for procedures: Procedure..., withTimeout timeout: TimeInterval = 3, withExpectationDescription expectationDescription: String = #function) {
+    public func wait(for procedures: Procedure..., withTimeout timeout: TimeInterval = 3, withExpectationDescription expectationDescription: String = #function) {
         for (i, procedure) in procedures.enumerated() {
             let _ = addCompletionBlockTo(procedure: procedure, withExpectationDescription: "\(i), \(expectationDescription)")
         }
@@ -51,13 +51,13 @@ class ProcedureTestCase: XCTestCase {
         waitForExpectations(timeout: timeout, handler: nil)
     }
 
-    func addCompletionBlockTo(procedure: Procedure, withExpectationDescription expectationDescription: String = #function) -> XCTestExpectation {
+    public func addCompletionBlockTo(procedure: Procedure, withExpectationDescription expectationDescription: String = #function) -> XCTestExpectation {
         let expect = expectation(description: "Test: \(expectationDescription), \(UUID())")
         addCompletionBlockTo(procedure: procedure, withExpectation: expect)
         return expect
     }
 
-    func addCompletionBlockTo(procedure: Procedure, withExpectation expectation: XCTestExpectation) {
+    public func addCompletionBlockTo(procedure: Procedure, withExpectation expectation: XCTestExpectation) {
         weak var weakExpectation = expectation
         procedure.addDidFinishBlockObserver { _, _ in
             DispatchQueue.main.async {

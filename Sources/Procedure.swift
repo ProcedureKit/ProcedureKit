@@ -12,6 +12,10 @@ import Foundation.NSOperation
 
 open class Procedure: Operation, ProcedureProcotol {
 
+    private enum FinishingFrom {
+        case main, cancel, finish
+    }
+
     private enum State: Int, Comparable {
 
         static func < (lhs: State, rhs: State) -> Bool {
@@ -63,10 +67,13 @@ open class Procedure: Operation, ProcedureProcotol {
 
 
     private var _isTransitioningToExecuting = false
-    private var _isHandlingFinish = false
+    private var _isFinishingFrom: FinishingFrom? = nil
     private var _isHandlingCancel = false
     private var _isCancelled = false  // should always be set by .cancel()
 
+    private var _isHandlingFinish: Bool {
+        return _isFinishingFrom != nil
+    }
 
     fileprivate let isAutomaticFinishingDisabled: Bool
 
@@ -107,28 +114,6 @@ open class Procedure: Operation, ProcedureProcotol {
     final public override var isCancelled: Bool {
         return _stateLock.withCriticalScope { _isCancelled }
     }
-
-    private var shouldCancel: Bool {
-        return _stateLock.withCriticalScope {
-            // Do not cancel if already finished or finishing, or cancelled
-            guard state <= .executing && !_isCancelled else { return false }
-            // Only a single call to cancel should continue
-            guard !_isHandlingCancel else { return false }
-            _isHandlingCancel = true
-            return true
-        }
-    }
-
-    private var shouldFinish: Bool {
-        return _stateLock.withCriticalScope {
-            let shouldFinish = isExecuting && !isAutomaticFinishingDisabled && !_isHandlingFinish
-            if shouldFinish {
-                _isHandlingFinish = true
-            }
-            return shouldFinish
-        }
-    }
-
 
     // Errors
 
@@ -221,7 +206,7 @@ open class Procedure: Operation, ProcedureProcotol {
                 // Check to see if the procedure has now been cancelled
                 // by an observer
                 guard (_errors.isEmpty && !isCancelled) || isAutomaticFinishingDisabled else {
-                    _isHandlingFinish = true
+                    _isFinishingFrom = .main
                     return .finishing
                 }
 
@@ -244,7 +229,7 @@ open class Procedure: Operation, ProcedureProcotol {
                     // but cancel is not (yet/ever?) handling the finish.
                     // Because cancel could have already passed the check for executing,
                     // handle calling finish here.
-                    _isHandlingFinish = true
+                    _isFinishingFrom = .main
                     return .finishing
                 }
                 return .executing
@@ -291,31 +276,59 @@ open class Procedure: Operation, ProcedureProcotol {
         observers.forEach { $0.procedure(self, didProduce: operation) }
     }
 
-    // MARK: Cancellation
+    // MARK: - Cancellation
 
+    open func procedureWillCancel(withErrors: [Error]) { }
+
+    open func procedureDidCancel(withErrors: [Error]) { }
 
     public func cancel(withErrors errors: [Error]) {
-        _stateLock.withCriticalScope {
-            if !errors.isEmpty {
-                // TODO
-            }
-            _errors += errors
-        }
-        cancel()
+        _cancel(withAdditionalErrors: errors)
     }
 
     public final override func cancel() {
+        _cancel(withAdditionalErrors: [])
+    }
+
+    private var shouldCancel: Bool {
+        return _stateLock.withCriticalScope {
+            // Do not cancel if already finished or finishing, or cancelled
+            guard state <= .executing && !_isCancelled else { return false }
+            // Only a single call to cancel should continue
+            guard !_isHandlingCancel else { return false }
+            _isHandlingCancel = true
+            return true
+        }
+    }
+
+    private var shouldFinishFromCancel: Bool {
+        return _stateLock.withCriticalScope {
+            let shouldFinish = isExecuting && !isAutomaticFinishingDisabled && !_isHandlingFinish
+            if shouldFinish {
+                _isFinishingFrom = .cancel
+            }
+            return shouldFinish
+        }
+    }
+
+    private final func _cancel(withAdditionalErrors additionalErrors: [Error]) {
 
         guard shouldCancel else { return }
 
-        procedureWillCancel(withErrors: errors)
+        let resultingErrors = errors + additionalErrors
+        procedureWillCancel(withErrors: resultingErrors)
         willChangeValue(forKey: .cancelled)
-        observers.forEach { $0.will(cancel: self, withErrors: errors) }
+        observers.forEach { $0.will(cancel: self, withErrors: resultingErrors) }
 
-        _stateLock.withCriticalScope { _isCancelled = true }
+        _stateLock.withCriticalScope {
+            if !additionalErrors.isEmpty {
+                _errors += additionalErrors
+            }
+            _isCancelled = true
+        }
 
-        procedureDidCancel(withErrors: errors)
-        observers.forEach { $0.did(cancel: self, withErrors: errors) }
+        procedureDidCancel(withErrors: resultingErrors)
+        observers.forEach { $0.did(cancel: self, withErrors: resultingErrors) }
         // TODO - log
         didChangeValue(forKey: .cancelled)
 
@@ -323,22 +336,17 @@ open class Procedure: Operation, ProcedureProcotol {
         // as well as isReady KVO notification
         super.cancel()
 
-        if shouldFinish {
-            // TODO - finish from cancel
+        if shouldFinishFromCancel {
+            _finish(withErrors: [])
         }
     }
 
 
+    // MARK: - Finishing
 
-    // Observers
+    open func procedureWillFinish(withErrors: [Error]) { }
 
-
-}
-
-
-// MARK: - Finishing
-
-public extension Procedure {
+    open func procedureDidFinish(withErrors: [Error]) { }
 
     /**
      Finish method which must be called eventually after an operation has
@@ -346,8 +354,74 @@ public extension Procedure {
 
      - parameter errors: an array of `Error`, which defaults to empty.
      */
-    final func finish(withErrors errors: [Error] = []) {
-        // TODO
+    public final func finish(withErrors errors: [Error] = []) {
+        _finish(withErrors: errors)
+    }
+
+    private var shouldFinish: Bool {
+        return _stateLock.withCriticalScope {
+            // Do not finish is already finishing or finished
+            guard state <= .finishing else { return false }
+            // Only a single call to _finish should continue
+            guard !_isHandlingFinish else { return false }
+            _isFinishingFrom = .finish
+            return true
+        }
+    }
+
+    private final func _finish(withErrors receivedErrors: [Error]) {
+        guard shouldFinish else { return }
+
+        // NOTE:
+        // - The stateLock should only be held when necessary, and should not
+        //   be held when notifying observers (whether via KVO or Operation's
+        //   observers) or deadlock can result.
+
+        let changedExecutingState = isExecuting
+        if changedExecutingState { willChangeValue(forKey: .executing) }
+        _stateLock.withCriticalScope { state = .finishing }
+        if changedExecutingState { didChangeValue(forKey: .executing) }
+
+        let resultingErrors: [Error] = _stateLock.withCriticalScope {
+            _errors += receivedErrors
+            return _errors
+        }
+
+        if resultingErrors.isEmpty {
+            // TODO: Log
+        }
+        else {
+            // TODO: Log
+        }
+
+        procedureWillFinish(withErrors: resultingErrors)
+        willChangeValue(forKey: .finished)
+        observers.forEach { $0.will(finish: self, withErrors: resultingErrors) }
+
+        _stateLock.withCriticalScope { state = .finished }
+
+        procedureDidFinish(withErrors: resultingErrors)
+        observers.forEach { $0.did(finish: self, withErrors: resultingErrors) }
+
+        let message = !errors.isEmpty ? "errors: \(errors)" : "no errors"
+//        TODO: log.verbose("Did finish with \(message)")
+
+        didChangeValue(forKey: .finished)
+    }
+
+
+    // Observers
+
+    /**
+     Public override which deliberately crashes your app, as usage is considered an antipattern
+
+     To promote best practices, where waiting is never the correct thing to do,
+     we will crash the app if this is called. Instead use discrete operations and
+     dependencies, or groups, or semaphores or even NSLocking.
+
+     */
+    public final override func waitUntilFinished() {
+        fatalError("Waiting on operations is an anti-pattern. Remove this ONLY if you're absolutely sure there is No Other Way™. Post a question in https://github.com/danthorpe/Operations if you are unsure.")
     }
 }
 

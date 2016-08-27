@@ -120,31 +120,51 @@ open class ProcedureQueue: OperationQueue {
      - parameter op: an `Operation` instance.
      */
     // swiftlint:disable function_body_length
-    public func add<Procedure: ProcedureProcotol>(operation procedure: Procedure) where Procedure: Operation {
+    public func add(operation: Operation) {
 
-//            procedure.log.verbose("Adding to queue")
+        defer {
+            super.addOperation(operation)
+        }
 
-            /// Add an observer so that any produced operations are added to the queue
-            procedure.addDidProduceOperationBlockObserver { [weak self] (_, produced) in
-                if let queue = self {
-                    queue.delegate?.procedureQueue(queue, willProduceOperation: produced)
-                    queue.add(operation: produced)
+        guard let procedure = operation as? Procedure else {
+
+            operation.addCompletionBlock { [weak self, weak operation] in
+                if let queue = self, let operation = operation {
+                    queue.delegate?.operationQueue(queue, didFinishOperation: operation)
                 }
             }
 
-            /// Add an observer to invoke the will finish delegate method
-            procedure.addWillFinishBlockObserver { [weak self] procedure, errors in
-                if let queue = self {
-                    self?.delegate?.procedureQueue(queue, willFinishOperation: procedure, withErrors: errors)
-                }
-            }
+            delegate?.operationQueue(self, willAddOperation: operation)
 
-            /// Add an observer to invoke the did finish delegate method
-            procedure.addDidFinishBlockObserver { [weak self] procedure, errors in
-                if let queue = self {
-                    queue.delegate?.procedureQueue(queue, didFinishOperation: procedure, withErrors: errors)
-                }
+            return
+        }
+
+
+/** --> Logging
+        procedure.log.verbose("Adding to queue")
+*/
+        /// Add an observer so that any produced operations are added to the queue
+        procedure.addDidProduceOperationBlockObserver { [weak self] (_, produced) in
+            if let queue = self {
+                queue.delegate?.procedureQueue(queue, willProduceOperation: produced)
+                queue.add(operation: produced)
             }
+        }
+
+        /// Add an observer to invoke the will finish delegate method
+        procedure.addWillFinishBlockObserver { [weak self] procedure, errors in
+            if let queue = self {
+                self?.delegate?.procedureQueue(queue, willFinishOperation: procedure, withErrors: errors)
+            }
+        }
+
+        /// Add an observer to invoke the did finish delegate method
+        procedure.addDidFinishBlockObserver { [weak self] procedure, errors in
+            if let queue = self {
+                queue.delegate?.procedureQueue(queue, didFinishOperation: procedure, withErrors: errors)
+            }
+        }
+
 /* -- > Conditions
 
             /// Process any conditions
@@ -196,31 +216,16 @@ open class ProcedureQueue: OperationQueue {
                 // Add the evaluator
                 addOperation(evaluator)
             }
-
-            // Indicate to the operation that it is to be enqueued
-            procedure.willEnqueue()
 */
+
+        // Indicate to the operation that it is to be enqueued
+        procedure.willEnqueue()
 
         delegate?.procedureQueue(self, willAddOperation: procedure)
 
-        super.addOperation(procedure)
     }
 
     // swiftlint:enable function_body_length
-
-    public func add(operation: Operation) {
-
-        operation.addCompletionBlock { [weak self, weak operation] in
-            if let queue = self, let operation = operation {
-                queue.delegate?.operationQueue(queue, didFinishOperation: operation)
-            }
-        }
-
-        delegate?.operationQueue(self, willAddOperation: operation)
-
-        super.addOperation(operation)
-    }
-
 
 
     /**

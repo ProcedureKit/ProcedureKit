@@ -7,8 +7,10 @@
 import Foundation
 import ProcedureKit
 
-public class TestProcedure: Procedure {
-    public struct SimulatedError: Error { }
+open class TestProcedure: Procedure {
+    public struct SimulatedError: Error {
+        public init() { }
+    }
 
     public let delay: TimeInterval
     public let error: Error?
@@ -28,7 +30,7 @@ public class TestProcedure: Procedure {
         name = "Test Procedure"
     }
 
-    public override func execute() {
+    open override func execute() {
 
         if let operation = producedOperation {
             let deadline = DispatchTime(uptimeNanoseconds: UInt64(delay * 0.001 * Double(NSEC_PER_SEC)))
@@ -44,19 +46,19 @@ public class TestProcedure: Procedure {
         }
     }
 
-    public func procedureWillCancel(withErrors: [Error]) {
+    open override func procedureWillCancel(withErrors: [Error]) {
         procedureWillCancelCalled = true
     }
 
-    public func procedureDidCancel(withErrors: [Error]) {
+    open override func procedureDidCancel(withErrors: [Error]) {
         procedureDidCancelCalled = true
     }
 
-    public func procedureWillFinish(withErrors: [Error]) {
+    open override func procedureWillFinish(withErrors: [Error]) {
         procedureWillFinishCalled = true
     }
 
-    public func procedureDidFinish(withErrors: [Error]) {
+    open override func procedureDidFinish(withErrors: [Error]) {
         procedureDidFinishCalled = true
     }
 }
