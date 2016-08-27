@@ -80,7 +80,7 @@ open class Procedure: Operation, ProcedureProcotol {
 
 
 
-    // State
+    // MARK: State
 
 
     private var _state = State.initialized
@@ -94,7 +94,7 @@ open class Procedure: Operation, ProcedureProcotol {
             _stateLock.withCriticalScope {
                 assert(_state.canTransition(to: newState, whenCancelled: isCancelled), "Attempting to perform illegal cyclic state transition, \(_state) -> \(newState).")
 //                assert(_state.canTransition(to: newState, whenCancelled: isCancelled), "Attempting to perform illegal cyclic state transition, \(_state) -> \(newState) for operation: \(identity).")
-//                log.verbose("\(_state) -> \(newState)")
+                log.verbose(message: "\(_state) -> \(newState)")
                 _state = newState
             }
         }
@@ -115,7 +115,7 @@ open class Procedure: Operation, ProcedureProcotol {
         return _stateLock.withCriticalScope { _isCancelled }
     }
 
-    // Errors
+    // MARK: Errors
 
     private var _errors = [Error]()
 
@@ -127,8 +127,60 @@ open class Procedure: Operation, ProcedureProcotol {
         return errors.count > 0
     }
 
+    // MARK: Log
 
-    // Observers
+    private var _log = Protector<AnyLogger>(AnyLogger(Logger()))
+
+    /**
+     Access the logger for this Operation
+
+     The `log` property can be used as the interface to access the logger.
+     e.g. to output a message with `LogSeverity.Info` from inside
+     the `Operation`, do this:
+
+     ```swift
+     log.info("This is my message")
+     ```
+
+     To adjust the instance severity of the LoggerType for the
+     `Operation`, access it via this property too:
+
+     ```swift
+     log.severity = .Verbose
+     ```
+
+     The logger is a very simple type, and all it does beyond
+     manage the enabled status and severity is send the String to
+     a block on a dedicated serial queue. Therefore to provide custom
+     logging, set the `logger` property:
+
+     ```swift
+     log.logger = { message in sendMessageToAnalytics(message) }
+     ```
+
+     By default, the Logger's logger block is the same as the global
+     LogManager. Therefore to use a custom logger for all Operations:
+
+     ```swift
+     LogManager.logger = { message in sendMessageToAnalytics(message) }
+     ```
+
+     */
+    public var log: AnyLogger {
+        get {
+            let operationName = self.operationName
+            return _log.read { AnyLogger(AnyLoggerContext(logger: $0, operationName: operationName)) }
+        }
+        set {
+            _log.write { ( ward: inout AnyLogger) in
+                ward = newValue
+            }
+        }
+    }
+
+
+
+    // MARK: Observers
 
     private var _observers = Protector([AnyObserver<Procedure>]())
 
@@ -285,7 +337,7 @@ open class Procedure: Operation, ProcedureProcotol {
         let nextState = getNextState()
 
         guard nextState != .finishing else {
-            // TODO - finish from cancel true
+            _finish(withErrors: [])
             return
         }
 
@@ -298,13 +350,13 @@ open class Procedure: Operation, ProcedureProcotol {
         didChangeValue(forKey: .executing)
 
         guard nextState2 != .finishing else {
-            // TODO - finish from cancel true
+            _finish(withErrors: [])
             return
         }
 
         guard nextState2 == .executing else { return }
 
-        // TODO - log
+        log.verbose(message: "Will Execute")
 
         execute()
     }
@@ -316,7 +368,7 @@ open class Procedure: Operation, ProcedureProcotol {
 
     public final func produce(operation: Operation) {
         precondition(state > .initialized, "Cannot produce operation will not being scheduled on a queue")
-        // TODO - log
+        log.verbose(message: "Did produce \(operation.operationName)")
         observers.forEach { $0.procedure(self, didProduce: operation) }
     }
 
@@ -373,7 +425,12 @@ open class Procedure: Operation, ProcedureProcotol {
 
         procedureDidCancel(withErrors: resultingErrors)
         observers.forEach { $0.did(cancel: self, withErrors: resultingErrors) }
-        // TODO - log
+        if additionalErrors.isEmpty {
+            log.verbose(message: "Did cancel.")
+        }
+        else {
+            log.verbose(message: "Did cancel with errors: \(additionalErrors)")
+        }
         didChangeValue(forKey: .cancelled)
 
         // Call super to trigger .isReady state change on cancel
@@ -431,12 +488,9 @@ open class Procedure: Operation, ProcedureProcotol {
             return _errors
         }
 
-        if resultingErrors.isEmpty {
-            // TODO: Log
-        }
-        else {
-            // TODO: Log
-        }
+        let messageSuffix = !errors.isEmpty ? "errors: \(errors)" : "no errors"
+
+        log.verbose(message: "Will finish with no \(messageSuffix).")
 
         procedureWillFinish(withErrors: resultingErrors)
         willChangeValue(forKey: .finished)
@@ -447,8 +501,7 @@ open class Procedure: Operation, ProcedureProcotol {
         procedureDidFinish(withErrors: resultingErrors)
         observers.forEach { $0.did(finish: self, withErrors: resultingErrors) }
 
-        let message = !errors.isEmpty ? "errors: \(errors)" : "no errors"
-//        TODO: log.verbose("Did finish with \(message)")
+        log.verbose(message: "Did finish with no \(messageSuffix).")
 
         didChangeValue(forKey: .finished)
     }
