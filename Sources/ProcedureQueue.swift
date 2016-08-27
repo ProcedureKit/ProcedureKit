@@ -15,7 +15,7 @@ public protocol OperationQueueDelegate: class {
      - paramter queue: the `OperationQueue`.
      - paramter operation: the `Operation` instance about to be added.
      */
-    func operationQueue(queue: OperationQueue, willAddOperation operation: Operation)
+    func operationQueue(_ queue: OperationQueue, willAddOperation operation: Operation)
 
     /**
      An operation will finish on the queue.
@@ -24,7 +24,7 @@ public protocol OperationQueueDelegate: class {
      - parameter operation: the `Operation` instance which finished.
      - parameter errors: an array of `Error`s.
      */
-    func operationQueue(queue: OperationQueue, willFinishOperation operation: Operation)
+    func operationQueue(_ queue: OperationQueue, willFinishOperation operation: Operation)
 
     /**
      An operation did finish on the queue.
@@ -33,7 +33,7 @@ public protocol OperationQueueDelegate: class {
      - parameter operation: the `Operation` instance which finished.
      - parameter errors: an array of `Error`s.
      */
-    func operationQueue(queue: OperationQueue, didFinishOperation operation: Operation)
+    func operationQueue(_ queue: OperationQueue, didFinishOperation operation: Operation)
 }
 
 /**
@@ -212,11 +212,11 @@ open class ProcedureQueue: OperationQueue {
 
         operation.addCompletionBlock { [weak self, weak operation] in
             if let queue = self, let operation = operation {
-                queue.delegate?.operationQueue(queue: queue, didFinishOperation: operation)
+                queue.delegate?.operationQueue(queue, didFinishOperation: operation)
             }
         }
 
-        delegate?.operationQueue(queue: self, willAddOperation: operation)
+        delegate?.operationQueue(self, willAddOperation: operation)
 
         super.addOperation(operation)
     }

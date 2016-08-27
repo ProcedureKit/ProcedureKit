@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		65245D1B1D72129800340A2D /* QueueTestDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65245D1A1D72129800340A2D /* QueueTestDelegate.swift */; };
 		653C9FCA1D6097A40070B7A2 /* ProcedureKitMobile.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 653C9FC11D6097A40070B7A2 /* ProcedureKitMobile.framework */; };
 		653C9FDB1D6098330070B7A2 /* ProcedureKitMobile.h in Headers */ = {isa = PBXBuildFile; fileRef = 653C9FDA1D6098330070B7A2 /* ProcedureKitMobile.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		653C9FDF1D6099110070B7A2 /* ProcedureKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65CFC5F01D608A5500CAD875 /* ProcedureKit.framework */; };
@@ -172,6 +173,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		65245D1A1D72129800340A2D /* QueueTestDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = QueueTestDelegate.swift; path = Sources/Testing/QueueTestDelegate.swift; sourceTree = "<group>"; };
 		653C9FC11D6097A40070B7A2 /* ProcedureKitMobile.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ProcedureKitMobile.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		653C9FDA1D6098330070B7A2 /* ProcedureKitMobile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ProcedureKitMobile.h; path = "Supporting Files/ProcedureKitMobile.h"; sourceTree = "<group>"; };
 		653C9FDC1D6098650070B7A2 /* ProcedureKitMobile.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = ProcedureKitMobile.xcconfig; path = "Supporting Files/ProcedureKitMobile.xcconfig"; sourceTree = "<group>"; };
@@ -356,8 +358,9 @@
 		653C9FE41D60993E0070B7A2 /* Testing */ = {
 			isa = PBXGroup;
 			children = (
-				659E5FF91D6E3B8D002B1D10 /* TestProcedure.swift */,
 				659E5FFB1D6E3BCF002B1D10 /* ProcedureTestCase.swift */,
+				65245D1A1D72129800340A2D /* QueueTestDelegate.swift */,
+				659E5FF91D6E3B8D002B1D10 /* TestProcedure.swift */,
 			);
 			name = Testing;
 			sourceTree = "<group>";
@@ -1070,6 +1073,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				65245D1B1D72129800340A2D /* QueueTestDelegate.swift in Sources */,
 				659E5FFA1D6E3B8D002B1D10 /* TestProcedure.swift in Sources */,
 				659E5FFC1D6E3BCF002B1D10 /* ProcedureTestCase.swift in Sources */,
 			);
