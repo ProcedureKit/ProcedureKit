@@ -17,3 +17,7 @@ steps:
     agents:
       swift: "2.2"
       iOS-Simulator: true
+    env:
+      FL_SLATHER_BUILDKITE_ENABLED: true
+      FL_SLATHER_COVERALLS_ENABLED: true
+      
