@@ -7,4 +7,7 @@
 PRODUCT_BUNDLE_IDENTIFIER = run.kit.procedure.TestingProcedureKit
 PRODUCT_NAME = TestingProcedureKit
 
+APPLICATION_EXTENSION_API_ONLY = NO
 
+
+FRAMEWORK_SEARCH_PATHS = $(inherited) $(DEVELOPER_SDK_DIR)/../Library/Frameworks
