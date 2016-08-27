@@ -123,6 +123,7 @@ public class LogManager: LogManagerProtocol {
     }
 
     let queue = DispatchQueue(label: "run.kit.procedure.ProcedureKit.Logger", qos: .utility)
+
     var enabled: Bool {
         get { return _enabled.read { $0 } }
         set {

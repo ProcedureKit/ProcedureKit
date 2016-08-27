@@ -12,6 +12,7 @@
 		65245D1F1D7231DC00340A2D /* CancellationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65245D1E1D7231DC00340A2D /* CancellationTests.swift */; };
 		65245D211D72345000340A2D /* FinishingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65245D201D72345000340A2D /* FinishingTests.swift */; };
 		65245D231D723A6B00340A2D /* Logging.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65245D221D723A6B00340A2D /* Logging.swift */; };
+		65245D251D724FC200340A2D /* LoggerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65245D241D724FC200340A2D /* LoggerTests.swift */; };
 		653C9FCA1D6097A40070B7A2 /* ProcedureKitMobile.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 653C9FC11D6097A40070B7A2 /* ProcedureKitMobile.framework */; };
 		653C9FDB1D6098330070B7A2 /* ProcedureKitMobile.h in Headers */ = {isa = PBXBuildFile; fileRef = 653C9FDA1D6098330070B7A2 /* ProcedureKitMobile.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		653C9FDF1D6099110070B7A2 /* ProcedureKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65CFC5F01D608A5500CAD875 /* ProcedureKit.framework */; };
@@ -182,6 +183,7 @@
 		65245D1E1D7231DC00340A2D /* CancellationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CancellationTests.swift; path = Tests/CancellationTests.swift; sourceTree = "<group>"; };
 		65245D201D72345000340A2D /* FinishingTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = FinishingTests.swift; path = Tests/FinishingTests.swift; sourceTree = "<group>"; };
 		65245D221D723A6B00340A2D /* Logging.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Logging.swift; path = Sources/Logging.swift; sourceTree = "<group>"; };
+		65245D241D724FC200340A2D /* LoggerTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = LoggerTests.swift; path = Tests/LoggerTests.swift; sourceTree = "<group>"; };
 		653C9FC11D6097A40070B7A2 /* ProcedureKitMobile.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ProcedureKitMobile.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		653C9FDA1D6098330070B7A2 /* ProcedureKitMobile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ProcedureKitMobile.h; path = "Supporting Files/ProcedureKitMobile.h"; sourceTree = "<group>"; };
 		653C9FDC1D6098650070B7A2 /* ProcedureKitMobile.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = ProcedureKitMobile.xcconfig; path = "Supporting Files/ProcedureKitMobile.xcconfig"; sourceTree = "<group>"; };
@@ -352,10 +354,11 @@
 		653C9FD91D6097E20070B7A2 /* Tests */ = {
 			isa = PBXGroup;
 			children = (
-				653C9FE81D6099F10070B7A2 /* ProcedureKitTests.swift */,
-				65245D1C1D721A7100340A2D /* ProcedureTests.swift */,
 				65245D1E1D7231DC00340A2D /* CancellationTests.swift */,
 				65245D201D72345000340A2D /* FinishingTests.swift */,
+				65245D241D724FC200340A2D /* LoggerTests.swift */,
+				653C9FE81D6099F10070B7A2 /* ProcedureKitTests.swift */,
+				65245D1C1D721A7100340A2D /* ProcedureTests.swift */,
 			);
 			name = Tests;
 			sourceTree = "<group>";
@@ -1078,6 +1081,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				65245D251D724FC200340A2D /* LoggerTests.swift in Sources */,
 				65245D1F1D7231DC00340A2D /* CancellationTests.swift in Sources */,
 				65245D211D72345000340A2D /* FinishingTests.swift in Sources */,
 				653C9FE91D6099F10070B7A2 /* ProcedureKitTests.swift in Sources */,

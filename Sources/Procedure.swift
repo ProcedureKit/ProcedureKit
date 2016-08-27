@@ -172,7 +172,7 @@ open class Procedure: Operation, ProcedureProcotol {
             return _log.read { LoggerContext(parent: $0, operationName: operationName) }
         }
         set {
-            _log.write { ( ward: inout LoggerProtocol) in
+            _log.write { (ward: inout LoggerProtocol) in
                 ward = newValue
             }
         }
