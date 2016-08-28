@@ -1,9 +1,9 @@
 {
 	"author": "Daniel Thorpe",
 	"author_url": "http://danthorpe.me",
-	"github_url": "https://github.com/danthorpe/Operations",
+	"github_url": "https://github.com/ProcedureKit/ProcedureKit",
 	"module": "Operations",
-	"module_version": "3.1.1",
+	"module_version": "3.2.0",
 	"readme": "README.md",
 	"swift_version": "2.2",	
 	"xcodebuild_arguments": [
