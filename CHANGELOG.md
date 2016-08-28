@@ -1,3 +1,19 @@
+# 3.2.0
+This is a pretty special release! All the important changes have been provided by contributors! 🚀😀💚
+
+Additionally, [@swiftlyfalling](https://github.com/swiftlyfalling) has become a _ProcedureKit_ core contributor 😀 
+
+1. [OPR-416](https://github.com/ProcedureKit/ProcedureKit/issues/416), [OPR-417](https://github.com/ProcedureKit/ProcedureKit/issues/417) Thanks to [@pomozoff](https://github.com/pomozoff) for reporting and fixing a bug which could cause a crash in an edge case where operation with conditions is previously cancelled. Thanks to [@swiftlyfalling](https://github.com/swiftlyfalling).
+2. [OPR-420](https://github.com/ProcedureKit/ProcedureKit/pull/420) Thanks to [@swiftlyfalling](https://github.com/swiftlyfalling) for replacing an assertion failure, and adding some more stress tests in `Condition`’s `execute` method.
+3. [OPR-344](https://github.com/ProcedureKit/ProcedureKit/issues/344), [OPR-344](https://github.com/ProcedureKit/ProcedureKit/pull/421) Thanks to [@ryanjm](https://github.com/ryanjm) for reporting (_a while ago_, sorry!) a bug in `NetworkObserver`, and thanks to [@swiftlyfalling](https://github.com/swiftlyfalling) for fixing the bug!
+4. [OPR-422](https://github.com/ProcedureKit/ProcedureKit/pull/422)  Thanks to [@swiftlyfalling](https://github.com/swiftlyfalling) for adding some robustness to `NetworkObserver` and its tests.
+5. [OPR-419](https://github.com/ProcedureKit/ProcedureKit/pull/419) Thanks to [@swiftlyfalling](https://github.com/swiftlyfalling) for fixing a bug which improves the performance of a whole number of tests. Mostly the changes here are to ensure that `XCTestExpectation`s get their `fulfill()` methods called on the main queue.
+6. [OPR-423](https://github.com/ProcedureKit/ProcedureKit/pull/423) Thanks to [@swiftlyfalling](https://github.com/swiftlyfalling) for fixing a bug where `cancelWithError()` could result in an assertion due to an illegal state transition. They even added some stress tests around this 💚
+7. [OPR-425](https://github.com/ProcedureKit/ProcedureKit/pull/425)  Thanks to [@swiftlyfalling](https://github.com/swiftlyfalling) for refactoring some unit tests to use a dispatch group instead of multiple `XCTestExpectation` instances.
+8. [OPR-427](https://github.com/ProcedureKit/ProcedureKit/pull/427) I made some changes to the CI pipeline for Swift 2.2 branch so that [@swiftlyfalling](https://github.com/swiftlyfalling) didn’t have to wait too long to merge their pull requests.
+
+
+
 # 3.1.1
 
 1. [OPR-410](https://github.com/danthorpe/Operations/pull/410) Thanks to [@paulpires](https://github.com/paulpires) for fixing a bug in the `ReachabilityManager`.
