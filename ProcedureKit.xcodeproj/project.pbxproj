@@ -11,9 +11,9 @@
 		65245D1D1D721A7100340A2D /* ProcedureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65245D1C1D721A7100340A2D /* ProcedureTests.swift */; };
 		65245D1F1D7231DC00340A2D /* CancellationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65245D1E1D7231DC00340A2D /* CancellationTests.swift */; };
 		65245D211D72345000340A2D /* FinishingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65245D201D72345000340A2D /* FinishingTests.swift */; };
-		65245D271D7258E400340A2D /* Group.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65245D261D7258E400340A2D /* Group.swift */; };
 		65245D231D723A6B00340A2D /* Logging.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65245D221D723A6B00340A2D /* Logging.swift */; };
 		65245D251D724FC200340A2D /* LoggerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65245D241D724FC200340A2D /* LoggerTests.swift */; };
+		65245D271D7258E400340A2D /* Group.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65245D261D7258E400340A2D /* Group.swift */; };
 		653C9FCA1D6097A40070B7A2 /* ProcedureKitMobile.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 653C9FC11D6097A40070B7A2 /* ProcedureKitMobile.framework */; };
 		653C9FDB1D6098330070B7A2 /* ProcedureKitMobile.h in Headers */ = {isa = PBXBuildFile; fileRef = 653C9FDA1D6098330070B7A2 /* ProcedureKitMobile.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		653C9FDF1D6099110070B7A2 /* ProcedureKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65CFC5F01D608A5500CAD875 /* ProcedureKit.framework */; };
@@ -48,6 +48,7 @@
 		65A2D7FF1D69FAEC00FB067C /* Operation+ProcedureKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65A2D7FE1D69FAEC00FB067C /* Operation+ProcedureKit.swift */; };
 		65A2D8021D6A05D800FB067C /* ProcedureProcotol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65A2D8011D6A05D800FB067C /* ProcedureProcotol.swift */; };
 		65A2D8041D6A1ED500FB067C /* AnyObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65A2D8031D6A1ED500FB067C /* AnyObserver.swift */; };
+		65B83EB71D731DE8007EFBFA /* Collection+ProcedureKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65B83EB61D731DE8007EFBFA /* Collection+ProcedureKit.swift */; };
 		65B97DB51D65138F00AC3B5D /* Procedure.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65B97DB41D65138F00AC3B5D /* Procedure.swift */; };
 		65CFC5FA1D608A5500CAD875 /* ProcedureKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65CFC5F01D608A5500CAD875 /* ProcedureKit.framework */; };
 		65CFC60B1D608AA700CAD875 /* ProcedureKit.h in Headers */ = {isa = PBXBuildFile; fileRef = 65CFC60A1D608AA700CAD875 /* ProcedureKit.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -183,9 +184,9 @@
 		65245D1C1D721A7100340A2D /* ProcedureTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ProcedureTests.swift; path = Tests/ProcedureTests.swift; sourceTree = "<group>"; };
 		65245D1E1D7231DC00340A2D /* CancellationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CancellationTests.swift; path = Tests/CancellationTests.swift; sourceTree = "<group>"; };
 		65245D201D72345000340A2D /* FinishingTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = FinishingTests.swift; path = Tests/FinishingTests.swift; sourceTree = "<group>"; };
-		65245D261D7258E400340A2D /* Group.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Group.swift; path = Sources/Group.swift; sourceTree = "<group>"; };
 		65245D221D723A6B00340A2D /* Logging.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Logging.swift; path = Sources/Logging.swift; sourceTree = "<group>"; };
 		65245D241D724FC200340A2D /* LoggerTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = LoggerTests.swift; path = Tests/LoggerTests.swift; sourceTree = "<group>"; };
+		65245D261D7258E400340A2D /* Group.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Group.swift; path = Sources/Group.swift; sourceTree = "<group>"; };
 		653C9FC11D6097A40070B7A2 /* ProcedureKitMobile.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ProcedureKitMobile.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		653C9FDA1D6098330070B7A2 /* ProcedureKitMobile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ProcedureKitMobile.h; path = "Supporting Files/ProcedureKitMobile.h"; sourceTree = "<group>"; };
 		653C9FDC1D6098650070B7A2 /* ProcedureKitMobile.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = ProcedureKitMobile.xcconfig; path = "Supporting Files/ProcedureKitMobile.xcconfig"; sourceTree = "<group>"; };
@@ -219,6 +220,7 @@
 		65A2D7FE1D69FAEC00FB067C /* Operation+ProcedureKit.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "Operation+ProcedureKit.swift"; path = "Sources/Operation+ProcedureKit.swift"; sourceTree = "<group>"; };
 		65A2D8011D6A05D800FB067C /* ProcedureProcotol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ProcedureProcotol.swift; path = Sources/ProcedureProcotol.swift; sourceTree = "<group>"; };
 		65A2D8031D6A1ED500FB067C /* AnyObserver.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AnyObserver.swift; path = Sources/AnyObserver.swift; sourceTree = "<group>"; };
+		65B83EB61D731DE8007EFBFA /* Collection+ProcedureKit.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "Collection+ProcedureKit.swift"; path = "Sources/Collection+ProcedureKit.swift"; sourceTree = "<group>"; };
 		65B97DB41D65138F00AC3B5D /* Procedure.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Procedure.swift; path = Sources/Procedure.swift; sourceTree = "<group>"; };
 		65CFC5F01D608A5500CAD875 /* ProcedureKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ProcedureKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		65CFC5F91D608A5500CAD875 /* ProcedureKitTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ProcedureKitTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -341,15 +343,14 @@
 			children = (
 				65A2D8031D6A1ED500FB067C /* AnyObserver.swift */,
 				65A2D7FA1D6852A500FB067C /* BlockObservers.swift */,
-				65A2D7FC1D69E52000FB067C /* DispatchQueue+ProcedureKit.swift */,
 				65245D261D7258E400340A2D /* Group.swift */,
 				65245D221D723A6B00340A2D /* Logging.swift */,
-				65A2D7FE1D69FAEC00FB067C /* Operation+ProcedureKit.swift */,
 				65B97DB41D65138F00AC3B5D /* Procedure.swift */,
 				655E86441D67B9F9000FBA6C /* ProcedureObserver.swift */,
 				65A2D8011D6A05D800FB067C /* ProcedureProcotol.swift */,
 				655E86421D67B55B000FBA6C /* ProcedureQueue.swift */,
 				655E86461D67BA9C000FBA6C /* Support.swift */,
+				65B83EB81D731DF2007EFBFA /* Extensions */,
 			);
 			name = ProcedureKit;
 			sourceTree = "<group>";
@@ -453,6 +454,16 @@
 			);
 			name = "Cloud Tests";
 			path = ProcedureKitCloudTests;
+			sourceTree = "<group>";
+		};
+		65B83EB81D731DF2007EFBFA /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				65A2D7FC1D69E52000FB067C /* DispatchQueue+ProcedureKit.swift */,
+				65A2D7FE1D69FAEC00FB067C /* Operation+ProcedureKit.swift */,
+				65B83EB61D731DE8007EFBFA /* Collection+ProcedureKit.swift */,
+			);
+			name = Extensions;
 			sourceTree = "<group>";
 		};
 		65CFC5E41D608A1A00CAD875 = {
@@ -1071,6 +1082,7 @@
 				65245D231D723A6B00340A2D /* Logging.swift in Sources */,
 				65A2D7FD1D69E52000FB067C /* DispatchQueue+ProcedureKit.swift in Sources */,
 				65A2D7FF1D69FAEC00FB067C /* Operation+ProcedureKit.swift in Sources */,
+				65B83EB71D731DE8007EFBFA /* Collection+ProcedureKit.swift in Sources */,
 				65245D271D7258E400340A2D /* Group.swift in Sources */,
 				65A2D8021D6A05D800FB067C /* ProcedureProcotol.swift in Sources */,
 				65B97DB51D65138F00AC3B5D /* Procedure.swift in Sources */,

@@ -25,21 +25,24 @@ open class Group: Procedure, ProcedureQueueDelegate {
 
     fileprivate let finishing = BlockOperation { }
 
-    fileprivate var groupOperations: Protector<[Operation]>
+    fileprivate var groupChildren: Protector<[Operation]>
     fileprivate var groupErrors = Protector(Errors())
     fileprivate var groupIsFinishing = false
     fileprivate var groupFinishLock = NSRecursiveLock()
     fileprivate var groupIsSuspended = false
     fileprivate var groupSuspendLock = NSLock()
-    fileprivate var groupAddingOperations = DispatchGroup()
+    fileprivate var groupIsAddingOperations = DispatchGroup()
 
 
 
     /// - returns: the operations which have been added to the queue
-    public private(set) var operations: [Operation] {
-        get { return groupOperations.read { $0 } }
-        set { groupOperations.write { (ward: inout [Operation]) in ward = newValue } }
+    public private(set) var children: [Operation] {
+        get { return groupChildren.read { $0 } }
+        set { groupChildren.write { (ward: inout [Operation]) in ward = newValue } }
     }
+
+    @available(*, unavailable, renamed: "children")
+    public var operations: [Operation] { return children }
 
 
 
@@ -63,7 +66,7 @@ open class Group: Procedure, ProcedureQueueDelegate {
     */
     public init(underlyingQueue: DispatchQueue? = nil, operations: [Operation]) {
 
-        groupOperations = Protector(operations)
+        groupChildren = Protector(operations)
 
         /**
          GroupOperation is responsible for calling `finish()` on cancellation
@@ -184,6 +187,88 @@ public extension Group {
         set {
             super.qualityOfService = newValue
             queue.qualityOfService = newValue
+        }
+    }
+}
+
+// MARL - Add Child API
+
+public extension Group {
+
+    /**
+     Add a single child Operation instance to the group
+     - parameter child: an Operation instance
+    */
+    func add(child: Operation) {
+        add(children: child)
+    }
+
+    /**
+     Add children Operation instances to the group
+     - parameter children: a variable number of Operation instances
+     */
+    func add(children: Operation...) {
+        add(children: children)
+    }
+
+    /**
+     Add a sequence of Operation instances to the group
+     - parameter children: a sequence of Operation instances
+     */
+    func add<Children: Collection>(children: Children) where Children.Iterator.Element: Operation {
+        add(additional: children, toOperationsArray: true)
+    }
+
+    private var shouldAddChildren: Bool {
+        return groupFinishLock.withCriticalScope {
+            guard !groupIsFinishing else { return false }
+            groupIsAddingOperations.enter()
+            return true
+        }
+    }
+
+    private func add<Additional: Collection>(additional: Additional, toOperationsArray shouldAddToProperty: Bool) where Additional.Iterator.Element: Operation {
+        // Exit early if there are no children in the collection
+        guard !additional.isEmpty else { return }
+
+        // Check to see if should add child operations, depending on finishing state
+        guard shouldAddChildren else {
+            let message = !finishing.isFinished ? "started to finish" : "completed"
+            assertionFailure("Cannot add new children to a group after the group has \(message).")
+            return
+        }
+
+        // Check for the group being cancelled, and cancel the children
+        var didHandleCancelled = false
+        if isCancelled {
+            additional.forEach { $0.cancel() }
+            didHandleCancelled = true
+        }
+
+        // Set the log severity on each child procedure
+        let severity = log.severity
+        additional.forEachProcedure { $0.log.severity = severity }
+
+        // Add the children to the queue
+        queue.add(operations: additional)
+
+        // Add the children to group property
+        if shouldAddToProperty {
+            let childrenToAdd: [Operation] = Array(additional)
+            groupChildren.append(contentsOf: childrenToAdd)
+        }
+
+        // Check again for the group being cancelled, and cancel the children if necessary
+        if !didHandleCancelled && isCancelled {
+            // It is possible that the cancellation happened before adding the
+            // additional operations to the operations array.
+            // Thus, ensure that all additional operations are cancelled.
+            additional.forEach { if !$0.isCancelled { $0.cancel() } }
+        }
+
+        // Leave the is adding operation group
+        groupFinishLock.withCriticalScope {
+            groupIsAddingOperations.leave()
         }
     }
 }
