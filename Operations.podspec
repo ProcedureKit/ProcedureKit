@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name              = "Operations"
-  s.version           = "3.1.1"
+  s.version           = "3.2.0"
   s.summary           = "Powerful NSOperation subclasses in Swift."
   s.description       = <<-DESC
   
@@ -8,10 +8,10 @@ A Swift framework inspired by Apple's WWDC 2015
 session Advanced NSOperations: https://developer.apple.com/videos/wwdc/2015/?id=226
 
                        DESC
-  s.homepage          = "https://github.com/danthorpe/Operations"
+  s.homepage          = "https://github.com/ProcedureKit/ProcedureKit"
   s.license           = 'MIT'
   s.author            = { "Daniel Thorpe" => "@danthorpe" }
-  s.source            = { :git => "https://github.com/danthorpe/Operations.git", :tag => s.version.to_s }
+  s.source            = { :git => "https://github.com/ProcedureKit/ProcedureKit.git", :tag => s.version.to_s }
   s.module_name       = 'Operations'
   s.social_media_url  = 'https://twitter.com/danthorpe'
   s.requires_arc      = true
