@@ -28,6 +28,7 @@ open class Group: Procedure, ProcedureQueueDelegate {
 
     fileprivate var groupErrors = Protector(GroupErrors())
     fileprivate var groupChildren: Protector<[Operation]>
+    fileprivate var groupProtectedObservers = Protector(Array<GroupObserverProtocol>())
     fileprivate var groupIsFinishing = false
     fileprivate var groupFinishLock = NSRecursiveLock()
     fileprivate var groupIsSuspended = false
@@ -39,17 +40,6 @@ open class Group: Procedure, ProcedureQueueDelegate {
     public private(set) var children: [Operation] {
         get { return groupChildren.read { $0 } }
         set { groupChildren.write { (ward: inout [Operation]) in ward = newValue } }
-    }
-
-    private var _groupObservers = Protector(Array<GroupObserverProtocol>())
-
-    fileprivate(set) var groupObservers: [GroupObserverProtocol] {
-        get { return _groupObservers.read { $0 } }
-        set {
-            _groupObservers.write { (ward: inout [GroupObserverProtocol]) in
-                ward = newValue
-            }
-        }
     }
 
     /**
@@ -640,8 +630,12 @@ public struct GroupDidAddChildObserver: GroupObserverProtocol {
 
 public extension Group {
 
+    var groupObservers: [GroupObserverProtocol] {
+        return groupProtectedObservers.read { $0 }
+    }
+
     func add(observer: GroupObserverProtocol) {
-        groupObservers.append(observer)
+        groupProtectedObservers.append(observer)
     }
 
     func addWillAddChildBlockObserver(block: GroupWillAddChildObserver.Block) {
