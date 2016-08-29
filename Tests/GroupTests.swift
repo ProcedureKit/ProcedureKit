@@ -16,6 +16,26 @@ class GroupTests: GroupTestCase {
        XCTAssertEqual(group.name, "Group")
     }
 
+    func test__group_has_user_intent_set_from_input_operations() {
+        let child = TestProcedure()
+        child.userIntent = .initiated
+        group = TestGroup(operations: [child, TestProcedure(), BlockOperation { }])
+        XCTAssertEqual(group.userIntent, .initiated)
+    }
+
+    func test__group_sets_user_intent_on_children() {
+        let child1 = TestProcedure()
+        child1.userIntent = .initiated
+        let child2 = TestProcedure()
+        let child3 = BlockOperation { }
+        group = TestGroup(operations: [child1, child2, child3])
+        group.userIntent = .sideEffect
+
+        XCTAssertEqual(child1.userIntent, .sideEffect)
+        XCTAssertEqual(child2.userIntent, .sideEffect)
+        XCTAssertEqual(child3.qualityOfService, .userInitiated)
+    }
+
     // MARK: - Execution
 
     func test__group_children_are_executed() {

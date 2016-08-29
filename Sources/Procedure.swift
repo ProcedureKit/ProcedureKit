@@ -54,7 +54,7 @@ open class Procedure: Operation, ProcedureProcotol {
     @objc public enum UserIntent: Int {
         case none = 0, sideEffect, initiated
 
-        internal var qos: QualityOfService {
+        internal var qualityOfService: QualityOfService {
             switch self {
             case .initiated, .sideEffect:
                 return .userInitiated
@@ -77,8 +77,20 @@ open class Procedure: Operation, ProcedureProcotol {
 
     fileprivate let isAutomaticFinishingDisabled: Bool
 
+    /**
+     Expresses the user intent in regards to the execution of this Procedure.
 
+     Setting this property will set the appropriate quality of service parameter
+     on the parent Operation.
 
+     - requires: self must not have started yet. i.e. either hasn't been added
+     to a queue, or is waiting on dependencies.
+     */
+    public var userIntent: UserIntent = .none {
+        didSet {
+            setQualityOfService(fromUserIntent: userIntent)
+        }
+    }
 
     // MARK: State
 
@@ -534,8 +546,6 @@ public extension Procedure {
 
         observer.didAttach(to: self)
     }
-
-
 }
 
 // swiftlint:enable type_body_length

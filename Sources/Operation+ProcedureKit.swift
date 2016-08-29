@@ -45,4 +45,8 @@ public extension Operation {
             completionBlock = block
         }
     }
+
+    func setQualityOfService(fromUserIntent userIntent: Procedure.UserIntent) {
+        qualityOfService = userIntent.qualityOfService
+    }
 }
