@@ -6,6 +6,23 @@
 
 import Foundation
 
+internal extension Operation {
+
+    enum KeyPath: String {
+        case cancelled = "isCancelled"
+        case executing = "isExecuting"
+        case finished = "isFinished"
+    }
+
+    func willChangeValue(forKey key: KeyPath) {
+        willChangeValue(forKey: key.rawValue)
+    }
+
+    func didChangeValue(forKey key: KeyPath) {
+        didChangeValue(forKey: key.rawValue)
+    }
+}
+
 public extension Operation {
 
     /**

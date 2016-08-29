@@ -50,7 +50,7 @@ struct Lock: ReadWriteLock {
     }
 }
 
-class Protector<T> {
+internal class Protector<T> {
 
     private var lock: ReadWriteLock = Lock()
     private var ward: T
@@ -72,7 +72,7 @@ class Protector<T> {
     }
 }
 
-extension Protector where T: RangeReplaceableCollection {
+internal extension Protector where T: RangeReplaceableCollection {
 
     func append(_ newElement: T.Iterator.Element) {
         write { (ward: inout T) in
@@ -88,7 +88,7 @@ extension Protector where T: RangeReplaceableCollection {
 }
 
 
-extension NSLock {
+internal extension NSLock {
 
     func withCriticalScope<T>(block: () -> T) -> T {
         lock()
@@ -98,7 +98,7 @@ extension NSLock {
     }
 }
 
-extension NSRecursiveLock {
+internal extension NSRecursiveLock {
 
     func withCriticalScope<T>(block: () -> T) -> T {
         lock()
