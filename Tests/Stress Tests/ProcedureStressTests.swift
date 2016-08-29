@@ -8,7 +8,7 @@ import XCTest
 import TestingProcedureKit
 @testable import ProcedureKit
 
-class ProcedureStressTest: StressTestCase {
+class ProcedureStressTest: ProcedureKitTestCase {
 
     func test__completion_blocks() {
         stress { _, _, dispatchGroup in
