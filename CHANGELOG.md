@@ -11,8 +11,8 @@ Additionally, [@swiftlyfalling](https://github.com/swiftlyfalling) has become a 
 6. [OPR-423](https://github.com/ProcedureKit/ProcedureKit/pull/423) Thanks to [@swiftlyfalling](https://github.com/swiftlyfalling) for fixing a bug where `cancelWithError()` could result in an assertion due to an illegal state transition. They even added some stress tests around this 💚
 7. [OPR-425](https://github.com/ProcedureKit/ProcedureKit/pull/425)  Thanks to [@swiftlyfalling](https://github.com/swiftlyfalling) for refactoring some unit tests to use a dispatch group instead of multiple `XCTestExpectation` instances.
 8. [OPR-427](https://github.com/ProcedureKit/ProcedureKit/pull/427) I made some changes to the CI pipeline for Swift 2.2 branch so that [@swiftlyfalling](https://github.com/swiftlyfalling) didn’t have to wait too long to merge their pull requests.
-
-
+9. [OPR-434](https://github.com/ProcedureKit/ProcedureKit/pull/434) Thanks to [@pomozoff](https://github.com/pomozoff) for raising a configuration issue where a file was added to the Xcode project twice, causing a warning when running Carthage.
+10. [OPR-435](https://github.com/ProcedureKit/ProcedureKit/pull/435) Thanks to [@swiftlyfalling](https://github.com/swiftlyfalling) for making some improvements to avoid a Swift 2.2 bug which causes a memory leak when using string interpolation.
 
 # 3.1.1
 
