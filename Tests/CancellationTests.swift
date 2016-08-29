@@ -9,7 +9,7 @@ import TestingProcedureKit
 @testable import ProcedureKit
 
 
-class CancellationTests: BasicProcedureKitTestCase {
+class CancellationTests: ProcedureKitTestCase {
 
     func test__procedure_cancel_with_nil_error() {
         procedure.cancel(withError: nil)

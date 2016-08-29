@@ -8,29 +8,25 @@ import Foundation
 import XCTest
 import ProcedureKit
 
-open class GroupTestCase: ProcedureKitTestCase<Group> {
+open class GroupTestCase: ProcedureKitTestCase {
 
     public var children: [TestProcedure]!
-
-    public var group: Group {
-        get { return target }
-        set { target = newValue }
-    }
+    public var group: Group!
 
     func createTestProcedures(count: Int = 5) -> [TestProcedure] {
-        return (0..<count).map { _ in TestProcedure() }
+        return (0..<count).map { i in TestProcedure(name: "Child: \(i)") }
     }
 
     open override func setUp() {
         super.setUp()
         children = createTestProcedures()
-        target = Group(operations: children)
+        group = Group(operations: children)
+        group.log.severity = .verbose
     }
 
     open override func tearDown() {
-        target.cancel()
+        group.cancel()
         children = nil
         super.tearDown()
     }
-
 }

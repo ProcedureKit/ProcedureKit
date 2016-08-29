@@ -8,7 +8,7 @@ import XCTest
 import TestingProcedureKit
 @testable import ProcedureKit
 
-class FinishingTests: BasicProcedureKitTestCase {
+class FinishingTests: ProcedureKitTestCase {
 
     func test__procedure_will_finish_is_called() {
         wait(for: procedure)

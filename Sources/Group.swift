@@ -24,7 +24,7 @@ open class Group: Procedure, ProcedureQueueDelegate {
 
     internal let queue = ProcedureQueue()
 
-    fileprivate let finishing = BlockOperation { }
+    fileprivate let finishing = BlockOperation { print("Group finishing operation is running....") }
 
     fileprivate var groupErrors = Protector(GroupErrors())
     fileprivate var groupChildren: Protector<[Operation]>
@@ -132,8 +132,17 @@ open class Group: Procedure, ProcedureQueueDelegate {
     // MARK - OperationQueueDelegate
 
     public func operationQueue(_ queue: OperationQueue, willAddOperation operation: Operation) { /* no op */ }
+    
     public func operationQueue(_ queue: OperationQueue, willFinishOperation operation: Operation) { /* no op */ }
-    public func operationQueue(_ queue: OperationQueue, didFinishOperation operation: Operation) { /* no op */ }
+
+    public func operationQueue(_ queue: OperationQueue, didFinishOperation operation: Operation) {
+        guard queue === self.queue else { return }
+
+        if operation === finishing {
+            finish(withErrors: errors)
+            queue.isSuspended = true
+        }
+    }
 
     // MARK: - ProcedureQueueDelegate
 
@@ -220,14 +229,7 @@ open class Group: Procedure, ProcedureQueueDelegate {
         }
     }
 
-    public func procedureQueue(_ queue: ProcedureQueue, didFinishOperation operation: Operation, withErrors errors: [Error]) {
-        guard queue === self.queue else { return }
-
-        if operation === finishing {
-            finish(withErrors: errors)
-            queue.isSuspended = true
-        }
-    }
+    public func procedureQueue(_ queue: ProcedureQueue, didFinishOperation operation: Operation, withErrors errors: [Error]) { }
 }
 
 // MARK: - OperationQueue API
@@ -330,6 +332,7 @@ public extension Group {
 
     private var shouldAddChildren: Bool {
         return groupFinishLock.withCriticalScope {
+            log.verbose(message: "checking to see if we can add child operations.")
             guard !groupIsFinishing else { return false }
             groupIsAddingOperations.enter()
             return true
@@ -346,6 +349,8 @@ public extension Group {
             assertionFailure("Cannot add new children to a group after the group has \(message).")
             return
         }
+
+        log.verbose(message: "is adding child operations to the queue.")
 
         // Check for the group being cancelled, and cancel the children
         var didHandleCancelled = false
@@ -378,6 +383,7 @@ public extension Group {
         // Leave the is adding operation group
         groupFinishLock.withCriticalScope {
             groupIsAddingOperations.leave()
+            log.verbose(message: "finished adding child operations to the queue.")
         }
     }
 }
@@ -471,6 +477,8 @@ fileprivate extension Group {
 
             if let group = group {
 
+                group.log.verbose(message: "executing can finish group operation.")
+
                 // All operations that were added as a side-effect of anything up to
                 // WillFinishObservers of prior operations should have been executed.
                 //
@@ -487,8 +495,11 @@ fileprivate extension Group {
                         // wait completes (i.e. after concurrent calls to Group.add(children:)
                         // have completed), and return from this call to execute() without finishing
                         // the operation.
+                        group.log.verbose(message: "cannot finish now, as group is currently adding children.")
+
                         let dispatchQueue = DispatchQueue.global(qos: group.qualityOfService.qosClass)
                         group.groupIsAddingOperations.notify(queue: dispatchQueue, execute: execute)
+
                         return true
                     }
 
@@ -500,7 +511,9 @@ fileprivate extension Group {
 
                         // Children were added after this CanFinishOperation became
                         // ready, but before it executed or before the lock could be acquired.
-                        //
+
+                        group.log.verbose(message: "cannot finish now, as there are children still active.")
+
                         // The Group should wait for these children to finish
                         // before finishing. Add the oustanding children as
                         // dependencies to a new CanFinishGroup, and add that as the
@@ -517,6 +530,9 @@ fileprivate extension Group {
                     else {
                         // There are no additional children to handle.
                         // Ensure that no new operations can be added.
+
+                        group.log.verbose(message: "can now finish.")
+
                         group.groupIsFinishing = true
                     }
 
@@ -525,6 +541,7 @@ fileprivate extension Group {
 
                 guard !isWaiting else { return }
             }
+
             isExecuting = false
             isFinished = true
         }
@@ -546,8 +563,6 @@ fileprivate extension Group {
                 didChangeValue(forKey: .finished)
             }
         }
-
-
     }
 
     fileprivate func add(canFinishGroup: CanFinishGroup) {
@@ -559,6 +574,9 @@ fileprivate extension Group {
 fileprivate extension ProcedureQueue {
 
     func add(canFinishGroup: Group.CanFinishGroup) {
+        // Do not add observers (not needed - CanFinishGroup is an implementation detail of Group)
+        // Do not add conditions (CanFinishGroup has none)
+        // Call OperationQueue.addOperation() directly
         super.addOperation(canFinishGroup)
     }
 }

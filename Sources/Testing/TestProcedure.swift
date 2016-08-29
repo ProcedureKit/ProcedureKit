@@ -22,12 +22,12 @@ open class TestProcedure: Procedure {
     public private(set) var procedureWillCancelCalled = false
     public private(set) var procedureDidCancelCalled = false
 
-    public init(delay: TimeInterval = 0.000_001, error: Error? = .none, produced: Operation? = .none) {
+    public init(name: String = "Test Procedure", delay: TimeInterval = 0.000_001, error: Error? = .none, produced: Operation? = .none) {
         self.delay = delay
         self.error = error
         self.producedOperation = produced
         super.init()
-        name = "Test Procedure"
+        self.name = name
     }
 
     open override func execute() {
