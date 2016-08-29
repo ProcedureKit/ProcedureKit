@@ -40,6 +40,16 @@ open class Group: Procedure, ProcedureQueueDelegate {
         set { groupChildren.write { (ward: inout [Operation]) in ward = newValue } }
     }
 
+    private var _groupObservers = Protector(Array<GroupObserverProtocol>())
+
+    fileprivate(set) var groupObservers: [GroupObserverProtocol] {
+        get { return _groupObservers.read { $0 } }
+        set {
+            _groupObservers.write { (ward: inout [GroupObserverProtocol]) in
+                ward = newValue
+            }
+        }
+    }
 
 
 
@@ -437,4 +447,63 @@ public extension Group {
     @available(*, unavailable, renamed: "add(children:)")
     func addOperations(additional: [Operation]) { }
 
+}
+
+// MARK: - Group Observer
+
+public protocol GroupObserverProtocol {
+
+    func group(_ group: Group, willAdd: Operation)
+
+    func group(_ group: Group, didAdd: Operation)
+}
+
+public extension GroupObserverProtocol {
+
+    func group(_ group: Group, willAdd: Operation) { }
+
+    func group(_ group: Group, didAdd: Operation) { }
+}
+
+public struct GroupWillAddChildObserver: GroupObserverProtocol {
+    public typealias Block = (Group, Operation) -> Void
+
+    private let block: Block
+
+    public init(willAddChild: Block) {
+        block = willAddChild
+    }
+
+    public func group(_ group: Group, willAdd operation: Operation) {
+        block(group, operation)
+    }
+}
+
+public struct GroupDidAddChildObserver: GroupObserverProtocol {
+    public typealias Block = (Group, Operation) -> Void
+
+    private let block: Block
+
+    public init(didAddChild: Block) {
+        block = didAddChild
+    }
+
+    public func group(_ group: Group, didAdd operation: Operation) {
+        block(group, operation)
+    }
+}
+
+public extension Group {
+
+    func add(observer: GroupObserverProtocol) {
+        groupObservers.append(observer)
+    }
+
+    func addWillAddChildBlockObserver(block: GroupWillAddChildObserver.Block) {
+        add(observer: GroupWillAddChildObserver(willAddChild: block))
+    }
+
+    func addDidAddChildBlockObserver(block: GroupDidAddChildObserver.Block) {
+        add(observer: GroupDidAddChildObserver(didAddChild: block))
+    }
 }
