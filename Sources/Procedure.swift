@@ -490,7 +490,7 @@ open class Procedure: Operation, ProcedureProcotol {
 
         let messageSuffix = !errors.isEmpty ? "errors: \(errors)" : "no errors"
 
-        log.verbose(message: "Will finish with no \(messageSuffix).")
+        log.verbose(message: "Will finish with \(messageSuffix).")
 
         procedureWillFinish(withErrors: resultingErrors)
         willChangeValue(forKey: .finished)
@@ -501,7 +501,7 @@ open class Procedure: Operation, ProcedureProcotol {
         procedureDidFinish(withErrors: resultingErrors)
         observers.forEach { $0.did(finish: self, withErrors: resultingErrors) }
 
-        log.verbose(message: "Did finish with no \(messageSuffix).")
+        log.verbose(message: "Did finish with \(messageSuffix).")
 
         didChangeValue(forKey: .finished)
     }

@@ -45,19 +45,30 @@ open class ProcedureKitTestCase: XCTestCase {
 
     public func wait(for procedures: Procedure..., withTimeout timeout: TimeInterval = 3, withExpectationDescription expectationDescription: String = #function) {
         for (i, procedure) in procedures.enumerated() {
-            let _ = addCompletionBlockTo(procedure: procedure, withExpectationDescription: "\(i), \(expectationDescription)")
+            addCompletionBlockTo(procedure: procedure, withExpectationDescription: "\(i), \(expectationDescription)")
         }
         run(operations: procedures)
         waitForExpectations(timeout: timeout, handler: nil)
     }
 
-    public func addCompletionBlockTo(procedure: Procedure, withExpectationDescription expectationDescription: String = #function) -> XCTestExpectation {
+    public func check<T: Procedure>(procedure: T, withTimeout timeout: TimeInterval = 3, withExpectationDescription expectationDescription: String = #function, checkBeforeWait: (T) -> Void) {
+        addCompletionBlockTo(procedure: procedure, withExpectationDescription: expectationDescription)
+        run(operations: procedure)
+        checkBeforeWait(procedure)
+        waitForExpectations(timeout: timeout, handler: nil)
+    }
+
+    public func addCompletionBlockTo(procedure: Procedure, withExpectationDescription expectationDescription: String = #function) {
+        let _ = addExpectationCompletionBlockTo(procedure: procedure, withExpectationDescription: expectationDescription)
+    }
+
+    public func addExpectationCompletionBlockTo(procedure: Procedure, withExpectationDescription expectationDescription: String = #function) -> XCTestExpectation {
         let expect = expectation(description: "Test: \(expectationDescription), \(UUID())")
-        addCompletionBlockTo(procedure: procedure, withExpectation: expect)
+        add(expectation: expect, to: procedure)
         return expect
     }
 
-    public func addCompletionBlockTo(procedure: Procedure, withExpectation expectation: XCTestExpectation) {
+    public func add(expectation: XCTestExpectation, to procedure: Procedure) {
         weak var weakExpectation = expectation
         procedure.addDidFinishBlockObserver { _, _ in
             DispatchQueue.main.async {

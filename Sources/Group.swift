@@ -132,7 +132,7 @@ open class Group: Procedure, ProcedureQueueDelegate {
     // MARK - OperationQueueDelegate
 
     public func operationQueue(_ queue: OperationQueue, willAddOperation operation: Operation) { /* no op */ }
-    
+
     public func operationQueue(_ queue: OperationQueue, willFinishOperation operation: Operation) { /* no op */ }
 
     public func operationQueue(_ queue: OperationQueue, didFinishOperation operation: Operation) {
@@ -408,6 +408,7 @@ public extension Group {
     }
 
     fileprivate func child(_ child: Operation, didEncounterFatalErrors errors: [Error]) {
+        log.verbose(message: "\(child.operationName) did encounter \(errors.count) fatal errors.")
         groupErrors.write { (ward: inout GroupErrors) in
             ward.fatal.append(contentsOf: errors)
         }
