@@ -47,7 +47,7 @@ public protocol ConditionType {
 internal extension ConditionType {
 
     internal var category: String {
-        return "\(self.dynamicType)"
+        return String(self.dynamicType)
     }
 }
 
@@ -240,7 +240,7 @@ internal class WrappedOperationCondition: Condition {
     let condition: OperationCondition
 
     var category: String {
-        return "\(condition.dynamicType)"
+        return String(condition.dynamicType)
     }
 
     init(_ condition: OperationCondition) {
