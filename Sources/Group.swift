@@ -16,7 +16,7 @@ import Foundation
  */
 open class Group: Procedure, ProcedureQueueDelegate {
 
-    internal struct Errors {
+    internal struct ErrorContainer {
         // TODO
     }
 
@@ -32,7 +32,7 @@ open class Group: Procedure, ProcedureQueueDelegate {
     fileprivate var groupIsSuspended = false
     fileprivate var groupSuspendLock = NSLock()
     fileprivate var groupIsAddingOperations = DispatchGroup()
-
+    fileprivate var groupCanFinish: CanFinishGroup!
 
 
     /// - returns: the operations which have been added to the queue
@@ -77,21 +77,40 @@ open class Group: Procedure, ProcedureQueueDelegate {
         */
         super.init(disableAutomaticFinishing: true)
 
-        // TODO: CanFinishProcedure needs to be setup
-
         name = "Group"
         queue.isSuspended = true
         queue.underlyingQueue = underlyingQueue
         queue.delegate = self
 
+        groupCanFinish = CanFinishGroup(group: self)
+
         addDidCancelBlockObserver { group, errors in
-            // TODO: Need to effectively cancel all child operations
+            if errors.isEmpty {
+                group.children.forEach { $0.cancel() }
+            }
+            else {
+                let (operations, procedures) = group.children.operationsAndProcedures
+                operations.forEach { $0.cancel() }
+                procedures.forEach { $0.cancel(withError: Errors.Cancelled(errors: errors)) }
+            }
         }
     }
 
     public convenience init(operations: Operation...) {
         self.init(operations: operations)
     }
+
+    // MARK: - Execute
+
+    open override func execute() {
+        add(additional: children.filter { !queue.operations.contains($0) }, toOperationsArray: false)
+        add(canFinishGroup: groupCanFinish)
+        queue.addOperation(finishing)
+        groupSuspendLock.withCriticalScope {
+            if !groupIsSuspended { queue.isSuspended = false }
+        }
+    }
+
 
     // MARK - OperationQueueDelegate
 
@@ -227,7 +246,7 @@ public extension Group {
         }
     }
 
-    private func add<Additional: Collection>(additional: Additional, toOperationsArray shouldAddToProperty: Bool) where Additional.Iterator.Element: Operation {
+    fileprivate func add<Additional: Collection>(additional: Additional, toOperationsArray shouldAddToProperty: Bool) where Additional.Iterator.Element: Operation {
         // Exit early if there are no children in the collection
         guard !additional.isEmpty else { return }
 
@@ -270,5 +289,138 @@ public extension Group {
         groupFinishLock.withCriticalScope {
             groupIsAddingOperations.leave()
         }
+    }
+}
+
+// MARK: - Finishing
+
+fileprivate extension Group {
+
+    fileprivate class CanFinishGroup: Operation {
+
+        private weak var group: Group?
+        private var _isFinished = false
+        private var _isExecuting = false
+
+        init(group: Group) {
+            self.group = group
+            super.init()
+        }
+
+        fileprivate override func start() {
+
+            // Override Operation.start() because this operation may have to
+            // finish asynchronously (if it has to register to be notified when
+            // operations are no longer being added concurrently).
+            //
+            // Since we override start(), it is important to send Operation
+            // isExecuting / isFinished KVO notifications.
+            //
+            // (Otherwise, the operation may not be released, there may be
+            // problems with dependencies, with the queue's handling of
+            // maxConcurrentOperationCount, etc.)
+
+            isExecuting = true
+
+            main()
+        }
+
+        override func main() {
+            execute()
+        }
+
+        func execute() {
+
+            if let group = group {
+
+                // All operations that were added as a side-effect of anything up to
+                // WillFinishObservers of prior operations should have been executed.
+                //
+                // Handle an edge case caused by concurrent calls to Group.add(children:)
+
+                let isWaiting: Bool = group.groupFinishLock.withCriticalScope {
+
+                    // Is anything currently adding operations?
+                    guard group.groupIsAddingOperations.wait(timeout: DispatchTime.now()) == .success else {
+                        // Operations are actively being added to the group
+                        // Wait for this to complete before proceeding.
+                        //
+                        // Register to dispatch a new call to execute() in the future, after the
+                        // wait completes (i.e. after concurrent calls to Group.add(children:)
+                        // have completed), and return from this call to execute() without finishing
+                        // the operation.
+                        let dispatchQueue = DispatchQueue.global(qos: group.qualityOfService.qosClass)
+                        group.groupIsAddingOperations.notify(queue: dispatchQueue, execute: execute)
+                        return true
+                    }
+
+                    // Check whether new children were added prior to the lock
+                    // by checking for child operations that are not finished.
+
+                    let active = group.children.filter({ !$0.isFinished })
+                    if !active.isEmpty {
+
+                        // Children were added after this CanFinishOperation became
+                        // ready, but before it executed or before the lock could be acquired.
+                        //
+                        // The Group should wait for these children to finish
+                        // before finishing. Add the oustanding children as
+                        // dependencies to a new CanFinishGroup, and add that as the
+                        // Group's new CanFinishGroup.
+
+                        let newCanFinishGroup = Group.CanFinishGroup(group: group)
+
+                        active.forEach { newCanFinishGroup.addDependency($0) }
+
+                        group.groupCanFinish = newCanFinishGroup
+
+                        group.add(canFinishGroup: newCanFinishGroup)
+                    }
+                    else {
+                        // There are no additional children to handle.
+                        // Ensure that no new operations can be added.
+                        group.groupIsFinishing = true
+                    }
+
+                    return false
+                } // End of isWaiting
+
+                guard !isWaiting else { return }
+            }
+            isExecuting = false
+            isFinished = true
+        }
+
+        override private(set) var isExecuting: Bool {
+            get { return _isExecuting }
+            set {
+                willChangeValue(forKey: .executing)
+                _isExecuting = newValue
+                didChangeValue(forKey: .executing)
+            }
+        }
+
+        override private(set) var isFinished: Bool {
+            get { return _isFinished }
+            set {
+                willChangeValue(forKey: .finished)
+                _isFinished = newValue
+                didChangeValue(forKey: .finished)
+            }
+        }
+
+
+    }
+
+    fileprivate func add(canFinishGroup: CanFinishGroup) {
+        finishing.addDependency(canFinishGroup)
+        queue.add(canFinishGroup: canFinishGroup)
+    }
+}
+
+fileprivate extension ProcedureQueue {
+
+    func add(canFinishGroup: Group.CanFinishGroup) {
+        super.addOperation(canFinishGroup)
     }
 }

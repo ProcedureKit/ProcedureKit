@@ -540,22 +540,4 @@ public extension Procedure {
 
 // swiftlint:enable type_body_length
 
-fileprivate extension Operation {
-
-    enum KeyPath: String {
-        case cancelled = "isCancelled"
-        case executing = "isExecuting"
-        case finished = "isFinished"
-    }
-
-    fileprivate func willChangeValue(forKey key: KeyPath) {
-        willChangeValue(forKey: key.rawValue)
-    }
-
-    fileprivate func didChangeValue(forKey key: KeyPath) {
-        didChangeValue(forKey: key.rawValue)
-    }
-}
-
-
 // swiftlint:enable file_length

@@ -34,3 +34,26 @@ public extension DispatchQueue {
         return DispatchQueue(label: label, qos: qos, attributes: [.concurrent], autoreleaseFrequency: autoreleaseFrequency, target: target)
     }
 }
+
+internal extension QualityOfService {
+
+    var qos: DispatchQoS {
+        switch self {
+        case .userInitiated: return DispatchQoS.userInitiated
+        case .userInteractive: return DispatchQoS.userInteractive
+        case .utility: return DispatchQoS.utility
+        case .background: return DispatchQoS.background
+        case .default: return DispatchQoS.default
+        }
+    }
+
+    var qosClass: DispatchQoS.QoSClass {
+        switch self {
+        case .userInitiated: return .userInitiated
+        case .userInteractive: return .userInteractive
+        case .utility: return .utility
+        case .background: return .background
+        case .default: return .default
+        }
+    }
+}
