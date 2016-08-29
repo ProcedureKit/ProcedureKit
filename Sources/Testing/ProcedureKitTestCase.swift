@@ -15,8 +15,8 @@ open class ProcedureKitTestCase: XCTestCase {
 
         public var batches: Int {
             switch self {
-            case .low: return 1
-            case .medium: return 2
+            case .low: return 2
+            case .medium: return 3
             case .high: return 5
             }
         }
@@ -31,21 +31,21 @@ open class ProcedureKitTestCase: XCTestCase {
 
         public var timeout: TimeInterval {
             switch self {
-            case .low: return 5
-            case .medium: return 10
+            case .low: return 10
+            case .medium: return 50
             case .high: return 100
             }
         }
     }
 
-    class Counter {
+    public class Counter {
         private(set) var count: Int32 = 0
 
-        func increment() -> Int32 {
+        public func increment() -> Int32 {
             return OSAtomicIncrement32(&count)
         }
 
-        func increment_barrier() -> Int32 {
+        public func increment_barrier() -> Int32 {
             return OSAtomicIncrement32Barrier(&count)
         }
     }
@@ -119,23 +119,54 @@ open class ProcedureKitTestCase: XCTestCase {
 
     // MARK: Stress Tests
 
-    public func stress(at level: StressLevel = .medium, withName name: String = #function, withTimeout timeout: TimeInterval? = nil, block: (Int, Int, DispatchGroup) -> Void) {
+    public struct Batch {
+        public let startTime = CFAbsoluteTimeGetCurrent()
+        public let queue = ProcedureQueue()
+        public let counter = Counter()
+        public let batch: Int
+
+        public init(batch: Int) {
+            self.batch = batch
+            queue.isSuspended = false
+        }
+    }
+
+    public struct Iteration {
+        public let counter = Counter()
+        public let iteration: Int
+    }
+
+    public func stress(atLevel level: StressLevel = .medium, withName name: String = #function, withTimeout timeoutOverride: TimeInterval? = nil, block: (Batch, Iteration, DispatchGroup) -> Void) {
         let stressTestName = "Stress Test: \(name)"
-        let dispatchGroup = DispatchGroup()
+        let timeout: TimeInterval = timeoutOverride ?? level.timeout
 
-        weak var didCompleteStressTestExpectation = expectation(description: stressTestName)
+        print("\(stressTestName), Parameters: \(level.batches) batches, size \(level.batchSize), timeout: \(timeout)")
 
-        (0..<level.batches).forEach { batch in
-            (0..<level.batchSize).forEach { iteration in
-                block(batch, iteration, dispatchGroup)
+        let overallDispatchGroup = DispatchGroup()
+        weak var overallExpectation = expectation(description: stressTestName)
+
+        (0..<level.batches).forEach { batchCount in
+            autoreleasepool {
+                let batch = Batch(batch: batchCount)
+
+                (0..<level.batchSize).forEach { iterationCount in
+
+                    let iteration = Iteration(iteration: iterationCount)
+
+                    block(batch, iteration, overallDispatchGroup)
+                }
+
+                let batchFinishTime = CFAbsoluteTimeGetCurrent()
+                let batchDuration = batchFinishTime - batch.startTime
+                print("\(stressTestName), finished batch: \(batchCount), in \(batchDuration) seconds")
             }
         }
 
-        dispatchGroup.notify(queue: .main) {
-            guard let expect = didCompleteStressTestExpectation else { print("stressTestName: Completed after timeout"); return }
+        overallDispatchGroup.notify(queue: .main) {
+            guard let expect = overallExpectation else { print("\(stressTestName): Completed after timeout"); return }
             expect.fulfill()
         }
 
-        waitForExpectations(timeout: timeout ?? level.timeout, handler: nil)
+        waitForExpectations(timeout: timeout, handler: nil)
     }
 }
