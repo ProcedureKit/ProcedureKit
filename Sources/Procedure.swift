@@ -88,10 +88,9 @@ open class Procedure: Operation, ProcedureProcotol {
      */
     public var userIntent: UserIntent = .none {
         didSet {
-            qualityOfService = userIntent.qualityOfService
+            setQualityOfService(fromUserIntent: userIntent)
         }
     }
-
 
     // MARK: State
 
@@ -547,8 +546,6 @@ public extension Procedure {
 
         observer.didAttach(to: self)
     }
-
-
 }
 
 // swiftlint:enable type_body_length

@@ -8,7 +8,7 @@ import Foundation
 
 extension Collection where Iterator.Element: Operation {
 
-    var operationsAndProcedures: ([Operation], [Procedure]) {
+    internal var operationsAndProcedures: ([Operation], [Procedure]) {
         return reduce(([], [])) { result, element in
             var (operations, procedures) = result
             if let procedure = element as? Procedure {
@@ -21,7 +21,14 @@ extension Collection where Iterator.Element: Operation {
         }
     }
 
-    func forEachProcedure(body: (Procedure) throws -> Void) rethrows {
+    internal var userIntent: Procedure.UserIntent {
+        get {
+            let (_, procedures) = operationsAndProcedures
+            return procedures.map { $0.userIntent }.max { $0.rawValue < $1.rawValue } ?? .none
+        }
+    }
+
+    internal func forEachProcedure(body: (Procedure) throws -> Void) rethrows {
         try forEach {
             if let procedure = $0 as? Procedure {
                 try body(procedure)

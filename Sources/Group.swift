@@ -66,11 +66,12 @@ open class Group: Procedure, ProcedureQueueDelegate {
         */
         super.init(disableAutomaticFinishing: true)
 
-        name = "Group"
         queue.isSuspended = true
         queue.underlyingQueue = underlyingQueue
         queue.delegate = self
 
+        name = "Group"
+        userIntent = operations.userIntent
         groupCanFinish = CanFinishGroup(group: self)
 
         addDidCancelBlockObserver { group, errors in
@@ -232,7 +233,7 @@ open class Group: Procedure, ProcedureQueueDelegate {
     public func procedureQueue(_ queue: ProcedureQueue, didFinishOperation operation: Operation, withErrors errors: [Error]) { }
 }
 
-// MARK: - OperationQueue API
+// MARK: - Group API
 
 public extension Group {
 
@@ -298,6 +299,15 @@ public extension Group {
         set {
             super.qualityOfService = newValue
             queue.qualityOfService = newValue
+        }
+    }
+
+    /// Override of Procedure.userIntent
+    public override var userIntent: Procedure.UserIntent {
+        didSet {
+            let (operations, procedures) = children.operationsAndProcedures
+            operations.forEach { $0.setQualityOfService(fromUserIntent: userIntent) }
+            procedures.forEach { $0.userIntent = userIntent }
         }
     }
 }
