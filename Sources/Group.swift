@@ -22,7 +22,6 @@ open class Group: Procedure, ProcedureQueueDelegate {
 
     internal let queue = ProcedureQueue()
 
-
     fileprivate let finishing = BlockOperation { }
 
     fileprivate var groupChildren: Protector<[Operation]>
@@ -40,9 +39,6 @@ open class Group: Procedure, ProcedureQueueDelegate {
         get { return groupChildren.read { $0 } }
         set { groupChildren.write { (ward: inout [Operation]) in ward = newValue } }
     }
-
-    @available(*, unavailable, renamed: "children")
-    public var operations: [Operation] { return children }
 
 
 
@@ -186,9 +182,6 @@ public extension Group {
             }
         }
     }
-
-    @available(*, unavailable, renamed: "isSuspended")
-    final var suspended: Bool { return isSuspended }
 
     /**
      The default service level to apply to the GroupOperation and its child operations.
@@ -423,4 +416,25 @@ fileprivate extension ProcedureQueue {
     func add(canFinishGroup: Group.CanFinishGroup) {
         super.addOperation(canFinishGroup)
     }
+}
+
+// MARK: - Unavailable
+
+public extension Group {
+
+    @available(*, unavailable, renamed: "children")
+    var operations: [Operation] { return children }
+
+    @available(*, unavailable, renamed: "isSuspended")
+    final var suspended: Bool { return isSuspended }
+
+    @available(*, unavailable, renamed: "add(child:)")
+    func addOperation(operation: Operation) { }
+
+    @available(*, unavailable, renamed: "add(children:)")
+    func addOperations(operations: Operation...) { }
+
+    @available(*, unavailable, renamed: "add(children:)")
+    func addOperations(additional: [Operation]) { }
+
 }
