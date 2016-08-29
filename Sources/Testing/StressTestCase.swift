@@ -13,19 +13,27 @@ open class StressTestCase: ProcedureKitTestCase {
     public enum StressLevel {
         case low, medium, high
 
-        var batches: Int {
+        public var batches: Int {
             switch self {
             case .low: return 1
-            case .medium: return 10
-            case .high: return 100
+            case .medium: return 2
+            case .high: return 5
             }
         }
 
-        var batchSize: Int {
+        public var batchSize: Int {
             switch self {
-            case .low: return 1_000
-            case .medium: return 10_000
+            case .low: return 10_000
+            case .medium: return 50_000
             case .high: return 100_000
+            }
+        }
+
+        public var timeout: TimeInterval {
+            switch self {
+            case .low: return 5
+            case .medium: return 10
+            case .high: return 100
             }
         }
     }
@@ -42,27 +50,16 @@ open class StressTestCase: ProcedureKitTestCase {
         }
     }
 
+    public var level: StressLevel = .medium
 
-    public var batches = StressLevel.low.batches
-
-    public var batchSize = StressLevel.medium.batchSize
-
-    public func set(batches stressLevel: StressLevel) {
-        batches = stressLevel.batches
-    }
-
-    public func set(batchSize stressLevel: StressLevel) {
-        batchSize = stressLevel.batchSize
-    }
-
-    public func stress(withName name: String = #function, withTimeout timeout: TimeInterval = 5, block: (Int, Int, DispatchGroup) -> Void) {
+    public func stress(withName name: String = #function, withTimeout timeout: TimeInterval? = nil, block: (Int, Int, DispatchGroup) -> Void) {
         let stressTestName = "Stress Test: \(name)"
         let dispatchGroup = DispatchGroup()
 
         weak var didCompleteStressTestExpectation = expectation(description: stressTestName)
 
-        (0..<batches).forEach { batch in
-            (0..<batchSize).forEach { iteration in
+        (0..<level.batches).forEach { batch in
+            (0..<level.batchSize).forEach { iteration in
                 block(batch, iteration, dispatchGroup)
             }
         }
@@ -72,7 +69,7 @@ open class StressTestCase: ProcedureKitTestCase {
             expect.fulfill()
         }
 
-        waitForExpectations(timeout: timeout, handler: nil)
+        waitForExpectations(timeout: timeout ?? level.timeout, handler: nil)
     }
 
 }
