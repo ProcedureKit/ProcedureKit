@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		2E7627401CE7BB550050AB05 /* OpenInSafariOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E76273F1CE7BB550050AB05 /* OpenInSafariOperation.swift */; };
-		2E7627421CE7BB7B0050AB05 /* OpenInSafariOperationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E7627411CE7BB7B0050AB05 /* OpenInSafariOperationTests.swift */; };
 		650852311C8B23580058F8AA /* Repeatable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 650852301C8B23580058F8AA /* Repeatable.swift */; };
 		650852321C8B23580058F8AA /* Repeatable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 650852301C8B23580058F8AA /* Repeatable.swift */; };
 		650852331C8B23580058F8AA /* Repeatable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 650852301C8B23580058F8AA /* Repeatable.swift */; };
@@ -219,6 +218,7 @@
 		6526197B1C11FE6D00654091 /* AddressBookConditionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6526171D1C11F5EB00654091 /* AddressBookConditionTests.swift */; };
 		6526197C1C11FE6D00654091 /* AddressBookTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6526171E1C11F5EB00654091 /* AddressBookTests.swift */; };
 		6526197D1C11FE6D00654091 /* ContactsOperationsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652617201C11F5EB00654091 /* ContactsOperationsTests.swift */; };
+		6527BCC21D74D00500524A4C /* OpenInSafariOperationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6527BCC11D74D00500524A4C /* OpenInSafariOperationTests.swift */; };
 		653097A61CC4B1AE00EC1431 /* ConditionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 653097A51CC4B1AE00EC1431 /* ConditionTests.swift */; };
 		653097A71CC4B1AE00EC1431 /* ConditionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 653097A51CC4B1AE00EC1431 /* ConditionTests.swift */; };
 		653097A81CC4B1AE00EC1431 /* ConditionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 653097A51CC4B1AE00EC1431 /* ConditionTests.swift */; };
@@ -350,7 +350,6 @@
 
 /* Begin PBXFileReference section */
 		2E76273F1CE7BB550050AB05 /* OpenInSafariOperation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OpenInSafariOperation.swift; sourceTree = "<group>"; };
-		2E7627411CE7BB7B0050AB05 /* OpenInSafariOperationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OpenInSafariOperationTests.swift; sourceTree = "<group>"; };
 		650852301C8B23580058F8AA /* Repeatable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Repeatable.swift; sourceTree = "<group>"; };
 		650852351C8B23950058F8AA /* Generators.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Generators.swift; sourceTree = "<group>"; };
 		652616C91C11F5EB00654091 /* AlertOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertOperation.swift; sourceTree = "<group>"; };
@@ -439,6 +438,7 @@
 		652617E91C11F72A00654091 /* Operations.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Operations.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		652617F21C11F72A00654091 /* OS X OperationsTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "OS X OperationsTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		652618561C11F84800654091 /* Extension Compatible.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = "Extension Compatible.xcconfig"; sourceTree = "<group>"; };
+		6527BCC11D74D00500524A4C /* OpenInSafariOperationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OpenInSafariOperationTests.swift; sourceTree = "<group>"; };
 		653097A51CC4B1AE00EC1431 /* ConditionTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConditionTests.swift; sourceTree = "<group>"; };
 		653D401C1CC184AF00893746 /* Condition.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Condition.swift; sourceTree = "<group>"; };
 		655B54041D281F9700B26270 /* TaskOperation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TaskOperation.swift; sourceTree = "<group>"; };
@@ -806,6 +806,7 @@
 				65EE50C51C3C198600152774 /* CloudKitOperationTests.swift */,
 				652617271C11F5EB00654091 /* LocationCapabilityTests.swift */,
 				652617281C11F5EB00654091 /* LocationOperationsTests.swift */,
+				6527BCC11D74D00500524A4C /* OpenInSafariOperationTests.swift */,
 				652617291C11F5EB00654091 /* PassbookCapabilityTests.swift */,
 				6526172A1C11F5EB00654091 /* PhotosCapabilityTests.swift */,
 				6526172B1C11F5EB00654091 /* ReachabilityConditionTests.swift */,
@@ -1406,12 +1407,12 @@
 				652619751C11FE6900654091 /* ReachabilityConditionTests.swift in Sources */,
 				65FD67B41CC38933009E2C88 /* BasicTests.swift in Sources */,
 				652619781C11FE6900654091 /* RemoteNotificationConditionTests.swift in Sources */,
-				2E7627421CE7BB7B0050AB05 /* OpenInSafariOperationTests.swift in Sources */,
 				6526197D1C11FE6D00654091 /* ContactsOperationsTests.swift in Sources */,
 				652619761C11FE6900654091 /* ReachabilityTests.swift in Sources */,
 				6526196E1C11FE6900654091 /* CapabilityTests.swift in Sources */,
 				6526192A1C11FC3D00654091 /* SilentConditionTests.swift in Sources */,
 				657DBA331C208830001E00F3 /* BlockObserverTests.swift in Sources */,
+				6527BCC21D74D00500524A4C /* OpenInSafariOperationTests.swift in Sources */,
 				6526197A1C11FE6900654091 /* WebpageOperationTests.swift in Sources */,
 				6526191F1C11FC3D00654091 /* BlockConditionTests.swift in Sources */,
 				6526196D1C11FE6900654091 /* CalendarCapabilityTests.swift in Sources */,
