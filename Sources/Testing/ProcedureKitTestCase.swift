@@ -8,26 +8,24 @@ import Foundation
 import XCTest
 import ProcedureKit
 
-open class ProcedureKitTestCase: XCTestCase {
+open class ProcedureKitTestCase<Target>: XCTestCase {
 
     public var queue: ProcedureQueue!
     public var delegate: QueueTestDelegate!
-    public var procedure: TestProcedure!
+    open var target: Target!
 
     open override func setUp() {
         super.setUp()
         queue = ProcedureQueue()
         delegate = QueueTestDelegate()
         queue.delegate = delegate
-        procedure = TestProcedure()
     }
 
     open override func tearDown() {
-        procedure.cancel()
         queue.cancelAllOperations()
         delegate = nil
         queue = nil
-        procedure = nil
+        target = nil
         super.tearDown()
     }
 
@@ -64,5 +62,24 @@ open class ProcedureKitTestCase: XCTestCase {
                 weakExpectation?.fulfill()
             }
         }
+    }
+}
+
+
+open class BasicProcedureKitTestCase: ProcedureKitTestCase<TestProcedure> {
+
+    public var procedure: TestProcedure {
+        get { return target }
+        set { target = newValue }
+    }
+
+    open override func setUp() {
+        super.setUp()
+        target = TestProcedure()
+    }
+
+    open override func tearDown() {
+        target.cancel()
+        super.tearDown()
     }
 }

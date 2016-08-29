@@ -8,7 +8,7 @@ import XCTest
 import TestingProcedureKit
 @testable import ProcedureKit
 
-class QueueDelegateTests: ProcedureKitTestCase {
+class QueueDelegateTests: BasicProcedureKitTestCase {
 
     func test__delegate__is_notified_when_procedure_starts() {
         wait(for: procedure)
@@ -17,7 +17,7 @@ class QueueDelegateTests: ProcedureKitTestCase {
     }
 }
 
-class ExecutionTest: ProcedureKitTestCase {
+class ExecutionTest: BasicProcedureKitTestCase {
 
     func test__procedure_executes() {
         wait(for: procedure)
