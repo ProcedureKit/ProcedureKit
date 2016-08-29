@@ -15,8 +15,8 @@ open class ProcedureKitTestCase: XCTestCase {
 
         public var batches: Int {
             switch self {
-            case .low: return 2
-            case .medium: return 3
+            case .low: return 1
+            case .medium: return 2
             case .high: return 5
             }
         }
@@ -119,24 +119,7 @@ open class ProcedureKitTestCase: XCTestCase {
 
     // MARK: Stress Tests
 
-    public struct Batch {
-        public let startTime = CFAbsoluteTimeGetCurrent()
-        public let queue = ProcedureQueue()
-        public let counter = Counter()
-        public let batch: Int
-
-        public init(batch: Int) {
-            self.batch = batch
-            queue.isSuspended = false
-        }
-    }
-
-    public struct Iteration {
-        public let counter = Counter()
-        public let iteration: Int
-    }
-
-    public func stress(atLevel level: StressLevel = .medium, withName name: String = #function, withTimeout timeoutOverride: TimeInterval? = nil, block: (Batch, Iteration, DispatchGroup) -> Void) {
+    public func stress(atLevel level: StressLevel = .medium, withName name: String = #function, withTimeout timeoutOverride: TimeInterval? = nil, block: (Int, Int, DispatchGroup) -> Void) {
         let stressTestName = "Stress Test: \(name)"
         let timeout: TimeInterval = timeoutOverride ?? level.timeout
 
@@ -145,20 +128,18 @@ open class ProcedureKitTestCase: XCTestCase {
         let overallDispatchGroup = DispatchGroup()
         weak var overallExpectation = expectation(description: stressTestName)
 
-        (0..<level.batches).forEach { batchCount in
+        queue.delegate = nil
+
+        (0..<level.batches).forEach { batch in
             autoreleasepool {
-                let batch = Batch(batch: batchCount)
-
-                (0..<level.batchSize).forEach { iterationCount in
-
-                    let iteration = Iteration(iteration: iterationCount)
-
+                let batchStartTime = CFAbsoluteTimeGetCurrent()
+                (0..<level.batchSize).forEach { iteration in
                     block(batch, iteration, overallDispatchGroup)
                 }
 
                 let batchFinishTime = CFAbsoluteTimeGetCurrent()
-                let batchDuration = batchFinishTime - batch.startTime
-                print("\(stressTestName), finished batch: \(batchCount), in \(batchDuration) seconds")
+                let batchDuration = batchFinishTime - batchStartTime
+                print("\(stressTestName), finished batch: \(batch), in \(batchDuration) seconds")
             }
         }
 
