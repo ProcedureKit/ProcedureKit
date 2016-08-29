@@ -49,10 +49,13 @@ class GroupOperationTests: OperationTests {
 
     func test__group_operations_are_performed_in_order() {
         let group = createGroupOperations()
-        let expectation = expectationWithDescription("Test: \(#function)")
+        weak var expectation = expectationWithDescription("Test: \(#function)")
         let operation = GroupOperation(operations: group)
         operation.addCompletionBlock {
-            expectation.fulfill()
+            dispatch_async(Queue.Main.queue, {
+                guard let expectation = expectation else { print("Test: \(#function): Finished expectation after timeout"); return }
+                expectation.fulfill()
+            })
         }
 
         runOperation(operation)
@@ -64,10 +67,13 @@ class GroupOperationTests: OperationTests {
     }
 
     func test__adding_operation_to_running_group() {
-        let expectation = expectationWithDescription("Test: \(#function)")
+        weak var expectation = expectationWithDescription("Test: \(#function)")
         let operation = GroupOperation(operations: TestOperation(), TestOperation())
         operation.addCompletionBlock {
-            expectation.fulfill()
+            dispatch_async(Queue.Main.queue, {
+                guard let expectation = expectation else { print("Test: \(#function): Finished expectation after timeout"); return }
+                expectation.fulfill()
+            })
         }
         let extra = TestOperation()
         runOperation(operation)

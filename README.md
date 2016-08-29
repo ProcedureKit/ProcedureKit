@@ -1,7 +1,7 @@
 ![](https://raw.githubusercontent.com/danthorpe/Operations/development/header.png)
 
 [![Build status](https://badge.buildkite.com/4bc80b0824c6357ae071342271cb503b8994cf0cfa58645849.svg?branch=master)](https://buildkite.com/blindingskies/operations)
-[![Coverage Status](https://coveralls.io/repos/github/danthorpe/Operations/badge.svg?branch=development)](https://coveralls.io/github/danthorpe/Operations?branch=development)
+[![Coverage Status](https://coveralls.io/repos/github/ProcedureKit/ProcedureKit/badge.svg?branch=swift%2F2.2)](https://coveralls.io/github/ProcedureKit/ProcedureKit?branch=swift%2F2.2)
 [![CocoaPods Compatible](https://img.shields.io/cocoapods/v/Operations.svg?style=flat)](https://cocoapods.org/pods/Operations)
 [![CocoaPods Documentation](https://img.shields.io/cocoapods/metrics/doc-percent/Operations.svg?style=flat)](https://cocoapods.org/pods/Operations)
 [![Platform](https://img.shields.io/cocoapods/p/Operations.svg?style=flat)](http://cocoadocs.org/docsets/Operations)

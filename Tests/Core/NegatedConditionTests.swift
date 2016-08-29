@@ -12,14 +12,17 @@ import XCTest
 class NegatedConditionTests: OperationTests {
 
     func test__operation_with_successful_block_condition_fails() {
-        let expectation = expectationWithDescription("Test: \(#function)")
+        weak var expectation = expectationWithDescription("Test: \(#function)")
         let operation = TestOperation()
         operation.addCondition(NegatedCondition(TrueCondition()))
 
         var receivedErrors = [ErrorType]()
         operation.addObserver(DidFinishObserver { _, errors in
             receivedErrors = errors
-            expectation.fulfill()
+            dispatch_async(Queue.Main.queue, {
+                guard let expectation = expectation else { print("Test: \(#function): Finished expectation after timeout"); return }
+                expectation.fulfill()
+            })
         })
 
         runOperation(operation)

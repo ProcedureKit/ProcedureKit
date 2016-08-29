@@ -1,20 +1,23 @@
 steps:
   -
-    name: ":muscle: Lint"
+    name: "Lint"
     command: .ci/scripts/lint
     agents:
-      swift: "$BUILDKITE_AGENT_META_DATA_SWIFT"
+      iOS-Simulator: false    
+      swift: "2.2"
   -
-    name: ":mac: Test Mac OS X"
+    name: "Test Mac"
     command: .ci/scripts/test-osx
     agents:
-      swift: "$BUILDKITE_AGENT_META_DATA_SWIFT"
+      iOS-Simulator: false    
+      swift: "2.2"
   -
-    name: ":fastlane: Test iOS"
+    name: "Test iOS"
     command: .ci/scripts/test-ios
+    agents:
+      swift: "2.2"
+      iOS-Simulator: true
     env:
       FL_SLATHER_BUILDKITE_ENABLED: true
       FL_SLATHER_COVERALLS_ENABLED: true
-    agents:
-      swift: "$BUILDKITE_AGENT_META_DATA_SWIFT"
-
+      

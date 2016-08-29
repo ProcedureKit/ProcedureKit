@@ -339,13 +339,7 @@ public class Operation: NSOperation {
      - parameter errors: an `[ErrorType]` defaults to empty array.
      */
     public func cancelWithErrors(errors: [ErrorType] = []) {
-        stateLock.withCriticalScope {
-            if !errors.isEmpty {
-                log.warning("Did cancel with errors: \(errors).")
-            }
-            _internalErrors += errors
-        }
-        cancel()
+        _cancel(withAdditionalErrors: errors)
     }
 
     /**
@@ -365,6 +359,10 @@ public class Operation: NSOperation {
     public func operationDidCancel() { /* No op */ }
 
     public final override func cancel() {
+        _cancel()
+    }
+
+    private final func _cancel(withAdditionalErrors additionalErrors: [ErrorType] = []) {
         let willCancel = stateLock.withCriticalScope { _ -> Bool in
             // Do not cancel if already finished or finishing, or cancelled
             guard state <= .Executing && !_cancelled else { return false }
@@ -376,17 +374,26 @@ public class Operation: NSOperation {
 
         guard willCancel else { return }
 
-        operationWillCancel(errors)
+        let resultingErrors = errors + additionalErrors
+        operationWillCancel(resultingErrors)
         willChangeValueForKey(NSOperation.KeyPath.Cancelled.rawValue)
-        willCancelObservers.forEach { $0.willCancelOperation(self, errors: self.errors) }
+        willCancelObservers.forEach { $0.willCancelOperation(self, errors: resultingErrors) }
 
         stateLock.withCriticalScope {
+            if !additionalErrors.isEmpty {
+                _internalErrors += additionalErrors
+            }
             _cancelled = true
         }
 
         operationDidCancel()
         didCancelObservers.forEach { $0.didCancelOperation(self) }
-        log.verbose("Did cancel.")
+        if additionalErrors.isEmpty {
+            log.verbose("Did cancel.")
+        }
+        else {
+            log.warning("Did cancel with errors: \(additionalErrors).")
+        }
         didChangeValueForKey(NSOperation.KeyPath.Cancelled.rawValue)
 
         // Call super.cancel() to trigger .isReady state change on cancel
@@ -533,16 +540,16 @@ public extension Operation {
         let evaluator = createEvaluateConditionsOperation()
 
         // Add an observer to the evaluator to see if any of the conditions failed.
-        evaluator.addObserver(WillFinishObserver { [unowned self] operation, errors in
+        evaluator.addObserver(WillFinishObserver { [weak self] operation, errors in
             guard let evaluation = operation as? EvaluateConditions else { return }
             switch evaluation.result {
             case .Pending, .Satisfied:
                 break
             case .Ignored:
-                self.cancel()
+                self?.cancel()
             case .Failed(let errors):
                 // If conditions fail, we should cancel the operation
-                self.cancelWithErrors(errors)
+                self?.cancelWithErrors(errors)
             }
         })
 
