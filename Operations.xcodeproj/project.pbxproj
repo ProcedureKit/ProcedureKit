@@ -817,7 +817,6 @@
 				65B9E0801CB85C53009161AD /* URLSessionTaskOperationTests.swift */,
 				6526172F1C11F5EB00654091 /* UserNotificationConditionTests.swift */,
 				652617301C11F5EB00654091 /* WebpageOperationTests.swift */,
-				2E7627411CE7BB7B0050AB05 /* OpenInSafariOperationTests.swift */,
 			);
 			path = Features;
 			sourceTree = "<group>";
