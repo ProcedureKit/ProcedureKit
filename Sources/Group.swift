@@ -24,7 +24,7 @@ open class Group: Procedure, ProcedureQueueDelegate {
 
     internal let queue = ProcedureQueue()
 
-    fileprivate let finishing = BlockOperation { print("Group finishing operation is running....") }
+    fileprivate let finishing = BlockOperation { }
 
     fileprivate var groupErrors = Protector(GroupErrors())
     fileprivate var groupChildren: Protector<[Operation]>

@@ -18,10 +18,6 @@ class GroupTests: GroupTestCase {
 
     // MARK: - Execution
 
-    func test__group_is_not_suspended_at_start() {
-        XCTAssertFalse(group.isSuspended)
-    }
-
     func test__group_children_are_executed() {
         wait(for: group)
 
@@ -46,6 +42,67 @@ class GroupTests: GroupTestCase {
     func test__group_only_adds_initial_operations_to_children_property_once() {
         wait(for: group)
         XCTAssertEqual(group.children, children)
+    }
+
+    func test_group_will_add_child_observer_is_called() {
+        var blockCalledWith: (Group, Operation)? = nil
+        group = TestGroup(operations: [children[0]])
+        group.addWillAddChildBlockObserver { group, child in
+            blockCalledWith = (group, child)
+        }
+        wait(for: group)
+        guard let (observedGroup, observedChild) = blockCalledWith else { XCTFail("Observer not called"); return }
+        XCTAssertEqual(observedGroup, group)
+        XCTAssertEqual(observedChild, children[0])
+    }
+
+    func test_group_did_add_child_observer_is_called() {
+        var blockCalledWith: (Group, Operation)? = nil
+        group = TestGroup(operations: [children[0]])
+        group.addDidAddChildBlockObserver { group, child in
+            blockCalledWith = (group, child)
+        }
+        wait(for: group)
+        guard let (observedGroup, observedChild) = blockCalledWith else { XCTFail("Observer not called"); return }
+        XCTAssertEqual(observedGroup, group)
+        XCTAssertEqual(observedChild, children[0])
+    }
+
+    func test__group_is_not_suspended_at_start() {
+        XCTAssertFalse(group.isSuspended)
+    }
+
+    func test__group_suspended_before_execute() {
+        let child = children[0]
+        group = TestGroup(operations: [child])
+        group.isSuspended = true
+
+        let childWillExecuteDispatchGroup = DispatchGroup()
+        childWillExecuteDispatchGroup.enter()
+        child.addWillExecuteBlockObserver { _ in
+            childWillExecuteDispatchGroup.leave()
+        }
+
+        let groupWillExecuteDispatchGroup = DispatchGroup()
+        groupWillExecuteDispatchGroup.enter()
+        group.addWillExecuteBlockObserver { _ in
+            groupWillExecuteDispatchGroup.leave()
+        }
+
+        check(procedure: group) { group in
+
+            XCTAssertEqual(groupWillExecuteDispatchGroup.wait(timeout: DispatchTime.now() + 0.01), .success, "Group has not yet executed")
+
+            XCTAssertNotEqual(childWillExecuteDispatchGroup.wait(timeout: DispatchTime.now() + 0.005), .success, "Child executed when group was suspended")
+
+            XCTAssertFalse(child.isFinished)
+            XCTAssertFalse(group.isFinished)
+
+            group.isSuspended = false
+        }
+
+        XCTAssertTrue(child.isFinished)
+        XCTAssertTrue(group.isFinished)
     }
 
     // MARK: - Error Tests
@@ -95,6 +152,19 @@ class GroupTests: GroupTestCase {
     }
 
     // MARK: - Finishing Tests
+
+    func test__group_does_not_finish_before_all_children_finish() {
+        var didFinishBlockObserverWasCalled = false
+        group.addWillFinishBlockObserver { group, _ in
+            didFinishBlockObserverWasCalled = true
+            for child in group.children {
+                XCTAssertTrue(child.isFinished)
+            }
+        }
+        wait(for: group)
+        XCTAssertTrue(group.isFinished)
+        XCTAssertTrue(didFinishBlockObserverWasCalled)
+    }
 
     // MARK: - Condition Tests
 }
