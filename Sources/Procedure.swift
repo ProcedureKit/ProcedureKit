@@ -505,6 +505,7 @@ open class Procedure: Operation, ProcedureProcotol {
         log.verbose(message: "Will finish with \(messageSuffix).")
 
         procedureWillFinish(withErrors: resultingErrors)
+
         willChangeValue(forKey: .finished)
         observers.forEach { $0.will(finish: self, withErrors: resultingErrors) }
 
