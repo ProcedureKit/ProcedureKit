@@ -16,10 +16,10 @@ class GroupCancelStressTests: StressTestCase {
 
     func test__group_cancel() {
 
-        stress(level: .low) { batch, iteration in
+        stress { batch, iteration in
             batch.dispatchGroup.enter()
             let group = TestGroup(operations: TestProcedure(delay: 0))
-            group.addDidFinishBlockObserver { _, _ in
+            group.addDidCancelBlockObserver { _, _ in
                 let _ = batch.counter.barrierIncrement()
                 batch.dispatchGroup.leave()
             }
@@ -49,10 +49,10 @@ class GroupCancelAndAddOperationStressTests: StressTestCase {
 
     func test__group_cancel_and_add() {
 
-        stress(level: .low) { batch, _ in
+        stress { batch, _ in
             batch.dispatchGroup.enter()
             let group = TestGroupWhichAddsOperationsAfterSuperInit()
-            group.addDidFinishBlockObserver { _, _ in
+            group.addDidCancelBlockObserver { _, _ in
                 batch.dispatchGroup.leave()
             }
             batch.queue.add(operation: group)
@@ -78,14 +78,14 @@ class GroupDoesNotFinishBeforeChildOperationsAreFinished: StressTestCase {
     }
 
     func test__group_does_not_finish_before_child_operations_are_finished() {
-        stress(level: .low) { batch, _ in
+        stress { batch, _ in
             batch.dispatchGroup.enter()
 
             let child1 = TestProcedure(delay: 0.05)
             let child2 = TestProcedure(delay: 0.05)
             let group = Group(operations: child1, child2)
 
-            group.addDidFinishBlockObserver { _, _ in
+            group.addDidCancelBlockObserver { _, _ in
                 if child1.isFinished { let _ = (batch as! SpecialBatch).child1Counter.barrierIncrement() }
                 if child2.isFinished { let _ = (batch as! SpecialBatch).child2Counter.barrierIncrement() }
                 batch.dispatchGroup.leave()
