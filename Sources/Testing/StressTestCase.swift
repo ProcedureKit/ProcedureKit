@@ -22,6 +22,8 @@ public class Counter {
     public func barrierIncrement() -> Int32 {
         return OSAtomicIncrement32Barrier(&_count)
     }
+
+    public init() { }
 }
 
 public protocol BatchProtocol {
@@ -31,6 +33,21 @@ public protocol BatchProtocol {
     var counter: Counter { get }
     var number: Int { get }
     var size: Int { get }
+}
+
+open class Batch: BatchProtocol {
+    public let startTime = CFAbsoluteTimeGetCurrent()
+    public let dispatchGroup = DispatchGroup()
+    public let counter = Counter()
+    public let queue: ProcedureQueue
+    public let number: Int
+    public let size: Int
+
+    public init(queue: ProcedureQueue = ProcedureQueue(), number: Int, size: Int) {
+        self.queue = queue
+        self.number = number
+        self.size = size
+    }
 }
 
 open class StressTestCase: GroupTestCase {
@@ -49,8 +66,8 @@ open class StressTestCase: GroupTestCase {
         public var batchSize: Int {
             switch self {
             case .low: return 10_000
-            case .medium: return 25_000
-            case .high: return 50_000
+            case .medium: return 15_000
+            case .high: return 30_000
             }
         }
 
@@ -60,20 +77,6 @@ open class StressTestCase: GroupTestCase {
             case .medium: return 100
             case .high: return 1000
             }
-        }
-    }
-
-    open class Batch: BatchProtocol {
-        public let startTime = CFAbsoluteTimeGetCurrent()
-        public let dispatchGroup = DispatchGroup()
-        public let queue = ProcedureQueue()
-        public let counter = Counter()
-        public let number: Int
-        public let size: Int
-
-        public init(number: Int, size: Int) {
-            self.number = number
-            self.size = size
         }
     }
 
