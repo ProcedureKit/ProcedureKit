@@ -10,46 +10,6 @@ import ProcedureKit
 
 open class ProcedureKitTestCase: XCTestCase {
 
-    public enum StressLevel {
-        case low, medium, high
-
-        public var batches: Int {
-            switch self {
-            case .low: return 1
-            case .medium: return 2
-            case .high: return 5
-            }
-        }
-
-        public var batchSize: Int {
-            switch self {
-            case .low: return 10_000
-            case .medium: return 50_000
-            case .high: return 100_000
-            }
-        }
-
-        public var timeout: TimeInterval {
-            switch self {
-            case .low: return 10
-            case .medium: return 50
-            case .high: return 100
-            }
-        }
-    }
-
-    public class Counter {
-        private(set) var count: Int32 = 0
-
-        public func increment() -> Int32 {
-            return OSAtomicIncrement32(&count)
-        }
-
-        public func increment_barrier() -> Int32 {
-            return OSAtomicIncrement32Barrier(&count)
-        }
-    }
-
     public var queue: ProcedureQueue!
     public var delegate: QueueTestDelegate!
     open var procedure: TestProcedure!
@@ -115,39 +75,5 @@ open class ProcedureKitTestCase: XCTestCase {
                 weakExpectation?.fulfill()
             }
         }
-    }
-
-    // MARK: Stress Tests
-
-    public func stress(atLevel level: StressLevel = .medium, withName name: String = #function, withTimeout timeoutOverride: TimeInterval? = nil, block: (Int, Int, DispatchGroup) -> Void) {
-        let stressTestName = "Stress Test: \(name)"
-        let timeout: TimeInterval = timeoutOverride ?? level.timeout
-
-        print("\(stressTestName), Parameters: \(level.batches) batches, size \(level.batchSize), timeout: \(timeout)")
-
-        let overallDispatchGroup = DispatchGroup()
-        weak var overallExpectation = expectation(description: stressTestName)
-
-        queue.delegate = nil
-
-        (0..<level.batches).forEach { batch in
-            autoreleasepool {
-                let batchStartTime = CFAbsoluteTimeGetCurrent()
-                (0..<level.batchSize).forEach { iteration in
-                    block(batch, iteration, overallDispatchGroup)
-                }
-
-                let batchFinishTime = CFAbsoluteTimeGetCurrent()
-                let batchDuration = batchFinishTime - batchStartTime
-                print("\(stressTestName), finished batch: \(batch), in \(batchDuration) seconds")
-            }
-        }
-
-        overallDispatchGroup.notify(queue: .main) {
-            guard let expect = overallExpectation else { print("\(stressTestName): Completed after timeout"); return }
-            expect.fulfill()
-        }
-
-        waitForExpectations(timeout: timeout, handler: nil)
     }
 }

@@ -8,17 +8,18 @@ import XCTest
 import TestingProcedureKit
 @testable import ProcedureKit
 
-class ProcedureStressTest: ProcedureKitTestCase {
+class CompletionBlockStressTest: StressTestCase {
 
     func test__completion_blocks() {
-        stress { _, _, dispatchGroup in
-            dispatchGroup.enter()
+
+        measure { batch, iteration in
+            batch.dispatchGroup.enter()
             let procedure = TestProcedure()
-            procedure.addCompletionBlock { dispatchGroup.leave() }
-            queue.add(operation: procedure)
+            procedure.addCompletionBlock { batch.dispatchGroup.leave() }
+            batch.queue.add(operation: procedure)
         }
     }
-
-    // TODO: Conditions
 }
 
+
+// TODO: Conditions

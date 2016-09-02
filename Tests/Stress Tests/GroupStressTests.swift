@@ -8,17 +8,22 @@ import XCTest
 import TestingProcedureKit
 @testable import ProcedureKit
 
-class GroupStressTests: GroupTestCase {
+class GroupCancelStressTests: StressTestCase {
+
+    override func ended(batch: BatchProtocol) {
+        XCTAssertEqual(Int(batch.counter.count), batch.size)
+    }
 
     func test__group_cancel() {
 
-        stress(atLevel: .low) { batch, iteration, dispatchGroup in
-            dispatchGroup.enter()
+        stress(level: .low) { batch, iteration in
+            batch.dispatchGroup.enter()
             let group = TestGroup(operations: TestProcedure(delay: 0))
             group.addDidFinishBlockObserver { _, _ in
-                dispatchGroup.leave()
+                let _ = batch.counter.barrierIncrement()
+                batch.dispatchGroup.leave()
             }
-            queue.add(operation: group)
+            batch.queue.add(operation: group)
             group.cancel()
         }
     }
