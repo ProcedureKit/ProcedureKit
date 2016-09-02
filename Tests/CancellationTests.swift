@@ -19,7 +19,7 @@ class CancellationTests: ProcedureKitTestCase {
     }
 
     func test__procedure_cancel_with_error() {
-        procedure.cancel(withError: TestProcedure.SimulatedError())
+        procedure.cancel(withError: TestError())
         XCTAssertFalse(procedure.didExecute)
         XCTAssertTrue(procedure.isCancelled)
         XCTAssertTrue(procedure.failed)
