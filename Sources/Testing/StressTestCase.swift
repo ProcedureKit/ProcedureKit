@@ -73,9 +73,9 @@ open class StressTestCase: GroupTestCase {
 
         public var batchTimeout: TimeInterval {
             switch self {
-            case .low: return 10
-            case .medium: return 100
-            case .high: return 1000
+            case .low: return 30
+            case .medium: return 200
+            case .high: return 1_000
             }
         }
     }
@@ -98,7 +98,7 @@ open class StressTestCase: GroupTestCase {
         print("    finished batch: \(batch.number), in \(duration) seconds")
     }
 
-    public func stress(level: StressLevel = .medium, withName name: String = #function, withTimeout timeoutOverride: TimeInterval? = nil, block: (BatchProtocol, Int) -> Void) {
+    public func stress(level: StressLevel = .low, withName name: String = #function, withTimeout timeoutOverride: TimeInterval? = nil, block: (BatchProtocol, Int) -> Void) {
         stress(level: level, withName: name, withTimeout: timeoutOverride, iteration: nil, block: block)
     }
 
@@ -114,12 +114,18 @@ open class StressTestCase: GroupTestCase {
         let measurementDescription = iteration.map { "Measurement: \($0), " } ?? ""
         let stressTestName = "\(measurementDescription)Stress Test: \(name)"
         let timeout: TimeInterval = timeoutOverride ?? level.batchTimeout
+        var shouldContinueBatches = true
 
         print("\(stressTestName)\n  Parameters: \(level.batches) batches, size \(level.batchSize), timeout: \(timeout)")
 
         setUpStressTest()
 
+        defer {
+            tearDownStressTest()
+        }
+
         (0..<level.batches).forEach { batchCount in
+            guard shouldContinueBatches else { return }
             autoreleasepool {
 
                 let batch = started(batch: batchCount, size: level.batchSize)
@@ -134,13 +140,15 @@ open class StressTestCase: GroupTestCase {
                     expect.fulfill()
                 }
 
-                waitForExpectations(timeout: timeout, handler: nil)
+                waitForExpectations(timeout: timeout) { error in
+                    if let _ = error {
+                        shouldContinueBatches = false
+                    }
+                }
 
                 ended(batch: batch)
 
             } // End of autorelease
         } // End of batches
-
-        tearDownStressTest()
     }
 }

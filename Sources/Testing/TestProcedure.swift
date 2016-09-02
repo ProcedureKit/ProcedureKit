@@ -7,10 +7,11 @@
 import Foundation
 import ProcedureKit
 
+public struct TestError: Error {
+    public init() { }
+}
+
 open class TestProcedure: Procedure {
-    public struct SimulatedError: Error {
-        public init() { }
-    }
 
     public let delay: TimeInterval
     public let error: Error?

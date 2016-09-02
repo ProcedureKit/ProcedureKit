@@ -49,7 +49,7 @@ class GroupCancelAndAddOperationStressTests: StressTestCase {
 
     func test__group_cancel_and_add() {
 
-        stress { batch, _ in
+        stress(level: .low) { batch, _ in
             batch.dispatchGroup.enter()
             let group = TestGroupWhichAddsOperationsAfterSuperInit()
             group.addDidFinishBlockObserver { _, _ in
@@ -78,7 +78,7 @@ class GroupDoesNotFinishBeforeChildOperationsAreFinished: StressTestCase {
     }
 
     func test__group_does_not_finish_before_child_operations_are_finished() {
-        stress { batch, _ in
+        stress(level: .low) { batch, _ in
             batch.dispatchGroup.enter()
 
             let child1 = TestProcedure(delay: 0.05)
