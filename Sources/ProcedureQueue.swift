@@ -139,10 +139,8 @@ open class ProcedureQueue: OperationQueue {
             return
         }
 
+        procedure.log.verbose(message: "Adding to queue")
 
-/** --> Logging
-        procedure.log.verbose("Adding to queue")
-*/
         /// Add an observer so that any produced operations are added to the queue
         procedure.addDidProduceOperationBlockObserver { [weak self] (_, produced) in
             if let queue = self {
@@ -165,44 +163,49 @@ open class ProcedureQueue: OperationQueue {
             }
         }
 
-/* -- > Conditions
 
-            /// Process any conditions
-            if procedure.conditions.count > 0 {
+        /// Process any conditions
+        if procedure.conditions.count > 0 {
 
-                /// Check for mutual exclusion conditions
-                let manager = ExclusivityManager.sharedInstance
-                let mutuallyExclusiveConditions = operation.conditions.filter { $0.mutuallyExclusive }
-                var previousMutuallyExclusiveOperations = Set<NSOperation>()
-                for condition in mutuallyExclusiveConditions {
-                    let category = "\(condition.category)"
-                    if let previous = manager.addOperation(operation, category: category) {
-                        previousMutuallyExclusiveOperations.insert(previous)
-                    }
+/* TODO: Mutual Exclusivity
+            /// Check for mutual exclusion conditions
+            let manager = ExclusivityManager.sharedInstance
+*/
+            let mutuallyExclusiveConditions = procedure.conditions.filter { $0.mutuallyExclusive }
+            var previousMutuallyExclusiveOperations = Set<Operation>()
+/*
+            for condition in mutuallyExclusiveConditions {
+                let category = "\(condition.category)"
+                if let previous = manager.addOperation(operation, category: category) {
+                    previousMutuallyExclusiveOperations.insert(previous)
                 }
+            }
+*/
+            // Create the condition evaluator
+            let evaluator = procedure.evaluateConditions()
 
-                // Create the condition evaluator
-                let evaluator = operation.evaluateConditions()
+            // Get the condition dependencies
+            let indirectDependencies = procedure.indirectDependencies
 
-                // Get the condition dependencies
-                let indirectDependencies = operation.indirectDependencies
+            // If there are dependencies
+            if indirectDependencies.count > 0 {
 
-                // If there are dependencies
-                if indirectDependencies.count > 0 {
+                // Filter out the indirect dependencies which have already been added to the queue
+                let indirectDependenciesToProcess = indirectDependencies.filter { !self.operations.contains($0) }
 
-                    // Filter out the indirect dependencies which have already been added to the queue
-                    let indirectDependenciesToProcess = indirectDependencies.filter { !self.operations.contains($0) }
+                // Check to see if there are any which need processing
+                if indirectDependenciesToProcess.count > 0 {
 
                     // Iterate through the indirect dependencies
                     indirectDependenciesToProcess.forEach {
 
                         // Indirect dependencies are executed after
                         // any previous mutually exclusive operation(s)
-                        $0.addDependencies(previousMutuallyExclusiveOperations)
+                        $0.add(dependencies: previousMutuallyExclusiveOperations)
 
                         // Indirect dependencies are executed after
                         // all direct dependencies
-                        $0.addDependencies(operation.directDependencies)
+                        $0.add(dependencies: procedure.directDependencies)
 
                         // Only evaluate conditions after all indirect
                         // dependencies have finished
@@ -210,19 +213,19 @@ open class ProcedureQueue: OperationQueue {
                     }
 
                     // Add indirect dependencies
-                    addOperations(indirectDependenciesToProcess)
+                    add(operations: indirectDependenciesToProcess)
                 }
-
-                // Add the evaluator
-                addOperation(evaluator)
             }
-*/
+
+            // Add the evaluator
+            addOperation(evaluator)
+        }
+
 
         // Indicate to the operation that it is to be enqueued
         procedure.willEnqueue()
 
         delegate?.procedureQueue(self, willAddOperation: procedure)
-
     }
 
     // swiftlint:enable function_body_length

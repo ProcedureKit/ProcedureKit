@@ -35,7 +35,7 @@ public protocol ConditionProtocol: ProcedureProcotol {
 
     var mutuallyExclusive: Bool { get set }
 
-    func evaluate(operation: Operation, completion: (ConditionResult) -> Void)
+    func evaluate(procedure: Procedure, completion: (ConditionResult) -> Void)
 }
 
 internal extension ConditionProtocol {
@@ -58,22 +58,25 @@ open class Condition: Procedure, ConditionProtocol {
 
     public var mutuallyExclusive: Bool = false
 
-    internal weak var operation: Operation? = nil
+    internal weak var procedure: Procedure? = nil
+
+    public var result: ConditionResult! = nil
 
     open override func execute() {
-        guard let operation = operation else {
-            log.verbose(message: "Condition finishing before evaluation because operation is nil.")
+        guard let procedure = procedure else {
+            log.verbose(message: "Condition finishing before evaluation because procedure is nil.")
             finish()
             return
         }
-        evaluate(operation: operation, completion: finish)
+        evaluate(procedure: procedure, completion: finish)
     }
 
-    public func evaluate(operation: Operation, completion: (ConditionResult) -> Void) {
+    public func evaluate(procedure: Procedure, completion: (ConditionResult) -> Void) {
         completion(.failed(Errors.ProgrammingError(reason: "Condition must be subclassed, and \(#function) overridden.")))
     }
 
     internal func finish(withConditionResult conditionResult: ConditionResult) {
+        result = conditionResult
         finish(withError: conditionResult.error)
     }
 }
@@ -86,7 +89,7 @@ public class TrueCondition: Condition {
         self.mutuallyExclusive = mutuallyExclusive
     }
 
-    public override func evaluate(operation: Operation, completion: (ConditionResult) -> Void) {
+    public override func evaluate(procedure: Procedure, completion: (ConditionResult) -> Void) {
         completion(.satisfied)
     }
 }
@@ -99,7 +102,7 @@ public class FalseCondition: Condition {
         self.mutuallyExclusive = mutuallyExclusive
     }
 
-    public override func evaluate(operation: Operation, completion: (ConditionResult) -> Void) {
+    public override func evaluate(procedure: Procedure, completion: (ConditionResult) -> Void) {
         completion(.failed(Errors.FalseCondition()))
     }
 }

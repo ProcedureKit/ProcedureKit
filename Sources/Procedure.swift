@@ -208,22 +208,21 @@ open class Procedure: Operation, ProcedureProcotol, ResultInjectionProtocol {
 
 
 
+    // MARK: Dependencies & Conditions
 
+    internal fileprivate(set) var directDependencies = Set<Operation>()
 
-    internal private(set) var directDependencies = Set<Operation>()
-//    internal private(set) var conditions = Set<Condition>()
-//    internal private(set) var evaluateConditionsOperation: GroupOperation? = .None
+    internal fileprivate(set) var evaluateConditionsProcedure: Group? = nil
 
-//    internal var indirectDependencies: Set<Operation> {
-//        return Set(conditions
-//            .flatMap { $0.directDependencies }
-//            .filter { !directDependencies.contains($0) }
-//        )
-//    }
+    internal var indirectDependencies: Set<Operation> {
+        return Set(conditions
+            .flatMap { $0.directDependencies }
+            .filter { !directDependencies.contains($0) }
+        )
+    }
 
-
-
-//    private var _log = Protector<LoggerType>(Logger())
+    /// - returns conditions: the Set of Condition instances attached to the operation
+    public fileprivate(set) var conditions = Set<Condition>()
 
     // MARK: - Initialization
 
@@ -574,18 +573,150 @@ public extension Procedure {
 
 public extension Procedure {
 
-//    final override var dependencies: [Operation] {
-//
-//    }
+    internal enum ConditionEvaluation {
+        case pending, satisfied, ignored
+        case failed([Error])
+
+        var errors: [Error] {
+            guard case let .failed(errors) = self else { return [] }
+            return errors
+        }
+
+        func evaluate(condition: Condition, withErrors errors: [Error]) -> ConditionEvaluation {
+            guard let result = condition.result else {
+                if errors.isEmpty { return self }
+                else { return .failed(errors) }
+            }
+
+            switch  (self, result) {
+            case let (_, .failed(conditionError)):
+                var errors = self.errors
+                errors.append(conditionError)
+                return .failed(errors)
+            case (.failed(_), _):
+                return self
+            case (_, .ignored):
+                return .ignored
+            case (.pending, .satisfied):
+                return .satisfied
+            default:
+                return self
+            }
+        }
+    }
+
+    internal class EvaluateConditions: Group {
+        var requirement: [Condition] = []
+        var result: ConditionEvaluation = .pending
+
+        init(conditions: Set<Condition>) {
+            let ops = Array(conditions)
+            requirement = ops
+            super.init(operations: ops)
+        }
+
+        override func procedureWillFinish(withErrors errors: [Error]) {
+            process(withErrors: errors)
+        }
+
+        override func procedureWillCancel(withErrors errors: [Error]) {
+            process(withErrors: errors)
+        }
+
+        private func process(withErrors errors: [Error]) {
+            result = requirement.reduce(.pending) { evaluation, condition in
+                log.verbose(message: "evaluating \(evaluation) with \(condition.result)")
+                return evaluation.evaluate(condition: condition, withErrors: errors)
+            }
+        }
+    }
+
+    internal func evaluateConditions() -> Procedure {
+
+        func createEvaluateConditionsProcedure() -> EvaluateConditions {
+            // Set the procedure on each condition
+            conditions.forEach { $0.procedure = self }
+
+            let evaluator = EvaluateConditions(conditions: conditions)
+            evaluator.name = "\(operationName) Evaluate Conditions"
+
+            super.addDependency(evaluator)
+            return evaluator
+        }
+
+        assert(state <= .executing, "Dependencies cannot be modified after execution has begun, current state: \(state).")
+
+        let evaluator = createEvaluateConditionsProcedure()
+
+        // Add the direct dependencies of the procedure as direct dependencies of the evaluator
+        directDependencies.forEach {
+            evaluator.add(dependency: $0)
+        }
+
+        // Add an observer to the evaluator to see if any of the conditions failed.
+        evaluator.addWillFinishBlockObserver { [weak self] evaluator, _ in
+            switch evaluator.result {
+            case .pending, .satisfied:
+                break
+            case .ignored:
+                self?.cancel()
+            case let .failed(errors):
+                self?.cancel(withErrors: errors)
+            }
+        }
+
+        return evaluator
+    }
+
+    internal func add(dependencyOnPreviousMutuallyExclusiveOperation operation: Procedure) {
+        precondition(state <= .executing, "Dependencies cannot be modified after execution has begun, current state: \(state).")
+        super.addDependency(operation)
+    }
 
     internal func add(directDependency: Operation) {
-
+        precondition(state <= .executing, "Dependencies cannot be modified after execution has begun, current state: \(state).")
+        directDependencies.insert(directDependency)
+        super.addDependency(directDependency)
     }
 
     internal func remove(directDependency: Operation) {
-
+        precondition(state <= .executing, "Dependencies cannot be modified after execution has begun, current state: \(state).")
+        directDependencies.remove(directDependency)
+        super.removeDependency(directDependency)
     }
 
+    final override var dependencies: [Operation] {
+        return Array(directDependencies.union(indirectDependencies))
+    }
+
+    /**
+     Add another `Operation` as a dependency. It is a programmatic error to call
+     this method after the receiver has already started executing. Therefore, best
+     practice is to add dependencies before adding them to operation queues.
+
+     - requires: self must not have started yet. i.e. either hasn't been added
+     to a queue, or is waiting on dependencies.
+     - parameter operation: a `Operation` instance.
+     */
+    final override func addDependency(_ operation: Operation) {
+        precondition(state <= .executing, "Dependencies cannot be modified after execution has begun, current state: \(state).")
+        add(directDependency: operation)
+    }
+
+    /**
+     Remove another `Operation` as a dependency. It is a programmatic error to call
+     this method after the receiver has already started executing. Therefore, best
+     practice is to manage dependencies before adding them to operation
+     queues.
+
+     - requires: self must not have started yet. i.e. either hasn't been added
+     to a queue, or is waiting on dependencies.
+     - parameter operation: a `Operation` instance.
+     */
+    final override func removeDependency(_ operation: Operation) {
+        precondition(state <= .executing, "Dependencies cannot be modified after execution has begun, current state: \(state).")
+        remove(directDependency: operation)
+    }
 }
 
 // swiftlint:enable type_body_length

@@ -44,7 +44,7 @@ public protocol ProcedureProcotol: class {
 
     func add<Observer: ProcedureObserver>(observer: Observer) where Observer.Procedure == Self
 
-    // Dependency
+    // Dependencies
 
     func add<Dependency: ProcedureProcotol>(dependency: Dependency)
 }
