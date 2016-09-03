@@ -54,7 +54,8 @@ steps:
 #      iOS-Simulator: true    
 #      xcode: "$BUILDKITE_AGENT_META_DATA_XCODE"
 
-  - trigger: "ProcedureKit"
+  -
+    trigger: "ProcedureKit"
     label: "Trigger Stress Tests"
     async: true
     build:
