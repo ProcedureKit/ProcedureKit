@@ -220,6 +220,17 @@ platform :mac do
 
   end
 
+  desc "Stress Test"
+  lane :stress_test do
+
+    scan(
+      project: "ProcedureKit.xcodeproj",
+      scheme: "Stress Tests",
+      destination: "platform=macOS"
+    )
+
+  end
+
   desc "macOS: ProcedureKitMac"
   lane :test_mac do
 

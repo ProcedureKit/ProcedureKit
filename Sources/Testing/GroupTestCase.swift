@@ -25,7 +25,7 @@ open class GroupTestCase: ProcedureKitTestCase {
     public func createTestProcedures(count: Int = 5, shouldError: Bool = false) -> [TestProcedure] {
         return (0..<count).map { i in
             let name = "Child: \(i)"
-            return shouldError ? TestProcedure(name: name, error: TestProcedure.SimulatedError()) : TestProcedure(name: name)
+            return shouldError ? TestProcedure(name: name, error: TestError()) : TestProcedure(name: name)
         }
     }
 

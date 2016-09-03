@@ -12,6 +12,7 @@ import TestingProcedureKit
 class CancellationTests: ProcedureKitTestCase {
 
     func test__procedure_cancel_with_nil_error() {
+        procedure.log.severity = .verbose
         procedure.cancel(withError: nil)
         XCTAssertFalse(procedure.didExecute)
         XCTAssertTrue(procedure.isCancelled)
@@ -19,7 +20,7 @@ class CancellationTests: ProcedureKitTestCase {
     }
 
     func test__procedure_cancel_with_error() {
-        procedure.cancel(withError: TestProcedure.SimulatedError())
+        procedure.cancel(withError: TestError())
         XCTAssertFalse(procedure.didExecute)
         XCTAssertTrue(procedure.isCancelled)
         XCTAssertTrue(procedure.failed)
