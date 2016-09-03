@@ -14,9 +14,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "653CA02F1D60A5D10070B7A2"
-               BuildableName = "ProcedureKitMac.framework"
-               BlueprintName = "ProcedureKitMac"
+               BlueprintIdentifier = "65CFC5EF1D608A5500CAD875"
+               BuildableName = "ProcedureKit.framework"
+               BlueprintName = "ProcedureKit"
                ReferencedContainer = "container:ProcedureKit.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -27,16 +27,15 @@
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       shouldUseLaunchSchemeArgsEnv = "YES"
-      codeCoverageEnabled = "YES"
       enableThreadSanitizer = "YES">
       <Testables>
          <TestableReference
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "653CA0371D60A5D10070B7A2"
-               BuildableName = "ProcedureKitMacTests.xctest"
-               BlueprintName = "ProcedureKitMacTests"
+               BlueprintIdentifier = "653CA0171D60A34E0070B7A2"
+               BuildableName = "Stress Tests.xctest"
+               BlueprintName = "Stress Tests"
                ReferencedContainer = "container:ProcedureKit.xcodeproj">
             </BuildableReference>
          </TestableReference>
@@ -44,9 +43,9 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "653CA02F1D60A5D10070B7A2"
-            BuildableName = "ProcedureKitMac.framework"
-            BlueprintName = "ProcedureKitMac"
+            BlueprintIdentifier = "65CFC5EF1D608A5500CAD875"
+            BuildableName = "ProcedureKit.framework"
+            BlueprintName = "ProcedureKit"
             ReferencedContainer = "container:ProcedureKit.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
@@ -66,9 +65,9 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "653CA02F1D60A5D10070B7A2"
-            BuildableName = "ProcedureKitMac.framework"
-            BlueprintName = "ProcedureKitMac"
+            BlueprintIdentifier = "65CFC5EF1D608A5500CAD875"
+            BuildableName = "ProcedureKit.framework"
+            BlueprintName = "ProcedureKit"
             ReferencedContainer = "container:ProcedureKit.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
@@ -84,9 +83,9 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "653CA02F1D60A5D10070B7A2"
-            BuildableName = "ProcedureKitMac.framework"
-            BlueprintName = "ProcedureKitMac"
+            BlueprintIdentifier = "65CFC5EF1D608A5500CAD875"
+            BuildableName = "ProcedureKit.framework"
+            BlueprintName = "ProcedureKit"
             ReferencedContainer = "container:ProcedureKit.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
