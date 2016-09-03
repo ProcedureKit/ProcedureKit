@@ -59,7 +59,6 @@ steps:
     label: "Trigger Stress Tests"
     async: true
     build:
-      message: "$MESSAGE"
       commit: "$COMMIT"
       meta_data:
         xcode: "$XCODE"
