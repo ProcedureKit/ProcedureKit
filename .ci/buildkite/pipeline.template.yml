@@ -55,7 +55,7 @@ steps:
 #      xcode: "$XCODE"
 
   -
-    trigger: "ProcedureKit"
+    trigger: "procedurekit"
     label: "Trigger Stress Tests"
     async: true
     build:
