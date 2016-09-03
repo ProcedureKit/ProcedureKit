@@ -46,7 +46,49 @@ public extension Operation {
         }
     }
 
+    /**
+     Sets the quality of service of the Operation from `UserIntent`
+     - parameter userIntent: a UserIntent value
+     */
     func setQualityOfService(fromUserIntent userIntent: Procedure.UserIntent) {
         qualityOfService = userIntent.qualityOfService
     }
+
+    /**
+     Add a dependency to the operation, using Swift 3 API style
+     - parameter dependency: the Operation to add as a dependency
+    */
+    func add(dependency: Operation) {
+        addDependency(dependency)
+    }
+
+    /**
+     Adds dependencies to the operation, using Swift 3 API style
+     - parameter dependencies: a sequencey of Operation instances
+     */
+    func add<Operations: Sequence>(dependencies: Operations) where Operations.Iterator.Element: Operation {
+        dependencies.forEach(add(dependency:))
+    }
+
+    /**
+     Remove dependency from the operation, using Swift 3 API style
+     - parameter dependency: a sequencey of Operation instances
+     */
+    func remove(dependency: Operation) {
+        removeDependency(dependency)
+    }
+
+    /**
+     Removes dependencies to the operation, using Swift 3 API style
+     - parameter dependencies: a sequencey of Operation instances
+     */
+    func remove<Operations: Sequence>(dependencies: Operations) where Operations.Iterator.Element: Operation {
+        dependencies.forEach(remove(dependency:))
+    }
+
+    /// Removes all dependencies from the operation
+    func removeAllDependencies() {
+        remove(dependencies: dependencies)
+    }
+
 }

@@ -68,8 +68,6 @@ open class Procedure: Operation, ProcedureProcotol, ResultInjectionProtocol {
         }
     }
 
-
-
     private var _isTransitioningToExecuting = false
     private var _isFinishingFrom: FinishingFrom? = nil
     private var _isHandlingCancel = false
@@ -97,7 +95,6 @@ open class Procedure: Operation, ProcedureProcotol, ResultInjectionProtocol {
     }
 
     // MARK: State
-
 
     private var _state = State.initialized
     private let _stateLock = NSRecursiveLock()
@@ -571,6 +568,24 @@ public extension Procedure {
     public func add<Dependency: ProcedureProcotol>(dependency: Dependency) {
 
     }
+}
+
+// MARK: Conditions
+
+public extension Procedure {
+
+//    final override var dependencies: [Operation] {
+//
+//    }
+
+    internal func add(directDependency: Operation) {
+
+    }
+
+    internal func remove(directDependency: Operation) {
+
+    }
+
 }
 
 // swiftlint:enable type_body_length

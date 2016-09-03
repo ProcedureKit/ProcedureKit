@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		6518D5E31D7B3A2800A12EF4 /* Condition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6518D5E21D7B3A2800A12EF4 /* Condition.swift */; };
 		65245D1B1D72129800340A2D /* QueueTestDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65245D1A1D72129800340A2D /* QueueTestDelegate.swift */; };
 		65245D1D1D721A7100340A2D /* ProcedureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65245D1C1D721A7100340A2D /* ProcedureTests.swift */; };
 		65245D1F1D7231DC00340A2D /* CancellationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65245D1E1D7231DC00340A2D /* CancellationTests.swift */; };
@@ -186,6 +187,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		6518D5E21D7B3A2800A12EF4 /* Condition.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Condition.swift; path = Sources/Condition.swift; sourceTree = "<group>"; };
 		65245D1A1D72129800340A2D /* QueueTestDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = QueueTestDelegate.swift; path = Sources/Testing/QueueTestDelegate.swift; sourceTree = "<group>"; };
 		65245D1C1D721A7100340A2D /* ProcedureTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ProcedureTests.swift; path = Tests/ProcedureTests.swift; sourceTree = "<group>"; };
 		65245D1E1D7231DC00340A2D /* CancellationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CancellationTests.swift; path = Tests/CancellationTests.swift; sourceTree = "<group>"; };
@@ -356,7 +358,6 @@
 				65A2D8031D6A1ED500FB067C /* AnyObserver.swift */,
 				65A2D7FA1D6852A500FB067C /* BlockObservers.swift */,
 				6584AF441D74770C0030DBB3 /* Errors.swift */,
-				65245D261D7258E400340A2D /* Group.swift */,
 				65245D221D723A6B00340A2D /* Logging.swift */,
 				655E86461D67BA9C000FBA6C /* Support.swift */,
 				658A7B491D74D5B900F897C8 /* Core */,
@@ -474,10 +475,12 @@
 		658A7B491D74D5B900F897C8 /* Core */ = {
 			isa = PBXGroup;
 			children = (
+				65245D261D7258E400340A2D /* Group.swift */,
 				65B97DB41D65138F00AC3B5D /* Procedure.swift */,
 				655E86441D67B9F9000FBA6C /* ProcedureObserver.swift */,
 				65A2D8011D6A05D800FB067C /* ProcedureProcotol.swift */,
 				655E86421D67B55B000FBA6C /* ProcedureQueue.swift */,
+				6518D5E21D7B3A2800A12EF4 /* Condition.swift */,
 			);
 			name = Core;
 			sourceTree = "<group>";
@@ -1115,6 +1118,7 @@
 				65A2D8021D6A05D800FB067C /* ProcedureProcotol.swift in Sources */,
 				6584AF451D74770C0030DBB3 /* Errors.swift in Sources */,
 				65B97DB51D65138F00AC3B5D /* Procedure.swift in Sources */,
+				6518D5E31D7B3A2800A12EF4 /* Condition.swift in Sources */,
 				655E86471D67BA9C000FBA6C /* Support.swift in Sources */,
 				655E86451D67B9F9000FBA6C /* ProcedureObserver.swift in Sources */,
 				655E86431D67B55B000FBA6C /* ProcedureQueue.swift in Sources */,
