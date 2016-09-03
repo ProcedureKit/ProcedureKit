@@ -10,7 +10,7 @@ import Foundation
 
 // swiftlint:disable type_body_length
 
-open class Procedure: Operation, ProcedureProcotol {
+open class Procedure: Operation, ProcedureProcotol, ResultInjectionProtocol {
 
     private enum FinishingFrom {
         case main, cancel, finish
@@ -561,6 +561,15 @@ public extension Procedure {
         observers.append(AnyObserver(base: observer))
 
         observer.didAttach(to: self)
+    }
+}
+
+// MARK: Dependencies
+
+public extension Procedure {
+
+    public func add<Dependency: ProcedureProcotol>(dependency: Dependency) {
+
     }
 }
 
