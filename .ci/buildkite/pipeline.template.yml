@@ -6,60 +6,59 @@ steps:
     name: "ProcedureKit: macOS"
     command: "source /usr/local/opt/chruby/share/chruby/chruby.sh && chruby ruby && bundle install --quiet && bundle exec fastlane mac test"
     agents:
-      xcode: "$BUILDKITE_AGENT_META_DATA_XCODE"
+      xcode: "$XCODE"
 #  -
 #    name: "ProcedureKit: iOS"
 #    command: "source /usr/local/opt/chruby/share/chruby/chruby.sh && chruby ruby && bundle install --quiet && bundle exec fastlane ios test_ios"
 #    agents:
 #      iOS-Simulator: true
-#      xcode: "$BUILDKITE_AGENT_META_DATA_XCODE"
+#      xcode: "$XCODE"
 #  -
 #    name: "ProcedureKit: tvOS"
 #    command: "source /usr/local/opt/chruby/share/chruby/chruby.sh && chruby ruby && bundle install --quiet && bundle exec fastlane ios test_tvos"
 #    agents:
 #      iOS-Simulator: true
-#      xcode: "$BUILDKITE_AGENT_META_DATA_XCODE"
+#      xcode: "$XCODE"
   -
     name: "Cloud: macOS"
     command: "source /usr/local/opt/chruby/share/chruby/chruby.sh && chruby ruby && bundle install --quiet && bundle exec fastlane mac test_cloud"
     agents:
-      xcode: "$BUILDKITE_AGENT_META_DATA_XCODE"
+      xcode: "$XCODE"
 #  -
 #    name: "Cloud: iOS"
 #    command: "source /usr/local/opt/chruby/share/chruby/chruby.sh && chruby ruby && bundle install --quiet && bundle exec fastlane ios test_ios_cloud"
 #    agents:
 #      iOS-Simulator: true    
-#      xcode: "$BUILDKITE_AGENT_META_DATA_XCODE"
+#      xcode: "$XCODE"
 #  -
 #    name: "Cloud: tvOS"
 #    command: "source /usr/local/opt/chruby/share/chruby/chruby.sh && chruby ruby && bundle install --quiet && bundle exec fastlane ios test_tvos_cloud"
 #    agents:
 #      iOS-Simulator: true    
-#      xcode: "$BUILDKITE_AGENT_META_DATA_XCODE"
+#      xcode: "$XCODE"
   -
     name: "Mac"
     command: "source /usr/local/opt/chruby/share/chruby/chruby.sh && chruby ruby && bundle install --quiet && bundle exec fastlane mac test_mac"
     agents:
-      xcode: "$BUILDKITE_AGENT_META_DATA_XCODE"
+      xcode: "$XCODE"
 #  -
 #    name: "Mobile"
 #    command: "source /usr/local/opt/chruby/share/chruby/chruby.sh && chruby ruby && bundle install --quiet && bundle exec fastlane ios test_mobile_ios"
 #    agents:
 #      iOS-Simulator: true    
-#      xcode: "$BUILDKITE_AGENT_META_DATA_XCODE"
+#      xcode: "$XCODE"
 #  -
 #    name: "TV"
 #    command: "source /usr/local/opt/chruby/share/chruby/chruby.sh && chruby ruby && bundle install --quiet && bundle exec fastlane ios test_tv_tvos"
 #    agents:
 #      iOS-Simulator: true    
-#      xcode: "$BUILDKITE_AGENT_META_DATA_XCODE"
+#      xcode: "$XCODE"
 
   -
     trigger: "ProcedureKit"
     label: "Trigger Stress Tests"
     async: true
     build:
-      commit: "$BUILDKITE_COMMIT"
-      branch: "$BUILDKITE_BRANCH"
+      commit: "$COMMIT"
       meta_data:
-        xcode: "$BUILDKITE_AGENT_META_DATA_XCODE"
+        xcode: "$XCODE"
