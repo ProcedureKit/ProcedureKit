@@ -54,12 +54,9 @@ steps:
 #      iOS-Simulator: true    
 #      xcode: "8.0"
 
-  -
-    
   - trigger: "Execute Stress Tests"
     label: "Trigger Stress Tests"
     async: true
     build:
-      message: "Running Stress Tests"
       meta_data:
         xcode: "8.0"
