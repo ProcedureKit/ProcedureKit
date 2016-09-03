@@ -36,6 +36,10 @@ open class Procedure: Operation, ProcedureProcotol {
                  (.finishing, .finished):
                 return true
 
+            case (.initialized, .finishing) where isCancelled:
+                // When an operation is cancelled before it is added to a queue it can go from pending direct to finishing.
+                return true
+
             case (.pending, .finishing) where isCancelled:
                 // When an operation is cancelled it can go from pending direct to finishing.
                 return true
@@ -277,6 +281,15 @@ open class Procedure: Operation, ProcedureProcotol {
 
     // MARK: - Execution
 
+    private var shouldEnqueue: Bool {
+        return _stateLock.withCriticalScope {
+            // Do not cancel if already finished or finishing, or cancelled
+            guard state < .pending && !_isCancelled else { return false }
+            return true
+        }
+    }
+
+
     public func willEnqueue() {
         state = .pending
     }
@@ -437,12 +450,10 @@ open class Procedure: Operation, ProcedureProcotol {
 
         procedureDidCancel(withErrors: resultingErrors)
         observers.forEach { $0.did(cancel: self, withErrors: resultingErrors) }
-        if additionalErrors.isEmpty {
-            log.verbose(message: "Did cancel.")
-        }
-        else {
-            log.verbose(message: "Did cancel with errors: \(additionalErrors)")
-        }
+
+        let messageSuffix = !additionalErrors.isEmpty ? "errors: \(additionalErrors)" : "no errors"
+        log.verbose(message: "Will cancel with \(messageSuffix).")
+
         didChangeValue(forKey: .cancelled)
 
         // Call super to trigger .isReady state change on cancel
@@ -476,7 +487,7 @@ open class Procedure: Operation, ProcedureProcotol {
             // Do not finish is already finishing or finished
             guard state <= .finishing else { return false }
             // Only a single call to _finish should continue
-            guard !_isHandlingFinish else { return false }
+            guard !_isHandlingFinish || _isFinishingFrom == FinishingFrom.cancel  else { return false }
             _isFinishingFrom = .finish
             return true
         }
@@ -491,9 +502,13 @@ open class Procedure: Operation, ProcedureProcotol {
         //   observers) or deadlock can result.
 
         let changedExecutingState = isExecuting
-        if changedExecutingState { willChangeValue(forKey: .executing) }
+        if changedExecutingState {
+            willChangeValue(forKey: .executing)
+        }
         _stateLock.withCriticalScope { state = .finishing }
-        if changedExecutingState { didChangeValue(forKey: .executing) }
+        if changedExecutingState {
+            didChangeValue(forKey: .executing)
+        }
 
         let resultingErrors: [Error] = _stateLock.withCriticalScope {
             _errors += receivedErrors

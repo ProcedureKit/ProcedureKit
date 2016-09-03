@@ -19,7 +19,7 @@ class GroupCancelStressTests: StressTestCase {
         stress { batch, iteration in
             batch.dispatchGroup.enter()
             let group = TestGroup(operations: TestProcedure(delay: 0))
-            group.addDidCancelBlockObserver { _, _ in
+            group.addDidFinishBlockObserver { _, _ in
                 let _ = batch.counter.barrierIncrement()
                 batch.dispatchGroup.leave()
             }
@@ -52,7 +52,7 @@ class GroupCancelAndAddOperationStressTests: StressTestCase {
         stress { batch, _ in
             batch.dispatchGroup.enter()
             let group = TestGroupWhichAddsOperationsAfterSuperInit()
-            group.addDidCancelBlockObserver { _, _ in
+            group.addDidFinishBlockObserver { _, _ in
                 batch.dispatchGroup.leave()
             }
             batch.queue.add(operation: group)
@@ -73,9 +73,8 @@ class GroupDoesNotFinishBeforeChildOperationsAreFinished: StressTestCase {
     }
 
     override func ended(batch: BatchProtocol) {
-// TODO: These currently fail - should be based around isFinished not isCancelled
-//        XCTAssertEqual((batch as! SpecialBatch).child1Counter.count, batch.size)
-//        XCTAssertEqual((batch as! SpecialBatch).child2Counter.count, batch.size)
+        XCTAssertEqual((batch as! SpecialBatch).child1Counter.count, batch.size)
+        XCTAssertEqual((batch as! SpecialBatch).child2Counter.count, batch.size)
     }
 
     func test__group_does_not_finish_before_child_operations_are_finished() {
@@ -86,9 +85,9 @@ class GroupDoesNotFinishBeforeChildOperationsAreFinished: StressTestCase {
             let child2 = TestProcedure(delay: 0.05)
             let group = Group(operations: child1, child2)
 
-            group.addDidCancelBlockObserver { _, _ in
-                if child1.isCancelled { let _ = (batch as! SpecialBatch).child1Counter.barrierIncrement() }
-                if child2.isCancelled { let _ = (batch as! SpecialBatch).child2Counter.barrierIncrement() }
+            group.addDidFinishBlockObserver { _, _ in
+                if child1.isFinished { let _ = (batch as! SpecialBatch).child1Counter.barrierIncrement() }
+                if child2.isFinished { let _ = (batch as! SpecialBatch).child2Counter.barrierIncrement() }
                 batch.dispatchGroup.leave()
             }
             batch.queue.add(operation: group)
