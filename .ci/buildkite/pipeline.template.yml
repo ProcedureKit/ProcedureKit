@@ -59,7 +59,6 @@ steps:
     label: "Trigger Stress Tests"
     async: true
     build:
-      message: "$BUILDKITE_MESSAGE"
-      commit: "$BUILDKITE_COMMIT"
+      commit: "$COMMIT"
       meta_data:
         xcode: "$XCODE"
