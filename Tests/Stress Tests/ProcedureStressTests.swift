@@ -12,7 +12,7 @@ class ProcedureCompletionBlockStressTest: StressTestCase {
 
     func test__completion_blocks() {
 
-        measure(level: .high, withTimeout: 30) { batch, iteration in
+        measure(withTimeout: 10) { batch, iteration in
             batch.dispatchGroup.enter()
             let procedure = TestProcedure()
             procedure.addCompletionBlock { batch.dispatchGroup.leave() }

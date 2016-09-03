@@ -53,10 +53,11 @@ open class Batch: BatchProtocol {
 open class StressTestCase: GroupTestCase {
 
     public enum StressLevel {
-        case low, medium, high
+        case minimal, low, medium, high
 
         public var batches: Int {
             switch self {
+            case .minimal: return 1
             case .low: return 2
             case .medium: return 3
             case .high: return 5
@@ -65,6 +66,7 @@ open class StressTestCase: GroupTestCase {
 
         public var batchSize: Int {
             switch self {
+            case .minimal: return 5_000
             case .low: return 10_000
             case .medium: return 15_000
             case .high: return 30_000
@@ -73,6 +75,7 @@ open class StressTestCase: GroupTestCase {
 
         public var batchTimeout: TimeInterval {
             switch self {
+            case .minimal: return 20
             case .low: return 30
             case .medium: return 200
             case .high: return 1_000
@@ -102,10 +105,10 @@ open class StressTestCase: GroupTestCase {
         stress(level: level, withName: name, withTimeout: timeoutOverride, iteration: nil, block: block)
     }
 
-    public func measure(level: StressLevel = .low, withName name: String = #function, withTimeout timeoutOverride: TimeInterval? = nil, block: @escaping (BatchProtocol, Int) -> Void) {
+    public func measure(withName name: String = #function, withTimeout timeoutOverride: TimeInterval? = nil, block: @escaping (BatchProtocol, Int) -> Void) {
         var count: Int = 0
         measure {
-            self.stress(level: level, withName: name, withTimeout: timeoutOverride, iteration: count, block: block)
+            self.stress(level: .minimal, withName: name, withTimeout: timeoutOverride, iteration: count, block: block)
             count = count.advanced(by: 1)
         }
     }
