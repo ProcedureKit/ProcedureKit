@@ -136,10 +136,6 @@ open class Procedure: Operation, ProcedureProcotol, ResultInjectionProtocol {
         return _stateLock.withCriticalScope { _errors }
     }
 
-    public var failed: Bool {
-        return errors.count > 0
-    }
-
     // MARK: Log
 
     private var _log = Protector<LoggerProtocol>(Logger())
@@ -716,6 +712,16 @@ public extension Procedure {
     final override func removeDependency(_ operation: Operation) {
         precondition(state <= .executing, "Dependencies cannot be modified after execution has begun, current state: \(state).")
         remove(directDependency: operation)
+    }
+
+    /**
+     Add an observer to the to the procedure.
+
+     - parameter observer: type conforming to protocol `ProcedureObserver`.
+     */
+    func add(condition: Condition) {
+        assert(state < .executing, "Cannot modify conditions after operation has begun executing, current state: \(state).")
+        conditions.insert(condition)
     }
 }
 

@@ -58,7 +58,13 @@ open class Condition: Procedure, ConditionProtocol {
 
     public var mutuallyExclusive: Bool = false
 
-    internal weak var procedure: Procedure? = nil
+    internal weak var procedure: Procedure? = nil {
+        didSet {
+            if let severity = procedure?.log.severity {
+                log.severity = severity
+            }
+        }
+    }
 
     public var result: ConditionResult! = nil
 

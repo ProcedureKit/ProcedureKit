@@ -34,6 +34,15 @@ public extension Operation {
         return name ?? "Unnamed Operation"
     }
 
+    /**
+     Returns a non-optional `String` to use as the name
+     of an Operation. If the `name` property is not
+     set, this resorts to the class description.
+     */
+    var procedureName: String {
+        return operationName
+    }
+
     func addCompletionBlock(block: @escaping () -> Void) {
         if let existing = completionBlock {
             completionBlock = {
@@ -60,6 +69,14 @@ public extension Operation {
     */
     func add(dependency: Operation) {
         addDependency(dependency)
+    }
+
+    /**
+     Adds dependencies to the operation, using Swift 3 API style
+     - parameter dependencies: a variable number of Operation instances
+     */
+    func add(dependencies: Operation...) {
+        add(dependencies: dependencies)
     }
 
     /**

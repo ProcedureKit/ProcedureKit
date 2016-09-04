@@ -8,6 +8,8 @@ import Foundation
 
 public protocol ProcedureProcotol: class {
 
+    var procedureName: String { get }
+
     var isExecuting: Bool { get }
 
     var isFinished: Bool { get }
@@ -51,21 +53,25 @@ public protocol ProcedureProcotol: class {
 
 public extension ProcedureProcotol {
 
-    public func cancel(withError error: Error?) {
+    var failed: Bool {
+        return errors.count > 0
+    }
+
+    func cancel(withError error: Error?) {
         cancel(withErrors: error.map { [$0] } ?? [])
     }
 
-    public func procedureWillCancel(withErrors: [Error]) { }
+    func procedureWillCancel(withErrors: [Error]) { }
 
-    public func procedureDidCancel(withErrors: [Error]) { }
+    func procedureDidCancel(withErrors: [Error]) { }
 
-    public func finish(withError error: Error? = nil) {
+    func finish(withError error: Error? = nil) {
         finish(withErrors: error.map { [$0] } ?? [])
     }
 
-    public func procedureWillFinish(withErrors: [Error]) { }
+    func procedureWillFinish(withErrors: [Error]) { }
 
-    public func procedureDidFinish(withErrors: [Error]) { }
+    func procedureDidFinish(withErrors: [Error]) { }
 
 
     /**
