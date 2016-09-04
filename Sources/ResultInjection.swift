@@ -56,7 +56,6 @@ public extension ResultInjectionProtocol where Self: ProcedureProcotol {
             guard errors.isEmpty else {
                 procedure.cancel(withError: ProcedureKitError.dependency(finishedWithErrors: errors)); return
             }
-            procedure.log.verbose(message: "injecting \(dependency.result) from \(dependency)")
             procedure.requirement = dependency.result
         }
     }
@@ -70,7 +69,6 @@ public extension ResultInjectionProtocol where Self: ProcedureProcotol {
             guard let requirement = dependency.result else {
                 procedure.cancel(withError: ProcedureKitError.requirementNotSatisfied()); return
             }
-            procedure.log.verbose(message: "injecting \(dependency.result) from \(dependency)")
             procedure.requirement = requirement
         }
     }

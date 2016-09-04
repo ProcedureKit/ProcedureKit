@@ -26,7 +26,7 @@ open class TestProcedure: Procedure, ResultInjectionProtocol {
     public let error: Error?
     public let producedOperation: Operation?
     public var requirement: Void = ()
-    public var result: String? = nil
+    public var result: String? = "Hello World"
     public private(set) var didExecute = false
     public private(set) var procedureWillFinishCalled = false
     public private(set) var procedureDidFinishCalled = false
@@ -53,7 +53,6 @@ open class TestProcedure: Procedure, ResultInjectionProtocol {
         let deadline = DispatchTime(uptimeNanoseconds: UInt64(delay * Double(NSEC_PER_SEC)))
         DispatchQueue.main.asyncAfter(deadline: deadline) {
             self.didExecute = true
-            self.result = "Hello World"
             self.finish(withError: self.error)
         }
     }
