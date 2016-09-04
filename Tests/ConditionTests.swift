@@ -31,6 +31,10 @@ class ConditionTests: ProcedureKitTestCase {
         }
     }
 
+    func test__ignored_condition_is_cancelled() {
+        // TODO: Need to add IgnoredCondition
+    }
+
     func test__condition_which_is_executed_without_a_procedure() {
         let condition = TrueCondition()
         wait(for: condition)
@@ -107,8 +111,8 @@ class ConditionTests: ProcedureKitTestCase {
 
     func test__dependencies_execute_before_condition_dependencies() {
 
-        let dependency1 = TestProcedure(); dependency1.name = "Dependency 1"
-        let dependency2 = TestProcedure(); dependency2.name = "Dependency 2"
+        let dependency1 = TestProcedure(name: "Dependency 1")
+        let dependency2 = TestProcedure(name: "Dependency 2")
         procedure.add(dependencies: dependency1, dependency2)
 
         let conditionDependency1 = BlockOperation {
@@ -161,5 +165,43 @@ class ConditionTests: ProcedureKitTestCase {
         XCTAssertEqual(procedure.dependencies.count, 4)
     }
 
+    func test__target_and_condition_have_same_dependency() {
+        let dependency = TestProcedure()
+        let condition = TrueCondition(name: "Condition")
+        condition.add(dependency: dependency)
+
+        procedure.add(condition: condition)
+        procedure.add(dependency: dependency)
+
+        wait(for: dependency, procedure)
+
+        XCTAssertProcedureFinishedWithoutErrors(dependency)
+        XCTAssertProcedureFinishedWithoutErrors()
+    }
+
+    func test__procedure_is_direct_dependency_and_indirect_of_different_procedures() {
+        // See OPR-386
+        let dependency = TestProcedure(name: "Dependency")
+
+        let condition1 = TrueCondition(name: "Condition 1")
+        condition1.add(dependency: dependency)
+
+        let procedure1 = TestProcedure(name: "Procedure 1")
+        procedure1.add(condition: condition1)
+        procedure1.add(dependency: dependency)
+
+        let condition2 = TrueCondition(name: "Condition 2")
+        condition2.add(dependency: dependency)
+
+        let procedure2 = TestProcedure(name: "Procedure 2")
+        procedure2.add(condition: condition2)
+        procedure2.add(dependency: procedure1)
+
+        wait(for: procedure1, dependency, procedure2)
+
+        XCTAssertProcedureFinishedWithoutErrors(dependency)
+        XCTAssertProcedureFinishedWithoutErrors(procedure1)
+        XCTAssertProcedureFinishedWithoutErrors(procedure2)
+    }
 }
 
