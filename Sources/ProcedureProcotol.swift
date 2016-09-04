@@ -8,6 +8,8 @@ import Foundation
 
 public protocol ProcedureProcotol: class {
 
+    var procedureName: String { get }
+
     var isExecuting: Bool { get }
 
     var isFinished: Bool { get }
@@ -44,28 +46,32 @@ public protocol ProcedureProcotol: class {
 
     func add<Observer: ProcedureObserver>(observer: Observer) where Observer.Procedure == Self
 
-    // Dependency
+    // Dependencies
 
     func add<Dependency: ProcedureProcotol>(dependency: Dependency)
 }
 
 public extension ProcedureProcotol {
 
-    public func cancel(withError error: Error?) {
+    var failed: Bool {
+        return errors.count > 0
+    }
+
+    func cancel(withError error: Error?) {
         cancel(withErrors: error.map { [$0] } ?? [])
     }
 
-    public func procedureWillCancel(withErrors: [Error]) { }
+    func procedureWillCancel(withErrors: [Error]) { }
 
-    public func procedureDidCancel(withErrors: [Error]) { }
+    func procedureDidCancel(withErrors: [Error]) { }
 
-    public func finish(withError error: Error? = nil) {
+    func finish(withError error: Error? = nil) {
         finish(withErrors: error.map { [$0] } ?? [])
     }
 
-    public func procedureWillFinish(withErrors: [Error]) { }
+    func procedureWillFinish(withErrors: [Error]) { }
 
-    public func procedureDidFinish(withErrors: [Error]) { }
+    func procedureDidFinish(withErrors: [Error]) { }
 
 
     /**
@@ -121,13 +127,26 @@ public extension ResultInjectionProtocol {
 
 public extension ResultInjectionProtocol where Self: ProcedureProcotol {
 
-    func injectResultFrom<Dependency>(dependency: Dependency, block: @escaping (Self, Dependency, [Error]) -> Void) -> Self where Dependency: ProcedureProcotol, Dependency: ResultInjectionProtocol, Dependency.Result == Requirement {
+    func injectResultFrom<Dependency>(dependency: Dependency) -> Self where Dependency: ProcedureProcotol, Dependency: ResultInjectionProtocol, Dependency.Result == Requirement {
         return inject(dependency: dependency) { procedure, dependency, errors in
             guard errors.isEmpty else {
                 procedure.cancel(withErrors: errors); return
             }
             var mutuableProcedure = procedure
             mutuableProcedure.requirement = dependency.result
+        }
+    }
+
+    func requireResultFrom<Dependency>(dependency: Dependency) -> Self where Dependency: ProcedureProcotol, Dependency: ResultInjectionProtocol, Dependency.Result == Optional<Requirement> {
+        return inject(dependency: dependency) { procedure, dependency, errors in
+            guard errors.isEmpty else {
+                procedure.cancel(withErrors: errors); return
+            }
+            guard let requirement = dependency.result else {
+                procedure.cancel(withError: Errors.ProgrammingError(reason: "TODO")); return
+            }
+            var mutuableProcedure = procedure
+            mutuableProcedure.requirement = requirement
         }
     }
 }

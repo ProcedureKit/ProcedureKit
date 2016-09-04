@@ -54,6 +54,7 @@ open class StressTestCase: GroupTestCase {
 
     public enum StressLevel {
         case minimal, low, medium, high
+        case custom(Int, Int)
 
         public var batches: Int {
             switch self {
@@ -61,6 +62,7 @@ open class StressTestCase: GroupTestCase {
             case .low: return 2
             case .medium: return 3
             case .high: return 5
+            case let .custom(batches, _): return batches
             }
         }
 
@@ -70,16 +72,27 @@ open class StressTestCase: GroupTestCase {
             case .low: return 10_000
             case .medium: return 15_000
             case .high: return 30_000
+            case let .custom(_, batchSize): return batchSize
             }
         }
 
         public var batchTimeout: TimeInterval {
             switch self {
-            case .minimal: return 20
             case .low: return 30
             case .medium: return 200
             case .high: return 1_000
+            default: return 20
             }
+        }
+
+        public func forEach(body: (Int, Int) throws -> Void) rethrows {
+            try (0..<batches).forEach { batch in
+                try autoreleasepool {
+                    try (0..<batchSize).forEach { iteration in
+                        try body(batch, iteration)
+                    }
+                } // End of autorelease
+            } // End of batches
         }
     }
 

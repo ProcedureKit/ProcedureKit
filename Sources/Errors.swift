@@ -8,7 +8,13 @@ import Foundation
 
 public struct Errors {
 
+    public struct ProgrammingError: Error {
+        public let reason: String
+    }
+
     public struct Cancelled: Error {
         let errors: [Error]
     }
+
+
 }
