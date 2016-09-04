@@ -361,8 +361,6 @@
 		653C9FD81D6097D00070B7A2 /* ProcedureKit */ = {
 			isa = PBXGroup;
 			children = (
-				65A2D8031D6A1ED500FB067C /* AnyObserver.swift */,
-				65A2D7FA1D6852A500FB067C /* BlockObservers.swift */,
 				6584AF441D74770C0030DBB3 /* Errors.swift */,
 				65245D221D723A6B00340A2D /* Logging.swift */,
 				655E86461D67BA9C000FBA6C /* Support.swift */,
@@ -484,12 +482,14 @@
 		658A7B491D74D5B900F897C8 /* Core */ = {
 			isa = PBXGroup;
 			children = (
+				65A2D8031D6A1ED500FB067C /* AnyObserver.swift */,
+				65A2D7FA1D6852A500FB067C /* BlockObservers.swift */,
+				6518D5E21D7B3A2800A12EF4 /* Condition.swift */,
 				65245D261D7258E400340A2D /* Group.swift */,
 				65B97DB41D65138F00AC3B5D /* Procedure.swift */,
 				655E86441D67B9F9000FBA6C /* ProcedureObserver.swift */,
 				65A2D8011D6A05D800FB067C /* ProcedureProcotol.swift */,
 				655E86421D67B55B000FBA6C /* ProcedureQueue.swift */,
-				6518D5E21D7B3A2800A12EF4 /* Condition.swift */,
 			);
 			name = Core;
 			sourceTree = "<group>";
