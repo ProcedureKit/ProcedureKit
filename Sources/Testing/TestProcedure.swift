@@ -11,16 +11,22 @@ public struct TestError: Error, Equatable {
     public static func == (lhs: TestError, rhs: TestError) -> Bool {
         return lhs.uuid == rhs.uuid
     }
+
+    public static func verify(errors: [Error], count: Int = 1, contains error: TestError) -> Bool {
+        return (errors.count == count) && errors.contains { ($0 as? TestError) ?? TestError() == error }
+    }
+
     let uuid = UUID()
     public init() { }
 }
 
-open class TestProcedure: Procedure {
+open class TestProcedure: Procedure, ResultInjectionProtocol {
 
     public let delay: TimeInterval
     public let error: Error?
     public let producedOperation: Operation?
-    public var result: String? = "Hello World"
+    public var requirement: Void = ()
+    public var result: String? = nil
     public private(set) var didExecute = false
     public private(set) var procedureWillFinishCalled = false
     public private(set) var procedureDidFinishCalled = false
@@ -47,6 +53,7 @@ open class TestProcedure: Procedure {
         let deadline = DispatchTime(uptimeNanoseconds: UInt64(delay * Double(NSEC_PER_SEC)))
         DispatchQueue.main.asyncAfter(deadline: deadline) {
             self.didExecute = true
+            self.result = "Hello World"
             self.finish(withError: self.error)
         }
     }
