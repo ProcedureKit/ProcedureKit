@@ -544,7 +544,7 @@ open class Procedure: Operation, ProcedureProcotol, ResultInjectionProtocol {
 public extension Procedure {
 
     /**
-     Add an observer to the to the procedure.
+     Add an observer to the procedure.
 
      - parameter observer: type conforming to protocol `ProcedureObserver`.
      */
@@ -715,9 +715,9 @@ public extension Procedure {
     }
 
     /**
-     Add an observer to the to the procedure.
+     Add a condition to the procedure.
 
-     - parameter observer: type conforming to protocol `ProcedureObserver`.
+     - parameter condition: a `Condition` which must be satisfied for the procedure to be executed.
      */
     func add(condition: Condition) {
         assert(state < .executing, "Cannot modify conditions after operation has begun executing, current state: \(state).")
