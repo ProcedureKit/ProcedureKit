@@ -77,7 +77,7 @@ open class Condition: Procedure, ConditionProtocol {
         evaluate(procedure: procedure, completion: finish)
     }
 
-    public func evaluate(procedure: Procedure, completion: (ConditionResult) -> Void) {
+    open func evaluate(procedure: Procedure, completion: (ConditionResult) -> Void) {
         completion(.failed(Errors.ProgrammingError(reason: "Condition must be subclassed, and \(#function) overridden.")))
     }
 
