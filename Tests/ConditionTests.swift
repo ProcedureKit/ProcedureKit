@@ -27,12 +27,8 @@ class ConditionTests: ProcedureKitTestCase {
             guard case let .failed(error) = result else {
                 XCTFail("FalseCondition did not evaluate as failed."); return
             }
-            XCTAssertTrue(error is Errors.FalseCondition)
+            XCTAssertTrue(error is ProcedureKitError.FalseCondition)
         }
-    }
-
-    func test__ignored_condition_is_cancelled() {
-        // TODO: Need to add IgnoredCondition
     }
 
     func test__condition_which_is_executed_without_a_procedure() {

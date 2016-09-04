@@ -18,6 +18,8 @@ public protocol ProcedureProcotol: class {
 
     var errors: [Error] { get }
 
+    var log: LoggerProtocol { get }
+
     // Execution
 
     func willEnqueue()
@@ -130,8 +132,9 @@ public extension ResultInjectionProtocol where Self: ProcedureProcotol {
     func injectResultFrom<Dependency>(dependency: Dependency) -> Self where Dependency: ProcedureProcotol, Dependency: ResultInjectionProtocol, Dependency.Result == Requirement {
         return inject(dependency: dependency) { procedure, dependency, errors in
             guard errors.isEmpty else {
-                procedure.cancel(withErrors: errors); return
+                procedure.cancel(withError: ProcedureKitError.dependency(finishedWithErrors: errors)); return
             }
+            procedure.log.verbose(message: "injecting result from dependency")
             var mutuableProcedure = procedure
             mutuableProcedure.requirement = dependency.result
         }
@@ -140,11 +143,12 @@ public extension ResultInjectionProtocol where Self: ProcedureProcotol {
     func requireResultFrom<Dependency>(dependency: Dependency) -> Self where Dependency: ProcedureProcotol, Dependency: ResultInjectionProtocol, Dependency.Result == Optional<Requirement> {
         return inject(dependency: dependency) { procedure, dependency, errors in
             guard errors.isEmpty else {
-                procedure.cancel(withErrors: errors); return
+                procedure.cancel(withError: ProcedureKitError.dependency(finishedWithErrors: errors)); return
             }
             guard let requirement = dependency.result else {
-                procedure.cancel(withError: Errors.ProgrammingError(reason: "TODO")); return
+                procedure.cancel(withError: ProcedureKitError.requirementNotSatisfied()); return
             }
+            procedure.log.verbose(message: "injecting result from dependency")
             var mutuableProcedure = procedure
             mutuableProcedure.requirement = requirement
         }

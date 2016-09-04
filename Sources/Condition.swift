@@ -50,7 +50,7 @@ internal extension ConditionProtocol {
 
 // MARK: Condition Errors
 
-public extension Errors {
+public extension ProcedureKitError {
 
     public struct FalseCondition: Error {
         internal init() { }
@@ -81,7 +81,7 @@ open class Condition: Procedure, ConditionProtocol {
     }
 
     open func evaluate(procedure: Procedure, completion: (ConditionResult) -> Void) {
-        completion(.failed(Errors.ProgrammingError(reason: "Condition must be subclassed, and \(#function) overridden.")))
+        completion(.failed(ProcedureKitError.programmingError(reason: "Condition must be subclassed, and \(#function) overridden.")))
     }
 
     internal func finish(withConditionResult conditionResult: ConditionResult) {
@@ -112,7 +112,7 @@ public class FalseCondition: Condition {
     }
 
     public override func evaluate(procedure: Procedure, completion: (ConditionResult) -> Void) {
-        completion(.failed(Errors.FalseCondition()))
+        completion(.failed(ProcedureKitError.FalseCondition()))
     }
 }
 
