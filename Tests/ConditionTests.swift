@@ -203,5 +203,40 @@ class ConditionTests: ProcedureKitTestCase {
         XCTAssertProcedureFinishedWithoutErrors(procedure1)
         XCTAssertProcedureFinishedWithoutErrors(procedure2)
     }
+
+    // MARK: - Ignored Conditions
+
+    func test__ignored_failing_condition_does_not_result_in_failure() {
+        let procedure1 = TestProcedure(name: "Procedure 1")
+        procedure1.add(condition: IgnoredCondition(FalseCondition()))
+
+        let procedure2 = TestProcedure(name: "Procedure 2")
+        procedure2.add(condition: FalseCondition())
+
+        wait(for: procedure1, procedure2)
+
+        XCTAssertProcedureCancelledWithoutErrors(procedure1)
+        XCTAssertProcedureCancelledWithErrors(procedure2, count: 1)
+    }
+
+    func test__ignored_satisfied_condition_does_not_result_in_failure() {
+        let procedure1 = TestProcedure(name: "Procedure 1")
+        procedure1.add(condition: IgnoredCondition(TrueCondition()))
+
+        let procedure2 = TestProcedure(name: "Procedure 2")
+        procedure2.add(condition: TrueCondition())
+
+        wait(for: procedure1, procedure2)
+
+        XCTAssertProcedureFinishedWithoutErrors(procedure1)
+        XCTAssertProcedureFinishedWithoutErrors(procedure2)
+
+    }
+
+    func test__ignored_ignored_condition_does_not_result_in_failure() {
+        procedure.add(condition: IgnoredCondition(IgnoredCondition(FalseCondition())))
+        wait(for: procedure)
+        XCTAssertProcedureCancelledWithoutErrors()
+    }
 }
 

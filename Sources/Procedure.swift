@@ -561,7 +561,11 @@ public extension Procedure {
 public extension Procedure {
 
     public func add<Dependency: ProcedureProcotol>(dependency: Dependency) {
-
+        guard let op = dependency as? Operation else {
+            assertionFailure("Adding dependencies which do not subclass Foundation.Operation is not supported.")
+            return
+        }
+        add(dependency: op)
     }
 }
 
@@ -579,12 +583,10 @@ public extension Procedure {
         }
 
         func evaluate(condition: Condition, withErrors errors: [Error]) -> ConditionEvaluation {
-            guard let result = condition.result else {
+            switch  (self, condition.result) {
+            case (_, .pending):
                 if errors.isEmpty { return self }
                 else { return .failed(errors) }
-            }
-
-            switch  (self, result) {
             case let (_, .failed(conditionError)):
                 var errors = self.errors
                 errors.append(conditionError)

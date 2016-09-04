@@ -13,6 +13,9 @@ import Foundation
  */
 public enum ConditionResult {
 
+    /// Indicates that the condition is pending
+    case pending
+
     /// Indicates that the condition is satisfied
     case satisfied
 
@@ -66,7 +69,7 @@ open class Condition: Procedure, ConditionProtocol {
         }
     }
 
-    public var result: ConditionResult! = nil
+    public var result: ConditionResult = .pending
 
     open override func execute() {
         guard let procedure = procedure else {
@@ -110,5 +113,82 @@ public class FalseCondition: Condition {
 
     public override func evaluate(procedure: Procedure, completion: (ConditionResult) -> Void) {
         completion(.failed(Errors.FalseCondition()))
+    }
+}
+
+/**
+ Class which can be used to compose a Condition, it is designed to be subclassed.
+
+ This can be useful to automatically manage the dependency and automatic
+ injection of the composed condition result for evaluation inside your custom subclass.
+
+ - see: NegatedCondition
+ - see: SilentCondition
+ */
+open class ComposedCondition<C: Condition>: Condition {
+
+    /**
+     The composed condition.
+
+     - parameter condition: a the composed `Condition`
+     */
+    public let condition: C
+
+    override var directDependencies: Set<Operation> {
+        return super.directDependencies.union(condition.directDependencies)
+    }
+
+    public var requirement: ConditionResult = .pending
+
+    override var procedure: Procedure? {
+        didSet {
+            condition.procedure = procedure
+        }
+    }
+
+    /**
+     Initializer which receives a conditon.
+
+     - parameter [unnamed]: a nested `Condition` type.
+     */
+    public init(_ condition: C) {
+        self.condition = condition
+        super.init()
+        mutuallyExclusive = condition.mutuallyExclusive
+        name = condition.name
+        let _ = inject(dependency: condition) { procedure, condition, _ in
+            procedure.requirement = condition.result
+        }
+    }
+
+    /// Override of public function
+    open override func evaluate(procedure: Procedure, completion: (ConditionResult) -> Void) {
+        completion(requirement)
+    }
+
+    override func remove(directDependency: Operation) {
+        condition.remove(directDependency: directDependency)
+        super.remove(directDependency: directDependency)
+    }
+}
+
+public class IgnoredCondition<C: Condition>: ComposedCondition<C> {
+
+    /// Public override of initializer.
+    public override init(_ condition: C) {
+        super.init(condition)
+        name = condition.name.map { "Ignored<\($0)>" }
+    }
+
+    /// Override of public function
+    public override func evaluate(procedure: Procedure, completion: (ConditionResult) -> Void) {
+        super.evaluate(procedure: procedure) { composedResult in
+            if case .failed(_) = composedResult {
+                completion(.ignored)
+            }
+            else {
+                completion(composedResult)
+            }
+        }
     }
 }

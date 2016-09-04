@@ -21,6 +21,10 @@ extension Collection where Iterator.Element: Operation {
         }
     }
 
+    internal var conditions: [Condition] {
+        return flatMap { $0 as? Condition }
+    }
+
     internal var userIntent: Procedure.UserIntent {
         get {
             let (_, procedures) = operationsAndProcedures

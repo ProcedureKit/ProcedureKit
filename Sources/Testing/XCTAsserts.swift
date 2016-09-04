@@ -116,7 +116,7 @@ public extension ProcedureKitTestCase {
                 return .expectedFailure("\(procedure.procedureName) has failed with errors: \"\(procedure.errors)\".")
             }
             guard procedure.isCancelled else {
-                return .expectedFailure("\(procedure.procedureName) was cancelled.")
+                return .expectedFailure("\(procedure.procedureName) was not cancelled.")
             }
             guard procedure.isFinished else {
                 return .expectedFailure("\(procedure.procedureName) did not finish.")
@@ -132,7 +132,7 @@ public extension ProcedureKitTestCase {
                 return .expectedFailure("\(procedure.procedureName) did not have any errors.")
             }
             guard procedure.isCancelled else {
-                return .expectedFailure("\(procedure.procedureName) was cancelled.")
+                return .expectedFailure("\(procedure.procedureName) was not cancelled.")
             }
             guard procedure.isFinished else {
                 return .expectedFailure("\(procedure.procedureName) did not finish.")
@@ -152,7 +152,7 @@ public extension ProcedureKitTestCase {
                 return .expectedFailure("\(procedure.procedureName) number of errors: (\(procedure.errors.count)), did not meet expectation: (\(count)).")
             }
             guard procedure.isCancelled else {
-                return .expectedFailure("\(procedure.procedureName) was cancelled.")
+                return .expectedFailure("\(procedure.procedureName) was not cancelled.")
             }
             guard procedure.isFinished else {
                 return .expectedFailure("\(procedure.procedureName) did not finish.")
@@ -184,6 +184,26 @@ public extension ProcedureKitTestCase {
             return .success
         }
     }
+
+    func XCTAssertProcedureCancelledWithoutErrors<T: ProcedureProcotol>(_ exp: @autoclosure () throws -> T, _ message: @autoclosure () -> String = "", file: StaticString = #file, line: UInt = #line) where T: TestProcedure {
+        __XCTEvaluateAssertion(testCase: self, message, file: file, line: line) {
+            let procedure = try exp()
+            guard !procedure.failed else {
+                return .expectedFailure("\(procedure.procedureName) has failed with errors: \"\(procedure.errors)\".")
+            }
+            guard !procedure.didExecute else {
+                return .expectedFailure("\(procedure.procedureName) did execute.")
+            }
+            guard procedure.isCancelled else {
+                return .expectedFailure("\(procedure.procedureName) was not cancelled.")
+            }
+            guard procedure.isFinished else {
+                return .expectedFailure("\(procedure.procedureName) did not finish.")
+            }
+            return .success
+        }
+    }
+
 }
 
 public extension ProcedureKitTestCase {
