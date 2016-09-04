@@ -81,7 +81,7 @@ open class Group: Procedure, ProcedureQueueDelegate {
             else {
                 let (operations, procedures) = group.children.operationsAndProcedures
                 operations.forEach { $0.cancel() }
-                procedures.forEach { $0.cancel(withError: Errors.Cancelled(errors: errors)) }
+                procedures.forEach { $0.cancel(withError: ProcedureKitError.parent(cancelledWithErrors: errors)) }
             }
         }
     }

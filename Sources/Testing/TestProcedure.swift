@@ -7,7 +7,11 @@
 import Foundation
 import ProcedureKit
 
-public struct TestError: Error {
+public struct TestError: Error, Equatable {
+    public static func == (lhs: TestError, rhs: TestError) -> Bool {
+        return lhs.uuid == rhs.uuid
+    }
+    let uuid = UUID()
     public init() { }
 }
 
@@ -16,8 +20,8 @@ open class TestProcedure: Procedure {
     public let delay: TimeInterval
     public let error: Error?
     public let producedOperation: Operation?
+    public var result: String? = "Hello World"
     public private(set) var didExecute = false
-
     public private(set) var procedureWillFinishCalled = false
     public private(set) var procedureDidFinishCalled = false
     public private(set) var procedureWillCancelCalled = false

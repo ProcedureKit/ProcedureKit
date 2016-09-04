@@ -43,6 +43,7 @@
 		65403AB81D7C453200D6036B /* ConditionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65403AB71D7C453200D6036B /* ConditionTests.swift */; };
 		65403ABA1D7C49C500D6036B /* XCTAsserts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65403AB91D7C49C500D6036B /* XCTAsserts.swift */; };
 		65403ABC1D7C6CBC00D6036B /* TestCondition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65403ABB1D7C6CBC00D6036B /* TestCondition.swift */; };
+		65403ABE1D7C9E7600D6036B /* ResultInjectionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65403ABD1D7C9E7600D6036B /* ResultInjectionTests.swift */; };
 		655E86431D67B55B000FBA6C /* ProcedureQueue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 655E86421D67B55B000FBA6C /* ProcedureQueue.swift */; };
 		655E86451D67B9F9000FBA6C /* ProcedureObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 655E86441D67B9F9000FBA6C /* ProcedureObserver.swift */; };
 		655E86471D67BA9C000FBA6C /* Support.swift in Sources */ = {isa = PBXBuildFile; fileRef = 655E86461D67BA9C000FBA6C /* Support.swift */; };
@@ -225,6 +226,7 @@
 		65403AB71D7C453200D6036B /* ConditionTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ConditionTests.swift; path = Tests/ConditionTests.swift; sourceTree = "<group>"; };
 		65403AB91D7C49C500D6036B /* XCTAsserts.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = XCTAsserts.swift; path = Sources/Testing/XCTAsserts.swift; sourceTree = "<group>"; };
 		65403ABB1D7C6CBC00D6036B /* TestCondition.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TestCondition.swift; path = Sources/Testing/TestCondition.swift; sourceTree = "<group>"; };
+		65403ABD1D7C9E7600D6036B /* ResultInjectionTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ResultInjectionTests.swift; path = Tests/ResultInjectionTests.swift; sourceTree = "<group>"; };
 		655E86421D67B55B000FBA6C /* ProcedureQueue.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ProcedureQueue.swift; path = Sources/ProcedureQueue.swift; sourceTree = "<group>"; };
 		655E86441D67B9F9000FBA6C /* ProcedureObserver.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ProcedureObserver.swift; path = Sources/ProcedureObserver.swift; sourceTree = "<group>"; };
 		655E86461D67BA9C000FBA6C /* Support.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Support.swift; path = Sources/Support.swift; sourceTree = "<group>"; };
@@ -361,8 +363,6 @@
 		653C9FD81D6097D00070B7A2 /* ProcedureKit */ = {
 			isa = PBXGroup;
 			children = (
-				65A2D8031D6A1ED500FB067C /* AnyObserver.swift */,
-				65A2D7FA1D6852A500FB067C /* BlockObservers.swift */,
 				6584AF441D74770C0030DBB3 /* Errors.swift */,
 				65245D221D723A6B00340A2D /* Logging.swift */,
 				655E86461D67BA9C000FBA6C /* Support.swift */,
@@ -382,6 +382,7 @@
 				65245D241D724FC200340A2D /* LoggerTests.swift */,
 				653C9FE81D6099F10070B7A2 /* ProcedureKitTests.swift */,
 				65245D1C1D721A7100340A2D /* ProcedureTests.swift */,
+				65403ABD1D7C9E7600D6036B /* ResultInjectionTests.swift */,
 			);
 			name = Tests;
 			sourceTree = "<group>";
@@ -484,12 +485,14 @@
 		658A7B491D74D5B900F897C8 /* Core */ = {
 			isa = PBXGroup;
 			children = (
+				65A2D8031D6A1ED500FB067C /* AnyObserver.swift */,
+				65A2D7FA1D6852A500FB067C /* BlockObservers.swift */,
+				6518D5E21D7B3A2800A12EF4 /* Condition.swift */,
 				65245D261D7258E400340A2D /* Group.swift */,
 				65B97DB41D65138F00AC3B5D /* Procedure.swift */,
 				655E86441D67B9F9000FBA6C /* ProcedureObserver.swift */,
 				65A2D8011D6A05D800FB067C /* ProcedureProcotol.swift */,
 				655E86421D67B55B000FBA6C /* ProcedureQueue.swift */,
-				6518D5E21D7B3A2800A12EF4 /* Condition.swift */,
 			);
 			name = Core;
 			sourceTree = "<group>";
@@ -1141,6 +1144,7 @@
 			files = (
 				65245D251D724FC200340A2D /* LoggerTests.swift in Sources */,
 				6591B3001D74954E00C2B57F /* GroupTests.swift in Sources */,
+				65403ABE1D7C9E7600D6036B /* ResultInjectionTests.swift in Sources */,
 				65245D1F1D7231DC00340A2D /* CancellationTests.swift in Sources */,
 				65245D211D72345000340A2D /* FinishingTests.swift in Sources */,
 				65403AB81D7C453200D6036B /* ConditionTests.swift in Sources */,
