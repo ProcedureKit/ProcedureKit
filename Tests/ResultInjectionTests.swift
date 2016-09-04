@@ -8,7 +8,8 @@ import XCTest
 import TestingProcedureKit
 @testable import ProcedureKit
 
-class DataProcessing: Procedure {
+class DataProcessing: Procedure, ResultInjectionProtocol {
+    let result: Void = ()
     var requirement: String? = nil
 
     override func execute() {
@@ -21,20 +22,32 @@ class DataProcessing: Procedure {
     }
 }
 
+class Printing: Procedure, ResultInjectionProtocol {
+    let result: Void = ()
+    var requirement: String = "Default Requirement"
+
+    override func execute() {
+        log.info(message: requirement)
+        finish()
+    }
+}
+
 class ResultInjectionTestCase: ProcedureKitTestCase {
     var processing: DataProcessing!
+    var printing: Printing!
 
     override func setUp() {
         super.setUp()
         processing = DataProcessing()
+        printing = Printing()
     }
 }
 
-class ManualResultInjectionTests: ResultInjectionTestCase {
+class ResultInjectionTests: ResultInjectionTestCase {
 
     func test__block_is_executed() {
         var injectionBlockDidExecute = false
-        let _ = processing.inject(dependency: procedure) { processing, dependency, errors in
+        processing.inject(dependency: procedure) { processing, dependency, errors in
             injectionBlockDidExecute = true
         }
         wait(for: procedure, processing)
@@ -45,11 +58,85 @@ class ManualResultInjectionTests: ResultInjectionTestCase {
         let error = TestError()
         var receivedErrors: [Error] = []
         procedure = TestProcedure(error: error)
-        let _ = processing.inject(dependency: procedure) { processing, dependency, errors in
+        processing.inject(dependency: procedure) { processing, dependency, errors in
             receivedErrors = errors
         }
         wait(for: procedure, processing)
-        XCTAssertEqual(error, (receivedErrors.first as? TestError) ?? TestError())
+        XCTAssertTrue(TestError.verify(errors: receivedErrors, contains: error))
+    }
+
+    func test__automatic_requirement_is_injected() {
+        processing.injectResultFrom(dependency: procedure)
+        wait(for: processing, procedure)
+        XCTAssertProcedureFinishedWithoutErrors(processing)
+    }
+
+    func test__receiver_cancels_with_error_if_dependency_errors() {
+        let error = TestError()
+        procedure = TestProcedure(error: error)
+        processing.injectResultFrom(dependency: procedure)
+        processing.addDidCancelBlockObserver { processing, errors in
+            XCTAssertEqual(errors.count, 1)
+            guard let procedureKitError = errors.first as? ProcedureKitError else {
+                XCTFail("Incorrect error received"); return
+            }
+            XCTAssertEqual(procedureKitError.context, .dependencyFinishedWithErrors)
+            XCTAssertTrue(TestError.verify(errors: procedureKitError.errors, contains: error))
+        }
+        wait(for: processing, procedure)
+        XCTAssertProcedureCancelledWithErrors(processing, count: 1)
+    }
+
+    func test__receiver_cancels_with_error_if_dependency_errors_2() {
+        let error = TestError()
+        procedure = TestProcedure(error: error)
+        printing.requireResultFrom(dependency: procedure)
+        printing.addDidCancelBlockObserver { processing, errors in
+            XCTAssertEqual(errors.count, 1)
+            guard let procedureKitError = errors.first as? ProcedureKitError else {
+                XCTFail("Incorrect error received"); return
+            }
+            XCTAssertEqual(procedureKitError.context, .dependencyFinishedWithErrors)
+            XCTAssertTrue(TestError.verify(errors: procedureKitError.errors, contains: error))
+        }
+        wait(for: printing, procedure)
+        XCTAssertProcedureCancelledWithErrors(printing, count: 1)
+    }
+
+
+    func test__requirement_is_injected() {
+        printing.requireResultFrom(dependency: procedure)
+        wait(for: procedure, printing)
+        XCTAssertEqual(printing.requirement, procedure.result ?? "not what we expect")
+    }
+
+    func test__receiver_cancels_with_errors_if_requirement_not_met() {
+        procedure.result = nil
+        printing.requireResultFrom(dependency: procedure)
+        printing.addDidCancelBlockObserver { printing, errors in
+            XCTAssertEqual(errors.count, 1)
+            guard let procedureKitError = errors.first as? ProcedureKitError else {
+                XCTFail("Incorrect error received"); return
+            }
+            XCTAssertEqual(procedureKitError.context, .requirementNotSatisfied)
+        }
+        wait(for: printing, procedure)
+        XCTAssertProcedureCancelledWithErrors(printing, count: 1)
+    }
+
+    func test__receiver_cancels_if_dependency_is_cancelled() {
+        processing.injectResultFrom(dependency: procedure)
+        processing.addDidCancelBlockObserver { printing, errors in
+            XCTAssertEqual(errors.count, 1)
+            guard let procedureKitError = errors.first as? ProcedureKitError else {
+                XCTFail("Incorrect error received"); return
+            }
+            XCTAssertEqual(procedureKitError.context, .parentCancelledWithErrors)
+        }
+        procedure.cancel()
+        wait(for: processing, procedure)
+        XCTAssertProcedureCancelledWithErrors(processing, count: 1)
     }
 }
+
 

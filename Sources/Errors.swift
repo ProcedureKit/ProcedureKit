@@ -8,7 +8,18 @@ import Foundation
 
 public struct ProcedureKitError: Error {
 
-    public enum Context {
+    public enum Context: Equatable {
+
+        public static func == (lhs: Context, rhs: Context) -> Bool {
+            switch (lhs, rhs) {
+            case (.unknown, .unknown), (.dependencyFinishedWithErrors, .dependencyFinishedWithErrors), (.parentCancelledWithErrors, .parentCancelledWithErrors), (.requirementNotSatisfied, .requirementNotSatisfied):
+                return true
+            case let (.programmingError(lhsReason), .programmingError(rhsReason)):
+                return lhsReason == rhsReason
+            default: return false
+            }
+        }
+
         case unknown
         case programmingError(String)
         case dependencyFinishedWithErrors
@@ -32,6 +43,6 @@ public struct ProcedureKitError: Error {
         return ProcedureKitError(context: .requirementNotSatisfied, errors: [])
     }
 
-    let context: Context
-    let errors: [Error]
+    public let context: Context
+    public let errors: [Error]
 }

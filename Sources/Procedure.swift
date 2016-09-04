@@ -10,7 +10,7 @@ import Foundation
 
 // swiftlint:disable type_body_length
 
-open class Procedure: Operation, ProcedureProcotol, ResultInjectionProtocol {
+open class Procedure: Operation, ProcedureProcotol {
 
     private enum FinishingFrom {
         case main, cancel, finish

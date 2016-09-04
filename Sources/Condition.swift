@@ -156,7 +156,7 @@ open class ComposedCondition<C: Condition>: Condition {
         super.init()
         mutuallyExclusive = condition.mutuallyExclusive
         name = condition.name
-        let _ = inject(dependency: condition) { procedure, condition, _ in
+        inject(dependency: condition) { procedure, condition, _ in
             procedure.requirement = condition.result
         }
     }

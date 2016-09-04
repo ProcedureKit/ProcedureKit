@@ -11,15 +11,21 @@ public struct TestError: Error, Equatable {
     public static func == (lhs: TestError, rhs: TestError) -> Bool {
         return lhs.uuid == rhs.uuid
     }
+
+    public static func verify(errors: [Error], count: Int = 1, contains error: TestError) -> Bool {
+        return (errors.count == count) && errors.contains { ($0 as? TestError) ?? TestError() == error }
+    }
+
     let uuid = UUID()
     public init() { }
 }
 
-open class TestProcedure: Procedure {
+open class TestProcedure: Procedure, ResultInjectionProtocol {
 
     public let delay: TimeInterval
     public let error: Error?
     public let producedOperation: Operation?
+    public var requirement: Void = ()
     public var result: String? = "Hello World"
     public private(set) var didExecute = false
     public private(set) var procedureWillFinishCalled = false
