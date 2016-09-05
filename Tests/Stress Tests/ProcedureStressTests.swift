@@ -21,7 +21,7 @@ class ProcedureCompletionBlockStressTest: StressTestCase {
     }
 }
 
-class ProcedureCancelWithErrorsThreadSafetyStressTest: StressTestCase {
+class CancelProcedureWithErrorsThreadSafetyStressTest: StressTestCase {
 
     func test__cancel_with_errors_thread_safety() {
 

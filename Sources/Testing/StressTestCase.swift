@@ -15,11 +15,11 @@ public class Counter {
         return Int(_count)
     }
 
-    public func increment() -> Int32 {
+    @discardableResult public func increment() -> Int32 {
         return OSAtomicIncrement32(&_count)
     }
 
-    public func barrierIncrement() -> Int32 {
+    @discardableResult public func barrierIncrement() -> Int32 {
         return OSAtomicIncrement32Barrier(&_count)
     }
 
@@ -30,23 +30,39 @@ public protocol BatchProtocol {
     var startTime: CFAbsoluteTime { get }
     var dispatchGroup: DispatchGroup { get }
     var queue: ProcedureQueue { get }
-    var counter: Counter { get }
     var number: Int { get }
     var size: Int { get }
+
+    func counter(named: String) -> Int
+
+    @discardableResult func incrementCounter(named: String, withBarrier: Bool) -> Int32
 }
 
 open class Batch: BatchProtocol {
     public let startTime = CFAbsoluteTimeGetCurrent()
     public let dispatchGroup = DispatchGroup()
-    public let counter = Counter()
     public let queue: ProcedureQueue
     public let number: Int
     public let size: Int
+
+    private var counters = Dictionary<String, Counter>()
 
     public init(queue: ProcedureQueue = ProcedureQueue(), number: Int, size: Int) {
         self.queue = queue
         self.number = number
         self.size = size
+    }
+
+    public func counter(named: String = "Standard") -> Int {
+        return counters[named]?.count ?? 0
+    }
+
+    @discardableResult public func incrementCounter(named: String = "Standard", withBarrier barrier: Bool = true) -> Int32 {
+        guard let counter = counters[named] else {
+            counters[named] = Counter()
+            return incrementCounter(named: named, withBarrier: barrier)
+        }
+        return barrier ? counter.barrierIncrement() : counter.increment()
     }
 }
 
