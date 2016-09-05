@@ -7,29 +7,27 @@
 import Foundation
 
 /**
- A `Procedure` which composes a block.
+ A `Procedure` which performs a transform mapping
  */
-public class BlockProcedure<Requirement, Result>: Procedure, ResultInjectionProtocol {
+public class MapProcedure<Requirement, Result>: Procedure, ResultInjectionProtocol {
 
-    public typealias Block = (Requirement!) throws -> Result
+    public typealias Transform = (Requirement!) throws -> Result
 
-    private let block: Block
-
+    private let transform: Transform
 
     public var requirement: Requirement! = nil
     public var result: Result! = nil
 
-    public init(block: Block) {
-        self.block = block
+    public init(transform: Transform) {
+        self.transform = transform
         super.init()
     }
 
     public override func execute() {
-        guard !isCancelled else { return }
         var finishingError: Error? = nil
         defer { finish(withError: finishingError) }
         do {
-            result = try block(requirement)
+            result = try transform(requirement)
         }
         catch {
             finishingError = error
@@ -37,4 +35,9 @@ public class BlockProcedure<Requirement, Result>: Procedure, ResultInjectionProt
     }
 }
 
-public typealias VoidBlockProcedure = BlockProcedure<Void, Void>
+public class BlockProcedure: MapProcedure<Void, Void> {
+
+    public init(block: @escaping () throws -> Void) {
+        super.init { _ in try block() }
+    }
+}
