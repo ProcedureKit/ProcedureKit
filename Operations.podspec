@@ -36,7 +36,7 @@ session Advanced NSOperations: https://developer.apple.com/videos/wwdc/2015/?id=
       'Sources/Extras/Calendar/Shared',
       'Sources/Extras/Passbook/iOS',
       'Sources/Extras/Photos/iOS',
-      'Sources/Extras/Location/iOS'
+      'Sources/Extras/Location/iOS',
       'Sources/Extras/Health/iOS'      
     ]
     ss.ios.exclude_files = [
