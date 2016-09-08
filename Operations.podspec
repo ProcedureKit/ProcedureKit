@@ -31,22 +31,23 @@ session Advanced NSOperations: https://developer.apple.com/videos/wwdc/2015/?id=
       'Sources/Features/Shared',
       'Sources/Features/iOS'
     ]
+    ss.exclude_files = [
+      'Sources/Extras/CloudKit/Shared', 
+      'Sources/Extras/Calendar/Shared',
+      'Sources/Extras/Passbook/iOS',
+      'Sources/Extras/Photos/iOS',
+      'Sources/Extras/Location/iOS'
+      'Sources/Extras/Health/iOS'      
+    ]
     ss.ios.exclude_files = [
-      'Sources/Features/Shared/CloudKit',
       'Sources/Features/Shared/TaskOperation.swift',
-      'Sources/Features/iOS/PhotosCapability.swift',
-      'Sources/Features/iOS/PassbookCapability.swift'
     ]
     ss.watchos.exclude_files = [
       'Sources/Core/iOS',
-      'Sources/Features/Shared/CloudKit',
       'Sources/Features/Shared/ReachabilityCondition.swift',
       'Sources/Features/Shared/ReachableOperation.swift',
       'Sources/Features/Shared/Reachability.swift',
       'Sources/Features/Shared/TaskOperation.swift',      
-      'Sources/Features/iOS/LocationCapability.swift',
-      'Sources/Features/iOS/LocationOperations.swift',
-      'Sources/Features/iOS/PhotosCapability.swift',
       'Sources/Features/iOS/RemoteNotificationCondition.swift',
       'Sources/Features/iOS/UserConfirmationCondition.swift',
       'Sources/Features/iOS/UserNotificationCondition.swift',
@@ -54,14 +55,7 @@ session Advanced NSOperations: https://developer.apple.com/videos/wwdc/2015/?id=
       'Sources/Features/iOS/OpenInSafariOperation.swift'
     ]
     ss.tvos.exclude_files = [
-      'Sources/Features/Shared/CloudKit',    
-      'Sources/Features/Shared/CalendarCapability.swift',      
       'Sources/Features/Shared/TaskOperation.swift',                  
-      'Sources/Features/iOS/HealthCapability.swift',
-      'Sources/Features/iOS/LocationCapability.swift',
-      'Sources/Features/iOS/LocationOperations.swift',      
-      'Sources/Features/iOS/PassbookCapability.swift',
-      'Sources/Features/iOS/PhotosCapability.swift',
       'Sources/Features/iOS/RemoteNotificationCondition.swift',
       'Sources/Features/iOS/UserNotificationCondition.swift',
       'Sources/Features/iOS/WebpageOperation.swift',
@@ -70,7 +64,6 @@ session Advanced NSOperations: https://developer.apple.com/videos/wwdc/2015/?id=
     ss.osx.exclude_files = [
       'Sources/Core/iOS',
       'Sources/Features/iOS',
-      'Sources/Features/Shared/CloudKit'
     ]
   end
 
@@ -134,13 +127,23 @@ session Advanced NSOperations: https://developer.apple.com/videos/wwdc/2015/?id=
     ]
   end
 	
+  # Subspec which includes CalendarCapability.
+  s.subspec '+Calendar' do |ss|
+    ss.platforms = { :ios => "8.0", :osx => "10.8", :watchos => "2.0" }
+    ss.dependency 'Operations/Standard'
+    ss.frameworks = 'EventKit'    
+    ss.source_files = [
+      'Sources/Extras/Calendar/Shared',
+    ]
+  end
+	
   # Subspec which includes CloudKit functionality
   s.subspec '+CloudKit' do |ss|
     ss.platforms = { :ios => "8.0", :tvos => "9.0", :osx => "10.10" }
     ss.dependency 'Operations/Standard'
     ss.frameworks = 'CloudKit'    
     ss.source_files = [
-      'Sources/Features/Shared/CloudKit'
+      'Sources/Extras/CloudKit/Shared'
     ]
   end
 	
@@ -150,7 +153,7 @@ session Advanced NSOperations: https://developer.apple.com/videos/wwdc/2015/?id=
     ss.dependency 'Operations/Standard'
     ss.frameworks = 'Photos'
     ss.source_files = [
-      'Sources/Features/iOS/PhotosCapability.swift'
+      'Sources/Extras/Photos/iOS'
     ]
   end
 	
@@ -160,7 +163,7 @@ session Advanced NSOperations: https://developer.apple.com/videos/wwdc/2015/?id=
     ss.dependency 'Operations/Standard'
     ss.frameworks = 'PassKit'
     ss.source_files = [
-      'Sources/Features/iOS/PassbookCapability.swift'
+      'Sources/Extras/Passbook/iOS'
     ]
   end
 end
