@@ -28,13 +28,18 @@ class CancelProcedureWithErrorsThreadSafetyStressTest: StressTestCase {
         stress { batch, iteration in
             batch.dispatchGroup.enter()
             let procedure = TestProcedure()
-            procedure.addDidCancelBlockObserver { _, _ in
+            procedure.addDidFinishBlockObserver { _, _ in
+                batch.incrementCounter(named: "finished", withBarrier: true)
                 batch.dispatchGroup.leave()
             }
             batch.queue.add(operation: procedure)
             procedure.cancel(withError: TestError())
         }
     }
+
+    override func ended(batch: BatchProtocol) {
+        XCTAssertEqual(batch.counter(named: "finished"), batch.size)
+    }    
 }
 
 class ProcedureConditionStressTest: StressTestCase {

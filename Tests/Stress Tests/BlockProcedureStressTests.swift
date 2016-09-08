@@ -15,10 +15,8 @@ class CancelBlockProcedureStessTests: StressTestCase {
         stress { batch, iteration in
             batch.dispatchGroup.enter()
             let block = BlockProcedure { usleep(500) }
-            block.addDidCancelBlockObserver { procedure, errors in
-                batch.incrementCounter(named: "cancelled", withBarrier: false)
-            }
             block.addDidFinishBlockObserver { procedure, errors in
+                batch.incrementCounter(named: "finished", withBarrier: false)
                 batch.dispatchGroup.leave()
             }
             batch.queue.add(operation: block)
@@ -27,6 +25,6 @@ class CancelBlockProcedureStessTests: StressTestCase {
     }
 
     override func ended(batch: BatchProtocol) {
-        XCTAssertEqual(batch.counter(named: "cancelled"), batch.size)
+        XCTAssertEqual(batch.counter(named: "finished"), batch.size)
     }
 }
