@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name              = "Operations"
-  s.version           = "3.3.0"
+  s.version           = "3.3.1"
   s.summary           = "Powerful NSOperation subclasses in Swift."
   s.description       = <<-DESC
   
@@ -117,7 +117,7 @@ session Advanced NSOperations: https://developer.apple.com/videos/wwdc/2015/?id=
 	
   # Subspec which includes CalendarCapability.
   s.subspec '+Calendar' do |ss|
-    ss.platforms = { :ios => "8.0", :osx => "10.8", :watchos => "2.0" }
+    ss.platforms = { :ios => "8.0", :osx => "10.10", :watchos => "2.0" }
     ss.dependency 'Operations/Standard'
     ss.frameworks = 'EventKit'    
     ss.source_files = [
