@@ -31,6 +31,9 @@ session Advanced NSOperations: https://developer.apple.com/videos/wwdc/2015/?id=
       'Sources/Features/Shared',
       'Sources/Features/iOS'
     ]
+    ss.exclude_files = [
+      'Sources/Features/Shared/CalendarCapability.swift'
+    ]
     ss.ios.exclude_files = [
       'Sources/Features/Shared/CloudKit',
       'Sources/Features/Shared/TaskOperation.swift',
@@ -55,7 +58,6 @@ session Advanced NSOperations: https://developer.apple.com/videos/wwdc/2015/?id=
     ]
     ss.tvos.exclude_files = [
       'Sources/Features/Shared/CloudKit',    
-      'Sources/Features/Shared/CalendarCapability.swift',      
       'Sources/Features/Shared/TaskOperation.swift',                  
       'Sources/Features/iOS/HealthCapability.swift',
       'Sources/Features/iOS/LocationCapability.swift',
@@ -104,6 +106,17 @@ session Advanced NSOperations: https://developer.apple.com/videos/wwdc/2015/?id=
     ss.osx.exclude_files = [
       'Sources/Core/iOS',
       'Sources/Features/iOS'
+    ]
+  end
+
+  # Subspec which includes CalendarCapability. Not Standard,
+  # since iOS10 became stricter about its inclusion.
+  s.subspec '+Calendar' do |ss|
+    ss.platforms = { :ios => "4.0", :osx => "10.8", :watchos => "2.0" }
+    ss.dependency 'Operations/Standard'
+    ss.frameworks = 'EventKit'    
+    ss.source_files = [
+      'Sources/Features/Shared/CalendarCapability.swift',
     ]
   end
 
