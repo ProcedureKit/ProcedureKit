@@ -1,3 +1,10 @@
+# 3.3.0
+This is a release suitable for submission for iOS 10, but built using Swift 2.2 & Xcode 7.
+
+1. [OPR-452](https://github.com/ProcedureKit/ProcedureKit/pull/452)  Resolves the warning related to CFErrorRef.
+2. [OPR-453](https://github.com/ProcedureKit/ProcedureKit/issues/453), [OPR-454](https://github.com/ProcedureKit/ProcedureKit/pull/454) Fixes an issue where the Mac OS X deployment target was incorrect.
+3. [OPR-456](https://github.com/ProcedureKit/ProcedureKit/pull/456)  Modifies the podspec to remove Calendar, Passbook, Photos, CloudKit, Location, AddressBook etc from the standard spec. This  is to prevent linking/importing OS frameworks which consumers might not have explanations in their info.plist. This is following reports that  are being more restrictive for iOS 10 submissions.
+
 # 3.2.0
 This is a pretty special release! All the important changes have been provided by contributors! 🚀😀💚
 
