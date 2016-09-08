@@ -638,7 +638,7 @@ public final class AddressBook: AddressBookType {
         case UnderlyingError(NSError)
         case UnknownError
 
-        init(error: Unmanaged<CFErrorRef>?) {
+        init(error: CFErrorRef?) {
             self = NSError.from(error).map { .UnderlyingError($0) } ?? .UnknownError
         }
     }
@@ -673,7 +673,7 @@ extension AddressBook {
         if ABAddressBookSave(addressBook, &error) {
             return .None
         }
-        return Error.Save(NSError.from(error))
+        return Error.Save(NSError.from(error?.takeRetainedValue()))
     }
 }
 
@@ -685,7 +685,7 @@ extension AddressBook { // Records
         if ABAddressBookAddRecord(addressBook, record.storage, &error) {
             return .None
         }
-        return Error.AddRecord(NSError.from(error))
+        return Error.AddRecord(NSError.from(error?.takeRetainedValue()))
     }
 
     public func removeRecord<R: AddressBookRecordType where R.Storage == RecordStorage>(record: R) -> ErrorType? {
@@ -693,7 +693,7 @@ extension AddressBook { // Records
         if ABAddressBookRemoveRecord(addressBook, record.storage, &error) {
             return .None
         }
-        return Error.RemoveRecord(NSError.from(error))
+        return Error.RemoveRecord(NSError.from(error?.takeRetainedValue()))
     }
 }
 
@@ -919,13 +919,13 @@ public class AddressBookRecord: AddressBookRecordType, Equatable {
             if ABRecordSetValue(storage, property.id, transformed, &error) {
                 return .None
             }
-            return AddressBook.Error.SetValue(id: property.id, underlyingError: NSError.from(error))
+            return AddressBook.Error.SetValue(id: property.id, underlyingError: NSError.from(error?.takeRetainedValue()))
         }
         else {
             if ABRecordRemoveValue(storage, property.id, &error) {
                 return .None
             }
-            return AddressBook.Error.RemoveValue(id: property.id, underlyingError: NSError.from(error))
+            return AddressBook.Error.RemoveValue(id: property.id, underlyingError: NSError.from(error?.takeRetainedValue()))
         }
     }
 }
@@ -1027,7 +1027,7 @@ public class AddressBookGroup: AddressBookRecord, AddressBookGroupType {
         if ABGroupAddMember(storage, member.storage, &error) {
             return .None
         }
-        return AddressBook.Error.AddGroupMember(NSError.from(error))
+        return AddressBook.Error.AddGroupMember(NSError.from(error?.takeRetainedValue()))
     }
 
     public func remove<P: AddressBook_PersonType where P.Storage == PersonStorage>(member: P) -> ErrorType? {
@@ -1035,7 +1035,7 @@ public class AddressBookGroup: AddressBookRecord, AddressBookGroupType {
         if ABGroupRemoveMember(storage, member.storage, &error) {
             return .None
         }
-        return AddressBook.Error.RemoveGroupMember(NSError.from(error))
+        return AddressBook.Error.RemoveGroupMember(NSError.from(error?.takeRetainedValue()))
     }
 }
 
@@ -1116,8 +1116,8 @@ func writer<T: MultiValueRepresentable>(value: [LabeledValue<T>]) -> CFTypeRef {
 
 extension NSError {
 
-    static func from(ref: Unmanaged<CFErrorRef>?) -> NSError? {
-        return ref.map { unsafeBitCast($0.takeRetainedValue(), NSError.self) }
+    static func from(ref: CFErrorRef?) -> NSError? {
+        return unsafeBitCast(ref, NSError.self)
     }
 }
 
@@ -1145,7 +1145,7 @@ public struct SystemAddressBookRegistrar: AddressBookPermissionRegistrar {
         if let addressBook = ABAddressBookCreateWithOptions(nil, &addressBookError) {
             return (addressBook.takeRetainedValue(), .None)
         }
-        else if let error = NSError.from(addressBookError) {
+        else if let error = NSError.from(addressBookError?.takeRetainedValue()) {
             if (error.domain == ABAddressBookErrorDomain as String) && error.code == kABOperationNotPermittedByUserError {
                 return (.None, AddressBookPermissionRegistrarError.AddressBookAccessDenied)
             }
