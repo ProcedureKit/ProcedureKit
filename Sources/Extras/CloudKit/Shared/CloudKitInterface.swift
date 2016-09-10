@@ -528,28 +528,26 @@ extension CKOperation: CKOperationType {
     /// The QueryCursor is a CKQueryCursor
     public typealias QueryCursor = CKQueryCursor
 
+    /// The CKOperationLongLivedOperationWasPersistedBlock is () -> Void
+    public typealias CKOperationLongLivedOperationWasPersistedBlock = () -> Void
+}
+
+@available(iOS 10.0, OSX 10.12, tvOS 10.0, watchOS 3.0, *)
+extension CKOperation: CKOperation2Type {
     /// The UserIdentity is a CKUserIdentity
-    @available(iOS 10.0, OSX 10.12, tvOS 10.0, watchOS 3.0, *)
     public typealias UserIdentity = CKUserIdentity
 
     /// The UserIdentityLookupInfo is a CKUserIdentityLookupInfo
-    @available(iOS 10.0, OSX 10.12, tvOS 10.0, watchOS 3.0, *)
     public typealias UserIdentityLookupInfo = CKUserIdentityLookupInfo
 
     /// The Share is a CKShare
-    @available(iOS 10.0, OSX 10.12, tvOS 10.0, watchOS 3.0, *)
     public typealias Share = CKShare
 
     /// The ShareMetadata is a CKShareMetadata
-    @available(iOS 10.0, OSX 10.12, tvOS 10.0, watchOS 3.0, *)
     public typealias ShareMetadata = CKShareMetadata
 
     /// The ShareParticipant is a CKShareParticipant
-    @available(iOS 10.0, OSX 10.12, tvOS 10.0, watchOS 3.0, *)
     public typealias ShareParticipant = CKShareParticipant
-
-    /// The CKOperationLongLivedOperationWasPersistedBlock is () -> Void
-    public typealias CKOperationLongLivedOperationWasPersistedBlock = () -> Void
 }
 
 extension CKDatabaseOperation: CKDatabaseOperationType {
