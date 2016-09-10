@@ -56,21 +56,6 @@ public protocol CKOperationType: class {
     /// The type of the CloudKit RecordID
     associatedtype RecordID: Hashable
 
-    /// The type of the CloudKit UserIdentity
-    associatedtype UserIdentity
-
-    /// The type of the CloudKit UserIdentityLookupInfo
-    associatedtype UserIdentityLookupInfo
-
-    /// The type of the CloudKit Share
-    associatedtype Share
-
-    /// The type of the CloudKit ShareMetadata
-    associatedtype ShareMetadata
-
-    /// The type of the CloudKit ShareParticipant
-    associatedtype ShareParticipant
-
     /// - returns the CloudKit Container
     var container: Container? { get set }
 
@@ -107,6 +92,27 @@ public protocol CKOperationType: class {
     /// See NSURLSessionConfiguration.timeoutIntervalForResource
     @available(iOS 10.0, tvOS 10.0, OSX 10.12, watchOS 3.0, *)
     var timeoutIntervalForResource: NSTimeInterval { get set }
+}
+
+/**
+ A generic protocol which exposes the additional types used by
+ Apple's new CloudKit Operation types in iOS 10 / macOS 10.12.
+ */
+public protocol CKOperation2Type: CKOperationType {
+    /// The type of the CloudKit UserIdentity
+    associatedtype UserIdentity
+
+    /// The type of the CloudKit UserIdentityLookupInfo
+    associatedtype UserIdentityLookupInfo
+
+    /// The type of the CloudKit Share
+    associatedtype Share
+
+    /// The type of the CloudKit ShareMetadata
+    associatedtype ShareMetadata
+
+    /// The type of the CloudKit ShareParticipant
+    associatedtype ShareParticipant
 }
 
 /**
@@ -175,7 +181,7 @@ public protocol CKDiscoverAllContactsOperationType: CKOperationType {
 }
 
 /// A generic protocol which exposes the properties used by Apple's CKAcceptSharesOperation.
-public protocol CKAcceptSharesOperationType: CKOperationType {
+public protocol CKAcceptSharesOperationType: CKOperation2Type {
 
     /// - returns: the share metadatas
     var shareMetadatas: [ShareMetadata] { get set }
@@ -188,7 +194,7 @@ public protocol CKAcceptSharesOperationType: CKOperationType {
 }
 
 /// A generic protocol which exposes the properties used by Apple's CKDiscoverAllUserIdentitiesOperation.
-public protocol CKDiscoverAllUserIdentitiesOperationType: CKOperationType {
+public protocol CKDiscoverAllUserIdentitiesOperationType: CKOperation2Type {
 
     /// - returns: a block for when a user identity is discovered
     var userIdentityDiscoveredBlock: ((UserIdentity) -> Void)? { get set }
@@ -211,7 +217,7 @@ public protocol CKDiscoverUserInfosOperationType: CKOperationType {
 }
 
 /// A generic protocol which exposes the properties used by Apple's CKDiscoverUserIdentitiesOperation.
-public protocol CKDiscoverUserIdentitiesOperationType: CKOperationType {
+public protocol CKDiscoverUserIdentitiesOperationType: CKOperation2Type {
 
     /// - returns: the user identity lookup info used in discovery
     var userIdentityLookupInfos: [UserIdentityLookupInfo] { get set }
@@ -340,7 +346,7 @@ public protocol CKFetchRecordZoneChangesOperationType: CKDatabaseOperationType, 
 }
 
 /// A generic protocol which exposes the properties used by Apple's CKFetchShareMetadataOperation.
-public protocol CKFetchShareMetadataOperationType: CKOperationType {
+public protocol CKFetchShareMetadataOperationType: CKOperation2Type {
 
     /// - returns: the share URLs
     var shareURLs: [NSURL] { get set }
@@ -359,7 +365,7 @@ public protocol CKFetchShareMetadataOperationType: CKOperationType {
 }
 
 /// A generic protocol which exposes the properties used by Apple's CKFetchShareParticipantsOperation.
-public protocol CKFetchShareParticipantsOperationType: CKOperationType {
+public protocol CKFetchShareParticipantsOperationType: CKOperation2Type {
 
     /// - returns: the user identity lookup infos
     var userIdentityLookupInfos: [UserIdentityLookupInfo] { get set }
@@ -522,28 +528,26 @@ extension CKOperation: CKOperationType {
     /// The QueryCursor is a CKQueryCursor
     public typealias QueryCursor = CKQueryCursor
 
+    /// The CKOperationLongLivedOperationWasPersistedBlock is () -> Void
+    public typealias CKOperationLongLivedOperationWasPersistedBlock = () -> Void
+}
+
+@available(iOS 10.0, OSX 10.12, tvOS 10.0, watchOS 3.0, *)
+extension CKOperation: CKOperation2Type {
     /// The UserIdentity is a CKUserIdentity
-    @available(iOS 10.0, OSX 10.12, tvOS 10.0, watchOS 3.0, *)
     public typealias UserIdentity = CKUserIdentity
 
     /// The UserIdentityLookupInfo is a CKUserIdentityLookupInfo
-    @available(iOS 10.0, OSX 10.12, tvOS 10.0, watchOS 3.0, *)
     public typealias UserIdentityLookupInfo = CKUserIdentityLookupInfo
 
     /// The Share is a CKShare
-    @available(iOS 10.0, OSX 10.12, tvOS 10.0, watchOS 3.0, *)
     public typealias Share = CKShare
 
     /// The ShareMetadata is a CKShareMetadata
-    @available(iOS 10.0, OSX 10.12, tvOS 10.0, watchOS 3.0, *)
     public typealias ShareMetadata = CKShareMetadata
 
     /// The ShareParticipant is a CKShareParticipant
-    @available(iOS 10.0, OSX 10.12, tvOS 10.0, watchOS 3.0, *)
     public typealias ShareParticipant = CKShareParticipant
-
-    /// The CKOperationLongLivedOperationWasPersistedBlock is () -> Void
-    public typealias CKOperationLongLivedOperationWasPersistedBlock = () -> Void
 }
 
 extension CKDatabaseOperation: CKDatabaseOperationType {
