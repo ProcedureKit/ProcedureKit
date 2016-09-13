@@ -163,24 +163,22 @@ open class ProcedureQueue: OperationQueue {
             }
         }
 
-
         /// Process any conditions
         if procedure.conditions.count > 0 {
 
-/* TODO: Mutual Exclusivity
             /// Check for mutual exclusion conditions
             let manager = ExclusivityManager.sharedInstance
-*/
+
             let mutuallyExclusiveConditions = procedure.conditions.filter { $0.mutuallyExclusive }
             var previousMutuallyExclusiveOperations = Set<Operation>()
-/*
+
             for condition in mutuallyExclusiveConditions {
                 let category = "\(condition.category)"
-                if let previous = manager.addOperation(operation, category: category) {
+                if let previous = manager.add(procedure: procedure, category: category) {
                     previousMutuallyExclusiveOperations.insert(previous)
                 }
             }
-*/
+
             // Create the condition evaluator
             let evaluator = procedure.evaluateConditions()
 
@@ -220,7 +218,6 @@ open class ProcedureQueue: OperationQueue {
             // Add the evaluator
             addOperation(evaluator)
         }
-
 
         // Indicate to the operation that it is to be enqueued
         procedure.willEnqueue()
