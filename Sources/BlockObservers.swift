@@ -22,7 +22,7 @@ public struct WillExecuteObserver<Procedure: ProcedureProcotol>: ProcedureObserv
      - parameter willExecute: the `Block`
      - returns: an observer.
      */
-    public init(willExecute: Block) {
+    public init(willExecute: @escaping Block) {
         self.block = willExecute
     }
 
@@ -49,7 +49,7 @@ public struct WillCancelObserver<Procedure: ProcedureProcotol>: ProcedureObserve
     /// Initialize the observer with a block.
     /// - parameter willCancel: the `Block`
     /// - returns: an observer.
-    public init(willCancel: Block) {
+    public init(willCancel: @escaping Block) {
         self.block = willCancel
     }
 
@@ -79,7 +79,7 @@ public struct DidCancelObserver<Procedure: ProcedureProcotol>: ProcedureObserver
     /// Initialize the observer with a block.
     /// - parameter didCancel: the `Block`
     /// - returns: an observer.
-    public init(didCancel: Block) {
+    public init(didCancel: @escaping Block) {
         self.block = didCancel
     }
 
@@ -109,7 +109,7 @@ public struct DidProduceOperationObserver<Procedure: ProcedureProcotol>: Procedu
     /// Initialize the observer with a block.
     /// - parameter didProduce: the `Block`
     /// - returns: an observer.
-    public init(didProduce: Block) {
+    public init(didProduce: @escaping Block) {
         self.block = didProduce
     }
 
@@ -139,7 +139,7 @@ public struct WillFinishObserver<Procedure: ProcedureProcotol>: ProcedureObserve
     /// Initialize the observer with a block.
     /// - parameter willFinish: the `Block`
     /// - returns: an observer.
-    public init(willFinish: Block) {
+    public init(willFinish: @escaping Block) {
         self.block = willFinish
     }
 
@@ -171,7 +171,7 @@ public struct DidFinishObserver<Procedure: ProcedureProcotol>: ProcedureObserver
     /// Initialize the observer with a block.
     /// - parameter didFinish: the `Block`
     /// - returns: an observer.
-    public init(didFinish: Block) {
+    public init(didFinish: @escaping Block) {
         self.block = didFinish
     }
 
@@ -192,27 +192,27 @@ public struct DidFinishObserver<Procedure: ProcedureProcotol>: ProcedureObserver
 
 public extension ProcedureProcotol {
 
-    func addWillExecuteBlockObserver(block: WillExecuteObserver<Self>.Block) {
+    func addWillExecuteBlockObserver(block: @escaping WillExecuteObserver<Self>.Block) {
         add(observer: WillExecuteObserver(willExecute: block))
     }
 
-    func addWillCancelBlockObserver(block: WillCancelObserver<Self>.Block) {
+    func addWillCancelBlockObserver(block: @escaping WillCancelObserver<Self>.Block) {
         add(observer: WillCancelObserver(willCancel: block))
     }
 
-    func addDidCancelBlockObserver(block: DidCancelObserver<Self>.Block) {
+    func addDidCancelBlockObserver(block: @escaping DidCancelObserver<Self>.Block) {
         add(observer: DidCancelObserver(didCancel: block))
     }
 
-    func addDidProduceOperationBlockObserver(block: DidProduceOperationObserver<Self>.Block) {
+    func addDidProduceOperationBlockObserver(block: @escaping DidProduceOperationObserver<Self>.Block) {
         add(observer: DidProduceOperationObserver(didProduce: block))
     }
 
-    func addWillFinishBlockObserver(block: WillFinishObserver<Self>.Block) {
+    func addWillFinishBlockObserver(block: @escaping WillFinishObserver<Self>.Block) {
         add(observer: WillFinishObserver(willFinish: block))
     }
 
-    func addDidFinishBlockObserver(block: DidFinishObserver<Self>.Block) {
+    func addDidFinishBlockObserver(block: @escaping DidFinishObserver<Self>.Block) {
         add(observer: DidFinishObserver(didFinish: block))
     }
 }

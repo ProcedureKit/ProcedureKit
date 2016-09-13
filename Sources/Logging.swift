@@ -339,7 +339,7 @@ internal struct _Logger<M: LogManagerProtocol>: LoggerProtocol {
 
     var operationName: String? = nil
 
-    init(severity: LogSeverity = Manager.severity, enabled: Bool = Manager.enabled, logger: LoggerBlockType = Manager.logger) {
+    init(severity: LogSeverity = Manager.severity, enabled: Bool = Manager.enabled, logger: @escaping LoggerBlockType = Manager.logger) {
         self.severity = severity
         self.enabled = enabled
         self.logger = logger
