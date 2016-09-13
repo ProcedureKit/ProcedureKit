@@ -8,11 +8,7 @@ import XCTest
 import TestingProcedureKit
 @testable import ProcedureKit
 
-class GroupCancelStressTests: StressTestCase {
-
-    override func ended(batch: BatchProtocol) {
-        XCTAssertEqual(batch.counter.count, batch.size)
-    }
+class CancelGroupStressTests: StressTestCase {
 
     func test__group_cancel() {
 
@@ -20,7 +16,6 @@ class GroupCancelStressTests: StressTestCase {
             batch.dispatchGroup.enter()
             let group = TestGroup(operations: TestProcedure(delay: 0))
             group.addDidFinishBlockObserver { _, _ in
-                let _ = batch.counter.barrierIncrement()
                 batch.dispatchGroup.leave()
             }
             batch.queue.add(operation: group)
@@ -63,35 +58,30 @@ class GroupCancelAndAddOperationStressTests: StressTestCase {
 
 class GroupDoesNotFinishBeforeChildOperationsAreFinished: StressTestCase {
 
-    final class SpecialBatch: Batch {
-        let child1Counter = Counter()
-        let child2Counter = Counter()
-    }
-
-    override func started(batch number: Int, size: Int) -> BatchProtocol {
-        return SpecialBatch(number: number, size: size)
-    }
-
-    override func ended(batch: BatchProtocol) {
-        XCTAssertEqual((batch as! SpecialBatch).child1Counter.count, batch.size)
-        XCTAssertEqual((batch as! SpecialBatch).child2Counter.count, batch.size)
-    }
-
     func test__group_does_not_finish_before_child_operations_are_finished() {
         stress { batch, _ in
             batch.dispatchGroup.enter()
 
-            let child1 = TestProcedure(delay: 0.05)
-            let child2 = TestProcedure(delay: 0.05)
+            let child1 = TestProcedure(delay: 0.004)
+            let child2 = TestProcedure(delay: 0.006)
             let group = Group(operations: child1, child2)
 
             group.addDidFinishBlockObserver { _, _ in
-                if child1.isFinished { let _ = (batch as! SpecialBatch).child1Counter.barrierIncrement() }
-                if child2.isFinished { let _ = (batch as! SpecialBatch).child2Counter.barrierIncrement() }
+                if child1.isFinished {
+                    batch.incrementCounter(named: "child 1 finished", withBarrier: true)
+                }
+                if child2.isFinished {
+                    batch.incrementCounter(named: "child 2 finished", withBarrier: true)
+                }
                 batch.dispatchGroup.leave()
             }
             batch.queue.add(operation: group)
             group.cancel()
         }
+    }
+
+    override func ended(batch: BatchProtocol) {
+        XCTAssertEqual(batch.counter(named: "child 1 finished"), batch.size)
+        XCTAssertEqual(batch.counter(named: "child 2 finished"), batch.size)
     }
 }

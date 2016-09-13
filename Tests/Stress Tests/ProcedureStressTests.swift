@@ -14,20 +14,20 @@ class ProcedureCompletionBlockStressTest: StressTestCase {
 
         measure(withTimeout: 10) { batch, iteration in
             batch.dispatchGroup.enter()
-            let procedure = TestProcedure()
+            let procedure = TestProcedure(name: "Batch \(batch.number), Iteration \(iteration)")
             procedure.addCompletionBlock { batch.dispatchGroup.leave() }
             batch.queue.add(operation: procedure)
         }
     }
 }
 
-class ProcedureCancelWithErrorsThreadSafetyStressTest: StressTestCase {
+class CancelProcedureWithErrorsStressTest: StressTestCase {
 
-    func test__cancel_with_errors_thread_safety() {
+    func test__cancel_with_errors() {
 
         stress { batch, iteration in
             batch.dispatchGroup.enter()
-            let procedure = TestProcedure()
+            let procedure = TestProcedure(name: "Batch \(batch.number), Iteration \(iteration)")
             procedure.addDidCancelBlockObserver { _, _ in
                 batch.dispatchGroup.leave()
             }

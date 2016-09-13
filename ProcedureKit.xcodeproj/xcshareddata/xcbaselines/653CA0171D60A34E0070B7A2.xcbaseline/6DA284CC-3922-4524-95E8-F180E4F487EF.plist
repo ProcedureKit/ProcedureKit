@@ -13,7 +13,9 @@
 					<key>baselineAverage</key>
 					<real>19.113</real>
 					<key>baselineIntegrationDisplayName</key>
-					<string>Local Baseline</string>
+					<string>13 Sep 2016, 22:08:14</string>
+					<key>maxPercentRelativeStandardDeviation</key>
+					<real>15</real>
 				</dict>
 			</dict>
 		</dict>

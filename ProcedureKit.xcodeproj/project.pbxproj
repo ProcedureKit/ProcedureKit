@@ -45,6 +45,7 @@
 		65403ABC1D7C6CBC00D6036B /* TestCondition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65403ABB1D7C6CBC00D6036B /* TestCondition.swift */; };
 		65403ABE1D7C9E7600D6036B /* ResultInjectionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65403ABD1D7C9E7600D6036B /* ResultInjectionTests.swift */; };
 		654FAFFB1D7CABA0002FA74D /* ResultInjection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 654FAFFA1D7CABA0002FA74D /* ResultInjection.swift */; };
+		654FAFFD1D7CD5EA002FA74D /* BlockProcedure.swift in Sources */ = {isa = PBXBuildFile; fileRef = 654FAFFC1D7CD5EA002FA74D /* BlockProcedure.swift */; };
 		655E86431D67B55B000FBA6C /* ProcedureQueue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 655E86421D67B55B000FBA6C /* ProcedureQueue.swift */; };
 		655E86451D67B9F9000FBA6C /* ProcedureObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 655E86441D67B9F9000FBA6C /* ProcedureObserver.swift */; };
 		655E86471D67BA9C000FBA6C /* Support.swift in Sources */ = {isa = PBXBuildFile; fileRef = 655E86461D67BA9C000FBA6C /* Support.swift */; };
@@ -55,6 +56,8 @@
 		6591B3021D74980900C2B57F /* GroupTestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6591B3011D74980900C2B57F /* GroupTestCase.swift */; };
 		659E5FFA1D6E3B8D002B1D10 /* TestProcedure.swift in Sources */ = {isa = PBXBuildFile; fileRef = 659E5FF91D6E3B8D002B1D10 /* TestProcedure.swift */; };
 		659E5FFC1D6E3BCF002B1D10 /* ProcedureKitTestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 659E5FFB1D6E3BCF002B1D10 /* ProcedureKitTestCase.swift */; };
+		65A0CB271D7D4CF1008FB37C /* BlockProcedureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65A0CB261D7D4CF1008FB37C /* BlockProcedureTests.swift */; };
+		65A0CB291D7D5444008FB37C /* BlockProcedureStressTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65A0CB281D7D5444008FB37C /* BlockProcedureStressTests.swift */; };
 		65A2D7FB1D6852A500FB067C /* BlockObservers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65A2D7FA1D6852A500FB067C /* BlockObservers.swift */; };
 		65A2D7FD1D69E52000FB067C /* DispatchQueue+ProcedureKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65A2D7FC1D69E52000FB067C /* DispatchQueue+ProcedureKit.swift */; };
 		65A2D7FF1D69FAEC00FB067C /* Operation+ProcedureKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65A2D7FE1D69FAEC00FB067C /* Operation+ProcedureKit.swift */; };
@@ -229,6 +232,7 @@
 		65403ABB1D7C6CBC00D6036B /* TestCondition.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TestCondition.swift; path = Sources/Testing/TestCondition.swift; sourceTree = "<group>"; };
 		65403ABD1D7C9E7600D6036B /* ResultInjectionTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ResultInjectionTests.swift; path = Tests/ResultInjectionTests.swift; sourceTree = "<group>"; };
 		654FAFFA1D7CABA0002FA74D /* ResultInjection.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ResultInjection.swift; path = Sources/ResultInjection.swift; sourceTree = "<group>"; };
+		654FAFFC1D7CD5EA002FA74D /* BlockProcedure.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = BlockProcedure.swift; path = Sources/BlockProcedure.swift; sourceTree = "<group>"; };
 		655E86421D67B55B000FBA6C /* ProcedureQueue.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ProcedureQueue.swift; path = Sources/ProcedureQueue.swift; sourceTree = "<group>"; };
 		655E86441D67B9F9000FBA6C /* ProcedureObserver.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ProcedureObserver.swift; path = Sources/ProcedureObserver.swift; sourceTree = "<group>"; };
 		655E86461D67BA9C000FBA6C /* Support.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Support.swift; path = Sources/Support.swift; sourceTree = "<group>"; };
@@ -239,6 +243,8 @@
 		6591B3011D74980900C2B57F /* GroupTestCase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = GroupTestCase.swift; path = Sources/Testing/GroupTestCase.swift; sourceTree = "<group>"; };
 		659E5FF91D6E3B8D002B1D10 /* TestProcedure.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TestProcedure.swift; path = Sources/Testing/TestProcedure.swift; sourceTree = "<group>"; };
 		659E5FFB1D6E3BCF002B1D10 /* ProcedureKitTestCase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ProcedureKitTestCase.swift; path = Sources/Testing/ProcedureKitTestCase.swift; sourceTree = "<group>"; };
+		65A0CB261D7D4CF1008FB37C /* BlockProcedureTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = BlockProcedureTests.swift; path = Tests/BlockProcedureTests.swift; sourceTree = "<group>"; };
+		65A0CB281D7D5444008FB37C /* BlockProcedureStressTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = BlockProcedureStressTests.swift; path = "Tests/Stress Tests/BlockProcedureStressTests.swift"; sourceTree = "<group>"; };
 		65A2D7FA1D6852A500FB067C /* BlockObservers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = BlockObservers.swift; path = Sources/BlockObservers.swift; sourceTree = "<group>"; };
 		65A2D7FC1D69E52000FB067C /* DispatchQueue+ProcedureKit.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "DispatchQueue+ProcedureKit.swift"; path = "Sources/DispatchQueue+ProcedureKit.swift"; sourceTree = "<group>"; };
 		65A2D7FE1D69FAEC00FB067C /* Operation+ProcedureKit.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "Operation+ProcedureKit.swift"; path = "Sources/Operation+ProcedureKit.swift"; sourceTree = "<group>"; };
@@ -377,6 +383,7 @@
 		653C9FD91D6097E20070B7A2 /* Tests */ = {
 			isa = PBXGroup;
 			children = (
+				65A0CB261D7D4CF1008FB37C /* BlockProcedureTests.swift */,
 				65245D1E1D7231DC00340A2D /* CancellationTests.swift */,
 				65403AB71D7C453200D6036B /* ConditionTests.swift */,
 				65245D201D72345000340A2D /* FinishingTests.swift */,
@@ -439,6 +446,7 @@
 				653CA0281D60A4440070B7A2 /* ProcedureKitStressTests.swift */,
 				658A7B4A1D74DCCD00F897C8 /* ProcedureStressTests.swift */,
 				658A7B4E1D74E54800F897C8 /* GroupStressTests.swift */,
+				65A0CB281D7D5444008FB37C /* BlockProcedureStressTests.swift */,
 			);
 			name = "Stress Tests";
 			sourceTree = "<group>";
@@ -489,6 +497,7 @@
 			children = (
 				65A2D8031D6A1ED500FB067C /* AnyObserver.swift */,
 				65A2D7FA1D6852A500FB067C /* BlockObservers.swift */,
+				654FAFFC1D7CD5EA002FA74D /* BlockProcedure.swift */,
 				6518D5E21D7B3A2800A12EF4 /* Condition.swift */,
 				65245D261D7258E400340A2D /* Group.swift */,
 				65B97DB41D65138F00AC3B5D /* Procedure.swift */,
@@ -1085,6 +1094,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				658A7B4F1D74E54800F897C8 /* GroupStressTests.swift in Sources */,
+				65A0CB291D7D5444008FB37C /* BlockProcedureStressTests.swift in Sources */,
 				653CA0291D60A4440070B7A2 /* ProcedureKitStressTests.swift in Sources */,
 				658A7B4B1D74DCCD00F897C8 /* ProcedureStressTests.swift in Sources */,
 			);
@@ -1127,6 +1137,7 @@
 				65A2D7FB1D6852A500FB067C /* BlockObservers.swift in Sources */,
 				65245D231D723A6B00340A2D /* Logging.swift in Sources */,
 				65A2D7FD1D69E52000FB067C /* DispatchQueue+ProcedureKit.swift in Sources */,
+				654FAFFD1D7CD5EA002FA74D /* BlockProcedure.swift in Sources */,
 				654FAFFB1D7CABA0002FA74D /* ResultInjection.swift in Sources */,
 				65A2D7FF1D69FAEC00FB067C /* Operation+ProcedureKit.swift in Sources */,
 				65B83EB71D731DE8007EFBFA /* Collection+ProcedureKit.swift in Sources */,
@@ -1152,6 +1163,7 @@
 				65245D1F1D7231DC00340A2D /* CancellationTests.swift in Sources */,
 				65245D211D72345000340A2D /* FinishingTests.swift in Sources */,
 				65403AB81D7C453200D6036B /* ConditionTests.swift in Sources */,
+				65A0CB271D7D4CF1008FB37C /* BlockProcedureTests.swift in Sources */,
 				653C9FE91D6099F10070B7A2 /* ProcedureKitTests.swift in Sources */,
 				65245D1D1D721A7100340A2D /* ProcedureTests.swift in Sources */,
 			);
