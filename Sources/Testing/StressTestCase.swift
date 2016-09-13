@@ -38,6 +38,15 @@ public protocol BatchProtocol {
     @discardableResult func incrementCounter(named: String, withBarrier: Bool) -> Int32
 }
 
+public extension BatchProtocol {
+
+    func didIncrementCounter(named name: String, withBarrier barrier: Bool = true) -> Bool {
+        let currentValue = counter(named: name)
+        let newValue = Int(incrementCounter(named: name, withBarrier: barrier))
+        return newValue > currentValue
+    }
+}
+
 open class Batch: BatchProtocol {
     public let startTime = CFAbsoluteTimeGetCurrent()
     public let dispatchGroup = DispatchGroup()

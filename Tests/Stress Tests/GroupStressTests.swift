@@ -16,16 +16,11 @@ class CancelGroupStressTests: StressTestCase {
             batch.dispatchGroup.enter()
             let group = TestGroup(operations: TestProcedure(delay: 0))
             group.addDidFinishBlockObserver { _, _ in
-                batch.incrementCounter(named: "finished", withBarrier: true)
                 batch.dispatchGroup.leave()
             }
             batch.queue.add(operation: group)
             group.cancel()
         }
-    }
-
-    override func ended(batch: BatchProtocol) {
-        XCTAssertEqual(batch.counter(named: "finished"), batch.size)
     }
 }
 
@@ -53,16 +48,11 @@ class GroupCancelAndAddOperationStressTests: StressTestCase {
             batch.dispatchGroup.enter()
             let group = TestGroupWhichAddsOperationsAfterSuperInit()
             group.addDidFinishBlockObserver { _, _ in
-                batch.incrementCounter(named: "finished", withBarrier: true)
                 batch.dispatchGroup.leave()
             }
             batch.queue.add(operation: group)
             group.cancel()
         }
-    }
-
-    override func ended(batch: BatchProtocol) {
-        XCTAssertEqual(batch.counter(named: "finished"), batch.size)
     }
 }
 
@@ -72,8 +62,8 @@ class GroupDoesNotFinishBeforeChildOperationsAreFinished: StressTestCase {
         stress { batch, _ in
             batch.dispatchGroup.enter()
 
-            let child1 = TestProcedure(delay: 0.05)
-            let child2 = TestProcedure(delay: 0.05)
+            let child1 = TestProcedure(delay: 0.004)
+            let child2 = TestProcedure(delay: 0.006)
             let group = Group(operations: child1, child2)
 
             group.addDidFinishBlockObserver { _, _ in

@@ -14,32 +14,27 @@ class ProcedureCompletionBlockStressTest: StressTestCase {
 
         measure(withTimeout: 10) { batch, iteration in
             batch.dispatchGroup.enter()
-            let procedure = TestProcedure()
+            let procedure = TestProcedure(name: "Batch \(batch.number), Iteration \(iteration)")
             procedure.addCompletionBlock { batch.dispatchGroup.leave() }
             batch.queue.add(operation: procedure)
         }
     }
 }
 
-class CancelProcedureWithErrorsThreadSafetyStressTest: StressTestCase {
+class CancelProcedureWithErrorsStressTest: StressTestCase {
 
-    func test__cancel_with_errors_thread_safety() {
-
+    func test__cancel_with_errors() {
+        LogManager.severity = .notice
         stress { batch, iteration in
             batch.dispatchGroup.enter()
-            let procedure = TestProcedure()
-            procedure.addDidFinishBlockObserver { _, _ in
-                batch.incrementCounter(named: "finished", withBarrier: true)
+            let procedure = TestProcedure(name: "Batch \(batch.number), Iteration \(iteration)")
+            procedure.addDidCancelBlockObserver { _, _ in
                 batch.dispatchGroup.leave()
             }
             batch.queue.add(operation: procedure)
             procedure.cancel(withError: TestError())
         }
     }
-
-    override func ended(batch: BatchProtocol) {
-        XCTAssertEqual(batch.counter(named: "finished"), batch.size)
-    }    
 }
 
 class ProcedureConditionStressTest: StressTestCase {

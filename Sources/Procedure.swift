@@ -452,9 +452,9 @@ open class Procedure: Operation, ProcedureProcotol {
         // as well as isReady KVO notification
         super.cancel()
 
-        if shouldFinishFromCancel {
-            _finish(withErrors: [])
-        }
+        guard shouldFinishFromCancel else { return }
+
+        _finish(withErrors: [])
     }
 
 
