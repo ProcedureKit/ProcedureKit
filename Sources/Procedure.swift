@@ -666,9 +666,9 @@ public extension Procedure {
         return evaluator
     }
 
-    internal func add(dependencyOnPreviousMutuallyExclusiveOperation operation: Procedure) {
+    internal func add(dependencyOnPreviousMutuallyExclusiveProcedure procedure: Procedure) {
         precondition(state <= .executing, "Dependencies cannot be modified after execution has begun, current state: \(state).")
-        super.addDependency(operation)
+        super.addDependency(procedure)
     }
 
     internal func add(directDependency: Operation) {
