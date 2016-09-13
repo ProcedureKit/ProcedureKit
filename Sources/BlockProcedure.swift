@@ -18,7 +18,7 @@ public class MapProcedure<Requirement, Result>: Procedure, ResultInjectionProtoc
     public var requirement: Requirement! = nil
     public var result: Result! = nil
 
-    public init(transform: Transform) {
+    public init(transform: @escaping Transform) {
         self.transform = transform
         super.init()
     }
