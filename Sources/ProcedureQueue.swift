@@ -163,7 +163,6 @@ open class ProcedureQueue: OperationQueue {
             }
         }
 
-
         /// Process any conditions
         if procedure.conditions.count > 0 {
 
@@ -219,7 +218,6 @@ open class ProcedureQueue: OperationQueue {
             // Add the evaluator
             addOperation(evaluator)
         }
-
 
         // Indicate to the operation that it is to be enqueued
         procedure.willEnqueue()

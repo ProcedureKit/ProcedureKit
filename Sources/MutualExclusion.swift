@@ -6,6 +6,25 @@
 
 import Foundation
 
+/**
+ A generic condition for describing operations that
+ cannot be allowed to execute concurrently.
+ */
+public final class MutuallyExclusive<T>: Condition {
+
+    /// Public constructor
+    public override init() {
+        super.init()
+        name = "MutuallyExclusive<\(T.self)>"
+        mutuallyExclusive = true
+    }
+
+    /// Required public override, but there is no evaluation, so it just completes with `.Satisfied`.
+    public override func evaluate(procedure: Procedure, completion: (ConditionResult) -> Void) {
+        completion(.satisfied)
+    }
+}
+
 internal class ExclusivityManager {
 
     static let sharedInstance = ExclusivityManager()
