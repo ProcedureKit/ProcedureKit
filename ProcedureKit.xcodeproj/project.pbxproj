@@ -40,6 +40,7 @@
 		653CA0741D60AB1B0070B7A2 /* ProcedureKitCloud.h in Headers */ = {isa = PBXBuildFile; fileRef = 653CA0731D60AB1B0070B7A2 /* ProcedureKitCloud.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		653CA0781D60ABC90070B7A2 /* ProcedureKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65CFC5F01D608A5500CAD875 /* ProcedureKit.framework */; };
 		653CA07B1D60ABD30070B7A2 /* TestingProcedureKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65CFC6161D60900000CAD875 /* TestingProcedureKit.framework */; };
+		653EBBBA1D88AFA800F4DB9F /* Delay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 653EBBB91D88AFA800F4DB9F /* Delay.swift */; };
 		65403AB81D7C453200D6036B /* ConditionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65403AB71D7C453200D6036B /* ConditionTests.swift */; };
 		65403ABA1D7C49C500D6036B /* XCTAsserts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65403AB91D7C49C500D6036B /* XCTAsserts.swift */; };
 		65403ABC1D7C6CBC00D6036B /* TestCondition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65403ABB1D7C6CBC00D6036B /* TestCondition.swift */; };
@@ -229,6 +230,7 @@
 		653CA0711D60AAFE0070B7A2 /* ProcedureKitCloudTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ProcedureKitCloudTests.swift; path = Tests/Cloud/ProcedureKitCloudTests.swift; sourceTree = SOURCE_ROOT; };
 		653CA0731D60AB1B0070B7A2 /* ProcedureKitCloud.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ProcedureKitCloud.h; path = "Supporting Files/ProcedureKitCloud.h"; sourceTree = "<group>"; };
 		653CA0751D60AB2B0070B7A2 /* ProcedureKitCloud.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = ProcedureKitCloud.xcconfig; path = "Supporting Files/ProcedureKitCloud.xcconfig"; sourceTree = "<group>"; };
+		653EBBB91D88AFA800F4DB9F /* Delay.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Delay.swift; path = Sources/Delay.swift; sourceTree = "<group>"; };
 		65403AB71D7C453200D6036B /* ConditionTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ConditionTests.swift; path = Tests/ConditionTests.swift; sourceTree = "<group>"; };
 		65403AB91D7C49C500D6036B /* XCTAsserts.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = XCTAsserts.swift; path = Sources/Testing/XCTAsserts.swift; sourceTree = "<group>"; };
 		65403ABB1D7C6CBC00D6036B /* TestCondition.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TestCondition.swift; path = Sources/Testing/TestCondition.swift; sourceTree = "<group>"; };
@@ -504,6 +506,7 @@
 				65A2D7FA1D6852A500FB067C /* BlockObservers.swift */,
 				654FAFFC1D7CD5EA002FA74D /* BlockProcedure.swift */,
 				6518D5E21D7B3A2800A12EF4 /* Condition.swift */,
+				653EBBB91D88AFA800F4DB9F /* Delay.swift */,
 				65245D261D7258E400340A2D /* Group.swift */,
 				65DA49301D8142BE00D4E1AA /* MutualExclusion.swift */,
 				65B97DB41D65138F00AC3B5D /* Procedure.swift */,
@@ -1155,6 +1158,7 @@
 				6518D5E31D7B3A2800A12EF4 /* Condition.swift in Sources */,
 				655E86471D67BA9C000FBA6C /* Support.swift in Sources */,
 				655E86451D67B9F9000FBA6C /* ProcedureObserver.swift in Sources */,
+				653EBBBA1D88AFA800F4DB9F /* Delay.swift in Sources */,
 				655E86431D67B55B000FBA6C /* ProcedureQueue.swift in Sources */,
 				65A2D8041D6A1ED500FB067C /* AnyObserver.swift in Sources */,
 			);
