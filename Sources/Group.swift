@@ -634,7 +634,7 @@ public struct GroupWillAddChildObserver: GroupObserverProtocol {
 
     private let block: Block
 
-    public init(willAddChild: Block) {
+    public init(willAddChild: @escaping Block) {
         block = willAddChild
     }
 
@@ -648,7 +648,7 @@ public struct GroupDidAddChildObserver: GroupObserverProtocol {
 
     private let block: Block
 
-    public init(didAddChild: Block) {
+    public init(didAddChild: @escaping Block) {
         block = didAddChild
     }
 
@@ -667,11 +667,11 @@ public extension Group {
         groupProtectedObservers.append(observer)
     }
 
-    func addWillAddChildBlockObserver(block: GroupWillAddChildObserver.Block) {
+    func addWillAddChildBlockObserver(block: @escaping GroupWillAddChildObserver.Block) {
         add(observer: GroupWillAddChildObserver(willAddChild: block))
     }
 
-    func addDidAddChildBlockObserver(block: GroupDidAddChildObserver.Block) {
+    func addDidAddChildBlockObserver(block: @escaping GroupDidAddChildObserver.Block) {
         add(observer: GroupDidAddChildObserver(didAddChild: block))
     }
 }

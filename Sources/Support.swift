@@ -67,7 +67,7 @@ internal class Protector<T> {
         lock.write({ block(&self.ward) })
     }
 
-    func write(_ block: @escaping (inout T) -> Void, completion: (() -> Void)) {
+    func write(_ block: @escaping (inout T) -> Void, completion: @escaping (() -> Void)) {
         lock.write({ block(&self.ward) }, completion: completion)
     }
 }
