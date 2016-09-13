@@ -24,7 +24,7 @@ class ProcedureCompletionBlockStressTest: StressTestCase {
 class CancelProcedureWithErrorsStressTest: StressTestCase {
 
     func test__cancel_with_errors() {
-        LogManager.severity = .notice
+
         stress { batch, iteration in
             batch.dispatchGroup.enter()
             let procedure = TestProcedure(name: "Batch \(batch.number), Iteration \(iteration)")
