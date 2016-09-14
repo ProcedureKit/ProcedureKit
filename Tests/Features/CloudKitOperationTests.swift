@@ -266,7 +266,7 @@ class TestModifyRecordsOperation: TestDatabaseOperation, CKModifyRecordsOperatio
     var recordIDsToDelete: [RecordID]?
     var savePolicy: RecordSavePolicy = 0
     var clientChangeTokenData: NSData?
-    var atomic: Bool = true
+    var atomicRecord: Bool = true
 
     var perRecordProgressBlock: ((Record, Double) -> Void)?
     var perRecordCompletionBlock: ((Record?, NSError?) -> Void)?
@@ -1076,13 +1076,13 @@ class OPRCKModifyRecordsOperationTests: CKTests {
     }
 
     func test__get_atomic() {
-        target.atomic = true
+        target.atomicRecord = true
         XCTAssertTrue(operation.atomic)
     }
 
     func test__set_atomic() {
         operation.atomic = true
-        XCTAssertTrue(target.atomic)
+        XCTAssertTrue(target.atomicRecord)
     }
 
     func test__get_per_record_progress_block() {

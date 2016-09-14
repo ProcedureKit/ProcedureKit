@@ -79,36 +79,41 @@ extension Protector where T: _ArrayType {
     }
 }
 
-public func dispatch_sync(queue: dispatch_queue_t, _ block: () throws -> Void) rethrows {
-    var failure: ErrorType? = .None
+public struct ThreadSafety {
 
-    let catcher = {
-        do {
-            try block()
+    public static func dispatch_sync<T>(queue: dispatch_queue_t, _ block: () throws -> T) rethrows -> T {
+        var result: T!
+        try dispatch_sync(queue) {
+            result = try block()
         }
-        catch {
-            failure = error
+        return result
+    }
+
+    public static func dispatch_sync(queue: dispatch_queue_t, _ block: () throws -> Void) rethrows {
+        var failure: ErrorType? = .None
+
+        let catcher = {
+            do {
+                try block()
+            }
+            catch {
+                failure = error
+            }
+        }
+
+        Foundation.dispatch_sync(queue, catcher)
+
+        if let failure = failure {
+            try { throw failure }()
         }
     }
 
-    dispatch_sync(queue, catcher)
-
-    if let failure = failure {
-        try { throw failure }()
-    }
 }
 
-public func dispatch_sync<T>(queue: dispatch_queue_t, _ block: () throws -> T) rethrows -> T {
-    var result: T!
-    try dispatch_sync(queue) {
-        result = try block()
-    }
-    return result
-}
 
 internal func dispatch_main_sync<T>(block: () throws -> T) rethrows -> T {
     guard Queue.isMainQueue else {
-        return try dispatch_sync(Queue.Main.queue, block)
+        return try ThreadSafety.dispatch_sync(Queue.Main.queue, block)
     }
     return try block()
 }
