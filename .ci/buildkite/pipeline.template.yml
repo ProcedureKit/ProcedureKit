@@ -4,20 +4,19 @@ steps:
     command: .ci/scripts/lint
     agents:
       iOS-Simulator: false    
-      swift: "2.2"
+      swift: "2.3"
   -
     name: "Test Mac"
     command: .ci/scripts/test-osx
     agents:
       iOS-Simulator: false    
-      swift: "2.2"
+      swift: "2.3"
   -
     name: "Test iOS"
     command: .ci/scripts/test-ios
     agents:
-      swift: "2.2"
+      swift: "2.3"
       iOS-Simulator: true
     env:
       FL_SLATHER_BUILDKITE_ENABLED: true
       FL_SLATHER_COVERALLS_ENABLED: true
-      
