@@ -9,6 +9,8 @@
 import Foundation
 import CloudKit
 
+// swiftlint:disable file_length
+
 /**
  A generic protocol which exposes the types and properties used by
  Apple's CloudKit Operation types.
@@ -56,6 +58,61 @@ public protocol CKOperationType: class {
 
     /// - returns the CloudKit Container
     var container: Container? { get set }
+
+    /// - returns whether to use cellular data access, if WiFi is unavailable (CKOperation default is true)
+    var allowsCellularAccess: Bool { get set }
+
+    /// - returns a unique identifier for a long-lived CKOperation
+    @available(iOS 9.3, tvOS 9.3, OSX 10.12, watchOS 2.3, *)
+    var operationID: String { get }
+
+    /// - returns whether the operation is long-lived
+    @available(iOS 9.3, tvOS 9.3, OSX 10.12, watchOS 2.3, *)
+    var longLived: Bool { get set }
+
+    /// The type of the CKOperation longLivedOperationWasPersistedBlock
+    associatedtype CKOperationLongLivedOperationWasPersistedBlock
+
+    #if swift(>=3.0) // TEMPORARY FIX: Swift 2.3 compiler crash
+        // The Swift 2.3 compiler (as of Xcode 8 beta 4) crashes with a fatal error caused by
+        // the following declaration & the extension CKOperation: CKOperationType { }
+        // The Swift 3.0 compiler has no issue. As of now, no workaround is available besides using Swift 3.0.
+        //
+        /// - returns the block to execute when the server starts storing callbacks for this long-lived CKOperation
+        @available(iOS 9.3, tvOS 9.3, OSX 10.12, watchOS 2.3, *)
+        var longLivedOperationWasPersistedBlock: CKOperationLongLivedOperationWasPersistedBlock { get set }
+    #endif
+
+    /// If non-zero, overrides the timeout interval for any network requests issued by this operation.
+    /// See NSURLSessionConfiguration.timeoutIntervalForRequest
+    @available(iOS 10.0, tvOS 10.0, OSX 10.12, watchOS 3.0, *)
+    var timeoutIntervalForRequest: NSTimeInterval { get set }
+
+    /// If non-zero, overrides the timeout interval for any network resources retrieved by this operation.
+    /// See NSURLSessionConfiguration.timeoutIntervalForResource
+    @available(iOS 10.0, tvOS 10.0, OSX 10.12, watchOS 3.0, *)
+    var timeoutIntervalForResource: NSTimeInterval { get set }
+}
+
+/**
+ A generic protocol which exposes the additional types used by
+ Apple's new CloudKit Operation types in iOS 10 / macOS 10.12.
+ */
+public protocol CKOperation2Type: CKOperationType {
+    /// The type of the CloudKit UserIdentity
+    associatedtype UserIdentity
+
+    /// The type of the CloudKit UserIdentityLookupInfo
+    associatedtype UserIdentityLookupInfo
+
+    /// The type of the CloudKit Share
+    associatedtype Share
+
+    /// The type of the CloudKit ShareMetadata
+    associatedtype ShareMetadata
+
+    /// The type of the CloudKit ShareParticipant
+    associatedtype ShareParticipant
 }
 
 /**
@@ -96,6 +153,13 @@ public protocol CKMoreComing: CKOperationType {
     var moreComing: Bool { get }
 }
 
+/// A generic protocol which exposes the properties used by Apple's CloudKit Operation's which have a flag to fetch all changes.
+public protocol CKFetchAllChanges: CKOperationType {
+
+    /// - returns: whether there are more results on the server
+    var fetchAllChanges: Bool { get set }
+}
+
 /// A generic protocol which exposes the properties used by Apple's CloudKit Operation's which have desired keys.
 public protocol CKDesiredKeys: CKOperationType {
 
@@ -116,6 +180,29 @@ public protocol CKDiscoverAllContactsOperationType: CKOperationType {
     var discoverAllContactsCompletionBlock: (([DiscoveredUserInfo]?, NSError?) -> Void)? { get set }
 }
 
+/// A generic protocol which exposes the properties used by Apple's CKAcceptSharesOperation.
+public protocol CKAcceptSharesOperationType: CKOperation2Type {
+
+    /// - returns: the share metadatas
+    var shareMetadatas: [ShareMetadata] { get set }
+
+    /// - returns: the block used to return accepted shares
+    var perShareCompletionBlock: ((ShareMetadata, Share?, NSError?) -> Void)? { get set }
+
+    /// - returns: the completion block used for accepting shares
+    var acceptSharesCompletionBlock: ((NSError?) -> Void)? { get set }
+}
+
+/// A generic protocol which exposes the properties used by Apple's CKDiscoverAllUserIdentitiesOperation.
+public protocol CKDiscoverAllUserIdentitiesOperationType: CKOperation2Type {
+
+    /// - returns: a block for when a user identity is discovered
+    var userIdentityDiscoveredBlock: ((UserIdentity) -> Void)? { get set }
+
+    /// - returns: the completion block used for discovering all user identities
+    var discoverAllUserIdentitiesCompletionBlock: ((NSError?) -> Void)? { get set }
+}
+
 /// A generic protocol which exposes the properties used by Apple's CKDiscoverUserInfosOperation.
 public protocol CKDiscoverUserInfosOperationType: CKOperationType {
 
@@ -127,6 +214,19 @@ public protocol CKDiscoverUserInfosOperationType: CKOperationType {
 
     /// - returns: the completion block used for discovering user infos
     var discoverUserInfosCompletionBlock: (([String: DiscoveredUserInfo]?, [RecordID: DiscoveredUserInfo]?, NSError?) -> Void)? { get set }
+}
+
+/// A generic protocol which exposes the properties used by Apple's CKDiscoverUserIdentitiesOperation.
+public protocol CKDiscoverUserIdentitiesOperationType: CKOperation2Type {
+
+    /// - returns: the user identity lookup info used in discovery
+    var userIdentityLookupInfos: [UserIdentityLookupInfo] { get set }
+
+    /// - returns: the block used to return discovered user identities
+    var userIdentityDiscoveredBlock: ((UserIdentity, UserIdentityLookupInfo) -> Void)? { get set }
+
+    /// - returns: the completion block used for discovering user identities
+    var discoverUserIdentitiesCompletionBlock: ((NSError?) -> Void)? { get set }
 }
 
 /// A generic protocol which exposes the properties used by Apple's CKFetchNotificationChangesOperation.
@@ -157,6 +257,22 @@ public protocol CKModifyBadgeOperationType: CKOperationType {
 
     /// - returns: the completion block used
     var modifyBadgeCompletionBlock: ((NSError?) -> Void)? { get set }
+}
+
+/// A generic protocol which exposes the properties used by Apple's CKFetchDatabaseChangesOperationType.
+public protocol CKFetchDatabaseChangesOperationType: CKDatabaseOperationType, CKFetchAllChanges, CKPreviousServerChangeToken, CKResultsLimit {
+
+    /// - returns: a block for when a the changeToken is updated
+    var changeTokenUpdatedBlock: ((ServerChangeToken) -> Void)? { get set }
+
+    /// - returns: a block for when a recordZone was changed
+    var recordZoneWithIDChangedBlock: ((RecordZoneID) -> Void)? { get set }
+
+    /// - returns: a block for when a recordZone was deleted
+    var recordZoneWithIDWasDeletedBlock: ((RecordZoneID) -> Void)? { get set }
+
+    /// - returns: the completion for fetching database changes
+    var fetchDatabaseChangesCompletionBlock: ((ServerChangeToken?, Bool, NSError?) -> Void)? { get set }
 }
 
 /// A generic protocol which exposes the properties used by Apple's CKFetchRecordChangesOperation.
@@ -201,6 +317,66 @@ public protocol CKFetchRecordsOperationType: CKDatabaseOperationType, CKDesiredK
     var fetchRecordsCompletionBlock: (([RecordID: Record]?, NSError?) -> Void)? { get set }
 }
 
+/// A generic protocol which exposes the properties used by Apple's CKFetchRecordZoneChangesOperation.
+public protocol CKFetchRecordZoneChangesOperationType: CKDatabaseOperationType, CKFetchAllChanges {
+
+    /// The type of the CloudKit FetchRecordZoneChangesOptions
+    associatedtype FetchRecordZoneChangesOptions
+
+    /// - returns: the record zone IDs which will fetch changes
+    var recordZoneIDs: [RecordZoneID] { get set }
+
+    /// - returns: the per-record-zone options
+    var optionsByRecordZoneID: [RecordZoneID : FetchRecordZoneChangesOptions]? { get set }
+
+    /// - returns: a block for when a record is changed
+    var recordChangedBlock: ((Record) -> Void)? { get set }
+
+    /// - returns: a block for when a recordID is deleted (receives the recordID and the recordType)
+    var recordWithIDWasDeletedBlock: ((RecordID, String) -> Void)? { get set }
+
+    /// - returns: a block for when a recordZone changeToken update is sent
+    var recordZoneChangeTokensUpdatedBlock: ((RecordZoneID, ServerChangeToken?, NSData?) -> Void)? { get set }
+
+    /// - returns: a block for when a recordZone fetch is complete
+    var recordZoneFetchCompletionBlock: ((RecordZoneID, ServerChangeToken?, NSData?, Bool, NSError?) -> Void)? { get set }
+
+    /// - returns: the completion for fetching records (i.e. for the entire operation)
+    var fetchRecordZoneChangesCompletionBlock: ((NSError?) -> Void)? { get set }
+}
+
+/// A generic protocol which exposes the properties used by Apple's CKFetchShareMetadataOperation.
+public protocol CKFetchShareMetadataOperationType: CKOperation2Type {
+
+    /// - returns: the share URLs
+    var shareURLs: [NSURL] { get set }
+
+    /// - returns: whether to fetch the share root record
+    var shouldFetchRootRecord: Bool { get set }
+
+    /// - returns: the share root record desired keys
+    var rootRecordDesiredKeys: [String]? { get set }
+
+    /// - returns: the per share metadata block
+    var perShareMetadataBlock: ((NSURL, ShareMetadata?, NSError?) -> Void)? { get set }
+
+    /// - returns: the fetch share metadata completion block
+    var fetchShareMetadataCompletionBlock: ((NSError?) -> Void)? { get set }
+}
+
+/// A generic protocol which exposes the properties used by Apple's CKFetchShareParticipantsOperation.
+public protocol CKFetchShareParticipantsOperationType: CKOperation2Type {
+
+    /// - returns: the user identity lookup infos
+    var userIdentityLookupInfos: [UserIdentityLookupInfo] { get set }
+
+    /// - returns: the share participant fetched block
+    var shareParticipantFetchedBlock: ((ShareParticipant) -> Void)? { get set }
+
+    /// - returns: the fetch share participants completion block
+    var fetchShareParticipantsCompletionBlock: ((NSError?) -> Void)? { get set }
+}
+
 /// A generic protocol which exposes the properties used by Apple's CKFetchSubscriptionsOperation.
 public protocol CKFetchSubscriptionsOperationType: CKDatabaseOperationType {
 
@@ -213,8 +389,6 @@ public protocol CKFetchSubscriptionsOperationType: CKDatabaseOperationType {
 
 /// A generic protocol which exposes the properties used by Apple's CKModifyRecordZonesOperation.
 public protocol CKModifyRecordZonesOperationType: CKDatabaseOperationType {
-
-    associatedtype Error = ModifyRecordZonesError<RecordZone, RecordZoneID>
 
     /// - returns: the record zones to save
     var recordZonesToSave: [RecordZone]? { get set }
@@ -229,8 +403,6 @@ public protocol CKModifyRecordZonesOperationType: CKDatabaseOperationType {
 // A generic protocol which exposes the properties used by Apple's CKModifyRecordsOperation.
 public protocol CKModifyRecordsOperationType: CKDatabaseOperationType {
 
-    associatedtype Error = ModifyRecordsError<Record, RecordID>
-
     /// - returns: the records to save
     var recordsToSave: [Record]? { get set }
 
@@ -244,7 +416,7 @@ public protocol CKModifyRecordsOperationType: CKDatabaseOperationType {
     var clientChangeTokenData: NSData? { get set }
 
     /// - returns: a flag for atomic changes
-    var atomic: Bool { get set }
+    var isAtomic: Bool { get set }
 
     /// - returns: a per record progress block
     var perRecordProgressBlock: ((Record, Double) -> Void)? { get set }
@@ -315,6 +487,10 @@ extension CKOperation: CKOperationType {
     public typealias ServerChangeToken = CKServerChangeToken
 
     /// The DiscoveredUserInfo is a CKDiscoveredUserInfo
+    @available(iOS, introduced=8.0, deprecated=10.0, message="Replaced by CKUserIdentity")
+    @available(OSX, introduced=10.10, deprecated=10.12, message="Replaced by CKUserIdentity")
+    @available(tvOS, introduced=8.0, deprecated=10.0, message="Replaced by CKUserIdentity")
+    @available(watchOS, introduced=2.0, deprecated=3.0, message="Replaced by CKUserIdentity")
     public typealias DiscoveredUserInfo = CKDiscoveredUserInfo
 
     /// The RecordZone is a CKRecordZone
@@ -335,8 +511,13 @@ extension CKOperation: CKOperationType {
     /// The RecordID is a CKRecordID
     public typealias RecordID = CKRecordID
 
-    /// The Subscription is a CKSubscription
-    public typealias Subscription = CKSubscription
+    #if !os(watchOS)
+        /// The Subscription is a CKSubscription
+        public typealias Subscription = CKSubscription
+    #else
+        // CKSubscription is unsupported on watchOS
+        public typealias Subscription = Void
+    #endif
 
     /// The RecordSavePolicy is a CKRecordSavePolicy
     public typealias RecordSavePolicy = CKRecordSavePolicy
@@ -346,6 +527,27 @@ extension CKOperation: CKOperationType {
 
     /// The QueryCursor is a CKQueryCursor
     public typealias QueryCursor = CKQueryCursor
+
+    /// The CKOperationLongLivedOperationWasPersistedBlock is () -> Void
+    public typealias CKOperationLongLivedOperationWasPersistedBlock = () -> Void
+}
+
+@available(iOS 10.0, OSX 10.12, tvOS 10.0, watchOS 3.0, *)
+extension CKOperation: CKOperation2Type {
+    /// The UserIdentity is a CKUserIdentity
+    public typealias UserIdentity = CKUserIdentity
+
+    /// The UserIdentityLookupInfo is a CKUserIdentityLookupInfo
+    public typealias UserIdentityLookupInfo = CKUserIdentityLookupInfo
+
+    /// The Share is a CKShare
+    public typealias Share = CKShare
+
+    /// The ShareMetadata is a CKShareMetadata
+    public typealias ShareMetadata = CKShareMetadata
+
+    /// The ShareParticipant is a CKShareParticipant
+    public typealias ShareParticipant = CKShareParticipant
 }
 
 extension CKDatabaseOperation: CKDatabaseOperationType {
@@ -354,8 +556,18 @@ extension CKDatabaseOperation: CKDatabaseOperationType {
     public typealias Database = CKDatabase
 }
 
+@available(iOS 10.0, OSX 10.12, tvOS 10.0, watchOS 3.0, *)
+extension CKAcceptSharesOperation: CKAcceptSharesOperationType, AssociatedErrorType {
+
+    // The associated error type
+    public typealias Error = CloudKitError
+}
+
 /// Extension to have CKDiscoverAllContactsOperation conform to CKDiscoverAllContactsOperationType
 #if !os(tvOS)
+@available(iOS, introduced=8.0, deprecated=10.0, message="Use CKDiscoverAllUserIdentitiesOperation instead")
+@available(OSX, introduced=10.10, deprecated=10.12, message="Use CKDiscoverAllUserIdentitiesOperation instead")
+@available(watchOS, introduced=2.0, deprecated=3.0, message="Use CKDiscoverAllUserIdentitiesOperation instead")
 extension CKDiscoverAllContactsOperation: CKDiscoverAllContactsOperationType, AssociatedErrorType {
 
     // The associated error type
@@ -363,7 +575,27 @@ extension CKDiscoverAllContactsOperation: CKDiscoverAllContactsOperationType, As
 }
 #endif
 
+#if !os(tvOS)
+@available(iOS 10.0, OSX 10.12, watchOS 3.0, *)
+extension CKDiscoverAllUserIdentitiesOperation: CKDiscoverAllUserIdentitiesOperationType, AssociatedErrorType {
+
+    // The associated error type
+    public typealias Error = CloudKitError
+}
+#endif
+
+@available(iOS, introduced=8.0, deprecated=10.0, message="Use CKDiscoverUserIdentitiesOperation instead")
+@available(OSX, introduced=10.10, deprecated=10.12, message="Use CKDiscoverUserIdentitiesOperation instead")
+@available(tvOS, introduced=8.0, deprecated=10.0, message="Use CKDiscoverUserIdentitiesOperation instead")
+@available(watchOS, introduced=2.0, deprecated=3.0, message="Use CKDiscoverUserIdentitiesOperation instead")
 extension CKDiscoverUserInfosOperation: CKDiscoverUserInfosOperationType, AssociatedErrorType {
+
+    // The associated error type
+    public typealias Error = CloudKitError
+}
+
+@available(iOS 10.0, OSX 10.12, tvOS 10.0, watchOS 3.0, *)
+extension CKDiscoverUserIdentitiesOperation: CKDiscoverUserIdentitiesOperationType, AssociatedErrorType {
 
     // The associated error type
     public typealias Error = CloudKitError
@@ -392,6 +624,17 @@ extension CKModifyBadgeOperation: CKModifyBadgeOperationType, AssociatedErrorTyp
     public typealias Error = CloudKitError
 }
 
+@available(iOS 10.0, OSX 10.12, tvOS 10.0, watchOS 3.0, *)
+extension CKFetchDatabaseChangesOperation: CKFetchDatabaseChangesOperationType, AssociatedErrorType {
+
+    // The associated error type
+    public typealias Error = FetchDatabaseChangesError<ServerChangeToken>
+}
+
+@available(iOS, introduced=8.0, deprecated=10.0, message="Use CKFetchRecordZoneChangesOperation instead")
+@available(OSX, introduced=10.10, deprecated=10.12, message="Use CKFetchRecordZoneChangesOperation instead")
+@available(tvOS, introduced=8.0, deprecated=10.0, message="Use CKFetchRecordZoneChangesOperation instead")
+@available(watchOS, introduced=2.0, deprecated=3.0, message="Use CKFetchRecordZoneChangesOperation instead")
 extension CKFetchRecordChangesOperation: CKFetchRecordChangesOperationType, AssociatedErrorType {
 
     // The associated error type
@@ -410,11 +653,37 @@ extension CKFetchRecordsOperation: CKFetchRecordsOperationType, AssociatedErrorT
     public typealias Error = FetchRecordsError<Record, RecordID>
 }
 
+@available(iOS 10.0, OSX 10.12, tvOS 10.0, watchOS 3.0, *)
+extension CKFetchRecordZoneChangesOperation: CKFetchRecordZoneChangesOperationType, AssociatedErrorType {
+
+    // The associated error type
+    public typealias Error = FetchRecordZoneChangesError
+
+    /// The type of the CloudKit FetchRecordZoneChangesOptions
+    public typealias FetchRecordZoneChangesOptions = CKFetchRecordZoneChangesOptions
+}
+
+@available(iOS 10.0, OSX 10.12, tvOS 10.0, watchOS 3.0, *)
+extension CKFetchShareMetadataOperation: CKFetchShareMetadataOperationType, AssociatedErrorType {
+
+    // The associated error type
+    public typealias Error = CloudKitError
+}
+
+@available(iOS 10.0, OSX 10.12, tvOS 10.0, watchOS 3.0, *)
+extension CKFetchShareParticipantsOperation: CKFetchShareParticipantsOperationType, AssociatedErrorType {
+
+    // The associated error type
+    public typealias Error = CloudKitError
+}
+
+#if !os(watchOS)
 extension CKFetchSubscriptionsOperation: CKFetchSubscriptionsOperationType, AssociatedErrorType {
 
     // The associated error type
     public typealias Error = FetchSubscriptionsError<Subscription>
 }
+#endif
 
 extension CKModifyRecordZonesOperation: CKModifyRecordZonesOperationType, AssociatedErrorType, BatchModifyOperationType {
 
@@ -448,6 +717,7 @@ extension CKModifyRecordsOperation: CKModifyRecordsOperationType, AssociatedErro
     }
 }
 
+#if !os(watchOS)
 extension CKModifySubscriptionsOperation: CKModifySubscriptionsOperationType, AssociatedErrorType, BatchModifyOperationType {
 
     // The associated error type
@@ -463,9 +733,12 @@ extension CKModifySubscriptionsOperation: CKModifySubscriptionsOperationType, As
         set { subscriptionIDsToDelete = newValue }
     }
 }
+#endif
 
 extension CKQueryOperation: CKQueryOperationType, AssociatedErrorType {
 
     // The associated error type
     public typealias Error = QueryError<QueryCursor>
 }
+
+// swiftlint:enable file_length
