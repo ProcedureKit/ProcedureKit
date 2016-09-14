@@ -3,7 +3,7 @@
 	"author_url": "http://danthorpe.me",
 	"github_url": "https://github.com/ProcedureKit/ProcedureKit",
 	"module": "Operations",
-	"module_version": "3.3.1",
+	"module_version": "3.4.0",
 	"readme": "README.md",
 	"swift_version": "2.2",	
 	"xcodebuild_arguments": [

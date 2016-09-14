@@ -1,3 +1,7 @@
+# 3.4.0
+
+This is a release suitable for submission for iOS 10, but built using Swift 2.3 & Xcode 8.
+
 # 3.3.0
 This is a release suitable for submission for iOS 10, but built using Swift 2.2 & Xcode 7.
 
