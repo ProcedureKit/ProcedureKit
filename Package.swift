@@ -1,7 +1,9 @@
 //
-//  Created by Daniel Thorpe on 03/03/2016.
+//  ProcedureKit
+//
+//  Copyright © 2016 ProcedureKit. All rights reserved.
 //
 
 import PackageDescription
 
-let package = Package(name: "Operations")
+let package = Package(name: "ProcedureKit")
