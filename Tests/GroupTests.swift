@@ -13,13 +13,13 @@ class GroupTests: GroupTestCase {
     // MARK: - Basic Group Tests
 
     func test__group_sets_name() {
-       XCTAssertEqual(group.name, "Group")
+       XCTAssertEqual(group.name, "GroupProcedure")
     }
 
     func test__group_has_user_intent_set_from_input_operations() {
         let child = TestProcedure()
         child.userIntent = .initiated
-        group = TestGroup(operations: [child, TestProcedure(), BlockOperation { }])
+        group = TestGroupProcedure(operations: [child, TestProcedure(), BlockOperation { }])
         XCTAssertEqual(group.userIntent, .initiated)
     }
 
@@ -28,7 +28,7 @@ class GroupTests: GroupTestCase {
         child1.userIntent = .initiated
         let child2 = TestProcedure()
         let child3 = BlockOperation { }
-        group = TestGroup(operations: [child1, child2, child3])
+        group = TestGroupProcedure(operations: [child1, child2, child3])
         group.userIntent = .sideEffect
 
         XCTAssertEqual(child1.userIntent, .sideEffect)
@@ -65,8 +65,8 @@ class GroupTests: GroupTestCase {
     }
 
     func test_group_will_add_child_observer_is_called() {
-        var blockCalledWith: (Group, Operation)? = nil
-        group = TestGroup(operations: [children[0]])
+        var blockCalledWith: (GroupProcedure, Operation)? = nil
+        group = TestGroupProcedure(operations: [children[0]])
         group.addWillAddChildBlockObserver { group, child in
             blockCalledWith = (group, child)
         }
@@ -77,8 +77,8 @@ class GroupTests: GroupTestCase {
     }
 
     func test_group_did_add_child_observer_is_called() {
-        var blockCalledWith: (Group, Operation)? = nil
-        group = TestGroup(operations: [children[0]])
+        var blockCalledWith: (GroupProcedure, Operation)? = nil
+        group = TestGroupProcedure(operations: [children[0]])
         group.addDidAddChildBlockObserver { group, child in
             blockCalledWith = (group, child)
         }
@@ -94,7 +94,7 @@ class GroupTests: GroupTestCase {
 
     func test__group_suspended_before_execute() {
         let child = children[0]
-        group = TestGroup(operations: [child])
+        group = TestGroupProcedure(operations: [child])
         group.isSuspended = true
 
         let childWillExecuteDispatchGroup = DispatchGroup()
@@ -129,7 +129,7 @@ class GroupTests: GroupTestCase {
 
     func test__group_exits_correctly_when_child_errors() {
         children = createTestProcedures(shouldError: true)
-        group = TestGroup(operations: children)
+        group = TestGroupProcedure(operations: children)
 
         wait(for: group)
 
@@ -138,8 +138,8 @@ class GroupTests: GroupTestCase {
 
     func test__group_exits_correctly_when_child_group_finishes_with_errors() {
         children = createTestProcedures(shouldError: true)
-        let child = TestGroup(operations: children); child.name = "Child Group"
-        group = TestGroup(operations: child)
+        let child = TestGroupProcedure(operations: children); child.name = "Child Group"
+        group = TestGroupProcedure(operations: child)
 
         wait(for: group)
         XCTAssertEqual(child.errors.count, children.count)

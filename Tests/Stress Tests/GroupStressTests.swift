@@ -14,7 +14,7 @@ class CancelGroupStressTests: StressTestCase {
 
         stress { batch, iteration in
             batch.dispatchGroup.enter()
-            let group = TestGroup(operations: TestProcedure(delay: 0))
+            let group = TestGroupProcedure(operations: TestProcedure(delay: 0))
             group.addDidFinishBlockObserver { _, _ in
                 batch.dispatchGroup.leave()
             }
@@ -26,13 +26,13 @@ class CancelGroupStressTests: StressTestCase {
 
 class GroupCancelAndAddOperationStressTests: StressTestCase {
 
-    final class TestGroupWhichAddsOperationsAfterSuperInit: Group {
+    final class TestGroupProcedureWhichAddsOperationsAfterSuperInit: GroupProcedure {
         let operationsToAddOnExecute: [Operation]
 
         init(operations: [Operation] = [TestProcedure(delay: 0)], operationsToAddOnExecute: [Operation] = [TestProcedure(delay: 0)]) {
             self.operationsToAddOnExecute = operationsToAddOnExecute
             super.init(operations: [])
-            name = "TestGroupWhichAddsOperationsAfterSuperInit"
+            name = "TestGroupProcedureWhichAddsOperationsAfterSuperInit"
             add(children: operations) // add operations during init, after super.init
         }
 
@@ -46,7 +46,7 @@ class GroupCancelAndAddOperationStressTests: StressTestCase {
 
         stress { batch, _ in
             batch.dispatchGroup.enter()
-            let group = TestGroupWhichAddsOperationsAfterSuperInit()
+            let group = TestGroupProcedureWhichAddsOperationsAfterSuperInit()
             group.addDidFinishBlockObserver { _, _ in
                 batch.dispatchGroup.leave()
             }
@@ -64,7 +64,7 @@ class GroupDoesNotFinishBeforeChildOperationsAreFinished: StressTestCase {
 
             let child1 = TestProcedure(delay: 0.004)
             let child2 = TestProcedure(delay: 0.006)
-            let group = Group(operations: child1, child2)
+            let group = GroupProcedure(operations: child1, child2)
 
             group.addDidFinishBlockObserver { _, _ in
                 if child1.isFinished {

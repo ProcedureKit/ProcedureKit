@@ -14,7 +14,7 @@ import Foundation
  related operations together, thereby creating higher
  levels of abstractions.
  */
-open class Group: Procedure, ProcedureQueueDelegate {
+open class GroupProcedure: Procedure, ProcedureQueueDelegate {
 
     internal struct GroupErrors {
         typealias ByOperation = [Operation: [Error]]
@@ -43,7 +43,7 @@ open class Group: Procedure, ProcedureQueueDelegate {
     }
 
     /**
-     Designated initializer for Group. Create a Group, a Procedure subclass with
+     Designated initializer for GroupProcedure. Create a GroupProcedure with
      an array of Operation instances. Optionally provide the underlying dispatch
      queue for the group's internal ProcedureQueue.
 
@@ -58,7 +58,7 @@ open class Group: Procedure, ProcedureQueueDelegate {
         groupChildren = Protector(operations)
 
         /**
-         GroupOperation is responsible for calling `finish()` on cancellation
+         GroupProcedure is responsible for calling `finish()` on cancellation
          once all of its childred have cancelled and finished, and its own
          finishing operation has finished.
 
@@ -70,7 +70,7 @@ open class Group: Procedure, ProcedureQueueDelegate {
         queue.underlyingQueue = underlyingQueue
         queue.delegate = self
 
-        name = "Group"
+        name = "GroupProcedure"
         userIntent = operations.userIntent
         groupCanFinish = CanFinishGroup(group: self)
 
@@ -113,7 +113,7 @@ open class Group: Procedure, ProcedureQueueDelegate {
 
      If the errors were recovered from, return true from this method, else return false.
 
-     Errors which are not handled will result in the Group finishing with errors.
+     Errors which are not handled will result in the GroupProcedure finishing with errors.
 
      - parameter child: the child operation which is finishing
      - parameter errors: an [ErrorType], the errors of the child operation
@@ -233,15 +233,15 @@ open class Group: Procedure, ProcedureQueueDelegate {
     public func procedureQueue(_ queue: ProcedureQueue, didFinishOperation operation: Operation, withErrors errors: [Error]) { }
 }
 
-// MARK: - Group API
+// MARK: - GroupProcedure API
 
-public extension Group {
+public extension GroupProcedure {
 
     /**
      The maximum number of child operations that can execute at the same time.
 
-     The value in this property affects only the operations that the current GroupOperation has
-     executing at the same time. Other operation queues and GroupOperations can also execute
+     The value in this property affects only the operations that the current GroupProcedure has
+     executing at the same time. Other operation queues and GroupProcedures can also execute
      their maximum number of operations in parallel.
 
      Reducing the number of concurrent operations does not affect any operations that are
@@ -258,15 +258,15 @@ public extension Group {
     }
 
     /**
-     A Boolean value indicating whether the Group is actively scheduling operations for execution.
+     A Boolean value indicating whether the GroupProcedure is actively scheduling operations for execution.
 
-     When the value of this property is false, the GroupOperation actively starts child operations
-     that are ready to execute once the GroupOperation has been executed.
+     When the value of this property is false, the GroupProcedure actively starts child operations
+     that are ready to execute once the GroupProcedure has been executed.
 
-     Setting this property to true prevents the GroupOperation from starting any child operations,
+     Setting this property to true prevents the GroupProcedure from starting any child operations,
      but already executing child operations continue to execute.
 
-     You may continue to add operations to a GroupOperation that is suspended but those operations
+     You may continue to add operations to a GroupProcedure that is suspended but those operations
      are not scheduled for execution until you change this property to false.
 
      The default value of this property is false.
@@ -284,10 +284,10 @@ public extension Group {
     }
 
     /**
-     The default service level to apply to the GroupOperation and its child operations.
+     The default service level to apply to the GroupProcedure and its child operations.
 
-     This property specifies the service level applied to the GroupOperation itself, and to
-     operation objects added to the GroupOperation.
+     This property specifies the service level applied to the GroupProcedure itself, and to
+     operation objects added to the GroupProcedure.
 
      If the added operation object has an explicit service level set, that value is used instead.
 
@@ -314,7 +314,7 @@ public extension Group {
 
 // MARK: - Add Child API
 
-public extension Group {
+public extension GroupProcedure {
 
     /**
      Add a single child Operation instance to the group
@@ -400,7 +400,7 @@ public extension Group {
 
 // MARK: - Error Handling & Recovery
 
-public extension Group {
+public extension GroupProcedure {
 
     public override var errors: [Error] {
         get { return groupErrors.read { $0.fatal } }
@@ -449,15 +449,15 @@ public extension Group {
 
 // MARK: - Finishing
 
-fileprivate extension Group {
+fileprivate extension GroupProcedure {
 
     fileprivate class CanFinishGroup: Operation {
 
-        private weak var group: Group?
+        private weak var group: GroupProcedure?
         private var _isFinished = false
         private var _isExecuting = false
 
-        init(group: Group) {
+        init(group: GroupProcedure) {
             self.group = group
             super.init()
         }
@@ -525,12 +525,12 @@ fileprivate extension Group {
 
                         group.log.verbose(message: "cannot finish now, as there are children still active.")
 
-                        // The Group should wait for these children to finish
+                        // The GroupProcedure should wait for these children to finish
                         // before finishing. Add the oustanding children as
                         // dependencies to a new CanFinishGroup, and add that as the
                         // Group's new CanFinishGroup.
 
-                        let newCanFinishGroup = Group.CanFinishGroup(group: group)
+                        let newCanFinishGroup = GroupProcedure.CanFinishGroup(group: group)
 
                         active.forEach { newCanFinishGroup.addDependency($0) }
 
@@ -584,7 +584,7 @@ fileprivate extension Group {
 
 fileprivate extension ProcedureQueue {
 
-    func add(canFinishGroup: Group.CanFinishGroup) {
+    func add(canFinishGroup: GroupProcedure.CanFinishGroup) {
         // Do not add observers (not needed - CanFinishGroup is an implementation detail of Group)
         // Do not add conditions (CanFinishGroup has none)
         // Call OperationQueue.addOperation() directly
@@ -594,7 +594,7 @@ fileprivate extension ProcedureQueue {
 
 // MARK: - Unavailable
 
-public extension Group {
+public extension GroupProcedure {
 
     @available(*, unavailable, renamed: "children")
     var operations: [Operation] { return children }
@@ -613,24 +613,24 @@ public extension Group {
 
 }
 
-// MARK: - Group Observer
+// MARK: - GroupProcedure Observer
 
 public protocol GroupObserverProtocol {
 
-    func group(_ group: Group, willAdd: Operation)
+    func group(_ group: GroupProcedure, willAdd: Operation)
 
-    func group(_ group: Group, didAdd: Operation)
+    func group(_ group: GroupProcedure, didAdd: Operation)
 }
 
 public extension GroupObserverProtocol {
 
-    func group(_ group: Group, willAdd: Operation) { }
+    func group(_ group: GroupProcedure, willAdd: Operation) { }
 
-    func group(_ group: Group, didAdd: Operation) { }
+    func group(_ group: GroupProcedure, didAdd: Operation) { }
 }
 
 public struct GroupWillAddChildObserver: GroupObserverProtocol {
-    public typealias Block = (Group, Operation) -> Void
+    public typealias Block = (GroupProcedure, Operation) -> Void
 
     private let block: Block
 
@@ -638,13 +638,13 @@ public struct GroupWillAddChildObserver: GroupObserverProtocol {
         block = willAddChild
     }
 
-    public func group(_ group: Group, willAdd operation: Operation) {
+    public func group(_ group: GroupProcedure, willAdd operation: Operation) {
         block(group, operation)
     }
 }
 
 public struct GroupDidAddChildObserver: GroupObserverProtocol {
-    public typealias Block = (Group, Operation) -> Void
+    public typealias Block = (GroupProcedure, Operation) -> Void
 
     private let block: Block
 
@@ -652,12 +652,12 @@ public struct GroupDidAddChildObserver: GroupObserverProtocol {
         block = didAddChild
     }
 
-    public func group(_ group: Group, didAdd operation: Operation) {
+    public func group(_ group: GroupProcedure, didAdd operation: Operation) {
         block(group, operation)
     }
 }
 
-public extension Group {
+public extension GroupProcedure {
 
     var groupObservers: [GroupObserverProtocol] {
         return groupProtectedObservers.read { $0 }
