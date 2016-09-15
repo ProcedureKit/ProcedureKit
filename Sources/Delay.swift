@@ -13,14 +13,12 @@ public enum Delay {
 
 extension Delay: CustomStringConvertible {
 
-    private static let formatter = DateFormatter()
-
     public var description: String {
         switch self {
         case .by(let _interval):
             return "for \(_interval) seconds"
         case .until(let date):
-            return "until \(Delay.formatter.string(from: date))"
+            return "until \(DateFormatter().string(from: date))"
         }
     }
 }
@@ -53,22 +51,18 @@ public class DelayProcedure: Procedure {
 
     private let delay: Delay
     private let leeway: DispatchTimeInterval
-    private let timer: DispatchSourceTimer
+    private var timer: DispatchSourceTimer? = nil
 
     internal init(delay: Delay, leeway: DispatchTimeInterval = .milliseconds(1)) {
         self.delay = delay
         self.leeway = leeway
-        self.timer = DispatchSource.makeTimerSource()
         super.init()
         name = "Delay \(delay)"
-        timer.setEventHandler { [weak self] in
-            guard let strongSelf = self else { return }
-            if !strongSelf.isCancelled { strongSelf.finish() }
-        }
         addDidCancelBlockObserver { procedure, _ in
-            procedure.timer.cancel()
+            procedure.timer?.cancel()
         }
     }
+
     /**
      Initialize the `DelayProcedure` with a time interval.
 
@@ -102,8 +96,14 @@ public class DelayProcedure: Procedure {
      */
     public override func execute() {
         switch delay.interval {
-        case (let interval) where interval > 0.0:
-            timer.scheduleOneshot(deadline: DispatchTime.now() + interval, leeway: leeway)
+        case (let interval) where interval > 0.0 && !isCancelled:
+            timer = DispatchSource.makeTimerSource(flags: [], queue: DispatchQueue.default)
+            timer?.setEventHandler { [weak self] in
+                guard let strongSelf = self else { return }
+                if !strongSelf.isCancelled { strongSelf.finish() }
+            }
+            timer?.scheduleOneshot(deadline: .now() + interval, leeway: leeway)
+            timer?.resume()
         default:
             finish()
         }

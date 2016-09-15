@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		650182C91D8916EC0052CE90 /* DelayProcedureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 650182C81D8916EC0052CE90 /* DelayProcedureTests.swift */; };
 		6518D5E31D7B3A2800A12EF4 /* Condition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6518D5E21D7B3A2800A12EF4 /* Condition.swift */; };
 		65245D1B1D72129800340A2D /* QueueTestDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65245D1A1D72129800340A2D /* QueueTestDelegate.swift */; };
 		65245D1D1D721A7100340A2D /* ProcedureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65245D1C1D721A7100340A2D /* ProcedureTests.swift */; };
@@ -198,6 +199,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		650182C81D8916EC0052CE90 /* DelayProcedureTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = DelayProcedureTests.swift; path = Tests/DelayProcedureTests.swift; sourceTree = "<group>"; };
 		6518D5E21D7B3A2800A12EF4 /* Condition.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Condition.swift; path = Sources/Condition.swift; sourceTree = "<group>"; };
 		65245D1A1D72129800340A2D /* QueueTestDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = QueueTestDelegate.swift; path = Sources/Testing/QueueTestDelegate.swift; sourceTree = "<group>"; };
 		65245D1C1D721A7100340A2D /* ProcedureTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ProcedureTests.swift; path = Tests/ProcedureTests.swift; sourceTree = "<group>"; };
@@ -392,6 +394,7 @@
 				65A0CB261D7D4CF1008FB37C /* BlockProcedureTests.swift */,
 				65245D1E1D7231DC00340A2D /* CancellationTests.swift */,
 				65403AB71D7C453200D6036B /* ConditionTests.swift */,
+				650182C81D8916EC0052CE90 /* DelayProcedureTests.swift */,
 				65245D201D72345000340A2D /* FinishingTests.swift */,
 				6591B2FE1D74953A00C2B57F /* GroupTests.swift */,
 				65245D241D724FC200340A2D /* LoggerTests.swift */,
@@ -1168,6 +1171,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				650182C91D8916EC0052CE90 /* DelayProcedureTests.swift in Sources */,
 				65245D251D724FC200340A2D /* LoggerTests.swift in Sources */,
 				6591B3001D74954E00C2B57F /* GroupTests.swift in Sources */,
 				65881B791D880ACB00C212C8 /* MutualExclusivityTests.swift in Sources */,
