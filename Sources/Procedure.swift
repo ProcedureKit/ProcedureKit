@@ -208,7 +208,7 @@ open class Procedure: Operation, ProcedureProcotol {
 
     internal fileprivate(set) var directDependencies = Set<Operation>()
 
-    internal fileprivate(set) var evaluateConditionsProcedure: Group? = nil
+    internal fileprivate(set) var evaluateConditionsProcedure: GroupProcedure? = nil
 
     internal var indirectDependencies: Set<Operation> {
         return Set(conditions
@@ -603,7 +603,7 @@ public extension Procedure {
         }
     }
 
-    internal class EvaluateConditions: Group {
+    internal class EvaluateConditions: GroupProcedure {
         var requirement: [Condition] = []
         var result: ConditionEvaluation = .pending
 

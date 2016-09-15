@@ -8,7 +8,7 @@ import Foundation
 import XCTest
 import ProcedureKit
 
-open class TestGroup: Group {
+open class TestGroupProcedure: GroupProcedure {
     public private(set) var didExecute = false
 
     open override func execute() {
@@ -20,7 +20,7 @@ open class TestGroup: Group {
 open class GroupTestCase: ProcedureKitTestCase {
 
     public var children: [TestProcedure]!
-    public var group: TestGroup!
+    public var group: TestGroupProcedure!
 
     public func createTestProcedures(count: Int = 5, shouldError: Bool = false) -> [TestProcedure] {
         return (0..<count).map { i in
@@ -32,7 +32,7 @@ open class GroupTestCase: ProcedureKitTestCase {
     open override func setUp() {
         super.setUp()
         children = createTestProcedures()
-        group = TestGroup(operations: children)
+        group = TestGroupProcedure(operations: children)
     }
 
     open override func tearDown() {
