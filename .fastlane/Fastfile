@@ -46,6 +46,7 @@ platform :ios do
       output_directory: ".ci/xcodebuild-data"
     )
 
+  end
 
 
   desc "watchOS: ProcedureKit"
