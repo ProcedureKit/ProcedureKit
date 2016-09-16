@@ -1,3 +1,91 @@
+# 4.0.0 Beta 1
+
+Well, it’s time to say goodbye to _Operations_ and hello to _ProcedureKit_. _ProcedureKit_ is a complete re-write of _Operations_ in Swift 3.0, and has the following key changes.
+
+1. _ProcedureKit_
+    _Operations_ has been lucky to have many contributors, and for _ProcedureKit_ I wanted to be able to recognise the fantastic contributions of this little community properly. So the repository has been transferred into an organization. At the moment, the only additional member is [@swiftlyfalling](https://github.com/swiftlyfalling) however I hope that more will join soon. In addition to moving to an org, there are now contribution guidelines and code of conduct documents.
+    
+2. Naming changes
+    Because Swift 3.0 has dropped the `NS` prefix from many classes, including `NSOperation`, `NSOperationQueue` and `NSBlockOperation`, _Operations_ had some pretty significant issues in Swift 3.0. At WWDC this year, I was able to discuss _Operations_ with Dave DeLong and Philippe Hausler. We brainstormed some alternatives, and came up with “Procedure”, which I’ve sort of grown accustomed to now. The name changes are  widespread, and essentially, what was once `Operation` is now `Procedure`.
+    
+3. Project structure
+    For a long time, we’ve had an issue where some classes are not extension API compatible. This has resulted in having two projects in the repository, which in turn leads to problems with Carthage not being able to build desired frameworks. With ProcedureKit, this problem is entirely resolved. The core framework, which is the focus of this beta, is entirely extension API compatible. It should be imported like this:
+    ```swift
+    import ProcedureKit
+    ```
+    
+    Functionality which depends on UIKit, such as `AlertProcedure` will be exposed in a framework called `ProcedureKitMobile`, and imported like this:
+    ```swift
+    import ProcedureKit
+    import ProcedureKitMobile
+    ```
+    
+    Similarly for other non-core functionality like CloudKit wrappers etc.
+    
+    In addition to types which should be used in applications, I wanted to expose types to aid writing unit tests. This is called `TestingProcedureKit`, which itself links against `XCTest`. *It can only be used inside test bundle targets*. This framework includes `ProcedureKitTestCase` and `StressTestCase` which are suitable for subclassing. The former then exposes simple APIs to wait for procedures to run using `XCTestExpectation`. Additionally, there are `XCTAssertProcedure*` style macros which can assert that a `Procedure` ran as expected. To use it in your own application’s unit test target:
+    ```swift
+    import ProcedureKit
+    import TestingProcedureKit
+    @testable import MyApplication
+    ```    
+4. Beta 1 Functionality
+    This beta is focused on the minimum. It has `Procedure`, `ProcedureQueue`, `GroupProcedure`, `MapProcedure`, `BlockProcedure` and `DelayProcedure`. In addition, there is support for the following features:
+    1. Attaching conditions which may support mutual exclusion
+    2. Adding observers - see notes below.
+    3. Result injection has been simplified to a single protocol.
+    4. Full logging support
+    5. Errors are consolidated into a single `ProcedureKitError` type.
+
+5. Observers
+    An annoying element of the observers in _Operations_ is that the received `Operation` does not retain full type fidelity. It’s just `Operation`, not `MyOperationSubclass`. With `ProcedureKit` this has been fixed as now the underlying protocol `ProcedureObserver` is generic over the `Procedure` which is possible as there is now a `ProcedureProtocol`. This means, that the block observers are now generic too. Additionally, an extension on `ProcedureProtocol` provides convenience methods for adding block observers. This means that adding block observers should now be done like this:    
+    ```swift 
+    let foo = FooProcedure()
+    foo.addDidFinishBlockObserver { foo, errors in
+        // No need to cast argument to FooProcedure
+        foo.doFooMethod()
+    }
+    ```
+6. `BlockProcedure`
+    The API for `BlockProcedure` has changed somewhat. The block type is now `() throws -> Void`. In some regards this is a reduction in capability over `BlockOperation` from _Operations_ which received a finishing block. The finishing block meant that the block could have an asynchronous callback to it.
+    
+    While this functionality might return, I think that it is far better to have a simple abstraction around synchronous work which will be enqueued and can throw errors. For asynchronous work, it would be best to make a proper `Procedure` subclass.
+    
+    Having said that, potentially we will add `AsyncBlockProcedure` to support this use case. Please raise an issue if this is something you care about!
+    
+Anyway, I think that is about it - thanks to all the contributors who have supported _Operations_ and _ProcedureKit_ while this has been written. Stay tuned for Beta 2 in a week or so.
+
+# 3.4.0
+
+This is a release suitable for submission for iOS 10, but built using Swift 2.3 & Xcode 8.
+
+# 3.3.0
+This is a release suitable for submission for iOS 10, but built using Swift 2.2 & Xcode 7.
+
+1. [OPR-452](https://github.com/ProcedureKit/ProcedureKit/pull/452)  Resolves the warning related to CFErrorRef.
+2. [OPR-453](https://github.com/ProcedureKit/ProcedureKit/issues/453), [OPR-454](https://github.com/ProcedureKit/ProcedureKit/pull/454) Fixes an issue where the Mac OS X deployment target was incorrect.
+3. [OPR-456](https://github.com/ProcedureKit/ProcedureKit/pull/456)  Modifies the podspec to remove Calendar, Passbook, Photos, CloudKit, Location, AddressBook etc from the standard spec. This  is to prevent linking/importing OS frameworks which consumers might not have explanations in their info.plist. This is following reports that  are being more restrictive for iOS 10 submissions.
+
+# 3.2.0
+This is a pretty special release! All the important changes have been provided by contributors! 🚀😀💚
+
+Additionally, [@swiftlyfalling](https://github.com/swiftlyfalling) has become a _ProcedureKit_ core contributor 😀 
+
+1. [OPR-416](https://github.com/ProcedureKit/ProcedureKit/issues/416), [OPR-417](https://github.com/ProcedureKit/ProcedureKit/issues/417) Thanks to [@pomozoff](https://github.com/pomozoff) for reporting and fixing a bug which could cause a crash in an edge case where operation with conditions is previously cancelled. Thanks to [@swiftlyfalling](https://github.com/swiftlyfalling).
+2. [OPR-420](https://github.com/ProcedureKit/ProcedureKit/pull/420) Thanks to [@swiftlyfalling](https://github.com/swiftlyfalling) for replacing an assertion failure, and adding some more stress tests in `Condition`’s `execute` method.
+3. [OPR-344](https://github.com/ProcedureKit/ProcedureKit/issues/344), [OPR-344](https://github.com/ProcedureKit/ProcedureKit/pull/421) Thanks to [@ryanjm](https://github.com/ryanjm) for reporting (_a while ago_, sorry!) a bug in `NetworkObserver`, and thanks to [@swiftlyfalling](https://github.com/swiftlyfalling) for fixing the bug!
+4. [OPR-422](https://github.com/ProcedureKit/ProcedureKit/pull/422)  Thanks to [@swiftlyfalling](https://github.com/swiftlyfalling) for adding some robustness to `NetworkObserver` and its tests.
+5. [OPR-419](https://github.com/ProcedureKit/ProcedureKit/pull/419) Thanks to [@swiftlyfalling](https://github.com/swiftlyfalling) for fixing a bug which improves the performance of a whole number of tests. Mostly the changes here are to ensure that `XCTestExpectation`s get their `fulfill()` methods called on the main queue.
+6. [OPR-423](https://github.com/ProcedureKit/ProcedureKit/pull/423) Thanks to [@swiftlyfalling](https://github.com/swiftlyfalling) for fixing a bug where `cancelWithError()` could result in an assertion due to an illegal state transition. They even added some stress tests around this 💚
+7. [OPR-425](https://github.com/ProcedureKit/ProcedureKit/pull/425)  Thanks to [@swiftlyfalling](https://github.com/swiftlyfalling) for refactoring some unit tests to use a dispatch group instead of multiple `XCTestExpectation` instances.
+8. [OPR-427](https://github.com/ProcedureKit/ProcedureKit/pull/427) I made some changes to the CI pipeline for Swift 2.2 branch so that [@swiftlyfalling](https://github.com/swiftlyfalling) didn’t have to wait too long to merge their pull requests.
+9. [OPR-434](https://github.com/ProcedureKit/ProcedureKit/pull/434) Thanks to [@pomozoff](https://github.com/pomozoff) for raising a configuration issue where a file was added to the Xcode project twice, causing a warning when running Carthage.
+10. [OPR-435](https://github.com/ProcedureKit/ProcedureKit/pull/435) Thanks to [@swiftlyfalling](https://github.com/swiftlyfalling) for making some improvements to avoid a Swift 2.2 bug which causes a memory leak when using string interpolation.
+
+# 3.1.1
+
+1. [OPR-410](https://github.com/danthorpe/Operations/pull/410) Thanks to [@paulpires](https://github.com/paulpires) for fixing a bug in the `ReachabilityManager`.
+2. [OPR-412](https://github.com/danthorpe/Operations/pull/412) Makes the `condition` property of `Operation` publicly accessible.
+
 # 3.1.0
 
 ## Improvements to Result Injection

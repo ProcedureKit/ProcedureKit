@@ -19,6 +19,42 @@ extension OPRCKOperation where T: CKOperationType {
         get { return operation.container }
         set { operation.container = newValue }
     }
+
+    var allowsCellularAccess: Bool {
+        get { return operation.allowsCellularAccess }
+        set { operation.allowsCellularAccess = newValue }
+    }
+
+    @available(iOS 9.3, tvOS 9.3, OSX 10.12, watchOS 2.3, *)
+    var operationID: String {
+        get { return operation.operationID }
+    }
+
+    @available(iOS 9.3, tvOS 9.3, OSX 10.12, watchOS 2.3, *)
+    var longLived: Bool {
+        get { return operation.longLived }
+        set { operation.longLived = newValue }
+    }
+
+    #if swift(>=3.0) // TEMPORARY FIX: Swift 2.3 compiler crash (see: CloudKitInterface.swift)
+        @available(iOS 9.3, tvOS 9.3, OSX 10.12, watchOS 2.3, *)
+        var longLivedOperationWasPersistedBlock: () -> Void {
+            get { return operation.longLivedOperationWasPersistedBlock }
+            set { operation.longLivedOperationWasPersistedBlock = newValue }
+        }
+    #endif
+
+    @available(iOS 10.0, tvOS 10.0, OSX 10.12, watchOS 3.0, *)
+    var timeoutIntervalForRequest: NSTimeInterval  {
+        get { return operation.timeoutIntervalForRequest }
+        set { operation.timeoutIntervalForRequest = newValue }
+    }
+
+    @available(iOS 10.0, tvOS 10.0, OSX 10.12, watchOS 3.0, *)
+    var timeoutIntervalForResource: NSTimeInterval {
+        get { return operation.timeoutIntervalForResource }
+        set { operation.timeoutIntervalForResource = newValue }
+    }
 }
 
 extension CloudKitOperation where T: CKOperationType {
@@ -31,6 +67,65 @@ extension CloudKitOperation where T: CKOperationType {
             addConfigureBlock { $0.container = newValue }
         }
     }
+
+    /// - returns whether to use cellular data access, if WiFi is unavailable (CKOperation default is true)
+    public var allowsCellularAccess: Bool {
+        get { return operation.allowsCellularAccess }
+        set {
+            operation.allowsCellularAccess = newValue
+            addConfigureBlock { $0.allowsCellularAccess = newValue }
+        }
+    }
+
+    /// - returns a unique identifier for a long-lived CKOperation
+    @available(iOS 9.3, tvOS 9.3, OSX 10.12, watchOS 2.3, *)
+    public var operationID: String {
+        get { return operation.operationID }
+    }
+
+    /// - returns whether the operation is long-lived
+    @available(iOS 9.3, tvOS 9.3, OSX 10.12, watchOS 2.3, *)
+    public var longLived: Bool {
+        get { return operation.longLived }
+        set {
+            operation.longLived = newValue
+            addConfigureBlock { $0.longLived = newValue }
+        }
+    }
+
+    #if swift(>=3.0) // TEMPORARY FIX: Swift 2.3 compiler crash (see: CloudKitInterface.swift)
+        /// - returns the block to execute when the server starts storing callbacks for this long-lived CKOperation
+        @available(iOS 9.3, tvOS 9.3, OSX 10.12, watchOS 2.3, *)
+        public var longLivedOperationWasPersistedBlock: () -> Void {
+            get { return operation.longLivedOperationWasPersistedBlock }
+            set {
+                operation.longLivedOperationWasPersistedBlock = newValue
+                addConfigureBlock { $0.longLivedOperationWasPersistedBlock = newValue }
+            }
+        }
+    #endif
+
+    /// If non-zero, overrides the timeout interval for any network requests issued by this operation.
+    /// See NSURLSessionConfiguration.timeoutIntervalForRequest
+    @available(iOS 10.0, tvOS 10.0, OSX 10.12, watchOS 3.0, *)
+    public var timeoutIntervalForRequest: NSTimeInterval  {
+        get { return operation.timeoutIntervalForRequest }
+        set {
+            operation.timeoutIntervalForRequest = newValue
+            addConfigureBlock { $0.timeoutIntervalForRequest = newValue }
+        }
+    }
+
+    /// If non-zero, overrides the timeout interval for any network resources retrieved by this operation.
+    /// See NSURLSessionConfiguration.timeoutIntervalForResource
+    @available(iOS 10.0, tvOS 10.0, OSX 10.12, watchOS 3.0, *)
+    public var timeoutIntervalForResource: NSTimeInterval {
+        get { return operation.timeoutIntervalForResource }
+        set {
+            operation.timeoutIntervalForResource = newValue
+            addConfigureBlock { $0.timeoutIntervalForResource = newValue }
+        }
+    }
 }
 
 extension BatchedCloudKitOperation where T: CKOperationType {
@@ -41,6 +136,65 @@ extension BatchedCloudKitOperation where T: CKOperationType {
         set {
             operation.container = newValue
             addConfigureBlock { $0.container = newValue }
+        }
+    }
+
+    /// - returns whether to use cellular data access, if WiFi is unavailable (CKOperation default is true)
+    public var allowsCellularAccess: Bool {
+        get { return operation.allowsCellularAccess }
+        set {
+            operation.allowsCellularAccess = newValue
+            addConfigureBlock { $0.allowsCellularAccess = newValue }
+        }
+    }
+
+    /// - returns a unique identifier for a long-lived CKOperation
+    @available(iOS 9.3, tvOS 9.3, OSX 10.12, watchOS 2.3, *)
+    public var operationID: String {
+        get { return operation.operationID }
+    }
+
+    /// - returns whether the operation is long-lived
+    @available(iOS 9.3, tvOS 9.3, OSX 10.12, watchOS 2.3, *)
+    public var longLived: Bool {
+        get { return operation.longLived }
+        set {
+            operation.longLived = newValue
+            addConfigureBlock { $0.longLived = newValue }
+        }
+    }
+
+    #if swift(>=3.0) // TEMPORARY FIX: Swift 2.3 compiler crash (see: CloudKitInterface.swift)
+        /// - returns the block to execute when the server starts storing callbacks for this long-lived CKOperation
+        @available(iOS 9.3, tvOS 9.3, OSX 10.12, watchOS 2.3, *)
+        public var longLivedOperationWasPersistedBlock: () -> Void {
+            get { return operation.longLivedOperationWasPersistedBlock }
+            set {
+                operation.longLivedOperationWasPersistedBlock = newValue
+                addConfigureBlock { $0.longLivedOperationWasPersistedBlock = newValue }
+            }
+        }
+    #endif
+
+    /// If non-zero, overrides the timeout interval for any network requests issued by this operation.
+    /// See NSURLSessionConfiguration.timeoutIntervalForRequest
+    @available(iOS 10.0, tvOS 10.0, OSX 10.12, watchOS 3.0, *)
+    public var timeoutIntervalForRequest: NSTimeInterval  {
+        get { return operation.timeoutIntervalForRequest }
+        set {
+            operation.timeoutIntervalForRequest = newValue
+            addConfigureBlock { $0.timeoutIntervalForRequest = newValue }
+        }
+    }
+
+    /// If non-zero, overrides the timeout interval for any network resources retrieved by this operation.
+    /// See NSURLSessionConfiguration.timeoutIntervalForResource
+    @available(iOS 10.0, tvOS 10.0, OSX 10.12, watchOS 3.0, *)
+    public var timeoutIntervalForResource: NSTimeInterval {
+        get { return operation.timeoutIntervalForResource }
+        set {
+            operation.timeoutIntervalForResource = newValue
+            addConfigureBlock { $0.timeoutIntervalForResource = newValue }
         }
     }
 }
@@ -172,6 +326,40 @@ extension BatchedCloudKitOperation where T: CKMoreComing {
     }
 }
 
+// MARK: - CKFetchAllChanges
+
+extension OPRCKOperation where T: CKFetchAllChanges {
+
+    public var fetchAllChanges: Bool {
+        get { return operation.fetchAllChanges }
+        set { operation.fetchAllChanges = newValue }
+    }
+}
+
+extension CloudKitOperation where T: CKFetchAllChanges {
+
+    /// - returns: the previous server change token
+    public var fetchAllChanges: Bool {
+        get { return operation.fetchAllChanges }
+        set {
+            operation.fetchAllChanges = newValue
+            addConfigureBlock { $0.fetchAllChanges = newValue }
+        }
+    }
+}
+
+extension BatchedCloudKitOperation where T: CKFetchAllChanges {
+
+    /// - returns: the previous server change token
+    public var fetchAllChanges: Bool {
+        get { return operation.fetchAllChanges }
+        set {
+            operation.fetchAllChanges = newValue
+            addConfigureBlock { $0.fetchAllChanges = newValue }
+        }
+    }
+}
+
 // MARK: - CKDesiredKeys
 
 extension OPRCKOperation where T: CKDesiredKeys {
@@ -261,6 +449,70 @@ public extension CloudKitOperation where T: BatchModifyOperationType {
     }
 }
 
+// MARK: - CKAcceptSharesOperation
+
+extension OPRCKOperation where T: CKAcceptSharesOperationType, T: AssociatedErrorType, T.Error: CloudKitErrorType {
+
+    public var shareMetadatas: [T.ShareMetadata] {
+        get { return operation.shareMetadatas }
+        set { operation.shareMetadatas = newValue }
+    }
+
+    public var perShareCompletionBlock: CloudKitOperation<T>.AcceptSharesPerShareCompletionBlock? {
+        get { return operation.perShareCompletionBlock }
+        set { operation.perShareCompletionBlock = newValue }
+    }
+
+    func setAcceptSharesCompletionBlock(block: CloudKitOperation<T>.AcceptSharesCompletionBlock) {
+        operation.acceptSharesCompletionBlock = { [unowned self] error in
+            if let error = error {
+                self.addFatalError(CloudKitError(error: error))
+            }
+            else {
+                block()
+            }
+        }
+    }
+}
+
+extension CloudKitOperation where T: CKAcceptSharesOperationType {
+
+    /// A typealias for the block type used by CloudKitOperation<CKAcceptSharesOperationType>
+    public typealias AcceptSharesPerShareCompletionBlock = (T.ShareMetadata, T.Share?, NSError?) -> Void
+
+    /// A typealias for the block type used by CloudKitOperation<CKAcceptSharesOperationType>
+    public typealias AcceptSharesCompletionBlock = () -> Void
+
+    /// - returns: the share metadatas
+    public var shareMetadatas: [T.ShareMetadata] {
+        get { return operation.shareMetadatas }
+        set {
+            operation.shareMetadatas = newValue
+            addConfigureBlock { $0.shareMetadatas = newValue }
+        }
+    }
+
+    /// - returns: the block used to return accepted shares
+    public var perShareCompletionBlock: AcceptSharesPerShareCompletionBlock? {
+        get { return operation.perShareCompletionBlock }
+        set {
+            operation.perShareCompletionBlock = newValue
+            addConfigureBlock { $0.perShareCompletionBlock = newValue }
+        }
+    }
+
+    /**
+     Before adding the CloudKitOperation instance to a queue, set a completion block
+     to collect the results in the successful case. Setting this completion block also
+     ensures that error handling gets triggered.
+
+     - parameter block: an AcceptSharesCompletionBlock block
+     */
+    public func setAcceptSharesCompletionBlock(block: AcceptSharesCompletionBlock) {
+        addConfigureBlock { $0.setAcceptSharesCompletionBlock(block) }
+    }
+}
+
 // MARK: - CKDiscoverAllContactsOperation
 
 public struct DiscoverAllContactsError<DiscoveredUserInfo>: CloudKitErrorType {
@@ -302,6 +554,56 @@ extension CloudKitOperation where T: CKDiscoverAllContactsOperationType {
      */
     public func setDiscoverAllContactsCompletionBlock(block: DiscoverAllContactsCompletionBlock) {
         addConfigureBlock { $0.setDiscoverAllContactsCompletionBlock(block) }
+    }
+}
+
+// MARK: - CKDiscoverAllUserIdentitiesOperation
+
+extension OPRCKOperation where T: CKDiscoverAllUserIdentitiesOperationType, T: AssociatedErrorType, T.Error: CloudKitErrorType {
+
+    public var userIdentityDiscoveredBlock: CloudKitOperation<T>.DiscoverAllUserIdentitiesUserIdentityDiscoveredBlock? {
+        get { return operation.userIdentityDiscoveredBlock }
+        set { operation.userIdentityDiscoveredBlock = newValue }
+    }
+
+    func setDiscoverAllUserIdentitiesCompletionBlock(block: CloudKitOperation<T>.DiscoverAllUserIdentitiesCompletionBlock) {
+        operation.discoverAllUserIdentitiesCompletionBlock = { [unowned self] error in
+            if let error = error {
+                self.addFatalError(CloudKitError(error: error))
+            }
+            else {
+                block()
+            }
+        }
+    }
+}
+
+extension CloudKitOperation where T: CKDiscoverAllUserIdentitiesOperationType {
+
+    /// A typealias for the block type used by CloudKitOperation<CKDiscoverAllUserIdentitiesOperationType>
+    public typealias DiscoverAllUserIdentitiesUserIdentityDiscoveredBlock = (T.UserIdentity) -> Void
+
+    /// A typealias for the block type used by CloudKitOperation<CKDiscoverAllUserIdentitiesOperationType>
+    public typealias DiscoverAllUserIdentitiesCompletionBlock = () -> Void
+
+    /// - returns: a block for when a recordZone changeToken update is sent
+    public var userIdentityDiscoveredBlock: DiscoverAllUserIdentitiesUserIdentityDiscoveredBlock? {
+        get { return operation.userIdentityDiscoveredBlock }
+        set {
+            operation.userIdentityDiscoveredBlock = newValue
+            addConfigureBlock { $0.userIdentityDiscoveredBlock = newValue }
+        }
+    }
+
+    /**
+     Before adding the CloudKitOperation instance to a queue, set a completion block
+     to collect the results in the successful case. Setting this completion block also
+     ensures that error handling gets triggered.
+
+     - parameter block: a DiscoverAllContactsCompletionBlock block
+     */
+    public func setDiscoverAllUserIdentitiesCompletionBlock(block: DiscoverAllUserIdentitiesCompletionBlock) {
+        addConfigureBlock { $0.setDiscoverAllUserIdentitiesCompletionBlock(block) }
     }
 }
 
@@ -363,6 +665,70 @@ extension CloudKitOperation where T: CKDiscoverUserInfosOperationType {
      */
     public func setDiscoverUserInfosCompletionBlock(block: DiscoverUserInfosCompletionBlock) {
         addConfigureBlock { $0.setDiscoverUserInfosCompletionBlock(block) }
+    }
+}
+
+// MARK: - CKDiscoverUserIdentitiesOperation
+
+extension OPRCKOperation where T: CKDiscoverUserIdentitiesOperationType, T: AssociatedErrorType, T.Error: CloudKitErrorType {
+
+    public var userIdentityLookupInfos: [T.UserIdentityLookupInfo] {
+        get { return operation.userIdentityLookupInfos }
+        set { operation.userIdentityLookupInfos = newValue }
+    }
+
+    public var userIdentityDiscoveredBlock: CloudKitOperation<T>.DiscoverUserIdentitiesUserIdentityDiscoveredBlock? {
+        get { return operation.userIdentityDiscoveredBlock }
+        set { operation.userIdentityDiscoveredBlock = newValue }
+    }
+
+    func setDiscoverUserIdentitiesCompletionBlock(block: CloudKitOperation<T>.DiscoverUserIdentitiesCompletionBlock) {
+        operation.discoverUserIdentitiesCompletionBlock = { [unowned self] error in
+            if let error = error {
+                self.addFatalError(CloudKitError(error: error))
+            }
+            else {
+                block()
+            }
+        }
+    }
+}
+
+extension CloudKitOperation where T: CKDiscoverUserIdentitiesOperationType {
+
+    /// A typealias for the block type used by CloudKitOperation<CKDiscoverUserIdentitiesOperationType>
+    public typealias DiscoverUserIdentitiesUserIdentityDiscoveredBlock = (T.UserIdentity, T.UserIdentityLookupInfo) -> Void
+
+    /// A typealias for the block type used by CloudKitOperation<CKDiscoverUserIdentitiesOperationType>
+    public typealias DiscoverUserIdentitiesCompletionBlock = () -> Void
+
+    /// - returns: the user identity lookup info used in discovery
+    public var userIdentityLookupInfos: [T.UserIdentityLookupInfo] {
+        get { return operation.userIdentityLookupInfos }
+        set {
+            operation.userIdentityLookupInfos = newValue
+            addConfigureBlock { $0.userIdentityLookupInfos = newValue }
+        }
+    }
+
+    /// - returns: the block used to return discovered user identities
+    public var userIdentityDiscoveredBlock: DiscoverUserIdentitiesUserIdentityDiscoveredBlock? {
+        get { return operation.userIdentityDiscoveredBlock }
+        set {
+            operation.userIdentityDiscoveredBlock = newValue
+            addConfigureBlock { $0.userIdentityDiscoveredBlock = newValue }
+        }
+    }
+
+    /**
+     Before adding the CloudKitOperation instance to a queue, set a completion block
+     to collect the results in the successful case. Setting this completion block also
+     ensures that error handling gets triggered.
+
+     - parameter block: a DiscoverUserIdentitiesCompletionBlock block
+     */
+    public func setDiscoverUserIdentitiesCompletionBlock(block: DiscoverUserIdentitiesCompletionBlock) {
+        addConfigureBlock { $0.setDiscoverUserIdentitiesCompletionBlock(block) }
     }
 }
 
@@ -552,6 +918,103 @@ extension CloudKitOperation where T: CKModifyBadgeOperationType {
 
     public func setModifyBadgeCompletionBlock(block: ModifyBadgeCompletionBlock) {
         addConfigureBlock { $0.setModifyBadgeCompletionBlock(block) }
+    }
+}
+
+// MARK: - CKFetchDatabaseChangesOperation (iOS 10+, macOS 10.12+, tvOS 10.0+, watchOS 3.0+)
+
+public struct FetchDatabaseChangesError<ServerChangeToken>: CloudKitErrorType {
+
+    public let underlyingError: NSError
+    public let token: ServerChangeToken?
+    public let moreComing: Bool
+
+    init(error: NSError, token: ServerChangeToken?, moreComing: Bool) {
+        self.underlyingError = error
+        self.token = token
+        self.moreComing = moreComing
+    }
+}
+
+extension OPRCKOperation where T: CKFetchDatabaseChangesOperationType, T: AssociatedErrorType, T.Error: CloudKitErrorType {
+
+    public var recordZoneWithIDChangedBlock: CloudKitOperation<T>.FetchDatabaseChangesRecordZoneWithIDChangedBlock? {
+        get { return operation.recordZoneWithIDChangedBlock }
+        set { operation.recordZoneWithIDChangedBlock = newValue }
+    }
+
+    public var recordZoneWithIDWasDeletedBlock: CloudKitOperation<T>.FetchDatabaseChangesRecordZoneWithIDWasDeletedBlock? {
+        get { return operation.recordZoneWithIDWasDeletedBlock }
+        set { operation.recordZoneWithIDWasDeletedBlock = newValue }
+    }
+
+    public var changeTokenUpdatedBlock: CloudKitOperation<T>.FetchDatabaseChangesChangeTokenUpdatedBlock? {
+        get { return operation.changeTokenUpdatedBlock }
+        set { operation.changeTokenUpdatedBlock = newValue }
+    }
+
+    func setFetchDatabaseChangesCompletionBlock(block: CloudKitOperation<T>.FetchDatabaseChangesCompletionBlock) {
+        operation.fetchDatabaseChangesCompletionBlock = { [unowned self] (serverChangeToken, moreComing, error) in
+            if let error = error {
+                self.addFatalError(FetchDatabaseChangesError(error: error, token: serverChangeToken, moreComing: moreComing))
+            }
+            else {
+                block(serverChangeToken: serverChangeToken, moreComing: moreComing)
+            }
+        }
+    }
+}
+
+extension CloudKitOperation where T: CKFetchDatabaseChangesOperationType {
+
+    /// A typealias for the block types used by CloudKitOperation<CKFetchDatabaseChangesOperationType>
+    public typealias FetchDatabaseChangesRecordZoneWithIDChangedBlock = (T.RecordZoneID) -> Void
+
+    /// A typealias for the block types used by CloudKitOperation<CKFetchDatabaseChangesOperationType>
+    public typealias FetchDatabaseChangesRecordZoneWithIDWasDeletedBlock = (T.RecordZoneID) -> Void
+
+    /// A typealias for the block types used by CloudKitOperation<CKFetchDatabaseChangesOperationType>
+    public typealias FetchDatabaseChangesChangeTokenUpdatedBlock = (T.ServerChangeToken) -> Void
+
+    /// A typealias for the block types used by CloudKitOperation<CKFetchDatabaseChangesOperationType>
+    public typealias FetchDatabaseChangesCompletionBlock = (serverChangeToken: T.ServerChangeToken?, moreComing: Bool) -> Void
+
+    /// - returns: a block for when a record is changed
+    public var recordZoneWithIDChangedBlock: FetchDatabaseChangesRecordZoneWithIDChangedBlock? {
+        get { return operation.recordZoneWithIDChangedBlock }
+        set {
+            operation.recordZoneWithIDChangedBlock = newValue
+            addConfigureBlock { $0.recordZoneWithIDChangedBlock = newValue }
+        }
+    }
+
+    /// - returns: a block for when a recordID is deleted (receives the recordID and the recordType)
+    public var recordZoneWithIDWasDeletedBlock: FetchDatabaseChangesRecordZoneWithIDWasDeletedBlock? {
+        get { return operation.recordZoneWithIDWasDeletedBlock }
+        set {
+            operation.recordZoneWithIDWasDeletedBlock = newValue
+            addConfigureBlock { $0.recordZoneWithIDWasDeletedBlock = newValue }
+        }
+    }
+
+    /// - returns: a block for when a recordZone changeToken update is sent
+    public var changeTokenUpdatedBlock: FetchDatabaseChangesChangeTokenUpdatedBlock? {
+        get { return operation.changeTokenUpdatedBlock }
+        set {
+            operation.changeTokenUpdatedBlock = newValue
+            addConfigureBlock { $0.changeTokenUpdatedBlock = newValue }
+        }
+    }
+
+    /**
+     Before adding the CloudKitOperation instance to a queue, set a completion block
+     to collect the results in the successful case. Setting this completion block also
+     ensures that error handling gets triggered.
+
+     - parameter block: a FetchDatabaseChangesCompletionBlock block
+     */
+    public func setFetchDatabaseChangesCompletionBlock(block: FetchDatabaseChangesCompletionBlock) {
+        addConfigureBlock { $0.setFetchDatabaseChangesCompletionBlock(block) }
     }
 }
 
@@ -840,6 +1303,292 @@ extension CloudKitOperation where T: CKFetchRecordsOperationType {
     }
 }
 
+// MARK: - CKFetchRecordZoneChangesOperation (iOS 10+, macOS 10.12+, tvOS 10.0+, watchOS 3.0+)
+
+public struct FetchRecordZoneChangesError: CloudKitErrorType {
+
+    public let underlyingError: NSError
+
+    init(error: NSError) {
+        self.underlyingError = error
+    }
+}
+
+extension OPRCKOperation where T: CKFetchRecordZoneChangesOperationType, T: AssociatedErrorType, T.Error: CloudKitErrorType {
+
+    /// - returns: the record zone IDs which will fetch changes
+    public var recordZoneIDs: [T.RecordZoneID] {
+        get { return operation.recordZoneIDs }
+        set { operation.recordZoneIDs = newValue }
+    }
+
+    /// - returns: the per-record-zone options
+    public var optionsByRecordZoneID: [T.RecordZoneID : T.FetchRecordZoneChangesOptions]? {
+        get { return operation.optionsByRecordZoneID }
+        set { operation.optionsByRecordZoneID = newValue }
+    }
+
+    /// - returns: a block for when a record is changed
+    public var recordChangedBlock: CloudKitOperation<T>.FetchRecordZoneChangesRecordChangedBlock? {
+        get { return operation.recordChangedBlock }
+        set { operation.recordChangedBlock = newValue }
+    }
+
+    /// - returns: a block for when a recordID is deleted (receives the recordID and the recordType)
+    public var recordWithIDWasDeletedBlock: CloudKitOperation<T>.FetchRecordZoneChangesRecordWithIDWasDeletedBlock? {
+        get { return operation.recordWithIDWasDeletedBlock }
+        set { operation.recordWithIDWasDeletedBlock = newValue }
+    }
+
+    /// - returns: a block for when a recordZone changeToken update is sent
+    public var recordZoneChangeTokensUpdatedBlock: CloudKitOperation<T>.FetchRecordZoneChangesRecordZoneChangeTokensUpdatedBlock? {
+        get { return operation.recordZoneChangeTokensUpdatedBlock }
+        set { operation.recordZoneChangeTokensUpdatedBlock = newValue }
+    }
+
+    /// - returns: the completion for fetching records (i.e. for the entire operation)
+    func setFetchRecordZoneChangesCompletionBlock(block: CloudKitOperation<T>.FetchRecordZoneChangesCompletionBlock) {
+        operation.fetchRecordZoneChangesCompletionBlock = { [unowned self] error in
+            if let error = error {
+                self.addFatalError(FetchRecordZoneChangesError(error: error))
+            }
+            else {
+                block()
+            }
+        }
+    }
+}
+
+extension CloudKitOperation where T: CKFetchRecordZoneChangesOperationType {
+
+    /// A typealias for the block types used by CloudKitOperation<CKFetchRecordZoneChangesOperationType>
+    public typealias FetchRecordZoneChangesRecordChangedBlock = T.Record -> Void
+
+    /// A typealias for the block types used by CloudKitOperation<CKFetchRecordZoneChangesOperationType>
+    public typealias FetchRecordZoneChangesRecordWithIDWasDeletedBlock = (T.RecordID, String) -> Void
+
+    /// A typealias for the block types used by CloudKitOperation<CKFetchRecordZoneChangesOperationType>
+    public typealias FetchRecordZoneChangesRecordZoneChangeTokensUpdatedBlock = (T.RecordZoneID, T.ServerChangeToken?, NSData?) -> Void
+
+    /// A typealias for the block types used by CloudKitOperation<CKFetchRecordZoneChangesOperationType>
+    public typealias FetchRecordChangesCompletionRecordZoneFetchCompletionBlock = (T.RecordZoneID, T.ServerChangeToken?, NSData?, Bool, NSError?) -> Void
+
+    /// A typealias for the block types used by CloudKitOperation<CKFetchRecordZoneChangesOperationType>
+    public typealias FetchRecordZoneChangesCompletionBlock = (Void) -> Void
+
+    /// - returns: the record zone IDs which will fetch changes
+    public var recordZoneIDs: [T.RecordZoneID] {
+        get { return operation.recordZoneIDs }
+        set {
+            operation.recordZoneIDs = newValue
+            addConfigureBlock { $0.recordZoneIDs = newValue }
+        }
+    }
+
+    /// - returns: the per-record-zone options
+    public var optionsByRecordZoneID: [T.RecordZoneID : T.FetchRecordZoneChangesOptions]? {
+        get { return operation.optionsByRecordZoneID }
+        set {
+            operation.optionsByRecordZoneID = newValue
+            addConfigureBlock { $0.optionsByRecordZoneID = newValue }
+        }
+    }
+
+    /// - returns: a block for when a record is changed
+    public var recordChangedBlock: FetchRecordZoneChangesRecordChangedBlock? {
+        get { return operation.recordChangedBlock }
+        set {
+            operation.recordChangedBlock = newValue
+            addConfigureBlock { $0.recordChangedBlock = newValue }
+        }
+    }
+
+    /// - returns: a block for when a recordID is deleted (receives the recordID and the recordType)
+    public var recordWithIDWasDeletedBlock: FetchRecordZoneChangesRecordWithIDWasDeletedBlock? {
+        get { return operation.recordWithIDWasDeletedBlock }
+        set {
+            operation.recordWithIDWasDeletedBlock = newValue
+            addConfigureBlock { $0.recordWithIDWasDeletedBlock = newValue }
+        }
+    }
+
+    /// - returns: a block for when a recordZone changeToken update is sent
+    public var recordZoneChangeTokensUpdatedBlock: FetchRecordZoneChangesRecordZoneChangeTokensUpdatedBlock? {
+        get { return operation.recordZoneChangeTokensUpdatedBlock }
+        set {
+            operation.recordZoneChangeTokensUpdatedBlock = newValue
+            addConfigureBlock { $0.recordZoneChangeTokensUpdatedBlock = newValue }
+        }
+    }
+
+    /**
+     Before adding the CloudKitOperation instance to a queue, set a completion block
+     to collect the results in the successful case. Setting this completion block also
+     ensures that error handling gets triggered.
+
+     - parameter block: a FetchRecordZoneChangesCompletionBlock block
+     */
+    public func setFetchRecordZoneChangesCompletionBlock(block: FetchRecordZoneChangesCompletionBlock) {
+        addConfigureBlock { $0.setFetchRecordZoneChangesCompletionBlock(block) }
+    }
+}
+
+// MARK: - CKFetchShareMetadataOperation
+
+extension OPRCKOperation where T: CKFetchShareMetadataOperationType, T: AssociatedErrorType, T.Error: CloudKitErrorType {
+
+    public var shareURLs: [NSURL] {
+        get { return operation.shareURLs }
+        set { operation.shareURLs = newValue }
+    }
+
+    public var shouldFetchRootRecord: Bool {
+        get { return operation.shouldFetchRootRecord }
+        set { operation.shouldFetchRootRecord = newValue }
+    }
+
+    public var rootRecordDesiredKeys: [String]? {
+        get { return operation.rootRecordDesiredKeys }
+        set { operation.rootRecordDesiredKeys = newValue }
+    }
+
+    public var perShareMetadataBlock: CloudKitOperation<T>.FetchShareMetadataPerShareMetadataBlock? {
+        get { return operation.perShareMetadataBlock }
+        set { operation.perShareMetadataBlock = newValue }
+    }
+
+    func setFetchShareMetadataCompletionBlock(block: CloudKitOperation<T>.FetchShareMetadataCompletionBlock) {
+        operation.fetchShareMetadataCompletionBlock = { [unowned self] error in
+            if let error = error {
+                self.addFatalError(CloudKitError(error: error))
+            }
+            else {
+                block()
+            }
+        }
+    }
+}
+
+extension CloudKitOperation where T: CKFetchShareMetadataOperationType {
+
+    /// A typealias for the block types used by CloudKitOperation<CKFetchShareMetadataOperationType>
+    public typealias FetchShareMetadataPerShareMetadataBlock = (NSURL, T.ShareMetadata?, NSError?) -> Void
+
+    /// A typealias for the block types used by CloudKitOperation<CKFetchShareMetadataOperationType>
+    public typealias FetchShareMetadataCompletionBlock = (Void) -> Void
+
+    /// - returns: the share URLs
+    public var shareURLs: [NSURL] {
+        get { return operation.shareURLs }
+        set {
+            operation.shareURLs = newValue
+            addConfigureBlock { $0.shareURLs = newValue }
+        }
+    }
+
+    /// - returns: whether to fetch the share root record
+    public var shouldFetchRootRecord: Bool {
+        get { return operation.shouldFetchRootRecord }
+        set {
+            operation.shouldFetchRootRecord = newValue
+            addConfigureBlock { $0.shouldFetchRootRecord = newValue }
+        }
+    }
+
+    /// - returns: the share root record desired keys
+    public var rootRecordDesiredKeys: [String]? {
+        get { return operation.rootRecordDesiredKeys }
+        set {
+            operation.rootRecordDesiredKeys = newValue
+            addConfigureBlock { $0.rootRecordDesiredKeys = newValue }
+        }
+    }
+
+    /// - returns: the per share metadata block
+    public var perShareMetadataBlock: FetchShareMetadataPerShareMetadataBlock? {
+        get { return operation.perShareMetadataBlock }
+        set {
+            operation.perShareMetadataBlock = newValue
+            addConfigureBlock { $0.perShareMetadataBlock = newValue }
+        }
+    }
+
+    /**
+     Before adding the CloudKitOperation instance to a queue, set a completion block
+     to collect the results in the successful case. Setting this completion block also
+     ensures that error handling gets triggered.
+
+     - parameter block: a FetchShareMetadataCompletionBlock block
+     */
+    public func setFetchShareMetadataCompletionBlock(block: FetchShareMetadataCompletionBlock) {
+        addConfigureBlock { $0.setFetchShareMetadataCompletionBlock(block) }
+    }
+}
+
+// MARK: - CKFetchShareParticipantsOperation
+
+extension OPRCKOperation where T: CKFetchShareParticipantsOperationType, T: AssociatedErrorType, T.Error: CloudKitErrorType {
+
+    public var userIdentityLookupInfos: [T.UserIdentityLookupInfo] {
+        get { return operation.userIdentityLookupInfos }
+        set { operation.userIdentityLookupInfos = newValue }
+    }
+
+    public var shareParticipantFetchedBlock: CloudKitOperation<T>.FetchShareParticipantsParticipantFetchedBlock? {
+        get { return operation.shareParticipantFetchedBlock }
+        set { operation.shareParticipantFetchedBlock = newValue }
+    }
+
+    func setFetchShareParticipantsCompletionBlock(block: CloudKitOperation<T>.FetchShareParticipantsCompletionBlock) {
+        operation.fetchShareParticipantsCompletionBlock = { [unowned self] error in
+            if let error = error {
+                self.addFatalError(CloudKitError(error: error))
+            }
+            else {
+                block()
+            }
+        }
+    }
+}
+
+extension CloudKitOperation where T: CKFetchShareParticipantsOperationType {
+
+    /// A typealias for the block types used by CloudKitOperation<CKFetchShareMetadataOperationType>
+    public typealias FetchShareParticipantsParticipantFetchedBlock = (T.ShareParticipant) -> Void
+
+    /// A typealias for the block types used by CloudKitOperation<CKFetchShareMetadataOperationType>
+    public typealias FetchShareParticipantsCompletionBlock = (Void) -> Void
+
+    /// - returns: the user identity lookup infos
+    public var userIdentityLookupInfos: [T.UserIdentityLookupInfo] {
+        get { return operation.userIdentityLookupInfos }
+        set {
+            operation.userIdentityLookupInfos = newValue
+            addConfigureBlock { $0.userIdentityLookupInfos = newValue }
+        }
+    }
+
+    /// - returns: the share participant fetched block
+    public var shareParticipantFetchedBlock: FetchShareParticipantsParticipantFetchedBlock? {
+        get { return operation.shareParticipantFetchedBlock }
+        set {
+            operation.shareParticipantFetchedBlock = newValue
+            addConfigureBlock { $0.shareParticipantFetchedBlock = newValue }
+        }
+    }
+
+    /**
+     Before adding the CloudKitOperation instance to a queue, set a completion block
+     to collect the results in the successful case. Setting this completion block also
+     ensures that error handling gets triggered.
+
+     - parameter block: a FetchShareParticipantsCompletionBlock block
+     */
+    public func setFetchShareParticipantsCompletionBlock(block: FetchShareParticipantsCompletionBlock) {
+        addConfigureBlock { $0.setFetchShareParticipantsCompletionBlock(block) }
+    }
+}
+
 // MARK: - CKFetchSubscriptionsOperation
 
 public struct FetchSubscriptionsError<Subscription>: CloudKitErrorType {
@@ -1011,9 +1760,9 @@ extension OPRCKOperation where T: CKModifyRecordsOperationType, T: AssociatedErr
         set { operation.clientChangeTokenData = newValue }
     }
 
-    public var atomic: Bool {
-        get { return operation.atomic }
-        set { operation.atomic = newValue }
+    public var isAtomic: Bool {
+        get { return operation.isAtomic }
+        set { operation.isAtomic = newValue }
     }
 
     public var perRecordProgressBlock: CloudKitOperation<T>.ModifyRecordsPerRecordProgressBlock? {
@@ -1086,11 +1835,11 @@ extension CloudKitOperation where T: CKModifyRecordsOperationType {
     }
 
     /// - returns: a flag to indicate atomicity
-    public var atomic: Bool {
-        get { return operation.atomic }
+    public var isAtomic: Bool {
+        get { return operation.isAtomic }
         set {
-            operation.atomic = newValue
-            addConfigureBlock { $0.atomic = newValue }
+            operation.isAtomic = newValue
+            addConfigureBlock { $0.isAtomic = newValue }
         }
     }
 
