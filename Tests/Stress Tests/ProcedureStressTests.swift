@@ -7,6 +7,7 @@
 import XCTest
 import TestingProcedureKit
 @testable import ProcedureKit
+import Dispatch
 
 class ProcedureCompletionBlockStressTest: StressTestCase {
 
@@ -94,5 +95,62 @@ class ProcedureConditionsWillFinishObserverCancelThreadSafety: StressTestCase {
             batch.queue.add(operation: procedure)
             procedure.cancel()
         }
+    }
+}
+
+class ProcedureFinishStressTest: StressTestCase {
+
+    class TestAttemptsMultipleFinishesProcedure: Procedure {
+        public init(name: String = "Test Procedure") {
+            super.init()
+            self.name = name
+        }
+        override func execute() {
+            DispatchQueue.global().async() {
+                self.finish()
+            }
+            DispatchQueue.global().async() {
+                self.finish()
+            }
+            DispatchQueue.global().async() {
+                self.finish()
+            }
+        }
+    }
+
+    func test__concurrent_calls_to_finish_only_first_succeeds() {
+        // NOTES:
+        //      This test should pass without any "cyclic state transition: finishing -> finishing" errors.
+
+        stress { batch, iteration in
+            batch.dispatchGroup.enter()
+            let procedure = TestAttemptsMultipleFinishesProcedure()
+            var didFinish = false
+            let lock = NSLock()
+            procedure.addDidFinishBlockObserver { _, _ in
+                let finishedMoreThanOnce = lock.withCriticalScope(block: { () -> Bool in
+                    guard !didFinish else {
+                        // procedure finishing more than once
+                        return true
+                    }
+                    didFinish = true
+                    return false
+                })
+                guard !finishedMoreThanOnce else {
+                    batch.incrementCounter(named: "finishedProcedureMoreThanOnce", withBarrier: true)
+                    return
+                }
+                // add small delay before leaving to increase the odds that concurrent finishes are caught
+                let deadline = DispatchTime(uptimeNanoseconds: UInt64(0.1 * Double(NSEC_PER_SEC)))
+                DispatchQueue.global().asyncAfter(deadline: deadline) {
+                    batch.dispatchGroup.leave()
+                }
+            }
+            batch.queue.add(operation: procedure)
+        }
+    }
+
+    override func ended(batch: BatchProtocol) {
+        XCTAssertEqual(batch.counter(named: "finishedProcedureMoreThanOnce"), 0)
     }
 }
