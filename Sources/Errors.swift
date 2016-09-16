@@ -23,7 +23,10 @@ public struct ProcedureKitError: Error {
         case unknown
         case programmingError(String)
         case conditionFailed
+        case dependenciesFailed
+        case dependenciesCancelled
         case dependencyFinishedWithErrors
+        case dependencyCancelledWithErrors
         case parentCancelledWithErrors
         case requirementNotSatisfied
     }
@@ -32,12 +35,24 @@ public struct ProcedureKitError: Error {
         return ProcedureKitError(context: .programmingError(reason), errors: [])
     }
 
+    public static func dependenciesFailed() -> ProcedureKitError {
+        return ProcedureKitError(context: .dependenciesFailed, errors: [])
+    }
+
     public static func conditionFailed(withErrors errors: [Error] = []) -> ProcedureKitError {
         return ProcedureKitError(context: .conditionFailed, errors: errors)
     }
 
+    public static func dependenciesCancelled() -> ProcedureKitError {
+        return ProcedureKitError(context: .dependenciesCancelled, errors: [])
+    }
+
     public static func dependency(finishedWithErrors errors: [Error]) -> ProcedureKitError {
         return ProcedureKitError(context: .dependencyFinishedWithErrors, errors: errors)
+    }
+
+    public static func dependency(cancelledWithErrors errors: [Error]) -> ProcedureKitError {
+        return ProcedureKitError(context: .dependencyCancelledWithErrors, errors: errors)
     }
 
     public static func parent(cancelledWithErrors errors: [Error]) -> ProcedureKitError {
