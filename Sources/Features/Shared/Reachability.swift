@@ -228,6 +228,7 @@ class DeviceReachability: NetworkReachabilityType {
         if let reachability = try? defaultRouteReachability() {
             SCNetworkReachabilityUnscheduleFromRunLoop(reachability, CFRunLoopGetCurrent(), kCFRunLoopCommonModes)
             SCNetworkReachabilitySetCallback(reachability, nil, nil)
+            SCNetworkReachabilitySetDispatchQueue(reachability, nil)
         }
         notifierIsRunning = false
     }

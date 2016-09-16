@@ -45,17 +45,6 @@ platform :ios do
       scheme: "iOS Operations",
       output_directory: ".ci/xcodebuild-data"
     )
-    
-    slather(
-	    proj: "Operations.xcodeproj",
-    	scheme: "iOS Operations",
-    	build_directory: ".ci/xcodebuild-data",
-    	use_bundle_exec: true    	
-    )
-	
-  end
-
-
 
 
 
@@ -187,6 +176,7 @@ platform :mac do
       project: "Operations_ExtensionCompatible.xcodeproj",
       scheme: "OS X Extensions Operations",
       output_directory: ".ci/xcodebuild-data",
+      destination: "platform=macOS",
       derived_data_path: ".ci/xcodebuild-data"
     )    
 

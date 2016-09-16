@@ -26,7 +26,7 @@ struct Lock: ReadWriteLock {
 
     mutating func read<T>(block: () -> T) -> T {
         var object: T!
-        dispatch_sync(queue) {
+        Dispatch.dispatch_sync(queue) {
             object = block()
         }
         return object
@@ -91,7 +91,7 @@ public func dispatch_sync(queue: dispatch_queue_t, _ block: () throws -> Void) r
         }
     }
 
-    dispatch_sync(queue, catcher)
+    Dispatch.dispatch_sync(queue, catcher)
 
     if let failure = failure {
         try { throw failure }()

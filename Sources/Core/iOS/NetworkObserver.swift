@@ -63,7 +63,7 @@ private class NetworkIndicatorController {
     }
 
     private func updateIndicatorVisibility() {
-        if activityCount > 0 && networkActivityIndicator.networkActivityIndicatorVisible == false {
+        if activityCount > 0 {
             networkIndicatorShouldShow(true)
         }
         else if activityCount == 0 {
@@ -76,7 +76,9 @@ private class NetworkIndicatorController {
     private func networkIndicatorShouldShow(shouldShow: Bool) {
         visibilityTimer?.cancel()
         visibilityTimer = .None
-        networkActivityIndicator.networkActivityIndicatorVisible = shouldShow
+        if networkActivityIndicator.networkActivityIndicatorVisible != shouldShow {
+            networkActivityIndicator.networkActivityIndicatorVisible = shouldShow
+        }
     }
 
     // Public API
@@ -94,7 +96,7 @@ private class NetworkIndicatorController {
     }
 }
 
-private struct Timer {
+internal class Timer {     // internal for testing
 
     private var isCancelled = false
 
@@ -107,7 +109,7 @@ private struct Timer {
         }
     }
 
-    mutating func cancel() {
+    func cancel() {
         isCancelled = true
     }
 }

@@ -47,7 +47,7 @@ public protocol ConditionType {
 internal extension ConditionType {
 
     internal var category: String {
-        return "\(self.dynamicType)"
+        return String(self.dynamicType)
     }
 }
 
@@ -103,7 +103,7 @@ public class Condition: Operation, ConditionType, ResultOperationType {
 
     public final override func execute() {
         guard let operation = operation else {
-            assertionFailure("ConditionOperation executed before operation set.")
+            log.verbose("ConditionOperation finishing before evaluation because operation == .None.")
             finish()
             return
         }
@@ -240,7 +240,7 @@ internal class WrappedOperationCondition: Condition {
     let condition: OperationCondition
 
     var category: String {
-        return "\(condition.dynamicType)"
+        return String(condition.dynamicType)
     }
 
     init(_ condition: OperationCondition) {

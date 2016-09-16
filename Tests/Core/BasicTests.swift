@@ -47,7 +47,7 @@ class BasicTests: OperationTests {
     }
 
     func test__add_multiple_completion_blocks() {
-        let expectation = expectationWithDescription("Test: \(#function)")
+        weak var expectation = expectationWithDescription("Test: \(#function)")
 
         var completionBlockOneDidRun = 0
         operation.addCompletionBlock {
@@ -62,7 +62,10 @@ class BasicTests: OperationTests {
         var finalCompletionBlockDidRun = 0
         operation.addCompletionBlock {
             finalCompletionBlockDidRun += 1
-            expectation.fulfill()
+            dispatch_async(Queue.Main.queue, {
+                guard let expectation = expectation else { print("Test: \(#function): Finished expectation after timeout"); return }
+                expectation.fulfill()
+            })
         }
 
         addCompletionBlockToTestOperation(operation)
@@ -174,7 +177,7 @@ class UserIntentOperationTests: OperationTests {
 class CompletionBlockOperationTests: OperationTests {
 
     func test__block_operation_with_default_block_runs_completion_block_once() {
-        let expectation = expectationWithDescription("Test: \(#function)")
+        weak var expectation = expectationWithDescription("Test: \(#function)")
         var numberOfTimesCompletionBlockIsRun = 0
 
         let operation = BlockOperation()
@@ -186,8 +189,11 @@ class CompletionBlockOperationTests: OperationTests {
 
         let delay = DelayOperation(interval: 0.1)
         delay.addObserver(BlockObserver { op, errors in
-            expectation.fulfill()
+            dispatch_async(Queue.Main.queue, {
+                guard let expectation = expectation else { print("Test: \(#function): Finished expectation after timeout"); return }
+                expectation.fulfill()
             })
+        })
         delay.addDependency(operation)
 
         runOperations(delay, operation)
@@ -198,10 +204,15 @@ class CompletionBlockOperationTests: OperationTests {
 
     func test__nsblockoperation_runs_completion_block_once() {
         let _queue = NSOperationQueue()
-        let expectation = expectationWithDescription("Test: \(#function)")
+        weak var expectation = expectationWithDescription("Test: \(#function)")
 
         let operation = NSBlockOperation()
-        operation.completionBlock = { expectation.fulfill() }
+        operation.completionBlock = {
+            dispatch_async(Queue.Main.queue, {
+                guard let expectation = expectation else { print("Test: \(#function): Finished expectation after timeout"); return }
+                expectation.fulfill()
+            })
+        }
 
         _queue.addOperation(operation)
         waitForExpectationsWithTimeout(3, handler: nil)
@@ -216,36 +227,47 @@ class OperationDependencyTests: OperationTests {
         var counter1: Int = 0
         var counter2: Int = 0
         var counter3: Int = 0
+        
+        weak var didExecuteAllOperationsExpectation = expectationWithDescription("Test: \(#function), All Operations Executed")
+        let operationDispatchGroup = dispatch_group_create()
 
         for i in 0..<count {
 
             let op1name = "Operation 1, iteration: \(i)"
-            let op1Expectation = expectationWithDescription(op1name)
+            dispatch_group_enter(operationDispatchGroup)
             let op1 = BlockOperation { (continuation: BlockOperation.ContinuationBlockType) in
                 counter1 += 1
-                op1Expectation.fulfill()
+                dispatch_group_leave(operationDispatchGroup)
                 continuation(error: nil)
             }
+            op1.name = op1name
 
             let op2name = "Operation 2, iteration: \(i)"
-            let op2Expectation = expectationWithDescription(op2name)
+            dispatch_group_enter(operationDispatchGroup)
             let op2 = BlockOperation { (continuation: BlockOperation.ContinuationBlockType) in
                 counter2 += 1
-                op2Expectation.fulfill()
+                dispatch_group_leave(operationDispatchGroup)
                 continuation(error: nil)
             }
+            op2.name = op2name
 
             let op3name = "Operation 3, iteration: \(i)"
-            let op3Expectation = expectationWithDescription(op3name)
+            dispatch_group_enter(operationDispatchGroup)
             let op3 = BlockOperation { (continuation: BlockOperation.ContinuationBlockType) in
                 counter3 += 1
-                op3Expectation.fulfill()
+                dispatch_group_leave(operationDispatchGroup)
                 continuation(error: nil)
             }
+            op3.name = op3name
 
             op2.addDependency(op1)
             runOperations(op1, op2, op3)
         }
+
+        dispatch_group_notify(operationDispatchGroup, dispatch_get_main_queue(), {
+            guard let didExecuteAllOperationsExpectation = didExecuteAllOperationsExpectation else { print("Test: \(#function): Finished executing operations after timeout"); return }
+            didExecuteAllOperationsExpectation.fulfill()
+        })
 
         waitForExpectationsWithTimeout(6, handler: nil)
 
@@ -295,12 +317,15 @@ class DelayOperationTests: OperationTests {
     func test__delay_operation_completes_after_interval() {
         var started: NSDate!
         var ended: NSDate!
-        let expectation = expectationWithDescription("Test: \(#function)")
+        weak var expectation = expectationWithDescription("Test: \(#function)")
         let interval: NSTimeInterval = 0.5
         let operation = DelayOperation(interval: interval)
         operation.addCompletionBlock {
             ended = NSDate()
-            expectation.fulfill()
+            dispatch_async(Queue.Main.queue, {
+                guard let expectation = expectation else { print("Test: \(#function): Finished expectation after timeout"); return }
+                expectation.fulfill()
+            })
         }
         started = NSDate()
         runOperation(operation)

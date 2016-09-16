@@ -142,8 +142,7 @@ public class OperationQueue: NSOperationQueue {
                 let mutuallyExclusiveConditions = operation.conditions.filter { $0.mutuallyExclusive }
                 var previousMutuallyExclusiveOperations = Set<NSOperation>()
                 for condition in mutuallyExclusiveConditions {
-                    let category = "\(condition.category)"
-                    if let previous = manager.addOperation(operation, category: category) {
+                    if let previous = manager.addOperation(operation, category: condition.category) {
                         previousMutuallyExclusiveOperations.insert(previous)
                     }
                 }

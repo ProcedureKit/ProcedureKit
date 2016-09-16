@@ -188,7 +188,7 @@ class CloudCapabilitiesTests: XCTestCase {
     // Requesting authorization
 
     func test__request_permissions() {
-        let expectation = expectationWithDescription("Test: \(#function)")
+        weak var expectation = expectationWithDescription("Test: \(#function)")
         requirement = [ .UserDiscoverability ]
         makeDefaultCapability()
         container.accountStatus = .Available
@@ -196,7 +196,10 @@ class CloudCapabilitiesTests: XCTestCase {
             XCTAssertTrue(self.container.didGetAccountStatus)
             XCTAssertTrue(self.container.didVerifyApplicationStatus)
             XCTAssertTrue(self.container.didRequestApplicationStatus)
-            expectation.fulfill()
+            dispatch_async(Queue.Main.queue, {
+                guard let expectation = expectation else { print("Test: \(#function): Finished expectation after timeout"); return }
+                expectation.fulfill()
+            })
         }
 
         waitForExpectationsWithTimeout(3, handler: nil)
