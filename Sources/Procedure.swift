@@ -354,7 +354,7 @@ open class Procedure: Operation, ProcedureProcotol {
         let nextState = getNextState()
 
         guard nextState != .finishing else {
-            _finish(withErrors: [])
+            _finish(withErrors: [], from: .main)
             return
         }
 
@@ -367,7 +367,7 @@ open class Procedure: Operation, ProcedureProcotol {
         didChangeValue(forKey: .executing)
 
         guard nextState2 != .finishing else {
-            _finish(withErrors: [])
+            _finish(withErrors: [], from: .main)
             return
         }
 
@@ -454,7 +454,7 @@ open class Procedure: Operation, ProcedureProcotol {
 
         guard shouldFinishFromCancel else { return }
 
-        _finish(withErrors: [])
+        _finish(withErrors: [], from: .cancel)
     }
 
 
@@ -471,22 +471,31 @@ open class Procedure: Operation, ProcedureProcotol {
      - parameter errors: an array of `Error`, which defaults to empty.
      */
     public final func finish(withErrors errors: [Error] = []) {
-        _finish(withErrors: errors)
+        _finish(withErrors: errors, from: .finish)
     }
 
-    private var shouldFinish: Bool {
+    private func shouldFinish(from source: FinishingFrom) -> Bool {
         return _stateLock.withCriticalScope {
             // Do not finish is already finishing or finished
             guard state <= .finishing else { return false }
             // Only a single call to _finish should continue
-            guard !_isHandlingFinish || _isFinishingFrom == FinishingFrom.cancel  else { return false }
-            _isFinishingFrom = .finish
+            guard !_isHandlingFinish
+                // cancel() and main() ensure one-time execution
+                // thus, cancel() and main() set _isFinishingFrom prior to calling _finish()
+                // but finish() does not; _isFinishingFrom is set below when finish() calls _finish()
+                // this could be simplified to a check for (_isFinishFrom == source) if finish()
+                // ensured that it could only call _finish() once
+                // (although that would require another aquisition of the lock)
+                || (_isFinishingFrom == source && (source == .cancel || source == .main))
+                else { return false }
+
+            _isFinishingFrom = source
             return true
         }
     }
 
-    private final func _finish(withErrors receivedErrors: [Error]) {
-        guard shouldFinish else { return }
+    private final func _finish(withErrors receivedErrors: [Error], from source: FinishingFrom) {
+        guard shouldFinish(from: source) else { return }
 
         // NOTE:
         // - The stateLock should only be held when necessary, and should not

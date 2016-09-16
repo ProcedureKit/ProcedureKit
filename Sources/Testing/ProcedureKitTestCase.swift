@@ -72,7 +72,7 @@ open class ProcedureKitTestCase: XCTestCase {
     public func add(expectation: XCTestExpectation, to procedure: Procedure) {
         weak var weakExpectation = expectation
         procedure.addDidFinishBlockObserver { _, _ in
-            DispatchQueue.default.async {
+            DispatchQueue.main.async {
                 weakExpectation?.fulfill()
             }
         }
