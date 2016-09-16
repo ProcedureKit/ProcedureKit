@@ -43,3 +43,4 @@ docs
 /Packages
 .DS_Store
 .ci/xcodebuild-data/*
+/.fastlane/README.md

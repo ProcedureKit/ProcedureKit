@@ -1,4 +1,4 @@
-![](https://raw.githubusercontent.com/danthorpe/Operations/development/header.png)
+![](https://raw.githubusercontent.com/ProcedureKit/ProcedureKit/development/header.png)
 
 [![Build status](https://badge.buildkite.com/4bc80b0824c6357ae071342271cb503b8994cf0cfa58645849.svg?branch=master)](https://buildkite.com/blindingskies/operations)
 [![Coverage Status](https://coveralls.io/repos/github/ProcedureKit/ProcedureKit/badge.svg?branch=swift%2F2.2)](https://coveralls.io/github/ProcedureKit/ProcedureKit?branch=swift%2F2.2)
@@ -8,9 +8,9 @@
 [![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/Carthage/Carthage)
 
 
-# Operations
+# ProcedureKit
 
-A Swift framework inspired by WWDC 2015 Advanced NSOperations session.
+A Swift framework inspired by WWDC 2015 Advanced NSOperations session. Previously known as _Operations_, developed by [@danthorpe](https://gihub.com/danthorpe).
 
 Resource | Where to find it
 ---------|-----------------
@@ -18,6 +18,13 @@ Session video | [developer.apple.com](https://developer.apple.com/videos/wwdc/20
 Reference documentation | [docs.danthorpe.me/operations](http://docs.danthorpe.me/operations/2.9.0/index.html)
 Programming guide | [operations.readme.io](https://operations.readme.io)
 Example projects | [danthorpe/Examples](https://github.com/danthorpe/Examples)
+
+## Transition to ProcedureKit
+_Operations_ has hit a turning point as part of its transition to Swift 3.0, due to the name change of `NSOperation` to `Operation`, which now conflicts with its base abstract class. I am taking this opportunity to rename the entire project and move it to an organization repository.
+
+During this transition period, code, documentation and examples will still refer to `Operation` and `NSOperation` until the grand renaming occurs.
+
+See #398 for the high level v4.0 roadmap which lists these forthcoming changes.
 
 ## Usage
 
@@ -160,9 +167,6 @@ github 'danthorpe/Operations'
 
 It was recently discovered that it is not currently possible to install the API extension compatible framework via Carthage. This boiled down to having two schemes for the same platform, and Carthage doesn’t provide a way to pick. As of now, there are two separate projects. One for standard application version, and one for API extension compatible frameworks only. This doesn’t actually solve the problem, but there is a [pull request](https://github.com/Carthage/Carthage/pull/892) which should allow all projects in a repo to be built. For now, the only semi-automatic way to integrate these flavors is to use Cocoapods: `pod 'Operations/Extension'`. 
 
-## Motivation
-
-I want to stress that this code is heavily influenced by Apple. In no way am I attempting to assume any sort of credit for this architecture - that goes to [Dave DeLong](https://twitter.com/davedelong) and his team. My motivations are that I want to adopt this code in my own projects, and so require a solid well tested framework which I can integrate with.
 
 ### Other *Advanced NSOperations*
 Other developers have created projects based off Apple’a WWDC sample code. Check them out too.

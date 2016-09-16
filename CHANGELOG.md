@@ -1,3 +1,59 @@
+# 4.0.0 Beta 1
+
+Well, it’s time to say goodbye to _Operations_ and hello to _ProcedureKit_. _ProcedureKit_ is a complete re-write of _Operations_ in Swift 3.0, and has the following key changes.
+
+1. _ProcedureKit_
+    _Operations_ has been lucky to have many contributors, and for _ProcedureKit_ I wanted to be able to recognise the fantastic contributions of this little community properly. So the repository has been transferred into an organization. At the moment, the only additional member is [@swiftlyfalling](https://github.com/swiftlyfalling) however I hope that more will join soon. In addition to moving to an org, there are now contribution guidelines and code of conduct documents.
+    
+2. Naming changes
+    Because Swift 3.0 has dropped the `NS` prefix from many classes, including `NSOperation`, `NSOperationQueue` and `NSBlockOperation`, _Operations_ had some pretty significant issues in Swift 3.0. At WWDC this year, I was able to discuss _Operations_ with Dave DeLong and Philippe Hausler. We brainstormed some alternatives, and came up with “Procedure”, which I’ve sort of grown accustomed to now. The name changes are  widespread, and essentially, what was once `Operation` is now `Procedure`.
+    
+3. Project structure
+    For a long time, we’ve had an issue where some classes are not extension API compatible. This has resulted in having two projects in the repository, which in turn leads to problems with Carthage not being able to build desired frameworks. With ProcedureKit, this problem is entirely resolved. The core framework, which is the focus of this beta, is entirely extension API compatible. It should be imported like this:
+    ```swift
+    import ProcedureKit
+    ```
+    
+    Functionality which depends on UIKit, such as `AlertProcedure` will be exposed in a framework called `ProcedureKitMobile`, and imported like this:
+    ```swift
+    import ProcedureKit
+    import ProcedureKitMobile
+    ```
+    
+    Similarly for other non-core functionality like CloudKit wrappers etc.
+    
+    In addition to types which should be used in applications, I wanted to expose types to aid writing unit tests. This is called `TestingProcedureKit`, which itself links against `XCTest`. *It can only be used inside test bundle targets*. This framework includes `ProcedureKitTestCase` and `StressTestCase` which are suitable for subclassing. The former then exposes simple APIs to wait for procedures to run using `XCTestExpectation`. Additionally, there are `XCTAssertProcedure*` style macros which can assert that a `Procedure` ran as expected. To use it in your own application’s unit test target:
+    ```swift
+    import ProcedureKit
+    import TestingProcedureKit
+    @testable import MyApplication
+    ```    
+4. Beta 1 Functionality
+    This beta is focused on the minimum. It has `Procedure`, `ProcedureQueue`, `GroupProcedure`, `MapProcedure`, `BlockProcedure` and `DelayProcedure`. In addition, there is support for the following features:
+    1. Attaching conditions which may support mutual exclusion
+    2. Adding observers - see notes below.
+    3. Result injection has been simplified to a single protocol.
+    4. Full logging support
+    5. Errors are consolidated into a single `ProcedureKitError` type.
+
+5. Observers
+    An annoying element of the observers in _Operations_ is that the received `Operation` does not retain full type fidelity. It’s just `Operation`, not `MyOperationSubclass`. With `ProcedureKit` this has been fixed as now the underlying protocol `ProcedureObserver` is generic over the `Procedure` which is possible as there is now a `ProcedureProtocol`. This means, that the block observers are now generic too. Additionally, an extension on `ProcedureProtocol` provides convenience methods for adding block observers. This means that adding block observers should now be done like this:    
+    ```swift 
+    let foo = FooProcedure()
+    foo.addDidFinishBlockObserver { foo, errors in
+        // No need to cast argument to FooProcedure
+        foo.doFooMethod()
+    }
+    ```
+6. `BlockProcedure`
+    The API for `BlockProcedure` has changed somewhat. The block type is now `() throws -> Void`. In some regards this is a reduction in capability over `BlockOperation` from _Operations_ which received a finishing block. The finishing block meant that the block could have an asynchronous callback to it.
+    
+    While this functionality might return, I think that it is far better to have a simple abstraction around synchronous work which will be enqueued and can throw errors. For asynchronous work, it would be best to make a proper `Procedure` subclass.
+    
+    Having said that, potentially we will add `AsyncBlockProcedure` to support this use case. Please raise an issue if this is something you care about!
+    
+Anyway, I think that is about it - thanks to all the contributors who have supported _Operations_ and _ProcedureKit_ while this has been written. Stay tuned for Beta 2 in a week or so.
+
 # 3.4.0
 
 This is a release suitable for submission for iOS 10, but built using Swift 2.3 & Xcode 8.
