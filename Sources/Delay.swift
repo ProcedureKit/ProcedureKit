@@ -66,26 +66,26 @@ public class DelayProcedure: Procedure {
     /**
      Initialize the `DelayProcedure` with a time interval.
 
-     - parameter interval: a `TimeInterval`.
+     - parameter by: a `TimeInterval`.
      - parameter leeway: an `DispatchTimeInterval` representing leeway
      for the timer. This defaults to 1 milli-second accuracy.
      This is partly from a energy standpoint as nanosecond
      accuracy is costly.
      */
-    public convenience init(interval: TimeInterval, leeway: DispatchTimeInterval = .milliseconds(1)) {
+    public convenience init(by interval: TimeInterval, leeway: DispatchTimeInterval = .milliseconds(1)) {
         self.init(delay: .by(interval), leeway: leeway)
     }
 
     /**
      Initialize the `DelayProcedure` with a time interval.
 
-     - parameter date: a `Date`.
+     - parameter until: a `Date`.
      - parameter leeway: an `DispatchTimeInterval` representing leeway
      for the timer. This defaults to 1 milli-second accuracy.
      This is partly from a energy standpoint as nanosecond
      accuracy is costly.
      */
-    public convenience init(date: Date, leeway: DispatchTimeInterval = .milliseconds(1)) {
+    public convenience init(until date: Date, leeway: DispatchTimeInterval = .milliseconds(1)) {
         self.init(delay: .until(date), leeway: leeway)
     }
 

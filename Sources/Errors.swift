@@ -22,6 +22,7 @@ public struct ProcedureKitError: Error {
 
         case unknown
         case programmingError(String)
+        case timedOut(Delay)
         case conditionFailed
         case dependenciesFailed
         case dependenciesCancelled
@@ -33,6 +34,10 @@ public struct ProcedureKitError: Error {
 
     public static func programmingError(reason: String) -> ProcedureKitError {
         return ProcedureKitError(context: .programmingError(reason), errors: [])
+    }
+
+    public static func timedOut(with delay: Delay) -> ProcedureKitError {
+        return ProcedureKitError(context: .timedOut(delay), errors: [])
     }
 
     public static func dependenciesFailed() -> ProcedureKitError {
