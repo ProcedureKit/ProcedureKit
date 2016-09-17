@@ -94,6 +94,8 @@ open class Procedure: Operation, ProcedureProcotol {
         }
     }
 
+    internal let identifier = UUID()
+
     // MARK: State
 
     private var _state = State.initialized
@@ -105,8 +107,7 @@ open class Procedure: Operation, ProcedureProcotol {
         }
         set(newState) {
             _stateLock.withCriticalScope {
-                assert(_state.canTransition(to: newState, whenCancelled: isCancelled), "Attempting to perform illegal cyclic state transition, \(_state) -> \(newState).")
-//                assert(_state.canTransition(to: newState, whenCancelled: isCancelled), "Attempting to perform illegal cyclic state transition, \(_state) -> \(newState) for operation: \(identity).")
+                assert(_state.canTransition(to: newState, whenCancelled: isCancelled), "Attempting to perform illegal cyclic state transition, \(_state) -> \(newState) for operation: \(identity).")
                 log.verbose(message: "\(_state) -> \(newState)")
                 _state = newState
             }
@@ -223,8 +224,9 @@ open class Procedure: Operation, ProcedureProcotol {
     // MARK: - Initialization
 
     public override init() {
-        self.isAutomaticFinishingDisabled = false
+        isAutomaticFinishingDisabled = false
         super.init()
+        name = String(describing: type(of: self))
     }
 
     // MARK: - Disable Automatic Finishing
@@ -266,8 +268,9 @@ open class Procedure: Operation, ProcedureProcotol {
 
      */
     public init(disableAutomaticFinishing: Bool) {
-        self.isAutomaticFinishingDisabled = disableAutomaticFinishing
+        isAutomaticFinishingDisabled = disableAutomaticFinishing
         super.init()
+        name = String(describing: type(of: self))
     }
 
 

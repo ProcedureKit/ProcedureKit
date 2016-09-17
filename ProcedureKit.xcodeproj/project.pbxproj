@@ -58,6 +58,7 @@
 		655E86431D67B55B000FBA6C /* ProcedureQueue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 655E86421D67B55B000FBA6C /* ProcedureQueue.swift */; };
 		655E86451D67B9F9000FBA6C /* ProcedureObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 655E86441D67B9F9000FBA6C /* ProcedureObserver.swift */; };
 		655E86471D67BA9C000FBA6C /* Support.swift in Sources */ = {isa = PBXBuildFile; fileRef = 655E86461D67BA9C000FBA6C /* Support.swift */; };
+		657431281D8D9765002E8FC9 /* Identity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 657431271D8D9765002E8FC9 /* Identity.swift */; };
 		6583F95F1D8C4C7F00000A8D /* NoFailedDependenciesConditionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6583F95E1D8C4C7F00000A8D /* NoFailedDependenciesConditionTests.swift */; };
 		6584AF451D74770C0030DBB3 /* Errors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6584AF441D74770C0030DBB3 /* Errors.swift */; };
 		65881B791D880ACB00C212C8 /* MutualExclusivityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65881B781D880ACB00C212C8 /* MutualExclusivityTests.swift */; };
@@ -259,6 +260,7 @@
 		655E86421D67B55B000FBA6C /* ProcedureQueue.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ProcedureQueue.swift; path = Sources/ProcedureQueue.swift; sourceTree = "<group>"; };
 		655E86441D67B9F9000FBA6C /* ProcedureObserver.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ProcedureObserver.swift; path = Sources/ProcedureObserver.swift; sourceTree = "<group>"; };
 		655E86461D67BA9C000FBA6C /* Support.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Support.swift; path = Sources/Support.swift; sourceTree = "<group>"; };
+		657431271D8D9765002E8FC9 /* Identity.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Identity.swift; path = Sources/Identity.swift; sourceTree = "<group>"; };
 		6583F95E1D8C4C7F00000A8D /* NoFailedDependenciesConditionTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = NoFailedDependenciesConditionTests.swift; path = Tests/NoFailedDependenciesConditionTests.swift; sourceTree = "<group>"; };
 		6584AF441D74770C0030DBB3 /* Errors.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Errors.swift; path = Sources/Errors.swift; sourceTree = "<group>"; };
 		65881B781D880ACB00C212C8 /* MutualExclusivityTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = MutualExclusivityTests.swift; path = Tests/MutualExclusivityTests.swift; sourceTree = "<group>"; };
@@ -546,6 +548,7 @@
 			children = (
 				65A2D8031D6A1ED500FB067C /* AnyObserver.swift */,
 				6518D5E21D7B3A2800A12EF4 /* Condition.swift */,
+				657431271D8D9765002E8FC9 /* Identity.swift */,
 				65DA49301D8142BE00D4E1AA /* MutualExclusion.swift */,
 				65B97DB41D65138F00AC3B5D /* Procedure.swift */,
 				655E86441D67B9F9000FBA6C /* ProcedureObserver.swift */,
@@ -1219,6 +1222,7 @@
 				65B97DB51D65138F00AC3B5D /* Procedure.swift in Sources */,
 				6518D5E31D7B3A2800A12EF4 /* Condition.swift in Sources */,
 				655E86471D67BA9C000FBA6C /* Support.swift in Sources */,
+				657431281D8D9765002E8FC9 /* Identity.swift in Sources */,
 				655E86451D67B9F9000FBA6C /* ProcedureObserver.swift in Sources */,
 				653EBBBA1D88AFA800F4DB9F /* Delay.swift in Sources */,
 				655E86431D67B55B000FBA6C /* ProcedureQueue.swift in Sources */,
