@@ -8,7 +8,7 @@ import XCTest
 import TestingProcedureKit
 @testable import ProcedureKit
 
-class LoggingTests: XCTestCase {
+class LoggingTests: ProcedureKitTestCase {
 
     static let defaultLogManager = LogManager.sharedInstance
 
