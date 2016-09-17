@@ -28,6 +28,7 @@ open class ProcedureKitTestCase: XCTestCase {
         delegate = nil
         queue = nil
         procedure = nil
+        LogManager.severity = .warning
         ExclusivityManager.sharedInstance.__tearDownForUnitTesting()
         super.tearDown()
     }
