@@ -12,10 +12,6 @@ class GroupTests: GroupTestCase {
 
     // MARK: - Basic Group Tests
 
-    func test__group_sets_name() {
-       XCTAssertEqual(group.name, "GroupProcedure")
-    }
-
     func test__group_has_user_intent_set_from_input_operations() {
         let child = TestProcedure()
         child.userIntent = .initiated

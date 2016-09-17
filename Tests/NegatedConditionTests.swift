@@ -30,6 +30,6 @@ class NegatedConditionTests: ProcedureKitTestCase {
 
     func test__negated_condition_name() {
         let negated = NegatedCondition(FalseCondition())
-        XCTAssertEqual(negated.name, "Not<False Condition>")
+        XCTAssertEqual(negated.name, "Not<FalseCondition>")
     }
 }
