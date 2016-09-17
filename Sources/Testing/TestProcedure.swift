@@ -33,7 +33,7 @@ open class TestProcedure: Procedure, ResultInjectionProtocol {
     public private(set) var procedureWillCancelCalled = false
     public private(set) var procedureDidCancelCalled = false
 
-    public init(name: String = "Test Procedure", delay: TimeInterval = 0.000_001, error: Error? = .none, produced: Operation? = .none) {
+    public init(name: String = "TestProcedure", delay: TimeInterval = 0.000_001, error: Error? = .none, produced: Operation? = .none) {
         self.delay = delay
         self.error = error
         self.producedOperation = produced

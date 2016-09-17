@@ -92,7 +92,7 @@ open class Condition: Procedure, ConditionProtocol {
 
 public class TrueCondition: Condition {
 
-    public init(name: String = "True Condition", mutuallyExclusive: Bool = false) {
+    public init(name: String = "TrueCondition", mutuallyExclusive: Bool = false) {
         super.init()
         self.name = name
         self.mutuallyExclusive = mutuallyExclusive
@@ -105,7 +105,7 @@ public class TrueCondition: Condition {
 
 public class FalseCondition: Condition {
 
-    public init(name: String = "False Condition", mutuallyExclusive: Bool = false) {
+    public init(name: String = "FalseCondition", mutuallyExclusive: Bool = false) {
         super.init()
         self.name = name
         self.mutuallyExclusive = mutuallyExclusive

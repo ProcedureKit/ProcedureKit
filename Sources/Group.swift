@@ -69,8 +69,6 @@ open class GroupProcedure: Procedure, ProcedureQueueDelegate {
         queue.isSuspended = true
         queue.underlyingQueue = underlyingQueue
         queue.delegate = self
-
-        name = "GroupProcedure"
         userIntent = operations.userIntent
         groupCanFinish = CanFinishGroup(group: self)
 
