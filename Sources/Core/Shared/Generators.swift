@@ -8,7 +8,7 @@
 
 import Foundation
 
-func arc4random<T: IntegerLiteralConvertible>(type: T.Type) -> T {
+public func arc4random<T: IntegerLiteralConvertible>(type: T.Type) -> T {
     var r: T = 0
     arc4random_buf(&r, Int(sizeof(T)))
     return r
@@ -56,10 +56,10 @@ public struct RandomFailGenerator<G: GeneratorType>: GeneratorType {
     }
 }
 
-struct FibonacciGenerator: GeneratorType {
+public struct FibonacciGenerator: GeneratorType {
     var currentValue = 0, nextValue = 1
 
-    mutating func next() -> Int? {
+    public mutating func next() -> Int? {
         let result = currentValue
         currentValue = nextValue
         nextValue += result
@@ -67,19 +67,19 @@ struct FibonacciGenerator: GeneratorType {
     }
 }
 
-struct FiniteGenerator<G: GeneratorType>: GeneratorType {
+public struct FiniteGenerator<G: GeneratorType>: GeneratorType {
 
-    private let limit: Int
+    public var limit: Int
     private var generator: G
 
     var count: Int = 0
 
-    init(_ generator: G, limit: Int = 10) {
+    public init(_ generator: G, limit: Int = 10) {
         self.generator = generator
         self.limit = limit
     }
 
-    mutating func next() -> G.Element? {
+    public mutating func next() -> G.Element? {
         guard count < limit else {
             return nil
         }
@@ -88,49 +88,57 @@ struct FiniteGenerator<G: GeneratorType>: GeneratorType {
     }
 }
 
-struct MapGenerator<G: GeneratorType, T>: GeneratorType {
+public struct ComposedGenerator<Element>: GeneratorType {
+    public var generator: AnyGenerator<Element>? = nil
+
+    public mutating func next() -> Element? {
+        return generator?.next()
+    }
+}
+
+public struct MapGenerator<G: GeneratorType, T>: GeneratorType {
     private let transform: G.Element -> T
     private var generator: G
 
 
-    init(_ generator: G, transform: G.Element -> T) {
+    public init(_ generator: G, transform: G.Element -> T) {
         self.generator = generator
         self.transform = transform
     }
 
-    mutating func next() -> T? {
+    public mutating func next() -> T? {
         return generator.next().map(transform)
     }
 }
 
-struct TupleGenerator<Primary: GeneratorType, Secondary: GeneratorType>: GeneratorType {
+public struct TupleGenerator<Primary: GeneratorType, Secondary: GeneratorType>: GeneratorType {
 
     private var primary: Primary
     private var secondary: Secondary
 
-    init(primary: Primary, secondary: Secondary) {
+    public init(primary: Primary, secondary: Secondary) {
         self.primary = primary
         self.secondary = secondary
     }
 
-    mutating func next() -> (Secondary.Element?, Primary.Element)? {
+    public mutating func next() -> (Secondary.Element?, Primary.Element)? {
         return primary.next().map { ( secondary.next(), $0) }
     }
 }
 
 
-struct IntervalGenerator: GeneratorType {
+public struct IntervalGenerator: GeneratorType {
 
     let strategy: WaitStrategy
 
     private var count: Int = 0
     private lazy var fibonacci = FibonacciGenerator()
 
-    init(_ strategy: WaitStrategy) {
+    public init(_ strategy: WaitStrategy) {
         self.strategy = strategy
     }
 
-    mutating func next() -> NSTimeInterval? {
+    public mutating func next() -> NSTimeInterval? {
         switch strategy {
 
         case .Immediate:

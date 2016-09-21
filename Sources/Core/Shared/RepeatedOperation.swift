@@ -58,7 +58,7 @@ public enum WaitStrategy {
     case Exponential((period: NSTimeInterval, maximum: NSTimeInterval))
     case Fibonacci((period: NSTimeInterval, maximum: NSTimeInterval))
 
-    internal func generator() -> IntervalGenerator {
+    public func generator() -> IntervalGenerator {
         return IntervalGenerator(self)
     }
 }
@@ -69,6 +69,12 @@ public struct RepeatedPayload<T where T: NSOperation> {
     public let delay: Delay?
     public let operation: T
     public let configure: ConfigureBlock?
+
+    public init(delay: Delay?, operation: T, configure: ConfigureBlock?) {
+        self.delay = delay
+        self.operation = operation
+        self.configure = configure
+    }
 }
 
 /**
