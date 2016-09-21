@@ -264,7 +264,7 @@ class NetworkObserverTests: OperationTests {
         // Test for: https://github.com/ProcedureKit/ProcedureKit/issues/344
         let interval = 0.4
         var ranHandler = false
-        var timer = Timer(interval: interval) {
+        let timer = Timer(interval: interval) {
             ranHandler = true
         }
         timer.cancel()
