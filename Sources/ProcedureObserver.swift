@@ -19,14 +19,14 @@ public protocol ProcedureObserver {
 
      - parameter procedure: the observed procedure, P.
      */
-    mutating func didAttach(to procedure: Procedure)
+    func didAttach(to procedure: Procedure)
 
     /**
      The procedure will execute.
 
      - parameter procedure: the observed `Procedure`.
      */
-    mutating func will(execute procedure: Procedure)
+    func will(execute procedure: Procedure)
 
     /**
      The procedure will cancel.
@@ -34,14 +34,14 @@ public protocol ProcedureObserver {
      - parameter procedure: the observed `Procedure`.
      - parameter errors: an array of [Error] types.
      */
-    mutating func will(cancel procedure: Procedure, withErrors: [Error])
+    func will(cancel procedure: Procedure, withErrors: [Error])
 
     /**
      The procedure did cancel.
 
      - parameter procedure: the observed `Procedure`.
      */
-    mutating func did(cancel procedure: Procedure, withErrors: [Error])
+    func did(cancel procedure: Procedure, withErrors: [Error])
 
     /**
      The procedure produced a new `Operation` instance which has been added to the
@@ -51,7 +51,7 @@ public protocol ProcedureObserver {
      - parameter procedure: the observed `Procedure`.
      - parameter newOperation: the produced `Operation`
      */
-    mutating func procedure(_ procedure: Procedure, didProduce newOperation: Operation)
+    func procedure(_ procedure: Procedure, didProduce newOperation: Operation)
 
     /**
      The procedure will finish. Any errors that were encountered are collected here.
@@ -59,7 +59,7 @@ public protocol ProcedureObserver {
      - parameter procedure: the observed `Procedure`.
      - parameter errors: an array of `Error`s.
      */
-    mutating func will(finish procedure: Procedure, withErrors errors: [Error])
+    func will(finish procedure: Procedure, withErrors: [Error])
 
     /**
      The procedure did finish. Any errors that were encountered are collected here.
@@ -67,16 +67,11 @@ public protocol ProcedureObserver {
      - parameter procedure: the observed `Procedure`.
      - parameter errors: an array of `ErrorType`s.
      */
-    mutating func did(finish procedure: Procedure, withErrors errors: [Error])
+    func did(finish procedure: Procedure, withErrors: [Error])
 }
 
 public extension ProcedureObserver {
 
-    /**
-     Default implementations that do nothing.
-
-     - parameter procedure: the observed `Procedure`.
-     */
     func didAttach(to procedure: Procedure) { }
 
     func will(execute procedure: Procedure) { }
