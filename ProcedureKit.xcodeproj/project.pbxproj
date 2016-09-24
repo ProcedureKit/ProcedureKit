@@ -66,6 +66,7 @@
 		658A7B4F1D74E54800F897C8 /* GroupStressTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 658A7B4E1D74E54800F897C8 /* GroupStressTests.swift */; };
 		6591B3001D74954E00C2B57F /* GroupTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6591B2FE1D74953A00C2B57F /* GroupTests.swift */; };
 		6591B3021D74980900C2B57F /* GroupTestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6591B3011D74980900C2B57F /* GroupTestCase.swift */; };
+		65958FD51D96B0AE00F542E2 /* BlockObserverTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65958FD41D96B0AE00F542E2 /* BlockObserverTests.swift */; };
 		659E5FFA1D6E3B8D002B1D10 /* TestProcedure.swift in Sources */ = {isa = PBXBuildFile; fileRef = 659E5FF91D6E3B8D002B1D10 /* TestProcedure.swift */; };
 		659E5FFC1D6E3BCF002B1D10 /* ProcedureKitTestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 659E5FFB1D6E3BCF002B1D10 /* ProcedureKitTestCase.swift */; };
 		65A0CB271D7D4CF1008FB37C /* BlockProcedureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65A0CB261D7D4CF1008FB37C /* BlockProcedureTests.swift */; };
@@ -268,6 +269,7 @@
 		658A7B4E1D74E54800F897C8 /* GroupStressTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = GroupStressTests.swift; path = "Tests/Stress Tests/GroupStressTests.swift"; sourceTree = "<group>"; };
 		6591B2FE1D74953A00C2B57F /* GroupTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = GroupTests.swift; path = Tests/GroupTests.swift; sourceTree = "<group>"; };
 		6591B3011D74980900C2B57F /* GroupTestCase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = GroupTestCase.swift; path = Sources/Testing/GroupTestCase.swift; sourceTree = "<group>"; };
+		65958FD41D96B0AE00F542E2 /* BlockObserverTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = BlockObserverTests.swift; path = Tests/BlockObserverTests.swift; sourceTree = "<group>"; };
 		659E5FF91D6E3B8D002B1D10 /* TestProcedure.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TestProcedure.swift; path = Sources/Testing/TestProcedure.swift; sourceTree = "<group>"; };
 		659E5FFB1D6E3BCF002B1D10 /* ProcedureKitTestCase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ProcedureKitTestCase.swift; path = Sources/Testing/ProcedureKitTestCase.swift; sourceTree = "<group>"; };
 		65A0CB261D7D4CF1008FB37C /* BlockProcedureTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = BlockProcedureTests.swift; path = Tests/BlockProcedureTests.swift; sourceTree = "<group>"; };
@@ -428,6 +430,7 @@
 			isa = PBXGroup;
 			children = (
 				652AFD401D8C745500793AF3 /* BlockConditionTests.swift */,
+				65958FD41D96B0AE00F542E2 /* BlockObserverTests.swift */,
 				65A0CB261D7D4CF1008FB37C /* BlockProcedureTests.swift */,
 				65245D1E1D7231DC00340A2D /* CancellationTests.swift */,
 				65403AB71D7C453200D6036B /* ConditionTests.swift */,
@@ -1239,6 +1242,7 @@
 				6591B3001D74954E00C2B57F /* GroupTests.swift in Sources */,
 				652AFD411D8C745500793AF3 /* BlockConditionTests.swift in Sources */,
 				65881B791D880ACB00C212C8 /* MutualExclusivityTests.swift in Sources */,
+				65958FD51D96B0AE00F542E2 /* BlockObserverTests.swift in Sources */,
 				652AFD3D1D8C628500793AF3 /* SilentConditionTests.swift in Sources */,
 				652AFD391D8C5BC000793AF3 /* NegatedConditionTests.swift in Sources */,
 				65EAC0161D8CA78F000E4A42 /* TimeoutObserverTests.swift in Sources */,
