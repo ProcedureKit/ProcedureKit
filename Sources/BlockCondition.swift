@@ -6,6 +6,8 @@
 
 import Foundation
 
+public typealias ThrowingBoolBlock = () throws -> Bool
+
 /**
  A Condition which will be satisfied if the block returns true. The
  block may throw an error, or return false, both of which are
@@ -13,14 +15,14 @@ import Foundation
  */
 public final class BlockCondition: Condition {
 
-    let block: () throws -> Bool
+    let block: ThrowingBoolBlock
 
     /**
      Creates a condition with a supplied block.
 
      - parameter block: a block which returns Bool, to indicate that the condition is satisfied.
     */
-    public init(block: @escaping () throws -> Bool) {
+    public init(block: @escaping ThrowingBoolBlock) {
         self.block = block
         super.init()
     }
