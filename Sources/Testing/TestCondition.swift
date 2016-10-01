@@ -18,7 +18,7 @@ open class TestCondition: Condition {
         self.add(dependencies: dependencies)
     }
 
-    open override func evaluate(procedure: Procedure, completion: (ConditionResult) -> Void) {
+    open override func evaluate(procedure: Procedure, completion: @escaping (ConditionResult) -> Void) {
         let result: ConditionResult
         do {
             result = try evaluate()

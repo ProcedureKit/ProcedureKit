@@ -10,7 +10,7 @@ internal func _abstractMethod(file: StaticString = #file, line: UInt = #line) {
     fatalError("Method must be overriden", file: file, line: line)
 }
 
-class AnyObserverBox_<Procedure: ProcedureProcotol>: ProcedureObserver {
+class AnyObserverBox_<Procedure: ProcedureProtocol>: ProcedureObserver {
     func didAttach(to procedure: Procedure) { _abstractMethod() }
     func will(execute procedure: Procedure) { _abstractMethod() }
     func will(cancel procedure: Procedure, withErrors: [Error]) { _abstractMethod() }
@@ -56,10 +56,10 @@ class AnyObserverBox<Base: ProcedureObserver>: AnyObserverBox_<Base.Procedure> {
     }
 }
 
-public struct AnyObserver<Procedure: ProcedureProcotol>: ProcedureObserver {
-    private typealias ErasedObserver = AnyObserverBox_<Procedure>
+public struct AnyObserver<Procedure: ProcedureProtocol>: ProcedureObserver {
+    private typealias Erased = AnyObserverBox_<Procedure>
 
-    private var box: ErasedObserver
+    private var box: Erased
 
     init<Base: ProcedureObserver>(base: Base) where Procedure == Base.Procedure {
         box = AnyObserverBox(base)

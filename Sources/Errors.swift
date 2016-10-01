@@ -6,7 +6,15 @@
 
 import Foundation
 
-public struct ProcedureKitError: Error {
+public struct ProcedureKitError: Error, Equatable {
+
+    public static func == (lhs: ProcedureKitError, rhs: ProcedureKitError) -> Bool {
+        return lhs.context == rhs.context
+    }
+
+    public enum CapabilityError: Error {
+        case unavailable, unauthorized
+    }
 
     public enum Context: Equatable {
 
@@ -14,8 +22,10 @@ public struct ProcedureKitError: Error {
             switch (lhs, rhs) {
             case (.unknown, .unknown), (.dependencyFinishedWithErrors, .dependencyFinishedWithErrors), (.parentCancelledWithErrors, .parentCancelledWithErrors), (.requirementNotSatisfied, .requirementNotSatisfied):
                 return true
-            case let (.programmingError(lhsReason), .programmingError(rhsReason)):
-                return lhsReason == rhsReason
+            case let (.programmingError(lhs), .programmingError(rhs)):
+                return lhs == rhs
+            case let (.capability(lhs), .capability(rhs)):
+                return lhs == rhs
             default: return false
             }
         }
@@ -30,6 +40,7 @@ public struct ProcedureKitError: Error {
         case dependencyCancelledWithErrors
         case parentCancelledWithErrors
         case requirementNotSatisfied
+        case capability(CapabilityError)
     }
 
     public static func programmingError(reason: String) -> ProcedureKitError {
@@ -67,6 +78,15 @@ public struct ProcedureKitError: Error {
     public static func requirementNotSatisfied() -> ProcedureKitError {
         return ProcedureKitError(context: .requirementNotSatisfied, errors: [])
     }
+
+    public static func capabilityUnavailable() -> ProcedureKitError {
+        return ProcedureKitError(context: .capability(.unavailable), errors: [])
+    }
+
+    public static func capabilityUnauthorized() -> ProcedureKitError {
+        return ProcedureKitError(context: .capability(.unauthorized), errors: [])
+    }
+
 
     public let context: Context
     public let errors: [Error]

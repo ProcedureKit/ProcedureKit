@@ -34,11 +34,11 @@ public extension ConditionResult {
     }
 }
 
-public protocol ConditionProtocol: ProcedureProcotol {
+public protocol ConditionProtocol: ProcedureProtocol {
 
     var mutuallyExclusive: Bool { get set }
 
-    func evaluate(procedure: Procedure, completion: (ConditionResult) -> Void)
+    func evaluate(procedure: Procedure, completion: @escaping (ConditionResult) -> Void)
 }
 
 internal extension ConditionProtocol {
@@ -80,7 +80,7 @@ open class Condition: Procedure, ConditionProtocol {
         evaluate(procedure: procedure, completion: finish)
     }
 
-    open func evaluate(procedure: Procedure, completion: (ConditionResult) -> Void) {
+    open func evaluate(procedure: Procedure, completion: @escaping (ConditionResult) -> Void) {
         completion(.failed(ProcedureKitError.programmingError(reason: "Condition must be subclassed, and \(#function) overridden.")))
     }
 
@@ -98,7 +98,7 @@ public class TrueCondition: Condition {
         self.mutuallyExclusive = mutuallyExclusive
     }
 
-    public override func evaluate(procedure: Procedure, completion: (ConditionResult) -> Void) {
+    public override func evaluate(procedure: Procedure, completion: @escaping (ConditionResult) -> Void) {
         completion(.satisfied)
     }
 }
@@ -111,7 +111,7 @@ public class FalseCondition: Condition {
         self.mutuallyExclusive = mutuallyExclusive
     }
 
-    public override func evaluate(procedure: Procedure, completion: (ConditionResult) -> Void) {
+    public override func evaluate(procedure: Procedure, completion: @escaping (ConditionResult) -> Void) {
         completion(.failed(ProcedureKitError.FalseCondition()))
     }
 }
@@ -162,7 +162,7 @@ open class ComposedCondition<C: Condition>: Condition {
     }
 
     /// Override of public function
-    open override func evaluate(procedure: Procedure, completion: (ConditionResult) -> Void) {
+    open override func evaluate(procedure: Procedure, completion: @escaping (ConditionResult) -> Void) {
         completion(requirement)
     }
 
@@ -181,7 +181,7 @@ public class IgnoredCondition<C: Condition>: ComposedCondition<C> {
     }
 
     /// Override of public function
-    public override func evaluate(procedure: Procedure, completion: (ConditionResult) -> Void) {
+    public override func evaluate(procedure: Procedure, completion: @escaping (ConditionResult) -> Void) {
         super.evaluate(procedure: procedure) { composedResult in
             if case .failed(_) = composedResult {
                 completion(.ignored)
