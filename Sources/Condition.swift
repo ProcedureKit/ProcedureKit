@@ -34,7 +34,7 @@ public extension ConditionResult {
     }
 }
 
-public protocol ConditionProtocol: ProcedureProcotol {
+public protocol ConditionProtocol: ProcedureProtocol {
 
     var mutuallyExclusive: Bool { get set }
 

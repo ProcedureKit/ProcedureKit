@@ -10,7 +10,7 @@ import Foundation
 
 // swiftlint:disable type_body_length
 
-open class Procedure: Operation, ProcedureProcotol {
+open class Procedure: Operation, ProcedureProtocol {
 
     private enum FinishingFrom {
         case main, cancel, finish
@@ -572,7 +572,7 @@ public extension Procedure {
 
 public extension Procedure {
 
-    public func add<Dependency: ProcedureProcotol>(dependency: Dependency) {
+    public func add<Dependency: ProcedureProtocol>(dependency: Dependency) {
         guard let op = dependency as? Operation else {
             assertionFailure("Adding dependencies which do not subclass Foundation.Operation is not supported.")
             return

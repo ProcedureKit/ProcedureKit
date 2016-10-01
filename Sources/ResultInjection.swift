@@ -15,7 +15,7 @@ public protocol ResultInjectionProtocol: class {
     var result: Result { get }
 }
 
-public extension ProcedureProcotol {
+public extension ProcedureProtocol {
 
     /**
      Access the completed dependency operation before `self` is
@@ -27,7 +27,7 @@ public extension ProcedureProcotol {
      operation, and an array of `ErrorType`, and returns Void.
      - returns: `self` - so that injections can be chained together.
      */
-    @discardableResult func inject<Dependency: ProcedureProcotol>(dependency: Dependency, block: @escaping (Self, Dependency, [Error]) -> Void) -> Self {
+    @discardableResult func inject<Dependency: ProcedureProtocol>(dependency: Dependency, block: @escaping (Self, Dependency, [Error]) -> Void) -> Self {
 
         dependency.addWillFinishBlockObserver { [weak self] dependency, errors in
             if let strongSelf = self {
@@ -48,9 +48,9 @@ public extension ProcedureProcotol {
 }
 
 
-public extension ResultInjectionProtocol where Self: ProcedureProcotol {
+public extension ResultInjectionProtocol where Self: ProcedureProtocol {
 
-    @discardableResult func injectResultFrom<Dependency>(dependency: Dependency) -> Self where Dependency: ProcedureProcotol, Dependency: ResultInjectionProtocol, Dependency.Result == Requirement {
+    @discardableResult func injectResultFrom<Dependency>(dependency: Dependency) -> Self where Dependency: ProcedureProtocol, Dependency: ResultInjectionProtocol, Dependency.Result == Requirement {
 
         return inject(dependency: dependency) { procedure, dependency, errors in
             guard errors.isEmpty else {
@@ -60,7 +60,7 @@ public extension ResultInjectionProtocol where Self: ProcedureProcotol {
         }
     }
 
-    @discardableResult func requireResultFrom<Dependency>(dependency: Dependency) -> Self where Dependency: ProcedureProcotol, Dependency: ResultInjectionProtocol, Dependency.Result == Optional<Requirement> {
+    @discardableResult func requireResultFrom<Dependency>(dependency: Dependency) -> Self where Dependency: ProcedureProtocol, Dependency: ResultInjectionProtocol, Dependency.Result == Optional<Requirement> {
 
         return inject(dependency: dependency) { procedure, dependency, errors in
             guard errors.isEmpty else {

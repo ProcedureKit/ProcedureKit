@@ -12,7 +12,7 @@ import Foundation
  */
 public protocol ProcedureObserver {
 
-    associatedtype Procedure: ProcedureProcotol
+    associatedtype Procedure: ProcedureProtocol
 
     /**
      Observer gets notified when it is attached to a procedure.

@@ -6,7 +6,7 @@
 
 import Foundation
 
-public struct Observer<Procedure: ProcedureProcotol> {
+public struct Observer<Procedure: ProcedureProtocol> {
 
     public typealias VoidBlock = (Procedure) -> Void
     public typealias ErrorsBlock = (Procedure, [Error]) -> Void
@@ -23,7 +23,7 @@ public struct Observer<Procedure: ProcedureProcotol> {
     private init() { }
 }
 
-public struct BlockObserver<Procedure: ProcedureProcotol>: ProcedureObserver {
+public struct BlockObserver<Procedure: ProcedureProtocol>: ProcedureObserver {
 
     /// - returns: the block which is called when the observer is attached to a procedure
     public let didAttach: Observer<Procedure>.DidAttach?
@@ -98,7 +98,7 @@ public struct BlockObserver<Procedure: ProcedureProcotol>: ProcedureObserver {
 
 /// WillExecuteObserver is an observer which will execute a
 /// closure when the operation starts.
-public struct WillExecuteObserver<Procedure: ProcedureProcotol>: ProcedureObserver {
+public struct WillExecuteObserver<Procedure: ProcedureProtocol>: ProcedureObserver {
     private let block: Observer<Procedure>.WillExecute
 
     /// - returns: a block which is called when the observer is attached to a procedure
@@ -126,7 +126,7 @@ public struct WillExecuteObserver<Procedure: ProcedureProcotol>: ProcedureObserv
 
 /// WillCancelObserver is an observer which will execute a
 /// closure when the operation cancels.
-public struct WillCancelObserver<Procedure: ProcedureProcotol>: ProcedureObserver {
+public struct WillCancelObserver<Procedure: ProcedureProtocol>: ProcedureObserver {
     private let block: Observer<Procedure>.WillCancel
 
     /// - returns: a block which is called when the observer is attached to a procedure
@@ -154,7 +154,7 @@ public struct WillCancelObserver<Procedure: ProcedureProcotol>: ProcedureObserve
 
 /// DidCancelObserver is an observer which will execute a
 /// closure when the operation cancels.
-public struct DidCancelObserver<Procedure: ProcedureProcotol>: ProcedureObserver {
+public struct DidCancelObserver<Procedure: ProcedureProtocol>: ProcedureObserver {
     private let block: Observer<Procedure>.DidCancel
 
     /// - returns: a block which is called when the observer is attached to a procedure
@@ -182,7 +182,7 @@ public struct DidCancelObserver<Procedure: ProcedureProcotol>: ProcedureObserver
 
 /// DidProduceOperationObserver is an observer which will execute a
 /// closure when the operation produces another observer.
-public struct DidProduceOperationObserver<Procedure: ProcedureProcotol>: ProcedureObserver {
+public struct DidProduceOperationObserver<Procedure: ProcedureProtocol>: ProcedureObserver {
     private let block: Observer<Procedure>.DidProduce
 
     /// - returns: a block which is called when the observer is attached to a procedure
@@ -210,7 +210,7 @@ public struct DidProduceOperationObserver<Procedure: ProcedureProcotol>: Procedu
 
 /// WillFinishObserver is an observer which will execute a
 /// closure when the operation is about to finish.
-public struct WillFinishObserver<Procedure: ProcedureProcotol>: ProcedureObserver {
+public struct WillFinishObserver<Procedure: ProcedureProtocol>: ProcedureObserver {
     private let block: Observer<Procedure>.WillFinish
 
     /// - returns: a block which is called when the observer is attached to a procedure
@@ -240,7 +240,7 @@ public struct WillFinishObserver<Procedure: ProcedureProcotol>: ProcedureObserve
  DidFinishObserver is an observer which will execute a
  closure when the operation did just finish.
  */
-public struct DidFinishObserver<Procedure: ProcedureProcotol>: ProcedureObserver {
+public struct DidFinishObserver<Procedure: ProcedureProtocol>: ProcedureObserver {
     private let block: Observer<Procedure>.DidFinish
 
     /// - returns: a block which is called when the observer is attached to a procedure
@@ -268,7 +268,7 @@ public struct DidFinishObserver<Procedure: ProcedureProcotol>: ProcedureObserver
 
 
 
-public extension ProcedureProcotol {
+public extension ProcedureProtocol {
 
     func addWillExecuteBlockObserver(block: @escaping Observer<Self>.WillExecute) {
         add(observer: WillExecuteObserver(willExecute: block))
