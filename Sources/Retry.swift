@@ -92,13 +92,13 @@ open class RetryProcedure<T: Operation>: RepeatProcedure<T> {
         super.init(max: max, iterator: retry)
     }
 
-    public init<OperationIterator: IteratorProtocol, DelayIterator: IteratorProtocol>(max: Int? = nil, delay: DelayIterator, iterator base: OperationIterator, retry block: @escaping Handler) where OperationIterator.Element == T, DelayIterator.Element == Delay {
+    public init<OperationIterator, DelayIterator>(max: Int? = nil, delay: DelayIterator, iterator base: OperationIterator, retry block: @escaping Handler) where OperationIterator: IteratorProtocol, DelayIterator: IteratorProtocol, OperationIterator.Element == T, DelayIterator.Element == Delay {
         let payloadIterator = MapIterator(PairIterator(primary: base, secondary: delay)) { Payload(operation: $0.0, delay: $0.1) }
         retry = RetryIterator(handler: block, iterator: payloadIterator)
         super.init(max: max, iterator: retry)
     }
 
-    public init<OperationIterator: IteratorProtocol>(max: Int? = nil, wait: WaitStrategy, iterator base: OperationIterator, retry block: @escaping Handler) where OperationIterator.Element == T {
+    public init<OperationIterator>(max: Int? = nil, wait: WaitStrategy, iterator base: OperationIterator, retry block: @escaping Handler) where OperationIterator: IteratorProtocol, OperationIterator.Element == T {
         let payloadIterator = MapIterator(PairIterator(primary: base, secondary: Delay.iterator(wait.iterator))) { Payload(operation: $0.0, delay: $0.1) }
         retry = RetryIterator(handler: block, iterator: payloadIterator)
         super.init(max: max, iterator: retry)

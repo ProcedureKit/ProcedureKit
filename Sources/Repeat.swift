@@ -52,17 +52,17 @@ open class RepeatProcedure<T: Operation>: GroupProcedure {
 
     private var iterator: AnyIterator<Payload>
 
-    public init<PayloadIterator: IteratorProtocol>(max: Int? = nil, iterator base: PayloadIterator) where PayloadIterator.Element == Payload {
+    public init<PayloadIterator>(max: Int? = nil, iterator base: PayloadIterator) where PayloadIterator: IteratorProtocol, PayloadIterator.Element == Payload {
         (current, iterator) = RepeatProcedure.create(withMax: max, andIterator: base)
         super.init(operations: [])
     }
 
-    public init<OperationIterator: IteratorProtocol, DelayIterator: IteratorProtocol>(max: Int? = nil, delay: DelayIterator, iterator base: OperationIterator) where OperationIterator.Element == T, DelayIterator.Element == Delay {
+    public init<OperationIterator, DelayIterator>(max: Int? = nil, delay: DelayIterator, iterator base: OperationIterator) where OperationIterator: IteratorProtocol, DelayIterator: IteratorProtocol, OperationIterator.Element == T, DelayIterator.Element == Delay {
         (current, iterator) = RepeatProcedure.create(withMax: max, andDelay: delay, andIterator: base)
         super.init(operations: [])
     }
 
-    public init<OperationIterator: IteratorProtocol>(max: Int? = nil, wait: WaitStrategy = .immediate, iterator base: OperationIterator) where OperationIterator.Element == T {
+    public init<OperationIterator>(max: Int? = nil, wait: WaitStrategy = .immediate, iterator base: OperationIterator) where OperationIterator: IteratorProtocol, OperationIterator.Element == T {
         (current, iterator) = RepeatProcedure.create(withMax: max, andDelay: Delay.iterator(wait.iterator), andIterator: base)
         super.init(operations: [])
     }
