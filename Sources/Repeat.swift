@@ -42,25 +42,27 @@ open class RepeatProcedure<T: Operation>: GroupProcedure {
 
     public internal(set) var previous: T? = nil
 
+    /// - returns: the currently executing operation instance of T
     public internal(set) var current: T
 
+    /// - returns: the number of operation instances
     public internal(set) var count: Int = 1
 
     internal private(set) var configure: Payload.ConfigureBlock = { _ in }
 
     private var iterator: AnyIterator<Payload>
 
-    public init<PayloadIterator: IteratorProtocol>(max: Int? = nil, iterator base: PayloadIterator) where PayloadIterator.Element == Payload {
+    public init<PayloadIterator>(max: Int? = nil, iterator base: PayloadIterator) where PayloadIterator: IteratorProtocol, PayloadIterator.Element == Payload {
         (current, iterator) = RepeatProcedure.create(withMax: max, andIterator: base)
         super.init(operations: [])
     }
 
-    public init<OperationIterator: IteratorProtocol, DelayIterator: IteratorProtocol>(max: Int? = nil, delay: DelayIterator, iterator base: OperationIterator) where OperationIterator.Element == T, DelayIterator.Element == Delay {
+    public init<OperationIterator, DelayIterator>(max: Int? = nil, delay: DelayIterator, iterator base: OperationIterator) where OperationIterator: IteratorProtocol, DelayIterator: IteratorProtocol, OperationIterator.Element == T, DelayIterator.Element == Delay {
         (current, iterator) = RepeatProcedure.create(withMax: max, andDelay: delay, andIterator: base)
         super.init(operations: [])
     }
 
-    public init<OperationIterator: IteratorProtocol>(max: Int? = nil, wait: WaitStrategy = .immediate, iterator base: OperationIterator) where OperationIterator.Element == T {
+    public init<OperationIterator>(max: Int? = nil, wait: WaitStrategy = .immediate, iterator base: OperationIterator) where OperationIterator: IteratorProtocol, OperationIterator.Element == T {
         (current, iterator) = RepeatProcedure.create(withMax: max, andDelay: Delay.iterator(wait.iterator), andIterator: base)
         super.init(operations: [])
     }
@@ -94,6 +96,8 @@ open class RepeatProcedure<T: Operation>: GroupProcedure {
     @discardableResult
     public func addNextOperation(_ shouldAddNext: @autoclosure () -> Bool = true) -> Bool {
         guard !isCancelled && shouldAddNext(), let payload = next() else { return false }
+
+        log.notice(message: "Will add next operation.")
 
         if let newConfigureBlock = payload.configure {
             replace(configureBlock: newConfigureBlock)
