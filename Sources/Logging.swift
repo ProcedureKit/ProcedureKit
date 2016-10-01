@@ -158,7 +158,7 @@ public class LogManager: LogManagerProtocol {
     /// Private protected properties
     private var _severity: Protector<LogSeverity>
     private var _enabled: Protector<Bool>
-    private var loggerLock: ReadWriteLock = Lock()
+    private var loggerLock = Lock()
     private var _logger: LoggerBlockType
 }
 
