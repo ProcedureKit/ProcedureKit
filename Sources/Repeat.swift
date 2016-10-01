@@ -141,6 +141,10 @@ open class RepeatProcedure<T: Operation>: GroupProcedure {
         }
     }
 
+    public func appendConfigureBlock(block: @escaping Payload.ConfigureBlock) {
+        append(configureBlock: block)
+    }
+
     /// Replaces the current configuration block
     ///
     /// If the payload returns a configure block, it replaces using
@@ -150,6 +154,10 @@ open class RepeatProcedure<T: Operation>: GroupProcedure {
     public func replace(configureBlock block: @escaping Payload.ConfigureBlock) {
         configure = block
         log.verbose(message: "did replace configure block.")
+    }
+
+    public func replaceConfigureBlock(block: @escaping Payload.ConfigureBlock) {
+        replace(configureBlock: block)
     }
 }
 
@@ -168,9 +176,8 @@ public struct CountingIterator<Element>: IteratorProtocol {
     }
 
     public mutating func next() -> Element? {
-        let current = count
-        count = count + 1
-        return body(current)
+        defer { count = count + 1 }
+        return body(count)
     }
 }
 
@@ -185,12 +192,15 @@ public struct RandomFailIterator<Element>: IteratorProtocol {
     private var iterator: AnyIterator<Element>
     private let shouldNotFail: () -> Bool
 
-    public init<I: IteratorProtocol>(_ iterator: I, probability: Double = 0.1) where I.Element == Element {
+    public let probability: Double
+
+    public init<I: IteratorProtocol>(_ iterator: I, probability prob: Double = 0.1) where I.Element == Element {
         self.iterator = AnyIterator(iterator)
         self.shouldNotFail = {
             let r = (Double(arc4random(UInt64.self)) / Double(UInt64.max))
-            return r > probability
+            return r > prob
         }
+        self.probability = prob
     }
 
     public mutating func next() -> Element? {
@@ -335,7 +345,7 @@ public extension Delay {
 public enum WaitStrategy {
     case immediate
     case constant(TimeInterval)
-    case random(min: TimeInterval, max: TimeInterval)
+    case random(minimum: TimeInterval, maximum: TimeInterval)
     case incrementing(initial: TimeInterval, increment: TimeInterval)
     case fibonacci(period: TimeInterval, maximum: TimeInterval)
     case exponential(power: Double, period: TimeInterval, maximum: TimeInterval)
@@ -346,7 +356,7 @@ public enum WaitStrategy {
             return IntervalIterator.immediate
         case let .constant(constant):
             return IntervalIterator.constant(constant)
-        case let .random(min: min, max: max):
+        case let .random(minimum: min, maximum: max):
             return IntervalIterator.random(withMinimum: min, andMaximum: max)
         case let .incrementing(initial: initial, increment: increment):
             return IntervalIterator.incrementing(from: initial, by: increment)
