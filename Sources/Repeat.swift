@@ -42,8 +42,10 @@ open class RepeatProcedure<T: Operation>: GroupProcedure {
 
     public internal(set) var previous: T? = nil
 
+    /// - returns: the currently executing operation instance of T
     public internal(set) var current: T
 
+    /// - returns: the number of operation instances
     public internal(set) var count: Int = 1
 
     internal private(set) var configure: Payload.ConfigureBlock = { _ in }
@@ -94,6 +96,8 @@ open class RepeatProcedure<T: Operation>: GroupProcedure {
     @discardableResult
     public func addNextOperation(_ shouldAddNext: @autoclosure () -> Bool = true) -> Bool {
         guard !isCancelled && shouldAddNext(), let payload = next() else { return false }
+
+        log.notice(message: "Will add next operation.")
 
         if let newConfigureBlock = payload.configure {
             replace(configureBlock: newConfigureBlock)

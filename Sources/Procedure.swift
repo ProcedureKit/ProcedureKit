@@ -209,7 +209,7 @@ open class Procedure: Operation, ProcedureProcotol {
 
     internal fileprivate(set) var directDependencies = Set<Operation>()
 
-    internal fileprivate(set) var evaluateConditionsProcedure: GroupProcedure? = nil
+    internal fileprivate(set) var evaluateConditionsProcedure: EvaluateConditions? = nil
 
     internal var indirectDependencies: Set<Operation> {
         return Set(conditions
@@ -376,7 +376,7 @@ open class Procedure: Operation, ProcedureProcotol {
 
         guard nextState2 == .executing else { return }
 
-        log.verbose(message: "Will Execute")
+        log.notice(message: "Will Execute")
 
         execute()
     }
@@ -388,7 +388,7 @@ open class Procedure: Operation, ProcedureProcotol {
 
     public final func produce(operation: Operation) {
         precondition(state > .initialized, "Cannot produce operation will not being scheduled on a queue")
-        log.verbose(message: "Did produce \(operation.operationName)")
+        log.notice(message: "Did produce \(operation.operationName)")
         observers.forEach { $0.procedure(self, didProduce: operation) }
     }
 
@@ -447,7 +447,7 @@ open class Procedure: Operation, ProcedureProcotol {
         observers.forEach { $0.did(cancel: self, withErrors: resultingErrors) }
 
         let messageSuffix = !additionalErrors.isEmpty ? "errors: \(additionalErrors)" : "no errors"
-        log.verbose(message: "Will cancel with \(messageSuffix).")
+        log.notice(message: "Will cancel with \(messageSuffix).")
 
         didChangeValue(forKey: .cancelled)
 
@@ -519,9 +519,9 @@ open class Procedure: Operation, ProcedureProcotol {
             return _errors
         }
 
-        let messageSuffix = !errors.isEmpty ? "errors: \(errors)" : "no errors"
+        let messageSuffix = !resultingErrors.isEmpty ? "errors: \(resultingErrors)" : "no errors"
 
-        log.verbose(message: "Will finish with \(messageSuffix).")
+        log.notice(message: "Will finish with \(messageSuffix).")
 
         procedureWillFinish(withErrors: resultingErrors)
 
@@ -533,7 +533,7 @@ open class Procedure: Operation, ProcedureProcotol {
         procedureDidFinish(withErrors: resultingErrors)
         observers.forEach { $0.did(finish: self, withErrors: resultingErrors) }
 
-        log.verbose(message: "Did finish with \(messageSuffix).")
+        log.notice(message: "Did finish with \(messageSuffix).")
 
         didChangeValue(forKey: .finished)
     }

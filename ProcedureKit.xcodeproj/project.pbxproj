@@ -81,6 +81,8 @@
 		65A2D7FF1D69FAEC00FB067C /* Operation+ProcedureKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65A2D7FE1D69FAEC00FB067C /* Operation+ProcedureKit.swift */; };
 		65A2D8021D6A05D800FB067C /* ProcedureProcotol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65A2D8011D6A05D800FB067C /* ProcedureProcotol.swift */; };
 		65A2D8041D6A1ED500FB067C /* AnyObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65A2D8031D6A1ED500FB067C /* AnyObserver.swift */; };
+		65A63B0F1D9FFDAD00E90B9D /* Retry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65A63B0E1D9FFDAD00E90B9D /* Retry.swift */; };
+		65A63B111DA0159B00E90B9D /* RetryProcedureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65A63B101DA0159B00E90B9D /* RetryProcedureTests.swift */; };
 		65B83EB71D731DE8007EFBFA /* Collection+ProcedureKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65B83EB61D731DE8007EFBFA /* Collection+ProcedureKit.swift */; };
 		65B97DB51D65138F00AC3B5D /* Procedure.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65B97DB41D65138F00AC3B5D /* Procedure.swift */; };
 		65CFC5FA1D608A5500CAD875 /* ProcedureKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65CFC5F01D608A5500CAD875 /* ProcedureKit.framework */; };
@@ -289,6 +291,8 @@
 		65A2D7FE1D69FAEC00FB067C /* Operation+ProcedureKit.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "Operation+ProcedureKit.swift"; path = "Sources/Operation+ProcedureKit.swift"; sourceTree = "<group>"; };
 		65A2D8011D6A05D800FB067C /* ProcedureProcotol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ProcedureProcotol.swift; path = Sources/ProcedureProcotol.swift; sourceTree = "<group>"; };
 		65A2D8031D6A1ED500FB067C /* AnyObserver.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AnyObserver.swift; path = Sources/AnyObserver.swift; sourceTree = "<group>"; };
+		65A63B0E1D9FFDAD00E90B9D /* Retry.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Retry.swift; path = Sources/Retry.swift; sourceTree = "<group>"; };
+		65A63B101DA0159B00E90B9D /* RetryProcedureTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = RetryProcedureTests.swift; path = Tests/RetryProcedureTests.swift; sourceTree = "<group>"; };
 		65B83EB61D731DE8007EFBFA /* Collection+ProcedureKit.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "Collection+ProcedureKit.swift"; path = "Sources/Collection+ProcedureKit.swift"; sourceTree = "<group>"; };
 		65B97DB41D65138F00AC3B5D /* Procedure.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Procedure.swift; path = Sources/Procedure.swift; sourceTree = "<group>"; };
 		65CFC5F01D608A5500CAD875 /* ProcedureKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ProcedureKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -456,6 +460,7 @@
 				65245D1C1D721A7100340A2D /* ProcedureTests.swift */,
 				655594F01D9E482D00B08990 /* RepeatProcedureTests.swift */,
 				65403ABD1D7C9E7600D6036B /* ResultInjectionTests.swift */,
+				65A63B101DA0159B00E90B9D /* RetryProcedureTests.swift */,
 				652AFD3C1D8C628500793AF3 /* SilentConditionTests.swift */,
 				65EAC0151D8CA78F000E4A42 /* TimeoutObserverTests.swift */,
 			);
@@ -661,6 +666,7 @@
 				65245D261D7258E400340A2D /* Group.swift */,
 				654FAFFC1D7CD5EA002FA74D /* Map.swift */,
 				659E11AB1D9862B900C5D749 /* Repeat.swift */,
+				65A63B0E1D9FFDAD00E90B9D /* Retry.swift */,
 			);
 			name = Procedures;
 			sourceTree = "<group>";
@@ -1222,6 +1228,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				652AFD361D8C5A5E00793AF3 /* NegatedCondition.swift in Sources */,
+				65A63B0F1D9FFDAD00E90B9D /* Retry.swift in Sources */,
 				65A2D7FB1D6852A500FB067C /* BlockObservers.swift in Sources */,
 				65245D231D723A6B00340A2D /* Logging.swift in Sources */,
 				65DA49311D8142BE00D4E1AA /* MutualExclusion.swift in Sources */,
@@ -1260,6 +1267,7 @@
 				652AFD411D8C745500793AF3 /* BlockConditionTests.swift in Sources */,
 				65881B791D880ACB00C212C8 /* MutualExclusivityTests.swift in Sources */,
 				65958FD51D96B0AE00F542E2 /* BlockObserverTests.swift in Sources */,
+				65A63B111DA0159B00E90B9D /* RetryProcedureTests.swift in Sources */,
 				652AFD3D1D8C628500793AF3 /* SilentConditionTests.swift in Sources */,
 				652AFD391D8C5BC000793AF3 /* NegatedConditionTests.swift in Sources */,
 				65EAC0161D8CA78F000E4A42 /* TimeoutObserverTests.swift in Sources */,
