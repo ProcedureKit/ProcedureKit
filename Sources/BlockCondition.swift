@@ -27,7 +27,7 @@ public final class BlockCondition: Condition {
         super.init()
     }
 
-    public override func evaluate(procedure: Procedure, completion: (ConditionResult) -> Void) {
+    public override func evaluate(procedure: Procedure, completion: @escaping (ConditionResult) -> Void) {
         do {
             let result = try block()
             completion(result ? .satisfied : .failed(ProcedureKitError.conditionFailed()))

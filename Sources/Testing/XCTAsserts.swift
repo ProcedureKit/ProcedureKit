@@ -8,7 +8,7 @@ import Foundation
 import XCTest
 import ProcedureKit
 
-private enum __XCTAssertionResult {
+internal enum __XCTAssertionResult {
     case success
     case expectedFailure(String?)
     case unexpectedFailure(Swift.Error)
@@ -32,7 +32,7 @@ private enum __XCTAssertionResult {
     }
 }
 
-private func __XCTEvaluateAssertion(testCase: XCTestCase, _ message: @autoclosure () -> String = "", file: StaticString = #file, line: UInt = #line, expression: () throws -> __XCTAssertionResult) {
+internal func __XCTEvaluateAssertion(testCase: XCTestCase, _ message: @autoclosure () -> String = "", file: StaticString = #file, line: UInt = #line, expression: () throws -> __XCTAssertionResult) {
     let result: __XCTAssertionResult
     do {
         result = try expression()
@@ -160,6 +160,42 @@ public extension ProcedureKitTestCase {
             return .success
         }
     }
+
+    public func XCTAssertConditionResult<E: Error>(_ exp1: @autoclosure () throws -> ConditionResult, failedWithError error: @autoclosure () throws -> E, _ message: @autoclosure () -> String = "", file: StaticString = #file, line: UInt = #line) where E: Equatable {
+        __XCTEvaluateAssertion(testCase: self, message, file: file, line: line) {
+
+            let result = try exp1()
+            let expectedError = try error()
+
+            switch result {
+            case let .failed(receivedError):
+                guard let error = receivedError as? E else {
+                    return .expectedFailure("Condition failed with unexpected error, \(receivedError).")
+                }
+                guard error == expectedError else {
+                    return .expectedFailure("Condition failed with error: \(error), instead of: \(expectedError).")
+                }
+            default:
+                return .expectedFailure("Condition did not fail, \(result).")
+            }
+            return .success
+        }
+    }
+
+    public func XCTAssertConditionResultSatisfied(_ exp1: @autoclosure () throws -> ConditionResult, _ message: @autoclosure () -> String = "", file: StaticString = #file, line: UInt = #line) {
+        __XCTEvaluateAssertion(testCase: self, message, file: file, line: line) {
+
+            let result = try exp1()
+
+            switch result {
+            case .satisfied: break
+            default:
+                return .expectedFailure("Condition was not satisfied: \(result).")
+            }
+            return .success
+        }
+    }
+
 }
 
 // MARK: Constrained to TestProcedure

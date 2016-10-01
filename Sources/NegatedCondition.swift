@@ -15,7 +15,7 @@ public final class NegatedCondition<C: Condition>: ComposedCondition<C> {
     }
 
     /// Override of public function
-    public override func evaluate(procedure: Procedure, completion: (ConditionResult) -> Void) {
+    public override func evaluate(procedure: Procedure, completion: @escaping (ConditionResult) -> Void) {
         super.evaluate(procedure: procedure) { composedResult in
             switch composedResult {
             case .pending: completion(.pending)

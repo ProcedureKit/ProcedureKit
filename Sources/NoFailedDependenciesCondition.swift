@@ -41,7 +41,7 @@ public class NoFailedDependenciesCondition: Condition {
      - parameter procedure: the `Procedure` which the condition is attached to.
      - parameter completion: the completion block which receives a `ConditionResult`.
      */
-    public override func evaluate(procedure: Procedure, completion: (ConditionResult) -> Void) {
+    public override func evaluate(procedure: Procedure, completion: @escaping (ConditionResult) -> Void) {
         let dependencies = procedure.dependencies
         let cancelled = dependencies.filter { $0.isCancelled }
         let failures = dependencies.filter {
