@@ -107,7 +107,7 @@ open class Procedure: Operation, ProcedureProtocol {
         }
         set(newState) {
             _stateLock.withCriticalScope {
-                assert(_state.canTransition(to: newState, whenCancelled: isCancelled), "Attempting to perform illegal cyclic state transition, \(_state) -> \(newState) for operation: \(identity).")
+                assert(_state.canTransition(to: newState, whenCancelled: isCancelled), "Attempting to perform illegal cyclic state transition, \(_state) -> \(newState) for operation: \(identity). Ensure that Procedure instances are added to a ProcedureQueue not an OperationQueue.")
                 log.verbose(message: "\(_state) -> \(newState)")
                 _state = newState
             }
