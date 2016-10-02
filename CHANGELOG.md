@@ -1,3 +1,22 @@
+# 4.0.0 Beta 2
+
+Beta 2 is all about rounding out the majority of the missing functionality from _ProcedureKit_, and additionally fixing integration issues.
+
+1. [#471](https://github.com/ProcedureKit/ProcedureKit/pull/471) NegatedCondition
+2. [#472](https://github.com/ProcedureKit/ProcedureKit/pull/472) SilentCondition 
+3. [#474](https://github.com/ProcedureKit/ProcedureKit/pull/471) Fixes for how Procedure finishes - thanks [@swiftlyfalling](https://github.com/swiftlyfalling)
+4. [#473](https://github.com/ProcedureKit/ProcedureKit/pull/471) BlockCondition
+5. [#470](https://github.com/ProcedureKit/ProcedureKit/pull/471) NoFailedDependenciesCondition
+6. [#475](https://github.com/ProcedureKit/ProcedureKit/pull/471) TimeoutObserver
+7. [#478](https://github.com/ProcedureKit/ProcedureKit/pull/471) Procedure name and identity
+8. [#480](https://github.com/ProcedureKit/ProcedureKit/pull/471) BlockObserver - thanks to [@jshier](https://github.com/jshier) for his input on this.
+9. [#487](https://github.com/ProcedureKit/ProcedureKit/pull/471) Adds ComposedProcedure & GatedProcedure
+10. [#488](https://github.com/ProcedureKit/ProcedureKit/pull/471) RepeatProcedure
+11. [#491](https://github.com/ProcedureKit/ProcedureKit/pull/471) RetryProcedure
+12. [#492](https://github.com/ProcedureKit/ProcedureKit/pull/492) Capabilities
+
+In addition to the above additions, fixes have been made to fix Release builds correctly compile, despite some Swift 3 compiler bugs in Xcode 8 and 8.1. See the release notes for more instructions.
+
 # 4.0.0 Beta 1
 
 Well, it’s time to say goodbye to _Operations_ and hello to _ProcedureKit_. _ProcedureKit_ is a complete re-write of _Operations_ in Swift 3.0, and has the following key changes.
