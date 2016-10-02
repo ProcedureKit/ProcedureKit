@@ -33,7 +33,7 @@ open class TestProcedure: Procedure, ResultInjectionProtocol {
     public private(set) var procedureWillCancelCalled = false
     public private(set) var procedureDidCancelCalled = false
 
-    public init(name: String = "Test Procedure", delay: TimeInterval = 0.000_001, error: Error? = .none, produced: Operation? = .none) {
+    public init(name: String = "TestProcedure", delay: TimeInterval = 0.000_001, error: Error? = .none, produced: Operation? = .none) {
         self.delay = delay
         self.error = error
         self.producedOperation = produced
@@ -44,14 +44,12 @@ open class TestProcedure: Procedure, ResultInjectionProtocol {
     open override func execute() {
 
         if let operation = producedOperation {
-            let deadline = DispatchTime(uptimeNanoseconds: UInt64(delay * 0.001 * Double(NSEC_PER_SEC)))
-            DispatchQueue.main.asyncAfter(deadline: deadline) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + (delay / 2.0)) {
                 self.produce(operation: operation)
             }
         }
 
-        let deadline = DispatchTime(uptimeNanoseconds: UInt64(delay * Double(NSEC_PER_SEC)))
-        DispatchQueue.main.asyncAfter(deadline: deadline) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
             self.didExecute = true
             self.finish(withError: self.error)
         }

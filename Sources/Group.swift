@@ -17,9 +17,21 @@ import Foundation
 open class GroupProcedure: Procedure, ProcedureQueueDelegate {
 
     internal struct GroupErrors {
-        typealias ByOperation = [Operation: [Error]]
+        typealias ByOperation = Dictionary<Operation, Array<Error>>
         var fatal = [Error]()
         var attemptedRecovery: ByOperation = [:]
+
+        var attemptedRecoveryErrors: [Error] {
+            return Array(attemptedRecovery.values.flatMap { $0 })
+        }
+
+        var all: [Error] {
+            get {
+                var tmp: [Error] = fatal
+                tmp.append(contentsOf: attemptedRecoveryErrors)
+                return tmp
+            }
+        }
     }
 
     internal let queue = ProcedureQueue()
@@ -69,8 +81,6 @@ open class GroupProcedure: Procedure, ProcedureQueueDelegate {
         queue.isSuspended = true
         queue.underlyingQueue = underlyingQueue
         queue.delegate = self
-
-        name = "GroupProcedure"
         userIntent = operations.userIntent
         groupCanFinish = CanFinishGroup(group: self)
 
@@ -216,6 +226,9 @@ open class GroupProcedure: Procedure, ProcedureQueueDelegate {
      */
     public func procedureQueue(_ queue: ProcedureQueue, willFinishOperation operation: Operation, withErrors errors: [Error]) {
         guard queue === self.queue else { return }
+
+        /// If the operation is a Procedure.EvaluateConditions - exit early.
+        if operation is Procedure.EvaluateConditions { return }
 
         if !errors.isEmpty {
             if child(operation, willAttemptRecoveryFromErrors: errors) {
@@ -402,6 +415,10 @@ public extension GroupProcedure {
 
 public extension GroupProcedure {
 
+    internal var attemptedRecoveryErrors: [Error] {
+        return groupErrors.read { $0.attemptedRecoveryErrors }
+    }
+
     public override var errors: [Error] {
         get { return groupErrors.read { $0.fatal } }
         set {
@@ -411,14 +428,14 @@ public extension GroupProcedure {
         }
     }
 
-    fileprivate func child(_ child: Operation, didAttemptRecoveryFromErrors errors: [Error]) {
+    public func child(_ child: Operation, didAttemptRecoveryFromErrors errors: [Error]) {
         groupErrors.write { (ward: inout GroupErrors) in
             ward.attemptedRecovery[child] = errors
         }
     }
 
-    fileprivate func child(_ child: Operation, didEncounterFatalErrors errors: [Error]) {
-        log.verbose(message: "\(child.operationName) did encounter \(errors.count) fatal errors.")
+    public func child(_ child: Operation, didEncounterFatalErrors errors: [Error]) {
+        log.notice(message: "\(child.operationName) did encounter \(errors.count) fatal errors.")
         groupErrors.write { (ward: inout GroupErrors) in
             ward.fatal.append(contentsOf: errors)
         }
@@ -430,7 +447,7 @@ public extension GroupProcedure {
 
     public func childDidRecoverFromErrors(_ child: Operation) {
         if let _ = attemptedRecovery[child] {
-            log.verbose(message: "successfully recovered from errors in \(child)")
+            log.notice(message: "successfully recovered from errors in \(child)")
             groupErrors.write { (ward: inout GroupErrors) in
                 ward.attemptedRecovery.removeValue(forKey: child)
             }
@@ -438,7 +455,7 @@ public extension GroupProcedure {
     }
 
     public func childDidNotRecoverFromErrors(_ child: Operation) {
-        log.verbose(message: "failed to recover from errors in \(child)")
+        log.notice(message: "failed to recover from errors in \(child)")
         groupErrors.write { (ward: inout GroupErrors) in
             if let errors = ward.attemptedRecovery.removeValue(forKey: child) {
                 ward.fatal.append(contentsOf: errors)

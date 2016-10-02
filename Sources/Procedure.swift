@@ -10,7 +10,7 @@ import Foundation
 
 // swiftlint:disable type_body_length
 
-open class Procedure: Operation, ProcedureProcotol {
+open class Procedure: Operation, ProcedureProtocol {
 
     private enum FinishingFrom {
         case main, cancel, finish
@@ -94,6 +94,8 @@ open class Procedure: Operation, ProcedureProcotol {
         }
     }
 
+    internal let identifier = UUID()
+
     // MARK: State
 
     private var _state = State.initialized
@@ -105,8 +107,7 @@ open class Procedure: Operation, ProcedureProcotol {
         }
         set(newState) {
             _stateLock.withCriticalScope {
-                assert(_state.canTransition(to: newState, whenCancelled: isCancelled), "Attempting to perform illegal cyclic state transition, \(_state) -> \(newState).")
-//                assert(_state.canTransition(to: newState, whenCancelled: isCancelled), "Attempting to perform illegal cyclic state transition, \(_state) -> \(newState) for operation: \(identity).")
+                assert(_state.canTransition(to: newState, whenCancelled: isCancelled), "Attempting to perform illegal cyclic state transition, \(_state) -> \(newState) for operation: \(identity). Ensure that Procedure instances are added to a ProcedureQueue not an OperationQueue.")
                 log.verbose(message: "\(_state) -> \(newState)")
                 _state = newState
             }
@@ -208,7 +209,7 @@ open class Procedure: Operation, ProcedureProcotol {
 
     internal fileprivate(set) var directDependencies = Set<Operation>()
 
-    internal fileprivate(set) var evaluateConditionsProcedure: GroupProcedure? = nil
+    internal fileprivate(set) var evaluateConditionsProcedure: EvaluateConditions? = nil
 
     internal var indirectDependencies: Set<Operation> {
         return Set(conditions
@@ -223,8 +224,9 @@ open class Procedure: Operation, ProcedureProcotol {
     // MARK: - Initialization
 
     public override init() {
-        self.isAutomaticFinishingDisabled = false
+        isAutomaticFinishingDisabled = false
         super.init()
+        name = String(describing: type(of: self))
     }
 
     // MARK: - Disable Automatic Finishing
@@ -266,8 +268,9 @@ open class Procedure: Operation, ProcedureProcotol {
 
      */
     public init(disableAutomaticFinishing: Bool) {
-        self.isAutomaticFinishingDisabled = disableAutomaticFinishing
+        isAutomaticFinishingDisabled = disableAutomaticFinishing
         super.init()
+        name = String(describing: type(of: self))
     }
 
 
@@ -354,7 +357,7 @@ open class Procedure: Operation, ProcedureProcotol {
         let nextState = getNextState()
 
         guard nextState != .finishing else {
-            _finish(withErrors: [])
+            _finish(withErrors: [], from: .main)
             return
         }
 
@@ -367,13 +370,13 @@ open class Procedure: Operation, ProcedureProcotol {
         didChangeValue(forKey: .executing)
 
         guard nextState2 != .finishing else {
-            _finish(withErrors: [])
+            _finish(withErrors: [], from: .main)
             return
         }
 
         guard nextState2 == .executing else { return }
 
-        log.verbose(message: "Will Execute")
+        log.notice(message: "Will Execute")
 
         execute()
     }
@@ -385,7 +388,7 @@ open class Procedure: Operation, ProcedureProcotol {
 
     public final func produce(operation: Operation) {
         precondition(state > .initialized, "Cannot produce operation will not being scheduled on a queue")
-        log.verbose(message: "Did produce \(operation.operationName)")
+        log.notice(message: "Did produce \(operation.operationName)")
         observers.forEach { $0.procedure(self, didProduce: operation) }
     }
 
@@ -444,7 +447,7 @@ open class Procedure: Operation, ProcedureProcotol {
         observers.forEach { $0.did(cancel: self, withErrors: resultingErrors) }
 
         let messageSuffix = !additionalErrors.isEmpty ? "errors: \(additionalErrors)" : "no errors"
-        log.verbose(message: "Will cancel with \(messageSuffix).")
+        log.notice(message: "Will cancel with \(messageSuffix).")
 
         didChangeValue(forKey: .cancelled)
 
@@ -454,7 +457,7 @@ open class Procedure: Operation, ProcedureProcotol {
 
         guard shouldFinishFromCancel else { return }
 
-        _finish(withErrors: [])
+        _finish(withErrors: [], from: .cancel)
     }
 
 
@@ -471,22 +474,31 @@ open class Procedure: Operation, ProcedureProcotol {
      - parameter errors: an array of `Error`, which defaults to empty.
      */
     public final func finish(withErrors errors: [Error] = []) {
-        _finish(withErrors: errors)
+        _finish(withErrors: errors, from: .finish)
     }
 
-    private var shouldFinish: Bool {
+    private func shouldFinish(from source: FinishingFrom) -> Bool {
         return _stateLock.withCriticalScope {
             // Do not finish is already finishing or finished
             guard state <= .finishing else { return false }
             // Only a single call to _finish should continue
-            guard !_isHandlingFinish || _isFinishingFrom == FinishingFrom.cancel  else { return false }
-            _isFinishingFrom = .finish
+            guard !_isHandlingFinish
+                // cancel() and main() ensure one-time execution
+                // thus, cancel() and main() set _isFinishingFrom prior to calling _finish()
+                // but finish() does not; _isFinishingFrom is set below when finish() calls _finish()
+                // this could be simplified to a check for (_isFinishFrom == source) if finish()
+                // ensured that it could only call _finish() once
+                // (although that would require another aquisition of the lock)
+                || (_isFinishingFrom == source && (source == .cancel || source == .main))
+                else { return false }
+
+            _isFinishingFrom = source
             return true
         }
     }
 
-    private final func _finish(withErrors receivedErrors: [Error]) {
-        guard shouldFinish else { return }
+    private final func _finish(withErrors receivedErrors: [Error], from source: FinishingFrom) {
+        guard shouldFinish(from: source) else { return }
 
         // NOTE:
         // - The stateLock should only be held when necessary, and should not
@@ -507,9 +519,9 @@ open class Procedure: Operation, ProcedureProcotol {
             return _errors
         }
 
-        let messageSuffix = !errors.isEmpty ? "errors: \(errors)" : "no errors"
+        let messageSuffix = !resultingErrors.isEmpty ? "errors: \(resultingErrors)" : "no errors"
 
-        log.verbose(message: "Will finish with \(messageSuffix).")
+        log.notice(message: "Will finish with \(messageSuffix).")
 
         procedureWillFinish(withErrors: resultingErrors)
 
@@ -521,7 +533,7 @@ open class Procedure: Operation, ProcedureProcotol {
         procedureDidFinish(withErrors: resultingErrors)
         observers.forEach { $0.did(finish: self, withErrors: resultingErrors) }
 
-        log.verbose(message: "Did finish with \(messageSuffix).")
+        log.notice(message: "Did finish with \(messageSuffix).")
 
         didChangeValue(forKey: .finished)
     }
@@ -560,7 +572,7 @@ public extension Procedure {
 
 public extension Procedure {
 
-    public func add<Dependency: ProcedureProcotol>(dependency: Dependency) {
+    public func add<Dependency: ProcedureProtocol>(dependency: Dependency) {
         guard let op = dependency as? Operation else {
             assertionFailure("Adding dependencies which do not subclass Foundation.Operation is not supported.")
             return

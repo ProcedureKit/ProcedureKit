@@ -100,7 +100,7 @@ class ConditionTests: ProcedureKitTestCase {
         condition.attach(condition: FalseCondition(name: "Nested Condition 1"))
         procedure.attach(condition: condition)
         wait(for: procedure)
-        XCTAssertProcedureCancelledWithErrors(count: 2)
+        XCTAssertProcedureCancelledWithErrors(count: 1)
     }
 
     // MARK: - Conditions with Dependencies

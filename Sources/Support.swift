@@ -52,7 +52,7 @@ struct Lock: ReadWriteLock {
 
 internal class Protector<T> {
 
-    private var lock: ReadWriteLock = Lock()
+    private var lock = Lock()
     private var ward: T
 
     init(_ ward: T) {

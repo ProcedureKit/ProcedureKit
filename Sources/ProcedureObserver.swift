@@ -12,7 +12,7 @@ import Foundation
  */
 public protocol ProcedureObserver {
 
-    associatedtype Procedure: ProcedureProcotol
+    associatedtype Procedure: ProcedureProtocol
 
     /**
      Observer gets notified when it is attached to a procedure.
@@ -59,7 +59,7 @@ public protocol ProcedureObserver {
      - parameter procedure: the observed `Procedure`.
      - parameter errors: an array of `Error`s.
      */
-    func will(finish procedure: Procedure, withErrors errors: [Error])
+    func will(finish procedure: Procedure, withErrors: [Error])
 
     /**
      The procedure did finish. Any errors that were encountered are collected here.
@@ -67,16 +67,11 @@ public protocol ProcedureObserver {
      - parameter procedure: the observed `Procedure`.
      - parameter errors: an array of `ErrorType`s.
      */
-    func did(finish procedure: Procedure, withErrors errors: [Error])
+    func did(finish procedure: Procedure, withErrors: [Error])
 }
 
 public extension ProcedureObserver {
 
-    /**
-     Default implementations that do nothing.
-
-     - parameter procedure: the observed `Procedure`.
-     */
     func didAttach(to procedure: Procedure) { }
 
     func will(execute procedure: Procedure) { }

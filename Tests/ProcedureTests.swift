@@ -81,3 +81,27 @@ class UserIntentTests: ProcedureKitTestCase {
         XCTAssertNotEqual(Procedure.UserIntent.initiated, Procedure.UserIntent.sideEffect)
     }
 }
+
+class ProcedureTests: ProcedureKitTestCase {
+
+    func test__procedure_name() {
+        let block = BlockProcedure { }
+        XCTAssertEqual(block.name, "BlockProcedure")
+
+        let group = GroupProcedure(operations: [])
+        XCTAssertEqual(group.name, "GroupProcedure")
+    }
+
+    func test__identity_is_equatable() {
+        let identity1 = procedure.identity
+        let identity2 = procedure.identity
+        XCTAssertEqual(identity1, identity2)
+    }
+
+    func test__identity_description() {
+        XCTAssertTrue(procedure.identity.description.hasPrefix("TestProcedure #"))
+        procedure.name = nil
+        XCTAssertTrue(procedure.identity.description.hasPrefix("Unnamed Procedure #"))
+    }
+}
+

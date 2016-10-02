@@ -6,7 +6,7 @@
 
 import Foundation
 
-public protocol ProcedureProcotol: class {
+public protocol ProcedureProtocol: class {
 
     var procedureName: String { get }
 
@@ -50,10 +50,10 @@ public protocol ProcedureProcotol: class {
 
     // Dependencies
 
-    func add<Dependency: ProcedureProcotol>(dependency: Dependency)
+    func add<Dependency: ProcedureProtocol>(dependency: Dependency)
 }
 
-public extension ProcedureProcotol {
+public extension ProcedureProtocol {
 
     var failed: Bool {
         return errors.count > 0

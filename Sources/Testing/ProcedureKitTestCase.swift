@@ -28,6 +28,7 @@ open class ProcedureKitTestCase: XCTestCase {
         delegate = nil
         queue = nil
         procedure = nil
+        LogManager.severity = .warning
         ExclusivityManager.sharedInstance.__tearDownForUnitTesting()
         super.tearDown()
     }
@@ -72,9 +73,20 @@ open class ProcedureKitTestCase: XCTestCase {
     public func add(expectation: XCTestExpectation, to procedure: Procedure) {
         weak var weakExpectation = expectation
         procedure.addDidFinishBlockObserver { _, _ in
-            DispatchQueue.default.async {
+            DispatchQueue.main.async {
                 weakExpectation?.fulfill()
             }
         }
+    }
+}
+
+public extension ProcedureKitTestCase {
+
+    func createCancellingProcedure() -> TestProcedure {
+        let procedure = TestProcedure(name: "Cancelling Test Procedure")
+        procedure.addWillExecuteBlockObserver { procedure in
+            procedure.cancel()
+        }
+        return procedure
     }
 }
