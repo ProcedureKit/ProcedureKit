@@ -11,31 +11,63 @@ import TestingProcedureKit
 
 class BackgroundObserverTests: ProcedureKitTestCase {
 
+    var backgroundTaskName: String!
+    var backgroundTaskIdentifier: UIBackgroundTaskIdentifier!
+    var endedBackgroundTaskIdentifier: UIBackgroundTaskIdentifier!
+
+    var didBeginTask: TestableUIApplication.DidBeginBackgroundTask!
+    var didEndTask: TestableUIApplication.DidEndBackgroundTask!
+    var observer: BackgroundObserver!
+
+    override func setUp() {
+        super.setUp()
+        backgroundTaskName = "Hello world"
+        didBeginTask = { name, identifier in
+            self.backgroundTaskName = name
+            self.backgroundTaskIdentifier = identifier
+        }
+        didEndTask = { self.endedBackgroundTaskIdentifier = $0 }
+        procedure.log.severity = .verbose
+    }
+
+    override func tearDown() {
+        backgroundTaskName = nil
+        backgroundTaskIdentifier = nil
+        endedBackgroundTaskIdentifier = nil
+        didBeginTask = nil
+        didEndTask = nil
+        observer = nil
+        super.tearDown()
+    }
+
     func test__background_observer_starts_background_task() {
-        var backgroundTaskName: String = "Hello world"
-        var backgroundTaskIdentifier: UIBackgroundTaskIdentifier!
-        var endedBackgroundTaskIdentifier: UIBackgroundTaskIdentifier!
-
-        let didBeginTask: TestableUIApplication.DidBeginBackgroundTask = { name, identifier in
-            if let name = name {
-                backgroundTaskName = name
-            }
-            backgroundTaskIdentifier = identifier
-        }
-
-        let didEndTask: TestableUIApplication.DidEndBackgroundTask = { identifier in
-            endedBackgroundTaskIdentifier = identifier
-        }
 
         let application = TestableUIApplication(state: UIApplicationState.active, didBeginTask: didBeginTask, didEndTask: didEndTask)
 
-        let observer = BackgroundObserver()
-        observer.application = application
+        observer = BackgroundObserver(app: application)
 
         procedure.add(observer: observer)
 
         check(procedure: procedure) { _ in
             application.enterBackground()
+        }
+
+        XCTAssertProcedureFinishedWithoutErrors()
+        XCTAssertEqual(backgroundTaskName, BackgroundObserver.backgroundTaskName)
+        XCTAssertEqual(backgroundTaskIdentifier, endedBackgroundTaskIdentifier)
+    }
+
+    func test__background_observer_starts_in_background_then_becomes_active() {
+
+        let application = TestableUIApplication(state: UIApplicationState.background, didBeginTask: didBeginTask, didEndTask: didEndTask)
+        application.enterBackground()
+
+        observer = BackgroundObserver(app: application)
+
+        procedure.add(observer: observer)
+
+        check(procedure: procedure) { _ in
+            application.becomeActive()
         }
 
         XCTAssertProcedureFinishedWithoutErrors()

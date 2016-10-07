@@ -23,14 +23,19 @@ public class BackgroundObserver: NSObject, ProcedureObserver {
     static let backgroundTaskName = "Background Observer"
 
     private var identifier: UIBackgroundTaskIdentifier? = nil
-    internal var application: BackgroundTaskApplicationProtocol = UIApplication.shared
+    private var log: LoggerProtocol? = nil
+    private let application: BackgroundTaskApplicationProtocol
 
     private var isInBackground: Bool {
         return application.applicationState == .background
     }
 
-    public override init() {
-        application = UIApplication.shared
+    public override convenience init() {
+        self.init(app: UIApplication.shared)
+    }
+
+    init(app: BackgroundTaskApplicationProtocol) {
+        self.application = app
         super.init()
         let nc = NotificationCenter.default
         nc.addObserver(self, selector: #selector(BackgroundObserver.didEnterBackground(withNotification:)), name: NSNotification.Name.UIApplicationDidEnterBackground, object: nil)
@@ -53,6 +58,7 @@ public class BackgroundObserver: NSObject, ProcedureObserver {
 
     private func startBackgroundTask() {
         if identifier == nil {
+            log?.info(message: "Will begin background task as application entered background.")
             identifier = application.beginBackgroundTask(withName: BackgroundObserver.backgroundTaskName, expirationHandler: endBackgroundTask)
         }
     }
@@ -60,7 +66,12 @@ public class BackgroundObserver: NSObject, ProcedureObserver {
     private func endBackgroundTask() {
         guard let id = identifier else { return }
         application.endBackgroundTask(id)
+        log?.info(message: "Did end background task.")
         identifier = nil
+    }
+
+    public func didAttach(to procedure: Procedure) {
+        log = procedure.log
     }
 
     public func did(finish procedure: Procedure, withErrors errors: [Error]) {

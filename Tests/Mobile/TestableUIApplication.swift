@@ -43,12 +43,12 @@ class TestableUIApplication: BackgroundTaskApplicationProtocol {
 
 
     func enterBackground() {
-        testableApplicationState = UIApplicationState.background
+        testableApplicationState = .background
         NotificationCenter.default.post(name: NSNotification.Name.UIApplicationDidEnterBackground, object: self)
     }
 
     func becomeActive() {
-        testableApplicationState = UIApplicationState.active
+        testableApplicationState = .active
         NotificationCenter.default.post(name: NSNotification.Name.UIApplicationDidBecomeActive, object: self)
     }
 }
