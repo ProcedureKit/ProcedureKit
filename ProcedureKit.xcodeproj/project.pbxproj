@@ -90,6 +90,8 @@
 		65A63B131DA03D1C00E90B9D /* Capability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65A63B121DA03D1C00E90B9D /* Capability.swift */; };
 		65A63B151DA04FDB00E90B9D /* CapabilityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65A63B141DA04FDB00E90B9D /* CapabilityTests.swift */; };
 		65A63B171DA0536200E90B9D /* CapabilityTestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65A63B161DA0536200E90B9D /* CapabilityTestCase.swift */; };
+		65A72C2A1DA7F37C008597CA /* ProcedureKit.framework in Copy Dependencies */ = {isa = PBXBuildFile; fileRef = 65CFC5F01D608A5500CAD875 /* ProcedureKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		65A72C2B1DA7F37C008597CA /* TestingProcedureKit.framework in Copy Dependencies */ = {isa = PBXBuildFile; fileRef = 65CFC6161D60900000CAD875 /* TestingProcedureKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		65B83EB71D731DE8007EFBFA /* Collection+ProcedureKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65B83EB61D731DE8007EFBFA /* Collection+ProcedureKit.swift */; };
 		65B97DB51D65138F00AC3B5D /* Procedure.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65B97DB41D65138F00AC3B5D /* Procedure.swift */; };
 		65CFC5FA1D608A5500CAD875 /* ProcedureKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65CFC5F01D608A5500CAD875 /* ProcedureKit.framework */; };
@@ -216,6 +218,30 @@
 			remoteInfo = ProcedureKit;
 		};
 /* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		659300891DA7F57000750212 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		65A72C291DA7F352008597CA /* Copy Dependencies */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				65A72C2A1DA7F37C008597CA /* ProcedureKit.framework in Copy Dependencies */,
+				65A72C2B1DA7F37C008597CA /* TestingProcedureKit.framework in Copy Dependencies */,
+			);
+			name = "Copy Dependencies";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		650182C81D8916EC0052CE90 /* DelayProcedureTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = DelayProcedureTests.swift; path = Tests/DelayProcedureTests.swift; sourceTree = "<group>"; };
@@ -774,7 +800,7 @@
 				653C9FC51D6097A40070B7A2 /* Sources */,
 				653C9FC61D6097A40070B7A2 /* Frameworks */,
 				653C9FC71D6097A40070B7A2 /* Resources */,
-				651FFDEE1DA8413000112220 /* ShellScript */,
+				65A72C291DA7F352008597CA /* Copy Dependencies */,
 			);
 			buildRules = (
 			);
@@ -965,6 +991,7 @@
 				65CFC6121D60900000CAD875 /* Frameworks */,
 				65CFC6131D60900000CAD875 /* Headers */,
 				65CFC6141D60900000CAD875 /* Resources */,
+				659300891DA7F57000750212 /* CopyFiles */,
 			);
 			buildRules = (
 			);
@@ -1156,20 +1183,6 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		651FFDEE1DA8413000112220 /* ShellScript */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-				"$(PLATFORM_DIR)/Developer/Library/Frameworks/XCTest.framework",
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "/usr/local/bin/carthage copy-frameworks";
-		};
 		65A2D8001D69FBFD00FB067C /* Swift Lint */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -2610,6 +2623,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				MTL_ENABLE_DEBUG_INFO = YES;
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
@@ -2661,6 +2675,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SKIP_INSTALL = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
