@@ -64,6 +64,6 @@ public class BackgroundObserver: NSObject, ProcedureObserver {
     }
 
     public func did(finish procedure: Procedure, withErrors errors: [Error]) {
-
+        endBackgroundTask()
     }
 }
