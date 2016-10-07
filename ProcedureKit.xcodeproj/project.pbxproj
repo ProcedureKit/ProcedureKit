@@ -53,6 +53,7 @@
 		65403ABA1D7C49C500D6036B /* XCTAsserts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65403AB91D7C49C500D6036B /* XCTAsserts.swift */; };
 		65403ABC1D7C6CBC00D6036B /* TestCondition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65403ABB1D7C6CBC00D6036B /* TestCondition.swift */; };
 		65403ABE1D7C9E7600D6036B /* ResultInjectionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65403ABD1D7C9E7600D6036B /* ResultInjectionTests.swift */; };
+		654A81E51D8DEDD8002F4F26 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 654A81E41D8DEDD8002F4F26 /* XCTest.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		654FAFFB1D7CABA0002FA74D /* ResultInjection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 654FAFFA1D7CABA0002FA74D /* ResultInjection.swift */; };
 		654FAFFD1D7CD5EA002FA74D /* Map.swift in Sources */ = {isa = PBXBuildFile; fileRef = 654FAFFC1D7CD5EA002FA74D /* Map.swift */; };
 		655594F11D9E482D00B08990 /* RepeatProcedureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 655594F01D9E482D00B08990 /* RepeatProcedureTests.swift */; };
@@ -61,6 +62,9 @@
 		655E86451D67B9F9000FBA6C /* ProcedureObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 655E86441D67B9F9000FBA6C /* ProcedureObserver.swift */; };
 		655E86471D67BA9C000FBA6C /* Support.swift in Sources */ = {isa = PBXBuildFile; fileRef = 655E86461D67BA9C000FBA6C /* Support.swift */; };
 		657431281D8D9765002E8FC9 /* Identity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 657431271D8D9765002E8FC9 /* Identity.swift */; };
+		6574312B1D8DDF0D002E8FC9 /* BackgroundObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 657431291D8DB8AD002E8FC9 /* BackgroundObserver.swift */; };
+		6574312D1D8DE712002E8FC9 /* BackgroundObserverTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6574312C1D8DE712002E8FC9 /* BackgroundObserverTests.swift */; };
+		6574312F1D8DE848002E8FC9 /* TestableUIApplication.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6574312E1D8DE848002E8FC9 /* TestableUIApplication.swift */; };
 		6583F95F1D8C4C7F00000A8D /* NoFailedDependenciesConditionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6583F95E1D8C4C7F00000A8D /* NoFailedDependenciesConditionTests.swift */; };
 		6584AF451D74770C0030DBB3 /* Errors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6584AF441D74770C0030DBB3 /* Errors.swift */; };
 		65881B791D880ACB00C212C8 /* MutualExclusivityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65881B781D880ACB00C212C8 /* MutualExclusivityTests.swift */; };
@@ -86,6 +90,8 @@
 		65A63B131DA03D1C00E90B9D /* Capability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65A63B121DA03D1C00E90B9D /* Capability.swift */; };
 		65A63B151DA04FDB00E90B9D /* CapabilityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65A63B141DA04FDB00E90B9D /* CapabilityTests.swift */; };
 		65A63B171DA0536200E90B9D /* CapabilityTestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65A63B161DA0536200E90B9D /* CapabilityTestCase.swift */; };
+		65A72C2A1DA7F37C008597CA /* ProcedureKit.framework in Copy Dependencies */ = {isa = PBXBuildFile; fileRef = 65CFC5F01D608A5500CAD875 /* ProcedureKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		65A72C2B1DA7F37C008597CA /* TestingProcedureKit.framework in Copy Dependencies */ = {isa = PBXBuildFile; fileRef = 65CFC6161D60900000CAD875 /* TestingProcedureKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		65B83EB71D731DE8007EFBFA /* Collection+ProcedureKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65B83EB61D731DE8007EFBFA /* Collection+ProcedureKit.swift */; };
 		65B97DB51D65138F00AC3B5D /* Procedure.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65B97DB41D65138F00AC3B5D /* Procedure.swift */; };
 		65CFC5FA1D608A5500CAD875 /* ProcedureKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65CFC5F01D608A5500CAD875 /* ProcedureKit.framework */; };
@@ -112,13 +118,6 @@
 			proxyType = 1;
 			remoteGlobalIDString = 65CFC5EF1D608A5500CAD875;
 			remoteInfo = ProcedureKit;
-		};
-		653C9FE01D6099220070B7A2 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 65CFC5E51D608A1A00CAD875 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 65CFC6151D60900000CAD875;
-			remoteInfo = TestingProcedureKit;
 		};
 		653C9FFD1D609E660070B7A2 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -220,6 +219,30 @@
 		};
 /* End PBXContainerItemProxy section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		659300891DA7F57000750212 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		65A72C291DA7F352008597CA /* Copy Dependencies */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				65A72C2A1DA7F37C008597CA /* ProcedureKit.framework in Copy Dependencies */,
+				65A72C2B1DA7F37C008597CA /* TestingProcedureKit.framework in Copy Dependencies */,
+			);
+			name = "Copy Dependencies";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		650182C81D8916EC0052CE90 /* DelayProcedureTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = DelayProcedureTests.swift; path = Tests/DelayProcedureTests.swift; sourceTree = "<group>"; };
 		6518D5E21D7B3A2800A12EF4 /* Condition.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Condition.swift; path = Sources/Condition.swift; sourceTree = "<group>"; };
@@ -266,6 +289,7 @@
 		65403AB91D7C49C500D6036B /* XCTAsserts.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = XCTAsserts.swift; path = Sources/Testing/XCTAsserts.swift; sourceTree = "<group>"; };
 		65403ABB1D7C6CBC00D6036B /* TestCondition.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TestCondition.swift; path = Sources/Testing/TestCondition.swift; sourceTree = "<group>"; };
 		65403ABD1D7C9E7600D6036B /* ResultInjectionTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ResultInjectionTests.swift; path = Tests/ResultInjectionTests.swift; sourceTree = "<group>"; };
+		654A81E41D8DEDD8002F4F26 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Platforms/iPhoneOS.platform/Developer/Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
 		654FAFFA1D7CABA0002FA74D /* ResultInjection.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ResultInjection.swift; path = Sources/ResultInjection.swift; sourceTree = "<group>"; };
 		654FAFFC1D7CD5EA002FA74D /* Map.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Map.swift; path = Sources/Map.swift; sourceTree = "<group>"; };
 		655594F01D9E482D00B08990 /* RepeatProcedureTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = RepeatProcedureTests.swift; path = Tests/RepeatProcedureTests.swift; sourceTree = "<group>"; };
@@ -274,6 +298,9 @@
 		655E86441D67B9F9000FBA6C /* ProcedureObserver.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ProcedureObserver.swift; path = Sources/ProcedureObserver.swift; sourceTree = "<group>"; };
 		655E86461D67BA9C000FBA6C /* Support.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Support.swift; path = Sources/Support.swift; sourceTree = "<group>"; };
 		657431271D8D9765002E8FC9 /* Identity.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Identity.swift; path = Sources/Identity.swift; sourceTree = "<group>"; };
+		657431291D8DB8AD002E8FC9 /* BackgroundObserver.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = BackgroundObserver.swift; path = Sources/Mobile/BackgroundObserver.swift; sourceTree = "<group>"; };
+		6574312C1D8DE712002E8FC9 /* BackgroundObserverTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = BackgroundObserverTests.swift; path = Tests/Mobile/BackgroundObserverTests.swift; sourceTree = "<group>"; };
+		6574312E1D8DE848002E8FC9 /* TestableUIApplication.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TestableUIApplication.swift; path = Tests/Mobile/TestableUIApplication.swift; sourceTree = "<group>"; };
 		6583F95E1D8C4C7F00000A8D /* NoFailedDependenciesConditionTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = NoFailedDependenciesConditionTests.swift; path = Tests/NoFailedDependenciesConditionTests.swift; sourceTree = "<group>"; };
 		6584AF441D74770C0030DBB3 /* Errors.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Errors.swift; path = Sources/Errors.swift; sourceTree = "<group>"; };
 		65881B781D880ACB00C212C8 /* MutualExclusivityTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = MutualExclusivityTests.swift; path = Tests/MutualExclusivityTests.swift; sourceTree = "<group>"; };
@@ -328,6 +355,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				654A81E51D8DEDD8002F4F26 /* XCTest.framework in Frameworks */,
 				653C9FE21D6099260070B7A2 /* TestingProcedureKit.framework in Frameworks */,
 				653C9FCA1D6097A40070B7A2 /* ProcedureKitMobile.framework in Frameworks */,
 			);
@@ -477,6 +505,7 @@
 		653C9FE31D60992E0070B7A2 /* Mobile */ = {
 			isa = PBXGroup;
 			children = (
+				657431291D8DB8AD002E8FC9 /* BackgroundObserver.swift */,
 			);
 			name = Mobile;
 			sourceTree = "<group>";
@@ -501,6 +530,8 @@
 			isa = PBXGroup;
 			children = (
 				653C9FE61D6099850070B7A2 /* ProcedureKitMobileTests.swift */,
+				6574312C1D8DE712002E8FC9 /* BackgroundObserverTests.swift */,
+				6574312E1D8DE848002E8FC9 /* TestableUIApplication.swift */,
 			);
 			name = "Mobile Tests";
 			sourceTree = "<group>";
@@ -572,6 +603,14 @@
 			path = ProcedureKitCloudTests;
 			sourceTree = "<group>";
 		};
+		654A81E31D8DEDD7002F4F26 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				654A81E41D8DEDD8002F4F26 /* XCTest.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		658A7B491D74D5B900F897C8 /* Core */ = {
 			isa = PBXGroup;
 			children = (
@@ -614,6 +653,7 @@
 				653CA05B1D60AA990070B7A2 /* Cloud */,
 				653CA0661D60AA990070B7A2 /* Cloud Tests */,
 				653CA02A1D60A4FB0070B7A2 /* ... */,
+				654A81E31D8DEDD7002F4F26 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -760,11 +800,11 @@
 				653C9FC51D6097A40070B7A2 /* Sources */,
 				653C9FC61D6097A40070B7A2 /* Frameworks */,
 				653C9FC71D6097A40070B7A2 /* Resources */,
+				65A72C291DA7F352008597CA /* Copy Dependencies */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				653C9FE11D6099220070B7A2 /* PBXTargetDependency */,
 				653C9FCC1D6097A40070B7A2 /* PBXTargetDependency */,
 			);
 			name = ProcedureKitMobileTests;
@@ -951,6 +991,7 @@
 				65CFC6121D60900000CAD875 /* Frameworks */,
 				65CFC6131D60900000CAD875 /* Headers */,
 				65CFC6141D60900000CAD875 /* Resources */,
+				659300891DA7F57000750212 /* CopyFiles */,
 			);
 			buildRules = (
 			);
@@ -980,8 +1021,7 @@
 					};
 					653C9FC81D6097A40070B7A2 = {
 						CreatedOnToolsVersion = 8.0;
-						DevelopmentTeam = WHEVNWJWTG;
-						ProvisioningStyle = Automatic;
+						ProvisioningStyle = Manual;
 					};
 					653C9FF21D609E650070B7A2 = {
 						CreatedOnToolsVersion = 8.0;
@@ -1165,6 +1205,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6574312B1D8DDF0D002E8FC9 /* BackgroundObserver.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1173,6 +1214,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				653C9FEA1D6099F40070B7A2 /* ProcedureKitMobileTests.swift in Sources */,
+				6574312F1D8DE848002E8FC9 /* TestableUIApplication.swift in Sources */,
+				6574312D1D8DE712002E8FC9 /* BackgroundObserverTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1324,11 +1367,6 @@
 			target = 65CFC5EF1D608A5500CAD875 /* ProcedureKit */;
 			targetProxy = 653C9FDD1D60990B0070B7A2 /* PBXContainerItemProxy */;
 		};
-		653C9FE11D6099220070B7A2 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 65CFC6151D60900000CAD875 /* TestingProcedureKit */;
-			targetProxy = 653C9FE01D6099220070B7A2 /* PBXContainerItemProxy */;
-		};
 		653C9FFE1D609E660070B7A2 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 653C9FF21D609E650070B7A2 /* ProcedureKitTV */;
@@ -1453,7 +1491,6 @@
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 3.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
@@ -1504,7 +1541,6 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SKIP_INSTALL = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
-				SWIFT_VERSION = 3.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 				VERSIONING_SYSTEM = "apple-generic";
@@ -1538,7 +1574,7 @@
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
-				DEVELOPMENT_TEAM = WHEVNWJWTG;
+				DEVELOPMENT_TEAM = "";
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
@@ -1560,7 +1596,6 @@
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 3.0;
 				TVOS_DEPLOYMENT_TARGET = 10.0;
 			};
 			name = Debug;
@@ -1591,7 +1626,7 @@
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEVELOPMENT_TEAM = WHEVNWJWTG;
+				DEVELOPMENT_TEAM = "";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
@@ -1606,7 +1641,6 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
-				SWIFT_VERSION = 3.0;
 				TVOS_DEPLOYMENT_TARGET = 10.0;
 				VALIDATE_PRODUCT = YES;
 			};
@@ -2572,7 +2606,6 @@
 				DEVELOPMENT_TEAM = "";
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
-				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				FRAMEWORK_VERSION = A;
@@ -2631,7 +2664,6 @@
 				DEVELOPMENT_TEAM = "";
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
-				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				FRAMEWORK_VERSION = A;

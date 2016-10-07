@@ -9,5 +9,6 @@ PRODUCT_NAME = TestingProcedureKit
 
 APPLICATION_EXTENSION_API_ONLY = NO
 
+INSTALL_PATH = @rpath
 
-FRAMEWORK_SEARCH_PATHS = $(inherited) $(DEVELOPER_SDK_DIR)/../Library/Frameworks
+FRAMEWORK_SEARCH_PATHS = $(inherited) $(PLATFORM_DIR)/Developer/Library/Frameworks

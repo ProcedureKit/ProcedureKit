@@ -12,4 +12,6 @@ PRODUCT_NAME_framework = ProcedureKitMobile
 PRODUCT_NAME_xctest = ProcedureKitMobileTests
 PRODUCT_NAME = $(PRODUCT_NAME_$(WRAPPER_EXTENSION))
 
+APPLICATION_EXTENSION_API_ONLY = NO
+
 SUPPORTED_PLATFORMS = iphoneos watchos iphonesimulator watchsimulator
