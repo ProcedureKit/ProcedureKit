@@ -27,7 +27,6 @@ class BackgroundObserverTests: ProcedureKitTestCase {
             self.backgroundTaskIdentifier = identifier
         }
         didEndTask = { self.endedBackgroundTaskIdentifier = $0 }
-        procedure.log.severity = .verbose
     }
 
     override func tearDown() {
