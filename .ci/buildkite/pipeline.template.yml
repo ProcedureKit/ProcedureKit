@@ -41,12 +41,12 @@ steps:
     command: "source /usr/local/opt/chruby/share/chruby/chruby.sh && chruby ruby && bundle install --quiet && bundle exec fastlane mac test_mac"
     agents:
       xcode: "$XCODE"
-#  -
-#    name: "Mobile"
-#    command: "source /usr/local/opt/chruby/share/chruby/chruby.sh && chruby ruby && bundle install --quiet && bundle exec fastlane ios test_mobile_ios"
-#    agents:
-#      iOS-Simulator: true    
-#      xcode: "$XCODE"
+  -
+    name: "Mobile"
+    command: "source /usr/local/opt/chruby/share/chruby/chruby.sh && chruby ruby && bundle install --quiet && bundle exec fastlane ios test_mobile_ios"
+    agents:
+      iOS-Simulator: true    
+      xcode: "$XCODE"
 #  -
 #    name: "TV"
 #    command: "source /usr/local/opt/chruby/share/chruby/chruby.sh && chruby ruby && bundle install --quiet && bundle exec fastlane ios test_tv_tvos"
