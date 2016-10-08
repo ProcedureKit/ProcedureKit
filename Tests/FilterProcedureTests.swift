@@ -8,28 +8,6 @@ import XCTest
 import TestingProcedureKit
 @testable import ProcedureKit
 
-class NumbersProcedure: Procedure, ResultInjectionProtocol {
-
-    var requirement: Void = ()
-    var result: Array<Int> = []
-    var error: Error? = nil
-
-    init(error: Error? = nil) {
-        self.error = error
-        super.init()
-    }
-
-    override func execute() {
-        if let error = error {
-            finish(withError: error)
-        }
-        else {
-            result = [0, 1, 2, 3, 4, 5 , 6 , 7, 8, 9]
-            finish()
-        }
-    }
-}
-
 class FilterProcedureTests: ProcedureKitTestCase {
 
     func test__requirement_is_filtered_to_result() {
