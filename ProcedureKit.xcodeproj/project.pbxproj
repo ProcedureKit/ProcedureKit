@@ -56,7 +56,7 @@
 		65403ABE1D7C9E7600D6036B /* ResultInjectionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65403ABD1D7C9E7600D6036B /* ResultInjectionTests.swift */; };
 		654A81E51D8DEDD8002F4F26 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 654A81E41D8DEDD8002F4F26 /* XCTest.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		654FAFFB1D7CABA0002FA74D /* ResultInjection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 654FAFFA1D7CABA0002FA74D /* ResultInjection.swift */; };
-		654FAFFD1D7CD5EA002FA74D /* Map.swift in Sources */ = {isa = PBXBuildFile; fileRef = 654FAFFC1D7CD5EA002FA74D /* Map.swift */; };
+		654FAFFD1D7CD5EA002FA74D /* Transform.swift in Sources */ = {isa = PBXBuildFile; fileRef = 654FAFFC1D7CD5EA002FA74D /* Transform.swift */; };
 		655594F11D9E482D00B08990 /* RepeatProcedureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 655594F01D9E482D00B08990 /* RepeatProcedureTests.swift */; };
 		655594F31D9E48A200B08990 /* RepeatTestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 655594F21D9E48A200B08990 /* RepeatTestCase.swift */; };
 		655E86431D67B55B000FBA6C /* ProcedureQueue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 655E86421D67B55B000FBA6C /* ProcedureQueue.swift */; };
@@ -73,8 +73,12 @@
 		658A7B4F1D74E54800F897C8 /* GroupStressTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 658A7B4E1D74E54800F897C8 /* GroupStressTests.swift */; };
 		6591B3001D74954E00C2B57F /* GroupTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6591B2FE1D74953A00C2B57F /* GroupTests.swift */; };
 		6591B3021D74980900C2B57F /* GroupTestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6591B3011D74980900C2B57F /* GroupTestCase.swift */; };
-		6593008C1DA8E31900750212 /* MapProcedureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6593008B1DA8E31900750212 /* MapProcedureTests.swift */; };
+		6593008C1DA8E31900750212 /* TransformProcedureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6593008B1DA8E31900750212 /* TransformProcedureTests.swift */; };
 		6593008E1DA8E32D00750212 /* FilterProcedureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6593008D1DA8E32D00750212 /* FilterProcedureTests.swift */; };
+		6594840E1DA98B8E0028F83B /* Reduce.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6594840D1DA98B8E0028F83B /* Reduce.swift */; };
+		659484101DA98E700028F83B /* ReduceProcedureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6594840F1DA98E700028F83B /* ReduceProcedureTests.swift */; };
+		659484121DA993DB0028F83B /* Map.swift in Sources */ = {isa = PBXBuildFile; fileRef = 659484111DA993DB0028F83B /* Map.swift */; };
+		659484141DA994150028F83B /* MapProcedureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 659484131DA994150028F83B /* MapProcedureTests.swift */; };
 		65958FD51D96B0AE00F542E2 /* BlockObserverTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65958FD41D96B0AE00F542E2 /* BlockObserverTests.swift */; };
 		659E11A71D9856FB00C5D749 /* Composed.swift in Sources */ = {isa = PBXBuildFile; fileRef = 659E11A61D9856FB00C5D749 /* Composed.swift */; };
 		659E11AA1D985B9300C5D749 /* ComposedProcedureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 659E11A81D985AA700C5D749 /* ComposedProcedureTests.swift */; };
@@ -295,7 +299,7 @@
 		65403ABD1D7C9E7600D6036B /* ResultInjectionTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ResultInjectionTests.swift; path = Tests/ResultInjectionTests.swift; sourceTree = "<group>"; };
 		654A81E41D8DEDD8002F4F26 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Platforms/iPhoneOS.platform/Developer/Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
 		654FAFFA1D7CABA0002FA74D /* ResultInjection.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ResultInjection.swift; path = Sources/ResultInjection.swift; sourceTree = "<group>"; };
-		654FAFFC1D7CD5EA002FA74D /* Map.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Map.swift; path = Sources/Map.swift; sourceTree = "<group>"; };
+		654FAFFC1D7CD5EA002FA74D /* Transform.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Transform.swift; path = Sources/Transform.swift; sourceTree = "<group>"; };
 		655594F01D9E482D00B08990 /* RepeatProcedureTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = RepeatProcedureTests.swift; path = Tests/RepeatProcedureTests.swift; sourceTree = "<group>"; };
 		655594F21D9E48A200B08990 /* RepeatTestCase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = RepeatTestCase.swift; path = Sources/Testing/RepeatTestCase.swift; sourceTree = "<group>"; };
 		655E86421D67B55B000FBA6C /* ProcedureQueue.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ProcedureQueue.swift; path = Sources/ProcedureQueue.swift; sourceTree = "<group>"; };
@@ -312,8 +316,12 @@
 		658A7B4E1D74E54800F897C8 /* GroupStressTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = GroupStressTests.swift; path = "Tests/Stress Tests/GroupStressTests.swift"; sourceTree = "<group>"; };
 		6591B2FE1D74953A00C2B57F /* GroupTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = GroupTests.swift; path = Tests/GroupTests.swift; sourceTree = "<group>"; };
 		6591B3011D74980900C2B57F /* GroupTestCase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = GroupTestCase.swift; path = Sources/Testing/GroupTestCase.swift; sourceTree = "<group>"; };
-		6593008B1DA8E31900750212 /* MapProcedureTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = MapProcedureTests.swift; path = Tests/MapProcedureTests.swift; sourceTree = "<group>"; };
+		6593008B1DA8E31900750212 /* TransformProcedureTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TransformProcedureTests.swift; path = Tests/TransformProcedureTests.swift; sourceTree = "<group>"; };
 		6593008D1DA8E32D00750212 /* FilterProcedureTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = FilterProcedureTests.swift; path = Tests/FilterProcedureTests.swift; sourceTree = "<group>"; };
+		6594840D1DA98B8E0028F83B /* Reduce.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Reduce.swift; path = Sources/Reduce.swift; sourceTree = "<group>"; };
+		6594840F1DA98E700028F83B /* ReduceProcedureTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ReduceProcedureTests.swift; path = Tests/ReduceProcedureTests.swift; sourceTree = "<group>"; };
+		659484111DA993DB0028F83B /* Map.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Map.swift; path = Sources/Map.swift; sourceTree = "<group>"; };
+		659484131DA994150028F83B /* MapProcedureTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = MapProcedureTests.swift; path = Tests/MapProcedureTests.swift; sourceTree = "<group>"; };
 		65958FD41D96B0AE00F542E2 /* BlockObserverTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = BlockObserverTests.swift; path = Tests/BlockObserverTests.swift; sourceTree = "<group>"; };
 		659E11A61D9856FB00C5D749 /* Composed.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Composed.swift; path = Sources/Composed.swift; sourceTree = "<group>"; };
 		659E11A81D985AA700C5D749 /* ComposedProcedureTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ComposedProcedureTests.swift; path = Tests/ComposedProcedureTests.swift; sourceTree = "<group>"; };
@@ -495,17 +503,19 @@
 				65245D201D72345000340A2D /* FinishingTests.swift */,
 				6591B2FE1D74953A00C2B57F /* GroupTests.swift */,
 				65245D241D724FC200340A2D /* LoggerTests.swift */,
-				6593008B1DA8E31900750212 /* MapProcedureTests.swift */,
+				659484131DA994150028F83B /* MapProcedureTests.swift */,
 				65881B781D880ACB00C212C8 /* MutualExclusivityTests.swift */,
 				652AFD381D8C5BC000793AF3 /* NegatedConditionTests.swift */,
 				6583F95E1D8C4C7F00000A8D /* NoFailedDependenciesConditionTests.swift */,
 				653C9FE81D6099F10070B7A2 /* ProcedureKitTests.swift */,
 				65245D1C1D721A7100340A2D /* ProcedureTests.swift */,
+				6594840F1DA98E700028F83B /* ReduceProcedureTests.swift */,
 				655594F01D9E482D00B08990 /* RepeatProcedureTests.swift */,
 				65403ABD1D7C9E7600D6036B /* ResultInjectionTests.swift */,
 				65A63B101DA0159B00E90B9D /* RetryProcedureTests.swift */,
 				652AFD3C1D8C628500793AF3 /* SilentConditionTests.swift */,
 				65EAC0151D8CA78F000E4A42 /* TimeoutObserverTests.swift */,
+				6593008B1DA8E31900750212 /* TransformProcedureTests.swift */,
 			);
 			name = Tests;
 			sourceTree = "<group>";
@@ -722,9 +732,11 @@
 				653EBBB91D88AFA800F4DB9F /* Delay.swift */,
 				651FFDEF1DA850FE00112220 /* Filter.swift */,
 				65245D261D7258E400340A2D /* Group.swift */,
-				654FAFFC1D7CD5EA002FA74D /* Map.swift */,
+				659484111DA993DB0028F83B /* Map.swift */,
+				6594840D1DA98B8E0028F83B /* Reduce.swift */,
 				659E11AB1D9862B900C5D749 /* Repeat.swift */,
 				65A63B0E1D9FFDAD00E90B9D /* Retry.swift */,
+				654FAFFC1D7CD5EA002FA74D /* Transform.swift */,
 			);
 			name = Procedures;
 			sourceTree = "<group>";
@@ -1297,7 +1309,7 @@
 				65DA49311D8142BE00D4E1AA /* MutualExclusion.swift in Sources */,
 				65A2D7FD1D69E52000FB067C /* DispatchQueue+ProcedureKit.swift in Sources */,
 				65EAC0121D8CA39F000E4A42 /* TimeoutObserver.swift in Sources */,
-				654FAFFD1D7CD5EA002FA74D /* Map.swift in Sources */,
+				654FAFFD1D7CD5EA002FA74D /* Transform.swift in Sources */,
 				652AFD3B1D8C61CA00793AF3 /* SilentCondition.swift in Sources */,
 				654FAFFB1D7CABA0002FA74D /* ResultInjection.swift in Sources */,
 				652AFD3F1D8C698400793AF3 /* BlockCondition.swift in Sources */,
@@ -1310,9 +1322,11 @@
 				65B97DB51D65138F00AC3B5D /* Procedure.swift in Sources */,
 				6518D5E31D7B3A2800A12EF4 /* Condition.swift in Sources */,
 				655E86471D67BA9C000FBA6C /* Support.swift in Sources */,
+				659484121DA993DB0028F83B /* Map.swift in Sources */,
 				657431281D8D9765002E8FC9 /* Identity.swift in Sources */,
 				659E11AC1D9862B900C5D749 /* Repeat.swift in Sources */,
 				659E11A71D9856FB00C5D749 /* Composed.swift in Sources */,
+				6594840E1DA98B8E0028F83B /* Reduce.swift in Sources */,
 				655E86451D67B9F9000FBA6C /* ProcedureObserver.swift in Sources */,
 				653EBBBA1D88AFA800F4DB9F /* Delay.swift in Sources */,
 				655E86431D67B55B000FBA6C /* ProcedureQueue.swift in Sources */,
@@ -1325,6 +1339,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				650182C91D8916EC0052CE90 /* DelayProcedureTests.swift in Sources */,
+				659484101DA98E700028F83B /* ReduceProcedureTests.swift in Sources */,
 				65245D251D724FC200340A2D /* LoggerTests.swift in Sources */,
 				6591B3001D74954E00C2B57F /* GroupTests.swift in Sources */,
 				652AFD411D8C745500793AF3 /* BlockConditionTests.swift in Sources */,
@@ -1333,6 +1348,7 @@
 				65A63B111DA0159B00E90B9D /* RetryProcedureTests.swift in Sources */,
 				652AFD3D1D8C628500793AF3 /* SilentConditionTests.swift in Sources */,
 				652AFD391D8C5BC000793AF3 /* NegatedConditionTests.swift in Sources */,
+				659484141DA994150028F83B /* MapProcedureTests.swift in Sources */,
 				65EAC0161D8CA78F000E4A42 /* TimeoutObserverTests.swift in Sources */,
 				65403ABE1D7C9E7600D6036B /* ResultInjectionTests.swift in Sources */,
 				65245D1F1D7231DC00340A2D /* CancellationTests.swift in Sources */,
@@ -1341,7 +1357,7 @@
 				659E11AA1D985B9300C5D749 /* ComposedProcedureTests.swift in Sources */,
 				6583F95F1D8C4C7F00000A8D /* NoFailedDependenciesConditionTests.swift in Sources */,
 				65245D211D72345000340A2D /* FinishingTests.swift in Sources */,
-				6593008C1DA8E31900750212 /* MapProcedureTests.swift in Sources */,
+				6593008C1DA8E31900750212 /* TransformProcedureTests.swift in Sources */,
 				65403AB81D7C453200D6036B /* ConditionTests.swift in Sources */,
 				65A0CB271D7D4CF1008FB37C /* BlockProcedureTests.swift in Sources */,
 				65A63B151DA04FDB00E90B9D /* CapabilityTests.swift in Sources */,
