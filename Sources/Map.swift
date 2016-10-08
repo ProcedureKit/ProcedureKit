@@ -6,36 +6,45 @@
 
 import Foundation
 
-/**
- A `Procedure` which performs a transform mapping
- */
-public class MapProcedure<Requirement, Result>: Procedure, ResultInjectionProtocol {
+public class MapProcedure<Element, U>: ReduceProcedure<Element, Array<U>> {
 
-    public typealias Transform = (Requirement!) throws -> Result
-
-    private let transform: Transform
-
-    public var requirement: Requirement! = nil
-    public var result: Result! = nil
-
-    public init(transform: @escaping Transform) {
-        self.transform = transform
-        super.init()
+    public init<S: Sequence>(source: S, transform: @escaping (Element) throws -> U) where S.Iterator.Element == Element, S.SubSequence: Sequence, S.SubSequence.Iterator.Element == Element, S.SubSequence.SubSequence == S.SubSequence {
+        super.init(source: source, initial: Array<U>()) { acc, element in
+            var accumulator = acc
+            try accumulator.append(transform(element))
+            return accumulator
+        }
     }
 
-    public override func execute() {
-        var finishingError: Error? = nil
-        defer { finish(withError: finishingError) }
-        do {
-            result = try transform(requirement)
-        }
-        catch { finishingError = error }
+    public convenience init(transform: @escaping (Element) throws -> U) {
+        self.init(source: [], transform: transform)
     }
 }
 
-public class BlockProcedure: MapProcedure<Void, Void> {
+public extension ProcedureProtocol where Self: ResultInjectionProtocol, Self.Result: Sequence {
 
-    public init(block: @escaping () throws -> Void) {
-        super.init { _ in try block() }
+    func map<U>(transform: @escaping (Result.Iterator.Element) throws -> U) -> MapProcedure<Result.Iterator.Element, U> {
+        return injectRequirement(MapProcedure(transform: transform))
+    }
+}
+
+public class FlatMapProcedure<Element, U>: ReduceProcedure<Element, Array<U>> {
+
+    public init<S: Sequence>(source: S, transform: @escaping (Element) throws -> U?) where S.Iterator.Element == Element, S.SubSequence: Sequence, S.SubSequence.Iterator.Element == Element, S.SubSequence.SubSequence == S.SubSequence {
+        super.init(source: source, initial: Array<U>()) { acc, element in
+            guard let u = try transform(element) else { return acc }
+            return acc + [u]
+        }
+    }
+
+    public convenience init(transform: @escaping (Element) throws -> U?) {
+        self.init(source: [], transform: transform)
+    }
+}
+
+public extension ProcedureProtocol where Self: ResultInjectionProtocol, Self.Result: Sequence {
+
+    func flatMap<U>(transform: @escaping (Result.Iterator.Element) throws -> U?) -> FlatMapProcedure<Result.Iterator.Element, U> {
+        return injectRequirement(FlatMapProcedure(transform: transform))
     }
 }

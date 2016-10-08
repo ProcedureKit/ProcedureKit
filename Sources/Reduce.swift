@@ -35,17 +35,22 @@ public class ReduceProcedure<Element, U>: Procedure, ResultInjectionProtocol {
     }
 }
 
+internal extension ProcedureProtocol where Self: ResultInjectionProtocol, Self.Result: Sequence {
+
+    func injectRequirement<P: ProcedureProtocol>(_ procedure: P) -> P where P: ResultInjectionProtocol, P.Requirement == AnySequence<Self.Result.Iterator.Element> {
+        procedure.inject(dependency: self) { procedure, dependency, errors in
+            guard errors.isEmpty else {
+                procedure.cancel(withError: ProcedureKitError.dependency(finishedWithErrors: errors)); return
+            }
+            procedure.requirement = AnySequence(Array(dependency.result))
+        }
+        return procedure
+    }
+}
+
 public extension ProcedureProtocol where Self: ResultInjectionProtocol, Self.Result: Sequence {
 
-    func reduce<ReducedResult>(_ initial: ReducedResult, nextPartialResult: @escaping (ReducedResult, Result.Iterator.Element) throws -> ReducedResult) -> ReduceProcedure<Result.Iterator.Element, ReducedResult> {
-
-        let reduce = ReduceProcedure(initial: initial, nextPartialResult: nextPartialResult)
-        reduce.inject(dependency: self) { reduce, dependency, errors in
-            guard errors.isEmpty else {
-                reduce.cancel(withError: ProcedureKitError.dependency(finishedWithErrors: errors)); return
-            }
-            reduce.requirement = AnySequence(Array(dependency.result))
-        }
-        return reduce
+    func reduce<U>(_ initial: U, nextPartialResult: @escaping (U, Result.Iterator.Element) throws -> U) -> ReduceProcedure<Result.Iterator.Element, U> {
+        return injectRequirement(ReduceProcedure(initial: initial, nextPartialResult: nextPartialResult))
     }
 }
