@@ -29,9 +29,7 @@ public class MapProcedure<Requirement, Result>: Procedure, ResultInjectionProtoc
         do {
             result = try transform(requirement)
         }
-        catch {
-            finishingError = error
-        }
+        catch { finishingError = error }
     }
 }
 
