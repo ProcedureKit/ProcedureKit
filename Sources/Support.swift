@@ -50,29 +50,29 @@ struct Lock: ReadWriteLock {
     }
 }
 
-internal class Protector<T> {
+public class Protector<T> {
 
     private var lock = Lock()
     private var ward: T
 
-    init(_ ward: T) {
+    public init(_ ward: T) {
         self.ward = ward
     }
 
-    func read<U>(_ block: @escaping (T) -> U) -> U {
+    public func read<U>(_ block: @escaping (T) -> U) -> U {
         return lock.read { [unowned self] in block(self.ward) }
     }
 
-    func write(_ block: @escaping (inout T) -> Void) {
+    public func write(_ block: @escaping (inout T) -> Void) {
         lock.write({ block(&self.ward) })
     }
 
-    func write(_ block: @escaping (inout T) -> Void, completion: @escaping (() -> Void)) {
+    public func write(_ block: @escaping (inout T) -> Void, completion: @escaping (() -> Void)) {
         lock.write({ block(&self.ward) }, completion: completion)
     }
 }
 
-internal extension Protector where T: RangeReplaceableCollection {
+public extension Protector where T: RangeReplaceableCollection {
 
     func append(_ newElement: T.Iterator.Element) {
         write { (ward: inout T) in

@@ -79,6 +79,8 @@
 		659484101DA98E700028F83B /* ReduceProcedureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6594840F1DA98E700028F83B /* ReduceProcedureTests.swift */; };
 		659484121DA993DB0028F83B /* Map.swift in Sources */ = {isa = PBXBuildFile; fileRef = 659484111DA993DB0028F83B /* Map.swift */; };
 		659484141DA994150028F83B /* MapProcedureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 659484131DA994150028F83B /* MapProcedureTests.swift */; };
+		659484161DAA53040028F83B /* NetworkObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 659484151DAA53040028F83B /* NetworkObserver.swift */; };
+		659484181DAA5EA50028F83B /* NetworkObserverTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 659484171DAA5EA50028F83B /* NetworkObserverTests.swift */; };
 		65958FD51D96B0AE00F542E2 /* BlockObserverTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65958FD41D96B0AE00F542E2 /* BlockObserverTests.swift */; };
 		659E11A71D9856FB00C5D749 /* Composed.swift in Sources */ = {isa = PBXBuildFile; fileRef = 659E11A61D9856FB00C5D749 /* Composed.swift */; };
 		659E11AA1D985B9300C5D749 /* ComposedProcedureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 659E11A81D985AA700C5D749 /* ComposedProcedureTests.swift */; };
@@ -322,6 +324,8 @@
 		6594840F1DA98E700028F83B /* ReduceProcedureTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ReduceProcedureTests.swift; path = Tests/ReduceProcedureTests.swift; sourceTree = "<group>"; };
 		659484111DA993DB0028F83B /* Map.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Map.swift; path = Sources/Map.swift; sourceTree = "<group>"; };
 		659484131DA994150028F83B /* MapProcedureTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = MapProcedureTests.swift; path = Tests/MapProcedureTests.swift; sourceTree = "<group>"; };
+		659484151DAA53040028F83B /* NetworkObserver.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = NetworkObserver.swift; path = Sources/Mobile/NetworkObserver.swift; sourceTree = "<group>"; };
+		659484171DAA5EA50028F83B /* NetworkObserverTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = NetworkObserverTests.swift; path = Tests/Mobile/NetworkObserverTests.swift; sourceTree = "<group>"; };
 		65958FD41D96B0AE00F542E2 /* BlockObserverTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = BlockObserverTests.swift; path = Tests/BlockObserverTests.swift; sourceTree = "<group>"; };
 		659E11A61D9856FB00C5D749 /* Composed.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Composed.swift; path = Sources/Composed.swift; sourceTree = "<group>"; };
 		659E11A81D985AA700C5D749 /* ComposedProcedureTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ComposedProcedureTests.swift; path = Tests/ComposedProcedureTests.swift; sourceTree = "<group>"; };
@@ -524,6 +528,7 @@
 			isa = PBXGroup;
 			children = (
 				657431291D8DB8AD002E8FC9 /* BackgroundObserver.swift */,
+				659484151DAA53040028F83B /* NetworkObserver.swift */,
 			);
 			name = Mobile;
 			sourceTree = "<group>";
@@ -547,8 +552,9 @@
 		653C9FE51D60995C0070B7A2 /* Mobile Tests */ = {
 			isa = PBXGroup;
 			children = (
-				653C9FE61D6099850070B7A2 /* ProcedureKitMobileTests.swift */,
 				6574312C1D8DE712002E8FC9 /* BackgroundObserverTests.swift */,
+				659484171DAA5EA50028F83B /* NetworkObserverTests.swift */,
+				653C9FE61D6099850070B7A2 /* ProcedureKitMobileTests.swift */,
 				6574312E1D8DE848002E8FC9 /* TestableUIApplication.swift */,
 			);
 			name = "Mobile Tests";
@@ -1226,6 +1232,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				659484161DAA53040028F83B /* NetworkObserver.swift in Sources */,
 				6574312B1D8DDF0D002E8FC9 /* BackgroundObserver.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1236,6 +1243,7 @@
 			files = (
 				653C9FEA1D6099F40070B7A2 /* ProcedureKitMobileTests.swift in Sources */,
 				6574312F1D8DE848002E8FC9 /* TestableUIApplication.swift in Sources */,
+				659484181DAA5EA50028F83B /* NetworkObserverTests.swift in Sources */,
 				6574312D1D8DE712002E8FC9 /* BackgroundObserverTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
