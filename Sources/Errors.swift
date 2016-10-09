@@ -6,6 +6,10 @@
 
 import Foundation
 
+public protocol ProcedureKitComponent {
+    var name: String { get }
+}
+
 public struct ProcedureKitError: Error, Equatable {
 
     public static func == (lhs: ProcedureKitError, rhs: ProcedureKitError) -> Bool {
@@ -26,11 +30,15 @@ public struct ProcedureKitError: Error, Equatable {
                 return lhs == rhs
             case let (.capability(lhs), .capability(rhs)):
                 return lhs == rhs
-            default: return false
+            case let (.component(lhs), .component(rhs)):
+                return lhs.name == rhs.name
+            default:
+                return false
             }
         }
 
         case unknown
+        case component(ProcedureKitComponent)
         case programmingError(String)
         case timedOut(Delay)
         case conditionFailed
@@ -87,6 +95,9 @@ public struct ProcedureKitError: Error, Equatable {
         return ProcedureKitError(context: .capability(.unauthorized), errors: [])
     }
 
+    public static func component(_ component: ProcedureKitComponent, error: Error) -> ProcedureKitError {
+        return ProcedureKitError(context: .component(component), errors: [error])
+    }
 
     public let context: Context
     public let errors: [Error]
