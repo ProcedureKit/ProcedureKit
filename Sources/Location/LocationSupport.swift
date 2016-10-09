@@ -96,7 +96,3 @@ internal class LocationManagerAuthorizationDelegate: NSObject, CLLocationManager
         didChangeAuthorizationStatusBlock(manager, status)
     }
 }
-
-public struct ProcedureKitLocationError: Error {
-
-}
