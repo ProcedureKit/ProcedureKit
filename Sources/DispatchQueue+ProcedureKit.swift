@@ -10,6 +10,10 @@ import Dispatch
 
 public extension DispatchQueue {
 
+    static var isMainDispatchQueue: Bool {
+        return mainQueueScheduler.isScheduledQueue
+    }
+
     static var `default`: DispatchQueue {
         return DispatchQueue.global(qos: DispatchQoS.QoSClass.default)
     }
@@ -32,6 +36,13 @@ public extension DispatchQueue {
 
     static func concurrent(label: String, qos: DispatchQoS = .default, autoreleaseFrequency: DispatchQueue.AutoreleaseFrequency = .inherit, target: DispatchQueue? = nil) -> DispatchQueue {
         return DispatchQueue(label: label, qos: qos, attributes: [.concurrent], autoreleaseFrequency: autoreleaseFrequency, target: target)
+    }
+
+    static func onMain<T>(execute work: () throws -> T) rethrows -> T {
+        guard isMainDispatchQueue else {
+            return try DispatchQueue.main.sync(execute: work)
+        }
+        return try work()
     }
 }
 
@@ -57,3 +68,21 @@ internal extension QualityOfService {
         }
     }
 }
+
+internal final class Scheduler {
+
+    var key: DispatchSpecificKey<UInt8>
+    var value: UInt8 = 1
+
+    init(queue: DispatchQueue) {
+        key = DispatchSpecificKey()
+        queue.setSpecific(key: key, value: value)
+    }
+
+    var isScheduledQueue: Bool {
+        guard let retrieved = DispatchQueue.getSpecific(key: key) else { return false }
+        return value == retrieved
+    }
+}
+
+internal let mainQueueScheduler = Scheduler(queue: DispatchQueue.main)
