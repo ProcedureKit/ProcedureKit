@@ -69,7 +69,13 @@ extension CLLocationManager: LocationServicesProtocol {
     }
 
     func pk_startUpdatingLocation() {
-        startUpdatingLocation()
+        #if os(iOS) || os(watchOS)
+            startUpdatingLocation()
+        #endif
+
+        #if os(tvOS)
+            requestLocation()
+        #endif
     }
 
     func pk_stopUpdatingLocation() {
