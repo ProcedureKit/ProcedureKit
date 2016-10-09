@@ -14,15 +14,12 @@ open class ProcedureKitTestCase: XCTestCase {
     public var delegate: QueueTestDelegate!
     open var procedure: TestProcedure!
 
-    private var didFinishProcedure: BlockProcedure!
-
     open override func setUp() {
         super.setUp()
         queue = ProcedureQueue()
         delegate = QueueTestDelegate()
         queue.delegate = delegate
         procedure = TestProcedure()
-        didFinishProcedure = BlockProcedure { }
     }
 
     open override func tearDown() {
@@ -64,7 +61,9 @@ open class ProcedureKitTestCase: XCTestCase {
     }
 
     public func addCompletionBlockTo(procedure: Procedure, withExpectationDescription expectationDescription: String = #function) {
-        let finishingProcedure = addFinishingProcedure(for: procedure, withExpectationDescription: expectationDescription)
+        // Make a finishing procedure, which depends on this target Procedure.
+        let finishingProcedure = makeFinishingProcedure(for: procedure, withExpectationDescription: expectationDescription)
+        // Add the did finish expectation block to the finishing procedure
         addExpectationCompletionBlockTo(procedure: finishingProcedure, withExpectationDescription: expectationDescription)
         run(operation: finishingProcedure)
     }
@@ -84,9 +83,12 @@ open class ProcedureKitTestCase: XCTestCase {
         }
     }
 
-    func addFinishingProcedure(for procedure: Procedure, withExpectationDescription expectationDescription: String = #function) -> Procedure {
+    func makeFinishingProcedure(for procedure: Procedure, withExpectationDescription expectationDescription: String = #function) -> Procedure {
         let finishing = BlockProcedure { }
         finishing.add(dependency: procedure)
+        // Adds a did produce operation observer, which adds the produced operation as a dependency
+        // of the finishing procedure. This way, we don't actually finish, until the
+        // procedure, and any produced operations also finish.
         procedure.addDidProduceOperationBlockObserver { _, operation in
             finishing.add(dependency: operation)
         }
