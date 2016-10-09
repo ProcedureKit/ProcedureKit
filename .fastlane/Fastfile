@@ -87,7 +87,6 @@ platform :ios do
     )
   end
 
-
   desc "ProcedureKitLocation: iOS"
   lane :test_location_ios do
 
@@ -97,6 +96,17 @@ platform :ios do
       destination: "platform=iOS Simulator,OS=10.0,name=iPhone 6s"
     )
   end
+
+  desc "ProcedureKitLocation: tvOS"
+  lane :test_location_tvos do
+
+    scan(
+      project: "ProcedureKit.xcodeproj",
+      scheme: "ProcedureKitLocation",
+      destination: "platform=tvOS Simulator,OS=10.0,name=Apple TV 1080p"
+    )
+  end
+
 
   desc "ProcedureKitCloud: tvOS"
   lane :test_tvos_cloud do
@@ -140,6 +150,16 @@ platform :mac do
     scan(
       project: "ProcedureKit.xcodeproj",
       scheme: "ProcedureKitMac",
+      destination: "platform=OS X"
+    )
+  end
+
+  desc "ProcedureKitLocation: macOS"
+  lane :test_location_mac do
+
+    scan(
+      project: "ProcedureKit.xcodeproj",
+      scheme: "ProcedureKitLocation",
       destination: "platform=OS X"
     )
   end
