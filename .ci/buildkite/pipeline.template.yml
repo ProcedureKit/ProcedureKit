@@ -20,23 +20,6 @@ steps:
 #      iOS-Simulator: true
 #      xcode: "$XCODE"
   -
-    name: "Cloud: macOS"
-    command: "source /usr/local/opt/chruby/share/chruby/chruby.sh && chruby ruby && bundle install --quiet && bundle exec fastlane mac test_cloud"
-    agents:
-      xcode: "$XCODE"
-#  -
-#    name: "Cloud: iOS"
-#    command: "source /usr/local/opt/chruby/share/chruby/chruby.sh && chruby ruby && bundle install --quiet && bundle exec fastlane ios test_ios_cloud"
-#    agents:
-#      iOS-Simulator: true    
-#      xcode: "$XCODE"
-#  -
-#    name: "Cloud: tvOS"
-#    command: "source /usr/local/opt/chruby/share/chruby/chruby.sh && chruby ruby && bundle install --quiet && bundle exec fastlane ios test_tvos_cloud"
-#    agents:
-#      iOS-Simulator: true    
-#      xcode: "$XCODE"
-  -
     name: "Mac"
     command: "source /usr/local/opt/chruby/share/chruby/chruby.sh && chruby ruby && bundle install --quiet && bundle exec fastlane mac test_mac"
     agents:
@@ -53,6 +36,29 @@ steps:
 #    agents:
 #      iOS-Simulator: true    
 #      xcode: "$XCODE"
+  -
+    name: "Cloud: macOS"
+    command: "source /usr/local/opt/chruby/share/chruby/chruby.sh && chruby ruby && bundle install --quiet && bundle exec fastlane mac test_cloud"
+    agents:
+      xcode: "$XCODE"
+#  -
+#    name: "Cloud: iOS"
+#    command: "source /usr/local/opt/chruby/share/chruby/chruby.sh && chruby ruby && bundle install --quiet && bundle exec fastlane ios test_cloud_ios"
+#    agents:
+#      iOS-Simulator: true    
+#      xcode: "$XCODE"
+#  -
+#    name: "Cloud: tvOS"
+#    command: "source /usr/local/opt/chruby/share/chruby/chruby.sh && chruby ruby && bundle install --quiet && bundle exec fastlane ios test_cloud_tvos"
+#    agents:
+#      iOS-Simulator: true    
+#      xcode: "$XCODE"
+  -
+    name: "Location"
+    command: "source /usr/local/opt/chruby/share/chruby/chruby.sh && chruby ruby && bundle install --quiet && bundle exec fastlane ios test_location_ios"
+    agents:
+      iOS-Simulator: true    
+      xcode: "$XCODE"
   -
     name: "Stress Tests"
     command: "source /usr/local/opt/chruby/share/chruby/chruby.sh && chruby ruby && bundle install --quiet && bundle exec fastlane mac stress_test"

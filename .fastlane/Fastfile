@@ -13,28 +13,6 @@ end
 
 platform :ios do
 
-  desc "watchOS: ProcedureKit"
-  lane :build_watchos do
-
-    gym(
-      project: "ProcedureKit.xcodeproj",
-      scheme: "ProcedureKit",
-      destination: "platform=watchOS Simulator"
-    )
-  end
-
-  desc "watchOS: ProcedureKitMobile"
-  lane :build_watchos_mobile do
-
-    gym(
-      project: "ProcedureKit.xcodeproj",
-      scheme: "ProcedureKitMobile",
-      destination: "platform=watchOS Simulator"
-    )
-  end
-
-
-
   desc "ProcedureKit: iOS"
   lane :test_ios do
 
@@ -90,11 +68,32 @@ platform :ios do
 
 
   desc "ProcedureKitCloud: iOS"
-  lane :test_ios_cloud do
+  lane :test_cloud_ios do
 
     scan(
       project: "ProcedureKit.xcodeproj",
       scheme: "ProcedureKitCloud",
+      destination: "platform=iOS Simulator,OS=10.0,name=iPhone 6s"
+    )
+  end
+
+  desc "ProcedureKitCloud: tvOS"
+  lane :test_cloud_tvos do
+
+    scan(
+      project: "ProcedureKit.xcodeproj",
+      scheme: "ProcedureKitCloud",
+      destination: "platform=tvOS Simulator,OS=10.0,name=Apple TV 1080p"
+    )
+  end
+
+
+  desc "ProcedureKitLocation: iOS"
+  lane :test_location_ios do
+
+    scan(
+      project: "ProcedureKit.xcodeproj",
+      scheme: "ProcedureKitLocation",
       destination: "platform=iOS Simulator,OS=10.0,name=iPhone 6s"
     )
   end
@@ -109,21 +108,11 @@ platform :ios do
     )
   end
 
-  desc "ProcedureKitCloud: watchOS"
-  lane :build_watchos_cloud do
-
-    gym(
-      project: "ProcedureKit.xcodeproj",
-      scheme: "ProcedureKitCloud",
-      destination: "platform=watchOS Simulator"
-    )
-  end
-
 end
 
 platform :mac do
   
-  desc "macOS: ProcedureKit"
+  desc "ProcedureKit: macOS"
   lane :test do
 
     scan(
@@ -145,7 +134,7 @@ platform :mac do
 
   end
 
-  desc "macOS: ProcedureKitMac"
+  desc "ProcedureKitMac: macOS"
   lane :test_mac do
 
     scan(
@@ -155,7 +144,7 @@ platform :mac do
     )
   end
 
-  desc "macOS: ProcedureKitCloud"
+  desc "ProcedureKitCloud: macOS"
   lane :test_cloud do
 
     scan(
