@@ -54,7 +54,7 @@
 		65403ABA1D7C49C500D6036B /* XCTAsserts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65403AB91D7C49C500D6036B /* XCTAsserts.swift */; };
 		65403ABC1D7C6CBC00D6036B /* TestCondition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65403ABB1D7C6CBC00D6036B /* TestCondition.swift */; };
 		65403ABE1D7C9E7600D6036B /* ResultInjectionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65403ABD1D7C9E7600D6036B /* ResultInjectionTests.swift */; };
-		6540D43A1DAAC038004DC8B8 /* UserLocationProcedure.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6540D4391DAAC038004DC8B8 /* UserLocationProcedure.swift */; };
+		6540D43A1DAAC038004DC8B8 /* UserLocation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6540D4391DAAC038004DC8B8 /* UserLocation.swift */; };
 		6540D43C1DAACE21004DC8B8 /* UserLocationProcedureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6540D43B1DAACE21004DC8B8 /* UserLocationProcedureTests.swift */; };
 		654A81E51D8DEDD8002F4F26 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 654A81E41D8DEDD8002F4F26 /* XCTest.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		654FAFFB1D7CABA0002FA74D /* ResultInjection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 654FAFFA1D7CABA0002FA74D /* ResultInjection.swift */; };
@@ -112,8 +112,10 @@
 		65A63B171DA0536200E90B9D /* CapabilityTestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65A63B161DA0536200E90B9D /* CapabilityTestCase.swift */; };
 		65A72C2A1DA7F37C008597CA /* ProcedureKit.framework in Copy Dependencies */ = {isa = PBXBuildFile; fileRef = 65CFC5F01D608A5500CAD875 /* ProcedureKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		65A72C2B1DA7F37C008597CA /* TestingProcedureKit.framework in Copy Dependencies */ = {isa = PBXBuildFile; fileRef = 65CFC6161D60900000CAD875 /* TestingProcedureKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		65B3D63D1DAC20F80074CA9D /* ReverseGeocodeProcedure.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65B3D63C1DAC20F80074CA9D /* ReverseGeocodeProcedure.swift */; };
+		65B3D63D1DAC20F80074CA9D /* ReverseGeocode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65B3D63C1DAC20F80074CA9D /* ReverseGeocode.swift */; };
 		65B3D6401DAC2FF40074CA9D /* ReverseGeocodeProcedureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65B3D63F1DAC2FF40074CA9D /* ReverseGeocodeProcedureTests.swift */; };
+		65B3D6441DAC40180074CA9D /* ReverseGeocodeUserLocation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65B3D6431DAC40180074CA9D /* ReverseGeocodeUserLocation.swift */; };
+		65B3D6461DAC40370074CA9D /* ReverseGeocodeUserLocationProcedureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65B3D6451DAC40370074CA9D /* ReverseGeocodeUserLocationProcedureTests.swift */; };
 		65B83EB71D731DE8007EFBFA /* Collection+ProcedureKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65B83EB61D731DE8007EFBFA /* Collection+ProcedureKit.swift */; };
 		65B97DB51D65138F00AC3B5D /* Procedure.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65B97DB41D65138F00AC3B5D /* Procedure.swift */; };
 		65CFC5FA1D608A5500CAD875 /* ProcedureKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65CFC5F01D608A5500CAD875 /* ProcedureKit.framework */; };
@@ -345,7 +347,7 @@
 		65403AB91D7C49C500D6036B /* XCTAsserts.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = XCTAsserts.swift; path = Sources/Testing/XCTAsserts.swift; sourceTree = "<group>"; };
 		65403ABB1D7C6CBC00D6036B /* TestCondition.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TestCondition.swift; path = Sources/Testing/TestCondition.swift; sourceTree = "<group>"; };
 		65403ABD1D7C9E7600D6036B /* ResultInjectionTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ResultInjectionTests.swift; path = Tests/ResultInjectionTests.swift; sourceTree = "<group>"; };
-		6540D4391DAAC038004DC8B8 /* UserLocationProcedure.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserLocationProcedure.swift; sourceTree = "<group>"; };
+		6540D4391DAAC038004DC8B8 /* UserLocation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserLocation.swift; sourceTree = "<group>"; };
 		6540D43B1DAACE21004DC8B8 /* UserLocationProcedureTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserLocationProcedureTests.swift; sourceTree = "<group>"; };
 		654A81E41D8DEDD8002F4F26 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Platforms/iPhoneOS.platform/Developer/Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
 		654FAFFA1D7CABA0002FA74D /* ResultInjection.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ResultInjection.swift; path = Sources/ResultInjection.swift; sourceTree = "<group>"; };
@@ -401,8 +403,10 @@
 		65A63B121DA03D1C00E90B9D /* Capability.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Capability.swift; path = Sources/Capability.swift; sourceTree = "<group>"; };
 		65A63B141DA04FDB00E90B9D /* CapabilityTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CapabilityTests.swift; path = Tests/CapabilityTests.swift; sourceTree = "<group>"; };
 		65A63B161DA0536200E90B9D /* CapabilityTestCase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CapabilityTestCase.swift; path = Sources/Testing/CapabilityTestCase.swift; sourceTree = "<group>"; };
-		65B3D63C1DAC20F80074CA9D /* ReverseGeocodeProcedure.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReverseGeocodeProcedure.swift; sourceTree = "<group>"; };
+		65B3D63C1DAC20F80074CA9D /* ReverseGeocode.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReverseGeocode.swift; sourceTree = "<group>"; };
 		65B3D63F1DAC2FF40074CA9D /* ReverseGeocodeProcedureTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReverseGeocodeProcedureTests.swift; sourceTree = "<group>"; };
+		65B3D6431DAC40180074CA9D /* ReverseGeocodeUserLocation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReverseGeocodeUserLocation.swift; sourceTree = "<group>"; };
+		65B3D6451DAC40370074CA9D /* ReverseGeocodeUserLocationProcedureTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReverseGeocodeUserLocationProcedureTests.swift; sourceTree = "<group>"; };
 		65B83EB61D731DE8007EFBFA /* Collection+ProcedureKit.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "Collection+ProcedureKit.swift"; path = "Sources/Collection+ProcedureKit.swift"; sourceTree = "<group>"; };
 		65B97DB41D65138F00AC3B5D /* Procedure.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Procedure.swift; path = Sources/Procedure.swift; sourceTree = "<group>"; };
 		65CFC5F01D608A5500CAD875 /* ProcedureKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ProcedureKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -730,8 +734,9 @@
 			children = (
 				6594843F1DAAA7620028F83B /* LocationCapability.swift */,
 				659484411DAAA95B0028F83B /* LocationSupport.swift */,
-				65B3D63C1DAC20F80074CA9D /* ReverseGeocodeProcedure.swift */,
-				6540D4391DAAC038004DC8B8 /* UserLocationProcedure.swift */,
+				65B3D63C1DAC20F80074CA9D /* ReverseGeocode.swift */,
+				6540D4391DAAC038004DC8B8 /* UserLocation.swift */,
+				65B3D6431DAC40180074CA9D /* ReverseGeocodeUserLocation.swift */,
 			);
 			name = Location;
 			path = Sources/Location;
@@ -745,6 +750,7 @@
 				65B3D63F1DAC2FF40074CA9D /* ReverseGeocodeProcedureTests.swift */,
 				659484431DAAAE010028F83B /* TestableLocationServices.swift */,
 				6540D43B1DAACE21004DC8B8 /* UserLocationProcedureTests.swift */,
+				65B3D6451DAC40370074CA9D /* ReverseGeocodeUserLocationProcedureTests.swift */,
 			);
 			name = "Location Tests";
 			path = Tests/Location;
@@ -1485,10 +1491,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6540D43A1DAAC038004DC8B8 /* UserLocationProcedure.swift in Sources */,
+				6540D43A1DAAC038004DC8B8 /* UserLocation.swift in Sources */,
+				65B3D6441DAC40180074CA9D /* ReverseGeocodeUserLocation.swift in Sources */,
 				659484421DAAA95B0028F83B /* LocationSupport.swift in Sources */,
 				659484401DAAA7620028F83B /* LocationCapability.swift in Sources */,
-				65B3D63D1DAC20F80074CA9D /* ReverseGeocodeProcedure.swift in Sources */,
+				65B3D63D1DAC20F80074CA9D /* ReverseGeocode.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1499,6 +1506,7 @@
 				659484441DAAAE010028F83B /* TestableLocationServices.swift in Sources */,
 				65B3D6401DAC2FF40074CA9D /* ReverseGeocodeProcedureTests.swift in Sources */,
 				6594843B1DAAA4D60028F83B /* ProcedureKitLocationTests.swift in Sources */,
+				65B3D6461DAC40370074CA9D /* ReverseGeocodeUserLocationProcedureTests.swift in Sources */,
 				6540D43C1DAACE21004DC8B8 /* UserLocationProcedureTests.swift in Sources */,
 				659484461DAAAF760028F83B /* LocationCapabilityTests.swift in Sources */,
 			);
