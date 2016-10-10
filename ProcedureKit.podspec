@@ -17,7 +17,7 @@ session Advanced NSOperations: https://developer.apple.com/videos/wwdc/2015/?id=
   s.requires_arc      = true
   s.ios.deployment_target = '8.0'
   s.watchos.deployment_target = '2.0'
-  s.tvos.deployment_target = '9.0'
+  s.tvos.deployment_target = '9.2'
   s.osx.deployment_target = '10.10'
   
   # Ensure the correct version of Swift is used
