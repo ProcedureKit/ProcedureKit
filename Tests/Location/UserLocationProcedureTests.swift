@@ -9,27 +9,6 @@ import ProcedureKit
 import TestingProcedureKit
 @testable import ProcedureKitLocation
 
-class LocationProcedureTestCase: ProcedureKitTestCase {
-
-    let accuracy: CLLocationAccuracy = 10
-    var manager: TestableLocationManager!
-    var location: CLLocation!
-
-    override func setUp() {
-        super.setUp()
-        location = createLocation(withAccuracy: accuracy)
-        manager = TestableLocationManager()
-        manager.authorizationStatus = .authorizedAlways
-        manager.returnedLocation = location
-    }
-
-    override func tearDown() {
-        location = nil
-        manager = nil
-        super.tearDown()
-    }
-}
-
 class UserLocationProcedureTests: LocationProcedureTestCase {
 
     func test__received_location_is_set() {
@@ -62,9 +41,7 @@ class UserLocationProcedureTests: LocationProcedureTestCase {
     func test__updates_stop_when_cancelled() {
         let procedure = UserLocationProcedure(accuracy: accuracy)
         procedure.manager = manager
-        check(procedure: procedure) { procedure in
-            procedure.cancel()
-        }
+        check(procedure: procedure) { $0.cancel() }
         XCTAssertTrue(manager.didStopUpdatingLocation)
     }
 
