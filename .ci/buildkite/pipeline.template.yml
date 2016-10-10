@@ -3,33 +3,60 @@ steps:
     name: "Lint"
     command: .ci/scripts/lint
   -
-    name: "ProcedureKit: macOS"
+    name: "Stress Tests (macOS)"
+    command: "source /usr/local/opt/chruby/share/chruby/chruby.sh && chruby ruby && bundle install --quiet && bundle exec fastlane mac stress_test"
+    agents:
+      xcode: "$XCODE"    
+  -
+    name: "ProcedureKit (macOS)"
     command: "source /usr/local/opt/chruby/share/chruby/chruby.sh && chruby ruby && bundle install --quiet && bundle exec fastlane mac test"
     agents:
       xcode: "$XCODE"
-#  -
-#    name: "ProcedureKit: iOS"
-#    command: "source /usr/local/opt/chruby/share/chruby/chruby.sh && chruby ruby && bundle install --quiet && bundle exec fastlane ios test_ios"
-#    agents:
-#      iOS-Simulator: true
-#      xcode: "$XCODE"
-#  -
-#    name: "ProcedureKit: tvOS"
-#    command: "source /usr/local/opt/chruby/share/chruby/chruby.sh && chruby ruby && bundle install --quiet && bundle exec fastlane ios test_tvos"
-#    agents:
-#      iOS-Simulator: true
-#      xcode: "$XCODE"
   -
     name: "Mac"
     command: "source /usr/local/opt/chruby/share/chruby/chruby.sh && chruby ruby && bundle install --quiet && bundle exec fastlane mac test_mac"
     agents:
       xcode: "$XCODE"
   -
-    name: "Mobile"
+    name: "Location (macOS)"
+    command: "source /usr/local/opt/chruby/share/chruby/chruby.sh && chruby ruby && bundle install --quiet && bundle exec fastlane mac test_location_mac"
+    agents:
+      xcode: "$XCODE"      
+  -
+    name: "Cloud (macOS)"
+    command: "source /usr/local/opt/chruby/share/chruby/chruby.sh && chruby ruby && bundle install --quiet && bundle exec fastlane mac test_cloud"
+    agents:
+      xcode: "$XCODE"
+#  -
+#    name: "ProcedureKit (iOS)"
+#    command: "source /usr/local/opt/chruby/share/chruby/chruby.sh && chruby ruby && bundle install --quiet && bundle exec fastlane ios test_ios"
+#    agents:
+#      iOS-Simulator: true
+#      xcode: "$XCODE"
+  -
+    name: "Mobile (iOS)"
     command: "source /usr/local/opt/chruby/share/chruby/chruby.sh && chruby ruby && bundle install --quiet && bundle exec fastlane ios test_mobile_ios"
     agents:
       iOS-Simulator: true    
       xcode: "$XCODE"
+  -
+    name: "Location (iOS)"
+    command: "source /usr/local/opt/chruby/share/chruby/chruby.sh && chruby ruby && bundle install --quiet && bundle exec fastlane ios test_location_ios"
+    agents:
+      iOS-Simulator: true    
+      xcode: "$XCODE"
+#  -
+#    name: "Cloud (iOS)"
+#    command: "source /usr/local/opt/chruby/share/chruby/chruby.sh && chruby ruby && bundle install --quiet && bundle exec fastlane ios test_cloud_ios"
+#    agents:
+#      iOS-Simulator: true    
+#      xcode: "$XCODE"      
+#  -
+#    name: "ProcedureKit: tvOS"
+#    command: "source /usr/local/opt/chruby/share/chruby/chruby.sh && chruby ruby && bundle install --quiet && bundle exec fastlane ios test_tvos"
+#    agents:
+#      iOS-Simulator: true
+#      xcode: "$XCODE"
 #  -
 #    name: "TV"
 #    command: "source /usr/local/opt/chruby/share/chruby/chruby.sh && chruby ruby && bundle install --quiet && bundle exec fastlane ios test_tv_tvos"
@@ -37,41 +64,14 @@ steps:
 #      iOS-Simulator: true    
 #      xcode: "$XCODE"
   -
-    name: "Cloud: macOS"
-    command: "source /usr/local/opt/chruby/share/chruby/chruby.sh && chruby ruby && bundle install --quiet && bundle exec fastlane mac test_cloud"
+    name: "Location (tvOS)"
+    command: "source /usr/local/opt/chruby/share/chruby/chruby.sh && chruby ruby && bundle install --quiet && bundle exec fastlane ios test_location_tvos"
     agents:
+      iOS-Simulator: true    
       xcode: "$XCODE"
-#  -
-#    name: "Cloud: iOS"
-#    command: "source /usr/local/opt/chruby/share/chruby/chruby.sh && chruby ruby && bundle install --quiet && bundle exec fastlane ios test_cloud_ios"
-#    agents:
-#      iOS-Simulator: true    
-#      xcode: "$XCODE"
 #  -
 #    name: "Cloud: tvOS"
 #    command: "source /usr/local/opt/chruby/share/chruby/chruby.sh && chruby ruby && bundle install --quiet && bundle exec fastlane ios test_cloud_tvos"
 #    agents:
 #      iOS-Simulator: true    
 #      xcode: "$XCODE"
-  -
-    name: "Location: iOS"
-    command: "source /usr/local/opt/chruby/share/chruby/chruby.sh && chruby ruby && bundle install --quiet && bundle exec fastlane ios test_location_ios"
-    agents:
-      iOS-Simulator: true    
-      xcode: "$XCODE"
-  -
-    name: "Location: tvOS"
-    command: "source /usr/local/opt/chruby/share/chruby/chruby.sh && chruby ruby && bundle install --quiet && bundle exec fastlane ios test_location_tvos"
-    agents:
-      iOS-Simulator: true    
-      xcode: "$XCODE"
-  -
-    name: "Location: macOS"
-    command: "source /usr/local/opt/chruby/share/chruby/chruby.sh && chruby ruby && bundle install --quiet && bundle exec fastlane mac test_location_mac"
-    agents:
-      xcode: "$XCODE"      
-  -
-    name: "Stress Tests"
-    command: "source /usr/local/opt/chruby/share/chruby/chruby.sh && chruby ruby && bundle install --quiet && bundle exec fastlane mac stress_test"
-    agents:
-      xcode: "$XCODE"

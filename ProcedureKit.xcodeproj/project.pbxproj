@@ -239,13 +239,6 @@
 			remoteGlobalIDString = 65CFC6151D60900000CAD875;
 			remoteInfo = TestingProcedureKit;
 		};
-		65B3D6411DAC39A50074CA9D /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 65CFC5E51D608A1A00CAD875 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 653C9FC01D6097A40070B7A2;
-			remoteInfo = ProcedureKitMobile;
-		};
 		65CFC5FB1D608A5500CAD875 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 65CFC5E51D608A1A00CAD875 /* Project object */;
@@ -1104,7 +1097,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				65B3D6421DAC39A50074CA9D /* PBXTargetDependency */,
 				659484481DAAB52B0028F83B /* PBXTargetDependency */,
 			);
 			name = ProcedureKitLocation;
@@ -1680,11 +1672,6 @@
 			isa = PBXTargetDependency;
 			target = 65CFC6151D60900000CAD875 /* TestingProcedureKit */;
 			targetProxy = 659484491DAAB5340028F83B /* PBXContainerItemProxy */;
-		};
-		65B3D6421DAC39A50074CA9D /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 653C9FC01D6097A40070B7A2 /* ProcedureKitMobile */;
-			targetProxy = 65B3D6411DAC39A50074CA9D /* PBXContainerItemProxy */;
 		};
 		65CFC5FC1D608A5500CAD875 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;

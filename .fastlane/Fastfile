@@ -90,11 +90,18 @@ platform :ios do
   desc "ProcedureKitLocation: iOS"
   lane :test_location_ios do
 
+	gym(
+      project: "ProcedureKit.xcodeproj",
+      scheme: "ProcedureKitMobile",
+      destination: "platform=iOS Simulator,OS=10.0,name=iPhone 6s"
+    )
+
     scan(
       project: "ProcedureKit.xcodeproj",
       scheme: "ProcedureKitLocation",
       destination: "platform=iOS Simulator,OS=10.0,name=iPhone 6s"
     )
+
   end
 
   desc "ProcedureKitLocation: tvOS"
