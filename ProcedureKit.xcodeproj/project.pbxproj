@@ -54,6 +54,8 @@
 		65403ABA1D7C49C500D6036B /* XCTAsserts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65403AB91D7C49C500D6036B /* XCTAsserts.swift */; };
 		65403ABC1D7C6CBC00D6036B /* TestCondition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65403ABB1D7C6CBC00D6036B /* TestCondition.swift */; };
 		65403ABE1D7C9E7600D6036B /* ResultInjectionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65403ABD1D7C9E7600D6036B /* ResultInjectionTests.swift */; };
+		6540D43A1DAAC038004DC8B8 /* UserLocationProcedure.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6540D4391DAAC038004DC8B8 /* UserLocationProcedure.swift */; };
+		6540D43C1DAACE21004DC8B8 /* UserLocationProcedureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6540D43B1DAACE21004DC8B8 /* UserLocationProcedureTests.swift */; };
 		654A81E51D8DEDD8002F4F26 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 654A81E41D8DEDD8002F4F26 /* XCTest.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		654FAFFB1D7CABA0002FA74D /* ResultInjection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 654FAFFA1D7CABA0002FA74D /* ResultInjection.swift */; };
 		654FAFFD1D7CD5EA002FA74D /* Transform.swift in Sources */ = {isa = PBXBuildFile; fileRef = 654FAFFC1D7CD5EA002FA74D /* Transform.swift */; };
@@ -88,7 +90,7 @@
 		6594843E1DAAA5430028F83B /* TestingProcedureKit.framework in Copy Files (2 items) */ = {isa = PBXBuildFile; fileRef = 65CFC6161D60900000CAD875 /* TestingProcedureKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		659484401DAAA7620028F83B /* LocationCapability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6594843F1DAAA7620028F83B /* LocationCapability.swift */; };
 		659484421DAAA95B0028F83B /* LocationSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 659484411DAAA95B0028F83B /* LocationSupport.swift */; };
-		659484441DAAAE010028F83B /* TestableLocationServicesRegistrar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 659484431DAAAE010028F83B /* TestableLocationServicesRegistrar.swift */; };
+		659484441DAAAE010028F83B /* TestableLocationServices.swift in Sources */ = {isa = PBXBuildFile; fileRef = 659484431DAAAE010028F83B /* TestableLocationServices.swift */; };
 		659484461DAAAF760028F83B /* LocationCapabilityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 659484451DAAAF760028F83B /* LocationCapabilityTests.swift */; };
 		65958FD51D96B0AE00F542E2 /* BlockObserverTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65958FD41D96B0AE00F542E2 /* BlockObserverTests.swift */; };
 		659E11A71D9856FB00C5D749 /* Composed.swift in Sources */ = {isa = PBXBuildFile; fileRef = 659E11A61D9856FB00C5D749 /* Composed.swift */; };
@@ -341,6 +343,8 @@
 		65403AB91D7C49C500D6036B /* XCTAsserts.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = XCTAsserts.swift; path = Sources/Testing/XCTAsserts.swift; sourceTree = "<group>"; };
 		65403ABB1D7C6CBC00D6036B /* TestCondition.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TestCondition.swift; path = Sources/Testing/TestCondition.swift; sourceTree = "<group>"; };
 		65403ABD1D7C9E7600D6036B /* ResultInjectionTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ResultInjectionTests.swift; path = Tests/ResultInjectionTests.swift; sourceTree = "<group>"; };
+		6540D4391DAAC038004DC8B8 /* UserLocationProcedure.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserLocationProcedure.swift; sourceTree = "<group>"; };
+		6540D43B1DAACE21004DC8B8 /* UserLocationProcedureTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserLocationProcedureTests.swift; sourceTree = "<group>"; };
 		654A81E41D8DEDD8002F4F26 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Platforms/iPhoneOS.platform/Developer/Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
 		654FAFFA1D7CABA0002FA74D /* ResultInjection.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ResultInjection.swift; path = Sources/ResultInjection.swift; sourceTree = "<group>"; };
 		654FAFFC1D7CD5EA002FA74D /* Transform.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Transform.swift; path = Sources/Transform.swift; sourceTree = "<group>"; };
@@ -375,7 +379,7 @@
 		6594843A1DAAA4D60028F83B /* ProcedureKitLocationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProcedureKitLocationTests.swift; sourceTree = "<group>"; };
 		6594843F1DAAA7620028F83B /* LocationCapability.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LocationCapability.swift; sourceTree = "<group>"; };
 		659484411DAAA95B0028F83B /* LocationSupport.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LocationSupport.swift; sourceTree = "<group>"; };
-		659484431DAAAE010028F83B /* TestableLocationServicesRegistrar.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestableLocationServicesRegistrar.swift; sourceTree = "<group>"; };
+		659484431DAAAE010028F83B /* TestableLocationServices.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestableLocationServices.swift; sourceTree = "<group>"; };
 		659484451DAAAF760028F83B /* LocationCapabilityTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LocationCapabilityTests.swift; sourceTree = "<group>"; };
 		65958FD41D96B0AE00F542E2 /* BlockObserverTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = BlockObserverTests.swift; path = Tests/BlockObserverTests.swift; sourceTree = "<group>"; };
 		659E11A61D9856FB00C5D749 /* Composed.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Composed.swift; path = Sources/Composed.swift; sourceTree = "<group>"; };
@@ -722,6 +726,7 @@
 			children = (
 				6594843F1DAAA7620028F83B /* LocationCapability.swift */,
 				659484411DAAA95B0028F83B /* LocationSupport.swift */,
+				6540D4391DAAC038004DC8B8 /* UserLocationProcedure.swift */,
 			);
 			name = Location;
 			path = Sources/Location;
@@ -730,9 +735,10 @@
 		659484391DAAA4D60028F83B /* Location Tests */ = {
 			isa = PBXGroup;
 			children = (
-				6594843A1DAAA4D60028F83B /* ProcedureKitLocationTests.swift */,
-				659484431DAAAE010028F83B /* TestableLocationServicesRegistrar.swift */,
 				659484451DAAAF760028F83B /* LocationCapabilityTests.swift */,
+				6594843A1DAAA4D60028F83B /* ProcedureKitLocationTests.swift */,
+				659484431DAAAE010028F83B /* TestableLocationServices.swift */,
+				6540D43B1DAACE21004DC8B8 /* UserLocationProcedureTests.swift */,
 			);
 			name = "Location Tests";
 			path = Tests/Location;
@@ -1473,6 +1479,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6540D43A1DAAC038004DC8B8 /* UserLocationProcedure.swift in Sources */,
 				659484421DAAA95B0028F83B /* LocationSupport.swift in Sources */,
 				659484401DAAA7620028F83B /* LocationCapability.swift in Sources */,
 			);
@@ -1482,8 +1489,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				659484441DAAAE010028F83B /* TestableLocationServicesRegistrar.swift in Sources */,
+				659484441DAAAE010028F83B /* TestableLocationServices.swift in Sources */,
 				6594843B1DAAA4D60028F83B /* ProcedureKitLocationTests.swift in Sources */,
+				6540D43C1DAACE21004DC8B8 /* UserLocationProcedureTests.swift in Sources */,
 				659484461DAAAF760028F83B /* LocationCapabilityTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

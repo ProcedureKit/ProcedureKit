@@ -4,6 +4,11 @@
 //  Copyright © 2016 ProcedureKit. All rights reserved.
 //
 
+import ProcedureKit
+
+struct ProcedureKitLocationComponent: ProcedureKitComponent {
+    let name = "ProcedureKitLocation"
+}
 
 protocol LocationServicesRegristrarProtocol {
 
@@ -45,6 +50,36 @@ extension CLLocationManager: LocationServicesRegristrarProtocol {
         #if os(tvOS)
             requestWhenInUseAuthorization()
         #endif
+    }
+}
+
+protocol LocationServicesProtocol {
+
+    func pk_set(desiredAccuracy: CLLocationAccuracy)
+
+    func pk_startUpdatingLocation()
+
+    func pk_stopUpdatingLocation()
+}
+
+extension CLLocationManager: LocationServicesProtocol {
+
+    func pk_set(desiredAccuracy accuracy: CLLocationAccuracy) {
+        desiredAccuracy = accuracy
+    }
+
+    func pk_startUpdatingLocation() {
+        #if os(iOS) || os(watchOS)
+            startUpdatingLocation()
+        #endif
+
+        #if os(tvOS)
+            requestLocation()
+        #endif
+    }
+
+    func pk_stopUpdatingLocation() {
+        stopUpdatingLocation()
     }
 }
 
