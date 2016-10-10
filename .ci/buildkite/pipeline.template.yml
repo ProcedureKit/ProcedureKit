@@ -69,7 +69,6 @@ steps:
     name: "Location: macOS"
     command: "source /usr/local/opt/chruby/share/chruby/chruby.sh && chruby ruby && bundle install --quiet && bundle exec fastlane mac test_location_mac"
     agents:
-      iOS-Simulator: true    
       xcode: "$XCODE"      
   -
     name: "Stress Tests"
