@@ -11,3 +11,8 @@ PRODUCT_BUNDLE_IDENTIFIER = $(PRODUCT_BUNDLE_IDENTIFIER_$(WRAPPER_EXTENSION))
 PRODUCT_NAME_framework = ProcedureKitLocation
 PRODUCT_NAME_xctest = ProcedureKitLocationTests
 PRODUCT_NAME = $(PRODUCT_NAME_$(WRAPPER_EXTENSION))
+
+// Conditionally link against other ProcedureKit* frameworks
+OTHER_LDFLAGS[sdk=iphoneos*] = -framework ProcedureKitMobile
+OTHER_LDFLAGS[sdk=watchos*] = -framework ProcedureKitMobile
+

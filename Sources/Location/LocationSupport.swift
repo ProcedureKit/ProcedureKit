@@ -10,6 +10,20 @@ struct ProcedureKitLocationComponent: ProcedureKitComponent {
     let name = "ProcedureKitLocation"
 }
 
+internal extension CLLocationManager {
+
+    static func make() -> CLLocationManager {
+        return DispatchQueue.onMain { CLLocationManager() }
+    }
+}
+
+internal extension CLGeocoder {
+
+    static func make() -> CLGeocoder {
+        return DispatchQueue.onMain { CLGeocoder() }
+    }
+}
+
 protocol LocationServicesRegristrarProtocol {
 
     func pk_locationServicesEnabled() -> Bool
@@ -83,13 +97,6 @@ extension CLLocationManager: LocationServicesProtocol {
     }
 }
 
-internal extension CLLocationManager {
-
-    static func make() -> CLLocationManager {
-        return DispatchQueue.onMain { CLLocationManager() }
-    }
-}
-
 internal class LocationManagerAuthorizationDelegate: NSObject, CLLocationManagerDelegate {
 
     let didChangeAuthorizationStatusBlock: (CLLocationManager, CLAuthorizationStatus) -> Void
@@ -100,5 +107,29 @@ internal class LocationManagerAuthorizationDelegate: NSObject, CLLocationManager
 
     func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
         didChangeAuthorizationStatusBlock(manager, status)
+    }
+}
+
+protocol GeocodeProtocol {
+
+    func pk_cancel()
+}
+
+extension CLGeocoder: GeocodeProtocol {
+
+    func pk_cancel() {
+        cancelGeocode()
+    }
+}
+
+protocol ReverseGeocodeProtocol {
+
+    func pk_reverseGeocodeLocation(location: CLLocation, completionHandler completion: @escaping CLGeocodeCompletionHandler)
+}
+
+extension CLGeocoder: ReverseGeocodeProtocol {
+
+    func pk_reverseGeocodeLocation(location: CLLocation, completionHandler completion: @escaping CLGeocodeCompletionHandler) {
+        reverseGeocodeLocation(location, completionHandler: completion)
     }
 }

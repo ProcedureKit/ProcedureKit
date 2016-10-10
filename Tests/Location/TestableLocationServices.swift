@@ -10,6 +10,23 @@ import ProcedureKit
 import TestingProcedureKit
 @testable import ProcedureKitLocation
 
+
+func createLocation(withAccuracy accuracy: CLLocationAccuracy = 10) -> CLLocation {
+    return CLLocation(
+        coordinate: CLLocationCoordinate2DMake(0.0, 0.0),
+        altitude: 100,
+        horizontalAccuracy: accuracy,
+        verticalAccuracy: accuracy,
+        course: 0,
+        speed: 0,
+        timestamp: Date()
+    )
+}
+
+func createPlacemark(coordinate: CLLocationCoordinate2D) -> CLPlacemark {
+    return MKPlacemark(coordinate: coordinate, addressDictionary: ["City": "London"])
+}
+
 class TestableLocationServicesRegistrar {
     let fake = CLLocationManager()
 
@@ -85,19 +102,50 @@ extension TestableLocationManager: LocationServicesProtocol {
     }
 }
 
+class TestableGeocoder: GeocodeProtocol {
 
-func createLocation(withAccuracy accuracy: CLLocationAccuracy = 10) -> CLLocation {
-    return CLLocation(
-        coordinate: CLLocationCoordinate2DMake(0.0, 0.0),
-        altitude: 100,
-        horizontalAccuracy: accuracy,
-        verticalAccuracy: accuracy,
-        course: 0,
-        speed: 0,
-        timestamp: Date()
-    )
+    var didCancel = false
+
+    func pk_cancel() {
+        didCancel = true
+    }
 }
 
-func createPlacemark(coordinate: CLLocationCoordinate2D) -> CLPlacemark {
-    return MKPlacemark(coordinate: coordinate, addressDictionary: ["City": "London"])
+class TestableReverseGeocoder: TestableGeocoder, ReverseGeocodeProtocol {
+
+    var didReverseGeocodeLocation: CLLocation? = nil
+
+    var placemarks: [CLPlacemark]? = nil
+    var error: Error? = nil
+
+    func pk_reverseGeocodeLocation(location: CLLocation, completionHandler completion: @escaping CLGeocodeCompletionHandler) {
+        didReverseGeocodeLocation = location
+        completion(placemarks, error)
+    }
 }
+
+class LocationProcedureTestCase: ProcedureKitTestCase {
+
+    let accuracy: CLLocationAccuracy = 10
+    var manager: TestableLocationManager!
+    var geocoder: TestableReverseGeocoder!
+    var location: CLLocation!
+
+    override func setUp() {
+        super.setUp()
+        location = createLocation(withAccuracy: accuracy)
+        manager = TestableLocationManager()
+        manager.authorizationStatus = .authorizedAlways
+        manager.returnedLocation = location
+        geocoder = TestableReverseGeocoder()
+    }
+
+    override func tearDown() {
+        location = nil
+        manager = nil
+        geocoder = nil
+        super.tearDown()
+    }
+}
+
+
