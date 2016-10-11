@@ -6,14 +6,10 @@
 
 import ProcedureKit
 
-#if os(iOS) || os(watchOS)
-import ProcedureKitMobile
-#endif
-
 open class ReverseGeocodeProcedure: Procedure, ResultInjectionProtocol {
     public typealias CompletionBlock = (CLPlacemark) -> Void
 
-    public var requirement: CLLocation
+    public var requirement: CLLocation? = nil
 
     public let completion: CompletionBlock?
 
@@ -23,13 +19,13 @@ open class ReverseGeocodeProcedure: Procedure, ResultInjectionProtocol {
         return placemark
     }
 
-    public var location: CLLocation {
+    public var location: CLLocation? {
         return requirement
     }
 
     internal var geocoder: ReverseGeocodeProtocol & GeocodeProtocol = CLGeocoder.make()
 
-    public init(timeout: TimeInterval = 3.0, location: CLLocation, completion: CompletionBlock? = nil) {
+    public init(timeout: TimeInterval = 3.0, location: CLLocation? = nil, completion: CompletionBlock? = nil) {
         self.requirement = location
         self.completion = completion
         super.init()
@@ -40,11 +36,6 @@ open class ReverseGeocodeProcedure: Procedure, ResultInjectionProtocol {
                 self?.cancelGeocoder()
             }
         }
-
-        #if os(iOS) || os(watchOS)
-        add(observer: NetworkObserver())
-        add(observer: BackgroundObserver())
-        #endif
     }
 
     deinit {
@@ -52,6 +43,12 @@ open class ReverseGeocodeProcedure: Procedure, ResultInjectionProtocol {
     }
 
     open override func execute() {
+
+        guard let requirement = requirement else {
+            finish(withError: ProcedureKitError.requirementNotSatisfied())
+            return
+        }
+
         geocoder.pk_reverseGeocodeLocation(location: requirement) { [weak self] results, error in
 
             // Check that the procedure is still running
