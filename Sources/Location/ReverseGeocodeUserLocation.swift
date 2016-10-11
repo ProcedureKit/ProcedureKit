@@ -6,7 +6,10 @@
 
 import ProcedureKit
 
-public struct UserLocationPlacemark {
+public struct UserLocationPlacemark: Equatable {
+    public static func == (lhs: UserLocationPlacemark, rhs: UserLocationPlacemark) -> Bool {
+        return lhs.location == rhs.location && lhs.placemark == rhs.placemark
+    }
     public let location: CLLocation
     public let placemark: CLPlacemark
 }
@@ -69,12 +72,18 @@ open class ReverseGeocodeUserLocationProcedure: GroupProcedure, ResultInjectionP
 
         reverseGeocodeLocation = ReverseGeocodeProcedure(timeout: timeout).injectResultFrom(dependency: userLocation)
 
-        finishing.inject(dependency: userLocation) { finishing, userLocation, _ in
-            finishing.location = userLocation.location
+        finishing.inject(dependency: userLocation) { procedure, userLocation, errors in
+            guard let location = userLocation.location, errors.isEmpty else {
+                procedure.cancel(withError: ProcedureKitError.dependency(finishedWithErrors: errors)); return
+            }
+            procedure.location = location
         }
 
-        finishing.inject(dependency: reverseGeocodeLocation) { finishing, reverseGeocodeLocation, _ in
-            finishing.placemark = reverseGeocodeLocation.placemark
+        finishing.inject(dependency: reverseGeocodeLocation) { procedure, reverseGeocodeLocation, errors in
+            guard let placemark = reverseGeocodeLocation.placemark, errors.isEmpty else {
+                procedure.cancel(withError: ProcedureKitError.dependency(finishedWithErrors: errors)); return
+            }
+            procedure.placemark = placemark
         }
 
         super.init(underlyingQueue: underlyingQueue, operations: [userLocation, reverseGeocodeLocation, finishing])

@@ -126,14 +126,16 @@ class TestableReverseGeocoder: TestableGeocoder, ReverseGeocodeProtocol {
 
 class LocationProcedureTestCase: ProcedureKitTestCase {
 
+    var location: CLLocation!
+    var placemark: CLPlacemark!    
     let accuracy: CLLocationAccuracy = 10
     var manager: TestableLocationManager!
     var geocoder: TestableReverseGeocoder!
-    var location: CLLocation!
 
     override func setUp() {
         super.setUp()
         location = createLocation(withAccuracy: accuracy)
+        placemark = createPlacemark(coordinate: location.coordinate)
         manager = TestableLocationManager()
         manager.authorizationStatus = .authorizedAlways
         manager.returnedLocation = location

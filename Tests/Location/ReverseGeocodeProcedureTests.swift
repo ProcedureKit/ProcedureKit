@@ -36,7 +36,7 @@ class ReverseGeocodeProcedureTests: LocationProcedureTestCase {
     }
 
     func test__result_is_set() {
-        geocoder.placemarks = [createPlacemark(coordinate: location.coordinate)]
+        geocoder.placemarks = [placemark]
         let procedure = ReverseGeocodeProcedure(location: location)
         procedure.geocoder = geocoder
         wait(for: procedure)
@@ -48,7 +48,7 @@ class ReverseGeocodeProcedureTests: LocationProcedureTestCase {
     func test__completion_is_executed_and_receives_placemark() {
         let exp = expectation(description: "Test: \(#function)")
         var didReceivePlacemark: CLPlacemark? = nil
-        geocoder.placemarks = [createPlacemark(coordinate: location.coordinate)]
+        geocoder.placemarks = [placemark]
         let procedure = ReverseGeocodeProcedure(location: location) { placemark in
             didReceivePlacemark = placemark
             exp.fulfill()
@@ -63,7 +63,7 @@ class ReverseGeocodeProcedureTests: LocationProcedureTestCase {
     func test__completion_is_executed_on_main_queue() {
         let exp = expectation(description: "Test: \(#function)")
         var didRunCompletionBlockOnMainQueue = false
-        geocoder.placemarks = [createPlacemark(coordinate: location.coordinate)]
+        geocoder.placemarks = [placemark]
         let procedure = ReverseGeocodeProcedure(location: location) { _ in
             didRunCompletionBlockOnMainQueue = DispatchQueue.isMainDispatchQueue
             exp.fulfill()
