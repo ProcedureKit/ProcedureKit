@@ -6,7 +6,7 @@
 
 import Foundation
 import XCTest
-@testable import ProcedureKit
+import ProcedureKit
 
 open class ProcedureKitTestCase: XCTestCase {
 
@@ -29,7 +29,7 @@ open class ProcedureKitTestCase: XCTestCase {
         queue = nil
         procedure = nil
         LogManager.severity = .warning
-        ExclusivityManager.sharedInstance.__tearDownForUnitTesting()
+        ExclusivityManager.__tearDownForUnitTesting()
         super.tearDown()
     }
 
