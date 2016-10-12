@@ -6,7 +6,7 @@
 
 import Foundation
 
-public class ReduceProcedure<Element, U>: Procedure, ResultInjectionProtocol {
+open class ReduceProcedure<Element, U>: Procedure, ResultInjectionProtocol {
 
     public var requirement: AnySequence<Element>
     public var result: U
@@ -25,7 +25,7 @@ public class ReduceProcedure<Element, U>: Procedure, ResultInjectionProtocol {
         self.init(source: [], initial: initial, nextPartialResult: block)
     }
 
-    public override func execute() {
+    open override func execute() {
         var finishingError: Error? = nil
         defer { finish(withError: finishingError) }
         do {

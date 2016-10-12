@@ -6,7 +6,7 @@
 
 import Foundation
 
-public class TransformProcedure<Requirement, Result>: Procedure, ResultInjectionProtocol {
+open class TransformProcedure<Requirement, Result>: Procedure, ResultInjectionProtocol {
 
     public typealias Transform = (Requirement!) throws -> Result
 
@@ -20,7 +20,7 @@ public class TransformProcedure<Requirement, Result>: Procedure, ResultInjection
         super.init()
     }
 
-    public override func execute() {
+    open override func execute() {
         var finishingError: Error? = nil
         defer { finish(withError: finishingError) }
         do {
@@ -30,7 +30,7 @@ public class TransformProcedure<Requirement, Result>: Procedure, ResultInjection
     }
 }
 
-public class BlockProcedure: TransformProcedure<Void, Void> {
+open class BlockProcedure: TransformProcedure<Void, Void> {
 
     public init(block: @escaping () throws -> Void) {
         super.init { _ in try block() }
