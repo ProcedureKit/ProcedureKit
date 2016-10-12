@@ -6,7 +6,7 @@
 
 import Foundation
 
-public class MapProcedure<Element, U>: ReduceProcedure<Element, Array<U>> {
+open class MapProcedure<Element, U>: ReduceProcedure<Element, Array<U>> {
 
     public init<S: Sequence>(source: S, transform: @escaping (Element) throws -> U) where S.Iterator.Element == Element, S.SubSequence: Sequence, S.SubSequence.Iterator.Element == Element, S.SubSequence.SubSequence == S.SubSequence {
         super.init(source: source, initial: Array<U>()) { acc, element in
@@ -28,7 +28,7 @@ public extension ProcedureProtocol where Self: ResultInjectionProtocol, Self.Res
     }
 }
 
-public class FlatMapProcedure<Element, U>: ReduceProcedure<Element, Array<U>> {
+open class FlatMapProcedure<Element, U>: ReduceProcedure<Element, Array<U>> {
 
     public init<S: Sequence>(source: S, transform: @escaping (Element) throws -> U?) where S.Iterator.Element == Element, S.SubSequence: Sequence, S.SubSequence.Iterator.Element == Element, S.SubSequence.SubSequence == S.SubSequence {
         super.init(source: source, initial: Array<U>()) { acc, element in

@@ -6,7 +6,7 @@
 
 import Foundation
 
-public class FilterProcedure<Element>: ReduceProcedure<Element, Array<Element>> {
+open class FilterProcedure<Element>: ReduceProcedure<Element, Array<Element>> {
 
     public init<S: Sequence>(source: S, isIncluded: @escaping (Element) throws -> Bool) where S.Iterator.Element == Element, S.SubSequence: Sequence, S.SubSequence.Iterator.Element == Element, S.SubSequence.SubSequence == S.SubSequence {
         super.init(source: source, initial: []) { acc, element in
