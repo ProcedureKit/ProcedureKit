@@ -14,4 +14,4 @@ PRODUCT_NAME = $(PRODUCT_NAME_$(WRAPPER_EXTENSION))
 
 APPLICATION_EXTENSION_API_ONLY = NO
 
-SUPPORTED_PLATFORMS = iphoneos watchos iphonesimulator watchsimulator
+SUPPORTED_PLATFORMS = iphoneos iphonesimulator
