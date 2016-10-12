@@ -14,6 +14,13 @@ class TransformProcedureTests: ProcedureKitTestCase {
         let timesTwo = TransformProcedure<Int, Int> { return $0 * 2 }
         timesTwo.requirement = 2
         wait(for: timesTwo)
+        XCTAssertProcedureFinishedWithoutErrors(timesTwo)
         XCTAssertEqual(timesTwo.result, 4)
+    }
+
+    func test__requirement_is_nil_finishes_with_error() {
+        let timesTwo = TransformProcedure<Int, Int> { return $0 * 2 }
+        wait(for: timesTwo)
+        XCTAssertProcedureFinishedWithErrors(timesTwo, count: 1)
     }
 }

@@ -8,12 +8,12 @@ import Foundation
 
 open class TransformProcedure<Requirement, Result>: Procedure, ResultInjectionProtocol {
 
-    public typealias Transform = (Requirement!) throws -> Result
+    public typealias Transform = (Requirement) throws -> Result
 
     private let transform: Transform
 
     public var requirement: Requirement! = nil
-    public var result: Result! = nil
+    public var result: Result? = nil
 
     public init(transform: @escaping Transform) {
         self.transform = transform
@@ -24,15 +24,11 @@ open class TransformProcedure<Requirement, Result>: Procedure, ResultInjectionPr
         var finishingError: Error? = nil
         defer { finish(withError: finishingError) }
         do {
+            guard let requirement = requirement else {
+                throw ProcedureKitError.requirementNotSatisfied()
+            }
             result = try transform(requirement)
         }
         catch { finishingError = error }
-    }
-}
-
-open class BlockProcedure: TransformProcedure<Void, Void> {
-
-    public init(block: @escaping () throws -> Void) {
-        super.init { _ in try block() }
     }
 }
