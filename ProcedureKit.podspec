@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name              = "ProcedureKit"
-  s.version           = "4.0.0-beta-2"
+  s.version           = "4.0.0-beta-3"
   s.summary           = "Powerful Operation subclasses in Swift."
   s.description       = <<-DESC
   
@@ -17,7 +17,7 @@ session Advanced NSOperations: https://developer.apple.com/videos/wwdc/2015/?id=
   s.requires_arc      = true
   s.ios.deployment_target = '8.0'
   s.watchos.deployment_target = '2.0'
-  s.tvos.deployment_target = '9.0'
+  s.tvos.deployment_target = '9.2'
   s.osx.deployment_target = '10.10'
   
   # Ensure the correct version of Swift is used
@@ -28,17 +28,17 @@ session Advanced NSOperations: https://developer.apple.com/videos/wwdc/2015/?id=
 
   # Creates a framework suitable for an iOS, watchOS, tvOS or macOS application
   s.subspec 'Standard' do |ss|
-    ss.source_files = [
-      'Sources', 
+    ss.source_files = ['Sources']
+    ss.exclude_files = [
+      'Sources/Testing',
+      'Sources/Mobile',
+      'Sources/Mac',
+      'Sources/TV',
+      'Sources/Cloud',
+      'Sources/Location'
     ]
   end
 
-  # Creates a framework suitable to use for testing code which uses ProcedureKit
-  s.subspec 'Testing' do |ss|
-    ss.source_files = [
-      'Sources/Testing',
-    ]
-  end
 end
 
 

@@ -9,5 +9,10 @@ PRODUCT_NAME = TestingProcedureKit
 
 APPLICATION_EXTENSION_API_ONLY = NO
 
+ENABLE_BITCODE = NO
 
-FRAMEWORK_SEARCH_PATHS = $(inherited) $(DEVELOPER_SDK_DIR)/../Library/Frameworks
+INSTALL_PATH = @rpath
+
+SUPPORTED_PLATFORMS = macosx iphoneos appletvos appletvsimulator iphonesimulator
+
+FRAMEWORK_SEARCH_PATHS = $(inherited) $(PLATFORM_DIR)/Developer/Library/Frameworks

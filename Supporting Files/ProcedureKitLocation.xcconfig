@@ -1,0 +1,14 @@
+//
+//  ProcedureKit
+//
+//  Copyright © 2016 ProcedureKit. All rights reserved.
+//
+
+PRODUCT_BUNDLE_IDENTIFIER_framework = run.kit.procedure.ProcedureKitLocation
+PRODUCT_BUNDLE_IDENTIFIER_xctest = run.kit.procedure.ProcedureKitLocationTests
+PRODUCT_BUNDLE_IDENTIFIER = $(PRODUCT_BUNDLE_IDENTIFIER_$(WRAPPER_EXTENSION))
+
+PRODUCT_NAME_framework = ProcedureKitLocation
+PRODUCT_NAME_xctest = ProcedureKitLocationTests
+PRODUCT_NAME = $(PRODUCT_NAME_$(WRAPPER_EXTENSION))
+

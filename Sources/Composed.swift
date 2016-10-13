@@ -6,7 +6,7 @@
 
 import Foundation
 
-public class ComposedProcedure<T: Operation>: GroupProcedure {
+open class ComposedProcedure<T: Operation>: GroupProcedure {
 
     public private(set) var operation: T
 
@@ -20,7 +20,7 @@ public class ComposedProcedure<T: Operation>: GroupProcedure {
     }
 }
 
-public class GatedProcedure<T: Operation>: ComposedProcedure<T> {
+open class GatedProcedure<T: Operation>: ComposedProcedure<T> {
 
     public convenience init(_ composed: T, gate: @escaping ThrowingBoolBlock) {
         self.init(operation: composed, gate: gate)

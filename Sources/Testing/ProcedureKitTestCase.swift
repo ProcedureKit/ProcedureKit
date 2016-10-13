@@ -6,7 +6,7 @@
 
 import Foundation
 import XCTest
-@testable import ProcedureKit
+import ProcedureKit
 
 open class ProcedureKitTestCase: XCTestCase {
 
@@ -29,7 +29,7 @@ open class ProcedureKitTestCase: XCTestCase {
         queue = nil
         procedure = nil
         LogManager.severity = .warning
-        ExclusivityManager.sharedInstance.__tearDownForUnitTesting()
+        ExclusivityManager.__tearDownForUnitTesting()
         super.tearDown()
     }
 
@@ -45,12 +45,12 @@ open class ProcedureKitTestCase: XCTestCase {
         queue.addOperations(operations, waitUntilFinished: false)
     }
 
-    public func wait(for procedures: Procedure..., withTimeout timeout: TimeInterval = 3, withExpectationDescription expectationDescription: String = #function) {
+    public func wait(for procedures: Procedure..., withTimeout timeout: TimeInterval = 3, withExpectationDescription expectationDescription: String = #function, handler: XCWaitCompletionHandler? = nil) {
         for (i, procedure) in procedures.enumerated() {
             addCompletionBlockTo(procedure: procedure, withExpectationDescription: "\(i), \(expectationDescription)")
         }
         run(operations: procedures)
-        waitForExpectations(timeout: timeout, handler: nil)
+        waitForExpectations(timeout: timeout, handler: handler)
     }
 
     public func check<T: Procedure>(procedure: T, withTimeout timeout: TimeInterval = 3, withExpectationDescription expectationDescription: String = #function, checkBeforeWait: (T) -> Void) {
@@ -61,10 +61,14 @@ open class ProcedureKitTestCase: XCTestCase {
     }
 
     public func addCompletionBlockTo(procedure: Procedure, withExpectationDescription expectationDescription: String = #function) {
-        let _ = addExpectationCompletionBlockTo(procedure: procedure, withExpectationDescription: expectationDescription)
+        // Make a finishing procedure, which depends on this target Procedure.
+        let finishingProcedure = makeFinishingProcedure(for: procedure, withExpectationDescription: expectationDescription)
+        // Add the did finish expectation block to the finishing procedure
+        addExpectationCompletionBlockTo(procedure: finishingProcedure, withExpectationDescription: expectationDescription)
+        run(operation: finishingProcedure)
     }
 
-    public func addExpectationCompletionBlockTo(procedure: Procedure, withExpectationDescription expectationDescription: String = #function) -> XCTestExpectation {
+    @discardableResult public func addExpectationCompletionBlockTo(procedure: Procedure, withExpectationDescription expectationDescription: String = #function) -> XCTestExpectation {
         let expect = expectation(description: "Test: \(expectationDescription), \(UUID())")
         add(expectation: expect, to: procedure)
         return expect
@@ -77,6 +81,18 @@ open class ProcedureKitTestCase: XCTestCase {
                 weakExpectation?.fulfill()
             }
         }
+    }
+
+    func makeFinishingProcedure(for procedure: Procedure, withExpectationDescription expectationDescription: String = #function) -> Procedure {
+        let finishing = BlockProcedure { }
+        finishing.add(dependency: procedure)
+        // Adds a did produce operation observer, which adds the produced operation as a dependency
+        // of the finishing procedure. This way, we don't actually finish, until the
+        // procedure, and any produced operations also finish.
+        procedure.addDidProduceOperationBlockObserver { _, operation in
+            finishing.add(dependency: operation)
+        }
+        return finishing
     }
 }
 
