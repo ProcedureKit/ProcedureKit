@@ -239,17 +239,17 @@ public struct FiniteIterator<Element>: IteratorProtocol {
     }
 }
 
-public struct MapIterator<Element, T>: IteratorProtocol {
+public struct MapIterator<T, V>: IteratorProtocol {
 
-    private let transform: (Element) -> T
-    private var iterator: AnyIterator<Element>
+    private let transform: (T) -> V
+    private var iterator: AnyIterator<T>
 
-    public init<I: IteratorProtocol>(_ iterator: I, transform: @escaping (Element) -> T) where I.Element == Element {
+    public init<I: IteratorProtocol>(_ iterator: I, transform: @escaping (T) -> V) where T == I.Element {
         self.iterator = AnyIterator(iterator)
         self.transform = transform
     }
 
-    public mutating func next() -> T? {
+    public mutating func next() -> V? {
         return iterator.next().map(transform)
     }
 }
