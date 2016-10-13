@@ -4,8 +4,6 @@
 //  Copyright © 2016 ProcedureKit. All rights reserved.
 //
 
-import Foundation
-
 /**
  A simple condition which suppresses its contained condition to not
  enqueue any dependencies. This is useful for verifying access to

@@ -4,8 +4,6 @@
 //  Copyright © 2016 ProcedureKit. All rights reserved.
 //
 
-import Foundation
-
 // swiftlint:disable file_length
 
 /**
@@ -249,6 +247,15 @@ open class GroupProcedure: Procedure, ProcedureQueueDelegate {
 // MARK: - GroupProcedure API
 
 public extension GroupProcedure {
+
+    /**
+     Access the underlying queue of the GroupProcedure.
+
+     - returns: the DispatchQueue of the groups private ProcedureQueue
+    */
+    final var underlyingQueue: DispatchQueue? {
+        return queue.underlyingQueue
+    }
 
     /**
      The maximum number of child operations that can execute at the same time.

@@ -4,8 +4,6 @@
 //  Copyright © 2016 ProcedureKit. All rights reserved.
 //
 
-import Foundation
-
 open class ReduceProcedure<Element, U>: Procedure, ResultInjectionProtocol {
 
     public var requirement: AnySequence<Element>

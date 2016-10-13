@@ -5,9 +5,6 @@
 //
 
 // swiftlint:disable file_length
-
-import Foundation
-
 // swiftlint:disable type_body_length
 
 open class Procedure: Operation, ProcedureProtocol {

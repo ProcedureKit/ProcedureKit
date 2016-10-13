@@ -4,8 +4,6 @@
 //  Copyright © 2016 ProcedureKit. All rights reserved.
 //
 
-import Foundation
-
 public class NoFailedDependenciesCondition: Condition {
 
     /// Options on how to handle cancellation

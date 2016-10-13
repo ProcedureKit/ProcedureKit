@@ -4,8 +4,6 @@
 //  Copyright © 2016 ProcedureKit. All rights reserved.
 //
 
-import Foundation
-
 /**
  A generic condition for describing operations that
  cannot be allowed to execute concurrently.

@@ -4,8 +4,6 @@
 //  Copyright © 2016 ProcedureKit. All rights reserved.
 //
 
-import Foundation
-
 public struct RetryFailureInfo<T: Operation> {
 
     /// - returns: the failed operation
