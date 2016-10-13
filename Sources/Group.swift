@@ -249,6 +249,15 @@ open class GroupProcedure: Procedure, ProcedureQueueDelegate {
 public extension GroupProcedure {
 
     /**
+     Access the underlying queue of the GroupProcedure.
+
+     - returns: the DispatchQueue of the groups private ProcedureQueue
+    */
+    final var underlyingQueue: DispatchQueue? {
+        return queue.underlyingQueue
+    }
+
+    /**
      The maximum number of child operations that can execute at the same time.
 
      The value in this property affects only the operations that the current GroupProcedure has

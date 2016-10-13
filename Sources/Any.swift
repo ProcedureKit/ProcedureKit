@@ -44,6 +44,6 @@ public class AnyProcedure<Requirement, Result>: GroupProcedure, ResultInjectionP
 
     public init<Base>(underlyingQueue: DispatchQueue? = nil, _ base: Base) where Base: Procedure, Base: ResultInjectionProtocol, Result == Base.Result, Requirement == Base.Requirement {
         erased = AnyProcedureBox(underlyingQueue: underlyingQueue, base: base)
-        super.init(underlyingQueue: underlyingQueue, operations: [erased])
+        super.init(underlyingQueue: erased.underlyingQueue, operations: [erased])
     }
 }
