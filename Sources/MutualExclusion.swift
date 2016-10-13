@@ -25,7 +25,7 @@ public final class MutuallyExclusive<T>: Condition {
     }
 }
 
-internal class ExclusivityManager {
+public class ExclusivityManager {
 
     static let sharedInstance = ExclusivityManager()
 
@@ -38,7 +38,7 @@ internal class ExclusivityManager {
     }
 
     func add(procedure: Procedure, category: String) -> Operation? {
-        return queue.sync { self._add(procedure: procedure, category: category) }
+        return queue.sync { _add(procedure: procedure, category: category) }
     }
 
     func remove(procedure: Procedure, category: String) {
@@ -78,16 +78,19 @@ internal class ExclusivityManager {
     }
 }
 
-internal extension ExclusivityManager {
+public extension ExclusivityManager {
+
+    static func __tearDownForUnitTesting() {
+        sharedInstance.__tearDownForUnitTesting()
+    }
 
     /// This should only be used as part of the unit testing
-    /// and in v2+ will not be publically accessible
-    func __tearDownForUnitTesting() {
+    fileprivate func __tearDownForUnitTesting() {
         queue.sync {
-            for (category, procedures) in self.procedures {
+            for (category, procedures) in procedures {
                 for procedure in procedures {
                     procedure.cancel()
-                    self._remove(procedure: procedure, category: category)
+                    _remove(procedure: procedure, category: category)
                 }
             }
         }
