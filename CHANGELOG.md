@@ -1,3 +1,42 @@
+# 4.0.0 Beta 3
+
+Beta 3 adds _ProcedureKitMobile_, _ProcedureKitLocation_ and _TestingProcedureKit_ frameworks. The mobile framework is suitable for use in iOS applications, although it does not yet have `AlertProcedure` which will come in a future beta.
+
+To integrate these frameworks, use:
+```swift
+import ProcedureKit
+```
+which can be done anywhere, such as internal frameworks and extensions, and on any platform.
+
+```swift
+import ProcedureKitMobile
+```
+which can only be done in an iOS application target, as it’s not extension compatible.
+
+```swift
+import ProcedureKitLocation
+```
+which can be used on any platform.
+
+_TestingProcedureKit_ is a framework is for adding to test bundle targets. It links with XCTest, so cannot be added to an application target. While documentation is sorely lacking here, this is very useful for writing unit tests for `Procedure` subclasses. It has APIs to support waiting for procedures to run, and asserting their end state.
+
+## New Features
+
+1. [#476](https://github.com/ProcedureKit/ProcedureKit/pull/476) Adds `BackgroundObserver`
+2. [#496](https://github.com/ProcedureKit/ProcedureKit/pull/496) Adds `FilterProcedure`
+3. [#497](https://github.com/ProcedureKit/ProcedureKit/pull/497) Adds `ReduceProcedure`
+4. [#498](https://github.com/ProcedureKit/ProcedureKit/pull/498) Adds `NetworkObserver`
+5. [#499](https://github.com/ProcedureKit/ProcedureKit/pull/499) Adds `Capability.Location`
+6. [#500](https://github.com/ProcedureKit/ProcedureKit/pull/500) Adds `UserLocationProcedure`
+7. [#502](https://github.com/ProcedureKit/ProcedureKit/pull/502) Adds `ReverseGeocodeUserLocationProcedure`
+8. [#503](https://github.com/ProcedureKit/ProcedureKit/pull/503) Adds `ReverseGeocodeUserLocationProcedure`
+
+## Bug fixes etc
+
+9. [#503](https://github.com/ProcedureKit/ProcedureKit/pull/503) Fixes an issue where the minimum deployment target was incorrect for iOS.
+10. [#510](https://github.com/ProcedureKit/ProcedureKit/pull/510) Makes procedures which were `public` and therefore not override-able by a framework consumer `open`. Got to watch out for these.
+11. [#511](https://github.com/ProcedureKit/ProcedureKit/pull/511) Refactors `BlockProcedure` to no longer be a subclass of `TransformProcedure`. I did like the simplicity of this, however, I want to be able to automatically throw an error if the requirement of `TransformProcedure` is not set.
+
 # 4.0.0 Beta 2
 
 Beta 2 is all about rounding out the majority of the missing functionality from _ProcedureKit_, and additionally fixing integration issues.
