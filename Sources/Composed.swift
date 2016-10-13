@@ -4,8 +4,6 @@
 //  Copyright © 2016 ProcedureKit. All rights reserved.
 //
 
-import Foundation
-
 open class ComposedProcedure<T: Operation>: GroupProcedure {
 
     public private(set) var operation: T

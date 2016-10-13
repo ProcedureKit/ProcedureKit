@@ -4,8 +4,6 @@
 //  Copyright © 2016 ProcedureKit. All rights reserved.
 //
 
-import Foundation
-
 open class TransformProcedure<Requirement, Result>: Procedure, ResultInjectionProtocol {
 
     public typealias Transform = (Requirement) throws -> Result

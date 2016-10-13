@@ -4,8 +4,6 @@
 //  Copyright © 2016 ProcedureKit. All rights reserved.
 //
 
-import Foundation
-
 /**
  Defines the authorization status of a capability. Typically
  this will be an enum, like CLAuthorizationStatus. Note

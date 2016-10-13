@@ -4,12 +4,6 @@
 //  Copyright © 2016 ProcedureKit. All rights reserved.
 //
 
-import Foundation
-
-internal func _abstractMethod(file: StaticString = #file, line: UInt = #line) {
-    fatalError("Method must be overriden", file: file, line: line)
-}
-
 class AnyObserverBox_<Procedure: ProcedureProtocol>: ProcedureObserver {
     func didAttach(to procedure: Procedure) { _abstractMethod() }
     func will(execute procedure: Procedure) { _abstractMethod() }

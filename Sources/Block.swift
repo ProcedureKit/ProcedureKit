@@ -4,8 +4,6 @@
 //  Copyright © 2016 ProcedureKit. All rights reserved.
 //
 
-import Foundation
-
 open class BlockProcedure: Procedure {
 
     public typealias ThrowingVoidBlock = () throws -> Void

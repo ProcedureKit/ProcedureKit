@@ -4,8 +4,6 @@
 //  Copyright © 2016 ProcedureKit. All rights reserved.
 //
 
-import Foundation
-
 extension Collection where Iterator.Element: Operation {
 
     internal var operationsAndProcedures: ([Operation], [Procedure]) {

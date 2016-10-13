@@ -4,8 +4,6 @@
 //  Copyright © 2016 ProcedureKit. All rights reserved.
 //
 
-import Foundation
-
 public enum Delay: Comparable {
 
     public static func == (lhs: Delay, rhs: Delay) -> Bool {
