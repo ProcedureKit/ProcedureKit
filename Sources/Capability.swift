@@ -162,7 +162,7 @@ public struct AnyCapability<Status: AuthorizationStatus>: CapabilityProtocol {
  A generic procedure which will get the current authorization
  status for AnyCapability<Status>.
  */
-public class GetAuthorizationStatus<Status: AuthorizationStatus>: Procedure, ResultInjectionProtocol {
+public class GetAuthorizationStatusProcedure<Status: AuthorizationStatus>: Procedure, ResultInjectionProtocol {
 
     /// the StatusResponse is a tuple for the capabilities availability and status
     public typealias StatusResponse = (Bool, Status)
@@ -216,7 +216,7 @@ public class GetAuthorizationStatus<Status: AuthorizationStatus>: Procedure, Res
 }
 
 /// A generic procedure which will authorize a capability
-public class Authorize<Status: AuthorizationStatus>: GetAuthorizationStatus<Status> {
+public class AuthorizeCapabilityProcedure<Status: AuthorizationStatus>: GetAuthorizationStatusProcedure<Status> {
 
     /**
      Initialize the operation with a base type which conforms to CapabilityProtocol
@@ -253,7 +253,7 @@ public class AuthorizedFor<Status: AuthorizationStatus>: Condition {
         capability = AnyCapability(base)
         super.init()
         mutuallyExclusive = true
-        add(dependency: Authorize(base))
+        add(dependency: AuthorizeCapabilityProcedure(base))
     }
 
     public override func evaluate(procedure: Procedure, completion: @escaping (ConditionResult) -> Void) {
