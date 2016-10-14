@@ -42,8 +42,8 @@ class MutualExclusiveTests: ProcedureKitTestCase {
         procedure1.name = "Procedure 1"
         let condition1A = MutuallyExclusive<BlockProcedure>()
         let condition1B = MutuallyExclusive<TestProcedure>()
-        procedure1.attach(condition: condition1A)
-        procedure1.attach(condition: condition1B)
+        procedure1.add(condition: condition1A)
+        procedure1.add(condition: condition1B)
 
         let procedure2 = BlockProcedure {
             XCTAssertEqual(text, "Star Wars\nA long time ago")
@@ -52,8 +52,8 @@ class MutualExclusiveTests: ProcedureKitTestCase {
         procedure2.name = "Procedure 2"
         let condition2A = MutuallyExclusive<BlockProcedure>()
         let condition2B = MutuallyExclusive<TestProcedure>()
-        procedure2.attach(condition: condition2A)
-        procedure2.attach(condition: condition2B)
+        procedure2.add(condition: condition2A)
+        procedure2.add(condition: condition2B)
 
         wait(for: procedure1, procedure2)
 
@@ -73,7 +73,7 @@ class MutualExclusiveTests: ProcedureKitTestCase {
         condition1.add(dependency: conditionDependency1)
 
         let procedure1 = TestProcedure(name: "Procedure 1")
-        procedure1.attach(condition: condition1)
+        procedure1.add(condition: condition1)
 
         let procedure1Dependency = TestProcedure(name: "Dependency 1")
         procedure1.add(dependency: procedure1Dependency)
@@ -88,7 +88,7 @@ class MutualExclusiveTests: ProcedureKitTestCase {
         condition2.add(dependency: conditionDependency2)
 
         let procedure2 = TestProcedure()
-        procedure2.attach(condition: condition2)
+        procedure2.add(condition: condition2)
 
         let procedure2Dependency = TestProcedure(name: "Dependency 2")
         procedure2.add(dependency: procedure2Dependency)
@@ -101,11 +101,11 @@ class MutualExclusiveTests: ProcedureKitTestCase {
     func test__mutually_exclusive_operations_can_be_executed() {
         let procedure1 = TestProcedure()
         procedure1.name = "Procedure 1"
-        procedure1.attach(condition: MutuallyExclusive<TestProcedure>())
+        procedure1.add(condition: MutuallyExclusive<TestProcedure>())
 
         let procedure2 = TestProcedure()
         procedure2.name = "Procedure 2"
-        procedure2.attach(condition: MutuallyExclusive<TestProcedure>())
+        procedure2.add(condition: MutuallyExclusive<TestProcedure>())
 
         wait(for: procedure1, procedure2)
     }

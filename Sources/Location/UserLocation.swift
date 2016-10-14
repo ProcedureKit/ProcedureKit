@@ -33,8 +33,8 @@ open class UserLocationProcedure: Procedure, ResultInjectionProtocol, CLLocation
         self.accuracy = accuracy
         self.completion = completion
         super.init()
-        attach(condition: AuthorizedFor(capability))
-        attach(condition: MutuallyExclusive<UserLocationProcedure>())
+        add(condition: AuthorizedFor(capability))
+        add(condition: MutuallyExclusive<UserLocationProcedure>())
         add(observer: TimeoutObserver(by: timeout))
         addDidCancelBlockObserver { [weak self] _, errors in
             DispatchQueue.main.async {

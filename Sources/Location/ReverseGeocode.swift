@@ -29,7 +29,7 @@ open class ReverseGeocodeProcedure: Procedure, ResultInjectionProtocol {
         self.requirement = location
         self.completion = completion
         super.init()
-        attach(condition: MutuallyExclusive<ReverseGeocodeProcedure>())
+        add(condition: MutuallyExclusive<ReverseGeocodeProcedure>())
         add(observer: TimeoutObserver(by: timeout))
         addDidCancelBlockObserver { [weak self] _, errors in
             DispatchQueue.main.async {

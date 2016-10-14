@@ -11,19 +11,19 @@ import TestingProcedureKit
 class BlockConditionTests: ProcedureKitTestCase {
 
     func test__procedure_with_successfull_block_finishes() {
-        procedure.attach(condition: BlockCondition { true })
+        procedure.add(condition: BlockCondition { true })
         wait(for: procedure)
         XCTAssertProcedureFinishedWithoutErrors()
     }
 
     func test__procedure_with_unsuccessful_block_cancels() {
-        procedure.attach(condition: BlockCondition { false })
+        procedure.add(condition: BlockCondition { false })
         wait(for: procedure)
         XCTAssertProcedureCancelledWithErrors(count: 1)
     }
 
     func test__procedure_with_throwing_block_cancels_with_error() {
-        procedure.attach(condition: BlockCondition { throw TestError() })
+        procedure.add(condition: BlockCondition { throw TestError() })
         wait(for: procedure)
         XCTAssertProcedureCancelledWithErrors(count: 1)
     }
