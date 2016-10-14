@@ -11,7 +11,7 @@
  for another (or existing) types to be used to define granular
  levels of permissions. Use Void if not needed.
  */
-public protocol AuthorizationStatusProtocol {
+public protocol AuthorizationStatus {
 
     /// A generic type for the requirement
     associatedtype Requirement
@@ -41,7 +41,7 @@ public protocol AuthorizationStatusProtocol {
  */
 public protocol CapabilityProtocol {
 
-    associatedtype Status: AuthorizationStatusProtocol
+    associatedtype Status: AuthorizationStatus
 
     /**
      A requirement of the capability. E.g. for Location this
@@ -92,7 +92,7 @@ extension Capability {
      an authorization level, but still might not be available. For example
      PassKit. In which case, use VoidStatus as the nested Status type.
      */
-    public struct VoidStatus: AuthorizationStatusProtocol, Equatable {
+    public struct VoidStatus: AuthorizationStatus, Equatable {
 
         public static func == (_: VoidStatus, _: VoidStatus) -> Bool {
             return true
@@ -108,7 +108,7 @@ extension Capability {
 
 // MARK: - AnyCapability
 
-internal class AnyCapabilityBox_<Status: AuthorizationStatusProtocol>: CapabilityProtocol {
+internal class AnyCapabilityBox_<Status: AuthorizationStatus>: CapabilityProtocol {
     var requirement: Status.Requirement? { _abstractMethod(); return nil }
     func isAvailable() -> Bool { _abstractMethod(); return false }
     func getAuthorizationStatus(_ completion: @escaping (Status) -> Void) { _abstractMethod() }
@@ -135,7 +135,7 @@ internal class AnyCapabilityBox<Base: CapabilityProtocol>: AnyCapabilityBox_<Bas
     }
 }
 
-public struct AnyCapability<Status: AuthorizationStatusProtocol>: CapabilityProtocol {
+public struct AnyCapability<Status: AuthorizationStatus>: CapabilityProtocol {
     private typealias Erased = AnyCapabilityBox_<Status>
 
     private var box: Erased
@@ -162,7 +162,7 @@ public struct AnyCapability<Status: AuthorizationStatusProtocol>: CapabilityProt
  A generic procedure which will get the current authorization
  status for AnyCapability<Status>.
  */
-public class GetAuthorizationStatus<Status: AuthorizationStatusProtocol>: Procedure, ResultInjectionProtocol {
+public class GetAuthorizationStatus<Status: AuthorizationStatus>: Procedure, ResultInjectionProtocol {
 
     /// the StatusResponse is a tuple for the capabilities availability and status
     public typealias StatusResponse = (Bool, Status)
@@ -216,7 +216,7 @@ public class GetAuthorizationStatus<Status: AuthorizationStatusProtocol>: Proced
 }
 
 /// A generic procedure which will authorize a capability
-public class Authorize<Status: AuthorizationStatusProtocol>: GetAuthorizationStatus<Status> {
+public class Authorize<Status: AuthorizationStatus>: GetAuthorizationStatus<Status> {
 
     /**
      Initialize the operation with a base type which conforms to CapabilityProtocol
@@ -245,7 +245,7 @@ public class Authorize<Status: AuthorizationStatusProtocol>: GetAuthorizationSta
  which means that potentially the user will be prompted to grant
  authorization. Suppress this from happening with SilentCondition.
  */
-public class AuthorizedFor<Status: AuthorizationStatusProtocol>: Condition {
+public class AuthorizedFor<Status: AuthorizationStatus>: Condition {
 
     fileprivate let capability: AnyCapability<Status>
 
