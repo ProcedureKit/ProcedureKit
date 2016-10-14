@@ -10,7 +10,7 @@ import ProcedureKit
 
 public class TestableCapability: CapabilityProtocol {
 
-    public enum Status: AuthorizationStatusProtocol {
+    public enum Status: AuthorizationStatus {
         public enum Requirement { // swiftlint:disable:this nesting
             case minimum, maximum
         }
@@ -91,7 +91,7 @@ open class TestableCapabilityTestCase: ProcedureKitTestCase {
         super.tearDown()
     }
 
-    public func XCTAssertGetAuthorizationStatus<Status: AuthorizationStatusProtocol>(_ exp1: @autoclosure () throws -> (Bool, Status)?, expected exp2: @autoclosure () throws -> (Bool, Status), _ message: @autoclosure () -> String = "", file: StaticString = #file, line: UInt = #line) where Status: Equatable {
+    public func XCTAssertGetAuthorizationStatus<Status: AuthorizationStatus>(_ exp1: @autoclosure () throws -> (Bool, Status)?, expected exp2: @autoclosure () throws -> (Bool, Status), _ message: @autoclosure () -> String = "", file: StaticString = #file, line: UInt = #line) where Status: Equatable {
         __XCTEvaluateAssertion(testCase: self, message, file: file, line: line) {
             let result = try exp1()
             let expected = try exp2()

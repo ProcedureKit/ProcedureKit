@@ -11,7 +11,7 @@ public enum LocationUsage {
     case always
 }
 
-extension CLAuthorizationStatus: AuthorizationStatusProtocol {
+extension CLAuthorizationStatus: AuthorizationStatus {
 
     public func meets(requirement: LocationUsage?) -> Bool {
         switch (requirement, self) {
