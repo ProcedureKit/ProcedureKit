@@ -26,6 +26,6 @@ open class GatedProcedure<T: Operation>: ComposedProcedure<T> {
 
     public init(operation: T, gate: @escaping ThrowingBoolBlock) {
         super.init(operation: operation)
-        attach(condition: IgnoredCondition(BlockCondition(block: gate)))
+        add(condition: IgnoredCondition(BlockCondition(block: gate)))
     }
 }

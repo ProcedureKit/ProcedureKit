@@ -11,7 +11,7 @@ import TestingProcedureKit
 class NoFailedDependenciesConditionTests: ProcedureKitTestCase {
 
     func test__procedure_with_no_dependencies_succeeds() {
-        procedure.attach(condition: NoFailedDependenciesCondition())
+        procedure.add(condition: NoFailedDependenciesCondition())
         wait(for: procedure)
         XCTAssertProcedureFinishedWithoutErrors()
     }
@@ -19,7 +19,7 @@ class NoFailedDependenciesConditionTests: ProcedureKitTestCase {
     func test__procedure_with_successful_dependency_succeeds() {
         let dependency = TestProcedure()
         procedure.add(dependency: dependency)
-        procedure.attach(condition: NoFailedDependenciesCondition())
+        procedure.add(condition: NoFailedDependenciesCondition())
         wait(for: procedure, dependency)
         XCTAssertProcedureFinishedWithoutErrors()
     }
@@ -27,7 +27,7 @@ class NoFailedDependenciesConditionTests: ProcedureKitTestCase {
     func test__procedure_with_cancelled_dependency_fails() {
         let dependency = createCancellingProcedure()
         procedure.add(dependency: dependency)
-        procedure.attach(condition: NoFailedDependenciesCondition())
+        procedure.add(condition: NoFailedDependenciesCondition())
         wait(for: procedure, dependency)
         XCTAssertProcedureCancelledWithErrors(count: 1)
     }
@@ -38,7 +38,7 @@ class NoFailedDependenciesConditionTests: ProcedureKitTestCase {
 
         procedure.add(dependency: dependency1)
         procedure.add(dependency: dependency2)
-        procedure.attach(condition: NoFailedDependenciesCondition())
+        procedure.add(condition: NoFailedDependenciesCondition())
         wait(for: procedure, dependency1, dependency2)
         XCTAssertProcedureCancelledWithErrors(count: 1)
     }
@@ -46,7 +46,7 @@ class NoFailedDependenciesConditionTests: ProcedureKitTestCase {
     func test__procedure_with_errored_dependency_fails() {
         let dependency = TestProcedure(error: TestError())
         procedure.add(dependency: dependency)
-        procedure.attach(condition: NoFailedDependenciesCondition())
+        procedure.add(condition: NoFailedDependenciesCondition())
         wait(for: procedure, dependency)
         XCTAssertProcedureCancelledWithErrors(count: 1)
     }
@@ -54,7 +54,7 @@ class NoFailedDependenciesConditionTests: ProcedureKitTestCase {
     func test__procedure_with_group_dependency_with_errored_child_fails() {
         let dependency = GroupProcedure(operations: [TestProcedure(error: TestError())])
         procedure.add(dependency: dependency)
-        procedure.attach(condition: NoFailedDependenciesCondition())
+        procedure.add(condition: NoFailedDependenciesCondition())
         wait(for: procedure, dependency)
         XCTAssertProcedureCancelledWithErrors(count: 1)
     }
@@ -62,7 +62,7 @@ class NoFailedDependenciesConditionTests: ProcedureKitTestCase {
     func test__procedure_with_ignored_cancellations() {
         let dependency = createCancellingProcedure()
         procedure.add(dependency: dependency)
-        procedure.attach(condition: NoFailedDependenciesCondition(ignoreCancellations: true))
+        procedure.add(condition: NoFailedDependenciesCondition(ignoreCancellations: true))
         wait(for: procedure, dependency)
         XCTAssertProcedureCancelledWithoutErrors()
     }
@@ -78,7 +78,7 @@ class NoFailedDependenciesConditionTests: ProcedureKitTestCase {
         let dependency3 = TestProcedure()
         procedure.add(dependency: dependency3)
 
-        procedure.attach(condition: NoFailedDependenciesCondition(ignoreCancellations: true))
+        procedure.add(condition: NoFailedDependenciesCondition(ignoreCancellations: true))
         wait(for: procedure, dependency1, dependency2, dependency3)
         XCTAssertProcedureCancelledWithErrors(count: 1)
     }

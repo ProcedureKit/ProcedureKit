@@ -43,7 +43,7 @@ class ProcedureConditionStressTest: StressTestCase {
     func test__adding_many_conditions() {
 
         StressLevel.custom(1, 10_000).forEach { _, _ in
-            procedure.attach(condition: TrueCondition())
+            procedure.add(condition: TrueCondition())
         }
         wait(for: procedure, withTimeout: 10)
         XCTAssertProcedureFinishedWithoutErrors()
@@ -52,7 +52,7 @@ class ProcedureConditionStressTest: StressTestCase {
     func test__adding_many_conditions_each_with_single_dependency() {
 
         StressLevel.custom(1, 10_000).forEach { _, _ in
-            procedure.attach(condition: TestCondition(dependencies: [TestProcedure()]) { .satisfied })
+            procedure.add(condition: TestCondition(dependencies: [TestProcedure()]) { .satisfied })
         }
         wait(for: procedure, withTimeout: 10)
         XCTAssertProcedureFinishedWithoutErrors()
@@ -88,7 +88,7 @@ class ProcedureConditionsWillFinishObserverCancelThreadSafety: StressTestCase {
         stress { batch, iteration in
             batch.dispatchGroup.enter()
             let procedure = TestProcedure()
-            procedure.attach(condition: FalseCondition())
+            procedure.add(condition: FalseCondition())
             procedure.addDidFinishBlockObserver { _, _ in
                 batch.dispatchGroup.leave()
             }

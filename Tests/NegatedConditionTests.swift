@@ -11,19 +11,19 @@ import TestingProcedureKit
 class NegatedConditionTests: ProcedureKitTestCase {
 
     func test__procedure_with_negated_successful_condition_fails() {
-        procedure.attach(condition: NegatedCondition(TrueCondition()))
+        procedure.add(condition: NegatedCondition(TrueCondition()))
         wait(for: procedure)
         XCTAssertProcedureCancelledWithErrors(count: 1)
     }
 
     func test__procedure_with_negated_failed_condition_succeeds() {
-        procedure.attach(condition: NegatedCondition(FalseCondition()))
+        procedure.add(condition: NegatedCondition(FalseCondition()))
         wait(for: procedure)
         XCTAssertProcedureFinishedWithoutErrors()
     }
 
     func test__procedure_with_negated_ignored_condition_succeeds() {
-        procedure.attach(condition: NegatedCondition(IgnoredCondition(FalseCondition())))
+        procedure.add(condition: NegatedCondition(IgnoredCondition(FalseCondition())))
         wait(for: procedure)
         XCTAssertProcedureFinishedWithoutErrors()
     }

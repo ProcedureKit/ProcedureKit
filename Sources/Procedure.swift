@@ -580,9 +580,9 @@ public extension Procedure {
 
 // MARK: Conditions
 
-public extension Procedure {
+extension Procedure {
 
-    internal enum ConditionEvaluation {
+    enum ConditionEvaluation {
         case pending, satisfied, ignored
         case failed([Error])
 
@@ -612,7 +612,7 @@ public extension Procedure {
         }
     }
 
-    internal class EvaluateConditions: GroupProcedure {
+    class EvaluateConditions: GroupProcedure {
         var requirement: [Condition] = []
         var result: ConditionEvaluation = .pending
 
@@ -638,7 +638,7 @@ public extension Procedure {
         }
     }
 
-    internal func evaluateConditions() -> Procedure {
+    func evaluateConditions() -> Procedure {
 
         func createEvaluateConditionsProcedure() -> EvaluateConditions {
             // Set the procedure on each condition
@@ -675,24 +675,24 @@ public extension Procedure {
         return evaluator
     }
 
-    internal func add(dependencyOnPreviousMutuallyExclusiveProcedure procedure: Procedure) {
+    func add(dependencyOnPreviousMutuallyExclusiveProcedure procedure: Procedure) {
         precondition(state <= .executing, "Dependencies cannot be modified after execution has begun, current state: \(state).")
         super.addDependency(procedure)
     }
 
-    internal func add(directDependency: Operation) {
+    func add(directDependency: Operation) {
         precondition(state <= .executing, "Dependencies cannot be modified after execution has begun, current state: \(state).")
         directDependencies.insert(directDependency)
         super.addDependency(directDependency)
     }
 
-    internal func remove(directDependency: Operation) {
+    func remove(directDependency: Operation) {
         precondition(state <= .executing, "Dependencies cannot be modified after execution has begun, current state: \(state).")
         directDependencies.remove(directDependency)
         super.removeDependency(directDependency)
     }
 
-    final override var dependencies: [Operation] {
+    public final override var dependencies: [Operation] {
         return Array(directDependencies.union(indirectDependencies))
     }
 
@@ -705,7 +705,7 @@ public extension Procedure {
      to a queue, or is waiting on dependencies.
      - parameter operation: a `Operation` instance.
      */
-    final override func addDependency(_ operation: Operation) {
+    public final override func addDependency(_ operation: Operation) {
         precondition(state <= .executing, "Dependencies cannot be modified after execution has begun, current state: \(state).")
         add(directDependency: operation)
     }
@@ -720,7 +720,7 @@ public extension Procedure {
      to a queue, or is waiting on dependencies.
      - parameter operation: a `Operation` instance.
      */
-    final override func removeDependency(_ operation: Operation) {
+    public final override func removeDependency(_ operation: Operation) {
         precondition(state <= .executing, "Dependencies cannot be modified after execution has begun, current state: \(state).")
         remove(directDependency: operation)
     }
@@ -730,7 +730,7 @@ public extension Procedure {
 
      - parameter condition: a `Condition` which must be satisfied for the procedure to be executed.
      */
-    func attach(condition: Condition) {
+    public func add(condition: Condition) {
         assert(state < .executing, "Cannot modify conditions after operation has begun executing, current state: \(state).")
         conditions.insert(condition)
     }
