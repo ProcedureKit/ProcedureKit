@@ -68,15 +68,15 @@ public class TestableCapability: CapabilityProtocol {
 open class TestableCapabilityTestCase: ProcedureKitTestCase {
 
     public var capability: TestableCapability!
-    public var getAuthorizationStatus: GetAuthorizationStatus<TestableCapability.Status>!
-    public var authorize: Authorize<TestableCapability.Status>!
+    public var getAuthorizationStatus: GetAuthorizationStatusProcedure<TestableCapability.Status>!
+    public var authorize: AuthorizeCapabilityProcedure<TestableCapability.Status>!
     public var authorizedFor: AuthorizedFor<TestableCapability.Status>!
 
     open override func setUp() {
         super.setUp()
         capability = TestableCapability()
-        getAuthorizationStatus = GetAuthorizationStatus(capability)
-        authorize = Authorize(capability)
+        getAuthorizationStatus = GetAuthorizationStatusProcedure(capability)
+        authorize = AuthorizeCapabilityProcedure(capability)
         authorizedFor = AuthorizedFor(capability)
         procedure.attach(condition: authorizedFor)
     }
