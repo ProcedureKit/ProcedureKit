@@ -23,9 +23,9 @@ extension CLAuthorizationStatus: AuthorizationStatus {
     }
 }
 
-extension Capability {
+public extension Capability {
 
-    public class Location: CapabilityProtocol {
+    class Location: CapabilityProtocol {
 
         public private(set) var requirement: LocationUsage?
 
