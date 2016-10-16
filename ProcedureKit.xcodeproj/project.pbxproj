@@ -80,6 +80,10 @@
 		6593008E1DA8E32D00750212 /* FilterProcedureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6593008D1DA8E32D00750212 /* FilterProcedureTests.swift */; };
 		65931A541DAFEDC00067B0A4 /* Any.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65931A531DAFEDC00067B0A4 /* Any.swift */; };
 		65931A561DAFF3E20067B0A4 /* AnyProcedureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65931A551DAFF3E20067B0A4 /* AnyProcedureTests.swift */; };
+		65931A5E1DB193B30067B0A4 /* CloudKitCapability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65931A5D1DB193B30067B0A4 /* CloudKitCapability.swift */; };
+		65931A601DB2640C0067B0A4 /* CloudKitSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65931A5F1DB2640C0067B0A4 /* CloudKitSupport.swift */; };
+		65931A621DB3B2580067B0A4 /* CloudKitCapabilityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65931A611DB3B2580067B0A4 /* CloudKitCapabilityTests.swift */; };
+		65931A641DB3B3C90067B0A4 /* TestableCloudKitContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65931A631DB3B3C90067B0A4 /* TestableCloudKitContainer.swift */; };
 		6594840E1DA98B8E0028F83B /* Reduce.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6594840D1DA98B8E0028F83B /* Reduce.swift */; };
 		659484101DA98E700028F83B /* ReduceProcedureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6594840F1DA98E700028F83B /* ReduceProcedureTests.swift */; };
 		659484121DA993DB0028F83B /* Map.swift in Sources */ = {isa = PBXBuildFile; fileRef = 659484111DA993DB0028F83B /* Map.swift */; };
@@ -376,6 +380,10 @@
 		6593008D1DA8E32D00750212 /* FilterProcedureTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = FilterProcedureTests.swift; path = Tests/FilterProcedureTests.swift; sourceTree = "<group>"; };
 		65931A531DAFEDC00067B0A4 /* Any.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Any.swift; path = Sources/Any.swift; sourceTree = "<group>"; };
 		65931A551DAFF3E20067B0A4 /* AnyProcedureTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AnyProcedureTests.swift; path = Tests/AnyProcedureTests.swift; sourceTree = "<group>"; };
+		65931A5D1DB193B30067B0A4 /* CloudKitCapability.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CloudKitCapability.swift; path = Sources/Cloud/CloudKitCapability.swift; sourceTree = SOURCE_ROOT; };
+		65931A5F1DB2640C0067B0A4 /* CloudKitSupport.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CloudKitSupport.swift; path = Sources/Cloud/CloudKitSupport.swift; sourceTree = SOURCE_ROOT; };
+		65931A611DB3B2580067B0A4 /* CloudKitCapabilityTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CloudKitCapabilityTests.swift; path = Tests/Cloud/CloudKitCapabilityTests.swift; sourceTree = SOURCE_ROOT; };
+		65931A631DB3B3C90067B0A4 /* TestableCloudKitContainer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TestableCloudKitContainer.swift; path = Tests/Cloud/TestableCloudKitContainer.swift; sourceTree = SOURCE_ROOT; };
 		6594840D1DA98B8E0028F83B /* Reduce.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Reduce.swift; path = Sources/Reduce.swift; sourceTree = "<group>"; };
 		6594840F1DA98E700028F83B /* ReduceProcedureTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ReduceProcedureTests.swift; path = Tests/ReduceProcedureTests.swift; sourceTree = "<group>"; };
 		659484111DA993DB0028F83B /* Map.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Map.swift; path = Sources/Map.swift; sourceTree = "<group>"; };
@@ -698,6 +706,8 @@
 		653CA05B1D60AA990070B7A2 /* Cloud */ = {
 			isa = PBXGroup;
 			children = (
+				65931A5D1DB193B30067B0A4 /* CloudKitCapability.swift */,
+				65931A5F1DB2640C0067B0A4 /* CloudKitSupport.swift */,
 			);
 			name = Cloud;
 			path = ProcedureKitCloud;
@@ -706,7 +716,9 @@
 		653CA0661D60AA990070B7A2 /* Cloud Tests */ = {
 			isa = PBXGroup;
 			children = (
+				65931A611DB3B2580067B0A4 /* CloudKitCapabilityTests.swift */,
 				653CA0711D60AAFE0070B7A2 /* ProcedureKitCloudTests.swift */,
+				65931A631DB3B3C90067B0A4 /* TestableCloudKitContainer.swift */,
 			);
 			name = "Cloud Tests";
 			path = ProcedureKitCloudTests;
@@ -1237,6 +1249,7 @@
 					};
 					653CA0591D60AA990070B7A2 = {
 						CreatedOnToolsVersion = 8.0;
+						LastSwiftMigration = 0800;
 						ProvisioningStyle = Automatic;
 					};
 					653CA0611D60AA990070B7A2 = {
@@ -1485,6 +1498,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				65931A601DB2640C0067B0A4 /* CloudKitSupport.swift in Sources */,
+				65931A5E1DB193B30067B0A4 /* CloudKitCapability.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1492,6 +1507,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				65931A641DB3B3C90067B0A4 /* TestableCloudKitContainer.swift in Sources */,
+				65931A621DB3B2580067B0A4 /* CloudKitCapabilityTests.swift in Sources */,
 				653CA0721D60AAFE0070B7A2 /* ProcedureKitCloudTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -2445,6 +2462,7 @@
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = "";
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
@@ -2466,6 +2484,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				MTL_ENABLE_DEBUG_INFO = YES;
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
@@ -2503,6 +2522,7 @@
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = "";
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
@@ -2518,6 +2538,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SKIP_INSTALL = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
