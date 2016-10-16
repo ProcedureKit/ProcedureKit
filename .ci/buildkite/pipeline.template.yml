@@ -45,12 +45,12 @@ steps:
     agents:
       iOS-Simulator: true    
       xcode: "$XCODE"
-#  -
-#    name: "Cloud (iOS)"
-#    command: "source /usr/local/opt/chruby/share/chruby/chruby.sh && chruby ruby && bundle install --quiet && bundle exec fastlane ios test_cloud_ios"
-#    agents:
-#      iOS-Simulator: true    
-#      xcode: "$XCODE"      
+  -
+    name: "Cloud (iOS)"
+    command: "source /usr/local/opt/chruby/share/chruby/chruby.sh && chruby ruby && bundle install --quiet && bundle exec fastlane ios test_cloud_ios"
+    agents:
+      iOS-Simulator: true    
+      xcode: "$XCODE"      
 #  -
 #    name: "ProcedureKit: tvOS"
 #    command: "source /usr/local/opt/chruby/share/chruby/chruby.sh && chruby ruby && bundle install --quiet && bundle exec fastlane ios test_tvos"
@@ -69,9 +69,9 @@ steps:
     agents:
       iOS-Simulator: true    
       xcode: "$XCODE"
-#  -
-#    name: "Cloud: tvOS"
-#    command: "source /usr/local/opt/chruby/share/chruby/chruby.sh && chruby ruby && bundle install --quiet && bundle exec fastlane ios test_cloud_tvos"
-#    agents:
-#      iOS-Simulator: true    
-#      xcode: "$XCODE"
+  -
+    name: "Cloud: tvOS"
+    command: "source /usr/local/opt/chruby/share/chruby/chruby.sh && chruby ruby && bundle install --quiet && bundle exec fastlane ios test_cloud_tvos"
+    agents:
+      iOS-Simulator: true    
+      xcode: "$XCODE"
