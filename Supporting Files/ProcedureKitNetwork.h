@@ -1,12 +1,10 @@
 //
-//  ProcedureKitNetwork.h
-//  ProcedureKitNetwork
+//  ProcedureKit
 //
-//  Created by Daniel Thorpe on 17/10/2016.
 //  Copyright © 2016 ProcedureKit. All rights reserved.
 //
 
-#import <Cocoa/Cocoa.h>
+@import Foundation;
 
 //! Project version number for ProcedureKitNetwork.
 FOUNDATION_EXPORT double ProcedureKitNetworkVersionNumber;
