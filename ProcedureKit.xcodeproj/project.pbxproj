@@ -130,6 +130,7 @@
 		65CFC6231D60911C00CAD875 /* TestingProcedureKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65CFC6161D60900000CAD875 /* TestingProcedureKit.framework */; };
 		65CFC6261D60912900CAD875 /* ProcedureKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65CFC5F01D608A5500CAD875 /* ProcedureKit.framework */; };
 		65DA49311D8142BE00D4E1AA /* MutualExclusion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65DA49301D8142BE00D4E1AA /* MutualExclusion.swift */; };
+		65DFA4851DB514DD009358CE /* URLTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65DFA4841DB514DD009358CE /* URLTests.swift */; };
 		65EAC0121D8CA39F000E4A42 /* TimeoutObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65EAC0111D8CA39F000E4A42 /* TimeoutObserver.swift */; };
 		65EAC0161D8CA78F000E4A42 /* TimeoutObserverTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65EAC0151D8CA78F000E4A42 /* TimeoutObserverTests.swift */; };
 		65ECB2D61DB4F0C000F96F46 /* ProcedureKitNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65ECB2CD1DB4F0C000F96F46 /* ProcedureKitNetwork.framework */; };
@@ -489,6 +490,7 @@
 		65CFC61E1D60904700CAD875 /* TestingProcedureKit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TestingProcedureKit.h; path = "Supporting Files/TestingProcedureKit.h"; sourceTree = "<group>"; };
 		65CFC6201D60905000CAD875 /* TestingProcedureKit.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = TestingProcedureKit.xcconfig; path = "Supporting Files/TestingProcedureKit.xcconfig"; sourceTree = "<group>"; };
 		65DA49301D8142BE00D4E1AA /* MutualExclusion.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = MutualExclusion.swift; path = Sources/MutualExclusion.swift; sourceTree = "<group>"; };
+		65DFA4841DB514DD009358CE /* URLTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = URLTests.swift; sourceTree = "<group>"; };
 		65EAC0111D8CA39F000E4A42 /* TimeoutObserver.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TimeoutObserver.swift; path = Sources/TimeoutObserver.swift; sourceTree = "<group>"; };
 		65EAC0151D8CA78F000E4A42 /* TimeoutObserverTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TimeoutObserverTests.swift; path = Tests/TimeoutObserverTests.swift; sourceTree = "<group>"; };
 		65ECB2CD1DB4F0C000F96F46 /* ProcedureKitNetwork.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ProcedureKitNetwork.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -973,6 +975,7 @@
 				65ECB2E61DB4F16E00F96F46 /* ProcedureKitNetworkTests.swift */,
 				65ECB2F31DB5097500F96F46 /* NetworkDataProcedureTests.swift */,
 				65ECB2F51DB509BA00F96F46 /* TestableNetwork.swift */,
+				65DFA4841DB514DD009358CE /* URLTests.swift */,
 			);
 			name = "Network Tests";
 			path = Tests/Network;
@@ -1815,6 +1818,7 @@
 				65ECB2F41DB5097500F96F46 /* NetworkDataProcedureTests.swift in Sources */,
 				65ECB2F61DB509BA00F96F46 /* TestableNetwork.swift in Sources */,
 				65ECB2E71DB4F16E00F96F46 /* ProcedureKitNetworkTests.swift in Sources */,
+				65DFA4851DB514DD009358CE /* URLTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3722,6 +3726,7 @@
 				65ECB2E01DB4F0C000F96F46 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		65ECB2E11DB4F0C000F96F46 /* Build configuration list for PBXNativeTarget "ProcedureKitNetworkTests" */ = {
 			isa = XCConfigurationList;
@@ -3730,6 +3735,7 @@
 				65ECB2E31DB4F0C000F96F46 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
