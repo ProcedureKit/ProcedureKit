@@ -8,25 +8,30 @@ steps:
     agents:
       xcode: "$XCODE"    
   -
-    name: "ProcedureKit (macOS)"
+    name: "ProcedureKit"
     command: "source /usr/local/opt/chruby/share/chruby/chruby.sh && chruby ruby && bundle install --quiet && bundle exec fastlane mac test"
+    agents:
+      xcode: "$XCODE"
+  -
+    name: "Network"
+    command: "source /usr/local/opt/chruby/share/chruby/chruby.sh && chruby ruby && bundle install --quiet && bundle exec fastlane mac test_network"
+    agents:
+      xcode: "$XCODE"            
+  -
+    name: "Location"
+    command: "source /usr/local/opt/chruby/share/chruby/chruby.sh && chruby ruby && bundle install --quiet && bundle exec fastlane mac test_location"
+    agents:
+      xcode: "$XCODE"      
+  -
+    name: "Cloud"
+    command: "source /usr/local/opt/chruby/share/chruby/chruby.sh && chruby ruby && bundle install --quiet && bundle exec fastlane mac test_cloud"
     agents:
       xcode: "$XCODE"
   -
     name: "Mac"
     command: "source /usr/local/opt/chruby/share/chruby/chruby.sh && chruby ruby && bundle install --quiet && bundle exec fastlane mac test_mac"
     agents:
-      xcode: "$XCODE"
-  -
-    name: "Location (macOS)"
-    command: "source /usr/local/opt/chruby/share/chruby/chruby.sh && chruby ruby && bundle install --quiet && bundle exec fastlane mac test_location_mac"
-    agents:
       xcode: "$XCODE"      
-  -
-    name: "Cloud (macOS)"
-    command: "source /usr/local/opt/chruby/share/chruby/chruby.sh && chruby ruby && bundle install --quiet && bundle exec fastlane mac test_cloud"
-    agents:
-      xcode: "$XCODE"
 #  -
 #    name: "ProcedureKit (iOS)"
 #    command: "source /usr/local/opt/chruby/share/chruby/chruby.sh && chruby ruby && bundle install --quiet && bundle exec fastlane ios test_ios"
@@ -34,8 +39,8 @@ steps:
 #      iOS-Simulator: true
 #      xcode: "$XCODE"
   -
-    name: "Mobile (iOS)"
-    command: "source /usr/local/opt/chruby/share/chruby/chruby.sh && chruby ruby && bundle install --quiet && bundle exec fastlane ios test_mobile_ios"
+    name: "Network (iOS)"
+    command: "source /usr/local/opt/chruby/share/chruby/chruby.sh && chruby ruby && bundle install --quiet && bundle exec fastlane ios test_network_ios"
     agents:
       iOS-Simulator: true    
       xcode: "$XCODE"
@@ -51,6 +56,12 @@ steps:
     agents:
       iOS-Simulator: true    
       xcode: "$XCODE"      
+  -
+    name: "Mobile (iOS)"
+    command: "source /usr/local/opt/chruby/share/chruby/chruby.sh && chruby ruby && bundle install --quiet && bundle exec fastlane ios test_mobile_ios"
+    agents:
+      iOS-Simulator: true    
+      xcode: "$XCODE"      
 #  -
 #    name: "ProcedureKit: tvOS"
 #    command: "source /usr/local/opt/chruby/share/chruby/chruby.sh && chruby ruby && bundle install --quiet && bundle exec fastlane ios test_tvos"
@@ -63,6 +74,12 @@ steps:
 #    agents:
 #      iOS-Simulator: true    
 #      xcode: "$XCODE"
+  -
+    name: "Network (tvOS)"
+    command: "source /usr/local/opt/chruby/share/chruby/chruby.sh && chruby ruby && bundle install --quiet && bundle exec fastlane ios test_network_tvos"
+    agents:
+      iOS-Simulator: true    
+      xcode: "$XCODE"
   -
     name: "Location (tvOS)"
     command: "source /usr/local/opt/chruby/share/chruby/chruby.sh && chruby ruby && bundle install --quiet && bundle exec fastlane ios test_location_tvos"
