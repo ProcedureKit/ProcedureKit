@@ -66,6 +66,25 @@ platform :ios do
     )
   end
 
+  desc "ProcedureKitNetwork: iOS"
+  lane :test_network_ios do
+
+    scan(
+      project: "ProcedureKit.xcodeproj",
+      scheme: "ProcedureKitNetwork",
+      destination: "platform=iOS Simulator,OS=10.0,name=iPhone 6s"
+    )
+  end
+
+  desc "ProcedureKitNetwork: tvOS"
+  lane :test_network_tvos do
+
+    scan(
+      project: "ProcedureKit.xcodeproj",
+      scheme: "ProcedureKitNetwork",
+      destination: "platform=tvOS Simulator,OS=10.0,name=Apple TV 1080p"
+    )
+  end
 
   desc "ProcedureKitCloud: iOS"
   lane :test_cloud_ios do
@@ -162,7 +181,7 @@ platform :mac do
   end
 
   desc "ProcedureKitLocation: macOS"
-  lane :test_location_mac do
+  lane :test_location do
 
     scan(
       project: "ProcedureKit.xcodeproj",
@@ -181,5 +200,15 @@ platform :mac do
     )
   end
 
+
+  desc "ProcedureKitNetwork: macOS"
+  lane :test_network do
+
+    scan(
+      project: "ProcedureKit.xcodeproj",
+      scheme: "ProcedureKitNetwork",
+      destination: "platform=OS X"
+    )
+  end
   
 end
