@@ -6,6 +6,7 @@ steps:
     name: "Stress Test"
     command: "source /usr/local/opt/chruby/share/chruby/chruby.sh && chruby ruby && bundle install --quiet && bundle exec fastlane mac stress_test"
     agents:
+      iOS-Simulator: false
       xcode: "$XCODE"    
   -
     name: "ProcedureKit"
