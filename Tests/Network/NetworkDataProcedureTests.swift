@@ -18,10 +18,16 @@ class NetworkDataProcedureTests: ProcedureKitTestCase {
 
     override func setUp() {
         super.setUp()
-        url = URL(string: "http://sky.com")
+        url = URL(string: "http://procedure.kit.run")
         request = URLRequest(url: url)
         session = TestableURLSessionTaskFactory()
         download = NetworkDataProcedure(session: session, request: request) { _, _ in }
+    }
+
+    func test__session_receives_request() {
+        wait(for: download)
+        XCTAssertProcedureFinishedWithoutErrors(download)
+        XCTAssertEqual(session.didReceiveDataRequest?.url, url)
     }
 
     func test__session_creates_data_task() {
