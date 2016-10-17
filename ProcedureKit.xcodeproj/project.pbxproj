@@ -130,12 +130,22 @@
 		65CFC6231D60911C00CAD875 /* TestingProcedureKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65CFC6161D60900000CAD875 /* TestingProcedureKit.framework */; };
 		65CFC6261D60912900CAD875 /* ProcedureKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65CFC5F01D608A5500CAD875 /* ProcedureKit.framework */; };
 		65DA49311D8142BE00D4E1AA /* MutualExclusion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65DA49301D8142BE00D4E1AA /* MutualExclusion.swift */; };
+		65DFA4851DB514DD009358CE /* URLTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65DFA4841DB514DD009358CE /* URLTests.swift */; };
 		65EAC0121D8CA39F000E4A42 /* TimeoutObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65EAC0111D8CA39F000E4A42 /* TimeoutObserver.swift */; };
 		65EAC0161D8CA78F000E4A42 /* TimeoutObserverTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65EAC0151D8CA78F000E4A42 /* TimeoutObserverTests.swift */; };
 		65ECB2D61DB4F0C000F96F46 /* ProcedureKitNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65ECB2CD1DB4F0C000F96F46 /* ProcedureKitNetwork.framework */; };
 		65ECB2E71DB4F16E00F96F46 /* ProcedureKitNetworkTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65ECB2E61DB4F16E00F96F46 /* ProcedureKitNetworkTests.swift */; };
 		65ECB2EA1DB4F1A200F96F46 /* ProcedureKitNetwork.h in Headers */ = {isa = PBXBuildFile; fileRef = 65ECB2E81DB4F1A200F96F46 /* ProcedureKitNetwork.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		65ECB2EC1DB4F27700F96F46 /* TestingProcedureKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65CFC6161D60900000CAD875 /* TestingProcedureKit.framework */; };
+		65ECB2EE1DB4FDE000F96F46 /* NetworkData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65ECB2ED1DB4FDE000F96F46 /* NetworkData.swift */; };
+		65ECB2F01DB4FE9900F96F46 /* NetworkSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65ECB2EF1DB4FE9900F96F46 /* NetworkSupport.swift */; };
+		65ECB2F41DB5097500F96F46 /* NetworkDataProcedureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65ECB2F31DB5097500F96F46 /* NetworkDataProcedureTests.swift */; };
+		65ECB2F61DB509BA00F96F46 /* TestableNetwork.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65ECB2F51DB509BA00F96F46 /* TestableNetwork.swift */; };
+		65ECB2F91DB50B8B00F96F46 /* ProcedureKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65CFC5F01D608A5500CAD875 /* ProcedureKit.framework */; };
+		65ECB2FD1DB50BC500F96F46 /* ProcedureKit.framework in Copy Dependencies */ = {isa = PBXBuildFile; fileRef = 65CFC5F01D608A5500CAD875 /* ProcedureKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		65ECB2FE1DB50BC500F96F46 /* TestingProcedureKit.framework in Copy Dependencies */ = {isa = PBXBuildFile; fileRef = 65CFC6161D60900000CAD875 /* TestingProcedureKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		65ECB3001DB50BD900F96F46 /* ProcedureKit.framework in Copy Dependencies */ = {isa = PBXBuildFile; fileRef = 65CFC5F01D608A5500CAD875 /* ProcedureKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		65ECB3011DB50BD900F96F46 /* TestingProcedureKit.framework in Copy Dependencies */ = {isa = PBXBuildFile; fileRef = 65CFC6161D60900000CAD875 /* TestingProcedureKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -279,6 +289,20 @@
 			remoteGlobalIDString = 65ECB2CC1DB4F0C000F96F46;
 			remoteInfo = ProcedureKitNetwork;
 		};
+		65ECB2F71DB50B7300F96F46 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 65CFC5E51D608A1A00CAD875 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 65CFC6151D60900000CAD875;
+			remoteInfo = TestingProcedureKit;
+		};
+		65ECB2FA1DB50B8F00F96F46 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 65CFC5E51D608A1A00CAD875 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 65CFC5EF1D608A5500CAD875;
+			remoteInfo = ProcedureKit;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -311,6 +335,30 @@
 			files = (
 				65A72C2A1DA7F37C008597CA /* ProcedureKit.framework in Copy Dependencies */,
 				65A72C2B1DA7F37C008597CA /* TestingProcedureKit.framework in Copy Dependencies */,
+			);
+			name = "Copy Dependencies";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		65ECB2FC1DB50BB500F96F46 /* Copy Dependencies */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				65ECB2FD1DB50BC500F96F46 /* ProcedureKit.framework in Copy Dependencies */,
+				65ECB2FE1DB50BC500F96F46 /* TestingProcedureKit.framework in Copy Dependencies */,
+			);
+			name = "Copy Dependencies";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		65ECB2FF1DB50BCF00F96F46 /* Copy Dependencies */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				65ECB3001DB50BD900F96F46 /* ProcedureKit.framework in Copy Dependencies */,
+				65ECB3011DB50BD900F96F46 /* TestingProcedureKit.framework in Copy Dependencies */,
 			);
 			name = "Copy Dependencies";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -442,6 +490,7 @@
 		65CFC61E1D60904700CAD875 /* TestingProcedureKit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TestingProcedureKit.h; path = "Supporting Files/TestingProcedureKit.h"; sourceTree = "<group>"; };
 		65CFC6201D60905000CAD875 /* TestingProcedureKit.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = TestingProcedureKit.xcconfig; path = "Supporting Files/TestingProcedureKit.xcconfig"; sourceTree = "<group>"; };
 		65DA49301D8142BE00D4E1AA /* MutualExclusion.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = MutualExclusion.swift; path = Sources/MutualExclusion.swift; sourceTree = "<group>"; };
+		65DFA4841DB514DD009358CE /* URLTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = URLTests.swift; sourceTree = "<group>"; };
 		65EAC0111D8CA39F000E4A42 /* TimeoutObserver.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TimeoutObserver.swift; path = Sources/TimeoutObserver.swift; sourceTree = "<group>"; };
 		65EAC0151D8CA78F000E4A42 /* TimeoutObserverTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TimeoutObserverTests.swift; path = Tests/TimeoutObserverTests.swift; sourceTree = "<group>"; };
 		65ECB2CD1DB4F0C000F96F46 /* ProcedureKitNetwork.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ProcedureKitNetwork.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -449,6 +498,10 @@
 		65ECB2E61DB4F16E00F96F46 /* ProcedureKitNetworkTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProcedureKitNetworkTests.swift; sourceTree = "<group>"; };
 		65ECB2E81DB4F1A200F96F46 /* ProcedureKitNetwork.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ProcedureKitNetwork.h; path = "Supporting Files/ProcedureKitNetwork.h"; sourceTree = "<group>"; };
 		65ECB2E91DB4F1A200F96F46 /* ProcedureKitNetwork.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = ProcedureKitNetwork.xcconfig; path = "Supporting Files/ProcedureKitNetwork.xcconfig"; sourceTree = "<group>"; };
+		65ECB2ED1DB4FDE000F96F46 /* NetworkData.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkData.swift; sourceTree = "<group>"; };
+		65ECB2EF1DB4FE9900F96F46 /* NetworkSupport.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkSupport.swift; sourceTree = "<group>"; };
+		65ECB2F31DB5097500F96F46 /* NetworkDataProcedureTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkDataProcedureTests.swift; sourceTree = "<group>"; };
+		65ECB2F51DB509BA00F96F46 /* TestableNetwork.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestableNetwork.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -572,6 +625,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				65ECB2F91DB50B8B00F96F46 /* ProcedureKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -908,6 +962,8 @@
 		65ECB2E41DB4F16200F96F46 /* Network */ = {
 			isa = PBXGroup;
 			children = (
+				65ECB2ED1DB4FDE000F96F46 /* NetworkData.swift */,
+				65ECB2EF1DB4FE9900F96F46 /* NetworkSupport.swift */,
 			);
 			name = Network;
 			path = Sources/Network;
@@ -917,6 +973,9 @@
 			isa = PBXGroup;
 			children = (
 				65ECB2E61DB4F16E00F96F46 /* ProcedureKitNetworkTests.swift */,
+				65ECB2F31DB5097500F96F46 /* NetworkDataProcedureTests.swift */,
+				65ECB2F51DB509BA00F96F46 /* TestableNetwork.swift */,
+				65DFA4841DB514DD009358CE /* URLTests.swift */,
 			);
 			name = "Network Tests";
 			path = Tests/Network;
@@ -1151,6 +1210,7 @@
 				653CA05E1D60AA990070B7A2 /* Sources */,
 				653CA05F1D60AA990070B7A2 /* Frameworks */,
 				653CA0601D60AA990070B7A2 /* Resources */,
+				65ECB2FF1DB50BCF00F96F46 /* Copy Dependencies */,
 			);
 			buildRules = (
 			);
@@ -1272,6 +1332,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				65ECB2FB1DB50B8F00F96F46 /* PBXTargetDependency */,
 			);
 			name = ProcedureKitNetwork;
 			productName = ProcedureKitNetwork;
@@ -1285,10 +1346,12 @@
 				65ECB2D11DB4F0C000F96F46 /* Sources */,
 				65ECB2D21DB4F0C000F96F46 /* Frameworks */,
 				65ECB2D31DB4F0C000F96F46 /* Resources */,
+				65ECB2FC1DB50BB500F96F46 /* Copy Dependencies */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				65ECB2F81DB50B7300F96F46 /* PBXTargetDependency */,
 				65ECB2D81DB4F0C000F96F46 /* PBXTargetDependency */,
 			);
 			name = ProcedureKitNetworkTests;
@@ -1370,6 +1433,7 @@
 					};
 					65ECB2CC1DB4F0C000F96F46 = {
 						CreatedOnToolsVersion = 8.0;
+						LastSwiftMigration = 0800;
 						ProvisioningStyle = Automatic;
 					};
 					65ECB2D41DB4F0C000F96F46 = {
@@ -1742,6 +1806,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				65ECB2F01DB4FE9900F96F46 /* NetworkSupport.swift in Sources */,
+				65ECB2EE1DB4FDE000F96F46 /* NetworkData.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1749,7 +1815,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				65ECB2F41DB5097500F96F46 /* NetworkDataProcedureTests.swift in Sources */,
+				65ECB2F61DB509BA00F96F46 /* TestableNetwork.swift in Sources */,
 				65ECB2E71DB4F16E00F96F46 /* ProcedureKitNetworkTests.swift in Sources */,
+				65DFA4851DB514DD009358CE /* URLTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1855,6 +1924,16 @@
 			isa = PBXTargetDependency;
 			target = 65ECB2CC1DB4F0C000F96F46 /* ProcedureKitNetwork */;
 			targetProxy = 65ECB2D71DB4F0C000F96F46 /* PBXContainerItemProxy */;
+		};
+		65ECB2F81DB50B7300F96F46 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 65CFC6151D60900000CAD875 /* TestingProcedureKit */;
+			targetProxy = 65ECB2F71DB50B7300F96F46 /* PBXContainerItemProxy */;
+		};
+		65ECB2FB1DB50B8F00F96F46 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 65CFC5EF1D608A5500CAD875 /* ProcedureKit */;
+			targetProxy = 65ECB2FA1DB50B8F00F96F46 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -3326,6 +3405,7 @@
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -3347,6 +3427,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				MTL_ENABLE_DEBUG_INFO = YES;
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
@@ -3383,6 +3464,7 @@
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -3398,6 +3480,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SKIP_INSTALL = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
@@ -3411,6 +3494,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 65ECB2E91DB4F1A200F96F46 /* ProcedureKitNetwork.xcconfig */;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
@@ -3459,6 +3543,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 65ECB2E91DB4F1A200F96F46 /* ProcedureKitNetwork.xcconfig */;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
@@ -3641,6 +3726,7 @@
 				65ECB2E01DB4F0C000F96F46 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		65ECB2E11DB4F0C000F96F46 /* Build configuration list for PBXNativeTarget "ProcedureKitNetworkTests" */ = {
 			isa = XCConfigurationList;
@@ -3649,6 +3735,7 @@
 				65ECB2E31DB4F0C000F96F46 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

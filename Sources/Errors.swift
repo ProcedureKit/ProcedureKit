@@ -49,6 +49,8 @@ public struct ProcedureKitError: Error, Equatable {
         case capability(CapabilityError)
     }
 
+    public static let unknown = ProcedureKitError(context: .unknown, errors: [])
+
     public static func programmingError(reason: String) -> ProcedureKitError {
         return ProcedureKitError(context: .programmingError(reason), errors: [])
     }
