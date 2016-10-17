@@ -131,6 +131,7 @@
 		65CFC6261D60912900CAD875 /* ProcedureKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65CFC5F01D608A5500CAD875 /* ProcedureKit.framework */; };
 		65DA49311D8142BE00D4E1AA /* MutualExclusion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65DA49301D8142BE00D4E1AA /* MutualExclusion.swift */; };
 		65DFA4851DB514DD009358CE /* URLTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65DFA4841DB514DD009358CE /* URLTests.swift */; };
+		65DFA4871DB51F60009358CE /* TestableNetwork.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65DFA4861DB51F60009358CE /* TestableNetwork.swift */; };
 		65EAC0121D8CA39F000E4A42 /* TimeoutObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65EAC0111D8CA39F000E4A42 /* TimeoutObserver.swift */; };
 		65EAC0161D8CA78F000E4A42 /* TimeoutObserverTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65EAC0151D8CA78F000E4A42 /* TimeoutObserverTests.swift */; };
 		65ECB2D61DB4F0C000F96F46 /* ProcedureKitNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65ECB2CD1DB4F0C000F96F46 /* ProcedureKitNetwork.framework */; };
@@ -140,7 +141,6 @@
 		65ECB2EE1DB4FDE000F96F46 /* NetworkData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65ECB2ED1DB4FDE000F96F46 /* NetworkData.swift */; };
 		65ECB2F01DB4FE9900F96F46 /* NetworkSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65ECB2EF1DB4FE9900F96F46 /* NetworkSupport.swift */; };
 		65ECB2F41DB5097500F96F46 /* NetworkDataProcedureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65ECB2F31DB5097500F96F46 /* NetworkDataProcedureTests.swift */; };
-		65ECB2F61DB509BA00F96F46 /* TestableNetwork.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65ECB2F51DB509BA00F96F46 /* TestableNetwork.swift */; };
 		65ECB2F91DB50B8B00F96F46 /* ProcedureKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65CFC5F01D608A5500CAD875 /* ProcedureKit.framework */; };
 		65ECB2FD1DB50BC500F96F46 /* ProcedureKit.framework in Copy Dependencies */ = {isa = PBXBuildFile; fileRef = 65CFC5F01D608A5500CAD875 /* ProcedureKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		65ECB2FE1DB50BC500F96F46 /* TestingProcedureKit.framework in Copy Dependencies */ = {isa = PBXBuildFile; fileRef = 65CFC6161D60900000CAD875 /* TestingProcedureKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -491,6 +491,7 @@
 		65CFC6201D60905000CAD875 /* TestingProcedureKit.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = TestingProcedureKit.xcconfig; path = "Supporting Files/TestingProcedureKit.xcconfig"; sourceTree = "<group>"; };
 		65DA49301D8142BE00D4E1AA /* MutualExclusion.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = MutualExclusion.swift; path = Sources/MutualExclusion.swift; sourceTree = "<group>"; };
 		65DFA4841DB514DD009358CE /* URLTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = URLTests.swift; sourceTree = "<group>"; };
+		65DFA4861DB51F60009358CE /* TestableNetwork.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TestableNetwork.swift; path = Sources/Testing/TestableNetwork.swift; sourceTree = "<group>"; };
 		65EAC0111D8CA39F000E4A42 /* TimeoutObserver.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TimeoutObserver.swift; path = Sources/TimeoutObserver.swift; sourceTree = "<group>"; };
 		65EAC0151D8CA78F000E4A42 /* TimeoutObserverTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TimeoutObserverTests.swift; path = Tests/TimeoutObserverTests.swift; sourceTree = "<group>"; };
 		65ECB2CD1DB4F0C000F96F46 /* ProcedureKitNetwork.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ProcedureKitNetwork.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -501,7 +502,6 @@
 		65ECB2ED1DB4FDE000F96F46 /* NetworkData.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkData.swift; sourceTree = "<group>"; };
 		65ECB2EF1DB4FE9900F96F46 /* NetworkSupport.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkSupport.swift; sourceTree = "<group>"; };
 		65ECB2F31DB5097500F96F46 /* NetworkDataProcedureTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkDataProcedureTests.swift; sourceTree = "<group>"; };
-		65ECB2F51DB509BA00F96F46 /* TestableNetwork.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestableNetwork.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -718,6 +718,7 @@
 				65245D1A1D72129800340A2D /* QueueTestDelegate.swift */,
 				655594F21D9E48A200B08990 /* RepeatTestCase.swift */,
 				653644F71D7A194800C72F07 /* StressTestCase.swift */,
+				65DFA4861DB51F60009358CE /* TestableNetwork.swift */,
 				65403ABB1D7C6CBC00D6036B /* TestCondition.swift */,
 				659E5FF91D6E3B8D002B1D10 /* TestProcedure.swift */,
 				65403AB91D7C49C500D6036B /* XCTAsserts.swift */,
@@ -974,7 +975,6 @@
 			children = (
 				65ECB2E61DB4F16E00F96F46 /* ProcedureKitNetworkTests.swift */,
 				65ECB2F31DB5097500F96F46 /* NetworkDataProcedureTests.swift */,
-				65ECB2F51DB509BA00F96F46 /* TestableNetwork.swift */,
 				65DFA4841DB514DD009358CE /* URLTests.swift */,
 			);
 			name = "Network Tests";
@@ -1796,6 +1796,7 @@
 				65A63B171DA0536200E90B9D /* CapabilityTestCase.swift in Sources */,
 				65403ABA1D7C49C500D6036B /* XCTAsserts.swift in Sources */,
 				655594F31D9E48A200B08990 /* RepeatTestCase.swift in Sources */,
+				65DFA4871DB51F60009358CE /* TestableNetwork.swift in Sources */,
 				6591B3021D74980900C2B57F /* GroupTestCase.swift in Sources */,
 				653644F81D7A194800C72F07 /* StressTestCase.swift in Sources */,
 				65403ABC1D7C6CBC00D6036B /* TestCondition.swift in Sources */,
@@ -1816,7 +1817,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				65ECB2F41DB5097500F96F46 /* NetworkDataProcedureTests.swift in Sources */,
-				65ECB2F61DB509BA00F96F46 /* TestableNetwork.swift in Sources */,
 				65ECB2E71DB4F16E00F96F46 /* ProcedureKitNetworkTests.swift in Sources */,
 				65DFA4851DB514DD009358CE /* URLTests.swift in Sources */,
 			);

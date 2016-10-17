@@ -10,7 +10,6 @@ import ProcedureKit
 import TestingProcedureKit
 @testable import ProcedureKitLocation
 
-
 func createLocation(withAccuracy accuracy: CLLocationAccuracy = 10) -> CLLocation {
     return CLLocation(
         coordinate: CLLocationCoordinate2DMake(0.0, 0.0),
