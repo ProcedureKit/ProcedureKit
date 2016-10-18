@@ -63,7 +63,7 @@ public extension ProcedureProtocol where Self: ResultInjectionProtocol {
     }
 
     @discardableResult func injectResult<Dependency: ProcedureProtocol>(from dependency: Dependency) -> Self where Dependency: ResultInjectionProtocol, Dependency.Result == Requirement {
-        return injectResult(from: dependency, via: { return $0 })
+        return injectResult(from: dependency, via: { $0 })
     }
 
     @discardableResult func requireResult<Dependency: ProcedureProtocol>(from dependency: Dependency) -> Self where Dependency: ResultInjectionProtocol, Dependency.Result == Optional<Requirement> {
