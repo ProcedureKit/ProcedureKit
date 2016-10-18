@@ -70,7 +70,7 @@ open class ReverseGeocodeUserLocationProcedure: GroupProcedure, ResultInjectionP
 
         userLocation = UserLocationProcedure(timeout: timeout, accuracy: accuracy)
 
-        reverseGeocodeLocation = ReverseGeocodeProcedure(timeout: timeout).injectResultFrom(dependency: userLocation)
+        reverseGeocodeLocation = ReverseGeocodeProcedure(timeout: timeout).injectResult(from: userLocation)
 
         finishing.inject(dependency: userLocation) { procedure, userLocation, errors in
             guard let location = userLocation.location, errors.isEmpty else {
