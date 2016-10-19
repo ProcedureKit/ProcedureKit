@@ -34,6 +34,13 @@ public protocol OperationQueueDelegate: class {
     func operationQueue(_ queue: OperationQueue, didFinishOperation operation: Operation)
 }
 
+public extension OperationQueueDelegate {
+
+    func operationQueue(_ queue: OperationQueue, willAddOperation operation: Operation) { /* default no-op */ }
+
+    func operationQueue(_ queue: OperationQueue, willFinishOperation operation: Operation) { /* default no-op */ }
+}
+
 /**
  A protocol which the `OperationQueue`'s delegate must conform to. The delegate is informed
  when the queue is about to add an operation/procedure, and when they finish. Because it is a
@@ -77,6 +84,15 @@ public protocol ProcedureQueueDelegate: OperationQueueDelegate {
      - paramter operation: the `Operation` instance about to be added.
      */
     func procedureQueue(_ queue: ProcedureQueue, willProduceOperation operation: Operation)
+}
+
+public extension ProcedureQueueDelegate {
+
+    func procedureQueue(_ queue: ProcedureQueue, willAddOperation operation: Operation) { /* default no-op */ }
+
+    func procedureQueue(_ queue: ProcedureQueue, willFinishOperation operation: Operation, withErrors errors: [Error]) { /* default no-op */ }
+
+    func procedureQueue(_ queue: ProcedureQueue, willProduceOperation operation: Operation) { /* default no-op */ }
 }
 
 /**
@@ -150,7 +166,7 @@ open class ProcedureQueue: OperationQueue {
         /// Add an observer to invoke the will finish delegate method
         procedure.addWillFinishBlockObserver { [weak self] procedure, errors in
             if let queue = self {
-                self?.delegate?.procedureQueue(queue, willFinishOperation: procedure, withErrors: errors)
+                queue.delegate?.procedureQueue(queue, willFinishOperation: procedure, withErrors: errors)
             }
         }
 
