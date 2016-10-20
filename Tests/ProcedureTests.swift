@@ -105,3 +105,22 @@ class ProcedureTests: ProcedureKitTestCase {
     }
 }
 
+class DependencyTests: ProcedureKitTestCase {
+
+    func test__operation_added_using_then_follows_receiver() {
+        let another = TestProcedure()
+        let operations = procedure.then(do: another)
+        XCTAssertEqual(operations, [procedure, another])
+        wait(for: procedure, another)
+        XCTAssertLessThan(procedure.executedAt, another.executedAt)
+    }
+
+    func test__operation_added_using_then_via_closure_follows_receiver() {
+        let another = TestProcedure()
+        let operations = procedure.then { another }
+        XCTAssertEqual(operations, [procedure, another])
+        wait(for: procedure, another)
+        XCTAssertLessThan(procedure.executedAt, another.executedAt)
+    }
+
+}
