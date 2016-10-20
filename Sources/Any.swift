@@ -25,6 +25,7 @@ class AnyProcedureBox<Base: Procedure>: AnyProcedureBox_<Base.Requirement, Base.
     public init(underlyingQueue: DispatchQueue? = nil, base: Base) {
         self.base = base
         super.init(underlyingQueue: underlyingQueue, operations: [base])
+        log.enabled = false
     }
 }
 
@@ -45,5 +46,6 @@ public class AnyProcedure<Requirement, Result>: GroupProcedure, ResultInjectionP
     public init<Base>(underlyingQueue: DispatchQueue? = nil, _ base: Base) where Base: Procedure, Base: ResultInjectionProtocol, Result == Base.Result, Requirement == Base.Requirement {
         erased = AnyProcedureBox(underlyingQueue: underlyingQueue, base: base)
         super.init(underlyingQueue: erased.underlyingQueue, operations: [erased])
+        log.enabled = false
     }
 }
