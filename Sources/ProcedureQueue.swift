@@ -90,8 +90,6 @@ public extension ProcedureQueueDelegate {
 
     func procedureQueue(_ queue: ProcedureQueue, willAddOperation operation: Operation) { /* default no-op */ }
 
-    func procedureQueue(_ queue: ProcedureQueue, willFinishOperation operation: Operation, withErrors errors: [Error]) { /* default no-op */ }
-
     func procedureQueue(_ queue: ProcedureQueue, willProduceOperation operation: Operation) { /* default no-op */ }
 }
 

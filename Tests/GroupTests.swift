@@ -167,6 +167,11 @@ class GroupTests: GroupTestCase {
         XCTAssertTrue(group.isFinished)
     }
 
+    func test__group_cancel_with_errors_does_not_collect_errors_sent_to_children() {
+        check(procedure: group) { $0.cancel(withError: TestError()) }
+        XCTAssertProcedureCancelledWithErrors(group, count: 1)
+    }
+
     // MARK: - Finishing Tests
 
     func test__group_does_not_finish_before_all_children_finish() {

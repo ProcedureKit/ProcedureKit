@@ -46,8 +46,6 @@ class ReverseGeocodeUserLocationProcedureTests: LocationProcedureTestCase {
         manager.returnedLocation = nil
         let procedure = ReverseGeocodeUserLocationProcedure(timeout: 1).set(manager: manager).set(geocoder: geocoder)
         wait(for: procedure)
-        // There are actually 4 errors here, because the UserLocation fails with
-        // a timeout error, which then triggers cancellations
-        XCTAssertProcedureCancelledWithErrors(procedure, count: 4)
+        XCTAssertProcedureCancelledWithErrors(procedure, count: 1)
     }
 }

@@ -140,10 +140,6 @@ open class GroupProcedure: Procedure, ProcedureQueueDelegate {
 
     // MARK - OperationQueueDelegate
 
-    public func operationQueue(_ queue: OperationQueue, willAddOperation operation: Operation) { /* no op */ }
-
-    public func operationQueue(_ queue: OperationQueue, willFinishOperation operation: Operation) { /* no op */ }
-
     public func operationQueue(_ queue: OperationQueue, didFinishOperation operation: Operation) {
         guard queue === self.queue else { return }
 
@@ -224,6 +220,9 @@ open class GroupProcedure: Procedure, ProcedureQueueDelegate {
      */
     public func procedureQueue(_ queue: ProcedureQueue, willFinishOperation operation: Operation, withErrors errors: [Error]) {
         guard queue === self.queue else { return }
+
+        /// If the group is cancelled, exit early
+        guard !isCancelled else { return }
 
         /// If the operation is a Procedure.EvaluateConditions - exit early.
         if operation is Procedure.EvaluateConditions { return }
