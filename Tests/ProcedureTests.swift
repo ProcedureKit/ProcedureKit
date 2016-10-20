@@ -123,4 +123,62 @@ class DependencyTests: ProcedureKitTestCase {
         XCTAssertLessThan(procedure.executedAt, another.executedAt)
     }
 
+    func test__operation_added_using_then_via_closure_returning_nil() {
+        XCTAssertEqual(procedure.then { nil }, [procedure])
+    }
+
+    func test__operation_added_using_then_via_closure_throwing_error() {
+        do {
+            let _ = try procedure.then { throw TestError() }
+        }
+        catch is TestError { }
+        catch { XCTFail("Caught unexpected error.") }
+    }
+
+    func test__operation_added_to_array_using_then() {
+        let one = TestProcedure()
+        let two = TestProcedure(delay: 1)
+        let another = TestProcedure()
+        let all = [one, two, procedure].then(do: another)
+        XCTAssertEqual(all.count, 4)
+        wait(for: one, two, procedure, another)
+        XCTAssertProcedureFinishedWithoutErrors(another)
+        XCTAssertLessThan(one.executedAt, another.executedAt)
+        XCTAssertLessThan(two.executedAt, another.executedAt)
+        XCTAssertLessThan(procedure.executedAt, another.executedAt)
+    }
+
+    func test__operation_added_to_array_using_then_via_closure() {
+        let one = TestProcedure()
+        let two = TestProcedure(delay: 1)
+        let another = TestProcedure()
+        let all = [one, two, procedure].then { another }
+        XCTAssertEqual(all.count, 4)
+        wait(for: one, two, procedure, another)
+        XCTAssertProcedureFinishedWithoutErrors(another)
+        XCTAssertLessThan(one.executedAt, another.executedAt)
+        XCTAssertLessThan(two.executedAt, another.executedAt)
+        XCTAssertLessThan(procedure.executedAt, another.executedAt)
+    }
+
+    func test__operation_added_to_array_using_then_via_closure_throwing_error() {
+        let one = TestProcedure()
+        let two = TestProcedure(delay: 1)
+        do {
+            let _ = try [one, two, procedure].then { throw TestError() }
+        }
+        catch is TestError { }
+        catch { XCTFail("Caught unexpected error.") }
+    }
+
+    func test__operation_added_to_array_using_then_via_closure_returning_nil() {
+        let one = TestProcedure()
+        let two = TestProcedure(delay: 1)
+        let all = [one, two, procedure].then { nil }
+        XCTAssertEqual(all.count, 3)
+    }
 }
+
+
+
+

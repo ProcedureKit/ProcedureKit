@@ -37,4 +37,42 @@ extension Collection where Iterator.Element: Operation {
             }
         }
     }
+
+    /**
+     Add the last operation of the receiver as a dependency of a new operation, and then
+     append the operation to the end of an array, which is returned.
+     - parameter operation: the Iterator.Element instance to add
+         the receiver as a dependency.
+     - returns: an array of all operations operations.
+     */
+    public func then<S: Sequence>(do sequence: S) -> [Iterator.Element] where S.Iterator.Element == Iterator.Element {
+        var operations = Array(self)
+        if let last = operations.last {
+            assert(!last.isFinished, "Cannot add a finished operation as a dependency.")
+            sequence.forEach { $0.add(dependency: last) }
+        }
+        operations += sequence
+        return operations
+    }
+
+    /**
+     Add the last operation of the receiver as a dependency of a new operation, and then
+     append the operation to the end of an array, which is returned.
+     - parameter operations: a variable argument of Iterator.Element instance(s) to
+         add the receiver as a dependency.
+     - returns: an array of all operations.
+     */
+    public func then(do operations: Iterator.Element...) -> [Iterator.Element] {
+        return then(do: operations)
+    }
+
+    /**
+     Add the result of a closure onto the receiver.
+     - parameter block: a throwing closure which returns an optional element
+     - returns: an array of all operations.
+     */
+    func then(do block: () throws -> Iterator.Element?) rethrows -> [Iterator.Element] {
+        guard let operations = try block() else { return Array(self) }
+        return then(do: operations)
+    }
 }

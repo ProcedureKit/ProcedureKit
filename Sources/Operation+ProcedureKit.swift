@@ -112,7 +112,7 @@ public extension Operation {
      - returns: an array of both operations.
     */
     func then(do operation: Operation) -> [Operation] {
-        assert(!isFinished, "Cannot add self as a dependency if finished.")
+        assert(!isFinished, "Cannot add a finished operation as a dependency.")
         operation.add(dependency: self)
         return [self, operation]
     }
