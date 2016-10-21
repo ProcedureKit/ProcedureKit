@@ -27,6 +27,7 @@ open class TestProcedure: Procedure, ResultInjectionProtocol {
     public let producedOperation: Operation?
     public var requirement: Void = ()
     public var result: String? = "Hello World"
+    public private(set) var executedAt: CFAbsoluteTime = 0
     public private(set) var didExecute = false
     public private(set) var procedureWillFinishCalled = false
     public private(set) var procedureDidFinishCalled = false
@@ -42,6 +43,8 @@ open class TestProcedure: Procedure, ResultInjectionProtocol {
     }
 
     open override func execute() {
+
+        executedAt = CFAbsoluteTimeGetCurrent()
 
         if let operation = producedOperation {
             DispatchQueue.main.asyncAfter(deadline: .now() + (delay / 2.0)) {
