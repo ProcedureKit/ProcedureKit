@@ -75,4 +75,12 @@ extension Collection where Iterator.Element: Operation {
         guard let operations = try block() else { return Array(self) }
         return then(do: operations)
     }
+
+    /**
+     Adds the receiver to a ProcedureQueue.
+     - parameter queue: a ProcedureQueue, with a default argument
+    */
+    func enqueue(on queue: ProcedureQueue = ProcedureQueue()) {
+        queue.add(operations: self)
+    }
 }

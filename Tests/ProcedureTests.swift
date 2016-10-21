@@ -51,7 +51,24 @@ class ExecutionTests: ProcedureKitTestCase {
         XCTAssertEqual(completionBlockOneDidRun, 1)
         XCTAssertEqual(completionBlockTwoDidRun, 1)
         XCTAssertEqual(finalCompletionBlockDidRun, 1)
+    }
 
+    func test__enqueue_a_sequence_of_operations() {
+        addCompletionBlockTo(procedure: procedure, withExpectationDescription: "\(#function)")
+        [procedure].enqueue()
+        waitForExpectations(timeout: 3, handler: nil)
+        XCTAssertProcedureFinishedWithoutErrors()
+    }
+
+    func test__enqueue_a_sequence_of_operations_deallocates_queue() {
+        addCompletionBlockTo(procedure: procedure, withExpectationDescription: "\(#function)")
+        var nilQueue: ProcedureQueue! = ProcedureQueue()
+        weak var weakQueue = nilQueue
+        [procedure].enqueue(on: weakQueue!)
+        nilQueue = nil
+        waitForExpectations(timeout: 3, handler: nil)
+        XCTAssertNil(nilQueue)
+        XCTAssertNil(weakQueue)
     }
 }
 
