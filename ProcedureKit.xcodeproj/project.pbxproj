@@ -149,6 +149,48 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		6532DD4B1DBC18DF00B030F5 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 65CFC5E51D608A1A00CAD875 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 65CFC5EF1D608A5500CAD875;
+			remoteInfo = ProcedureKit;
+		};
+		6532DD4D1DBC18F800B030F5 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 65CFC5E51D608A1A00CAD875 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 65CFC5EF1D608A5500CAD875;
+			remoteInfo = ProcedureKit;
+		};
+		6532DD4F1DBC190000B030F5 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 65CFC5E51D608A1A00CAD875 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 65CFC5EF1D608A5500CAD875;
+			remoteInfo = ProcedureKit;
+		};
+		6532DD511DBC190600B030F5 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 65CFC5E51D608A1A00CAD875 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 65CFC5EF1D608A5500CAD875;
+			remoteInfo = ProcedureKit;
+		};
+		6532DD531DBC190A00B030F5 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 65CFC5E51D608A1A00CAD875 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 65CFC5EF1D608A5500CAD875;
+			remoteInfo = ProcedureKit;
+		};
+		6532DD551DBC190F00B030F5 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 65CFC5E51D608A1A00CAD875 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 65CFC5EF1D608A5500CAD875;
+			remoteInfo = ProcedureKit;
+		};
 		653C9FCB1D6097A40070B7A2 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 65CFC5E51D608A1A00CAD875 /* Project object */;
@@ -1082,6 +1124,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				6532DD521DBC190600B030F5 /* PBXTargetDependency */,
 				653C9FCC1D6097A40070B7A2 /* PBXTargetDependency */,
 			);
 			name = ProcedureKitMobileTests;
@@ -1119,6 +1162,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				6532DD541DBC190A00B030F5 /* PBXTargetDependency */,
 				653CA0111D609FA50070B7A2 /* PBXTargetDependency */,
 				653C9FFE1D609E660070B7A2 /* PBXTargetDependency */,
 			);
@@ -1176,6 +1220,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				6532DD561DBC190F00B030F5 /* PBXTargetDependency */,
 				653CA0521D60A70F0070B7A2 /* PBXTargetDependency */,
 				653CA03B1D60A5D10070B7A2 /* PBXTargetDependency */,
 			);
@@ -1215,6 +1260,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				6532DD4E1DBC18F800B030F5 /* PBXTargetDependency */,
 				653CA07A1D60ABCE0070B7A2 /* PBXTargetDependency */,
 				653CA0651D60AA990070B7A2 /* PBXTargetDependency */,
 			);
@@ -1254,6 +1300,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				6532DD501DBC190000B030F5 /* PBXTargetDependency */,
 				6594844A1DAAB5340028F83B /* PBXTargetDependency */,
 				659484291DAAA2B90028F83B /* PBXTargetDependency */,
 			);
@@ -1351,6 +1398,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				6532DD4C1DBC18DF00B030F5 /* PBXTargetDependency */,
 				65ECB2F81DB50B7300F96F46 /* PBXTargetDependency */,
 				65ECB2D81DB4F0C000F96F46 /* PBXTargetDependency */,
 			);
@@ -1825,6 +1873,36 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		6532DD4C1DBC18DF00B030F5 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 65CFC5EF1D608A5500CAD875 /* ProcedureKit */;
+			targetProxy = 6532DD4B1DBC18DF00B030F5 /* PBXContainerItemProxy */;
+		};
+		6532DD4E1DBC18F800B030F5 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 65CFC5EF1D608A5500CAD875 /* ProcedureKit */;
+			targetProxy = 6532DD4D1DBC18F800B030F5 /* PBXContainerItemProxy */;
+		};
+		6532DD501DBC190000B030F5 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 65CFC5EF1D608A5500CAD875 /* ProcedureKit */;
+			targetProxy = 6532DD4F1DBC190000B030F5 /* PBXContainerItemProxy */;
+		};
+		6532DD521DBC190600B030F5 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 65CFC5EF1D608A5500CAD875 /* ProcedureKit */;
+			targetProxy = 6532DD511DBC190600B030F5 /* PBXContainerItemProxy */;
+		};
+		6532DD541DBC190A00B030F5 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 65CFC5EF1D608A5500CAD875 /* ProcedureKit */;
+			targetProxy = 6532DD531DBC190A00B030F5 /* PBXContainerItemProxy */;
+		};
+		6532DD561DBC190F00B030F5 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 65CFC5EF1D608A5500CAD875 /* ProcedureKit */;
+			targetProxy = 6532DD551DBC190F00B030F5 /* PBXContainerItemProxy */;
+		};
 		653C9FCC1D6097A40070B7A2 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 653C9FC01D6097A40070B7A2 /* ProcedureKitMobile */;
