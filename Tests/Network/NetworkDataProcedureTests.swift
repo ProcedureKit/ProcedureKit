@@ -18,10 +18,10 @@ class NetworkDataProcedureTests: ProcedureKitTestCase {
 
     override func setUp() {
         super.setUp()
-        url = URL(string: "http://procedure.kit.run")
+        url = "http://procedure.kit.run"
         request = URLRequest(url: url)
         session = TestableURLSessionTaskFactory()
-        download = NetworkDataProcedure(session: session, request: request) { _, _ in }
+        download = NetworkDataProcedure(session: session, request: request)
     }
 
     func test__session_receives_request() {

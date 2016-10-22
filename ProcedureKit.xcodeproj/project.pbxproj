@@ -132,6 +132,8 @@
 		65DA49311D8142BE00D4E1AA /* MutualExclusion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65DA49301D8142BE00D4E1AA /* MutualExclusion.swift */; };
 		65DFA4851DB514DD009358CE /* URLTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65DFA4841DB514DD009358CE /* URLTests.swift */; };
 		65DFA4871DB51F60009358CE /* TestableNetwork.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65DFA4861DB51F60009358CE /* TestableNetwork.swift */; };
+		65DFA4A71DBB9EEA009358CE /* NetworkResilience.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65DFA4A61DBB9EEA009358CE /* NetworkResilience.swift */; };
+		65DFA4A91DBBC0B0009358CE /* ResilientNetworkProcedureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65DFA4A81DBBC0B0009358CE /* ResilientNetworkProcedureTests.swift */; };
 		65EAC0121D8CA39F000E4A42 /* TimeoutObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65EAC0111D8CA39F000E4A42 /* TimeoutObserver.swift */; };
 		65EAC0161D8CA78F000E4A42 /* TimeoutObserverTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65EAC0151D8CA78F000E4A42 /* TimeoutObserverTests.swift */; };
 		65ECB2D61DB4F0C000F96F46 /* ProcedureKitNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65ECB2CD1DB4F0C000F96F46 /* ProcedureKitNetwork.framework */; };
@@ -534,6 +536,8 @@
 		65DA49301D8142BE00D4E1AA /* MutualExclusion.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = MutualExclusion.swift; path = Sources/MutualExclusion.swift; sourceTree = "<group>"; };
 		65DFA4841DB514DD009358CE /* URLTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = URLTests.swift; sourceTree = "<group>"; };
 		65DFA4861DB51F60009358CE /* TestableNetwork.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TestableNetwork.swift; path = Sources/Testing/TestableNetwork.swift; sourceTree = "<group>"; };
+		65DFA4A61DBB9EEA009358CE /* NetworkResilience.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkResilience.swift; sourceTree = "<group>"; };
+		65DFA4A81DBBC0B0009358CE /* ResilientNetworkProcedureTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ResilientNetworkProcedureTests.swift; sourceTree = "<group>"; };
 		65EAC0111D8CA39F000E4A42 /* TimeoutObserver.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TimeoutObserver.swift; path = Sources/TimeoutObserver.swift; sourceTree = "<group>"; };
 		65EAC0151D8CA78F000E4A42 /* TimeoutObserverTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TimeoutObserverTests.swift; path = Tests/TimeoutObserverTests.swift; sourceTree = "<group>"; };
 		65ECB2CD1DB4F0C000F96F46 /* ProcedureKitNetwork.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ProcedureKitNetwork.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -1007,6 +1011,7 @@
 			children = (
 				65ECB2ED1DB4FDE000F96F46 /* NetworkData.swift */,
 				65ECB2EF1DB4FE9900F96F46 /* NetworkSupport.swift */,
+				65DFA4A61DBB9EEA009358CE /* NetworkResilience.swift */,
 			);
 			name = Network;
 			path = Sources/Network;
@@ -1015,8 +1020,9 @@
 		65ECB2E51DB4F16E00F96F46 /* Network Tests */ = {
 			isa = PBXGroup;
 			children = (
-				65ECB2E61DB4F16E00F96F46 /* ProcedureKitNetworkTests.swift */,
 				65ECB2F31DB5097500F96F46 /* NetworkDataProcedureTests.swift */,
+				65ECB2E61DB4F16E00F96F46 /* ProcedureKitNetworkTests.swift */,
+				65DFA4A81DBBC0B0009358CE /* ResilientNetworkProcedureTests.swift */,
 				65DFA4841DB514DD009358CE /* URLTests.swift */,
 			);
 			name = "Network Tests";
@@ -1856,6 +1862,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				65ECB2F01DB4FE9900F96F46 /* NetworkSupport.swift in Sources */,
+				65DFA4A71DBB9EEA009358CE /* NetworkResilience.swift in Sources */,
 				65ECB2EE1DB4FDE000F96F46 /* NetworkData.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1864,6 +1871,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				65DFA4A91DBBC0B0009358CE /* ResilientNetworkProcedureTests.swift in Sources */,
 				65ECB2F41DB5097500F96F46 /* NetworkDataProcedureTests.swift in Sources */,
 				65ECB2E71DB4F16E00F96F46 /* ProcedureKitNetworkTests.swift in Sources */,
 				65DFA4851DB514DD009358CE /* URLTests.swift in Sources */,
