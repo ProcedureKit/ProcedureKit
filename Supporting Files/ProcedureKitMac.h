@@ -5,6 +5,7 @@
 //
 
 @import Cocoa;
+@import ProcedureKit;
 
 //! Project version number for ProcedureKitMac.
 FOUNDATION_EXPORT double ProcedureKitMacVersionNumber;

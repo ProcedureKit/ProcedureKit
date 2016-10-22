@@ -4,8 +4,6 @@
 //  Copyright © 2016 ProcedureKit. All rights reserved.
 //
 
-import ProcedureKit
-
 /**
  NetworkDataProcedure is a simple procedure which will perform a data task using
  URLSession based APIs. It only supports the completion block style API, therefore

@@ -4,8 +4,6 @@
 //  Copyright © 2016 ProcedureKit. All rights reserved.
 //
 
-import ProcedureKit
-
 open class UserLocationProcedure: Procedure, ResultInjectionProtocol, CLLocationManagerDelegate {
     public typealias CompletionBlock = (CLLocation) -> Void
 

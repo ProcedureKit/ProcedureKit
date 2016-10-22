@@ -5,6 +5,7 @@
 //
 
 @import UIKit;
+@import ProcedureKit;
 
 //! Project version number for ProcedureKitTV.
 FOUNDATION_EXPORT double ProcedureKitTVVersionNumber;

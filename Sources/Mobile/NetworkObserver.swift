@@ -4,9 +4,6 @@
 //  Copyright © 2016 ProcedureKit. All rights reserved.
 //
 
-import UIKit
-import ProcedureKit
-
 protocol NetworkActivityIndicatorProtocol {
     var networkActivityIndicatorVisible: Bool { get set }
 }

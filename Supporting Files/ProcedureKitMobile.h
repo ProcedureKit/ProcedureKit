@@ -5,6 +5,7 @@
 //
 
 @import UIKit;
+@import ProcedureKit;
 
 //! Project version number for ProcedureKitMobile.
 FOUNDATION_EXPORT double ProcedureKitMobileVersionNumber;
