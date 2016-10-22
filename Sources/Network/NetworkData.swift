@@ -12,14 +12,14 @@
 open class NetworkDataProcedure<Session: URLSessionTaskFactory>: Procedure, ResultInjectionProtocol {
 
     public var requirement: URLRequest? = nil
-    public var result: (Data, URLResponse)? = nil
+    public var result: (Data, HTTPURLResponse)? = nil
 
     public private(set) var session: Session
-    public let completion: (Data, URLResponse) -> Void
+    public let completion: (Data, HTTPURLResponse) -> Void
 
     internal var task: Session.DataTask? = nil
 
-    public init(session: Session, request: URLRequest? = nil, completionHandler: @escaping (Data, URLResponse) -> Void = { _, _ in }) {
+    public init(session: Session, request: URLRequest? = nil, completionHandler: @escaping (Data, HTTPURLResponse) -> Void = { _, _ in }) {
         self.session = session
         self.requirement = request
         self.completion = completionHandler
@@ -43,7 +43,7 @@ open class NetworkDataProcedure<Session: URLSessionTaskFactory>: Procedure, Resu
                 return
             }
 
-            guard let data = data, let response = response else {
+            guard let data = data, let response = response as? HTTPURLResponse else {
                 strongSelf.finish(withError: ProcedureKitError.unknown)
                 return
             }

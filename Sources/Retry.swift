@@ -119,14 +119,14 @@ open class RetryProcedure<T: Operation>: RepeatProcedure<T> {
         return returnValue
     }
 
-    public override func child(_ child: Operation, didAttemptRecoveryFromErrors errors: [Error]) {
+    open override func child(_ child: Operation, didAttemptRecoveryFromErrors errors: [Error]) {
         if let previous = previous, child === current {
             childDidNotRecoverFromErrors(previous)
         }
         super.child(child, didAttemptRecoveryFromErrors: errors)
     }
 
-    public override func procedureQueue(_ queue: ProcedureQueue, willFinishOperation operation: Operation, withErrors errors: [Error]) {
+    open override func procedureQueue(_ queue: ProcedureQueue, willFinishOperation operation: Operation, withErrors errors: [Error]) {
         if errors.isEmpty, let previous = previous, operation === current {
             childDidRecoverFromErrors(previous)
         }
@@ -144,5 +144,4 @@ open class RetryProcedure<T: Operation>: RepeatProcedure<T> {
             configure: configure
         )
     }
-
 }

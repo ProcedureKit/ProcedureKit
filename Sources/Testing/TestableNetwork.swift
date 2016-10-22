@@ -35,7 +35,7 @@ public class TestableURLSessionTask: Equatable {
 public class TestableURLSessionTaskFactory {
 
     public var delay: TimeInterval = 0
-    public var returnedResponse: URLResponse? = URLResponse()
+    public var returnedResponse: HTTPURLResponse? = HTTPURLResponse()
     public var returnedError: Error? = nil
 
     // Data
