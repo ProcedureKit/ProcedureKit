@@ -6,7 +6,6 @@
 
 import Foundation
 import XCTest
-import ProcedureKit
 
 open class TestGroupProcedure: GroupProcedure {
     public private(set) var didExecute = false

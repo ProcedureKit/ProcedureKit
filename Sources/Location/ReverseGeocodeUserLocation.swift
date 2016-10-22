@@ -4,6 +4,9 @@
 //  Copyright © 2016 ProcedureKit. All rights reserved.
 //
 
+import CoreLocation
+import MapKit
+
 public struct UserLocationPlacemark: Equatable {
     public static func == (lhs: UserLocationPlacemark, rhs: UserLocationPlacemark) -> Bool {
         return lhs.location == rhs.location && lhs.placemark == rhs.placemark

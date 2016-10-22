@@ -5,8 +5,8 @@
 //
 
 import XCTest
-import TestingProcedureKit
 @testable import ProcedureKit
+import TestingProcedureKit
 
 class LoggingTests: ProcedureKitTestCase {
 

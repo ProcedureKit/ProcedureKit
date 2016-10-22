@@ -6,7 +6,6 @@
 
 import Foundation
 import XCTest
-import ProcedureKit
 
 open class RepeatTestCase: ProcedureKitTestCase {
     public var repeatProcedure: RepeatProcedure<TestProcedure>!

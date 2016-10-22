@@ -4,6 +4,9 @@
 //  Copyright © 2016 ProcedureKit. All rights reserved.
 //
 
+import CoreLocation
+import MapKit
+
 open class ReverseGeocodeProcedure: Procedure, ResultInjectionProtocol {
     public typealias CompletionBlock = (CLPlacemark) -> Void
 

@@ -5,7 +5,6 @@
 //
 
 import XCTest
-import ProcedureKit
 
 public class TestableURLSessionTask: Equatable {
 

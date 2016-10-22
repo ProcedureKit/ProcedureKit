@@ -4,9 +4,6 @@
 //  Copyright © 2016 ProcedureKit. All rights reserved.
 //
 
-import Foundation
-import ProcedureKit
-
 public struct TestError: Error, Equatable {
     public static func == (lhs: TestError, rhs: TestError) -> Bool {
         return lhs.uuid == rhs.uuid

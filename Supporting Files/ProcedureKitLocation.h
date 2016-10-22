@@ -5,8 +5,6 @@
 //
 
 @import Foundation;
-@import CoreLocation;
-@import MapKit;
 @import ProcedureKit;
 
 //! Project version number for ProcedureKitLocation.

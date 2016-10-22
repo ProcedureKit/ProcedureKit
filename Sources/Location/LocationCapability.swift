@@ -4,6 +4,9 @@
 //  Copyright © 2016 ProcedureKit. All rights reserved.
 //
 
+import CoreLocation
+import MapKit
+
 public enum LocationUsage {
     case whenInUse
     case always
