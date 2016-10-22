@@ -58,7 +58,7 @@ extension Collection where Iterator.Element: Operation {
 
     /**
      Add the last operation of the receiver as a dependency of each element
-     of the argument. An Array of the receiver extended by the argument is 
+     of the argument. An Array of the receiver extended by the argument is
      returned.
      - parameter operations: a variable argument of Iterator.Element instance(s) to
          add the receiver as a dependency.

@@ -6,6 +6,11 @@
 
 import ProcedureKit
 
+/**
+ NetworkDataProcedure is a simple procedure which will perform a data task using
+ URLSession based APIs. It only supports the completion block style API, therefore
+ do not use this procedure if you wish to use delegate based APIs on URLSession.
+*/
 open class NetworkDataProcedure<Session: URLSessionTaskFactory>: Procedure, ResultInjectionProtocol {
 
     public var requirement: URLRequest? = nil
@@ -16,8 +21,7 @@ open class NetworkDataProcedure<Session: URLSessionTaskFactory>: Procedure, Resu
 
     internal var task: Session.DataTask? = nil
 
-    //swiftlint:disable:next force_cast
-    public init(session: Session = URLSession.shared as! Session, request: URLRequest? = nil, completionHandler: @escaping (Data, URLResponse) -> Void = { _, _ in }) {
+    public init(session: Session, request: URLRequest? = nil, completionHandler: @escaping (Data, URLResponse) -> Void = { _, _ in }) {
         self.session = session
         self.requirement = request
         self.completion = completionHandler
