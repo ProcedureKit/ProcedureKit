@@ -22,7 +22,6 @@ public class QueueTestDelegate: ProcedureQueueDelegate, OperationQueueDelegate {
     public var procedureQueueWillFinishOperation = [ProcedureQueueCheckTypeWithErrors]()
     public var procedureQueueDidFinishOperation = [ProcedureQueueCheckTypeWithErrors]()
 
-
     public func operationQueue(_ queue: OperationQueue, willAddOperation operation: Operation) {
         operationQueueWillAddOperation.append((queue, operation))
     }

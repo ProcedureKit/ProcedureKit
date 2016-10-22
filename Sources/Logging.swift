@@ -199,7 +199,6 @@ public protocol LoggerProtocol {
     func log(message: @autoclosure () -> String, severity: LogSeverity, file: String, function: String, line: Int)
 }
 
-
 public extension LoggerProtocol {
 
     /// Access the minimum `LogSeverity` severity.

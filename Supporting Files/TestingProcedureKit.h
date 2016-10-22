@@ -5,7 +5,6 @@
 //
 
 @import Foundation;
-@import ProcedureKit;
 
 //! Project version number for TestingProcedureKit.
 FOUNDATION_EXPORT double TestingProcedureKitVersionNumber;
