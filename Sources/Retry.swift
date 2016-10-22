@@ -42,6 +42,14 @@ public struct RetryFailureInfo<T: Operation> {
     public let configure: (T) -> Void
 }
 
+public extension RetryFailureInfo {
+
+    var errorCode: Int? {
+        return (errors.first as? NSError)?.code
+    }
+}
+
+
 internal class RetryIterator<T: Operation>: IteratorProtocol {
     typealias Payload = RepeatProcedure<T>.Payload
     typealias Handler = RetryProcedure<T>.Handler

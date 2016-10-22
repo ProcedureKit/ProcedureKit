@@ -50,7 +50,7 @@ public protocol ResilientNetworkBehavior {
      - parameter statusCode: an Int
      - returns: a Bool, to indicate that the
      */
-    func retryRequest(forResponseWithStatusCode statusCode: Int) -> Bool
+    func retryRequest(forResponseWithStatusCode statusCode: Int, errorCode: Int?) -> Bool
 }
 
 internal class ResilientNetworkRecovery<T: Operation> where T: ResultInjectionProtocol, T.Result == Optional<(Data, HTTPURLResponse)> {
@@ -70,12 +70,9 @@ internal class ResilientNetworkRecovery<T: Operation> where T: ResultInjectionPr
     }
 
     func recover(withInfo info: RetryFailureInfo<T>, payload: Payload) -> Recovery? {
-        if let response = info.operation.result?.1, let delay = behavior.errorDelay, behavior.retryRequest(forResponseWithStatusCode: response.statusCode) {
-            return (delay, info.configure)
-        }
-        else {
-            return (payload.delay, info.configure)
-        }
+        guard let response = info.operation.result?.1, behavior.retryRequest(forResponseWithStatusCode: response.statusCode, errorCode: info.errorCode) else { return nil }
+
+        return (behavior.errorDelay ?? payload.delay, info.configure)
     }
 }
 
@@ -116,14 +113,15 @@ open class ResilientNetworkProcedure<T: Operation>: RetryProcedure<T> where T: R
 
         super.init(max: recovery.max, wait: recovery.wait, iterator: AnyIterator(body), retry: handler)
     }
-/*
+
     open override func procedureQueue(_ queue: ProcedureQueue, willFinishOperation operation: Operation, withErrors errors: [Error]) {
-        guard errors.isEmpty && operation === current, let code = response?.statusCode, recovery.behavior.retryRequest(forResponseWithStatusCode: code) else {
+        guard errors.isEmpty && operation === current, let code = response?.statusCode, recovery.behavior.retryRequest(forResponseWithStatusCode: code, errorCode: nil) else {
             super.procedureQueue(queue, willFinishOperation: operation, withErrors: errors)
             return
         }
+
+        log.fatal(message: "*** Should we still be throwing and error here?")
     }
-*/
 }
 
 extension ResilientNetworkProcedure: ResultInjectionProtocol {
