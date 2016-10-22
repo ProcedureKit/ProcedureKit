@@ -6,7 +6,6 @@
 
 import Foundation
 import XCTest
-import ProcedureKit
 
 internal enum __XCTAssertionResult {
     case success

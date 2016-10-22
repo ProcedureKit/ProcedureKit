@@ -5,7 +5,6 @@
 //
 
 import Foundation
-import ProcedureKit
 
 public class QueueTestDelegate: ProcedureQueueDelegate, OperationQueueDelegate {
 

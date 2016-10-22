@@ -5,7 +5,6 @@
 //
 
 @import Foundation;
-@import CloudKit;
 @import ProcedureKit;
 
 //! Project version number for ProcedureKitCloud.
