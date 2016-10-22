@@ -71,9 +71,12 @@ internal class ResilientNetworkRecovery<T: Operation> where T: ResultInjectionPr
 
     func recover(withInfo info: RetryFailureInfo<T>, payload: Payload) -> Recovery? {
         guard let response = info.operation.result?.1, behavior.retryRequest(forResponseWithStatusCode: response.statusCode, errorCode: info.errorCode) else { return nil }
-
         return (behavior.errorDelay ?? payload.delay, info.configure)
     }
+}
+
+public enum ProcedureKitNetworkResiliencyError: Error {
+    case receivedErrorStatusCode(Int)
 }
 
 /**
@@ -115,12 +118,15 @@ open class ResilientNetworkProcedure<T: Operation>: RetryProcedure<T> where T: R
     }
 
     open override func procedureQueue(_ queue: ProcedureQueue, willFinishOperation operation: Operation, withErrors errors: [Error]) {
-        guard errors.isEmpty && operation === current, let code = response?.statusCode, recovery.behavior.retryRequest(forResponseWithStatusCode: code, errorCode: nil) else {
+        guard errors.isEmpty && operation === current,
+            let code = response?.statusCode, recovery.behavior.retryRequest(forResponseWithStatusCode: code, errorCode: nil)
+        else {
             super.procedureQueue(queue, willFinishOperation: operation, withErrors: errors)
             return
         }
 
-        log.fatal(message: "*** Should we still be throwing and error here?")
+        log.warning(message: "Identified erroneous error status code: \(code). Will trigger retry mechanism.")
+        super.procedureQueue(queue, willFinishOperation: operation, withErrors: [ProcedureKitNetworkResiliencyError.receivedErrorStatusCode(code)])
     }
 }
 
