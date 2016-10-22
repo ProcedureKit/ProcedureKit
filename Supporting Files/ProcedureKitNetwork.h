@@ -5,6 +5,7 @@
 //
 
 @import Foundation;
+@import ProcedureKit;
 
 //! Project version number for ProcedureKitNetwork.
 FOUNDATION_EXPORT double ProcedureKitNetworkVersionNumber;

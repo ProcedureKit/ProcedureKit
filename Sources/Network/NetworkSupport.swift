@@ -4,8 +4,6 @@
 //  Copyright © 2016 ProcedureKit. All rights reserved.
 //
 
-import ProcedureKit
-
 // MARK: - URLSession
 
 public protocol URLSessionTaskProtocol {
