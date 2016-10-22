@@ -12,7 +12,7 @@ class CancelBlockProcedureStessTests: StressTestCase {
 
     func test__cancel_block_procedure() {
 
-        stress { batch, _ in
+        stress(level: .custom(10, 5_000)) { batch, _ in
             batch.dispatchGroup.enter()
             let block = BlockProcedure { }
             block.addDidCancelBlockObserver { _, _ in
