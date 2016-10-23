@@ -50,24 +50,24 @@ open class RepeatProcedure<T: Operation>: GroupProcedure {
 
     private var iterator: AnyIterator<Payload>
 
-    public init<PayloadIterator>(max: Int? = nil, iterator base: PayloadIterator) where PayloadIterator: IteratorProtocol, PayloadIterator.Element == Payload {
+    public init<PayloadIterator>(dispatchQueue: DispatchQueue? = nil, max: Int? = nil, iterator base: PayloadIterator) where PayloadIterator: IteratorProtocol, PayloadIterator.Element == Payload {
         (current, iterator) = RepeatProcedure.create(withMax: max, andIterator: base)
-        super.init(operations: [])
+        super.init(dispatchQueue: dispatchQueue, operations: [])
     }
 
-    public init<OperationIterator, DelayIterator>(max: Int? = nil, delay: DelayIterator, iterator base: OperationIterator) where OperationIterator: IteratorProtocol, DelayIterator: IteratorProtocol, OperationIterator.Element == T, DelayIterator.Element == Delay {
+    public init<OperationIterator, DelayIterator>(dispatchQueue: DispatchQueue? = nil, max: Int? = nil, delay: DelayIterator, iterator base: OperationIterator) where OperationIterator: IteratorProtocol, DelayIterator: IteratorProtocol, OperationIterator.Element == T, DelayIterator.Element == Delay {
         (current, iterator) = RepeatProcedure.create(withMax: max, andDelay: delay, andIterator: base)
-        super.init(operations: [])
+        super.init(dispatchQueue: dispatchQueue, operations: [])
     }
 
-    public init<OperationIterator>(max: Int? = nil, wait: WaitStrategy = .immediate, iterator base: OperationIterator) where OperationIterator: IteratorProtocol, OperationIterator.Element == T {
+    public init<OperationIterator>(dispatchQueue: DispatchQueue? = nil, max: Int? = nil, wait: WaitStrategy = .immediate, iterator base: OperationIterator) where OperationIterator: IteratorProtocol, OperationIterator.Element == T {
         (current, iterator) = RepeatProcedure.create(withMax: max, andDelay: Delay.iterator(wait.iterator), andIterator: base)
-        super.init(operations: [])
+        super.init(dispatchQueue: dispatchQueue, operations: [])
     }
 
-    public init(max: Int? = nil, wait: WaitStrategy = .immediate, body: @escaping () -> T?) {
+    public init(dispatchQueue: DispatchQueue? = nil, max: Int? = nil, wait: WaitStrategy = .immediate, body: @escaping () -> T?) {
         (current, iterator) = RepeatProcedure.create(withMax: max, andDelay: Delay.iterator(wait.iterator), andIterator: AnyIterator(body))
-        super.init(operations: [])
+        super.init(dispatchQueue: dispatchQueue, operations: [])
     }
 
     /// Public override of execute which configures and adds the first operation

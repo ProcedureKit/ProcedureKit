@@ -100,7 +100,7 @@ open class ResilientNetworkProcedure<T: Operation>: RetryProcedure<T> where T: R
 
     internal private(set) var recovery: ResilientNetworkRecovery<T>
 
-    public init(behavior: ResilientNetworkBehavior, body: @escaping () -> T?) {
+    public init(dispatchQueue: DispatchQueue = DispatchQueue.default, behavior: ResilientNetworkBehavior, body: @escaping () -> T?) {
 
         let _recovery = ResilientNetworkRecovery<T>(behavior: behavior)
 
@@ -114,7 +114,7 @@ open class ResilientNetworkProcedure<T: Operation>: RetryProcedure<T> where T: R
 
         recovery = _recovery
 
-        super.init(max: recovery.max, wait: recovery.wait, iterator: AnyIterator(body), retry: handler)
+        super.init(dispatchQueue: dispatchQueue, max: recovery.max, wait: recovery.wait, iterator: AnyIterator(body), retry: handler)
     }
 
     open override func procedureQueue(_ queue: ProcedureQueue, willFinishOperation operation: Operation, withErrors errors: [Error]) {

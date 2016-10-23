@@ -63,7 +63,7 @@ open class GroupProcedure: Procedure, ProcedureQueueDelegate {
      have to be Procedure instances - you can use `Foundation.Operation` instances
      from other sources.
     */
-    public init(underlyingQueue: DispatchQueue? = nil, operations: [Operation]) {
+    public init(dispatchQueue underlyingQueue: DispatchQueue? = nil, operations: [Operation]) {
 
         groupChildren = Protector(operations)
 
@@ -252,7 +252,7 @@ public extension GroupProcedure {
 
      - returns: the DispatchQueue of the groups private ProcedureQueue
     */
-    final var underlyingQueue: DispatchQueue? {
+    final var dispatchQueue: DispatchQueue? {
         return queue.underlyingQueue
     }
 

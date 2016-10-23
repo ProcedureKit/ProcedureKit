@@ -4,6 +4,13 @@
 //  Copyright © 2016 ProcedureKit. All rights reserved.
 //
 
+/// A type which has an associated error type
+public protocol AssociatedErrorProtocol {
+
+    /// The type of associated error
+    associatedtype AssociatedError: Error
+}
+
 public protocol ProcedureKitComponent {
     var name: String { get }
 }
