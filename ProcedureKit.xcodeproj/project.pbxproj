@@ -90,6 +90,28 @@
 		654FAFFD1D7CD5EA002FA74D /* Transform.swift in Sources */ = {isa = PBXBuildFile; fileRef = 654FAFFC1D7CD5EA002FA74D /* Transform.swift */; };
 		655594F11D9E482D00B08990 /* RepeatProcedureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 655594F01D9E482D00B08990 /* RepeatProcedureTests.swift */; };
 		655594F31D9E48A200B08990 /* RepeatTestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 655594F21D9E48A200B08990 /* RepeatTestCase.swift */; };
+		65589FDF1DBD2BDC0030C950 /* CKAcceptSharesOperationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65589FDE1DBD2BDC0030C950 /* CKAcceptSharesOperationTests.swift */; };
+		65589FE11DBD2C1A0030C950 /* CKOperationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65589FE01DBD2C1A0030C950 /* CKOperationTests.swift */; };
+		65589FE31DBD2D3E0030C950 /* CKDatabaseOperationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65589FE21DBD2D3E0030C950 /* CKDatabaseOperationTests.swift */; };
+		65589FE51DBD31AC0030C950 /* CKDiscoverAllContactsOperationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65589FE41DBD31AC0030C950 /* CKDiscoverAllContactsOperationTests.swift */; };
+		65589FF91DBD33690030C950 /* CKDiscoverAllUserIdentitiesOperationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65589FE61DBD33690030C950 /* CKDiscoverAllUserIdentitiesOperationTests.swift */; };
+		65589FFB1DBD33690030C950 /* CKDiscoverUserIdentitiesOperationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65589FE81DBD33690030C950 /* CKDiscoverUserIdentitiesOperationTests.swift */; };
+		65589FFC1DBD33690030C950 /* CKDiscoverUserInfosOperationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65589FE91DBD33690030C950 /* CKDiscoverUserInfosOperationTests.swift */; };
+		65589FFD1DBD33690030C950 /* CKFetchDatabaseChangesOperationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65589FEA1DBD33690030C950 /* CKFetchDatabaseChangesOperationTests.swift */; };
+		65589FFE1DBD33690030C950 /* CKFetchNotificationChangesOperationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65589FEB1DBD33690030C950 /* CKFetchNotificationChangesOperationTests.swift */; };
+		65589FFF1DBD33690030C950 /* CKFetchRecordChangesOperationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65589FEC1DBD33690030C950 /* CKFetchRecordChangesOperationTests.swift */; };
+		6558A0001DBD33690030C950 /* CKFetchRecordsOperationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65589FED1DBD33690030C950 /* CKFetchRecordsOperationTests.swift */; };
+		6558A0011DBD33690030C950 /* CKFetchRecordZoneChangesOperationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65589FEE1DBD33690030C950 /* CKFetchRecordZoneChangesOperationTests.swift */; };
+		6558A0021DBD33690030C950 /* CKFetchRecordZonesOperationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65589FEF1DBD33690030C950 /* CKFetchRecordZonesOperationTests.swift */; };
+		6558A0031DBD33690030C950 /* CKFetchShareMetadataOperationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65589FF01DBD33690030C950 /* CKFetchShareMetadataOperationTests.swift */; };
+		6558A0041DBD33690030C950 /* CKFetchShareParticipantsOperationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65589FF11DBD33690030C950 /* CKFetchShareParticipantsOperationTests.swift */; };
+		6558A0051DBD33690030C950 /* CKFetchSubscriptionsOperationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65589FF21DBD33690030C950 /* CKFetchSubscriptionsOperationTests.swift */; };
+		6558A0061DBD33690030C950 /* CKMarkNotificationsReadOperationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65589FF31DBD33690030C950 /* CKMarkNotificationsReadOperationTests.swift */; };
+		6558A0071DBD33690030C950 /* CKModifyBadgeOperationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65589FF41DBD33690030C950 /* CKModifyBadgeOperationTests.swift */; };
+		6558A0081DBD33690030C950 /* CKModifyRecordsOperationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65589FF51DBD33690030C950 /* CKModifyRecordsOperationTests.swift */; };
+		6558A0091DBD33690030C950 /* CKModifyRecordZonesOperationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65589FF61DBD33690030C950 /* CKModifyRecordZonesOperationTests.swift */; };
+		6558A00A1DBD33690030C950 /* CKModifySubscriptionsOperationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65589FF71DBD33690030C950 /* CKModifySubscriptionsOperationTests.swift */; };
+		6558A00B1DBD33690030C950 /* CKQueryOperationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65589FF81DBD33690030C950 /* CKQueryOperationTests.swift */; };
 		655E86431D67B55B000FBA6C /* ProcedureQueue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 655E86421D67B55B000FBA6C /* ProcedureQueue.swift */; };
 		655E86451D67B9F9000FBA6C /* ProcedureObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 655E86441D67B9F9000FBA6C /* ProcedureObserver.swift */; };
 		655E86471D67BA9C000FBA6C /* Support.swift in Sources */ = {isa = PBXBuildFile; fileRef = 655E86461D67BA9C000FBA6C /* Support.swift */; };
@@ -530,6 +552,28 @@
 		654FAFFC1D7CD5EA002FA74D /* Transform.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Transform.swift; path = Sources/Transform.swift; sourceTree = "<group>"; };
 		655594F01D9E482D00B08990 /* RepeatProcedureTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = RepeatProcedureTests.swift; path = Tests/RepeatProcedureTests.swift; sourceTree = "<group>"; };
 		655594F21D9E48A200B08990 /* RepeatTestCase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = RepeatTestCase.swift; path = Sources/Testing/RepeatTestCase.swift; sourceTree = "<group>"; };
+		65589FDE1DBD2BDC0030C950 /* CKAcceptSharesOperationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CKAcceptSharesOperationTests.swift; path = Tests/Cloud/CKAcceptSharesOperationTests.swift; sourceTree = SOURCE_ROOT; };
+		65589FE01DBD2C1A0030C950 /* CKOperationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CKOperationTests.swift; path = Tests/Cloud/CKOperationTests.swift; sourceTree = SOURCE_ROOT; };
+		65589FE21DBD2D3E0030C950 /* CKDatabaseOperationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CKDatabaseOperationTests.swift; path = Tests/Cloud/CKDatabaseOperationTests.swift; sourceTree = SOURCE_ROOT; };
+		65589FE41DBD31AC0030C950 /* CKDiscoverAllContactsOperationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CKDiscoverAllContactsOperationTests.swift; path = Tests/Cloud/CKDiscoverAllContactsOperationTests.swift; sourceTree = SOURCE_ROOT; };
+		65589FE61DBD33690030C950 /* CKDiscoverAllUserIdentitiesOperationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CKDiscoverAllUserIdentitiesOperationTests.swift; path = Tests/Cloud/CKDiscoverAllUserIdentitiesOperationTests.swift; sourceTree = SOURCE_ROOT; };
+		65589FE81DBD33690030C950 /* CKDiscoverUserIdentitiesOperationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CKDiscoverUserIdentitiesOperationTests.swift; path = Tests/Cloud/CKDiscoverUserIdentitiesOperationTests.swift; sourceTree = SOURCE_ROOT; };
+		65589FE91DBD33690030C950 /* CKDiscoverUserInfosOperationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CKDiscoverUserInfosOperationTests.swift; path = Tests/Cloud/CKDiscoverUserInfosOperationTests.swift; sourceTree = SOURCE_ROOT; };
+		65589FEA1DBD33690030C950 /* CKFetchDatabaseChangesOperationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CKFetchDatabaseChangesOperationTests.swift; path = Tests/Cloud/CKFetchDatabaseChangesOperationTests.swift; sourceTree = SOURCE_ROOT; };
+		65589FEB1DBD33690030C950 /* CKFetchNotificationChangesOperationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CKFetchNotificationChangesOperationTests.swift; path = Tests/Cloud/CKFetchNotificationChangesOperationTests.swift; sourceTree = SOURCE_ROOT; };
+		65589FEC1DBD33690030C950 /* CKFetchRecordChangesOperationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CKFetchRecordChangesOperationTests.swift; path = Tests/Cloud/CKFetchRecordChangesOperationTests.swift; sourceTree = SOURCE_ROOT; };
+		65589FED1DBD33690030C950 /* CKFetchRecordsOperationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CKFetchRecordsOperationTests.swift; path = Tests/Cloud/CKFetchRecordsOperationTests.swift; sourceTree = SOURCE_ROOT; };
+		65589FEE1DBD33690030C950 /* CKFetchRecordZoneChangesOperationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CKFetchRecordZoneChangesOperationTests.swift; path = Tests/Cloud/CKFetchRecordZoneChangesOperationTests.swift; sourceTree = SOURCE_ROOT; };
+		65589FEF1DBD33690030C950 /* CKFetchRecordZonesOperationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CKFetchRecordZonesOperationTests.swift; path = Tests/Cloud/CKFetchRecordZonesOperationTests.swift; sourceTree = SOURCE_ROOT; };
+		65589FF01DBD33690030C950 /* CKFetchShareMetadataOperationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CKFetchShareMetadataOperationTests.swift; path = Tests/Cloud/CKFetchShareMetadataOperationTests.swift; sourceTree = SOURCE_ROOT; };
+		65589FF11DBD33690030C950 /* CKFetchShareParticipantsOperationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CKFetchShareParticipantsOperationTests.swift; path = Tests/Cloud/CKFetchShareParticipantsOperationTests.swift; sourceTree = SOURCE_ROOT; };
+		65589FF21DBD33690030C950 /* CKFetchSubscriptionsOperationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CKFetchSubscriptionsOperationTests.swift; path = Tests/Cloud/CKFetchSubscriptionsOperationTests.swift; sourceTree = SOURCE_ROOT; };
+		65589FF31DBD33690030C950 /* CKMarkNotificationsReadOperationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CKMarkNotificationsReadOperationTests.swift; path = Tests/Cloud/CKMarkNotificationsReadOperationTests.swift; sourceTree = SOURCE_ROOT; };
+		65589FF41DBD33690030C950 /* CKModifyBadgeOperationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CKModifyBadgeOperationTests.swift; path = Tests/Cloud/CKModifyBadgeOperationTests.swift; sourceTree = SOURCE_ROOT; };
+		65589FF51DBD33690030C950 /* CKModifyRecordsOperationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CKModifyRecordsOperationTests.swift; path = Tests/Cloud/CKModifyRecordsOperationTests.swift; sourceTree = SOURCE_ROOT; };
+		65589FF61DBD33690030C950 /* CKModifyRecordZonesOperationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CKModifyRecordZonesOperationTests.swift; path = Tests/Cloud/CKModifyRecordZonesOperationTests.swift; sourceTree = SOURCE_ROOT; };
+		65589FF71DBD33690030C950 /* CKModifySubscriptionsOperationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CKModifySubscriptionsOperationTests.swift; path = Tests/Cloud/CKModifySubscriptionsOperationTests.swift; sourceTree = SOURCE_ROOT; };
+		65589FF81DBD33690030C950 /* CKQueryOperationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CKQueryOperationTests.swift; path = Tests/Cloud/CKQueryOperationTests.swift; sourceTree = SOURCE_ROOT; };
 		655E86421D67B55B000FBA6C /* ProcedureQueue.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ProcedureQueue.swift; path = Sources/ProcedureQueue.swift; sourceTree = "<group>"; };
 		655E86441D67B9F9000FBA6C /* ProcedureObserver.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ProcedureObserver.swift; path = Sources/ProcedureObserver.swift; sourceTree = "<group>"; };
 		655E86461D67BA9C000FBA6C /* Support.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Support.swift; path = Sources/Support.swift; sourceTree = "<group>"; };
@@ -951,6 +995,28 @@
 		653CA0661D60AA990070B7A2 /* Cloud Tests */ = {
 			isa = PBXGroup;
 			children = (
+				65589FDE1DBD2BDC0030C950 /* CKAcceptSharesOperationTests.swift */,
+				65589FE21DBD2D3E0030C950 /* CKDatabaseOperationTests.swift */,
+				65589FE41DBD31AC0030C950 /* CKDiscoverAllContactsOperationTests.swift */,
+				65589FE61DBD33690030C950 /* CKDiscoverAllUserIdentitiesOperationTests.swift */,
+				65589FE81DBD33690030C950 /* CKDiscoverUserIdentitiesOperationTests.swift */,
+				65589FE91DBD33690030C950 /* CKDiscoverUserInfosOperationTests.swift */,
+				65589FEA1DBD33690030C950 /* CKFetchDatabaseChangesOperationTests.swift */,
+				65589FEB1DBD33690030C950 /* CKFetchNotificationChangesOperationTests.swift */,
+				65589FEC1DBD33690030C950 /* CKFetchRecordChangesOperationTests.swift */,
+				65589FED1DBD33690030C950 /* CKFetchRecordsOperationTests.swift */,
+				65589FEE1DBD33690030C950 /* CKFetchRecordZoneChangesOperationTests.swift */,
+				65589FEF1DBD33690030C950 /* CKFetchRecordZonesOperationTests.swift */,
+				65589FF01DBD33690030C950 /* CKFetchShareMetadataOperationTests.swift */,
+				65589FF11DBD33690030C950 /* CKFetchShareParticipantsOperationTests.swift */,
+				65589FF21DBD33690030C950 /* CKFetchSubscriptionsOperationTests.swift */,
+				65589FF31DBD33690030C950 /* CKMarkNotificationsReadOperationTests.swift */,
+				65589FF41DBD33690030C950 /* CKModifyBadgeOperationTests.swift */,
+				65589FF51DBD33690030C950 /* CKModifyRecordsOperationTests.swift */,
+				65589FF61DBD33690030C950 /* CKModifyRecordZonesOperationTests.swift */,
+				65589FF71DBD33690030C950 /* CKModifySubscriptionsOperationTests.swift */,
+				65589FE01DBD2C1A0030C950 /* CKOperationTests.swift */,
+				65589FF81DBD33690030C950 /* CKQueryOperationTests.swift */,
 				65931A611DB3B2580067B0A4 /* CloudKitCapabilityTests.swift */,
 				653CA0711D60AAFE0070B7A2 /* ProcedureKitCloudTests.swift */,
 				65931A631DB3B3C90067B0A4 /* TestableCloudKitContainer.swift */,
@@ -1874,9 +1940,31 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				65589FFE1DBD33690030C950 /* CKFetchNotificationChangesOperationTests.swift in Sources */,
+				6558A0081DBD33690030C950 /* CKModifyRecordsOperationTests.swift in Sources */,
+				65589FE31DBD2D3E0030C950 /* CKDatabaseOperationTests.swift in Sources */,
+				65589FE11DBD2C1A0030C950 /* CKOperationTests.swift in Sources */,
+				65589FDF1DBD2BDC0030C950 /* CKAcceptSharesOperationTests.swift in Sources */,
+				65589FFD1DBD33690030C950 /* CKFetchDatabaseChangesOperationTests.swift in Sources */,
+				6558A00A1DBD33690030C950 /* CKModifySubscriptionsOperationTests.swift in Sources */,
+				65589FFF1DBD33690030C950 /* CKFetchRecordChangesOperationTests.swift in Sources */,
+				6558A00B1DBD33690030C950 /* CKQueryOperationTests.swift in Sources */,
 				65931A641DB3B3C90067B0A4 /* TestableCloudKitContainer.swift in Sources */,
+				6558A0071DBD33690030C950 /* CKModifyBadgeOperationTests.swift in Sources */,
+				6558A0031DBD33690030C950 /* CKFetchShareMetadataOperationTests.swift in Sources */,
+				6558A0011DBD33690030C950 /* CKFetchRecordZoneChangesOperationTests.swift in Sources */,
+				6558A0041DBD33690030C950 /* CKFetchShareParticipantsOperationTests.swift in Sources */,
 				65931A621DB3B2580067B0A4 /* CloudKitCapabilityTests.swift in Sources */,
+				65589FF91DBD33690030C950 /* CKDiscoverAllUserIdentitiesOperationTests.swift in Sources */,
+				6558A0061DBD33690030C950 /* CKMarkNotificationsReadOperationTests.swift in Sources */,
+				6558A0021DBD33690030C950 /* CKFetchRecordZonesOperationTests.swift in Sources */,
+				6558A0001DBD33690030C950 /* CKFetchRecordsOperationTests.swift in Sources */,
+				6558A0091DBD33690030C950 /* CKModifyRecordZonesOperationTests.swift in Sources */,
+				65589FFB1DBD33690030C950 /* CKDiscoverUserIdentitiesOperationTests.swift in Sources */,
+				65589FE51DBD31AC0030C950 /* CKDiscoverAllContactsOperationTests.swift in Sources */,
 				653CA0721D60AAFE0070B7A2 /* ProcedureKitCloudTests.swift in Sources */,
+				65589FFC1DBD33690030C950 /* CKDiscoverUserInfosOperationTests.swift in Sources */,
+				6558A0051DBD33690030C950 /* CKFetchSubscriptionsOperationTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

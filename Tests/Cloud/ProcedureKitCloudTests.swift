@@ -15,3 +15,12 @@ class TestSuiteRuns: XCTestCase {
         XCTAssertTrue(true)
     }
 }
+
+class CloudKitTestCase: ProcedureKitTestCase {
+
+}
+
+class CKProcedureTestCase: CloudKitTestCase {
+
+}
+

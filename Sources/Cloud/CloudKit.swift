@@ -257,7 +257,7 @@ public final class CloudKitProcedure<T: Operation>: RetryProcedure<CKProcedure<T
         recovery.customHandlers = errorHandlers
     }
 
-    // When an error occurs, CloudKitOperation executes the appropriate error handler (as long as the completion block is set).
+    // When an error occurs, CloudKitProcedure executes the appropriate error handler (as long as the completion block is set).
     // (By default, certain errors are automatically handled with a retry attempt, such as common network errors.)
     //
     // If the error handler specifies that the operation should retry, it also specifies a configuration block for the operation.
@@ -277,7 +277,7 @@ public final class CloudKitProcedure<T: Operation>: RetryProcedure<CKProcedure<T
     //          - `optionsByRecordZoneID`
     //              - to update the previousServerChangeToken for zones that were partially fetched prior to the error
     //                (assuming you have persisted the successfully-fetched data)
-    //    
+    //
     public func set(finallyConfigureRetryOperationBlock block: CloudKitRecovery<T>.ConfigureBlock?) {
         recovery.set(finallyConfigureRetryOperationBlock: block)
     }
