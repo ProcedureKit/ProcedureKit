@@ -34,7 +34,7 @@
 		6532DD5C1DBCE5F500B030F5 /* CloudKitError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6532DD5B1DBCE5F500B030F5 /* CloudKitError.swift */; };
 		6532DD5E1DBCEA9800B030F5 /* CKOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6532DD5D1DBCEA9800B030F5 /* CKOperation.swift */; };
 		6532DD601DBCEB3D00B030F5 /* CKDatabaseOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6532DD5F1DBCEB3D00B030F5 /* CKDatabaseOperation.swift */; };
-		6532DD621DBCEB5900B030F5 /* CKAcceptSharedOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6532DD611DBCEB5900B030F5 /* CKAcceptSharedOperation.swift */; };
+		6532DD621DBCEB5900B030F5 /* CKAcceptSharesOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6532DD611DBCEB5900B030F5 /* CKAcceptSharesOperation.swift */; };
 		6532DD641DBCEB6F00B030F5 /* CKDiscoverAllContactsOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6532DD631DBCEB6F00B030F5 /* CKDiscoverAllContactsOperation.swift */; };
 		6532DD661DBCEB8A00B030F5 /* CKDiscoverAllUserIdentitiesOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6532DD651DBCEB8A00B030F5 /* CKDiscoverAllUserIdentitiesOperation.swift */; };
 		6532DD681DBCEBA200B030F5 /* CKDiscoverUserInfosOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6532DD671DBCEBA200B030F5 /* CKDiscoverUserInfosOperation.swift */; };
@@ -476,7 +476,7 @@
 		6532DD5B1DBCE5F500B030F5 /* CloudKitError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CloudKitError.swift; path = Sources/Cloud/CloudKitError.swift; sourceTree = SOURCE_ROOT; };
 		6532DD5D1DBCEA9800B030F5 /* CKOperation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CKOperation.swift; path = Sources/Cloud/CKOperation.swift; sourceTree = SOURCE_ROOT; };
 		6532DD5F1DBCEB3D00B030F5 /* CKDatabaseOperation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CKDatabaseOperation.swift; path = Sources/Cloud/CKDatabaseOperation.swift; sourceTree = SOURCE_ROOT; };
-		6532DD611DBCEB5900B030F5 /* CKAcceptSharedOperation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CKAcceptSharedOperation.swift; path = Sources/Cloud/CKAcceptSharedOperation.swift; sourceTree = SOURCE_ROOT; };
+		6532DD611DBCEB5900B030F5 /* CKAcceptSharesOperation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CKAcceptSharesOperation.swift; path = Sources/Cloud/CKAcceptSharesOperation.swift; sourceTree = SOURCE_ROOT; };
 		6532DD631DBCEB6F00B030F5 /* CKDiscoverAllContactsOperation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CKDiscoverAllContactsOperation.swift; path = Sources/Cloud/CKDiscoverAllContactsOperation.swift; sourceTree = SOURCE_ROOT; };
 		6532DD651DBCEB8A00B030F5 /* CKDiscoverAllUserIdentitiesOperation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CKDiscoverAllUserIdentitiesOperation.swift; path = Sources/Cloud/CKDiscoverAllUserIdentitiesOperation.swift; sourceTree = SOURCE_ROOT; };
 		6532DD671DBCEBA200B030F5 /* CKDiscoverUserInfosOperation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CKDiscoverUserInfosOperation.swift; path = Sources/Cloud/CKDiscoverUserInfosOperation.swift; sourceTree = SOURCE_ROOT; };
@@ -773,7 +773,7 @@
 		6532DD891DBCECF800B030F5 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
-				6532DD611DBCEB5900B030F5 /* CKAcceptSharedOperation.swift */,
+				6532DD611DBCEB5900B030F5 /* CKAcceptSharesOperation.swift */,
 				6532DD5F1DBCEB3D00B030F5 /* CKDatabaseOperation.swift */,
 				6532DD631DBCEB6F00B030F5 /* CKDiscoverAllContactsOperation.swift */,
 				6532DD651DBCEB8A00B030F5 /* CKDiscoverAllUserIdentitiesOperation.swift */,
@@ -1857,7 +1857,7 @@
 				6532DD721DBCEC1D00B030F5 /* CKFetchDatabaseChanges.swift in Sources */,
 				6532DD701DBCEC0400B030F5 /* CKModifyBadgeOperation.swift in Sources */,
 				6532DD7E1DBCECAA00B030F5 /* CKFetchShareParticipantsOperation.swift in Sources */,
-				6532DD621DBCEB5900B030F5 /* CKAcceptSharedOperation.swift in Sources */,
+				6532DD621DBCEB5900B030F5 /* CKAcceptSharesOperation.swift in Sources */,
 				6532DD741DBCEC6100B030F5 /* CKFetchRecordChangesOperation.swift in Sources */,
 				6532DD6A1DBCEBCE00B030F5 /* CKDiscoverUserIdentitiesOperation.swift in Sources */,
 				6532DD661DBCEB8A00B030F5 /* CKDiscoverAllUserIdentitiesOperation.swift in Sources */,
