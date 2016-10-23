@@ -63,7 +63,7 @@ open class ReverseGeocodeUserLocationProcedure: GroupProcedure, ResultInjection 
         return finishing.result
     }
 
-    init(underlyingQueue: DispatchQueue? = nil, timeout: TimeInterval = 3.0, accuracy: CLLocationAccuracy = kCLLocationAccuracyThreeKilometers, completion: CompletionBlock? = nil) {
+    init(dispatchQueue: DispatchQueue? = nil, timeout: TimeInterval = 3.0, accuracy: CLLocationAccuracy = kCLLocationAccuracyThreeKilometers, completion: CompletionBlock? = nil) {
 
         finishing = Finishing(completion: completion)
 
@@ -85,7 +85,7 @@ open class ReverseGeocodeUserLocationProcedure: GroupProcedure, ResultInjection 
             procedure.placemark = .ready(placemark)
         }
 
-        super.init(underlyingQueue: underlyingQueue, operations: [userLocation, reverseGeocodeLocation, finishing])
+        super.init(dispatchQueue: dispatchQueue, operations: [userLocation, reverseGeocodeLocation, finishing])
         add(observer: TimeoutObserver(by: timeout))
     }
 
