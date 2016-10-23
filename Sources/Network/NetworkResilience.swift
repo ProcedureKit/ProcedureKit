@@ -53,7 +53,7 @@ public protocol ResilientNetworkBehavior {
     func retryRequest(forResponseWithStatusCode statusCode: Int, errorCode: Int?) -> Bool
 }
 
-internal class ResilientNetworkRecovery<T: Operation> where T: ResultInjectionProtocol, T.Result == Optional<(Data, HTTPURLResponse)> {
+internal class ResilientNetworkRecovery<T: Operation> where T: ResultInjectionProtocol, T.Result == (Data, HTTPURLResponse) {
 
     typealias ConfigurationBlock = (T) -> Void
     typealias Payload = RepeatProcedurePayload<T>
@@ -70,7 +70,7 @@ internal class ResilientNetworkRecovery<T: Operation> where T: ResultInjectionPr
     }
 
     func recover(withInfo info: RetryFailureInfo<T>, payload: Payload) -> Recovery? {
-        guard let response = info.operation.result?.1, behavior.retryRequest(forResponseWithStatusCode: response.statusCode, errorCode: info.errorCode) else { return nil }
+        guard let response = info.operation.result.value?.1, behavior.retryRequest(forResponseWithStatusCode: response.statusCode, errorCode: info.errorCode) else { return nil }
         return (behavior.errorDelay ?? payload.delay, info.configure)
     }
 }
@@ -96,7 +96,7 @@ public enum ProcedureKitNetworkResiliencyError: Error {
  where the result is (Data, HTTPURLResponse)?. For example, see NetworkDataProcedure.
 
  */
-open class ResilientNetworkProcedure<T: Operation>: RetryProcedure<T> where T: ResultInjectionProtocol, T.Result == Optional<(Data, HTTPURLResponse)> {
+open class ResilientNetworkProcedure<T: Operation>: RetryProcedure<T> where T: ResultInjectionProtocol, T.Result == (Data, HTTPURLResponse) {
 
     internal private(set) var recovery: ResilientNetworkRecovery<T>
 
@@ -132,7 +132,7 @@ open class ResilientNetworkProcedure<T: Operation>: RetryProcedure<T> where T: R
 
 extension ResilientNetworkProcedure: ResultInjectionProtocol {
 
-    public var requirement: T.Requirement {
+    public var requirement: PendingValue<T.Requirement> {
         get { return current.requirement }
         set {
             current.requirement = newValue
@@ -140,14 +140,14 @@ extension ResilientNetworkProcedure: ResultInjectionProtocol {
         }
     }
 
-    public var result: T.Result { return current.result }
+    public var result: PendingValue<T.Result> { return current.result }
 }
 
 public extension ResilientNetworkProcedure {
 
     /// - returns: the resultant Data
-    var data: Data? { return result?.0 }
+    var data: Data? { return result.value?.0 }
 
     /// - returns: the resultant Data
-    var response: HTTPURLResponse? { return result?.1 }
+    var response: HTTPURLResponse? { return result.value?.1 }
 }

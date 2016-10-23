@@ -23,7 +23,7 @@ extension Collection where Iterator.Element: Operation {
         return flatMap { $0 as? Condition }
     }
 
-    internal var userIntent: Procedure.UserIntent {
+    internal var userIntent: UserIntent {
         get {
             let (_, procedures) = operationsAndProcedures
             return procedures.map { $0.userIntent }.max { $0.rawValue < $1.rawValue } ?? .none

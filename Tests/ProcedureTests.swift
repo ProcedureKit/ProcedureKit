@@ -95,7 +95,7 @@ class UserIntentTests: ProcedureKitTestCase {
     }
 
     func test__user_intent__equality() {
-        XCTAssertNotEqual(Procedure.UserIntent.initiated, Procedure.UserIntent.sideEffect)
+        XCTAssertNotEqual(UserIntent.initiated, UserIntent.sideEffect)
     }
 }
 

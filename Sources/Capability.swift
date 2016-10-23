@@ -171,7 +171,7 @@ public class GetAuthorizationStatusProcedure<Status: AuthorizationStatus>: Proce
     public typealias Completion = (StatusResponse) -> Void
 
     public typealias Requirement = Void
-    public typealias Result = StatusResponse?
+    public typealias Result = StatusResponse
 
     /**
      After the procedure has executed, this property will be set
@@ -179,9 +179,9 @@ public class GetAuthorizationStatusProcedure<Status: AuthorizationStatus>: Proce
 
      - returns: a StatusResponse
      */
-    public var result: StatusResponse? = nil
+    public var result: PendingValue<StatusResponse> = .pending
 
-    public var requirement: Requirement = ()
+    public var requirement: PendingValue<Void> = .ready(())
 
     fileprivate let capability: AnyCapability<Status>
     fileprivate let completion: Completion?
@@ -201,7 +201,7 @@ public class GetAuthorizationStatusProcedure<Status: AuthorizationStatus>: Proce
 
     public override func execute() {
         determineStatus { status in
-            self.result = status
+            self.result = .ready(status)
             self.completion?(status)
             self.finish()
         }

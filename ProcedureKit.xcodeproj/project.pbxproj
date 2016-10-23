@@ -193,6 +193,13 @@
 			remoteGlobalIDString = 65CFC5EF1D608A5500CAD875;
 			remoteInfo = ProcedureKit;
 		};
+		6532DD571DBCDB3400B030F5 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 65CFC5E51D608A1A00CAD875 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 65CFC6151D60900000CAD875;
+			remoteInfo = TestingProcedureKit;
+		};
 		653C9FCB1D6097A40070B7A2 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 65CFC5E51D608A1A00CAD875 /* Project object */;
@@ -563,8 +570,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				653C9FE21D6099260070B7A2 /* TestingProcedureKit.framework in Frameworks */,
 				653C9FCA1D6097A40070B7A2 /* ProcedureKitMobile.framework in Frameworks */,
+				653C9FE21D6099260070B7A2 /* TestingProcedureKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -623,8 +630,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				653CA07B1D60ABD30070B7A2 /* TestingProcedureKit.framework in Frameworks */,
 				653CA0631D60AA990070B7A2 /* ProcedureKitCloud.framework in Frameworks */,
+				653CA07B1D60ABD30070B7A2 /* TestingProcedureKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1132,6 +1139,7 @@
 			dependencies = (
 				6532DD521DBC190600B030F5 /* PBXTargetDependency */,
 				653C9FCC1D6097A40070B7A2 /* PBXTargetDependency */,
+				6532DD581DBCDB3400B030F5 /* PBXTargetDependency */,
 			);
 			name = ProcedureKitMobileTests;
 			productName = "ProcedureKit iOSTests";
@@ -1169,8 +1177,8 @@
 			);
 			dependencies = (
 				6532DD541DBC190A00B030F5 /* PBXTargetDependency */,
-				653CA0111D609FA50070B7A2 /* PBXTargetDependency */,
 				653C9FFE1D609E660070B7A2 /* PBXTargetDependency */,
+				653CA0111D609FA50070B7A2 /* PBXTargetDependency */,
 			);
 			name = ProcedureKitTVTests;
 			productName = ProcedureKitTVTests;
@@ -1227,8 +1235,8 @@
 			);
 			dependencies = (
 				6532DD561DBC190F00B030F5 /* PBXTargetDependency */,
-				653CA0521D60A70F0070B7A2 /* PBXTargetDependency */,
 				653CA03B1D60A5D10070B7A2 /* PBXTargetDependency */,
+				653CA0521D60A70F0070B7A2 /* PBXTargetDependency */,
 			);
 			name = ProcedureKitMacTests;
 			productName = ProcedureKitMacTests;
@@ -1267,8 +1275,8 @@
 			);
 			dependencies = (
 				6532DD4E1DBC18F800B030F5 /* PBXTargetDependency */,
-				653CA07A1D60ABCE0070B7A2 /* PBXTargetDependency */,
 				653CA0651D60AA990070B7A2 /* PBXTargetDependency */,
+				653CA07A1D60ABCE0070B7A2 /* PBXTargetDependency */,
 			);
 			name = ProcedureKitCloudTests;
 			productName = ProcedureKitCloudTests;
@@ -1307,8 +1315,8 @@
 			);
 			dependencies = (
 				6532DD501DBC190000B030F5 /* PBXTargetDependency */,
-				6594844A1DAAB5340028F83B /* PBXTargetDependency */,
 				659484291DAAA2B90028F83B /* PBXTargetDependency */,
+				6594844A1DAAB5340028F83B /* PBXTargetDependency */,
 			);
 			name = ProcedureKitLocationTests;
 			productName = ProcedureKitLocationTests;
@@ -1910,6 +1918,11 @@
 			isa = PBXTargetDependency;
 			target = 65CFC5EF1D608A5500CAD875 /* ProcedureKit */;
 			targetProxy = 6532DD551DBC190F00B030F5 /* PBXContainerItemProxy */;
+		};
+		6532DD581DBCDB3400B030F5 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 65CFC6151D60900000CAD875 /* TestingProcedureKit */;
+			targetProxy = 6532DD571DBCDB3400B030F5 /* PBXContainerItemProxy */;
 		};
 		653C9FCC1D6097A40070B7A2 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;

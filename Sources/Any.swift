@@ -5,20 +5,20 @@
 //
 
 class AnyProcedureBox_<Requirement, Result>: GroupProcedure, ResultInjectionProtocol {
-    var requirement: Requirement!
-    var result: Result! { return nil }
+    var requirement: PendingValue<Requirement> = .pending
+    var result: PendingValue<Result> { return .pending }
 }
 
 class AnyProcedureBox<Base: Procedure>: AnyProcedureBox_<Base.Requirement, Base.Result> where Base: ResultInjectionProtocol {
 
     private var base: Base
 
-    public override var requirement: Base.Requirement! {
+    public override var requirement: PendingValue<Base.Requirement> {
         get { return base.requirement }
         set { base.requirement = newValue }
     }
 
-    public override var result: Base.Result! {
+    public override var result: PendingValue<Base.Result> {
         return base.result
     }
 
@@ -34,12 +34,12 @@ public class AnyProcedure<Requirement, Result>: GroupProcedure, ResultInjectionP
 
     private var erased: Erased
 
-    public var requirement: Erased.Requirement {
+    public var requirement: PendingValue<Erased.Requirement> {
         get { return erased.requirement }
         set { erased.requirement = newValue }
     }
 
-    public var result: Erased.Result {
+    public var result: PendingValue<Erased.Result> {
         return erased.result
     }
 

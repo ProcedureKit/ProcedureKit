@@ -9,28 +9,34 @@ import TestingProcedureKit
 @testable import ProcedureKit
 
 class Foo: Procedure, ResultInjectionProtocol {
-    var requirement: String = ""
-    var result: String = "Foo"
+    var requirement: PendingValue<String> = .ready("")
+    var result: PendingValue<String> = .pending
     override func execute() {
-        result = "\(requirement)Foo"
+        if let requirement = requirement.value {
+            result = .ready("\(requirement)Foo")
+        }
         finish()
     }
 }
 
 class Bar: Procedure, ResultInjectionProtocol {
-    var requirement: String = ""
-    var result: String = "Bar"
+    var requirement: PendingValue<String> = .ready("")
+    var result: PendingValue<String> = .pending
     override func execute() {
-        result = "\(requirement)Bar"
+        if let requirement = requirement.value {
+            result = .ready("\(requirement)Bar")
+        }
         finish()
     }
 }
 
 class Baz: Procedure, ResultInjectionProtocol {
-    var requirement: String = ""
-    var result: String = "Baz"
+    var requirement: PendingValue<String> = .ready("")
+    var result: PendingValue<String> = .pending
     override func execute() {
-        result = "\(requirement)Baz"
+        if let requirement = requirement.value {
+            result = .ready("\(requirement)Baz")
+        }
         finish()
     }
 }
@@ -49,7 +55,7 @@ class AnyProcedureTests: ProcedureKitTestCase {
         wait(for: anyProcedure)
         XCTAssertProcedureFinishedWithoutErrors(procedure)
         XCTAssertProcedureFinishedWithoutErrors(anyProcedure)
-        XCTAssertEqual(anyProcedure.result, "Hello World")
+        XCTAssertEqual(anyProcedure.result.value, "Hello World")
     }
 
     func test__array_of_any_procedures() {
@@ -57,18 +63,17 @@ class AnyProcedureTests: ProcedureKitTestCase {
         let group = GroupProcedure(operations: procedures)
         wait(for: group)
         XCTAssertProcedureFinishedWithoutErrors(group)
-        XCTAssertEqual(procedures.map { $0.result }, ["Foo", "Bar", "Baz"])
-        XCTAssertEqual(procedures.map { $0.requirement }, ["", "", ""])
+        XCTAssertEqual(procedures.map { $0.result.value ?? "" }, ["Foo", "Bar", "Baz"])
     }
 
     func test__setting_requirement() {
         let foo = Foo()
         let anyProcedure = AnyProcedure(foo)
-        anyProcedure.requirement = "Hello "
+        anyProcedure.requirement = .ready("Hello ")
         wait(for: anyProcedure)
         XCTAssertProcedureFinishedWithoutErrors(foo)
         XCTAssertProcedureFinishedWithoutErrors(anyProcedure)
-        XCTAssertEqual(anyProcedure.result, "Hello Foo")
+        XCTAssertEqual(anyProcedure.result.value ?? "Not Hello Foo", "Hello Foo")
     }
 }
 

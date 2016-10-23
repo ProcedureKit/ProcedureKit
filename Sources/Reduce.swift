@@ -6,16 +6,16 @@
 
 open class ReduceProcedure<Element, U>: Procedure, ResultInjectionProtocol {
 
-    public var requirement: AnySequence<Element>
-    public var result: U
     public let initial: U
     public let nextPartialResult: (U, Element) throws -> U
+    public var requirement: PendingValue<AnySequence<Element>> = .pending
+    public var result: PendingValue<U> = .pending
 
     public init<S: Sequence>(source: S, initial: U, nextPartialResult block: @escaping (U, Element) throws -> U) where S.Iterator.Element == Element, S.SubSequence: Sequence, S.SubSequence.Iterator.Element == Element, S.SubSequence.SubSequence == S.SubSequence {
-        self.requirement = AnySequence(source)
         self.initial = initial
-        self.result = initial
         self.nextPartialResult = block
+        self.requirement = .ready(AnySequence(source))
+        self.result = .ready(initial)
         super.init()
     }
 
@@ -27,7 +27,9 @@ open class ReduceProcedure<Element, U>: Procedure, ResultInjectionProtocol {
         var finishingError: Error? = nil
         defer { finish(withError: finishingError) }
         do {
-            result = try requirement.reduce(initial, nextPartialResult)
+            if let requirementValue = requirement.value {
+                result = .ready(try requirementValue.reduce(initial, nextPartialResult))
+            }
         }
         catch { finishingError = error }
     }
@@ -40,7 +42,10 @@ internal extension ProcedureProtocol where Self: ResultInjectionProtocol, Self.R
             guard errors.isEmpty else {
                 procedure.cancel(withError: ProcedureKitError.dependency(finishedWithErrors: errors)); return
             }
-            procedure.requirement = AnySequence(Array(dependency.result))
+            guard let result = dependency.result.value else {
+                procedure.cancel(withError: ProcedureKitError.requirementNotSatisfied()); return
+            }
+            procedure.requirement = .ready(AnySequence(Array(result)))
         }
         return procedure
     }

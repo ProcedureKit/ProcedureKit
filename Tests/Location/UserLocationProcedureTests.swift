@@ -18,7 +18,7 @@ class UserLocationProcedureTests: LocationProcedureTestCase {
         procedure.manager = manager
         wait(for: procedure)
         XCTAssertProcedureFinishedWithoutErrors(procedure)
-        XCTAssertEqual(procedure.result, location)
+        XCTAssertEqual(procedure.result.value, location)
         XCTAssertEqual(manager.didSetDesiredAccuracy, accuracy)
         XCTAssertTrue(manager.didSetDelegate)
         XCTAssertTrue(manager.didStartUpdatingLocation)

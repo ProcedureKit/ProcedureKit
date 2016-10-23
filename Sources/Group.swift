@@ -322,7 +322,7 @@ public extension GroupProcedure {
     }
 
     /// Override of Procedure.userIntent
-    public override var userIntent: Procedure.UserIntent {
+    public override var userIntent: UserIntent {
         didSet {
             let (operations, procedures) = children.operationsAndProcedures
             operations.forEach { $0.setQualityOfService(fromUserIntent: userIntent) }

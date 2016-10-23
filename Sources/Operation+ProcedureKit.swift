@@ -57,7 +57,7 @@ public extension Operation {
      Sets the quality of service of the Operation from `UserIntent`
      - parameter userIntent: a UserIntent value
      */
-    func setQualityOfService(fromUserIntent userIntent: Procedure.UserIntent) {
+    func setQualityOfService(fromUserIntent userIntent: UserIntent) {
         qualityOfService = userIntent.qualityOfService
     }
 

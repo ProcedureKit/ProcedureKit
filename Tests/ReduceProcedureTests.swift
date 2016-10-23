@@ -10,8 +10,8 @@ import TestingProcedureKit
 
 class NumbersProcedure: Procedure, ResultInjectionProtocol {
 
-    var requirement: Void = ()
-    var result: Array<Int> = []
+    var requirement: PendingValue<Void> = .void
+    var result: PendingValue<Array<Int>> = .ready([])
     var error: Error? = nil
 
     init(error: Error? = nil) {
@@ -24,7 +24,7 @@ class NumbersProcedure: Procedure, ResultInjectionProtocol {
             finish(withError: error)
         }
         else {
-            result = [0, 1, 2, 3, 4, 5 , 6 , 7, 8, 9]
+            result = .ready([0, 1, 2, 3, 4, 5 , 6 , 7, 8, 9])
             finish()
         }
     }
@@ -36,7 +36,7 @@ class ReduceProcedureTests: ProcedureKitTestCase {
         let reduced = ReduceProcedure(source: [0, 1, 2, 3, 4, 5 , 6 , 7, 8, 9], initial: 0, nextPartialResult: +)
         wait(for: reduced)
         XCTAssertProcedureFinishedWithoutErrors(reduced)
-        XCTAssertEqual(reduced.result, 45)
+        XCTAssertEqual(reduced.result.value ?? 0, 45)
     }
 
     func test__finishes_with_error_if_block_throws() {
@@ -51,7 +51,7 @@ class ReduceProcedureTests: ProcedureKitTestCase {
         wait(for: numbers, reduced)
         XCTAssertProcedureFinishedWithoutErrors(numbers)
         XCTAssertProcedureFinishedWithoutErrors(reduced)
-        XCTAssertEqual(reduced.result, 45)
+        XCTAssertEqual(reduced.result.value ?? 0, 45)
     }
 
     func test__reduce_dependency_which_finishes_with_error() {

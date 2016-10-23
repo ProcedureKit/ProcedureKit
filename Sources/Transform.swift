@@ -10,8 +10,8 @@ open class TransformProcedure<Requirement, Result>: Procedure, ResultInjectionPr
 
     private let transform: Transform
 
-    public var requirement: Requirement! = nil
-    public var result: Result? = nil
+    public var requirement: PendingValue<Requirement> = .pending
+    public var result: PendingValue<Result> = .pending
 
     public init(transform: @escaping Transform) {
         self.transform = transform
@@ -22,10 +22,10 @@ open class TransformProcedure<Requirement, Result>: Procedure, ResultInjectionPr
         var finishingError: Error? = nil
         defer { finish(withError: finishingError) }
         do {
-            guard let requirement = requirement else {
+            guard let requirement = requirement.value else {
                 throw ProcedureKitError.requirementNotSatisfied()
             }
-            result = try transform(requirement)
+            result = .ready(try transform(requirement))
         }
         catch { finishingError = error }
     }
