@@ -15,3 +15,46 @@ public protocol CKModifyBadgeOperationProtocol: CKOperationProtocol {
     /// - returns: the completion block used
     var modifyBadgeCompletionBlock: ((Error?) -> Void)? { get set }
 }
+
+extension CKModifyBadgeOperation: CKModifyBadgeOperationProtocol, AssociatedErrorProtocol {
+
+    // The associated error type
+    public typealias AssociatedError = PKCKError
+}
+
+extension CKProcedure where T: CKModifyBadgeOperationProtocol, T: AssociatedErrorProtocol, T.AssociatedError: CloudKitError {
+
+    public var badgeValue: Int {
+        get { return operation.badgeValue }
+        set { operation.badgeValue = newValue }
+    }
+
+    func setModifyBadgeCompletionBlock(_ block: @escaping CloudKitProcedure<T>.ModifyBadgeCompletionBlock) {
+        operation.modifyBadgeCompletionBlock = { [weak self] error in
+            if let strongSelf = self, let error = error {
+                strongSelf.append(fatalError: PKCKError(underlyingError: error))
+            }
+            else {
+                block()
+            }
+        }
+    }
+}
+
+extension CloudKitProcedure where T: CKModifyBadgeOperationProtocol, T: AssociatedErrorProtocol, T.AssociatedError: CloudKitError {
+
+    /// A typealias for the block types used by CloudKitOperation<CKModifyBadgeOperation>
+    public typealias ModifyBadgeCompletionBlock = () -> Void
+
+    public var badgeValue: Int {
+        get { return current.badgeValue }
+        set {
+            current.badgeValue = newValue
+            appendConfigureBlock { $0.badgeValue = newValue }
+        }
+    }
+
+    public func setModifyBadgeCompletionBlock(block: @escaping ModifyBadgeCompletionBlock) {
+        appendConfigureBlock { $0.setModifyBadgeCompletionBlock(block) }
+    }
+}
