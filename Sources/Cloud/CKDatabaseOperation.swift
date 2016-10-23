@@ -131,34 +131,6 @@ extension CloudKitProcedure where T: CKMoreComing {
         return current.moreComing
     }
 }
-// MARK: - CKFetchAllChanges
-
-/// A generic protocol which exposes the properties used by Apple's CloudKit Operation's which have a flag to fetch all changes.
-public protocol CKFetchAllChanges: CKOperationProtocol {
-
-    /// - returns: whether there are more results on the server
-    var fetchAllChanges: Bool { get set }
-}
-
-extension CKProcedure where T: CKFetchAllChanges {
-
-    var fetchAllChanges: Bool {
-        get { return operation.fetchAllChanges }
-        set { operation.fetchAllChanges = newValue }
-    }
-}
-
-extension CloudKitProcedure where T: CKFetchAllChanges {
-
-    /// - returns: the previous server change token
-    public var fetchAllChanges: Bool {
-        get { return current.fetchAllChanges }
-        set {
-            current.fetchAllChanges = newValue
-            appendConfigureBlock { $0.fetchAllChanges = newValue }
-        }
-    }
-}
 
 // MARK: - CKDesiredKeys
 
