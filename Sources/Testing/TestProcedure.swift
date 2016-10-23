@@ -17,7 +17,7 @@ public struct TestError: Error, Equatable {
     public init() { }
 }
 
-open class TestProcedure: Procedure, ResultInjectionProtocol {
+open class TestProcedure: Procedure, ResultInjection {
 
     public let delay: TimeInterval
     public let error: Error?

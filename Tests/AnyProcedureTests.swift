@@ -8,7 +8,7 @@ import XCTest
 import TestingProcedureKit
 @testable import ProcedureKit
 
-class Foo: Procedure, ResultInjectionProtocol {
+class Foo: Procedure, ResultInjection {
     var requirement: PendingValue<String> = .ready("")
     var result: PendingValue<String> = .pending
     override func execute() {
@@ -19,7 +19,7 @@ class Foo: Procedure, ResultInjectionProtocol {
     }
 }
 
-class Bar: Procedure, ResultInjectionProtocol {
+class Bar: Procedure, ResultInjection {
     var requirement: PendingValue<String> = .ready("")
     var result: PendingValue<String> = .pending
     override func execute() {
@@ -30,7 +30,7 @@ class Bar: Procedure, ResultInjectionProtocol {
     }
 }
 
-class Baz: Procedure, ResultInjectionProtocol {
+class Baz: Procedure, ResultInjection {
     var requirement: PendingValue<String> = .ready("")
     var result: PendingValue<String> = .pending
     override func execute() {

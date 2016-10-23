@@ -8,7 +8,7 @@ import XCTest
 import TestingProcedureKit
 @testable import ProcedureKit
 
-class NumbersProcedure: Procedure, ResultInjectionProtocol {
+class NumbersProcedure: Procedure, ResultInjection {
 
     var requirement: PendingValue<Void> = .void
     var result: PendingValue<Array<Int>> = .ready([])

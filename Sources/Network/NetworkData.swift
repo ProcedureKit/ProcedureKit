@@ -9,7 +9,7 @@
  URLSession based APIs. It only supports the completion block style API, therefore
  do not use this procedure if you wish to use delegate based APIs on URLSession.
 */
-open class NetworkDataProcedure<Session: URLSessionTaskFactory>: Procedure, ResultInjectionProtocol {
+open class NetworkDataProcedure<Session: URLSessionTaskFactory>: Procedure, ResultInjection {
 
     public var requirement: PendingValue<URLRequest> = .pending
     public var result: PendingValue<(Data, HTTPURLResponse)> = .pending

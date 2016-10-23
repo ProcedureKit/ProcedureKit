@@ -7,7 +7,7 @@
 import CoreLocation
 import MapKit
 
-open class UserLocationProcedure: Procedure, ResultInjectionProtocol, CLLocationManagerDelegate {
+open class UserLocationProcedure: Procedure, ResultInjection, CLLocationManagerDelegate {
     public typealias CompletionBlock = (CLLocation) -> Void
 
     public let accuracy: CLLocationAccuracy

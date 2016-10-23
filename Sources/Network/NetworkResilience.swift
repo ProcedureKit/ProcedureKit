@@ -53,7 +53,7 @@ public protocol ResilientNetworkBehavior {
     func retryRequest(forResponseWithStatusCode statusCode: Int, errorCode: Int?) -> Bool
 }
 
-internal class ResilientNetworkRecovery<T: Operation> where T: ResultInjectionProtocol, T.Result == (Data, HTTPURLResponse) {
+internal class ResilientNetworkRecovery<T: Operation> where T: ResultInjection, T.Result == (Data, HTTPURLResponse) {
 
     typealias ConfigurationBlock = (T) -> Void
     typealias Payload = RepeatProcedurePayload<T>
@@ -92,11 +92,11 @@ public enum ProcedureKitNetworkResiliencyError: Error {
  encapsulated by the ResilientNetworkBehavior protocol. Clients should implement this on
  a type, which it uses to initialize the procedure with.
 
- For the actual network request, this can be any operation (which conforms to ResultInjectionProtocol)
+ For the actual network request, this can be any operation (which conforms to ResultInjection)
  where the result is (Data, HTTPURLResponse)?. For example, see NetworkDataProcedure.
 
  */
-open class ResilientNetworkProcedure<T: Operation>: RetryProcedure<T> where T: ResultInjectionProtocol, T.Result == (Data, HTTPURLResponse) {
+open class ResilientNetworkProcedure<T: Operation>: RetryProcedure<T> where T: ResultInjection, T.Result == (Data, HTTPURLResponse) {
 
     internal private(set) var recovery: ResilientNetworkRecovery<T>
 
@@ -130,7 +130,7 @@ open class ResilientNetworkProcedure<T: Operation>: RetryProcedure<T> where T: R
     }
 }
 
-extension ResilientNetworkProcedure: ResultInjectionProtocol {
+extension ResilientNetworkProcedure: ResultInjection {
 
     public var requirement: PendingValue<T.Requirement> {
         get { return current.requirement }

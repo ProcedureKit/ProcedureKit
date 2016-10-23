@@ -7,7 +7,7 @@
 import CoreLocation
 import MapKit
 
-open class ReverseGeocodeProcedure: Procedure, ResultInjectionProtocol {
+open class ReverseGeocodeProcedure: Procedure, ResultInjection {
     public typealias CompletionBlock = (CLPlacemark) -> Void
 
     public var requirement: PendingValue<CLLocation> = .pending

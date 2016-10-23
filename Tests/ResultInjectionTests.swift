@@ -8,7 +8,7 @@ import XCTest
 import TestingProcedureKit
 @testable import ProcedureKit
 
-class DataProcessing: Procedure, ResultInjectionProtocol {
+class DataProcessing: Procedure, ResultInjection {
     let result: PendingValue<Void> = .void
     var requirement: PendingValue<String> = .pending
 
@@ -22,7 +22,7 @@ class DataProcessing: Procedure, ResultInjectionProtocol {
     }
 }
 
-class Printing: Procedure, ResultInjectionProtocol {
+class Printing: Procedure, ResultInjection {
     let result: PendingValue<Void> = .void
     var requirement: PendingValue<String> = .ready("Default Requirement")
 

@@ -162,7 +162,7 @@ public struct AnyCapability<Status: AuthorizationStatus>: CapabilityProtocol {
  A generic procedure which will get the current authorization
  status for AnyCapability<Status>.
  */
-public class GetAuthorizationStatusProcedure<Status: AuthorizationStatus>: Procedure, ResultInjectionProtocol {
+public class GetAuthorizationStatusProcedure<Status: AuthorizationStatus>: Procedure, ResultInjection {
 
     /// the StatusResponse is a tuple for the capabilities availability and status
     public typealias StatusResponse = (Bool, Status)

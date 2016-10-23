@@ -15,7 +15,7 @@ public struct UserLocationPlacemark: Equatable {
     public let placemark: CLPlacemark
 }
 
-open class ReverseGeocodeUserLocationProcedure: GroupProcedure, ResultInjectionProtocol {
+open class ReverseGeocodeUserLocationProcedure: GroupProcedure, ResultInjection {
 
     public typealias CompletionBlock = (UserLocationPlacemark) -> Void
 

@@ -4,7 +4,7 @@
 //  Copyright © 2016 ProcedureKit. All rights reserved.
 //
 
-open class TransformProcedure<Requirement, Result>: Procedure, ResultInjectionProtocol {
+open class TransformProcedure<Requirement, Result>: Procedure, ResultInjection {
 
     public typealias Transform = (Requirement) throws -> Result
 

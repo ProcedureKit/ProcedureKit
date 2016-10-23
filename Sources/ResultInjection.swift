@@ -15,7 +15,7 @@ public enum PendingValue<T> {
     }
 }
 
-public protocol ResultInjectionProtocol: class {
+public protocol ResultInjection: class {
 
     associatedtype Requirement
     associatedtype Result
@@ -56,9 +56,9 @@ public extension ProcedureProtocol {
     }
 }
 
-public extension ProcedureProtocol where Self: ResultInjectionProtocol {
+public extension ProcedureProtocol where Self: ResultInjection {
 
-    @discardableResult public func injectResult<Dependency: ProcedureProtocol>(from dependency: Dependency, via block: @escaping (Dependency.Result) throws -> Requirement) -> Self where Dependency: ResultInjectionProtocol {
+    @discardableResult public func injectResult<Dependency: ProcedureProtocol>(from dependency: Dependency, via block: @escaping (Dependency.Result) throws -> Requirement) -> Self where Dependency: ResultInjection {
 
         return inject(dependency: dependency) { procedure, dependency, errors in
             guard errors.isEmpty else {
@@ -76,7 +76,7 @@ public extension ProcedureProtocol where Self: ResultInjectionProtocol {
         }
     }
 
-    @discardableResult func injectResult<Dependency: ProcedureProtocol>(from dependency: Dependency) -> Self where Dependency: ResultInjectionProtocol, Dependency.Result == Requirement {
+    @discardableResult func injectResult<Dependency: ProcedureProtocol>(from dependency: Dependency) -> Self where Dependency: ResultInjection, Dependency.Result == Requirement {
         return injectResult(from: dependency, via: { $0 })
     }
 }
