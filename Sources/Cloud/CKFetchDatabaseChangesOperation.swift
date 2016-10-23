@@ -37,12 +37,12 @@ extension CKFetchDatabaseChangesOperation: CKFetchDatabaseChangesOperationProtoc
 
 extension CKProcedure where T: CKFetchDatabaseChangesOperationProtocol, T: AssociatedErrorProtocol, T.AssociatedError: CloudKitError {
 
-    public var recordZoneWithIDChangedBlock: CloudKitProcedure<T>.FetchDatabaseChangesRecordZoneWithIDChangedBlock? {
+    var recordZoneWithIDChangedBlock: CloudKitProcedure<T>.FetchDatabaseChangesRecordZoneWithIDChangedBlock? {
         get { return operation.recordZoneWithIDChangedBlock }
         set { operation.recordZoneWithIDChangedBlock = newValue }
     }
 
-    public var recordZoneWithIDWasDeletedBlock: CloudKitProcedure<T>.FetchDatabaseChangesRecordZoneWithIDWasDeletedBlock? {
+    var recordZoneWithIDWasDeletedBlock: CloudKitProcedure<T>.FetchDatabaseChangesRecordZoneWithIDWasDeletedBlock? {
         get { return operation.recordZoneWithIDWasDeletedBlock }
         set { operation.recordZoneWithIDWasDeletedBlock = newValue }
     }

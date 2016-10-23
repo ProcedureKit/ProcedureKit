@@ -27,7 +27,7 @@ extension CKDiscoverAllUserIdentitiesOperation: CKDiscoverAllUserIdentitiesOpera
 
 extension CKProcedure where T: CKDiscoverAllUserIdentitiesOperationProtocol, T: AssociatedErrorProtocol, T.AssociatedError: CloudKitError {
 
-    public var userIdentityDiscoveredBlock: CloudKitProcedure<T>.DiscoverAllUserIdentitiesUserIdentityDiscoveredBlock? {
+    var userIdentityDiscoveredBlock: CloudKitProcedure<T>.DiscoverAllUserIdentitiesUserIdentityDiscoveredBlock? {
         get { return operation.userIdentityDiscoveredBlock }
         set { operation.userIdentityDiscoveredBlock = newValue }
     }

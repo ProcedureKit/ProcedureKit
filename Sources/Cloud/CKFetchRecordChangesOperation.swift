@@ -41,17 +41,17 @@ extension CKFetchRecordChangesOperation: CKFetchRecordChangesOperationProtocol, 
 
 extension CKProcedure where T: CKFetchRecordChangesOperationProtocol, T: AssociatedErrorProtocol, T.AssociatedError: CloudKitError {
 
-    public var recordZoneID: T.RecordZoneID {
+    var recordZoneID: T.RecordZoneID {
         get { return operation.recordZoneID }
         set { operation.recordZoneID = newValue }
     }
 
-    public var recordChangedBlock: CloudKitProcedure<T>.FetchRecordChangesRecordChangedBlock? {
+    var recordChangedBlock: CloudKitProcedure<T>.FetchRecordChangesRecordChangedBlock? {
         get { return operation.recordChangedBlock }
         set { operation.recordChangedBlock = newValue }
     }
 
-    public var recordWithIDWasDeletedBlock: CloudKitProcedure<T>.FetchRecordChangesRecordDeletedBlock? {
+    var recordWithIDWasDeletedBlock: CloudKitProcedure<T>.FetchRecordChangesRecordDeletedBlock? {
         get { return operation.recordWithIDWasDeletedBlock }
         set { operation.recordWithIDWasDeletedBlock = newValue }
     }
