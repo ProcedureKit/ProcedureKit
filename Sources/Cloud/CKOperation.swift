@@ -6,6 +6,95 @@
 
 import CloudKit
 
+/**
+ A generic protocol which exposes the types and properties used by
+ Apple's CloudKit Operation types.
+ */
+public protocol CKOperationProtocol: class {
+
+    /// The type of the CloudKit Container
+    associatedtype Container
+
+    /// The type of the CloudKit ServerChangeToken
+    associatedtype ServerChangeToken
+
+    /// The type of the CloudKit Notification
+    associatedtype Notification
+
+    /// The type of the CloudKit RecordZone
+    associatedtype RecordZone
+
+    /// The type of the CloudKit Record
+    associatedtype Record
+
+    /// The type of the CloudKit Subscription
+    associatedtype Subscription
+
+    /// The type of the CloudKit RecordSavePolicy
+    associatedtype RecordSavePolicy
+
+    /// The type of the CloudKit DiscoveredUserInfo
+    associatedtype DiscoveredUserInfo
+
+    /// The type of the CloudKit Query
+    associatedtype Query
+
+    /// The type of the CloudKit QueryCursor
+    associatedtype QueryCursor
+
+    /// The type of the CloudKit RecordZoneID
+    associatedtype RecordZoneID: Hashable
+
+    /// The type of the CloudKit NotificationID
+    associatedtype NotificationID: Hashable
+
+    /// The type of the CloudKit RecordID
+    associatedtype RecordID: Hashable
+
+    /// The type of the CloudKit UserIdentity
+    associatedtype UserIdentity
+
+    /// The type of the CloudKit UserIdentityLookupInfo
+    associatedtype UserIdentityLookupInfo
+
+    /// The type of the CloudKit Share
+    associatedtype Share
+
+    /// The type of the CloudKit ShareMetadata
+    associatedtype ShareMetadata
+
+    /// The type of the CloudKit ShareParticipant
+    associatedtype ShareParticipant
+
+    /// - returns the CloudKit Container
+    var container: Container? { get set }
+
+    /// - returns whether to use cellular data access, if WiFi is unavailable (CKOperation default is true)
+    var allowsCellularAccess: Bool { get set }
+
+    /// - returns a unique identifier for a long-lived CKOperation
+    @available(iOS 9.3, tvOS 9.3, OSX 10.12, watchOS 2.3, *)
+    var operationID: String { get }
+
+    /// - returns whether the operation is long-lived
+    @available(iOS 9.3, tvOS 9.3, OSX 10.12, watchOS 2.3, *)
+    var longLived: Bool { get set }
+
+    /// - returns the block to execute when the server starts storing callbacks for this long-lived CKOperation
+    @available(iOS 9.3, tvOS 9.3, OSX 10.12, watchOS 2.3, *)
+    var longLivedOperationWasPersistedBlock: () -> Void { get set }
+
+    /// If non-zero, overrides the timeout interval for any network requests issued by this operation.
+    /// See NSURLSessionConfiguration.timeoutIntervalForRequest
+    @available(iOS 10.0, tvOS 10.0, OSX 10.12, watchOS 3.0, *)
+    var timeoutIntervalForRequest: TimeInterval { get set }
+
+    /// If non-zero, overrides the timeout interval for any network resources retrieved by this operation.
+    /// See NSURLSessionConfiguration.timeoutIntervalForResource
+    @available(iOS 10.0, tvOS 10.0, OSX 10.12, watchOS 3.0, *)
+    var timeoutIntervalForResource: TimeInterval { get set }
+}
+
 /// An extension to make CKOperation to conform to the CKOperationProtocol.
 extension CKOperation: CKOperationProtocol {
 

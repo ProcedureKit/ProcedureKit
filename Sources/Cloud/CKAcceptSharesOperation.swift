@@ -6,6 +6,19 @@
 
 import CloudKit
 
+/// A generic protocol which exposes the properties used by Apple's CKAcceptSharesOperation.
+public protocol CKAcceptSharesOperationProtocol: CKOperationProtocol {
+
+    /// - returns: the share metadatas
+    var shareMetadatas: [ShareMetadata] { get set }
+
+    /// - returns: the block used to return accepted shares
+    var perShareCompletionBlock: ((ShareMetadata, Share?, Swift.Error?) -> Void)? { get set }
+
+    /// - returns: the completion block used for accepting shares
+    var acceptSharesCompletionBlock: ((Swift.Error?) -> Void)? { get set }
+}
+
 @available(iOS 10.0, OSX 10.12, tvOS 10.0, watchOS 3.0, *)
 extension CKAcceptSharesOperation: CKAcceptSharesOperationProtocol, AssociatedErrorProtocol {
 

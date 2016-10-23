@@ -6,6 +6,19 @@
 
 import CloudKit
 
+/// A generic protocol which exposes the properties used by Apple's CKDiscoverUserIdentitiesOperation.
+public protocol CKDiscoverUserIdentitiesOperationProtocol: CKOperationProtocol {
+
+    /// - returns: the user identity lookup info used in discovery
+    var userIdentityLookupInfos: [UserIdentityLookupInfo] { get set }
+
+    /// - returns: the block used to return discovered user identities
+    var userIdentityDiscoveredBlock: ((UserIdentity, UserIdentityLookupInfo) -> Void)? { get set }
+
+    /// - returns: the completion block used for discovering user identities
+    var discoverUserIdentitiesCompletionBlock: ((Error?) -> Void)? { get set }
+}
+
 @available(iOS 10.0, OSX 10.12, tvOS 10.0, watchOS 3.0, *)
 extension CKDiscoverUserIdentitiesOperation: CKDiscoverUserIdentitiesOperationProtocol, AssociatedErrorProtocol {
 

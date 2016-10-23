@@ -6,6 +6,22 @@
 
 import CloudKit
 
+/// A generic protocol which exposes the properties used by Apple's CKFetchDatabaseChangesOperationType.
+public protocol CKFetchDatabaseChangesOperationProtocol: CKDatabaseOperationProtocol, CKFetchAllChanges, CKPreviousServerChangeToken, CKResultsLimit {
+
+    /// - returns: a block for when a the changeToken is updated
+    var changeTokenUpdatedBlock: ((ServerChangeToken) -> Void)? { get set }
+
+    /// - returns: a block for when a recordZone was changed
+    var recordZoneWithIDChangedBlock: ((RecordZoneID) -> Void)? { get set }
+
+    /// - returns: a block for when a recordZone was deleted
+    var recordZoneWithIDWasDeletedBlock: ((RecordZoneID) -> Void)? { get set }
+
+    /// - returns: the completion for fetching database changes
+    var fetchDatabaseChangesCompletionBlock: ((ServerChangeToken?, Bool, Error?) -> Void)? { get set }
+}
+
 public struct FetchDatabaseChangesError<ServerChangeToken>: CloudKitError {
     public let underlyingError: Error
     public let token: ServerChangeToken?

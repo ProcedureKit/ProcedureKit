@@ -6,6 +6,16 @@
 
 import CloudKit
 
+/// A generic protocol which exposes the properties used by Apple's CKFetchNotificationChangesOperation.
+public protocol CKFetchNotificationChangesOperationProtocol: CKFetchOperation {
+
+    /// - returns: the block invoked when there are notification changes.
+    var notificationChangedBlock: ((Notification) -> Void)? { get set }
+
+    /// - returns: the completion block used for notification changes.
+    var fetchNotificationChangesCompletionBlock: ((ServerChangeToken?, Error?) -> Void)? { get set }
+}
+
 public struct FetchNotificationChangesError<ServerChangeToken>: CloudKitError {
     public let underlyingError: Error
     public let token: ServerChangeToken?

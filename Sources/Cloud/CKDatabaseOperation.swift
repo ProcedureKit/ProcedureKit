@@ -6,6 +6,19 @@
 
 import CloudKit
 
+/**
+ A generic protocol which exposes the types and properties used by
+ Apple's CloudKit Database Operation types.
+ */
+public protocol CKDatabaseOperationProtocol: CKOperationProtocol {
+
+    /// The type of the CloudKit Database
+    associatedtype Database
+
+    /// - returns: the CloudKit Database
+    var database: Database? { get set }
+}
+
 /// An extension to make CKDatabaseOperation to conform to the CKDatabaseOperationProtocol.
 extension CKDatabaseOperation: CKDatabaseOperationProtocol {
 
@@ -35,6 +48,17 @@ extension CloudKitProcedure where T: CKDatabaseOperationProtocol {
 
 // MARK: - CKPreviousServerChangeToken
 
+/**
+ A generic protocol which exposes the types and properties used by
+ Apple's CloudKit Operation's which return the previous sever change
+ token.
+ */
+public protocol CKPreviousServerChangeToken: CKOperationProtocol {
+
+    /// - returns: the previous sever change token
+    var previousServerChangeToken: ServerChangeToken? { get set }
+}
+
 extension CKProcedure where T: CKPreviousServerChangeToken {
 
     var previousServerChangeToken: T.ServerChangeToken? {
@@ -56,6 +80,13 @@ extension CloudKitProcedure where T: CKPreviousServerChangeToken {
 }
 
 // MARK: - CKResultsLimit
+
+/// A generic protocol which exposes the properties used by Apple's CloudKit Operation's which return a results limit.
+public protocol CKResultsLimit: CKOperationProtocol {
+
+    /// - returns: the results limit
+    var resultsLimit: Int { get set }
+}
 
 extension CKProcedure where T: CKResultsLimit {
 
@@ -79,6 +110,13 @@ extension CloudKitProcedure where T: CKResultsLimit {
 
 // MARK: - CKMoreComing
 
+/// A generic protocol which exposes the properties used by Apple's CloudKit Operation's which return a flag for more coming.
+public protocol CKMoreComing: CKOperationProtocol {
+
+    /// - returns: whether there are more results on the server
+    var moreComing: Bool { get }
+}
+
 extension CKProcedure where T: CKMoreComing {
 
     var moreComing: Bool {
@@ -94,6 +132,13 @@ extension CloudKitProcedure where T: CKMoreComing {
     }
 }
 // MARK: - CKFetchAllChanges
+
+/// A generic protocol which exposes the properties used by Apple's CloudKit Operation's which have a flag to fetch all changes.
+public protocol CKFetchAllChanges: CKOperationProtocol {
+
+    /// - returns: whether there are more results on the server
+    var fetchAllChanges: Bool { get set }
+}
 
 extension CKProcedure where T: CKFetchAllChanges {
 
@@ -117,6 +162,13 @@ extension CloudKitProcedure where T: CKFetchAllChanges {
 
 // MARK: - CKDesiredKeys
 
+/// A generic protocol which exposes the properties used by Apple's CloudKit Operation's which have desired keys.
+public protocol CKDesiredKeys: CKOperationProtocol {
+
+    /// - returns: the desired keys to fetch or fetched.
+    var desiredKeys: [String]? { get set }
+}
+
 extension CKProcedure where T: CKDesiredKeys {
 
     var desiredKeys: [String]? {
@@ -136,3 +188,9 @@ extension CloudKitProcedure where T: CKDesiredKeys {
         }
     }
 }
+
+/// A protocol typealias which exposes the properties used by Apple's CloudKit batched operation types.
+public typealias CKBatchedOperation = CKResultsLimit & CKMoreComing
+
+/// A protocol typealias which exposes the properties used by Apple's CloudKit fetched operation types.
+public typealias CKFetchOperation = CKPreviousServerChangeToken & CKBatchedOperation

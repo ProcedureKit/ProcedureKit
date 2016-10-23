@@ -8,6 +8,13 @@ import CloudKit
 
 #if !os(tvOS)
 
+/// A generic protocol which exposes the properties used by Apple's CKDiscoverAllContactsOperation.
+public protocol CKDiscoverAllContactsOperationProtocol: CKOperationProtocol {
+
+    /// - returns: the completion block used for discovering all contacts.
+    var discoverAllContactsCompletionBlock: (([DiscoveredUserInfo]?, Error?) -> Void)? { get set }
+}
+
 public struct DiscoverAllContactsError<DiscoveredUserInfo>: CloudKitError {
     public let underlyingError: Error
     public let userInfo: [DiscoveredUserInfo]?

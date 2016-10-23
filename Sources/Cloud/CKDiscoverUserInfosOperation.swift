@@ -6,6 +6,19 @@
 
 import CloudKit
 
+/// A generic protocol which exposes the properties used by Apple's CKDiscoverUserInfosOperation.
+public protocol CKDiscoverUserInfosOperationProtocol: CKOperationProtocol {
+
+    /// - returns: the email addresses used in discovery
+    var emailAddresses: [String]? { get set }
+
+    /// - returns: the user record IDs
+    var userRecordIDs: [RecordID]? { get set }
+
+    /// - returns: the completion block used for discovering user infos
+    var discoverUserInfosCompletionBlock: (([String: DiscoveredUserInfo]?, [RecordID: DiscoveredUserInfo]?, Error?) -> Void)? { get set }
+}
+
 public struct DiscoverUserInfosError<RecordID: Hashable, DiscoveredUserInfo>: CloudKitError {
     public let underlyingError: Error
     public let userInfoByEmail: [String: DiscoveredUserInfo]?
