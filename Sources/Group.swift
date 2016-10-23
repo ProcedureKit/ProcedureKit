@@ -434,16 +434,29 @@ public extension GroupProcedure {
         }
     }
 
-    public func child(_ child: Operation, didAttemptRecoveryFromErrors errors: [Error]) {
+    public func append(fatalError error: Error) {
+        append(fatalErrors: [error])
+    }
+
+    public func child(_ child: Operation, didEncounterFatalError error: Error) {
+        log.warning(message: "\(child.operationName) did encounter fatal error: \(error).")
+        append(fatalError: error)
+    }
+
+    public func append(fatalErrors errors: [Error]) {
         groupErrors.write { (ward: inout GroupErrors) in
-            ward.attemptedRecovery[child] = errors
+            ward.fatal.append(contentsOf: errors)
         }
     }
 
     public func child(_ child: Operation, didEncounterFatalErrors errors: [Error]) {
-        log.notice(message: "\(child.operationName) did encounter \(errors.count) fatal errors.")
+        log.warning(message: "\(child.operationName) did encounter \(errors.count) fatal errors.")
+        append(fatalErrors: errors)
+    }
+
+    public func child(_ child: Operation, didAttemptRecoveryFromErrors errors: [Error]) {
         groupErrors.write { (ward: inout GroupErrors) in
-            ward.fatal.append(contentsOf: errors)
+            ward.attemptedRecovery[child] = errors
         }
     }
 

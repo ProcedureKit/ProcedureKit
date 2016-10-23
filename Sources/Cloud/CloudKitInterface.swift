@@ -82,12 +82,9 @@ public protocol CKOperationProtocol: class {
     @available(iOS 9.3, tvOS 9.3, OSX 10.12, watchOS 2.3, *)
     var longLived: Bool { get set }
 
-    /// The type of the CKOperation longLivedOperationWasPersistedBlock
-    associatedtype CKOperationLongLivedOperationWasPersistedBlock
-
     /// - returns the block to execute when the server starts storing callbacks for this long-lived CKOperation
     @available(iOS 9.3, tvOS 9.3, OSX 10.12, watchOS 2.3, *)
-    var longLivedOperationWasPersistedBlock: CKOperationLongLivedOperationWasPersistedBlock { get set }
+    var longLivedOperationWasPersistedBlock: () -> Void { get set }
 
     /// If non-zero, overrides the timeout interval for any network requests issued by this operation.
     /// See NSURLSessionConfiguration.timeoutIntervalForRequest

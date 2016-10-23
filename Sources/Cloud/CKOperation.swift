@@ -76,7 +76,115 @@ extension CKOperation: CKOperationProtocol {
     /// The ShareParticipant is a CKShareParticipant
     @available(iOS 10.0, OSX 10.12, tvOS 10.0, watchOS 3.0, *)
     public typealias ShareParticipant = CKShareParticipant
+}
 
-    /// The CKOperationLongLivedOperationWasPersistedBlock is () -> Void
-    public typealias CKOperationLongLivedOperationWasPersistedBlock = () -> Void
+extension CKProcedure where T: CKOperationProtocol {
+
+    var container: T.Container? {
+        get { return operation.container }
+        set { operation.container = newValue }
+    }
+
+    var allowsCellularAccess: Bool {
+        get { return operation.allowsCellularAccess }
+        set { operation.allowsCellularAccess = newValue }
+    }
+
+    @available(iOS 9.3, tvOS 9.3, OSX 10.12, watchOS 2.3, *)
+    var operationID: String {
+        get { return operation.operationID }
+    }
+
+    @available(iOS 9.3, tvOS 9.3, OSX 10.12, watchOS 2.3, *)
+    var longLived: Bool {
+        get { return operation.longLived }
+        set { operation.longLived = newValue }
+    }
+
+    @available(iOS 9.3, tvOS 9.3, OSX 10.12, watchOS 2.3, *)
+    var longLivedOperationWasPersistedBlock: () -> Void {
+        get { return operation.longLivedOperationWasPersistedBlock }
+        set { operation.longLivedOperationWasPersistedBlock = newValue }
+    }
+
+    @available(iOS 10.0, tvOS 10.0, OSX 10.12, watchOS 3.0, *)
+    var timeoutIntervalForRequest: TimeInterval {
+        get { return operation.timeoutIntervalForRequest }
+        set { operation.timeoutIntervalForRequest = newValue }
+    }
+
+    @available(iOS 10.0, tvOS 10.0, OSX 10.12, watchOS 3.0, *)
+    var timeoutIntervalForResource: TimeInterval {
+        get { return operation.timeoutIntervalForResource }
+        set { operation.timeoutIntervalForResource = newValue }
+    }
+}
+
+extension CloudKitProcedure where T: CKOperationProtocol {
+
+    /// - returns: the CloudKit container
+    public var container: T.Container? {
+        get { return current.container }
+        set {
+            current.container = newValue
+            appendConfigureBlock { $0.container = newValue }
+        }
+    }
+
+    /// - returns whether to use cellular data access, if WiFi is unavailable (CKOperation default is true)
+    public var allowsCellularAccess: Bool {
+        get { return current.allowsCellularAccess }
+        set {
+            current.allowsCellularAccess = newValue
+            appendConfigureBlock { $0.allowsCellularAccess = newValue }
+        }
+    }
+
+    /// - returns a unique identifier for a long-lived CKOperation
+    @available(iOS 9.3, tvOS 9.3, OSX 10.12, watchOS 2.3, *)
+    public var operationID: String {
+        get { return current.operationID }
+    }
+
+    /// - returns whether the operation is long-lived
+    @available(iOS 9.3, tvOS 9.3, OSX 10.12, watchOS 2.3, *)
+    public var longLived: Bool {
+        get { return current.longLived }
+        set {
+            current.longLived = newValue
+            appendConfigureBlock { $0.longLived = newValue }
+        }
+    }
+
+    /// - returns the block to execute when the server starts storing callbacks for this long-lived CKOperation
+    @available(iOS 9.3, tvOS 9.3, OSX 10.12, watchOS 2.3, *)
+    public var longLivedOperationWasPersistedBlock: () -> Void {
+        get { return current.longLivedOperationWasPersistedBlock }
+        set {
+            current.longLivedOperationWasPersistedBlock = newValue
+            appendConfigureBlock { $0.longLivedOperationWasPersistedBlock = newValue }
+        }
+    }
+
+    /// If non-zero, overrides the timeout interval for any network requests issued by this operation.
+    /// See NSURLSessionConfiguration.timeoutIntervalForRequest
+    @available(iOS 10.0, tvOS 10.0, OSX 10.12, watchOS 3.0, *)
+    public var timeoutIntervalForRequest: TimeInterval {
+        get { return current.timeoutIntervalForRequest }
+        set {
+            current.timeoutIntervalForRequest = newValue
+            appendConfigureBlock { $0.timeoutIntervalForRequest = newValue }
+        }
+    }
+
+    /// If non-zero, overrides the timeout interval for any network resources retrieved by this operation.
+    /// See NSURLSessionConfiguration.timeoutIntervalForResource
+    @available(iOS 10.0, tvOS 10.0, OSX 10.12, watchOS 3.0, *)
+    public var timeoutIntervalForResource: TimeInterval {
+        get { return current.timeoutIntervalForResource }
+        set {
+            current.timeoutIntervalForResource = newValue
+            appendConfigureBlock { $0.timeoutIntervalForResource = newValue }
+        }
+    }
 }

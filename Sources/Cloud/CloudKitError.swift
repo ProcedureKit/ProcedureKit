@@ -10,7 +10,7 @@ import CloudKit
 public protocol CloudKitError: Error {
 
     /// - returns: the original NSError received from CloudKit
-    var underlyingError: NSError { get }
+    var underlyingError: Error { get }
 
     /// - returns: an operation Delay, used to indicate how long to wait until retry
     var retryAfterDelay: Delay? { get }
@@ -19,14 +19,18 @@ public protocol CloudKitError: Error {
 /// Public extensions to extract useful error information
 public extension CloudKitError {
 
+    internal var underlyingNSError: NSError {
+        return underlyingError as NSError
+    }
+
     /// - returns: the CKErrorCode if possible
     var code: CKError.Code? {
-        return CKError.Code(rawValue: underlyingError.code)
+        return CKError.Code(rawValue: underlyingNSError.code)
     }
 
     /// - returns: an optional Delay, if the underlying error's user info contains CKErrorRetryAfterKey
     var retryAfterDelay: Delay? {
-        return (underlyingError.userInfo[CKErrorRetryAfterKey] as? NSNumber).map { .by($0.doubleValue) }
+        return (underlyingNSError.userInfo[CKErrorRetryAfterKey] as? NSNumber).flatMap { .by($0.doubleValue) }
     }
 }
 
@@ -51,10 +55,5 @@ public protocol CloudKitBatchProcessError: CloudKitError {
 // MARK: - Concrete types
 
 public struct PKCKError: CloudKitError {
-
-    public let underlyingError: NSError
-
-    init(error: NSError) {
-        underlyingError = error
-    }
+    public let underlyingError: Error
 }
