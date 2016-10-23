@@ -33,3 +33,83 @@ extension CKFetchRecordsOperation: CKFetchRecordsOperationProtocol, AssociatedEr
     // The associated error type
     public typealias AssociatedError = FetchRecordsError<Record, RecordID>
 }
+
+
+extension CKProcedure where T: CKFetchRecordsOperationProtocol, T: AssociatedErrorProtocol, T.AssociatedError: CloudKitError {
+
+    public var recordIDs: [T.RecordID]? {
+        get { return operation.recordIDs }
+        set { operation.recordIDs = newValue }
+    }
+
+    public var perRecordProgressBlock: CloudKitProcedure<T>.FetchRecordsPerRecordProgressBlock? {
+        get { return operation.perRecordProgressBlock }
+        set { operation.perRecordProgressBlock = newValue }
+    }
+
+    public var perRecordCompletionBlock: CloudKitProcedure<T>.FetchRecordsPerRecordCompletionBlock? {
+        get { return operation.perRecordCompletionBlock }
+        set { operation.perRecordCompletionBlock = newValue }
+    }
+
+    func setFetchRecordsCompletionBlock(_ block: @escaping CloudKitProcedure<T>.FetchRecordsCompletionBlock) {
+        operation.fetchRecordsCompletionBlock = { [weak self] recordsByID, error in
+            if let strongSelf = self, let error = error {
+                strongSelf.append(fatalError: FetchRecordsError(underlyingError: error, recordsByID: recordsByID))
+            }
+            else {
+                block(recordsByID)
+            }
+        }
+    }
+}
+
+extension CloudKitProcedure where T: CKFetchRecordsOperationProtocol, T: AssociatedErrorProtocol, T.AssociatedError: CloudKitError {
+
+    /// A typealias for the block types used by CloudKitOperation<CKFetchRecordsOperation>
+    public typealias FetchRecordsPerRecordProgressBlock = (T.RecordID, Double) -> Void
+
+    /// A typealias for the block types used by CloudKitOperation<CKFetchRecordsOperation>
+    public typealias FetchRecordsPerRecordCompletionBlock = (T.Record?, T.RecordID?, Error?) -> Void
+
+    /// A typealias for the block types used by CloudKitOperation<CKFetchRecordsOperation>
+    public typealias FetchRecordsCompletionBlock = ([T.RecordID: T.Record]?) -> Void
+
+    /// - returns: the record IDs
+    public var recordIDs: [T.RecordID]? {
+        get { return current.recordIDs }
+        set {
+            current.recordIDs = newValue
+            appendConfigureBlock { $0.recordIDs = newValue }
+        }
+    }
+
+    /// - returns: a block for the record progress
+    public var perRecordProgressBlock: FetchRecordsPerRecordProgressBlock? {
+        get { return current.perRecordProgressBlock }
+        set {
+            current.perRecordProgressBlock = newValue
+            appendConfigureBlock { $0.perRecordProgressBlock = newValue }
+        }
+    }
+
+    /// - returns: a block for the record completion
+    public var perRecordCompletionBlock: FetchRecordsPerRecordCompletionBlock? {
+        get { return current.perRecordCompletionBlock }
+        set {
+            current.perRecordCompletionBlock = newValue
+            appendConfigureBlock { $0.perRecordCompletionBlock = newValue }
+        }
+    }
+
+    /**
+     Before adding the CloudKitOperation instance to a queue, set a completion block
+     to collect the results in the successful case. Setting this completion block also
+     ensures that error handling gets triggered.
+
+     - parameter block: a FetchRecordsCompletionBlock block
+     */
+    public func setFetchRecordsCompletionBlock(block: @escaping FetchRecordsCompletionBlock) {
+        appendConfigureBlock { $0.setFetchRecordsCompletionBlock(block) }
+    }
+}
