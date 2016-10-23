@@ -13,4 +13,53 @@ extension CKDiscoverAllUserIdentitiesOperation: CKDiscoverAllUserIdentitiesOpera
     // The associated error type
     public typealias AssociatedError = PKCKError
 }
+
+extension CKProcedure where T: CKDiscoverAllUserIdentitiesOperationProtocol, T: AssociatedErrorProtocol, T.AssociatedError: CloudKitError {
+
+    public var userIdentityDiscoveredBlock: CloudKitProcedure<T>.DiscoverAllUserIdentitiesUserIdentityDiscoveredBlock? {
+        get { return operation.userIdentityDiscoveredBlock }
+        set { operation.userIdentityDiscoveredBlock = newValue }
+    }
+
+    func setDiscoverAllUserIdentitiesCompletionBlock(_ block: @escaping CloudKitProcedure<T>.DiscoverAllUserIdentitiesCompletionBlock) {
+        operation.discoverAllUserIdentitiesCompletionBlock = { [weak self] error in
+            if let strongSelf = self, let error = error {
+                strongSelf.append(fatalError: PKCKError(underlyingError: error))
+            }
+            else {
+                block()
+            }
+        }
+    }
+}
+
+extension CloudKitProcedure where T: CKDiscoverAllUserIdentitiesOperationProtocol, T: AssociatedErrorProtocol, T.AssociatedError: CloudKitError {
+
+    /// A typealias for the block type used by CloudKitOperation<CKDiscoverAllUserIdentitiesOperationType>
+    public typealias DiscoverAllUserIdentitiesUserIdentityDiscoveredBlock = (T.UserIdentity) -> Void
+
+    /// A typealias for the block type used by CloudKitOperation<CKDiscoverAllUserIdentitiesOperationType>
+    public typealias DiscoverAllUserIdentitiesCompletionBlock = () -> Void
+
+    /// - returns: a block for when a recordZone changeToken update is sent
+    public var userIdentityDiscoveredBlock: DiscoverAllUserIdentitiesUserIdentityDiscoveredBlock? {
+        get { return current.userIdentityDiscoveredBlock }
+        set {
+            current.userIdentityDiscoveredBlock = newValue
+            appendConfigureBlock { $0.userIdentityDiscoveredBlock = newValue }
+        }
+    }
+
+    /**
+     Before adding the CloudKitOperation instance to a queue, set a completion block
+     to collect the results in the successful case. Setting this completion block also
+     ensures that error handling gets triggered.
+
+     - parameter block: a DiscoverAllContactsCompletionBlock block
+     */
+    public func setDiscoverAllUserIdentitiesCompletionBlock(block: @escaping DiscoverAllUserIdentitiesCompletionBlock) {
+        appendConfigureBlock { $0.setDiscoverAllUserIdentitiesCompletionBlock(block) }
+    }
+}
+
 #endif
