@@ -8,6 +8,7 @@ import XCTest
 import ProcedureKit
 import TestingProcedureKit
 @testable import ProcedureKitCloud
+#if !os(tvOS)
 
 class TestCKAcceptSharesOperation: TestCKOperation, CKAcceptSharesOperationProtocol, AssociatedErrorProtocol {
     typealias AssociatedError = DiscoverAllContactsError<DiscoveredUserInfo>
@@ -86,3 +87,4 @@ class CKAcceptSharesOperationTests: CKProcedureTestCase {
     }
 }
 
+#endif

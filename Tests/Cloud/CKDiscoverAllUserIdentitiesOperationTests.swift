@@ -9,6 +9,8 @@ import ProcedureKit
 import TestingProcedureKit
 @testable import ProcedureKitCloud
 
+#if !os(tvOS)
+
 class TestCKDiscoverAllUserIdentitiesOperation: TestCKOperation, CKDiscoverAllUserIdentitiesOperationProtocol, AssociatedErrorProtocol {
     typealias AssociatedError = PKCKError
 
@@ -26,3 +28,5 @@ class TestCKDiscoverAllUserIdentitiesOperation: TestCKOperation, CKDiscoverAllUs
         discoverAllUserIdentitiesCompletionBlock?(error)
     }
 }
+
+#endif
