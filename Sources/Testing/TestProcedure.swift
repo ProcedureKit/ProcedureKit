@@ -17,13 +17,13 @@ public struct TestError: Error, Equatable {
     public init() { }
 }
 
-open class TestProcedure: Procedure, ResultInjectionProtocol {
+open class TestProcedure: Procedure, ResultInjection {
 
     public let delay: TimeInterval
     public let error: Error?
     public let producedOperation: Operation?
-    public var requirement: Void = ()
-    public var result: String? = "Hello World"
+    public var requirement: PendingValue<Void> = .void
+    public var result: PendingValue<String> = .ready("Hello World")
     public private(set) var executedAt: CFAbsoluteTime = 0
     public private(set) var didExecute = false
     public private(set) var procedureWillFinishCalled = false

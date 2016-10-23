@@ -4,13 +4,24 @@
 //  Copyright © 2016 ProcedureKit. All rights reserved.
 //
 
-public protocol ResultInjectionProtocol: class {
+public enum PendingValue<T> {
+    case void
+    case pending
+    case ready(T)
+
+    public var value: T? {
+        guard case let .ready(value) = self else { return nil }
+        return value
+    }
+}
+
+public protocol ResultInjection: class {
 
     associatedtype Requirement
     associatedtype Result
 
-    var requirement: Requirement { get set }
-    var result: Result { get }
+    var requirement: PendingValue<Requirement> { get set }
+    var result: PendingValue<Result> { get }
 }
 
 public extension ProcedureProtocol {
@@ -45,16 +56,19 @@ public extension ProcedureProtocol {
     }
 }
 
-public extension ProcedureProtocol where Self: ResultInjectionProtocol {
+public extension ProcedureProtocol where Self: ResultInjection {
 
-    @discardableResult public func injectResult<Dependency: ProcedureProtocol>(from dependency: Dependency, via block: @escaping (Dependency.Result) throws -> Requirement) -> Self where Dependency: ResultInjectionProtocol {
+    @discardableResult public func injectResult<Dependency: ProcedureProtocol>(from dependency: Dependency, via block: @escaping (Dependency.Result) throws -> Requirement) -> Self where Dependency: ResultInjection {
 
         return inject(dependency: dependency) { procedure, dependency, errors in
             guard errors.isEmpty else {
                 procedure.cancel(withError: ProcedureKitError.dependency(finishedWithErrors: errors)); return
             }
+            guard let result = dependency.result.value else {
+                procedure.cancel(withError: ProcedureKitError.requirementNotSatisfied()); return
+            }
             do {
-                procedure.requirement = try block(dependency.result)
+                procedure.requirement = .ready(try block(result))
             }
             catch {
                 procedure.cancel(withError: ProcedureKitError.dependency(finishedWithErrors: errors)); return
@@ -62,14 +76,7 @@ public extension ProcedureProtocol where Self: ResultInjectionProtocol {
         }
     }
 
-    @discardableResult func injectResult<Dependency: ProcedureProtocol>(from dependency: Dependency) -> Self where Dependency: ResultInjectionProtocol, Dependency.Result == Requirement {
+    @discardableResult func injectResult<Dependency: ProcedureProtocol>(from dependency: Dependency) -> Self where Dependency: ResultInjection, Dependency.Result == Requirement {
         return injectResult(from: dependency, via: { $0 })
-    }
-
-    @discardableResult func requireResult<Dependency: ProcedureProtocol>(from dependency: Dependency) -> Self where Dependency: ResultInjectionProtocol, Dependency.Result == Optional<Requirement> {
-        return injectResult(from: dependency) { result in
-            guard let requirement = result else { throw ProcedureKitError.requirementNotSatisfied() }
-            return requirement
-        }
     }
 }

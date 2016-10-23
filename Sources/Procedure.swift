@@ -7,13 +7,13 @@
 // swiftlint:disable file_length
 // swiftlint:disable type_body_length
 
-open class Procedure: Operation, ProcedureProtocol {
+internal struct ProcedureKit {
 
-    private enum FinishingFrom {
+    fileprivate enum FinishingFrom {
         case main, cancel, finish
     }
 
-    private enum State: Int, Comparable {
+    fileprivate enum State: Int, Comparable {
 
         static func < (lhs: State, rhs: State) -> Bool {
             return lhs.rawValue < rhs.rawValue
@@ -47,26 +47,31 @@ open class Procedure: Operation, ProcedureProtocol {
         }
     }
 
-    /**
-     Type to express the intent of the user in regards to executing an Operation instance
+    private init() { }
+}
 
-     - see: https://developer.apple.com/library/ios/documentation/Performance/Conceptual/EnergyGuide-iOS/PrioritizeWorkWithQoS.html#//apple_ref/doc/uid/TP40015243-CH39
-     */
-    @objc public enum UserIntent: Int {
-        case none = 0, sideEffect, initiated
+/**
+ Type to express the intent of the user in regards to executing an Operation instance
 
-        internal var qualityOfService: QualityOfService {
-            switch self {
-            case .initiated, .sideEffect:
-                return .userInitiated
-            default:
-                return .default
-            }
+ - see: https://developer.apple.com/library/ios/documentation/Performance/Conceptual/EnergyGuide-iOS/PrioritizeWorkWithQoS.html#//apple_ref/doc/uid/TP40015243-CH39
+ */
+@objc public enum UserIntent: Int {
+    case none = 0, sideEffect, initiated
+
+    internal var qualityOfService: QualityOfService {
+        switch self {
+        case .initiated, .sideEffect:
+            return .userInitiated
+        default:
+            return .default
         }
     }
+}
+
+open class Procedure: Operation, ProcedureProtocol {
 
     private var _isTransitioningToExecuting = false
-    private var _isFinishingFrom: FinishingFrom? = nil
+    private var _isFinishingFrom: ProcedureKit.FinishingFrom? = nil
     private var _isHandlingCancel = false
     private var _isCancelled = false  // should always be set by .cancel()
 
@@ -95,10 +100,10 @@ open class Procedure: Operation, ProcedureProtocol {
 
     // MARK: State
 
-    private var _state = State.initialized
+    private var _state = ProcedureKit.State.initialized
     private let _stateLock = NSRecursiveLock()
 
-    fileprivate var state: State {
+    fileprivate var state: ProcedureKit.State {
         get {
             return _stateLock.withCriticalScope { _state }
         }
@@ -184,8 +189,6 @@ open class Procedure: Operation, ProcedureProtocol {
             }
         }
     }
-
-
 
     // MARK: Observers
 
@@ -302,7 +305,7 @@ open class Procedure: Operation, ProcedureProtocol {
     public final override func main() {
 
         // Prevent concurrent execution
-        func getNextState() -> State? {
+        func getNextState() -> ProcedureKit.State? {
             return _stateLock.withCriticalScope {
 
                 // Check to see if the procedure is already attempting to execute
@@ -330,7 +333,7 @@ open class Procedure: Operation, ProcedureProtocol {
         }
 
         // Check the state again, as it could have changed in another queue via finish
-        func getNextStateAgain() -> State? {
+        func getNextStateAgain() -> ProcedureKit.State? {
             return _stateLock.withCriticalScope {
                 guard state <= .pending else { return nil }
 
@@ -474,7 +477,7 @@ open class Procedure: Operation, ProcedureProtocol {
         _finish(withErrors: errors, from: .finish)
     }
 
-    private func shouldFinish(from source: FinishingFrom) -> Bool {
+    private func shouldFinish(from source: ProcedureKit.FinishingFrom) -> Bool {
         return _stateLock.withCriticalScope {
             // Do not finish is already finishing or finished
             guard state <= .finishing else { return false }
@@ -494,7 +497,7 @@ open class Procedure: Operation, ProcedureProtocol {
         }
     }
 
-    private final func _finish(withErrors receivedErrors: [Error], from source: FinishingFrom) {
+    private final func _finish(withErrors receivedErrors: [Error], from source: ProcedureKit.FinishingFrom) {
         guard shouldFinish(from: source) else { return }
 
         // NOTE:

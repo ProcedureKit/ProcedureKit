@@ -19,7 +19,7 @@ open class MapProcedure<Element, U>: ReduceProcedure<Element, Array<U>> {
     }
 }
 
-public extension ProcedureProtocol where Self: ResultInjectionProtocol, Self.Result: Sequence {
+public extension ProcedureProtocol where Self: ResultInjection, Self.Result: Sequence {
 
     func map<U>(transform: @escaping (Result.Iterator.Element) throws -> U) -> MapProcedure<Result.Iterator.Element, U> {
         return injectRequirement(MapProcedure(transform: transform))
@@ -40,7 +40,7 @@ open class FlatMapProcedure<Element, U>: ReduceProcedure<Element, Array<U>> {
     }
 }
 
-public extension ProcedureProtocol where Self: ResultInjectionProtocol, Self.Result: Sequence {
+public extension ProcedureProtocol where Self: ResultInjection, Self.Result: Sequence {
 
     func flatMap<U>(transform: @escaping (Result.Iterator.Element) throws -> U?) -> FlatMapProcedure<Result.Iterator.Element, U> {
         return injectRequirement(FlatMapProcedure(transform: transform))

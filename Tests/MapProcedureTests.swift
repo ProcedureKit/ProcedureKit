@@ -14,7 +14,7 @@ class MapProcedureTests: ProcedureKitTestCase {
         let functional = MapProcedure(source: [0,1,2,3,4,5,6,7]) { $0 * 2 }
         wait(for: functional)
         XCTAssertProcedureFinishedWithoutErrors(functional)
-        XCTAssertEqual(functional.result, [0,2,4,6,8,10,12,14])
+        XCTAssertEqual(functional.result.value ?? [0,1,2,3,4,5,6,7], [0,2,4,6,8,10,12,14])
     }
 
     func test__finishes_with_error_if_block_throws() {
@@ -29,7 +29,7 @@ class MapProcedureTests: ProcedureKitTestCase {
         wait(for: numbers, functional)
         XCTAssertProcedureFinishedWithoutErrors(numbers)
         XCTAssertProcedureFinishedWithoutErrors(functional)
-        XCTAssertEqual(functional.result, [0,2,4,6,8,10,12,14,16,18])
+        XCTAssertEqual(functional.result.value ?? [0,1,2,3,4,5,6,7], [0,2,4,6,8,10,12,14,16,18])
     }
 
     func test__map_dependency_which_finishes_with_errors() {
@@ -51,7 +51,7 @@ class FlatMapProcedureTests: ProcedureKitTestCase {
         }
         wait(for: functional)
         XCTAssertProcedureFinishedWithoutErrors(functional)
-        XCTAssertEqual(functional.result, [0,4,8,12,16])
+        XCTAssertEqual(functional.result.value ?? [0,1,2,3,4,5,6,7,8,9], [0,4,8,12,16])
     }
 
     func test__finishes_with_error_if_block_throws() {
@@ -69,7 +69,7 @@ class FlatMapProcedureTests: ProcedureKitTestCase {
         wait(for: numbers, functional)
         XCTAssertProcedureFinishedWithoutErrors(numbers)
         XCTAssertProcedureFinishedWithoutErrors(functional)
-        XCTAssertEqual(functional.result, [0,4,8,12,16])
+        XCTAssertEqual(functional.result.value ?? [0,1,2,3,4,5,6,7,8,9], [0,4,8,12,16])
     }
 
     func test__flat_map_dependency_which_finishes_with_errors() {
