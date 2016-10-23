@@ -269,7 +269,7 @@ public protocol CKFetchRecordChangesOperationProtocol: CKDatabaseOperationProtoc
     var recordWithIDWasDeletedBlock: ((RecordID) -> Void)? { get set }
 
     /// - returns: the completion for fetching records
-    var fetchRecordChangesCompletionBlock: ((ServerChangeToken?, NSData?, Error?) -> Void)? { get set }
+    var fetchRecordChangesCompletionBlock: ((ServerChangeToken?, Data?, Error?) -> Void)? { get set }
 }
 
 /// A generic protocol which exposes the properties used by Apple's CKFetchRecordZonesOperation.
