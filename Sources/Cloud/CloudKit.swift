@@ -29,12 +29,88 @@ public final class CloudKitRecovery<T: Operation> where T: CKOperationProtocol, 
     public typealias Payload = RepeatProcedurePayload<WrappedOperation>
     public typealias Handler = (T, T.AssociatedError, LoggerProtocol, Recovery) -> Recovery?
 
+    var defaultHandlers: [CKError.Code: Handler] = [:]
+    var customHandlers: [CKError.Code: Handler] = [:]
+    private var finallyConfigureRetryOperationBlock: ConfigureBlock?
+
     internal init() {
 
     }
 
+    func cloudKitErrors(fromInfo info: RetryFailureInfo<WrappedOperation>) -> (CKError.Code, T.AssociatedError)? {
+        let mapped: [(CKError.Code, T.AssociatedError)] = info.errors.flatMap { error in
+            guard
+                let cloudKitError = error as? T.AssociatedError,
+                let code = cloudKitError.code
+            else { return nil }
+            return (code, cloudKitError)
+        }
+        return mapped.first
+    }
+
     func recover(withInfo info: RetryFailureInfo<WrappedOperation>, payload: Payload) -> Recovery? {
-        return nil
+        guard let (code, error) = cloudKitErrors(fromInfo: info) else { return nil }
+
+        let suggestion: Recovery = (payload.delay, info.configure)
+
+        guard
+            let handler = customHandlers[code] ?? defaultHandlers[code],
+            var response = handler(info.operation.operation, error, info.log, suggestion)
+        else { return nil }
+
+        if let finallyConfigureBlock = finallyConfigureRetryOperationBlock {
+            let previousConfigureBlock = response.1
+            response.1 = { operation in
+                previousConfigureBlock(operation)
+                finallyConfigureBlock(operation)
+            }
+        }
+
+        return response
+    }
+
+    func addDefaultHandlers() {
+
+        let exit: Handler = { _, error, log, _ in
+            log.fatal(message: "Exiting due to CloudKit Error: \(error)")
+            return nil
+        }
+
+        set(defaultHandlerForCode: .internalError, handler: exit)
+        set(defaultHandlerForCode: .missingEntitlement, handler: exit)
+        set(defaultHandlerForCode: .invalidArguments, handler: exit)
+        set(defaultHandlerForCode: .serverRejectedRequest, handler: exit)
+        set(defaultHandlerForCode: .assetFileNotFound, handler: exit)
+        set(defaultHandlerForCode: .incompatibleVersion, handler: exit)
+        set(defaultHandlerForCode: .constraintViolation, handler: exit)
+        set(defaultHandlerForCode: .badDatabase, handler: exit)
+        set(defaultHandlerForCode: .quotaExceeded, handler: exit)
+        set(defaultHandlerForCode: .operationCancelled, handler: exit)
+
+        let retry: Handler = { _, error, log, suggestion in
+            log.info(message: "Will retry after receiving error: \(error)")
+            return error.retryAfterDelay.map { ($0, suggestion.1) } ?? suggestion
+        }
+
+        set(defaultHandlerForCode: .networkUnavailable, handler: retry)
+        set(defaultHandlerForCode: .networkFailure, handler: retry)
+        set(defaultHandlerForCode: .serviceUnavailable, handler: retry)
+        set(defaultHandlerForCode: .requestRateLimited, handler: retry)
+        set(defaultHandlerForCode: .assetFileModified, handler: retry)
+        set(defaultHandlerForCode: .batchRequestFailed, handler: retry)
+        set(defaultHandlerForCode: .zoneBusy, handler: retry)
+    }
+
+    func set(defaultHandlerForCode code: CKError.Code, handler: @escaping Handler) {
+        defaultHandlers[code] = handler
+    }
+
+    func set(customHandlerForCode code: CKError.Code, handler: @escaping Handler) {
+        customHandlers[code] = handler
+    }
+
+    func set(finallyConfigureRetryOperationBlock block: ConfigureBlock?) {
+        finallyConfigureRetryOperationBlock = block
     }
 }
 
@@ -139,9 +215,15 @@ public final class CloudKitRecovery<T: Operation> where T: CKOperationProtocol, 
  */
 public final class CloudKitProcedure<T: Operation>: RetryProcedure<CKProcedure<T>> where T: CKOperationProtocol, T: AssociatedErrorProtocol, T.AssociatedError: CloudKitError {
 
+    public typealias ErrorHandler = CloudKitRecovery<T>.Handler
+
     let recovery: CloudKitRecovery<T>
 
-    init<Iterator: IteratorProtocol>(dispatchQueue: DispatchQueue = DispatchQueue.default, timeout: TimeInterval? = 30, strategy: WaitStrategy, iterator: Iterator) where T == Iterator.Element {
+    public var errorHandlers: [CKError.Code: ErrorHandler] {
+        return recovery.customHandlers
+    }
+
+    public init<Iterator: IteratorProtocol>(dispatchQueue: DispatchQueue, timeout: TimeInterval?, strategy: WaitStrategy, iterator: Iterator) where T == Iterator.Element {
 
         // Create a delay between retries
         let delayIterator = Delay.iterator(strategy.iterator)
@@ -161,5 +243,42 @@ public final class CloudKitProcedure<T: Operation>: RetryProcedure<CKProcedure<T
         self.recovery = recovery
 
         super.init(dispatchQueue: dispatchQueue, delay: delayIterator, iterator: operationIterator, retry: handler)
+    }
+
+    public convenience init(dispatchQueue: DispatchQueue = DispatchQueue.default, timeout: TimeInterval? = 30, strategy: WaitStrategy = .random(minimum: 0.1, maximum: 1.0), body: @escaping () -> T?) {
+        self.init(dispatchQueue: dispatchQueue, timeout: timeout, strategy: strategy, iterator: AnyIterator(body))
+    }
+
+    public func set(errorHandlerForCode code: CKError.Code, handler: @escaping ErrorHandler) {
+        recovery.set(customHandlerForCode: code, handler: handler)
+    }
+
+    public func set(errorHandlers: [CKError.Code: ErrorHandler]) {
+        recovery.customHandlers = errorHandlers
+    }
+
+    // When an error occurs, CloudKitOperation executes the appropriate error handler (as long as the completion block is set).
+    // (By default, certain errors are automatically handled with a retry attempt, such as common network errors.)
+    //
+    // If the error handler specifies that the operation should retry, it also specifies a configuration block for the operation.
+    // After the configuration block returned by the error handler configures the operation, the finallyConfigureRetryOperationBlock
+    // will be passed the new ("retry") operation so it can further modify its properties.
+    //
+    // For example:
+    //      - CKFetchDatabaseChangesOperation, for updating:
+    //          - `previousServerChangeToken`
+    //              - with the last changeToken received by the changeTokenUpdatedBlock prior to the error
+    //                (assuming you have persisted the information received prior to the last changeToken update)
+    //
+    //      - CKFetchRecordZoneChangesOperation, for updating:
+    //          - `recordZoneIDs`
+    //              - to remove zones that were completely fetched prior to the error
+    //                (assuming you have persisted the fetched data)
+    //          - `optionsByRecordZoneID`
+    //              - to update the previousServerChangeToken for zones that were partially fetched prior to the error
+    //                (assuming you have persisted the successfully-fetched data)
+    //    
+    public func set(finallyConfigureRetryOperationBlock block: CloudKitRecovery<T>.ConfigureBlock?) {
+        recovery.set(finallyConfigureRetryOperationBlock: block)
     }
 }
