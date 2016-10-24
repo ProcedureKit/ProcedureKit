@@ -47,7 +47,7 @@ class CKAcceptSharesOperationTests: CKProcedureTestCase {
         XCTAssertEqual(target.shareMetadatas, shareMetaddatas)
     }
 
-    func test__set_get__perShareCompletioBlock() {
+    func test__set_get__perShareCompletionBlock() {
         var setByCompletionBlock = false
         let block: (String, String?, Error?) -> Void = { metadata, share, error in
             setByCompletionBlock = true
