@@ -201,6 +201,7 @@
 		65ECB3001DB50BD900F96F46 /* ProcedureKit.framework in Copy Dependencies */ = {isa = PBXBuildFile; fileRef = 65CFC5F01D608A5500CAD875 /* ProcedureKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		65ECB3011DB50BD900F96F46 /* TestingProcedureKit.framework in Copy Dependencies */ = {isa = PBXBuildFile; fileRef = 65CFC6161D60900000CAD875 /* TestingProcedureKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		EE6A68621DC0036300EAB112 /* ConcurrencyTestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE6A68611DC0036300EAB112 /* ConcurrencyTestCase.swift */; };
+		EEB0B55E1DBE646C008A6B35 /* CKFetchAllChangesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEB0B55D1DBE646C008A6B35 /* CKFetchAllChangesTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -662,6 +663,7 @@
 		65ECB2EF1DB4FE9900F96F46 /* NetworkSupport.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkSupport.swift; sourceTree = "<group>"; };
 		65ECB2F31DB5097500F96F46 /* NetworkDataProcedureTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkDataProcedureTests.swift; sourceTree = "<group>"; };
 		EE6A68611DC0036300EAB112 /* ConcurrencyTestCase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ConcurrencyTestCase.swift; path = Sources/Testing/ConcurrencyTestCase.swift; sourceTree = "<group>"; };
+		EEB0B55D1DBE646C008A6B35 /* CKFetchAllChangesTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CKFetchAllChangesTests.swift; path = Tests/Cloud/CKFetchAllChangesTests.swift; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1015,6 +1017,7 @@
 				65589FF51DBD33690030C950 /* CKModifyRecordsOperationTests.swift */,
 				65589FF61DBD33690030C950 /* CKModifyRecordZonesOperationTests.swift */,
 				65589FF71DBD33690030C950 /* CKModifySubscriptionsOperationTests.swift */,
+				EEB0B55D1DBE646C008A6B35 /* CKFetchAllChangesTests.swift */,
 				65589FE01DBD2C1A0030C950 /* CKOperationTests.swift */,
 				65589FF81DBD33690030C950 /* CKQueryOperationTests.swift */,
 				65931A611DB3B2580067B0A4 /* CloudKitCapabilityTests.swift */,
@@ -1954,6 +1957,7 @@
 				6558A0031DBD33690030C950 /* CKFetchShareMetadataOperationTests.swift in Sources */,
 				6558A0011DBD33690030C950 /* CKFetchRecordZoneChangesOperationTests.swift in Sources */,
 				6558A0041DBD33690030C950 /* CKFetchShareParticipantsOperationTests.swift in Sources */,
+				EEB0B55E1DBE646C008A6B35 /* CKFetchAllChangesTests.swift in Sources */,
 				65931A621DB3B2580067B0A4 /* CloudKitCapabilityTests.swift in Sources */,
 				65589FF91DBD33690030C950 /* CKDiscoverAllUserIdentitiesOperationTests.swift in Sources */,
 				6558A0061DBD33690030C950 /* CKMarkNotificationsReadOperationTests.swift in Sources */,
