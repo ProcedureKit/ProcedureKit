@@ -76,6 +76,12 @@ extension CKProcedure where T: CKFetchRecordZoneChangesOperationProtocol, T: Ass
         set { operation.recordZoneChangeTokensUpdatedBlock = newValue }
     }
 
+    /// - returns: a block to execute when the fetch for a zone has completed
+    var recordZoneFetchCompletionBlock: CloudKitProcedure<T>.FetchRecordZoneChangesCompletionRecordZoneFetchCompletionBlock? {
+        get { return operation.recordZoneFetchCompletionBlock }
+        set { operation.recordZoneFetchCompletionBlock = newValue }
+    }
+
     /// - returns: the completion for fetching records (i.e. for the entire operation)
     func setFetchRecordZoneChangesCompletionBlock(_ block: @escaping CloudKitProcedure<T>.FetchRecordZoneChangesCompletionBlock) {
         operation.fetchRecordZoneChangesCompletionBlock = { [weak self] error in
@@ -101,7 +107,7 @@ extension CloudKitProcedure where T: CKFetchRecordZoneChangesOperationProtocol, 
     public typealias FetchRecordZoneChangesRecordZoneChangeTokensUpdatedBlock = (T.RecordZoneID, T.ServerChangeToken?, Data?) -> Void
 
     /// A typealias for the block types used by CloudKitOperation<CKFetchRecordZoneChangesOperationType>
-    public typealias FetchRecordChangesCompletionRecordZoneFetchCompletionBlock = (T.RecordZoneID, T.ServerChangeToken?, Data?, Bool, Error?) -> Void
+    public typealias FetchRecordZoneChangesCompletionRecordZoneFetchCompletionBlock = (T.RecordZoneID, T.ServerChangeToken?, Data?, Bool, Error?) -> Void
 
     /// A typealias for the block types used by CloudKitOperation<CKFetchRecordZoneChangesOperationType>
     public typealias FetchRecordZoneChangesCompletionBlock = () -> Void
@@ -148,6 +154,15 @@ extension CloudKitProcedure where T: CKFetchRecordZoneChangesOperationProtocol, 
         set {
             current.recordZoneChangeTokensUpdatedBlock = newValue
             appendConfigureBlock { $0.recordZoneChangeTokensUpdatedBlock = newValue }
+        }
+    }
+
+    /// - returns: a block to execute when the fetch for a zone has completed
+    public var recordZoneFetchCompletionBlock: FetchRecordZoneChangesCompletionRecordZoneFetchCompletionBlock? {
+        get { return current.recordZoneFetchCompletionBlock }
+        set {
+            current.recordZoneFetchCompletionBlock = newValue
+            appendConfigureBlock { $0.recordZoneFetchCompletionBlock = newValue }
         }
     }
 
