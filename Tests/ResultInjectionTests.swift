@@ -23,8 +23,8 @@ class DataProcessing: Procedure, ResultInjection {
 }
 
 class Printing: Procedure, ResultInjection {
-    let result: PendingValue<Void> = .void
     var requirement: PendingValue<String> = .ready("Default Requirement")
+    let result: PendingValue<Void> = .void
 
     override func execute() {
         if let message = requirement.value {
@@ -116,6 +116,24 @@ class ResultInjectionTests: ResultInjectionTestCase {
         wait(for: processing, procedure)
         XCTAssertProcedureCancelledWithErrors(processing, count: 1)
     }
+
+    func test__automatic_unwrap_when_result_is_optional_requrement() {
+        let hello = ResultProcedure<String?> { "Hello, World" }
+        hello.log.severity = .notice
+        let print = Printing().injectResult(from: hello)
+        print.log.severity = .notice
+        wait(for: print, hello)
+        XCTAssertProcedureFinishedWithoutErrors(print)
+    }
+
+    func test__automatic_unwrap_when_result_is_nil_optional_requrement() {
+        let hello = ResultProcedure<String?> { nil }
+        let printer = Printing().injectResult(from: hello)
+        wait(for: printer, hello)
+        XCTAssertProcedureCancelledWithErrors(printer, count: 1)
+    }
+
+
 }
 
 

@@ -4,13 +4,15 @@
 //  Copyright © 2016 ProcedureKit. All rights reserved.
 //
 
-open class BlockProcedure: Procedure {
+open class ResultProcedure<Result>: Procedure, ResultInjection {
+    public var requirement: PendingValue<Void> = .void
+    public private(set) var result: PendingValue<Result> = .pending
 
-    public typealias ThrowingVoidBlock = () throws -> Void
+    public typealias ThrowingResultBlock = () throws -> Result
 
-    private let block: ThrowingVoidBlock
+    private let block: ThrowingResultBlock
 
-    public init(block: @escaping ThrowingVoidBlock) {
+    public init(block: @escaping ThrowingResultBlock) {
         self.block = block
         super.init()
     }
@@ -18,7 +20,9 @@ open class BlockProcedure: Procedure {
     open override func execute() {
         var finishingError: Error? = nil
         defer { finish(withError: finishingError) }
-        do { try block() }
+        do { result = .ready(try block()) }
         catch { finishingError = error }
     }
 }
+
+open class BlockProcedure: ResultProcedure<Void> { }

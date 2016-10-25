@@ -4,6 +4,7 @@
 //  Copyright © 2016 ProcedureKit. All rights reserved.
 //
 
+
 public enum PendingValue<T> {
     case void
     case pending
@@ -58,7 +59,7 @@ public extension ProcedureProtocol {
 
 public extension ProcedureProtocol where Self: ResultInjection {
 
-    @discardableResult public func injectResult<Dependency: ProcedureProtocol>(from dependency: Dependency, via block: @escaping (Dependency.Result) throws -> Requirement) -> Self where Dependency: ResultInjection {
+    @discardableResult func injectResult<Dependency: ProcedureProtocol>(from dependency: Dependency, via block: @escaping (Dependency.Result) throws -> Requirement) -> Self where Dependency: ResultInjection {
 
         return inject(dependency: dependency) { procedure, dependency, errors in
             guard errors.isEmpty else {
@@ -78,5 +79,14 @@ public extension ProcedureProtocol where Self: ResultInjection {
 
     @discardableResult func injectResult<Dependency: ProcedureProtocol>(from dependency: Dependency) -> Self where Dependency: ResultInjection, Dependency.Result == Requirement {
         return injectResult(from: dependency, via: { $0 })
+    }
+
+    @discardableResult func injectResult<Dependency: ProcedureProtocol>(from dependency: Dependency) -> Self where Dependency: ResultInjection, Dependency.Result == Optional<Requirement> {
+        return injectResult(from: dependency) { result in
+            guard let value = result else {
+                throw ProcedureKitError.requirementNotSatisfied()
+            }
+            return value
+        }
     }
 }
