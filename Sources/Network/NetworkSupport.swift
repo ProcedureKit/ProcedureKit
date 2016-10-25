@@ -42,3 +42,11 @@ extension URL: ExpressibleByStringLiteral {
         self.init(string: value)!
     }
 }
+
+public struct HTTPResult<Payload: Equatable>: Equatable {
+    public static func == (lhs: HTTPResult<Payload>, rhs: HTTPResult<Payload>) -> Bool {
+        return lhs.payload == rhs.payload && lhs.response == rhs.response
+    }
+    public var payload: Payload
+    public var response: HTTPURLResponse
+}

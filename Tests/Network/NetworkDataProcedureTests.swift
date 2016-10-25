@@ -55,7 +55,7 @@ class NetworkDataProcedureTests: ProcedureKitTestCase {
     }
 
     func test__no_requirement__finishes_with_error() {
-        download = NetworkDataProcedure(session: session) { _, _ in }
+        download = NetworkDataProcedure(session: session) { _ in }
         wait(for: download)
         XCTAssertProcedureFinishedWithErrors(download, count: 1)
         XCTAssertEqual(download.errors.first as? ProcedureKitError, ProcedureKitError.requirementNotSatisfied())
@@ -76,9 +76,9 @@ class NetworkDataProcedureTests: ProcedureKitTestCase {
 
     func test__completion_handler_receives_data_and_response() {
         var completionHandlerDidExecute = false
-        download = NetworkDataProcedure(session: session, request: request) { data, response in
-            XCTAssertEqual(data, self.session.returnedData)
-            XCTAssertEqual(response, self.session.returnedResponse)
+        download = NetworkDataProcedure(session: session, request: request) { result in            
+            XCTAssertEqual(result.payload, self.session.returnedData)
+            XCTAssertEqual(result.response, self.session.returnedResponse)
             completionHandlerDidExecute = true
         }
         wait(for: download)
