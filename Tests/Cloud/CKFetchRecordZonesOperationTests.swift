@@ -28,3 +28,56 @@ class TestCKFetchRecordZonesOperation: TestCKDatabaseOperation, CKFetchRecordZon
         fetchRecordZonesCompletionBlock?(zonesByID, error)
     }
 }
+
+class CKFetchRecordZonesOperationTests: CKProcedureTestCase {
+
+    var target: TestCKFetchRecordZonesOperation!
+    var operation: CKProcedure<TestCKFetchRecordZonesOperation>!
+
+    override func setUp() {
+        super.setUp()
+        target = TestCKFetchRecordZonesOperation()
+        operation = CKProcedure(operation: target)
+    }
+
+    func test__set_get__recordZoneIDs() {
+        let recordZoneIDs = [ "a-zone-id", "another-zone-id" ]
+        operation.recordZoneIDs = recordZoneIDs
+        XCTAssertNotNil(operation.recordZoneIDs)
+        XCTAssertEqual(operation.recordZoneIDs!, recordZoneIDs)
+        XCTAssertNotNil(target.recordZoneIDs)
+        XCTAssertEqual(target.recordZoneIDs!, recordZoneIDs)
+    }
+
+    func test__success_without_completion_block() {
+        wait(for: operation)
+        XCTAssertProcedureFinishedWithoutErrors(operation)
+    }
+
+    func test__success_with_completion_block() {
+        var didExecuteBlock = false
+        operation.setFetchRecordZonesCompletionBlock { _ in
+            didExecuteBlock = true
+        }
+        wait(for: operation)
+        XCTAssertProcedureFinishedWithoutErrors(operation)
+        XCTAssertTrue(didExecuteBlock)
+    }
+
+    func test__error_without_completion_block() {
+        target.error = TestError()
+        wait(for: operation)
+        XCTAssertProcedureFinishedWithoutErrors(operation)
+    }
+
+    func test__error_with_completion_block() {
+        var didExecuteBlock = false
+        operation.setFetchRecordZonesCompletionBlock { _ in
+            didExecuteBlock = true
+        }
+        target.error = TestError()
+        wait(for: operation)
+        XCTAssertProcedureFinishedWithErrors(operation, count: 1)
+        XCTAssertFalse(didExecuteBlock)
+    }
+}
