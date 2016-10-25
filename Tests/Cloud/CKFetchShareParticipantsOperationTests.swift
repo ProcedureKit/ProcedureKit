@@ -13,7 +13,6 @@ class TestCKFetchShareParticipantsOperation: TestCKOperation, CKFetchSharePartic
     typealias AssociatedError = PKCKError
 
     var error: Error?
-
     var userIdentityLookupInfos: [UserIdentityLookupInfo] = []
     var shareParticipantFetchedBlock: ((ShareParticipant) -> Void)? = nil
     var fetchShareParticipantsCompletionBlock: ((Error?) -> Void)? = nil

@@ -15,7 +15,6 @@ class TestCKModifyRecordZonesOperation: TestCKDatabaseOperation, CKModifyRecordZ
     var saved: [RecordZone]? = nil
     var deleted: [RecordZoneID]? = nil
     var error: Error? = nil
-
     var recordZonesToSave: [RecordZone]? = nil
     var recordZoneIDsToDelete: [RecordZoneID]? = nil
     var modifyRecordZonesCompletionBlock: (([RecordZone]?, [RecordZoneID]?, Error?) -> Void)? = nil

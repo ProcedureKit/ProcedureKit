@@ -15,13 +15,11 @@ class TestCKModifyRecordsOperation: TestCKDatabaseOperation, CKModifyRecordsOper
     var saved: [Record]?
     var deleted: [RecordID]?
     var error: Error?
-
     var recordsToSave: [Record]? = nil
     var recordIDsToDelete: [RecordID]? = nil
     var savePolicy: RecordSavePolicy = 0
     var clientChangeTokenData: Data? = nil
     var isAtomic: Bool = true
-
     var perRecordProgressBlock: ((Record, Double) -> Void)? = nil
     var perRecordCompletionBlock: ((Record?, Error?) -> Void)? = nil
     var modifyRecordsCompletionBlock: (([Record]?, [RecordID]?, Error?) -> Void)? = nil

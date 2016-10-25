@@ -10,13 +10,11 @@ import TestingProcedureKit
 @testable import ProcedureKitCloud
 
 class TestCKModifySubscriptionsOperation: TestCKDatabaseOperation, CKModifySubscriptionsOperationProtocol, AssociatedErrorProtocol {
-
     typealias AssociatedError = ModifySubscriptionsError<Subscription, String>
 
     var saved: [Subscription]? = nil
     var deleted: [String]? = nil
     var error: Error? = nil
-
     var subscriptionsToSave: [Subscription]? = nil
     var subscriptionIDsToDelete: [String]? = nil
     var modifySubscriptionsCompletionBlock: (([Subscription]?, [String]?, Error?) -> Void)? = nil

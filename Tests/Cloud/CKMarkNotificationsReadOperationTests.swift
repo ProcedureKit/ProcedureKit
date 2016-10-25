@@ -10,12 +10,10 @@ import TestingProcedureKit
 @testable import ProcedureKitCloud
 
 class TestCKMarkNotificationsReadOperation: TestCKOperation, CKMarkNotificationsReadOperationProtocol, AssociatedErrorProtocol {
-
     typealias AssociatedError = MarkNotificationsReadError<String>
 
     var notificationIDs: [String] = []
     var error: Error? = nil
-
     var markNotificationsReadCompletionBlock: (([String]?, Error?) -> Void)? = nil
 
     init(markIDsToRead: [String] = [], error: Error? = nil) {

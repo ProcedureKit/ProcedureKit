@@ -14,7 +14,6 @@ class TestCKFetchDatabaseChangesOperation: TestCKDatabaseOperation, CKFetchDatab
 
     var token: String?
     var error: Error?
-
     var fetchAllChanges: Bool = true
     var recordZoneWithIDChangedBlock: ((RecordZoneID) -> Void)? = nil
     var recordZoneWithIDWasDeletedBlock: ((RecordZoneID) -> Void)? = nil

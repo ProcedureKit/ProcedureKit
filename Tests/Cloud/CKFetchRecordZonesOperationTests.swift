@@ -14,7 +14,6 @@ class TestCKFetchRecordZonesOperation: TestCKDatabaseOperation, CKFetchRecordZon
 
     var zonesByID: [RecordZoneID: RecordZone]? = nil
     var error: Error? = nil
-
     var recordZoneIDs: [RecordZoneID]? = nil
     var fetchRecordZonesCompletionBlock: (([RecordZoneID: RecordZone]?, Error?) -> Void)? = nil
 

@@ -10,7 +10,6 @@ import TestingProcedureKit
 @testable import ProcedureKitCloud
 
 class TestCKFetchNotificationChangesOperation: TestCKOperation, CKFetchNotificationChangesOperationProtocol, AssociatedErrorProtocol {
-
     typealias AssociatedError = FetchNotificationChangesError<ServerChangeToken>
 
     var error: Error? = nil

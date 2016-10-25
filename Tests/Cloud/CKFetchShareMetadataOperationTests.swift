@@ -13,7 +13,6 @@ class TestCKFetchShareMetadataOperation: TestCKOperation, CKFetchShareMetadataOp
     typealias AssociatedError = PKCKError
 
     var error: Error?
-
     var shareURLs: [URL] = []
     var shouldFetchRootRecord: Bool = false
     var rootRecordDesiredKeys: [String]? = nil

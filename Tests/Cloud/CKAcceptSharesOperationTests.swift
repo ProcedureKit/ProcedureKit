@@ -4,17 +4,17 @@
 //  Copyright © 2016 ProcedureKit. All rights reserved.
 //
 
+#if !os(tvOS)
+
 import XCTest
 import ProcedureKit
 import TestingProcedureKit
 @testable import ProcedureKitCloud
-#if !os(tvOS)
 
 class TestCKAcceptSharesOperation: TestCKOperation, CKAcceptSharesOperationProtocol, AssociatedErrorProtocol {
     typealias AssociatedError = DiscoverAllContactsError<DiscoveredUserInfo>
 
     var error: Error?
-
     var shareMetadatas: [ShareMetadata] = []
     var perShareCompletionBlock: ((ShareMetadata, Share?, Error?) -> Void)? = nil
     var acceptSharesCompletionBlock: ((Error?) -> Void)? = nil

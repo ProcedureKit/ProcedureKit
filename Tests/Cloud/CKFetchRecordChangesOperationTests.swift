@@ -15,7 +15,6 @@ class TestCKFetchRecordChangesOperation: TestCKDatabaseOperation, CKFetchRecordC
     var token: String?
     var data: Data?
     var error: Error?
-
     var recordZoneID: RecordZoneID = "zone-id"
     var recordChangedBlock: ((Record) -> Void)? = nil
     var recordWithIDWasDeletedBlock: ((RecordID) -> Void)? = nil

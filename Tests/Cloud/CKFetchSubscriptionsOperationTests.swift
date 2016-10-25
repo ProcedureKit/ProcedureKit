@@ -10,12 +10,10 @@ import TestingProcedureKit
 @testable import ProcedureKitCloud
 
 class TestCKFetchSubscriptionsOperation: TestCKDatabaseOperation, CKFetchSubscriptionsOperationProtocol, AssociatedErrorProtocol {
-
     typealias AssociatedError = FetchSubscriptionsError<Subscription>
 
     var subscriptionsByID: [String: Subscription]? = nil
     var error: Error? = nil
-
     var subscriptionIDs: [String]? = nil
     var fetchSubscriptionCompletionBlock: (([String: Subscription]?, Error?) -> Void)? = nil
 
