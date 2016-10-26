@@ -12,14 +12,14 @@
 open class NetworkDataProcedure<Session: URLSessionTaskFactory>: Procedure, ResultInjection {
 
     public var requirement: PendingValue<URLRequest> = .pending
-    public var result: PendingValue<(Data, HTTPURLResponse)> = .pending
+    public var result: PendingValue<HTTPResult<Data>> = .pending
 
     public private(set) var session: Session
-    public let completion: (Data, HTTPURLResponse) -> Void
+    public let completion: (HTTPResult<Data>) -> Void
 
     internal var task: Session.DataTask? = nil
 
-    public init(session: Session, request: URLRequest? = nil, completionHandler: @escaping (Data, HTTPURLResponse) -> Void = { _, _ in }) {
+    public init(session: Session, request: URLRequest? = nil, completionHandler: @escaping (HTTPResult<Data>) -> Void = { _ in }) {
         self.session = session
         self.requirement = request.flatMap { .ready($0) } ?? .pending
         self.completion = completionHandler
@@ -48,8 +48,10 @@ open class NetworkDataProcedure<Session: URLSessionTaskFactory>: Procedure, Resu
                 return
             }
 
-            strongSelf.result = .ready((data, response))
-            strongSelf.completion(data, response)
+            let http = HTTPResult(payload: data, response: response)
+
+            strongSelf.result = .ready(http)
+            strongSelf.completion(http)
             strongSelf.finish()
         }
 

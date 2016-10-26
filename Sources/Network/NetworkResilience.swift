@@ -53,7 +53,7 @@ public protocol ResilientNetworkBehavior {
     func retryRequest(forResponseWithStatusCode statusCode: Int, errorCode: Int?) -> Bool
 }
 
-internal class ResilientNetworkRecovery<T: Operation> where T: ResultInjection, T.Result == (Data, HTTPURLResponse) {
+internal class ResilientNetworkRecovery<T: Operation> where T: ResultInjection, T.Result == HTTPResult<Data> {
 
     typealias ConfigurationBlock = (T) -> Void
     typealias Payload = RepeatProcedurePayload<T>
@@ -70,7 +70,7 @@ internal class ResilientNetworkRecovery<T: Operation> where T: ResultInjection, 
     }
 
     func recover(withInfo info: RetryFailureInfo<T>, payload: Payload) -> Recovery? {
-        guard let response = info.operation.result.value?.1, behavior.retryRequest(forResponseWithStatusCode: response.statusCode, errorCode: info.errorCode) else { return nil }
+        guard let response = info.operation.result.value?.response, behavior.retryRequest(forResponseWithStatusCode: response.statusCode, errorCode: info.errorCode) else { return nil }
         return (behavior.errorDelay ?? payload.delay, info.configure)
     }
 }
@@ -96,7 +96,7 @@ public enum ProcedureKitNetworkResiliencyError: Error {
  where the result is (Data, HTTPURLResponse)?. For example, see NetworkDataProcedure.
 
  */
-open class ResilientNetworkProcedure<T: Operation>: RetryProcedure<T> where T: ResultInjection, T.Result == (Data, HTTPURLResponse) {
+open class ResilientNetworkProcedure<T: Operation>: RetryProcedure<T> where T: ResultInjection, T.Result == HTTPResult<Data> {
 
     internal private(set) var recovery: ResilientNetworkRecovery<T>
 
@@ -146,8 +146,8 @@ extension ResilientNetworkProcedure: ResultInjection {
 public extension ResilientNetworkProcedure {
 
     /// - returns: the resultant Data
-    var data: Data? { return result.value?.0 }
+    var data: Data? { return result.value?.payload }
 
     /// - returns: the resultant Data
-    var response: HTTPURLResponse? { return result.value?.1 }
+    var response: HTTPURLResponse? { return result.value?.response }
 }
