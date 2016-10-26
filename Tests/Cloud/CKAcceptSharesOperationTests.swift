@@ -4,6 +4,8 @@
 //  Copyright © 2016 ProcedureKit. All rights reserved.
 //
 
+#if !os(tvOS)
+
 import XCTest
 import CloudKit
 import ProcedureKit
@@ -164,5 +166,5 @@ class CloudKitProcedureAcceptSharesOperationTests: CKProcedureTestCase {
     }
 }
 
-
+#endif
 
