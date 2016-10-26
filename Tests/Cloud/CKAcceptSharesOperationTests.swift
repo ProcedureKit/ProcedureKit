@@ -4,9 +4,8 @@
 //  Copyright © 2016 ProcedureKit. All rights reserved.
 //
 
-#if !os(tvOS)
-
 import XCTest
+import CloudKit
 import ProcedureKit
 import TestingProcedureKit
 @testable import ProcedureKitCloud
@@ -14,7 +13,7 @@ import TestingProcedureKit
 class TestCKAcceptSharesOperation: TestCKOperation, CKAcceptSharesOperationProtocol, AssociatedErrorProtocol {
     typealias AssociatedError = DiscoverAllContactsError<DiscoveredUserInfo>
 
-    var error: Error?
+    var error: Error? = nil
     var shareMetadatas: [ShareMetadata] = []
     var perShareCompletionBlock: ((ShareMetadata, Share?, Error?) -> Void)? = nil
     var acceptSharesCompletionBlock: ((Error?) -> Void)? = nil
@@ -87,4 +86,83 @@ class CKAcceptSharesOperationTests: CKProcedureTestCase {
     }
 }
 
-#endif
+class CloudKitProcedureAcceptSharesOperationTests: CKProcedureTestCase {
+
+    var shareMetadatas: [TestCKAcceptSharesOperation.ShareMetadata]!
+    var setByBlockPerShareCompletionBlock: Bool!
+    var cloudkit: CloudKitProcedure<TestCKAcceptSharesOperation>!
+
+    override func setUp() {
+        super.setUp()
+        shareMetadatas = [ "hello@world.com" ]
+        setByBlockPerShareCompletionBlock = false
+        cloudkit = CloudKitProcedure(strategy: .immediate) { TestCKAcceptSharesOperation() }
+        cloudkit.container = container
+        cloudkit.shareMetadatas = shareMetadatas
+        cloudkit.perShareCompletionBlock = { [weak self] _, _, _ in
+            self?.setByBlockPerShareCompletionBlock = true
+        }
+    }
+
+    override func tearDown() {
+        shareMetadatas = nil
+        setByBlockPerShareCompletionBlock = false
+        cloudkit = nil
+        super.tearDown()
+    }
+
+    func test__setting_common_properties() {
+        wait(for: cloudkit)
+        XCTAssertEqual(cloudkit.container, container)
+        XCTAssertEqual(cloudkit.shareMetadatas, shareMetadatas)
+        XCTAssertNotNil(cloudkit.perShareCompletionBlock)
+        cloudkit.perShareCompletionBlock?("share metadata", "accepted share", nil)
+        XCTAssertProcedureFinishedWithoutErrors(cloudkit)
+        XCTAssertTrue(setByBlockPerShareCompletionBlock)
+    }
+
+    func test__cancellation() {
+        cloudkit.cancel()
+        wait(for: cloudkit)
+        XCTAssertProcedureCancelledWithoutErrors(cloudkit)
+    }
+
+    func test__success_without_completion_block_set() {
+        wait(for: cloudkit)
+        XCTAssertProcedureFinishedWithoutErrors(cloudkit)
+    }
+
+    func test__success_with_completion_block_set() {
+        var didExecuteBlock = false
+        cloudkit.setAcceptSharesCompletionBlock { didExecuteBlock = true }
+        wait(for: cloudkit)
+        XCTAssertProcedureFinishedWithoutErrors(cloudkit)
+        XCTAssertTrue(didExecuteBlock)
+    }
+
+    func test__error_without_completion_block_set() {
+        cloudkit = CloudKitProcedure(strategy: .immediate) {
+            let operation = TestCKAcceptSharesOperation()
+            operation.error = NSError(domain: CKErrorDomain, code: CKError.internalError.rawValue, userInfo: nil)
+            return operation
+        }
+        wait(for: cloudkit)
+        XCTAssertProcedureFinishedWithoutErrors(cloudkit)
+    }
+
+    func test__error_with_completion_block_set() {
+        cloudkit = CloudKitProcedure(strategy: .immediate) {
+            let operation = TestCKAcceptSharesOperation()
+            operation.error = NSError(domain: CKErrorDomain, code: CKError.internalError.rawValue, userInfo: nil)
+            return operation
+        }
+        var didExecuteBlock = false
+        cloudkit.setAcceptSharesCompletionBlock { didExecuteBlock = true }
+        wait(for: cloudkit)
+        XCTAssertProcedureFinishedWithErrors(cloudkit, count: 1)
+        XCTAssertFalse(didExecuteBlock)
+    }
+}
+
+
+
