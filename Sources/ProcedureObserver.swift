@@ -27,6 +27,13 @@ public protocol ProcedureObserver {
     func will(execute procedure: Procedure)
 
     /**
+     The procedure did execute.
+
+     - parameter procedure: the observed `Procedure`.
+     */
+    func did(execute procedure: Procedure)
+
+    /**
      The procedure will cancel.
 
      - parameter procedure: the observed `Procedure`.
@@ -73,6 +80,8 @@ public extension ProcedureObserver {
     func didAttach(to procedure: Procedure) { }
 
     func will(execute procedure: Procedure) { }
+
+    func did(execute procedure: Procedure) { }
 
     func will(cancel procedure: Procedure, withErrors: [Error]) { }
 
