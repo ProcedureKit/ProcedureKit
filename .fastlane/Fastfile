@@ -115,12 +115,6 @@ platform :ios do
       destination: "platform=iOS Simulator,OS=10.0,name=iPhone 6s"
     )
 
-    scan(
-      project: "ProcedureKit.xcodeproj",
-      scheme: "ProcedureKitLocation",
-      destination: "platform=iOS Simulator,OS=10.0,name=iPhone 6s"
-    )
-
   end
 
   desc "ProcedureKitLocation: tvOS"
