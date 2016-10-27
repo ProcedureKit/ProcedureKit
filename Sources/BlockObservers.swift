@@ -142,7 +142,7 @@ public struct DidExecuteObserver<Procedure: ProcedureProtocol>: ProcedureObserve
     /**
      Initialize the observer with a block.
 
-     - parameter willExecute: the `Block`
+     - parameter didExecute: the `Block`
      - returns: an observer.
      */
     public init(didExecute: @escaping Observer<Procedure>.DidExecute) {
