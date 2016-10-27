@@ -30,4 +30,14 @@ class BlockProcedureTests: ProcedureKitTestCase {
         wait(for: block)
         XCTAssertProcedureFinishedWithErrors(block, count: 1)
     }
+
+    func test__block_did_execute_observer() {
+        let block = BlockProcedure { /* does nothing */ }
+        var didExecuteBlockObserver = false
+        block.addDidExecuteBlockObserver { procedure in
+            didExecuteBlockObserver = true
+        }
+        wait(for: block)
+        XCTAssertTrue(didExecuteBlockObserver)
+    }
 }

@@ -23,6 +23,13 @@ class BlockObserverTests: ProcedureKitTestCase {
         XCTAssertEqual(willExecuteCalled, procedure)
     }
 
+    func test__did_execute_is_called() {
+        var didExecuteCalled: Procedure? = nil
+        procedure.add(observer: BlockObserver(didExecute: { didExecuteCalled = $0 }))
+        wait(for: procedure)
+        XCTAssertEqual(didExecuteCalled, procedure)
+    }
+
     func test__will_cancel_is_called() {
         var willCancelCalled: (Procedure, [Error])? = nil
         let error = TestError()
