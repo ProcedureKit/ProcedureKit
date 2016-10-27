@@ -116,21 +116,21 @@ class MutualExclusiveConcurrencyTests: ConcurrencyTestCase {
     func test__mutually_exclusive_operation_are_run_exclusively() {
 
         let numOperations = 3
-        let procedureDelayMicroseconds: useconds_t = 500000 // 0.5 seconds
+        let delayMicroseconds: useconds_t = 500000 // 0.5 seconds
 
         queue.maxConcurrentOperationCount = numOperations
 
-        concurrencyTest(operations: numOperations, withProcedureDelayMicroseconds: procedureDelayMicroseconds, withTimeout: 3,
+        concurrencyTest(operations: numOperations, withDelayMicroseconds: delayMicroseconds, withTimeout: 3,
             withConfigureBlock: { (testOp) in
-                let condition = MutuallyExclusive<TestConcurrencyTrackingProcedure>()
+                let condition = MutuallyExclusive<TrackingProcedure>()
                 testOp.add(condition: condition)
                 return testOp
             },
-            withExpectations: ConcurrencyTestExpectations(
-                minConcurrentOperationsDetectedCount: 1,
-                maxConcurrentOperationsDetectedCount: 1,
-                allTestConcurrencyProceduresFinished: true,
-                minimumDurationInSeconds: Double(useconds_t(numOperations) * procedureDelayMicroseconds) / 1000000.0
+            withExpectations: Expectations(
+                checkMinimumDetected: 1,
+                checkMaximumDetected: 1,
+                checkAllProceduresFinished: true,
+                checkMinimumDuration: TimeInterval(useconds_t(numOperations) * delayMicroseconds) / 1000000.0
             )
         )
     }
@@ -141,12 +141,12 @@ class MutualExclusiveConcurrencyTests: ConcurrencyTestCase {
         // Covers Issue: https://github.com/ProcedureKit/ProcedureKit/issues/543
 
         let numOperations = 3
-        let procedureDelayMicroseconds: useconds_t = 500000 // 0.5 seconds
+        let delayMicroseconds: useconds_t = 500000 // 0.5 seconds
 
         queue.maxConcurrentOperationCount = numOperations
 
-        let testProcedures: [TestConcurrencyTrackingProcedure] = createTestProcedures(count: numOperations, procedureDelayMicroseconds: procedureDelayMicroseconds, withConcurrencyRegistrar: concurrencyRegistrar).map {
-            let condition = MutuallyExclusive<TestConcurrencyTrackingProcedure>()
+        let procedures: [TrackingProcedure] = createProcedures(count: numOperations, delayMicroseconds: delayMicroseconds, withRegistrar: registrar).map {
+            let condition = MutuallyExclusive<TrackingProcedure>()
             $0.add(condition: condition)
             addCompletionBlockTo(procedure: $0, withExpectationDescription: "\($0.name), didFinish")
             return $0
@@ -156,7 +156,7 @@ class MutualExclusiveConcurrencyTests: ConcurrencyTestCase {
 
         // add procedures to the queue simultaneously
         let dispatchQueue = DispatchQueue.global(qos: .userInitiated)
-        for procedure in testProcedures {
+        for procedure in procedures {
             dispatchQueue.async { [weak self] in
                 guard let strongSelf = self else { return }
                 strongSelf.queue.addOperation(procedure)
@@ -168,12 +168,12 @@ class MutualExclusiveConcurrencyTests: ConcurrencyTestCase {
         let endTime = CFAbsoluteTimeGetCurrent()
         let duration = Double(endTime) - Double(startTime)
 
-        XCTAssertConcurrencyResults(ConcurrencyTestResult(testProcedures: testProcedures, duration: duration, concurrencyRegistrar: concurrencyRegistrar),
-            matchExpectations: ConcurrencyTestExpectations(
-                minConcurrentOperationsDetectedCount: 1,
-                maxConcurrentOperationsDetectedCount: 1,
-                allTestConcurrencyProceduresFinished: true,
-                minimumDurationInSeconds: Double(useconds_t(numOperations) * procedureDelayMicroseconds) / 1000000.0
+        XCTAssertResults(TestResult(procedures: procedures, duration: duration, registrar: registrar),
+            matchExpectations: Expectations(
+                checkMinimumDetected: 1,
+                checkMaximumDetected: 1,
+                checkAllProceduresFinished: true,
+                checkMinimumDuration: TimeInterval(useconds_t(numOperations) * delayMicroseconds) / 1000000.0
             )
         )
     }
