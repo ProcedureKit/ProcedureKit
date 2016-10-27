@@ -148,6 +148,7 @@
 		65ECB2FE1DB50BC500F96F46 /* TestingProcedureKit.framework in Copy Dependencies */ = {isa = PBXBuildFile; fileRef = 65CFC6161D60900000CAD875 /* TestingProcedureKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		65ECB3001DB50BD900F96F46 /* ProcedureKit.framework in Copy Dependencies */ = {isa = PBXBuildFile; fileRef = 65CFC5F01D608A5500CAD875 /* ProcedureKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		65ECB3011DB50BD900F96F46 /* TestingProcedureKit.framework in Copy Dependencies */ = {isa = PBXBuildFile; fileRef = 65CFC6161D60900000CAD875 /* TestingProcedureKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		EE6A68621DC0036300EAB112 /* ConcurrencyTestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE6A68611DC0036300EAB112 /* ConcurrencyTestCase.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -555,6 +556,7 @@
 		65ECB2ED1DB4FDE000F96F46 /* NetworkData.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkData.swift; sourceTree = "<group>"; };
 		65ECB2EF1DB4FE9900F96F46 /* NetworkSupport.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkSupport.swift; sourceTree = "<group>"; };
 		65ECB2F31DB5097500F96F46 /* NetworkDataProcedureTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkDataProcedureTests.swift; sourceTree = "<group>"; };
+		EE6A68611DC0036300EAB112 /* ConcurrencyTestCase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ConcurrencyTestCase.swift; path = Sources/Testing/ConcurrencyTestCase.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -766,6 +768,7 @@
 			isa = PBXGroup;
 			children = (
 				65A63B161DA0536200E90B9D /* CapabilityTestCase.swift */,
+				EE6A68611DC0036300EAB112 /* ConcurrencyTestCase.swift */,
 				6591B3011D74980900C2B57F /* GroupTestCase.swift */,
 				659E5FFB1D6E3BCF002B1D10 /* ProcedureKitTestCase.swift */,
 				65245D1A1D72129800340A2D /* QueueTestDelegate.swift */,
@@ -1857,6 +1860,7 @@
 				659E5FFC1D6E3BCF002B1D10 /* ProcedureKitTestCase.swift in Sources */,
 				65A63B171DA0536200E90B9D /* CapabilityTestCase.swift in Sources */,
 				65403ABA1D7C49C500D6036B /* XCTAsserts.swift in Sources */,
+				EE6A68621DC0036300EAB112 /* ConcurrencyTestCase.swift in Sources */,
 				655594F31D9E48A200B08990 /* RepeatTestCase.swift in Sources */,
 				65DFA4871DB51F60009358CE /* TestableNetwork.swift in Sources */,
 				6591B3021D74980900C2B57F /* GroupTestCase.swift in Sources */,

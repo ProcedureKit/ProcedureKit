@@ -111,6 +111,73 @@ class MutualExclusiveTests: ProcedureKitTestCase {
     }
 }
 
+class MutualExclusiveConcurrencyTests: ConcurrencyTestCase {
+
+    func test__mutually_exclusive_operation_are_run_exclusively() {
+
+        let numOperations = 3
+        let delayMicroseconds: useconds_t = 500000 // 0.5 seconds
+
+        queue.maxConcurrentOperationCount = numOperations
+
+        concurrencyTest(operations: numOperations, withDelayMicroseconds: delayMicroseconds, withTimeout: 3,
+            withConfigureBlock: { (testOp) in
+                let condition = MutuallyExclusive<TrackingProcedure>()
+                testOp.add(condition: condition)
+                return testOp
+            },
+            withExpectations: Expectations(
+                checkMinimumDetected: 1,
+                checkMaximumDetected: 1,
+                checkAllProceduresFinished: true,
+                checkMinimumDuration: TimeInterval(useconds_t(numOperations) * delayMicroseconds) / 1000000.0
+            )
+        )
+    }
+
+    func test__mutually_exclusive_operations_added_concurrently_are_run_exclusively() {
+        // Attempt to add mutually exclusive operations to a queue simultaneously.
+        // This should not affect their mutual exclusivity.
+        // Covers Issue: https://github.com/ProcedureKit/ProcedureKit/issues/543
+
+        let numOperations = 3
+        let delayMicroseconds: useconds_t = 500000 // 0.5 seconds
+
+        queue.maxConcurrentOperationCount = numOperations
+
+        let procedures: [TrackingProcedure] = create(procedures: numOperations, delayMicroseconds: delayMicroseconds, withRegistrar: registrar).map {
+            let condition = MutuallyExclusive<TrackingProcedure>()
+            $0.add(condition: condition)
+            addCompletionBlockTo(procedure: $0, withExpectationDescription: "\($0.name), didFinish")
+            return $0
+        }
+
+        let startTime = CFAbsoluteTimeGetCurrent()
+
+        // add procedures to the queue simultaneously
+        let dispatchQueue = DispatchQueue.global(qos: .userInitiated)
+        for procedure in procedures {
+            dispatchQueue.async { [weak self] in
+                guard let strongSelf = self else { return }
+                strongSelf.queue.addOperation(procedure)
+            }
+        }
+
+        waitForExpectations(timeout: TimeInterval(numOperations), handler: nil)
+
+        let endTime = CFAbsoluteTimeGetCurrent()
+        let duration = Double(endTime) - Double(startTime)
+
+        XCTAssertResults(TestResult(procedures: procedures, duration: duration, registrar: registrar),
+            matchExpectations: Expectations(
+                checkMinimumDetected: 1,
+                checkMaximumDetected: 1,
+                checkAllProceduresFinished: true,
+                checkMinimumDuration: TimeInterval(useconds_t(numOperations) * delayMicroseconds) / 1000000.0
+            )
+        )
+    }
+}
 
 
 
