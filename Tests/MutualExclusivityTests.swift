@@ -111,6 +111,73 @@ class MutualExclusiveTests: ProcedureKitTestCase {
     }
 }
 
+class MutualExclusiveConcurrencyTests: ConcurrencyTestCase {
+
+    func test__mutually_exclusive_operation_are_run_exclusively() {
+
+        let numOperations = 3
+        let procedureDelayMicroseconds: useconds_t = 500000 // 0.5 seconds
+
+        queue.maxConcurrentOperationCount = numOperations
+
+        concurrencyTest(operations: numOperations, withProcedureDelayMicroseconds: procedureDelayMicroseconds, withTimeout: 3,
+            withConfigureBlock: { (testOp) in
+                let condition = MutuallyExclusive<TestConcurrencyTrackingProcedure>()
+                testOp.add(condition: condition)
+                return testOp
+            },
+            withExpectations: ConcurrencyTestExpectations(
+                minConcurrentOperationsDetectedCount: 1,
+                maxConcurrentOperationsDetectedCount: 1,
+                allTestConcurrencyProceduresFinished: true,
+                minimumDurationInSeconds: Double(useconds_t(numOperations) * procedureDelayMicroseconds) / 1000000.0
+            )
+        )
+    }
+
+    func test__mutually_exclusive_operations_added_concurrently_are_run_exclusively() {
+        // Attempt to add mutually exclusive operations to a queue simultaneously.
+        // This should not affect their mutual exclusivity.
+        // Covers Issue: https://github.com/ProcedureKit/ProcedureKit/issues/543
+
+        let numOperations = 3
+        let procedureDelayMicroseconds: useconds_t = 500000 // 0.5 seconds
+
+        queue.maxConcurrentOperationCount = numOperations
+
+        let testProcedures: [TestConcurrencyTrackingProcedure] = createTestProcedures(count: numOperations, procedureDelayMicroseconds: procedureDelayMicroseconds, withConcurrencyRegistrar: concurrencyRegistrar).map {
+            let condition = MutuallyExclusive<TestConcurrencyTrackingProcedure>()
+            $0.add(condition: condition)
+            addCompletionBlockTo(procedure: $0, withExpectationDescription: "\($0.name), didFinish")
+            return $0
+        }
+
+        let startTime = CFAbsoluteTimeGetCurrent()
+
+        // add procedures to the queue simultaneously
+        let dispatchQueue = DispatchQueue.global(qos: .userInitiated)
+        for procedure in testProcedures {
+            dispatchQueue.async { [weak self] in
+                guard let strongSelf = self else { return }
+                strongSelf.queue.addOperation(procedure)
+            }
+        }
+
+        waitForExpectations(timeout: TimeInterval(numOperations), handler: nil)
+
+        let endTime = CFAbsoluteTimeGetCurrent()
+        let duration = Double(endTime) - Double(startTime)
+
+        XCTAssertConcurrencyResults(ConcurrencyTestResult(testProcedures: testProcedures, duration: duration, concurrencyRegistrar: concurrencyRegistrar),
+            matchExpectations: ConcurrencyTestExpectations(
+                minConcurrentOperationsDetectedCount: 1,
+                maxConcurrentOperationsDetectedCount: 1,
+                allTestConcurrencyProceduresFinished: true,
+                minimumDurationInSeconds: Double(useconds_t(numOperations) * procedureDelayMicroseconds) / 1000000.0
+            )
+        )
+    }
+}
 
 
 
