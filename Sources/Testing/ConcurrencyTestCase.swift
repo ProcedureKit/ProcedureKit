@@ -57,7 +57,7 @@ open class ConcurrencyTestCase: ProcedureKitTestCase {
         }
     }
 
-    public func createProcedures(count: Int = 3, delayMicroseconds: useconds_t = 500000 /* 0.5 seconds */, withRegistrar registrar: Registrar) -> [TrackingProcedure] {
+    public func create(procedures count: Int = 3, delayMicroseconds: useconds_t = 500000 /* 0.5 seconds */, withRegistrar registrar: Registrar) -> [TrackingProcedure] {
         return (0..<count).map { i in
             let name = "TestConcurrencyTrackingProcedure: \(i)"
             return TestConcurrencyTrackingProcedure(name: name, microsecondsToSleep: delayMicroseconds, registrar: registrar)
@@ -76,7 +76,7 @@ open class ConcurrencyTestCase: ProcedureKitTestCase {
     public func concurrencyTest(operations: Int = 3, withDelayMicroseconds delayMicroseconds: useconds_t = 500000 /* 0.5 seconds */, withName name: String = #function, withTimeout timeout: TimeInterval = 3, withConfigureBlock configure: (TrackingProcedure) -> TrackingProcedure = { return $0 }, completionBlock completion: (TestResult) -> Void) {
 
         let registrar = Registrar()
-        let procedures = createProcedures(count: operations, delayMicroseconds: delayMicroseconds, withRegistrar: registrar).map {
+        let procedures = create(procedures: operations, delayMicroseconds: delayMicroseconds, withRegistrar: registrar).map {
             return configure($0)
         }
 
@@ -96,7 +96,7 @@ open class ConcurrencyTestCase: ProcedureKitTestCase {
                 XCTAssertTrue(i.element.isFinished, "Test procedure [\(i.offset)] did not finish")
             }
         }
-        // exact test for maxConcurrentOperationsDetectedCount
+        // exact test for registrar.maximumDetected
         if let checkExactDetected = expectations.checkExactDetected {
             XCTAssertEqual(results.registrar.maximumDetected, checkExactDetected, "maximumDetected concurrent operations (\(results.registrar.maximumDetected)) does not equal expected: \(checkExactDetected)")
         }

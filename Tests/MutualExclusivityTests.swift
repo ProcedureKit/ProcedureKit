@@ -145,7 +145,7 @@ class MutualExclusiveConcurrencyTests: ConcurrencyTestCase {
 
         queue.maxConcurrentOperationCount = numOperations
 
-        let procedures: [TrackingProcedure] = createProcedures(count: numOperations, delayMicroseconds: delayMicroseconds, withRegistrar: registrar).map {
+        let procedures: [TrackingProcedure] = create(procedures: numOperations, delayMicroseconds: delayMicroseconds, withRegistrar: registrar).map {
             let condition = MutuallyExclusive<TrackingProcedure>()
             $0.add(condition: condition)
             addCompletionBlockTo(procedure: $0, withExpectationDescription: "\($0.name), didFinish")
