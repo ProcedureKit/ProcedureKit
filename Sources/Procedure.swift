@@ -379,6 +379,10 @@ open class Procedure: Operation, ProcedureProtocol {
         log.notice(message: "Will Execute")
 
         execute()
+
+        observers.forEach { $0.did(execute: self) }
+
+        log.notice(message: "Did Execute")
     }
 
     open func execute() {
