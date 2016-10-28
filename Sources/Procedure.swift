@@ -16,7 +16,7 @@ open class Procedure: Operation, ProcedureProtocol {
         case main, cancel, finish
     }
 
-    private enum State: Int, Comparable {
+    fileprivate enum State: Int, Comparable {
 
         static func < (lhs: State, rhs: State) -> Bool {
             return lhs.rawValue < rhs.rawValue
