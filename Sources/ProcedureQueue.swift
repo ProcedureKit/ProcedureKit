@@ -247,7 +247,7 @@ open class ProcedureQueue: OperationQueue {
      - parameter wait: a Bool flag which is ignored.
      */
     open override func addOperations(_ ops: [Operation], waitUntilFinished wait: Bool) {
-        ops.forEach(addOperation)
+        ops.forEach { addOperation($0) }
     }
 
     /// Overrides and wraps the Swift 3 interface
