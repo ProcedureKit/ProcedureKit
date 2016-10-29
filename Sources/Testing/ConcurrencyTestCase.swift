@@ -141,15 +141,15 @@ open class ConcurrencyRegistrar {
             return state.read { $0.maximumDetected }
         }
     }
-    public func registerRunning(_ op: Operation) {
+    public func registerRunning(_ operation: Operation) {
         state.write { ward in
-            ward.operations.append(op)
+            ward.operations.append(operation)
             ward.maximumDetected = max(ward.operations.count, ward.maximumDetected)
         }
     }
-    public func deregisterRunning(_ op: Operation) {
+    public func deregisterRunning(_ operation: Operation) {
         state.write { ward in
-            if let opIndex = ward.operations.index(of: op) {
+            if let opIndex = ward.operations.index(of: operation) {
                 ward.operations.remove(at: opIndex)
             }
         }
