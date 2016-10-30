@@ -5,6 +5,8 @@
 //
 
 import XCTest
+import CoreLocation
+import MapKit
 import ProcedureKit
 import TestingProcedureKit
 @testable import ProcedureKitLocation

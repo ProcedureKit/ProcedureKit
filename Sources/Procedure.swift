@@ -5,18 +5,15 @@
 //
 
 // swiftlint:disable file_length
-
-import Foundation
-
 // swiftlint:disable type_body_length
 
-open class Procedure: Operation, ProcedureProtocol {
+internal struct ProcedureKit {
 
-    private enum FinishingFrom {
+    fileprivate enum FinishingFrom {
         case main, cancel, finish
     }
 
-    private enum State: Int, Comparable {
+    fileprivate enum State: Int, Comparable {
 
         static func < (lhs: State, rhs: State) -> Bool {
             return lhs.rawValue < rhs.rawValue
@@ -50,26 +47,31 @@ open class Procedure: Operation, ProcedureProtocol {
         }
     }
 
-    /**
-     Type to express the intent of the user in regards to executing an Operation instance
+    private init() { }
+}
 
-     - see: https://developer.apple.com/library/ios/documentation/Performance/Conceptual/EnergyGuide-iOS/PrioritizeWorkWithQoS.html#//apple_ref/doc/uid/TP40015243-CH39
-     */
-    @objc public enum UserIntent: Int {
-        case none = 0, sideEffect, initiated
+/**
+ Type to express the intent of the user in regards to executing an Operation instance
 
-        internal var qualityOfService: QualityOfService {
-            switch self {
-            case .initiated, .sideEffect:
-                return .userInitiated
-            default:
-                return .default
-            }
+ - see: https://developer.apple.com/library/ios/documentation/Performance/Conceptual/EnergyGuide-iOS/PrioritizeWorkWithQoS.html#//apple_ref/doc/uid/TP40015243-CH39
+ */
+@objc public enum UserIntent: Int {
+    case none = 0, sideEffect, initiated
+
+    internal var qualityOfService: QualityOfService {
+        switch self {
+        case .initiated, .sideEffect:
+            return .userInitiated
+        default:
+            return .default
         }
     }
+}
+
+open class Procedure: Operation, ProcedureProtocol {
 
     private var _isTransitioningToExecuting = false
-    private var _isFinishingFrom: FinishingFrom? = nil
+    private var _isFinishingFrom: ProcedureKit.FinishingFrom? = nil
     private var _isHandlingCancel = false
     private var _isCancelled = false  // should always be set by .cancel()
 
@@ -98,10 +100,10 @@ open class Procedure: Operation, ProcedureProtocol {
 
     // MARK: State
 
-    private var _state = State.initialized
+    private var _state = ProcedureKit.State.initialized
     private let _stateLock = NSRecursiveLock()
 
-    fileprivate var state: State {
+    fileprivate var state: ProcedureKit.State {
         get {
             return _stateLock.withCriticalScope { _state }
         }
@@ -187,8 +189,6 @@ open class Procedure: Operation, ProcedureProtocol {
             }
         }
     }
-
-
 
     // MARK: Observers
 
@@ -305,7 +305,7 @@ open class Procedure: Operation, ProcedureProtocol {
     public final override func main() {
 
         // Prevent concurrent execution
-        func getNextState() -> State? {
+        func getNextState() -> ProcedureKit.State? {
             return _stateLock.withCriticalScope {
 
                 // Check to see if the procedure is already attempting to execute
@@ -333,7 +333,7 @@ open class Procedure: Operation, ProcedureProtocol {
         }
 
         // Check the state again, as it could have changed in another queue via finish
-        func getNextStateAgain() -> State? {
+        func getNextStateAgain() -> ProcedureKit.State? {
             return _stateLock.withCriticalScope {
                 guard state <= .pending else { return nil }
 
@@ -379,6 +379,10 @@ open class Procedure: Operation, ProcedureProtocol {
         log.notice(message: "Will Execute")
 
         execute()
+
+        observers.forEach { $0.did(execute: self) }
+
+        log.notice(message: "Did Execute")
     }
 
     open func execute() {
@@ -477,7 +481,7 @@ open class Procedure: Operation, ProcedureProtocol {
         _finish(withErrors: errors, from: .finish)
     }
 
-    private func shouldFinish(from source: FinishingFrom) -> Bool {
+    private func shouldFinish(from source: ProcedureKit.FinishingFrom) -> Bool {
         return _stateLock.withCriticalScope {
             // Do not finish is already finishing or finished
             guard state <= .finishing else { return false }
@@ -497,7 +501,7 @@ open class Procedure: Operation, ProcedureProtocol {
         }
     }
 
-    private final func _finish(withErrors receivedErrors: [Error], from source: FinishingFrom) {
+    private final func _finish(withErrors receivedErrors: [Error], from source: ProcedureKit.FinishingFrom) {
         guard shouldFinish(from: source) else { return }
 
         // NOTE:
@@ -583,9 +587,9 @@ public extension Procedure {
 
 // MARK: Conditions
 
-public extension Procedure {
+extension Procedure {
 
-    internal enum ConditionEvaluation {
+    enum ConditionEvaluation {
         case pending, satisfied, ignored
         case failed([Error])
 
@@ -615,7 +619,7 @@ public extension Procedure {
         }
     }
 
-    internal class EvaluateConditions: GroupProcedure {
+    class EvaluateConditions: GroupProcedure {
         var requirement: [Condition] = []
         var result: ConditionEvaluation = .pending
 
@@ -641,7 +645,7 @@ public extension Procedure {
         }
     }
 
-    internal func evaluateConditions() -> Procedure {
+    func evaluateConditions() -> Procedure {
 
         func createEvaluateConditionsProcedure() -> EvaluateConditions {
             // Set the procedure on each condition
@@ -678,24 +682,24 @@ public extension Procedure {
         return evaluator
     }
 
-    internal func add(dependencyOnPreviousMutuallyExclusiveProcedure procedure: Procedure) {
+    func add(dependencyOnPreviousMutuallyExclusiveProcedure procedure: Procedure) {
         precondition(state <= .executing, "Dependencies cannot be modified after execution has begun, current state: \(state).")
         super.addDependency(procedure)
     }
 
-    internal func add(directDependency: Operation) {
+    func add(directDependency: Operation) {
         precondition(state <= .executing, "Dependencies cannot be modified after execution has begun, current state: \(state).")
         directDependencies.insert(directDependency)
         super.addDependency(directDependency)
     }
 
-    internal func remove(directDependency: Operation) {
+    func remove(directDependency: Operation) {
         precondition(state <= .executing, "Dependencies cannot be modified after execution has begun, current state: \(state).")
         directDependencies.remove(directDependency)
         super.removeDependency(directDependency)
     }
 
-    final override var dependencies: [Operation] {
+    public final override var dependencies: [Operation] {
         return Array(directDependencies.union(indirectDependencies))
     }
 
@@ -708,7 +712,7 @@ public extension Procedure {
      to a queue, or is waiting on dependencies.
      - parameter operation: a `Operation` instance.
      */
-    final override func addDependency(_ operation: Operation) {
+    public final override func addDependency(_ operation: Operation) {
         precondition(state <= .executing, "Dependencies cannot be modified after execution has begun, current state: \(state).")
         add(directDependency: operation)
     }
@@ -723,7 +727,7 @@ public extension Procedure {
      to a queue, or is waiting on dependencies.
      - parameter operation: a `Operation` instance.
      */
-    final override func removeDependency(_ operation: Operation) {
+    public final override func removeDependency(_ operation: Operation) {
         precondition(state <= .executing, "Dependencies cannot be modified after execution has begun, current state: \(state).")
         remove(directDependency: operation)
     }
@@ -733,7 +737,7 @@ public extension Procedure {
 
      - parameter condition: a `Condition` which must be satisfied for the procedure to be executed.
      */
-    func attach(condition: Condition) {
+    public func add(condition: Condition) {
         assert(state < .executing, "Cannot modify conditions after operation has begun executing, current state: \(state).")
         conditions.insert(condition)
     }

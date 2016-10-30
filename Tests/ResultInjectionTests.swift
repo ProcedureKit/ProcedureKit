@@ -8,12 +8,12 @@ import XCTest
 import TestingProcedureKit
 @testable import ProcedureKit
 
-class DataProcessing: Procedure, ResultInjectionProtocol {
-    let result: Void = ()
-    var requirement: String? = nil
+class DataProcessing: Procedure, ResultInjection {
+    let result: PendingValue<Void> = .void
+    var requirement: PendingValue<String> = .pending
 
     override func execute() {
-        guard let output = requirement else {
+        guard let output = requirement.value else {
             finish(withError: ProcedureKitError.requirementNotSatisfied())
             return
         }
@@ -22,12 +22,14 @@ class DataProcessing: Procedure, ResultInjectionProtocol {
     }
 }
 
-class Printing: Procedure, ResultInjectionProtocol {
-    let result: Void = ()
-    var requirement: String = "Default Requirement"
+class Printing: Procedure, ResultInjection {
+    var requirement: PendingValue<String> = .ready("Default Requirement")
+    let result: PendingValue<Void> = .void
 
     override func execute() {
-        log.info(message: requirement)
+        if let message = requirement.value {
+            log.info(message: message)
+        }
         finish()
     }
 }
@@ -66,7 +68,7 @@ class ResultInjectionTests: ResultInjectionTestCase {
     }
 
     func test__automatic_requirement_is_injected() {
-        processing.injectResultFrom(dependency: procedure)
+        processing.injectResult(from: procedure)
         wait(for: processing, procedure)
         XCTAssertProcedureFinishedWithoutErrors(processing)
     }
@@ -74,7 +76,7 @@ class ResultInjectionTests: ResultInjectionTestCase {
     func test__receiver_cancels_with_error_if_dependency_errors() {
         let error = TestError()
         procedure = TestProcedure(error: error)
-        processing.injectResultFrom(dependency: procedure)
+        processing.injectResult(from: procedure)
         processing.addDidCancelBlockObserver { processing, errors in
             XCTAssertEqual(errors.count, 1)
             guard let procedureKitError = errors.first as? ProcedureKitError else {
@@ -87,32 +89,9 @@ class ResultInjectionTests: ResultInjectionTestCase {
         XCTAssertProcedureCancelledWithErrors(processing, count: 1)
     }
 
-    func test__receiver_cancels_with_error_if_dependency_errors_2() {
-        let error = TestError()
-        procedure = TestProcedure(error: error)
-        printing.requireResultFrom(dependency: procedure)
-        printing.addDidCancelBlockObserver { processing, errors in
-            XCTAssertEqual(errors.count, 1)
-            guard let procedureKitError = errors.first as? ProcedureKitError else {
-                XCTFail("Incorrect error received"); return
-            }
-            XCTAssertEqual(procedureKitError.context, .dependencyFinishedWithErrors)
-            XCTAssertTrue(TestError.verify(errors: procedureKitError.errors, contains: error))
-        }
-        wait(for: printing, procedure)
-        XCTAssertProcedureCancelledWithErrors(printing, count: 1)
-    }
-
-
-    func test__requirement_is_injected() {
-        printing.requireResultFrom(dependency: procedure)
-        wait(for: procedure, printing)
-        XCTAssertEqual(printing.requirement, procedure.result ?? "not what we expect")
-    }
-
     func test__receiver_cancels_with_errors_if_requirement_not_met() {
-        procedure.result = nil
-        printing.requireResultFrom(dependency: procedure)
+        procedure.result = .pending
+        printing.injectResult(from: procedure)
         printing.addDidCancelBlockObserver { printing, errors in
             XCTAssertEqual(errors.count, 1)
             guard let procedureKitError = errors.first as? ProcedureKitError else {
@@ -125,7 +104,7 @@ class ResultInjectionTests: ResultInjectionTestCase {
     }
 
     func test__receiver_cancels_if_dependency_is_cancelled() {
-        processing.injectResultFrom(dependency: procedure)
+        processing.injectResult(from: procedure)
         processing.addDidCancelBlockObserver { printing, errors in
             XCTAssertEqual(errors.count, 1)
             guard let procedureKitError = errors.first as? ProcedureKitError else {
@@ -137,6 +116,24 @@ class ResultInjectionTests: ResultInjectionTestCase {
         wait(for: processing, procedure)
         XCTAssertProcedureCancelledWithErrors(processing, count: 1)
     }
+
+    func test__automatic_unwrap_when_result_is_optional_requrement() {
+        let hello = ResultProcedure<String?> { "Hello, World" }
+        hello.log.severity = .notice
+        let print = Printing().injectResult(from: hello)
+        print.log.severity = .notice
+        wait(for: print, hello)
+        XCTAssertProcedureFinishedWithoutErrors(print)
+    }
+
+    func test__automatic_unwrap_when_result_is_nil_optional_requrement() {
+        let hello = ResultProcedure<String?> { nil }
+        let printer = Printing().injectResult(from: hello)
+        wait(for: printer, hello)
+        XCTAssertProcedureCancelledWithErrors(printer, count: 1)
+    }
+
+
 }
 
 

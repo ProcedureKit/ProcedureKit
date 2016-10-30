@@ -4,8 +4,6 @@
 //  Copyright © 2016 ProcedureKit. All rights reserved.
 //
 
-import Foundation
-
 // swiftlint:disable file_length
 
 /**
@@ -142,10 +140,6 @@ open class GroupProcedure: Procedure, ProcedureQueueDelegate {
 
     // MARK - OperationQueueDelegate
 
-    public func operationQueue(_ queue: OperationQueue, willAddOperation operation: Operation) { /* no op */ }
-
-    public func operationQueue(_ queue: OperationQueue, willFinishOperation operation: Operation) { /* no op */ }
-
     public func operationQueue(_ queue: OperationQueue, didFinishOperation operation: Operation) {
         guard queue === self.queue else { return }
 
@@ -227,6 +221,9 @@ open class GroupProcedure: Procedure, ProcedureQueueDelegate {
     public func procedureQueue(_ queue: ProcedureQueue, willFinishOperation operation: Operation, withErrors errors: [Error]) {
         guard queue === self.queue else { return }
 
+        /// If the group is cancelled, exit early
+        guard !isCancelled else { return }
+
         /// If the operation is a Procedure.EvaluateConditions - exit early.
         if operation is Procedure.EvaluateConditions { return }
 
@@ -249,6 +246,15 @@ open class GroupProcedure: Procedure, ProcedureQueueDelegate {
 // MARK: - GroupProcedure API
 
 public extension GroupProcedure {
+
+    /**
+     Access the underlying queue of the GroupProcedure.
+
+     - returns: the DispatchQueue of the groups private ProcedureQueue
+    */
+    final var underlyingQueue: DispatchQueue? {
+        return queue.underlyingQueue
+    }
 
     /**
      The maximum number of child operations that can execute at the same time.
@@ -316,7 +322,7 @@ public extension GroupProcedure {
     }
 
     /// Override of Procedure.userIntent
-    public override var userIntent: Procedure.UserIntent {
+    public override var userIntent: UserIntent {
         didSet {
             let (operations, procedures) = children.operationsAndProcedures
             operations.forEach { $0.setQualityOfService(fromUserIntent: userIntent) }

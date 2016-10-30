@@ -4,8 +4,6 @@
 //  Copyright © 2016 ProcedureKit. All rights reserved.
 //
 
-import Foundation
-
 /**
  The result of a Condition. Either the condition is satisfied,
  indicated by `.satisfied` or it has failed. In the failure

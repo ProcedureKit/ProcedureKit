@@ -4,15 +4,10 @@
 //  Copyright © 2016 ProcedureKit. All rights reserved.
 //
 
-import Foundation
-
-internal func _abstractMethod(file: StaticString = #file, line: UInt = #line) {
-    fatalError("Method must be overriden", file: file, line: line)
-}
-
 class AnyObserverBox_<Procedure: ProcedureProtocol>: ProcedureObserver {
     func didAttach(to procedure: Procedure) { _abstractMethod() }
     func will(execute procedure: Procedure) { _abstractMethod() }
+    func did(execute procedure: Procedure) { _abstractMethod() }
     func will(cancel procedure: Procedure, withErrors: [Error]) { _abstractMethod() }
     func did(cancel procedure: Procedure, withErrors errors: [Error]) { _abstractMethod() }
     func procedure(_ procedure: Procedure, didProduce newOperation: Operation) { _abstractMethod() }
@@ -33,6 +28,10 @@ class AnyObserverBox<Base: ProcedureObserver>: AnyObserverBox_<Base.Procedure> {
 
     override func will(execute procedure: Base.Procedure) {
         base.will(execute: procedure)
+    }
+
+    override func did(execute procedure: Base.Procedure) {
+        base.did(execute: procedure)
     }
 
     override func will(cancel procedure: Base.Procedure, withErrors errors: [Error]) {
@@ -71,6 +70,10 @@ public struct AnyObserver<Procedure: ProcedureProtocol>: ProcedureObserver {
 
     public func will(execute procedure: Procedure) {
         box.will(execute: procedure)
+    }
+
+    public func did(execute procedure: Procedure) {
+        box.did(execute: procedure)
     }
 
     public func will(cancel procedure: Procedure, withErrors errors: [Error]) {

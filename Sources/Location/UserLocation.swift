@@ -4,18 +4,20 @@
 //  Copyright © 2016 ProcedureKit. All rights reserved.
 //
 
-import ProcedureKit
+import CoreLocation
+import MapKit
 
-open class UserLocationProcedure: Procedure, ResultInjectionProtocol, CLLocationManagerDelegate {
+open class UserLocationProcedure: Procedure, ResultInjection, CLLocationManagerDelegate {
     public typealias CompletionBlock = (CLLocation) -> Void
 
     public let accuracy: CLLocationAccuracy
     public let completion: CompletionBlock?
-    public private(set) var location: CLLocation? = nil
 
-    public var requirement: Void = ()
-    public var result: CLLocation? {
-        return location
+    public var requirement: PendingValue<Void> = .void
+    public var result: PendingValue<CLLocation> = .pending
+
+    public var location: CLLocation? {
+        return result.value
     }
 
     internal var capability = Capability.Location()
@@ -33,8 +35,8 @@ open class UserLocationProcedure: Procedure, ResultInjectionProtocol, CLLocation
         self.accuracy = accuracy
         self.completion = completion
         super.init()
-        attach(condition: AuthorizedFor(capability))
-        attach(condition: MutuallyExclusive<UserLocationProcedure>())
+        add(condition: AuthorizedFor(capability))
+        add(condition: MutuallyExclusive<UserLocationProcedure>())
         add(observer: TimeoutObserver(by: timeout))
         addDidCancelBlockObserver { [weak self] _, errors in
             DispatchQueue.main.async {
@@ -72,14 +74,14 @@ open class UserLocationProcedure: Procedure, ResultInjectionProtocol, CLLocation
     public func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         guard !isFinished, let location = locations.last else { return }
         guard shouldFinish(afterReceivingLocation: location) else {
-            self.location = location
+            result = .ready(location)
             return
         }
         log.info(message: "Updated last location: \(location)")
         DispatchQueue.main.async { [weak self] in
             guard let weakSelf = self, !weakSelf.isFinished else { return }
             weakSelf.stopLocationUpdates()
-            weakSelf.location = location
+            weakSelf.result = .ready(location)
             weakSelf.completion?(location)
             weakSelf.finish()
         }

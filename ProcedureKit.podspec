@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name              = "ProcedureKit"
-  s.version           = "4.0.0-beta-3"
+  s.version           = "4.0.0.beta.4"
   s.summary           = "Powerful Operation subclasses in Swift."
   s.description       = <<-DESC
   
@@ -26,7 +26,7 @@ session Advanced NSOperations: https://developer.apple.com/videos/wwdc/2015/?id=
   # Defaul spec is 'Standard'
   s.default_subspec   = 'Standard'
 
-  # Creates a framework suitable for an iOS, watchOS, tvOS or macOS application
+  # Default core framework suitable for an iOS, watchOS, tvOS or macOS application
   s.subspec 'Standard' do |ss|
     ss.source_files = ['Sources']
     ss.exclude_files = [
@@ -34,11 +34,36 @@ session Advanced NSOperations: https://developer.apple.com/videos/wwdc/2015/?id=
       'Sources/Mobile',
       'Sources/Mac',
       'Sources/TV',
+      'Sources/Network',
       'Sources/Cloud',
       'Sources/Location'
     ]
   end
 
+  # ProcedureKitNetwork
+  s.subspec 'Network' do |ss|
+  	ss.dependency 'ProcedureKit/Standard'
+  	ss.source_files = ['Sources/Network']
+  end
+
+  # ProcedureKitLocation
+  s.subspec 'Location' do |ss|
+  	ss.dependency 'ProcedureKit/Standard'
+  	ss.frameworks = 'CoreLocation', 'MapKit'
+  	ss.source_files = ['Sources/Location']
+  end
+
+  # ProcedureKitCloud
+  s.subspec 'Cloud' do |ss|
+  	ss.dependency 'ProcedureKit/Standard'
+  	ss.frameworks = 'CloudKit'
+  	ss.source_files = ['Sources/Cloud']
+  end
+
+  # ProcedureKitMobile
+  s.subspec 'Mobile' do |ss|
+    ss.platforms = { :ios => "8.0" }
+  	ss.dependency 'ProcedureKit/Standard'
+  	ss.source_files = ['Sources/Mobile']
+  end
 end
-
-

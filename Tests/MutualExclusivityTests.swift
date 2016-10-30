@@ -42,8 +42,8 @@ class MutualExclusiveTests: ProcedureKitTestCase {
         procedure1.name = "Procedure 1"
         let condition1A = MutuallyExclusive<BlockProcedure>()
         let condition1B = MutuallyExclusive<TestProcedure>()
-        procedure1.attach(condition: condition1A)
-        procedure1.attach(condition: condition1B)
+        procedure1.add(condition: condition1A)
+        procedure1.add(condition: condition1B)
 
         let procedure2 = BlockProcedure {
             XCTAssertEqual(text, "Star Wars\nA long time ago")
@@ -52,8 +52,8 @@ class MutualExclusiveTests: ProcedureKitTestCase {
         procedure2.name = "Procedure 2"
         let condition2A = MutuallyExclusive<BlockProcedure>()
         let condition2B = MutuallyExclusive<TestProcedure>()
-        procedure2.attach(condition: condition2A)
-        procedure2.attach(condition: condition2B)
+        procedure2.add(condition: condition2A)
+        procedure2.add(condition: condition2B)
 
         wait(for: procedure1, procedure2)
 
@@ -73,7 +73,7 @@ class MutualExclusiveTests: ProcedureKitTestCase {
         condition1.add(dependency: conditionDependency1)
 
         let procedure1 = TestProcedure(name: "Procedure 1")
-        procedure1.attach(condition: condition1)
+        procedure1.add(condition: condition1)
 
         let procedure1Dependency = TestProcedure(name: "Dependency 1")
         procedure1.add(dependency: procedure1Dependency)
@@ -88,7 +88,7 @@ class MutualExclusiveTests: ProcedureKitTestCase {
         condition2.add(dependency: conditionDependency2)
 
         let procedure2 = TestProcedure()
-        procedure2.attach(condition: condition2)
+        procedure2.add(condition: condition2)
 
         let procedure2Dependency = TestProcedure(name: "Dependency 2")
         procedure2.add(dependency: procedure2Dependency)
@@ -101,16 +101,83 @@ class MutualExclusiveTests: ProcedureKitTestCase {
     func test__mutually_exclusive_operations_can_be_executed() {
         let procedure1 = TestProcedure()
         procedure1.name = "Procedure 1"
-        procedure1.attach(condition: MutuallyExclusive<TestProcedure>())
+        procedure1.add(condition: MutuallyExclusive<TestProcedure>())
 
         let procedure2 = TestProcedure()
         procedure2.name = "Procedure 2"
-        procedure2.attach(condition: MutuallyExclusive<TestProcedure>())
+        procedure2.add(condition: MutuallyExclusive<TestProcedure>())
 
         wait(for: procedure1, procedure2)
     }
 }
 
+class MutualExclusiveConcurrencyTests: ConcurrencyTestCase {
+
+    func test__mutually_exclusive_operation_are_run_exclusively() {
+
+        let numOperations = 3
+        let delayMicroseconds: useconds_t = 500000 // 0.5 seconds
+
+        queue.maxConcurrentOperationCount = numOperations
+
+        concurrencyTest(operations: numOperations, withDelayMicroseconds: delayMicroseconds, withTimeout: 3,
+            withConfigureBlock: { (testOp) in
+                let condition = MutuallyExclusive<TrackingProcedure>()
+                testOp.add(condition: condition)
+                return testOp
+            },
+            withExpectations: Expectations(
+                checkMinimumDetected: 1,
+                checkMaximumDetected: 1,
+                checkAllProceduresFinished: true,
+                checkMinimumDuration: TimeInterval(useconds_t(numOperations) * delayMicroseconds) / 1000000.0
+            )
+        )
+    }
+
+    func test__mutually_exclusive_operations_added_concurrently_are_run_exclusively() {
+        // Attempt to add mutually exclusive operations to a queue simultaneously.
+        // This should not affect their mutual exclusivity.
+        // Covers Issue: https://github.com/ProcedureKit/ProcedureKit/issues/543
+
+        let numOperations = 3
+        let delayMicroseconds: useconds_t = 500000 // 0.5 seconds
+
+        queue.maxConcurrentOperationCount = numOperations
+
+        let procedures: [TrackingProcedure] = create(procedures: numOperations, delayMicroseconds: delayMicroseconds, withRegistrar: registrar).map {
+            let condition = MutuallyExclusive<TrackingProcedure>()
+            $0.add(condition: condition)
+            addCompletionBlockTo(procedure: $0, withExpectationDescription: "\($0.name), didFinish")
+            return $0
+        }
+
+        let startTime = CFAbsoluteTimeGetCurrent()
+
+        // add procedures to the queue simultaneously
+        let dispatchQueue = DispatchQueue.global(qos: .userInitiated)
+        for procedure in procedures {
+            dispatchQueue.async { [weak self] in
+                guard let strongSelf = self else { return }
+                strongSelf.queue.addOperation(procedure)
+            }
+        }
+
+        waitForExpectations(timeout: TimeInterval(numOperations), handler: nil)
+
+        let endTime = CFAbsoluteTimeGetCurrent()
+        let duration = Double(endTime) - Double(startTime)
+
+        XCTAssertResults(TestResult(procedures: procedures, duration: duration, registrar: registrar),
+            matchExpectations: Expectations(
+                checkMinimumDetected: 1,
+                checkMaximumDetected: 1,
+                checkAllProceduresFinished: true,
+                checkMinimumDuration: TimeInterval(useconds_t(numOperations) * delayMicroseconds) / 1000000.0
+            )
+        )
+    }
+}
 
 
 

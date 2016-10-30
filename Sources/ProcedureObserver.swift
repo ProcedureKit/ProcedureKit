@@ -4,8 +4,6 @@
 //  Copyright © 2016 ProcedureKit. All rights reserved.
 //
 
-import Foundation
-
 /**
  Types which conform to this protocol, can be attached to `Procedure` subclasses to receive
  events at state transitions.
@@ -27,6 +25,23 @@ public protocol ProcedureObserver {
      - parameter procedure: the observed `Procedure`.
      */
     func will(execute procedure: Procedure)
+
+    /**
+     The procedure did execute.
+
+     - notes: this observer will be invoked directly after the
+     `execute` returns.
+
+     - warning: there are no guarantees about when this observer
+     will be called, relative to the lifecycle of the procedure. It
+     is entirely possible that the procedure, will actually
+     have already finished be the time the observer is invoked. See
+     the conversation here which explains the reasoning behind it:
+     https://github.com/ProcedureKit/ProcedureKit/pull/554
+
+     - parameter procedure: the observed `Procedure`.
+     */
+    func did(execute procedure: Procedure)
 
     /**
      The procedure will cancel.
@@ -75,6 +90,8 @@ public extension ProcedureObserver {
     func didAttach(to procedure: Procedure) { }
 
     func will(execute procedure: Procedure) { }
+
+    func did(execute procedure: Procedure) { }
 
     func will(cancel procedure: Procedure, withErrors: [Error]) { }
 

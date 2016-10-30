@@ -4,8 +4,6 @@
 //  Copyright © 2016 ProcedureKit. All rights reserved.
 //
 
-import Foundation
-
 public protocol ProcedureKitComponent {
     var name: String { get }
 }
@@ -50,6 +48,8 @@ public struct ProcedureKitError: Error, Equatable {
         case requirementNotSatisfied
         case capability(CapabilityError)
     }
+
+    public static let unknown = ProcedureKitError(context: .unknown, errors: [])
 
     public static func programmingError(reason: String) -> ProcedureKitError {
         return ProcedureKitError(context: .programmingError(reason), errors: [])

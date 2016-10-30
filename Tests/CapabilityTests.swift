@@ -12,20 +12,20 @@ class GetAuthorizationStatusTests: TestableCapabilityTestCase {
 
     func test__sets_result() {
         wait(for: getAuthorizationStatus)
-        XCTAssertGetAuthorizationStatus(getAuthorizationStatus.result, expected: (true, .unknown))
+        XCTAssertGetAuthorizationStatus(getAuthorizationStatus.result.value, expected: (true, .unknown))
         XCTAssertTestCapabilityStatusChecked()
     }
 
     func test__async_sets_result() {
         capability.isAsynchronous = true
         wait(for: getAuthorizationStatus)
-        XCTAssertGetAuthorizationStatus(getAuthorizationStatus.result, expected: (true, .unknown))
+        XCTAssertGetAuthorizationStatus(getAuthorizationStatus.result.value, expected: (true, .unknown))
         XCTAssertTestCapabilityStatusChecked()
     }
 
     func test__runs_completion_block() {
-        var completedWithResult: GetAuthorizationStatus<TestableCapability.Status>.Result = nil
-        getAuthorizationStatus = GetAuthorizationStatus(capability) { completedWithResult = $0 }
+        var completedWithResult: GetAuthorizationStatusProcedure<TestableCapability.Status>.Result = (false, .unknown)
+        getAuthorizationStatus = GetAuthorizationStatusProcedure(capability) { completedWithResult = $0 }
 
         wait(for: getAuthorizationStatus)
         XCTAssertGetAuthorizationStatus(completedWithResult, expected: (true, .unknown))
@@ -34,9 +34,9 @@ class GetAuthorizationStatusTests: TestableCapabilityTestCase {
 
     func test__async_runs_completion_block() {
         capability.isAsynchronous = true
-        var completedWithResult: GetAuthorizationStatus<TestableCapability.Status>.Result = nil
+        var completedWithResult: GetAuthorizationStatusProcedure<TestableCapability.Status>.Result = (false, .unknown)
 
-        getAuthorizationStatus = GetAuthorizationStatus(capability) { result in
+        getAuthorizationStatus = GetAuthorizationStatusProcedure(capability) { result in
             completedWithResult = result
         }
 
@@ -74,7 +74,7 @@ class AuthorizedForTests: TestableCapabilityTestCase {
             return
         }
 
-        guard let _ = dependency as? Authorize<TestableCapability.Status> else {
+        guard let _ = dependency as? AuthorizeCapabilityProcedure<TestableCapability.Status> else {
             XCTFail("Dependency is not the correct type")
             return
         }

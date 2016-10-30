@@ -4,9 +4,6 @@
 //  Copyright © 2016 ProcedureKit. All rights reserved.
 //
 
-import Foundation
-import ProcedureKit
-
 open class TestCondition: Condition {
 
     let evaluate: () throws -> ConditionResult

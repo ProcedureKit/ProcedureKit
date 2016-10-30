@@ -4,8 +4,6 @@
 //  Copyright © 2016 ProcedureKit. All rights reserved.
 //
 
-import Foundation
-
 public final class NegatedCondition<C: Condition>: ComposedCondition<C> {
 
     /// Public override of initializer.

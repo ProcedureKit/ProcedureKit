@@ -6,7 +6,6 @@
 
 import Foundation
 import XCTest
-import ProcedureKit
 
 open class RepeatTestCase: ProcedureKitTestCase {
     public var repeatProcedure: RepeatProcedure<TestProcedure>!
@@ -46,7 +45,7 @@ open class RetryTestCase: ProcedureKitTestCase {
         let info = RetryTestCaseInfo()
         return AnyIterator {
             let procedure = TestProcedure()
-            procedure.attach(condition: BlockCondition { info.numberOfFailures == failureThreshold })
+            procedure.add(condition: BlockCondition { info.numberOfFailures == failureThreshold })
             procedure.addWillFinishBlockObserver { test in
                 info.numberOfExecuctions += 1
                 info.numberOfFailures += 1
@@ -59,7 +58,7 @@ open class RetryTestCase: ProcedureKitTestCase {
         let info = RetryTestCaseInfo()
         return AnyIterator {
             let procedure = TestProcedure()
-            procedure.attach(condition: BlockCondition { info.numberOfFailures == failureThreshold })
+            procedure.add(condition: BlockCondition { info.numberOfFailures == failureThreshold })
             procedure.addWillFinishBlockObserver { test in
                 info.numberOfExecuctions += 1
                 info.numberOfFailures += 1

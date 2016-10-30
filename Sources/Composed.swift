@@ -4,8 +4,6 @@
 //  Copyright © 2016 ProcedureKit. All rights reserved.
 //
 
-import Foundation
-
 open class ComposedProcedure<T: Operation>: GroupProcedure {
 
     public private(set) var operation: T
@@ -28,6 +26,6 @@ open class GatedProcedure<T: Operation>: ComposedProcedure<T> {
 
     public init(operation: T, gate: @escaping ThrowingBoolBlock) {
         super.init(operation: operation)
-        attach(condition: IgnoredCondition(BlockCondition(block: gate)))
+        add(condition: IgnoredCondition(BlockCondition(block: gate)))
     }
 }

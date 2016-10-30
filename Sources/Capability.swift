@@ -4,8 +4,6 @@
 //  Copyright © 2016 ProcedureKit. All rights reserved.
 //
 
-import Foundation
-
 /**
  Defines the authorization status of a capability. Typically
  this will be an enum, like CLAuthorizationStatus. Note
@@ -13,7 +11,7 @@ import Foundation
  for another (or existing) types to be used to define granular
  levels of permissions. Use Void if not needed.
  */
-public protocol AuthorizationStatusProtocol {
+public protocol AuthorizationStatus {
 
     /// A generic type for the requirement
     associatedtype Requirement
@@ -43,7 +41,7 @@ public protocol AuthorizationStatusProtocol {
  */
 public protocol CapabilityProtocol {
 
-    associatedtype Status: AuthorizationStatusProtocol
+    associatedtype Status: AuthorizationStatus
 
     /**
      A requirement of the capability. E.g. for Location this
@@ -94,7 +92,7 @@ extension Capability {
      an authorization level, but still might not be available. For example
      PassKit. In which case, use VoidStatus as the nested Status type.
      */
-    public struct VoidStatus: AuthorizationStatusProtocol, Equatable {
+    public struct VoidStatus: AuthorizationStatus, Equatable {
 
         public static func == (_: VoidStatus, _: VoidStatus) -> Bool {
             return true
@@ -110,7 +108,7 @@ extension Capability {
 
 // MARK: - AnyCapability
 
-internal class AnyCapabilityBox_<Status: AuthorizationStatusProtocol>: CapabilityProtocol {
+internal class AnyCapabilityBox_<Status: AuthorizationStatus>: CapabilityProtocol {
     var requirement: Status.Requirement? { _abstractMethod(); return nil }
     func isAvailable() -> Bool { _abstractMethod(); return false }
     func getAuthorizationStatus(_ completion: @escaping (Status) -> Void) { _abstractMethod() }
@@ -137,7 +135,7 @@ internal class AnyCapabilityBox<Base: CapabilityProtocol>: AnyCapabilityBox_<Bas
     }
 }
 
-public struct AnyCapability<Status: AuthorizationStatusProtocol>: CapabilityProtocol {
+public struct AnyCapability<Status: AuthorizationStatus>: CapabilityProtocol {
     private typealias Erased = AnyCapabilityBox_<Status>
 
     private var box: Erased
@@ -164,7 +162,7 @@ public struct AnyCapability<Status: AuthorizationStatusProtocol>: CapabilityProt
  A generic procedure which will get the current authorization
  status for AnyCapability<Status>.
  */
-public class GetAuthorizationStatus<Status: AuthorizationStatusProtocol>: Procedure, ResultInjectionProtocol {
+public class GetAuthorizationStatusProcedure<Status: AuthorizationStatus>: Procedure, ResultInjection {
 
     /// the StatusResponse is a tuple for the capabilities availability and status
     public typealias StatusResponse = (Bool, Status)
@@ -173,7 +171,7 @@ public class GetAuthorizationStatus<Status: AuthorizationStatusProtocol>: Proced
     public typealias Completion = (StatusResponse) -> Void
 
     public typealias Requirement = Void
-    public typealias Result = StatusResponse?
+    public typealias Result = StatusResponse
 
     /**
      After the procedure has executed, this property will be set
@@ -181,9 +179,9 @@ public class GetAuthorizationStatus<Status: AuthorizationStatusProtocol>: Proced
 
      - returns: a StatusResponse
      */
-    public var result: StatusResponse? = nil
+    public var result: PendingValue<StatusResponse> = .pending
 
-    public var requirement: Requirement = ()
+    public var requirement: PendingValue<Void> = .ready(())
 
     fileprivate let capability: AnyCapability<Status>
     fileprivate let completion: Completion?
@@ -203,7 +201,7 @@ public class GetAuthorizationStatus<Status: AuthorizationStatusProtocol>: Proced
 
     public override func execute() {
         determineStatus { status in
-            self.result = status
+            self.result = .ready(status)
             self.completion?(status)
             self.finish()
         }
@@ -218,7 +216,7 @@ public class GetAuthorizationStatus<Status: AuthorizationStatusProtocol>: Proced
 }
 
 /// A generic procedure which will authorize a capability
-public class Authorize<Status: AuthorizationStatusProtocol>: GetAuthorizationStatus<Status> {
+public class AuthorizeCapabilityProcedure<Status: AuthorizationStatus>: GetAuthorizationStatusProcedure<Status> {
 
     /**
      Initialize the operation with a base type which conforms to CapabilityProtocol
@@ -247,7 +245,7 @@ public class Authorize<Status: AuthorizationStatusProtocol>: GetAuthorizationSta
  which means that potentially the user will be prompted to grant
  authorization. Suppress this from happening with SilentCondition.
  */
-public class AuthorizedFor<Status: AuthorizationStatusProtocol>: Condition {
+public class AuthorizedFor<Status: AuthorizationStatus>: Condition {
 
     fileprivate let capability: AnyCapability<Status>
 
@@ -255,7 +253,7 @@ public class AuthorizedFor<Status: AuthorizationStatusProtocol>: Condition {
         capability = AnyCapability(base)
         super.init()
         mutuallyExclusive = true
-        add(dependency: Authorize(base))
+        add(dependency: AuthorizeCapabilityProcedure(base))
     }
 
     public override func evaluate(procedure: Procedure, completion: @escaping (ConditionResult) -> Void) {

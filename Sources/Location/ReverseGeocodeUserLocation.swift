@@ -4,7 +4,8 @@
 //  Copyright © 2016 ProcedureKit. All rights reserved.
 //
 
-import ProcedureKit
+import CoreLocation
+import MapKit
 
 public struct UserLocationPlacemark: Equatable {
     public static func == (lhs: UserLocationPlacemark, rhs: UserLocationPlacemark) -> Bool {
@@ -14,7 +15,7 @@ public struct UserLocationPlacemark: Equatable {
     public let placemark: CLPlacemark
 }
 
-open class ReverseGeocodeUserLocationProcedure: GroupProcedure, ResultInjectionProtocol {
+open class ReverseGeocodeUserLocationProcedure: GroupProcedure, ResultInjection {
 
     public typealias CompletionBlock = (UserLocationPlacemark) -> Void
 
@@ -22,15 +23,11 @@ open class ReverseGeocodeUserLocationProcedure: GroupProcedure, ResultInjectionP
 
         let completion: CompletionBlock?
 
-        var location: CLLocation? = nil
-        var placemark: CLPlacemark? = nil
+        var location: PendingValue<CLLocation> = .pending
+        var placemark: PendingValue<CLPlacemark> = .pending
 
-        var result: UserLocationPlacemark? {
-            get {
-                guard let location = location, let placemark = placemark else { return nil }
-                return UserLocationPlacemark(location: location, placemark: placemark)
-            }
-        }
+        var requirement: PendingValue<Void> = .void
+        var result: PendingValue<UserLocationPlacemark> = .pending
 
         init(completion: CompletionBlock? = nil) {
             self.completion = completion
@@ -41,14 +38,17 @@ open class ReverseGeocodeUserLocationProcedure: GroupProcedure, ResultInjectionP
             var finishingError: Error? = nil
             defer { finish(withError: finishingError) }
 
-            guard let result = result else {
+            guard let location = location.value, let placemark = placemark.value else {
                 finishingError = ProcedureKitError.requirementNotSatisfied()
                 return
             }
 
+            let userLocationPlacemark = UserLocationPlacemark(location: location, placemark: placemark)
+            result = .ready(userLocationPlacemark)
+
             if let block = completion {
                 DispatchQueue.main.async {
-                    block(result)
+                    block(userLocationPlacemark)
                 }
             }
         }
@@ -58,9 +58,8 @@ open class ReverseGeocodeUserLocationProcedure: GroupProcedure, ResultInjectionP
     private let userLocation: UserLocationProcedure
     private let reverseGeocodeLocation: ReverseGeocodeProcedure
 
-    public var requirement: Void = ()
-
-    public var result: UserLocationPlacemark? {
+    public var requirement: PendingValue<Void> = .void
+    public var result: PendingValue<UserLocationPlacemark> {
         return finishing.result
     }
 
@@ -70,20 +69,20 @@ open class ReverseGeocodeUserLocationProcedure: GroupProcedure, ResultInjectionP
 
         userLocation = UserLocationProcedure(timeout: timeout, accuracy: accuracy)
 
-        reverseGeocodeLocation = ReverseGeocodeProcedure(timeout: timeout).injectResultFrom(dependency: userLocation)
+        reverseGeocodeLocation = ReverseGeocodeProcedure(timeout: timeout).injectResult(from: userLocation)
 
         finishing.inject(dependency: userLocation) { procedure, userLocation, errors in
             guard let location = userLocation.location, errors.isEmpty else {
                 procedure.cancel(withError: ProcedureKitError.dependency(finishedWithErrors: errors)); return
             }
-            procedure.location = location
+            procedure.location = .ready(location)
         }
 
         finishing.inject(dependency: reverseGeocodeLocation) { procedure, reverseGeocodeLocation, errors in
             guard let placemark = reverseGeocodeLocation.placemark, errors.isEmpty else {
                 procedure.cancel(withError: ProcedureKitError.dependency(finishedWithErrors: errors)); return
             }
-            procedure.placemark = placemark
+            procedure.placemark = .ready(placemark)
         }
 
         super.init(underlyingQueue: underlyingQueue, operations: [userLocation, reverseGeocodeLocation, finishing])

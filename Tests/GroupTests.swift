@@ -167,6 +167,11 @@ class GroupTests: GroupTestCase {
         XCTAssertTrue(group.isFinished)
     }
 
+    func test__group_cancel_with_errors_does_not_collect_errors_sent_to_children() {
+        check(procedure: group) { $0.cancel(withError: TestError()) }
+        XCTAssertProcedureCancelledWithErrors(group, count: 1)
+    }
+
     // MARK: - Finishing Tests
 
     func test__group_does_not_finish_before_all_children_finish() {
@@ -184,3 +189,42 @@ class GroupTests: GroupTestCase {
 
     // MARK: - Condition Tests
 }
+
+class GroupConcurrencyTests: GroupConcurrencyTestCase {
+
+    // MARK: - MaxConcurrentOperationCount Tests
+
+    func test__group_maxConcurrentOperationCount_1() {
+        let children: Int = 3
+        let delayMicroseconds: useconds_t = 500000 // 0.5 seconds
+        let timeout: TimeInterval = 4
+        concurrencyTestGroup(children: children, withDelayMicroseconds: delayMicroseconds, withTimeout: timeout,
+            withConfigureBlock: { (group) in
+                group.maxConcurrentOperationCount = 1
+            },
+            withExpectations: Expectations(
+                checkMinimumDetected: 1,
+                checkMaximumDetected: 1,
+                checkAllProceduresFinished: true,
+                checkMinimumDuration: TimeInterval(useconds_t(children) * delayMicroseconds) / 1000000.0
+            )
+        )
+    }
+
+    func test__group_operation_maxConcurrentOperationCount_2() {
+        let children: Int = 3
+        let delayMicroseconds: useconds_t = 500000 // 0.5 seconds
+        let timeout: TimeInterval = 3
+        concurrencyTestGroup(children: children, withDelayMicroseconds: delayMicroseconds, withTimeout: timeout,
+            withConfigureBlock: { (group) in
+                group.maxConcurrentOperationCount = 2
+            },
+            withExpectations: Expectations(
+                checkMinimumDetected: 1,
+                checkMaximumDetected: 2,
+                checkAllProceduresFinished: true
+            )
+        )
+    }
+}
+

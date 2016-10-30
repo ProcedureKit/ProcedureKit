@@ -4,8 +4,6 @@
 //  Copyright © 2016 ProcedureKit. All rights reserved.
 //
 
-import Foundation
-
 internal extension Operation {
 
     enum KeyPath: String {
@@ -59,7 +57,7 @@ public extension Operation {
      Sets the quality of service of the Operation from `UserIntent`
      - parameter userIntent: a UserIntent value
      */
-    func setQualityOfService(fromUserIntent userIntent: Procedure.UserIntent) {
+    func setQualityOfService(fromUserIntent userIntent: UserIntent) {
         qualityOfService = userIntent.qualityOfService
     }
 
@@ -108,4 +106,24 @@ public extension Operation {
         remove(dependencies: dependencies)
     }
 
+    /**
+     Add self as a dependency of a new operation and return both operations
+     - parameter operation: the Operation instance to add the receiver as a dependency
+     - returns: an array of both operations.
+    */
+    func then(do operation: Operation) -> [Operation] {
+        assert(!isFinished, "Cannot add a finished operation as a dependency.")
+        operation.add(dependency: self)
+        return [self, operation]
+    }
+
+    /**
+     Add self as a dependency of a new operation via a throwing closure and return both operations
+     - parameter block: a throwing closure which returns an optional Operation
+     - returns: an array of both operations.
+     */
+    func then(do block: () throws -> Operation?) rethrows -> [Operation] {
+        guard let operation = try block() else { return [self] }
+        return then(do: operation)
+    }
 }

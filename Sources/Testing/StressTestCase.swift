@@ -6,7 +6,6 @@
 
 import Foundation
 import XCTest
-import ProcedureKit
 
 public class Counter {
     private(set) var _count: Int32 = 0 // swiftlint:disable:this variable_name

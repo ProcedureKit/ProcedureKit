@@ -6,7 +6,6 @@
 
 import Foundation
 import XCTest
-import ProcedureKit
 
 open class ProcedureKitTestCase: XCTestCase {
 
@@ -46,6 +45,10 @@ open class ProcedureKitTestCase: XCTestCase {
     }
 
     public func wait(for procedures: Procedure..., withTimeout timeout: TimeInterval = 3, withExpectationDescription expectationDescription: String = #function, handler: XCWaitCompletionHandler? = nil) {
+        wait(forAll: procedures, withTimeout: timeout, withExpectationDescription: expectationDescription, handler: handler)
+    }
+
+    public func wait(forAll procedures: [Procedure], withTimeout timeout: TimeInterval = 3, withExpectationDescription expectationDescription: String = #function, handler: XCWaitCompletionHandler? = nil) {
         for (i, procedure) in procedures.enumerated() {
             addCompletionBlockTo(procedure: procedure, withExpectationDescription: "\(i), \(expectationDescription)")
         }

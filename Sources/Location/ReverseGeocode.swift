@@ -4,32 +4,32 @@
 //  Copyright © 2016 ProcedureKit. All rights reserved.
 //
 
-import ProcedureKit
+import CoreLocation
+import MapKit
 
-open class ReverseGeocodeProcedure: Procedure, ResultInjectionProtocol {
+open class ReverseGeocodeProcedure: Procedure, ResultInjection {
     public typealias CompletionBlock = (CLPlacemark) -> Void
 
-    public var requirement: CLLocation? = nil
+    public var requirement: PendingValue<CLLocation> = .pending
+    public private(set) var result: PendingValue<CLPlacemark> = .pending
 
     public let completion: CompletionBlock?
 
-    public private(set) var placemark: CLPlacemark? = nil
-
-    public var result: CLPlacemark? {
-        return placemark
+    public var placemark: CLPlacemark? {
+        return result.value
     }
 
     public var location: CLLocation? {
-        return requirement
+        return requirement.value
     }
 
     internal var geocoder: ReverseGeocodeProtocol & GeocodeProtocol = CLGeocoder.make()
 
     public init(timeout: TimeInterval = 3.0, location: CLLocation? = nil, completion: CompletionBlock? = nil) {
-        self.requirement = location
+        self.requirement = location.flatMap { .ready($0) } ?? .pending
         self.completion = completion
         super.init()
-        attach(condition: MutuallyExclusive<ReverseGeocodeProcedure>())
+        add(condition: MutuallyExclusive<ReverseGeocodeProcedure>())
         add(observer: TimeoutObserver(by: timeout))
         addDidCancelBlockObserver { [weak self] _, errors in
             DispatchQueue.main.async {
@@ -44,12 +44,12 @@ open class ReverseGeocodeProcedure: Procedure, ResultInjectionProtocol {
 
     open override func execute() {
 
-        guard let requirement = requirement else {
+        guard let location = requirement.value else {
             finish(withError: ProcedureKitError.requirementNotSatisfied())
             return
         }
 
-        geocoder.pk_reverseGeocodeLocation(location: requirement) { [weak self] results, error in
+        geocoder.pk_reverseGeocodeLocation(location: location) { [weak self] results, error in
 
             // Check that the procedure is still running
             guard let strongSelf = self, !strongSelf.isFinished else { return }
@@ -62,7 +62,7 @@ open class ReverseGeocodeProcedure: Procedure, ResultInjectionProtocol {
 
             // Continue if there is a suitable placemark
             if let placemark = strongSelf.shouldFinish(afterReceivingPlacemarks: placemarks) {
-                strongSelf.placemark = placemark
+                strongSelf.result = .ready(placemark)
                 if let block = strongSelf.completion {
                     DispatchQueue.main.async { block(placemark) }
                 }

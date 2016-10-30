@@ -4,8 +4,6 @@
 //  Copyright © 2016 ProcedureKit. All rights reserved.
 //
 
-import Foundation
-
 public protocol OperationQueueDelegate: class {
 
     /**
@@ -34,6 +32,13 @@ public protocol OperationQueueDelegate: class {
      - parameter errors: an array of `Error`s.
      */
     func operationQueue(_ queue: OperationQueue, didFinishOperation operation: Operation)
+}
+
+public extension OperationQueueDelegate {
+
+    func operationQueue(_ queue: OperationQueue, willAddOperation operation: Operation) { /* default no-op */ }
+
+    func operationQueue(_ queue: OperationQueue, willFinishOperation operation: Operation) { /* default no-op */ }
 }
 
 /**
@@ -79,6 +84,13 @@ public protocol ProcedureQueueDelegate: OperationQueueDelegate {
      - paramter operation: the `Operation` instance about to be added.
      */
     func procedureQueue(_ queue: ProcedureQueue, willProduceOperation operation: Operation)
+}
+
+public extension ProcedureQueueDelegate {
+
+    func procedureQueue(_ queue: ProcedureQueue, willAddOperation operation: Operation) { /* default no-op */ }
+
+    func procedureQueue(_ queue: ProcedureQueue, willProduceOperation operation: Operation) { /* default no-op */ }
 }
 
 /**
@@ -152,7 +164,7 @@ open class ProcedureQueue: OperationQueue {
         /// Add an observer to invoke the will finish delegate method
         procedure.addWillFinishBlockObserver { [weak self] procedure, errors in
             if let queue = self {
-                self?.delegate?.procedureQueue(queue, willFinishOperation: procedure, withErrors: errors)
+                queue.delegate?.procedureQueue(queue, willFinishOperation: procedure, withErrors: errors)
             }
         }
 
@@ -235,7 +247,7 @@ open class ProcedureQueue: OperationQueue {
      - parameter wait: a Bool flag which is ignored.
      */
     open override func addOperations(_ ops: [Operation], waitUntilFinished wait: Bool) {
-        ops.forEach(addOperation)
+        ops.forEach { addOperation($0) }
     }
 
     /// Overrides and wraps the Swift 3 interface

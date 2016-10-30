@@ -4,14 +4,15 @@
 //  Copyright © 2016 ProcedureKit. All rights reserved.
 //
 
-import ProcedureKit
+import CoreLocation
+import MapKit
 
 public enum LocationUsage {
     case whenInUse
     case always
 }
 
-extension CLAuthorizationStatus: AuthorizationStatusProtocol {
+extension CLAuthorizationStatus: AuthorizationStatus {
 
     public func meets(requirement: LocationUsage?) -> Bool {
         switch (requirement, self) {
@@ -23,9 +24,9 @@ extension CLAuthorizationStatus: AuthorizationStatusProtocol {
     }
 }
 
-extension Capability {
+public extension Capability {
 
-    public class Location: CapabilityProtocol {
+    class Location: CapabilityProtocol {
 
         public private(set) var requirement: LocationUsage?
 

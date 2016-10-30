@@ -4,8 +4,6 @@
 //  Copyright © 2016 ProcedureKit. All rights reserved.
 //
 
-import Foundation
-
 /**
  Log Severity
 
@@ -200,7 +198,6 @@ public protocol LoggerProtocol {
      */
     func log(message: @autoclosure () -> String, severity: LogSeverity, file: String, function: String, line: Int)
 }
-
 
 public extension LoggerProtocol {
 

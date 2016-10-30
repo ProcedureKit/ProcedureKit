@@ -4,7 +4,8 @@
 //  Copyright © 2016 ProcedureKit. All rights reserved.
 //
 
-@import CloudKit;
+@import Foundation;
+@import ProcedureKit;
 
 //! Project version number for ProcedureKitCloud.
 FOUNDATION_EXPORT double ProcedureKitCloudVersionNumber;
