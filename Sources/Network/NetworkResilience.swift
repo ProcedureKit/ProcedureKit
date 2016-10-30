@@ -22,35 +22,50 @@ public protocol ResilientNetworkBehavior {
 
      - returns: a WaitStrategy
      */
-    var timeoutBackoffStrategy: WaitStrategy { get }
+    var backoffStrategy: WaitStrategy { get }
 
     /**
-     The error delay is a period to wait in the event of an erroneous
-     http response status code.
+     A request timeout, which if specified indicates the maximum
+     amount of time to wait for a response.
 
-     - returns: a Delay?
+     - returns: a TimeInterval
      */
-    var errorDelay: Delay? { get }
-
-    /**
-     The subsequent attempt timeout defines a time period
-     after a failed request during which time another
-     request is considered a 2nd request (vs automatic
-     retry attempt). After this time, requests are
-     considered to be 1st attempts.
-
-     - returns: a NSTimeInterval
-     */
-    var subsequentAttemptDelay: Delay { get }
+    var requestTimeout: TimeInterval? { get }
 
     /**
      Some network response status codes should be treated as
      errors.
 
      - parameter statusCode: an Int
+     - parameter errorCode: an Int? if returned from URLSession
      - returns: a Bool, to indicate that the
      */
-    func retryRequest(forResponseWithStatusCode statusCode: Int, errorCode: Int?) -> Bool
+    func shouldRetryRequest(forResponseWithStatusCode statusCode: HTTPStatusCode, errorCode: Int?) -> Bool
+
+    /**
+     The behavior can modify the suggest delay before retrying a request.
+
+     - parameter statusCode: an Int
+     - parameter errorCode: an Int? if returned from URLSession
+     - parameter delay: the suggested delay as determined by the backoffStrategy
+     - returns: a Delay?
+     */
+    func retryRequestAfter(suggestedDelay delay: Delay, forResponseWithStatusCode statusCode: HTTPStatusCode, errorCode: Int?) -> Delay?
+}
+
+public extension ResilientNetworkBehavior {
+
+    func shouldRetryRequest(forResponseWithStatusCode statusCode: Int, errorCode: Int?) -> Bool {
+        switch statusCode {
+        case 408, 429: return true
+        case 500..<600: return true
+        default: return false
+        }
+    }
+
+    func retryRequestAfter(suggestedDelay delay: Delay, forResponseWithStatusCode statusCode: Int, errorCode: Int?) -> Delay? {
+        return delay
+    }
 }
 
 internal class ResilientNetworkRecovery<T: Operation> where T: InputProcedure & OutputProcedure, T.Output == HTTPPayloadResponse<Data> {
@@ -63,20 +78,24 @@ internal class ResilientNetworkRecovery<T: Operation> where T: InputProcedure & 
 
     var max: Int { return behavior.maximumNumberOfAttempts }
 
-    var wait: WaitStrategy { return behavior.timeoutBackoffStrategy }
+    var wait: WaitStrategy { return behavior.backoffStrategy }
 
     init(behavior: ResilientNetworkBehavior) {
         self.behavior = behavior
     }
 
     func recover(withInfo info: RetryFailureInfo<T>, payload: Payload) -> Recovery? {
-        guard let response = info.operation.output.success?.response, behavior.retryRequest(forResponseWithStatusCode: response.statusCode, errorCode: info.errorCode) else { return nil }
-        return (behavior.errorDelay ?? payload.delay, info.configure)
+        guard
+            let response = info.operation.result.value?.response,
+            let suggestedDelay = payload.delay,
+            let delay = behavior.retryRequestAfter(suggestedDelay: suggestedDelay, forResponseWithStatusCode: response.statusCode, errorCode: info.errorCode)
+        else { return nil }
+        return (delay, info.configure)
     }
 }
 
 public enum ProcedureKitNetworkResiliencyError: Error {
-    case receivedErrorStatusCode(Int)
+    case receivedErrorStatusCode(HTTPStatusCode)
 }
 
 /**
@@ -100,7 +119,7 @@ open class ResilientNetworkProcedure<T: Operation>: RetryProcedure<T>, InputProc
 
     internal private(set) var recovery: ResilientNetworkRecovery<T>
 
-    public init(dispatchQueue: DispatchQueue = DispatchQueue.default, behavior: ResilientNetworkBehavior, body: @escaping () -> T?) {
+    public init<NetworkIterator: IteratorProtocol>(dispatchQueue: DispatchQueue? = nil, behavior: ResilientNetworkBehavior, iterator: NetworkIterator) where T == NetworkIterator.Element {
 
         let _recovery = ResilientNetworkRecovery<T>(behavior: behavior)
 
@@ -108,20 +127,37 @@ open class ResilientNetworkProcedure<T: Operation>: RetryProcedure<T>, InputProc
             guard
                 let recovery = _recovery,
                 let (delay, configure) = recovery.recover(withInfo: info, payload: payload)
-            else { return nil }
+                else { return nil }
             return RepeatProcedurePayload(operation: payload.operation, delay: delay, configure: configure)
         }
 
         recovery = _recovery
 
-        super.init(dispatchQueue: dispatchQueue, max: recovery.max, wait: recovery.wait, iterator: AnyIterator(body), retry: handler)
+        let requestTimeout = behavior.requestTimeout
+        let tmp = MapIterator(iterator) { (procedure: T) -> T in
+            if let timeout = requestTimeout {
+                procedure.add(observer: TimeoutObserver(by: timeout))
+            }
+            return procedure
+        }
+        super.init(dispatchQueue: dispatchQueue, max: recovery.max, wait: recovery.wait, iterator: tmp, retry: handler)
+    }
+
+    public convenience init(dispatchQueue: DispatchQueue? = nil, behavior: ResilientNetworkBehavior, body: @escaping () -> T?) {
+        self.init(dispatchQueue: dispatchQueue, behavior: behavior, iterator: AnyIterator(body))
     }
 
     open override func procedureQueue(_ queue: ProcedureQueue, willFinishOperation operation: Operation, withErrors errors: [Error]) {
         guard errors.isEmpty && operation === current,
-            let code = response?.statusCode, recovery.behavior.retryRequest(forResponseWithStatusCode: code, errorCode: nil)
+            let response = response,
+            let code = response.code, code.isClientError || code.isServerError
         else {
             super.procedureQueue(queue, willFinishOperation: operation, withErrors: errors)
+            return
+        }
+
+        guard recovery.behavior.shouldRetryRequest(forResponseWithStatusCode: code, errorCode: nil) else {
+            log.notice(message: "Will not retry response: \(response)")
             return
         }
 

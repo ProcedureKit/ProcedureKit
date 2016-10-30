@@ -9,37 +9,122 @@ import ProcedureKit
 import TestingProcedureKit
 @testable import ProcedureKitNetwork
 
-struct Behavior: ResilientNetworkBehavior {
-    var maximumNumberOfAttempts: Int = 3
-    var timeoutBackoffStrategy: WaitStrategy = .constant(1)
-    var errorDelay: Delay? = nil
-    var subsequentAttemptDelay: Delay = .by(0.1)
-
-    var retryRequestForResponseWithStatusCode: (Int, Int?) -> Bool = { _, _ in false }
-
-    public func retryRequest(forResponseWithStatusCode statusCode: Int, errorCode: Int?) -> Bool {
-        return retryRequestForResponseWithStatusCode(statusCode, errorCode)
-    }
-}
-
 class ResilientNetworkProcedureTests: ProcedureKitTestCase {
+    typealias NetworkProcedure = ResultProcedure<HTTPResult<Data>>
 
-    var session: TestableURLSessionTaskFactory!
-    var behavior: Behavior!
-    var download: ResilientNetworkProcedure<NetworkDataProcedure<TestableURLSessionTaskFactory>>!
-
-    override func setUp() {
-        super.setUp()
-        session = TestableURLSessionTaskFactory()
-        behavior = Behavior()
-        download = ResilientNetworkProcedure(behavior: behavior) { NetworkDataProcedure(session: self.session, request: URLRequest(url: "http://procedure.kit.run")) }
+    func makeFakeNetworkProcedure(withHTTPResult result: HTTPResult<Data>) -> NetworkProcedure {
+        return NetworkProcedure { result }
     }
 
-    func test__given__valid_response__then_one_request_made() {
-        wait(for: download)
-        XCTAssertProcedureFinishedWithoutErrors(download)
-        XCTAssertEqual(download.count, 1)
-        XCTAssertEqual(download.data, session.returnedData)
+    func makeFakeNetworkProcedure(withData data: Data, withResponse response: HTTPURLResponse) -> NetworkProcedure {
+        return makeFakeNetworkProcedure(withHTTPResult: HTTPResult(payload: data, response: response))
+    }
+
+    func makeFakeNetworkProcedure(withData data: Data? = nil, withResponse response: HTTPURLResponse) -> NetworkProcedure {
+        return makeFakeNetworkProcedure(withHTTPResult: HTTPResult(payload: data, response: response))
+    }
+
+    func makeFakeNetworkProcedure(withURL url: URL, statusCode: Int) -> NetworkProcedure {
+        let response = HTTPURLResponse(url: url, statusCode: statusCode, httpVersion: nil, headerFields: nil)
+        return makeFakeNetworkProcedure(withResponse: response!)
+    }
+
+    func makeFakeNetworkRequest() -> NetworkProcedure {
+        return makeFakeNetworkProcedure(withURL: "http://httpbin.org/status/200", statusCode: 200)
+    }
+
+    func makeRealNetworkProcedure(withURL url: URL) -> NetworkDataProcedure<URLSession> {
+        return NetworkDataProcedure(session: URLSession.shared, request: URLRequest(url: url))
+    }
+
+    func makeRealNetworkRequest() -> NetworkDataProcedure<URLSession> {
+        return makeRealNetworkProcedure(withURL: "http://httpbin.org/status/200")
     }
 }
+
+class BadRequestResilientNetworkProcedureTests: ResilientNetworkProcedureTests {
+
+    struct Behavior: ResilientNetworkBehavior {
+        var maximumNumberOfAttempts = 4
+        var backoffStrategy: WaitStrategy = .incrementing(initial: 2, increment: 2)
+        var requestTimeout: TimeInterval? = nil
+
+        func shouldRetryRequest(forResponseWithStatusCode statusCode: HTTPStatusCode, errorCode: Int?) -> Bool {
+            return false
+        }
+
+        func retryRequestAfter(suggestedDelay delay: Delay, forResponseWithStatusCode statusCode: HTTPStatusCode, errorCode: Int?) -> Delay? {
+            return delay
+        }
+    }
+
+    func makeFakeBadRequestNetworkProcedure() -> NetworkProcedure {
+        return makeFakeNetworkProcedure(withURL: "http://httpbin.org/status/400", statusCode: 400)
+    }
+
+    func makeRealBadRequestNetworkProcedure() -> NetworkDataProcedure<URLSession> {
+        return makeRealNetworkProcedure(withURL: "http://httpbin.org/status/400")
+    }
+
+    func test__no_retries() {
+        let network = ResilientNetworkProcedure(behavior: Behavior(), body: makeFakeBadRequestNetworkProcedure)
+        wait(for: network)
+        XCTAssertEqual(network.count, 1)
+    }
+}
+
+class NetworkTimeoutResilientNetworkProcedureTests: ResilientNetworkProcedureTests {
+
+    struct Behavior: ResilientNetworkBehavior {
+        var maximumNumberOfAttempts = 4
+        var backoffStrategy: WaitStrategy = .incrementing(initial: 0.1, increment: 0.1)
+        var requestTimeout: TimeInterval? = nil
+
+        func shouldRetryRequest(forResponseWithStatusCode statusCode: HTTPStatusCode, errorCode: Int?) -> Bool {
+            switch statusCode {
+            case .requestTimeout: return true
+            default: return false
+            }
+        }
+
+        func retryRequestAfter(suggestedDelay delay: Delay, forResponseWithStatusCode statusCode: HTTPStatusCode, errorCode: Int?) -> Delay? {
+            return delay
+        }
+    }
+
+    func makeFakeNetworkTimeoutNetworkProcedure() -> NetworkProcedure {
+        return makeFakeNetworkProcedure(withURL: "http://httpbin.org/status/408", statusCode: 408)
+    }
+
+    func makeFakeRequestIterator() -> IndexingIterator<[NetworkProcedure]> {
+        return [ makeFakeNetworkTimeoutNetworkProcedure(), makeFakeNetworkRequest()].makeIterator()
+    }
+
+    func makeRealNetworkTimeoutNetworkProcedure() -> NetworkDataProcedure<URLSession> {
+        return makeRealNetworkProcedure(withURL: "http://httpbin.org/status/408")
+    }
+
+    func makeRealRequestIterator() -> IndexingIterator<[NetworkDataProcedure<URLSession>]> {
+        return [ makeRealNetworkTimeoutNetworkProcedure(), makeRealNetworkRequest()].makeIterator()
+    }
+
+    func test__one_retry() {
+        let network = ResilientNetworkProcedure(behavior: Behavior(), iterator: makeFakeRequestIterator())
+        network.log.severity = .notice
+        wait(for: network)
+        XCTAssertEqual(network.count, 2)
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
 

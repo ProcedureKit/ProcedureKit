@@ -83,6 +83,7 @@ open class NetworkDataProcedure<Session: URLSessionTaskFactory>: Procedure, Inpu
                 strongSelf.finish(withResult: .success(http))
             }
 
+            log.notice(message: "Will make request: \(request)")
             task?.resume()
         }
     }
