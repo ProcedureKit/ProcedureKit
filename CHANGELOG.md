@@ -4,12 +4,15 @@ Beta 4 is a significant maturation over Beta 3. There are a couple of breaking c
 Additionally, Beta 4 now supports integration via Carthage _and CocoaPods_ including full support for _TestingProcedureKit_ and CocoaPod subspecs.
 
 ## Breaking API Changes
-1. [#519](https://github.com/ProcedureKit/ProcedureKit/pull/519) Renames `AuthorizationStatusProtocol` to `AuthorizationStatus`. Thanks to [@martnst](https://github.com/martnst).
+1. [#519](https://github.com/ProcedureKit/ProcedureKit/pull/519) Renames 
+    - `AuthorizationStatusProtocol` to `AuthorizationStatus`. 
+    Thanks to [@martnst](https://github.com/martnst).
 2. [#520](https://github.com/ProcedureKit/ProcedureKit/pull/520) Renames:
     - `GetAuthorizationStatus` to `GetAuthorizationStatusProcedure`, 
     - `Authorize` to `AuthorizeCapabilityProcedure`
     Thanks to [@martnst](https://github.com/martnst) again.
-3. [#527](https://github.com/ProcedureKit/ProcedureKit/pull/527), [#528](https://github.com/ProcedureKit/ProcedureKit/pull/528), [#541](https://github.com/ProcedureKit/ProcedureKit/pull/541), [#546](https://github.com/ProcedureKit/ProcedureKit/pull/546) ResultInjection
+3. [#527](https://github.com/ProcedureKit/ProcedureKit/pull/527), [#528](https://github.com/ProcedureKit/ProcedureKit/pull/528), [#541](https://github.com/ProcedureKit/ProcedureKit/pull/541), [#546](https://github.com/ProcedureKit/ProcedureKit/pull/546) ResultInjection 
+
     ResultInjection, which is what we call the methodology of automatically injecting the result from one procedure as the requirement of a dependency, has been revamped in Beta 4.
     - It is now an extension on `ProcedureProctocol`.
     - The API now support injection via a transform block. For example, lets assume that we are using `NetworkDataProcedure` which requires a `URLRequest`, and we have a procedure which results in a `URL`, we might do this:
@@ -31,36 +34,44 @@ Additionally, Beta 4 now supports integration via Carthage _and CocoaPods_ inclu
 1. [#516](https://github.com/ProcedureKit/ProcedureKit/pull/516), [#534](https://github.com/ProcedureKit/ProcedureKit/pull/534): `AnyProcedure` 
 
     This is a new procedure which supports composition of any `Procedure` subclass conforming to `ResultInjection` APIs with complete type erasure. This makes the following usage possible: 
-      - Inject / store generic `Procedure` subclasses into other types.
-	    - Store many different types of `Procedure` subclasses in a homogenous storage container, so long as they have the same sub-type `Requirement` and `Result`.
+    - Inject / store generic `Procedure` subclasses into other types.
+    - Store many different types of `Procedure` subclasses in a homogenous storage container, so long as they have the same sub-type `Requirement` and `Result`.
 
     An example of where this is useful would be with a strategy design pattern, where each strategies likely has a different `Procedure` subclass, but the `Requirement` (i.e. input) and `Result` (i.e. output) of each is the same. Given this, any strategy can be injected into a `GroupProcedure` or other structure type-erased using `AnyProcedure<Requirement,Result>`.
 2. [#523](https://github.com/ProcedureKit/ProcedureKit/pull/523) _ProcedureKitCloud_
-     Added a _ProcedureKitCloud_ framework, which currently just
+
+    Added a _ProcedureKitCloud_ framework, which currently just
 includes `Capability.CloudKit`. Unfortunately the full `CloudKitProcedure` class did not get finished in time for this beta. However, it is very close to being finished, see PR: [#542](https://github.com/ProcedureKit/ProcedureKit/pull/542).
 3. [#524](https://github.com/ProcedureKit/ProcedureKit/pull/524), [#525](https://github.com/ProcedureKit/ProcedureKit/pull/525), [#526](https://github.com/ProcedureKit/ProcedureKit/pull/526), [#538](https://github.com/ProcedureKit/ProcedureKit/pull/538),[#547](https://github.com/ProcedureKit/ProcedureKit/pull/547) _ProcedureKitNetwork_
+    
     _ProcedureKitNetwork_ is a framework which offers a very simple wrapper around `URLSession` **completion based** APIs. Currently only for `NetworkDataProcedure` which uses the `URLSessionDataTask` based APIs. If you need to use the delegate based APIs you cannot use this `Procedure` subclass.
     
     Additionally, there is full support in _TestingProcedureKit_ for using `TestableURLSession` which allows framework consumers to check that the session receives the correct request etc.
 4. [#536](https://github.com/ProcedureKit/ProcedureKit/pull/536) `.then { }` API
+
     Added an alternative way of adding dependencies on `Operation` in a chain. For example:
     ```swift
     let operations = foo.then(do: bar).then { Baz() }
     ```
     Thanks to [@jshier](https://github.com/jshier) for initial idea and suggestion - sorry it took so long to get done!
 5. [#508](https://github.com/ProcedureKit/ProcedureKit/pull/508), [#553](https://github.com/ProcedureKit/ProcedureKit/pull/553) CocoaPods
+
     Note here that the standard pod is just the core framework. This is Extension API compatible with support for all 4 platforms. To get iOS related classes, such as `BackgroundObserver` which are not Extension API compatible use `ProcedureKit/Mobile`, likewise for `ProcedureKit/Location`, `ProcedureKit/Network`, `ProcedureKit/Cloud` etc.
     _TestingProcedureKit_, has its own podspec.
 6. [#537](https://github.com/ProcedureKit/ProcedureKit/pull/537) `ResilientNetworkProcedure` Beta
+
     This is a `RetryProcedure` subclass which is designed to add network resiliency around network request based `Procedure` subclasses. This procedure works by providing a value which corresponds to `ResilientNetworkBehavior` protocol, and a closure which returns a new network request procedure. The protocol allows the framework consumer to decide how to interpret status/error codes, and trigger retries.
 7. [#550](https://github.com/ProcedureKit/ProcedureKit/pull/550) `ConcurrencyTestCase`
-This is a new `ProcedureKitTestCase` subclass in _TestingProcedureKit_ which has methods to help test concurrency issues in _ProcedureKit_ itself, but also in your applications. Thanks to [@swiftlyfalling](https://github.com/swiftlyfalling) for adding it.
-8. [#552](https://github.com/ProcedureKit/ProcedureKit/pull/552) Adds `wait(forAll: [Procedure])` API to `ProcedureKitTestCase`. Thanks to [@swiftlyfalling](https://github.com/swiftlyfalling) for adding this.
-9. [#554](https://github.com/ProcedureKit/ProcedureKit/pull/554) Adds `did(execute: Procedure)` observer callback.
-Use this with great caution, as it may not always do what you expect depending on the behavior of the `execute` method of the procedure. From the discussion:
-> all that's currently guaranteed is that didExecuteObservers will be called after execute() returns. The rest is up to the specifics of the Procedure subclass implementation.
-This will likely be improved before 4.0.0 is final. 
 
+    This is a new `ProcedureKitTestCase` subclass in _TestingProcedureKit_ which has methods to help test concurrency issues in _ProcedureKit_ itself, but also in your applications. Thanks to [@swiftlyfalling](https://github.com/swiftlyfalling) for adding it.
+8. [#552](https://github.com/ProcedureKit/ProcedureKit/pull/552) `wait(forAll: [Procedure])` API 
+
+    This is added to `ProcedureKitTestCase`. Thanks to [@swiftlyfalling](https://github.com/swiftlyfalling) for adding this.
+9. [#554](https://github.com/ProcedureKit/ProcedureKit/pull/554) Adds `did(execute: Procedure)` observer callback.
+
+    Use this with great caution, as it may not always do what you expect depending on the behavior of the `execute` method of the procedure. From the discussion:
+    > all that's currently guaranteed is that didExecuteObservers will be called after execute() returns. The rest is up to the specifics of the Procedure subclass implementation.
+    This will likely be improved before 4.0.0 is final. 
     
 ## Bug Fixes etc
 1. [#518](https://github.com/ProcedureKit/ProcedureKit/pull/518) Fixes failing release build regression.
