@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name              = "ProcedureKit"
-  s.version           = "4.0.0-beta-3"
+  s.version           = "4.0.0.beta.4"
   s.summary           = "Powerful Operation subclasses in Swift."
   s.description       = <<-DESC
   
@@ -40,14 +40,6 @@ session Advanced NSOperations: https://developer.apple.com/videos/wwdc/2015/?id=
     ]
   end
 
-  # TestingProcedureKit
-  s.subspec 'Testing' do |ss|
-    ss.platforms = { :ios => "8.0", :tvos => "9.2", :osx => "10.10" }  
-  	ss.dependency 'ProcedureKit/Standard'  
-  	ss.frameworks = 'XCTest'  	
-  	ss.source_files = ['Sources/Testing']
-  end
-
   # ProcedureKitNetwork
   s.subspec 'Network' do |ss|
   	ss.dependency 'ProcedureKit/Standard'
@@ -75,5 +67,3 @@ session Advanced NSOperations: https://developer.apple.com/videos/wwdc/2015/?id=
   	ss.source_files = ['Sources/Mobile']
   end
 end
-
-

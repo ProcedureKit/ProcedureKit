@@ -1,6 +1,0 @@
-coverage_service: coveralls
-xcodeproj: Operations.xcodeproj
-build_directory: .ci/xcodebuild-data
-ignore:
-  - Tests/*
-  - Supporting Files/*
