@@ -22,8 +22,8 @@ open class UserLocationProcedure: Procedure, ResultInjection, CLLocationManagerD
 
     internal var capability = Capability.Location()
 
-    internal lazy var locationManager: LocationServicesRegristrarProtocol & LocationServicesProtocol = CLLocationManager.make()
-    internal var manager: LocationServicesRegristrarProtocol & LocationServicesProtocol {
+    internal lazy var locationManager: LocationServicesRegistrarProtocol & LocationServicesProtocol = CLLocationManager.make()
+    internal var manager: LocationServicesRegistrarProtocol & LocationServicesProtocol {
         get { return locationManager }
         set {
             locationManager = newValue
