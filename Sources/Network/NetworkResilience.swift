@@ -4,6 +4,49 @@
 //  Copyright © 2016 ProcedureKit. All rights reserved.
 //
 
+public struct ResilientNetworkResponse {
+    public enum ResilientNetworkError: Error {
+        case requestTimeout
+        case underlyingErrors([Error])
+    }
+
+    public let http: HTTPURLResponse?
+    public let error: ResilientNetworkError?
+
+    public var statusCode: HTTPStatusCode? {
+        return http?.code
+    }
+
+    func set(http: HTTPURLResponse?) -> ResilientNetworkResponse {
+        return ResilientNetworkResponse(http: http, error: error)
+    }
+
+    func set(error: ResilientNetworkError?) -> ResilientNetworkResponse {
+        return ResilientNetworkResponse(http: http, error: error)
+    }
+
+    internal var underlyingErrors: [Error]? {
+        if case let .some(.underlyingErrors(errors)) = error {
+            return errors
+        }
+        return nil
+    }
+
+    internal var possiblyRequiresRetry: Bool {
+        get {
+            // Check for request timeout error
+            if case .some(.requestTimeout) = error {
+                return true
+            }
+            // status code is a client or server error
+            else if let code = statusCode, code.isClientError || code.isServerError {
+                return true
+            }
+            return underlyingErrors != nil
+        }
+    }
+}
+
 public protocol ResilientNetworkBehavior {
 
     /**
@@ -40,7 +83,7 @@ public protocol ResilientNetworkBehavior {
      - parameter errorCode: an Int? if returned from URLSession
      - returns: a Bool, to indicate that the
      */
-    func shouldRetryRequest(forResponseWithStatusCode statusCode: HTTPStatusCode, errorCode: Int?) -> Bool
+    func shouldRetryRequest(forResponse response: ResilientNetworkResponse) -> Bool
 
     /**
      The behavior can modify the suggest delay before retrying a request.
@@ -50,22 +93,7 @@ public protocol ResilientNetworkBehavior {
      - parameter delay: the suggested delay as determined by the backoffStrategy
      - returns: a Delay?
      */
-    func retryRequestAfter(suggestedDelay delay: Delay, forResponseWithStatusCode statusCode: HTTPStatusCode, errorCode: Int?) -> Delay?
-}
-
-public extension ResilientNetworkBehavior {
-
-    func shouldRetryRequest(forResponseWithStatusCode statusCode: Int, errorCode: Int?) -> Bool {
-        switch statusCode {
-        case 408, 429: return true
-        case 500..<600: return true
-        default: return false
-        }
-    }
-
-    func retryRequestAfter(suggestedDelay delay: Delay, forResponseWithStatusCode statusCode: Int, errorCode: Int?) -> Delay? {
-        return delay
-    }
+    func retryRequestAfter(suggestedDelay delay: Delay, forResponse response: ResilientNetworkResponse) -> Delay?
 }
 
 internal class ResilientNetworkRecovery<T: Operation> where T: InputProcedure & OutputProcedure, T.Output == HTTPPayloadResponse<Data> {
@@ -84,11 +112,25 @@ internal class ResilientNetworkRecovery<T: Operation> where T: InputProcedure & 
         self.behavior = behavior
     }
 
+    func resilientNetworkResponse(fromHTTPURLResponse http: HTTPURLResponse?, errors: [Error]) -> ResilientNetworkResponse {
+        // Create a network response
+        var networkResponse = ResilientNetworkResponse(http: http, error: .underlyingErrors(errors))
+
+        // Check to see if we timed out
+        if let procedureKitError = errors.first as? ProcedureKitError {
+            if case .timedOut(with: _) = procedureKitError.context {
+                networkResponse = networkResponse.set(error: .requestTimeout)
+            }
+        }
+        return networkResponse
+    }
+
     func recover(withInfo info: RetryFailureInfo<T>, payload: Payload) -> Recovery? {
+        guard let http = info.operation.result.value?.response else { return nil }
+        let response = resilientNetworkResponse(fromHTTPURLResponse: http, errors: info.errors)
         guard
-            let response = info.operation.result.value?.response,
             let suggestedDelay = payload.delay,
-            let delay = behavior.retryRequestAfter(suggestedDelay: suggestedDelay, forResponseWithStatusCode: response.statusCode, errorCode: info.errorCode)
+            let delay = behavior.retryRequestAfter(suggestedDelay: suggestedDelay, forResponse: response)
         else { return nil }
         return (delay, info.configure)
     }
@@ -148,21 +190,21 @@ open class ResilientNetworkProcedure<T: Operation>: RetryProcedure<T>, InputProc
     }
 
     open override func procedureQueue(_ queue: ProcedureQueue, willFinishOperation operation: Operation, withErrors errors: [Error]) {
-        guard errors.isEmpty && operation === current,
-            let response = response,
-            let code = response.code, code.isClientError || code.isServerError
-        else {
-            super.procedureQueue(queue, willFinishOperation: operation, withErrors: errors)
+        guard operation == current else { return }
+
+        // Create a network response
+        let networkResponse = recovery.resilientNetworkResponse(fromHTTPURLResponse: response, errors: errors)
+
+        // Check the behaviour to see if we should retry this request
+        guard networkResponse.possiblyRequiresRetry && recovery.behavior.shouldRetryRequest(forResponse: networkResponse) else {
             return
         }
 
-        guard recovery.behavior.shouldRetryRequest(forResponseWithStatusCode: code, errorCode: nil) else {
-            log.notice(message: "Will not retry response: \(response)")
-            return
-        }
+        // Make sure that we have final errors
+        let finalErrors: [Error] = networkResponse.error.map { [$0] } ?? []
 
-        log.warning(message: "Identified erroneous error status code: \(code). Will trigger retry mechanism.")
-        super.procedureQueue(queue, willFinishOperation: operation, withErrors: [ProcedureKitNetworkResiliencyError.receivedErrorStatusCode(code)])
+        log.notice(message: "Behaviour indicates retry given errors: \(finalErrors)")
+        super.procedureQueue(queue, willFinishOperation: operation, withErrors: finalErrors)
     }
 }
 
