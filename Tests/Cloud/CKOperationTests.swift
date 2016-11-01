@@ -109,6 +109,3 @@ class CKOperationTests: CKProcedureTestCase {
         XCTAssertEqual(target.timeoutIntervalForResource, timeout)
     }
 }
-
-
-

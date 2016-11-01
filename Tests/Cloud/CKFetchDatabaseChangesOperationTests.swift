@@ -139,10 +139,30 @@ class CloudKitProcedureFetchDatabaseChangesOperationTests: CKProcedureTestCase {
         }
     }
 
-    // TODO: set_get_database
-    // TODO: set_get_previousServerChangeToke
-    // TODO: set_get_resultsLimit
-    // TODO: set_get_fetchAllChanges
+    func test_set_get_container() {
+        cloudkit.container = "I'm a different container!"
+        XCTAssertEqual(cloudkit.container, "I'm a different container!")
+    }
+
+    func test_set_get_database() {
+        cloudkit.database = "I'm a different database!"
+        XCTAssertEqual(cloudkit.database, "I'm a different database!")
+    }
+
+    func test_set_get_previousServerChangeToken() {
+        cloudkit.previousServerChangeToken = "I'm a different token!"
+        XCTAssertEqual(cloudkit.previousServerChangeToken, "I'm a different token!")
+    }
+
+    func test_set_get_resultsLimit() {
+        cloudkit.resultsLimit = 20
+        XCTAssertEqual(cloudkit.resultsLimit, 20)
+    }
+
+    func test_set_get_fetchAllChanges() {
+        cloudkit.fetchAllChanges = false
+        XCTAssertEqual(cloudkit.fetchAllChanges, false)
+    }
 
     func test_set_get_recordZoneWithIDChangedBlock() {
         XCTAssertNotNil(cloudkit.recordZoneWithIDChangedBlock)

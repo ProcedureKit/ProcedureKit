@@ -113,13 +113,19 @@ class CloudKitProcedureAcceptSharesOperationTests: CKProcedureTestCase {
         super.tearDown()
     }
 
-    func test__setting_common_properties() {
-        wait(for: cloudkit)
-        XCTAssertEqual(cloudkit.container, container)
-        XCTAssertEqual(cloudkit.shareMetadatas, shareMetadatas)
+    func test_set_get_container() {
+        cloudkit.container = "I'm a different container!"
+        XCTAssertEqual(cloudkit.container, "I'm a different container!")
+    }
+
+    func test__set_get_shareMetadatas() {
+        cloudkit.shareMetadatas = [ "hello-again@world.com" ]
+        XCTAssertEqual(cloudkit.shareMetadatas, [ "hello-again@world.com" ])
+    }
+
+    func test__set_get_perShareCompletionBlock() {
         XCTAssertNotNil(cloudkit.perShareCompletionBlock)
         cloudkit.perShareCompletionBlock?("share metadata", "accepted share", nil)
-        XCTAssertProcedureFinishedWithoutErrors(cloudkit)
         XCTAssertTrue(setByBlockPerShareCompletionBlock)
     }
 

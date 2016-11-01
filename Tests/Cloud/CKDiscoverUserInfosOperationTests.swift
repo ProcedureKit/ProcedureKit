@@ -46,23 +46,15 @@ class CKDiscoverUserInfosOperationTests: CKProcedureTestCase {
     func test__set_get__emailAddresses() {
         let emailAddresses = [ "hello@world.com" ]
         operation.emailAddresses = emailAddresses
-        XCTAssertNotNil(operation.emailAddresses)
-        XCTAssertEqual(operation.emailAddresses!.count, 1)
-        XCTAssertEqual(operation.emailAddresses!, emailAddresses)
-        XCTAssertNotNil(target.emailAddresses)
-        XCTAssertEqual(target.emailAddresses!.count, 1)
-        XCTAssertEqual(target.emailAddresses!, emailAddresses)
+        XCTAssertEqual(operation.emailAddresses ?? [], emailAddresses)
+        XCTAssertEqual(target.emailAddresses ?? [], emailAddresses)
     }
 
     func test__set_get__userRecordIDs() {
         let userRecordIDs = [ "userRecordID" ]
         operation.userRecordIDs = userRecordIDs
-        XCTAssertNotNil(operation.userRecordIDs)
-        XCTAssertEqual(operation.userRecordIDs!.count, 1)
-        XCTAssertEqual(operation.userRecordIDs!, userRecordIDs)
-        XCTAssertNotNil(target.userRecordIDs)
-        XCTAssertEqual(target.userRecordIDs!.count, 1)
-        XCTAssertEqual(target.userRecordIDs!, userRecordIDs)
+        XCTAssertEqual(operation.userRecordIDs ?? [], userRecordIDs)
+        XCTAssertEqual(target.userRecordIDs ?? [], userRecordIDs)
     }
 
     func test__success_without_completion_block() {
@@ -117,6 +109,11 @@ class CloudKitProcedureDiscoverUserInfosOperationTests: CKProcedureTestCase {
         cloudkit.container = container
         cloudkit.emailAddresses = [ "hello@world.com" ]
         cloudkit.userRecordIDs = [ "hello user" ]
+    }
+
+    func test_set_get_container() {
+        cloudkit.container = "I'm a different container!"
+        XCTAssertEqual(cloudkit.container, "I'm a different container!")
     }
 
     func test__set_get_emailAddresses() {
