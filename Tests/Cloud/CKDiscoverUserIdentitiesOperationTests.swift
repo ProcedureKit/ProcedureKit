@@ -95,6 +95,7 @@ class CloudKitProcedureDiscoverUserIdentitiesOperationTests: CKProcedureTestCase
         super.setUp()
         cloudkit = CloudKitProcedure(strategy: .immediate) { TestCKDiscoverUserIdentitiesOperation() }
         cloudkit.container = container
+        cloudkit.userIdentityLookupInfos = [ "user lookup info" ]
         cloudkit.userIdentityDiscoveredBlock = { [weak self] _, _ in
             self?.setByUserIdentityDiscoveredBlock = true
         }

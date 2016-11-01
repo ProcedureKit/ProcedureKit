@@ -5,6 +5,7 @@
 //
 
 import XCTest
+import CloudKit
 import ProcedureKit
 import TestingProcedureKit
 @testable import ProcedureKitCloud
@@ -104,3 +105,76 @@ class CKDiscoverUserInfosOperationTests: CKProcedureTestCase {
         XCTAssertFalse(didExecuteBlock)
     }
 }
+
+class CloudKitProcedureDiscoverUserInfosOperationTests: CKProcedureTestCase {
+
+    var setByUserIdentityDiscoveredBlock = false
+    var cloudkit: CloudKitProcedure<TestCKDiscoverUserInfosOperation>!
+
+    override func setUp() {
+        super.setUp()
+        cloudkit = CloudKitProcedure(strategy: .immediate) { TestCKDiscoverUserInfosOperation() }
+        cloudkit.container = container
+        cloudkit.emailAddresses = [ "hello@world.com" ]
+        cloudkit.userRecordIDs = [ "hello user" ]
+    }
+
+    func test__set_get_emailAddresses() {
+        cloudkit.emailAddresses = [ "hello@world.com" ]
+        XCTAssertEqual(cloudkit.emailAddresses ?? [], [ "hello@world.com" ])
+    }
+
+    func test__set_get_userRecordIDs() {
+        cloudkit.userRecordIDs = [ "hello user" ]
+        XCTAssertEqual(cloudkit.userRecordIDs ?? [], [ "hello user" ])
+    }
+
+    func test__cancellation() {
+        cloudkit.cancel()
+        wait(for: cloudkit)
+        XCTAssertProcedureCancelledWithoutErrors(cloudkit)
+    }
+
+    func test__success_without_completion_block_set() {
+        wait(for: cloudkit)
+        XCTAssertProcedureFinishedWithoutErrors(cloudkit)
+    }
+
+    func test__success_with_completion_block_set() {
+        var didExecuteBlock = false
+        cloudkit.setDiscoverUserInfosCompletionBlock { _, _ in
+            didExecuteBlock = true
+        }
+        wait(for: cloudkit)
+        XCTAssertProcedureFinishedWithoutErrors(cloudkit)
+        XCTAssertTrue(didExecuteBlock)
+    }
+
+    func test__error_without_completion_block_set() {
+        cloudkit = CloudKitProcedure(strategy: .immediate) {
+            let operation = TestCKDiscoverUserInfosOperation()
+            operation.error = NSError(domain: CKErrorDomain, code: CKError.internalError.rawValue, userInfo: nil)
+            return operation
+        }
+        wait(for: cloudkit)
+        XCTAssertProcedureFinishedWithoutErrors(cloudkit)
+    }
+
+    func test__error_with_completion_block_set() {
+        cloudkit = CloudKitProcedure(strategy: .immediate) {
+            let operation = TestCKDiscoverUserInfosOperation()
+            operation.error = NSError(domain: CKErrorDomain, code: CKError.internalError.rawValue, userInfo: nil)
+            return operation
+        }
+
+        var didExecuteBlock = false
+        cloudkit.setDiscoverUserInfosCompletionBlock { _, _ in
+            didExecuteBlock = true
+        }
+
+        wait(for: cloudkit)
+        XCTAssertProcedureFinishedWithErrors(cloudkit, count: 1)
+        XCTAssertFalse(didExecuteBlock)
+    }
+}
+

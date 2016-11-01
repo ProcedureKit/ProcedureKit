@@ -814,6 +814,36 @@
 			name = Conditions;
 			sourceTree = "<group>";
 		};
+		652D9E7F1DC8B78A00FCC0DC /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				65589FDE1DBD2BDC0030C950 /* CKAcceptSharesOperationTests.swift */,
+				65589FE21DBD2D3E0030C950 /* CKDatabaseOperationTests.swift */,
+				65589FE41DBD31AC0030C950 /* CKDiscoverAllContactsOperationTests.swift */,
+				65589FE61DBD33690030C950 /* CKDiscoverAllUserIdentitiesOperationTests.swift */,
+				65589FE81DBD33690030C950 /* CKDiscoverUserIdentitiesOperationTests.swift */,
+				65589FE91DBD33690030C950 /* CKDiscoverUserInfosOperationTests.swift */,
+				EEB0B55D1DBE646C008A6B35 /* CKFetchAllChangesTests.swift */,
+				65589FEA1DBD33690030C950 /* CKFetchDatabaseChangesOperationTests.swift */,
+				65589FEB1DBD33690030C950 /* CKFetchNotificationChangesOperationTests.swift */,
+				65589FEC1DBD33690030C950 /* CKFetchRecordChangesOperationTests.swift */,
+				65589FED1DBD33690030C950 /* CKFetchRecordsOperationTests.swift */,
+				65589FEE1DBD33690030C950 /* CKFetchRecordZoneChangesOperationTests.swift */,
+				65589FEF1DBD33690030C950 /* CKFetchRecordZonesOperationTests.swift */,
+				65589FF01DBD33690030C950 /* CKFetchShareMetadataOperationTests.swift */,
+				65589FF11DBD33690030C950 /* CKFetchShareParticipantsOperationTests.swift */,
+				65589FF21DBD33690030C950 /* CKFetchSubscriptionsOperationTests.swift */,
+				65589FF31DBD33690030C950 /* CKMarkNotificationsReadOperationTests.swift */,
+				65589FF41DBD33690030C950 /* CKModifyBadgeOperationTests.swift */,
+				65589FF51DBD33690030C950 /* CKModifyRecordsOperationTests.swift */,
+				65589FF61DBD33690030C950 /* CKModifyRecordZonesOperationTests.swift */,
+				65589FF71DBD33690030C950 /* CKModifySubscriptionsOperationTests.swift */,
+				65589FE01DBD2C1A0030C950 /* CKOperationTests.swift */,
+				65589FF81DBD33690030C950 /* CKQueryOperationTests.swift */,
+			);
+			name = Extensions;
+			sourceTree = "<group>";
+		};
 		6532DD891DBCECF800B030F5 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
@@ -997,29 +1027,7 @@
 		653CA0661D60AA990070B7A2 /* Cloud Tests */ = {
 			isa = PBXGroup;
 			children = (
-				65589FDE1DBD2BDC0030C950 /* CKAcceptSharesOperationTests.swift */,
-				65589FE21DBD2D3E0030C950 /* CKDatabaseOperationTests.swift */,
-				65589FE41DBD31AC0030C950 /* CKDiscoverAllContactsOperationTests.swift */,
-				65589FE61DBD33690030C950 /* CKDiscoverAllUserIdentitiesOperationTests.swift */,
-				65589FE81DBD33690030C950 /* CKDiscoverUserIdentitiesOperationTests.swift */,
-				65589FE91DBD33690030C950 /* CKDiscoverUserInfosOperationTests.swift */,
-				EEB0B55D1DBE646C008A6B35 /* CKFetchAllChangesTests.swift */,
-				65589FEA1DBD33690030C950 /* CKFetchDatabaseChangesOperationTests.swift */,
-				65589FEB1DBD33690030C950 /* CKFetchNotificationChangesOperationTests.swift */,
-				65589FEC1DBD33690030C950 /* CKFetchRecordChangesOperationTests.swift */,
-				65589FED1DBD33690030C950 /* CKFetchRecordsOperationTests.swift */,
-				65589FEE1DBD33690030C950 /* CKFetchRecordZoneChangesOperationTests.swift */,
-				65589FEF1DBD33690030C950 /* CKFetchRecordZonesOperationTests.swift */,
-				65589FF01DBD33690030C950 /* CKFetchShareMetadataOperationTests.swift */,
-				65589FF11DBD33690030C950 /* CKFetchShareParticipantsOperationTests.swift */,
-				65589FF21DBD33690030C950 /* CKFetchSubscriptionsOperationTests.swift */,
-				65589FF31DBD33690030C950 /* CKMarkNotificationsReadOperationTests.swift */,
-				65589FF41DBD33690030C950 /* CKModifyBadgeOperationTests.swift */,
-				65589FF51DBD33690030C950 /* CKModifyRecordsOperationTests.swift */,
-				65589FF61DBD33690030C950 /* CKModifyRecordZonesOperationTests.swift */,
-				65589FF71DBD33690030C950 /* CKModifySubscriptionsOperationTests.swift */,
-				65589FE01DBD2C1A0030C950 /* CKOperationTests.swift */,
-				65589FF81DBD33690030C950 /* CKQueryOperationTests.swift */,
+				652D9E7F1DC8B78A00FCC0DC /* Extensions */,
 				65931A611DB3B2580067B0A4 /* CloudKitCapabilityTests.swift */,
 				653CA0711D60AAFE0070B7A2 /* ProcedureKitCloudTests.swift */,
 				65931A631DB3B3C90067B0A4 /* TestableCloudKitContainer.swift */,
