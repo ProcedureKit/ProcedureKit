@@ -10,6 +10,8 @@ import TestingProcedureKit
 @testable import ProcedureKitCloud
 
 class TestCKDatabaseOperation: TestCKOperation, CKDatabaseOperationProtocol, CKPreviousServerChangeToken, CKResultsLimit, CKMoreComing, CKDesiredKeys {
+    typealias Database = String
+
     var database: String?
     var previousServerChangeToken: ServerChangeToken? = nil
     var resultsLimit: Int = 100
@@ -63,6 +65,4 @@ class CKDatabaseOperationTests: CKProcedureTestCase {
         XCTAssertEqual(operation.desiredKeys ?? [], keys)
         XCTAssertEqual(target.desiredKeys ?? [], keys)
     }
-
-
 }

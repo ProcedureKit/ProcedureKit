@@ -20,19 +20,23 @@ class TestSuiteRuns: XCTestCase {
 class CloudKitTestCase: ProcedureKitTestCase {
 
     var container: TestCKOperation.Container!
+    var database: TestCKDatabaseOperation.Database!
+    var token: TestCKOperation.ServerChangeToken!
 
     override func setUp() {
         super.setUp()
         container = "I'm a test container!"
+        database = "I'm a test database!"
+        token = "I'm a server change token!"
     }
 
     override func tearDown() {
         container = nil
+        database = nil
+        token = nil
         super.tearDown()
     }
 }
 
-class CKProcedureTestCase: CloudKitTestCase {
-
-}
+class CKProcedureTestCase: CloudKitTestCase { }
 
