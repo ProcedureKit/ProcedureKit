@@ -89,7 +89,7 @@ open class ReverseGeocodeUserLocationProcedure: GroupProcedure, ResultInjection 
         add(observer: TimeoutObserver(by: timeout))
     }
 
-    internal func set(manager: LocationServicesRegristrarProtocol & LocationServicesProtocol) -> ReverseGeocodeUserLocationProcedure {
+    internal func set(manager: LocationServicesRegistrarProtocol & LocationServicesProtocol) -> ReverseGeocodeUserLocationProcedure {
         precondition(!isExecuting)
         userLocation.manager = manager
         return self

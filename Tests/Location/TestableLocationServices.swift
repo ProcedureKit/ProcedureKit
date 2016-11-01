@@ -41,7 +41,7 @@ class TestableLocationServicesRegistrar {
     var didRequestAuthorizationForUsage: LocationUsage? = nil
 }
 
-extension TestableLocationServicesRegistrar: LocationServicesRegristrarProtocol {
+extension TestableLocationServicesRegistrar: LocationServicesRegistrarProtocol {
 
     func pk_locationServicesEnabled() -> Bool {
         didCheckServiceEnabled = true

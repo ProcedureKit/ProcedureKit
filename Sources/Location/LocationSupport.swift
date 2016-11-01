@@ -25,7 +25,7 @@ internal extension CLGeocoder {
     }
 }
 
-protocol LocationServicesRegristrarProtocol {
+protocol LocationServicesRegistrarProtocol {
 
     func pk_locationServicesEnabled() -> Bool
 
@@ -37,7 +37,7 @@ protocol LocationServicesRegristrarProtocol {
     func pk_requestAuthorization(withRequirement: LocationUsage?)
 }
 
-extension CLLocationManager: LocationServicesRegristrarProtocol {
+extension CLLocationManager: LocationServicesRegistrarProtocol {
 
     func pk_locationServicesEnabled() -> Bool {
         return CLLocationManager.locationServicesEnabled()

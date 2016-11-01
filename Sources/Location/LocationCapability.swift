@@ -30,7 +30,7 @@ public extension Capability {
 
         public private(set) var requirement: LocationUsage?
 
-        internal lazy var registrar: LocationServicesRegristrarProtocol = CLLocationManager.make()
+        internal lazy var registrar: LocationServicesRegistrarProtocol = CLLocationManager.make()
 
         private var authorizationDelegate: LocationManagerAuthorizationDelegate? = nil
 
