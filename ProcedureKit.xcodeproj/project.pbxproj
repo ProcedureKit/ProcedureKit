@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0B795A8C1DC9E52F00E03CE8 /* NetworkDownload.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B795A8B1DC9E52F00E03CE8 /* NetworkDownload.swift */; };
+		0B795A8F1DC9EE6D00E03CE8 /* NetworkDownloadProcedureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B795A8D1DC9EE2E00E03CE8 /* NetworkDownloadProcedureTests.swift */; };
 		650182C91D8916EC0052CE90 /* DelayProcedureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 650182C81D8916EC0052CE90 /* DelayProcedureTests.swift */; };
 		6518D5E31D7B3A2800A12EF4 /* Condition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6518D5E21D7B3A2800A12EF4 /* Condition.swift */; };
 		651FFDF01DA850FE00112220 /* Filter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 651FFDEF1DA850FE00112220 /* Filter.swift */; };
@@ -418,6 +420,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		0B795A8B1DC9E52F00E03CE8 /* NetworkDownload.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkDownload.swift; sourceTree = "<group>"; };
+		0B795A8D1DC9EE2E00E03CE8 /* NetworkDownloadProcedureTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkDownloadProcedureTests.swift; sourceTree = "<group>"; };
 		650182C81D8916EC0052CE90 /* DelayProcedureTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = DelayProcedureTests.swift; path = Tests/DelayProcedureTests.swift; sourceTree = "<group>"; };
 		6518D5E21D7B3A2800A12EF4 /* Condition.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Condition.swift; path = Sources/Condition.swift; sourceTree = "<group>"; };
 		651FFDEF1DA850FE00112220 /* Filter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Filter.swift; path = Sources/Filter.swift; sourceTree = "<group>"; };
@@ -1022,6 +1026,7 @@
 			isa = PBXGroup;
 			children = (
 				65ECB2ED1DB4FDE000F96F46 /* NetworkData.swift */,
+				0B795A8B1DC9E52F00E03CE8 /* NetworkDownload.swift */,
 				65ECB2EF1DB4FE9900F96F46 /* NetworkSupport.swift */,
 				65DFA4A61DBB9EEA009358CE /* NetworkResilience.swift */,
 			);
@@ -1033,6 +1038,7 @@
 			isa = PBXGroup;
 			children = (
 				65ECB2F31DB5097500F96F46 /* NetworkDataProcedureTests.swift */,
+				0B795A8D1DC9EE2E00E03CE8 /* NetworkDownloadProcedureTests.swift */,
 				65ECB2E61DB4F16E00F96F46 /* ProcedureKitNetworkTests.swift */,
 				65DFA4A81DBBC0B0009358CE /* ResilientNetworkProcedureTests.swift */,
 				65DFA4841DB514DD009358CE /* URLTests.swift */,
@@ -1875,6 +1881,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0B795A8C1DC9E52F00E03CE8 /* NetworkDownload.swift in Sources */,
 				65ECB2F01DB4FE9900F96F46 /* NetworkSupport.swift in Sources */,
 				65DFA4A71DBB9EEA009358CE /* NetworkResilience.swift in Sources */,
 				65ECB2EE1DB4FDE000F96F46 /* NetworkData.swift in Sources */,
@@ -1887,6 +1894,7 @@
 			files = (
 				65DFA4A91DBBC0B0009358CE /* ResilientNetworkProcedureTests.swift in Sources */,
 				65ECB2F41DB5097500F96F46 /* NetworkDataProcedureTests.swift in Sources */,
+				0B795A8F1DC9EE6D00E03CE8 /* NetworkDownloadProcedureTests.swift in Sources */,
 				65ECB2E71DB4F16E00F96F46 /* ProcedureKitNetworkTests.swift in Sources */,
 				65DFA4851DB514DD009358CE /* URLTests.swift in Sources */,
 			);
