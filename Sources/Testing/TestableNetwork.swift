@@ -48,6 +48,10 @@ public class TestableURLSessionTaskFactory {
     public var didReturnDownloadTask: TestableURLSessionTask? = nil
     public var returnedURL: URL? = URL(fileURLWithPath: "/var/tmp/hello/this/is/a/test/url")
 
+    // Upload
+    public var didReceiveUploadRequest: URLRequest? = nil
+    public var didReturnUploadTask: TestableURLSessionTask? = nil
+
     public init() { }
 
     public func dataTask(with request: URLRequest, completionHandler: @escaping (Data?, URLResponse?, Error?) -> Void) -> TestableURLSessionTask {
@@ -69,6 +73,18 @@ public class TestableURLSessionTaskFactory {
             }
         }
         didReturnDownloadTask = task
+        return task
+    }
+
+    public func uploadTask(with request: URLRequest, from bodyData: Data?, completionHandler: @escaping (Data?, URLResponse?, Error?) -> Void) -> TestableURLSessionTask {
+
+        didReceiveUploadRequest = request
+        let task = TestableURLSessionTask {
+            DispatchQueue.main.asyncAfter(deadline: .now() + self.delay) {
+                completionHandler(self.returnedData, self.returnedResponse, self.returnedError)
+            }
+        }
+        didReturnUploadTask = task
         return task
     }
 }

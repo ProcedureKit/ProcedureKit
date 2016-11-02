@@ -9,7 +9,7 @@ import ProcedureKit
 import TestingProcedureKit
 @testable import ProcedureKitNetwork
 
-extension TestableURLSessionTask: URLSessionTaskProtocol, URLSessionDataTaskProtocol, URLSessionDownloadTaskProtocol { }
+extension TestableURLSessionTask: URLSessionTaskProtocol, URLSessionDataTaskProtocol, URLSessionDownloadTaskProtocol, URLSessionUploadTaskProtocol { }
 extension TestableURLSessionTaskFactory: URLSessionTaskFactory { }
 
 class TestSuiteRuns: XCTestCase {
