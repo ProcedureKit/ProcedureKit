@@ -47,6 +47,25 @@ internal extension ConditionProtocol {
 
 public extension ProcedureKitError {
 
+    public struct FailedConditions: Error {
+        public let errors: [Error]
+
+        internal init(errors: [Error]) {
+            self.errors = errors
+        }
+
+        internal func append(error: Error) -> FailedConditions {
+            var errors = self.errors
+            if let failedConditions = error as? FailedConditions {
+                errors.append(contentsOf: failedConditions.errors)
+            }
+            else {
+                errors.append(error)
+            }
+            return FailedConditions(errors: errors)
+        }
+    }
+
     public struct FalseCondition: Error {
         internal init() { }
     }
