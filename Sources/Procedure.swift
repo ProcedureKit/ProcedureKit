@@ -595,8 +595,8 @@ internal extension ConditionResult {
             assertionFailure("A pending ConditionResult cannot be void.")
             return .failed(ProcedureKitError.programmingError(reason: "A pending ConditionResult cannot be void."))
         case (_, .pending):
-            assertionFailure("Cannot evaluate a ConditionResult that is still pending.")
-            return .failed(ProcedureKitError.programmingError(reason: "Cannot evaluate a ConditionResult that is still pending."))
+            // other condition has been cancelled so, it is effectively ignored.
+            return self
         case let (_, .ready(result)):
             return evaluate(result: result)
         }
