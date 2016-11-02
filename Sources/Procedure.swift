@@ -603,15 +603,15 @@ extension Procedure {
             case (_, .pending):
                 if errors.isEmpty { return self }
                 else { return .failed(errors) }
-            case let (_, .failed(conditionError)):
+            case let (_, .ready(.failed(conditionError))):
                 var errors = self.errors
                 errors.append(conditionError)
                 return .failed(errors)
             case (.failed(_), _):
                 return self
-            case (_, .ignored):
+            case (_, .ready(.ignored)):
                 return .ignored
-            case (.pending, .satisfied):
+            case (.pending, .ready(.satisfied)):
                 return .satisfied
             default:
                 return self
