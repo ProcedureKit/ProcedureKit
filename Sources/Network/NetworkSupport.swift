@@ -56,3 +56,11 @@ public struct HTTPResult<Payload: Equatable>: Equatable {
     public var payload: Payload
     public var response: HTTPURLResponse
 }
+
+public struct HTTPRequirement<Payload: Equatable>: Equatable {
+    public static func == (lhs: HTTPRequirement <Payload>, rhs: HTTPRequirement <Payload>) -> Bool {
+        return lhs.payload == rhs.payload && lhs.request == rhs.request
+    }
+    public var payload: Payload?
+    public var request: URLRequest
+}

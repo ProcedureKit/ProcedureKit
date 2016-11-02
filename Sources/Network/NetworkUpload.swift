@@ -11,7 +11,7 @@
  */
 open class NetworkUploadProcedure<Session: URLSessionTaskFactory>: Procedure, ResultInjection {
 
-    public var requirement: PendingValue<(request: URLRequest, data: Data)>
+    public var requirement: PendingValue<HTTPRequirement<Data>>
     public var result: PendingValue<HTTPResult<Data>> = .pending
 
     public private(set) var session: Session
@@ -22,13 +22,7 @@ open class NetworkUploadProcedure<Session: URLSessionTaskFactory>: Procedure, Re
     public init(session: Session, request: URLRequest? = nil, data: Data? = nil, completionHandler: @escaping (HTTPResult<Data>) -> Void = { _ in }) {
 
         self.session = session
-
-        if let request = request, let data = data {
-            self.requirement = .ready((request: request, data: data))
-        } else {
-            self.requirement = .pending
-        }
-
+        self.requirement = request.flatMap { .ready(HTTPRequirement(payload: data, request: $0)) } ?? .pending
         self.completion = completionHandler
 
         super.init()
@@ -39,12 +33,12 @@ open class NetworkUploadProcedure<Session: URLSessionTaskFactory>: Procedure, Re
     }
 
     open override func execute() {
-        guard let tuple = requirement.value else {
+        guard let requirement = requirement.value else {
             finish(withError: ProcedureKitError.requirementNotSatisfied())
             return
         }
 
-        task = session.uploadTask(with: tuple.request, from: tuple.data) { [weak self] data, response, error in
+        task = session.uploadTask(with: requirement.request, from: requirement.payload) { [weak self] data, response, error in
               guard let strongSelf = self else { return }
 
 
