@@ -83,6 +83,8 @@ open class Condition: Procedure, ConditionProtocol {
         }
     }
 
+    public typealias Result = ConditionResult
+
     public var result: PendingValue<ConditionResult> = .pending
 
     open override func execute() {
