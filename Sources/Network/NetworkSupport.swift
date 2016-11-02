@@ -13,19 +13,25 @@ public protocol URLSessionTaskProtocol {
 
 public protocol URLSessionDataTaskProtocol: URLSessionTaskProtocol { }
 public protocol URLSessionDownloadTaskProtocol: URLSessionTaskProtocol { }
+public protocol URLSessionUploadTaskProtocol: URLSessionTaskProtocol { }
 
 public protocol URLSessionTaskFactory {
     associatedtype DataTask: URLSessionDataTaskProtocol
     associatedtype DownloadTask: URLSessionDownloadTaskProtocol
+    associatedtype UploadTask: URLSessionUploadTaskProtocol
 
     func dataTask(with request: URLRequest, completionHandler: @escaping (Data?, URLResponse?, Error?) -> Void) -> DataTask
 
     func downloadTask(with request: URLRequest, completionHandler: @escaping (URL?, URLResponse?, Error?) -> Void) -> DownloadTask
+
+    func uploadTask(with request: URLRequest, from bodyData: Data?, completionHandler: @escaping (Data?, URLResponse?, Error?) -> Void) -> UploadTask
 }
 
 extension URLSessionTask: URLSessionTaskProtocol { }
 extension URLSessionDataTask: URLSessionDataTaskProtocol {}
-extension URLSessionDownloadTask: URLSessionDownloadTaskProtocol {}
+extension URLSessionDownloadTask: URLSessionDownloadTaskProtocol { }
+extension URLSessionUploadTask: URLSessionUploadTaskProtocol { }
+
 extension URLSession: URLSessionTaskFactory { }
 
 extension URL: ExpressibleByStringLiteral {
