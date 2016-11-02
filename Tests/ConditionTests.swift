@@ -204,7 +204,6 @@ class ConditionTests: ProcedureKitTestCase {
 
     func test__ignored_failing_condition_does_not_result_in_failure() {
         let procedure1 = TestProcedure(name: "Procedure 1")
-        procedure1.log.severity = .verbose
         procedure1.add(condition: IgnoredCondition(FalseCondition()))
 
         let procedure2 = TestProcedure(name: "Procedure 2")
