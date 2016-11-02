@@ -16,7 +16,6 @@ public final class NegatedCondition<C: Condition>: ComposedCondition<C> {
     public override func evaluate(procedure: Procedure, completion: @escaping (ConditionResult) -> Void) {
         super.evaluate(procedure: procedure) { composedResult in
             switch composedResult {
-            case .pending: completion(.pending)
             case .satisfied:
                 completion(.failed(ProcedureKitError.conditionFailed()))
             case .ignored(_), .failed(_):

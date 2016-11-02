@@ -11,9 +11,6 @@
  */
 public enum ConditionResult {
 
-    /// Indicates that the condition is pending
-    case pending
-
     /// Indicates that the condition is satisfied
     case satisfied
 
@@ -50,6 +47,25 @@ internal extension ConditionProtocol {
 
 public extension ProcedureKitError {
 
+    public struct FailedConditions: Error {
+        public let errors: [Error]
+
+        internal init(errors: [Error]) {
+            self.errors = errors
+        }
+
+        internal func append(error: Error) -> FailedConditions {
+            var errors = self.errors
+            if let failedConditions = error as? FailedConditions {
+                errors.append(contentsOf: failedConditions.errors)
+            }
+            else {
+                errors.append(error)
+            }
+            return FailedConditions(errors: errors)
+        }
+    }
+
     public struct FalseCondition: Error {
         internal init() { }
     }
@@ -67,7 +83,9 @@ open class Condition: Procedure, ConditionProtocol {
         }
     }
 
-    public var result: ConditionResult = .pending
+    public typealias Result = ConditionResult
+
+    public var result: PendingValue<ConditionResult> = .pending
 
     open override func execute() {
         guard let procedure = procedure else {
@@ -83,7 +101,7 @@ open class Condition: Procedure, ConditionProtocol {
     }
 
     internal func finish(withConditionResult conditionResult: ConditionResult) {
-        result = conditionResult
+        result = .ready(conditionResult)
         finish(withError: conditionResult.error)
     }
 }
@@ -136,7 +154,7 @@ open class ComposedCondition<C: Condition>: Condition {
         return super.directDependencies.union(condition.directDependencies)
     }
 
-    public var requirement: ConditionResult = .pending
+    public var requirement: PendingValue<ConditionResult> = .pending
 
     override var procedure: Procedure? {
         didSet {
@@ -161,6 +179,10 @@ open class ComposedCondition<C: Condition>: Condition {
 
     /// Override of public function
     open override func evaluate(procedure: Procedure, completion: @escaping (ConditionResult) -> Void) {
+        guard let requirement = requirement.value else {
+            completion(.failed(ProcedureKitError.requirementNotSatisfied()))
+            return
+        }
         completion(requirement)
     }
 

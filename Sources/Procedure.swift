@@ -587,60 +587,73 @@ public extension Procedure {
 
 // MARK: Conditions
 
-extension Procedure {
+internal extension ConditionResult {
 
-    enum ConditionEvaluation {
-        case pending, satisfied, ignored
-        case failed([Error])
-
-        var errors: [Error] {
-            guard case let .failed(errors) = self else { return [] }
-            return errors
-        }
-
-        func evaluate(condition: Condition, withErrors errors: [Error]) -> ConditionEvaluation {
-            switch  (self, condition.result) {
-            case (_, .pending):
-                if errors.isEmpty { return self }
-                else { return .failed(errors) }
-            case let (_, .failed(conditionError)):
-                var errors = self.errors
-                errors.append(conditionError)
-                return .failed(errors)
-            case (.failed(_), _):
-                return self
-            case (_, .ignored):
-                return .ignored
-            case (.pending, .satisfied):
-                return .satisfied
-            default:
-                return self
-            }
+    func evaluate(result: PendingValue<ConditionResult>) -> ConditionResult {
+        switch (self, result) {
+        case (_, .void):
+            assertionFailure("A pending ConditionResult cannot be void.")
+            return .failed(ProcedureKitError.programmingError(reason: "A pending ConditionResult cannot be void."))
+        case (_, .pending):
+            // other condition has been cancelled so, it is effectively ignored.
+            return self
+        case let (_, .ready(result)):
+            return evaluate(result: result)
         }
     }
 
-    class EvaluateConditions: GroupProcedure {
-        var requirement: [Condition] = []
-        var result: ConditionEvaluation = .pending
+    func evaluate(result: ConditionResult) -> ConditionResult {
+        switch (self, result) {
+        case let (.failed(error), .failed(anotherError)):
+            if let error = error as? ProcedureKitError.FailedConditions {
+                return .failed(error.append(error: anotherError))
+            }
+            else if let anotherError = anotherError as? ProcedureKitError.FailedConditions {
+                return .failed(anotherError.append(error: error))
+            }
+            else {
+                return .failed(ProcedureKitError.FailedConditions(errors: [error, anotherError]))
+            }
+        case (_, .failed(_)):
+            return result
+        case (.ignored, _):
+            return result
+        default:
+            return self
+        }
+    }
+}
+
+extension Procedure {
+
+    class EvaluateConditions: GroupProcedure, ResultInjection {
+        var requirement: PendingValue<[Condition]> = .pending
+        var result: PendingValue<ConditionResult> = .pending
 
         init(conditions: Set<Condition>) {
             let ops = Array(conditions)
-            requirement = ops
+            requirement = .ready(ops)
             super.init(operations: ops)
         }
 
         override func procedureWillFinish(withErrors errors: [Error]) {
-            process(withErrors: errors)
+            result = .ready(process(withErrors: errors))
         }
 
         override func procedureWillCancel(withErrors errors: [Error]) {
-            process(withErrors: errors)
+            result = .ready(process(withErrors: errors))
         }
 
-        private func process(withErrors errors: [Error]) {
-            result = requirement.reduce(.pending) { evaluation, condition in
-                log.verbose(message: "evaluating \(evaluation) with \(condition.result)")
-                return evaluation.evaluate(condition: condition, withErrors: errors)
+        private func process(withErrors errors: [Error]) -> ConditionResult {
+            guard errors.isEmpty else {
+                return .failed(ProcedureKitError.FailedConditions(errors: errors))
+            }
+            guard let conditions = requirement.value else {
+                fatalError("Conditions must be set before the evaluation is performed.")
+            }
+            return conditions.reduce(.ignored) { result, condition in
+                log.verbose(message: "evaluating \(result) with \(condition.result)")
+                return result.evaluate(result: condition.result)
             }
         }
     }
@@ -669,13 +682,20 @@ extension Procedure {
 
         // Add an observer to the evaluator to see if any of the conditions failed.
         evaluator.addWillFinishBlockObserver { [weak self] evaluator, _ in
-            switch evaluator.result {
-            case .pending, .satisfied:
+            guard let result = evaluator.result.value else { return }
+
+            switch result {
+            case .satisfied:
                 break
             case .ignored:
                 self?.cancel()
-            case let .failed(errors):
-                self?.cancel(withErrors: errors)
+            case let .failed(error):
+                if let failedConditions = error as? ProcedureKitError.FailedConditions {
+                    self?.cancel(withErrors: failedConditions.errors)
+                }
+                else {
+                    self?.cancel(withError: error)
+                }
             }
         }
 
