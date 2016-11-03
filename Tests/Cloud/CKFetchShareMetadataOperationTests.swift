@@ -5,6 +5,7 @@
 //
 
 import XCTest
+import CloudKit
 import ProcedureKit
 import TestingProcedureKit
 @testable import ProcedureKitCloud
@@ -106,3 +107,101 @@ class CKFetchShareMetadataOperationTests: CKProcedureTestCase {
         XCTAssertFalse(didExecuteBlock)
     }
 }
+
+class CloudKitProcedureFetchShareMetadataOperationTests: CKProcedureTestCase {
+    typealias T = TestCKFetchShareMetadataOperation
+    var cloudkit: CloudKitProcedure<T>!
+
+    var setByPerShareMetadataBlock: (URL, T.ShareMetadata?, Error?)!
+
+    override func setUp() {
+        super.setUp()
+        cloudkit = CloudKitProcedure(strategy: .immediate) { TestCKFetchShareMetadataOperation() }
+        cloudkit.container = container
+        cloudkit.shareURLs = [ URL(string: "http://url.com")! ]
+        cloudkit.shouldFetchRootRecord = true
+        cloudkit.rootRecordDesiredKeys = [ "key 1" ]
+        cloudkit.perShareMetadataBlock = { [unowned self] url, metadata, error in
+            self.setByPerShareMetadataBlock = (url, metadata, error)
+        }
+    }
+
+    func test_set_get_container() {
+        cloudkit.container = "I'm a different container!"
+        XCTAssertEqual(cloudkit.container, "I'm a different container!")
+    }
+
+    func test_set_get_shareURLs() {
+        cloudkit.shareURLs = [ URL(string: "http://different-url.com")! ]
+        XCTAssertEqual(cloudkit.shareURLs, [ URL(string: "http://different-url.com")! ])
+    }
+
+    func test_set_get_shouldFetchRootRecord() {
+        cloudkit.shouldFetchRootRecord = false
+        XCTAssertEqual(cloudkit.shouldFetchRootRecord, false)
+    }
+
+    func test_set_get_rootRecordDesiredKeys() {
+        cloudkit.rootRecordDesiredKeys = [ "key 1", "key 2" ]
+        XCTAssertEqual(cloudkit.rootRecordDesiredKeys ?? [], [ "key 1", "key 2" ])
+    }
+
+    func test_set_get_perShareMetadataBlock() {
+        XCTAssertNotNil(cloudkit.perShareMetadataBlock)
+        let url = URL(string: "http://different-url.com")!
+        let error = TestError()
+        cloudkit.perShareMetadataBlock?(url, "metadata", error)
+        XCTAssertEqual(setByPerShareMetadataBlock?.0, url)
+        XCTAssertEqual(setByPerShareMetadataBlock?.1, "metadata")
+        XCTAssertEqual(setByPerShareMetadataBlock?.2 as? TestError ?? TestError(), error)
+    }
+
+    func test__cancellation() {
+        cloudkit.cancel()
+        wait(for: cloudkit)
+        XCTAssertProcedureCancelledWithoutErrors(cloudkit)
+    }
+
+    func test__success_without_completion_block_set() {
+        wait(for: cloudkit)
+        XCTAssertProcedureFinishedWithoutErrors(cloudkit)
+    }
+
+    func test__success_with_completion_block_set() {
+        var didExecuteBlock = false
+        cloudkit.setFetchShareMetadataCompletionBlock { _ in
+            didExecuteBlock = true
+        }
+        wait(for: cloudkit)
+        XCTAssertProcedureFinishedWithoutErrors(cloudkit)
+        XCTAssertTrue(didExecuteBlock)
+    }
+
+    func test__error_without_completion_block_set() {
+        cloudkit = CloudKitProcedure(strategy: .immediate) {
+            let operation = TestCKFetchShareMetadataOperation()
+            operation.error = NSError(domain: CKErrorDomain, code: CKError.internalError.rawValue, userInfo: nil)
+            return operation
+        }
+        wait(for: cloudkit)
+        XCTAssertProcedureFinishedWithoutErrors(cloudkit)
+    }
+
+    func test__error_with_completion_block_set() {
+        cloudkit = CloudKitProcedure(strategy: .immediate) {
+            let operation = TestCKFetchShareMetadataOperation()
+            operation.error = NSError(domain: CKErrorDomain, code: CKError.internalError.rawValue, userInfo: nil)
+            return operation
+        }
+
+        var didExecuteBlock = false
+        cloudkit.setFetchShareMetadataCompletionBlock { _ in
+            didExecuteBlock = true
+        }
+
+        wait(for: cloudkit)
+        XCTAssertProcedureFinishedWithErrors(cloudkit, count: 1)
+        XCTAssertFalse(didExecuteBlock)
+    }
+}
+

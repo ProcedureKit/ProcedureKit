@@ -144,7 +144,7 @@ class CKFetchRecordZoneChangesOperationTests: CKProcedureTestCase {
 
 class CloudKitProcedureFetchRecordZoneChangesOperationTests: CKProcedureTestCase {
     typealias T = TestCKFetchRecordZoneChangesOperation
-    var cloudkit: CloudKitProcedure<TestCKFetchRecordZoneChangesOperation>!
+    var cloudkit: CloudKitProcedure<T>!
 
     var setByRecordChangedBlock: T.Record!
     var setByRecordWithIDWasDeletedBlock: (T.RecordID, String)!
