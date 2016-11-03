@@ -79,6 +79,7 @@ public class DelayProcedure: Procedure {
         name = "Delay \(delay)"
         addDidCancelBlockObserver { procedure, _ in
             procedure.timer?.cancel()
+            procedure.finish()
         }
     }
 
