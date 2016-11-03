@@ -60,5 +60,21 @@ class DelayProcedureTests: ProcedureKitTestCase {
         wait(for: delay)
         XCTAssertTrue(delay.isCancelled)
     }
+
+    func test__timer_cancelled_after_execute_finishes_immediately() {
+        let interval: TimeInterval = 10
+        let delay = DelayProcedure(by: interval)
+        let started = Date()
+        delay.addDidExecuteBlockObserver { delay in
+            delay.cancel()
+        }
+        delay.addDidFinishBlockObserver { _, _ in
+            let ended = Date()
+            let timeTaken = ended.timeIntervalSince(started)
+            XCTAssertLessThanOrEqual(timeTaken, interval)
+        }
+        wait(for: delay)
+        XCTAssertTrue(delay.isCancelled)
+    }
 }
 
