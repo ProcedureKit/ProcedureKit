@@ -5,6 +5,7 @@
 //
 
 import XCTest
+import CloudKit
 import ProcedureKit
 import TestingProcedureKit
 @testable import ProcedureKitCloud
@@ -140,3 +141,147 @@ class CKFetchRecordZoneChangesOperationTests: CKProcedureTestCase {
         XCTAssertFalse(didExecuteBlock)
     }
 }
+
+class CloudKitProcedureFetchRecordZoneChangesOperationTests: CKProcedureTestCase {
+    typealias T = TestCKFetchRecordZoneChangesOperation
+    var cloudkit: CloudKitProcedure<TestCKFetchRecordZoneChangesOperation>!
+
+    var setByRecordChangedBlock: T.Record!
+    var setByRecordWithIDWasDeletedBlock: (T.RecordID, String)!
+    var setByRecordZoneChangeTokensUpdatedBlock: (T.RecordZoneID, T.ServerChangeToken?, Data?)!
+    var setByRecordZoneFetchCompletionBlock: (T.RecordZoneID, T.ServerChangeToken?, Data?, Bool, Error?)!
+
+    override func setUp() {
+        super.setUp()
+        cloudkit = CloudKitProcedure(strategy: .immediate) { TestCKFetchRecordZoneChangesOperation() }
+        cloudkit.container = container
+        cloudkit.previousServerChangeToken = token
+        cloudkit.resultsLimit = 10
+        cloudkit.recordZoneIDs = [ "record zone 1 id", "record zone 2 id" ]
+        cloudkit.optionsByRecordZoneID = [ "record zone 1 id": "option 1", "record zone 2 id": "option 2" ]
+        cloudkit.fetchAllChanges = false
+        cloudkit.recordChangedBlock = { [unowned self] record in
+            self.setByRecordChangedBlock = record
+        }
+        cloudkit.recordWithIDWasDeletedBlock = { [unowned self] recordId, type in
+            self.setByRecordWithIDWasDeletedBlock = (recordId, type)
+        }
+        cloudkit.recordZoneChangeTokensUpdatedBlock = { [unowned self] zoneId, token, data in
+            self.setByRecordZoneChangeTokensUpdatedBlock = (zoneId, token, data)
+        }
+        cloudkit.recordZoneFetchCompletionBlock = { [unowned self] zoneId, token, data, isComplete, error in
+            self.setByRecordZoneFetchCompletionBlock = (zoneId, token, data, isComplete, error)
+        }
+    }
+
+    func test_set_get_container() {
+        cloudkit.container = "I'm a different container!"
+        XCTAssertEqual(cloudkit.container, "I'm a different container!")
+    }
+
+    func test_set_get_previousServerChangeToken() {
+        cloudkit.previousServerChangeToken = "I'm a different token!"
+        XCTAssertEqual(cloudkit.previousServerChangeToken, "I'm a different token!")
+    }
+
+    func test_set_get_resultsLimit() {
+        cloudkit.resultsLimit = 20
+        XCTAssertEqual(cloudkit.resultsLimit, 20)
+    }
+
+    func test_set_get_fetchAllChanges() {
+        cloudkit.fetchAllChanges = true
+        XCTAssertEqual(cloudkit.fetchAllChanges, true)
+    }
+
+    func test_set_get_recordZoneIDs() {
+        cloudkit.recordZoneIDs = [ "record zone 1 id", "record zone 2 id" ]
+        XCTAssertEqual(cloudkit.recordZoneIDs, [ "record zone 1 id", "record zone 2 id" ])
+    }
+
+    func test_set_get_optionsByRecordZoneID() {
+        cloudkit.optionsByRecordZoneID = [ "record zone 1 id": "option 1", "record zone 2 id": "option 2" ]
+        XCTAssertEqual(cloudkit.optionsByRecordZoneID ?? [:], [ "record zone 1 id": "option 1", "record zone 2 id": "option 2" ])
+    }
+
+    func test_set_get_recordChangedBlock() {
+        XCTAssertNotNil(cloudkit.recordChangedBlock)
+        cloudkit.recordChangedBlock?("a record")
+        XCTAssertEqual(setByRecordChangedBlock, "a record")
+    }
+
+    func test_set_get_recordWithIDWasDeletedBlock() {
+        XCTAssertNotNil(cloudkit.recordWithIDWasDeletedBlock)
+        cloudkit.recordWithIDWasDeletedBlock?("a record id", "record type")
+        XCTAssertEqual(setByRecordWithIDWasDeletedBlock?.0, "a record id")
+        XCTAssertEqual(setByRecordWithIDWasDeletedBlock?.1, "record type")
+    }
+
+    func test_set_get_recordZoneChangeTokensUpdatedBlock() {
+        XCTAssertNotNil(cloudkit.recordZoneChangeTokensUpdatedBlock)
+        cloudkit.recordZoneChangeTokensUpdatedBlock?("zone id", "token", nil)
+        XCTAssertEqual(setByRecordZoneChangeTokensUpdatedBlock?.0, "zone id")
+        XCTAssertEqual(setByRecordZoneChangeTokensUpdatedBlock?.1, "token")
+        XCTAssertNil(setByRecordZoneChangeTokensUpdatedBlock?.2)
+    }
+
+    func test_set_get_recordZoneFetchCompletionBlock() {
+        XCTAssertNotNil(cloudkit.recordZoneFetchCompletionBlock)
+        let error = TestError()
+        cloudkit.recordZoneFetchCompletionBlock?("zone id", "token", nil, false, error)
+        XCTAssertEqual(setByRecordZoneFetchCompletionBlock?.0, "zone id")
+        XCTAssertEqual(setByRecordZoneFetchCompletionBlock?.1, "token")
+        XCTAssertNil(setByRecordZoneFetchCompletionBlock?.2)
+        XCTAssertFalse(setByRecordZoneFetchCompletionBlock?.3 ?? true)
+        XCTAssertEqual(setByRecordZoneFetchCompletionBlock?.4 as? TestError ?? TestError(), error)
+    }
+
+    func test__cancellation() {
+        cloudkit.cancel()
+        wait(for: cloudkit)
+        XCTAssertProcedureCancelledWithoutErrors(cloudkit)
+    }
+
+    func test__success_without_completion_block_set() {
+        wait(for: cloudkit)
+        XCTAssertProcedureFinishedWithoutErrors(cloudkit)
+    }
+
+    func test__success_with_completion_block_set() {
+        var didExecuteBlock = false
+        cloudkit.setFetchRecordZoneChangesCompletionBlock { _ in
+            didExecuteBlock = true
+        }
+        wait(for: cloudkit)
+        XCTAssertProcedureFinishedWithoutErrors(cloudkit)
+        XCTAssertTrue(didExecuteBlock)
+    }
+
+    func test__error_without_completion_block_set() {
+        cloudkit = CloudKitProcedure(strategy: .immediate) {
+            return TestCKFetchRecordZoneChangesOperation { _ in
+                NSError(domain: CKErrorDomain, code: CKError.internalError.rawValue, userInfo: nil)
+            }
+        }
+        wait(for: cloudkit)
+        XCTAssertProcedureFinishedWithoutErrors(cloudkit)
+    }
+
+    func test__error_with_completion_block_set() {
+        cloudkit = CloudKitProcedure(strategy: .immediate) {
+            return TestCKFetchRecordZoneChangesOperation { _ in
+                NSError(domain: CKErrorDomain, code: CKError.internalError.rawValue, userInfo: nil)
+            }
+        }
+
+        var didExecuteBlock = false
+        cloudkit.setFetchRecordZoneChangesCompletionBlock { _ in
+            didExecuteBlock = true
+        }
+
+        wait(for: cloudkit)
+        XCTAssertProcedureFinishedWithErrors(cloudkit, count: 1)
+        XCTAssertFalse(didExecuteBlock)
+    }
+}
+
