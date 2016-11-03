@@ -11,8 +11,19 @@ open class ProcessProcedure: Procedure {
 
     /// Error type for ProcessProcedure
     public enum Error: Swift.Error, Equatable {
-        case LaunchPathNotSet
-        case TerminationReason(Process.TerminationReason)
+        case launchPathNotSet
+        case terminationReason(Process.TerminationReason)
+
+        public static func == (lhs: ProcessProcedure.Error, rhs: ProcessProcedure.Error) -> Bool {
+            switch (lhs, rhs) {
+            case (.launchPathNotSet, .launchPathNotSet):
+                return true
+            case let (.terminationReason(lhsReason), .terminationReason(rhsReason)):
+                return lhsReason == rhsReason
+            default:
+                return false
+            }
+        }
     }
 
     /// Closure type for testing if the task did exit cleanly
@@ -42,41 +53,32 @@ open class ProcessProcedure: Procedure {
         self.processDidExitCleanly = processDidExitCleanly
         super.init()
 
-        addWillCancelBlockObserver { [unowned self] procedure, errors in
-            guard procedure == self && procedure.process.isRunning else { return }
+        addWillCancelBlockObserver { procedure, errors in
+            guard procedure.process.isRunning else { return }
             procedure.process.terminate()
         }
     }
 
     open override func execute() {
         guard let _ = process.launchPath else {
-            finish(withError: Error.LaunchPathNotSet)
+            finish(withError: Error.launchPathNotSet)
             return
         }
 
         let previousTerminationHandler = process.terminationHandler
 
-        process.terminationHandler = { [unowned self] task in
-            previousTerminationHandler?(self.process)
-            if self.processDidExitCleanly(Int(self.process.terminationStatus)) {
-                self.finish()
+        process.terminationHandler = { [weak self] task in
+            guard let strongSelf = self else { return }
+
+            previousTerminationHandler?(strongSelf.process)
+            if strongSelf.processDidExitCleanly(Int(strongSelf.process.terminationStatus)) {
+                strongSelf.finish()
             }
             else {
-                self.finish(withError: Error.TerminationReason(self.process.terminationReason))
+                strongSelf.finish(withError: Error.terminationReason(strongSelf.process.terminationReason))
             }
         }
 
         process.launch()
-    }
-}
-
-public func == (lhs: ProcessProcedure.Error, rhs: ProcessProcedure.Error) -> Bool {
-    switch (lhs, rhs) {
-    case (.LaunchPathNotSet, .LaunchPathNotSet):
-        return true
-    case let (.TerminationReason(lhsReason), .TerminationReason(rhsReason)):
-        return lhsReason == rhsReason
-    default:
-        return false
     }
 }
