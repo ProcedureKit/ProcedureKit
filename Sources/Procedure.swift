@@ -192,10 +192,10 @@ open class Procedure: Operation, ProcedureProtocol {
 
     // MARK: Observers
 
-    fileprivate var _observers = Protector([AnyObserver<Procedure>]())
+    fileprivate var procedureObservers = Protector([AnyObserver<Procedure>]())
 
     var observers: [AnyObserver<Procedure>] {
-        get { return _observers.read { $0 } }
+        get { return procedureObservers.read { $0 } }
     }
 
 
@@ -561,7 +561,7 @@ public extension Procedure {
      */
     func add<Observer: ProcedureObserver>(observer: Observer) where Observer.Procedure == Procedure {
 
-        _observers.append(AnyObserver(base: observer))
+        procedureObservers.append(AnyObserver(base: observer))
 
         observer.didAttach(to: self)
     }
