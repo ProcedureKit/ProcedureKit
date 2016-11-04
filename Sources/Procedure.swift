@@ -192,15 +192,10 @@ open class Procedure: Operation, ProcedureProtocol {
 
     // MARK: Observers
 
-    private var _observers = Protector([AnyObserver<Procedure>]())
+    fileprivate var _observers = Protector([AnyObserver<Procedure>]())
 
-    fileprivate(set) var observers: [AnyObserver<Procedure>] {
+    var observers: [AnyObserver<Procedure>] {
         get { return _observers.read { $0 } }
-        set {
-            _observers.write { (ward: inout [AnyObserver<Procedure>]) in
-                ward = newValue
-            }
-        }
     }
 
 
@@ -566,7 +561,7 @@ public extension Procedure {
      */
     func add<Observer: ProcedureObserver>(observer: Observer) where Observer.Procedure == Procedure {
 
-        observers.append(AnyObserver(base: observer))
+        _observers.append(AnyObserver(base: observer))
 
         observer.didAttach(to: self)
     }
