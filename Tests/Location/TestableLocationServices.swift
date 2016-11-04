@@ -119,7 +119,13 @@ class TestableReverseGeocoder: TestableGeocoder, ReverseGeocodeProtocol {
 
     func pk_reverseGeocodeLocation(location: CLLocation, completionHandler completion: @escaping CLGeocodeCompletionHandler) {
         didReverseGeocodeLocation = location
-        completion(placemarks, error)
+        // To replicate CLGeocoder, the completion block must be called on the main thread
+        DispatchQueue.main.async { [weak self] in
+            guard let strongSelf = self else {
+                fatalError("TestableReverseGeocoder disappeared before completion was called")
+            }
+            completion(strongSelf.placemarks, strongSelf.error)
+        }
     }
 }
 
