@@ -22,9 +22,10 @@ extension ProcedureEvent: CustomStringConvertible {
         }
     }
 }
+
 // MARK: - ProcedureProfilerReporter
 public protocol ProcedureProfilerReporter {
-    func finishedProfilingWithResult(result: ProfileResult)
+    func finishedProfiling(withResult result: ProfileResult)
 }
 
 // MARK: - ProfileResult
@@ -38,30 +39,7 @@ public struct ProfileResult {
     public let children: [ProfileResult]
 }
 
-extension PendingValue where T: Equatable {
-    var pending: Bool {
-        if case .pending = self {
-            return true
-        }
-        return false
-    }
-
-    static func==(lhs: PendingValue<T>, rhs: PendingValue<T>) -> Bool {
-        switch (lhs, rhs) {
-        case (.pending, .pending):
-            return true
-        case (.void, .void):
-            return true
-        case let (.ready(lhsValue), .ready(rhsValue)):
-            return lhsValue == rhsValue
-        default:
-            return false
-        }
-    }
-}
-
 // MARK: - PendingResult
-
 struct PendingResult {
 
     let created: TimeInterval
@@ -72,12 +50,12 @@ struct PendingResult {
     let finished: PendingValue<TimeInterval>
     let children: [ProfileResult]
 
-    var pending: Bool {
-        return identity.pending || attached.pending || started.pending || (cancelled.pending && finished.pending)
+    var isPending: Bool {
+        return identity.isPending || attached.isPending || started.isPending || (cancelled.isPending && finished.isPending)
     }
 
     func createResult() -> ProfileResult? {
-        guard !pending,
+        guard !isPending,
             let
             identity = identity.value,
             let attached = attached.value,
@@ -87,32 +65,32 @@ struct PendingResult {
         return ProfileResult(identity: identity, created: created, attached: attached, started: started, cancelled: cancelled.value, finished: finished.value, children: children)
     }
 
-    func setIdentity(newIdentity: Procedure.Identity) -> PendingResult {
-        guard identity.pending else { return self }
+    func set(identity newIdentity: Procedure.Identity) -> PendingResult {
+        guard identity.isPending else { return self }
         return PendingResult(created: created, identity: .ready(newIdentity), attached: attached, started: started, cancelled: cancelled, finished: finished, children: children)
     }
 
     func attach(now: TimeInterval = CFAbsoluteTimeGetCurrent() as TimeInterval) -> PendingResult {
-        guard attached.pending else { return self }
+        guard attached.isPending else { return self }
         return PendingResult(created: created, identity: identity, attached: .ready(now - created), started: started, cancelled: cancelled, finished: finished, children: children)
     }
 
     func start(now: TimeInterval = CFAbsoluteTimeGetCurrent() as TimeInterval) -> PendingResult {
-        guard started.pending else { return self }
+        guard started.isPending else { return self }
         return PendingResult(created: created, identity: identity, attached: attached, started: .ready(now - created), cancelled: cancelled, finished: finished, children: children)
     }
 
     func cancel(now: TimeInterval = CFAbsoluteTimeGetCurrent() as TimeInterval) -> PendingResult {
-        guard cancelled.pending else { return self }
+        guard cancelled.isPending else { return self }
         return PendingResult(created: created, identity: identity, attached: attached, started: started, cancelled: .ready(now - created), finished: finished, children: children)
     }
 
     func finish(now: TimeInterval = CFAbsoluteTimeGetCurrent() as TimeInterval) -> PendingResult {
-        guard finished.pending else { return self }
+        guard finished.isPending else { return self }
         return PendingResult(created: created, identity: identity, attached: attached, started: started, cancelled: cancelled, finished: .ready(now - created), children: children)
     }
 
-    func addChild(child: ProfileResult) -> PendingResult {
+    func add(child: ProfileResult) -> PendingResult {
         var newChildren = children
         newChildren.append(child)
         return PendingResult(created: created, identity: identity, attached: attached, started: started, cancelled: cancelled, finished: finished, children: newChildren)
@@ -125,12 +103,12 @@ public final class ProcedureProfiler: Identifiable, Equatable {
     public let identifier = UUID()
 
     enum Reporter {
-        case Parent(ProcedureProfiler)
-        case Reporters([ProcedureProfilerReporter])
+        case parent(ProcedureProfiler)
+        case reporters([ProcedureProfilerReporter])
     }
 
 
-    let queue = DispatchQueue(label: "me.danthorpe.ProcedureKit.Profiler")
+    let queue = DispatchQueue(label: "run.kit.ProcedureKit.Profiler")
     let reporter: Reporter
 
     var result = PendingResult(created: CFAbsoluteTimeGetCurrent() as TimeInterval, identity: .pending, attached: .pending, started: .pending, cancelled: .pending, finished: .pending, children: [])
@@ -138,15 +116,15 @@ public final class ProcedureProfiler: Identifiable, Equatable {
     var finishedOrCancelled = false
 
     var pending: Bool {
-        return result.pending || (children.count > 0)
+        return result.isPending || (children.count > 0)
     }
 
     public convenience init(reporters: [ProcedureProfilerReporter]) {
-        self.init(reporter: .Reporters(reporters))
+        self.init(reporter: .reporters(reporters))
     }
 
     convenience init(parent: ProcedureProfiler) {
-        self.init(reporter: .Parent(parent))
+        self.init(reporter: .parent(parent))
     }
 
     init(reporter: Reporter) {
@@ -154,20 +132,20 @@ public final class ProcedureProfiler: Identifiable, Equatable {
     }
 
     func addMetricNow(now: TimeInterval = CFAbsoluteTimeGetCurrent() as TimeInterval, forEvent event: ProcedureEvent) {
-        queue.sync { [unowned self] in
+        queue.sync {
             switch event {
-            case .attached:
-                self.result = self.result.attach(now: now)
-            case .started:
-                self.result = self.result.start(now: now)
-            case .cancelled:
-                self.result = self.result.cancel(now: now)
-                self.finishedOrCancelled = true
-            case .finished:
-                self.result = self.result.finish(now: now)
-                self.finishedOrCancelled = true
-            default:
-                break
+                case .attached:
+                    self.result = self.result.attach(now: now)
+                case .started:
+                    self.result = self.result.start(now: now)
+                case .cancelled:
+                    self.result = self.result.cancel(now: now)
+                    self.finishedOrCancelled = true
+                case .finished:
+                    self.result = self.result.finish(now: now)
+                    self.finishedOrCancelled = true
+                default:
+                    break
             }
         }
         finish()
@@ -185,28 +163,28 @@ public final class ProcedureProfiler: Identifiable, Equatable {
 
     func finish() {
         guard finishedOrCancelled && !pending, let result = result.createResult() else { return }
-        reporter.finishedProfilingWithResult(result: result)
+        reporter.finishedProfiling(withResult: result)
     }
 }
 
 extension ProcedureProfiler.Reporter: ProcedureProfilerReporter {
 
-    func finishedProfilingWithResult(result: ProfileResult) {
+    func finishedProfiling(withResult result: ProfileResult) {
         switch self {
-        case .Parent(let parent):
-            parent.finishedProfilingWithResult(result: result)
-        case .Reporters(let reporters):
-            reporters.forEach { $0.finishedProfilingWithResult(result: result)  }
+        case .parent(let parent):
+            parent.finishedProfiling(withResult: result)
+        case .reporters(let reporters):
+            reporters.forEach { $0.finishedProfiling(withResult: result)  }
         }
     }
 }
 
 extension ProcedureProfiler: ProcedureProfilerReporter {
 
-    public func finishedProfilingWithResult(result: ProfileResult) {
+    public func finishedProfiling(withResult result: ProfileResult) {
         queue.sync { [unowned self] in
             if let index = self.children.index(of: result.identity) {
-                self.result = self.result.addChild(child: result)
+                self.result = self.result.add(child: result)
                 self.children.remove(at: index)
             }
         }
@@ -218,7 +196,7 @@ extension ProcedureProfiler: ProcedureObserver {
 
     public func didAttach(to procedure: Procedure) {
         queue.sync { [unowned self] in
-            self.result = self.result.setIdentity(newIdentity: procedure.identity)
+            self.result = self.result.set(identity: procedure.identity)
         }
         addMetricNow(forEvent: .attached)
     }
@@ -310,7 +288,7 @@ public class _ProcedureProfileLogger<Manager: LogManagerProtocol>: ProcedureProf
         self.logger = _Logger<Manager>(severity: severity, enabled: enabled, logger: logger)
     }
 
-    public func finishedProfilingWithResult(result: ProfileResult) {
+    public func finishedProfiling(withResult result: ProfileResult) {
         self.logger.operationName = result.identity.description
         self.logger.info(message: "finished profiling with results:\n\(PrintableProfileResult(result: result))")
     }

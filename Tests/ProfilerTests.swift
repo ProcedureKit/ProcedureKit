@@ -12,7 +12,7 @@ import TestingProcedureKit
 class TestableProfileReporter: ProcedureProfilerReporter {
     var didProfileResult: ProfileResult? = .none
 
-    func finishedProfilingWithResult(result: ProfileResult) {
+    func finishedProfiling(withResult result: ProfileResult) {
         didProfileResult = result
     }
 }
