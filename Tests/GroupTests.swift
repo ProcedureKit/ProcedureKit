@@ -187,6 +187,35 @@ class GroupTests: GroupTestCase {
         XCTAssertTrue(didFinishBlockObserverWasCalled)
     }
 
+    // MARK: - ProcedureQueue Delegate Tests
+
+    func test__group_ignores_delegate_calls_from_other_queues() {
+        // The base GroupProcedure ProcedureQueue delegate implementation should ignore
+        // other queues' delegate callbacks, or various bad things may happen, including:
+        //  - Observers may be improperly notified
+        //  - The Group may wait to finish on non-child operations
+
+        group = TestGroupProcedure(operations: [])
+        let otherQueue = ProcedureQueue()
+        otherQueue.delegate = group
+
+        var observerCalledFromGroupDelegate = false
+        group.addWillAddChildBlockObserver { (group, child) in
+            observerCalledFromGroupDelegate = true
+        }
+        group.addDidAddChildBlockObserver { (group, child) in
+            observerCalledFromGroupDelegate = true
+        }
+
+        // Adding a TestProcedure to the otherQueue should not result in the Group's
+        // Will/DidAddChild observers being called, nor should the Group wait
+        // on the other queue's TestProcedure to finish.
+        otherQueue.add(operation: TestProcedure())
+        wait(for: group)
+        XCTAssertTrue(group.isFinished)
+        XCTAssertFalse(observerCalledFromGroupDelegate)
+    }
+
     // MARK: - Condition Tests
 }
 
