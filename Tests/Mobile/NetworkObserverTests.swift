@@ -78,9 +78,9 @@ class NetworkObserverTests: ProcedureKitTestCase {
     }
 
     func test__network_indicator_only_changes_once_when_multiple_procedures_start() {
-        let procedure1 = TestProcedure(delay: 1.0)
+        let procedure1 = TestProcedure(delay: 0.1)
         procedure1.add(observer: NetworkObserver(controller: controller))
-        let procedure2 = TestProcedure(delay: 1.0)
+        let procedure2 = TestProcedure(delay: 0.1)
         procedure2.add(observer: NetworkObserver(controller: controller))
 
         wait(for: procedure1, procedure2, withTimeout: max(procedure1.delay, procedure2.delay) + controller.interval + 1.0) { _ in
