@@ -193,6 +193,7 @@ class GroupTests: GroupTestCase {
         // The base GroupProcedure ProcedureQueue delegate implementation should ignore
         // other queues' delegate callbacks, or various bad things may happen, including:
         //  - Observers may be improperly notified
+        //  - The Group may wait to finish on non-child operations
 
         group = TestGroupProcedure(operations: [])
         let otherQueue = ProcedureQueue()
