@@ -132,7 +132,7 @@ open class ProcedureQueue: OperationQueue {
      - parameter op: an `Operation` instance.
      */
     // swiftlint:disable function_body_length
-    public func add(operation: Operation) {
+    open func add(operation: Operation) {
 
         defer {
             super.addOperation(operation)
