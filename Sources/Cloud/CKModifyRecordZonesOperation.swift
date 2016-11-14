@@ -58,6 +58,8 @@ extension CKProcedure where T: CKModifyRecordZonesOperationProtocol, T: Associat
 
 extension CloudKitProcedure where T: CKModifyRecordZonesOperationProtocol, T: AssociatedErrorProtocol, T.AssociatedError: CloudKitError {
 
+    internal typealias ModifyRecordZonesCompletion = ([T.RecordZone]?, [T.RecordZoneID]?)
+
     /// A typealias for the block types used by CloudKitOperation<CKModifyRecordZonesOperation>
     public typealias ModifyRecordZonesCompletionBlock = ([T.RecordZone]?, [T.RecordZoneID]?) -> Void
 
