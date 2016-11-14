@@ -183,5 +183,23 @@ class CloudKitProcedureModifySubscriptionsOperationTests: CKProcedureTestCase {
         XCTAssertProcedureFinishedWithErrors(cloudkit, count: 1)
         XCTAssertFalse(didExecuteBlock)
     }
+
+    func test__error_which_retries_using_retry_after_key() {
+        var shouldError = true
+        cloudkit = CloudKitProcedure(strategy: .immediate) {
+            let op = TestCKModifySubscriptionsOperation()
+            if shouldError {
+                let userInfo = [CKErrorRetryAfterKey: NSNumber(value: 0.001)]
+                op.error = NSError(domain: CKErrorDomain, code: CKError.Code.serviceUnavailable.rawValue, userInfo: userInfo)
+                shouldError = false
+            }
+            return op
+        }
+        var didExecuteBlock = false
+        cloudkit.setModifySubscriptionsCompletionBlock { _, _ in didExecuteBlock = true }
+        wait(for: cloudkit)
+        XCTAssertProcedureFinishedWithoutErrors(cloudkit)
+        XCTAssertTrue(didExecuteBlock)
+    }
 }
 

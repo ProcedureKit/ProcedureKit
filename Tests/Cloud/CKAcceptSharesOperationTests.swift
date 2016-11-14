@@ -13,7 +13,7 @@ import TestingProcedureKit
 @testable import ProcedureKitCloud
 
 class TestCKAcceptSharesOperation: TestCKOperation, CKAcceptSharesOperationProtocol, AssociatedErrorProtocol {
-    typealias AssociatedError = DiscoverAllContactsError<DiscoveredUserInfo>
+    typealias AssociatedError = PKCKError
 
     var error: Error? = nil
     var shareMetadatas: [ShareMetadata] = []
@@ -169,6 +169,24 @@ class CloudKitProcedureAcceptSharesOperationTests: CKProcedureTestCase {
         wait(for: cloudkit)
         XCTAssertProcedureFinishedWithErrors(cloudkit, count: 1)
         XCTAssertFalse(didExecuteBlock)
+    }
+
+    func test__error_which_retries_using_retry_after_key() {
+        var shouldError = true
+        cloudkit = CloudKitProcedure(strategy: .immediate) {
+            let op = TestCKAcceptSharesOperation()
+            if shouldError {
+                let userInfo = [CKErrorRetryAfterKey: NSNumber(value: 0.001)]
+                op.error = NSError(domain: CKErrorDomain, code: CKError.Code.serviceUnavailable.rawValue, userInfo: userInfo)
+                shouldError = false
+            }
+            return op
+        }
+        var didExecuteBlock = false
+        cloudkit.setAcceptSharesCompletionBlock { didExecuteBlock = true }
+        wait(for: cloudkit)
+        XCTAssertProcedureFinishedWithoutErrors(cloudkit)
+        XCTAssertTrue(didExecuteBlock)
     }
 }
 
