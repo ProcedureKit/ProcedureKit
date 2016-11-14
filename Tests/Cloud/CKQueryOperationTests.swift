@@ -5,6 +5,7 @@
 //
 
 import XCTest
+import CloudKit
 import ProcedureKit
 import TestingProcedureKit
 @testable import ProcedureKitCloud
@@ -107,6 +108,102 @@ class CKQueryOperationTests: CKProcedureTestCase {
         target.error = TestError()
         wait(for: operation)
         XCTAssertProcedureFinishedWithErrors(operation, count: 1)
+        XCTAssertFalse(didExecuteBlock)
+    }
+}
+
+class CloudKitProcedureQueryOperationTests: CKProcedureTestCase {
+    typealias T = TestCKQueryOperation
+    var cloudkit: CloudKitProcedure<T>!
+
+    var setByQueryRecordFetchedBlock: T.Record!
+
+    override func setUp() {
+        super.setUp()
+        cloudkit = CloudKitProcedure(strategy: .immediate) { TestCKQueryOperation() }
+        cloudkit.container = container
+        cloudkit.query = "a query"
+        cloudkit.cursor = "a cursor"
+        cloudkit.zoneID = "a zone 1 ID"
+        cloudkit.recordFetchedBlock = { self.setByQueryRecordFetchedBlock = $0 }
+    }
+
+    func test__set_get_container() {
+        cloudkit.container = "I'm a different container!"
+        XCTAssertEqual(cloudkit.container, "I'm a different container!")
+    }
+
+    func test__set_get_database() {
+        cloudkit.database = "I'm a different database!"
+        XCTAssertEqual(cloudkit.database, "I'm a different database!")
+    }
+
+    func test__set_get_query() {
+        cloudkit.query = "a query"
+        XCTAssertEqual(cloudkit.query, "a query")
+    }
+
+    func test__set_get_cursor() {
+        cloudkit.cursor = "a cursor"
+        XCTAssertEqual(cloudkit.cursor, "a cursor")
+    }
+
+    func test__set_get_zoneID() {
+        cloudkit.zoneID = "a zone 2 ID"
+        XCTAssertEqual(cloudkit.zoneID, "a zone 2 ID")
+    }
+
+    func test__set_get_queryRecordFetchedBlock() {
+        XCTAssertNotNil(cloudkit.recordFetchedBlock)
+        cloudkit.recordFetchedBlock?("a record")
+        XCTAssertEqual(setByQueryRecordFetchedBlock ?? "incorrect", "a record")
+    }
+
+    func test__cancellation() {
+        cloudkit.cancel()
+        wait(for: cloudkit)
+        XCTAssertProcedureCancelledWithoutErrors(cloudkit)
+    }
+
+    func test__success_without_completion_block_set() {
+        wait(for: cloudkit)
+        XCTAssertProcedureFinishedWithoutErrors(cloudkit)
+    }
+
+    func test__success_with_completion_block_set() {
+        var didExecuteBlock = false
+        cloudkit.setQueryCompletionBlock { _ in
+            didExecuteBlock = true
+        }
+        wait(for: cloudkit)
+        XCTAssertProcedureFinishedWithoutErrors(cloudkit)
+        XCTAssertTrue(didExecuteBlock)
+    }
+
+    func test__error_without_completion_block_set() {
+        cloudkit = CloudKitProcedure(strategy: .immediate) {
+            let operation = TestCKQueryOperation()
+            operation.error = NSError(domain: CKErrorDomain, code: CKError.internalError.rawValue, userInfo: nil)
+            return operation
+        }
+        wait(for: cloudkit)
+        XCTAssertProcedureFinishedWithoutErrors(cloudkit)
+    }
+
+    func test__error_with_completion_block_set() {
+        cloudkit = CloudKitProcedure(strategy: .immediate) {
+            let operation = TestCKQueryOperation()
+            operation.error = NSError(domain: CKErrorDomain, code: CKError.internalError.rawValue, userInfo: nil)
+            return operation
+        }
+
+        var didExecuteBlock = false
+        cloudkit.setQueryCompletionBlock { _ in
+            didExecuteBlock = true
+        }
+
+        wait(for: cloudkit)
+        XCTAssertProcedureFinishedWithErrors(cloudkit, count: 1)
         XCTAssertFalse(didExecuteBlock)
     }
 }
