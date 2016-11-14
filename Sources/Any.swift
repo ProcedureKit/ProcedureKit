@@ -22,9 +22,9 @@ class AnyProcedureBox<Base: Procedure>: AnyProcedureBox_<Base.Requirement, Base.
         return base.result
     }
 
-    public init(underlyingQueue: DispatchQueue? = nil, base: Base) {
+    public init(dispatchQueue: DispatchQueue? = nil, base: Base) {
         self.base = base
-        super.init(underlyingQueue: underlyingQueue, operations: [base])
+        super.init(dispatchQueue: dispatchQueue, operations: [base])
         log.enabled = false
     }
 }
@@ -43,9 +43,9 @@ public class AnyProcedure<Requirement, Result>: GroupProcedure, ResultInjection 
         return erased.result
     }
 
-    public init<Base>(underlyingQueue: DispatchQueue? = nil, _ base: Base) where Base: Procedure, Base: ResultInjection, Result == Base.Result, Requirement == Base.Requirement {
-        erased = AnyProcedureBox(underlyingQueue: underlyingQueue, base: base)
-        super.init(underlyingQueue: erased.underlyingQueue, operations: [erased])
+    public init<Base>(dispatchQueue: DispatchQueue? = nil, _ base: Base) where Base: Procedure, Base: ResultInjection, Result == Base.Result, Requirement == Base.Requirement {
+        erased = AnyProcedureBox(dispatchQueue: dispatchQueue, base: base)
+        super.init(dispatchQueue: erased.dispatchQueue, operations: [erased])
         log.enabled = false
     }
 }

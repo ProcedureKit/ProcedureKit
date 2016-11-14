@@ -12,9 +12,9 @@ open class ComposedProcedure<T: Operation>: GroupProcedure {
         self.init(operation: composed)
     }
 
-    public init(operation: T) {
+    public init(dispatchQueue: DispatchQueue? = nil, operation: T) {
         self.operation = operation
-        super.init(operations: [operation])
+        super.init(dispatchQueue: dispatchQueue, operations: [operation])
     }
 }
 
@@ -24,8 +24,8 @@ open class GatedProcedure<T: Operation>: ComposedProcedure<T> {
         self.init(operation: composed, gate: gate)
     }
 
-    public init(operation: T, gate: @escaping ThrowingBoolBlock) {
-        super.init(operation: operation)
+    public init(dispatchQueue: DispatchQueue? = nil, operation: T, gate: @escaping ThrowingBoolBlock) {
+        super.init(dispatchQueue: dispatchQueue, operation: operation)
         add(condition: IgnoredCondition(BlockCondition(block: gate)))
     }
 }
