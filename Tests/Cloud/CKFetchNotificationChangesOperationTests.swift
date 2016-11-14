@@ -131,22 +131,22 @@ class CloudKitProcedureFetchNotificationChangesOperationTests: CKProcedureTestCa
         }
     }
 
-    func test_set_get_container() {
+    func test__set_get_container() {
         cloudkit.container = "I'm a different container!"
         XCTAssertEqual(cloudkit.container, "I'm a different container!")
     }
 
-    func test_set_get_previousServerChangeToken() {
+    func test__set_get_previousServerChangeToken() {
         cloudkit.previousServerChangeToken = "I'm a different token!"
         XCTAssertEqual(cloudkit.previousServerChangeToken, "I'm a different token!")
     }
 
-    func test_set_get_resultsLimit() {
+    func test__set_get_resultsLimit() {
         cloudkit.resultsLimit = 20
         XCTAssertEqual(cloudkit.resultsLimit, 20)
     }
 
-    func test_set_get_notificationChangedBlock() {
+    func test__set_get_notificationChangedBlock() {
         XCTAssertNotNil(cloudkit.notificationChangedBlock)
         cloudkit.notificationChangedBlock?("a notification")
         XCTAssertEqual(setByNotificationChangedBlock, "a notification")

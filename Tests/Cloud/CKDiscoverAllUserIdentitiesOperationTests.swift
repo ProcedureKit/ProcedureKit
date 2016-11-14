@@ -94,7 +94,7 @@ class CloudKitProcedureDiscoverAllUserIdentitiesOperationTests: CKProcedureTestC
         }
     }
 
-    func test_set_get_container() {
+    func test__set_get_container() {
         cloudkit.container = "I'm a different container!"
         XCTAssertEqual(cloudkit.container, "I'm a different container!")
     }

@@ -95,22 +95,22 @@ class CloudKitProcedureFetchRecordZonesOperationTests: CKProcedureTestCase {
         cloudkit.recordZoneIDs = [ "record zone 1 id", "record zone 2 id" ]
     }
 
-    func test_set_get_container() {
+    func test__set_get_container() {
         cloudkit.container = "I'm a different container!"
         XCTAssertEqual(cloudkit.container, "I'm a different container!")
     }
 
-    func test_set_get_previousServerChangeToken() {
+    func test__set_get_previousServerChangeToken() {
         cloudkit.previousServerChangeToken = "I'm a different token!"
         XCTAssertEqual(cloudkit.previousServerChangeToken, "I'm a different token!")
     }
 
-    func test_set_get_resultsLimit() {
+    func test__set_get_resultsLimit() {
         cloudkit.resultsLimit = 20
         XCTAssertEqual(cloudkit.resultsLimit, 20)
     }
 
-    func test_set_get_recordZoneIDs() {
+    func test__set_get_recordZoneIDs() {
         cloudkit.recordZoneIDs = [ "record zone 1 id", "record zone 2 id" ]
         XCTAssertEqual(cloudkit.recordZoneIDs ?? [], [ "record zone 1 id", "record zone 2 id" ])
     }

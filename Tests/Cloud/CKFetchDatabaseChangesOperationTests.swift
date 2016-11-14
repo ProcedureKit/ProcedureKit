@@ -139,44 +139,44 @@ class CloudKitProcedureFetchDatabaseChangesOperationTests: CKProcedureTestCase {
         }
     }
 
-    func test_set_get_container() {
+    func test__set_get_container() {
         cloudkit.container = "I'm a different container!"
         XCTAssertEqual(cloudkit.container, "I'm a different container!")
     }
 
-    func test_set_get_database() {
+    func test__set_get_database() {
         cloudkit.database = "I'm a different database!"
         XCTAssertEqual(cloudkit.database, "I'm a different database!")
     }
 
-    func test_set_get_previousServerChangeToken() {
+    func test__set_get_previousServerChangeToken() {
         cloudkit.previousServerChangeToken = "I'm a different token!"
         XCTAssertEqual(cloudkit.previousServerChangeToken, "I'm a different token!")
     }
 
-    func test_set_get_resultsLimit() {
+    func test__set_get_resultsLimit() {
         cloudkit.resultsLimit = 20
         XCTAssertEqual(cloudkit.resultsLimit, 20)
     }
 
-    func test_set_get_fetchAllChanges() {
+    func test__set_get_fetchAllChanges() {
         cloudkit.fetchAllChanges = false
         XCTAssertEqual(cloudkit.fetchAllChanges, false)
     }
 
-    func test_set_get_recordZoneWithIDChangedBlock() {
+    func test__set_get_recordZoneWithIDChangedBlock() {
         XCTAssertNotNil(cloudkit.recordZoneWithIDChangedBlock)
         cloudkit.recordZoneWithIDChangedBlock?("record zone ID")
         XCTAssertEqual(setByRecordZoneWithIDChangedBlock, "record zone ID")
     }
 
-    func test_set_get_recordZoneWithIDWasDeletedBlock() {
+    func test__set_get_recordZoneWithIDWasDeletedBlock() {
         XCTAssertNotNil(cloudkit.recordZoneWithIDWasDeletedBlock)
         cloudkit.recordZoneWithIDWasDeletedBlock?("record zone ID")
         XCTAssertEqual(setByRecordZoneWithIDWasDeletedBlock, "record zone ID")
     }
 
-    func test_set_get_changeTokenUpdatedBlock() {
+    func test__set_get_changeTokenUpdatedBlock() {
         XCTAssertNotNil(cloudkit.changeTokenUpdatedBlock)
         cloudkit.changeTokenUpdatedBlock?("new change token")
         XCTAssertEqual(setByChangeTokenUpdatedBlock, "new change token")

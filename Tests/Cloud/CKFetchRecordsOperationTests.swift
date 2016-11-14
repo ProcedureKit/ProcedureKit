@@ -128,34 +128,34 @@ class CloudKitProcedureFetchRecordOperationTests: CKProcedureTestCase {
         }
     }
 
-    func test_set_get_container() {
+    func test__set_get_container() {
         cloudkit.container = "I'm a different container!"
         XCTAssertEqual(cloudkit.container, "I'm a different container!")
     }
 
-    func test_set_get_previousServerChangeToken() {
+    func test__set_get_previousServerChangeToken() {
         cloudkit.previousServerChangeToken = "I'm a different token!"
         XCTAssertEqual(cloudkit.previousServerChangeToken, "I'm a different token!")
     }
 
-    func test_set_get_resultsLimit() {
+    func test__set_get_resultsLimit() {
         cloudkit.resultsLimit = 20
         XCTAssertEqual(cloudkit.resultsLimit, 20)
     }
 
-    func test_set_get_recordIDs() {
+    func test__set_get_recordIDs() {
         cloudkit.recordIDs = [ "record id 3", "record id 4" ]
         XCTAssertEqual(cloudkit.recordIDs ?? [], [ "record id 3", "record id 4" ])
     }
 
-    func test_set_get_perRecordProgressBlock() {
+    func test__set_get_perRecordProgressBlock() {
         XCTAssertNotNil(cloudkit.perRecordProgressBlock)
         cloudkit.perRecordProgressBlock?("a record id", 0.1)
         XCTAssertEqual(setByPerRecordProgressBlock?.0, "a record id")
         XCTAssertEqual(setByPerRecordProgressBlock?.1, 0.1)
     }
 
-    func test_set_get_perRecordCompletionBlock() {
+    func test__set_get_perRecordCompletionBlock() {
         let error = TestError()
         XCTAssertNotNil(cloudkit.perRecordCompletionBlock)
         cloudkit.perRecordCompletionBlock?("a record", "a record id", error)

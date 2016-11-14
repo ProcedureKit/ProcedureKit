@@ -126,27 +126,27 @@ class CloudKitProcedureFetchShareMetadataOperationTests: CKProcedureTestCase {
         }
     }
 
-    func test_set_get_container() {
+    func test__set_get_container() {
         cloudkit.container = "I'm a different container!"
         XCTAssertEqual(cloudkit.container, "I'm a different container!")
     }
 
-    func test_set_get_shareURLs() {
+    func test__set_get_shareURLs() {
         cloudkit.shareURLs = [ URL(string: "http://different-url.com")! ]
         XCTAssertEqual(cloudkit.shareURLs, [ URL(string: "http://different-url.com")! ])
     }
 
-    func test_set_get_shouldFetchRootRecord() {
+    func test__set_get_shouldFetchRootRecord() {
         cloudkit.shouldFetchRootRecord = false
         XCTAssertEqual(cloudkit.shouldFetchRootRecord, false)
     }
 
-    func test_set_get_rootRecordDesiredKeys() {
+    func test__set_get_rootRecordDesiredKeys() {
         cloudkit.rootRecordDesiredKeys = [ "key 1", "key 2" ]
         XCTAssertEqual(cloudkit.rootRecordDesiredKeys ?? [], [ "key 1", "key 2" ])
     }
 
-    func test_set_get_perShareMetadataBlock() {
+    func test__set_get_perShareMetadataBlock() {
         XCTAssertNotNil(cloudkit.perShareMetadataBlock)
         let url = URL(string: "http://different-url.com")!
         let error = TestError()

@@ -174,50 +174,50 @@ class CloudKitProcedureFetchRecordZoneChangesOperationTests: CKProcedureTestCase
         }
     }
 
-    func test_set_get_container() {
+    func test__set_get_container() {
         cloudkit.container = "I'm a different container!"
         XCTAssertEqual(cloudkit.container, "I'm a different container!")
     }
 
-    func test_set_get_previousServerChangeToken() {
+    func test__set_get_previousServerChangeToken() {
         cloudkit.previousServerChangeToken = "I'm a different token!"
         XCTAssertEqual(cloudkit.previousServerChangeToken, "I'm a different token!")
     }
 
-    func test_set_get_resultsLimit() {
+    func test__set_get_resultsLimit() {
         cloudkit.resultsLimit = 20
         XCTAssertEqual(cloudkit.resultsLimit, 20)
     }
 
-    func test_set_get_fetchAllChanges() {
+    func test__set_get_fetchAllChanges() {
         cloudkit.fetchAllChanges = true
         XCTAssertEqual(cloudkit.fetchAllChanges, true)
     }
 
-    func test_set_get_recordZoneIDs() {
+    func test__set_get_recordZoneIDs() {
         cloudkit.recordZoneIDs = [ "record zone 1 id", "record zone 2 id" ]
         XCTAssertEqual(cloudkit.recordZoneIDs, [ "record zone 1 id", "record zone 2 id" ])
     }
 
-    func test_set_get_optionsByRecordZoneID() {
+    func test__set_get_optionsByRecordZoneID() {
         cloudkit.optionsByRecordZoneID = [ "record zone 1 id": "option 1", "record zone 2 id": "option 2" ]
         XCTAssertEqual(cloudkit.optionsByRecordZoneID ?? [:], [ "record zone 1 id": "option 1", "record zone 2 id": "option 2" ])
     }
 
-    func test_set_get_recordChangedBlock() {
+    func test__set_get_recordChangedBlock() {
         XCTAssertNotNil(cloudkit.recordChangedBlock)
         cloudkit.recordChangedBlock?("a record")
         XCTAssertEqual(setByRecordChangedBlock, "a record")
     }
 
-    func test_set_get_recordWithIDWasDeletedBlock() {
+    func test__set_get_recordWithIDWasDeletedBlock() {
         XCTAssertNotNil(cloudkit.recordWithIDWasDeletedBlock)
         cloudkit.recordWithIDWasDeletedBlock?("a record id", "record type")
         XCTAssertEqual(setByRecordWithIDWasDeletedBlock?.0, "a record id")
         XCTAssertEqual(setByRecordWithIDWasDeletedBlock?.1, "record type")
     }
 
-    func test_set_get_recordZoneChangeTokensUpdatedBlock() {
+    func test__set_get_recordZoneChangeTokensUpdatedBlock() {
         XCTAssertNotNil(cloudkit.recordZoneChangeTokensUpdatedBlock)
         cloudkit.recordZoneChangeTokensUpdatedBlock?("zone id", "token", nil)
         XCTAssertEqual(setByRecordZoneChangeTokensUpdatedBlock?.0, "zone id")
@@ -225,7 +225,7 @@ class CloudKitProcedureFetchRecordZoneChangesOperationTests: CKProcedureTestCase
         XCTAssertNil(setByRecordZoneChangeTokensUpdatedBlock?.2)
     }
 
-    func test_set_get_recordZoneFetchCompletionBlock() {
+    func test__set_get_recordZoneFetchCompletionBlock() {
         XCTAssertNotNil(cloudkit.recordZoneFetchCompletionBlock)
         let error = TestError()
         cloudkit.recordZoneFetchCompletionBlock?("zone id", "token", nil, false, error)
