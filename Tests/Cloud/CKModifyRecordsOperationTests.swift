@@ -298,6 +298,31 @@ class CloudKitProcedureModifyRecordsOperationTests: CKProcedureTestCase {
         XCTAssertProcedureFinishedWithoutErrors(cloudkit)
         XCTAssertTrue(didExecuteBlock)
     }
+
+    func test__error_which_retries_using_custom_handler() {
+        var shouldError = true
+        cloudkit = CloudKitProcedure(strategy: .immediate) {
+            let op = TestCKModifyRecordsOperation()
+            if shouldError {
+                op.error = NSError(domain: CKErrorDomain, code: CKError.Code.limitExceeded.rawValue, userInfo: nil)
+                shouldError = false
+            }
+            return op
+        }
+        var didRunCustomHandler = false
+        cloudkit.set(errorHandlerForCode: .limitExceeded) { _, _, _, suggestion in
+            didRunCustomHandler = true
+            return suggestion
+        }
+
+        var didExecuteBlock = false
+        cloudkit.setModifyRecordsCompletionBlock { _, _ in didExecuteBlock = true }
+        wait(for: cloudkit)
+        XCTAssertProcedureFinishedWithoutErrors(cloudkit)
+        XCTAssertTrue(didExecuteBlock)
+        XCTAssertTrue(didRunCustomHandler)
+    }
+    
 }
 
 

@@ -89,10 +89,10 @@ class CKAcceptSharesOperationTests: CKProcedureTestCase {
 }
 
 class CloudKitProcedureAcceptSharesOperationTests: CKProcedureTestCase {
-
-    var shareMetadatas: [TestCKAcceptSharesOperation.ShareMetadata]!
+    typealias T = TestCKAcceptSharesOperation
+    var shareMetadatas: [T.ShareMetadata]!
     var setByBlockPerShareCompletionBlock: Bool!
-    var cloudkit: CloudKitProcedure<TestCKAcceptSharesOperation>!
+    var cloudkit: CloudKitProcedure<T>!
 
     override func setUp() {
         super.setUp()
@@ -193,6 +193,30 @@ class CloudKitProcedureAcceptSharesOperationTests: CKProcedureTestCase {
         wait(for: cloudkit)
         XCTAssertProcedureFinishedWithoutErrors(cloudkit)
         XCTAssertTrue(didExecuteBlock)
+    }
+
+    func test__error_which_retries_using_custom_handler() {
+        var shouldError = true
+        cloudkit = CloudKitProcedure(strategy: .immediate) {
+            let op = TestCKAcceptSharesOperation()
+            if shouldError {
+                op.error = NSError(domain: CKErrorDomain, code: CKError.Code.limitExceeded.rawValue, userInfo: nil)
+                shouldError = false
+            }
+            return op
+        }
+        var didRunCustomHandler = false
+        cloudkit.set(errorHandlerForCode: .limitExceeded) { _, _, _, suggestion in
+            didRunCustomHandler = true
+            return suggestion
+        }
+
+        var didExecuteBlock = false
+        cloudkit.setAcceptSharesCompletionBlock { didExecuteBlock = true }
+        wait(for: cloudkit)
+        XCTAssertProcedureFinishedWithoutErrors(cloudkit)
+        XCTAssertTrue(didExecuteBlock)
+        XCTAssertTrue(didRunCustomHandler)
     }
 }
 
