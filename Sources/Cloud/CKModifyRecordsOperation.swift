@@ -98,6 +98,10 @@ extension CKProcedure where T: CKModifyRecordsOperationProtocol, T: AssociatedEr
 
 extension CloudKitProcedure where T: CKModifyRecordsOperationProtocol, T: AssociatedErrorProtocol, T.AssociatedError: CloudKitError {
 
+    internal typealias ModifyRecordsPerRecordProgress = (T.Record, Double)
+    internal typealias ModifyRecordsPerRecordCompletion = (T.Record?, Error?)
+    internal typealias ModifyRecordsCompletion = ([T.Record]?, [T.RecordID]?)
+
     /// A typealias for the block types used by CloudKitOperation<CKModifyRecordsOperation>
     public typealias ModifyRecordsPerRecordProgressBlock = (T.Record, Double) -> Void
 

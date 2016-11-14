@@ -5,6 +5,7 @@
 //
 
 import XCTest
+import CloudKit
 import ProcedureKit
 import TestingProcedureKit
 @testable import ProcedureKitCloud
@@ -144,3 +145,135 @@ class CKModifyRecordsOperationTests: CKProcedureTestCase {
         XCTAssertFalse(didExecuteBlock)
     }
 }
+
+class CloudKitProcedureModifyRecordsOperationTests: CKProcedureTestCase {
+    typealias T = TestCKModifyRecordsOperation
+    var cloudkit: CloudKitProcedure<T>!
+
+    var setByPerRecordProgressBlock: CloudKitProcedure<T>.ModifyRecordsPerRecordProgress!
+    var setByPerRecordCompletionBlock: CloudKitProcedure<T>.ModifyRecordsPerRecordCompletion!
+
+    override func setUp() {
+        super.setUp()
+        cloudkit = CloudKitProcedure(strategy: .immediate) { TestCKModifyRecordsOperation() }
+        cloudkit.container = container
+        cloudkit.recordsToSave = [ "record 1" ]
+        cloudkit.recordIDsToDelete = [ "record 2 ID" ]
+        cloudkit.savePolicy = 1
+        cloudkit.clientChangeTokenData = "hello-world".data(using: .utf8)
+        cloudkit.isAtomic = true
+        cloudkit.perRecordProgressBlock = { self.setByPerRecordProgressBlock = ($0, $1) }
+        cloudkit.perRecordCompletionBlock = { self.setByPerRecordCompletionBlock = ($0, $1) }
+    }
+
+    func test__set_get_container() {
+        cloudkit.container = "I'm a different container!"
+        XCTAssertEqual(cloudkit.container, "I'm a different container!")
+    }
+
+    func test__set_get_database() {
+        cloudkit.database = "I'm a different database!"
+        XCTAssertEqual(cloudkit.database, "I'm a different database!")
+    }
+
+    func test__set_get_previousServerChangeToken() {
+        cloudkit.previousServerChangeToken = "I'm a different token!"
+        XCTAssertEqual(cloudkit.previousServerChangeToken, "I'm a different token!")
+    }
+
+    func test__set_get_resultsLimit() {
+        cloudkit.resultsLimit = 20
+        XCTAssertEqual(cloudkit.resultsLimit, 20)
+    }
+
+    func test__set_get_recordsToSave() {
+        cloudkit.recordsToSave = [ "record 3" ]
+        XCTAssertEqual(cloudkit.recordsToSave ?? [], [ "record 3" ])
+    }
+
+    func test__set_get_recordIDsToDelete() {
+        cloudkit.recordIDsToDelete = [ "record 4 ID" ]
+        XCTAssertEqual(cloudkit.recordIDsToDelete ?? [], [ "record 4 ID" ])
+    }
+
+    func test__set_get_savePolicy() {
+        cloudkit.savePolicy = 2
+        XCTAssertEqual(cloudkit.savePolicy, 2)
+    }
+
+    func test__set_get__clientChangeTokenData() {
+        let clientChangeTokenData = "this-is-some-data".data(using: .utf8)
+        cloudkit.clientChangeTokenData = clientChangeTokenData
+        XCTAssertEqual(cloudkit.clientChangeTokenData, clientChangeTokenData)
+    }
+
+    func test__set_get_isAtomic() {
+        cloudkit.isAtomic = false
+        XCTAssertEqual(cloudkit.isAtomic, false)
+    }
+
+    func test__set_get_perRecordProgressBlock() {
+        XCTAssertNotNil(cloudkit.perRecordProgressBlock)
+        cloudkit.perRecordProgressBlock?("record 1", 0.5)
+        XCTAssertEqual(setByPerRecordProgressBlock?.0 ?? "not record 1", "record 1")
+        XCTAssertEqual(setByPerRecordProgressBlock?.1 ?? 0.1, 0.5)
+    }
+
+    func test__set_get_perRecordCompletionBlock() {
+        XCTAssertNotNil(cloudkit.perRecordCompletionBlock)
+        let anError = TestError()
+        cloudkit.perRecordCompletionBlock?("record 2", anError)
+        XCTAssertEqual(setByPerRecordCompletionBlock?.0 ?? "not record 2", "record 2")
+        XCTAssertEqual(setByPerRecordCompletionBlock?.1 as? TestError ?? TestError(), anError)
+    }
+
+    func test__cancellation() {
+        cloudkit.cancel()
+        wait(for: cloudkit)
+        XCTAssertProcedureCancelledWithoutErrors(cloudkit)
+    }
+
+    func test__success_without_completion_block_set() {
+        wait(for: cloudkit)
+        XCTAssertProcedureFinishedWithoutErrors(cloudkit)
+    }
+
+    func test__success_with_completion_block_set() {
+        var didExecuteBlock = false
+        cloudkit.setModifyRecordsCompletionBlock { _, _ in
+            didExecuteBlock = true
+        }
+        wait(for: cloudkit)
+        XCTAssertProcedureFinishedWithoutErrors(cloudkit)
+        XCTAssertTrue(didExecuteBlock)
+    }
+
+    func test__error_without_completion_block_set() {
+        cloudkit = CloudKitProcedure(strategy: .immediate) {
+            let operation = TestCKModifyRecordsOperation()
+            operation.error = NSError(domain: CKErrorDomain, code: CKError.internalError.rawValue, userInfo: nil)
+            return operation
+        }
+        wait(for: cloudkit)
+        XCTAssertProcedureFinishedWithoutErrors(cloudkit)
+    }
+
+    func test__error_with_completion_block_set() {
+        cloudkit = CloudKitProcedure(strategy: .immediate) {
+            let operation = TestCKModifyRecordsOperation()
+            operation.error = NSError(domain: CKErrorDomain, code: CKError.internalError.rawValue, userInfo: nil)
+            return operation
+        }
+
+        var didExecuteBlock = false
+        cloudkit.setModifyRecordsCompletionBlock { _, _ in
+            didExecuteBlock = true
+        }
+
+        wait(for: cloudkit)
+        XCTAssertProcedureFinishedWithErrors(cloudkit, count: 1)
+        XCTAssertFalse(didExecuteBlock)
+    }
+}
+
+
