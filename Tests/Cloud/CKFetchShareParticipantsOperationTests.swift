@@ -86,7 +86,6 @@ class CKFetchShareParticipantsOperationTests: CKProcedureTestCase {
     }
 }
 
-
 class CloudKitProcedureFetchShareParticipantsOperationTests: CKProcedureTestCase {
     typealias T = TestCKFetchShareParticipantsOperation
     var cloudkit: CloudKitProcedure<T>!
@@ -110,7 +109,6 @@ class CloudKitProcedureFetchShareParticipantsOperationTests: CKProcedureTestCase
         cloudkit.userIdentityLookupInfos = [ "different user lookup info" ]
         XCTAssertEqual(cloudkit.userIdentityLookupInfos, [ "different user lookup info" ])
     }
-
 
     func test__set_get_shareParticipantFetchedBlock() {
         XCTAssertNotNil(cloudkit.shareParticipantFetchedBlock)
