@@ -40,3 +40,9 @@ class CloudKitTestCase: ProcedureKitTestCase {
 
 class CKProcedureTestCase: CloudKitTestCase { }
 
+extension CloudKitProcedure {
+
+    var passthroughSuggestedErrorHandler: ErrorHandler {
+        return { $3 }
+    }
+}

@@ -81,6 +81,12 @@ class CloudKitProcedureDiscoverAllContactsOperationTests: CKProcedureTestCase {
         cloudkit = CloudKitProcedure(strategy: .immediate) { TestCKDiscoverAllContactsOperation(result: [ "user info" ]) }
     }
 
+    func test__set_get__errorHandlers() {
+        cloudkit.set(errorHandlers: [.internalError: cloudkit.passthroughSuggestedErrorHandler])
+        XCTAssertEqual(cloudkit.errorHandlers.count, 1)
+        XCTAssertNotNil(cloudkit.errorHandlers[.internalError])
+    }
+    
     func test__cancellation() {
         cloudkit.cancel()
         wait(for: cloudkit)

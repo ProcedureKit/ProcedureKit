@@ -126,6 +126,12 @@ class CloudKitProcedureFetchShareMetadataOperationTests: CKProcedureTestCase {
         }
     }
 
+    func test__set_get__errorHandlers() {
+        cloudkit.set(errorHandlers: [.internalError: cloudkit.passthroughSuggestedErrorHandler])
+        XCTAssertEqual(cloudkit.errorHandlers.count, 1)
+        XCTAssertNotNil(cloudkit.errorHandlers[.internalError])
+    }
+
     func test__set_get_container() {
         cloudkit.container = "I'm a different container!"
         XCTAssertEqual(cloudkit.container, "I'm a different container!")
