@@ -86,8 +86,6 @@ class CloudKitProcedureFetchSubscriptionsOperationTests: CKProcedureTestCase {
     typealias T = TestCKFetchSubscriptionsOperation
     var cloudkit: CloudKitProcedure<T>!
 
-    var setByShareParticipantFetchedBlock: (T.ShareParticipant)!
-
     override func setUp() {
         super.setUp()
         cloudkit = CloudKitProcedure(strategy: .immediate) { TestCKFetchSubscriptionsOperation() }

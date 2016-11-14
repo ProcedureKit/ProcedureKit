@@ -88,8 +88,6 @@ class CloudKitProcedureMarkNotificationsReadOperationTests: CKProcedureTestCase 
     typealias T = TestCKMarkNotificationsReadOperation
     var cloudkit: CloudKitProcedure<T>!
 
-    var setByShareParticipantFetchedBlock: (T.ShareParticipant)!
-
     override func setUp() {
         super.setUp()
         cloudkit = CloudKitProcedure(strategy: .immediate) { TestCKMarkNotificationsReadOperation() }
