@@ -55,12 +55,11 @@ struct PendingResult {
     }
 
     func createResult() -> ProfileResult? {
-        guard !isPending,
-            let
+        guard !isPending, let
             identity = identity.value,
             let attached = attached.value,
             let started = started.value
-            else { return .none }
+        else { return nil }
 
         return ProfileResult(identity: identity, created: created, attached: attached, started: started, cancelled: cancelled.value, finished: finished.value, children: children)
     }
@@ -107,7 +106,6 @@ public final class ProcedureProfiler: Identifiable, Equatable {
         case reporters([ProcedureProfilerReporter])
     }
 
-
     let queue = DispatchQueue(label: "run.kit.ProcedureKit.Profiler")
     let reporter: Reporter
 
@@ -131,19 +129,20 @@ public final class ProcedureProfiler: Identifiable, Equatable {
         self.reporter = reporter
     }
 
-    func addMetricNow(now: TimeInterval = CFAbsoluteTimeGetCurrent() as TimeInterval, forEvent event: ProcedureEvent) {
-        queue.sync {
+    func addMetric(now: TimeInterval = CFAbsoluteTimeGetCurrent() as TimeInterval, forEvent event: ProcedureEvent) {
+        queue.sync { [weak self] in
+            guard let strongSelf = self else { return }
             switch event {
                 case .attached:
-                    self.result = self.result.attach(now: now)
+                    strongSelf.result = strongSelf.result.attach(now: now)
                 case .started:
-                    self.result = self.result.start(now: now)
+                    strongSelf.result = strongSelf.result.start(now: now)
                 case .cancelled:
-                    self.result = self.result.cancel(now: now)
-                    self.finishedOrCancelled = true
+                    strongSelf.result = strongSelf.result.cancel(now: now)
+                    strongSelf.finishedOrCancelled = true
                 case .finished:
-                    self.result = self.result.finish(now: now)
-                    self.finishedOrCancelled = true
+                    strongSelf.result = strongSelf.result.finish(now: now)
+                    strongSelf.finishedOrCancelled = true
                 default:
                     break
             }
@@ -155,14 +154,17 @@ public final class ProcedureProfiler: Identifiable, Equatable {
         if let procedure = operation as? Procedure {
             let profiler = ProcedureProfiler(parent: self)
             procedure.add(observer: profiler)
-            queue.sync { [unowned self] in
-                self.children.append(procedure.identity)
+            queue.sync { [weak self] in
+                self?.children.append(procedure.identity)
             }
         }
     }
 
     func finish() {
-        guard finishedOrCancelled && !pending, let result = result.createResult() else { return }
+        guard finishedOrCancelled && !pending, let result = result.createResult() else {
+            print("Exiting early, \(finishedOrCancelled), \(pending).")
+            return
+        }
         reporter.finishedProfiling(withResult: result)
     }
 }
@@ -182,10 +184,11 @@ extension ProcedureProfiler.Reporter: ProcedureProfilerReporter {
 extension ProcedureProfiler: ProcedureProfilerReporter {
 
     public func finishedProfiling(withResult result: ProfileResult) {
-        queue.sync { [unowned self] in
-            if let index = self.children.index(of: result.identity) {
-                self.result = self.result.add(child: result)
-                self.children.remove(at: index)
+        queue.sync { [weak self] in
+            guard let strongSelf = self else { return }
+            if let index = strongSelf.children.index(of: result.identity) {
+                strongSelf.result = strongSelf.result.add(child: result)
+                strongSelf.children.remove(at: index)
             }
         }
         finish()
@@ -198,33 +201,31 @@ extension ProcedureProfiler: ProcedureObserver {
         queue.sync { [unowned self] in
             self.result = self.result.set(identity: procedure.identity)
         }
-        addMetricNow(forEvent: .attached)
+        addMetric(forEvent: .attached)
     }
 
     public func will(execute procedure: Procedure) {
-        addMetricNow(forEvent: .started)
+        addMetric(forEvent: .started)
     }
 
     public func did(cancel procedure: Procedure) {
-        addMetricNow(forEvent: .cancelled)
+        addMetric(forEvent: .cancelled)
     }
 
-
     public func did(finish procedure: Procedure, withErrors errors: [Error]) {
-        addMetricNow(forEvent: .finished)
+        addMetric(forEvent: .finished)
     }
 
     public func procedure(_ procedure: Procedure, didProduce newOperation: Operation) {
-         addChild(operation: newOperation)
+        addChild(operation: newOperation)
     }
 }
 
 extension ProcedureProfiler: GroupObserverProtocol {
 
     public func group(_ group: GroupProcedure, willAdd: Operation) {
-           addChild(operation: willAdd)
+        addChild(operation: willAdd)
     }
-
 }
 
 // MARK: - Reporters
@@ -233,19 +234,19 @@ struct PrintableProfileResult: CustomStringConvertible {
     let spacing: Int
     let result: ProfileResult
 
-    func addRowWithInterval(_ interval: TimeInterval, text: String) -> String {
+    func addRow(withInterval interval: TimeInterval, text: String) -> String {
         return "\(createIndentation())+\(interval)\(createSpacing())\(text)\n"
     }
 
-    func addRowWithInterval(_ interval: TimeInterval, forEvent event: ProcedureEvent) -> String {
-        return addRowWithInterval(interval, text: event.description)
+    func addRow(withInterval interval: TimeInterval, forEvent event: ProcedureEvent) -> String {
+        return addRow(withInterval: interval, text: event.description)
     }
 
     var description: String {
         get {
             var output = ""
-            output += addRowWithInterval(result.attached, forEvent: .attached)
-            output += addRowWithInterval(result.started, forEvent: .started)
+            output += addRow(withInterval: result.attached, forEvent: .attached)
+            output += addRow(withInterval: result.started, forEvent: .started)
 
             for child in result.children {
                 output += "\(createIndentation())-> Spawned \(child.identity) with profile results\n"
@@ -253,11 +254,11 @@ struct PrintableProfileResult: CustomStringConvertible {
             }
 
             if let cancelled = result.cancelled {
-                output += addRowWithInterval(cancelled, forEvent: .cancelled)
+                output += addRow(withInterval: cancelled, forEvent: .cancelled)
             }
 
             if let finished = result.finished {
-                output += addRowWithInterval(finished, forEvent: .finished)
+                output += addRow(withInterval: finished, forEvent: .finished)
             }
 
             return output
