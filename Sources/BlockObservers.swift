@@ -16,6 +16,8 @@ public struct Observer<Procedure: ProcedureProtocol> {
     public typealias WillCancel = ErrorsBlock
     public typealias DidCancel = ErrorsBlock
     public typealias DidProduce = ProducerBlock
+    public typealias WillAdd = ProducerBlock
+    public typealias DidAdd = ProducerBlock
     public typealias WillFinish = ErrorsBlock
     public typealias DidFinish = ErrorsBlock
 
@@ -226,7 +228,7 @@ public struct DidCancelObserver<Procedure: ProcedureProtocol>: ProcedureObserver
 }
 
 /// DidProduceOperationObserver is an observer which will execute a
-/// closure when the operation produces another observer.
+/// closure when the operation produces another operation.
 public struct DidProduceOperationObserver<Procedure: ProcedureProtocol>: ProcedureObserver {
     private let block: Observer<Procedure>.DidProduce
 
@@ -249,6 +251,62 @@ public struct DidProduceOperationObserver<Procedure: ProcedureProtocol>: Procedu
     /// - parameter procedure: the procedure which produced another Operation.
     /// - parameter newOperation: the new Operation instance which has been produced.
     public func procedure(_ procedure: Procedure, didProduce newOperation: Operation) {
+        block(procedure, newOperation)
+    }
+}
+
+/// WillAddOperationObserver is an observer which will execute a
+/// closure when the operation will add another operation.
+public struct WillAddOperationObserver<Procedure: ProcedureProtocol>: ProcedureObserver {
+    private let block: Observer<Procedure>.WillAdd
+
+    /// - returns: a block which is called when the observer is attached to a procedure
+    public var didAttachToProcedure: Observer<Procedure>.DidAttach? = nil
+
+    /// Initialize the observer with a block.
+    /// - parameter willAdd: the `Block`
+    /// - returns: an observer.
+    public init(willAdd: @escaping Observer<Procedure>.WillAdd) {
+        self.block = willAdd
+    }
+
+    /// - parameter to: the procedure which is attached
+    public func didAttach(to procedure: Procedure) {
+        didAttachToProcedure?(procedure)
+    }
+
+    /// Observes when the attached procedure will add another Operation.
+    /// - parameter procedure: the procedure which will add another Operation.
+    /// - parameter newOperation: the new Operation instance which will be added.
+    public func procedure(_ procedure: Procedure, willAdd newOperation: Operation) {
+        block(procedure, newOperation)
+    }
+}
+
+/// DidAddOperationObserver is an observer which will execute a
+/// closure when the operation did add another operation.
+public struct DidAddOperationObserver<Procedure: ProcedureProtocol>: ProcedureObserver {
+    private let block: Observer<Procedure>.DidAdd
+
+    /// - returns: a block which is called when the observer is attached to a procedure
+    public var didAttachToProcedure: Observer<Procedure>.DidAttach? = nil
+
+    /// Initialize the observer with a block.
+    /// - parameter didAdd: the `Block`
+    /// - returns: an observer.
+    public init(didAdd: @escaping Observer<Procedure>.DidAdd) {
+        self.block = didAdd
+    }
+
+    /// - parameter to: the procedure which is attached
+    public func didAttach(to procedure: Procedure) {
+        didAttachToProcedure?(procedure)
+    }
+
+    /// Observes when the attached procedure did add another Operation.
+    /// - parameter procedure: the procedure which did add another Operation.
+    /// - parameter newOperation: the new Operation instance which was added.
+    public func procedure(_ procedure: Procedure, didAdd newOperation: Operation) {
         block(procedure, newOperation)
     }
 }
@@ -311,8 +369,6 @@ public struct DidFinishObserver<Procedure: ProcedureProtocol>: ProcedureObserver
     }
 }
 
-
-
 public extension ProcedureProtocol {
 
     func addWillExecuteBlockObserver(block: @escaping Observer<Self>.WillExecute) {
@@ -329,6 +385,14 @@ public extension ProcedureProtocol {
 
     func addDidCancelBlockObserver(block: @escaping Observer<Self>.DidCancel) {
         add(observer: DidCancelObserver(didCancel: block))
+    }
+
+    func addWillAddOperationBlockObserver(block: @escaping Observer<Self>.WillAdd) {
+        add(observer: WillAddOperationObserver(willAdd: block))
+    }
+
+    func addDidAddOperationBlockObserver(block: @escaping Observer<Self>.DidAdd) {
+        add(observer: DidAddOperationObserver(didAdd: block))
     }
 
     func addDidProduceOperationBlockObserver(block: @escaping Observer<Self>.DidProduce) {
