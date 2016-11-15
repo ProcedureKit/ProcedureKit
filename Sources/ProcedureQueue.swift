@@ -58,6 +58,14 @@ public protocol ProcedureQueueDelegate: OperationQueueDelegate {
     func procedureQueue(_ queue: ProcedureQueue, willAddOperation operation: Operation)
 
     /**
+     The procedure queue did add a new operation. This is for information only.
+
+     - paramter queue: the `ProcedureQueue`.
+     - paramter operation: the `Operation` instance which was added.
+     */
+    func procedureQueue(_ queue: ProcedureQueue, didAddOperation operation: Operation)
+
+    /**
      An operation will finish on the queue.
 
      - parameter queue: the `ProcedureQueue`.
@@ -89,6 +97,8 @@ public protocol ProcedureQueueDelegate: OperationQueueDelegate {
 public extension ProcedureQueueDelegate {
 
     func procedureQueue(_ queue: ProcedureQueue, willAddOperation operation: Operation) { /* default no-op */ }
+
+    func procedureQueue(_ queue: ProcedureQueue, didAddOperation operation: Operation) { /* default no-op */ }
 
     func procedureQueue(_ queue: ProcedureQueue, willProduceOperation operation: Operation) { /* default no-op */ }
 }
@@ -136,6 +146,8 @@ open class ProcedureQueue: OperationQueue {
 
         defer {
             super.addOperation(operation)
+
+            delegate?.procedureQueue(self, didAddOperation: operation)
         }
 
         guard let procedure = operation as? Procedure else {
@@ -154,11 +166,11 @@ open class ProcedureQueue: OperationQueue {
         procedure.log.verbose(message: "Adding to queue")
 
         /// Add an observer so that any produced operations are added to the queue
-        procedure.addDidProduceOperationBlockObserver { [weak self] (_, produced) in
-            if let queue = self {
-                queue.delegate?.procedureQueue(queue, willProduceOperation: produced)
-                queue.add(operation: produced)
-            }
+        procedure.addWillAddOperationBlockObserver { [weak self] (procedure, operation) in
+            guard let queue = self else { return }
+            queue.delegate?.procedureQueue(queue, willAddOperation: operation)
+            queue.add(operation: operation)
+            procedure.queue(queue, didAddOperation: operation)
         }
 
         /// Add an observer to invoke the will finish delegate method

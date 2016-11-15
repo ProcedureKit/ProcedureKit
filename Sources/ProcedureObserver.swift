@@ -59,16 +59,6 @@ public protocol ProcedureObserver {
     func did(cancel procedure: Procedure, withErrors: [Error])
 
     /**
-     The procedure produced a new `Operation` instance which has been added to the
-     queue. Note that this isn't necessarily an `Procedure`, so be careful, if you
-     intend to automatically start observing it.
-
-     - parameter procedure: the observed `Procedure`.
-     - parameter newOperation: the produced `Operation`
-     */
-    func procedure(_ procedure: Procedure, didProduce newOperation: Operation)
-
-    /**
      The procedure will add a new `Operation` instance to the
      queue. Note that this isn't necessarily a `Procedure`, so be careful, if you
      intend to automatically start observing it.
@@ -117,7 +107,7 @@ public extension ProcedureObserver {
 
     func did(cancel procedure: Procedure, withErrors: [Error]) { }
 
-    func procedure(_ procedure: Procedure, didProduce newOperation: Operation) { }
+//    func procedure(_ procedure: Procedure, didProduce newOperation: Operation) { }
 
     func procedure(_ procedure: Procedure, willAdd newOperation: Operation) { }
 

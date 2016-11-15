@@ -213,7 +213,7 @@ extension ProcedureProfiler: ProcedureObserver {
         addMetric(forEvent: .finished)
     }
 
-    public func procedure(_ procedure: Procedure, didProduce newOperation: Operation) {
+    public func procedure(_ procedure: Procedure, willAdd newOperation: Operation) {
         addChild(operation: newOperation)
     }
 }

@@ -386,9 +386,14 @@ open class Procedure: Operation, ProcedureProtocol {
     }
 
     public final func produce(operation: Operation) {
-        precondition(state > .initialized, "Cannot produce operation will not being scheduled on a queue")
-        log.notice(message: "Did produce \(operation.operationName)")
-        observers.forEach { $0.procedure(self, didProduce: operation) }
+        precondition(state > .initialized, "Cannot add operation which is not being scheduled on a queue")
+        log.notice(message: "Will add \(operation.operationName)")
+        observers.forEach { $0.procedure(self, willAdd: operation) }
+    }
+
+    internal func queue(_ queue: ProcedureQueue, didAddOperation operation: Operation) {
+        log.notice(message: "Did add \(operation.operationName)")
+        observers.forEach { $0.procedure(self, didAdd: operation) }
     }
 
     // MARK: - Cancellation
