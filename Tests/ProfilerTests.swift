@@ -100,25 +100,24 @@ class ProfilerTests: ProcedureKitTestCase {
             validateProfileResult(result: childResult, after: now)
         }
     }
-    
-//TODO: Uncomment after checking GroupProcedure
-//    func test__profile_group_operation() {
-//        let group = GroupProcedure(operations: [ TestProcedure(), TestProcedure() ])
-//        group.add(observer: profiler)
-//
-//        wait(for: group)
-//
-//        guard let result = reporter.didProfileResult else {
-//            XCTFail("Reporter did not receive profile result."); return
-//        }
-//
-//        validateProfileResult(result: result, after: now)
-//         XCTAssertProcedureFinishedWithoutErrors()
-//
-//        XCTAssertEqual(result.children.count, 2)
-//        for child in result.children {
-//            validateProfileResult(result: child, after: now)
-//        }
-//    }
 
+    func test__profile_group_operation() {
+        let group = GroupProcedure(operations: [ TestProcedure(), TestProcedure() ])
+        group.log.severity = .notice
+        group.add(observer: profiler)
+
+        wait(for: group)
+
+        guard let result = reporter.didProfileResult else {
+            XCTFail("Reporter did not receive profile result."); return
+        }
+
+        validateProfileResult(result: result, after: now)
+        XCTAssertProcedureFinishedWithoutErrors()
+
+        XCTAssertEqual(result.children.count, 2)
+        for child in result.children {
+            validateProfileResult(result: child, after: now)
+        }
+    }
 }
