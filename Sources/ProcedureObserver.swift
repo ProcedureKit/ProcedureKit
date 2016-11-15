@@ -107,8 +107,6 @@ public extension ProcedureObserver {
 
     func did(cancel procedure: Procedure, withErrors: [Error]) { }
 
-//    func procedure(_ procedure: Procedure, didProduce newOperation: Operation) { }
-
     func procedure(_ procedure: Procedure, willAdd newOperation: Operation) { }
 
     func procedure(_ procedure: Procedure, didAdd newOperation: Operation) { }
