@@ -161,10 +161,7 @@ public final class ProcedureProfiler: Identifiable, Equatable {
     }
 
     func finish() {
-        guard finishedOrCancelled && !pending, let result = result.createResult() else {
-            print("Exiting early, \(finishedOrCancelled), \(pending).")
-            return
-        }
+        guard finishedOrCancelled && !pending, let result = result.createResult() else { return }
         reporter.finishedProfiling(withResult: result)
     }
 }
