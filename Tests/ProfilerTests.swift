@@ -113,7 +113,7 @@ class ProfilerTests: ProcedureKitTestCase {
         }
 
         validateProfileResult(result: result, after: now)
-        XCTAssertProcedureFinishedWithoutErrors()
+        XCTAssertProcedureFinishedWithoutErrors(group)
 
         XCTAssertEqual(result.children.count, 2)
         for child in result.children {

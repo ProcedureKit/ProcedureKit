@@ -135,13 +135,14 @@ open class ProcedureQueue: OperationQueue {
      */
     open weak var delegate: ProcedureQueueDelegate? = nil
 
+    // swiftlint:disable function_body_length
+    // swiftlint:disable cyclomatic_complexity
     /**
      Adds the operation to the queue. Subclasses which override this method must call this
      implementation as it is critical to how ProcedureKit function.
 
      - parameter op: an `Operation` instance.
      */
-    // swiftlint:disable function_body_length
     open func add(operation: Operation) {
 
         defer {
@@ -167,7 +168,8 @@ open class ProcedureQueue: OperationQueue {
 
         /// Add an observer so that any produced operations are added to the queue
         procedure.addWillAddOperationBlockObserver { [weak self] (procedure, operation) in
-            guard let queue = self else { return }
+            guard let queue = self, procedure !== operation else { return }
+            if let anotherProcedure = operation as? Procedure, anotherProcedure.isEnqueued { return }
             queue.delegate?.procedureQueue(queue, willAddOperation: operation)
             queue.add(operation: operation)
             procedure.queue(queue, didAddOperation: operation)
@@ -248,7 +250,7 @@ open class ProcedureQueue: OperationQueue {
 
         delegate?.procedureQueue(self, willAddOperation: procedure)
     }
-
+    // swiftlint:enable cyclomatic_complexity
     // swiftlint:enable function_body_length
 
 

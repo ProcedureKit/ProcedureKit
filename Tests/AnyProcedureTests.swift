@@ -45,6 +45,8 @@ class AnyProcedureTests: ProcedureKitTestCase {
 
     func test__any_procedure() {
         let anyProcedure = AnyProcedure(procedure)
+        anyProcedure.log.enabled = true
+        anyProcedure.log.severity = .verbose
         wait(for: anyProcedure)
         XCTAssertProcedureFinishedWithoutErrors(procedure)
         XCTAssertProcedureFinishedWithoutErrors(anyProcedure)

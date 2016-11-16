@@ -63,7 +63,7 @@ class GroupTests: GroupTestCase {
     func test_group_will_add_child_observer_is_called() {
         var blockCalledWith: (GroupProcedure, Operation)? = nil
         group = TestGroupProcedure(operations: [children[0]])
-        group.addWillAddChildBlockObserver { group, child in
+        group.addWillAddOperationBlockObserver { group, child in
             blockCalledWith = (group, child)
         }
         wait(for: group)
@@ -75,7 +75,7 @@ class GroupTests: GroupTestCase {
     func test_group_did_add_child_observer_is_called() {
         var blockCalledWith: (GroupProcedure, Operation)? = nil
         group = TestGroupProcedure(operations: [children[0]])
-        group.addDidAddChildBlockObserver { group, child in
+        group.addDidAddOperationBlockObserver { group, child in
             blockCalledWith = (group, child)
         }
         wait(for: group)
@@ -200,10 +200,10 @@ class GroupTests: GroupTestCase {
         otherQueue.delegate = group
 
         var observerCalledFromGroupDelegate = false
-        group.addWillAddChildBlockObserver { (group, child) in
+        group.addWillAddOperationBlockObserver { group, child in
             observerCalledFromGroupDelegate = true
         }
-        group.addDidAddChildBlockObserver { (group, child) in
+        group.addDidAddOperationBlockObserver { group, child in
             observerCalledFromGroupDelegate = true
         }
 

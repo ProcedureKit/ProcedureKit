@@ -109,19 +109,29 @@ open class Procedure: Operation, ProcedureProtocol {
         }
         set(newState) {
             _stateLock.withCriticalScope {
-                assert(_state.canTransition(to: newState, whenCancelled: isCancelled), "Attempting to perform illegal cyclic state transition, \(_state) -> \(newState) for operation: \(identity). Ensure that Procedure instances are added to a ProcedureQueue not an OperationQueue.")
                 log.verbose(message: "\(_state) -> \(newState)")
+                assert(_state.canTransition(to: newState, whenCancelled: isCancelled), "Attempting to perform illegal cyclic state transition, \(_state) -> \(newState) for operation: \(identity). Ensure that Procedure instances are added to a ProcedureQueue not an OperationQueue.")
                 _state = newState
             }
         }
     }
 
-    /// Boolean indicator for whether the Operation is currently executing or not
+    /// Boolean indicator for whether the Procedure has been enqueue
+    final public var isEnqueued: Bool {
+        return state >= .pending
+    }
+
+    /// Boolean indicator for whether the Procedure is pending
+    final public var isPending: Bool {
+        return state == .pending
+    }
+
+    /// Boolean indicator for whether the Procedure is currently executing or not
     final public override var isExecuting: Bool {
         return state == .executing
     }
 
-    /// Boolean indicator for whether the Operation has finished or not
+    /// Boolean indicator for whether the Procedure has finished or not
     final public override var isFinished: Bool {
         return state == .finished
     }

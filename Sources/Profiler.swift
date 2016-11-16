@@ -218,13 +218,6 @@ extension ProcedureProfiler: ProcedureObserver {
     }
 }
 
-extension ProcedureProfiler: GroupObserverProtocol {
-
-    public func group(_ group: GroupProcedure, willAdd: Operation) {
-        addChild(operation: willAdd)
-    }
-}
-
 // MARK: - Reporters
 struct PrintableProfileResult: CustomStringConvertible {
     let indentation: Int

@@ -38,7 +38,6 @@ open class GroupProcedure: Procedure, ProcedureQueueDelegate {
 
     fileprivate var groupErrors = Protector(GroupErrors())
     fileprivate var groupChildren: Protector<[Operation]>
-    fileprivate var groupProtectedObservers = Protector(Array<GroupObserverProtocol>())
     fileprivate var groupIsFinishing = false
     fileprivate var groupFinishLock = NSRecursiveLock()
     fileprivate var groupIsSuspended = false
@@ -180,7 +179,7 @@ open class GroupProcedure: Procedure, ProcedureQueueDelegate {
 
         guard shouldAddOperation else { return }
 
-        groupObservers.forEach { $0.group(self, willAdd: operation) }
+        observers.forEach { $0.procedure(self, willAdd: operation) }
 
         groupCanFinish.addDependency(operation)
 
@@ -188,7 +187,7 @@ open class GroupProcedure: Procedure, ProcedureQueueDelegate {
             groupIsAddingOperations.leave()
         }
 
-        groupObservers.forEach { $0.group(self, didAdd: operation) }
+        observers.forEach { $0.procedure(self, didAdd: operation) }
     }
 
     public func procedureQueue(_ queue: ProcedureQueue, willProduceOperation operation: Operation) {
@@ -647,67 +646,4 @@ public extension GroupProcedure {
     @available(*, unavailable, renamed: "add(children:)")
     func addOperations(additional: [Operation]) { }
 
-}
-
-// MARK: - GroupProcedure Observer
-
-public protocol GroupObserverProtocol {
-
-    func group(_ group: GroupProcedure, willAdd: Operation)
-
-    func group(_ group: GroupProcedure, didAdd: Operation)
-}
-
-public extension GroupObserverProtocol {
-
-    func group(_ group: GroupProcedure, willAdd: Operation) { }
-
-    func group(_ group: GroupProcedure, didAdd: Operation) { }
-}
-
-public struct GroupWillAddChildObserver: GroupObserverProtocol {
-    public typealias Block = (GroupProcedure, Operation) -> Void
-
-    private let block: Block
-
-    public init(willAddChild: @escaping Block) {
-        block = willAddChild
-    }
-
-    public func group(_ group: GroupProcedure, willAdd operation: Operation) {
-        block(group, operation)
-    }
-}
-
-public struct GroupDidAddChildObserver: GroupObserverProtocol {
-    public typealias Block = (GroupProcedure, Operation) -> Void
-
-    private let block: Block
-
-    public init(didAddChild: @escaping Block) {
-        block = didAddChild
-    }
-
-    public func group(_ group: GroupProcedure, didAdd operation: Operation) {
-        block(group, operation)
-    }
-}
-
-public extension GroupProcedure {
-
-    var groupObservers: [GroupObserverProtocol] {
-        return groupProtectedObservers.read { $0 }
-    }
-
-    func add(observer: GroupObserverProtocol) {
-        groupProtectedObservers.append(observer)
-    }
-
-    func addWillAddChildBlockObserver(block: @escaping GroupWillAddChildObserver.Block) {
-        add(observer: GroupWillAddChildObserver(willAddChild: block))
-    }
-
-    func addDidAddChildBlockObserver(block: @escaping GroupDidAddChildObserver.Block) {
-        add(observer: GroupDidAddChildObserver(didAddChild: block))
-    }
 }
