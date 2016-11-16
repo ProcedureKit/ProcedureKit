@@ -563,18 +563,15 @@ open class Procedure: Operation, ProcedureProtocol {
     public final override func waitUntilFinished() {
         fatalError("Waiting on operations is an anti-pattern. Remove this ONLY if you're absolutely sure there is No Other Way™. Post a question in https://github.com/danthorpe/Operations if you are unsure.")
     }
-}
 
-// MARK: Observers
-
-public extension Procedure {
+    // MARK: - Observers
 
     /**
      Add an observer to the procedure.
 
      - parameter observer: type conforming to protocol `ProcedureObserver`.
      */
-    func add<Observer: ProcedureObserver>(observer: Observer) where Observer.Procedure == Procedure {
+    open func add<Observer: ProcedureObserver>(observer: Observer) where Observer.Procedure == Procedure {
 
         procedureObservers.append(AnyObserver(base: observer))
 
