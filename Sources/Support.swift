@@ -27,16 +27,19 @@ protocol ReadWriteLock {
     mutating func write(_ block: @escaping () -> Void, completion: (() -> Void)?)
 }
 
+extension ReadWriteLock {
+
+    mutating func write(_ block: @escaping () -> Void) {
+        write(block, completion: nil)
+    }
+}
+
 struct Lock: ReadWriteLock {
 
     let queue = DispatchQueue.concurrent(label: "run.kit.procedure.ProcedureKit.Lock", qos: .userInitiated)
 
     mutating func read<T>(_ block: () throws -> T) rethrows -> T {
         return try queue.sync(execute: block)
-    }
-
-    mutating func write(_ block: @escaping () -> Void) {
-        queue.sync(execute: block)
     }
 
     mutating func write(_ block: @escaping () -> Void, completion: (() -> Void)?) {

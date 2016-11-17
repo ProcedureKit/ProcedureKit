@@ -443,9 +443,9 @@ public extension GroupProcedure {
     }
 
     public func append(fatalErrors errors: [Error]) {
-        groupErrors.write({ (ward: inout GroupErrors) in
+        groupErrors.write { (ward: inout GroupErrors) in
             ward.fatal.append(contentsOf: errors)
-        }, completion: { })
+        }
     }
 
     public func child(_ child: Operation, didEncounterFatalErrors errors: [Error]) {
@@ -454,9 +454,9 @@ public extension GroupProcedure {
     }
 
     public func child(_ child: Operation, didAttemptRecoveryFromErrors errors: [Error]) {
-        groupErrors.write({ (ward: inout GroupErrors) in
+        groupErrors.write { (ward: inout GroupErrors) in
             ward.attemptedRecovery[child] = errors
-        }, completion: { })
+        }
     }
 
     fileprivate var attemptedRecovery: GroupErrors.ByOperation {
@@ -466,19 +466,19 @@ public extension GroupProcedure {
     public func childDidRecoverFromErrors(_ child: Operation) {
         if let _ = attemptedRecovery[child] {
             log.notice(message: "successfully recovered from errors in \(child)")
-            groupErrors.write({ (ward: inout GroupErrors) in
+            groupErrors.write { (ward: inout GroupErrors) in
                 ward.attemptedRecovery.removeValue(forKey: child)
-            }, completion: { })
+            }
         }
     }
 
     public func childDidNotRecoverFromErrors(_ child: Operation) {
         log.notice(message: "failed to recover from errors in \(child)")
-        groupErrors.write({ (ward: inout GroupErrors) in
+        groupErrors.write { (ward: inout GroupErrors) in
             if let errors = ward.attemptedRecovery.removeValue(forKey: child) {
                 ward.fatal.append(contentsOf: errors)
             }
-        }, completion: { })
+        }
     }
 }
 
