@@ -10,14 +10,19 @@ import TestingProcedureKit
 
 class MutualExclusiveTests: ProcedureKitTestCase {
 
-    func test__mutual_eclusive_name() {
+    func test__mutual_exclusive_name() {
         let condition = MutuallyExclusive<Procedure>()
         XCTAssertEqual(condition.name, "MutuallyExclusive<Procedure>")
     }
 
+    func test__mutual_exclusive_category() {
+        let condition = MutuallyExclusive<Procedure>(category: "testing")
+        XCTAssertEqual(condition.category, "testing")
+    }
+
     func test__alert_presentation_is_mutually_exclusive() {
         let condition = MutuallyExclusive<Procedure>()
-        XCTAssertTrue(condition.mutuallyExclusive)
+        XCTAssertTrue(condition.isMutuallyExclusive)
     }
 
     func test__alert_presentation_evaluation_satisfied() {
@@ -69,7 +74,7 @@ class MutualExclusiveTests: ProcedureKitTestCase {
         }
         conditionDependency1.name = "Condition 1 Dependency"
 
-        let condition1 = TrueCondition(name: "Condition 1", mutuallyExclusive: true)
+        let condition1 = TrueCondition(name: "Condition 1", mutuallyExclusiveCategory: "Condition 1")
         condition1.add(dependency: conditionDependency1)
 
         let procedure1 = TestProcedure(name: "Procedure 1")
@@ -84,7 +89,7 @@ class MutualExclusiveTests: ProcedureKitTestCase {
         }
         conditionDependency2.name = "Condition 2 Dependency"
 
-        let condition2 = TrueCondition(name: "Condition 2", mutuallyExclusive: true)
+        let condition2 = TrueCondition(name: "Condition 2", mutuallyExclusiveCategory: "Condition 2")
         condition2.add(dependency: conditionDependency2)
 
         let procedure2 = TestProcedure()

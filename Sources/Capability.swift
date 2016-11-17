@@ -252,7 +252,7 @@ public class AuthorizedFor<Status: AuthorizationStatus>: Condition {
     public init<Base>(_ base: Base) where Base: CapabilityProtocol, Status == Base.Status {
         capability = AnyCapability(base)
         super.init()
-        mutuallyExclusive = true
+        mutuallyExclusiveCategory = String(describing: base)
         add(dependency: AuthorizeCapabilityProcedure(base))
     }
 

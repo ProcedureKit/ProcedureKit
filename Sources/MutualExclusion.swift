@@ -11,10 +11,10 @@
 public final class MutuallyExclusive<T>: Condition {
 
     /// Public constructor
-    public override init() {
+    public init(category: String = "MutuallyExclusive<\(T.self)>") {
         super.init()
         name = "MutuallyExclusive<\(T.self)>"
-        mutuallyExclusive = true
+        mutuallyExclusiveCategory = category
     }
 
     /// Required public override, but there is no evaluation, so it just completes with `.Satisfied`.
