@@ -360,34 +360,58 @@ public struct DidFinishObserver<Procedure: ProcedureProtocol>: ProcedureObserver
 
 public extension ProcedureProtocol {
 
+    /// Adds a WillExecuteObserver to the receiver using a provided block
+    ///
+    /// - Parameter block: the block which will be invoked before execute is called.
     func addWillExecuteBlockObserver(block: @escaping Observer<Self>.WillExecute) {
         add(observer: WillExecuteObserver(willExecute: block))
     }
 
+    /// Adds a DidExecuteObserver to the receiver using a provided block
+    ///
+    /// - Parameter block: the block which will be invoked after execute is called.
     func addDidExecuteBlockObserver(block: @escaping Observer<Self>.DidExecute) {
         add(observer: DidExecuteObserver(didExecute: block))
     }
 
+    /// Adds a WillCancelObserver to the receiver using a provided block
+    ///
+    /// - Parameter block: the block which will be invoked before the procedure cancels.
     func addWillCancelBlockObserver(block: @escaping Observer<Self>.WillCancel) {
         add(observer: WillCancelObserver(willCancel: block))
     }
 
+    /// Adds a DidCancelObserver to the receiver using a provided block
+    ///
+    /// - Parameter block: the block which will be invoked after the procedure cancels.
     func addDidCancelBlockObserver(block: @escaping Observer<Self>.DidCancel) {
         add(observer: DidCancelObserver(didCancel: block))
     }
 
+    /// Adds a WillAddOperationObserver to the receiver using a provided block
+    ///
+    /// - Parameter block: the block which will be invoked before the procedure adds another operation.
     func addWillAddOperationBlockObserver(block: @escaping Observer<Self>.WillAdd) {
         add(observer: WillAddOperationObserver(willAdd: block))
     }
 
+    /// Adds a DidAddOperationObserver to the receiver using a provided block
+    ///
+    /// - Parameter block: the block which will be invoked after the procedure adds another operation.
     func addDidAddOperationBlockObserver(block: @escaping Observer<Self>.DidAdd) {
         add(observer: DidAddOperationObserver(didAdd: block))
     }
 
+    /// Adds a WillFinishObserver to the receiver using a provided block
+    ///
+    /// - Parameter block: the block which will be invoked before the procedure finishes.
     func addWillFinishBlockObserver(block: @escaping Observer<Self>.WillFinish) {
         add(observer: WillFinishObserver(willFinish: block))
     }
 
+    /// Adds a DidFinishObserver to the receiver using a provided block
+    ///
+    /// - Parameter block: the block which will be invoked after the procedure has finished.
     func addDidFinishBlockObserver(block: @escaping Observer<Self>.DidFinish) {
         add(observer: DidFinishObserver(didFinish: block))
     }
