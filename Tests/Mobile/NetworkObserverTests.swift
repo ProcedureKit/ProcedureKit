@@ -146,10 +146,15 @@ class NetworkObserverTests: ProcedureKitTestCase {
         addCompletionBlockTo(procedure: procedure3)
 
         procedure1.addDidFinishBlockObserver { procedure, _ in
-            procedure.produce(operation: delayForProcedure2)
-            procedure.produce(operation: procedure2)
-            procedure.produce(operation: delayForProcedure3)
-            procedure.produce(operation: procedure3)
+            do {
+                try procedure.produce(operation: delayForProcedure2)
+                try procedure.produce(operation: procedure2)
+                try procedure.produce(operation: delayForProcedure3)
+                try procedure.produce(operation: procedure3)
+            }
+            catch {
+                fatalError("\(error)")
+            }
         }
 
         // wait until all procedures have finished and the timer has invalidated the network indicator
