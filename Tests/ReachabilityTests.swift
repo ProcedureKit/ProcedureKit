@@ -109,7 +109,6 @@ class SCNetworkReachabilityFlagsTests: XCTestCase {
     }
 }
 
-
 class NetworkStatusTests: XCTestCase {
     typealias Status = Reachability.NetworkStatus
 

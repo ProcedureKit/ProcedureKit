@@ -47,6 +47,8 @@ public protocol NetworkReachability {
 
     weak var delegate: NetworkReachabilityDelegate? { get set }
 
+    var log: LoggerProtocol { get }
+
     func startNotifier(onQueue queue: DispatchQueue) throws
 
     func stopNotifier()

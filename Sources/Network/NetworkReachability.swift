@@ -13,16 +13,12 @@ extension Reachability {
     final class Manager {
         typealias Status = NetworkStatus
 
-        let queue = DispatchQueue(label: "run.kit.ProcedureKit.Reachability")
+        let queue = DispatchQueue(label: "run.kit.ProcedureKit.Network.Reachability")
         var network: NetworkReachability
         fileprivate var protectedObservers = Protector(Array<Observer>())
 
         var observers: [Observer] {
             return protectedObservers.access
-        }
-
-        var count: Int {
-            return observers.count
         }
 
         init(_ network: NetworkReachability) {
@@ -39,17 +35,28 @@ extension Reachability.Manager: NetworkReachabilityDelegate {
         let observersToCheck = observers
 
         protectedObservers.write { (observers: inout Array<Reachability.Observer>) in
-            observers = observersToCheck.filter { observer in
+
+            var observersToBeRemoved = Array<Reachability.Observer>()
+
+            let newObservers = observersToCheck.filter { observer in
                 let shouldRemove = status.isConnected(via: observer.connectivity)
                 if shouldRemove {
-                    DispatchQueue.main.async(execute: observer.didConnectBlock)
+                    observersToBeRemoved.append(observer)
                 }
-                return shouldRemove
+                return !shouldRemove
             }
-        }
 
-        if count == 0 {
-            network.stopNotifier()
+            if newObservers.count == 0 {
+                self.network.stopNotifier()
+            }
+
+            if observersToBeRemoved.count > 0 {
+                observersToBeRemoved.forEach {
+                    DispatchQueue.main.async(execute: $0.didConnectBlock)
+                }
+            }
+
+            observers = newObservers
         }
     }
 }
@@ -88,9 +95,11 @@ class DeviceReachability: NetworkReachability {
         return reachability
     }
 
-    fileprivate let defaultRouteReachability: SCNetworkReachability
-    fileprivate var threadSafeProtector = Protector(false)
+    internal let defaultRouteReachability: SCNetworkReachability
+    fileprivate private(set) var threadSafeProtector = Protector(false)
     weak var delegate: NetworkReachabilityDelegate?
+
+    var log: LoggerProtocol
 
     var notifierIsRunning: Bool {
         get { return threadSafeProtector.access }
@@ -101,8 +110,9 @@ class DeviceReachability: NetworkReachability {
         }
     }
 
-    init() throws {
+    init(log logger: LoggerProtocol = Logger()) throws {
         defaultRouteReachability = try DeviceReachability.makeDefaultRouteReachability()
+        log = logger
     }
 
     func getFlags(forReachability reachability: SCNetworkReachability) -> SCNetworkReachabilityFlags {

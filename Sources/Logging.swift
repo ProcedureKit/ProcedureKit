@@ -324,23 +324,23 @@ internal struct LoggerContext: LoggerProtocol {
     }
 }
 
-internal struct _Logger<M: LogManagerProtocol>: LoggerProtocol {
+public struct _Logger<M: LogManagerProtocol>: LoggerProtocol {
 
     typealias Manager = M
 
-    var severity: LogSeverity
+    public var severity: LogSeverity
 
-    var enabled: Bool
+    public var enabled: Bool
 
-    var logger: LoggerBlockType
+    public var logger: LoggerBlockType
 
-    var operationName: String? = nil
+    public var operationName: String? = nil
 
-    init(severity: LogSeverity = Manager.severity, enabled: Bool = Manager.enabled, logger: @escaping LoggerBlockType = Manager.logger) {
+    public init(severity: LogSeverity = Manager.severity, enabled: Bool = Manager.enabled, logger: @escaping LoggerBlockType = Manager.logger) {
         self.severity = severity
         self.enabled = enabled
         self.logger = logger
     }
 }
 
-internal typealias Logger = _Logger<LogManager>
+public typealias Logger = _Logger<LogManager>

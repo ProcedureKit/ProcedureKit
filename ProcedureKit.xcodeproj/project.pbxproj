@@ -1227,11 +1227,11 @@
 			children = (
 				65ECB2F31DB5097500F96F46 /* NetworkDataProcedureTests.swift */,
 				0B795A8D1DC9EE2E00E03CE8 /* NetworkDownloadProcedureTests.swift */,
+				658B14571DDE009300D63100 /* NetworkReachabilityTests.swift */,
 				0B15EDEA1DCA13810060D2D7 /* NetworkUploadProcedureTests.swift */,
 				65ECB2E61DB4F16E00F96F46 /* ProcedureKitNetworkTests.swift */,
 				65DFA4A81DBBC0B0009358CE /* ResilientNetworkProcedureTests.swift */,
 				65DFA4841DB514DD009358CE /* URLTests.swift */,
-				658B14571DDE009300D63100 /* NetworkReachabilityTests.swift */,
 			);
 			name = "Network Tests";
 			path = Tests/Network;
