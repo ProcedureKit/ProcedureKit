@@ -31,15 +31,19 @@ public extension ConditionResult {
 
 public protocol ConditionProtocol: ProcedureProtocol {
 
-    var mutuallyExclusive: Bool { get set }
+    var mutuallyExclusiveCategory: String? { get }
 
     func evaluate(procedure: Procedure, completion: @escaping (ConditionResult) -> Void)
 }
 
-internal extension ConditionProtocol {
+public extension ConditionProtocol {
+
+    var isMutuallyExclusive: Bool {
+        return mutuallyExclusiveCategory != nil
+    }
 
     var category: String {
-        return String(describing: type(of: self))
+        return mutuallyExclusiveCategory ?? String(describing: type(of: self))
     }
 }
 
@@ -73,7 +77,7 @@ public extension ProcedureKitError {
 
 open class Condition: Procedure, ConditionProtocol {
 
-    public var mutuallyExclusive: Bool = false
+    public var mutuallyExclusiveCategory: String? = nil
 
     internal weak var procedure: Procedure? = nil {
         didSet {
@@ -108,10 +112,10 @@ open class Condition: Procedure, ConditionProtocol {
 
 public class TrueCondition: Condition {
 
-    public init(name: String = "TrueCondition", mutuallyExclusive: Bool = false) {
+    public init(name: String = "TrueCondition", mutuallyExclusiveCategory: String? = nil) {
         super.init()
         self.name = name
-        self.mutuallyExclusive = mutuallyExclusive
+        self.mutuallyExclusiveCategory = mutuallyExclusiveCategory
     }
 
     public override func evaluate(procedure: Procedure, completion: @escaping (ConditionResult) -> Void) {
@@ -121,10 +125,10 @@ public class TrueCondition: Condition {
 
 public class FalseCondition: Condition {
 
-    public init(name: String = "FalseCondition", mutuallyExclusive: Bool = false) {
+    public init(name: String = "FalseCondition", mutuallyExclusiveCategory: String? = nil) {
         super.init()
         self.name = name
-        self.mutuallyExclusive = mutuallyExclusive
+        self.mutuallyExclusiveCategory = mutuallyExclusiveCategory
     }
 
     public override func evaluate(procedure: Procedure, completion: @escaping (ConditionResult) -> Void) {
@@ -170,7 +174,7 @@ open class ComposedCondition<C: Condition>: Condition {
     public init(_ condition: C) {
         self.condition = condition
         super.init()
-        mutuallyExclusive = condition.mutuallyExclusive
+        mutuallyExclusiveCategory = condition.mutuallyExclusiveCategory
         name = condition.name
         inject(dependency: condition) { procedure, condition, _ in
             procedure.requirement = condition.result

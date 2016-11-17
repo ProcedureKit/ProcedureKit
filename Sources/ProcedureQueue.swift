@@ -195,7 +195,7 @@ open class ProcedureQueue: OperationQueue {
             /// Check for mutual exclusion conditions
             let manager = ExclusivityManager.sharedInstance
 
-            let mutuallyExclusiveConditions = procedure.conditions.filter { $0.mutuallyExclusive }
+            let mutuallyExclusiveConditions = procedure.conditions.filter { $0.isMutuallyExclusive }
             var previousMutuallyExclusiveOperations = Set<Operation>()
 
             for condition in mutuallyExclusiveConditions {

@@ -65,7 +65,16 @@ class AuthorizeTests: TestableCapabilityTestCase {
 class AuthorizedForTests: TestableCapabilityTestCase {
 
     func test__is_mututally_exclusive() {
-        XCTAssertTrue(authorizedFor.mutuallyExclusive)
+        XCTAssertTrue(authorizedFor.isMutuallyExclusive)
+    }
+
+    func test__default_mututally_exclusive_category() {
+        XCTAssertEqual(authorizedFor.category, "TestableCapability")
+    }
+
+    func test__custom_mututally_exclusive_category() {
+        authorizedFor = AuthorizedFor(capability, category: "testing")
+        XCTAssertEqual(authorizedFor.category, "testing")
     }
 
     func test__has_authorize_dependency() {
