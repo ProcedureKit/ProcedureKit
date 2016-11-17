@@ -13,6 +13,8 @@ extension Reachability {
     final class Manager {
         typealias Status = NetworkStatus
 
+        static let shared = Reachability.Manager(DeviceReachability())
+
         let queue = DispatchQueue(label: "run.kit.ProcedureKit.Network.Reachability")
         var network: NetworkReachability
         fileprivate var protectedObservers = Protector(Array<Observer>())
@@ -110,8 +112,8 @@ class DeviceReachability: NetworkReachability {
         }
     }
 
-    init(log logger: LoggerProtocol = Logger()) throws {
-        defaultRouteReachability = try DeviceReachability.makeDefaultRouteReachability()
+    init(log logger: LoggerProtocol = Logger()) {
+        defaultRouteReachability = try! DeviceReachability.makeDefaultRouteReachability() // swiftlint:disable:this force_try
         log = logger
     }
 

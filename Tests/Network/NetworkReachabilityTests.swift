@@ -58,10 +58,7 @@ class DeviceReachabilityTests: XCTestCase, NetworkReachabilityDelegate {
     override func setUp() {
         super.setUp()
         queue = DispatchQueue(label: "run.kit.ProcedureKit.Network.Reachability.Testing")
-        do {
-            device = try DeviceReachability()
-        }
-        catch { XCTFail("DeviceReachability threw error: \(error)") }
+        device = DeviceReachability()
         device.delegate = self
     }
 
