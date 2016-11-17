@@ -29,7 +29,7 @@ public struct ProcedureKitError: Error, Equatable {
 
         public static func == (lhs: Context, rhs: Context) -> Bool {
             switch (lhs, rhs) {
-            case (.unknown, .unknown), (.dependencyFinishedWithErrors, .dependencyFinishedWithErrors), (.parentCancelledWithErrors, .parentCancelledWithErrors), (.requirementNotSatisfied, .requirementNotSatisfied):
+            case (.unknown, .unknown), (.dependencyFinishedWithErrors, .dependencyFinishedWithErrors), (.parentCancelledWithErrors, .parentCancelledWithErrors), (.requirementNotSatisfied, .requirementNotSatisfied), (.noQueue, .noQueue):
                 return true
             case let (.programmingError(lhs), .programmingError(rhs)):
                 return lhs == rhs
@@ -54,6 +54,7 @@ public struct ProcedureKitError: Error, Equatable {
         case parentCancelledWithErrors
         case requirementNotSatisfied
         case capability(CapabilityError)
+        case noQueue
     }
 
     public static let unknown = ProcedureKitError(context: .unknown, errors: [])
@@ -104,6 +105,10 @@ public struct ProcedureKitError: Error, Equatable {
 
     public static func component(_ component: ProcedureKitComponent, error: Error) -> ProcedureKitError {
         return ProcedureKitError(context: .component(component), errors: [error])
+    }
+
+    public static func noQueue() -> ProcedureKitError {
+        return ProcedureKitError(context: .noQueue, errors: [])
     }
 
     public let context: Context

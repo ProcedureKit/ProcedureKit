@@ -81,6 +81,8 @@ open class Procedure: Operation, ProcedureProtocol {
 
     fileprivate let isAutomaticFinishingDisabled: Bool
 
+    private weak var queue: ProcedureQueue?
+
     /**
      Expresses the user intent in regards to the execution of this Procedure.
 
@@ -290,8 +292,9 @@ open class Procedure: Operation, ProcedureProtocol {
     }
 
 
-    public func willEnqueue() {
+    public func willEnqueue(on queue: ProcedureQueue) {
         state = .pending
+        self.queue = queue
     }
 
     /// Starts the operation, correctly managing the cancelled state. Cannot be over-ridden
@@ -395,10 +398,21 @@ open class Procedure: Operation, ProcedureProtocol {
         finish()
     }
 
-    public final func produce(operation: Operation) {
+    public final func produce(operation: Operation) throws {
         precondition(state > .initialized, "Cannot add operation which is not being scheduled on a queue")
+        guard let queue = queue else {
+            throw ProcedureKitError.noQueue()
+        }
+
+        queue.delegate?.procedureQueue(queue, willProduceOperation: operation)
+
         log.notice(message: "Will add \(operation.operationName)")
+
         observers.forEach { $0.procedure(self, willAdd: operation) }
+
+        queue.add(operation: operation)
+
+        observers.forEach { $0.procedure(self, didAdd: operation) }
     }
 
     internal func queue(_ queue: ProcedureQueue, didAddOperation operation: Operation) {

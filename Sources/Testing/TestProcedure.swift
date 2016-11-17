@@ -45,7 +45,7 @@ open class TestProcedure: Procedure, ResultInjection {
 
         if let operation = producedOperation {
             DispatchQueue.main.asyncAfter(deadline: .now() + (delay / 2.0)) {
-                self.produce(operation: operation)
+                try! self.produce(operation: operation)
             }
         }
 
