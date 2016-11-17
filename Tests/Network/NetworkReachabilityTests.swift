@@ -19,13 +19,11 @@ class ReachabilityManagerTests: ProcedureKitTestCase {
         super.setUp()
         network = TestableNetworkReachability()
         manager = Reachability.Manager(network)
-        LogManager.severity = .notice
     }
 
     override func tearDown() {
         network = nil
         manager = nil
-        LogManager.severity = .warning
         super.tearDown()
     }
 

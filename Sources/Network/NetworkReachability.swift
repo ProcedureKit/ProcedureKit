@@ -33,6 +33,8 @@ extension Reachability {
 extension Reachability.Manager: NetworkReachabilityDelegate {
 
     func didChangeReachability(flags: SCNetworkReachabilityFlags) {
+        guard observers.count > 0 else { return }
+
         let status = Status(flags: flags)
         let observersToCheck = observers
 
