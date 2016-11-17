@@ -22,7 +22,7 @@ open class NetworkUploadProcedure<Session: URLSessionTaskFactory>: Procedure, Re
     public init(session: Session, request: URLRequest? = nil, data: Data? = nil, completionHandler: @escaping (HTTPResult<Data>) -> Void = { _ in }) {
 
         self.session = session
-        self.requirement = request.flatMap { .ready(HTTPRequirement(payload: data, request: $0)) } ?? .pending
+        self.requirement = request.flatMap { .ready(HTTPRequirement(request: $0, payload: data)) } ?? .pending
         self.completion = completionHandler
 
         super.init()
