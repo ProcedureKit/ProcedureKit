@@ -67,7 +67,7 @@ extension Reachability.Manager: NetworkReachabilityDelegate {
 
 extension Reachability.Manager: SystemReachability {
 
-    func whenConnected(via connectivity: Reachability.Connectivity, block: @escaping () -> Void) {
+    func whenReachable(via connectivity: Reachability.Connectivity, block: @escaping () -> Void) {
         protectedObservers.write({ (observers: inout Array<Reachability.Observer>) in
             let observer = Reachability.Observer(connectivity: connectivity, didConnectBlock: block)
             observers.append(observer)
@@ -81,13 +81,17 @@ extension Reachability.Manager: SystemReachability {
             }
         })
     }
+
+    func reachability(of: URL, block: @escaping (Reachability.NetworkStatus) -> Void) {
+
+    }
 }
 
 // MARK: - Device Reachability
 
 extension Reachability {
 
-    class Device {
+    final class Device {
 
         static func makeDefaultRouteReachability() throws -> SCNetworkReachability {
             var zeroAddress = sockaddr()
@@ -117,28 +121,17 @@ extension Reachability {
         }
 
         init(log logger: LoggerProtocol = Logger()) {
-            defaultRouteReachability = try! DeviceReachability.makeDefaultRouteReachability() // swiftlint:disable:this force_try
+            defaultRouteReachability = try! Device.makeDefaultRouteReachability() // swiftlint:disable:this force_try
             log = logger
         }
 
         deinit {
             stopNotifier()
         }
-
-        func getFlags(forReachability reachability: SCNetworkReachability) -> SCNetworkReachabilityFlags {
-            var flags = SCNetworkReachabilityFlags()
-            guard withUnsafeMutablePointer(to: &flags, {
-                SCNetworkReachabilityGetFlags(reachability, UnsafeMutablePointer($0))
-            }) else { return SCNetworkReachabilityFlags() }
-
-            return flags
-        }
-
     }
 }
 
 extension Reachability.Device: NetworkReachability {
-
 
     func getFlags(forReachability reachability: SCNetworkReachability) -> SCNetworkReachabilityFlags {
         var flags = SCNetworkReachabilityFlags()
@@ -192,7 +185,7 @@ extension Reachability.Device: NetworkReachability {
 
 private func __device_reachability_callback(reachability: SCNetworkReachability, flags: SCNetworkReachabilityFlags, info: UnsafeMutableRawPointer?) {
     guard let info = info else { return }
-    let deviceReachability = Unmanaged<DeviceReachability>.fromOpaque(info).takeUnretainedValue()
+    let deviceReachability = Unmanaged<Reachability.Device>.fromOpaque(info).takeUnretainedValue()
     DispatchQueue.main.async {
         deviceReachability.didChangeReachability(flags: flags)
     }

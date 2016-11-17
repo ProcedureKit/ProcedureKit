@@ -53,12 +53,14 @@ public protocol NetworkReachability {
 
     func stopNotifier()
 
-    //    func reachabilityFlags(forHost: String) -> SCNetworkReachabilityFlags?
+    //func reachabilityFlags(of: URL) -> SCNetworkReachabilityFlags?
 }
 
 public protocol SystemReachability {
 
-    func whenConnected(via: Reachability.Connectivity, block: @escaping () -> Void)
+    func whenReachable(via: Reachability.Connectivity, block: @escaping () -> Void)
+
+    func reachability(of: URL, block: @escaping (Reachability.NetworkStatus) -> Void)
 }
 
 

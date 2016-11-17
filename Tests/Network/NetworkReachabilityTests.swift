@@ -35,7 +35,7 @@ class ReachabilityManagerTests: ProcedureKitTestCase {
         var didRunBlock = false
         let exp = expectation(description: "Test: \(#function)")
 
-        manager.whenConnected(via: .any) {
+        manager.whenReachable(via: .any) {
             didRunBlock = true
             exp.fulfill()
         }
@@ -49,14 +49,14 @@ class ReachabilityManagerTests: ProcedureKitTestCase {
 class DeviceReachabilityTests: XCTestCase, NetworkReachabilityDelegate {
 
     var queue: DispatchQueue!
-    var device: DeviceReachability!
+    var device: Reachability.Device!
     var testExpectation: XCTestExpectation? = nil
     var delegateDidReceiveFlags: SCNetworkReachabilityFlags? = nil
 
     override func setUp() {
         super.setUp()
         queue = DispatchQueue(label: "run.kit.ProcedureKit.Network.Reachability.Testing")
-        device = DeviceReachability()
+        device = Reachability.Device()
         device.delegate = self
     }
 

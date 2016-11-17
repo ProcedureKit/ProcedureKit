@@ -8,4 +8,11 @@ disabled_rules:
 file_length:
   warning: 500
   error: 1200
-  
+variable_name:
+  excluded:
+    - id
+    - URL
+    - of
+    - in
+    - x
+    - y  
