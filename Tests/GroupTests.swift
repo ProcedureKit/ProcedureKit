@@ -219,10 +219,12 @@ class GroupTests: GroupTestCase {
     // MARK: - Child Produce Operation Tests
 
     func test__child_can_produce_operation() {
-        let producedOperation = TestProcedure(delay: 0.05)
-        let child = TestProcedure(delay: 0.05, produced: producedOperation)
+        let producedOperation = TestProcedure(name: "ProducedOperation", delay: 0.05)
+        let child = TestProcedure(name: "Child", delay: 0.05, produced: producedOperation)
+        addCompletionBlockTo(procedure: child)
+        addCompletionBlockTo(procedure: producedOperation)
         group = TestGroupProcedure(operations: child)
-        wait(for: group, child, producedOperation)
+        wait(for: group)
         XCTAssertProcedureFinishedWithoutErrors(group)
         XCTAssertProcedureFinishedWithoutErrors(child)
         XCTAssertProcedureFinishedWithoutErrors(producedOperation)
