@@ -9,7 +9,7 @@
  URLSession based APIs. It only supports the completion block style API, therefore
  do not use this procedure if you wish to use delegate based APIs on URLSession.
 */
-open class NetworkDataProcedure<Session: URLSessionTaskFactory>: Procedure, ResultInjection {
+open class NetworkDataProcedure<Session: URLSessionTaskFactory>: Procedure, ResultInjection, NetworkOperation {
 
     public var requirement: PendingValue<URLRequest> = .pending
     public var result: PendingValue<HTTPResult<Data>> = .pending
@@ -18,6 +18,10 @@ open class NetworkDataProcedure<Session: URLSessionTaskFactory>: Procedure, Resu
     public let completion: (HTTPResult<Data>) -> Void
 
     internal var task: Session.DataTask? = nil
+
+    public var networkError: ProcedureKitNetworkError? {
+        return errors.flatMap { $0 as? ProcedureKitNetworkError }.first
+    }
 
     public init(session: Session, request: URLRequest? = nil, completionHandler: @escaping (HTTPResult<Data>) -> Void = { _ in }) {
         self.session = session
@@ -39,7 +43,7 @@ open class NetworkDataProcedure<Session: URLSessionTaskFactory>: Procedure, Resu
             guard let strongSelf = self else { return }
 
             if let error = error {
-                strongSelf.finish(withError: error)
+                strongSelf.finish(withError: ProcedureKitNetworkError(error as NSError))
                 return
             }
 

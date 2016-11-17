@@ -9,7 +9,7 @@
  URLSession based APIs. It only supports the completion block style API, therefore
  do not use this procedure if you wish to use delegate based APIs on URLSession.
  */
-open class NetworkDownloadProcedure<Session: URLSessionTaskFactory>: Procedure, ResultInjection {
+open class NetworkDownloadProcedure<Session: URLSessionTaskFactory>: Procedure, ResultInjection, NetworkOperation {
 
     public var requirement: PendingValue<URLRequest> = .pending
     public var result: PendingValue<HTTPResult<URL>> = .pending
@@ -17,7 +17,11 @@ open class NetworkDownloadProcedure<Session: URLSessionTaskFactory>: Procedure, 
     public private(set) var session: Session
     public let completion: (HTTPResult<URL>) -> Void
 
-     internal var task: Session.DownloadTask? = nil
+    internal var task: Session.DownloadTask? = nil
+
+    public var networkError: ProcedureKitNetworkError? {
+        return errors.flatMap { $0 as? ProcedureKitNetworkError }.first
+    }
 
     public init(session: Session, request: URLRequest? = nil, completionHandler: @escaping (HTTPResult<URL>) -> Void = {_ in }) {
 
@@ -41,7 +45,7 @@ open class NetworkDownloadProcedure<Session: URLSessionTaskFactory>: Procedure, 
             guard let strongSelf = self else { return }
 
             if let error = error {
-                strongSelf.finish(withError: error)
+                strongSelf.finish(withError: ProcedureKitNetworkError(error as NSError))
                 return
             }
 

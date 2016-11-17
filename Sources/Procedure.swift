@@ -669,7 +669,11 @@ extension Procedure {
 
         func createEvaluateConditionsProcedure() -> EvaluateConditions {
             // Set the procedure on each condition
-            conditions.forEach { $0.procedure = self }
+            conditions.forEach {
+                $0.procedure = self
+                $0.log.enabled = self.log.enabled
+                $0.log.severity = self.log.severity
+            }
 
             let evaluator = EvaluateConditions(conditions: conditions)
             evaluator.name = "\(operationName) Evaluate Conditions"

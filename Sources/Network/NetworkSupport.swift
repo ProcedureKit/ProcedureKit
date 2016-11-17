@@ -70,3 +70,34 @@ public struct HTTPRequirement<Payload: Equatable>: Equatable {
     public var request: URLRequest
     public var payload: Payload?
 }
+
+public struct ProcedureKitNetworkError: Error {
+    public let underlyingError: NSError
+
+    public var isTransientError: Bool {
+        switch underlyingError.code {
+        case NSURLErrorNetworkConnectionLost:
+            return true
+        default:
+            return false
+        }
+    }
+
+    public var waitForReachabilityChangeBeforeRetrying: Bool {
+        switch underlyingError.code {
+        case NSURLErrorNotConnectedToInternet, NSURLErrorInternationalRoamingOff, NSURLErrorCallIsActive, NSURLErrorDataNotAllowed:
+            return true
+        default:
+            return false
+        }
+    }
+
+    public init(_ error: NSError) {
+        underlyingError = error
+    }
+}
+
+public protocol NetworkOperation {
+
+    var networkError: ProcedureKitNetworkError? { get }
+}

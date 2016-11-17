@@ -61,6 +61,10 @@ public class Protector<T> {
         self.ward = ward
     }
 
+    public var access: T {
+        return read { $0 }
+    }
+
     public func read<U>(_ block: @escaping (T) -> U) -> U {
         return lock.read { [unowned self] in block(self.ward) }
     }
@@ -88,7 +92,6 @@ public extension Protector where T: RangeReplaceableCollection {
         }
     }
 }
-
 
 internal extension NSLock {
 

@@ -27,6 +27,14 @@ class NetworkUploadProcedureTests: ProcedureKitTestCase {
         upload = NetworkUploadProcedure(session: session, request: request, data: sendingData)
     }
 
+    override func tearDown() {
+        url = nil
+        request = nil
+        session = nil
+        upload = nil
+        super.tearDown()
+    }
+
     func test__session_receives_request() {
         wait(for: upload)
         XCTAssertProcedureFinishedWithoutErrors(upload)
@@ -72,10 +80,10 @@ class NetworkUploadProcedureTests: ProcedureKitTestCase {
     }
 
     func test__session_error__finishes_with_error() {
-        session.returnedError = TestError()
+        session.returnedError = NSError(domain: NSURLErrorDomain, code: NSURLErrorNotConnectedToInternet, userInfo: nil)
         wait(for: upload)
         XCTAssertProcedureFinishedWithErrors(upload, count: 1)
-        XCTAssertEqual(upload.errors.first as? TestError, session.returnedError as? TestError)
+        XCTAssertNotNil(upload.networkError)
     }
 
     func test__completion_handler_receives_data_and_response() {
