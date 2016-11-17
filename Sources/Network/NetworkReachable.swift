@@ -18,9 +18,7 @@ class NetworkReachabilityWaitProcedure: Procedure {
     }
 
     override func execute() {
-        reachability.whenConnected(via: connectivity) { [weak self] in
-            self?.finish()
-        }
+        reachability.whenConnected(via: connectivity) { [weak self] in self?.finish() }
     }
 }
 

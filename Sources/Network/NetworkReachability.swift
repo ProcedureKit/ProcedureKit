@@ -119,6 +119,10 @@ class DeviceReachability: NetworkReachability {
         log = logger
     }
 
+    deinit {
+        stopNotifier()
+    }
+
     func getFlags(forReachability reachability: SCNetworkReachability) -> SCNetworkReachabilityFlags {
         var flags = SCNetworkReachabilityFlags()
         guard withUnsafeMutablePointer(to: &flags, {
