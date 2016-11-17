@@ -13,7 +13,7 @@ extension Reachability {
     final class Manager {
         typealias Status = NetworkStatus
 
-        static let shared = Reachability.Manager(DeviceReachability())
+        static let shared = Reachability.Manager(Device())
 
         let queue = DispatchQueue(label: "run.kit.ProcedureKit.Network.Reachability")
         var network: NetworkReachability
@@ -85,43 +85,60 @@ extension Reachability.Manager: SystemReachability {
 
 // MARK: - Device Reachability
 
-class DeviceReachability: NetworkReachability {
+extension Reachability {
 
-    static func makeDefaultRouteReachability() throws -> SCNetworkReachability {
-        var zeroAddress = sockaddr()
-        zeroAddress.sa_len = UInt8(MemoryLayout<sockaddr>.size)
-        zeroAddress.sa_family = sa_family_t(AF_INET)
+    class Device {
 
-        guard let reachability: SCNetworkReachability = withUnsafePointer(to: &zeroAddress, {
-            SCNetworkReachabilityCreateWithAddress(nil, UnsafePointer($0))
-        }) else { throw ReachabilityError.failedToCreateDefaultRouteReachability }
+        static func makeDefaultRouteReachability() throws -> SCNetworkReachability {
+            var zeroAddress = sockaddr()
+            zeroAddress.sa_len = UInt8(MemoryLayout<sockaddr>.size)
+            zeroAddress.sa_family = sa_family_t(AF_INET)
 
-        return reachability
-    }
+            guard let reachability: SCNetworkReachability = withUnsafePointer(to: &zeroAddress, {
+                SCNetworkReachabilityCreateWithAddress(nil, UnsafePointer($0))
+            }) else { throw ReachabilityError.failedToCreateDefaultRouteReachability }
 
-    internal let defaultRouteReachability: SCNetworkReachability
-    fileprivate private(set) var threadSafeProtector = Protector(false)
-    weak var delegate: NetworkReachabilityDelegate?
+            return reachability
+        }
 
-    var log: LoggerProtocol
+        internal let defaultRouteReachability: SCNetworkReachability
+        fileprivate private(set) var threadSafeProtector = Protector(false)
+        weak var delegate: NetworkReachabilityDelegate?
 
-    var notifierIsRunning: Bool {
-        get { return threadSafeProtector.access }
-        set {
-            threadSafeProtector.write { (isRunning: inout Bool) in
-                isRunning = newValue
+        var log: LoggerProtocol
+
+        var notifierIsRunning: Bool {
+            get { return threadSafeProtector.access }
+            set {
+                threadSafeProtector.write { (isRunning: inout Bool) in
+                    isRunning = newValue
+                }
             }
         }
-    }
 
-    init(log logger: LoggerProtocol = Logger()) {
-        defaultRouteReachability = try! DeviceReachability.makeDefaultRouteReachability() // swiftlint:disable:this force_try
-        log = logger
-    }
+        init(log logger: LoggerProtocol = Logger()) {
+            defaultRouteReachability = try! DeviceReachability.makeDefaultRouteReachability() // swiftlint:disable:this force_try
+            log = logger
+        }
 
-    deinit {
-        stopNotifier()
+        deinit {
+            stopNotifier()
+        }
+
+        func getFlags(forReachability reachability: SCNetworkReachability) -> SCNetworkReachabilityFlags {
+            var flags = SCNetworkReachabilityFlags()
+            guard withUnsafeMutablePointer(to: &flags, {
+                SCNetworkReachabilityGetFlags(reachability, UnsafeMutablePointer($0))
+            }) else { return SCNetworkReachabilityFlags() }
+
+            return flags
+        }
+
     }
+}
+
+extension Reachability.Device: NetworkReachability {
+
 
     func getFlags(forReachability reachability: SCNetworkReachability) -> SCNetworkReachabilityFlags {
         var flags = SCNetworkReachabilityFlags()
