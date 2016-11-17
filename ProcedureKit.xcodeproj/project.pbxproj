@@ -914,6 +914,7 @@
 				6583F95E1D8C4C7F00000A8D /* NoFailedDependenciesConditionTests.swift */,
 				653C9FE81D6099F10070B7A2 /* ProcedureKitTests.swift */,
 				65245D1C1D721A7100340A2D /* ProcedureTests.swift */,
+				0B7922301DCCD88A000AC3CA /* ProfilerTests.swift */,
 				6594840F1DA98E700028F83B /* ReduceProcedureTests.swift */,
 				655594F01D9E482D00B08990 /* RepeatProcedureTests.swift */,
 				65403ABD1D7C9E7600D6036B /* ResultInjectionTests.swift */,
@@ -921,7 +922,6 @@
 				652AFD3C1D8C628500793AF3 /* SilentConditionTests.swift */,
 				65EAC0151D8CA78F000E4A42 /* TimeoutObserverTests.swift */,
 				6593008B1DA8E31900750212 /* TransformProcedureTests.swift */,
-				0B7922301DCCD88A000AC3CA /* ProfilerTests.swift */,
 			);
 			name = Tests;
 			sourceTree = "<group>";
@@ -1044,7 +1044,6 @@
 		658A7B491D74D5B900F897C8 /* Core */ = {
 			isa = PBXGroup;
 			children = (
-				0B27C4F01DCBEB8900E86824 /* Profiler.swift */,
 				65A2D8031D6A1ED500FB067C /* AnyObserver.swift */,
 				6518D5E21D7B3A2800A12EF4 /* Condition.swift */,
 				657431271D8D9765002E8FC9 /* Identity.swift */,
@@ -1171,6 +1170,7 @@
 			isa = PBXGroup;
 			children = (
 				65A2D7FA1D6852A500FB067C /* BlockObservers.swift */,
+				0B27C4F01DCBEB8900E86824 /* Profiler.swift */,
 				65EAC0111D8CA39F000E4A42 /* TimeoutObserver.swift */,
 			);
 			name = Observers;

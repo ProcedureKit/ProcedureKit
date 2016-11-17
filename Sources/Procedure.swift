@@ -109,19 +109,29 @@ open class Procedure: Operation, ProcedureProtocol {
         }
         set(newState) {
             _stateLock.withCriticalScope {
-                assert(_state.canTransition(to: newState, whenCancelled: isCancelled), "Attempting to perform illegal cyclic state transition, \(_state) -> \(newState) for operation: \(identity). Ensure that Procedure instances are added to a ProcedureQueue not an OperationQueue.")
                 log.verbose(message: "\(_state) -> \(newState)")
+                assert(_state.canTransition(to: newState, whenCancelled: isCancelled), "Attempting to perform illegal cyclic state transition, \(_state) -> \(newState) for operation: \(identity). Ensure that Procedure instances are added to a ProcedureQueue not an OperationQueue.")
                 _state = newState
             }
         }
     }
 
-    /// Boolean indicator for whether the Operation is currently executing or not
+    /// Boolean indicator for whether the Procedure has been enqueue
+    final public var isEnqueued: Bool {
+        return state >= .pending
+    }
+
+    /// Boolean indicator for whether the Procedure is pending
+    final public var isPending: Bool {
+        return state == .pending
+    }
+
+    /// Boolean indicator for whether the Procedure is currently executing or not
     final public override var isExecuting: Bool {
         return state == .executing
     }
 
-    /// Boolean indicator for whether the Operation has finished or not
+    /// Boolean indicator for whether the Procedure has finished or not
     final public override var isFinished: Bool {
         return state == .finished
     }
@@ -386,9 +396,14 @@ open class Procedure: Operation, ProcedureProtocol {
     }
 
     public final func produce(operation: Operation) {
-        precondition(state > .initialized, "Cannot produce operation will not being scheduled on a queue")
-        log.notice(message: "Did produce \(operation.operationName)")
-        observers.forEach { $0.procedure(self, didProduce: operation) }
+        precondition(state > .initialized, "Cannot add operation which is not being scheduled on a queue")
+        log.notice(message: "Will add \(operation.operationName)")
+        observers.forEach { $0.procedure(self, willAdd: operation) }
+    }
+
+    internal func queue(_ queue: ProcedureQueue, didAddOperation operation: Operation) {
+        log.notice(message: "Did add \(operation.operationName)")
+        observers.forEach { $0.procedure(self, didAdd: operation) }
     }
 
     // MARK: - Cancellation
@@ -548,18 +563,15 @@ open class Procedure: Operation, ProcedureProtocol {
     public final override func waitUntilFinished() {
         fatalError("Waiting on operations is an anti-pattern. Remove this ONLY if you're absolutely sure there is No Other Way™. Post a question in https://github.com/danthorpe/Operations if you are unsure.")
     }
-}
 
-// MARK: Observers
-
-public extension Procedure {
+    // MARK: - Observers
 
     /**
      Add an observer to the procedure.
 
      - parameter observer: type conforming to protocol `ProcedureObserver`.
      */
-    func add<Observer: ProcedureObserver>(observer: Observer) where Observer.Procedure == Procedure {
+    open func add<Observer: ProcedureObserver>(observer: Observer) where Observer.Procedure == Procedure {
 
         procedureObservers.append(AnyObserver(base: observer))
 
