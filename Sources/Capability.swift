@@ -249,10 +249,10 @@ public class AuthorizedFor<Status: AuthorizationStatus>: Condition {
 
     fileprivate let capability: AnyCapability<Status>
 
-    public init<Base>(_ base: Base) where Base: CapabilityProtocol, Status == Base.Status {
+    public init<Base>(_ base: Base, category: String? = nil) where Base: CapabilityProtocol, Status == Base.Status {
         capability = AnyCapability(base)
         super.init()
-        mutuallyExclusiveCategory = String(describing: base)
+        mutuallyExclusiveCategory = category ?? String(describing: type(of: base))
         add(dependency: AuthorizeCapabilityProcedure(base))
     }
 

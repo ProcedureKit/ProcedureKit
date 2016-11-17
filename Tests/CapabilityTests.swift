@@ -68,6 +68,15 @@ class AuthorizedForTests: TestableCapabilityTestCase {
         XCTAssertTrue(authorizedFor.isMutuallyExclusive)
     }
 
+    func test__default_mututally_exclusive_category() {
+        XCTAssertEqual(authorizedFor.category, "TestableCapability")
+    }
+
+    func test__custom_mututally_exclusive_category() {
+        authorizedFor = AuthorizedFor(capability, category: "testing")
+        XCTAssertEqual(authorizedFor.category, "testing")
+    }
+
     func test__has_authorize_dependency() {
         guard let dependency = authorizedFor.dependencies.first else {
             XCTFail("Condition did not return a dependency")
