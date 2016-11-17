@@ -67,11 +67,21 @@ class NetworkReachabilityWaitProcedureTests: ProcedureKitTestCase {
 
 class NetworkReachableProcedureTests: ProcedureKitTestCase {
 
+    typealias Target = NetworkDataProcedure<TestableURLSessionTaskFactory>
+
+    var url: URL!
+    var request: URLRequest!
+    var session: TestableURLSessionTaskFactory!
+    var data: NetworkDataProcedure<TestableURLSessionTaskFactory>!
     var network: TestableNetworkReachability!
     var manager: Reachability.Manager!
 
     override func setUp() {
         super.setUp()
+        url = "http://procedure.kit.run"
+        request = URLRequest(url: url)
+        session = TestableURLSessionTaskFactory()
+        data = NetworkDataProcedure(session: session, request: request)
         network = TestableNetworkReachability()
         manager = Reachability.Manager(network)
         LogManager.severity = .notice
@@ -84,11 +94,47 @@ class NetworkReachableProcedureTests: ProcedureKitTestCase {
         super.tearDown()
     }
 
+    func createNetworkProcedure() -> Target {
+        return Target(session: session, request: request)
+    }
+
     func test__reachable_network_does_not_start_notifier() {
-        let procedure = NetworkReachableProcedure { TestProcedure() }
+        let procedure = NetworkReachableProcedure<Target>(body: createNetworkProcedure)
         procedure.reachability = manager
         wait(for: procedure)
         XCTAssertProcedureFinishedWithoutErrors(procedure)
         XCTAssertFalse(network.didStartNotifier)
+    }
+
+    func test__waits_for_reachability_change_before_retrying() {
+        session.returnedError = NSError(domain: NSURLErrorDomain, code: NSURLErrorNotConnectedToInternet, userInfo: nil)
+        network.flags = .connectionRequired
+        let delay = DelayProcedure(by: 0.1)
+        let makeSessionSuccessful = BlockProcedure { self.session.returnedError = nil }
+        makeSessionSuccessful.add(dependency: delay)
+        let makeNetworkReachable = BlockProcedure { self.network.flags = .reachable }
+        makeNetworkReachable.add(dependency: makeSessionSuccessful)
+
+        let procedure = NetworkReachableProcedure<Target>(body: createNetworkProcedure)
+        procedure.reachability = manager
+
+        wait(forAll: [procedure, delay, makeSessionSuccessful, makeNetworkReachable])
+        XCTAssertProcedureFinishedWithoutErrors(procedure)
+        XCTAssertEqual(procedure.count, 2)
+        XCTAssertTrue(network.didStopNotifier)
+    }
+
+    func test__does_not_wait_for_reachability_if_transient_error() {
+        session.returnedError = NSError(domain: NSURLErrorDomain, code: NSURLErrorNetworkConnectionLost, userInfo: nil)
+        let delay = DelayProcedure(by: 0.1)
+        let makeSessionSuccessful = BlockProcedure { self.session.returnedError = nil }
+        makeSessionSuccessful.add(dependency: delay)
+
+        let procedure = NetworkReachableProcedure<Target>(body: createNetworkProcedure)
+        procedure.reachability = manager
+
+        wait(forAll: [procedure, delay, makeSessionSuccessful])
+        XCTAssertProcedureFinishedWithoutErrors(procedure)
+        XCTAssertEqual(procedure.count, 2)
     }
 }

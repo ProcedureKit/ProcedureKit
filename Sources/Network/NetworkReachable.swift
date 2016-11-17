@@ -22,7 +22,7 @@ class NetworkReachabilityWaitProcedure: Procedure {
     }
 }
 
-class NetworkReachableRecovery<T: Operation> {
+class NetworkReachableRecovery<T: Operation> where T: NetworkOperation {
 
     let connectivity: Reachability.Connectivity
     var reachability: SystemReachability = Reachability.Manager.shared
@@ -32,15 +32,17 @@ class NetworkReachableRecovery<T: Operation> {
     }
 
     func recover(withInfo info: RetryFailureInfo<T>, payload: RepeatProcedurePayload<T>) -> RepeatProcedurePayload<T>? {
-
+        guard let networkError = info.operation.networkError, networkError.waitForReachabilityChangeBeforeRetrying else {
+            return payload
+        }
         let waiter = NetworkReachabilityWaitProcedure(reachability: reachability, via: connectivity)
         payload.operation.add(dependency: waiter)
         info.addOperations(waiter)
-        return payload
+        return RepeatProcedurePayload(operation: payload.operation, delay: nil, configure: payload.configure)
     }
 }
 
-open class NetworkReachableProcedure<T: Operation>: RetryProcedure<T> {
+open class NetworkReachableProcedure<T: Operation>: RetryProcedure<T> where T: NetworkOperation {
 
     let recovery: NetworkReachableRecovery<T>
 
@@ -51,7 +53,7 @@ open class NetworkReachableProcedure<T: Operation>: RetryProcedure<T> {
 
     public init<OperationIterator>(dispatchQueue: DispatchQueue? = nil, max: Int? = nil, connectivity: Reachability.Connectivity = .any, iterator base: OperationIterator) where OperationIterator: IteratorProtocol, OperationIterator.Element == T {
         recovery = NetworkReachableRecovery<T>(connectivity: connectivity)
-        super.init(dispatchQueue: dispatchQueue, max: max, wait: .immediate, iterator: base, retry: recovery.recover(withInfo:payload:))
+        super.init(dispatchQueue: dispatchQueue, max: max, wait: .random(minimum: 0.1, maximum: 0.5), iterator: base, retry: recovery.recover(withInfo:payload:))
     }
 
     public convenience init(dispatchQueue: DispatchQueue = DispatchQueue.default, max: Int? = nil, connectivity: Reachability.Connectivity = .any, body: @escaping () -> T?) {
