@@ -127,6 +127,10 @@
 		65881B791D880ACB00C212C8 /* MutualExclusivityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65881B781D880ACB00C212C8 /* MutualExclusivityTests.swift */; };
 		658A7B4B1D74DCCD00F897C8 /* ProcedureStressTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 658A7B4A1D74DCCD00F897C8 /* ProcedureStressTests.swift */; };
 		658A7B4F1D74E54800F897C8 /* GroupStressTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 658A7B4E1D74E54800F897C8 /* GroupStressTests.swift */; };
+		658B144D1DDDE41A00D63100 /* NetworkReachability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 658B144C1DDDE41A00D63100 /* NetworkReachability.swift */; };
+		658B14511DDDFD1400D63100 /* Reachability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 658B14501DDDFD1400D63100 /* Reachability.swift */; };
+		658B14521DDDFD1400D63100 /* Reachability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 658B14501DDDFD1400D63100 /* Reachability.swift */; };
+		658B14541DDDFE6D00D63100 /* ReachabilityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 658B14531DDDFE6D00D63100 /* ReachabilityTests.swift */; };
 		6591B3001D74954E00C2B57F /* GroupTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6591B2FE1D74953A00C2B57F /* GroupTests.swift */; };
 		6591B3021D74980900C2B57F /* GroupTestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6591B3011D74980900C2B57F /* GroupTestCase.swift */; };
 		6593008C1DA8E31900750212 /* TransformProcedureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6593008B1DA8E31900750212 /* TransformProcedureTests.swift */; };
@@ -592,6 +596,9 @@
 		65881B781D880ACB00C212C8 /* MutualExclusivityTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = MutualExclusivityTests.swift; path = Tests/MutualExclusivityTests.swift; sourceTree = "<group>"; };
 		658A7B4A1D74DCCD00F897C8 /* ProcedureStressTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ProcedureStressTests.swift; path = "Tests/Stress Tests/ProcedureStressTests.swift"; sourceTree = "<group>"; };
 		658A7B4E1D74E54800F897C8 /* GroupStressTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = GroupStressTests.swift; path = "Tests/Stress Tests/GroupStressTests.swift"; sourceTree = "<group>"; };
+		658B144C1DDDE41A00D63100 /* NetworkReachability.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkReachability.swift; sourceTree = "<group>"; };
+		658B14501DDDFD1400D63100 /* Reachability.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Reachability.swift; path = Sources/Reachability.swift; sourceTree = "<group>"; };
+		658B14531DDDFE6D00D63100 /* ReachabilityTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ReachabilityTests.swift; path = Tests/ReachabilityTests.swift; sourceTree = "<group>"; };
 		6591B2FE1D74953A00C2B57F /* GroupTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = GroupTests.swift; path = Tests/GroupTests.swift; sourceTree = "<group>"; };
 		6591B3011D74980900C2B57F /* GroupTestCase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = GroupTestCase.swift; path = Sources/Testing/GroupTestCase.swift; sourceTree = "<group>"; };
 		6593008B1DA8E31900750212 /* TransformProcedureTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TransformProcedureTests.swift; path = Tests/TransformProcedureTests.swift; sourceTree = "<group>"; };
@@ -882,12 +889,13 @@
 			children = (
 				6584AF441D74770C0030DBB3 /* Errors.swift */,
 				65245D221D723A6B00340A2D /* Logging.swift */,
+				658B14501DDDFD1400D63100 /* Reachability.swift */,
 				655E86461D67BA9C000FBA6C /* Support.swift */,
-				658A7B491D74D5B900F897C8 /* Core */,
 				652AFD371D8C5A6200793AF3 /* Conditions */,
+				658A7B491D74D5B900F897C8 /* Core */,
+				65B83EB81D731DF2007EFBFA /* Extensions */,
 				65EAC0131D8CA3A3000E4A42 /* Observers */,
 				65EAC0141D8CA3BB000E4A42 /* Procedures */,
-				65B83EB81D731DF2007EFBFA /* Extensions */,
 			);
 			name = ProcedureKit;
 			sourceTree = "<group>";
@@ -915,6 +923,7 @@
 				653C9FE81D6099F10070B7A2 /* ProcedureKitTests.swift */,
 				65245D1C1D721A7100340A2D /* ProcedureTests.swift */,
 				0B7922301DCCD88A000AC3CA /* ProfilerTests.swift */,
+				658B14531DDDFE6D00D63100 /* ReachabilityTests.swift */,
 				6594840F1DA98E700028F83B /* ReduceProcedureTests.swift */,
 				655594F01D9E482D00B08990 /* RepeatProcedureTests.swift */,
 				65403ABD1D7C9E7600D6036B /* ResultInjectionTests.swift */,
@@ -1200,9 +1209,10 @@
 			children = (
 				65ECB2ED1DB4FDE000F96F46 /* NetworkData.swift */,
 				0B795A8B1DC9E52F00E03CE8 /* NetworkDownload.swift */,
-				0B15EDE71DCA07CB0060D2D7 /* NetworkUpload.swift */,
-				65ECB2EF1DB4FE9900F96F46 /* NetworkSupport.swift */,
+				658B144C1DDDE41A00D63100 /* NetworkReachability.swift */,
 				65DFA4A61DBB9EEA009358CE /* NetworkResilience.swift */,
+				65ECB2EF1DB4FE9900F96F46 /* NetworkSupport.swift */,
+				0B15EDE71DCA07CB0060D2D7 /* NetworkUpload.swift */,
 			);
 			name = Network;
 			path = Sources/Network;
@@ -1213,10 +1223,10 @@
 			children = (
 				65ECB2F31DB5097500F96F46 /* NetworkDataProcedureTests.swift */,
 				0B795A8D1DC9EE2E00E03CE8 /* NetworkDownloadProcedureTests.swift */,
+				0B15EDEA1DCA13810060D2D7 /* NetworkUploadProcedureTests.swift */,
 				65ECB2E61DB4F16E00F96F46 /* ProcedureKitNetworkTests.swift */,
 				65DFA4A81DBBC0B0009358CE /* ResilientNetworkProcedureTests.swift */,
 				65DFA4841DB514DD009358CE /* URLTests.swift */,
-				0B15EDEA1DCA13810060D2D7 /* NetworkUploadProcedureTests.swift */,
 			);
 			name = "Network Tests";
 			path = Tests/Network;
@@ -2035,6 +2045,7 @@
 				65245D271D7258E400340A2D /* Group.swift in Sources */,
 				658740C71DAE70DA00E8D93E /* Block.swift in Sources */,
 				65A2D8021D6A05D800FB067C /* ProcedureProcotol.swift in Sources */,
+				658B14511DDDFD1400D63100 /* Reachability.swift in Sources */,
 				6584AF451D74770C0030DBB3 /* Errors.swift in Sources */,
 				65B97DB51D65138F00AC3B5D /* Procedure.swift in Sources */,
 				6518D5E31D7B3A2800A12EF4 /* Condition.swift in Sources */,
@@ -2074,6 +2085,7 @@
 				655594F11D9E482D00B08990 /* RepeatProcedureTests.swift in Sources */,
 				6593008E1DA8E32D00750212 /* FilterProcedureTests.swift in Sources */,
 				659E11AA1D985B9300C5D749 /* ComposedProcedureTests.swift in Sources */,
+				658B14541DDDFE6D00D63100 /* ReachabilityTests.swift in Sources */,
 				6583F95F1D8C4C7F00000A8D /* NoFailedDependenciesConditionTests.swift in Sources */,
 				65245D211D72345000340A2D /* FinishingTests.swift in Sources */,
 				6593008C1DA8E31900750212 /* TransformProcedureTests.swift in Sources */,
@@ -2110,6 +2122,7 @@
 			files = (
 				0B795A8C1DC9E52F00E03CE8 /* NetworkDownload.swift in Sources */,
 				65ECB2F01DB4FE9900F96F46 /* NetworkSupport.swift in Sources */,
+				658B144D1DDDE41A00D63100 /* NetworkReachability.swift in Sources */,
 				0B15EDE91DCA0AFE0060D2D7 /* NetworkUpload.swift in Sources */,
 				65DFA4A71DBB9EEA009358CE /* NetworkResilience.swift in Sources */,
 				65ECB2EE1DB4FDE000F96F46 /* NetworkData.swift in Sources */,
@@ -2120,6 +2133,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				658B14521DDDFD1400D63100 /* Reachability.swift in Sources */,
 				65DFA4A91DBBC0B0009358CE /* ResilientNetworkProcedureTests.swift in Sources */,
 				65ECB2F41DB5097500F96F46 /* NetworkDataProcedureTests.swift in Sources */,
 				0B795A8F1DC9EE6D00E03CE8 /* NetworkDownloadProcedureTests.swift in Sources */,
