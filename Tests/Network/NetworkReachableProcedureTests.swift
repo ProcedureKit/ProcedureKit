@@ -84,13 +84,11 @@ class NetworkReachableProcedureTests: ProcedureKitTestCase {
         data = NetworkDataProcedure(session: session, request: request)
         network = TestableNetworkReachability()
         manager = Reachability.Manager(network)
-        LogManager.severity = .notice
     }
 
     override func tearDown() {
         network = nil
         manager = nil
-        LogManager.severity = .warning
         super.tearDown()
     }
 
