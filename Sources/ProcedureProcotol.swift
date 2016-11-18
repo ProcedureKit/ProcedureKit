@@ -20,11 +20,11 @@ public protocol ProcedureProtocol: class {
 
     // Execution
 
-    func willEnqueue()
+    func willEnqueue(on: ProcedureQueue)
 
     func execute()
 
-    func produce(operation: Operation)
+    func produce(operation: Operation) throws
 
     // Cancelling
 

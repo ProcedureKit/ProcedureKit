@@ -216,6 +216,33 @@ class GroupTests: GroupTestCase {
         XCTAssertFalse(observerCalledFromGroupDelegate)
     }
 
+    // MARK: - Child Produce Operation Tests
+
+    func test__child_can_produce_operation() {
+        let producedOperation = TestProcedure(name: "ProducedOperation", delay: 0.05)
+        let child = TestProcedure(name: "Child", delay: 0.05, produced: producedOperation)
+        addCompletionBlockTo(procedure: child)
+        addCompletionBlockTo(procedure: producedOperation)
+        group = TestGroupProcedure(operations: child)
+        wait(for: group)
+        XCTAssertProcedureFinishedWithoutErrors(group)
+        XCTAssertProcedureFinishedWithoutErrors(child)
+        XCTAssertProcedureFinishedWithoutErrors(producedOperation)
+    }
+
+    func test__group_does_not_finish_before_child_produced_operations_are_finished() {
+        let child = TestProcedure(name: "Child", delay: 0.01)
+        let childProducedOperation = TestProcedure(name: "ChildProducedOperation", delay: 0.2)
+        childProducedOperation.add(dependency: child)
+        let group = GroupProcedure(operations: [child])
+        child.addWillExecuteBlockObserver { operation in
+            try! operation.produce(operation: childProducedOperation)
+        }
+        wait(for: group)
+        XCTAssertProcedureFinishedWithoutErrors(group)
+        XCTAssertProcedureFinishedWithoutErrors(childProducedOperation)
+    }
+
     // MARK: - Condition Tests
 }
 

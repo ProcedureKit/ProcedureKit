@@ -166,15 +166,6 @@ open class ProcedureQueue: OperationQueue {
 
         procedure.log.verbose(message: "Adding to queue")
 
-        /// Add an observer so that any produced operations are added to the queue
-        procedure.addWillAddOperationBlockObserver { [weak self] (procedure, operation) in
-            guard let queue = self, procedure !== operation else { return }
-            if let anotherProcedure = operation as? Procedure, anotherProcedure.isEnqueued { return }
-            queue.delegate?.procedureQueue(queue, willAddOperation: operation)
-            queue.add(operation: operation)
-            procedure.queue(queue, didAddOperation: operation)
-        }
-
         /// Add an observer to invoke the will finish delegate method
         procedure.addWillFinishBlockObserver { [weak self] procedure, errors in
             if let queue = self {
@@ -246,7 +237,7 @@ open class ProcedureQueue: OperationQueue {
         }
 
         // Indicate to the operation that it is to be enqueued
-        procedure.willEnqueue()
+        procedure.willEnqueue(on: self)
 
         delegate?.procedureQueue(self, willAddOperation: procedure)
     }
