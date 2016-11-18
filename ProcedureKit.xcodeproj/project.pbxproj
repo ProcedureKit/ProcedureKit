@@ -134,6 +134,7 @@
 		658B14581DDE009300D63100 /* NetworkReachabilityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 658B14571DDE009300D63100 /* NetworkReachabilityTests.swift */; };
 		658B145A1DDE1D7900D63100 /* NetworkReachable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 658B14591DDE1D7900D63100 /* NetworkReachable.swift */; };
 		658B145C1DDE1D9B00D63100 /* NetworkReachableProcedureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 658B145B1DDE1D9B00D63100 /* NetworkReachableProcedureTests.swift */; };
+		658B145E1DDF5C4000D63100 /* ProcedureKitErrorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 658B145D1DDF5C4000D63100 /* ProcedureKitErrorTests.swift */; };
 		6591B3001D74954E00C2B57F /* GroupTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6591B2FE1D74953A00C2B57F /* GroupTests.swift */; };
 		6591B3021D74980900C2B57F /* GroupTestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6591B3011D74980900C2B57F /* GroupTestCase.swift */; };
 		6593008C1DA8E31900750212 /* TransformProcedureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6593008B1DA8E31900750212 /* TransformProcedureTests.swift */; };
@@ -606,6 +607,7 @@
 		658B14571DDE009300D63100 /* NetworkReachabilityTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkReachabilityTests.swift; sourceTree = "<group>"; };
 		658B14591DDE1D7900D63100 /* NetworkReachable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkReachable.swift; sourceTree = "<group>"; };
 		658B145B1DDE1D9B00D63100 /* NetworkReachableProcedureTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkReachableProcedureTests.swift; sourceTree = "<group>"; };
+		658B145D1DDF5C4000D63100 /* ProcedureKitErrorTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ProcedureKitErrorTests.swift; path = Tests/ProcedureKitErrorTests.swift; sourceTree = "<group>"; };
 		6591B2FE1D74953A00C2B57F /* GroupTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = GroupTests.swift; path = Tests/GroupTests.swift; sourceTree = "<group>"; };
 		6591B3011D74980900C2B57F /* GroupTestCase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = GroupTestCase.swift; path = Sources/Testing/GroupTestCase.swift; sourceTree = "<group>"; };
 		6593008B1DA8E31900750212 /* TransformProcedureTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TransformProcedureTests.swift; path = Tests/TransformProcedureTests.swift; sourceTree = "<group>"; };
@@ -927,6 +929,7 @@
 				65881B781D880ACB00C212C8 /* MutualExclusivityTests.swift */,
 				652AFD381D8C5BC000793AF3 /* NegatedConditionTests.swift */,
 				6583F95E1D8C4C7F00000A8D /* NoFailedDependenciesConditionTests.swift */,
+				658B145D1DDF5C4000D63100 /* ProcedureKitErrorTests.swift */,
 				653C9FE81D6099F10070B7A2 /* ProcedureKitTests.swift */,
 				65245D1C1D721A7100340A2D /* ProcedureTests.swift */,
 				0B7922301DCCD88A000AC3CA /* ProfilerTests.swift */,
@@ -2104,6 +2107,7 @@
 				65A0CB271D7D4CF1008FB37C /* BlockProcedureTests.swift in Sources */,
 				65A63B151DA04FDB00E90B9D /* CapabilityTests.swift in Sources */,
 				653C9FE91D6099F10070B7A2 /* ProcedureKitTests.swift in Sources */,
+				658B145E1DDF5C4000D63100 /* ProcedureKitErrorTests.swift in Sources */,
 				65245D1D1D721A7100340A2D /* ProcedureTests.swift in Sources */,
 				0B7922311DCCD88A000AC3CA /* ProfilerTests.swift in Sources */,
 			);
