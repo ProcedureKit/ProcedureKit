@@ -159,6 +159,7 @@ platform :mac do
     scan(
       project: "ProcedureKit.xcodeproj",
       scheme: "Stress Tests",
+      configuration: "Release",
       destination: "platform=macOS"
     )
 
