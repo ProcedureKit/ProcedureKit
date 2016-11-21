@@ -91,6 +91,9 @@ extension Collection where Iterator.Element: Operation {
 
 extension Collection where Iterator.Element: ProcedureProtocol, Iterator.Element: ResultInjection {
 
+    /// Gathers the non-nil results of the receiver's procedures into a single array
+    ///
+    /// - Returns: a ResultProcedure<[Self.Iterator.Element.Result]> procedure
     public func gather() -> ResultProcedure<[Self.Iterator.Element.Result]> {
 
         let gather = ResultProcedure { self.flatMap { $0.result.value } }
@@ -100,12 +103,17 @@ extension Collection where Iterator.Element: ProcedureProtocol, Iterator.Element
         return gather
     }
 
-    public func reduce<ReducedResult>(_ initialResult: ReducedResult, _ nextPartialResult: @escaping (ReducedResult, Self.Iterator.Element.Result) throws -> ReducedResult) rethrows -> ResultProcedure<ReducedResult> {
+    /// Creates a new procedure which will reduce the non-nil results of the receiver's procedures into a single type, using
+    /// and initial result, and combining closure.
+    ///
+    /// - Parameters:
+    ///   - initialResult: the initial result
+    ///   - nextPartialResult: a closure which receives the partial result, and next element (result) returns the next partial result.
+    /// - Returns: a ResultProcedure<ReducedResult> procedure
+    public func reduce<ReducedResult>(_ initialResult: ReducedResult, _ nextPartialResult: @escaping (ReducedResult, Self.Iterator.Element.Result) throws -> ReducedResult) -> ResultProcedure<ReducedResult> {
 
-        // Create a procedure to gather the results of the collection
         let result = ResultProcedure { try self.flatMap { $0.result.value }.reduce(initialResult, nextPartialResult) }
 
-        // Add each collection element as a dependency
         forEach { result.add(dependency: $0) }
 
         return result
