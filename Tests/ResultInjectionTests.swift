@@ -158,6 +158,18 @@ class ResultInjectionTests: ResultInjectionTestCase {
         XCTAssertProcedureFinishedWithoutErrors(helloWorld)
         XCTAssertEqual(helloWorld.result.value, "Hello World")
     }
+
+    func test__collection_reduce_which_throws_finishes_with_error() {
+        let hello = ResultProcedure { "Hello" }
+        let world = ResultProcedure { "World" }
+        let error = TestError()
+        let helloWorld = [hello, world].reduce("") { _, _ in throw error }
+        wait(forAll: [hello, world, helloWorld])
+        XCTAssertProcedureFinishedWithoutErrors(hello)
+        XCTAssertProcedureFinishedWithoutErrors(world)
+        XCTAssertProcedureFinishedWithErrors(helloWorld, count: 1)
+        XCTAssertNil(helloWorld.result.value)
+    }
 }
 
 
