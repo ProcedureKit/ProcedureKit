@@ -138,6 +138,8 @@
 		658B145A1DDE1D7900D63100 /* Network.swift in Sources */ = {isa = PBXBuildFile; fileRef = 658B14591DDE1D7900D63100 /* Network.swift */; };
 		658B145C1DDE1D9B00D63100 /* NetworkProcedureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 658B145B1DDE1D9B00D63100 /* NetworkProcedureTests.swift */; };
 		658B145E1DDF5C4000D63100 /* ProcedureKitErrorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 658B145D1DDF5C4000D63100 /* ProcedureKitErrorTests.swift */; };
+		658B14601DDF635500D63100 /* Presentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 658B145F1DDF635500D63100 /* Presentation.swift */; };
+		658B14621DDF637000D63100 /* PresentationProcedureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 658B14611DDF637000D63100 /* PresentationProcedureTests.swift */; };
 		6591B3001D74954E00C2B57F /* GroupTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6591B2FE1D74953A00C2B57F /* GroupTests.swift */; };
 		6591B3021D74980900C2B57F /* GroupTestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6591B3011D74980900C2B57F /* GroupTestCase.swift */; };
 		6593008C1DA8E31900750212 /* TransformProcedureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6593008B1DA8E31900750212 /* TransformProcedureTests.swift */; };
@@ -611,6 +613,8 @@
 		658B14591DDE1D7900D63100 /* Network.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Network.swift; sourceTree = "<group>"; };
 		658B145B1DDE1D9B00D63100 /* NetworkProcedureTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkProcedureTests.swift; sourceTree = "<group>"; };
 		658B145D1DDF5C4000D63100 /* ProcedureKitErrorTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ProcedureKitErrorTests.swift; path = Tests/ProcedureKitErrorTests.swift; sourceTree = "<group>"; };
+		658B145F1DDF635500D63100 /* Presentation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Presentation.swift; path = Sources/Mobile/Presentation.swift; sourceTree = "<group>"; };
+		658B14611DDF637000D63100 /* PresentationProcedureTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = PresentationProcedureTests.swift; path = Tests/Mobile/PresentationProcedureTests.swift; sourceTree = "<group>"; };
 		6591B2FE1D74953A00C2B57F /* GroupTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = GroupTests.swift; path = Tests/GroupTests.swift; sourceTree = "<group>"; };
 		6591B3011D74980900C2B57F /* GroupTestCase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = GroupTestCase.swift; path = Sources/Testing/GroupTestCase.swift; sourceTree = "<group>"; };
 		6593008B1DA8E31900750212 /* TransformProcedureTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TransformProcedureTests.swift; path = Tests/TransformProcedureTests.swift; sourceTree = "<group>"; };
@@ -951,6 +955,7 @@
 			children = (
 				657431291D8DB8AD002E8FC9 /* BackgroundObserver.swift */,
 				657243941DE9C0EF00BFEB5B /* NetworkObserver+Mobile.swift */,
+				658B145F1DDF635500D63100 /* Presentation.swift */,
 			);
 			name = Mobile;
 			sourceTree = "<group>";
@@ -978,6 +983,7 @@
 			isa = PBXGroup;
 			children = (
 				6574312C1D8DE712002E8FC9 /* BackgroundObserverTests.swift */,
+				658B14611DDF637000D63100 /* PresentationProcedureTests.swift */,
 				653C9FE61D6099850070B7A2 /* ProcedureKitMobileTests.swift */,
 				6574312E1D8DE848002E8FC9 /* TestableUIApplication.swift */,
 			);
@@ -1886,6 +1892,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				657243951DE9C0EF00BFEB5B /* NetworkObserver+Mobile.swift in Sources */,
+				658B14601DDF635500D63100 /* Presentation.swift in Sources */,
 				6574312B1D8DDF0D002E8FC9 /* BackgroundObserver.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1896,6 +1903,7 @@
 			files = (
 				653C9FEA1D6099F40070B7A2 /* ProcedureKitMobileTests.swift in Sources */,
 				6574312F1D8DE848002E8FC9 /* TestableUIApplication.swift in Sources */,
+				658B14621DDF637000D63100 /* PresentationProcedureTests.swift in Sources */,
 				6574312D1D8DE712002E8FC9 /* BackgroundObserverTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
