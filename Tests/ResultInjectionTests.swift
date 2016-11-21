@@ -133,7 +133,31 @@ class ResultInjectionTests: ResultInjectionTestCase {
         XCTAssertProcedureCancelledWithErrors(printer, count: 1)
     }
 
+    func test__collection_gather() {
+        let hello = ResultProcedure { "Hello" }
+        let world = ResultProcedure { "World" }
+        let gathered = [hello, world].gather()
 
+        wait(forAll: [hello, world, gathered])
+        XCTAssertProcedureFinishedWithoutErrors(hello)
+        XCTAssertProcedureFinishedWithoutErrors(world)
+        XCTAssertProcedureFinishedWithoutErrors(gathered)
+        XCTAssertEqual(gathered.result.value ?? [], ["Hello", "World"])
+    }
+
+    func test__collection_reduce() {
+        let hello = ResultProcedure { "Hello" }
+        let world = ResultProcedure { "World" }
+        let helloWorld = [hello, world].reduce("") { accumulator, element in
+            guard !accumulator.isEmpty else { return element }
+            return "\(accumulator) \(element)"
+        }
+        wait(forAll: [hello, world, helloWorld])
+        XCTAssertProcedureFinishedWithoutErrors(hello)
+        XCTAssertProcedureFinishedWithoutErrors(world)
+        XCTAssertProcedureFinishedWithoutErrors(helloWorld)
+        XCTAssertEqual(helloWorld.result.value, "Hello World")
+    }
 }
 
 

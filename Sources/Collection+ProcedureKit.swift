@@ -86,3 +86,28 @@ extension Collection where Iterator.Element: Operation {
         queue.add(operations: self)
     }
 }
+
+// MARK: - ResultInjection & Gathering
+
+extension Collection where Iterator.Element: ProcedureProtocol, Iterator.Element: ResultInjection {
+
+    public func gather() -> ResultProcedure<[Self.Iterator.Element.Result]> {
+
+        let gather = ResultProcedure { self.flatMap { $0.result.value } }
+
+        forEach { gather.add(dependency: $0) }
+
+        return gather
+    }
+
+    public func reduce<ReducedResult>(_ initialResult: ReducedResult, _ nextPartialResult: @escaping (ReducedResult, Self.Iterator.Element.Result) throws -> ReducedResult) rethrows -> ResultProcedure<ReducedResult> {
+
+        // Create a procedure to gather the results of the collection
+        let result = ResultProcedure { try self.flatMap { $0.result.value }.reduce(initialResult, nextPartialResult) }
+
+        // Add each collection element as a dependency
+        forEach { result.add(dependency: $0) }
+
+        return result
+    }
+}
