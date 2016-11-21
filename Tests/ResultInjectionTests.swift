@@ -133,16 +133,15 @@ class ResultInjectionTests: ResultInjectionTestCase {
         XCTAssertProcedureCancelledWithErrors(printer, count: 1)
     }
 
-    func test__collection_gather() {
+    func test__collection_flatMap() {
         let hello = ResultProcedure { "Hello" }
         let world = ResultProcedure { "World" }
-        let gathered = [hello, world].gather()
-
-        wait(forAll: [hello, world, gathered])
+        let mapped = [world, hello].flatMap { $0.uppercased() }
+        wait(forAll: [hello, world, mapped])
         XCTAssertProcedureFinishedWithoutErrors(hello)
         XCTAssertProcedureFinishedWithoutErrors(world)
-        XCTAssertProcedureFinishedWithoutErrors(gathered)
-        XCTAssertEqual(gathered.result.value ?? [], ["Hello", "World"])
+        XCTAssertProcedureFinishedWithoutErrors(mapped)
+        XCTAssertEqual(mapped.result.value ?? [], ["WORLD", "HELLO"])
     }
 
     func test__collection_reduce() {
@@ -169,6 +168,18 @@ class ResultInjectionTests: ResultInjectionTestCase {
         XCTAssertProcedureFinishedWithoutErrors(world)
         XCTAssertProcedureFinishedWithErrors(helloWorld, count: 1)
         XCTAssertNil(helloWorld.result.value)
+    }
+
+    func test__collection_gather() {
+        let hello = ResultProcedure { "Hello" }
+        let world = ResultProcedure { "World" }
+        let gathered = [hello, world].gather()
+
+        wait(forAll: [hello, world, gathered])
+        XCTAssertProcedureFinishedWithoutErrors(hello)
+        XCTAssertProcedureFinishedWithoutErrors(world)
+        XCTAssertProcedureFinishedWithoutErrors(gathered)
+        XCTAssertEqual(gathered.result.value ?? [], ["Hello", "World"])
     }
 }
 
