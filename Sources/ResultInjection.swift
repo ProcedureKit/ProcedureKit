@@ -24,7 +24,7 @@ public enum PendingValue<T> {
 
 extension PendingValue where T: Equatable {
 
-    static func==(lhs: PendingValue<T>, rhs: PendingValue<T>) -> Bool {
+    static func == (lhs: PendingValue<T>, rhs: PendingValue<T>) -> Bool {
         switch (lhs, rhs) {
         case (.pending, .pending), (.void, .void):
             return true
