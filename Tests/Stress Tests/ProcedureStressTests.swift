@@ -137,7 +137,7 @@ class ProcedureFinishStressTest: StressTestCase {
                     return false
                 })
                 guard !finishedMoreThanOnce else {
-                    batch.incrementCounter(named: "finishedProcedureMoreThanOnce", withBarrier: true)
+                    batch.incrementCounter(named: "finishedProcedureMoreThanOnce")
                     return
                 }
                 // add small delay before leaving to increase the odds that concurrent finishes are caught
