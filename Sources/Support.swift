@@ -85,6 +85,13 @@ public class Protector<T> {
     @discardableResult public func write<U>(_ block: (inout T) -> U) -> U {
         return lock.write_sync({ block(&self.ward) })
     }
+
+    // Supports old callers that expect to pass in a completion block
+    // NOTE: Like `write()`, this is synchronous.
+    public func write(_ block: (inout T) -> Void, completion: (() -> Void)) {
+        lock.write_sync({ block(&self.ward) })
+        completion()
+    }
 }
 
 public extension Protector where T: RangeReplaceableCollection {
