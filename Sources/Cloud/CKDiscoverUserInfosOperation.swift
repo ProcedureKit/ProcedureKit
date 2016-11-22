@@ -37,12 +37,12 @@ extension CKDiscoverUserInfosOperation: CKDiscoverUserInfosOperationProtocol, As
 
 extension CKProcedure where T: CKDiscoverUserInfosOperationProtocol, T: AssociatedErrorProtocol, T.AssociatedError: CloudKitError {
 
-    var emailAddresses: [String]? {
+    public var emailAddresses: [String]? {
         get { return operation.emailAddresses }
         set { operation.emailAddresses = newValue }
     }
 
-    var userRecordIDs: [T.RecordID]? {
+    public var userRecordIDs: [T.RecordID]? {
         get { return operation.userRecordIDs }
         set { operation.userRecordIDs = newValue }
     }

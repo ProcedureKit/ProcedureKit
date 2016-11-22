@@ -29,7 +29,7 @@ extension CKFetchNotificationChangesOperation: CKFetchNotificationChangesOperati
 
 extension CKProcedure where T: CKFetchNotificationChangesOperationProtocol, T: AssociatedErrorProtocol, T.AssociatedError: CloudKitError {
 
-    var notificationChangedBlock: CloudKitProcedure<T>.FetchNotificationChangesChangedBlock? {
+    public var notificationChangedBlock: CloudKitProcedure<T>.FetchNotificationChangesChangedBlock? {
         get { return operation.notificationChangedBlock }
         set { operation.notificationChangedBlock = newValue }
     }

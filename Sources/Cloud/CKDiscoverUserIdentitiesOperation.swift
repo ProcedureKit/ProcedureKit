@@ -28,12 +28,12 @@ extension CKDiscoverUserIdentitiesOperation: CKDiscoverUserIdentitiesOperationPr
 
 extension CKProcedure where T: CKDiscoverUserIdentitiesOperationProtocol, T: AssociatedErrorProtocol, T.AssociatedError: CloudKitError {
 
-    var userIdentityLookupInfos: [T.UserIdentityLookupInfo] {
+    public var userIdentityLookupInfos: [T.UserIdentityLookupInfo] {
         get { return operation.userIdentityLookupInfos }
         set { operation.userIdentityLookupInfos = newValue }
     }
 
-    var userIdentityDiscoveredBlock: CloudKitProcedure<T>.DiscoverUserIdentitiesUserIdentityDiscoveredBlock? {
+    public var userIdentityDiscoveredBlock: CloudKitProcedure<T>.DiscoverUserIdentitiesUserIdentityDiscoveredBlock? {
         get { return operation.userIdentityDiscoveredBlock }
         set { operation.userIdentityDiscoveredBlock = newValue }
     }

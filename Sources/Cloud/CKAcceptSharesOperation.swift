@@ -28,12 +28,12 @@ extension CKAcceptSharesOperation: CKAcceptSharesOperationProtocol, AssociatedEr
 
 extension CKProcedure where T: CKAcceptSharesOperationProtocol, T: AssociatedErrorProtocol, T.AssociatedError: CloudKitError {
 
-    var shareMetadatas: [T.ShareMetadata] {
+    public var shareMetadatas: [T.ShareMetadata] {
         get { return operation.shareMetadatas }
         set { operation.shareMetadatas = newValue }
     }
 
-    var perShareCompletionBlock: CloudKitProcedure<T>.AcceptSharesPerShareCompletionBlock? {
+    public var perShareCompletionBlock: CloudKitProcedure<T>.AcceptSharesPerShareCompletionBlock? {
         get { return operation.perShareCompletionBlock }
         set { operation.perShareCompletionBlock = newValue }
     }

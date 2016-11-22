@@ -28,7 +28,7 @@ extension CKDatabaseOperation: CKDatabaseOperationProtocol {
 
 extension CKProcedure where T: CKDatabaseOperationProtocol {
 
-    var database: T.Database? {
+    public var database: T.Database? {
         get { return operation.database }
         set { operation.database = newValue }
     }
@@ -61,7 +61,7 @@ public protocol CKPreviousServerChangeToken: CKOperationProtocol {
 
 extension CKProcedure where T: CKPreviousServerChangeToken {
 
-    var previousServerChangeToken: T.ServerChangeToken? {
+    public var previousServerChangeToken: T.ServerChangeToken? {
         get { return operation.previousServerChangeToken }
         set { operation.previousServerChangeToken = newValue }
     }
@@ -90,7 +90,7 @@ public protocol CKResultsLimit: CKOperationProtocol {
 
 extension CKProcedure where T: CKResultsLimit {
 
-    var resultsLimit: Int {
+    public var resultsLimit: Int {
         get { return operation.resultsLimit }
         set { operation.resultsLimit = newValue }
     }
@@ -119,7 +119,7 @@ public protocol CKMoreComing: CKOperationProtocol {
 
 extension CKProcedure where T: CKMoreComing {
 
-    var moreComing: Bool {
+    public var moreComing: Bool {
         return operation.moreComing
     }
 }
@@ -143,7 +143,7 @@ public protocol CKDesiredKeys: CKOperationProtocol {
 
 extension CKProcedure where T: CKDesiredKeys {
 
-    var desiredKeys: [String]? {
+    public var desiredKeys: [String]? {
         get { return operation.desiredKeys }
         set { operation.desiredKeys = newValue }
     }

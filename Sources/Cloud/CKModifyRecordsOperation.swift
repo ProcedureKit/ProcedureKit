@@ -49,37 +49,37 @@ extension CKModifyRecordsOperation: CKModifyRecordsOperationProtocol, Associated
 
 extension CKProcedure where T: CKModifyRecordsOperationProtocol, T: AssociatedErrorProtocol, T.AssociatedError: CloudKitError {
 
-    var recordsToSave: [T.Record]? {
+    public var recordsToSave: [T.Record]? {
         get { return operation.recordsToSave }
         set { operation.recordsToSave = newValue }
     }
 
-    var recordIDsToDelete: [T.RecordID]? {
+    public var recordIDsToDelete: [T.RecordID]? {
         get { return operation.recordIDsToDelete }
         set { operation.recordIDsToDelete = newValue }
     }
 
-    var savePolicy: T.RecordSavePolicy {
+    public var savePolicy: T.RecordSavePolicy {
         get { return operation.savePolicy }
         set { operation.savePolicy = newValue }
     }
 
-    var clientChangeTokenData: Data? {
+    public var clientChangeTokenData: Data? {
         get { return operation.clientChangeTokenData }
         set { operation.clientChangeTokenData = newValue }
     }
 
-    var isAtomic: Bool {
+    public var isAtomic: Bool {
         get { return operation.isAtomic }
         set { operation.isAtomic = newValue }
     }
 
-    var perRecordProgressBlock: CloudKitProcedure<T>.ModifyRecordsPerRecordProgressBlock? {
+    public var perRecordProgressBlock: CloudKitProcedure<T>.ModifyRecordsPerRecordProgressBlock? {
         get { return operation.perRecordProgressBlock }
         set { operation.perRecordProgressBlock = newValue }
     }
 
-    var perRecordCompletionBlock: CloudKitProcedure<T>.ModifyRecordsPerRecordCompletionBlock? {
+    public var perRecordCompletionBlock: CloudKitProcedure<T>.ModifyRecordsPerRecordCompletionBlock? {
         get { return operation.perRecordCompletionBlock }
         set { operation.perRecordCompletionBlock = newValue }
     }

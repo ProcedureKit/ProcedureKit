@@ -62,16 +62,14 @@ extension CKFetchDatabaseChangesOperation: CKFetchDatabaseChangesOperationProtoc
     public typealias AssociatedError = FetchDatabaseChangesError<ServerChangeToken>
 }
 
-
-
 extension CKProcedure where T: CKFetchDatabaseChangesOperationProtocol, T: AssociatedErrorProtocol, T.AssociatedError: CloudKitError {
 
-    var recordZoneWithIDChangedBlock: CloudKitProcedure<T>.FetchDatabaseChangesRecordZoneWithIDChangedBlock? {
+    public var recordZoneWithIDChangedBlock: CloudKitProcedure<T>.FetchDatabaseChangesRecordZoneWithIDChangedBlock? {
         get { return operation.recordZoneWithIDChangedBlock }
         set { operation.recordZoneWithIDChangedBlock = newValue }
     }
 
-    var recordZoneWithIDWasDeletedBlock: CloudKitProcedure<T>.FetchDatabaseChangesRecordZoneWithIDWasDeletedBlock? {
+    public var recordZoneWithIDWasDeletedBlock: CloudKitProcedure<T>.FetchDatabaseChangesRecordZoneWithIDWasDeletedBlock? {
         get { return operation.recordZoneWithIDWasDeletedBlock }
         set { operation.recordZoneWithIDWasDeletedBlock = newValue }
     }

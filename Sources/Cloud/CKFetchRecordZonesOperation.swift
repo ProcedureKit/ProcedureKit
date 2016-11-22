@@ -30,7 +30,7 @@ extension CKFetchRecordZonesOperation: CKFetchRecordZonesOperationProtocol, Asso
 
 extension CKProcedure where T: CKFetchRecordZonesOperationProtocol, T: AssociatedErrorProtocol, T.AssociatedError: CloudKitError {
 
-    var recordZoneIDs: [T.RecordZoneID]? {
+    public var recordZoneIDs: [T.RecordZoneID]? {
         get { return operation.recordZoneIDs }
         set { operation.recordZoneIDs = newValue }
     }
