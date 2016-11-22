@@ -75,12 +75,8 @@ public class Protector<T> {
         return read { $0 }
     }
 
-    public func read<U>(_ block: @escaping (T) -> U) -> U {
-        return lock.read { [unowned self] in block(self.ward) }
-    }
-
-    public func write(_ block: @escaping (inout T) -> Void) {
-        lock.write({ block(&self.ward) })
+    public func read<U>(_ block: (T) -> U) -> U {
+        return lock.read { block(self.ward) }
     }
 
     /// Synchronously modify the protected value
