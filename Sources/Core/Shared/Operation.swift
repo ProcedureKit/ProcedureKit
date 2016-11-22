@@ -197,6 +197,7 @@ public class Operation: NSOperation {
     public override init() {
         self.disableAutomaticFinishing = false
         super.init()
+        self.name = String(self.dynamicType)
     }
 
     // MARK: - Disable Automatic Finishing
@@ -240,6 +241,7 @@ public class Operation: NSOperation {
     public init(disableAutomaticFinishing: Bool) {
         self.disableAutomaticFinishing = disableAutomaticFinishing
         super.init()
+        self.name = String(self.dynamicType)
     }
 
     // MARK: - Add Condition

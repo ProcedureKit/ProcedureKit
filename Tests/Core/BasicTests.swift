@@ -521,3 +521,26 @@ class FinishingOperationTests: OperationTests {
         // This will crash the test execution if it happens.
     }
 }
+
+class SubclassedGroupOperation: GroupOperation { }
+
+class NamedOperationsTests: OperationTests {
+    
+    func test__operation_name() {
+        let operation = Operation()
+        
+        XCTAssertEqual(operation.name, "Operation")
+        
+        operation.name = "Changed Name"
+        XCTAssertEqual(operation.name, "Changed Name")
+        
+        operation.name = nil
+        XCTAssertNil(operation.name)
+    }
+    
+    func test__subclassed_group_operation_name() {
+        let operation = SubclassedGroupOperation()
+        XCTAssertEqual(operation.name, "SubclassedGroupOperation")
+    }
+    
+}

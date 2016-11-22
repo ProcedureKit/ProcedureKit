@@ -154,7 +154,6 @@ public class GroupOperation: Operation, OperationQueueDelegate {
         // and its finishingOperation has finished.
         super.init(disableAutomaticFinishing: true) // Override default Operation finishing behavior
         canFinishOperation = GroupOperation.CanFinishOperation(parentGroupOperation: self)
-        name = "Group Operation"
         queue.suspended = true
         queue.delegate = self
         queue.underlyingQueue = underlyingQueue
