@@ -24,13 +24,14 @@ extension Dictionary {
 
 protocol ReadWriteLock {
     mutating func read<T>(_ block: () throws -> T) rethrows -> T
-    mutating func write(_ block: @escaping () -> Void, completion: (() -> Void)?)
+    mutating func write_async(_ block: @escaping () -> Void, completion: (() -> Void)?)
+    mutating func write_sync<T>(_ block: () throws -> T) rethrows -> T
 }
 
 extension ReadWriteLock {
 
-    mutating func write(_ block: @escaping () -> Void) {
-        write(block, completion: nil)
+    mutating func write_async(_ block: @escaping () -> Void) {
+        write_async(block, completion: nil)
     }
 }
 
@@ -42,13 +43,20 @@ struct Lock: ReadWriteLock {
         return try queue.sync(execute: block)
     }
 
-    mutating func write(_ block: @escaping () -> Void, completion: (() -> Void)?) {
+    mutating func write_async(_ block: @escaping () -> Void, completion: (() -> Void)?) {
         queue.async(group: nil, flags: [.barrier]) {
             block()
             if let completion = completion {
                 DispatchQueue.main.async(execute: completion)
             }
         }
+    }
+
+    mutating func write_sync<T>(_ block: () throws -> T) rethrows -> T {
+        let result = try queue.sync(flags: [.barrier]) {
+            try block()
+        }
+        return result
     }
 }
 
@@ -73,8 +81,11 @@ public class Protector<T> {
         lock.write({ block(&self.ward) })
     }
 
-    public func write(_ block: @escaping (inout T) -> Void, completion: @escaping (() -> Void)) {
-        lock.write({ block(&self.ward) }, completion: completion)
+    /// Synchronously modify the protected value
+    ///
+    /// - Returns: The value returned by the `block`, if any. (discardable)
+    @discardableResult public func write<U>(_ block: (inout T) -> U) -> U {
+        return lock.write_sync({ block(&self.ward) })
     }
 }
 

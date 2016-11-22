@@ -142,7 +142,7 @@ public class LogManager: LogManagerProtocol {
 
     var logger: LoggerBlockType {
         get { return loggerLock.read { _logger } }
-        set { loggerLock.write { self._logger = newValue } }
+        set { loggerLock.write_sync { self._logger = newValue } }
     }
 
     init() {
