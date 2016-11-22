@@ -34,12 +34,12 @@ extension CKModifyRecordZonesOperation: CKModifyRecordZonesOperationProtocol, As
 
 extension CKProcedure where T: CKModifyRecordZonesOperationProtocol, T: AssociatedErrorProtocol, T.AssociatedError: CloudKitError {
 
-    var recordZonesToSave: [T.RecordZone]? {
+    public var recordZonesToSave: [T.RecordZone]? {
         get { return operation.recordZonesToSave }
         set { operation.recordZonesToSave = newValue }
     }
 
-    var recordZoneIDsToDelete: [T.RecordZoneID]? {
+    public var recordZoneIDsToDelete: [T.RecordZoneID]? {
         get { return operation.recordZoneIDsToDelete }
         set { operation.recordZoneIDsToDelete = newValue }
     }

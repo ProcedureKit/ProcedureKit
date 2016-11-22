@@ -169,41 +169,41 @@ extension CKOperation: CKOperationProtocol {
 
 extension CKProcedure where T: CKOperationProtocol {
 
-    var container: T.Container? {
+    public var container: T.Container? {
         get { return operation.container }
         set { operation.container = newValue }
     }
 
-    var allowsCellularAccess: Bool {
+    public var allowsCellularAccess: Bool {
         get { return operation.allowsCellularAccess }
         set { operation.allowsCellularAccess = newValue }
     }
 
     @available(iOS 9.3, tvOS 9.3, OSX 10.12, watchOS 2.3, *)
-    var operationID: String {
+    public var operationID: String {
         get { return operation.operationID }
     }
 
     @available(iOS 9.3, tvOS 9.3, OSX 10.12, watchOS 2.3, *)
-    var longLived: Bool {
+    public var longLived: Bool {
         get { return operation.longLived }
         set { operation.longLived = newValue }
     }
 
     @available(iOS 9.3, tvOS 9.3, OSX 10.12, watchOS 2.3, *)
-    var longLivedOperationWasPersistedBlock: () -> Void {
+    public var longLivedOperationWasPersistedBlock: () -> Void {
         get { return operation.longLivedOperationWasPersistedBlock }
         set { operation.longLivedOperationWasPersistedBlock = newValue }
     }
 
     @available(iOS 10.0, tvOS 10.0, OSX 10.12, watchOS 3.0, *)
-    var timeoutIntervalForRequest: TimeInterval {
+    public var timeoutIntervalForRequest: TimeInterval {
         get { return operation.timeoutIntervalForRequest }
         set { operation.timeoutIntervalForRequest = newValue }
     }
 
     @available(iOS 10.0, tvOS 10.0, OSX 10.12, watchOS 3.0, *)
-    var timeoutIntervalForResource: TimeInterval {
+    public var timeoutIntervalForResource: TimeInterval {
         get { return operation.timeoutIntervalForResource }
         set { operation.timeoutIntervalForResource = newValue }
     }

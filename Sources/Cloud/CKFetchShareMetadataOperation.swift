@@ -34,22 +34,22 @@ extension CKFetchShareMetadataOperation: CKFetchShareMetadataOperationProtocol, 
 
 extension CKProcedure where T: CKFetchShareMetadataOperationProtocol, T: AssociatedErrorProtocol, T.AssociatedError: CloudKitError {
 
-    var shareURLs: [URL] {
+    public var shareURLs: [URL] {
         get { return operation.shareURLs }
         set { operation.shareURLs = newValue }
     }
 
-    var shouldFetchRootRecord: Bool {
+    public var shouldFetchRootRecord: Bool {
         get { return operation.shouldFetchRootRecord }
         set { operation.shouldFetchRootRecord = newValue }
     }
 
-    var rootRecordDesiredKeys: [String]? {
+    public var rootRecordDesiredKeys: [String]? {
         get { return operation.rootRecordDesiredKeys }
         set { operation.rootRecordDesiredKeys = newValue }
     }
 
-    var perShareMetadataBlock: CloudKitProcedure<T>.FetchShareMetadataPerShareMetadataBlock? {
+    public var perShareMetadataBlock: CloudKitProcedure<T>.FetchShareMetadataPerShareMetadataBlock? {
         get { return operation.perShareMetadataBlock }
         set { operation.perShareMetadataBlock = newValue }
     }

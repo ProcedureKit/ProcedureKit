@@ -37,17 +37,17 @@ extension CKFetchRecordsOperation: CKFetchRecordsOperationProtocol, AssociatedEr
 
 extension CKProcedure where T: CKFetchRecordsOperationProtocol, T: AssociatedErrorProtocol, T.AssociatedError: CloudKitError {
 
-    var recordIDs: [T.RecordID]? {
+    public var recordIDs: [T.RecordID]? {
         get { return operation.recordIDs }
         set { operation.recordIDs = newValue }
     }
 
-    var perRecordProgressBlock: CloudKitProcedure<T>.FetchRecordsPerRecordProgressBlock? {
+    public var perRecordProgressBlock: CloudKitProcedure<T>.FetchRecordsPerRecordProgressBlock? {
         get { return operation.perRecordProgressBlock }
         set { operation.perRecordProgressBlock = newValue }
     }
 
-    var perRecordCompletionBlock: CloudKitProcedure<T>.FetchRecordsPerRecordCompletionBlock? {
+    public var perRecordCompletionBlock: CloudKitProcedure<T>.FetchRecordsPerRecordCompletionBlock? {
         get { return operation.perRecordCompletionBlock }
         set { operation.perRecordCompletionBlock = newValue }
     }

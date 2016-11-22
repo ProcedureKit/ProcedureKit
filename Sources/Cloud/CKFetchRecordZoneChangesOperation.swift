@@ -47,37 +47,37 @@ extension CKFetchRecordZoneChangesOperation: CKFetchRecordZoneChangesOperationPr
 extension CKProcedure where T: CKFetchRecordZoneChangesOperationProtocol, T: AssociatedErrorProtocol, T.AssociatedError: CloudKitError {
 
     /// - returns: the record zone IDs which will fetch changes
-    var recordZoneIDs: [T.RecordZoneID] {
+    public var recordZoneIDs: [T.RecordZoneID] {
         get { return operation.recordZoneIDs }
         set { operation.recordZoneIDs = newValue }
     }
 
     /// - returns: the per-record-zone options
-    var optionsByRecordZoneID: [T.RecordZoneID : T.FetchRecordZoneChangesOptions]? {
+    public var optionsByRecordZoneID: [T.RecordZoneID : T.FetchRecordZoneChangesOptions]? {
         get { return operation.optionsByRecordZoneID }
         set { operation.optionsByRecordZoneID = newValue }
     }
 
     /// - returns: a block for when a record is changed
-    var recordChangedBlock: CloudKitProcedure<T>.FetchRecordZoneChangesRecordChangedBlock? {
+    public var recordChangedBlock: CloudKitProcedure<T>.FetchRecordZoneChangesRecordChangedBlock? {
         get { return operation.recordChangedBlock }
         set { operation.recordChangedBlock = newValue }
     }
 
     /// - returns: a block for when a recordID is deleted (receives the recordID and the recordType)
-    var recordWithIDWasDeletedBlock: CloudKitProcedure<T>.FetchRecordZoneChangesRecordWithIDWasDeletedBlock? {
+    public var recordWithIDWasDeletedBlock: CloudKitProcedure<T>.FetchRecordZoneChangesRecordWithIDWasDeletedBlock? {
         get { return operation.recordWithIDWasDeletedBlock }
         set { operation.recordWithIDWasDeletedBlock = newValue }
     }
 
     /// - returns: a block for when a recordZone changeToken update is sent
-    var recordZoneChangeTokensUpdatedBlock: CloudKitProcedure<T>.FetchRecordZoneChangesRecordZoneChangeTokensUpdatedBlock? {
+    public var recordZoneChangeTokensUpdatedBlock: CloudKitProcedure<T>.FetchRecordZoneChangesRecordZoneChangeTokensUpdatedBlock? {
         get { return operation.recordZoneChangeTokensUpdatedBlock }
         set { operation.recordZoneChangeTokensUpdatedBlock = newValue }
     }
 
     /// - returns: a block to execute when the fetch for a zone has completed
-    var recordZoneFetchCompletionBlock: CloudKitProcedure<T>.FetchRecordZoneChangesCompletionRecordZoneFetchCompletionBlock? {
+    public var recordZoneFetchCompletionBlock: CloudKitProcedure<T>.FetchRecordZoneChangesCompletionRecordZoneFetchCompletionBlock? {
         get { return operation.recordZoneFetchCompletionBlock }
         set { operation.recordZoneFetchCompletionBlock = newValue }
     }
