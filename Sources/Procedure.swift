@@ -143,17 +143,25 @@ open class Procedure: Operation, ProcedureProtocol {
         return _stateLock.withCriticalScope { _isCancelled }
     }
 
+    // MARK: Protected Internal Properties
+
+    fileprivate struct ProtectedProperties {
+        var log: LoggerProtocol = Logger()
+        var errors = [Error]()
+        var observers = [AnyObserver<Procedure>]()
+        var directDependencies = Set<Operation>()
+        var conditions = Set<Condition>()
+    }
+    fileprivate let protectedProperties = Protector(ProtectedProperties())
+
+
     // MARK: Errors
 
-    private var _errors = [Error]()
-
     public var errors: [Error] {
-        return _stateLock.withCriticalScope { _errors }
+        return protectedProperties.read { $0.errors }
     }
 
     // MARK: Log
-
-    private var _log = Protector<LoggerProtocol>(Logger())
 
     /**
      Access the logger for this Operation
@@ -193,28 +201,28 @@ open class Procedure: Operation, ProcedureProtocol {
     public var log: LoggerProtocol {
         get {
             let operationName = self.operationName
-            return _log.read { LoggerContext(parent: $0, operationName: operationName) }
+            return protectedProperties.read { LoggerContext(parent: $0.log, operationName: operationName) }
         }
         set {
-            _log.write { (ward: inout LoggerProtocol) in
-                ward = newValue
+            protectedProperties.write {
+                $0.log = newValue
             }
         }
     }
 
     // MARK: Observers
 
-    fileprivate var procedureObservers = Protector([AnyObserver<Procedure>]())
-
     var observers: [AnyObserver<Procedure>] {
-        get { return procedureObservers.read { $0 } }
+        get { return protectedProperties.read { $0.observers } }
     }
 
 
 
     // MARK: Dependencies & Conditions
 
-    internal fileprivate(set) var directDependencies = Set<Operation>()
+    internal var directDependencies: Set<Operation> {
+        get { return protectedProperties.read { $0.directDependencies } }
+    }
 
     internal fileprivate(set) var evaluateConditionsProcedure: EvaluateConditions? = nil
 
@@ -226,7 +234,9 @@ open class Procedure: Operation, ProcedureProtocol {
     }
 
     /// - returns conditions: the Set of Condition instances attached to the operation
-    public fileprivate(set) var conditions = Set<Condition>()
+    public var conditions: Set<Condition> {
+        get { return protectedProperties.read { $0.conditions } }
+    }
 
     // MARK: - Initialization
 
@@ -329,7 +339,7 @@ open class Procedure: Operation, ProcedureProtocol {
 
                 // Check to see if the procedure has now been cancelled
                 // by an observer
-                guard (_errors.isEmpty && !isCancelled) || isAutomaticFinishingDisabled else {
+                guard (errors.isEmpty && !isCancelled) || isAutomaticFinishingDisabled else {
                     _isFinishingFrom = .main
                     return .finishing
                 }
@@ -466,7 +476,9 @@ open class Procedure: Operation, ProcedureProtocol {
 
         _stateLock.withCriticalScope {
             if !additionalErrors.isEmpty {
-                _errors += additionalErrors
+                protectedProperties.write {
+                    $0.errors.append(contentsOf: additionalErrors)
+                }
             }
             _isCancelled = true
         }
@@ -542,9 +554,11 @@ open class Procedure: Operation, ProcedureProtocol {
             didChangeValue(forKey: .executing)
         }
 
-        let resultingErrors: [Error] = _stateLock.withCriticalScope {
-            _errors += receivedErrors
-            return _errors
+        let resultingErrors: [Error] = protectedProperties.write {
+            if !receivedErrors.isEmpty {
+                $0.errors.append(contentsOf: receivedErrors)
+            }
+            return $0.errors
         }
 
         let messageSuffix = !resultingErrors.isEmpty ? "errors: \(resultingErrors)" : "no errors"
@@ -587,7 +601,9 @@ open class Procedure: Operation, ProcedureProtocol {
      */
     open func add<Observer: ProcedureObserver>(observer: Observer) where Observer.Procedure == Procedure {
 
-        procedureObservers.append(AnyObserver(base: observer))
+        protectedProperties.write {
+            $0.observers.append(AnyObserver(base: observer))
+        }
 
         observer.didAttach(to: self)
     }
@@ -734,13 +750,17 @@ extension Procedure {
 
     func add(directDependency: Operation) {
         precondition(state <= .executing, "Dependencies cannot be modified after execution has begun, current state: \(state).")
-        directDependencies.insert(directDependency)
+        protectedProperties.write {
+            $0.directDependencies.insert(directDependency)
+        }
         super.addDependency(directDependency)
     }
 
     func remove(directDependency: Operation) {
         precondition(state <= .executing, "Dependencies cannot be modified after execution has begun, current state: \(state).")
-        directDependencies.remove(directDependency)
+        protectedProperties.write {
+            $0.directDependencies.remove(directDependency)
+        }
         super.removeDependency(directDependency)
     }
 
@@ -784,7 +804,9 @@ extension Procedure {
      */
     public func add(condition: Condition) {
         assert(state < .executing, "Cannot modify conditions after operation has begun executing, current state: \(state).")
-        conditions.insert(condition)
+        protectedProperties.write {
+            $0.conditions.insert(condition)
+        }
     }
 }
 
