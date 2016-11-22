@@ -43,11 +43,11 @@ public struct ProfileResult {
 struct PendingProfileResult {
 
     let created: TimeInterval
-    let identity: PendingValue<Procedure.Identity>
-    let attached: PendingValue<TimeInterval>
-    let started: PendingValue<TimeInterval>
-    let cancelled: PendingValue<TimeInterval>
-    let finished: PendingValue<TimeInterval>
+    let identity: Pending<Procedure.Identity>
+    let attached: Pending<TimeInterval>
+    let started: Pending<TimeInterval>
+    let cancelled: Pending<TimeInterval>
+    let finished: Pending<TimeInterval>
     let children: [ProfileResult]
 
     var isPending: Bool {

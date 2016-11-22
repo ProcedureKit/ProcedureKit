@@ -21,7 +21,40 @@ public enum Pending<T> {
     }
 }
 
-public enum Result<T> {
+extension Pending where T: Equatable {
+
+    static func == (lhs: Pending<T>, rhs: Pending<T>) -> Bool {
+        switch (lhs, rhs) {
+        case (.pending, .pending):
+            return true
+        case let (.ready(lhsValue), .ready(rhsValue)):
+            return lhsValue == rhsValue
+        default:
+            return false
+        }
+    }
+}
+
+public protocol ResultProtocol {
+    associatedtype Value
+
+    var value: Value? { get }
+
+    var error: Error? { get }
+}
+
+extension Pending where T: ResultProtocol {
+
+    public var success: T.Value? {
+        return value?.value
+    }
+
+    public var error: Error? {
+        return value?.error
+    }
+}
+
+public enum Result<T>: ResultProtocol {
 
     case success(T)
     case failure(Error)
@@ -34,6 +67,18 @@ public enum Result<T> {
     public var error: Error? {
         guard case let .failure(error) = self else { return nil }
         return error
+    }
+}
+
+extension Result where T: Equatable {
+
+    static func == (lhs: Result<T>, rhs: Result<T>) -> Bool {
+        switch (lhs, rhs) {
+        case let (.success(lhsValue), .success(rhsValue)):
+            return lhsValue == rhsValue
+        default:
+            return false
+        }
     }
 }
 
@@ -51,6 +96,10 @@ public protocol OutputProcedure: ProcedureProtocol {
     var output: Pending<Result<Output>> { get }
 }
 
+
+public let pendingVoid: Pending<Void> = .ready(())
+
+public let pendingVoidResult: Pending<Result<Void>> = .ready(.success(()))
 
 // MARK: - Extensions
 

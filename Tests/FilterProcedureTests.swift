@@ -14,7 +14,7 @@ class FilterProcedureTests: ProcedureKitTestCase {
         let functional = FilterProcedure(source: [0,1,2,3,4,5,6,7]) { $0 % 2 == 0 }
         wait(for: functional)
         XCTAssertProcedureFinishedWithoutErrors(functional)
-        XCTAssertEqual(functional.result.value ?? [0,1,2,3,4,5,6,7], [0,2,4,6])
+        XCTAssertEqual(functional.output.success ?? [0,1,2,3,4,5,6,7], [0,2,4,6])
     }
 
     func test__finishes_with_error_if_block_throws() {
@@ -29,7 +29,7 @@ class FilterProcedureTests: ProcedureKitTestCase {
         wait(for: numbers, functional)
         XCTAssertProcedureFinishedWithoutErrors(numbers)
         XCTAssertProcedureFinishedWithoutErrors(functional)
-        XCTAssertEqual(functional.result.value ?? [0,1,2,3,4,5,6,7], [0,2,4,6,8])
+        XCTAssertEqual(functional.output.success ?? [0,1,2,3,4,5,6,7], [0,2,4,6,8])
     }
 
     func test__filter_dependency_which_finishes_with_errors() {
