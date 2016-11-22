@@ -21,7 +21,7 @@ open class TestCondition: Condition {
             result = try evaluate()
         }
         catch {
-            result = .failed(error)
+            result = .failure(error)
         }
         completion(result)
     }

@@ -253,15 +253,15 @@ public class AuthorizedFor<Status: AuthorizationStatus>: Condition {
 
     public override func evaluate(procedure: Procedure, completion: @escaping (ConditionResult) -> Void) {
         guard capability.isAvailable() else {
-            completion(.failed(ProcedureKitError.capabilityUnavailable())); return
+            completion(.failure(ProcedureKitError.capabilityUnavailable())); return
         }
 
         capability.getAuthorizationStatus { [requirement = self.capability.requirement] status in
             if status.meets(requirement: requirement) {
-                completion(.satisfied)
+                completion(.success(true))
             }
             else {
-                completion(.failed(ProcedureKitError.capabilityUnauthorized()))
+                completion(.failure(ProcedureKitError.capabilityUnauthorized()))
             }
         }
     }

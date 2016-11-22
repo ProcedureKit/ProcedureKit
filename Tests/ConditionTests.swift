@@ -15,7 +15,7 @@ class ConditionTests: ProcedureKitTestCase {
     func test__true_condition_is_satisfied() {
         let condition = TrueCondition()
         condition.evaluate(procedure: procedure) { result in
-            guard case .satisfied = result else {
+            guard case .success(true) = result else {
                 XCTFail("TrueCondition did not evaluate as satisfied."); return
             }
         }
@@ -24,7 +24,7 @@ class ConditionTests: ProcedureKitTestCase {
     func test__false_condition_is_failed() {
         let condition = FalseCondition()
         condition.evaluate(procedure: procedure) { result in
-            guard case let .failed(error) = result else {
+            guard case let .failure(error) = result else {
                 XCTFail("FalseCondition did not evaluate as failed."); return
             }
             XCTAssertTrue(error is ProcedureKitError.FalseCondition)

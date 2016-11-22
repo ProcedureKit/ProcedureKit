@@ -29,7 +29,7 @@ class MutualExclusiveTests: ProcedureKitTestCase {
         let condition = MutuallyExclusive<Procedure>()
         condition.evaluate(procedure: TestProcedure()) { result in
             switch result {
-            case .satisfied:
+            case .success(true):
                 return XCTAssertTrue(true)
             default:
                 return XCTFail("Condition should evaluate true.")
