@@ -4,6 +4,8 @@
 //  Copyright © 2016 ProcedureKit. All rights reserved.
 //
 
+import Dispatch
+
 internal func _abstractMethod(file: StaticString = #file, line: UInt = #line) {
     fatalError("Method must be overriden", file: file, line: line)
 }
