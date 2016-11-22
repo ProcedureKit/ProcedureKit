@@ -226,6 +226,25 @@ open class RepeatProcedure<T: Operation>: GroupProcedure {
 }
 
 
+// MARK: - Extensions
+
+extension RepeatProcedure where T: InputProcedure {
+
+    public var input: Pending<T.Input> {
+        get { return current.input }
+        set {
+            current.input = newValue
+            appendConfigureBlock { $0.input = newValue }
+        }
+    }
+}
+
+extension RepeatProcedure where T: OutputProcedure {
+
+    public var output: Pending<Result<T.Output>> {
+        get { return current.output }
+    }
+}
 
 
 // MARK: - Iterators
