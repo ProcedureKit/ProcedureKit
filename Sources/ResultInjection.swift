@@ -45,38 +45,6 @@ public protocol ResultInjection: class {
     var result: PendingValue<Result> { get }
 }
 
-public extension ProcedureProtocol {
-
-    /**
-     Access the completed dependency operation before `self` is
-     started. This can be useful for transfering results/data between
-     operations.
-
-     - parameters dep: any `Operation` subclass.
-     - parameters block: a closure which receives `self`, the dependent
-     operation, and an array of `ErrorType`, and returns Void.
-     - returns: `self` - so that injections can be chained together.
-     */
-    @discardableResult func inject<Dependency: ProcedureProtocol>(dependency: Dependency, block: @escaping (Self, Dependency, [Error]) -> Void) -> Self {
-
-        dependency.addWillFinishBlockObserver { [weak self] dependency, errors in
-            if let strongSelf = self {
-                block(strongSelf, dependency, errors)
-            }
-        }
-
-        dependency.addDidCancelBlockObserver { [weak self] dependency, errors in
-            if let strongSelf = self {
-                strongSelf.cancel(withError: ProcedureKitError.parent(cancelledWithErrors: errors))
-            }
-        }
-
-        add(dependency: dependency)
-
-        return self
-    }
-}
-
 public extension ProcedureProtocol where Self: ResultInjection {
 
     @discardableResult func injectResult<Dependency: ProcedureProtocol>(from dependency: Dependency, via block: @escaping (Dependency.Result) throws -> Requirement) -> Self where Dependency: ResultInjection {
