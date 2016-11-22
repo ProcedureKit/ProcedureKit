@@ -54,16 +54,16 @@ open class GroupConcurrencyTestCase: ConcurrencyTestCase {
         }
     }
 
-    public func concurrencyTestGroup(children: Int = 3, withDelayMicroseconds delayMicroseconds: useconds_t = 500000 /* 0.5 seconds */, withName name: String = #function, withTimeout timeout: TimeInterval = 3, withConfigureBlock configure: (TestGroupProcedure) -> Void, withExpectations expectations: Expectations) {
+    @discardableResult public func concurrencyTestGroup(children: Int = 3, withDelayMicroseconds delayMicroseconds: useconds_t = 500000 /* 0.5 seconds */, withName name: String = #function, withTimeout timeout: TimeInterval = 3, withConfigureBlock configure: (TestGroupProcedure) -> Void, withExpectations expectations: Expectations) -> GroupTestResult {
 
-        concurrencyTestGroup(children: children, withDelayMicroseconds: delayMicroseconds, withName: name, withTimeout: timeout,
+        return concurrencyTestGroup(children: children, withDelayMicroseconds: delayMicroseconds, withName: name, withTimeout: timeout,
             withConfigureBlock: configure,
             completionBlock: { (results) in
                 XCTAssertResults(results, matchExpectations: expectations)
         })
     }
 
-    public func concurrencyTestGroup(children: Int = 3, withDelayMicroseconds delayMicroseconds: useconds_t = 500000 /* 0.5 seconds */, withName name: String = #function, withTimeout timeout: TimeInterval = 3, withConfigureBlock configure: (TestGroupProcedure) -> Void, completionBlock completion: (GroupTestResult) -> Void) {
+    @discardableResult public func concurrencyTestGroup(children: Int = 3, withDelayMicroseconds delayMicroseconds: useconds_t = 500000 /* 0.5 seconds */, withName name: String = #function, withTimeout timeout: TimeInterval = 3, withConfigureBlock configure: (TestGroupProcedure) -> Void, completionBlock completion: (GroupTestResult) -> Void) -> GroupTestResult {
 
         let registrar = Registrar()
         let testProcedures = create(procedures: children, delayMicroseconds: delayMicroseconds, withRegistrar: registrar)
@@ -76,6 +76,8 @@ open class GroupConcurrencyTestCase: ConcurrencyTestCase {
         let endTime = CFAbsoluteTimeGetCurrent()
         let duration = Double(endTime) - Double(startTime)
 
-        completion(GroupTestResult(group: group, procedures: testProcedures, duration: duration, registrar: registrar))
+        let result = GroupTestResult(group: group, procedures: testProcedures, duration: duration, registrar: registrar)
+        completion(result)
+        return result
     }
 }

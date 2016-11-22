@@ -46,9 +46,8 @@ open class GroupProcedure: Procedure, ProcedureQueueDelegate {
     fileprivate var groupCanFinish: CanFinishGroup!
 
     /// - returns: the operations which have been added to the queue
-    public private(set) var children: [Operation] {
+    public var children: [Operation] {
         get { return groupChildren.read { $0 } }
-        set { groupChildren.write { (ward: inout [Operation]) in ward = newValue } }
     }
 
     /**
