@@ -40,7 +40,7 @@ public struct ProfileResult {
 }
 
 // MARK: - PendingResult
-struct PendingResult {
+struct PendingProfileResult {
 
     let created: TimeInterval
     let identity: PendingValue<Procedure.Identity>
@@ -64,35 +64,35 @@ struct PendingResult {
         return ProfileResult(identity: identity, created: created, attached: attached, started: started, cancelled: cancelled.value, finished: finished.value, children: children)
     }
 
-    func set(identity newIdentity: Procedure.Identity) -> PendingResult {
+    func set(identity newIdentity: Procedure.Identity) -> PendingProfileResult {
         guard identity.isPending else { return self }
-        return PendingResult(created: created, identity: .ready(newIdentity), attached: attached, started: started, cancelled: cancelled, finished: finished, children: children)
+        return PendingProfileResult(created: created, identity: .ready(newIdentity), attached: attached, started: started, cancelled: cancelled, finished: finished, children: children)
     }
 
-    func attach(now: TimeInterval = CFAbsoluteTimeGetCurrent() as TimeInterval) -> PendingResult {
+    func attach(now: TimeInterval = CFAbsoluteTimeGetCurrent() as TimeInterval) -> PendingProfileResult {
         guard attached.isPending else { return self }
-        return PendingResult(created: created, identity: identity, attached: .ready(now - created), started: started, cancelled: cancelled, finished: finished, children: children)
+        return PendingProfileResult(created: created, identity: identity, attached: .ready(now - created), started: started, cancelled: cancelled, finished: finished, children: children)
     }
 
-    func start(now: TimeInterval = CFAbsoluteTimeGetCurrent() as TimeInterval) -> PendingResult {
+    func start(now: TimeInterval = CFAbsoluteTimeGetCurrent() as TimeInterval) -> PendingProfileResult {
         guard started.isPending else { return self }
-        return PendingResult(created: created, identity: identity, attached: attached, started: .ready(now - created), cancelled: cancelled, finished: finished, children: children)
+        return PendingProfileResult(created: created, identity: identity, attached: attached, started: .ready(now - created), cancelled: cancelled, finished: finished, children: children)
     }
 
-    func cancel(now: TimeInterval = CFAbsoluteTimeGetCurrent() as TimeInterval) -> PendingResult {
+    func cancel(now: TimeInterval = CFAbsoluteTimeGetCurrent() as TimeInterval) -> PendingProfileResult {
         guard cancelled.isPending else { return self }
-        return PendingResult(created: created, identity: identity, attached: attached, started: started, cancelled: .ready(now - created), finished: finished, children: children)
+        return PendingProfileResult(created: created, identity: identity, attached: attached, started: started, cancelled: .ready(now - created), finished: finished, children: children)
     }
 
-    func finish(now: TimeInterval = CFAbsoluteTimeGetCurrent() as TimeInterval) -> PendingResult {
+    func finish(now: TimeInterval = CFAbsoluteTimeGetCurrent() as TimeInterval) -> PendingProfileResult {
         guard finished.isPending else { return self }
-        return PendingResult(created: created, identity: identity, attached: attached, started: started, cancelled: cancelled, finished: .ready(now - created), children: children)
+        return PendingProfileResult(created: created, identity: identity, attached: attached, started: started, cancelled: cancelled, finished: .ready(now - created), children: children)
     }
 
-    func add(child: ProfileResult) -> PendingResult {
+    func add(child: ProfileResult) -> PendingProfileResult {
         var newChildren = children
         newChildren.append(child)
-        return PendingResult(created: created, identity: identity, attached: attached, started: started, cancelled: cancelled, finished: finished, children: newChildren)
+        return PendingProfileResult(created: created, identity: identity, attached: attached, started: started, cancelled: cancelled, finished: finished, children: newChildren)
     }
 }
 
@@ -109,7 +109,7 @@ public final class ProcedureProfiler: Identifiable, Equatable {
     let queue = DispatchQueue(label: "run.kit.ProcedureKit.Profiler")
     let reporter: Reporter
 
-    var result = PendingResult(created: CFAbsoluteTimeGetCurrent() as TimeInterval, identity: .pending, attached: .pending, started: .pending, cancelled: .pending, finished: .pending, children: [])
+    var result = PendingProfileResult(created: CFAbsoluteTimeGetCurrent() as TimeInterval, identity: .pending, attached: .pending, started: .pending, cancelled: .pending, finished: .pending, children: [])
     var children: [Procedure.Identity] = []
     var finishedOrCancelled = false
 
