@@ -6,9 +6,9 @@
 
 open class ResultProcedure<Output>: Procedure, OutputProcedure {
 
-    public private(set) var output: Pending<Result<Output>> = .pending
-
     public typealias ThrowingOutputBlock = () throws -> Output
+
+    public private(set) var output: Pending<Result<Output>> = .pending
 
     private let block: ThrowingOutputBlock
 
