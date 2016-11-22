@@ -258,10 +258,10 @@ open class Procedure: Operation, ProcedureProtocol {
      The default behavior of Operation is to automatically call finish()
      when:
      (a) it's cancelled, whether that occurs:
-     - prior to the Operation starting
-     (in which case, Operation will skip calling execute())
-     - on another thread at the same time that the operation is
-     executing
+        - prior to the Operation starting
+          (in which case, Operation will skip calling execute())
+        - on another thread at the same time that the operation is
+          executing
      (b) when willExecuteObservers log errors
 
      To ensure that an Operation subclass does not finish until the
@@ -277,9 +277,9 @@ open class Procedure: Operation, ProcedureProtocol {
 
      ```swift
      guard !cancelled else {
-     // do any necessary clean-up
-     finish()    // always call finish if automatic finishing is disabled
-     return
+        // do any necessary clean-up
+        finish()    // always call finish if automatic finishing is disabled
+        return
      }
      ```
 
