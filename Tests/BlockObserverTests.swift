@@ -52,15 +52,26 @@ class BlockObserverTests: ProcedureKitTestCase {
         XCTAssertEqual(didCancelCalled?.1.first as? TestError, error)
     }
 
-    func test__did_produce_operation_is_called() {
-        var didProduceCalled: (Procedure, Operation)? = nil
+    func test__will_add_operation_is_called() {
+        var willAddCalled: (Procedure, Operation)? = nil
         var didExecuteProducedOperation = false
         let producingProcedure = TestProcedure(produced: BlockOperation { didExecuteProducedOperation = true })
-        producingProcedure.add(observer: BlockObserver(didProduce: { didProduceCalled = ($0, $1) }))
+        producingProcedure.add(observer: BlockObserver(willAdd: { willAddCalled = ($0, $1) }))
         wait(for: producingProcedure)
         XCTAssertTrue(didExecuteProducedOperation)
-        XCTAssertEqual(didProduceCalled?.0, producingProcedure)
-        XCTAssertNotNil(didProduceCalled?.1)
+        XCTAssertEqual(willAddCalled?.0, producingProcedure)
+        XCTAssertNotNil(willAddCalled?.1)
+    }
+
+    func test__did_add_operation_is_called() {
+        var didAddCalled: (Procedure, Operation)? = nil
+        var didExecuteProducedOperation = false
+        let producingProcedure = TestProcedure(produced: BlockOperation { didExecuteProducedOperation = true })
+        producingProcedure.add(observer: BlockObserver(didAdd: { didAddCalled = ($0, $1) }))
+        wait(for: producingProcedure)
+        XCTAssertTrue(didExecuteProducedOperation)
+        XCTAssertEqual(didAddCalled?.0, producingProcedure)
+        XCTAssertNotNil(didAddCalled?.1)
     }
 
     func test__will_finish_is_called() {

@@ -63,7 +63,7 @@ class GroupTests: GroupTestCase {
     func test_group_will_add_child_observer_is_called() {
         var blockCalledWith: (GroupProcedure, Operation)? = nil
         group = TestGroupProcedure(operations: [children[0]])
-        group.addWillAddChildBlockObserver { group, child in
+        group.addWillAddOperationBlockObserver { group, child in
             blockCalledWith = (group, child)
         }
         wait(for: group)
@@ -75,7 +75,7 @@ class GroupTests: GroupTestCase {
     func test_group_did_add_child_observer_is_called() {
         var blockCalledWith: (GroupProcedure, Operation)? = nil
         group = TestGroupProcedure(operations: [children[0]])
-        group.addDidAddChildBlockObserver { group, child in
+        group.addDidAddOperationBlockObserver { group, child in
             blockCalledWith = (group, child)
         }
         wait(for: group)
@@ -185,6 +185,62 @@ class GroupTests: GroupTestCase {
         wait(for: group)
         XCTAssertTrue(group.isFinished)
         XCTAssertTrue(didFinishBlockObserverWasCalled)
+    }
+
+    // MARK: - ProcedureQueue Delegate Tests
+
+    func test__group_ignores_delegate_calls_from_other_queues() {
+        // The base GroupProcedure ProcedureQueue delegate implementation should ignore
+        // other queues' delegate callbacks, or various bad things may happen, including:
+        //  - Observers may be improperly notified
+        //  - The Group may wait to finish on non-child operations
+
+        group = TestGroupProcedure(operations: [])
+        let otherQueue = ProcedureQueue()
+        otherQueue.delegate = group
+
+        var observerCalledFromGroupDelegate = false
+        group.addWillAddOperationBlockObserver { group, child in
+            observerCalledFromGroupDelegate = true
+        }
+        group.addDidAddOperationBlockObserver { group, child in
+            observerCalledFromGroupDelegate = true
+        }
+
+        // Adding a TestProcedure to the otherQueue should not result in the Group's
+        // Will/DidAddChild observers being called, nor should the Group wait
+        // on the other queue's TestProcedure to finish.
+        otherQueue.add(operation: TestProcedure())
+        wait(for: group)
+        XCTAssertTrue(group.isFinished)
+        XCTAssertFalse(observerCalledFromGroupDelegate)
+    }
+
+    // MARK: - Child Produce Operation Tests
+
+    func test__child_can_produce_operation() {
+        let producedOperation = TestProcedure(name: "ProducedOperation", delay: 0.05)
+        let child = TestProcedure(name: "Child", delay: 0.05, produced: producedOperation)
+        addCompletionBlockTo(procedure: child)
+        addCompletionBlockTo(procedure: producedOperation)
+        group = TestGroupProcedure(operations: child)
+        wait(for: group)
+        XCTAssertProcedureFinishedWithoutErrors(group)
+        XCTAssertProcedureFinishedWithoutErrors(child)
+        XCTAssertProcedureFinishedWithoutErrors(producedOperation)
+    }
+
+    func test__group_does_not_finish_before_child_produced_operations_are_finished() {
+        let child = TestProcedure(name: "Child", delay: 0.01)
+        let childProducedOperation = TestProcedure(name: "ChildProducedOperation", delay: 0.2)
+        childProducedOperation.add(dependency: child)
+        let group = GroupProcedure(operations: [child])
+        child.addWillExecuteBlockObserver { operation in
+            try! operation.produce(operation: childProducedOperation)
+        }
+        wait(for: group)
+        XCTAssertProcedureFinishedWithoutErrors(group)
+        XCTAssertProcedureFinishedWithoutErrors(childProducedOperation)
     }
 
     // MARK: - Condition Tests

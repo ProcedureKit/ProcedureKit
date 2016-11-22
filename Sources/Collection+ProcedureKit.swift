@@ -86,3 +86,45 @@ extension Collection where Iterator.Element: Operation {
         queue.add(operations: self)
     }
 }
+
+// MARK: - ResultInjection & Gathering
+
+extension Collection where Iterator.Element: ProcedureProtocol, Iterator.Element: ResultInjection {
+
+    /// Creates a new procedure which will flatmap the non-nil results of the receiver's procedures into a
+    /// new array. This new array is available as the result of the returned procedure.
+    ///
+    /// - Parameter transform: a throwing closure which receives the result from the receiver's procedure.
+    /// - Returns: a ResultProcedure<[T]> procedure.
+    public func flatMap<T>(transform: @escaping (Self.Iterator.Element.Result) throws -> T?) -> ResultProcedure<[T]> {
+
+        let mapped = ResultProcedure { try self.flatMap { $0.result.value }.flatMap(transform) }
+
+        forEach { mapped.add(dependency: $0) }
+
+        return mapped
+    }
+
+    /// Creates a new procedure which will reduce the non-nil results of the receiver's procedures into a single type, using
+    /// and initial result, and combining closure.
+    ///
+    /// - Parameters:
+    ///   - initialResult: the initial result
+    ///   - nextPartialResult: a closure which receives the partial result, and next element (result) returns the next partial result.
+    /// - Returns: a ResultProcedure<ReducedResult> procedure
+    public func reduce<ReducedResult>(_ initialResult: ReducedResult, _ nextPartialResult: @escaping (ReducedResult, Self.Iterator.Element.Result) throws -> ReducedResult) -> ResultProcedure<ReducedResult> {
+
+        let result = ResultProcedure { try self.flatMap { $0.result.value }.reduce(initialResult, nextPartialResult) }
+
+        forEach { result.add(dependency: $0) }
+
+        return result
+    }
+
+    /// Creates a new procedure which will gather the non-nil results of the receiver's procedures into a single array
+    ///
+    /// - Returns: a ResultProcedure<[Self.Iterator.Element.Result]> procedur
+    public func gather() -> ResultProcedure<[Self.Iterator.Element.Result]> {
+        return flatMap(transform: { $0 })
+    }
+}

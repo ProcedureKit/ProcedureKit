@@ -31,27 +31,35 @@ class NetworkActivityController {
     static let shared = NetworkActivityController()
 
     let interval: TimeInterval
-    var indicator: NetworkActivityIndicatorProtocol
+    private(set) var indicator: NetworkActivityIndicatorProtocol
 
-    var count = 0
-    var timer: Timer?
+    private var count = 0
+    private var timer: Timer?
+
+    private let queue = DispatchQueue(label: "run.kit.procedure.ProcedureKit.NetworkActivityController", qos: .userInteractive)
 
     init(timerInterval: TimeInterval = 1.0, indicator: NetworkActivityIndicatorProtocol = UIApplication.shared) {
         self.interval = timerInterval
         self.indicator = indicator
     }
 
+    /// start() is thread-safe
     func start() {
-        count += 1
-        update()
+        queue.async {
+            self.count += 1
+            self.update()
+        }
     }
 
+    /// stop() is thread-safe
     func stop() {
-        count -= 1
-        update()
+        queue.async {
+            self.count -= 1
+            self.update()
+        }
     }
 
-    func update() {
+    private func update() {
         if count > 0 {
             updateIndicator(withVisibility: true)
         }
@@ -62,11 +70,14 @@ class NetworkActivityController {
         }
     }
 
-    func updateIndicator(withVisibility visibility: Bool) {
+    private func updateIndicator(withVisibility visibility: Bool) {
         timer?.cancel()
         timer = nil
         DispatchQueue.main.async {
-            self.indicator.networkActivityIndicatorVisible = visibility
+            // only set the visibility if it has changed
+            if self.indicator.networkActivityIndicatorVisible != visibility {
+                self.indicator.networkActivityIndicatorVisible = visibility
+            }
         }
     }
 }

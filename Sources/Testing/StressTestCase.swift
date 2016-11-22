@@ -7,24 +7,6 @@
 import Foundation
 import XCTest
 
-public class Counter {
-    private(set) var _count: Int32 = 0 // swiftlint:disable:this variable_name
-
-    public var count: Int {
-        return Int(_count)
-    }
-
-    @discardableResult public func increment() -> Int32 {
-        return OSAtomicIncrement32(&_count)
-    }
-
-    @discardableResult public func barrierIncrement() -> Int32 {
-        return OSAtomicIncrement32Barrier(&_count)
-    }
-
-    public init() { }
-}
-
 public protocol BatchProtocol {
     var startTime: CFAbsoluteTime { get }
     var dispatchGroup: DispatchGroup { get }
@@ -34,14 +16,14 @@ public protocol BatchProtocol {
 
     func counter(named: String) -> Int
 
-    @discardableResult func incrementCounter(named: String, withBarrier: Bool) -> Int32
+    @discardableResult func incrementCounter(named: String) -> Int
 }
 
 public extension BatchProtocol {
 
-    func didIncrementCounter(named name: String, withBarrier barrier: Bool = true) -> Bool {
+    func didIncrementCounter(named name: String) -> Bool {
         let currentValue = counter(named: name)
-        let newValue = Int(incrementCounter(named: name, withBarrier: barrier))
+        let newValue = Int(incrementCounter(named: name))
         return newValue > currentValue
     }
 }
@@ -53,7 +35,8 @@ open class Batch: BatchProtocol {
     public let number: Int
     public let size: Int
 
-    private var counters = Dictionary<String, Counter>()
+    private var _countersLock = NSLock()
+    private var _counters = Dictionary<String, Int>()
 
     public init(queue: ProcedureQueue = ProcedureQueue(), number: Int, size: Int) {
         self.queue = queue
@@ -62,15 +45,18 @@ open class Batch: BatchProtocol {
     }
 
     public func counter(named: String = "Standard") -> Int {
-        return counters[named]?.count ?? 0
+        return _countersLock.withCriticalScope { _counters[named] ?? 0 }
     }
 
-    @discardableResult public func incrementCounter(named: String = "Standard", withBarrier barrier: Bool = true) -> Int32 {
-        guard let counter = counters[named] else {
-            counters[named] = Counter()
-            return incrementCounter(named: named, withBarrier: barrier)
+    @discardableResult public func incrementCounter(named: String = "Standard") -> Int {
+        return _countersLock.withCriticalScope {
+            guard let currentCount = _counters[named] else {
+                _counters[named] = 1
+                return 1
+            }
+            _counters[named] = currentCount + 1
+            return currentCount + 1
         }
-        return barrier ? counter.barrierIncrement() : counter.increment()
     }
 }
 

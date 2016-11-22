@@ -36,12 +36,13 @@ class NetworkObserverTests: ProcedureKitTestCase {
 
     override func setUp() {
         super.setUp()
-        let indicatorExpectation = expectation(description: "Indicator Expectation")
+        weak var indicatorExpectation = expectation(description: "Indicator Expectation")
         _changes = Protector<[Bool]>([])
         indicator = TestableNetworkActivityIndicator { visibility in
             self._changes.append(visibility)
             if !visibility {
                 DispatchQueue.main.async {
+                    guard let indicatorExpectation = indicatorExpectation else { return }
                     indicatorExpectation.fulfill()
                 }
             }
@@ -66,7 +67,7 @@ class NetworkObserverTests: ProcedureKitTestCase {
 
     func test__network_indicator_hides_after_short_delay_when_procedure_finishes() {
         procedure.add(observer: NetworkObserver(controller: controller))
-        wait(for: procedure, withTimeout: 5) { _ in
+        wait(for: procedure, withTimeout: procedure.delay + controller.interval + 1.0) { _ in
             self.XCTAssertProcedureFinishedWithoutErrors()
             guard self.changes.count == 2 else {
                 XCTFail("Too few changes"); return
@@ -77,19 +78,22 @@ class NetworkObserverTests: ProcedureKitTestCase {
     }
 
     func test__network_indicator_only_changes_once_when_multiple_procedures_start() {
-        let procedure1 = TestProcedure()
+        let procedure1 = TestProcedure(delay: 0.1)
         procedure1.add(observer: NetworkObserver(controller: controller))
-        let procedure2 = TestProcedure()
+        let procedure2 = TestProcedure(delay: 0.1)
         procedure2.add(observer: NetworkObserver(controller: controller))
 
-        wait(for: procedure1, procedure2, withTimeout: 5) { _ in
+        wait(for: procedure1, procedure2, withTimeout: max(procedure1.delay, procedure2.delay) + controller.interval + 1.0) { _ in
             self.XCTAssertProcedureFinishedWithoutErrors(procedure1)
             self.XCTAssertProcedureFinishedWithoutErrors(procedure2)
-            XCTAssertEqual(self.changes.count, 4)
+            XCTAssertEqual(self.changes, [true, false])
         }
     }
 
     func test__network_indicator_does_not_hide_before_all_procedures_are_finished() {
+
+        let timerInterval = 1.0
+
         //
         // Definitions:
         //  timerInterval = the interval used inside NetworkIndicatorController for its Timer
@@ -124,34 +128,43 @@ class NetworkObserverTests: ProcedureKitTestCase {
         // Previously, this test would fail by producing 4 visibility changes: (true, false, true, false)
         //
 
-        let delay1 = DelayProcedure(by: 0.1)
-        let delay2 = DelayProcedure(by: 1.1)
+        let controller = NetworkActivityController(timerInterval: timerInterval, indicator: indicator)
 
         let procedure1 = TestProcedure(delay: 0.1)
         procedure1.add(observer: NetworkObserver(controller: controller))
 
-        let procedure2 = TestProcedure(delay: 2.1)
+        let procedure2 = TestProcedure(delay: (timerInterval * 2.0))
         procedure2.add(observer: NetworkObserver(controller: controller))
-        procedure2.add(dependency: delay1)
+        let delayForProcedure2 = DelayProcedure(by: 0.1)
+        procedure2.add(dependency: delayForProcedure2)
+        addCompletionBlockTo(procedure: procedure2)
 
         let procedure3 = TestProcedure(delay: 0.1)
         procedure3.add(observer: NetworkObserver(controller: controller))
-        procedure3.add(dependency: delay2)
+        let delayForProcedure3 = DelayProcedure(by: (timerInterval + 0.2))
+        procedure3.add(dependency: delayForProcedure3)
+        addCompletionBlockTo(procedure: procedure3)
 
-        procedure1.addWillExecuteBlockObserver { procedure in
-            procedure.produce(operation: delay1)
-            procedure.produce(operation: procedure2)
-            procedure.produce(operation: delay2)
-            procedure.produce(operation: procedure3)
+        procedure1.addDidFinishBlockObserver { procedure, _ in
+            do {
+                try procedure.produce(operation: delayForProcedure2)
+                try procedure.produce(operation: procedure2)
+                try procedure.produce(operation: delayForProcedure3)
+                try procedure.produce(operation: procedure3)
+            }
+            catch {
+                fatalError("\(error)")
+            }
         }
 
-        wait(for: procedure1, withTimeout: 5) { _ in
+        // wait until all procedures have finished and the timer has invalidated the network indicator
+
+        wait(for: procedure1, withTimeout: (timerInterval + 0.5) * 3.0 + (timerInterval * 2.0)) { _ in
             self.XCTAssertProcedureFinishedWithoutErrors(procedure1)
             self.XCTAssertProcedureFinishedWithoutErrors(procedure2)
             self.XCTAssertProcedureFinishedWithoutErrors(procedure3)
-            XCTAssertEqual(self.changes.count, 5)
+            XCTAssertEqual(self.changes, [true, false])
         }
-
     }
 }
 
@@ -159,12 +172,14 @@ class NetworkObserverTests: ProcedureKitTestCase {
 class NetworkActivityControllerTimerTests: ProcedureKitTestCase {
 
     func test__network_indicator_timer_cancellation_prevents_handler_from_running() {
+        let interval = 0.4
         let expect = expectation(description: "Test: \(#function)")
         var didRunBlock = false
-        let timer = NetworkActivityController.Timer(interval: 0.4) { didRunBlock = true }
+        let timer = NetworkActivityController.Timer(interval: interval) { didRunBlock = true }
         timer.cancel()
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { expect.fulfill() }
-        waitForExpectations(timeout: 1, handler: nil)
+        // wait until after the timer would have run (if not successfully cancelled)
+        DispatchQueue.main.asyncAfter(deadline: .now() + interval + 0.1) { expect.fulfill() }
+        waitForExpectations(timeout: interval + 0.1 + 1.0, handler: nil)
         XCTAssertFalse(didRunBlock)
     }
 }

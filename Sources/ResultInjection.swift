@@ -4,7 +4,6 @@
 //  Copyright © 2016 ProcedureKit. All rights reserved.
 //
 
-
 public enum PendingValue<T> {
     case void
     case pending
@@ -13,6 +12,27 @@ public enum PendingValue<T> {
     public var value: T? {
         guard case let .ready(value) = self else { return nil }
         return value
+    }
+
+    var isPending: Bool {
+        if case .pending = self {
+            return true
+        }
+        return false
+    }
+}
+
+extension PendingValue where T: Equatable {
+
+    static func == (lhs: PendingValue<T>, rhs: PendingValue<T>) -> Bool {
+        switch (lhs, rhs) {
+        case (.pending, .pending), (.void, .void):
+            return true
+        case let (.ready(lhsValue), .ready(rhsValue)):
+            return lhsValue == rhsValue
+        default:
+            return false
+        }
     }
 }
 

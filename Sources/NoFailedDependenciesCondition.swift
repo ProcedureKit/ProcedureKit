@@ -24,7 +24,6 @@ public class NoFailedDependenciesCondition: Condition {
         cancellationOptions = ignoreCancellations ? .ignore : .fail
         super.init()
         name = "No Failed Dependencies"
-        mutuallyExclusive = false
     }
 
     /**

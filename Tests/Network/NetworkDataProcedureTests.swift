@@ -24,6 +24,14 @@ class NetworkDataProcedureTests: ProcedureKitTestCase {
         download = NetworkDataProcedure(session: session, request: request)
     }
 
+    override func tearDown() {
+        url = nil
+        request = nil
+        session = nil
+        download = nil
+        super.tearDown()
+    }
+
     func test__session_receives_request() {
         wait(for: download)
         XCTAssertProcedureFinishedWithoutErrors(download)
@@ -68,10 +76,10 @@ class NetworkDataProcedureTests: ProcedureKitTestCase {
     }
 
     func test__session_error__finishes_with_error() {
-        session.returnedError = TestError()
+        session.returnedError = NSError(domain: NSURLErrorDomain, code: NSURLErrorNotConnectedToInternet, userInfo: nil)
         wait(for: download)
         XCTAssertProcedureFinishedWithErrors(download, count: 1)
-        XCTAssertEqual(download.errors.first as? TestError, session.returnedError as? TestError)
+        XCTAssertNotNil(download.networkError)
     }
 
     func test__completion_handler_receives_data_and_response() {

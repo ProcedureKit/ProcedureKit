@@ -61,6 +61,43 @@ public struct HTTPRequirement<Payload: Equatable>: Equatable {
     public static func == (lhs: HTTPRequirement <Payload>, rhs: HTTPRequirement <Payload>) -> Bool {
         return lhs.payload == rhs.payload && lhs.request == rhs.request
     }
-    public var payload: Payload?
+
+    public init(request: URLRequest, payload: Payload? = nil) {
+        self.request = request
+        self.payload = payload
+    }
+
     public var request: URLRequest
+    public var payload: Payload?
+}
+
+public struct ProcedureKitNetworkError: Error {
+    public let underlyingError: NSError
+
+    public var isTransientError: Bool {
+        switch underlyingError.code {
+        case NSURLErrorNetworkConnectionLost:
+            return true
+        default:
+            return false
+        }
+    }
+
+    public var waitForReachabilityChangeBeforeRetrying: Bool {
+        switch underlyingError.code {
+        case NSURLErrorNotConnectedToInternet, NSURLErrorInternationalRoamingOff, NSURLErrorCallIsActive, NSURLErrorDataNotAllowed:
+            return true
+        default:
+            return false
+        }
+    }
+
+    public init(_ error: NSError) {
+        underlyingError = error
+    }
+}
+
+public protocol NetworkOperation {
+
+    var networkError: ProcedureKitNetworkError? { get }
 }
