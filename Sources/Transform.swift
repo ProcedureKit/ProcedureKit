@@ -4,14 +4,14 @@
 //  Copyright © 2016 ProcedureKit. All rights reserved.
 //
 
-open class TransformProcedure<Requirement, Result>: Procedure, ResultInjection {
+open class TransformProcedure<Input, Output>: Procedure, InputProcedure, OutputProcedure {
 
-    public typealias Transform = (Requirement) throws -> Result
+    public typealias Transform = (Input) throws -> Output
 
     private let transform: Transform
 
-    public var requirement: PendingValue<Requirement> = .pending
-    public var result: PendingValue<Result> = .pending
+    public var input: Pending<Input> = .pending
+    public var output: Pending<Result<Output>> = .pending
 
     public init(transform: @escaping Transform) {
         self.transform = transform
@@ -22,11 +22,12 @@ open class TransformProcedure<Requirement, Result>: Procedure, ResultInjection {
         var finishingError: Error? = nil
         defer { finish(withError: finishingError) }
         do {
-            guard let requirement = requirement.value else {
-                throw ProcedureKitError.requirementNotSatisfied()
-            }
-            result = .ready(try transform(requirement))
+            guard let inputValue = input.value else { throw ProcedureKitError.requirementNotSatisfied() }
+            output = .ready(.success(try transform(inputValue)))
         }
-        catch { finishingError = error }
+        catch {
+            output = .ready(.failure(error))
+            finishingError = error
+        }
     }
 }
