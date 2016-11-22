@@ -6,7 +6,6 @@
 
 import Foundation
 import XCTest
-@testable import ProcedureKit
 
 public protocol BatchProtocol {
     var startTime: CFAbsoluteTime { get }

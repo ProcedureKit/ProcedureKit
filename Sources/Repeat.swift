@@ -105,7 +105,7 @@ open class RepeatProcedure<T: Operation>: GroupProcedure {
 
     /// Public override of execute which configures and adds the first operation
     open override func execute() {
-        let current = _repeatStateLock.withCriticalScope { () -> T in 
+        let current = _repeatStateLock.withCriticalScope { () -> T in
             _configure(_current)
             return _current
         }

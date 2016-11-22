@@ -109,8 +109,12 @@ public extension Protector where T: RangeReplaceableCollection {
     }
 }
 
-internal extension NSLock {
+public extension NSLock {
 
+    /// Convenience API to execute block after acquiring the lock
+    ///
+    /// - Parameter block: the block to run
+    /// - Returns: returns the return value of the block
     func withCriticalScope<T>(block: () -> T) -> T {
         lock()
         let value = block()
@@ -119,8 +123,12 @@ internal extension NSLock {
     }
 }
 
-internal extension NSRecursiveLock {
+public extension NSRecursiveLock {
 
+    /// Convenience API to execute block after acquiring the lock
+    ///
+    /// - Parameter block: the block to run
+    /// - Returns: returns the return value of the block
     func withCriticalScope<T>(block: () -> T) -> T {
         lock()
         let value = block()
