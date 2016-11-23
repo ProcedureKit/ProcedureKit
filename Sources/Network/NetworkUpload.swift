@@ -11,10 +11,10 @@
  */
 open class NetworkUploadProcedure<Session: URLSessionTaskFactory>: Procedure, InputProcedure, OutputProcedure, NetworkOperation {
 
-    public typealias CompletionBlock = (Result<HTTPResult<Data>>) -> Void
+    public typealias CompletionBlock = (Result<HTTPPayloadResponse<Data>>) -> Void
 
-    public var input: Pending<HTTPRequirement<Data>> = .pending
-    public var output: Pending<Result<HTTPResult<Data>>> = .pending
+    public var input: Pending<HTTPPayloadRequest<Data>> = .pending
+    public var output: Pending<Result<HTTPPayloadResponse<Data>>> = .pending
 
     public private(set) var session: Session
     public let completion: CompletionBlock
@@ -28,14 +28,13 @@ open class NetworkUploadProcedure<Session: URLSessionTaskFactory>: Procedure, In
     public init(session: Session, request: URLRequest? = nil, data: Data? = nil, completionHandler: @escaping CompletionBlock = { _ in }) {
 
         self.session = session
-        self.input = request.flatMap { .ready(HTTPRequirement(request: $0, payload: data)) } ?? .pending
+        self.input = request.flatMap { .ready(HTTPPayloadRequest(payload: data, request: $0)) } ?? .pending
         self.completion = completionHandler
 
         super.init()
         addWillCancelBlockObserver { procedure, _ in
             procedure.task?.cancel()
         }
-
     }
 
     open override func execute() {
@@ -57,7 +56,7 @@ open class NetworkUploadProcedure<Session: URLSessionTaskFactory>: Procedure, In
                 return
             }
 
-            let http = HTTPResult(payload: data, response: response)
+            let http = HTTPPayloadResponse(payload: data, response: response)
 
             strongSelf.completion(.success(http))
             strongSelf.finish(withResult: .success(http))
@@ -65,5 +64,4 @@ open class NetworkUploadProcedure<Session: URLSessionTaskFactory>: Procedure, In
 
         task?.resume()
     }
-
 }

@@ -11,10 +11,10 @@
  */
 open class NetworkDownloadProcedure<Session: URLSessionTaskFactory>: Procedure, InputProcedure, OutputProcedure, NetworkOperation {
 
-    public typealias CompletionBlock = (Result<HTTPResult<URL>>) -> Void
+    public typealias CompletionBlock = (Result<HTTPPayloadResponse<URL>>) -> Void
 
     public var input: Pending<URLRequest> = .pending
-    public var output: Pending<Result<HTTPResult<URL>>> = .pending
+    public var output: Pending<Result<HTTPPayloadResponse<URL>>> = .pending
 
     public private(set) var session: Session
     public let completion: CompletionBlock
@@ -56,7 +56,7 @@ open class NetworkDownloadProcedure<Session: URLSessionTaskFactory>: Procedure, 
                 return
             }
 
-            let http = HTTPResult(payload: location, response: response)
+            let http = HTTPPayloadResponse(payload: location, response: response)
 
             strongSelf.completion(.success(http))
             strongSelf.finish(withResult: .success(http))

@@ -53,7 +53,7 @@ public protocol ResilientNetworkBehavior {
     func retryRequest(forResponseWithStatusCode statusCode: Int, errorCode: Int?) -> Bool
 }
 
-internal class ResilientNetworkRecovery<T: Operation> where T: InputProcedure & OutputProcedure, T.Output == HTTPResult<Data> {
+internal class ResilientNetworkRecovery<T: Operation> where T: InputProcedure & OutputProcedure, T.Output == HTTPPayloadResponse<Data> {
 
     typealias ConfigurationBlock = (T) -> Void
     typealias Payload = RepeatProcedurePayload<T>
@@ -96,7 +96,7 @@ public enum ProcedureKitNetworkResiliencyError: Error {
  where the result is (Data, HTTPURLResponse)?. For example, see NetworkDataProcedure.
 
  */
-open class ResilientNetworkProcedure<T: Operation>: RetryProcedure<T>, InputProcedure, OutputProcedure where T: InputProcedure & OutputProcedure, T.Output == HTTPResult<Data> {
+open class ResilientNetworkProcedure<T: Operation>: RetryProcedure<T>, InputProcedure, OutputProcedure where T: InputProcedure & OutputProcedure, T.Output == HTTPPayloadResponse<Data> {
 
     internal private(set) var recovery: ResilientNetworkRecovery<T>
 
