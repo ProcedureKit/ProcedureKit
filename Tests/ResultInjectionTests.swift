@@ -26,9 +26,6 @@ class Printing: Procedure, InputProcedure, OutputProcedure {
     var input: Pending<String> = .ready("Default Requirement")
     var output: Pending<Result<Void>> = pendingVoidResult
 
-    var requirement: PendingValue<String> = .ready("Default Requirement")
-    let result: PendingValue<Void> = .void
-
     override func execute() {
         if let message = input.value {
             log.info(message: message)
