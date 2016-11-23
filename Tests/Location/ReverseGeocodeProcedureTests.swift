@@ -14,6 +14,7 @@ import TestingProcedureKit
 class ReverseGeocodeProcedureTests: LocationProcedureTestCase {
 
     func test__geocoder_starts() {
+        geocoder.placemarks = [placemark]
         let procedure = ReverseGeocodeProcedure(location: location)
         procedure.geocoder = geocoder
         wait(for: procedure)
@@ -43,8 +44,8 @@ class ReverseGeocodeProcedureTests: LocationProcedureTestCase {
         procedure.geocoder = geocoder
         wait(for: procedure)
         XCTAssertProcedureFinishedWithoutErrors(procedure)
-        XCTAssertNotNil(procedure.result.value)
-        XCTAssertEqual(procedure.result.value, geocoder.placemarks?.first)
+        XCTAssertNotNil(procedure.output.success)
+        XCTAssertEqual(procedure.output.success, geocoder.placemarks?.first)
     }
 
     func test__completion_is_executed_and_receives_placemark() {

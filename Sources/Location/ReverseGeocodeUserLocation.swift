@@ -15,19 +15,18 @@ public struct UserLocationPlacemark: Equatable {
     public let placemark: CLPlacemark
 }
 
-open class ReverseGeocodeUserLocationProcedure: GroupProcedure, ResultInjection {
+open class ReverseGeocodeUserLocationProcedure: GroupProcedure, OutputProcedure {
 
     public typealias CompletionBlock = (UserLocationPlacemark) -> Void
 
-    class Finishing: Procedure {
+    class Finishing: Procedure, OutputProcedure {
 
         let completion: CompletionBlock?
 
-        var location: PendingValue<CLLocation> = .pending
-        var placemark: PendingValue<CLPlacemark> = .pending
+        var location: Pending<CLLocation> = .pending
+        var placemark: Pending<CLPlacemark> = .pending
 
-        var requirement: PendingValue<Void> = .void
-        var result: PendingValue<UserLocationPlacemark> = .pending
+        var output: Pending<Result<UserLocationPlacemark>> = .pending
 
         init(completion: CompletionBlock? = nil) {
             self.completion = completion
@@ -35,22 +34,21 @@ open class ReverseGeocodeUserLocationProcedure: GroupProcedure, ResultInjection 
         }
 
         override func execute() {
-            var finishingError: Error? = nil
-            defer { finish(withError: finishingError) }
 
             guard let location = location.value, let placemark = placemark.value else {
-                finishingError = ProcedureKitError.requirementNotSatisfied()
+                output = .ready(.failure(ProcedureKitError.requirementNotSatisfied()))
                 return
             }
 
             let userLocationPlacemark = UserLocationPlacemark(location: location, placemark: placemark)
-            result = .ready(userLocationPlacemark)
 
             if let block = completion {
                 DispatchQueue.main.async {
                     block(userLocationPlacemark)
                 }
             }
+
+            finish(withResult: .success(userLocationPlacemark))
         }
     }
 
@@ -58,9 +56,9 @@ open class ReverseGeocodeUserLocationProcedure: GroupProcedure, ResultInjection 
     private let userLocation: UserLocationProcedure
     private let reverseGeocodeLocation: ReverseGeocodeProcedure
 
-    public var requirement: PendingValue<Void> = .void
-    public var result: PendingValue<UserLocationPlacemark> {
-        return finishing.result
+    public var output: Pending<Result<UserLocationPlacemark>> {
+        get { return finishing.output }
+        set { assertionFailure("\(#function) should not be publically settable.") }
     }
 
     init(dispatchQueue: DispatchQueue? = nil, timeout: TimeInterval = 3.0, accuracy: CLLocationAccuracy = kCLLocationAccuracyThreeKilometers, completion: CompletionBlock? = nil) {

@@ -4,22 +4,23 @@
 //  Copyright © 2016 ProcedureKit. All rights reserved.
 //
 
-class AnyProcedureBox_<Requirement, Result>: GroupProcedure, ResultInjection {
-    var requirement: PendingValue<Requirement> = .pending
-    var result: PendingValue<Result> { return .pending }
+class AnyProcedureBox_<Input, Output>: GroupProcedure, InputProcedure, OutputProcedure {
+    var input: Pending<Input> = .pending
+    var output: Pending<Result<Output>> = .pending
 }
 
-class AnyProcedureBox<Base: Procedure>: AnyProcedureBox_<Base.Requirement, Base.Result> where Base: ResultInjection {
+class AnyProcedureBox<Base: Procedure>: AnyProcedureBox_<Base.Input, Base.Output> where Base: InputProcedure & OutputProcedure {
 
     private var base: Base
 
-    public override var requirement: PendingValue<Base.Requirement> {
-        get { return base.requirement }
-        set { base.requirement = newValue }
+    public override var input: Pending<Base.Input> {
+        get { return base.input }
+        set { base.input = newValue }
     }
 
-    public override var result: PendingValue<Base.Result> {
-        return base.result
+    public override var output: Pending<Result<Base.Output>> {
+        get { return base.output }
+        set { base.output = newValue }
     }
 
     public init(dispatchQueue: DispatchQueue? = nil, base: Base) {
@@ -29,21 +30,22 @@ class AnyProcedureBox<Base: Procedure>: AnyProcedureBox_<Base.Requirement, Base.
     }
 }
 
-public class AnyProcedure<Requirement, Result>: GroupProcedure, ResultInjection {
-    private typealias Erased = AnyProcedureBox_<Requirement, Result>
+public class AnyProcedure<Input, Output>: GroupProcedure, InputProcedure, OutputProcedure {
+    private typealias Erased = AnyProcedureBox_<Input, Output>
 
     private var erased: Erased
 
-    public var requirement: PendingValue<Erased.Requirement> {
-        get { return erased.requirement }
-        set { erased.requirement = newValue }
+    public var input: Pending<Erased.Input> {
+        get { return erased.input }
+        set { erased.input = newValue }
     }
 
-    public var result: PendingValue<Erased.Result> {
-        return erased.result
+    public var output: Pending<Result<Erased.Output>> {
+        get { return erased.output }
+        set { erased.output = newValue }
     }
 
-    public init<Base>(dispatchQueue: DispatchQueue? = nil, _ base: Base) where Base: Procedure, Base: ResultInjection, Result == Base.Result, Requirement == Base.Requirement {
+    public init<Base: Procedure>(dispatchQueue: DispatchQueue? = nil, _ base: Base) where Base: InputProcedure & OutputProcedure, Output == Base.Output, Input == Base.Input {
         erased = AnyProcedureBox(dispatchQueue: dispatchQueue, base: base)
         super.init(dispatchQueue: erased.dispatchQueue, operations: [erased])
         log.enabled = false

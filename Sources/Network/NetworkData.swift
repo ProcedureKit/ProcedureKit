@@ -9,23 +9,25 @@
  URLSession based APIs. It only supports the completion block style API, therefore
  do not use this procedure if you wish to use delegate based APIs on URLSession.
 */
-open class NetworkDataProcedure<Session: URLSessionTaskFactory>: Procedure, ResultInjection, NetworkOperation {
+open class NetworkDataProcedure<Session: URLSessionTaskFactory>: Procedure, InputProcedure, OutputProcedure, NetworkOperation {
 
-    public var requirement: PendingValue<URLRequest> = .pending
-    public var result: PendingValue<HTTPResult<Data>> = .pending
+    public typealias CompletionBlock = (Result<HTTPPayloadResponse<Data>>) -> Void
+
+    public var input: Pending<URLRequest> = .pending
+    public var output: Pending<Result<HTTPPayloadResponse<Data>>> = .pending
 
     public private(set) var session: Session
-    public let completion: (HTTPResult<Data>) -> Void
+    public let completion: CompletionBlock
 
     internal var task: Session.DataTask? = nil
 
     public var networkError: ProcedureKitNetworkError? {
-        return errors.flatMap { $0 as? ProcedureKitNetworkError }.first
+        return output.error as? ProcedureKitNetworkError ?? errors.flatMap { $0 as? ProcedureKitNetworkError }.first
     }
 
-    public init(session: Session, request: URLRequest? = nil, completionHandler: @escaping (HTTPResult<Data>) -> Void = { _ in }) {
+    public init(session: Session, request: URLRequest? = nil, completionHandler: @escaping CompletionBlock = { _ in }) {
         self.session = session
-        self.requirement = request.flatMap { .ready($0) } ?? .pending
+        self.input = request.flatMap { .ready($0) } ?? .pending
         self.completion = completionHandler
         super.init()
         addWillCancelBlockObserver { procedure, _ in
@@ -34,8 +36,8 @@ open class NetworkDataProcedure<Session: URLSessionTaskFactory>: Procedure, Resu
     }
 
     open override func execute() {
-        guard let request = requirement.value else {
-            finish(withError: ProcedureKitError.requirementNotSatisfied())
+        guard let request = input.value else {
+            finish(withResult: .failure(ProcedureKitError.requirementNotSatisfied()))
             return
         }
 
@@ -43,20 +45,19 @@ open class NetworkDataProcedure<Session: URLSessionTaskFactory>: Procedure, Resu
             guard let strongSelf = self else { return }
 
             if let error = error {
-                strongSelf.finish(withError: ProcedureKitNetworkError(error as NSError))
+                strongSelf.finish(withResult: .failure(ProcedureKitNetworkError(error as NSError)))
                 return
             }
 
             guard let data = data, let response = response as? HTTPURLResponse else {
-                strongSelf.finish(withError: ProcedureKitError.unknown)
+                strongSelf.finish(withResult: .failure(ProcedureKitError.unknown))
                 return
             }
 
-            let http = HTTPResult(payload: data, response: response)
+            let http = HTTPPayloadResponse(payload: data, response: response)
 
-            strongSelf.result = .ready(http)
-            strongSelf.completion(http)
-            strongSelf.finish()
+            strongSelf.completion(.success(http))
+            strongSelf.finish(withResult: .success(http))
         }
 
         task?.resume()

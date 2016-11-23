@@ -75,8 +75,8 @@ public struct ProcedureKitError: Error, Equatable {
         return ProcedureKitError(context: .capability(.unauthorized), errors: [])
     }
 
-    public static func component(_ component: ProcedureKitComponent, error: Error) -> ProcedureKitError {
-        return ProcedureKitError(context: .component(component), errors: [error])
+    public static func component(_ component: ProcedureKitComponent, error: Error?) -> ProcedureKitError {
+        return ProcedureKitError(context: .component(component), errors: error.map { [$0] } ?? [])
     }
 
     public static func conditionFailed(withErrors errors: [Error] = []) -> ProcedureKitError {

@@ -19,7 +19,7 @@ public final class MutuallyExclusive<T>: Condition {
 
     /// Required public override, but there is no evaluation, so it just completes with `.Satisfied`.
     public override func evaluate(procedure: Procedure, completion: @escaping (ConditionResult) -> Void) {
-        completion(.satisfied)
+        completion(.success(true))
     }
 }
 

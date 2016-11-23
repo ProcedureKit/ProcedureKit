@@ -84,8 +84,8 @@ class NetworkDownloadProcedureTests: ProcedureKitTestCase {
     func test__completion_handler_receives_data_and_response() {
         var completionHandlerDidExecute = false
         download = NetworkDownloadProcedure(session: session, request: request) { result in
-            XCTAssertEqual(result.payload, self.session.returnedURL)
-            XCTAssertEqual(result.response, self.session.returnedResponse)
+            XCTAssertEqual(result.value?.payload, self.session.returnedURL)
+            XCTAssertEqual(result.value?.response, self.session.returnedResponse)
             completionHandlerDidExecute = true
         }
         wait(for: download)

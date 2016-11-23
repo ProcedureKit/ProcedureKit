@@ -53,7 +53,7 @@ public protocol ResilientNetworkBehavior {
     func retryRequest(forResponseWithStatusCode statusCode: Int, errorCode: Int?) -> Bool
 }
 
-internal class ResilientNetworkRecovery<T: Operation> where T: ResultInjection, T.Result == HTTPResult<Data> {
+internal class ResilientNetworkRecovery<T: Operation> where T: InputProcedure & OutputProcedure, T.Output == HTTPPayloadResponse<Data> {
 
     typealias ConfigurationBlock = (T) -> Void
     typealias Payload = RepeatProcedurePayload<T>
@@ -70,7 +70,7 @@ internal class ResilientNetworkRecovery<T: Operation> where T: ResultInjection, 
     }
 
     func recover(withInfo info: RetryFailureInfo<T>, payload: Payload) -> Recovery? {
-        guard let response = info.operation.result.value?.response, behavior.retryRequest(forResponseWithStatusCode: response.statusCode, errorCode: info.errorCode) else { return nil }
+        guard let response = info.operation.output.success?.response, behavior.retryRequest(forResponseWithStatusCode: response.statusCode, errorCode: info.errorCode) else { return nil }
         return (behavior.errorDelay ?? payload.delay, info.configure)
     }
 }
@@ -96,7 +96,7 @@ public enum ProcedureKitNetworkResiliencyError: Error {
  where the result is (Data, HTTPURLResponse)?. For example, see NetworkDataProcedure.
 
  */
-open class ResilientNetworkProcedure<T: Operation>: RetryProcedure<T> where T: ResultInjection, T.Result == HTTPResult<Data> {
+open class ResilientNetworkProcedure<T: Operation>: RetryProcedure<T>, InputProcedure, OutputProcedure where T: InputProcedure & OutputProcedure, T.Output == HTTPPayloadResponse<Data> {
 
     internal private(set) var recovery: ResilientNetworkRecovery<T>
 
@@ -130,24 +130,11 @@ open class ResilientNetworkProcedure<T: Operation>: RetryProcedure<T> where T: R
     }
 }
 
-extension ResilientNetworkProcedure: ResultInjection {
-
-    public var requirement: PendingValue<T.Requirement> {
-        get { return current.requirement }
-        set {
-            current.requirement = newValue
-            appendConfigureBlock { $0.requirement = newValue }
-        }
-    }
-
-    public var result: PendingValue<T.Result> { return current.result }
-}
-
 public extension ResilientNetworkProcedure {
 
     /// - returns: the resultant Data
-    var data: Data? { return result.value?.payload }
+    var data: Data? { return output.success?.payload }
 
     /// - returns: the resultant Data
-    var response: HTTPURLResponse? { return result.value?.response }
+    var response: HTTPURLResponse? { return output.success?.response }
 }

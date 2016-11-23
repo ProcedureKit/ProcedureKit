@@ -9,13 +9,15 @@
  URLSession based APIs. It only supports the completion block style API, therefore
  do not use this procedure if you wish to use delegate based APIs on URLSession.
  */
-open class NetworkUploadProcedure<Session: URLSessionTaskFactory>: Procedure, ResultInjection, NetworkOperation {
+open class NetworkUploadProcedure<Session: URLSessionTaskFactory>: Procedure, InputProcedure, OutputProcedure, NetworkOperation {
 
-    public var requirement: PendingValue<HTTPRequirement<Data>>
-    public var result: PendingValue<HTTPResult<Data>> = .pending
+    public typealias CompletionBlock = (Result<HTTPPayloadResponse<Data>>) -> Void
+
+    public var input: Pending<HTTPPayloadRequest<Data>> = .pending
+    public var output: Pending<Result<HTTPPayloadResponse<Data>>> = .pending
 
     public private(set) var session: Session
-    public let completion: (HTTPResult<Data>) -> Void
+    public let completion: CompletionBlock
 
     internal var task: Session.UploadTask? = nil
 
@@ -23,47 +25,43 @@ open class NetworkUploadProcedure<Session: URLSessionTaskFactory>: Procedure, Re
         return errors.flatMap { $0 as? ProcedureKitNetworkError }.first
     }
 
-    public init(session: Session, request: URLRequest? = nil, data: Data? = nil, completionHandler: @escaping (HTTPResult<Data>) -> Void = { _ in }) {
+    public init(session: Session, request: URLRequest? = nil, data: Data? = nil, completionHandler: @escaping CompletionBlock = { _ in }) {
 
         self.session = session
-        self.requirement = request.flatMap { .ready(HTTPRequirement(request: $0, payload: data)) } ?? .pending
+        self.input = request.flatMap { .ready(HTTPPayloadRequest(payload: data, request: $0)) } ?? .pending
         self.completion = completionHandler
 
         super.init()
         addWillCancelBlockObserver { procedure, _ in
             procedure.task?.cancel()
         }
-
     }
 
     open override func execute() {
-        guard let requirement = requirement.value else {
-            finish(withError: ProcedureKitError.requirementNotSatisfied())
+        guard let requirement = input.value else {
+            finish(withResult: .failure(ProcedureKitError.requirementNotSatisfied()))
             return
         }
 
         task = session.uploadTask(with: requirement.request, from: requirement.payload) { [weak self] data, response, error in
-              guard let strongSelf = self else { return }
-
+            guard let strongSelf = self else { return }
 
             if let error = error {
-                strongSelf.finish(withError: ProcedureKitNetworkError(error as NSError))
+                strongSelf.finish(withResult: .failure(ProcedureKitNetworkError(error as NSError)))
                 return
             }
 
             guard let data = data, let response = response as? HTTPURLResponse else {
-                strongSelf.finish(withError: ProcedureKitError.unknown)
+                strongSelf.finish(withResult: .failure(ProcedureKitError.unknown))
                 return
             }
 
-            let http = HTTPResult(payload: data, response: response)
+            let http = HTTPPayloadResponse(payload: data, response: response)
 
-            strongSelf.result = .ready(http)
-            strongSelf.completion(http)
-            strongSelf.finish()
+            strongSelf.completion(.success(http))
+            strongSelf.finish(withResult: .success(http))
         }
 
         task?.resume()
     }
-
 }

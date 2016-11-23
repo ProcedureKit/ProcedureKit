@@ -52,7 +52,7 @@ class ProcedureConditionStressTest: StressTestCase {
     func test__adding_many_conditions_each_with_single_dependency() {
 
         StressLevel.custom(1, 10_000).forEach { _, _ in
-            procedure.add(condition: TestCondition(dependencies: [TestProcedure()]) { .satisfied })
+            procedure.add(condition: TestCondition(dependencies: [TestProcedure()]) { .success(true) })
         }
         wait(for: procedure, withTimeout: 10)
         XCTAssertProcedureFinishedWithoutErrors()

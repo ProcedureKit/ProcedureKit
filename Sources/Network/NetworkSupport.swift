@@ -49,26 +49,33 @@ extension URL: ExpressibleByStringLiteral {
     }
 }
 
-public struct HTTPResult<Payload: Equatable>: Equatable {
-    public static func == (lhs: HTTPResult<Payload>, rhs: HTTPResult<Payload>) -> Bool {
+public struct HTTPPayloadResponse<Payload: Equatable>: Equatable {
+
+    public static func == (lhs: HTTPPayloadResponse<Payload>, rhs: HTTPPayloadResponse<Payload>) -> Bool {
         return lhs.payload == rhs.payload && lhs.response == rhs.response
     }
+
     public var payload: Payload
     public var response: HTTPURLResponse
+
+    public init(payload: Payload, response: HTTPURLResponse) {
+        self.payload = payload
+        self.response = response
+    }
 }
 
-public struct HTTPRequirement<Payload: Equatable>: Equatable {
-    public static func == (lhs: HTTPRequirement <Payload>, rhs: HTTPRequirement <Payload>) -> Bool {
+public struct HTTPPayloadRequest<Payload: Equatable>: Equatable {
+    public static func == (lhs: HTTPPayloadRequest <Payload>, rhs: HTTPPayloadRequest <Payload>) -> Bool {
         return lhs.payload == rhs.payload && lhs.request == rhs.request
-    }
-
-    public init(request: URLRequest, payload: Payload? = nil) {
-        self.request = request
-        self.payload = payload
     }
 
     public var request: URLRequest
     public var payload: Payload?
+
+    public init(payload: Payload? = nil, request: URLRequest) {
+        self.payload = payload
+        self.request = request
+    }
 }
 
 public struct ProcedureKitNetworkError: Error {
