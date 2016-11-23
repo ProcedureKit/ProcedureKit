@@ -93,7 +93,7 @@ public protocol OutputProcedure: ProcedureProtocol {
 
     associatedtype Output
 
-    var output: Pending<Result<Output>> { get }
+    var output: Pending<Result<Output>> { get set }
 }
 
 
@@ -102,6 +102,14 @@ public let pendingVoid: Pending<Void> = .ready(())
 public let pendingVoidResult: Pending<Result<Void>> = .ready(.success(()))
 
 // MARK: - Extensions
+
+public extension OutputProcedure {
+
+    func finish(withResult result: Result<Output>) {
+        output = .ready(result)
+        finish(withError: output.error)
+    }
+}
 
 public extension ProcedureProtocol {
 

@@ -6,7 +6,7 @@
 
 class AnyProcedureBox_<Input, Output>: GroupProcedure, InputProcedure, OutputProcedure {
     var input: Pending<Input> = .pending
-    var output: Pending<Result<Output>> { return .pending }
+    var output: Pending<Result<Output>> = .pending
 }
 
 class AnyProcedureBox<Base: Procedure>: AnyProcedureBox_<Base.Input, Base.Output> where Base: InputProcedure & OutputProcedure {
@@ -19,7 +19,8 @@ class AnyProcedureBox<Base: Procedure>: AnyProcedureBox_<Base.Input, Base.Output
     }
 
     public override var output: Pending<Result<Base.Output>> {
-        return base.output
+        get { return base.output }
+        set { base.output = newValue }
     }
 
     public init(dispatchQueue: DispatchQueue? = nil, base: Base) {
@@ -40,7 +41,8 @@ public class AnyProcedure<Input, Output>: GroupProcedure, InputProcedure, Output
     }
 
     public var output: Pending<Result<Erased.Output>> {
-        return erased.output
+        get { return erased.output }
+        set { erased.output = newValue }
     }
 
     public init<Base: Procedure>(dispatchQueue: DispatchQueue? = nil, _ base: Base) where Base: InputProcedure & OutputProcedure, Output == Base.Output, Input == Base.Input {
