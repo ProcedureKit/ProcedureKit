@@ -40,29 +40,27 @@ open class NetworkUploadProcedure<Session: URLSessionTaskFactory>: Procedure, In
 
     open override func execute() {
         guard let requirement = input.value else {
-            finish(withError: ProcedureKitError.requirementNotSatisfied())
+            finish(withResult: .failure(ProcedureKitError.requirementNotSatisfied()))
             return
         }
 
         task = session.uploadTask(with: requirement.request, from: requirement.payload) { [weak self] data, response, error in
             guard let strongSelf = self else { return }
 
-            defer { strongSelf.finish(withError: strongSelf.output.error) }
-
             if let error = error {
-                strongSelf.output = .ready(.failure(ProcedureKitNetworkError(error as NSError)))
+                strongSelf.finish(withResult: .failure(ProcedureKitNetworkError(error as NSError)))
                 return
             }
 
             guard let data = data, let response = response as? HTTPURLResponse else {
-                strongSelf.output = .ready(.failure(ProcedureKitError.unknown))
+                strongSelf.finish(withResult: .failure(ProcedureKitError.unknown))
                 return
             }
 
             let http = HTTPResult(payload: data, response: response)
 
-            strongSelf.output = .ready(.success(http))
             strongSelf.completion(.success(http))
+            strongSelf.finish(withResult: .success(http))
         }
 
         task?.resume()

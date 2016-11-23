@@ -243,6 +243,10 @@ extension RepeatProcedure where T: OutputProcedure {
 
     public var output: Pending<Result<T.Output>> {
         get { return current.output }
+        set {
+            current.output = newValue
+            appendConfigureBlock { $0.output = newValue }
+        }
     }
 }
 

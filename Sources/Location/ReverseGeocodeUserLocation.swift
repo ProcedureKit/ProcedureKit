@@ -34,7 +34,6 @@ open class ReverseGeocodeUserLocationProcedure: GroupProcedure, OutputProcedure 
         }
 
         override func execute() {
-            defer { finish(withError: output.error) }
 
             guard let location = location.value, let placemark = placemark.value else {
                 output = .ready(.failure(ProcedureKitError.requirementNotSatisfied()))
@@ -42,13 +41,14 @@ open class ReverseGeocodeUserLocationProcedure: GroupProcedure, OutputProcedure 
             }
 
             let userLocationPlacemark = UserLocationPlacemark(location: location, placemark: placemark)
-            output = .ready(.success(userLocationPlacemark))
 
             if let block = completion {
                 DispatchQueue.main.async {
                     block(userLocationPlacemark)
                 }
             }
+
+            finish(withResult: .success(userLocationPlacemark))
         }
     }
 
@@ -57,7 +57,8 @@ open class ReverseGeocodeUserLocationProcedure: GroupProcedure, OutputProcedure 
     private let reverseGeocodeLocation: ReverseGeocodeProcedure
 
     public var output: Pending<Result<UserLocationPlacemark>> {
-        return finishing.output
+        get { return finishing.output }
+        set { assertionFailure("\(#function) should not be publically settable.") }
     }
 
     init(dispatchQueue: DispatchQueue? = nil, timeout: TimeInterval = 3.0, accuracy: CLLocationAccuracy = kCLLocationAccuracyThreeKilometers, completion: CompletionBlock? = nil) {

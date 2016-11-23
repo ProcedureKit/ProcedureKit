@@ -39,29 +39,27 @@ open class NetworkDownloadProcedure<Session: URLSessionTaskFactory>: Procedure, 
 
     open override func execute() {
         guard let request = input.value else {
-            finish(withError: ProcedureKitError.requirementNotSatisfied())
+            finish(withResult: .failure(ProcedureKitError.requirementNotSatisfied()))
             return
         }
 
         task = session.downloadTask(with: request) { [weak self] location, response, error in
             guard let strongSelf = self else { return }
 
-            defer { strongSelf.finish(withError: strongSelf.output.error) }
-
             if let error = error {
-                strongSelf.output = .ready(.failure(ProcedureKitNetworkError(error as NSError)))
+                strongSelf.finish(withResult: .failure(ProcedureKitNetworkError(error as NSError)))
                 return
             }
 
             guard let location = location, let response = response as? HTTPURLResponse else {
-                strongSelf.output = .ready(.failure(ProcedureKitError.unknown))
+                strongSelf.finish(withResult: .failure(ProcedureKitError.unknown))
                 return
             }
 
             let http = HTTPResult(payload: location, response: response)
 
-            strongSelf.output = .ready(.success(http))
             strongSelf.completion(.success(http))
+            strongSelf.finish(withResult: .success(http))
         }
 
         task?.resume()

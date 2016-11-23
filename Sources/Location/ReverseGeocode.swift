@@ -11,7 +11,7 @@ open class ReverseGeocodeProcedure: Procedure, InputProcedure, OutputProcedure {
     public typealias CompletionBlock = (CLPlacemark) -> Void
 
     public var input: Pending<CLLocation> = .pending
-    public private(set) var output: Pending<Result<CLPlacemark>> = .pending
+    public var output: Pending<Result<CLPlacemark>> = .pending
 
     public let completion: CompletionBlock?
 
@@ -45,8 +45,7 @@ open class ReverseGeocodeProcedure: Procedure, InputProcedure, OutputProcedure {
     open override func execute() {
 
         guard let location = input.value else {
-            output = .ready(.failure(ProcedureKitError.requirementNotSatisfied()))
-            finish(withError: output.error)
+            finish(withResult: .failure(ProcedureKitError.requirementNotSatisfied()))
             return
         }
 
@@ -55,21 +54,18 @@ open class ReverseGeocodeProcedure: Procedure, InputProcedure, OutputProcedure {
             // Check that the procedure is still running
             guard let strongSelf = self, !strongSelf.isFinished else { return }
 
-            // Defer finishing, potentially with an error
-            defer { strongSelf.finish(withError: strongSelf.output.error) }
-
             // Check for placemarks results
             guard let placemarks = results else {
-                strongSelf.output = .ready(.failure(ProcedureKitError.component(ProcedureKitLocationComponent(), error: error)))
+                strongSelf.finish(withResult: .failure(ProcedureKitError.component(ProcedureKitLocationComponent(), error: error)))
                 return
             }
 
             // Continue if there is a suitable placemark
             if let placemark = strongSelf.shouldFinish(afterReceivingPlacemarks: placemarks) {
-                strongSelf.output = .ready(.success(placemark))
                 if let block = strongSelf.completion {
                     DispatchQueue.main.async { block(placemark) }
                 }
+                strongSelf.finish(withResult: .success(placemark))
             }
         }
     }
