@@ -19,15 +19,11 @@ open class TransformProcedure<Input, Output>: Procedure, InputProcedure, OutputP
     }
 
     open override func execute() {
-        var finishingError: Error? = nil
-        defer { finish(withError: finishingError) }
+        defer { finish(withError: output.error) }
         do {
             guard let inputValue = input.value else { throw ProcedureKitError.requirementNotSatisfied() }
             output = .ready(.success(try transform(inputValue)))
         }
-        catch {
-            output = .ready(.failure(error))
-            finishingError = error
-        }
+        catch { output = .ready(.failure(error)) }
     }
 }

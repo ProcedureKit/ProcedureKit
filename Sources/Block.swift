@@ -18,13 +18,9 @@ open class ResultProcedure<Output>: Procedure, OutputProcedure {
     }
 
     open override func execute() {
-        var finishingError: Error? = nil
-        defer { finish(withError: finishingError) }
+        defer { finish(withError: output.error) }
         do { output = .ready(.success(try block())) }
-        catch {
-            output = .ready(.failure(error))
-            finishingError = error
-        }
+        catch { output = .ready(.failure(error)) }
     }
 }
 
