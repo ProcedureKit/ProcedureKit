@@ -176,7 +176,7 @@ public class GetAuthorizationStatusProcedure<Status: AuthorizationStatus>: Proce
 
      - returns: a StatusResponse
      */
-    public var output: Pending<Result<StatusResponse>> = .pending
+    public var output: Pending<ProcedureResult<StatusResponse>> = .pending
 
     fileprivate let capability: AnyCapability<Status>
     fileprivate let completion: Completion?

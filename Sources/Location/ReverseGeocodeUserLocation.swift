@@ -26,7 +26,7 @@ open class ReverseGeocodeUserLocationProcedure: GroupProcedure, OutputProcedure 
         var location: Pending<CLLocation> = .pending
         var placemark: Pending<CLPlacemark> = .pending
 
-        var output: Pending<Result<UserLocationPlacemark>> = .pending
+        var output: Pending<ProcedureResult<UserLocationPlacemark>> = .pending
 
         init(completion: CompletionBlock? = nil) {
             self.completion = completion
@@ -56,7 +56,7 @@ open class ReverseGeocodeUserLocationProcedure: GroupProcedure, OutputProcedure 
     private let userLocation: UserLocationProcedure
     private let reverseGeocodeLocation: ReverseGeocodeProcedure
 
-    public var output: Pending<Result<UserLocationPlacemark>> {
+    public var output: Pending<ProcedureResult<UserLocationPlacemark>> {
         get { return finishing.output }
         set { assertionFailure("\(#function) should not be publically settable.") }
     }

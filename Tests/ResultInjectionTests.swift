@@ -10,7 +10,7 @@ import TestingProcedureKit
 
 class DataProcessing: Procedure, InputProcedure, OutputProcedure {
     var input: Pending<String> = .pending
-    var output: Pending<Result<Void>> = pendingVoidResult
+    var output: Pending<ProcedureResult<Void>> = pendingVoidResult
 
     override func execute() {
         guard let output = input.value else {
@@ -24,7 +24,7 @@ class DataProcessing: Procedure, InputProcedure, OutputProcedure {
 
 class Printing: Procedure, InputProcedure, OutputProcedure {
     var input: Pending<String> = .ready("Default Requirement")
-    var output: Pending<Result<Void>> = pendingVoidResult
+    var output: Pending<ProcedureResult<Void>> = pendingVoidResult
 
     override func execute() {
         if let message = input.value {

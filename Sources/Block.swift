@@ -8,7 +8,7 @@ open class ResultProcedure<Output>: Procedure, OutputProcedure {
 
     public typealias ThrowingOutputBlock = () throws -> Output
 
-    public var output: Pending<Result<Output>> = .pending
+    public var output: Pending<ProcedureResult<Output>> = .pending
 
     private let block: ThrowingOutputBlock
 

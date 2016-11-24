@@ -23,7 +23,7 @@ open class TestProcedure: Procedure, InputProcedure, OutputProcedure {
     public let error: Error?
     public let producedOperation: Operation?
     public var input: Pending<Void> = pendingVoid
-    public var output: Pending<Result<String>> = .ready(.success("Hello World"))
+    public var output: Pending<ProcedureResult<String>> = .ready(.success("Hello World"))
     public private(set) var executedAt: CFAbsoluteTime = 0
     public private(set) var didExecute = false
     public private(set) var procedureWillFinishCalled = false

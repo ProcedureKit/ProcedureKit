@@ -11,7 +11,7 @@ open class ReverseGeocodeProcedure: Procedure, InputProcedure, OutputProcedure {
     public typealias CompletionBlock = (CLPlacemark) -> Void
 
     public var input: Pending<CLLocation> = .pending
-    public var output: Pending<Result<CLPlacemark>> = .pending
+    public var output: Pending<ProcedureResult<CLPlacemark>> = .pending
 
     public let completion: CompletionBlock?
 
