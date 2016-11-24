@@ -27,3 +27,27 @@ open class TransformProcedure<Input, Output>: Procedure, InputProcedure, OutputP
         catch { output = .ready(.failure(error)) }
     }
 }
+
+open class AsyncTransformProcedure<Input, Output>: Procedure, InputProcedure, OutputProcedure {
+
+    public typealias FinishingBlock = (ProcedureResult<Output>) -> Void
+    public typealias Transform = (Input, FinishingBlock) -> Void
+
+    private let transform: Transform
+
+    public var input: Pending<Input> = .pending
+    public var output: Pending<ProcedureResult<Output>> = .pending
+
+    public init(transform: @escaping Transform) {
+        self.transform = transform
+        super.init()
+    }
+
+    open override func execute() {
+        guard let inputValue = input.value else {
+            finish(withResult: .failure(ProcedureKitError.requirementNotSatisfied()))
+            return
+        }
+        transform(inputValue) { self.finish(withResult: $0) }
+    }
+}
