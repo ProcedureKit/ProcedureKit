@@ -98,8 +98,8 @@ public protocol OutputProcedure: ProcedureProtocol {
 
 
 public let pendingVoid: Pending<Void> = .ready(())
-
-public let pendingVoidResult: Pending<ProcedureResult<Void>> = .ready(.success(()))
+public let success: ProcedureResult<Void> = .success(())
+public let pendingVoidResult: Pending<ProcedureResult<Void>> = .ready(success)
 
 // MARK: - Extensions
 

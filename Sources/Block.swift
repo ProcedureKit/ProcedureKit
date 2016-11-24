@@ -25,3 +25,24 @@ open class ResultProcedure<Output>: Procedure, OutputProcedure {
 }
 
 open class BlockProcedure: ResultProcedure<Void> { }
+
+open class AsyncResultProcedure<Output>: Procedure, OutputProcedure {
+
+    public typealias FinishingBlock = (ProcedureResult<Output>) -> Void
+    public typealias Block = (FinishingBlock) -> Void
+
+    private let block: Block
+
+    public var output: Pending<ProcedureResult<Output>> = .pending
+
+    public init(block: @escaping Block) {
+        self.block = block
+        super.init()
+    }
+
+    open override func execute() {
+        block { self.finish(withResult: $0) }
+    }
+}
+
+open class AsyncBlockProcedure: AsyncResultProcedure<Void> { }
