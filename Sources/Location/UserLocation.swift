@@ -13,7 +13,7 @@ open class UserLocationProcedure: Procedure, OutputProcedure, CLLocationManagerD
     public let accuracy: CLLocationAccuracy
     public let completion: CompletionBlock?
 
-    public var output: Pending<Result<CLLocation>> = .pending
+    public var output: Pending<ProcedureResult<CLLocation>> = .pending
 
     public var location: CLLocation? {
         return output.success
