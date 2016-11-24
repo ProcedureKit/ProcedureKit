@@ -11,7 +11,7 @@ open class TransformProcedure<Input, Output>: Procedure, InputProcedure, OutputP
     private let transform: Transform
 
     public var input: Pending<Input> = .pending
-    public var output: Pending<Result<Output>> = .pending
+    public var output: Pending<ProcedureResult<Output>> = .pending
 
     public init(transform: @escaping Transform) {
         self.transform = transform

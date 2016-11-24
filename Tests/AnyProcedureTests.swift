@@ -10,7 +10,7 @@ import TestingProcedureKit
 
 class Foo: Procedure, InputProcedure, OutputProcedure {
     var input: Pending<String> = .ready("")
-    var output: Pending<Result<String>> = .pending
+    var output: Pending<ProcedureResult<String>> = .pending
     override func execute() {
         if let input = input.value {
             output = .ready(.success("\(input)Foo"))
@@ -21,7 +21,7 @@ class Foo: Procedure, InputProcedure, OutputProcedure {
 
 class Bar: Procedure, InputProcedure, OutputProcedure {
     var input: Pending<String> = .ready("")
-    var output: Pending<Result<String>> = .pending
+    var output: Pending<ProcedureResult<String>> = .pending
     override func execute() {
         if let input = input.value {
             output = .ready(.success("\(input)Bar"))
@@ -32,7 +32,7 @@ class Bar: Procedure, InputProcedure, OutputProcedure {
 
 class Baz: Procedure, InputProcedure, OutputProcedure {
     var input: Pending<String> = .ready("")
-    var output: Pending<Result<String>> = .pending
+    var output: Pending<ProcedureResult<String>> = .pending
     override func execute() {
         if let input = input.value {
             output = .ready(.success("\(input)Baz"))

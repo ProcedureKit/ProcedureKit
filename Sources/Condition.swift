@@ -4,7 +4,7 @@
 //  Copyright © 2016 ProcedureKit. All rights reserved.
 //
 
-public typealias ConditionResult = Result<Bool>
+public typealias ConditionResult = ProcedureResult<Bool>
 
 public protocol ConditionProtocol: ProcedureProtocol {
 

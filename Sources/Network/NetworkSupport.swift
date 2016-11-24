@@ -31,7 +31,6 @@ extension URLSessionTask: URLSessionTaskProtocol { }
 extension URLSessionDataTask: URLSessionDataTaskProtocol {}
 extension URLSessionDownloadTask: URLSessionDownloadTaskProtocol { }
 extension URLSessionUploadTask: URLSessionUploadTaskProtocol { }
-
 extension URLSession: URLSessionTaskFactory { }
 
 extension URL: ExpressibleByStringLiteral {

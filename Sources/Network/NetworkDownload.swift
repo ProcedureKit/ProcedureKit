@@ -10,11 +10,11 @@
  do not use this procedure if you wish to use delegate based APIs on URLSession.
  */
 open class NetworkDownloadProcedure<Session: URLSessionTaskFactory>: Procedure, InputProcedure, OutputProcedure, NetworkOperation {
-
-    public typealias CompletionBlock = (Result<HTTPPayloadResponse<URL>>) -> Void
+    public typealias NetworkResult = ProcedureResult<HTTPPayloadResponse<URL>>
+    public typealias CompletionBlock = (NetworkResult) -> Void
 
     public var input: Pending<URLRequest> = .pending
-    public var output: Pending<Result<HTTPPayloadResponse<URL>>> = .pending
+    public var output: Pending<NetworkResult> = .pending
 
     public private(set) var session: Session
     public let completion: CompletionBlock

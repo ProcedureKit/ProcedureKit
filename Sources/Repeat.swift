@@ -241,7 +241,7 @@ extension RepeatProcedure where T: InputProcedure {
 
 extension RepeatProcedure where T: OutputProcedure {
 
-    public var output: Pending<Result<T.Output>> {
+    public var output: Pending<ProcedureResult<T.Output>> {
         get { return current.output }
         set {
             current.output = newValue

@@ -35,7 +35,7 @@ extension Pending where T: Equatable {
     }
 }
 
-public protocol ResultProtocol {
+public protocol ProcedureResultProtocol {
     associatedtype Value
 
     var value: Value? { get }
@@ -43,7 +43,7 @@ public protocol ResultProtocol {
     var error: Error? { get }
 }
 
-extension Pending where T: ResultProtocol {
+extension Pending where T: ProcedureResultProtocol {
 
     public var success: T.Value? {
         return value?.value
@@ -54,7 +54,7 @@ extension Pending where T: ResultProtocol {
     }
 }
 
-public enum Result<T>: ResultProtocol {
+public enum ProcedureResult<T>: ProcedureResultProtocol {
 
     case success(T)
     case failure(Error)
@@ -70,9 +70,9 @@ public enum Result<T>: ResultProtocol {
     }
 }
 
-extension Result where T: Equatable {
+extension ProcedureResult where T: Equatable {
 
-    static func == (lhs: Result<T>, rhs: Result<T>) -> Bool {
+    static func == (lhs: ProcedureResult<T>, rhs: ProcedureResult<T>) -> Bool {
         switch (lhs, rhs) {
         case let (.success(lhsValue), .success(rhsValue)):
             return lhsValue == rhsValue
@@ -93,19 +93,19 @@ public protocol OutputProcedure: ProcedureProtocol {
 
     associatedtype Output
 
-    var output: Pending<Result<Output>> { get set }
+    var output: Pending<ProcedureResult<Output>> { get set }
 }
 
 
 public let pendingVoid: Pending<Void> = .ready(())
 
-public let pendingVoidResult: Pending<Result<Void>> = .ready(.success(()))
+public let pendingVoidResult: Pending<ProcedureResult<Void>> = .ready(.success(()))
 
 // MARK: - Extensions
 
 public extension OutputProcedure {
 
-    func finish(withResult result: Result<Output>) {
+    func finish(withResult result: ProcedureResult<Output>) {
         output = .ready(result)
         finish(withError: output.error)
     }
