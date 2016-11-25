@@ -4,6 +4,8 @@
 //  Copyright © 2016 ProcedureKit. All rights reserved.
 //
 
+import Dispatch
+
 class AnyProcedureBox_<Input, Output>: GroupProcedure, InputProcedure, OutputProcedure {
     var input: Pending<Input> = .pending
     var output: Pending<ProcedureResult<Output>> = .pending

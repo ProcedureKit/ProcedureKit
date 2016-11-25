@@ -4,6 +4,9 @@
 //  Copyright © 2016 ProcedureKit. All rights reserved.
 //
 
+import Foundation
+import UIKit
+
 internal protocol BackgroundTaskApplicationProtocol {
 
     var applicationState: UIApplicationState { get }

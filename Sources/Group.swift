@@ -6,6 +6,9 @@
 
 // swiftlint:disable file_length
 
+import Foundation
+import Dispatch
+
 /**
  A `Procedure` subclass which enables the grouping
  of other procedures. Use `Group`s to associate

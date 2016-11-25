@@ -4,6 +4,7 @@
 //  Copyright © 2016 ProcedureKit. All rights reserved.
 //
 
+import Foundation
 import Dispatch
 
 internal func _abstractMethod(file: StaticString = #file, line: UInt = #line) {
