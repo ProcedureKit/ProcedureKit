@@ -31,7 +31,7 @@ open class TransformProcedure<Input, Output>: Procedure, InputProcedure, OutputP
 open class AsyncTransformProcedure<Input, Output>: Procedure, InputProcedure, OutputProcedure {
 
     public typealias FinishingBlock = (ProcedureResult<Output>) -> Void
-    public typealias Transform = (Input, FinishingBlock) -> Void
+    public typealias Transform = (Input, @escaping FinishingBlock) -> Void
 
     private let transform: Transform
 

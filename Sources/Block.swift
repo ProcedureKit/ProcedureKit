@@ -29,7 +29,7 @@ open class BlockProcedure: ResultProcedure<Void> { }
 open class AsyncResultProcedure<Output>: Procedure, OutputProcedure {
 
     public typealias FinishingBlock = (ProcedureResult<Output>) -> Void
-    public typealias Block = (FinishingBlock) -> Void
+    public typealias Block = (@escaping FinishingBlock) -> Void
 
     private let block: Block
 
