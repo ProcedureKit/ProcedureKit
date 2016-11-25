@@ -4,6 +4,9 @@
 //  Copyright © 2016 ProcedureKit. All rights reserved.
 //
 
+import Foundation
+import Dispatch
+
 public struct RepeatProcedurePayload<T: Operation> {
     public typealias ConfigureBlock = (T) -> Void
 

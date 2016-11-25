@@ -4,6 +4,8 @@
 //  Copyright © 2016 ProcedureKit. All rights reserved.
 //
 
+import Foundation
+
 public protocol Identifiable {
     var identifier: UUID { get }
 }

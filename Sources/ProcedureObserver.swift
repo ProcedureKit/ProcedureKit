@@ -4,6 +4,8 @@
 //  Copyright © 2016 ProcedureKit. All rights reserved.
 //
 
+import Foundation
+
 /**
  Types which conform to this protocol, can be attached to `Procedure` subclasses to receive
  events at state transitions.
