@@ -13,13 +13,31 @@ open class NetworkUploadProcedure<Session: URLSessionTaskFactory>: Procedure, In
     public typealias NetworkResult = ProcedureResult<HTTPPayloadResponse<Data>>
     public typealias CompletionBlock = (NetworkResult) -> Void
 
-    public var input: Pending<HTTPPayloadRequest<Data>> = .pending
-    public var output: Pending<NetworkResult> = .pending
+    public var input: Pending<HTTPPayloadRequest<Data>> {
+        get { return stateLock.withCriticalScope { _input } }
+        set {
+            stateLock.withCriticalScope {
+                _input = newValue
+            }
+        }
+    }
 
-    public private(set) var session: Session
+    public var output: Pending<NetworkResult> {
+        get { return stateLock.withCriticalScope { _output } }
+        set {
+            stateLock.withCriticalScope {
+                _output = newValue
+            }
+        }
+    }
+
+    public let session: Session
     public let completion: CompletionBlock
 
+    private let stateLock = NSLock()
     internal var task: Session.UploadTask? = nil
+    private var _input: Pending<HTTPPayloadRequest<Data>> = .pending
+    private var _output: Pending<NetworkResult> = .pending
 
     public var networkError: ProcedureKitNetworkError? {
         return errors.flatMap { $0 as? ProcedureKitNetworkError }.first
@@ -28,12 +46,14 @@ open class NetworkUploadProcedure<Session: URLSessionTaskFactory>: Procedure, In
     public init(session: Session, request: URLRequest? = nil, data: Data? = nil, completionHandler: @escaping CompletionBlock = { _ in }) {
 
         self.session = session
-        self.input = request.flatMap { .ready(HTTPPayloadRequest(payload: data, request: $0)) } ?? .pending
         self.completion = completionHandler
-
         super.init()
+        self.input = request.flatMap { .ready(HTTPPayloadRequest(payload: data, request: $0)) } ?? .pending
+
         addWillCancelBlockObserver { procedure, _ in
-            procedure.task?.cancel()
+            procedure.stateLock.withCriticalScope {
+                procedure.task?.cancel()
+            }
         }
     }
 
@@ -43,25 +63,27 @@ open class NetworkUploadProcedure<Session: URLSessionTaskFactory>: Procedure, In
             return
         }
 
-        task = session.uploadTask(with: requirement.request, from: requirement.payload) { [weak self] data, response, error in
-            guard let strongSelf = self else { return }
+        stateLock.withCriticalScope {
+            task = session.uploadTask(with: requirement.request, from: requirement.payload) { [weak self] data, response, error in
+                guard let strongSelf = self else { return }
 
-            if let error = error {
-                strongSelf.finish(withResult: .failure(ProcedureKitNetworkError(error as NSError)))
-                return
+                if let error = error {
+                    strongSelf.finish(withResult: .failure(ProcedureKitNetworkError(error as NSError)))
+                    return
+                }
+
+                guard let data = data, let response = response as? HTTPURLResponse else {
+                    strongSelf.finish(withResult: .failure(ProcedureKitError.unknown))
+                    return
+                }
+
+                let http = HTTPPayloadResponse(payload: data, response: response)
+
+                strongSelf.completion(.success(http))
+                strongSelf.finish(withResult: .success(http))
             }
 
-            guard let data = data, let response = response as? HTTPURLResponse else {
-                strongSelf.finish(withResult: .failure(ProcedureKitError.unknown))
-                return
-            }
-
-            let http = HTTPPayloadResponse(payload: data, response: response)
-
-            strongSelf.completion(.success(http))
-            strongSelf.finish(withResult: .success(http))
+            task?.resume()
         }
-
-        task?.resume()
     }
 }
