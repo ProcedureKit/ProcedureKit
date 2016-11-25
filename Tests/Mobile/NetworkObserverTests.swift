@@ -168,20 +168,3 @@ class NetworkObserverTests: ProcedureKitTestCase {
     }
 }
 
-
-class NetworkActivityControllerTimerTests: ProcedureKitTestCase {
-
-    func test__network_indicator_timer_cancellation_prevents_handler_from_running() {
-        let interval = 0.4
-        let expect = expectation(description: "Test: \(#function)")
-        var didRunBlock = false
-        let timer = NetworkActivityController.Timer(interval: interval) { didRunBlock = true }
-        timer.cancel()
-        // wait until after the timer would have run (if not successfully cancelled)
-        DispatchQueue.main.asyncAfter(deadline: .now() + interval + 0.1) { expect.fulfill() }
-        waitForExpectations(timeout: interval + 0.1 + 1.0, handler: nil)
-        XCTAssertFalse(didRunBlock)
-    }
-}
-
-
