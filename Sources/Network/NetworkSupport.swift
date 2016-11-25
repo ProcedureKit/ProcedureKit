@@ -48,7 +48,16 @@ extension URL: ExpressibleByStringLiteral {
     }
 }
 
-public struct HTTPPayloadResponse<Payload: Equatable>: Equatable {
+// MARK: - Input & Output wrapper types
+
+public protocol HTTPPayloadResponseProtocol: Equatable {
+    associatedtype Payload: Equatable
+
+    var payload: Payload? { get }
+    var response: HTTPURLResponse { get }
+}
+
+public struct HTTPPayloadResponse<Payload: Equatable>: HTTPPayloadResponseProtocol {
 
     public static func == (lhs: HTTPPayloadResponse<Payload>, rhs: HTTPPayloadResponse<Payload>) -> Bool {
         return lhs.payload == rhs.payload && lhs.response == rhs.response
@@ -77,11 +86,23 @@ public struct HTTPPayloadRequest<Payload: Equatable>: Equatable {
     }
 }
 
+// MARK: - Error Handling
+
 public struct ProcedureKitNetworkError: Error {
-    public let underlyingError: NSError
+
+    public let response: HTTPURLResponse?
+    public let underlyingError: Error
+
+    public var errorCode: Int {
+        return (underlyingError as NSError).code
+    }
+
+    public var httpStatusCode: HTTPStatusCode? {
+        return response?.code
+    }
 
     public var isTransientError: Bool {
-        switch underlyingError.code {
+        switch errorCode {
         case NSURLErrorNetworkConnectionLost:
             return true
         default:
@@ -89,8 +110,14 @@ public struct ProcedureKitNetworkError: Error {
         }
     }
 
+    public var isTimeoutError: Bool {
+        guard let procedureKitError = underlyingError as? ProcedureKitError else { return false }
+        guard case .timedOut(with: _) = procedureKitError.context else { return false }
+        return true
+    }
+
     public var waitForReachabilityChangeBeforeRetrying: Bool {
-        switch underlyingError.code {
+        switch errorCode {
         case NSURLErrorNotConnectedToInternet, NSURLErrorInternationalRoamingOff, NSURLErrorCallIsActive, NSURLErrorDataNotAllowed:
             return true
         default:
@@ -98,14 +125,17 @@ public struct ProcedureKitNetworkError: Error {
         }
     }
 
-    public init(_ error: NSError) {
-        underlyingError = error
+    public init(response: HTTPURLResponse? = nil, error: Error) {
+        self.response = response
+        self.underlyingError = error
     }
 }
 
 public protocol NetworkOperation {
 
     var networkError: ProcedureKitNetworkError? { get }
+
+    var response: HTTPURLResponse? { get }
 }
 
 public enum HTTPStatusCode: Int, CustomStringConvertible {
@@ -230,9 +260,18 @@ public enum HTTPStatusCode: Int, CustomStringConvertible {
     }
 }
 
+// MARK: - Extensions
+
 public extension HTTPURLResponse {
 
     public var code: HTTPStatusCode? {
         return HTTPStatusCode(rawValue: statusCode)
+    }
+}
+
+extension NetworkOperation where Self: OutputProcedure, Self.Output: HTTPPayloadResponseProtocol {
+
+    public var response: HTTPURLResponse? {
+        return output.success?.response ?? networkError?.response
     }
 }

@@ -67,10 +67,10 @@ open class NetworkDownloadProcedure<Session: URLSessionTaskFactory>: Procedure, 
             task = session.downloadTask(with: request) { [weak self] location, response, error in
                 guard let strongSelf = self else { return }
 
-                if let error = error {
-                    strongSelf.finish(withResult: .failure(ProcedureKitNetworkError(error as NSError)))
-                    return
-                }
+            if let error = error {
+                strongSelf.finish(withResult: .failure(ProcedureKitNetworkError(response: response as? HTTPURLResponse, error: error)))
+                return
+            }
 
                 guard let location = location, let response = response as? HTTPURLResponse else {
                     strongSelf.finish(withResult: .failure(ProcedureKitError.unknown))

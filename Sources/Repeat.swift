@@ -16,6 +16,10 @@ public struct RepeatProcedurePayload<T: Operation> {
         self.delay = delay
         self.configure = configure
     }
+
+    public func set(delay newDelay: Delay?) -> RepeatProcedurePayload {
+        return RepeatProcedurePayload(operation: operation, delay: newDelay, configure: configure)
+    }
 }
 
 open class RepeatProcedure<T: Operation>: GroupProcedure {
