@@ -4,6 +4,7 @@
 //  Copyright © 2016 ProcedureKit. All rights reserved.
 //
 
+import Foundation
 import CloudKit
 
 /// A generic protocol which exposes the properties used by Apple's CKFetchShareMetadataOperation.
