@@ -12,29 +12,13 @@ extension UIApplication: NetworkActivityIndicatorProtocol { }
 
 class NetworkActivityController {
 
-    class Timer {
-        let workItem: DispatchWorkItem
-        init(interval: TimeInterval, workItem: DispatchWorkItem) {
-            self.workItem = workItem
-            DispatchQueue.main.asyncAfter(deadline: .now() + interval, execute: workItem)
-        }
-
-        convenience init(interval: TimeInterval, block: @escaping () -> Void) {
-            self.init(interval: interval, workItem: DispatchWorkItem(block: block))
-        }
-
-        func cancel() {
-            workItem.cancel()
-        }
-    }
-
     static let shared = NetworkActivityController()
 
     let interval: TimeInterval
     private(set) var indicator: NetworkActivityIndicatorProtocol
 
     private var count = 0
-    private var timer: Timer?
+    private var delayedHide: DispatchWorkItem?
 
     private let queue = DispatchQueue(label: "run.kit.procedure.ProcedureKit.NetworkActivityController", qos: .userInteractive)
 
@@ -64,15 +48,17 @@ class NetworkActivityController {
             updateIndicator(withVisibility: true)
         }
         else if count == 0 {
-            timer = Timer(interval: interval) {
+            let workItem = DispatchWorkItem(block: {
                 self.updateIndicator(withVisibility: false)
-            }
+            })
+            delayedHide = workItem
+            queue.asyncAfter(deadline: .now() + interval, execute: workItem)
         }
     }
 
     private func updateIndicator(withVisibility visibility: Bool) {
-        timer?.cancel()
-        timer = nil
+        delayedHide?.cancel()
+        delayedHide = nil
         DispatchQueue.main.async {
             // only set the visibility if it has changed
             if self.indicator.networkActivityIndicatorVisible != visibility {
