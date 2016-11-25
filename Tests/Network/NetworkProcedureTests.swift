@@ -65,12 +65,13 @@ class NetworkReachabilityWaitProcedureTests: ProcedureKitTestCase {
 
 }
 
-class NetworkReachableProcedureTests: ProcedureKitTestCase {
+class NetworkProcedureTests: ProcedureKitTestCase {
 
     typealias Target = NetworkDataProcedure<TestableURLSessionTaskFactory>
 
     var url: URL!
     var request: URLRequest!
+    var resilience: DefaultNetworkResilience!
     var session: TestableURLSessionTaskFactory!
     var data: NetworkDataProcedure<TestableURLSessionTaskFactory>!
     var network: TestableNetworkReachability!
@@ -80,6 +81,7 @@ class NetworkReachableProcedureTests: ProcedureKitTestCase {
         super.setUp()
         url = "http://procedure.kit.run"
         request = URLRequest(url: url)
+        resilience = DefaultNetworkResilience(backoffStrategy: .constant(1.0), requestTimeout: 1.0)
         session = TestableURLSessionTaskFactory()
         data = NetworkDataProcedure(session: session, request: request)
         network = TestableNetworkReachability()
@@ -97,7 +99,7 @@ class NetworkReachableProcedureTests: ProcedureKitTestCase {
     }
 
     func test__reachable_network_does_not_start_notifier() {
-        let procedure = NetworkReachableProcedure<Target>(body: createNetworkProcedure)
+        let procedure = NetworkProcedure<Target>(body: createNetworkProcedure)
         procedure.reachability = manager
         wait(for: procedure)
         XCTAssertProcedureFinishedWithoutErrors(procedure)
@@ -113,7 +115,7 @@ class NetworkReachableProcedureTests: ProcedureKitTestCase {
         let makeNetworkReachable = BlockProcedure { self.network.flags = .reachable }
         makeNetworkReachable.add(dependency: makeSessionSuccessful)
 
-        let procedure = NetworkReachableProcedure<Target>(body: createNetworkProcedure)
+        let procedure = NetworkProcedure<Target>(resilience: resilience, body: createNetworkProcedure)
         procedure.reachability = manager
 
         wait(forAll: [procedure, delay, makeSessionSuccessful, makeNetworkReachable])
@@ -124,14 +126,47 @@ class NetworkReachableProcedureTests: ProcedureKitTestCase {
 
     func test__does_not_wait_for_reachability_if_transient_error() {
         session.returnedError = NSError(domain: NSURLErrorDomain, code: NSURLErrorNetworkConnectionLost, userInfo: nil)
+
         let delay = DelayProcedure(by: 0.1)
         let makeSessionSuccessful = BlockProcedure { self.session.returnedError = nil }
         makeSessionSuccessful.add(dependency: delay)
 
-        let procedure = NetworkReachableProcedure<Target>(body: createNetworkProcedure)
+        let procedure = NetworkProcedure<Target>(resilience: resilience, body: createNetworkProcedure)
         procedure.reachability = manager
 
-        wait(forAll: [procedure, delay, makeSessionSuccessful])
+        wait(forAll: [procedure, delay, makeSessionSuccessful], withTimeout: 4)
+        XCTAssertProcedureFinishedWithoutErrors(procedure)
+        XCTAssertEqual(procedure.count, 2)
+    }
+
+    func test__retry_server_error() {
+        session.returnedResponse = HTTPURLResponse(url: url, statusCode: 500, httpVersion: nil, headerFields: nil)
+
+        let delay = DelayProcedure(by: 0.1)
+        let makeSessionSuccessful = BlockProcedure { self.session.returnedResponse = HTTPURLResponse(url: self.url, statusCode: 200, httpVersion: nil, headerFields: nil) }
+        makeSessionSuccessful.add(dependency: delay)
+
+        let procedure = NetworkProcedure<Target>(resilience: resilience, body: createNetworkProcedure)
+        procedure.log.severity = .notice
+        procedure.reachability = manager
+
+        wait(forAll: [procedure, delay, makeSessionSuccessful], withTimeout: 4)
+        XCTAssertProcedureFinishedWithoutErrors(procedure)
+        XCTAssertEqual(procedure.count, 2)
+    }
+
+    func test__retry_client_error_too_many_requests() {
+        session.returnedResponse = HTTPURLResponse(url: url, statusCode: HTTPStatusCode.tooManyRequests.rawValue, httpVersion: nil, headerFields: nil)
+
+        let delay = DelayProcedure(by: 0.1)
+        let makeSessionSuccessful = BlockProcedure { self.session.returnedResponse = HTTPURLResponse(url: self.url, statusCode: 200, httpVersion: nil, headerFields: nil) }
+        makeSessionSuccessful.add(dependency: delay)
+
+        let procedure = NetworkProcedure<Target>(resilience: resilience, body: createNetworkProcedure)
+        procedure.log.severity = .notice
+        procedure.reachability = manager
+
+        wait(forAll: [procedure, delay, makeSessionSuccessful], withTimeout: 4)
         XCTAssertProcedureFinishedWithoutErrors(procedure)
         XCTAssertEqual(procedure.count, 2)
     }

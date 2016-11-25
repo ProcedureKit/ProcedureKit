@@ -39,8 +39,8 @@ open class NetworkDownloadProcedure<Session: URLSessionTaskFactory>: Procedure, 
     private var _input: Pending<URLRequest> = .pending
     private var _output: Pending<NetworkResult> = .pending
 
-    public var networkError: ProcedureKitNetworkError? {
-        return output.error as? ProcedureKitNetworkError ?? errors.flatMap { $0 as? ProcedureKitNetworkError }.first
+    public var networkError: Error? {
+        return errors.first
     }
 
     public init(session: Session, request: URLRequest? = nil, completionHandler: @escaping CompletionBlock = { _ in }) {
@@ -67,10 +67,10 @@ open class NetworkDownloadProcedure<Session: URLSessionTaskFactory>: Procedure, 
             task = session.downloadTask(with: request) { [weak self] location, response, error in
                 guard let strongSelf = self else { return }
 
-                if let error = error {
-                    strongSelf.finish(withResult: .failure(ProcedureKitNetworkError(error as NSError)))
-                    return
-                }
+            if let error = error {
+                strongSelf.finish(withResult: .failure(error))
+                return
+            }
 
                 guard let location = location, let response = response as? HTTPURLResponse else {
                     strongSelf.finish(withResult: .failure(ProcedureKitError.unknown))
