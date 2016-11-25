@@ -173,16 +173,16 @@ open class NetworkProcedure<T: Procedure>: RetryProcedure<T> where T: NetworkOpe
     open override func procedureQueue(_ queue: ProcedureQueue, willFinishOperation operation: Operation, withErrors errors: [Error]) {
         var networkErrors = errors
 
-        // Always call super to correctly manage the operation lifecycle.
+        // Ultimately, always call super to correctly manage the operation lifecycle.
         defer { super.procedureQueue(queue, willFinishOperation: operation, withErrors: networkErrors) }
 
         // Check that the operation is the current one.
         guard operation == current else { return }
 
-        // If we have an errors let RetryProcedure (super) deal with it
+        // If we have any errors let RetryProcedure (super) deal with it by returning here
         guard errors.isEmpty else { return }
 
-        // Create a network response
+        // Create a network response from the network operation
         let networkResponse = current.makeNetworkResponse()
 
         // Check to see if this network response should be retried

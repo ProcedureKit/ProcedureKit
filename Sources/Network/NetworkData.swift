@@ -73,7 +73,7 @@ open class NetworkDataProcedure<Session: URLSessionTaskFactory>: Procedure, Inpu
             }
 
                 if let error = error {
-                    strongSelf.finish(withResult: .failure(ProcedureKitNetworkError(error as NSError)))
+                    strongSelf.finish(withResult: .failure(error))
                     return
                 }
 
