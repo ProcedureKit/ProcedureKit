@@ -39,8 +39,8 @@ open class NetworkUploadProcedure<Session: URLSessionTaskFactory>: Procedure, In
     private var _input: Pending<HTTPPayloadRequest<Data>> = .pending
     private var _output: Pending<NetworkResult> = .pending
 
-    public var networkError: ProcedureKitNetworkError? {
-        return errors.flatMap { $0 as? ProcedureKitNetworkError }.first
+    public var networkError: Error? {
+        return errors.first
     }
 
     public init(session: Session, request: URLRequest? = nil, data: Data? = nil, completionHandler: @escaping CompletionBlock = { _ in }) {
@@ -68,7 +68,7 @@ open class NetworkUploadProcedure<Session: URLSessionTaskFactory>: Procedure, In
                 guard let strongSelf = self else { return }
 
             if let error = error {
-                strongSelf.finish(withResult: .failure(ProcedureKitNetworkError(response: response as? HTTPURLResponse, error: error)))
+                strongSelf.finish(withResult: .failure(error))
                 return
             }
 

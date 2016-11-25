@@ -6,11 +6,6 @@
 
 import SystemConfiguration
 
-public enum NetworkRetryBehavior {
-    case fail
-    case retryWithDelay(Delay)
-}
-
 public protocol NetworkResilience {
 
     /**
@@ -46,7 +41,7 @@ public protocol NetworkResilience {
      - parameter statusCode: an Int
      - returns: a Bool, to indicate that the
      */
-    func retryBehavior(forResponseWithHTTPStatusCode statusCode: HTTPStatusCode, withSuggestedDelay: Delay) -> NetworkRetryBehavior
+    func shouldRetry(forResponseWithHTTPStatusCode statusCode: HTTPStatusCode) -> Bool
 }
 
 public struct DefaultNetworkResilience: NetworkResilience {
@@ -57,22 +52,26 @@ public struct DefaultNetworkResilience: NetworkResilience {
 
     public let requestTimeout: TimeInterval?
 
-    public func retryBehavior(forResponseWithHTTPStatusCode statusCode: HTTPStatusCode, withSuggestedDelay delay: Delay) -> NetworkRetryBehavior {
-        switch statusCode {
-        case let code where code.isServerError:
-            return .retryWithDelay(delay)
-        case .requestTimeout, .tooManyRequests:
-            return .retryWithDelay(delay)
-        default:
-            return .fail
-        }
-    }
-
     public init(maximumNumberOfAttempts: Int = 3, backoffStrategy: WaitStrategy = .incrementing(initial: 2, increment: 2), requestTimeout: TimeInterval? = 8.0) {
         self.maximumNumberOfAttempts = maximumNumberOfAttempts
         self.backoffStrategy = backoffStrategy
         self.requestTimeout = requestTimeout
     }
+
+    public func shouldRetry(forResponseWithHTTPStatusCode statusCode: HTTPStatusCode) -> Bool {
+        switch statusCode {
+        case let code where code.isServerError:
+            return true
+        case .requestTimeout, .tooManyRequests:
+            return true
+        default:
+            return false
+        }
+    }
+}
+
+public enum ProcedureKitNetworkResiliencyError: Error {
+    case receivedErrorStatusCode(HTTPStatusCode)
 }
 
 class NetworkReachabilityWaitProcedure: Procedure {
@@ -108,45 +107,45 @@ class NetworkRecovery<T: Operation> where T: NetworkOperation {
 
     func recover(withInfo info: RetryFailureInfo<T>, payload: RepeatProcedurePayload<T>) -> RepeatProcedurePayload<T>? {
 
+        let networkResponse = info.operation.makeNetworkResponse()
+
         // Check to see if we should wait for a network reachability change before retrying
-        if shouldWaitForReachabilityChange(givenInfo: info) {
+        if shouldWaitForReachabilityChange(givenNetworkResponse: networkResponse) {
             let waiter = NetworkReachabilityWaitProcedure(reachability: reachability, via: connectivity)
             payload.operation.add(dependency: waiter)
             info.addOperations(waiter)
             return RepeatProcedurePayload(operation: payload.operation, delay: nil, configure: payload.configure)
         }
 
-        // Determine the retry behavior
-        switch retryBehavior(givenInfo: info, delay: payload.delay) {
-        case let .retryWithDelay(delay):
-            return payload.set(delay: delay)
-        case .fail:
-            return nil
-        }
+        // Check if the resiliency behavior indicates a retry
+        guard shouldRetry(givenNetworkResponse: networkResponse) else { return nil }
+
+        return payload
     }
 
-    func shouldWaitForReachabilityChange(givenInfo info: RetryFailureInfo<T>) -> Bool {
-        guard let networkError = info.operation.networkError else { return false }
+    func shouldWaitForReachabilityChange(givenNetworkResponse networkResponse: ProcedureKitNetworkResponse) -> Bool {
+        guard let networkError = networkResponse.error else { return false }
         return networkError.waitForReachabilityChangeBeforeRetrying
     }
 
-    func retryBehavior(givenInfo info: RetryFailureInfo<T>, delay: Delay?) -> NetworkRetryBehavior {
+    func shouldRetry(givenNetworkResponse networkResponse: ProcedureKitNetworkResponse) -> Bool {
 
         // Check that we've actually got a network error & suggested delay
-        guard let networkError = info.operation.networkError, let delay = delay else { return .fail }
+        if let networkError = networkResponse.error {
 
-        // Check to see if we have a transient or timeout network error - retry with suggested delay
-        if networkError.isTransientError || networkError.isTimeoutError {
-            return .retryWithDelay(delay)
+            // Check to see if we have a transient or timeout network error - retry with suggested delay
+            if networkError.isTransientError || networkError.isTimeoutError {
+                return true
+            }
         }
 
         // Check to see if we have an http error code
-        guard let statusCode = networkError.httpStatusCode, statusCode.isClientError || statusCode.isServerError else {
-            return .fail
+        guard let statusCode = networkResponse.httpStatusCode, statusCode.isClientError || statusCode.isServerError else {
+            return false
         }
 
         // Query the network resilience type to determine the behavior.
-        return resilience.retryBehavior(forResponseWithHTTPStatusCode: statusCode, withSuggestedDelay: delay)
+        return resilience.shouldRetry(forResponseWithHTTPStatusCode: statusCode)
     }
 }
 
@@ -169,5 +168,30 @@ open class NetworkProcedure<T: Procedure>: RetryProcedure<T> where T: NetworkOpe
 
     public convenience init(dispatchQueue: DispatchQueue = DispatchQueue.default, resilience: NetworkResilience = DefaultNetworkResilience(), connectivity: Reachability.Connectivity = .any, body: @escaping () -> T?) {
         self.init(dispatchQueue: dispatchQueue, resilience: resilience, connectivity: connectivity, iterator: AnyIterator(body))
+    }
+
+    open override func procedureQueue(_ queue: ProcedureQueue, willFinishOperation operation: Operation, withErrors errors: [Error]) {
+        var networkErrors = errors
+
+        // Always call super to correctly manage the operation lifecycle.
+        defer { super.procedureQueue(queue, willFinishOperation: operation, withErrors: networkErrors) }
+
+        // Check that the operation is the current one.
+        guard operation == current else { return }
+
+        // If we have an errors let RetryProcedure (super) deal with it
+        guard errors.isEmpty else { return }
+
+        // Create a network response
+        let networkResponse = current.makeNetworkResponse()
+
+        // Check to see if this network response should be retried
+        guard recovery.shouldRetry(givenNetworkResponse: networkResponse), let statusCode = networkResponse.httpStatusCode else { return }
+
+        // Create resiliency error
+        let error: ProcedureKitNetworkResiliencyError = .receivedErrorStatusCode(statusCode)
+
+        // Set the network errors
+        networkErrors = [error]
     }
 }

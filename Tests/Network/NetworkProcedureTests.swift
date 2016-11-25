@@ -65,7 +65,7 @@ class NetworkReachabilityWaitProcedureTests: ProcedureKitTestCase {
 
 }
 
-class NetworkReachableProcedureTests: ProcedureKitTestCase {
+class NetworkProcedureTests: ProcedureKitTestCase {
 
     typealias Target = NetworkDataProcedure<TestableURLSessionTaskFactory>
 
@@ -126,8 +126,40 @@ class NetworkReachableProcedureTests: ProcedureKitTestCase {
 
     func test__does_not_wait_for_reachability_if_transient_error() {
         session.returnedError = NSError(domain: NSURLErrorDomain, code: NSURLErrorNetworkConnectionLost, userInfo: nil)
+
         let delay = DelayProcedure(by: 0.1)
         let makeSessionSuccessful = BlockProcedure { self.session.returnedError = nil }
+        makeSessionSuccessful.add(dependency: delay)
+
+        let procedure = NetworkProcedure<Target>(resilience: resilience, body: createNetworkProcedure)
+        procedure.reachability = manager
+
+        wait(forAll: [procedure, delay, makeSessionSuccessful], withTimeout: 4)
+        XCTAssertProcedureFinishedWithoutErrors(procedure)
+        XCTAssertEqual(procedure.count, 2)
+    }
+
+    func test__retry_server_error() {
+        session.returnedResponse = HTTPURLResponse(url: url, statusCode: 500, httpVersion: nil, headerFields: nil)
+
+        let delay = DelayProcedure(by: 0.1)
+        let makeSessionSuccessful = BlockProcedure { self.session.returnedResponse = HTTPURLResponse(url: self.url, statusCode: 200, httpVersion: nil, headerFields: nil) }
+        makeSessionSuccessful.add(dependency: delay)
+
+        let procedure = NetworkProcedure<Target>(resilience: resilience, body: createNetworkProcedure)
+        procedure.log.severity = .notice
+        procedure.reachability = manager
+
+        wait(forAll: [procedure, delay, makeSessionSuccessful], withTimeout: 4)
+        XCTAssertProcedureFinishedWithoutErrors(procedure)
+        XCTAssertEqual(procedure.count, 2)
+    }
+
+    func test__retry_client_error_too_many_requests() {
+        session.returnedResponse = HTTPURLResponse(url: url, statusCode: HTTPStatusCode.tooManyRequests.rawValue, httpVersion: nil, headerFields: nil)
+
+        let delay = DelayProcedure(by: 0.1)
+        let makeSessionSuccessful = BlockProcedure { self.session.returnedResponse = HTTPURLResponse(url: self.url, statusCode: 200, httpVersion: nil, headerFields: nil) }
         makeSessionSuccessful.add(dependency: delay)
 
         let procedure = NetworkProcedure<Target>(resilience: resilience, body: createNetworkProcedure)
