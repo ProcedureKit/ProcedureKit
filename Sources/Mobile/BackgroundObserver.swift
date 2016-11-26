@@ -47,6 +47,10 @@ public class BackgroundObserver: NSObject, ProcedureObserver {
         }
     }
 
+    deinit {
+        removeNotificationCenterObservers()
+    }
+
     @objc func didEnterBackground(withNotification notification: NSNotification) {
         guard isInBackground else { return }
         startBackgroundTask()
@@ -82,6 +86,16 @@ public class BackgroundObserver: NSObject, ProcedureObserver {
     }
 
     public func did(finish procedure: Procedure, withErrors errors: [Error]) {
+        removeNotificationCenterObservers()
         endBackgroundTask()
+    }
+
+    private func removeNotificationCenterObservers() {
+        // To support iOS < 9.0 and macOS < 10.11, NotificationCenter observers must be removed.
+        // (Or a crash may result.)
+        // Reference: https://developer.apple.com/reference/foundation/notificationcenter/1415360-addobserver
+        let nc = NotificationCenter.default
+        nc.removeObserver(self, name: NSNotification.Name.UIApplicationDidEnterBackground, object: nil)
+        nc.removeObserver(self, name: NSNotification.Name.UIApplicationDidBecomeActive, object: nil)
     }
 }
