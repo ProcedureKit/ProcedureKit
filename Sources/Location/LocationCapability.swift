@@ -38,6 +38,10 @@ public extension Capability {
             self.requirement = requirement
         }
 
+        deinit {
+            registrar.pk_set(delegate: nil)
+        }
+
         public func isAvailable() -> Bool {
             return registrar.pk_locationServicesEnabled()
         }
