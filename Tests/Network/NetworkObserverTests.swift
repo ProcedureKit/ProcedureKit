@@ -7,7 +7,7 @@
 import XCTest
 import ProcedureKit
 import TestingProcedureKit
-@testable import ProcedureKitMobile
+@testable import ProcedureKitNetwork
 
 class TestableNetworkActivityIndicator: NetworkActivityIndicatorProtocol {
     typealias IndicatorVisibilityDidChange = (Bool) -> Void

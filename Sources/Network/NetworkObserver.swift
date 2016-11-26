@@ -57,7 +57,7 @@ public class NetworkActivityController {
     ///   - indicator:     Conforms to `NetworkActivityIndicatorProtocol`.
     ///                    The `indicator`'s `networkActivityIndicatorVisible` property
     ///                    is queried/set by the NetworkActivityController.
-    ///                    (NOTE: NetworkActivityController always accesses the indicator's 
+    ///                    (NOTE: NetworkActivityController always accesses the indicator's
     ///                    `networkActivityIndicatorVisible` property on the main queue.)
     ///
     public init(timerInterval: TimeInterval = 1.0, indicator: NetworkActivityIndicatorProtocol) {
