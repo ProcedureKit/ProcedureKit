@@ -6,17 +6,24 @@
 
 import Foundation
 import Dispatch
+#if os(iOS)
 import UIKit
+#endif
 
-protocol NetworkActivityIndicatorProtocol {
+public protocol NetworkActivityIndicatorProtocol {
     var networkActivityIndicatorVisible: Bool { get set }
 }
 
+#if os(iOS)
 extension UIApplication: NetworkActivityIndicatorProtocol { }
+#endif
 
-class NetworkActivityController {
+public class NetworkActivityController {
 
+    #if os(iOS)
+    @available(iOSApplicationExtension, unavailable)
     static let shared = NetworkActivityController()
+    #endif
 
     let interval: TimeInterval
     private(set) var indicator: NetworkActivityIndicatorProtocol
@@ -26,7 +33,34 @@ class NetworkActivityController {
 
     private let queue = DispatchQueue(label: "run.kit.procedure.ProcedureKit.NetworkActivityController", qos: .userInteractive)
 
-    init(timerInterval: TimeInterval = 1.0, indicator: NetworkActivityIndicatorProtocol = UIApplication.shared) {
+    #if os(iOS)
+    /// (iOS-only) Initialize a NetworkActivityController that displays/hides the
+    /// network activity indicator in the status bar. (via UIApplication)
+    ///
+    /// - Parameter timerInterval: How long to wait after observed network activity stops
+    ///                            before the network activity indicator is set to false.
+    ///                            (This helps reduce flickering if you rapidly create
+    ///                            procedures with attached NetworkObservers.)
+    @available(iOSApplicationExtension, unavailable, message: "Not supported in Application Extensions because UIApplication.shared is unavailable. Use init(indicator:) or init(timerInterval:indicator:) instead.")
+    public convenience init(timerInterval: TimeInterval = 1.0) {
+        self.init(timerInterval: timerInterval, indicator: UIApplication.shared)
+    }
+    #endif
+
+    /// Initialize a NetworkActivityController
+    ///
+    /// - Parameters:
+    ///   - timerInterval: How long to wait after observed network activity stops before
+    ///                    the network activity indicator is set to false.
+    ///                    (This helps reduce flickering if you rapidly create procedures
+    ///                    with attached NetworkObservers.)
+    ///   - indicator:     Conforms to `NetworkActivityIndicatorProtocol`.
+    ///                    The `indicator`'s `networkActivityIndicatorVisible` property
+    ///                    is queried/set by the NetworkActivityController.
+    ///                    (NOTE: NetworkActivityController always accesses the indicator's 
+    ///                    `networkActivityIndicatorVisible` property on the main queue.)
+    ///
+    public init(timerInterval: TimeInterval = 1.0, indicator: NetworkActivityIndicatorProtocol) {
         self.interval = timerInterval
         self.indicator = indicator
     }
@@ -76,13 +110,19 @@ public class NetworkObserver: ProcedureObserver {
 
     private let networkActivityController: NetworkActivityController
 
-    init(controller: NetworkActivityController) {
+    /// Initialize a NetworkObserver with a supplied NetworkActivityController.
+    public init(controller: NetworkActivityController) {
         networkActivityController = controller
     }
 
+    #if os(iOS)
+    /// (iOS-only) Initialize a NetworkObserver that displays/hides
+    /// the network activity indicator in the status bar. (via UIApplication)
+    @available(iOSApplicationExtension, unavailable, message: "Not supported in Application Extensions because UIApplication.shared is unavailable. Use init(controller:) instead.")
     public convenience init() {
         self.init(controller: NetworkActivityController.shared)
     }
+    #endif
 
     public func will(execute procedure: Procedure) {
         networkActivityController.start()
