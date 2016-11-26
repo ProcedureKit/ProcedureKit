@@ -60,7 +60,7 @@ class GroupTests: GroupTestCase {
         XCTAssertEqual(group.children, children)
     }
 
-    func test_group_will_add_child_observer_is_called() {
+    func test__group_will_add_child_observer_is_called() {
         var blockCalledWith: (GroupProcedure, Operation)? = nil
         group = TestGroupProcedure(operations: [children[0]])
         group.addWillAddOperationBlockObserver { group, child in
@@ -72,7 +72,7 @@ class GroupTests: GroupTestCase {
         XCTAssertEqual(observedChild, children[0])
     }
 
-    func test_group_did_add_child_observer_is_called() {
+    func test__group_did_add_child_observer_is_called() {
         var blockCalledWith: (GroupProcedure, Operation)? = nil
         group = TestGroupProcedure(operations: [children[0]])
         group.addDidAddOperationBlockObserver { group, child in
@@ -119,6 +119,35 @@ class GroupTests: GroupTestCase {
 
         XCTAssertTrue(child.isFinished)
         XCTAssertTrue(group.isFinished)
+    }
+
+    func test__group_suspended_during_execution_does_not_run_additional_children() {
+        let child1 = children[0]
+        let child2 = children[1]
+        child2.add(dependency: child1)
+        group = TestGroupProcedure(operations: [child1, child2])
+
+        child1.addWillFinishBlockObserver { (_, _) in
+            self.group.isSuspended = true
+        }
+        addCompletionBlockTo(procedure: child1)
+        run(operation: group)
+
+        waitForExpectations(timeout: 3)
+        usleep(500)
+
+        XCTAssertTrue(group.isSuspended)
+        XCTAssertFalse(group.isFinished)
+        XCTAssertTrue(child1.isFinished)
+        XCTAssertFalse(child2.isFinished)
+
+        addCompletionBlockTo(procedure: group)
+        group.isSuspended = false
+        waitForExpectations(timeout: 3)
+
+        XCTAssertFalse(group.isSuspended)
+        XCTAssertTrue(group.isFinished)
+        XCTAssertTrue(child2.isFinished)
     }
 
     // MARK: - Error Tests
@@ -170,6 +199,13 @@ class GroupTests: GroupTestCase {
     func test__group_cancel_with_errors_does_not_collect_errors_sent_to_children() {
         check(procedure: group) { $0.cancel(withError: TestError()) }
         XCTAssertProcedureCancelledWithErrors(group, count: 1)
+    }
+
+    func test__group_additional_children_are_cancelled_if_group_is_cancelled() {
+        group.cancel()
+        let additionalChild = TestProcedure(delay: 0)
+        group.add(child: additionalChild)
+        XCTAssertTrue(additionalChild.isCancelled)
     }
 
     // MARK: - Finishing Tests
@@ -243,6 +279,20 @@ class GroupTests: GroupTestCase {
         XCTAssertProcedureFinishedWithoutErrors(childProducedOperation)
     }
 
+    func test__group_children_array_receives_operations_produced_by_children() {
+        let child = TestProcedure(name: "Child", delay: 0.01)
+        let childProducedOperation = TestProcedure(name: "ChildProducedOperation", delay: 0.2)
+        childProducedOperation.add(dependency: child)
+        let group = GroupProcedure(operations: [child])
+        child.addWillExecuteBlockObserver { operation in
+            try! operation.produce(operation: childProducedOperation)
+        }
+        wait(for: group)
+        XCTAssertEqual(group.children.count, 2)
+        XCTAssertTrue(group.children.contains(child))
+        XCTAssertTrue(group.children.contains(childProducedOperation))
+    }
+
     // MARK: - Condition Tests
 }
 
@@ -254,7 +304,7 @@ class GroupConcurrencyTests: GroupConcurrencyTestCase {
         let children: Int = 3
         let delayMicroseconds: useconds_t = 500000 // 0.5 seconds
         let timeout: TimeInterval = 4
-        concurrencyTestGroup(children: children, withDelayMicroseconds: delayMicroseconds, withTimeout: timeout,
+        let results = concurrencyTestGroup(children: children, withDelayMicroseconds: delayMicroseconds, withTimeout: timeout,
             withConfigureBlock: { (group) in
                 group.maxConcurrentOperationCount = 1
             },
@@ -265,13 +315,14 @@ class GroupConcurrencyTests: GroupConcurrencyTestCase {
                 checkMinimumDuration: TimeInterval(useconds_t(children) * delayMicroseconds) / 1000000.0
             )
         )
+        XCTAssertEqual(results.group.maxConcurrentOperationCount, 1)
     }
 
     func test__group_operation_maxConcurrentOperationCount_2() {
         let children: Int = 3
         let delayMicroseconds: useconds_t = 500000 // 0.5 seconds
         let timeout: TimeInterval = 3
-        concurrencyTestGroup(children: children, withDelayMicroseconds: delayMicroseconds, withTimeout: timeout,
+        let results = concurrencyTestGroup(children: children, withDelayMicroseconds: delayMicroseconds, withTimeout: timeout,
             withConfigureBlock: { (group) in
                 group.maxConcurrentOperationCount = 2
             },
@@ -281,6 +332,7 @@ class GroupConcurrencyTests: GroupConcurrencyTestCase {
                 checkAllProceduresFinished: true
             )
         )
+        XCTAssertEqual(results.group.maxConcurrentOperationCount, 2)
     }
 }
 

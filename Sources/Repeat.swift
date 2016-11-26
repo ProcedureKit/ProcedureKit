@@ -4,6 +4,9 @@
 //  Copyright © 2016 ProcedureKit. All rights reserved.
 //
 
+import Foundation
+import Dispatch
+
 public struct RepeatProcedurePayload<T: Operation> {
     public typealias ConfigureBlock = (T) -> Void
 
@@ -15,6 +18,10 @@ public struct RepeatProcedurePayload<T: Operation> {
         self.operation = operation
         self.delay = delay
         self.configure = configure
+    }
+
+    public func set(delay newDelay: Delay?) -> RepeatProcedurePayload {
+        return RepeatProcedurePayload(operation: operation, delay: newDelay, configure: configure)
     }
 }
 
@@ -226,6 +233,29 @@ open class RepeatProcedure<T: Operation>: GroupProcedure {
 }
 
 
+// MARK: - Extensions
+
+extension RepeatProcedure where T: InputProcedure {
+
+    public var input: Pending<T.Input> {
+        get { return current.input }
+        set {
+            current.input = newValue
+            appendConfigureBlock { $0.input = newValue }
+        }
+    }
+}
+
+extension RepeatProcedure where T: OutputProcedure {
+
+    public var output: Pending<ProcedureResult<T.Output>> {
+        get { return current.output }
+        set {
+            current.output = newValue
+            appendConfigureBlock { $0.output = newValue }
+        }
+    }
+}
 
 
 // MARK: - Iterators

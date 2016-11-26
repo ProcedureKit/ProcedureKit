@@ -8,12 +8,12 @@ import XCTest
 import TestingProcedureKit
 @testable import ProcedureKit
 
-class DataProcessing: Procedure, ResultInjection {
-    let result: PendingValue<Void> = .void
-    var requirement: PendingValue<String> = .pending
+class DataProcessing: Procedure, InputProcedure, OutputProcedure {
+    var input: Pending<String> = .pending
+    var output: Pending<ProcedureResult<Void>> = pendingVoidResult
 
     override func execute() {
-        guard let output = requirement.value else {
+        guard let output = input.value else {
             finish(withError: ProcedureKitError.requirementNotSatisfied())
             return
         }
@@ -22,12 +22,12 @@ class DataProcessing: Procedure, ResultInjection {
     }
 }
 
-class Printing: Procedure, ResultInjection {
-    var requirement: PendingValue<String> = .ready("Default Requirement")
-    let result: PendingValue<Void> = .void
+class Printing: Procedure, InputProcedure, OutputProcedure {
+    var input: Pending<String> = .ready("Default Requirement")
+    var output: Pending<ProcedureResult<Void>> = pendingVoidResult
 
     override func execute() {
-        if let message = requirement.value {
+        if let message = input.value {
             log.info(message: message)
         }
         finish()
@@ -90,7 +90,7 @@ class ResultInjectionTests: ResultInjectionTestCase {
     }
 
     func test__receiver_cancels_with_errors_if_requirement_not_met() {
-        procedure.result = .pending
+        procedure.output = .pending
         printing.injectResult(from: procedure)
         printing.addDidCancelBlockObserver { printing, errors in
             XCTAssertEqual(errors.count, 1)
@@ -141,7 +141,7 @@ class ResultInjectionTests: ResultInjectionTestCase {
         XCTAssertProcedureFinishedWithoutErrors(hello)
         XCTAssertProcedureFinishedWithoutErrors(world)
         XCTAssertProcedureFinishedWithoutErrors(mapped)
-        XCTAssertEqual(mapped.result.value ?? [], ["WORLD", "HELLO"])
+        XCTAssertEqual(mapped.output.success ?? [], ["WORLD", "HELLO"])
     }
 
     func test__collection_reduce() {
@@ -155,7 +155,7 @@ class ResultInjectionTests: ResultInjectionTestCase {
         XCTAssertProcedureFinishedWithoutErrors(hello)
         XCTAssertProcedureFinishedWithoutErrors(world)
         XCTAssertProcedureFinishedWithoutErrors(helloWorld)
-        XCTAssertEqual(helloWorld.result.value, "Hello World")
+        XCTAssertEqual(helloWorld.output.success, "Hello World")
     }
 
     func test__collection_reduce_which_throws_finishes_with_error() {
@@ -167,19 +167,19 @@ class ResultInjectionTests: ResultInjectionTestCase {
         XCTAssertProcedureFinishedWithoutErrors(hello)
         XCTAssertProcedureFinishedWithoutErrors(world)
         XCTAssertProcedureFinishedWithErrors(helloWorld, count: 1)
-        XCTAssertNil(helloWorld.result.value)
+        XCTAssertNil(helloWorld.output.success)
     }
 
     func test__collection_gather() {
         let hello = ResultProcedure { "Hello" }
         let world = ResultProcedure { "World" }
-        let gathered = [hello, world].gather()
+        let gathered = [hello, world].gathered()
 
         wait(forAll: [hello, world, gathered])
         XCTAssertProcedureFinishedWithoutErrors(hello)
         XCTAssertProcedureFinishedWithoutErrors(world)
         XCTAssertProcedureFinishedWithoutErrors(gathered)
-        XCTAssertEqual(gathered.result.value ?? [], ["Hello", "World"])
+        XCTAssertEqual(gathered.output.success ?? [], ["Hello", "World"])
     }
 }
 

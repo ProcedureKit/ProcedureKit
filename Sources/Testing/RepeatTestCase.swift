@@ -45,7 +45,10 @@ open class RetryTestCase: ProcedureKitTestCase {
         let info = RetryTestCaseInfo()
         return AnyIterator {
             let procedure = TestProcedure()
-            procedure.add(condition: BlockCondition { info.numberOfFailures == failureThreshold })
+            procedure.add(condition: BlockCondition {
+                guard info.numberOfFailures == failureThreshold else { throw ProcedureKitError.conditionFailed() }
+                return true
+            })
             procedure.addWillFinishBlockObserver { test in
                 info.numberOfExecuctions += 1
                 info.numberOfFailures += 1
@@ -58,7 +61,10 @@ open class RetryTestCase: ProcedureKitTestCase {
         let info = RetryTestCaseInfo()
         return AnyIterator {
             let procedure = TestProcedure()
-            procedure.add(condition: BlockCondition { info.numberOfFailures == failureThreshold })
+            procedure.add(condition: BlockCondition {
+                guard info.numberOfFailures == failureThreshold else { throw ProcedureKitError.conditionFailed() }
+                return true
+            })
             procedure.addWillFinishBlockObserver { test in
                 info.numberOfExecuctions += 1
                 info.numberOfFailures += 1

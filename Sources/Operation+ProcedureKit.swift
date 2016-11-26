@@ -4,6 +4,8 @@
 //  Copyright © 2016 ProcedureKit. All rights reserved.
 //
 
+import Foundation
+
 internal extension Operation {
 
     enum KeyPath: String {

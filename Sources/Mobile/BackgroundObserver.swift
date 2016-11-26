@@ -4,6 +4,9 @@
 //  Copyright © 2016 ProcedureKit. All rights reserved.
 //
 
+import Foundation
+import UIKit
+
 internal protocol BackgroundTaskApplicationProtocol {
 
     var applicationState: UIApplicationState { get }
@@ -19,8 +22,9 @@ public class BackgroundObserver: NSObject, ProcedureObserver {
 
     static let backgroundTaskName = "Background Observer"
 
-    private var identifier: UIBackgroundTaskIdentifier? = nil
-    private var log: LoggerProtocol? = nil
+    private let stateLock = NSLock()
+    private var _identifier: UIBackgroundTaskIdentifier? = nil
+    private var _log: LoggerProtocol? = nil
     private let application: BackgroundTaskApplicationProtocol
 
     private var isInBackground: Bool {
@@ -43,6 +47,10 @@ public class BackgroundObserver: NSObject, ProcedureObserver {
         }
     }
 
+    deinit {
+        removeNotificationCenterObservers()
+    }
+
     @objc func didEnterBackground(withNotification notification: NSNotification) {
         guard isInBackground else { return }
         startBackgroundTask()
@@ -54,24 +62,40 @@ public class BackgroundObserver: NSObject, ProcedureObserver {
     }
 
     private func startBackgroundTask() {
-        if identifier == nil {
-            log?.info(message: "Will begin background task as application entered background.")
-            identifier = application.beginBackgroundTask(withName: BackgroundObserver.backgroundTaskName, expirationHandler: endBackgroundTask)
+        stateLock.withCriticalScope {
+            if _identifier == nil {
+                _log?.info(message: "Will begin background task as application entered background.")
+                _identifier = application.beginBackgroundTask(withName: BackgroundObserver.backgroundTaskName, expirationHandler: endBackgroundTask)
+            }
         }
     }
 
     private func endBackgroundTask() {
-        guard let id = identifier else { return }
-        application.endBackgroundTask(id)
-        log?.info(message: "Did end background task.")
-        identifier = nil
+        stateLock.withCriticalScope {
+            guard let id = _identifier else { return }
+            application.endBackgroundTask(id)
+            _log?.info(message: "Did end background task.")
+            _identifier = nil
+        }
     }
 
     public func didAttach(to procedure: Procedure) {
-        log = procedure.log
+        stateLock.withCriticalScope {
+            _log = procedure.log
+        }
     }
 
     public func did(finish procedure: Procedure, withErrors errors: [Error]) {
+        removeNotificationCenterObservers()
         endBackgroundTask()
+    }
+
+    private func removeNotificationCenterObservers() {
+        // To support iOS < 9.0 and macOS < 10.11, NotificationCenter observers must be removed.
+        // (Or a crash may result.)
+        // Reference: https://developer.apple.com/reference/foundation/notificationcenter/1415360-addobserver
+        let nc = NotificationCenter.default
+        nc.removeObserver(self, name: NSNotification.Name.UIApplicationDidEnterBackground, object: nil)
+        nc.removeObserver(self, name: NSNotification.Name.UIApplicationDidBecomeActive, object: nil)
     }
 }

@@ -4,6 +4,8 @@
 //  Copyright © 2016 ProcedureKit. All rights reserved.
 //
 
+import Foundation
+
 class AnyObserverBox_<Procedure: ProcedureProtocol>: ProcedureObserver {
     func didAttach(to procedure: Procedure) { _abstractMethod() }
     func will(execute procedure: Procedure) { _abstractMethod() }

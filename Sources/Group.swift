@@ -6,6 +6,9 @@
 
 // swiftlint:disable file_length
 
+import Foundation
+import Dispatch
+
 /**
  A `Procedure` subclass which enables the grouping
  of other procedures. Use `Group`s to associate
@@ -46,9 +49,8 @@ open class GroupProcedure: Procedure, ProcedureQueueDelegate {
     fileprivate var groupCanFinish: CanFinishGroup!
 
     /// - returns: the operations which have been added to the queue
-    public private(set) var children: [Operation] {
+    public var children: [Operation] {
         get { return groupChildren.read { $0 } }
-        set { groupChildren.write { (ward: inout [Operation]) in ward = newValue } }
     }
 
     /**

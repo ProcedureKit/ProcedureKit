@@ -4,41 +4,37 @@
 //  Copyright © 2016 ProcedureKit. All rights reserved.
 //
 
-protocol NetworkActivityIndicatorProtocol {
+import Foundation
+import Dispatch
+
+public protocol NetworkActivityIndicatorProtocol {
     var networkActivityIndicatorVisible: Bool { get set }
 }
 
-extension UIApplication: NetworkActivityIndicatorProtocol { }
-
-class NetworkActivityController {
-
-    class Timer {
-        let workItem: DispatchWorkItem
-        init(interval: TimeInterval, workItem: DispatchWorkItem) {
-            self.workItem = workItem
-            DispatchQueue.main.asyncAfter(deadline: .now() + interval, execute: workItem)
-        }
-
-        convenience init(interval: TimeInterval, block: @escaping () -> Void) {
-            self.init(interval: interval, workItem: DispatchWorkItem(block: block))
-        }
-
-        func cancel() {
-            workItem.cancel()
-        }
-    }
-
-    static let shared = NetworkActivityController()
+public class NetworkActivityController {
 
     let interval: TimeInterval
     private(set) var indicator: NetworkActivityIndicatorProtocol
 
     private var count = 0
-    private var timer: Timer?
+    private var delayedHide: DispatchWorkItem?
 
     private let queue = DispatchQueue(label: "run.kit.procedure.ProcedureKit.NetworkActivityController", qos: .userInteractive)
 
-    init(timerInterval: TimeInterval = 1.0, indicator: NetworkActivityIndicatorProtocol = UIApplication.shared) {
+    /// Initialize a NetworkActivityController
+    ///
+    /// - Parameters:
+    ///   - timerInterval: How long to wait after observed network activity stops before
+    ///                    the network activity indicator is set to false.
+    ///                    (This helps reduce flickering if you rapidly create procedures
+    ///                    with attached NetworkObservers.)
+    ///   - indicator:     Conforms to `NetworkActivityIndicatorProtocol`.
+    ///                    The `indicator`'s `networkActivityIndicatorVisible` property
+    ///                    is queried/set by the NetworkActivityController.
+    ///                    (NOTE: NetworkActivityController always accesses the indicator's
+    ///                    `networkActivityIndicatorVisible` property on the main queue.)
+    ///
+    public init(timerInterval: TimeInterval = 1.0, indicator: NetworkActivityIndicatorProtocol) {
         self.interval = timerInterval
         self.indicator = indicator
     }
@@ -64,15 +60,17 @@ class NetworkActivityController {
             updateIndicator(withVisibility: true)
         }
         else if count == 0 {
-            timer = Timer(interval: interval) {
+            let workItem = DispatchWorkItem(block: {
                 self.updateIndicator(withVisibility: false)
-            }
+            })
+            delayedHide = workItem
+            queue.asyncAfter(deadline: .now() + interval, execute: workItem)
         }
     }
 
     private func updateIndicator(withVisibility visibility: Bool) {
-        timer?.cancel()
-        timer = nil
+        delayedHide?.cancel()
+        delayedHide = nil
         DispatchQueue.main.async {
             // only set the visibility if it has changed
             if self.indicator.networkActivityIndicatorVisible != visibility {
@@ -86,12 +84,9 @@ public class NetworkObserver: ProcedureObserver {
 
     private let networkActivityController: NetworkActivityController
 
-    init(controller: NetworkActivityController) {
+    /// Initialize a NetworkObserver with a supplied NetworkActivityController.
+    public init(controller: NetworkActivityController) {
         networkActivityController = controller
-    }
-
-    public convenience init() {
-        self.init(controller: NetworkActivityController.shared)
     }
 
     public func will(execute procedure: Procedure) {

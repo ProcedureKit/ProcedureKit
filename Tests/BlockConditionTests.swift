@@ -16,10 +16,10 @@ class BlockConditionTests: ProcedureKitTestCase {
         XCTAssertProcedureFinishedWithoutErrors()
     }
 
-    func test__procedure_with_unsuccessful_block_cancels() {
+    func test__procedure_with_unsuccessful_block_cancels_without_errors() {
         procedure.add(condition: BlockCondition { false })
         wait(for: procedure)
-        XCTAssertProcedureCancelledWithErrors(count: 1)
+        XCTAssertProcedureCancelledWithoutErrors()
     }
 
     func test__procedure_with_throwing_block_cancels_with_error() {

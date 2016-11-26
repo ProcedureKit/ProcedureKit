@@ -8,24 +8,12 @@ import XCTest
 import TestingProcedureKit
 @testable import ProcedureKit
 
-class NumbersProcedure: Procedure, ResultInjection {
-
-    var requirement: PendingValue<Void> = .void
-    var result: PendingValue<Array<Int>> = .ready([])
-    var error: Error? = nil
+class NumbersProcedure: ResultProcedure<Array<Int>> {
 
     init(error: Error? = nil) {
-        self.error = error
-        super.init()
-    }
-
-    override func execute() {
-        if let error = error {
-            finish(withError: error)
-        }
-        else {
-            result = .ready([0, 1, 2, 3, 4, 5 , 6 , 7, 8, 9])
-            finish()
+        super.init {
+            if let error = error { throw error }
+            return [0, 1, 2, 3, 4, 5 , 6 , 7, 8, 9]
         }
     }
 }
@@ -36,7 +24,7 @@ class ReduceProcedureTests: ProcedureKitTestCase {
         let reduced = ReduceProcedure(source: [0, 1, 2, 3, 4, 5 , 6 , 7, 8, 9], initial: 0, nextPartialResult: +)
         wait(for: reduced)
         XCTAssertProcedureFinishedWithoutErrors(reduced)
-        XCTAssertEqual(reduced.result.value ?? 0, 45)
+        XCTAssertEqual(reduced.output.success ?? 0, 45)
     }
 
     func test__finishes_with_error_if_block_throws() {
@@ -51,7 +39,7 @@ class ReduceProcedureTests: ProcedureKitTestCase {
         wait(for: numbers, reduced)
         XCTAssertProcedureFinishedWithoutErrors(numbers)
         XCTAssertProcedureFinishedWithoutErrors(reduced)
-        XCTAssertEqual(reduced.result.value ?? 0, 45)
+        XCTAssertEqual(reduced.output.success ?? 0, 45)
     }
 
     func test__reduce_dependency_which_finishes_with_error() {

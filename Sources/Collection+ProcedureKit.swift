@@ -4,6 +4,8 @@
 //  Copyright © 2016 ProcedureKit. All rights reserved.
 //
 
+import Foundation
+
 extension Collection where Iterator.Element: Operation {
 
     internal var operationsAndProcedures: ([Operation], [Procedure]) {
@@ -87,18 +89,18 @@ extension Collection where Iterator.Element: Operation {
     }
 }
 
-// MARK: - ResultInjection & Gathering
+// MARK: - OutputProcedure & Gathering
 
-extension Collection where Iterator.Element: ProcedureProtocol, Iterator.Element: ResultInjection {
+extension Collection where Iterator.Element: ProcedureProtocol, Iterator.Element: OutputProcedure {
 
     /// Creates a new procedure which will flatmap the non-nil results of the receiver's procedures into a
     /// new array. This new array is available as the result of the returned procedure.
     ///
     /// - Parameter transform: a throwing closure which receives the result from the receiver's procedure.
     /// - Returns: a ResultProcedure<[T]> procedure.
-    public func flatMap<T>(transform: @escaping (Self.Iterator.Element.Result) throws -> T?) -> ResultProcedure<[T]> {
+    public func flatMap<T>(transform: @escaping (Self.Iterator.Element.Output) throws -> T?) -> ResultProcedure<[T]> {
 
-        let mapped = ResultProcedure { try self.flatMap { $0.result.value }.flatMap(transform) }
+        let mapped = ResultProcedure { try self.flatMap { $0.output.success }.flatMap(transform) }
 
         forEach { mapped.add(dependency: $0) }
 
@@ -112,9 +114,9 @@ extension Collection where Iterator.Element: ProcedureProtocol, Iterator.Element
     ///   - initialResult: the initial result
     ///   - nextPartialResult: a closure which receives the partial result, and next element (result) returns the next partial result.
     /// - Returns: a ResultProcedure<ReducedResult> procedure
-    public func reduce<ReducedResult>(_ initialResult: ReducedResult, _ nextPartialResult: @escaping (ReducedResult, Self.Iterator.Element.Result) throws -> ReducedResult) -> ResultProcedure<ReducedResult> {
+    public func reduce<ReducedResult>(_ initialResult: ReducedResult, _ nextPartialResult: @escaping (ReducedResult, Self.Iterator.Element.Output) throws -> ReducedResult) -> ResultProcedure<ReducedResult> {
 
-        let result = ResultProcedure { try self.flatMap { $0.result.value }.reduce(initialResult, nextPartialResult) }
+        let result = ResultProcedure { try self.flatMap { $0.output.success }.reduce(initialResult, nextPartialResult) }
 
         forEach { result.add(dependency: $0) }
 
@@ -124,7 +126,7 @@ extension Collection where Iterator.Element: ProcedureProtocol, Iterator.Element
     /// Creates a new procedure which will gather the non-nil results of the receiver's procedures into a single array
     ///
     /// - Returns: a ResultProcedure<[Self.Iterator.Element.Result]> procedur
-    public func gather() -> ResultProcedure<[Self.Iterator.Element.Result]> {
+    public func gathered() -> ResultProcedure<[Self.Iterator.Element.Output]> {
         return flatMap(transform: { $0 })
     }
 }

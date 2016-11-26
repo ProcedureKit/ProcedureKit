@@ -4,6 +4,8 @@
 //  Copyright © 2016 ProcedureKit. All rights reserved.
 //
 
+import Foundation
+
 public struct Observer<Procedure: ProcedureProtocol> {
 
     public typealias VoidBlock = (Procedure) -> Void
