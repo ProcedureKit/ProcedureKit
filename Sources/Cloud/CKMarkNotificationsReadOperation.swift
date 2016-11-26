@@ -16,16 +16,27 @@ public protocol CKMarkNotificationsReadOperationProtocol: CKOperationProtocol {
     var markNotificationsReadCompletionBlock: (([NotificationID]?, Error?) -> Void)? { get set }
 }
 
-public struct MarkNotificationsReadError<NotificationID>: CloudKitError {
+public struct MarkNotificationsReadError<NotificationID>: CloudKitBatchProcessError {
 
     public let underlyingError: Error
     public let marked: [NotificationID]?
+
+    public var processed: [NotificationID]? {
+        return marked
+    }
 }
 
-extension CKMarkNotificationsReadOperation: CKMarkNotificationsReadOperationProtocol, AssociatedErrorProtocol {
+extension CKMarkNotificationsReadOperation: CKMarkNotificationsReadOperationProtocol, AssociatedErrorProtocol, CloudKitBatchProcessOperation {
 
-    // The associated error type
+    public typealias Process = NotificationID
+
+    /// The associated error type
     public typealias AssociatedError = MarkNotificationsReadError<NotificationID>
+
+    public var toProcess: [NotificationID]? {
+        get { return notificationIDs }
+        set { notificationIDs = newValue ?? [] }
+    }
 }
 
 extension CKProcedure where T: CKMarkNotificationsReadOperationProtocol, T: AssociatedErrorProtocol, T.AssociatedError: CloudKitError {

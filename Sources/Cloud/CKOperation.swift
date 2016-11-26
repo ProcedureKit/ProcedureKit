@@ -278,3 +278,54 @@ extension CloudKitProcedure where T: CKOperationProtocol {
         }
     }
 }
+
+internal extension CKProcedure where T: CloudKitBatchProcessOperation {
+
+    var toProcess: [T.Process]? {
+        get { return operation.toProcess }
+        set { operation.toProcess = newValue }
+    }
+}
+
+public extension CloudKitProcedure where T: CloudKitBatchProcessOperation {
+
+    var toProcess: [T.Process]? {
+        get { return current.toProcess }
+        set {
+            current.toProcess = newValue
+            appendConfigureBlock { $0.toProcess = newValue }
+        }
+    }
+}
+
+internal extension CKProcedure where T: CloudKitBatchModifyOperation {
+
+    var toSave: [T.Save]? {
+        get { return operation.toSave }
+        set { operation.toSave = newValue }
+    }
+
+    var toDelete: [T.Delete]? {
+        get { return operation.toDelete }
+        set { operation.toDelete = newValue }
+    }
+}
+
+public extension CloudKitProcedure where T: CloudKitBatchModifyOperation {
+
+    var toSave: [T.Save]? {
+        get { return current.toSave }
+        set {
+            current.toSave = newValue
+            appendConfigureBlock { $0.toSave = newValue }
+        }
+    }
+
+    var toDelete: [T.Delete]? {
+        get { return current.toDelete }
+        set {
+            current.toDelete = newValue
+            appendConfigureBlock { $0.toDelete = newValue }
+        }
+    }
+}

@@ -39,12 +39,28 @@ public struct ModifyRecordsError<Record, RecordID>: CloudKitError, CloudKitBatch
     public let underlyingError: Error
     public let saved: [Record]?
     public let deleted: [RecordID]?
+
+    public init(error: Error, saved: [Record]?, deleted: [RecordID]?) {
+        self.underlyingError = error
+        self.saved = saved
+        self.deleted = deleted
+    }
 }
 
-extension CKModifyRecordsOperation: CKModifyRecordsOperationProtocol, AssociatedErrorProtocol {
+extension CKModifyRecordsOperation: CKModifyRecordsOperationProtocol, AssociatedErrorProtocol, CloudKitBatchModifyOperation {
 
     // The associated error type
     public typealias AssociatedError = ModifyRecordsError<Record, RecordID>
+
+    public var toSave: [Record]? {
+        get { return recordsToSave }
+        set { recordsToSave = newValue }
+    }
+
+    public var toDelete: [RecordID]? {
+        get { return recordIDsToDelete }
+        set { recordIDsToDelete = newValue }
+    }
 }
 
 extension CKProcedure where T: CKModifyRecordsOperationProtocol, T: AssociatedErrorProtocol, T.AssociatedError: CloudKitError {
@@ -87,7 +103,7 @@ extension CKProcedure where T: CKModifyRecordsOperationProtocol, T: AssociatedEr
     func setModifyRecordsCompletionBlock(_ block: @escaping CloudKitProcedure<T>.ModifyRecordsCompletionBlock) {
         operation.modifyRecordsCompletionBlock = { [weak self] saved, deleted, error in
             if let strongSelf = self, let error = error {
-                strongSelf.append(fatalError: ModifyRecordsError(underlyingError: error, saved: saved, deleted: deleted))
+                strongSelf.append(fatalError: ModifyRecordsError(error: error, saved: saved, deleted: deleted))
             }
             else {
                 block(saved, deleted)

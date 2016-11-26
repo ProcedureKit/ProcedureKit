@@ -35,24 +35,6 @@ public extension CloudKitError {
     }
 }
 
-// MARK: - Batch Errors
-
-/// An error protocol for batch modifying operations
-public protocol CloudKitBatchModifyError: CloudKitError {
-    associatedtype Save
-    associatedtype Delete
-
-    var saved: [Save]? { get }
-    var deleted: [Delete]? { get }
-}
-
-/// An error protocol for batch processing operations
-public protocol CloudKitBatchProcessError: CloudKitError {
-    associatedtype Process
-
-    var processed: [Process]? { get }
-}
-
 // MARK: - Concrete types
 
 public struct PKCKError: CloudKitError {
