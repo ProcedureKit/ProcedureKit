@@ -17,6 +17,8 @@ class CLLocationManagerTests: XCTestCase, CLLocationManagerDelegate {
         let manager = CLLocationManager.make()
         manager.pk_set(delegate: self)
         XCTAssertNotNil(manager.delegate)
+        manager.pk_set(delegate: nil)
+        XCTAssertNil(manager.delegate)
     }
 }
 
@@ -112,10 +114,13 @@ class LocationCapabilityTests: XCTestCase {
     }
 
     func test__given_not_determined_request_authorization() {
+        weak var exp = expectation(description: "Test: \(#function)")
         var didComplete = false
         capability.requestAuthorization {
             didComplete = true
+            exp?.fulfill()
         }
+        waitForExpectations(timeout: 3, handler: nil)
         XCTAssertTrue(registrar.didCheckServiceEnabled)
         XCTAssertTrue(registrar.didRequestAuthorization)
         XCTAssertEqual(registrar.didRequestAuthorizationForUsage, .whenInUse)
@@ -125,13 +130,16 @@ class LocationCapabilityTests: XCTestCase {
 
     #if os(iOS)
     func test__given_when_in_use_require_always_request_authorization() {
+        weak var exp = expectation(description: "Test: \(#function)")
         registrar.authorizationStatus = .authorizedWhenInUse
         capability = Capability.Location(.always)
         capability.registrar = registrar
         var didComplete = false
         capability.requestAuthorization {
             didComplete = true
+            exp?.fulfill()
         }
+        waitForExpectations(timeout: 3, handler: nil)
         XCTAssertTrue(registrar.didCheckServiceEnabled)
         XCTAssertTrue(registrar.didRequestAuthorization)
         XCTAssertEqual(registrar.didRequestAuthorizationForUsage, .always)
@@ -141,11 +149,14 @@ class LocationCapabilityTests: XCTestCase {
     #endif
 
     func test__given_denied_does_not_request_authorization() {
+        weak var exp = expectation(description: "Test: \(#function)")
         registrar.authorizationStatus = .denied
         var didComplete = false
         capability.requestAuthorization {
             didComplete = true
+            exp?.fulfill()
         }
+        waitForExpectations(timeout: 3, handler: nil)
         XCTAssertFalse(registrar.didRequestAuthorization)
         XCTAssertNil(registrar.didRequestAuthorizationForUsage)
         XCTAssertTrue(didComplete)
@@ -153,13 +164,16 @@ class LocationCapabilityTests: XCTestCase {
 
 
     func test__given_already_authorized_sufficiently_does_not_request_authorization() {
+        weak var exp = expectation(description: "Test: \(#function)")
         registrar.authorizationStatus = .authorizedAlways
         capability = Capability.Location(.whenInUse)
         capability.registrar = registrar
         var didComplete = false
         capability.requestAuthorization {
             didComplete = true
+            exp?.fulfill()
         }
+        waitForExpectations(timeout: 3, handler: nil)
         XCTAssertFalse(registrar.didRequestAuthorization)
         XCTAssertNil(registrar.didRequestAuthorizationForUsage)
         XCTAssertTrue(didComplete)
