@@ -4,6 +4,8 @@
 //  Copyright © 2016 ProcedureKit. All rights reserved.
 //
 
+#if !os(watchOS)
+
 import SystemConfiguration
 
 public protocol NetworkResilience {
@@ -195,3 +197,5 @@ open class NetworkProcedure<T: Procedure>: RetryProcedure<T> where T: NetworkOpe
         networkErrors = [error]
     }
 }
+
+#endif

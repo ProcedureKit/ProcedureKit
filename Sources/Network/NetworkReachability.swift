@@ -4,6 +4,8 @@
 //  Copyright © 2016 ProcedureKit. All rights reserved.
 //
 
+#if !os(watchOS)
+
 import SystemConfiguration
 
 // MARK: - Internal concrete types
@@ -190,3 +192,5 @@ private func __device_reachability_callback(reachability: SCNetworkReachability,
         deviceReachability.didChangeReachability(flags: flags)
     }
 }
+
+#endif
