@@ -135,7 +135,7 @@ public extension CloudKitBatchProcessOperation where Process: Equatable, Process
         var left: [Process]? = nil
         var right: [Process]? = nil
 
-        let remainingToProcess = toProcess?.filter { !(error.processed?.contains($0) ?? false) }
+        let remainingToProcess = toProcess?.filter { error.processed?.contains($0) ?? false }
 
         if let bisectedToProcess = remainingToProcess.map({ $0.bisect() }) {
             left = bisectedToProcess.left
@@ -160,10 +160,14 @@ public extension CloudKitProcedure where T: CloudKitBatchProcessOperation, T.Pro
             // Execute the handler
             guard let response = handler(error, log, operation.bisect(error: error)) else { return nil }
 
+            let name = strongSelf.operationName
+
             // Create a new procedure for the left hand bisect of the remaining data
             let lhs = CloudKitProcedure { T() }
 
             // Setup basic configuration such as container & database
+            lhs.log.severity = strongSelf.log.severity
+
             lhs.append(configureBlock: suggested.configure)
 
             // Set the error handlers
@@ -171,6 +175,9 @@ public extension CloudKitProcedure where T: CloudKitBatchProcessOperation, T.Pro
 
             // Set the modifications to perform
             lhs.toProcess = response.left
+
+            // Set the name
+            lhs.name = "\(name), left bisection \(response.left?.count ?? 0)"
 
             // Setup the configuration block for the right hand side
             // which is the original procedure which will be re-tried
@@ -181,6 +188,9 @@ public extension CloudKitProcedure where T: CloudKitBatchProcessOperation, T.Pro
 
                 // Set the modifications to perform
                 rhs.toProcess = response.right
+
+                // Set the name
+                rhs.name = "\(name), right bisection \(response.left?.count ?? 0)"
 
                 // Set the left half as a dependency
                 rhs.add(dependency: lhs)

@@ -10,21 +10,27 @@ import ProcedureKit
 import TestingProcedureKit
 @testable import ProcedureKitCloud
 
-class TestCKMarkNotificationsReadOperation: TestCKOperation, CKMarkNotificationsReadOperationProtocol, AssociatedErrorProtocol {
+class TestCKMarkNotificationsReadOperation: TestCKOperation, CKMarkNotificationsReadOperationProtocol, AssociatedErrorProtocol, CloudKitBatchProcessOperation {
+    typealias Process = String
     typealias AssociatedError = MarkNotificationsReadError<String>
 
     var notificationIDs: [String] = []
     var error: Error? = nil
     var markNotificationsReadCompletionBlock: (([String]?, Error?) -> Void)? = nil
 
-    init(markIDsToRead: [String] = [], error: Error? = nil) {
+    var toProcess: [String]? {
+        get { return notificationIDs }
+        set { notificationIDs = newValue ?? [] }
+    }
+
+    convenience init(markIDsToRead: [String] = [], error: Error? = nil) {
+        self.init()
         self.notificationIDs = markIDsToRead
         self.error = error
-        super.init()
     }
 
     override func main() {
-        markNotificationsReadCompletionBlock?(notificationIDs, error)
+        markNotificationsReadCompletionBlock?(toProcess, error)
     }
 }
 
@@ -182,13 +188,13 @@ class CloudKitProcedureMarkNotificationsReadOperationTests: CKProcedureTestCase 
         cloudkit = CloudKitProcedure(strategy: .immediate) {
             let op = TestCKMarkNotificationsReadOperation()
             if shouldError {
-                op.error = NSError(domain: CKErrorDomain, code: CKError.Code.limitExceeded.rawValue, userInfo: nil)
+                op.error = NSError(domain: CKErrorDomain, code: CKError.Code.serviceUnavailable.rawValue, userInfo: nil)
                 shouldError = false
             }
             return op
         }
         var didRunCustomHandler = false
-        cloudkit.set(errorHandlerForCode: .limitExceeded) { _, _, _, suggestion in
+        cloudkit.set(errorHandlerForCode: .serviceUnavailable) { _, _, _, suggestion in
             didRunCustomHandler = true
             return suggestion
         }
@@ -200,6 +206,29 @@ class CloudKitProcedureMarkNotificationsReadOperationTests: CKProcedureTestCase 
         XCTAssertTrue(didExecuteBlock)
         XCTAssertTrue(didRunCustomHandler)
     }
-    
+
+    func test__limit_exceeded_error_handling() {
+        var shouldError = true
+        cloudkit = CloudKitProcedure(strategy: .immediate) {
+            let op = TestCKMarkNotificationsReadOperation(markIDsToRead: [ "id 1", "id 2", "id 3", "id 4" ])
+            if shouldError {
+                op.error = NSError(domain: CKErrorDomain, code: CKError.Code.limitExceeded.rawValue, userInfo: nil)
+                shouldError = false
+            }
+            return op
+        }
+        cloudkit.log.severity = .notice
+        var didRunCustomHandler = false
+        cloudkit.setErrorHandlerForLimitExceeded {
+            didRunCustomHandler = true
+            return $2
+        }
+        var didExecuteBlock = false
+        cloudkit.setMarkNotificationsReadCompletionBlock { _ in didExecuteBlock = true }
+        wait(for: cloudkit)
+        XCTAssertProcedureFinishedWithoutErrors(cloudkit)
+        XCTAssertTrue(didExecuteBlock)
+        XCTAssertTrue(didRunCustomHandler)
+    }
 }
 
