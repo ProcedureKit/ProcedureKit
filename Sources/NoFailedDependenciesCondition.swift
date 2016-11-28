@@ -24,7 +24,6 @@ public class NoFailedDependenciesCondition: Condition {
         cancellationOptions = ignoreCancellations ? .ignore : .fail
         super.init()
         name = "No Failed Dependencies"
-        mutuallyExclusive = false
     }
 
     /**
@@ -49,14 +48,13 @@ public class NoFailedDependenciesCondition: Condition {
 
         switch cancellationOptions {
         case _ where !failures.isEmpty:
-            completion(.failed(ProcedureKitError.dependenciesFailed()))
+            completion(.failure(ProcedureKitError.dependenciesFailed()))
         case .fail where !cancelled.isEmpty:
-            completion(.failed(ProcedureKitError.dependenciesCancelled()))
+            completion(.failure(ProcedureKitError.dependenciesCancelled()))
         case .ignore where !cancelled.isEmpty:
-            completion(.ignored)
+            completion(.success(false))
         default:
-            completion(.satisfied)
+            completion(.success(true))
         }
     }
-
 }

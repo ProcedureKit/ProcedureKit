@@ -4,25 +4,45 @@
 //  Copyright © 2016 ProcedureKit. All rights reserved.
 //
 
-open class ResultProcedure<Result>: Procedure, ResultInjection {
-    public var requirement: PendingValue<Void> = .void
-    public private(set) var result: PendingValue<Result> = .pending
+open class ResultProcedure<Output>: Procedure, OutputProcedure {
 
-    public typealias ThrowingResultBlock = () throws -> Result
+    public typealias ThrowingOutputBlock = () throws -> Output
 
-    private let block: ThrowingResultBlock
+    public var output: Pending<ProcedureResult<Output>> = .pending
 
-    public init(block: @escaping ThrowingResultBlock) {
+    private let block: ThrowingOutputBlock
+
+    public init(block: @escaping ThrowingOutputBlock) {
         self.block = block
         super.init()
     }
 
     open override func execute() {
-        var finishingError: Error? = nil
-        defer { finish(withError: finishingError) }
-        do { result = .ready(try block()) }
-        catch { finishingError = error }
+        defer { finish(withError: output.error) }
+        do { output = .ready(.success(try block())) }
+        catch { output = .ready(.failure(error)) }
     }
 }
 
 open class BlockProcedure: ResultProcedure<Void> { }
+
+open class AsyncResultProcedure<Output>: Procedure, OutputProcedure {
+
+    public typealias FinishingBlock = (ProcedureResult<Output>) -> Void
+    public typealias Block = (@escaping FinishingBlock) -> Void
+
+    private let block: Block
+
+    public var output: Pending<ProcedureResult<Output>> = .pending
+
+    public init(block: @escaping Block) {
+        self.block = block
+        super.init()
+    }
+
+    open override func execute() {
+        block { self.finish(withResult: $0) }
+    }
+}
+
+open class AsyncBlockProcedure: AsyncResultProcedure<Void> { }

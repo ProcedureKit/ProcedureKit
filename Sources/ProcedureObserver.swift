@@ -4,6 +4,8 @@
 //  Copyright © 2016 ProcedureKit. All rights reserved.
 //
 
+import Foundation
+
 /**
  Types which conform to this protocol, can be attached to `Procedure` subclasses to receive
  events at state transitions.
@@ -59,14 +61,24 @@ public protocol ProcedureObserver {
     func did(cancel procedure: Procedure, withErrors: [Error])
 
     /**
-     The procedure produced a new `Operation` instance which has been added to the
-     queue. Note that this isn't necessarily an `Procedure`, so be careful, if you
+     The procedure will add a new `Operation` instance to the
+     queue. Note that this isn't necessarily a `Procedure`, so be careful, if you
      intend to automatically start observing it.
 
      - parameter procedure: the observed `Procedure`.
-     - parameter newOperation: the produced `Operation`
+     - parameter newOperation: the `Operation` which will be added
      */
-    func procedure(_ procedure: Procedure, didProduce newOperation: Operation)
+    func procedure(_ procedure: Procedure, willAdd newOperation: Operation)
+
+    /**
+     The procedure did add a new `Operation` instance to the
+     queue. Note that this isn't necessarily a `Procedure`, so be careful, if you
+     intend to automatically start observing it.
+
+     - parameter procedure: the observed `Procedure`.
+     - parameter newOperation: the `Operation` which has been added to the queue
+     */
+    func procedure(_ procedure: Procedure, didAdd newOperation: Operation)
 
     /**
      The procedure will finish. Any errors that were encountered are collected here.
@@ -97,7 +109,9 @@ public extension ProcedureObserver {
 
     func did(cancel procedure: Procedure, withErrors: [Error]) { }
 
-    func procedure(_ procedure: Procedure, didProduce newOperation: Operation) { }
+    func procedure(_ procedure: Procedure, willAdd newOperation: Operation) { }
+
+    func procedure(_ procedure: Procedure, didAdd newOperation: Operation) { }
 
     func will(finish procedure: Procedure, withErrors errors: [Error]) { }
 

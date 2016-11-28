@@ -4,6 +4,9 @@
 //  Copyright © 2016 ProcedureKit. All rights reserved.
 //
 
+import Foundation
+import Dispatch
+
 /**
  A generic condition for describing operations that
  cannot be allowed to execute concurrently.
@@ -11,15 +14,15 @@
 public final class MutuallyExclusive<T>: Condition {
 
     /// Public constructor
-    public override init() {
+    public init(category: String = "MutuallyExclusive<\(T.self)>") {
         super.init()
         name = "MutuallyExclusive<\(T.self)>"
-        mutuallyExclusive = true
+        mutuallyExclusiveCategory = category
     }
 
     /// Required public override, but there is no evaluation, so it just completes with `.Satisfied`.
     public override func evaluate(procedure: Procedure, completion: @escaping (ConditionResult) -> Void) {
-        completion(.satisfied)
+        completion(.success(true))
     }
 }
 

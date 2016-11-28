@@ -4,6 +4,9 @@
 //  Copyright © 2016 ProcedureKit. All rights reserved.
 //
 
+import Foundation
+import Dispatch
+
 public struct RepeatProcedurePayload<T: Operation> {
     public typealias ConfigureBlock = (T) -> Void
 
@@ -15,6 +18,10 @@ public struct RepeatProcedurePayload<T: Operation> {
         self.operation = operation
         self.delay = delay
         self.configure = configure
+    }
+
+    public func set(delay newDelay: Delay?) -> RepeatProcedurePayload {
+        return RepeatProcedurePayload(operation: operation, delay: newDelay, configure: configure)
     }
 }
 
@@ -38,41 +45,77 @@ open class RepeatProcedure<T: Operation>: GroupProcedure {
         return create(withMax: max, andIterator: tmp)
     }
 
-    public internal(set) var previous: T? = nil
+    private let _repeatStateLock = NSRecursiveLock()
 
+    private var _previous: T? = nil
+    /// - returns: the previous executing operation instance of T
+    public internal(set) var previous: T? {
+        get {
+            return _repeatStateLock.withCriticalScope { _previous }
+        }
+        set {
+            _repeatStateLock.withCriticalScope {
+                _previous = newValue
+            }
+        }
+    }
+
+    private var _current: T
     /// - returns: the currently executing operation instance of T
-    public internal(set) var current: T
+    public internal(set) var current: T {
+        get {
+            return _repeatStateLock.withCriticalScope { _current }
+        }
+        set {
+            _repeatStateLock.withCriticalScope {
+                _current = newValue
+            }
+        }
+    }
 
+    private var _count: Int = 1
     /// - returns: the number of operation instances
-    public internal(set) var count: Int = 1
-
-    internal private(set) var configure: Payload.ConfigureBlock = { _ in }
-
-    private var iterator: AnyIterator<Payload>
-
-    public init<PayloadIterator>(max: Int? = nil, iterator base: PayloadIterator) where PayloadIterator: IteratorProtocol, PayloadIterator.Element == Payload {
-        (current, iterator) = RepeatProcedure.create(withMax: max, andIterator: base)
-        super.init(operations: [])
+    public var count: Int {
+        get {
+            return _repeatStateLock.withCriticalScope { _count }
+        }
     }
 
-    public init<OperationIterator, DelayIterator>(max: Int? = nil, delay: DelayIterator, iterator base: OperationIterator) where OperationIterator: IteratorProtocol, DelayIterator: IteratorProtocol, OperationIterator.Element == T, DelayIterator.Element == Delay {
-        (current, iterator) = RepeatProcedure.create(withMax: max, andDelay: delay, andIterator: base)
-        super.init(operations: [])
+    private var _configure: Payload.ConfigureBlock = { _ in }
+    internal var configure: Payload.ConfigureBlock {
+        get {
+            return _repeatStateLock.withCriticalScope { _configure }
+        }
     }
 
-    public init<OperationIterator>(max: Int? = nil, wait: WaitStrategy = .immediate, iterator base: OperationIterator) where OperationIterator: IteratorProtocol, OperationIterator.Element == T {
-        (current, iterator) = RepeatProcedure.create(withMax: max, andDelay: Delay.iterator(wait.iterator), andIterator: base)
-        super.init(operations: [])
+    private var _iterator: AnyIterator<Payload>
+
+    public init<PayloadIterator>(dispatchQueue: DispatchQueue? = nil, max: Int? = nil, iterator base: PayloadIterator) where PayloadIterator: IteratorProtocol, PayloadIterator.Element == Payload {
+        (_current, _iterator) = RepeatProcedure.create(withMax: max, andIterator: base)
+        super.init(dispatchQueue: dispatchQueue, operations: [])
     }
 
-    public init(max: Int? = nil, wait: WaitStrategy = .immediate, body: @escaping () -> T?) {
-        (current, iterator) = RepeatProcedure.create(withMax: max, andDelay: Delay.iterator(wait.iterator), andIterator: AnyIterator(body))
-        super.init(operations: [])
+    public init<OperationIterator, DelayIterator>(dispatchQueue: DispatchQueue? = nil, max: Int? = nil, delay: DelayIterator, iterator base: OperationIterator) where OperationIterator: IteratorProtocol, DelayIterator: IteratorProtocol, OperationIterator.Element == T, DelayIterator.Element == Delay {
+        (_current, _iterator) = RepeatProcedure.create(withMax: max, andDelay: delay, andIterator: base)
+        super.init(dispatchQueue: dispatchQueue, operations: [])
+    }
+
+    public init<OperationIterator>(dispatchQueue: DispatchQueue? = nil, max: Int? = nil, wait: WaitStrategy = .immediate, iterator base: OperationIterator) where OperationIterator: IteratorProtocol, OperationIterator.Element == T {
+        (_current, _iterator) = RepeatProcedure.create(withMax: max, andDelay: Delay.iterator(wait.iterator), andIterator: base)
+        super.init(dispatchQueue: dispatchQueue, operations: [])
+    }
+
+    public init(dispatchQueue: DispatchQueue? = nil, max: Int? = nil, wait: WaitStrategy = .immediate, body: @escaping () -> T?) {
+        (_current, _iterator) = RepeatProcedure.create(withMax: max, andDelay: Delay.iterator(wait.iterator), andIterator: AnyIterator(body))
+        super.init(dispatchQueue: dispatchQueue, operations: [])
     }
 
     /// Public override of execute which configures and adds the first operation
     open override func execute() {
-        configure(current)
+        let current = _repeatStateLock.withCriticalScope { () -> T in
+            _configure(_current)
+            return _current
+        }
         add(child: current)
         super.execute()
     }
@@ -93,15 +136,27 @@ open class RepeatProcedure<T: Operation>: GroupProcedure {
     /// - returns: whether or not there was a next payload added.
     @discardableResult
     public func addNextOperation(_ shouldAddNext: @autoclosure () -> Bool = true) -> Bool {
-        guard !isCancelled && shouldAddNext(), let payload = next() else { return false }
+        assert(!isFinished, "Cannot add next operation after the procedure has finished.")
+        guard !isCancelled else { return false }
 
-        log.notice(message: "Will add next operation.")
+        let nextPayload: Payload? = _repeatStateLock.withCriticalScope {
+            guard shouldAddNext(), let payload = _next() else { return nil }
 
-        if let newConfigureBlock = payload.configure {
-            replace(configureBlock: newConfigureBlock)
+            log.notice(message: "Will add next operation.")
+
+            if let newConfigureBlock = payload.configure {
+                _replace(configureBlock: newConfigureBlock)
+            }
+
+            _configure(payload.operation)
+
+            _count += 1
+            _previous = _current
+            _current = payload.operation
+
+            return payload
         }
-
-        configure(payload.operation)
+        guard let payload = nextPayload else { return false }
 
         if let delay = payload.delay.map({ DelayProcedure(delay: $0) }) {
             payload.operation.add(dependency: delay)
@@ -110,10 +165,6 @@ open class RepeatProcedure<T: Operation>: GroupProcedure {
         else {
             add(child: payload.operation)
         }
-
-        count += 1
-        previous = current
-        current = payload.operation
 
         return true
     }
@@ -124,7 +175,7 @@ open class RepeatProcedure<T: Operation>: GroupProcedure {
     ///
     /// - returns: an optional Paylod
     public func next() -> Payload? {
-        return iterator.next()
+        return _repeatStateLock.withCriticalScope { _next() }
     }
 
     /// Appends a configuration block to the current block. This
@@ -136,10 +187,12 @@ open class RepeatProcedure<T: Operation>: GroupProcedure {
     ///
     /// - parameter block: a block which receives an instance of T
     public func append(configureBlock block: @escaping Payload.ConfigureBlock) {
-        let config = configure
-        configure = { operation in
-            config(operation)
-            block(operation)
+        _repeatStateLock.withCriticalScope {
+            let config = _configure
+            _configure = { operation in
+                config(operation)
+                block(operation)
+            }
         }
     }
 
@@ -154,16 +207,55 @@ open class RepeatProcedure<T: Operation>: GroupProcedure {
     ///
     /// - parameter block: a block which receives an instance of T
     public func replace(configureBlock block: @escaping Payload.ConfigureBlock) {
-        configure = block
-        log.verbose(message: "did replace configure block.")
+        _repeatStateLock.withCriticalScope {
+            _replace(configureBlock: block)
+        }
     }
 
     public func replaceConfigureBlock(block: @escaping Payload.ConfigureBlock) {
         replace(configureBlock: block)
     }
+
+    // MARK: - Private Implementation
+
+    // This method is not thread-safe, and must be called within an aquisition
+    // of the _repeatStateLock.
+    private func _next() -> Payload? {
+        return _iterator.next()
+    }
+
+    // This method is not thread-safe, and must be called within an aquisition
+    // of the _repeatStateLock.
+    private func _replace(configureBlock block: @escaping Payload.ConfigureBlock) {
+        _configure = block
+        log.verbose(message: "did replace configure block.")
+    }
 }
 
 
+// MARK: - Extensions
+
+extension RepeatProcedure where T: InputProcedure {
+
+    public var input: Pending<T.Input> {
+        get { return current.input }
+        set {
+            current.input = newValue
+            appendConfigureBlock { $0.input = newValue }
+        }
+    }
+}
+
+extension RepeatProcedure where T: OutputProcedure {
+
+    public var output: Pending<ProcedureResult<T.Output>> {
+        get { return current.output }
+        set {
+            current.output = newValue
+            appendConfigureBlock { $0.output = newValue }
+        }
+    }
+}
 
 
 // MARK: - Iterators

@@ -4,6 +4,13 @@
 //  Copyright © 2016 ProcedureKit. All rights reserved.
 //
 
+/// A type which has an associated error type
+public protocol AssociatedErrorProtocol {
+
+    /// The type of associated error
+    associatedtype AssociatedError: Error
+}
+
 public protocol ProcedureKitComponent {
     var name: String { get }
 }
@@ -22,49 +29,62 @@ public struct ProcedureKitError: Error, Equatable {
 
         public static func == (lhs: Context, rhs: Context) -> Bool {
             switch (lhs, rhs) {
-            case (.unknown, .unknown), (.dependencyFinishedWithErrors, .dependencyFinishedWithErrors), (.parentCancelledWithErrors, .parentCancelledWithErrors), (.requirementNotSatisfied, .requirementNotSatisfied):
-                return true
-            case let (.programmingError(lhs), .programmingError(rhs)):
-                return lhs == rhs
             case let (.capability(lhs), .capability(rhs)):
                 return lhs == rhs
             case let (.component(lhs), .component(rhs)):
                 return lhs.name == rhs.name
+            case let (.programmingError(lhs), .programmingError(rhs)):
+                return lhs == rhs
+            case let (.timedOut(lhs), .timedOut(rhs)):
+                return lhs == rhs
+            case (.conditionFailed, .conditionFailed),
+                 (.dependenciesFailed, .dependenciesFailed),
+                 (.dependenciesCancelled, .dependenciesCancelled),
+                 (.dependencyFinishedWithErrors, .dependencyFinishedWithErrors),
+                 (.dependencyCancelledWithErrors, .dependencyCancelledWithErrors),
+                 (.noQueue, .noQueue),
+                 (.parentCancelledWithErrors, .parentCancelledWithErrors),
+                 (.requirementNotSatisfied, .requirementNotSatisfied),
+                 (.unknown, .unknown):
+                return true
             default:
                 return false
             }
         }
 
-        case unknown
+        case capability(CapabilityError)
         case component(ProcedureKitComponent)
-        case programmingError(String)
-        case timedOut(Delay)
         case conditionFailed
         case dependenciesFailed
         case dependenciesCancelled
         case dependencyFinishedWithErrors
         case dependencyCancelledWithErrors
+        case noQueue
         case parentCancelledWithErrors
+        case programmingError(String)
         case requirementNotSatisfied
-        case capability(CapabilityError)
+        case timedOut(Delay)
+        case unknown
     }
 
-    public static let unknown = ProcedureKitError(context: .unknown, errors: [])
-
-    public static func programmingError(reason: String) -> ProcedureKitError {
-        return ProcedureKitError(context: .programmingError(reason), errors: [])
+    public static func capabilityUnavailable() -> ProcedureKitError {
+        return ProcedureKitError(context: .capability(.unavailable), errors: [])
     }
 
-    public static func timedOut(with delay: Delay) -> ProcedureKitError {
-        return ProcedureKitError(context: .timedOut(delay), errors: [])
+    public static func capabilityUnauthorized() -> ProcedureKitError {
+        return ProcedureKitError(context: .capability(.unauthorized), errors: [])
     }
 
-    public static func dependenciesFailed() -> ProcedureKitError {
-        return ProcedureKitError(context: .dependenciesFailed, errors: [])
+    public static func component(_ component: ProcedureKitComponent, error: Error?) -> ProcedureKitError {
+        return ProcedureKitError(context: .component(component), errors: error.map { [$0] } ?? [])
     }
 
     public static func conditionFailed(withErrors errors: [Error] = []) -> ProcedureKitError {
         return ProcedureKitError(context: .conditionFailed, errors: errors)
+    }
+
+    public static func dependenciesFailed() -> ProcedureKitError {
+        return ProcedureKitError(context: .dependenciesFailed, errors: [])
     }
 
     public static func dependenciesCancelled() -> ProcedureKitError {
@@ -79,25 +99,28 @@ public struct ProcedureKitError: Error, Equatable {
         return ProcedureKitError(context: .dependencyCancelledWithErrors, errors: errors)
     }
 
+    public static func noQueue() -> ProcedureKitError {
+        return ProcedureKitError(context: .noQueue, errors: [])
+    }
+
     public static func parent(cancelledWithErrors errors: [Error]) -> ProcedureKitError {
         return ProcedureKitError(context: .parentCancelledWithErrors, errors: errors)
+    }
+
+    public static func programmingError(reason: String) -> ProcedureKitError {
+        return ProcedureKitError(context: .programmingError(reason), errors: [])
     }
 
     public static func requirementNotSatisfied() -> ProcedureKitError {
         return ProcedureKitError(context: .requirementNotSatisfied, errors: [])
     }
 
-    public static func capabilityUnavailable() -> ProcedureKitError {
-        return ProcedureKitError(context: .capability(.unavailable), errors: [])
+    public static func timedOut(with delay: Delay) -> ProcedureKitError {
+        return ProcedureKitError(context: .timedOut(delay), errors: [])
     }
 
-    public static func capabilityUnauthorized() -> ProcedureKitError {
-        return ProcedureKitError(context: .capability(.unauthorized), errors: [])
-    }
+    public static let unknown = ProcedureKitError(context: .unknown, errors: [])
 
-    public static func component(_ component: ProcedureKitComponent, error: Error) -> ProcedureKitError {
-        return ProcedureKitError(context: .component(component), errors: [error])
-    }
 
     public let context: Context
     public let errors: [Error]

@@ -10,21 +10,26 @@ import TestingProcedureKit
 
 class MutualExclusiveTests: ProcedureKitTestCase {
 
-    func test__mutual_eclusive_name() {
+    func test__mutual_exclusive_name() {
         let condition = MutuallyExclusive<Procedure>()
         XCTAssertEqual(condition.name, "MutuallyExclusive<Procedure>")
     }
 
+    func test__mutual_exclusive_category() {
+        let condition = MutuallyExclusive<Procedure>(category: "testing")
+        XCTAssertEqual(condition.category, "testing")
+    }
+
     func test__alert_presentation_is_mutually_exclusive() {
         let condition = MutuallyExclusive<Procedure>()
-        XCTAssertTrue(condition.mutuallyExclusive)
+        XCTAssertTrue(condition.isMutuallyExclusive)
     }
 
     func test__alert_presentation_evaluation_satisfied() {
         let condition = MutuallyExclusive<Procedure>()
         condition.evaluate(procedure: TestProcedure()) { result in
             switch result {
-            case .satisfied:
+            case .success(true):
                 return XCTAssertTrue(true)
             default:
                 return XCTFail("Condition should evaluate true.")
@@ -61,6 +66,7 @@ class MutualExclusiveTests: ProcedureKitTestCase {
     }
 
     func test__condition_has_dependency_executed_first() {
+        LogManager.severity = .notice
         var text = "Star Wars"
 
         let conditionDependency1 = BlockProcedure {
@@ -69,7 +75,7 @@ class MutualExclusiveTests: ProcedureKitTestCase {
         }
         conditionDependency1.name = "Condition 1 Dependency"
 
-        let condition1 = TrueCondition(name: "Condition 1", mutuallyExclusive: true)
+        let condition1 = TrueCondition(name: "Condition 1", mutuallyExclusiveCategory: "Testing")
         condition1.add(dependency: conditionDependency1)
 
         let procedure1 = TestProcedure(name: "Procedure 1")
@@ -78,16 +84,17 @@ class MutualExclusiveTests: ProcedureKitTestCase {
         let procedure1Dependency = TestProcedure(name: "Dependency 1")
         procedure1.add(dependency: procedure1Dependency)
 
+
         let conditionDependency2 = BlockProcedure {
             XCTAssertEqual(text, "Star Wars\nA long time ago")
             text = "\(text), in a galaxy far, far away."
         }
         conditionDependency2.name = "Condition 2 Dependency"
 
-        let condition2 = TrueCondition(name: "Condition 2", mutuallyExclusive: true)
+        let condition2 = TrueCondition(name: "Condition 2", mutuallyExclusiveCategory: "Testing")
         condition2.add(dependency: conditionDependency2)
 
-        let procedure2 = TestProcedure()
+        let procedure2 = TestProcedure(name: "Dependency 2")
         procedure2.add(condition: condition2)
 
         let procedure2Dependency = TestProcedure(name: "Dependency 2")
@@ -96,6 +103,7 @@ class MutualExclusiveTests: ProcedureKitTestCase {
         wait(for: procedure1, procedure2, procedure1Dependency, procedure2Dependency)
 
         XCTAssertEqual(text, "Star Wars\nA long time ago, in a galaxy far, far away.")
+        LogManager.severity = .warning
     }
 
     func test__mutually_exclusive_operations_can_be_executed() {
@@ -116,7 +124,7 @@ class MutualExclusiveConcurrencyTests: ConcurrencyTestCase {
     func test__mutually_exclusive_operation_are_run_exclusively() {
 
         let numOperations = 3
-        let delayMicroseconds: useconds_t = 500000 // 0.5 seconds
+        let delayMicroseconds: useconds_t = 500_000 // 0.5 seconds
 
         queue.maxConcurrentOperationCount = numOperations
 

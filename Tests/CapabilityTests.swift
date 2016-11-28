@@ -12,19 +12,19 @@ class GetAuthorizationStatusTests: TestableCapabilityTestCase {
 
     func test__sets_result() {
         wait(for: getAuthorizationStatus)
-        XCTAssertGetAuthorizationStatus(getAuthorizationStatus.result.value, expected: (true, .unknown))
+        XCTAssertGetAuthorizationStatus(getAuthorizationStatus.output.success, expected: (true, .unknown))
         XCTAssertTestCapabilityStatusChecked()
     }
 
     func test__async_sets_result() {
         capability.isAsynchronous = true
         wait(for: getAuthorizationStatus)
-        XCTAssertGetAuthorizationStatus(getAuthorizationStatus.result.value, expected: (true, .unknown))
+        XCTAssertGetAuthorizationStatus(getAuthorizationStatus.output.success, expected: (true, .unknown))
         XCTAssertTestCapabilityStatusChecked()
     }
 
     func test__runs_completion_block() {
-        var completedWithResult: GetAuthorizationStatusProcedure<TestableCapability.Status>.Result = (false, .unknown)
+        var completedWithResult: GetAuthorizationStatusProcedure<TestableCapability.Status>.Output = (false, .unknown)
         getAuthorizationStatus = GetAuthorizationStatusProcedure(capability) { completedWithResult = $0 }
 
         wait(for: getAuthorizationStatus)
@@ -34,7 +34,7 @@ class GetAuthorizationStatusTests: TestableCapabilityTestCase {
 
     func test__async_runs_completion_block() {
         capability.isAsynchronous = true
-        var completedWithResult: GetAuthorizationStatusProcedure<TestableCapability.Status>.Result = (false, .unknown)
+        var completedWithResult: GetAuthorizationStatusProcedure<TestableCapability.Status>.Output = (false, .unknown)
 
         getAuthorizationStatus = GetAuthorizationStatusProcedure(capability) { result in
             completedWithResult = result
@@ -65,7 +65,16 @@ class AuthorizeTests: TestableCapabilityTestCase {
 class AuthorizedForTests: TestableCapabilityTestCase {
 
     func test__is_mututally_exclusive() {
-        XCTAssertTrue(authorizedFor.mutuallyExclusive)
+        XCTAssertTrue(authorizedFor.isMutuallyExclusive)
+    }
+
+    func test__default_mututally_exclusive_category() {
+        XCTAssertEqual(authorizedFor.category, "TestableCapability")
+    }
+
+    func test__custom_mututally_exclusive_category() {
+        authorizedFor = AuthorizedFor(capability, category: "testing")
+        XCTAssertEqual(authorizedFor.category, "testing")
     }
 
     func test__has_authorize_dependency() {
@@ -83,14 +92,14 @@ class AuthorizedForTests: TestableCapabilityTestCase {
     func test__fails_if_capability_is_not_available() {
         capability.serviceIsAvailable = false
         wait(for: procedure)
-        XCTAssertConditionResult(authorizedFor.result, failedWithError: ProcedureKitError.capabilityUnavailable())
+        XCTAssertConditionResult(authorizedFor.output.value ?? .success(true), failedWithError: ProcedureKitError.capabilityUnavailable())
     }
 
     func test__async_fails_if_capability_is_not_available() {
         capability.isAsynchronous = true
         capability.serviceIsAvailable = false
         wait(for: procedure)
-        XCTAssertConditionResult(authorizedFor.result, failedWithError: ProcedureKitError.capabilityUnavailable())
+        XCTAssertConditionResult(authorizedFor.output.value ?? .success(true), failedWithError: ProcedureKitError.capabilityUnavailable())
     }
 
     func test__fails_if_requirement_is_not_met() {
@@ -98,7 +107,7 @@ class AuthorizedForTests: TestableCapabilityTestCase {
         capability.responseAuthorizationStatus = .minimumAuthorized
 
         wait(for: procedure)
-        XCTAssertConditionResult(authorizedFor.result, failedWithError: ProcedureKitError.capabilityUnauthorized())
+        XCTAssertConditionResult(authorizedFor.output.value ?? .success(true), failedWithError: ProcedureKitError.capabilityUnauthorized())
     }
 
     func test__async_fails_if_requirement_is_not_met() {
@@ -107,18 +116,18 @@ class AuthorizedForTests: TestableCapabilityTestCase {
         capability.responseAuthorizationStatus = .minimumAuthorized
 
         wait(for: procedure)
-        XCTAssertConditionResult(authorizedFor.result, failedWithError: ProcedureKitError.capabilityUnauthorized())
+        XCTAssertConditionResult(authorizedFor.output.value ?? .success(true), failedWithError: ProcedureKitError.capabilityUnauthorized())
     }
 
     func test__suceeds_if_requirement_is_met() {
         wait(for: procedure)
-        XCTAssertConditionResultSatisfied(authorizedFor.result)
+        XCTAssertConditionResultSatisfied(authorizedFor.output.value ?? .success(false))
     }
 
     func test__async_suceeds_if_requirement_is_met() {
         capability.isAsynchronous = true
         wait(for: procedure)
-        XCTAssertConditionResultSatisfied(authorizedFor.result)
+        XCTAssertConditionResultSatisfied(authorizedFor.output.value ?? .success(false))
     }
 
 }

@@ -4,6 +4,9 @@
 //  Copyright © 2016 ProcedureKit. All rights reserved.
 //
 
+import Foundation
+import Dispatch
+
 internal func _abstractMethod(file: StaticString = #file, line: UInt = #line) {
     fatalError("Method must be overriden", file: file, line: line)
 }
@@ -24,13 +27,14 @@ extension Dictionary {
 
 protocol ReadWriteLock {
     mutating func read<T>(_ block: () throws -> T) rethrows -> T
-    mutating func write(_ block: @escaping () -> Void, completion: (() -> Void)?)
+    mutating func write_async(_ block: @escaping () -> Void, completion: (() -> Void)?)
+    mutating func write_sync<T>(_ block: () throws -> T) rethrows -> T
 }
 
 extension ReadWriteLock {
 
-    mutating func write(_ block: @escaping () -> Void) {
-        write(block, completion: nil)
+    mutating func write_async(_ block: @escaping () -> Void) {
+        write_async(block, completion: nil)
     }
 }
 
@@ -42,13 +46,20 @@ struct Lock: ReadWriteLock {
         return try queue.sync(execute: block)
     }
 
-    mutating func write(_ block: @escaping () -> Void, completion: (() -> Void)?) {
+    mutating func write_async(_ block: @escaping () -> Void, completion: (() -> Void)?) {
         queue.async(group: nil, flags: [.barrier]) {
             block()
             if let completion = completion {
                 DispatchQueue.main.async(execute: completion)
             }
         }
+    }
+
+    mutating func write_sync<T>(_ block: () throws -> T) rethrows -> T {
+        let result = try queue.sync(flags: [.barrier]) {
+            try block()
+        }
+        return result
     }
 }
 
@@ -61,16 +72,26 @@ public class Protector<T> {
         self.ward = ward
     }
 
-    public func read<U>(_ block: @escaping (T) -> U) -> U {
-        return lock.read { [unowned self] in block(self.ward) }
+    public var access: T {
+        return read { $0 }
     }
 
-    public func write(_ block: @escaping (inout T) -> Void) {
-        lock.write({ block(&self.ward) })
+    public func read<U>(_ block: (T) -> U) -> U {
+        return lock.read { block(self.ward) }
     }
 
-    public func write(_ block: @escaping (inout T) -> Void, completion: @escaping (() -> Void)) {
-        lock.write({ block(&self.ward) }, completion: completion)
+    /// Synchronously modify the protected value
+    ///
+    /// - Returns: The value returned by the `block`, if any. (discardable)
+    @discardableResult public func write<U>(_ block: (inout T) -> U) -> U {
+        return lock.write_sync({ block(&self.ward) })
+    }
+
+    // Supports old callers that expect to pass in a completion block
+    // NOTE: Like `write()`, this is synchronous.
+    public func write(_ block: (inout T) -> Void, completion: (() -> Void)) {
+        lock.write_sync({ block(&self.ward) })
+        completion()
     }
 }
 
@@ -89,9 +110,12 @@ public extension Protector where T: RangeReplaceableCollection {
     }
 }
 
+public extension NSLock {
 
-internal extension NSLock {
-
+    /// Convenience API to execute block after acquiring the lock
+    ///
+    /// - Parameter block: the block to run
+    /// - Returns: returns the return value of the block
     func withCriticalScope<T>(block: () -> T) -> T {
         lock()
         let value = block()
@@ -100,8 +124,12 @@ internal extension NSLock {
     }
 }
 
-internal extension NSRecursiveLock {
+public extension NSRecursiveLock {
 
+    /// Convenience API to execute block after acquiring the lock
+    ///
+    /// - Parameter block: the block to run
+    /// - Returns: returns the return value of the block
     func withCriticalScope<T>(block: () -> T) -> T {
         lock()
         let value = block()

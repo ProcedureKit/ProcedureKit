@@ -6,6 +6,9 @@
 
 // swiftlint:disable file_length
 
+import Foundation
+import Dispatch
+
 /**
  A `Procedure` subclass which enables the grouping
  of other procedures. Use `Group`s to associate
@@ -38,7 +41,6 @@ open class GroupProcedure: Procedure, ProcedureQueueDelegate {
 
     fileprivate var groupErrors = Protector(GroupErrors())
     fileprivate var groupChildren: Protector<[Operation]>
-    fileprivate var groupProtectedObservers = Protector(Array<GroupObserverProtocol>())
     fileprivate var groupIsFinishing = false
     fileprivate var groupFinishLock = NSRecursiveLock()
     fileprivate var groupIsSuspended = false
@@ -47,9 +49,8 @@ open class GroupProcedure: Procedure, ProcedureQueueDelegate {
     fileprivate var groupCanFinish: CanFinishGroup!
 
     /// - returns: the operations which have been added to the queue
-    public private(set) var children: [Operation] {
+    public var children: [Operation] {
         get { return groupChildren.read { $0 } }
-        set { groupChildren.write { (ward: inout [Operation]) in ward = newValue } }
     }
 
     /**
@@ -63,7 +64,7 @@ open class GroupProcedure: Procedure, ProcedureQueueDelegate {
      have to be Procedure instances - you can use `Foundation.Operation` instances
      from other sources.
     */
-    public init(underlyingQueue: DispatchQueue? = nil, operations: [Operation]) {
+    public init(dispatchQueue underlyingQueue: DispatchQueue? = nil, operations: [Operation]) {
 
         groupChildren = Protector(operations)
 
@@ -180,7 +181,7 @@ open class GroupProcedure: Procedure, ProcedureQueueDelegate {
 
         guard shouldAddOperation else { return }
 
-        groupObservers.forEach { $0.group(self, willAdd: operation) }
+        observers.forEach { $0.procedure(self, willAdd: operation) }
 
         groupCanFinish.addDependency(operation)
 
@@ -188,7 +189,7 @@ open class GroupProcedure: Procedure, ProcedureQueueDelegate {
             groupIsAddingOperations.leave()
         }
 
-        groupObservers.forEach { $0.group(self, didAdd: operation) }
+        observers.forEach { $0.procedure(self, didAdd: operation) }
     }
 
     public func procedureQueue(_ queue: ProcedureQueue, willProduceOperation operation: Operation) {
@@ -252,7 +253,7 @@ public extension GroupProcedure {
 
      - returns: the DispatchQueue of the groups private ProcedureQueue
     */
-    final var underlyingQueue: DispatchQueue? {
+    final var dispatchQueue: DispatchQueue? {
         return queue.underlyingQueue
     }
 
@@ -434,16 +435,29 @@ public extension GroupProcedure {
         }
     }
 
-    public func child(_ child: Operation, didAttemptRecoveryFromErrors errors: [Error]) {
+    public func append(fatalError error: Error) {
+        append(fatalErrors: [error])
+    }
+
+    public func child(_ child: Operation, didEncounterFatalError error: Error) {
+        log.warning(message: "\(child.operationName) did encounter fatal error: \(error).")
+        append(fatalError: error)
+    }
+
+    public func append(fatalErrors errors: [Error]) {
         groupErrors.write { (ward: inout GroupErrors) in
-            ward.attemptedRecovery[child] = errors
+            ward.fatal.append(contentsOf: errors)
         }
     }
 
     public func child(_ child: Operation, didEncounterFatalErrors errors: [Error]) {
-        log.notice(message: "\(child.operationName) did encounter \(errors.count) fatal errors.")
+        log.warning(message: "\(child.operationName) did encounter \(errors.count) fatal errors.")
+        append(fatalErrors: errors)
+    }
+
+    public func child(_ child: Operation, didAttemptRecoveryFromErrors errors: [Error]) {
         groupErrors.write { (ward: inout GroupErrors) in
-            ward.fatal.append(contentsOf: errors)
+            ward.attemptedRecovery[child] = errors
         }
     }
 
@@ -634,67 +648,4 @@ public extension GroupProcedure {
     @available(*, unavailable, renamed: "add(children:)")
     func addOperations(additional: [Operation]) { }
 
-}
-
-// MARK: - GroupProcedure Observer
-
-public protocol GroupObserverProtocol {
-
-    func group(_ group: GroupProcedure, willAdd: Operation)
-
-    func group(_ group: GroupProcedure, didAdd: Operation)
-}
-
-public extension GroupObserverProtocol {
-
-    func group(_ group: GroupProcedure, willAdd: Operation) { }
-
-    func group(_ group: GroupProcedure, didAdd: Operation) { }
-}
-
-public struct GroupWillAddChildObserver: GroupObserverProtocol {
-    public typealias Block = (GroupProcedure, Operation) -> Void
-
-    private let block: Block
-
-    public init(willAddChild: @escaping Block) {
-        block = willAddChild
-    }
-
-    public func group(_ group: GroupProcedure, willAdd operation: Operation) {
-        block(group, operation)
-    }
-}
-
-public struct GroupDidAddChildObserver: GroupObserverProtocol {
-    public typealias Block = (GroupProcedure, Operation) -> Void
-
-    private let block: Block
-
-    public init(didAddChild: @escaping Block) {
-        block = didAddChild
-    }
-
-    public func group(_ group: GroupProcedure, didAdd operation: Operation) {
-        block(group, operation)
-    }
-}
-
-public extension GroupProcedure {
-
-    var groupObservers: [GroupObserverProtocol] {
-        return groupProtectedObservers.read { $0 }
-    }
-
-    func add(observer: GroupObserverProtocol) {
-        groupProtectedObservers.append(observer)
-    }
-
-    func addWillAddChildBlockObserver(block: @escaping GroupWillAddChildObserver.Block) {
-        add(observer: GroupWillAddChildObserver(willAddChild: block))
-    }
-
-    func addDidAddChildBlockObserver(block: @escaping GroupDidAddChildObserver.Block) {
-        add(observer: GroupDidAddChildObserver(didAddChild: block))
-    }
 }

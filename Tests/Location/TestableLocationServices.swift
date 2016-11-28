@@ -27,7 +27,7 @@ func createPlacemark(coordinate: CLLocationCoordinate2D) -> CLPlacemark {
 }
 
 class TestableLocationServicesRegistrar {
-    let fake = CLLocationManager()
+    static let fake = CLLocationManager()
 
     weak var delegate: CLLocationManagerDelegate? = nil
     var servicesEnabled = true
@@ -41,7 +41,7 @@ class TestableLocationServicesRegistrar {
     var didRequestAuthorizationForUsage: LocationUsage? = nil
 }
 
-extension TestableLocationServicesRegistrar: LocationServicesRegristrarProtocol {
+extension TestableLocationServicesRegistrar: LocationServicesRegistrarProtocol {
 
     func pk_locationServicesEnabled() -> Bool {
         didCheckServiceEnabled = true
@@ -62,8 +62,8 @@ extension TestableLocationServicesRegistrar: LocationServicesRegristrarProtocol 
         didRequestAuthorization = true
         didRequestAuthorizationForUsage = requirement
         // In some cases CLLocationManager will immediately send a .NotDetermined
-        delegate?.locationManager!(fake, didChangeAuthorization: .notDetermined)
-        delegate?.locationManager!(fake, didChangeAuthorization: responseStatus)
+        delegate?.locationManager!(TestableLocationServicesRegistrar.fake, didChangeAuthorization: .notDetermined)
+        delegate?.locationManager!(TestableLocationServicesRegistrar.fake, didChangeAuthorization: responseStatus)
     }
 }
 
@@ -87,11 +87,11 @@ extension TestableLocationManager: LocationServicesProtocol {
     func pk_startUpdatingLocation() {
         didStartUpdatingLocation = true
         if let error = returnedError {
-            delegate?.locationManager!(fake, didFailWithError: error)
+            delegate?.locationManager!(TestableLocationServicesRegistrar.fake, didFailWithError: error)
         }
         else {
             DispatchQueue.main.asyncAfter(deadline: .now() + returnAfterDelay) {
-                self.delegate?.locationManager!(self.fake, didUpdateLocations: self.returnedLocation.flatMap { [$0] } ?? [])
+                self.delegate?.locationManager!(TestableLocationServicesRegistrar.fake, didUpdateLocations: self.returnedLocation.flatMap { [$0] } ?? [])
             }
         }
     }
@@ -119,7 +119,13 @@ class TestableReverseGeocoder: TestableGeocoder, ReverseGeocodeProtocol {
 
     func pk_reverseGeocodeLocation(location: CLLocation, completionHandler completion: @escaping CLGeocodeCompletionHandler) {
         didReverseGeocodeLocation = location
-        completion(placemarks, error)
+        // To replicate CLGeocoder, the completion block must be called on the main thread
+        DispatchQueue.main.async { [weak self] in
+            guard let strongSelf = self else {
+                fatalError("TestableReverseGeocoder disappeared before completion was called")
+            }
+            completion(strongSelf.placemarks, strongSelf.error)
+        }
     }
 }
 

@@ -4,6 +4,7 @@
 //  Copyright © 2016 ProcedureKit. All rights reserved.
 //
 
+import Dispatch
 import CoreLocation
 import MapKit
 
@@ -25,7 +26,7 @@ internal extension CLGeocoder {
     }
 }
 
-protocol LocationServicesRegristrarProtocol {
+protocol LocationServicesRegistrarProtocol {
 
     func pk_locationServicesEnabled() -> Bool
 
@@ -37,7 +38,7 @@ protocol LocationServicesRegristrarProtocol {
     func pk_requestAuthorization(withRequirement: LocationUsage?)
 }
 
-extension CLLocationManager: LocationServicesRegristrarProtocol {
+extension CLLocationManager: LocationServicesRegistrarProtocol {
 
     func pk_locationServicesEnabled() -> Bool {
         return CLLocationManager.locationServicesEnabled()

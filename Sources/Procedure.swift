@@ -7,6 +7,8 @@
 // swiftlint:disable file_length
 // swiftlint:disable type_body_length
 
+import Foundation
+
 internal struct ProcedureKit {
 
     fileprivate enum FinishingFrom {
@@ -81,6 +83,8 @@ open class Procedure: Operation, ProcedureProtocol {
 
     fileprivate let isAutomaticFinishingDisabled: Bool
 
+    private weak var queue: ProcedureQueue?
+
     /**
      Expresses the user intent in regards to the execution of this Procedure.
 
@@ -109,19 +113,29 @@ open class Procedure: Operation, ProcedureProtocol {
         }
         set(newState) {
             _stateLock.withCriticalScope {
-                assert(_state.canTransition(to: newState, whenCancelled: isCancelled), "Attempting to perform illegal cyclic state transition, \(_state) -> \(newState) for operation: \(identity). Ensure that Procedure instances are added to a ProcedureQueue not an OperationQueue.")
                 log.verbose(message: "\(_state) -> \(newState)")
+                assert(_state.canTransition(to: newState, whenCancelled: isCancelled), "Attempting to perform illegal cyclic state transition, \(_state) -> \(newState) for operation: \(identity). Ensure that Procedure instances are added to a ProcedureQueue not an OperationQueue.")
                 _state = newState
             }
         }
     }
 
-    /// Boolean indicator for whether the Operation is currently executing or not
+    /// Boolean indicator for whether the Procedure has been enqueue
+    final public var isEnqueued: Bool {
+        return state >= .pending
+    }
+
+    /// Boolean indicator for whether the Procedure is pending
+    final public var isPending: Bool {
+        return state == .pending
+    }
+
+    /// Boolean indicator for whether the Procedure is currently executing or not
     final public override var isExecuting: Bool {
         return state == .executing
     }
 
-    /// Boolean indicator for whether the Operation has finished or not
+    /// Boolean indicator for whether the Procedure has finished or not
     final public override var isFinished: Bool {
         return state == .finished
     }
@@ -131,17 +145,25 @@ open class Procedure: Operation, ProcedureProtocol {
         return _stateLock.withCriticalScope { _isCancelled }
     }
 
+    // MARK: Protected Internal Properties
+
+    fileprivate struct ProtectedProperties {
+        var log: LoggerProtocol = Logger()
+        var errors = [Error]()
+        var observers = [AnyObserver<Procedure>]()
+        var directDependencies = Set<Operation>()
+        var conditions = Set<Condition>()
+    }
+    fileprivate let protectedProperties = Protector(ProtectedProperties())
+
+
     // MARK: Errors
 
-    private var _errors = [Error]()
-
     public var errors: [Error] {
-        return _stateLock.withCriticalScope { _errors }
+        return protectedProperties.read { $0.errors }
     }
 
     // MARK: Log
-
-    private var _log = Protector<LoggerProtocol>(Logger())
 
     /**
      Access the logger for this Operation
@@ -181,33 +203,28 @@ open class Procedure: Operation, ProcedureProtocol {
     public var log: LoggerProtocol {
         get {
             let operationName = self.operationName
-            return _log.read { LoggerContext(parent: $0, operationName: operationName) }
+            return protectedProperties.read { LoggerContext(parent: $0.log, operationName: operationName) }
         }
         set {
-            _log.write { (ward: inout LoggerProtocol) in
-                ward = newValue
+            protectedProperties.write {
+                $0.log = newValue
             }
         }
     }
 
     // MARK: Observers
 
-    private var _observers = Protector([AnyObserver<Procedure>]())
-
-    fileprivate(set) var observers: [AnyObserver<Procedure>] {
-        get { return _observers.read { $0 } }
-        set {
-            _observers.write { (ward: inout [AnyObserver<Procedure>]) in
-                ward = newValue
-            }
-        }
+    var observers: [AnyObserver<Procedure>] {
+        get { return protectedProperties.read { $0.observers } }
     }
 
 
 
     // MARK: Dependencies & Conditions
 
-    internal fileprivate(set) var directDependencies = Set<Operation>()
+    internal var directDependencies: Set<Operation> {
+        get { return protectedProperties.read { $0.directDependencies } }
+    }
 
     internal fileprivate(set) var evaluateConditionsProcedure: EvaluateConditions? = nil
 
@@ -219,7 +236,9 @@ open class Procedure: Operation, ProcedureProtocol {
     }
 
     /// - returns conditions: the Set of Condition instances attached to the operation
-    public fileprivate(set) var conditions = Set<Condition>()
+    public var conditions: Set<Condition> {
+        get { return protectedProperties.read { $0.conditions } }
+    }
 
     // MARK: - Initialization
 
@@ -241,10 +260,10 @@ open class Procedure: Operation, ProcedureProtocol {
      The default behavior of Operation is to automatically call finish()
      when:
      (a) it's cancelled, whether that occurs:
-     - prior to the Operation starting
-     (in which case, Operation will skip calling execute())
-     - on another thread at the same time that the operation is
-     executing
+        - prior to the Operation starting
+          (in which case, Operation will skip calling execute())
+        - on another thread at the same time that the operation is
+          executing
      (b) when willExecuteObservers log errors
 
      To ensure that an Operation subclass does not finish until the
@@ -260,9 +279,9 @@ open class Procedure: Operation, ProcedureProtocol {
 
      ```swift
      guard !cancelled else {
-     // do any necessary clean-up
-     finish()    // always call finish if automatic finishing is disabled
-     return
+        // do any necessary clean-up
+        finish()    // always call finish if automatic finishing is disabled
+        return
      }
      ```
 
@@ -285,8 +304,9 @@ open class Procedure: Operation, ProcedureProtocol {
     }
 
 
-    public func willEnqueue() {
+    public func willEnqueue(on queue: ProcedureQueue) {
         state = .pending
+        self.queue = queue
     }
 
     /// Starts the operation, correctly managing the cancelled state. Cannot be over-ridden
@@ -321,7 +341,7 @@ open class Procedure: Operation, ProcedureProtocol {
 
                 // Check to see if the procedure has now been cancelled
                 // by an observer
-                guard (_errors.isEmpty && !isCancelled) || isAutomaticFinishingDisabled else {
+                guard (errors.isEmpty && !isCancelled) || isAutomaticFinishingDisabled else {
                     _isFinishingFrom = .main
                     return .finishing
                 }
@@ -390,10 +410,26 @@ open class Procedure: Operation, ProcedureProtocol {
         finish()
     }
 
-    public final func produce(operation: Operation) {
-        precondition(state > .initialized, "Cannot produce operation will not being scheduled on a queue")
-        log.notice(message: "Did produce \(operation.operationName)")
-        observers.forEach { $0.procedure(self, didProduce: operation) }
+    public final func produce(operation: Operation) throws {
+        precondition(state > .initialized, "Cannot add operation which is not being scheduled on a queue")
+        guard let queue = queue else {
+            throw ProcedureKitError.noQueue()
+        }
+
+        queue.delegate?.procedureQueue(queue, willProduceOperation: operation)
+
+        log.notice(message: "Will add \(operation.operationName)")
+
+        observers.forEach { $0.procedure(self, willAdd: operation) }
+
+        queue.add(operation: operation)
+
+        observers.forEach { $0.procedure(self, didAdd: operation) }
+    }
+
+    internal func queue(_ queue: ProcedureQueue, didAddOperation operation: Operation) {
+        log.notice(message: "Did add \(operation.operationName)")
+        observers.forEach { $0.procedure(self, didAdd: operation) }
     }
 
     // MARK: - Cancellation
@@ -442,7 +478,9 @@ open class Procedure: Operation, ProcedureProtocol {
 
         _stateLock.withCriticalScope {
             if !additionalErrors.isEmpty {
-                _errors += additionalErrors
+                protectedProperties.write {
+                    $0.errors.append(contentsOf: additionalErrors)
+                }
             }
             _isCancelled = true
         }
@@ -518,9 +556,11 @@ open class Procedure: Operation, ProcedureProtocol {
             didChangeValue(forKey: .executing)
         }
 
-        let resultingErrors: [Error] = _stateLock.withCriticalScope {
-            _errors += receivedErrors
-            return _errors
+        let resultingErrors: [Error] = protectedProperties.write {
+            if !receivedErrors.isEmpty {
+                $0.errors.append(contentsOf: receivedErrors)
+            }
+            return $0.errors
         }
 
         let messageSuffix = !resultingErrors.isEmpty ? "errors: \(resultingErrors)" : "no errors"
@@ -553,20 +593,19 @@ open class Procedure: Operation, ProcedureProtocol {
     public final override func waitUntilFinished() {
         fatalError("Waiting on operations is an anti-pattern. Remove this ONLY if you're absolutely sure there is No Other Way™. Post a question in https://github.com/danthorpe/Operations if you are unsure.")
     }
-}
 
-// MARK: Observers
-
-public extension Procedure {
+    // MARK: - Observers
 
     /**
      Add an observer to the procedure.
 
      - parameter observer: type conforming to protocol `ProcedureObserver`.
      */
-    func add<Observer: ProcedureObserver>(observer: Observer) where Observer.Procedure == Procedure {
+    open func add<Observer: ProcedureObserver>(observer: Observer) where Observer.Procedure == Procedure {
 
-        observers.append(AnyObserver(base: observer))
+        protectedProperties.write {
+            $0.observers.append(AnyObserver(base: observer))
+        }
 
         observer.didAttach(to: self)
     }
@@ -589,58 +628,59 @@ public extension Procedure {
 
 extension Procedure {
 
-    enum ConditionEvaluation {
-        case pending, satisfied, ignored
-        case failed([Error])
+    class EvaluateConditions: GroupProcedure, InputProcedure, OutputProcedure {
 
-        var errors: [Error] {
-            guard case let .failed(errors) = self else { return [] }
-            return errors
-        }
-
-        func evaluate(condition: Condition, withErrors errors: [Error]) -> ConditionEvaluation {
-            switch  (self, condition.result) {
-            case (_, .pending):
-                if errors.isEmpty { return self }
-                else { return .failed(errors) }
-            case let (_, .failed(conditionError)):
-                var errors = self.errors
-                errors.append(conditionError)
-                return .failed(errors)
-            case (.failed(_), _):
-                return self
-            case (_, .ignored):
-                return .ignored
-            case (.pending, .satisfied):
-                return .satisfied
-            default:
-                return self
-            }
-        }
-    }
-
-    class EvaluateConditions: GroupProcedure {
-        var requirement: [Condition] = []
-        var result: ConditionEvaluation = .pending
+        var input: Pending<[Condition]> = .pending
+        var output: Pending<ConditionResult> = .pending
 
         init(conditions: Set<Condition>) {
             let ops = Array(conditions)
-            requirement = ops
+            input = .ready(ops)
             super.init(operations: ops)
         }
 
         override func procedureWillFinish(withErrors errors: [Error]) {
-            process(withErrors: errors)
+            output = .ready(process(withErrors: errors))
         }
 
         override func procedureWillCancel(withErrors errors: [Error]) {
-            process(withErrors: errors)
+            output = .ready(process(withErrors: errors))
         }
 
-        private func process(withErrors errors: [Error]) {
-            result = requirement.reduce(.pending) { evaluation, condition in
-                log.verbose(message: "evaluating \(evaluation) with \(condition.result)")
-                return evaluation.evaluate(condition: condition, withErrors: errors)
+        private func process(withErrors errors: [Error]) -> ConditionResult {
+            guard errors.isEmpty else {
+                return .failure(ProcedureKitError.FailedConditions(errors: errors))
+            }
+            guard let conditions = input.value else {
+                fatalError("Conditions must be set before the evaluation is performed.")
+            }
+            return conditions.reduce(.success(false)) { lhs, condition in
+                // Unwrap the condition's output
+                guard let rhs = condition.output.value else { return lhs }
+
+                log.verbose(message: "evaluating \(lhs) with \(rhs)")
+
+                switch (lhs, rhs) {
+                // both results are failures
+                case let (.failure(error), .failure(anotherError)):
+                    if let error = error as? ProcedureKitError.FailedConditions {
+                        return .failure(error.append(error: anotherError))
+                    }
+                    else if let anotherError = anotherError as? ProcedureKitError.FailedConditions {
+                        return .failure(anotherError.append(error: error))
+                    }
+                    else {
+                        return .failure(ProcedureKitError.FailedConditions(errors: [error, anotherError]))
+                    }
+                // new condition failed - so return it
+                case (_, .failure(_)):
+                    return rhs
+                // first condition is ignored - so return the new one
+                case (.success(false), _):
+                    return rhs
+                default:
+                    return lhs
+                }
             }
         }
     }
@@ -649,7 +689,11 @@ extension Procedure {
 
         func createEvaluateConditionsProcedure() -> EvaluateConditions {
             // Set the procedure on each condition
-            conditions.forEach { $0.procedure = self }
+            conditions.forEach {
+                $0.procedure = self
+                $0.log.enabled = self.log.enabled
+                $0.log.severity = self.log.severity
+            }
 
             let evaluator = EvaluateConditions(conditions: conditions)
             evaluator.name = "\(operationName) Evaluate Conditions"
@@ -669,13 +713,20 @@ extension Procedure {
 
         // Add an observer to the evaluator to see if any of the conditions failed.
         evaluator.addWillFinishBlockObserver { [weak self] evaluator, _ in
-            switch evaluator.result {
-            case .pending, .satisfied:
+            guard let result = evaluator.output.value else { return }
+
+            switch result {
+            case .success(true):
                 break
-            case .ignored:
+            case .success(false):
                 self?.cancel()
-            case let .failed(errors):
-                self?.cancel(withErrors: errors)
+            case let .failure(error):
+                if let failedConditions = error as? ProcedureKitError.FailedConditions {
+                    self?.cancel(withErrors: failedConditions.errors)
+                }
+                else {
+                    self?.cancel(withError: error)
+                }
             }
         }
 
@@ -689,13 +740,17 @@ extension Procedure {
 
     func add(directDependency: Operation) {
         precondition(state <= .executing, "Dependencies cannot be modified after execution has begun, current state: \(state).")
-        directDependencies.insert(directDependency)
+        protectedProperties.write {
+            $0.directDependencies.insert(directDependency)
+        }
         super.addDependency(directDependency)
     }
 
     func remove(directDependency: Operation) {
         precondition(state <= .executing, "Dependencies cannot be modified after execution has begun, current state: \(state).")
-        directDependencies.remove(directDependency)
+        protectedProperties.write {
+            $0.directDependencies.remove(directDependency)
+        }
         super.removeDependency(directDependency)
     }
 
@@ -739,7 +794,9 @@ extension Procedure {
      */
     public func add(condition: Condition) {
         assert(state < .executing, "Cannot modify conditions after operation has begun executing, current state: \(state).")
-        conditions.insert(condition)
+        protectedProperties.write {
+            $0.conditions.insert(condition)
+        }
     }
 }
 

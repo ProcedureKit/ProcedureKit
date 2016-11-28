@@ -68,10 +68,10 @@ class GroupDoesNotFinishBeforeChildOperationsAreFinished: StressTestCase {
 
             group.addDidFinishBlockObserver { _, _ in
                 if child1.isFinished {
-                    batch.incrementCounter(named: "child 1 finished", withBarrier: true)
+                    batch.incrementCounter(named: "child 1 finished")
                 }
                 if child2.isFinished {
-                    batch.incrementCounter(named: "child 2 finished", withBarrier: true)
+                    batch.incrementCounter(named: "child 2 finished")
                 }
                 batch.dispatchGroup.leave()
             }

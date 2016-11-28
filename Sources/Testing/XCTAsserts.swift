@@ -167,7 +167,7 @@ public extension ProcedureKitTestCase {
             let expectedError = try error()
 
             switch result {
-            case let .failed(receivedError):
+            case let .failure(receivedError):
                 guard let error = receivedError as? E else {
                     return .expectedFailure("Condition failed with unexpected error, \(receivedError).")
                 }
@@ -187,7 +187,7 @@ public extension ProcedureKitTestCase {
             let result = try exp1()
 
             switch result {
-            case .satisfied: break
+            case .success(true): break
             default:
                 return .expectedFailure("Condition was not satisfied: \(result).")
             }

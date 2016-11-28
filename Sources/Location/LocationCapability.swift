@@ -30,12 +30,16 @@ public extension Capability {
 
         public private(set) var requirement: LocationUsage?
 
-        internal lazy var registrar: LocationServicesRegristrarProtocol = CLLocationManager.make()
+        internal lazy var registrar: LocationServicesRegistrarProtocol = CLLocationManager.make()
 
         private var authorizationDelegate: LocationManagerAuthorizationDelegate? = nil
 
         public init(_ requirement: LocationUsage = .whenInUse) {
             self.requirement = requirement
+        }
+
+        deinit {
+            registrar.pk_set(delegate: nil)
         }
 
         public func isAvailable() -> Bool {

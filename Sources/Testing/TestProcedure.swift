@@ -17,13 +17,13 @@ public struct TestError: Error, Equatable {
     public init() { }
 }
 
-open class TestProcedure: Procedure, ResultInjection {
+open class TestProcedure: Procedure, InputProcedure, OutputProcedure {
 
     public let delay: TimeInterval
     public let error: Error?
     public let producedOperation: Operation?
-    public var requirement: PendingValue<Void> = .void
-    public var result: PendingValue<String> = .ready("Hello World")
+    public var input: Pending<Void> = pendingVoid
+    public var output: Pending<ProcedureResult<String>> = .ready(.success("Hello World"))
     public private(set) var executedAt: CFAbsoluteTime = 0
     public private(set) var didExecute = false
     public private(set) var procedureWillFinishCalled = false
@@ -45,7 +45,7 @@ open class TestProcedure: Procedure, ResultInjection {
 
         if let operation = producedOperation {
             DispatchQueue.main.asyncAfter(deadline: .now() + (delay / 2.0)) {
-                self.produce(operation: operation)
+                try! self.produce(operation: operation) // swiftlint:disable:this force_try
             }
         }
 

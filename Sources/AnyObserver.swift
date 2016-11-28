@@ -4,13 +4,16 @@
 //  Copyright © 2016 ProcedureKit. All rights reserved.
 //
 
+import Foundation
+
 class AnyObserverBox_<Procedure: ProcedureProtocol>: ProcedureObserver {
     func didAttach(to procedure: Procedure) { _abstractMethod() }
     func will(execute procedure: Procedure) { _abstractMethod() }
     func did(execute procedure: Procedure) { _abstractMethod() }
     func will(cancel procedure: Procedure, withErrors: [Error]) { _abstractMethod() }
     func did(cancel procedure: Procedure, withErrors errors: [Error]) { _abstractMethod() }
-    func procedure(_ procedure: Procedure, didProduce newOperation: Operation) { _abstractMethod() }
+    func procedure(_ procedure: Procedure, willAdd newOperation: Operation) { _abstractMethod() }
+    func procedure(_ procedure: Procedure, didAdd newOperation: Operation) { _abstractMethod() }
     func will(finish procedure: Procedure, withErrors errors: [Error]) { _abstractMethod() }
     func did(finish procedure: Procedure, withErrors errors: [Error]) { _abstractMethod() }
 }
@@ -42,8 +45,12 @@ class AnyObserverBox<Base: ProcedureObserver>: AnyObserverBox_<Base.Procedure> {
         base.did(cancel: procedure, withErrors: errors)
     }
 
-    override func procedure(_ procedure: Base.Procedure, didProduce newOperation: Operation) {
-        base.procedure(procedure, didProduce: newOperation)
+    override func procedure(_ procedure: Base.Procedure, willAdd newOperation: Operation) {
+        base.procedure(procedure, willAdd: newOperation)
+    }
+
+    override func procedure(_ procedure: Base.Procedure, didAdd newOperation: Operation) {
+        base.procedure(procedure, didAdd: newOperation)
     }
 
     override func will(finish procedure: Base.Procedure, withErrors errors: [Error]) {
@@ -84,8 +91,12 @@ public struct AnyObserver<Procedure: ProcedureProtocol>: ProcedureObserver {
         box.did(cancel: procedure, withErrors: errors)
     }
 
-    public func procedure(_ procedure: Procedure, didProduce newOperation: Operation) {
-        box.procedure(procedure, didProduce: newOperation)
+    public func procedure(_ procedure: Procedure, willAdd newOperation: Operation) {
+        box.procedure(procedure, willAdd: newOperation)
+    }
+
+    public func procedure(_ procedure: Procedure, didAdd newOperation: Operation) {
+        box.procedure(procedure, didAdd: newOperation)
     }
 
     public func will(finish procedure: Procedure, withErrors errors: [Error]) {

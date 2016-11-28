@@ -1,3 +1,90 @@
+# 4.0.0 Beta 5
+Beta 5 is primarily about refinements and bug fixes.
+
+## Breaking API Changes
+1. [#574](https://github.com/ProcedureKit/ProcedureKit/issues/574), [#583](https://github.com/ProcedureKit/ProcedureKit/pull/583) Removal of `GroupObserverProtocol`
+    This protocol was to allow observer to be attached to a group, and be informed when children are added to the group. Instead, this functionality has been rolled into `ProcedureObserver`.
+2. [#601](https://github.com/ProcedureKit/ProcedureKit/pull/601), [#605](https://github.com/ProcedureKit/ProcedureKit/pull/605) Refactor of `ResultInjection`.
+    The `ResultInjection` protocol has been overhauled, again. The major changes here, are:
+    - Change to a pair of protocols, `InputProcedure` and  `OutputProcedure`, with associated type `Input` and `Output` respectively. This change is to avoid overloading the "result" concept.
+    - Renames `PendingValue<T>` to just `Pending`. Both protocols have properties which are `Pending`, which in turn maintains  the `.pending` and `.ready` cases.
+    - `ProcedureResult<T>` which is an _either_ enum type, which is either `.success(value)` or `.failure(error)`. The error is not an associated type - so any `Error` will do.
+    - `OutputProcedure`'s `output` property is `Pending<ProcedureResult<Output>>` which means that it can now capture the procedure finishing with an error instead of just a value.
+
+    In addition, `Procedure` subclasses which conform to `OutputProcedure` can use the following API:
+    
+    ```swift
+    /// Finish the procedure with a successful result.
+    finish(withResult: .success(outputValue))
+
+    /// Finish the procedure with an error.
+    finish(withResult: .failure(anError))    
+    ``` 
+    
+    To support `OutputProcedure` with a `Void` output value, there is also a public constant called `success` which represents `.success(())`.
+    
+    All other APIs have been changed to reflect this change, e.g. `injectResult(from: dependency)` works as before if your receiver is updated to conform to `OutputProcedure`.
+3. [#561](https://github.com/ProcedureKit/ProcedureKit/pull/561) Rename & refactor of `ResilientNetworkProcedure`
+    `NetworkProcedure` now performs the functionality of network resiliency, in addition to automatic handling of client reachability errors.
+
+
+## New Features
+1. [#565](https://github.com/ProcedureKit/ProcedureKit/pull/565) `NetworkDownloadProcedure`
+    Thanks to [@yageek](https://github.com/yageek) for adding support for network file downloads.
+2. [#567](https://github.com/ProcedureKit/ProcedureKit/pull/567) `NetworkUploadProcedure`
+    Thanks to [@yageek](https://github.com/yageek) for adding support for network file uploads.
+3. [#570](https://github.com/ProcedureKit/ProcedureKit/pull/570) `ProcessProcedure`
+    Thanks to [@yageek](https://github.com/yageek) for adding support for wrapping `Process` (previously `NSTask`) to _ProcedureKitMac_.
+4. [#542](https://github.com/ProcedureKit/ProcedureKit/pull/542), [#599](https://github.com/ProcedureKit/ProcedureKit/pull/599) `CloudKitProcedure`
+    This is a wrapper class for running Apple's `CKOperation` subclasses.
+5. [#587](https://github.com/ProcedureKit/ProcedureKit/pull/587) Mutual Exclusion categories
+    Mutually exclusive conditions now support arbitrary category names, which means that a condition can be used to add mutual exclusion to any number of disparate procedures.
+6. [#563](https://github.com/ProcedureKit/ProcedureKit/pull/563) `NetworkProcedure` (called `NetworkReachableProcedure` here)
+    `NetworkProcedure` is a wrapper procedure for executing network procedures. It has full support for handling client reachability issues, and resilient handling of client and server errors.  
+7. [#569](https://github.com/ProcedureKit/ProcedureKit/issues/569) `Profiler`
+    Thanks to [@yageek](https://github.com/yageek) for implementing the `Profiler` which is a `ProcedureObserver` and can be used to report timing profiles of procedures.
+8. [#593](https://github.com/ProcedureKit/ProcedureKit/pull/593) Supports the merging of collections of `Procedure` subclasses which all conform to `ResultInjection`.
+    These APIs `flatMap`, `reduce` and `gathered()` each return another procedure which will depend on all other procedures in the collection, and then perform synchronous processing of the results. For example, either just gather the results into a single array, or flat map the resultant array into an array of different types, or reduce the resultant array into a single type.
+9. [#606](https://github.com/ProcedureKit/ProcedureKit/pull/606), [#607](https://github.com/ProcedureKit/ProcedureKit/pull/607) `AsyncResultProcedure` etc.
+    `AsyncResultProcedure`, `AsyncBlockProcedure` and `AsyncTransformProcedure` support asynchronous blocks. Each procedure's initialiser receives a _finishWithResult_ closure, which must be called to finish the procedure. For example:
+    
+    ```swift
+    let procedure = AsyncBlockProcedure { finishWithResult in
+        asyncTask {
+            finishWithResult(success)
+        }
+    }
+    ```
+
+
+
+## Bug Fixes etc
+1. [#562](https://github.com/ProcedureKit/ProcedureKit/pull/562) Fixes a typo in `LocationServicesRegistrarProtocol`
+2. [#566](https://github.com/ProcedureKit/ProcedureKit/pull/566) Fixes `Condition` so that it can support result injection.
+3. [#575](https://github.com/ProcedureKit/ProcedureKit/pull/575) Improves the performance of `add(observer: )`.
+4. [#568](https://github.com/ProcedureKit/ProcedureKit/pull/578) Opens up `add(operation: Operation)` for overriding by subclasses. Thanks to [@bizz84](https://github.com/bizz84).
+6. [#579](https://github.com/ProcedureKit/ProcedureKit/pull/579) Adds more test coverage to `GroupProcedure`.
+7. [#586](https://github.com/ProcedureKit/ProcedureKit/issues/586) Fixes `HTTPRequirement` initializers. Thanks to [@yageek](https://github.com/yageek) for this one.
+8. [#588](https://github.com/ProcedureKit/ProcedureKit/pull/588) Fixes bug where using the `produce(operation:)` from a `GroupProcedure` subclass was failing. This was actually introduced by other changes since Beta 4.
+9. [#591](https://github.com/ProcedureKit/ProcedureKit/pull/591) Adds some missing equality checks in `ProcedureKitError.Context`.
+10. [#600](https://github.com/ProcedureKit/ProcedureKit/pull/600) Minor changes to remove @testable imports.
+11. [#602](https://github.com/ProcedureKit/ProcedureKit/pull/602) Adds stress tests for cancelling `RepeatProcedure`.
+12. [#603](https://github.com/ProcedureKit/ProcedureKit/pull/603) Adds more `GroupProcedure` tests.
+13. [#608](https://github.com/ProcedureKit/ProcedureKit/pull/608) Uses the internal queue for the `DispatchAfter` delayed functionality in `NetworkActivityController` instead of the main queue.
+14. [#611](https://github.com/ProcedureKit/ProcedureKit/pull/611) Restores `import Foundation` etc where needed in all classes, which makes Xcode 8 a little happier - although not strictly necessary.
+15. [#615](https://github.com/ProcedureKit/ProcedureKit/pull/615) Fixes issues where `BackgroundObserver` was not removing notification observers.
+16. [#619](https://github.com/ProcedureKit/ProcedureKit/pull/619) Fixes some issues with location related procedures.
+
+## Thread Safety bug fixes
+Recently, [@swiftlyfalling](https://github.com/swiftlyfalling) has been fixing a number of thread safety issues highlighted either from our own stress tests, or from the Thread Sanitizer. 
+1. `NetworkObserver` - [#577](https://github.com/ProcedureKit/ProcedureKit/pull/577)
+2. `StressTestCase` - [#596](https://github.com/ProcedureKit/ProcedureKit/pull/596) 
+3. `RepeatProcedure` - [#597](https://github.com/ProcedureKit/ProcedureKit/pull/597)
+4. `Procedure` - [#598](https://github.com/ProcedureKit/ProcedureKit/pull/598)
+5. `NetworkDataProcedure` etc - [#609](https://github.com/ProcedureKit/ProcedureKit/pull/609)
+6. `BackgroundObserver` - [#614](https://github.com/ProcedureKit/ProcedureKit/pull/614)
+7. `DelayProcedure` - [#616](https://github.com/ProcedureKit/ProcedureKit/pull/616)
+
 # 4.0.0 Beta 4
 Beta 4 is a significant maturation over Beta 3. There are a couple of breaking changes here which I will call out explicitly. Overall however, the APIs have been refined, adjusted and extended, bugs have been fixed, and tests have been stabilised.
 

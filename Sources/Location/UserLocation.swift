@@ -4,26 +4,27 @@
 //  Copyright © 2016 ProcedureKit. All rights reserved.
 //
 
+import Foundation
+import Dispatch
 import CoreLocation
 import MapKit
 
-open class UserLocationProcedure: Procedure, ResultInjection, CLLocationManagerDelegate {
+open class UserLocationProcedure: Procedure, OutputProcedure, CLLocationManagerDelegate {
     public typealias CompletionBlock = (CLLocation) -> Void
 
     public let accuracy: CLLocationAccuracy
     public let completion: CompletionBlock?
 
-    public var requirement: PendingValue<Void> = .void
-    public var result: PendingValue<CLLocation> = .pending
+    public var output: Pending<ProcedureResult<CLLocation>> = .pending
 
     public var location: CLLocation? {
-        return result.value
+        return output.success
     }
 
     internal var capability = Capability.Location()
 
-    internal lazy var locationManager: LocationServicesRegristrarProtocol & LocationServicesProtocol = CLLocationManager.make()
-    internal var manager: LocationServicesRegristrarProtocol & LocationServicesProtocol {
+    internal lazy var locationManager: LocationServicesRegistrarProtocol & LocationServicesProtocol = CLLocationManager.make()
+    internal var manager: LocationServicesRegistrarProtocol & LocationServicesProtocol {
         get { return locationManager }
         set {
             locationManager = newValue
@@ -74,14 +75,14 @@ open class UserLocationProcedure: Procedure, ResultInjection, CLLocationManagerD
     public func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         guard !isFinished, let location = locations.last else { return }
         guard shouldFinish(afterReceivingLocation: location) else {
-            result = .ready(location)
+            output = .ready(.success(location))
             return
         }
         log.info(message: "Updated last location: \(location)")
         DispatchQueue.main.async { [weak self] in
             guard let weakSelf = self, !weakSelf.isFinished else { return }
             weakSelf.stopLocationUpdates()
-            weakSelf.result = .ready(location)
+            weakSelf.output = .ready(.success(location))
             weakSelf.completion?(location)
             weakSelf.finish()
         }
@@ -91,7 +92,9 @@ open class UserLocationProcedure: Procedure, ResultInjection, CLLocationManagerD
         DispatchQueue.main.async { [weak self] in
             guard let weakSelf = self else { return }
             weakSelf.stopLocationUpdates()
-            weakSelf.finish(withError: ProcedureKitError.component(ProcedureKitLocationComponent(), error: error))
+            let pkerror = ProcedureKitError.component(ProcedureKitLocationComponent(), error: error)
+            weakSelf.output = .ready(.failure(pkerror))
+            weakSelf.finish(withError: pkerror)
         }
     }
 }

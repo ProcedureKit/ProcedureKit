@@ -14,6 +14,7 @@ import TestingProcedureKit
 class ReverseGeocodeProcedureTests: LocationProcedureTestCase {
 
     func test__geocoder_starts() {
+        geocoder.placemarks = [placemark]
         let procedure = ReverseGeocodeProcedure(location: location)
         procedure.geocoder = geocoder
         wait(for: procedure)
@@ -43,17 +44,17 @@ class ReverseGeocodeProcedureTests: LocationProcedureTestCase {
         procedure.geocoder = geocoder
         wait(for: procedure)
         XCTAssertProcedureFinishedWithoutErrors(procedure)
-        XCTAssertNotNil(procedure.result.value)
-        XCTAssertEqual(procedure.result.value, geocoder.placemarks?.first)
+        XCTAssertNotNil(procedure.output.success)
+        XCTAssertEqual(procedure.output.success, geocoder.placemarks?.first)
     }
 
     func test__completion_is_executed_and_receives_placemark() {
-        let exp = expectation(description: "Test: \(#function)")
+        weak var exp = expectation(description: "Test: \(#function)")
         var didReceivePlacemark: CLPlacemark? = nil
         geocoder.placemarks = [placemark]
         let procedure = ReverseGeocodeProcedure(location: location) { placemark in
             didReceivePlacemark = placemark
-            exp.fulfill()
+            exp?.fulfill()
         }
         procedure.geocoder = geocoder
         wait(for: procedure)
@@ -63,12 +64,12 @@ class ReverseGeocodeProcedureTests: LocationProcedureTestCase {
     }
 
     func test__completion_is_executed_on_main_queue() {
-        let exp = expectation(description: "Test: \(#function)")
+        weak var exp = expectation(description: "Test: \(#function)")
         var didRunCompletionBlockOnMainQueue = false
         geocoder.placemarks = [placemark]
         let procedure = ReverseGeocodeProcedure(location: location) { _ in
             didRunCompletionBlockOnMainQueue = DispatchQueue.isMainDispatchQueue
-            exp.fulfill()
+            exp?.fulfill()
         }
         procedure.geocoder = geocoder
         wait(for: procedure)

@@ -4,6 +4,8 @@
 //  Copyright © 2016 ProcedureKit. All rights reserved.
 //
 
+import Foundation
+
 public protocol ProcedureProtocol: class {
 
     var procedureName: String { get }
@@ -20,11 +22,11 @@ public protocol ProcedureProtocol: class {
 
     // Execution
 
-    func willEnqueue()
+    func willEnqueue(on: ProcedureQueue)
 
     func execute()
 
-    func produce(operation: Operation)
+    func produce(operation: Operation) throws
 
     // Cancelling
 
