@@ -42,7 +42,6 @@ open class GroupProcedure: Procedure, ProcedureQueueDelegate {
     fileprivate var groupErrors = Protector(GroupErrors())
     fileprivate var groupChildren: Protector<[Operation]>
     fileprivate var groupIsFinishing = false
-    fileprivate var groupFinishLock = NSRecursiveLock()
     fileprivate var groupIsSuspended = false
     fileprivate var groupSuspendLock = NSLock()
     fileprivate var groupIsAddingOperations = DispatchGroup()
@@ -97,6 +96,17 @@ open class GroupProcedure: Procedure, ProcedureQueueDelegate {
 
     public convenience init(operations: Operation...) {
         self.init(operations: operations)
+    }
+
+    deinit {
+        // To ensure that any remaining operations on the internal queue are released
+        // we must cancelAllOperations and also ensure the queue is not suspended.
+        queue.cancelAllOperations()
+        queue.isSuspended = false
+
+        // If you find that execution is stuck on the following line, one of the child
+        // Operations/Procedures is likely not handling cancellation and finishing.
+        queue.waitUntilAllOperationsAreFinished()
     }
 
     // MARK: - Execute
