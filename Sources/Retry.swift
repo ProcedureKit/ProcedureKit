@@ -127,6 +127,7 @@ open class RetryProcedure<T: Operation>: RepeatProcedure<T> {
         }
         retry.info = createFailureInfo(for: current, errors: errors)
         returnValue = addNextOperation()
+        retry.info = .none
         return returnValue
     }
 
