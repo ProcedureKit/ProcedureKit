@@ -313,12 +313,16 @@ open class Procedure: Operation, ProcedureProtocol {
     public final override func start() {
         // Don't call super.start
 
-        guard !isCancelled || isAutomaticFinishingDisabled else {
-            finish()
-            return
-        }
+        // Replicate NSOperation.start() autorelease behavior
+        // (Push an autoreleasepool before calling main(), pop after main() returns)
+        autoreleasepool {
+            guard !isCancelled || isAutomaticFinishingDisabled else {
+                finish()
+                return
+            }
 
-        main()
+            main()
+        }
     }
 
     /// Triggers execution of the operation's task, correctly managing errors and the cancelled state. Cannot be over-ridden
