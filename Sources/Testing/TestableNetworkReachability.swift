@@ -4,8 +4,10 @@
 //  Copyright © 2016 ProcedureKit. All rights reserved.
 //
 
-import XCTest
+import Foundation
 import SystemConfiguration
+import XCTest
+import ProcedureKit
 
 public class TestableNetworkReachability {
     typealias Reachability = String
