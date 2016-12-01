@@ -64,6 +64,7 @@ open class NetworkDataProcedure<Session: URLSessionTaskFactory>: Procedure, Inpu
         }
 
         stateLock.withCriticalScope {
+            guard !isCancelled else { return }
             task = session.dataTask(with: request) { [weak self] data, response, error in
                 guard let strongSelf = self else { return }
 

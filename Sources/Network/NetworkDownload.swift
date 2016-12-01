@@ -64,6 +64,7 @@ open class NetworkDownloadProcedure<Session: URLSessionTaskFactory>: Procedure, 
         }
 
         stateLock.withCriticalScope {
+            guard !isCancelled else { return }
             task = session.downloadTask(with: request) { [weak self] location, response, error in
                 guard let strongSelf = self else { return }
 

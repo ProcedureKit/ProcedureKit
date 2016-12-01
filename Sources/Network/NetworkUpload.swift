@@ -64,6 +64,7 @@ open class NetworkUploadProcedure<Session: URLSessionTaskFactory>: Procedure, In
         }
 
         stateLock.withCriticalScope {
+            guard !isCancelled else { return }
             task = session.uploadTask(with: requirement.request, from: requirement.payload) { [weak self] data, response, error in
                 guard let strongSelf = self else { return }
 
