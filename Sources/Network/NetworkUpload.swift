@@ -35,7 +35,7 @@ open class NetworkUploadProcedure<Session: URLSessionTaskFactory>: Procedure, In
     public let completion: CompletionBlock
 
     private let stateLock = NSLock()
-    internal var task: Session.UploadTask? = nil
+    internal private(set) var task: Session.UploadTask? = nil
     private var _input: Pending<HTTPPayloadRequest<Data>> = .pending
     private var _output: Pending<NetworkResult> = .pending
 
