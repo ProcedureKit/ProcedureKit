@@ -36,9 +36,10 @@ public struct TimeoutObserver: ProcedureObserver {
     public func will(execute procedure: Procedure) {
         switch delay.interval {
         case (let interval) where interval > 0.0:
-            DispatchQueue.main.asyncAfter(deadline: .now() + interval) { [delay = self.delay] in
-                guard !procedure.isFinished && !procedure.isCancelled else { return }
-                procedure.cancel(withError: ProcedureKitError.timedOut(with: delay))
+            DispatchQueue.main.asyncAfter(deadline: .now() + interval) { [delay = self.delay, weak procedure] in
+                guard let strongProcedure = procedure else { return }
+                guard !strongProcedure.isFinished && !strongProcedure.isCancelled else { return }
+                strongProcedure.cancel(withError: ProcedureKitError.timedOut(with: delay))
             }
         default: break
         }

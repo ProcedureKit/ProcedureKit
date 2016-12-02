@@ -99,6 +99,17 @@ open class GroupProcedure: Procedure, ProcedureQueueDelegate {
         self.init(operations: operations)
     }
 
+    deinit {
+        // To ensure that any remaining operations on the internal queue are released
+        // we must cancelAllOperations and also ensure the queue is not suspended.
+        queue.cancelAllOperations()
+        queue.isSuspended = false
+
+        // If you find that execution is stuck on the following line, one of the child
+        // Operations/Procedures is likely not handling cancellation and finishing.
+        queue.waitUntilAllOperationsAreFinished()
+    }
+
     // MARK: - Execute
 
     open override func execute() {
