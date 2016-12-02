@@ -50,7 +50,7 @@ open class NetworkUploadProcedure<Session: URLSessionTaskFactory>: Procedure, In
         super.init()
         self.input = request.flatMap { .ready(HTTPPayloadRequest(payload: data, request: $0)) } ?? .pending
 
-        addWillCancelBlockObserver { procedure, _ in
+        addDidCancelBlockObserver { procedure, _ in
             procedure.stateLock.withCriticalScope {
                 procedure.task?.cancel()
             }

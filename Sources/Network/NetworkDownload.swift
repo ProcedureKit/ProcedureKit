@@ -50,7 +50,7 @@ open class NetworkDownloadProcedure<Session: URLSessionTaskFactory>: Procedure, 
         super.init()
         self.input = request.flatMap { .ready($0) } ?? .pending
 
-        addWillCancelBlockObserver { procedure, _ in
+        addDidCancelBlockObserver { procedure, _ in
             procedure.stateLock.withCriticalScope {
                 procedure.task?.cancel()
             }
