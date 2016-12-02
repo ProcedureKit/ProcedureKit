@@ -35,7 +35,7 @@ open class NetworkUploadProcedure<Session: URLSessionTaskFactory>: Procedure, In
     public let completion: CompletionBlock
 
     private let stateLock = NSLock()
-    internal var task: Session.UploadTask? = nil
+    internal private(set) var task: Session.UploadTask? = nil
     private var _input: Pending<HTTPPayloadRequest<Data>> = .pending
     private var _output: Pending<NetworkResult> = .pending
 
@@ -64,6 +64,7 @@ open class NetworkUploadProcedure<Session: URLSessionTaskFactory>: Procedure, In
         }
 
         stateLock.withCriticalScope {
+            guard !isCancelled else { return }
             task = session.uploadTask(with: requirement.request, from: requirement.payload) { [weak self] data, response, error in
                 guard let strongSelf = self else { return }
 

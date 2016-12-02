@@ -35,7 +35,7 @@ open class NetworkDownloadProcedure<Session: URLSessionTaskFactory>: Procedure, 
     public let completion: CompletionBlock
 
     private let stateLock = NSLock()
-    internal var task: Session.DownloadTask? = nil
+    internal private(set) var task: Session.DownloadTask? = nil
     private var _input: Pending<URLRequest> = .pending
     private var _output: Pending<NetworkResult> = .pending
 
@@ -64,6 +64,7 @@ open class NetworkDownloadProcedure<Session: URLSessionTaskFactory>: Procedure, 
         }
 
         stateLock.withCriticalScope {
+            guard !isCancelled else { return }
             task = session.downloadTask(with: request) { [weak self] location, response, error in
                 guard let strongSelf = self else { return }
 
