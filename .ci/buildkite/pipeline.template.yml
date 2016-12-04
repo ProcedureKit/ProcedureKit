@@ -102,7 +102,7 @@ steps:
     build:
       message: "Testing ProcedureKit Integration via Cocoapods"
       commit: "HEAD"
-      branch: "cocoapods/macOS"
+      branch: "cocoapods"
       env:
         PROCEDUREKIT_HASH: "$COMMIT"
 
