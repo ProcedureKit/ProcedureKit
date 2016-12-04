@@ -98,7 +98,7 @@ steps:
   
   -
     name: "Test CocoaPods Integration"
-    trigger: "TryProcedureKit"
+    trigger: "tryprocedurekit"
     build:
       message: "Testing ProcedureKit Integration via Cocoapods"
       commit: "HEAD"
