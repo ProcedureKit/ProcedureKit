@@ -104,6 +104,6 @@ steps:
       commit: "HEAD"
       branch: "cocoapods/macOS"
       env:
-        PROCEDUREKIT_HASH: $BUILDKITE_COMMIT
+        PROCEDUREKIT_HASH: "$COMMIT"
 
 
