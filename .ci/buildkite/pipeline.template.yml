@@ -93,3 +93,17 @@ steps:
     agents:
       queue: "iOS-Simulator" 
       xcode: "$XCODE"
+
+  - wait
+  
+  -
+    name: "Test CocoaPods Integration"
+    trigger: "TryProcedureKit"
+    build:
+      message: "Testing ProcedureKit Integration via Cocoapods"
+      commit: "HEAD"
+      branch: "cocoapods/macOS"
+      env:
+        PROCEDUREKIT_HASH: $BUILDKITE_COMMIT
+
+
