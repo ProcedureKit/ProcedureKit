@@ -68,11 +68,6 @@ open class NetworkDataProcedure<Session: URLSessionTaskFactory>: Procedure, Inpu
             task = session.dataTask(with: request) { [weak self] data, response, error in
                 guard let strongSelf = self else { return }
 
-            if let error = error {
-                strongSelf.finish(withResult: .failure(error))
-                return
-            }
-
                 if let error = error {
                     strongSelf.finish(withResult: .failure(error))
                     return
