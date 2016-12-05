@@ -8,7 +8,7 @@ import Foundation
 import XCTest
 import ProcedureKit
 
-public class TestableURLSessionTask: Equatable {
+public class TestableURLSessionTask: NSObject {
 
     public static func == (lhs: TestableURLSessionTask, rhs: TestableURLSessionTask) -> Bool {
         return lhs.uuid == rhs.uuid
