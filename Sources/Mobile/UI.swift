@@ -16,6 +16,8 @@ public protocol PresentingViewController: class {
     func showDetailViewController(_ viewControllerToShow: UIViewController, sender: Any?)
 }
 
+extension UIViewController: PresentingViewController { }
+
 public protocol DismissingViewController: class {
     var didDismissViewControllerBlock: () -> Void { get set }
 }
@@ -24,17 +26,17 @@ public enum PresentationStyle {
     case show, showDetail, present
 }
 
-open class UIProcedure<Presenting>: Procedure where Presenting: PresentingViewController {
+open class UIProcedure: Procedure {
 
     public let presented: UIViewController
-    public let presenting: Presenting
+    public let presenting: PresentingViewController
     public let style: PresentationStyle
     public let wrapInNavigationController: Bool
     public let sender: Any?
 
     private var shouldFinishAfterPresentating: Bool
 
-    public init<T: UIViewController>(present: T, from: Presenting, withStyle style: PresentationStyle, inNavigationController: Bool = true, sender: Any? = nil) {
+    public init<T: UIViewController>(present: T, from: PresentingViewController, withStyle style: PresentationStyle, inNavigationController: Bool = true, sender: Any? = nil) {
         self.presented = present
         self.presenting = from
         self.style = style
@@ -44,7 +46,7 @@ open class UIProcedure<Presenting>: Procedure where Presenting: PresentingViewCo
         super.init()
     }
 
-    public init<T: UIViewController>(present: T, from: Presenting, withStyle style: PresentationStyle, inNavigationController: Bool = true, sender: Any? = nil, waitForDismissal: Bool) where T: DismissingViewController {
+    public init<T: UIViewController>(present: T, from: PresentingViewController, withStyle style: PresentationStyle, inNavigationController: Bool = true, sender: Any? = nil, waitForDismissal: Bool) where T: DismissingViewController {
         self.presented = present
         self.presenting = from
         self.style = style
@@ -55,8 +57,10 @@ open class UIProcedure<Presenting>: Procedure where Presenting: PresentingViewCo
         if waitForDismissal {
             shouldFinishAfterPresentating = false
             present.didDismissViewControllerBlock = { [weak self] in
-                guard let strongSelf = self, !strongSelf.shouldFinishAfterPresentating && strongSelf.isExecuting else { return }
-                strongSelf.finish()
+                guard let strongSelf = self else { return }
+                if !strongSelf.shouldFinishAfterPresentating && strongSelf.isExecuting {
+                    strongSelf.finish()
+                }
             }
         }
     }
