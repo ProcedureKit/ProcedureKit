@@ -201,3 +201,13 @@ open class NetworkProcedure<T: Procedure>: RetryProcedure<T>, OutputProcedure wh
 }
 
 #endif
+
+public extension InputProcedure where Input: Equatable {
+
+    @discardableResult func injectPayload<Dependency: OutputProcedure>(fromNetwork dependency: Dependency) -> Self where Dependency.Output: HTTPPayloadResponseProtocol, Dependency.Output.Payload == Input {
+        return injectResult(from: dependency) { http in
+            guard let payload = http.payload else { throw ProcedureKitError.requirementNotSatisfied() }
+            return payload
+        }
+    }
+}
