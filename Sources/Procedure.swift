@@ -586,18 +586,6 @@ open class Procedure: Operation, ProcedureProtocol {
         didChangeValue(forKey: .finished)
     }
 
-    /**
-     Public override which deliberately crashes your app, as usage is considered an antipattern
-
-     To promote best practices, where waiting is never the correct thing to do,
-     we will crash the app if this is called. Instead use discrete operations and
-     dependencies, or groups, or semaphores or even NSLocking.
-
-     */
-    public final override func waitUntilFinished() {
-        fatalError("Waiting on operations is an anti-pattern. Remove this ONLY if you're absolutely sure there is No Other Way™. Post a question in https://github.com/danthorpe/Operations if you are unsure.")
-    }
-
     // MARK: - Observers
 
     /**
