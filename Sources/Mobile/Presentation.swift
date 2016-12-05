@@ -17,7 +17,7 @@ public protocol PresentingViewController: class {
 }
 
 public protocol DismissingViewController: class {
-    var didDismiss: () -> Void { get set }
+    var didDismissViewControllerBlock: () -> Void { get set }
 }
 
 public enum PresentationStyle {
@@ -48,7 +48,7 @@ open class UIProcedure<Presenting>: Procedure where Presenting: PresentingViewCo
         self.init(present: present, from: from, withStyle: style, inNavigationController: inNavigationController, sender: sender)
         if waitForDismissal {
             shouldFinishAfterPresentating = false
-            present.didDismiss = { [weak self] in
+            present.didDismissViewControllerBlock = { [weak self] in
                 guard let strongSelf = self, !strongSelf.shouldFinishAfterPresentating && strongSelf.isExecuting else { return }
                 strongSelf.finish()
             }
@@ -56,7 +56,6 @@ open class UIProcedure<Presenting>: Procedure where Presenting: PresentingViewCo
     }
 
     open override func execute() {
-
         DispatchQueue.main.async { [weak self] in
             guard let strongSelf = self else { return }
 
@@ -78,13 +77,10 @@ open class UIProcedure<Presenting>: Procedure where Presenting: PresentingViewCo
                 strongSelf.presenting.showDetailViewController(strongSelf.presented, sender: strongSelf.sender)
             }
 
-            guard strongSelf.shouldFinishAfterPresentating else {
+            if strongSelf.shouldFinishAfterPresentating {
                 strongSelf.finish()
                 return
             }
-
-            // Deal with waiting for dismissal here
-
         }
     }
 }
