@@ -151,7 +151,9 @@ class NetworkRecovery<T: Operation> where T: NetworkOperation {
     }
 }
 
-open class NetworkProcedure<T: Procedure>: RetryProcedure<T> where T: NetworkOperation {
+open class NetworkProcedure<T: Procedure>: RetryProcedure<T>, OutputProcedure where T: NetworkOperation, T: OutputProcedure, T.Output: HTTPPayloadResponseProtocol {
+
+    public typealias Output = T.Output
 
     let recovery: NetworkRecovery<T>
 
