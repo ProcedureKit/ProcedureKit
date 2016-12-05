@@ -151,7 +151,9 @@ class NetworkRecovery<T: Operation> where T: NetworkOperation {
     }
 }
 
-open class NetworkProcedure<T: Procedure>: RetryProcedure<T> where T: NetworkOperation {
+open class NetworkProcedure<T: Procedure>: RetryProcedure<T>, OutputProcedure where T: NetworkOperation, T: OutputProcedure, T.Output: HTTPPayloadResponseProtocol {
+
+    public typealias Output = T.Output
 
     let recovery: NetworkRecovery<T>
 
@@ -199,3 +201,13 @@ open class NetworkProcedure<T: Procedure>: RetryProcedure<T> where T: NetworkOpe
 }
 
 #endif
+
+public extension InputProcedure where Input: Equatable {
+
+    @discardableResult func injectPayload<Dependency: OutputProcedure>(fromNetwork dependency: Dependency) -> Self where Dependency.Output: HTTPPayloadResponseProtocol, Dependency.Output.Payload == Input {
+        return injectResult(from: dependency) { http in
+            guard let payload = http.payload else { throw ProcedureKitError.requirementNotSatisfied() }
+            return payload
+        }
+    }
+}
