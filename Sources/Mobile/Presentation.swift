@@ -16,41 +16,46 @@ public protocol PresentingViewController: class {
     func showDetailViewController(_ viewControllerToShow: UIViewController, sender: Any?)
 }
 
-public protocol PresentationProcedure {
-    associatedtype Presented: UIViewController
-    associatedtype Presenting: PresentingViewController
+public protocol DismissingViewController: class {
+    var didDismiss: () -> Void { get set }
 }
 
 public enum PresentationStyle {
     case show, showDetail, present
 }
 
-open class UIProcedure<T, V>: Procedure, PresentationProcedure, InputProcedure where T: UIViewController, V: PresentingViewController {
-    public typealias Presented = T
-    public typealias Presenting = V
+open class UIProcedure<Presenting>: Procedure where Presenting: PresentingViewController {
 
-    public var input: Pending<Presented> = .pending
+    public let presented: UIViewController
     public let presenting: Presenting
     public let style: PresentationStyle
     public let wrapInNavigationController: Bool
     public let sender: Any?
-    public let waitForDismissal: Bool
 
-    public init(present: T? = nil, from: V, withStyle style: PresentationStyle, inNavigationController: Bool = true, sender: Any? = nil, waitForDismissal: Bool = false) {
-        self.input = Pending(present)
+    private var shouldFinishAfterPresentating: Bool
+
+    public init<T: UIViewController>(present: T, from: Presenting, withStyle style: PresentationStyle, inNavigationController: Bool = true, sender: Any? = nil) {
+        self.presented = present
         self.presenting = from
         self.style = style
         self.wrapInNavigationController = inNavigationController
         self.sender = sender
-        self.waitForDismissal = waitForDismissal
+        self.shouldFinishAfterPresentating = true
         super.init()
     }
 
-    open override func execute() {
-        guard let viewController = input.value else {
-            finish(withError: ProcedureKitError.requirementNotSatisfied())
-            return
+    public convenience init<T: UIViewController>(present: T, from: Presenting, withStyle style: PresentationStyle, inNavigationController: Bool = true, sender: Any? = nil, waitForDismissal: Bool) where T: DismissingViewController {
+        self.init(present: present, from: from, withStyle: style, inNavigationController: inNavigationController, sender: sender)
+        if waitForDismissal {
+            shouldFinishAfterPresentating = false
+            present.didDismiss = { [weak self] in
+                guard let strongSelf = self, !strongSelf.shouldFinishAfterPresentating && strongSelf.isExecuting else { return }
+                strongSelf.finish()
+            }
         }
+    }
+
+    open override func execute() {
 
         DispatchQueue.main.async { [weak self] in
             guard let strongSelf = self else { return }
@@ -58,22 +63,22 @@ open class UIProcedure<T, V>: Procedure, PresentationProcedure, InputProcedure w
             switch strongSelf.style {
             case .present:
                 let viewControllerToPresent: UIViewController
-                if viewController is UIAlertController || !strongSelf.wrapInNavigationController {
-                    viewControllerToPresent = viewController
+                if strongSelf.presented is UIAlertController || !strongSelf.wrapInNavigationController {
+                    viewControllerToPresent = strongSelf.presented
                 }
                 else {
-                    viewControllerToPresent = UINavigationController(rootViewController: viewController)
+                    viewControllerToPresent = UINavigationController(rootViewController: strongSelf.presented)
                 }
                 strongSelf.presenting.present(viewControllerToPresent, animated: true, completion: nil)
 
             case .show:
-                strongSelf.presenting.show(viewController, sender: strongSelf.sender)
+                strongSelf.presenting.show(strongSelf.presented, sender: strongSelf.sender)
 
             case .showDetail:
-                strongSelf.presenting.showDetailViewController(viewController, sender: strongSelf.sender)
+                strongSelf.presenting.showDetailViewController(strongSelf.presented, sender: strongSelf.sender)
             }
 
-            guard strongSelf.waitForDismissal else {
+            guard strongSelf.shouldFinishAfterPresentating else {
                 strongSelf.finish()
                 return
             }
