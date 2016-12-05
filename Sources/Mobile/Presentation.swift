@@ -44,8 +44,14 @@ open class UIProcedure<Presenting>: Procedure where Presenting: PresentingViewCo
         super.init()
     }
 
-    public convenience init<T: UIViewController>(present: T, from: Presenting, withStyle style: PresentationStyle, inNavigationController: Bool = true, sender: Any? = nil, waitForDismissal: Bool) where T: DismissingViewController {
-        self.init(present: present, from: from, withStyle: style, inNavigationController: inNavigationController, sender: sender)
+    public init<T: UIViewController>(present: T, from: Presenting, withStyle style: PresentationStyle, inNavigationController: Bool = true, sender: Any? = nil, waitForDismissal: Bool) where T: DismissingViewController {
+        self.presented = present
+        self.presenting = from
+        self.style = style
+        self.wrapInNavigationController = inNavigationController
+        self.sender = sender
+        self.shouldFinishAfterPresentating = true
+        super.init()
         if waitForDismissal {
             shouldFinishAfterPresentating = false
             present.didDismissViewControllerBlock = { [weak self] in
