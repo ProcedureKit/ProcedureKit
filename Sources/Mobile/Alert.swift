@@ -98,9 +98,9 @@ public class AlertProcedure: UIProcedure {
      - parameter from: a generic type conforming to `PresentingViewController`,
      such as an `UIViewController`
      */
-    public init(presentAlertFrom presenting: PresentingViewController, withPreferredStyle preferredAlertStyle: UIAlertControllerStyle = .alert, waitForDismissal: Bool = false) {
+    public init(presentAlertFrom presenting: PresentingViewController, withPreferredStyle preferredAlertStyle: UIAlertControllerStyle = .alert, waitForDismissal: Bool = true) {
         let alert = UIAlertController(title: nil, message: nil, preferredStyle: preferredAlertStyle)
-        super.init(present: alert, from: presenting, withStyle: .present, inNavigationController: false, sender: nil)
+        super.init(present: alert, from: presenting, withStyle: .present, inNavigationController: false, sender: nil, finishAfterPresenting: !waitForDismissal)
         add(condition: MutuallyExclusive<UIAlertController>())
     }
 
@@ -118,7 +118,9 @@ public class AlertProcedure: UIProcedure {
         let action = UIAlertAction(title: title, style: style) { [weak self] action in
             guard let strongSelf = self else { return }
             handler(strongSelf, action)
-            strongSelf.finish()
+            if strongSelf.shouldWaitUntilDismissal {
+                strongSelf.finish()
+            }
         }
         alert.addAction(action)
         return action

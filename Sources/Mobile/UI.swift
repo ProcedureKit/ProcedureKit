@@ -33,32 +33,28 @@ open class UIProcedure: Procedure {
     public let style: PresentationStyle
     public let wrapInNavigationController: Bool
     public let sender: Any?
+    public let finishAfterPresentating: Bool
 
-    private var shouldFinishAfterPresentating: Bool
+    internal var shouldWaitUntilDismissal: Bool {
+        return !finishAfterPresentating
+    }
 
-    public init<T: UIViewController>(present: T, from: PresentingViewController, withStyle style: PresentationStyle, inNavigationController: Bool = true, sender: Any? = nil) {
+    public init<T: UIViewController>(present: T, from: PresentingViewController, withStyle style: PresentationStyle, inNavigationController: Bool = true, sender: Any? = nil, finishAfterPresenting: Bool = true) {
         self.presented = present
         self.presenting = from
         self.style = style
         self.wrapInNavigationController = inNavigationController
         self.sender = sender
-        self.shouldFinishAfterPresentating = true
+        self.finishAfterPresentating = finishAfterPresenting
         super.init()
     }
 
-    public init<T: UIViewController>(present: T, from: PresentingViewController, withStyle style: PresentationStyle, inNavigationController: Bool = true, sender: Any? = nil, waitForDismissal: Bool) where T: DismissingViewController {
-        self.presented = present
-        self.presenting = from
-        self.style = style
-        self.wrapInNavigationController = inNavigationController
-        self.sender = sender
-        self.shouldFinishAfterPresentating = true
-        super.init()
+    public convenience init<T: UIViewController>(present: T, from: PresentingViewController, withStyle style: PresentationStyle, inNavigationController: Bool = true, sender: Any? = nil, waitForDismissal: Bool) where T: DismissingViewController {
+        self.init(present: present, from: from, withStyle: style, inNavigationController: inNavigationController, sender: sender, finishAfterPresenting: !waitForDismissal)
         if waitForDismissal {
-            shouldFinishAfterPresentating = false
             present.didDismissViewControllerBlock = { [weak self] in
                 guard let strongSelf = self else { return }
-                if !strongSelf.shouldFinishAfterPresentating && strongSelf.isExecuting {
+                if !strongSelf.finishAfterPresentating && strongSelf.isExecuting {
                     strongSelf.finish()
                 }
             }
@@ -87,7 +83,7 @@ open class UIProcedure: Procedure {
                 strongSelf.presenting.showDetailViewController(strongSelf.presented, sender: strongSelf.sender)
             }
 
-            if strongSelf.shouldFinishAfterPresentating {
+            if strongSelf.finishAfterPresentating {
                 strongSelf.finish()
                 return
             }
