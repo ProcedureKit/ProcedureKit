@@ -19,6 +19,10 @@ public enum Pending<T> {
         guard case let .ready(value) = self else { return nil }
         return value
     }
+
+    public init(_ value: T?) {
+        self = value.pending
+    }
 }
 
 extension Pending where T: Equatable {
@@ -31,6 +35,18 @@ extension Pending where T: Equatable {
             return lhsValue == rhsValue
         default:
             return false
+        }
+    }
+}
+
+public extension Optional {
+
+    var pending: Pending<Wrapped> {
+        switch self {
+        case .none:
+            return .pending
+        case let .some(value):
+            return .ready(value)
         }
     }
 }
