@@ -33,7 +33,7 @@ open class ProcessProcedure: Procedure {
     }
 
     // - returns process: the Process
-    private let process: Process
+    fileprivate let process: Process
 
     /// - returns processDidExitCleanly: the closure for exiting cleanly.
     private let processDidExitCleanly: ProcessDidExitCleanly
