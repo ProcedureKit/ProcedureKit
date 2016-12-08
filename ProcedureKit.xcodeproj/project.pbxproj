@@ -1039,7 +1039,6 @@
 			isa = PBXGroup;
 			children = (
 				0BC54B7A1DCB4906006C7DE2 /* Process.swift */,
-				0BB369441DCB51E000AB91BD /* ProcessProcedureTests.swift */,
 			);
 			name = Mac;
 			sourceTree = "<group>";
@@ -1048,6 +1047,7 @@
 			isa = PBXGroup;
 			children = (
 				653CA04C1D60A6C80070B7A2 /* ProcedureKitMacTests.swift */,
+				0BB369441DCB51E000AB91BD /* ProcessProcedureTests.swift */,
 			);
 			name = "Mac Tests";
 			sourceTree = "<group>";
