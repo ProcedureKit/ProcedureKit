@@ -12,8 +12,11 @@ public protocol CKFetchRecordZoneChangesOperationProtocol: CKDatabaseOperationPr
     /// The type of the CloudKit FetchRecordZoneChangesOptions
     associatedtype FetchRecordZoneChangesOptions
 
+    /// The type of the recordZoneIDs property
+    associatedtype RecordZoneIDsPropertyType
+
     /// - returns: the record zone IDs which will fetch changes
-    var recordZoneIDs: [RecordZoneID] { get set }
+    var recordZoneIDs: RecordZoneIDsPropertyType { get set }
 
     /// - returns: the per-record-zone options
     var optionsByRecordZoneID: [RecordZoneID : FetchRecordZoneChangesOptions]? { get set }
@@ -47,7 +50,7 @@ extension CKFetchRecordZoneChangesOperation: CKFetchRecordZoneChangesOperationPr
 extension CKProcedure where T: CKFetchRecordZoneChangesOperationProtocol, T: AssociatedErrorProtocol, T.AssociatedError: CloudKitError {
 
     /// - returns: the record zone IDs which will fetch changes
-    public var recordZoneIDs: [T.RecordZoneID] {
+    public var recordZoneIDs: T.RecordZoneIDsPropertyType {
         get { return operation.recordZoneIDs }
         set { operation.recordZoneIDs = newValue }
     }
@@ -113,7 +116,7 @@ extension CloudKitProcedure where T: CKFetchRecordZoneChangesOperationProtocol, 
     public typealias FetchRecordZoneChangesCompletionBlock = () -> Void
 
     /// - returns: the record zone IDs which will fetch changes
-    public var recordZoneIDs: [T.RecordZoneID] {
+    public var recordZoneIDs: T.RecordZoneIDsPropertyType {
         get { return current.recordZoneIDs }
         set {
             current.recordZoneIDs = newValue

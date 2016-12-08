@@ -10,8 +10,11 @@ import CloudKit
 /// A generic protocol which exposes the properties used by Apple's CKFetchShareMetadataOperation.
 public protocol CKFetchShareMetadataOperationProtocol: CKOperationProtocol {
 
+    /// The type of the shareURLs property
+    associatedtype ShareURLsPropertyType
+
     /// - returns: the share URLs
-    var shareURLs: [URL] { get set }
+    var shareURLs: ShareURLsPropertyType { get set }
 
     /// - returns: whether to fetch the share root record
     var shouldFetchRootRecord: Bool { get set }
@@ -35,7 +38,7 @@ extension CKFetchShareMetadataOperation: CKFetchShareMetadataOperationProtocol, 
 
 extension CKProcedure where T: CKFetchShareMetadataOperationProtocol, T: AssociatedErrorProtocol, T.AssociatedError: CloudKitError {
 
-    public var shareURLs: [URL] {
+    public var shareURLs: T.ShareURLsPropertyType {
         get { return operation.shareURLs }
         set { operation.shareURLs = newValue }
     }
@@ -76,7 +79,7 @@ extension CloudKitProcedure where T: CKFetchShareMetadataOperationProtocol, T: A
     public typealias FetchShareMetadataCompletionBlock = () -> Void
 
     /// - returns: the share URLs
-    public var shareURLs: [URL] {
+    public var shareURLs: T.ShareURLsPropertyType {
         get { return current.shareURLs }
         set {
             current.shareURLs = newValue

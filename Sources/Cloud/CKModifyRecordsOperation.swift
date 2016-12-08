@@ -9,6 +9,9 @@ import CloudKit
 /// A generic protocol which exposes the properties used by Apple's CKModifyRecordsOperation.
 public protocol CKModifyRecordsOperationProtocol: CKDatabaseOperationProtocol {
 
+    /// The type of the perRecordCompletionBlock property
+    associatedtype PerRecordCompletionBlockType
+
     /// - returns: the records to save
     var recordsToSave: [Record]? { get set }
 
@@ -28,7 +31,7 @@ public protocol CKModifyRecordsOperationProtocol: CKDatabaseOperationProtocol {
     var perRecordProgressBlock: ((Record, Double) -> Void)? { get set }
 
     /// - returns: a per record completion block
-    var perRecordCompletionBlock: ((Record?, Error?) -> Void)? { get set }
+    var perRecordCompletionBlock: PerRecordCompletionBlockType { get set }
 
     /// - returns: the modify records completion block
     var modifyRecordsCompletionBlock: (([Record]?, [RecordID]?, Error?) -> Void)? { get set }
@@ -79,7 +82,7 @@ extension CKProcedure where T: CKModifyRecordsOperationProtocol, T: AssociatedEr
         set { operation.perRecordProgressBlock = newValue }
     }
 
-    public var perRecordCompletionBlock: CloudKitProcedure<T>.ModifyRecordsPerRecordCompletionBlock? {
+    public var perRecordCompletionBlock: CloudKitProcedure<T>.ModifyRecordsPerRecordCompletionBlock {
         get { return operation.perRecordCompletionBlock }
         set { operation.perRecordCompletionBlock = newValue }
     }
@@ -106,7 +109,7 @@ extension CloudKitProcedure where T: CKModifyRecordsOperationProtocol, T: Associ
     public typealias ModifyRecordsPerRecordProgressBlock = (T.Record, Double) -> Void
 
     /// A typealias for the block types used by CloudKitOperation<CKModifyRecordsOperation>
-    public typealias ModifyRecordsPerRecordCompletionBlock = (T.Record?, Error?) -> Void
+    public typealias ModifyRecordsPerRecordCompletionBlock = T.PerRecordCompletionBlockType
 
     /// A typealias for the block types used by CloudKitOperation<CKModifyRecordsOperation>
     public typealias ModifyRecordsCompletionBlock = ([T.Record]?, [T.RecordID]?) -> Void
@@ -166,7 +169,7 @@ extension CloudKitProcedure where T: CKModifyRecordsOperationProtocol, T: Associ
     }
 
     /// - returns: a block for per record completion
-    public var perRecordCompletionBlock: ModifyRecordsPerRecordCompletionBlock? {
+    public var perRecordCompletionBlock: ModifyRecordsPerRecordCompletionBlock {
         get { return current.perRecordCompletionBlock }
         set {
             current.perRecordCompletionBlock = newValue
