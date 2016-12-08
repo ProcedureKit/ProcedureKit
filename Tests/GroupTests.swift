@@ -47,9 +47,18 @@ class GroupTests: GroupTestCase {
     }
 
     func test__group_adding_operation_to_running_group() {
+        let semaphore = DispatchSemaphore(value: 0)
+        group.add(child: BlockOperation {
+            // prevent the Group from finishing before an extra child is added
+            // after execute
+            semaphore.wait()
+        })
         let extra = TestProcedure(name: "Extra child")
 
-        check(procedure: group) { $0.add(child: extra) }
+        checkAfterDidExecute(procedure: group) {
+            $0.add(child: extra)
+            semaphore.signal()
+        }
 
         XCTAssertTrue(group.isFinished)
         XCTAssertTrue(extra.didExecute)
@@ -99,15 +108,10 @@ class GroupTests: GroupTestCase {
             childWillExecuteDispatchGroup.leave()
         }
 
-        let groupWillExecuteDispatchGroup = DispatchGroup()
-        groupWillExecuteDispatchGroup.enter()
-        group.addWillExecuteBlockObserver { _ in
-            groupWillExecuteDispatchGroup.leave()
-        }
+        checkAfterDidExecute(procedure: group) { group in
 
-        check(procedure: group) { group in
-
-            XCTAssertEqual(groupWillExecuteDispatchGroup.wait(timeout: DispatchTime.now() + 0.01), .success, "Group has not yet executed")
+            XCTAssertTrue(group.didExecute)
+            XCTAssertTrue(group.isExecuting)
 
             XCTAssertNotEqual(childWillExecuteDispatchGroup.wait(timeout: DispatchTime.now() + 0.005), .success, "Child executed when group was suspended")
 
@@ -181,7 +185,7 @@ class GroupTests: GroupTestCase {
     }
 
     func test__group_cancels_children_when_running() {
-        check(procedure: group) { $0.cancel() }
+        checkAfterDidExecute(procedure: group) { $0.cancel() }
         XCTAssertTrue(group.isCancelled)
     }
 

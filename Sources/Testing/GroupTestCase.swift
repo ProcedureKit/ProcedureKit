@@ -22,10 +22,10 @@ open class GroupTestCase: ProcedureKitTestCase {
     public var children: [TestProcedure]!
     public var group: TestGroupProcedure!
 
-    public func createTestProcedures(count: Int = 5, shouldError: Bool = false) -> [TestProcedure] {
+    public func createTestProcedures(count: Int = 5, shouldError: Bool = false, duration: TimeInterval = 0.000_001) -> [TestProcedure] {
         return (0..<count).map { i in
             let name = "Child: \(i)"
-            return shouldError ? TestProcedure(name: name, error: TestError()) : TestProcedure(name: name)
+            return shouldError ? TestProcedure(name: name, delay: duration, error: TestError()) : TestProcedure(name: name, delay: duration)
         }
     }
 

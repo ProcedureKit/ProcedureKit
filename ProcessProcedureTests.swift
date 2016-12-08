@@ -46,7 +46,7 @@ class ProcessProcedureTests: ProcedureKitTestCase {
 
     func test__cancel_process_after_launched() {
         processProcedure = ProcessProcedure(launchPath: "/bin/bash/", arguments: ["-c", "sleep 2"])
-        check(procedure: processProcedure, withTimeout: 1) { procedure in
+        checkAfterDidExecute(procedure: processProcedure, withTimeout: 1) { procedure in
             procedure.cancel()
         }
         XCTAssertProcedureCancelledWithoutErrors(processProcedure)
