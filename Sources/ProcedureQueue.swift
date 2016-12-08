@@ -271,7 +271,7 @@ public extension OperationQueue {
      Add operations to the queue as an array
      - parameters ops: a array of `NSOperation` instances.
      */
-    func add<S>(operations: S) where S: Sequence, S.Iterator.Element: Operation {
+    final func add<S>(operations: S) where S: Sequence, S.Iterator.Element: Operation {
         addOperations(Array(operations), waitUntilFinished: false)
     }
 
@@ -279,7 +279,7 @@ public extension OperationQueue {
      Add operations to the queue as a variadic parameter
      - parameters ops: a variadic array of `NSOperation` instances.
      */
-    func add(operations: Operation...) {
+    final func add(operations: Operation...) {
         add(operations: operations)
     }
 }

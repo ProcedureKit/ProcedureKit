@@ -26,7 +26,7 @@ public final class MutuallyExclusive<T>: Condition {
     }
 }
 
-public class ExclusivityManager {
+final public class ExclusivityManager {
 
     static let sharedInstance = ExclusivityManager()
 
