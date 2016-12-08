@@ -53,11 +53,12 @@ public class TestableURLSessionTask: Equatable {
 
     public func cancel() {
         // Behavior: cancel the delayed completion, and call the completion handler immediately
+        // (Unless already finished)
+        guard shouldFinish() else { return }
         stateLock.withCriticalScope {
             _didCancel = true
             completionWorkItem.cancel()
         }
-        guard shouldFinish() else { return }
         completion(self)
     }
 
