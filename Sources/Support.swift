@@ -87,6 +87,11 @@ public class Protector<T> {
         return lock.write_sync({ block(&self.ward) })
     }
 
+    /// Synchronously overwrite the protected value
+    public func overwrite(with newValue: T) {
+        write { (ward: inout T) in ward = newValue }
+    }
+
     // Supports old callers that expect to pass in a completion block
     // NOTE: Like `write()`, this is synchronous.
     public func write(_ block: (inout T) -> Void, completion: (() -> Void)) {

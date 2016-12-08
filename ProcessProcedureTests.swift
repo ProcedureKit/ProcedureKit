@@ -46,10 +46,9 @@ class ProcessProcedureTests: ProcedureKitTestCase {
 
     func test__cancel_process_after_launched() {
         processProcedure = ProcessProcedure(launchPath: "/bin/bash/", arguments: ["-c", "sleep 2"])
-        processProcedure.addDidExecuteBlockObserver { (procedure) in
+        check(procedure: processProcedure, withTimeout: 1) { procedure in
             procedure.cancel()
         }
-        wait(for: processProcedure, withTimeout: 1)
         XCTAssertProcedureCancelledWithoutErrors(processProcedure)
     }
 
@@ -60,12 +59,10 @@ class ProcessProcedureTests: ProcedureKitTestCase {
     func test__processIdentifier_after_launched() {
         processProcedure = ProcessProcedure(launchPath: "/bin/bash/", arguments: ["-c", "sleep 1"])
         weak var didExecuteExpectation = expectation(description: "DidExecute: \(#function)")
-        var processIdentifier = Protector<Int32>(-1)
-        processProcedure.addDidExecuteBlockObserver { (procedure) in
+        let processIdentifier = Protector<Int32>(-1)
+        processProcedure.addDidExecuteBlockObserver { procedure in
             let retrievedProcessIdentifier = procedure.processIdentifier
-            processIdentifier.write({ (processIdentifier) in
-                processIdentifier = retrievedProcessIdentifier
-            })
+            processIdentifier.overwrite(with: retrievedProcessIdentifier)
             DispatchQueue.main.async {
                 didExecuteExpectation?.fulfill()
             }
@@ -83,7 +80,7 @@ class ProcessProcedureTests: ProcedureKitTestCase {
     func test__suspend_before_launched_returns_false() {
         weak var didSuspendExpectation = expectation(description: "Did Suspend: \(#function)")
         processProcedure = ProcessProcedure(launchPath: "/bin/bash/", arguments: ["-c", "sleep 1"])
-        processProcedure.suspend { (success) in
+        processProcedure.suspend { success in
             DispatchQueue.main.async {
                 XCTAssertFalse(success)
                 didSuspendExpectation?.fulfill()
@@ -96,7 +93,7 @@ class ProcessProcedureTests: ProcedureKitTestCase {
         wait(for: processProcedure)
         XCTAssertProcedureFinishedWithoutErrors(processProcedure)
         weak var didSuspendExpectation = expectation(description: "Did Suspend: \(#function)")
-        processProcedure.suspend { (success) in
+        processProcedure.suspend { success in
             DispatchQueue.main.async {
                 XCTAssertFalse(success)
                 didSuspendExpectation?.fulfill()
@@ -108,7 +105,7 @@ class ProcessProcedureTests: ProcedureKitTestCase {
     func test__resume_before_launched_returns_false() {
         weak var didResumeExpectation = expectation(description: "Did Resume: \(#function)")
         processProcedure = ProcessProcedure(launchPath: "/bin/bash/", arguments: ["-c", "sleep 1"])
-        processProcedure.resume { (success) in
+        processProcedure.resume { success in
             DispatchQueue.main.async {
                 XCTAssertFalse(success)
                 didResumeExpectation?.fulfill()
@@ -121,7 +118,7 @@ class ProcessProcedureTests: ProcedureKitTestCase {
         wait(for: processProcedure)
         XCTAssertProcedureFinishedWithoutErrors(processProcedure)
         weak var didResumeExpectation = expectation(description: "Did Resume: \(#function)")
-        processProcedure.resume { (success) in
+        processProcedure.resume { success in
             DispatchQueue.main.async {
                 XCTAssertFalse(success)
                 didResumeExpectation?.fulfill()
@@ -135,8 +132,8 @@ class ProcessProcedureTests: ProcedureKitTestCase {
         weak var didSuspendExpectation = expectation(description: "Did Suspend: \(#function)")
         weak var delayPassed = expectation(description: "Delay Passed: \(#function)")
         processProcedure = ProcessProcedure(launchPath: "/bin/bash/", arguments: ["-c", "sleep 1"])
-        processProcedure.addDidExecuteBlockObserver { (processProcedure) in
-            processProcedure.suspend { (success) in
+        processProcedure.addDidExecuteBlockObserver { procedure in
+            procedure.suspend { (success) in
                 DispatchQueue.main.async {
                     XCTAssertTrue(success)
                     didSuspendExpectation?.fulfill()
