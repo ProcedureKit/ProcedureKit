@@ -48,7 +48,7 @@ public class TestableURLSessionTask: Equatable {
         stateLock.withCriticalScope {
             _didResume = true
         }
-        DispatchQueue.main.asyncAfter(deadline: .now() + delay, execute: completionWorkItem)
+        DispatchQueue.global(qos: .default).asyncAfter(deadline: .now() + delay, execute: completionWorkItem)
     }
 
     public func cancel() {
