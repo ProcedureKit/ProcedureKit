@@ -50,6 +50,8 @@ class NetworkDownloadProcedureTests: ProcedureKitTestCase {
         XCTAssertTrue(session.didReturnDownloadTask?.didResume ?? false)
     }
 
+    // MARK: Cancellation
+
     func test__download_cancels_data_download_is_cancelled() {
         session.delay = 2.0
         let delay = DelayProcedure(by: 0.1)
@@ -60,6 +62,33 @@ class NetworkDownloadProcedureTests: ProcedureKitTestCase {
         XCTAssertProcedureCancelledWithoutErrors(download)
         XCTAssertTrue(session.didReturnDownloadTask?.didCancel ?? false)
     }
+
+    func test__download_cancelled_while_executing() {
+        session.delay = 2.0
+        download.addDidExecuteBlockObserver { (procedure) in
+            procedure.cancel()
+        }
+        wait(for: download)
+        XCTAssertProcedureCancelledWithoutErrors(download)
+    }
+
+    func test__download_cancelled_does_not_call_completion_handler() {
+        session.delay = 2.0
+        var calledCompletionHandler = false
+        download = NetworkDownloadProcedure(session: session, request: request) { _ in
+            DispatchQueue.onMain {
+                calledCompletionHandler = true
+            }
+        }
+        download.addDidExecuteBlockObserver { (procedure) in
+            procedure.cancel()
+        }
+        wait(for: download)
+        XCTAssertProcedureCancelledWithoutErrors(download)
+        XCTAssertFalse(calledCompletionHandler)
+    }
+
+    // MARK: Finishing
 
     func test__no_requirement__finishes_with_error() {
         download = NetworkDownloadProcedure(session: session) { _ in }
