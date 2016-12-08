@@ -3511,6 +3511,8 @@
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
+				DEVELOPMENT_TEAM = "";
+				CODE_SIGN_IDENTITY = "";
 			};
 			name = Debug;
 		};
