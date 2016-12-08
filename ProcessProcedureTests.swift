@@ -8,6 +8,7 @@
 import XCTest
 import ProcedureKit
 import TestingProcedureKit
+import Foundation
 @testable import ProcedureKitMac
 
 class ProcessProcedureTests: ProcedureKitTestCase {
@@ -27,6 +28,12 @@ class ProcessProcedureTests: ProcedureKitTestCase {
     }
 
     func test__start_process() {
+        wait(for: processProcedure)
+        XCTAssertProcedureFinishedWithoutErrors(processProcedure)
+    }
+
+    func test__start_process_with_launchpath_only() {
+        processProcedure = ProcessProcedure(launchPath: launchPath)
         wait(for: processProcedure)
         XCTAssertProcedureFinishedWithoutErrors(processProcedure)
     }
@@ -154,5 +161,71 @@ class ProcessProcedureTests: ProcedureKitTestCase {
         }
         waitForExpectations(timeout: 3, handler: nil)
         XCTAssertTrue(processProcedure.isFinished)
+    }
+
+    // MARK: - Configuration Properties (Read-only)
+
+    func test__arguments() {
+        processProcedure = ProcessProcedure(launchPath: launchPath, arguments: arguments)
+        XCTAssertEqual(processProcedure.arguments ?? [], arguments)
+    }
+
+    func test__currentDirectoryPath() {
+        let currentDirectoryPath = "/bin/"
+        processProcedure = ProcessProcedure(launchPath: launchPath, currentDirectoryPath: currentDirectoryPath)
+        XCTAssertEqual(processProcedure.currentDirectoryPath, currentDirectoryPath)
+    }
+
+    func test__environment() {
+        var environment = ProcessInfo().environment
+        environment.updateValue("new", forKey: "procedurekittest")
+        processProcedure = ProcessProcedure(launchPath: launchPath, environment: environment)
+        XCTAssertEqual(processProcedure.environment ?? [:], environment)
+    }
+
+    func test__launchPath() {
+        XCTAssertEqual(processProcedure.launchPath, launchPath)
+    }
+
+    func test__standardError() {
+        let pipe = Pipe()
+        processProcedure = ProcessProcedure(launchPath: launchPath, standardError: pipe)
+        guard let readValue = processProcedure.standardError else {
+            XCTFail("standardError is nil")
+            return
+        }
+        guard let readValueAsPipe = readValue as? Pipe else {
+            XCTFail("standardError is not expected type")
+            return
+        }
+        XCTAssertEqual(readValueAsPipe, pipe)
+    }
+
+    func test__standardInput() {
+        let pipe = Pipe()
+        processProcedure = ProcessProcedure(launchPath: launchPath, standardInput: pipe)
+        guard let readValue = processProcedure.standardInput else {
+            XCTFail("standardInput is nil")
+            return
+        }
+        guard let readValueAsPipe = readValue as? Pipe else {
+            XCTFail("standardInput is not expected type")
+            return
+        }
+        XCTAssertEqual(readValueAsPipe, pipe)
+    }
+
+    func test__standardOutput() {
+        let pipe = Pipe()
+        processProcedure = ProcessProcedure(launchPath: launchPath, standardOutput: pipe)
+        guard let readValue = processProcedure.standardOutput else {
+            XCTFail("standardOutput is nil")
+            return
+        }
+        guard let readValueAsPipe = readValue as? Pipe else {
+            XCTFail("standardOutput is not expected type")
+            return
+        }
+        XCTAssertEqual(readValueAsPipe, pipe)
     }
 }
