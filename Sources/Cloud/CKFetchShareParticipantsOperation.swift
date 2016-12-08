@@ -9,8 +9,11 @@ import CloudKit
 /// A generic protocol which exposes the properties used by Apple's CKFetchShareParticipantsOperation.
 public protocol CKFetchShareParticipantsOperationProtocol: CKOperationProtocol {
 
+    /// The type of the userIdentityLookupInfos property
+    associatedtype UserIdentityLookupInfosPropertyType
+
     /// - returns: the user identity lookup infos
-    var userIdentityLookupInfos: [UserIdentityLookupInfo] { get set }
+    var userIdentityLookupInfos: UserIdentityLookupInfosPropertyType { get set }
 
     /// - returns: the share participant fetched block
     var shareParticipantFetchedBlock: ((ShareParticipant) -> Void)? { get set }
@@ -28,7 +31,7 @@ extension CKFetchShareParticipantsOperation: CKFetchShareParticipantsOperationPr
 
 extension CKProcedure where T: CKFetchShareParticipantsOperationProtocol, T: AssociatedErrorProtocol, T.AssociatedError: CloudKitError {
 
-    public var userIdentityLookupInfos: [T.UserIdentityLookupInfo] {
+    public var userIdentityLookupInfos: T.UserIdentityLookupInfosPropertyType {
         get { return operation.userIdentityLookupInfos }
         set { operation.userIdentityLookupInfos = newValue }
     }
@@ -59,7 +62,7 @@ extension CloudKitProcedure where T: CKFetchShareParticipantsOperationProtocol, 
     public typealias FetchShareParticipantsCompletionBlock = (Void) -> Void
 
     /// - returns: the user identity lookup infos
-    public var userIdentityLookupInfos: [T.UserIdentityLookupInfo] {
+    public var userIdentityLookupInfos: T.UserIdentityLookupInfosPropertyType {
         get { return current.userIdentityLookupInfos }
         set {
             current.userIdentityLookupInfos = newValue

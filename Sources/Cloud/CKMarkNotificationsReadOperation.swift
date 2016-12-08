@@ -9,8 +9,11 @@ import CloudKit
 /// A generic protocol which exposes the properties used by Apple's CKMarkNotificationsReadOperation.
 public protocol CKMarkNotificationsReadOperationProtocol: CKOperationProtocol {
 
+    /// The type of the notificationIDs property
+    associatedtype NotificationIDsPropertyType
+
     /// - returns: the notification IDs
-    var notificationIDs: [NotificationID] { get set }
+    var notificationIDs: NotificationIDsPropertyType { get set }
 
     /// - returns: the completion block used when marking notifications
     var markNotificationsReadCompletionBlock: (([NotificationID]?, Error?) -> Void)? { get set }
@@ -30,7 +33,7 @@ extension CKMarkNotificationsReadOperation: CKMarkNotificationsReadOperationProt
 
 extension CKProcedure where T: CKMarkNotificationsReadOperationProtocol, T: AssociatedErrorProtocol, T.AssociatedError: CloudKitError {
 
-    public var notificationIDs: [T.NotificationID] {
+    public var notificationIDs: T.NotificationIDsPropertyType {
         get { return operation.notificationIDs }
         set { operation.notificationIDs = newValue }
     }
@@ -53,7 +56,7 @@ extension CloudKitProcedure where T: CKMarkNotificationsReadOperationProtocol, T
     public typealias MarkNotificationsReadCompletionBlock = ([T.NotificationID]?) -> Void
 
     /// - returns: the notification IDs
-    public var notificationIDs: [T.NotificationID] {
+    public var notificationIDs: T.NotificationIDsPropertyType {
         get { return current.notificationIDs }
         set {
             current.notificationIDs = newValue
