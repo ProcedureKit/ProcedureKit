@@ -6,6 +6,7 @@
 
 import Foundation
 import ProcedureKit
+import Dispatch
 
 open class ProcessProcedure: Procedure {
 
