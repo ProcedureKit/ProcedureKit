@@ -310,12 +310,16 @@ open class Procedure: Operation, ProcedureProtocol {
     public final override func start() {
         // Don't call super.start
 
-        guard !isCancelled || isAutomaticFinishingDisabled else {
-            finish()
-            return
-        }
+        // Replicate NSOperation.start() autorelease behavior
+        // (Push an autoreleasepool before calling main(), pop after main() returns)
+        autoreleasepool {
+            guard !isCancelled || isAutomaticFinishingDisabled else {
+                finish()
+                return
+            }
 
-        main()
+            main()
+        }
     }
 
     /// Triggers execution of the operation's task, correctly managing errors and the cancelled state. Cannot be over-ridden
@@ -585,18 +589,6 @@ open class Procedure: Operation, ProcedureProtocol {
         log.notice(message: "Did finish with \(messageSuffix).")
 
         didChangeValue(forKey: .finished)
-    }
-
-    /**
-     Public override which deliberately crashes your app, as usage is considered an antipattern
-
-     To promote best practices, where waiting is never the correct thing to do,
-     we will crash the app if this is called. Instead use discrete operations and
-     dependencies, or groups, or semaphores or even NSLocking.
-
-     */
-    public final override func waitUntilFinished() {
-        fatalError("Waiting on operations is an anti-pattern. Remove this ONLY if you're absolutely sure there is No Other Way™. Post a question in https://github.com/danthorpe/Operations if you are unsure.")
     }
 
     // MARK: - Observers

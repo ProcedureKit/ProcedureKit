@@ -4,6 +4,8 @@
 //  Copyright © 2016 ProcedureKit. All rights reserved.
 //
 
+#if !os(watchOS)
+
 import Foundation
 import Dispatch
 import SystemConfiguration
@@ -180,3 +182,5 @@ public extension SCNetworkReachabilityFlags {
         #endif
     }
 }
+
+#endif

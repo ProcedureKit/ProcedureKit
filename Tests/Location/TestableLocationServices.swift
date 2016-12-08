@@ -27,7 +27,7 @@ func createPlacemark(coordinate: CLLocationCoordinate2D) -> CLPlacemark {
 }
 
 class TestableLocationServicesRegistrar {
-    let fake = CLLocationManager()
+    static let fake = CLLocationManager()
 
     weak var delegate: CLLocationManagerDelegate? = nil
     var servicesEnabled = true
@@ -62,8 +62,8 @@ extension TestableLocationServicesRegistrar: LocationServicesRegistrarProtocol {
         didRequestAuthorization = true
         didRequestAuthorizationForUsage = requirement
         // In some cases CLLocationManager will immediately send a .NotDetermined
-        delegate?.locationManager!(fake, didChangeAuthorization: .notDetermined)
-        delegate?.locationManager!(fake, didChangeAuthorization: responseStatus)
+        delegate?.locationManager!(TestableLocationServicesRegistrar.fake, didChangeAuthorization: .notDetermined)
+        delegate?.locationManager!(TestableLocationServicesRegistrar.fake, didChangeAuthorization: responseStatus)
     }
 }
 
@@ -87,11 +87,11 @@ extension TestableLocationManager: LocationServicesProtocol {
     func pk_startUpdatingLocation() {
         didStartUpdatingLocation = true
         if let error = returnedError {
-            delegate?.locationManager!(fake, didFailWithError: error)
+            delegate?.locationManager!(TestableLocationServicesRegistrar.fake, didFailWithError: error)
         }
         else {
             DispatchQueue.main.asyncAfter(deadline: .now() + returnAfterDelay) {
-                self.delegate?.locationManager!(self.fake, didUpdateLocations: self.returnedLocation.flatMap { [$0] } ?? [])
+                self.delegate?.locationManager!(TestableLocationServicesRegistrar.fake, didUpdateLocations: self.returnedLocation.flatMap { [$0] } ?? [])
             }
         }
     }

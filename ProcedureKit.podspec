@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name              = "ProcedureKit"
-  s.version           = "4.0.0.beta.4"
+  s.version           = "4.0.0.beta.5"
   s.summary           = "Powerful Operation subclasses in Swift."
   s.description       = <<-DESC
   
@@ -60,10 +60,18 @@ session Advanced NSOperations: https://developer.apple.com/videos/wwdc/2015/?id=
   	ss.source_files = ['Sources/Cloud']
   end
 
+  # All cross-platform ProcedureKit
+  s.subspec 'All' do |ss|
+  	ss.dependency 'ProcedureKit/Network'
+  	ss.dependency 'ProcedureKit/Location'
+  	ss.dependency 'ProcedureKit/Cloud'  	  
+  end
+
   # ProcedureKitMobile
   s.subspec 'Mobile' do |ss|
     ss.platforms = { :ios => "8.0" }
   	ss.dependency 'ProcedureKit/Standard'
   	ss.source_files = ['Sources/Mobile']
   end
+  
 end

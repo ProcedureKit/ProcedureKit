@@ -170,4 +170,33 @@ class NetworkProcedureTests: ProcedureKitTestCase {
         XCTAssertProcedureFinishedWithoutErrors(procedure)
         XCTAssertEqual(procedure.count, 2)
     }
+
+    // Payload Injection
+
+    func test__payload_is_injected() {
+        let procedure = NetworkProcedure<Target>(body: createNetworkProcedure)
+        var didReceivePayload = false
+        let transform = TransformProcedure<Data, Bool> { data in
+            didReceivePayload = true
+            return true
+        }.injectPayload(fromNetwork: procedure)
+
+        wait(for: procedure, transform)
+        XCTAssertProcedureFinishedWithoutErrors(procedure)
+        XCTAssertTrue(didReceivePayload)
+    }
+
+    func test__payload_injection_error() {
+        session.returnedData = nil
+        let procedure = NetworkProcedure<Target>(body: createNetworkProcedure)
+        var didReceivePayload = false
+        let transform = TransformProcedure<Data, Bool> { data in
+            didReceivePayload = true
+            return true
+        }.injectPayload(fromNetwork: procedure)
+
+        wait(for: procedure, transform)
+        XCTAssertProcedureCancelledWithErrors(transform, count: 1)
+        XCTAssertFalse(didReceivePayload)
+    }
 }
