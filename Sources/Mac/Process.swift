@@ -118,6 +118,8 @@ open class ProcessProcedure: Procedure {
     }
 }
 
+// MARK: - Properties of the Process
+
 public extension ProcessProcedure {
 
     /// The processIdentifier for the started Process.
@@ -131,6 +133,51 @@ public extension ProcessProcedure {
             return DispatchQueue.onMain { process.processIdentifier }
         }
     }
+}
+
+// MARK: - Configuration Properties (Read-only)
+
+public extension ProcessProcedure {
+
+    /// (Read-only) The command arguments that should be used to launch the executable.
+    var arguments: [String]? {
+        get { return DispatchQueue.onMain { process.arguments } }
+    }
+
+    /// (Read-only) The current directory to be used when launching the executable.
+    var currentDirectoryPath: String {
+        get { return DispatchQueue.onMain { process.currentDirectoryPath } }
+    }
+
+    /// (Read-only) The environment to be used when launching the executable.
+    var environment: [String : String]? {
+        get { return DispatchQueue.onMain { process.environment } }
+    }
+
+    /// (Read-only) The path to the executable to be launched.
+    var launchPath: String {
+        get { return DispatchQueue.onMain { process.launchPath! } }
+    }
+
+    /// (Read-only) The standard error (FileHandle or Pipe object).
+    var standardError: Any? {
+        get { return DispatchQueue.onMain { process.standardError } }
+    }
+
+    /// (Read-only) The standard input (FileHandle or Pipe object).
+    var standardInput: Any? {
+        get { return DispatchQueue.onMain { process.standardInput } }
+    }
+
+    /// (Read-only) The standard output (FileHandle or Pipe object).
+    var standardOutput: Any? {
+        get { return DispatchQueue.onMain { process.standardOutput } }
+    }
+}
+
+// MARK: - Process Suspend / Resume
+
+public extension ProcessProcedure {
 
     /// Resumes execution of the ProcessProcedure's Process that had previously been suspended with
     /// a call to suspend().
