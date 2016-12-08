@@ -14,23 +14,59 @@ public class TestableURLSessionTask: Equatable {
         return lhs.uuid == rhs.uuid
     }
 
+    public typealias CompletionBlock = (TestableURLSessionTask) -> Void
+
+    public let delay: TimeInterval
     public let uuid = UUID()
-    public let completion: () -> Void
 
-    public var didResume = false
-    public var didCancel = false
+    public var didResume: Bool {
+        get { return stateLock.withCriticalScope { _didResume } }
+    }
+    public var didCancel: Bool {
+        get { return stateLock.withCriticalScope { _didCancel } }
+    }
 
-    public init(completion: @escaping () -> Void) {
+    private let completion: CompletionBlock
+    private var completionWorkItem: DispatchWorkItem!
+    private var stateLock = NSLock()
+    private var _didResume = false
+    private var _didCancel = false
+    private var _didFinish = false
+
+    public init(delay: TimeInterval = 0.000_001, completion: @escaping CompletionBlock) {
+        self.delay = delay
         self.completion = completion
+        self.completionWorkItem = DispatchWorkItem(block: { [weak self] in
+            guard let strongSelf = self else { return }
+            guard !strongSelf.completionWorkItem.isCancelled else { return }
+            guard strongSelf.shouldFinish() else { return }
+            completion(strongSelf)
+        })
     }
 
     public func resume() {
-        didResume = true
-        completion()
+        stateLock.withCriticalScope {
+            _didResume = true
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + delay, execute: completionWorkItem)
     }
 
     public func cancel() {
-        didCancel = true
+        // Behavior: cancel the delayed completion, and call the completion handler immediately
+        stateLock.withCriticalScope {
+            _didCancel = true
+            completionWorkItem.cancel()
+        }
+        guard shouldFinish() else { return }
+        completion(self)
+    }
+
+    private func shouldFinish() -> Bool {
+        return stateLock.withCriticalScope { () -> Bool in
+            guard !_didFinish else { return false }
+            _didFinish = true
+            return true
+        }
     }
 }
 
@@ -58,8 +94,12 @@ public class TestableURLSessionTaskFactory {
 
     public func dataTask(with request: URLRequest, completionHandler: @escaping (Data?, URLResponse?, Error?) -> Void) -> TestableURLSessionTask {
         didReceiveDataRequest = request
-        let task = TestableURLSessionTask {
-            DispatchQueue.main.asyncAfter(deadline: .now() + self.delay) {
+        let task = TestableURLSessionTask(delay: delay) { (task) in
+            DispatchQueue.main.async {
+                guard !task.didCancel else {
+                    completionHandler(nil, nil, self.cancelledError(forRequest: request))
+                    return
+                }
                 completionHandler(self.returnedData, self.returnedResponse, self.returnedError)
             }
         }
@@ -69,8 +109,12 @@ public class TestableURLSessionTaskFactory {
 
     public func downloadTask(with request: URLRequest, completionHandler: @escaping (URL?, URLResponse?, Error?) -> Void) -> TestableURLSessionTask {
         didReceiveDownloadRequest = request
-        let task = TestableURLSessionTask {
-            DispatchQueue.main.asyncAfter(deadline: .now() + self.delay) {
+        let task = TestableURLSessionTask(delay: delay) { (task) in
+            DispatchQueue.main.async {
+                guard !task.didCancel else {
+                    completionHandler(nil, nil, self.cancelledError(forRequest: request))
+                    return
+                }
                 completionHandler(self.returnedURL, self.returnedResponse, self.returnedError)
             }
         }
@@ -81,12 +125,27 @@ public class TestableURLSessionTaskFactory {
     public func uploadTask(with request: URLRequest, from bodyData: Data?, completionHandler: @escaping (Data?, URLResponse?, Error?) -> Void) -> TestableURLSessionTask {
 
         didReceiveUploadRequest = request
-        let task = TestableURLSessionTask {
-            DispatchQueue.main.asyncAfter(deadline: .now() + self.delay) {
+        let task = TestableURLSessionTask(delay: delay) { (task) in
+            DispatchQueue.main.async {
+                guard !task.didCancel else {
+                    completionHandler(nil, nil, self.cancelledError(forRequest: request))
+                    return
+                }
                 completionHandler(self.returnedData, self.returnedResponse, self.returnedError)
             }
         }
         didReturnUploadTask = task
         return task
+    }
+
+    private func cancelledError(forRequest request: URLRequest) -> Error {
+        var userInfo: [AnyHashable: Any] = [NSLocalizedDescriptionKey: "cancelled"]
+        if let requestURL = request.url {
+            userInfo[NSURLErrorFailingURLErrorKey] = requestURL
+        }
+        if let requestURLString = request.url?.absoluteString {
+            userInfo[NSURLErrorFailingURLStringErrorKey] = requestURLString
+        }
+        return NSError(domain: NSURLErrorDomain, code: NSURLErrorCancelled, userInfo: userInfo)
     }
 }
