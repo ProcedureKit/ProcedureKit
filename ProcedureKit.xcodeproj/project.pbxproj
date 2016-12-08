@@ -13,7 +13,6 @@
 		0B7922311DCCD88A000AC3CA /* ProfilerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B7922301DCCD88A000AC3CA /* ProfilerTests.swift */; };
 		0B795A8C1DC9E52F00E03CE8 /* NetworkDownload.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B795A8B1DC9E52F00E03CE8 /* NetworkDownload.swift */; };
 		0B795A8F1DC9EE6D00E03CE8 /* NetworkDownloadProcedureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B795A8D1DC9EE2E00E03CE8 /* NetworkDownloadProcedureTests.swift */; };
-		0BB369461DCB524400AB91BD /* ProcessProcedureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BB369441DCB51E000AB91BD /* ProcessProcedureTests.swift */; };
 		0BC54B7B1DCB4906006C7DE2 /* Process.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BC54B7A1DCB4906006C7DE2 /* Process.swift */; };
 		650182C91D8916EC0052CE90 /* DelayProcedureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 650182C81D8916EC0052CE90 /* DelayProcedureTests.swift */; };
 		6518D5E31D7B3A2800A12EF4 /* Condition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6518D5E21D7B3A2800A12EF4 /* Condition.swift */; };
@@ -183,6 +182,7 @@
 		65A63B171DA0536200E90B9D /* CapabilityTestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65A63B161DA0536200E90B9D /* CapabilityTestCase.swift */; };
 		65A72C2A1DA7F37C008597CA /* ProcedureKit.framework in Copy Dependencies */ = {isa = PBXBuildFile; fileRef = 65CFC5F01D608A5500CAD875 /* ProcedureKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		65A72C2B1DA7F37C008597CA /* TestingProcedureKit.framework in Copy Dependencies */ = {isa = PBXBuildFile; fileRef = 65CFC6161D60900000CAD875 /* TestingProcedureKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		65AA39EC1DFA0707000942A7 /* ProcessProcedureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65AA39EB1DFA0707000942A7 /* ProcessProcedureTests.swift */; };
 		65B3D63D1DAC20F80074CA9D /* ReverseGeocode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65B3D63C1DAC20F80074CA9D /* ReverseGeocode.swift */; };
 		65B3D6401DAC2FF40074CA9D /* ReverseGeocodeProcedureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65B3D63F1DAC2FF40074CA9D /* ReverseGeocodeProcedureTests.swift */; };
 		65B3D6441DAC40180074CA9D /* ReverseGeocodeUserLocation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65B3D6431DAC40180074CA9D /* ReverseGeocodeUserLocation.swift */; };
@@ -492,7 +492,6 @@
 		0B7922301DCCD88A000AC3CA /* ProfilerTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ProfilerTests.swift; path = Tests/ProfilerTests.swift; sourceTree = "<group>"; };
 		0B795A8B1DC9E52F00E03CE8 /* NetworkDownload.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkDownload.swift; sourceTree = "<group>"; };
 		0B795A8D1DC9EE2E00E03CE8 /* NetworkDownloadProcedureTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkDownloadProcedureTests.swift; sourceTree = "<group>"; };
-		0BB369441DCB51E000AB91BD /* ProcessProcedureTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProcessProcedureTests.swift; sourceTree = "<group>"; };
 		0BC54B7A1DCB4906006C7DE2 /* Process.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Process.swift; path = Sources/Mac/Process.swift; sourceTree = "<group>"; };
 		650182C81D8916EC0052CE90 /* DelayProcedureTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = DelayProcedureTests.swift; path = Tests/DelayProcedureTests.swift; sourceTree = "<group>"; };
 		6518D5E21D7B3A2800A12EF4 /* Condition.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Condition.swift; path = Sources/Condition.swift; sourceTree = "<group>"; };
@@ -659,6 +658,7 @@
 		65A63B121DA03D1C00E90B9D /* Capability.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Capability.swift; path = Sources/Capability.swift; sourceTree = "<group>"; };
 		65A63B141DA04FDB00E90B9D /* CapabilityTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CapabilityTests.swift; path = Tests/CapabilityTests.swift; sourceTree = "<group>"; };
 		65A63B161DA0536200E90B9D /* CapabilityTestCase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CapabilityTestCase.swift; path = Sources/Testing/CapabilityTestCase.swift; sourceTree = "<group>"; };
+		65AA39EB1DFA0707000942A7 /* ProcessProcedureTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ProcessProcedureTests.swift; path = Tests/Mac/ProcessProcedureTests.swift; sourceTree = "<group>"; };
 		65B3D63C1DAC20F80074CA9D /* ReverseGeocode.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReverseGeocode.swift; sourceTree = "<group>"; };
 		65B3D63F1DAC2FF40074CA9D /* ReverseGeocodeProcedureTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReverseGeocodeProcedureTests.swift; sourceTree = "<group>"; };
 		65B3D6431DAC40180074CA9D /* ReverseGeocodeUserLocation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReverseGeocodeUserLocation.swift; sourceTree = "<group>"; };
@@ -1047,7 +1047,7 @@
 			isa = PBXGroup;
 			children = (
 				653CA04C1D60A6C80070B7A2 /* ProcedureKitMacTests.swift */,
-				0BB369441DCB51E000AB91BD /* ProcessProcedureTests.swift */,
+				65AA39EB1DFA0707000942A7 /* ProcessProcedureTests.swift */,
 			);
 			name = "Mac Tests";
 			sourceTree = "<group>";
@@ -1960,7 +1960,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				653CA04D1D60A6C80070B7A2 /* ProcedureKitMacTests.swift in Sources */,
-				0BB369461DCB524400AB91BD /* ProcessProcedureTests.swift in Sources */,
+				65AA39EC1DFA0707000942A7 /* ProcessProcedureTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2354,7 +2354,6 @@
 				CLANG_WARN_SUSPICIOUS_MOVES = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_IDENTITY = "";
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = dwarf;
@@ -2411,7 +2410,6 @@
 				CLANG_WARN_SUSPICIOUS_MOVES = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_IDENTITY = "";
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
@@ -2463,7 +2461,6 @@
 				CLANG_WARN_SUSPICIOUS_MOVES = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = "";
@@ -2515,7 +2512,6 @@
 				CLANG_WARN_SUSPICIOUS_MOVES = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = "";
@@ -2560,7 +2556,6 @@
 				CLANG_WARN_SUSPICIOUS_MOVES = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_IDENTITY = "";
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = dwarf;
@@ -2618,7 +2613,6 @@
 				CLANG_WARN_SUSPICIOUS_MOVES = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_IDENTITY = "";
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
@@ -2859,7 +2853,6 @@
 				CLANG_WARN_SUSPICIOUS_MOVES = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_IDENTITY = "";
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1;
@@ -2919,7 +2912,6 @@
 				CLANG_WARN_SUSPICIOUS_MOVES = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_IDENTITY = "";
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1;
@@ -3065,7 +3057,6 @@
 				CLANG_WARN_SUSPICIOUS_MOVES = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_IDENTITY = "";
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1;
@@ -3125,7 +3116,6 @@
 				CLANG_WARN_SUSPICIOUS_MOVES = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_IDENTITY = "";
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1;
@@ -3386,7 +3376,6 @@
 				CLANG_WARN_SUSPICIOUS_MOVES = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -3437,7 +3426,6 @@
 				CLANG_WARN_SUSPICIOUS_MOVES = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
@@ -3658,7 +3646,6 @@
 				CLANG_WARN_SUSPICIOUS_MOVES = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_IDENTITY = "";
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1;
@@ -3715,7 +3702,6 @@
 				CLANG_WARN_SUSPICIOUS_MOVES = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_IDENTITY = "";
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1;
