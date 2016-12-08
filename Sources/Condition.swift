@@ -84,7 +84,7 @@ open class Condition: Procedure, ConditionProtocol, OutputProcedure {
         completion(result)
     }
 
-    internal func finish(withConditionResult conditionResult: ConditionResult) {
+    final internal func finish(withConditionResult conditionResult: ConditionResult) {
         output = .ready(conditionResult)
         finish(withError: conditionResult.error)
     }
