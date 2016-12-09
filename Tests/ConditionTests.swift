@@ -234,5 +234,57 @@ class ConditionTests: ProcedureKitTestCase {
         wait(for: procedure)
         XCTAssertProcedureCancelledWithoutErrors()
     }
+
+    // MARK: - Condition Cancellation
+
+    func test__condition_cancelled_before_evaluation_skips_evaluation() {
+        var didEvaluateCondition = false
+        let condition = TestCondition() {
+            didEvaluateCondition = true
+            return ConditionResult.success(true)
+        }
+        procedure.add(condition: condition)
+        condition.cancel()
+        wait(for: procedure)
+        XCTAssertFalse(didEvaluateCondition)
+        XCTAssertProcedureCancelledWithoutErrors(procedure)
+    }
+
+    func test_condition_cancelled_before_evaluation_but_after_procedure_is_added_to_queue_is_immediately_finished() {
+        let dependencySemaphore = DispatchSemaphore(value: 0)
+        let dependency = BlockProcedure {
+            // prevent the dependency procedure from finishing before signaled
+            dependencySemaphore.wait()
+        }
+        var didEvaluateCondition = false
+        let condition = TestCondition() {
+            didEvaluateCondition = true
+            return ConditionResult.success(true)
+        }
+        let procedureSemaphore = DispatchSemaphore(value: 0)
+        let procedure = BlockProcedure {
+            // prevent the main procedure from finishing before signaled (unless cancelled)
+            procedureSemaphore.wait()
+        }
+        procedure.add(condition: condition)
+        procedure.add(dependency: dependency)
+        check(procedure: procedure, withAdditionalProcedures: dependency) { _ in
+            let conditionFinishedSemaphore = DispatchSemaphore(value: 0)
+            condition.addDidFinishBlockObserver(block: { (_, _) in
+                conditionFinishedSemaphore.signal()
+            })
+            condition.cancel()
+            dependencySemaphore.signal()
+            // the condition is now cancelled and should be unblocked from running
+            // as its dependency is able to finish
+            // wait 1 second to see if the condition finishes
+            guard conditionFinishedSemaphore.wait(timeout: .now() + 1.0) == .success else {
+                XCTFail("Condition did not finish immediately after it was cancelled.")
+                return
+            }
+        }
+        XCTAssertFalse(didEvaluateCondition)
+        XCTAssertProcedureCancelledWithoutErrors(procedure)
+    }
 }
 
