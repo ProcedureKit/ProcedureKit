@@ -453,7 +453,7 @@ public extension CloudKitOperation where T: BatchModifyOperationType {
 
 extension OPRCKOperation where T: CKAcceptSharesOperationType, T: AssociatedErrorType, T.Error: CloudKitErrorType {
 
-    public var shareMetadatas: [T.ShareMetadata] {
+    public var shareMetadatas: T.ShareMetadatasPropertyType {
         get { return operation.shareMetadatas }
         set { operation.shareMetadatas = newValue }
     }
@@ -484,7 +484,7 @@ extension CloudKitOperation where T: CKAcceptSharesOperationType {
     public typealias AcceptSharesCompletionBlock = () -> Void
 
     /// - returns: the share metadatas
-    public var shareMetadatas: [T.ShareMetadata] {
+    public var shareMetadatas: T.ShareMetadatasPropertyType {
         get { return operation.shareMetadatas }
         set {
             operation.shareMetadatas = newValue
@@ -839,7 +839,7 @@ extension MarkNotificationsReadError: CloudKitBatchProcessErrorType {
 
 extension OPRCKOperation where T: CKMarkNotificationsReadOperationType, T: AssociatedErrorType, T.Error: CloudKitErrorType {
 
-    public var notificationIDs: [T.NotificationID] {
+    public var notificationIDs: T.NotificationIDsPropertyType {
         get { return operation.notificationIDs }
         set { operation.notificationIDs = newValue }
     }
@@ -862,7 +862,7 @@ extension CloudKitOperation where T: CKMarkNotificationsReadOperationType {
     public typealias MarkNotificationReadCompletionBlock = [T.NotificationID]? -> Void
 
     /// - returns: the notification IDs
-    public var notificationIDs: [T.NotificationID] {
+    public var notificationIDs: T.NotificationIDsPropertyType {
         get { return operation.notificationIDs }
         set {
             operation.notificationIDs = newValue
@@ -1035,7 +1035,7 @@ public struct FetchRecordChangesError<ServerChangeToken>: CloudKitErrorType {
 
 extension OPRCKOperation where T: CKFetchRecordChangesOperationType, T: AssociatedErrorType, T.Error: CloudKitErrorType {
 
-    public var recordZoneID: T.RecordZoneID {
+    public var recordZoneID: T.RecordZoneIDPropertyType {
         get { return operation.recordZoneID }
         set { operation.recordZoneID = newValue }
     }
@@ -1074,7 +1074,7 @@ extension CloudKitOperation where T: CKFetchRecordChangesOperationType {
     public typealias FetchRecordChangesCompletionBlock = (T.ServerChangeToken?, NSData?) -> Void
 
     /// - returns: the record zone ID
-    public var recordZoneID: T.RecordZoneID {
+    public var recordZoneID: T.RecordZoneIDPropertyType {
         get { return operation.recordZoneID }
         set {
             operation.recordZoneID = newValue
@@ -1115,7 +1115,7 @@ extension CloudKitOperation where T: CKFetchRecordChangesOperationType {
 extension BatchedCloudKitOperation where T: CKFetchRecordChangesOperationType {
 
     /// - returns: the record zone ID
-    public var recordZoneID: T.RecordZoneID {
+    public var recordZoneID: T.RecordZoneIDPropertyType {
         get { return operation.recordZoneID }
         set {
             operation.recordZoneID = newValue
@@ -1317,7 +1317,7 @@ public struct FetchRecordZoneChangesError: CloudKitErrorType {
 extension OPRCKOperation where T: CKFetchRecordZoneChangesOperationType, T: AssociatedErrorType, T.Error: CloudKitErrorType {
 
     /// - returns: the record zone IDs which will fetch changes
-    public var recordZoneIDs: [T.RecordZoneID] {
+    public var recordZoneIDs: T.RecordZoneIDsPropertyType {
         get { return operation.recordZoneIDs }
         set { operation.recordZoneIDs = newValue }
     }
@@ -1377,7 +1377,7 @@ extension CloudKitOperation where T: CKFetchRecordZoneChangesOperationType {
     public typealias FetchRecordZoneChangesCompletionBlock = (Void) -> Void
 
     /// - returns: the record zone IDs which will fetch changes
-    public var recordZoneIDs: [T.RecordZoneID] {
+    public var recordZoneIDs: T.RecordZoneIDsPropertyType {
         get { return operation.recordZoneIDs }
         set {
             operation.recordZoneIDs = newValue
@@ -1437,7 +1437,7 @@ extension CloudKitOperation where T: CKFetchRecordZoneChangesOperationType {
 
 extension OPRCKOperation where T: CKFetchShareMetadataOperationType, T: AssociatedErrorType, T.Error: CloudKitErrorType {
 
-    public var shareURLs: [NSURL] {
+    public var shareURLs: T.ShareURLsPropertyType {
         get { return operation.shareURLs }
         set { operation.shareURLs = newValue }
     }
@@ -1478,7 +1478,7 @@ extension CloudKitOperation where T: CKFetchShareMetadataOperationType {
     public typealias FetchShareMetadataCompletionBlock = (Void) -> Void
 
     /// - returns: the share URLs
-    public var shareURLs: [NSURL] {
+    public var shareURLs: T.ShareURLsPropertyType {
         get { return operation.shareURLs }
         set {
             operation.shareURLs = newValue
@@ -1529,7 +1529,7 @@ extension CloudKitOperation where T: CKFetchShareMetadataOperationType {
 
 extension OPRCKOperation where T: CKFetchShareParticipantsOperationType, T: AssociatedErrorType, T.Error: CloudKitErrorType {
 
-    public var userIdentityLookupInfos: [T.UserIdentityLookupInfo] {
+    public var userIdentityLookupInfos: T.UserIdentityLookupInfosPropertyType {
         get { return operation.userIdentityLookupInfos }
         set { operation.userIdentityLookupInfos = newValue }
     }
@@ -1560,7 +1560,7 @@ extension CloudKitOperation where T: CKFetchShareParticipantsOperationType {
     public typealias FetchShareParticipantsCompletionBlock = (Void) -> Void
 
     /// - returns: the user identity lookup infos
-    public var userIdentityLookupInfos: [T.UserIdentityLookupInfo] {
+    public var userIdentityLookupInfos: T.UserIdentityLookupInfosPropertyType {
         get { return operation.userIdentityLookupInfos }
         set {
             operation.userIdentityLookupInfos = newValue
@@ -1770,7 +1770,7 @@ extension OPRCKOperation where T: CKModifyRecordsOperationType, T: AssociatedErr
         set { operation.perRecordProgressBlock = newValue }
     }
 
-    public var perRecordCompletionBlock: CloudKitOperation<T>.ModifyRecordsPerRecordCompletionBlock? {
+    public var perRecordCompletionBlock: CloudKitOperation<T>.ModifyRecordsPerRecordCompletionBlock {
         get { return operation.perRecordCompletionBlock }
         set { operation.perRecordCompletionBlock = newValue }
     }
@@ -1793,7 +1793,7 @@ extension CloudKitOperation where T: CKModifyRecordsOperationType {
     public typealias ModifyRecordsPerRecordProgressBlock = (T.Record, Double) -> Void
 
     /// A typealias for the block types used by CloudKitOperation<CKModifyRecordsOperation>
-    public typealias ModifyRecordsPerRecordCompletionBlock = (T.Record?, NSError?) -> Void
+    public typealias ModifyRecordsPerRecordCompletionBlock = T.PerRecordCompletionBlockType
 
     /// A typealias for the block types used by CloudKitOperation<CKModifyRecordsOperation>
     public typealias ModifyRecordsCompletionBlock = ([T.Record]?, [T.RecordID]?) -> Void
@@ -1853,7 +1853,7 @@ extension CloudKitOperation where T: CKModifyRecordsOperationType {
     }
 
     /// - returns: a block for per record completion
-    public var perRecordCompletionBlock: ModifyRecordsPerRecordCompletionBlock? {
+    public var perRecordCompletionBlock: ModifyRecordsPerRecordCompletionBlock {
         get { return operation.perRecordCompletionBlock }
         set {
             operation.perRecordCompletionBlock = newValue
