@@ -1,3 +1,8 @@
+# 3.4.1
+This is a release suitable for submission for iOS 10, but built using Swift 2.3 & Xcode 8.2.
+
+1. [OPR-652](https://github.com/ProcedureKit/ProcedureKit/pull/652) Update CloudKit interfaces which have changed in Xcode 8.2 - note that this is still Swift 2.3.
+
 # 3.4.0
 
 This is a release suitable for submission for iOS 10, but built using Swift 2.3 & Xcode 8.
