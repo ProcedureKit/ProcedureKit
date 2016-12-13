@@ -247,7 +247,6 @@
 		658158481C20DBAD0086FB2A /* ResultInjection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 658158441C20DBAD0086FB2A /* ResultInjection.swift */; };
 		658174FF1D81921A004B0E08 /* CalendarCapability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 658174FE1D81921A004B0E08 /* CalendarCapability.swift */; };
 		658175001D81921A004B0E08 /* CalendarCapability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 658174FE1D81921A004B0E08 /* CalendarCapability.swift */; };
-		658175011D81921A004B0E08 /* CalendarCapability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 658174FE1D81921A004B0E08 /* CalendarCapability.swift */; };
 		658175021D81921A004B0E08 /* CalendarCapability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 658174FE1D81921A004B0E08 /* CalendarCapability.swift */; };
 		6581750A1D81A94B004B0E08 /* CloudCapability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 658175051D81A94B004B0E08 /* CloudCapability.swift */; };
 		6581750B1D81A94B004B0E08 /* CloudCapability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 658175051D81A94B004B0E08 /* CloudCapability.swift */; };
@@ -1502,7 +1501,6 @@
 				652618D71C11F93F00654091 /* AlertOperation.swift in Sources */,
 				65BB56D91C70F29500DF5211 /* ThreadSafety.swift in Sources */,
 				652618891C11F8FE00654091 /* BlockOperation.swift in Sources */,
-				658175011D81921A004B0E08 /* CalendarCapability.swift in Sources */,
 				6526188A1C11F8FE00654091 /* ComposedOperation.swift in Sources */,
 				6526189A1C11F8FE00654091 /* TimeoutObserver.swift in Sources */,
 				65C98C741C281EEC00BA76B7 /* FunctionalOperations.swift in Sources */,
