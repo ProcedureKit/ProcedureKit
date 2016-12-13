@@ -183,8 +183,11 @@ public protocol CKDiscoverAllContactsOperationType: CKOperationType {
 /// A generic protocol which exposes the properties used by Apple's CKAcceptSharesOperation.
 public protocol CKAcceptSharesOperationType: CKOperation2Type {
 
+    /// The type of the shareMetadatas property
+    associatedtype ShareMetadatasPropertyType
+
     /// - returns: the share metadatas
-    var shareMetadatas: [ShareMetadata] { get set }
+    var shareMetadatas: ShareMetadatasPropertyType { get set }
 
     /// - returns: the block used to return accepted shares
     var perShareCompletionBlock: ((ShareMetadata, Share?, NSError?) -> Void)? { get set }
@@ -242,8 +245,11 @@ public protocol CKFetchNotificationChangesOperationType: CKFetchOperationType {
 /// A generic protocol which exposes the properties used by Apple's CKMarkNotificationsReadOperation.
 public protocol CKMarkNotificationsReadOperationType: CKOperationType {
 
+    /// The type of the notificationIDs property
+    associatedtype NotificationIDsPropertyType
+
     /// - returns: the notification IDs
-    var notificationIDs: [NotificationID] { get set }
+    var notificationIDs: NotificationIDsPropertyType { get set }
 
     /// - returns: the completion block used when marking notifications
     var markNotificationsReadCompletionBlock: (([NotificationID]?, NSError?) -> Void)? { get set }
@@ -278,8 +284,11 @@ public protocol CKFetchDatabaseChangesOperationType: CKDatabaseOperationType, CK
 /// A generic protocol which exposes the properties used by Apple's CKFetchRecordChangesOperation.
 public protocol CKFetchRecordChangesOperationType: CKDatabaseOperationType, CKFetchOperationType, CKDesiredKeys {
 
+    /// The type of the recordZoneID property
+    associatedtype RecordZoneIDPropertyType
+
     /// - returns: the record zone ID whcih will fetch changes
-    var recordZoneID: RecordZoneID { get set }
+    var recordZoneID: RecordZoneIDPropertyType { get set }
 
     /// - returns: a block for when a record is changed
     var recordChangedBlock: ((Record) -> Void)? { get set }
@@ -323,8 +332,11 @@ public protocol CKFetchRecordZoneChangesOperationType: CKDatabaseOperationType, 
     /// The type of the CloudKit FetchRecordZoneChangesOptions
     associatedtype FetchRecordZoneChangesOptions
 
+    /// The type of the recordZoneIDs property
+    associatedtype RecordZoneIDsPropertyType
+
     /// - returns: the record zone IDs which will fetch changes
-    var recordZoneIDs: [RecordZoneID] { get set }
+    var recordZoneIDs: RecordZoneIDsPropertyType { get set }
 
     /// - returns: the per-record-zone options
     var optionsByRecordZoneID: [RecordZoneID : FetchRecordZoneChangesOptions]? { get set }
@@ -348,8 +360,11 @@ public protocol CKFetchRecordZoneChangesOperationType: CKDatabaseOperationType, 
 /// A generic protocol which exposes the properties used by Apple's CKFetchShareMetadataOperation.
 public protocol CKFetchShareMetadataOperationType: CKOperation2Type {
 
+    /// The type of the shareURLs property
+    associatedtype ShareURLsPropertyType
+
     /// - returns: the share URLs
-    var shareURLs: [NSURL] { get set }
+    var shareURLs: ShareURLsPropertyType { get set }
 
     /// - returns: whether to fetch the share root record
     var shouldFetchRootRecord: Bool { get set }
@@ -367,8 +382,11 @@ public protocol CKFetchShareMetadataOperationType: CKOperation2Type {
 /// A generic protocol which exposes the properties used by Apple's CKFetchShareParticipantsOperation.
 public protocol CKFetchShareParticipantsOperationType: CKOperation2Type {
 
+    /// The type of the userIdentityLookupInfos property
+    associatedtype UserIdentityLookupInfosPropertyType
+
     /// - returns: the user identity lookup infos
-    var userIdentityLookupInfos: [UserIdentityLookupInfo] { get set }
+    var userIdentityLookupInfos: UserIdentityLookupInfosPropertyType { get set }
 
     /// - returns: the share participant fetched block
     var shareParticipantFetchedBlock: ((ShareParticipant) -> Void)? { get set }
@@ -403,6 +421,9 @@ public protocol CKModifyRecordZonesOperationType: CKDatabaseOperationType {
 // A generic protocol which exposes the properties used by Apple's CKModifyRecordsOperation.
 public protocol CKModifyRecordsOperationType: CKDatabaseOperationType {
 
+    /// The type of the perRecordCompletionBlock property
+    associatedtype PerRecordCompletionBlockType
+
     /// - returns: the records to save
     var recordsToSave: [Record]? { get set }
 
@@ -422,7 +443,7 @@ public protocol CKModifyRecordsOperationType: CKDatabaseOperationType {
     var perRecordProgressBlock: ((Record, Double) -> Void)? { get set }
 
     /// - returns: a per record completion block
-    var perRecordCompletionBlock: ((Record?, NSError?) -> Void)? { get set }
+    var perRecordCompletionBlock: PerRecordCompletionBlockType { get set }
 
     /// - returns: the modify records completion block
     var modifyRecordsCompletionBlock: (([Record]?, [RecordID]?, NSError?) -> Void)? { get set }
