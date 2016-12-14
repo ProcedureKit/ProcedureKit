@@ -92,6 +92,8 @@ open class GroupProcedure: Procedure, ProcedureQueueDelegate {
                 operations.forEach { $0.cancel() }
                 procedures.forEach { $0.cancel(withError: ProcedureKitError.parent(cancelledWithErrors: errors)) }
             }
+            // the GroupProcedure ensures that `finish()` is called once all the
+            // children have finished in `operationQueue(_, didFinishOperation:)`
         }
     }
 
