@@ -54,6 +54,7 @@ class NetworkUploadProcedureTests: ProcedureKitTestCase {
         XCTAssertTrue(session.didReturnUploadTask?.didResume ?? false)
     }
 
+    // MARK: Cancellation
 
     func test__upload_cancels_data_task_is_cancelled() {
         session.delay = 2.0
@@ -65,6 +66,33 @@ class NetworkUploadProcedureTests: ProcedureKitTestCase {
         XCTAssertProcedureCancelledWithoutErrors(upload)
         XCTAssertTrue(session.didReturnUploadTask?.didCancel ?? false)
     }
+
+    func test__upload_cancelled_while_executing() {
+        session.delay = 2.0
+        upload.addDidExecuteBlockObserver { (procedure) in
+            procedure.cancel()
+        }
+        wait(for: upload)
+        XCTAssertProcedureCancelledWithoutErrors(upload)
+    }
+
+    func test__upload_cancelled_does_not_call_completion_handler() {
+        session.delay = 2.0
+        var calledCompletionHandler = false
+        upload = NetworkUploadProcedure(session: session, request: request, data: sendingData) { _ in
+            DispatchQueue.onMain {
+                calledCompletionHandler = true
+            }
+        }
+        upload.addDidExecuteBlockObserver { (procedure) in
+            procedure.cancel()
+        }
+        wait(for: upload)
+        XCTAssertProcedureCancelledWithoutErrors(upload)
+        XCTAssertFalse(calledCompletionHandler)
+    }
+
+    // MARK: Finishing
 
     func test__no_requirement__finishes_with_error() {
         upload = NetworkUploadProcedure(session: session) { _ in }

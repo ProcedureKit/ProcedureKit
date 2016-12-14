@@ -9,8 +9,11 @@ import CloudKit
 /// A generic protocol which exposes the properties used by Apple's CKFetchRecordChangesOperation.
 public protocol CKFetchRecordChangesOperationProtocol: CKDatabaseOperationProtocol, CKFetchOperation, CKDesiredKeys {
 
+    /// The type of the recordZoneID property
+    associatedtype RecordZoneIDPropertyType
+
     /// - returns: the record zone ID whcih will fetch changes
-    var recordZoneID: RecordZoneID { get set }
+    var recordZoneID: RecordZoneIDPropertyType { get set }
 
     /// - returns: a block for when a record is changed
     var recordChangedBlock: ((Record) -> Void)? { get set }
@@ -41,7 +44,7 @@ extension CKFetchRecordChangesOperation: CKFetchRecordChangesOperationProtocol, 
 
 extension CKProcedure where T: CKFetchRecordChangesOperationProtocol, T: AssociatedErrorProtocol, T.AssociatedError: CloudKitError {
 
-    public var recordZoneID: T.RecordZoneID {
+    public var recordZoneID: T.RecordZoneIDPropertyType {
         get { return operation.recordZoneID }
         set { operation.recordZoneID = newValue }
     }
@@ -80,7 +83,7 @@ extension CloudKitProcedure where T: CKFetchRecordChangesOperationProtocol, T: A
     public typealias FetchRecordChangesCompletionBlock = (T.ServerChangeToken?, Data?) -> Void
 
     /// - returns: the record zone ID
-    public var recordZoneID: T.RecordZoneID {
+    public var recordZoneID: T.RecordZoneIDPropertyType {
         get { return current.recordZoneID }
         set {
             current.recordZoneID = newValue

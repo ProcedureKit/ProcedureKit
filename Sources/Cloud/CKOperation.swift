@@ -67,6 +67,9 @@ public protocol CKOperationProtocol: class {
     /// The type of the CloudKit ShareParticipant
     associatedtype ShareParticipant
 
+    /// The type of the longLivedOperationWasPersistedBlock property
+    associatedtype LongLivedOperationWasPersistedBlockType
+
     /// - returns the CloudKit Container
     var container: Container? { get set }
 
@@ -83,7 +86,7 @@ public protocol CKOperationProtocol: class {
 
     /// - returns the block to execute when the server starts storing callbacks for this long-lived CKOperation
     @available(iOS 9.3, tvOS 9.3, OSX 10.12, watchOS 2.3, *)
-    var longLivedOperationWasPersistedBlock: () -> Void { get set }
+    var longLivedOperationWasPersistedBlock: LongLivedOperationWasPersistedBlockType { get set }
 
     /// If non-zero, overrides the timeout interval for any network requests issued by this operation.
     /// See NSURLSessionConfiguration.timeoutIntervalForRequest
@@ -192,7 +195,7 @@ extension CKProcedure where T: CKOperationProtocol {
     }
 
     @available(iOS 9.3, tvOS 9.3, OSX 10.12, watchOS 2.3, *)
-    public var longLivedOperationWasPersistedBlock: () -> Void {
+    public var longLivedOperationWasPersistedBlock: T.LongLivedOperationWasPersistedBlockType {
         get { return operation.longLivedOperationWasPersistedBlock }
         set { operation.longLivedOperationWasPersistedBlock = newValue }
     }
@@ -248,7 +251,7 @@ extension CloudKitProcedure where T: CKOperationProtocol {
 
     /// - returns the block to execute when the server starts storing callbacks for this long-lived CKOperation
     @available(iOS 9.3, tvOS 9.3, OSX 10.12, watchOS 2.3, *)
-    public var longLivedOperationWasPersistedBlock: () -> Void {
+    public var longLivedOperationWasPersistedBlock: T.LongLivedOperationWasPersistedBlockType {
         get { return current.longLivedOperationWasPersistedBlock }
         set {
             current.longLivedOperationWasPersistedBlock = newValue

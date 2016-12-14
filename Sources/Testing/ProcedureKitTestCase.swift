@@ -50,17 +50,38 @@ open class ProcedureKitTestCase: XCTestCase {
     }
 
     public func wait(forAll procedures: [Procedure], withTimeout timeout: TimeInterval = 3, withExpectationDescription expectationDescription: String = #function, handler: XCWaitCompletionHandler? = nil) {
-        for (i, procedure) in procedures.enumerated() {
-            addCompletionBlockTo(procedure: procedure, withExpectationDescription: "\(i), \(expectationDescription)")
-        }
+        addCompletionBlockTo(procedures: procedures)
         run(operations: procedures)
         waitForExpectations(timeout: timeout, handler: handler)
     }
 
-    public func check<T: Procedure>(procedure: T, withTimeout timeout: TimeInterval = 3, withExpectationDescription expectationDescription: String = #function, checkBeforeWait: (T) -> Void) {
-        addCompletionBlockTo(procedure: procedure, withExpectationDescription: expectationDescription)
-        run(operations: procedure)
+    /// Runs a Procedure on the queue, waiting until it is complete to return,
+    /// but calls a specified block before the wait.
+    ///
+    /// IMPORTANT: This function calls the specified block immediately after adding
+    ///            the Procedure to the queue. This does *not* ensure any specific
+    ///            ordering/timing in regards to the block and the Procedure executing.
+    ///
+    /// - Parameters:
+    ///   - procedure: a Procedure
+    ///   - timeout: (optional) a timeout for the wait
+    ///   - expectationDescription: (optional) an expectation description
+    ///   - checkBeforeWait: a block to be executed before the wait (see above)
+    public func check<T: Procedure>(procedure: T, withAdditionalProcedures additionalProcedures: Procedure..., withTimeout timeout: TimeInterval = 3, withExpectationDescription expectationDescription: String = #function, checkBeforeWait: (T) -> Void) {
+        var allProcedures = additionalProcedures
+        allProcedures.append(procedure)
+        addCompletionBlockTo(procedures: allProcedures)
+        run(operations: allProcedures)
         checkBeforeWait(procedure)
+        waitForExpectations(timeout: timeout, handler: nil)
+    }
+
+    public func checkAfterDidExecute<T: ProcedureProtocol>(procedure: T, withTimeout timeout: TimeInterval = 3, withExpectationDescription expectationDescription: String = #function, checkAfterDidExecuteBlock: @escaping (T) -> Void) where T: Procedure {
+        addCompletionBlockTo(procedure: procedure, withExpectationDescription: expectationDescription)
+        procedure.addDidExecuteBlockObserver { (procedure) in
+            checkAfterDidExecuteBlock(procedure)
+        }
+        run(operations: procedure)
         waitForExpectations(timeout: timeout, handler: nil)
     }
 
@@ -70,6 +91,12 @@ open class ProcedureKitTestCase: XCTestCase {
         // Add the did finish expectation block to the finishing procedure
         addExpectationCompletionBlockTo(procedure: finishingProcedure, withExpectationDescription: expectationDescription)
         run(operation: finishingProcedure)
+    }
+
+    public func addCompletionBlockTo<S : Sequence>(procedures: S, withExpectationDescription expectationDescription: String = #function) where S.Iterator.Element == Procedure {
+        for (i, procedure) in procedures.enumerated() {
+            addCompletionBlockTo(procedure: procedure, withExpectationDescription: "\(i), \(expectationDescription)")
+        }
     }
 
     @discardableResult public func addExpectationCompletionBlockTo(procedure: Procedure, withExpectationDescription expectationDescription: String = #function) -> XCTestExpectation {

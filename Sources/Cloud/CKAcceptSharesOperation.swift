@@ -9,8 +9,11 @@ import CloudKit
 /// A generic protocol which exposes the properties used by Apple's CKAcceptSharesOperation.
 public protocol CKAcceptSharesOperationProtocol: CKOperationProtocol {
 
+    /// The type of the shareMetadatas property
+    associatedtype ShareMetadatasPropertyType
+
     /// - returns: the share metadatas
-    var shareMetadatas: [ShareMetadata] { get set }
+    var shareMetadatas: ShareMetadatasPropertyType { get set }
 
     /// - returns: the block used to return accepted shares
     var perShareCompletionBlock: ((ShareMetadata, Share?, Swift.Error?) -> Void)? { get set }
@@ -28,7 +31,7 @@ extension CKAcceptSharesOperation: CKAcceptSharesOperationProtocol, AssociatedEr
 
 extension CKProcedure where T: CKAcceptSharesOperationProtocol, T: AssociatedErrorProtocol, T.AssociatedError: CloudKitError {
 
-    public var shareMetadatas: [T.ShareMetadata] {
+    public var shareMetadatas: T.ShareMetadatasPropertyType {
         get { return operation.shareMetadatas }
         set { operation.shareMetadatas = newValue }
     }
@@ -59,7 +62,7 @@ extension CloudKitProcedure where T: CKAcceptSharesOperationProtocol, T: Associa
     public typealias AcceptSharesCompletionBlock = () -> Void
 
     /// - returns: the share metadatas
-    public var shareMetadatas: [T.ShareMetadata] {
+    public var shareMetadatas: T.ShareMetadatasPropertyType {
         get { return current.shareMetadatas }
         set {
             current.shareMetadatas = newValue

@@ -66,9 +66,12 @@ open class Condition: Procedure, ConditionProtocol, OutputProcedure {
         }
     }
 
+    /// The ConditionResult.
+    /// Will be Pending.ready(ConditionResult) once the Condition has been evaluated.
     public var output: Pending<ConditionResult> = .pending
 
-    open override func execute() {
+    /// Triggers evaluation of the Condition, unless the procedure no longer exists. Cannot be over-ridden
+    final public override func execute() {
         guard let procedure = procedure else {
             log.verbose(message: "Condition finishing before evaluation because procedure is nil.")
             finish()
@@ -77,6 +80,8 @@ open class Condition: Procedure, ConditionProtocol, OutputProcedure {
         evaluate(procedure: procedure, completion: finish)
     }
 
+    /// Must be overriden in Condition subclasses.
+    /// Must always call `completion` with the result.
     open func evaluate(procedure: Procedure, completion: @escaping (ConditionResult) -> Void) {
         let reason = "Condition must be subclassed, and \(#function) overridden."
         let result: ConditionResult = .failure(ProcedureKitError.programmingError(reason: reason))
@@ -84,7 +89,7 @@ open class Condition: Procedure, ConditionProtocol, OutputProcedure {
         completion(result)
     }
 
-    internal func finish(withConditionResult conditionResult: ConditionResult) {
+    final internal func finish(withConditionResult conditionResult: ConditionResult) {
         output = .ready(conditionResult)
         finish(withError: conditionResult.error)
     }
