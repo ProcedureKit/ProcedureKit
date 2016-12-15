@@ -1,3 +1,49 @@
+# 4.0.0 Beta 6
+_ProcedureKit_ is nearing a final v4 release. Beta 6 sees all functionality that will be added for v4 in place. Some breaking changes around cancellation are currently being discussed, and will come in the next (and hopefully last) beta.
+
+In this release, [@swiftlyfalling](https://github.com/swiftlyfalling) has been doing amazing work finding, fixing and adding tests for race-conditions, memory leaks, general thread-safety and cancellation. It really has been fantastic. Currently, over 83% for all components on average. 
+
+## New APIs
+1. [#631](https://github.com/ProcedureKit/ProcedureKit/issues/631), [#632](https://github.com/ProcedureKit/ProcedureKit/pull/632) Result injection is now supported for `NetworkDataProcedure` et. al. This API is called `injectPayload(fromNetwork:)` and will support functionality like this:
+    ```swift
+    // Procedure to get a network request
+    let getRequest = GetRequest()
+    // Procedure to get the Data payload
+    let network = NetworkDataProcedure()
+        // Inject the URLRequest
+        .injectResult(from: getRequest)
+    // Procedure to decode the data payload
+    let decode = DecodeNetworkPayload()
+        // Inject the network payload
+        .injectPayload(fromNetwork: network)
+    ```
+    Thanks to [@robfeldmann](https://github.com/robfeldmann) for raising the initial issue.
+2. [#592](https://github.com/ProcedureKit/ProcedureKit/pull/592) Adds `UIProcedure` and `AlertProcedure` as part of _ProcedureKitMobile_ framework. Usage is like this:
+    ```swift
+    let alert = AlertProcedure(presentAlertFrom: self)
+    alert.add(actionWithTitle: "Sweet") { alert, action in
+        alert.log.info(message: "Running the handler!")
+    }
+    alert.title = "Hello World"
+    alert.message = "This is a message in an alert"
+    queue.add(operation: alert)
+    ```
+
+1. [#623](https://github.com/ProcedureKit/ProcedureKit/issues/623) Adds `ProcedureKit/All` CocoaPod sub-spec which corresponds to all the cross platform components.
+2. [#625](https://github.com/ProcedureKit/ProcedureKit/issues/625) Tweaks for _TestingProcedureKit_ imports.
+3. [#626](https://github.com/ProcedureKit/ProcedureKit/issues/626),  [#627](https://github.com/ProcedureKit/ProcedureKit/issues/627),[#640](https://github.com/ProcedureKit/ProcedureKit/pull/640), [#646](https://github.com/ProcedureKit/ProcedureKit/pull/646) Tweaks Network procedures so that cancellation is thread safe, avoids a potential race condition, and testing enhancements.
+4. [#624](https://github.com/ProcedureKit/ProcedureKit/issues/624) Some minor fixes after a through investigation with the visual memory debugger - which can produce erroneous leak indicators.
+6. [#630](https://github.com/ProcedureKit/ProcedureKit/issues/630) Adds a build step to CI to perform integration testing using CocoaPods works with the current changes on a feature branch. Currently this does not work for 3rd party contributions.
+7. [#634](https://github.com/ProcedureKit/ProcedureKit/issues/634) Fixes some copy/paste typos from a merge conflict.
+8. [#635](https://github.com/ProcedureKit/ProcedureKit/pull/635) Removes the fatal override of `waitUntilFinished()`.
+9. [#639](https://github.com/ProcedureKit/ProcedureKit/pull/639) Thread safety improvements to `ProcedureProcedure` in _ProcedureKitMac_.
+10. [#643](https://github.com/ProcedureKit/ProcedureKit/pull/643) Further testing of `DidExecute` observers. Adds `checkAfterDidExecute` API to `ProcedureKitTestCase`.
+11. [#649](https://github.com/ProcedureKit/ProcedureKit/pull/649) Removes all code signing settings.
+12. [#644](https://github.com/ProcedureKit/ProcedureKit/pull/644) Fixes issues for _ProcedureKitCloud_ in Xcode 8.2 - as they've changed some APIs here.
+13. [#647](https://github.com/ProcedureKit/ProcedureKit/pull/647) Marks non-open properties/methods as `final`.
+14. [#650](https://github.com/ProcedureKit/ProcedureKit/pull/650) Adds more tests for cancelling `Condition` subclasses.
+15. [#655](https://github.com/ProcedureKit/ProcedureKit/pull/655) Removes the beta tag from the internal framework versioning.
+
 # 4.0.0 Beta 5
 Beta 5 is primarily about refinements and bug fixes.
 
