@@ -6,6 +6,7 @@
 
 import Foundation
 import XCTest
+import ProcedureKit
 
 public class TestableCapability: CapabilityProtocol {
 

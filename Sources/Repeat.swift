@@ -135,7 +135,7 @@ open class RepeatProcedure<T: Operation>: GroupProcedure {
     ///
     /// - returns: whether or not there was a next payload added.
     @discardableResult
-    public func addNextOperation(_ shouldAddNext: @autoclosure () -> Bool = true) -> Bool {
+    final public func addNextOperation(_ shouldAddNext: @autoclosure () -> Bool = true) -> Bool {
         assert(!isFinished, "Cannot add next operation after the procedure has finished.")
         guard !isCancelled else { return false }
 
@@ -174,7 +174,7 @@ open class RepeatProcedure<T: Operation>: GroupProcedure {
     /// further before it is added.
     ///
     /// - returns: an optional Paylod
-    public func next() -> Payload? {
+    final public func next() -> Payload? {
         return _repeatStateLock.withCriticalScope { _next() }
     }
 
@@ -186,7 +186,7 @@ open class RepeatProcedure<T: Operation>: GroupProcedure {
     /// so it is possible to overwrite previous configurations.
     ///
     /// - parameter block: a block which receives an instance of T
-    public func append(configureBlock block: @escaping Payload.ConfigureBlock) {
+    final public func append(configureBlock block: @escaping Payload.ConfigureBlock) {
         _repeatStateLock.withCriticalScope {
             let config = _configure
             _configure = { operation in
@@ -196,7 +196,7 @@ open class RepeatProcedure<T: Operation>: GroupProcedure {
         }
     }
 
-    public func appendConfigureBlock(block: @escaping Payload.ConfigureBlock) {
+    final public func appendConfigureBlock(block: @escaping Payload.ConfigureBlock) {
         append(configureBlock: block)
     }
 
@@ -206,13 +206,13 @@ open class RepeatProcedure<T: Operation>: GroupProcedure {
     /// this API, before configuring
     ///
     /// - parameter block: a block which receives an instance of T
-    public func replace(configureBlock block: @escaping Payload.ConfigureBlock) {
+    final public func replace(configureBlock block: @escaping Payload.ConfigureBlock) {
         _repeatStateLock.withCriticalScope {
             _replace(configureBlock: block)
         }
     }
 
-    public func replaceConfigureBlock(block: @escaping Payload.ConfigureBlock) {
+    final public func replaceConfigureBlock(block: @escaping Payload.ConfigureBlock) {
         replace(configureBlock: block)
     }
 

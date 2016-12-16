@@ -35,7 +35,7 @@ open class NetworkUploadProcedure<Session: URLSessionTaskFactory>: Procedure, In
     public let completion: CompletionBlock
 
     private let stateLock = NSLock()
-    internal var task: Session.UploadTask? = nil
+    internal private(set) var task: Session.UploadTask? = nil
     private var _input: Pending<HTTPPayloadRequest<Data>> = .pending
     private var _output: Pending<NetworkResult> = .pending
 
@@ -50,7 +50,7 @@ open class NetworkUploadProcedure<Session: URLSessionTaskFactory>: Procedure, In
         super.init()
         self.input = request.flatMap { .ready(HTTPPayloadRequest(payload: data, request: $0)) } ?? .pending
 
-        addWillCancelBlockObserver { procedure, _ in
+        addDidCancelBlockObserver { procedure, _ in
             procedure.stateLock.withCriticalScope {
                 procedure.task?.cancel()
             }
@@ -64,13 +64,14 @@ open class NetworkUploadProcedure<Session: URLSessionTaskFactory>: Procedure, In
         }
 
         stateLock.withCriticalScope {
+            guard !isCancelled else { return }
             task = session.uploadTask(with: requirement.request, from: requirement.payload) { [weak self] data, response, error in
                 guard let strongSelf = self else { return }
 
-            if let error = error {
-                strongSelf.finish(withResult: .failure(error))
-                return
-            }
+                if let error = error {
+                    strongSelf.finish(withResult: .failure(error))
+                    return
+                }
 
                 guard let data = data, let response = response as? HTTPURLResponse else {
                     strongSelf.finish(withResult: .failure(ProcedureKitError.unknown))

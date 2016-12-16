@@ -4,22 +4,66 @@
 //  Copyright © 2016 ProcedureKit. All rights reserved.
 //
 
-import XCTest
+import Foundation
 import SystemConfiguration
+import XCTest
+import ProcedureKit
 
 public class TestableNetworkReachability {
     typealias Reachability = String
 
-    public var flags: SCNetworkReachabilityFlags = .reachable {
+    public var flags: SCNetworkReachabilityFlags {
+        get { return stateLock.withCriticalScope { _flags } }
+        set {
+            stateLock.withCriticalScope {
+                _flags = newValue
+            }
+        }
+    }
+    public var didStartNotifier: Bool {
+        get { return stateLock.withCriticalScope { _didStartNotifier } }
+        set {
+            stateLock.withCriticalScope {
+                _didStartNotifier = newValue
+            }
+        }
+    }
+    public var didStopNotifier: Bool {
+        get { return stateLock.withCriticalScope { _didStopNotifier } }
+        set {
+            stateLock.withCriticalScope {
+                _didStopNotifier = newValue
+            }
+        }
+    }
+
+    public var log: LoggerProtocol {
+        get { return stateLock.withCriticalScope { _log } }
+        set {
+            stateLock.withCriticalScope {
+                _log = newValue
+            }
+        }
+    }
+    public weak var delegate: NetworkReachabilityDelegate? {
+        get { return stateLock.withCriticalScope { _delegate } }
+        set {
+            stateLock.withCriticalScope {
+                _delegate = newValue
+            }
+        }
+    }
+
+    private var stateLock = NSRecursiveLock()
+    private var _flags: SCNetworkReachabilityFlags = .reachable {
         didSet {
             delegate?.didChangeReachability(flags: flags)
         }
     }
-    public var didStartNotifier = false
-    public var didStopNotifier = false
-
-    public var log: LoggerProtocol = Logger()
-    public weak var delegate: NetworkReachabilityDelegate? = nil
+    private var _didStartNotifier = false
+    private var _didStopNotifier = false
+    private var _log: LoggerProtocol = Logger()
+    private var _delegate: NetworkReachabilityDelegate? = nil
 
     public init() { }
 }

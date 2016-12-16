@@ -49,7 +49,7 @@ open class GroupProcedure: Procedure, ProcedureQueueDelegate {
     fileprivate var groupCanFinish: CanFinishGroup!
 
     /// - returns: the operations which have been added to the queue
-    public var children: [Operation] {
+    final public var children: [Operation] {
         get { return groupChildren.read { $0 } }
     }
 
@@ -97,6 +97,17 @@ open class GroupProcedure: Procedure, ProcedureQueueDelegate {
 
     public convenience init(operations: Operation...) {
         self.init(operations: operations)
+    }
+
+    deinit {
+        // To ensure that any remaining operations on the internal queue are released
+        // we must cancelAllOperations and also ensure the queue is not suspended.
+        queue.cancelAllOperations()
+        queue.isSuspended = false
+
+        // If you find that execution is stuck on the following line, one of the child
+        // Operations/Procedures is likely not handling cancellation and finishing.
+        queue.waitUntilAllOperationsAreFinished()
     }
 
     // MARK: - Execute
@@ -314,7 +325,7 @@ public extension GroupProcedure {
      For more, see the NSOperation and NSOperationQueue documentation for `qualityOfService`.
      */
     @available(OSX 10.10, iOS 8.0, tvOS 8.0, watchOS 2.0, *)
-    final override var qualityOfService: QualityOfService {
+    final public override var qualityOfService: QualityOfService {
         get { return queue.qualityOfService }
         set {
             super.qualityOfService = newValue
@@ -323,7 +334,7 @@ public extension GroupProcedure {
     }
 
     /// Override of Procedure.userIntent
-    public override var userIntent: UserIntent {
+    final public override var userIntent: UserIntent {
         didSet {
             let (operations, procedures) = children.operationsAndProcedures
             operations.forEach { $0.setQualityOfService(fromUserIntent: userIntent) }
@@ -340,7 +351,7 @@ public extension GroupProcedure {
      Add a single child Operation instance to the group
      - parameter child: an Operation instance
     */
-    func add(child: Operation) {
+    final func add(child: Operation) {
         add(children: child)
     }
 
@@ -348,7 +359,7 @@ public extension GroupProcedure {
      Add children Operation instances to the group
      - parameter children: a variable number of Operation instances
      */
-    func add(children: Operation...) {
+    final func add(children: Operation...) {
         add(children: children)
     }
 
@@ -356,7 +367,7 @@ public extension GroupProcedure {
      Add a sequence of Operation instances to the group
      - parameter children: a sequence of Operation instances
      */
-    func add<Children: Collection>(children: Children) where Children.Iterator.Element: Operation {
+    final func add<Children: Collection>(children: Children) where Children.Iterator.Element: Operation {
         add(additional: children, toOperationsArray: true)
     }
 
@@ -369,7 +380,7 @@ public extension GroupProcedure {
         }
     }
 
-    fileprivate func add<Additional: Collection>(additional: Additional, toOperationsArray shouldAddToProperty: Bool) where Additional.Iterator.Element: Operation {
+    final fileprivate func add<Additional: Collection>(additional: Additional, toOperationsArray shouldAddToProperty: Bool) where Additional.Iterator.Element: Operation {
         // Exit early if there are no children in the collection
         guard !additional.isEmpty else { return }
 
@@ -435,22 +446,22 @@ public extension GroupProcedure {
         }
     }
 
-    public func append(fatalError error: Error) {
+    final public func append(fatalError error: Error) {
         append(fatalErrors: [error])
     }
 
-    public func child(_ child: Operation, didEncounterFatalError error: Error) {
+    final public func child(_ child: Operation, didEncounterFatalError error: Error) {
         log.warning(message: "\(child.operationName) did encounter fatal error: \(error).")
         append(fatalError: error)
     }
 
-    public func append(fatalErrors errors: [Error]) {
+    final public func append(fatalErrors errors: [Error]) {
         groupErrors.write { (ward: inout GroupErrors) in
             ward.fatal.append(contentsOf: errors)
         }
     }
 
-    public func child(_ child: Operation, didEncounterFatalErrors errors: [Error]) {
+    final public func child(_ child: Operation, didEncounterFatalErrors errors: [Error]) {
         log.warning(message: "\(child.operationName) did encounter \(errors.count) fatal errors.")
         append(fatalErrors: errors)
     }
@@ -465,7 +476,7 @@ public extension GroupProcedure {
         return groupErrors.read { $0.attemptedRecovery }
     }
 
-    public func childDidRecoverFromErrors(_ child: Operation) {
+    final public func childDidRecoverFromErrors(_ child: Operation) {
         if let _ = attemptedRecovery[child] {
             log.notice(message: "successfully recovered from errors in \(child)")
             groupErrors.write { (ward: inout GroupErrors) in
@@ -474,7 +485,7 @@ public extension GroupProcedure {
         }
     }
 
-    public func childDidNotRecoverFromErrors(_ child: Operation) {
+    final public func childDidNotRecoverFromErrors(_ child: Operation) {
         log.notice(message: "failed to recover from errors in \(child)")
         groupErrors.write { (ward: inout GroupErrors) in
             if let errors = ward.attemptedRecovery.removeValue(forKey: child) {
@@ -488,7 +499,7 @@ public extension GroupProcedure {
 
 fileprivate extension GroupProcedure {
 
-    fileprivate class CanFinishGroup: Operation {
+    fileprivate final class CanFinishGroup: Operation {
 
         private weak var group: GroupProcedure?
         private var _isFinished = false

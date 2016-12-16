@@ -35,7 +35,7 @@ open class NetworkDataProcedure<Session: URLSessionTaskFactory>: Procedure, Inpu
     public let completion: CompletionBlock
 
     private let stateLock = NSLock()
-    internal var task: Session.DataTask? = nil
+    internal private(set) var task: Session.DataTask? = nil
     private var _input: Pending<URLRequest> = .pending
     private var _output: Pending<NetworkResult> = .pending
 
@@ -50,7 +50,7 @@ open class NetworkDataProcedure<Session: URLSessionTaskFactory>: Procedure, Inpu
         super.init()
         self.input = request.flatMap { .ready($0) } ?? .pending
 
-        addWillCancelBlockObserver { procedure, _ in
+        addDidCancelBlockObserver { procedure, _ in
             procedure.stateLock.withCriticalScope {
                 procedure.task?.cancel()
             }
@@ -64,13 +64,9 @@ open class NetworkDataProcedure<Session: URLSessionTaskFactory>: Procedure, Inpu
         }
 
         stateLock.withCriticalScope {
+            guard !isCancelled else { return }
             task = session.dataTask(with: request) { [weak self] data, response, error in
                 guard let strongSelf = self else { return }
-
-            if let error = error {
-                strongSelf.finish(withResult: .failure(error))
-                return
-            }
 
                 if let error = error {
                     strongSelf.finish(withResult: .failure(error))

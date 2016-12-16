@@ -200,7 +200,7 @@ open class Procedure: Operation, ProcedureProtocol {
      ```
 
      */
-    public var log: LoggerProtocol {
+    final public var log: LoggerProtocol {
         get {
             let operationName = self.operationName
             return protectedProperties.read { LoggerContext(parent: $0.log, operationName: operationName) }
@@ -214,7 +214,7 @@ open class Procedure: Operation, ProcedureProtocol {
 
     // MARK: Observers
 
-    var observers: [AnyObserver<Procedure>] {
+    final var observers: [AnyObserver<Procedure>] {
         get { return protectedProperties.read { $0.observers } }
     }
 
@@ -304,7 +304,7 @@ open class Procedure: Operation, ProcedureProtocol {
     }
 
 
-    public func willEnqueue(on queue: ProcedureQueue) {
+    public final func willEnqueue(on queue: ProcedureQueue) {
         state = .pending
         self.queue = queue
     }
@@ -313,12 +313,16 @@ open class Procedure: Operation, ProcedureProtocol {
     public final override func start() {
         // Don't call super.start
 
-        guard !isCancelled || isAutomaticFinishingDisabled else {
-            finish()
-            return
-        }
+        // Replicate NSOperation.start() autorelease behavior
+        // (Push an autoreleasepool before calling main(), pop after main() returns)
+        autoreleasepool {
+            guard !isCancelled || isAutomaticFinishingDisabled else {
+                finish()
+                return
+            }
 
-        main()
+            main()
+        }
     }
 
     /// Triggers execution of the operation's task, correctly managing errors and the cancelled state. Cannot be over-ridden
@@ -438,7 +442,7 @@ open class Procedure: Operation, ProcedureProtocol {
 
     open func procedureDidCancel(withErrors: [Error]) { }
 
-    public func cancel(withErrors errors: [Error]) {
+    public final func cancel(withErrors errors: [Error]) {
         _cancel(withAdditionalErrors: errors)
     }
 
@@ -519,7 +523,7 @@ open class Procedure: Operation, ProcedureProtocol {
         _finish(withErrors: errors, from: .finish)
     }
 
-    private func shouldFinish(from source: ProcedureKit.FinishingFrom) -> Bool {
+    private final func shouldFinish(from source: ProcedureKit.FinishingFrom) -> Bool {
         return _stateLock.withCriticalScope {
             // Do not finish is already finishing or finished
             guard state <= .finishing else { return false }
@@ -582,18 +586,6 @@ open class Procedure: Operation, ProcedureProtocol {
         didChangeValue(forKey: .finished)
     }
 
-    /**
-     Public override which deliberately crashes your app, as usage is considered an antipattern
-
-     To promote best practices, where waiting is never the correct thing to do,
-     we will crash the app if this is called. Instead use discrete operations and
-     dependencies, or groups, or semaphores or even NSLocking.
-
-     */
-    public final override func waitUntilFinished() {
-        fatalError("Waiting on operations is an anti-pattern. Remove this ONLY if you're absolutely sure there is No Other Way™. Post a question in https://github.com/danthorpe/Operations if you are unsure.")
-    }
-
     // MARK: - Observers
 
     /**
@@ -615,7 +607,7 @@ open class Procedure: Operation, ProcedureProtocol {
 
 public extension Procedure {
 
-    public func add<Dependency: ProcedureProtocol>(dependency: Dependency) {
+    public final func add<Dependency: ProcedureProtocol>(dependency: Dependency) {
         guard let op = dependency as? Operation else {
             assertionFailure("Adding dependencies which do not subclass Foundation.Operation is not supported.")
             return
@@ -628,7 +620,7 @@ public extension Procedure {
 
 extension Procedure {
 
-    class EvaluateConditions: GroupProcedure, InputProcedure, OutputProcedure {
+    final class EvaluateConditions: GroupProcedure, InputProcedure, OutputProcedure {
 
         var input: Pending<[Condition]> = .pending
         var output: Pending<ConditionResult> = .pending
@@ -792,7 +784,7 @@ extension Procedure {
 
      - parameter condition: a `Condition` which must be satisfied for the procedure to be executed.
      */
-    public func add(condition: Condition) {
+    public final func add(condition: Condition) {
         assert(state < .executing, "Cannot modify conditions after operation has begun executing, current state: \(state).")
         protectedProperties.write {
             $0.conditions.insert(condition)

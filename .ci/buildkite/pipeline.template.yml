@@ -88,8 +88,22 @@ steps:
       queue: "iOS-Simulator" 
       xcode: "$XCODE"
   -
-    name: "Cloud: tvOS"
+    name: "Cloud (tvOS)"
     command: "source /usr/local/opt/chruby/share/chruby/chruby.sh && chruby ruby && bundle install --quiet && bundle exec fastlane ios test_cloud_tvos"
     agents:
       queue: "iOS-Simulator" 
       xcode: "$XCODE"
+
+  - wait
+  
+  -
+    name: "Test CocoaPods Integration"
+    trigger: "tryprocedurekit"
+    build:
+      message: "Testing ProcedureKit Integration via Cocoapods"
+      commit: "HEAD"
+      branch: "cocoapods"
+      env:
+        PROCEDUREKIT_HASH: "$COMMIT"
+
+
