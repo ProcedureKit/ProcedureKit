@@ -93,7 +93,7 @@ open class ProcedureKitTestCase: XCTestCase {
         run(operation: finishingProcedure)
     }
 
-    public func addCompletionBlockTo<S : Sequence>(procedures: S, withExpectationDescription expectationDescription: String = #function) where S.Iterator.Element == Procedure {
+    public func addCompletionBlockTo<S: Sequence>(procedures: S, withExpectationDescription expectationDescription: String = #function) where S.Iterator.Element == Procedure {
         for (i, procedure) in procedures.enumerated() {
             addCompletionBlockTo(procedure: procedure, withExpectationDescription: "\(i), \(expectationDescription)")
         }
