@@ -74,6 +74,7 @@ internal class ProcedureTimeoutRegistrar {
             procedureTimers.append(timer)
             $0[procedure] = procedureTimers
         }
+        timer.scheduleOneshot(deadline: .now() + delay.interval)
         timer.resume()
     }
 
