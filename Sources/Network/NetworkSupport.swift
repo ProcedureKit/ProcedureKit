@@ -4,6 +4,11 @@
 //  Copyright © 2016 ProcedureKit. All rights reserved.
 //
 
+public protocol ValueObservable {
+    func addObserver(_ observer: NSObject, forKeyPath: String, options: NSKeyValueObservingOptions, context: UnsafeMutableRawPointer?)
+    func removeObserver(_ observer: NSObject, forKeyPath: String)
+}
+
 // MARK: - URLSession
 
 public protocol URLSessionTaskProtocol {
@@ -11,9 +16,17 @@ public protocol URLSessionTaskProtocol {
     func cancel()
 }
 
-public protocol URLSessionDataTaskProtocol: URLSessionTaskProtocol { }
-public protocol URLSessionDownloadTaskProtocol: URLSessionTaskProtocol { }
-public protocol URLSessionUploadTaskProtocol: URLSessionTaskProtocol { }
+@objc public protocol URLSessionTaskProgressProtocol {
+    var countOfBytesExpectedToReceive: Int64 { get }
+    var countOfBytesReceived: Int64 { get }
+
+    var countOfBytesExpectedToSend: Int64 { get }
+    var countOfBytesSent: Int64 { get }
+}
+
+public protocol URLSessionDataTaskProtocol: URLSessionTaskProtocol, URLSessionTaskProgressProtocol, ValueObservable { }
+public protocol URLSessionDownloadTaskProtocol: URLSessionTaskProtocol, URLSessionTaskProgressProtocol, ValueObservable { }
+public protocol URLSessionUploadTaskProtocol: URLSessionTaskProtocol, URLSessionTaskProgressProtocol, ValueObservable { }
 
 public protocol URLSessionTaskFactory {
     associatedtype DataTask: URLSessionDataTaskProtocol
@@ -28,9 +41,12 @@ public protocol URLSessionTaskFactory {
 }
 
 extension URLSessionTask: URLSessionTaskProtocol { }
-extension URLSessionDataTask: URLSessionDataTaskProtocol {}
+extension URLSessionDataTask: URLSessionDataTaskProtocol { }
 extension URLSessionDownloadTask: URLSessionDownloadTaskProtocol { }
 extension URLSessionUploadTask: URLSessionUploadTaskProtocol { }
+
+extension URLSessionDataTask: URLSessionTaskProgressProtocol { }
+
 extension URLSession: URLSessionTaskFactory { }
 
 extension URL: ExpressibleByStringLiteral {
@@ -49,8 +65,6 @@ extension URL: ExpressibleByStringLiteral {
 }
 
 // MARK: - Input & Output wrapper types
-
-
 
 public protocol HTTPPayloadResponseProtocol: Equatable {
     associatedtype Payload: Equatable

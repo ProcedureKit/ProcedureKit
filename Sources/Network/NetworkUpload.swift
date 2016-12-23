@@ -4,12 +4,14 @@
 //  Copyright © 2016 ProcedureKit. All rights reserved.
 //
 
+fileprivate var observerContext = 0
+
 /**
  NetworkUploadProcedure is a simple procedure which will perform a upload task using
  URLSession based APIs. It only supports the completion block style API, therefore
  do not use this procedure if you wish to use delegate based APIs on URLSession.
  */
-open class NetworkUploadProcedure<Session: URLSessionTaskFactory>: Procedure, InputProcedure, OutputProcedure, NetworkOperation {
+open class NetworkUploadProcedure<Session: URLSessionTaskFactory>: Procedure, InputProcedure, OutputProcedure, NetworkOperation, ProgressReporting {
     public typealias NetworkResult = ProcedureResult<HTTPPayloadResponse<Data>>
     public typealias CompletionBlock = (NetworkResult) -> Void
 
@@ -31,6 +33,8 @@ open class NetworkUploadProcedure<Session: URLSessionTaskFactory>: Procedure, In
         }
     }
 
+    public private(set) var progress: Progress
+
     public let session: Session
     public let completion: CompletionBlock
 
@@ -43,8 +47,14 @@ open class NetworkUploadProcedure<Session: URLSessionTaskFactory>: Procedure, In
         return errors.first
     }
 
+    deinit {
+        task?.removeObserver(self, forKeyPath: #keyPath(URLSessionTaskProgressProtocol.countOfBytesExpectedToSend))
+        task?.removeObserver(self, forKeyPath: #keyPath(URLSessionTaskProgressProtocol.countOfBytesSent))
+    }
+
     public init(session: Session, request: URLRequest? = nil, data: Data? = nil, completionHandler: @escaping CompletionBlock = { _ in }) {
 
+        self.progress = Progress(totalUnitCount: Int64(data?.count ?? -1))
         self.session = session
         self.completion = completionHandler
         super.init()
@@ -84,7 +94,28 @@ open class NetworkUploadProcedure<Session: URLSessionTaskFactory>: Procedure, In
                 strongSelf.finish(withResult: .success(http))
             }
 
+            task?.addObserver(self, forKeyPath: #keyPath(URLSessionTaskProgressProtocol.countOfBytesExpectedToSend), options: [.new, .old], context: &observerContext)
+            task?.addObserver(self, forKeyPath: #keyPath(URLSessionTaskProgressProtocol.countOfBytesSent), options: [.new, .old], context: &observerContext)
+
             task?.resume()
         }
     }
+
+    override open func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
+        guard context == &observerContext else {
+            super.observeValue(forKeyPath: keyPath, of: object, change: change, context: context)
+            return
+        }
+
+        if let keyPath = keyPath, let task = object as? Session.UploadTask {
+            switch keyPath {
+            case #keyPath(URLSessionTaskProgressProtocol.countOfBytesExpectedToSend):
+                progress.totalUnitCount = task.countOfBytesExpectedToSend
+            case #keyPath(URLSessionTaskProgressProtocol.countOfBytesSent):
+                progress.completedUnitCount = task.countOfBytesSent
+            default: break
+            }
+        }
+    }
+
 }

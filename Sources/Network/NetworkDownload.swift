@@ -4,12 +4,14 @@
 //  Copyright © 2016 ProcedureKit. All rights reserved.
 //
 
+fileprivate var observerContext = 0
+
 /**
  NetworkDownloadProcedure is a simple procedure which will perform a download task using
  URLSession based APIs. It only supports the completion block style API, therefore
  do not use this procedure if you wish to use delegate based APIs on URLSession.
  */
-open class NetworkDownloadProcedure<Session: URLSessionTaskFactory>: Procedure, InputProcedure, OutputProcedure, NetworkOperation {
+open class NetworkDownloadProcedure<Session: URLSessionTaskFactory>: Procedure, InputProcedure, OutputProcedure, NetworkOperation, ProgressReporting {
     public typealias NetworkResult = ProcedureResult<HTTPPayloadResponse<URL>>
     public typealias CompletionBlock = (NetworkResult) -> Void
 
@@ -31,6 +33,8 @@ open class NetworkDownloadProcedure<Session: URLSessionTaskFactory>: Procedure, 
         }
     }
 
+    public private(set) var progress: Progress
+
     public let session: Session
     public let completion: CompletionBlock
 
@@ -43,8 +47,14 @@ open class NetworkDownloadProcedure<Session: URLSessionTaskFactory>: Procedure, 
         return errors.first
     }
 
+    deinit {
+        task?.removeObserver(self, forKeyPath: #keyPath(URLSessionTaskProgressProtocol.countOfBytesExpectedToReceive))
+        task?.removeObserver(self, forKeyPath: #keyPath(URLSessionTaskProgressProtocol.countOfBytesReceived))
+    }
+
     public init(session: Session, request: URLRequest? = nil, completionHandler: @escaping CompletionBlock = { _ in }) {
 
+        self.progress = Progress(totalUnitCount: -1)
         self.session = session
         self.completion = completionHandler
         super.init()
@@ -84,7 +94,27 @@ open class NetworkDownloadProcedure<Session: URLSessionTaskFactory>: Procedure, 
                 strongSelf.finish(withResult: .success(http))
             }
 
+            task?.addObserver(self, forKeyPath: #keyPath(URLSessionTaskProgressProtocol.countOfBytesExpectedToReceive), options: [.new, .old], context: &observerContext)
+            task?.addObserver(self, forKeyPath: #keyPath(URLSessionTaskProgressProtocol.countOfBytesReceived), options: [.new, .old], context: &observerContext)
+
             task?.resume()
+        }
+    }
+
+    override open func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
+        guard context == &observerContext else {
+            super.observeValue(forKeyPath: keyPath, of: object, change: change, context: context)
+            return
+        }
+
+        if let keyPath = keyPath, let task = object as? Session.DownloadTask {
+            switch keyPath {
+            case #keyPath(URLSessionTaskProgressProtocol.countOfBytesExpectedToReceive):
+                progress.totalUnitCount = task.countOfBytesExpectedToReceive
+            case #keyPath(URLSessionTaskProgressProtocol.countOfBytesReceived):
+                progress.completedUnitCount = task.countOfBytesReceived
+            default: break
+            }
         }
     }
 }
