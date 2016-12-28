@@ -7,24 +7,55 @@
 import Foundation
 import Dispatch
 
+/// Struct to hold the values necessary for each
+/// iteration of a RepeatProcedure. It is generic
+/// over the Operation type (i.e. the type being
+/// iterated). However, it also holds an optional
+/// Delay property, and an optional ConfigureBlock.
 public struct RepeatProcedurePayload<T: Operation> {
     public typealias ConfigureBlock = (T) -> Void
 
+    /// - returns: the operation value
     public let operation: T
+    /// - returns: the optional Delay
     public let delay: Delay?
+    /// - returns: the optional ConfigureBlock
     public let configure: ConfigureBlock?
 
+    /// Initializes a payload struct.
+    ///
+    /// - Parameters:
+    ///   - operation: an instance of an Operation subclass T
+    ///   - delay: an optional Delay value, which defaults to nil
+    ///   - configure: an optional closure which receives the operation, and which defaults to nil
     public init(operation: T, delay: Delay? = nil, configure: ConfigureBlock? = nil) {
         self.operation = operation
         self.delay = delay
         self.configure = configure
     }
 
+    /// Sets the delay property.
+    ///
+    /// - Parameter newDelay: the new Delay property
+    /// - Returns: a new RepeatProcedurePayload value.
     public func set(delay newDelay: Delay?) -> RepeatProcedurePayload {
         return RepeatProcedurePayload(operation: operation, delay: newDelay, configure: configure)
     }
 }
 
+/// RepeatProcedure is a GroupProcedure subclass which can be used to create
+/// polling or repeating procedures. Each child procedure is a new instance
+/// of the same Operation subclass T.
+///
+/// While RepeatProcedure can be initialized in a variety of ways, it helps
+/// to understand that it works by using an Iterator. The iterator's payload
+/// is a structure which holds an instance of the Operation subclass (`T`),
+/// and optional Delay value, and an optional configuration block. The block
+/// receives the instance, and can be used to prepare the operation before
+/// it is executed.
+///
+/// All of the initializers available will ultimately create the underlying
+/// iterator.
 open class RepeatProcedure<T: Operation>: GroupProcedure {
 
     public typealias Payload = RepeatProcedurePayload<T>
@@ -50,61 +81,83 @@ open class RepeatProcedure<T: Operation>: GroupProcedure {
     private var _previous: T? = nil
     /// - returns: the previous executing operation instance of T
     public internal(set) var previous: T? {
-        get {
-            return _repeatStateLock.withCriticalScope { _previous }
-        }
-        set {
-            _repeatStateLock.withCriticalScope {
-                _previous = newValue
-            }
-        }
+        get { return _repeatStateLock.withCriticalScope { _previous } }
+        set { _repeatStateLock.withCriticalScope { _previous = newValue } }
     }
 
     private var _current: T
     /// - returns: the currently executing operation instance of T
     public internal(set) var current: T {
-        get {
-            return _repeatStateLock.withCriticalScope { _current }
-        }
-        set {
-            _repeatStateLock.withCriticalScope {
-                _current = newValue
-            }
-        }
+        get { return _repeatStateLock.withCriticalScope { _current } }
+        set { _repeatStateLock.withCriticalScope { _current = newValue } }
     }
 
     private var _count: Int = 1
     /// - returns: the number of operation instances
     public var count: Int {
-        get {
-            return _repeatStateLock.withCriticalScope { _count }
-        }
+        return _repeatStateLock.withCriticalScope { _count }
     }
 
     private var _configure: Payload.ConfigureBlock = { _ in }
     internal var configure: Payload.ConfigureBlock {
-        get {
-            return _repeatStateLock.withCriticalScope { _configure }
-        }
+        return _repeatStateLock.withCriticalScope { _configure }
     }
 
     private var _iterator: AnyIterator<Payload>
 
+    /// Initialize RepeatProcedure with an iterator, the element of the iterator a `RepeatProcedurePayload<T>`.
+    /// Other arguments allow for specific dispatch queues, and a maximum count of iteratations.
+    ///
+    /// - parameter dispatchQueue: an optional DispatchQueue, which defaults to nil
+    /// - parameter max: an optional Int, which defaults to nil.
+    /// - parameter iterator: a generic IteratorProtocol type, with a Payload Element type
     public init<PayloadIterator>(dispatchQueue: DispatchQueue? = nil, max: Int? = nil, iterator base: PayloadIterator) where PayloadIterator: IteratorProtocol, PayloadIterator.Element == Payload {
         (_current, _iterator) = RepeatProcedure.create(withMax: max, andIterator: base)
         super.init(dispatchQueue: dispatchQueue, operations: [])
     }
 
+    /// Initialize RepeatProcedure with two iterators, the first one has `Delay` elements, the
+    /// second has `T` elements - i.e. the Operation subclass to be repeated.
+    /// Other arguments allow for specific dispatch queues, and a maximum count of iteratations.
+    ///
+    /// - parameter dispatchQueue: an optional DispatchQueue, which defaults to nil
+    /// - parameter max: an optional Int, which defaults to nil.
+    /// - parameter delay: a generic IteratorProtocol type, with a Delay Element type
+    /// - parameter iterator: a generic IteratorProtocol type, with a T Element type
     public init<OperationIterator, DelayIterator>(dispatchQueue: DispatchQueue? = nil, max: Int? = nil, delay: DelayIterator, iterator base: OperationIterator) where OperationIterator: IteratorProtocol, DelayIterator: IteratorProtocol, OperationIterator.Element == T, DelayIterator.Element == Delay {
         (_current, _iterator) = RepeatProcedure.create(withMax: max, andDelay: delay, andIterator: base)
         super.init(dispatchQueue: dispatchQueue, operations: [])
     }
 
+    /// Initialize RepeatProcedure with a WaitStrategy and an iterator, which has `T` type
+    /// elements - i.e. the Operation subclass to be repeated.
+    /// Other arguments allow for specific dispatch queues, and a maximum count of iteratations.
+    ///
+    /// - parameter dispatchQueue: an optional DispatchQueue, which defaults to nil
+    /// - parameter max: an optional Int, which defaults to nil.
+    /// - parameter wait: a WaitStrategy value, which defaults to .immediate
+    /// - parameter iterator: a generic IteratorProtocol type, with a T Element type
     public init<OperationIterator>(dispatchQueue: DispatchQueue? = nil, max: Int? = nil, wait: WaitStrategy = .immediate, iterator base: OperationIterator) where OperationIterator: IteratorProtocol, OperationIterator.Element == T {
         (_current, _iterator) = RepeatProcedure.create(withMax: max, andDelay: Delay.iterator(wait.iterator), andIterator: base)
         super.init(dispatchQueue: dispatchQueue, operations: [])
     }
 
+    /// Initialize RepeatProcedure with a WaitStrategy and a closure. The closure returns
+    /// an optional instance of T, i.e. the Operation subclass to be repeated.
+    /// Other arguments allow for specific dispatch queues, and a maximum count of iteratations.
+    ///
+    /// This is the most convenient initializer, you can use it like this:
+    /// ```
+    ///    let procedure = RepeatProcedure { MyOperation() }
+    ///    let procedure = RepeatProcedure(dispatchQueue: target) { MyOperation() }
+    ///    let procedure = RepeatProcedure(dispatchQueue: target, max: 5) { MyOperation() }
+    ///    let procedure = RepeatProcedure(dispatchQueue: target, max: 5, wait: .constant(10)) { MyOperation() }
+    /// ```
+    ///
+    /// - parameter dispatchQueue: an optional DispatchQueue, which defaults to nil
+    /// - parameter max: an optional Int, which defaults to nil.
+    /// - parameter wait: a WaitStrategy value, which defaults to .immediate
+    /// - parameter body: an espacing closure which returns an optional T
     public init(dispatchQueue: DispatchQueue? = nil, max: Int? = nil, wait: WaitStrategy = .immediate, body: @escaping () -> T?) {
         (_current, _iterator) = RepeatProcedure.create(withMax: max, andDelay: Delay.iterator(wait.iterator), andIterator: AnyIterator(body))
         super.init(dispatchQueue: dispatchQueue, operations: [])
@@ -233,6 +286,25 @@ open class RepeatProcedure<T: Operation>: GroupProcedure {
 }
 
 
+// MARK: - Repeatable
+
+/// Repeatable protocol is a very simple protocol which allows
+/// `Operation` subclasses to determine whether they should
+/// trigger another repeated value. In other words, the current
+/// just finished instance determines whether a new instance is
+/// executed next, or the repeating finishes.
+public protocol Repeatable {
+
+    func shouldRepeat(count: Int) -> Bool
+}
+
+extension RepeatProcedure where T: Repeatable {
+
+    public convenience init(dispatchQueue: DispatchQueue? = nil, max: Int? = nil, wait: WaitStrategy = .immediate, body: @escaping () -> T?) {
+        self.init(dispatchQueue: dispatchQueue, max: max, wait: wait, iterator: RepeatableGenerator(AnyIterator(body)))
+    }
+}
+
 // MARK: - Extensions
 
 extension RepeatProcedure where T: InputProcedure {
@@ -259,6 +331,25 @@ extension RepeatProcedure where T: OutputProcedure {
 
 
 // MARK: - Iterators
+
+internal struct RepeatableGenerator<Element: Repeatable>: IteratorProtocol {
+
+    private var iterator: CountingIterator<Element>
+    private var latest: Element? = nil
+
+    init<I: IteratorProtocol>(_ base: I) where I.Element == Element {
+        let mutatingBaseIterator = AnyIterator(base)
+        iterator = CountingIterator { _ in return mutatingBaseIterator.next() }
+    }
+
+    mutating func next() -> Element? {
+        if let latest = latest {
+            guard latest.shouldRepeat(count: iterator.count) else { return nil }
+        }
+        latest = iterator.next()
+        return latest
+    }
+}
 
 public struct CountingIterator<Element>: IteratorProtocol {
 

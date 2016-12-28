@@ -101,6 +101,37 @@ class RepeatProcedureTests: RepeatTestCase {
     }
 }
 
+class RepeatableTestProcedure: TestProcedure, Repeatable {
+
+    let limit: Int
+
+    init(limit: Int = 5) {
+        self.limit = limit
+        super.init()
+    }
+
+    func shouldRepeat(count: Int) -> Bool {
+        return count < limit
+    }
+}
+
+class RepeatableRepeatProcedureTests: ProcedureKitTestCase {
+
+    func test__init_with_repeatable_procedure() {
+        let repeatProcedure = RepeatProcedure { RepeatableTestProcedure() }
+        wait(for: repeatProcedure)
+        XCTAssertProcedureFinishedWithoutErrors(repeatProcedure)
+        XCTAssertEqual(repeatProcedure.count, 5)
+    }
+
+    func test__init_with_max_repeatable_procedure() {
+        let repeatProcedure = RepeatProcedure(max: 4) { RepeatableTestProcedure() }
+        wait(for: repeatProcedure)
+        XCTAssertProcedureFinishedWithoutErrors(repeatProcedure)
+        XCTAssertEqual(repeatProcedure.count, 4)
+    }
+}
+
 class IteratorTests: XCTestCase {
 
     func test__finite__limits_are_not_exceeeded() {
