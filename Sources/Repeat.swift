@@ -45,7 +45,10 @@ public struct RepeatProcedurePayload<T: Operation> {
 
 /// RepeatProcedure is a GroupProcedure subclass which can be used to create
 /// polling or repeating procedures. Each child procedure is a new instance
-/// of the same Operation subclass T.
+/// of the same Operation subclass T. For example `RepeatProcedure<MyOperation>`
+/// will create and execute instances of MyOperation repeatedly, and we say
+/// that the RepeatProcedure is generic over T, which in this case is 
+/// MyOperation.
 ///
 /// While RepeatProcedure can be initialized in a variety of ways, it helps
 /// to understand that it works by using an Iterator. The iterator's payload
@@ -299,11 +302,34 @@ open class RepeatProcedure<T: Operation>: GroupProcedure {
 /// executed next, or the repeating finishes.
 public protocol Repeatable {
 
+    /// Determines whether or not a subsequent instance of the
+    /// receiver should be executed.
+    ///
+    /// - Parameter count: an Int, the number of instances executes thus far
+    /// - Returns: a Bool, true to indicate that another instance should be executed.
     func shouldRepeat(count: Int) -> Bool
 }
 
 extension RepeatProcedure where T: Repeatable {
 
+    /// Initialize RepeatProcedure with a WaitStrategy and a closure. The closure returns
+    /// an optional instance of T which conform to the `Repeatable` protocol.
+    /// i.e. T is the Operation subclass to be repeated.
+    /// Other arguments allow for specific dispatch queues, and a maximum count of iteratations.
+    ///
+    /// This is the most convenient initializer, you can use it like this:
+    /// ```
+    ///    let procedure = RepeatProcedure { MyRepeatableOperation() }
+    ///    let procedure = RepeatProcedure(dispatchQueue: target) { MyRepeatableOperation() }
+    ///    let procedure = RepeatProcedure(dispatchQueue: target, max: 5) { MyRepeatableOperation() }
+    ///    let procedure = RepeatProcedure(dispatchQueue: target, max: 5, wait: .constant(10)) { MyRepeatableOperation() }
+    /// ```
+    ///
+    /// - Parameters:
+    ///   - dispatchQueue: an optional DispatchQueue, which defaults to nil
+    ///   - max: an optional Int, which defaults to nil.
+    ///   - wait: a WaitStrategy value, which defaults to .immediate
+    ///   - body: an espacing closure which returns an optional T
     public convenience init(dispatchQueue: DispatchQueue? = nil, max: Int? = nil, wait: WaitStrategy = .immediate, body: @escaping () -> T?) {
         self.init(dispatchQueue: dispatchQueue, max: max, wait: wait, iterator: RepeatableGenerator(AnyIterator(body)))
     }
@@ -313,6 +339,7 @@ extension RepeatProcedure where T: Repeatable {
 
 extension RepeatProcedure where T: InputProcedure {
 
+    /// - returns: the pending input value where T conforms to InputProcedure
     public var input: Pending<T.Input> {
         get { return current.input }
         set {
@@ -324,6 +351,7 @@ extension RepeatProcedure where T: InputProcedure {
 
 extension RepeatProcedure where T: OutputProcedure {
 
+    /// - returns: the pending output result value where T conforms to OutputProcedure
     public var output: Pending<ProcedureResult<T.Output>> {
         get { return current.output }
         set {
