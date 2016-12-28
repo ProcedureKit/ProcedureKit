@@ -108,11 +108,12 @@ open class RepeatProcedure<T: Operation>: GroupProcedure {
     /// Initialize RepeatProcedure with an iterator, the element of the iterator a `RepeatProcedurePayload<T>`.
     /// Other arguments allow for specific dispatch queues, and a maximum count of iteratations.
     ///
-    /// - parameter dispatchQueue: an optional DispatchQueue, which defaults to nil
-    /// - parameter max: an optional Int, which defaults to nil.
-    /// - parameter iterator: a generic IteratorProtocol type, with a Payload Element type
-    public init<PayloadIterator>(dispatchQueue: DispatchQueue? = nil, max: Int? = nil, iterator base: PayloadIterator) where PayloadIterator: IteratorProtocol, PayloadIterator.Element == Payload {
-        (_current, _iterator) = RepeatProcedure.create(withMax: max, andIterator: base)
+    /// - Parameters:
+    ///   - dispatchQueue: an optional DispatchQueue, which defaults to nil
+    ///   - max: an optional Int, which defaults to nil.
+    ///   - iterator: a generic IteratorProtocol type, with a Payload Element type
+    public init<PayloadIterator>(dispatchQueue: DispatchQueue? = nil, max: Int? = nil, iterator: PayloadIterator) where PayloadIterator: IteratorProtocol, PayloadIterator.Element == Payload {
+        (_current, _iterator) = RepeatProcedure.create(withMax: max, andIterator: iterator)
         super.init(dispatchQueue: dispatchQueue, operations: [])
     }
 
@@ -120,12 +121,13 @@ open class RepeatProcedure<T: Operation>: GroupProcedure {
     /// second has `T` elements - i.e. the Operation subclass to be repeated.
     /// Other arguments allow for specific dispatch queues, and a maximum count of iteratations.
     ///
-    /// - parameter dispatchQueue: an optional DispatchQueue, which defaults to nil
-    /// - parameter max: an optional Int, which defaults to nil.
-    /// - parameter delay: a generic IteratorProtocol type, with a Delay Element type
-    /// - parameter iterator: a generic IteratorProtocol type, with a T Element type
-    public init<OperationIterator, DelayIterator>(dispatchQueue: DispatchQueue? = nil, max: Int? = nil, delay: DelayIterator, iterator base: OperationIterator) where OperationIterator: IteratorProtocol, DelayIterator: IteratorProtocol, OperationIterator.Element == T, DelayIterator.Element == Delay {
-        (_current, _iterator) = RepeatProcedure.create(withMax: max, andDelay: delay, andIterator: base)
+    /// - Parameters:
+    ///   - dispatchQueue: an optional DispatchQueue, which defaults to nil
+    ///   - max: an optional Int, which defaults to nil.
+    ///   - delay: a generic IteratorProtocol type, with a Delay Element type
+    ///   - iterator: a generic IteratorProtocol type, with a T Element type
+    public init<OperationIterator, DelayIterator>(dispatchQueue: DispatchQueue? = nil, max: Int? = nil, delay: DelayIterator, iterator: OperationIterator) where OperationIterator: IteratorProtocol, DelayIterator: IteratorProtocol, OperationIterator.Element == T, DelayIterator.Element == Delay {
+        (_current, _iterator) = RepeatProcedure.create(withMax: max, andDelay: delay, andIterator: iterator)
         super.init(dispatchQueue: dispatchQueue, operations: [])
     }
 
@@ -133,12 +135,13 @@ open class RepeatProcedure<T: Operation>: GroupProcedure {
     /// elements - i.e. the Operation subclass to be repeated.
     /// Other arguments allow for specific dispatch queues, and a maximum count of iteratations.
     ///
-    /// - parameter dispatchQueue: an optional DispatchQueue, which defaults to nil
-    /// - parameter max: an optional Int, which defaults to nil.
-    /// - parameter wait: a WaitStrategy value, which defaults to .immediate
-    /// - parameter iterator: a generic IteratorProtocol type, with a T Element type
-    public init<OperationIterator>(dispatchQueue: DispatchQueue? = nil, max: Int? = nil, wait: WaitStrategy = .immediate, iterator base: OperationIterator) where OperationIterator: IteratorProtocol, OperationIterator.Element == T {
-        (_current, _iterator) = RepeatProcedure.create(withMax: max, andDelay: Delay.iterator(wait.iterator), andIterator: base)
+    /// - Parameters:
+    ///   - dispatchQueue: an optional DispatchQueue, which defaults to nil
+    ///   - max: an optional Int, which defaults to nil.
+    ///   - wait: a WaitStrategy value, which defaults to .immediate
+    ///   - iterator: a generic IteratorProtocol type, with a T Element type
+    public init<OperationIterator>(dispatchQueue: DispatchQueue? = nil, max: Int? = nil, wait: WaitStrategy = .immediate, iterator: OperationIterator) where OperationIterator: IteratorProtocol, OperationIterator.Element == T {
+        (_current, _iterator) = RepeatProcedure.create(withMax: max, andDelay: Delay.iterator(wait.iterator), andIterator: iterator)
         super.init(dispatchQueue: dispatchQueue, operations: [])
     }
 
@@ -154,10 +157,11 @@ open class RepeatProcedure<T: Operation>: GroupProcedure {
     ///    let procedure = RepeatProcedure(dispatchQueue: target, max: 5, wait: .constant(10)) { MyOperation() }
     /// ```
     ///
-    /// - parameter dispatchQueue: an optional DispatchQueue, which defaults to nil
-    /// - parameter max: an optional Int, which defaults to nil.
-    /// - parameter wait: a WaitStrategy value, which defaults to .immediate
-    /// - parameter body: an espacing closure which returns an optional T
+    /// - Parameters:
+    ///   - dispatchQueue: an optional DispatchQueue, which defaults to nil
+    ///   - max: an optional Int, which defaults to nil.
+    ///   - wait: a WaitStrategy value, which defaults to .immediate
+    ///   - body: an espacing closure which returns an optional T
     public init(dispatchQueue: DispatchQueue? = nil, max: Int? = nil, wait: WaitStrategy = .immediate, body: @escaping () -> T?) {
         (_current, _iterator) = RepeatProcedure.create(withMax: max, andDelay: Delay.iterator(wait.iterator), andIterator: AnyIterator(body))
         super.init(dispatchQueue: dispatchQueue, operations: [])
