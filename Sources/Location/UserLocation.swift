@@ -42,6 +42,9 @@ open class UserLocationProcedure: Procedure, OutputProcedure, CLLocationManagerD
         addDidCancelBlockObserver { [weak self] _, errors in
             DispatchQueue.main.async {
                 self?.stopLocationUpdates()
+                if self?.isExecuting ?? false {
+                    self?.finish()
+                }
             }
         }
     }

@@ -88,6 +88,7 @@ open class ProcessProcedure: Procedure {
             DispatchQueue.main.async {
                 guard procedure.isExecuting && procedure.process.isRunning else { return }
                 procedure.process.terminate()
+                // `finish()` is handled by the process termination handler
             }
         }
     }
@@ -105,6 +106,13 @@ open class ProcessProcedure: Procedure {
             procedure.process.terminationHandler = { [weak procedure] task in
                 guard let procedure = procedure else { return }
 
+                guard !procedure.isCancelled else {
+                    // special case: hide the Process's cancellation error
+                    // if the ProcessProcedure was cancelled
+                    procedure.finish()
+                    return
+                }
+
                 if procedure.processDidExitCleanly(Int(procedure.process.terminationStatus)) {
                     procedure.finish()
                 }
@@ -113,7 +121,10 @@ open class ProcessProcedure: Procedure {
                 }
             }
 
-            guard !procedure.isCancelled else { return }
+            guard !procedure.isCancelled else {
+                procedure.finish()
+                return
+            }
             procedure.process.launch()
         }
     }

@@ -84,6 +84,9 @@ public class DelayProcedure: Procedure {
         addDidCancelBlockObserver { procedure, _ in
             procedure.stateLock.withCriticalScope {
                 procedure._timer?.cancel()
+                if procedure.isExecuting {
+                    procedure.finish()
+                }
             }
         }
     }

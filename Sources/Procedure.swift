@@ -140,7 +140,16 @@ open class Procedure: Operation, ProcedureProtocol {
         return state == .finished
     }
 
-    /// Boolean indicator for whether the Operation has cancelled or not
+    /// Boolean indicator for whether the Procedure is cancelled or not
+    ///
+    /// Canceling a Procedure does not actively stop the Procedure's code from executing.
+    ///
+    /// An executing Procedure is responsible for checking its own cancellation status,
+    /// and stopping and moving to the finished state as quickly as possible.
+    ///
+    /// Built-in Procedure subclasses in ProcedureKit (like GroupProcedure and CloudKitProcedure)
+    /// handle responding to cancellation as appropriate.
+    ///
     final public override var isCancelled: Bool {
         return _stateLock.withCriticalScope { _isCancelled }
     }
@@ -259,11 +268,8 @@ open class Procedure: Operation, ProcedureProtocol {
 
      The default behavior of Operation is to automatically call finish()
      when:
-     (a) it's cancelled, whether that occurs:
-        - prior to the Operation starting
-          (in which case, Operation will skip calling execute())
-        - on another thread at the same time that the operation is
-          executing
+     (a) the Operation is cancelled prior to it starting
+         (in which case, the Operation will skip calling execute())
      (b) when willExecuteObservers log errors
 
      To ensure that an Operation subclass does not finish until the
@@ -438,6 +444,28 @@ open class Procedure: Operation, ProcedureProtocol {
 
     // MARK: - Cancellation
 
+    /**
+     By default, cancelling a Procedure simply sets the `isCancelled` flag to true.
+
+     It is the responsibility of the Procedure subclass to handle cancellation,
+     as appropriate.
+
+     For example, GroupProcedure handles cancellation by cancelling all of its
+     children.
+
+     You can react to cancellation using WillCancelObserver/DidCancelObserver
+     and/or checking periodically during execute with something like:
+
+     ```swift
+     guard !cancelled else {
+        // do any necessary clean-up
+        finish()    // always call finish when your Procedure is done
+        return
+     }
+     ```
+
+     */
+
     open func procedureWillCancel(withErrors: [Error]) { }
 
     open func procedureDidCancel(withErrors: [Error]) { }
@@ -458,16 +486,6 @@ open class Procedure: Operation, ProcedureProtocol {
             guard !_isHandlingCancel else { return false }
             _isHandlingCancel = true
             return true
-        }
-    }
-
-    private var shouldFinishFromCancel: Bool {
-        return _stateLock.withCriticalScope {
-            let shouldFinish = isExecuting && !isAutomaticFinishingDisabled && !_isHandlingFinish
-            if shouldFinish {
-                _isFinishingFrom = .cancel
-            }
-            return shouldFinish
         }
     }
 
@@ -500,10 +518,6 @@ open class Procedure: Operation, ProcedureProtocol {
         // Call super to trigger .isReady state change on cancel
         // as well as isReady KVO notification
         super.cancel()
-
-        guard shouldFinishFromCancel else { return }
-
-        _finish(withErrors: [], from: .cancel)
     }
 
 

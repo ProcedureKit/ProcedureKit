@@ -53,6 +53,9 @@ open class NetworkDataProcedure<Session: URLSessionTaskFactory>: Procedure, Inpu
         addDidCancelBlockObserver { procedure, _ in
             procedure.stateLock.withCriticalScope {
                 procedure.task?.cancel()
+                // a call to `finish()` is not necessary here, because the URLSessionTask's
+                // completion handler is always called (even if cancelled) and it
+                // ensures that `finish()` is called
             }
         }
     }
@@ -64,11 +67,21 @@ open class NetworkDataProcedure<Session: URLSessionTaskFactory>: Procedure, Inpu
         }
 
         stateLock.withCriticalScope {
-            guard !isCancelled else { return }
+            guard !isCancelled else {
+                finish()
+                return
+            }
             task = session.dataTask(with: request) { [weak self] data, response, error in
                 guard let strongSelf = self else { return }
 
                 if let error = error {
+                    let nsError = error as NSError
+                    guard !strongSelf.isCancelled || (nsError.domain != NSURLErrorDomain || nsError.code != NSURLErrorCancelled) else {
+                        // special case: hide the task's cancellation error
+                        // if the NetworkProcedure was cancelled
+                        strongSelf.finish()
+                        return
+                    }
                     strongSelf.finish(withResult: .failure(error))
                     return
                 }

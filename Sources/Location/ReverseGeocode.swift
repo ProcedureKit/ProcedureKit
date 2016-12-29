@@ -36,6 +36,9 @@ open class ReverseGeocodeProcedure: Procedure, InputProcedure, OutputProcedure {
         addDidCancelBlockObserver { [weak self] _, errors in
             DispatchQueue.main.async {
                 self?.cancelGeocoder()
+                if self?.isExecuting ?? false {
+                    self?.finish()
+                }
             }
         }
     }
