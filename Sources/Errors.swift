@@ -15,7 +15,7 @@ public protocol ProcedureKitComponent {
     var name: String { get }
 }
 
-public struct ProcedureKitError: Error, Equatable {
+public struct ProcedureKitError: Error, Equatable, CustomStringConvertible {
 
     public static func == (lhs: ProcedureKitError, rhs: ProcedureKitError) -> Bool {
         return lhs.context == rhs.context
@@ -124,4 +124,16 @@ public struct ProcedureKitError: Error, Equatable {
 
     public let context: Context
     public let errors: [Error]
+
+    // Swift 3.0 Leak Fix:
+    //
+    // As of Swift 3.0.1 & Xcode 8.1, ProcedureKitError leaks memory when converted to a string
+    // unless it conforms to CustomStringConvertible and provides its own `description`
+    // implementation.
+    //
+    // Symptoms: Malloc 48 byte leaks
+    //
+    public var description: String {
+        return "ProcedureKitError(context: \(context), errors: \(errors))"
+    }
 }
