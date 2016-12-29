@@ -28,12 +28,12 @@ public final class CloudKitRecovery<T: Operation> where T: CKOperationProtocol, 
 
     public typealias WrappedOperation = CKProcedure<T>
     public typealias ConfigureBlock = (WrappedOperation) -> Void
-    public typealias Recovery = (Delay?, ConfigureBlock)
+    public typealias Recovery = (delay: Delay?, configure: ConfigureBlock)
     public typealias Payload = RepeatProcedurePayload<WrappedOperation>
     public typealias Handler = (T, T.AssociatedError, LoggerProtocol, Recovery) -> Recovery?
 
-    var defaultHandlers: [CKError.Code: Handler] = [:]
-    var customHandlers: [CKError.Code: Handler] = [:]
+    var handlers: [CKError.Code: Handler] = [:]
+
     private var finallyConfigureRetryOperationBlock: ConfigureBlock?
 
     internal init() {
@@ -57,13 +57,13 @@ public final class CloudKitRecovery<T: Operation> where T: CKOperationProtocol, 
         let suggestion: Recovery = (payload.delay, info.configure)
 
         guard
-            let handler = customHandlers[code] ?? defaultHandlers[code],
+            let handler = handlers[code],
             var response = handler(info.operation.operation, error, info.log, suggestion)
         else { return nil }
 
         if let finallyConfigureBlock = finallyConfigureRetryOperationBlock {
             let previousConfigureBlock = response.1
-            response.1 = { operation in
+            response.configure = { operation in
                 previousConfigureBlock(operation)
                 finallyConfigureBlock(operation)
             }
@@ -79,37 +79,33 @@ public final class CloudKitRecovery<T: Operation> where T: CKOperationProtocol, 
             return nil
         }
 
-        set(defaultHandlerForCode: .internalError, handler: exit)
-        set(defaultHandlerForCode: .missingEntitlement, handler: exit)
-        set(defaultHandlerForCode: .invalidArguments, handler: exit)
-        set(defaultHandlerForCode: .serverRejectedRequest, handler: exit)
-        set(defaultHandlerForCode: .assetFileNotFound, handler: exit)
-        set(defaultHandlerForCode: .incompatibleVersion, handler: exit)
-        set(defaultHandlerForCode: .constraintViolation, handler: exit)
-        set(defaultHandlerForCode: .badDatabase, handler: exit)
-        set(defaultHandlerForCode: .quotaExceeded, handler: exit)
-        set(defaultHandlerForCode: .operationCancelled, handler: exit)
+        set(handlerForCode: .internalError, handler: exit)
+        set(handlerForCode: .missingEntitlement, handler: exit)
+        set(handlerForCode: .invalidArguments, handler: exit)
+        set(handlerForCode: .serverRejectedRequest, handler: exit)
+        set(handlerForCode: .assetFileNotFound, handler: exit)
+        set(handlerForCode: .incompatibleVersion, handler: exit)
+        set(handlerForCode: .constraintViolation, handler: exit)
+        set(handlerForCode: .badDatabase, handler: exit)
+        set(handlerForCode: .quotaExceeded, handler: exit)
+        set(handlerForCode: .operationCancelled, handler: exit)
 
         let retry: Handler = { _, error, log, suggestion in
             log.info(message: "Will retry after receiving error: \(error)")
-            return error.retryAfterDelay.map { ($0, suggestion.1) } ?? suggestion
+            return error.retryAfterDelay.map { ($0, suggestion.configure) } ?? suggestion
         }
 
-        set(defaultHandlerForCode: .networkUnavailable, handler: retry)
-        set(defaultHandlerForCode: .networkFailure, handler: retry)
-        set(defaultHandlerForCode: .serviceUnavailable, handler: retry)
-        set(defaultHandlerForCode: .requestRateLimited, handler: retry)
-        set(defaultHandlerForCode: .assetFileModified, handler: retry)
-        set(defaultHandlerForCode: .batchRequestFailed, handler: retry)
-        set(defaultHandlerForCode: .zoneBusy, handler: retry)
+        set(handlerForCode: .networkUnavailable, handler: retry)
+        set(handlerForCode: .networkFailure, handler: retry)
+        set(handlerForCode: .serviceUnavailable, handler: retry)
+        set(handlerForCode: .requestRateLimited, handler: retry)
+        set(handlerForCode: .assetFileModified, handler: retry)
+        set(handlerForCode: .batchRequestFailed, handler: retry)
+        set(handlerForCode: .zoneBusy, handler: retry)
     }
 
-    func set(defaultHandlerForCode code: CKError.Code, handler: @escaping Handler) {
-        defaultHandlers[code] = handler
-    }
-
-    func set(customHandlerForCode code: CKError.Code, handler: @escaping Handler) {
-        customHandlers[code] = handler
+    func set(handlerForCode code: CKError.Code, handler: @escaping Handler) {
+        handlers[code] = handler
     }
 
     func set(finallyConfigureRetryOperationBlock block: ConfigureBlock?) {
@@ -223,7 +219,7 @@ public final class CloudKitProcedure<T: Operation>: RetryProcedure<CKProcedure<T
     let recovery: CloudKitRecovery<T>
 
     public var errorHandlers: [CKError.Code: ErrorHandler] {
-        return recovery.customHandlers
+        return recovery.handlers
     }
 
     public init<Iterator: IteratorProtocol>(dispatchQueue: DispatchQueue, timeout: TimeInterval?, strategy: WaitStrategy, iterator: Iterator) where T == Iterator.Element {
@@ -253,11 +249,11 @@ public final class CloudKitProcedure<T: Operation>: RetryProcedure<CKProcedure<T
     }
 
     public func set(errorHandlerForCode code: CKError.Code, handler: @escaping ErrorHandler) {
-        recovery.set(customHandlerForCode: code, handler: handler)
+        recovery.set(handlerForCode: code, handler: handler)
     }
 
     public func set(errorHandlers: [CKError.Code: ErrorHandler]) {
-        recovery.customHandlers = errorHandlers
+        recovery.handlers = errorHandlers
     }
 
     // When an error occurs, CloudKitProcedure executes the appropriate error handler (as long as the completion block is set).

@@ -26,12 +26,28 @@ public struct ModifySubscriptionsError<Subscription, SubscriptionID>: CloudKitEr
     public let underlyingError: Error
     public let saved: [Subscription]?
     public let deleted: [SubscriptionID]?
+
+    public init(error: Error, saved: [Subscription]?, deleted: [SubscriptionID]?) {
+        self.underlyingError = error
+        self.saved = saved
+        self.deleted = deleted
+    }
 }
 
-extension CKModifySubscriptionsOperation: CKModifySubscriptionsOperationProtocol, AssociatedErrorProtocol {
+extension CKModifySubscriptionsOperation: CKModifySubscriptionsOperationProtocol, AssociatedErrorProtocol, CloudKitBatchModifyOperation {
 
     // The associated error type
     public typealias AssociatedError = ModifySubscriptionsError<Subscription, String>
+
+    public var toSave: [Subscription]? {
+        get { return subscriptionsToSave }
+        set { subscriptionsToSave = newValue }
+    }
+
+    public var toDelete: [String]? {
+        get { return subscriptionIDsToDelete }
+        set { subscriptionIDsToDelete = newValue }
+    }
 }
 
 extension CKProcedure where T: CKModifySubscriptionsOperationProtocol, T: AssociatedErrorProtocol, T.AssociatedError: CloudKitError {
@@ -49,7 +65,7 @@ extension CKProcedure where T: CKModifySubscriptionsOperationProtocol, T: Associ
     func setModifySubscriptionsCompletionBlock(_ block: @escaping CloudKitProcedure<T>.ModifySubscriptionsCompletionBlock) {
         operation.modifySubscriptionsCompletionBlock = { [weak self] saved, deleted, error in
             if let strongSelf = self, let error = error {
-                strongSelf.append(fatalError: ModifySubscriptionsError(underlyingError: error, saved: saved, deleted: deleted))
+                strongSelf.append(fatalError: ModifySubscriptionsError(error: error, saved: saved, deleted: deleted))
             }
             else {
                 block(saved, deleted)
@@ -92,6 +108,5 @@ extension CloudKitProcedure where T: CKModifySubscriptionsOperationProtocol, T: 
         appendConfigureBlock { $0.setModifySubscriptionsCompletionBlock(block) }
     }
 }
-
 
 #endif
