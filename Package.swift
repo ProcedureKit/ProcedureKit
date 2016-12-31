@@ -13,6 +13,10 @@ let package = Package(
             dependencies: ["ProcedureKit"]),
 
         Target(
+            name: "ProcedureKitLocation",
+            dependencies: ["ProcedureKit"]),
+
+        Target(
             name: "ProcedureKitNetwork",
             dependencies: ["ProcedureKit"]),
 
@@ -35,17 +39,19 @@ let package = Package(
             dependencies: ["ProcedureKitCloud", "TestingProcedureKit"]),
 
          Target(
+            name: "ProcedureKitLocationTests",
+            dependencies: ["ProcedureKitLocation", "TestingProcedureKit"]),
+
+         Target(
             name: "ProcedureKitNetworkTests",
             dependencies: ["ProcedureKitNetwork", "TestingProcedureKit"])
 
     ],
 
     exclude: [
-        "Sources/ProcedureKitLocation",
         "Sources/ProcedureKitMac",
         "Sources/ProcedureKitMobile",
         "Sources/ProcedureKitTV",
-        "Tests/ProcedureKitLocationTests",
         "Tests/ProcedureKitMacTests",
         "Tests/ProcedureKitMobileTests",
         "Tests/ProcedureKitTVTests",

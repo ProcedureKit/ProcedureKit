@@ -32,7 +32,18 @@ class TestableLocationServicesRegistrar {
     weak var delegate: CLLocationManagerDelegate? = nil
     var servicesEnabled = true
     var authorizationStatus: CLAuthorizationStatus = .notDetermined
-    var responseStatus: CLAuthorizationStatus = .authorizedAlways
+    var responseStatus: CLAuthorizationStatus = {
+        if #available(OSX 10.12, iOS 8.0, tvOS 8.0, watchOS 2.0, *) {
+            return CLAuthorizationStatus.authorizedAlways
+        }
+        else {
+            #if os(OSX)
+                return CLAuthorizationStatus.authorized
+            #else
+                return CLAuthorizationStatus.authorizedAlways
+            #endif
+        }
+    }()
 
     var didCheckServiceEnabled = false
     var didCheckAuthorizationStatus = false
@@ -142,7 +153,18 @@ class LocationProcedureTestCase: ProcedureKitTestCase {
         location = createLocation(withAccuracy: accuracy)
         placemark = createPlacemark(coordinate: location.coordinate)
         manager = TestableLocationManager()
-        manager.authorizationStatus = .authorizedAlways
+        manager.authorizationStatus = {
+            if #available(OSX 10.12, iOS 8.0, tvOS 8.0, watchOS 2.0, *) {
+                return CLAuthorizationStatus.authorizedAlways
+            }
+            else {
+                #if os(OSX)
+                    return CLAuthorizationStatus.authorized
+                #else
+                    return CLAuthorizationStatus.authorizedAlways
+                #endif
+            }
+        }()
         manager.returnedLocation = location
         geocoder = TestableReverseGeocoder()
     }

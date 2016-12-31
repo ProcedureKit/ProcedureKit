@@ -56,12 +56,14 @@ class CLAuthorizationStatusTests: XCTestCase {
     }
     #endif
 
+    @available(OSX 10.12, iOS 8.0, tvOS 8.0, watchOS 2.0, *)
     func test__given_status_authorized_always__requirement_when_in_use_met() {
         let status = CLAuthorizationStatus.authorizedAlways
         XCTAssertTrue(status.meets(requirement: .whenInUse))
         XCTAssertTrue(status.meets(requirement: nil))
     }
 
+    @available(OSX 10.12, iOS 8.0, tvOS 8.0, watchOS 2.0, *)
     func test__given_status_authorized_always__requirement_always_met() {
         let status = CLAuthorizationStatus.authorizedAlways
         XCTAssertTrue(status.meets(requirement: .always))
@@ -165,7 +167,18 @@ class LocationCapabilityTests: XCTestCase {
 
     func test__given_already_authorized_sufficiently_does_not_request_authorization() {
         weak var exp = expectation(description: "Test: \(#function)")
-        registrar.authorizationStatus = .authorizedAlways
+        registrar.authorizationStatus = {
+            if #available(OSX 10.12, iOS 8.0, tvOS 8.0, watchOS 2.0, *) {
+                return CLAuthorizationStatus.authorizedAlways
+            }
+            else {
+                #if os(OSX)
+                    return CLAuthorizationStatus.authorized
+                #else
+                    return CLAuthorizationStatus.authorizedAlways
+                #endif
+            }
+        }()
         capability = Capability.Location(.whenInUse)
         capability.registrar = registrar
         var didComplete = false

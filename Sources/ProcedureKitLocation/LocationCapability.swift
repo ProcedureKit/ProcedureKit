@@ -4,6 +4,11 @@
 //  Copyright © 2016 ProcedureKit. All rights reserved.
 //
 
+#if SWIFT_PACKAGE
+    import ProcedureKit
+    import Foundation
+#endif
+
 import CoreLocation
 import MapKit
 
@@ -15,11 +20,21 @@ public enum LocationUsage {
 extension CLAuthorizationStatus: AuthorizationStatus {
 
     public func meets(requirement: LocationUsage?) -> Bool {
-        switch (requirement, self) {
-        case (.some(.whenInUse), .authorizedWhenInUse), (_, .authorizedAlways):
-            return true
-        default:
-            return false
+        if #available(OSX 10.12, iOS 8.0, tvOS 8.0, watchOS 2.0, *) {
+            switch (requirement, self) {
+            case (.some(.whenInUse), .authorizedWhenInUse), (_, .authorizedAlways): return true
+            default: return false
+            }
+        }
+        else {
+            #if os(OSX)
+                switch (requirement, self) {
+                case (_, .authorized): return true
+                default: return false
+                }
+            #else
+                return false
+            #endif
         }
     }
 }
