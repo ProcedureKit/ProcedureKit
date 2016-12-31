@@ -4,6 +4,11 @@
 //  Copyright © 2016 ProcedureKit. All rights reserved.
 //
 
+#if SWIFT_PACKAGE
+    import ProcedureKit
+    import Foundation
+#endif
+
 /**
  NetworkUploadProcedure is a simple procedure which will perform a upload task using
  URLSession based APIs. It only supports the completion block style API, therefore

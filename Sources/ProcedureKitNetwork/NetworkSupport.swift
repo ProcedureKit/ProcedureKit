@@ -4,6 +4,11 @@
 //  Copyright © 2016 ProcedureKit. All rights reserved.
 //
 
+#if SWIFT_PACKAGE
+    import ProcedureKit
+    import Foundation
+#endif
+
 // MARK: - URLSession
 
 public protocol URLSessionTaskProtocol {

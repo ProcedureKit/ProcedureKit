@@ -8,6 +8,10 @@ let package = Package(
         /** ProcedureKit libraries */
         Target(name: "ProcedureKit"),
 
+        Target(
+            name: "ProcedureKitNetwork",
+            dependencies: ["ProcedureKit"]),
+
         /** Test Support library */
         Target(
             name: "TestingProcedureKit",
@@ -20,7 +24,12 @@ let package = Package(
 
          Target(
             name: "ProcedureKitStressTests",
-            dependencies: ["ProcedureKit", "TestingProcedureKit"])
+            dependencies: ["ProcedureKit", "TestingProcedureKit"]),
+
+         Target(
+            name: "ProcedureKitNetworkTests",
+            dependencies: ["ProcedureKitNetwork", "TestingProcedureKit"])
+
     ],
 
     exclude: [
@@ -28,13 +37,11 @@ let package = Package(
         "Sources/ProcedureKitLocation",
         "Sources/ProcedureKitMac",
         "Sources/ProcedureKitMobile",
-        "Sources/ProcedureKitNetwork",
         "Sources/ProcedureKitTV",
         "Tests/ProcedureKitCloudTests",
         "Tests/ProcedureKitLocationTests",
         "Tests/ProcedureKitMacTests",
         "Tests/ProcedureKitMobileTests",
-        "Tests/ProcedureKitNetworkTests",
         "Tests/ProcedureKitTVTests",
     ]
 )

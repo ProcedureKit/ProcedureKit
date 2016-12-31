@@ -6,6 +6,11 @@
 
 #if !os(watchOS)
 
+#if SWIFT_PACKAGE
+    import ProcedureKit
+    import Foundation
+#endif
+
 import SystemConfiguration
 
 public protocol NetworkResilience {
