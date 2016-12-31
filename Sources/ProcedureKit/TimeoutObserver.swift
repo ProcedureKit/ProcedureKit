@@ -87,7 +87,7 @@ internal class ProcedureTimeoutRegistrar {
     // Removes all DispatchTimers associated with a Procedure's registered timeouts.
     // Is called when a Procedure finishes and when a timeout fires.
     private func registerTimeoutProcessed(forProcedure procedure: Procedure) {
-        guard let dispatchTimers = protectedFinishTimers.write( {
+        guard let dispatchTimers = protectedFinishTimers.write({
             return $0.removeValue(forKey: procedure)
         })
         else {
@@ -99,7 +99,7 @@ internal class ProcedureTimeoutRegistrar {
     }
 }
 
-// A wrapper for a DispatchSourceTimer that ensures that the timer is cancelled 
+// A wrapper for a DispatchSourceTimer that ensures that the timer is cancelled
 // and not suspended prior to deinitialization.
 fileprivate class DispatchTimerWrapper {
     fileprivate typealias EventHandler = @convention(block) () -> Swift.Void

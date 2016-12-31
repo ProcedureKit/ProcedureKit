@@ -47,7 +47,7 @@ public struct RepeatProcedurePayload<T: Operation> {
 /// polling or repeating procedures. Each child procedure is a new instance
 /// of the same Operation subclass T. For example `RepeatProcedure<MyOperation>`
 /// will create and execute instances of MyOperation repeatedly, and we say
-/// that the RepeatProcedure is generic over T, which in this case is 
+/// that the RepeatProcedure is generic over T, which in this case is
 /// MyOperation.
 ///
 /// While RepeatProcedure can be initialized in a variety of ways, it helps
