@@ -33,7 +33,7 @@ session Advanced NSOperations: https://developer.apple.com/videos/wwdc/2015/?id=
     ss.platforms = { :ios => "8.0", :tvos => "9.2", :osx => "10.10" }  
   	ss.dependency 'ProcedureKit'  
   	ss.frameworks = 'XCTest'  	
-  	ss.source_files = ['Sources/Testing']
+  	ss.source_files = ['Sources/TestingProcedureKit']
   end
 end
 
