@@ -4,9 +4,14 @@
 //  Copyright © 2016 ProcedureKit. All rights reserved.
 //
 
-import CloudKit
-
 #if !os(tvOS)
+
+#if SWIFT_PACKAGE
+    import ProcedureKit
+    import Foundation
+#endif
+
+import CloudKit
 
 /// A generic protocol which exposes the properties used by Apple's CKDiscoverAllContactsOperation.
 public protocol CKDiscoverAllContactsOperationProtocol: CKOperationProtocol {
