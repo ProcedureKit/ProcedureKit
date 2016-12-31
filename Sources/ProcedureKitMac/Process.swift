@@ -4,8 +4,11 @@
 //  Copyright © 2016 ProcedureKit. All rights reserved.
 //
 
-import Foundation
-import ProcedureKit
+#if SWIFT_PACKAGE
+    import ProcedureKit
+    import Foundation
+#endif
+
 import Dispatch
 
 open class ProcessProcedure: Procedure {
