@@ -80,8 +80,7 @@ open class NetworkDownloadProcedure<Session: URLSessionTaskFactory>: Procedure, 
                 guard let strongSelf = self else { return }
 
                 if let error = error {
-                    let nsError = error as NSError
-                    guard !strongSelf.isCancelled || (nsError.domain != NSURLErrorDomain || nsError.code != NSURLErrorCancelled) else {
+                    if strongSelf.isCancelled, let error = error as? URLError, error.code == .cancelled {
                         // special case: hide the task's cancellation error
                         // if the NetworkProcedure was cancelled
                         strongSelf.finish()
