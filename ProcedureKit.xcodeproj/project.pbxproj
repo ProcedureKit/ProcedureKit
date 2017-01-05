@@ -3452,6 +3452,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 65CFC60E1D608AE200CAD875 /* ProcedureKit.xcconfig */;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "";
 				ONLY_ACTIVE_ARCH = YES;
 			};
 			name = Debug;
@@ -3460,6 +3461,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 65CFC60E1D608AE200CAD875 /* ProcedureKit.xcconfig */;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "";
 			};
 			name = Release;
 		};
