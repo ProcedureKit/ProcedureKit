@@ -83,5 +83,6 @@ class GroupDoesNotFinishBeforeChildOperationsAreFinished: StressTestCase {
     override func ended(batch: BatchProtocol) {
         XCTAssertEqual(batch.counter(named: "child 1 finished"), batch.size)
         XCTAssertEqual(batch.counter(named: "child 2 finished"), batch.size)
+        super.ended(batch: batch)
     }
 }

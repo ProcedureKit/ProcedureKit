@@ -24,12 +24,14 @@ class ProcedureCompletionBlockStressTest: StressTestCase {
 
 class CancelProcedureWithErrorsStressTest: StressTestCase {
 
-    func test__cancel_with_errors() {
+    func test__cancel_or_finish_with_errors() {
+
+        // NOTE: It is possible for a TestProcedure below to finish prior to being cancelled
 
         stress { batch, iteration in
             batch.dispatchGroup.enter()
             let procedure = TestProcedure(name: "Batch \(batch.number), Iteration \(iteration)")
-            procedure.addDidCancelBlockObserver { _, _ in
+            procedure.addDidFinishBlockObserver { _, _ in
                 batch.dispatchGroup.leave()
             }
             batch.queue.add(operation: procedure)
@@ -152,5 +154,6 @@ class ProcedureFinishStressTest: StressTestCase {
 
     override func ended(batch: BatchProtocol) {
         XCTAssertEqual(batch.counter(named: "finishedProcedureMoreThanOnce"), 0)
+        super.ended(batch: batch)
     }
 }
