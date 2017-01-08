@@ -23,8 +23,13 @@ open class ProcedureKitTestCase: XCTestCase {
     }
 
     open override func tearDown() {
-        procedure.cancel()
-        queue.cancelAllOperations()
+        if let procedure = procedure {
+            procedure.cancel()
+        }
+        if let queue = queue {
+            queue.cancelAllOperations()
+            queue.waitUntilAllOperationsAreFinished()
+        }
         delegate = nil
         queue = nil
         procedure = nil
@@ -124,6 +129,7 @@ open class ProcedureKitTestCase: XCTestCase {
         procedure.addWillAddOperationBlockObserver { _, operation in
             finishing.add(dependency: operation)
         }
+        finishing.name = "FinishingBlockProcedure(for: \(procedure.operationName))"
         return finishing
     }
 }
