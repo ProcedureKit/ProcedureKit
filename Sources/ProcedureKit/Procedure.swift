@@ -852,11 +852,11 @@ open class Procedure: Operation, ProcedureProtocol {
 
     private final func _finish(withInfo info: FinishingInfo) {
         dispatchEvent {
-            self._finishImpl(withInfo: info)
+            self._finish_onEventQueue(withInfo: info)
         }
     }
 
-    private final func _finishImpl(withInfo info: FinishingInfo) {
+    private final func _finish_onEventQueue(withInfo info: FinishingInfo) {
 
         debugAssertIsOnEventQueue()
 
