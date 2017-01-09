@@ -1063,7 +1063,7 @@ internal extension Procedure {
     internal func optimizedDispatchEventNotify(group: DispatchGroup, inheritQoS: Bool = false, block: @escaping () -> ()) {
         debugAssertIsOnEventQueue()
         
-        if group.wait(timeout: .now()) == DispatchTimeoutResult.success {
+        if group.wait(timeout: .now()) == .success {
             // no need to dispatch notify, just execute block directly
             // (optimal path when the DispatchGroup is already finished)
             block()

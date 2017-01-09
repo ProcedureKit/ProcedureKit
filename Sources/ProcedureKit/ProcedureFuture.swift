@@ -138,9 +138,7 @@ public class ProcedureFuture {
     public func then(on eventQueueProvider: QueueProvider, block: @escaping (Void) -> Void) {
 
         let eventQueue = eventQueueProvider.providedQueue
-        eventQueue.dispatchNotify(withGroup: group, block: {
-            block()
-        })
+        eventQueue.dispatchNotify(withGroup: group, block: block)
     }
 }
 
@@ -160,7 +158,7 @@ fileprivate extension ProcedureFuture {
     func thenOnSelfOrLater(on eventQueueProvider: QueueProvider, block: @escaping (Void) -> Void) -> ProcedureFuture {
         let promise = ProcedurePromise()
         let eventQueue = eventQueueProvider.providedQueue
-        if group.wait(timeout: .now()) == DispatchTimeoutResult.success {
+        if group.wait(timeout: .now()) == .success {
             // future is immediately available, execute the block synchronously on the current thread
             block()
             promise.complete()
@@ -168,10 +166,10 @@ fileprivate extension ProcedureFuture {
         else {
             // future is not immediately available, so queue an asynchrous dispatch when it is on the
             // provided queue
-            eventQueue.dispatchNotify(withGroup: group, block: {
+            eventQueue.dispatchNotify(withGroup: group) {
                 block()
                 promise.complete()
-            })
+            }
         }
         return promise.future
     }
@@ -198,9 +196,9 @@ public class ProcedureFutureGroup {
                 group.leave()
             }
         }
-        group.notify(queue: DispatchQueue.global(), execute: { [future] in
+        group.notify(queue: DispatchQueue.global()) { [future] in
             future.complete()
-        })
+        }
     }
 }
 
@@ -291,10 +289,10 @@ public class ProcedureFutureResult<Result> {
     public func then(on eventQueueProvider: QueueProvider, block: @escaping (ProcedureResult<Result>) -> Void) {
 
         let eventQueue = eventQueueProvider.providedQueue
-        eventQueue.dispatchNotify(withGroup: group, block: {
+        eventQueue.dispatchNotify(withGroup: group) {
             guard let value = self.result.value else { fatalError("Notify triggered before result is available.") }
             block(value)
-        })
+        }
     }
 
     // MARK: - Private Implementation used by ProcedurePromiseResult
