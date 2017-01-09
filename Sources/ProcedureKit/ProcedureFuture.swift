@@ -59,11 +59,13 @@ public class ProcedurePromise {
     #endif
 
     #if DEBUG
-    // in Debug builds, verify and assert if a promise is not completed before it is deinited
+    // in Debug builds, verify and fail if a promise is not completed before it is deinited
     // (this slightly impacts performance)
     deinit {
         let didComplete = lock.withCriticalScope { _didComplete }
-        assert(didComplete, "Did not complete ProcedurePromise (\(self)) before deinit. All promises must eventually be completed.")
+        guard didComplete else {
+            fatalError("Did not complete ProcedurePromise (\(self)) before deinit. All promises must eventually be completed.")
+        }
     }
     #endif
 
@@ -175,30 +177,32 @@ fileprivate extension ProcedureFuture {
     }
 }
 
-/// Easily wait on multiple ProcedureFutures.
-/// Provides a future that is signaled once all ProcedureFutures in an array are signaled.
-///
-/// ```swift
-/// let futures: [ProcedureFuture] = ... // multiple ProcedureFutures
-/// let group = ProcedureFutureGroup(futures: futures)
-/// group.future.then(on: DispatchQueue.global()) {
-///     // execute this block when all the futures have completed
-/// }
-/// ```
-public class ProcedureFutureGroup {
-    public let future = ProcedureFuture()
-    private let group = DispatchGroup()
+extension Collection where Iterator.Element: ProcedureFuture {
 
-    init(_ futures: [ProcedureFuture]) {
-        futures.forEach {
+    /// Retrieve a future for a collection of ProcedureFutures that is signaled once
+    /// all the futures in the collection are signaled.
+    ///
+    /// ```swift
+    /// let futures: [ProcedureFuture] = ... // multiple ProcedureFutures
+    /// futures.future.then(on: DispatchQueue.global()) {
+    ///     // execute this block when all the futures have completed
+    /// }
+    /// ```
+    ///
+    /// - returns: a ProcedureFuture that is signaled once all ProcedureFutures in the collection are signaled
+    var future: ProcedureFuture {
+        let future = ProcedureFuture()
+        let group = DispatchGroup()
+        self.forEach {
             group.enter()
-            $0.thenOnSelfOrLater(on: DispatchQueue.global()) { [group = self.group] result in
+            $0.thenOnSelfOrLater(on: DispatchQueue.global()) { result in
                 group.leave()
             }
         }
-        group.notify(queue: DispatchQueue.global()) { [future] in
+        group.notify(queue: DispatchQueue.global()) {
             future.complete()
         }
+        return future
     }
 }
 

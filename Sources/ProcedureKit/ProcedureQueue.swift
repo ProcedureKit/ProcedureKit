@@ -397,27 +397,29 @@ open class ProcedureQueue: OperationQueue {
             let indirectDependenciesToProcess = indirectDependencies.filter { !self.operations.contains($0) }
 
             // Check to see if there are any which need processing
-            if indirectDependenciesToProcess.count > 0 {
-
-                // Iterate through the indirect dependencies
-                indirectDependenciesToProcess.forEach {
-
-                    // Indirect dependencies are executed after
-                    // any previous mutually exclusive operation(s)
-                    $0.add(dependencies: previousMutuallyExclusiveOperations)
-
-                    // Indirect dependencies are executed after
-                    // all direct dependencies
-                    $0.add(dependencies: procedure.directDependencies)
-
-                    // Only evaluate conditions after all indirect
-                    // dependencies have finished
-                    evaluator.addDependency($0)
-                }
-
-                // Add indirect dependencies
-                add(operations: indirectDependenciesToProcess)
+            guard indirectDependenciesToProcess.count > 0 else {
+                // No more processing to do - return the evaluator
+                return evaluator
             }
+
+            // Iterate through the indirect dependencies
+            indirectDependenciesToProcess.forEach {
+
+                // Indirect dependencies are executed after
+                // any previous mutually exclusive operation(s)
+                $0.add(dependencies: previousMutuallyExclusiveOperations)
+
+                // Indirect dependencies are executed after
+                // all direct dependencies
+                $0.add(dependencies: procedure.directDependencies)
+
+                // Only evaluate conditions after all indirect
+                // dependencies have finished
+                evaluator.addDependency($0)
+            }
+
+            // Add indirect dependencies
+            add(operations: indirectDependenciesToProcess)
         }
 
         return evaluator
@@ -428,9 +430,9 @@ public extension ProcedureQueue {
     /**
      Add operations to the queue as an array
      
-     - parameters operations: a variadic array of `NSOperation` instances.
+     - parameters operations: a sequence of `NSOperation` instances.
      - parameter context: an optional parameter that is passed-through to the Will/DidAdd delegate callbacks
-     - returns: a ProcedureFuture that is signaled once the operation has been added to the ProcedureQueue
+     - returns: a ProcedureFuture that is signaled once the operations have been added to the ProcedureQueue
      */
     @discardableResult
     final func add<S: Sequence>(operations: S, withContext context: Any? = nil) -> ProcedureFuture where S.Iterator.Element: Operation {
@@ -439,7 +441,7 @@ public extension ProcedureQueue {
             add(operation: $0, withContext: context)
         }
 
-        return ProcedureFutureGroup(futures).future
+        return futures.future
     }
 
     /**
@@ -447,7 +449,7 @@ public extension ProcedureQueue {
 
      - parameters operations: a variadic array of `NSOperation` instances.
      - parameter context: an optional parameter that is passed-through to the Will/DidAdd delegate callbacks
-     - returns: a ProcedureFuture that is signaled once the operation has been added to the ProcedureQueue
+     - returns: a ProcedureFuture that is signaled once the operations have been added to the ProcedureQueue
      */
     final func add(operations: Operation..., withContext context: Any? = nil) -> ProcedureFuture {
         return add(operations: operations, withContext: context)
