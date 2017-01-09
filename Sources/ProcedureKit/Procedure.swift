@@ -225,18 +225,18 @@ open class Procedure: Operation, ProcedureProtocol {
         var directDependencies = Set<Operation>()
         var conditions = Set<Condition>()
     }
-    fileprivate var protectedProperties: ProtectedProperties? = ProtectedProperties()
+    fileprivate var protectedProperties: ProtectedProperties! = ProtectedProperties()
 
     // the errors variable to be used *within* the stateLock
     private var _errors: [Error] {
-        return protectedProperties!.errors
+        return protectedProperties.errors
     }
 
     // the log variable to be used *within* the stateLock
     private var _log: LoggerProtocol {
         get {
             let operationName = self.operationName
-            return LoggerContext(parent: protectedProperties!.log, operationName: operationName)
+            return LoggerContext(parent: protectedProperties.log, operationName: operationName)
         }
     }
 
@@ -286,11 +286,11 @@ open class Procedure: Operation, ProcedureProtocol {
     final public var log: LoggerProtocol {
         get {
             let operationName = self.operationName
-            return _stateLock.withCriticalScope { LoggerContext(parent: protectedProperties!.log, operationName: operationName) }
+            return _stateLock.withCriticalScope { LoggerContext(parent: protectedProperties.log, operationName: operationName) }
         }
         set {
             _stateLock.withCriticalScope {
-                protectedProperties!.log = newValue
+                protectedProperties.log = newValue
             }
         }
     }
@@ -299,7 +299,7 @@ open class Procedure: Operation, ProcedureProtocol {
 
     final internal var observers: [AnyObserver<Procedure>] {
         get {
-            return _stateLock.withCriticalScope { protectedProperties!.observers }
+            return _stateLock.withCriticalScope { protectedProperties.observers }
         }
     }
 
@@ -307,7 +307,7 @@ open class Procedure: Operation, ProcedureProtocol {
     // MARK: Dependencies & Conditions
 
     internal var directDependencies: Set<Operation> {
-        get { return _stateLock.withCriticalScope { protectedProperties!.directDependencies } }
+        get { return _stateLock.withCriticalScope { protectedProperties.directDependencies } }
     }
 
     internal fileprivate(set) var evaluateConditionsProcedure: EvaluateConditions? = nil
@@ -321,7 +321,7 @@ open class Procedure: Operation, ProcedureProtocol {
 
     /// - returns conditions: the Set of Condition instances attached to the operation
     public var conditions: Set<Condition> {
-        get { return _stateLock.withCriticalScope { protectedProperties!.conditions } }
+        get { return _stateLock.withCriticalScope { protectedProperties.conditions } }
     }
 
     // MARK: - Initialization
@@ -709,10 +709,10 @@ open class Procedure: Operation, ProcedureProtocol {
 
         let resultingErrors = _stateLock.withCriticalScope { () -> [Error] in
             if !additionalErrors.isEmpty {
-                protectedProperties!.errors.append(contentsOf: additionalErrors)
+                protectedProperties.errors.append(contentsOf: additionalErrors)
             }
             _isCancelled = true
-            return protectedProperties!.errors
+            return protectedProperties.errors
         }
 
         log.notice(message: "Will cancel with \(!additionalErrors.isEmpty ? "errors: \(additionalErrors)" : "no errors").")
@@ -880,16 +880,14 @@ open class Procedure: Operation, ProcedureProtocol {
         let resultingErrors: [Error] = _stateLock.withCriticalScope {
             _state = .finishing
             if !info.receivedErrors.isEmpty {
-                protectedProperties!.errors.append(contentsOf: info.receivedErrors)
+                protectedProperties.errors.append(contentsOf: info.receivedErrors)
             }
-            return protectedProperties!.errors
+            return protectedProperties.errors
         }
 
         if changedExecutingState {
             didChangeValue(forKey: .executing)
         }
-
-//        let messageSuffix = !resultingErrors.isEmpty ? "errors: \(resultingErrors)" : "no errors"
 
         log.notice(message: "Will finish with \(!resultingErrors.isEmpty ? "errors: \(resultingErrors)" : "no errors").")
 
@@ -950,7 +948,7 @@ open class Procedure: Operation, ProcedureProtocol {
 
             // Add the observer to the internal observers array
             self._stateLock.withCriticalScope {
-                self.protectedProperties!.observers.append(AnyObserver(base: observer))
+                self.protectedProperties.observers.append(AnyObserver(base: observer))
             }
 
             // Dispatch the DidAttach event to the observer
@@ -1198,7 +1196,7 @@ extension Procedure {
     func add(directDependency: Operation) {
         precondition(state < .started, "Dependencies cannot be modified after a Procedure has started, current state: \(state).")
         _stateLock.withCriticalScope { () -> Void in
-            protectedProperties!.directDependencies.insert(directDependency)
+            protectedProperties.directDependencies.insert(directDependency)
         }
         super.addDependency(directDependency)
     }
@@ -1206,7 +1204,7 @@ extension Procedure {
     func remove(directDependency: Operation) {
         precondition(state < .started, "Dependencies cannot be modified after a Procedure has started, current state: \(state).")
         _stateLock.withCriticalScope { () -> Void in
-            protectedProperties!.directDependencies.remove(directDependency)
+            protectedProperties.directDependencies.remove(directDependency)
         }
         super.removeDependency(directDependency)
     }
@@ -1254,7 +1252,7 @@ extension Procedure {
     public final func add(condition: Condition) {
         assert(state < .willEnqueue, "Cannot modify conditions after a Procedure has been added to a queue, current state: \(state).")
         _stateLock.withCriticalScope { () -> Void in
-            protectedProperties!.conditions.insert(condition)
+            protectedProperties.conditions.insert(condition)
         }
     }
 }
