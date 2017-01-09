@@ -108,14 +108,14 @@ final public class PendingEvent: CustomStringConvertible {
 }
 
 internal extension PendingEvent {
-    static let executeEvent: (Procedure) -> PendingEvent = { PendingEvent(forProcedure: $0, withEvent: .execute) }
-    static let postDidExecuteEvent: (Procedure) -> PendingEvent = { PendingEvent(forProcedure: $0, withEvent: .postDidExecute) }
-    static let finishEvent: (Procedure) -> PendingEvent = { PendingEvent(forProcedure: $0, withEvent: .finish) }
-    static let postFinishEvent: (Procedure) -> PendingEvent = { PendingEvent(forProcedure: $0, withEvent: .postDidFinish) }
-    static let addOperationEvent: (Procedure) -> PendingEvent = { PendingEvent(forProcedure: $0, withEvent: .addOperation) }
-    static let postDidAddEvent: (Procedure) -> PendingEvent = { PendingEvent(forProcedure: $0, withEvent: .postDidAddOperation) }
-    static let postDidAttachEvent: (Procedure) -> PendingEvent = { PendingEvent(forProcedure: $0, withEvent: .postDidAttach) }
-    static let postDidCancelEvent: (Procedure) -> PendingEvent = { PendingEvent(forProcedure: $0, withEvent: .postDidCancel) }
+    static let execute: (Procedure) -> PendingEvent = { PendingEvent(forProcedure: $0, withEvent: .execute) }
+    static let postDidExecute: (Procedure) -> PendingEvent = { PendingEvent(forProcedure: $0, withEvent: .postDidExecute) }
+    static let finish: (Procedure) -> PendingEvent = { PendingEvent(forProcedure: $0, withEvent: .finish) }
+    static let postFinish: (Procedure) -> PendingEvent = { PendingEvent(forProcedure: $0, withEvent: .postDidFinish) }
+    static let addOperation: (Procedure) -> PendingEvent = { PendingEvent(forProcedure: $0, withEvent: .addOperation) }
+    static let postDidAdd: (Procedure) -> PendingEvent = { PendingEvent(forProcedure: $0, withEvent: .postDidAddOperation) }
+    static let postDidAttach: (Procedure) -> PendingEvent = { PendingEvent(forProcedure: $0, withEvent: .postDidAttach) }
+    static let postDidCancel: (Procedure) -> PendingEvent = { PendingEvent(forProcedure: $0, withEvent: .postDidCancel) }
 }
 
 public typealias PendingExecuteEvent = PendingEvent

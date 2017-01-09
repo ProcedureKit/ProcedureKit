@@ -446,7 +446,7 @@ open class Procedure: Operation, ProcedureProtocol {
         log.verbose(message: "[observers]: WillExecute")
 
         // Call the WillExecute observers
-        let willExecuteObserversGroup = dispatchObservers(pendingEvent: PendingEvent.executeEvent) { observer, pendingEvent in
+        let willExecuteObserversGroup = dispatchObservers(pendingEvent: PendingEvent.execute) { observer, pendingEvent in
             observer.will(execute: self, futureExecute: pendingEvent)
         }
 
@@ -551,7 +551,7 @@ open class Procedure: Operation, ProcedureProtocol {
 
         // Dispatch DidExecute observers
         log.verbose(message: "[observers]: DidExecute")
-        let _ = dispatchObservers(pendingEvent: PendingEvent.postDidExecuteEvent) { observer, _ in
+        let _ = dispatchObservers(pendingEvent: PendingEvent.postDidExecute) { observer, _ in
             observer.did(execute: self)
         }
         
@@ -589,7 +589,7 @@ open class Procedure: Operation, ProcedureProtocol {
         log.verbose(message: ".produce() | [observers]: WillAddOperation(\(operation.operationName))")
 
         // Dispatch WillAddOperation observers
-        let willAddObserversGroup = dispatchObservers(pendingEvent: PendingEvent.addOperationEvent) { observer, _ in
+        let willAddObserversGroup = dispatchObservers(pendingEvent: PendingEvent.addOperation) { observer, _ in
             observer.procedure(self, willAdd: operation)
         }
 
@@ -630,7 +630,7 @@ open class Procedure: Operation, ProcedureProtocol {
         promise.complete()
 
         // Dispatch DidAddOperation observers
-        let _ = self.dispatchObservers(pendingEvent: PendingEvent.postDidAddEvent) { observer, _ in
+        let _ = self.dispatchObservers(pendingEvent: PendingEvent.postDidAdd) { observer, _ in
             observer.procedure(self, didAdd: operation)
         }
         // no follow-up events to wait on the didAdd observers
@@ -733,7 +733,7 @@ open class Procedure: Operation, ProcedureProtocol {
 
             // DidCancel observers
             self.log.verbose(message: "[observers]: DidCancel")
-            let didCancelObserversGroup = self.dispatchObservers(pendingEvent: PendingEvent.postDidCancelEvent) { observer, _ in
+            let didCancelObserversGroup = self.dispatchObservers(pendingEvent: PendingEvent.postDidCancel) { observer, _ in
                 observer.did(cancel: self, withErrors: resultingErrors)
             }
 
@@ -893,7 +893,7 @@ open class Procedure: Operation, ProcedureProtocol {
 
         procedureWillFinish(withErrors: resultingErrors)
 
-        let willFinishObserversGroup = dispatchObservers(pendingEvent: PendingEvent.finishEvent) {
+        let willFinishObserversGroup = dispatchObservers(pendingEvent: PendingEvent.finish) {
             $0.will(finish: self, withErrors: resultingErrors, futureFinish: $1)
         }
 
@@ -920,7 +920,7 @@ open class Procedure: Operation, ProcedureProtocol {
             self.procedureDidFinish(withErrors: resultingErrors)
 
             // Dispatch the DidFinishObservers
-            let didFinishObserversGroup = self.dispatchObservers(pendingEvent: PendingEvent.postFinishEvent) { observer, _ in
+            let didFinishObserversGroup = self.dispatchObservers(pendingEvent: PendingEvent.postFinish) { observer, _ in
                 observer.did(finish: self, withErrors: resultingErrors)
             }
 

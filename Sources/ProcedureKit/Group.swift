@@ -311,7 +311,7 @@ open class GroupProcedure: Procedure, ProcedureQueueDelegate {
         groupWillAdd(child: operation)
 
         // WillAddOperation observers
-        let willAddObserversGroup = dispatchObservers(pendingEvent: PendingEvent.addOperationEvent) { observer, pendingEvent in
+        let willAddObserversGroup = dispatchObservers(pendingEvent: PendingEvent.addOperation) { observer, pendingEvent in
             observer.procedure(self, willAdd: operation)
         }
 
@@ -321,7 +321,7 @@ open class GroupProcedure: Procedure, ProcedureQueueDelegate {
             promise.complete()
 
             // DidAddOperation observers
-            let _ = self.dispatchObservers(pendingEvent: PendingEvent.postDidAddEvent) { observer, pendingEvent in
+            let _ = self.dispatchObservers(pendingEvent: PendingEvent.postDidAdd) { observer, pendingEvent in
                     observer.procedure(self, didAdd: operation)
             }
 
@@ -524,7 +524,7 @@ public extension GroupProcedure {
         additional.forEach { self.groupWillAdd(child: $0) }
 
         // WillAddOperation observers
-        let willAddObserversGroup = self.dispatchObservers(pendingEvent: PendingEvent.addOperationEvent) { observer, pendingEvent in
+        let willAddObserversGroup = self.dispatchObservers(pendingEvent: PendingEvent.addOperation) { observer, pendingEvent in
             additional.forEach {
                 observer.procedure(self, willAdd: $0)
             }
@@ -542,7 +542,7 @@ public extension GroupProcedure {
                 }
 
                 // DidAddOperation observers
-                let didAddObserversGroup = self.dispatchObservers(pendingEvent: PendingEvent.postDidAddEvent) { observer, pendingEvent in
+                let didAddObserversGroup = self.dispatchObservers(pendingEvent: PendingEvent.postDidAdd) { observer, pendingEvent in
                     additional.forEach {
                         observer.procedure(self, didAdd: $0)
                     }
