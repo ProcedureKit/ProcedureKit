@@ -38,6 +38,50 @@ class CancelProcedureWithErrorsStressTest: StressTestCase {
             procedure.cancel(withError: TestError())
         }
     }
+
+    func test__cancel_with_errors_prior_to_execute() {
+
+        stress { batch, iteration in
+            batch.dispatchGroup.enter()
+            let procedure = TestProcedure(name: "Batch \(batch.number), Iteration \(iteration)")
+            procedure.addDidFinishBlockObserver { _, errors in
+                if errors.isEmpty {
+                    DispatchQueue.main.async {
+                        XCTAssertFalse(errors.isEmpty, "errors is empty - cancel errors were not propagated")
+                        batch.dispatchGroup.leave()
+                    }
+                }
+                else {
+                    batch.dispatchGroup.leave()
+                }
+            }
+            procedure.cancel(withError: TestError())
+            batch.queue.add(operation: procedure)
+        }
+    }
+
+    func test__cancel_with_errors_from_will_execute_observer() {
+
+        stress { batch, iteration in
+            batch.dispatchGroup.enter()
+            let procedure = TestProcedure(name: "Batch \(batch.number), Iteration \(iteration)")
+            procedure.addDidFinishBlockObserver { _, errors in
+                if errors.isEmpty {
+                    DispatchQueue.main.async {
+                        XCTAssertFalse(errors.isEmpty, "errors is empty - cancel errors were not propagated")
+                        batch.dispatchGroup.leave()
+                    }
+                }
+                else {
+                    batch.dispatchGroup.leave()
+                }
+            }
+            procedure.addWillExecuteBlockObserver { (procedure, _) in
+                procedure.cancel(withError: TestError())
+            }
+            batch.queue.add(operation: procedure)
+        }
+    }
 }
 
 class ProcedureConditionStressTest: StressTestCase {
@@ -155,5 +199,57 @@ class ProcedureFinishStressTest: StressTestCase {
     override func ended(batch: BatchProtocol) {
         XCTAssertEqual(batch.counter(named: "finishedProcedureMoreThanOnce"), 0)
         super.ended(batch: batch)
+    }
+}
+
+class ProcedureCancellationHandlerConcurrencyTest: StressTestCase {
+
+    func test__cancelled_procedure_no_concurrent_events() {
+
+        stress(level: StressLevel.custom(2, 1000)) { batch, iteration in
+            batch.dispatchGroup.enter()
+            let procedure = EventConcurrencyTrackingProcedure(execute: { procedure in
+                usleep(50000)
+                procedure.finish()
+            })
+            procedure.addDidFinishBlockObserver(block: { (procedure, error) in
+                DispatchQueue.main.async {
+                    self.XCTAssertProcedureNoConcurrentEvents(procedure)
+                    batch.dispatchGroup.leave()
+                }
+            })
+            batch.queue.add(operation: procedure)
+            procedure.cancel()
+        }
+    }
+}
+
+class ProcedureFinishHandlerConcurrencyTest: StressTestCase {
+
+    func test__finish_from_asynchronous_callback_while_execute_is_still_running() {
+        // NOTE: Do not use this test as an example of what to do.
+
+        stress(level: StressLevel.custom(2, 1000)) { batch, iteration in
+            batch.dispatchGroup.enter()
+            let procedure = EventConcurrencyTrackingProcedure(execute: { procedure in
+                assert(!DispatchQueue.isMainDispatchQueue)
+                let semaphore = DispatchSemaphore(value: 0)
+                // dispatch finish on another thread...
+                DispatchQueue.global().async { [unowned procedure] in
+                    procedure.finish()
+                    semaphore.signal()
+                }
+                // and block this thread until the call to finish() returns
+                semaphore.wait()
+            })
+            procedure.addDidFinishBlockObserver(block: { (procedure, error) in
+                DispatchQueue.main.async {
+                    self.XCTAssertProcedureNoConcurrentEvents(procedure)
+                    batch.dispatchGroup.leave()
+                }
+            })
+            batch.queue.add(operation: procedure)
+            procedure.cancel()
+        }
     }
 }
