@@ -42,10 +42,10 @@ open class GroupProcedure: Procedure, ProcedureQueueDelegate {
     fileprivate var groupStateLock = PThreadMutex()
 
     // Protected private properties
-    fileprivate var _groupErrors = GroupErrors()
-    fileprivate var _groupChildren: [Operation]
-    fileprivate var _groupIsFinishing = false
-    fileprivate var _groupIsSuspended = false
+    fileprivate var _groupErrors = GroupErrors() // swiftlint:disable:this variable_name
+    fileprivate var _groupChildren: [Operation] // swiftlint:disable:this variable_name
+    fileprivate var _groupIsFinishing = false // swiftlint:disable:this variable_name
+    fileprivate var _groupIsSuspended = false // swiftlint:disable:this variable_name
 
     /// - returns: the operations which have been added to the queue
     final public var children: [Operation] {

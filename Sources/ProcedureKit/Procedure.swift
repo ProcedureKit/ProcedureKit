@@ -96,7 +96,7 @@ open class Procedure: Operation, ProcedureProtocol {
         var receivedErrors: [Error]
         var source: ProcedureKit.FinishingFrom
     }
-    fileprivate var _pendingFinish: FinishingInfo? = nil
+    private var _pendingFinish: FinishingInfo? = nil
 
     // only accessed from within the EventQueue
     private var pendingAutomaticFinish: FinishingInfo? = nil
