@@ -51,7 +51,10 @@ class UserLocationProcedureTests: LocationProcedureTestCase {
         var tmp: UserLocationProcedure! = UserLocationProcedure(accuracy: accuracy)
         tmp.manager = manager
         tmp = nil
-        XCTAssertTrue(manager.didStopUpdatingLocation)
+        // because of the asynchronous nature of a Procedure, deinit could occur in
+        // another thread that is still finishing up a block and releases the last reference
+        // to `tmp` - therefore, wait for a short bit to allow for that case
+        XCTAssertEqual(manager.waitForDidStopUpdatingLocation(withTimeout: 0.5), .success)
     }
 
     func test__finishes_if_accuracy_is_best() {
