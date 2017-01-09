@@ -47,7 +47,7 @@ public extension DispatchQueue {
     }
 
     static var currentQoSClass: DispatchQoS.QoSClass {
-        return DispatchQoS.QoSClass(rawValue: qos_class_self()) ?? DispatchQoS.QoSClass.unspecified
+        return DispatchQoS.QoSClass(rawValue: qos_class_self()) ?? .unspecified
     }
 }
 
@@ -75,7 +75,7 @@ internal extension QualityOfService {
 }
 
 extension DispatchQoS.QoSClass: Comparable {
-    public static func < (lhs: DispatchQoS.QoSClass, rhs:DispatchQoS.QoSClass) -> Bool {
+    public static func < (lhs: DispatchQoS.QoSClass, rhs: DispatchQoS.QoSClass) -> Bool {
         switch lhs {
         case .unspecified:
             return rhs != .unspecified
@@ -103,7 +103,7 @@ extension DispatchQoS.QoSClass: Comparable {
 }
 
 extension DispatchQoS: Comparable {
-    public static func < (lhs: DispatchQoS, rhs:DispatchQoS) -> Bool {
+    public static func < (lhs: DispatchQoS, rhs: DispatchQoS) -> Bool {
         if lhs.qosClass < rhs.qosClass { return true }
         else if lhs.qosClass > rhs.qosClass { return false }
         else { // qosClass are equal

@@ -272,10 +272,10 @@ public class ProcedurePromiseResult<T> {
 }
 
 public class ProcedureFutureResult<Result> {
-    fileprivate var _result = Pending<ProcedureResult<Result>>(nil)
-    fileprivate var group = DispatchGroup()
-    fileprivate var resultLock = PThreadMutex()
-    fileprivate var result: Pending<ProcedureResult<Result>> {
+    private var _result = Pending<ProcedureResult<Result>>(nil)
+    private var group = DispatchGroup()
+    private var resultLock = PThreadMutex()
+    private var result: Pending<ProcedureResult<Result>> {
         get { return resultLock.withCriticalScope { _result } }
         set {
             resultLock.withCriticalScope {
@@ -296,10 +296,8 @@ public class ProcedureFutureResult<Result> {
             block(value)
         })
     }
-}
 
-// Used by ProcedurePromiseResult
-fileprivate extension ProcedureFutureResult {
+    // MARK: - Private Implementation used by ProcedurePromiseResult
 
     fileprivate func complete(withResult value: Result) {
         setResult(.success(value))
