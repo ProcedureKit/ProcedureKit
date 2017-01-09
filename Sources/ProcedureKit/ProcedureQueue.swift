@@ -437,7 +437,7 @@ public extension ProcedureQueue {
     @discardableResult
     final func add<S: Sequence>(operations: S, withContext context: Any? = nil) -> ProcedureFuture where S.Iterator.Element: Operation {
 
-        let futures = Array(operations).map {
+        let futures = operations.map {
             add(operation: $0, withContext: context)
         }
 

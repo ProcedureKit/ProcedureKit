@@ -17,18 +17,18 @@ class KVOTests: ProcedureKitTestCase {
         private var isFinishedBlock: (() -> Void)?
 
         enum KeyPath: String {
-            case Cancelled = "isCancelled"
-            case Asynchronous = "isAsynchronous"
-            case Executing = "isExecuting"
-            case Finished = "isFinished"
-            case Ready = "isReady"
-            case Dependencies = "dependencies"
-            case QueuePriority = "queuePriority"
-            case CompletionBlock = "completionBlock"
+            case cancelled = "isCancelled"
+            case asynchronous = "isAsynchronous"
+            case executing = "isExecuting"
+            case finished = "isFinished"
+            case ready = "isReady"
+            case dependencies = "dependencies"
+            case queuePriority = "queuePriority"
+            case completionBlock = "completionBlock"
         }
 
         struct KeyPathSets {
-            static let State = Set<String>([KeyPath.Cancelled.rawValue, KeyPath.Executing.rawValue, KeyPath.Finished.rawValue, KeyPath.Ready.rawValue])
+            static let State = Set<String>([KeyPath.cancelled.rawValue, KeyPath.executing.rawValue, KeyPath.finished.rawValue, KeyPath.ready.rawValue])
         }
 
         struct KVONotification {
@@ -53,25 +53,25 @@ class KVOTests: ProcedureKitTestCase {
             self.isFinishedBlock = isFinishedBlock
             super.init()
             let options: NSKeyValueObservingOptions = [.old, .new]
-            operation.addObserver(self, forKeyPath: KeyPath.Cancelled.rawValue, options: options, context: &TestKVOOperationKVOContext)
-            operation.addObserver(self, forKeyPath: KeyPath.Asynchronous.rawValue, options: options, context: &TestKVOOperationKVOContext)
-            operation.addObserver(self, forKeyPath: KeyPath.Executing.rawValue, options: options, context: &TestKVOOperationKVOContext)
-            operation.addObserver(self, forKeyPath: KeyPath.Finished.rawValue, options: options, context: &TestKVOOperationKVOContext)
-            operation.addObserver(self, forKeyPath: KeyPath.Ready.rawValue, options: options, context: &TestKVOOperationKVOContext)
-            operation.addObserver(self, forKeyPath: KeyPath.Dependencies.rawValue, options: options, context: &TestKVOOperationKVOContext)
-            operation.addObserver(self, forKeyPath: KeyPath.QueuePriority.rawValue, options: options, context: &TestKVOOperationKVOContext)
-            operation.addObserver(self, forKeyPath: KeyPath.CompletionBlock.rawValue, options: options, context: &TestKVOOperationKVOContext)
+            operation.addObserver(self, forKeyPath: KeyPath.cancelled.rawValue, options: options, context: &TestKVOOperationKVOContext)
+            operation.addObserver(self, forKeyPath: KeyPath.asynchronous.rawValue, options: options, context: &TestKVOOperationKVOContext)
+            operation.addObserver(self, forKeyPath: KeyPath.executing.rawValue, options: options, context: &TestKVOOperationKVOContext)
+            operation.addObserver(self, forKeyPath: KeyPath.finished.rawValue, options: options, context: &TestKVOOperationKVOContext)
+            operation.addObserver(self, forKeyPath: KeyPath.ready.rawValue, options: options, context: &TestKVOOperationKVOContext)
+            operation.addObserver(self, forKeyPath: KeyPath.dependencies.rawValue, options: options, context: &TestKVOOperationKVOContext)
+            operation.addObserver(self, forKeyPath: KeyPath.queuePriority.rawValue, options: options, context: &TestKVOOperationKVOContext)
+            operation.addObserver(self, forKeyPath: KeyPath.completionBlock.rawValue, options: options, context: &TestKVOOperationKVOContext)
         }
 
         deinit {
-            operation.removeObserver(self, forKeyPath: KeyPath.Cancelled.rawValue)
-            operation.removeObserver(self, forKeyPath: KeyPath.Asynchronous.rawValue)
-            operation.removeObserver(self, forKeyPath: KeyPath.Executing.rawValue)
-            operation.removeObserver(self, forKeyPath: KeyPath.Finished.rawValue)
-            operation.removeObserver(self, forKeyPath: KeyPath.Ready.rawValue)
-            operation.removeObserver(self, forKeyPath: KeyPath.Dependencies.rawValue)
-            operation.removeObserver(self, forKeyPath: KeyPath.QueuePriority.rawValue)
-            operation.removeObserver(self, forKeyPath: KeyPath.CompletionBlock.rawValue)
+            operation.removeObserver(self, forKeyPath: KeyPath.cancelled.rawValue)
+            operation.removeObserver(self, forKeyPath: KeyPath.asynchronous.rawValue)
+            operation.removeObserver(self, forKeyPath: KeyPath.executing.rawValue)
+            operation.removeObserver(self, forKeyPath: KeyPath.finished.rawValue)
+            operation.removeObserver(self, forKeyPath: KeyPath.ready.rawValue)
+            operation.removeObserver(self, forKeyPath: KeyPath.dependencies.rawValue)
+            operation.removeObserver(self, forKeyPath: KeyPath.queuePriority.rawValue)
+            operation.removeObserver(self, forKeyPath: KeyPath.completionBlock.rawValue)
         }
 
         var observedKVO: [KVONotification] {
@@ -101,7 +101,7 @@ class KVOTests: ProcedureKitTestCase {
             }
             guard object as AnyObject? === operation else { return }
             guard let keyPath = keyPath else { return }
-            if let isFinishedBlock = self.isFinishedBlock, keyPath == KeyPath.Finished.rawValue {
+            if let isFinishedBlock = self.isFinishedBlock, keyPath == KeyPath.finished.rawValue {
                 orderOfKVONotifications.write( { (array) -> Void in
                     array.append(KVONotification(keyPath: keyPath, time: NSDate().timeIntervalSinceReferenceDate, old: change?[.oldKey], new: change?[.newKey]))
                 }, completion: {
@@ -119,7 +119,8 @@ class KVOTests: ProcedureKitTestCase {
 
     func test__nsoperation_kvo__procedure_state_transition_from_initializing_to_pending() {
         let kvoObserver = NSOperationKVOObserver(operation: procedure)
-        procedure.willEnqueue(on: queue) // trigger state transition from .Initializing -> .Pending
+        procedure.willEnqueue(on: queue) // trigger state transition from .initialized -> .willEnqueue
+        procedure.pendingQueueStart() // trigger state transition from .willEnqueue -> .pending
         let observedKVO = kvoObserver.observedKVOFor(NSOperationKVOObserver.KeyPathSets.State)
         XCTAssertEqual(observedKVO.count, 0)    // should be no KVO notification on any NSOperation keyPaths for this internal state transition
     }
@@ -138,16 +139,16 @@ class KVOTests: ProcedureKitTestCase {
             }
         }
         let kvoObserver = NSOperationKVOObserver(operation: procedure)
-        procedure.willEnqueue(on: queue) // trigger state transition from .Initializing -> .WillEnqueue
-        procedure.pendingQueueStart() // trigger state transition from .WillEnqueue -> .Pending
-        procedure.start() // trigger state transition from .Pending -> .Executing
+        procedure.willEnqueue(on: queue) // trigger state transition from .initialized -> .willEnqueue
+        procedure.pendingQueueStart() // trigger state transition from .willEnqueue -> .pending
+        procedure.start() // trigger state transition from .pending -> .executing
 
         waitForExpectations(timeout: 3, handler: nil)
 
         let observedKVO = kvoObserver.observedKVOFor(NSOperationKVOObserver.KeyPathSets.State)
         // should be a single KVO notification for NSOperation keyPath "isExecuting" for this internal state transition
         XCTAssertEqual(observedKVO.count, 1, "ObservedKVO = \(observedKVO)")
-        XCTAssertEqual(observedKVO.get(safe: 0)?.keyPath, NSOperationKVOObserver.KeyPath.Executing.rawValue)
+        XCTAssertEqual(observedKVO.get(safe: 0)?.keyPath, NSOperationKVOObserver.KeyPath.executing.rawValue)
     }
 
     func test__nsoperation_kvo__procedure_state_transition_to_executing_via_queue() {
@@ -170,14 +171,14 @@ class KVOTests: ProcedureKitTestCase {
             didFinishGroup.leave()
         }
         let kvoObserver = NSOperationKVOObserver(operation: operation)
-        run(operation: operation) // trigger state transition from .Initializing -> .Executing via the queue
+        run(operation: operation) // trigger state transition from .initialized -> .executing via the queue
 
         waitForExpectations(timeout: 5, handler: nil)
 
         let observedKVO = kvoObserver.observedKVOFor(NSOperationKVOObserver.KeyPathSets.State)
         // should be a single KVO notification for NSOperation keyPath "isExecuting" for this internal state transition
         XCTAssertEqual(observedKVO.count, 1)
-        XCTAssertEqual(observedKVO.get(safe: 0)?.keyPath, NSOperationKVOObserver.KeyPath.Executing.rawValue)
+        XCTAssertEqual(observedKVO.get(safe: 0)?.keyPath, NSOperationKVOObserver.KeyPath.executing.rawValue)
 
         weak var expDidFinish = expectation(description: "Test: \(#function); Did Complete Operation")
         didFinishGroup.notify(queue: DispatchQueue.main, execute: {
@@ -190,13 +191,13 @@ class KVOTests: ProcedureKitTestCase {
     private func verifyKVO_cancelledNotifications(_ observedKVO: [NSOperationKVOObserver.KVONotification]) -> (success: Bool, isReadyIndex: Int?, failureMessage: String?) {
         // ensure that the observedKVO contains:
         // "isReady", with at least one "isCancelled" before it
-        if let isReadyIndex = observedKVO.index(where: { $0.keyPath == NSOperationKVOObserver.KeyPath.Ready.rawValue }) {
+        if let isReadyIndex = observedKVO.index(where: { $0.keyPath == NSOperationKVOObserver.KeyPath.ready.rawValue }) {
             var foundIsCancelled = false
             guard isReadyIndex > 0 else {
                 return (success: false, isReadyIndex: isReadyIndex, failureMessage: "Found isReady KVO notification, but no isCancelled beforehand.")
             }
             for idx in (0..<isReadyIndex) {
-                if observedKVO[idx].keyPath == NSOperationKVOObserver.KeyPath.Cancelled.rawValue {
+                if observedKVO[idx].keyPath == NSOperationKVOObserver.KeyPath.cancelled.rawValue {
                     guard let newBool = observedKVO[idx].new as? Bool, newBool == true else { continue }
                     foundIsCancelled = true
                     break
@@ -267,8 +268,8 @@ class KVOTests: ProcedureKitTestCase {
 
         let observedKVO = kvoObserver.observedKVOFor(NSOperationKVOObserver.KeyPathSets.State)
         XCTAssertEqual(observedKVO.count, 2)
-        XCTAssertEqual(observedKVO.get(safe: 0)?.keyPath, NSOperationKVOObserver.KeyPath.Cancelled.rawValue)
-        XCTAssertEqual(observedKVO.get(safe: 1)?.keyPath, NSOperationKVOObserver.KeyPath.Ready.rawValue)
+        XCTAssertEqual(observedKVO.get(safe: 0)?.keyPath, NSOperationKVOObserver.KeyPath.cancelled.rawValue)
+        XCTAssertEqual(observedKVO.get(safe: 1)?.keyPath, NSOperationKVOObserver.KeyPath.ready.rawValue)
     }
 
     func test__nsoperation_kvo__procedure_cancelled_to_completion() {
@@ -290,10 +291,10 @@ class KVOTests: ProcedureKitTestCase {
         // it is valid, but not necessary, for a cancelled operation to transition through isExecuting
 
         // last KVO notification should always be isFinished
-        XCTAssertEqual(observedKVO.last?.keyPath, NSOperationKVOObserver.KeyPath.Finished.rawValue, "Notifications were: \(observedKVO)")
+        XCTAssertEqual(observedKVO.last?.keyPath, NSOperationKVOObserver.KeyPath.finished.rawValue, "Notifications were: \(observedKVO)")
 
         // isFinished should only be sent once
-        XCTAssertEqual(keyPathFrequency[NSOperationKVOObserver.KeyPath.Finished.rawValue], 1)
+        XCTAssertEqual(keyPathFrequency[NSOperationKVOObserver.KeyPath.finished.rawValue], 1)
     }
 
     func test__nsoperation_kvo__groupprocedure_cancelled_to_completion() {
@@ -317,10 +318,10 @@ class KVOTests: ProcedureKitTestCase {
         // it is valid, but not necessary, for a cancelled operation to transition through isExecuting
 
         // last KVO notification should always be isFinished
-        XCTAssertEqual(observedKVO.last?.keyPath, NSOperationKVOObserver.KeyPath.Finished.rawValue)
+        XCTAssertEqual(observedKVO.last?.keyPath, NSOperationKVOObserver.KeyPath.finished.rawValue)
 
         // isFinished should only be sent once
-        XCTAssertEqual(keyPathFrequency[NSOperationKVOObserver.KeyPath.Finished.rawValue], 1)
+        XCTAssertEqual(keyPathFrequency[NSOperationKVOObserver.KeyPath.finished.rawValue], 1)
     }
 
     func test__nsoperation_kvo__procedure_execute_to_completion() {
@@ -330,9 +331,9 @@ class KVOTests: ProcedureKitTestCase {
 
         let observedKVO = kvoObserver.observedKVOFor(NSOperationKVOObserver.KeyPathSets.State)
         XCTAssertEqual(observedKVO.count, 3)
-        XCTAssertEqual(observedKVO.get(safe: 0)?.keyPath, NSOperationKVOObserver.KeyPath.Executing.rawValue)
-        XCTAssertEqual(observedKVO.get(safe: 1)?.keyPath, NSOperationKVOObserver.KeyPath.Executing.rawValue)
-        XCTAssertEqual(observedKVO.get(safe: 2)?.keyPath, NSOperationKVOObserver.KeyPath.Finished.rawValue)
+        XCTAssertEqual(observedKVO.get(safe: 0)?.keyPath, NSOperationKVOObserver.KeyPath.executing.rawValue)
+        XCTAssertEqual(observedKVO.get(safe: 1)?.keyPath, NSOperationKVOObserver.KeyPath.executing.rawValue)
+        XCTAssertEqual(observedKVO.get(safe: 2)?.keyPath, NSOperationKVOObserver.KeyPath.finished.rawValue)
     }
 
     func test__nsoperation_kvo__groupprocedure_execute_to_completion() {
@@ -344,9 +345,9 @@ class KVOTests: ProcedureKitTestCase {
 
         let observedKVO = kvoObserver.observedKVOFor(NSOperationKVOObserver.KeyPathSets.State)
         XCTAssertEqual(observedKVO.count, 3)
-        XCTAssertEqual(observedKVO.get(safe: 0)?.keyPath, NSOperationKVOObserver.KeyPath.Executing.rawValue)
-        XCTAssertEqual(observedKVO.get(safe: 1)?.keyPath, NSOperationKVOObserver.KeyPath.Executing.rawValue)
-        XCTAssertEqual(observedKVO.get(safe: 2)?.keyPath, NSOperationKVOObserver.KeyPath.Finished.rawValue)
+        XCTAssertEqual(observedKVO.get(safe: 0)?.keyPath, NSOperationKVOObserver.KeyPath.executing.rawValue)
+        XCTAssertEqual(observedKVO.get(safe: 1)?.keyPath, NSOperationKVOObserver.KeyPath.executing.rawValue)
+        XCTAssertEqual(observedKVO.get(safe: 2)?.keyPath, NSOperationKVOObserver.KeyPath.finished.rawValue)
     }
 
     func test__nsoperation_kvo__procedure_execute_with_dependencies_to_completion() {
@@ -357,14 +358,14 @@ class KVOTests: ProcedureKitTestCase {
         operation.addDependency(delay)
         wait(for: delay, operation)
 
-        let observedKVO = kvoObserver.observedKVOFor(NSOperationKVOObserver.KeyPathSets.State.union([NSOperationKVOObserver.KeyPath.Dependencies.rawValue]))
+        let observedKVO = kvoObserver.observedKVOFor(NSOperationKVOObserver.KeyPathSets.State.union([NSOperationKVOObserver.KeyPath.dependencies.rawValue]))
         XCTAssertEqual(observedKVO.count, 6)
-        XCTAssertEqual(observedKVO.get(safe: 0)?.keyPath, NSOperationKVOObserver.KeyPath.Ready.rawValue)
-        XCTAssertEqual(observedKVO.get(safe: 1)?.keyPath, NSOperationKVOObserver.KeyPath.Dependencies.rawValue)
-        XCTAssertEqual(observedKVO.get(safe: 2)?.keyPath, NSOperationKVOObserver.KeyPath.Ready.rawValue)
-        XCTAssertEqual(observedKVO.get(safe: 3)?.keyPath, NSOperationKVOObserver.KeyPath.Executing.rawValue)
-        XCTAssertEqual(observedKVO.get(safe: 4)?.keyPath, NSOperationKVOObserver.KeyPath.Executing.rawValue)
-        XCTAssertEqual(observedKVO.get(safe: 5)?.keyPath, NSOperationKVOObserver.KeyPath.Finished.rawValue)
+        XCTAssertEqual(observedKVO.get(safe: 0)?.keyPath, NSOperationKVOObserver.KeyPath.ready.rawValue)
+        XCTAssertEqual(observedKVO.get(safe: 1)?.keyPath, NSOperationKVOObserver.KeyPath.dependencies.rawValue)
+        XCTAssertEqual(observedKVO.get(safe: 2)?.keyPath, NSOperationKVOObserver.KeyPath.ready.rawValue)
+        XCTAssertEqual(observedKVO.get(safe: 3)?.keyPath, NSOperationKVOObserver.KeyPath.executing.rawValue)
+        XCTAssertEqual(observedKVO.get(safe: 4)?.keyPath, NSOperationKVOObserver.KeyPath.executing.rawValue)
+        XCTAssertEqual(observedKVO.get(safe: 5)?.keyPath, NSOperationKVOObserver.KeyPath.finished.rawValue)
     }
 }
 
