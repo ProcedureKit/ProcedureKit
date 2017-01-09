@@ -676,28 +676,28 @@ open class Procedure: Operation, ProcedureProtocol {
     }
 
     private enum ShouldCancelResult {
-        case ShouldCancel
-        case AlreadyFinishingOrFinished
-        case AlreadyCancelling
-        case AlreadyCancelled
+        case shouldCancel
+        case alreadyFinishingOrFinished
+        case alreadyCancelling
+        case alreadyCancelled
     }
     private var shouldCancel: ShouldCancelResult {
         return _stateLock.withCriticalScope {
             // Do not cancel if already finished or finishing, or if finish has already been called
-            guard _state <= .executing && !_isHandlingFinish else { return .AlreadyFinishingOrFinished }
+            guard _state <= .executing && !_isHandlingFinish else { return .alreadyFinishingOrFinished }
             // Do not cancel if already cancelled
-            guard !_isCancelled else { return .AlreadyCancelled }
+            guard !_isCancelled else { return .alreadyCancelled }
             // Only a single call to cancel should continue
-            guard !_isHandlingCancel else { return .AlreadyCancelling }
+            guard !_isHandlingCancel else { return .alreadyCancelling }
             _isHandlingCancel = true
-            return .ShouldCancel
+            return .shouldCancel
         }
     }
 
     private final func _cancel(withAdditionalErrors additionalErrors: [Error], promise: ProcedurePromise? = nil) {
 
         let shouldCancel = self.shouldCancel
-        guard shouldCancel == .ShouldCancel else {
+        guard shouldCancel == .shouldCancel else {
             promise?.complete()//(withFailure: shouldCancel.error ?? ProcedureKitError.unknown)
             return
         }
