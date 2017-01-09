@@ -209,9 +209,9 @@ public extension MutexProtector where T: RangeReplaceableCollection {
 
 public extension MutexProtector where T: Integer {
 
-    func advance(by n: T.Stride) {
+    func advance(by stride: T.Stride) {
         write { (ward: inout T) in
-            ward = ward.advanced(by: n)
+            ward = ward.advanced(by: stride)
         }
     }
 }
