@@ -33,7 +33,7 @@ public struct TimeoutObserver: ProcedureObserver {
         delay = .until(date)
     }
 
-    public func will(execute procedure: Procedure) {
+    public func will(execute procedure: Procedure, futureExecute: PendingExecuteEvent) {
         switch delay.interval {
         case (let interval) where interval > 0.0:
             ProcedureTimeoutRegistrar.shared.createFinishTimeout(forProcedure: procedure, withDelay: delay)

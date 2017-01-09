@@ -79,7 +79,7 @@ open class RepeatProcedure<T: Operation>: GroupProcedure {
         return create(withMax: max, andIterator: tmp)
     }
 
-    private let _repeatStateLock = NSRecursiveLock()
+    private let _repeatStateLock = PThreadMutex()
 
     private var _previous: T? = nil
     /// - returns: the previous executing operation instance of T
@@ -181,11 +181,13 @@ open class RepeatProcedure<T: Operation>: GroupProcedure {
     }
 
     open override func childWillFinishWithoutErrors(_ child: Operation) {
-        addNextOperation(child === current)
+        eventQueue.debugAssertIsOnQueue()
+        _addNextOperation(child === self.current)
     }
 
     open override func child(_ child: Operation, willAttemptRecoveryFromErrors errors: [Error]) -> Bool {
-        addNextOperation(child === current)
+        eventQueue.debugAssertIsOnQueue()
+        _addNextOperation(child === self.current)
         return super.child(child, willAttemptRecoveryFromErrors: errors)
     }
 
@@ -195,15 +197,27 @@ open class RepeatProcedure<T: Operation>: GroupProcedure {
     ///
     /// - returns: whether or not there was a next payload added.
     @discardableResult
-    final public func addNextOperation(_ shouldAddNext: @autoclosure () -> Bool = true) -> Bool {
+    final public func addNextOperation(_ shouldAddNext: @escaping @autoclosure () -> Bool = true) -> ProcedureFutureResult<Bool> {
         assert(!isFinished, "Cannot add next operation after the procedure has finished.")
+        let promise = ProcedurePromiseResult<Bool>()
+        dispatchEvent {
+            let result = self._addNextOperation(shouldAddNext)
+            promise.complete(withResult: result)
+        }
+        return promise.future
+    }
+
+    @discardableResult
+    final internal func _addNextOperation(_ shouldAddNext: @escaping @autoclosure () -> Bool = true) -> Bool {
+        eventQueue.debugAssertIsOnQueue() // Must always be called on the EventQueue.
+
         guard !isCancelled else { return false }
 
-        let nextPayload: Payload? = _repeatStateLock.withCriticalScope {
-            guard shouldAddNext(), let payload = _next() else { return nil }
+        guard shouldAddNext(), let payload = _next() else { return false }
 
-            log.notice(message: "Will add next operation.")
+        log.notice(message: "Will add next operation.")
 
+        _repeatStateLock.withCriticalScope {
             if let newConfigureBlock = payload.configure {
                 _replace(configureBlock: newConfigureBlock)
             }
@@ -213,10 +227,7 @@ open class RepeatProcedure<T: Operation>: GroupProcedure {
             _count += 1
             _previous = _current
             _current = payload.operation
-
-            return payload
         }
-        guard let payload = nextPayload else { return false }
 
         if let delay = payload.delay.map({ DelayProcedure(delay: $0) }) {
             payload.operation.add(dependency: delay)
@@ -233,9 +244,14 @@ open class RepeatProcedure<T: Operation>: GroupProcedure {
     /// allow subclasses to override and configure the operation
     /// further before it is added.
     ///
-    /// - returns: an optional Paylod
-    final public func next() -> Payload? {
-        return _repeatStateLock.withCriticalScope { _next() }
+    /// - returns: an optional Payload
+    final public func next() -> ProcedureFutureResult<Payload?> {
+        let promise = ProcedurePromiseResult<Payload?>()
+        dispatchEvent {
+            let next = self._next()
+            promise.complete(withResult: next)
+        }
+        return promise.future
     }
 
     /// Appends a configuration block to the current block. This
@@ -278,9 +294,9 @@ open class RepeatProcedure<T: Operation>: GroupProcedure {
 
     // MARK: - Private Implementation
 
-    // This method is not thread-safe, and must be called within an aquisition
-    // of the _repeatStateLock.
+    // This method must be called on the Procedure's EventQueue.
     private func _next() -> Payload? {
+        eventQueue.debugAssertIsOnQueue()
         return _iterator.next()
     }
 

@@ -268,3 +268,19 @@ public extension ProcedureKitTestCase {
         XCTAssertProcedureCancelledWithErrors(procedure, count: count, message, file: file, line: line)
     }
 }
+
+// MARK: Constrained to EventConcurrencyTrackingProcedureProtocol
+
+public extension ProcedureKitTestCase {
+
+    func XCTAssertProcedureNoConcurrentEvents<T: ProcedureProtocol & EventConcurrencyTrackingProcedureProtocol>(_ exp: @autoclosure () throws -> T, minimumConcurrentDetected: Int = 1, _ message: @autoclosure () -> String = "", file: StaticString = #file, line: UInt = #line) where T: Procedure {
+        __XCTEvaluateAssertion(testCase: self, message, file: file, line: line) {
+            let procedure = try exp()
+            let detectedConcurrentEvents = procedure.concurrencyRegistrar.detectedConcurrentEvents
+            guard procedure.concurrencyRegistrar.maximumDetected >= minimumConcurrentDetected && detectedConcurrentEvents.isEmpty else {
+                return .expectedFailure("\(procedure.procedureName) detected concurrent events: \n\(detectedConcurrentEvents)")
+            }
+            return .success
+        }
+    }
+}

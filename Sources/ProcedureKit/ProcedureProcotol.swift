@@ -24,9 +24,11 @@ public protocol ProcedureProtocol: class {
 
     func willEnqueue(on: ProcedureQueue)
 
+    func pendingQueueStart()
+
     func execute()
 
-    func produce(operation: Operation) throws
+    @discardableResult func produce(operation: Operation, before: PendingEvent?) throws -> ProcedureFuture
 
     // Cancelling
 

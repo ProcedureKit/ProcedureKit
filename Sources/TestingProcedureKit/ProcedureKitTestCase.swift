@@ -138,7 +138,7 @@ public extension ProcedureKitTestCase {
 
     func createCancellingProcedure() -> TestProcedure {
         let procedure = TestProcedure(name: "Cancelling Test Procedure")
-        procedure.addWillExecuteBlockObserver { procedure in
+        procedure.addWillExecuteBlockObserver { procedure, _ in
             procedure.cancel()
         }
         return procedure

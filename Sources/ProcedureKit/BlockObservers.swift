@@ -13,13 +13,12 @@ public struct Observer<Procedure: ProcedureProtocol> {
     public typealias ProducerBlock = (Procedure, Operation) -> Void
 
     public typealias DidAttach = VoidBlock
-    public typealias WillExecute = VoidBlock
+    public typealias WillExecute = (Procedure, PendingExecuteEvent) -> Void
     public typealias DidExecute = VoidBlock
-    public typealias WillCancel = ErrorsBlock
     public typealias DidCancel = ErrorsBlock
     public typealias WillAdd = ProducerBlock
     public typealias DidAdd = ProducerBlock
-    public typealias WillFinish = ErrorsBlock
+    public typealias WillFinish = (Procedure, [Error], PendingFinishEvent) -> Void
     public typealias DidFinish = ErrorsBlock
 
     private init() { }
@@ -36,9 +35,6 @@ public struct BlockObserver<Procedure: ProcedureProtocol>: ProcedureObserver {
     /// - returns: the block which is called when the attached procedure did execute
     public let didExecute: Observer<Procedure>.DidExecute?
 
-    /// - returns: the block which is called when the attached procedure will cancel
-    public let willCancel: Observer<Procedure>.WillCancel?
-
     /// - returns: the block which is called when the attached procedure did cancel
     public let didCancel: Observer<Procedure>.DidCancel?
 
@@ -54,11 +50,14 @@ public struct BlockObserver<Procedure: ProcedureProtocol>: ProcedureObserver {
     /// - returns: the block which is called when the attached procedure did finish
     public let didFinish: Observer<Procedure>.DidFinish?
 
+    /// - returns: the queue onto which observer callbacks are dispatched
+    public let eventQueue: DispatchQueueProtocol?
+
     /// Creates a new BlockObserver.
     ///
+    /// - parameter synchronizedWith: a provider of the queue onto which observer callbacks are dispatched
     /// - parameter didAttach:   the block which will execute when the observer is attached to a procedure
     /// - parameter willExecute: the block which is called when the attached procedure will execute
-    /// - parameter willCancel:  the block which is called when the attached procedure will cancel
     /// - parameter didCancel:   the block which is called when the attached procedure did cancel
     /// - parameter willAdd:     the block which is called when the attached procedure will add a new operation
     /// - parameter didAdd:      the block which is called when the attached procedure did add a new operation
@@ -67,19 +66,19 @@ public struct BlockObserver<Procedure: ProcedureProtocol>: ProcedureObserver {
     ///
     /// - returns: an immutable BlockObserver
     public init(
+        synchronizedWith queueProvider: QueueProvider? = nil,
         didAttach: Observer<Procedure>.DidAttach? = nil,
         willExecute: Observer<Procedure>.WillExecute? = nil,
         didExecute: Observer<Procedure>.DidExecute? = nil,
-        willCancel: Observer<Procedure>.WillCancel? = nil,
         didCancel: Observer<Procedure>.DidCancel? = nil,
         willAdd: Observer<Procedure>.WillAdd? = nil,
         didAdd: Observer<Procedure>.DidAdd? = nil,
         willFinish: Observer<Procedure>.WillFinish? = nil,
         didFinish: Observer<Procedure>.DidFinish? = nil) {
+            self.eventQueue = queueProvider?.providedQueue
             self.didAttach = didAttach
             self.willExecute = willExecute
             self.didExecute = didExecute
-            self.willCancel = willCancel
             self.didCancel = didCancel
             self.willAdd = willAdd
             self.didAdd = didAdd
@@ -91,16 +90,12 @@ public struct BlockObserver<Procedure: ProcedureProtocol>: ProcedureObserver {
         didAttach?(procedure)
     }
 
-    public func will(execute procedure: Procedure) {
-        willExecute?(procedure)
+    public func will(execute procedure: Procedure, futureExecute: PendingExecuteEvent) {
+        willExecute?(procedure, futureExecute)
     }
 
     public func did(execute procedure: Procedure) {
         didExecute?(procedure)
-    }
-
-    public func will(cancel procedure: Procedure, withErrors errors: [Error]) {
-        willCancel?(procedure, errors)
     }
 
     public func did(cancel procedure: Procedure, withErrors errors: [Error]) {
@@ -115,8 +110,8 @@ public struct BlockObserver<Procedure: ProcedureProtocol>: ProcedureObserver {
         didAdd?(procedure, newOperation)
     }
 
-    public func will(finish procedure: Procedure, withErrors errors: [Error]) {
-        willFinish?(procedure, errors)
+    public func will(finish procedure: Procedure, withErrors errors: [Error], futureFinish: PendingFinishEvent) {
+        willFinish?(procedure, errors, futureFinish)
     }
 
     public func did(finish procedure: Procedure, withErrors errors: [Error]) {
@@ -132,14 +127,19 @@ public struct WillExecuteObserver<Procedure: ProcedureProtocol>: ProcedureObserv
     /// - returns: a block which is called when the observer is attached to a procedure
     public var didAttachToProcedure: Observer<Procedure>.DidAttach? = nil
 
+    /// - returns: the queue onto which observer callbacks are dispatched
+    public let eventQueue: DispatchQueueProtocol?
+
     /**
      Initialize the observer with a block.
 
+     - parameter synchronizedWith: a provider of the queue onto which observer callbacks are dispatched
      - parameter willExecute: the `Block`
      - returns: an observer.
      */
-    public init(willExecute: @escaping Observer<Procedure>.WillExecute) {
+    public init(synchronizedWith queueProvider: QueueProvider? = nil, willExecute: @escaping Observer<Procedure>.WillExecute) {
         self.block = willExecute
+        self.eventQueue = queueProvider?.providedQueue
     }
 
     public func didAttach(to procedure: Procedure) {
@@ -147,8 +147,8 @@ public struct WillExecuteObserver<Procedure: ProcedureProtocol>: ProcedureObserv
     }
 
     /// Conforms to `WillExecuteProcedureObserver`, executes the block
-    public func will(execute procedure: Procedure) {
-        block(procedure)
+    public func will(execute procedure: Procedure, futureExecute: PendingExecuteEvent) {
+        block(procedure, futureExecute)
     }
 }
 
@@ -170,14 +170,19 @@ public struct DidExecuteObserver<Procedure: ProcedureProtocol>: ProcedureObserve
     /// - returns: a block which is called when the observer is attached to a procedure
     public var didAttachToProcedure: Observer<Procedure>.DidAttach? = nil
 
+    /// - returns: the queue onto which observer callbacks are dispatched
+    public let eventQueue: DispatchQueueProtocol?
+
     /**
      Initialize the observer with a block.
 
+     - parameter synchronizedWith: a provider of the queue onto which observer callbacks are dispatched
      - parameter didExecute: the `Block`
      - returns: an observer.
      */
-    public init(didExecute: @escaping Observer<Procedure>.DidExecute) {
+    public init(synchronizedWith queueProvider: QueueProvider? = nil, didExecute: @escaping Observer<Procedure>.DidExecute) {
         self.block = didExecute
+        self.eventQueue = queueProvider?.providedQueue
     }
 
     public func didAttach(to procedure: Procedure) {
@@ -190,34 +195,6 @@ public struct DidExecuteObserver<Procedure: ProcedureProtocol>: ProcedureObserve
     }
 }
 
-/// WillCancelObserver is an observer which will execute a
-/// closure when the operation cancels.
-public struct WillCancelObserver<Procedure: ProcedureProtocol>: ProcedureObserver {
-    private let block: Observer<Procedure>.WillCancel
-
-    /// - returns: a block which is called when the observer is attached to a procedure
-    public var didAttachToProcedure: Observer<Procedure>.DidAttach? = nil
-
-    /// Initialize the observer with a block.
-    /// - parameter willCancel: the `Block`
-    /// - returns: an observer.
-    public init(willCancel: @escaping Observer<Procedure>.WillCancel) {
-        self.block = willCancel
-    }
-
-    /// - parameter to: the procedure which is attached
-    public func didAttach(to procedure: Procedure) {
-        didAttachToProcedure?(procedure)
-    }
-
-    /// Observes when the attached procedure will be cancelled.
-    /// - parameter cancel: the procedure which is cancelled.
-    /// - parameter withErrors: the errors the procedure was cancelled with.
-    public func will(cancel procedure: Procedure, withErrors errors: [Error]) {
-        block(procedure, errors)
-    }
-}
-
 /// DidCancelObserver is an observer which will execute a
 /// closure when the operation cancels.
 public struct DidCancelObserver<Procedure: ProcedureProtocol>: ProcedureObserver {
@@ -226,11 +203,16 @@ public struct DidCancelObserver<Procedure: ProcedureProtocol>: ProcedureObserver
     /// - returns: a block which is called when the observer is attached to a procedure
     public var didAttachToProcedure: Observer<Procedure>.DidAttach? = nil
 
+    /// - returns: the queue onto which observer callbacks are dispatched
+    public let eventQueue: DispatchQueueProtocol?
+
     /// Initialize the observer with a block.
+    /// - parameter synchronizedWith: a provider of the queue onto which observer callbacks are dispatched
     /// - parameter didCancel: the `Block`
     /// - returns: an observer.
-    public init(didCancel: @escaping Observer<Procedure>.DidCancel) {
+    public init(synchronizedWith queueProvider: QueueProvider? = nil, didCancel: @escaping Observer<Procedure>.DidCancel) {
         self.block = didCancel
+        self.eventQueue = queueProvider?.providedQueue
     }
 
     /// - parameter to: the procedure which is attached
@@ -254,11 +236,16 @@ public struct WillAddOperationObserver<Procedure: ProcedureProtocol>: ProcedureO
     /// - returns: a block which is called when the observer is attached to a procedure
     public var didAttachToProcedure: Observer<Procedure>.DidAttach? = nil
 
+    /// - returns: the queue onto which observer callbacks are dispatched
+    public let eventQueue: DispatchQueueProtocol?
+
     /// Initialize the observer with a block.
+    /// - parameter synchronizedWith: a provider of the queue onto which observer callbacks are dispatched
     /// - parameter willAdd: the `Block`
     /// - returns: an observer.
-    public init(willAdd: @escaping Observer<Procedure>.WillAdd) {
+    public init(synchronizedWith queueProvider: QueueProvider? = nil, willAdd: @escaping Observer<Procedure>.WillAdd) {
         self.block = willAdd
+        self.eventQueue = queueProvider?.providedQueue
     }
 
     /// - parameter to: the procedure which is attached
@@ -282,11 +269,16 @@ public struct DidAddOperationObserver<Procedure: ProcedureProtocol>: ProcedureOb
     /// - returns: a block which is called when the observer is attached to a procedure
     public var didAttachToProcedure: Observer<Procedure>.DidAttach? = nil
 
+    /// - returns: the queue onto which observer callbacks are dispatched
+    public let eventQueue: DispatchQueueProtocol?
+
     /// Initialize the observer with a block.
+    /// - parameter synchronizedWith: a provider of the queue onto which observer callbacks are dispatched
     /// - parameter didAdd: the `Block`
     /// - returns: an observer.
-    public init(didAdd: @escaping Observer<Procedure>.DidAdd) {
+    public init(synchronizedWith queueProvider: QueueProvider? = nil, didAdd: @escaping Observer<Procedure>.DidAdd) {
         self.block = didAdd
+        self.eventQueue = queueProvider?.providedQueue
     }
 
     /// - parameter to: the procedure which is attached
@@ -310,11 +302,16 @@ public struct WillFinishObserver<Procedure: ProcedureProtocol>: ProcedureObserve
     /// - returns: a block which is called when the observer is attached to a procedure
     public var didAttachToProcedure: Observer<Procedure>.DidAttach? = nil
 
+    /// - returns: the queue onto which observer callbacks are dispatched
+    public let eventQueue: DispatchQueueProtocol?
+
     /// Initialize the observer with a block.
+    /// - parameter synchronizedWith: a provider of the queue onto which observer callbacks are dispatched
     /// - parameter willFinish: the `Block`
     /// - returns: an observer.
-    public init(willFinish: @escaping Observer<Procedure>.WillFinish) {
+    public init(synchronizedWith queueProvider: QueueProvider? = nil, willFinish: @escaping Observer<Procedure>.WillFinish) {
         self.block = willFinish
+        self.eventQueue = queueProvider?.providedQueue
     }
 
     /// - parameter to: the procedure which is attached
@@ -325,8 +322,8 @@ public struct WillFinishObserver<Procedure: ProcedureProtocol>: ProcedureObserve
     /// Observes when the attached procedure will finish.
     /// - parameter procedure: the procedure which will finish.
     /// - parameter errors: the errors the procedure will finish with
-    public func will(finish procedure: Procedure, withErrors errors: [Error]) {
-        block(procedure, errors)
+    public func will(finish procedure: Procedure, withErrors errors: [Error], futureFinish: PendingFinishEvent) {
+        block(procedure, errors, futureFinish)
     }
 }
 
@@ -340,11 +337,16 @@ public struct DidFinishObserver<Procedure: ProcedureProtocol>: ProcedureObserver
     /// - returns: a block which is called when the observer is attached to a procedure
     public var didAttachToProcedure: Observer<Procedure>.DidAttach? = nil
 
+    /// - returns: the queue onto which observer callbacks are dispatched
+    public let eventQueue: DispatchQueueProtocol?
+
     /// Initialize the observer with a block.
+    /// - parameter synchronizedWith: a provider of the queue onto which observer callbacks are dispatched
     /// - parameter didFinish: the `Block`
     /// - returns: an observer.
-    public init(didFinish: @escaping Observer<Procedure>.DidFinish) {
+    public init(synchronizedWith queueProvider: QueueProvider? = nil, didFinish: @escaping Observer<Procedure>.DidFinish) {
         self.block = didFinish
+        self.eventQueue = queueProvider?.providedQueue
     }
 
     /// - parameter to: the procedure which is attached
@@ -362,59 +364,89 @@ public struct DidFinishObserver<Procedure: ProcedureProtocol>: ProcedureObserver
 
 public extension ProcedureProtocol {
 
+    private var _currentEventQueue: DispatchQueueProtocol? {
+        get {
+            guard let queueProvider = self as? QueueProvider else {
+                return nil
+            }
+            return queueProvider.providedQueue
+        }
+    }
+
+    private func assertQueueProviderIsNotSelf(_ queueProvider: QueueProvider?, function: String = #function) {
+        assert(queueProvider == nil || queueProvider!.providedQueue !== _currentEventQueue, "\(function): Synchronizing with self is unnecessary for an observer added to self.")
+    }
+
     /// Adds a WillExecuteObserver to the receiver using a provided block
     ///
+    /// - Parameter synchronizedWith: a QueueProvider that provides a queue onto which the observer callback will be dispatched (can be a Procedure, an EventQueue, or a DispatchQueue)
     /// - Parameter block: the block which will be invoked before execute is called.
-    func addWillExecuteBlockObserver(block: @escaping Observer<Self>.WillExecute) {
-        add(observer: WillExecuteObserver(willExecute: block))
+    func addWillExecuteBlockObserver(synchronizedWith queueProvider: QueueProvider? = nil, block: @escaping Observer<Self>.WillExecute) {
+        assertQueueProviderIsNotSelf(queueProvider)
+        add(observer: WillExecuteObserver(synchronizedWith: queueProvider, willExecute: block))
     }
 
     /// Adds a DidExecuteObserver to the receiver using a provided block
     ///
+    /// - Parameter synchronizedWith: a QueueProvider that provides a queue onto which the observer callback will be dispatched (can be a Procedure, an EventQueue, or a DispatchQueue)
     /// - Parameter block: the block which will be invoked after execute is called.
-    func addDidExecuteBlockObserver(block: @escaping Observer<Self>.DidExecute) {
-        add(observer: DidExecuteObserver(didExecute: block))
-    }
-
-    /// Adds a WillCancelObserver to the receiver using a provided block
-    ///
-    /// - Parameter block: the block which will be invoked before the procedure cancels.
-    func addWillCancelBlockObserver(block: @escaping Observer<Self>.WillCancel) {
-        add(observer: WillCancelObserver(willCancel: block))
+    func addDidExecuteBlockObserver(synchronizedWith queueProvider: QueueProvider? = nil, block: @escaping Observer<Self>.DidExecute) {
+        assertQueueProviderIsNotSelf(queueProvider)
+        add(observer: DidExecuteObserver(synchronizedWith: queueProvider, didExecute: block))
     }
 
     /// Adds a DidCancelObserver to the receiver using a provided block
     ///
+    /// - Parameter synchronizedWith: a QueueProvider that provides a queue onto which the observer callback will be dispatched (can be a Procedure, an EventQueue, or a DispatchQueue)
     /// - Parameter block: the block which will be invoked after the procedure cancels.
-    func addDidCancelBlockObserver(block: @escaping Observer<Self>.DidCancel) {
-        add(observer: DidCancelObserver(didCancel: block))
+    func addDidCancelBlockObserver(synchronizedWith queueProvider: QueueProvider? = nil, block: @escaping Observer<Self>.DidCancel) {
+        assertQueueProviderIsNotSelf(queueProvider)
+        add(observer: DidCancelObserver(synchronizedWith: queueProvider, didCancel: block))
     }
 
     /// Adds a WillAddOperationObserver to the receiver using a provided block
     ///
+    /// - Parameter synchronizedWith: a QueueProvider that provides a queue onto which the observer callback will be dispatched (can be a Procedure, an EventQueue, or a DispatchQueue)
     /// - Parameter block: the block which will be invoked before the procedure adds another operation.
-    func addWillAddOperationBlockObserver(block: @escaping Observer<Self>.WillAdd) {
-        add(observer: WillAddOperationObserver(willAdd: block))
+    func addWillAddOperationBlockObserver(synchronizedWith queueProvider: QueueProvider? = nil, block: @escaping Observer<Self>.WillAdd) {
+        assertQueueProviderIsNotSelf(queueProvider)
+        add(observer: WillAddOperationObserver(synchronizedWith: queueProvider, willAdd: block))
     }
 
     /// Adds a DidAddOperationObserver to the receiver using a provided block
     ///
+    /// - Parameter synchronizedWith: a QueueProvider that provides a queue onto which the observer callback will be dispatched (can be a Procedure, an EventQueue, or a DispatchQueue)
     /// - Parameter block: the block which will be invoked after the procedure adds another operation.
-    func addDidAddOperationBlockObserver(block: @escaping Observer<Self>.DidAdd) {
-        add(observer: DidAddOperationObserver(didAdd: block))
+    func addDidAddOperationBlockObserver(synchronizedWith queueProvider: QueueProvider? = nil, block: @escaping Observer<Self>.DidAdd) {
+        assertQueueProviderIsNotSelf(queueProvider)
+        add(observer: DidAddOperationObserver(synchronizedWith: queueProvider, didAdd: block))
     }
 
     /// Adds a WillFinishObserver to the receiver using a provided block
     ///
+    /// - Parameter synchronizedWith: a QueueProvider that provides a queue onto which the observer callback will be dispatched (can be a Procedure, an EventQueue, or a DispatchQueue)
     /// - Parameter block: the block which will be invoked before the procedure finishes.
-    func addWillFinishBlockObserver(block: @escaping Observer<Self>.WillFinish) {
-        add(observer: WillFinishObserver(willFinish: block))
+    func addWillFinishBlockObserver(synchronizedWith queueProvider: QueueProvider? = nil, block: @escaping Observer<Self>.WillFinish) {
+        assertQueueProviderIsNotSelf(queueProvider)
+        add(observer: WillFinishObserver(synchronizedWith: queueProvider, willFinish: block))
     }
 
     /// Adds a DidFinishObserver to the receiver using a provided block
     ///
+    /// - Parameter synchronizedWith: a QueueProvider that provides a queue onto which the observer callback will be dispatched (can be a Procedure, an EventQueue, or a DispatchQueue)
     /// - Parameter block: the block which will be invoked after the procedure has finished.
-    func addDidFinishBlockObserver(block: @escaping Observer<Self>.DidFinish) {
-        add(observer: DidFinishObserver(didFinish: block))
+    func addDidFinishBlockObserver(synchronizedWith queueProvider: QueueProvider? = nil, block: @escaping Observer<Self>.DidFinish) {
+        assertQueueProviderIsNotSelf(queueProvider)
+        add(observer: DidFinishObserver(synchronizedWith: queueProvider, didFinish: block))
+    }
+}
+
+// MARK: - Unavailable
+
+public extension ProcedureProtocol {
+
+    @available(*, unavailable, renamed: "addDidCancelBlockObserver(block:)", message: "WillCancel observers are no longer available. Use a DidCancel observer.")
+    func addWillCancelBlockObserver(block: @escaping Observer<Self>.ErrorsBlock) {
+        fatalError("No longer available.")
     }
 }

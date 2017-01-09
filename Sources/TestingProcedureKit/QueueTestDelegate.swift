@@ -7,69 +7,84 @@
 import Foundation
 import ProcedureKit
 
-public class QueueTestDelegate: ProcedureQueueDelegate, OperationQueueDelegate {
+public class QueueTestDelegate: ProcedureQueueDelegate {
 
-    public typealias OperationQueueCheckType = (OperationQueue, Operation)
-    public typealias ProcedureQueueCheckType = (ProcedureQueue, Operation)
-    public typealias ProcedureQueueCheckTypeWithErrors = (ProcedureQueue, Operation, [Error])
+    public typealias OperationCheckType = (ProcedureQueue, Operation, Any?)
+    public typealias OperationFinishType = (ProcedureQueue, Operation)
+    public typealias ProcedureCheckType = (ProcedureQueue, Procedure, Any?)
+    public typealias ProcedureFinishType = (ProcedureQueue, Procedure, [Error])
 
-    public var operationQueueWillAddOperation: [OperationQueueCheckType] {
-        get { return _operationQueueWillAddOperation.read { $0 } }
-    }
-    public var operationQueueWillFinishOperation: [OperationQueueCheckType] {
-        get { return _operationQueueWillFinishOperation.read { $0 } }
-    }
-    public var operationQueueDidFinishOperation: [OperationQueueCheckType] {
-        get { return _operationQueueDidFinishOperation.read { $0 } }
-    }
-
-    public var procedureQueueWillAddOperation: [ProcedureQueueCheckType] {
+    public var procedureQueueWillAddOperation: [OperationCheckType] {
         get { return _procedureQueueWillAddOperation.read { $0 } }
     }
-    public var procedureQueueWillProduceOperation: [ProcedureQueueCheckType] {
-        get { return _procedureQueueWillProduceOperation.read { $0 } }
+    public var procedureQueueDidAddOperation: [OperationCheckType] {
+        get { return _procedureQueueDidAddOperation.read { $0 } }
     }
-    public var procedureQueueWillFinishOperation: [ProcedureQueueCheckTypeWithErrors] {
-        get { return _procedureQueueWillFinishOperation.read { $0 } }
-    }
-    public var procedureQueueDidFinishOperation: [ProcedureQueueCheckTypeWithErrors] {
+    public var procedureQueueDidFinishOperation: [OperationFinishType] {
         get { return _procedureQueueDidFinishOperation.read { $0 } }
     }
 
-    private var _operationQueueWillAddOperation = Protector([OperationQueueCheckType]())
-    private var _operationQueueWillFinishOperation = Protector([OperationQueueCheckType]())
-    private var _operationQueueDidFinishOperation = Protector([OperationQueueCheckType]())
-
-    private var _procedureQueueWillAddOperation = Protector([ProcedureQueueCheckType]())
-    private var _procedureQueueWillProduceOperation = Protector([ProcedureQueueCheckType]())
-    private var _procedureQueueWillFinishOperation = Protector([ProcedureQueueCheckTypeWithErrors]())
-    private var _procedureQueueDidFinishOperation = Protector([ProcedureQueueCheckTypeWithErrors]())
-
-    public func operationQueue(_ queue: OperationQueue, willAddOperation operation: Operation) {
-        _operationQueueWillAddOperation.append((queue, operation))
+    public var procedureQueueWillAddProcedure: [ProcedureCheckType] {
+        get { return _procedureQueueWillAddProcedure.read { $0 } }
+    }
+    public var procedureQueueDidAddProcedure: [ProcedureCheckType] {
+        get { return _procedureQueueDidAddProcedure.read { $0 } }
     }
 
-    public func operationQueue(_ queue: OperationQueue, willFinishOperation operation: Operation) {
-        _operationQueueWillFinishOperation.append((queue, operation))
+    public var procedureQueueWillFinishProcedure: [ProcedureFinishType] {
+        get { return _procedureQueueWillFinishProcedure.read { $0 } }
+    }
+    public var procedureQueueDidFinishProcedure: [ProcedureFinishType] {
+        get { return _procedureQueueDidFinishProcedure.read { $0 } }
     }
 
-    public func operationQueue(_ queue: OperationQueue, didFinishOperation operation: Operation) {
-        _operationQueueDidFinishOperation.append((queue, operation))
+    private var _procedureQueueWillAddOperation = Protector([OperationCheckType]())
+    private var _procedureQueueDidAddOperation = Protector([OperationCheckType]())
+    private var _procedureQueueDidFinishOperation = Protector([OperationFinishType]())
+
+    private var _procedureQueueWillAddProcedure = Protector([ProcedureCheckType]())
+    private var _procedureQueueDidAddProcedure = Protector([ProcedureCheckType]())
+    private var _procedureQueueWillFinishProcedure = Protector([ProcedureFinishType]())
+    private var _procedureQueueDidFinishProcedure = Protector([ProcedureFinishType]())
+
+    // MARK: - Init
+    
+    public init() { }
+
+    // MARK: - ProcedureQueueDelegate Methods
+
+    // Operations
+
+    public func procedureQueue(_ queue: ProcedureQueue, willAddOperation operation: Operation, context: Any?) -> ProcedureFuture? {
+        _procedureQueueWillAddOperation.append((queue, operation, context))
+        return nil
     }
 
-    public func procedureQueue(_ queue: ProcedureQueue, willAddOperation operation: Operation) {
-        _procedureQueueWillAddOperation.append((queue, operation))
+    public func procedureQueue(_ queue: ProcedureQueue, didAddOperation operation: Operation, context: Any?) {
+        _procedureQueueDidAddOperation.append((queue, operation, context))
     }
 
-    public func procedureQueue(_ queue: ProcedureQueue, willProduceOperation operation: Operation) {
-        _procedureQueueWillProduceOperation.append((queue, operation))
+    public func procedureQueue(_ queue: ProcedureQueue, didFinishOperation operation: Operation) {
+        _procedureQueueDidFinishOperation.append((queue, operation))
     }
 
-    public func procedureQueue(_ queue: ProcedureQueue, willFinishOperation operation: Operation, withErrors errors: [Error]) {
-        _procedureQueueWillFinishOperation.append((queue, operation, errors))
+    // Procedures
+
+    public func procedureQueue(_ queue: ProcedureQueue, willAddProcedure procedure: Procedure, context: Any?) -> ProcedureFuture? {
+        _procedureQueueWillAddProcedure.append((queue, procedure, context))
+        return nil
     }
 
-    public func procedureQueue(_ queue: ProcedureQueue, didFinishOperation operation: Operation, withErrors errors: [Error]) {
-        _procedureQueueDidFinishOperation.append((queue, operation, errors))
+    public func procedureQueue(_ queue: ProcedureQueue, didAddProcedure procedure: Procedure, context: Any?) {
+        _procedureQueueDidAddProcedure.append((queue, procedure, context))
+    }
+
+    public func procedureQueue(_ queue: ProcedureQueue, willFinishProcedure procedure: Procedure, withErrors errors: [Error]) -> ProcedureFuture? {
+        _procedureQueueWillFinishProcedure.append((queue, procedure, errors))
+        return nil
+    }
+
+    public func procedureQueue(_ queue: ProcedureQueue, didFinishProcedure procedure: Procedure, withErrors errors: [Error]) {
+        _procedureQueueDidFinishProcedure.append((queue, procedure, errors))
     }
 }

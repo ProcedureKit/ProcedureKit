@@ -6,75 +6,77 @@
 
 import Foundation
 
-public protocol OperationQueueDelegate: class {
-
-    /**
-     The operation queue will add a new operation. This is for information only, the
-     delegate cannot affect whether the operation is added, or other control flow.
-
-     - paramter queue: the `OperationQueue`.
-     - paramter operation: the `Operation` instance about to be added.
-     */
-    func operationQueue(_ queue: OperationQueue, willAddOperation operation: Operation)
-
-    /**
-     An operation will finish on the queue.
-
-     - parameter queue: the `OperationQueue`.
-     - parameter operation: the `Operation` instance which finished.
-     - parameter errors: an array of `Error`s.
-     */
-    func operationQueue(_ queue: OperationQueue, willFinishOperation operation: Operation)
-
-    /**
-     An operation did finish on the queue.
-
-     - parameter queue: the `OperationQueue`.
-     - parameter operation: the `Operation` instance which finished.
-     - parameter errors: an array of `Error`s.
-     */
-    func operationQueue(_ queue: OperationQueue, didFinishOperation operation: Operation)
-}
-
-public extension OperationQueueDelegate {
-
-    func operationQueue(_ queue: OperationQueue, willAddOperation operation: Operation) { /* default no-op */ }
-
-    func operationQueue(_ queue: OperationQueue, willFinishOperation operation: Operation) { /* default no-op */ }
-}
-
 /**
- A protocol which the `OperationQueue`'s delegate must conform to. The delegate is informed
+ A protocol which the `ProcedureQueue`'s delegate must conform to. The delegate is informed
  when the queue is about to add an operation/procedure, and when they finish. Because it is a
  delegate protocol, conforming types must be classes, as the queue weakly owns it.
+ 
+ There are slight differences depending on whether an Operation subclass or a Procedure subclass
+ is being added to a ProcedureQueue.
+ 
+ For an Operation subclass, the delegate callbacks are:
+ 
+    - procedureQueue(_:, willAddOperation:, context:)
+    - procedureQueue(_:, didAddOperation:, context:)
+    - procedureQueue(_:, didFinishOperation:)
+ 
+ If you get the first, you are guaranteed* to get the other two callbacks once the Operation
+ finishes (*unless you later modify the completionBlock - which is a bad idea - or your Operation
+ never finishes - which is also a bad idea).
+ 
+ For a Procedure subclass, the delegate callbacks are:
+ 
+    - procedureQueue(_:, willAddProcedure:, context:)
+    - procedureQueue(_:, didAddProcedure:, context:)
+    - procedureQueue(_:, willFinishProcedure:)
+    - procedureQueue(_:, didFinishProcedure:)
+ 
+ You will (eventually) receive all 4 delegate callbacks for a Procedure (assuming it finishes).
+ 
+ The `context` parameter provided to the will/didAdd delegate callbacks is the same `context`
+ parameter that was passed into the call to `ProcedureQueue.add(operation:context:)`.
+ 
+ For both adding and finishing, the "will" delegate will be called before the respective "did" delegate
+ method. However, you should be aware of the following additional guidelines:
+ 
+    - `willAddOperation` / `willAddProcedure` is always guaranteed to be called before any other delegate
+      methods for an Operation / Procedure instance
+    - `willFinishProcedure` is always guaranteed to be called before `didFinishProcedure` for a
+      Procedure instance
+    - No other ordering (or non-concurrency) is guaranteed
+ 
+ Delegate callbacks may occur concurrently and on any thread.
+ 
+ Examples:
+    - It is possible for `didAddOperation` / `didAddProcedure` to be called concurrently with
+    `didFinishOperation` / `will/didFinishProcedure` for an Operation / Procedure instance.
+    - It is possible for `didAddOperation` to be called concurrently for two different Operation
+    instances added to a ProcedureQueue simultaneously. (i.e. Once for each Operation.)
+ 
  */
-public protocol ProcedureQueueDelegate: OperationQueueDelegate {
+public protocol ProcedureQueueDelegate: class {
+
+    // MARK: - Operations
 
     /**
      The procedure queue will add a new operation. This is for information only, the
      delegate cannot affect whether the operation is added, or other control flow.
 
-     - paramter queue: the `ProcedureQueue`.
-     - paramter operation: the `Operation` instance about to be added.
+     - parameter queue: the `ProcedureQueue`.
+     - parameter operation: the `Operation` instance about to be added.
+     - parameter context: the context, if any, passed into the call to ProcedureQueue.add(operation:context:) that triggered the delegate callback
+     - returns: (optional) a ProcedureFuture (signaled when handling of the delegate callback is complete), or nil (if there is no need for the ProcedureQueue to wait to add the operation)
      */
-    func procedureQueue(_ queue: ProcedureQueue, willAddOperation operation: Operation)
+    func procedureQueue(_ queue: ProcedureQueue, willAddOperation operation: Operation, context: Any?) -> ProcedureFuture?
 
     /**
      The procedure queue did add a new operation. This is for information only.
 
-     - paramter queue: the `ProcedureQueue`.
-     - paramter operation: the `Operation` instance which was added.
-     */
-    func procedureQueue(_ queue: ProcedureQueue, didAddOperation operation: Operation)
-
-    /**
-     An operation will finish on the queue.
-
      - parameter queue: the `ProcedureQueue`.
-     - parameter operation: the `Operation` instance which finished.
-     - parameter errors: an array of `Error`s.
+     - parameter operation: the `Operation` instance which was added.
+     - parameter context: the context, if any, passed into the call to ProcedureQueue.add(operation:context:) that triggered the delegate callback
      */
-    func procedureQueue(_ queue: ProcedureQueue, willFinishOperation operation: Operation, withErrors errors: [Error])
+    func procedureQueue(_ queue: ProcedureQueue, didAddOperation operation: Operation, context: Any?)
 
     /**
      An operation has finished on the queue.
@@ -83,26 +85,69 @@ public protocol ProcedureQueueDelegate: OperationQueueDelegate {
      - parameter operation: the `Operation` instance which finished.
      - parameter errors: an array of `Error`s.
      */
-    func procedureQueue(_ queue: ProcedureQueue, didFinishOperation operation: Operation, withErrors errors: [Error])
+    func procedureQueue(_ queue: ProcedureQueue, didFinishOperation operation: Operation)
+
+    // MARK: - Procedures
 
     /**
-     The operation queue will add a new operation via produceOperation().
-     This is for information only, the delegate cannot affect whether the operation
-     is added, or other control flow.
-
-     - paramter queue: the `ProcedureQueue`.
-     - paramter operation: the `Operation` instance about to be added.
+     The procedure queue will add a new Procedure. This is for information only, the
+     delegate cannot affect whether the Procedure is added, or other control flow.
+     
+     - parameter queue: the `ProcedureQueue`.
+     - parameter procedure: the `Procedure` instance about to be added.
+     - parameter context: the context, if any, passed into the call to ProcedureQueue.add(operation:context:) that triggered the delegate callback
+     - returns: (optional) a ProcedureFuture (signaled when handling of the delegate callback is complete), or nil (if there is no need for the ProcedureQueue to wait to add the operation)
      */
-    func procedureQueue(_ queue: ProcedureQueue, willProduceOperation operation: Operation)
+    func procedureQueue(_ queue: ProcedureQueue, willAddProcedure procedure: Procedure, context: Any?) -> ProcedureFuture?
+
+    /**
+     The procedure queue did add a new Procedure. This is for information only.
+     
+     - parameter queue: the `ProcedureQueue`.
+     - parameter procedure: the `Procedure` instance which was added.
+     - parameter context: the context, if any, passed into the call to ProcedureQueue.add(operation:context:) that triggered the delegate callback
+     */
+    func procedureQueue(_ queue: ProcedureQueue, didAddProcedure procedure: Procedure, context: Any?)
+
+    /**
+     A Procedure will finish on the queue.
+     
+     - parameter queue: the `ProcedureQueue`.
+     - parameter procedure: the `Procedure` instance which finished.
+     - parameter errors: an array of `Error`s.
+     - returns: (optional) a ProcedureFuture (signaled when handling of the delegate callback is complete), or nil (if there is no need for the ProcedureQueue to temporarily block the Procedure from finishing)
+     */
+    func procedureQueue(_ queue: ProcedureQueue, willFinishProcedure procedure: Procedure, withErrors errors: [Error]) -> ProcedureFuture?
+
+    /**
+     A Procedure has finished on the queue.
+     
+     - parameter queue: the `ProcedureQueue`.
+     - parameter procedure: the `Procedure` instance which finished.
+     - parameter errors: an array of `Error`s.
+     */
+    func procedureQueue(_ queue: ProcedureQueue, didFinishProcedure procedure: Procedure, withErrors errors: [Error])
 }
 
 public extension ProcedureQueueDelegate {
 
-    func procedureQueue(_ queue: ProcedureQueue, willAddOperation operation: Operation) { /* default no-op */ }
+    // Operations
+    
+    func procedureQueue(_ queue: ProcedureQueue, willAddOperation operation: Operation, context: Any?) -> ProcedureFuture? { /* default no-op */ return nil }
 
-    func procedureQueue(_ queue: ProcedureQueue, didAddOperation operation: Operation) { /* default no-op */ }
+    func procedureQueue(_ queue: ProcedureQueue, didAddOperation operation: Operation, context: Any?) { /* default no-op */ }
 
-    func procedureQueue(_ queue: ProcedureQueue, willProduceOperation operation: Operation) { /* default no-op */ }
+    func procedureQueue(_ queue: ProcedureQueue, didFinishOperation operation: Operation) { /* default no-op */ }
+    
+    // Procedures
+    
+    func procedureQueue(_ queue: ProcedureQueue, willAddProcedure procedure: Procedure, context: Any?) -> ProcedureFuture? { /* default no-op */ return nil }
+    
+    func procedureQueue(_ queue: ProcedureQueue, didAddProcedure procedure: Procedure, context: Any?) { /* default no-op */ }
+    
+    func procedureQueue(_ queue: ProcedureQueue, willFinishProcedure procedure: Procedure, withErrors errors: [Error]) -> ProcedureFuture? { /* default no-op */ return nil }
+    
+    func procedureQueue(_ queue: ProcedureQueue, didFinishProcedure procedure: Procedure, withErrors errors: [Error]) { /* default no-op */ }
 }
 
 /**
@@ -121,6 +166,8 @@ open class ProcedureQueue: OperationQueue {
 
     private static let sharedMainQueue = MainProcedureQueue()
 
+    fileprivate let dispatchQueue = DispatchQueue(label: "run.kit.procedure.ProcedureKit.ProcedureQueue"/*, qos: DispatchQoS.userInteractive*/, attributes: [.concurrent])
+
     /**
      Override OperationQueue's main to return the main queue as an ProcedureQueue
 
@@ -137,6 +184,7 @@ open class ProcedureQueue: OperationQueue {
      */
     open weak var delegate: ProcedureQueueDelegate? = nil
 
+
     // swiftlint:disable function_body_length
     // swiftlint:disable cyclomatic_complexity
     /**
@@ -144,104 +192,28 @@ open class ProcedureQueue: OperationQueue {
      implementation as it is critical to how ProcedureKit function.
 
      - parameter op: an `Operation` instance.
+     - parameter context: an optional parameter that is passed-through to the Will/DidAdd delegate callbacks
+     - returns: a ProcedureFuture that is signaled once the operation has been added to the ProcedureQueue
      */
-    open func add(operation: Operation) {
+    @discardableResult open func add(operation: Operation, withContext context: Any? = nil) -> ProcedureFuture {
 
-        defer {
-            super.addOperation(operation)
+        let promise = ProcedurePromise()
 
-            delegate?.procedureQueue(self, didAddOperation: operation)
-        }
+        // Execute the first internal implementation function on the current thread.
+        // This will ensure that willAddOperation/Procedure delegate callbacks are called
+        // prior to returning.
+        //
+        // If those delegate callbacks return a future, additional steps may be executed 
+        // asynchronously on the ProcedureQueue's internal DispatchQueue.
+        //
+        // Thus, when this function returns:
+        //  - it is guaranteed that the `willAddOperation` / `willAddProcedure` delegate callbacks
+        //    have been called
+        //  - the operation may not have been added to the queue yet, but *will* be (if not)
+        //
+        _add(operation: operation, context: context, promise: promise)
 
-        guard let procedure = operation as? Procedure else {
-
-            operation.addCompletionBlock { [weak self, weak operation] in
-                if let queue = self, let operation = operation {
-                    queue.delegate?.operationQueue(queue, didFinishOperation: operation)
-                }
-            }
-
-            delegate?.operationQueue(self, willAddOperation: operation)
-
-            return
-        }
-
-        procedure.log.verbose(message: "Adding to queue")
-
-        /// Add an observer to invoke the will finish delegate method
-        procedure.addWillFinishBlockObserver { [weak self] procedure, errors in
-            if let queue = self {
-                queue.delegate?.procedureQueue(queue, willFinishOperation: procedure, withErrors: errors)
-            }
-        }
-
-        /// Add an observer to invoke the did finish delegate method
-        procedure.addDidFinishBlockObserver { [weak self] procedure, errors in
-            if let queue = self {
-                queue.delegate?.procedureQueue(queue, didFinishOperation: procedure, withErrors: errors)
-            }
-        }
-
-        /// Process any conditions
-        if procedure.conditions.count > 0 {
-
-            /// Check for mutual exclusion conditions
-            let manager = ExclusivityManager.sharedInstance
-
-            let mutuallyExclusiveConditions = procedure.conditions.filter { $0.isMutuallyExclusive }
-            var previousMutuallyExclusiveOperations = Set<Operation>()
-
-            for condition in mutuallyExclusiveConditions {
-                let category = "\(condition.category)"
-                if let previous = manager.add(procedure: procedure, category: category) {
-                    previousMutuallyExclusiveOperations.insert(previous)
-                }
-            }
-
-            // Create the condition evaluator
-            let evaluator = procedure.evaluateConditions()
-
-            // Get the condition dependencies
-            let indirectDependencies = procedure.indirectDependencies
-
-            // If there are dependencies
-            if indirectDependencies.count > 0 {
-
-                // Filter out the indirect dependencies which have already been added to the queue
-                let indirectDependenciesToProcess = indirectDependencies.filter { !self.operations.contains($0) }
-
-                // Check to see if there are any which need processing
-                if indirectDependenciesToProcess.count > 0 {
-
-                    // Iterate through the indirect dependencies
-                    indirectDependenciesToProcess.forEach {
-
-                        // Indirect dependencies are executed after
-                        // any previous mutually exclusive operation(s)
-                        $0.add(dependencies: previousMutuallyExclusiveOperations)
-
-                        // Indirect dependencies are executed after
-                        // all direct dependencies
-                        $0.add(dependencies: procedure.directDependencies)
-
-                        // Only evaluate conditions after all indirect
-                        // dependencies have finished
-                        evaluator.addDependency($0)
-                    }
-
-                    // Add indirect dependencies
-                    add(operations: indirectDependenciesToProcess)
-                }
-            }
-
-            // Add the evaluator
-            addOperation(evaluator)
-        }
-
-        // Indicate to the operation that it is to be enqueued
-        procedure.willEnqueue(on: self)
-
-        delegate?.procedureQueue(self, willAddOperation: procedure)
+        return promise.future
     }
     // swiftlint:enable cyclomatic_complexity
     // swiftlint:enable function_body_length
@@ -261,6 +233,225 @@ open class ProcedureQueue: OperationQueue {
     open override func addOperation(_ operation: Operation) {
         add(operation: operation)
     }
+
+
+    // MARK: - Private Implementation
+
+
+    private func _add(operation: Operation, context: Any?, promise: ProcedurePromise) {
+
+        // Stage 1: Add observers / completion block,
+        //          willEnqueue(on: self)
+        //          Call async WillAdd delegate method, .then(onQueue: )
+
+        guard let procedure = operation as? Procedure else {
+
+            // Operation (non-Procedure) subclasses are handled differently:
+            //  - They receive the following delegate callbacks: 
+            //      willAddOperation, didAddOperation, didFinishOperation
+            //    (There is no willFinishOperation callback fired for non-Procedure Operation subclasses,
+            //    and no error information is automatically available when finished.)
+
+            // Add a completion block to invoke the did finish delegate method
+            operation.addCompletionBlock { [weak self, weak operation] in
+                if let queue = self, let operation = operation {
+                    queue.delegate?.procedureQueue(queue, didFinishOperation: operation)
+                }
+            }
+
+            if let delegate = delegate {
+
+                // WillAddOperation delegate
+                (delegate.procedureQueue(self, willAddOperation: operation, context: context) ?? _SyncAlreadyAvailableFuture()).then(on: dispatchQueue) { _ in
+
+                    super.addOperation(operation)
+
+                    delegate.procedureQueue(self, didAddOperation: operation, context: context)
+
+                    promise.complete()
+                }
+            }
+            else {
+                super.addOperation(operation)
+
+                promise.complete()
+            }
+
+            return
+        }
+
+        // Procedure subclass
+
+        procedure.log.verbose(message: "Adding to queue")
+
+        /// Add an observer to invoke the will finish delegate method
+        procedure.addWillFinishBlockObserver { [weak self] procedure, errors, futureFinish in
+            if let queue = self {
+                queue.delegate?.procedureQueue(queue, willFinishProcedure: procedure, withErrors: errors)?.then(on: queue.dispatchQueue) {
+                    // ensure that the observed procedure does not finish prior to the
+                    // willFinishProcedure delegate completing
+                    futureFinish.doThisBeforeEvent()
+                }
+            }
+        }
+
+        /// Add an observer to invoke the did finish delegate method
+        procedure.addDidFinishBlockObserver { [weak self] procedure, errors in
+            if let queue = self {
+                queue.delegate?.procedureQueue(queue, didFinishProcedure: procedure, withErrors: errors)
+            }
+        }
+
+        // Indicate to the operation that it is to be enqueued
+        procedure.willEnqueue(on: self)
+
+        if let delegate = delegate {
+
+            // WillAddProcedure delegate
+            (delegate.procedureQueue(self, willAddProcedure: procedure, context: context) ?? _SyncAlreadyAvailableFuture()).then(on: dispatchQueue) { _ in
+
+                // Step 2:
+                self._add_step2(procedure: procedure, context: context, promise: promise)
+            }
+        }
+        else {
+
+            // if no delegate, proceed to Step 2 directly:
+            _add_step2(procedure: procedure, context: context, promise: promise)
+        }
+    }
+
+    // Step2 2: process conditions
+    //          add the evaluator procedure to self (using async method), .then(onQueue: )
+    //
+    private func _add_step2(procedure: Procedure, context: Any?, promise: ProcedurePromise) {
+
+        /// Process any conditions
+        if let evaluator = processConditions(procedure: procedure) {
+
+            // Add the evaluator
+            let addEvaluatorPromise = ProcedurePromise()
+            _add(operation: evaluator, context: nil, promise: addEvaluatorPromise)
+            addEvaluatorPromise.future.then(on: dispatchQueue) { _ in
+
+                // proceed to Step 3:
+                self._add_step3(procedure: procedure, context: context, promise: promise)
+            }
+        }
+        else {
+
+            // no conditions - proceed directly to Step 3:
+            _add_step3(procedure: procedure, context: context, promise: promise)
+        }
+    }
+
+    // Step 3: pendingQueueStart()
+    //          super.addOperation()
+    //          Call async DidAdd delegate method, .then(onQueue: )
+    //
+    private func _add_step3(procedure: Procedure, context: Any?, promise: ProcedurePromise) {
+
+        // Indicate to the Procedure that it will be added to the queue
+        // and is waiting for the queue to start it
+        procedure.pendingQueueStart()
+
+        super.addOperation(procedure)
+
+        // DidAddProcedure delegate
+        delegate?.procedureQueue(self, didAddProcedure: procedure, context: context)
+
+        promise.complete()
+    }
+
+    /// Processes a Procedure's Conditions, and returns a Procedure.EvaluateConditions Procedure
+    /// (if there are Conditions present).
+    ///
+    /// - Parameter procedure: a Procedure that is being added to the ProcedureQueue
+    /// - Returns: the EvaluateConditions Procedure for the input Procedure
+    private func processConditions(procedure: Procedure) -> Procedure? {
+        guard procedure.conditions.count > 0 else { return nil }
+
+        /// Check for mutual exclusion conditions
+        let manager = ExclusivityManager.sharedInstance
+
+        let mutuallyExclusiveConditions = procedure.conditions.filter { $0.isMutuallyExclusive }
+        var previousMutuallyExclusiveOperations = Set<Operation>()
+
+        for condition in mutuallyExclusiveConditions {
+            let category = "\(condition.category)"
+            if let previous = manager.add(procedure: procedure, category: category) {
+                previousMutuallyExclusiveOperations.insert(previous)
+            }
+        }
+
+        // Create the condition evaluator
+        let evaluator = procedure.evaluateConditions()
+
+        // Get the condition dependencies
+        let indirectDependencies = procedure.indirectDependencies
+
+        // If there are dependencies
+        if indirectDependencies.count > 0 {
+
+            // Filter out the indirect dependencies which have already been added to the queue
+            let indirectDependenciesToProcess = indirectDependencies.filter { !self.operations.contains($0) }
+
+            // Check to see if there are any which need processing
+            if indirectDependenciesToProcess.count > 0 {
+
+                // Iterate through the indirect dependencies
+                indirectDependenciesToProcess.forEach {
+
+                    // Indirect dependencies are executed after
+                    // any previous mutually exclusive operation(s)
+                    $0.add(dependencies: previousMutuallyExclusiveOperations)
+
+                    // Indirect dependencies are executed after
+                    // all direct dependencies
+                    $0.add(dependencies: procedure.directDependencies)
+
+                    // Only evaluate conditions after all indirect
+                    // dependencies have finished
+                    evaluator.addDependency($0)
+                }
+
+                // Add indirect dependencies
+                add(operations: indirectDependenciesToProcess)
+            }
+        }
+
+        return evaluator
+    }
+}
+
+public extension ProcedureQueue {
+    /**
+     Add operations to the queue as an array
+     
+     - parameters operations: a variadic array of `NSOperation` instances.
+     - parameter context: an optional parameter that is passed-through to the Will/DidAdd delegate callbacks
+     - returns: a ProcedureFuture that is signaled once the operation has been added to the ProcedureQueue
+     */
+    @discardableResult
+    final func add<S: Sequence>(operations: S, withContext context: Any? = nil) -> ProcedureFuture where S.Iterator.Element: Operation {
+
+        let futures = Array(operations).map {
+            add(operation: $0, withContext: context)
+        }
+
+        return ProcedureFutureGroup(futures).future
+    }
+
+    /**
+     Add operations to the queue as a variadic parameter
+
+     - parameters operations: a variadic array of `NSOperation` instances.
+     - parameter context: an optional parameter that is passed-through to the Will/DidAdd delegate callbacks
+     - returns: a ProcedureFuture that is signaled once the operation has been added to the ProcedureQueue
+     */
+    final func add(operations: Operation..., withContext context: Any? = nil) -> ProcedureFuture {
+        return add(operations: operations, withContext: context)
+    }
 }
 
 
@@ -269,7 +460,7 @@ public extension OperationQueue {
 
     /**
      Add operations to the queue as an array
-     - parameters ops: a array of `NSOperation` instances.
+     - parameters operations: a array of `NSOperation` instances.
      */
     final func add<S>(operations: S) where S: Sequence, S.Iterator.Element: Operation {
         addOperations(Array(operations), waitUntilFinished: false)
@@ -277,9 +468,28 @@ public extension OperationQueue {
 
     /**
      Add operations to the queue as a variadic parameter
-     - parameters ops: a variadic array of `NSOperation` instances.
+     - parameters operations: a variadic array of `NSOperation` instances.
      */
     final func add(operations: Operation...) {
         add(operations: operations)
     }
 }
+
+
+/// A ProcedureFuture that is used internally to shortcut dispatching async when no waiting is required.
+fileprivate class _SyncAlreadyAvailableFuture: ProcedureFuture {
+    internal init() { }
+
+    deinit {
+        group.leave()
+    }
+
+    @discardableResult public override func then(on eventQueueProvider: QueueProvider, block: @escaping (Void) -> Void) {
+        block()
+    }
+}
+
+// MARK: - Unavilable & Renamed
+
+@available(*, unavailable, renamed: "ProcedureQueueDelegate")
+public protocol OperationQueueDelegate { }

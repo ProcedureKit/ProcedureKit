@@ -9,16 +9,18 @@ import Foundation
 extension Collection where Iterator.Element: Operation {
 
     internal var operationsAndProcedures: ([Operation], [Procedure]) {
-        return reduce(([], [])) { result, element in
-            var (operations, procedures) = result
+        // this for-in loop has considerably better performance characteristics than reduce()
+        var operations: [Operation] = []
+        var procedures: [Procedure] = []
+        for element in self {
             if let procedure = element as? Procedure {
                 procedures.append(procedure)
             }
             else {
                 operations.append(element)
             }
-            return (operations, procedures)
         }
+        return (operations, procedures)
     }
 
     internal var conditions: [Condition] {
