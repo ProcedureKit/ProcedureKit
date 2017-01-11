@@ -10,7 +10,7 @@
 
 # ProcedureKit
 
-A Swift framework inspired by WWDC 2015 Advanced NSOperations session. Previously known as _Operations_, developed by [@danthorpe](https://gihub.com/danthorpe).
+A Swift framework inspired by WWDC 2015 Advanced NSOperations session. Previously known as _Operations_, developed by [@danthorpe](https://github.com/danthorpe).
 
 Resource | Where to find it
 ---------|-----------------
