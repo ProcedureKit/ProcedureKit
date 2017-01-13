@@ -12,28 +12,28 @@ import Dispatch
 class BlockObserverTests: ProcedureKitTestCase {
 
     func test__did_attach_is_called() {
-        let didAttachCalled = MutexProtector<Procedure?>(nil)
+        let didAttachCalled = Protector<Procedure?>(nil)
         procedure.add(observer: BlockObserver(didAttach: { didAttachCalled.overwrite(with: $0) }))
         wait(for: procedure)
         XCTAssertEqual(didAttachCalled.access, procedure)
     }
 
     func test__will_execute_is_called() {
-        let willExecuteCalled = MutexProtector<Procedure?>(nil)
+        let willExecuteCalled = Protector<Procedure?>(nil)
         procedure.add(observer: BlockObserver(willExecute: { willExecuteCalled.overwrite(with: $0.0) }))
         wait(for: procedure)
         XCTAssertEqual(willExecuteCalled.access, procedure)
     }
 
     func test__did_execute_is_called() {
-        let didExecuteCalled = MutexProtector<Procedure?>(nil)
+        let didExecuteCalled = Protector<Procedure?>(nil)
         procedure.add(observer: BlockObserver(didExecute: { didExecuteCalled.overwrite(with: $0) }))
         wait(for: procedure)
         XCTAssertEqual(didExecuteCalled.access, procedure)
     }
 
     func test__did_cancel_is_called() {
-        let didCancelCalled = MutexProtector<(Procedure, [Error])?>(nil)
+        let didCancelCalled = Protector<(Procedure, [Error])?>(nil)
         let error = TestError()
         procedure.add(observer: BlockObserver(didCancel: { didCancelCalled.overwrite(with: ($0, $1)) }))
         check(procedure: procedure) { procedure in
@@ -44,7 +44,7 @@ class BlockObserverTests: ProcedureKitTestCase {
     }
 
     func test__will_add_operation_is_called() {
-        let willAddCalled = MutexProtector<(Procedure, Operation)?>(nil)
+        let willAddCalled = Protector<(Procedure, Operation)?>(nil)
         var didExecuteProducedOperation = false
         let producingProcedure = TestProcedure(produced: BlockOperation { didExecuteProducedOperation = true })
         producingProcedure.add(observer: BlockObserver(willAdd: { willAddCalled.overwrite(with: ($0, $1)) }))
@@ -55,7 +55,7 @@ class BlockObserverTests: ProcedureKitTestCase {
     }
 
     func test__did_add_operation_is_called() {
-        let didAddCalled = MutexProtector<(Procedure, Operation)?>(nil)
+        let didAddCalled = Protector<(Procedure, Operation)?>(nil)
         var didExecuteProducedOperation = false
         let producingProcedure = TestProcedure(produced: BlockOperation { didExecuteProducedOperation = true })
         producingProcedure.add(observer: BlockObserver(didAdd: { didAddCalled.overwrite(with: ($0, $1)) }))
@@ -66,14 +66,14 @@ class BlockObserverTests: ProcedureKitTestCase {
     }
 
     func test__will_finish_is_called() {
-        let willFinishCalled = MutexProtector<(Procedure, [Error])?>(nil)
+        let willFinishCalled = Protector<(Procedure, [Error])?>(nil)
         procedure.add(observer: BlockObserver(willFinish: { willFinishCalled.overwrite(with: ($0.0, $0.1)) }))
         wait(for: procedure)
         XCTAssertEqual(willFinishCalled.access?.0, procedure)
     }
 
     func test__did_finish_is_called() {
-        let didFinishCalled = MutexProtector<(Procedure, [Error])?>(nil)
+        let didFinishCalled = Protector<(Procedure, [Error])?>(nil)
         procedure.add(observer: BlockObserver(didFinish: { didFinishCalled.overwrite(with: ($0, $1)) }))
         wait(for: procedure)
         XCTAssertEqual(didFinishCalled.access?.0, procedure)
@@ -145,7 +145,7 @@ class BlockObserverSynchronizationTests: ProcedureKitTestCase {
 
     func test__did_attach_synchronized() {
         syncTest { syncObject, isSynced in
-            let didAttachCalled_BlockObserver = MutexProtector<(Procedure, Bool)?>(nil)
+            let didAttachCalled_BlockObserver = Protector<(Procedure, Bool)?>(nil)
             let procedure = TestProcedure()
             procedure.add(observer: BlockObserver(synchronizedWith: syncObject, didAttach: { didAttachCalled_BlockObserver.overwrite(with: ($0, isSynced())) }))
             wait(for: procedure)
@@ -156,8 +156,8 @@ class BlockObserverSynchronizationTests: ProcedureKitTestCase {
 
     func test__will_execute_synchronized() {
         syncTest { syncObject, isSynced in
-            let willExecuteCalled_addBlock = MutexProtector<(Procedure, Bool)?>(nil)
-            let willExecuteCalled_BlockObserver = MutexProtector<(Procedure, Bool)?>(nil)
+            let willExecuteCalled_addBlock = Protector<(Procedure, Bool)?>(nil)
+            let willExecuteCalled_BlockObserver = Protector<(Procedure, Bool)?>(nil)
             let procedure = TestProcedure()
             procedure.addWillExecuteBlockObserver(synchronizedWith: syncObject) { procedure, _ in
                 willExecuteCalled_addBlock.overwrite(with: (procedure, isSynced()))
@@ -173,8 +173,8 @@ class BlockObserverSynchronizationTests: ProcedureKitTestCase {
 
     func test__did_execute_synchronized() {
         syncTest { syncObject, isSynced in
-            let didExecuteCalled_addBlock = MutexProtector<(Procedure, Bool)?>(nil)
-            let didExecuteCalled_BlockObserver = MutexProtector<(Procedure, Bool)?>(nil)
+            let didExecuteCalled_addBlock = Protector<(Procedure, Bool)?>(nil)
+            let didExecuteCalled_BlockObserver = Protector<(Procedure, Bool)?>(nil)
             let procedure = TestProcedure()
             procedure.addDidExecuteBlockObserver(synchronizedWith: syncObject) { procedure in
                 didExecuteCalled_addBlock.overwrite(with: (procedure, isSynced()))
@@ -191,8 +191,8 @@ class BlockObserverSynchronizationTests: ProcedureKitTestCase {
     func test__did_cancel_synchronized() {
         syncTest { syncObject, isSynced in
             let error = TestError()
-            let didCancelCalled_addBlock = MutexProtector<(Procedure, [Error], Bool)?>(nil)
-            let didCancelCalled_BlockObserver = MutexProtector<(Procedure, [Error], Bool)?>(nil)
+            let didCancelCalled_addBlock = Protector<(Procedure, [Error], Bool)?>(nil)
+            let didCancelCalled_BlockObserver = Protector<(Procedure, [Error], Bool)?>(nil)
             let procedure = TestProcedure()
             procedure.addDidCancelBlockObserver(synchronizedWith: syncObject) { procedure, errors in
                 didCancelCalled_addBlock.overwrite(with: (procedure, errors, isSynced()))
@@ -210,8 +210,8 @@ class BlockObserverSynchronizationTests: ProcedureKitTestCase {
     func test__will_add_synchronized() {
         syncTest { syncObject, isSynced in
             var didExecuteProducedOperation = false
-            let willAddOperationCalled_addBlock = MutexProtector<(Procedure, Operation, Bool)?>(nil)
-            let willAddOperationCalled_BlockObserver = MutexProtector<(Procedure, Operation, Bool)?>(nil)
+            let willAddOperationCalled_addBlock = Protector<(Procedure, Operation, Bool)?>(nil)
+            let willAddOperationCalled_BlockObserver = Protector<(Procedure, Operation, Bool)?>(nil)
             let producedOperation = BlockOperation { didExecuteProducedOperation = true }
             let producingProcedure = TestProcedure(produced: producedOperation)
             producingProcedure.addWillAddOperationBlockObserver(synchronizedWith: syncObject) {
@@ -232,8 +232,8 @@ class BlockObserverSynchronizationTests: ProcedureKitTestCase {
     func test__did_add_synchronized() {
         syncTest { syncObject, isSynced in
             var didExecuteProducedOperation = false
-            let didAddOperationCalled_addBlock = MutexProtector<(Procedure, Operation, Bool)?>(nil)
-            let didAddOperationCalled_BlockObserver = MutexProtector<(Procedure, Operation, Bool)?>(nil)
+            let didAddOperationCalled_addBlock = Protector<(Procedure, Operation, Bool)?>(nil)
+            let didAddOperationCalled_BlockObserver = Protector<(Procedure, Operation, Bool)?>(nil)
             let producedOperation = BlockOperation { didExecuteProducedOperation = true }
             let producingProcedure = TestProcedure(produced: producedOperation)
             producingProcedure.addDidAddOperationBlockObserver(synchronizedWith: syncObject) {
@@ -253,8 +253,8 @@ class BlockObserverSynchronizationTests: ProcedureKitTestCase {
 
     func test__will_finish_synchronized() {
         syncTest { syncObject, isSynced in
-            let willFinishCalled_addBlock = MutexProtector<(Procedure, [Error], Bool)?>(nil)
-            let willFinishCalled_BlockObserver = MutexProtector<(Procedure, [Error], Bool)?>(nil)
+            let willFinishCalled_addBlock = Protector<(Procedure, [Error], Bool)?>(nil)
+            let willFinishCalled_BlockObserver = Protector<(Procedure, [Error], Bool)?>(nil)
             let procedure = TestProcedure()
             procedure.addWillFinishBlockObserver(synchronizedWith: syncObject) { procedure, errors, _ in
                 willFinishCalled_addBlock.overwrite(with: (procedure, errors, isSynced()))
@@ -270,8 +270,8 @@ class BlockObserverSynchronizationTests: ProcedureKitTestCase {
 
     func test__did_finish_synchronized() {
         syncTest { syncObject, isSynced in
-            let didFinishCalled_addBlock = MutexProtector<(Procedure, [Error], Bool)?>(nil)
-            let didFinishCalled_BlockObserver = MutexProtector<(Procedure, [Error], Bool)?>(nil)
+            let didFinishCalled_addBlock = Protector<(Procedure, [Error], Bool)?>(nil)
+            let didFinishCalled_BlockObserver = Protector<(Procedure, [Error], Bool)?>(nil)
             let procedure = TestProcedure()
             procedure.addDidFinishBlockObserver(synchronizedWith: syncObject) { procedure, errors in
                 didFinishCalled_addBlock.overwrite(with: (procedure, errors, isSynced()))

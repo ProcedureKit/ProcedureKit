@@ -15,7 +15,7 @@ class TestableProfileReporter: ProcedureProfilerReporter {
         set { _didProfileResult.overwrite(with: newValue) }
     }
 
-    var _didProfileResult = MutexProtector<ProfileResult?>(.none)
+    var _didProfileResult = Protector<ProfileResult?>(.none)
 
     func finishedProfiling(withResult result: ProfileResult) {
         didProfileResult = result

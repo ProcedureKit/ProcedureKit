@@ -103,7 +103,7 @@ class CancellationTests: ProcedureKitTestCase {
     func test__procedure_cancelled_then_finished_from_within_execute() {
 
         class TestCancelFinishFromExecuteProcedure: Procedure {
-            var didCancel = MutexProtector((false, false))
+            var didCancel = Protector((false, false))
             let error = TestError()
             override func execute() {
                 cancel()

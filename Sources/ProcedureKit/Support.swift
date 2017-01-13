@@ -63,65 +63,6 @@ struct Lock: ReadWriteLock {
     }
 }
 
-public class Protector<T> {
-
-    private var lock = Lock()
-    private var ward: T
-
-    public init(_ ward: T) {
-        self.ward = ward
-    }
-
-    public var access: T {
-        return read { $0 }
-    }
-
-    public func read<U>(_ block: (T) -> U) -> U {
-        return lock.read { block(self.ward) }
-    }
-
-    /// Synchronously modify the protected value
-    ///
-    /// - Returns: The value returned by the `block`, if any. (discardable)
-    @discardableResult public func write<U>(_ block: (inout T) -> U) -> U {
-        return lock.write_sync({ block(&self.ward) })
-    }
-
-    /// Synchronously overwrite the protected value
-    public func overwrite(with newValue: T) {
-        write { (ward: inout T) in ward = newValue }
-    }
-
-    // Supports old callers that expect to pass in a completion block
-    // NOTE: Like `write()`, this is synchronous.
-    public func write(_ block: (inout T) -> Void, completion: (() -> Void)) {
-        lock.write_sync({ block(&self.ward) })
-        completion()
-    }
-}
-
-public extension Protector where T: RangeReplaceableCollection {
-
-    func append(_ newElement: T.Iterator.Element) {
-        write { (ward: inout T) in
-            ward.append(newElement)
-        }
-    }
-
-    func append<S: Sequence>(contentsOf newElements: S) where S.Iterator.Element == T.Iterator.Element {
-        write { (ward: inout T) in
-            ward.append(contentsOf: newElements)
-        }
-    }
-
-    func append<C : Collection>(contentsOf newElements: C) where C.Iterator.Element == T.Iterator.Element {
-        write { (ward: inout T) in
-            ward.append(contentsOf: newElements)
-        }
-    }
-}
-
-
 /// A wrapper class for a pthread_mutex
 final public class PThreadMutex {
     private var mutex = pthread_mutex_t()
@@ -158,7 +99,7 @@ final public class PThreadMutex {
     }
 }
 
-public class MutexProtector<T> {
+public class Protector<T> {
 
     private var lock = PThreadMutex()
     private var ward: T
@@ -192,7 +133,7 @@ public class MutexProtector<T> {
     }
 }
 
-public extension MutexProtector where T: RangeReplaceableCollection {
+public extension Protector where T: RangeReplaceableCollection {
 
     func append(_ newElement: T.Iterator.Element) {
         write { (ward: inout T) in
@@ -205,9 +146,15 @@ public extension MutexProtector where T: RangeReplaceableCollection {
             ward.append(contentsOf: newElements)
         }
     }
+
+    func append<C : Collection>(contentsOf newElements: C) where C.Iterator.Element == T.Iterator.Element {
+        write { (ward: inout T) in
+            ward.append(contentsOf: newElements)
+        }
+    }
 }
 
-public extension MutexProtector where T: Integer {
+public extension Protector where T: Integer {
 
     func advance(by stride: T.Stride) {
         write { (ward: inout T) in

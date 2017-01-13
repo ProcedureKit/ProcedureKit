@@ -102,11 +102,12 @@ class KVOTests: ProcedureKitTestCase {
             guard object as AnyObject? === operation else { return }
             guard let keyPath = keyPath else { return }
             if let isFinishedBlock = self.isFinishedBlock, keyPath == KeyPath.finished.rawValue {
-                orderOfKVONotifications.write( { (array) -> Void in
+                orderOfKVONotifications.write { (array) -> Void in
                     array.append(KVONotification(keyPath: keyPath, time: NSDate().timeIntervalSinceReferenceDate, old: change?[.oldKey], new: change?[.newKey]))
-                }, completion: {
-                    isFinishedBlock()   // write completion is executed on main queue
-                })
+                    DispatchQueue.main.async {
+                        isFinishedBlock()
+                    }
+                }
             }
             else {
                 orderOfKVONotifications.write { (array) -> Void in

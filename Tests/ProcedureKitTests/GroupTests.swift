@@ -403,7 +403,7 @@ class GroupTests: GroupTestCase {
             return _childEventsForEvaluateConditionsProcedure.access
         }
 
-        private let _childEventsForEvaluateConditionsProcedure = MutexProtector(Array<CheckChildEventsGroupProcedure.GroupChildEvent>())
+        private let _childEventsForEvaluateConditionsProcedure = Protector(Array<CheckChildEventsGroupProcedure.GroupChildEvent>())
 
         init(operations: [Operation]) {
             super.init(operations: operations)

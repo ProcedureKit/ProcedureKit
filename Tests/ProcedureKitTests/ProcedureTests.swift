@@ -214,7 +214,7 @@ class QualityOfServiceTests: ProcedureKitTestCase {
 
     func test__procedure__set_quality_of_service__procedure_execute() {
         testQoSClassLevels { desiredQoS in
-            let recordedQoSClass = MutexProtector<DispatchQoS.QoSClass>(.unspecified)
+            let recordedQoSClass = Protector<DispatchQoS.QoSClass>(.unspecified)
             let procedure = BlockProcedure {
                 recordedQoSClass.overwrite(with: DispatchQueue.currentQoSClass)
             }
@@ -226,7 +226,7 @@ class QualityOfServiceTests: ProcedureKitTestCase {
 
     func test__procedure__set_quality_of_service__will_execute_observer() {
         testQoSClassLevels { desiredQoS in
-            let recordedQoSClass = MutexProtector<DispatchQoS.QoSClass>(.unspecified)
+            let recordedQoSClass = Protector<DispatchQoS.QoSClass>(.unspecified)
             let procedure = TestProcedure()
             procedure.addWillExecuteBlockObserver { procedure, _ in
                 recordedQoSClass.overwrite(with: DispatchQueue.currentQoSClass)
@@ -239,9 +239,9 @@ class QualityOfServiceTests: ProcedureKitTestCase {
 
     func test__procedure__set_quality_of_service__execute_after_will_execute_on_custom_queue() {
         testQoSClassLevels { desiredQoS in
-            let recordedQoSClass_willExecute_otherQueue = MutexProtector<DispatchQoS.QoSClass>(.unspecified)
-            let recordedQoSClass_willExecute = MutexProtector<DispatchQoS.QoSClass>(.unspecified)
-            let recordedQoSClass_execute = MutexProtector<DispatchQoS.QoSClass>(.unspecified)
+            let recordedQoSClass_willExecute_otherQueue = Protector<DispatchQoS.QoSClass>(.unspecified)
+            let recordedQoSClass_willExecute = Protector<DispatchQoS.QoSClass>(.unspecified)
+            let recordedQoSClass_execute = Protector<DispatchQoS.QoSClass>(.unspecified)
             let procedure = BlockProcedure {
                 recordedQoSClass_execute.overwrite(with: DispatchQueue.currentQoSClass)
             }
@@ -267,7 +267,7 @@ class QualityOfServiceTests: ProcedureKitTestCase {
     func test__procedure__set_quality_of_service__did_cancel_observer() {
         testQoSClassLevels { desiredQoS in
             weak var expDidCancel = expectation(description: "did cancel Procedure with qualityOfService: \(desiredQoS.qosClass)")
-            let recordedQoSClass = MutexProtector<DispatchQoS.QoSClass>(.unspecified)
+            let recordedQoSClass = Protector<DispatchQoS.QoSClass>(.unspecified)
             let procedure = TestProcedure()
             procedure.addDidCancelBlockObserver { procedure, _ in
                 recordedQoSClass.overwrite(with: DispatchQueue.currentQoSClass)
@@ -499,8 +499,8 @@ class ProduceTests: ProcedureKitTestCase {
 class ObserverEventQueueTests: ProcedureKitTestCase {
 
     func test__custom_observer_with_event_queue() {
-        let eventsNotOnSpecifiedQueue = MutexProtector<[EventConcurrencyTrackingRegistrar.ProcedureEvent]>([])
-        let eventsOnSpecifiedQueue = MutexProtector<[EventConcurrencyTrackingRegistrar.ProcedureEvent]>([])
+        let eventsNotOnSpecifiedQueue = Protector<[EventConcurrencyTrackingRegistrar.ProcedureEvent]>([])
+        let eventsOnSpecifiedQueue = Protector<[EventConcurrencyTrackingRegistrar.ProcedureEvent]>([])
         let registrar = EventConcurrencyTrackingRegistrar()
         let customEventQueue = EventQueue(label: "run.kit.procedure.ProcedureKit.Testing.ObserverCustomEventQueue")
         let observer = ConcurrencyTrackingObserver(registrar: registrar, eventQueue: customEventQueue, callbackBlock: { procedure, event in

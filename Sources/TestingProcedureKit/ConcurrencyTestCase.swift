@@ -315,7 +315,7 @@ public class EventConcurrencyTrackingRegistrar {
         // a history of all detected events (optional)
         var eventHistory: [ProcedureEvent] = []
     }
-    private let state = MutexProtector(State())
+    private let state = Protector(State())
 
     public var maximumDetected: Int { return state.read { $0.maximumDetected } }
     public var detectedConcurrentEvents: DetectedConcurrentEventSet { return state.read { $0.detectedConcurrentEvents } }

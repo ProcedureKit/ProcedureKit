@@ -58,7 +58,7 @@ open class TestProcedure: Procedure, InputProcedure, OutputProcedure {
         var procedureDidFinishCalled = false
         var procedureDidCancelCalled = false
     }
-    private var protected = MutexProtector(ProtectedProperties())
+    private var protected = Protector(ProtectedProperties())
 
     public init(name: String = "TestProcedure", delay: TimeInterval = 0.000_001, error: Error? = .none, produced: Operation? = .none) {
         self.delay = delay

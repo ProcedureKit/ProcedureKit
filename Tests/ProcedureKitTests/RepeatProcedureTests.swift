@@ -32,7 +32,7 @@ class RepeatProcedureTests: RepeatTestCase {
     }
 
     func test__init_with_max_and_body() {
-        let procedureExecutedCount = MutexProtector<Int>(0)
+        let procedureExecutedCount = Protector<Int>(0)
         let repeatProcedure = RepeatProcedure(max: 2) { BlockProcedure(block: { procedureExecutedCount.advance(by: 1) }) }
         wait(for: repeatProcedure)
         XCTAssertProcedureFinishedWithoutErrors(repeatProcedure)
