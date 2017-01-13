@@ -44,7 +44,7 @@ import Dispatch
 /// ```
 ///
 final public class PendingEvent: CustomStringConvertible {
-    public enum Event: CustomStringConvertible {
+    public enum Kind: CustomStringConvertible {
         case postDidAttach
         case addOperation
         case postDidAddOperation
@@ -68,11 +68,11 @@ final public class PendingEvent: CustomStringConvertible {
         }
     }
 
-    internal let event: Event
+    internal let event: Kind
     internal let group: DispatchGroup
     fileprivate let procedure: ProcedureProtocol
     private let isDerivedEvent: Bool
-    internal init(forProcedure procedure: ProcedureProtocol, withGroup group: DispatchGroup = DispatchGroup(), withEvent event: Event) {
+    internal init(forProcedure procedure: ProcedureProtocol, withGroup group: DispatchGroup = DispatchGroup(), withEvent event: Kind) {
         self.group = group
         self.procedure = procedure
         self.event = event
