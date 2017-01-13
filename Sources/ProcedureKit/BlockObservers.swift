@@ -90,8 +90,8 @@ public struct BlockObserver<Procedure: ProcedureProtocol>: ProcedureObserver {
         didAttach?(procedure)
     }
 
-    public func will(execute procedure: Procedure, futureExecute: PendingExecuteEvent) {
-        willExecute?(procedure, futureExecute)
+    public func will(execute procedure: Procedure, pendingExecute: PendingExecuteEvent) {
+        willExecute?(procedure, pendingExecute)
     }
 
     public func did(execute procedure: Procedure) {
@@ -110,8 +110,8 @@ public struct BlockObserver<Procedure: ProcedureProtocol>: ProcedureObserver {
         didAdd?(procedure, newOperation)
     }
 
-    public func will(finish procedure: Procedure, withErrors errors: [Error], futureFinish: PendingFinishEvent) {
-        willFinish?(procedure, errors, futureFinish)
+    public func will(finish procedure: Procedure, withErrors errors: [Error], pendingFinish: PendingFinishEvent) {
+        willFinish?(procedure, errors, pendingFinish)
     }
 
     public func did(finish procedure: Procedure, withErrors errors: [Error]) {
@@ -147,8 +147,8 @@ public struct WillExecuteObserver<Procedure: ProcedureProtocol>: ProcedureObserv
     }
 
     /// Conforms to `WillExecuteProcedureObserver`, executes the block
-    public func will(execute procedure: Procedure, futureExecute: PendingExecuteEvent) {
-        block(procedure, futureExecute)
+    public func will(execute procedure: Procedure, pendingExecute: PendingExecuteEvent) {
+        block(procedure, pendingExecute)
     }
 }
 
@@ -322,8 +322,8 @@ public struct WillFinishObserver<Procedure: ProcedureProtocol>: ProcedureObserve
     /// Observes when the attached procedure will finish.
     /// - parameter procedure: the procedure which will finish.
     /// - parameter errors: the errors the procedure will finish with
-    public func will(finish procedure: Procedure, withErrors errors: [Error], futureFinish: PendingFinishEvent) {
-        block(procedure, errors, futureFinish)
+    public func will(finish procedure: Procedure, withErrors errors: [Error], pendingFinish: PendingFinishEvent) {
+        block(procedure, errors, pendingFinish)
     }
 }
 

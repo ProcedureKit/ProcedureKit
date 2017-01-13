@@ -447,7 +447,7 @@ open class Procedure: Operation, ProcedureProtocol {
 
         // Call the WillExecute observers
         let willExecuteObserversGroup = dispatchObservers(pendingEvent: PendingEvent.execute) { observer, pendingEvent in
-            observer.will(execute: self, futureExecute: pendingEvent)
+            observer.will(execute: self, pendingExecute: pendingEvent)
         }
 
         // After the WillExecute observers have all completed, proceed to Step 2 of main()
@@ -894,7 +894,7 @@ open class Procedure: Operation, ProcedureProtocol {
         procedureWillFinish(withErrors: resultingErrors)
 
         let willFinishObserversGroup = dispatchObservers(pendingEvent: PendingEvent.finish) {
-            $0.will(finish: self, withErrors: resultingErrors, futureFinish: $1)
+            $0.will(finish: self, withErrors: resultingErrors, pendingFinish: $1)
         }
 
         optimizedDispatchEventNotify(group: willFinishObserversGroup, block: {

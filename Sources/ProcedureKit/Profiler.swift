@@ -201,7 +201,7 @@ extension ProcedureProfiler: ProcedureObserver {
         addMetric(forEvent: .attached)
     }
 
-    public func will(execute procedure: Procedure, futureExecute: PendingExecuteEvent) {
+    public func will(execute procedure: Procedure, pendingExecute: PendingExecuteEvent) {
         addMetric(forEvent: .started)
     }
 

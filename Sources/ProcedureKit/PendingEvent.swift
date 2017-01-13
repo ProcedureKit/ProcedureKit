@@ -23,9 +23,9 @@ import Dispatch
 /// completes, you can use the Pending(Execute/Finish)Event like so:
 ///
 /// ```swift
-/// procedure.addWillFinishObserver { procedure, errors, futureFinish in
+/// procedure.addWillFinishObserver { procedure, errors, pendingFinish in
 ///     DispatchQueue.global().async {
-///         futureFinish.doBeforeEvent {
+///         pendingFinish.doBeforeEvent {
 ///             // do something asynchronous
 ///             // this block is guaranteed to complete before the procedure finishes
 ///         }
@@ -37,9 +37,9 @@ import Dispatch
 /// to which a PendingEvent can be directly passed. For example:
 ///
 /// ```swift
-/// procedure.addWillFinishObserver { procedure, errors, futureFinish in
+/// procedure.addWillFinishObserver { procedure, errors, pendingFinish in
 ///     // produce a new operation before the procedure finishes
-///     procedure.produce(BlockOperation { /* do something */ }, before: futureFinish)
+///     procedure.produce(BlockOperation { /* do something */ }, before: pendingFinish)
 /// }
 /// ```
 ///

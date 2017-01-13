@@ -285,12 +285,12 @@ open class ProcedureQueue: OperationQueue {
         procedure.log.verbose(message: "Adding to queue")
 
         /// Add an observer to invoke the will finish delegate method
-        procedure.addWillFinishBlockObserver { [weak self] procedure, errors, futureFinish in
+        procedure.addWillFinishBlockObserver { [weak self] procedure, errors, pendingFinish in
             if let queue = self {
                 queue.delegate?.procedureQueue(queue, willFinishProcedure: procedure, withErrors: errors)?.then(on: queue.dispatchQueue) {
                     // ensure that the observed procedure does not finish prior to the
                     // willFinishProcedure delegate completing
-                    futureFinish.doThisBeforeEvent()
+                    pendingFinish.doThisBeforeEvent()
                 }
             }
         }

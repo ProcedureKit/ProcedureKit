@@ -305,8 +305,8 @@ class GroupTests: GroupTestCase {
         let childProducedOperation = TestProcedure(name: "ChildProducedOperation", delay: 0.2)
         childProducedOperation.add(dependency: child)
         let group = GroupProcedure(operations: [child])
-        child.addWillExecuteBlockObserver { operation, futureExecute in
-            try! operation.produce(operation: childProducedOperation, before: futureExecute) // swiftlint:disable:this force_try
+        child.addWillExecuteBlockObserver { operation, pendingExecute in
+            try! operation.produce(operation: childProducedOperation, before: pendingExecute) // swiftlint:disable:this force_try
         }
         wait(for: group)
         XCTAssertProcedureFinishedWithoutErrors(group)
@@ -318,8 +318,8 @@ class GroupTests: GroupTestCase {
         let childProducedOperation = TestProcedure(name: "ChildProducedOperation", delay: 0.2)
         childProducedOperation.add(dependency: child)
         let group = GroupProcedure(operations: [child])
-        child.addWillExecuteBlockObserver { operation, futureExecute in
-            try! operation.produce(operation: childProducedOperation, before: futureExecute) // swiftlint:disable:this force_try
+        child.addWillExecuteBlockObserver { operation, pendingExecute in
+            try! operation.produce(operation: childProducedOperation, before: pendingExecute) // swiftlint:disable:this force_try
         }
         wait(for: group)
         XCTAssertEqual(group.children.count, 2)

@@ -406,7 +406,7 @@ open class ConcurrencyTrackingObserver: ProcedureObserver {
         }
     }
 
-    public func will(execute procedure: Procedure, futureExecute: PendingExecuteEvent) { doRun(.observer_willExecute, block: { callback in callbackBlock(procedure, callback) } ) }
+    public func will(execute procedure: Procedure, pendingExecute: PendingExecuteEvent) { doRun(.observer_willExecute, block: { callback in callbackBlock(procedure, callback) } ) }
 
     public func did(execute procedure: Procedure) { doRun(.observer_didExecute, block: { callback in callbackBlock(procedure, callback) }) }
 
@@ -418,7 +418,7 @@ open class ConcurrencyTrackingObserver: ProcedureObserver {
 
     public func procedure(_ procedure: Procedure, didAdd newOperation: Operation) { doRun(.observer_procedureDidAdd(newOperation.operationName), block: { callback in callbackBlock(procedure, callback) }) }
 
-    public func will(finish procedure: Procedure, withErrors errors: [Error], futureFinish: PendingFinishEvent) { doRun(.observer_willFinish, block: { callback in callbackBlock(procedure, callback) }) }
+    public func will(finish procedure: Procedure, withErrors errors: [Error], pendingFinish: PendingFinishEvent) { doRun(.observer_willFinish, block: { callback in callbackBlock(procedure, callback) }) }
 
     public func did(finish procedure: Procedure, withErrors errors: [Error]) { doRun(.observer_didFinish, block: { callback in callbackBlock(procedure, callback) }) }
 

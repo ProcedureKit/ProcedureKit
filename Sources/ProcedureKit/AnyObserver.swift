@@ -8,12 +8,12 @@ import Foundation
 
 class AnyObserverBox_<Procedure: ProcedureProtocol>: ProcedureObserver {
     func didAttach(to procedure: Procedure) { _abstractMethod() }
-    func will(execute procedure: Procedure, futureExecute: PendingExecuteEvent) { _abstractMethod() }
+    func will(execute procedure: Procedure, pendingExecute: PendingExecuteEvent) { _abstractMethod() }
     func did(execute procedure: Procedure) { _abstractMethod() }
     func did(cancel procedure: Procedure, withErrors errors: [Error]) { _abstractMethod() }
     func procedure(_ procedure: Procedure, willAdd newOperation: Operation) { _abstractMethod() }
     func procedure(_ procedure: Procedure, didAdd newOperation: Operation) { _abstractMethod() }
-    func will(finish procedure: Procedure, withErrors errors: [Error], futureFinish: PendingFinishEvent) { _abstractMethod() }
+    func will(finish procedure: Procedure, withErrors errors: [Error], pendingFinish: PendingFinishEvent) { _abstractMethod() }
     func did(finish procedure: Procedure, withErrors errors: [Error]) { _abstractMethod() }
     var eventQueue: DispatchQueueProtocol? { _abstractMethod(); return nil }
 }
@@ -29,8 +29,8 @@ class AnyObserverBox<Base: ProcedureObserver>: AnyObserverBox_<Base.Procedure> {
         base.didAttach(to: procedure)
     }
 
-    override func will(execute procedure: Base.Procedure, futureExecute: PendingExecuteEvent) {
-        base.will(execute: procedure, futureExecute: futureExecute)
+    override func will(execute procedure: Base.Procedure, pendingExecute: PendingExecuteEvent) {
+        base.will(execute: procedure, pendingExecute: pendingExecute)
     }
 
     override func did(execute procedure: Base.Procedure) {
@@ -49,8 +49,8 @@ class AnyObserverBox<Base: ProcedureObserver>: AnyObserverBox_<Base.Procedure> {
         base.procedure(procedure, didAdd: newOperation)
     }
 
-    override func will(finish procedure: Base.Procedure, withErrors errors: [Error], futureFinish: PendingFinishEvent) {
-        base.will(finish: procedure, withErrors: errors, futureFinish: futureFinish)
+    override func will(finish procedure: Base.Procedure, withErrors errors: [Error], pendingFinish: PendingFinishEvent) {
+        base.will(finish: procedure, withErrors: errors, pendingFinish: pendingFinish)
     }
 
     override func did(finish procedure: Base.Procedure, withErrors errors: [Error]) {
@@ -75,8 +75,8 @@ public struct AnyObserver<Procedure: ProcedureProtocol>: ProcedureObserver {
         box.didAttach(to: procedure)
     }
 
-    public func will(execute procedure: Procedure, futureExecute: PendingExecuteEvent) {
-        box.will(execute: procedure, futureExecute: futureExecute)
+    public func will(execute procedure: Procedure, pendingExecute: PendingExecuteEvent) {
+        box.will(execute: procedure, pendingExecute: pendingExecute)
     }
 
     public func did(execute procedure: Procedure) {
@@ -95,8 +95,8 @@ public struct AnyObserver<Procedure: ProcedureProtocol>: ProcedureObserver {
         box.procedure(procedure, didAdd: newOperation)
     }
 
-    public func will(finish procedure: Procedure, withErrors errors: [Error], futureFinish: PendingFinishEvent) {
-        box.will(finish: procedure, withErrors: errors, futureFinish: futureFinish)
+    public func will(finish procedure: Procedure, withErrors errors: [Error], pendingFinish: PendingFinishEvent) {
+        box.will(finish: procedure, withErrors: errors, pendingFinish: pendingFinish)
     }
 
     public func did(finish procedure: Procedure, withErrors errors: [Error]) {
