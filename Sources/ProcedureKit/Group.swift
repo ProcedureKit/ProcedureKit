@@ -99,7 +99,15 @@ open class GroupProcedure: Procedure, ProcedureQueueDelegate {
     */
     public init(dispatchQueue underlyingQueue: DispatchQueue? = nil, operations: [Operation]) {
 
-        assert(operations.filter({ if let procedure = $0 as? Procedure { return procedure.isEnqueued } else { return false } }).isEmpty, "Cannot initialize GroupProcedure with Procedures that have already been added to another queue / GroupProcedure: \(operations.filter({ if let procedure = $0 as? Procedure { return procedure.isEnqueued } else { return false } }))")
+        assert(operations.filter({
+            if let procedure = $0 as? Procedure {
+                return procedure.isEnqueued
+            }
+            else {
+                return false
+            }
+        }).isEmpty,
+        "Cannot initialize GroupProcedure with Procedures that have already been added to another queue / GroupProcedure: \(operations.filter({ if let procedure = $0 as? Procedure { return procedure.isEnqueued } else { return false } }))")
 
         _groupChildren = operations
         initialChildren = operations
