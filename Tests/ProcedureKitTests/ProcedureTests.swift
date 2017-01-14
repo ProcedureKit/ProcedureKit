@@ -499,6 +499,8 @@ class ProduceTests: ProcedureKitTestCase {
 class ObserverEventQueueTests: ProcedureKitTestCase {
 
     func test__custom_observer_with_event_queue() {
+        let didFinishGroup = DispatchGroup()
+        didFinishGroup.enter()
         let eventsNotOnSpecifiedQueue = Protector<[EventConcurrencyTrackingRegistrar.ProcedureEvent]>([])
         let eventsOnSpecifiedQueue = Protector<[EventConcurrencyTrackingRegistrar.ProcedureEvent]>([])
         let registrar = EventConcurrencyTrackingRegistrar()
@@ -514,12 +516,26 @@ class ObserverEventQueueTests: ProcedureKitTestCase {
             procedure.finish()
         }
         procedure.add(observer: observer)
+        procedure.addDidFinishBlockObserver { _, _ in
+            didFinishGroup.leave()
+        }
 
         let finishing = BlockProcedure { }
         finishing.addDependency(procedure)
 
         run(operation: procedure)
         wait(for: finishing)
+
+        // Because Procedure signals isFinished KVO *prior* to calling DidFinish observers,
+        // the above wait() may return before the ConcurrencyTrackingObserver is called to
+        // record the DidFinish event.
+        // Thus, wait on a second observer added *after* the ConcurrencyTrackingObserver
+        // to ensure the event is captured by this test.
+        weak var expDidFinishObserverFired = expectation(description: "DidFinishObserver was fired")
+        didFinishGroup.notify(queue: DispatchQueue.main) {
+            expDidFinishObserverFired?.fulfill()
+        }
+        waitForExpectations(timeout: 2)
 
         XCTAssertTrue(eventsNotOnSpecifiedQueue.access.isEmpty, "Found events not on expected queue: \(eventsNotOnSpecifiedQueue.access)")
 
