@@ -225,7 +225,7 @@ open class Procedure: Operation, ProcedureProtocol {
         var directDependencies = Set<Operation>()
         var conditions = Set<Condition>()
     }
-    fileprivate var protectedProperties: ProtectedProperties! = ProtectedProperties()
+    fileprivate var protectedProperties: ProtectedProperties! = ProtectedProperties() // see deinit
 
     // the errors variable to be used *within* the stateLock
     private var _errors: [Error] {
