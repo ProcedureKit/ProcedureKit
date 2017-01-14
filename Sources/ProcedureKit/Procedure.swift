@@ -765,7 +765,7 @@ open class Procedure: Operation, ProcedureProtocol {
 
     /**
      Finish method which must be called eventually after an operation has
-     begun executing, unless it is cancelled.
+     begun executing (even if cancelled).
 
      This method may not be overridden. To handle finishing, override
      `procedureWillFinish(withErrors:)` or `procedureDidFinish(withErrors:)`
