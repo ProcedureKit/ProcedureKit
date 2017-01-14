@@ -217,6 +217,7 @@
 		65ECB2FE1DB50BC500F96F46 /* TestingProcedureKit.framework in Copy Dependencies */ = {isa = PBXBuildFile; fileRef = 65CFC6161D60900000CAD875 /* TestingProcedureKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		65ECB3001DB50BD900F96F46 /* ProcedureKit.framework in Copy Dependencies */ = {isa = PBXBuildFile; fileRef = 65CFC5F01D608A5500CAD875 /* ProcedureKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		65ECB3011DB50BD900F96F46 /* TestingProcedureKit.framework in Copy Dependencies */ = {isa = PBXBuildFile; fileRef = 65CFC6161D60900000CAD875 /* TestingProcedureKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		EE3371091E29AD5A004272E9 /* DispatchQueueExtensionsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE3371071E29AD3E004272E9 /* DispatchQueueExtensionsTests.swift */; };
 		EEE79AE81E21B9C90030C768 /* PendingEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEE79AE71E21B9C90030C768 /* PendingEvent.swift */; };
 		EEE79AEB1E21B9D30030C768 /* ProcedureEventQueue.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEE79AE91E21B9D30030C768 /* ProcedureEventQueue.swift */; };
 		EEE79AEC1E21B9D30030C768 /* ProcedureFuture.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEE79AEA1E21B9D30030C768 /* ProcedureFuture.swift */; };
@@ -698,6 +699,7 @@
 		65ECB2D51DB4F0C000F96F46 /* ProcedureKitNetworkTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ProcedureKitNetworkTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		65ECB2E81DB4F1A200F96F46 /* ProcedureKitNetwork.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ProcedureKitNetwork.h; path = "Supporting Files/ProcedureKitNetwork.h"; sourceTree = "<group>"; };
 		65ECB2E91DB4F1A200F96F46 /* ProcedureKitNetwork.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = ProcedureKitNetwork.xcconfig; path = "Supporting Files/ProcedureKitNetwork.xcconfig"; sourceTree = "<group>"; };
+		EE3371071E29AD3E004272E9 /* DispatchQueueExtensionsTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DispatchQueueExtensionsTests.swift; sourceTree = "<group>"; };
 		EEE79AE71E21B9C90030C768 /* PendingEvent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PendingEvent.swift; sourceTree = "<group>"; };
 		EEE79AE91E21B9D30030C768 /* ProcedureEventQueue.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProcedureEventQueue.swift; sourceTree = "<group>"; };
 		EEE79AEA1E21B9D30030C768 /* ProcedureFuture.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProcedureFuture.swift; sourceTree = "<group>"; };
@@ -1031,6 +1033,7 @@
 				65D366ED1E183FB000D03E86 /* ComposedProcedureTests.swift */,
 				65D366EE1E183FB000D03E86 /* ConditionTests.swift */,
 				65D366EF1E183FB000D03E86 /* DelayProcedureTests.swift */,
+				EE3371071E29AD3E004272E9 /* DispatchQueueExtensionsTests.swift */,
 				65D366F01E183FB000D03E86 /* FilterProcedureTests.swift */,
 				65D366F11E183FB000D03E86 /* FinishingTests.swift */,
 				EEE79AED1E21C9750030C768 /* KVONotificationTests.swift */,
@@ -2127,6 +2130,7 @@
 				65D367131E183FB000D03E86 /* ConditionTests.swift in Sources */,
 				65D3671D1E183FB000D03E86 /* LoggerTests.swift in Sources */,
 				65D3673D1E183FB000D03E86 /* TimeoutObserverTests.swift in Sources */,
+				EE3371091E29AD5A004272E9 /* DispatchQueueExtensionsTests.swift in Sources */,
 				65D3673F1E183FB000D03E86 /* TransformProcedureTests.swift in Sources */,
 				65D367051E183FB000D03E86 /* AnyProcedureTests.swift in Sources */,
 				65D3672B1E183FB000D03E86 /* ProcedureKitTests.swift in Sources */,
