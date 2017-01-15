@@ -172,10 +172,10 @@ public class LogManager: LogManagerProtocol {
     }
 
     /// Private protected properties
+    private let stateLock = PThreadMutex()
     private var _severity: LogSeverity
     private var _enabled: Bool
     private var _logger: LoggerBlockType
-    private let stateLock = PThreadMutex()
 }
 
 
