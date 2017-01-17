@@ -89,7 +89,7 @@ public class NetworkObserver: ProcedureObserver {
         networkActivityController = controller
     }
 
-    public func will(execute procedure: Procedure) {
+    public func will(execute procedure: Procedure, pendingExecute: PendingExecuteEvent) {
         networkActivityController.start()
     }
 

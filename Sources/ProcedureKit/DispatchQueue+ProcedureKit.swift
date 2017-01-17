@@ -45,6 +45,10 @@ public extension DispatchQueue {
         }
         return try work()
     }
+
+    static var currentQoSClass: DispatchQoS.QoSClass {
+        return DispatchQoS.QoSClass(rawValue: qos_class_self()) ?? .unspecified
+    }
 }
 
 internal extension QualityOfService {
@@ -66,6 +70,44 @@ internal extension QualityOfService {
         case .utility: return .utility
         case .background: return .background
         case .default: return .default
+        }
+    }
+}
+
+extension DispatchQoS.QoSClass: Comparable {
+    public static func < (lhs: DispatchQoS.QoSClass, rhs: DispatchQoS.QoSClass) -> Bool {
+        switch lhs {
+        case .unspecified:
+            return rhs != .unspecified
+        case .background:
+            switch rhs {
+            case .unspecified, lhs: return false
+            default: return true
+            }
+        case .utility:
+            switch rhs {
+            case .default, .userInitiated, .userInteractive: return true
+            default: return false
+            }
+        case .default:
+            switch rhs {
+            case .userInitiated, .userInteractive: return true
+            default: return false
+            }
+        case .userInitiated:
+            return rhs == .userInteractive
+        case .userInteractive:
+            return false
+        }
+    }
+}
+
+extension DispatchQoS: Comparable {
+    public static func < (lhs: DispatchQoS, rhs: DispatchQoS) -> Bool {
+        if lhs.qosClass < rhs.qosClass { return true }
+        else if lhs.qosClass > rhs.qosClass { return false }
+        else { // qosClass are equal
+            return lhs.relativePriority < rhs.relativePriority
         }
     }
 }

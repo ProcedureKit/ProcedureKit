@@ -32,10 +32,12 @@ class RepeatProcedureTests: RepeatTestCase {
     }
 
     func test__init_with_max_and_body() {
-        repeatProcedure = RepeatProcedure(max: 2) { TestProcedure() }
+        let procedureExecutedCount = Protector<Int>(0)
+        let repeatProcedure = RepeatProcedure(max: 2) { BlockProcedure(block: { procedureExecutedCount.advance(by: 1) }) }
         wait(for: repeatProcedure)
         XCTAssertProcedureFinishedWithoutErrors(repeatProcedure)
         XCTAssertEqual(repeatProcedure.count, 2)
+        XCTAssertEqual(procedureExecutedCount.access, 2)
     }
 
     func test__init_with_no_max_and_delay_iterator() {

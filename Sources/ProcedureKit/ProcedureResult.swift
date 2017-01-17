@@ -137,11 +137,15 @@ public extension ProcedureProtocol {
      - parameters dep: any `Operation` subclass.
      - parameters block: a closure which receives `self`, the dependent
      operation, and an array of `ErrorType`, and returns Void.
+     (The closure is automatically dispatched on the EventQueue
+     of the receiver, if the receiver is a Procedure or supports the
+     QueueProvider protocol).
      - returns: `self` - so that injections can be chained together.
      */
     @discardableResult func inject<Dependency: ProcedureProtocol>(dependency: Dependency, block: @escaping (Self, Dependency, [Error]) -> Void) -> Self {
+        precondition(dependency !== self, "Cannot inject result of self into self.")
 
-        dependency.addWillFinishBlockObserver { [weak self] dependency, errors in
+        dependency.addWillFinishBlockObserver(synchronizedWith: (self as? QueueProvider)) { [weak self] dependency, errors, _ in
             if let strongSelf = self {
                 block(strongSelf, dependency, errors)
             }

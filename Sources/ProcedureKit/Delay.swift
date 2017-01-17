@@ -74,7 +74,6 @@ public class DelayProcedure: Procedure {
     private let delay: Delay
     private let leeway: DispatchTimeInterval
     private var _timer: DispatchSourceTimer? = nil
-    private let stateLock = NSLock()
 
     internal init(delay: Delay, leeway: DispatchTimeInterval = .milliseconds(1)) {
         self.delay = delay
@@ -82,12 +81,8 @@ public class DelayProcedure: Procedure {
         super.init()
         name = "Delay \(delay)"
         addDidCancelBlockObserver { procedure, _ in
-            procedure.stateLock.withCriticalScope {
-                procedure._timer?.cancel()
-                if procedure.isExecuting {
-                    procedure.finish()
-                }
-            }
+            procedure._timer?.cancel()
+            procedure.finish()
         }
     }
 
@@ -125,18 +120,14 @@ public class DelayProcedure: Procedure {
     public override func execute() {
         switch delay.interval {
         case (let interval) where interval > 0.0:
-            let setupTimer = stateLock.withCriticalScope { () -> Bool in
-                guard !isCancelled else { return false }
-                _timer = DispatchSource.makeTimerSource(flags: [], queue: DispatchQueue.default)
-                _timer?.setEventHandler { [weak self] in
-                    guard let strongSelf = self else { return }
-                    if !strongSelf.isCancelled { strongSelf.finish() }
-                }
-                _timer?.scheduleOneshot(deadline: .now() + interval, leeway: self.leeway)
-                _timer?.resume()
-                return true
+            guard !isCancelled else { return }
+            _timer = DispatchSource.makeTimerSource(flags: [], queue: DispatchQueue.default)
+            _timer?.setEventHandler { [weak self] in
+                guard let strongSelf = self else { return }
+                if !strongSelf.isCancelled { strongSelf.finish() }
             }
-            if !setupTimer { finish() }
+            _timer?.scheduleOneshot(deadline: .now() + interval, leeway: self.leeway)
+            _timer?.resume()
         default:
             finish()
         }

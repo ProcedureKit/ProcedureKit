@@ -26,7 +26,7 @@ public protocol ProcedureObserver {
 
      - parameter procedure: the observed `Procedure`.
      */
-    func will(execute procedure: Procedure)
+    func will(execute procedure: Procedure, pendingExecute: PendingExecuteEvent)
 
     /**
      The procedure did execute.
@@ -44,14 +44,6 @@ public protocol ProcedureObserver {
      - parameter procedure: the observed `Procedure`.
      */
     func did(execute procedure: Procedure)
-
-    /**
-     The procedure will cancel.
-
-     - parameter procedure: the observed `Procedure`.
-     - parameter errors: an array of [Error] types.
-     */
-    func will(cancel procedure: Procedure, withErrors: [Error])
 
     /**
      The procedure did cancel.
@@ -86,7 +78,7 @@ public protocol ProcedureObserver {
      - parameter procedure: the observed `Procedure`.
      - parameter errors: an array of `Error`s.
      */
-    func will(finish procedure: Procedure, withErrors: [Error])
+    func will(finish procedure: Procedure, withErrors: [Error], pendingFinish: PendingFinishEvent)
 
     /**
      The procedure did finish. Any errors that were encountered are collected here.
@@ -95,17 +87,29 @@ public protocol ProcedureObserver {
      - parameter errors: an array of `ErrorType`s.
      */
     func did(finish procedure: Procedure, withErrors: [Error])
+
+    /**
+     Provide a queue onto which observer callbacks will be dispatched.
+    */
+    var eventQueue: DispatchQueueProtocol? { get }
+}
+
+public extension ProcedureObserver {
+    // MARK: - Unavailable/renamed observer callbacks
+    @available(*, unavailable, renamed: "will(execute:pendingExecute:)")
+    func will(execute procedure: Procedure) { }
+    
+    @available(*, unavailable, renamed: "will(finish:withErrors:pendingFinish:)")
+    func will(finish procedure: Procedure, withErrors: [Error]) { }
 }
 
 public extension ProcedureObserver {
 
     func didAttach(to procedure: Procedure) { }
 
-    func will(execute procedure: Procedure) { }
+    func will(execute procedure: Procedure, pendingExecute: PendingExecuteEvent) { }
 
     func did(execute procedure: Procedure) { }
-
-    func will(cancel procedure: Procedure, withErrors: [Error]) { }
 
     func did(cancel procedure: Procedure, withErrors: [Error]) { }
 
@@ -113,9 +117,11 @@ public extension ProcedureObserver {
 
     func procedure(_ procedure: Procedure, didAdd newOperation: Operation) { }
 
-    func will(finish procedure: Procedure, withErrors errors: [Error]) { }
+    func will(finish procedure: Procedure, withErrors errors: [Error], pendingFinish: PendingFinishEvent) { }
 
     func did(finish procedure: Procedure, withErrors errors: [Error]) { }
+
+    var eventQueue: DispatchQueueProtocol? { return nil }
 }
 
 

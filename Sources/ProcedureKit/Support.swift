@@ -63,9 +63,45 @@ struct Lock: ReadWriteLock {
     }
 }
 
+/// A wrapper class for a pthread_mutex
+final public class PThreadMutex {
+    private var mutex = pthread_mutex_t()
+
+    public init() {
+        let result = pthread_mutex_init(&mutex, nil)
+        precondition(result == 0, "Failed to create pthread mutex")
+    }
+
+    deinit {
+        let result = pthread_mutex_destroy(&mutex)
+        assert(result == 0, "Failed to destroy mutex")
+    }
+
+    fileprivate func lock() {
+        let result = pthread_mutex_lock(&mutex)
+        assert(result == 0, "Failed to lock mutex")
+    }
+
+    fileprivate func unlock() {
+        let result = pthread_mutex_unlock(&mutex)
+        assert(result == 0, "Failed to unlock mutex")
+    }
+
+    /// Convenience API to execute block after acquiring the lock
+    ///
+    /// - Parameter block: the block to run
+    /// - Returns: returns the return value of the block
+    public func withCriticalScope<T>(block: () -> T) -> T {
+        lock()
+        defer { unlock() }
+        let value = block()
+        return value
+    }
+}
+
 public class Protector<T> {
 
-    private var lock = Lock()
+    private var lock = PThreadMutex()
     private var ward: T
 
     public init(_ ward: T) {
@@ -73,30 +109,27 @@ public class Protector<T> {
     }
 
     public var access: T {
-        return read { $0 }
+        var value: T?
+        lock.lock()
+        value = ward
+        lock.unlock()
+        return value!
     }
 
     public func read<U>(_ block: (T) -> U) -> U {
-        return lock.read { block(self.ward) }
+        return lock.withCriticalScope { block(self.ward) }
     }
 
     /// Synchronously modify the protected value
     ///
     /// - Returns: The value returned by the `block`, if any. (discardable)
     @discardableResult public func write<U>(_ block: (inout T) -> U) -> U {
-        return lock.write_sync({ block(&self.ward) })
+        return lock.withCriticalScope { block(&self.ward) }
     }
 
     /// Synchronously overwrite the protected value
     public func overwrite(with newValue: T) {
         write { (ward: inout T) in ward = newValue }
-    }
-
-    // Supports old callers that expect to pass in a completion block
-    // NOTE: Like `write()`, this is synchronous.
-    public func write(_ block: (inout T) -> Void, completion: (() -> Void)) {
-        lock.write_sync({ block(&self.ward) })
-        completion()
     }
 }
 
@@ -111,6 +144,21 @@ public extension Protector where T: RangeReplaceableCollection {
     func append<S: Sequence>(contentsOf newElements: S) where S.Iterator.Element == T.Iterator.Element {
         write { (ward: inout T) in
             ward.append(contentsOf: newElements)
+        }
+    }
+
+    func append<C : Collection>(contentsOf newElements: C) where C.Iterator.Element == T.Iterator.Element {
+        write { (ward: inout T) in
+            ward.append(contentsOf: newElements)
+        }
+    }
+}
+
+public extension Protector where T: Integer {
+
+    func advance(by stride: T.Stride) {
+        write { (ward: inout T) in
+            ward = ward.advanced(by: stride)
         }
     }
 }
@@ -142,3 +190,4 @@ public extension NSRecursiveLock {
         return value
     }
 }
+

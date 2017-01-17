@@ -179,29 +179,30 @@ open class NetworkProcedure<T: Procedure>: RetryProcedure<T>, OutputProcedure wh
         self.init(dispatchQueue: dispatchQueue, resilience: resilience, connectivity: connectivity, iterator: AnyIterator(body))
     }
 
-    open override func procedureQueue(_ queue: ProcedureQueue, willFinishOperation operation: Operation, withErrors errors: [Error]) {
+    open override func procedureQueue(_ queue: ProcedureQueue, willFinishProcedure procedure: Procedure, withErrors errors: [Error]) -> ProcedureFuture? {
         var networkErrors = errors
 
         // Ultimately, always call super to correctly manage the operation lifecycle.
-        defer { super.procedureQueue(queue, willFinishOperation: operation, withErrors: networkErrors) }
 
         // Check that the operation is the current one.
-        guard operation == current else { return }
+        guard procedure == current else { return super.procedureQueue(queue, willFinishProcedure: procedure, withErrors: networkErrors) }
 
         // If we have any errors let RetryProcedure (super) deal with it by returning here
-        guard errors.isEmpty else { return }
+        guard errors.isEmpty else { return super.procedureQueue(queue, willFinishProcedure: procedure, withErrors: networkErrors) }
 
         // Create a network response from the network operation
         let networkResponse = current.makeNetworkResponse()
 
         // Check to see if this network response should be retried
-        guard recovery.shouldRetry(givenNetworkResponse: networkResponse), let statusCode = networkResponse.httpStatusCode else { return }
+        guard recovery.shouldRetry(givenNetworkResponse: networkResponse), let statusCode = networkResponse.httpStatusCode else { return super.procedureQueue(queue, willFinishProcedure: procedure, withErrors: networkErrors) }
 
         // Create resiliency error
         let error: ProcedureKitNetworkResiliencyError = .receivedErrorStatusCode(statusCode)
 
         // Set the network errors
         networkErrors = [error]
+
+        return super.procedureQueue(queue, willFinishProcedure: procedure, withErrors: networkErrors)
     }
 }
 

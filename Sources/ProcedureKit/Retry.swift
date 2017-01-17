@@ -119,6 +119,7 @@ open class RetryProcedure<T: Operation>: RepeatProcedure<T> {
     }
 
     open override func child(_ child: Operation, willAttemptRecoveryFromErrors errors: [Error]) -> Bool {
+        eventQueue.debugAssertIsOnQueue()
         guard child === current else { return false }
         var returnValue = false
         defer {
@@ -126,23 +127,24 @@ open class RetryProcedure<T: Operation>: RepeatProcedure<T> {
             log.notice(message: "\(message) recovery from errors: \(errors) in operation: \(child)")
         }
         retry.info = createFailureInfo(for: current, errors: errors)
-        returnValue = addNextOperation()
+        returnValue = _addNextOperation()
         retry.info = .none
         return returnValue
     }
 
     open override func child(_ child: Operation, didAttemptRecoveryFromErrors errors: [Error]) {
+        eventQueue.debugAssertIsOnQueue()
         if let previous = previous, child === current {
             childDidNotRecoverFromErrors(previous)
         }
         super.child(child, didAttemptRecoveryFromErrors: errors)
     }
 
-    open override func procedureQueue(_ queue: ProcedureQueue, willFinishOperation operation: Operation, withErrors errors: [Error]) {
-        if errors.isEmpty, let previous = previous, operation === current {
+    open override func procedureQueue(_ queue: ProcedureQueue, willFinishProcedure procedure: Procedure, withErrors errors: [Error]) -> ProcedureFuture? {
+        if errors.isEmpty, let previous = previous, procedure === current {
             childDidRecoverFromErrors(previous)
         }
-        super.procedureQueue(queue, willFinishOperation: operation, withErrors: errors)
+        return super.procedureQueue(queue, willFinishProcedure: procedure, withErrors: errors)
     }
 
     internal func createFailureInfo(for operation: T, errors: [Error]) -> FailureInfo {
@@ -151,7 +153,7 @@ open class RetryProcedure<T: Operation>: RepeatProcedure<T> {
             errors: errors,
             historicalErrors: attemptedRecoveryErrors,
             count: count,
-            addOperations: add(children:),
+            addOperations: { self.add(children: $0, before: nil); return },
             log: log,
             configure: configure
         )

@@ -111,6 +111,7 @@ open class StressTestCase: GroupTestCase {
 
     open func setUpStressTest() {
         queue.delegate = nil
+        queue.qualityOfService = .userInteractive
     }
 
     open func tearDownStressTest() { }

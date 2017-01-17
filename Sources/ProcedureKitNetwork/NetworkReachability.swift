@@ -75,18 +75,16 @@ extension Reachability.Manager: NetworkReachabilityDelegate {
 extension Reachability.Manager: SystemReachability {
 
     func whenReachable(via connectivity: Reachability.Connectivity, block: @escaping () -> Void) {
-        protectedObservers.write({ (observers: inout Array<Reachability.Observer>) in
+        protectedObservers.write { (observers: inout Array<Reachability.Observer>) in
             let observer = Reachability.Observer(connectivity: connectivity, didConnectBlock: block)
             observers.append(observer)
-        }, completion: { [ weak self] in
-            guard let strongSelf = self else { return }
-            do {
-                try strongSelf.network.startNotifier(onQueue: strongSelf.queue)
-            }
-            catch {
-                print("Caught error: \(error) starting reachability notifier.")
-            }
-        })
+        }
+        do {
+            try network.startNotifier(onQueue: queue)
+        }
+        catch {
+            print("Caught error: \(error) starting reachability notifier.")
+        }
     }
 
     func reachability(of: URL, block: @escaping (Reachability.NetworkStatus) -> Void) {

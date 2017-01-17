@@ -7,7 +7,7 @@
 import Foundation
 import ProcedureKit
 
-public struct TestError: Error, Equatable {
+public struct TestError: Error, Equatable, CustomDebugStringConvertible {
     public static func == (lhs: TestError, rhs: TestError) -> Bool {
         return lhs.uuid == rhs.uuid
     }
@@ -18,6 +18,10 @@ public struct TestError: Error, Equatable {
 
     let uuid = UUID()
     public init() { }
+
+    public var debugDescription: String {
+        return "TestError (\(uuid.uuidString))"
+    }
 }
 
 open class TestProcedure: Procedure, InputProcedure, OutputProcedure {
@@ -27,12 +31,34 @@ open class TestProcedure: Procedure, InputProcedure, OutputProcedure {
     public let producedOperation: Operation?
     public var input: Pending<Void> = pendingVoid
     public var output: Pending<ProcedureResult<String>> = .ready(.success("Hello World"))
-    public private(set) var executedAt: CFAbsoluteTime = 0
-    public private(set) var didExecute = false
-    public private(set) var procedureWillFinishCalled = false
-    public private(set) var procedureDidFinishCalled = false
-    public private(set) var procedureWillCancelCalled = false
-    public private(set) var procedureDidCancelCalled = false
+    public private(set) var executedAt: CFAbsoluteTime {
+        get { return protected.read { $0.executedAt } }
+        set { protected.write { $0.executedAt = newValue } }
+    }
+    public private(set) var didExecute: Bool {
+        get { return protected.read { $0.didExecute } }
+        set { protected.write { $0.didExecute = newValue } }
+    }
+    public private(set) var procedureWillFinishCalled: Bool {
+        get { return protected.read { $0.procedureWillFinishCalled } }
+        set { protected.write { $0.procedureWillFinishCalled = newValue } }
+    }
+    public private(set) var procedureDidFinishCalled: Bool {
+        get { return protected.read { $0.procedureDidFinishCalled } }
+        set { protected.write { $0.procedureDidFinishCalled = newValue } }
+    }
+    public private(set) var procedureDidCancelCalled: Bool {
+        get { return protected.read { $0.procedureDidCancelCalled } }
+        set { protected.write { $0.procedureDidCancelCalled = newValue } }
+    }
+    private class ProtectedProperties {
+        var executedAt: CFAbsoluteTime = 0
+        var didExecute = false
+        var procedureWillFinishCalled = false
+        var procedureDidFinishCalled = false
+        var procedureDidCancelCalled = false
+    }
+    private var protected = Protector(ProtectedProperties())
 
     public init(name: String = "TestProcedure", delay: TimeInterval = 0.000_001, error: Error? = .none, produced: Operation? = .none) {
         self.delay = delay
@@ -56,10 +82,6 @@ open class TestProcedure: Procedure, InputProcedure, OutputProcedure {
             self.didExecute = true
             self.finish(withError: self.error)
         }
-    }
-
-    open override func procedureWillCancel(withErrors: [Error]) {
-        procedureWillCancelCalled = true
     }
 
     open override func procedureDidCancel(withErrors: [Error]) {

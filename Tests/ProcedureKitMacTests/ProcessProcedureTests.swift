@@ -129,6 +129,7 @@ class ProcessProcedureTests: ProcedureKitTestCase {
 
     func test__suspend_resume_while_executing() {
         // suspend
+        let didFinishGroup = DispatchGroup()
         weak var didSuspendExpectation = expectation(description: "Did Suspend: \(#function)")
         weak var delayPassed = expectation(description: "Delay Passed: \(#function)")
         processProcedure = ProcessProcedure(launchPath: "/bin/bash/", arguments: ["-c", "sleep 1"])
@@ -143,12 +144,19 @@ class ProcessProcedureTests: ProcedureKitTestCase {
                 delayPassed?.fulfill()
             }
         }
+        didFinishGroup.enter()
+        processProcedure.addDidFinishBlockObserver { procedure, _ in
+            didFinishGroup.leave()
+        }
         run(operations: processProcedure)
         waitForExpectations(timeout: 3, handler: nil)
         XCTAssertFalse(processProcedure.isFinished)
 
         // resume
-        addCompletionBlockTo(procedure: processProcedure)
+        weak var didFinishExpectation = expectation(description: "Did Finish: \(#function)")
+        didFinishGroup.notify(queue: DispatchQueue.main) {
+            didFinishExpectation?.fulfill()
+        }
         weak var didResumeExpectation = expectation(description: "Did Resume: \(#function)")
         processProcedure.resume { (success) in
             DispatchQueue.main.async {

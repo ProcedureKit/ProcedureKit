@@ -56,12 +56,10 @@ open class NetworkDownloadProcedure<Session: URLSessionTaskFactory>: Procedure, 
         self.input = request.flatMap { .ready($0) } ?? .pending
 
         addDidCancelBlockObserver { procedure, _ in
-            procedure.stateLock.withCriticalScope {
-                procedure.task?.cancel()
-                // a call to `finish()` is not necessary here, because the URLSessionTask's
-                // completion handler is always called (even if cancelled) and it
-                // ensures that `finish()` is called
-            }
+            procedure.task?.cancel()
+            // a call to `finish()` is not necessary here, because the URLSessionTask's
+            // completion handler is always called (even if cancelled) and it
+            // ensures that `finish()` is called
         }
     }
 
@@ -71,37 +69,35 @@ open class NetworkDownloadProcedure<Session: URLSessionTaskFactory>: Procedure, 
             return
         }
 
-        stateLock.withCriticalScope {
-            guard !isCancelled else {
-                finish()
+        guard !isCancelled else {
+            finish()
+            return
+        }
+        task = session.downloadTask(with: request) { [weak self] location, response, error in
+            guard let strongSelf = self else { return }
+
+            if let error = error {
+                if strongSelf.isCancelled, let error = error as? URLError, error.code == .cancelled {
+                    // special case: hide the task's cancellation error
+                    // if the NetworkProcedure was cancelled
+                    strongSelf.finish()
+                    return
+                }
+                strongSelf.finish(withResult: .failure(error))
                 return
             }
-            task = session.downloadTask(with: request) { [weak self] location, response, error in
-                guard let strongSelf = self else { return }
 
-                if let error = error {
-                    if strongSelf.isCancelled, let error = error as? URLError, error.code == .cancelled {
-                        // special case: hide the task's cancellation error
-                        // if the NetworkProcedure was cancelled
-                        strongSelf.finish()
-                        return
-                    }
-                    strongSelf.finish(withResult: .failure(error))
-                    return
-                }
-
-                guard let location = location, let response = response as? HTTPURLResponse else {
-                    strongSelf.finish(withResult: .failure(ProcedureKitError.unknown))
-                    return
-                }
-
-                let http = HTTPPayloadResponse(payload: location, response: response)
-
-                strongSelf.completion(.success(http))
-                strongSelf.finish(withResult: .success(http))
+            guard let location = location, let response = response as? HTTPURLResponse else {
+                strongSelf.finish(withResult: .failure(ProcedureKitError.unknown))
+                return
             }
 
-            task?.resume()
+            let http = HTTPPayloadResponse(payload: location, response: response)
+
+            strongSelf.completion(.success(http))
+            strongSelf.finish(withResult: .success(http))
         }
+
+        task?.resume()
     }
 }

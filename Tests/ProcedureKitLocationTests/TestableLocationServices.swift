@@ -87,6 +87,26 @@ class TestableLocationManager: TestableLocationServicesRegistrar {
     var didSetDesiredAccuracy: CLLocationAccuracy? = nil
     var didStartUpdatingLocation = false
     var didStopUpdatingLocation = false
+
+    fileprivate let updatingLocationGroup = DispatchGroup()
+    fileprivate let stateLock = PThreadMutex()
+    fileprivate var _didStartUpdatingLocationCount = 0
+
+    enum TimeoutResult {
+        case success
+        case timedOut
+
+        init(dispatchTimeoutResult: DispatchTimeoutResult) {
+            switch dispatchTimeoutResult{
+            case .success: self = .success
+            case .timedOut: self = .timedOut
+            }
+        }
+    }
+    func waitForDidStopUpdatingLocation(withTimeout timeout: TimeInterval) -> TimeoutResult {
+        let result = updatingLocationGroup.wait(timeout: .now() + timeout)
+        return TimeoutResult(dispatchTimeoutResult: result)
+    }
 }
 
 extension TestableLocationManager: LocationServicesProtocol {
@@ -96,6 +116,10 @@ extension TestableLocationManager: LocationServicesProtocol {
     }
 
     func pk_startUpdatingLocation() {
+        stateLock.withCriticalScope {
+            _didStartUpdatingLocationCount += 1
+            updatingLocationGroup.enter()
+        }
         didStartUpdatingLocation = true
         if let error = returnedError {
             delegate?.locationManager!(TestableLocationServicesRegistrar.fake, didFailWithError: error)
@@ -108,6 +132,11 @@ extension TestableLocationManager: LocationServicesProtocol {
     }
 
     func pk_stopUpdatingLocation() {
+        stateLock.withCriticalScope {
+            guard _didStartUpdatingLocationCount > 0 else { return }
+            _didStartUpdatingLocationCount -= 1
+            updatingLocationGroup.leave()
+        }
         didStopUpdatingLocation = true
     }
 }

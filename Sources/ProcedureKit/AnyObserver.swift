@@ -8,14 +8,14 @@ import Foundation
 
 class AnyObserverBox_<Procedure: ProcedureProtocol>: ProcedureObserver {
     func didAttach(to procedure: Procedure) { _abstractMethod() }
-    func will(execute procedure: Procedure) { _abstractMethod() }
+    func will(execute procedure: Procedure, pendingExecute: PendingExecuteEvent) { _abstractMethod() }
     func did(execute procedure: Procedure) { _abstractMethod() }
-    func will(cancel procedure: Procedure, withErrors: [Error]) { _abstractMethod() }
     func did(cancel procedure: Procedure, withErrors errors: [Error]) { _abstractMethod() }
     func procedure(_ procedure: Procedure, willAdd newOperation: Operation) { _abstractMethod() }
     func procedure(_ procedure: Procedure, didAdd newOperation: Operation) { _abstractMethod() }
-    func will(finish procedure: Procedure, withErrors errors: [Error]) { _abstractMethod() }
+    func will(finish procedure: Procedure, withErrors errors: [Error], pendingFinish: PendingFinishEvent) { _abstractMethod() }
     func did(finish procedure: Procedure, withErrors errors: [Error]) { _abstractMethod() }
+    var eventQueue: DispatchQueueProtocol? { _abstractMethod(); return nil }
 }
 
 class AnyObserverBox<Base: ProcedureObserver>: AnyObserverBox_<Base.Procedure> {
@@ -29,16 +29,12 @@ class AnyObserverBox<Base: ProcedureObserver>: AnyObserverBox_<Base.Procedure> {
         base.didAttach(to: procedure)
     }
 
-    override func will(execute procedure: Base.Procedure) {
-        base.will(execute: procedure)
+    override func will(execute procedure: Base.Procedure, pendingExecute: PendingExecuteEvent) {
+        base.will(execute: procedure, pendingExecute: pendingExecute)
     }
 
     override func did(execute procedure: Base.Procedure) {
         base.did(execute: procedure)
-    }
-
-    override func will(cancel procedure: Base.Procedure, withErrors errors: [Error]) {
-        base.will(cancel: procedure, withErrors: errors)
     }
 
     override func did(cancel procedure: Base.Procedure, withErrors errors: [Error]) {
@@ -53,12 +49,16 @@ class AnyObserverBox<Base: ProcedureObserver>: AnyObserverBox_<Base.Procedure> {
         base.procedure(procedure, didAdd: newOperation)
     }
 
-    override func will(finish procedure: Base.Procedure, withErrors errors: [Error]) {
-        base.will(finish: procedure, withErrors: errors)
+    override func will(finish procedure: Base.Procedure, withErrors errors: [Error], pendingFinish: PendingFinishEvent) {
+        base.will(finish: procedure, withErrors: errors, pendingFinish: pendingFinish)
     }
 
     override func did(finish procedure: Base.Procedure, withErrors errors: [Error]) {
         base.did(finish: procedure, withErrors: errors)
+    }
+
+    override var eventQueue: DispatchQueueProtocol? {
+        return base.eventQueue
     }
 }
 
@@ -75,16 +75,12 @@ public struct AnyObserver<Procedure: ProcedureProtocol>: ProcedureObserver {
         box.didAttach(to: procedure)
     }
 
-    public func will(execute procedure: Procedure) {
-        box.will(execute: procedure)
+    public func will(execute procedure: Procedure, pendingExecute: PendingExecuteEvent) {
+        box.will(execute: procedure, pendingExecute: pendingExecute)
     }
 
     public func did(execute procedure: Procedure) {
         box.did(execute: procedure)
-    }
-
-    public func will(cancel procedure: Procedure, withErrors errors: [Error]) {
-        box.will(cancel: procedure, withErrors: errors)
     }
 
     public func did(cancel procedure: Procedure, withErrors errors: [Error]) {
@@ -99,11 +95,15 @@ public struct AnyObserver<Procedure: ProcedureProtocol>: ProcedureObserver {
         box.procedure(procedure, didAdd: newOperation)
     }
 
-    public func will(finish procedure: Procedure, withErrors errors: [Error]) {
-        box.will(finish: procedure, withErrors: errors)
+    public func will(finish procedure: Procedure, withErrors errors: [Error], pendingFinish: PendingFinishEvent) {
+        box.will(finish: procedure, withErrors: errors, pendingFinish: pendingFinish)
     }
 
     public func did(finish procedure: Procedure, withErrors errors: [Error]) {
         box.did(finish: procedure, withErrors: errors)
+    }
+
+    public var eventQueue: DispatchQueueProtocol? {
+        return box.eventQueue
     }
 }

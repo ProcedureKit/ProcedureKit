@@ -11,9 +11,16 @@ import TestingProcedureKit
 public class ComposedProcedureTests: ProcedureKitTestCase {
 
     func test__composed_procedure_is_cancelled() {
+        let didCancelCalled = DispatchSemaphore(value: 0)
+        procedure.addDidCancelBlockObserver { _, _ in
+            didCancelCalled.signal()
+        }
         let composed = ComposedProcedure(procedure)
         composed.cancel()
         XCTAssertTrue(composed.isCancelled)
+
+        XCTAssertEqual(didCancelCalled.wait(timeout: .now() + 1.0), DispatchTimeoutResult.success)
+
         XCTAssertTrue(composed.operation.isCancelled)
         XCTAssertTrue(procedure.isCancelled)
     }

@@ -10,7 +10,12 @@ import TestingProcedureKit
 
 
 class TestableProfileReporter: ProcedureProfilerReporter {
-    var didProfileResult: ProfileResult? = .none
+    var didProfileResult: ProfileResult? {
+        get { return _didProfileResult.access }
+        set { _didProfileResult.overwrite(with: newValue) }
+    }
+
+    var _didProfileResult = Protector<ProfileResult?>(.none)
 
     func finishedProfiling(withResult result: ProfileResult) {
         didProfileResult = result
@@ -66,7 +71,7 @@ class ProfilerTests: ProcedureKitTestCase {
 
     func test__profile_simple_operation_which_cancels() {
 
-        procedure.add(observer: WillExecuteObserver { op in
+        procedure.add(observer: WillExecuteObserver { op, _ in
             op.cancel()
         })
         procedure.add(observer: profiler)

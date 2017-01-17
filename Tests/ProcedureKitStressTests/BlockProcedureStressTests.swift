@@ -15,14 +15,14 @@ class CancelBlockProcedureStessTests: StressTestCase {
         stress(level: .custom(10, 5_000)) { batch, _ in
             batch.dispatchGroup.enter() // enter once for cancel
             batch.dispatchGroup.enter() // enter once for finish
-            let semaphore = DispatchSemaphore(value: 0)
-            let block = BlockProcedure {
+            let block = CancellableBlockProcedure { isCancelled in
                 // prevent the BlockProcedure from finishing before it is cancelled
-                semaphore.wait()
+                while !isCancelled() {
+                    usleep(10)
+                }
             }
             block.addDidCancelBlockObserver { _, _ in
                 batch.dispatchGroup.leave() // leave once for cancel
-                semaphore.signal()
             }
             block.addDidFinishBlockObserver { _, _ in
                 batch.dispatchGroup.leave() // leave once for finish

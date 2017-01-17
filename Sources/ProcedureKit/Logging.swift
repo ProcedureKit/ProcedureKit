@@ -74,6 +74,9 @@ public protocol LogManagerProtocol {
 
     /// - returns: the global logger block type
     static var logger: LoggerBlockType { get set }
+
+    /// - returns: all of the LogManagerProtocol values (as a tuple)
+    static var allValues: (enabled: Bool, severity: LogSeverity, logger: LoggerBlockType) { get }
 }
 
 /**
@@ -117,6 +120,14 @@ public class LogManager: LogManagerProtocol {
         set { sharedInstance.logger = newValue }
     }
 
+    /**
+     # Global acquire all LogManager values
+     Acquire all LogManager values with a single lock acquisition.
+     */
+    public static var allValues: (enabled: Bool, severity: LogSeverity, logger: LoggerBlockType) {
+        get { return sharedInstance.allValues }
+    }
+
     static var sharedInstance = LogManager()
 
     static var queue: DispatchQueue {
@@ -126,40 +137,44 @@ public class LogManager: LogManagerProtocol {
     let queue = DispatchQueue(label: "run.kit.procedure.ProcedureKit.Logger", qos: .utility)
 
     var enabled: Bool {
-        get { return _enabled.read { $0 } }
-        set {
-            _enabled.write { (value) in
-                value = newValue
-            }
-        }
+        get { return stateLock.withCriticalScope { _enabled } }
+        set { stateLock.withCriticalScope { _enabled = newValue } }
     }
 
     var severity: LogSeverity {
-        get { return _severity.read { $0 } }
-        set {
-            _severity.write { (value) in
-                value = newValue
-            }
-        }
+        get { return stateLock.withCriticalScope { _severity } }
+        set { stateLock.withCriticalScope { _severity = newValue } }
     }
 
     var logger: LoggerBlockType {
-        get { return loggerLock.read { _logger } }
-        set { loggerLock.write_sync { self._logger = newValue } }
+        get { return stateLock.withCriticalScope { _logger } }
+        set { stateLock.withCriticalScope { _logger = newValue } }
+    }
+
+    var enabledAndSeverity: (enabled: Bool, severity: LogSeverity) {
+        get {
+            return stateLock.withCriticalScope { (enabled: _enabled, severity: _severity) }
+        }
+    }
+
+    var allValues: (enabled: Bool, severity: LogSeverity, logger: LoggerBlockType) {
+        get {
+            return stateLock.withCriticalScope { (enabled: _enabled, severity: _severity, logger: _logger) }
+        }
     }
 
     init() {
-        _enabled = Protector<Bool>(true)
-        _severity = Protector<LogSeverity>(.warning)
+        _enabled = true
+        _severity = .warning
         _logger = { message, severity, file, function, line in
             print("\(LogManager.metadata(for: file, function: function, line: line))\(message)")
         }
     }
 
     /// Private protected properties
-    private var _severity: Protector<LogSeverity>
-    private var _enabled: Protector<Bool>
-    private var loggerLock = Lock()
+    private let stateLock = PThreadMutex()
+    private var _severity: LogSeverity
+    private var _enabled: Bool
     private var _logger: LoggerBlockType
 }
 
@@ -241,10 +256,10 @@ public extension LoggerProtocol {
      - parameter line: a `Int`, containing the line number (make it default to #line)
      */
     func log(message: @autoclosure () -> String, severity: LogSeverity, file: String = #file, function: String = #function, line: Int = #line) {
-        guard LogManager.enabled && enabled && severity >= minimumLogSeverity else { return }
+        guard enabled && severity >= self.severity else { return }
         let _message = messageWithOperationName(message())
-        LogManager.queue.async {
-            self.logger(message: _message, severity: severity, file: file, function: function, line: line)
+        LogManager.queue.async { [logger = self.logger] in
+            logger(message: _message, severity: severity, file: file, function: function, line: line)
         }
     }
 
@@ -339,9 +354,60 @@ public struct _Logger<M: LogManagerProtocol>: LoggerProtocol {
 
     public var operationName: String? = nil
 
-    public init(severity: LogSeverity = Manager.severity, enabled: Bool = Manager.enabled, logger: @escaping LoggerBlockType = Manager.logger) {
+    // break out the different inits to speed-up obtaining the current values from the Manager
+    // (i.e. to only require a single lock)
+
+    public init() {
+        let managerValues = Manager.allValues
+        self.severity = managerValues.severity
+        self.enabled = managerValues.enabled
+        self.logger = managerValues.logger
+    }
+    
+    public init(severity: LogSeverity) {
+        let managerValues = Manager.allValues
+        self.severity = severity
+        self.enabled = managerValues.enabled
+        self.logger = managerValues.logger
+    }
+
+    public init(severity: LogSeverity, enabled: Bool) {
+        let managerValues = Manager.allValues
         self.severity = severity
         self.enabled = enabled
+        self.logger = managerValues.logger
+    }
+    
+    public init(severity: LogSeverity, logger: @escaping LoggerBlockType) {
+        self.severity = severity
+        self.enabled = Manager.enabled
+        self.logger = logger
+    }
+    
+    public init(severity: LogSeverity, enabled: Bool, logger: @escaping LoggerBlockType) {
+        self.severity = severity
+        self.enabled = enabled
+        self.logger = logger
+    }
+    
+    public init(enabled: Bool) {
+        let managerValues = Manager.allValues
+        self.severity = managerValues.severity
+        self.enabled = enabled
+        self.logger = managerValues.logger
+    }
+    
+    public init(enabled: Bool, logger: @escaping LoggerBlockType) {
+        let managerValues = Manager.allValues
+        self.severity = managerValues.severity
+        self.enabled = enabled
+        self.logger = logger
+    }
+    
+    public init(logger: @escaping LoggerBlockType) {
+        let managerValues = Manager.allValues
+        self.severity = managerValues.severity
+        self.enabled = managerValues.enabled
         self.logger = logger
     }
 }

@@ -144,21 +144,12 @@ class NetworkObserverTests: ProcedureKitTestCase {
         procedure3.add(dependency: delayForProcedure3)
         addCompletionBlockTo(procedure: procedure3)
 
-        procedure1.addDidFinishBlockObserver { procedure, _ in
-            do {
-                try procedure.produce(operation: delayForProcedure2)
-                try procedure.produce(operation: procedure2)
-                try procedure.produce(operation: delayForProcedure3)
-                try procedure.produce(operation: procedure3)
-            }
-            catch {
-                fatalError("\(error)")
-            }
-        }
+        let afterFirstGroup = GroupProcedure(operations: delayForProcedure2, procedure2, delayForProcedure3, procedure3)
+        afterFirstGroup.add(dependency: procedure1)
 
         // wait until all procedures have finished and the timer has invalidated the network indicator
 
-        wait(for: procedure1, withTimeout: (timerInterval + 0.5) * 3.0 + (timerInterval * 2.0)) { _ in
+        wait(for: procedure1, afterFirstGroup, withTimeout: (timerInterval + 0.5) * 3.0 + (timerInterval * 2.0)) { _ in
             self.XCTAssertProcedureFinishedWithoutErrors(procedure1)
             self.XCTAssertProcedureFinishedWithoutErrors(procedure2)
             self.XCTAssertProcedureFinishedWithoutErrors(procedure3)
