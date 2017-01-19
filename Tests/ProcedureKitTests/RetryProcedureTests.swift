@@ -41,7 +41,7 @@ class RetryProcedureTests: RetryTestCase {
     func test__retry_deinits_after_finished() {
         // Catches reference cycles.
 
-        class RetryDeinitMonitor<T: Operation>: RetryProcedure<T> {
+        class RetryDeinitMonitor<T: Procedure>: RetryProcedure<T> {
             var deinitBlock: (() -> Void)?
             override public init<OperationIterator>(dispatchQueue: DispatchQueue? = nil, max: Int? = nil, wait: WaitStrategy, iterator base: OperationIterator, retry block: @escaping Handler) where OperationIterator: IteratorProtocol, OperationIterator.Element == T {
                 super.init(dispatchQueue: dispatchQueue, max: max, wait: wait, iterator: base, retry: block)
