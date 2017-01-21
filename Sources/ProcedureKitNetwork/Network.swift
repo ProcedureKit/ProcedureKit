@@ -97,7 +97,7 @@ class NetworkReachabilityWaitProcedure: Procedure {
     }
 }
 
-class NetworkRecovery<T: Operation> where T: NetworkOperation {
+class NetworkRecovery<T: Procedure> where T: NetworkOperation {
 
     let resilience: NetworkResilience
     let connectivity: Reachability.Connectivity

@@ -7,7 +7,7 @@
 import Foundation
 import Dispatch
 
-public struct RetryFailureInfo<T: Operation> {
+public struct RetryFailureInfo<T: Procedure> {
 
     /// - returns: the failed operation
     public let operation: T
@@ -53,7 +53,7 @@ public extension RetryFailureInfo {
 }
 
 
-internal class RetryIterator<T: Operation>: IteratorProtocol {
+internal class RetryIterator<T: Procedure>: IteratorProtocol {
     typealias Payload = RepeatProcedure<T>.Payload
     typealias Handler = RetryProcedure<T>.Handler
     typealias FailureInfo = RetryProcedure<T>.FailureInfo
@@ -75,10 +75,10 @@ internal class RetryIterator<T: Operation>: IteratorProtocol {
 }
 
 /**
- RetryProcedure is a subclass of RepeatProcedure. Like RepeatProcedure
- it is generic over T, an Operation subclass. It can be used to
- automatically retry another instance of operation T if the first
- instance finishes with errors.
+ RetryProcedure is a RepeatProcedure subclass which can be used
+ to automatically retry another instance of procedure T if the
+ first instance finishes with errors. It is generic over T, a
+ `Procedure` subclass.
 
  To support effective error recovery, in addition to a (T, Delay?)
  iterator, RetryProcedure is initialized with a block. This block
@@ -90,7 +90,7 @@ internal class RetryIterator<T: Operation>: IteratorProtocol {
 
  To exit with the error, this block can return nil.
  */
-open class RetryProcedure<T: Operation>: RepeatProcedure<T> {
+open class RetryProcedure<T: Procedure>: RepeatProcedure<T> {
     public typealias Handler = (FailureInfo, Payload) -> Payload?
     public typealias FailureInfo = RetryFailureInfo<T>
 
@@ -115,7 +115,7 @@ open class RetryProcedure<T: Operation>: RepeatProcedure<T> {
 
     open override func childWillFinishWithoutErrors(_ child: Operation) {
         // no-op
-        // To ensure that we do not retry/repeat successful operations
+        // To ensure that we do not retry/repeat successful procedures
     }
 
     open override func child(_ child: Operation, willAttemptRecoveryFromErrors errors: [Error]) -> Bool {
