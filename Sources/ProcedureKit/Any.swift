@@ -58,7 +58,8 @@ public class AnyInputProcedure<Input>: GroupProcedure, InputProcedure {
         }
     }
 
-    public init<Base: Procedure>(dispatchQueue: DispatchQueue? = nil, _ base: Base) where Base: InputProcedure, Input == Base.Input {
+    public init<Base: Procedure>(dispatchQueue: DispatchQueue? = nil, _ base: Base) where Base: InputProcedure,
+                                                                                        Input == Base.Input {
         self.inputBox = ProcedureInputBoxCreator.inputBox(for: base)
         super.init(dispatchQueue: dispatchQueue, operations: [base])
         self.log.enabled = false
@@ -76,7 +77,8 @@ public class AnyOutputProcedure<Output>: GroupProcedure, OutputProcedure {
         }
     }
 
-    public init<Base: Procedure>(dispatchQueue: DispatchQueue? = nil, _ base: Base) where Base: OutputProcedure, Output == Base.Output {
+    public init<Base: Procedure>(dispatchQueue: DispatchQueue? = nil, _ base: Base) where Base: OutputProcedure,
+                                                                                            Output == Base.Output {
         self.outputBox = ProcedureOutputBoxCreator.outputBox(for: base)
         super.init(dispatchQueue: dispatchQueue, operations: [base])
         self.log.enabled = false
@@ -104,7 +106,8 @@ public class AnyProcedure<Input, Output>: GroupProcedure, InputProcedure, Output
         }
     }
 
-    public init<Base: Procedure>(dispatchQueue: DispatchQueue? = nil, _ base: Base) where Base: InputProcedure & OutputProcedure, Output == Base.Output, Input == Base.Input {
+    public init<Base: Procedure>(dispatchQueue: DispatchQueue? = nil, _ base: Base)
+                            where Base: InputProcedure & OutputProcedure, Output == Base.Output, Input == Base.Input {
         self.inputBox = ProcedureInputBoxCreator.inputBox(for: base)
         self.outputBox = ProcedureOutputBoxCreator.outputBox(for: base)
         super.init(dispatchQueue: dispatchQueue, operations: [base])
