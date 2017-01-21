@@ -215,13 +215,15 @@ public class AuthorizeCapabilityProcedure<Status: AuthorizationStatus>: GetAutho
 
     /**
      Initialize the operation with a base type which conforms to CapabilityProtocol
-     and an optional completion block. This operation is mutually exclusive with itself
+     and an optional completion block. This operation is mutually exclusive with
+     other AuthorizeCapabilityProcedures with the same base type CapabilityProtocol.
 
      - parameter capability: the Capability.
      - parameter completion: an optional Completion closure.
      */
     public override init<Base>(_ base: Base, completion block: Completion? = nil) where Base: CapabilityProtocol, Status == Base.Status {
         super.init(base, completion: block)
+        add(condition: MutuallyExclusive<AuthorizeCapabilityProcedure>(category: "AuthorizeCapabilityProcedure(\(String(describing: type(of: base))))"))
     }
 
     public override func execute() {
@@ -247,7 +249,7 @@ public class AuthorizedFor<Status: AuthorizationStatus>: Condition {
     public init<Base>(_ base: Base, category: String? = nil) where Base: CapabilityProtocol, Status == Base.Status {
         capability = AnyCapability(base)
         super.init()
-        mutuallyExclusiveCategory = category ?? String(describing: type(of: base))
+        mutuallyExclusiveCategory = category
         add(dependency: AuthorizeCapabilityProcedure(base))
     }
 

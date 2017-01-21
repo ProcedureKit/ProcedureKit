@@ -60,16 +60,35 @@ class AuthorizeTests: TestableCapabilityTestCase {
         wait(for: authorize)
         XCTAssertTrue(capability.didRequestAuthorization)
     }
+
+    func test__authorize_procedure_is_mutually_exclusive() {
+        // AuthorizeCapabilityProcedure should have a condition that is:
+        //  MutuallyExclusive<AuthorizeCapabilityProcedure<TestableCapability.Status>>
+        // with a mutually exclusive category of: 
+        //  "AuthorizeCapabilityProcedure(TestableCapability)"
+
+        var foundMutuallyExclusiveCondition = false
+        for condition in authorize.conditions {
+            guard condition.isMutuallyExclusive else { continue }
+            guard condition is MutuallyExclusive<AuthorizeCapabilityProcedure<TestableCapability.Status>> else { continue }
+            guard condition.category == "AuthorizeCapabilityProcedure(TestableCapability)" else { continue }
+            foundMutuallyExclusiveCondition = true
+            break
+        }
+
+        XCTAssertTrue(foundMutuallyExclusiveCondition, "Failed to find appropriate Mutual Exclusivity condition")
+    }
 }
 
 class AuthorizedForTests: TestableCapabilityTestCase {
 
-    func test__is_mututally_exclusive() {
-        XCTAssertTrue(authorizedFor.isMutuallyExclusive)
+    func test__is_not_mututally_exclusive_by_default() {
+        // the AuthorizedFor condition itself does not confer mutual exclusivity by default
+        XCTAssertFalse(authorizedFor.isMutuallyExclusive)
     }
 
     func test__default_mututally_exclusive_category() {
-        XCTAssertEqual(authorizedFor.category, "TestableCapability")
+        XCTAssertNil(authorizedFor.mutuallyExclusiveCategory)
     }
 
     func test__custom_mututally_exclusive_category() {
