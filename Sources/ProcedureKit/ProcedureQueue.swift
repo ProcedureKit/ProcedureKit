@@ -321,35 +321,11 @@ open class ProcedureQueue: OperationQueue {
         }
     }
 
-    // Step2 2: process conditions
-    //          add the evaluator procedure to self (using async method), .then(onQueue: )
+    // Step 2: pendingQueueStart()
+    //         super.addOperation()
+    //         Call async DidAdd delegate method, .then(onQueue: )
     //
     private func _add_step2(procedure: Procedure, context: Any?, promise: ProcedurePromise) {
-
-        /// Process any conditions
-        if let evaluator = processConditions(procedure: procedure) {
-
-            // Add the evaluator
-            let addEvaluatorPromise = ProcedurePromise()
-            _add(operation: evaluator, context: nil, promise: addEvaluatorPromise)
-            addEvaluatorPromise.future.then(on: dispatchQueue) { _ in
-
-                // proceed to Step 3:
-                self._add_step3(procedure: procedure, context: context, promise: promise)
-            }
-        }
-        else {
-
-            // no conditions - proceed directly to Step 3:
-            _add_step3(procedure: procedure, context: context, promise: promise)
-        }
-    }
-
-    // Step 3: pendingQueueStart()
-    //          super.addOperation()
-    //          Call async DidAdd delegate method, .then(onQueue: )
-    //
-    private func _add_step3(procedure: Procedure, context: Any?, promise: ProcedurePromise) {
 
         // Indicate to the Procedure that it will be added to the queue
         // and is waiting for the queue to start it
@@ -361,68 +337,6 @@ open class ProcedureQueue: OperationQueue {
         delegate?.procedureQueue(self, didAddProcedure: procedure, context: context)
 
         promise.complete()
-    }
-
-    /// Processes a Procedure's Conditions, and returns a Procedure.EvaluateConditions Procedure
-    /// (if there are Conditions present).
-    ///
-    /// - Parameter procedure: a Procedure that is being added to the ProcedureQueue
-    /// - Returns: the EvaluateConditions Procedure for the input Procedure
-    private func processConditions(procedure: Procedure) -> Procedure? {
-        guard procedure.conditions.count > 0 else { return nil }
-
-        /// Check for mutual exclusion conditions
-        let manager = ExclusivityManager.sharedInstance
-
-        let mutuallyExclusiveConditions = procedure.conditions.filter { $0.isMutuallyExclusive }
-        var previousMutuallyExclusiveOperations = Set<Operation>()
-
-        for condition in mutuallyExclusiveConditions {
-            let category = "\(condition.category)"
-            if let previous = manager.add(procedure: procedure, category: category) {
-                previousMutuallyExclusiveOperations.insert(previous)
-            }
-        }
-
-        // Create the condition evaluator
-        let evaluator = procedure.evaluateConditions()
-
-        // Get the condition dependencies
-        let indirectDependencies = procedure.indirectDependencies
-
-        // If there are dependencies
-        if indirectDependencies.count > 0 {
-
-            // Filter out the indirect dependencies which have already been added to the queue
-            let indirectDependenciesToProcess = indirectDependencies.filter { !self.operations.contains($0) }
-
-            // Check to see if there are any which need processing
-            guard indirectDependenciesToProcess.count > 0 else {
-                // No more processing to do - return the evaluator
-                return evaluator
-            }
-
-            // Iterate through the indirect dependencies
-            indirectDependenciesToProcess.forEach {
-
-                // Indirect dependencies are executed after
-                // any previous mutually exclusive operation(s)
-                $0.add(dependencies: previousMutuallyExclusiveOperations)
-
-                // Indirect dependencies are executed after
-                // all direct dependencies
-                $0.add(dependencies: procedure.directDependencies)
-
-                // Only evaluate conditions after all indirect
-                // dependencies have finished
-                evaluator.addDependency($0)
-            }
-
-            // Add indirect dependencies
-            add(operations: indirectDependenciesToProcess)
-        }
-
-        return evaluator
     }
 }
 

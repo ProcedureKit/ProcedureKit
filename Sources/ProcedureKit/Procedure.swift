@@ -76,6 +76,70 @@ internal struct ProcedureKit {
     }
 }
 
+/**
+ Procedure is an Operation subclass. It is an abstract class which should be subclassed.
+
+ ```swift
+ import ProcedureKit
+
+ class MyFirstProcedure: Procedure {
+     override func execute() {
+         guard !isCancelled else { return }
+         print("Hello World")
+         finish()
+     }
+ }
+
+ let queue = ProcedureQueue()
+ let myProcedure = MyFirstProcedure()
+ queue.addOperation(myProcedure)
+ ```
+
+ The key points here are:
+
+ 1. Subclass `Procedure`
+ 2. Override `execute` but do not call `super.execute()`
+ 3. Check the `isCancelled` property before starting any work.
+ 4. If not cancelled, always call `finish()` after the work is done. This could be done asynchronously.
+ 5. Add procedures to instances of `ProcedureQueue`.
+
+ ### Built-in Procedures
+
+ ProcedureKit includes a number of built-in Procedure subclasses, such as `GroupProcedure`,
+ `RetryProcedure`, `RepeatProcedure`. Many of these built-in subclasses can be used as-is
+ (without subclassing them). See their documentation for information on what they do and
+ how to utilize them.
+
+ ### Cancellation
+
+ Once you add a Procedure to a ProcedureQueue, the queue takes over and handles the
+ scheduling of the task at some point in the future (based on dependencies, and
+ qualityOfService, etc).
+
+ If you later decide that you do not want to execute the procedure after all, you can cancel
+ the procedure to prevent it from running needlessly. You do this by calling the `cancel()`
+ method on the Procedure instance itself.
+
+ Cancelling a Procedure before it has been started by the queue will cause the queue to:
+    - Ignore any unfinished dependencies
+    - Automatically finish the Procedure (without calling your `execute()` override)
+
+ This helps clear the cancelled Procedure from the queue as quickly as possible. Since it
+ hasn't yet started to execute, the framework can help handle this case for you.
+
+ However, cancelling a Procedure that has already been started by the queue will *not*
+ automatically stop it from executing. It is the responsibility of your Procedure subclass,
+ once it has started to execute, to check its cancelled state and respond to cancellation
+ by finishing as quickly as possible.
+
+ You can implement this via two different methods:
+    1. Checking `isCancelled` periodically (for example, in your `execute()` override)
+    2. Adding a DidCancel observer or overriding `produceDidCancel(withErrors:)`, which will be called after your Procedure is cancelled.
+
+ Which method you should use is likely determined by how your Procedure performs the
+ bulk of its task (synchronously - in its `execute()` override - or asynchronously, for
+ which a DidCancel observer may be more useful).
+ */
 open class Procedure: Operation, ProcedureProtocol {
 
     private var _isTransitioningToExecuting = false
@@ -137,9 +201,13 @@ open class Procedure: Operation, ProcedureProtocol {
     internal let queueAddContext = ProcedureQueueContext()
 
     deinit {
+        // ensure that any EvaluateConditions operation is cancelled
+        evaluateConditionsProcedure?.cancel()
+
         // ensure that the Protected Properies are deinitialized within the lock
         stateLock.withCriticalScope {
             self.protectedProperties = nil
+            _evaluateConditionsProcedure = nil
         }
     }
 
@@ -187,6 +255,40 @@ open class Procedure: Operation, ProcedureProtocol {
         return stateLock.withCriticalScope { _isFinished }
     }
 
+    private var _mutuallyExclusiveCategories: Set<String>?
+    private var mutuallyExclusiveCategories: Set<String>? {
+        get { return stateLock.withCriticalScope { _mutuallyExclusiveCategories } }
+        set { stateLock.withCriticalScope { _mutuallyExclusiveCategories = newValue } }
+    }
+
+    fileprivate func request(mutuallyExclusiveCategories: Set<String>, completion: @escaping (Bool) -> Void) {
+        // On the internal EventQueue
+        dispatchEvent {
+            guard self.state < .started else {
+                // If the Procedure has already started or finished, it's too late to acquire mutual
+                // exclusivity locks. This can occur, normally, if a Procedure is cancelled (and then
+                // finished) at just the right time.
+                guard self.isCancelled else {
+                    fatalError("Procedure started prior to acquiring mutual exclusivity locks, but is not cancelled.")
+                }
+
+                // Immediately call the completion block, with false
+                completion(false)
+                return
+            }
+
+            // Store the mutually-exclusive categories for later release (when the Procedure is finished).
+            assert(self.mutuallyExclusiveCategories == nil, "Mutually exclusive locks were requested more than once.")
+            self.mutuallyExclusiveCategories = mutuallyExclusiveCategories
+
+            // Request a lock from the ExclusivityManager.
+            ExclusivityManager.sharedInstance.requestLock(for: mutuallyExclusiveCategories) {
+                // Once the lock is acquired, call the completion block
+                completion(true)
+            }
+        }
+    }
+
     /// Boolean indicator for whether the Procedure is cancelled or not
     ///
     /// Canceling a Procedure does not actively stop the Procedure's code from executing.
@@ -216,6 +318,8 @@ open class Procedure: Operation, ProcedureProtocol {
     }
 
     // MARK: Protected Internal Properties
+
+    fileprivate var _evaluateConditionsProcedure: EvaluateConditions? = nil // swiftlint:disable:this variable_name
 
     // Grouped in a class to allow for easily deinitializing in `deinit`.
     fileprivate class ProtectedProperties {
@@ -303,25 +407,20 @@ open class Procedure: Operation, ProcedureProtocol {
         }
     }
 
-
     // MARK: Dependencies & Conditions
 
     internal var directDependencies: Set<Operation> {
         get { return stateLock.withCriticalScope { protectedProperties.directDependencies } }
     }
 
-    internal fileprivate(set) var evaluateConditionsProcedure: EvaluateConditions? = nil
-
-    internal var indirectDependencies: Set<Operation> {
-        return Set(conditions
-            .flatMap { $0.directDependencies }
-            .filter { !directDependencies.contains($0) }
-        )
-    }
-
     /// - returns conditions: the Set of Condition instances attached to the operation
     public var conditions: Set<Condition> {
         get { return stateLock.withCriticalScope { protectedProperties.conditions } }
+    }
+
+    /// Internal for testing.
+    internal var evaluateConditionsProcedure: EvaluateConditions? {
+        return stateLock.withCriticalScope { _evaluateConditionsProcedure }
     }
 
     // MARK: - Initialization
@@ -383,7 +482,56 @@ open class Procedure: Operation, ProcedureProtocol {
     }
 
     public final func pendingQueueStart() {
-        state = .pending
+        let optionalConditionEvaluator: EvaluateConditions? = stateLock.withCriticalScope {
+            _state = .pending
+
+            // After the state has been set to `.willEnqueue` (via an earlier call
+            // to `willEnqueue(on:)`), Procedure conditions cannot be modified.
+            //
+            // `pendingQueueStart()` is called *after* the ProcedureQueue
+            // delegate's `procedureQueue(_:willAddProcedure:context:)` is called,
+            // but *before* the Procedure is actually added to the queue. Thus:
+            //  - the delegate's willAdd method has had a chance to add any dependencies to
+            //    the Procedure (which _must_ be picked up and added as dependencies to the
+            //    EvaluateConditions operation)
+            //  - the Procedure will not be executed by the queue until this method returns
+            //
+            // Thus, construct the EvaluateConditions procedure now (if needed).
+            guard !protectedProperties.conditions.isEmpty else { return nil }
+
+            // If the Procedure is cancelled, there is no point to evaluating Conditions
+            guard !_isCancelled else { return nil }
+
+            // Create the EvaluateConditions operation
+            let evaluator = EvaluateConditions(procedure: self)
+            evaluator.name = "\(operationName) Evaluate Conditions"
+
+            // Add the direct dependencies of the procedure as direct dependencies of the evaluator
+            // (to ensure that conditions are evaluated after all of the Procedure's dependencies)
+            let directDependencies = protectedProperties.directDependencies
+            evaluator.add(dependencies: directDependencies)
+
+            // Store the evaluator in the Procedure
+            // (the Procedure maintains a strong reference to the EvaluateConditions operation)
+            assert(_evaluateConditionsProcedure == nil)
+            _evaluateConditionsProcedure = evaluator
+
+            return evaluator
+        }
+
+        guard let evaluator = optionalConditionEvaluator else { return }
+
+        // The Procedure must be dependent on its condition evaluator.
+        // Call super.addDependency so the evaluator isn't added to the visible
+        // `directDependencies`, but *is* treated as a dependency by the underlying
+        // Operation.
+        super.addDependency(evaluator)
+
+        // Ensure that if there are no dependencies, or if the dependencies are already finished,
+        // the EvaluateConditions procedure immediately executes.
+        if evaluator.isReady {
+            evaluator.dispatchStartOnce()
+        }
     }
 
     /// Starts the operation, correctly managing the cancelled state. Cannot be over-ridden
@@ -502,14 +650,15 @@ open class Procedure: Operation, ProcedureProtocol {
                     return nil
                 }
 
-                _state = .executing
-                _isTransitioningToExecuting = false
-
                 if _isCancelled && !isAutomaticFinishingDisabled && !_isHandlingFinish {
                     // Procedure was cancelled, and automatic finishing is enabled.
                     // Because execute() has not yet been called, handle finish here.
                     return .finishing
                 }
+
+                _state = .executing
+                _isTransitioningToExecuting = false
+
                 return .executing
             }
         }
@@ -725,6 +874,15 @@ open class Procedure: Operation, ProcedureProtocol {
         // Micro-optimization for built-in Procedures that can safely handle cancellation off the EventQueue
         _procedureDidCancel()
 
+        // Cancel the EvaluateConditions operation (in case the Procedure is cancelled
+        // before its dependencies have finished, and the EvaluateConditions operation
+        // is still waiting on those dependencies).
+        //
+        // If the Procedure is cancelled before it is added to a queue, the
+        // EvaluateConditions operation will not yet exist, and so must be handled
+        // later.
+        evaluateConditionsProcedure?.cancel()
+
         // Trigger DidCancel function & observers on the event queue
         dispatchEvent {
 
@@ -749,6 +907,9 @@ open class Procedure: Operation, ProcedureProtocol {
                     // (i.e. if a DidCancel observer has already called finish, that call is the one
                     // that succeeds)
                     self.finish(withErrors: pendingAutomaticFinish.receivedErrors, from: pendingAutomaticFinish.source)
+
+                    // Ensure that the EvaluateConditions operation is cancelled
+                    self.evaluateConditionsProcedure?.cancel()
                 }
             }
 
@@ -785,6 +946,7 @@ open class Procedure: Operation, ProcedureProtocol {
         
         debugAssertIsOnEventQueue() // only ever called from a block on the EventQueue
         assert(pendingAutomaticFinish == nil)
+        assert(state < .executing)
         
         if finishedHandlingCancel {
             // DidCancel observers have already been run, and given a chance to call finish() themselves.
@@ -918,6 +1080,11 @@ open class Procedure: Operation, ProcedureProtocol {
 
             // Call the Procedure.procedureDidFinish(withErrors:) override
             self.procedureDidFinish(withErrors: resultingErrors)
+
+            // If mutually exclusive categories were locked, unlock
+            if let mutuallyExclusiveCategories = self.mutuallyExclusiveCategories {
+                ExclusivityManager.sharedInstance.unlock(categories: mutuallyExclusiveCategories)
+            }
 
             // Dispatch the DidFinishObservers
             let didFinishObserversGroup = self.dispatchObservers(pendingEvent: PendingEvent.postFinish) { observer, _ in
@@ -1087,116 +1254,190 @@ internal extension Procedure {
 
 extension Procedure {
 
-    final class EvaluateConditions: GroupProcedure, InputProcedure, OutputProcedure {
+    // A custom internal operation subclass that handles evaluating Conditions for a Procedure.
+    final class EvaluateConditions: Operation {
 
-        var input: Pending<[Condition]> = .pending
-        var output: Pending<ConditionResult> = .pending
+        private enum State: Int, Comparable {
 
-        init(conditions: Set<Condition>) {
-            let ops = Array(conditions)
-            input = .ready(ops)
-            super.init(operations: ops)
+            static func < (lhs: State, rhs: State) -> Bool {
+                return lhs.rawValue < rhs.rawValue
+            }
+
+            case waitingOnProcedureDependencies
+            case dispatchedStart
+            case started
+            case executingMain
         }
 
-        override func procedureWillFinish(withErrors errors: [Error]) {
-            output = .ready(process(withErrors: errors))
+        let queue: DispatchQueue
+        weak var procedure: Procedure?
+        let context: ConditionEvaluationContext
+
+        init(procedure: Procedure) {
+            self.procedure = procedure
+            let queue = DispatchQueue(label: "run.kit.procedure.ProcedureKit.EvaluateConditions", qos: procedure.qualityOfService.qos, attributes: [.concurrent])
+            self.queue = queue
+            self.context = ConditionEvaluationContext(queue: queue, behavior: .andPredicate)
+            super.init()
         }
 
-        private func process(withErrors errors: [Error]) -> ConditionResult {
-            guard errors.isEmpty else {
-                return .failure(ProcedureKitError.FailedConditions(errors: errors))
-            }
-            guard let conditions = input.value else {
-                fatalError("Conditions must be set before the evaluation is performed.")
-            }
-            return conditions.reduce(.success(false)) { lhs, condition in
-                // Unwrap the condition's output
-                guard let rhs = condition.output.value else { return lhs }
+        private var _isFinished: Bool = false
+        private var _isExecuting: Bool = false
+        private let stateLock = PThreadMutex()
+        private var _state: State = .waitingOnProcedureDependencies
 
-                log.verbose(message: "evaluating \(lhs) with \(rhs)")
+        override var isFinished: Bool {
+            get { return stateLock.withCriticalScope { return _isFinished } }
+            set {
+                willChangeValue(forKey: .finished)
+                stateLock.withCriticalScope { _isFinished = newValue }
+                didChangeValue(forKey: .finished)
+            }
+        }
+        override var isExecuting: Bool {
+            get { return stateLock.withCriticalScope { return _isExecuting } }
+            set {
+                willChangeValue(forKey: .executing)
+                stateLock.withCriticalScope { _isExecuting = newValue }
+                didChangeValue(forKey: .executing)
+            }
+        }
 
-                switch (lhs, rhs) {
-                // both results are failures
-                case let (.failure(error), .failure(anotherError)):
-                    if let error = error as? ProcedureKitError.FailedConditions {
-                        return .failure(error.append(error: anotherError))
-                    }
-                    else if let anotherError = anotherError as? ProcedureKitError.FailedConditions {
-                        return .failure(anotherError.append(error: error))
+        final override var isReady: Bool {
+            let superIsReady = super.isReady
+            if superIsReady {
+                // If super.isReady == true, dispatch start *once*
+                dispatchStartOnce()
+            }
+            return superIsReady
+        }
+
+        final func dispatchStartOnce() {
+            // dispatch start() once
+            let shouldDispatchStart: Bool = stateLock.withCriticalScope {
+                guard _state < .dispatchedStart else { return false }
+                _state = .dispatchedStart
+                return true
+            }
+            guard shouldDispatchStart else { return }
+            queue.async {
+                self.start()
+            }
+        }
+
+        final override func cancel() {
+            // If the EvaluateConditions operation is cancelled
+            // Ensure that the attached Procedure is cancelled
+            procedure?.cancel()
+            super.cancel()
+            // Cancel the context to ensure that any concurrent
+            // evaluation of Conditions rapidly stops.
+            context.cancel()
+        }
+
+        override func start() {
+            isExecuting = true
+            main()
+        }
+
+        override func main() {
+            // This should only be executed once
+            let shouldContinue: Bool = stateLock.withCriticalScope {
+                guard _state < .executingMain else { return false }
+                _state = .executingMain
+                return true
+            }
+            guard shouldContinue else { return }
+
+            guard let procedure = procedure else {
+                // the Procedure went away - finish immediately
+                finish()
+                return
+            }
+            guard !isCancelled else {
+                // this EvaluateConditions operation has been cancelled
+                // ensure that the dependent Procedure is cancelled
+                procedure.cancel()
+                // then finish immediately
+                finish()
+                return
+            }
+
+            let conditions = procedure.conditions
+            conditions.evaluate(procedure: procedure, withContext: context) { result in
+
+                // Determine whether the Procedure can proceed to execution
+                switch result {
+                case .success(true):
+                    // All conditions were successful - the Procedure may execute
+                    // Continue on
+                    break
+                case .success(false):
+                    // One or more conditions failed (with an ignored error)
+                    procedure.log.verbose(message: "Condition(s) failed.")
+                    // Cancel the Procedure without errors
+                    procedure.cancel()
+                    // Finish this EvaluateConditions operation immediately
+                    self.finish()
+                    return
+                case let .failure(error):
+                    procedure.log.verbose(message: "Condition(s) failed with errors: \(error).")
+                    if let failedConditions = error as? ProcedureKitError.FailedConditions {
+                        procedure.cancel(withErrors: failedConditions.errors)
                     }
                     else {
-                        return .failure(ProcedureKitError.FailedConditions(errors: [error, anotherError]))
+                        procedure.cancel(withError: error)
                     }
-                // new condition failed - so return it
-                case (_, .failure(_)):
-                    return rhs
-                // first condition is ignored - so return the new one
-                case (.success(false), _):
-                    return rhs
-                default:
-                    return lhs
+                    // Finish this EvaluateConditions operation immediately
+                    self.finish()
+                    return
+                }
+
+                // If the parent Procedure wasn't cancelled
+                // by something else
+                guard !procedure.isCancelled else {
+                    // Finish this EvaluateConditions operation immediately
+                    self.finish()
+                    return
+                }
+
+                // Check for any mutually exclusive categories
+                // to apply to the Procedure
+                let mutuallyExclusiveCategories = conditions.mutuallyExclusiveCategories
+                guard !mutuallyExclusiveCategories.isEmpty else {
+                    // No mutually-exclusive categories to acquire - finish immediately
+                    self.finish()
+                    return
+                }
+
+                // Acquire the mutually-exclusive categories (locks) for the Procedure
+                // before allowing it to execute.
+
+                procedure.request(mutuallyExclusiveCategories: mutuallyExclusiveCategories) { success in
+                    // Exclusivity locks have been acquired, or the request did not succeed
+                    // (but for valid cancellation/timing reasons).
+                    //
+                    // Regardless, it is now safe to finish the EvaluateConditions operation
+                    // and trigger the parent Procedure (if it hasn't already cancelled + finished).
+                    self.finish()
                 }
             }
         }
-    }
-
-    func evaluateConditions() -> Procedure {
-
-        func createEvaluateConditionsProcedure() -> EvaluateConditions {
-            // Set the procedure on each condition
-            conditions.forEach {
-                $0.procedure = self
-                $0.log.enabled = self.log.enabled
-                $0.log.severity = self.log.severity
-            }
-
-            let evaluator = EvaluateConditions(conditions: conditions)
-            evaluator.name = "\(operationName) Evaluate Conditions"
-
-            super.addDependency(evaluator)
-            return evaluator
+        func finish() {
+            isExecuting = false
+            isFinished = true
         }
-
-        assert(state < .pending, "Dependencies cannot be modified after a Procedure has been added to a queue, current state: \(state).")
-
-        let evaluator = createEvaluateConditionsProcedure()
-
-        // Add the direct dependencies of the procedure as direct dependencies of the evaluator
-        directDependencies.forEach {
-            evaluator.add(dependency: $0)
-        }
-
-        // Add an observer to the evaluator to see if any of the conditions failed.
-        evaluator.addWillFinishBlockObserver { [weak self] evaluator, _, _ in
-            guard let result = evaluator.output.value else { return }
-
-            switch result {
-            case .success(true):
-                break
-            case .success(false):
-                self?.cancel()
-            case let .failure(error):
-                if let failedConditions = error as? ProcedureKitError.FailedConditions {
-                    self?.cancel(withErrors: failedConditions.errors)
-                }
-                else {
-                    self?.cancel(withError: error)
-                }
-            }
-        }
-
-        return evaluator
-    }
-
-    func add(dependencyOnPreviousMutuallyExclusiveProcedure procedure: Procedure) {
-        precondition(state < .started, "Dependencies cannot be modified after a Procedure has started, current state: \(state).")
-        super.addDependency(procedure)
     }
 
     func add(directDependency: Operation) {
         precondition(state < .started, "Dependencies cannot be modified after a Procedure has started, current state: \(state).")
         stateLock.withCriticalScope { () -> Void in
             protectedProperties.directDependencies.insert(directDependency)
+
+            // occurs inside the stateLock to prevent any double-adds of dependencies
+            // to the EvaluateConditions operation
+            assert(!((_evaluateConditionsProcedure?.isExecuting ?? false) || (_evaluateConditionsProcedure?.isFinished ?? false)), "Conditions are already being evaluated (or have already finished being evaluated). It is too late to add a dependency and have it properly affect the Procedure. Instead, consider adding dependencies before adding the Procedure to a queue, or adding dependencies before all other existing dependencies have finished (for example: from a WillFinish observer on a dependency).")
+            _evaluateConditionsProcedure?.add(dependency: directDependency)
         }
         super.addDependency(directDependency)
     }
@@ -1205,12 +1446,16 @@ extension Procedure {
         precondition(state < .started, "Dependencies cannot be modified after a Procedure has started, current state: \(state).")
         stateLock.withCriticalScope { () -> Void in
             protectedProperties.directDependencies.remove(directDependency)
+
+            // occurs inside the stateLock to ensure that every removed dependency is
+            // removed from the EvaluateConditions operation
+            _evaluateConditionsProcedure?.remove(dependency: directDependency)
         }
         super.removeDependency(directDependency)
     }
 
     public final override var dependencies: [Operation] {
-        return Array(directDependencies.union(indirectDependencies))
+        return Array(directDependencies)
     }
 
     /**

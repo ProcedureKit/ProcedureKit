@@ -17,7 +17,7 @@ class MutualExclusiveTests: ProcedureKitTestCase {
 
     func test__mutual_exclusive_category() {
         let condition = MutuallyExclusive<Procedure>(category: "testing")
-        XCTAssertEqual(condition.category, "testing")
+        XCTAssertEqual(condition.mutuallyExclusiveCategories, ["testing"])
     }
 
     func test__alert_presentation_is_mutually_exclusive() {

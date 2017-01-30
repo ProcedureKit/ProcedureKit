@@ -249,8 +249,10 @@ public class AuthorizedFor<Status: AuthorizationStatus>: Condition {
     public init<Base>(_ base: Base, category: String? = nil) where Base: CapabilityProtocol, Status == Base.Status {
         capability = AnyCapability(base)
         super.init()
-        mutuallyExclusiveCategory = category
-        add(dependency: AuthorizeCapabilityProcedure(base))
+        if let category = category {
+            addToAttachedProcedure(mutuallyExclusiveCategory: category)
+        }
+        produce(dependency: AuthorizeCapabilityProcedure(base))
     }
 
     public override func evaluate(procedure: Procedure, completion: @escaping (ConditionResult) -> Void) {
