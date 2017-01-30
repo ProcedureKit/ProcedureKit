@@ -625,22 +625,9 @@ open class CompoundCondition: Condition {
     /// i.e. The CompoundCondition will only succeed if all the supplied
     /// conditions succeed.
     ///
-    /// - Parameter conditions: an array of Conditions
-    public init(andPredicateWith conditions: [Condition]) {
-        self.conditions = conditions
-        self.kind = .andPredicate
-        super.init()
-    }
-
-    /// Initialize a CompoundCondition that evaluates to the logical "&&"
-    /// of all the supplied conditions.
-    ///
-    /// i.e. The CompoundCondition will only succeed if all the supplied
-    /// conditions succeed.
-    ///
-    /// - Parameter conditions: an Sequence of Conditions
+    /// - Parameter conditions: a Sequence of Conditions
     public init<S: Sequence>(andPredicateWith conditions: S) where S.Iterator.Element == Condition {
-        self.conditions = Array<Condition>(conditions)
+        self.conditions = conditions.filterDuplicates()
         self.kind = .andPredicate
         super.init()
     }
@@ -664,22 +651,9 @@ open class CompoundCondition: Condition {
     /// i.e. As soon as one of the supplied conditions evaluates successfully,
     /// the CompoundCondition will return success.
     ///
-    /// - Parameter conditions: an array of Conditions
-    public init(orPredicateWith conditions: [Condition]) {
-        self.conditions = conditions
-        self.kind = .orPredicate
-        super.init()
-    }
-
-    /// Initialize a CompoundCondition that evaluates to the logical "||"
-    /// of all the supplied conditions.
-    ///
-    /// i.e. As soon as one of the supplied conditions evaluates successfully,
-    /// the CompoundCondition will return success.
-    ///
     /// - Parameter conditions: a Sequence of Conditions
     public init<S: Sequence>(orPredicateWith conditions: S) where S.Iterator.Element == Condition {
-        self.conditions = Array<Condition>(conditions)
+        self.conditions = conditions.filterDuplicates()
         self.kind = .orPredicate
         super.init()
     }
@@ -1336,6 +1310,21 @@ internal extension Collection where Iterator.Element == ConditionResult {
             }
         }
         return false
+    }
+}
+
+internal extension Sequence where Iterator.Element: Hashable {
+
+    // - returns: an Array<Iterator.Element> that preserves the original sequence order, but in which only the first instance of a unique Element is preserved
+    func filterDuplicates() -> [Iterator.Element] {
+        var result: [Iterator.Element] = []
+        var added = Set<Iterator.Element>()
+        for element in self {
+            guard !added.contains(element) else { continue }
+            result.append(element)
+            added.insert(element)
+        }
+        return result
     }
 }
 

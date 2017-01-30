@@ -739,6 +739,24 @@ class ConditionTests: ProcedureKitTestCase {
         XCTAssertEqual(compoundCondition2.mutuallyExclusiveCategories, ["test0", "test1", "test2"])
     }
 
+    func test__compound_condition_and_predicate_filters_duplicates() {
+        let evaluationCount = Protector<Int>(0)
+        let condition1 = TestCondition() { evaluationCount.advance(by: 1); return .success(true) }
+        let compoundCondition = CompoundCondition(andPredicateWith: condition1, condition1, condition1)
+        procedure.add(condition: compoundCondition)
+        wait(for: procedure)
+        XCTAssertEqual(evaluationCount.access, 1)
+    }
+
+    func test__compound_condition_or_predicate_filters_duplicates() {
+        let evaluationCount = Protector<Int>(0)
+        let condition1 = TestCondition() { evaluationCount.advance(by: 1); return .success(false) }
+        let compoundCondition = CompoundCondition(orPredicateWith: condition1, condition1, condition1)
+        procedure.add(condition: compoundCondition)
+        wait(for: procedure)
+        XCTAssertEqual(evaluationCount.access, 1)
+    }
+
     // MARK: - Compound Conditions - &&
 
     func test__and_condition__with_no_conditions_cancels_without_errors() {
