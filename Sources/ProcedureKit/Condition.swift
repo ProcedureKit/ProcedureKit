@@ -4,6 +4,8 @@
 //  Copyright © 2016 ProcedureKit. All rights reserved.
 //
 
+// swiftlint:disable file_length
+
 import Foundation
 
 /**
@@ -107,7 +109,7 @@ public extension ProcedureKitError {
         public var description: String {
             return "ProcedureKitError.ConditionDependenciesFailed(condition: \(condition))"
         }
-        public static func ==(lhs: ConditionDependenciesFailed, rhs: ConditionDependenciesFailed) -> Bool {
+        public static func == (lhs: ConditionDependenciesFailed, rhs: ConditionDependenciesFailed) -> Bool {
             return lhs.condition === rhs.condition
         }
     }
@@ -120,7 +122,7 @@ public extension ProcedureKitError {
         public var description: String {
             return "ProcedureKitError.ConditionDependenciesCancelled(condition: \(condition))"
         }
-        public static func ==(lhs: ConditionDependenciesCancelled, rhs: ConditionDependenciesCancelled) -> Bool {
+        public static func == (lhs: ConditionDependenciesCancelled, rhs: ConditionDependenciesCancelled) -> Bool {
             return lhs.condition === rhs.condition
         }
     }
@@ -436,11 +438,11 @@ open class Condition: ConditionProtocol, Hashable {
 
     // MARK: Hashable
 
-    public static func ==(lhs: Condition, rhs: Condition) -> Bool {
+    public static func == (lhs: Condition, rhs: Condition) -> Bool {
         return lhs === rhs
     }
 
-    public var hashValue : Int {
+    public var hashValue: Int {
         return ObjectIdentifier(self).hashValue
     }
 
@@ -733,7 +735,7 @@ open class CompoundCondition: Condition {
 }
 
 open class AndCondition: CompoundCondition {
-    public init(_ conditions: [Condition]){
+    public init(_ conditions: [Condition]) {
         super.init(andPredicateWith: conditions)
     }
     public init<S: Sequence>(_ conditions: S) where S.Iterator.Element == Condition {
@@ -745,7 +747,7 @@ open class AndCondition: CompoundCondition {
 }
 
 open class OrCondition: CompoundCondition {
-    public init(_ conditions: [Condition]){
+    public init(_ conditions: [Condition]) {
         super.init(orPredicateWith: conditions)
     }
     public init<S: Sequence>(_ conditions: S) where S.Iterator.Element == Condition {
@@ -868,11 +870,11 @@ public class IgnoredCondition<C: Condition>: ComposedCondition<C> {
 
 // MARK: - Condition Logical Operator Support
 
-public func &&(lhs: Condition, rhs: Condition) -> AndCondition {
+public func && (lhs: Condition, rhs: Condition) -> AndCondition {
     return AndCondition([lhs, rhs])
 }
 
-public func ||(lhs: Condition, rhs: Condition) -> OrCondition {
+public func || (lhs: Condition, rhs: Condition) -> OrCondition {
     return OrCondition([lhs, rhs])
 }
 
@@ -908,7 +910,7 @@ internal class ConditionEvaluationContext {
         }
         return __procedureQueue!
     }
-    private var __procedureQueue: ProcedureQueue? = nil
+    private var __procedureQueue: ProcedureQueue? = nil // swiftlint:disable:this variable_name
 
     func cancel() {
         stateLock.withCriticalScope {
@@ -1118,6 +1120,7 @@ internal extension Condition {
         case dependencyCancelled
     }
 
+    // swiftlint:disable cyclomatic_complexity
     func verifyDependencyRequirements() -> DependencyVerificationResult {
         let dependencyRequirements = self.dependencyRequirements
         guard !dependencyRequirements.isEmpty else { return .success }
@@ -1150,6 +1153,7 @@ internal extension Condition {
 
         return .success
     }
+    // swiftlint:enable cyclomatic_complexity
 }
 
 internal extension Collection where Iterator.Element == Condition {
@@ -1338,10 +1342,12 @@ internal extension Collection where Iterator.Element == ConditionResult {
 // MARK: - Unavailable
 
 public extension Condition {
-    
+
     @available(*, unavailable, renamed: "addToAttachedProcedure(mutuallyExclusiveCategory:)")
     public var mutuallyExclusiveCategory: String? {
         get { fatalError("Unavailable. Use `mutuallyExclusiveCategories` instead to query.") }
         set { fatalError("Unavailable. Use `addToAttachedProcedure(mutuallyExclusiveCategory:)` instead to set.") }
     }
 }
+
+// swiftlint:enable file_length
