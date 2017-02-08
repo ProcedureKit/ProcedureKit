@@ -13,7 +13,7 @@ public final class SilentCondition<C: Condition>: ComposedCondition<C> {
 
     /// Public override of initializer.
     public override init(_ condition: C) {
-        condition.removeAllDependencies()
+        condition.producedDependencies.forEach { condition.remove(dependency: $0) }
         super.init(condition)
         name = condition.name.map { "Silent<\($0)>" }
     }

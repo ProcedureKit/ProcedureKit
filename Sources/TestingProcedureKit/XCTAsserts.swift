@@ -196,6 +196,18 @@ public extension ProcedureKitTestCase {
         }
     }
 
+    public func XCTAssertProcedure<T: ProcedureProtocol, E: Error>(_ exp: @autoclosure () throws -> T, firstErrorEquals firstError: E, _ message: @autoclosure () -> String = "", file: StaticString = #file, line: UInt = #line) where E: Equatable {
+        __XCTEvaluateAssertion(testCase: self, message, file: file, line: line) {
+            let procedure = try exp()
+            guard procedure.failed else {
+                return .expectedFailure("\(procedure.procedureName) did not have any errors.")
+            }
+            guard procedure.errors[0] as? E == firstError else {
+                return .expectedFailure("\(procedure.procedureName) first error is not expected error. Errors are: \(procedure.errors)")
+            }
+            return .success
+        }
+    }
 }
 
 // MARK: Constrained to TestProcedure

@@ -71,7 +71,7 @@ class AuthorizeTests: TestableCapabilityTestCase {
         for condition in authorize.conditions {
             guard condition.isMutuallyExclusive else { continue }
             guard condition is MutuallyExclusive<AuthorizeCapabilityProcedure<TestableCapability.Status>> else { continue }
-            guard condition.category == "AuthorizeCapabilityProcedure(TestableCapability)" else { continue }
+            guard condition.mutuallyExclusiveCategories == ["AuthorizeCapabilityProcedure(TestableCapability)"] else { continue }
             foundMutuallyExclusiveCondition = true
             break
         }
@@ -88,16 +88,16 @@ class AuthorizedForTests: TestableCapabilityTestCase {
     }
 
     func test__default_mututally_exclusive_category() {
-        XCTAssertNil(authorizedFor.mutuallyExclusiveCategory)
+        XCTAssertTrue(authorizedFor.mutuallyExclusiveCategories.isEmpty)
     }
 
     func test__custom_mututally_exclusive_category() {
         authorizedFor = AuthorizedFor(capability, category: "testing")
-        XCTAssertEqual(authorizedFor.category, "testing")
+        XCTAssertEqual(authorizedFor.mutuallyExclusiveCategories, ["testing"])
     }
 
     func test__has_authorize_dependency() {
-        guard let dependency = authorizedFor.dependencies.first else {
+        guard let dependency = authorizedFor.producedDependencies.first else {
             XCTFail("Condition did not return a dependency")
             return
         }
@@ -112,6 +112,8 @@ class AuthorizedForTests: TestableCapabilityTestCase {
         capability.serviceIsAvailable = false
         wait(for: procedure)
         XCTAssertConditionResult(authorizedFor.output.value ?? .success(true), failedWithError: ProcedureKitError.capabilityUnavailable())
+        XCTAssertProcedureCancelledWithErrors(count: 1)
+        XCTAssertProcedure(procedure, firstErrorEquals: ProcedureKitError.capabilityUnavailable())
     }
 
     func test__async_fails_if_capability_is_not_available() {
@@ -119,6 +121,8 @@ class AuthorizedForTests: TestableCapabilityTestCase {
         capability.serviceIsAvailable = false
         wait(for: procedure)
         XCTAssertConditionResult(authorizedFor.output.value ?? .success(true), failedWithError: ProcedureKitError.capabilityUnavailable())
+        XCTAssertProcedureCancelledWithErrors(count: 1)
+        XCTAssertProcedure(procedure, firstErrorEquals: ProcedureKitError.capabilityUnavailable())
     }
 
     func test__fails_if_requirement_is_not_met() {
@@ -127,6 +131,8 @@ class AuthorizedForTests: TestableCapabilityTestCase {
 
         wait(for: procedure)
         XCTAssertConditionResult(authorizedFor.output.value ?? .success(true), failedWithError: ProcedureKitError.capabilityUnauthorized())
+        XCTAssertProcedureCancelledWithErrors(count: 1)
+        XCTAssertProcedure(procedure, firstErrorEquals: ProcedureKitError.capabilityUnauthorized())
     }
 
     func test__async_fails_if_requirement_is_not_met() {
@@ -136,19 +142,46 @@ class AuthorizedForTests: TestableCapabilityTestCase {
 
         wait(for: procedure)
         XCTAssertConditionResult(authorizedFor.output.value ?? .success(true), failedWithError: ProcedureKitError.capabilityUnauthorized())
+        XCTAssertProcedureCancelledWithErrors(count: 1)
+        XCTAssertProcedure(procedure, firstErrorEquals: ProcedureKitError.capabilityUnauthorized())
     }
 
     func test__suceeds_if_requirement_is_met() {
         wait(for: procedure)
         XCTAssertConditionResultSatisfied(authorizedFor.output.value ?? .success(false))
+        XCTAssertProcedureFinishedWithoutErrors()
     }
 
     func test__async_suceeds_if_requirement_is_met() {
         capability.isAsynchronous = true
         wait(for: procedure)
         XCTAssertConditionResultSatisfied(authorizedFor.output.value ?? .success(false))
+        XCTAssertProcedureFinishedWithoutErrors()
     }
 
+    func test__negated_authorized_for_and_no_failed_dependencies_succeeds() {
+        // See: Issue #515
+        // https://github.com/ProcedureKit/ProcedureKit/issues/515
+        //
+        // This test previously failed because dependencies of Conditions
+        // were incorporated into the dependencies of the parent Procedure
+        // and, thus, the NoFailedDependenciesCondition picked up the
+        // failing dependencies of the NegatedCondition.
+        //
+
+        // set the TestableCapability so it fails to meet the requirement
+        capability.requirement = .maximum
+        capability.responseAuthorizationStatus = .minimumAuthorized
+
+        let procedure = TestProcedure()
+        let authorizedCondition = AuthorizedFor(capability)
+
+        procedure.add(condition: NegatedCondition(authorizedCondition))
+        procedure.add(condition: NoFailedDependenciesCondition())
+
+        wait(for: procedure)
+        XCTAssertProcedureFinishedWithoutErrors(procedure)
+    }
 }
 
 

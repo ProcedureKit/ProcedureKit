@@ -17,7 +17,7 @@ class MutualExclusiveTests: ProcedureKitTestCase {
 
     func test__mutual_exclusive_category() {
         let condition = MutuallyExclusive<Procedure>(category: "testing")
-        XCTAssertEqual(condition.category, "testing")
+        XCTAssertEqual(condition.mutuallyExclusiveCategories, ["testing"])
     }
 
     func test__alert_presentation_is_mutually_exclusive() {
@@ -115,6 +115,35 @@ class MutualExclusiveConcurrencyTests: ConcurrencyTestCase {
                 checkMinimumDuration: TimeInterval(useconds_t(numOperations) * delayMicroseconds) / 1000000.0
             )
         )
+    }
+
+    func test__mutual_exclusivity_with_dependencies() {
+        // The expected result is that procedure1 will run first and, once procedure1
+        // has finished, procedure2 will run.
+        //
+        // Previously, this test resulted in neither procedure finishing (i.e. deadlock).
+
+        // Two procedures that are mutually-exclusive
+        let procedure1 = TestProcedure()
+        procedure1.add(condition: MutuallyExclusive<TestProcedure>())
+        let procedure2 = TestProcedure()
+        procedure2.add(condition: MutuallyExclusive<TestProcedure>())
+
+        addCompletionBlockTo(procedures: [procedure1, procedure2])
+
+        // procedure2 will not run until procedure1 is complete
+        procedure2.add(dependency: procedure1)
+
+        // add procedure2 to the queue first
+        queue.add(operation: procedure2).then(on: DispatchQueue.main) {
+            // then add procedure1 to the queue
+            self.queue.add(operation: procedure1)
+        }
+
+        waitForExpectations(timeout: 2)
+
+        XCTAssertTrue(procedure1.isFinished)
+        XCTAssertTrue(procedure2.isFinished)
     }
 }
 

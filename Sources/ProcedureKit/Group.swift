@@ -257,9 +257,6 @@ open class GroupProcedure: Procedure, ProcedureQueueDelegate {
     public func procedureQueue(_ queue: ProcedureQueue, willAddProcedure procedure: Procedure, context: Any?) -> ProcedureFuture? {
         guard queue === self.queue else { return nil }
 
-        /// If the operation is a Procedure.EvaluateConditions - exit early.
-        if procedure is Procedure.EvaluateConditions { return nil }
-
         return willAdd(operation: procedure, context: context)
     }
 
@@ -346,9 +343,6 @@ open class GroupProcedure: Procedure, ProcedureQueueDelegate {
 
         /// If the group is cancelled, exit early
         guard !isCancelled else { return nil }
-
-        /// If the operation is a Procedure.EvaluateConditions - exit early.
-        if procedure is Procedure.EvaluateConditions { return nil }
 
         let promise = ProcedurePromise()
         dispatchEvent {
