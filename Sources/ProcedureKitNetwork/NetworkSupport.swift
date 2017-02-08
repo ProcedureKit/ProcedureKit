@@ -55,8 +55,6 @@ extension URL: ExpressibleByStringLiteral {
 
 // MARK: - Input & Output wrapper types
 
-
-
 public protocol HTTPPayloadResponseProtocol: Equatable {
     associatedtype Payload: Equatable
 

@@ -73,7 +73,7 @@ public class DelayProcedure: Procedure {
 
     private let delay: Delay
     private let leeway: DispatchTimeInterval
-    private var _timer: DispatchSourceTimer? = nil
+    private var _timer: DispatchSourceTimer?
 
     internal init(delay: Delay, leeway: DispatchTimeInterval = .milliseconds(1)) {
         self.delay = delay

@@ -195,7 +195,7 @@ extension Collection where Iterator.Element: ProcedureFuture {
         let group = DispatchGroup()
         self.forEach {
             group.enter()
-            $0.thenOnSelfOrLater(on: DispatchQueue.global()) { result in
+            $0.thenOnSelfOrLater(on: DispatchQueue.global()) { _ in
                 group.leave()
             }
         }
@@ -255,7 +255,7 @@ extension Collection where Iterator.Element: ProcedureFuture {
  */
 public class ProcedurePromiseResult<T> {
     public let future = ProcedureFutureResult<T>()
-    
+
     deinit {
         assert(future.hasResult, "Did not complete ProcedureResultPromise (\(self)) before deinit. All promises must eventually be completed.")
         guard future.hasResult else {
@@ -332,5 +332,3 @@ public extension ProcedureKitError {
         internal init() { }
     }
 }
-
-

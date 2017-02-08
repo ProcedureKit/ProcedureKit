@@ -98,5 +98,4 @@ extension CloudKitProcedure where T: CKModifySubscriptionsOperationProtocol, T: 
     }
 }
 
-
 #endif

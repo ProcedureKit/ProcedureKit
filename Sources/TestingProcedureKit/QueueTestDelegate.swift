@@ -48,7 +48,7 @@ public class QueueTestDelegate: ProcedureQueueDelegate {
     private var _procedureQueueDidFinishProcedure = Protector([ProcedureFinishType]())
 
     // MARK: - Init
-    
+
     public init() { }
 
     // MARK: - ProcedureQueueDelegate Methods

@@ -160,10 +160,10 @@ open class Procedure: Operation, ProcedureProtocol {
         var receivedErrors: [Error]
         var source: ProcedureKit.FinishingFrom
     }
-    private var _pendingFinish: FinishingInfo? = nil
+    private var _pendingFinish: FinishingInfo?
 
     // only accessed from within the EventQueue
-    private var pendingAutomaticFinish: FinishingInfo? = nil
+    private var pendingAutomaticFinish: FinishingInfo?
     private var finishedHandlingCancel: Bool = false
 
     // The Procedure's EventQueue
@@ -319,7 +319,7 @@ open class Procedure: Operation, ProcedureProtocol {
 
     // MARK: Protected Internal Properties
 
-    fileprivate var _evaluateConditionsProcedure: EvaluateConditions? = nil // swiftlint:disable:this variable_name
+    fileprivate var _evaluateConditionsProcedure: EvaluateConditions? // swiftlint:disable:this variable_name
 
     // Grouped in a class to allow for easily deinitializing in `deinit`.
     fileprivate class ProtectedProperties {
@@ -537,7 +537,7 @@ open class Procedure: Operation, ProcedureProtocol {
     /// Starts the operation, correctly managing the cancelled state. Cannot be over-ridden
     public final override func start() {
         // Don't call super.start
-        
+
         // Dispatch the innards of start() on the EventQueue,
         // inheriting the current QoS level (i.e. the Qos that
         // the ProcedureQueue decided to use to call start()).
@@ -605,7 +605,7 @@ open class Procedure: Operation, ProcedureProtocol {
         }
     }
 
-    private final func _main_step2() {
+    private final func _main_step2() { // swiftlint:disable:this function_body_length
 
         debugAssertIsOnEventQueue()
 
@@ -662,7 +662,7 @@ open class Procedure: Operation, ProcedureProtocol {
                 return .executing
             }
         }
-            
+
         log.verbose(message: "[event]: Continue Pending Execute")
 
         // Determine the next Procedure state (prepare to set to executing, if possible)
@@ -703,7 +703,7 @@ open class Procedure: Operation, ProcedureProtocol {
         let _ = dispatchObservers(pendingEvent: PendingEvent.postDidExecute) { observer, _ in
             observer.did(execute: self)
         }
-        
+
         // Log that execute() has returned
         log.notice(message: "Did Execute")
     }
@@ -853,7 +853,7 @@ open class Procedure: Operation, ProcedureProtocol {
 
         // Immediately (and possibly concurrently with the EventQueue) set the `isCancelled`
         // state of the Procedure to true, sending appropriate KVO.
-        
+
         willChangeValue(forKey: .cancelled)
 
         let resultingErrors = stateLock.withCriticalScope { () -> [Error] in
@@ -917,7 +917,6 @@ open class Procedure: Operation, ProcedureProtocol {
         }
     }
 
-
     // MARK: - Finishing
 
     open func procedureWillFinish(withErrors: [Error]) { }
@@ -943,11 +942,11 @@ open class Procedure: Operation, ProcedureProtocol {
     // (i.e. if a Procedure should automatically finish prior to executing if, for example,
     // it is cancelled prior to executing)
     private func queueAutomaticFinish(from source: ProcedureKit.FinishingFrom) {
-        
+
         debugAssertIsOnEventQueue() // only ever called from a block on the EventQueue
         assert(pendingAutomaticFinish == nil)
         assert(state < .executing)
-        
+
         if finishedHandlingCancel {
             // DidCancel observers have already been run, and given a chance to call finish() themselves.
             // Thus, it is safe to call finish() directly here (which will queue a finish attempt at the
@@ -1061,9 +1060,9 @@ open class Procedure: Operation, ProcedureProtocol {
 
         optimizedDispatchEventNotify(group: willFinishObserversGroup, block: {
             // Once all the WillFinishObservers have completed, continue processing finish
-            
+
             self.log.verbose(message: "[event]: Resuming pending finish")
-            
+
             // Change the state to .finished and signal `isFinished` KVO.
             //
             // IMPORTANT: willChangeValue and didChangeValue *must* occur
@@ -1127,7 +1126,7 @@ open class Procedure: Operation, ProcedureProtocol {
                 self.eventQueue.dispatchSynchronizedBlock(onOtherQueue: observerEventQueue) {
                     // this block is now synchronized with *both* queues
                     //observerEventQueue.debugAssertIsOnQueue()
-                    
+
                     // process observer block on Observer's event queue
                     observer.didAttach(to: self)
                 }
@@ -1150,7 +1149,7 @@ open class Procedure: Operation, ProcedureProtocol {
     ///   - block: a block that will be called for every observer, on the appropriate queue/thread
     /// - Returns: a DispatchGroup that will be signaled (ready) when the PendingEvent is ready (i.e. when
     //             all of the observers have completed their work)
-    internal func dispatchObservers(pendingEvent: (Procedure) -> PendingEvent, block: @escaping (AnyObserver<Procedure>, PendingEvent) -> ()) -> DispatchGroup {
+    internal func dispatchObservers(pendingEvent: (Procedure) -> PendingEvent, block: @escaping (AnyObserver<Procedure>, PendingEvent) -> Void) -> DispatchGroup {
         debugAssertIsOnEventQueue() // This function should only be called if already on the EventQueue
 
         let iterator = observers.makeIterator()
@@ -1161,7 +1160,7 @@ open class Procedure: Operation, ProcedureProtocol {
     }
 
     typealias ObserverIterator = IndexingIterator<[AnyObserver<Procedure>]>
-    private func processObservers(iterator: ObserverIterator, futureEvent: PendingEvent, block: @escaping (AnyObserver<Procedure>, PendingEvent) -> ()) {
+    private func processObservers(iterator: ObserverIterator, futureEvent: PendingEvent, block: @escaping (AnyObserver<Procedure>, PendingEvent) -> Void) {
         debugAssertIsOnEventQueue() // This function should only be called if already on the EventQueue
 
         var modifiableIterator = iterator
@@ -1222,14 +1221,14 @@ internal extension Procedure {
     ///
     /// - Parameters:
     ///   - block: a block to execute on the EventQueue
-    internal func dispatchEvent(minimumQoS: DispatchQoS? = nil, block: @escaping () -> ()) {
+    internal func dispatchEvent(minimumQoS: DispatchQoS? = nil, block: @escaping () -> Void) {
         eventQueue.dispatchEventBlockInternal(minimumQoS: minimumQoS, block: block)
     }
 
     // Only to be called when already on the eventQueue
-    internal func optimizedDispatchEventNotify(group: DispatchGroup, inheritQoS: Bool = false, block: @escaping () -> ()) {
+    internal func optimizedDispatchEventNotify(group: DispatchGroup, inheritQoS: Bool = false, block: @escaping () -> Void) {
         debugAssertIsOnEventQueue()
-        
+
         if group.wait(timeout: .now()) == .success {
             // no need to dispatch notify, just execute block directly
             // (optimal path when the DispatchGroup is already finished)
@@ -1237,10 +1236,10 @@ internal extension Procedure {
         }
         else {
             // must wait on group to execute the block on the eventQueue
-            
+
             // use either the QoS of the Procedure, or the current QoS
             let minimumQoS = (!inheritQoS) ? qualityOfService.qos : DispatchQoS(qosClass: DispatchQueue.currentQoSClass, relativePriority: 0)
-            
+
             eventQueue.dispatchNotify(withGroup: group, minimumQoS: minimumQoS, block: block)
         }
     }
@@ -1257,7 +1256,7 @@ extension Procedure {
     // A custom internal operation subclass that handles evaluating Conditions for a Procedure.
     final class EvaluateConditions: Operation {
 
-        private enum State: Int, Comparable {
+        private enum State: Int, Comparable { // swiftlint:disable:this nesting
 
             static func < (lhs: State, rhs: State) -> Bool {
                 return lhs.rawValue < rhs.rawValue
@@ -1413,7 +1412,7 @@ extension Procedure {
                 // Acquire the mutually-exclusive categories (locks) for the Procedure
                 // before allowing it to execute.
 
-                procedure.request(mutuallyExclusiveCategories: mutuallyExclusiveCategories) { success in
+                procedure.request(mutuallyExclusiveCategories: mutuallyExclusiveCategories) { _ in
                     // Exclusivity locks have been acquired, or the request did not succeed
                     // (but for valid cancellation/timing reasons).
                     //

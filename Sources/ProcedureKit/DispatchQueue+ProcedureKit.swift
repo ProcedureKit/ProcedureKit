@@ -75,7 +75,8 @@ internal extension QualityOfService {
 }
 
 extension DispatchQoS.QoSClass: Comparable {
-    public static func < (lhs: DispatchQoS.QoSClass, rhs: DispatchQoS.QoSClass) -> Bool {
+
+    public static func < (lhs: DispatchQoS.QoSClass, rhs: DispatchQoS.QoSClass) -> Bool { // swiftlint:disable:this cyclomatic_complexity
         switch lhs {
         case .unspecified:
             return rhs != .unspecified

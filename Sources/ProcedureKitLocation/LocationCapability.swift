@@ -47,7 +47,9 @@ public extension Capability {
 
         internal lazy var registrar: LocationServicesRegistrarProtocol = CLLocationManager.make()
 
-        private var authorizationDelegate: LocationManagerAuthorizationDelegate? = nil
+        // Note, that this property is the authorization delegate, however, it is not
+        // owned by anything else, so should not be weak referenced.
+        private var authorizationDelegate: LocationManagerAuthorizationDelegate? // swiftlint:disable:this weak_delegate
 
         public init(_ requirement: LocationUsage = .whenInUse) {
             self.requirement = requirement

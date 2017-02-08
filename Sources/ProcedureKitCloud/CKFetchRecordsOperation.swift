@@ -39,7 +39,6 @@ extension CKFetchRecordsOperation: CKFetchRecordsOperationProtocol, AssociatedEr
     public typealias AssociatedError = FetchRecordsError<Record, RecordID>
 }
 
-
 extension CKProcedure where T: CKFetchRecordsOperationProtocol, T: AssociatedErrorProtocol, T.AssociatedError: CloudKitError {
 
     public var recordIDs: [T.RecordID]? {

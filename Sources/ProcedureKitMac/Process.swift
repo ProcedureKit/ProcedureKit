@@ -87,7 +87,7 @@ open class ProcessProcedure: Procedure {
         self.processDidExitCleanly = processDidExitCleanly
         super.init()
 
-        addDidCancelBlockObserver { procedure, errors in
+        addDidCancelBlockObserver { procedure, _ in
             DispatchQueue.main.async {
                 guard procedure.isExecuting && procedure.process.isRunning else { return }
                 procedure.process.terminate()

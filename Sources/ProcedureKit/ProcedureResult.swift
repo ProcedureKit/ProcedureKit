@@ -4,7 +4,6 @@
 //  Copyright © 2016 ProcedureKit. All rights reserved.
 //
 
-
 public enum Pending<T> {
 
     case pending
@@ -112,7 +111,6 @@ public protocol OutputProcedure: ProcedureProtocol {
     var output: Pending<ProcedureResult<Output>> { get set }
 }
 
-
 public let pendingVoid: Pending<Void> = .ready(())
 public let success: ProcedureResult<Void> = .success(())
 public let pendingVoidResult: Pending<ProcedureResult<Void>> = .ready(success)
@@ -151,7 +149,7 @@ public extension ProcedureProtocol {
             }
         }
 
-        dependency.addDidCancelBlockObserver { [weak self] dependency, errors in
+        dependency.addDidCancelBlockObserver { [weak self] _, errors in
             if let strongSelf = self {
                 strongSelf.cancel(withError: ProcedureKitError.parent(cancelledWithErrors: errors))
             }

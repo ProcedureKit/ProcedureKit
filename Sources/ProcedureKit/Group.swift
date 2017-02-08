@@ -219,7 +219,6 @@ open class GroupProcedure: Procedure, ProcedureQueueDelegate {
      */
     open func childWillFinishWithoutErrors(_ child: Operation) { /* no-op */ }
 
-
     // MARK: - ProcedureQueueDelegate
 
     /**

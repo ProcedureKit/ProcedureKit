@@ -52,14 +52,13 @@ public extension RetryFailureInfo {
     }
 }
 
-
 internal class RetryIterator<T: Procedure>: IteratorProtocol {
     typealias Payload = RepeatProcedure<T>.Payload
     typealias Handler = RetryProcedure<T>.Handler
     typealias FailureInfo = RetryProcedure<T>.FailureInfo
 
     internal let handler: Handler
-    internal var info: FailureInfo? = nil
+    internal var info: FailureInfo?
     private var iterator: AnyIterator<Payload>
 
     init<PayloadIterator: IteratorProtocol>(handler: @escaping Handler, iterator base: PayloadIterator) where PayloadIterator.Element == Payload {

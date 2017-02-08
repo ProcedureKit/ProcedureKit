@@ -216,8 +216,8 @@ open class Condition: ConditionProtocol, Hashable {
     }
 
     fileprivate let stateLock = PThreadMutex()
-    private weak var _procedure: Procedure? = nil
-    fileprivate var _name: String? = nil // swiftlint:disable:this variable_name
+    private weak var _procedure: Procedure?
+    fileprivate var _name: String? // swiftlint:disable:this variable_name
     private var _dependencyRequirements: DependencyRequirements = .none
     fileprivate var _output: Pending<ConditionResult> = .pending // swiftlint:disable:this variable_name
     private var _producedDependencies = Set<Operation>()
@@ -545,7 +545,7 @@ open class CompoundCondition: Condition {
 
     public let conditions: [Condition]
 
-    private var _currentEvaluationContext: ConditionEvaluationContext? = nil
+    private var _currentEvaluationContext: ConditionEvaluationContext?
     private var currentEvaluationContext: ConditionEvaluationContext? {
         get { return stateLock.withCriticalScope { _currentEvaluationContext } }
         set {
@@ -750,7 +750,7 @@ open class ComposedCondition<C: Condition>: Condition {
      */
     public let condition: C
 
-    private var _currentEvaluationContext: ConditionEvaluationContext? = nil
+    private var _currentEvaluationContext: ConditionEvaluationContext?
     private var currentEvaluationContext: ConditionEvaluationContext? {
         get { return stateLock.withCriticalScope { _currentEvaluationContext } }
         set {
@@ -884,7 +884,7 @@ internal class ConditionEvaluationContext {
         }
         return __procedureQueue!
     }
-    private var __procedureQueue: ProcedureQueue? = nil // swiftlint:disable:this variable_name
+    private var __procedureQueue: ProcedureQueue? // swiftlint:disable:this variable_name
 
     func cancel() {
         stateLock.withCriticalScope {
@@ -980,7 +980,7 @@ fileprivate class ConditionResultAggregator {
     private let stateLock = PThreadMutex()
     private var _oustandingExpectations = 0
     private var _aggregatedResults = [ConditionResult]()
-    private var _hasFinishedWithResult: ConditionResult? = nil
+    private var _hasFinishedWithResult: ConditionResult?
     private let resultAggregationBehavior: ConditionResultAggregationBehavior
     private let group = DispatchGroup()
 
@@ -1079,7 +1079,7 @@ fileprivate class ConditionResultAggregator {
         }
     }
 
-    func notify(queue: DispatchQueue, execute: @escaping (ConditionResult) -> ()) {
+    func notify(queue: DispatchQueue, execute: @escaping (ConditionResult) -> Void) {
         group.notify(queue: queue) {
             execute(self.result)
         }

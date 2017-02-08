@@ -63,7 +63,7 @@ public class TestableNetworkReachability {
     private var _didStartNotifier = false
     private var _didStopNotifier = false
     private var _log: LoggerProtocol = Logger()
-    private var _delegate: NetworkReachabilityDelegate? = nil
+    private weak var _delegate: NetworkReachabilityDelegate?
 
     public init() { }
 }

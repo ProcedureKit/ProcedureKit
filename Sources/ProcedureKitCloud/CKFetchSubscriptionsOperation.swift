@@ -80,5 +80,4 @@ extension CloudKitProcedure where T: CKFetchSubscriptionsOperationProtocol, T: A
     }
 }
 
-
 #endif

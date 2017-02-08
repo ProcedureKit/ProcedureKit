@@ -121,7 +121,6 @@ public struct ProcedureKitError: Error, Equatable, CustomStringConvertible {
 
     public static let unknown = ProcedureKitError(context: .unknown, errors: [])
 
-
     public let context: Context
     public let errors: [Error]
 

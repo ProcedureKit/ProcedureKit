@@ -40,7 +40,7 @@ open class NetworkDownloadProcedure<Session: URLSessionTaskFactory>: Procedure, 
     public let completion: CompletionBlock
 
     private let stateLock = NSLock()
-    internal private(set) var task: Session.DownloadTask? = nil
+    internal private(set) var task: Session.DownloadTask?
     private var _input: Pending<URLRequest> = .pending
     private var _output: Pending<NetworkResult> = .pending
 

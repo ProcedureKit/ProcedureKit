@@ -23,8 +23,8 @@ public class BackgroundObserver: NSObject, ProcedureObserver {
     static let backgroundTaskName = "Background Observer"
 
     private let stateLock = NSLock()
-    private var _identifier: UIBackgroundTaskIdentifier? = nil
-    private var _log: LoggerProtocol? = nil
+    private var _identifier: UIBackgroundTaskIdentifier?
+    private var _log: LoggerProtocol?
     private let application: BackgroundTaskApplicationProtocol
 
     private var isInBackground: Bool {
