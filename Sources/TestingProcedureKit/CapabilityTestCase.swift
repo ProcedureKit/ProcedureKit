@@ -26,7 +26,6 @@ public class TestableCapability: CapabilityProtocol {
         }
     }
 
-
     public var requirement: Status.Requirement? = .minimum
     public var isAsynchronous = false
     public var serviceIsAvailable = true

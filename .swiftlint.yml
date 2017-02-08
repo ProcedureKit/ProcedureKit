@@ -5,8 +5,11 @@ disabled_rules:
   - statement_position
   - line_length
   - type_name
+  - large_tuple
+  - implicit_getter
+  - syntactic_sugar
 file_length:
-  warning: 500
+  warning: 750
   error: 1200
 variable_name:
   excluded:

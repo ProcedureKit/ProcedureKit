@@ -11,7 +11,7 @@ import ProcedureKit
 open class ProcedureKitTestCase: XCTestCase {
 
     public var queue: ProcedureQueue!
-    public var delegate: QueueTestDelegate!
+    public weak var delegate: QueueTestDelegate!
     open var procedure: TestProcedure!
 
     open override func setUp() {

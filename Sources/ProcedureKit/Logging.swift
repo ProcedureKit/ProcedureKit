@@ -49,7 +49,6 @@ import Dispatch
  */
 public typealias LoggerInfo = (message: String, severity: LogSeverity, file: String, function: String, line: Int)
 
-
 /**
  A typealias for a logging block. This is an easy way
  to pipe the message string into another logging system.
@@ -178,9 +177,7 @@ public class LogManager: LogManagerProtocol {
     private var _logger: LoggerBlockType
 }
 
-
 // MARK: - Logging
-
 
 /**
  LoggerProtocol
@@ -332,7 +329,7 @@ internal struct LoggerContext: LoggerProtocol {
 
     public var logger: LoggerBlockType
 
-    public var operationName: String? = nil
+    public var operationName: String?
 
     public init(parent: LoggerProtocol, operationName name: String) {
         severity = parent.severity
@@ -352,7 +349,7 @@ public struct _Logger<M: LogManagerProtocol>: LoggerProtocol {
 
     public var logger: LoggerBlockType
 
-    public var operationName: String? = nil
+    public var operationName: String?
 
     // break out the different inits to speed-up obtaining the current values from the Manager
     // (i.e. to only require a single lock)
@@ -363,7 +360,7 @@ public struct _Logger<M: LogManagerProtocol>: LoggerProtocol {
         self.enabled = managerValues.enabled
         self.logger = managerValues.logger
     }
-    
+
     public init(severity: LogSeverity) {
         let managerValues = Manager.allValues
         self.severity = severity
@@ -377,33 +374,33 @@ public struct _Logger<M: LogManagerProtocol>: LoggerProtocol {
         self.enabled = enabled
         self.logger = managerValues.logger
     }
-    
+
     public init(severity: LogSeverity, logger: @escaping LoggerBlockType) {
         self.severity = severity
         self.enabled = Manager.enabled
         self.logger = logger
     }
-    
+
     public init(severity: LogSeverity, enabled: Bool, logger: @escaping LoggerBlockType) {
         self.severity = severity
         self.enabled = enabled
         self.logger = logger
     }
-    
+
     public init(enabled: Bool) {
         let managerValues = Manager.allValues
         self.severity = managerValues.severity
         self.enabled = enabled
         self.logger = managerValues.logger
     }
-    
+
     public init(enabled: Bool, logger: @escaping LoggerBlockType) {
         let managerValues = Manager.allValues
         self.severity = managerValues.severity
         self.enabled = enabled
         self.logger = logger
     }
-    
+
     public init(logger: @escaping LoggerBlockType) {
         let managerValues = Manager.allValues
         self.severity = managerValues.severity

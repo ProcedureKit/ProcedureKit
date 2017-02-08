@@ -41,7 +41,7 @@ public class EventQueue {
         #endif
         // does nothing if not compiled in Debug mode
     }
-    
+
     #if DEBUG
     internal var isOnQueue: Bool {
         guard let retrieved = DispatchQueue.getSpecific(key: key) else { return false }
@@ -150,7 +150,7 @@ internal extension EventQueue {
     internal func dispatchSynchronizedBlock(onOtherQueue otherQueue: DispatchQueueProtocol, block: @escaping () -> Void) {
         debugAssertIsOnQueue()
         assert(otherQueue !== self, "Cannot dispatch synchronized block onOtherQueue if otherQueue is self.")
-        
+
         // acquire the QoS class of the current block on the receiver queue
         let originalQueueQoS = DispatchQoS(qosClass: DispatchQueue.currentQoSClass, relativePriority: 0)
 

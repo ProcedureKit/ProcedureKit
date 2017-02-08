@@ -67,7 +67,6 @@ public protocol SystemReachability {
     func reachability(of: URL, block: @escaping (Reachability.NetworkStatus) -> Void)
 }
 
-
 // MARK: Conformance
 
 extension Reachability.NetworkStatus: Equatable {
@@ -83,7 +82,6 @@ extension Reachability.NetworkStatus: Equatable {
         }
     }
 }
-
 
 public extension Reachability.NetworkStatus {
 

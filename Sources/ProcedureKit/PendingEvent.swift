@@ -81,7 +81,7 @@ final public class PendingEvent: CustomStringConvertible {
     }
 
     // ensures that a block is executed prior to the PendingEvent
-    public func doBeforeEvent(block: () -> ()) {
+    public func doBeforeEvent(block: () -> Void) {
         group.enter()
         block()
         group.leave()
@@ -121,4 +121,3 @@ internal extension PendingEvent {
 public typealias PendingExecuteEvent = PendingEvent
 public typealias PendingFinishEvent = PendingEvent
 public typealias PendingAddOperationEvent = PendingEvent
-

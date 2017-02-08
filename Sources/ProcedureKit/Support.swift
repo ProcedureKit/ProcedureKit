@@ -147,7 +147,7 @@ public extension Protector where T: RangeReplaceableCollection {
         }
     }
 
-    func append<C : Collection>(contentsOf newElements: C) where C.Iterator.Element == T.Iterator.Element {
+    func append<C: Collection>(contentsOf newElements: C) where C.Iterator.Element == T.Iterator.Element {
         write { (ward: inout T) in
             ward.append(contentsOf: newElements)
         }
@@ -190,4 +190,3 @@ public extension NSRecursiveLock {
         return value
     }
 }
-

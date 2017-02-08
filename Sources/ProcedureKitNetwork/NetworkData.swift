@@ -40,7 +40,7 @@ open class NetworkDataProcedure<Session: URLSessionTaskFactory>: Procedure, Inpu
     public let completion: CompletionBlock
 
     private let stateLock = NSLock()
-    internal private(set) var task: Session.DataTask? = nil // internal for testing
+    internal private(set) var task: Session.DataTask? // internal for testing
     private var _input: Pending<URLRequest> = .pending
     private var _output: Pending<NetworkResult> = .pending
 

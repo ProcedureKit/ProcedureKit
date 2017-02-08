@@ -125,7 +125,7 @@ public struct WillExecuteObserver<Procedure: ProcedureProtocol>: ProcedureObserv
     private let block: Observer<Procedure>.WillExecute
 
     /// - returns: a block which is called when the observer is attached to a procedure
-    public var didAttachToProcedure: Observer<Procedure>.DidAttach? = nil
+    public var didAttachToProcedure: Observer<Procedure>.DidAttach?
 
     /// - returns: the queue onto which observer callbacks are dispatched
     public let eventQueue: DispatchQueueProtocol?
@@ -168,7 +168,7 @@ public struct DidExecuteObserver<Procedure: ProcedureProtocol>: ProcedureObserve
     private let block: Observer<Procedure>.DidExecute
 
     /// - returns: a block which is called when the observer is attached to a procedure
-    public var didAttachToProcedure: Observer<Procedure>.DidAttach? = nil
+    public var didAttachToProcedure: Observer<Procedure>.DidAttach?
 
     /// - returns: the queue onto which observer callbacks are dispatched
     public let eventQueue: DispatchQueueProtocol?
@@ -201,7 +201,7 @@ public struct DidCancelObserver<Procedure: ProcedureProtocol>: ProcedureObserver
     private let block: Observer<Procedure>.DidCancel
 
     /// - returns: a block which is called when the observer is attached to a procedure
-    public var didAttachToProcedure: Observer<Procedure>.DidAttach? = nil
+    public var didAttachToProcedure: Observer<Procedure>.DidAttach?
 
     /// - returns: the queue onto which observer callbacks are dispatched
     public let eventQueue: DispatchQueueProtocol?
@@ -234,7 +234,7 @@ public struct WillAddOperationObserver<Procedure: ProcedureProtocol>: ProcedureO
     private let block: Observer<Procedure>.WillAdd
 
     /// - returns: a block which is called when the observer is attached to a procedure
-    public var didAttachToProcedure: Observer<Procedure>.DidAttach? = nil
+    public var didAttachToProcedure: Observer<Procedure>.DidAttach?
 
     /// - returns: the queue onto which observer callbacks are dispatched
     public let eventQueue: DispatchQueueProtocol?
@@ -267,7 +267,7 @@ public struct DidAddOperationObserver<Procedure: ProcedureProtocol>: ProcedureOb
     private let block: Observer<Procedure>.DidAdd
 
     /// - returns: a block which is called when the observer is attached to a procedure
-    public var didAttachToProcedure: Observer<Procedure>.DidAttach? = nil
+    public var didAttachToProcedure: Observer<Procedure>.DidAttach?
 
     /// - returns: the queue onto which observer callbacks are dispatched
     public let eventQueue: DispatchQueueProtocol?
@@ -300,7 +300,7 @@ public struct WillFinishObserver<Procedure: ProcedureProtocol>: ProcedureObserve
     private let block: Observer<Procedure>.WillFinish
 
     /// - returns: a block which is called when the observer is attached to a procedure
-    public var didAttachToProcedure: Observer<Procedure>.DidAttach? = nil
+    public var didAttachToProcedure: Observer<Procedure>.DidAttach?
 
     /// - returns: the queue onto which observer callbacks are dispatched
     public let eventQueue: DispatchQueueProtocol?
@@ -335,7 +335,7 @@ public struct DidFinishObserver<Procedure: ProcedureProtocol>: ProcedureObserver
     private let block: Observer<Procedure>.DidFinish
 
     /// - returns: a block which is called when the observer is attached to a procedure
-    public var didAttachToProcedure: Observer<Procedure>.DidAttach? = nil
+    public var didAttachToProcedure: Observer<Procedure>.DidAttach?
 
     /// - returns: the queue onto which observer callbacks are dispatched
     public let eventQueue: DispatchQueueProtocol?

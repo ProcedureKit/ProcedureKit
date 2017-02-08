@@ -132,21 +132,21 @@ public protocol ProcedureQueueDelegate: class {
 public extension ProcedureQueueDelegate {
 
     // Operations
-    
+
     func procedureQueue(_ queue: ProcedureQueue, willAddOperation operation: Operation, context: Any?) -> ProcedureFuture? { /* default no-op */ return nil }
 
     func procedureQueue(_ queue: ProcedureQueue, didAddOperation operation: Operation, context: Any?) { /* default no-op */ }
 
     func procedureQueue(_ queue: ProcedureQueue, didFinishOperation operation: Operation) { /* default no-op */ }
-    
+
     // Procedures
-    
+
     func procedureQueue(_ queue: ProcedureQueue, willAddProcedure procedure: Procedure, context: Any?) -> ProcedureFuture? { /* default no-op */ return nil }
-    
+
     func procedureQueue(_ queue: ProcedureQueue, didAddProcedure procedure: Procedure, context: Any?) { /* default no-op */ }
-    
+
     func procedureQueue(_ queue: ProcedureQueue, willFinishProcedure procedure: Procedure, withErrors errors: [Error]) -> ProcedureFuture? { /* default no-op */ return nil }
-    
+
     func procedureQueue(_ queue: ProcedureQueue, didFinishProcedure procedure: Procedure, withErrors errors: [Error]) { /* default no-op */ }
 }
 
@@ -182,8 +182,7 @@ open class ProcedureQueue: OperationQueue {
 
      - parameter delegate: a weak `ProcedureQueueDelegate?`
      */
-    open weak var delegate: ProcedureQueueDelegate? = nil
-
+    open weak var delegate: ProcedureQueueDelegate?
 
     // swiftlint:disable function_body_length
     // swiftlint:disable cyclomatic_complexity
@@ -218,7 +217,6 @@ open class ProcedureQueue: OperationQueue {
     // swiftlint:enable cyclomatic_complexity
     // swiftlint:enable function_body_length
 
-
     /**
      Adds the operations to the queue.
 
@@ -234,9 +232,7 @@ open class ProcedureQueue: OperationQueue {
         add(operation: operation)
     }
 
-
     // MARK: - Private Implementation
-
 
     private func _add(operation: Operation, context: Any?, promise: ProcedurePromise) {
 
@@ -370,7 +366,6 @@ public extension ProcedureQueue {
     }
 }
 
-
 /// Public extensions on OperationQueue
 public extension OperationQueue {
 
@@ -391,7 +386,6 @@ public extension OperationQueue {
     }
 }
 
-
 /// A ProcedureFuture that is used internally to shortcut dispatching async when no waiting is required.
 fileprivate class _SyncAlreadyAvailableFuture: ProcedureFuture {
     internal init() { }
@@ -408,4 +402,4 @@ fileprivate class _SyncAlreadyAvailableFuture: ProcedureFuture {
 // MARK: - Unavilable & Renamed
 
 @available(*, unavailable, renamed: "ProcedureQueueDelegate")
-public protocol OperationQueueDelegate { }
+public protocol OperationQueueDelegate: class { }

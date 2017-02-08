@@ -70,7 +70,7 @@ extension Capability {
 
         internal let containerId: String?
 
-        internal var storedRegistrar: CloudKitContainerRegistrar? = nil
+        internal var storedRegistrar: CloudKitContainerRegistrar?
         internal var registrar: CloudKitContainerRegistrar {
             get {
                 storedRegistrar = storedRegistrar ?? containerId.map { CKContainer(identifier: $0) } ?? CKContainer.default()

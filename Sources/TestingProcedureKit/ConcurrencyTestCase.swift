@@ -176,7 +176,6 @@ open class TestConcurrencyTrackingProcedure: Procedure {
     }
 }
 
-
 // MARK: - EventConcurrencyTrackingRegistrar
 
 // Tracks Procedure Events and the Threads on which they occur.
@@ -209,7 +208,7 @@ public class EventConcurrencyTrackingRegistrar {
         // GroupProcedure non-final public functions
         case override_child_didAttemptRecoveryFromErrors(String)
 
-        public var description : String {
+        public var description: String {
             switch self {
             case .do_Execute: return "execute()"
             case .observer_didAttach: return "observer_didAttach"
@@ -233,7 +232,8 @@ public class EventConcurrencyTrackingRegistrar {
             case .override_child_didAttemptRecoveryFromErrors(let child): return "child(_:didAttemptRecoveryFromErrors:) [\(child)]"
             }
         }
-        public static func ==(lhs: EventConcurrencyTrackingRegistrar.ProcedureEvent, rhs: EventConcurrencyTrackingRegistrar.ProcedureEvent) -> Bool {
+
+        public static func == (lhs: EventConcurrencyTrackingRegistrar.ProcedureEvent, rhs: EventConcurrencyTrackingRegistrar.ProcedureEvent) -> Bool {
             switch (lhs, rhs) {
                 case (.do_Execute, .do_Execute),
                      (.observer_didAttach, .observer_didAttach),
@@ -293,7 +293,7 @@ public class EventConcurrencyTrackingRegistrar {
             //let uuidString = threadUUID.uuidString
             return uuidString.substring(to: uuidString.index(uuidString.startIndex, offsetBy: 4))
         }
-        public var description : String {
+        public var description: String {
             var description = "+ \(newEvent.event) (t: \(truncateThreadID(newEvent.threadUUID))) while: " /*+
              "while: \n"*/
             for (_, event) in currentEvents {
@@ -311,7 +311,7 @@ public class EventConcurrencyTrackingRegistrar {
 
         // a list of detected concurrent events
         var detectedConcurrentEvents = DetectedConcurrentEventSet()
-        
+
         // a history of all detected events (optional)
         var eventHistory: [ProcedureEvent] = []
     }
@@ -389,7 +389,7 @@ open class ConcurrencyTrackingObserver: ProcedureObserver {
     public let eventQueue: DispatchQueueProtocol?
     let callbackBlock: (Procedure, EventConcurrencyTrackingRegistrar.ProcedureEvent) -> Void
 
-    public init(registrar: EventConcurrencyTrackingRegistrar? = nil, eventQueue: DispatchQueueProtocol? = nil, callbackBlock: @escaping (Procedure, EventConcurrencyTrackingRegistrar.ProcedureEvent) -> Void = { _, _ in } ) {
+    public init(registrar: EventConcurrencyTrackingRegistrar? = nil, eventQueue: DispatchQueueProtocol? = nil, callbackBlock: @escaping (Procedure, EventConcurrencyTrackingRegistrar.ProcedureEvent) -> Void = { _, _ in }) {
         if let registrar = registrar {
             self.registrar = registrar
         }
@@ -406,7 +406,7 @@ open class ConcurrencyTrackingObserver: ProcedureObserver {
         }
     }
 
-    public func will(execute procedure: Procedure, pendingExecute: PendingExecuteEvent) { doRun(.observer_willExecute, block: { callback in callbackBlock(procedure, callback) } ) }
+    public func will(execute procedure: Procedure, pendingExecute: PendingExecuteEvent) { doRun(.observer_willExecute, block: { callback in callbackBlock(procedure, callback) }) }
 
     public func did(execute procedure: Procedure) { doRun(.observer_didExecute, block: { callback in callbackBlock(procedure, callback) }) }
 

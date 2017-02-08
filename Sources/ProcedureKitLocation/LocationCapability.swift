@@ -47,7 +47,7 @@ public extension Capability {
 
         internal lazy var registrar: LocationServicesRegistrarProtocol = CLLocationManager.make()
 
-        private var authorizationDelegate: LocationManagerAuthorizationDelegate? = nil
+        private weak var authorizationDelegate: LocationManagerAuthorizationDelegate?
 
         public init(_ requirement: LocationUsage = .whenInUse) {
             self.requirement = requirement

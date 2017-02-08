@@ -173,18 +173,18 @@ public class TestableURLSessionTaskFactory {
     // Private (protected) Properties
     private var _delay: TimeInterval = 0
     private var _returnedResponse: HTTPURLResponse? = HTTPURLResponse()
-    private var _returnedError: Error? = nil
+    private var _returnedError: Error?
 
-    private var _didReceiveDataRequest: URLRequest? = nil
-    private var _didReturnDataTask: TestableURLSessionTask? = nil
+    private var _didReceiveDataRequest: URLRequest?
+    private var _didReturnDataTask: TestableURLSessionTask?
     private var _returnedData: Data? = "hello world".data(using: String.Encoding.utf8)
 
-    private var _didReceiveDownloadRequest: URLRequest? = nil
-    private var _didReturnDownloadTask: TestableURLSessionTask? = nil
+    private var _didReceiveDownloadRequest: URLRequest?
+    private var _didReturnDownloadTask: TestableURLSessionTask?
     private var _returnedURL: URL? = URL(fileURLWithPath: "/var/tmp/hello/this/is/a/test/url")
 
-    private var _didReceiveUploadRequest: URLRequest? = nil
-    private var _didReturnUploadTask: TestableURLSessionTask? = nil
+    private var _didReceiveUploadRequest: URLRequest?
+    private var _didReturnUploadTask: TestableURLSessionTask?
 
     // Initializers
     public init() { }

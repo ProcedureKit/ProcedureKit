@@ -105,7 +105,6 @@ extension Capability {
     }
 }
 
-
 // MARK: - AnyCapability
 
 internal class AnyCapabilityBox_<Status: AuthorizationStatus>: CapabilityProtocol {

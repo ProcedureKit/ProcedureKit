@@ -98,7 +98,7 @@ public extension ProcedureObserver {
     // MARK: - Unavailable/renamed observer callbacks
     @available(*, unavailable, renamed: "will(execute:pendingExecute:)")
     func will(execute procedure: Procedure) { }
-    
+
     @available(*, unavailable, renamed: "will(finish:withErrors:pendingFinish:)")
     func will(finish procedure: Procedure, withErrors: [Error]) { }
 }
@@ -123,7 +123,6 @@ public extension ProcedureObserver {
 
     var eventQueue: DispatchQueueProtocol? { return nil }
 }
-
 
 // MARK: - Unavilable & Renamed
 

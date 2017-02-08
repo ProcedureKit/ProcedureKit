@@ -81,7 +81,7 @@ open class RepeatProcedure<T: Operation>: GroupProcedure {
 
     private let _repeatStateLock = PThreadMutex()
 
-    private var _previous: T? = nil
+    private var _previous: T?
     /// - returns: the previous executing operation instance of T
     public internal(set) var previous: T? {
         get { return _repeatStateLock.withCriticalScope { _previous } }
@@ -308,7 +308,6 @@ open class RepeatProcedure<T: Operation>: GroupProcedure {
     }
 }
 
-
 // MARK: - Repeatable
 
 /// Repeatable protocol is a very simple protocol which allows
@@ -377,13 +376,12 @@ extension RepeatProcedure where T: OutputProcedure {
     }
 }
 
-
 // MARK: - Iterators
 
 internal struct RepeatableGenerator<Element: Repeatable>: IteratorProtocol {
 
     private var iterator: CountingIterator<Element>
-    private var latest: Element? = nil
+    private var latest: Element?
 
     init<I: IteratorProtocol>(_ base: I) where I.Element == Element {
         let mutatingBaseIterator = AnyIterator(base)
