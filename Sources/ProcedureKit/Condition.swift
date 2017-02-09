@@ -98,7 +98,7 @@ public extension ProcedureKitError {
     }
 
     public struct ConditionEvaluationCancelled: Error {
-        internal init() { }
+        public init() { }
     }
 
     public struct ConditionDependenciesFailed: Error, Equatable, CustomStringConvertible {

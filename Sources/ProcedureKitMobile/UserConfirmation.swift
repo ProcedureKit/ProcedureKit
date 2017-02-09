@@ -7,30 +7,43 @@
 import Foundation
 import UIKit
 
-public protocol Alert {
+public class UserConfirmationCondition: Condition {
 
-    var preferredStyle: UIAlertControllerStyle { get }
+    public enum Response {
+        case unknown, confirmed, cancelled
+    }
 
-    var title: String? { get set }
+    fileprivate var alert: AlertProcedure
+    private var response: Response = .unknown
 
-    var message: String? { get set }
+    public init(presentAlertFrom presenting: PresentingViewController, withPreferredStyle preferredAlertStyle: UIAlertControllerStyle = .alert, title: String = "User confirmation", message: String? = nil, confirmMessage: String = NSLocalizedString("Okay", comment: "Okay"), isDestructive: Bool = true, cancelMessage: String = NSLocalizedString("Cancel", comment: "Cancel")) {
 
-    var actions: [UIAlertAction] { get }
+        alert = AlertProcedure(presentAlertFrom: presenting, withPreferredStyle: preferredAlertStyle, waitForDismissal: true)
+        super.init()
+        name = "UserConfirmationCondition"
+        alert.title = title
+        alert.message = message
+        alert.add(actionWithTitle: confirmMessage, style: isDestructive ? .destructive : .default) { [weak self] _, _ in
+            self?.response = .confirmed
+        }
+        alert.add(actionWithTitle: cancelMessage, style: .cancel) { [weak self] _, _ in
+            self?.response = .cancelled
+        }
+        produce(dependency: alert)
+    }
 
-    @available (iOS 9.0, *)
-    var preferredAction: UIAlertAction? { get set }
-
-    var textFields: [UITextField]? { get }
-
-    @discardableResult func add(actionWithTitle title: String?, style: UIAlertActionStyle, handler: @escaping (AlertProcedure, UIAlertAction) -> Void) -> UIAlertAction
+    public override func evaluate(procedure: Procedure, completion: @escaping (ConditionResult) -> Void) {
+        completion({
+            switch response {
+            case .unknown: return .failure(ProcedureKitError.unknown)
+            case .cancelled: return .failure(ProcedureKitError.ConditionEvaluationCancelled())
+            case .confirmed: return .success(true)
+            }
+        }())
+    }
 }
 
-public class AlertProcedure: UIProcedure, Alert {
-
-    /// - returns: the presented `UIAlertController`.
-    public var alert: UIAlertController {
-        return presented as! UIAlertController // swiftlint:disable:this force_cast
-    }
+extension UserConfirmationCondition: Alert {
 
     /**
      The style of the alert controller. (read-only)
@@ -110,19 +123,6 @@ public class AlertProcedure: UIProcedure, Alert {
     }
 
     /**
-     Creates an `AlertProcedure`. It must be constructed with the view
-     controller which the alert will be presented from.
-
-     - parameter from: a generic type conforming to `PresentingViewController`,
-     such as an `UIViewController`
-     */
-    public init(presentAlertFrom presenting: PresentingViewController, withPreferredStyle preferredAlertStyle: UIAlertControllerStyle = .alert, waitForDismissal: Bool = true) {
-        let alert = UIAlertController(title: nil, message: nil, preferredStyle: preferredAlertStyle)
-        super.init(present: alert, from: presenting, withStyle: .present, inNavigationController: false, sender: nil, finishAfterPresenting: !waitForDismissal)
-        add(condition: MutuallyExclusive<UIAlertController>())
-    }
-
-    /**
      Adds an action button with a title, style and handler.
 
      Do not add actions directly to the `UIAlertController`, as
@@ -133,34 +133,6 @@ public class AlertProcedure: UIProcedure, Alert {
      - parameter handler: a block which receives the operation, and returns Void.
      */
     @discardableResult public func add(actionWithTitle title: String?, style: UIAlertActionStyle = .default, handler: @escaping (AlertProcedure, UIAlertAction) -> Void = { _, _ in }) -> UIAlertAction {
-        let action = UIAlertAction(title: title, style: style) { [weak self] action in
-            guard let strongSelf = self else { return }
-            handler(strongSelf, action)
-            if strongSelf.shouldWaitUntilDismissal {
-                strongSelf.finish()
-            }
-        }
-        alert.addAction(action)
-        return action
-    }
-
-    /**
-     Adds a text field to an alert.
-
-     Calling this method adds an editable text field to the alert. You can call this method more than once to add additional text fields. The text fields are stacked in the resulting alert.
-
-     You can add a text field only if the [preferredStyle](https://developer.apple.com/library/ios/documentation/UIKit/Reference/UIAlertController_class/#//apple_ref/occ/instp/UIAlertController/preferredStyle) property is set to [UIAlertControllerStyleAlert](https://developer.apple.com/library/ios/documentation/UIKit/Reference/UIAlertController_class/#//apple_ref/c/tdef/UIAlertControllerStyle).
-
-     - parameter configurationHandler: A block for configuring the text field prior to displaying the alert. This block has no return value and takes a single parameter corresponding to the text field object. Use that parameter to change the text field properties.
-     */
-    public func addTextField(configurationHandler: ((UITextField) -> Void)?) {
-        alert.addTextField(configurationHandler: configurationHandler)
-    }
-
-    public override func execute() {
-        if alert.actions.isEmpty {
-            add(actionWithTitle: NSLocalizedString("Okay", comment: "Okay"))
-        }
-        super.execute()
+        return alert.add(actionWithTitle: title, style: style, handler: handler)
     }
 }
