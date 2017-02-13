@@ -217,6 +217,7 @@
 		65ECB2FE1DB50BC500F96F46 /* TestingProcedureKit.framework in Copy Dependencies */ = {isa = PBXBuildFile; fileRef = 65CFC6161D60900000CAD875 /* TestingProcedureKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		65ECB3001DB50BD900F96F46 /* ProcedureKit.framework in Copy Dependencies */ = {isa = PBXBuildFile; fileRef = 65CFC5F01D608A5500CAD875 /* ProcedureKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		65ECB3011DB50BD900F96F46 /* TestingProcedureKit.framework in Copy Dependencies */ = {isa = PBXBuildFile; fileRef = 65CFC6161D60900000CAD875 /* TestingProcedureKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		65FFC36F1E4BDF03005DC38F /* UserConfirmation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65FFC36E1E4BDF03005DC38F /* UserConfirmation.swift */; };
 		EE3371091E29AD5A004272E9 /* DispatchQueueExtensionsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE3371071E29AD3E004272E9 /* DispatchQueueExtensionsTests.swift */; };
 		EEE79AE81E21B9C90030C768 /* PendingEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEE79AE71E21B9C90030C768 /* PendingEvent.swift */; };
 		EEE79AEB1E21B9D30030C768 /* ProcedureEventQueue.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEE79AE91E21B9D30030C768 /* ProcedureEventQueue.swift */; };
@@ -699,6 +700,7 @@
 		65ECB2D51DB4F0C000F96F46 /* ProcedureKitNetworkTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ProcedureKitNetworkTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		65ECB2E81DB4F1A200F96F46 /* ProcedureKitNetwork.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ProcedureKitNetwork.h; path = "Supporting Files/ProcedureKitNetwork.h"; sourceTree = "<group>"; };
 		65ECB2E91DB4F1A200F96F46 /* ProcedureKitNetwork.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = ProcedureKitNetwork.xcconfig; path = "Supporting Files/ProcedureKitNetwork.xcconfig"; sourceTree = "<group>"; };
+		65FFC36E1E4BDF03005DC38F /* UserConfirmation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserConfirmation.swift; sourceTree = "<group>"; };
 		EE3371071E29AD3E004272E9 /* DispatchQueueExtensionsTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DispatchQueueExtensionsTests.swift; sourceTree = "<group>"; };
 		EEE79AE71E21B9C90030C768 /* PendingEvent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PendingEvent.swift; sourceTree = "<group>"; };
 		EEE79AE91E21B9D30030C768 /* ProcedureEventQueue.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProcedureEventQueue.swift; sourceTree = "<group>"; };
@@ -1171,6 +1173,7 @@
 				65D368231E18451C00D03E86 /* BackgroundObserver.swift */,
 				65D368241E18451C00D03E86 /* NetworkObserver+Mobile.swift */,
 				65D368251E18451C00D03E86 /* UI.swift */,
+				65FFC36E1E4BDF03005DC38F /* UserConfirmation.swift */,
 			);
 			name = ProcedureKitMobile;
 			path = Sources/ProcedureKitMobile;
@@ -1916,6 +1919,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				65FFC36F1E4BDF03005DC38F /* UserConfirmation.swift in Sources */,
 				65D368261E18451C00D03E86 /* Alert.swift in Sources */,
 				65D368291E18451C00D03E86 /* UI.swift in Sources */,
 				65D368281E18451C00D03E86 /* NetworkObserver+Mobile.swift in Sources */,
