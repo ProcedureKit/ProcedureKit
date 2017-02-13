@@ -7,25 +7,7 @@
 import Foundation
 import UIKit
 
-public protocol Alert {
-
-    var preferredStyle: UIAlertControllerStyle { get }
-
-    var title: String? { get set }
-
-    var message: String? { get set }
-
-    var actions: [UIAlertAction] { get }
-
-    @available (iOS 9.0, *)
-    var preferredAction: UIAlertAction? { get set }
-
-    var textFields: [UITextField]? { get }
-
-    @discardableResult func add(actionWithTitle title: String?, style: UIAlertActionStyle, handler: @escaping (AlertProcedure, UIAlertAction) -> Void) -> UIAlertAction
-}
-
-public class AlertProcedure: UIProcedure, Alert {
+public class AlertProcedure: UIProcedure {
 
     /// - returns: the presented `UIAlertController`.
     public var alert: UIAlertController {
