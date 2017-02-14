@@ -29,7 +29,7 @@ open class BlockProcedure: ResultProcedure<Void> { }
 open class AsyncResultProcedure<Output>: Procedure, OutputProcedure {
 
     public typealias FinishingBlock = (ProcedureResult<Output>) -> Void
-    public typealias Block = (AsyncResultProcedure, @escaping FinishingBlock) -> Void
+    public typealias Block = (AsyncResultProcedure?, @escaping FinishingBlock) -> Void
 
     private var block: Block
 
@@ -41,7 +41,8 @@ open class AsyncResultProcedure<Output>: Procedure, OutputProcedure {
     }
 
     open override func execute() {
-        block(self) { self.finish(withResult: $0) }
+        weak var weakSelf = self
+        block(weakSelf) { self.finish(withResult: $0) }
     }
 }
 
