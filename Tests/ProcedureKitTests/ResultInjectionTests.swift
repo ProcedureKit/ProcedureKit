@@ -110,7 +110,7 @@ class ResultInjectionTests: ResultInjectionTestCase {
             guard let procedureKitError = errors.first as? ProcedureKitError else {
                 XCTFail("Incorrect error received"); return
             }
-            XCTAssertEqual(procedureKitError.context, .parentCancelledWithErrors)
+            XCTAssertEqual(procedureKitError.context, .dependencyCancelledWithErrors)
         }
         procedure.cancel()
         wait(for: processing, procedure)

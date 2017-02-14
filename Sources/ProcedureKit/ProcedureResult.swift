@@ -151,7 +151,7 @@ public extension ProcedureProtocol {
 
         dependency.addDidCancelBlockObserver { [weak self] _, errors in
             if let strongSelf = self {
-                strongSelf.cancel(withError: ProcedureKitError.parent(cancelledWithErrors: errors))
+                strongSelf.cancel(withError: ProcedureKitError.dependency(cancelledWithErrors: errors))
             }
         }
 
