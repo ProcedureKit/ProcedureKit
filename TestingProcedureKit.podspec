@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name              = "TestingProcedureKit"
-  s.version           = "4.0.0"
+  s.version           = "4.0.0.beta.7"
   s.summary           = "XCTest support for ProcedureKit."
   s.description       = <<-DESC
   
@@ -11,7 +11,7 @@ session Advanced NSOperations: https://developer.apple.com/videos/wwdc/2015/?id=
   s.homepage          = "https://github.com/ProcedureKit/ProcedureKit"
   s.license           = 'MIT'
   s.authors           = { "ProcedureKit Core Contributors" => "hello@procedure.kit.run" }
-  s.source            = { :git => "https://github.com/ProcedureKit/ProcedureKit.git", :tag => "4.0.0.beta.6" }
+  s.source            = { :git => "https://github.com/ProcedureKit/ProcedureKit.git", :tag => s.version.to_s }
   s.module_name       = 'TestingProcedureKit'
   s.social_media_url  = 'https://twitter.com/danthorpe'
   s.requires_arc      = true
