@@ -1,3 +1,26 @@
+# 4.0.0 Beta 7
+
+## Breaking Changes
+1. [#668](https://github.com/ProcedureKit/ProcedureKit/pull/668) Adds Procedure event queue. Procedure now utilises an internal serial FIFO queue which dispatched user "events". Procedure events include anything that calls user code, like overridden methods, observer callbacks, injecting results from a dependency. See the PR for more details, there are some breaking changes here, which is very well documented in the PR description.
+2. [#681](https://github.com/ProcedureKit/ProcedureKit/pull/681) [@swiftlyfalling](https://github.com/swiftlyfalling) Refactors how Condition is implemented. There are breaking changes here which are well documented in PR description.
+
+## New APIs & Enhancements
+1. [#662](https://github.com/ProcedureKit/ProcedureKit/pull/662), [#673](https://github.com/ProcedureKit/ProcedureKit/pull/673) Improves the TimeoutObserver implementation by utilising a registrar to handle the lifetime of timers. By [@swiftlyfalling](https://github.com/swiftlyfalling).
+2. [#658](https://github.com/ProcedureKit/ProcedureKit/issues/658), [#659](https://github.com/ProcedureKit/ProcedureKit/pull/659) Adds Repeatable type.
+3. [#663](https://github.com/ProcedureKit/ProcedureKit/pull/663) Fixes building when using Swift Package Manager.
+4. [#664](https://github.com/ProcedureKit/ProcedureKit/pull/664) Improves Swift 3 URLError handling in Network procedures.
+5. [#690](https://github.com/ProcedureKit/ProcedureKit/pull/690) Adds `UserConfirmationCondition` as in _Operations_.
+6. [#676](https://github.com/ProcedureKit/ProcedureKit/pull/676) Enhances `AnyProcedure` to allow for `AnyOutputProcedure`. Thanks to [@sviatoslav](https://github.com/sviatoslav).
+
+## Bug Fixes
+1. [#660](https://github.com/ProcedureKit/ProcedureKit/issues/660), [#661](https://github.com/ProcedureKit/ProcedureKit/pull/661) Fixes a string conversion memory leak, which is actually a bug in Swift itself.
+2. [#666](https://github.com/ProcedureKit/ProcedureKit/pull/666) Fixes code signing issues that prevents compiling release configuration builds.
+3. [#669](https://github.com/ProcedureKit/ProcedureKit/pull/669) Fixes a type to Dan's GitHub profile.
+4. [#677](https://github.com/ProcedureKit/ProcedureKit/pull/677) Restricts `RetryProcedure` to only allow `Procedure` subclasses.
+5. [#679](https://github.com/ProcedureKit/ProcedureKit/pull/679) `AuthorizedFor` condition now ensures that the produced `AuthorizedCapabilityProcedure` is mutually exclusive, rather than the procedure it gets attached to.
+6. [#689](https://github.com/ProcedureKit/ProcedureKit/pull/689) Updates SwiftLint ruleset.
+7. [#687](https://github.com/ProcedureKit/ProcedureKit/pull/687) Uses `dependencyCancelledWithErrors` error context.
+
 # 4.0.0 Beta 6
 _ProcedureKit_ is nearing a final v4 release. Beta 6 sees all functionality that will be added for v4 in place. Some breaking changes around cancellation are currently being discussed, and will come in the next (and hopefully last) beta.
 

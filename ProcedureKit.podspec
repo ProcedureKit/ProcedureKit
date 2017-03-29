@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name              = "ProcedureKit"
-  s.version           = "4.0.0"
+  s.version           = "4.0.0.beta.7"
   s.summary           = "Powerful Operation subclasses in Swift."
   s.description       = <<-DESC
   
@@ -11,7 +11,7 @@ session Advanced NSOperations: https://developer.apple.com/videos/wwdc/2015/?id=
   s.homepage          = "https://github.com/ProcedureKit/ProcedureKit"
   s.license           = 'MIT'
   s.authors           = { "ProcedureKit Core Contributors" => "hello@procedure.kit.run" }
-  s.source            = { :git => "https://github.com/ProcedureKit/ProcedureKit.git", :tag => "4.0.0.beta.6" }
+  s.source            = { :git => "https://github.com/ProcedureKit/ProcedureKit.git", :tag => s.version.to_s }
   s.module_name       = 'ProcedureKit'
   s.social_media_url  = 'https://twitter.com/danthorpe'
   s.requires_arc      = true
@@ -28,36 +28,36 @@ session Advanced NSOperations: https://developer.apple.com/videos/wwdc/2015/?id=
 
   # Default core framework suitable for an iOS, watchOS, tvOS or macOS application
   s.subspec 'Standard' do |ss|
-    ss.source_files = ['Sources']
+    ss.source_files = ['Sources/ProcedureKit']
     ss.exclude_files = [
-      'Sources/Testing',
-      'Sources/Mobile',
-      'Sources/Mac',
-      'Sources/TV',
-      'Sources/Network',
-      'Sources/Cloud',
-      'Sources/Location'
+      'Sources/TestingProcedureKit',
+      'Sources/ProcedureKitMobile',
+      'Sources/ProcedureKitMac',
+      'Sources/ProcedureKitTV',
+      'Sources/ProcedureKitNetwork',
+      'Sources/ProcedureKitCloud',
+      'Sources/ProcedureKitLocation'
     ]
   end
 
   # ProcedureKitNetwork
   s.subspec 'Network' do |ss|
   	ss.dependency 'ProcedureKit/Standard'
-  	ss.source_files = ['Sources/Network']
+  	ss.source_files = ['Sources/ProcedureKitNetwork']
   end
 
   # ProcedureKitLocation
   s.subspec 'Location' do |ss|
   	ss.dependency 'ProcedureKit/Standard'
   	ss.frameworks = 'CoreLocation', 'MapKit'
-  	ss.source_files = ['Sources/Location']
+  	ss.source_files = ['Sources/ProcedureKitLocation']
   end
 
   # ProcedureKitCloud
   s.subspec 'Cloud' do |ss|
   	ss.dependency 'ProcedureKit/Standard'
   	ss.frameworks = 'CloudKit'
-  	ss.source_files = ['Sources/Cloud']
+  	ss.source_files = ['Sources/ProcedureKitCloud']
   end
 
   # All cross-platform ProcedureKit
@@ -71,7 +71,7 @@ session Advanced NSOperations: https://developer.apple.com/videos/wwdc/2015/?id=
   s.subspec 'Mobile' do |ss|
     ss.platforms = { :ios => "8.0" }
   	ss.dependency 'ProcedureKit/Standard'
-  	ss.source_files = ['Sources/Mobile']
+  	ss.source_files = ['Sources/ProcedureKitMobile']
   end
   
 end

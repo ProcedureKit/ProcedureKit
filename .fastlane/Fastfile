@@ -19,7 +19,7 @@ platform :ios do
     scan(
       project: "ProcedureKit.xcodeproj",
       scheme: "ProcedureKit",
-      destination: "platform=iOS Simulator,OS=10.0,name=iPhone 6s"
+      destination: "platform=iOS Simulator,OS=10.1,name=iPhone 6s"
     )
   end
 
@@ -29,7 +29,7 @@ platform :ios do
     scan(
       project: "ProcedureKit.xcodeproj",
       scheme: "ProcedureKit",
-      destination: "platform=tvOS Simulator,OS=10.0,name=Apple TV 1080p"
+      destination: "platform=tvOS Simulator,OS=10.1,name=Apple TV 1080p"
     )
   end
 
@@ -41,7 +41,7 @@ platform :ios do
     scan(
       project: "ProcedureKit.xcodeproj",
       scheme: "ProcedureKitMobile",
-      destination: "platform=iOS Simulator,OS=10.0,name=iPhone 6s"
+      destination: "platform=iOS Simulator,OS=10.1,name=iPhone 6s"
     )
   end
 
@@ -51,7 +51,7 @@ platform :ios do
     scan(
       project: "ProcedureKit.xcodeproj",
       scheme: "ProcedureKitMobile",
-      destination: "platform=tvOS Simulator,OS=10.0,name=Apple TV 1080p"
+      destination: "platform=tvOS Simulator,OS=10.1,name=Apple TV 1080p"
     )
   end
 
@@ -62,7 +62,7 @@ platform :ios do
     scan(
       project: "ProcedureKit.xcodeproj",
       scheme: "ProcedureKitTV",
-      destination: "platform=tvOS Simulator,OS=10.0,name=Apple TV 1080p"
+      destination: "platform=tvOS Simulator,OS=10.1,name=Apple TV 1080p"
     )
   end
 
@@ -72,7 +72,7 @@ platform :ios do
     scan(
       project: "ProcedureKit.xcodeproj",
       scheme: "ProcedureKitNetwork",
-      destination: "platform=iOS Simulator,OS=10.0,name=iPhone 6s"
+      destination: "platform=iOS Simulator,OS=10.1,name=iPhone 6s"
     )
   end
 
@@ -82,7 +82,7 @@ platform :ios do
     scan(
       project: "ProcedureKit.xcodeproj",
       scheme: "ProcedureKitNetwork",
-      destination: "platform=tvOS Simulator,OS=10.0,name=Apple TV 1080p"
+      destination: "platform=tvOS Simulator,OS=10.1,name=Apple TV 1080p"
     )
   end
 
@@ -92,7 +92,7 @@ platform :ios do
     scan(
       project: "ProcedureKit.xcodeproj",
       scheme: "ProcedureKitCloud",
-      destination: "platform=iOS Simulator,OS=10.0,name=iPhone 6s"
+      destination: "platform=iOS Simulator,OS=10.1,name=iPhone 6s"
     )
   end
 
@@ -102,7 +102,7 @@ platform :ios do
     scan(
       project: "ProcedureKit.xcodeproj",
       scheme: "ProcedureKitCloud",
-      destination: "platform=tvOS Simulator,OS=10.0,name=Apple TV 1080p"
+      destination: "platform=tvOS Simulator,OS=10.1,name=Apple TV 1080p"
     )
   end
 
@@ -112,7 +112,7 @@ platform :ios do
     scan(
       project: "ProcedureKit.xcodeproj",
       scheme: "ProcedureKitLocation",
-      destination: "platform=iOS Simulator,OS=10.0,name=iPhone 6s"
+      destination: "platform=iOS Simulator,OS=10.1,name=iPhone 6s"
     )
 
   end
@@ -123,7 +123,7 @@ platform :ios do
     scan(
       project: "ProcedureKit.xcodeproj",
       scheme: "ProcedureKitLocation",
-      destination: "platform=tvOS Simulator,OS=10.0,name=Apple TV 1080p"
+      destination: "platform=tvOS Simulator,OS=10.1,name=Apple TV 1080p"
     )
   end
 
@@ -134,7 +134,7 @@ platform :ios do
     scan(
       project: "ProcedureKit.xcodeproj",
       scheme: "ProcedureKitCloud",
-      destination: "platform=tvOS Simulator,OS=10.0,name=Apple TV 1080p"
+      destination: "platform=tvOS Simulator,OS=10.1,name=Apple TV 1080p"
     )
   end
 

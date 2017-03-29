@@ -35,7 +35,7 @@
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "65CFC5F81D608A5500CAD875"
                BuildableName = "ProcedureKitTests.xctest"
-               BlueprintName = "Tests"
+               BlueprintName = "ProcedureKitTests"
                ReferencedContainer = "container:ProcedureKit.xcodeproj">
             </BuildableReference>
          </TestableReference>
