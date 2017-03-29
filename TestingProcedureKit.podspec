@@ -16,7 +16,6 @@ session Advanced NSOperations: https://developer.apple.com/videos/wwdc/2015/?id=
   s.social_media_url  = 'https://twitter.com/danthorpe'
   s.requires_arc      = true
   s.ios.deployment_target = '8.0'
-  s.watchos.deployment_target = '2.0'
   s.tvos.deployment_target = '9.2'
   s.osx.deployment_target = '10.10'
   
@@ -30,7 +29,6 @@ session Advanced NSOperations: https://developer.apple.com/videos/wwdc/2015/?id=
 
   # TestingProcedureKit
   s.subspec 'Testing' do |ss|
-    ss.platforms = { :ios => "8.0", :tvos => "9.2", :osx => "10.10" }  
   	ss.dependency 'ProcedureKit'  
   	ss.frameworks = 'XCTest'  	
   	ss.source_files = ['Sources/TestingProcedureKit']
