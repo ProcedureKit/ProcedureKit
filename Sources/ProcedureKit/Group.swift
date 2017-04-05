@@ -52,16 +52,6 @@ open class GroupProcedure: Procedure, ProcedureQueueDelegate {
         get { return groupStateLock.withCriticalScope { _groupChildren } }
     }
 
-    /// Override of errors
-    public override var errors: [Error] {
-        get { return groupStateLock.withCriticalScope { _groupErrors.fatal } }
-        set {
-            groupStateLock.withCriticalScope {
-                _groupErrors.fatal = newValue
-            }
-        }
-    }
-
     /**
      The default service level to apply to the GroupProcedure and its child operations.
      
@@ -87,6 +77,16 @@ open class GroupProcedure: Procedure, ProcedureQueueDelegate {
             let (operations, procedures) = children.operationsAndProcedures
             operations.forEach { $0.setQualityOfService(fromUserIntent: userIntent) }
             procedures.forEach { $0.userIntent = userIntent }
+        }
+    }
+
+    /// Override of errors
+    public override var errors: [Error] {
+        get { return groupStateLock.withCriticalScope { _groupErrors.fatal } }
+        set {
+            groupStateLock.withCriticalScope {
+                _groupErrors.fatal = newValue
+            }
         }
     }
 
@@ -168,7 +168,10 @@ open class GroupProcedure: Procedure, ProcedureQueueDelegate {
     //
     // This function is called internally by the Group's .cancel() (Procedure.cancel())
     // prior to dispatching DidCancel observers on the Group's EventQueue.
-    final internal override func _procedureDidCancel() {
+    final internal override func _procedureDidCancel(withAdditionalErrors additionalErrors: [Error]) {
+        if !additionalErrors.isEmpty {
+            append(fatalErrors: additionalErrors)
+        }
         let errors = self.errors
         if errors.isEmpty {
             children.forEach { $0.cancel() }
