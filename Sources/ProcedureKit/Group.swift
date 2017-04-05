@@ -52,6 +52,16 @@ open class GroupProcedure: Procedure, ProcedureQueueDelegate {
         get { return groupStateLock.withCriticalScope { _groupChildren } }
     }
 
+    /// Override of errors
+    public override var errors: [Error] {
+        get { return groupStateLock.withCriticalScope { _groupErrors.fatal } }
+        set {
+            groupStateLock.withCriticalScope {
+                _groupErrors.fatal = newValue
+            }
+        }
+    }
+
     /**
      The default service level to apply to the GroupProcedure and its child operations.
      
@@ -68,6 +78,15 @@ open class GroupProcedure: Procedure, ProcedureQueueDelegate {
         set {
             super.qualityOfService = newValue
             queue.qualityOfService = newValue
+        }
+    }
+
+    /// Override of Procedure.userIntent
+    final public override var userIntent: UserIntent {
+        didSet {
+            let (operations, procedures) = children.operationsAndProcedures
+            operations.forEach { $0.setQualityOfService(fromUserIntent: userIntent) }
+            procedures.forEach { $0.userIntent = userIntent }
         }
     }
 
@@ -421,15 +440,6 @@ public extension GroupProcedure {
             }
         }
     }
-
-    /// Override of Procedure.userIntent
-    final public override var userIntent: UserIntent {
-        didSet {
-            let (operations, procedures) = children.operationsAndProcedures
-            operations.forEach { $0.setQualityOfService(fromUserIntent: userIntent) }
-            procedures.forEach { $0.userIntent = userIntent }
-        }
-    }
 }
 
 // MARK: - Add Child API
@@ -563,15 +573,6 @@ public extension GroupProcedure {
 
     internal var attemptedRecoveryErrors: [Error] {
         return groupStateLock.withCriticalScope { _groupErrors.attemptedRecoveryErrors }
-    }
-
-    public override var errors: [Error] {
-        get { return groupStateLock.withCriticalScope { _groupErrors.fatal } }
-        set {
-            groupStateLock.withCriticalScope {
-                _groupErrors.fatal = newValue
-            }
-        }
     }
 
     final public func append(fatalError error: Error) {
