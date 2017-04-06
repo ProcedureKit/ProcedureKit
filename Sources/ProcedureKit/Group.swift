@@ -156,10 +156,7 @@ open class GroupProcedure: Procedure, ProcedureQueueDelegate {
         // we must cancelAllOperations and also ensure the queue is not suspended.
         queue.cancelAllOperations()
         queue.isSuspended = false
-
-        // If you find that execution is stuck on the following line, one of the child
-        // Operations/Procedures is likely not handling cancellation and finishing.
-        queue.waitUntilAllOperationsAreFinished()
+        
     }
 
     // MARK: - Handling Cancellation
