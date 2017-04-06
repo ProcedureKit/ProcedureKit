@@ -394,7 +394,7 @@ fileprivate class _SyncAlreadyAvailableFuture: ProcedureFuture {
         group.leave()
     }
 
-    @discardableResult public override func then(on eventQueueProvider: QueueProvider, block: @escaping (Void) -> Void) {
+    public override func then(on eventQueueProvider: QueueProvider, block: @escaping (Void) -> Void) {
         block()
     }
 }

@@ -819,8 +819,8 @@ open class Procedure: Operation, ProcedureProtocol {
         _cancel(withAdditionalErrors: [])
     }
 
-    // used by GroupProcedure to bypass dispatching to the event queue for its cancellation handling
-    internal func _procedureDidCancel() {
+    // Micro-optimaization used by GroupProcedure to bypass dispatching to the event queue for its cancellation handling
+    internal func _procedureDidCancel(withAdditionalErrors additionalErrors: [Error]) {
         // no-op
     }
 
@@ -872,7 +872,7 @@ open class Procedure: Operation, ProcedureProtocol {
         super.cancel()
 
         // Micro-optimization for built-in Procedures that can safely handle cancellation off the EventQueue
-        _procedureDidCancel()
+        _procedureDidCancel(withAdditionalErrors: additionalErrors)
 
         // Cancel the EvaluateConditions operation (in case the Procedure is cancelled
         // before its dependencies have finished, and the EvaluateConditions operation

@@ -48,7 +48,7 @@ public struct RetryFailureInfo<T: Procedure> {
 public extension RetryFailureInfo {
 
     var errorCode: Int? {
-        return (errors.first as? NSError)?.code
+        return (errors.first as NSError?)?.code
     }
 }
 

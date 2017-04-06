@@ -71,6 +71,25 @@ open class GroupProcedure: Procedure, ProcedureQueueDelegate {
         }
     }
 
+    /// Override of Procedure.userIntent
+    final public override var userIntent: UserIntent {
+        didSet {
+            let (operations, procedures) = children.operationsAndProcedures
+            operations.forEach { $0.setQualityOfService(fromUserIntent: userIntent) }
+            procedures.forEach { $0.userIntent = userIntent }
+        }
+    }
+
+    /// Override of errors
+    public override var errors: [Error] {
+        get { return groupStateLock.withCriticalScope { _groupErrors.fatal } }
+        set {
+            groupStateLock.withCriticalScope {
+                _groupErrors.fatal = newValue
+            }
+        }
+    }
+
     /**
      Do not call `finish()` on a GroupProcedure or a GroupProcedure subclass.
      A GroupProcedure finishes when all of its children finish.
@@ -137,10 +156,7 @@ open class GroupProcedure: Procedure, ProcedureQueueDelegate {
         // we must cancelAllOperations and also ensure the queue is not suspended.
         queue.cancelAllOperations()
         queue.isSuspended = false
-
-        // If you find that execution is stuck on the following line, one of the child
-        // Operations/Procedures is likely not handling cancellation and finishing.
-        queue.waitUntilAllOperationsAreFinished()
+        
     }
 
     // MARK: - Handling Cancellation
@@ -149,15 +165,15 @@ open class GroupProcedure: Procedure, ProcedureQueueDelegate {
     //
     // This function is called internally by the Group's .cancel() (Procedure.cancel())
     // prior to dispatching DidCancel observers on the Group's EventQueue.
-    final internal override func _procedureDidCancel() {
-        let errors = self.errors
-        if errors.isEmpty {
+    final internal override func _procedureDidCancel(withAdditionalErrors additionalErrors: [Error]) {
+        if additionalErrors.isEmpty {
             children.forEach { $0.cancel() }
         }
         else {
+            append(fatalErrors: additionalErrors)
             let (operations, procedures) = children.operationsAndProcedures
             operations.forEach { $0.cancel() }
-            procedures.forEach { $0.cancel(withError: ProcedureKitError.parent(cancelledWithErrors: errors)) }
+            procedures.forEach { $0.cancel(withError: ProcedureKitError.parent(cancelledWithErrors: additionalErrors)) }
         }
         // the GroupProcedure ensures that `finish()` is called once all the
         // children have finished in its CanFinishGroup operation
@@ -421,15 +437,6 @@ public extension GroupProcedure {
             }
         }
     }
-
-    /// Override of Procedure.userIntent
-    final public override var userIntent: UserIntent {
-        didSet {
-            let (operations, procedures) = children.operationsAndProcedures
-            operations.forEach { $0.setQualityOfService(fromUserIntent: userIntent) }
-            procedures.forEach { $0.userIntent = userIntent }
-        }
-    }
 }
 
 // MARK: - Add Child API
@@ -563,15 +570,6 @@ public extension GroupProcedure {
 
     internal var attemptedRecoveryErrors: [Error] {
         return groupStateLock.withCriticalScope { _groupErrors.attemptedRecoveryErrors }
-    }
-
-    public override var errors: [Error] {
-        get { return groupStateLock.withCriticalScope { _groupErrors.fatal } }
-        set {
-            groupStateLock.withCriticalScope {
-                _groupErrors.fatal = newValue
-            }
-        }
     }
 
     final public func append(fatalError error: Error) {
