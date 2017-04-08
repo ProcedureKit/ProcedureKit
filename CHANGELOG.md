@@ -1,3 +1,7 @@
+# 4.0.1
+
+Same as Beta 7 😀
+
 # 4.0.0 Beta 7
 
 ## Breaking Changes
