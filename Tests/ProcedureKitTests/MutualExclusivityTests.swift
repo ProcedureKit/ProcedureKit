@@ -87,7 +87,7 @@ class MutualExclusiveConcurrencyTests: ConcurrencyTestCase {
         let procedures: [TrackingProcedure] = create(procedures: numOperations, delayMicroseconds: delayMicroseconds, withRegistrar: registrar).map {
             let condition = MutuallyExclusive<TrackingProcedure>()
             $0.add(condition: condition)
-            addCompletionBlockTo(procedure: $0, withExpectationDescription: "\($0.name), didFinish")
+            addCompletionBlockTo(procedure: $0, withExpectationDescription: "\(String(describing: $0.name)), didFinish")
             return $0
         }
 

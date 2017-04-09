@@ -121,7 +121,7 @@ final public class ExclusivityManager {
         // Remove the first item in the queue for this category
         // (which should be the procedure that currently has the lock).
         assert(!queueForThisCategory.isEmpty)
-        let _ = queueForThisCategory.removeFirst()
+        _ = queueForThisCategory.removeFirst()
 
         // If another operation is waiting on this particular lock
         if let nextOperationForLock = queueForThisCategory.first {
