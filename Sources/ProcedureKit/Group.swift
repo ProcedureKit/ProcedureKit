@@ -603,7 +603,7 @@ public extension GroupProcedure {
     }
 
     final public func childDidRecoverFromErrors(_ child: Operation) {
-        if let _ = attemptedRecovery[child] {
+        if attemptedRecovery[child] != nil {
             log.notice(message: "successfully recovered from errors in \(child)")
             groupStateLock.withCriticalScope { () -> Void in
                 _groupErrors.attemptedRecovery.removeValue(forKey: child)

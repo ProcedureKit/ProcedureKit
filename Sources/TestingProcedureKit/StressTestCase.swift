@@ -169,7 +169,7 @@ open class StressTestCase: GroupTestCase {
                 }
 
                 waitForExpectations(timeout: timeout) { error in
-                    if let _ = error {
+                    if error != nil {
                         shouldContinueBatches = false
                     }
                 }
