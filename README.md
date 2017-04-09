@@ -19,13 +19,6 @@ Reference documentation | [docs.danthorpe.me/operations](http://docs.danthorpe.m
 Programming guide | [operations.readme.io](https://operations.readme.io)
 Example projects | [danthorpe/Examples](https://github.com/danthorpe/Examples)
 
-## Transition to ProcedureKit
-_Operations_ has hit a turning point as part of its transition to Swift 3.0, due to the name change of `NSOperation` to `Operation`, which now conflicts with its base abstract class. I am taking this opportunity to rename the entire project and move it to an organization repository.
-
-During this transition period, code, documentation and examples will still refer to `Operation` and `NSOperation` until the grand renaming occurs.
-
-See #398 for the high level v4.0 roadmap which lists these forthcoming changes.
-
 ## Framework structure
 
 _ProcedureKit_ is a "multi-module" framework (don't bother Googling that, I just made it up). But what I mean by this, is that the Xcode project has multiple targets/products each of which produces a Swift module. Some of these modules are cross-platform, others are dedicated, e.g. `ProcedureKitNetwork` vs `ProcedureKitMobile`.
