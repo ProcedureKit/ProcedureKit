@@ -700,7 +700,7 @@ open class Procedure: Operation, ProcedureProtocol {
 
         // Dispatch DidExecute observers
         log.verbose(message: "[observers]: DidExecute")
-        let _ = dispatchObservers(pendingEvent: PendingEvent.postDidExecute) { observer, _ in
+        _ = dispatchObservers(pendingEvent: PendingEvent.postDidExecute) { observer, _ in
             observer.did(execute: self)
         }
 
@@ -779,7 +779,7 @@ open class Procedure: Operation, ProcedureProtocol {
         promise.complete()
 
         // Dispatch DidAddOperation observers
-        let _ = self.dispatchObservers(pendingEvent: PendingEvent.postDidAdd) { observer, _ in
+        _ = self.dispatchObservers(pendingEvent: PendingEvent.postDidAdd) { observer, _ in
             observer.procedure(self, didAdd: operation)
         }
         // no follow-up events to wait on the didAdd observers
