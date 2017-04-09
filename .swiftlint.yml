@@ -6,6 +6,7 @@ disabled_rules:
   - line_length
   - type_name
   - large_tuple
+  - identifier_name
   - implicit_getter
   - syntactic_sugar
 file_length:

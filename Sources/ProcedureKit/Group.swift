@@ -156,7 +156,7 @@ open class GroupProcedure: Procedure, ProcedureQueueDelegate {
         // we must cancelAllOperations and also ensure the queue is not suspended.
         queue.cancelAllOperations()
         queue.isSuspended = false
-        
+
     }
 
     // MARK: - Handling Cancellation
@@ -331,7 +331,7 @@ open class GroupProcedure: Procedure, ProcedureQueueDelegate {
         groupWillAdd(child: operation)
 
         // WillAddOperation observers
-        let willAddObserversGroup = dispatchObservers(pendingEvent: PendingEvent.addOperation) { observer, pendingEvent in
+        let willAddObserversGroup = dispatchObservers(pendingEvent: PendingEvent.addOperation) { observer, _ in
             observer.procedure(self, willAdd: operation)
         }
 
@@ -341,7 +341,7 @@ open class GroupProcedure: Procedure, ProcedureQueueDelegate {
             promise.complete()
 
             // DidAddOperation observers
-            let _ = self.dispatchObservers(pendingEvent: PendingEvent.postDidAdd) { observer, pendingEvent in
+            _ = self.dispatchObservers(pendingEvent: PendingEvent.postDidAdd) { observer, _ in
                     observer.procedure(self, didAdd: operation)
             }
 
@@ -532,7 +532,7 @@ public extension GroupProcedure {
         additional.forEach { self.groupWillAdd(child: $0) }
 
         // WillAddOperation observers
-        let willAddObserversGroup = self.dispatchObservers(pendingEvent: PendingEvent.addOperation) { observer, pendingEvent in
+        let willAddObserversGroup = self.dispatchObservers(pendingEvent: PendingEvent.addOperation) { observer, _ in
             additional.forEach {
                 observer.procedure(self, willAdd: $0)
             }
@@ -550,7 +550,7 @@ public extension GroupProcedure {
                 }
 
                 // DidAddOperation observers
-                let didAddObserversGroup = self.dispatchObservers(pendingEvent: PendingEvent.postDidAdd) { observer, pendingEvent in
+                let didAddObserversGroup = self.dispatchObservers(pendingEvent: PendingEvent.postDidAdd) { observer, _ in
                     additional.forEach {
                         observer.procedure(self, didAdd: $0)
                     }
@@ -603,7 +603,7 @@ public extension GroupProcedure {
     }
 
     final public func childDidRecoverFromErrors(_ child: Operation) {
-        if let _ = attemptedRecovery[child] {
+        if attemptedRecovery[child] != nil {
             log.notice(message: "successfully recovered from errors in \(child)")
             groupStateLock.withCriticalScope { () -> Void in
                 _groupErrors.attemptedRecovery.removeValue(forKey: child)
