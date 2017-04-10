@@ -7,7 +7,6 @@
 [![Platform](https://img.shields.io/cocoapods/p/ProcedureKit.svg?style=flat)](http://cocoadocs.org/docsets/ProcedureKit)
 [![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/Carthage/Carthage)
 
-
 # ProcedureKit
 
 A Swift framework inspired by WWDC 2015 Advanced NSOperations session. Previously known as _Operations_, developed by [@danthorpe](https://github.com/danthorpe) with a lot of help from our fantastic community.
@@ -19,25 +18,18 @@ Reference documentation | [docs.danthorpe.me/operations](http://docs.danthorpe.m
 Programming guide | [operations.readme.io](https://operations.readme.io)
 Example projects | [danthorpe/Examples](https://github.com/danthorpe/Examples)
 
-## Transition to ProcedureKit
-_Operations_ has hit a turning point as part of its transition to Swift 3.0, due to the name change of `NSOperation` to `Operation`, which now conflicts with its base abstract class. I am taking this opportunity to rename the entire project and move it to an organization repository.
-
-During this transition period, code, documentation and examples will still refer to `Operation` and `NSOperation` until the grand renaming occurs.
-
-See #398 for the high level v4.0 roadmap which lists these forthcoming changes.
-
 ## Framework structure
 
-_ProcedureKit_ is a "multi-module" framework (don't bother Googling that, I just made it up). But what I mean by this, is that the Xcode project has multiple targets/products each of which produces a Swift module. Some of these modules are cross-platform, others are dedicated, e.g. `ProcedureKitNetwork` vs `ProcedureKitMobile`.
+_ProcedureKit_ is a "multi-module" framework (don't bother Googling that, I just made it up). What I mean, is that the Xcode project has multiple targets/products each of which produces a Swift module. Some of these modules are cross-platform, others are dedicated, e.g. `ProcedureKitNetwork` vs `ProcedureKitMobile`.
 
 ### Integration
 
-You can add _ProcedureKit_ to your project, by following Apple's guidelines (dragging the `.xcodeproj` file into your project). Alternatively, there you can use package managers as described below.
+You can add _ProcedureKit_ to your project, by following [Apple's guidelines](https://www.google.com/search?q=apple+docs,+add+framework+to+xcode+project) (dragging the `.xcodeproj` file into your project). Alternatively, you can use package managers as described below.
 
 #### CocoaPods
 
-ProcedureKit is available through [CocoaPods](http://cocoapods.org). To install
-it, add it to your Podfile. Here is a full example of a cross platform application with unit test support.
+ProcedureKit is available through [CocoaPods](https://cocoapods.org/pods/ProcedureKit). To install
+it, include it in your Podfile. Here is a full example of a cross platform application with unit test support. In this case, _ProcedureKit_ has been included via submodules.
 
 ```ruby
 target 'MyApp' do
@@ -72,7 +64,7 @@ target 'MyApp iOS' do
 end
 ```
 
-Due to the way that CocoaPods works, all code from the _ProcedureKit_ is made available under a single module name, in this case `ProcedureKit`. This is because CocoaPods creates it's own Xcode targets adding the files defined in the spec. So, your Swift files will only need to add `import ProcedureKit` even if you want to use functionality from the _ProcedureKitMobile_ module. This can be a bit confusing.
+Now, due to the way that CocoaPods works, all code from the _ProcedureKit_ is made available under a single module name. In this case `ProcedureKit`. This is because CocoaPods creates its own Xcode targets to add the files defined in the spec. So, your Swift files will only need to add `import ProcedureKit` even if you want to use functionality from other modules, such as  _ProcedureKitMobile_. We appreciate that this can be a bit confusing!
 
 ### Carthage
 
@@ -87,7 +79,7 @@ Then update your `Carthage` directory by running on the command line:
 ```bash
 $ carthage bootstrap
 ```
-This will go off and build everything, it'll take a short while, time for a cup of tea. When it's complete, you can drag the built frameworks to your project and embed them in the binary.
+This will go off and build everything. It'll take a short while, definitely time for a cup of tea. When it's complete, you can drag the built frameworks to your project and embed them in the binary.
 
 When using Carthage, each module is separated out. So, if you want to use the networking APIs, you would add the following to your Swift file:
 
@@ -101,7 +93,7 @@ _ProcedureKit_ totally supports SPM, it's basically just like Carthage.
 
 ## Usage
 
-`Procedure` is an `NSOperation` subclass. It is an abstract class which _must_ be subclassed.
+`Procedure` is a `Foundation.Operation` subclass. It is an abstract class which _must_ be subclassed.
 
 ```swift
 import ProcedureKit
@@ -156,13 +148,13 @@ myProcedure.add(condition: BlockCondition {
 
 Conditions can be mutually exclusive. This is akin to a lock being held preventing other operations with the same exclusion being executed.
 
-The framework provides the following conditions: `AuthorizedFor`, `BlockCondition`, `MutuallyExclusive`, `NegatedCondition`, `NoFailedDependenciesCondition`, `SilentCondition` and `UserConfirmationCondition`.
+The framework provides the following conditions: `AuthorizedFor`, `BlockCondition`, `MutuallyExclusive`, `NegatedCondition`, `NoFailedDependenciesCondition`, `SilentCondition` and `UserConfirmationCondition` (in _ProcedureKitMobile_).
 
 See the wiki on [[Conditions|Conditions]], or the old programming guide on [Conditions|](https://operations.readme.io/docs/conditions) for more information.
 
 ## Capabilities
 
-A _capability_ represents the application’s ability to access device or user account abilities, or potentially any kind of gated resource. For example, location services, cloud kit containers, calendars etc. The `CapabiltiyProtocol` provides a unified model to:
+A _capability_ represents the application’s ability to access device or user account abilities, or potentially any kind of gated resource. For example, location services, cloud kit containers, calendars etc or a webservice. The `CapabiltiyProtocol` provides a unified model to:
  
 1. Check the current authorization status, using `GetAuthorizationStatusProcedure`, 
 2. Explicitly request access, using `AuthorizeCapabilityProcedure`
@@ -192,7 +184,7 @@ class DoSomethingWithLocation: Procedure {
 
 _ProcedureKit_ provides the following capabilities: `Capability.CloudKit` and `Capability.Location`.
 
-In _Operations_, a previous version, more functionality existed (calendar, health, photos, address book, etc), and we are still considering how to offer these in _ProcedureKit_. 
+In _Operations_, (a previous version of this framework), more functionality existed (calendar, health, photos, address book, etc), and we are still considering how to offer these in _ProcedureKit_. 
 
 See the wiki on [[Capabilities|Capabilities]], or the old programming guide on [Capabilities](https://operations.readme.io/docs/capabilities) for more information.
 
@@ -214,9 +206,9 @@ See the programming guide for more information on [logging](https://operations.r
 
 ## Dependency Injection
 
-Often, procedures will need dependencies in order to execute. As is typical with asynchronous/event based applications, these dependencies might not be known at creation time. Instead they must be injected after the procedure is initialised, but before it is executed. _ProcedureKit_ supports this via a set of protocols and types which work together.
+Often, procedures will need dependencies in order to execute. As is typical with asynchronous/event based applications, these dependencies might not be known at creation time. Instead they must be injected after the procedure is initialised, but before it is executed. _ProcedureKit_ supports this via a set of protocols and types which work together. We think this pattern is great, as it encourages the composition of small single purpose procedures. These can be easier to test and potentially enable greater re-use. You will find dependency injection used and encouraged throughout this framework. 
 
-Firstly, a value may be ready or pending. For example, when a procedure is initialised, it might not have all its dependencies, so they are in a pending state. Hopefully they become ready by the time it executes.
+Anyway, firstly, a value may be ready or pending. For example, when a procedure is initialised, it might not have all its dependencies, so they are in a pending state. Hopefully they become ready by the time it executes.
 
 Secondly, if a procedure is acquiring the dependency required by another procedure, it may succeed, or it may fail with an error. Therefore there is a simple _Result_ type which supports this.
 
