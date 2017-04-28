@@ -47,6 +47,12 @@ public class EventQueue {
         guard let retrieved = DispatchQueue.getSpecific(key: key) else { return false }
         return value == retrieved
     }
+    internal func debugBestowTemporaryEventQueueStatusOn(queue: DispatchQueueProtocol) {
+        queue.setSpecific(key: key, value: value)
+    }
+    internal func debugClearTemporaryEventQueueStatusFrom(queue: DispatchQueueProtocol) {
+        queue.clearSpecific(key: key)
+    }
     #endif
 
     /// Asynchronously dispatches a block for execution on the EventQueue.
@@ -173,8 +179,24 @@ internal extension EventQueue {
             // to ensure that all blocks on the original queue are done executing
 
             originalQueue.eventQueueLock.withCriticalScope {
-                // i.e. this block should be synchronized with *both* queues
+
+                #if DEBUG
+                    // For Debug purposes, treat the otherQueue at this point as if it were *also* the EventQueue
+                    // (Since the actual EventQueue is paused and no longer executing blocks until this finishes.)
+                    //
+                    // This ensures that if the code inside the block calls `eventQueue.debugAssertIsOnQueue()`,
+                    // it will (properly) succeed.
+                    originalQueue.debugBestowTemporaryEventQueueStatusOn(queue: otherQueue)
+                    assert(originalQueue.isOnQueue)
+                #endif
+
+                // This block should be synchronized with *both* queues
                 block()
+
+                #if DEBUG
+                    originalQueue.debugClearTemporaryEventQueueStatusFrom(queue: otherQueue)
+                    assert(!originalQueue.isOnQueue)
+                #endif
             }
 
             // after the block is complete, resume the original queue
@@ -219,6 +241,10 @@ public protocol DispatchQueueProtocol: class {
     @discardableResult func asyncDispatch(block: @escaping () -> Void) -> DispatchWorkItem
     @discardableResult func asyncDispatch(minimumQoS: DispatchQoS, block: @escaping () -> Void) -> DispatchWorkItem
     func dispatchNotify(withGroup group: DispatchGroup, block: @escaping () -> Void)
+    #if DEBUG
+    func setSpecific<T>(key: DispatchSpecificKey<T>, value: T)
+    func clearSpecific<T>(key: DispatchSpecificKey<T>)
+    #endif
 }
 
 extension DispatchQueue: DispatchQueueProtocol {
@@ -245,4 +271,12 @@ extension EventQueue: DispatchQueueProtocol {
         let desiredQoS = max(minimumQoS, qualityOfService)
         return self.dispatchEventBlockInternal(minimumQoS: desiredQoS, block: block)
     }
+    #if DEBUG
+    public func setSpecific<T>(key: DispatchSpecificKey<T>, value: T) {
+        queue.setSpecific(key: key, value: value)
+    }
+    public func clearSpecific<T>(key: DispatchSpecificKey<T>) {
+        queue.clearSpecific(key: key)
+    }
+    #endif
 }
