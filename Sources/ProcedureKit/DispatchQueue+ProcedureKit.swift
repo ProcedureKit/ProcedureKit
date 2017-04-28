@@ -12,7 +12,11 @@ import Dispatch
 public extension DispatchQueue {
 
     static var isMainDispatchQueue: Bool {
-        return mainQueueScheduler.isScheduledQueue
+        return mainQueueScheduler.isOnScheduledQueue
+    }
+
+    var isMainDispatchQueue: Bool {
+        return mainQueueScheduler.isScheduledQueue(self)
     }
 
     static var `default`: DispatchQueue {
@@ -123,8 +127,13 @@ internal final class Scheduler {
         queue.setSpecific(key: key, value: value)
     }
 
-    var isScheduledQueue: Bool {
+    var isOnScheduledQueue: Bool {
         guard let retrieved = DispatchQueue.getSpecific(key: key) else { return false }
+        return value == retrieved
+    }
+
+    func isScheduledQueue(_ queue: DispatchQueue) -> Bool {
+        guard let retrieved = queue.getSpecific(key: key) else { return false }
         return value == retrieved
     }
 }
