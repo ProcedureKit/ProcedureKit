@@ -171,6 +171,48 @@ class ExecutionTests: ProcedureKitTestCase {
         XCTAssertNil(nilQueue)
         XCTAssertNil(weakQueue)
     }
+
+    func test__procedure_executes_on_underlying_queue_of_procedurequeue() {
+        // If a Procedure is added to a ProcedureQueue with an `underlyingQueue` configured,
+        // the Procedure's `execute()` function should run on the underlyingQueue.
+
+        class TestExecuteOnUnderlyingQueueProcedure: Procedure {
+
+            public typealias Block = () -> Void
+            private let block: Block
+
+            public init(block: @escaping Block) {
+                self.block = block
+                super.init()
+            }
+
+            open override func execute() {
+                block()
+                finish()
+            }
+        }
+
+        let customDispatchQueueLabel = "run.kit.procedure.ProcedureKit.Tests.TestUnderlyingQueue"
+        let customDispatchQueue = DispatchQueue(label: customDispatchQueueLabel, attributes: [.concurrent])
+        let customScheduler = ProcedureKit.Scheduler(queue: customDispatchQueue)
+
+        let procedureQueue = ProcedureQueue()
+        procedureQueue.underlyingQueue = customDispatchQueue
+
+        let didExecuteOnDesiredQueue = Protector(false)
+        let procedure = TestExecuteOnUnderlyingQueueProcedure {
+            // inside execute()
+            if customScheduler.isOnScheduledQueue {
+                didExecuteOnDesiredQueue.overwrite(with: true)
+            }
+        }
+
+        addCompletionBlockTo(procedure: procedure)
+        procedureQueue.add(operation: procedure)
+        waitForExpectations(timeout: 3)
+
+        XCTAssertTrue(didExecuteOnDesiredQueue.access, "execute() did not execute on the desired underlyingQueue")
+    }
 }
 
 class UserIntentTests: ProcedureKitTestCase {
@@ -559,5 +601,24 @@ class ObserverEventQueueTests: ProcedureKitTestCase {
 
         run(operation: procedure)
         wait(for: finishing) // This test should not timeout.
+    }
+}
+
+class MainQueueTests: XCTestCase {
+
+    func test__operation_queue_main_has_underlyingqueue_main() {
+        guard let underlyingQueue = OperationQueue.main.underlyingQueue else {
+            XCTFail("OperationQueue.main is missing any set underlyingQueue.")
+            return
+        }
+        XCTAssertTrue(underlyingQueue.isMainDispatchQueue, "OperationQueue.main.underlyingQueue does not seem to be the same as DispatchQueue.main")
+    }
+
+    func test__procedure_queue_main_has_underlyingqueue_main() {
+        guard let underlyingQueue = ProcedureQueue.main.underlyingQueue else {
+            XCTFail("ProcedureQueue.main is missing any set underlyingQueue.")
+            return
+        }
+        XCTAssertTrue(underlyingQueue.isMainDispatchQueue, "ProcedureQueue.main.underlyingQueue does not seem to be the same as DispatchQueue.main")
     }
 }
