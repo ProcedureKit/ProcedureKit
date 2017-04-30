@@ -163,6 +163,50 @@ class GroupTests: GroupTestCase {
         XCTAssertTrue(child2.isFinished)
     }
 
+    func test__group_executes_on_procedure_queue_with_underlying_queue() {
+        // If a GroupProcedure is added to a ProcedureQueue with an `underlyingQueue` configured,
+        // the GroupProcedure's `execute()` function will run on the underlyingQueue.
+        // This should succeed - previously, an assert failed in debug mode.
+
+        class TestExecuteOnUnderlyingQueueGroupProcedure: GroupProcedure {
+            public typealias Block = () -> Void
+            private let block: Block
+
+            public init(dispatchQueue underlyingQueue: DispatchQueue? = nil, operations: [Operation], executeCheckBlock: @escaping Block) {
+                self.block = executeCheckBlock
+                super.init(dispatchQueue: underlyingQueue, operations: operations)
+            }
+            open override func execute() {
+                block()
+                super.execute()
+            }
+        }
+
+        let customDispatchQueueLabel = "run.kit.procedure.ProcedureKit.Tests.TestUnderlyingQueue"
+        let customDispatchQueue = DispatchQueue(label: customDispatchQueueLabel, attributes: [.concurrent])
+        let customScheduler = ProcedureKit.Scheduler(queue: customDispatchQueue)
+
+        let procedureQueue = ProcedureQueue()
+        procedureQueue.underlyingQueue = customDispatchQueue
+
+        let didExecuteOnDesiredQueue = Protector(false)
+        let child = TestProcedure()
+        let group = TestExecuteOnUnderlyingQueueGroupProcedure(operations: [child]) {
+            // inside execute()
+            if customScheduler.isOnScheduledQueue {
+                didExecuteOnDesiredQueue.overwrite(with: true)
+            }
+        }
+
+        addCompletionBlockTo(procedure: group)
+        procedureQueue.add(operation: group)
+        waitForExpectations(timeout: 3)
+
+        XCTAssertTrue(didExecuteOnDesiredQueue.access, "execute() did not execute on the desired underlyingQueue")
+        XCTAssertProcedureFinishedWithoutErrors(group)
+        XCTAssertProcedureFinishedWithoutErrors(child)
+    }
+
     // MARK: - Error Tests
 
     func test__group_exits_correctly_when_child_errors() {

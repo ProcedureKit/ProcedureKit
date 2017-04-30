@@ -641,25 +641,25 @@ open class Procedure: Operation, ProcedureProtocol {
         }
 
         // Check the state again, as it could have changed in another queue via finish
-        func getNextStateAgain() -> ProcedureKit.State? {
+        func getNextStateAgain() -> (ProcedureKit.State?, ProcedureQueue?) {
             return stateLock.withCriticalScope {
-                guard _state <= .started else { return nil }
+                guard _state <= .started else { return (nil, nil) }
 
                 guard !_isHandlingFinish else {
                     // a finish is pending, simply exit from processing execute
-                    return nil
+                    return (nil, nil)
                 }
 
                 if _isCancelled && !isAutomaticFinishingDisabled && !_isHandlingFinish {
                     // Procedure was cancelled, and automatic finishing is enabled.
                     // Because execute() has not yet been called, handle finish here.
-                    return .finishing
+                    return (.finishing, nil)
                 }
 
                 _state = .executing
                 _isTransitioningToExecuting = false
 
-                return .executing
+                return (.executing, _queue)
             }
         }
 
@@ -680,7 +680,7 @@ open class Procedure: Operation, ProcedureProtocol {
         willChangeValue(forKey: .executing)
 
         // Set the state to executing (unless something, like cancellation, has happened concurrently)
-        let nextState2 = getNextStateAgain()
+        let (nextState2, queue) = getNextStateAgain()
 
         didChangeValue(forKey: .executing)
 
@@ -696,7 +696,39 @@ open class Procedure: Operation, ProcedureProtocol {
         log.notice(message: "Will Execute")
 
         // Call the execute() function (which should be overriden in Procedure subclasses)
+        if let underlyingQueue = queue?.underlyingQueue {
+            // The Procedure was enqueued on a ProcedureQueue that specifies an `underlyingQueue`.
+            //
+            // Explicitly call the `execute()` function on the underlyingQueue, while also
+            // pausing dispatch of any new blocks on the Procedure's EventQueue until the call
+            // to `execute()` returns, to ensure that `execute()` occurs on the underlyingQueue
+            // *and* non-concurrently with this Procedure's EventQueue.
+
+            eventQueue.dispatchSynchronizedBlock(onOtherQueue: underlyingQueue) {
+                // This block is now synchronized with *both* queues:
+                //  - the Procedure's EventQueue
+                //  - the underlyingQueue of the ProcedureQueue on which the Procedure is scheduled to execute
+                // and is *on* the underlyingQueue of said ProcedureQueue.
+
+                // Call the `execute()` function on the underlyingQueue
+                self.execute()
+
+                // Dispatch async back to the Procedure's EventQueue to
+                // process DidExecute observers.
+                self.dispatchEvent {
+                    self._handleDidExecute()
+                }
+            }
+            return
+        }
+
         execute()
+        _handleDidExecute()
+    }
+
+    private func _handleDidExecute() {
+
+        debugAssertIsOnEventQueue()
 
         // Dispatch DidExecute observers
         log.verbose(message: "[observers]: DidExecute")

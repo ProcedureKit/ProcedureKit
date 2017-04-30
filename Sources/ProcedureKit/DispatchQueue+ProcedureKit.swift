@@ -12,7 +12,24 @@ import Dispatch
 public extension DispatchQueue {
 
     static var isMainDispatchQueue: Bool {
-        return mainQueueScheduler.isScheduledQueue
+        return mainQueueScheduler.isOnScheduledQueue
+    }
+
+    // Swift <= 3.1 is missing the ability to clear specific keys from DispatchQueues
+    // via DispatchQueue.setSpecific(key:value:) because it does not take an optional.
+    //
+    // A fix was merged into apple/swift in: https://github.com/apple/swift/commit/5accebf556f40ea104a7440ff0353f9e4f7f1ac2
+    // But is not yet available in a release branch of Swift.
+    //
+    // As such, this custom clearSpecific(key:) function is provided, and should not
+    // ultimately conflict with a future Swift release with a fixed setSpecific().
+    func clearSpecific<T>(key: DispatchSpecificKey<T>) {
+        let k = Unmanaged.passUnretained(key).toOpaque()
+        __dispatch_queue_set_specific(self, k, nil, nil)
+    }
+
+    var isMainDispatchQueue: Bool {
+        return mainQueueScheduler.isScheduledQueue(self)
     }
 
     static var `default`: DispatchQueue {
@@ -123,8 +140,13 @@ internal final class Scheduler {
         queue.setSpecific(key: key, value: value)
     }
 
-    var isScheduledQueue: Bool {
+    var isOnScheduledQueue: Bool {
         guard let retrieved = DispatchQueue.getSpecific(key: key) else { return false }
+        return value == retrieved
+    }
+
+    func isScheduledQueue(_ queue: DispatchQueue) -> Bool {
+        guard let retrieved = queue.getSpecific(key: key) else { return false }
         return value == retrieved
     }
 }
