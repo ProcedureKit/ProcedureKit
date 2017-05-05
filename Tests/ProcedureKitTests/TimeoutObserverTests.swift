@@ -27,7 +27,8 @@ final class TimeoutObserverTests: ProcedureKitTestCase {
     func test__timeout_observer_where_procedure_is_already_cancelled() {
         procedure = TestProcedure(delay: 0.5)
         procedure.add(observer: TimeoutObserver(until: Date() + 0.1))
-        check(procedure: procedure) { $0.cancel() }
+        procedure.cancel()
+        wait(for: procedure)
         XCTAssertProcedureCancelledWithoutErrors()
     }
 
