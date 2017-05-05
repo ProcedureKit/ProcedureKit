@@ -96,9 +96,9 @@ class MutualExclusiveConcurrencyTests: ConcurrencyTestCase {
         // add procedures to the queue simultaneously
         let dispatchQueue = DispatchQueue.global(qos: .userInitiated)
         for procedure in procedures {
-            dispatchQueue.async { [weak self] in
-                guard let strongSelf = self else { return }
-                strongSelf.queue.addOperation(procedure)
+            dispatchQueue.async { [weak weakQueue = self.queue] in
+                guard let queue = weakQueue else { return }
+                queue.addOperation(procedure)
             }
         }
 
@@ -135,9 +135,10 @@ class MutualExclusiveConcurrencyTests: ConcurrencyTestCase {
         procedure2.add(dependency: procedure1)
 
         // add procedure2 to the queue first
-        queue.add(operation: procedure2).then(on: DispatchQueue.main) {
+        queue.add(operation: procedure2).then(on: DispatchQueue.main) { [weak weakQueue = self.queue] in
+            guard let queue = weakQueue else { return }
             // then add procedure1 to the queue
-            self.queue.add(operation: procedure1)
+            queue.add(operation: procedure1)
         }
 
         waitForExpectations(timeout: 2)
