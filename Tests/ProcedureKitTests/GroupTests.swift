@@ -522,10 +522,46 @@ class GroupConcurrencyTests: GroupConcurrencyTestCase {
 class GroupEventConcurrencyTests: GroupTestCase {
 
     let expectedEndingEvents: [EventConcurrencyTrackingRegistrar.ProcedureEvent] = [.override_procedureWillFinish, .observer_willFinish, .override_procedureDidFinish, .observer_didFinish]
+    var didFinishGroup: DispatchGroup!
+    var baseObserver: ConcurrencyTrackingObserver!
+
+    open override func setUp() {
+        super.setUp()
+        let didFinishGroup = DispatchGroup()
+        self.didFinishGroup = didFinishGroup
+        didFinishGroup.enter()
+        baseObserver = ConcurrencyTrackingObserver() { procedure, event in
+            assert(procedure is GroupProcedure)
+            if event == .observer_didFinish {
+                didFinishGroup.leave()
+            }
+        }
+    }
+
+    open override func tearDown() {
+        didFinishGroup = nil
+        baseObserver = nil
+        super.tearDown()
+    }
+
+    private func waitForBaseObserverDidFinish(timeout: TimeInterval) {
+        weak var expDidFinishObserverFired = expectation(description: "DidFinishObserver was fired")
+        didFinishGroup.notify(queue: DispatchQueue.main) {
+            expDidFinishObserverFired?.fulfill()
+        }
+        waitForExpectations(timeout: timeout)
+    }
 
     func test_group_finish_no_concurrent_events() {
-        let group = EventConcurrencyTrackingGroupProcedure(operations: children, registrar: EventConcurrencyTrackingRegistrar(recordHistory: true))
+        let group = EventConcurrencyTrackingGroupProcedure(operations: children, registrar: EventConcurrencyTrackingRegistrar(recordHistory: true), baseObserver: baseObserver)
         wait(for: group)
+
+        // Because Procedure signals isFinished KVO *prior* to calling DidFinish observers,
+        // the above wait() may return before the ConcurrencyTrackingObserver is called to
+        // record the DidFinish event.
+        // Thus, wait for the Group's ConcurrencyTrackingObserver to receive the
+        // .observer_DidFinish event.
+        waitForBaseObserverDidFinish(timeout: 2)
 
         XCTAssertProcedureFinishedWithoutErrors(group)
         XCTAssertProcedureNoConcurrentEvents(group)
@@ -536,9 +572,16 @@ class GroupEventConcurrencyTests: GroupTestCase {
     }
 
     func test_group_cancel_no_concurrent_events() {
-        let group = EventConcurrencyTrackingGroupProcedure(operations: children, registrar: EventConcurrencyTrackingRegistrar(recordHistory: true))
+        let group = EventConcurrencyTrackingGroupProcedure(operations: children, registrar: EventConcurrencyTrackingRegistrar(recordHistory: true), baseObserver: baseObserver)
         group.cancel()
         wait(for: group)
+
+        // Because Procedure signals isFinished KVO *prior* to calling DidFinish observers,
+        // the above wait() may return before the ConcurrencyTrackingObserver is called to
+        // record the DidFinish event.
+        // Thus, wait for the Group's ConcurrencyTrackingObserver to receive the
+        // .observer_DidFinish event.
+        waitForBaseObserverDidFinish(timeout: 2)
 
         XCTAssertProcedureCancelledWithoutErrors(group)
         XCTAssertProcedureNoConcurrentEvents(group)
