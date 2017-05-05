@@ -478,8 +478,12 @@ class ConditionTests: ProcedureKitTestCase {
 
         let procedureDidFinishGroup = DispatchGroup()
         let conditionEvaluatedGroup = DispatchGroup()
+        weak var expDependencyDidStart = expectation(description: "Did Start Dependency")
         let dependency = AsyncBlockProcedure { completion in
-            // does not finish
+            DispatchQueue.main.async {
+                expDependencyDidStart?.fulfill()
+            }
+            // does not finish - the test handles that later for timing reasons
         }
         let procedure = TestProcedure()
         procedureDidFinishGroup.enter()
@@ -505,6 +509,7 @@ class ConditionTests: ProcedureKitTestCase {
         queue.add(operations: procedure, dependency)
 
         // wait until the procedure has been added to the queue
+        // and the dependency has been started
         waitForExpectations(timeout: 2)
 
         // sleep for 0.05 seconds to give a chance for the Condition to be improperly evaluated
@@ -539,8 +544,12 @@ class ConditionTests: ProcedureKitTestCase {
         let procedureDidFinishGroup = DispatchGroup()
         let conditionEvaluatedGroup = DispatchGroup()
 
+        weak var expDependencyDidStart = expectation(description: "Did Start additionalDependency")
         let dependency = TestProcedure()
         let additionalDependency = AsyncBlockProcedure { completion in
+            DispatchQueue.main.async {
+                expDependencyDidStart?.fulfill()
+            }
             // does not finish
         }
         dependency.addWillFinishBlockObserver { _, _, _ in
@@ -569,7 +578,8 @@ class ConditionTests: ProcedureKitTestCase {
 
         queue.add(operations: procedure, dependency, additionalDependency)
 
-        // wait until the first dependency has finished
+        // wait until the first dependency has finished,
+        // and the additionalDependency has started
         waitForExpectations(timeout: 2)
 
         // sleep for 0.05 seconds to give a chance for the Condition to be improperly evaluated
