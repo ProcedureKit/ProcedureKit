@@ -270,14 +270,31 @@ class BlockObserverSynchronizationTests: ProcedureKitTestCase {
 
     func test__did_finish_synchronized() {
         syncTest { syncObject, isSynced in
+            let didFinishGroup = DispatchGroup()
             let didFinishCalled_addBlock = Protector<(Procedure, [Error], Bool)?>(nil)
             let didFinishCalled_BlockObserver = Protector<(Procedure, [Error], Bool)?>(nil)
             let procedure = TestProcedure()
+            didFinishGroup.enter()
             procedure.addDidFinishBlockObserver(synchronizedWith: syncObject) { procedure, errors in
                 didFinishCalled_addBlock.overwrite(with: (procedure, errors, isSynced()))
+                didFinishGroup.leave()
             }
-            procedure.add(observer: BlockObserver(synchronizedWith: syncObject, didFinish: { didFinishCalled_BlockObserver.overwrite(with: ($0, $1, isSynced())) }))
+            didFinishGroup.enter()
+            procedure.add(observer: BlockObserver(synchronizedWith: syncObject, didFinish: { didFinishCalled_BlockObserver.overwrite(with: ($0, $1, isSynced()))
+                didFinishGroup.leave()
+            }))
             wait(for: procedure)
+
+            // Because Procedure signals isFinished KVO *prior* to calling DidFinish observers,
+            // the above wait() may return before either observer is called to record the
+            // DidFinish event.
+            // Thus, wait on both observers to be called before proceeding.
+            weak var expDidFinishObserverFired = expectation(description: "DidFinishObservers were fired")
+            didFinishGroup.notify(queue: DispatchQueue.main) {
+                expDidFinishObserverFired?.fulfill()
+            }
+            waitForExpectations(timeout: 2)
+
             XCTAssertEqual(didFinishCalled_addBlock.access?.0, procedure)
             XCTAssertTrue(didFinishCalled_addBlock.access?.2 ?? false, "Was not synchronized on \(syncObject).") // was synchronized
             XCTAssertEqual(didFinishCalled_BlockObserver.access?.0, procedure)
