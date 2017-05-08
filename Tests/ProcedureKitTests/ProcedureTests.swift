@@ -10,20 +10,83 @@ import TestingProcedureKit
 
 class QueueDelegateTests: ProcedureKitTestCase {
 
+    class WeakExpectation {
+        private(set) weak var expectation: XCTestExpectation?
+        init(_ expectation: XCTestExpectation) {
+            self.expectation = expectation
+        }
+    }
+    var expectOperations: Protector<[Operation: WeakExpectation]>!
+    var expectProcedures: Protector<[Procedure: WeakExpectation]>!
+
+    open override func setUp() {
+        super.setUp()
+        let expectOperations = Protector<[Operation: WeakExpectation]>([:])
+        let expectProcedures = Protector<[Procedure: WeakExpectation]>([:])
+        self.expectOperations = expectOperations
+        self.expectProcedures = expectProcedures
+
+        set(queueDelegate: QueueTestDelegate() { callback in
+            switch callback {
+            case .didFinishOperation(_, let operation):
+                if let expForOperation = expectOperations.read({ (ward) -> WeakExpectation? in
+                    return ward[operation]
+                }) {
+                    DispatchQueue.main.async {
+                        expForOperation.expectation?.fulfill()
+                    }
+                }
+            case .didFinishProcedure(_, let procedure, _):
+                if let expForProcedure = expectProcedures.read({ (ward) -> WeakExpectation? in
+                    return ward[procedure]
+                }) {
+                    DispatchQueue.main.async {
+                        expForProcedure.expectation?.fulfill()
+                    }
+                }
+                break
+            default: break
+            }
+        })
+    }
+
+    open override func tearDown() {
+        expectOperations = nil
+        expectProcedures = nil
+        super.tearDown()
+    }
+
+    func expectQueueDelegateDidFinishFor(operations: [Operation] = [], procedures: [Procedure] = []) {
+        var operationExpectations = [Operation: WeakExpectation]()
+        operations.forEach {
+            assert(!($0 is Procedure), "Passed a Procedure (\($0)) to `operations:` - use `procedures:`. Different delegate callbacks are provided for Operations vs Procedures.")
+            operationExpectations[$0] = WeakExpectation(expectation(description: "Expecting \($0.operationName) to generate didFinishOperation delegate callback."))
+        }
+        var procedureExpectations = [Procedure: WeakExpectation]()
+        procedures.forEach {
+            procedureExpectations[$0] = WeakExpectation(expectation(description: "Expecting \($0.operationName) to generate didFinishProcedure delegate callback."))
+        }
+
+        expectOperations.overwrite(with: operationExpectations)
+        expectProcedures.overwrite(with: procedureExpectations)
+    }
+
     func test__delegate__operation_notifications() {
 
         weak var expAddFinished = expectation(description: "Test: \(#function), queue.add did finish")
         weak var expOperationFinished = expectation(description: "Test: \(#function), Operation did finish")
         let operation = BlockOperation { }
-        let finishedOperation = BlockProcedure { }
-        finishedOperation.addDependency(operation)
-        finishedOperation.addDidFinishBlockObserver { _, _ in
+        let finishedProcedure = BlockProcedure { }
+        finishedProcedure.addDependency(operation)
+        finishedProcedure.addDidFinishBlockObserver { _, _ in
             DispatchQueue.main.async {
                 expOperationFinished?.fulfill()
             }
         }
 
-        queue.add(operations: [operation, finishedOperation]).then(on: DispatchQueue.main) {
+        expectQueueDelegateDidFinishFor(operations: [operation], procedures: [finishedProcedure])
+
+        queue.add(operations: [operation, finishedProcedure]).then(on: DispatchQueue.main) {
             expAddFinished?.fulfill()
         }
         waitForExpectations(timeout: 3)
@@ -37,6 +100,8 @@ class QueueDelegateTests: ProcedureKitTestCase {
 
         weak var expAddFinished = expectation(description: "Test: \(#function), queue.add did finish")
         addCompletionBlockTo(procedure: procedure)
+
+        expectQueueDelegateDidFinishFor(procedures: [procedure])
 
         queue.add(operation: procedure).then(on: DispatchQueue.main) {
             expAddFinished?.fulfill()
@@ -54,16 +119,20 @@ class QueueDelegateTests: ProcedureKitTestCase {
         // `open func addOperation(_ op: Operation)`
         // on a ProcedureQueue to ensure that it goes through the
         // overriden ProcedureQueue add path.
-        
+
         weak var didExecuteOperation = expectation(description: "Test: \(#function), did execute block")
-        queue.addOperation( BlockOperation{
+        let operation = BlockOperation{
             DispatchQueue.main.async {
                 didExecuteOperation?.fulfill()
             }
-        })
-        
+        }
+
+        expectQueueDelegateDidFinishFor(operations: [operation])
+
+        queue.addOperation(operation)
+
         waitForExpectations(timeout: 3)
-        
+
         XCTAssertFalse(delegate.procedureQueueWillAddOperation.isEmpty)
         XCTAssertFalse(delegate.procedureQueueDidAddOperation.isEmpty)
         XCTAssertFalse(delegate.procedureQueueDidFinishOperation.isEmpty)
@@ -74,7 +143,7 @@ class QueueDelegateTests: ProcedureKitTestCase {
         // `open func addOperations(_ ops: [Operation], waitUntilFinished wait: Bool)`
         // on a ProcedureQueue to ensure that it goes through the
         // overriden ProcedureQueue add path and that it *doesn't* wait.
-        
+
         weak var didExecuteOperation = expectation(description: "Test: \(#function), Operation did finish without being waited on by addOperations(_:waitUntilFinished:)")
         let operationCanProceed = DispatchSemaphore(value: 0)
         let operation = BlockOperation{
@@ -87,6 +156,9 @@ class QueueDelegateTests: ProcedureKitTestCase {
                 didExecuteOperation?.fulfill()
             }
         }
+
+        expectQueueDelegateDidFinishFor(operations: [operation])
+
         queue.addOperations([operation], waitUntilFinished: true)
         operationCanProceed.signal()
 
@@ -96,7 +168,7 @@ class QueueDelegateTests: ProcedureKitTestCase {
         XCTAssertFalse(delegate.procedureQueueDidAddOperation.isEmpty)
         XCTAssertFalse(delegate.procedureQueueDidFinishOperation.isEmpty)
     }
-    
+
     func test__delegate__operationqueue_addoperation_block() {
         // Testing OperationQueue's
         // `open func addOperation(_ block: @escaping () -> Swift.Void)`
@@ -104,12 +176,21 @@ class QueueDelegateTests: ProcedureKitTestCase {
         // overriden ProcedureQueue add path.
 
         weak var didExecuteBlock = expectation(description: "Test: \(#function), did execute block")
+        queue.isSuspended = true
         queue.addOperation({
             DispatchQueue.main.async {
                 didExecuteBlock?.fulfill()
             }
         })
 
+        // check the queue to see if a new BlockOperation has been created
+        XCTAssertEqual(queue.operations.count, 1)
+        XCTAssertTrue(queue.operations[0] is BlockOperation, "First item in Queue is not the expected BlockOperation")
+
+        expectQueueDelegateDidFinishFor(operations: [queue.operations[0]])
+
+        // resume the queue and wait for the BlockOperation to finish
+        queue.isSuspended = false
         waitForExpectations(timeout: 3)
 
         XCTAssertFalse(delegate.procedureQueueWillAddOperation.isEmpty)

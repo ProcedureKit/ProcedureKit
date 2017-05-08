@@ -38,6 +38,11 @@ open class ProcedureKitTestCase: XCTestCase {
         super.tearDown()
     }
 
+    public func set(queueDelegate delegate: QueueTestDelegate) {
+        self.delegate = delegate
+        queue.delegate = delegate
+    }
+
     public func run(operation: Operation) {
         run(operations: [operation])
     }
