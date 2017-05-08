@@ -9,10 +9,12 @@ import XCTest
 import ProcedureKit
 
 open class TestGroupProcedure: GroupProcedure {
-    public private(set) var didExecute = false
+    public var didExecute: Bool { return _didExecute.access }
+
+    private var _didExecute = Protector(false)
 
     open override func execute() {
-        didExecute = true
+        _didExecute.overwrite(with: true)
         super.execute()
     }
 }

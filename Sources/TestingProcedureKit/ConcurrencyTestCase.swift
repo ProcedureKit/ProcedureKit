@@ -160,8 +160,9 @@ open class ConcurrencyRegistrar {
 // MARK: - TestConcurrencyTrackingProcedure
 
 open class TestConcurrencyTrackingProcedure: Procedure {
-    private weak var concurrencyRegistrar: ConcurrencyRegistrar?
-    private let microsecondsToSleep: useconds_t
+    private(set) weak var concurrencyRegistrar: ConcurrencyRegistrar?
+    let microsecondsToSleep: useconds_t
+
     init(name: String = "TestConcurrencyTrackingProcedure", microsecondsToSleep: useconds_t, registrar: ConcurrencyRegistrar) {
         self.concurrencyRegistrar = registrar
         self.microsecondsToSleep = microsecondsToSleep
