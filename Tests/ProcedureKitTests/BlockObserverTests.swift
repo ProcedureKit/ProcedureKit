@@ -232,17 +232,33 @@ class BlockObserverSynchronizationTests: ProcedureKitTestCase {
 
     func test__did_add_synchronized() {
         syncTest { syncObject, isSynced in
+            let didAddGroup = DispatchGroup()
             let didExecuteProducedOperation = Protector(false)
             let didAddOperationCalled_addBlock = Protector<(Procedure, Operation, Bool)?>(nil)
             let didAddOperationCalled_BlockObserver = Protector<(Procedure, Operation, Bool)?>(nil)
             let producedOperation = BlockProcedure { didExecuteProducedOperation.overwrite(with: true) }
             addCompletionBlockTo(procedure: producedOperation)
             let producingProcedure = TestProcedure(produced: producedOperation)
+            didAddGroup.enter()
             producingProcedure.addDidAddOperationBlockObserver(synchronizedWith: syncObject) {
                 didAddOperationCalled_addBlock.overwrite(with: ($0, $1, isSynced()))
+                didAddGroup.leave()
             }
-            producingProcedure.add(observer: BlockObserver(synchronizedWith: syncObject, didAdd: { didAddOperationCalled_BlockObserver.overwrite(with: ($0, $1, isSynced())) }))
+            didAddGroup.enter()
+            producingProcedure.add(observer: BlockObserver(synchronizedWith: syncObject, didAdd: {
+                didAddOperationCalled_BlockObserver.overwrite(with: ($0, $1, isSynced()))
+                didAddGroup.leave()
+            }))
             wait(for: producingProcedure)
+
+            // DidAdd events are only guaranteed to happen at *some point after* the operation is added.
+            // Thus, wait on both observers to be called before proceeding.
+            weak var expDidAddObserverFired = expectation(description: "DidAddObservers were fired")
+            didAddGroup.notify(queue: DispatchQueue.main) {
+                expDidAddObserverFired?.fulfill()
+            }
+            waitForExpectations(timeout: 2)
+
             XCTAssertTrue(didExecuteProducedOperation.access)
             XCTAssertEqual(didAddOperationCalled_addBlock.access?.0, producingProcedure)
             XCTAssertEqual(didAddOperationCalled_addBlock.access?.1, producedOperation)
