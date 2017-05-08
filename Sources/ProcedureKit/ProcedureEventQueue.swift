@@ -203,6 +203,10 @@ internal extension EventQueue {
             originalQueue.queue.resume()
         }
     }
+
+    func makeTimerSource(flags: DispatchSource.TimerFlags = []) -> DispatchSourceTimer {
+        return DispatchSource.makeTimerSource(flags: flags, queue: queue)
+    }
 }
 
 // MARK: - QueueProvider
