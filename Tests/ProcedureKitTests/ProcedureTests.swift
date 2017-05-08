@@ -59,6 +59,7 @@ class QueueDelegateTests: ProcedureKitTestCase {
     func expectQueueDelegateDidFinishFor(operations: [Operation] = [], procedures: [Procedure] = []) {
         var operationExpectations = [Operation: WeakExpectation]()
         operations.forEach {
+            assert(!($0 is Procedure), "Passed a Procedure (\($0)) to `operations:` - use `procedures:`. Different delegate callbacks are provided for Operations vs Procedures.")
             operationExpectations[$0] = WeakExpectation(expectation(description: "Expecting \($0.operationName) to generate didFinishOperation delegate callback."))
         }
         var procedureExpectations = [Procedure: WeakExpectation]()
