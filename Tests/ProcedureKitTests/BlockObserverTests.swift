@@ -209,17 +209,18 @@ class BlockObserverSynchronizationTests: ProcedureKitTestCase {
 
     func test__will_add_synchronized() {
         syncTest { syncObject, isSynced in
-            var didExecuteProducedOperation = false
+            let didExecuteProducedOperation = Protector(false)
             let willAddOperationCalled_addBlock = Protector<(Procedure, Operation, Bool)?>(nil)
             let willAddOperationCalled_BlockObserver = Protector<(Procedure, Operation, Bool)?>(nil)
-            let producedOperation = BlockOperation { didExecuteProducedOperation = true }
+            let producedOperation = BlockProcedure { didExecuteProducedOperation.overwrite(with: true) }
+            addCompletionBlockTo(procedure: producedOperation)
             let producingProcedure = TestProcedure(produced: producedOperation)
             producingProcedure.addWillAddOperationBlockObserver(synchronizedWith: syncObject) {
                 willAddOperationCalled_addBlock.overwrite(with: ($0, $1, isSynced()))
             }
             producingProcedure.add(observer: BlockObserver(synchronizedWith: syncObject, willAdd: { willAddOperationCalled_BlockObserver.overwrite(with: ($0, $1, isSynced())) }))
             wait(for: producingProcedure)
-            XCTAssertTrue(didExecuteProducedOperation)
+            XCTAssertTrue(didExecuteProducedOperation.access)
             XCTAssertEqual(willAddOperationCalled_addBlock.access?.0, producingProcedure)
             XCTAssertEqual(willAddOperationCalled_addBlock.access?.1, producedOperation)
             XCTAssertTrue(willAddOperationCalled_addBlock.access?.2 ?? false, "Was not synchronized on \(syncObject).") // was synchronized
@@ -231,17 +232,18 @@ class BlockObserverSynchronizationTests: ProcedureKitTestCase {
 
     func test__did_add_synchronized() {
         syncTest { syncObject, isSynced in
-            var didExecuteProducedOperation = false
+            let didExecuteProducedOperation = Protector(false)
             let didAddOperationCalled_addBlock = Protector<(Procedure, Operation, Bool)?>(nil)
             let didAddOperationCalled_BlockObserver = Protector<(Procedure, Operation, Bool)?>(nil)
-            let producedOperation = BlockOperation { didExecuteProducedOperation = true }
+            let producedOperation = BlockProcedure { didExecuteProducedOperation.overwrite(with: true) }
+            addCompletionBlockTo(procedure: producedOperation)
             let producingProcedure = TestProcedure(produced: producedOperation)
             producingProcedure.addDidAddOperationBlockObserver(synchronizedWith: syncObject) {
                 didAddOperationCalled_addBlock.overwrite(with: ($0, $1, isSynced()))
             }
             producingProcedure.add(observer: BlockObserver(synchronizedWith: syncObject, didAdd: { didAddOperationCalled_BlockObserver.overwrite(with: ($0, $1, isSynced())) }))
             wait(for: producingProcedure)
-            XCTAssertTrue(didExecuteProducedOperation)
+            XCTAssertTrue(didExecuteProducedOperation.access)
             XCTAssertEqual(didAddOperationCalled_addBlock.access?.0, producingProcedure)
             XCTAssertEqual(didAddOperationCalled_addBlock.access?.1, producedOperation)
             XCTAssertTrue(didAddOperationCalled_addBlock.access?.2 ?? false, "Was not synchronized on \(syncObject).") // was synchronized
