@@ -461,10 +461,24 @@ class DependencyTests: ProcedureKitTestCase {
     func test__operation_added_to_array_using_then() {
         let one = TestProcedure()
         let two = TestProcedure(delay: 1)
+        let didFinishAnother = DispatchGroup()
+        didFinishAnother.enter()
         let another = TestProcedure()
+        another.addDidFinishBlockObserver { _, _ in
+            didFinishAnother.leave()
+        }
         let all = [one, two, procedure].then(do: another)
         XCTAssertEqual(all.count, 4)
-        wait(for: one, two, procedure, another)
+        run(operation: another)
+        wait(for: procedure)
+        // wait should time out because all of `one`, `two`, `procedure` should be waited on to start `another`
+        XCTAssertEqual(didFinishAnother.wait(timeout: .now() + 0.1), .timedOut)
+
+        weak var expDidFinishAnother = expectation(description: "DidFinish: another")
+        didFinishAnother.notify(queue: DispatchQueue.main) {
+            expDidFinishAnother?.fulfill()
+        }
+        wait(for: one, two) // wait for `one`, `two` and `another` (after `one` and `two`) to finish
         XCTAssertProcedureFinishedWithoutErrors(another)
         XCTAssertLessThan(one.executedAt, another.executedAt)
         XCTAssertLessThan(two.executedAt, another.executedAt)
