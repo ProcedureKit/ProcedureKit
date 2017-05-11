@@ -70,12 +70,17 @@ open class ProcessProcedure: Procedure, InputProcedure, OutputProcedure {
 
     /// Error type for ProcessProcedure
     public enum Error: Swift.Error, Equatable {
+        case emptyLaunchPath
+        case invalidLaunchPath
         case didNotExitCleanly(Int32, Process.TerminationReason)
 
         public static func == (lhs: ProcessProcedure.Error, rhs: ProcessProcedure.Error) -> Bool {
             switch (lhs, rhs) {
+            case (.emptyLaunchPath, .emptyLaunchPath): return true
+            case (.invalidLaunchPath, .invalidLaunchPath): return true
             case let (.didNotExitCleanly(lhsStatus, lhsReason), .didNotExitCleanly(rhsStatus, rhsReason)):
                 return (lhsReason == rhsReason) && (lhsStatus == rhsStatus)
+            default: return false
             }
         }
     }
@@ -217,6 +222,27 @@ open class ProcessProcedure: Procedure, InputProcedure, OutputProcedure {
 
         guard let request = input.value else {
             finish(withResult: .failure(ProcedureKitError.requirementNotSatisfied()))
+            return
+        }
+
+        guard !request.launchPath.isEmpty else {
+            finish(withResult: .failure(Error.emptyLaunchPath))
+            return
+        }
+
+        // Check whether the launchPath provided in the request is executable
+        //
+        // NOTE: This check is a "snapshot" check, is **not** exhaustive, and
+        // exists largely to assist in catching simple programmer error.
+        //
+        // If the `launchPath` disappears or becomes non-executable between the time
+        // of this check, and the ProcessProcedure's later call to `Process.launch()`,
+        // or if various other error situations occur with the provided LaunchRequest
+        // parameters passed to the Process, Process may throw an Objective-C exception.
+        // See the documentation for Process / NSTask for more details.
+        //
+        guard FileManager.default.isExecutableFile(atPath: request.launchPath) else {
+            finish(withResult: .failure(Error.invalidLaunchPath))
             return
         }
 

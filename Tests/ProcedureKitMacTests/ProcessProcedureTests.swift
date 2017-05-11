@@ -18,6 +18,7 @@ class ProcessProcedureTests: ProcedureKitTestCase {
     var launchPath: String!
     var arguments: [String]!
 
+    let bash = "/bin/bash"
     let bashWaitIndefinitelyForInput = "read -n1 -r -p \"Wait indefinitely for input\" key"
 
     override func setUp() {
@@ -39,6 +40,26 @@ class ProcessProcedureTests: ProcedureKitTestCase {
         XCTAssertProcedureFinishedWithoutErrors(processProcedure)
     }
 
+    func test__start_process_with_empty_launchpath() {
+        processProcedure = ProcessProcedure(launchPath: "")
+        wait(for: processProcedure)
+        XCTAssertProcedureFinishedWithErrors(processProcedure, count: 1)
+        XCTAssertEqual(processProcedure.errors.first as? ProcessProcedure.Error, ProcessProcedure.Error.emptyLaunchPath)
+    }
+
+    func test__start_process_with_non_existent_launchpath() {
+        let nonExistentLaunchPath = "/bin/echo8procedurekit"
+        guard !FileManager.default.isExecutableFile(atPath: nonExistentLaunchPath) else {
+            // the non-existent launch path used for this test exists on the local system
+            XCTFail("Cannot run test. The non-existent launch path exists on this system: \(nonExistentLaunchPath)")
+            return
+        }
+        processProcedure = ProcessProcedure(launchPath: nonExistentLaunchPath)
+        wait(for: processProcedure)
+        XCTAssertProcedureFinishedWithErrors(processProcedure, count: 1)
+        XCTAssertEqual(processProcedure.errors.first as? ProcessProcedure.Error, ProcessProcedure.Error.invalidLaunchPath)
+    }
+
     func test__cancel_process_before_launched() {
         processProcedure.cancel()
         wait(for: processProcedure)
@@ -46,7 +67,7 @@ class ProcessProcedureTests: ProcedureKitTestCase {
     }
 
     func test__cancel_process_after_launched() {
-        processProcedure = ProcessProcedure(launchPath: "/bin/bash/", arguments: ["-c", bashWaitIndefinitelyForInput], processDidLaunch: { processProcedure in
+        processProcedure = ProcessProcedure(launchPath: bash, arguments: ["-c", bashWaitIndefinitelyForInput], processDidLaunch: { processProcedure in
                 processProcedure.cancel()
         })
         wait(for: processProcedure, withTimeout: 1)
@@ -60,7 +81,7 @@ class ProcessProcedureTests: ProcedureKitTestCase {
     func test__processIdentifier_after_launched() {
         weak var didExecuteExpectation = expectation(description: "DidExecute: \(#function)")
         let processIdentifier = Protector<Int32>(-1)
-        processProcedure = ProcessProcedure(launchPath: "/bin/bash/", arguments: ["-c", "sleep 1"], processDidLaunch: { processProcedure in
+        processProcedure = ProcessProcedure(launchPath: bash, arguments: ["-c", "sleep 1"], processDidLaunch: { processProcedure in
                 let retrievedProcessIdentifier = processProcedure.processIdentifier
                 processIdentifier.overwrite(with: retrievedProcessIdentifier)
                 DispatchQueue.main.async {
@@ -79,7 +100,7 @@ class ProcessProcedureTests: ProcedureKitTestCase {
 
     func test__suspend_before_launched_returns_false() {
         weak var didSuspendExpectation = expectation(description: "Did Suspend: \(#function)")
-        processProcedure = ProcessProcedure(launchPath: "/bin/bash/", arguments: ["-c", "sleep 1"])
+        processProcedure = ProcessProcedure(launchPath: bash, arguments: ["-c", "sleep 1"])
         processProcedure.suspend { success in
             DispatchQueue.main.async {
                 XCTAssertFalse(success)
@@ -104,7 +125,7 @@ class ProcessProcedureTests: ProcedureKitTestCase {
 
     func test__resume_before_launched_returns_false() {
         weak var didResumeExpectation = expectation(description: "Did Resume: \(#function)")
-        processProcedure = ProcessProcedure(launchPath: "/bin/bash/", arguments: ["-c", "sleep 1"])
+        processProcedure = ProcessProcedure(launchPath: bash, arguments: ["-c", "sleep 1"])
         processProcedure.resume { success in
             DispatchQueue.main.async {
                 XCTAssertFalse(success)
@@ -132,7 +153,7 @@ class ProcessProcedureTests: ProcedureKitTestCase {
         let didFinishGroup = DispatchGroup()
         weak var didSuspendExpectation = expectation(description: "Did Suspend: \(#function)")
         weak var delayPassed = expectation(description: "Delay Passed: \(#function)")
-        processProcedure = ProcessProcedure(launchPath: "/bin/bash/", arguments: ["-c", "sleep 1"], processDidLaunch: { processProcedure in
+        processProcedure = ProcessProcedure(launchPath: bash, arguments: ["-c", "sleep 1"], processDidLaunch: { processProcedure in
                 processProcedure.suspend { (success) in
                     DispatchQueue.main.async {
                         XCTAssertTrue(success)
@@ -173,7 +194,7 @@ class ProcessProcedureTests: ProcedureKitTestCase {
         let exitStatus: Int32 = 5
         let receivedStatus = Protector<Int32?>(nil)
         let receivedReason = Protector<Process.TerminationReason?>(nil)
-        processProcedure = ProcessProcedure(launchPath: "/bin/bash/", arguments: ["-c", "exit \(exitStatus)"], processDidExitCleanly: { status, reason in
+        processProcedure = ProcessProcedure(launchPath: bash, arguments: ["-c", "exit \(exitStatus)"], processDidExitCleanly: { status, reason in
             receivedStatus.overwrite(with: status)
             receivedReason.overwrite(with: reason)
             return false
@@ -193,7 +214,7 @@ class ProcessProcedureTests: ProcedureKitTestCase {
     func test__process_did_exit_cleanly_closure_receives_expected_uncaught_signal_input() {
         let receivedStatus = Protector<Int32?>(nil)
         let receivedReason = Protector<Process.TerminationReason?>(nil)
-        processProcedure = ProcessProcedure(launchPath: "/bin/bash/", arguments: ["-c", bashWaitIndefinitelyForInput], processDidLaunch: { processProcedure in
+        processProcedure = ProcessProcedure(launchPath: bash, arguments: ["-c", bashWaitIndefinitelyForInput], processDidLaunch: { processProcedure in
             guard let process = processProcedure.process else { assertionFailure("ProcessProcedure.process does not exist"); return }
             DispatchQueue.main.async {
                 // Send SIGTERM to the ProcessProcedure's internal Process
@@ -293,14 +314,14 @@ class ProcessProcedureTests: ProcedureKitTestCase {
     }
 
     func test__process_exit_status_1__finishes_with_error() {
-        processProcedure = ProcessProcedure(launchPath: "/bin/bash/", arguments: ["-c", "exit 1"])
+        processProcedure = ProcessProcedure(launchPath: bash, arguments: ["-c", "exit 1"])
         wait(for: processProcedure)
         XCTAssertProcedureFinishedWithErrors(processProcedure, count: 1)
         XCTAssertEqual(processProcedure.errors.first as? ProcessProcedure.Error, ProcessProcedure.Error.didNotExitCleanly(1, .exit))
     }
 
     func test__process_terminated_with_uncaught_signal__finishes_with_error() {
-        processProcedure = ProcessProcedure(launchPath: "/bin/bash/", arguments: ["-c", bashWaitIndefinitelyForInput], processDidLaunch: { processProcedure in
+        processProcedure = ProcessProcedure(launchPath: bash, arguments: ["-c", bashWaitIndefinitelyForInput], processDidLaunch: { processProcedure in
             guard let process = processProcedure.process else { assertionFailure("ProcessProcedure.process does not exist"); return }
             DispatchQueue.main.async {
                 // Send SIGTERM to the ProcessProcedure's internal Process
@@ -315,7 +336,7 @@ class ProcessProcedureTests: ProcedureKitTestCase {
 
     func test__process_did_exit_cleanly_closure_false__finishes_with_error() {
         let didCallClosure = Protector(false)
-        processProcedure = ProcessProcedure(launchPath: "/bin/bash/", arguments: ["-c", "exit 0"], processDidExitCleanly: { _, _ in
+        processProcedure = ProcessProcedure(launchPath: bash, arguments: ["-c", "exit 0"], processDidExitCleanly: { _, _ in
             didCallClosure.overwrite(with: true)
             return false
         })
@@ -327,7 +348,7 @@ class ProcessProcedureTests: ProcedureKitTestCase {
 
     func test__process_did_exit_cleanly_closure_true__finishes_without_error() {
         let didCallClosure = Protector(false)
-        processProcedure = ProcessProcedure(launchPath: "/bin/bash/", arguments: ["-c", "exit 1"], processDidExitCleanly: { _, _ in
+        processProcedure = ProcessProcedure(launchPath: bash, arguments: ["-c", "exit 1"], processDidExitCleanly: { _, _ in
             didCallClosure.overwrite(with: true)
             return true
         })
