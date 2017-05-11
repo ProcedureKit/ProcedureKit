@@ -18,6 +18,19 @@ Reference documentation | [docs.danthorpe.me/operations](http://docs.danthorpe.m
 Programming guide | [operations.readme.io](https://operations.readme.io)
 Example projects | [danthorpe/Examples](https://github.com/danthorpe/Examples)
 
+## Compatibility
+
+ProcedureKit supports all current Apple platforms. The minimum requirements are:
+
+- iOS 8.0+
+- macOS 10.10+
+- watchOS 2.0+
+- tvOS 9.2+
+
+The current version of ProcedureKit supports Swift 3+, and the use of Xcode 8.2+ is strongly recommended.
+
+(If you need Swift 2.3 support, see [version 3.4.1](https://github.com/ProcedureKit/ProcedureKit/releases/tag/3.4.1) or the [`swift/2.3` branch](https://github.com/ProcedureKit/ProcedureKit/tree/swift/2.3).)
+
 ## Framework structure
 
 _ProcedureKit_ is a "multi-module" framework (don't bother Googling that, I just made it up). What I mean, is that the Xcode project has multiple targets/products each of which produces a Swift module. Some of these modules are cross-platform, others are dedicated, e.g. `ProcedureKitNetwork` vs `ProcedureKitMobile`.
