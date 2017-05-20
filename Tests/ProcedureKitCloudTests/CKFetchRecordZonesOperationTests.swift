@@ -40,6 +40,12 @@ class CKFetchRecordZonesOperationTests: CKProcedureTestCase {
         operation = CKProcedure(operation: target)
     }
 
+    override func tearDown() {
+        target = nil
+        operation = nil
+        super.tearDown()
+    }
+
     func test__set_get__recordZoneIDs() {
         let recordZoneIDs = [ "a-zone-id", "another-zone-id" ]
         operation.recordZoneIDs = recordZoneIDs
@@ -93,6 +99,11 @@ class CloudKitProcedureFetchRecordZonesOperationTests: CKProcedureTestCase {
         cloudkit.previousServerChangeToken = token
         cloudkit.resultsLimit = 10
         cloudkit.recordZoneIDs = [ "record zone 1 id", "record zone 2 id" ]
+    }
+
+    override func tearDown() {
+        cloudkit = nil
+        super.tearDown()
     }
 
     func test__set_get__errorHandlers() {

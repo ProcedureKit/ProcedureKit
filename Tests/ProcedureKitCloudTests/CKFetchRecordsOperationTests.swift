@@ -42,6 +42,12 @@ class CKFetchRecordsOperationTests: CKProcedureTestCase {
         operation = CKProcedure(operation: target)
     }
 
+    override func tearDown() {
+        target = nil
+        operation = nil
+        super.tearDown()
+    }
+
     func test__set_get__recordIDs() {
         let recordIDs: [String] = ["I'm a record ID"]
         operation.recordIDs = recordIDs
@@ -126,6 +132,13 @@ class CloudKitProcedureFetchRecordOperationTests: CKProcedureTestCase {
         cloudkit.perRecordCompletionBlock = { [unowned self] record, recordID, error in
             self.setByPerRecordCompletionBlock = (record, recordID, error)
         }
+    }
+
+    override func tearDown() {
+        cloudkit = nil
+        setByPerRecordProgressBlock = nil
+        setByPerRecordCompletionBlock = nil
+        super.tearDown()
     }
 
     func test__set_get__errorHandlers() {

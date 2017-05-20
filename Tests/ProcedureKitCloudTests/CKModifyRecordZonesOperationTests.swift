@@ -43,6 +43,12 @@ class CKModifyRecordZonesOperationTests: CKProcedureTestCase {
         operation = CKProcedure(operation: target)
     }
 
+    override func tearDown() {
+        target = nil
+        operation = nil
+        super.tearDown()
+    }
+
     func test__set_get__recordZonesToSave() {
         let recordZonesToSave = [ "a-record-zone", "another-record-zone" ]
         operation.recordZonesToSave = recordZonesToSave
@@ -104,6 +110,11 @@ class CloudKitProcedureModifyRecordZonesOperationTests: CKProcedureTestCase {
         cloudkit.container = container
         cloudkit.recordZonesToSave = [ "record zone 1" ]
         cloudkit.recordZoneIDsToDelete = [ "record zone 2 ID" ]
+    }
+
+    override func tearDown() {
+        cloudkit = nil
+        super.tearDown()
     }
 
     func test__set_get__errorHandlers() {

@@ -40,6 +40,12 @@ class CKFetchSubscriptionsOperationTests: CKProcedureTestCase {
         operation = CKProcedure(operation: target)
     }
 
+    override func tearDown() {
+        target = nil
+        operation = nil
+        super.tearDown()
+    }
+
     func test__set_get__subscriptionIDs() {
         let subscriptionIDs = [ "an-id", "another-id" ]
         operation.subscriptionIDs = subscriptionIDs
@@ -91,6 +97,11 @@ class CloudKitProcedureFetchSubscriptionsOperationTests: CKProcedureTestCase {
         cloudkit = CloudKitProcedure(strategy: .immediate) { TestCKFetchSubscriptionsOperation() }
         cloudkit.container = container
         cloudkit.subscriptionIDs = [ "subscription id 1", "subscription id 2" ]
+    }
+
+    override func tearDown() {
+        cloudkit = nil
+        super.tearDown()
     }
 
     func test__set_get__errorHandlers() {

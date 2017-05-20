@@ -39,6 +39,12 @@ class CKFetchShareParticipantsOperationTests: CKProcedureTestCase {
         operation = CKProcedure(operation: target)
     }
 
+    override func tearDown() {
+        target = nil
+        operation = nil
+        super.tearDown()
+    }
+
     func test__set_get__userIdentityLookupInfos() {
         let userIdentityLookupInfos = [ "hello@world.com" ]
         operation.userIdentityLookupInfos = userIdentityLookupInfos
@@ -98,6 +104,12 @@ class CloudKitProcedureFetchShareParticipantsOperationTests: CKProcedureTestCase
         cloudkit.container = container
         cloudkit.userIdentityLookupInfos = [ "user lookup info" ]
         cloudkit.shareParticipantFetchedBlock = { self.setByShareParticipantFetchedBlock = $0 }
+    }
+
+    override func tearDown() {
+        cloudkit = nil
+        setByShareParticipantFetchedBlock = nil
+        super.tearDown()
     }
 
     func test__set_get__errorHandlers() {

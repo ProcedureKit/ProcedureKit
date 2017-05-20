@@ -41,6 +41,12 @@ class CKFetchShareMetadataOperationTests: CKProcedureTestCase {
         operation = CKProcedure(operation: target)
     }
 
+    override func tearDown() {
+        target = nil
+        operation = nil
+        super.tearDown()
+    }
+
     func test__set_get__shareURLs() {
         let shareURLs = [ URL(string: "http://example.com")! ]
         operation.shareURLs = shareURLs
@@ -124,6 +130,12 @@ class CloudKitProcedureFetchShareMetadataOperationTests: CKProcedureTestCase {
         cloudkit.perShareMetadataBlock = { [unowned self] url, metadata, error in
             self.setByPerShareMetadataBlock = (url, metadata, error)
         }
+    }
+
+    override func tearDown() {
+        cloudkit = nil
+        setByPerShareMetadataBlock = nil
+        super.tearDown()
     }
 
     func test__set_get__errorHandlers() {

@@ -41,6 +41,12 @@ class CKMarkNotificationsReadOperationTests: CKProcedureTestCase {
         operation = CKProcedure(operation: target)
     }
 
+    override func tearDown() {
+        target = nil
+        operation = nil
+        super.tearDown()
+    }
+
     func test__set_get__notificationIDs() {
         let notificationIDs = [ "an-id", "another-id" ]
         operation.notificationIDs = notificationIDs
@@ -93,6 +99,11 @@ class CloudKitProcedureMarkNotificationsReadOperationTests: CKProcedureTestCase 
         cloudkit = CloudKitProcedure(strategy: .immediate) { TestCKMarkNotificationsReadOperation() }
         cloudkit.container = container
         cloudkit.notificationIDs = [ "notification id 1", "notification id 2" ]
+    }
+
+    override func tearDown() {
+        cloudkit = nil
+        super.tearDown()
     }
 
     func test__set_get__errorHandlers() {

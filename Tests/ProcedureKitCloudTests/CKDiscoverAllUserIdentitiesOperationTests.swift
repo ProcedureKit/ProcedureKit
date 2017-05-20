@@ -40,6 +40,12 @@ class CKDiscoverAllUserIdentitiesOperationTests: CKProcedureTestCase {
         operation = CKProcedure(operation: target)
     }
 
+    override func tearDown() {
+        target = nil
+        operation = nil
+        super.tearDown()
+    }
+
     func test__set_get__userIdentityDiscoveredBlock() {
         var setByCompletionBlock = false
         let block: (String) -> Void = { identity in
@@ -92,6 +98,12 @@ class CloudKitProcedureDiscoverAllUserIdentitiesOperationTests: CKProcedureTestC
         cloudkit.userIdentityDiscoveredBlock = { [weak self] _ in
             self?.setByUserIdentityDiscoveredBlock = true
         }
+    }
+
+    override func tearDown() {
+        setByUserIdentityDiscoveredBlock = false
+        cloudkit = nil
+        super.tearDown()
     }
 
     func test__set_get__errorHandlers() {

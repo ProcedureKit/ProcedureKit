@@ -53,6 +53,12 @@ class CKFetchRecordZoneChangesOperationTests: CKProcedureTestCase {
         operation = CKProcedure(operation: target)
     }
 
+    override func tearDown() {
+        target = nil
+        operation = nil
+        super.tearDown()
+    }
+
     func test__set_get__recordZoneIDs() {
         let recordZoneIDs: [String] = ["I'm a record zone ID"]
         operation.recordZoneIDs = recordZoneIDs
@@ -172,6 +178,15 @@ class CloudKitProcedureFetchRecordZoneChangesOperationTests: CKProcedureTestCase
         cloudkit.recordZoneFetchCompletionBlock = { [unowned self] zoneId, token, data, isComplete, error in
             self.setByRecordZoneFetchCompletionBlock = (zoneId, token, data, isComplete, error)
         }
+    }
+
+    override func tearDown() {
+        cloudkit = nil
+        setByRecordChangedBlock = nil
+        setByRecordWithIDWasDeletedBlock = nil
+        setByRecordZoneChangeTokensUpdatedBlock = nil
+        setByRecordZoneFetchCompletionBlock = nil
+        super.tearDown()
     }
 
     func test__set_get__errorHandlers() {

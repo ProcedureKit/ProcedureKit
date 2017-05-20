@@ -29,7 +29,13 @@ class CKDatabaseOperationTests: CKProcedureTestCase {
         target = TestCKDatabaseOperation()
         operation = CKProcedure(operation: target)
     }
-    
+
+    override func tearDown() {
+        target = nil
+        operation = nil
+        super.tearDown()
+    }
+
     func test__set_get__database() {
         let database = "I'm a cloud kit database"
         operation.database = database

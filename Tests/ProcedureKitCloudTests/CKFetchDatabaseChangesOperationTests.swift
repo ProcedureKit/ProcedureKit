@@ -44,6 +44,12 @@ class CKFetchDatabaseChangesOperationTests: CKProcedureTestCase {
         operation = CKProcedure(operation: target)
     }
 
+    override func tearDown() {
+        target = nil
+        operation = nil
+        super.tearDown()
+    }
+
     // fetchAllChanges is tested by CKFetchAllChangesTests
 
     func test__set_get__recordZoneWithIDChangedBlock() {
@@ -137,6 +143,14 @@ class CloudKitProcedureFetchDatabaseChangesOperationTests: CKProcedureTestCase {
         cloudkit.changeTokenUpdatedBlock = { [unowned self] token in
             self.setByChangeTokenUpdatedBlock = token
         }
+    }
+
+    override func tearDown() {
+        cloudkit = nil
+        setByRecordZoneWithIDChangedBlock = nil
+        setByRecordZoneWithIDWasDeletedBlock = nil
+        setByChangeTokenUpdatedBlock = nil
+        super.tearDown()
     }
 
     func test__set_get__errorHandlers() {

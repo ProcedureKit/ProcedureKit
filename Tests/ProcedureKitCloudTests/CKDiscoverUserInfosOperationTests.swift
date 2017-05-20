@@ -43,6 +43,12 @@ class CKDiscoverUserInfosOperationTests: CKProcedureTestCase {
         operation = CKProcedure(operation: target)
     }
 
+    override func tearDown() {
+        target = nil
+        operation = nil
+        super.tearDown()
+    }
+
     func test__set_get__emailAddresses() {
         let emailAddresses = [ "hello@world.com" ]
         operation.emailAddresses = emailAddresses
@@ -109,6 +115,12 @@ class CloudKitProcedureDiscoverUserInfosOperationTests: CKProcedureTestCase {
         cloudkit.container = container
         cloudkit.emailAddresses = [ "hello@world.com" ]
         cloudkit.userRecordIDs = [ "hello user" ]
+    }
+
+    override func tearDown() {
+        setByUserIdentityDiscoveredBlock = false
+        cloudkit = nil
+        super.tearDown()
     }
 
     func test__set_get__errorHandlers() {
