@@ -2,19 +2,29 @@ language: objective-c
 osx_image: xcode8.3
 jobs:
   include:
-    - stage: Test
+    - stage: ProcedureKit
       script: bundle exec fastlane mac test
-      script: bundle exec fastlane mac test_network
-      script: bundle exec fastlane mac test_location
-      script: bundle exec fastlane mac test_cloud
-      script: bundle exec fastlane mac test_mac
+    - stage: ProcedureKit
       script: bundle exec fastlane ios test_ios
+    - stage: Network
+      script: bundle exec fastlane mac test_network
+    - stage: Network
       script: bundle exec fastlane ios test_network_ios
-      script: bundle exec fastlane ios test_location_ios      
-      script: bundle exec fastlane ios test_cloud_ios
-      script: bundle exec fastlane ios test_mobile_ios      
-      script: bundle exec fastlane ios test_network_tvos
+    - stage: Network      
+      script: bundle exec fastlane ios test_network_tvos      
+    - stage: Location
+      script: bundle exec fastlane mac test_location
+    - stage: Location
+      script: bundle exec fastlane ios test_location_ios    
+    - stage: Location
       script: bundle exec fastlane ios test_location_tvos
-      script: bundle exec fastlane ios test_cloud_tvos                        
+    - stage: Cloud
+      script: bundle exec fastlane mac test_cloud
+    - stage: Cloud
+      script: bundle exec fastlane ios test_cloud_ios    
+    - stage: Cloud
+      script: bundle exec fastlane ios test_cloud_tvos
+    - stage: Mac
+      script: bundle exec fastlane mac test_mac
     - stage: Stress Test
       script: bundle exec fastlane mac stress_test
