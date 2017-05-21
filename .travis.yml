@@ -4,3 +4,17 @@ jobs:
   include:
     - stage: Test
       script: bundle exec fastlane mac test
+      script: bundle exec fastlane mac test_network
+      script: bundle exec fastlane mac test_location
+      script: bundle exec fastlane mac test_cloud
+      script: bundle exec fastlane mac test_mac
+      script: bundle exec fastlane ios test_ios
+      script: bundle exec fastlane ios test_network_ios
+      script: bundle exec fastlane ios test_location_ios      
+      script: bundle exec fastlane ios test_cloud_ios
+      script: bundle exec fastlane ios test_mobile_ios      
+      script: bundle exec fastlane ios test_network_tvos
+      script: bundle exec fastlane ios test_location_tvos
+      script: bundle exec fastlane ios test_cloud_tvos                        
+    - stage: Stress Test
+      script: bundle exec fastlane mac stress_test
