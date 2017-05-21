@@ -24,6 +24,12 @@ class CKFetchAllChangesOperationTests: CKProcedureTestCase {
         operation = CKProcedure(operation: target)
     }
 
+    override func tearDown() {
+        target = nil
+        operation = nil
+        super.tearDown()
+    }
+
     func test__set_get__fetchAllChanges() {
         var fetchAllChanges = false
         operation.fetchAllChanges = fetchAllChanges

@@ -117,6 +117,7 @@ class CloudKitStatusTests: XCTestCase {
 
     override func tearDown() {
         error = nil
+        status = nil
         super.tearDown()
     }
 

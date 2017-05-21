@@ -41,6 +41,12 @@ class CKQueryOperationTests: CKProcedureTestCase {
         operation = CKProcedure(operation: target)
     }
 
+    override func tearDown() {
+        target = nil
+        operation = nil
+        super.tearDown()
+    }
+
     func test__set_get__query() {
         let query = "a-query"
         operation.query = query
@@ -126,6 +132,12 @@ class CloudKitProcedureQueryOperationTests: CKProcedureTestCase {
         cloudkit.cursor = "a cursor"
         cloudkit.zoneID = "a zone 1 ID"
         cloudkit.recordFetchedBlock = { self.setByQueryRecordFetchedBlock = $0 }
+    }
+
+    override func tearDown() {
+        cloudkit = nil
+        setByQueryRecordFetchedBlock = nil
+        super.tearDown()
     }
 
     func test__set_get__errorHandlers() {

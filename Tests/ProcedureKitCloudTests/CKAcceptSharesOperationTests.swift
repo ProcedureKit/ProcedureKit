@@ -41,6 +41,12 @@ class CKAcceptSharesOperationTests: CKProcedureTestCase {
         operation = CKProcedure(operation: target)
     }
 
+    override func tearDown() {
+        target = nil
+        operation = nil
+        super.tearDown()
+    }
+
     func test__set_get__shareMetadatas() {
         let shareMetaddatas = [ "hello@world.com" ]
         operation.shareMetadatas = shareMetaddatas

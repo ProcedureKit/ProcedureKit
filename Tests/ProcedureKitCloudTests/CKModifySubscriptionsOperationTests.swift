@@ -42,7 +42,13 @@ class CKModifySubscriptionsOperationTests: CKProcedureTestCase {
         target = TestCKModifySubscriptionsOperation()
         operation = CKProcedure(operation: target)
     }
-    
+
+    override func tearDown() {
+        target = nil
+        operation = nil
+        super.tearDown()
+    }
+
     func test__set_get__subscriptionsToSave() {
         let subscriptionsToSave = [ "a-subscription", "another-subscription" ]
         operation.subscriptionsToSave = subscriptionsToSave
@@ -104,6 +110,11 @@ class CloudKitProcedureModifySubscriptionsOperationTests: CKProcedureTestCase {
         cloudkit.container = container
         cloudkit.subscriptionsToSave = [ "subscription 1" ]
         cloudkit.subscriptionIDsToDelete = [ "subscription 2 ID" ]
+    }
+
+    override func tearDown() {
+        cloudkit = nil
+        super.tearDown()
     }
 
     func test__set_get__errorHandlers() {

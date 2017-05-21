@@ -55,6 +55,12 @@ class CKOperationTests: CKProcedureTestCase {
         operation = CKProcedure(operation: target)
     }
 
+    override func tearDown() {
+        target = nil
+        operation = nil
+        super.tearDown()
+    }
+
     func test__set_get__container() {
         let container = "I'm a cloud kit container"
         operation.container = container
