@@ -131,7 +131,8 @@ open class ProcedureKitTestCase: XCTestCase {
         // Adds a will add operation observer, which adds the produced operation as a dependency
         // of the finishing procedure. This way, we don't actually finish, until the
         // procedure, and any produced operations also finish.
-        procedure.addWillAddOperationBlockObserver { _, operation in
+        procedure.addWillAddOperationBlockObserver { [weak weakFinishing = finishing] _, operation in
+            guard let finishing = weakFinishing else { fatalError("Finishing procedure is finished + gone, but a WillAddOperation observer on a dependency was called. This should never happen.") }
             finishing.add(dependency: operation)
         }
         finishing.name = "FinishingBlockProcedure(for: \(procedure.operationName))"
