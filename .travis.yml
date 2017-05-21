@@ -1,4 +1,6 @@
 language: objective-c
 osx_image: xcode8.3
-xcode_project: ProcedureKit.xcodeproj
-xcode_scheme: ProcedureKit
+jobs:
+  include:
+    - stage: Test
+      script: bundle exec fastlane mac test
