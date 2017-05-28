@@ -51,7 +51,11 @@ public class EventQueue {
         queue.setSpecific(key: key, value: value)
     }
     internal func debugClearTemporaryEventQueueStatusFrom(queue: DispatchQueueProtocol) {
-        queue.clearSpecific(key: key)
+        #if swift(>=4.0)
+            queue.setSpecific(key: key, value: nil)
+        #else // Swift 3.x
+            queue.clearSpecific(key: key)
+        #endif
     }
     #endif
 
@@ -246,8 +250,12 @@ public protocol DispatchQueueProtocol: class {
     @discardableResult func asyncDispatch(minimumQoS: DispatchQoS, block: @escaping () -> Void) -> DispatchWorkItem
     func dispatchNotify(withGroup group: DispatchGroup, block: @escaping () -> Void)
     #if DEBUG
-    func setSpecific<T>(key: DispatchSpecificKey<T>, value: T)
-    func clearSpecific<T>(key: DispatchSpecificKey<T>)
+    #if swift(>=4.0)
+        func setSpecific<T>(key: DispatchSpecificKey<T>, value: T?)
+    #else // Swift 3.x
+        func setSpecific<T>(key: DispatchSpecificKey<T>, value: T)
+        func clearSpecific<T>(key: DispatchSpecificKey<T>)
+    #endif
     #endif
 }
 
@@ -276,11 +284,17 @@ extension EventQueue: DispatchQueueProtocol {
         return self.dispatchEventBlockInternal(minimumQoS: desiredQoS, block: block)
     }
     #if DEBUG
-    public func setSpecific<T>(key: DispatchSpecificKey<T>, value: T) {
-        queue.setSpecific(key: key, value: value)
-    }
-    public func clearSpecific<T>(key: DispatchSpecificKey<T>) {
-        queue.clearSpecific(key: key)
-    }
+    #if swift(>=4.0)
+        public func setSpecific<T>(key: DispatchSpecificKey<T>, value: T?) {
+            queue.setSpecific(key: key, value: value)
+        }
+    #else // Swift 3.x
+        public func setSpecific<T>(key: DispatchSpecificKey<T>, value: T) {
+            queue.setSpecific(key: key, value: value)
+        }
+        public func clearSpecific<T>(key: DispatchSpecificKey<T>) {
+            queue.clearSpecific(key: key)
+        }
+    #endif
     #endif
 }
