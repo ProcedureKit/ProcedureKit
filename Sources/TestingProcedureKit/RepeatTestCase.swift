@@ -50,7 +50,7 @@ open class RetryTestCase: ProcedureKitTestCase {
                 guard info.numberOfFailures == failureThreshold else { throw ProcedureKitError.conditionFailed() }
                 return true
             })
-            procedure.addWillFinishBlockObserver { _ in
+            procedure.addWillFinishBlockObserver { _, _, _ in
                 info.numberOfExecuctions += 1
                 info.numberOfFailures += 1
             }
@@ -66,7 +66,7 @@ open class RetryTestCase: ProcedureKitTestCase {
                 guard info.numberOfFailures == failureThreshold else { throw ProcedureKitError.conditionFailed() }
                 return true
             })
-            procedure.addWillFinishBlockObserver { _ in
+            procedure.addWillFinishBlockObserver { _, _, _ in
                 info.numberOfExecuctions += 1
                 info.numberOfFailures += 1
             }

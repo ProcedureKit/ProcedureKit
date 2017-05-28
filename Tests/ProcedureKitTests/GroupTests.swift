@@ -104,7 +104,7 @@ class GroupTests: GroupTestCase {
 
         let childWillExecuteDispatchGroup = DispatchGroup()
         childWillExecuteDispatchGroup.enter()
-        child.addWillExecuteBlockObserver { _ in
+        child.addWillExecuteBlockObserver { _, _ in
             childWillExecuteDispatchGroup.leave()
         }
 

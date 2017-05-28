@@ -192,7 +192,7 @@ class CloudKitProcedureFetchRecordChangesOperationTests: CKProcedureTestCase {
 
     func test__success_with_completion_block_set() {
         var didExecuteBlock = false
-        cloudkit.setFetchRecordChangesCompletionBlock { _ in
+        cloudkit.setFetchRecordChangesCompletionBlock { _, _ in
             didExecuteBlock = true
         }
         wait(for: cloudkit)
@@ -218,7 +218,7 @@ class CloudKitProcedureFetchRecordChangesOperationTests: CKProcedureTestCase {
         }
 
         var didExecuteBlock = false
-        cloudkit.setFetchRecordChangesCompletionBlock { _ in
+        cloudkit.setFetchRecordChangesCompletionBlock { _, _ in
             didExecuteBlock = true
         }
 
@@ -239,7 +239,7 @@ class CloudKitProcedureFetchRecordChangesOperationTests: CKProcedureTestCase {
             return op
         }
         var didExecuteBlock = false
-        cloudkit.setFetchRecordChangesCompletionBlock { _ in didExecuteBlock = true }
+        cloudkit.setFetchRecordChangesCompletionBlock { _, _ in didExecuteBlock = true }
         wait(for: cloudkit)
         XCTAssertProcedureFinishedWithoutErrors(cloudkit)
         XCTAssertTrue(didExecuteBlock)
@@ -262,7 +262,7 @@ class CloudKitProcedureFetchRecordChangesOperationTests: CKProcedureTestCase {
         }
 
         var didExecuteBlock = false
-        cloudkit.setFetchRecordChangesCompletionBlock { _ in didExecuteBlock = true }
+        cloudkit.setFetchRecordChangesCompletionBlock { _, _ in didExecuteBlock = true }
         wait(for: cloudkit)
         XCTAssertProcedureFinishedWithoutErrors(cloudkit)
         XCTAssertTrue(didExecuteBlock)
