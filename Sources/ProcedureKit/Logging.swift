@@ -165,7 +165,8 @@ public class LogManager: LogManagerProtocol {
     init() {
         _enabled = true
         _severity = .warning
-        _logger = { message, severity, file, function, line in
+        _logger = { (info) in
+            let (message, _, file, function, line) = info
             print("\(LogManager.metadata(for: file, function: function, line: line))\(message)")
         }
     }
@@ -256,7 +257,7 @@ public extension LoggerProtocol {
         guard enabled && severity >= self.severity else { return }
         let _message = messageWithOperationName(message())
         LogManager.queue.async { [logger = self.logger] in
-            logger(message: _message, severity: severity, file: file, function: function, line: line)
+            logger(LoggerInfo(message: _message, severity: severity, file: file, function: function, line: line))
         }
     }
 
