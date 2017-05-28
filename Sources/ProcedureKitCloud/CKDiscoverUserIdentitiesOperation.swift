@@ -55,7 +55,7 @@ extension CKProcedure where T: CKDiscoverUserIdentitiesOperationProtocol, T: Ass
     }
 }
 
-extension CloudKitProcedure where T: CKDiscoverUserIdentitiesOperationProtocol, T: AssociatedErrorProtocol, T.AssociatedError: CloudKitError {
+extension CloudKitProcedure where T: CKDiscoverUserIdentitiesOperationProtocol {
 
     /// A typealias for the block type used by CloudKitOperation<CKDiscoverUserIdentitiesOperationType>
     public typealias DiscoverUserIdentitiesUserIdentityDiscoveredBlock = (T.UserIdentity, T.UserIdentityLookupInfo) -> Void
