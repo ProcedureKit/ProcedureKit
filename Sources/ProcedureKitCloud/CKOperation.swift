@@ -84,9 +84,15 @@ public protocol CKOperationProtocol: class {
     @available(iOS 9.3, tvOS 9.3, OSX 10.12, watchOS 2.3, *)
     var operationID: String { get }
 
-    /// - returns whether the operation is long-lived
-    @available(iOS 9.3, tvOS 9.3, OSX 10.12, watchOS 2.3, *)
-    var longLived: Bool { get set }
+    #if swift(>=4.0)
+        /// - returns whether the operation is long-lived
+        @available(iOS 9.3, tvOS 9.3, OSX 10.12, watchOS 2.3, *)
+        var isLongLived: Bool { get set }
+    #else // Swift 3.x
+        /// - returns whether the operation is long-lived
+        @available(iOS 9.3, tvOS 9.3, OSX 10.12, watchOS 2.3, *)
+        var longLived: Bool { get set }
+    #endif
 
     /// - returns the block to execute when the server starts storing callbacks for this long-lived CKOperation
     @available(iOS 9.3, tvOS 9.3, OSX 10.12, watchOS 2.3, *)
@@ -192,11 +198,19 @@ extension CKProcedure {
         get { return operation.operationID }
     }
 
-    @available(iOS 9.3, tvOS 9.3, OSX 10.12, watchOS 2.3, *)
-    public var longLived: Bool {
-        get { return operation.longLived }
-        set { operation.longLived = newValue }
-    }
+    #if swift(>=4.0)
+        @available(iOS 9.3, tvOS 9.3, OSX 10.12, watchOS 2.3, *)
+        public var isLongLived: Bool {
+            get { return operation.isLongLived }
+            set { operation.isLongLived = newValue }
+        }
+    #else // Swift 3.x
+        @available(iOS 9.3, tvOS 9.3, OSX 10.12, watchOS 2.3, *)
+        public var longLived: Bool {
+            get { return operation.longLived }
+            set { operation.longLived = newValue }
+        }
+    #endif
 
     @available(iOS 9.3, tvOS 9.3, OSX 10.12, watchOS 2.3, *)
     public var longLivedOperationWasPersistedBlock: T.LongLivedOperationWasPersistedBlockType {
@@ -243,15 +257,27 @@ extension CloudKitProcedure {
         get { return current.operationID }
     }
 
-    /// - returns whether the operation is long-lived
-    @available(iOS 9.3, tvOS 9.3, OSX 10.12, watchOS 2.3, *)
-    public var longLived: Bool {
-        get { return current.longLived }
-        set {
-            current.longLived = newValue
-            appendConfigureBlock { $0.longLived = newValue }
+    #if swift(>=4.0)
+        /// - returns whether the operation is long-lived
+        @available(iOS 9.3, tvOS 9.3, OSX 10.12, watchOS 2.3, *)
+        public var isLongLived: Bool {
+            get { return current.isLongLived }
+            set {
+                current.isLongLived = newValue
+                appendConfigureBlock { $0.isLongLived = newValue }
+            }
         }
-    }
+    #else // Swift 3.x
+        /// - returns whether the operation is long-lived
+        @available(iOS 9.3, tvOS 9.3, OSX 10.12, watchOS 2.3, *)
+        public var longLived: Bool {
+            get { return current.longLived }
+            set {
+                current.longLived = newValue
+                appendConfigureBlock { $0.longLived = newValue }
+            }
+        }
+    #endif
 
     /// - returns the block to execute when the server starts storing callbacks for this long-lived CKOperation
     @available(iOS 9.3, tvOS 9.3, OSX 10.12, watchOS 2.3, *)
