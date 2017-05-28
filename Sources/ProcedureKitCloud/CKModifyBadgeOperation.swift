@@ -46,7 +46,7 @@ extension CKProcedure where T: CKModifyBadgeOperationProtocol, T: AssociatedErro
     }
 }
 
-extension CloudKitProcedure where T: CKModifyBadgeOperationProtocol, T: AssociatedErrorProtocol, T.AssociatedError: CloudKitError {
+extension CloudKitProcedure where T: CKModifyBadgeOperationProtocol {
 
     /// A typealias for the block types used by CloudKitOperation<CKModifyBadgeOperation>
     public typealias ModifyBadgeCompletionBlock = () -> Void

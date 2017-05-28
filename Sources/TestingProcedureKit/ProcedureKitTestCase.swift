@@ -86,7 +86,7 @@ open class ProcedureKitTestCase: XCTestCase {
         waitForExpectations(timeout: timeout, handler: nil)
     }
 
-    public func checkAfterDidExecute<T: ProcedureProtocol>(procedure: T, withTimeout timeout: TimeInterval = 3, withExpectationDescription expectationDescription: String = #function, checkAfterDidExecuteBlock: @escaping (T) -> Void) where T: Procedure {
+    public func checkAfterDidExecute<T>(procedure: T, withTimeout timeout: TimeInterval = 3, withExpectationDescription expectationDescription: String = #function, checkAfterDidExecuteBlock: @escaping (T) -> Void) where T: Procedure {
         addCompletionBlockTo(procedure: procedure, withExpectationDescription: expectationDescription)
         procedure.addDidExecuteBlockObserver { (procedure) in
             checkAfterDidExecuteBlock(procedure)

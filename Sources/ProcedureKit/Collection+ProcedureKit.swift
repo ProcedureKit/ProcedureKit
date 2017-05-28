@@ -90,7 +90,7 @@ extension Collection where Iterator.Element: Operation {
 
 // MARK: - OutputProcedure & Gathering
 
-extension Collection where Iterator.Element: ProcedureProtocol, Iterator.Element: OutputProcedure {
+extension Collection where Iterator.Element: OutputProcedure {
 
     /// Creates a new procedure which will flatmap the non-nil results of the receiver's procedures into a
     /// new array. This new array is available as the result of the returned procedure.

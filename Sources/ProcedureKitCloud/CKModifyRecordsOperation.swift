@@ -104,7 +104,7 @@ extension CKProcedure where T: CKModifyRecordsOperationProtocol, T: AssociatedEr
     }
 }
 
-extension CloudKitProcedure where T: CKModifyRecordsOperationProtocol, T: AssociatedErrorProtocol, T.AssociatedError: CloudKitError {
+extension CloudKitProcedure where T: CKModifyRecordsOperationProtocol {
 
     internal typealias ModifyRecordsPerRecordProgress = (T.Record, Double)
     internal typealias ModifyRecordsPerRecordCompletion = (T.Record?, Error?)
