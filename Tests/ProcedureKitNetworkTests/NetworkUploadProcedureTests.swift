@@ -59,7 +59,7 @@ class NetworkUploadProcedureTests: ProcedureKitTestCase {
     func test__upload_cancels_data_task_is_cancelled() {
         session.delay = 2.0
         let delay = DelayProcedure(by: 0.1)
-        delay.addDidFinishBlockObserver { _ in
+        delay.addDidFinishBlockObserver { _, _ in
             self.upload.cancel()
         }
         wait(for: upload, delay)

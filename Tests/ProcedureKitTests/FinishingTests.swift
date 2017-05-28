@@ -25,7 +25,7 @@ class FinishingTests: ProcedureKitTestCase {
         class TestOperation_CancelsAndManuallyFinishesOnWillExecute: Procedure {
             override init() {
                 super.init(disableAutomaticFinishing: true) // <-- disableAutomaticFinishing
-                addWillExecuteBlockObserver { [weak self] _ in
+                addWillExecuteBlockObserver { [weak self] _, _ in
                     guard let strongSelf = self else { return }
                     strongSelf.cancel()
                     strongSelf.finish() // manually finishes after cancelling

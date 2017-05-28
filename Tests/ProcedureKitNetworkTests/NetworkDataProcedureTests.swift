@@ -56,7 +56,7 @@ class NetworkDataProcedureTests: ProcedureKitTestCase {
     func test__download_cancels_data_task_is_cancelled() {
         session.delay = 2.0
         let delay = DelayProcedure(by: 0.1)
-        delay.addDidFinishBlockObserver { _ in
+        delay.addDidFinishBlockObserver { _, _ in
             self.download.cancel()
         }
         wait(for: download, delay)

@@ -20,7 +20,9 @@ class BlockObserverTests: ProcedureKitTestCase {
 
     func test__will_execute_is_called() {
         let willExecuteCalled = Protector<Procedure?>(nil)
-        procedure.add(observer: BlockObserver(willExecute: { willExecuteCalled.overwrite(with: $0.0) }))
+        procedure.add(observer: BlockObserver(willExecute: { procedure, _ in
+            willExecuteCalled.overwrite(with: procedure)
+        }))
         wait(for: procedure)
         XCTAssertEqual(willExecuteCalled.access, procedure)
     }
@@ -67,7 +69,9 @@ class BlockObserverTests: ProcedureKitTestCase {
 
     func test__will_finish_is_called() {
         let willFinishCalled = Protector<(Procedure, [Error])?>(nil)
-        procedure.add(observer: BlockObserver(willFinish: { willFinishCalled.overwrite(with: ($0.0, $0.1)) }))
+        procedure.add(observer: BlockObserver(willFinish: { procedure, errors, _ in
+            willFinishCalled.overwrite(with: (procedure, errors))
+        }))
         wait(for: procedure)
         XCTAssertEqual(willFinishCalled.access?.0, procedure)
     }
@@ -162,7 +166,9 @@ class BlockObserverSynchronizationTests: ProcedureKitTestCase {
             procedure.addWillExecuteBlockObserver(synchronizedWith: syncObject) { procedure, _ in
                 willExecuteCalled_addBlock.overwrite(with: (procedure, isSynced()))
             }
-            procedure.add(observer: BlockObserver(synchronizedWith: syncObject, willExecute: { willExecuteCalled_BlockObserver.overwrite(with: ($0.0, isSynced())) }))
+            procedure.add(observer: BlockObserver(synchronizedWith: syncObject, willExecute: { procedure, _ in
+                willExecuteCalled_BlockObserver.overwrite(with: (procedure, isSynced()))
+            }))
             wait(for: procedure)
             XCTAssertEqual(willExecuteCalled_addBlock.access?.0, procedure)
             XCTAssertTrue(willExecuteCalled_addBlock.access?.1 ?? false, "Was not synchronized on \(syncObject).") // was synchronized
@@ -277,7 +283,9 @@ class BlockObserverSynchronizationTests: ProcedureKitTestCase {
             procedure.addWillFinishBlockObserver(synchronizedWith: syncObject) { procedure, errors, _ in
                 willFinishCalled_addBlock.overwrite(with: (procedure, errors, isSynced()))
             }
-            procedure.add(observer: BlockObserver(synchronizedWith: syncObject, willFinish: { willFinishCalled_BlockObserver.overwrite(with: ($0.0, $0.1, isSynced())) }))
+            procedure.add(observer: BlockObserver(synchronizedWith: syncObject, willFinish: { procedure, errors, _ in
+                willFinishCalled_BlockObserver.overwrite(with: (procedure, errors, isSynced()))
+            }))
             wait(for: procedure)
             XCTAssertEqual(willFinishCalled_addBlock.access?.0, procedure)
             XCTAssertTrue(willFinishCalled_addBlock.access?.2 ?? false, "Was not synchronized on \(syncObject).") // was synchronized
