@@ -376,6 +376,12 @@ open class GroupProcedure: Procedure, ProcedureQueueDelegate {
         }
         return promise.future
     }
+
+    public func child(_ child: Operation, didAttemptRecoveryFromErrors errors: [Error]) {
+        groupStateLock.withCriticalScope {
+            _groupErrors.attemptedRecovery[child] = errors
+        }
+    }
 }
 
 // MARK: - GroupProcedure API
@@ -590,12 +596,6 @@ public extension GroupProcedure {
     final public func child(_ child: Operation, didEncounterFatalErrors errors: [Error]) {
         log.warning(message: "\(child.operationName) did encounter \(errors.count) fatal errors.")
         append(fatalErrors: errors)
-    }
-
-    public func child(_ child: Operation, didAttemptRecoveryFromErrors errors: [Error]) {
-        groupStateLock.withCriticalScope {
-            _groupErrors.attemptedRecovery[child] = errors
-        }
     }
 
     fileprivate var attemptedRecovery: GroupErrors.ByOperation {
