@@ -204,6 +204,10 @@ extension CKProcedure {
             get { return operation.isLongLived }
             set { operation.isLongLived = newValue }
         }
+
+        // Renamed in Swift 4
+        @available(*, unavailable, renamed: "isLongLived")
+        public var longLived: Bool { return isLongLived }
     #else // Swift 3.x
         @available(iOS 9.3, tvOS 9.3, OSX 10.12, watchOS 2.3, *)
         public var longLived: Bool {
@@ -267,6 +271,10 @@ extension CloudKitProcedure {
                 appendConfigureBlock { $0.isLongLived = newValue }
             }
         }
+
+        // Renamed in Swift 4
+        @available(*, unavailable, renamed: "isLongLived")
+        public var longLived: Bool { return isLongLived }
     #else // Swift 3.x
         /// - returns whether the operation is long-lived
         @available(iOS 9.3, tvOS 9.3, OSX 10.12, watchOS 2.3, *)
