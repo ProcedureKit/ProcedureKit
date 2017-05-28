@@ -63,7 +63,7 @@ extension CKProcedure where T: CKModifySubscriptionsOperationProtocol, T: Associ
     }
 }
 
-extension CloudKitProcedure where T: CKModifySubscriptionsOperationProtocol, T: AssociatedErrorProtocol, T.AssociatedError: CloudKitError {
+extension CloudKitProcedure where T: CKModifySubscriptionsOperationProtocol {
 
     /// A typealias for the block types used by CloudKitOperation<CKModifySubscriptionsOperation>
     public typealias ModifySubscriptionsCompletionBlock = ([T.Subscription]?, [String]?) -> Void

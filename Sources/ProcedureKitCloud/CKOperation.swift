@@ -175,7 +175,7 @@ extension CKOperation: CKOperationProtocol {
     public typealias ShareParticipant = CKShareParticipant
 }
 
-extension CKProcedure where T: CKOperationProtocol {
+extension CKProcedure {
 
     public var container: T.Container? {
         get { return operation.container }
@@ -217,7 +217,7 @@ extension CKProcedure where T: CKOperationProtocol {
     }
 }
 
-extension CloudKitProcedure where T: CKOperationProtocol {
+extension CloudKitProcedure {
 
     /// - returns: the CloudKit container
     public var container: T.Container? {
