@@ -34,8 +34,6 @@ public protocol ProcedureProtocol: class {
 
     func cancel(withErrors: [Error])
 
-    func procedureWillCancel(withErrors: [Error])
-
     func procedureDidCancel(withErrors: [Error])
 
     // Finishing
