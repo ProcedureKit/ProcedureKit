@@ -270,7 +270,7 @@ class CloudKitProcedureFetchRecordZoneChangesOperationTests: CKProcedureTestCase
 
     func test__success_with_completion_block_set() {
         var didExecuteBlock = false
-        cloudkit.setFetchRecordZoneChangesCompletionBlock { _ in
+        cloudkit.setFetchRecordZoneChangesCompletionBlock {
             didExecuteBlock = true
         }
         wait(for: cloudkit)
@@ -296,7 +296,7 @@ class CloudKitProcedureFetchRecordZoneChangesOperationTests: CKProcedureTestCase
         }
 
         var didExecuteBlock = false
-        cloudkit.setFetchRecordZoneChangesCompletionBlock { _ in
+        cloudkit.setFetchRecordZoneChangesCompletionBlock { 
             didExecuteBlock = true
         }
 

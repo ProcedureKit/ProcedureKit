@@ -258,7 +258,7 @@ open class ProcedureQueue: OperationQueue {
             if let delegate = delegate {
 
                 // WillAddOperation delegate
-                (delegate.procedureQueue(self, willAddOperation: operation, context: context) ?? _SyncAlreadyAvailableFuture()).then(on: dispatchQueue) { _ in
+                (delegate.procedureQueue(self, willAddOperation: operation, context: context) ?? _SyncAlreadyAvailableFuture()).then(on: dispatchQueue) {
 
                     super.addOperation(operation)
 
@@ -304,7 +304,7 @@ open class ProcedureQueue: OperationQueue {
         if let delegate = delegate {
 
             // WillAddProcedure delegate
-            (delegate.procedureQueue(self, willAddProcedure: procedure, context: context) ?? _SyncAlreadyAvailableFuture()).then(on: dispatchQueue) { _ in
+            (delegate.procedureQueue(self, willAddProcedure: procedure, context: context) ?? _SyncAlreadyAvailableFuture()).then(on: dispatchQueue) {
 
                 // Step 2:
                 self._add_step2(procedure: procedure, context: context, promise: promise)
@@ -394,7 +394,7 @@ fileprivate class _SyncAlreadyAvailableFuture: ProcedureFuture {
         group.leave()
     }
 
-    public override func then(on eventQueueProvider: QueueProvider, block: @escaping (Void) -> Void) {
+    public override func then(on eventQueueProvider: QueueProvider, block: @escaping () -> Void) {
         block()
     }
 }
