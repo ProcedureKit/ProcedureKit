@@ -54,7 +54,7 @@ extension CKProcedure where T: CKFetchSubscriptionsOperationProtocol, T: Associa
     }
 }
 
-extension CloudKitProcedure where T: CKFetchSubscriptionsOperationProtocol {
+extension CloudKitProcedure where T: CKFetchSubscriptionsOperationProtocol, T: AssociatedErrorProtocol, T.AssociatedError: CloudKitError {
 
     /// A typealias for the block types used by CloudKitOperation<CKFetchSubscriptionsOperation>
     public typealias FetchSubscriptionCompletionBlock = ([String: T.Subscription]?) -> Void

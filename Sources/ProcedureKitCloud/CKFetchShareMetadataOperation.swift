@@ -74,7 +74,7 @@ extension CKProcedure where T: CKFetchShareMetadataOperationProtocol, T: Associa
     }
 }
 
-extension CloudKitProcedure where T: CKFetchShareMetadataOperationProtocol {
+extension CloudKitProcedure where T: CKFetchShareMetadataOperationProtocol, T: AssociatedErrorProtocol, T.AssociatedError: CloudKitError {
 
     /// A typealias for the block types used by CloudKitOperation<CKFetchShareMetadataOperationType>
     public typealias FetchShareMetadataPerShareMetadataBlock = (URL, T.ShareMetadata?, Error?) -> Void

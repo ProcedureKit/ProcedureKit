@@ -55,7 +55,7 @@ extension CKProcedure where T: CKMarkNotificationsReadOperationProtocol, T: Asso
     }
 }
 
-extension CloudKitProcedure where T: CKMarkNotificationsReadOperationProtocol {
+extension CloudKitProcedure where T: CKMarkNotificationsReadOperationProtocol, T: AssociatedErrorProtocol, T.AssociatedError: CloudKitError {
 
     /// A typealias for the block types used by CloudKitOperation<CKMarkNotificationsReadOperation>
     public typealias MarkNotificationsReadCompletionBlock = ([T.NotificationID]?) -> Void

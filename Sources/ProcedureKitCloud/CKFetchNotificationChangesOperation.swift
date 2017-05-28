@@ -52,7 +52,7 @@ extension CKProcedure where T: CKFetchNotificationChangesOperationProtocol, T: A
     }
 }
 
-extension CloudKitProcedure where T: CKFetchNotificationChangesOperationProtocol {
+extension CloudKitProcedure where T: CKFetchNotificationChangesOperationProtocol, T: AssociatedErrorProtocol, T.AssociatedError: CloudKitError {
 
     /// A typealias for the block types used by CloudKitOperation<CKFetchNotificationChangesOperation>
     public typealias FetchNotificationChangesChangedBlock = (T.Notification) -> Void

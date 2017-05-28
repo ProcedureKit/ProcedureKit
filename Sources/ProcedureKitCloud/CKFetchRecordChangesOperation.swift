@@ -76,7 +76,7 @@ extension CKProcedure where T: CKFetchRecordChangesOperationProtocol, T: Associa
     }
 }
 
-extension CloudKitProcedure where T: CKFetchRecordChangesOperationProtocol {
+extension CloudKitProcedure where T: CKFetchRecordChangesOperationProtocol, T: AssociatedErrorProtocol, T.AssociatedError: CloudKitError {
 
     /// A typealias for the block types used by CloudKitOperation<CKFetchRecordChangesOperation>
     public typealias FetchRecordChangesRecordChangedBlock = (T.Record) -> Void
