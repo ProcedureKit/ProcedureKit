@@ -85,7 +85,8 @@ class LogManagerTests: LoggingTests {
     func test__custom_logger() {
         var receivedMessage: String? = nil
         var receivedSeverity: LogSeverity? = nil
-        LogManager.logger = { message, severity, _, _, _ in
+        LogManager.logger = { (info) in
+            let (message, severity, _, _, _) = info
             receivedMessage = message
             receivedSeverity = severity
         }
@@ -105,7 +106,8 @@ class RunAllTheLoggersTests: XCTestCase {
     }
 
     func test__verbose() {
-        log = Logger(severity: .verbose) { message, severity, _, _, _ in
+        log = Logger(severity: .verbose) { (info) in
+            let (message, severity, _, _, _) = info
             XCTAssertEqual(severity, LogSeverity.verbose)
             XCTAssertEqual(message, "Hello World")
         }
@@ -113,7 +115,8 @@ class RunAllTheLoggersTests: XCTestCase {
     }
 
     func test__notice() {
-        log = Logger(severity: .verbose) { message, severity, _, _, _ in
+        log = Logger(severity: .verbose) { (info) in
+            let (message, severity, _, _, _) = info
             XCTAssertEqual(severity, LogSeverity.notice)
             XCTAssertEqual(message, "Hello World")
         }
@@ -121,7 +124,8 @@ class RunAllTheLoggersTests: XCTestCase {
     }
 
     func test__info() {
-        log = Logger(severity: .verbose) { message, severity, _, _, _ in
+        log = Logger(severity: .verbose) { (info) in
+            let (message, severity, _, _, _) = info
             XCTAssertEqual(severity, LogSeverity.info)
             XCTAssertEqual(message, "Hello World")
         }
@@ -129,7 +133,8 @@ class RunAllTheLoggersTests: XCTestCase {
     }
 
     func test__warning() {
-        log = Logger(severity: .verbose) { message, severity, _, _, _ in
+        log = Logger(severity: .verbose) { (info) in
+            let (message, severity, _, _, _) = info
             XCTAssertEqual(severity, LogSeverity.warning)
             XCTAssertEqual(message, "Hello World")
         }
@@ -137,7 +142,8 @@ class RunAllTheLoggersTests: XCTestCase {
     }
 
     func test__fatal() {
-        log = Logger(severity: .verbose) { message, severity, _, _, _ in
+        log = Logger(severity: .verbose) { (info) in
+            let (message, severity, _, _, _) = info
             XCTAssertEqual(severity, LogSeverity.fatal)
             XCTAssertEqual(message, "Hello World")
         }
