@@ -64,7 +64,7 @@ extension CloudKitProcedure where T: CKFetchShareParticipantsOperationProtocol {
     public typealias FetchShareParticipantsParticipantFetchedBlock = (T.ShareParticipant) -> Void
 
     /// A typealias for the block types used by CloudKitOperation<CKFetchShareMetadataOperationType>
-    public typealias FetchShareParticipantsCompletionBlock = (Void) -> Void
+    public typealias FetchShareParticipantsCompletionBlock = () -> Void
 
     /// - returns: the user identity lookup infos
     public var userIdentityLookupInfos: T.UserIdentityLookupInfosPropertyType {

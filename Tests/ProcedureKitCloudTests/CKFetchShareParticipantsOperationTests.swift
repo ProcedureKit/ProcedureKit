@@ -147,7 +147,7 @@ class CloudKitProcedureFetchShareParticipantsOperationTests: CKProcedureTestCase
 
     func test__success_with_completion_block_set() {
         var didExecuteBlock = false
-        cloudkit.setFetchShareParticipantsCompletionBlock { _ in
+        cloudkit.setFetchShareParticipantsCompletionBlock {
             didExecuteBlock = true
         }
         wait(for: cloudkit)
@@ -173,7 +173,7 @@ class CloudKitProcedureFetchShareParticipantsOperationTests: CKProcedureTestCase
         }
 
         var didExecuteBlock = false
-        cloudkit.setFetchShareParticipantsCompletionBlock { _ in
+        cloudkit.setFetchShareParticipantsCompletionBlock {
             didExecuteBlock = true
         }
 
@@ -194,7 +194,7 @@ class CloudKitProcedureFetchShareParticipantsOperationTests: CKProcedureTestCase
             return op
         }
         var didExecuteBlock = false
-        cloudkit.setFetchShareParticipantsCompletionBlock { _ in didExecuteBlock = true }
+        cloudkit.setFetchShareParticipantsCompletionBlock { didExecuteBlock = true }
         wait(for: cloudkit)
         XCTAssertProcedureFinishedWithoutErrors(cloudkit)
         XCTAssertTrue(didExecuteBlock)
@@ -217,7 +217,7 @@ class CloudKitProcedureFetchShareParticipantsOperationTests: CKProcedureTestCase
         }
 
         var didExecuteBlock = false
-        cloudkit.setFetchShareParticipantsCompletionBlock { _ in didExecuteBlock = true }
+        cloudkit.setFetchShareParticipantsCompletionBlock { didExecuteBlock = true }
         wait(for: cloudkit)
         XCTAssertProcedureFinishedWithoutErrors(cloudkit)
         XCTAssertTrue(didExecuteBlock)

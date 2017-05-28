@@ -176,7 +176,7 @@ class CloudKitProcedureModifyBadgeOperationTests: CKProcedureTestCase {
             return op
         }
         var didExecuteBlock = false
-        cloudkit.setModifyBadgeCompletionBlock { _ in didExecuteBlock = true }
+        cloudkit.setModifyBadgeCompletionBlock { didExecuteBlock = true }
         wait(for: cloudkit)
         XCTAssertProcedureFinishedWithoutErrors(cloudkit)
         XCTAssertTrue(didExecuteBlock)
@@ -199,7 +199,7 @@ class CloudKitProcedureModifyBadgeOperationTests: CKProcedureTestCase {
         }
 
         var didExecuteBlock = false
-        cloudkit.setModifyBadgeCompletionBlock { _ in didExecuteBlock = true }
+        cloudkit.setModifyBadgeCompletionBlock { didExecuteBlock = true }
         wait(for: cloudkit)
         XCTAssertProcedureFinishedWithoutErrors(cloudkit)
         XCTAssertTrue(didExecuteBlock)

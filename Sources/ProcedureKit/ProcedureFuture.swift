@@ -137,7 +137,7 @@ public class ProcedureFuture {
     /// - Parameters:
     ///   - on: a queue [DispatchQueue, EventQueue, Procedure (which schedules it on its internal event queue)]
     ///   - block: The block to be scheduled after the ProcedureFuture completes.
-    public func then(on eventQueueProvider: QueueProvider, block: @escaping (Void) -> Void) {
+    public func then(on eventQueueProvider: QueueProvider, block: @escaping () -> Void) {
 
         let eventQueue = eventQueueProvider.providedQueue
         eventQueue.dispatchNotify(withGroup: group, block: block)
@@ -157,7 +157,7 @@ fileprivate extension ProcedureFuture {
     // If the future is immediately available, execute the block synchronously on the current thread
     // otherwise, queue a future dispatch onto the QueueProvider's queue.
     @discardableResult
-    func thenOnSelfOrLater(on eventQueueProvider: QueueProvider, block: @escaping (Void) -> Void) -> ProcedureFuture {
+    func thenOnSelfOrLater(on eventQueueProvider: QueueProvider, block: @escaping () -> Void) -> ProcedureFuture {
         let promise = ProcedurePromise()
         let eventQueue = eventQueueProvider.providedQueue
         if group.wait(timeout: .now()) == .success {
@@ -195,7 +195,7 @@ extension Collection where Iterator.Element: ProcedureFuture {
         let group = DispatchGroup()
         self.forEach {
             group.enter()
-            $0.thenOnSelfOrLater(on: DispatchQueue.global()) { _ in
+            $0.thenOnSelfOrLater(on: DispatchQueue.global()) {
                 group.leave()
             }
         }

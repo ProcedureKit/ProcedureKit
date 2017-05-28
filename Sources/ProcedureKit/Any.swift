@@ -8,7 +8,7 @@ import Dispatch
 
 struct ValueBox<Value> {
 
-    typealias Getter = (Void) -> Value
+    typealias Getter = () -> Value
     typealias Setter = (Value) -> Void
 
     private let setter: Setter
