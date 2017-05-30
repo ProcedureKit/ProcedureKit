@@ -49,7 +49,7 @@ extension CKProcedure where T: CKFetchShareParticipantsOperationProtocol, T: Ass
     func setFetchShareParticipantsCompletionBlock(_ block: @escaping CloudKitProcedure<T>.FetchShareParticipantsCompletionBlock) {
         operation.fetchShareParticipantsCompletionBlock = { [weak self] error in
             if let strongSelf = self, let error = error {
-                strongSelf.append(fatalError: PKCKError(underlyingError: error))
+                strongSelf.append(error: PKCKError(underlyingError: error))
             }
             else {
                 block()

@@ -204,10 +204,7 @@ public class EventConcurrencyTrackingRegistrar {
 
         // GroupProcedure open functions
         case override_groupWillAdd_child(String)
-        case override_child_willAttemptRecoveryFromErrors(String)
-        case override_childWillFinishWithoutErrors(String)
-        // GroupProcedure non-final public functions
-        case override_child_didAttemptRecoveryFromErrors(String)
+        case override_child_willFinishWithErrors(String)
 
         public var description: String {
             switch self {
@@ -227,10 +224,7 @@ public class EventConcurrencyTrackingRegistrar {
             case .override_procedureDidFinish: return "procedureDidFinish()"
             // GroupProcedure open functions
             case .override_groupWillAdd_child(let child): return "groupWillAdd(child:) [\(child)]"
-            case .override_child_willAttemptRecoveryFromErrors(let child): return "child(_:willAttemptRecoveryFromErrors:) [\(child)]"
-            case .override_childWillFinishWithoutErrors(let child): return "childWillFinishWithoutErrors() [\(child)]"
-            // GroupProcedure public non-final functions
-            case .override_child_didAttemptRecoveryFromErrors(let child): return "child(_:didAttemptRecoveryFromErrors:) [\(child)]"
+            case .override_child_willFinishWithErrors(let child): return "child(_:willFinishWithErrors:) [\(child)]"
             }
         }
 
@@ -255,11 +249,7 @@ public class EventConcurrencyTrackingRegistrar {
                 return lhs_name == rhs_name
             case (.override_groupWillAdd_child(let lhs_child), .override_groupWillAdd_child(let rhs_child)):
                 return lhs_child == rhs_child
-            case (.override_child_willAttemptRecoveryFromErrors(let lhs_child), .override_child_willAttemptRecoveryFromErrors(let rhs_child)):
-                return lhs_child == rhs_child
-            case (.override_childWillFinishWithoutErrors(let lhs_child), .override_childWillFinishWithoutErrors(let rhs_child)):
-                return lhs_child == rhs_child
-            case (.override_child_didAttemptRecoveryFromErrors(let lhs_child), .override_child_didAttemptRecoveryFromErrors(let rhs_child)):
+            case (.override_child_willFinishWithErrors(let lhs_child), .override_child_willFinishWithErrors(let rhs_child)):
                 return lhs_child == rhs_child
             default:
                 return false
@@ -510,12 +500,8 @@ open class EventConcurrencyTrackingGroupProcedure: GroupProcedure, EventConcurre
         concurrencyRegistrar.doRun(.override_groupWillAdd_child(child.operationName))
         super.groupWillAdd(child: child)
     }
-    open override func child(_ child: Operation, willAttemptRecoveryFromErrors errors: [Error]) -> Bool {
-        concurrencyRegistrar.doRun(.override_child_willAttemptRecoveryFromErrors(child.operationName))
-        return super.child(child, willAttemptRecoveryFromErrors: errors)
-    }
-    open override func childWillFinishWithoutErrors(_ child: Operation) {
-        concurrencyRegistrar.doRun(.override_childWillFinishWithoutErrors(child.operationName))
-        super.childWillFinishWithoutErrors(child)
+    open override func child(_ child: Procedure, willFinishWithErrors errors: [Error]) {
+        concurrencyRegistrar.doRun(.override_child_willFinishWithErrors(child.operationName))
+        return super.child(child, willFinishWithErrors: errors)
     }
 }

@@ -54,7 +54,7 @@ extension CKProcedure where T: CKModifySubscriptionsOperationProtocol, T: Associ
     func setModifySubscriptionsCompletionBlock(_ block: @escaping CloudKitProcedure<T>.ModifySubscriptionsCompletionBlock) {
         operation.modifySubscriptionsCompletionBlock = { [weak self] saved, deleted, error in
             if let strongSelf = self, let error = error {
-                strongSelf.append(fatalError: ModifySubscriptionsError(underlyingError: error, saved: saved, deleted: deleted))
+                strongSelf.append(error: ModifySubscriptionsError(underlyingError: error, saved: saved, deleted: deleted))
             }
             else {
                 block(saved, deleted)

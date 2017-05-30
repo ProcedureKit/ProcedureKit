@@ -179,30 +179,29 @@ open class NetworkProcedure<T: Procedure>: RetryProcedure<T>, OutputProcedure wh
         self.init(dispatchQueue: dispatchQueue, resilience: resilience, connectivity: connectivity, iterator: AnyIterator(body))
     }
 
-    open override func procedureQueue(_ queue: ProcedureQueue, willFinishProcedure procedure: Procedure, withErrors errors: [Error]) -> ProcedureFuture? {
+    open override func child(_ child: Procedure, willFinishWithErrors errors: [Error]) {
         var networkErrors = errors
 
         // Ultimately, always call super to correctly manage the operation lifecycle.
+        defer { super.child(child, willFinishWithErrors: networkErrors) }
 
         // Check that the operation is the current one.
-        guard procedure == current else { return super.procedureQueue(queue, willFinishProcedure: procedure, withErrors: networkErrors) }
+        guard child == current else { return }
 
         // If we have any errors let RetryProcedure (super) deal with it by returning here
-        guard errors.isEmpty else { return super.procedureQueue(queue, willFinishProcedure: procedure, withErrors: networkErrors) }
+        guard errors.isEmpty else { return }
 
         // Create a network response from the network operation
         let networkResponse = current.makeNetworkResponse()
 
         // Check to see if this network response should be retried
-        guard recovery.shouldRetry(givenNetworkResponse: networkResponse), let statusCode = networkResponse.httpStatusCode else { return super.procedureQueue(queue, willFinishProcedure: procedure, withErrors: networkErrors) }
+        guard recovery.shouldRetry(givenNetworkResponse: networkResponse), let statusCode = networkResponse.httpStatusCode else { return }
 
         // Create resiliency error
         let error: ProcedureKitNetworkResiliencyError = .receivedErrorStatusCode(statusCode)
 
         // Set the network errors
         networkErrors = [error]
-
-        return super.procedureQueue(queue, willFinishProcedure: procedure, withErrors: networkErrors)
     }
 }
 

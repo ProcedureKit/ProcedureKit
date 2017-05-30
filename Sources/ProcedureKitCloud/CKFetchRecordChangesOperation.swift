@@ -67,7 +67,7 @@ extension CKProcedure where T: CKFetchRecordChangesOperationProtocol, T: Associa
     func setFetchRecordChangesCompletionBlock(_ block: @escaping CloudKitProcedure<T>.FetchRecordChangesCompletionBlock) {
         operation.fetchRecordChangesCompletionBlock = { [weak self] token, data, error in
             if let strongSelf = self, let error = error {
-                strongSelf.append(fatalError: FetchRecordChangesError(underlyingError: error, token: token, data: data))
+                strongSelf.append(error: FetchRecordChangesError(underlyingError: error, token: token, data: data))
             }
             else {
                 block(token, data)

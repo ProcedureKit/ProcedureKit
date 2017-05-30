@@ -180,15 +180,18 @@ open class RepeatProcedure<T: Operation>: GroupProcedure {
         super.execute()
     }
 
-    open override func childWillFinishWithoutErrors(_ child: Operation) {
+    /// Handle child willFinish event
+    ///
+    /// This is used by RepeatProcedure to trigger adding the next Procedure,
+    /// and calls `super.child(_:willFinishWithErrors:)` to get the default
+    /// GroupProcedure error-handling behavior.
+    ///
+    /// If subclassing RepeatProcedure and overriding this method, consider
+    /// carefully whether / when / how you should call super.
+    open override func child(_ child: Procedure, willFinishWithErrors errors: [Error]) {
         eventQueue.debugAssertIsOnQueue()
         _addNextOperation(child === self.current)
-    }
-
-    open override func child(_ child: Operation, willAttemptRecoveryFromErrors errors: [Error]) -> Bool {
-        eventQueue.debugAssertIsOnQueue()
-        _addNextOperation(child === self.current)
-        return super.child(child, willAttemptRecoveryFromErrors: errors)
+        super.child(child, willFinishWithErrors: errors) // default GroupProcedure error-handling
     }
 
     /// Adds the next payload from the iterator to the queue.
