@@ -9,10 +9,10 @@ import Dispatch
 
 /// Struct to hold the values necessary for each
 /// iteration of a RepeatProcedure. It is generic
-/// over the Procedure type (i.e. the type being
+/// over the Operation type (i.e. the type being
 /// iterated). However, it also holds an optional
 /// Delay property, and an optional ConfigureBlock.
-public struct RepeatProcedurePayload<T: Procedure> {
+public struct RepeatProcedurePayload<T: Operation> {
     public typealias ConfigureBlock = (T) -> Void
 
     /// - returns: the operation value
@@ -25,7 +25,7 @@ public struct RepeatProcedurePayload<T: Procedure> {
     /// Initializes a payload struct.
     ///
     /// - Parameters:
-    ///   - operation: an instance of a Procedure subclass T
+    ///   - operation: an instance of an Operation subclass T
     ///   - delay: an optional Delay value, which defaults to nil
     ///   - configure: an optional closure which receives the operation, and which defaults to nil
     public init(operation: T, delay: Delay? = nil, configure: ConfigureBlock? = nil) {
@@ -45,21 +45,21 @@ public struct RepeatProcedurePayload<T: Procedure> {
 
 /// RepeatProcedure is a GroupProcedure subclass which can be used to create
 /// polling or repeating procedures. Each child procedure is a new instance
-/// of the same Procedure subclass T. For example `RepeatProcedure<MyProcedure>`
-/// will create and execute instances of MyProcedure repeatedly, and we say
+/// of the same Operation subclass T. For example `RepeatProcedure<MyOperation>`
+/// will create and execute instances of MyOperation repeatedly, and we say
 /// that the RepeatProcedure is generic over T, which in this case is
-/// MyProcedure.
+/// MyOperation.
 ///
 /// While RepeatProcedure can be initialized in a variety of ways, it helps
 /// to understand that it works by using an Iterator. The iterator's payload
-/// is a structure which holds an instance of the Procedure subclass (`T`),
-/// an optional Delay value, and an optional configuration block. The block
+/// is a structure which holds an instance of the Operation subclass (`T`),
+/// and optional Delay value, and an optional configuration block. The block
 /// receives the instance, and can be used to prepare the operation before
 /// it is executed.
 ///
 /// All of the initializers available will ultimately create the underlying
 /// iterator.
-open class RepeatProcedure<T: Procedure>: GroupProcedure {
+open class RepeatProcedure<T: Operation>: GroupProcedure {
 
     public typealias Payload = RepeatProcedurePayload<T>
 
@@ -121,7 +121,7 @@ open class RepeatProcedure<T: Procedure>: GroupProcedure {
     }
 
     /// Initialize RepeatProcedure with two iterators, the first one has `Delay` elements, the
-    /// second has `T` elements - i.e. the Procedure subclass to be repeated.
+    /// second has `T` elements - i.e. the Operation subclass to be repeated.
     /// Other arguments allow for specific dispatch queues, and a maximum count of iteratations.
     ///
     /// - Parameters:
@@ -129,13 +129,13 @@ open class RepeatProcedure<T: Procedure>: GroupProcedure {
     ///   - max: an optional Int, which defaults to nil.
     ///   - delay: a generic IteratorProtocol type, with a Delay Element type
     ///   - iterator: a generic IteratorProtocol type, with a T Element type
-    public init<ProcedureIterator, DelayIterator>(dispatchQueue: DispatchQueue? = nil, max: Int? = nil, delay: DelayIterator, iterator: ProcedureIterator) where ProcedureIterator: IteratorProtocol, DelayIterator: IteratorProtocol, ProcedureIterator.Element == T, DelayIterator.Element == Delay {
+    public init<OperationIterator, DelayIterator>(dispatchQueue: DispatchQueue? = nil, max: Int? = nil, delay: DelayIterator, iterator: OperationIterator) where OperationIterator: IteratorProtocol, DelayIterator: IteratorProtocol, OperationIterator.Element == T, DelayIterator.Element == Delay {
         (_current, _iterator) = RepeatProcedure.create(withMax: max, andDelay: delay, andIterator: iterator)
         super.init(dispatchQueue: dispatchQueue, operations: [])
     }
 
     /// Initialize RepeatProcedure with a WaitStrategy and an iterator, which has `T` type
-    /// elements - i.e. the Procedure subclass to be repeated.
+    /// elements - i.e. the Operation subclass to be repeated.
     /// Other arguments allow for specific dispatch queues, and a maximum count of iteratations.
     ///
     /// - Parameters:
@@ -143,21 +143,21 @@ open class RepeatProcedure<T: Procedure>: GroupProcedure {
     ///   - max: an optional Int, which defaults to nil.
     ///   - wait: a WaitStrategy value, which defaults to .immediate
     ///   - iterator: a generic IteratorProtocol type, with a T Element type
-    public init<ProcedureIterator>(dispatchQueue: DispatchQueue? = nil, max: Int? = nil, wait: WaitStrategy = .immediate, iterator: ProcedureIterator) where ProcedureIterator: IteratorProtocol, ProcedureIterator.Element == T {
+    public init<OperationIterator>(dispatchQueue: DispatchQueue? = nil, max: Int? = nil, wait: WaitStrategy = .immediate, iterator: OperationIterator) where OperationIterator: IteratorProtocol, OperationIterator.Element == T {
         (_current, _iterator) = RepeatProcedure.create(withMax: max, andDelay: Delay.iterator(wait.iterator), andIterator: iterator)
         super.init(dispatchQueue: dispatchQueue, operations: [])
     }
 
     /// Initialize RepeatProcedure with a WaitStrategy and a closure. The closure returns
-    /// an optional instance of T, i.e. the Procedure subclass to be repeated.
+    /// an optional instance of T, i.e. the Operation subclass to be repeated.
     /// Other arguments allow for specific dispatch queues, and a maximum count of iteratations.
     ///
     /// This is the most convenient initializer, you can use it like this:
     /// ```
-    ///    let procedure = RepeatProcedure { MyProcedure() }
-    ///    let procedure = RepeatProcedure(dispatchQueue: target) { MyProcedure() }
-    ///    let procedure = RepeatProcedure(dispatchQueue: target, max: 5) { MyProcedure() }
-    ///    let procedure = RepeatProcedure(dispatchQueue: target, max: 5, wait: .constant(10)) { MyProcedure() }
+    ///    let procedure = RepeatProcedure { MyOperation() }
+    ///    let procedure = RepeatProcedure(dispatchQueue: target) { MyOperation() }
+    ///    let procedure = RepeatProcedure(dispatchQueue: target, max: 5) { MyOperation() }
+    ///    let procedure = RepeatProcedure(dispatchQueue: target, max: 5, wait: .constant(10)) { MyOperation() }
     /// ```
     ///
     /// - Parameters:
