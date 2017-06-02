@@ -94,7 +94,7 @@ extension CKProcedure where T: CKFetchRecordZoneChangesOperationProtocol, T: Ass
     func setFetchRecordZoneChangesCompletionBlock(_ block: @escaping CloudKitProcedure<T>.FetchRecordZoneChangesCompletionBlock) {
         operation.fetchRecordZoneChangesCompletionBlock = { [weak self] error in
             if let strongSelf = self, let error = error {
-                strongSelf.append(fatalError: PKCKError(underlyingError: error))
+                strongSelf.append(error: PKCKError(underlyingError: error))
             }
             else {
                 block()

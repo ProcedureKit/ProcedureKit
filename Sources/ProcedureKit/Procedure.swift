@@ -214,7 +214,7 @@ open class Procedure: Operation, ProcedureProtocol {
     // MARK: State
 
     // the state variable to be used *within* the stateLock
-    private var _state = ProcedureKit.State.initialized {
+    fileprivate var _state = ProcedureKit.State.initialized { // swiftlint:disable:this variable_name
         willSet(newState) {
             _log.verbose(message: "\(_state) -> \(newState)")
             assert(_state.canTransition(to: newState, whenCancelled: _isCancelled), "Attempting to perform illegal cyclic state transition, \(_state) -> \(newState) for operation: \(identity). Ensure that Procedure instances are added to a ProcedureQueue not an OperationQueue.")
@@ -1529,6 +1529,22 @@ extension Procedure {
         assert(state < .willEnqueue, "Cannot modify conditions after a Procedure has been added to a queue, current state: \(state).")
         stateLock.withCriticalScope { () -> Void in
             protectedProperties.conditions.insert(condition)
+        }
+    }
+}
+
+// MARK: - Internal Extensions
+
+internal extension Procedure {
+
+    // Used from GroupProcedure to aggregate errors
+    internal func append(errors: [Error]) {
+        stateLock.withCriticalScope {
+            guard _state <= .executing else {
+                assertionFailure("Cannot append errors to Procedure that is finishing or finished.")
+                return
+            }
+            protectedProperties.errors.append(contentsOf: errors)
         }
     }
 }

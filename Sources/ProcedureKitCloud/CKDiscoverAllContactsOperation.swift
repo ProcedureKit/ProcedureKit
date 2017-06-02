@@ -40,7 +40,7 @@ extension CKProcedure where T: CKDiscoverAllContactsOperationProtocol, T: Associ
     func setDiscoverAllContactsCompletionBlock(_ block: @escaping CloudKitProcedure<T>.DiscoverAllContactsCompletionBlock) {
         operation.discoverAllContactsCompletionBlock = { [weak self] userInfos, error in
             if let strongSelf = self, let error = error {
-                strongSelf.append(fatalError: DiscoverAllContactsError(underlyingError: error, userInfo: userInfos))
+                strongSelf.append(error: DiscoverAllContactsError(underlyingError: error, userInfo: userInfos))
             }
             else {
                 block(userInfos)

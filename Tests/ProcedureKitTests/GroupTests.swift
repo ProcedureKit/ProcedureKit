@@ -228,6 +228,71 @@ class GroupTests: GroupTestCase {
         XCTAssertEqual(group.errors.count, 5)
     }
 
+    // MARK: - Custom Error Handling Tests
+
+    class TestGroupChildWillFinishWithErrors: GroupProcedure {
+        enum WillFinishWithErrorsAction {
+            case none
+            case callSuperWithErrors([Error])
+            case callSuperWithUnmodifiedInput
+        }
+        let receivedInput = Protector<[Procedure: [Error]]>([:])
+        let didReceiveDuplicate = Protector(false)
+        let action: WillFinishWithErrorsAction
+        init(operations: [Operation], action: WillFinishWithErrorsAction) {
+            self.action = action
+            super.init(operations: operations)
+        }
+        open override func child(_ child: Procedure, willFinishWithErrors errors: [Error]) {
+            // store received input
+            let hasExistingEntryForKey = receivedInput.write { ward in
+                return ward.updateValue(errors, forKey: child) != nil
+            }
+            if hasExistingEntryForKey {
+                didReceiveDuplicate.overwrite(with: true)
+            }
+
+            // execute action
+            switch action {
+            case .callSuperWithErrors(let error):
+                super.child(child, willFinishWithErrors: error)
+            case .callSuperWithUnmodifiedInput:
+                super.child(child, willFinishWithErrors: errors)
+            case .none: break
+            }
+        }
+    }
+
+    func test__group__child_willfinishwitherrors_does_not_call_super() {
+        children = createTestProcedures(shouldError: true)
+        let group = TestGroupChildWillFinishWithErrors(operations: children, action: .none)
+
+        wait(for: group)
+
+        XCTAssertFalse(group.receivedInput.access.isEmpty, "child(_:willFinishWithErrors:) was not called")
+        XCTAssertFalse(group.didReceiveDuplicate.access, "child(_:willFinishWithErrors:) received a duplicate call for the same child")
+        for child in children {
+            XCTAssertTrue(group.receivedInput.access.keys.contains(child), "child(_:willFinishWithErrors:) was not called for child: \(child)")
+        }
+
+        XCTAssertEqual(group.errors.count, 0)
+    }
+
+    func test__group__child_willfinishwitherrors_calls_super_with_modified_errors() {
+        children = createTestProcedures(shouldError: true)
+        let group = TestGroupChildWillFinishWithErrors(operations: children, action: .callSuperWithErrors([]))
+
+        wait(for: group)
+
+        XCTAssertFalse(group.receivedInput.access.isEmpty, "child(_:willFinishWithErrors:) was not called")
+        XCTAssertFalse(group.didReceiveDuplicate.access, "child(_:willFinishWithErrors:) received a duplicate call for the same child")
+        for child in children {
+            XCTAssertTrue(group.receivedInput.access.keys.contains(child), "child(_:willFinishWithErrors:) was not called for child: \(child)")
+        }
+
+        XCTAssertEqual(group.errors.count, 0)
+    }
+
     // MARK: - Cancellation Tests
 
     func test__group_cancels_children() {
@@ -311,7 +376,7 @@ class GroupTests: GroupTestCase {
 
         group = TestGroupProcedure(operations: [])
         let otherQueue = ProcedureQueue()
-        otherQueue.delegate = group
+        otherQueue.delegate = group.queueDelegate
 
         var observerCalledFromGroupDelegate = false
         group.addWillAddOperationBlockObserver { group, child in
@@ -412,8 +477,7 @@ class GroupTests: GroupTestCase {
             case willAddOperationObserver
             case didAddOperationObserver
             case groupWillAdd
-            case childWillAttemptRecoveryFromErrors
-            case childWillFinishWithoutErrors
+            case childWillFinishWithErrors(Procedure, [Error])
         }
 
         init(operations: [Operation], childEventBlock: @escaping ChildEventBlock = { _,_ in }) {
@@ -432,13 +496,9 @@ class GroupTests: GroupTestCase {
             childEventBlock(.groupWillAdd, child)
             super.groupWillAdd(child: child)
         }
-        open override func child(_ child: Operation, willAttemptRecoveryFromErrors errors: [Error]) -> Bool {
-            childEventBlock(.childWillAttemptRecoveryFromErrors, child)
-            return super.child(child, willAttemptRecoveryFromErrors: errors)
-        }
-        open override func childWillFinishWithoutErrors(_ child: Operation) {
-            childEventBlock(.childWillFinishWithoutErrors, child)
-            super.childWillFinishWithoutErrors(child)
+        open override func child(_ child: Procedure, willFinishWithErrors errors: [Error]) {
+            childEventBlock(.childWillFinishWithErrors(child, errors), child)
+            return super.child(child, willFinishWithErrors: errors)
         }
     }
 

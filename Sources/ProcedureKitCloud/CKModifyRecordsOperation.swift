@@ -95,7 +95,7 @@ extension CKProcedure where T: CKModifyRecordsOperationProtocol, T: AssociatedEr
     func setModifyRecordsCompletionBlock(_ block: @escaping CloudKitProcedure<T>.ModifyRecordsCompletionBlock) {
         operation.modifyRecordsCompletionBlock = { [weak self] saved, deleted, error in
             if let strongSelf = self, let error = error {
-                strongSelf.append(fatalError: ModifyRecordsError(underlyingError: error, saved: saved, deleted: deleted))
+                strongSelf.append(error: ModifyRecordsError(underlyingError: error, saved: saved, deleted: deleted))
             }
             else {
                 block(saved, deleted)

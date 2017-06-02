@@ -46,7 +46,7 @@ extension CKProcedure where T: CKMarkNotificationsReadOperationProtocol, T: Asso
     func setMarkNotificationsReadCompletionBlock(_ block: @escaping CloudKitProcedure<T>.MarkNotificationsReadCompletionBlock) {
         operation.markNotificationsReadCompletionBlock = { [weak self] notificationIDs, error in
             if let strongSelf = self, let error = error {
-                strongSelf.append(fatalError: MarkNotificationsReadError(underlyingError: error, marked: notificationIDs))
+                strongSelf.append(error: MarkNotificationsReadError(underlyingError: error, marked: notificationIDs))
             }
             else {
                 block(notificationIDs)
