@@ -205,6 +205,8 @@ public class EventConcurrencyTrackingRegistrar {
         // GroupProcedure open functions
         case override_groupWillAdd_child(String)
         case override_child_willFinishWithErrors(String)
+        // GroupProcedure handlers
+        case group_transformChildErrorsBlock(String)
 
         public var description: String {
             switch self {
@@ -225,6 +227,7 @@ public class EventConcurrencyTrackingRegistrar {
             // GroupProcedure open functions
             case .override_groupWillAdd_child(let child): return "groupWillAdd(child:) [\(child)]"
             case .override_child_willFinishWithErrors(let child): return "child(_:willFinishWithErrors:) [\(child)]"
+            case .group_transformChildErrorsBlock(let child): return "group.transformChildErrorsBlock [\(child)]"
             }
         }
 
@@ -250,6 +253,8 @@ public class EventConcurrencyTrackingRegistrar {
             case (.override_groupWillAdd_child(let lhs_child), .override_groupWillAdd_child(let rhs_child)):
                 return lhs_child == rhs_child
             case (.override_child_willFinishWithErrors(let lhs_child), .override_child_willFinishWithErrors(let rhs_child)):
+                return lhs_child == rhs_child
+            case (.group_transformChildErrorsBlock(let lhs_child), .group_transformChildErrorsBlock(let rhs_child)):
                 return lhs_child == rhs_child
             default:
                 return false
@@ -473,6 +478,10 @@ open class EventConcurrencyTrackingGroupProcedure: GroupProcedure, EventConcurre
         self.name = name
         if let baseObserver = baseObserver {
             add(observer: baseObserver)
+        }
+        // GroupProcedure transformChildErrorsBlock
+        transformChildErrorsBlock = { [concurrencyRegistrar] (child, errors) in
+            concurrencyRegistrar.doRun(.group_transformChildErrorsBlock(child.operationName))
         }
     }
     open override func execute() {

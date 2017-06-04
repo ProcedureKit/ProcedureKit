@@ -230,6 +230,96 @@ class GroupTests: GroupTestCase {
 
     // MARK: - Custom Error Handling Tests
 
+    func test__group__transform_child_errors_block_receives_children_and_errors() {
+        let receivedInput = Protector<[Procedure: [Error]]>([:])
+        let didReceiveDuplicate = Protector(false)
+        children = createTestProcedures(shouldError: true)
+        group = TestGroupProcedure(operations: children)
+        group.transformChildErrorsBlock = { (child, errors) in
+            let hasExistingEntryForKey = receivedInput.write { ward in
+                return ward.updateValue(errors, forKey: child) != nil
+            }
+            if hasExistingEntryForKey {
+                didReceiveDuplicate.overwrite(with: true)
+            }
+        }
+
+        wait(for: group)
+
+        XCTAssertFalse(receivedInput.access.isEmpty, "transformChildErrorsBlock was not called")
+        XCTAssertFalse(didReceiveDuplicate.access, "transformChildErrorsBlock received a duplicate call for the same child")
+        for child in children {
+            guard let errors = receivedInput.access[child] else {
+                XCTFail("transformChildErrorsBlock was not called for child: \(child)")
+                continue
+            }
+            XCTAssertEqual(errors.count, child.errors.count, "transformChildErrorsBlock input errors.count (\(errors.count)) does not equal the child's errors.count (\(child.errors.count))")
+            for (idx, error) in errors.enumerated() {
+                guard let blockError = error as? TestError else {
+                    XCTFail("Error provided to block was not a TestError")
+                    continue
+                }
+                guard let childError = child.errors[idx] as? TestError else {
+                    XCTFail("Error in child was not a TestError")
+                    continue
+                }
+                XCTAssertEqual(blockError, childError)
+            }
+            
+        }
+        XCTAssertEqual(group.errors.count, children.count)
+    }
+
+    func test__group__simple_transform_child_errors_block_removes_errors() {
+        let transformChildErrorsBlockChildren = Protector<[Procedure]>([])
+        children = createTestProcedures(shouldError: true)
+        let ignoredChild = children.first!
+        group = TestGroupProcedure(operations: children)
+        group.transformChildErrorsBlock = { (child, errors) in
+            transformChildErrorsBlockChildren.append(child)
+            if child === ignoredChild {
+                errors.removeAll()
+            }
+        }
+
+        wait(for: group)
+
+        XCTAssertFalse(transformChildErrorsBlockChildren.access.isEmpty, "transformChildErrorsBlock was not called")
+        for child in children {
+            XCTAssertTrue(transformChildErrorsBlockChildren.access.contains(child), "transformChildErrorsBlock was not called for child: \(child)")
+        }
+
+        XCTAssertEqual(group.errors.count, children.count - 1)
+        let suppressedError = ignoredChild.errors.first! as! TestError
+        XCTAssertFalse(TestError.verify(errors: group.errors, contains: suppressedError), "The supposedly suppressed error is in the Group errors.")
+    }
+
+    func test__group__transform_child_errors_block_removes_errors_from_child_willfinishwitherrors() {
+        children = createTestProcedures(shouldError: true)
+        let group = TestGroupChildWillFinishWithErrors(operations: children, action: .callSuperWithUnmodifiedInput)
+        let ignoredChild = children.first!
+        group.transformChildErrorsBlock = { (child, errors) in
+            if child === ignoredChild {
+                errors.removeAll()
+            }
+        }
+
+        wait(for: group)
+
+        XCTAssertFalse(group.receivedInput.access.isEmpty, "child(_:willFinishWithErrors:) was not called")
+        XCTAssertFalse(group.didReceiveDuplicate.access, "child(_:willFinishWithErrors:) received a duplicate call for the same child")
+        for child in children {
+            XCTAssertTrue(group.receivedInput.access.keys.contains(child), "child(_:willFinishWithErrors:) was not called for child: \(child)")
+        }
+
+        XCTAssertEqual(group.errors.count, children.count - 1)
+        guard let receivedErrorsForIgnoredChild = group.receivedInput.access[ignoredChild] else {
+            XCTFail("child(_:willFinishWithErrors:) was not called for the ignoredChild")
+            return
+        }
+        XCTAssertTrue(receivedErrorsForIgnoredChild.isEmpty, "child(_:willFinishWithErrors:) received a non-empty errors array for the ignoredChild")
+    }
+
     class TestGroupChildWillFinishWithErrors: GroupProcedure {
         enum WillFinishWithErrorsAction {
             case none
@@ -478,6 +568,7 @@ class GroupTests: GroupTestCase {
             case didAddOperationObserver
             case groupWillAdd
             case childWillFinishWithErrors(Procedure, [Error])
+            case transformChildErrorsBlock(Procedure, [Error])
         }
 
         init(operations: [Operation], childEventBlock: @escaping ChildEventBlock = { _,_ in }) {
@@ -488,6 +579,9 @@ class GroupTests: GroupTestCase {
             }
             addDidAddOperationBlockObserver { group, child in
                 group.childEventBlock(.didAddOperationObserver, child)
+            }
+            transformChildErrorsBlock = { (child, errors) in
+                childEventBlock(.transformChildErrorsBlock(child, errors), child)
             }
         }
 

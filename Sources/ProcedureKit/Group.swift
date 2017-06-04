@@ -17,6 +17,8 @@ import Dispatch
  */
 open class GroupProcedure: Procedure {
 
+    public typealias TransformChildErrorsBlockType = (Procedure, inout [Error]) -> Void
+
     internal let queue = ProcedureQueue()
     internal var queueDelegate: GroupQueueDelegate!
 
@@ -28,6 +30,7 @@ open class GroupProcedure: Procedure {
     fileprivate var _groupChildren: [Operation] // swiftlint:disable:this variable_name
     fileprivate var _groupIsFinishing = false // swiftlint:disable:this variable_name
     fileprivate var _groupIsSuspended = false // swiftlint:disable:this variable_name
+    fileprivate var _groupTransformChildErrorsBlock: TransformChildErrorsBlockType? = nil
 
     /// - returns: the operations which have been added to the queue
     final public var children: [Operation] {
@@ -201,6 +204,33 @@ open class GroupProcedure: Procedure {
 
         guard !errors.isEmpty else { return }
         append(errors: errors, fromChild: child)
+    }
+
+    /**
+     The transformChildErrorsBlock is called before the GroupProcedure handles child errors.
+     (It is called on the Group's EventQueue.)
+
+     The block is passed two parameters:
+        - Procedure: the child Procedure that will finish
+        - inout [Error]: the errors that the Group attributes to the child (on input: the errors that the child Procedure will finish with)
+
+     The array of errors is an `inout` parameter, and may be modified directly.
+
+     This enables the customization of the errors that the GroupProcedure (or GroupProcedure subclass) 
+     attributes to the child and considers in its `child(_:willFinishWithErrors:)` function.
+
+     IMPORTANT: This only affects the child errors that the GroupProcedure (or GroupProcedure subclass) 
+     utilizes. It does not directly impact the child Procedure itself, nor the child Procedure's errors
+     (if obtained or read directly from the child).
+    */
+    final public var transformChildErrorsBlock: TransformChildErrorsBlockType? {
+        get { return groupStateLock.withCriticalScope { _groupTransformChildErrorsBlock } }
+        set {
+            assert(!isExecuting, "Do not modify the child errors block after the Group has started.")
+            groupStateLock.withCriticalScope {
+                _groupTransformChildErrorsBlock = newValue
+            }
+        }
     }
 }
 
@@ -459,7 +489,7 @@ internal extension GroupProcedure {
             return strongGroup.willAdd(operation: procedure, context: context)
         }
 
-        public func procedureQueue(_ queue: ProcedureQueue, willFinishProcedure procedure: Procedure, withErrors errors: [Error]) -> ProcedureFuture? {
+        public func procedureQueue(_ queue: ProcedureQueue, willFinishProcedure procedure: Procedure, withErrors initialErrors: [Error]) -> ProcedureFuture? {
             guard let strongGroup = group else { return nil }
             guard queue === strongGroup.queue else { return nil }
 
@@ -470,8 +500,15 @@ internal extension GroupProcedure {
             strongGroup.dispatchEvent {
                 defer { promise.complete() }
 
+                var childErrors: [Error] = initialErrors
+                if let transformChildErrors = strongGroup.transformChildErrorsBlock {
+                    // transform child errors
+                    transformChildErrors(procedure, &childErrors)
+                    strongGroup.log.verbose(message: "Child errors for <\(procedure.operationName)> \((initialErrors.count != childErrors.count) ? "were transformed." : "were passed to transform block.")\n\t Initial errors ((initialErrors.count)): \(initialErrors)\n\t Transformed errors (\(childErrors.count)): \(childErrors)")
+                }
+
                 // handle child errors
-                strongGroup.child(procedure, willFinishWithErrors: errors)
+                strongGroup.child(procedure, willFinishWithErrors: childErrors)
             }
             return promise.future
         }
