@@ -157,7 +157,7 @@ open class RetryProcedure<T: Procedure>: RepeatProcedure<T> {
             operation: operation,
             errors: errors,
             count: count,
-            addOperations: { self.add(children: $0, before: nil); return },
+            addOperations: { (ops: Operation...) in self.add(children: ops, before: nil); return },
             log: log,
             configure: configure
         )

@@ -44,11 +44,19 @@ internal func __XCTEvaluateAssertion(testCase: XCTestCase, _ message: @autoclosu
     switch result {
     case .success: return
     default:
-        testCase.recordFailure(
-            withDescription: "\(result.failureDescription()) - \(message())",
-            inFile: String(describing: file), atLine: line,
-            expected: result.isExpected
-        )
+        #if swift(>=4.0)
+            testCase.recordFailure(
+                withDescription: "\(result.failureDescription()) - \(message())",
+                inFile: String(describing: file), atLine: Int(line),
+                expected: result.isExpected
+            )
+        #else
+            testCase.recordFailure(
+                withDescription: "\(result.failureDescription()) - \(message())",
+                inFile: String(describing: file), atLine: line,
+                expected: result.isExpected
+            )
+        #endif
     }
 
 }
