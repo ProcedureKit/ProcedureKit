@@ -48,14 +48,10 @@ public class EventQueue {
         return value == retrieved
     }
     internal func debugBestowTemporaryEventQueueStatusOn(queue: DispatchQueueProtocol) {
-        queue.setSpecific(key: key, value: value)
+        queue.pk_setSpecific(key: key, value: value)
     }
     internal func debugClearTemporaryEventQueueStatusFrom(queue: DispatchQueueProtocol) {
-        #if swift(>=4.0)
-            queue.setSpecific(key: key, value: nil)
-        #else // Swift 3.x
-            queue.clearSpecific(key: key)
-        #endif
+        queue.pk_setSpecific(key: key, value: nil)
     }
     #endif
 
@@ -250,12 +246,7 @@ public protocol DispatchQueueProtocol: class {
     @discardableResult func asyncDispatch(minimumQoS: DispatchQoS, block: @escaping () -> Void) -> DispatchWorkItem
     func dispatchNotify(withGroup group: DispatchGroup, block: @escaping () -> Void)
     #if DEBUG
-    #if swift(>=4.0)
-        func setSpecific<T>(key: DispatchSpecificKey<T>, value: T?)
-    #else // Swift 3.x
-        func setSpecific<T>(key: DispatchSpecificKey<T>, value: T)
-        func clearSpecific<T>(key: DispatchSpecificKey<T>)
-    #endif
+    func pk_setSpecific<T>(key: DispatchSpecificKey<T>, value: T?)
     #endif
 }
 
@@ -273,6 +264,36 @@ extension DispatchQueue: DispatchQueueProtocol {
     public func dispatchNotify(withGroup group: DispatchGroup, block: @escaping () -> Void) {
         group.notify(queue: self, execute: block)
     }
+    #if DEBUG
+    public func pk_setSpecific<T>(key: DispatchSpecificKey<T>, value: T?) {
+        #if swift(>=4.0)
+            setSpecific(key: key, value: value)
+        #else // Swift 3.x
+            if let value = value {
+                setSpecific(key: key, value: value)
+            }
+            else {
+                pk_clearSpecific(key: key)
+            }
+        #endif
+    }
+    #endif
+}
+
+// Swift 3.x
+fileprivate extension DispatchQueue {
+    // Swift 3.x (Xcode 8.x) is missing the ability to clear specific keys from DispatchQueues
+    // via DispatchQueue.setSpecific(key:value:) because it does not take an optional.
+    //
+    // A fix was merged into apple/swift in: https://github.com/apple/swift/commit/5accebf556f40ea104a7440ff0353f9e4f7f1ac2
+    // And is available in Swift 4+.
+    //
+    // For compatibility with Xcode < 9 and Swift 3, this custom clearSpecific(key:)
+    // function is provided.
+    fileprivate func pk_clearSpecific<T>(key: DispatchSpecificKey<T>) {
+        let k = Unmanaged.passUnretained(key).toOpaque()
+        __dispatch_queue_set_specific(self, k, nil, nil)
+    }
 }
 
 extension EventQueue: DispatchQueueProtocol {
@@ -284,17 +305,8 @@ extension EventQueue: DispatchQueueProtocol {
         return self.dispatchEventBlockInternal(minimumQoS: desiredQoS, block: block)
     }
     #if DEBUG
-    #if swift(>=4.0)
-        public func setSpecific<T>(key: DispatchSpecificKey<T>, value: T?) {
-            queue.setSpecific(key: key, value: value)
-        }
-    #else // Swift 3.x
-        public func setSpecific<T>(key: DispatchSpecificKey<T>, value: T) {
-            queue.setSpecific(key: key, value: value)
-        }
-        public func clearSpecific<T>(key: DispatchSpecificKey<T>) {
-            queue.clearSpecific(key: key)
-        }
-    #endif
+    public func pk_setSpecific<T>(key: DispatchSpecificKey<T>, value: T?) {
+        queue.pk_setSpecific(key: key, value: value)
+    }
     #endif
 }
