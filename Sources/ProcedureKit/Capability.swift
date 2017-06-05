@@ -107,7 +107,8 @@ extension Capability {
 
 // MARK: - AnyCapability
 
-internal class AnyCapabilityBox_<Status: AuthorizationStatus>: CapabilityProtocol {
+internal class AnyCapabilityBox_<_Status: AuthorizationStatus>: CapabilityProtocol {
+    typealias Status = _Status // Workaround for Swift 4: SR-5016
     var requirement: Status.Requirement? { _abstractMethod(); return nil }
     func isAvailable() -> Bool { _abstractMethod(); return false }
     func getAuthorizationStatus(_ completion: @escaping (Status) -> Void) { _abstractMethod() }
@@ -134,7 +135,8 @@ internal class AnyCapabilityBox<Base: CapabilityProtocol>: AnyCapabilityBox_<Bas
     }
 }
 
-public struct AnyCapability<Status: AuthorizationStatus>: CapabilityProtocol {
+public struct AnyCapability<_Status: AuthorizationStatus>: CapabilityProtocol {
+    public typealias Status = _Status // Workaround for Swift 4: SR-5016
     private typealias Erased = AnyCapabilityBox_<Status>
 
     private var box: Erased
