@@ -107,6 +107,8 @@ extension Capability {
 
 // MARK: - AnyCapability
 
+// swiftlint:disable generic_type_name
+
 internal class AnyCapabilityBox_<_Status: AuthorizationStatus>: CapabilityProtocol {
     typealias Status = _Status // Workaround for Swift 4: SR-5016
     var requirement: Status.Requirement? { _abstractMethod(); return nil }
@@ -156,6 +158,8 @@ public struct AnyCapability<_Status: AuthorizationStatus>: CapabilityProtocol {
         box.requestAuthorization(withCompletion: completion)
     }
 }
+
+// swiftlint:enable generic_type_name
 
 // MARK: - Procedures
 
