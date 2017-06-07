@@ -542,7 +542,7 @@ fileprivate extension ProcessProcedure {
 public extension ProcessProcedure {
 
     @available(*, unavailable, renamed: "executableURL")
-    var launchPath: String { fatalError("Use executableURL") }
+    var launchPath: String? { fatalError("Use executableURL") }
 
     @available(*, unavailable, renamed: "currentDirectoryURL")
     var currentDirectoryPath: String? { fatalError("Use currentDirectoryURL") }
