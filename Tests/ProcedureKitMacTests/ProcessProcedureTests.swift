@@ -16,6 +16,7 @@ class ProcessProcedureTests: ProcedureKitTestCase {
     var processProcedure: ProcessProcedure!
 
     var launchPath: String!
+    var executableURL: URL!
     var arguments: [String]!
 
     let bash = "/bin/bash"
@@ -25,11 +26,18 @@ class ProcessProcedureTests: ProcedureKitTestCase {
         super.setUp()
 
         launchPath = "/bin/echo"
+        executableURL = URL(fileURLWithPath: launchPath)
         arguments = [ "Hello World" ]
         processProcedure = ProcessProcedure(launchPath: launchPath, arguments: arguments)
     }
 
     func test__start_process() {
+        wait(for: processProcedure)
+        XCTAssertProcedureFinishedWithoutErrors(processProcedure)
+    }
+
+    func test__start_process_with_executableurl() {
+        processProcedure = ProcessProcedure(executableURL: executableURL, arguments: arguments)
         wait(for: processProcedure)
         XCTAssertProcedureFinishedWithoutErrors(processProcedure)
     }
@@ -40,11 +48,10 @@ class ProcessProcedureTests: ProcedureKitTestCase {
         XCTAssertProcedureFinishedWithoutErrors(processProcedure)
     }
 
-    func test__start_process_with_empty_launchpath() {
-        processProcedure = ProcessProcedure(launchPath: "")
+    func test__start_process_with_executableurl_only() {
+        processProcedure = ProcessProcedure(executableURL: executableURL)
         wait(for: processProcedure)
-        XCTAssertProcedureFinishedWithErrors(processProcedure, count: 1)
-        XCTAssertEqual(processProcedure.errors.first as? ProcessProcedure.Error, ProcessProcedure.Error.emptyLaunchPath)
+        XCTAssertProcedureFinishedWithoutErrors(processProcedure)
     }
 
     func test__start_process_with_non_existent_launchpath() {
@@ -55,6 +62,19 @@ class ProcessProcedureTests: ProcedureKitTestCase {
             return
         }
         processProcedure = ProcessProcedure(launchPath: nonExistentLaunchPath)
+        wait(for: processProcedure)
+        XCTAssertProcedureFinishedWithErrors(processProcedure, count: 1)
+        XCTAssertEqual(processProcedure.errors.first as? ProcessProcedure.Error, ProcessProcedure.Error.invalidLaunchPath)
+    }
+
+    func test__start_process_with_non_existent_executableurl() {
+        let nonExistentExecutableURL = URL(fileURLWithPath: "/bin/echo8procedurekit")
+        guard !FileManager.default.isExecutableFile(atPath: nonExistentExecutableURL.path) else {
+            // the non-existent launch path used for this test exists on the local system
+            XCTFail("Cannot run test. The non-existent launch path exists on this system: \(nonExistentExecutableURL)")
+            return
+        }
+        processProcedure = ProcessProcedure(executableURL: nonExistentExecutableURL)
         wait(for: processProcedure)
         XCTAssertProcedureFinishedWithErrors(processProcedure, count: 1)
         XCTAssertEqual(processProcedure.errors.first as? ProcessProcedure.Error, ProcessProcedure.Error.invalidLaunchPath)
@@ -245,10 +265,10 @@ class ProcessProcedureTests: ProcedureKitTestCase {
         XCTAssertEqual(processProcedure.arguments ?? [], arguments)
     }
 
-    func test__currentDirectoryPath() {
-        let currentDirectoryPath = "/bin/"
+    func test__currentDirectoryURL() {
+        let currentDirectoryPath = "/bin"
         processProcedure = ProcessProcedure(launchPath: launchPath, currentDirectoryPath: currentDirectoryPath)
-        XCTAssertEqual(processProcedure.currentDirectoryPath, currentDirectoryPath)
+        XCTAssertEqual(processProcedure.currentDirectoryURL?.path, currentDirectoryPath)
     }
 
     func test__environment() {
@@ -258,8 +278,8 @@ class ProcessProcedureTests: ProcedureKitTestCase {
         XCTAssertEqual(processProcedure.environment ?? [:], environment)
     }
 
-    func test__launchPath() {
-        XCTAssertEqual(processProcedure.launchPath, launchPath)
+    func test__executableURL() {
+        XCTAssertEqual(processProcedure.executableURL?.path, launchPath)
     }
 
     func test__standardError() {
