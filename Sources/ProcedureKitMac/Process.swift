@@ -15,13 +15,13 @@ open class ProcessProcedure: Procedure, InputProcedure, OutputProcedure {
 
     public struct LaunchRequest {
         /// (Read-only) The path to the executable to be launched.
-        let launchPath: String
+        let executableURL: URL
 
         /// (Read-only) The command arguments that should be used to launch the executable.
         let arguments: [String]?
 
         /// (Read-only) The current directory to be used when launching the executable.
-        let currentDirectoryPath: String?
+        let currentDirectoryURL: URL?
 
         /// (Read-only) The environment to be used when launching the executable.
         let environment: [String : String]?
@@ -37,7 +37,7 @@ open class ProcessProcedure: Procedure, InputProcedure, OutputProcedure {
 
         /// Initialize a request to launch a Process.
         ///
-        /// The minimum required parameter is a path to the executable to launch (`launchPath`).
+        /// The minimum required parameter is a path to the executable to launch (`executableURL`).
         ///
         /// Other parameters are optional, and are described in full in the documentation
         /// for NSTask/Process: https://developer.apple.com/reference/foundation/process
@@ -45,17 +45,17 @@ open class ProcessProcedure: Procedure, InputProcedure, OutputProcedure {
         /// By default, `Process` inherits the environment and some other parameters from the current process.
         ///
         /// - Parameters:
-        ///   - launchPath: the path to the executable to be launched.
+        ///   - executableURL: the path to the executable to be launched.
         ///   - arguments: (optional) the command arguments that should be used to launch the executable.
-        ///   - currentDirectoryPath: (optional) the current directory to be used when launching the executable.
+        ///   - currentDirectoryURL: (optional) the current directory to be used when launching the executable.
         ///   - environment: (optional) the environment to be used when launching the executable.
         ///   - standardError: (optional) the standard error (FileHandle or Pipe object)
         ///   - standardInput: (optional) the standard input (FileHandle or Pipe object)
         ///   - standardOutput: (optional) the standard output (FileHandle or Pipe object)
-        init(launchPath: String, arguments: [String]? = nil, currentDirectoryPath: String? = nil, environment: [String : String]? = nil, standardError: Any? = nil, standardInput: Any? = nil, standardOutput: Any? = nil) {
-            self.launchPath = launchPath
+        init(executableURL: URL, arguments: [String]? = nil, currentDirectoryURL: URL? = nil, environment: [String : String]? = nil, standardError: Any? = nil, standardInput: Any? = nil, standardOutput: Any? = nil) {
+            self.executableURL = executableURL
             self.arguments = arguments
-            self.currentDirectoryPath = currentDirectoryPath
+            self.currentDirectoryURL = currentDirectoryURL
             self.environment = environment
             self.standardError = standardError
             self.standardInput = standardInput
@@ -160,6 +160,8 @@ open class ProcessProcedure: Procedure, InputProcedure, OutputProcedure {
     /// - returns processDidExitCleanly: the closure for exiting cleanly.
     private let processDidExitCleanly: ProcessDidExitCleanly
 
+    // MARK: Initializer (with launchPath + currentDirectoryPath)
+
     /// Initialize a ProcessProcedure.
     ///
     /// The minimum required parameter is a path to the executable to launch (`launchPath`).
@@ -181,7 +183,38 @@ open class ProcessProcedure: Procedure, InputProcedure, OutputProcedure {
     ///   - processDidExitCleanly: a ProcessDidExitCleanly block that is called once the Process has terminated, and is used to determine whether the ProcessProcedure finishes with an error.
     public convenience init(launchPath: String, arguments: [String]? = nil, currentDirectoryPath: String? = nil, environment: [String : String]? = nil, standardError: Any? = nil, standardInput: Any? = nil, standardOutput: Any? = nil, processDidLaunch: @escaping ProcessDidLaunch = { _ in }, processDidExitCleanly: @escaping ProcessDidExitCleanly = ProcessProcedure.defaultProcessDidExitCleanly) {
 
-        let launchRequest = LaunchRequest(launchPath: launchPath, arguments: arguments, currentDirectoryPath: currentDirectoryPath, environment: environment, standardError: standardError, standardInput: standardInput, standardOutput: standardOutput)
+        let executableURL = URL(fileURLWithPath: launchPath)
+        let currentDirectoryURL = (currentDirectoryPath != nil) ? URL(fileURLWithPath: currentDirectoryPath!) : nil
+
+        let launchRequest = LaunchRequest(executableURL: executableURL, arguments: arguments, currentDirectoryURL: currentDirectoryURL, environment: environment, standardError: standardError, standardInput: standardInput, standardOutput: standardOutput)
+
+        self.init(launchRequest: launchRequest, processDidLaunch: processDidLaunch, processDidExitCleanly: processDidExitCleanly)
+    }
+
+    // MARK: Initializer (with executableURL + currentDirectoryURL)
+
+    /// Initialize a ProcessProcedure.
+    ///
+    /// The minimum required parameter is a path to the executable to launch (`executableURL`).
+    ///
+    /// Other parameters are optional, and are described in full in the documentation
+    /// for NSTask/Process: https://developer.apple.com/reference/foundation/process
+    ///
+    /// By default, `Process` inherits the environment and some other parameters from the current process.
+    ///
+    /// - Parameters:
+    ///   - executableURL: the path to the executable to be launched.
+    ///   - arguments: (optional) the command arguments that should be used to launch the executable.
+    ///   - currentDirectoryURL: (optional) the current directory to be used when launching the executable.
+    ///   - environment: (optional) the environment to be used when launching the executable.
+    ///   - standardError: (optional) the standard error (FileHandle or Pipe object)
+    ///   - standardInput: (optional) the standard input (FileHandle or Pipe object)
+    ///   - standardOutput: (optional) the standard output (FileHandle or Pipe object)
+    ///   - processDidLaunch: a ProcessDidLaunch block that is called once the Process has been launched.
+    ///   - processDidExitCleanly: a ProcessDidExitCleanly block that is called once the Process has terminated, and is used to determine whether the ProcessProcedure finishes with an error.
+    public convenience init(executableURL: URL, arguments: [String]? = nil, currentDirectoryURL: URL? = nil, environment: [String : String]? = nil, standardError: Any? = nil, standardInput: Any? = nil, standardOutput: Any? = nil, processDidLaunch: @escaping ProcessDidLaunch = { _ in }, processDidExitCleanly: @escaping ProcessDidExitCleanly = ProcessProcedure.defaultProcessDidExitCleanly) {
+
+        let launchRequest = LaunchRequest(executableURL: executableURL, arguments: arguments, currentDirectoryURL: currentDirectoryURL, environment: environment, standardError: standardError, standardInput: standardInput, standardOutput: standardOutput)
 
         self.init(launchRequest: launchRequest, processDidLaunch: processDidLaunch, processDidExitCleanly: processDidExitCleanly)
     }
@@ -225,7 +258,13 @@ open class ProcessProcedure: Procedure, InputProcedure, OutputProcedure {
             return
         }
 
-        guard !request.launchPath.isEmpty else {
+        guard request.executableURL.isFileURL else {
+            finish(withResult: .failure(Error.invalidLaunchPath))
+            return
+        }
+
+        let launchPath = request.executableURL.path
+        guard !launchPath.isEmpty else {
             finish(withResult: .failure(Error.emptyLaunchPath))
             return
         }
@@ -238,10 +277,11 @@ open class ProcessProcedure: Procedure, InputProcedure, OutputProcedure {
         // If the `launchPath` disappears or becomes non-executable between the time
         // of this check, and the ProcessProcedure's later call to `Process.launch()`,
         // or if various other error situations occur with the provided LaunchRequest
-        // parameters passed to the Process, Process may throw an Objective-C exception.
+        // parameters passed to the Process, Process may throw an Objective-C exception
+        // on macOS < 10.13.
         // See the documentation for Process / NSTask for more details.
         //
-        guard FileManager.default.isExecutableFile(atPath: request.launchPath) else {
+        guard FileManager.default.isExecutableFile(atPath: launchPath) else {
             finish(withResult: .failure(Error.invalidLaunchPath))
             return
         }
@@ -294,7 +334,15 @@ open class ProcessProcedure: Procedure, InputProcedure, OutputProcedure {
             procedure.process = process
 
             // Launch the Process
-            process.launch()
+            do { try procedure.run(process: process) }
+            catch {
+                // Failed to run the Process
+                // Note: This will generally only occur on macOS 10.13+, where new methods
+                //       on Process are available that throw errors (instead of raising
+                //       Objective-C exceptions).
+                procedure.finish(withResult: .failure(error))
+                return
+            }
 
             // Store the processIdentifier
             procedure.processIdentifier = process.processIdentifier
@@ -341,8 +389,8 @@ public extension ProcessProcedure {
     }
 
     /// (Read-only) The current directory to be used when launching the executable.
-    var currentDirectoryPath: String? {
-        get { return input.value?.currentDirectoryPath }
+    var currentDirectoryURL: URL? {
+        get { return input.value?.currentDirectoryURL }
     }
 
     /// (Read-only) The environment to be used when launching the executable.
@@ -350,9 +398,9 @@ public extension ProcessProcedure {
         get { return input.value?.environment }
     }
 
-    /// (Read-only) The path to the executable to be launched.
-    var launchPath: String? {
-        get { return input.value?.launchPath }
+    /// (Read-only) The path (URL) for the executable to be launched.
+    var executableURL: URL? {
+        get { return input.value?.executableURL }
     }
 
     /// (Read-only) The standard error (FileHandle or Pipe object).
@@ -430,12 +478,28 @@ fileprivate extension ProcessProcedure {
     fileprivate func createProcess(withRequest request: LaunchRequest) -> Process {
         let process = Process()
 
-        process.launchPath = request.launchPath
+        #if swift(>=3.2)
+            if #available(OSX 10.13, *) {
+                process.executableURL = request.executableURL
+                if let currentDirectoryURL = request.currentDirectoryURL {
+                    process.currentDirectoryURL = currentDirectoryURL
+                }
+            }
+            else {
+                // Versions of macOS < 10.13 only support string-based paths
+                process.launchPath = request.executableURL.path
+                if let currentDirectoryPath = request.currentDirectoryURL?.path {
+                    process.currentDirectoryPath = currentDirectoryPath
+                }
+            }
+        #else
+            process.launchPath = request.executableURL.path
+            if let currentDirectoryPath = request.currentDirectoryURL?.path {
+                process.currentDirectoryPath = currentDirectoryPath
+            }
+        #endif
         if let arguments = request.arguments {
             process.arguments = arguments
-        }
-        if let currentDirectoryPath = request.currentDirectoryPath {
-            process.currentDirectoryPath = currentDirectoryPath
         }
         if let environment = request.environment {
             process.environment = environment
@@ -451,4 +515,35 @@ fileprivate extension ProcessProcedure {
         }
         return process
     }
+
+    #if swift(>=3.2)
+    // On macOS 10.13+, new methods on Process are available that throw errors
+    // (instead of raising Objective-C exceptions). This method uses them if
+    // possible.
+    fileprivate func run(process: Process) throws {
+        if #available(OSX 10.13, *) {
+            try process.run()
+        }
+        else {
+            // macOS < 10.13 only support the launch() method, which may throw an ObjC exception
+            process.launch()
+        }
+    }
+    #else
+    fileprivate func run(process: Process) throws {
+        // Earlier SDKs only support Process.launch()
+        process.launch()
+    }
+    #endif
+}
+
+// MARK: - Unavailable
+
+public extension ProcessProcedure {
+
+    @available(*, unavailable, renamed: "executableURL")
+    var launchPath: String? { fatalError("Use executableURL") }
+
+    @available(*, unavailable, renamed: "currentDirectoryURL")
+    var currentDirectoryPath: String? { fatalError("Use currentDirectoryURL") }
 }
