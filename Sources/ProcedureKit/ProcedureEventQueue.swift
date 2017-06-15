@@ -266,9 +266,9 @@ extension DispatchQueue: DispatchQueueProtocol {
     }
     #if DEBUG
     public func pk_setSpecific<T>(key: DispatchSpecificKey<T>, value: T?) {
-        #if swift(>=4.0)
+        #if swift(>=3.2)
             setSpecific(key: key, value: value)
-        #else // Swift 3.x
+        #else // Swift < 3.2 (Xcode 8.x)
             if let value = value {
                 setSpecific(key: key, value: value)
             }
