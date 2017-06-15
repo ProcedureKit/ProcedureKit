@@ -95,6 +95,7 @@ steps:
   
   -
     name: "Test CocoaPods Integration"
+    branches: "master release/*"      
     trigger: "tryprocedurekit"
     build:
       message: "Testing ProcedureKit Integration via Cocoapods"
