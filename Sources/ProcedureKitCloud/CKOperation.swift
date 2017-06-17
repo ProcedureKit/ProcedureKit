@@ -84,11 +84,11 @@ public protocol CKOperationProtocol: class {
     @available(iOS 9.3, tvOS 9.3, OSX 10.12, watchOS 2.3, *)
     var operationID: String { get }
 
-    #if swift(>=4.0)
+    #if swift(>=3.2)
         /// - returns whether the operation is long-lived
         @available(iOS 9.3, tvOS 9.3, OSX 10.12, watchOS 2.3, *)
         var isLongLived: Bool { get set }
-    #else // Swift 3.x
+    #else // Swift < 3.2 (Xcode 8.x)
         /// - returns whether the operation is long-lived
         @available(iOS 9.3, tvOS 9.3, OSX 10.12, watchOS 2.3, *)
         var longLived: Bool { get set }
@@ -198,17 +198,17 @@ extension CKProcedure {
         get { return operation.operationID }
     }
 
-    #if swift(>=4.0)
+    #if swift(>=3.2)
         @available(iOS 9.3, tvOS 9.3, OSX 10.12, watchOS 2.3, *)
         public var isLongLived: Bool {
             get { return operation.isLongLived }
             set { operation.isLongLived = newValue }
         }
 
-        // Renamed in Swift 4
+        // Renamed in Swift 3.2+
         @available(*, unavailable, renamed: "isLongLived")
         public var longLived: Bool { fatalError("Use isLongLived") }
-    #else // Swift 3.x
+    #else // Swift < 3.2 (Xcode 8.x)
         @available(iOS 9.3, tvOS 9.3, OSX 10.12, watchOS 2.3, *)
         public var longLived: Bool {
             get { return operation.longLived }
@@ -261,7 +261,7 @@ extension CloudKitProcedure {
         get { return current.operationID }
     }
 
-    #if swift(>=4.0)
+    #if swift(>=3.2)
         /// - returns whether the operation is long-lived
         @available(iOS 9.3, tvOS 9.3, OSX 10.12, watchOS 2.3, *)
         public var isLongLived: Bool {
@@ -275,7 +275,7 @@ extension CloudKitProcedure {
         // Renamed in Swift 4
         @available(*, unavailable, renamed: "isLongLived")
         public var longLived: Bool { fatalError("Use isLongLived") }
-    #else // Swift 3.x
+    #else // Swift < 3.2 (Xcode 8.x)
         /// - returns whether the operation is long-lived
         @available(iOS 9.3, tvOS 9.3, OSX 10.12, watchOS 2.3, *)
         public var longLived: Bool {

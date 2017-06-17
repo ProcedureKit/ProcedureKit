@@ -17,13 +17,13 @@ class TestableNetworkActivityIndicator: NetworkActivityIndicatorProtocol {
         visibilityDidChange = didChange
     }
 
-    #if swift(>=4.0)
+    #if swift(>=3.2)
         var isNetworkActivityIndicatorVisible = false {
             didSet {
                 visibilityDidChange(isNetworkActivityIndicatorVisible)
             }
         }
-    #else // Swift 3.x
+    #else // Swift < 3.2 (Xcode 8.x)
         var networkActivityIndicatorVisible = false {
             didSet {
                 visibilityDidChange(networkActivityIndicatorVisible)
