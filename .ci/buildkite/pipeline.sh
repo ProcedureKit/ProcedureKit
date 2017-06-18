@@ -11,7 +11,9 @@ YAML
 
 if [[ "$BUILDKITE_BUILD_CREATOR" == "Daniel Thorpe" ]]; then
   cat <<-YAML
+
   - wait
+
   -
     name: "Test CocoaPods Integration"
     trigger: "tryprocedurekit"
