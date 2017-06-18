@@ -49,7 +49,7 @@ extension CKProcedure where T: CKFetchShareParticipantsOperationProtocol, T: Ass
     func setFetchShareParticipantsCompletionBlock(_ block: @escaping CloudKitProcedure<T>.FetchShareParticipantsCompletionBlock) {
         operation.fetchShareParticipantsCompletionBlock = { [weak self] error in
             if let strongSelf = self, let error = error {
-                strongSelf.append(fatalError: PKCKError(underlyingError: error))
+                strongSelf.append(error: PKCKError(underlyingError: error))
             }
             else {
                 block()
@@ -58,13 +58,13 @@ extension CKProcedure where T: CKFetchShareParticipantsOperationProtocol, T: Ass
     }
 }
 
-extension CloudKitProcedure where T: CKFetchShareParticipantsOperationProtocol, T: AssociatedErrorProtocol, T.AssociatedError: CloudKitError {
+extension CloudKitProcedure where T: CKFetchShareParticipantsOperationProtocol {
 
     /// A typealias for the block types used by CloudKitOperation<CKFetchShareMetadataOperationType>
     public typealias FetchShareParticipantsParticipantFetchedBlock = (T.ShareParticipant) -> Void
 
     /// A typealias for the block types used by CloudKitOperation<CKFetchShareMetadataOperationType>
-    public typealias FetchShareParticipantsCompletionBlock = (Void) -> Void
+    public typealias FetchShareParticipantsCompletionBlock = () -> Void
 
     /// - returns: the user identity lookup infos
     public var userIdentityLookupInfos: T.UserIdentityLookupInfosPropertyType {

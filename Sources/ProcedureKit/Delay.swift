@@ -121,7 +121,7 @@ public class DelayProcedure: Procedure {
         switch delay.interval {
         case (let interval) where interval > 0.0:
             guard !isCancelled else { return }
-            _timer = DispatchSource.makeTimerSource(flags: [], queue: DispatchQueue.default)
+            _timer = eventQueue.makeTimerSource()
             _timer?.setEventHandler { [weak self] in
                 guard let strongSelf = self else { return }
                 if !strongSelf.isCancelled { strongSelf.finish() }

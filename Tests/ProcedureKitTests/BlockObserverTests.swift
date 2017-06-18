@@ -20,7 +20,9 @@ class BlockObserverTests: ProcedureKitTestCase {
 
     func test__will_execute_is_called() {
         let willExecuteCalled = Protector<Procedure?>(nil)
-        procedure.add(observer: BlockObserver(willExecute: { willExecuteCalled.overwrite(with: $0.0) }))
+        procedure.add(observer: BlockObserver(willExecute: { procedure, _ in
+            willExecuteCalled.overwrite(with: procedure)
+        }))
         wait(for: procedure)
         XCTAssertEqual(willExecuteCalled.access, procedure)
     }
@@ -67,7 +69,9 @@ class BlockObserverTests: ProcedureKitTestCase {
 
     func test__will_finish_is_called() {
         let willFinishCalled = Protector<(Procedure, [Error])?>(nil)
-        procedure.add(observer: BlockObserver(willFinish: { willFinishCalled.overwrite(with: ($0.0, $0.1)) }))
+        procedure.add(observer: BlockObserver(willFinish: { procedure, errors, _ in
+            willFinishCalled.overwrite(with: (procedure, errors))
+        }))
         wait(for: procedure)
         XCTAssertEqual(willFinishCalled.access?.0, procedure)
     }
@@ -162,7 +166,9 @@ class BlockObserverSynchronizationTests: ProcedureKitTestCase {
             procedure.addWillExecuteBlockObserver(synchronizedWith: syncObject) { procedure, _ in
                 willExecuteCalled_addBlock.overwrite(with: (procedure, isSynced()))
             }
-            procedure.add(observer: BlockObserver(synchronizedWith: syncObject, willExecute: { willExecuteCalled_BlockObserver.overwrite(with: ($0.0, isSynced())) }))
+            procedure.add(observer: BlockObserver(synchronizedWith: syncObject, willExecute: { procedure, _ in
+                willExecuteCalled_BlockObserver.overwrite(with: (procedure, isSynced()))
+            }))
             wait(for: procedure)
             XCTAssertEqual(willExecuteCalled_addBlock.access?.0, procedure)
             XCTAssertTrue(willExecuteCalled_addBlock.access?.1 ?? false, "Was not synchronized on \(syncObject).") // was synchronized
@@ -209,17 +215,18 @@ class BlockObserverSynchronizationTests: ProcedureKitTestCase {
 
     func test__will_add_synchronized() {
         syncTest { syncObject, isSynced in
-            var didExecuteProducedOperation = false
+            let didExecuteProducedOperation = Protector(false)
             let willAddOperationCalled_addBlock = Protector<(Procedure, Operation, Bool)?>(nil)
             let willAddOperationCalled_BlockObserver = Protector<(Procedure, Operation, Bool)?>(nil)
-            let producedOperation = BlockOperation { didExecuteProducedOperation = true }
+            let producedOperation = BlockProcedure { didExecuteProducedOperation.overwrite(with: true) }
+            addCompletionBlockTo(procedure: producedOperation)
             let producingProcedure = TestProcedure(produced: producedOperation)
             producingProcedure.addWillAddOperationBlockObserver(synchronizedWith: syncObject) {
                 willAddOperationCalled_addBlock.overwrite(with: ($0, $1, isSynced()))
             }
             producingProcedure.add(observer: BlockObserver(synchronizedWith: syncObject, willAdd: { willAddOperationCalled_BlockObserver.overwrite(with: ($0, $1, isSynced())) }))
             wait(for: producingProcedure)
-            XCTAssertTrue(didExecuteProducedOperation)
+            XCTAssertTrue(didExecuteProducedOperation.access)
             XCTAssertEqual(willAddOperationCalled_addBlock.access?.0, producingProcedure)
             XCTAssertEqual(willAddOperationCalled_addBlock.access?.1, producedOperation)
             XCTAssertTrue(willAddOperationCalled_addBlock.access?.2 ?? false, "Was not synchronized on \(syncObject).") // was synchronized
@@ -231,17 +238,34 @@ class BlockObserverSynchronizationTests: ProcedureKitTestCase {
 
     func test__did_add_synchronized() {
         syncTest { syncObject, isSynced in
-            var didExecuteProducedOperation = false
+            let didAddGroup = DispatchGroup()
+            let didExecuteProducedOperation = Protector(false)
             let didAddOperationCalled_addBlock = Protector<(Procedure, Operation, Bool)?>(nil)
             let didAddOperationCalled_BlockObserver = Protector<(Procedure, Operation, Bool)?>(nil)
-            let producedOperation = BlockOperation { didExecuteProducedOperation = true }
+            let producedOperation = BlockProcedure { didExecuteProducedOperation.overwrite(with: true) }
+            addCompletionBlockTo(procedure: producedOperation)
             let producingProcedure = TestProcedure(produced: producedOperation)
+            didAddGroup.enter()
             producingProcedure.addDidAddOperationBlockObserver(synchronizedWith: syncObject) {
                 didAddOperationCalled_addBlock.overwrite(with: ($0, $1, isSynced()))
+                didAddGroup.leave()
             }
-            producingProcedure.add(observer: BlockObserver(synchronizedWith: syncObject, didAdd: { didAddOperationCalled_BlockObserver.overwrite(with: ($0, $1, isSynced())) }))
+            didAddGroup.enter()
+            producingProcedure.add(observer: BlockObserver(synchronizedWith: syncObject, didAdd: {
+                didAddOperationCalled_BlockObserver.overwrite(with: ($0, $1, isSynced()))
+                didAddGroup.leave()
+            }))
             wait(for: producingProcedure)
-            XCTAssertTrue(didExecuteProducedOperation)
+
+            // DidAdd events are only guaranteed to happen at *some point after* the operation is added.
+            // Thus, wait on both observers to be called before proceeding.
+            weak var expDidAddObserverFired = expectation(description: "DidAddObservers were fired")
+            didAddGroup.notify(queue: DispatchQueue.main) {
+                expDidAddObserverFired?.fulfill()
+            }
+            waitForExpectations(timeout: 2)
+
+            XCTAssertTrue(didExecuteProducedOperation.access)
             XCTAssertEqual(didAddOperationCalled_addBlock.access?.0, producingProcedure)
             XCTAssertEqual(didAddOperationCalled_addBlock.access?.1, producedOperation)
             XCTAssertTrue(didAddOperationCalled_addBlock.access?.2 ?? false, "Was not synchronized on \(syncObject).") // was synchronized
@@ -259,7 +283,9 @@ class BlockObserverSynchronizationTests: ProcedureKitTestCase {
             procedure.addWillFinishBlockObserver(synchronizedWith: syncObject) { procedure, errors, _ in
                 willFinishCalled_addBlock.overwrite(with: (procedure, errors, isSynced()))
             }
-            procedure.add(observer: BlockObserver(synchronizedWith: syncObject, willFinish: { willFinishCalled_BlockObserver.overwrite(with: ($0.0, $0.1, isSynced())) }))
+            procedure.add(observer: BlockObserver(synchronizedWith: syncObject, willFinish: { procedure, errors, _ in
+                willFinishCalled_BlockObserver.overwrite(with: (procedure, errors, isSynced()))
+            }))
             wait(for: procedure)
             XCTAssertEqual(willFinishCalled_addBlock.access?.0, procedure)
             XCTAssertTrue(willFinishCalled_addBlock.access?.2 ?? false, "Was not synchronized on \(syncObject).") // was synchronized
@@ -270,14 +296,31 @@ class BlockObserverSynchronizationTests: ProcedureKitTestCase {
 
     func test__did_finish_synchronized() {
         syncTest { syncObject, isSynced in
+            let didFinishGroup = DispatchGroup()
             let didFinishCalled_addBlock = Protector<(Procedure, [Error], Bool)?>(nil)
             let didFinishCalled_BlockObserver = Protector<(Procedure, [Error], Bool)?>(nil)
             let procedure = TestProcedure()
+            didFinishGroup.enter()
             procedure.addDidFinishBlockObserver(synchronizedWith: syncObject) { procedure, errors in
                 didFinishCalled_addBlock.overwrite(with: (procedure, errors, isSynced()))
+                didFinishGroup.leave()
             }
-            procedure.add(observer: BlockObserver(synchronizedWith: syncObject, didFinish: { didFinishCalled_BlockObserver.overwrite(with: ($0, $1, isSynced())) }))
+            didFinishGroup.enter()
+            procedure.add(observer: BlockObserver(synchronizedWith: syncObject, didFinish: { didFinishCalled_BlockObserver.overwrite(with: ($0, $1, isSynced()))
+                didFinishGroup.leave()
+            }))
             wait(for: procedure)
+
+            // Because Procedure signals isFinished KVO *prior* to calling DidFinish observers,
+            // the above wait() may return before either observer is called to record the
+            // DidFinish event.
+            // Thus, wait on both observers to be called before proceeding.
+            weak var expDidFinishObserverFired = expectation(description: "DidFinishObservers were fired")
+            didFinishGroup.notify(queue: DispatchQueue.main) {
+                expDidFinishObserverFired?.fulfill()
+            }
+            waitForExpectations(timeout: 2)
+
             XCTAssertEqual(didFinishCalled_addBlock.access?.0, procedure)
             XCTAssertTrue(didFinishCalled_addBlock.access?.2 ?? false, "Was not synchronized on \(syncObject).") // was synchronized
             XCTAssertEqual(didFinishCalled_BlockObserver.access?.0, procedure)

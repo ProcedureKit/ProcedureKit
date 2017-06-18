@@ -67,7 +67,7 @@ extension CKProcedure where T: CKQueryOperationProtocol, T: AssociatedErrorProto
     func setQueryCompletionBlock(_ block: @escaping CloudKitProcedure<T>.QueryCompletionBlock) {
         operation.queryCompletionBlock = { [weak self] cursor, error in
             if let strongSelf = self, let error = error {
-                strongSelf.append(fatalError: QueryError(underlyingError: error, cursor: cursor))
+                strongSelf.append(error: QueryError(underlyingError: error, cursor: cursor))
             }
             else {
                 block(cursor)
@@ -76,7 +76,7 @@ extension CKProcedure where T: CKQueryOperationProtocol, T: AssociatedErrorProto
     }
 }
 
-extension CloudKitProcedure where T: CKQueryOperationProtocol, T: AssociatedErrorProtocol, T.AssociatedError: CloudKitError {
+extension CloudKitProcedure where T: CKQueryOperationProtocol {
 
     /// A typealias for the block types used by CloudKitOperation<CKQueryOperation>
     public typealias QueryRecordFetchedBlock = (T.Record) -> Void

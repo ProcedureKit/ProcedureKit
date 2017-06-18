@@ -65,7 +65,7 @@ extension CKProcedure where T: CKFetchShareMetadataOperationProtocol, T: Associa
     func setFetchShareMetadataCompletionBlock(_ block: @escaping CloudKitProcedure<T>.FetchShareMetadataCompletionBlock) {
         operation.fetchShareMetadataCompletionBlock = { [weak self] error in
             if let strongSelf = self, let error = error {
-                strongSelf.append(fatalError: PKCKError(underlyingError: error))
+                strongSelf.append(error: PKCKError(underlyingError: error))
             }
             else {
                 block()
@@ -74,7 +74,7 @@ extension CKProcedure where T: CKFetchShareMetadataOperationProtocol, T: Associa
     }
 }
 
-extension CloudKitProcedure where T: CKFetchShareMetadataOperationProtocol, T: AssociatedErrorProtocol, T.AssociatedError: CloudKitError {
+extension CloudKitProcedure where T: CKFetchShareMetadataOperationProtocol {
 
     /// A typealias for the block types used by CloudKitOperation<CKFetchShareMetadataOperationType>
     public typealias FetchShareMetadataPerShareMetadataBlock = (URL, T.ShareMetadata?, Error?) -> Void

@@ -39,6 +39,12 @@ class CKFetchShareParticipantsOperationTests: CKProcedureTestCase {
         operation = CKProcedure(operation: target)
     }
 
+    override func tearDown() {
+        target = nil
+        operation = nil
+        super.tearDown()
+    }
+
     func test__set_get__userIdentityLookupInfos() {
         let userIdentityLookupInfos = [ "hello@world.com" ]
         operation.userIdentityLookupInfos = userIdentityLookupInfos
@@ -100,6 +106,12 @@ class CloudKitProcedureFetchShareParticipantsOperationTests: CKProcedureTestCase
         cloudkit.shareParticipantFetchedBlock = { self.setByShareParticipantFetchedBlock = $0 }
     }
 
+    override func tearDown() {
+        cloudkit = nil
+        setByShareParticipantFetchedBlock = nil
+        super.tearDown()
+    }
+
     func test__set_get__errorHandlers() {
         cloudkit.set(errorHandlers: [.internalError: cloudkit.passthroughSuggestedErrorHandler])
         XCTAssertEqual(cloudkit.errorHandlers.count, 1)
@@ -135,7 +147,7 @@ class CloudKitProcedureFetchShareParticipantsOperationTests: CKProcedureTestCase
 
     func test__success_with_completion_block_set() {
         var didExecuteBlock = false
-        cloudkit.setFetchShareParticipantsCompletionBlock { _ in
+        cloudkit.setFetchShareParticipantsCompletionBlock {
             didExecuteBlock = true
         }
         wait(for: cloudkit)
@@ -161,7 +173,7 @@ class CloudKitProcedureFetchShareParticipantsOperationTests: CKProcedureTestCase
         }
 
         var didExecuteBlock = false
-        cloudkit.setFetchShareParticipantsCompletionBlock { _ in
+        cloudkit.setFetchShareParticipantsCompletionBlock {
             didExecuteBlock = true
         }
 
@@ -182,7 +194,7 @@ class CloudKitProcedureFetchShareParticipantsOperationTests: CKProcedureTestCase
             return op
         }
         var didExecuteBlock = false
-        cloudkit.setFetchShareParticipantsCompletionBlock { _ in didExecuteBlock = true }
+        cloudkit.setFetchShareParticipantsCompletionBlock { didExecuteBlock = true }
         wait(for: cloudkit)
         XCTAssertProcedureFinishedWithoutErrors(cloudkit)
         XCTAssertTrue(didExecuteBlock)
@@ -205,7 +217,7 @@ class CloudKitProcedureFetchShareParticipantsOperationTests: CKProcedureTestCase
         }
 
         var didExecuteBlock = false
-        cloudkit.setFetchShareParticipantsCompletionBlock { _ in didExecuteBlock = true }
+        cloudkit.setFetchShareParticipantsCompletionBlock { didExecuteBlock = true }
         wait(for: cloudkit)
         XCTAssertProcedureFinishedWithoutErrors(cloudkit)
         XCTAssertTrue(didExecuteBlock)

@@ -44,6 +44,12 @@ class CKFetchRecordChangesOperationTests: CKProcedureTestCase {
         operation = CKProcedure(operation: target)
     }
 
+    override func tearDown() {
+        target = nil
+        operation = nil
+        super.tearDown()
+    }
+
     func test__set_get__recordZoneID() {
         let recordZoneID: String = "I'm a record zone ID"
         operation.recordZoneID = recordZoneID
@@ -128,6 +134,13 @@ class CloudKitProcedureFetchRecordChangesOperationTests: CKProcedureTestCase {
         }
     }
 
+    override func tearDown() {
+        cloudkit = nil
+        setByRecordChangedBlock = nil
+        setByRecordWithIDWasDeletedBlock = nil
+        super.tearDown()
+    }
+
     func test__set_get__errorHandlers() {
         cloudkit.set(errorHandlers: [.internalError: cloudkit.passthroughSuggestedErrorHandler])
         XCTAssertEqual(cloudkit.errorHandlers.count, 1)
@@ -179,7 +192,7 @@ class CloudKitProcedureFetchRecordChangesOperationTests: CKProcedureTestCase {
 
     func test__success_with_completion_block_set() {
         var didExecuteBlock = false
-        cloudkit.setFetchRecordChangesCompletionBlock { _ in
+        cloudkit.setFetchRecordChangesCompletionBlock { _, _ in
             didExecuteBlock = true
         }
         wait(for: cloudkit)
@@ -205,7 +218,7 @@ class CloudKitProcedureFetchRecordChangesOperationTests: CKProcedureTestCase {
         }
 
         var didExecuteBlock = false
-        cloudkit.setFetchRecordChangesCompletionBlock { _ in
+        cloudkit.setFetchRecordChangesCompletionBlock { _, _ in
             didExecuteBlock = true
         }
 
@@ -226,7 +239,7 @@ class CloudKitProcedureFetchRecordChangesOperationTests: CKProcedureTestCase {
             return op
         }
         var didExecuteBlock = false
-        cloudkit.setFetchRecordChangesCompletionBlock { _ in didExecuteBlock = true }
+        cloudkit.setFetchRecordChangesCompletionBlock { _, _ in didExecuteBlock = true }
         wait(for: cloudkit)
         XCTAssertProcedureFinishedWithoutErrors(cloudkit)
         XCTAssertTrue(didExecuteBlock)
@@ -249,7 +262,7 @@ class CloudKitProcedureFetchRecordChangesOperationTests: CKProcedureTestCase {
         }
 
         var didExecuteBlock = false
-        cloudkit.setFetchRecordChangesCompletionBlock { _ in didExecuteBlock = true }
+        cloudkit.setFetchRecordChangesCompletionBlock { _, _ in didExecuteBlock = true }
         wait(for: cloudkit)
         XCTAssertProcedureFinishedWithoutErrors(cloudkit)
         XCTAssertTrue(didExecuteBlock)

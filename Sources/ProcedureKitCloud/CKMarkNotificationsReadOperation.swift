@@ -46,7 +46,7 @@ extension CKProcedure where T: CKMarkNotificationsReadOperationProtocol, T: Asso
     func setMarkNotificationsReadCompletionBlock(_ block: @escaping CloudKitProcedure<T>.MarkNotificationsReadCompletionBlock) {
         operation.markNotificationsReadCompletionBlock = { [weak self] notificationIDs, error in
             if let strongSelf = self, let error = error {
-                strongSelf.append(fatalError: MarkNotificationsReadError(underlyingError: error, marked: notificationIDs))
+                strongSelf.append(error: MarkNotificationsReadError(underlyingError: error, marked: notificationIDs))
             }
             else {
                 block(notificationIDs)
@@ -55,7 +55,7 @@ extension CKProcedure where T: CKMarkNotificationsReadOperationProtocol, T: Asso
     }
 }
 
-extension CloudKitProcedure where T: CKMarkNotificationsReadOperationProtocol, T: AssociatedErrorProtocol, T.AssociatedError: CloudKitError {
+extension CloudKitProcedure where T: CKMarkNotificationsReadOperationProtocol {
 
     /// A typealias for the block types used by CloudKitOperation<CKMarkNotificationsReadOperation>
     public typealias MarkNotificationsReadCompletionBlock = ([T.NotificationID]?) -> Void

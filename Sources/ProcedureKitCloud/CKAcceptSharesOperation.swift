@@ -49,7 +49,7 @@ extension CKProcedure where T: CKAcceptSharesOperationProtocol, T: AssociatedErr
     func setAcceptSharesCompletionBlock(_ block: @escaping CloudKitProcedure<T>.AcceptSharesCompletionBlock) {
         operation.acceptSharesCompletionBlock = { [weak self] error in
             if let strongSelf = self, let error = error {
-                strongSelf.append(fatalError: PKCKError(underlyingError: error))
+                strongSelf.append(error: PKCKError(underlyingError: error))
             }
             else {
                 block()
@@ -58,7 +58,7 @@ extension CKProcedure where T: CKAcceptSharesOperationProtocol, T: AssociatedErr
     }
 }
 
-extension CloudKitProcedure where T: CKAcceptSharesOperationProtocol, T: AssociatedErrorProtocol, T.AssociatedError: CloudKitError {
+extension CloudKitProcedure where T: CKAcceptSharesOperationProtocol {
 
     /// A typealias for the block type used by CloudKitOperation<CKAcceptSharesOperationType>
     public typealias AcceptSharesPerShareCompletionBlock = (T.ShareMetadata, T.Share?, Error?) -> Void

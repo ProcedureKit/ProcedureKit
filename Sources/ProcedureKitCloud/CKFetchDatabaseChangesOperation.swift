@@ -87,7 +87,7 @@ extension CKProcedure where T: CKFetchDatabaseChangesOperationProtocol, T: Assoc
     func setFetchDatabaseChangesCompletionBlock(_ block: @escaping CloudKitProcedure<T>.FetchDatabaseChangesCompletionBlock) {
         operation.fetchDatabaseChangesCompletionBlock = { [weak self] (serverChangeToken, moreComing, error) in
             if let strongSelf = self, let error = error {
-                strongSelf.append(fatalError: FetchDatabaseChangesError(underlyingError: error, token: serverChangeToken, moreComing: moreComing))
+                strongSelf.append(error: FetchDatabaseChangesError(underlyingError: error, token: serverChangeToken, moreComing: moreComing))
             }
             else {
                 block(serverChangeToken, moreComing)
@@ -96,7 +96,7 @@ extension CKProcedure where T: CKFetchDatabaseChangesOperationProtocol, T: Assoc
     }
 }
 
-extension CloudKitProcedure where T: CKFetchDatabaseChangesOperationProtocol, T: AssociatedErrorProtocol, T.AssociatedError: CloudKitError {
+extension CloudKitProcedure where T: CKFetchDatabaseChangesOperationProtocol {
 
     /// A typealias for the block types used by CloudKitOperation<CKFetchDatabaseChangesOperationType>
     public typealias FetchDatabaseChangesRecordZoneWithIDChangedBlock = (T.RecordZoneID) -> Void

@@ -43,7 +43,7 @@ extension CKProcedure where T: CKFetchNotificationChangesOperationProtocol, T: A
 
         operation.fetchNotificationChangesCompletionBlock = { [weak self] token, error in
             if let strongSelf = self, let error = error {
-                strongSelf.append(fatalError: FetchNotificationChangesError(underlyingError: error, token: token))
+                strongSelf.append(error: FetchNotificationChangesError(underlyingError: error, token: token))
             }
             else {
                 block(token)
@@ -52,7 +52,7 @@ extension CKProcedure where T: CKFetchNotificationChangesOperationProtocol, T: A
     }
 }
 
-extension CloudKitProcedure where T: CKFetchNotificationChangesOperationProtocol, T: AssociatedErrorProtocol, T.AssociatedError: CloudKitError {
+extension CloudKitProcedure where T: CKFetchNotificationChangesOperationProtocol {
 
     /// A typealias for the block types used by CloudKitOperation<CKFetchNotificationChangesOperation>
     public typealias FetchNotificationChangesChangedBlock = (T.Notification) -> Void

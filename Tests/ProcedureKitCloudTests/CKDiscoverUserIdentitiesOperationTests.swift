@@ -39,6 +39,12 @@ class CKDiscoverUserIdentitiesOperationTests: CKProcedureTestCase {
         operation = CKProcedure(operation: target)
     }
 
+    override func tearDown() {
+        target = nil
+        operation = nil
+        super.tearDown()
+    }
+
     func test__set_get__userIdentityLookupInfos() {
         let userIdentityLookupInfos = [ "hello@world.com" ]
         operation.userIdentityLookupInfos = userIdentityLookupInfos
@@ -99,6 +105,12 @@ class CloudKitProcedureDiscoverUserIdentitiesOperationTests: CKProcedureTestCase
         cloudkit.userIdentityDiscoveredBlock = { [weak self] _, _ in
             self?.setByUserIdentityDiscoveredBlock = true
         }
+    }
+
+    override func tearDown() {
+        setByUserIdentityDiscoveredBlock = false
+        cloudkit = nil
+        super.tearDown()
     }
 
     func test__set_get__errorHandlers() {

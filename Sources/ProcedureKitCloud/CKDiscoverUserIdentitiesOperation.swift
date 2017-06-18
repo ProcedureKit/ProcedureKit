@@ -46,7 +46,7 @@ extension CKProcedure where T: CKDiscoverUserIdentitiesOperationProtocol, T: Ass
     func setDiscoverUserIdentitiesCompletionBlock(_ block: @escaping CloudKitProcedure<T>.DiscoverUserIdentitiesCompletionBlock) {
         operation.discoverUserIdentitiesCompletionBlock = { [weak self] error in
             if let strongSelf = self, let error = error {
-                strongSelf.append(fatalError: PKCKError(underlyingError: error))
+                strongSelf.append(error: PKCKError(underlyingError: error))
             }
             else {
                 block()
@@ -55,7 +55,7 @@ extension CKProcedure where T: CKDiscoverUserIdentitiesOperationProtocol, T: Ass
     }
 }
 
-extension CloudKitProcedure where T: CKDiscoverUserIdentitiesOperationProtocol, T: AssociatedErrorProtocol, T.AssociatedError: CloudKitError {
+extension CloudKitProcedure where T: CKDiscoverUserIdentitiesOperationProtocol {
 
     /// A typealias for the block type used by CloudKitOperation<CKDiscoverUserIdentitiesOperationType>
     public typealias DiscoverUserIdentitiesUserIdentityDiscoveredBlock = (T.UserIdentity, T.UserIdentityLookupInfo) -> Void

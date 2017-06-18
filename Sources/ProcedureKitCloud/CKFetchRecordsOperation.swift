@@ -59,7 +59,7 @@ extension CKProcedure where T: CKFetchRecordsOperationProtocol, T: AssociatedErr
     func setFetchRecordsCompletionBlock(_ block: @escaping CloudKitProcedure<T>.FetchRecordsCompletionBlock) {
         operation.fetchRecordsCompletionBlock = { [weak self] recordsByID, error in
             if let strongSelf = self, let error = error {
-                strongSelf.append(fatalError: FetchRecordsError(underlyingError: error, recordsByID: recordsByID))
+                strongSelf.append(error: FetchRecordsError(underlyingError: error, recordsByID: recordsByID))
             }
             else {
                 block(recordsByID)
@@ -68,7 +68,7 @@ extension CKProcedure where T: CKFetchRecordsOperationProtocol, T: AssociatedErr
     }
 }
 
-extension CloudKitProcedure where T: CKFetchRecordsOperationProtocol, T: AssociatedErrorProtocol, T.AssociatedError: CloudKitError {
+extension CloudKitProcedure where T: CKFetchRecordsOperationProtocol {
 
     /// A typealias for the block types used by CloudKitOperation<CKFetchRecordsOperation>
     public typealias FetchRecordsPerRecordProgressBlock = (T.RecordID, Double) -> Void

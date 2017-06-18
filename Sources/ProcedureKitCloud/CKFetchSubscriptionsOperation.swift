@@ -45,7 +45,7 @@ extension CKProcedure where T: CKFetchSubscriptionsOperationProtocol, T: Associa
     func setFetchSubscriptionCompletionBlock(_ block: @escaping CloudKitProcedure<T>.FetchSubscriptionCompletionBlock) {
         operation.fetchSubscriptionCompletionBlock = { [weak self] subscriptionsByID, error in
             if let strongSelf = self, let error = error {
-                strongSelf.append(fatalError: FetchSubscriptionsError(underlyingError: error, subscriptionsByID: subscriptionsByID))
+                strongSelf.append(error: FetchSubscriptionsError(underlyingError: error, subscriptionsByID: subscriptionsByID))
             }
             else {
                 block(subscriptionsByID)
@@ -54,7 +54,7 @@ extension CKProcedure where T: CKFetchSubscriptionsOperationProtocol, T: Associa
     }
 }
 
-extension CloudKitProcedure where T: CKFetchSubscriptionsOperationProtocol, T: AssociatedErrorProtocol, T.AssociatedError: CloudKitError {
+extension CloudKitProcedure where T: CKFetchSubscriptionsOperationProtocol {
 
     /// A typealias for the block types used by CloudKitOperation<CKFetchSubscriptionsOperation>
     public typealias FetchSubscriptionCompletionBlock = ([String: T.Subscription]?) -> Void

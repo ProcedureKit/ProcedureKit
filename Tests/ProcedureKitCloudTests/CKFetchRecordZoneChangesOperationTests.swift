@@ -53,6 +53,12 @@ class CKFetchRecordZoneChangesOperationTests: CKProcedureTestCase {
         operation = CKProcedure(operation: target)
     }
 
+    override func tearDown() {
+        target = nil
+        operation = nil
+        super.tearDown()
+    }
+
     func test__set_get__recordZoneIDs() {
         let recordZoneIDs: [String] = ["I'm a record zone ID"]
         operation.recordZoneIDs = recordZoneIDs
@@ -174,6 +180,15 @@ class CloudKitProcedureFetchRecordZoneChangesOperationTests: CKProcedureTestCase
         }
     }
 
+    override func tearDown() {
+        cloudkit = nil
+        setByRecordChangedBlock = nil
+        setByRecordWithIDWasDeletedBlock = nil
+        setByRecordZoneChangeTokensUpdatedBlock = nil
+        setByRecordZoneFetchCompletionBlock = nil
+        super.tearDown()
+    }
+
     func test__set_get__errorHandlers() {
         cloudkit.set(errorHandlers: [.internalError: cloudkit.passthroughSuggestedErrorHandler])
         XCTAssertEqual(cloudkit.errorHandlers.count, 1)
@@ -255,7 +270,7 @@ class CloudKitProcedureFetchRecordZoneChangesOperationTests: CKProcedureTestCase
 
     func test__success_with_completion_block_set() {
         var didExecuteBlock = false
-        cloudkit.setFetchRecordZoneChangesCompletionBlock { _ in
+        cloudkit.setFetchRecordZoneChangesCompletionBlock {
             didExecuteBlock = true
         }
         wait(for: cloudkit)
@@ -281,7 +296,7 @@ class CloudKitProcedureFetchRecordZoneChangesOperationTests: CKProcedureTestCase
         }
 
         var didExecuteBlock = false
-        cloudkit.setFetchRecordZoneChangesCompletionBlock { _ in
+        cloudkit.setFetchRecordZoneChangesCompletionBlock { 
             didExecuteBlock = true
         }
 

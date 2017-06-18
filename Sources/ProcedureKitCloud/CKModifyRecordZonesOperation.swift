@@ -52,7 +52,7 @@ extension CKProcedure where T: CKModifyRecordZonesOperationProtocol, T: Associat
     func setModifyRecordZonesCompletionBlock(_ block: @escaping CloudKitProcedure<T>.ModifyRecordZonesCompletionBlock) {
         operation.modifyRecordZonesCompletionBlock = { [weak self] saved, deleted, error in
             if let strongSelf = self, let error = error {
-                strongSelf.append(fatalError: ModifyRecordZonesError(underlyingError: error, saved: saved, deleted: deleted))
+                strongSelf.append(error: ModifyRecordZonesError(underlyingError: error, saved: saved, deleted: deleted))
             }
             else {
                 block(saved, deleted)
@@ -61,7 +61,7 @@ extension CKProcedure where T: CKModifyRecordZonesOperationProtocol, T: Associat
     }
 }
 
-extension CloudKitProcedure where T: CKModifyRecordZonesOperationProtocol, T: AssociatedErrorProtocol, T.AssociatedError: CloudKitError {
+extension CloudKitProcedure where T: CKModifyRecordZonesOperationProtocol {
 
     internal typealias ModifyRecordZonesCompletion = ([T.RecordZone]?, [T.RecordZoneID]?)
 

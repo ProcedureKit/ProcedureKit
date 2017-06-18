@@ -54,7 +54,7 @@ extension CKProcedure where T: CKModifySubscriptionsOperationProtocol, T: Associ
     func setModifySubscriptionsCompletionBlock(_ block: @escaping CloudKitProcedure<T>.ModifySubscriptionsCompletionBlock) {
         operation.modifySubscriptionsCompletionBlock = { [weak self] saved, deleted, error in
             if let strongSelf = self, let error = error {
-                strongSelf.append(fatalError: ModifySubscriptionsError(underlyingError: error, saved: saved, deleted: deleted))
+                strongSelf.append(error: ModifySubscriptionsError(underlyingError: error, saved: saved, deleted: deleted))
             }
             else {
                 block(saved, deleted)
@@ -63,7 +63,7 @@ extension CKProcedure where T: CKModifySubscriptionsOperationProtocol, T: Associ
     }
 }
 
-extension CloudKitProcedure where T: CKModifySubscriptionsOperationProtocol, T: AssociatedErrorProtocol, T.AssociatedError: CloudKitError {
+extension CloudKitProcedure where T: CKModifySubscriptionsOperationProtocol {
 
     /// A typealias for the block types used by CloudKitOperation<CKModifySubscriptionsOperation>
     public typealias ModifySubscriptionsCompletionBlock = ([T.Subscription]?, [String]?) -> Void

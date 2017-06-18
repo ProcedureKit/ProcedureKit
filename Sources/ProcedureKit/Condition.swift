@@ -852,7 +852,7 @@ public func || (lhs: Condition, rhs: Condition) -> OrCondition {
     return OrCondition([lhs, rhs])
 }
 
-public prefix func !<T: Condition>(rhs: T) -> NegatedCondition<T> {
+public prefix func !<T>(rhs: T) -> NegatedCondition<T> {
     return NegatedCondition(rhs)
 }
 

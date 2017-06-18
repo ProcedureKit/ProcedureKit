@@ -38,6 +38,11 @@ open class ProcedureKitTestCase: XCTestCase {
         super.tearDown()
     }
 
+    public func set(queueDelegate delegate: QueueTestDelegate) {
+        self.delegate = delegate
+        queue.delegate = delegate
+    }
+
     public func run(operation: Operation) {
         run(operations: [operation])
     }
@@ -81,7 +86,7 @@ open class ProcedureKitTestCase: XCTestCase {
         waitForExpectations(timeout: timeout, handler: nil)
     }
 
-    public func checkAfterDidExecute<T: ProcedureProtocol>(procedure: T, withTimeout timeout: TimeInterval = 3, withExpectationDescription expectationDescription: String = #function, checkAfterDidExecuteBlock: @escaping (T) -> Void) where T: Procedure {
+    public func checkAfterDidExecute<T>(procedure: T, withTimeout timeout: TimeInterval = 3, withExpectationDescription expectationDescription: String = #function, checkAfterDidExecuteBlock: @escaping (T) -> Void) where T: Procedure {
         addCompletionBlockTo(procedure: procedure, withExpectationDescription: expectationDescription)
         procedure.addDidExecuteBlockObserver { (procedure) in
             checkAfterDidExecuteBlock(procedure)
@@ -126,7 +131,8 @@ open class ProcedureKitTestCase: XCTestCase {
         // Adds a will add operation observer, which adds the produced operation as a dependency
         // of the finishing procedure. This way, we don't actually finish, until the
         // procedure, and any produced operations also finish.
-        procedure.addWillAddOperationBlockObserver { _, operation in
+        procedure.addWillAddOperationBlockObserver { [weak weakFinishing = finishing] _, operation in
+            guard let finishing = weakFinishing else { fatalError("Finishing procedure is finished + gone, but a WillAddOperation observer on a dependency was called. This should never happen.") }
             finishing.add(dependency: operation)
         }
         finishing.name = "FinishingBlockProcedure(for: \(procedure.operationName))"

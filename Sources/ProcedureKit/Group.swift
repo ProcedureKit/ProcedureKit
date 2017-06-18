@@ -15,37 +15,22 @@ import Dispatch
  related operations together, thereby creating higher
  levels of abstractions.
  */
-open class GroupProcedure: Procedure, ProcedureQueueDelegate {
+open class GroupProcedure: Procedure {
 
-    internal struct GroupErrors {
-        typealias ByOperation = Dictionary<Operation, Array<Error>>
-        var fatal = [Error]()
-        var attemptedRecovery: ByOperation = [:]
-
-        var attemptedRecoveryErrors: [Error] {
-            return Array(attemptedRecovery.values.flatMap { $0 })
-        }
-
-        var all: [Error] {
-            get {
-                var tmp: [Error] = fatal
-                tmp.append(contentsOf: attemptedRecoveryErrors)
-                return tmp
-            }
-        }
-    }
+    public typealias TransformChildErrorsBlockType = (Procedure, inout [Error]) -> Void
 
     internal let queue = ProcedureQueue()
+    internal var queueDelegate: GroupQueueDelegate!
 
     fileprivate let initialChildren: [Operation]
     fileprivate var groupCanFinish: CanFinishGroup!
     fileprivate var groupStateLock = PThreadMutex()
 
     // Protected private properties
-    fileprivate var _groupErrors = GroupErrors() // swiftlint:disable:this variable_name
     fileprivate var _groupChildren: [Operation] // swiftlint:disable:this variable_name
     fileprivate var _groupIsFinishing = false // swiftlint:disable:this variable_name
     fileprivate var _groupIsSuspended = false // swiftlint:disable:this variable_name
+    fileprivate var _groupTransformChildErrorsBlock: TransformChildErrorsBlockType? = nil
 
     /// - returns: the operations which have been added to the queue
     final public var children: [Operation] {
@@ -77,16 +62,6 @@ open class GroupProcedure: Procedure, ProcedureQueueDelegate {
             let (operations, procedures) = children.operationsAndProcedures
             operations.forEach { $0.setQualityOfService(fromUserIntent: userIntent) }
             procedures.forEach { $0.userIntent = userIntent }
-        }
-    }
-
-    /// Override of errors
-    public override var errors: [Error] {
-        get { return groupStateLock.withCriticalScope { _groupErrors.fatal } }
-        set {
-            groupStateLock.withCriticalScope {
-                _groupErrors.fatal = newValue
-            }
         }
     }
 
@@ -142,7 +117,8 @@ open class GroupProcedure: Procedure, ProcedureQueueDelegate {
 
         queue.isSuspended = true
         queue.underlyingQueue = underlyingQueue
-        queue.delegate = self
+        queueDelegate = GroupQueueDelegate(self)
+        queue.delegate = queueDelegate
         userIntent = operations.userIntent
         groupCanFinish = CanFinishGroup(group: self)
     }
@@ -170,7 +146,6 @@ open class GroupProcedure: Procedure, ProcedureQueueDelegate {
             children.forEach { $0.cancel() }
         }
         else {
-            append(fatalErrors: additionalErrors)
             let (operations, procedures) = children.operationsAndProcedures
             operations.forEach { $0.cancel() }
             procedures.forEach { $0.cancel(withError: ProcedureKitError.parent(cancelledWithErrors: additionalErrors)) }
@@ -204,177 +179,58 @@ open class GroupProcedure: Procedure, ProcedureQueueDelegate {
      */
     open func groupWillAdd(child: Operation) { /* no-op */ }
 
-    // MARK: - Error recovery and child finishing
+    // MARK: - Customizing the Group's Child Error Handling
 
     /**
-     This method is called when a child will finish with errors.
+     This method is called when a child Procedure will finish (with / without errors).
      (It is called on the Group's EventQueue.)
 
-     Often an operation will finish with errors become some of its pre-requisites were not
-     met. Errors of this nature should be recoverable. This can be done by re-trying the
-     original operation, but with another operation which fulfil the pre-requisites as a
-     dependency.
+     The default behavior is to append the child's errors, if any, to the Group's errors.
 
-     If the errors were recovered from, return true from this method, else return false.
+     When subclassing GroupProcedure, you can override this method to execute custom
+     code in response to child Procedures finishing, or to override the default
+     error-aggregating behavior.
 
-     Errors which are not handled will result in the GroupProcedure finishing with errors.
+     The child Procedure (and, thus, the Group) will not finish until this method returns.
 
-     - parameter child: the child operation which is finishing
-     - parameter errors: an [ErrorType], the errors of the child operation
-     - returns: a Boolean, return true if the errors were handled, else return false.
-     */
-    open func child(_ child: Operation, willAttemptRecoveryFromErrors errors: [Error]) -> Bool {
-        return false
+     - parameter child: the child Procedure which is finishing
+     - parameter errors: an [Error], the errors of the child Procedure
+    */
+    open func child(_ child: Procedure, willFinishWithErrors errors: [Error]) {
+        assert(!child.isFinished, "child(_:willFinishWithErrors:) called with a child that has already finished")
+
+        // Default GroupProcedure error-handling behavior:
+        // - Aggregate errors from child Procedures
+
+        guard !errors.isEmpty else { return }
+        append(errors: errors, fromChild: child)
     }
 
     /**
-     This method is only called when a child finishes without any errors.
+     The transformChildErrorsBlock is called before the GroupProcedure handles child errors.
      (It is called on the Group's EventQueue.)
 
-     - parameter child: the Operation which will finish without errors
-     */
-    open func childWillFinishWithoutErrors(_ child: Operation) { /* no-op */ }
+     The block is passed two parameters:
+        - Procedure: the child Procedure that will finish
+        - inout [Error]: the errors that the Group attributes to the child (on input: the errors that the child Procedure will finish with)
 
-    // MARK: - ProcedureQueueDelegate
+     The array of errors is an `inout` parameter, and may be modified directly.
 
-    /**
-     The group acts as its own queue's delegate. When an operation is added to the queue,
-     assuming that the group is not yet finishing or finished, then we add the operation
-     as a dependency to an internal "barrier" operation that separates executing from
-     finishing state.
+     This enables the customization of the errors that the GroupProcedure (or GroupProcedure subclass) 
+     attributes to the child and considers in its `child(_:willFinishWithErrors:)` function.
 
-     The purpose of this is to keep the internal operation as a final child operation that executes
-     when there are no more operations in the group operation, safely handling the transition of
-     group operation state.
-     */
-
-    private func shouldAdd(operation: Operation) -> Bool {
-        return groupStateLock.withCriticalScope {
-            guard !_groupIsFinishing else {
-                assertionFailure("Cannot add new operations to a group after the group has started to finish.")
-                return false
+     IMPORTANT: This only affects the child errors that the GroupProcedure (or GroupProcedure subclass) 
+     utilizes. It does not directly impact the child Procedure itself, nor the child Procedure's errors
+     (if obtained or read directly from the child).
+    */
+    final public var transformChildErrorsBlock: TransformChildErrorsBlockType? {
+        get { return groupStateLock.withCriticalScope { _groupTransformChildErrorsBlock } }
+        set {
+            assert(!isExecuting, "Do not modify the child errors block after the Group has started.")
+            groupStateLock.withCriticalScope {
+                _groupTransformChildErrorsBlock = newValue
             }
-
-            // Add the new child as a dependency of the internal GroupCanFinish operation
-            groupCanFinish.addDependency(operation)
-
-            // Add the new child to the Group's internal children array
-            _groupChildren.append(operation)
-            return true
         }
-    }
-
-    public func procedureQueue(_ queue: ProcedureQueue, willAddOperation operation: Operation, context: Any?) -> ProcedureFuture? {
-
-        return willAdd(operation: operation, context: context)
-    }
-
-    public func procedureQueue(_ queue: ProcedureQueue, willAddProcedure procedure: Procedure, context: Any?) -> ProcedureFuture? {
-        guard queue === self.queue else { return nil }
-
-        return willAdd(operation: procedure, context: context)
-    }
-
-    /**
-     - returns: a ProcedureFuture that is signaled once the Group has fully prepared for the operation to be added
-                to its internal queue (including notifying all WillAdd observers)
-     */
-    private func willAdd(operation: Operation, context: Any?) -> ProcedureFuture? {
-
-        if let context = context as? ProcedureQueueContext, context === queueAddContext {
-            // The Procedure adding the operation to the Group's private queue is the Group itself
-            //
-            // which means it could only have come from:
-            //      - self.add(child:)  (and convenience overloads)
-            //
-            // which will handle the setup-work for this operation in the context of the Group
-            // (asynchronously) so there is nothing to do here - exit early
-
-            return nil
-        }
-
-        // The Procedure adding the operation to the Group's private queue is *not* the Group.
-        //
-        // It could have come from:
-        //      - a child.produce(operation:)
-        //      - an Operation (NSOperation) subclass calling OperationQueue.current.addOperation()
-        //        (which is not at all recommended, but is possible from an Operation subclass)
-        //
-        // In either case, the operation has not yet been handled in the context of the Group
-        // (i.e. adding it as a child, adding it as a dependency on finishing, notifying Group
-        // Will/DidAddOperation observers) thus it must be handled here:
-        //
-
-        assert(!isFinished, "Cannot add new operations to a group after the group has completed.")
-
-        guard shouldAdd(operation: operation) else { return nil }
-
-        let promise = ProcedurePromise()
-
-        // If the Group is already cancelled, ensure that the new child is cancelled.
-        if isCancelled && !operation.isCancelled {
-            operation.cancel()
-        }
-
-        // Dispatch the next step (observers, etc) asynchronously on the Procedure EventQueue
-        dispatchEvent {
-            self.willAdd_step2(operation: operation, promise: promise)
-        }
-
-        return promise.future
-    }
-
-    private func willAdd_step2(operation: Operation, promise: ProcedurePromise) {
-        eventQueue.debugAssertIsOnQueue()
-
-        // groupWillAdd(child:) override
-        groupWillAdd(child: operation)
-
-        // WillAddOperation observers
-        let willAddObserversGroup = dispatchObservers(pendingEvent: PendingEvent.addOperation) { observer, _ in
-            observer.procedure(self, willAdd: operation)
-        }
-
-        optimizedDispatchEventNotify(group: willAddObserversGroup) {
-
-            // Complete the promise
-            promise.complete()
-
-            // DidAddOperation observers
-            _ = self.dispatchObservers(pendingEvent: PendingEvent.postDidAdd) { observer, _ in
-                    observer.procedure(self, didAdd: operation)
-            }
-
-            // Note: no need to wait on DidAddOperation observers - nothing left to do.
-        }
-    }
-
-    /**
-     The group acts as it's own queue's delegate. When a Procedure finishes, the group is
-     notified that a child Procedure has finished.
-     */
-    public func procedureQueue(_ queue: ProcedureQueue, willFinishProcedure procedure: Procedure, withErrors errors: [Error]) -> ProcedureFuture? {
-        guard queue === self.queue else { return nil }
-
-        /// If the group is cancelled, exit early
-        guard !isCancelled else { return nil }
-
-        let promise = ProcedurePromise()
-        dispatchEvent {
-            if !errors.isEmpty {
-                if self.child(procedure, willAttemptRecoveryFromErrors: errors) {
-                    self.child(procedure, didAttemptRecoveryFromErrors: errors)
-                }
-                else {
-                    self.child(procedure, didEncounterFatalErrors: errors)
-                }
-            }
-            else {
-                self.childWillFinishWithoutErrors(procedure)
-            }
-            promise.complete()
-        }
-        return promise.future
     }
 }
 
@@ -564,59 +420,187 @@ public extension GroupProcedure {
     }
 }
 
-// MARK: - Error Handling & Recovery
+// MARK: - Aggregating Errors
 
 public extension GroupProcedure {
 
-    internal var attemptedRecoveryErrors: [Error] {
-        return groupStateLock.withCriticalScope { _groupErrors.attemptedRecoveryErrors }
-    }
-
-    final public func append(fatalError error: Error) {
-        append(fatalErrors: [error])
-    }
-
-    final public func child(_ child: Operation, didEncounterFatalError error: Error) {
-        log.warning(message: "\(child.operationName) did encounter fatal error: \(error).")
-        append(fatalError: error)
-    }
-
-    final public func append(fatalErrors errors: [Error]) {
-        groupStateLock.withCriticalScope {
-            _groupErrors.fatal.append(contentsOf: errors)
+    /// Append an error to the Group's errors
+    ///
+    /// - Parameter error: an Error
+    final public func append(error: Error, fromChild child: Operation? = nil) {
+        if let child = child {
+            log.warning(message: "\(child.operationName) did encounter error: \(error).")
+        } else {
+            log.warning(message: "Appending error: \(error).")
         }
+        append(errors: [error])
     }
 
-    final public func child(_ child: Operation, didEncounterFatalErrors errors: [Error]) {
-        log.warning(message: "\(child.operationName) did encounter \(errors.count) fatal errors.")
-        append(fatalErrors: errors)
-    }
-
-    public func child(_ child: Operation, didAttemptRecoveryFromErrors errors: [Error]) {
-        groupStateLock.withCriticalScope {
-            _groupErrors.attemptedRecovery[child] = errors
+    /// Append errors to the Group's errors
+    ///
+    /// - Parameter errors: an [Error]
+    /// - Parameter child: a child Operation
+    final public func append(errors: [Error], fromChild child: Operation? = nil) {
+        if let child = child {
+            log.warning(message: "\(child.operationName) did encounter \(errors.count) errors.")
+        } else {
+            log.warning(message: "Appending \(errors.count) errors.")
         }
+        append(errors: errors)
     }
+}
 
-    fileprivate var attemptedRecovery: GroupErrors.ByOperation {
-        return groupStateLock.withCriticalScope { _groupErrors.attemptedRecovery }
-    }
+// MARK: - GroupProcedure Private Queue Delegate
 
-    final public func childDidRecoverFromErrors(_ child: Operation) {
-        if attemptedRecovery[child] != nil {
-            log.notice(message: "successfully recovered from errors in \(child)")
-            groupStateLock.withCriticalScope { () -> Void in
-                _groupErrors.attemptedRecovery.removeValue(forKey: child)
+internal extension GroupProcedure {
+
+    /**
+     The group utilizes a GroupQueueDelegate to effectively act as its own delegate for its own
+     internal queue, while keeping this implementation detail private.
+
+     When an operation is added to the queue, assuming that the group is not yet finishing or 
+     finished, then we add the operation as a dependency to an internal "barrier" operation that
+     separates executing from finishing state.
+
+     This serves to keep the internal operation as a final child operation that executes when
+     there are no more operations in the group operation, safely handling the transition
+     of group operation state.
+     */
+
+    internal class GroupQueueDelegate: ProcedureQueueDelegate {
+
+        private weak var group: GroupProcedure?
+
+        init(_ group: GroupProcedure) {
+            self.group = group
+        }
+
+        func procedureQueue(_ queue: ProcedureQueue, willAddOperation operation: Operation, context: Any?) -> ProcedureFuture? {
+            guard let strongGroup = group else { return nil }
+            guard queue === strongGroup.queue else { return nil }
+
+            return strongGroup.willAdd(operation: operation, context: context)
+        }
+
+        func procedureQueue(_ queue: ProcedureQueue, willAddProcedure procedure: Procedure, context: Any?) -> ProcedureFuture? {
+            guard let strongGroup = group else { return nil }
+            guard queue === strongGroup.queue else { return nil }
+
+            return strongGroup.willAdd(operation: procedure, context: context)
+        }
+
+        public func procedureQueue(_ queue: ProcedureQueue, willFinishProcedure procedure: Procedure, withErrors initialErrors: [Error]) -> ProcedureFuture? {
+            guard let strongGroup = group else { return nil }
+            guard queue === strongGroup.queue else { return nil }
+
+            /// If the group is cancelled, exit early
+            guard !strongGroup.isCancelled else { return nil }
+
+            let promise = ProcedurePromise()
+            strongGroup.dispatchEvent {
+                defer { promise.complete() }
+
+                var childErrors: [Error] = initialErrors
+                if let transformChildErrors = strongGroup.transformChildErrorsBlock {
+                    // transform child errors
+                    transformChildErrors(procedure, &childErrors)
+                    strongGroup.log.verbose(message: "Child errors for <\(procedure.operationName)> \((initialErrors.count != childErrors.count) ? "were transformed." : "were passed to transform block.")\n\t Initial errors ((initialErrors.count)): \(initialErrors)\n\t Transformed errors (\(childErrors.count)): \(childErrors)")
+                }
+
+                // handle child errors
+                strongGroup.child(procedure, willFinishWithErrors: childErrors)
             }
+            return promise.future
         }
     }
 
-    final public func childDidNotRecoverFromErrors(_ child: Operation) {
-        log.notice(message: "failed to recover from errors in \(child)")
-        groupStateLock.withCriticalScope {
-            if let errors = _groupErrors.attemptedRecovery.removeValue(forKey: child) {
-                _groupErrors.fatal.append(contentsOf: errors)
+    private func shouldAdd(operation: Operation) -> Bool {
+        return groupStateLock.withCriticalScope {
+            guard !_groupIsFinishing else {
+                assertionFailure("Cannot add new operations to a group after the group has started to finish.")
+                return false
             }
+
+            // Add the new child as a dependency of the internal GroupCanFinish operation
+            groupCanFinish.addDependency(operation)
+
+            // Add the new child to the Group's internal children array
+            _groupChildren.append(operation)
+            return true
+        }
+    }
+
+    /**
+     - returns: a ProcedureFuture that is signaled once the Group has fully prepared for the operation to be added
+                to its internal queue (including notifying all WillAdd observers)
+     */
+    private func willAdd(operation: Operation, context: Any?) -> ProcedureFuture? {
+
+        if let context = context as? ProcedureQueueContext, context === queueAddContext {
+            // The Procedure adding the operation to the Group's private queue is the Group itself
+            //
+            // which means it could only have come from:
+            //      - self.add(child:)  (and convenience overloads)
+            //
+            // which will handle the setup-work for this operation in the context of the Group
+            // (asynchronously) so there is nothing to do here - exit early
+
+            return nil
+        }
+
+        // The Procedure adding the operation to the Group's private queue is *not* the Group.
+        //
+        // It could have come from:
+        //      - a child.produce(operation:)
+        //      - an Operation (NSOperation) subclass calling OperationQueue.current.addOperation()
+        //        (which is not at all recommended, but is possible from an Operation subclass)
+        //
+        // In either case, the operation has not yet been handled in the context of the Group
+        // (i.e. adding it as a child, adding it as a dependency on finishing, notifying Group
+        // Will/DidAddOperation observers) thus it must be handled here:
+        //
+
+        assert(!isFinished, "Cannot add new operations to a group after the group has completed.")
+
+        guard shouldAdd(operation: operation) else { return nil }
+
+        let promise = ProcedurePromise()
+
+        // If the Group is already cancelled, ensure that the new child is cancelled.
+        if isCancelled && !operation.isCancelled {
+            operation.cancel()
+        }
+
+        // Dispatch the next step (observers, etc) asynchronously on the Procedure EventQueue
+        dispatchEvent {
+            self.willAdd_step2(operation: operation, promise: promise)
+        }
+
+        return promise.future
+    }
+
+    private func willAdd_step2(operation: Operation, promise: ProcedurePromise) {
+        eventQueue.debugAssertIsOnQueue()
+
+        // groupWillAdd(child:) override
+        groupWillAdd(child: operation)
+
+        // WillAddOperation observers
+        let willAddObserversGroup = dispatchObservers(pendingEvent: PendingEvent.addOperation) { observer, _ in
+            observer.procedure(self, willAdd: operation)
+        }
+
+        optimizedDispatchEventNotify(group: willAddObserversGroup) {
+
+            // Complete the promise
+            promise.complete()
+
+            // DidAddOperation observers
+            _ = self.dispatchObservers(pendingEvent: PendingEvent.postDidAdd) { observer, _ in
+                    observer.procedure(self, didAdd: operation)
+            }
+
+            // Note: no need to wait on DidAddOperation observers - nothing left to do.
         }
     }
 }
@@ -756,7 +740,9 @@ fileprivate extension GroupProcedure {
 
 fileprivate extension GroupProcedure {
     fileprivate func _finishGroup() {
-        super.finish(withErrors: errors)
+        // Because errors have been added throughout to the (superclass) Procedure's `errors`,
+        // there is no need to pass any additional errors to the call to finish().
+        super.finish()
         queue.isSuspended = true
     }
 }
@@ -790,4 +776,15 @@ public extension GroupProcedure {
     @available(*, unavailable, renamed: "add(children:)")
     func addOperations(additional: [Operation]) { }
 
+    @available(*, unavailable, message: "GroupProcedure child error handling customization has been re-worked. Consider overriding child(_:willFinishWithErrors:).")
+    final public func childDidRecoverFromErrors(_ child: Operation) { }
+
+    @available(*, unavailable, message: "GroupProcedure child error handling customization has been re-worked. Consider overriding child(_:willFinishWithErrors:).")
+    final public func childDidNotRecoverFromErrors(_ child: Operation) { }
+
+    @available(*, unavailable, renamed: "append(error:)")
+    final public func append(fatalError error: Error) { }
+
+    @available(*, unavailable, renamed: "append(errors:)")
+    final public func append(fatalErrors errors: [Error]) { }
 }

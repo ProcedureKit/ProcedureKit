@@ -41,6 +41,13 @@ class CKModifyBadgeOperationTests: CKProcedureTestCase {
         operation = CKProcedure(operation: target)
     }
 
+    override func tearDown() {
+        target = nil
+        operation = nil
+        badge = nil
+        super.tearDown()
+    }
+
     func test__set_get__badgeValue() {
         let badgeValue = 4
         operation.badgeValue = badgeValue
@@ -86,6 +93,11 @@ class CloudKitProcedureModifyBadgeOperationTests: CKProcedureTestCase {
         cloudkit = CloudKitProcedure(strategy: .immediate) { TestCKModifyBadgeOperation() }
         cloudkit.container = container
         cloudkit.badgeValue = 10
+    }
+
+    override func tearDown() {
+        cloudkit = nil
+        super.tearDown()
     }
 
     func test__set_get__errorHandlers() {
@@ -164,7 +176,7 @@ class CloudKitProcedureModifyBadgeOperationTests: CKProcedureTestCase {
             return op
         }
         var didExecuteBlock = false
-        cloudkit.setModifyBadgeCompletionBlock { _ in didExecuteBlock = true }
+        cloudkit.setModifyBadgeCompletionBlock { didExecuteBlock = true }
         wait(for: cloudkit)
         XCTAssertProcedureFinishedWithoutErrors(cloudkit)
         XCTAssertTrue(didExecuteBlock)
@@ -187,7 +199,7 @@ class CloudKitProcedureModifyBadgeOperationTests: CKProcedureTestCase {
         }
 
         var didExecuteBlock = false
-        cloudkit.setModifyBadgeCompletionBlock { _ in didExecuteBlock = true }
+        cloudkit.setModifyBadgeCompletionBlock { didExecuteBlock = true }
         wait(for: cloudkit)
         XCTAssertProcedureFinishedWithoutErrors(cloudkit)
         XCTAssertTrue(didExecuteBlock)

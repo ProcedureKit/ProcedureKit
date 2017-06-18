@@ -17,11 +17,19 @@ class TestableNetworkActivityIndicator: NetworkActivityIndicatorProtocol {
         visibilityDidChange = didChange
     }
 
-    var networkActivityIndicatorVisible = false {
-        didSet {
-            visibilityDidChange(networkActivityIndicatorVisible)
+    #if swift(>=3.2)
+        var isNetworkActivityIndicatorVisible = false {
+            didSet {
+                visibilityDidChange(isNetworkActivityIndicatorVisible)
+            }
         }
-    }
+    #else // Swift < 3.2 (Xcode 8.x)
+        var networkActivityIndicatorVisible = false {
+            didSet {
+                visibilityDidChange(networkActivityIndicatorVisible)
+            }
+        }
+    #endif
 }
 
 class NetworkObserverTests: ProcedureKitTestCase {
@@ -37,8 +45,9 @@ class NetworkObserverTests: ProcedureKitTestCase {
         super.setUp()
         weak var indicatorExpectation = expectation(description: "Indicator Expectation")
         _changes = Protector<[Bool]>([])
-        indicator = TestableNetworkActivityIndicator { visibility in
-            self._changes.append(visibility)
+        indicator = TestableNetworkActivityIndicator { [weak weakChanges = _changes] visibility in
+            guard let changes = weakChanges else { return }
+            changes.append(visibility)
             if !visibility {
                 DispatchQueue.main.async {
                     guard let indicatorExpectation = indicatorExpectation else { return }

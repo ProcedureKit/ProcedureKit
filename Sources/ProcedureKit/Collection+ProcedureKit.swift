@@ -43,27 +43,24 @@ extension Collection where Iterator.Element: Operation {
     }
 
     /**
-     Add the last operation of the receiver as a dependency of each element
-     of the argument sequence. An Array of the receiver extended by the argument is
-     returned.
-     - parameter operation: the Iterator.Element instance to add
-         the receiver as a dependency.
+     Add the operations of the receiver as dependencies of each element of the argument sequence.
+     An Array of the receiver extended by the argument is returned.
+     - parameter operation: the Iterator.Element instance to add the receiver as a dependency.
      - returns: an array of all operations operations.
      */
     public func then<S: Sequence>(do sequence: S) -> [Iterator.Element] where S.Iterator.Element == Iterator.Element {
         var operations = Array(self)
-        if let last = operations.last {
-            assert(!last.isFinished, "Cannot add a finished operation as a dependency.")
-            sequence.forEach { $0.add(dependency: last) }
+        for operation in self {
+            assert(!operation.isFinished, "Cannot add a finished operation as a dependency.")
+            sequence.forEach { $0.add(dependency: operation) }
         }
         operations += sequence
         return operations
     }
 
     /**
-     Add the last operation of the receiver as a dependency of each element
-     of the argument. An Array of the receiver extended by the argument is
-     returned.
+     Add the operations of the receiver as dependencies of each element of the argument.
+     An Array of the receiver extended by the argument is returned.
      - parameter operations: a variable argument of Iterator.Element instance(s) to
          add the receiver as a dependency.
      - returns: an array of all operations.
@@ -93,7 +90,7 @@ extension Collection where Iterator.Element: Operation {
 
 // MARK: - OutputProcedure & Gathering
 
-extension Collection where Iterator.Element: ProcedureProtocol, Iterator.Element: OutputProcedure {
+extension Collection where Iterator.Element: OutputProcedure {
 
     /// Creates a new procedure which will flatmap the non-nil results of the receiver's procedures into a
     /// new array. This new array is available as the result of the returned procedure.

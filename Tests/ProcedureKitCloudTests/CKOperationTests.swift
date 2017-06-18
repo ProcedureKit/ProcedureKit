@@ -35,7 +35,11 @@ class TestCKOperation: Operation, CKOperationProtocol {
 
     //@available(iOS 9.3, tvOS 9.3, OSX 10.12, watchOS 2.3, *)
     var operationID: String = ""
-    var longLived: Bool = false
+    #if swift(>=3.2)
+        var isLongLived: Bool = false
+    #else // Swift 3.x
+        var longLived: Bool = false
+    #endif
 
     var longLivedOperationWasPersistedBlock: () -> Void = { }
 
@@ -53,6 +57,12 @@ class CKOperationTests: CKProcedureTestCase {
         super.setUp()
         target = TestCKOperation()
         operation = CKProcedure(operation: target)
+    }
+
+    override func tearDown() {
+        target = nil
+        operation = nil
+        super.tearDown()
     }
 
     func test__set_get__container() {
@@ -79,9 +89,15 @@ class CKOperationTests: CKProcedureTestCase {
     @available(iOS 9.3, tvOS 9.3, OSX 10.12, watchOS 2.3, *)
     func test__set_get__longLived() {
         let longLived = true
-        operation.longLived = longLived
-        XCTAssertEqual(operation.longLived, longLived)
-        XCTAssertEqual(target.longLived, longLived)
+        #if swift(>=3.2)
+            operation.isLongLived = longLived
+            XCTAssertEqual(operation.isLongLived, longLived)
+            XCTAssertEqual(target.isLongLived, longLived)
+        #else // Swift < 3.2 (Xcode 8.x)
+            operation.longLived = longLived
+            XCTAssertEqual(operation.longLived, longLived)
+            XCTAssertEqual(target.longLived, longLived)
+        #endif
     }
 
     @available(iOS 9.3, tvOS 9.3, OSX 10.12, watchOS 2.3, *)

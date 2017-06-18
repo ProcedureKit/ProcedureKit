@@ -41,6 +41,12 @@ class CKDiscoverAllContactsOperationTests: CKProcedureTestCase {
         operation = CKProcedure(operation: target)
     }
 
+    override func tearDown() {
+        target = nil
+        operation = nil
+        super.tearDown()
+    }
+
     func test__success_without_completion_block() {
         wait(for: operation)
         XCTAssertProcedureFinishedWithoutErrors(operation)
@@ -79,6 +85,11 @@ class CloudKitProcedureDiscoverAllContactsOperationTests: CKProcedureTestCase {
     override func setUp() {
         super.setUp()
         cloudkit = CloudKitProcedure(strategy: .immediate) { TestCKDiscoverAllContactsOperation(result: [ "user info" ]) }
+    }
+
+    override func tearDown() {
+        cloudkit = nil
+        super.tearDown()
     }
 
     func test__set_get__errorHandlers() {

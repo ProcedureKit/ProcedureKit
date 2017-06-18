@@ -48,6 +48,12 @@ class CKModifyRecordsOperationTests: CKProcedureTestCase {
         operation = CKProcedure(operation: target)
     }
 
+    override func tearDown() {
+        target = nil
+        operation = nil
+        super.tearDown()
+    }
+
     func test__set_get__recordsToSave() {
         let recordsToSave = [ "a-record", "another-record" ]
         operation.recordsToSave = recordsToSave
@@ -164,6 +170,13 @@ class CloudKitProcedureModifyRecordsOperationTests: CKProcedureTestCase {
         cloudkit.isAtomic = true
         cloudkit.perRecordProgressBlock = { self.setByPerRecordProgressBlock = ($0, $1) }
         cloudkit.perRecordCompletionBlock = { self.setByPerRecordCompletionBlock = ($0, $1) }
+    }
+
+    override func tearDown() {
+        cloudkit = nil
+        setByPerRecordProgressBlock = nil
+        setByPerRecordCompletionBlock = nil
+        super.tearDown()
     }
 
     func test__set_get__errorHandlers() {

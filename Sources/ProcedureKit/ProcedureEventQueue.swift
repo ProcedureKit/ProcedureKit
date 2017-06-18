@@ -47,6 +47,12 @@ public class EventQueue {
         guard let retrieved = DispatchQueue.getSpecific(key: key) else { return false }
         return value == retrieved
     }
+    internal func debugBestowTemporaryEventQueueStatusOn(queue: DispatchQueueProtocol) {
+        queue.pk_setSpecific(key: key, value: value)
+    }
+    internal func debugClearTemporaryEventQueueStatusFrom(queue: DispatchQueueProtocol) {
+        queue.pk_setSpecific(key: key, value: nil)
+    }
     #endif
 
     /// Asynchronously dispatches a block for execution on the EventQueue.
@@ -173,13 +179,33 @@ internal extension EventQueue {
             // to ensure that all blocks on the original queue are done executing
 
             originalQueue.eventQueueLock.withCriticalScope {
-                // i.e. this block should be synchronized with *both* queues
+
+                #if DEBUG
+                    // For Debug purposes, treat the otherQueue at this point as if it were *also* the EventQueue
+                    // (Since the actual EventQueue is paused and no longer executing blocks until this finishes.)
+                    //
+                    // This ensures that if the code inside the block calls `eventQueue.debugAssertIsOnQueue()`,
+                    // it will (properly) succeed.
+                    originalQueue.debugBestowTemporaryEventQueueStatusOn(queue: otherQueue)
+                    assert(originalQueue.isOnQueue)
+                #endif
+
+                // This block should be synchronized with *both* queues
                 block()
+
+                #if DEBUG
+                    originalQueue.debugClearTemporaryEventQueueStatusFrom(queue: otherQueue)
+                    assert(!originalQueue.isOnQueue)
+                #endif
             }
 
             // after the block is complete, resume the original queue
             originalQueue.queue.resume()
         }
+    }
+
+    func makeTimerSource(flags: DispatchSource.TimerFlags = []) -> DispatchSourceTimer {
+        return DispatchSource.makeTimerSource(flags: flags, queue: queue)
     }
 }
 
@@ -219,6 +245,9 @@ public protocol DispatchQueueProtocol: class {
     @discardableResult func asyncDispatch(block: @escaping () -> Void) -> DispatchWorkItem
     @discardableResult func asyncDispatch(minimumQoS: DispatchQoS, block: @escaping () -> Void) -> DispatchWorkItem
     func dispatchNotify(withGroup group: DispatchGroup, block: @escaping () -> Void)
+    #if DEBUG
+    func pk_setSpecific<T>(key: DispatchSpecificKey<T>, value: T?)
+    #endif
 }
 
 extension DispatchQueue: DispatchQueueProtocol {
@@ -235,6 +264,36 @@ extension DispatchQueue: DispatchQueueProtocol {
     public func dispatchNotify(withGroup group: DispatchGroup, block: @escaping () -> Void) {
         group.notify(queue: self, execute: block)
     }
+    #if DEBUG
+    public func pk_setSpecific<T>(key: DispatchSpecificKey<T>, value: T?) {
+        #if swift(>=3.2)
+            setSpecific(key: key, value: value)
+        #else // Swift < 3.2 (Xcode 8.x)
+            if let value = value {
+                setSpecific(key: key, value: value)
+            }
+            else {
+                pk_clearSpecific(key: key)
+            }
+        #endif
+    }
+    #endif
+}
+
+// Swift 3.x
+fileprivate extension DispatchQueue {
+    // Swift 3.x (Xcode 8.x) is missing the ability to clear specific keys from DispatchQueues
+    // via DispatchQueue.setSpecific(key:value:) because it does not take an optional.
+    //
+    // A fix was merged into apple/swift in: https://github.com/apple/swift/commit/5accebf556f40ea104a7440ff0353f9e4f7f1ac2
+    // And is available in Swift 4+.
+    //
+    // For compatibility with Xcode < 9 and Swift 3, this custom clearSpecific(key:)
+    // function is provided.
+    fileprivate func pk_clearSpecific<T>(key: DispatchSpecificKey<T>) {
+        let k = Unmanaged.passUnretained(key).toOpaque()
+        __dispatch_queue_set_specific(self, k, nil, nil)
+    }
 }
 
 extension EventQueue: DispatchQueueProtocol {
@@ -245,4 +304,9 @@ extension EventQueue: DispatchQueueProtocol {
         let desiredQoS = max(minimumQoS, qualityOfService)
         return self.dispatchEventBlockInternal(minimumQoS: desiredQoS, block: block)
     }
+    #if DEBUG
+    public func pk_setSpecific<T>(key: DispatchSpecificKey<T>, value: T?) {
+        queue.pk_setSpecific(key: key, value: value)
+    }
+    #endif
 }

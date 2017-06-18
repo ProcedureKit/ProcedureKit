@@ -104,7 +104,7 @@ class GroupTests: GroupTestCase {
 
         let childWillExecuteDispatchGroup = DispatchGroup()
         childWillExecuteDispatchGroup.enter()
-        child.addWillExecuteBlockObserver { _ in
+        child.addWillExecuteBlockObserver { _, _ in
             childWillExecuteDispatchGroup.leave()
         }
 
@@ -163,6 +163,50 @@ class GroupTests: GroupTestCase {
         XCTAssertTrue(child2.isFinished)
     }
 
+    func test__group_executes_on_procedure_queue_with_underlying_queue() {
+        // If a GroupProcedure is added to a ProcedureQueue with an `underlyingQueue` configured,
+        // the GroupProcedure's `execute()` function will run on the underlyingQueue.
+        // This should succeed - previously, an assert failed in debug mode.
+
+        class TestExecuteOnUnderlyingQueueGroupProcedure: GroupProcedure {
+            public typealias Block = () -> Void
+            private let block: Block
+
+            public init(dispatchQueue underlyingQueue: DispatchQueue? = nil, operations: [Operation], executeCheckBlock: @escaping Block) {
+                self.block = executeCheckBlock
+                super.init(dispatchQueue: underlyingQueue, operations: operations)
+            }
+            open override func execute() {
+                block()
+                super.execute()
+            }
+        }
+
+        let customDispatchQueueLabel = "run.kit.procedure.ProcedureKit.Tests.TestUnderlyingQueue"
+        let customDispatchQueue = DispatchQueue(label: customDispatchQueueLabel, attributes: [.concurrent])
+        let customScheduler = ProcedureKit.Scheduler(queue: customDispatchQueue)
+
+        let procedureQueue = ProcedureQueue()
+        procedureQueue.underlyingQueue = customDispatchQueue
+
+        let didExecuteOnDesiredQueue = Protector(false)
+        let child = TestProcedure()
+        let group = TestExecuteOnUnderlyingQueueGroupProcedure(operations: [child]) {
+            // inside execute()
+            if customScheduler.isOnScheduledQueue {
+                didExecuteOnDesiredQueue.overwrite(with: true)
+            }
+        }
+
+        addCompletionBlockTo(procedure: group)
+        procedureQueue.add(operation: group)
+        waitForExpectations(timeout: 3)
+
+        XCTAssertTrue(didExecuteOnDesiredQueue.access, "execute() did not execute on the desired underlyingQueue")
+        XCTAssertProcedureFinishedWithoutErrors(group)
+        XCTAssertProcedureFinishedWithoutErrors(child)
+    }
+
     // MARK: - Error Tests
 
     func test__group_exits_correctly_when_child_errors() {
@@ -182,6 +226,161 @@ class GroupTests: GroupTestCase {
         wait(for: group)
         XCTAssertEqual(child.errors.count, children.count)
         XCTAssertEqual(group.errors.count, 5)
+    }
+
+    // MARK: - Custom Error Handling Tests
+
+    func test__group__transform_child_errors_block_receives_children_and_errors() {
+        let receivedInput = Protector<[Procedure: [Error]]>([:])
+        let didReceiveDuplicate = Protector(false)
+        children = createTestProcedures(shouldError: true)
+        group = TestGroupProcedure(operations: children)
+        group.transformChildErrorsBlock = { (child, errors) in
+            let hasExistingEntryForKey = receivedInput.write { ward in
+                return ward.updateValue(errors, forKey: child) != nil
+            }
+            if hasExistingEntryForKey {
+                didReceiveDuplicate.overwrite(with: true)
+            }
+        }
+
+        wait(for: group)
+
+        XCTAssertFalse(receivedInput.access.isEmpty, "transformChildErrorsBlock was not called")
+        XCTAssertFalse(didReceiveDuplicate.access, "transformChildErrorsBlock received a duplicate call for the same child")
+        for child in children {
+            guard let errors = receivedInput.access[child] else {
+                XCTFail("transformChildErrorsBlock was not called for child: \(child)")
+                continue
+            }
+            XCTAssertEqual(errors.count, child.errors.count, "transformChildErrorsBlock input errors.count (\(errors.count)) does not equal the child's errors.count (\(child.errors.count))")
+            for (idx, error) in errors.enumerated() {
+                guard let blockError = error as? TestError else {
+                    XCTFail("Error provided to block was not a TestError")
+                    continue
+                }
+                guard let childError = child.errors[idx] as? TestError else {
+                    XCTFail("Error in child was not a TestError")
+                    continue
+                }
+                XCTAssertEqual(blockError, childError)
+            }
+            
+        }
+        XCTAssertEqual(group.errors.count, children.count)
+    }
+
+    func test__group__simple_transform_child_errors_block_removes_errors() {
+        let transformChildErrorsBlockChildren = Protector<[Procedure]>([])
+        children = createTestProcedures(shouldError: true)
+        let ignoredChild = children.first!
+        group = TestGroupProcedure(operations: children)
+        group.transformChildErrorsBlock = { (child, errors) in
+            transformChildErrorsBlockChildren.append(child)
+            if child === ignoredChild {
+                errors.removeAll()
+            }
+        }
+
+        wait(for: group)
+
+        XCTAssertFalse(transformChildErrorsBlockChildren.access.isEmpty, "transformChildErrorsBlock was not called")
+        for child in children {
+            XCTAssertTrue(transformChildErrorsBlockChildren.access.contains(child), "transformChildErrorsBlock was not called for child: \(child)")
+        }
+
+        XCTAssertEqual(group.errors.count, children.count - 1)
+        let suppressedError = ignoredChild.errors.first! as! TestError
+        XCTAssertFalse(TestError.verify(errors: group.errors, contains: suppressedError), "The supposedly suppressed error is in the Group errors.")
+    }
+
+    func test__group__transform_child_errors_block_removes_errors_from_child_willfinishwitherrors() {
+        children = createTestProcedures(shouldError: true)
+        let group = TestGroupChildWillFinishWithErrors(operations: children, action: .callSuperWithUnmodifiedInput)
+        let ignoredChild = children.first!
+        group.transformChildErrorsBlock = { (child, errors) in
+            if child === ignoredChild {
+                errors.removeAll()
+            }
+        }
+
+        wait(for: group)
+
+        XCTAssertFalse(group.receivedInput.access.isEmpty, "child(_:willFinishWithErrors:) was not called")
+        XCTAssertFalse(group.didReceiveDuplicate.access, "child(_:willFinishWithErrors:) received a duplicate call for the same child")
+        for child in children {
+            XCTAssertTrue(group.receivedInput.access.keys.contains(child), "child(_:willFinishWithErrors:) was not called for child: \(child)")
+        }
+
+        XCTAssertEqual(group.errors.count, children.count - 1)
+        guard let receivedErrorsForIgnoredChild = group.receivedInput.access[ignoredChild] else {
+            XCTFail("child(_:willFinishWithErrors:) was not called for the ignoredChild")
+            return
+        }
+        XCTAssertTrue(receivedErrorsForIgnoredChild.isEmpty, "child(_:willFinishWithErrors:) received a non-empty errors array for the ignoredChild")
+    }
+
+    class TestGroupChildWillFinishWithErrors: GroupProcedure {
+        enum WillFinishWithErrorsAction {
+            case none
+            case callSuperWithErrors([Error])
+            case callSuperWithUnmodifiedInput
+        }
+        let receivedInput = Protector<[Procedure: [Error]]>([:])
+        let didReceiveDuplicate = Protector(false)
+        let action: WillFinishWithErrorsAction
+        init(operations: [Operation], action: WillFinishWithErrorsAction) {
+            self.action = action
+            super.init(operations: operations)
+        }
+        open override func child(_ child: Procedure, willFinishWithErrors errors: [Error]) {
+            // store received input
+            let hasExistingEntryForKey = receivedInput.write { ward in
+                return ward.updateValue(errors, forKey: child) != nil
+            }
+            if hasExistingEntryForKey {
+                didReceiveDuplicate.overwrite(with: true)
+            }
+
+            // execute action
+            switch action {
+            case .callSuperWithErrors(let error):
+                super.child(child, willFinishWithErrors: error)
+            case .callSuperWithUnmodifiedInput:
+                super.child(child, willFinishWithErrors: errors)
+            case .none: break
+            }
+        }
+    }
+
+    func test__group__child_willfinishwitherrors_does_not_call_super() {
+        children = createTestProcedures(shouldError: true)
+        let group = TestGroupChildWillFinishWithErrors(operations: children, action: .none)
+
+        wait(for: group)
+
+        XCTAssertFalse(group.receivedInput.access.isEmpty, "child(_:willFinishWithErrors:) was not called")
+        XCTAssertFalse(group.didReceiveDuplicate.access, "child(_:willFinishWithErrors:) received a duplicate call for the same child")
+        for child in children {
+            XCTAssertTrue(group.receivedInput.access.keys.contains(child), "child(_:willFinishWithErrors:) was not called for child: \(child)")
+        }
+
+        XCTAssertEqual(group.errors.count, 0)
+    }
+
+    func test__group__child_willfinishwitherrors_calls_super_with_modified_errors() {
+        children = createTestProcedures(shouldError: true)
+        let group = TestGroupChildWillFinishWithErrors(operations: children, action: .callSuperWithErrors([]))
+
+        wait(for: group)
+
+        XCTAssertFalse(group.receivedInput.access.isEmpty, "child(_:willFinishWithErrors:) was not called")
+        XCTAssertFalse(group.didReceiveDuplicate.access, "child(_:willFinishWithErrors:) received a duplicate call for the same child")
+        for child in children {
+            XCTAssertTrue(group.receivedInput.access.keys.contains(child), "child(_:willFinishWithErrors:) was not called for child: \(child)")
+        }
+
+        XCTAssertEqual(group.errors.count, 0)
     }
 
     // MARK: - Cancellation Tests
@@ -267,7 +466,7 @@ class GroupTests: GroupTestCase {
 
         group = TestGroupProcedure(operations: [])
         let otherQueue = ProcedureQueue()
-        otherQueue.delegate = group
+        otherQueue.delegate = group.queueDelegate
 
         var observerCalledFromGroupDelegate = false
         group.addWillAddOperationBlockObserver { group, child in
@@ -368,8 +567,8 @@ class GroupTests: GroupTestCase {
             case willAddOperationObserver
             case didAddOperationObserver
             case groupWillAdd
-            case childWillAttemptRecoveryFromErrors
-            case childWillFinishWithoutErrors
+            case childWillFinishWithErrors(Procedure, [Error])
+            case transformChildErrorsBlock(Procedure, [Error])
         }
 
         init(operations: [Operation], childEventBlock: @escaping ChildEventBlock = { _,_ in }) {
@@ -381,6 +580,9 @@ class GroupTests: GroupTestCase {
             addDidAddOperationBlockObserver { group, child in
                 group.childEventBlock(.didAddOperationObserver, child)
             }
+            transformChildErrorsBlock = { (child, errors) in
+                childEventBlock(.transformChildErrorsBlock(child, errors), child)
+            }
         }
 
         // GroupProcedure Overrides
@@ -388,13 +590,9 @@ class GroupTests: GroupTestCase {
             childEventBlock(.groupWillAdd, child)
             super.groupWillAdd(child: child)
         }
-        open override func child(_ child: Operation, willAttemptRecoveryFromErrors errors: [Error]) -> Bool {
-            childEventBlock(.childWillAttemptRecoveryFromErrors, child)
-            return super.child(child, willAttemptRecoveryFromErrors: errors)
-        }
-        open override func childWillFinishWithoutErrors(_ child: Operation) {
-            childEventBlock(.childWillFinishWithoutErrors, child)
-            super.childWillFinishWithoutErrors(child)
+        open override func child(_ child: Procedure, willFinishWithErrors errors: [Error]) {
+            childEventBlock(.childWillFinishWithErrors(child, errors), child)
+            return super.child(child, willFinishWithErrors: errors)
         }
     }
 
@@ -478,10 +676,46 @@ class GroupConcurrencyTests: GroupConcurrencyTestCase {
 class GroupEventConcurrencyTests: GroupTestCase {
 
     let expectedEndingEvents: [EventConcurrencyTrackingRegistrar.ProcedureEvent] = [.override_procedureWillFinish, .observer_willFinish, .override_procedureDidFinish, .observer_didFinish]
+    var didFinishGroup: DispatchGroup!
+    var baseObserver: ConcurrencyTrackingObserver!
+
+    open override func setUp() {
+        super.setUp()
+        let didFinishGroup = DispatchGroup()
+        self.didFinishGroup = didFinishGroup
+        didFinishGroup.enter()
+        baseObserver = ConcurrencyTrackingObserver() { procedure, event in
+            assert(procedure is GroupProcedure)
+            if event == .observer_didFinish {
+                didFinishGroup.leave()
+            }
+        }
+    }
+
+    open override func tearDown() {
+        didFinishGroup = nil
+        baseObserver = nil
+        super.tearDown()
+    }
+
+    private func waitForBaseObserverDidFinish(timeout: TimeInterval) {
+        weak var expDidFinishObserverFired = expectation(description: "DidFinishObserver was fired")
+        didFinishGroup.notify(queue: DispatchQueue.main) {
+            expDidFinishObserverFired?.fulfill()
+        }
+        waitForExpectations(timeout: timeout)
+    }
 
     func test_group_finish_no_concurrent_events() {
-        let group = EventConcurrencyTrackingGroupProcedure(operations: children, registrar: EventConcurrencyTrackingRegistrar(recordHistory: true))
+        let group = EventConcurrencyTrackingGroupProcedure(operations: children, registrar: EventConcurrencyTrackingRegistrar(recordHistory: true), baseObserver: baseObserver)
         wait(for: group)
+
+        // Because Procedure signals isFinished KVO *prior* to calling DidFinish observers,
+        // the above wait() may return before the ConcurrencyTrackingObserver is called to
+        // record the DidFinish event.
+        // Thus, wait for the Group's ConcurrencyTrackingObserver to receive the
+        // .observer_DidFinish event.
+        waitForBaseObserverDidFinish(timeout: 2)
 
         XCTAssertProcedureFinishedWithoutErrors(group)
         XCTAssertProcedureNoConcurrentEvents(group)
@@ -492,9 +726,16 @@ class GroupEventConcurrencyTests: GroupTestCase {
     }
 
     func test_group_cancel_no_concurrent_events() {
-        let group = EventConcurrencyTrackingGroupProcedure(operations: children, registrar: EventConcurrencyTrackingRegistrar(recordHistory: true))
+        let group = EventConcurrencyTrackingGroupProcedure(operations: children, registrar: EventConcurrencyTrackingRegistrar(recordHistory: true), baseObserver: baseObserver)
         group.cancel()
         wait(for: group)
+
+        // Because Procedure signals isFinished KVO *prior* to calling DidFinish observers,
+        // the above wait() may return before the ConcurrencyTrackingObserver is called to
+        // record the DidFinish event.
+        // Thus, wait for the Group's ConcurrencyTrackingObserver to receive the
+        // .observer_DidFinish event.
+        waitForBaseObserverDidFinish(timeout: 2)
 
         XCTAssertProcedureCancelledWithoutErrors(group)
         XCTAssertProcedureNoConcurrentEvents(group)

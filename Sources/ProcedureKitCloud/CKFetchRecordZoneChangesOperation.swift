@@ -94,7 +94,7 @@ extension CKProcedure where T: CKFetchRecordZoneChangesOperationProtocol, T: Ass
     func setFetchRecordZoneChangesCompletionBlock(_ block: @escaping CloudKitProcedure<T>.FetchRecordZoneChangesCompletionBlock) {
         operation.fetchRecordZoneChangesCompletionBlock = { [weak self] error in
             if let strongSelf = self, let error = error {
-                strongSelf.append(fatalError: PKCKError(underlyingError: error))
+                strongSelf.append(error: PKCKError(underlyingError: error))
             }
             else {
                 block()
@@ -103,7 +103,7 @@ extension CKProcedure where T: CKFetchRecordZoneChangesOperationProtocol, T: Ass
     }
 }
 
-extension CloudKitProcedure where T: CKFetchRecordZoneChangesOperationProtocol, T: AssociatedErrorProtocol, T.AssociatedError: CloudKitError {
+extension CloudKitProcedure where T: CKFetchRecordZoneChangesOperationProtocol {
 
     /// A typealias for the block types used by CloudKitOperation<CKFetchRecordZoneChangesOperationType>
     public typealias FetchRecordZoneChangesRecordChangedBlock = (T.Record) -> Void

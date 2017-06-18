@@ -49,6 +49,12 @@ class CKFetchNotificationChangesOperationTests: CKProcedureTestCase {
         operation = CKProcedure(operation: target)
     }
 
+    override func tearDown() {
+        target = nil
+        operation = nil
+        super.tearDown()
+    }
+
     func test__set_get__previousServerChangeToken() {
         let previousServerChangeToken: String = "I'm a server token"
         operation.previousServerChangeToken = previousServerChangeToken
@@ -129,6 +135,12 @@ class CloudKitProcedureFetchNotificationChangesOperationTests: CKProcedureTestCa
         cloudkit.notificationChangedBlock = { [unowned self] notification in
             self.setByNotificationChangedBlock = notification
         }
+    }
+
+    override func tearDown() {
+        cloudkit = nil
+        setByNotificationChangedBlock = nil
+        super.tearDown()
     }
 
     func test__set_get__errorHandlers() {

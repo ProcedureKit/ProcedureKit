@@ -15,9 +15,6 @@ public struct RetryFailureInfo<T: Procedure> {
     /// - returns: the errors the operation finished with
     public let errors: [Error]
 
-    /// - returns: the previous errors of previous attempts
-    public let historicalErrors: [Error]
-
     /// - returns: the number of attempts made so far
     public let count: Int
 
@@ -112,47 +109,55 @@ open class RetryProcedure<T: Procedure>: RepeatProcedure<T> {
         super.init(dispatchQueue: dispatchQueue, max: max, iterator: retry)
     }
 
-    open override func childWillFinishWithoutErrors(_ child: Operation) {
-        // no-op
-        // To ensure that we do not retry/repeat successful procedures
-    }
-
-    open override func child(_ child: Operation, willAttemptRecoveryFromErrors errors: [Error]) -> Bool {
+    /// Handle child willFinish event
+    ///
+    /// This is used by RetryProcedure to trigger adding the next Procedure,
+    /// if the current Procedure fails with errors.
+    ///
+    /// If no further Procedure will be attempted (based on the Retry block / iterator),
+    /// it adds the current (last) Procedure's errors to the Group's errors.
+    ///
+    /// If subclassing RetryProcedure and overriding this method, consider
+    /// carefully whether / when / how you should call super.
+    open override func child(_ child: Procedure, willFinishWithErrors errors: [Error]) {
         eventQueue.debugAssertIsOnQueue()
-        guard child === current else { return false }
-        var returnValue = false
+        assert(!child.isFinished, "child(_:willFinishWithErrors:) called with a child that has already finished")
+        guard child === current else {
+            // There may be other Procedures that finish, such as DelayProcedures (between retried
+            // Procedures), and Procedures produced onto the Group's internal queue.
+            // 
+            // These other Procedures do not affect whether the RetryProcedure tries a next
+            // Procedure, and their errors (if any) are excluded from the RetryProcedure's
+            // errors.
+            return
+        }
+        guard !errors.isEmpty else {
+            // The RetryProcedure's current Procedure succeeded - stop retrying.
+            return
+        }
+
+        var willAttemptAnotherOperation = false
         defer {
-            let message = returnValue ? "will attempt" : "will not attempt"
-            log.notice(message: "\(message) recovery from errors: \(errors) in operation: \(child)")
+            log.notice(message: "\(willAttemptAnotherOperation ? "will attempt" : "will not attempt") recovery from errors: \(errors) in operation: \(child)")
         }
         retry.info = createFailureInfo(for: current, errors: errors)
-        returnValue = _addNextOperation()
+        willAttemptAnotherOperation = _addNextOperation()
         retry.info = .none
-        return returnValue
-    }
-
-    open override func child(_ child: Operation, didAttemptRecoveryFromErrors errors: [Error]) {
-        eventQueue.debugAssertIsOnQueue()
-        if let previous = previous, child === current {
-            childDidNotRecoverFromErrors(previous)
+        if !willAttemptAnotherOperation {
+            // If no further operation will be attempted, append the errors from this child
+            // to the Group's errors.
+            append(errors: errors, fromChild: child)
         }
-        super.child(child, didAttemptRecoveryFromErrors: errors)
-    }
-
-    open override func procedureQueue(_ queue: ProcedureQueue, willFinishProcedure procedure: Procedure, withErrors errors: [Error]) -> ProcedureFuture? {
-        if errors.isEmpty, let previous = previous, procedure === current {
-            childDidRecoverFromErrors(previous)
-        }
-        return super.procedureQueue(queue, willFinishProcedure: procedure, withErrors: errors)
+        // Do not call super.child(_:willFinishWithErrors:)
+        // To ensure that we do not retry/repeat successful procedures (via RepeatProcedure)
     }
 
     internal func createFailureInfo(for operation: T, errors: [Error]) -> FailureInfo {
         return FailureInfo(
             operation: operation,
             errors: errors,
-            historicalErrors: attemptedRecoveryErrors,
             count: count,
-            addOperations: { self.add(children: $0, before: nil); return },
+            addOperations: { (ops: Operation...) in self.add(children: ops, before: nil); return },
             log: log,
             configure: configure
         )

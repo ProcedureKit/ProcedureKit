@@ -154,7 +154,7 @@ public extension Protector where T: RangeReplaceableCollection {
     }
 }
 
-public extension Protector where T: Integer {
+public extension Protector where T: Strideable {
 
     func advance(by stride: T.Stride) {
         write { (ward: inout T) in
