@@ -8,7 +8,7 @@ steps:
 YAML
 
 if [[ "$BUILDKITE_BUILD_CREATOR" == "Daniel Thorpe" ]]; then
-  cat <<-YAML
+cat <<-YAML
 
   - wait
 
