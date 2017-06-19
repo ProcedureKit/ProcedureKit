@@ -1,3 +1,30 @@
+# 4.2.0
+
+## Breaking Changes
+1. [#717](https://github.com/ProcedureKit/ProcedureKit/pull/717) Termination status & termination reason provided to handler (full details in PR).
+2. [#737](https://github.com/ProcedureKit/ProcedureKit/pull/737) Simplifies `GroupProcedure` child error handling, so that it is now centralised in a single, better named method: `child(_:willFinishWithErrors:)`
+
+## Swift 4
+1. [@swiftlyfalling](https://github.com/swiftlyfalling) has gone through the entire project and fixes Swift 4 released issues so that _ProcedureKit_ will work in Xcode 9 beta without issue. Critically, we have not yet changed the build settings for Swift 4 - but this is the last release for Swift 3.
+2. [#739](https://github.com/ProcedureKit/ProcedureKit/pull/739) Fixes complication of `ProcedureEventQueue` in Xcode 9, when in Swift 3 mode.
+
+## Tweaks & Improvements
+1. [#715](https://github.com/ProcedureKit/ProcedureKit/pull/715) Improves the `.then { }` API so that _all_ operations in the receiver are added as dependents of the argument.
+2. [#717](https://github.com/ProcedureKit/ProcedureKit/pull/717) Improves `ProcessProcedure` so that can be used with result injection and dispatches using its internal queue.
+3. [#738](https://github.com/ProcedureKit/ProcedureKit/pull/738) Adds `transformChildErrorsBlock` to `GroupProcedure`. This will enable customisation of the errors with `GroupProcedure` without subclassing.
+
+
+## Stability & Bug Fixes
+1. [#710](https://github.com/ProcedureKit/ProcedureKit/pull/710), [#711](https://github.com/ProcedureKit/ProcedureKit/pull/711), [#712](https://github.com/ProcedureKit/ProcedureKit/pull/712) Lots of robustness fixes for tests.
+2. [#714](https://github.com/ProcedureKit/ProcedureKit/pull/714) Fixes a (rare) data race in DelayProcedure.
+3. [#721](https://github.com/ProcedureKit/ProcedureKit/pull/721) Adds missing `tearDown` overrides to `CloudKitProcedure` tests.
+4. [#722](https://github.com/ProcedureKit/ProcedureKit/pull/722) Fixes a memory cycle in `makeFinishingProcedure` in the testing framework helpers.
+5. [#724](https://github.com/ProcedureKit/ProcedureKit/pull/724) Reduces dependencies on BuildKite agents by adding Travis CI.  
+
+# 4.1.0
+
+1. Swift 3.1 fixes for Xcode 8.3
+
 # 4.0.1
 
 Same as Beta 7 😀
