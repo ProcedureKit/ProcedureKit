@@ -28,11 +28,11 @@ cat <<-YAML
   - wait
 
   - block: ":aws: Docs"
-    branches: "!features/*"
+    branches: "!feature/*"
 
   - label: ":aws:"
     trigger: "procedurekit-documentation"
-    branches: "!features/*"  
+    branches: "!feature/*"  
     build:
       message: "Generating documentation for ProcedureKit"
       commit: "HEAD"

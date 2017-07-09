@@ -2,8 +2,8 @@
 
 [![Build status](https://badge.buildkite.com/4bc80b0824c6357ae071342271cb503b8994cf0cfa58645849.svg?branch=master)](https://buildkite.com/blindingskies/procedurekit)
 [![Coverage Status](https://coveralls.io/repos/github/ProcedureKit/ProcedureKit/badge.svg?branch=swift%2F2.2)](https://coveralls.io/github/ProcedureKit/ProcedureKit?branch=swift%2F2.2)
+[![Documentation](http://procedure.kit.run/development/badge.svg)](http://procedure.kit.run/development)
 [![CocoaPods Compatible](https://img.shields.io/cocoapods/v/ProcedureKit.svg?style=flat)](https://cocoapods.org/pods/ProcedureKit)
-[![CocoaPods Documentation](https://img.shields.io/cocoapods/metrics/doc-percent/ProcedureKit.svg?style=flat)](https://cocoapods.org/pods/ProcedureKit)
 [![Platform](https://img.shields.io/cocoapods/p/ProcedureKit.svg?style=flat)](http://cocoadocs.org/docsets/ProcedureKit)
 [![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/Carthage/Carthage)
 
