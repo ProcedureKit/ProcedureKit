@@ -24,7 +24,7 @@ YAML
 fi
 
 cat <<-YAML
-  - block: ":aws: Update Documentation"
+#  - block: ":aws: Update Documentation"
 
   - name: ":aws: Generate Docs"
     trigger: "procedurekit-documentation"
@@ -34,6 +34,5 @@ cat <<-YAML
       branch: "setup"
       env:
         PROCEDUREKIT_HASH: "$COMMIT"
-        PROCEDUREKIT_BRANCH: "$BRANCH"        
-
+        PROCEDUREKIT_BRANCH: "$BRANCH"
 YAML
