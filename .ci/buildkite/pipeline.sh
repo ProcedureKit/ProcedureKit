@@ -22,3 +22,22 @@ cat <<-YAML
         PROCEDUREKIT_HASH: "$COMMIT"
 YAML
 fi
+
+cat <<-YAML
+
+  - wait
+
+  - block: ":aws: Docs"
+    branches: "!features/*"
+
+  - label: ":aws:"
+    trigger: "procedurekit-documentation"
+    branches: "!features/*"  
+    build:
+      message: "Generating documentation for ProcedureKit"
+      commit: "HEAD"
+      branch: "master"
+      env:
+        PROCEDUREKIT_HASH: "$COMMIT"
+        PROCEDUREKIT_BRANCH: "$BRANCH"
+YAML
