@@ -24,14 +24,16 @@ YAML
 fi
 
 cat <<-YAML
-#  - block: ":aws: Update Documentation"
+  - block: ":aws: Generate Documentation"
+    branches: "!features/*"
 
-  - name: ":aws: Generate Docs"
+  - name: ":aws: Generate Documentation"
+    branches: "!features/*"  
     trigger: "procedurekit-documentation"
     build:
-      message: "Generating docs for ProcedureKit"
+      message: "Generating documentation for ProcedureKit"
       commit: "HEAD"
-      branch: "setup"
+      branch: "master"
       env:
         PROCEDUREKIT_HASH: "$COMMIT"
         PROCEDUREKIT_BRANCH: "$BRANCH"
