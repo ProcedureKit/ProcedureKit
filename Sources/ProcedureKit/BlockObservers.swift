@@ -26,7 +26,7 @@ public struct Observer<Procedure: ProcedureProtocol> {
 
 public func typedProcedure<ProcedureType: ProcedureProtocol>(_ procedure: ProcedureProtocol) -> ProcedureType? {
     guard let typedProcedure = procedure as? ProcedureType else {
-        procedure.log.warning(message: "Unable to convert \(procedure) to the expected type \(String(describing: type(of: ProcedureType.self)))")
+        procedure.log.warning(message: "Unable to convert to the expected type \"\(String(describing: ProcedureType))\"")
         return nil
     }
     return typedProcedure
