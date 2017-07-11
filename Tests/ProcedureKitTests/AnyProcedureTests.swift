@@ -48,6 +48,7 @@ class Baz: Procedure, InputProcedure, OutputProcedure {
 }
 
 class BaseAnyProcedureTests: ProcedureKitTestCase {
+
     func test__any_procedure(_ anyProcedure: Procedure) {
         wait(for: anyProcedure)
         XCTAssertProcedureFinishedWithoutErrors(procedure)
@@ -119,7 +120,7 @@ class AnyInputProcedureTests: BaseAnyProcedureTests {
 
     func test__any_procedure() {
         let anyProcedure = AnyInputProcedure(procedure)
-        self.test__any_procedure(anyProcedure)
+        test__any_procedure(anyProcedure)
     }
 
     func test__setting_requirement() {
@@ -131,7 +132,7 @@ class AnyInputProcedureTests: BaseAnyProcedureTests {
     func test__not_setting_requirement() {
         let foo = Foo()
         let anyProcedure = AnyInputProcedure(foo)
-        self.test__not_setting_requirement(anyProcedure: anyProcedure, boxedProcedure: foo)
+        test__not_setting_requirement(anyProcedure: anyProcedure, boxedProcedure: foo)
     }
 }
 

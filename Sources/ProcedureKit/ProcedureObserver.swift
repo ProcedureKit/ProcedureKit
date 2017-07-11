@@ -12,21 +12,19 @@ import Foundation
  */
 public protocol ProcedureObserver {
 
-    associatedtype Procedure: ProcedureProtocol
-
     /**
      Observer gets notified when it is attached to a procedure.
 
      - parameter procedure: the observed procedure, P.
      */
-    func didAttach(to procedure: Procedure)
+    func didAttach<P: Procedure>(to procedure: P)
 
     /**
      The procedure will execute.
 
      - parameter procedure: the observed `Procedure`.
      */
-    func will(execute procedure: Procedure, pendingExecute: PendingExecuteEvent)
+    func will<P: Procedure>(execute procedure: P, pendingExecute: PendingExecuteEvent)
 
     /**
      The procedure did execute.
@@ -43,14 +41,14 @@ public protocol ProcedureObserver {
 
      - parameter procedure: the observed `Procedure`.
      */
-    func did(execute procedure: Procedure)
+    func did<P: Procedure>(execute procedure: P)
 
     /**
      The procedure did cancel.
 
      - parameter procedure: the observed `Procedure`.
      */
-    func did(cancel procedure: Procedure, withErrors: [Error])
+    func did<P: Procedure>(cancel procedure: P, withErrors: [Error])
 
     /**
      The procedure will add a new `Operation` instance to the
@@ -60,7 +58,7 @@ public protocol ProcedureObserver {
      - parameter procedure: the observed `Procedure`.
      - parameter newOperation: the `Operation` which will be added
      */
-    func procedure(_ procedure: Procedure, willAdd newOperation: Operation)
+    func procedure<P: Procedure>(_ procedure: P, willAdd newOperation: Operation)
 
     /**
      The procedure did add a new `Operation` instance to the
@@ -70,7 +68,7 @@ public protocol ProcedureObserver {
      - parameter procedure: the observed `Procedure`.
      - parameter newOperation: the `Operation` which has been added to the queue
      */
-    func procedure(_ procedure: Procedure, didAdd newOperation: Operation)
+    func procedure<P: Procedure>(_ procedure: P, didAdd newOperation: Operation)
 
     /**
      The procedure will finish. Any errors that were encountered are collected here.
@@ -78,7 +76,7 @@ public protocol ProcedureObserver {
      - parameter procedure: the observed `Procedure`.
      - parameter errors: an array of `Error`s.
      */
-    func will(finish procedure: Procedure, withErrors: [Error], pendingFinish: PendingFinishEvent)
+    func will<P: Procedure>(finish procedure: P, withErrors: [Error], pendingFinish: PendingFinishEvent)
 
     /**
      The procedure did finish. Any errors that were encountered are collected here.
@@ -86,7 +84,7 @@ public protocol ProcedureObserver {
      - parameter procedure: the observed `Procedure`.
      - parameter errors: an array of `ErrorType`s.
      */
-    func did(finish procedure: Procedure, withErrors: [Error])
+    func did<P: Procedure>(finish procedure: P, withErrors: [Error])
 
     /**
      Provide a queue onto which observer callbacks will be dispatched.
@@ -105,21 +103,21 @@ public extension ProcedureObserver {
 
 public extension ProcedureObserver {
 
-    func didAttach(to procedure: Procedure) { }
+    func didAttach<P: Procedure>(to procedure: P) { }
 
-    func will(execute procedure: Procedure, pendingExecute: PendingExecuteEvent) { }
+    func will<P: Procedure>(execute procedure: P, pendingExecute: PendingExecuteEvent) { }
 
-    func did(execute procedure: Procedure) { }
+    func did<P: Procedure>(execute procedure: P) { }
 
-    func did(cancel procedure: Procedure, withErrors: [Error]) { }
+    func did<P: Procedure>(cancel procedure: P, withErrors: [Error]) { }
 
-    func procedure(_ procedure: Procedure, willAdd newOperation: Operation) { }
+    func procedure<P: Procedure>(_ procedure: P, willAdd newOperation: Operation) { }
 
-    func procedure(_ procedure: Procedure, didAdd newOperation: Operation) { }
+    func procedure<P: Procedure>(_ procedure: P, didAdd newOperation: Operation) { }
 
-    func will(finish procedure: Procedure, withErrors errors: [Error], pendingFinish: PendingFinishEvent) { }
+    func will<P: Procedure>(finish procedure: P, withErrors errors: [Error], pendingFinish: PendingFinishEvent) { }
 
-    func did(finish procedure: Procedure, withErrors errors: [Error]) { }
+    func did<P: Procedure>(finish procedure: P, withErrors errors: [Error]) { }
 
     var eventQueue: DispatchQueueProtocol? { return nil }
 }

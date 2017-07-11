@@ -251,7 +251,7 @@ class BlockObserverSynchronizationTests: ProcedureKitTestCase {
                 didAddGroup.leave()
             }
             didAddGroup.enter()
-            producingProcedure.add(observer: BlockObserver(synchronizedWith: syncObject, didAdd: {
+            producingProcedure.add(observer: BlockObserver<TestProcedure>(synchronizedWith: syncObject, didAdd: {
                 didAddOperationCalled_BlockObserver.overwrite(with: ($0, $1, isSynced()))
                 didAddGroup.leave()
             }))
@@ -306,7 +306,7 @@ class BlockObserverSynchronizationTests: ProcedureKitTestCase {
                 didFinishGroup.leave()
             }
             didFinishGroup.enter()
-            procedure.add(observer: BlockObserver(synchronizedWith: syncObject, didFinish: { didFinishCalled_BlockObserver.overwrite(with: ($0, $1, isSynced()))
+            procedure.add(observer: BlockObserver<TestProcedure>(synchronizedWith: syncObject, didFinish: { didFinishCalled_BlockObserver.overwrite(with: ($0, $1, isSynced()))
                 didFinishGroup.leave()
             }))
             wait(for: procedure)
