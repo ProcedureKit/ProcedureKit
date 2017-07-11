@@ -26,7 +26,7 @@ public struct Observer<Procedure: ProcedureProtocol> {
 
 public func typedProcedure<ProcedureType: ProcedureProtocol>(_ procedure: ProcedureProtocol) -> ProcedureType? {
     guard let typedProcedure = procedure as? ProcedureType else {
-        procedure.log.warning(message: "Unable to convert to the expected type \"\(String(describing: ProcedureType))\"")
+        procedure.log.warning(message: "Unable to convert to the expected type \"\(String(describing: ProcedureType.self))\"")
         return nil
     }
     return typedProcedure
@@ -95,43 +95,59 @@ public struct BlockObserver<Procedure: ProcedureProtocol>: ProcedureObserver {
     }
 
     public func didAttach(to procedure: ProcedureProtocol) {
+        guard let didAttach = didAttach else { return }
         guard let typedProcedure: Procedure = typedProcedure(procedure) else { return }
-        didAttach?(typedProcedure)
+        didAttach(typedProcedure)
     }
 
     public func will(execute procedure: ProcedureProtocol, pendingExecute: PendingExecuteEvent) {
+        guard let willExecute = willExecute else { return }
         guard let typedProcedure: Procedure = typedProcedure(procedure) else { return }
-        willExecute?(typedProcedure, pendingExecute)
+        willExecute(typedProcedure, pendingExecute)
     }
 
     public func did(execute procedure: ProcedureProtocol) {
+        guard let didExecute = didExecute else { return }
         guard let typedProcedure: Procedure = typedProcedure(procedure) else { return }
-        didExecute?(typedProcedure)
+        didExecute(typedProcedure)
     }
 
     public func did(cancel procedure: ProcedureProtocol, withErrors errors: [Error]) {
+        guard let didCancel = didCancel else { return }
         guard let typedProcedure: Procedure = typedProcedure(procedure) else { return }
-        didCancel?(typedProcedure, errors)
+        didCancel(typedProcedure, errors)
     }
 
     public func procedure(_ procedure: ProcedureProtocol, willAdd newOperation: Operation) {
+        guard let willAdd = willAdd else { return }
         guard let typedProcedure: Procedure = typedProcedure(procedure) else { return }
-        willAdd?(typedProcedure, newOperation)
+        willAdd(typedProcedure, newOperation)
     }
 
     public func procedure(_ procedure: ProcedureProtocol, didAdd newOperation: Operation) {
+        guard let didAdd = didAdd else { return }
         guard let typedProcedure: Procedure = typedProcedure(procedure) else { return }
-        didAdd?(typedProcedure, newOperation)
+        didAdd(typedProcedure, newOperation)
     }
 
     public func will(finish procedure: ProcedureProtocol, withErrors errors: [Error], pendingFinish: PendingFinishEvent) {
+        guard let willFinish = willFinish else { return }
         guard let typedProcedure: Procedure = typedProcedure(procedure) else { return }
-        willFinish?(typedProcedure, errors, pendingFinish)
+        willFinish(typedProcedure, errors, pendingFinish)
     }
 
     public func did(finish procedure: ProcedureProtocol, withErrors errors: [Error]) {
+        guard let didFinish = didFinish else { return }
         guard let typedProcedure: Procedure = typedProcedure(procedure) else { return }
-        didFinish?(typedProcedure, errors)
+        didFinish(typedProcedure, errors)
+    }
+
+    private func typedProcedure(_ procedure: ProcedureProtocol) -> Procedure? {
+        guard let typedProcedure = procedure as? Procedure else {
+            procedure.log.warning(message: "BlockObserver<\(String(describing: Procedure.self))> will not receive event. Unable to convert input procedure \"\(procedure.procedureName)\" to the expected type `\(String(describing: Procedure.self))`")
+            return nil
+        }
+        return typedProcedure
     }
 }
 
@@ -159,8 +175,9 @@ public struct WillExecuteObserver<Procedure: ProcedureProtocol>: ProcedureObserv
     }
 
     public func didAttach(to procedure: ProcedureProtocol) {
+        guard let didAttachToProcedure = didAttachToProcedure else { return }
         guard let typedProcedure: Procedure = typedProcedure(procedure) else { return }
-        didAttachToProcedure?(typedProcedure)
+        didAttachToProcedure(typedProcedure)
     }
 
     /// Conforms to `WillExecuteProcedureObserver`, executes the block
@@ -204,8 +221,9 @@ public struct DidExecuteObserver<Procedure: ProcedureProtocol>: ProcedureObserve
     }
 
     public func didAttach(to procedure: ProcedureProtocol) {
+        guard let didAttachToProcedure = didAttachToProcedure else { return }
         guard let typedProcedure: Procedure = typedProcedure(procedure) else { return }
-        didAttachToProcedure?(typedProcedure)
+        didAttachToProcedure(typedProcedure)
     }
 
     /// Conforms to `DidExecuteProcedureObserver`, executes the block
@@ -237,8 +255,9 @@ public struct DidCancelObserver<Procedure: ProcedureProtocol>: ProcedureObserver
 
     /// - parameter to: the procedure which is attached
     public func didAttach(to procedure: ProcedureProtocol) {
+        guard let didAttachToProcedure = didAttachToProcedure else { return }
         guard let typedProcedure: Procedure = typedProcedure(procedure) else { return }
-        didAttachToProcedure?(typedProcedure)
+        didAttachToProcedure(typedProcedure)
     }
 
     /// Observes when the attached procedure did cancel.
@@ -272,8 +291,9 @@ public struct WillAddOperationObserver<Procedure: ProcedureProtocol>: ProcedureO
 
     /// - parameter to: the procedure which is attached
     public func didAttach(to procedure: ProcedureProtocol) {
+        guard let didAttachToProcedure = didAttachToProcedure else { return }
         guard let typedProcedure: Procedure = typedProcedure(procedure) else { return }
-        didAttachToProcedure?(typedProcedure)
+        didAttachToProcedure(typedProcedure)
     }
 
     /// Observes when the attached procedure will add another Operation.
@@ -307,8 +327,9 @@ public struct DidAddOperationObserver<Procedure: ProcedureProtocol>: ProcedureOb
 
     /// - parameter to: the procedure which is attached
     public func didAttach(to procedure: ProcedureProtocol) {
+        guard let didAttachToProcedure = didAttachToProcedure else { return }
         guard let typedProcedure: Procedure = typedProcedure(procedure) else { return }
-        didAttachToProcedure?(typedProcedure)
+        didAttachToProcedure(typedProcedure)
     }
 
     /// Observes when the attached procedure did add another Operation.
@@ -342,8 +363,9 @@ public struct WillFinishObserver<Procedure: ProcedureProtocol>: ProcedureObserve
 
     /// - parameter to: the procedure which is attached
     public func didAttach(to procedure: ProcedureProtocol) {
+        guard let didAttachToProcedure = didAttachToProcedure else { return }
         guard let typedProcedure: Procedure = typedProcedure(procedure) else { return }
-        didAttachToProcedure?(typedProcedure)
+        didAttachToProcedure(typedProcedure)
     }
 
     /// Observes when the attached procedure will finish.
@@ -379,8 +401,9 @@ public struct DidFinishObserver<Procedure: ProcedureProtocol>: ProcedureObserver
 
     /// - parameter to: the procedure which is attached
     public func didAttach(to procedure: ProcedureProtocol) {
+        guard let didAttachToProcedure = didAttachToProcedure else { return }
         guard let typedProcedure: Procedure = typedProcedure(procedure) else { return }
-        didAttachToProcedure?(typedProcedure)
+        didAttachToProcedure(typedProcedure)
     }
 
     /// Observes when the attached procedure did finish.
