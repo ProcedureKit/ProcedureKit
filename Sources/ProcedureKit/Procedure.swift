@@ -197,6 +197,10 @@ open class Procedure: Operation, ProcedureProtocol {
 
     internal let identifier = UUID()
 
+    internal var typeDescription: String {
+        return String(describing: type(of: self))
+    }
+
     internal class ProcedureQueueContext { }
     internal let queueAddContext = ProcedureQueueContext()
 
@@ -1137,7 +1141,14 @@ open class Procedure: Operation, ProcedureProtocol {
 
      - parameter observer: type conforming to protocol `ProcedureObserver`.
      */
-    open func add<Observer: ProcedureObserver>(observer: Observer) where Observer.Procedure == Procedure {
+    public func add<Observer>(observer: Observer) where Observer: ProcedureObserver, Observer.Procedure: Procedure {
+        assert(self as? Observer.Procedure != nil, "add(observer:) passed an Observer with an invalid expected Procedure type. The Observer will not receive any events from this Procedure. (Observer expects a Procedure of type \"\(String(describing: Observer.Procedure.self))\", but `self` is a \"\(typeDescription)\" and cannot be converted.)")
+
+        add(anyObserver: AnyObserver(base: TransformObserver<Observer.Procedure, Procedure>(base: observer)))
+    }
+
+    // Internal function used to add AnyObserver<Procedure> to the Procedure's internal array of observers.
+    internal func add(anyObserver observer: AnyObserver<Procedure>) {
         assert(state < .pending, "Adding observers to a Procedure after it has been added to a queue is an inherent race condition, and risks missing events.")
 
         dispatchEvent {
@@ -1146,7 +1157,7 @@ open class Procedure: Operation, ProcedureProtocol {
 
             // Add the observer to the internal observers array
             self.stateLock.withCriticalScope {
-                self.protectedProperties.observers.append(AnyObserver(base: observer))
+                self.protectedProperties.observers.append(observer)
             }
 
             // Dispatch the DidAttach event to the observer
