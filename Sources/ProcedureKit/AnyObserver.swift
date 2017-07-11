@@ -113,47 +113,47 @@ internal class TransformObserver<O: ProcedureProtocol, R: ProcedureProtocol>: Pr
         return typedProcedure
     }
 
-    public func didAttach(to procedure: Procedure) {
+    func didAttach(to procedure: Procedure) {
         guard let baseProcedure = typedProcedure(procedure, event: .didAttach, logError: true) else { return }
         wrapped.didAttach(to: baseProcedure)
     }
 
-    public func will(execute procedure: Procedure, pendingExecute: PendingExecuteEvent) {
+    func will(execute procedure: Procedure, pendingExecute: PendingExecuteEvent) {
         guard let baseProcedure = typedProcedure(procedure, event: .willExecute) else { return }
         wrapped.will(execute: baseProcedure, pendingExecute: pendingExecute)
     }
 
-    public func did(execute procedure: Procedure) {
+    func did(execute procedure: Procedure) {
         guard let baseProcedure = typedProcedure(procedure, event: .didExecute) else { return }
         wrapped.did(execute: baseProcedure)
     }
 
-    public func did(cancel procedure: Procedure, withErrors errors: [Error]) {
+    func did(cancel procedure: Procedure, withErrors errors: [Error]) {
         guard let baseProcedure = typedProcedure(procedure, event: .didCancel) else { return }
         wrapped.did(cancel: baseProcedure, withErrors: errors)
     }
 
-    public func procedure(_ procedure: Procedure, willAdd newOperation: Operation) {
+    func procedure(_ procedure: Procedure, willAdd newOperation: Operation) {
         guard let baseProcedure = typedProcedure(procedure, event: .willAdd) else { return }
         wrapped.procedure(baseProcedure, willAdd: newOperation)
     }
 
-    public func procedure(_ procedure: Procedure, didAdd newOperation: Operation) {
+    func procedure(_ procedure: Procedure, didAdd newOperation: Operation) {
         guard let baseProcedure = typedProcedure(procedure, event: .didAdd) else { return }
         wrapped.procedure(baseProcedure, didAdd: newOperation)
     }
 
-    public func will(finish procedure: Procedure, withErrors errors: [Error], pendingFinish: PendingFinishEvent) {
+    func will(finish procedure: Procedure, withErrors errors: [Error], pendingFinish: PendingFinishEvent) {
         guard let baseProcedure = typedProcedure(procedure, event: .willFinish) else { return }
         wrapped.will(finish: baseProcedure, withErrors: errors, pendingFinish: pendingFinish)
     }
 
-    public func did(finish procedure: Procedure, withErrors errors: [Error]) {
+    func did(finish procedure: Procedure, withErrors errors: [Error]) {
         guard let baseProcedure = typedProcedure(procedure, event: .didFinish) else { return }
         wrapped.did(finish: baseProcedure, withErrors: errors)
     }
 
-    public var eventQueue: DispatchQueueProtocol? {
+    var eventQueue: DispatchQueueProtocol? {
         return wrapped.eventQueue
     }
 }
