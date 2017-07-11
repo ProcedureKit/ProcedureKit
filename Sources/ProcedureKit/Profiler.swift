@@ -193,26 +193,27 @@ extension ProcedureProfiler: ProcedureProfilerReporter {
 
 extension ProcedureProfiler: ProcedureObserver {
 
-    public func didAttach(to procedure: Procedure) {
+    public func didAttach(to procedure: ProcedureProtocol) {
+        guard let typedProcedure: Procedure = typedProcedure(procedure) else { return }
         queue.sync { [unowned self] in
-            self.result = self.result.set(identity: procedure.identity)
+            self.result = self.result.set(identity: typedProcedure.identity)
         }
         addMetric(forEvent: .attached)
     }
 
-    public func will(execute procedure: Procedure, pendingExecute: PendingExecuteEvent) {
+    public func will(execute procedure: ProcedureProtocol, pendingExecute: PendingExecuteEvent) {
         addMetric(forEvent: .started)
     }
 
-    public func did(cancel procedure: Procedure) {
+    public func did(cancel procedure: ProcedureProtocol) {
         addMetric(forEvent: .cancelled)
     }
 
-    public func did(finish procedure: Procedure, withErrors errors: [Error]) {
+    public func did(finish procedure: ProcedureProtocol, withErrors errors: [Error]) {
         addMetric(forEvent: .finished)
     }
 
-    public func procedure(_ procedure: Procedure, willAdd newOperation: Operation) {
+    public func procedure(_ procedure: ProcedureProtocol, willAdd newOperation: Operation) {
         addChild(operation: newOperation)
     }
 }

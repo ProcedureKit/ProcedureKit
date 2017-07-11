@@ -393,30 +393,55 @@ open class ConcurrencyTrackingObserver: ProcedureObserver {
         self.callbackBlock = callbackBlock
     }
 
-    public func didAttach(to procedure: Procedure) {
+    public func didAttach(to procedure: ProcedureProtocol) {
+        guard let typedProcedure: Procedure = typedProcedure(procedure) else { fatalError("ConcurrencyTrackingObserver cannot convert input procedure to `Procedure`.") }
         if let eventTrackingProcedure = procedure as? EventConcurrencyTrackingProcedureProtocol {
             if registrar == nil {
                 registrar = eventTrackingProcedure.concurrencyRegistrar
             }
-            doRun(.observer_didAttach, block: { callback in callbackBlock(procedure, callback) })
+            doRun(.observer_didAttach, block: { callback in callbackBlock(typedProcedure, callback) })
         }
     }
 
-    public func will(execute procedure: Procedure, pendingExecute: PendingExecuteEvent) { doRun(.observer_willExecute, block: { callback in callbackBlock(procedure, callback) }) }
+    public func will(execute procedure: ProcedureProtocol, pendingExecute: PendingExecuteEvent) {
+        guard let typedProcedure: Procedure = typedProcedure(procedure) else { fatalError("ConcurrencyTrackingObserver cannot convert input procedure to `Procedure`.") }
+        doRun(.observer_willExecute, block: { callback in callbackBlock(typedProcedure, callback) })
+    }
 
-    public func did(execute procedure: Procedure) { doRun(.observer_didExecute, block: { callback in callbackBlock(procedure, callback) }) }
+    public func did(execute procedure: ProcedureProtocol) {
+        guard let typedProcedure: Procedure = typedProcedure(procedure) else { fatalError("ConcurrencyTrackingObserver cannot convert input procedure to `Procedure`.") }
+        doRun(.observer_didExecute, block: { callback in callbackBlock(typedProcedure, callback) })
+    }
 
-    public func will(cancel procedure: Procedure, withErrors: [Error]) { doRun(.observer_willCancel, block: { callback in callbackBlock(procedure, callback) }) }
+    public func will(cancel procedure: ProcedureProtocol, withErrors: [Error]) {
+        guard let typedProcedure: Procedure = typedProcedure(procedure) else { fatalError("ConcurrencyTrackingObserver cannot convert input procedure to `Procedure`.") }
+        doRun(.observer_willCancel, block: { callback in callbackBlock(typedProcedure, callback) })
+    }
 
-    public func did(cancel procedure: Procedure, withErrors: [Error]) { doRun(.observer_didCancel, block: { callback in callbackBlock(procedure, callback) }) }
+    public func did(cancel procedure: ProcedureProtocol, withErrors: [Error]) {
+        guard let typedProcedure: Procedure = typedProcedure(procedure) else { fatalError("ConcurrencyTrackingObserver cannot convert input procedure to `Procedure`.") }
+        doRun(.observer_didCancel, block: { callback in callbackBlock(typedProcedure, callback) })
+    }
 
-    public func procedure(_ procedure: Procedure, willAdd newOperation: Operation) { doRun(.observer_procedureWillAdd(newOperation.operationName), block: { callback in callbackBlock(procedure, callback) }) }
+    public func procedure(_ procedure: ProcedureProtocol, willAdd newOperation: Operation) {
+        guard let typedProcedure: Procedure = typedProcedure(procedure) else { fatalError("ConcurrencyTrackingObserver cannot convert input procedure to `Procedure`.") }
+        doRun(.observer_procedureWillAdd(newOperation.operationName), block: { callback in callbackBlock(typedProcedure, callback) })
+    }
 
-    public func procedure(_ procedure: Procedure, didAdd newOperation: Operation) { doRun(.observer_procedureDidAdd(newOperation.operationName), block: { callback in callbackBlock(procedure, callback) }) }
+    public func procedure(_ procedure: ProcedureProtocol, didAdd newOperation: Operation) {
+        guard let typedProcedure: Procedure = typedProcedure(procedure) else { fatalError("ConcurrencyTrackingObserver cannot convert input procedure to `Procedure`.") }
+        doRun(.observer_procedureDidAdd(newOperation.operationName), block: { callback in callbackBlock(typedProcedure, callback) })
+    }
 
-    public func will(finish procedure: Procedure, withErrors errors: [Error], pendingFinish: PendingFinishEvent) { doRun(.observer_willFinish, block: { callback in callbackBlock(procedure, callback) }) }
+    public func will(finish procedure: ProcedureProtocol, withErrors errors: [Error], pendingFinish: PendingFinishEvent) {
+        guard let typedProcedure: Procedure = typedProcedure(procedure) else { fatalError("ConcurrencyTrackingObserver cannot convert input procedure to `Procedure`.") }
+        doRun(.observer_willFinish, block: { callback in callbackBlock(typedProcedure, callback) })
+    }
 
-    public func did(finish procedure: Procedure, withErrors errors: [Error]) { doRun(.observer_didFinish, block: { callback in callbackBlock(procedure, callback) }) }
+    public func did(finish procedure: ProcedureProtocol, withErrors errors: [Error]) {
+        guard let typedProcedure: Procedure = typedProcedure(procedure) else { fatalError("ConcurrencyTrackingObserver cannot convert input procedure to `Procedure`.") }
+        doRun(.observer_didFinish, block: { callback in callbackBlock(typedProcedure, callback) })
+    }
 
     public func doRun(_ callback: EventConcurrencyTrackingRegistrar.ProcedureEvent, withDelay delay: TimeInterval = 0.0001, block: (EventConcurrencyTrackingRegistrar.ProcedureEvent) -> Void = { _ in }) {
         registrar.doRun(callback, withDelay: delay, block: block)

@@ -40,17 +40,19 @@ public struct TimeoutObserver: ProcedureObserver {
         delay = .until(date)
     }
 
-    public func will(execute procedure: Procedure, pendingExecute: PendingExecuteEvent) {
+    public func will(execute procedure: ProcedureProtocol, pendingExecute: PendingExecuteEvent) {
+        guard let typedProcedure: Procedure = typedProcedure(procedure) else { assertionFailure("TimeoutObserver only supports Procedure subclasses."); return }
         switch delay.interval {
         case (let interval) where interval > 0.0:
-            ProcedureTimeoutRegistrar.shared.createFinishTimeout(forProcedure: procedure, withDelay: delay)
+            ProcedureTimeoutRegistrar.shared.createFinishTimeout(forProcedure: typedProcedure, withDelay: delay)
             break
         default: break
         }
     }
 
-    public func did(finish procedure: Procedure, withErrors errors: [Error]) {
-        ProcedureTimeoutRegistrar.shared.registerFinished(procedure: procedure)
+    public func did(finish procedure: ProcedureProtocol, withErrors errors: [Error]) {
+        guard let typedProcedure: Procedure = typedProcedure(procedure) else { assertionFailure("TimeoutObserver only supports Procedure subclasses."); return }
+        ProcedureTimeoutRegistrar.shared.registerFinished(procedure: typedProcedure)
     }
 }
 
