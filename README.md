@@ -33,7 +33,7 @@ The current version of ProcedureKit supports Swift 3+, and the use of Xcode 8.2+
 
 ## Installing ProcedureKit
 
-See the [Getting Started / Installing](http://procedure.kit.run/development/guides/) guide. 
+See the [Installing ProcedureKit](http://procedure.kit.run/development/installing-procedurekit.html) guide. 
 
 ## Usage
 

@@ -1,6 +1,6 @@
 {
   "xcodebuild_arguments": [
-  	"-project", "sources/ProcedureKit/ProcedureKit.xcodeproj", 
+  	"-project", "ProcedureKit.xcodeproj", 
   	"-scheme", "ProcedureKit"],
   "author": "ProcedureKit Contributors",
   "author_url": "https://github.com/ProcedureKit",
@@ -42,5 +42,5 @@
 	    "Advanced Groups",
 	    "Advanced Result Injection"
 	]}
-  }]
+  ]
 }
