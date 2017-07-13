@@ -342,7 +342,7 @@ class QualityOfServiceTests: ProcedureKitTestCase {
                 recordedQoSClass.overwrite(with: DispatchQueue.currentQoSClass)
             }
             procedure.qualityOfService = desiredQoS
-            wait(for: procedure)
+            wait(for: procedure, withExpectationDescription: "Procedure Did Finish (QoSClassLevel: \(desiredQoS.qosClass))")
             XCTAssertEqual(recordedQoSClass.access, desiredQoS.qosClass)
         }
     }
@@ -355,7 +355,7 @@ class QualityOfServiceTests: ProcedureKitTestCase {
                 recordedQoSClass.overwrite(with: DispatchQueue.currentQoSClass)
             }
             procedure.qualityOfService = desiredQoS
-            wait(for: procedure)
+            wait(for: procedure, withExpectationDescription: "Procedure Did Finish (QoSClassLevel: \(desiredQoS.qosClass))")
             XCTAssertEqual(recordedQoSClass.access, desiredQoS.qosClass)
         }
     }
@@ -380,7 +380,7 @@ class QualityOfServiceTests: ProcedureKitTestCase {
                 recordedQoSClass_willExecute.overwrite(with: DispatchQueue.currentQoSClass)
             }
             procedure.qualityOfService = desiredQoS
-            wait(for: procedure)
+            wait(for: procedure, withExpectationDescription: "Procedure Did Finish (QoSClassLevel: \(desiredQoS.qosClass))")
             XCTAssertGreaterThanOrEqual(recordedQoSClass_willExecute_otherQueue.access, desiredQoS.qosClass)
             XCTAssertEqual(recordedQoSClass_willExecute.access, desiredQoS.qosClass)
             XCTAssertEqual(recordedQoSClass_execute.access, desiredQoS.qosClass)
