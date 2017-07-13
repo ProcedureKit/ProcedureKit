@@ -25,7 +25,7 @@
 	    "From PSOperations",
 	    "From v3 Operations"
 	]}, {
-	"name": "Core Features",
+	"name": "Basic Features",
 	"children": [
 	    "Observers",
 	    "Conditions",
@@ -40,6 +40,34 @@
 	    "Logging",
 	    "Advanced Groups",
 	    "Advanced Result Injection"
+	]}, {
+	"name": "Core",
+	"children": [
+	    "Procedure",
+	    "ProcedureQueue",
+	    "ProcedureObserver",
+	    "ProcedureProtocol",
+	    "Condition",
+	    "Logging"	    
+	]}, {
+	"name": "Conditions",
+	"children": [
+	    "BlockCondition",
+	    "NegatedContion",
+	    "SilentCondition",
+	    "NoFailedDependenciesCondition",
+	    "MutualExclusion"
+	]}, {
+	"name": "Observers",
+	"children": [
+	    "BlockObserver",
+	    "WillExecuteObserver",
+	    "DidExecuteObserver",
+	    "DidCancelObserver",
+	    "WillAddOperationObserver",
+	    "DidAddOperationObserver",
+	    "WillFinishObserver",
+	    "DidFinishObserver"
 	]}
   ]
 }
