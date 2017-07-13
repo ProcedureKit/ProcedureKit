@@ -23,8 +23,7 @@
 	    "From NSOperation",
 	    "From WWDC2015",
 	    "From PSOperations",
-	    "From ProcedureKit v3",
-	    "From ProcedureKit v4"
+	    "From v3 Operations"
 	]}, {
 	"name": "Core Features",
 	"children": [

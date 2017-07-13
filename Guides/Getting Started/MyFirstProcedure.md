@@ -1,6 +1,6 @@
 # Creating MyFirstProcedure
 
-`Procedure` is a `Foundation.Operation` subclass. It is also an abstract class which *must* be subclassed.
+[`Procedure`](Classes/Procedure.html) is a `Foundation.Operation` subclass. It is also an abstract class which *must* be subclassed.
 
 Here is a simple example. 
 

@@ -2,7 +2,7 @@
 
 *ProcedureKit* is a framework which provides advanced features to [`Foundation.Operation`](https://developer.apple.com/reference/foundation/operation) and [`Foundation.OperationQueue`](https://developer.apple.com/reference/foundation/operationqueue). 
 
-`Procedure` is a subclass of `Foundation.Operation` and is used to perform *work* on an instance of `ProcedureQueue` which is a subclass of `Foundation.OperationQueue`. `Procedure` itself however is an abstract class and should always be subclassed to specialize the *work*.
+[`Procedure`](Classes/Procedure.html) is a subclass of `Foundation.Operation` and is used to perform *work* on an instance of `ProcedureQueue` which is a subclass of `Foundation.OperationQueue`. `Procedure` itself however is an abstract class and should always be subclassed to specialize the *work*.
 
 What do we mean by *work*? This is anything (programmatic), for example number crunching, data processing, parsing or retrieval, view controller presentation, seriously - anything.
 
