@@ -33,7 +33,7 @@
 	    "Cancellation",
 	    "Mutual Exclusivity",
 	    "Groups",
-	    "Result Injection"
+	    "Dependency Injection"
 	]}, {
 	"name": "Advanced Features",
 	"children": [

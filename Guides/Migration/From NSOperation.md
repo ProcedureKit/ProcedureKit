@@ -16,7 +16,7 @@ A cheat-sheet for the _ProcedureKit_ replacements for _Foundation.Operation_ con
 | OperationQueue | ProcedureQueue | [Compare](#operationqueue--procedurequeue) |
 | BlockOperation | BlockProcedure | [Compare](#blockoperation--blockprocedure) |
 
-### Operation → [[Procedure]]
+### Operation → [Procedure](Procedure.html)
 
 #### Core Differences:
 - A `Procedure` **must** be added to a `ProcedureQueue`. It cannot be started manually.
@@ -24,12 +24,12 @@ A cheat-sheet for the _ProcedureKit_ replacements for _Foundation.Operation_ con
 - A `Procedure` cannot override `cancel()` or several other `Operation` methods - safer alternatives (like Observers) are provided.
 
 #### Core Additional Functionality:
-- A `Procedure` supports [[Observers]] for executing code in response to `Procedure` events, which have numerous advantages over KVO on `Operation`.
-- A `Procedure` supports [[Conditions]]. Before a `Procedure` is ready to execute it will asynchronously evaluate all of its conditions. If any condition fails, it finishes with an error instead of executing.
+- A `Procedure` supports [Observers](Observers.html) for executing code in response to `Procedure` events, which have numerous advantages over KVO on `Operation`.
+- A `Procedure` supports [Conditions](Conditions.html). Before a `Procedure` is ready to execute it will asynchronously evaluate all of its conditions. If any condition fails, it finishes with an error instead of executing.
 - `Procedure` has its own internal logging functionality that can be easily customized to [[support third-party logging frameworks or custom logging|Custom-Logging]] for easy debugging.
-- `Procedures` can support the property of [[Mutual Exclusion]].
+- `Procedures` can support the property of [Mutual Exclusion](Mutual-Exclusion.html).
 
-### OperationQueue → [[ProcedureQueue]]
+### OperationQueue → [ProcedureQueue](ProcedureQueue.html)
 
 A `ProcedureQueue` can be a drop-in replacement for an `OperationQueue`, and supports the same API and functionality as `OperationQueue`.
 
@@ -37,7 +37,7 @@ A `ProcedureQueue` can be a drop-in replacement for an `OperationQueue`, and sup
 - Full `Procedure` support.
 - Supports a `ProcedureQueueDelegate` to receive asynchronous callbacks when events (like adding a new `Operation` / `Procedure`) occur.
 
-### BlockOperation → [[BlockProcedure]]
+### BlockOperation → [BlockProcedure](BlockProcedure.html)
 
 In essentially all cases, `BlockProcedure` can be a drop-in replacement for `BlockOperation`, but provides all the additional functionality of a `Procedure` ([see above](#operation--procedure)).
 
@@ -46,7 +46,7 @@ In essentially all cases, `BlockProcedure` can be a drop-in replacement for `Blo
 - Dependency Injection
 - GroupProcedure
 
-## [[Dependency Injection]]
+## [Dependency Injection](Dependency-Injection.html)
 
 Often, `Procedure`s will need dependencies in order to execute. As is typical with asynchronous / event-based applications, these dependencies might not be known at creation time. Instead they must be injected after the `Procedure` is initialised, but before it is executed.
 
