@@ -50,9 +50,9 @@ In essentially all cases, `BlockProcedure` can be a drop-in replacement for `Blo
 
 Often, `Procedure`s will need dependencies in order to execute. As is typical with asynchronous / event-based applications, these dependencies might not be known at creation time. Instead they must be injected after the `Procedure` is initialised, but before it is executed.
 
-_ProcedureKit_ supports this via a set of [[protocols and types which work together|Dependency-Injection]]. We think this pattern is great, as it encourages the composition of small single purpose procedures. These are easier to test and potentially enable greater re-use. You will find dependency injection used and encouraged throughout this framework.
+_ProcedureKit_ supports this via a set of [protocols and types which work together](Dependency-Injection.html). We think this pattern is great, as it encourages the composition of small single purpose procedures. These are easier to test and potentially enable greater re-use. You will find dependency injection used and encouraged throughout this framework.
 
-## [[GroupProcedure]]
+## [GroupProcedure](GroupProcedure.html)
 
 A `GroupProcedure` can be used to create a logical grouping of "child" `Operations` / `Procedures` that run on its own (private) queue.
 
