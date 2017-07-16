@@ -474,6 +474,11 @@ open class Procedure: Operation, ProcedureProtocol {
 
     // MARK: - Execution
 
+    /// Called by the framework before a Procedure is added to a ProcedureQueue.
+    ///
+    /// NOTE: Do *NOT* call this function directly.
+    ///
+    /// - Parameter queue: the ProcedureQueue onto which the Procedure will be added
     public final func willEnqueue(on queue: ProcedureQueue) {
         stateLock.withCriticalScope {
             _state = .willEnqueue
@@ -481,6 +486,10 @@ open class Procedure: Operation, ProcedureProtocol {
         }
     }
 
+    /// Called by the framework before a Procedure is added to a ProcedureQueue, but *after*
+    /// the ProcedureQueue delegate's `procedureQueue(_:willAddProcedure:context:)` is called.
+    ///
+    /// NOTE: Do *NOT* call this function directly.
     public final func pendingQueueStart() {
         let optionalConditionEvaluator: EvaluateConditions? = stateLock.withCriticalScope {
             _state = .pending
@@ -532,6 +541,29 @@ open class Procedure: Operation, ProcedureProtocol {
         if evaluator.isReady {
             evaluator.dispatchStartOnce()
         }
+    }
+
+    /// Called by the framework after a Procedure is added to a ProcedureQueue.
+    /// The Procedure may have already been scheduled for / started executing.
+    /// This is only used to manage when it's safe to begin evaluating conditions.
+    internal final func postQueueAdd() {
+        guard let evaluateConditionsProcedure = evaluateConditionsProcedure else { return }
+
+        // If this Procedure has a condition evaluator, the condition evaluator must not
+        // finish prior to the return of the internal OperationQueue.addOperation() call
+        // in ProcedureQueue that adds this Procedure to the ProcedureQueue's underlying
+        // OperationQueue.
+        //
+        // (If the EvaluateConditions operation finishes while the underlying OperationQueue
+        // implementation is in the process of adding the operation, a rare race condition may
+        // be triggered with NSOperationQueue's handling of the Operation isReady state for
+        // the Procedure. This can result in a situation in which a Procedure with, for
+        // example, failing conditions ends up cancelled + ready but never finishes.)
+        //
+        // To accomplish this, signal to the EvaluateConditions operation that it is now safe 
+        // (post-add) to begin evaluating conditions (assuming it is otherwise ready).
+
+        evaluateConditionsProcedure.procedureHasBeenAddedToQueue()
     }
 
     /// Starts the operation, correctly managing the cancelled state. Cannot be over-ridden
@@ -1295,6 +1327,7 @@ extension Procedure {
             }
 
             case waitingOnProcedureDependencies
+            case waitingForProcedureToBeAddedToQueue
             case dispatchedStart
             case started
             case executingMain
@@ -1312,10 +1345,19 @@ extension Procedure {
             super.init()
         }
 
+        func procedureHasBeenAddedToQueue() {
+            // Only once the related procedure has been fully added to the ProcedureQueue
+            // (OperationQueue) is it safe to begin evaluating conditions (if otherwise ready).
+
+            // start the evaluation of conditions *only if* otherwise ready
+            dispatchStartOnce(source: .procedureHasBeenAddedToQueue)
+        }
+
         private var _isFinished: Bool = false
         private var _isExecuting: Bool = false
         private let stateLock = PThreadMutex()
         private var _state: State = .waitingOnProcedureDependencies
+        private var _procedureHasBeenAddedToQueue: Bool = false
 
         override var isFinished: Bool {
             get { return stateLock.withCriticalScope { return _isFinished } }
@@ -1338,15 +1380,34 @@ extension Procedure {
             let superIsReady = super.isReady
             if superIsReady {
                 // If super.isReady == true, dispatch start *once*
-                dispatchStartOnce()
+                dispatchStartOnce(source: .isReady)
             }
             return superIsReady
         }
 
-        final func dispatchStartOnce() {
+        private enum StartSource {
+            case isReady
+            case procedureHasBeenAddedToQueue
+        }
+        final private func dispatchStartOnce(source: StartSource) {
             // dispatch start() once
             let shouldDispatchStart: Bool = stateLock.withCriticalScope {
-                guard _state < .dispatchedStart else { return false }
+                guard _state < .dispatchedStart else { return false } // already started evaluating
+                switch source {
+                case .isReady:
+                    // isReady can proceed to .dispatchedStart *if* _procedureHasBeenAddedToQueue
+                    guard _procedureHasBeenAddedToQueue else {
+                        // all dependencies are finished, but the procedure hasn't yet been added
+                        // to the queue - wait until it is
+                        _state = .waitingForProcedureToBeAddedToQueue
+                        return false
+                    }
+                case .procedureHasBeenAddedToQueue:
+                    assert(!_procedureHasBeenAddedToQueue)
+                    _procedureHasBeenAddedToQueue = true
+                    // can proceed to .dispatchedStart *if* otherwise ready (i.e. if state == waitingForProcedureToBeAddedToQueue)
+                    guard _state == .waitingForProcedureToBeAddedToQueue else { return false }
+                }
                 _state = .dispatchedStart
                 return true
             }
@@ -1354,6 +1415,9 @@ extension Procedure {
             queue.async {
                 self.start()
             }
+        }
+        final fileprivate func dispatchStartOnce() {
+            dispatchStartOnce(source: .isReady)
         }
 
         final override func cancel() {
