@@ -28,6 +28,3 @@ jobs:
       script: bundle exec fastlane mac test_mac
     - stage: Stress Test
       script: bundle exec fastlane mac stress_test
-branches:
-  only:
-    - master
