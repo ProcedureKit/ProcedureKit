@@ -99,11 +99,11 @@ public class NetworkObserver: ProcedureObserver {
         networkActivityController = controller
     }
 
-    public func will(execute procedure: Procedure, pendingExecute: PendingExecuteEvent) {
+    public func will(execute procedure: ProcedureProtocol, pendingExecute: PendingExecuteEvent) {
         networkActivityController.start()
     }
 
-    public func did(finish procedure: Procedure, withErrors errors: [Error]) {
+    public func did(finish procedure: ProcedureProtocol, withErrors errors: [Error]) {
         networkActivityController.stop()
     }
 }

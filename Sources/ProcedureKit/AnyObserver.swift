@@ -5,7 +5,7 @@
 //
 
 import Foundation
-
+/*
 class AnyObserverBox_<Procedure: ProcedureProtocol>: ProcedureObserver {
     func didAttach(to procedure: Procedure) { _abstractMethod() }
     func will(execute procedure: Procedure, pendingExecute: PendingExecuteEvent) { _abstractMethod() }
@@ -107,3 +107,4 @@ public struct AnyObserver<Procedure: ProcedureProtocol>: ProcedureObserver {
         return box.eventQueue
     }
 }
+*/

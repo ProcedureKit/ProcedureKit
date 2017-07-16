@@ -71,7 +71,7 @@ class ProfilerTests: ProcedureKitTestCase {
 
     func test__profile_simple_operation_which_cancels() {
 
-        procedure.add(observer: WillExecuteObserver { op, _ in
+        procedure.add(observer: WillExecuteObserver<TestProcedure> { op, _ in
             op.cancel()
         })
         procedure.add(observer: profiler)

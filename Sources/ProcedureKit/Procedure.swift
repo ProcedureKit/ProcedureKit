@@ -325,7 +325,7 @@ open class Procedure: Operation, ProcedureProtocol {
     fileprivate class ProtectedProperties {
         var log: LoggerProtocol = Logger()
         var errors = [Error]()
-        var observers = [AnyObserver<Procedure>]()
+        var observers = [ProcedureObserver]()
         var directDependencies = Set<Operation>()
         var conditions = Set<Condition>()
     }
@@ -401,7 +401,7 @@ open class Procedure: Operation, ProcedureProtocol {
 
     // MARK: Observers
 
-    final internal var observers: [AnyObserver<Procedure>] {
+    final internal var observers: [ProcedureObserver] {
         get {
             return stateLock.withCriticalScope { protectedProperties.observers }
         }
@@ -1169,7 +1169,7 @@ open class Procedure: Operation, ProcedureProtocol {
 
      - parameter observer: type conforming to protocol `ProcedureObserver`.
      */
-    open func add<Observer: ProcedureObserver>(observer: Observer) where Observer.Procedure == Procedure {
+    open func add(observer: ProcedureObserver) {
         assert(state < .pending, "Adding observers to a Procedure after it has been added to a queue is an inherent race condition, and risks missing events.")
 
         dispatchEvent {
@@ -1178,7 +1178,7 @@ open class Procedure: Operation, ProcedureProtocol {
 
             // Add the observer to the internal observers array
             self.stateLock.withCriticalScope {
-                self.protectedProperties.observers.append(AnyObserver(base: observer))
+                self.protectedProperties.observers.append(observer)
             }
 
             // Dispatch the DidAttach event to the observer
@@ -1213,7 +1213,7 @@ open class Procedure: Operation, ProcedureProtocol {
     ///   - block: a block that will be called for every observer, on the appropriate queue/thread
     /// - Returns: a DispatchGroup that will be signaled (ready) when the PendingEvent is ready (i.e. when
     //             all of the observers have completed their work)
-    internal func dispatchObservers(pendingEvent: (Procedure) -> PendingEvent, block: @escaping (AnyObserver<Procedure>, PendingEvent) -> Void) -> DispatchGroup {
+    internal func dispatchObservers(pendingEvent: (Procedure) -> PendingEvent, block: @escaping (ProcedureObserver, PendingEvent) -> Void) -> DispatchGroup {
         debugAssertIsOnEventQueue() // This function should only be called if already on the EventQueue
 
         let iterator = observers.makeIterator()
@@ -1223,8 +1223,8 @@ open class Procedure: Operation, ProcedureProtocol {
         return pendingEvent.group
     }
 
-    typealias ObserverIterator = IndexingIterator<[AnyObserver<Procedure>]>
-    private func processObservers(iterator: ObserverIterator, futureEvent: PendingEvent, block: @escaping (AnyObserver<Procedure>, PendingEvent) -> Void) {
+    typealias ObserverIterator = IndexingIterator<[ProcedureObserver]>
+    private func processObservers(iterator: ObserverIterator, futureEvent: PendingEvent, block: @escaping (ProcedureObserver, PendingEvent) -> Void) {
         debugAssertIsOnEventQueue() // This function should only be called if already on the EventQueue
 
         var modifiableIterator = iterator

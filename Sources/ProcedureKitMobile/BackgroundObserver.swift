@@ -79,13 +79,13 @@ public class BackgroundObserver: NSObject, ProcedureObserver {
         }
     }
 
-    public func didAttach(to procedure: Procedure) {
+    public func didAttach(to procedure: ProcedureProtocol) {
         stateLock.withCriticalScope {
             _log = procedure.log
         }
     }
 
-    public func did(finish procedure: Procedure, withErrors errors: [Error]) {
+    public func did(finish procedure: ProcedureProtocol, withErrors errors: [Error]) {
         removeNotificationCenterObservers()
         endBackgroundTask()
     }
