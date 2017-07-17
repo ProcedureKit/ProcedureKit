@@ -30,12 +30,14 @@
 	    "Observers",
 	    "Conditions",
 	    "Cancellation",
-	    "Mutual Exclusion",
 	    "Groups",
 	    "Result Injection"
 	]}, {
 	"name": "Advanced Features",
 	"children": [
+	    "Custom Observers",	
+	    "Mutual Exclusion",	
+	    "Advanced Conditions",
 	    "Capabilities",
 	    "Logging",
 	    "Advanced Groups",
