@@ -1,5 +1,9 @@
 # Observers
 
+_Observers watch procedures_
+
+--
+
 When a procedure is added to a queue, it moves through its own internal state, as discussed in [Scheduling](Classes\Scheduling.html). Key transitions between these states are referred to as events, and each state transition can be observed.
 
 Observers are attached to the procedure. When an event occurs, the method equivalent to the state transition will be invoked. The [`ProcedureObserver`](Protocols\ProcedureObserver.html) defines all the methods, and there are empty default implementations provided. This is because typically an observer is only for a particular transition, such as the procedure cancelling or finishing.

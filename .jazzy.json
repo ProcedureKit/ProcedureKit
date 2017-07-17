@@ -30,9 +30,9 @@
 	    "Observers",
 	    "Conditions",
 	    "Cancellation",
-	    "Mutual Exclusivity",
+	    "Mutual Exclusion",
 	    "Groups",
-	    "Dependency Injection"
+	    "Result Injection"
 	]}, {
 	"name": "Advanced Features",
 	"children": [
