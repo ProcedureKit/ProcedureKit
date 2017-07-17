@@ -329,6 +329,8 @@ open class ProcedureQueue: OperationQueue {
 
         super.addOperation(procedure)
 
+        procedure.postQueueAdd()
+
         // DidAddProcedure delegate
         delegate?.procedureQueue(self, didAddProcedure: procedure, context: context)
 
