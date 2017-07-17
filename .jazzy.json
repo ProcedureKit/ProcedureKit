@@ -31,7 +31,8 @@
 	    "Conditions",
 	    "Cancellation",
 	    "Groups",
-	    "Result Injection"
+	    "Result Injection",
+	    "Logging"
 	]}, {
 	"name": "Advanced Features",
 	"children": [
@@ -39,9 +40,18 @@
 	    "Mutual Exclusion",	
 	    "Advanced Conditions",
 	    "Capabilities",
-	    "Logging",
 	    "Advanced Groups",
-	    "Advanced Result Injection"
+	    "Advanced Result Injection",
+	    "Custom Logging"
+	]}, {
+	"name": "Built-in Procedures",
+	"children": [
+	    "BlockProcedure",	
+	    "ComposedProcedure",	
+	    "GatedProcedure",
+	    "DelayProcedure",
+	    "RepeatProcedure",
+	    "RetryProcedure"
 	]}, {
 	"name": "Core",
 	"children": [
@@ -49,10 +59,9 @@
 	    "ProcedureQueue",
 	    "ProcedureObserver",
 	    "ProcedureProtocol",
-	    "Condition",
-	    "Logging"	    
+	    "Condition"
 	]}, {
-	"name": "Conditions",
+	"name": "Built-in Conditions",
 	"children": [
 	    "BlockCondition",
 	    "NegatedContion",
@@ -60,7 +69,7 @@
 	    "NoFailedDependenciesCondition",
 	    "MutualExclusion"
 	]}, {
-	"name": "Observers",
+	"name": "Built-in Observers",
 	"children": [
 	    "BlockObserver",
 	    "WillExecuteObserver",
