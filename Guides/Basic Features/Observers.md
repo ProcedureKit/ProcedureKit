@@ -2,7 +2,7 @@
 
 _Observers watch procedures_
 
---
+---
 
 When a procedure is added to a queue, it moves through its own internal state, as discussed in [Scheduling](Classes\Scheduling.html). Key transitions between these states are referred to as events, and each state transition can be observed.
 

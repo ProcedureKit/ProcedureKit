@@ -2,7 +2,8 @@
 
 _Makes procedures exclusive_
 
---
+---
+
 A condition can assert whether its procedure should be evaluated exclusively with respect to other procedures. This can be very handy for preventing procedures from executing at the same time.
 
 For example, if our application presents a modal alert, by adding a mutually exclusive condition, it will prevent any other modal alert from being presented. Given the nature of event based applications this would otherwise be quite tricky. We would write this:
@@ -47,7 +48,7 @@ Then in the procedure, add a condition for mutual exclusion:
 procedure.add(condition: MutuallyExclusive<CoreDataWork>())
 ```
 
-## Using categories string
+## Using the `category` string
 
 The _mutual exclusion type_ is a convenience to add some strong typing to `MutualExclusion`. However if using `String` categories names is easier, that works too:
 

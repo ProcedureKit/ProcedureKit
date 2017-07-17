@@ -2,7 +2,7 @@
 
 _Conditions (can) prevent procedures from starting_.
 
---
+---
 
 Conditions are types which can be attached to a procedure, and multiple conditions can be attached to the same procedure. Before the procedure executes, it asynchronously _evaluates_ all of its conditions. If any condition fails, the procedure is canceled with an error instead of executing.
 
@@ -50,14 +50,40 @@ and for a false value:
 
 The key point is that the greeting procedure, which is added a dependency executes first, and then the condition (and all other conditions) is evaluated.
 
-## Creating a custom Condition
+_ProcedureKit_ has several built-in Conditions, like `BlockCondition` and `MutuallyExclusive<T>`. It is also easy to implement your own.
 
-While there are many built in conditions available in the framework, and `BlockCondition` offer excellent utility, creating a custom condition is pretty straightforward too.
+## Implementing a custom Condition
 
-1. Subclass `Condition`
-2. Override `evaluate(procedure:completion:)`
+First, subclass `Condition`. Then, override `evaluate(procedure:completion:)`. Here is a simple example of `FalseCondition` which is part of the framework:
+
+```swift
+class FalseCondition: Condition {
+     override func evaluate(procedure: Procedure, completion: @escaping (ConditionResult) -> Void) {
+        completion(.failure(ProcedureKitError.FalseCondition()))
+     }
+}
+```
 
 This method receives the procedure instance which the condition has been attached to, and should called the (escaping) completion handler with the result. This means that it is possible to evaluate the condition asynchronously. The result of the evaluation is a `ConditionResult`, which is a typealias for `ProcedureResult<Bool>`.
+
+### Calling the completion BlockCondition
+
+Your `evaluate(procedure:completion:)` override *must* eventually call the completion block with a `ConditionResult`. (Although it may, of course, be called asynchronously.)
+
+`ConditionResult` encompasses 3 states:
+1. `.success(true)`, the "successful" result
+2. `.failure(let error: Error)`, the "failure" result
+3. `.success(false)`, an "ignored" result
+
+
+Generally:
+ - If a Condition *succeeds*, return `.success(true)`.
+ - If a Condition *fails*, return `.failure(error)` with a unique error defined for your Condition.
+
+ In some situations, it can be beneficial for a Procedure to not collect an
+ error if an attached condition fails. You can use `IgnoredCondition` to
+ suppress the error associated with any Condition. This is generally
+ preferred (greater utility, flexibility) to returning `.success(false)` directly.
 
 ## Indirect Dependencies
 
