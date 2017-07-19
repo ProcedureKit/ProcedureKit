@@ -41,8 +41,15 @@ You can add _ProcedureKit_ to your project, by following [Apple's guidelines](ht
 
 #### CocoaPods
 
-ProcedureKit is available through [CocoaPods](https://cocoapods.org/pods/ProcedureKit). To install
-it, include it in your Podfile. Here is a full example of a cross platform application with unit test support. In this case, _ProcedureKit_ has been included via submodules.
+ProcedureKit is available through [CocoaPods](https://cocoapods.org/pods/ProcedureKit). To install it, include it in your Podfile. For example on iOS you can:
+
+```ruby
+  pod 'ProcedureKit/All'
+  # Or this subspec is the iOS only UIKit related stuff
+  pod 'ProcedureKit/Mobile'
+```
+
+Here is a full example of a cross platform application with unit test support. In this case, _ProcedureKit_ has been included via submodules.
 
 ```ruby
 target 'MyApp' do
