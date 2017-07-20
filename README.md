@@ -14,7 +14,8 @@ A Swift framework inspired by WWDC 2015 Advanced NSOperations session. Previousl
 Resource | Where to find it
 ---------|-----------------
 Session video | [developer.apple.com](https://developer.apple.com/videos/wwdc/2015/?id=226)
-Reference documentation | [docs.danthorpe.me/operations](http://docs.danthorpe.me/operations/2.9.0/index.html)
+Old but more complete reference documentation | [docs.danthorpe.me/operations](http://docs.danthorpe.me/operations/2.9.0/index.html)
+Updated but not yet complete reference docs | [procedure.kit.run/development] (http://procedure.kit.run/development/index.html)
 Programming guide | [operations.readme.io](https://operations.readme.io)
 Example projects | [danthorpe/Examples](https://github.com/danthorpe/Examples)
 
