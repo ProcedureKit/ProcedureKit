@@ -27,12 +27,20 @@ cat <<-YAML
 
   - wait
 
-  - block: ":aws: Docs"
-    branches: "!feature/*"
+YAML
 
-  - label: ":aws:"
+if [[ "$BUILDKITE_BUILD_CREATOR" != "Daniel Thorpe" ]]; then
+cat <<-YAML
+
+  - block: "Docs"
+
+YAML
+fi
+
+cat <<-YAML
+
+  - label: ":aws: Generate"
     trigger: "procedurekit-documentation"
-    branches: "!feature/*"  
     build:
       message: "Generating documentation for ProcedureKit"
       commit: "HEAD"
