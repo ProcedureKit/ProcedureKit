@@ -35,6 +35,7 @@ cat <<-YAML
   - block: "Docs"
 
 YAML
+fi
 
 cat <<-YAML
 
