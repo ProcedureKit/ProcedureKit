@@ -27,7 +27,16 @@ cat <<-YAML
 
   - wait
 
+YAML
+
+if [[ "$BUILDKITE_BUILD_CREATOR" != "Daniel Thorpe" ]]; then
+cat <<-YAML
+
   - block: "Docs"
+
+YAML
+
+cat <<-YAML
 
   - label: ":aws: Generate"
     trigger: "procedurekit-documentation"
