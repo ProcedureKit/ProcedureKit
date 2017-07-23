@@ -19,13 +19,13 @@ In general, `Procedure` instances should not call `cancel()` on themselves. Inst
     Potentially here, the app delegate may signal to any running procedures to `cancel()`.
     
 3. A `Procedure`'s dependency finishes with errors.
-    In this scenario, a procedure is waiting for the results of another procedure. However, if the dependency finishes unsuccessfully, the waiting procedure aught to be cancelled. This is likely done from within a `DidFinishObserver` which will call `cancel(withError:)` on the waiting procedure. The framework does this automatically with the `inject(result:)` APIs.
+    In this scenario, a procedure is waiting for the results of another procedure. However, if the dependency finishes unsuccessfully, the waiting procedure aught to be cancelled. This is likely done from within a *DidCancelObserver* which will call `cancel(withError:)` on the waiting procedure. The framework does this automatically with the `inject(result:)` APIs.
     
 In all of these example, `cancel()` is invoked on the procedure from outside. In all situations, the `Procedure` needs to ensure that it _handles_ cancellation correctly.
 
 ## Handling Cancellation
 
-Once a procedure is cancelled, it must move to the finished state. **It is the responsibility of the `Procedure` subclass to cancel its work and move to the finished state as soon as is practical once cancelled.*
+Once a procedure is cancelled, it must move to the finished state. *It is the responsibility of the `Procedure` subclass to cancel its work and move to the finished state as soon as is practical once cancelled.*
 
 We call handling cancellation and moving to the finished state quickly once cancelled being *responsive to cancellation*.
 
