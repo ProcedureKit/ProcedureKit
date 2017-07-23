@@ -1,6 +1,6 @@
 # Handling Cancellation in Asynchronous Procedures
 
---
+---
 
 An *Asynchronous* procedure may return from its `execute()` method without _finishing_, and then call `finish()` some time later. Typically this happens in a completion block of another asynchronous API.
 

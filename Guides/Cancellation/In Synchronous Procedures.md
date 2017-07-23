@@ -1,6 +1,6 @@
 # Handling Cancellation in Synchronous Procedures
 
---
+---
 
 A _synchronous_ `Procedure` performs all its work as part of its `execute()` method, and calls `finish()` before returning.
 
