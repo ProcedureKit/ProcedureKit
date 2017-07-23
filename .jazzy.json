@@ -35,9 +35,9 @@
 	]}, {
 	"name": "Cancellation",
 	"children": [
-	    "Understanding Cancellation",	
-	    "Cancelling Synchronous Procedures",	
-	    "Cancelling Asynchronous Procedures"
+	    "Understanding Cancellation",
+	    "Cancelling in Synchronous Procedures",	
+	    "Cancelling in Asynchronous Procedures"
 	]}, {
 	"name": "Advanced Features",
 	"children": [
