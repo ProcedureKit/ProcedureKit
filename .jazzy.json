@@ -29,10 +29,15 @@
 	"children": [
 	    "Observers",
 	    "Conditions",
-	    "Cancellation",
 	    "Groups",
 	    "Result Injection",
 	    "Logging"
+	]}, {
+	"name": "Cancellation",
+	"children": [
+	    "Understanding Cancellation",	
+	    "Cancelling Synchronous Procedures",	
+	    "Cancelling Asynchronous Procedures"
 	]}, {
 	"name": "Advanced Features",
 	"children": [
