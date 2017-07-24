@@ -342,7 +342,7 @@ public extension ProcedureQueue {
     /**
      Add operations to the queue as an array
      
-     - parameters operations: a sequence of `NSOperation` instances.
+     - parameter operations: a sequence of `Operation` instances.
      - parameter context: an optional parameter that is passed-through to the Will/DidAdd delegate callbacks
      - returns: a ProcedureFuture that is signaled once the operations have been added to the ProcedureQueue
      */
@@ -359,7 +359,7 @@ public extension ProcedureQueue {
     /**
      Add operations to the queue as a variadic parameter
 
-     - parameters operations: a variadic array of `NSOperation` instances.
+     - parameter operations: a variadic array of `Operation` instances.
      - parameter context: an optional parameter that is passed-through to the Will/DidAdd delegate callbacks
      - returns: a ProcedureFuture that is signaled once the operations have been added to the ProcedureQueue
      */
@@ -373,7 +373,7 @@ public extension OperationQueue {
 
     /**
      Add operations to the queue as an array
-     - parameters operations: a array of `NSOperation` instances.
+     - parameter operations: a array of `Operation` instances.
      */
     final func add<S>(operations: S) where S: Sequence, S.Iterator.Element: Operation {
         addOperations(Array(operations), waitUntilFinished: false)
@@ -381,7 +381,7 @@ public extension OperationQueue {
 
     /**
      Add operations to the queue as a variadic parameter
-     - parameters operations: a variadic array of `NSOperation` instances.
+     - parameter operations: a variadic array of `Operation` instances.
      */
     final func add(operations: Operation...) {
         add(operations: operations)

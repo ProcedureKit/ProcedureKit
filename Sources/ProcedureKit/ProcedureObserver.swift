@@ -31,12 +31,12 @@ public protocol ProcedureObserver {
     /**
      The procedure did execute.
 
-     - notes: this observer will be invoked directly after the
-     `execute` returns.
+     - note: This observer will be invoked directly after the
+     `execute` method of the procedure returns.
 
-     - warning: there are no guarantees about when this observer
+     - warning: There are no guarantees about when this observer
      will be called, relative to the lifecycle of the procedure. It
-     is entirely possible that the procedure, will actually
+     is entirely possible that the procedure will actually
      have already finished be the time the observer is invoked. See
      the conversation here which explains the reasoning behind it:
      https://github.com/ProcedureKit/ProcedureKit/pull/554
@@ -105,22 +105,31 @@ public extension ProcedureObserver {
 
 public extension ProcedureObserver {
 
+    /// Do nothing.
     func didAttach(to procedure: Procedure) { }
 
+    /// Do nothing.
     func will(execute procedure: Procedure, pendingExecute: PendingExecuteEvent) { }
 
+    /// Do nothing.
     func did(execute procedure: Procedure) { }
 
+    /// Do nothing.
     func did(cancel procedure: Procedure, withErrors: [Error]) { }
 
+    /// Do nothing.
     func procedure(_ procedure: Procedure, willAdd newOperation: Operation) { }
 
+    /// Do nothing.
     func procedure(_ procedure: Procedure, didAdd newOperation: Operation) { }
 
+    /// Do nothing.
     func will(finish procedure: Procedure, withErrors errors: [Error], pendingFinish: PendingFinishEvent) { }
 
+    /// Do nothing.
     func did(finish procedure: Procedure, withErrors errors: [Error]) { }
 
+    /// - Returns: nil
     var eventQueue: DispatchQueueProtocol? { return nil }
 }
 
