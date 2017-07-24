@@ -1,10 +1,9 @@
 # Conditions
 
-_Conditions (can) prevent procedures from starting_.
+- Remark: Conditions (can) prevent procedures from starting
 
----
 
-Conditions are types which can be attached to a procedure, and multiple conditions can be attached to the same procedure. Before the procedure executes, it asynchronously _evaluates_ all of its conditions. If any condition fails, the procedure is canceled with an error instead of executing.
+Conditions are types which can be attached to a [Procedure](Classes\/Procedure.html), and multiple conditions can be attached to the same Procedure. Before the Procedure executes, it asynchronously _evaluates_ all of its conditions. If any condition fails, the procedure is canceled with an error instead of executing.
 
 This is very useful as it allows us to abstract the control logic of whether a procedure should be executed or not into a decoupled unit. This is a key idea behind _ProcedureKit_: that procedures are units of work, and conditions are the business logic which executes them or not.
 
@@ -50,11 +49,11 @@ and for a false value:
 
 The key point is that the greeting procedure, which is added a dependency executes first, and then the condition (and all other conditions) is evaluated.
 
-_ProcedureKit_ has several built-in Conditions, like `BlockCondition` and `MutuallyExclusive<T>`. It is also easy to implement your own.
+_ProcedureKit_ has several built-in Conditions, like `BlockCondition` and [`MutuallyExclusive<T>`](Classes\/MutuallyExclusive.html). It is also easy to implement your own.
 
 ## Implementing a custom Condition
 
-First, subclass `Condition`. Then, override `evaluate(procedure:completion:)`. Here is a simple example of `FalseCondition` which is part of the framework:
+First, subclass [`Condition`](Classes\/Condition.html). Then, override `evaluate(procedure:completion:)`. Here is a simple example of [`FalseCondition`](Classes\/FalseCondition.html) which is part of the framework:
 
 ```swift
 class FalseCondition: Condition {
@@ -64,11 +63,12 @@ class FalseCondition: Condition {
 }
 ```
 
-This method receives the procedure instance which the condition has been attached to, and should called the (escaping) completion handler with the result. This means that it is possible to evaluate the condition asynchronously. The result of the evaluation is a `ConditionResult`, which is a typealias for `ProcedureResult<Bool>`.
+This method receives the procedure instance which the condition has been attached to, and should called the (escaping) completion handler with the result. This means that it is possible to evaluate the condition asynchronously. The result of the evaluation is a [`ConditionResult`](Other%20Typealiases.html#\/s:12ProcedureKit15ConditionResult), which is a typealias for `ProcedureResult<Bool>`.
 
-### Calling the completion BlockCondition
+### Calling the completion block
 
-Your `evaluate(procedure:completion:)` override *must* eventually call the completion block with a `ConditionResult`. (Although it may, of course, be called asynchronously.)
+- Important:
+Your `evaluate(procedure:completion:)` override *must* eventually call the completion block with a [`ConditionResult`](Other%20Typealiases.html#\/s:12ProcedureKit15ConditionResult). (Although it may, of course, be called asynchronously.)
 
 `ConditionResult` encompasses 3 states:
 1. `.success(true)`, the "successful" result
@@ -81,10 +81,10 @@ Generally:
  - If a Condition *fails*, return `.failure(error)` with a unique error defined for your Condition.
 
  In some situations, it can be beneficial for a Procedure to not collect an
- error if an attached condition fails. You can use `IgnoredCondition` to
+ error if an attached condition fails. You can use [`IgnoredCondition`](Classes\/IgnoredCondition.html) to
  suppress the error associated with any Condition. This is generally
  preferred (greater utility, flexibility) to returning `.success(false)` directly.
 
 ## Indirect Dependencies
 
-`Condition`, while not an `Operation` subclass supports the concept of producing dependencies using the API: `produce(dependency:)`. This should be called during the initializer of the condition. These dependencies can be `Operation` instances. They allow conditions to create an operation which runs _after_ the procedure's direct dependencies, but before the conditions are evaluated. We'll cover this topic more in [Advanced Conditions](Advanced-Conditions.html) and [Capabilities](Capabilities.html).
+[`Condition`](Classes\/Condition.html), while not an `Operation` or `Procedure` subclass, supports the concept of producing dependencies using the API: `produce(dependency:)`. This should be called during the initializer of the condition. These dependencies can be `Operation` instances. They allow conditions to create an operation which runs _after_ the procedure's direct dependencies, but before the conditions are evaluated. We'll cover this topic more in [Advanced Conditions](Advanced-Conditions.html) and [Capabilities](Capabilities.html).
