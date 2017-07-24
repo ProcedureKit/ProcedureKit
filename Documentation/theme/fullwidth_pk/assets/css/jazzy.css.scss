@@ -462,6 +462,7 @@ pre code {
 
 .aside, .language {
   padding: 6px 12px;
+  padding-bottom: 14px;
   margin: 12px 0;
   border-left: $aside_border;
   overflow-y: hidden;
@@ -493,6 +494,9 @@ pre code {
   border-left: $declaration_language_border;
   .aside-title {
     color: $declaration_title_language_color;
+  }
+  p:last-child {
+    padding-bottom: 0;
   }
 }
 
