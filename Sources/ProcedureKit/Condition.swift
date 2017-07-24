@@ -539,7 +539,7 @@ public class FalseCondition: Condition {
  procedure.add(condition: OrCondition(condition1, condition2))
  ```
 
- -SeeAlso: `AndCondition`, `OrCondition`
+ - see: `AndCondition`, `OrCondition`
  */
 open class CompoundCondition: Condition {
 
@@ -738,8 +738,8 @@ open class OrCondition: CompoundCondition {
  This can be useful to automatically manage the dependency and automatic
  injection of the composed condition result for evaluation inside your custom subclass.
 
- - see: NegatedCondition
- - see: SilentCondition
+ - see: `NegatedCondition`
+ - see: `SilentCondition`
  */
 open class ComposedCondition<C: Condition>: Condition {
 
