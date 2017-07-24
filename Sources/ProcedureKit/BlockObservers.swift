@@ -120,7 +120,8 @@ public struct BlockObserver<Procedure: ProcedureProtocol>: ProcedureObserver {
 }
 
 /// WillExecuteObserver is an observer which will execute a
-/// closure when the operation starts.
+/// closure when the procedure starts (prior to the `execute()`
+/// method being called).
 public struct WillExecuteObserver<Procedure: ProcedureProtocol>: ProcedureObserver {
     private let block: Observer<Procedure>.WillExecute
 
@@ -153,14 +154,14 @@ public struct WillExecuteObserver<Procedure: ProcedureProtocol>: ProcedureObserv
 }
 
 /// DidExecuteObserver is an observer which will execute a
-/// closure when the operation starts.
+/// closure when the procedure starts.
 ///
-/// - notes: this observer will be invoked directly after the
-/// `execute` returns.
+/// - note: This observer will be invoked directly after the
+/// `execute` method of the procedure returns.
 ///
-/// - warning: there are no guarantees about when this observer
+/// - warning: There are no guarantees about when this observer
 /// will be called, relative to the lifecycle of the procedure. It
-/// is entirely possible that the procedure, will actually
+/// is entirely possible that the procedure will actually
 /// have already finished be the time the observer is invoked. See
 /// the conversation here which explains the reasoning behind it:
 /// https://github.com/ProcedureKit/ProcedureKit/pull/554
@@ -196,7 +197,7 @@ public struct DidExecuteObserver<Procedure: ProcedureProtocol>: ProcedureObserve
 }
 
 /// DidCancelObserver is an observer which will execute a
-/// closure when the operation cancels.
+/// closure when the procedure cancels.
 public struct DidCancelObserver<Procedure: ProcedureProtocol>: ProcedureObserver {
     private let block: Observer<Procedure>.DidCancel
 
@@ -229,7 +230,7 @@ public struct DidCancelObserver<Procedure: ProcedureProtocol>: ProcedureObserver
 }
 
 /// WillAddOperationObserver is an observer which will execute a
-/// closure when the operation will add another operation.
+/// closure when the procedure will add another operation.
 public struct WillAddOperationObserver<Procedure: ProcedureProtocol>: ProcedureObserver {
     private let block: Observer<Procedure>.WillAdd
 
@@ -262,7 +263,7 @@ public struct WillAddOperationObserver<Procedure: ProcedureProtocol>: ProcedureO
 }
 
 /// DidAddOperationObserver is an observer which will execute a
-/// closure when the operation did add another operation.
+/// closure when the procedure did add another operation.
 public struct DidAddOperationObserver<Procedure: ProcedureProtocol>: ProcedureObserver {
     private let block: Observer<Procedure>.DidAdd
 
@@ -295,7 +296,7 @@ public struct DidAddOperationObserver<Procedure: ProcedureProtocol>: ProcedureOb
 }
 
 /// WillFinishObserver is an observer which will execute a
-/// closure when the operation is about to finish.
+/// closure when the procedure is about to finish.
 public struct WillFinishObserver<Procedure: ProcedureProtocol>: ProcedureObserver {
     private let block: Observer<Procedure>.WillFinish
 
@@ -329,7 +330,7 @@ public struct WillFinishObserver<Procedure: ProcedureProtocol>: ProcedureObserve
 
 /**
  DidFinishObserver is an observer which will execute a
- closure when the operation did just finish.
+ closure when the procedure did just finish.
  */
 public struct DidFinishObserver<Procedure: ProcedureProtocol>: ProcedureObserver {
     private let block: Observer<Procedure>.DidFinish

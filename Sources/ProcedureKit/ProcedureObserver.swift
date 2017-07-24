@@ -31,12 +31,12 @@ public protocol ProcedureObserver {
     /**
      The procedure did execute.
 
-     - notes: this observer will be invoked directly after the
-     `execute` returns.
+     - note: This observer will be invoked directly after the
+     `execute` method of the procedure returns.
 
-     - warning: there are no guarantees about when this observer
+     - warning: There are no guarantees about when this observer
      will be called, relative to the lifecycle of the procedure. It
-     is entirely possible that the procedure, will actually
+     is entirely possible that the procedure will actually
      have already finished be the time the observer is invoked. See
      the conversation here which explains the reasoning behind it:
      https://github.com/ProcedureKit/ProcedureKit/pull/554
