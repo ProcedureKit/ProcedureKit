@@ -301,6 +301,9 @@ pre code {
     background: $navigation_bg_color;
     border-right: 1px solid $navigation_border_color;
   }
+  @media print {
+    display: none;
+  }
 }
 
 .nav-groups {
