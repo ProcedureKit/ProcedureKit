@@ -105,22 +105,31 @@ public extension ProcedureObserver {
 
 public extension ProcedureObserver {
 
+    /// Do nothing.
     func didAttach(to procedure: Procedure) { }
 
+    /// Do nothing.
     func will(execute procedure: Procedure, pendingExecute: PendingExecuteEvent) { }
 
+    /// Do nothing.
     func did(execute procedure: Procedure) { }
 
+    /// Do nothing.
     func did(cancel procedure: Procedure, withErrors: [Error]) { }
 
+    /// Do nothing.
     func procedure(_ procedure: Procedure, willAdd newOperation: Operation) { }
 
+    /// Do nothing.
     func procedure(_ procedure: Procedure, didAdd newOperation: Operation) { }
 
+    /// Do nothing.
     func will(finish procedure: Procedure, withErrors errors: [Error], pendingFinish: PendingFinishEvent) { }
 
+    /// Do nothing.
     func did(finish procedure: Procedure, withErrors errors: [Error]) { }
 
+    /// - Returns: nil
     var eventQueue: DispatchQueueProtocol? { return nil }
 }
 
