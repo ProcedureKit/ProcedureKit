@@ -745,13 +745,38 @@ open class AndCondition: CompoundCondition {
     }
 }
 
+/**
+ A Condition subclass that evaluates a sequence of Conditions according to the "||"
+ compound predicate. i.e. At least one Condition in the sequence must succeed for the
+ OrCondition to succeed.
+
+ A subclass of `CompoundCondition` that provides custom initializers (for convenience)
+ for "||" behavior.
+
+ - see: `CompoundCondition`
+ */
 open class OrCondition: CompoundCondition {
+
+    /// Initialize an OrCondition that evaluates to the logical "||"
+    /// of all the supplied conditions.
+    ///
+    /// - Parameter conditions: an array of `Condition`s
     public init(_ conditions: [Condition]) {
         super.init(orPredicateWith: conditions)
     }
+
+    /// Initialize an OrCondition that evaluates to the logical "||"
+    /// of all the supplied conditions.
+    ///
+    /// - Parameter conditions: an sequence of `Condition`s
     public init<S: Sequence>(_ conditions: S) where S.Iterator.Element == Condition {
         super.init(orPredicateWith: conditions)
     }
+
+    /// Initialize an OrCondition that evaluates to the logical "||"
+    /// of all the supplied conditions.
+    ///
+    /// - Parameter conditions: a variadic array of `Condition`s
     convenience public init(_ conditions: Condition...) {
         self.init(conditions)
     }
@@ -837,6 +862,7 @@ open class ComposedCondition<C: Condition>: Condition {
         super.evaluate(procedure: procedure, withContext: context, completion: completion)
     }
 }
+
 /**
  A condition that treats failures from a composed condition as `.success(false)`.
 
