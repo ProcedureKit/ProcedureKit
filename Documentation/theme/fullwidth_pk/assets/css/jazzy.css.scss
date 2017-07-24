@@ -58,14 +58,16 @@ $declaration_language_border: 5px solid #cde9f4;
 $declaration_bg_color: #fff;
 $declaration_border_color: #ddd;
 
-$aside_color: #aaa;
+$aside_color: #777;
 $aside_background_color: #fafafa;
-$aside_border: 5px solid #dddddd;
-$aside_warning_color: #ae272f;
-$aside_warning_background: #f2dbdc;
+$aside_border: 5px solid #ccc;
+$aside_warning_color: #ff6666;
+$aside_warning_background: #ffe7e8;
 $aside_warning_border: 5px solid $aside_warning_color;
+$aside_warning_title_color: #ae272f;
 $aside_important_background: #fbf8e8;
 $aside_important_border: 5px solid #fee450;
+$aside_important_title_color: #776a25;
 
 // ----- Footer
 
@@ -466,7 +468,7 @@ pre code {
   margin: 12px 0;
   border-left: $aside_border;
   overflow-y: hidden;
-  //background-color: $aside_background_color;
+  background-color: $aside_background_color;
   border-radius: 4px;
   .aside-title {
     font-size: 9px;
@@ -504,18 +506,24 @@ pre code {
   background-color: $aside_warning_background;
   border-left: $aside_warning_border;
   .aside-title {
-    color: $aside_warning_color;
+    color: $aside_warning_title_color;
   }
 }
 
 .aside-important {
   background-color: $aside_important_background;
   border-left: $aside_important_border;
+  .aside-title {
+    color: $aside_important_title_color;
+  }
 }
 
 .aside-precondition {
   background-color: $aside_important_background;
   border-left: $aside_important_border;
+  .aside-title {
+    color: $aside_important_title_color;
+  }
 }
 
 .graybox {
