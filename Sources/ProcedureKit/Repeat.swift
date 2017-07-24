@@ -186,7 +186,7 @@ open class RepeatProcedure<T: Operation>: GroupProcedure {
     /// and calls `super.child(_:willFinishWithErrors:)` to get the default
     /// GroupProcedure error-handling behavior.
     ///
-    /// -IMPORTANT: If subclassing RepeatProcedure and overriding this method, consider
+    /// - IMPORTANT: If subclassing RepeatProcedure and overriding this method, consider
     /// carefully whether / when / how you should call `super.child(_:willFinishWithErrors:)`.
     open override func child(_ child: Procedure, willFinishWithErrors errors: [Error]) {
         eventQueue.debugAssertIsOnQueue()
