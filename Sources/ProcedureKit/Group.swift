@@ -156,6 +156,9 @@ open class GroupProcedure: Procedure {
 
     // MARK: - Execute
 
+    /// Starts execution of the Group's children.
+    ///
+    /// - important: When overriding GroupProcedure's `execute()`, always call `super.execute()`.
     open override func execute() {
         // Add the initial children to the Group's internal queue.
         // (This is delayed until execute to allow WillAdd/DidAdd observers set on the Group, post-init (but pre-execute),
