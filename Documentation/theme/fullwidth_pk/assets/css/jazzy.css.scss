@@ -61,7 +61,8 @@ $declaration_border_color: #ddd;
 $aside_color: #333;
 $aside_background_color: #fafafa;
 $aside_border: 5px solid #e6e6e6;
-$aside_warning_color: #ff0000;
+$aside_note_color: #aaa;
+$aside_warning_color: #ae272f;
 $aside_warning_background: #f2dbdc;
 $aside_warning_border: 5px solid $aside_warning_color;
 $aside_important_background: #fbf8e8;
@@ -500,11 +501,18 @@ pre code {
   }
 }
 
+.aside-note {
+  color: $aside_note_color;
+  .aside-title {
+    color: $aside_note_color;
+  }
+}
+
 .aside-warning {
   background-color: $aside_warning_background;
   border-left: $aside_warning_border;
   .aside-title {
-    color: #333;
+    color: $aside_warning_color;
   }
 }
 
