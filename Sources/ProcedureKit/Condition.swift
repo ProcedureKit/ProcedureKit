@@ -708,13 +708,38 @@ open class CompoundCondition: Condition {
     }
 }
 
+/**
+ A Condition subclass that evaluates a sequence of Conditions according to the "&&"
+ compound predicate. i.e. All Conditions in the sequence must succeed for the AndCondition
+ to succeed.
+
+ A subclass of `CompoundCondition` that provides custom initializers (for convenience)
+ for "&&" behavior.
+
+ - see: `CompoundCondition`
+ */
 open class AndCondition: CompoundCondition {
+
+    /// Initialize an AndCondition that evaluates to the logical "&&"
+    /// of all the supplied conditions.
+    ///
+    /// - Parameter conditions: an array of `Condition`s
     public init(_ conditions: [Condition]) {
         super.init(andPredicateWith: conditions)
     }
+
+    /// Initialize an AndCondition that evaluates to the logical "&&"
+    /// of all the supplied conditions.
+    ///
+    /// - Parameter conditions: an sequence of `Condition`s
     public init<S: Sequence>(_ conditions: S) where S.Iterator.Element == Condition {
         super.init(andPredicateWith: conditions)
     }
+
+    /// Initialize an AndCondition that evaluates to the logical "&&"
+    /// of all the supplied conditions.
+    ///
+    /// - Parameter conditions: a variadic array of `Condition`s
     convenience public init(_ conditions: Condition...) {
         self.init(conditions)
     }
