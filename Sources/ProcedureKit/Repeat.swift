@@ -261,7 +261,7 @@ open class RepeatProcedure<T: Operation>: GroupProcedure {
     /// can be used to configure every instance of the operation
     /// before it is added to the queue.
     ///
-    /// Note that configuration block are executed in FIFO order,
+    /// - NOTE: The configuration blocks are executed in FIFO order,
     /// so it is possible to overwrite previous configurations.
     ///
     /// - parameter block: a block which receives an instance of T
@@ -275,6 +275,7 @@ open class RepeatProcedure<T: Operation>: GroupProcedure {
         }
     }
 
+    /// - See: `append(configureBlock:)`
     final public func appendConfigureBlock(block: @escaping Payload.ConfigureBlock) {
         append(configureBlock: block)
     }
@@ -291,6 +292,7 @@ open class RepeatProcedure<T: Operation>: GroupProcedure {
         }
     }
 
+    /// - See: `replace(configureBlock:)`
     final public func replaceConfigureBlock(block: @escaping Payload.ConfigureBlock) {
         replace(configureBlock: block)
     }
