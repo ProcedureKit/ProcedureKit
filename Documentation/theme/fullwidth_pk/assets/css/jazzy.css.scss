@@ -62,7 +62,7 @@ $aside_color: #333;
 $aside_background_color: #fafafa;
 $aside_border: 5px solid #e6e6e6;
 $aside_warning_color: #ff0000;
-$aside_warning_background: lighten($aside_warning_color, 50%);
+$aside_warning_background: #fcd5df;
 $aside_warning_border: 5px solid $aside_warning_color;
 $aside_important_background: #fbf8e8;
 $aside_important_border: 5px solid #fee450;
@@ -461,17 +461,20 @@ pre code {
 }
 
 .aside, .language {
-  padding: 10px 12px;
+  padding: 6px 12px;
   margin: 12px 0;
   border-left: $aside_border;
   overflow-y: hidden;
   background-color: $aside_background_color;
   border-radius: 4px;
+  p {
+    padding: 8px 0;
+  }
   .aside-title {
     font-size: 9px;
     letter-spacing: 2px;
     text-transform: uppercase;
-    padding-bottom: 0;
+    padding: 0;
     margin: 0;
     color: $aside_color;
     -webkit-user-select: none;
