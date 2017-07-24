@@ -1226,13 +1226,13 @@ open class Procedure: Operation, ProcedureProtocol {
 
     /// Appropriately dispatch an observer call (using the provided block) for every observer.
     ///
-    /// NOTE: Only call this if already on the eventQueue.
+    /// - IMPORTANT: Only call this if already on the eventQueue.
     ///
     /// - Parameters:
     ///   - pendingEvent: the Procedure's PendingEvent that occurs after all the observers have completed their work
     ///   - block: a block that will be called for every observer, on the appropriate queue/thread
     /// - Returns: a DispatchGroup that will be signaled (ready) when the PendingEvent is ready (i.e. when
-    //             all of the observers have completed their work)
+    ///            all of the observers have completed their work)
     internal func dispatchObservers(pendingEvent: (Procedure) -> PendingEvent, block: @escaping (AnyObserver<Procedure>, PendingEvent) -> Void) -> DispatchGroup {
         debugAssertIsOnEventQueue() // This function should only be called if already on the EventQueue
 
