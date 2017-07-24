@@ -29,8 +29,8 @@ class BadOneMinuteDelay: Procedure {
 
 A `BadOneMinuteDelay` instance will wait for 60 seconds and then finishes, by calling `finish()` from inside the event handler block of a dispatch source timer.
 
-> 💡 Note:
-> The event handle code above shows the best-practice of capturing self as a `weak` reference. It is not necessarily guaranteed that the `Procedure` will not have been deallocated when the closure is invoked, so it is recommended to use `weak` instead of `unowned` in this situation.
+- Note:
+The event handle code above shows the best-practice of capturing self as a `weak` reference. It is not necessarily guaranteed that the `Procedure` will not have been deallocated when the closure is invoked, so it is recommended to use `weak` instead of `unowned` in this situation.
 
 The `BadOneMinuteDelay` can be cancelled, but it does not *_respond_* to cancellation. If it is cancelled after it has begun executing, it will only finish when the timer fires.
 
@@ -42,6 +42,8 @@ To respond to cancellation, we need to do two things:
 To intercept the *DidCancel* event in an asynchronous procedure we can either override the  *`procedureDidCancel(withErrors:)`* method, or add an observer which is shown below.
 
 ```swift
+// NOTE: This is a limited example of handling cancellation.
+// Use `DelayProcedure` if you need a delay.
 class BetterOneMinuteDelay: Procedure {
 
     var timer: DispatchSourceTimer? = nil

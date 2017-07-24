@@ -109,9 +109,9 @@ Using this technique the group will keep executing and only finish until all chi
 
 ## Cancelling
 
-`GroupProcedure` itself already responds to cancellation correctly. Its behaviour is to call `cancel()` on all of its children and wait for them to finish before itself finishes. Not also, that while not strictly `private` it is assumed that children created inside the group will not be cancelled except by the group. 
+`GroupProcedure` itself already responds to cancellation correctly: Its behaviour is to call `cancel()` on all of its children and wait for them to finish before it finishes.
 
-However, consider operations that are injected into a `GroupProcedure`. By definition, these are exposed outside the group, and in some scenarios may be cancelled. For example, a network procedure that is injected may be cancelled by the user or system. In a scenario such as this, it often makes sense that a cancelled child should result in the entire group being cancelled.
+However, sometimes additional behavior is warranted. Consider operations that are injected into a `GroupProcedure`. By definition, these are exposed outside the group, and in some scenarios may be cancelled by external factors. For example, a network procedure that is injected may be cancelled by the user or system. In a scenario such as this, it often makes sense for a cancelled child to result in the entire group being cancelled.
 
 Therefore, a good practice when subclassing `GroupProcedure` is to add *DidCancel* observers to injected operations. Lets modify our `LoginProcedure` to inject the network session task:
 

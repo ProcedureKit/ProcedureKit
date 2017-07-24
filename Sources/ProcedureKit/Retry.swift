@@ -117,8 +117,8 @@ open class RetryProcedure<T: Procedure>: RepeatProcedure<T> {
     /// If no further Procedure will be attempted (based on the Retry block / iterator),
     /// it adds the current (last) Procedure's errors to the Group's errors.
     ///
-    /// If subclassing RetryProcedure and overriding this method, consider
-    /// carefully whether / when / how you should call super.
+    /// - IMPORTANT: If subclassing RetryProcedure and overriding this method, consider
+    /// carefully whether / when / how you should call `super.child(_:willFinishWithErrors:)`.
     open override func child(_ child: Procedure, willFinishWithErrors errors: [Error]) {
         eventQueue.debugAssertIsOnQueue()
         assert(!child.isFinished, "child(_:willFinishWithErrors:) called with a child that has already finished")

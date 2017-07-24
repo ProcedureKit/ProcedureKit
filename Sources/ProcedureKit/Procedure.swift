@@ -438,27 +438,27 @@ open class Procedure: Operation, ProcedureProtocol {
     // MARK: - Disable Automatic Finishing
 
     /**
-     Ability to override Operation's built-in finishing behavior, if a
-     subclass requires full control over when finish() is called.
+     Ability to override Procedure's built-in finishing behavior, if a
+     subclass requires full control over when `finish()` is called.
 
-     Used for GroupOperation to implement proper .Finished state-handling
+     Used for GroupProcedure to implement proper .Finished state-handling
      (only finishing after all child operations have finished).
 
-     The default behavior of Operation is to automatically call finish()
+     The default behavior of Procedure is to automatically call `finish()`
      when:
-     (a) the Operation is cancelled prior to it starting
-         (in which case, the Operation will skip calling execute())
+     (a) the Procedure is cancelled prior to it starting
+         (in which case, the Procedure will skip calling `execute()`)
      (b) when willExecuteObservers log errors
 
-     To ensure that an Operation subclass does not finish until the
-     subclass calls finish():
+     To ensure that a Procedure subclass does not finish until the
+     subclass calls `finish()`:
      call `super.init(disableAutomaticFinishing: true)` in the init.
 
-     IMPORTANT: If disableAutomaticFinishing == TRUE, the subclass is
-     responsible for calling finish() in *ALL* cases, including when the
-     operation is cancelled.
+     - Important: If `disableAutomaticFinishing == TRUE`, the subclass is
+     responsible for calling `finish()` in **ALL** cases, including when the
+     Procedure is cancelled.
 
-     You can react to cancellation using WillCancelObserver/DidCancelObserver
+     You can react to cancellation using `WillCancelObserver` / `DidCancelObserver`
      and/or checking periodically during execute with something like:
 
      ```swift
@@ -480,7 +480,7 @@ open class Procedure: Operation, ProcedureProtocol {
 
     /// Called by the framework before a Procedure is added to a ProcedureQueue.
     ///
-    /// NOTE: Do *NOT* call this function directly.
+    /// - warning: Do *NOT* call this function directly.
     ///
     /// - Parameter queue: the ProcedureQueue onto which the Procedure will be added
     public final func willEnqueue(on queue: ProcedureQueue) {
@@ -493,7 +493,7 @@ open class Procedure: Operation, ProcedureProtocol {
     /// Called by the framework before a Procedure is added to a ProcedureQueue, but *after*
     /// the ProcedureQueue delegate's `procedureQueue(_:willAddProcedure:context:)` is called.
     ///
-    /// NOTE: Do *NOT* call this function directly.
+    /// - warning: Do *NOT* call this function directly.
     public final func pendingQueueStart() {
         let optionalConditionEvaluator: EvaluateConditions? = stateLock.withCriticalScope {
             _state = .pending
@@ -570,7 +570,7 @@ open class Procedure: Operation, ProcedureProtocol {
         evaluateConditionsProcedure.procedureHasBeenAddedToQueue()
     }
 
-    /// Starts the operation, correctly managing the cancelled state. Cannot be over-ridden
+    /// Starts the Procedure, correctly managing the cancelled state. Cannot be over-ridden
     public final override func start() {
         // Don't call super.start
 
@@ -615,7 +615,7 @@ open class Procedure: Operation, ProcedureProtocol {
         _main()
     }
 
-    /// Do not call main() directly on a Procedure. Add the Procedure to a ProcedureQueue or call start().
+    /// - warning: Do not call `main()` directly on a Procedure. Add the Procedure to a `ProcedureQueue` or call `start()`.
     public final override func main() {
         assertionFailure("Do not call main() directly on a Procedure. Add the Procedure to a ProcedureQueue.")
     }
@@ -777,11 +777,20 @@ open class Procedure: Operation, ProcedureProtocol {
     }
 
     /// Procedure subclasses must override `execute()`.
+    /// - important: Do not call `super.execute()` when subclassing `Procedure` directly.
     open func execute() {
         print("\(self) must override `execute()`.")
         finish()
     }
 
+    /// Adds an operation to the same queue as target.
+    ///
+    /// - Precondition: Target must already be added to a queue / `GroupProcedure`.
+    /// - Parameters:
+    ///   - operation: The operation to add to the same queue as target.
+    ///   - pendingEvent: (optional) A PendingEvent. The operation will be added prior to the PendingEvent.
+    /// - Returns: A ProcedureFuture that is completed once the operation has been added to the queue.
+    /// - Throws: `ProcedureKitError.noQueue` if the target has not yet been added to a queue / `GroupProcedure`.
     @discardableResult public final func produce(operation: Operation, before pendingEvent: PendingEvent? = nil) throws -> ProcedureFuture {
         precondition(state > .initialized, "Cannot add operation which is not being scheduled on a queue")
         guard let queue = stateLock.withCriticalScope(block: { return _queue }) else {
@@ -1217,13 +1226,13 @@ open class Procedure: Operation, ProcedureProtocol {
 
     /// Appropriately dispatch an observer call (using the provided block) for every observer.
     ///
-    /// NOTE: Only call this if already on the eventQueue.
+    /// - IMPORTANT: Only call this if already on the eventQueue.
     ///
     /// - Parameters:
     ///   - pendingEvent: the Procedure's PendingEvent that occurs after all the observers have completed their work
     ///   - block: a block that will be called for every observer, on the appropriate queue/thread
     /// - Returns: a DispatchGroup that will be signaled (ready) when the PendingEvent is ready (i.e. when
-    //             all of the observers have completed their work)
+    ///            all of the observers have completed their work)
     internal func dispatchObservers(pendingEvent: (Procedure) -> PendingEvent, block: @escaping (AnyObserver<Procedure>, PendingEvent) -> Void) -> DispatchGroup {
         debugAssertIsOnEventQueue() // This function should only be called if already on the EventQueue
 
