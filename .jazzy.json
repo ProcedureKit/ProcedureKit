@@ -7,7 +7,7 @@
   "module": "ProcedureKit",
   "readme": "README.md",
   "theme": "Documentation/Themes/fullwidth_pk",
-  "documentation": "Guides/**/*.md",
+  "documentation": "Documentation/Guides/**/*.md",
   
   "custom_categories": [{
 	"name": "Getting Started",
