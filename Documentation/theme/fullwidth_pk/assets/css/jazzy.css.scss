@@ -62,8 +62,8 @@ $aside_color: #333;
 $aside_background_color: #fafafa;
 $aside_border: 5px solid #e6e6e6;
 $aside_warning_color: #ff0000;
-$aside_warning_background: #f2dbdc;
-$aside_warning_border: 5px solid #ae272f;
+$aside_warning_background: lighten($aside_warning_color, 50%);
+$aside_warning_border: 5px solid $aside_warning_color;
 $aside_important_background: #fbf8e8;
 $aside_important_border: 5px solid #fee450;
 
@@ -461,7 +461,7 @@ pre code {
 }
 
 .aside, .language {
-  padding: 6px 12px;
+  padding: 10px 12px;
   margin: 12px 0;
   border-left: $aside_border;
   overflow-y: hidden;
@@ -482,6 +482,7 @@ pre code {
 }
 
 .language {
+  padding: 6px 12px;
   border-left: $declaration_language_border;
   .aside-title {
     color: $declaration_title_language_color;
