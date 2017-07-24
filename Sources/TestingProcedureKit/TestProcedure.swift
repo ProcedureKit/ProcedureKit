@@ -73,14 +73,28 @@ open class TestProcedure: Procedure, InputProcedure, OutputProcedure {
         executedAt = CFAbsoluteTimeGetCurrent()
 
         if let operation = producedOperation {
-            DispatchQueue.main.asyncAfter(deadline: .now() + (delay / 2.0)) {
-                try! self.produce(operation: operation) // swiftlint:disable:this force_try
+            let producedOperationGroup = DispatchGroup()
+            producedOperationGroup.enter()
+            DispatchQueue.global().asyncAfter(deadline: .now() + (delay / 2.0)) {
+                let future = try! self.produce(operation: operation) // swiftlint:disable:this force_try
+                future.then(on: DispatchQueue.global()) {
+                    producedOperationGroup.leave()
+                }
+            }
+            DispatchQueue.global().asyncAfter(deadline: .now() + delay) {
+                // If producing an operation, ensure that the TestProcedure finishes
+                // *after* the operation is successfully produced
+                producedOperationGroup.notify(queue: DispatchQueue.global()) {
+                    self.didExecute = true
+                    self.finish(withError: self.error)
+                }
             }
         }
-
-        DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
-            self.didExecute = true
-            self.finish(withError: self.error)
+        else {
+            DispatchQueue.global().asyncAfter(deadline: .now() + delay) {
+                self.didExecute = true
+                self.finish(withError: self.error)
+            }
         }
     }
 
