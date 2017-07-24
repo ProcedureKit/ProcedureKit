@@ -58,10 +58,9 @@ $declaration_language_border: 5px solid #cde9f4;
 $declaration_bg_color: #fff;
 $declaration_border_color: #ddd;
 
-$aside_color: #333;
+$aside_color: #aaa;
 $aside_background_color: #fafafa;
-$aside_border: 5px solid #e6e6e6;
-$aside_note_color: #aaa;
+$aside_border: 5px solid #dddddd;
 $aside_warning_color: #ae272f;
 $aside_warning_background: #f2dbdc;
 $aside_warning_border: 5px solid $aside_warning_color;
@@ -467,7 +466,7 @@ pre code {
   margin: 12px 0;
   border-left: $aside_border;
   overflow-y: hidden;
-  background-color: $aside_background_color;
+  //background-color: $aside_background_color;
   border-radius: 4px;
   .aside-title {
     font-size: 9px;
@@ -498,13 +497,6 @@ pre code {
   }
   p:last-child {
     padding-bottom: 0;
-  }
-}
-
-.aside-note {
-  color: $aside_note_color;
-  .aside-title {
-    color: $aside_note_color;
   }
 }
 
