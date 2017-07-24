@@ -66,7 +66,7 @@ open class GroupProcedure: Procedure {
     }
 
     /**
-     Do not call `finish()` on a GroupProcedure or a GroupProcedure subclass.
+     - WARNING: Do not call `finish()` on a GroupProcedure or a GroupProcedure subclass.
      A GroupProcedure finishes when all of its children finish.
      It is an anti-pattern to call `finish()` directly on a GroupProcedure.
 
@@ -123,6 +123,9 @@ open class GroupProcedure: Procedure {
         groupCanFinish = CanFinishGroup(group: self)
     }
 
+    /// Create a GroupProcedure with a variadic array of Operation instances.
+    ///
+    /// - Parameter operations: a variadic array of `Operation` instances.
     public convenience init(operations: Operation...) {
         self.init(operations: operations)
     }
@@ -224,7 +227,7 @@ open class GroupProcedure: Procedure {
      This enables the customization of the errors that the GroupProcedure (or GroupProcedure subclass) 
      attributes to the child and considers in its `child(_:willFinishWithErrors:)` function.
 
-     IMPORTANT: This only affects the child errors that the GroupProcedure (or GroupProcedure subclass) 
+     - IMPORTANT: This only affects the child errors that the GroupProcedure (or GroupProcedure subclass)
      utilizes. It does not directly impact the child Procedure itself, nor the child Procedure's errors
      (if obtained or read directly from the child).
     */
@@ -246,7 +249,7 @@ public extension GroupProcedure {
     /**
      Access the underlying queue of the GroupProcedure.
 
-     - returns: the DispatchQueue of the groups private ProcedureQueue
+     - returns: the underlying DispatchQueue of the groups private ProcedureQueue
     */
     final var dispatchQueue: DispatchQueue? {
         return queue.underlyingQueue
@@ -300,9 +303,9 @@ public extension GroupProcedure {
     }
 }
 
-// MARK: - Add Child API
-
 public extension GroupProcedure {
+
+    // MARK: - Add Child API
 
     /**
      Add a single child Operation instance to the group
@@ -323,7 +326,6 @@ public extension GroupProcedure {
     /**
      Add a sequence of Operation instances to the group
      - parameter children: a sequence of Operation instances
-     - returns: a ProcedureFuture that is signaled when the child is added to the Group
      */
     final func add<Children: Collection>(children: Children, before pendingEvent: PendingEvent? = nil) where Children.Iterator.Element: Operation {
         add(additional: children, toOperationsArray: true, before: pendingEvent)
@@ -425,9 +427,9 @@ public extension GroupProcedure {
     }
 }
 
-// MARK: - Aggregating Errors
-
 public extension GroupProcedure {
+
+    // MARK: - Aggregating Errors
 
     /// Append an error to the Group's errors
     ///
