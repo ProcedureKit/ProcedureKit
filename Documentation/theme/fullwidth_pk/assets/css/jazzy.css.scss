@@ -62,7 +62,7 @@ $aside_color: #333;
 $aside_background_color: #fafafa;
 $aside_border: 5px solid #e6e6e6;
 $aside_warning_color: #ff0000;
-$aside_warning_background: #fcd5df;
+$aside_warning_background: #f2dbdc;
 $aside_warning_border: 5px solid $aside_warning_color;
 $aside_important_background: #fbf8e8;
 $aside_important_border: 5px solid #fee450;
@@ -476,7 +476,6 @@ pre code {
     margin: 0;
     color: $aside_color;
     -webkit-user-select: none;
-    font-weight: bold;
   }
   p:last-child {
     margin-bottom: 0;
@@ -485,6 +484,7 @@ pre code {
 
 .aside {
   .aside-title {
+    font-weight: 400;
     padding-bottom: 8px;
   }
 }
@@ -511,9 +511,11 @@ pre code {
 .aside-important {
   background-color: $aside_important_background;
   border-left: $aside_important_border;
-  .aside-title {
-    color: #333;
-  }
+}
+
+.aside-precondition {
+  background-color: $aside_important_background;
+  border-left: $aside_important_border;
 }
 
 .graybox {
