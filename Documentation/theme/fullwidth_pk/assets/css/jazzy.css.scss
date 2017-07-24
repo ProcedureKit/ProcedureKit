@@ -467,20 +467,24 @@ pre code {
   overflow-y: hidden;
   background-color: $aside_background_color;
   border-radius: 4px;
-  p {
-    padding: 8px 0;
-  }
   .aside-title {
     font-size: 9px;
     letter-spacing: 2px;
     text-transform: uppercase;
-    padding: 0;
+    padding-bottom: 0;
     margin: 0;
     color: $aside_color;
     -webkit-user-select: none;
+    font-weight: bold;
   }
   p:last-child {
     margin-bottom: 0;
+  }
+}
+
+.aside {
+  .aside-title {
+    padding-bottom: 8px;
   }
 }
 
