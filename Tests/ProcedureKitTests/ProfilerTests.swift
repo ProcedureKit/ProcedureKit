@@ -88,10 +88,14 @@ class ProfilerTests: ProcedureKitTestCase {
     func test__profile_operation__which_produces_child() {
 
         let child = TestProcedure()
+        // Also wait for the produced child to complete
+        addCompletionBlockTo(procedure: child)
 
         procedure = TestProcedure(produced: child)
         procedure.add(observer: profiler)
 
+        // Because of the addCompletionBlockTo line above, wait for the procedure *and*
+        // the child it produces to complete
         wait(for: procedure)
 
         guard let result = reporter.didProfileResult else {
