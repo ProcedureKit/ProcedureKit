@@ -6,7 +6,7 @@
   "author_url": "https://github.com/ProcedureKit",
   "module": "ProcedureKit",
   "readme": "README.md",
-  "theme": "Documentation/theme/fullwidth_pk",
+  "theme": "Documentation/Themes/fullwidth_pk",
   "documentation": "Guides/**/*.md",
   
   "custom_categories": [{
