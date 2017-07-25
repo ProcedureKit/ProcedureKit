@@ -37,7 +37,22 @@ class BlockObserverTests: ProcedureKitTestCase {
     func test__did_cancel_is_called() {
         let didCancelCalled = Protector<(Procedure, [Error])?>(nil)
         let error = TestError()
-        procedure.add(observer: BlockObserver(didCancel: { didCancelCalled.overwrite(with: ($0, $1)) }))
+        let cancelWaitGroup = DispatchGroup()
+        cancelWaitGroup.enter()
+        let procedure = AsyncBlockProcedure { finishWithResult in
+            // Wait for the Procedure to be cancelled by the test
+            // (and for all didCancel observers to be triggered)
+            // to avoid a race condition in which the Procedure finishes
+            // before the check block below can cancel it and/or the DidCancel
+            // observers can be called.
+            cancelWaitGroup.notify(queue: DispatchQueue.global()) {
+                finishWithResult(success)
+            }
+        }
+        procedure.add(observer: BlockObserver(didCancel: {
+            didCancelCalled.overwrite(with: ($0, $1))
+            cancelWaitGroup.leave()
+        }))
         check(procedure: procedure) { procedure in
             procedure.cancel(withError: error)
         }
