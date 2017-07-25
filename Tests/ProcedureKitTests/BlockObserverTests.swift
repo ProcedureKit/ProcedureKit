@@ -199,17 +199,36 @@ class BlockObserverSynchronizationTests: ProcedureKitTestCase {
             let error = TestError()
             let didCancelCalled_addBlock = Protector<(Procedure, [Error], Bool)?>(nil)
             let didCancelCalled_BlockObserver = Protector<(Procedure, [Error], Bool)?>(nil)
-            let procedure = TestProcedure()
+            let cancelWaitGroup = DispatchGroup()
+            cancelWaitGroup.enter()
+            cancelWaitGroup.enter()
+            let procedure = AsyncBlockProcedure { finishWithResult in
+                // Wait for the Procedure to be cancelled by the test
+                // (and for all didCancel observers to be triggered)
+                // to avoid a race condition in which the Procedure finishes
+                // before the check block below can cancel it and/or the DidCancel
+                // observers can be called.
+                cancelWaitGroup.notify(queue: DispatchQueue.global()) {
+                    finishWithResult(success)
+                }
+            }
             procedure.addDidCancelBlockObserver(synchronizedWith: syncObject) { procedure, errors in
                 didCancelCalled_addBlock.overwrite(with: (procedure, errors, isSynced()))
+                cancelWaitGroup.leave() // A
             }
-            procedure.add(observer: BlockObserver(synchronizedWith: syncObject, didCancel: { didCancelCalled_BlockObserver.overwrite(with: ($0, $1, isSynced())) }))
+            procedure.add(observer: BlockObserver(synchronizedWith: syncObject, didCancel: {
+                didCancelCalled_BlockObserver.overwrite(with: ($0, $1, isSynced()))
+                cancelWaitGroup.leave() // B
+            }))
             check(procedure: procedure) { procedure in
                 procedure.cancel(withError: error)
             }
             XCTAssertEqual(didCancelCalled_addBlock.access?.0, procedure)
             XCTAssertEqual(didCancelCalled_addBlock.access?.1.first as? TestError, error)
             XCTAssertTrue(didCancelCalled_addBlock.access?.2 ?? false, "Was not synchronized on \(syncObject).") // was synchronized
+            XCTAssertEqual(didCancelCalled_BlockObserver.access?.0, procedure)
+            XCTAssertEqual(didCancelCalled_BlockObserver.access?.1.first as? TestError, error)
+            XCTAssertTrue(didCancelCalled_BlockObserver.access?.2 ?? false, "Was not synchronized on \(syncObject).") // was synchronized
         }
     }
 
