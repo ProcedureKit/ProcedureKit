@@ -1,9 +1,9 @@
 # Handling Cancellation in Synchronous Procedures
 
 
-A _synchronous_ [`Procedure`](Classes/Procedure.html) performs all its work as part of its `execute()` method, and calls `finish()` before returning.
+A _synchronous_ [`Procedure`](Classes/Procedure.html) performs all its work as part of its [`execute()`](Classes/Procedure.html#/s:FC12ProcedureKit9Procedure7executeFT_T_) method, and calls [`finish()`](Classes/Procedure.html#/s:FC12ProcedureKit9Procedure6finishFT10withErrorsGSaPs5Error___T_) before returning.
 
-- Note: 💡 Synchronous procedures are great candidates for the use of occasional `!isCancelled` checks.
+- Note: 💡 Synchronous procedures are great candidates for the use of occasional [`!isCancelled`](Classes/Procedure.html#/s:vC12ProcedureKit9Procedure11isCancelledSb) checks.
 
 For example, consider the following example `BadFibonacci`, which shows an *anti-pattern* which generates a sequence and feeds them to a block:
 
@@ -38,7 +38,7 @@ class BadFibonacci: Procedure {
 }
 ``` 
 
-An instance of `BadFibonacci` can be cancelled, but it does not *_respond_* to cancellation. It will have no impact if cancelled while running. To make it respond, we need to modify the loop to periodically check `isCancelled`.
+An instance of `BadFibonacci` can be cancelled, but it does not *_respond_* to cancellation. It will have no impact if cancelled while running. To make it respond, we need to modify the loop to periodically check [`isCancelled`](Classes/Procedure.html#/s:vC12ProcedureKit9Procedure11isCancelledSb).
 
 ```swift
 class BetterFibonacci: Procedure {
@@ -79,6 +79,7 @@ class BetterFibonacci: Procedure {
 The `BetterFibonacci` class checks whether it has been cancelled every 2 values in the sequence. If it has, then it finishes and returns immediately.
 
 - Important:
-You may want to consider how frequently `isCancelled` is checked, and potentially use a throttle as shown above. Consider that each check to `isCancelled` requires a lock which can impact performance.
-For tight loops, say 1000 iterations in 50ms, do not check `isCancelled` more frequently than every 1000 or even 10,000 iterations. Try to determine how quickly you want the procedure to respond to cancellation, to calibrate how frequently you check for cancellation.
+  You may want to consider how frequently [`isCancelled`](Classes/Procedure.html#/s:vC12ProcedureKit9Procedure11isCancelledSb) is checked, and potentially use a throttle as shown above. Consider that each check to [`isCancelled`](Classes/Procedure.html#/s:vC12ProcedureKit9Procedure11isCancelledSb) requires a lock which can impact performance.
+  
+  For tight loops, say 1000 iterations in 50ms, do not check [`isCancelled`](Classes/Procedure.html#/s:vC12ProcedureKit9Procedure11isCancelledSb) more frequently than every 1000 or even 10,000 iterations. Try to determine how quickly you want the procedure to respond to cancellation, to calibrate how frequently you check for cancellation.
 
