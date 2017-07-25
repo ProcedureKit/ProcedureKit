@@ -82,7 +82,7 @@ When a [`Procedure`](Classes/Procedure.html) is cancelled, the following order o
 
 2. *[`procedureDidCancel(withErrors:)`](Classes/Procedure.html#/s:FC12ProcedureKit9Procedure18procedureDidCancelFT10withErrorsGSaPs5Error___T_)* is called (can be overridden)
 
-3. *`DidCancelObserver`* instances are called.
+3. *[`DidCancelObserver`](Structs/DidCancelObserver.html)* instances are called.
 
 ## You can handle cancellation by any combination of:
 
@@ -91,7 +91,7 @@ When a [`Procedure`](Classes/Procedure.html) is cancelled, the following order o
 2. Override [`procedureDidCancel(withErrors:)`](Classes/Procedure.html#/s:FC12ProcedureKit9Procedure18procedureDidCancelFT10withErrorsGSaPs5Error___T_).
     While the [`Procedure`](Classes/Procedure.html) implementation of this method is empty, it is best practice to call `super.procedureDidCancel(withErrors:)` at the beginning of your override.
     
-3. Attach [`DidCancelObserver`](Classes/DidCancelObserver.html) instances. This is the only mechanism to observe cancellation from outside the instance. For example:
+3. Attach [`DidCancelObserver`](Structs/DidCancelObserver.html) instances. This is the only mechanism to observe cancellation from outside the instance. For example:
     ```swift
     let procedure = MyProcedure() // etc
     
