@@ -1,10 +1,9 @@
 # Handling Cancellation in Asynchronous Procedures
 
----
 
-An *Asynchronous* procedure may return from its `execute()` method without _finishing_, and then call `finish()` some time later. Typically this happens in a completion block of another asynchronous API.
+An *Asynchronous* [`Procedure`](Classes/Procedure.html) may return from its `execute()` method without _finishing_, and then call `finish()` some time later. Typically this happens in a completion block of another asynchronous API.
 
-For example, consider this simplified version of [`DelayProcedure`](DelayProcedure.html) from the framework:
+For example, consider this simplified version of [`DelayProcedure`](Classes/DelayProcedure.html) from the framework:
 
 ```swift
 // NOTE: Do not use this code. It is not responsive to cancellation. It is
@@ -79,7 +78,7 @@ The `BetterOneMinuteDelay` class adds a block based observer for *DidCancel* eve
 
 Note also that the observer block is provided with an instance of the procedure - we don't need to capture `self` here.
 
-## Add an observer vs override `procedureDidCancel(withErrors:)`?
+### Add an observer vs override `procedureDidCancel(withErrors:)`?
 
 The main differences between these two options are..
 
