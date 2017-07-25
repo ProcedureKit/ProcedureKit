@@ -1,12 +1,11 @@
 # Mutual Exclusion
 
-_Makes procedures exclusive_
+- Remark: Makes Procedures exclusive
 
----
 
-A condition can assert whether its procedure should be evaluated exclusively with respect to other procedures. This can be very handy for preventing procedures from executing at the same time.
+A [`Condition`](Classes\/Condition.html) can assert whether its Procedure should be evaluated exclusively with respect to other Procedures. This can be very handy for preventing Procedures from executing at the same time.
 
-For example, if our application presents a modal alert, by adding a mutually exclusive condition, it will prevent any other modal alert from being presented. Given the nature of event based applications this would otherwise be quite tricky. We would write this:
+For example, if our application presents a modal alert, by adding a mutually exclusive condition, it will prevent any other modal alert from being presented at the same time. Given the nature of event based applications this would otherwise be quite tricky. We would write this:
 
 ```swift
 import ProcedureKitMobile
@@ -18,11 +17,11 @@ queue.addOperation(alert)
 
 `AlertProcedure` adds a mutually exclusive condition to itself during its initializer.
 
-> Note: mutual exclusion does not stop subsequent operations from running. The operation will run once the mutually exclusive blocking operation in front of it finishes.
+- Note: Mutual exclusion does not stop subsequent Procedures from ever running. The Procedure will run once the mutually-exclusive blocking Procedure in front of it finishes.
 
 ## Implementation
 
-To add mutual exclusion to an operation, we attach a `MutuallyExclusive<T>()` condition, in the case of `AlertProcedure` it is implemented like this:
+To add mutual exclusion to an operation, we attach a [`MutuallyExclusive<T>()`](Classes\/MutuallyExclusive.html) condition, in the case of `AlertProcedure` it is implemented like this:
 
 ```swift
 procedure.add(condition: MutuallyExclusive<UIAlertController>())
@@ -34,7 +33,7 @@ This generic type, let call it the _mutual exclusion type_ has no constraints: i
 
 ### How to choose the mutual exclusion type?
 
-If it is only necessary to restrict the same type of Procedure from executing then use the operation's own class, or parent class, as the type.
+If it is only necessary to restrict the same type of Procedure from executing then use the Procedure's own class, or parent class, as the type.
 
 To share mutual exclusion between a number of different Procedure, either create an empty `enum` which will be used to define the mutual exclusion. Name it based on the category of procedure, for example:
 
