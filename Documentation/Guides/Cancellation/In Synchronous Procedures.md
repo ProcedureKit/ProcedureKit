@@ -79,7 +79,8 @@ class BetterFibonacci: Procedure {
 The `BetterFibonacci` class checks whether it has been cancelled every 2 values in the sequence. If it has, then it finishes and returns immediately.
 
 - Important:
-  You may want to consider how frequently [`isCancelled`](Classes/Procedure.html#/s:vC12ProcedureKit9Procedure11isCancelledSb) is checked, and potentially use a throttle as shown above. Consider that each check to [`isCancelled`](Classes/Procedure.html#/s:vC12ProcedureKit9Procedure11isCancelledSb) requires a lock which can impact performance.
-  
-  For tight loops, say 1000 iterations in 50ms, do not check [`isCancelled`](Classes/Procedure.html#/s:vC12ProcedureKit9Procedure11isCancelledSb) more frequently than every 1000 or even 10,000 iterations. Try to determine how quickly you want the procedure to respond to cancellation, to calibrate how frequently you check for cancellation.
+You may want to consider how frequently [`isCancelled`](Classes/Procedure.html#/s:vC12ProcedureKit9Procedure11isCancelledSb) is checked, and potentially use a throttle as shown above. Consider that each check to [`isCancelled`](Classes/Procedure.html#/s:vC12ProcedureKit9Procedure11isCancelledSb) requires a lock which can impact performance.
+\
+\
+For tight loops, say 1000 iterations in 50ms, do not check [`isCancelled`](Classes/Procedure.html#/s:vC12ProcedureKit9Procedure11isCancelledSb) more frequently than every 1000 or even 10,000 iterations. Try to determine how quickly you want the procedure to respond to cancellation, to calibrate how frequently you check for cancellation.
 
