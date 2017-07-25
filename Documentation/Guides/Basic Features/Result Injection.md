@@ -1,5 +1,5 @@
 # Result Injection
 
-_Transforming state through procedures_
+- Remark: Transforming state through procedures
 
----
+## TODO: 

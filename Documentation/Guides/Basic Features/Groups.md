@@ -1,16 +1,15 @@
 # Groups
 
-_Groups encapsulate procedures into a single logic unit_
+- Remark: Groups encapsulate Procedures into a single logic unit
 
----
 
 _ProcedureKit_ makes it easy to decompose significant work into smaller chunks of work which can be combined together. This is always a good architectural practice, as it will reduce the impact of each component and increase their re-use and testability. However, it can be unwieldy and diminish code readability.
 
-Therefore we can create more abstract notions of _work_ by using a `GroupProcedure`.
+Therefore we can create more abstract notions of _work_ by using a [`GroupProcedure`](Classes\/GroupProcedure.html).
 
 ## Direct usage
 
-`GroupProcedure` can be used directly.
+[`GroupProcedure`](Classes\/GroupProcedure.html) can be used directly.
 
 ```swift
 let group = GroupProcedure(operations: opOne, opTwo, opThree)
@@ -24,11 +23,11 @@ queue.add(operation: group)
 
 There are a couple of key points here.
 
-1. Child operations need only be `Foundation.Operation` instances, not necessarily `Procedure` subclasses. So, a group can be used with Apple's `Operation` subclasses or from elsewhere.
+1. Child operations need only be [`Foundation.Operation`](https://developer.apple.com/documentation/foundation/operation) instances, not necessarily [`Procedure`](Classes\/Procedure.html) subclasses. So, a group can be used with Apple's `Operation` subclasses or from elsewhere.
 
-2. The operation instances added to the group are referred to as its children, and can be accessed via its `.children` property.
+2. The operation instances added to the group are referred to as its children, and can be accessed via its [`.children`](Classes\/GroupProcedure.html#\/s:vC12ProcedureKit14GroupProcedure8childrenGSaCSo9Operation_) property.
 
-3. A `GroupProcedure` runs until its last child finishes. This means, that it is possible to add additional children while it is running.
+3. A [`GroupProcedure`](Classes\/GroupProcedure.html) runs until its last child finishes. This means, that it is possible to add additional children while it is running.
     ```swift
     group.add(child: opFour)
     group.add(children: [opFive, opSix])
@@ -37,7 +36,7 @@ There are a couple of key points here.
 
 ## Custom `GroupProcedure`
 
-While using a `GroupProcedure` directly is convenient, it doesn't really help to create a larger abstraction of work around the children. For example, consider authenticating a user with a webservice, it is likely that we will need, network requests, possibly some data parsing and mapping, and possibly writing to disks or caches. All of these tasks should be `Procedure` subclasses, but when encapsulated together, its just a `LoginProcedure`. The group _hides_ all the detail. Therefore, most of the time, we want to subclass `GroupProcedure`, which is the focus of this guide.  
+While using a [`GroupProcedure`](Classes\/GroupProcedure.html) directly is convenient, it doesn't really help to create a larger abstraction of work around the children. For example, consider authenticating a user with a webservice - it is likely that we will need: network requests, possibly some data parsing and mapping, and possibly writing to disks or caches. All of these tasks should be [`Procedure`](Classes\/Procedure.html) subclasses, but when encapsulated together, its just a `LoginProcedure`. The group _hides_ all the detail. Therefore, most of the time, we want to subclass [`GroupProcedure`](Classes\/GroupProcedure.html), which is the focus of this guide.  
 
 ## The initialiser
 
@@ -72,7 +71,7 @@ class LoginProcedure: GroupProcedure {
 }
 ```
 
-The initialization strategy shown above is relatively simple but shows some good practices. Creating and configuring child operations before calling the `LoginProcedure` initialiser reduces the complexity and increases the readability of the class. Adding observers and conditions to the group inside its initialiser sets the default and expected behaviour which makes using the class easier. Remember that these can always be nullified by using [`ComposedProcedure`](ComposedProcedure.html).
+The initialization strategy shown above is relatively simple but shows some good practices. Creating and configuring child operations before calling the `LoginProcedure` initialiser reduces the complexity and increases the readability of the class. Adding observers and conditions to the group inside its initialiser sets the default and expected behaviour which makes using the class easier. Remember that these can always be nullified by using [`ComposedProcedure`](Classes\/ComposedProcedure.html).
 
 ## Adding child operations later
 
@@ -109,11 +108,11 @@ Using this technique the group will keep executing and only finish until all chi
 
 ## Cancelling
 
-`GroupProcedure` itself already responds to cancellation correctly: Its behaviour is to call `cancel()` on all of its children and wait for them to finish before it finishes.
+[`GroupProcedure`](Classes\/GroupProcedure.html) itself already responds to cancellation correctly: Its behaviour is to call `cancel()` on all of its children and wait for them to finish before it finishes.
 
-However, sometimes additional behavior is warranted. Consider operations that are injected into a `GroupProcedure`. By definition, these are exposed outside the group, and in some scenarios may be cancelled by external factors. For example, a network procedure that is injected may be cancelled by the user or system. In a scenario such as this, it often makes sense for a cancelled child to result in the entire group being cancelled.
+However, sometimes additional behavior is warranted. Consider operations that are injected into a [`GroupProcedure`](Classes\/GroupProcedure.html). By definition, these are exposed outside the group, and in some scenarios may be cancelled by external factors. For example, a network procedure that is injected may be cancelled by the user or system. In a scenario such as this, it often makes sense for a cancelled child to result in the entire group being cancelled.
 
-Therefore, a good practice when subclassing `GroupProcedure` is to add *DidCancel* observers to injected operations. Lets modify our `LoginProcedure` to inject the network session task:
+Therefore, a good practice when subclassing [`GroupProcedure`](Classes\/GroupProcedure.html) is to add *DidCancel* observers to injected operations. Lets modify our `LoginProcedure` to inject the network session task:
 
 ```swift
 // Lets assume we have a network procedure
@@ -152,6 +151,7 @@ class LoginProcedure: GroupProcedure {
 }
 ``` 
 
-Sometimes it is necessary to perform such configuration (which references `self`) after the initializer has finished. For these situations, override `execute` but *always* call `super.execute()`. This is because the `GroupOperation` has critical functionality in its `execute` implementation (such as starting the queue).
+- Important:
+Sometimes it is necessary to perform such configuration (which references `self`) after the initializer has finished. For these situations, override `execute` but *always* call `super.execute()`. This is because the [`GroupProcedure`](Classes\/GroupProcedure.html) has critical functionality in its `execute` implementation (such as starting the queue).
 
-We will cover move advanced usage of `GroupProcedure` in [Advanced Groups](advanced-groups.html). Also, see [`ComposedProcedure`](ComposedProcedure.html) on how to wrap an `Operation` class, to be able to add observers.
+We will cover move advanced usage of [`GroupProcedure`](Classes\/GroupProcedure.html) in [Advanced Groups](advanced-groups.html). Also, see [`ComposedProcedure`](Classes\/ComposedProcedure.html) on how to wrap an `Operation` class, to be able to add observers.
