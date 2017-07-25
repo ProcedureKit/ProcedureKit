@@ -2,7 +2,6 @@
 
 - Remark: Groups encapsulate Procedures into a single logic unit
 
----
 
 _ProcedureKit_ makes it easy to decompose significant work into smaller chunks of work which can be combined together. This is always a good architectural practice, as it will reduce the impact of each component and increase their re-use and testability. However, it can be unwieldy and diminish code readability.
 
@@ -26,7 +25,7 @@ There are a couple of key points here.
 
 1. Child operations need only be [`Foundation.Operation`](https://developer.apple.com/documentation/foundation/operation) instances, not necessarily [`Procedure`](Classes\/Procedure.html) subclasses. So, a group can be used with Apple's `Operation` subclasses or from elsewhere.
 
-2. The operation instances added to the group are referred to as its children, and can be accessed via its `.children` property.
+2. The operation instances added to the group are referred to as its children, and can be accessed via its [`.children`](Classes\/GroupProcedure.html#\/s:vC12ProcedureKit14GroupProcedure8childrenGSaCSo9Operation_) property.
 
 3. A [`GroupProcedure`](Classes\/GroupProcedure.html) runs until its last child finishes. This means, that it is possible to add additional children while it is running.
     ```swift

@@ -68,9 +68,9 @@ This method receives the procedure instance which the condition has been attache
 ### Calling the completion block
 
 - Important:
-Your `evaluate(procedure:completion:)` override *must* eventually call the completion block with a [`ConditionResult`](Other%20Typealiases.html#\/s:12ProcedureKit15ConditionResult). (Although it may, of course, be called asynchronously.)
+Your `evaluate(procedure:completion:)` override **must** eventually call the completion block with a [`ConditionResult`](Other%20Typealiases.html#\/s:12ProcedureKit15ConditionResult). (Although it may, of course, be called asynchronously.)
 
-`ConditionResult` encompasses 3 states:
+[`ConditionResult`](Other%20Typealiases.html#\/s:12ProcedureKit15ConditionResult) encompasses 3 states:
 1. `.success(true)`, the "successful" result
 2. `.failure(let error: Error)`, the "failure" result
 3. `.success(false)`, an "ignored" result
