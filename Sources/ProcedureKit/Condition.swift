@@ -227,12 +227,13 @@ open class Condition: ConditionProtocol, Hashable {
     /// Dependencies to produce and wait on.
     ///
     /// The framework will automatically schedule these dependencies to run
-    /// after all dependencies on the attached Procedure, and will wait for
+    /// after all dependencies on the attached `Procedure`, and will wait for
     /// these dependencies to finish before the Condition's
     /// `evaluate(procedure:completion:)` function is called.
     ///
+    /// - IMPORTANT:
     /// It is programmer error to add an Operation to the `producedDependencies`
-    /// this is already scheduled for execution or executing, or that will be
+    /// that is already scheduled for execution or executing, or that will be
     /// scheduled for execution elsewhere.
     public var producedDependencies: Set<Operation> {
         return stateLock.withCriticalScope { _producedDependencies }
@@ -323,22 +324,23 @@ open class Condition: ConditionProtocol, Hashable {
 
     // MARK: Dependencies
 
-    // Produce a dependency that the Condition runs before evaluation.
-    //
-    // Dependencies produced in this way are scheduled after all dependencies on 
-    // the attached Procedure, but prior to the `evaluate(procedure:completion)`
-    // method being called.
-    //
-    // The Condition "owns" the dependency, and the framework will handle
-    // scheduling and running the dependency at the appropriate time.
-    // Do *not* separately add the dependency to your own queue.
-    //
-    // If you want to add a dependency that has been or will be separately added
-    // to a queue (or otherwise scheduled for execution), use `add(dependency:)` instead.
-    //
-    // It is a programmer error to produce the same Operation instance on more than
-    // one Condition instance.
-    //
+    /// Produce a dependency that the `Condition` runs before evaluation.
+    ///
+    /// Dependencies produced in this way are scheduled after all dependencies on
+    /// the attached `Procedure`, but prior to the `evaluate(procedure:completion)`
+    /// method being called.
+    ///
+    /// The Condition "owns" the dependency, and the framework will handle
+    /// scheduling and running the dependency at the appropriate time.
+    /// - IMPORTANT: Do *not* separately add the dependency to your own queue.
+    ///
+    /// If you want to add a dependency that has been or will be separately added
+    /// to a queue (or otherwise scheduled for execution), use `add(dependency:)` instead.
+    ///
+    /// - IMPORTANT:
+    /// It is a programmer error to produce the same Operation instance on more than
+    /// one `Condition` instance.
+    ///
     /// - Parameter dependency: an Operation to be produced as a dependency
     final public func produce(dependency: Operation) {
         assert(!dependency.isExecuting, "Do not call produce(dependency:) with an Operation that is already executing.")
@@ -357,6 +359,7 @@ open class Condition: ConditionProtocol, Hashable {
     /// The framework will wait for the dependency to finish before the Condition's 
     /// `evaluate(procedure:completion:)` function is called.
     ///
+    /// - IMPORTANT:
     /// Does not schedule the dependency for execution. You must do this elsewhere by,
     /// for example, adding it to an `OperationQueue` / `ProcedureQueue`.
     ///
@@ -376,6 +379,7 @@ open class Condition: ConditionProtocol, Hashable {
     /// The framework will wait for the dependencies to finish before the Condition's
     /// `evaluate(procedure:completion:)` function is called.
     ///
+    /// - IMPORTANT:
     /// Does not schedule the dependencies for execution. You must do this elsewhere by,
     /// for example, adding it to an `OperationQueue` / `ProcedureQueue`.
     ///
@@ -488,6 +492,11 @@ internal extension Condition {
 
 // MARK: - Condition Subclasses
 
+/**
+ A `Condition` subclass that always evaluates successfully.
+
+ - seealso: `FalseCondition`
+ */
 public class TrueCondition: Condition {
 
     public init(name: String = "TrueCondition", mutuallyExclusiveCategory: String? = nil) {
@@ -503,6 +512,11 @@ public class TrueCondition: Condition {
     }
 }
 
+/**
+ A `Condition` subclass that always fails.
+
+ - seealso: `TrueCondition`
+ */
 public class FalseCondition: Condition {
 
     public init(name: String = "FalseCondition", mutuallyExclusiveCategory: String? = nil) {

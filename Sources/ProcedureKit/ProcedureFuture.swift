@@ -10,9 +10,9 @@ import Dispatch
 // MARK: - ProcedurePromise & ProcedureFuture
 
 /**
- A ProcedurePromise provides a ProcedureFuture that is signaled when the promise is completed.
+ A `ProcedurePromise` provides a `ProcedureFuture` that is signaled when the promise is completed.
  
- Create a ProcedurePromise and retrieve the future from the promise:
+ Create a `ProcedurePromise` and retrieve the future from the promise:
  
  ```swift
  let promise = ProcedurePromise()
@@ -25,7 +25,7 @@ import Dispatch
  promise.complete()
  ```
  
- and anything scheduled using the ProcedureFuture will occur after the promise has been completed.
+ and anything scheduled using the `ProcedureFuture` will occur after the promise has been completed.
  
  A simple example is:
  
@@ -46,12 +46,14 @@ import Dispatch
  }
  ```
  
- A ProcedurePromise/ProcedureFuture does not return a value - it merely allows you to execute
+ A `ProcedurePromise` / `ProcedureFuture` does not return a value - it merely allows you to execute
  a block when a promise is complete.
  
- To return a future value, use ProcedureResultPromise (and ProcedureResultFuture).
+ To return a future value, use `ProcedurePromiseResult` (and `ProcedureFutureResult`).
  */
 public class ProcedurePromise {
+
+    /// The `ProcedureFuture` associated with the Promise.
     public let future = ProcedureFuture()
     #if DEBUG
     private var _didComplete = false
@@ -59,7 +61,7 @@ public class ProcedurePromise {
     #endif
 
     #if DEBUG
-    // in Debug builds, verify and fail if a promise is not completed before it is deinited
+    // In Debug builds, verify and fail if a promise is not completed before it is deinited
     // (this slightly impacts performance)
     deinit {
         let didComplete = lock.withCriticalScope { _didComplete }
@@ -69,7 +71,9 @@ public class ProcedurePromise {
     }
     #endif
 
-    /// complete the ProcedurePromise, signaling the future to dispatch any waiting blocks
+    /// Complete the ProcedurePromise, signaling the future to dispatch any waiting blocks
+    ///
+    /// - IMPORTANT: Only call `complete()` **once** on a ProcedurePromise.
     func complete() {
         #if DEBUG
         lock.withCriticalScope {
@@ -82,9 +86,9 @@ public class ProcedurePromise {
 }
 
 /**
- A ProcedureFuture can be used to schedule a following block of code after it is signaled (in the future).
+ A `ProcedureFuture` can be used to schedule a following block of code after it is signaled (in the future).
  
- You cannot create a ProcedureFuture directly. Instead, create a ProcedurePromise and retrieve the future
+ You cannot create a `ProcedureFuture` directly. Instead, create a `ProcedurePromise` and retrieve the future
  from the promise:
  
  ```swift
@@ -98,7 +102,7 @@ public class ProcedurePromise {
  promise.complete()
  ```
  
- and anything scheduled using the ProcedureFuture will occur after the promise has been completed.
+ and anything scheduled using the `ProcedureFuture` will occur after the promise has been completed.
 
  A simple example is:
  
@@ -119,10 +123,10 @@ public class ProcedurePromise {
  }
  ```
  
- A ProcedureFuture/ProcedurePromise does not return a value - it merely allows you to execute 
+ A `ProcedureFuture` / `ProcedurePromise` does not return a value - it merely allows you to execute
  a block when a promise is complete.
  
- To return a future value, use ProcedureResultPromise (and ProcedureResultFuture).
+ To return a future value, use `ProcedurePromiseResult` (and `ProcedureFutureResult`).
 */
 public class ProcedureFuture {
     internal let group: DispatchGroup
@@ -209,10 +213,10 @@ extension Collection where Iterator.Element: ProcedureFuture {
 // MARK: - ProcedurePromiseResult
 
 /**
- A ProcedurePromiseResult<T>, is much like a ProcedurePromise, except it returns a
- ProcedureFutureResult<T> that provides a ProcedureResult<T> when the promise is completed.
+ A `ProcedurePromiseResult<T>`, is much like a `ProcedurePromise`, except it returns a
+ `ProcedureFutureResult<T>` that provides a `ProcedureResult<T>` when the promise is completed.
 
- Create a ProcedurePromiseResult and retrieve the future from the promise:
+ Create a `ProcedurePromiseResult` and retrieve the future from the promise:
  
  ```swift
  let promise = ProcedurePromiseResult<Bool>()
@@ -225,7 +229,7 @@ extension Collection where Iterator.Element: ProcedureFuture {
  promise.complete(withResult: true)
  ```
  
- and anything scheduled using the ProcedureFuture will occur after the promise has been completed.
+ and anything scheduled using the `ProcedureFutureResult` will occur after the promise has been completed.
  
  A simple example is:
  
@@ -252,8 +256,12 @@ extension Collection where Iterator.Element: ProcedureFuture {
      print("The result is: \(value)")
  }
  ```
+
+ If you do not need to return a value, use `ProcedurePromise` (and `ProcedureFuture`) instead.
  */
 public class ProcedurePromiseResult<T> {
+
+    /// The `ProcedureFutureResult` associated with the Promise.
     public let future = ProcedureFutureResult<T>()
 
     deinit {
@@ -264,10 +272,24 @@ public class ProcedurePromiseResult<T> {
         }
     }
 
+    /// Complete the `ProcedurePromiseResult` with a result of type T, signaling the
+    /// future to dispatch any waiting blocks.
+    ///
+    /// The blocks will receive a `ProcedureResult<T>.success(result)`.
+    /// - See: `ProcedureResult`
+    ///
+    /// - IMPORTANT: Only call `complete` **once** on a ProcedurePromiseResult.
     func complete(withResult success: T) {
         future.complete(withResult: success)
     }
 
+    /// Complete the `ProcedurePromiseResult` with a failure Error, signaling the
+    /// future to dispatch any waiting blocks
+    ///
+    /// The blocks will receive a `ProcedureResult<T>.failure(error)`.
+    /// - See: `ProcedureResult`
+    ///
+    /// - IMPORTANT: Only call `complete` **once** on a ProcedurePromiseResult.
     func complete(withFailure failure: Error) {
         future.complete(withFailure: failure)
     }

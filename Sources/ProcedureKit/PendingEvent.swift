@@ -7,19 +7,19 @@
 import Foundation
 import Dispatch
 
-/// PendingEvent encapsulates a reference to a future Procedure event, and can be used
+/// `PendingEvent` encapsulates a reference to a future `Procedure` event, and can be used
 /// to ensure that asynchronous tasks are executed to completion *before* the future event.
 ///
-/// While a reference to the PendingEvent exists, the event will not occur.
+/// While a reference to the `PendingEvent` exists, the event will not occur.
 ///
-/// You cannot instantiate your own PendingEvent instances - only the framework
+/// You cannot instantiate your own `PendingEvent` instances - only the framework
 /// itself creates and provides (in certain circumstances) PendingEvents.
 ///
 /// A common use-case is when handling a WillExecute or WillFinish observer callback.
-/// ProcedureKit will provide your observer with a PendingExecuteEvent or a PendingFinishEvent.
+/// ProcedureKit will provide your observer with a `PendingExecuteEvent` or a `PendingFinishEvent`.
 ///
 /// If you must dispatch an asynchronous task from within your observer, but want to
-/// ensure that the observed Procedure does not execute/finish until your asynchronous task
+/// ensure that the observed `Procedure` does not execute / finish until your asynchronous task
 /// completes, you can use the Pending(Execute/Finish)Event like so:
 ///
 /// ```swift
@@ -33,8 +33,8 @@ import Dispatch
 /// }
 /// ```
 ///
-/// Some of the built-in Procedure functions take an optional "before:" parameter,
-/// to which a PendingEvent can be directly passed. For example:
+/// Some of the built-in `Procedure` functions take an optional "before:" parameter,
+/// to which a `PendingEvent` can be directly passed. For example:
 ///
 /// ```swift
 /// procedure.addWillFinishObserver { procedure, errors, pendingFinish in
@@ -80,14 +80,14 @@ final public class PendingEvent: CustomStringConvertible {
         group.enter()
     }
 
-    // ensures that a block is executed prior to the PendingEvent
+    // Ensures that a block is executed prior to the event described by the `PendingEvent`
     public func doBeforeEvent(block: () -> Void) {
         group.enter()
         block()
         group.leave()
     }
 
-    // ensures that the call to this function will occur prior to the PendingEvent
+    // Ensures that the call to this function will occur prior to the event described by the `PendingEvent`
     public func doThisBeforeEvent() {
         group.enter()
         group.leave()

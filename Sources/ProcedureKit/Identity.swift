@@ -6,7 +6,10 @@
 
 import Foundation
 
+/// `Identifiable` provides a unique identifier.
 public protocol Identifiable {
+
+    /// A unique identifier
     var identifier: UUID { get }
 }
 
@@ -30,6 +33,8 @@ public extension Procedure {
         }
     }
 
+    /// A Procedure's identity (often used for debugging purposes) provides a unique identifier
+    /// for a `Procedure` instance, comprised of the Procedure's `name` and a `UUID`.
     var identity: Identity {
         return Identity(identifier: identifier, name: name)
     }
