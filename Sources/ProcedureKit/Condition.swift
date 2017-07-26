@@ -492,6 +492,11 @@ internal extension Condition {
 
 // MARK: - Condition Subclasses
 
+/**
+ A `Condition` subclass that always evaluates successfully.
+
+ - seealso: `FalseCondition`
+ */
 public class TrueCondition: Condition {
 
     public init(name: String = "TrueCondition", mutuallyExclusiveCategory: String? = nil) {
