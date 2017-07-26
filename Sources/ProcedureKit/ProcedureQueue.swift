@@ -133,20 +133,27 @@ public extension ProcedureQueueDelegate {
 
     // Operations
 
+    /// Default - do nothing.
     func procedureQueue(_ queue: ProcedureQueue, willAddOperation operation: Operation, context: Any?) -> ProcedureFuture? { /* default no-op */ return nil }
 
+    /// Default - do nothing.
     func procedureQueue(_ queue: ProcedureQueue, didAddOperation operation: Operation, context: Any?) { /* default no-op */ }
 
+    /// Default - do nothing.
     func procedureQueue(_ queue: ProcedureQueue, didFinishOperation operation: Operation) { /* default no-op */ }
 
     // Procedures
 
+    /// Default - do nothing.
     func procedureQueue(_ queue: ProcedureQueue, willAddProcedure procedure: Procedure, context: Any?) -> ProcedureFuture? { /* default no-op */ return nil }
 
+    /// Default - do nothing.
     func procedureQueue(_ queue: ProcedureQueue, didAddProcedure procedure: Procedure, context: Any?) { /* default no-op */ }
 
+    /// Default - do nothing.
     func procedureQueue(_ queue: ProcedureQueue, willFinishProcedure procedure: Procedure, withErrors errors: [Error]) -> ProcedureFuture? { /* default no-op */ return nil }
 
+    /// Default - do nothing.
     func procedureQueue(_ queue: ProcedureQueue, didFinishProcedure procedure: Procedure, withErrors errors: [Error]) { /* default no-op */ }
 }
 
@@ -188,7 +195,7 @@ open class ProcedureQueue: OperationQueue {
     // swiftlint:disable cyclomatic_complexity
     /**
      Adds the operation to the queue. Subclasses which override this method must call this
-     implementation as it is critical to how ProcedureKit function.
+     implementation as it is critical to how ProcedureKit functions.
 
      - parameter op: an `Operation` instance.
      - parameter context: an optional parameter that is passed-through to the Will/DidAdd delegate callbacks
@@ -222,6 +229,10 @@ open class ProcedureQueue: OperationQueue {
 
      - parameter ops: an array of `NSOperation` instances.
      - parameter wait: a Bool flag which is ignored.
+
+     - IMPORTANT:
+       Unlike `Foundation.OperationQueue`, `ProcedureQueue` ignores the
+       `waitUntilFinished` parameter.
      */
     open override func addOperations(_ ops: [Operation], waitUntilFinished wait: Bool) {
         ops.forEach { addOperation($0) }
