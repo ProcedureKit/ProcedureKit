@@ -153,7 +153,7 @@ open class RepeatProcedure<T: Operation>: GroupProcedure {
     /// Other arguments allow for specific dispatch queues, and a maximum count of iteratations.
     ///
     /// This is the most convenient initializer, you can use it like this:
-    /// ```
+    /// ```swift
     ///    let procedure = RepeatProcedure { MyOperation() }
     ///    let procedure = RepeatProcedure(dispatchQueue: target) { MyOperation() }
     ///    let procedure = RepeatProcedure(dispatchQueue: target, max: 5) { MyOperation() }
@@ -170,7 +170,10 @@ open class RepeatProcedure<T: Operation>: GroupProcedure {
         super.init(dispatchQueue: dispatchQueue, operations: [])
     }
 
-    /// Public override of execute which configures and adds the first operation
+    /// Public override of `execute()` which configures and adds the first operation
+    ///
+    /// - IMPORTANT: If subclassing `RepeatProcedure` and overriding this method, consider
+    /// carefully whether / when / how you should call `super.execute()`.
     open override func execute() {
         let current = _repeatStateLock.withCriticalScope { () -> T in
             _configure(_current)
@@ -247,7 +250,7 @@ open class RepeatProcedure<T: Operation>: GroupProcedure {
     /// allow subclasses to override and configure the operation
     /// further before it is added.
     ///
-    /// - returns: an optional Payload
+    /// - returns: an optional Payload future
     final public func next() -> ProcedureFutureResult<Payload?> {
         let promise = ProcedurePromiseResult<Payload?>()
         dispatchEvent {
@@ -338,7 +341,7 @@ extension RepeatProcedure where T: Repeatable {
     /// Other arguments allow for specific dispatch queues, and a maximum count of iteratations.
     ///
     /// This is the most convenient initializer, you can use it like this:
-    /// ```
+    /// ```swift
     ///    let procedure = RepeatProcedure { MyRepeatableOperation() }
     ///    let procedure = RepeatProcedure(dispatchQueue: target) { MyRepeatableOperation() }
     ///    let procedure = RepeatProcedure(dispatchQueue: target, max: 5) { MyRepeatableOperation() }
