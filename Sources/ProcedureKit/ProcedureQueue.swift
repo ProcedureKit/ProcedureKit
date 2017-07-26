@@ -65,7 +65,7 @@ public protocol ProcedureQueueDelegate: class {
      - parameter queue: the `ProcedureQueue`.
      - parameter operation: the `Operation` instance about to be added.
      - parameter context: the context, if any, passed into the call to ProcedureQueue.add(operation:context:) that triggered the delegate callback
-     - returns: (optional) a ProcedureFuture (signaled when handling of the delegate callback is complete), or nil (if there is no need for the ProcedureQueue to wait to add the operation)
+     - returns: (optional) a `ProcedureFuture` (signaled when handling of the delegate callback is complete), or nil (if there is no need for the `ProcedureQueue` to wait to add the operation)
      */
     func procedureQueue(_ queue: ProcedureQueue, willAddOperation operation: Operation, context: Any?) -> ProcedureFuture?
 
@@ -96,7 +96,7 @@ public protocol ProcedureQueueDelegate: class {
      - parameter queue: the `ProcedureQueue`.
      - parameter procedure: the `Procedure` instance about to be added.
      - parameter context: the context, if any, passed into the call to ProcedureQueue.add(operation:context:) that triggered the delegate callback
-     - returns: (optional) a ProcedureFuture (signaled when handling of the delegate callback is complete), or nil (if there is no need for the ProcedureQueue to wait to add the operation)
+     - returns: (optional) a `ProcedureFuture` (signaled when handling of the delegate callback is complete), or nil (if there is no need for the `ProcedureQueue` to wait to add the operation)
      */
     func procedureQueue(_ queue: ProcedureQueue, willAddProcedure procedure: Procedure, context: Any?) -> ProcedureFuture?
 
@@ -115,7 +115,7 @@ public protocol ProcedureQueueDelegate: class {
      - parameter queue: the `ProcedureQueue`.
      - parameter procedure: the `Procedure` instance which finished.
      - parameter errors: an array of `Error`s.
-     - returns: (optional) a ProcedureFuture (signaled when handling of the delegate callback is complete), or nil (if there is no need for the ProcedureQueue to temporarily block the Procedure from finishing)
+     - returns: (optional) a `ProcedureFuture` (signaled when handling of the delegate callback is complete), or nil (if there is no need for the `ProcedureQueue` to temporarily block the Procedure from finishing)
      */
     func procedureQueue(_ queue: ProcedureQueue, willFinishProcedure procedure: Procedure, withErrors errors: [Error]) -> ProcedureFuture?
 
@@ -192,7 +192,7 @@ open class ProcedureQueue: OperationQueue {
 
      - parameter op: an `Operation` instance.
      - parameter context: an optional parameter that is passed-through to the Will/DidAdd delegate callbacks
-     - returns: a ProcedureFuture that is signaled once the operation has been added to the ProcedureQueue
+     - returns: a `ProcedureFuture` that is signaled once the operation has been added to the `ProcedureQueue`
      */
     @discardableResult open func add(operation: Operation, withContext context: Any? = nil) -> ProcedureFuture {
 
@@ -344,7 +344,7 @@ public extension ProcedureQueue {
      
      - parameter operations: a sequence of `Operation` instances.
      - parameter context: an optional parameter that is passed-through to the Will/DidAdd delegate callbacks
-     - returns: a ProcedureFuture that is signaled once the operations have been added to the ProcedureQueue
+     - returns: a `ProcedureFuture` that is signaled once the operations have been added to the `ProcedureQueue`
      */
     @discardableResult
     final func add<S: Sequence>(operations: S, withContext context: Any? = nil) -> ProcedureFuture where S.Iterator.Element: Operation {
@@ -361,7 +361,7 @@ public extension ProcedureQueue {
 
      - parameter operations: a variadic array of `Operation` instances.
      - parameter context: an optional parameter that is passed-through to the Will/DidAdd delegate callbacks
-     - returns: a ProcedureFuture that is signaled once the operations have been added to the ProcedureQueue
+     - returns: a `ProcedureFuture` that is signaled once the operations have been added to the `ProcedureQueue`
      */
     final func add(operations: Operation..., withContext context: Any? = nil) -> ProcedureFuture {
         return add(operations: operations, withContext: context)
