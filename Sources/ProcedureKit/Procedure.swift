@@ -458,8 +458,8 @@ open class Procedure: Operation, ProcedureProtocol {
      responsible for calling `finish()` in **ALL** cases, including when the
      Procedure is cancelled.
 
-     You can react to cancellation using `WillCancelObserver` / `DidCancelObserver`
-     and/or checking periodically during execute with something like:
+     You can react to cancellation using a `DidCancelObserver` and/or
+     checking periodically during `execute()` with something like:
 
      ```swift
      guard !cancelled else {
