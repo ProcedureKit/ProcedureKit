@@ -512,6 +512,11 @@ public class TrueCondition: Condition {
     }
 }
 
+/**
+ A `Condition` subclass that always fails.
+
+ - seealso: `TrueCondition`
+ */
 public class FalseCondition: Condition {
 
     public init(name: String = "FalseCondition", mutuallyExclusiveCategory: String? = nil) {
