@@ -538,7 +538,7 @@ internal extension GroupProcedure {
     }
 
     /**
-     - returns: a ProcedureFuture that is signaled once the Group has fully prepared for the operation to be added
+     - returns: a `ProcedureFuture` that is signaled once the Group has fully prepared for the operation to be added
                 to its internal queue (including notifying all WillAdd observers)
      */
     private func willAdd(operation: Operation, context: Any?) -> ProcedureFuture? {

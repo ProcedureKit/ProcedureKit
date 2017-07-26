@@ -458,8 +458,8 @@ open class Procedure: Operation, ProcedureProtocol {
      responsible for calling `finish()` in **ALL** cases, including when the
      Procedure is cancelled.
 
-     You can react to cancellation using `WillCancelObserver` / `DidCancelObserver`
-     and/or checking periodically during execute with something like:
+     You can react to cancellation using a `DidCancelObserver` and/or
+     checking periodically during `execute()` with something like:
 
      ```swift
      guard !cancelled else {
@@ -789,7 +789,7 @@ open class Procedure: Operation, ProcedureProtocol {
     /// - Parameters:
     ///   - operation: The operation to add to the same queue as target.
     ///   - pendingEvent: (optional) A PendingEvent. The operation will be added prior to the PendingEvent.
-    /// - Returns: A ProcedureFuture that is completed once the operation has been added to the queue.
+    /// - Returns: A `ProcedureFuture` that is completed once the operation has been added to the queue.
     /// - Throws: `ProcedureKitError.noQueue` if the target has not yet been added to a queue / `GroupProcedure`.
     @discardableResult public final func produce(operation: Operation, before pendingEvent: PendingEvent? = nil) throws -> ProcedureFuture {
         precondition(state > .initialized, "Cannot add operation which is not being scheduled on a queue")
