@@ -25,6 +25,8 @@
 		653CA0741D60AB1B0070B7A2 /* ProcedureKitCloud.h in Headers */ = {isa = PBXBuildFile; fileRef = 653CA0731D60AB1B0070B7A2 /* ProcedureKitCloud.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		653CA0781D60ABC90070B7A2 /* ProcedureKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65CFC5F01D608A5500CAD875 /* ProcedureKit.framework */; };
 		653CA07B1D60ABD30070B7A2 /* TestingProcedureKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65CFC6161D60900000CAD875 /* TestingProcedureKit.framework */; };
+		6559B9521EA38E8C00181DEE /* ProcedureChain.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6559B9511EA38E8C00181DEE /* ProcedureChain.swift */; };
+		6559B9541EA392E800181DEE /* ProcedureChainTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6559B9531EA392E800181DEE /* ProcedureChainTests.swift */; };
 		659484271DAAA2B90028F83B /* ProcedureKitLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6594841E1DAAA2B90028F83B /* ProcedureKitLocation.framework */; };
 		659484361DAAA3360028F83B /* ProcedureKitLocation.h in Headers */ = {isa = PBXBuildFile; fileRef = 659484351DAAA3360028F83B /* ProcedureKitLocation.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6594843D1DAAA5430028F83B /* ProcedureKit.framework in Copy Files (2 items) */ = {isa = PBXBuildFile; fileRef = 65CFC5F01D608A5500CAD875 /* ProcedureKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -509,6 +511,8 @@
 		653CA0621D60AA990070B7A2 /* ProcedureKitCloudTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ProcedureKitCloudTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		653CA0731D60AB1B0070B7A2 /* ProcedureKitCloud.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ProcedureKitCloud.h; path = "Supporting Files/ProcedureKitCloud.h"; sourceTree = "<group>"; };
 		653CA0751D60AB2B0070B7A2 /* ProcedureKitCloud.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = ProcedureKitCloud.xcconfig; path = "Supporting Files/ProcedureKitCloud.xcconfig"; sourceTree = "<group>"; };
+		6559B9511EA38E8C00181DEE /* ProcedureChain.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProcedureChain.swift; sourceTree = "<group>"; };
+		6559B9531EA392E800181DEE /* ProcedureChainTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProcedureChainTests.swift; sourceTree = "<group>"; };
 		6594841E1DAAA2B90028F83B /* ProcedureKitLocation.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ProcedureKitLocation.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		659484261DAAA2B90028F83B /* ProcedureKitLocationTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ProcedureKitLocationTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		659484351DAAA3360028F83B /* ProcedureKitLocation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ProcedureKitLocation.h; path = "Supporting Files/ProcedureKitLocation.h"; sourceTree = "<group>"; };
@@ -1058,6 +1062,7 @@
 				65D367021E183FB000D03E86 /* SilentConditionTests.swift */,
 				65D367031E183FB000D03E86 /* TimeoutObserverTests.swift */,
 				65D367041E183FB000D03E86 /* TransformProcedureTests.swift */,
+				6559B9531EA392E800181DEE /* ProcedureChainTests.swift */,
 			);
 			name = ProcedureKitTests;
 			path = Tests/ProcedureKitTests;
@@ -1276,6 +1281,7 @@
 				65D3687E1E184AA600D03E86 /* ProcedureProcotol.swift */,
 				65D3687F1E184AA600D03E86 /* ProcedureQueue.swift */,
 				65D368801E184AA600D03E86 /* ProcedureResult.swift */,
+				6559B9511EA38E8C00181DEE /* ProcedureChain.swift */,
 			);
 			name = Core;
 			sourceTree = "<group>";
@@ -2090,6 +2096,7 @@
 				65D368951E184AA600D03E86 /* Errors.swift in Sources */,
 				65D3689F1E184AA600D03E86 /* Operation+ProcedureKit.swift in Sources */,
 				65D368941E184AA600D03E86 /* DispatchQueue+ProcedureKit.swift in Sources */,
+				6559B9521EA38E8C00181DEE /* ProcedureChain.swift in Sources */,
 				65D368A21E184AA600D03E86 /* ProcedureProcotol.swift in Sources */,
 				EEE79AEB1E21B9D30030C768 /* ProcedureEventQueue.swift in Sources */,
 				65D368AC1E184AA600D03E86 /* TimeoutObserver.swift in Sources */,
@@ -2133,6 +2140,7 @@
 				EEE79AEE1E21C9750030C768 /* KVONotificationTests.swift in Sources */,
 				65D367131E183FB000D03E86 /* ConditionTests.swift in Sources */,
 				65D3671D1E183FB000D03E86 /* LoggerTests.swift in Sources */,
+				6559B9541EA392E800181DEE /* ProcedureChainTests.swift in Sources */,
 				65D3673D1E183FB000D03E86 /* TimeoutObserverTests.swift in Sources */,
 				EE3371091E29AD5A004272E9 /* DispatchQueueExtensionsTests.swift in Sources */,
 				65D3673F1E183FB000D03E86 /* TransformProcedureTests.swift in Sources */,

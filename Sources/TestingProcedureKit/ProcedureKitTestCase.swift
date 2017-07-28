@@ -55,8 +55,18 @@ open class ProcedureKitTestCase: XCTestCase {
         queue.addOperations(operations, waitUntilFinished: false)
     }
 
+    public func run<Output>(chain: Procedure.Chain<Output>) {
+        queue.add(chain: chain)
+    }
+
     public func wait(for procedures: Procedure..., withTimeout timeout: TimeInterval = 3, withExpectationDescription expectationDescription: String = #function, handler: XCWaitCompletionHandler? = nil) {
         wait(forAll: procedures, withTimeout: timeout, withExpectationDescription: expectationDescription, handler: handler)
+    }
+
+    public func wait<Output>(for chain: Procedure.Chain<Output>, withTimeout timeout: TimeInterval = 3, withExpectationDescription expectationDescription: String = #function, handler: XCWaitCompletionHandler? = nil) {
+        addCompletionBlockTo(procedures: chain.procedures)
+        run(chain: chain)
+        waitForExpectations(timeout: timeout, handler: handler)
     }
 
     public func wait(forAll procedures: [Procedure], withTimeout timeout: TimeInterval = 3, withExpectationDescription expectationDescription: String = #function, handler: XCWaitCompletionHandler? = nil) {
