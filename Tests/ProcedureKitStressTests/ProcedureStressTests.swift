@@ -103,6 +103,59 @@ class ProcedureConditionStressTest: StressTestCase {
         wait(for: procedure, withTimeout: 10)
         XCTAssertProcedureFinishedWithoutErrors()
     }
+
+    func test__dependencies_execute_before_condition_dependencies() {
+
+        var failures = Protector<[Int: [String]]>([:])
+        func appendFailure(batch: Int, _ failure: String) {
+            failures.write { (dict) in
+                if var existingFailures = dict[batch] {
+                    existingFailures.append(failure)
+                    dict[batch] = existingFailures
+                }
+                else {
+                    dict[batch] = [failure]
+                }
+            }
+        }
+
+        stress { batch, iteration in
+            batch.dispatchGroup.enter()
+            let procedure = TestProcedure(name: "TestProcedure (\(batch.number): \(iteration))")
+            procedure.addDidFinishBlockObserver { _, _ in
+                batch.dispatchGroup.leave()
+            }
+
+            let dependency1 = TestProcedure(name: "Dependency 1 (\(batch.number): \(iteration))")
+            let dependency2 = TestProcedure(name: "Dependency 2 (\(batch.number): \(iteration))")
+            procedure.add(dependencies: dependency1, dependency2)
+
+            let conditionDependency1 = BlockOperation { [weak procedure] in
+                // dependency1 and dependency2 should be finished
+                let dep1Finished = dependency1.isFinished
+                let dep2Finished = dependency2.isFinished
+                if !dep1Finished { appendFailure(batch: batch.number, "\(dependency1.operationName) did not finish prior to condition-produced dependency") }
+                if !dep2Finished { appendFailure(batch: batch.number, "\(dependency2.operationName) did not finish prior to condition-produced dependency") }
+            }
+            conditionDependency1.name = "Condition 1 Dependency"
+
+            let condition1 = TrueCondition(name: "Condition 1")
+            condition1.produce(dependency: conditionDependency1)
+
+            procedure.add(condition: condition1)
+
+            batch.queue.add(operations: dependency1, dependency2)
+            batch.queue.add(operation: procedure)
+        }
+
+        let finalFailures = failures.access
+        for (batch, failures) in finalFailures {
+            guard failures.isEmpty else {
+                XCTFail("Batch \(batch) encountered \(failures.count) failures:\n\t\(failures.joined(separator: "\n\t"))")
+                continue
+            }
+        }
+    }
 }
 
 class ProcedureConditionsWillFinishObserverCancelThreadSafety: StressTestCase {

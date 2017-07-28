@@ -539,12 +539,6 @@ open class Procedure: Operation, ProcedureProtocol {
         // `directDependencies`, but *is* treated as a dependency by the underlying
         // Operation.
         super.addDependency(evaluator)
-
-        // Ensure that if there are no dependencies, or if the dependencies are already finished,
-        // the EvaluateConditions procedure immediately executes.
-        if evaluator.isReady {
-            evaluator.dispatchStartOnce()
-        }
     }
 
     /// Called by the framework after a Procedure is added to a ProcedureQueue.
@@ -567,7 +561,7 @@ open class Procedure: Operation, ProcedureProtocol {
         // To accomplish this, signal to the EvaluateConditions operation that it is now safe 
         // (post-add) to begin evaluating conditions (assuming it is otherwise ready).
 
-        evaluateConditionsProcedure.procedureHasBeenAddedToQueue()
+        evaluateConditionsProcedure.parentProcedureHasBeenAddedToQueue()
     }
 
     /// Starts the Procedure, correctly managing the cancelled state. Cannot be over-ridden
@@ -1346,8 +1340,7 @@ extension Procedure {
                 return lhs.rawValue < rhs.rawValue
             }
 
-            case waitingOnProcedureDependencies
-            case waitingForProcedureToBeAddedToQueue
+            case waiting
             case dispatchedStart
             case started
             case executingMain
@@ -1365,19 +1358,18 @@ extension Procedure {
             super.init()
         }
 
-        func procedureHasBeenAddedToQueue() {
-            // Only once the related procedure has been fully added to the ProcedureQueue
-            // (OperationQueue) is it safe to begin evaluating conditions (if otherwise ready).
+        func parentProcedureHasBeenAddedToQueue() {
+            // Only once the parent Procedure has been fully added to the ProcedureQueue
+            // (OperationQueue) is it safe to begin evaluating conditions (if otherwise isReady).
 
-            // start the evaluation of conditions *only if* otherwise ready
-            dispatchStartOnce(source: .procedureHasBeenAddedToQueue)
+            dispatchStartOnce(source: .parentProcedureHasBeenAddedToQueue)
         }
 
         private var _isFinished: Bool = false
         private var _isExecuting: Bool = false
         private let stateLock = PThreadMutex()
-        private var _state: State = .waitingOnProcedureDependencies
-        private var _procedureHasBeenAddedToQueue: Bool = false
+        private var _state: State = .waiting
+        private var _parentProcedureHasBeenAddedToQueue: Bool = false
 
         override var isFinished: Bool {
             get { return stateLock.withCriticalScope { return _isFinished } }
@@ -1407,7 +1399,7 @@ extension Procedure {
 
         private enum StartSource {
             case isReady
-            case procedureHasBeenAddedToQueue
+            case parentProcedureHasBeenAddedToQueue
         }
         final private func dispatchStartOnce(source: StartSource) {
             // dispatch start() once
@@ -1415,18 +1407,17 @@ extension Procedure {
                 guard _state < .dispatchedStart else { return false } // already started evaluating
                 switch source {
                 case .isReady:
-                    // isReady can proceed to .dispatchedStart *if* _procedureHasBeenAddedToQueue
-                    guard _procedureHasBeenAddedToQueue else {
-                        // all dependencies are finished, but the procedure hasn't yet been added
-                        // to the queue - wait until it is
-                        _state = .waitingForProcedureToBeAddedToQueue
+                    // if isReady, can proceed to .dispatchedStart *if* _parentProcedureHasBeenAddedToQueue
+                    guard _parentProcedureHasBeenAddedToQueue else {
+                        // isReady, but the parent procedure hasn't yet been added
+                        // to the queue - do not proceed
                         return false
                     }
-                case .procedureHasBeenAddedToQueue:
-                    assert(!_procedureHasBeenAddedToQueue)
-                    _procedureHasBeenAddedToQueue = true
-                    // can proceed to .dispatchedStart *if* otherwise ready (i.e. if state == waitingForProcedureToBeAddedToQueue)
-                    guard _state == .waitingForProcedureToBeAddedToQueue else { return false }
+                case .parentProcedureHasBeenAddedToQueue:
+                    assert(!_parentProcedureHasBeenAddedToQueue)
+                    _parentProcedureHasBeenAddedToQueue = true
+                    // can proceed to .dispatchedStart *if* otherwise isReady
+                    guard super.isReady else { return false }
                 }
                 _state = .dispatchedStart
                 return true
