@@ -2,7 +2,7 @@
 
 - Remark: Transforming state through procedures
 
-Up until now procedures have been discussed as being isolated units of work, albeit with scheduling thanks to dependencies. In practice, this has rather limiting, and if a procedure has a dependency, then likely the result of that work is needed for the waiting procedure.
+Up until now procedures have been discussed as isolated units of work, albeit with scheduling thanks to dependencies. In practice, this is rather limiting. If a procedure has a dependency, then it's likely the result of the dependency is needed for the waiting procedure.
 
 In software engineering this is known as [dependency injection](https://en.wikipedia.org/wiki/Dependency_injection), but we wish to avoid this term to avoid confusion the operational dependencies.
 
@@ -12,7 +12,7 @@ If the requirement for a procedure is available synchronously, or perhaps as a l
 
 ## Asynchronous input
 
-When the requirements needed for a procedure are not available when the instance is created, it will must be injected sometime later - but _before the procedure executes_.
+When the requirements needed for a procedure are not available when the instance is created, it must be injected sometime later - but _before the procedure executes_.
 
 Consider a `DataProcessing` procedure class. Its job is to process `Data`, which we refer to as its _input_. However, lets assume that the data in question must be retrieved from storage, or the network. For this, there is a `DataFetch` procedure. In this context, the `Data` is its _output_.
 
@@ -76,16 +76,12 @@ There is a constraint on `injectResult(from:)` where the dependency, which confo
 
 ## What about errors?
 
-- Warning:
 If the dependency (the `DataFetch` procedure in this example) is cancelled with an error, the _dependent_ procedure (`DataProcessing` in this example) is automatically cancelled with a `ProcedureKitError`.
 
-- Warning:
 If the dependency finishes with errors, likewise, the dependent is cancelled with an appropriate error.
 
-- Warning:
 If the dependency finishes without a `.ready` output value, the dependent is cancelled with an appropriate error.
 
-- Warning:
 if the dependency finishes with an error, the dependency is cancelled with an appropriate error.
 
 
