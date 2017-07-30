@@ -30,7 +30,7 @@ open class GroupProcedure: Procedure {
     fileprivate var _groupChildren: [Operation] // swiftlint:disable:this variable_name
     fileprivate var _groupIsFinishing = false // swiftlint:disable:this variable_name
     fileprivate var _groupIsSuspended = false // swiftlint:disable:this variable_name
-    fileprivate var _groupTransformChildErrorsBlock: TransformChildErrorsBlockType? = nil
+    fileprivate var _groupTransformChildErrorsBlock: TransformChildErrorsBlockType?
 
     /// - returns: the operations which have been added to the queue
     final public var children: [Operation] {

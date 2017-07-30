@@ -158,7 +158,6 @@ internal class TransformObserver<O: ProcedureProtocol, R: ProcedureProtocol>: Pr
     }
 }
 
-
 public struct AnyObserver<Procedure: ProcedureProtocol>: ProcedureObserver {
     private typealias Erased = AnyObserverBox_<Procedure>
 

@@ -1397,10 +1397,12 @@ extension Procedure {
             return superIsReady
         }
 
-        private enum StartSource {
+        private enum StartSource { // swiftlint:disable:this nesting
+
             case isReady
             case parentProcedureHasBeenAddedToQueue
         }
+
         final private func dispatchStartOnce(source: StartSource) {
             // dispatch start() once
             let shouldDispatchStart: Bool = stateLock.withCriticalScope {
