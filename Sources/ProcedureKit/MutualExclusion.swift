@@ -26,6 +26,12 @@ public final class MutuallyExclusive<T>: Condition {
     }
 }
 
+/// Manages Exclusivity locks. A single shared instance (per-process) is used by the framework.
+///
+/// - NOTE: You should not interact with ExclusivityManager directly.
+/// Instead, add `MutuallyExclusive` Conditions to Procedures.
+///
+/// - see: `MutuallyExclusive`
 final public class ExclusivityManager {
 
     static let sharedInstance = ExclusivityManager()
@@ -141,7 +147,7 @@ final public class ExclusivityManager {
 public extension ExclusivityManager {
 
     /// This should only be used as part of the unit testing
-    /// Warning: This immediately frees up any oustanding mutual exclusion.
+    /// - WARNING: This immediately frees up any oustanding mutual exclusion.
     static func __tearDownForUnitTesting() {
         sharedInstance.__tearDownForUnitTesting()
     }

@@ -227,12 +227,13 @@ open class Condition: ConditionProtocol, Hashable {
     /// Dependencies to produce and wait on.
     ///
     /// The framework will automatically schedule these dependencies to run
-    /// after all dependencies on the attached Procedure, and will wait for
+    /// after all dependencies on the attached `Procedure`, and will wait for
     /// these dependencies to finish before the Condition's
     /// `evaluate(procedure:completion:)` function is called.
     ///
+    /// - IMPORTANT:
     /// It is programmer error to add an Operation to the `producedDependencies`
-    /// this is already scheduled for execution or executing, or that will be
+    /// that is already scheduled for execution or executing, or that will be
     /// scheduled for execution elsewhere.
     public var producedDependencies: Set<Operation> {
         return stateLock.withCriticalScope { _producedDependencies }
@@ -323,22 +324,23 @@ open class Condition: ConditionProtocol, Hashable {
 
     // MARK: Dependencies
 
-    // Produce a dependency that the Condition runs before evaluation.
-    //
-    // Dependencies produced in this way are scheduled after all dependencies on 
-    // the attached Procedure, but prior to the `evaluate(procedure:completion)`
-    // method being called.
-    //
-    // The Condition "owns" the dependency, and the framework will handle
-    // scheduling and running the dependency at the appropriate time.
-    // Do *not* separately add the dependency to your own queue.
-    //
-    // If you want to add a dependency that has been or will be separately added
-    // to a queue (or otherwise scheduled for execution), use `add(dependency:)` instead.
-    //
-    // It is a programmer error to produce the same Operation instance on more than
-    // one Condition instance.
-    //
+    /// Produce a dependency that the `Condition` runs before evaluation.
+    ///
+    /// Dependencies produced in this way are scheduled after all dependencies on
+    /// the attached `Procedure`, but prior to the `evaluate(procedure:completion)`
+    /// method being called.
+    ///
+    /// The Condition "owns" the dependency, and the framework will handle
+    /// scheduling and running the dependency at the appropriate time.
+    /// - IMPORTANT: Do *not* separately add the dependency to your own queue.
+    ///
+    /// If you want to add a dependency that has been or will be separately added
+    /// to a queue (or otherwise scheduled for execution), use `add(dependency:)` instead.
+    ///
+    /// - IMPORTANT:
+    /// It is a programmer error to produce the same Operation instance on more than
+    /// one `Condition` instance.
+    ///
     /// - Parameter dependency: an Operation to be produced as a dependency
     final public func produce(dependency: Operation) {
         assert(!dependency.isExecuting, "Do not call produce(dependency:) with an Operation that is already executing.")
@@ -357,6 +359,7 @@ open class Condition: ConditionProtocol, Hashable {
     /// The framework will wait for the dependency to finish before the Condition's 
     /// `evaluate(procedure:completion:)` function is called.
     ///
+    /// - IMPORTANT:
     /// Does not schedule the dependency for execution. You must do this elsewhere by,
     /// for example, adding it to an `OperationQueue` / `ProcedureQueue`.
     ///
@@ -376,6 +379,7 @@ open class Condition: ConditionProtocol, Hashable {
     /// The framework will wait for the dependencies to finish before the Condition's
     /// `evaluate(procedure:completion:)` function is called.
     ///
+    /// - IMPORTANT:
     /// Does not schedule the dependencies for execution. You must do this elsewhere by,
     /// for example, adding it to an `OperationQueue` / `ProcedureQueue`.
     ///
@@ -488,6 +492,11 @@ internal extension Condition {
 
 // MARK: - Condition Subclasses
 
+/**
+ A `Condition` subclass that always evaluates successfully.
+
+ - seealso: `FalseCondition`
+ */
 public class TrueCondition: Condition {
 
     public init(name: String = "TrueCondition", mutuallyExclusiveCategory: String? = nil) {
@@ -503,6 +512,11 @@ public class TrueCondition: Condition {
     }
 }
 
+/**
+ A `Condition` subclass that always fails.
+
+ - seealso: `TrueCondition`
+ */
 public class FalseCondition: Condition {
 
     public init(name: String = "FalseCondition", mutuallyExclusiveCategory: String? = nil) {
@@ -539,7 +553,7 @@ public class FalseCondition: Condition {
  procedure.add(condition: OrCondition(condition1, condition2))
  ```
 
- -SeeAlso: `AndCondition`, `OrCondition`
+ - see: `AndCondition`, `OrCondition`
  */
 open class CompoundCondition: Condition {
 
@@ -708,25 +722,75 @@ open class CompoundCondition: Condition {
     }
 }
 
+/**
+ A Condition subclass that evaluates a sequence of Conditions according to the "&&"
+ compound predicate. i.e. All Conditions in the sequence must succeed for the AndCondition
+ to succeed.
+
+ A subclass of `CompoundCondition` that provides custom initializers (for convenience)
+ for "&&" behavior.
+
+ - see: `CompoundCondition`
+ */
 open class AndCondition: CompoundCondition {
+
+    /// Initialize an AndCondition that evaluates to the logical "&&"
+    /// of all the supplied conditions.
+    ///
+    /// - Parameter conditions: an array of `Condition`s
     public init(_ conditions: [Condition]) {
         super.init(andPredicateWith: conditions)
     }
+
+    /// Initialize an AndCondition that evaluates to the logical "&&"
+    /// of all the supplied conditions.
+    ///
+    /// - Parameter conditions: an sequence of `Condition`s
     public init<S: Sequence>(_ conditions: S) where S.Iterator.Element == Condition {
         super.init(andPredicateWith: conditions)
     }
+
+    /// Initialize an AndCondition that evaluates to the logical "&&"
+    /// of all the supplied conditions.
+    ///
+    /// - Parameter conditions: a variadic array of `Condition`s
     convenience public init(_ conditions: Condition...) {
         self.init(conditions)
     }
 }
 
+/**
+ A Condition subclass that evaluates a sequence of Conditions according to the "||"
+ compound predicate. i.e. At least one Condition in the sequence must succeed for the
+ OrCondition to succeed.
+
+ A subclass of `CompoundCondition` that provides custom initializers (for convenience)
+ for "||" behavior.
+
+ - see: `CompoundCondition`
+ */
 open class OrCondition: CompoundCondition {
+
+    /// Initialize an OrCondition that evaluates to the logical "||"
+    /// of all the supplied conditions.
+    ///
+    /// - Parameter conditions: an array of `Condition`s
     public init(_ conditions: [Condition]) {
         super.init(orPredicateWith: conditions)
     }
+
+    /// Initialize an OrCondition that evaluates to the logical "||"
+    /// of all the supplied conditions.
+    ///
+    /// - Parameter conditions: an sequence of `Condition`s
     public init<S: Sequence>(_ conditions: S) where S.Iterator.Element == Condition {
         super.init(orPredicateWith: conditions)
     }
+
+    /// Initialize an OrCondition that evaluates to the logical "||"
+    /// of all the supplied conditions.
+    ///
+    /// - Parameter conditions: a variadic array of `Condition`s
     convenience public init(_ conditions: Condition...) {
         self.init(conditions)
     }
@@ -738,8 +802,8 @@ open class OrCondition: CompoundCondition {
  This can be useful to automatically manage the dependency and automatic
  injection of the composed condition result for evaluation inside your custom subclass.
 
- - see: NegatedCondition
- - see: SilentCondition
+ - see: `NegatedCondition`
+ - see: `SilentCondition`
  */
 open class ComposedCondition<C: Condition>: Condition {
 
@@ -812,6 +876,7 @@ open class ComposedCondition<C: Condition>: Condition {
         super.evaluate(procedure: procedure, withContext: context, completion: completion)
     }
 }
+
 /**
  A condition that treats failures from a composed condition as `.success(false)`.
 
@@ -852,7 +917,7 @@ public func || (lhs: Condition, rhs: Condition) -> OrCondition {
     return OrCondition([lhs, rhs])
 }
 
-public prefix func !<T>(rhs: T) -> NegatedCondition<T> {
+public prefix func !<T> (rhs: T) -> NegatedCondition<T> {
     return NegatedCondition(rhs)
 }
 
@@ -865,11 +930,11 @@ internal class ConditionEvaluationContext {
     var isCancelled: Bool {
         return stateLock.withCriticalScope { _isCancelled }
     }
-    let queue: DispatchQueue
+    fileprivate let underlyingQueue: DispatchQueue
     fileprivate let aggregator: ConditionResultAggregator
 
     init(queue: DispatchQueue = DispatchQueue(label: "run.kit.procedure.ProcedureKit.ConditionEvaluationContext", attributes: [.concurrent]), behavior: ConditionResultAggregationBehavior = .andPredicate) {
-        self.queue = queue
+        self.underlyingQueue = queue
         self.aggregator = ConditionResultAggregator(behavior: behavior)
     }
 
@@ -880,7 +945,7 @@ internal class ConditionEvaluationContext {
         if __procedureQueue == nil {
             // Lazily create a ProcedureQueue the first time it's needed
             __procedureQueue = ProcedureQueue()
-            __procedureQueue!.underlyingQueue = queue
+            __procedureQueue!.underlyingQueue = underlyingQueue
         }
         return __procedureQueue!
     }
@@ -899,17 +964,17 @@ internal class ConditionEvaluationContext {
         }
     }
 
-    func queue(operation: Operation) {
-        stateLock.withCriticalScope {
+    func queue(operation: Operation) -> ProcedureFuture {
+        return stateLock.withCriticalScope {
             if _isCancelled { operation.cancel() }
-            _procedureQueue.add(operation: operation)
+            return _procedureQueue.add(operation: operation)
         }
     }
 
-    func queue<S>(operations: S) where S: Sequence, S.Iterator.Element: Operation {
-        stateLock.withCriticalScope {
+    func queue<S>(operations: S) -> ProcedureFuture where S: Sequence, S.Iterator.Element: Operation {
+        return stateLock.withCriticalScope {
             if _isCancelled { operations.forEach { $0.cancel() } }
-            _procedureQueue.add(operations: operations)
+            return _procedureQueue.add(operations: operations)
         }
     }
 
@@ -924,7 +989,7 @@ internal class ConditionEvaluationContext {
 
     func subContext(withBehavior behavior: ConditionResultAggregationBehavior = .andPredicate) -> ConditionEvaluationContext {
         return stateLock.withCriticalScope {
-            let newContext = ConditionEvaluationContext(queue: queue, behavior: behavior)
+            let newContext = ConditionEvaluationContext(queue: underlyingQueue, behavior: behavior)
             if _isCancelled { newContext.cancel() }
             _subContexts.append(newContext)
             return newContext
@@ -1130,6 +1195,57 @@ internal extension Condition {
     // swiftlint:enable cyclomatic_complexity
 }
 
+// A Dummy Operation that only finishes once: 
+// - something external calls `finishOnceStarted()` *and* it has been started by the queue
+fileprivate class DummyDependency: Operation {
+    private var stateLock = PThreadMutex()
+    private var _started: Bool = false
+    private var _shouldFinish: Bool = false
+    private var _isFinished: Bool = false
+    private var _isExecuting: Bool = false
+
+    override func start() {
+        isExecuting = true
+        main()
+    }
+    override func main() {
+        let canFinish: Bool = stateLock.withCriticalScope {
+            _started = true
+            return _shouldFinish
+        }
+        guard canFinish else { return }
+        finish()
+    }
+    func finishOnceStarted() {
+        let canFinish: Bool = stateLock.withCriticalScope {
+            _shouldFinish = true
+            return _started
+        }
+        guard canFinish else { return }
+        finish()
+    }
+    private func finish() {
+        isExecuting = false
+        isFinished = true
+    }
+    override var isFinished: Bool {
+        get { return stateLock.withCriticalScope { return _isFinished } }
+        set {
+            willChangeValue(forKey: .finished)
+            stateLock.withCriticalScope { _isFinished = newValue }
+            didChangeValue(forKey: .finished)
+        }
+    }
+    override var isExecuting: Bool {
+        get { return stateLock.withCriticalScope { return _isExecuting } }
+        set {
+            willChangeValue(forKey: .executing)
+            stateLock.withCriticalScope { _isExecuting = newValue }
+            didChangeValue(forKey: .executing)
+        }
+    }
+}
+
 internal extension Collection where Iterator.Element == Condition {
 
     internal var producedDependencies: Set<Operation> {
@@ -1245,7 +1361,39 @@ internal extension Collection where Iterator.Element == Condition {
                 assert(producedDependencies.filter { $0.isExecuting || $0.isFinished }.isEmpty, "One or more produced dependencies are already executing or finished. Condition-produced dependencies must be produced by a single Condition instance, and not manually added to a queue, or executed, or produced by any other Condition instances. Problem Operations: \(producedDependencies.filter { $0.isExecuting || $0.isFinished })")
 
                 // Add the producedDependencies and the conditionEvaluateOperation to the procedureQueue
-                context.queue(operations: producedDependencies, [conditionEvaluateOperation])
+                //
+                // IMPORTANT: To work around a rare race condition in NSOperation / NSOperationQueue,
+                //            the conditionEvaluateOperation must not have its isReady state transition to
+                //            `true` while it is being added to the queue.
+                //
+                //            Therefore: 
+                //              1.) Add the `conditionEvaluateOperation` to the queue *before* its 
+                //                  producedDependencies.
+                //              2.) If only directDependencies exist, create a "dummy" producedDependency,
+                //                  which is explicitly finished only after the queue add completes.
+                //
+                //            (Otherwise, it is possible for a conditionEvaluateOperation to get
+                //            "stuck" as ready but never executing if the dependencies all finish
+                //            while the conditionEvaluateOperation is being added to the underlying
+                //            NSOperationQueue.)
+                //
+                if !producedDependencies.isEmpty {
+                    // 1.) Add the `conditionEvaluateOperation` to the queue *before* its
+                    //     producedDependencies.
+                    context.queue(operations: [conditionEvaluateOperation], producedDependencies)
+                }
+                else {
+                    // 2.) No produced dependencies (only direct dependencies)
+                    //     Create a "dummy" workaround produced dependency which is explicitly finished
+                    //     only after the queue add completes. 
+                    //     (This ensures that the conditionEvaluateOperation will not become ready while
+                    //     being added to the queue.)
+                    let workaroundProducedDependency = DummyDependency()
+                    conditionEvaluateOperation.add(dependency: workaroundProducedDependency)
+                    context.queue(operations: [conditionEvaluateOperation, workaroundProducedDependency]).then(on: context.underlyingQueue) {
+                        workaroundProducedDependency.finishOnceStarted()
+                    }
+                }
 
                 // Skip to the next condition
                 continue
@@ -1258,7 +1406,7 @@ internal extension Collection where Iterator.Element == Condition {
             }
         }
 
-        aggregator.notify(queue: context.queue) { result in
+        aggregator.notify(queue: context.underlyingQueue) { result in
             // Cancel the current evaluation context (since we have a result)
             // (This cancels outstanding produced dependencies and dependent condition operations)
             context.cancel()

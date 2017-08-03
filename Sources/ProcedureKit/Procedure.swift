@@ -197,6 +197,10 @@ open class Procedure: Operation, ProcedureProtocol {
 
     internal let identifier = UUID()
 
+    internal var typeDescription: String {
+        return String(describing: type(of: self))
+    }
+
     internal class ProcedureQueueContext { }
     internal let queueAddContext = ProcedureQueueContext()
 
@@ -434,28 +438,28 @@ open class Procedure: Operation, ProcedureProtocol {
     // MARK: - Disable Automatic Finishing
 
     /**
-     Ability to override Operation's built-in finishing behavior, if a
-     subclass requires full control over when finish() is called.
+     Ability to override Procedure's built-in finishing behavior, if a
+     subclass requires full control over when `finish()` is called.
 
-     Used for GroupOperation to implement proper .Finished state-handling
+     Used for GroupProcedure to implement proper .Finished state-handling
      (only finishing after all child operations have finished).
 
-     The default behavior of Operation is to automatically call finish()
+     The default behavior of Procedure is to automatically call `finish()`
      when:
-     (a) the Operation is cancelled prior to it starting
-         (in which case, the Operation will skip calling execute())
+     (a) the Procedure is cancelled prior to it starting
+         (in which case, the Procedure will skip calling `execute()`)
      (b) when willExecuteObservers log errors
 
-     To ensure that an Operation subclass does not finish until the
-     subclass calls finish():
+     To ensure that a Procedure subclass does not finish until the
+     subclass calls `finish()`:
      call `super.init(disableAutomaticFinishing: true)` in the init.
 
-     IMPORTANT: If disableAutomaticFinishing == TRUE, the subclass is
-     responsible for calling finish() in *ALL* cases, including when the
-     operation is cancelled.
+     - Important: If `disableAutomaticFinishing == TRUE`, the subclass is
+     responsible for calling `finish()` in **ALL** cases, including when the
+     Procedure is cancelled.
 
-     You can react to cancellation using WillCancelObserver/DidCancelObserver
-     and/or checking periodically during execute with something like:
+     You can react to cancellation using a `DidCancelObserver` and/or
+     checking periodically during `execute()` with something like:
 
      ```swift
      guard !cancelled else {
@@ -474,6 +478,11 @@ open class Procedure: Operation, ProcedureProtocol {
 
     // MARK: - Execution
 
+    /// Called by the framework before a Procedure is added to a ProcedureQueue.
+    ///
+    /// - warning: Do *NOT* call this function directly.
+    ///
+    /// - Parameter queue: the ProcedureQueue onto which the Procedure will be added
     public final func willEnqueue(on queue: ProcedureQueue) {
         stateLock.withCriticalScope {
             _state = .willEnqueue
@@ -481,6 +490,10 @@ open class Procedure: Operation, ProcedureProtocol {
         }
     }
 
+    /// Called by the framework before a Procedure is added to a ProcedureQueue, but *after*
+    /// the ProcedureQueue delegate's `procedureQueue(_:willAddProcedure:context:)` is called.
+    ///
+    /// - warning: Do *NOT* call this function directly.
     public final func pendingQueueStart() {
         let optionalConditionEvaluator: EvaluateConditions? = stateLock.withCriticalScope {
             _state = .pending
@@ -526,15 +539,32 @@ open class Procedure: Operation, ProcedureProtocol {
         // `directDependencies`, but *is* treated as a dependency by the underlying
         // Operation.
         super.addDependency(evaluator)
-
-        // Ensure that if there are no dependencies, or if the dependencies are already finished,
-        // the EvaluateConditions procedure immediately executes.
-        if evaluator.isReady {
-            evaluator.dispatchStartOnce()
-        }
     }
 
-    /// Starts the operation, correctly managing the cancelled state. Cannot be over-ridden
+    /// Called by the framework after a Procedure is added to a ProcedureQueue.
+    /// The Procedure may have already been scheduled for / started executing.
+    /// This is only used to manage when it's safe to begin evaluating conditions.
+    internal final func postQueueAdd() {
+        guard let evaluateConditionsProcedure = evaluateConditionsProcedure else { return }
+
+        // If this Procedure has a condition evaluator, the condition evaluator must not
+        // finish prior to the return of the internal OperationQueue.addOperation() call
+        // in ProcedureQueue that adds this Procedure to the ProcedureQueue's underlying
+        // OperationQueue.
+        //
+        // (If the EvaluateConditions operation finishes while the underlying OperationQueue
+        // implementation is in the process of adding the operation, a rare race condition may
+        // be triggered with NSOperationQueue's handling of the Operation isReady state for
+        // the Procedure. This can result in a situation in which a Procedure with, for
+        // example, failing conditions ends up cancelled + ready but never finishes.)
+        //
+        // To accomplish this, signal to the EvaluateConditions operation that it is now safe 
+        // (post-add) to begin evaluating conditions (assuming it is otherwise ready).
+
+        evaluateConditionsProcedure.parentProcedureHasBeenAddedToQueue()
+    }
+
+    /// Starts the Procedure, correctly managing the cancelled state. Cannot be over-ridden
     public final override func start() {
         // Don't call super.start
 
@@ -579,7 +609,7 @@ open class Procedure: Operation, ProcedureProtocol {
         _main()
     }
 
-    /// Do not call main() directly on a Procedure. Add the Procedure to a ProcedureQueue or call start().
+    /// - warning: Do not call `main()` directly on a Procedure. Add the Procedure to a `ProcedureQueue` or call `start()`.
     public final override func main() {
         assertionFailure("Do not call main() directly on a Procedure. Add the Procedure to a ProcedureQueue.")
     }
@@ -741,11 +771,20 @@ open class Procedure: Operation, ProcedureProtocol {
     }
 
     /// Procedure subclasses must override `execute()`.
+    /// - important: Do not call `super.execute()` when subclassing `Procedure` directly.
     open func execute() {
         print("\(self) must override `execute()`.")
         finish()
     }
 
+    /// Adds an operation to the same queue as target.
+    ///
+    /// - Precondition: Target must already be added to a queue / `GroupProcedure`.
+    /// - Parameters:
+    ///   - operation: The operation to add to the same queue as target.
+    ///   - pendingEvent: (optional) A PendingEvent. The operation will be added prior to the PendingEvent.
+    /// - Returns: A `ProcedureFuture` that is completed once the operation has been added to the queue.
+    /// - Throws: `ProcedureKitError.noQueue` if the target has not yet been added to a queue / `GroupProcedure`.
     @discardableResult public final func produce(operation: Operation, before pendingEvent: PendingEvent? = nil) throws -> ProcedureFuture {
         precondition(state > .initialized, "Cannot add operation which is not being scheduled on a queue")
         guard let queue = stateLock.withCriticalScope(block: { return _queue }) else {
@@ -1137,7 +1176,14 @@ open class Procedure: Operation, ProcedureProtocol {
 
      - parameter observer: type conforming to protocol `ProcedureObserver`.
      */
-    open func add<Observer: ProcedureObserver>(observer: Observer) where Observer.Procedure == Procedure {
+    open func add<Observer>(observer: Observer) where Observer: ProcedureObserver, Observer.Procedure: Procedure {
+        assert(self as? Observer.Procedure != nil, "add(observer:) passed an Observer with an invalid expected Procedure type. The Observer will not receive any events from this Procedure. (Observer expects a Procedure of type \"\(String(describing: Observer.Procedure.self))\", but `self` is a \"\(typeDescription)\" and cannot be converted.)")
+
+        add(anyObserver: AnyObserver(base: TransformObserver<Observer.Procedure, Procedure>(base: observer)))
+    }
+
+    // Internal function used to add AnyObserver<Procedure> to the Procedure's internal array of observers.
+    internal func add(anyObserver observer: AnyObserver<Procedure>) {
         assert(state < .pending, "Adding observers to a Procedure after it has been added to a queue is an inherent race condition, and risks missing events.")
 
         dispatchEvent {
@@ -1146,7 +1192,7 @@ open class Procedure: Operation, ProcedureProtocol {
 
             // Add the observer to the internal observers array
             self.stateLock.withCriticalScope {
-                self.protectedProperties.observers.append(AnyObserver(base: observer))
+                self.protectedProperties.observers.append(observer)
             }
 
             // Dispatch the DidAttach event to the observer
@@ -1174,13 +1220,13 @@ open class Procedure: Operation, ProcedureProtocol {
 
     /// Appropriately dispatch an observer call (using the provided block) for every observer.
     ///
-    /// NOTE: Only call this if already on the eventQueue.
+    /// - IMPORTANT: Only call this if already on the eventQueue.
     ///
     /// - Parameters:
     ///   - pendingEvent: the Procedure's PendingEvent that occurs after all the observers have completed their work
     ///   - block: a block that will be called for every observer, on the appropriate queue/thread
     /// - Returns: a DispatchGroup that will be signaled (ready) when the PendingEvent is ready (i.e. when
-    //             all of the observers have completed their work)
+    ///            all of the observers have completed their work)
     internal func dispatchObservers(pendingEvent: (Procedure) -> PendingEvent, block: @escaping (AnyObserver<Procedure>, PendingEvent) -> Void) -> DispatchGroup {
         debugAssertIsOnEventQueue() // This function should only be called if already on the EventQueue
 
@@ -1294,7 +1340,7 @@ extension Procedure {
                 return lhs.rawValue < rhs.rawValue
             }
 
-            case waitingOnProcedureDependencies
+            case waiting
             case dispatchedStart
             case started
             case executingMain
@@ -1312,10 +1358,18 @@ extension Procedure {
             super.init()
         }
 
+        func parentProcedureHasBeenAddedToQueue() {
+            // Only once the parent Procedure has been fully added to the ProcedureQueue
+            // (OperationQueue) is it safe to begin evaluating conditions (if otherwise isReady).
+
+            dispatchStartOnce(source: .parentProcedureHasBeenAddedToQueue)
+        }
+
         private var _isFinished: Bool = false
         private var _isExecuting: Bool = false
         private let stateLock = PThreadMutex()
-        private var _state: State = .waitingOnProcedureDependencies
+        private var _state: State = .waiting
+        private var _parentProcedureHasBeenAddedToQueue: Bool = false
 
         override var isFinished: Bool {
             get { return stateLock.withCriticalScope { return _isFinished } }
@@ -1338,15 +1392,35 @@ extension Procedure {
             let superIsReady = super.isReady
             if superIsReady {
                 // If super.isReady == true, dispatch start *once*
-                dispatchStartOnce()
+                dispatchStartOnce(source: .isReady)
             }
             return superIsReady
         }
 
-        final func dispatchStartOnce() {
+        private enum StartSource { // swiftlint:disable:this nesting
+
+            case isReady
+            case parentProcedureHasBeenAddedToQueue
+        }
+
+        final private func dispatchStartOnce(source: StartSource) {
             // dispatch start() once
             let shouldDispatchStart: Bool = stateLock.withCriticalScope {
-                guard _state < .dispatchedStart else { return false }
+                guard _state < .dispatchedStart else { return false } // already started evaluating
+                switch source {
+                case .isReady:
+                    // if isReady, can proceed to .dispatchedStart *if* _parentProcedureHasBeenAddedToQueue
+                    guard _parentProcedureHasBeenAddedToQueue else {
+                        // isReady, but the parent procedure hasn't yet been added
+                        // to the queue - do not proceed
+                        return false
+                    }
+                case .parentProcedureHasBeenAddedToQueue:
+                    assert(!_parentProcedureHasBeenAddedToQueue)
+                    _parentProcedureHasBeenAddedToQueue = true
+                    // can proceed to .dispatchedStart *if* otherwise isReady
+                    guard super.isReady else { return false }
+                }
                 _state = .dispatchedStart
                 return true
             }
@@ -1354,6 +1428,9 @@ extension Procedure {
             queue.async {
                 self.start()
             }
+        }
+        final fileprivate func dispatchStartOnce() {
+            dispatchStartOnce(source: .isReady)
         }
 
         final override func cancel() {

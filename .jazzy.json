@@ -1,14 +1,89 @@
 {
-	"author": "Procedure Kit Contributors",
-	"author_url": "http://procedure.kit.run",
-	"github_url": "https://github.com/ProcedureKit/ProcedureKit",
-	"module": "ProcedureKit",
-	"module_version": "4.0.0",
-	"readme": "README.md",
-	"swift_version": "3.0",	
-	"xcodebuild_arguments": [
-		"-project", "ProcedureKit.xcodeproj", 
-		"-scheme", "ProcedureKit"
-	],
-	"exclude": [ "Tests" ],
+  "xcodebuild_arguments": [
+  	"-project", "ProcedureKit.xcodeproj", 
+  	"-scheme", "ProcedureKit"],
+  "author": "ProcedureKit Contributors",
+  "author_url": "https://github.com/ProcedureKit",
+  "module": "ProcedureKit",
+  "readme": "README.md",
+  "theme": "Documentation/Themes/fullwidth_pk",
+  "documentation": "Documentation/Guides/**/*.md",
+  
+  "custom_categories": [{
+	"name": "Getting Started",
+	"children": [
+		"What is ProcedureKit?",
+		"Installing ProcedureKit",
+		"MyFirstProcedure",
+		"Scheduling",
+		"Dependencies"
+	]}, {
+	"name": "Migrating",
+	"children": [
+	    "From NSOperation",
+	    "From WWDC2015",
+	    "From PSOperations",
+	    "From v3 Operations"
+	]}, {
+	"name": "Basic Features",
+	"children": [
+	    "Observers",
+	    "Conditions",
+	    "Groups",
+	    "Result Injection",
+	    "Logging"
+	]}, {
+	"name": "Cancellation",
+	"children": [
+	    "Handling Cancellation",
+	    "In Synchronous Procedures",	
+	    "In Asynchronous Procedures"
+	]}, {
+	"name": "Advanced Features",
+	"children": [
+	    "Custom Observers",	
+	    "Mutual Exclusion",	
+	    "Advanced Conditions",
+	    "Capabilities",
+	    "Advanced Groups",
+	    "Advanced Result Injection",
+	    "Custom Logging"
+	]}, {
+	"name": "Built-in Procedures",
+	"children": [
+	    "BlockProcedure",	
+	    "ComposedProcedure",	
+	    "GatedProcedure",
+	    "DelayProcedure",
+	    "RepeatProcedure",
+	    "RetryProcedure"
+	]}, {
+	"name": "Core",
+	"children": [
+	    "Procedure",
+	    "ProcedureQueue",
+	    "ProcedureObserver",
+	    "ProcedureProtocol",
+	    "Condition"
+	]}, {
+	"name": "Built-in Conditions",
+	"children": [
+	    "BlockCondition",
+	    "NegatedContion",
+	    "SilentCondition",
+	    "NoFailedDependenciesCondition",
+	    "MutualExclusion"
+	]}, {
+	"name": "Built-in Observers",
+	"children": [
+	    "BlockObserver",
+	    "WillExecuteObserver",
+	    "DidExecuteObserver",
+	    "DidCancelObserver",
+	    "WillAddOperationObserver",
+	    "DidAddOperationObserver",
+	    "WillFinishObserver",
+	    "DidFinishObserver"
+	]}
+  ]
 }

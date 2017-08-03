@@ -2,8 +2,8 @@
 
 [![Build status](https://badge.buildkite.com/4bc80b0824c6357ae071342271cb503b8994cf0cfa58645849.svg?branch=master)](https://buildkite.com/blindingskies/procedurekit)
 [![Coverage Status](https://coveralls.io/repos/github/ProcedureKit/ProcedureKit/badge.svg?branch=swift%2F2.2)](https://coveralls.io/github/ProcedureKit/ProcedureKit?branch=swift%2F2.2)
+[![Documentation](http://procedure.kit.run/development/badge.svg)](http://procedure.kit.run/development)
 [![CocoaPods Compatible](https://img.shields.io/cocoapods/v/ProcedureKit.svg?style=flat)](https://cocoapods.org/pods/ProcedureKit)
-[![CocoaPods Documentation](https://img.shields.io/cocoapods/metrics/doc-percent/ProcedureKit.svg?style=flat)](https://cocoapods.org/pods/ProcedureKit)
 [![Platform](https://img.shields.io/cocoapods/p/ProcedureKit.svg?style=flat)](http://cocoadocs.org/docsets/ProcedureKit)
 [![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/Carthage/Carthage)
 
@@ -14,7 +14,8 @@ A Swift framework inspired by WWDC 2015 Advanced NSOperations session. Previousl
 Resource | Where to find it
 ---------|-----------------
 Session video | [developer.apple.com](https://developer.apple.com/videos/wwdc/2015/?id=226)
-Reference documentation | [docs.danthorpe.me/operations](http://docs.danthorpe.me/operations/2.9.0/index.html)
+Old but more complete reference documentation | [docs.danthorpe.me/operations](http://docs.danthorpe.me/operations/2.9.0/index.html)
+Updated but not yet complete reference docs | [procedure.kit.run/development](http://procedure.kit.run/development/index.html)
 Programming guide | [operations.readme.io](https://operations.readme.io)
 Example projects | [danthorpe/Examples](https://github.com/danthorpe/Examples)
 
@@ -35,74 +36,9 @@ The current version of ProcedureKit supports Swift 3+, and the use of Xcode 8.2+
 
 _ProcedureKit_ is a "multi-module" framework (don't bother Googling that, I just made it up). What I mean, is that the Xcode project has multiple targets/products each of which produces a Swift module. Some of these modules are cross-platform, others are dedicated, e.g. `ProcedureKitNetwork` vs `ProcedureKitMobile`.
 
-### Integration
+## Installing ProcedureKit
 
-You can add _ProcedureKit_ to your project, by following [Apple's guidelines](https://www.google.com/search?q=apple+docs,+add+framework+to+xcode+project) (dragging the `.xcodeproj` file into your project). Alternatively, you can use package managers as described below.
-
-#### CocoaPods
-
-ProcedureKit is available through [CocoaPods](https://cocoapods.org/pods/ProcedureKit). To install
-it, include it in your Podfile. Here is a full example of a cross platform application with unit test support. In this case, _ProcedureKit_ has been included via submodules.
-
-```ruby
-target 'MyApp' do
-  platform :osx, '10.11'
-
-  use_frameworks!
-
-  # This subspec includes all the cross-platform modules
-  # including networking, location & cloudkit
-  pod 'ProcedureKit/All', :path => 'submodules/ProcedureKit'
-
-  target 'TryProcedureKitTests' do
-    inherit! :search_paths
-    # This pod provides test harnesses and mechanism to help
-    # write unit tests for your Procedures
-    pod 'TestingProcedureKit', :path => 'submodules/ProcedureKit'
-  end
-end
-
-target 'MyApp iOS' do
-  platform :ios, '10'
-  use_frameworks!
-
-  pod 'ProcedureKit/All', :path => 'submodules/ProcedureKit'
-  # This subspec is the iOS only UIKit related stuff
-  pod 'ProcedureKit/Mobile', :path => 'submodules/ProcedureKit'  
-
-  target 'TryProcedureKit iOSTests' do
-    inherit! :search_paths
-    pod 'TestingProcedureKit', :path => 'submodules/ProcedureKit'
-  end
-end
-```
-
-Now, due to the way that CocoaPods works, all code from the _ProcedureKit_ is made available under a single module name. In this case `ProcedureKit`. This is because CocoaPods creates its own Xcode targets to add the files defined in the spec. So, your Swift files will only need to add `import ProcedureKit` even if you want to use functionality from other modules, such as  _ProcedureKitMobile_. We appreciate that this can be a bit confusing!
-
-### Carthage
-
-Add the following line to your Cartfile:
-
-```ruby
-github 'ProcedureKit/ProcedureKit'
-```
-
-Then update your `Carthage` directory by running on the command line:
-
-```bash
-$ carthage bootstrap
-```
-This will go off and build everything. It'll take a short while, definitely time for a cup of tea. When it's complete, you can drag the built frameworks to your project and embed them in the binary.
-
-When using Carthage, each module is separated out. So, if you want to use the networking APIs, you would add the following to your Swift file:
-
-```swift
-import ProcedureKit
-import ProcedureKitNetwork
-```
-
-#### Swift Package Manager
-_ProcedureKit_ totally supports SPM, it's basically just like Carthage.
+See the [Installing ProcedureKit](http://procedure.kit.run/development/installing-procedurekit.html) guide. 
 
 ## Usage
 

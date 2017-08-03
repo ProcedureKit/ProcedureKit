@@ -10,6 +10,21 @@ import TestingProcedureKit
 
 
 class TestableProfileReporter: ProcedureProfilerReporter {
+
+    let didProfileResultGroup = DispatchGroup()
+
+    init() {
+        didProfileResultGroup.enter()
+    }
+    deinit {
+        guard let _ = didProfileResult else {
+            // did not finish profiling before going out of scope
+            // missing matching leave for DispatchGroup.enter()
+            didProfileResultGroup.leave()
+            return
+        }
+    }
+
     var didProfileResult: ProfileResult? {
         get { return _didProfileResult.access }
         set { _didProfileResult.overwrite(with: newValue) }
@@ -19,6 +34,7 @@ class TestableProfileReporter: ProcedureProfilerReporter {
 
     func finishedProfiling(withResult result: ProfileResult) {
         didProfileResult = result
+        didProfileResultGroup.leave()
     }
 }
 
@@ -41,6 +57,26 @@ class ProfilerTests: ProcedureKitTestCase {
         super.tearDown()
     }
 
+    func waitForReporterAnd(for procedure: Procedure, withTimeout timeout: TimeInterval = 3, withExpectationDescription expectationDescription: String = #function) {
+        wait(for: procedure, andReporter: reporter, withTimeout: timeout, withExpectationDescription: expectationDescription)
+    }
+
+    func wait(for procedure: Procedure, andReporter reporter: TestableProfileReporter, withTimeout timeout: TimeInterval = 3, withExpectationDescription expectationDescription: String = #function) {
+
+        // Wait for the Procedure to finish
+        wait(for: procedure, withTimeout: timeout, withExpectationDescription: expectationDescription)
+
+        // - Profiling finishes via a DidFinish observer on the Procedure
+        // - The above wait may return prior to the DidFinish observer being called
+        // Thus, additionally wait for the TestableProfileReporter to be signaled
+        // with the ProfileResult.
+        weak var exp = expectation(description: "Finished profiling for: \(expectationDescription)")
+        reporter.didProfileResultGroup.notify(queue: DispatchQueue.main) {
+            exp?.fulfill()
+        }
+        waitForExpectations(timeout: timeout)
+    }
+
     func validateProfileResult(result: ProfileResult, after: TimeInterval) {
         XCTAssertGreaterThanOrEqual(result.created, after)
         XCTAssertGreaterThan(result.attached, 0)
@@ -60,7 +96,7 @@ class ProfilerTests: ProcedureKitTestCase {
     func test__profile_simple_operation_which_finishes() {
         procedure.add(observer: profiler)
 
-        wait(for: procedure)
+        waitForReporterAnd(for: procedure)
         guard let result = reporter.didProfileResult else {
             XCTFail("Reporter did not receive profile result."); return
         }
@@ -75,7 +111,7 @@ class ProfilerTests: ProcedureKitTestCase {
             op.cancel()
         })
         procedure.add(observer: profiler)
-        wait(for: procedure)
+        waitForReporterAnd(for: procedure)
 
         guard let result = reporter.didProfileResult else {
             XCTFail("Reporter did not receive profile result."); return
@@ -88,11 +124,15 @@ class ProfilerTests: ProcedureKitTestCase {
     func test__profile_operation__which_produces_child() {
 
         let child = TestProcedure()
+        // Also wait for the produced child to complete
+        addCompletionBlockTo(procedure: child)
 
         procedure = TestProcedure(produced: child)
         procedure.add(observer: profiler)
 
-        wait(for: procedure)
+        // Because of the addCompletionBlockTo line above, wait for the procedure *and*
+        // the child it produces to complete
+        waitForReporterAnd(for: procedure)
 
         guard let result = reporter.didProfileResult else {
             XCTFail("Reporter did not receive profile result."); return
@@ -111,7 +151,7 @@ class ProfilerTests: ProcedureKitTestCase {
         group.log.severity = .notice
         group.add(observer: profiler)
 
-        wait(for: group)
+        waitForReporterAnd(for: group)
 
         guard let result = reporter.didProfileResult else {
             XCTFail("Reporter did not receive profile result."); return

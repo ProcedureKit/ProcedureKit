@@ -7,6 +7,10 @@
 import Foundation
 import Dispatch
 
+/// `Delay` encapsulates different ways of specifying a delay.
+///
+/// - by: a `TimeInterval`
+/// - until: a `Date`
 public enum Delay: Comparable {
 
     public static func == (lhs: Delay, rhs: Delay) -> Bool {
@@ -58,12 +62,13 @@ internal extension Delay {
 }
 
 /**
- `DelayProcedure` is a procedure which waits until a given future
+ `DelayProcedure` is a `Procedure` which waits until a given future
  date, or a time interval. If the interval is negative, or the date
  is in the past, the procedure finishes.
 
- Note that this procedure efficiently uses GCD so it
- does not block the thread on which it is called.
+ - Note: This procedure efficiently uses
+ [GCD](https://developer.apple.com/documentation/dispatch) so it does
+ not block the thread on which it is called (i.e. it is asynchronous).
 
  Make an operation dependent on a `DelayProcedure` in order to
  make it execute after a timeout, or in a repeated fashion with a
@@ -100,7 +105,7 @@ public class DelayProcedure: Procedure {
     }
 
     /**
-     Initialize the `DelayProcedure` with a time interval.
+     Initialize the `DelayProcedure` with a date.
 
      - parameter until: a `Date`.
      - parameter leeway: an `DispatchTimeInterval` representing leeway
@@ -113,9 +118,9 @@ public class DelayProcedure: Procedure {
     }
 
     /**
-     Executes the operation by using dispatch_after to finish the
-     operation in the future, but only if the time interval is
-     greater than zero.
+     Executes the operation by using a DispatchSourceTimer to finish
+     the operation in the future, but only if the time interval is
+     greater than zero. (Otherwise it finishes immediately.)
      */
     public override func execute() {
         switch delay.interval {

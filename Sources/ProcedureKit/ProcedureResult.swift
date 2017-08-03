@@ -128,12 +128,12 @@ public extension OutputProcedure {
 public extension ProcedureProtocol {
 
     /**
-     Access the completed dependency operation before `self` is
+     Access the completed dependency Procedure before `self` is
      started. This can be useful for transfering results/data between
-     operations.
+     Procedures.
 
-     - parameters dep: any `Operation` subclass.
-     - parameters block: a closure which receives `self`, the dependent
+     - parameter dependency: any `Procedure` subclass.
+     - parameter block: a closure which receives `self`, the dependent
      operation, and an array of `ErrorType`, and returns Void.
      (The closure is automatically dispatched on the EventQueue
      of the receiver, if the receiver is a Procedure or supports the

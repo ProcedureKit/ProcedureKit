@@ -4,4 +4,4 @@ set -eu
 
 # Makes sure all the steps run on this same agent
 #sed "s/\$XCODE/$BUILDKITE_AGENT_META_DATA_XCODE/;s/\$COMMIT/$BUILDKITE_COMMIT/" .ci/buildkite/pipeline.template.yml
-sed "s/\$XCODE/$BUILDKITE_AGENT_META_DATA_XCODE/;s/\$COMMIT/$BUILDKITE_COMMIT/" .ci/buildkite/pipeline.sh | sh
+sed "s~\$XCODE~$BUILDKITE_AGENT_META_DATA_XCODE~;s~\$COMMIT~$BUILDKITE_COMMIT~;s~\$BRANCH~$BUILDKITE_BRANCH~" .ci/buildkite/pipeline.sh | sh

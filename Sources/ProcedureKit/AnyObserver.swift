@@ -62,6 +62,102 @@ class AnyObserverBox<Base: ProcedureObserver>: AnyObserverBox_<Base.Procedure> {
     }
 }
 
+/// Creates a ProcedureObserver that wraps another ProcedureObserver and transforms the input events from
+/// the input Procedure type ("R") to the wrapped ProcedureObserver's expected Procedure type ("O") (via a
+/// `procedureTransformBlock`).
+///
+/// This observer will fail at run-time if an event handler is called with a Procedure subclass that cannot
+/// be converted to the wrapped ProcedureObserver's expected Procedure type (via the transform block).
+///
+/// Failures are logged as warnings to the event's input Procedure.
+internal class TransformObserver<O: ProcedureProtocol, R: ProcedureProtocol>: ProcedureObserver {
+    private typealias Erased = AnyObserverBox_<O>
+    public typealias Procedure = R
+
+    private var wrapped: Erased
+    private var procedureTransformBlock: (R) -> O?
+    init<Base: ProcedureObserver>(base: Base, procedureTransformBlock: @escaping (R) -> O? = { return $0 as? O }) where O == Base.Procedure {
+        wrapped = AnyObserverBox(base)
+        self.procedureTransformBlock = procedureTransformBlock
+    }
+
+    private enum Event {
+        case didAttach
+        case willExecute
+        case didExecute
+        case didCancel
+        case willAdd
+        case didAdd
+        case willFinish
+        case didFinish
+
+        var string: String {
+            switch self {
+            case .didAttach: return "didAttach"
+            case .willExecute: return "willExecute"
+            case .didExecute: return "didExecute"
+            case .didCancel: return "didCancel"
+            case .willAdd: return "procedureWillAdd"
+            case .didAdd: return "procedureDidAdd"
+            case .willFinish: return "willFinish"
+            case .didFinish: return "didFinish"
+            }
+        }
+    }
+
+    private func typedProcedure(_ procedure: R, event: Event) -> O? {
+        guard let typedProcedure = procedureTransformBlock(procedure) else {
+            procedure.log.warning(message: ("Observer will not receive event (\(event.string)). Unable to convert \(procedure) to the expected type \"\(String(describing: O.self))\""))
+            return nil
+        }
+        return typedProcedure
+    }
+
+    func didAttach(to procedure: Procedure) {
+        guard let baseProcedure = typedProcedure(procedure, event: .didAttach) else { return }
+        wrapped.didAttach(to: baseProcedure)
+    }
+
+    func will(execute procedure: Procedure, pendingExecute: PendingExecuteEvent) {
+        guard let baseProcedure = typedProcedure(procedure, event: .willExecute) else { return }
+        wrapped.will(execute: baseProcedure, pendingExecute: pendingExecute)
+    }
+
+    func did(execute procedure: Procedure) {
+        guard let baseProcedure = typedProcedure(procedure, event: .didExecute) else { return }
+        wrapped.did(execute: baseProcedure)
+    }
+
+    func did(cancel procedure: Procedure, withErrors errors: [Error]) {
+        guard let baseProcedure = typedProcedure(procedure, event: .didCancel) else { return }
+        wrapped.did(cancel: baseProcedure, withErrors: errors)
+    }
+
+    func procedure(_ procedure: Procedure, willAdd newOperation: Operation) {
+        guard let baseProcedure = typedProcedure(procedure, event: .willAdd) else { return }
+        wrapped.procedure(baseProcedure, willAdd: newOperation)
+    }
+
+    func procedure(_ procedure: Procedure, didAdd newOperation: Operation) {
+        guard let baseProcedure = typedProcedure(procedure, event: .didAdd) else { return }
+        wrapped.procedure(baseProcedure, didAdd: newOperation)
+    }
+
+    func will(finish procedure: Procedure, withErrors errors: [Error], pendingFinish: PendingFinishEvent) {
+        guard let baseProcedure = typedProcedure(procedure, event: .willFinish) else { return }
+        wrapped.will(finish: baseProcedure, withErrors: errors, pendingFinish: pendingFinish)
+    }
+
+    func did(finish procedure: Procedure, withErrors errors: [Error]) {
+        guard let baseProcedure = typedProcedure(procedure, event: .didFinish) else { return }
+        wrapped.did(finish: baseProcedure, withErrors: errors)
+    }
+
+    var eventQueue: DispatchQueueProtocol? {
+        return wrapped.eventQueue
+    }
+}
+
 public struct AnyObserver<Procedure: ProcedureProtocol>: ProcedureObserver {
     private typealias Erased = AnyObserverBox_<Procedure>
 

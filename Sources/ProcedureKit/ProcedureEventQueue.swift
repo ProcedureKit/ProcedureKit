@@ -98,7 +98,7 @@ internal extension EventQueue {
     /// at init(). For Procedure.eventQueue, this value is updated when the
     /// Procedure.qualityOfService is updated.)
     ///
-    /// Note: Just because a block has a specified QoS level does not guarantee the block
+    /// - NOTE: Just because a block has a specified QoS level does not guarantee the block
     /// will execute with that exact QoS level. Promotional QoS and other factors can come
     /// into play and result in a higher QoS level.
     ///
@@ -132,7 +132,7 @@ internal extension EventQueue {
         })
     }
 
-    /// NOTE: MUST be called when executing on the receiver EventQueue itself.
+    /// - IMPORTANT: MUST be called when executing on the receiver EventQueue itself.
     ///
     /// Dispatches a block to be executed on another queue (EventQueue, DispatchQueue, etc)
     /// non-concurrently with the receiver (i.e. the current EventQueue). No further blocks
