@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name              = "ProcedureKit"
-  s.version           = "4.2.0"
+  s.version           = "4.3.1"
   s.summary           = "Powerful Operation subclasses in Swift."
   s.description       = <<-DESC
   
