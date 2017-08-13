@@ -1,3 +1,7 @@
+# 4.3.1
+
+1. [#785](https://github.com/ProcedureKit/ProcedureKit/pull/785) To get round an error with Xcode 9 betas archiving applications. 
+
 # 4.3.0
 
 ## Documentation
