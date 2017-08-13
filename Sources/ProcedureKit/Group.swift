@@ -144,7 +144,7 @@ open class GroupProcedure: Procedure {
     //
     // This function is called internally by the Group's .cancel() (Procedure.cancel())
     // prior to dispatching DidCancel observers on the Group's EventQueue.
-    final internal override func _procedureDidCancel(withAdditionalErrors additionalErrors: [Error]) {
+    override func _procedureDidCancel(withAdditionalErrors additionalErrors: [Error]) {
         if additionalErrors.isEmpty {
             children.forEach { $0.cancel() }
         }
