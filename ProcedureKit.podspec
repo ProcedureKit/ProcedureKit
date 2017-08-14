@@ -16,7 +16,7 @@ session Advanced NSOperations: https://developer.apple.com/videos/wwdc/2015/?id=
   s.social_media_url  = 'https://twitter.com/danthorpe'
   s.requires_arc      = true
   s.ios.deployment_target = '8.0'
-  s.watchos.deployment_target = '2.0'
+  s.watchos.deployment_target = '3.0'
   s.tvos.deployment_target = '9.2'
   s.osx.deployment_target = '10.10'
   
