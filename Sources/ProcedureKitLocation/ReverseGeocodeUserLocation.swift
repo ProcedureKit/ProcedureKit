@@ -68,7 +68,7 @@ open class ReverseGeocodeUserLocationProcedure: GroupProcedure, OutputProcedure 
         set { assertionFailure("\(#function) should not be publically settable.") }
     }
 
-    init(dispatchQueue: DispatchQueue? = nil, timeout: TimeInterval = 3.0, accuracy: CLLocationAccuracy = kCLLocationAccuracyThreeKilometers, completion: CompletionBlock? = nil) {
+    public init(dispatchQueue: DispatchQueue? = nil, timeout: TimeInterval = 3.0, accuracy: CLLocationAccuracy = kCLLocationAccuracyThreeKilometers, completion: CompletionBlock? = nil) {
 
         finishing = Finishing(completion: completion)
 
