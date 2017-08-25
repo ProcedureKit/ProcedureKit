@@ -130,8 +130,6 @@ cat <<-YAML
 - 
   name: ":aws: Generate"
   trigger: "procedurekit-documentation"
-  agents:
-    docs: "true"    
   build:
     message: "Generating documentation for ProcedureKit"
     commit: "HEAD"
