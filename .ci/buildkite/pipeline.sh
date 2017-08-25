@@ -63,7 +63,7 @@ steps:
     queue: "iOS-Simulator" 
     xcode: "$XCODE"      
 -
-  name: "ProcedureKit: tvOS"
+  name: "ProcedureKit (tvOS)"
   command: "source /usr/local/opt/chruby/share/chruby/chruby.sh && chruby ruby && bundle install --quiet && bundle exec fastlane ios test_tvos"
   agents:
     queue: "iOS-Simulator"
