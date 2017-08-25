@@ -128,7 +128,7 @@ fi
 cat <<-YAML
 
 - 
-  name: ":aws: Generate"
+  name: ":aws: Generate Docs"
   trigger: "procedurekit-documentation"
   build:
     message: "Generating documentation for ProcedureKit"
