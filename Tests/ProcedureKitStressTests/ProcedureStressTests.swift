@@ -195,6 +195,50 @@ class ProcedureConditionsWillFinishObserverCancelThreadSafety: StressTestCase {
             procedure.cancel()
         }
     }
+
+    func test__conditions_queue_suspension_safety() {
+        let numberOfQueueIsSuspendedCycles = Protector<Int>(0)
+        var lastBatchStopQueueSuspensionLoop = Protector<Bool>(false)
+        let procedures = Protector<[Procedure]>([])
+
+        stress { batch, iteration in
+            if (iteration == 0) {
+                // On the first iteration in a batch
+                // Stop the prior batch's loop
+                lastBatchStopQueueSuspensionLoop.overwrite(with: true)
+
+                // Dispatch an asynchronous loop to toggle isSuspended on the batch's queue
+                lastBatchStopQueueSuspensionLoop = Protector<Bool>(false)
+                DispatchQueue.global(qos: .userInteractive).async { [stopLoop = lastBatchStopQueueSuspensionLoop, queue = batch.queue] in
+                    // constantly suspend/resume the queue
+                    repeat {
+                        queue.isSuspended = true
+                        queue.isSuspended = false
+                        numberOfQueueIsSuspendedCycles.write({ (number) in
+                            if number < Int.max { // ensure we don't overflow
+                                number += 1
+                            }
+                        })
+                    } while (!stopLoop.access)
+                }
+            }
+            batch.dispatchGroup.enter()
+            let procedure = TestProcedure()
+            procedure.add(condition: FalseCondition())
+            procedure.addDidFinishBlockObserver { _, _ in
+                batch.dispatchGroup.leave()
+            }
+            procedures.append(procedure)
+            batch.queue.add(operation: procedure)
+        }
+
+        lastBatchStopQueueSuspensionLoop.overwrite(with: true)
+
+        for procedure in procedures.access {
+            XCTAssertProcedureCancelledWithErrors(procedure)
+        }
+        print ("Queue isSuspended cycles (total, all batches): \(numberOfQueueIsSuspendedCycles.access)")
+    }
 }
 
 class ProcedureFinishStressTest: StressTestCase {

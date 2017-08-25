@@ -46,23 +46,27 @@ final public class ExclusivityManager {
         // from creating an instance.
     }
 
+    /// Asynchronously requests a lock for a set of categories, and calls the completion block
+    /// once it is acquired.
+    ///
+    /// The set of categories must not be empty.
+    ///
+    /// The completion block is *always* called asynchronously.
+    ///
+    /// - Parameters:
+    ///   - categories: a Set of Strings - each String is treated as a unique lock identifier
+    ///   - completion: a block called once the lock on every category is acquired
     internal func requestLock(for categories: Set<String>, completion: @escaping () -> Void) {
         guard !categories.isEmpty else {
             // No categories requested
-            assertionFailure("A request for Mutual Exclusivity locks was made with no categories specified. This request is unnecessary.")
-            completion()
-            return
+            fatalError("A request for Mutual Exclusivity locks was made with no categories specified. This request is unnecessary.") // ProcedureKit internal programmer error
         }
 
         queue.async { self._requestLock(for: categories, completion: completion) }
     }
 
     private func _requestLock(for categories: Set<String>, completion: @escaping () -> Void) {
-
-        guard !categories.isEmpty else {
-            completion()
-            return
-        }
+        assert(!categories.isEmpty)
 
         // Create a new dispatch group for this lock request
         let categoriesGroup = DispatchGroup()

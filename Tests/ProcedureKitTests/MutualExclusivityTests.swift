@@ -48,6 +48,131 @@ class MutualExclusiveTests: ProcedureKitTestCase {
 
         wait(for: procedure1, procedure2)
     }
+
+    func test__procedure_mutual_exclusivity_internal_API_contract() {
+        class CustomProcedureQueue: ProcedureQueue {
+            typealias RequestLockObserver = (Set<String>) -> Void
+            typealias ProcedureClaimLockObserver = (ExclusivityLockTicket) -> Void
+            typealias UnlockObservers = (Set<String>) -> Void
+
+            private let requestLockCallback: RequestLockObserver
+            private let procedureClaimLockCallback: ProcedureClaimLockObserver
+            private let unlockCallback: UnlockObservers
+
+            init(requestLock: @escaping RequestLockObserver, procedureClaimLock: @escaping ProcedureClaimLockObserver, unlock: @escaping UnlockObservers) {
+                requestLockCallback = requestLock
+                procedureClaimLockCallback = procedureClaimLock
+                unlockCallback = unlock
+            }
+
+            internal override func requestLock(for mutuallyExclusiveCategories: Set<String>, completion: @escaping (ExclusivityLockTicket) -> Void) {
+                DispatchQueue.main.async {
+                    self.requestLockCallback(mutuallyExclusiveCategories)
+                    super.requestLock(for: mutuallyExclusiveCategories, completion: completion)
+                }
+            }
+
+            internal override func procedureClaimLock(withTicket ticket: ExclusivityLockTicket, completion: @escaping () -> Void) {
+                DispatchQueue.main.async {
+                    self.procedureClaimLockCallback(ticket)
+                    super.procedureClaimLock(withTicket: ticket, completion: completion)
+                }
+            }
+
+            internal override func unlock(mutuallyExclusiveCategories categories: Set<String>) {
+                DispatchQueue.main.async {
+                    self.unlockCallback(categories)
+                    super.unlock(mutuallyExclusiveCategories: categories)
+                }
+            }
+        }
+
+        struct DummyExclusivity { }
+
+        let calledRequestLock = Protector(false)
+        let calledProcedureClaimLock = Protector(false)
+        let calledUnlock = Protector(false)
+
+        let procedure = TestProcedure()
+        let mutuallyExclusiveConditions = [MutuallyExclusive<TestProcedure>(), MutuallyExclusive<DummyExclusivity>()]
+        let expectedMutuallyExclusiveCategories = Set(mutuallyExclusiveConditions.map { $0.mutuallyExclusiveCategories }.joined())
+        print("\(expectedMutuallyExclusiveCategories)")
+        mutuallyExclusiveConditions.forEach { procedure.add(condition: $0) }
+
+        procedure.addWillExecuteBlockObserver(synchronizedWith: DispatchQueue.main) { procedure, _ in
+            // The Procedure should have called procedureClaimLock prior
+            // to dispatching willExecute observers
+            XCTAssertTrue(calledProcedureClaimLock.access)
+        }
+
+        let queue = CustomProcedureQueue(
+            requestLock: { mutuallyExclusiveCategories in
+                // Requesting the lock should occur *prior* to the Procedure being ready
+                XCTAssertFalse(procedure.isReady)
+
+                // And only once
+                let previouslyCalledRequestLock = calledRequestLock.write({ (value) -> Bool in
+                    let previousValue = value
+                    value = true
+                    return previousValue
+                })
+                XCTAssertFalse(previouslyCalledRequestLock)
+
+                // And should contain the expected set of categories
+                XCTAssertEqual(mutuallyExclusiveCategories, expectedMutuallyExclusiveCategories)
+        },
+            procedureClaimLock: { ticket in
+                // Should be called *after* requestLock was called
+                XCTAssertTrue(calledRequestLock.access)
+
+                // Should only be called once for the Procedure
+                let previouslyCalledProcedureClaimLock = calledProcedureClaimLock.write({ (value) -> Bool in
+                    let previousValue = value
+                    value = true
+                    return previousValue
+                })
+                XCTAssertFalse(previouslyCalledProcedureClaimLock)
+
+                // At the point the procedure claims the lock, it should no longer be pending
+                // (i.e. it should have been started by the queue) but it also should not yet
+                // be executing
+                XCTAssertFalse(procedure.isPending)
+                XCTAssertFalse(procedure.isExecuting)
+                XCTAssertFalse(procedure.isFinished)
+
+                // The ticket should contain the original categories
+                XCTAssertEqual(ticket.mutuallyExclusiveCategories, expectedMutuallyExclusiveCategories)
+        },
+            unlock: { categories in
+                // Should be called after the Procedure has finished
+                XCTAssertTrue(procedure.isFinished)
+
+                // And after the required prior calls to requestLock, procedureClaimLock
+                XCTAssertTrue(calledRequestLock.access)
+                XCTAssertTrue(calledProcedureClaimLock.access)
+
+                // And only once
+                let previouslyCalledUnlock = calledUnlock.write({ (value) -> Bool in
+                    let previousValue = value
+                    value = true
+                    return previousValue
+                })
+                XCTAssertFalse(previouslyCalledUnlock)
+
+                // Providing the original categories
+                XCTAssertEqual(categories, expectedMutuallyExclusiveCategories)
+        }
+        )
+
+        addCompletionBlockTo(procedure: procedure)
+        queue.add(operation: procedure)
+        waitForExpectations(timeout: 3)
+
+        XCTAssertProcedureFinishedWithoutErrors(procedure)
+        XCTAssertTrue(calledRequestLock.access)
+        XCTAssertTrue(calledProcedureClaimLock.access)
+        XCTAssertTrue(calledUnlock.access)
+    }
 }
 
 class MutualExclusiveConcurrencyTests: ConcurrencyTestCase {
@@ -145,6 +270,84 @@ class MutualExclusiveConcurrencyTests: ConcurrencyTestCase {
 
         XCTAssertTrue(procedure1.isFinished)
         XCTAssertTrue(procedure2.isFinished)
+    }
+
+    func test__mutual_exclusivity_when_initial_reference_to_queue_goes_away() {
+
+        class DoesNotFinishByItselfProcedure: Procedure {
+            override func execute() {
+                // does not finish by itself - the test must call finish()
+            }
+        }
+
+        weak var weakQueue: ProcedureQueue?
+        let procedure1 = DoesNotFinishByItselfProcedure()
+
+        let procedureFinishedGroup = DispatchGroup()
+        procedureFinishedGroup.enter()
+        procedure1.addDidFinishBlockObserver { _, _ in
+            procedureFinishedGroup.leave()
+        }
+
+        procedure1.addWillFinishBlockObserver(synchronizedWith: DispatchQueue.main) { _, _, _ in
+            guard let _ = weakQueue else {
+                // Neither NSOperationInternal (nor Procedure) appears to be holding a strong
+                // reference to the OperationQueue while the Operation is executing (i.e. prior to finish)
+                //
+                // The current mutual exclusivity implementation requires this,
+                // so Procedure must hold onto its own strong reference.
+                //
+                XCTFail("ERROR: The Procedure is about to finish, but nothing has a strong reference to the ProcedureQueue it's executing \"on\". This needs to be resolved by modifying Procedure to maintain a strong reference to its queue through finish.")
+                return
+            }
+        }
+
+        autoreleasepool {
+
+            var queue: ProcedureQueue? = ProcedureQueue()
+
+            procedure1.add(condition: MutuallyExclusive<TestProcedure>())
+
+            let expProcedureWasStarted = expectation(description: "Procedure was started - execute was called")
+            procedure1.addDidExecuteBlockObserver(synchronizedWith: DispatchQueue.main) { _ in
+                // the Procedure has been started
+                expProcedureWasStarted.fulfill()
+            }
+
+            queue!.add(operation: procedure1)
+            waitForExpectations(timeout: 3) // wait for the Procedure to be started by the queue
+
+            // store a weak reference to the ProcedureQueue
+            weakQueue = queue
+
+            // get rid of our strong reference to the ProcedureQueue
+            queue = nil
+
+        }
+
+        // verify that the weak reference to the ProcedureQueue still exists
+        guard let _ = weakQueue else {
+            // Neither NSOperationInternal (nor Procedure) appears to be holding a strong
+            // reference to the OperationQueue while the Operation is executing (i.e. prior to finish)
+            //
+            // The current mutual exclusivity implementation requires this,
+            // so Procedure must hold onto its own strong reference.
+            //
+            XCTFail("ERROR: The Procedure is still executing, but nothing has a strong reference to the ProcedureQueue it's executing \"on\". This needs to be resolved by modifying Procedure to maintain a strong reference to its queue through finish.")
+            return
+        }
+
+        // then finish the testing procedure
+        procedure1.finish()
+
+        // and wait for it to finish
+        let expProcedureDidFinish = expectation(description: "Procedure did finish")
+        procedureFinishedGroup.notify(queue: DispatchQueue.main) {
+            expProcedureDidFinish.fulfill()
+        }
+        waitForExpectations(timeout: 3)
+
+        XCTAssertProcedureFinishedWithoutErrors(procedure1)
     }
 }
 
