@@ -191,8 +191,6 @@ open class ProcedureQueue: OperationQueue {
      */
     open weak var delegate: ProcedureQueueDelegate?
 
-    // swiftlint:disable function_body_length
-    // swiftlint:disable cyclomatic_complexity
     /**
      Adds the operation to the queue. Subclasses which override this method must call this
      implementation as it is critical to how ProcedureKit functions.
@@ -221,8 +219,6 @@ open class ProcedureQueue: OperationQueue {
 
         return promise.future
     }
-    // swiftlint:enable cyclomatic_complexity
-    // swiftlint:enable function_body_length
 
     /**
      Adds the operations to the queue.
