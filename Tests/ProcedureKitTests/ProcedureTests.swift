@@ -330,8 +330,11 @@ class QualityOfServiceTests: ProcedureKitTestCase {
     private func testQoSClassLevels(_ block: (QualityOfService) -> Void) {
         block(.userInteractive)
         block(.userInitiated)
+/*
+// IOS11: breaking changes
         block(.utility)
         block(.background)
+*/
         block(.`default`)
     }
 
