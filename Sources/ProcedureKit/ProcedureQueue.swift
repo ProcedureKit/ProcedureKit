@@ -175,6 +175,12 @@ open class ProcedureQueue: OperationQueue {
 
     fileprivate let dispatchQueue = DispatchQueue(label: "run.kit.procedure.ProcedureKit.ProcedureQueue"/*, qos: DispatchQoS.userInteractive*/, attributes: [.concurrent])
 
+    // Events that are queued until the ProcedureQueue is un-suspended
+    fileprivate var queuedConditionEvaluators: [Procedure.EvaluateConditions] = [] // must be accessed within the suspendLock
+    fileprivate var queuedProcedureLockRequests: [ExclusivityLockRequest] = [] // must be accessed within the suspendLock
+    fileprivate var unclaimedExclusivityLockTickets = Set<ExclusivityLockTicket>() // must be accessed within the suspendLock
+    fileprivate let suspendLock = PThreadMutex()
+
     /**
      Override OperationQueue's main to return the main queue as an ProcedureQueue
 
@@ -237,6 +243,43 @@ open class ProcedureQueue: OperationQueue {
     /// Overrides and wraps the Swift 3 interface
     open override func addOperation(_ operation: Operation) {
         add(operation: operation)
+    }
+
+    /**
+     Override of OperationQueue's `isSuspended`. Functions the same (with some additional support for
+     ProcedureKit internal functionality).
+     */
+    open override var isSuspended: Bool {
+        get { return super.isSuspended }
+        set (newIsSuspended) {
+            suspendLock.withCriticalScope {
+                guard newIsSuspended != super.isSuspended else { return } // nothing changed
+                super.isSuspended = newIsSuspended
+                if !newIsSuspended {
+                    // When resuming a ProcedureQueue:
+                    // 1.) Process all queuedProcedureLockRequests
+                    for lockRequest in queuedProcedureLockRequests {
+                        _requestLockAsync(for: lockRequest.mutuallyExclusiveCategories, completion: lockRequest.completion)
+                    }
+                    queuedProcedureLockRequests.removeAll()
+                    // 2.) Process all queued condition evaluators
+                    for conditionEvaluator in queuedConditionEvaluators {
+                        conditionEvaluator.queue.async {
+                            conditionEvaluator.start()
+                        }
+                    }
+                    queuedConditionEvaluators.removeAll()
+                }
+                else {
+                    // When suspending a ProcedureQueue:
+                    // 1.) Invalidate all unclaimedExclusivityLockTickets (releasing the locks)
+                    for ticket in unclaimedExclusivityLockTickets {
+                        ExclusivityManager.sharedInstance.unlock(categories: ticket.mutuallyExclusiveCategories)
+                    }
+                    unclaimedExclusivityLockTickets.removeAll()
+                }
+            }
+        }
     }
 
     // MARK: - Private Implementation
@@ -342,6 +385,167 @@ open class ProcedureQueue: OperationQueue {
         delegate?.procedureQueue(self, didAddProcedure: procedure, context: context)
 
         promise.complete()
+    }
+
+    // MARK: Mutual Exclusivity
+
+    fileprivate struct ExclusivityLockRequest {
+        let mutuallyExclusiveCategories: Set<String>
+        let completion: (ExclusivityLockTicket) -> Void
+    }
+
+    internal class ExclusivityLockTicket: Hashable {
+        let mutuallyExclusiveCategories: Set<String>
+        fileprivate init(mutuallyExclusiveCategories: Set<String>)
+        {
+            self.mutuallyExclusiveCategories = mutuallyExclusiveCategories
+        }
+        static func ==(lhs: ExclusivityLockTicket, rhs: ExclusivityLockTicket) -> Bool {
+            return ObjectIdentifier(lhs) == ObjectIdentifier(rhs)
+        }
+        var hashValue: Int {
+            return ObjectIdentifier(self).hashValue
+        }
+    }
+
+    /// Requests a Mutual Exclusivity lock for a set of categories, taking into account
+    /// the ProcedureQueue's `isSuspended` status.
+    ///
+    /// If the ProcedureQueue is suspended, the request is queued until the ProcedureQueue is resumed.
+    /// If the ProcedureQueue is running, the lock request is processed (asynchronously).
+    ///
+    /// Once the lock request is granted (asynchronously), this function again checks whether the
+    /// ProcedureQueue is suspended. If it is, the lock is immediately released and a future attempt
+    /// is queued for when the ProcedureQueue is resumed.
+    ///
+    /// The completion block is provided an `ExclusivityLockTicket`. Once the Procedure has started,
+    /// it *must* internally call ProcedureQueue's `procedureClaimLock(withTicket:completion:)`
+    /// to officially "claim" the lock to ensure that Mutual Exclusivity is, in fact, enforced.
+    /// (This mechanic allows the ProcedureQueue to safely handle various tricky situations
+    /// caused by the asynchronous nature of suspending vs. when/how Foundation.Operation
+    /// internally decides to start Operations on the queue.)
+    ///
+    /// - Parameters:
+    ///   - mutuallyExclusiveCategories: a Set of mutually exclusive categories (Strings)
+    ///   - completion: a block called once a ExclusivityLockTicket has been granted by the ProcedureQueue
+    internal func requestLock(for mutuallyExclusiveCategories: Set<String>, completion: @escaping (ExclusivityLockTicket) -> Void) {
+
+        assert(!mutuallyExclusiveCategories.isEmpty, "requestLock called with an empty set of categories")
+
+        let proceed: Bool = suspendLock.withCriticalScope {
+            guard !super.isSuspended else {
+                // The ProcedureQueue is currently suspended
+                // Queue a future lock request attempt (once the queue is resumed)
+                queuedProcedureLockRequests.append(
+                    ExclusivityLockRequest(mutuallyExclusiveCategories: mutuallyExclusiveCategories, completion: completion)
+                )
+                return false
+            }
+            return true
+        }
+        guard proceed else { return }
+
+        _requestLockAsync(for: mutuallyExclusiveCategories, completion: completion)
+    }
+
+    fileprivate func _requestLockAsync(for mutuallyExclusiveCategories: Set<String>, completion: @escaping (ExclusivityLockTicket) -> Void) {
+
+        assert(!mutuallyExclusiveCategories.isEmpty, "requestLock called with an empty set of categories")
+
+        // Request a lock from the ExclusivityManager.
+        ExclusivityManager.sharedInstance.requestLock(for: mutuallyExclusiveCategories) {
+            // Once the lock is acquired
+            let optionalTicket: ExclusivityLockTicket? = self.suspendLock.withCriticalScope {
+                guard !super.isSuspended else {
+                    // If by the time the lock request is granted the Procedure is suspended,
+                    // immediately release the lock and queue a future lock request attempt
+                    // (once the ProcedureQueue is resumed)
+                    ExclusivityManager.sharedInstance.unlock(categories: mutuallyExclusiveCategories)
+                    self.queuedProcedureLockRequests.append(
+                        ExclusivityLockRequest(mutuallyExclusiveCategories: mutuallyExclusiveCategories, completion: completion)
+                    )
+                    return nil
+                }
+                // If by the time the lock request succeeds the ProcedureQueue is not suspended,
+                // return an ExclusivityLockTicket (which is recorded within the ProcedureQueue)
+                let ticket = ExclusivityLockTicket(mutuallyExclusiveCategories: mutuallyExclusiveCategories)
+                self.unclaimedExclusivityLockTickets.insert(ticket)
+                return ticket
+            }
+
+            guard let ticket = optionalTicket else { return }
+            completion(ticket)
+        }
+    }
+
+    /// Called by a Procedure, *once the ProcedureQueue has started the Procedure*,
+    /// to claim an outstanding Exclusivity Lock
+    ///
+    /// If the ProcedureQueue has released the lock in the interim (for example, if
+    /// it was suspended), this function issues a new lock request on behalf of
+    /// the Procedure.
+    internal func procedureClaimLock(withTicket ticket: ExclusivityLockTicket, completion: @escaping () -> Void) {
+        let claimedLock: Bool = suspendLock.withCriticalScope {
+            guard unclaimedExclusivityLockTickets.remove(ticket) != nil else {
+                //
+                // The ticket is no longer valid (likely because the ProcedureQueue was suspended
+                // and released the exclusivity lock in the interim)
+                //
+                // Initiate a new async lock request on behalf of the Procedure
+                //
+                // NOTE: Since the Procedure has *already been started* by the ProcedureQueue,
+                // there is no point in trying to delay its execution further if the
+                // ProcedureQueue is now suspended.
+                //
+                // Foundation.OperationQueue already only guarantees that:
+                //   "Setting [isSuspended] to true prevents the queue from starting any queued
+                //    operations, but already executing operations continue to execute."
+                // https://developer.apple.com/documentation/foundation/operationqueue/1415909-issuspended
+                //
+                // Therefore, instead of calling the *ProcedureQueue's* `requestLock` function,
+                // (which *would* delay requesting a lock if the ProcedureQueue is suspended),
+                // we use the ExclusivityManager directly here.
+                //
+
+                ExclusivityManager.sharedInstance.requestLock(for: ticket.mutuallyExclusiveCategories, completion: completion)
+                return false
+            }
+            return true
+        }
+        guard claimedLock else { return }
+
+        // Lock was successfully claimed - call the completion block
+        completion()
+    }
+
+    internal func unlock(mutuallyExclusiveCategories categories: Set<String>) {
+        ExclusivityManager.sharedInstance.unlock(categories: categories)
+    }
+
+    // MARK: Condition Evaluation
+
+    // When a Procedure's EvaluateConditions Operation is ready to begin (i.e. when all dependencies
+    // have finished), it calls requestEvaluation(of: self) to ask the ProcedureQueue associated
+    // with its Procedure to begin its evaluation.
+    //
+    // If the ProcedureQueue is suspended, it queues the request until it the queue is un-suspended.
+    // If the ProcedureQueue is running, the condition evaluation is started (asynchronously).
+    internal func requestEvaluation(of conditionEvaluator: Procedure.EvaluateConditions) {
+        let dispatchEvaluator: Bool = suspendLock.withCriticalScope {
+            guard !super.isSuspended else {
+                // The ProcedureQueue is currently suspended
+                // Queue a future dispatch of the condition evaluator (once the queue is resumed)
+                queuedConditionEvaluators.append(conditionEvaluator)
+                return false
+            }
+            return true
+        }
+        guard dispatchEvaluator else { return }
+
+        // Since the ProcedureQueue wasn't suspended, dispatch condition evaluation
+        conditionEvaluator.queue.async {
+            conditionEvaluator.start()
+        }
     }
 }
 
