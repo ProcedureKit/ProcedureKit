@@ -150,8 +150,13 @@ open class Procedure: Operation, ProcedureProtocol {
 
     fileprivate let isAutomaticFinishingDisabled: Bool
 
-    // A weak reference to the ProcedureQueue onto which this Procedure was added
-    private weak var _queue: ProcedureQueue?
+    // A strong reference to the ProcedureQueue onto which this Procedure was added
+    // This is cleared when the Procedure finishes
+    private var _queue: ProcedureQueue?
+
+    fileprivate var procedureQueue: ProcedureQueue? {
+        get { return stateLock.withCriticalScope { _queue } }
+    }
 
     // Stored pending finish information
     // (used if a Procedure is cancelled and finish() is called prior to the queue
@@ -228,7 +233,7 @@ open class Procedure: Operation, ProcedureProtocol {
     fileprivate let stateLock = PThreadMutex()
 
     // the state variable to be used *outside* the stateLock
-    fileprivate var state: ProcedureKit.State {
+    fileprivate private(set) var state: ProcedureKit.State {
         get {
             return stateLock.withCriticalScope { _state }
         }
@@ -264,7 +269,13 @@ open class Procedure: Operation, ProcedureProtocol {
         get { return stateLock.withCriticalScope { _mutuallyExclusiveCategories } }
         set { stateLock.withCriticalScope { _mutuallyExclusiveCategories = newValue } }
     }
+    private var _mutualExclusivityTicket: ProcedureQueue.ExclusivityLockTicket?
+    private var mutualExclusivityTicket: ProcedureQueue.ExclusivityLockTicket? {
+        get { return stateLock.withCriticalScope { _mutualExclusivityTicket } }
+        set { stateLock.withCriticalScope { _mutualExclusivityTicket = newValue } }
+    }
 
+    // Only called by the ConditionEvaluator
     fileprivate func request(mutuallyExclusiveCategories: Set<String>, completion: @escaping (Bool) -> Void) {
         // On the internal EventQueue
         dispatchEvent {
@@ -280,14 +291,22 @@ open class Procedure: Operation, ProcedureProtocol {
                 completion(false)
                 return
             }
+            guard let procedureQueue = self.procedureQueue else {
+                fatalError("procedureQueue is nil")
+            }
 
             // Store the mutually-exclusive categories for later release (when the Procedure is finished).
             assert(self.mutuallyExclusiveCategories == nil, "Mutually exclusive locks were requested more than once.")
             self.mutuallyExclusiveCategories = mutuallyExclusiveCategories
 
-            // Request a lock from the ExclusivityManager.
-            ExclusivityManager.sharedInstance.requestLock(for: mutuallyExclusiveCategories) {
-                // Once the lock is acquired, call the completion block
+            // Request a lock via the ProcedureQueue
+            procedureQueue.requestLock(for: mutuallyExclusiveCategories) { lockTicket in
+                // Once a lock ticket is acquired, store the lockTicket
+                // (which must be claimed once the Procedure starts)
+
+                self.mutualExclusivityTicket = lockTicket
+
+                // and call the completion block
                 completion(true)
             }
         }
@@ -565,8 +584,13 @@ open class Procedure: Operation, ProcedureProtocol {
     }
 
     /// Starts the Procedure, correctly managing the cancelled state. Cannot be over-ridden
+    ///
+    /// - warning: Do not call `start()` directly on a Procedure. Add the Procedure to a `ProcedureQueue`.
     public final override func start() {
         // Don't call super.start
+
+        assert(state >= .pending, "Calling start() manually on a Procedure is unsupported. Instead, add the Procedure to a ProcedureQueue.") // Do not check for < .started here; _start() does that.
+        assert(procedureQueue != nil, "The Procedure's associated procedureQueue is nil. If you are adding the Procedure to a ProcedureQueue, this should never happen.")
 
         // Dispatch the innards of start() on the EventQueue,
         // inheriting the current QoS level (i.e. the Qos that
@@ -609,7 +633,7 @@ open class Procedure: Operation, ProcedureProtocol {
         _main()
     }
 
-    /// - warning: Do not call `main()` directly on a Procedure. Add the Procedure to a `ProcedureQueue` or call `start()`.
+    /// - warning: Do not call `main()` directly on a Procedure. Add the Procedure to a `ProcedureQueue`.
     public final override func main() {
         assertionFailure("Do not call main() directly on a Procedure. Add the Procedure to a ProcedureQueue.")
     }
@@ -620,6 +644,40 @@ open class Procedure: Operation, ProcedureProtocol {
         debugAssertIsOnEventQueue()
 
         assert(state >= .started, "Procedure.main() is being called when Procedure.start() has not been called. Do not call main() directly. Add the Procedure to a ProcedureQueue.")
+
+        if let mutualExclusivityTicket = mutualExclusivityTicket {
+            // Mutual Exclusivity has been requested for this Procedure
+            // Proceed only once the ticket has been claimed via the ProcedureQueue
+
+            guard let procedureQueue = procedureQueue else {
+                fatalError("Procedure has a nil procedureQueue") // ProcedureKit internal programmer error
+            }
+
+            // Store the current QoS level
+            let originalQoS = DispatchQoS(qosClass: DispatchQueue.currentQoSClass, relativePriority: 0)
+
+            // Now that the Procedure has started, claim the mutual exclusivity lock
+            procedureQueue.procedureClaimLock(withTicket: mutualExclusivityTicket) {
+                // Mutual Exclusivity lock has been claimed - can now proceed with executing
+
+                // Dispatch the innards of main() on the EventQueue,
+                // inheriting the original QoS level (i.e. the Qos that
+                // the ProcedureQueue decided to use to call start()).
+
+                self.eventQueue.dispatchEventBlockInternal(minimumQoS: originalQoS) {
+                    self._main_step1()
+                }
+            }
+        }
+        else {
+            // No Mutual Exclusivity required - proceed immediately with the next steps of executing
+            _main_step1()
+        }
+    }
+
+    private final func _main_step1() {
+
+        debugAssertIsOnEventQueue()
 
         log.verbose(message: "[observers]: WillExecute")
 
@@ -1094,6 +1152,16 @@ open class Procedure: Operation, ProcedureProtocol {
 
         assert(state <= .executing)
 
+        // Obtain a local strong reference to the Procedure queue
+        guard let strongProcedureQueue = procedureQueue else {
+            // NOTE: For the mutual exclusivity implementation to work properly,
+            // a strong reference to the ProcedureQueue must exist through finish.
+            //
+            // Procedure is supposed to hold onto its own strong reference
+            // to the ProcedureQueue onto which it was added.
+            fatalError("Procedure hasn't finished, but procedureQueue is nil") // ProcedureKit internal programmer error
+        }
+
         // NOTE:
         // - The stateLock should only be held when necessary, and should not
         //   be held when notifying observers (whether via KVO or Operation's
@@ -1145,7 +1213,15 @@ open class Procedure: Operation, ProcedureProtocol {
             // same _thread_ as the earlier call to willChangeValue.
             //
             self.willChangeValue(forKey: .finished)
-            self.stateLock.withCriticalScope { self._state = .finished }
+            self.stateLock.withCriticalScope {
+                // Set the state to .finished
+                self._state = .finished
+                // Clear the internal Procedure strong reference to its ProcedureQueue
+                //
+                // A separate strong reference (strongProcedureQueue) exists for use
+                // in cleanup (unlocking) tasks below
+                self._queue = nil
+            }
             self.didChangeValue(forKey: .finished)
 
             // Call the Procedure.procedureDidFinish(withErrors:) override
@@ -1153,7 +1229,7 @@ open class Procedure: Operation, ProcedureProtocol {
 
             // If mutually exclusive categories were locked, unlock
             if let mutuallyExclusiveCategories = self.mutuallyExclusiveCategories {
-                ExclusivityManager.sharedInstance.unlock(categories: mutuallyExclusiveCategories)
+                strongProcedureQueue.unlock(mutuallyExclusiveCategories: mutuallyExclusiveCategories)
             }
 
             // Dispatch the DidFinishObservers
@@ -1425,9 +1501,16 @@ extension Procedure {
                 return true
             }
             guard shouldDispatchStart else { return }
-            queue.async {
-                self.start()
+
+            guard let procedure = procedure else {
+                // the Procedure went away - finish immediately
+                finish()
+                return
             }
+            guard let procedureQueue = procedure.procedureQueue else {
+                fatalError("The Condition Evaluator's Procedure has a nil associated ProcedureQueue.")
+            }
+            procedureQueue.requestEvaluation(of: self)
         }
         final fileprivate func dispatchStartOnce() {
             dispatchStartOnce(source: .isReady)
@@ -1443,11 +1526,14 @@ extension Procedure {
             context.cancel()
         }
 
+        /// Should only be called by ProcedureQueue
+        /// (see: the call to `procedureQueue.requestEvaluation(of: self)` above)
         override func start() {
             isExecuting = true
             main()
         }
 
+        /// Should only be called by start()
         override func main() {
             // This should only be executed once
             let shouldContinue: Bool = stateLock.withCriticalScope {
