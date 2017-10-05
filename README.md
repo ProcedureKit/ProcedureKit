@@ -1,6 +1,6 @@
 ![](https://raw.githubusercontent.com/ProcedureKit/ProcedureKit/development/header.png)
 
-[![Build status](https://badge.buildkite.com/4bc80b0824c6357ae071342271cb503b8994cf0cfa58645849.svg?branch=master)](https://buildkite.com/blindingskies/procedurekit)
+[![Build status](https://badge.buildkite.com/4bc80b0824c6357ae071342271cb503b8994cf0cfa58645849.svg)](https://buildkite.com/procedurekit/procedurekit)
 [![Coverage Status](https://coveralls.io/repos/github/ProcedureKit/ProcedureKit/badge.svg?branch=swift%2F2.2)](https://coveralls.io/github/ProcedureKit/ProcedureKit?branch=swift%2F2.2)
 [![Documentation](http://procedure.kit.run/development/badge.svg)](http://procedure.kit.run/development)
 [![CocoaPods Compatible](https://img.shields.io/cocoapods/v/ProcedureKit.svg?style=flat)](https://cocoapods.org/pods/ProcedureKit)
