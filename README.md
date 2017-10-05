@@ -25,7 +25,7 @@ ProcedureKit supports all current Apple platforms. The minimum requirements are:
 
 - iOS 8.0+
 - macOS 10.10+
-- watchOS 2.0+
+- watchOS 3.0+
 - tvOS 9.2+
 
 The current version of ProcedureKit supports Swift 3+, and the use of Xcode 8.2+ is strongly recommended.
