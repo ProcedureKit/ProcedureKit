@@ -140,7 +140,11 @@ fileprivate class DispatchTimerWrapper {
         timer.setEventHandler(handler: handler)
     }
     func scheduleOneshot(deadline: DispatchTime, leeway: DispatchTimeInterval = .nanoseconds(0)) {
-        timer.scheduleOneshot(deadline: deadline, leeway: leeway)
+        #if swift(>=4.0)
+            timer.schedule(deadline: deadline, leeway: leeway)
+        #else // Swift 3.x
+            timer.scheduleOneshot(deadline: deadline, leeway: leeway)
+        #endif
     }
     func resume() {
         lock.withCriticalScope {
