@@ -7,7 +7,7 @@
 /**
  A simple condition which suppresses its contained condition to not
  enqueue any dependencies. This is useful for verifying access to
- a resource without prompting for permission, for example
+ a resource without prompting for permission, for example.
  */
 public final class SilentCondition<C: Condition>: ComposedCondition<C> {
 
