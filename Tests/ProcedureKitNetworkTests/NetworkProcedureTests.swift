@@ -67,13 +67,13 @@ class NetworkReachabilityWaitProcedureTests: ProcedureKitTestCase {
 
 class NetworkProcedureTests: ProcedureKitTestCase {
 
-    typealias Target = NetworkDataProcedure<TestableURLSessionTaskFactory>
+    typealias Target = NetworkDataProcedure
 
     var url: URL!
     var request: URLRequest!
     var resilience: DefaultNetworkResilience!
     var session: TestableURLSessionTaskFactory!
-    var data: NetworkDataProcedure<TestableURLSessionTaskFactory>!
+    var data: NetworkDataProcedure!
     var network: TestableNetworkReachability!
     var manager: Reachability.Manager!
 

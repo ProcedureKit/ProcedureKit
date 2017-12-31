@@ -14,7 +14,7 @@ class NetworkDataProcedureTests: ProcedureKitTestCase {
     var url: URL!
     var request: URLRequest!
     var session: TestableURLSessionTaskFactory!
-    var download: NetworkDataProcedure<TestableURLSessionTaskFactory>!
+    var download: NetworkDataProcedure!
 
     override func setUp() {
         super.setUp()
@@ -42,7 +42,7 @@ class NetworkDataProcedureTests: ProcedureKitTestCase {
         wait(for: download)
         XCTAssertProcedureFinishedWithoutErrors(download)
         XCTAssertNotNil(session.didReturnDataTask)
-        XCTAssertEqual(session.didReturnDataTask, download.task)
+        XCTAssertEqual(session.didReturnDataTask, download.task as? TestableURLSessionTask)
     }
 
     func test__download_resumes_data_task() {
