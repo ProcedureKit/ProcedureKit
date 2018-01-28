@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name              = "TestingProcedureKit"
-  s.version           = "4.3.2"
+  s.version           = "4.4.0"
   s.summary           = "XCTest support for ProcedureKit."
   s.description       = <<-DESC
   
