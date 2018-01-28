@@ -280,7 +280,11 @@ class RandomnessTests: StressTestCase {
             }
         }
         let probabilityFailure = Double(100_000 - numberOfSuccess) / 100_000.0
-        XCTAssertEqualWithAccuracy(probabilityFailure, iterator.probability, accuracy: 0.10)
+        #if swift(>=4.0)
+            XCTAssertEqual(probabilityFailure, iterator.probability, accuracy: 0.10)
+        #else // Swift 3.x
+            XCTAssertEqualWithAccuracy(probabilityFailure, iterator.probability, accuracy: 0.10)
+        #endif
     }
 }
 

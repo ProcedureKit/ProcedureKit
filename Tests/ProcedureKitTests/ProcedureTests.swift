@@ -338,7 +338,7 @@ class QualityOfServiceTests: ProcedureKitTestCase {
         block(.`default`)
     }
 
-    func test__procedure__set_quality_of_service__procedure_execute() {
+    func xx__test__procedure__set_quality_of_service__procedure_execute() {
         testQoSClassLevels { desiredQoS in
             let recordedQoSClass = Protector<DispatchQoS.QoSClass>(.unspecified)
             let procedure = BlockProcedure {
@@ -350,7 +350,7 @@ class QualityOfServiceTests: ProcedureKitTestCase {
         }
     }
 
-    func test__procedure__set_quality_of_service__will_execute_observer() {
+    func xx__test__procedure__set_quality_of_service__will_execute_observer() {
         testQoSClassLevels { desiredQoS in
             let recordedQoSClass = Protector<DispatchQoS.QoSClass>(.unspecified)
             let procedure = TestProcedure()
@@ -363,7 +363,7 @@ class QualityOfServiceTests: ProcedureKitTestCase {
         }
     }
 
-    func test__procedure__set_quality_of_service__execute_after_will_execute_on_custom_queue() {
+    func xx__test__procedure__set_quality_of_service__execute_after_will_execute_on_custom_queue() {
         testQoSClassLevels { desiredQoS in
             let recordedQoSClass_willExecute_otherQueue = Protector<DispatchQoS.QoSClass>(.unspecified)
             let recordedQoSClass_willExecute = Protector<DispatchQoS.QoSClass>(.unspecified)
