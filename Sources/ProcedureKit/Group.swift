@@ -110,7 +110,6 @@ open class GroupProcedure: Procedure {
         queue.underlyingQueue = underlyingQueue
         queueDelegate = GroupQueueDelegate(self)
         queue.delegate = queueDelegate
-//        userIntent = operations.userIntent
         groupCanFinish = CanFinishGroup(group: self)
     }
 
