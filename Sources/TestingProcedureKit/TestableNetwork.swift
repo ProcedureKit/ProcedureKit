@@ -236,7 +236,7 @@ public class TestableURLSessionTaskFactory {
     }
 
     private static func cancelledError(forRequest request: URLRequest) -> Error {
-        var userInfo: [AnyHashable: Any] = [NSLocalizedDescriptionKey: "cancelled"]
+        var userInfo: [String: Any] = [NSLocalizedDescriptionKey: "cancelled"]
         if let requestURL = request.url {
             userInfo[NSURLErrorFailingURLErrorKey] = requestURL
         }

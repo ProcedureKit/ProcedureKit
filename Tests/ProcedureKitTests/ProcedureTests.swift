@@ -328,14 +328,14 @@ import Dispatch
 class QualityOfServiceTests: ProcedureKitTestCase {
 
     private func testQoSClassLevels(_ block: (QualityOfService) -> Void) {
+        #if os(macOS)
         block(.userInteractive)
         block(.userInitiated)
-/*
-// IOS11: breaking changes
-        block(.utility)
-        block(.background)
-*/
+        #else
+        block(.userInteractive)
+        block(.userInitiated)
         block(.`default`)
+        #endif
     }
 
     func test__procedure__set_quality_of_service__procedure_execute() {
