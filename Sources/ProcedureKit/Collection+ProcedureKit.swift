@@ -26,12 +26,10 @@ extension Collection where Iterator.Element: Operation {
     internal var conditions: [Condition] {
         return flatMap { $0 as? Condition }
     }
-
+    
+    @available(*, deprecated: 4.5.0, message: "Use underlying quality of service APIs instead.")
     internal var userIntent: UserIntent {
-        get {
-            let (_, procedures) = operationsAndProcedures
-            return procedures.map { $0.userIntent }.max { $0.rawValue < $1.rawValue } ?? .none
-        }
+        get { return .none }
     }
 
     internal func forEachProcedure(body: (Procedure) throws -> Void) rethrows {

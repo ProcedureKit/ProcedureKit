@@ -296,33 +296,6 @@ class ExecutionTests: ProcedureKitTestCase {
     }
 }
 
-class UserIntentTests: ProcedureKitTestCase {
-
-    func test__getting_user_intent_default_background() {
-        XCTAssertEqual(procedure.userIntent, .none)
-    }
-
-    func test__set_user_intent__initiated() {
-        procedure.userIntent = .initiated
-        XCTAssertEqual(procedure.qualityOfService, .userInitiated)
-    }
-
-    func test__set_user_intent__side_effect() {
-        procedure.userIntent = .sideEffect
-        XCTAssertEqual(procedure.qualityOfService, .userInitiated)
-    }
-
-    func test__set_user_intent__initiated_then_background() {
-        procedure.userIntent = .initiated
-        procedure.userIntent = .none
-        XCTAssertEqual(procedure.qualityOfService, .default)
-    }
-
-    func test__user_intent__equality() {
-        XCTAssertNotEqual(UserIntent.initiated, UserIntent.sideEffect)
-    }
-}
-
 import Dispatch
 
 class QualityOfServiceTests: ProcedureKitTestCase {
