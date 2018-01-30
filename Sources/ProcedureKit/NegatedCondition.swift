@@ -26,7 +26,7 @@ public final class NegatedCondition<C: Condition>: ComposedCondition<C> {
             switch composedResult {
             case .success(true):
                 completion(.failure(ProcedureKitError.conditionFailed()))
-            case .success(false), .failure(_):
+            case .success(false), .failure:
                 completion(.success(true))
             }
         }

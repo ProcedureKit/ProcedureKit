@@ -130,7 +130,7 @@ class ProcedureConditionStressTest: StressTestCase {
             let dependency2 = TestProcedure(name: "Dependency 2 (\(batch.number): \(iteration))")
             procedure.add(dependencies: dependency1, dependency2)
 
-            let conditionDependency1 = BlockOperation { [weak procedure] in
+            let conditionDependency1 = BlockOperation {
                 // dependency1 and dependency2 should be finished
                 let dep1Finished = dependency1.isFinished
                 let dep2Finished = dependency2.isFinished
@@ -194,6 +194,50 @@ class ProcedureConditionsWillFinishObserverCancelThreadSafety: StressTestCase {
             batch.queue.add(operation: procedure)
             procedure.cancel()
         }
+    }
+
+    func test__conditions_queue_suspension_safety() {
+        let numberOfQueueIsSuspendedCycles = Protector<Int>(0)
+        var lastBatchStopQueueSuspensionLoop = Protector<Bool>(false)
+        let procedures = Protector<[Procedure]>([])
+
+        stress { batch, iteration in
+            if (iteration == 0) {
+                // On the first iteration in a batch
+                // Stop the prior batch's loop
+                lastBatchStopQueueSuspensionLoop.overwrite(with: true)
+
+                // Dispatch an asynchronous loop to toggle isSuspended on the batch's queue
+                lastBatchStopQueueSuspensionLoop = Protector<Bool>(false)
+                DispatchQueue.global(qos: .userInteractive).async { [stopLoop = lastBatchStopQueueSuspensionLoop, queue = batch.queue] in
+                    // constantly suspend/resume the queue
+                    repeat {
+                        queue.isSuspended = true
+                        queue.isSuspended = false
+                        numberOfQueueIsSuspendedCycles.write({ (number) in
+                            if number < Int.max { // ensure we don't overflow
+                                number += 1
+                            }
+                        })
+                    } while (!stopLoop.access)
+                }
+            }
+            batch.dispatchGroup.enter()
+            let procedure = TestProcedure()
+            procedure.add(condition: FalseCondition())
+            procedure.addDidFinishBlockObserver { _, _ in
+                batch.dispatchGroup.leave()
+            }
+            procedures.append(procedure)
+            batch.queue.add(operation: procedure)
+        }
+
+        lastBatchStopQueueSuspensionLoop.overwrite(with: true)
+
+        for procedure in procedures.access {
+            XCTAssertProcedureCancelledWithErrors(procedure)
+        }
+        print ("Queue isSuspended cycles (total, all batches): \(numberOfQueueIsSuspendedCycles.access)")
     }
 }
 

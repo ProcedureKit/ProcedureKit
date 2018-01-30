@@ -56,14 +56,6 @@ public extension Operation {
     }
 
     /**
-     Sets the quality of service of the Operation from `UserIntent`
-     - parameter userIntent: a UserIntent value
-     */
-    func setQualityOfService(fromUserIntent userIntent: UserIntent) {
-        qualityOfService = userIntent.qualityOfService
-    }
-
-    /**
      Add a dependency to the operation, using Swift 3 API style
      - parameter dependency: the Operation to add as a dependency
     */
@@ -128,4 +120,15 @@ public extension Operation {
         guard let operation = try block() else { return [self] }
         return then(do: operation)
     }
+}
+
+
+public extension Operation {
+    
+    /**
+     Sets the quality of service of the Operation from `UserIntent`
+     - parameter userIntent: a UserIntent value
+     */
+    @available(*, deprecated: 4.5.0, message: "Use underlying quality of service APIs instead.")
+    func setQualityOfService(fromUserIntent userIntent: UserIntent) { }
 }

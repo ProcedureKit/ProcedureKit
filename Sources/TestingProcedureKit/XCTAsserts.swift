@@ -15,7 +15,7 @@ internal enum __XCTAssertionResult {
 
     var isExpected: Bool {
         switch self {
-        case .unexpectedFailure(_): return false
+        case .unexpectedFailure: return false
         default: return true
         }
     }
@@ -25,7 +25,7 @@ internal enum __XCTAssertionResult {
         switch self {
         case .success: explanation = "passed"
         case .expectedFailure(let details?): explanation = "failed: \(details)"
-        case .expectedFailure(_): explanation = "failed"
+        case .expectedFailure: explanation = "failed"
         case .unexpectedFailure(let error): explanation = "threw error \"\(error)\""
         }
         return explanation

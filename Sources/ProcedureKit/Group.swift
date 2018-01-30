@@ -56,15 +56,6 @@ open class GroupProcedure: Procedure {
         }
     }
 
-    /// Override of Procedure.userIntent
-    final public override var userIntent: UserIntent {
-        didSet {
-            let (operations, procedures) = children.operationsAndProcedures
-            operations.forEach { $0.setQualityOfService(fromUserIntent: userIntent) }
-            procedures.forEach { $0.userIntent = userIntent }
-        }
-    }
-
     /**
      - WARNING: Do not call `finish()` on a GroupProcedure or a GroupProcedure subclass.
      A GroupProcedure finishes when all of its children finish.
@@ -119,7 +110,6 @@ open class GroupProcedure: Procedure {
         queue.underlyingQueue = underlyingQueue
         queueDelegate = GroupQueueDelegate(self)
         queue.delegate = queueDelegate
-        userIntent = operations.userIntent
         groupCanFinish = CanFinishGroup(group: self)
     }
 
@@ -144,7 +134,7 @@ open class GroupProcedure: Procedure {
     //
     // This function is called internally by the Group's .cancel() (Procedure.cancel())
     // prior to dispatching DidCancel observers on the Group's EventQueue.
-    final internal override func _procedureDidCancel(withAdditionalErrors additionalErrors: [Error]) {
+    override func _procedureDidCancel(withAdditionalErrors additionalErrors: [Error]) {
         if additionalErrors.isEmpty {
             children.forEach { $0.cancel() }
         }

@@ -370,7 +370,7 @@ class KVOTests: ProcedureKitTestCase {
     }
 }
 
-extension Collection where Indices.Iterator.Element == Index {
+extension Collection {
     // Returns the element at the specified index iff it is within bounds, otherwise nil.
     func get(safe index: Index) -> Iterator.Element? {
         return indices.contains(index) ? self[index] : nil

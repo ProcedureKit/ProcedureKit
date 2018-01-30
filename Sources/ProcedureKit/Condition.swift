@@ -1025,7 +1025,7 @@ internal enum ConditionResultAggregationBehavior {
 
     private func andProcess(newResult: ConditionResult) -> ConditionResultAggregationResult {
         switch newResult {
-        case .success(_): return .aggregate
+        case .success: return .aggregate
         default: return .finishWithResult(newResult)
         }
     }
@@ -1290,6 +1290,7 @@ internal extension Collection where Iterator.Element == Condition {
     ///   - procedure: a Procedure that is passed-in to every Condition's evaluate method
     ///   - context: a ConditionEvaluationContext, containing parameters like the aggregation behavior
     ///   - completion: the completion block that is called with a result as soon as it is known
+
     internal func evaluate(procedure: Procedure, withContext context: ConditionEvaluationContext, completion: @escaping (ConditionResult) -> Void) {
 
         let aggregator = context.aggregator
@@ -1438,7 +1439,7 @@ internal extension Collection where Iterator.Element == ConditionResult {
                     return .failure(ProcedureKitError.FailedConditions(errors: [error, anotherError]))
                 }
             // new condition failed - so return it
-            case (_, .failure(_)):
+            case (_, .failure):
                 return rhs
             // first condition is ignored - so return the new one
             case (.success(false), _):

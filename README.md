@@ -1,6 +1,6 @@
 ![](https://raw.githubusercontent.com/ProcedureKit/ProcedureKit/development/header.png)
 
-[![Build status](https://badge.buildkite.com/4bc80b0824c6357ae071342271cb503b8994cf0cfa58645849.svg?branch=master)](https://buildkite.com/blindingskies/procedurekit)
+[![Build status](https://badge.buildkite.com/4bc80b0824c6357ae071342271cb503b8994cf0cfa58645849.svg)](https://buildkite.com/procedurekit/procedurekit)
 [![Coverage Status](https://coveralls.io/repos/github/ProcedureKit/ProcedureKit/badge.svg?branch=swift%2F2.2)](https://coveralls.io/github/ProcedureKit/ProcedureKit?branch=swift%2F2.2)
 [![Documentation](http://procedure.kit.run/development/badge.svg)](http://procedure.kit.run/development)
 [![CocoaPods Compatible](https://img.shields.io/cocoapods/v/ProcedureKit.svg?style=flat)](https://cocoapods.org/pods/ProcedureKit)
@@ -25,7 +25,7 @@ ProcedureKit supports all current Apple platforms. The minimum requirements are:
 
 - iOS 8.0+
 - macOS 10.10+
-- watchOS 2.0+
+- watchOS 3.0+
 - tvOS 9.2+
 
 The current version of ProcedureKit supports Swift 3+, and the use of Xcode 8.2+ is strongly recommended.
@@ -35,26 +35,6 @@ The current version of ProcedureKit supports Swift 3+, and the use of Xcode 8.2+
 ## Framework structure
 
 _ProcedureKit_ is a "multi-module" framework (don't bother Googling that, I just made it up). What I mean, is that the Xcode project has multiple targets/products each of which produces a Swift module. Some of these modules are cross-platform, others are dedicated, e.g. `ProcedureKitNetwork` vs `ProcedureKitMobile`.
-
-### Integration
-
-You can add _ProcedureKit_ to your project, by following [Apple's guidelines](https://www.google.com/search?q=apple+docs,+add+framework+to+xcode+project) (dragging the `.xcodeproj` file into your project). Alternatively, you can use package managers as described below.
-
-#### CocoaPods
-
-ProcedureKit is available through [CocoaPods](https://cocoapods.org/pods/ProcedureKit). To install it, include it in your Podfile. For example on iOS you can:
-
-```ruby
-  pod 'ProcedureKit/All'
-  # Or this subspec is the iOS only UIKit related stuff
-  pod 'ProcedureKit/Mobile'
-```
-
-Here is a full example of a cross platform application with unit test support. In this case, _ProcedureKit_ has been included via submodules.
-
-```ruby
-target 'MyApp' do
-  platform :osx, '10.11'
 
 ## Installing ProcedureKit
 
