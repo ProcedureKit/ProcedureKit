@@ -20,14 +20,6 @@ extension UIApplication: BackgroundTaskApplicationProtocol { }
 
 public extension ProcedureKitError {
 
-    /// When the background time remaining for the app is near expiration, and background
-    /// tasks are signaled, Procedures with an attached `BackgroundObserver` with
-    /// cancellationOption == `.cancelProcedureWhenBackgroundExecutionTimeExpires`
-    /// will be cancelled with this error.
-    public struct AppBackgroundTimeExpired: Error {
-        internal init() { }
-    }
-
     /// When the app enters (or is already in) the background state,
     /// Procedures with an attached `BackgroundObserver` with
     /// cancellationOption == `.cancelProcedureWhenAppIsBackgrounded`
@@ -59,16 +51,12 @@ public extension ProcedureKitError {
  with error `ProcedureKitError.AppWasBackgrounded` when the application is backgrounded (or if it is
  already in the background).
 
- Specifying `.whenBackgroundExecutionTimeExpires` causes the `BackgroundObserver` to cancel the attached
- `Procedure` with error `ProcedureKitError.AppBackgroundTimeExpired` when the application's background
- execution time expires.
-
  In any case, the `Procedure` still has an associated background task until it finishes, which provides a
  [system-determined finite amount of time](https://developer.apple.com/documentation/uikit/uiapplication/1623029-backgroundtimeremaining) to handle cancellation, clean-up, and finish.
 
  - NOTE:
  For a short, finite-length `Procedure` that should be completed even if the app goes into the background,
- attach a `BackgroundObserver` with `CancellationBehavior` `.none` or `.whenBackgroundExecutionTimeExpires`.
+ attach a `BackgroundObserver` with `CancellationBehavior` `.never` (the default).
 
  - NOTE:
  For a `Procedure` that shouldn't start or continue running if the app goes into the background (or if the
@@ -84,7 +72,6 @@ public class BackgroundObserver: ProcedureObserver {
     /// - never: do not cancel the attached Procedure
     public enum CancellationBehavior {
         case whenAppIsBackgrounded
-        case whenBackgroundExecutionTimeExpires
         case never
     }
 
@@ -115,10 +102,6 @@ public class BackgroundObserver: ProcedureObserver {
         switch cancelProcedure {
         case .never:
             result = manager.startBackgroundHandling(for: procedure, withExpirationHandler: { _ in })
-        case .whenBackgroundExecutionTimeExpires:
-            result = manager.startBackgroundHandling(for: procedure, withExpirationHandler: { procedure in
-                procedure.cancel(withErrors: [ProcedureKitError.AppBackgroundTimeExpired()])
-            })
         case .whenAppIsBackgrounded:
             result = manager.startBackgroundHandling(for: procedure, withAppIsInBackgroundHandler: { procedure in
                 procedure.cancel(withErrors: [ProcedureKitError.AppWasBackgrounded()])
