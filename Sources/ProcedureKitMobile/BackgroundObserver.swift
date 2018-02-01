@@ -154,10 +154,6 @@ internal class BackgroundManager {
     static let shared = BackgroundManager(app: UIApplication.shared)
 
     private class ProcedureBackgroundRegistry {
-        typealias AppDidEnterBackgroundHandler = AppIsInBackgroundHandler
-        private var _backgroundTasksPerProcedure = [Procedure: [Protector<UIBackgroundTaskIdentifier>]]()
-        private var _backgroundEventHandlersPerProcedure = [Procedure: [AppDidEnterBackgroundHandlerRecord]]()
-        private let lock = PThreadMutex()
 
         class AppDidEnterBackgroundHandlerRecord {
             let handler: AppDidEnterBackgroundHandler
@@ -171,9 +167,15 @@ internal class BackgroundManager {
             case additionalBackgroundTaskIdentifierForProcedure
         }
 
+        typealias AppDidEnterBackgroundHandler = AppIsInBackgroundHandler
+
+        private var _backgroundTasksPerProcedure = [Procedure: [Protector<UIBackgroundTaskIdentifier>]]()
+        private var _backgroundEventHandlersPerProcedure = [Procedure: [AppDidEnterBackgroundHandlerRecord]]()
+        private let lock = PThreadMutex()
+
         /// Adds a background task identifier to the registry for a specific `Procedure`.
         ///
-        /// While this always succeeds, it may return additional information about the
+        /// While this always succeeds, it will return information about the
         /// state of the registry for that `Procedure`.
         ///
         /// - Parameters:
@@ -193,7 +195,7 @@ internal class BackgroundManager {
         }
 
         func add(appDidEnterBackgroundHandler handler: @escaping AppDidEnterBackgroundHandler, for procedure: Procedure) -> AppDidEnterBackgroundHandlerRecord {
-            return lock.withCriticalScope { () -> AppDidEnterBackgroundHandlerRecord in
+            return lock.withCriticalScope {
                 let newRecord = AppDidEnterBackgroundHandlerRecord(handler)
                 guard var backgroundHandlers = _backgroundEventHandlersPerProcedure[procedure] else {
                     _backgroundEventHandlersPerProcedure.updateValue([newRecord], forKey: procedure)
