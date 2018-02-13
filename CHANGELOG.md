@@ -5,7 +5,7 @@
 1. [#816](https://github.com/ProcedureKit/ProcedureKit/pull/816) Updates for Xcode 9.2 and Swift 4.0. Thanks to [@jshier](https://github.com/jshier) for making the updates. Included here are updates to the Travis config too.
 
 ## Improvements
-1. [#718](https://github.com/ProcedureKit/ProcedureKit/pull/718) Some significant performance and reliability improvements for `BackgroundObserver` by [@swiftlyfalling](https://github.com/swiftlyfalling).
+1. [#781](https://github.com/ProcedureKit/ProcedureKit/pull/781) Some significant performance and reliability improvements for `BackgroundObserver` by [@swiftlyfalling](https://github.com/swiftlyfalling).
 
 ## Deprecations
 1. [#818](https://github.com/ProcedureKit/ProcedureKit/pull/818) `UserIntent` property on `Procedure` has been deprecated. Suggestion is to set the underlying queue priority. 
