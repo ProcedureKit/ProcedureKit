@@ -245,7 +245,7 @@ public class AuthorizeCapabilityProcedure<Status: AuthorizationStatus>: GetAutho
 
  By default, the condition will add an Authorize operation as a dependency
  which means that potentially the user will be prompted to grant
- authorization. Suppress this from happening with SilentCondition.
+ authorization. Suppress this from happening by wrapping in a SilentCondition.
  */
 public class AuthorizedFor<Status: AuthorizationStatus>: Condition {
 

@@ -131,7 +131,11 @@ public class DelayProcedure: Procedure {
                 guard let strongSelf = self else { return }
                 if !strongSelf.isCancelled { strongSelf.finish() }
             }
-            _timer?.scheduleOneshot(deadline: .now() + interval, leeway: self.leeway)
+            #if swift(>=4.0)
+                _timer?.schedule(deadline: .now() + interval, leeway: self.leeway)
+            #else
+                _timer?.scheduleOneshot(deadline: .now() + interval, leeway: self.leeway)
+            #endif
             _timer?.resume()
         default:
             finish()

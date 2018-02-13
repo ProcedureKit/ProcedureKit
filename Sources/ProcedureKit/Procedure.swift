@@ -63,6 +63,7 @@ internal struct ProcedureKit {
 
  - see: https://developer.apple.com/library/ios/documentation/Performance/Conceptual/EnergyGuide-iOS/PrioritizeWorkWithQoS.html#//apple_ref/doc/uid/TP40015243-CH39
  */
+@available(*, deprecated: 4.5.0, message: "Use underlying quality of service APIs instead.")
 @objc public enum UserIntent: Int {
     case none = 0, sideEffect, initiated
 
@@ -185,11 +186,8 @@ open class Procedure: Operation, ProcedureProtocol {
      - requires: self must not have started yet. i.e. either hasn't been added
      to a queue, or is waiting on dependencies.
      */
-    public var userIntent: UserIntent = .none {
-        didSet {
-            setQualityOfService(fromUserIntent: userIntent)
-        }
-    }
+    @available(*, deprecated: 4.5.0, message: "Use underlying quality of service APIs instead.")
+    public var userIntent: UserIntent = .none
 
     @available(OSX 10.10, iOS 8.0, tvOS 8.0, watchOS 2.0, *)
     open override var qualityOfService: QualityOfService {

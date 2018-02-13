@@ -130,7 +130,7 @@ class ProcedureConditionStressTest: StressTestCase {
             let dependency2 = TestProcedure(name: "Dependency 2 (\(batch.number): \(iteration))")
             procedure.add(dependencies: dependency1, dependency2)
 
-            let conditionDependency1 = BlockOperation { [weak procedure] in
+            let conditionDependency1 = BlockOperation {
                 // dependency1 and dependency2 should be finished
                 let dep1Finished = dependency1.isFinished
                 let dep2Finished = dependency2.isFinished
