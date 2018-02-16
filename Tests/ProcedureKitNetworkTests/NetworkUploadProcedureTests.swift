@@ -15,7 +15,7 @@ class NetworkUploadProcedureTests: ProcedureKitTestCase {
     var request: URLRequest!
     var sendingData: Data!
     var session: TestableURLSessionTaskFactory!
-    var upload: NetworkUploadProcedure<TestableURLSessionTaskFactory>!
+    var upload: NetworkUploadProcedure!
 
     override func setUp() {
         super.setUp()
@@ -45,7 +45,7 @@ class NetworkUploadProcedureTests: ProcedureKitTestCase {
         wait(for: upload)
         XCTAssertProcedureFinishedWithoutErrors(upload)
         XCTAssertNotNil(session.didReturnUploadTask)
-        XCTAssertEqual(session.didReturnUploadTask, upload.task)
+        XCTAssertEqual(session.didReturnUploadTask, upload.task as? TestableURLSessionTask)
     }
 
     func test__upload_resumes_data_task() {
