@@ -38,6 +38,33 @@ class RetryProcedureTests: RetryTestCase {
         XCTAssertEqual(retry.count, 3)
     }
 
+    func test__with_input_procedure_payload() {
+
+        let outputProcedure = TestProcedure()
+        outputProcedure.output = .ready(.success("ProcedureKit"))
+        retry = Retry(iterator: createPayloadIterator(succeedsAfterFailureCount: 2), retry: { $1 })
+
+        var textOutput: [String] = []
+        retry.addWillAddOperationBlockObserver { (_, operation) in
+            if let procedure = operation as? TestProcedure {
+                procedure.addDidFinishBlockObserver { (testProcedure, _) in
+                    if let output = testProcedure.output.value?.value {
+                        textOutput.append(output)
+                    }
+                }
+            }
+        }
+
+        retry.injectResult(from: outputProcedure)
+
+        wait(for: retry, outputProcedure)
+        XCTAssertProcedureFinishedWithoutErrors(retry)
+
+        // The first two attemps fail due to a failed condition - so the output isn't
+        // set using the input.
+        XCTAssertEqual(textOutput, ["Hello World", "Hello World", "Hello ProcedureKit"])
+    }
+
     func test__retry_deinits_after_finished() {
         // Catches reference cycles.
 
