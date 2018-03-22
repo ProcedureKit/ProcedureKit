@@ -29,7 +29,7 @@ open class TestProcedure: Procedure, InputProcedure, OutputProcedure {
     public let delay: TimeInterval
     public let error: Error?
     public let producedOperation: Operation?
-    public var input: Pending<Void> = pendingVoid
+    public var input: Pending<String> = .pending
     public var output: Pending<ProcedureResult<String>> = .ready(.success("Hello World"))
     public private(set) var executedAt: CFAbsoluteTime {
         get { return protected.read { $0.executedAt } }
@@ -71,6 +71,10 @@ open class TestProcedure: Procedure, InputProcedure, OutputProcedure {
     open override func execute() {
 
         executedAt = CFAbsoluteTimeGetCurrent()
+
+        if let input = input.value {
+            output = .ready(.success("Hello \(input)"))
+        }
 
         if let operation = producedOperation {
             let producedOperationGroup = DispatchGroup()

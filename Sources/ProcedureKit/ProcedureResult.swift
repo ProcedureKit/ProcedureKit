@@ -159,20 +159,21 @@ public extension ProcedureProtocol {
 
         return self
     }
-}
 
-public extension InputProcedure {
+    @discardableResult func injectResult<Dependency: OutputProcedure>(from dependency: Dependency, block: @escaping (Self, Dependency.Output) -> Void) -> Self {
 
-    @discardableResult func injectResult<Dependency: OutputProcedure>(from dependency: Dependency, via block: @escaping (Dependency.Output) throws -> Input) -> Self {
         return inject(dependency: dependency) { procedure, dependency, errors in
+
             // Check if there are any errors first
             guard errors.isEmpty else {
                 procedure.cancel(withError: ProcedureKitError.dependency(finishedWithErrors: errors)); return
             }
+
             // Check that we have a result ready
             guard let result = dependency.output.value else {
                 procedure.cancel(withError: ProcedureKitError.requirementNotSatisfied()); return
             }
+
             // Check that the result was successful
             guard let output = result.value else {
                 // If not, check for an error
@@ -186,6 +187,16 @@ public extension InputProcedure {
             }
 
             // Given successfull output
+            block(self, output)
+        }
+    }
+}
+
+public extension InputProcedure {
+
+    @discardableResult func injectResult<Dependency: OutputProcedure>(from dependency: Dependency, via block: @escaping (Dependency.Output) throws -> Input) -> Self {
+
+        return injectResult(from: dependency) { (procedure, output) in
             do {
                 procedure.input = .ready(try block(output))
             }

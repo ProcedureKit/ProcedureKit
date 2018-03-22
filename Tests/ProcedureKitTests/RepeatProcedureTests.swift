@@ -101,6 +101,31 @@ class RepeatProcedureTests: RepeatTestCase {
         XCTAssertEqual(repeatProcedure.count, 3)
         XCTAssertEqual(didExecuteConfigureBlock, 2)
     }
+
+    func test__with_input_procedure_payload() {
+
+        let outputProcedure = TestProcedure()
+        outputProcedure.output = .ready(.success("ProcedureKit"))
+        repeatProcedure = RepeatProcedure(max: 3, iterator: createIterator())
+
+        var textOutput: [String] = []
+        repeatProcedure.addWillAddOperationBlockObserver { (_, operation) in
+            if let procedure = operation as? TestProcedure {
+                procedure.addDidFinishBlockObserver { (testProcedure, _) in
+                    if let output = testProcedure.output.value?.value {
+                        textOutput.append(output)
+                    }
+                }
+            }
+        }
+
+        repeatProcedure.injectResult(from: outputProcedure)
+
+        wait(for: repeatProcedure, outputProcedure)
+        XCTAssertProcedureFinishedWithoutErrors(repeatProcedure)
+
+        XCTAssertEqual(textOutput, ["Hello ProcedureKit", "Hello ProcedureKit", "Hello ProcedureKit"])
+    }
 }
 
 class RepeatableTestProcedure: TestProcedure, Repeatable {
