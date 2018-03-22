@@ -47,7 +47,8 @@ class RetryProcedureTests: RetryTestCase {
         var textOutput: [String] = []
         retry.addWillAddOperationBlockObserver { (_, operation) in
             if let procedure = operation as? TestProcedure {
-                procedure.addDidFinishBlockObserver { (testProcedure, _) in
+                procedure.addDidFinishBlockObserver { (testProcedure, errors) in
+                    guard errors.count == 0 else { return }
                     if let output = testProcedure.output.value?.value {
                         textOutput.append(output)
                     }
@@ -60,9 +61,7 @@ class RetryProcedureTests: RetryTestCase {
         wait(for: retry, outputProcedure)
         XCTAssertProcedureFinishedWithoutErrors(retry)
 
-        // The first two attemps fail due to a failed condition - so the output isn't
-        // set using the input.
-        XCTAssertEqual(textOutput, ["Hello World", "Hello World", "Hello ProcedureKit"])
+        XCTAssertEqual(textOutput, ["Hello ProcedureKit"])
     }
 
     func test__retry_deinits_after_finished() {
