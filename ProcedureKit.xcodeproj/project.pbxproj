@@ -25,6 +25,8 @@
 		653CA0741D60AB1B0070B7A2 /* ProcedureKitCloud.h in Headers */ = {isa = PBXBuildFile; fileRef = 653CA0731D60AB1B0070B7A2 /* ProcedureKitCloud.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		653CA0781D60ABC90070B7A2 /* ProcedureKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65CFC5F01D608A5500CAD875 /* ProcedureKit.framework */; };
 		653CA07B1D60ABD30070B7A2 /* TestingProcedureKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65CFC6161D60900000CAD875 /* TestingProcedureKit.framework */; };
+		656C427B2066C54000F5DCA2 /* UserNotificationCapability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 656C427A2066C54000F5DCA2 /* UserNotificationCapability.swift */; };
+		656C427D2067D22F00F5DCA2 /* UserNotificationSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 656C427C2067D22E00F5DCA2 /* UserNotificationSupport.swift */; };
 		659484271DAAA2B90028F83B /* ProcedureKitLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6594841E1DAAA2B90028F83B /* ProcedureKitLocation.framework */; };
 		659484361DAAA3360028F83B /* ProcedureKitLocation.h in Headers */ = {isa = PBXBuildFile; fileRef = 659484351DAAA3360028F83B /* ProcedureKitLocation.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6594843D1DAAA5430028F83B /* ProcedureKit.framework in Copy Files (2 items) */ = {isa = PBXBuildFile; fileRef = 65CFC5F01D608A5500CAD875 /* ProcedureKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -509,6 +511,8 @@
 		653CA0621D60AA990070B7A2 /* ProcedureKitCloudTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ProcedureKitCloudTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		653CA0731D60AB1B0070B7A2 /* ProcedureKitCloud.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ProcedureKitCloud.h; path = "Supporting Files/ProcedureKitCloud.h"; sourceTree = "<group>"; };
 		653CA0751D60AB2B0070B7A2 /* ProcedureKitCloud.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = ProcedureKitCloud.xcconfig; path = "Supporting Files/ProcedureKitCloud.xcconfig"; sourceTree = "<group>"; };
+		656C427A2066C54000F5DCA2 /* UserNotificationCapability.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserNotificationCapability.swift; sourceTree = "<group>"; };
+		656C427C2067D22E00F5DCA2 /* UserNotificationSupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserNotificationSupport.swift; sourceTree = "<group>"; };
 		6594841E1DAAA2B90028F83B /* ProcedureKitLocation.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ProcedureKitLocation.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		659484261DAAA2B90028F83B /* ProcedureKitLocationTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ProcedureKitLocationTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		659484351DAAA3360028F83B /* ProcedureKitLocation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ProcedureKitLocation.h; path = "Supporting Files/ProcedureKitLocation.h"; sourceTree = "<group>"; };
@@ -1174,6 +1178,8 @@
 				65D368241E18451C00D03E86 /* NetworkObserver+Mobile.swift */,
 				65D368251E18451C00D03E86 /* UI.swift */,
 				65FFC36E1E4BDF03005DC38F /* UserConfirmation.swift */,
+				656C427A2066C54000F5DCA2 /* UserNotificationCapability.swift */,
+				656C427C2067D22E00F5DCA2 /* UserNotificationSupport.swift */,
 			);
 			name = ProcedureKitMobile;
 			path = Sources/ProcedureKitMobile;
@@ -1909,9 +1915,11 @@
 			files = (
 				65FFC36F1E4BDF03005DC38F /* UserConfirmation.swift in Sources */,
 				65D368261E18451C00D03E86 /* Alert.swift in Sources */,
+				656C427B2066C54000F5DCA2 /* UserNotificationCapability.swift in Sources */,
 				65D368291E18451C00D03E86 /* UI.swift in Sources */,
 				65D368281E18451C00D03E86 /* NetworkObserver+Mobile.swift in Sources */,
 				65D368271E18451C00D03E86 /* BackgroundObserver.swift in Sources */,
+				656C427D2067D22F00F5DCA2 /* UserNotificationSupport.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
