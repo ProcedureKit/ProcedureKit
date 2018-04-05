@@ -10,6 +10,27 @@ import ProcedureKit
 import TestingProcedureKit
 @testable import ProcedureKitMobile
 
+class UNAuthorizationStatusTests: XCTestCase {
+
+    func test__given_status_not_determined__requirement_not_met() {
+        let status = UNAuthorizationStatus.notDetermined
+        XCTAssertFalse(status.meets(requirement: [.alert]))
+        XCTAssertFalse(status.meets(requirement: []))
+    }
+
+    func test__given_status_denied__requirement_not_met() {
+        let status = UNAuthorizationStatus.denied
+        XCTAssertFalse(status.meets(requirement: [.alert]))
+        XCTAssertFalse(status.meets(requirement: []))
+    }
+
+    func test__given_status_authorized__requirement_met() {
+        let status = UNAuthorizationStatus.authorized
+        XCTAssertTrue(status.meets(requirement: [.alert]))
+        XCTAssertTrue(status.meets(requirement: []))
+    }
+}
+
 class UserNotificationCapabilityTests: XCTestCase {
 
     var registrar: TestableUserNotificationsRegistrar!
