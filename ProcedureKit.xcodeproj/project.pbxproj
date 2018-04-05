@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		650EF772206A2548002DCC4D /* UserNotificationCapabilityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 650EF771206A2548002DCC4D /* UserNotificationCapabilityTests.swift */; };
+		650EF774206A25E6002DCC4D /* TestableUserNotificationsRegistrar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 650EF773206A25E6002DCC4D /* TestableUserNotificationsRegistrar.swift */; };
 		653C9FCA1D6097A40070B7A2 /* ProcedureKitMobile.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 653C9FC11D6097A40070B7A2 /* ProcedureKitMobile.framework */; };
 		653C9FDB1D6098330070B7A2 /* ProcedureKitMobile.h in Headers */ = {isa = PBXBuildFile; fileRef = 653C9FDA1D6098330070B7A2 /* ProcedureKitMobile.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		653C9FDF1D6099110070B7A2 /* ProcedureKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65CFC5F01D608A5500CAD875 /* ProcedureKit.framework */; };
@@ -494,6 +496,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		650EF771206A2548002DCC4D /* UserNotificationCapabilityTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserNotificationCapabilityTests.swift; sourceTree = "<group>"; };
+		650EF773206A25E6002DCC4D /* TestableUserNotificationsRegistrar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestableUserNotificationsRegistrar.swift; sourceTree = "<group>"; };
 		653C9FC11D6097A40070B7A2 /* ProcedureKitMobile.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ProcedureKitMobile.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		653C9FDA1D6098330070B7A2 /* ProcedureKitMobile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ProcedureKitMobile.h; path = "Supporting Files/ProcedureKitMobile.h"; sourceTree = "<group>"; };
 		653C9FDC1D6098650070B7A2 /* ProcedureKitMobile.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = ProcedureKitMobile.xcconfig; path = "Supporting Files/ProcedureKitMobile.xcconfig"; sourceTree = "<group>"; };
@@ -998,6 +1002,8 @@
 				65D366CB1E183F5000D03E86 /* ProcedureKitMobileTests.swift */,
 				65D366CC1E183F5000D03E86 /* TestableUIApplication.swift */,
 				65D366CD1E183F5000D03E86 /* UIProcedureTests.swift */,
+				650EF771206A2548002DCC4D /* UserNotificationCapabilityTests.swift */,
+				650EF773206A25E6002DCC4D /* TestableUserNotificationsRegistrar.swift */,
 			);
 			name = ProcedureKitMobileTests;
 			path = Tests/ProcedureKitMobileTests;
@@ -1929,7 +1935,9 @@
 			files = (
 				65D366D11E183F5000D03E86 /* ProcedureKitMobileTests.swift in Sources */,
 				65D366CE1E183F5000D03E86 /* AlertProcedureTests.swift in Sources */,
+				650EF774206A25E6002DCC4D /* TestableUserNotificationsRegistrar.swift in Sources */,
 				65D366D21E183F5000D03E86 /* TestableUIApplication.swift in Sources */,
+				650EF772206A2548002DCC4D /* UserNotificationCapabilityTests.swift in Sources */,
 				65D366CF1E183F5000D03E86 /* BackgroundObserverTests.swift in Sources */,
 				65D366D31E183F5000D03E86 /* UIProcedureTests.swift in Sources */,
 				65D366D01E183F5000D03E86 /* PresentationProcedureTests.swift in Sources */,

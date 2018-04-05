@@ -15,8 +15,8 @@ import UserNotifications
 extension UNAuthorizationStatus: AuthorizationStatus {
 
     public func meets(requirement: UNAuthorizationOptions?) -> Bool {
-        switch (requirement, self) {
-        case (_, .authorized):
+        switch self {
+        case .authorized:
             return true
         default:
             return false
@@ -42,9 +42,7 @@ public extension Capability {
         }
 
         public func getAuthorizationStatus(_ completion: @escaping (UNAuthorizationStatus) -> Void) {
-            registrar.pk_getAuthorizationStatus { settings in
-                completion(settings.authorizationStatus)
-            }
+            registrar.pk_getAuthorizationStatus(completion)
         }
 
         public func requestAuthorization(withCompletion completion: @escaping () -> Void) {
