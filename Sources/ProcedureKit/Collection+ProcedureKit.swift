@@ -24,7 +24,7 @@ extension Collection where Iterator.Element: Operation {
     }
 
     internal var conditions: [Condition] {
-        return flatMap { $0 as? Condition }
+        return compactMap { $0 as? Condition }
     }
     
     @available(*, deprecated: 4.5.0, message: "Use underlying quality of service APIs instead.")
@@ -97,7 +97,7 @@ extension Collection where Iterator.Element: OutputProcedure {
     /// - Returns: a ResultProcedure<[T]> procedure.
     public func flatMap<T>(transform: @escaping (Self.Iterator.Element.Output) throws -> T?) -> ResultProcedure<[T]> {
 
-        let mapped = ResultProcedure { try self.flatMap { $0.output.success }.flatMap(transform) }
+        let mapped = ResultProcedure { try self.compactMap { $0.output.success }.compactMap(transform) }
 
         forEach { mapped.add(dependency: $0) }
 
@@ -113,7 +113,7 @@ extension Collection where Iterator.Element: OutputProcedure {
     /// - Returns: a ResultProcedure<ReducedResult> procedure
     public func reduce<ReducedResult>(_ initialResult: ReducedResult, _ nextPartialResult: @escaping (ReducedResult, Self.Iterator.Element.Output) throws -> ReducedResult) -> ResultProcedure<ReducedResult> {
 
-        let result = ResultProcedure { try self.flatMap { $0.output.success }.reduce(initialResult, nextPartialResult) }
+        let result = ResultProcedure { try self.compactMap { $0.output.success }.reduce(initialResult, nextPartialResult) }
 
         forEach { result.add(dependency: $0) }
 
