@@ -5,6 +5,7 @@
 //
 
 #if !os(tvOS)
+#if !swift(>=4.1)
 
 #if SWIFT_PACKAGE
     import ProcedureKit
@@ -78,4 +79,5 @@ extension CloudKitProcedure where T: CKDiscoverAllUserIdentitiesOperationProtoco
     }
 }
 
+#endif
 #endif
