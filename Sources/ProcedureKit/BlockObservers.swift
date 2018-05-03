@@ -13,6 +13,7 @@ public struct Observer<Procedure: ProcedureProtocol> {
     public typealias ProducerBlock = (Procedure, Operation) -> Void
 
     public typealias DidAttach = VoidBlock
+    public typealias DidSetInputReady = VoidBlock
     public typealias WillExecute = (Procedure, PendingExecuteEvent) -> Void
     public typealias DidExecute = VoidBlock
     public typealias DidCancel = ErrorsBlock
@@ -28,6 +29,9 @@ public struct BlockObserver<Procedure: ProcedureProtocol>: ProcedureObserver {
 
     /// - returns: the block which is called when the observer is attached to a procedure
     public let didAttach: Observer<Procedure>.DidAttach?
+
+    /// - returns: the block which is called when the input value is set on an InputProcedure
+    public let didSetInputReady: Observer<Procedure>.DidSetInputReady?
 
     /// - returns: the block which is called when the attached procedure will execute
     public let willExecute: Observer<Procedure>.WillExecute?
@@ -68,6 +72,7 @@ public struct BlockObserver<Procedure: ProcedureProtocol>: ProcedureObserver {
     public init(
         synchronizedWith queueProvider: QueueProvider? = nil,
         didAttach: Observer<Procedure>.DidAttach? = nil,
+        didSetInputReady: Observer<Procedure>.DidSetInputReady? = nil,
         willExecute: Observer<Procedure>.WillExecute? = nil,
         didExecute: Observer<Procedure>.DidExecute? = nil,
         didCancel: Observer<Procedure>.DidCancel? = nil,
@@ -77,6 +82,7 @@ public struct BlockObserver<Procedure: ProcedureProtocol>: ProcedureObserver {
         didFinish: Observer<Procedure>.DidFinish? = nil) {
             self.eventQueue = queueProvider?.providedQueue
             self.didAttach = didAttach
+            self.didSetInputReady = didSetInputReady
             self.willExecute = willExecute
             self.didExecute = didExecute
             self.didCancel = didCancel
@@ -88,6 +94,10 @@ public struct BlockObserver<Procedure: ProcedureProtocol>: ProcedureObserver {
 
     public func didAttach(to procedure: Procedure) {
         didAttach?(procedure)
+    }
+
+    public func didSetInputReady(on procedure: Procedure) {
+        didSetInputReady?(procedure)
     }
 
     public func will(execute procedure: Procedure, pendingExecute: PendingExecuteEvent) {
@@ -150,6 +160,41 @@ public struct WillExecuteObserver<Procedure: ProcedureProtocol>: ProcedureObserv
     /// Conforms to `WillExecuteProcedureObserver`, executes the block
     public func will(execute procedure: Procedure, pendingExecute: PendingExecuteEvent) {
         block(procedure, pendingExecute)
+    }
+}
+
+/// DidSetInputReadyObserver is an observer which will execute a
+/// closure when the input property of a procedure which conforms to
+/// InputProcedure is set to be ready.
+public struct DidSetInputReadyObserver<Procedure: InputProcedure>: ProcedureObserver {
+    private let block: Observer<Procedure>.DidSetInputReady
+
+    /// - returns: a block which is called when the observer is attached to a procedure
+    public var didAttachToProcedure: Observer<Procedure>.DidAttach?
+
+    /// - returns: the queue onto which observer callbacks are dispatched
+    public let eventQueue: DispatchQueueProtocol?
+
+    /**
+     Initialize the observer with a block.
+
+     - parameter synchronizedWith: a provider of the queue onto which observer callbacks are dispatched
+     - parameter didSetInputReady: the `Block`
+     - returns: an observer.
+     */
+    public init(synchronizedWith queueProvider: QueueProvider? = nil, didSetInputReady: @escaping Observer<Procedure>.DidSetInputReady) {
+        self.block = didSetInputReady
+        self.eventQueue = queueProvider?.providedQueue
+    }
+
+    /// Conforms to ProcedureObserver
+    public func didAttach(to procedure: Procedure) {
+        didAttachToProcedure?(procedure)
+    }
+
+    /// Conforms to ProcedureObserver
+    public func didSetInputReady(on procedure: Procedure) {
+        block(procedure)
     }
 }
 
@@ -374,7 +419,7 @@ public extension ProcedureProtocol {
         }
     }
 
-    private func assertQueueProviderIsNotSelf(_ queueProvider: QueueProvider?, function: String = #function) {
+    fileprivate func assertQueueProviderIsNotSelf(_ queueProvider: QueueProvider?, function: String = #function) {
         assert(queueProvider == nil || queueProvider!.providedQueue !== _currentEventQueue, "\(function): Synchronizing with self is unnecessary for an observer added to self.")
     }
 
@@ -386,6 +431,7 @@ public extension ProcedureProtocol {
         assertQueueProviderIsNotSelf(queueProvider)
         add(observer: WillExecuteObserver(synchronizedWith: queueProvider, willExecute: block))
     }
+
 
     /// Adds a DidExecuteObserver to the receiver using a provided block
     ///
@@ -439,6 +485,18 @@ public extension ProcedureProtocol {
     func addDidFinishBlockObserver(synchronizedWith queueProvider: QueueProvider? = nil, block: @escaping Observer<Self>.DidFinish) {
         assertQueueProviderIsNotSelf(queueProvider)
         add(observer: DidFinishObserver(synchronizedWith: queueProvider, didFinish: block))
+    }
+}
+
+public extension InputProcedure {
+
+    /// Adds a WillExecuteObserver to the receiver using a provided block
+    ///
+    /// - Parameter synchronizedWith: a QueueProvider that provides a queue onto which the observer callback will be dispatched (can be a Procedure, an EventQueue, or a DispatchQueue)
+    /// - Parameter block: the block which will be invoked before execute is called.
+    func addDidSetInputReadyBlockObserver(synchronizedWith queueProvider: QueueProvider? = nil, block: @escaping Observer<Self>.DidSetInputReady) {
+        assertQueueProviderIsNotSelf(queueProvider)
+        add(observer: DidSetInputReadyObserver(synchronizedWith: queueProvider, didSetInputReady: block))
     }
 }
 
