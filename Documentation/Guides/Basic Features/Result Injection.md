@@ -84,5 +84,3 @@ If the dependency finishes without a `.ready` output value, the dependent is can
 
 if the dependency finishes with an error, the dependency is cancelled with an appropriate error.
 
-
-
