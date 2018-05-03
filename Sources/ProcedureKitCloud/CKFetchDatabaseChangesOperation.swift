@@ -38,6 +38,8 @@ extension CloudKitProcedure where T: CKFetchAllChanges {
     }
 }
 
+#if !swift(>=4.1)
+
 /// A generic protocol which exposes the properties used by Apple's CKFetchDatabaseChangesOperationType.
 public protocol CKFetchDatabaseChangesOperationProtocol: CKDatabaseOperationProtocol, CKFetchAllChanges, CKPreviousServerChangeToken, CKResultsLimit {
 
@@ -148,3 +150,5 @@ extension CloudKitProcedure where T: CKFetchDatabaseChangesOperationProtocol {
         appendConfigureBlock { $0.setFetchDatabaseChangesCompletionBlock(block) }
     }
 }
+
+#endif

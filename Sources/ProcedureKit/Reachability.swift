@@ -49,7 +49,7 @@ public protocol NetworkReachabilityDelegate: class {
 
 public protocol NetworkReachability {
 
-    weak var delegate: NetworkReachabilityDelegate? { get set }
+    var delegate: NetworkReachabilityDelegate? { get set }
 
     var log: LoggerProtocol { get }
 
