@@ -181,6 +181,50 @@ class ResultInjectionTests: ResultInjectionTestCase {
         XCTAssertProcedureFinishedWithoutErrors(gathered)
         XCTAssertEqual(gathered.output.success ?? [], ["Hello", "World"])
     }
+
+    func test__input_binding() {
+        let hello = ResultProcedure { "Hello" }
+        let world = TransformProcedure<String, String> { "\($0) World" }.injectResult(from: hello)
+        let dan = TransformProcedure<String, String> { "\($0) Dan" }
+        world.bind(to: dan)
+        dan.add(dependency: world) // note that bind does not setup any dependencies.
+
+        wait(for: hello, world, dan)
+        XCTAssertProcedureFinishedWithoutErrors(hello)
+        XCTAssertProcedureFinishedWithoutErrors(world)
+        XCTAssertProcedureFinishedWithoutErrors(dan)
+        XCTAssertEqual(dan.output.success ?? "Hello World", "Hello Dan")
+    }
+
+    func test__binding() {
+
+        class TestGroup: TestGroupProcedure, InputProcedure, OutputProcedure {
+            var input: Pending<String> = .pending
+            var output: Pending<ProcedureResult<String>> = .pending
+
+            init() {
+                let world = TransformProcedure<String, String> { "\($0) World" }
+                let result = TransformProcedure<String, String> { "\($0), we are running on ProcedureKit" }
+                    .injectResult(from: world)
+
+                super.init(operations: [world, result])
+
+                // Note that we do not need to worry about dependencies here
+                // because the child procedures are by definition depending on
+                // the group's dependency to have finished.
+                bind(to: world)
+                bind(from: result)
+            }
+        }
+
+        let hello = ResultProcedure { "Hello" }
+        let group = TestGroup().injectResult(from: hello)
+
+        wait(for: hello, group)
+        XCTAssertProcedureFinishedWithoutErrors(hello)
+        XCTAssertProcedureFinishedWithoutErrors(group)
+        XCTAssertEqual(group.output.success ?? "Hello World", "Hello World, we are running on ProcedureKit")
+    }
 }
 
 
