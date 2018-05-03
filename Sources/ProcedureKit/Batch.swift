@@ -18,7 +18,7 @@ open class BatchProcedure<Transform: Procedure>: GroupProcedure, InputProcedure,
 
     public let generator: Generator
 
-    init(dispatchQueue: DispatchQueue? = nil, via generator: @escaping Generator) {
+    public init(dispatchQueue: DispatchQueue? = nil, via generator: @escaping Generator) {
         self.generator = generator
         super.init(dispatchQueue: dispatchQueue, operations: [])
         name = "Batch<\(Transform.self)>"
