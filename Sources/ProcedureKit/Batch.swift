@@ -38,6 +38,7 @@ open class BatchProcedure<Transform: Procedure>: GroupProcedure, InputProcedure,
         }
 
         let gathered = batch.gathered()
+        bind(from: gathered)
 
         add(children: batch)
         add(child: gathered)
