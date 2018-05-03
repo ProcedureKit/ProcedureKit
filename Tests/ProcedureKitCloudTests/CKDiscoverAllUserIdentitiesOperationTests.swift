@@ -5,6 +5,7 @@
 //
 
 #if !os(tvOS)
+#if !swift(>=4.1)
 
 import XCTest
 import CloudKit
@@ -214,4 +215,5 @@ class CloudKitProcedureDiscoverAllUserIdentitiesOperationTests: CKProcedureTestC
     }
 }
 
+#endif
 #endif

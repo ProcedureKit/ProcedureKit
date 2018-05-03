@@ -45,7 +45,7 @@ public final class CloudKitRecovery<T: Operation> where T: CKOperationProtocol, 
     }
 
     func cloudKitErrors(fromInfo info: RetryFailureInfo<WrappedOperation>) -> (CKError.Code, T.AssociatedError)? {
-        let mapped: [(CKError.Code, T.AssociatedError)] = info.errors.flatMap { error in
+        let mapped: [(CKError.Code, T.AssociatedError)] = info.errors.compactMap { error in
             guard
                 let cloudKitError = error as? T.AssociatedError,
                 let code = cloudKitError.code
