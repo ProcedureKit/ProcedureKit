@@ -1,19 +1,22 @@
 # Advanced Result Injection
 
-- Remark: Functional state transform
+- Remark: Functional state transformation
 
-In [Result Injection](result-injection.html) we introduced the basic concept of _transforming state_ by chaining procedures together. Each link in the change received an input, and is responsible for settings its output. This works very nicely at a simple level, but is a bit restrictive when it comes to real world usage.
+In [Result Injection](result-injection.html) we introduced the basic concept of _transforming state_ by chaining procedures together. Each link in the chain received an input, and is responsible for settings its output. The `injectResult(from:)` API then glues everything together. 
+
+This works very nicely at a simple level, however it is a bit restrictive when it comes to real world usage. While we firmly advocate writing small single purpose procedures, chaining these together can result in code which is a little _ungaily_. What to do...
 
 ## Binding
 
 Typically, the scenario described above would be encapsulated in a [`GroupProcedure`](Classes\/GroupProcedure.html). However, the initial `Input` property, and final `Output` property should then be exposed at the group level. This requires the group's `input` property to be set on the first child procedure, and to observe the last procedure in the chain to extract it's `output` property.
 
-This can be quite frustrating to write more than once, but luckily there is a helper API for this called `bind(to:)` and `bind(from:)`.
+This can be quite frustrating to write more than once, but luckily there are helper APIs for this called `bind(to:)` and `bind(from:)`.
 
 ```swift
 class MyGroup: TestGroupProcedure, InputProcedure, OutputProcedure {
 
     var input: Pending<Foo> = .pending
+    
     var output: Pending<ProcedureResult<Bar>> = .pending
 
     init() {
@@ -24,7 +27,7 @@ class MyGroup: TestGroupProcedure, InputProcedure, OutputProcedure {
 		    .injectResult(from: stage1)
 
 		let stage3 = TransformProcedure<Bat,Bar> { /* etc */ }
-		    .injectResult(from: stage3)
+		    .injectResult(from: stage2)
 
 		super.init(operations: [stage1, stage2, stage3])
 
