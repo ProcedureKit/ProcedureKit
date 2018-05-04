@@ -38,6 +38,7 @@ open class BatchProcedure<Transform: Procedure>: GroupProcedure, InputProcedure,
         let batch = input.map { i -> Transform in
             let transform = generator()
             transform.input = .ready(i)
+            transform.didSetInputReady()
             return transform
         }
 
