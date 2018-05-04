@@ -23,7 +23,7 @@ session Advanced NSOperations: https://developer.apple.com/videos/wwdc/2015/?id=
   # Ensure the correct version of Swift is used
   s.pod_target_xcconfig = { 'SWIFT_VERSION' => '4.0' }
 
-  # Defaul spec is 'Standard'
+  # Default spec is 'Standard'
   s.default_subspec   = 'Standard'
 
   # Default core framework suitable for an iOS, watchOS, tvOS or macOS application
