@@ -194,17 +194,23 @@ public extension ProcedureProtocol {
 
 public extension InputProcedure {
 
+    /// Notifies observers that the input was set .ready
+    func didSetInputReady() {
+        guard !input.isPending, let procedure = self as? Procedure else { return }
+        procedure.eventQueue.dispatch {
+            procedure.dispatchObservers(pendingEvent: PendingEvent.execute) { (observer, event) in
+                observer.didSetInputReady(on: procedure)
+            }
+        }
+    }
+
     @discardableResult func injectResult<Dependency: OutputProcedure>(from dependency: Dependency, via block: @escaping (Dependency.Output) throws -> Input) -> Self {
 
         return injectResult(from: dependency) { (procedure, output) in
             do {
                 procedure.input = .ready(try block(output))
 
-                if let p = procedure as? Procedure {
-                    p.dispatchObservers(pendingEvent: PendingEvent.execute) { (observer, event) in
-                        observer.didSetInputReady(on: p)
-                    }
-                }
+                procedure.didSetInputReady()
             }
             catch {
                 procedure.cancel(withError: ProcedureKitError.dependency(finishedWithErrors: [error]))
