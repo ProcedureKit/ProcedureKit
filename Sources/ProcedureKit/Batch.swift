@@ -26,8 +26,12 @@ open class BatchProcedure<Transform: Procedure>: GroupProcedure, InputProcedure,
 
     open override func execute() {
 
+        defer { super.execute() }
+
         guard let input = input.value else {
-            finish(withResult: .failure(ProcedureKitError.requirementNotSatisfied()))
+            let error = ProcedureKitError.requirementNotSatisfied()
+            output = .ready(.failure(error))
+            cancel(withError: error)
             return
         }
 
@@ -42,7 +46,5 @@ open class BatchProcedure<Transform: Procedure>: GroupProcedure, InputProcedure,
 
         add(children: batch)
         add(child: gathered)
-
-        super.execute()
     }
 }
