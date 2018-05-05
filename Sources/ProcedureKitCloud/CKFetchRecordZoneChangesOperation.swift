@@ -4,6 +4,8 @@
 //  Copyright © 2016 ProcedureKit. All rights reserved.
 //
 
+#if !swift(>=4.1)
+
 #if SWIFT_PACKAGE
     import ProcedureKit
     import Foundation
@@ -185,3 +187,5 @@ extension CloudKitProcedure where T: CKFetchRecordZoneChangesOperationProtocol {
         appendConfigureBlock { $0.setFetchRecordZoneChangesCompletionBlock(block) }
     }
 }
+
+#endif

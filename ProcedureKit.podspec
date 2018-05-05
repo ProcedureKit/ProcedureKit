@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name              = "ProcedureKit"
-  s.version           = "4.4.0"
+  s.version           = "4.5.0"
   s.summary           = "Powerful Operation subclasses in Swift."
   s.description       = <<-DESC
   
@@ -21,10 +21,10 @@ session Advanced NSOperations: https://developer.apple.com/videos/wwdc/2015/?id=
   s.osx.deployment_target = '10.10'
   
   # Ensure the correct version of Swift is used
-  s.swift_version = '3.0'
+  s.swift_version = '4.0'
 
-  # Defaul spec is 'Standard'
-  s.default_subspec   = 'Standard'
+  # Default spec is 'Standard'
+  s.default_subspec = 'Standard'
 
   # Default core framework suitable for an iOS, watchOS, tvOS or macOS application
   s.subspec 'Standard' do |ss|

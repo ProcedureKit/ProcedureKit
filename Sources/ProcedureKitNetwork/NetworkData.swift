@@ -14,7 +14,7 @@
  URLSession based APIs. It only supports the completion block style API, therefore
  do not use this procedure if you wish to use delegate based APIs on URLSession.
 */
-open class NetworkDataProcedure<Session: URLSessionTaskFactory>: Procedure, InputProcedure, OutputProcedure, NetworkOperation {
+open class NetworkDataProcedure: Procedure, InputProcedure, OutputProcedure, NetworkOperation {
     public typealias NetworkResult = ProcedureResult<HTTPPayloadResponse<Data>>
     public typealias CompletionBlock = (NetworkResult) -> Void
 
@@ -36,11 +36,11 @@ open class NetworkDataProcedure<Session: URLSessionTaskFactory>: Procedure, Inpu
         }
     }
 
-    public let session: Session
+    public let session: NetworkSession
     public let completion: CompletionBlock
 
     private let stateLock = NSLock()
-    internal private(set) var task: Session.DataTask? // internal for testing
+    internal private(set) var task: NetworkDataTask? // internal for testing
     private var _input: Pending<URLRequest> = .pending
     private var _output: Pending<NetworkResult> = .pending
 
@@ -48,7 +48,7 @@ open class NetworkDataProcedure<Session: URLSessionTaskFactory>: Procedure, Inpu
         return errors.first
     }
 
-    public init(session: Session, request: URLRequest? = nil, completionHandler: @escaping CompletionBlock = { _ in }) {
+    public init(session: NetworkSession, request: URLRequest? = nil, completionHandler: @escaping CompletionBlock = { _ in }) {
 
         self.session = session
         self.completion = completionHandler

@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name              = "TestingProcedureKit"
-  s.version           = "4.4.0"
+  s.version           = "4.5.0"
   s.summary           = "XCTest support for ProcedureKit."
   s.description       = <<-DESC
   
@@ -22,7 +22,7 @@ session Advanced NSOperations: https://developer.apple.com/videos/wwdc/2015/?id=
   s.frameworks = 'XCTest'
   
   # Ensure the correct version of Swift is used
-  s.pod_target_xcconfig = { 'SWIFT_VERSION' => '3.0' }
+  s.pod_target_xcconfig = { 'SWIFT_VERSION' => '4.0' }
 
   # Defaul spec is 'Testing'
   s.default_subspec   = 'Testing'

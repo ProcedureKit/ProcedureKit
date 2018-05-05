@@ -4,6 +4,8 @@
 //  Copyright © 2016 ProcedureKit. All rights reserved.
 //
 
+#if !swift(>=4.1)
+
 import XCTest
 import CloudKit
 import ProcedureKit
@@ -305,4 +307,6 @@ class CloudKitProcedureFetchRecordZoneChangesOperationTests: CKProcedureTestCase
         XCTAssertFalse(didExecuteBlock)
     }
 }
+
+#endif
 

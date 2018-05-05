@@ -8,6 +8,7 @@ import Foundation
 
 class AnyObserverBox_<Procedure: ProcedureProtocol>: ProcedureObserver {
     func didAttach(to procedure: Procedure) { _abstractMethod() }
+    func didSetInputReady(on procedure: Procedure) { _abstractMethod() }
     func will(execute procedure: Procedure, pendingExecute: PendingExecuteEvent) { _abstractMethod() }
     func did(execute procedure: Procedure) { _abstractMethod() }
     func did(cancel procedure: Procedure, withErrors errors: [Error]) { _abstractMethod() }
@@ -27,6 +28,10 @@ class AnyObserverBox<Base: ProcedureObserver>: AnyObserverBox_<Base.Procedure> {
 
     override func didAttach(to procedure: Base.Procedure) {
         base.didAttach(to: procedure)
+    }
+
+    override func didSetInputReady(on procedure: Base.Procedure) {
+        base.didSetInputReady(on: procedure)
     }
 
     override func will(execute procedure: Base.Procedure, pendingExecute: PendingExecuteEvent) {
@@ -83,6 +88,7 @@ internal class TransformObserver<O: ProcedureProtocol, R: ProcedureProtocol>: Pr
 
     private enum Event {
         case didAttach
+        case didSetInputReady
         case willExecute
         case didExecute
         case didCancel
@@ -94,6 +100,7 @@ internal class TransformObserver<O: ProcedureProtocol, R: ProcedureProtocol>: Pr
         var string: String {
             switch self {
             case .didAttach: return "didAttach"
+            case .didSetInputReady: return "didSetInputReady"
             case .willExecute: return "willExecute"
             case .didExecute: return "didExecute"
             case .didCancel: return "didCancel"
@@ -116,6 +123,11 @@ internal class TransformObserver<O: ProcedureProtocol, R: ProcedureProtocol>: Pr
     func didAttach(to procedure: Procedure) {
         guard let baseProcedure = typedProcedure(procedure, event: .didAttach) else { return }
         wrapped.didAttach(to: baseProcedure)
+    }
+
+    func didSetInputReady(on procedure: Procedure) {
+        guard let baseProcedure = typedProcedure(procedure, event: .didAttach) else { return }
+        wrapped.didSetInputReady(on: baseProcedure)
     }
 
     func will(execute procedure: Procedure, pendingExecute: PendingExecuteEvent) {
@@ -169,6 +181,10 @@ public struct AnyObserver<Procedure: ProcedureProtocol>: ProcedureObserver {
 
     public func didAttach(to procedure: Procedure) {
         box.didAttach(to: procedure)
+    }
+
+    public func didSetInputReady(on procedure: Procedure) {
+        box.didSetInputReady(on: procedure)
     }
 
     public func will(execute procedure: Procedure, pendingExecute: PendingExecuteEvent) {
