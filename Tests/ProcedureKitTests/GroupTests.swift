@@ -19,7 +19,7 @@ class GroupTests: GroupTestCase {
         for child in group.children {
             XCTAssertTrue(child.isFinished)
         }
-        for testProcedures in group.children.flatMap({ $0 as? TestProcedure }) {
+        for testProcedures in group.children.compactMap({ $0 as? TestProcedure }) {
             XCTAssertTrue(testProcedures.didExecute)
         }
     }
