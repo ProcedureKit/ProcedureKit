@@ -1,7 +1,7 @@
 //
 //  ProcedureKit
 //
-//  Copyright © 2016 ProcedureKit. All rights reserved.
+//  Copyright © 2016-2018 ProcedureKit. All rights reserved.
 //
 
 import Foundation
@@ -11,14 +11,7 @@ import Foundation
 */
 final public class IgnoreErrorsProcedure<T: Procedure>: ComposedProcedure<T> {
 
-    public convenience init(_ composed: T) {
-        self.init(operation: composed)
-    }
-
-    override public init(dispatchQueue: DispatchQueue? = nil, operation: T) {
-        super.init(dispatchQueue: dispatchQueue, operation: operation)
-    }
-
+    /// Override to supress errors from the composed procedure
     override public func child(_ child: Procedure, willFinishWithErrors errors: [Error]) {
         assert(!child.isFinished, "child(_:willFinishWithErrors:) called with a child that has already finished")
 
