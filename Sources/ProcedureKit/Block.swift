@@ -77,14 +77,19 @@ open class CancellableBlockProcedure: CancellableResultProcedure<Void> { }
  */
 open class UIBlockProcedure: AsyncBlockProcedure {
 
-    open override func execute() {
-        let substitute = AsyncBlockProcedure(block: block)
-        substitute.addDidFinishBlockObserver { (_, errors) in
-            self.finish(withErrors: errors)
+    public typealias ThrowingOutputBlock = () throws -> Output
+
+    public init(block: @escaping ThrowingOutputBlock) {
+        super.init { finishWithResult in
+            let sub = BlockProcedure(block: block)
+            sub.addDidFinishBlockObserver { (_, errors) in
+                finishWithResult(.failure(ProcedureKitError.dependency(finishedWithErrors: errors)))
+            }
+            sub.addDidCancelBlockObserver { (_, errors) in
+                finishWithResult(.failure(ProcedureKitError.dependency(cancelledWithErrors: errors)))
+            }
+
+            ProcedureQueue.main.add(operation: BlockProcedure(block: block))
         }
-        substitute.addDidCancelBlockObserver { (_, errors) in
-            self.cancel(withErrors: errors)
-        }
-        ProcedureQueue.main.add(operation: substitute)
     }
 }
