@@ -1,7 +1,7 @@
 //
 //  ProcedureKit
 //
-//  Copyright © 2016 ProcedureKit. All rights reserved.
+//  Copyright © 2015-2018 ProcedureKit. All rights reserved.
 //
 
 #if SWIFT_PACKAGE
@@ -76,10 +76,6 @@ public protocol HTTPPayloadResponseProtocol: Equatable {
 
 public struct HTTPPayloadResponse<Payload: Equatable>: HTTPPayloadResponseProtocol {
 
-    public static func == (lhs: HTTPPayloadResponse<Payload>, rhs: HTTPPayloadResponse<Payload>) -> Bool {
-        return lhs.payload == rhs.payload && lhs.response == rhs.response
-    }
-
     public var payload: Payload?
     public var response: HTTPURLResponse
 
@@ -90,9 +86,6 @@ public struct HTTPPayloadResponse<Payload: Equatable>: HTTPPayloadResponseProtoc
 }
 
 public struct HTTPPayloadRequest<Payload: Equatable>: Equatable {
-    public static func == (lhs: HTTPPayloadRequest <Payload>, rhs: HTTPPayloadRequest <Payload>) -> Bool {
-        return lhs.payload == rhs.payload && lhs.request == rhs.request
-    }
 
     public var request: URLRequest
     public var payload: Payload?

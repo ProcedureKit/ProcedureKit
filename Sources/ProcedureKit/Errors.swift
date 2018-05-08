@@ -1,7 +1,7 @@
 //
 //  ProcedureKit
 //
-//  Copyright © 2016 ProcedureKit. All rights reserved.
+//  Copyright © 2015-2018 ProcedureKit. All rights reserved.
 //
 
 /// A type which has an associated error type

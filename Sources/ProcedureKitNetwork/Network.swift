@@ -1,7 +1,7 @@
 //
 //  ProcedureKit
 //
-//  Copyright © 2016 ProcedureKit. All rights reserved.
+//  Copyright © 2015-2018 ProcedureKit. All rights reserved.
 //
 
 #if !os(watchOS)
@@ -156,9 +156,7 @@ class NetworkRecovery<T: Procedure> where T: NetworkOperation {
     }
 }
 
-open class NetworkProcedure<T: Procedure>: RetryProcedure<T>, OutputProcedure where T: NetworkOperation, T: OutputProcedure, T.Output: HTTPPayloadResponseProtocol {
-
-    public typealias Output = T.Output
+open class NetworkProcedure<T: Procedure>: RetryProcedure<T> where T: NetworkOperation {
 
     let recovery: NetworkRecovery<T>
 
