@@ -24,9 +24,9 @@ public enum Pending<T> {
     }
 }
 
-extension Pending where T: Equatable {
+extension Pending: Equatable where T: Equatable {
 
-    static func == (lhs: Pending<T>, rhs: Pending<T>) -> Bool {
+    public static func == (lhs: Pending<T>, rhs: Pending<T>) -> Bool {
         switch (lhs, rhs) {
         case (.pending, .pending):
             return true
@@ -58,7 +58,7 @@ public protocol ProcedureResultProtocol {
     var error: Error? { get }
 }
 
-extension Pending where T: ProcedureResultProtocol {
+extension Pending: ProcedureResultProtocol where T: ProcedureResultProtocol {
 
     public var success: T.Value? {
         return value?.value
@@ -85,9 +85,9 @@ public enum ProcedureResult<T>: ProcedureResultProtocol {
     }
 }
 
-extension ProcedureResult where T: Equatable {
+extension ProcedureResult: Equatable where T: Equatable {
 
-    static func == (lhs: ProcedureResult<T>, rhs: ProcedureResult<T>) -> Bool {
+    public static func == (lhs: ProcedureResult<T>, rhs: ProcedureResult<T>) -> Bool {
         switch (lhs, rhs) {
         case let (.success(lhsValue), .success(rhsValue)):
             return lhsValue == rhsValue
