@@ -10,7 +10,7 @@ open class ResultProcedure<Output>: Procedure, OutputProcedure {
 
     public var output: Pending<ProcedureResult<Output>> = .pending
 
-    private let block: ThrowingOutputBlock
+    public let block: ThrowingOutputBlock
 
     public init(block: @escaping ThrowingOutputBlock) {
         self.block = block
@@ -31,7 +31,7 @@ open class AsyncResultProcedure<Output>: Procedure, OutputProcedure {
     public typealias FinishingBlock = (ProcedureResult<Output>) -> Void
     public typealias Block = (@escaping FinishingBlock) -> Void
 
-    private let block: Block
+    public let block: Block
 
     public var output: Pending<ProcedureResult<Output>> = .pending
 
@@ -56,7 +56,7 @@ open class CancellableResultProcedure<Output>: Procedure, OutputProcedure {
 
     public var output: Pending<ProcedureResult<Output>> = .pending
 
-    private let block: ThrowingCancellableOutputBlock
+    public let block: ThrowingCancellableOutputBlock
 
     public init(cancellableBlock: @escaping ThrowingCancellableOutputBlock) {
         self.block = cancellableBlock
@@ -71,3 +71,25 @@ open class CancellableResultProcedure<Output>: Procedure, OutputProcedure {
 }
 
 open class CancellableBlockProcedure: CancellableResultProcedure<Void> { }
+
+/*
+ A block based procedure which execute the provided block on the UI/main thread.
+ */
+open class UIBlockProcedure: AsyncBlockProcedure {
+
+    public typealias ThrowingOutputBlock = () throws -> Output
+
+    public init(block: @escaping ThrowingOutputBlock) {
+        super.init { finishWithResult in
+            let sub = BlockProcedure(block: block)
+            sub.addDidFinishBlockObserver { (_, errors) in
+                finishWithResult(.failure(ProcedureKitError.dependency(finishedWithErrors: errors)))
+            }
+            sub.addDidCancelBlockObserver { (_, errors) in
+                finishWithResult(.failure(ProcedureKitError.dependency(cancelledWithErrors: errors)))
+            }
+
+            ProcedureQueue.main.add(operation: BlockProcedure(block: block))
+        }
+    }
+}
