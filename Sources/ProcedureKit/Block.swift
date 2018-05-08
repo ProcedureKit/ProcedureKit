@@ -41,7 +41,7 @@ open class AsyncResultProcedure<Output>: Procedure, OutputProcedure {
     }
 
     open override func execute() {
-        block { self.finish(withResult: $0) }
+        block { [weak self] in self?.finish(withResult: $0) }
     }
 }
 
