@@ -169,7 +169,7 @@ public extension ProcedureKitTestCase {
         }
     }
 
-    public func XCTAssertConditionResult<E: Error>(_ exp1: @autoclosure () throws -> ConditionResult, failedWithError error: @autoclosure () throws -> E, _ message: @autoclosure () -> String = "", file: StaticString = #file, line: UInt = #line) where E: Equatable {
+    func XCTAssertConditionResult<E: Error>(_ exp1: @autoclosure () throws -> ConditionResult, failedWithError error: @autoclosure () throws -> E, _ message: @autoclosure () -> String = "", file: StaticString = #file, line: UInt = #line) where E: Equatable {
         __XCTEvaluateAssertion(testCase: self, message, file: file, line: line) {
 
             let result = try exp1()
@@ -190,7 +190,7 @@ public extension ProcedureKitTestCase {
         }
     }
 
-    public func XCTAssertConditionResultSatisfied(_ exp1: @autoclosure () throws -> ConditionResult, _ message: @autoclosure () -> String = "", file: StaticString = #file, line: UInt = #line) {
+    func XCTAssertConditionResultSatisfied(_ exp1: @autoclosure () throws -> ConditionResult, _ message: @autoclosure () -> String = "", file: StaticString = #file, line: UInt = #line) {
         __XCTEvaluateAssertion(testCase: self, message, file: file, line: line) {
 
             let result = try exp1()
@@ -204,7 +204,7 @@ public extension ProcedureKitTestCase {
         }
     }
 
-    public func XCTAssertProcedure<T: ProcedureProtocol, E: Error>(_ exp: @autoclosure () throws -> T, firstErrorEquals firstError: E, _ message: @autoclosure () -> String = "", file: StaticString = #file, line: UInt = #line) where E: Equatable {
+    func XCTAssertProcedure<T: ProcedureProtocol, E: Error>(_ exp: @autoclosure () throws -> T, firstErrorEquals firstError: E, _ message: @autoclosure () -> String = "", file: StaticString = #file, line: UInt = #line) where E: Equatable {
         __XCTEvaluateAssertion(testCase: self, message, file: file, line: line) {
             let procedure = try exp()
             guard procedure.failed else {
@@ -212,6 +212,29 @@ public extension ProcedureKitTestCase {
             }
             guard procedure.errors[0] as? E == firstError else {
                 return .expectedFailure("\(procedure.procedureName) first error is not expected error. Errors are: \(procedure.errors)")
+            }
+            return .success
+        }
+    }
+
+    func XCTAssertProcedureOutputSuccess<T: OutputProcedure>(_ exp: @autoclosure () throws -> T, _ exp2: @autoclosure () -> T.Output, _ message: @autoclosure () -> String = "", file: StaticString = #file, line: UInt = #line) where T.Output: Equatable {
+        __XCTEvaluateAssertion(testCase: self, message, file: file, line: line) {
+            let procedure = try exp()
+            guard !procedure.failed else {
+                return .expectedFailure("\(procedure.procedureName) has failed with errors: \"\(procedure.errors)\".")
+            }
+            guard !procedure.isCancelled else {
+                return .expectedFailure("\(procedure.procedureName) was cancelled.")
+            }
+            guard procedure.isFinished else {
+                return .expectedFailure("\(procedure.procedureName) did not finish.")
+            }
+            guard let output = procedure.output.success else {
+                return .expectedFailure("\(procedure.procedureName) did not have a successful output value.")
+            }
+            let expectedOutput = exp2()
+            guard expectedOutput == output else {
+                return .expectedFailure("\(procedure.procedureName)'s successful output did not == .")
             }
             return .success
         }
