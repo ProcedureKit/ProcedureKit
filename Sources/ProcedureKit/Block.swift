@@ -41,7 +41,10 @@ open class AsyncResultProcedure<Output>: Procedure, OutputProcedure {
     }
 
     open override func execute() {
-        block { self.finish(withResult: $0) }
+        block { [weak self] result in
+            guard let strongSelf = self else { return }
+            strongSelf.finish(withResult: result)
+        }
     }
 }
 
