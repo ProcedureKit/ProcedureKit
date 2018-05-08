@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		652F9015209C488600365B2D /* BatchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652F9014209C488600365B2D /* BatchTests.swift */; };
+		652F903D209E3E3D00365B2D /* IgnoreErrors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652F903C209E3E3D00365B2D /* IgnoreErrors.swift */; };
+		652F903F209E445200365B2D /* IgnoreErrorsProcedureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652F903E209E445200365B2D /* IgnoreErrorsProcedureTests.swift */; };
 		653C9FCA1D6097A40070B7A2 /* ProcedureKitMobile.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 653C9FC11D6097A40070B7A2 /* ProcedureKitMobile.framework */; };
 		653C9FDB1D6098330070B7A2 /* ProcedureKitMobile.h in Headers */ = {isa = PBXBuildFile; fileRef = 653C9FDA1D6098330070B7A2 /* ProcedureKitMobile.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		653C9FDF1D6099110070B7A2 /* ProcedureKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65CFC5F01D608A5500CAD875 /* ProcedureKit.framework */; };
@@ -495,6 +497,8 @@
 
 /* Begin PBXFileReference section */
 		652F9014209C488600365B2D /* BatchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BatchTests.swift; sourceTree = "<group>"; };
+		652F903C209E3E3D00365B2D /* IgnoreErrors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IgnoreErrors.swift; sourceTree = "<group>"; };
+		652F903E209E445200365B2D /* IgnoreErrorsProcedureTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IgnoreErrorsProcedureTests.swift; sourceTree = "<group>"; };
 		653C9FC11D6097A40070B7A2 /* ProcedureKitMobile.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ProcedureKitMobile.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		653C9FDA1D6098330070B7A2 /* ProcedureKitMobile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ProcedureKitMobile.h; path = "Supporting Files/ProcedureKitMobile.h"; sourceTree = "<group>"; };
 		653C9FDC1D6098650070B7A2 /* ProcedureKitMobile.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = ProcedureKitMobile.xcconfig; path = "Supporting Files/ProcedureKitMobile.xcconfig"; sourceTree = "<group>"; };
@@ -1044,6 +1048,7 @@
 				65D366F01E183FB000D03E86 /* FilterProcedureTests.swift */,
 				65D366F11E183FB000D03E86 /* FinishingTests.swift */,
 				65D366F21E183FB000D03E86 /* GroupTests.swift */,
+				652F903E209E445200365B2D /* IgnoreErrorsProcedureTests.swift */,
 				EEE79AED1E21C9750030C768 /* KVONotificationTests.swift */,
 				65D366F31E183FB000D03E86 /* LoggerTests.swift */,
 				65D366F41E183FB000D03E86 /* MapProcedureTests.swift */,
@@ -1225,6 +1230,7 @@
 				65D3686F1E184AA600D03E86 /* Delay.swift */,
 				65D368721E184AA600D03E86 /* Filter.swift */,
 				65D368731E184AA600D03E86 /* Group.swift */,
+				652F903C209E3E3D00365B2D /* IgnoreErrors.swift */,
 				65D368761E184AA600D03E86 /* Map.swift */,
 				65D368831E184AA600D03E86 /* Reduce.swift */,
 				65D368841E184AA600D03E86 /* Repeat.swift */,
@@ -2107,6 +2113,7 @@
 				65D368A11E184AA600D03E86 /* ProcedureObserver.swift in Sources */,
 				65D368A71E184AA600D03E86 /* Reduce.swift in Sources */,
 				65D3688F1E184AA600D03E86 /* Capability.swift in Sources */,
+				652F903D209E3E3D00365B2D /* IgnoreErrors.swift in Sources */,
 				65D368A91E184AA600D03E86 /* Retry.swift in Sources */,
 				65D368931E184AA600D03E86 /* Delay.swift in Sources */,
 				65D3689B1E184AA600D03E86 /* MutualExclusion.swift in Sources */,
@@ -2120,6 +2127,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				652F903F209E445200365B2D /* IgnoreErrorsProcedureTests.swift in Sources */,
 				65D367091E183FB000D03E86 /* BlockObserverTests.swift in Sources */,
 				65D367391E183FB000D03E86 /* RetryProcedureTests.swift in Sources */,
 				65D367331E183FB000D03E86 /* ReduceProcedureTests.swift in Sources */,
