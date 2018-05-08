@@ -21,7 +21,7 @@ session Advanced NSOperations: https://developer.apple.com/videos/wwdc/2015/?id=
   s.osx.deployment_target = '10.10'
   
   # Ensure the correct version of Swift is used
-  s.swift_version = '4.0'
+  s.swift_version = '4.1'
 
   # Default spec is 'Standard'
   s.default_subspec = 'Standard'

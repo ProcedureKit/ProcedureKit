@@ -1,7 +1,7 @@
 //
 //  ProcedureKit
 //
-//  Copyright © 2016 ProcedureKit. All rights reserved.
+//  Copyright © 2015-2018 ProcedureKit. All rights reserved.
 //
 
 import Foundation
@@ -360,7 +360,9 @@ extension RepeatProcedure where T: Repeatable {
 
 // MARK: - Extensions
 
-extension RepeatProcedure where T: InputProcedure {
+extension RepeatProcedure: InputProcedure where T: InputProcedure {
+
+    public typealias Input = T.Input
 
     /// - returns: the pending input value where T conforms to InputProcedure
     public var input: Pending<T.Input> {
@@ -399,7 +401,9 @@ extension RepeatProcedure where T: InputProcedure {
     }
 }
 
-extension RepeatProcedure where T: OutputProcedure {
+extension RepeatProcedure: OutputProcedure where T: OutputProcedure {
+
+    public typealias Output = T.Output
 
     /// - returns: the pending output result value where T conforms to OutputProcedure
     public var output: Pending<ProcedureResult<T.Output>> {

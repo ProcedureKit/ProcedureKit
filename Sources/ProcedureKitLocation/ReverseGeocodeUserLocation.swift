@@ -1,7 +1,7 @@
 //
 //  ProcedureKit
 //
-//  Copyright © 2016 ProcedureKit. All rights reserved.
+//  Copyright © 2015-2018 ProcedureKit. All rights reserved.
 //
 
 #if SWIFT_PACKAGE
@@ -15,9 +15,6 @@ import CoreLocation
 import MapKit
 
 public struct UserLocationPlacemark: Equatable {
-    public static func == (lhs: UserLocationPlacemark, rhs: UserLocationPlacemark) -> Bool {
-        return lhs.location == rhs.location && lhs.placemark == rhs.placemark
-    }
     public let location: CLLocation
     public let placemark: CLPlacemark
 }

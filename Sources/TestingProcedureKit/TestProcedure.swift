@@ -1,16 +1,13 @@
 //
 //  ProcedureKit
 //
-//  Copyright © 2016 ProcedureKit. All rights reserved.
+//  Copyright © 2015-2018 ProcedureKit. All rights reserved.
 //
 
 import Foundation
 import ProcedureKit
 
 public struct TestError: Error, Equatable, CustomDebugStringConvertible {
-    public static func == (lhs: TestError, rhs: TestError) -> Bool {
-        return lhs.uuid == rhs.uuid
-    }
 
     public static func verify(errors: [Error], count: Int = 1, contains error: TestError) -> Bool {
         return (errors.count == count) && errors.contains { ($0 as? TestError) ?? TestError() == error }
