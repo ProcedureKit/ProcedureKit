@@ -205,6 +205,7 @@ public class EventConcurrencyTrackingRegistrar {
         // GroupProcedure open functions
         case override_groupWillAdd_child(String)
         case override_child_willFinishWithErrors(String)
+
         // GroupProcedure handlers
         case group_transformChildErrorsBlock(String)
 
@@ -230,39 +231,11 @@ public class EventConcurrencyTrackingRegistrar {
             case .group_transformChildErrorsBlock(let child): return "group.transformChildErrorsBlock [\(child)]"
             }
         }
-
-        public static func == (lhs: EventConcurrencyTrackingRegistrar.ProcedureEvent, rhs: EventConcurrencyTrackingRegistrar.ProcedureEvent) -> Bool {
-            switch (lhs, rhs) {
-                case (.do_Execute, .do_Execute),
-                     (.observer_didAttach, .observer_didAttach),
-                     (.observer_willExecute, .observer_willExecute),
-                     (.observer_didExecute, .observer_didExecute),
-                     (.observer_willCancel, .observer_willCancel),
-                     (.observer_didCancel, .observer_didCancel),
-                     (.observer_willFinish, .observer_willFinish),
-                     (.observer_didFinish, .observer_didFinish),
-                     (.override_procedureWillCancel, .override_procedureWillCancel),
-                     (.override_procedureDidCancel, .override_procedureDidCancel),
-                     (.override_procedureWillFinish, .override_procedureWillFinish),
-                     (.override_procedureDidFinish, .override_procedureDidFinish):
-                    return true
-            case (.observer_procedureWillAdd(let lhs_name), .observer_procedureWillAdd(let rhs_name)):
-                return lhs_name == rhs_name
-            case (.observer_procedureDidAdd(let lhs_name), .observer_procedureDidAdd(let rhs_name)):
-                return lhs_name == rhs_name
-            case (.override_groupWillAdd_child(let lhs_child), .override_groupWillAdd_child(let rhs_child)):
-                return lhs_child == rhs_child
-            case (.override_child_willFinishWithErrors(let lhs_child), .override_child_willFinishWithErrors(let rhs_child)):
-                return lhs_child == rhs_child
-            case (.group_transformChildErrorsBlock(let lhs_child), .group_transformChildErrorsBlock(let rhs_child)):
-                return lhs_child == rhs_child
-            default:
-                return false
-            }
-        }
     }
+
     public struct DetectedConcurrentEventSet: CustomStringConvertible {
         private var array: [DetectedConcurrentEvent] = []
+
         public var description: String {
             var description: String = ""
             for concurrentEvent in array {
@@ -274,13 +247,16 @@ public class EventConcurrencyTrackingRegistrar {
             }
             return description
         }
+
         public var isEmpty: Bool {
             return array.isEmpty
         }
+
         public mutating func append(_ newElement: DetectedConcurrentEvent) {
             array.append(newElement)
         }
     }
+
     public struct DetectedConcurrentEvent: CustomStringConvertible {
         var newEvent: (event: ProcedureEvent, threadUUID: String)
         var currentEvents: [UUID: (event: ProcedureEvent, threadUUID: String)]
@@ -293,6 +269,7 @@ public class EventConcurrencyTrackingRegistrar {
             return uuidString.substring(to: uuidString.index(uuidString.startIndex, offsetBy: 4))
             #endif
         }
+
         public var description: String {
             var description = "+ \(newEvent.event) (t: \(truncateThreadID(newEvent.threadUUID))) while: " /*+
              "while: \n"*/
@@ -302,6 +279,7 @@ public class EventConcurrencyTrackingRegistrar {
             return description
         }
     }
+
     private struct State {
         // the current eventCallbacks
         var eventCallbacks: [UUID: (event: ProcedureEvent, threadUUID: String)] = [:]
@@ -315,6 +293,7 @@ public class EventConcurrencyTrackingRegistrar {
         // a history of all detected events (optional)
         var eventHistory: [ProcedureEvent] = []
     }
+
     private let state = Protector(State())
 
     public var maximumDetected: Int { return state.read { $0.maximumDetected } }
@@ -366,11 +345,13 @@ public class EventConcurrencyTrackingRegistrar {
             return newUUID
         }
     }
+
     private func deregisterRunning(_ uuid: UUID) {
         state.write { ward -> Bool in
             return ward.eventCallbacks.removeValue(forKey: uuid) != nil
         }
     }
+
     public func doRun(_ callback: ProcedureEvent, withDelay delay: TimeInterval = 0.0001, block: (ProcedureEvent) -> Void = { _ in }) {
         let id = registerRunning(callback)
         if delay > 0 {

@@ -102,28 +102,28 @@ public extension ProcedureKitError {
     }
 
     public struct ConditionDependenciesFailed: Error, Equatable, CustomStringConvertible {
+
         public let condition: Condition
+
         internal init(condition: Condition) {
             self.condition = condition
         }
+
         public var description: String {
             return "ProcedureKitError.ConditionDependenciesFailed(condition: \(condition))"
-        }
-        public static func == (lhs: ConditionDependenciesFailed, rhs: ConditionDependenciesFailed) -> Bool {
-            return lhs.condition === rhs.condition
         }
     }
 
     public struct ConditionDependenciesCancelled: Error, Equatable, CustomStringConvertible {
+
         public let condition: Condition
+
         internal init(condition: Condition) {
             self.condition = condition
         }
+
         public var description: String {
             return "ProcedureKitError.ConditionDependenciesCancelled(condition: \(condition))"
-        }
-        public static func == (lhs: ConditionDependenciesCancelled, rhs: ConditionDependenciesCancelled) -> Bool {
-            return lhs.condition === rhs.condition
         }
     }
 }

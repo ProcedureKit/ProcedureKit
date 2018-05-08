@@ -13,16 +13,6 @@ import Dispatch
 /// - until: a `Date`
 public enum Delay: Comparable {
 
-    public static func == (lhs: Delay, rhs: Delay) -> Bool {
-        switch (lhs, rhs) {
-        case let (.by(lhsBy), .by(rhsBy)):
-            return lhsBy == rhsBy
-        case let (.until(lhsUntil), .until(rhsUntil)):
-            return lhsUntil == rhsUntil
-        default: return false
-        }
-    }
-
     public static func < (lhs: Delay, rhs: Delay) -> Bool {
         switch (lhs, rhs) {
         case let (.by(lhsBy), .by(rhsBy)):
