@@ -10,7 +10,7 @@ open class ResultProcedure<Output>: Procedure, OutputProcedure {
 
     public var output: Pending<ProcedureResult<Output>> = .pending
 
-    private let block: ThrowingOutputBlock
+    public let block: ThrowingOutputBlock
 
     public init(block: @escaping ThrowingOutputBlock) {
         self.block = block
@@ -31,7 +31,7 @@ open class AsyncResultProcedure<Output>: Procedure, OutputProcedure {
     public typealias FinishingBlock = (ProcedureResult<Output>) -> Void
     public typealias Block = (@escaping FinishingBlock) -> Void
 
-    private let block: Block
+    public let block: Block
 
     public var output: Pending<ProcedureResult<Output>> = .pending
 
@@ -56,7 +56,7 @@ open class CancellableResultProcedure<Output>: Procedure, OutputProcedure {
 
     public var output: Pending<ProcedureResult<Output>> = .pending
 
-    private let block: ThrowingCancellableOutputBlock
+    public let block: ThrowingCancellableOutputBlock
 
     public init(cancellableBlock: @escaping ThrowingCancellableOutputBlock) {
         self.block = cancellableBlock
@@ -71,3 +71,20 @@ open class CancellableResultProcedure<Output>: Procedure, OutputProcedure {
 }
 
 open class CancellableBlockProcedure: CancellableResultProcedure<Void> { }
+
+/*
+ A block based procedure which execute the provided block on the UI/main thread.
+ */
+open class UIBlockProcedure: AsyncBlockProcedure {
+
+    open override func execute() {
+        let substitute = AsyncBlockProcedure(block: block)
+        substitute.addDidFinishBlockObserver { (_, errors) in
+            self.finish(withErrors: errors)
+        }
+        substitute.addDidCancelBlockObserver { (_, errors) in
+            self.cancel(withErrors: errors)
+        }
+        ProcedureQueue.main.add(operation: substitute)
+    }
+}
