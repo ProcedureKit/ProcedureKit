@@ -35,6 +35,8 @@
 		65A72C2A1DA7F37C008597CA /* ProcedureKit.framework in Copy Dependencies */ = {isa = PBXBuildFile; fileRef = 65CFC5F01D608A5500CAD875 /* ProcedureKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		65A72C2B1DA7F37C008597CA /* TestingProcedureKit.framework in Copy Dependencies */ = {isa = PBXBuildFile; fileRef = 65CFC6161D60900000CAD875 /* TestingProcedureKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		65AB7DDA209B95B400726796 /* Batch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65AB7DD9209B95B400726796 /* Batch.swift */; };
+		65AEF19F20A3AE340089B6C8 /* ViewControllerContainment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65AEF19E20A3AE340089B6C8 /* ViewControllerContainment.swift */; };
+		65C2737620ADDE39005C28E2 /* PushUIPresentationProcedure.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65C2737520ADDE39005C28E2 /* PushUIPresentationProcedure.swift */; };
 		65C7BBC22085CEF4009A6D6E /* CKAcceptSharesOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D367DF1E1844F800D03E86 /* CKAcceptSharesOperation.swift */; };
 		65C7BBC32085CF21009A6D6E /* CKDatabaseOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D367E01E1844F800D03E86 /* CKDatabaseOperation.swift */; };
 		65C7BBC42085CF26009A6D6E /* CKDiscoverAllContactsOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D367E11E1844F800D03E86 /* CKDiscoverAllContactsOperation.swift */; };
@@ -521,6 +523,8 @@
 		659484351DAAA3360028F83B /* ProcedureKitLocation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ProcedureKitLocation.h; path = "Supporting Files/ProcedureKitLocation.h"; sourceTree = "<group>"; };
 		659484371DAAA3A60028F83B /* ProcedureKitLocation.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = ProcedureKitLocation.xcconfig; path = "Supporting Files/ProcedureKitLocation.xcconfig"; sourceTree = "<group>"; };
 		65AB7DD9209B95B400726796 /* Batch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Batch.swift; sourceTree = "<group>"; };
+		65AEF19E20A3AE340089B6C8 /* ViewControllerContainment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewControllerContainment.swift; sourceTree = "<group>"; };
+		65C2737520ADDE39005C28E2 /* PushUIPresentationProcedure.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PushUIPresentationProcedure.swift; sourceTree = "<group>"; };
 		65C88D761DC4EB4300C8D4EB /* Warnings.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = Warnings.xcconfig; path = "Supporting Files/Warnings.xcconfig"; sourceTree = "<group>"; };
 		65CFC5F01D608A5500CAD875 /* ProcedureKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ProcedureKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		65CFC5F91D608A5500CAD875 /* ProcedureKitTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ProcedureKitTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -1184,6 +1188,8 @@
 				65D368241E18451C00D03E86 /* NetworkObserver+Mobile.swift */,
 				65D368251E18451C00D03E86 /* UI.swift */,
 				65FFC36E1E4BDF03005DC38F /* UserConfirmation.swift */,
+				65AEF19E20A3AE340089B6C8 /* ViewControllerContainment.swift */,
+				65C2737520ADDE39005C28E2 /* PushUIPresentationProcedure.swift */,
 			);
 			name = ProcedureKitMobile;
 			path = Sources/ProcedureKitMobile;
@@ -1920,10 +1926,12 @@
 			buildActionMask = 2147483647;
 			files = (
 				65FFC36F1E4BDF03005DC38F /* UserConfirmation.swift in Sources */,
+				65AEF19F20A3AE340089B6C8 /* ViewControllerContainment.swift in Sources */,
 				65D368261E18451C00D03E86 /* Alert.swift in Sources */,
 				65D368291E18451C00D03E86 /* UI.swift in Sources */,
 				65D368281E18451C00D03E86 /* NetworkObserver+Mobile.swift in Sources */,
 				65D368271E18451C00D03E86 /* BackgroundObserver.swift in Sources */,
+				65C2737620ADDE39005C28E2 /* PushUIPresentationProcedure.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
