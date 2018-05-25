@@ -5,7 +5,9 @@
 //
 
 
-#import <Cocoa/Cocoa.h>
+@import Foundation;
+@import CoreData;
+@import ProcedureKit;
 
 //! Project version number for ProcedureKitCoreData.
 FOUNDATION_EXPORT double ProcedureKitCoreDataVersionNumber;
