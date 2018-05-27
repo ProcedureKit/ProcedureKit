@@ -33,9 +33,11 @@
 		6594843D1DAAA5430028F83B /* ProcedureKit.framework in Copy Files (2 items) */ = {isa = PBXBuildFile; fileRef = 65CFC5F01D608A5500CAD875 /* ProcedureKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		6594843E1DAAA5430028F83B /* TestingProcedureKit.framework in Copy Files (2 items) */ = {isa = PBXBuildFile; fileRef = 65CFC6161D60900000CAD875 /* TestingProcedureKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		65A0E4A220B85169002D6C8C /* ProcedureKitCoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65A0E49920B85168002D6C8C /* ProcedureKitCoreData.framework */; };
-		65A0E4B220B85213002D6C8C /* LoadModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65A0E4B120B85213002D6C8C /* LoadModel.swift */; };
+		65A0E4B220B85213002D6C8C /* LoadCoreData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65A0E4B120B85213002D6C8C /* LoadCoreData.swift */; };
 		65A0E4B420B85258002D6C8C /* ProcedureKitCoreData.h in Headers */ = {isa = PBXBuildFile; fileRef = 65A0E4B320B85258002D6C8C /* ProcedureKitCoreData.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		65A0E4BA20B8548D002D6C8C /* ProcedureKitCoreDataTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65A0E4B820B8548D002D6C8C /* ProcedureKitCoreDataTests.swift */; };
+		65A0E4C120BB18EA002D6C8C /* TestDataModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 65A0E4BF20BB18EA002D6C8C /* TestDataModel.xcdatamodeld */; };
+		65A0E4C320BB1975002D6C8C /* LoadCoreDataProcedureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65A0E4C220BB1975002D6C8C /* LoadCoreDataProcedureTests.swift */; };
 		65A72C2A1DA7F37C008597CA /* ProcedureKit.framework in Copy Dependencies */ = {isa = PBXBuildFile; fileRef = 65CFC5F01D608A5500CAD875 /* ProcedureKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		65A72C2B1DA7F37C008597CA /* TestingProcedureKit.framework in Copy Dependencies */ = {isa = PBXBuildFile; fileRef = 65CFC6161D60900000CAD875 /* TestingProcedureKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		65AB7DDA209B95B400726796 /* Batch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65AB7DD9209B95B400726796 /* Batch.swift */; };
@@ -547,10 +549,12 @@
 		659484371DAAA3A60028F83B /* ProcedureKitLocation.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = ProcedureKitLocation.xcconfig; path = "Supporting Files/ProcedureKitLocation.xcconfig"; sourceTree = "<group>"; };
 		65A0E49920B85168002D6C8C /* ProcedureKitCoreData.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ProcedureKitCoreData.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		65A0E4A120B85169002D6C8C /* ProcedureKitCoreDataTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ProcedureKitCoreDataTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		65A0E4B120B85213002D6C8C /* LoadModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadModel.swift; sourceTree = "<group>"; };
+		65A0E4B120B85213002D6C8C /* LoadCoreData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadCoreData.swift; sourceTree = "<group>"; };
 		65A0E4B320B85258002D6C8C /* ProcedureKitCoreData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ProcedureKitCoreData.h; path = "Supporting Files/ProcedureKitCoreData.h"; sourceTree = "<group>"; };
 		65A0E4B520B85297002D6C8C /* ProcedureKitCoreData.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = ProcedureKitCoreData.xcconfig; path = "Supporting Files/ProcedureKitCoreData.xcconfig"; sourceTree = "<group>"; };
 		65A0E4B820B8548D002D6C8C /* ProcedureKitCoreDataTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProcedureKitCoreDataTests.swift; sourceTree = "<group>"; };
+		65A0E4C020BB18EA002D6C8C /* TestDataModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = TestDataModel.xcdatamodel; sourceTree = "<group>"; };
+		65A0E4C220BB1975002D6C8C /* LoadCoreDataProcedureTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadCoreDataProcedureTests.swift; sourceTree = "<group>"; };
 		65AB7DD9209B95B400726796 /* Batch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Batch.swift; sourceTree = "<group>"; };
 		65C88D761DC4EB4300C8D4EB /* Warnings.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = Warnings.xcconfig; path = "Supporting Files/Warnings.xcconfig"; sourceTree = "<group>"; };
 		65CFC5F01D608A5500CAD875 /* ProcedureKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ProcedureKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -927,7 +931,7 @@
 		65A0E4B020B851D4002D6C8C /* ProcedureKitCoreData */ = {
 			isa = PBXGroup;
 			children = (
-				65A0E4B120B85213002D6C8C /* LoadModel.swift */,
+				65A0E4B120B85213002D6C8C /* LoadCoreData.swift */,
 			);
 			name = ProcedureKitCoreData;
 			path = Sources/ProcedureKitCoreData;
@@ -936,7 +940,9 @@
 		65A0E4B620B8548D002D6C8C /* ProcedureKitCoreDataTests */ = {
 			isa = PBXGroup;
 			children = (
+				65A0E4C220BB1975002D6C8C /* LoadCoreDataProcedureTests.swift */,
 				65A0E4B820B8548D002D6C8C /* ProcedureKitCoreDataTests.swift */,
+				65A0E4BF20BB18EA002D6C8C /* TestDataModel.xcdatamodeld */,
 			);
 			name = ProcedureKitCoreDataTests;
 			path = Tests/ProcedureKitCoreDataTests;
@@ -2210,7 +2216,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				65A0E4B220B85213002D6C8C /* LoadModel.swift in Sources */,
+				65A0E4B220B85213002D6C8C /* LoadCoreData.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2219,6 +2225,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				65A0E4BA20B8548D002D6C8C /* ProcedureKitCoreDataTests.swift in Sources */,
+				65A0E4C320BB1975002D6C8C /* LoadCoreDataProcedureTests.swift in Sources */,
+				65A0E4C120BB18EA002D6C8C /* TestDataModel.xcdatamodeld in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3417,7 +3425,6 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
-				SDKROOT = macosx;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_COMPILATION_MODE = singlefile;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -3464,7 +3471,6 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
-				SDKROOT = macosx;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				TVOS_DEPLOYMENT_TARGET = 10.0;
@@ -3635,9 +3641,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.12;
 				MTL_ENABLE_DEBUG_INFO = YES;
-				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_COMPILATION_MODE = singlefile;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -3679,9 +3683,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.12;
 				MTL_ENABLE_DEBUG_INFO = NO;
-				SDKROOT = iphoneos;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				VALIDATE_PRODUCT = YES;
@@ -3880,10 +3882,8 @@
 					"@executable_path/../Frameworks",
 					"@loader_path/../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 4.0;
@@ -3942,10 +3942,8 @@
 					"@executable_path/../Frameworks",
 					"@loader_path/../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				SWIFT_VERSION = 4.0;
@@ -4651,6 +4649,19 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCVersionGroup section */
+		65A0E4BF20BB18EA002D6C8C /* TestDataModel.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				65A0E4C020BB18EA002D6C8C /* TestDataModel.xcdatamodel */,
+			);
+			currentVersion = 65A0E4C020BB18EA002D6C8C /* TestDataModel.xcdatamodel */;
+			path = TestDataModel.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
 	};
 	rootObject = 65CFC5E51D608A1A00CAD875 /* Project object */;
 }
