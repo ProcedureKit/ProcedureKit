@@ -26,17 +26,13 @@ final class SaveManagedObjectContextProcedureTests: ProcedureKitCoreDataTestCase
 
         let save = SaveManagedObjectContext().injectResult(from: insert)
 
-        let read = TransformProcedure<NSPersistentContainer, [TestEntity]> { (container) in
-            return try container.viewContext.fetch(TestEntity.fetchRequest())
-        }.injectResult(from: coreDataStack)
+        fetchTestEntities.add(dependency: save)
 
-        read.add(dependency: save)
-
-        wait(for: coreDataStack, insert, save, read)
+        wait(for: coreDataStack, insert, save, fetchTestEntities)
 
         XCTAssertProcedureFinishedWithoutErrors(save)
 
-        guard let testEntity = read.output.success?.first else {
+        guard let testEntity = fetchTestEntities.output.success?.first else {
             XCTFail("Did not fetch any test entities.")
             return
         }

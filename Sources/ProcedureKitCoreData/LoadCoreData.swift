@@ -101,3 +101,14 @@ open class LoadCoreDataProcedure: Procedure, OutputProcedure {
         }
     }
 }
+
+
+// MARK: - Internal Core Data Helpers
+
+internal extension NSManagedObject {
+
+    static var entityName: String {
+        return entity().name ?? description()
+    }
+}
+

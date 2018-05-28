@@ -27,6 +27,8 @@ open class ProcedureKitCoreDataTestCase: ProcedureKitTestCase {
 
     var coreDataStack: LoadCoreDataProcedure!
 
+    var fetchTestEntities: TransformProcedure<NSPersistentContainer, [TestEntity]>!
+
     open override func setUp() {
         super.setUp()
 
@@ -35,11 +37,24 @@ open class ProcedureKitCoreDataTestCase: ProcedureKitTestCase {
             managedObjectModel: managedObjectModel,
             persistentStoreDescriptions: persistentStoreDescriptions
         )
+
+        coreDataStack.addWillFinishBlockObserver  { (procedure, errors, _) in
+            guard errors.isEmpty, let container = procedure.output.success else { return }
+            container.viewContext.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
+            container.viewContext.undoManager = nil
+            container.viewContext.shouldDeleteInaccessibleFaults = true
+            container.viewContext.automaticallyMergesChangesFromParent = true
+        }
+
+        fetchTestEntities = TransformProcedure<NSPersistentContainer, [TestEntity]> { (container) in
+            return try container.viewContext.fetch(TestEntity.fetchRequest())
+        }.injectResult(from: coreDataStack)
+
     }
 
     open override func tearDown() {
         coreDataStack = nil
-        
+        fetchTestEntities = nil
         super.tearDown()
     }
 }

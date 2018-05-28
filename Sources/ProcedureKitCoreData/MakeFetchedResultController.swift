@@ -56,7 +56,6 @@ open class MakeFetchedResultControllerProcedure<Result: NSFetchRequestResult>: T
 public extension MakeFetchedResultControllerProcedure where Result: NSManagedObject {
 
     public convenience init(fetchLimit: Int = 50, sortDescriptors: [NSSortDescriptor] = [], sectionNameKeyPath: String? = nil, cacheName: String? = nil) {
-        let entityName = Result.entity().name ?? Result.description()
-        self.init(for: entityName, fetchLimit: fetchLimit, sortDescriptors: sortDescriptors, sectionNameKeyPath: sectionNameKeyPath, cacheName: cacheName)
+        self.init(for: Result.entityName, fetchLimit: fetchLimit, sortDescriptors: sortDescriptors, sectionNameKeyPath: sectionNameKeyPath, cacheName: cacheName)
     }
 }
