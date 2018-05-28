@@ -38,6 +38,7 @@
 		65A0E4BA20B8548D002D6C8C /* ProcedureKitCoreDataTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65A0E4B820B8548D002D6C8C /* ProcedureKitCoreDataTests.swift */; };
 		65A0E4C120BB18EA002D6C8C /* TestDataModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 65A0E4BF20BB18EA002D6C8C /* TestDataModel.xcdatamodeld */; };
 		65A0E4C320BB1975002D6C8C /* LoadCoreDataProcedureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65A0E4C220BB1975002D6C8C /* LoadCoreDataProcedureTests.swift */; };
+		65A0E4C520BB2E51002D6C8C /* SaveManagedObjectContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65A0E4C420BB2E51002D6C8C /* SaveManagedObjectContext.swift */; };
 		65A72C2A1DA7F37C008597CA /* ProcedureKit.framework in Copy Dependencies */ = {isa = PBXBuildFile; fileRef = 65CFC5F01D608A5500CAD875 /* ProcedureKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		65A72C2B1DA7F37C008597CA /* TestingProcedureKit.framework in Copy Dependencies */ = {isa = PBXBuildFile; fileRef = 65CFC6161D60900000CAD875 /* TestingProcedureKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		65AB7DDA209B95B400726796 /* Batch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65AB7DD9209B95B400726796 /* Batch.swift */; };
@@ -555,6 +556,7 @@
 		65A0E4B820B8548D002D6C8C /* ProcedureKitCoreDataTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProcedureKitCoreDataTests.swift; sourceTree = "<group>"; };
 		65A0E4C020BB18EA002D6C8C /* TestDataModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = TestDataModel.xcdatamodel; sourceTree = "<group>"; };
 		65A0E4C220BB1975002D6C8C /* LoadCoreDataProcedureTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadCoreDataProcedureTests.swift; sourceTree = "<group>"; };
+		65A0E4C420BB2E51002D6C8C /* SaveManagedObjectContext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaveManagedObjectContext.swift; sourceTree = "<group>"; };
 		65AB7DD9209B95B400726796 /* Batch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Batch.swift; sourceTree = "<group>"; };
 		65C88D761DC4EB4300C8D4EB /* Warnings.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = Warnings.xcconfig; path = "Supporting Files/Warnings.xcconfig"; sourceTree = "<group>"; };
 		65CFC5F01D608A5500CAD875 /* ProcedureKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ProcedureKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -932,6 +934,7 @@
 			isa = PBXGroup;
 			children = (
 				65A0E4B120B85213002D6C8C /* LoadCoreData.swift */,
+				65A0E4C420BB2E51002D6C8C /* SaveManagedObjectContext.swift */,
 			);
 			name = ProcedureKitCoreData;
 			path = Sources/ProcedureKitCoreData;
@@ -2217,6 +2220,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				65A0E4B220B85213002D6C8C /* LoadCoreData.swift in Sources */,
+				65A0E4C520BB2E51002D6C8C /* SaveManagedObjectContext.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

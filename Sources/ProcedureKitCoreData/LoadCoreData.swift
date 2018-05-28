@@ -65,12 +65,12 @@ open class LoadCoreDataProcedure: Procedure, OutputProcedure {
     /// - returns: [NSPersistentStoreDescription] the initialized store descriptions
     public let persistentStoreDescriptions: [NSPersistentStoreDescription]
 
-    public init(filename: String, managedObjectModel: NSManagedObjectModel? = nil, persistentStoreDescriptions: [NSPersistentStoreDescription] = []) {
-        self.filename = filename
+    public init(name: String, managedObjectModel: NSManagedObjectModel? = nil, persistentStoreDescriptions: [NSPersistentStoreDescription] = []) {
+        self.filename = name
         self.managedObjectModel = managedObjectModel
         self.persistentStoreDescriptions = persistentStoreDescriptions
         super.init()
-        name = "Load Core Data"
+        self.name = "Load Core Data"
         add(condition: MutuallyExclusive<LoadCoreDataProcedure>())
     }
 
