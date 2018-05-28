@@ -98,7 +98,7 @@ struct PendingProfileResult {
 // MARK: ProcedureProfiler
 public final class ProcedureProfiler: Identifiable, Equatable {
 
-    public let identifier = UUID()
+    public let identity = UUID()
 
     enum Reporter {
         case parent(ProcedureProfiler)
