@@ -30,6 +30,8 @@
 		653CA07B1D60ABD30070B7A2 /* TestingProcedureKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65CFC6161D60900000CAD875 /* TestingProcedureKit.framework */; };
 		658BE06F20BC69170021F11B /* ProcedureKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65CFC5F01D608A5500CAD875 /* ProcedureKit.framework */; };
 		658BE07020BC69170021F11B /* TestingProcedureKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65CFC6161D60900000CAD875 /* TestingProcedureKit.framework */; };
+		658BE07220BC72540021F11B /* MakeFetchedResultController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 658BE07120BC72540021F11B /* MakeFetchedResultController.swift */; };
+		658BE07420BC77AD0021F11B /* MakeFetchedResultsControllerProcedureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 658BE07320BC77AD0021F11B /* MakeFetchedResultsControllerProcedureTests.swift */; };
 		659484271DAAA2B90028F83B /* ProcedureKitLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6594841E1DAAA2B90028F83B /* ProcedureKitLocation.framework */; };
 		659484361DAAA3360028F83B /* ProcedureKitLocation.h in Headers */ = {isa = PBXBuildFile; fileRef = 659484351DAAA3360028F83B /* ProcedureKitLocation.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6594843D1DAAA5430028F83B /* ProcedureKit.framework in Copy Files (2 items) */ = {isa = PBXBuildFile; fileRef = 65CFC5F01D608A5500CAD875 /* ProcedureKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -554,6 +556,8 @@
 		653CA0621D60AA990070B7A2 /* ProcedureKitCloudTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ProcedureKitCloudTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		653CA0731D60AB1B0070B7A2 /* ProcedureKitCloud.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ProcedureKitCloud.h; path = "Supporting Files/ProcedureKitCloud.h"; sourceTree = "<group>"; };
 		653CA0751D60AB2B0070B7A2 /* ProcedureKitCloud.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = ProcedureKitCloud.xcconfig; path = "Supporting Files/ProcedureKitCloud.xcconfig"; sourceTree = "<group>"; };
+		658BE07120BC72540021F11B /* MakeFetchedResultController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MakeFetchedResultController.swift; sourceTree = "<group>"; };
+		658BE07320BC77AD0021F11B /* MakeFetchedResultsControllerProcedureTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MakeFetchedResultsControllerProcedureTests.swift; sourceTree = "<group>"; };
 		6594841E1DAAA2B90028F83B /* ProcedureKitLocation.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ProcedureKitLocation.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		659484261DAAA2B90028F83B /* ProcedureKitLocationTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ProcedureKitLocationTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		659484351DAAA3360028F83B /* ProcedureKitLocation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ProcedureKitLocation.h; path = "Supporting Files/ProcedureKitLocation.h"; sourceTree = "<group>"; };
@@ -954,6 +958,7 @@
 			isa = PBXGroup;
 			children = (
 				65A0E4B120B85213002D6C8C /* LoadCoreData.swift */,
+				658BE07120BC72540021F11B /* MakeFetchedResultController.swift */,
 				65A0E4C420BB2E51002D6C8C /* SaveManagedObjectContext.swift */,
 			);
 			name = ProcedureKitCoreData;
@@ -964,6 +969,7 @@
 			isa = PBXGroup;
 			children = (
 				65A0E4C220BB1975002D6C8C /* LoadCoreDataProcedureTests.swift */,
+				658BE07320BC77AD0021F11B /* MakeFetchedResultsControllerProcedureTests.swift */,
 				65A0E4B820B8548D002D6C8C /* ProcedureKitCoreDataTests.swift */,
 				65A0E4C620BC548A002D6C8C /* SaveManagedObjectContextProcedureTests.swift */,
 				65A0E4BF20BB18EA002D6C8C /* TestDataModel.xcdatamodeld */,
@@ -2243,6 +2249,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				65A0E4B220B85213002D6C8C /* LoadCoreData.swift in Sources */,
+				658BE07220BC72540021F11B /* MakeFetchedResultController.swift in Sources */,
 				65A0E4C520BB2E51002D6C8C /* SaveManagedObjectContext.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -2255,6 +2262,7 @@
 				65A0E4BA20B8548D002D6C8C /* ProcedureKitCoreDataTests.swift in Sources */,
 				65A0E4C320BB1975002D6C8C /* LoadCoreDataProcedureTests.swift in Sources */,
 				65A0E4C820BC5540002D6C8C /* SaveManagedObjectContextProcedureTests.swift in Sources */,
+				658BE07420BC77AD0021F11B /* MakeFetchedResultsControllerProcedureTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
