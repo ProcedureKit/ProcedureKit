@@ -27,6 +27,7 @@ import CoreData
 
  Lastly the managed object context is saved.
  */
+@available(iOS 10.0, OSX 10.12, tvOS 10.0, watchOS 3.0, *)
 open class InsertManagedObjectsProcedure<Item, ManagedObject>: GroupProcedure, InputProcedure, OutputProcedure where ManagedObject: NSManagedObject {
 
     public var input: Pending<[Item]> = .pending
