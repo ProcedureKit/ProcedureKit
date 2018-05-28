@@ -28,6 +28,8 @@
 		653CA0741D60AB1B0070B7A2 /* ProcedureKitCloud.h in Headers */ = {isa = PBXBuildFile; fileRef = 653CA0731D60AB1B0070B7A2 /* ProcedureKitCloud.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		653CA0781D60ABC90070B7A2 /* ProcedureKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65CFC5F01D608A5500CAD875 /* ProcedureKit.framework */; };
 		653CA07B1D60ABD30070B7A2 /* TestingProcedureKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65CFC6161D60900000CAD875 /* TestingProcedureKit.framework */; };
+		658BE06F20BC69170021F11B /* ProcedureKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65CFC5F01D608A5500CAD875 /* ProcedureKit.framework */; };
+		658BE07020BC69170021F11B /* TestingProcedureKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65CFC6161D60900000CAD875 /* TestingProcedureKit.framework */; };
 		659484271DAAA2B90028F83B /* ProcedureKitLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6594841E1DAAA2B90028F83B /* ProcedureKitLocation.framework */; };
 		659484361DAAA3360028F83B /* ProcedureKitLocation.h in Headers */ = {isa = PBXBuildFile; fileRef = 659484351DAAA3360028F83B /* ProcedureKitLocation.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6594843D1DAAA5430028F83B /* ProcedureKit.framework in Copy Files (2 items) */ = {isa = PBXBuildFile; fileRef = 65CFC5F01D608A5500CAD875 /* ProcedureKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -39,6 +41,7 @@
 		65A0E4C120BB18EA002D6C8C /* TestDataModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 65A0E4BF20BB18EA002D6C8C /* TestDataModel.xcdatamodeld */; };
 		65A0E4C320BB1975002D6C8C /* LoadCoreDataProcedureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65A0E4C220BB1975002D6C8C /* LoadCoreDataProcedureTests.swift */; };
 		65A0E4C520BB2E51002D6C8C /* SaveManagedObjectContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65A0E4C420BB2E51002D6C8C /* SaveManagedObjectContext.swift */; };
+		65A0E4C820BC5540002D6C8C /* SaveManagedObjectContextProcedureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65A0E4C620BC548A002D6C8C /* SaveManagedObjectContextProcedureTests.swift */; };
 		65A72C2A1DA7F37C008597CA /* ProcedureKit.framework in Copy Dependencies */ = {isa = PBXBuildFile; fileRef = 65CFC5F01D608A5500CAD875 /* ProcedureKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		65A72C2B1DA7F37C008597CA /* TestingProcedureKit.framework in Copy Dependencies */ = {isa = PBXBuildFile; fileRef = 65CFC6161D60900000CAD875 /* TestingProcedureKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		65AB7DDA209B95B400726796 /* Batch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65AB7DD9209B95B400726796 /* Batch.swift */; };
@@ -285,6 +288,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = 65CFC6151D60900000CAD875;
 			remoteInfo = TestingProcedureKit;
+		};
+		65374F3220BC6553009948B4 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 65CFC5E51D608A1A00CAD875 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 65CFC5EF1D608A5500CAD875;
+			remoteInfo = ProcedureKit;
 		};
 		653C9FCB1D6097A40070B7A2 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -557,6 +567,7 @@
 		65A0E4C020BB18EA002D6C8C /* TestDataModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = TestDataModel.xcdatamodel; sourceTree = "<group>"; };
 		65A0E4C220BB1975002D6C8C /* LoadCoreDataProcedureTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadCoreDataProcedureTests.swift; sourceTree = "<group>"; };
 		65A0E4C420BB2E51002D6C8C /* SaveManagedObjectContext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaveManagedObjectContext.swift; sourceTree = "<group>"; };
+		65A0E4C620BC548A002D6C8C /* SaveManagedObjectContextProcedureTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaveManagedObjectContextProcedureTests.swift; sourceTree = "<group>"; };
 		65AB7DD9209B95B400726796 /* Batch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Batch.swift; sourceTree = "<group>"; };
 		65C88D761DC4EB4300C8D4EB /* Warnings.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = Warnings.xcconfig; path = "Supporting Files/Warnings.xcconfig"; sourceTree = "<group>"; };
 		65CFC5F01D608A5500CAD875 /* ProcedureKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ProcedureKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -857,6 +868,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				658BE06F20BC69170021F11B /* ProcedureKit.framework in Frameworks */,
+				658BE07020BC69170021F11B /* TestingProcedureKit.framework in Frameworks */,
 				65A0E4A220B85169002D6C8C /* ProcedureKitCoreData.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -930,6 +943,13 @@
 			name = ...;
 			sourceTree = "<group>";
 		};
+		658BE06E20BC69170021F11B /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		65A0E4B020B851D4002D6C8C /* ProcedureKitCoreData */ = {
 			isa = PBXGroup;
 			children = (
@@ -945,6 +965,7 @@
 			children = (
 				65A0E4C220BB1975002D6C8C /* LoadCoreDataProcedureTests.swift */,
 				65A0E4B820B8548D002D6C8C /* ProcedureKitCoreDataTests.swift */,
+				65A0E4C620BC548A002D6C8C /* SaveManagedObjectContextProcedureTests.swift */,
 				65A0E4BF20BB18EA002D6C8C /* TestDataModel.xcdatamodeld */,
 			);
 			name = ProcedureKitCoreDataTests;
@@ -957,6 +978,7 @@
 				65D367BE1E1843ED00D03E86 /* Sources */,
 				653C9FD91D6097E20070B7A2 /* Tests */,
 				653CA02A1D60A4FB0070B7A2 /* ... */,
+				658BE06E20BC69170021F11B /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -1696,6 +1718,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				65374F3320BC6553009948B4 /* PBXTargetDependency */,
 				65A0E4BE20B8588F002D6C8C /* PBXTargetDependency */,
 				65A0E4A420B85169002D6C8C /* PBXTargetDependency */,
 			);
@@ -2228,9 +2251,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				65A0E4C120BB18EA002D6C8C /* TestDataModel.xcdatamodeld in Sources */,
 				65A0E4BA20B8548D002D6C8C /* ProcedureKitCoreDataTests.swift in Sources */,
 				65A0E4C320BB1975002D6C8C /* LoadCoreDataProcedureTests.swift in Sources */,
-				65A0E4C120BB18EA002D6C8C /* TestDataModel.xcdatamodeld in Sources */,
+				65A0E4C820BC5540002D6C8C /* SaveManagedObjectContextProcedureTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2406,6 +2430,11 @@
 			isa = PBXTargetDependency;
 			target = 65CFC6151D60900000CAD875 /* TestingProcedureKit */;
 			targetProxy = 6532DD571DBCDB3400B030F5 /* PBXContainerItemProxy */;
+		};
+		65374F3320BC6553009948B4 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 65CFC5EF1D608A5500CAD875 /* ProcedureKit */;
+			targetProxy = 65374F3220BC6553009948B4 /* PBXContainerItemProxy */;
 		};
 		653C9FCC1D6097A40070B7A2 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -3833,7 +3862,6 @@
 			baseConfigurationReference = 65A0E4B520B85297002D6C8C /* ProcedureKitCoreData.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
-				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
@@ -3860,11 +3888,11 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_IDENTITY = "-";
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = "";
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -3887,7 +3915,6 @@
 					"@loader_path/../Frameworks",
 				);
 				MTL_ENABLE_DEBUG_INFO = YES;
-				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 4.0;
@@ -3899,7 +3926,6 @@
 			baseConfigurationReference = 65A0E4B520B85297002D6C8C /* ProcedureKitCoreData.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
-				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
@@ -3926,11 +3952,11 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_IDENTITY = "-";
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = "";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -3947,7 +3973,6 @@
 					"@loader_path/../Frameworks",
 				);
 				MTL_ENABLE_DEBUG_INFO = NO;
-				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				SWIFT_VERSION = 4.0;
