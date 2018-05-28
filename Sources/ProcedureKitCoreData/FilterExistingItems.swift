@@ -66,27 +66,39 @@ open class FilteredExistingItemsProcedure<Item, ManagedObject>: Procedure, Input
             finish(withResult: .success(items))
         }
 
+        do {
+
+            let existing = try fetchExistingIdentities(from: source)
+
+            guard existing.count > 0 else { return }
+
+            items = items.filter { false == existing.contains($0.identity) }
+        }
+        catch { return }
+    }
+
+    private func makeRequest(using source: [Item]) -> NSFetchRequest<NSDictionary> {
         let request = NSFetchRequest<NSDictionary>(entityName: ManagedObject.entityName)
         request.resultType = .dictionaryResultType
         request.returnsDistinctResults = true
         request.propertiesToFetch = ["identifier"]
         request.predicate = NSPredicate(format: "identifier in %@", source.map { $0.identity })
+        return request
+    }
 
-        do {
+    private func fetchExistingIdentities(from source: [Item]) throws -> Set<Item.Identity> {
 
-            let result = try managedObjectContext.fetch(request)
+        let request = makeRequest(using: source)
 
-            guard result.count > 0 else { return }
+        let result = try managedObjectContext.fetch(request)
 
-            let existing: Set<Item.Identity> = Set(result.compactMap { (dictionary) in
-                guard let keyValuePair = dictionary as? [String: Any] else { return nil }
-                return keyValuePair["identifier"] as? Item.Identity
-            })
+        let existing: Set<Item.Identity> = Set(result.compactMap { (dictionary) in
+            guard let keyValuePair = dictionary as? [String: Any] else { return nil }
+            return keyValuePair["identifier"] as? Item.Identity
+        })
 
-            log.notice(message: "Found \(existing.count) \(ManagedObject.entityName) entries in Core Data with identifiers matching source items.")
+        log.notice(message: "Found \(existing.count) \(ManagedObject.entityName) entries in Core Data with identifiers matching source items.")
 
-            items = items.filter { false == existing.contains($0.identity) }
-        }
-        catch { return }
+        return existing
     }
 }

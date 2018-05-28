@@ -72,7 +72,6 @@ open class InsertManagedObjectsProcedure<Item, ManagedObject>: GroupProcedure, I
 
                 finishWithResult(.success(result))
             }
-
         }
 
         let save = SaveManagedObjectContext(managedObjectContext)
@@ -80,7 +79,6 @@ open class InsertManagedObjectsProcedure<Item, ManagedObject>: GroupProcedure, I
         self.managedObjectContext = managedObjectContext
 
         super.init(operations: [insert])
-
         name = "Insert \(ManagedObject.entityName)"
 
         if shouldSave {
