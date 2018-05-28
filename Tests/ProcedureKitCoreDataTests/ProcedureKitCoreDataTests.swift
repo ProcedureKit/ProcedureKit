@@ -36,6 +36,12 @@ open class ProcedureKitCoreDataTestCase: ProcedureKitTestCase {
             persistentStoreDescriptions: persistentStoreDescriptions
         )
     }
+
+    open override func tearDown() {
+        coreDataStack = nil
+        
+        super.tearDown()
+    }
 }
 
 class TestSuiteRuns: XCTestCase {
