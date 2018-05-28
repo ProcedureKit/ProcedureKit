@@ -107,6 +107,7 @@ open class LoadCoreDataProcedure: Procedure, OutputProcedure {
 
 internal extension NSManagedObject {
 
+    @available(iOS 10.0, OSX 10.12, tvOS 10.0, watchOS 3.0, *)
     static var entityName: String {
         return entity().name ?? description()
     }
