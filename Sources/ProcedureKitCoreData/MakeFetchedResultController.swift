@@ -53,6 +53,7 @@ open class MakeFetchedResultControllerProcedure<Result: NSFetchRequestResult>: T
     }
 }
 
+@available(iOS 10.0, OSX 10.12, tvOS 10.0, watchOS 3.0, *)
 public extension MakeFetchedResultControllerProcedure where Result: NSManagedObject {
 
     public convenience init(fetchLimit: Int = 50, sortDescriptors: [NSSortDescriptor] = [], sectionNameKeyPath: String? = nil, cacheName: String? = nil) {
