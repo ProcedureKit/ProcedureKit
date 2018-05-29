@@ -42,9 +42,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "65ECB2CC1DB4F0C000F96F46"
-               BuildableName = "ProcedureKitNetwork.framework"
-               BlueprintName = "ProcedureKitNetwork"
+               BlueprintIdentifier = "65A0E49820B85168002D6C8C"
+               BuildableName = "ProcedureKitCoreData.framework"
+               BlueprintName = "ProcedureKitCoreData"
                ReferencedContainer = "container:ProcedureKit.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -70,9 +70,37 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
+               BlueprintIdentifier = "65ECB2CC1DB4F0C000F96F46"
+               BuildableName = "ProcedureKitNetwork.framework"
+               BlueprintName = "ProcedureKitNetwork"
+               ReferencedContainer = "container:ProcedureKit.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
                BlueprintIdentifier = "65CFC6151D60900000CAD875"
                BuildableName = "TestingProcedureKit.framework"
                BlueprintName = "TestingProcedureKit"
+               ReferencedContainer = "container:ProcedureKit.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "NO"
+            buildForProfiling = "NO"
+            buildForArchiving = "NO"
+            buildForAnalyzing = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "65A0E4A020B85169002D6C8C"
+               BuildableName = "ProcedureKitCoreDataTests.xctest"
+               BlueprintName = "ProcedureKitCoreDataTests"
                ReferencedContainer = "container:ProcedureKit.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>

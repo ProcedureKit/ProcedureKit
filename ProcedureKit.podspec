@@ -46,13 +46,6 @@ session Advanced NSOperations: https://developer.apple.com/videos/wwdc/2015/?id=
   	ss.source_files = ['Sources/ProcedureKitNetwork']
   end
 
-  # ProcedureKitLocation
-  s.subspec 'Location' do |ss|
-  	ss.dependency 'ProcedureKit/Standard'
-  	ss.frameworks = 'CoreLocation', 'MapKit'
-  	ss.source_files = ['Sources/ProcedureKitLocation']
-  end
-
   # ProcedureKitCloud
   s.subspec 'Cloud' do |ss|
   	ss.dependency 'ProcedureKit/Standard'
@@ -60,11 +53,26 @@ session Advanced NSOperations: https://developer.apple.com/videos/wwdc/2015/?id=
   	ss.source_files = ['Sources/ProcedureKitCloud']
   end
 
+  # ProcedureKitCoreData
+  s.subspec 'CoreData' do |ss|
+  	ss.dependency 'ProcedureKit/Standard'
+  	ss.frameworks = 'CoreData'
+  	ss.source_files = ['Sources/ProcedureKitCoreData']
+  end
+
+  # ProcedureKitLocation
+  s.subspec 'Location' do |ss|
+  	ss.dependency 'ProcedureKit/Standard'
+  	ss.frameworks = 'CoreLocation', 'MapKit'
+  	ss.source_files = ['Sources/ProcedureKitLocation']
+  end
+
   # All cross-platform ProcedureKit
   s.subspec 'All' do |ss|
   	ss.dependency 'ProcedureKit/Network'
   	ss.dependency 'ProcedureKit/Location'
-  	ss.dependency 'ProcedureKit/Cloud'  	  
+  	ss.dependency 'ProcedureKit/CoreData'  	
+  	ss.dependency 'ProcedureKit/Cloud'
   end
 
   # ProcedureKitMobile
