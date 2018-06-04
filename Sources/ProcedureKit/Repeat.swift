@@ -323,6 +323,7 @@ open class RepeatProcedure<T: Operation>: GroupProcedure {
 /// trigger another repeated value. In other words, the current
 /// just finished instance determines whether a new instance is
 /// executed next, or the repeating finishes.
+@available(*, deprecated: 4.6.0, message: "Use RepeatProcedure or RetryProcedure instead")
 public protocol Repeatable {
 
     /// Determines whether or not a subsequent instance of the
@@ -333,6 +334,7 @@ public protocol Repeatable {
     func shouldRepeat(count: Int) -> Bool
 }
 
+@available(*, deprecated: 4.6.0, message: "Use RepeatProcedure or RetryProcedure instead")
 extension RepeatProcedure where T: Repeatable {
 
     /// Initialize RepeatProcedure with a WaitStrategy and a closure. The closure returns
@@ -353,6 +355,7 @@ extension RepeatProcedure where T: Repeatable {
     ///   - max: an optional Int, which defaults to nil.
     ///   - wait: a WaitStrategy value, which defaults to .immediate
     ///   - body: an espacing closure which returns an optional T
+    @available(*, deprecated: 4.6.0, message: "Use RepeatProcedure or RetryProcedure instead")
     public convenience init(dispatchQueue: DispatchQueue? = nil, max: Int? = nil, wait: WaitStrategy = .immediate, body: @escaping () -> T?) {
         self.init(dispatchQueue: dispatchQueue, max: max, wait: wait, iterator: RepeatableGenerator(AnyIterator(body)))
     }
@@ -417,6 +420,7 @@ extension RepeatProcedure: OutputProcedure where T: OutputProcedure {
 
 // MARK: - Iterators
 
+@available(*, deprecated: 4.6.0, message: "Use RepeatProcedure or RetryProcedure instead")
 internal struct RepeatableGenerator<Element: Repeatable>: IteratorProtocol {
 
     private var iterator: CountingIterator<Element>
