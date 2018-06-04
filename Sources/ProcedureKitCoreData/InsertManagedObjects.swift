@@ -32,7 +32,7 @@ open class InsertManagedObjectsProcedure<Item, ManagedObject>: GroupProcedure, I
 
     public var input: Pending<[Item]> = .pending
 
-    public var output: Pending<ProcedureResult<[ManagedObject]>> = .pending
+    public var output: Pending<ProcedureResult<[NSManagedObjectID]>> = .pending
 
     public let managedObjectContext: NSManagedObjectContext
 
@@ -67,7 +67,7 @@ open class InsertManagedObjectsProcedure<Item, ManagedObject>: GroupProcedure, I
                 let result: Output = items.enumerated().map { (enumeratedItem) in
                     let managed = ManagedObject(context: managedObjectContext)
                     block(enumeratedItem.0, enumeratedItem.1, managed)
-                    return managed
+                    return managed.objectID
                 }
 
                 finishWithResult(.success(result))

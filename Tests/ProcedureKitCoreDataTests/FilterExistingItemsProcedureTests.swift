@@ -42,10 +42,18 @@ fileprivate final class FilterExistingItemsProcedureTestHarness: GroupProcedure,
         let insert = InsertManagedObjectsProcedure<Item, TestEntity>(into: managedObjectContext, andSave: shouldSave) { (_, item, testEntity) in
             testEntity.identifier = item.0
             testEntity.name = item.1
-            }.injectResult(from: download)
+        }.injectResult(from: download)
 
         insert.addWillFinishBlockObserver { [unowned self] (procedure, errors, _) in
-            self.output = procedure.output
+
+            guard let managedObjectIDs = procedure.output.success else {
+                self.output = .ready(.failure(procedure.output.error ?? ProcedureKitError.dependency(finishedWithErrors: errors)))
+                return
+            }
+
+            let managedObjects: [TestEntity] = managedObjectIDs.compactMap { self.managedObjectContext.object(with: $0) as? TestEntity }
+
+            self.output = .ready(.success(managedObjects))
         }
 
         add(child: insert)

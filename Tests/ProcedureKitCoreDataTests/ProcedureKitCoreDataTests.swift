@@ -46,7 +46,15 @@ open class ProcedureKitCoreDataTestCase: ProcedureKitTestCase {
             insert.injectResult(from: download)
 
             insert.addWillFinishBlockObserver { [unowned self] (procedure, errors, _) in
-                self.output = procedure.output
+
+                guard let managedObjectIDs = procedure.output.success else {
+                    self.output = .ready(.failure(procedure.output.error ?? ProcedureKitError.dependency(finishedWithErrors: errors)))
+                    return
+                }
+
+                let managedObjects: [TestEntity] = managedObjectIDs.compactMap { self.managedObjectContext.object(with: $0) as? TestEntity }
+
+                self.output = .ready(.success(managedObjects))
             }
 
             add(child: insert)
