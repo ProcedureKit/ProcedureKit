@@ -51,7 +51,6 @@ open class MakeFetchedResultControllerProcedure<Result: NSFetchRequestResult>: T
         let fetchRequest: NSFetchRequest<Result> = NSFetchRequest(entityName: entityName)
         fetchRequest.fetchLimit = fetchLimit
         fetchRequest.sortDescriptors = sortDescriptors
-        fetchRequest.returnsObjectsAsFaults = false
 
         super.init(transform: MakeFetchedResultControllerProcedure<Result>.transform(fetchRequest: fetchRequest, sectionNameKeyPath: sectionNameKeyPath, cacheName: cacheName))
         name = "Make FRC \(fetchRequest.entityName ?? "")".trimmingCharacters(in: .whitespaces)
