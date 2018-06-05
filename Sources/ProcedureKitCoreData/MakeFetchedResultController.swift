@@ -33,9 +33,7 @@ open class MakeFetchedResultControllerProcedure<Result: NSFetchRequestResult>: T
                 sectionNameKeyPath: sectionNameKeyPath,
                 cacheName: cacheName)
 
-            let managedObjectContext = container.newBackgroundContext()
-
-            try managedObjectContext.performAndWait(block: frc.performFetch)
+            try container.viewContext.performAndWait(block: frc.performFetch)
 
             return frc
         }
