@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		65068FB920C6416800B0A0A3 /* ProcedureKit Instrument.instrpkg in Sources */ = {isa = PBXBuildFile; fileRef = 65068FB820C6416800B0A0A3 /* ProcedureKit Instrument.instrpkg */; };
 		652F9015209C488600365B2D /* BatchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652F9014209C488600365B2D /* BatchTests.swift */; };
 		652F903D209E3E3D00365B2D /* IgnoreErrors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652F903C209E3E3D00365B2D /* IgnoreErrors.swift */; };
 		652F903F209E445200365B2D /* IgnoreErrorsProcedureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652F903E209E445200365B2D /* IgnoreErrorsProcedureTests.swift */; };
@@ -540,6 +541,9 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		65068FB020C640ED00B0A0A3 /* ProcedureKitInstrument.instrdst */ = {isa = PBXFileReference; explicitFileType = com.apple.instruments.instrdst; includeInIndex = 0; path = ProcedureKitInstrument.instrdst; sourceTree = BUILT_PRODUCTS_DIR; };
+		65068FB820C6416800B0A0A3 /* ProcedureKit Instrument.instrpkg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = "com.apple.instruments.package-definition"; path = "ProcedureKit Instrument.instrpkg"; sourceTree = "<group>"; };
+		65068FBA20C6418800B0A0A3 /* ProcedureKitInstrument.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = ProcedureKitInstrument.xcconfig; path = "Supporting Files/ProcedureKitInstrument.xcconfig"; sourceTree = "<group>"; };
 		652F9014209C488600365B2D /* BatchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BatchTests.swift; sourceTree = "<group>"; };
 		652F903C209E3E3D00365B2D /* IgnoreErrors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IgnoreErrors.swift; sourceTree = "<group>"; };
 		652F903E209E445200365B2D /* IgnoreErrorsProcedureTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IgnoreErrorsProcedureTests.swift; sourceTree = "<group>"; };
@@ -930,6 +934,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		65068FB720C6416800B0A0A3 /* ProcedureKitInstrument */ = {
+			isa = PBXGroup;
+			children = (
+				65068FB820C6416800B0A0A3 /* ProcedureKit Instrument.instrpkg */,
+			);
+			name = ProcedureKitInstrument;
+			path = Sources/ProcedureKitInstrument;
+			sourceTree = "<group>";
+		};
 		653C9FD91D6097E20070B7A2 /* Tests */ = {
 			isa = PBXGroup;
 			children = (
@@ -1021,6 +1034,7 @@
 				65ECB2D51DB4F0C000F96F46 /* ProcedureKitNetworkTests.xctest */,
 				65A0E49920B85168002D6C8C /* ProcedureKitCoreData.framework */,
 				65A0E4A120B85169002D6C8C /* ProcedureKitCoreDataTests.xctest */,
+				65068FB020C640ED00B0A0A3 /* ProcedureKitInstrument.instrdst */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1041,6 +1055,7 @@
 				65CFC60E1D608AE200CAD875 /* ProcedureKit.xcconfig */,
 				653CA0751D60AB2B0070B7A2 /* ProcedureKitCloud.xcconfig */,
 				65A0E4B520B85297002D6C8C /* ProcedureKitCoreData.xcconfig */,
+				65068FBA20C6418800B0A0A3 /* ProcedureKitInstrument.xcconfig */,
 				659484371DAAA3A60028F83B /* ProcedureKitLocation.xcconfig */,
 				653CA0491D60A6630070B7A2 /* ProcedureKitMac.xcconfig */,
 				653C9FDC1D6098650070B7A2 /* ProcedureKitMobile.xcconfig */,
@@ -1210,6 +1225,7 @@
 				65D368651E184AA600D03E86 /* ProcedureKit */,
 				65D367DE1E1844F800D03E86 /* ProcedureKitCloud */,
 				65A0E4B020B851D4002D6C8C /* ProcedureKitCoreData */,
+				65068FB720C6416800B0A0A3 /* ProcedureKitInstrument */,
 				65D368131E18450200D03E86 /* ProcedureKitLocation */,
 				65D3681E1E18451000D03E86 /* ProcedureKitMac */,
 				65D368211E18451C00D03E86 /* ProcedureKitMobile */,
@@ -1489,6 +1505,21 @@
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
+		65068FAF20C640ED00B0A0A3 /* ProcedureKitInstrument */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 65068FB620C640ED00B0A0A3 /* Build configuration list for PBXNativeTarget "ProcedureKitInstrument" */;
+			buildPhases = (
+				65068FAE20C640ED00B0A0A3 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = ProcedureKitInstrument;
+			productName = "ProcedureKit Instrument";
+			productReference = 65068FB020C640ED00B0A0A3 /* ProcedureKitInstrument.instrdst */;
+			productType = "com.apple.product-type.instruments-package";
+		};
 		653C9FC01D6097A40070B7A2 /* ProcedureKitMobile */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 653C9FD61D6097A40070B7A2 /* Build configuration list for PBXNativeTarget "ProcedureKitMobile" */;
@@ -1849,10 +1880,14 @@
 			isa = PBXProject;
 			attributes = {
 				CLASSPREFIX = PCK;
+				DefaultBuildSystemTypeForWorkspace = Latest;
 				LastSwiftUpdateCheck = 0930;
 				LastUpgradeCheck = 0930;
 				ORGANIZATIONNAME = ProcedureKit;
 				TargetAttributes = {
+					65068FAF20C640ED00B0A0A3 = {
+						CreatedOnToolsVersion = 10.0;
+					};
 					653C9FC01D6097A40070B7A2 = {
 						CreatedOnToolsVersion = 8.0;
 						LastSwiftMigration = 0920;
@@ -1952,6 +1987,7 @@
 				653CA0611D60AA990070B7A2 /* ProcedureKitCloudTests */,
 				65A0E49820B85168002D6C8C /* ProcedureKitCoreData */,
 				65A0E4A020B85169002D6C8C /* ProcedureKitCoreDataTests */,
+				65068FAF20C640ED00B0A0A3 /* ProcedureKitInstrument */,
 				6594841D1DAAA2B90028F83B /* ProcedureKitLocation */,
 				659484251DAAA2B90028F83B /* ProcedureKitLocationTests */,
 				653CA02F1D60A5D10070B7A2 /* ProcedureKitMac */,
@@ -2096,6 +2132,14 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		65068FAE20C640ED00B0A0A3 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				65068FB920C6416800B0A0A3 /* ProcedureKit Instrument.instrpkg in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		653C9FBC1D6097A40070B7A2 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -2588,6 +2632,20 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
+		65068FB420C640ED00B0A0A3 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 65068FBA20C6418800B0A0A3 /* ProcedureKitInstrument.xcconfig */;
+			buildSettings = {
+			};
+			name = Debug;
+		};
+		65068FB520C640ED00B0A0A3 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 65068FBA20C6418800B0A0A3 /* ProcedureKitInstrument.xcconfig */;
+			buildSettings = {
+			};
+			name = Release;
+		};
 		653C9FD21D6097A40070B7A2 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 653C9FDC1D6098650070B7A2 /* ProcedureKitMobile.xcconfig */;
@@ -4530,6 +4588,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		65068FB620C640ED00B0A0A3 /* Build configuration list for PBXNativeTarget "ProcedureKitInstrument" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				65068FB420C640ED00B0A0A3 /* Debug */,
+				65068FB520C640ED00B0A0A3 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		653C9FD61D6097A40070B7A2 /* Build configuration list for PBXNativeTarget "ProcedureKitMobile" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

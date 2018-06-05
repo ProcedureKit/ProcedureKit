@@ -8,6 +8,7 @@
 // swiftlint:disable type_body_length
 
 import Foundation
+import os
 
 internal struct ProcedureKit {
 
@@ -54,6 +55,9 @@ internal struct ProcedureKit {
             }
         }
     }
+
+    @available(iOSApplicationExtension 12.0, tvOSApplicationExtension 12.0, watchOSApplicationExtension 5.0, OSXApplicationExtension 10.14, *)
+    static let log = OSLog(subsystem: "run.kit.procedure.ProcedureKit", category: .pointsOfInterest)
 
     private init() { }
 }
@@ -796,6 +800,10 @@ open class Procedure: Operation, ProcedureProtocol {
                 //  - the underlyingQueue of the ProcedureQueue on which the Procedure is scheduled to execute
                 // and is *on* the underlyingQueue of said ProcedureQueue.
 
+                if #available(iOSApplicationExtension 12.0, tvOSApplicationExtension 12.0, watchOSApplicationExtension 5.0, OSXApplicationExtension 10.14, *) {
+                    os_signpost(type: .begin, log: ProcedureKit.log, name: "Started Execution", signpostID: .null)
+                }
+
                 // Call the `execute()` function on the underlyingQueue
                 self.execute()
 
@@ -1221,6 +1229,10 @@ open class Procedure: Operation, ProcedureProtocol {
                 self._queue = nil
             }
             self.didChangeValue(forKey: .finished)
+
+            if #available(iOSApplicationExtension 12.0, tvOSApplicationExtension 12.0, watchOSApplicationExtension 5.0, OSXApplicationExtension 10.14, *) {
+                os_signpost(type: .end, log: ProcedureKit.log, name: "Finished Execution", signpostID: .null)
+            }
 
             // Call the Procedure.procedureDidFinish(withErrors:) override
             self.procedureDidFinish(withErrors: resultingErrors)
