@@ -102,18 +102,3 @@ open class LoadCoreDataProcedure: Procedure, OutputProcedure {
     }
 }
 
-
-// MARK: - Internal Core Data Helpers
-
-internal extension NSManagedObject {
-
-    static var entityName: String {
-        if #available(iOS 10.0, OSX 10.12, tvOS 10.0, watchOS 3.0, *) {
-            return entity().name ?? description()
-        }
-        else {
-            return description()
-        }
-    }
-}
-
