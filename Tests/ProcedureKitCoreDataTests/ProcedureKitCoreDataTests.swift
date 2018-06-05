@@ -12,7 +12,6 @@ import TestingProcedureKit
 open class ProcedureKitCoreDataTestCase: ProcedureKitTestCase {
 
     typealias Insert = InsertManagedObjectsProcedure<TestEntityItem, TestEntity>
-    typealias Filter = FilteredExistingItemsProcedure<TestEntityItem, TestEntity>
 
     final class TestInsert: GroupProcedure, InputProcedure, OutputProcedure {
         typealias Item = TestEntityItem
@@ -60,38 +59,6 @@ open class ProcedureKitCoreDataTestCase: ProcedureKitTestCase {
             add(child: insert)
 
             self.managedObjectContext = insert.managedObjectContext
-
-            super.execute()
-        }
-    }
-
-    final class TestFilter: GroupProcedure, InputProcedure, OutputProcedure {
-        typealias Item = TestEntityItem
-
-        var input: Pending<NSPersistentContainer> = .pending
-        var output: Pending<ProcedureResult<[Item]>> = .pending
-
-        let download: ResultProcedure<[Item]>
-
-        init(items: [Item]) {
-            self.download = ResultProcedure { items }
-            super.init(operations: [download])
-        }
-
-        override func execute() {
-            guard let container = input.value else {
-                finish(withError: ProcedureKitError.requirementNotSatisfied())
-                return
-            }
-
-            let filter = Filter(from: container.newBackgroundContext())
-                .injectResult(from: download)
-
-            filter.addWillFinishBlockObserver { [unowned self] (procedure, errors, _) in
-                self.output = procedure.output
-            }
-
-            add(child: filter)
 
             super.execute()
         }
