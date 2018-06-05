@@ -12,7 +12,6 @@ import TestingProcedureKit
 open class ProcedureKitCoreDataTestCase: ProcedureKitTestCase {
 
     typealias Insert = InsertManagedObjectsProcedure<TestEntityItem, TestEntity>
-    typealias Filter = FilteredExistingItemsProcedure<TestEntityItem, TestEntity>
 
     final class TestInsert: GroupProcedure, InputProcedure, OutputProcedure {
         typealias Item = TestEntityItem
@@ -31,14 +30,13 @@ open class ProcedureKitCoreDataTestCase: ProcedureKitTestCase {
         }
 
         override func execute() {
+
             guard let container = input.value else {
                 finish(withError: ProcedureKitError.requirementNotSatisfied())
                 return
             }
 
-            managedObjectContext = container.newBackgroundContext()
-
-            let insert = Insert(into: managedObjectContext, andSave: shouldSave) { (_, item, testEntity) in
+            let insert = Insert(into: container, andSave: shouldSave) { (_, item, testEntity) in
                 testEntity.identifier = item.identity
                 testEntity.name = item.name
             }
@@ -46,42 +44,21 @@ open class ProcedureKitCoreDataTestCase: ProcedureKitTestCase {
             insert.injectResult(from: download)
 
             insert.addWillFinishBlockObserver { [unowned self] (procedure, errors, _) in
-                self.output = procedure.output
+
+                guard let managedObjectIDs = procedure.output.success else {
+                    self.output = .ready(.failure(procedure.output.error ?? ProcedureKitError.dependency(finishedWithErrors: errors)))
+                    return
+                }
+
+                let moc = container.newBackgroundContext()
+                let managedObjects: [TestEntity] = managedObjectIDs.compactMap { moc.object(with: $0) as? TestEntity }
+
+                self.output = .ready(.success(managedObjects))
             }
 
             add(child: insert)
 
-            super.execute()
-        }
-    }
-
-    final class TestFilter: GroupProcedure, InputProcedure, OutputProcedure {
-        typealias Item = TestEntityItem
-
-        var input: Pending<NSPersistentContainer> = .pending
-        var output: Pending<ProcedureResult<[Item]>> = .pending
-
-        let download: ResultProcedure<[Item]>
-
-        init(items: [Item]) {
-            self.download = ResultProcedure { items }
-            super.init(operations: [download])
-        }
-
-        override func execute() {
-            guard let container = input.value else {
-                finish(withError: ProcedureKitError.requirementNotSatisfied())
-                return
-            }
-
-            let filter = Filter(from: container.newBackgroundContext())
-                .injectResult(from: download)
-
-            filter.addWillFinishBlockObserver { [unowned self] (procedure, errors, _) in
-                self.output = procedure.output
-            }
-
-            add(child: filter)
+            self.managedObjectContext = insert.managedObjectContext
 
             super.execute()
         }

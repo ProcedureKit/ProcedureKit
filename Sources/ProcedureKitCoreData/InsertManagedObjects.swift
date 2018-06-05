@@ -32,7 +32,7 @@ open class InsertManagedObjectsProcedure<Item, ManagedObject>: GroupProcedure, I
 
     public var input: Pending<[Item]> = .pending
 
-    public var output: Pending<ProcedureResult<[ManagedObject]>> = .pending
+    public var output: Pending<ProcedureResult<[NSManagedObjectID]>> = .pending
 
     public let managedObjectContext: NSManagedObjectContext
 
@@ -48,12 +48,14 @@ open class InsertManagedObjectsProcedure<Item, ManagedObject>: GroupProcedure, I
      ```
      In the above example, we assume that `downloadItems` has an output of `[MyItem]`.
 
-     - parameter into: the NSManagedObjectContext to insert objects into
+     - parameter into: a MakesBackgroundManagedObjectContext type, which in turn will create a new background context to insert into.
      - parameter andSave: a Bool, default true, which if set to false will not save the context.
      - parameter block: a `(Int, Item, ManagedObject) -> ()` block, the arguments are the index in the
              array of items, the item this index, and the inserted managed object which represents the item.
     */
-    public init(into managedObjectContext: NSManagedObjectContext, andSave shouldSave: Bool = true, block: @escaping (Int, Item, ManagedObject) -> ()) {
+    public init(into makesManagedObjectContext: MakesBackgroundManagedObjectContext, andSave shouldSave: Bool = true, block: @escaping (Int, Item, ManagedObject) -> ()) {
+
+        let moc = makesManagedObjectContext.newBackgroundContext()
 
         let insert = AsyncTransformProcedure<Input, Output> { (items, finishWithResult) in
 
@@ -61,22 +63,22 @@ open class InsertManagedObjectsProcedure<Item, ManagedObject>: GroupProcedure, I
                 finishWithResult(.success([]))
                 return
             }
-
-            managedObjectContext.perform {
+            
+            moc.perform {
 
                 let result: Output = items.enumerated().map { (enumeratedItem) in
-                    let managed = ManagedObject(context: managedObjectContext)
+                    let managed = ManagedObject(context: moc)
                     block(enumeratedItem.0, enumeratedItem.1, managed)
-                    return managed
+                    return managed.objectID
                 }
 
                 finishWithResult(.success(result))
             }
         }
 
-        let save = SaveManagedObjectContext(managedObjectContext)
+        let save = SaveManagedObjectContext(moc)
 
-        self.managedObjectContext = managedObjectContext
+        self.managedObjectContext = moc
 
         super.init(operations: [insert])
         name = "Insert \(ManagedObject.entityName)"

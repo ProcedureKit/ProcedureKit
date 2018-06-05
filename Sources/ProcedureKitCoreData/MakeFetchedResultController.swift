@@ -26,13 +26,14 @@ open class MakeFetchedResultControllerProcedure<Result: NSFetchRequestResult>: T
 
     static func transform(fetchRequest: NSFetchRequest<Result>, sectionNameKeyPath: String? = nil, cacheName: String? = nil) -> (NSPersistentContainer) throws -> NSFetchedResultsController<Result> {
         return { (container) in
+
             let frc = NSFetchedResultsController(
                 fetchRequest: fetchRequest,
                 managedObjectContext: container.viewContext,
                 sectionNameKeyPath: sectionNameKeyPath,
                 cacheName: cacheName)
 
-            try frc.performFetch()
+            try container.viewContext.performAndWait(block: frc.performFetch)
 
             return frc
         }
@@ -64,3 +65,6 @@ public extension MakeFetchedResultControllerProcedure where Result: NSManagedObj
         self.init(for: Result.entityName, fetchLimit: fetchLimit, sortDescriptors: sortDescriptors, sectionNameKeyPath: sectionNameKeyPath, cacheName: cacheName)
     }
 }
+
+
+
