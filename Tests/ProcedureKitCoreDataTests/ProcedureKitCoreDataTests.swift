@@ -31,14 +31,13 @@ open class ProcedureKitCoreDataTestCase: ProcedureKitTestCase {
         }
 
         override func execute() {
+
             guard let container = input.value else {
                 finish(withError: ProcedureKitError.requirementNotSatisfied())
                 return
             }
 
-            managedObjectContext = container.newBackgroundContext()
-
-            let insert = Insert(into: managedObjectContext, andSave: shouldSave) { (_, item, testEntity) in
+            let insert = Insert(into: container, andSave: shouldSave) { (_, item, testEntity) in
                 testEntity.identifier = item.identity
                 testEntity.name = item.name
             }
@@ -52,12 +51,15 @@ open class ProcedureKitCoreDataTestCase: ProcedureKitTestCase {
                     return
                 }
 
-                let managedObjects: [TestEntity] = managedObjectIDs.compactMap { self.managedObjectContext.object(with: $0) as? TestEntity }
+                let moc = container.newBackgroundContext()
+                let managedObjects: [TestEntity] = managedObjectIDs.compactMap { moc.object(with: $0) as? TestEntity }
 
                 self.output = .ready(.success(managedObjects))
             }
 
             add(child: insert)
+
+            self.managedObjectContext = insert.managedObjectContext
 
             super.execute()
         }

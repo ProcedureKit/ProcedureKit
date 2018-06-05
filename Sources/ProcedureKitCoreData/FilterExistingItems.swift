@@ -46,8 +46,8 @@ open class FilteredExistingItemsProcedure<Item, ManagedObject>: Procedure, Input
 
     public let managedObjectContext: NSManagedObjectContext
 
-    public init(from managedObjectContext: NSManagedObjectContext) {
-        self.managedObjectContext = managedObjectContext
+    public init(from makesManagedObjectContext: MakesBackgroundManagedObjectContext) {
+        self.managedObjectContext = makesManagedObjectContext.newBackgroundContext()
         super.init()
         name = "Filter Existing \(ManagedObject.entityName)"
     }
@@ -63,6 +63,7 @@ open class FilteredExistingItemsProcedure<Item, ManagedObject>: Procedure, Input
 
         defer {
             log.info(message: "Filtered \(source.count - items.count) items.")
+
             finish(withResult: .success(items))
         }
 
@@ -90,15 +91,18 @@ open class FilteredExistingItemsProcedure<Item, ManagedObject>: Procedure, Input
 
         let request = makeRequest(using: source)
 
-        let result = try managedObjectContext.fetch(request)
+        return try managedObjectContext.performAndWait {
 
-        let existing: Set<Item.Identity> = Set(result.compactMap { (dictionary) in
-            guard let keyValuePair = dictionary as? [String: Any] else { return nil }
-            return keyValuePair["identifier"] as? Item.Identity
-        })
+            let result = try managedObjectContext.fetch(request)
 
-        log.notice(message: "Found \(existing.count) \(ManagedObject.entityName) entries in Core Data with identifiers matching source items.")
+            let existing: Set<Item.Identity> = Set(result.compactMap { (dictionary) in
+                guard let keyValuePair = dictionary as? [String: Any] else { return nil }
+                return keyValuePair["identifier"] as? Item.Identity
+            })
 
-        return existing
+            log.notice(message: "Found \(existing.count) \(ManagedObject.entityName) entries in Core Data with identifiers matching source items.")
+
+            return existing
+        }
     }
 }

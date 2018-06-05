@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		65068FAD20C62AE300B0A0A3 /* MakesBackgroundManagedObjectContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65068FAC20C62AE300B0A0A3 /* MakesBackgroundManagedObjectContext.swift */; };
 		651E670520C610D800BE520E /* CoreDataHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 651E670420C610D800BE520E /* CoreDataHelpers.swift */; };
 		652F9015209C488600365B2D /* BatchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652F9014209C488600365B2D /* BatchTests.swift */; };
 		652F903D209E3E3D00365B2D /* IgnoreErrors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652F903C209E3E3D00365B2D /* IgnoreErrors.swift */; };
@@ -541,6 +542,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		65068FAC20C62AE300B0A0A3 /* MakesBackgroundManagedObjectContext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MakesBackgroundManagedObjectContext.swift; sourceTree = "<group>"; };
 		651E670420C610D800BE520E /* CoreDataHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataHelpers.swift; sourceTree = "<group>"; };
 		652F9014209C488600365B2D /* BatchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BatchTests.swift; sourceTree = "<group>"; };
 		652F903C209E3E3D00365B2D /* IgnoreErrors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IgnoreErrors.swift; sourceTree = "<group>"; };
@@ -967,12 +969,13 @@
 		65A0E4B020B851D4002D6C8C /* ProcedureKitCoreData */ = {
 			isa = PBXGroup;
 			children = (
+				65068FAC20C62AE300B0A0A3 /* MakesBackgroundManagedObjectContext.swift */,
+				651E670420C610D800BE520E /* CoreDataHelpers.swift */,
 				658BE07920BCAA0A0021F11B /* FilterExistingItems.swift */,
 				658BE07520BC99100021F11B /* InsertManagedObjects.swift */,
 				65A0E4B120B85213002D6C8C /* LoadCoreData.swift */,
 				658BE07120BC72540021F11B /* MakeFetchedResultController.swift */,
 				65A0E4C420BB2E51002D6C8C /* SaveManagedObjectContext.swift */,
-				651E670420C610D800BE520E /* CoreDataHelpers.swift */,
 			);
 			name = ProcedureKitCoreData;
 			path = Sources/ProcedureKitCoreData;
@@ -2265,6 +2268,7 @@
 			files = (
 				651E670520C610D800BE520E /* CoreDataHelpers.swift in Sources */,
 				65A0E4B220B85213002D6C8C /* LoadCoreData.swift in Sources */,
+				65068FAD20C62AE300B0A0A3 /* MakesBackgroundManagedObjectContext.swift in Sources */,
 				658BE07620BC99100021F11B /* InsertManagedObjects.swift in Sources */,
 				658BE07220BC72540021F11B /* MakeFetchedResultController.swift in Sources */,
 				65A0E4C520BB2E51002D6C8C /* SaveManagedObjectContext.swift in Sources */,
