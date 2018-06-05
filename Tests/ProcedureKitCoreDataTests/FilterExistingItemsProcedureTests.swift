@@ -26,8 +26,6 @@ fileprivate final class FilterExistingItemsProcedureTestHarness: GroupProcedure,
         self.download = ResultProcedure { items }
 
         super.init(operations: [download])
-
-        log.severity = .verbose
     }
 
     override func execute() {
