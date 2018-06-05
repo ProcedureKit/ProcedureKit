@@ -20,6 +20,7 @@ public protocol MakesBackgroundManagedObjectContext {
     func newBackgroundContext() -> NSManagedObjectContext
 }
 
+@available(iOS 10.0, OSX 10.12, tvOS 10.0, watchOS 3.0, *)
 extension NSPersistentContainer: MakesBackgroundManagedObjectContext { }
 
 extension NSManagedObjectContext: MakesBackgroundManagedObjectContext {
