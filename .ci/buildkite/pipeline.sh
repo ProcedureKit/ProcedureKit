@@ -8,8 +8,8 @@ steps:
     queue: "stress-tests"
     xcode: "$XCODE"
 -
-  name: "Mac"
-  command: ".ci/scripts/test-mac"
+  name: "macOS"
+  command: ".ci/scripts/test-macos"
   agents:
     xcode: "$XCODE"
 -

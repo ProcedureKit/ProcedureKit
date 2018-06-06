@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -o pipefail
 source /usr/local/opt/chruby/share/chruby/chruby.sh
 chruby ruby
 bundle install --quiet
