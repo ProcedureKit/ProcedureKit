@@ -7,7 +7,7 @@ steps:
   retry:
     automatic: true
   artifact_paths:
-    - ".ci/result/xcodebuild.log"
+    - ".ci/results/xcodebuild.log"
   agents:
     queue: "stress-tests"
     xcode: "$XCODE"
@@ -17,7 +17,7 @@ steps:
   retry:
     automatic: true
   artifact_paths:
-    - ".ci/result/xcodebuild.log"
+    - ".ci/results/xcodebuild.log"
   agents:
     xcode: "$XCODE"
 -
@@ -26,7 +26,7 @@ steps:
   retry:
     automatic: true
   artifact_paths:
-    - ".ci/result/xcodebuild.log"
+    - ".ci/results/xcodebuild.log"
   agents:
     queue: "iOS-Simulator"
     xcode: "$XCODE"
@@ -36,7 +36,7 @@ steps:
   retry:
     automatic: true
   artifact_paths:
-    - ".ci/result/xcodebuild.log"
+    - ".ci/results/xcodebuild.log"
   agents:
     queue: "iOS-Simulator"
     xcode: "$XCODE"
