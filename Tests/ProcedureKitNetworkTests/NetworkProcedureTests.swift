@@ -81,7 +81,7 @@ class NetworkProcedureTests: ProcedureKitTestCase {
         super.setUp()
         url = "http://procedure.kit.run"
         request = URLRequest(url: url)
-        resilience = DefaultNetworkResilience(backoffStrategy: .constant(1.0), requestTimeout: 1.0)
+        resilience = DefaultNetworkResilience(backoffStrategy: .constant(0.1), requestTimeout: 0.1)
         session = TestableURLSessionTaskFactory()
         data = NetworkDataProcedure(session: session, request: request)
         network = TestableNetworkReachability()

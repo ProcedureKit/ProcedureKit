@@ -955,13 +955,6 @@
 			name = ...;
 			sourceTree = "<group>";
 		};
-		658BE06E20BC69170021F11B /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			name = Frameworks;
-			sourceTree = "<group>";
-		};
 		65A0E4B020B851D4002D6C8C /* ProcedureKitCoreData */ = {
 			isa = PBXGroup;
 			children = (
@@ -996,7 +989,6 @@
 				65D367BE1E1843ED00D03E86 /* Sources */,
 				653C9FD91D6097E20070B7A2 /* Tests */,
 				653CA02A1D60A4FB0070B7A2 /* ... */,
-				658BE06E20BC69170021F11B /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
