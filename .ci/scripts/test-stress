@@ -3,4 +3,4 @@ set -o pipefail
 source /usr/local/opt/chruby/share/chruby/chruby.sh
 chruby ruby
 bundle install --quiet
-xcodebuild -project "ProcedureKit.xcodeproj" -scheme "Stress Tests" -destination "platform=macOS" clean test | tee xcodebuild.log | xcpretty
+xcodebuild -project "ProcedureKit.xcodeproj" -scheme "Stress Tests" -destination "platform=macOS" clean test | tee .ci/results/xcodebuild.log | xcpretty

@@ -3,4 +3,4 @@ set -o pipefail
 source /usr/local/opt/chruby/share/chruby/chruby.sh
 chruby ruby
 bundle install --quiet
-xcodebuild -project "ProcedureKit.xcodeproj" -scheme "iOS" -destination "platform=iOS Simulator,name=iPhone X" clean test | tee xcodebuild.log | xcpretty
+xcodebuild -project "ProcedureKit.xcodeproj" -scheme "iOS" -destination "platform=iOS Simulator,name=iPhone X" clean test | tee .ci/result/xcodebuild.log | xcpretty
