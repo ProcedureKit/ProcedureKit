@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+set -o pipefail
 source /usr/local/opt/chruby/share/chruby/chruby.sh
 chruby ruby
-bundle install --quiet && bundle exec fastlane mac test
+bundle install --quiet
+xcodebuild -project "ProcedureKit.xcodeproj" -scheme "Mac" -destination "platform=macOS" clean test | tee xcodebuild.log | xcpretty
