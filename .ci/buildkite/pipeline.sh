@@ -33,7 +33,7 @@ steps:
 -
   name: "tvOS"
   command: ".ci/scripts/test-tvos"
-    retry:
+  retry:
     automatic: true
   artifact_paths:
     - ".ci/result/xcodebuild.log"
