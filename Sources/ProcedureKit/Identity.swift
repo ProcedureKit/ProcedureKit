@@ -45,7 +45,7 @@ extension Procedure: Identifiable {
         return Identity(identity: identifier, name: name)
     }
 
-    @available(iOSApplicationExtension 12.0, tvOSApplicationExtension 12.0, watchOSApplicationExtension 5.0, OSXApplicationExtension 10.14, *)
+    @available(iOS 12.0, tvOS 12.0, watchOS 5.0, OSX 10.14, *)
     internal var signpostID: OSSignpostID {
         return OSSignpostID(log: ProcedureKit.Signposts.procedure, object: identifier as AnyObject)
     }

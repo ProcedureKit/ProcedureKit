@@ -56,7 +56,7 @@ internal struct ProcedureKit {
         }
     }
 
-    @available(iOSApplicationExtension 12.0, tvOSApplicationExtension 12.0, watchOSApplicationExtension 5.0, OSXApplicationExtension 10.14, *)
+    @available(iOS 12.0, tvOS 12.0, watchOS 5.0, OSX 10.14, *)
     public struct Signposts {
 
         internal static let procedure: OSLog = {
@@ -806,7 +806,7 @@ open class Procedure: Operation, ProcedureProtocol {
                 //  - the underlyingQueue of the ProcedureQueue on which the Procedure is scheduled to execute
                 // and is *on* the underlyingQueue of said ProcedureQueue.
 
-                if #available(iOSApplicationExtension 12.0, tvOSApplicationExtension 12.0, watchOSApplicationExtension 5.0, OSXApplicationExtension 10.14, *) {
+                if #available(iOS 12.0, tvOS 12.0, watchOS 5.0, OSX 10.14, *) {
                     os_signpost(type: .begin, log: ProcedureKit.Signposts.procedure, name: "Execution", signpostID: self.signpostID, "%{public}s", self.operationName)
                 }
 
@@ -1236,7 +1236,7 @@ open class Procedure: Operation, ProcedureProtocol {
             }
             self.didChangeValue(forKey: .finished)
 
-            if #available(iOSApplicationExtension 12.0, tvOSApplicationExtension 12.0, watchOSApplicationExtension 5.0, OSXApplicationExtension 10.14, *) {
+            if #available(iOS 12.0, tvOS 12.0, watchOS 5.0, OSX 10.14, *) {
                 os_signpost(type: .end, log: ProcedureKit.Signposts.procedure, name: "Execution", signpostID: self.signpostID, "%{public}s", self.operationName)
             }
 
