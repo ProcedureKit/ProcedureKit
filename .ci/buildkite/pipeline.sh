@@ -4,27 +4,31 @@ steps:
 -
   name: "Stress Test"
   command: ".ci/scripts/test-stress"
-  artifact_paths: ".ci/results/**"
+  artifact_paths:
+    - ".ci/result/xcodebuild.log"
   agents:
     queue: "stress-tests"
     xcode: "$XCODE"
 -
   name: "macOS"
   command: ".ci/scripts/test-macos"
-  artifact_paths: ".ci/results/**"  
+  artifact_paths:
+    - ".ci/result/xcodebuild.log"
   agents:
     xcode: "$XCODE"
 -
   name: "iOS"
   command: ".ci/scripts/test-ios"
-  artifact_paths: ".ci/results/**"  
+  artifact_paths:
+    - ".ci/result/xcodebuild.log"
   agents:
     queue: "iOS-Simulator"
     xcode: "$XCODE"
 -
   name: "tvOS"
   command: ".ci/scripts/test-tvos"
-  artifact_paths: ".ci/results/**"  
+  artifact_paths:
+    - ".ci/result/xcodebuild.log"
   agents:
     queue: "iOS-Simulator"
     xcode: "$XCODE"
