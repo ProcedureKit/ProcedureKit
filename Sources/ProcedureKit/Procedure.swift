@@ -57,7 +57,13 @@ internal struct ProcedureKit {
     }
 
     @available(iOSApplicationExtension 12.0, tvOSApplicationExtension 12.0, watchOSApplicationExtension 5.0, OSXApplicationExtension 10.14, *)
-    static let log = OSLog(subsystem: "run.kit.procedure.ProcedureKit", category: .pointsOfInterest)
+    public struct Signposts {
+
+        internal static let procedure: OSLog = {
+            /// TODO: Add conditional checking here
+            return OSLog(subsystem: "run.kit.procedure.ProcedureKit", category: "Procedure")
+        }()
+    }
 
     private init() { }
 }
@@ -801,7 +807,7 @@ open class Procedure: Operation, ProcedureProtocol {
                 // and is *on* the underlyingQueue of said ProcedureQueue.
 
                 if #available(iOSApplicationExtension 12.0, tvOSApplicationExtension 12.0, watchOSApplicationExtension 5.0, OSXApplicationExtension 10.14, *) {
-                    os_signpost(type: .begin, log: ProcedureKit.log, name: "Started Execution", signpostID: .null)
+                    os_signpost(type: .begin, log: ProcedureKit.Signposts.procedure, name: "Execution", signpostID: self.signpostID, "%{public}s", self.operationName)
                 }
 
                 // Call the `execute()` function on the underlyingQueue
@@ -1231,7 +1237,7 @@ open class Procedure: Operation, ProcedureProtocol {
             self.didChangeValue(forKey: .finished)
 
             if #available(iOSApplicationExtension 12.0, tvOSApplicationExtension 12.0, watchOSApplicationExtension 5.0, OSXApplicationExtension 10.14, *) {
-                os_signpost(type: .end, log: ProcedureKit.log, name: "Finished Execution", signpostID: .null)
+                os_signpost(type: .end, log: ProcedureKit.Signposts.procedure, name: "Execution", signpostID: self.signpostID, "%{public}s", self.operationName)
             }
 
             // Call the Procedure.procedureDidFinish(withErrors:) override
