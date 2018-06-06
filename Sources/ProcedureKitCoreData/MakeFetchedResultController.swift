@@ -26,13 +26,14 @@ open class MakeFetchedResultControllerProcedure<Result: NSFetchRequestResult>: T
 
     static func transform(fetchRequest: NSFetchRequest<Result>, sectionNameKeyPath: String? = nil, cacheName: String? = nil) -> (NSPersistentContainer) throws -> NSFetchedResultsController<Result> {
         return { (container) in
+
             let frc = NSFetchedResultsController(
                 fetchRequest: fetchRequest,
                 managedObjectContext: container.viewContext,
                 sectionNameKeyPath: sectionNameKeyPath,
                 cacheName: cacheName)
 
-            try frc.performFetch()
+            try container.viewContext.performAndWait(block: frc.performFetch)
 
             return frc
         }
@@ -50,7 +51,6 @@ open class MakeFetchedResultControllerProcedure<Result: NSFetchRequestResult>: T
         let fetchRequest: NSFetchRequest<Result> = NSFetchRequest(entityName: entityName)
         fetchRequest.fetchLimit = fetchLimit
         fetchRequest.sortDescriptors = sortDescriptors
-        fetchRequest.returnsObjectsAsFaults = false
 
         super.init(transform: MakeFetchedResultControllerProcedure<Result>.transform(fetchRequest: fetchRequest, sectionNameKeyPath: sectionNameKeyPath, cacheName: cacheName))
         name = "Make FRC \(fetchRequest.entityName ?? "")".trimmingCharacters(in: .whitespaces)
@@ -64,3 +64,6 @@ public extension MakeFetchedResultControllerProcedure where Result: NSManagedObj
         self.init(for: Result.entityName, fetchLimit: fetchLimit, sortDescriptors: sortDescriptors, sectionNameKeyPath: sectionNameKeyPath, cacheName: cacheName)
     }
 }
+
+
+
