@@ -3,26 +3,26 @@ cat <<-YAML
 steps:
 -
   name: "Stress Test"
-  command: "source /usr/local/opt/chruby/share/chruby/chruby.sh && chruby ruby && bundle install --quiet && bundle exec fastlane mac stress_test"
+  command: ".ci/scripts/test-stress"
   agents:
     queue: "stress-tests"
-    xcode: "$XCODE"    
+    xcode: "$XCODE"
 -
   name: "Mac"
   command: ".ci/scripts/test-mac"
   agents:
-    xcode: "$XCODE"    
+    xcode: "$XCODE"
 -
   name: "iOS"
   command: ".ci/scripts/test-ios"
   agents:
-  	queue: "iOS-Simulator"
-    xcode: "$XCODE"    
+    queue: "iOS-Simulator"
+    xcode: "$XCODE"
 -
   name: "tvOS"
   command: ".ci/scripts/test-tvos"
   agents:
-  	queue: "iOS-Simulator"
+    queue: "iOS-Simulator"
     xcode: "$XCODE"
 YAML
 
