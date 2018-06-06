@@ -4,7 +4,8 @@ steps:
 -
   name: "Stress Test"
   command: ".ci/scripts/test-stress"
-  retry: "automatic"
+  retry:
+    automatic: true
   artifact_paths:
     - ".ci/result/xcodebuild.log"
   agents:
@@ -13,7 +14,8 @@ steps:
 -
   name: "macOS"
   command: ".ci/scripts/test-macos"
-  retry: "automatic"  
+  retry:
+    automatic: true
   artifact_paths:
     - ".ci/result/xcodebuild.log"
   agents:
@@ -21,7 +23,8 @@ steps:
 -
   name: "iOS"
   command: ".ci/scripts/test-ios"
-  retry: "automatic"
+  retry:
+    automatic: true
   artifact_paths:
     - ".ci/result/xcodebuild.log"
   agents:
@@ -30,7 +33,8 @@ steps:
 -
   name: "tvOS"
   command: ".ci/scripts/test-tvos"
-  retry: "automatic"
+    retry:
+    automatic: true
   artifact_paths:
     - ".ci/result/xcodebuild.log"
   agents:
