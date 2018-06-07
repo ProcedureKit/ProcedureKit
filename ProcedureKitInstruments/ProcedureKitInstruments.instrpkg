@@ -41,7 +41,7 @@
         </start-pattern>
 
         <end-pattern>
-            <message>"Procedure name: " ?procedureName</message>
+            <message>"Procedure name: " ?procedureName ", status: " ?status</message>
         </end-pattern>
 
         <duration-column>
@@ -69,6 +69,13 @@
             <title>Identifier</title>
             <type>string</type>
             <expression>?procedureID</expression>
+        </column>
+
+        <column>
+            <mnemonic>status</mnemonic>
+            <title>Status</title>
+            <type>string</type>
+            <expression>?status</expression>
         </column>
 
         <column>
@@ -107,9 +114,10 @@
                 <table-ref>procedurekit-instrument-table</table-ref>
 
                 <!-- plot, plot-template or histogram elements -->
-                <plot>
+                <plot-template>
+                    <instance-by>parent-id</instance-by>
                     <value-from>procedure-name</value-from>
-                </plot>
+                </plot-template>
             </lane>
         </graph>
 
@@ -120,6 +128,7 @@
             <column>signpost-name</column>
             <column>duration</column>
             <column>procedure-name</column>
+            <column>status</column>
             <column>procedure-id</column>
             <column>procedure-is-group</column>
             <column>parent-id</column>

@@ -57,7 +57,7 @@ internal struct ProcedureKit {
     }
 
     @available(iOS 12.0, tvOS 12.0, watchOS 5.0, OSX 10.14, *)
-    public struct Signposts {
+    internal struct Signposts {
 
         internal static let procedure: OSLog = {
             /// TODO: Add conditional checking here
@@ -67,6 +67,11 @@ internal struct ProcedureKit {
 
     private init() { }
 }
+
+public enum ProcedureStatus: String {
+    case pending, executing, cancelled, failed, finished
+}
+
 
 /**
  Type to express the intent of the user in regards to executing an Operation instance
@@ -86,6 +91,7 @@ internal struct ProcedureKit {
         }
     }
 }
+
 
 /**
  Procedure is an Operation subclass. It is an abstract class which should be subclassed.
@@ -276,6 +282,23 @@ open class Procedure: Operation, ProcedureProtocol {
     /// Boolean indicator for whether the Procedure is a Group
     public var isGroup: Bool {
         return false
+    }
+
+    public var status: ProcedureStatus {
+        switch (isPending, isExecuting, isFinished, isCancelled, failed) {
+        case (true, _, _, _, _):
+            return .pending
+        case (_, true, _, _, _):
+            return .executing
+        case (_, _, true, _, _):
+            return .finished
+        case (_, _, _, true, _):
+            return .cancelled
+        case (_, _, _, _, true):
+            return .failed
+        default:
+            return .finished
+        }
     }
 
     private var _mutuallyExclusiveCategories: Set<String>?

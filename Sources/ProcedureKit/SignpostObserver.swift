@@ -45,7 +45,7 @@ extension SignpostObserver: ProcedureObserver {
             log: log,
             name: "Execution",
             signpostID: signpostID(for: procedure),
-            "Procedure name: %{public}s", procedure.procedureName)
+            "Procedure name: %{public}s, status: %{public}s", procedure.procedureName, procedure.status.rawValue)
     }
 }
 

@@ -14,6 +14,8 @@ public protocol ProcedureProtocol: class {
 
     var parentIdentifier: UUID? { get }
 
+    var status: ProcedureStatus { get }
+
     var isExecuting: Bool { get }
 
     var isFinished: Bool { get }
