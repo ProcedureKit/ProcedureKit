@@ -61,7 +61,7 @@ internal struct ProcedureKit {
 
         internal static let procedure: OSLog = {
             /// TODO: Add conditional checking here
-            return OSLog(subsystem: "run.kit.procedure.ProcedureKit", category: "Procedure")
+            return OSLog(subsystem: "run.kit.procedure", category: "ProcedureKit")
         }()
     }
 
@@ -208,7 +208,7 @@ open class Procedure: Operation, ProcedureProtocol {
         }
     }
 
-    internal let identifier = UUID()
+    public let identifier = UUID()
 
     internal var typeDescription: String {
         return String(describing: type(of: self))
@@ -460,6 +460,9 @@ open class Procedure: Operation, ProcedureProtocol {
         isAutomaticFinishingDisabled = false
         super.init()
         name = String(describing: type(of: self))
+        if #available(iOS 12.0, tvOS 12.0, watchOS 5.0, OSX 10.14, *) {
+            add(observer: SignpostObserver())
+        }
     }
 
     // MARK: - Disable Automatic Finishing
@@ -501,6 +504,9 @@ open class Procedure: Operation, ProcedureProtocol {
         isAutomaticFinishingDisabled = disableAutomaticFinishing
         super.init()
         name = String(describing: type(of: self))
+        if #available(iOS 12.0, tvOS 12.0, watchOS 5.0, OSX 10.14, *) {
+            add(observer: SignpostObserver())
+        }
     }
 
     // MARK: - Execution
@@ -805,10 +811,6 @@ open class Procedure: Operation, ProcedureProtocol {
                 //  - the Procedure's EventQueue
                 //  - the underlyingQueue of the ProcedureQueue on which the Procedure is scheduled to execute
                 // and is *on* the underlyingQueue of said ProcedureQueue.
-
-                if #available(iOS 12.0, tvOS 12.0, watchOS 5.0, OSX 10.14, *) {
-                    os_signpost(type: .begin, log: ProcedureKit.Signposts.procedure, name: "Execution", signpostID: self.signpostID, "%{public}s", self.operationName)
-                }
 
                 // Call the `execute()` function on the underlyingQueue
                 self.execute()
@@ -1235,10 +1237,6 @@ open class Procedure: Operation, ProcedureProtocol {
                 self._queue = nil
             }
             self.didChangeValue(forKey: .finished)
-
-            if #available(iOS 12.0, tvOS 12.0, watchOS 5.0, OSX 10.14, *) {
-                os_signpost(type: .end, log: ProcedureKit.Signposts.procedure, name: "Execution", signpostID: self.signpostID, "%{public}s", self.operationName)
-            }
 
             // Call the Procedure.procedureDidFinish(withErrors:) override
             self.procedureDidFinish(withErrors: resultingErrors)

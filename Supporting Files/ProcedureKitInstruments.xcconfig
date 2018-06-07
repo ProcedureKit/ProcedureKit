@@ -1,0 +1,10 @@
+//
+//  ProcedureKit
+//
+//  Copyright © 2015-2018 ProcedureKit. All rights reserved.
+//
+
+PRODUCT_BUNDLE_IDENTIFIER = run.kit.procedure.ProcedureKitInstruments
+
+PRODUCT_NAME = ProcedureKitInstruments
+

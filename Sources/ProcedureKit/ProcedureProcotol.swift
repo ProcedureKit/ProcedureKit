@@ -10,6 +10,8 @@ public protocol ProcedureProtocol: class {
 
     var procedureName: String { get }
 
+    var identifier: UUID { get }
+
     var isExecuting: Bool { get }
 
     var isFinished: Bool { get }

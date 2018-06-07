@@ -30,6 +30,7 @@
 		653CA0741D60AB1B0070B7A2 /* ProcedureKitCloud.h in Headers */ = {isa = PBXBuildFile; fileRef = 653CA0731D60AB1B0070B7A2 /* ProcedureKitCloud.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		653CA0781D60ABC90070B7A2 /* ProcedureKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65CFC5F01D608A5500CAD875 /* ProcedureKit.framework */; };
 		653CA07B1D60ABD30070B7A2 /* TestingProcedureKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65CFC6161D60900000CAD875 /* TestingProcedureKit.framework */; };
+		6589732020C8E3EC00EC1F81 /* ProcedureKitInstruments.instrpkg in Sources */ = {isa = PBXBuildFile; fileRef = 6589731F20C8E3EC00EC1F81 /* ProcedureKitInstruments.instrpkg */; };
 		658BE06F20BC69170021F11B /* ProcedureKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65CFC5F01D608A5500CAD875 /* ProcedureKit.framework */; };
 		658BE07020BC69170021F11B /* TestingProcedureKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65CFC6161D60900000CAD875 /* TestingProcedureKit.framework */; };
 		658BE07220BC72540021F11B /* MakeFetchedResultController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 658BE07120BC72540021F11B /* MakeFetchedResultController.swift */; };
@@ -229,6 +230,7 @@
 		65D368AB1E184AA600D03E86 /* Support.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D368871E184AA600D03E86 /* Support.swift */; };
 		65D368AC1E184AA600D03E86 /* TimeoutObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D368881E184AA600D03E86 /* TimeoutObserver.swift */; };
 		65D368AD1E184AA600D03E86 /* Transform.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D368891E184AA600D03E86 /* Transform.swift */; };
+		65D4BEF520C8A31100D85877 /* SignpostObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D4BEF420C8A31100D85877 /* SignpostObserver.swift */; };
 		65ECB2D61DB4F0C000F96F46 /* ProcedureKitNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65ECB2CD1DB4F0C000F96F46 /* ProcedureKitNetwork.framework */; };
 		65ECB2EA1DB4F1A200F96F46 /* ProcedureKitNetwork.h in Headers */ = {isa = PBXBuildFile; fileRef = 65ECB2E81DB4F1A200F96F46 /* ProcedureKitNetwork.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		65ECB2EC1DB4F27700F96F46 /* TestingProcedureKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65CFC6161D60900000CAD875 /* TestingProcedureKit.framework */; };
@@ -562,6 +564,7 @@
 		653CA0621D60AA990070B7A2 /* ProcedureKitCloudTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ProcedureKitCloudTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		653CA0731D60AB1B0070B7A2 /* ProcedureKitCloud.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ProcedureKitCloud.h; path = "Supporting Files/ProcedureKitCloud.h"; sourceTree = "<group>"; };
 		653CA0751D60AB2B0070B7A2 /* ProcedureKitCloud.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = ProcedureKitCloud.xcconfig; path = "Supporting Files/ProcedureKitCloud.xcconfig"; sourceTree = "<group>"; };
+		6589731F20C8E3EC00EC1F81 /* ProcedureKitInstruments.instrpkg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = "com.apple.instruments.package-definition"; path = ProcedureKitInstruments.instrpkg; sourceTree = "<group>"; };
 		658BE07120BC72540021F11B /* MakeFetchedResultController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MakeFetchedResultController.swift; sourceTree = "<group>"; };
 		658BE07320BC77AD0021F11B /* MakeFetchedResultsControllerProcedureTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MakeFetchedResultsControllerProcedureTests.swift; sourceTree = "<group>"; };
 		658BE07520BC99100021F11B /* InsertManagedObjects.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsertManagedObjects.swift; sourceTree = "<group>"; };
@@ -764,6 +767,9 @@
 		65D368871E184AA600D03E86 /* Support.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Support.swift; sourceTree = "<group>"; };
 		65D368881E184AA600D03E86 /* TimeoutObserver.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TimeoutObserver.swift; sourceTree = "<group>"; };
 		65D368891E184AA600D03E86 /* Transform.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Transform.swift; sourceTree = "<group>"; };
+		65D4BEED20C894B500D85877 /* ProcedureKitInstruments.instrdst */ = {isa = PBXFileReference; explicitFileType = com.apple.instruments.instrdst; includeInIndex = 0; path = ProcedureKitInstruments.instrdst; sourceTree = BUILT_PRODUCTS_DIR; };
+		65D4BEF420C8A31100D85877 /* SignpostObserver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignpostObserver.swift; sourceTree = "<group>"; };
+		65D4BEF920C8DDA700D85877 /* ProcedureKitInstruments.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = ProcedureKitInstruments.xcconfig; path = "Supporting Files/ProcedureKitInstruments.xcconfig"; sourceTree = "<group>"; };
 		65ECB2CD1DB4F0C000F96F46 /* ProcedureKitNetwork.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ProcedureKitNetwork.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		65ECB2D51DB4F0C000F96F46 /* ProcedureKitNetworkTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ProcedureKitNetworkTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		65ECB2E81DB4F1A200F96F46 /* ProcedureKitNetwork.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ProcedureKitNetwork.h; path = "Supporting Files/ProcedureKitNetwork.h"; sourceTree = "<group>"; };
@@ -955,11 +961,13 @@
 			name = ...;
 			sourceTree = "<group>";
 		};
-		658BE06E20BC69170021F11B /* Frameworks */ = {
+		6589731E20C8E3EC00EC1F81 /* ProcedureKitInstruments */ = {
 			isa = PBXGroup;
 			children = (
+				6589731F20C8E3EC00EC1F81 /* ProcedureKitInstruments.instrpkg */,
 			);
-			name = Frameworks;
+			name = ProcedureKitInstruments;
+			path = Sources/ProcedureKitInstruments;
 			sourceTree = "<group>";
 		};
 		65A0E4B020B851D4002D6C8C /* ProcedureKitCoreData */ = {
@@ -996,7 +1004,6 @@
 				65D367BE1E1843ED00D03E86 /* Sources */,
 				653C9FD91D6097E20070B7A2 /* Tests */,
 				653CA02A1D60A4FB0070B7A2 /* ... */,
-				658BE06E20BC69170021F11B /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -1021,6 +1028,7 @@
 				65ECB2D51DB4F0C000F96F46 /* ProcedureKitNetworkTests.xctest */,
 				65A0E49920B85168002D6C8C /* ProcedureKitCoreData.framework */,
 				65A0E4A120B85169002D6C8C /* ProcedureKitCoreDataTests.xctest */,
+				65D4BEED20C894B500D85877 /* ProcedureKitInstruments.instrdst */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1041,6 +1049,7 @@
 				65CFC60E1D608AE200CAD875 /* ProcedureKit.xcconfig */,
 				653CA0751D60AB2B0070B7A2 /* ProcedureKitCloud.xcconfig */,
 				65A0E4B520B85297002D6C8C /* ProcedureKitCoreData.xcconfig */,
+				65D4BEF920C8DDA700D85877 /* ProcedureKitInstruments.xcconfig */,
 				659484371DAAA3A60028F83B /* ProcedureKitLocation.xcconfig */,
 				653CA0491D60A6630070B7A2 /* ProcedureKitMac.xcconfig */,
 				653C9FDC1D6098650070B7A2 /* ProcedureKitMobile.xcconfig */,
@@ -1210,6 +1219,7 @@
 				65D368651E184AA600D03E86 /* ProcedureKit */,
 				65D367DE1E1844F800D03E86 /* ProcedureKitCloud */,
 				65A0E4B020B851D4002D6C8C /* ProcedureKitCoreData */,
+				6589731E20C8E3EC00EC1F81 /* ProcedureKitInstruments */,
 				65D368131E18450200D03E86 /* ProcedureKitLocation */,
 				65D3681E1E18451000D03E86 /* ProcedureKitMac */,
 				65D368211E18451C00D03E86 /* ProcedureKitMobile */,
@@ -1367,6 +1377,7 @@
 				65D368791E184AA600D03E86 /* NetworkObserver.swift */,
 				65D368811E184AA600D03E86 /* Profiler.swift */,
 				65D368881E184AA600D03E86 /* TimeoutObserver.swift */,
+				65D4BEF420C8A31100D85877 /* SignpostObserver.swift */,
 			);
 			name = Observers;
 			sourceTree = "<group>";
@@ -1802,6 +1813,21 @@
 			productReference = 65CFC6161D60900000CAD875 /* TestingProcedureKit.framework */;
 			productType = "com.apple.product-type.framework";
 		};
+		65D4BEEC20C894B500D85877 /* ProcedureKitInstruments */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 65D4BEF320C894B500D85877 /* Build configuration list for PBXNativeTarget "ProcedureKitInstruments" */;
+			buildPhases = (
+				65D4BEEB20C894B500D85877 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = ProcedureKitInstruments;
+			productName = "ProcedureKit Instrument";
+			productReference = 65D4BEED20C894B500D85877 /* ProcedureKitInstruments.instrdst */;
+			productType = "com.apple.product-type.instruments-package";
+		};
 		65ECB2CC1DB4F0C000F96F46 /* ProcedureKitNetwork */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 65ECB2DE1DB4F0C000F96F46 /* Build configuration list for PBXNativeTarget "ProcedureKitNetwork" */;
@@ -1849,6 +1875,7 @@
 			isa = PBXProject;
 			attributes = {
 				CLASSPREFIX = PCK;
+				DefaultBuildSystemTypeForWorkspace = Latest;
 				LastSwiftUpdateCheck = 0930;
 				LastUpgradeCheck = 0930;
 				ORGANIZATIONNAME = ProcedureKit;
@@ -1921,6 +1948,9 @@
 						CreatedOnToolsVersion = 8.0;
 						LastSwiftMigration = 0920;
 					};
+					65D4BEEC20C894B500D85877 = {
+						CreatedOnToolsVersion = 10.0;
+					};
 					65ECB2CC1DB4F0C000F96F46 = {
 						CreatedOnToolsVersion = 8.0;
 						LastSwiftMigration = 0920;
@@ -1952,6 +1982,7 @@
 				653CA0611D60AA990070B7A2 /* ProcedureKitCloudTests */,
 				65A0E49820B85168002D6C8C /* ProcedureKitCoreData */,
 				65A0E4A020B85169002D6C8C /* ProcedureKitCoreDataTests */,
+				65D4BEEC20C894B500D85877 /* ProcedureKitInstruments */,
 				6594841D1DAAA2B90028F83B /* ProcedureKitLocation */,
 				659484251DAAA2B90028F83B /* ProcedureKitLocationTests */,
 				653CA02F1D60A5D10070B7A2 /* ProcedureKitMac */,
@@ -2323,6 +2354,7 @@
 				652F903D209E3E3D00365B2D /* IgnoreErrors.swift in Sources */,
 				65D368A91E184AA600D03E86 /* Retry.swift in Sources */,
 				65D368931E184AA600D03E86 /* Delay.swift in Sources */,
+				65D4BEF520C8A31100D85877 /* SignpostObserver.swift in Sources */,
 				65D3689B1E184AA600D03E86 /* MutualExclusion.swift in Sources */,
 				65D368991E184AA600D03E86 /* Logging.swift in Sources */,
 				65D368AD1E184AA600D03E86 /* Transform.swift in Sources */,
@@ -2387,6 +2419,14 @@
 				65D367DB1E1844E500D03E86 /* TestCondition.swift in Sources */,
 				65D367D91E1844E500D03E86 /* TestableNetwork.swift in Sources */,
 				65D367D31E1844E500D03E86 /* ConcurrencyTestCase.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		65D4BEEB20C894B500D85877 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6589732020C8E3EC00EC1F81 /* ProcedureKitInstruments.instrpkg in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4311,6 +4351,26 @@
 			};
 			name = Release;
 		};
+		65D4BEF120C894B500D85877 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 65D4BEF920C8DDA700D85877 /* ProcedureKitInstruments.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Instruments/Packages";
+				VERSIONING_SYSTEM = "";
+			};
+			name = Debug;
+		};
+		65D4BEF220C894B500D85877 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 65D4BEF920C8DDA700D85877 /* ProcedureKitInstruments.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Instruments/Packages";
+				VERSIONING_SYSTEM = "";
+			};
+			name = Release;
+		};
 		65ECB2DF1DB4F0C000F96F46 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 65ECB2E91DB4F1A200F96F46 /* ProcedureKitNetwork.xcconfig */;
@@ -4679,6 +4739,15 @@
 			buildConfigurations = (
 				65CFC61B1D60900000CAD875 /* Debug */,
 				65CFC61C1D60900000CAD875 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		65D4BEF320C894B500D85877 /* Build configuration list for PBXNativeTarget "ProcedureKitInstruments" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				65D4BEF120C894B500D85877 /* Debug */,
+				65D4BEF220C894B500D85877 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

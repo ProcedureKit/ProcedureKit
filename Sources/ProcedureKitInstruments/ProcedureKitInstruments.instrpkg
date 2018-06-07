@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<package>
+	<id>run.kit.procedure.ProcedureKitInstruments</id>
+    <version>1</version>
+	<title>ProcedureKit Instruments</title>
+	<owner>
+		<name>The ProcedureKit Contributors</name>
+	</owner>
+
+    <!-- MARK: Schema Definitions -->
+    <!-- Define point and interval schemas needed to represent the input and output tables your package will use. -->
+    <!-- Two kinds are available: schemas with automatically generated modelers, and schemas that require custom modelers -->
+    <!--   Generated modelers: 'os-log-point-schema', 'os-signpost-interval-schema', 'ktrace-point-schema', 'ktrace-interval-schema' -->
+    <!--   Custom modeler required: 'point-schema', 'interval-schema' -->
+    <!-- To use existing schemas from other packages, declare 'import-schema' elements -->
+
+    <!-- MARK: Modeler Declarations -->
+    <!-- If there are schemas defined that require a custom modeler, each can be declared with a 'modeler' element -->
+    <!-- Modelers are based on CLIPS rules and may define 1..n output schemas, each requiring 1..n input schemas -->
+
+    <!-- MARK: Instrument Definitions -->
+    <!-- Instruments record and display data, creating concrete table requirements that instance modelers and data streams. -->
+    <!-- Any number of 'instrument' elements can be defined; each instrument should provide a cohesive graph and detail experience. -->
+
+    <!-- MARK: Embed Templates -->
+    <!-- Templates may be included and represent a collection of tools configured for a specific tracing workflow -->
+    <!-- Each 'template' element specifies the relative path to a .tracetemplate file in the project -->
+    <!-- To create a template: start with a blank document, configure with instruments desired, and choose "File -> Save as Template" -->
+
+
+    <os-signpost-interval-schema>
+        <id>procedurekit-signpost-schema</id>
+        <title>"ProcedureKit Signposts"</title>
+        <subsystem>"run.kit.procedure"</subsystem>
+        <category>"ProcedureKit"</category>
+        <name>?name</name>
+
+        <start-pattern>
+            <message>?procedureName</message>
+        </start-pattern>
+
+        <end-pattern>
+            <message>?procedureName</message>
+        </end-pattern>
+
+        <duration-column>
+            <mnemonic>duration</mnemonic>
+            <title>Duration</title>
+            <type>duration</type>
+        </duration-column>
+
+        <column>
+            <mnemonic>name</mnemonic>
+            <title>"Signpost"</title>
+            <type>string</type>
+            <expression>?name</expression>
+        </column>
+
+        <column>
+            <mnemonic>procedure-name</mnemonic>
+            <title>"Procedure"</title>
+            <type>string</type>
+            <expression>?procedureName</expression>
+        </column>
+
+    </os-signpost-interval-schema>
+
+    <instrument>
+        <id>procedurekit-signpost-instrument</id>
+        <title>"ProcedureKit Signpost Instrument"</title>
+        <category>Behavior</category>
+        <purpose>"Shows when Procedure are running."</purpose>
+        <icon>Scheduling</icon>
+
+        <create-table>
+            <id>procedurekit-instrument-table</id>
+            <schema-ref>procedurekit-signpost-schema</schema-ref>
+        </create-table>
+
+        <!-- Define graph to draw for your Instrument (optional) -->
+        <graph>
+            <title>"Lifecycle graph title"</title>
+            <lane>
+                <title>"Lifecycle lane title"</title>
+                <table-ref>procedurekit-instrument-table</table-ref>
+
+                <!-- plot, plot-template or histogram elements -->
+                <plot>
+                    <value-from>procedure-name</value-from>
+                </plot>
+            </lane>
+        </graph>
+
+        <!-- Define at least one detail view for your Instrument -->
+        <list>
+            <title>"Lifecycle list title"</title>
+            <table-ref>procedurekit-instrument-table</table-ref>
+            <column>name</column>
+            <column>procedure-name</column>
+            <column>duration</column>
+        </list>
+
+    </instrument>
+
+</package>
