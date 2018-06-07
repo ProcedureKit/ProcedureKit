@@ -29,10 +29,22 @@
       enableThreadSanitizer = "YES"
       enableUBSanitizer = "YES"
       codeCoverageEnabled = "YES"
+      onlyGenerateCoverageForSpecifiedTargets = "YES"
       shouldUseLaunchSchemeArgsEnv = "YES">
+      <CodeCoverageTargets>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "653CA02F1D60A5D10070B7A2"
+            BuildableName = "ProcedureKitMac.framework"
+            BlueprintName = "ProcedureKitMac"
+            ReferencedContainer = "container:ProcedureKit.xcodeproj">
+         </BuildableReference>
+      </CodeCoverageTargets>
       <Testables>
          <TestableReference
-            skipped = "NO">
+            skipped = "NO"
+            parallelizable = "YES"
+            testExecutionOrdering = "random">
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "653CA0371D60A5D10070B7A2"

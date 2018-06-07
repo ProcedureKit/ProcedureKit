@@ -1,4 +1,3 @@
-source 'https://rubygems.org' do
-	gem 'fastlane'
-	gem 'jazzy'
-end
+source "https://rubygems.org"
+gem "xcpretty"
+gem "jazzy"

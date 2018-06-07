@@ -43,10 +43,22 @@
       enableThreadSanitizer = "YES"
       enableUBSanitizer = "YES"
       codeCoverageEnabled = "YES"
+      onlyGenerateCoverageForSpecifiedTargets = "YES"
       shouldUseLaunchSchemeArgsEnv = "YES">
+      <CodeCoverageTargets>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "653C9FC01D6097A40070B7A2"
+            BuildableName = "ProcedureKitMobile.framework"
+            BlueprintName = "ProcedureKitMobile"
+            ReferencedContainer = "container:ProcedureKit.xcodeproj">
+         </BuildableReference>
+      </CodeCoverageTargets>
       <Testables>
          <TestableReference
-            skipped = "NO">
+            skipped = "NO"
+            parallelizable = "YES"
+            testExecutionOrdering = "random">
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "653C9FC81D6097A40070B7A2"
