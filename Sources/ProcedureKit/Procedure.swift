@@ -156,7 +156,6 @@ open class Procedure: Operation, ProcedureProtocol {
     private var _isTransitioningToExecuting = false
     private var _isHandlingCancel = false
     private var _isCancelled = false  // should always be set by .cancel()
-
     private var _isHandlingFinish: Bool = false
 
     fileprivate let isAutomaticFinishingDisabled: Bool
@@ -209,6 +208,8 @@ open class Procedure: Operation, ProcedureProtocol {
     }
 
     public let identifier = UUID()
+
+    public internal(set) var parentIdentifier: UUID?
 
     internal var typeDescription: String {
         return String(describing: type(of: self))
@@ -270,6 +271,11 @@ open class Procedure: Operation, ProcedureProtocol {
     /// Boolean indicator for whether the Procedure has finished or not
     final public override var isFinished: Bool {
         return stateLock.withCriticalScope { _isFinished }
+    }
+
+    /// Boolean indicator for whether the Procedure is a Group
+    public var isGroup: Bool {
+        return false
     }
 
     private var _mutuallyExclusiveCategories: Set<String>?

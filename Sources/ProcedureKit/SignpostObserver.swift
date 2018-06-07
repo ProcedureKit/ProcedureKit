@@ -29,12 +29,29 @@ public final class SignpostObserver<Procedure: ProcedureProtocol> {
 extension SignpostObserver: ProcedureObserver {
 
     public func will(execute procedure: Procedure, pendingExecute: PendingExecuteEvent) {
-        os_log("Will begin signpost for %s", log: log, type: .default, procedure.procedureName as CVarArg)
-        os_signpost(type: .begin, log: log, name: "Procedure", signpostID: signpostID(for: procedure), "%s", procedure.procedureName as CVarArg)
+        os_log("Will begin signpost for -> Procedure name: %{public}s, is group: %{public}hhd, is child: %{public}hhd", log: log, type: .default, procedure.procedureName, procedure.isGroup.intValue, procedure.isChild.intValue)
+        os_signpost(
+            type: .begin,
+            log: log,
+            name: "Execution",
+            signpostID: signpostID(for: procedure),
+            "Procedure name: %{public}s,id: %{public}s,is group: %{public}hhd,parent id: %{public}s", procedure.procedureName, procedure.identifier.uuidString, procedure.isGroup.intValue, procedure.parentIdentifier?.uuidString ?? "")
     }
 
     public func did(finish procedure: Procedure, withErrors errors: [Error]) {
         os_log("Will end signpost for %s", log: log, type: .default, procedure.procedureName as CVarArg)
-        os_signpost(type: .end, log: log, name: "Procedure", signpostID: signpostID(for: procedure), "%s", procedure.procedureName as CVarArg)
+        os_signpost(
+            type: .end,
+            log: log,
+            name: "Execution",
+            signpostID: signpostID(for: procedure),
+            "Procedure name: %{public}s", procedure.procedureName)
+    }
+}
+
+extension Bool {
+
+    var intValue: Int {
+        return NSNumber(booleanLiteral: self).intValue
     }
 }

@@ -12,11 +12,17 @@ public protocol ProcedureProtocol: class {
 
     var identifier: UUID { get }
 
+    var parentIdentifier: UUID? { get }
+
     var isExecuting: Bool { get }
 
     var isFinished: Bool { get }
 
     var isCancelled: Bool { get }
+
+    var isGroup: Bool { get }
+
+    var isChild: Bool { get }
 
     var errors: [Error] { get }
 
@@ -57,8 +63,14 @@ public protocol ProcedureProtocol: class {
 
 public extension ProcedureProtocol {
 
+    /// Boolean indicator for whether the Procedure finished with an error
     var failed: Bool {
         return errors.count > 0
+    }
+
+    /// Boolean indicator for whether the Procedure is considered a child of another Procedure
+    var isChild: Bool {
+        return parentIdentifier != nil
     }
 
     func cancel(withError error: Error?) {

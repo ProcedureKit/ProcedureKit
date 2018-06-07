@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <package>
 	<id>run.kit.procedure.ProcedureKitInstruments</id>
-    <version>1</version>
+    <version>2</version>
 	<title>ProcedureKit Instruments</title>
 	<owner>
 		<name>The ProcedureKit Contributors</name>
@@ -30,17 +30,18 @@
 
     <os-signpost-interval-schema>
         <id>procedurekit-signpost-schema</id>
-        <title>"ProcedureKit Signposts"</title>
+        <title>ProcedureKit</title>
         <subsystem>"run.kit.procedure"</subsystem>
         <category>"ProcedureKit"</category>
-        <name>?name</name>
+
+        <name>?signpostName</name>
 
         <start-pattern>
-            <message>?procedureName</message>
+            <message>"Procedure name: " ?procedureName ",id: " ?procedureID ",is group: " ?isGroup ",parent id: " ?parentID</message>
         </start-pattern>
 
         <end-pattern>
-            <message>?procedureName</message>
+            <message>"Procedure name: " ?procedureName</message>
         </end-pattern>
 
         <duration-column>
@@ -50,26 +51,47 @@
         </duration-column>
 
         <column>
-            <mnemonic>name</mnemonic>
-            <title>"Signpost"</title>
+            <mnemonic>signpost-name</mnemonic>
+            <title>Signpost</title>
             <type>string</type>
-            <expression>?name</expression>
+            <expression>?signpostName</expression>
         </column>
 
         <column>
             <mnemonic>procedure-name</mnemonic>
-            <title>"Procedure"</title>
+            <title>Procedure</title>
             <type>string</type>
             <expression>?procedureName</expression>
+        </column>
+
+        <column>
+            <mnemonic>procedure-id</mnemonic>
+            <title>Identifier</title>
+            <type>string</type>
+            <expression>?procedureID</expression>
+        </column>
+
+        <column>
+            <mnemonic>procedure-is-group</mnemonic>
+            <title>Is a group</title>
+            <type>string</type>
+            <expression>(switch ?isGroup (case 1 then "True") (default "False"))</expression>
+        </column>
+
+        <column>
+            <mnemonic>parent-id</mnemonic>
+            <title>Parent Group</title>
+            <type>string</type>
+            <expression>?parentID</expression>
         </column>
 
     </os-signpost-interval-schema>
 
     <instrument>
         <id>procedurekit-signpost-instrument</id>
-        <title>"ProcedureKit Signpost Instrument"</title>
+        <title>ProcedureKit Signposts</title>
         <category>Behavior</category>
-        <purpose>"Shows when Procedure are running."</purpose>
+        <purpose>Shows when Procedure are running.</purpose>
         <icon>Scheduling</icon>
 
         <create-table>
@@ -79,9 +101,9 @@
 
         <!-- Define graph to draw for your Instrument (optional) -->
         <graph>
-            <title>"Lifecycle graph title"</title>
+            <title>Procedure Life Cycle</title>
             <lane>
-                <title>"Lifecycle lane title"</title>
+                <title>Procedure Life Cycle</title>
                 <table-ref>procedurekit-instrument-table</table-ref>
 
                 <!-- plot, plot-template or histogram elements -->
@@ -93,11 +115,14 @@
 
         <!-- Define at least one detail view for your Instrument -->
         <list>
-            <title>"Lifecycle list title"</title>
+            <title>Procedure Life Cycle</title>
             <table-ref>procedurekit-instrument-table</table-ref>
-            <column>name</column>
-            <column>procedure-name</column>
+            <column>signpost-name</column>
             <column>duration</column>
+            <column>procedure-name</column>
+            <column>procedure-id</column>
+            <column>procedure-is-group</column>
+            <column>parent-id</column>
         </list>
 
     </instrument>

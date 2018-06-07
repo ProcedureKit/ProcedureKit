@@ -12,6 +12,17 @@ class GroupTests: GroupTestCase {
 
     // MARK: - Execution
 
+    func test__is_group_returns_true() {
+        XCTAssertTrue(group.isGroup)
+    }
+
+    func test__is_child_returns_true_for_all_children() {
+        wait(for: group)
+        let isChildren = group.children.operationsAndProcedures.1.map { $0.isChild }
+        let result: Bool = isChildren.reduce(true) { $0 && $1 }
+        XCTAssertTrue(result)
+    }
+
     func test__group_children_are_executed() {
         wait(for: group)
 
