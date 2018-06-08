@@ -87,21 +87,21 @@ class CKFetchShareMetadataOperationTests: CKProcedureTestCase {
 
     func test__success_without_completion_block() {
         wait(for: operation)
-        XCTAssertProcedureFinishedWithoutErrors(operation)
+        PKAssertProcedureFinished(operation)
     }
 
     func test__success_with_completion_block() {
         var didExecuteBlock = false
         operation.setFetchShareMetadataCompletionBlock { didExecuteBlock = true }
         wait(for: operation)
-        XCTAssertProcedureFinishedWithoutErrors(operation)
+        PKAssertProcedureFinished(operation)
         XCTAssertTrue(didExecuteBlock)
     }
 
     func test__error_without_completion_block() {
         target.error = TestError()
         wait(for: operation)
-        XCTAssertProcedureFinishedWithoutErrors(operation)
+        PKAssertProcedureFinished(operation)
     }
 
     func test__error_with_completion_block() {
@@ -182,7 +182,7 @@ class CloudKitProcedureFetchShareMetadataOperationTests: CKProcedureTestCase {
 
     func test__success_without_completion_block_set() {
         wait(for: cloudkit)
-        XCTAssertProcedureFinishedWithoutErrors(cloudkit)
+        PKAssertProcedureFinished(cloudkit)
     }
 
     func test__success_with_completion_block_set() {
@@ -191,7 +191,7 @@ class CloudKitProcedureFetchShareMetadataOperationTests: CKProcedureTestCase {
             didExecuteBlock = true
         }
         wait(for: cloudkit)
-        XCTAssertProcedureFinishedWithoutErrors(cloudkit)
+        PKAssertProcedureFinished(cloudkit)
         XCTAssertTrue(didExecuteBlock)
     }
 
@@ -202,7 +202,7 @@ class CloudKitProcedureFetchShareMetadataOperationTests: CKProcedureTestCase {
             return operation
         }
         wait(for: cloudkit)
-        XCTAssertProcedureFinishedWithoutErrors(cloudkit)
+        PKAssertProcedureFinished(cloudkit)
     }
 
     func test__error_with_completion_block_set() {
@@ -236,7 +236,7 @@ class CloudKitProcedureFetchShareMetadataOperationTests: CKProcedureTestCase {
         var didExecuteBlock = false
         cloudkit.setFetchShareMetadataCompletionBlock { didExecuteBlock = true }
         wait(for: cloudkit)
-        XCTAssertProcedureFinishedWithoutErrors(cloudkit)
+        PKAssertProcedureFinished(cloudkit)
         XCTAssertTrue(didExecuteBlock)
     }
 
@@ -259,7 +259,7 @@ class CloudKitProcedureFetchShareMetadataOperationTests: CKProcedureTestCase {
         var didExecuteBlock = false
         cloudkit.setFetchShareMetadataCompletionBlock { didExecuteBlock = true }
         wait(for: cloudkit)
-        XCTAssertProcedureFinishedWithoutErrors(cloudkit)
+        PKAssertProcedureFinished(cloudkit)
         XCTAssertTrue(didExecuteBlock)
         XCTAssertTrue(didRunCustomHandler)
     }

@@ -92,7 +92,7 @@ class ProcedureConditionStressTest: StressTestCase {
             procedure.add(condition: TrueCondition())
         }
         wait(for: procedure, withTimeout: 10)
-        XCTAssertProcedureFinishedWithoutErrors()
+        PKAssertProcedureFinished()
     }
 
     func test__adding_many_conditions_each_with_single_dependency() {
@@ -101,7 +101,7 @@ class ProcedureConditionStressTest: StressTestCase {
             procedure.add(condition: TestCondition(producedDependencies: [TestProcedure()]) { .success(true) })
         }
         wait(for: procedure, withTimeout: 10)
-        XCTAssertProcedureFinishedWithoutErrors()
+        PKAssertProcedureFinished()
     }
 
     func test__dependencies_execute_before_condition_dependencies() {

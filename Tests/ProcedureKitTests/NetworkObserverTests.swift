@@ -68,7 +68,7 @@ class NetworkObserverTests: ProcedureKitTestCase {
     func test__network_indicator_shows_when_procedure_starts() {
         procedure.add(observer: NetworkObserver(controller: controller))
         wait(for: procedure, withTimeout: 5) { _ in
-            self.XCTAssertProcedureFinishedWithoutErrors()
+            self.PKAssertProcedureFinished()
             XCTAssertTrue(self.changes.first ?? false)
         }
     }
@@ -76,7 +76,7 @@ class NetworkObserverTests: ProcedureKitTestCase {
     func test__network_indicator_hides_after_short_delay_when_procedure_finishes() {
         procedure.add(observer: NetworkObserver(controller: controller))
         wait(for: procedure, withTimeout: procedure.delay + controller.interval + 1.0) { _ in
-            self.XCTAssertProcedureFinishedWithoutErrors()
+            self.PKAssertProcedureFinished()
             guard self.changes.count == 2 else {
                 XCTFail("Too few changes"); return
             }
@@ -92,8 +92,8 @@ class NetworkObserverTests: ProcedureKitTestCase {
         procedure2.add(observer: NetworkObserver(controller: controller))
 
         wait(for: procedure1, procedure2, withTimeout: max(procedure1.delay, procedure2.delay) + controller.interval + 1.0) { _ in
-            self.XCTAssertProcedureFinishedWithoutErrors(procedure1)
-            self.XCTAssertProcedureFinishedWithoutErrors(procedure2)
+            self.PKAssertProcedureFinished(procedure1)
+            self.PKAssertProcedureFinished(procedure2)
             XCTAssertEqual(self.changes, [true, false])
         }
     }
@@ -159,9 +159,9 @@ class NetworkObserverTests: ProcedureKitTestCase {
         // wait until all procedures have finished and the timer has invalidated the network indicator
 
         wait(for: procedure1, afterFirstGroup, withTimeout: (timerInterval + 0.5) * 3.0 + (timerInterval * 2.0)) { _ in
-            self.XCTAssertProcedureFinishedWithoutErrors(procedure1)
-            self.XCTAssertProcedureFinishedWithoutErrors(procedure2)
-            self.XCTAssertProcedureFinishedWithoutErrors(procedure3)
+            self.PKAssertProcedureFinished(procedure1)
+            self.PKAssertProcedureFinished(procedure2)
+            self.PKAssertProcedureFinished(procedure3)
             XCTAssertEqual(self.changes, [true, false])
         }
     }

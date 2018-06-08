@@ -126,7 +126,7 @@ class BackgroundObserverTests: ProcedureKitTestCase {
         wait(for: backgroundProcedure)
         waitForTaskGroup()
 
-        XCTAssertProcedureFinishedWithoutErrors(backgroundProcedure)
+        PKAssertProcedureFinished(backgroundProcedure)
         XCTAssertEqual(backgroundTaskName, expectedBackgroundTaskName)
         XCTAssertNotEqual(backgroundTaskIdentifier, UIBackgroundTaskInvalid)
         XCTAssertEqual(backgroundTaskIdentifier, endedBackgroundTaskIdentifier)
@@ -181,7 +181,7 @@ class BackgroundObserverTests: ProcedureKitTestCase {
         // clean-up - explicitly finish the task group
         taskGroup.leave()
 
-        XCTAssertProcedureFinishedWithoutErrors(backgroundProcedure)
+        PKAssertProcedureFinished(backgroundProcedure)
     }
 
     // MARK: Cancellation Behavior: .never
@@ -223,7 +223,7 @@ class BackgroundObserverTests: ProcedureKitTestCase {
         wait(for: backgroundProcedure)
         waitForTaskGroup()
 
-        XCTAssertProcedureFinishedWithoutErrors(backgroundProcedure)
+        PKAssertProcedureFinished(backgroundProcedure)
         XCTAssertEqual(backgroundTaskName, expectedBackgroundTaskName)
         XCTAssertNotEqual(backgroundTaskIdentifier, UIBackgroundTaskInvalid)
         XCTAssertEqual(backgroundTaskIdentifier, endedBackgroundTaskIdentifier)
@@ -335,7 +335,7 @@ class BackgroundObserverTests: ProcedureKitTestCase {
         wait(for: backgroundProcedure)
         waitForTaskGroup()
 
-        XCTAssertProcedureFinishedWithoutErrors(backgroundProcedure)
+        PKAssertProcedureFinished(backgroundProcedure)
         XCTAssertEqual(backgroundTaskName, expectedBackgroundTaskName)
         XCTAssertNotEqual(backgroundTaskIdentifier, UIBackgroundTaskInvalid)
         XCTAssertEqual(backgroundTaskIdentifier, endedBackgroundTaskIdentifier)

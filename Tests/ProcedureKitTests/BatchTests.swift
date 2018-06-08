@@ -25,7 +25,7 @@ class BatchProcedureTests: ProcedureKitTestCase {
 
         wait(for: beatles, greetings)
 
-        XCTAssertProcedureFinishedWithoutErrors(greetings)
+        PKAssertProcedureFinished(greetings)
         guard let result = greetings.output.success else {
             XCTFail("Batch did not finish with successful output.")
             return

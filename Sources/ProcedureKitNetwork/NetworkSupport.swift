@@ -152,7 +152,7 @@ struct ProcedureKitNetworkResponse {
 
 public protocol NetworkOperation {
 
-    var networkError: Error? { get }
+    var error: Error? { get }
 
     var urlResponse: HTTPURLResponse? { get }
 }
@@ -291,7 +291,7 @@ public extension HTTPURLResponse {
 extension NetworkOperation {
 
     func makeNetworkResponse() -> ProcedureKitNetworkResponse {
-        return ProcedureKitNetworkResponse(response: urlResponse, error: networkError)
+        return ProcedureKitNetworkResponse(response: urlResponse, error: error)
     }
 }
 

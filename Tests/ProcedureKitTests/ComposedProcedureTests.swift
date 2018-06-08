@@ -29,14 +29,14 @@ public class ComposedProcedureTests: ProcedureKitTestCase {
         var didExecute = false
         let composed = ComposedProcedure(BlockOperation { didExecute = true })
         wait(for: composed)
-        XCTAssertProcedureFinishedWithoutErrors(composed)
+        PKAssertProcedureFinished(composed)
         XCTAssertTrue(didExecute)
     }
 
     func test__composed_procedure_is_executed() {
         let composed = ComposedProcedure(procedure)
         wait(for: composed)
-        XCTAssertProcedureFinishedWithoutErrors()
+        PKAssertProcedureFinished()
     }
 }
 
@@ -51,8 +51,8 @@ public class GatedProcedureTests: ProcedureKitTestCase {
     func test__when_gate_is_open_procedure_is_performed() {
         let gated = GatedProcedure(procedure) { true }
         wait(for: gated)
-        XCTAssertProcedureFinishedWithoutErrors(gated)
-        XCTAssertProcedureFinishedWithoutErrors(procedure)
+        PKAssertProcedureFinished(gated)
+        PKAssertProcedureFinished(procedure)
     }
 }
 

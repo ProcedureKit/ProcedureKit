@@ -56,7 +56,7 @@ class CKMarkNotificationsReadOperationTests: CKProcedureTestCase {
 
     func test__success_without_completion_block() {
         wait(for: operation)
-        XCTAssertProcedureFinishedWithoutErrors(operation)
+        PKAssertProcedureFinished(operation)
     }
 
     func test__success_with_completion_block() {
@@ -67,7 +67,7 @@ class CKMarkNotificationsReadOperationTests: CKProcedureTestCase {
             receivedNotificationIDs = notificationIDsMarkedRead
         }
         wait(for: operation)
-        XCTAssertProcedureFinishedWithoutErrors(operation)
+        PKAssertProcedureFinished(operation)
         XCTAssertTrue(didExecuteBlock)
         XCTAssertEqual(receivedNotificationIDs ?? ["this is not the id you're looking for"], toMark)
     }
@@ -75,7 +75,7 @@ class CKMarkNotificationsReadOperationTests: CKProcedureTestCase {
     func test__error_without_completion_block() {
         target.error = TestError()
         wait(for: operation)
-        XCTAssertProcedureFinishedWithoutErrors(operation)
+        PKAssertProcedureFinished(operation)
     }
 
     func test__error_with_completion_block() {
@@ -130,7 +130,7 @@ class CloudKitProcedureMarkNotificationsReadOperationTests: CKProcedureTestCase 
 
     func test__success_without_completion_block_set() {
         wait(for: cloudkit)
-        XCTAssertProcedureFinishedWithoutErrors(cloudkit)
+        PKAssertProcedureFinished(cloudkit)
     }
 
     func test__success_with_completion_block_set() {
@@ -139,7 +139,7 @@ class CloudKitProcedureMarkNotificationsReadOperationTests: CKProcedureTestCase 
             didExecuteBlock = true
         }
         wait(for: cloudkit)
-        XCTAssertProcedureFinishedWithoutErrors(cloudkit)
+        PKAssertProcedureFinished(cloudkit)
         XCTAssertTrue(didExecuteBlock)
     }
 
@@ -150,7 +150,7 @@ class CloudKitProcedureMarkNotificationsReadOperationTests: CKProcedureTestCase 
             return operation
         }
         wait(for: cloudkit)
-        XCTAssertProcedureFinishedWithoutErrors(cloudkit)
+        PKAssertProcedureFinished(cloudkit)
     }
 
     func test__error_with_completion_block_set() {
@@ -184,7 +184,7 @@ class CloudKitProcedureMarkNotificationsReadOperationTests: CKProcedureTestCase 
         var didExecuteBlock = false
         cloudkit.setMarkNotificationsReadCompletionBlock { _ in didExecuteBlock = true }
         wait(for: cloudkit)
-        XCTAssertProcedureFinishedWithoutErrors(cloudkit)
+        PKAssertProcedureFinished(cloudkit)
         XCTAssertTrue(didExecuteBlock)
     }
 
@@ -207,7 +207,7 @@ class CloudKitProcedureMarkNotificationsReadOperationTests: CKProcedureTestCase 
         var didExecuteBlock = false
         cloudkit.setMarkNotificationsReadCompletionBlock { _ in didExecuteBlock = true }
         wait(for: cloudkit)
-        XCTAssertProcedureFinishedWithoutErrors(cloudkit)
+        PKAssertProcedureFinished(cloudkit)
         XCTAssertTrue(didExecuteBlock)
         XCTAssertTrue(didRunCustomHandler)
     }

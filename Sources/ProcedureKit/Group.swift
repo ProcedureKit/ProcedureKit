@@ -180,7 +180,7 @@ open class GroupProcedure: Procedure {
     // MARK: - Customizing the Group's Child Error Handling
 
     /**
-     This method is called when a child Procedure will finish (with / without errors).
+     This method is called when a child Procedure will finish (with / without an error).
      (It is called on the Group's EventQueue.)
 
      The default behavior is to append the child's errors, if any, to the Group's errors.

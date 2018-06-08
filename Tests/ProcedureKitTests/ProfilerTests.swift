@@ -102,7 +102,7 @@ class ProfilerTests: ProcedureKitTestCase {
         }
 
         validateProfileResult(result: result, after: now)
-        XCTAssertProcedureFinishedWithoutErrors()
+        PKAssertProcedureFinished()
     }
 
     func test__profile_simple_operation_which_cancels() {
@@ -139,7 +139,7 @@ class ProfilerTests: ProcedureKitTestCase {
         }
 
         validateProfileResult(result: result, after: now)
-        XCTAssertProcedureFinishedWithoutErrors()
+        PKAssertProcedureFinished()
         XCTAssertEqual(result.children.count, 1)
         if let childResult = result.children.first {
             validateProfileResult(result: childResult, after: now)
@@ -158,7 +158,7 @@ class ProfilerTests: ProcedureKitTestCase {
         }
 
         validateProfileResult(result: result, after: now)
-        XCTAssertProcedureFinishedWithoutErrors(group)
+        PKAssertProcedureFinished(group)
 
         XCTAssertEqual(result.children.count, 2)
         for child in result.children {

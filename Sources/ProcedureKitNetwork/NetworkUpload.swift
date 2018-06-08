@@ -44,10 +44,6 @@ open class NetworkUploadProcedure: Procedure, InputProcedure, OutputProcedure, N
     private var _input: Pending<HTTPPayloadRequest<Data>> = .pending
     private var _output: Pending<NetworkResult> = .pending
 
-    public var networkError: Error? {
-        return errors.first
-    }
-
     public init(session: NetworkSession, request: URLRequest? = nil, data: Data? = nil, completionHandler: @escaping CompletionBlock = { _ in }) {
 
         self.session = session

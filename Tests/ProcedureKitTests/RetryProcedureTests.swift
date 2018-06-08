@@ -13,7 +13,7 @@ class RetryProcedureTests: RetryTestCase {
     func test__with_payload_iterator() {
         retry = Retry(iterator: createPayloadIterator(succeedsAfterFailureCount: 2), retry: { $1 })
         wait(for: retry)
-        XCTAssertProcedureFinishedWithoutErrors(retry)
+        PKAssertProcedureFinished(retry)
         XCTAssertEqual(retry.count, 3)
     }
 
@@ -27,14 +27,14 @@ class RetryProcedureTests: RetryTestCase {
     func test__with_delay_and_operation_iterator() {
         retry = Retry(delay: Delay.Iterator.fibonacci(withPeriod: 0.001), iterator: createOperationIterator(succeedsAfterFailureCount: 2), retry: { $1 })
         wait(for: retry)
-        XCTAssertProcedureFinishedWithoutErrors(retry)
+        PKAssertProcedureFinished(retry)
         XCTAssertEqual(retry.count, 3)
     }
 
     func test__with_wait_strategy_and_operation_iterator() {
         retry = Retry(wait: .incrementing(initial: 0, increment: 0.001), iterator: createOperationIterator(succeedsAfterFailureCount: 2), retry: { $1 })
         wait(for: retry)
-        XCTAssertProcedureFinishedWithoutErrors(retry)
+        PKAssertProcedureFinished(retry)
         XCTAssertEqual(retry.count, 3)
     }
 
@@ -66,7 +66,7 @@ class RetryProcedureTests: RetryTestCase {
         retry.injectResult(from: outputProcedure)
 
         wait(for: retry, outputProcedure)
-        XCTAssertProcedureFinishedWithoutErrors(retry)
+        PKAssertProcedureFinished(retry)
 
         XCTAssertEqual(textOutput, ["Hello ProcedureKit"])
     }

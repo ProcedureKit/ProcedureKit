@@ -36,14 +36,14 @@ final class TimeoutObserverTests: ProcedureKitTestCase {
         procedure = TestProcedure()
         procedure.add(observer: TimeoutObserver(by: 0.5))
         wait(for: procedure)
-        XCTAssertProcedureFinishedWithoutErrors()
+        PKAssertProcedureFinished()
     }
 
     func test__timeout_observer_negative_interval() {
         procedure = TestProcedure()
         procedure.add(observer: TimeoutObserver(by: -0.5))
         wait(for: procedure)
-        XCTAssertProcedureFinishedWithoutErrors()
+        PKAssertProcedureFinished()
     }
 
     func test__multiple_timeout_observers_on_a_single_procedure() {
@@ -67,6 +67,6 @@ final class TimeoutObserverTests: ProcedureKitTestCase {
         wait(for: procedure1, procedure2, procedure3)
         XCTAssertProcedureCancelledWithErrors(procedure1, count: 1)
         XCTAssertProcedureCancelledWithErrors(procedure2, count: 1)
-        XCTAssertProcedureFinishedWithoutErrors(procedure3)
+        PKAssertProcedureFinished(procedure3)
     }
 }

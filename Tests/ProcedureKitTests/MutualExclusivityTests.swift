@@ -168,7 +168,7 @@ class MutualExclusiveTests: ProcedureKitTestCase {
         queue.add(operation: procedure)
         waitForExpectations(timeout: 3)
 
-        XCTAssertProcedureFinishedWithoutErrors(procedure)
+        PKAssertProcedureFinished(procedure)
         XCTAssertTrue(calledRequestLock.access)
         XCTAssertTrue(calledProcedureClaimLock.access)
         XCTAssertTrue(calledUnlock.access)
@@ -347,7 +347,7 @@ class MutualExclusiveConcurrencyTests: ConcurrencyTestCase {
         }
         waitForExpectations(timeout: 3)
 
-        XCTAssertProcedureFinishedWithoutErrors(procedure1)
+        PKAssertProcedureFinished(procedure1)
     }
 }
 

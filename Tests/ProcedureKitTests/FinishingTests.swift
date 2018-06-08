@@ -137,7 +137,7 @@ class FinishingTests: ProcedureKitTestCase {
         }
 
         wait(for: procedure)
-        XCTAssertProcedureFinishedWithoutErrors(procedure)
+        PKAssertProcedureFinished(procedure)
     }
 }
 

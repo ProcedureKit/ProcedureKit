@@ -1711,7 +1711,9 @@ internal extension Procedure {
 
     // Used from GroupProcedure to aggregate errors
     internal func append(errors: [Error]) {
-        #warning("Multiple errors are longer supported")
+
+        // TODO: Sort this out.
+
         stateLock.withCriticalScope {
             guard _state <= .executing else {
                 assertionFailure("Cannot append errors to Procedure that is finishing or finished.")

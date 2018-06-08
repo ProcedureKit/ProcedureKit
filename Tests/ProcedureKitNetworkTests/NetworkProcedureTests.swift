@@ -37,7 +37,7 @@ class NetworkReachabilityWaitProcedureTests: ProcedureKitTestCase {
         makeNetworkReachable.add(dependency: delay)
 
         wait(forAll: [delay, makeNetworkReachable, procedure])
-        XCTAssertProcedureFinishedWithoutErrors(procedure)
+        PKAssertProcedureFinished(procedure)
     }
 
     #if os(iOS)
@@ -59,7 +59,7 @@ class NetworkReachabilityWaitProcedureTests: ProcedureKitTestCase {
 
 
         wait(forAll: [delay1, changeNetwork1, delay2, changeNetwork2, procedure])
-        XCTAssertProcedureFinishedWithoutErrors(procedure)
+        PKAssertProcedureFinished(procedure)
     }
     #endif
 
@@ -102,7 +102,7 @@ class NetworkProcedureTests: ProcedureKitTestCase {
         let procedure = NetworkProcedure<Target>(body: createNetworkProcedure)
         procedure.reachability = manager
         wait(for: procedure)
-        XCTAssertProcedureFinishedWithoutErrors(procedure)
+        PKAssertProcedureFinished(procedure)
         XCTAssertFalse(network.didStartNotifier)
     }
 
@@ -119,7 +119,7 @@ class NetworkProcedureTests: ProcedureKitTestCase {
         procedure.reachability = manager
 
         wait(forAll: [procedure, delay, makeSessionSuccessful, makeNetworkReachable])
-        XCTAssertProcedureFinishedWithoutErrors(procedure)
+        PKAssertProcedureFinished(procedure)
         XCTAssertEqual(procedure.count, 2)
         XCTAssertTrue(network.didStopNotifier)
     }
@@ -135,7 +135,7 @@ class NetworkProcedureTests: ProcedureKitTestCase {
         procedure.reachability = manager
 
         wait(forAll: [procedure, delay, makeSessionSuccessful], withTimeout: 4)
-        XCTAssertProcedureFinishedWithoutErrors(procedure)
+        PKAssertProcedureFinished(procedure)
         XCTAssertEqual(procedure.count, 2)
     }
 
@@ -151,7 +151,7 @@ class NetworkProcedureTests: ProcedureKitTestCase {
         procedure.reachability = manager
 
         wait(forAll: [procedure, delay, makeSessionSuccessful], withTimeout: 4)
-        XCTAssertProcedureFinishedWithoutErrors(procedure)
+        PKAssertProcedureFinished(procedure)
         XCTAssertEqual(procedure.count, 2)
     }
 
@@ -167,7 +167,7 @@ class NetworkProcedureTests: ProcedureKitTestCase {
         procedure.reachability = manager
 
         wait(forAll: [procedure, delay, makeSessionSuccessful], withTimeout: 4)
-        XCTAssertProcedureFinishedWithoutErrors(procedure)
+        PKAssertProcedureFinished(procedure)
         XCTAssertEqual(procedure.count, 2)
     }
 
@@ -182,7 +182,7 @@ class NetworkProcedureTests: ProcedureKitTestCase {
         }.injectPayload(fromNetwork: procedure)
 
         wait(for: procedure, transform)
-        XCTAssertProcedureFinishedWithoutErrors(procedure)
+        PKAssertProcedureFinished(procedure)
         XCTAssertTrue(didReceivePayload)
     }
 

@@ -83,6 +83,6 @@ class AlertProcedureTests: ProcedureKitTestCase {
         }
 
         wait(for: alert)
-        XCTAssertProcedureFinishedWithoutErrors(alert)
+        PKAssertProcedureFinished(alert)
     }
 }

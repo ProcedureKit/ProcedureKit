@@ -18,7 +18,7 @@ class ReverseGeocodeProcedureTests: LocationProcedureTestCase {
         let procedure = ReverseGeocodeProcedure(location: location)
         procedure.geocoder = geocoder
         wait(for: procedure)
-        XCTAssertProcedureFinishedWithoutErrors(procedure)
+        PKAssertProcedureFinished(procedure)
         XCTAssertEqual(geocoder.didReverseGeocodeLocation, location)
     }
 
@@ -43,7 +43,7 @@ class ReverseGeocodeProcedureTests: LocationProcedureTestCase {
         let procedure = ReverseGeocodeProcedure(location: location)
         procedure.geocoder = geocoder
         wait(for: procedure)
-        XCTAssertProcedureFinishedWithoutErrors(procedure)
+        PKAssertProcedureFinished(procedure)
         XCTAssertNotNil(procedure.output.success)
         XCTAssertEqual(procedure.output.success, geocoder.placemarks?.first)
     }
@@ -58,7 +58,7 @@ class ReverseGeocodeProcedureTests: LocationProcedureTestCase {
         }
         procedure.geocoder = geocoder
         wait(for: procedure)
-        XCTAssertProcedureFinishedWithoutErrors(procedure)
+        PKAssertProcedureFinished(procedure)
         XCTAssertNotNil(didReceivePlacemark)
         XCTAssertEqual(didReceivePlacemark, geocoder.placemarks?.first)
     }
@@ -73,7 +73,7 @@ class ReverseGeocodeProcedureTests: LocationProcedureTestCase {
         }
         procedure.geocoder = geocoder
         wait(for: procedure)
-        XCTAssertProcedureFinishedWithoutErrors(procedure)
+        PKAssertProcedureFinished(procedure)
         XCTAssertTrue(didRunCompletionBlockOnMainQueue)
     }
 }

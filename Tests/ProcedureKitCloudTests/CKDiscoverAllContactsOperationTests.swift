@@ -49,7 +49,7 @@ class CKDiscoverAllContactsOperationTests: CKProcedureTestCase {
 
     func test__success_without_completion_block() {
         wait(for: operation)
-        XCTAssertProcedureFinishedWithoutErrors(operation)
+        PKAssertProcedureFinished(operation)
     }
 
     func test__success_with_completion_block() {
@@ -58,14 +58,14 @@ class CKDiscoverAllContactsOperationTests: CKProcedureTestCase {
             didExecuteBlock = true
         }
         wait(for: operation)
-        XCTAssertProcedureFinishedWithoutErrors(operation)
+        PKAssertProcedureFinished(operation)
         XCTAssertTrue(didExecuteBlock)
     }
 
     func test__error_without_completion_block() {
         target.error = TestError()
         wait(for: operation)
-        XCTAssertProcedureFinishedWithoutErrors(operation)
+        PKAssertProcedureFinished(operation)
     }
 
     func test__error_with_completion_block() {
@@ -106,14 +106,14 @@ class CloudKitProcedureDiscoverAllContactsOperationTests: CKProcedureTestCase {
 
     func test__success_without_completion_block_set() {
         wait(for: cloudkit)
-        XCTAssertProcedureFinishedWithoutErrors(cloudkit)
+        PKAssertProcedureFinished(cloudkit)
     }
 
     func test__success_with_completion_block_set() {
         var didSetDiscoveredUserInfo: [TestCKDiscoverAllContactsOperation.DiscoveredUserInfo]? = nil
         cloudkit.setDiscoverAllContactsCompletionBlock { didSetDiscoveredUserInfo = $0 }
         wait(for: cloudkit)
-        XCTAssertProcedureFinishedWithoutErrors(cloudkit)
+        PKAssertProcedureFinished(cloudkit)
         XCTAssertEqual(didSetDiscoveredUserInfo?.first ?? "not user info", "user info")
     }
 
@@ -124,7 +124,7 @@ class CloudKitProcedureDiscoverAllContactsOperationTests: CKProcedureTestCase {
             return operation
         }
         wait(for: cloudkit)
-        XCTAssertProcedureFinishedWithoutErrors(cloudkit)
+        PKAssertProcedureFinished(cloudkit)
     }
 
     func test__error_with_completion_block_set() {
@@ -156,7 +156,7 @@ class CloudKitProcedureDiscoverAllContactsOperationTests: CKProcedureTestCase {
         var didExecuteBlock = false
         cloudkit.setDiscoverAllContactsCompletionBlock { _ in didExecuteBlock = true }
         wait(for: cloudkit)
-        XCTAssertProcedureFinishedWithoutErrors(cloudkit)
+        PKAssertProcedureFinished(cloudkit)
         XCTAssertTrue(didExecuteBlock)
     }
 
@@ -179,7 +179,7 @@ class CloudKitProcedureDiscoverAllContactsOperationTests: CKProcedureTestCase {
         var didExecuteBlock = false
         cloudkit.setDiscoverAllContactsCompletionBlock { _ in didExecuteBlock = true }
         wait(for: cloudkit)
-        XCTAssertProcedureFinishedWithoutErrors(cloudkit)
+        PKAssertProcedureFinished(cloudkit)
         XCTAssertTrue(didExecuteBlock)
         XCTAssertTrue(didRunCustomHandler)
     }

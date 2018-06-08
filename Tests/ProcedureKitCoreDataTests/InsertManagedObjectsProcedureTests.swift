@@ -20,7 +20,7 @@ final class InsertManagedObjectsProcedureTests: ProcedureKitCoreDataTestCase {
 
         wait(for: coreDataStack, insert, fetchTestEntities)
 
-        XCTAssertProcedureFinishedWithoutErrors(insert)
+        PKAssertProcedureFinished(insert)
 
         guard let names = fetchTestEntities.output.success?.map({ $0.name! }) else {
             XCTFail("Did not fetch any test entities.")
@@ -39,7 +39,7 @@ final class InsertManagedObjectsProcedureTests: ProcedureKitCoreDataTestCase {
 
         wait(for: coreDataStack, insert, fetchTestEntities)
 
-        XCTAssertProcedureFinishedWithoutErrors(insert)
+        PKAssertProcedureFinished(insert)
 
         guard let names = fetchTestEntities.output.success?.map({ $0.name! }) else {
             XCTFail("Did not fetch any test entities.")
@@ -58,7 +58,7 @@ final class InsertManagedObjectsProcedureTests: ProcedureKitCoreDataTestCase {
 
         wait(for: coreDataStack, insert, fetchTestEntities)
 
-        XCTAssertProcedureFinishedWithoutErrors(insert)
+        PKAssertProcedureFinished(insert)
 
         guard let names = fetchTestEntities.output.success?.map({ $0.name! }) else {
             XCTFail("Did not fetch any test entities.")

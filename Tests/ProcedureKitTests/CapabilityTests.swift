@@ -149,14 +149,14 @@ class AuthorizedForTests: TestableCapabilityTestCase {
     func test__suceeds_if_requirement_is_met() {
         wait(for: procedure)
         XCTAssertConditionResultSatisfied(authorizedFor.output.value ?? .success(false))
-        XCTAssertProcedureFinishedWithoutErrors()
+        PKAssertProcedureFinished()
     }
 
     func test__async_suceeds_if_requirement_is_met() {
         capability.isAsynchronous = true
         wait(for: procedure)
         XCTAssertConditionResultSatisfied(authorizedFor.output.value ?? .success(false))
-        XCTAssertProcedureFinishedWithoutErrors()
+        PKAssertProcedureFinished()
     }
 
     func test__negated_authorized_for_and_no_failed_dependencies_succeeds() {
@@ -180,7 +180,7 @@ class AuthorizedForTests: TestableCapabilityTestCase {
         procedure.add(condition: NoFailedDependenciesCondition())
 
         wait(for: procedure)
-        XCTAssertProcedureFinishedWithoutErrors(procedure)
+        PKAssertProcedureFinished(procedure)
     }
 }
 

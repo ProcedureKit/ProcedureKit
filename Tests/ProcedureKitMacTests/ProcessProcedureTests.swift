@@ -33,25 +33,25 @@ class ProcessProcedureTests: ProcedureKitTestCase {
 
     func test__start_process() {
         wait(for: processProcedure)
-        XCTAssertProcedureFinishedWithoutErrors(processProcedure)
+        PKAssertProcedureFinished(processProcedure)
     }
 
     func test__start_process_with_executableurl() {
         processProcedure = ProcessProcedure(executableURL: executableURL, arguments: arguments)
         wait(for: processProcedure)
-        XCTAssertProcedureFinishedWithoutErrors(processProcedure)
+        PKAssertProcedureFinished(processProcedure)
     }
 
     func test__start_process_with_launchpath_only() {
         processProcedure = ProcessProcedure(launchPath: launchPath)
         wait(for: processProcedure)
-        XCTAssertProcedureFinishedWithoutErrors(processProcedure)
+        PKAssertProcedureFinished(processProcedure)
     }
 
     func test__start_process_with_executableurl_only() {
         processProcedure = ProcessProcedure(executableURL: executableURL)
         wait(for: processProcedure)
-        XCTAssertProcedureFinishedWithoutErrors(processProcedure)
+        PKAssertProcedureFinished(processProcedure)
     }
 
     func test__start_process_with_non_existent_launchpath() {
@@ -114,7 +114,7 @@ class ProcessProcedureTests: ProcedureKitTestCase {
 
     func test__processIdentifier_after_finished() {
         wait(for: processProcedure)
-        XCTAssertProcedureFinishedWithoutErrors(processProcedure)
+        PKAssertProcedureFinished(processProcedure)
         XCTAssertGreaterThan(processProcedure.processIdentifier, 0)
     }
 
@@ -132,7 +132,7 @@ class ProcessProcedureTests: ProcedureKitTestCase {
 
     func test__suspend_after_finished_returns_false() {
         wait(for: processProcedure)
-        XCTAssertProcedureFinishedWithoutErrors(processProcedure)
+        PKAssertProcedureFinished(processProcedure)
         weak var didSuspendExpectation = expectation(description: "Did Suspend: \(#function)")
         processProcedure.suspend { success in
             DispatchQueue.main.async {
@@ -157,7 +157,7 @@ class ProcessProcedureTests: ProcedureKitTestCase {
 
     func test__resume_after_finished_returns_false() {
         wait(for: processProcedure)
-        XCTAssertProcedureFinishedWithoutErrors(processProcedure)
+        PKAssertProcedureFinished(processProcedure)
         weak var didResumeExpectation = expectation(description: "Did Resume: \(#function)")
         processProcedure.resume { success in
             DispatchQueue.main.async {
@@ -374,7 +374,7 @@ class ProcessProcedureTests: ProcedureKitTestCase {
         })
         wait(for: processProcedure)
         XCTAssertTrue(didCallClosure.access, "processDidExitCleanly closure was not called.")
-        XCTAssertProcedureFinishedWithoutErrors(processProcedure)
+        PKAssertProcedureFinished(processProcedure)
     }
 }
 

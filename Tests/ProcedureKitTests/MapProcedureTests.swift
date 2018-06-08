@@ -13,7 +13,7 @@ class MapProcedureTests: ProcedureKitTestCase {
     func test__requirement_is_mapped_to_result() {
         let functional = MapProcedure(source: [0,1,2,3,4,5,6,7]) { $0 * 2 }
         wait(for: functional)
-        XCTAssertProcedureFinishedWithoutErrors(functional)
+        PKAssertProcedureFinished(functional)
         XCTAssertEqual(functional.output.success ?? [0,1,2,3,4,5,6,7], [0,2,4,6,8,10,12,14])
     }
 
@@ -27,8 +27,8 @@ class MapProcedureTests: ProcedureKitTestCase {
         let numbers = NumbersProcedure()
         let functional = numbers.map { $0 * 2 }
         wait(for: numbers, functional)
-        XCTAssertProcedureFinishedWithoutErrors(numbers)
-        XCTAssertProcedureFinishedWithoutErrors(functional)
+        PKAssertProcedureFinished(numbers)
+        PKAssertProcedureFinished(functional)
         XCTAssertEqual(functional.output.success ?? [0,1,2,3,4,5,6,7], [0,2,4,6,8,10,12,14,16,18])
     }
 
@@ -50,7 +50,7 @@ class FlatMapProcedureTests: ProcedureKitTestCase {
             return value * 2
         }
         wait(for: functional)
-        XCTAssertProcedureFinishedWithoutErrors(functional)
+        PKAssertProcedureFinished(functional)
         XCTAssertEqual(functional.output.success ?? [0,1,2,3,4,5,6,7,8,9], [0,4,8,12,16])
     }
 
@@ -67,8 +67,8 @@ class FlatMapProcedureTests: ProcedureKitTestCase {
             return value * 2
         }
         wait(for: numbers, functional)
-        XCTAssertProcedureFinishedWithoutErrors(numbers)
-        XCTAssertProcedureFinishedWithoutErrors(functional)
+        PKAssertProcedureFinished(numbers)
+        PKAssertProcedureFinished(functional)
         XCTAssertEqual(functional.output.success ?? [0,1,2,3,4,5,6,7,8,9], [0,4,8,12,16])
     }
 

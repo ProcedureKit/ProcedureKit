@@ -76,28 +76,28 @@ class UIProcedureTests: ProcedureKitTestCase {
         presenting.check = checkReceivedViewController(inNavigationController: true)
         let ui = UIProcedure(present: presented, from: presenting, withStyle: .present, sender: nil)
         wait(for: ui)
-        XCTAssertProcedureFinishedWithoutErrors(ui)
+        PKAssertProcedureFinished(ui)
     }
 
     func test__present_style_without_navigation_controller() {
         presenting.check = checkReceivedViewController(inNavigationController: false)
         let ui = UIProcedure(present: presented, from: presenting, withStyle: .present, inNavigationController: false, sender: nil)
         wait(for: ui)
-        XCTAssertProcedureFinishedWithoutErrors(ui)
+        PKAssertProcedureFinished(ui)
     }
 
     func test__show_style() {
         presenting.check = checkReceivedViewController(inNavigationController: false)
         let ui = UIProcedure(present: presented, from: presenting, withStyle: .show, sender: nil)
         wait(for: ui)
-        XCTAssertProcedureFinishedWithoutErrors(ui)
+        PKAssertProcedureFinished(ui)
     }
 
     func test__show_detail_style() {
         presenting.check = checkReceivedViewController(inNavigationController: false)
         let ui = UIProcedure(present: presented, from: presenting, withStyle: .showDetail, sender: nil)
         wait(for: ui)
-        XCTAssertProcedureFinishedWithoutErrors(ui)
+        PKAssertProcedureFinished(ui)
     }
 
     func test__present_dismissing_view_controller() {
@@ -107,6 +107,6 @@ class UIProcedureTests: ProcedureKitTestCase {
         let dismiss = BlockProcedure { [unowned self] in self.presented.dismissTheViewController() }
         dismiss.add(dependency: delay)
         wait(for: ui, delay, dismiss)
-        XCTAssertProcedureFinishedWithoutErrors(ui)
+        PKAssertProcedureFinished(ui)
     }
 }

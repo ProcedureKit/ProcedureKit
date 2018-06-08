@@ -14,14 +14,15 @@ class TransformProcedureTests: ProcedureKitTestCase {
         let timesTwo = TransformProcedure<Int, Int> { return $0 * 2 }
         timesTwo.input = .ready(2)
         wait(for: timesTwo)
-        XCTAssertProcedureFinishedWithoutErrors(timesTwo)
+        PKAssertProcedureFinished(timesTwo)
         XCTAssertEqual(timesTwo.output.success ?? 0, 4)
     }
 
     func test__requirement_is_nil_finishes_with_error() {
         let timesTwo = TransformProcedure<Int, Int> { return $0 * 2 }
+        // Note that input has not been set
         wait(for: timesTwo)
-        XCTAssertProcedureFinishedWithErrors(timesTwo, count: 1)
+        PKAssertProcedureError(timesTwo, ProcedureKitError.requirementNotSatisfied())
     }
 }
 
@@ -47,7 +48,7 @@ class AsyncTransformProcedureTests: ProcedureKitTestCase {
         }
         timesTwo.input = .ready(2)
         wait(for: timesTwo)
-        XCTAssertProcedureFinishedWithoutErrors(timesTwo)
+        PKAssertProcedureFinished(timesTwo)
         XCTAssertEqual(timesTwo.output.success ?? 0, 4)
     }
 
@@ -58,6 +59,6 @@ class AsyncTransformProcedureTests: ProcedureKitTestCase {
             }
         }
         wait(for: timesTwo)
-        XCTAssertProcedureFinishedWithErrors(timesTwo, count: 1)
+        PKAssertProcedureError(timesTwo, ProcedureKitError.requirementNotSatisfied())
     }
 }

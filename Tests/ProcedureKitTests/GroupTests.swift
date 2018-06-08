@@ -181,8 +181,8 @@ class GroupTests: GroupTestCase {
         waitForExpectations(timeout: 3)
 
         XCTAssertTrue(didExecuteOnDesiredQueue.access, "execute() did not execute on the desired underlyingQueue")
-        XCTAssertProcedureFinishedWithoutErrors(group)
-        XCTAssertProcedureFinishedWithoutErrors(child)
+        PKAssertProcedureFinished(group)
+        PKAssertProcedureFinished(child)
     }
 
     // MARK: - Error Tests
@@ -472,9 +472,9 @@ class GroupTests: GroupTestCase {
         addCompletionBlockTo(procedure: producedOperation)
         group = TestGroupProcedure(operations: child)
         wait(for: group)
-        XCTAssertProcedureFinishedWithoutErrors(group)
-        XCTAssertProcedureFinishedWithoutErrors(child)
-        XCTAssertProcedureFinishedWithoutErrors(producedOperation)
+        PKAssertProcedureFinished(group)
+        PKAssertProcedureFinished(child)
+        PKAssertProcedureFinished(producedOperation)
     }
 
     func test__group_does_not_finish_before_child_produced_operations_are_finished() {
@@ -486,8 +486,8 @@ class GroupTests: GroupTestCase {
             try! operation.produce(operation: childProducedOperation, before: pendingExecute) // swiftlint:disable:this force_try
         }
         wait(for: group)
-        XCTAssertProcedureFinishedWithoutErrors(group)
-        XCTAssertProcedureFinishedWithoutErrors(childProducedOperation)
+        PKAssertProcedureFinished(group)
+        PKAssertProcedureFinished(childProducedOperation)
     }
 
     func test__group_children_array_receives_operations_produced_by_children() {
@@ -695,7 +695,7 @@ class GroupEventConcurrencyTests: GroupTestCase {
         // .observer_DidFinish event.
         waitForBaseObserverDidFinish(timeout: 2)
 
-        XCTAssertProcedureFinishedWithoutErrors(group)
+        PKAssertProcedureFinished(group)
         XCTAssertProcedureNoConcurrentEvents(group)
 
         let expectedBeginningEvents: [EventConcurrencyTrackingRegistrar.ProcedureEvent] = [.observer_didAttach, .observer_willExecute, .do_Execute]
@@ -733,8 +733,8 @@ class GroupAddChildConcurrencyTests: ProcedureKitTestCase {
         let group = EventConcurrencyTrackingGroupProcedure(operations: [], registrar: EventConcurrencyTrackingRegistrar(recordHistory: true))
         group.add(child: child)
         wait(for: group)
-        XCTAssertProcedureFinishedWithoutErrors(child)
-        XCTAssertProcedureFinishedWithoutErrors(group)
+        PKAssertProcedureFinished(child)
+        PKAssertProcedureFinished(group)
         XCTAssertProcedureNoConcurrentEvents(group)
     }
 
@@ -748,7 +748,7 @@ class GroupAddChildConcurrencyTests: ProcedureKitTestCase {
         group.add(child: child)
         wait(for: group, childFinishedOperation)
         XCTAssertTrue(child.isFinished)
-        XCTAssertProcedureFinishedWithoutErrors(group)
+        PKAssertProcedureFinished(group)
         XCTAssertProcedureNoConcurrentEvents(group)
     }
 
@@ -764,9 +764,9 @@ class GroupAddChildConcurrencyTests: ProcedureKitTestCase {
             group.add(child: addedChild)
         }
         wait(for: group)
-        XCTAssertProcedureFinishedWithoutErrors(initialChild)
-        XCTAssertProcedureFinishedWithoutErrors(addedChild)
-        XCTAssertProcedureFinishedWithoutErrors(group)
+        PKAssertProcedureFinished(initialChild)
+        PKAssertProcedureFinished(addedChild)
+        PKAssertProcedureFinished(group)
         XCTAssertProcedureNoConcurrentEvents(group)
     }
 
@@ -798,7 +798,7 @@ class GroupAddChildConcurrencyTests: ProcedureKitTestCase {
             procedureIsFinished_InWillAddObserver = procedure.isFinished
         }
         wait(for: procedure)
-        XCTAssertProcedureFinishedWithoutErrors(procedure)
+        PKAssertProcedureFinished(procedure)
         XCTAssertTrue(didExecuteWillAddObserverForAddedChildOperation, "group never executed its WillAddOperation observer for the added child operation")
         XCTAssertFalse(procedureIsExecuting_InWillAddObserver, "group was executing when its WillAddOperation observer was fired for the added child operation")
         XCTAssertFalse(procedureIsFinished_InWillAddObserver, "group was finished when its WillAddOperation observer was fired for the added child operation")
@@ -832,7 +832,7 @@ class GroupAddChildConcurrencyTests: ProcedureKitTestCase {
             procedureIsFinished_InWillAddObserver = procedure.isFinished
         }
         wait(for: procedure)
-        XCTAssertProcedureFinishedWithoutErrors(procedure)
+        PKAssertProcedureFinished(procedure)
         XCTAssertTrue(didExecuteWillAddObserverForAddedChildOperation, "procedure never executed its WillAddOperation observer for the produced operation")
         XCTAssertFalse(procedureIsExecuting_InWillAddObserver, "procedure was executing when its WillAddOperation observer was fired for the produced operation")
         XCTAssertFalse(procedureIsFinished_InWillAddObserver, "procedure was finished when its WillAddOperation observer was fired for the produced operation")

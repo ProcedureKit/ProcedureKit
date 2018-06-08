@@ -23,7 +23,7 @@ class ReduceProcedureTests: ProcedureKitTestCase {
     func test__requirement_is_reduced_to_result() {
         let reduced = ReduceProcedure(source: [0, 1, 2, 3, 4, 5 , 6 , 7, 8, 9], initial: 0, nextPartialResult: +)
         wait(for: reduced)
-        XCTAssertProcedureFinishedWithoutErrors(reduced)
+        PKAssertProcedureFinished(reduced)
         XCTAssertEqual(reduced.output.success ?? 0, 45)
     }
 
@@ -37,8 +37,8 @@ class ReduceProcedureTests: ProcedureKitTestCase {
         let numbers = NumbersProcedure()
         let reduced = numbers.reduce(0, nextPartialResult: +)
         wait(for: numbers, reduced)
-        XCTAssertProcedureFinishedWithoutErrors(numbers)
-        XCTAssertProcedureFinishedWithoutErrors(reduced)
+        PKAssertProcedureFinished(numbers)
+        PKAssertProcedureFinished(reduced)
         XCTAssertEqual(reduced.output.success ?? 0, 45)
     }
 

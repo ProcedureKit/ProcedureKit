@@ -57,28 +57,26 @@ internal func __XCTEvaluateAssertion(testCase: XCTestCase, _ message: @autoclosu
 
 public extension ProcedureKitTestCase {
 
-    func PKAssertProcedureFinished<T: Procedure>(_ exp: @autoclosure () throws -> T, _ message: @autoclosure () -> String = "", file: StaticString = #file, line: UInt = #line) {
+    func PKAssertProcedureFinished<T: Procedure>(_ exp: @autoclosure () throws -> T, withErrors: Bool = false, cancelling: Bool = false, _ message: @autoclosure () -> String = "", file: StaticString = #file, line: UInt = #line) {
         __XCTEvaluateAssertion(testCase: self, message, file: file, line: line) {
             let procedure = try exp()
-            if let error = procedure.error {
+
+            if !withErrors, let error = procedure.error {
                 return .expectedFailure("\(procedure.procedureName) has error: \(error).")
             }
-            guard !procedure.isCancelled else {
+
+            guard !cancelling, !procedure.isCancelled else {
                 return .expectedFailure("\(procedure.procedureName) was cancelled.")
             }
+
+            guard cancelling, procedure.isCancelled else {
+                return .expectedFailure("\(procedure.procedureName) was not cancelled.")
+            }
+
             guard procedure.isFinished else {
                 return .expectedFailure("\(procedure.procedureName) did not finish.")
             }
-            return .success
-        }
-    }
 
-    func PKAssertProcedureCancelled<T: Procedure>(_ exp: @autoclosure () throws -> T, _ message: @autoclosure () -> String = "", file: StaticString = #file, line: UInt = #line) {
-        __XCTEvaluateAssertion(testCase: self, message, file: file, line: line) {
-            let procedure = try exp()
-            guard procedure.isCancelled else {
-                return .expectedFailure("\(procedure.procedureName) was not cancelled.")
-            }
             return .success
         }
     }
@@ -98,6 +96,21 @@ public extension ProcedureKitTestCase {
             }
             return .success
         }
+    }
+
+
+    func PKAssertProcedureCancelled<T: Procedure>(_ exp: @autoclosure () throws -> T, withErrors: Bool = true, _ message: @autoclosure () -> String = "", file: StaticString = #file, line: UInt = #line) {
+        PKAssertProcedureFinished(exp, withErrors: withErrors, cancelling: true, message, file: file, line: line)
+    }
+
+    func PKAssertProcedureFinishedWithError<T: Procedure, E: Error>(_ exp: @autoclosure () throws -> T, _ exp2: @autoclosure () throws -> E, _ message: @autoclosure () -> String = "", file: StaticString = #file, line: UInt = #line) where E: Equatable {
+        PKAssertProcedureFinished(exp, withErrors: true, message, file: file, line: line)
+        PKAssertProcedureError(exp, exp2, message, file: file, line: line)
+    }
+
+    func PKAssertProcedureCancelledWithError<T: Procedure, E: Error>(_ exp: @autoclosure () throws -> T, _ exp2: @autoclosure () throws -> E, _ message: @autoclosure () -> String = "", file: StaticString = #file, line: UInt = #line) where E: Equatable {
+        PKAssertProcedureCancelled(exp, withErrors: true, message, file: file, line: line)
+        PKAssertProcedureError(exp, exp2, message, file: file, line: line)
     }
 
     func PKAssertConditionSatisfied(_ exp1: @autoclosure () throws -> ConditionResult, _ message: @autoclosure () -> String = "", file: StaticString = #file, line: UInt = #line) {

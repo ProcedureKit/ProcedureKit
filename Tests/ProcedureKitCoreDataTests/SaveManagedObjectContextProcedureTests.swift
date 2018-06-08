@@ -30,7 +30,7 @@ final class SaveManagedObjectContextProcedureTests: ProcedureKitCoreDataTestCase
 
         wait(for: coreDataStack, insert, save, fetchTestEntities)
 
-        XCTAssertProcedureFinishedWithoutErrors(save)
+        PKAssertProcedureFinished(save)
 
         guard let testEntity = fetchTestEntities.output.success?.first else {
             XCTFail("Did not fetch any test entities.")

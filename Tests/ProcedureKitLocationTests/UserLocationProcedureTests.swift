@@ -17,7 +17,7 @@ class UserLocationProcedureTests: LocationProcedureTestCase {
         let procedure = UserLocationProcedure(accuracy: accuracy)
         procedure.manager = manager
         wait(for: procedure)
-        XCTAssertProcedureFinishedWithoutErrors(procedure)
+        PKAssertProcedureFinished(procedure)
         XCTAssertEqual(procedure.output.success, location)
         XCTAssertEqual(manager.didSetDesiredAccuracy, accuracy)
         XCTAssertTrue(manager.didSetDelegate)
@@ -32,7 +32,7 @@ class UserLocationProcedureTests: LocationProcedureTestCase {
         }
         procedure.manager = manager
         wait(for: procedure)
-        XCTAssertProcedureFinishedWithoutErrors(procedure)
+        PKAssertProcedureFinished(procedure)
         XCTAssertEqual(receivedLocation, location)
         XCTAssertEqual(manager.didSetDesiredAccuracy, accuracy)
         XCTAssertTrue(manager.didSetDelegate)
@@ -61,7 +61,7 @@ class UserLocationProcedureTests: LocationProcedureTestCase {
         let procedure = UserLocationProcedure(accuracy: kCLLocationAccuracyBestForNavigation)
         procedure.manager = manager
         wait(for: procedure)
-        XCTAssertProcedureFinishedWithoutErrors(procedure)
+        PKAssertProcedureFinished(procedure)
     }
 
     func test__finishes_with_error_if_location_manager_fails() {

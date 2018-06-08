@@ -15,7 +15,7 @@ class ReverseGeocodeUserLocationProcedureTests: LocationProcedureTestCase {
         geocoder.placemarks = [placemark]
         let procedure = ReverseGeocodeUserLocationProcedure().set(manager: manager).set(geocoder: geocoder)
         wait(for: procedure)
-        XCTAssertProcedureFinishedWithoutErrors(procedure)
+        PKAssertProcedureFinished(procedure)
         XCTAssertEqual(geocoder.didReverseGeocodeLocation, location)
     }
 
@@ -28,7 +28,7 @@ class ReverseGeocodeUserLocationProcedureTests: LocationProcedureTestCase {
             exp.fulfill()
         }.set(manager: manager).set(geocoder: geocoder)
         wait(for: procedure)
-        XCTAssertProcedureFinishedWithoutErrors(procedure)
+        PKAssertProcedureFinished(procedure)
         XCTAssertNotNil(didReceiveUserLocationPlacemark)
         XCTAssertEqual(didReceiveUserLocationPlacemark, UserLocationPlacemark(location: location, placemark: placemark))
     }

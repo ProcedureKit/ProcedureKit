@@ -100,7 +100,7 @@ open class UserLocationProcedure: Procedure, OutputProcedure, CLLocationManagerD
             weakSelf.stopLocationUpdates()
             let pkerror = ProcedureKitError.component(ProcedureKitLocationComponent(), error: error)
             weakSelf.output = .ready(.failure(pkerror))
-            weakSelf.finish(withError: pkerror)
+            weakSelf.finish(with: pkerror)
         }
     }
 }

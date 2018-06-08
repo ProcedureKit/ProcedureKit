@@ -37,20 +37,20 @@ class NetworkUploadProcedureTests: ProcedureKitTestCase {
 
     func test__session_receives_request() {
         wait(for: upload)
-        XCTAssertProcedureFinishedWithoutErrors(upload)
+        PKAssertProcedureFinished(upload)
         XCTAssertEqual(session.didReceiveUploadRequest?.url, url)
     }
 
     func test__session_creates_upload_task() {
         wait(for: upload)
-        XCTAssertProcedureFinishedWithoutErrors(upload)
+        PKAssertProcedureFinished(upload)
         XCTAssertNotNil(session.didReturnUploadTask)
         XCTAssertEqual(session.didReturnUploadTask, upload.task as? TestableURLSessionTask)
     }
 
     func test__upload_resumes_data_task() {
         wait(for: upload)
-        XCTAssertProcedureFinishedWithoutErrors(upload)
+        PKAssertProcedureFinished(upload)
         XCTAssertTrue(session.didReturnUploadTask?.didResume ?? false)
     }
 
@@ -111,7 +111,7 @@ class NetworkUploadProcedureTests: ProcedureKitTestCase {
         session.returnedError = NSError(domain: NSURLErrorDomain, code: NSURLErrorNotConnectedToInternet, userInfo: nil)
         wait(for: upload)
         XCTAssertProcedureFinishedWithErrors(upload, count: 1)
-        XCTAssertNotNil(upload.networkError)
+        XCTAssertNotNil(upload.error)
     }
 
     func test__completion_handler_receives_data_and_response() {
@@ -122,7 +122,7 @@ class NetworkUploadProcedureTests: ProcedureKitTestCase {
             completionHandlerDidExecute = true
         }
         wait(for: upload)
-        XCTAssertProcedureFinishedWithoutErrors(upload)
+        PKAssertProcedureFinished(upload)
         XCTAssertTrue(completionHandlerDidExecute)
     }
 

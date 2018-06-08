@@ -33,20 +33,20 @@ class NetworkDownloadProcedureTests: ProcedureKitTestCase {
 
     func test__session_receive_request() {
         wait(for: download)
-        XCTAssertProcedureFinishedWithoutErrors(download)
+        PKAssertProcedureFinished(download)
         XCTAssertEqual(session.didReceiveDownloadRequest?.url, url)
     }
 
     func test__session_creates_download_task() {
         wait(for: download)
-        XCTAssertProcedureFinishedWithoutErrors(download)
+        PKAssertProcedureFinished(download)
         XCTAssertNotNil(session.didReturnDownloadTask)
         XCTAssertEqual(session.didReturnDownloadTask, download.task as? TestableURLSessionTask)
     }
 
     func test__download_resumes_download_task() {
         wait(for: download)
-        XCTAssertProcedureFinishedWithoutErrors(download)
+        PKAssertProcedureFinished(download)
         XCTAssertTrue(session.didReturnDownloadTask?.didResume ?? false)
     }
 
@@ -107,7 +107,7 @@ class NetworkDownloadProcedureTests: ProcedureKitTestCase {
         session.returnedError = NSError(domain: NSURLErrorDomain, code: NSURLErrorNotConnectedToInternet, userInfo: nil)
         wait(for: download)
         XCTAssertProcedureFinishedWithErrors(download, count: 1)
-        XCTAssertNotNil(download.networkError)
+        XCTAssertNotNil(download.error)
     }
 
     func test__completion_handler_receives_data_and_response() {
@@ -118,7 +118,7 @@ class NetworkDownloadProcedureTests: ProcedureKitTestCase {
             completionHandlerDidExecute = true
         }
         wait(for: download)
-        XCTAssertProcedureFinishedWithoutErrors(download)
+        PKAssertProcedureFinished(download)
         XCTAssertTrue(completionHandlerDidExecute)
     }
 

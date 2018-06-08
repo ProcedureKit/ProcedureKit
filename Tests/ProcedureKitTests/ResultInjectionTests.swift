@@ -70,7 +70,7 @@ class ResultInjectionTests: ResultInjectionTestCase {
     func test__automatic_requirement_is_injected() {
         processing.injectResult(from: procedure)
         wait(for: processing, procedure)
-        XCTAssertProcedureFinishedWithoutErrors(processing)
+        PKAssertProcedureFinished(processing)
     }
 
     func test__receiver_cancels_with_error_if_dependency_errors() {
@@ -123,7 +123,7 @@ class ResultInjectionTests: ResultInjectionTestCase {
         let print = Printing().injectResult(from: hello)
         print.log.severity = .notice
         wait(for: print, hello)
-        XCTAssertProcedureFinishedWithoutErrors(print)
+        PKAssertProcedureFinished(print)
     }
 
     func test__automatic_unwrap_when_result_is_nil_optional_requrement() {
@@ -138,9 +138,9 @@ class ResultInjectionTests: ResultInjectionTestCase {
         let world = ResultProcedure { "World" }
         let mapped = [world, hello].flatMap { $0.uppercased() }
         wait(forAll: [hello, world, mapped])
-        XCTAssertProcedureFinishedWithoutErrors(hello)
-        XCTAssertProcedureFinishedWithoutErrors(world)
-        XCTAssertProcedureFinishedWithoutErrors(mapped)
+        PKAssertProcedureFinished(hello)
+        PKAssertProcedureFinished(world)
+        PKAssertProcedureFinished(mapped)
         XCTAssertEqual(mapped.output.success ?? [], ["WORLD", "HELLO"])
     }
 
@@ -152,9 +152,9 @@ class ResultInjectionTests: ResultInjectionTestCase {
             return "\(accumulator) \(element)"
         }
         wait(forAll: [hello, world, helloWorld])
-        XCTAssertProcedureFinishedWithoutErrors(hello)
-        XCTAssertProcedureFinishedWithoutErrors(world)
-        XCTAssertProcedureFinishedWithoutErrors(helloWorld)
+        PKAssertProcedureFinished(hello)
+        PKAssertProcedureFinished(world)
+        PKAssertProcedureFinished(helloWorld)
         XCTAssertEqual(helloWorld.output.success, "Hello World")
     }
 
@@ -164,8 +164,8 @@ class ResultInjectionTests: ResultInjectionTestCase {
         let error = TestError()
         let helloWorld = [hello, world].reduce("") { _, _ in throw error }
         wait(forAll: [hello, world, helloWorld])
-        XCTAssertProcedureFinishedWithoutErrors(hello)
-        XCTAssertProcedureFinishedWithoutErrors(world)
+        PKAssertProcedureFinished(hello)
+        PKAssertProcedureFinished(world)
         XCTAssertProcedureFinishedWithErrors(helloWorld, count: 1)
         XCTAssertNil(helloWorld.output.success)
     }
@@ -176,9 +176,9 @@ class ResultInjectionTests: ResultInjectionTestCase {
         let gathered = [hello, world].gathered()
 
         wait(forAll: [hello, world, gathered])
-        XCTAssertProcedureFinishedWithoutErrors(hello)
-        XCTAssertProcedureFinishedWithoutErrors(world)
-        XCTAssertProcedureFinishedWithoutErrors(gathered)
+        PKAssertProcedureFinished(hello)
+        PKAssertProcedureFinished(world)
+        PKAssertProcedureFinished(gathered)
         XCTAssertEqual(gathered.output.success ?? [], ["Hello", "World"])
     }
 
@@ -190,9 +190,9 @@ class ResultInjectionTests: ResultInjectionTestCase {
         dan.add(dependency: world) // note that bind does not setup any dependencies.
 
         wait(for: hello, world, dan)
-        XCTAssertProcedureFinishedWithoutErrors(hello)
-        XCTAssertProcedureFinishedWithoutErrors(world)
-        XCTAssertProcedureFinishedWithoutErrors(dan)
+        PKAssertProcedureFinished(hello)
+        PKAssertProcedureFinished(world)
+        PKAssertProcedureFinished(dan)
         XCTAssertEqual(dan.output.success ?? "Hello World", "Hello Dan")
     }
 
@@ -221,8 +221,8 @@ class ResultInjectionTests: ResultInjectionTestCase {
         let group = TestGroup().injectResult(from: hello)
 
         wait(for: hello, group)
-        XCTAssertProcedureFinishedWithoutErrors(hello)
-        XCTAssertProcedureFinishedWithoutErrors(group)
+        PKAssertProcedureFinished(hello)
+        PKAssertProcedureFinished(group)
         XCTAssertEqual(group.output.success ?? "Hello World", "Hello World, we are running on ProcedureKit")
     }
 }

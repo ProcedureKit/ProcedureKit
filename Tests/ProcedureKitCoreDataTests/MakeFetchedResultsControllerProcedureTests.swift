@@ -18,7 +18,7 @@ final class MakeFetchedResultsControllerProcedureTests: ProcedureKitCoreDataTest
 
         wait(for: coreDataStack, makeFRC)
 
-        XCTAssertProcedureFinishedWithoutErrors(makeFRC)
+        PKAssertProcedureFinished(makeFRC)
 
         guard let _ = makeFRC.output.success else {
             XCTFail("Did not make FRC")
