@@ -387,21 +387,37 @@ open class ConcurrencyTrackingObserver: ProcedureObserver {
         }
     }
 
-    public func will(execute procedure: Procedure, pendingExecute: PendingExecuteEvent) { doRun(.observer_willExecute, block: { callback in callbackBlock(procedure, callback) }) }
+    public func will(execute procedure: Procedure, pendingExecute: PendingExecuteEvent) {
+        doRun(.observer_willExecute, block: { callback in callbackBlock(procedure, callback) })
+    }
 
-    public func did(execute procedure: Procedure) { doRun(.observer_didExecute, block: { callback in callbackBlock(procedure, callback) }) }
+    public func did(execute procedure: Procedure) {
+        doRun(.observer_didExecute, block: { callback in callbackBlock(procedure, callback) })
+    }
 
-    public func will(cancel procedure: Procedure, withErrors: [Error]) { doRun(.observer_willCancel, block: { callback in callbackBlock(procedure, callback) }) }
+    public func will(cancel procedure: Procedure, withErrors: [Error]) {
+        doRun(.observer_willCancel, block: { callback in callbackBlock(procedure, callback) })
+    }
 
-    public func did(cancel procedure: Procedure, withErrors: [Error]) { doRun(.observer_didCancel, block: { callback in callbackBlock(procedure, callback) }) }
+    public func did(cancel procedure: Procedure, withErrors: [Error]) {
+        doRun(.observer_didCancel, block: { callback in callbackBlock(procedure, callback) })
+    }
 
-    public func procedure(_ procedure: Procedure, willAdd newOperation: Operation) { doRun(.observer_procedureWillAdd(newOperation.operationName), block: { callback in callbackBlock(procedure, callback) }) }
+    public func procedure(_ procedure: Procedure, willAdd newOperation: Operation) {
+        doRun(.observer_procedureWillAdd(newOperation.operationName), block: { callback in callbackBlock(procedure, callback) })
+    }
 
-    public func procedure(_ procedure: Procedure, didAdd newOperation: Operation) { doRun(.observer_procedureDidAdd(newOperation.operationName), block: { callback in callbackBlock(procedure, callback) }) }
+    public func procedure(_ procedure: Procedure, didAdd newOperation: Operation) {
+        doRun(.observer_procedureDidAdd(newOperation.operationName), block: { callback in callbackBlock(procedure, callback) })
+    }
 
-    public func will(finish procedure: Procedure, withErrors errors: [Error], pendingFinish: PendingFinishEvent) { doRun(.observer_willFinish, block: { callback in callbackBlock(procedure, callback) }) }
+    public func will(finish procedure: Procedure, withErrors errors: [Error], pendingFinish: PendingFinishEvent) {
+        doRun(.observer_willFinish, block: { callback in callbackBlock(procedure, callback) })
+    }
 
-    public func did(finish procedure: Procedure, withErrors errors: [Error]) { doRun(.observer_didFinish, block: { callback in callbackBlock(procedure, callback) }) }
+    public func did(finish procedure: Procedure, withErrors errors: [Error]) {
+        doRun(.observer_didFinish, block: { callback in callbackBlock(procedure, callback) })
+    }
 
     public func doRun(_ callback: EventConcurrencyTrackingRegistrar.ProcedureEvent, withDelay delay: TimeInterval = 0.0001, block: (EventConcurrencyTrackingRegistrar.ProcedureEvent) -> Void = { _ in }) {
         registrar.doRun(callback, withDelay: delay, block: block)
@@ -438,18 +454,18 @@ open class EventConcurrencyTrackingProcedure: Procedure, EventConcurrencyTrackin
         })
     }
     // Cancellation Handler Overrides
-    open override func procedureDidCancel(withErrors: [Error]) {
+    open override func procedureDidCancel(with error: Error?) {
         concurrencyRegistrar.doRun(.override_procedureDidCancel)
-        super.procedureDidCancel(withErrors: withErrors)
+        super.procedureDidCancel(with: error)
     }
     // Finish Handler Overrides
-    open override func procedureWillFinish(withErrors: [Error]) {
+    open override func procedureWillFinish(with error: Error?) {
         concurrencyRegistrar.doRun(.override_procedureWillFinish)
-        super.procedureWillFinish(withErrors: withErrors)
+        super.procedureWillFinish(with: error)
     }
-    open override func procedureDidFinish(withErrors: [Error]) {
+    open override func procedureDidFinish(with error: Error?) {
         concurrencyRegistrar.doRun(.override_procedureDidFinish)
-        super.procedureDidFinish(withErrors: withErrors)
+        super.procedureDidFinish(with: error)
     }
 }
 
@@ -465,7 +481,7 @@ open class EventConcurrencyTrackingGroupProcedure: GroupProcedure, EventConcurre
             add(observer: baseObserver)
         }
         // GroupProcedure transformChildErrorsBlock
-        transformChildErrorsBlock = { [concurrencyRegistrar] (child, errors) in
+        transformChildErrorBlock = { [concurrencyRegistrar] (child, _) in
             concurrencyRegistrar.doRun(.group_transformChildErrorsBlock(child.operationName))
         }
     }
@@ -475,18 +491,18 @@ open class EventConcurrencyTrackingGroupProcedure: GroupProcedure, EventConcurre
         })
     }
     // Cancellation Handler Overrides
-    open override func procedureDidCancel(withErrors: [Error]) {
+    open override func procedureDidCancel(with error: Error?) {
         concurrencyRegistrar.doRun(.override_procedureDidCancel)
-        super.procedureDidCancel(withErrors: withErrors)
+        super.procedureDidCancel(with: error)
     }
     // Finish Handler Overrides
-    open override func procedureWillFinish(withErrors: [Error]) {
+    open override func procedureWillFinish(with error: Error?) {
         concurrencyRegistrar.doRun(.override_procedureWillFinish)
-        super.procedureWillFinish(withErrors: withErrors)
+        super.procedureWillFinish(with: error)
     }
-    open override func procedureDidFinish(withErrors: [Error]) {
+    open override func procedureDidFinish(with error: Error?) {
         concurrencyRegistrar.doRun(.override_procedureDidFinish)
-        super.procedureDidFinish(withErrors: withErrors)
+        super.procedureDidFinish(with: error)
     }
 
     // GroupProcedure Overrides
