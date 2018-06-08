@@ -31,7 +31,7 @@ open class BatchProcedure<Transform: Procedure>: GroupProcedure, InputProcedure,
         guard let input = input.value else {
             let error = ProcedureKitError.requirementNotSatisfied()
             output = .ready(.failure(error))
-            cancel(withError: error)
+            cancel(with: error)
             return
         }
 

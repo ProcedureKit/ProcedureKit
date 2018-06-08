@@ -191,10 +191,10 @@ open class RepeatProcedure<T: Operation>: GroupProcedure {
     ///
     /// - IMPORTANT: If subclassing RepeatProcedure and overriding this method, consider
     /// carefully whether / when / how you should call `super.child(_:willFinishWithErrors:)`.
-    open override func child(_ child: Procedure, willFinishWithErrors errors: [Error]) {
+    open override func child(_ child: Procedure, willFinishWithError error: Error?) {
         eventQueue.debugAssertIsOnQueue()
         _addNextOperation(child === self.current)
-        super.child(child, willFinishWithErrors: errors) // default GroupProcedure error-handling
+        super.child(child, willFinishWithError: error) // default GroupProcedure error-handling
     }
 
     /// Adds the next payload from the iterator to the queue.
@@ -385,7 +385,7 @@ extension RepeatProcedure: InputProcedure where T: InputProcedure {
                 procedure.input = .ready(try block(output))
             }
             catch {
-                procedure.cancel(withError: ProcedureKitError.dependency(finishedWithErrors: [error]))
+                procedure.cancel(with: ProcedureKitError.dependency(finishedWithError: error))
             }
         }
     }

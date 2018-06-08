@@ -12,16 +12,16 @@ import Foundation
 final public class IgnoreErrorsProcedure<T: Procedure>: ComposedProcedure<T> {
 
     /// Override to supress errors from the composed procedure
-    override public func child(_ child: Procedure, willFinishWithErrors errors: [Error]) {
+    override public func child(_ child: Procedure, willFinishWithError error: Error?) {
         assert(!child.isFinished, "child(_:willFinishWithErrors:) called with a child that has already finished")
 
         // No errors - call the super.
-        guard !errors.isEmpty else {
-            super.child(child, willFinishWithErrors: errors)
+        guard let e = error else {
+            super.child(child, willFinishWithError: error)
             return
         }
 
         // If there are errors, just log them.
-        log.warning(message: "Ignoring \(errors.count) errors from \(child.operationName).")
+        log.warning(message: "Ignoring \(e) errors from \(child.operationName).")
     }
 }

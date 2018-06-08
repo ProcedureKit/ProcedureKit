@@ -18,7 +18,7 @@ open class ResultProcedure<Output>: Procedure, OutputProcedure {
     }
 
     open override func execute() {
-        defer { finish(withError: output.error) }
+        defer { finish(with: output.error) }
         do { output = .ready(.success(try block())) }
         catch { output = .ready(.failure(error)) }
     }
@@ -64,7 +64,7 @@ open class CancellableResultProcedure<Output>: Procedure, OutputProcedure {
     }
 
     open override func execute() {
-        defer { finish(withError: output.error) }
+        defer { finish(with: output.error) }
         do { output = .ready(.success(try block({[unowned self] in return self.isCancelled }))) }
         catch { output = .ready(.failure(error)) }
     }
@@ -82,11 +82,11 @@ open class UIBlockProcedure: AsyncBlockProcedure {
     public init(block: @escaping ThrowingOutputBlock) {
         super.init { finishWithResult in
             let sub = BlockProcedure(block: block)
-            sub.addDidFinishBlockObserver { (_, errors) in
-                finishWithResult(.failure(ProcedureKitError.dependency(finishedWithErrors: errors)))
+            sub.addDidFinishBlockObserver { (_, error) in
+                finishWithResult(.failure(ProcedureKitError.dependency(finishedWithError: error)))
             }
-            sub.addDidCancelBlockObserver { (_, errors) in
-                finishWithResult(.failure(ProcedureKitError.dependency(cancelledWithErrors: errors)))
+            sub.addDidCancelBlockObserver { (_, error) in
+                finishWithResult(.failure(ProcedureKitError.dependency(cancelledWithError: error)))
             }
 
             ProcedureQueue.main.add(operation: BlockProcedure(block: block))

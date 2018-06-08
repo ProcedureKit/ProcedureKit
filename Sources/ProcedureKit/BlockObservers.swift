@@ -9,18 +9,18 @@ import Foundation
 public struct Observer<Procedure: ProcedureProtocol> {
 
     public typealias VoidBlock = (Procedure) -> Void
-    public typealias ErrorsBlock = (Procedure, [Error]) -> Void
+    public typealias ErrorBlock = (Procedure, Error?) -> Void
     public typealias ProducerBlock = (Procedure, Operation) -> Void
 
     public typealias DidAttach = VoidBlock
     public typealias DidSetInputReady = VoidBlock
     public typealias WillExecute = (Procedure, PendingExecuteEvent) -> Void
     public typealias DidExecute = VoidBlock
-    public typealias DidCancel = ErrorsBlock
+    public typealias DidCancel = ErrorBlock
     public typealias WillAdd = ProducerBlock
     public typealias DidAdd = ProducerBlock
-    public typealias WillFinish = (Procedure, [Error], PendingFinishEvent) -> Void
-    public typealias DidFinish = ErrorsBlock
+    public typealias WillFinish = (Procedure, Error?, PendingFinishEvent) -> Void
+    public typealias DidFinish = ErrorBlock
 
     private init() { }
 }
@@ -108,8 +108,8 @@ public struct BlockObserver<Procedure: ProcedureProtocol>: ProcedureObserver {
         didExecute?(procedure)
     }
 
-    public func did(cancel procedure: Procedure, withErrors errors: [Error]) {
-        didCancel?(procedure, errors)
+    public func did(cancel procedure: Procedure, with error: Error?) {
+        didCancel?(procedure, error)
     }
 
     public func procedure(_ procedure: Procedure, willAdd newOperation: Operation) {
@@ -120,12 +120,12 @@ public struct BlockObserver<Procedure: ProcedureProtocol>: ProcedureObserver {
         didAdd?(procedure, newOperation)
     }
 
-    public func will(finish procedure: Procedure, withErrors errors: [Error], pendingFinish: PendingFinishEvent) {
-        willFinish?(procedure, errors, pendingFinish)
+    public func will(finish procedure: Procedure, with error: Error?, pendingFinish: PendingFinishEvent) {
+        willFinish?(procedure, error, pendingFinish)
     }
 
-    public func did(finish procedure: Procedure, withErrors errors: [Error]) {
-        didFinish?(procedure, errors)
+    public func did(finish procedure: Procedure, with error: Error?) {
+        didFinish?(procedure, error)
     }
 }
 
@@ -269,8 +269,8 @@ public struct DidCancelObserver<Procedure: ProcedureProtocol>: ProcedureObserver
     /// Observes when the attached procedure did cancel.
     /// - parameter cancel: the procedure which is cancelled.
     /// - parameter errors: the errors the procedure was cancelled with.
-    public func did(cancel procedure: Procedure, withErrors errors: [Error]) {
-        block(procedure, errors)
+    public func did(cancel procedure: Procedure, with error: Error?) {
+        block(procedure, error)
     }
 }
 
@@ -368,8 +368,8 @@ public struct WillFinishObserver<Procedure: ProcedureProtocol>: ProcedureObserve
     /// Observes when the attached procedure will finish.
     /// - parameter procedure: the procedure which will finish.
     /// - parameter errors: the errors the procedure will finish with
-    public func will(finish procedure: Procedure, withErrors errors: [Error], pendingFinish: PendingFinishEvent) {
-        block(procedure, errors, pendingFinish)
+    public func will(finish procedure: Procedure, with error: Error?, pendingFinish: PendingFinishEvent) {
+        block(procedure, error, pendingFinish)
     }
 }
 
@@ -403,8 +403,8 @@ public struct DidFinishObserver<Procedure: ProcedureProtocol>: ProcedureObserver
     /// Observes when the attached procedure did finish.
     /// - parameter procedure: the procedure which will finish.
     /// - parameter errors: the errors the procedure will finish with
-    public func did(finish procedure: Procedure, withErrors errors: [Error]) {
-        block(procedure, errors)
+    public func did(finish procedure: Procedure, with error: Error?) {
+        block(procedure, error)
     }
 }
 
@@ -500,12 +500,3 @@ public extension InputProcedure {
     }
 }
 
-// MARK: - Unavailable
-
-public extension ProcedureProtocol {
-
-    @available(*, unavailable, renamed: "addDidCancelBlockObserver(block:)", message: "WillCancel observers are no longer available. Use a DidCancel observer.")
-    func addWillCancelBlockObserver(block: @escaping Observer<Self>.ErrorsBlock) {
-        fatalError("No longer available.")
-    }
-}

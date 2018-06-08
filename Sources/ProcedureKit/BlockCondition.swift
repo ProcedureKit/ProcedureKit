@@ -31,7 +31,7 @@ public final class BlockCondition: Condition {
             completion(.success(try block()))
         }
         catch {
-            completion(.failure(ProcedureKitError.conditionFailed(withErrors: [error])))
+            completion(.failure(ProcedureKitError.conditionFailed(with: error)))
         }
     }
 }

@@ -163,7 +163,7 @@ open class Procedure: Operation, ProcedureProtocol {
     // (used if a Procedure is cancelled and finish() is called prior to the queue
     // starting the Procedure - see `shouldFinish`)
     fileprivate struct FinishingInfo {
-        var receivedErrors: [Error]
+        var error: Error?
         var source: ProcedureKit.FinishingFrom
     }
     private var _pendingFinish: FinishingInfo?
@@ -345,16 +345,17 @@ open class Procedure: Operation, ProcedureProtocol {
     // Grouped in a class to allow for easily deinitializing in `deinit`.
     fileprivate class ProtectedProperties {
         var log: LoggerProtocol = Logger()
-        var errors = [Error]()
+        var error: Error? = nil
         var observers = [AnyObserver<Procedure>]()
         var directDependencies = Set<Operation>()
         var conditions = Set<Condition>()
     }
+
     fileprivate var protectedProperties: ProtectedProperties! = ProtectedProperties() // see deinit
 
     // the errors variable to be used *within* the stateLock
-    private var _errors: [Error] {
-        return protectedProperties.errors
+    private var _error: Error? {
+        return protectedProperties.error
     }
 
     // the log variable to be used *within* the stateLock
@@ -367,8 +368,8 @@ open class Procedure: Operation, ProcedureProtocol {
 
     // MARK: Errors
 
-    public var errors: [Error] {
-        return stateLock.withCriticalScope { _errors }
+    public var error: Error? {
+        return stateLock.withCriticalScope { _error }
     }
 
     // MARK: Log
@@ -716,7 +717,7 @@ open class Procedure: Operation, ProcedureProtocol {
 
                 // Check to see if the procedure has now been cancelled
                 // by an observer
-                guard (_errors.isEmpty && !_isCancelled) || isAutomaticFinishingDisabled else {
+                guard ((_error == nil) && !_isCancelled) || isAutomaticFinishingDisabled else {
                     return .finishing
                 }
 
@@ -936,18 +937,18 @@ open class Procedure: Operation, ProcedureProtocol {
 
      */
 
-    open func procedureDidCancel(withErrors: [Error]) { }
-
-    public final func cancel(withErrors errors: [Error]) {
-        _cancel(withAdditionalErrors: errors)
-    }
+    open func procedureDidCancel(with: Error) { }
 
     public final override func cancel() {
-        _cancel(withAdditionalErrors: [])
+        _cancel(with: nil)
+    }
+
+    public final func cancel(with error: Error?) {
+        _cancel(with: error)
     }
 
     // Micro-optimaization used by GroupProcedure to bypass dispatching to the event queue for its cancellation handling
-    internal func _procedureDidCancel(withAdditionalErrors additionalErrors: [Error]) {
+    internal func _procedureDidCancel(with error: Error?) {
         // no-op
     }
 
@@ -957,6 +958,7 @@ open class Procedure: Operation, ProcedureProtocol {
         case alreadyCancelling
         case alreadyCancelled
     }
+
     private var shouldCancel: ShouldCancelResult {
         return stateLock.withCriticalScope {
             // Do not cancel if already finished or finishing, or if finish has already been called
@@ -970,9 +972,10 @@ open class Procedure: Operation, ProcedureProtocol {
         }
     }
 
-    private final func _cancel(withAdditionalErrors additionalErrors: [Error], promise: ProcedurePromise? = nil) {
+    private final func _cancel(with error: Error?, promise: ProcedurePromise? = nil) {
 
         let shouldCancel = self.shouldCancel
+
         guard shouldCancel == .shouldCancel else {
             promise?.complete()//(withFailure: shouldCancel.error ?? ProcedureKitError.unknown)
             return
@@ -983,15 +986,18 @@ open class Procedure: Operation, ProcedureProtocol {
 
         willChangeValue(forKey: .cancelled)
 
-        let resultingErrors = stateLock.withCriticalScope { () -> [Error] in
-            if !additionalErrors.isEmpty {
-                protectedProperties.errors.append(contentsOf: additionalErrors)
-            }
+        let resultingError = stateLock.withCriticalScope { () -> Error? in
+            protectedProperties.error = error
             _isCancelled = true
-            return protectedProperties.errors
+            return protectedProperties.error
         }
 
-        log.notice(message: "Will cancel with \(!additionalErrors.isEmpty ? "errors: \(additionalErrors)" : "no errors").")
+        if let error = error {
+            log.notice(message: "Will cancel with error: \(error).")
+        }
+        else {
+            log.notice(message: "Will cancel with no error.")
+        }
 
         didChangeValue(forKey: .cancelled)
 
@@ -999,7 +1005,7 @@ open class Procedure: Operation, ProcedureProtocol {
         super.cancel()
 
         // Micro-optimization for built-in Procedures that can safely handle cancellation off the EventQueue
-        _procedureDidCancel(withAdditionalErrors: additionalErrors)
+        _procedureDidCancel(with: error)
 
         // Cancel the EvaluateConditions operation (in case the Procedure is cancelled
         // before its dependencies have finished, and the EvaluateConditions operation
@@ -1014,12 +1020,12 @@ open class Procedure: Operation, ProcedureProtocol {
         dispatchEvent {
 
             // procedureDidCancel(withErrors:) override
-            self.procedureDidCancel(withErrors: resultingErrors)
+            self.procedureDidCancel(with: resultingError)
 
             // DidCancel observers
             self.log.verbose(message: "[observers]: DidCancel")
             let didCancelObserversGroup = self.dispatchObservers(pendingEvent: PendingEvent.postDidCancel) { observer, _ in
-                observer.did(cancel: self, withErrors: resultingErrors)
+                observer.did(cancel: self, with: resultingError)
             }
 
             // After the DidCancel observers have all completed
@@ -1033,7 +1039,7 @@ open class Procedure: Operation, ProcedureProtocol {
                     // finish() will handle ensuring that only the first call to finish succeeds
                     // (i.e. if a DidCancel observer has already called finish, that call is the one
                     // that succeeds)
-                    self.finish(withErrors: pendingAutomaticFinish.receivedErrors, from: pendingAutomaticFinish.source)
+                    self.finish(with: pendingAutomaticFinish.error, from: pendingAutomaticFinish.source)
 
                     // Ensure that the EvaluateConditions operation is cancelled
                     self.evaluateConditionsProcedure?.cancel()
@@ -1046,9 +1052,9 @@ open class Procedure: Operation, ProcedureProtocol {
 
     // MARK: - Finishing
 
-    open func procedureWillFinish(withErrors: [Error]) { }
+    open func procedureWillFinish(with: Error?) { }
 
-    open func procedureDidFinish(withErrors: [Error]) { }
+    open func procedureDidFinish(with: Error?) { }
 
     /**
      Finish method which must be called eventually after an operation has
@@ -1060,9 +1066,9 @@ open class Procedure: Operation, ProcedureProtocol {
 
      - parameter errors: an array of `Error`, which defaults to empty.
      */
-    public func finish(withErrors errors: [Error] = []) {
+    public func finish(with error: Error? = nil) {
         log.verbose(message: "finish() called")
-        finish(withErrors: errors, from: .finish)
+        finish(with: error, from: .finish)
     }
 
     // Used to queue an automatic finish from Procedure.start()/main()
@@ -1078,7 +1084,7 @@ open class Procedure: Operation, ProcedureProtocol {
             // DidCancel observers have already been run, and given a chance to call finish() themselves.
             // Thus, it is safe to call finish() directly here (which will queue a finish attempt at the
             // end of the EventQueue):
-            finish(withErrors: [], from: source)
+            finish(with: nil, from: source)
         }
         else {
             // DidCancel observers have not yet been run.
@@ -1091,11 +1097,11 @@ open class Procedure: Operation, ProcedureProtocol {
             //
             // Instead, store the pendingAutomaticFinish for processing in the DidCancel observer block
             // (whenever it is executed):
-            pendingAutomaticFinish = FinishingInfo(receivedErrors: [], source: source)
+            pendingAutomaticFinish = FinishingInfo(error: nil, source: source)
         }
     }
 
-    private final func shouldFinish(withErrors receivedErrors: [Error], from source: ProcedureKit.FinishingFrom) -> FinishingInfo? {
+    private final func shouldFinish(with receivedError: Error?, from source: ProcedureKit.FinishingFrom) -> FinishingInfo? {
         return stateLock.withCriticalScope {
             // Do not finish is already finishing or finished
             guard _state <= .finishing else { return nil }
@@ -1121,17 +1127,18 @@ open class Procedure: Operation, ProcedureProtocol {
                 //
                 // (It's an error for an Operation added to an OperationQueue to
                 // set isFinished to true prior to the queue starting the Operation.)
-                _pendingFinish = FinishingInfo(receivedErrors: receivedErrors, source: source)
+                _pendingFinish = FinishingInfo(error: receivedError, source: source)
                 return nil
             }
 
-            return FinishingInfo(receivedErrors: receivedErrors, source: source)
+            return FinishingInfo(error: receivedError, source: source)
         }
     }
 
-    private final func finish(withErrors receivedErrors: [Error], from source: ProcedureKit.FinishingFrom) {
-        guard let finishingInfo = shouldFinish(withErrors: receivedErrors, from: source) else {
-            log.verbose(message: "An earlier call to finish \((isFinished) ? "has already succeeded." : "is pending. The Procedure will finish from the first call.") This call will have no effect: finish(withErrors: \(receivedErrors))")
+    private final func finish(with receivedError: Error?, from source: ProcedureKit.FinishingFrom) {
+
+        guard let finishingInfo = shouldFinish(with: receivedError, from: source) else {
+            log.verbose(message: "An earlier call to finish \((isFinished) ? "has already succeeded." : "is pending. The Procedure will finish from the first call.") This call will have no effect: finish(with: \(receivedError.debugDescription)")
             return
         }
 
@@ -1175,27 +1182,30 @@ open class Procedure: Operation, ProcedureProtocol {
         }
 
         // Change the state to .finishing and set & retrieve the final resulting array of errors
-        let resultingErrors: [Error] = stateLock.withCriticalScope {
+        let resultingError: Error? = stateLock.withCriticalScope {
+            protectedProperties.error = info.error
             _state = .finishing
-            if !info.receivedErrors.isEmpty {
-                protectedProperties.errors.append(contentsOf: info.receivedErrors)
-            }
-            return protectedProperties.errors
+            return protectedProperties.error
         }
 
         if changedExecutingState {
             didChangeValue(forKey: .executing)
         }
 
-        log.notice(message: "Will finish with \(!resultingErrors.isEmpty ? "errors: \(resultingErrors)" : "no errors").")
-
-        procedureWillFinish(withErrors: resultingErrors)
-
-        let willFinishObserversGroup = dispatchObservers(pendingEvent: PendingEvent.finish) {
-            $0.will(finish: self, withErrors: resultingErrors, pendingFinish: $1)
+        if let error = resultingError {
+            log.notice(message: "Will finish with error: \(error).")
+        }
+        else {
+            log.notice(message: "Will finish with no errors.")
         }
 
-        optimizedDispatchEventNotify(group: willFinishObserversGroup, block: {
+        procedureWillFinish(with: resultingError)
+
+        let willFinishObserversGroup = dispatchObservers(pendingEvent: PendingEvent.finish) {
+            $0.will(finish: self, with: resultingError, pendingFinish: $1)
+        }
+
+        optimizedDispatchEventNotify(group: willFinishObserversGroup) {
             // Once all the WillFinishObservers have completed, continue processing finish
 
             self.log.verbose(message: "[event]: Resuming pending finish")
@@ -1223,7 +1233,7 @@ open class Procedure: Operation, ProcedureProtocol {
             self.didChangeValue(forKey: .finished)
 
             // Call the Procedure.procedureDidFinish(withErrors:) override
-            self.procedureDidFinish(withErrors: resultingErrors)
+            self.procedureDidFinish(with: resultingError)
 
             // If mutually exclusive categories were locked, unlock
             if let mutuallyExclusiveCategories = self.mutuallyExclusiveCategories {
@@ -1232,15 +1242,20 @@ open class Procedure: Operation, ProcedureProtocol {
 
             // Dispatch the DidFinishObservers
             let didFinishObserversGroup = self.dispatchObservers(pendingEvent: PendingEvent.postFinish) { observer, _ in
-                observer.did(finish: self, withErrors: resultingErrors)
+                observer.did(finish: self, with: resultingError)
             }
 
-            self.optimizedDispatchEventNotify(group: didFinishObserversGroup, block: {
+            self.optimizedDispatchEventNotify(group: didFinishObserversGroup) {
                 // Once all the DidFinishObservers have completed, log a final notice
 
-                self.log.notice(message: "Did finish with \(!resultingErrors.isEmpty ? "errors: \(resultingErrors)" : "no errors").")
-            })
-        })
+                if let error = resultingError {
+                    self.log.notice(message: "Did finish with error: \(error).")
+                }
+                else {
+                    self.log.notice(message: "Did finish with no errors.")
+                }
+            }
+        }
     }
 
     // MARK: - Observers
@@ -1575,12 +1590,7 @@ extension Procedure {
                     return
                 case let .failure(error):
                     procedure.log.verbose(message: "Condition(s) failed with errors: \(error).")
-                    if let failedConditions = error as? ProcedureKitError.FailedConditions {
-                        procedure.cancel(withErrors: failedConditions.errors)
-                    }
-                    else {
-                        procedure.cancel(withError: error)
-                    }
+                    procedure.cancel(with: error)
                     // Finish this EvaluateConditions operation immediately
                     self.finish()
                     return
@@ -1701,23 +1711,15 @@ internal extension Procedure {
 
     // Used from GroupProcedure to aggregate errors
     internal func append(errors: [Error]) {
+        #warning("Multiple errors are longer supported")
         stateLock.withCriticalScope {
             guard _state <= .executing else {
                 assertionFailure("Cannot append errors to Procedure that is finishing or finished.")
                 return
             }
-            protectedProperties.errors.append(contentsOf: errors)
+//            protectedProperties.errors.append(contentsOf: errors)
         }
     }
-}
-
-// MARK: - Unavailable
-
-public extension Procedure {
-
-    @available(*, unavailable, renamed: "procedureDidCancel(withErrors:)", message: "procedureWillCancel is no longer available. Use procedureDidCancel.")
-    public func procedureWillCancel(withErrors: [Error]) { }
-
 }
 
 // swiftlint:enable type_body_length
