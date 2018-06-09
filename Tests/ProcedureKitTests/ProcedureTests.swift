@@ -239,7 +239,7 @@ class ExecutionTests: ProcedureKitTestCase {
         addCompletionBlockTo(procedure: procedure, withExpectationDescription: "\(#function)")
         [procedure].enqueue()
         waitForExpectations(timeout: 3, handler: nil)
-        PKAssertProcedureFinished()
+        PKAssertProcedureFinished(procedure)
     }
 
     func test__enqueue_a_sequence_of_operations_deallocates_queue() {
@@ -506,7 +506,7 @@ class ProduceTests: ProcedureKitTestCase {
         wait(for: procedure)
         PKAssertProcedureFinished(producedOperation)
         PKAssertProcedureFinished(procedure)
-        XCTAssertProcedureNoConcurrentEvents(procedure)
+        PKAssertProcedureNoConcurrentEvents(procedure)
     }
 
     func test__procedure_produce_operation_before_execute() {
@@ -523,7 +523,7 @@ class ProduceTests: ProcedureKitTestCase {
         wait(for: procedure)
         PKAssertProcedureFinished(producedOperation)
         PKAssertProcedureFinished(procedure)
-        XCTAssertProcedureNoConcurrentEvents(procedure)
+        PKAssertProcedureNoConcurrentEvents(procedure)
     }
 
     func test__procedure_produce_operation_before_execute_async() {

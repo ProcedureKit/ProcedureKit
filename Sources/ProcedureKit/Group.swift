@@ -1,4 +1,4 @@
-//
+    //
 //  ProcedureKit
 //
 //  Copyright © 2015-2018 ProcedureKit. All rights reserved.
@@ -26,15 +26,25 @@ open class GroupProcedure: Procedure {
     fileprivate var groupCanFinish: CanFinishGroup!
     fileprivate var groupStateLock = PThreadMutex()
 
+    @discardableResult
+    fileprivate func synchronise<T>(block: () -> T) -> T {
+        return groupStateLock.withCriticalScope(block: block)
+    }
+
     // Protected private properties
+    fileprivate var _groupWorkingError = GroupError() // swiftlint:disable:this variable_name
     fileprivate var _groupChildren: [Operation] // swiftlint:disable:this variable_name
     fileprivate var _groupIsFinishing = false // swiftlint:disable:this variable_name
     fileprivate var _groupIsSuspended = false // swiftlint:disable:this variable_name
     fileprivate var _groupTransformChildErrorBlock: TransformChildErrorBlockType?
 
+    public override var error: Error? {
+        get { return makeGroupError() }
+    }
+
     /// - returns: the operations which have been added to the queue
     final public var children: [Operation] {
-        get { return groupStateLock.withCriticalScope { _groupChildren } }
+        get { return synchronise { _groupChildren } }
     }
 
     /**
@@ -124,7 +134,6 @@ open class GroupProcedure: Procedure {
         // we must cancelAllOperations and also ensure the queue is not suspended.
         queue.cancelAllOperations()
         queue.isSuspended = false
-
     }
 
     // MARK: - Handling Cancellation
@@ -196,12 +205,11 @@ open class GroupProcedure: Procedure {
     */
     open func child(_ child: Procedure, willFinishWithError error: Error?) {
         assert(!child.isFinished, "child(_:willFinishWithError:) called with a child that has already finished")
-
-        // Default GroupProcedure error-handling behavior:
-        // - Aggregate errors from child Procedures
-
         guard let error = error else { return }
-        append(errors: [error], fromChild: child)
+
+        // Default GroupProcedure error-handling is to collect
+        // any errors related to non-Procedure subclasses.
+        append(error: error, fromChild: child)
     }
 
     @available(*, deprecated: 5.0.0, renamed: "child(_:willFinishWithError:)", message: "Use child(_:,willFinishWithError:) instead.")
@@ -422,6 +430,30 @@ public extension GroupProcedure {
     }
 }
 
+// MARK: - Errors
+
+public extension GroupProcedure {
+
+    public final class GroupError: Error {
+
+        public fileprivate(set) var errors: [Error]
+
+        internal init(errors: [Error] = []) {
+            self.errors = errors
+        }
+
+        internal func append(error: Error) {
+            errors.append(error)
+        }
+    }
+
+    internal func makeGroupError() -> Error {
+        return synchronise {
+            return GroupError(errors: _groupWorkingError.errors)
+        }
+    }
+}
+
 public extension GroupProcedure {
 
     // MARK: - Aggregating Errors
@@ -435,20 +467,22 @@ public extension GroupProcedure {
         } else {
             log.warning(message: "Appending error: \(error).")
         }
-        append(errors: [error])
+        
+        debugAssertIsExecuting("Cannot append errors to Group which is finishing or already finished.")
+
+        synchronise {
+            _groupWorkingError.append(error: error)
+        }
     }
 
     /// Append errors to the Group's errors
     ///
     /// - Parameter errors: an [Error]
     /// - Parameter child: a child Operation
+    @available(*, unavailable, renamed: "append(error:fromChild:)", message: "Use append(error:fromChild:) instead.")
     final public func append(errors: [Error], fromChild child: Operation? = nil) {
-        if let child = child {
-            log.warning(message: "\(child.operationName) did encounter \(errors.count) errors.")
-        } else {
-            log.warning(message: "Appending \(errors.count) errors.")
-        }
-        append(errors: errors)
+        guard let error = errors.first else { return }
+        append(error: error, fromChild: child)
     }
 }
 

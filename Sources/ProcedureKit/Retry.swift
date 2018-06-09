@@ -13,7 +13,7 @@ public struct RetryFailureInfo<T: Procedure> {
     public let operation: T
 
     /// - returns: the errors the operation finished with
-    public let errors: [Error]
+    public let error: Error
 
     /// - returns: the number of attempts made so far
     public let count: Int
@@ -45,7 +45,7 @@ public struct RetryFailureInfo<T: Procedure> {
 public extension RetryFailureInfo {
 
     var errorCode: Int? {
-        return (errors.first as NSError?)?.code
+        return (error as NSError?)?.code
     }
 }
 
@@ -118,16 +118,17 @@ open class RetryProcedure<T: Procedure>: RepeatProcedure<T> {
     /// Handle child willFinish event
     ///
     /// This is used by RetryProcedure to trigger adding the next Procedure,
-    /// if the current Procedure fails with errors.
+    /// if the current Procedure fails with an error.
     ///
     /// If no further Procedure will be attempted (based on the Retry block / iterator),
-    /// it adds the current (last) Procedure's errors to the Group's errors.
+    /// it adds the current (last) Procedure's error to the Group's error.
     ///
     /// - IMPORTANT: If subclassing RetryProcedure and overriding this method, consider
-    /// carefully whether / when / how you should call `super.child(_:willFinishWithErrors:)`.
-    open override func child(_ child: Procedure, willFinishWithErrors errors: [Error]) {
+    /// carefully whether / when / how you should call `super.child(_:willFinishWithError:)`.
+    open override func child(_ child: Procedure, willFinishWithError error: Error?) {
         eventQueue.debugAssertIsOnQueue()
         assert(!child.isFinished, "child(_:willFinishWithErrors:) called with a child that has already finished")
+
         guard child === current else {
             // There may be other Procedures that finish, such as DelayProcedures (between retried
             // Procedures), and Procedures produced onto the Group's internal queue.
@@ -137,31 +138,32 @@ open class RetryProcedure<T: Procedure>: RepeatProcedure<T> {
             // errors.
             return
         }
-        guard !errors.isEmpty else {
+
+        guard let error = error else {
             // The RetryProcedure's current Procedure succeeded - stop retrying.
             return
         }
 
         var willAttemptAnotherOperation = false
         defer {
-            log.notice(message: "\(willAttemptAnotherOperation ? "will attempt" : "will not attempt") recovery from errors: \(errors) in operation: \(child)")
+            log.notice(message: "\(willAttemptAnotherOperation ? "will attempt" : "will not attempt") recovery from error: \(error) in operation: \(child)")
         }
-        retry.info = createFailureInfo(for: current, errors: errors)
+        retry.info = createFailureInfo(for: current, error: error)
         willAttemptAnotherOperation = _addNextOperation()
         retry.info = .none
         if !willAttemptAnotherOperation {
-            // If no further operation will be attempted, append the errors from this child
+            // If no further operation will be attempted, append the error from this child
             // to the Group's errors.
-            append(errors: errors, fromChild: child)
+            append(error: error, fromChild: child)
         }
         // Do not call super.child(_:willFinishWithErrors:)
         // To ensure that we do not retry/repeat successful procedures (via RepeatProcedure)
     }
 
-    internal func createFailureInfo(for operation: T, errors: [Error]) -> FailureInfo {
+    internal func createFailureInfo(for operation: T, error: Error) -> FailureInfo {
         return FailureInfo(
             operation: operation,
-            errors: errors,
+            error: error,
             count: count,
             addOperations: { (ops: Operation...) in self.add(children: ops, before: nil); return },
             log: log,

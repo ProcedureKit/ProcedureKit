@@ -28,9 +28,10 @@ class ReduceProcedureTests: ProcedureKitTestCase {
     }
 
     func test__finishes_with_error_if_block_throws() {
-        let reduced = ReduceProcedure(source: [0, 1, 2, 3, 4, 5 , 6 , 7, 8, 9], initial: 0) { _, _ in throw TestError() }
+        let error = TestError()
+        let reduced = ReduceProcedure(source: [0, 1, 2, 3, 4, 5 , 6 , 7, 8, 9], initial: 0) { _, _ in throw error }
         wait(for: reduced)
-        XCTAssertProcedureFinishedWithErrors(reduced, count: 1)
+        PKAssertProcedureFinishedWithError(reduced, error)
     }
 
     func test__reduce_dependency_which_finishes_without_errors() {
@@ -43,10 +44,11 @@ class ReduceProcedureTests: ProcedureKitTestCase {
     }
 
     func test__reduce_dependency_which_finishes_with_error() {
-        let numbers = NumbersProcedure(error: TestError())
+        let error = TestError()
+        let numbers = NumbersProcedure(error: error)
         let reduced = numbers.reduce(0, nextPartialResult: +)
         wait(for: numbers, reduced)
-        XCTAssertProcedureFinishedWithErrors(numbers, count: 1)
-        XCTAssertProcedureCancelledWithErrors(reduced, count: 1)
+        PKAssertProcedureFinishedWithError(numbers, error)
+        PKAssertProcedureCancelledWithError(reduced, error)
     }
 }

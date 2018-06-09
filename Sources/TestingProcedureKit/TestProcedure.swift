@@ -14,6 +14,7 @@ public struct TestError: Error, Equatable, CustomDebugStringConvertible {
     }
 
     let uuid = UUID()
+
     public init() { }
 
     public var debugDescription: String {

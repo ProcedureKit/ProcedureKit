@@ -43,15 +43,15 @@ class RepeatProcedureTests: RepeatTestCase {
     func test__init_with_no_max_and_delay_iterator() {
         repeatProcedure = RepeatProcedure(delay: Delay.Iterator.immediate, iterator: createIterator(succeedsAfterCount: 2))
         wait(for: repeatProcedure)
-        XCTAssertProcedureFinishedWithErrors(repeatProcedure, count: 1)
         XCTAssertEqual(repeatProcedure.count, 2)
+        PKAssertProcedureFinishedWithError(repeatProcedure, expectedError)
     }
 
     func test__init_with_no_max_and_wait_strategy() {
         repeatProcedure = RepeatProcedure(wait: .constant(0.001), iterator: createIterator(succeedsAfterCount: 2))
         wait(for: repeatProcedure)
-        XCTAssertProcedureFinishedWithErrors(repeatProcedure, count: 1)
         XCTAssertEqual(repeatProcedure.count, 2)
+        PKAssertProcedureFinishedWithError(repeatProcedure, expectedError)
     }
 
     func test__append_configure_block() {

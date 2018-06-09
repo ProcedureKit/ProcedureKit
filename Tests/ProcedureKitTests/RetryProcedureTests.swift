@@ -20,8 +20,8 @@ class RetryProcedureTests: RetryTestCase {
     func test__with_max_count() {
         retry = Retry(max: 2, iterator: createPayloadIterator(succeedsAfterFailureCount: 4), retry: { $1 })
         wait(for: retry)
-        XCTAssertProcedureFinishedWithErrors(retry, count: 1)
         XCTAssertEqual(retry.count, 2)
+        PKAssertProcedureFinishedWithError(retry, ProcedureKitError.conditionFailed())
     }
 
     func test__with_delay_and_operation_iterator() {
@@ -54,8 +54,8 @@ class RetryProcedureTests: RetryTestCase {
         var textOutput: [String] = []
         retry.addWillAddOperationBlockObserver { (_, operation) in
             if let procedure = operation as? TestProcedure {
-                procedure.addDidFinishBlockObserver { (testProcedure, errors) in
-                    guard errors.count == 0 else { return }
+                procedure.addDidFinishBlockObserver { (testProcedure, error) in
+                    guard error == nil else { return }
                     if let output = testProcedure.output.value?.value {
                         textOutput.append(output)
                     }

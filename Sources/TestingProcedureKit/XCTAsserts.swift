@@ -59,6 +59,7 @@ public extension ProcedureKitTestCase {
 
     func PKAssertProcedureFinished<T: Procedure>(_ exp: @autoclosure () throws -> T, withErrors: Bool = false, cancelling: Bool = false, _ message: @autoclosure () -> String = "", file: StaticString = #file, line: UInt = #line) {
         __XCTEvaluateAssertion(testCase: self, message, file: file, line: line) {
+
             let procedure = try exp()
 
             if !withErrors, let error = procedure.error {

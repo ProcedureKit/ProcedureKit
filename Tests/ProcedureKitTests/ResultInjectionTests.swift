@@ -14,7 +14,7 @@ class DataProcessing: Procedure, InputProcedure, OutputProcedure {
 
     override func execute() {
         guard let output = input.value else {
-            finish(withError: ProcedureKitError.requirementNotSatisfied())
+            finish(with: ProcedureKitError.requirementNotSatisfied())
             return
         }
         log.info(message: output)
@@ -49,7 +49,7 @@ class ResultInjectionTests: ResultInjectionTestCase {
 
     func test__block_is_executed() {
         var injectionBlockDidExecute = false
-        processing.inject(dependency: procedure) { processing, dependency, errors in
+        processing.inject(dependency: procedure) { processing, dependency, error in
             injectionBlockDidExecute = true
         }
         wait(for: procedure, processing)
@@ -57,14 +57,17 @@ class ResultInjectionTests: ResultInjectionTestCase {
     }
 
     func test__block_passes_through_errors() {
-        let error = TestError()
-        var receivedErrors: [Error] = []
-        procedure = TestProcedure(error: error)
-        processing.inject(dependency: procedure) { processing, dependency, errors in
-            receivedErrors = errors
+        let expectedError = TestError()
+        var receivedError: Error?
+        procedure = TestProcedure(error: expectedError)
+        processing.inject(dependency: procedure) { processing, dependency, error in
+            receivedError = expectedError
         }
         wait(for: procedure, processing)
-        XCTAssertTrue(TestError.verify(errors: receivedErrors, contains: error))
+        guard let error = receivedError as? TestError else {
+            XCTFail("Did not receive an error"); return
+        }
+        XCTAssertEqual(expectedError, error)
     }
 
     func test__automatic_requirement_is_injected() {
@@ -74,47 +77,25 @@ class ResultInjectionTests: ResultInjectionTestCase {
     }
 
     func test__receiver_cancels_with_error_if_dependency_errors() {
-        let error = TestError()
-        procedure = TestProcedure(error: error)
+        let expectedError = TestError()
+        procedure = TestProcedure(error: expectedError)
         processing.injectResult(from: procedure)
-        processing.addDidCancelBlockObserver { processing, errors in
-            XCTAssertEqual(errors.count, 1)
-            guard let procedureKitError = errors.first as? ProcedureKitError else {
-                XCTFail("Incorrect error received"); return
-            }
-            XCTAssertEqual(procedureKitError.context, .dependencyFinishedWithErrors)
-            XCTAssertTrue(TestError.verify(errors: procedureKitError.errors, contains: error))
-        }
         wait(for: processing, procedure)
-        XCTAssertProcedureCancelledWithErrors(processing, count: 1)
+        PKAssertProcedureCancelledWithError(processing, ProcedureKitError.dependency(finishedWithError: expectedError))
     }
 
     func test__receiver_cancels_with_errors_if_requirement_not_met() {
         procedure.output = .pending
         printing.injectResult(from: procedure)
-        printing.addDidCancelBlockObserver { printing, errors in
-            XCTAssertEqual(errors.count, 1)
-            guard let procedureKitError = errors.first as? ProcedureKitError else {
-                XCTFail("Incorrect error received"); return
-            }
-            XCTAssertEqual(procedureKitError.context, .requirementNotSatisfied)
-        }
         wait(for: printing, procedure)
-        XCTAssertProcedureCancelledWithErrors(printing, count: 1)
+        PKAssertProcedureCancelledWithError(printing, ProcedureKitError.requirementNotSatisfied())
     }
 
     func test__receiver_cancels_if_dependency_is_cancelled() {
         processing.injectResult(from: procedure)
-        processing.addDidCancelBlockObserver { printing, errors in
-            XCTAssertEqual(errors.count, 1)
-            guard let procedureKitError = errors.first as? ProcedureKitError else {
-                XCTFail("Incorrect error received"); return
-            }
-            XCTAssertEqual(procedureKitError.context, .dependencyCancelledWithErrors)
-        }
         procedure.cancel()
         wait(for: processing, procedure)
-        XCTAssertProcedureCancelledWithErrors(processing, count: 1)
+        PKAssertProcedureCancelledWithError(processing, ProcedureKitError.dependenciesCancelled())
     }
 
     func test__automatic_unwrap_when_result_is_optional_requrement() {
@@ -130,7 +111,7 @@ class ResultInjectionTests: ResultInjectionTestCase {
         let hello = ResultProcedure<String?> { nil }
         let printer = Printing().injectResult(from: hello)
         wait(for: printer, hello)
-        XCTAssertProcedureCancelledWithErrors(printer, count: 1)
+        PKAssertProcedureCancelledWithError(printer, ProcedureKitError.requirementNotSatisfied())
     }
 
     func test__collection_flatMap() {
@@ -141,7 +122,7 @@ class ResultInjectionTests: ResultInjectionTestCase {
         PKAssertProcedureFinished(hello)
         PKAssertProcedureFinished(world)
         PKAssertProcedureFinished(mapped)
-        XCTAssertEqual(mapped.output.success ?? [], ["WORLD", "HELLO"])
+        PKAssertProcedureOutput(mapped, ["WORLD", "HELLO"])
     }
 
     func test__collection_reduce() {
@@ -155,7 +136,7 @@ class ResultInjectionTests: ResultInjectionTestCase {
         PKAssertProcedureFinished(hello)
         PKAssertProcedureFinished(world)
         PKAssertProcedureFinished(helloWorld)
-        XCTAssertEqual(helloWorld.output.success, "Hello World")
+        PKAssertProcedureOutput(helloWorld, "Hello World")
     }
 
     func test__collection_reduce_which_throws_finishes_with_error() {
@@ -166,7 +147,7 @@ class ResultInjectionTests: ResultInjectionTestCase {
         wait(forAll: [hello, world, helloWorld])
         PKAssertProcedureFinished(hello)
         PKAssertProcedureFinished(world)
-        XCTAssertProcedureFinishedWithErrors(helloWorld, count: 1)
+        PKAssertProcedureFinishedWithError(helloWorld, error)
         XCTAssertNil(helloWorld.output.success)
     }
 
@@ -179,21 +160,21 @@ class ResultInjectionTests: ResultInjectionTestCase {
         PKAssertProcedureFinished(hello)
         PKAssertProcedureFinished(world)
         PKAssertProcedureFinished(gathered)
-        XCTAssertEqual(gathered.output.success ?? [], ["Hello", "World"])
+        PKAssertProcedureOutput(gathered, ["Hello", "World"])
     }
 
     func test__input_binding() {
         let hello = ResultProcedure { "Hello" }
         let world = TransformProcedure<String, String> { "\($0) World" }.injectResult(from: hello)
         let dan = TransformProcedure<String, String> { "\($0) Dan" }
-        world.bind(to: dan)
+        world.bind(to: dan) // Binds the same input to another procedure
         dan.add(dependency: world) // note that bind does not setup any dependencies.
 
         wait(for: hello, world, dan)
         PKAssertProcedureFinished(hello)
         PKAssertProcedureFinished(world)
         PKAssertProcedureFinished(dan)
-        XCTAssertEqual(dan.output.success ?? "Hello World", "Hello Dan")
+        PKAssertProcedureOutput(dan, "Hello Dan")
     }
 
     func test__binding() {
@@ -223,7 +204,7 @@ class ResultInjectionTests: ResultInjectionTestCase {
         wait(for: hello, group)
         PKAssertProcedureFinished(hello)
         PKAssertProcedureFinished(group)
-        XCTAssertEqual(group.output.success ?? "Hello World", "Hello World, we are running on ProcedureKit")
+        PKAssertProcedureOutput(group, "Hello World, we are running on ProcedureKit")
     }
 }
 

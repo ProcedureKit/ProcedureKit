@@ -36,7 +36,7 @@ public class ComposedProcedureTests: ProcedureKitTestCase {
     func test__composed_procedure_is_executed() {
         let composed = ComposedProcedure(procedure)
         wait(for: composed)
-        PKAssertProcedureFinished()
+        PKAssertProcedureFinished(procedure)
     }
 }
 

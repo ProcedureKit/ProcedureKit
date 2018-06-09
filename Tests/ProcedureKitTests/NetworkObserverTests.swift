@@ -68,7 +68,7 @@ class NetworkObserverTests: ProcedureKitTestCase {
     func test__network_indicator_shows_when_procedure_starts() {
         procedure.add(observer: NetworkObserver(controller: controller))
         wait(for: procedure, withTimeout: 5) { _ in
-            self.PKAssertProcedureFinished()
+            self.PKAssertProcedureFinished(self.procedure)
             XCTAssertTrue(self.changes.first ?? false)
         }
     }
@@ -76,7 +76,7 @@ class NetworkObserverTests: ProcedureKitTestCase {
     func test__network_indicator_hides_after_short_delay_when_procedure_finishes() {
         procedure.add(observer: NetworkObserver(controller: controller))
         wait(for: procedure, withTimeout: procedure.delay + controller.interval + 1.0) { _ in
-            self.PKAssertProcedureFinished()
+            self.PKAssertProcedureFinished(self.procedure)
             guard self.changes.count == 2 else {
                 XCTFail("Too few changes"); return
             }
