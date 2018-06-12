@@ -16,7 +16,7 @@ open class TestGroupProcedure: GroupProcedure {
     open override func execute() {
         _didExecute.overwrite(with: true)
         super.execute()
-    }
+    } 
 }
 
 open class GroupTestCase: ProcedureKitTestCase {
@@ -41,6 +41,54 @@ open class GroupTestCase: ProcedureKitTestCase {
         group.cancel()
         children = nil
         super.tearDown()
+    }
+}
+
+public extension GroupTestCase {
+
+    func PKAssertGroupErrors<T: GroupProcedure>(_ exp: @autoclosure () throws -> T, count exp2:  @autoclosure () throws -> Int, _ message: @autoclosure () -> String = "", file: StaticString = #file, line: UInt = #line) {
+        __XCTEvaluateAssertion(testCase: self, message, file: file, line: line) {
+
+            let procedure = try exp()
+            let count = try exp2()
+
+            guard let groupError = procedure.error as? GroupProcedure.GroupError else {
+                return .expectedFailure("\(procedure.procedureName) did not have a GroupError.")
+            }
+
+            guard groupError.errors.count == count else {
+                return .expectedFailure("\(procedure.procedureName) expected \(count) errors, received \(groupError.errors.count).")
+            }
+
+            return .success
+        }
+    }
+
+    func PKAssertGroupErrorsContains<T: GroupProcedure, E: Error>(_ exp: @autoclosure () throws -> T, error exp2:  @autoclosure () throws -> E, _ message: @autoclosure () -> String = "", file: StaticString = #file, line: UInt = #line) where E: Equatable {
+        __XCTEvaluateAssertion(testCase: self, message, file: file, line: line) {
+
+            let procedure = try exp()
+            let otherError = try exp2()
+
+            guard let groupError = procedure.error as? GroupProcedure.GroupError else {
+                return .expectedFailure("\(procedure.procedureName) did not have a GroupError.")
+            }
+
+            guard groupError.errors.count > 0 else {
+                return .expectedFailure("\(procedure.procedureName) did not have any errors at all.")
+            }
+
+            let errors = groupError.errors.compactMap({ $0 as? E })
+            guard errors.count > 0 else {
+                return .expectedFailure("\(procedure.procedureName) did not have any errors of type \(E.self).")
+            }
+
+            guard errors.contains(otherError) else {
+                return .expectedFailure("\(procedure.procedureName) errors did not contain \(otherError).")
+            }
+
+            return .success
+        }
     }
 }
 

@@ -17,7 +17,7 @@ import Dispatch
  */
 open class GroupProcedure: Procedure {
 
-    public typealias TransformChildErrorBlockType = (Procedure, inout Error) -> Void
+    public typealias TransformChildErrorBlockType = (Procedure, inout Error?) -> Void
 
     internal let queue = ProcedureQueue()
     internal var queueDelegate: GroupQueueDelegate!
@@ -235,12 +235,10 @@ open class GroupProcedure: Procedure {
      (if obtained or read directly from the child).
     */
     final public var transformChildErrorBlock: TransformChildErrorBlockType? {
-        get { return groupStateLock.withCriticalScope { _groupTransformChildErrorBlock } }
+        get { return synchronise { _groupTransformChildErrorBlock } }
         set {
             assert(!isExecuting, "Do not modify the child errors block after the Group has started.")
-            groupStateLock.withCriticalScope {
-                _groupTransformChildErrorBlock = newValue
-            }
+            synchronise { _groupTransformChildErrorBlock = newValue }
         }
     }
 }
@@ -542,11 +540,9 @@ internal extension GroupProcedure {
 
                 guard let transformChildError = strongGroup.transformChildErrorBlock else { return }
 
-                if var error = error {
-                    transformChildError(procedure, &error)
-                    childError = error
-                    strongGroup.log.verbose(message: "Child error for <\(procedure.operationName)> was transformed.")
-                }
+                transformChildError(procedure, &childError)
+
+                strongGroup.log.verbose(message: "Child error for <\(procedure.operationName)> was transformed.")
             }
             return promise.future
         }
