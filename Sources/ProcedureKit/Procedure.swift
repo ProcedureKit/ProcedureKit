@@ -1184,8 +1184,8 @@ open class Procedure: Operation, ProcedureProtocol {
         }
 
         // Change the state to .finishing and set & retrieve the final resulting array of errors
-        let resultingError: Error? = stateLock.withCriticalScope {
-            protectedProperties.error = info.error
+        let resultingError: Error? = synchronise {
+            protectedProperties.error = protectedProperties.error ?? info.error
             _state = .finishing
             return protectedProperties.error
         }
@@ -1701,7 +1701,7 @@ extension Procedure {
      */
     public final func add(condition: Condition) {
         assert(state < .willEnqueue, "Cannot modify conditions after a Procedure has been added to a queue, current state: \(state).")
-        stateLock.withCriticalScope { () -> Void in
+        synchronise { () -> Void in
             protectedProperties.conditions.insert(condition)
         }
     }

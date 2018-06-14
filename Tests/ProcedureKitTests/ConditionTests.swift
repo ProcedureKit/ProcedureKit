@@ -109,9 +109,10 @@ class ConditionTests: ProcedureKitTestCase {
     }
 
     func test__single_condition_which_is_failed() {
+        procedure.log.severity = .verbose
         procedure.add(condition: FalseCondition())
         wait(for: procedure)
-        PKAssertProcedureCancelledWithError(procedure, ProcedureKitError.conditionFailed())
+        PKAssertProcedureCancelledWithError(procedure, ProcedureKitError.FalseCondition())
     }
 
     // MARK: - Multiple Attachment
@@ -129,7 +130,7 @@ class ConditionTests: ProcedureKitTestCase {
         procedure.add(condition: FalseCondition())
         procedure.add(condition: FalseCondition())
         wait(for: procedure)
-        PKAssertProcedureCancelledWithError(procedure, ProcedureKitError.conditionFailed())
+        PKAssertProcedureCancelledWithError(procedure, ProcedureKitError.FalseCondition())
     }
 
     func test__multiple_conditions_where_one_succeeds() {
@@ -137,7 +138,7 @@ class ConditionTests: ProcedureKitTestCase {
         procedure.add(condition: FalseCondition())
         procedure.add(condition: FalseCondition())
         wait(for: procedure)
-        PKAssertProcedureCancelledWithError(procedure, ProcedureKitError.conditionFailed())
+        PKAssertProcedureCancelledWithError(procedure, ProcedureKitError.FalseCondition())
     }
 
     func test__multiple_conditions_where_one_fails() {
@@ -145,7 +146,7 @@ class ConditionTests: ProcedureKitTestCase {
         procedure.add(condition: TrueCondition())
         procedure.add(condition: FalseCondition())
         wait(for: procedure)
-        PKAssertProcedureCancelledWithError(procedure, ProcedureKitError.conditionFailed())
+        PKAssertProcedureCancelledWithError(procedure, ProcedureKitError.FalseCondition())
     }
 
     // MARK: - Shortcut Processing
@@ -792,7 +793,7 @@ class ConditionTests: ProcedureKitTestCase {
     func test__and_condition__with_two_successful_conditions__succeeds() {
         procedure.add(condition: AndCondition([TrueCondition(), TrueCondition()]))
         wait(for: procedure)
-        PKAssertProcedureCancelled(procedure)
+        PKAssertProcedureFinished(procedure)
     }
 
     func test__and_condition__with_successful_and_failing_conditions__fails() {

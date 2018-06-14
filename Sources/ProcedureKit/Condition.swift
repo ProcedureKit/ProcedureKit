@@ -93,8 +93,8 @@ public extension ProcedureKitError {
         }
     }
 
-    public struct FalseCondition: Error {
-        internal init() { }
+    public struct FalseCondition: Error, Equatable {
+        public init() { }
     }
 
     public struct ConditionEvaluationCancelled: Error {
@@ -224,6 +224,10 @@ open class Condition: ConditionProtocol, Hashable {
     private var _dependencies = Set<Operation>()
     private var _mutuallyExclusiveCategories = Set<String>()
 
+    fileprivate func synchronise<T>(block: () -> T) -> T {
+        return stateLock.withCriticalScope(block: block)
+    }
+
     /// Dependencies to produce and wait on.
     ///
     /// The framework will automatically schedule these dependencies to run
@@ -236,7 +240,7 @@ open class Condition: ConditionProtocol, Hashable {
     /// that is already scheduled for execution or executing, or that will be
     /// scheduled for execution elsewhere.
     public var producedDependencies: Set<Operation> {
-        return stateLock.withCriticalScope { _producedDependencies }
+        return synchronise { _producedDependencies }
     }
 
     /// Dependencies to wait on, added via `add(dependency:)`.
@@ -245,7 +249,7 @@ open class Condition: ConditionProtocol, Hashable {
     /// before the Condition's `evaluate(procedure:completion:)`
     /// function is called.
     public var dependencies: Set<Operation> {
-        return stateLock.withCriticalScope { _dependencies }
+        return synchronise { _dependencies }
     }
 
     /// Mutually exclusive categories to apply to the attached Procedure.
@@ -253,13 +257,13 @@ open class Condition: ConditionProtocol, Hashable {
     /// Only one Procedure with a particular mutuallyExclusiveCategory may
     /// execute at a time.
     public var mutuallyExclusiveCategories: Set<String> {
-        return stateLock.withCriticalScope { _mutuallyExclusiveCategories }
+        return synchronise { _mutuallyExclusiveCategories }
     }
 
     /// A descriptive name for the Condition. (optional)
     public var name: String? {
-        get { return stateLock.withCriticalScope { _name } }
-        set { stateLock.withCriticalScope { _name = newValue } }
+        get { return synchronise { _name } }
+        set { synchronise { _name = newValue } }
     }
 
     /// Requirements that must be satisfied after all dependencies are finished, before
@@ -272,13 +276,10 @@ open class Condition: ConditionProtocol, Hashable {
     ///
     /// - See: `DependencyRequirements`
     public var dependencyRequirements: DependencyRequirements {
-        get { return stateLock.withCriticalScope { _dependencyRequirements } }
+        get { return synchronise { _dependencyRequirements } }
         set {
-            stateLock.withCriticalScope {
-                guard _procedure == nil else {
-                    assertionFailure("Dependency requirement must be modified before the Condition is added to a Procedure.")
-                    return
-                }
+            synchronise {
+                debugAssertConditionNotAttachedToProcedure("Dependency requirement must be modified before the Condition is added to a Procedure.")
                 _dependencyRequirements = newValue
             }
         }
@@ -287,7 +288,7 @@ open class Condition: ConditionProtocol, Hashable {
     /// The ConditionResult.
     /// Will be Pending.ready(ConditionResult) once the Condition has been evaluated.
     public var output: Pending<ConditionResult> {
-        return stateLock.withCriticalScope { _output }
+        return synchronise { _output }
     }
 
     public init() { }
@@ -296,11 +297,8 @@ open class Condition: ConditionProtocol, Hashable {
     ///
     /// - Parameter procedure: the Procedure to which the Condition is being added
     public func willAttach(to procedure: Procedure) {
-        stateLock.withCriticalScope {
-            guard _procedure == nil else {
-                assertionFailure("Cannot add a single Condition instance to multiple Procedures.")
-                return
-            }
+        synchronise {
+            debugAssertConditionNotAttachedToProcedure("Cannot add a single Condition instance to multiple Procedures.")
             _procedure = procedure
         }
     }
@@ -313,11 +311,8 @@ open class Condition: ConditionProtocol, Hashable {
     ///
     /// - Parameter mutuallyExclusiveCategory: a String, which should be unique per category
     final public func addToAttachedProcedure(mutuallyExclusiveCategory: String) {
-        stateLock.withCriticalScope {
-            guard _procedure == nil else {
-                assertionFailure("Categories must be modified before the Condition is added to a Procedure.")
-                return
-            }
+        synchronise {
+            debugAssertConditionNotAttachedToProcedure("Categories must be modified before the Condition is added to a Procedure.")
             _mutuallyExclusiveCategories.insert(mutuallyExclusiveCategory)
         }
     }
@@ -345,11 +340,8 @@ open class Condition: ConditionProtocol, Hashable {
     final public func produce(dependency: Operation) {
         assert(!dependency.isExecuting, "Do not call produce(dependency:) with an Operation that is already executing.")
         assert(!dependency.isFinished, "Do not call produce(dependency:) with an Operation that is already finished.")
-        stateLock.withCriticalScope {
-            guard _procedure == nil else {
-                assertionFailure("Dependencies must be modified before the Condition is added to a Procedure.")
-                return
-            }
+        synchronise {
+            debugAssertConditionNotAttachedToProcedure("Dependencies must be modified before the Condition is added to a Procedure.")
             _producedDependencies.insert(dependency)
         }
     }
@@ -365,11 +357,8 @@ open class Condition: ConditionProtocol, Hashable {
     ///
     /// - Parameter dependency: an Operation to be added as a dependency
     final public func add(dependency: Operation) {
-        stateLock.withCriticalScope {
-            guard _procedure == nil else {
-                assertionFailure("Dependencies must be modified before the Condition is added to a Procedure.")
-                return
-            }
+        synchronise {
+            debugAssertConditionNotAttachedToProcedure("Dependencies must be modified before the Condition is added to a Procedure.")
             _dependencies.insert(dependency)
         }
     }
@@ -385,11 +374,8 @@ open class Condition: ConditionProtocol, Hashable {
     ///
     /// - Parameter dependencies: an array of Operations to be added as a dependencies
     final public func add(dependencies: [Operation]) {
-        stateLock.withCriticalScope {
-            guard _procedure == nil else {
-                assertionFailure("Dependencies must be modified before the Condition is added to a Procedure.")
-                return
-            }
+        synchronise {
+            debugAssertConditionNotAttachedToProcedure("Dependencies must be modified before the Condition is added to a Procedure.")
             _dependencies.formUnion(dependencies)
         }
     }
@@ -401,11 +387,8 @@ open class Condition: ConditionProtocol, Hashable {
     ///
     /// - Parameter dependency: an Operation to be removed from the `producedDependencies` and/or `dependencies`.
     public func remove(dependency: Operation) {
-        stateLock.withCriticalScope {
-            guard _procedure == nil else {
-                assertionFailure("Dependencies must be modified before the Condition is added to a Procedure.")
-                return
-            }
+        synchronise {
+            debugAssertConditionNotAttachedToProcedure("Dependencies must be modified before the Condition is added to a Procedure.")
             _dependencies.remove(dependency)
             _producedDependencies.remove(dependency)
         }
@@ -415,11 +398,8 @@ open class Condition: ConditionProtocol, Hashable {
     ///
     /// - Parameter dependencies: an array of Operations to be removed from the `producedDependencies` and/or `dependencies`.
     public func remove(dependencies: [Operation]) {
-        stateLock.withCriticalScope {
-            guard _procedure == nil else {
-                assertionFailure("Dependencies must be modified before the Condition is added to a Procedure.")
-                return
-            }
+        synchronise {
+            debugAssertConditionNotAttachedToProcedure("Dependencies must be modified before the Condition is added to a Procedure.")
             dependencies.forEach {
                 _dependencies.remove($0)
                 _producedDependencies.remove($0)
@@ -459,6 +439,7 @@ open class Condition: ConditionProtocol, Hashable {
 }
 
 extension Condition {
+
     public var isMutuallyExclusive: Bool {
         return !mutuallyExclusiveCategories.isEmpty
     }
@@ -472,7 +453,7 @@ internal extension Condition {
     ///   - ifNotAlreadySet: if `true` (the default), the new name will only be set if the existing name is `nil`
     /// - Returns: the resulting name for the Condition
     internal func set(name: String, ifNotAlreadySet: Bool = true) -> String {
-        return stateLock.withCriticalScope {
+        return synchronise {
             if ifNotAlreadySet, let existingName = _name {
                 return existingName
             }
@@ -483,10 +464,24 @@ internal extension Condition {
 
     // Set the output (once the Condition has been evaluated).
     internal func set(output: ConditionResult) {
-        stateLock.withCriticalScope {
+        synchronise {
             assert(_output.isPending, "Trying to set output of Condition evaluation more than once.")
             _output = .ready(output)
         }
+    }
+}
+
+// MARK: - Internal Extensions
+
+internal extension Condition {
+
+    internal func debugAssertConditionNotAttachedToProcedure(_ message: String = "Condition is already attached to a Procedure.") {
+        #if DEBUG
+        guard _procedure == nil else {
+            assertionFailure("Dependencies must be modified before the Condition is added to a Procedure.")
+            return
+        }
+        #endif
     }
 }
 

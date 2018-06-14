@@ -68,6 +68,7 @@ class RetryProcedureTests: RetryTestCase {
         wait(for: retry, outputProcedure)
         PKAssertProcedureFinished(retry)
 
+        #warning("Swift access race in implicit closure.")
         XCTAssertEqual(textOutput, ["Hello ProcedureKit"])
     }
 

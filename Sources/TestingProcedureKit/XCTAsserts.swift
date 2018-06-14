@@ -62,16 +62,21 @@ public extension ProcedureKitTestCase {
 
             let procedure = try exp()
 
-            if !withErrors, let error = procedure.error {
-                return .expectedFailure("\(procedure.procedureName) has error: \(error).")
+            if withErrors {
+                guard let _ = procedure.error else {
+                    return .expectedFailure("\(procedure.procedureName) did not have an error.")
+                }
             }
 
-            guard !cancelling, !procedure.isCancelled else {
-                return .expectedFailure("\(procedure.procedureName) was cancelled.")
+            if cancelling {
+                guard procedure.isCancelled else {
+                    return .expectedFailure("\(procedure.procedureName) was not cancelled.")
+                }
             }
-
-            guard cancelling, procedure.isCancelled else {
-                return .expectedFailure("\(procedure.procedureName) was not cancelled.")
+            else {
+                guard !procedure.isCancelled else {
+                    return .expectedFailure("\(procedure.procedureName) was cancelled.")
+                }
             }
 
             guard procedure.isFinished else {
@@ -100,7 +105,7 @@ public extension ProcedureKitTestCase {
     }
 
 
-    func PKAssertProcedureCancelled<T: Procedure>(_ exp: @autoclosure () throws -> T, withErrors: Bool = true, _ message: @autoclosure () -> String = "", file: StaticString = #file, line: UInt = #line) {
+    func PKAssertProcedureCancelled<T: Procedure>(_ exp: @autoclosure () throws -> T, withErrors: Bool = false, _ message: @autoclosure () -> String = "", file: StaticString = #file, line: UInt = #line) {
         PKAssertProcedureFinished(exp, withErrors: withErrors, cancelling: true, message, file: file, line: line)
     }
 
