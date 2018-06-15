@@ -80,7 +80,6 @@ class NoFailedDependenciesConditionTests: ProcedureKitTestCase {
 
         procedure.add(condition: NoFailedDependenciesCondition(ignoreCancellations: true))
         wait(for: procedure, dependency1, dependency2, dependency3)
-        PKAssertProcedureCancelled(procedure)
-        PKAssertProcedureError(procedure, ProcedureKitError.dependenciesCancelled())
+        PKAssertProcedureCancelledWithError(procedure, ProcedureKitError.dependenciesFailed())
     }
 }
