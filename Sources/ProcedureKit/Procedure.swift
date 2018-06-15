@@ -940,7 +940,9 @@ open class Procedure: Operation, ProcedureProtocol {
 
      */
 
-    open func procedureDidCancel(with: Error) { }
+    open func procedureDidCancel(with: Error?) {
+        // no-op
+    }
 
     public final override func cancel() {
         _cancel(with: nil)
@@ -990,12 +992,12 @@ open class Procedure: Operation, ProcedureProtocol {
         willChangeValue(forKey: .cancelled)
 
         let resultingError = synchronise { () -> Error? in
-            protectedProperties.error = error
+            protectedProperties.error = error ?? protectedProperties.error
             _isCancelled = true
             return protectedProperties.error
         }
 
-        if let error = error {
+        if let error = resultingError {
             log.notice(message: "Will cancel with error: \(error).")
         }
         else {

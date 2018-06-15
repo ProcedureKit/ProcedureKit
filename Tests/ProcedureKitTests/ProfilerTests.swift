@@ -148,7 +148,6 @@ class ProfilerTests: ProcedureKitTestCase {
 
     func test__profile_group_operation() {
         let group = GroupProcedure(operations: [ TestProcedure(), TestProcedure() ])
-        group.log.severity = .notice
         group.add(observer: profiler)
 
         waitForReporterAnd(for: group)

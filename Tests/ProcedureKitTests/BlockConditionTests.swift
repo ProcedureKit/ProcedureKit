@@ -26,7 +26,7 @@ class BlockConditionTests: ProcedureKitTestCase {
         let error = TestError()
         procedure.add(condition: BlockCondition { throw error })
         wait(for: procedure)
-        PKAssertProcedureCancelledWithError(procedure, error)
+        PKAssertProcedureCancelledWithError(procedure, ProcedureKitError.conditionFailed(with: error))
     }
 }
 

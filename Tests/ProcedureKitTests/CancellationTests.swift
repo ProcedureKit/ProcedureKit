@@ -166,8 +166,9 @@ class CancellationTests: ProcedureKitTestCase {
 
         wait(for: special)
 
+        PKAssertProcedureFinished(special)
         XCTAssertFalse(special.didCancel.access)
-        PKAssertProcedureCancelled(special)
+        XCTAssertFalse(special.isCancelled)
     }
 
     func test__procedure_finished_then_cancelled_async_during_execute() {
@@ -192,8 +193,9 @@ class CancellationTests: ProcedureKitTestCase {
 
         wait(for: special)
 
+        PKAssertProcedureFinished(special)
         XCTAssertFalse(special.didCancel.access)
-        PKAssertProcedureCancelled(special)
+        XCTAssertFalse(special.isCancelled)
     }
 
     func test__cancel_from_didcancel_observer_is_ignored() {

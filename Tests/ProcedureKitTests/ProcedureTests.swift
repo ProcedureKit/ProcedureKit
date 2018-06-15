@@ -495,7 +495,6 @@ class DependencyTests: ProcedureKitTestCase {
 class ProduceTests: ProcedureKitTestCase {
 
     func test__procedure_produce_operation() {
-        LogManager.severity = .verbose
         let producedOperation = BlockProcedure { usleep(5000) }
         producedOperation.name = "ProducedOperation"
         let procedure = EventConcurrencyTrackingProcedure() { procedure in
@@ -510,7 +509,6 @@ class ProduceTests: ProcedureKitTestCase {
     }
 
     func test__procedure_produce_operation_before_execute() {
-        LogManager.severity = .verbose
         let producedOperation = BlockProcedure { usleep(5000) }
         producedOperation.name = "ProducedOperation"
         let procedure = EventConcurrencyTrackingProcedure() { procedure in
