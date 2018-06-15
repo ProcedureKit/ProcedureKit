@@ -62,9 +62,16 @@ public extension ProcedureKitTestCase {
 
             let procedure = try exp()
 
+            // Errors are expected
             if withErrors {
                 guard let _ = procedure.error else {
                     return .expectedFailure("\(procedure.procedureName) did not have an error.")
+                }
+            }
+            // Errors are not expected
+            else {
+                guard procedure.error == nil else {
+                    return .expectedFailure("\(procedure.procedureName) has an error.")
                 }
             }
 

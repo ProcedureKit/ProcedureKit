@@ -446,8 +446,11 @@ public extension GroupProcedure {
         }
     }
 
-    internal func makeGroupError() -> Error {
+    internal func makeGroupError() -> Error? {
         return synchronise {
+            if _groupWorkingError.errors.isEmpty {
+                return nil
+            }
             return GroupError(errors: _groupWorkingError.errors)
         }
     }

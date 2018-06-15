@@ -38,8 +38,8 @@ class MapProcedureTests: ProcedureKitTestCase {
         let numbers = NumbersProcedure(error: error)
         let functional = numbers.map { $0 * 2 }
         wait(for: numbers, functional)
-        PKAssertProcedureFinished(numbers)
-        PKAssertProcedureCancelledWithError(functional, error)
+        PKAssertProcedureFinishedWithError(numbers, error)
+        PKAssertProcedureCancelledWithError(functional, ProcedureKitError.dependency(finishedWithError: error))
     }
 
 }
@@ -81,7 +81,7 @@ class FlatMapProcedureTests: ProcedureKitTestCase {
         let functional = numbers.map { $0 * 2 }
         wait(for: numbers, functional)
         PKAssertProcedureFinishedWithError(numbers, error)
-        PKAssertProcedureCancelledWithError(functional, error)
+        PKAssertProcedureCancelledWithError(functional, ProcedureKitError.dependency(finishedWithError: error))
     }
     
 }

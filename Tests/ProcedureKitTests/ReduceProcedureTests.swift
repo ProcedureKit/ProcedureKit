@@ -49,6 +49,6 @@ class ReduceProcedureTests: ProcedureKitTestCase {
         let reduced = numbers.reduce(0, nextPartialResult: +)
         wait(for: numbers, reduced)
         PKAssertProcedureFinishedWithError(numbers, error)
-        PKAssertProcedureCancelledWithError(reduced, error)
+        PKAssertProcedureCancelledWithError(reduced, ProcedureKitError.dependency(finishedWithError: error))
     }
 }
