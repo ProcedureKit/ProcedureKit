@@ -81,32 +81,51 @@ open class RepeatProcedure<T: Operation>: GroupProcedure {
 
     private let _repeatStateLock = PThreadMutex()
 
+    @discardableResult
+    fileprivate func synchronise<T>(block: () -> T) -> T {
+        return _repeatStateLock.withCriticalScope(block: block)
+    }
+
+    private var _iterator: AnyIterator<Payload>
+
     private var _previous: T?
+
     /// - returns: the previous executing operation instance of T
     public internal(set) var previous: T? {
-        get { return _repeatStateLock.withCriticalScope { _previous } }
-        set { _repeatStateLock.withCriticalScope { _previous = newValue } }
+        get { return synchronise { _previous } }
+        set { synchronise { _previous = newValue } }
     }
 
     private var _current: T
+
     /// - returns: the currently executing operation instance of T
     public internal(set) var current: T {
-        get { return _repeatStateLock.withCriticalScope { _current } }
-        set { _repeatStateLock.withCriticalScope { _current = newValue } }
+        get { return synchronise { _current } }
+        set { synchronise { _current = newValue } }
     }
 
     private var _count: Int = 1
+
     /// - returns: the number of operation instances
     public var count: Int {
-        return _repeatStateLock.withCriticalScope { _count }
+        return synchronise { _count }
     }
 
     private var _configure: Payload.ConfigureBlock = { _ in }
     internal var configure: Payload.ConfigureBlock {
-        return _repeatStateLock.withCriticalScope { _configure }
+        return synchronise { _configure }
     }
 
-    private var _iterator: AnyIterator<Payload>
+    /// - returns: the first error registered with the group
+    public override var error: Error? {
+        get { return makeError() }
+    }
+
+    internal func makeError() -> Error? {
+        return synchronise {
+            return (super.error as? GroupError).flatMap { $0.errors.first }
+        }
+    }
 
     /// Initialize RepeatProcedure with an iterator, the element of the iterator a `RepeatProcedurePayload<T>`.
     /// Other arguments allow for specific dispatch queues, and a maximum count of iteratations.
