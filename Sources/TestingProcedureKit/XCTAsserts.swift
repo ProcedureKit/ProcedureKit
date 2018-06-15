@@ -102,7 +102,7 @@ public extension ProcedureKitTestCase {
                 return .expectedFailure("\(procedure.procedureName) did not error.")
             }
             guard let e = error as? E else {
-                return .expectedFailure("\(procedure.procedureName) error: \(error), was not the correct type.")
+                return .expectedFailure("\(procedure.procedureName) error: \(error), was not the expected type.")
             }
             guard expectedError == e else {
                 return .expectedFailure("\(procedure.procedureName) error: \(e), did not equal expected error: \(expectedError).")

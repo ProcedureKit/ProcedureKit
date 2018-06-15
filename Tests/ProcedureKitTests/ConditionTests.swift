@@ -267,7 +267,7 @@ class ConditionTests: ProcedureKitTestCase {
             requirements: .noCancelled,
             conditionProducedDependency: cancelledDependency) { result in
                 XCTAssertFalse(result.didEvaluateCondition, "Condition evaluate was called, despite dependency requirement and cancelled dependency.")
-                PKAssertProcedureCancelledWithError(result.procedure, ProcedureKitError.ConditionDependenciesFailed(condition: result.condition))
+                PKAssertProcedureCancelledWithError(result.procedure, ProcedureKitError.ConditionDependenciesCancelled(condition: result.condition))
         }
     }
 
@@ -658,7 +658,7 @@ class ConditionTests: ProcedureKitTestCase {
         wait(for: procedure1, procedure2)
 
         PKAssertProcedureCancelled(procedure1)
-        PKAssertProcedureCancelledWithError(procedure2, ProcedureKitError.conditionFailed())
+        PKAssertProcedureCancelledWithError(procedure2, ProcedureKitError.FalseCondition())
     }
 
     func test__ignored_satisfied_condition_does_not_result_in_failure() {
@@ -781,7 +781,7 @@ class ConditionTests: ProcedureKitTestCase {
     func test__and_condition__with_single_failing_condition__fails() {
         procedure.add(condition: AndCondition([FalseCondition()]))
         wait(for: procedure)
-        PKAssertProcedureCancelledWithError(procedure, ProcedureKitError.conditionFailed())
+        PKAssertProcedureCancelledWithError(procedure, ProcedureKitError.FalseCondition())
     }
 
     func test__and_condition__with_single_ignored_condition__does_not_fail() {
@@ -799,13 +799,13 @@ class ConditionTests: ProcedureKitTestCase {
     func test__and_condition__with_successful_and_failing_conditions__fails() {
         procedure.add(condition: AndCondition([TrueCondition(), FalseCondition()]))
         wait(for: procedure)
-        PKAssertProcedureCancelledWithError(procedure, ProcedureKitError.conditionFailed())
+        PKAssertProcedureCancelledWithError(procedure, ProcedureKitError.FalseCondition())
     }
 
     func test__and_condition__with_failing_and_successful_conditions__fails() {
         procedure.add(condition: AndCondition([FalseCondition(), TrueCondition()]))
         wait(for: procedure)
-        PKAssertProcedureCancelledWithError(procedure, ProcedureKitError.conditionFailed())
+        PKAssertProcedureCancelledWithError(procedure, ProcedureKitError.FalseCondition())
     }
 
     func test__and_condition__with_successful_and_ignored_condition__does_not_fail() {
@@ -817,7 +817,7 @@ class ConditionTests: ProcedureKitTestCase {
     func test__and_condition__with_failing_and_ignored_condition__fails() {
         procedure.add(condition: AndCondition([IgnoredCondition(FalseCondition()), FalseCondition()]))
         wait(for: procedure)
-        PKAssertProcedureCancelledWithError(procedure, ProcedureKitError.conditionFailed())
+        PKAssertProcedureCancelledWithError(procedure, ProcedureKitError.FalseCondition())
     }
 
     func test__and_condition__with_two_ignored_conditions__does_not_fail() {
@@ -835,7 +835,7 @@ class ConditionTests: ProcedureKitTestCase {
     func test__nested_failing_and_conditions() {
         procedure.add(condition: AndCondition([AndCondition([FalseCondition(), FalseCondition()]), AndCondition([FalseCondition(), FalseCondition()])]))
         wait(for: procedure)
-        PKAssertProcedureCancelledWithError(procedure, ProcedureKitError.conditionFailed())
+        PKAssertProcedureCancelledWithError(procedure, ProcedureKitError.FalseCondition())
     }
 
     func test__ignored_and_condition_does_not_fail() {
@@ -861,7 +861,7 @@ class ConditionTests: ProcedureKitTestCase {
     func test__or_condition__with_single_failing_condition__fails() {
         procedure.add(condition: OrCondition([FalseCondition()]))
         wait(for: procedure)
-        PKAssertProcedureCancelledWithError(procedure, ProcedureKitError.conditionFailed())
+        PKAssertProcedureCancelledWithError(procedure, ProcedureKitError.FalseCondition())
     }
 
     func test__or_condition__with_single_ignored_condition__does_not_fail() {
@@ -897,7 +897,7 @@ class ConditionTests: ProcedureKitTestCase {
     func test__or_condition__with_failing_and_ignored_condition__fails() {
         procedure.add(condition: OrCondition([IgnoredCondition(FalseCondition()), FalseCondition()]))
         wait(for: procedure)
-        PKAssertProcedureCancelledWithError(procedure, ProcedureKitError.conditionFailed())
+        PKAssertProcedureCancelledWithError(procedure, ProcedureKitError.FalseCondition())
     }
 
     func test__or_condition__with_two_ignored_conditions__does_not_fail() {
@@ -915,13 +915,13 @@ class ConditionTests: ProcedureKitTestCase {
     func test__nested_failing_or_conditions() {
         procedure.add(condition: OrCondition([OrCondition([FalseCondition(), FalseCondition()]), OrCondition([FalseCondition(), FalseCondition()])]))
         wait(for: procedure)
-        PKAssertProcedureCancelledWithError(procedure, ProcedureKitError.conditionFailed())
+        PKAssertProcedureCancelled(procedure, withErrors: true)
     }
 
     func test__ignored_or_condition_does_not_fail() {
         procedure.add(condition: IgnoredCondition(OrCondition([FalseCondition()])))
         wait(for: procedure)
-        PKAssertProcedureCancelledWithError(procedure, ProcedureKitError.conditionFailed())
+        PKAssertProcedureCancelled(procedure)
     }
 
     // MARK: - Concurrency

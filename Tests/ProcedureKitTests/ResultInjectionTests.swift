@@ -100,9 +100,7 @@ class ResultInjectionTests: ResultInjectionTestCase {
 
     func test__automatic_unwrap_when_result_is_optional_requrement() {
         let hello = ResultProcedure<String?> { "Hello, World" }
-        hello.log.severity = .notice
         let print = Printing().injectResult(from: hello)
-        print.log.severity = .notice
         wait(for: print, hello)
         PKAssertProcedureFinished(print)
     }

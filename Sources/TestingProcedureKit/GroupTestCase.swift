@@ -52,6 +52,13 @@ public extension GroupTestCase {
             let procedure = try exp()
             let count = try exp2()
 
+            guard count > 0 else {
+                guard procedure.error == nil else {
+                    return .expectedFailure("\(procedure.procedureName) had an error.")
+                }
+                return .success
+            }
+
             guard let groupError = procedure.error as? GroupProcedure.GroupError else {
                 return .expectedFailure("\(procedure.procedureName) did not have a GroupError.")
             }
@@ -64,7 +71,7 @@ public extension GroupTestCase {
         }
     }
 
-    func PKAssertGroupErrorsContains<T: GroupProcedure, E: Error>(_ exp: @autoclosure () throws -> T, error exp2:  @autoclosure () throws -> E, _ message: @autoclosure () -> String = "", file: StaticString = #file, line: UInt = #line) where E: Equatable {
+    func PKAssertGroupErrors<T: GroupProcedure, E: Error>(_ exp: @autoclosure () throws -> T, doesNot: Bool = false, contain exp2:  @autoclosure () throws -> E, _ message: @autoclosure () -> String = "", file: StaticString = #file, line: UInt = #line) where E: Equatable {
         __XCTEvaluateAssertion(testCase: self, message, file: file, line: line) {
 
             let procedure = try exp()
@@ -79,12 +86,18 @@ public extension GroupTestCase {
             }
 
             let errors = groupError.errors.compactMap({ $0 as? E })
+
             guard errors.count > 0 else {
                 return .expectedFailure("\(procedure.procedureName) did not have any errors of type \(E.self).")
             }
 
-            guard errors.contains(otherError) else {
+            switch (doesNot, errors.contains(otherError)) {
+            case (false, false):
                 return .expectedFailure("\(procedure.procedureName) errors did not contain \(otherError).")
+            case (true, true):
+                return .expectedFailure("\(procedure.procedureName) errors did contain \(otherError).")
+            default:
+                break
             }
 
             return .success

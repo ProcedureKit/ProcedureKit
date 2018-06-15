@@ -29,9 +29,7 @@ open class BatchProcedure<Transform: Procedure>: GroupProcedure, InputProcedure,
         defer { super.execute() }
 
         guard let input = input.value else {
-            let error = ProcedureKitError.requirementNotSatisfied()
-            output = .ready(.failure(error))
-            cancel(with: error)
+            cancel(with: ProcedureKitError.requirementNotSatisfied())
             return
         }
 

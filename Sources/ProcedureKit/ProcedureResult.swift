@@ -125,6 +125,11 @@ public extension OutputProcedure {
     }
 }
 
+private enum InjectionResult<Dependency: OutputProcedure> {
+    case success(Dependency.Output)
+    case cancel(Error)
+}
+
 public extension ProcedureProtocol {
 
     /**
@@ -151,7 +156,12 @@ public extension ProcedureProtocol {
 
         dependency.addDidCancelBlockObserver { [weak self] _, error in
             if let strongSelf = self {
-                strongSelf.cancel(with: ProcedureKitError.dependency(cancelledWithError: error))
+                if let dependencyError = error {
+                    strongSelf.cancel(with: ProcedureKitError.dependency(cancelledWithError: dependencyError))
+                }
+                else {
+                    strongSelf.cancel(with: ProcedureKitError.dependenciesCancelled())
+                }
             }
         }
 
@@ -162,32 +172,34 @@ public extension ProcedureProtocol {
 
     @discardableResult func injectResult<Dependency: OutputProcedure>(from dependency: Dependency, block: @escaping (Self, Dependency.Output) -> Void) -> Self {
 
+
+        func injectionResultGiven(_ pendingResult: Pending<ProcedureResult<Dependency.Output>>, and error: Error?) -> InjectionResult<Dependency> {
+
+            if let error = error {
+                return .cancel(ProcedureKitError.dependency(finishedWithError: error))
+            }
+
+            switch pendingResult {
+
+            case .pending:
+                return .cancel(ProcedureKitError.requirementNotSatisfied())
+
+            case let .ready(.failure(error)):
+                return .cancel(ProcedureKitError.dependency(finishedWithError: error))
+
+            case let .ready(.success(output)):
+                return .success(output)
+            }
+        }
+
         return inject(dependency: dependency) { procedure, dependency, error in
 
-            // Check if there are any errors first
-            if let error = error {
-                procedure.cancel(with: ProcedureKitError.dependency(finishedWithError: error)); return
+            switch injectionResultGiven(dependency.output, and: error) {
+            case let .cancel(e):
+                procedure.cancel(with: e)
+            case let .success(output):
+                block(self, output)
             }
-
-            // Check that we have a result ready
-            guard let result = dependency.output.value else {
-                procedure.cancel(with: ProcedureKitError.requirementNotSatisfied()); return
-            }
-
-            // Check that the result was successful
-            guard let output = result.value else {
-                // If not, check for an error
-                if let error = result.error {
-                    procedure.cancel(with: ProcedureKitError.dependency(finishedWithError: error))
-                }
-                else {
-                    procedure.cancel(with: ProcedureKitError.requirementNotSatisfied())
-                }
-                return
-            }
-
-            // Given successfull output
-            block(self, output)
         }
     }
 }
@@ -213,7 +225,7 @@ public extension InputProcedure {
                 procedure.didSetInputReady()
             }
             catch {
-                procedure.cancel(with: ProcedureKitError.dependency(finishedWithError: error))
+                procedure.cancel(with: error)
             }
         }
     }

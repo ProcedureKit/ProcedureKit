@@ -197,7 +197,7 @@ extension GroupTests {
         wait(for: group)
         PKAssertProcedureFinished(group, withErrors: true)
         guard let error = group.error as? GroupProcedure.GroupError else {
-            XCTFail("Group Error was not a GroupError type.")
+            XCTFail("Group Error was a \(String(describing:group.error)) instead of a GroupError type.")
             return
         }
 
@@ -205,6 +205,7 @@ extension GroupTests {
     }
 
     func test__group_exits_correctly_when_child_group_finishes_with_errors() {
+
         children = createTestProcedures(shouldError: true)
         let child = TestGroupProcedure(operations: children); child.name = "Child Group"
         group = TestGroupProcedure(operations: child)
@@ -212,15 +213,22 @@ extension GroupTests {
         wait(for: group)
         PKAssertProcedureFinished(group, withErrors: true)
 
-        guard let error = group.error as? GroupProcedure.GroupError else {
-            XCTFail("Group Error was not a GroupError type.")
+        guard let outerGroupError = group.error as? GroupProcedure.GroupError else {
+            XCTFail("Group Error was a \(String(describing:group.error)) instead of a GroupError type.")
             return
         }
 
-        XCTAssertEqual(error.errors.count, children.count)
-        XCTAssertEqual(error.errors.count, 5)
-    }
+        // Top error is the outer group error
+        XCTAssertEqual(outerGroupError.errors.count, 1)
 
+        guard let innerGroupError = outerGroupError.errors.first as? GroupProcedure.GroupError else {
+            XCTFail("Child Group Error was a \(String(describing:group.error)) instead of a GroupError type.")
+            return
+        }
+
+        XCTAssertEqual(innerGroupError.errors.count, children.count)
+        XCTAssertEqual(innerGroupError.errors.count, 5)
+    }
 }
 
 // MARK: - Custom Error Handling Tests
@@ -327,18 +335,18 @@ extension GroupTests {
 
         PKAssertGroupErrors(group, count: children.count - 1)
 
-        PKAssertGroupErrorsContains(group, error: ignoredChild.error as! TestError)
+        PKAssertGroupErrors(group, doesNot: true, contain: ignoredChild.error as! TestError)
 
     }
 
     func test__group__transform_child_errors_block_removes_errors_from_child_willFinishWithError() {
-
+        let modifiedError = TestError()
         children = createTestProcedures(shouldError: true)
         let group = TestGroupChildWillFinishWithErrors(operations: children, action: .callSuperWithUnmodifiedInput)
         let ignoredChild = children.first!
         group.transformChildErrorBlock = { (child, error) in
             if child === ignoredChild {
-                error = nil
+                error = modifiedError
             }
         }
 
@@ -350,13 +358,13 @@ extension GroupTests {
             XCTAssertTrue(group.receivedInput.access.keys.contains(child), "child(_:willFinishWithError:) was not called for child: \(child)")
         }
 
-        PKAssertGroupErrors(group, count: children.count - 1)
+        PKAssertGroupErrors(group, count: children.count)
 
-        guard let receivedErrorsForIgnoredChild = group.receivedInput.access[ignoredChild] else {
+        guard let receivedErrorsForIgnoredChild = group.receivedInput.access[ignoredChild] as? TestError else {
             XCTFail("child(_:willFinishWithError:) was not called for the ignoredChild")
             return
         }
-        XCTAssertTrue(receivedErrorsForIgnoredChild != nil, "child(_:willFinishWithError:) received a non-empty errors array for the ignoredChild")
+        XCTAssertEqual(receivedErrorsForIgnoredChild, modifiedError)
     }
 
     func test__group__child_willFinishWithError_does_not_call_super() {

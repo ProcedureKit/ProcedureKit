@@ -127,8 +127,8 @@ class AuthorizedForTests: TestableCapabilityTestCase {
         capability.requirement = .maximum
         capability.responseAuthorizationStatus = .minimumAuthorized
         wait(for: procedure)
-        PKAssertConditionFailed(authorizedFor.output.value ?? .success(true), failedWithError: ProcedureKitError.capabilityUnavailable())
-        PKAssertProcedureCancelledWithError(procedure, ProcedureKitError.capabilityUnavailable())
+        PKAssertConditionFailed(authorizedFor.output.value ?? .success(true), failedWithError: ProcedureKitError.capabilityUnauthorized())
+        PKAssertProcedureCancelledWithError(procedure, ProcedureKitError.capabilityUnauthorized())
     }
 
     func test__async_fails_if_requirement_is_not_met() {

@@ -39,7 +39,7 @@ open class GroupProcedure: Procedure {
     fileprivate var _groupTransformChildErrorBlock: TransformChildErrorBlockType?
 
     public override var error: Error? {
-        get { return makeGroupError() }
+        get { return super.error ?? makeGroupError() }
     }
 
     /// - returns: the operations which have been added to the queue
@@ -778,9 +778,7 @@ fileprivate extension GroupProcedure {
 
 fileprivate extension GroupProcedure {
     fileprivate func _finishGroup() {
-        // Because errors have been added throughout to the (superclass) Procedure's `errors`,
-        // there is no need to pass any additional errors to the call to finish().
-        super.finish()
+        super.finish(with: makeGroupError())
         queue.isSuspended = true
     }
 }
