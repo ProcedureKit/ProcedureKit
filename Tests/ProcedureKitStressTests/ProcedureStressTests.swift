@@ -35,7 +35,7 @@ class CancelProcedureWithErrorsStressTest: StressTestCase {
                 batch.dispatchGroup.leave()
             }
             batch.queue.add(operation: procedure)
-            procedure.cancel(withError: TestError())
+            procedure.cancel(with: TestError())
         }
     }
 
@@ -44,10 +44,10 @@ class CancelProcedureWithErrorsStressTest: StressTestCase {
         stress { batch, iteration in
             batch.dispatchGroup.enter()
             let procedure = TestProcedure(name: "Batch \(batch.number), Iteration \(iteration)")
-            procedure.addDidFinishBlockObserver { _, errors in
-                if errors.isEmpty {
+            procedure.addDidFinishBlockObserver { _, error in
+                if error == nil {
                     DispatchQueue.main.async {
-                        XCTAssertFalse(errors.isEmpty, "errors is empty - cancel errors were not propagated")
+                        XCTAssertNil(error, "error is nil - cancel errors were not propagated")
                         batch.dispatchGroup.leave()
                     }
                 }
@@ -55,7 +55,7 @@ class CancelProcedureWithErrorsStressTest: StressTestCase {
                     batch.dispatchGroup.leave()
                 }
             }
-            procedure.cancel(withError: TestError())
+            procedure.cancel(with: TestError())
             batch.queue.add(operation: procedure)
         }
     }
@@ -65,10 +65,10 @@ class CancelProcedureWithErrorsStressTest: StressTestCase {
         stress { batch, iteration in
             batch.dispatchGroup.enter()
             let procedure = TestProcedure(name: "Batch \(batch.number), Iteration \(iteration)")
-            procedure.addDidFinishBlockObserver { _, errors in
-                if errors.isEmpty {
+            procedure.addDidFinishBlockObserver { _, error in
+                if error == nil {
                     DispatchQueue.main.async {
-                        XCTAssertFalse(errors.isEmpty, "errors is empty - cancel errors were not propagated")
+                        XCTAssertNil(error, "error is nil - cancel errors were not propagated")
                         batch.dispatchGroup.leave()
                     }
                 }
@@ -77,7 +77,7 @@ class CancelProcedureWithErrorsStressTest: StressTestCase {
                 }
             }
             procedure.addWillExecuteBlockObserver { (procedure, _) in
-                procedure.cancel(withError: TestError())
+                procedure.cancel(with: TestError())
             }
             batch.queue.add(operation: procedure)
         }
@@ -92,7 +92,7 @@ class ProcedureConditionStressTest: StressTestCase {
             procedure.add(condition: TrueCondition())
         }
         wait(for: procedure, withTimeout: 10)
-        PKAssertProcedureFinished()
+        PKAssertProcedureFinished(procedure)
     }
 
     func test__adding_many_conditions_each_with_single_dependency() {
@@ -101,7 +101,7 @@ class ProcedureConditionStressTest: StressTestCase {
             procedure.add(condition: TestCondition(producedDependencies: [TestProcedure()]) { .success(true) })
         }
         wait(for: procedure, withTimeout: 10)
-        PKAssertProcedureFinished()
+        PKAssertProcedureFinished(procedure)
     }
 
     func test__dependencies_execute_before_condition_dependencies() {
@@ -311,7 +311,7 @@ class ProcedureCancellationHandlerConcurrencyTest: StressTestCase {
             })
             procedure.addDidFinishBlockObserver(block: { (procedure, error) in
                 DispatchQueue.main.async {
-                    self.XCTAssertProcedureNoConcurrentEvents(procedure)
+                    self.PKAssertProcedureNoConcurrentEvents(procedure)
                     batch.dispatchGroup.leave()
                 }
             })
@@ -341,7 +341,7 @@ class ProcedureFinishHandlerConcurrencyTest: StressTestCase {
             })
             procedure.addDidFinishBlockObserver(block: { (procedure, error) in
                 DispatchQueue.main.async {
-                    self.XCTAssertProcedureNoConcurrentEvents(procedure)
+                    self.PKAssertProcedureNoConcurrentEvents(procedure)
                     batch.dispatchGroup.leave()
                 }
             })
