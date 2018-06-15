@@ -395,11 +395,11 @@ open class ConcurrencyTrackingObserver: ProcedureObserver {
         doRun(.observer_didExecute, block: { callback in callbackBlock(procedure, callback) })
     }
 
-    public func will(cancel procedure: Procedure, withErrors: [Error]) {
+    public func will(cancel procedure: Procedure, with: Error?) {
         doRun(.observer_willCancel, block: { callback in callbackBlock(procedure, callback) })
     }
 
-    public func did(cancel procedure: Procedure, withErrors: [Error]) {
+    public func did(cancel procedure: Procedure, with: Error?) {
         doRun(.observer_didCancel, block: { callback in callbackBlock(procedure, callback) })
     }
 
@@ -411,11 +411,11 @@ open class ConcurrencyTrackingObserver: ProcedureObserver {
         doRun(.observer_procedureDidAdd(newOperation.operationName), block: { callback in callbackBlock(procedure, callback) })
     }
 
-    public func will(finish procedure: Procedure, withErrors errors: [Error], pendingFinish: PendingFinishEvent) {
+    public func will(finish procedure: Procedure, with error: Error?, pendingFinish: PendingFinishEvent) {
         doRun(.observer_willFinish, block: { callback in callbackBlock(procedure, callback) })
     }
 
-    public func did(finish procedure: Procedure, withErrors errors: [Error]) {
+    public func did(finish procedure: Procedure, with error: Error?) {
         doRun(.observer_didFinish, block: { callback in callbackBlock(procedure, callback) })
     }
 
@@ -510,8 +510,8 @@ open class EventConcurrencyTrackingGroupProcedure: GroupProcedure, EventConcurre
         concurrencyRegistrar.doRun(.override_groupWillAdd_child(child.operationName))
         super.groupWillAdd(child: child)
     }
-    open override func child(_ child: Procedure, willFinishWithErrors errors: [Error]) {
+    open override func child(_ child: Procedure, willFinishWithError error: Error?) {
         concurrencyRegistrar.doRun(.override_child_willFinishWithErrors(child.operationName))
-        return super.child(child, willFinishWithErrors: errors)
+        return super.child(child, willFinishWithError: error)
     }
 }

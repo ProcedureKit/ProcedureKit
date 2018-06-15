@@ -53,7 +53,7 @@ public struct TimeoutObserver: ProcedureObserver {
         }
     }
 
-    public func did(finish procedure: Procedure, withErrors errors: [Error]) {
+    public func did(finish procedure: Procedure, with error: Error?) {
         ProcedureTimeoutRegistrar.shared.registerFinished(procedure: procedure)
     }
 }

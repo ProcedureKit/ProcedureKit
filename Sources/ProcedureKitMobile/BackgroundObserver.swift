@@ -123,7 +123,7 @@ public class BackgroundObserver: ProcedureObserver {
     /// event handlers.
     ///
     /// - Parameter procedure: the `Procedure`
-    public func did(finish procedure: Procedure, withErrors errors: [Error]) {
+    public func did(finish procedure: Procedure, with error: Error?) {
         manager.didFinish(procedure: procedure)
     }
 }

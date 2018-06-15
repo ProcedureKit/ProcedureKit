@@ -214,6 +214,7 @@ open class GroupProcedure: Procedure {
 
     @available(*, deprecated: 5.0.0, renamed: "child(_:willFinishWithError:)", message: "Use child(_:,willFinishWithError:) instead.")
     open func child(_ childProcedure: Procedure, willFinishWithErrors errors: [Error]) {
+        assertionFailure("Use child(_:willFinishWithError:) instead.")
         child(childProcedure, willFinishWithError: errors.first)
     }
 
