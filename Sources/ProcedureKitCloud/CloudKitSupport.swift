@@ -15,9 +15,9 @@ protocol CloudKitContainerRegistrar {
 
     func pk_accountStatus(withCompletionHandler completionHandler: @escaping (CKAccountStatus, Error?) -> Void)
 
-    func pk_status(forApplicationPermission: CKApplicationPermissions, completionHandler: @escaping CKApplicationPermissionBlock)
+    func pk_status(forApplicationPermission: CKContainer.Application.Permissions, completionHandler: @escaping CKContainer.Application.PermissionBlock)
 
-    func pk_requestApplicationPermission(_ applicationPermission: CKApplicationPermissions, completionHandler: @escaping CKApplicationPermissionBlock)
+    func pk_requestApplicationPermission(_ applicationPermission: CKContainer.Application.Permissions, completionHandler: @escaping CKContainer.Application.PermissionBlock)
 }
 
 extension CKContainer: CloudKitContainerRegistrar {
@@ -26,11 +26,11 @@ extension CKContainer: CloudKitContainerRegistrar {
         accountStatus(completionHandler: completionHandler)
     }
 
-    func pk_status(forApplicationPermission applicationPermission: CKApplicationPermissions, completionHandler: @escaping CKApplicationPermissionBlock) {
+    func pk_status(forApplicationPermission applicationPermission: CKContainer.Application.Permissions, completionHandler: @escaping CKContainer.Application.PermissionBlock) {
         status(forApplicationPermission: applicationPermission, completionHandler: completionHandler)
     }
 
-    func pk_requestApplicationPermission(_ applicationPermission: CKApplicationPermissions, completionHandler: @escaping CKApplicationPermissionBlock) {
+    func pk_requestApplicationPermission(_ applicationPermission: CKContainer.Application.Permissions, completionHandler: @escaping CKContainer.Application.PermissionBlock) {
         requestApplicationPermission(applicationPermission, completionHandler: completionHandler)
     }
 }

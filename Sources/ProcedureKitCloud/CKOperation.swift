@@ -38,9 +38,6 @@ public protocol CKOperationProtocol: class {
     /// The type of the CloudKit RecordSavePolicy
     associatedtype RecordSavePolicy
 
-    /// The type of the CloudKit DiscoveredUserInfo
-    associatedtype DiscoveredUserInfo
-
     /// The type of the CloudKit Query
     associatedtype Query
 
@@ -118,30 +115,23 @@ extension CKOperation: CKOperationProtocol {
     /// The ServerChangeToken is a CKServerChangeToken
     public typealias ServerChangeToken = CKServerChangeToken
 
-    /// The DiscoveredUserInfo is a CKDiscoveredUserInfo
-    @available(iOS, introduced: 8.0, deprecated: 10.0, message: "Replaced by CKUserIdentity")
-    @available(OSX, introduced: 10.10, deprecated: 10.12, message: "Replaced by CKUserIdentity")
-    @available(tvOS, introduced: 8.0, deprecated: 10.0, message: "Replaced by CKUserIdentity")
-    @available(watchOS, introduced: 2.0, deprecated: 3.0, message: "Replaced by CKUserIdentity")
-    public typealias DiscoveredUserInfo = CKDiscoveredUserInfo
-
     /// The RecordZone is a CKRecordZone
     public typealias RecordZone = CKRecordZone
 
     /// The RecordZoneID is a CKRecordZoneID
-    public typealias RecordZoneID = CKRecordZoneID
+    public typealias RecordZoneID = CKRecordZone.ID
 
     /// The Notification is a CKNotification
     public typealias Notification = CKNotification
 
     /// The NotificationID is a CKNotificationID
-    public typealias NotificationID = CKNotificationID
+    public typealias NotificationID = CKNotification.ID
 
     /// The Record is a CKRecord
     public typealias Record = CKRecord
 
     /// The RecordID is a CKRecordID
-    public typealias RecordID = CKRecordID
+    public typealias RecordID = CKRecord.ID
 
     #if !os(watchOS)
     /// The Subscription is a CKSubscription
@@ -152,13 +142,13 @@ extension CKOperation: CKOperationProtocol {
     #endif
 
     /// The RecordSavePolicy is a CKRecordSavePolicy
-    public typealias RecordSavePolicy = CKRecordSavePolicy
+    public typealias RecordSavePolicy = CKModifyRecordsOperation.RecordSavePolicy
 
     /// The Query is a CKQuery
     public typealias Query = CKQuery
 
     /// The QueryCursor is a CKQueryCursor
-    public typealias QueryCursor = CKQueryCursor
+    public typealias QueryCursor = CKQueryOperation.Cursor
 
     /// The UserIdentity is a CKUserIdentity
     @available(iOS 10.0, OSX 10.12, tvOS 10.0, watchOS 3.0, *)
@@ -166,7 +156,7 @@ extension CKOperation: CKOperationProtocol {
 
     /// The UserIdentityLookupInfo is a CKUserIdentityLookupInfo
     @available(iOS 10.0, OSX 10.12, tvOS 10.0, watchOS 3.0, *)
-    public typealias UserIdentityLookupInfo = CKUserIdentityLookupInfo
+    public typealias UserIdentityLookupInfo = CKUserIdentity.LookupInfo
 
     /// The Share is a CKShare
     @available(iOS 10.0, OSX 10.12, tvOS 10.0, watchOS 3.0, *)
@@ -174,11 +164,13 @@ extension CKOperation: CKOperationProtocol {
 
     /// The ShareMetadata is a CKShareMetadata
     @available(iOS 10.0, OSX 10.12, tvOS 10.0, watchOS 3.0, *)
-    public typealias ShareMetadata = CKShareMetadata
+    public typealias ShareMetadata = CKShare.Metadata
 
     /// The ShareParticipant is a CKShareParticipant
     @available(iOS 10.0, OSX 10.12, tvOS 10.0, watchOS 3.0, *)
-    public typealias ShareParticipant = CKShareParticipant
+    public typealias ShareParticipant = CKShare.Participant
+
+    public typealias LongLivedOperationWasPersistedBlockType = (() -> Void)?
 }
 
 extension CKProcedure {

@@ -11,6 +11,9 @@
     import Foundation
 #endif
 
+#if swift(>=4.2)
+#else
+
 import CloudKit
 
 /// A generic protocol which exposes the properties used by Apple's CKDiscoverAllContactsOperation.
@@ -66,4 +69,5 @@ extension CloudKitProcedure where T: CKDiscoverAllContactsOperationProtocol {
     }
 }
 
+#endif
 #endif
