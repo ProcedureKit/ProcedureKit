@@ -16,7 +16,7 @@ public class UserConfirmationCondition: Condition {
     fileprivate var alert: AlertProcedure
     private var response: Response = .unknown
 
-    public init(presentAlertFrom presenting: PresentingViewController, withPreferredStyle preferredAlertStyle: UIAlertControllerStyle = .alert, title: String = "User confirmation", message: String? = nil, confirmMessage: String = NSLocalizedString("Okay", comment: "Okay"), isDestructive: Bool = true, cancelMessage: String = NSLocalizedString("Cancel", comment: "Cancel")) {
+    public init(presentAlertFrom presenting: PresentingViewController, withPreferredStyle preferredAlertStyle: UIAlertController.Style = .alert, title: String = "User confirmation", message: String? = nil, confirmMessage: String = NSLocalizedString("Okay", comment: "Okay"), isDestructive: Bool = true, cancelMessage: String = NSLocalizedString("Cancel", comment: "Cancel")) {
 
         alert = AlertProcedure(presentAlertFrom: presenting, withPreferredStyle: preferredAlertStyle, waitForDismissal: true)
         super.init()
