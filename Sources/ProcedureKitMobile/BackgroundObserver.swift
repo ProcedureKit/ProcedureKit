@@ -9,7 +9,7 @@ import UIKit
 
 internal protocol BackgroundTaskApplicationProtocol {
 
-    var applicationState: UIApplicationState { get }
+    var applicationState: UIApplication.State { get }
 
     func beginBackgroundTask(withName taskName: String?, expirationHandler handler: (() -> Swift.Void)?) -> UIBackgroundTaskIdentifier
 
@@ -230,8 +230,8 @@ internal class BackgroundManager {
                 return backgroundTasks
             }
             let backgroundTaskIdentifiers: [UIBackgroundTaskIdentifier]? = backgroundTasks?.compactMap {
-                let identifier = $0.returnCurrentAndOverwrite(with: UIBackgroundTaskInvalid)
-                guard identifier != UIBackgroundTaskInvalid else { return nil }
+                let identifier = $0.returnCurrentAndOverwrite(with: UIBackgroundTaskIdentifier.invalid)
+                guard identifier != UIBackgroundTaskIdentifier.invalid else { return nil }
                 return identifier
             }
             return backgroundTaskIdentifiers
@@ -264,8 +264,8 @@ internal class BackgroundManager {
 
         // Register to receive Background Enter / Leave notifications
         let nc = NotificationCenter.default
-        nc.addObserver(self, selector: #selector(BackgroundManager.didEnterBackground(withNotification:)), name: NSNotification.Name.UIApplicationDidEnterBackground, object: application)
-        nc.addObserver(self, selector: #selector(BackgroundManager.didBecomeActive(withNotification:)), name: NSNotification.Name.UIApplicationDidBecomeActive, object: application)
+        nc.addObserver(self, selector: #selector(BackgroundManager.didEnterBackground(withNotification:)), name: UIApplication.didEnterBackgroundNotification, object: application)
+        nc.addObserver(self, selector: #selector(BackgroundManager.didBecomeActive(withNotification:)), name: UIApplication.didBecomeActiveNotification, object: application)
 
         // To obtain the current application state, dispatch to main
         DispatchQueue.main.async {
@@ -386,7 +386,7 @@ internal class BackgroundManager {
     private func registerBackgroundTask(for procedure: Procedure, withExpirationHandler expirationHandler: @escaping BackgroundTaskExpirationHandler) -> BackgroundHandlingResult {
         // register a background task for the Procedure
 
-        let identifier = Protector<UIBackgroundTaskIdentifier>(UIBackgroundTaskInvalid)
+        let identifier = Protector<UIBackgroundTaskIdentifier>(UIBackgroundTaskIdentifier.invalid)
         let finalExpirationHandler = { [weak procedure, application, identifier] in
             // call provided expiration handler
             if let procedure = procedure {
@@ -394,10 +394,10 @@ internal class BackgroundManager {
             }
 
             // claim the identifier (for ending *once*) here
-            let claimedIdentifier = identifier.returnCurrentAndOverwrite(with: UIBackgroundTaskInvalid)
+            let claimedIdentifier = identifier.returnCurrentAndOverwrite(with: UIBackgroundTaskIdentifier.invalid)
 
             // end background task (if it hasn't already ended)
-            guard claimedIdentifier != UIBackgroundTaskInvalid else { return }
+            guard claimedIdentifier != UIBackgroundTaskIdentifier.invalid else { return }
             application.endBackgroundTask(claimedIdentifier)
         }
 
@@ -406,7 +406,7 @@ internal class BackgroundManager {
             return ward
         }
 
-        guard createdIdentifier != UIBackgroundTaskInvalid else {
+        guard createdIdentifier != UIBackgroundTaskIdentifier.invalid else {
             // beginBackgroundTask(withName:expirationHandler:) returned `UIBackgroundTaskInvalid`
             // This can happen if running in the background is not possible.
             // Return the empty set of BackgroundHandlingResult
@@ -432,8 +432,8 @@ internal class BackgroundManager {
         // (Or a crash may result.)
         // Reference: https://developer.apple.com/reference/foundation/notificationcenter/1415360-addobserver
         let nc = NotificationCenter.default
-        nc.removeObserver(self, name: NSNotification.Name.UIApplicationDidEnterBackground, object: nil)
-        nc.removeObserver(self, name: NSNotification.Name.UIApplicationDidBecomeActive, object: nil)
+        nc.removeObserver(self, name: UIApplication.didEnterBackgroundNotification, object: nil)
+        nc.removeObserver(self, name: UIApplication.didBecomeActiveNotification, object: nil)
     }
 }
 
