@@ -11,6 +11,9 @@
 
 import CloudKit
 
+#if swift(>=4.2)
+#else
+
 /// A generic protocol which exposes the properties used by Apple's CKDiscoverUserInfosOperation.
 public protocol CKDiscoverUserInfosOperationProtocol: CKOperationProtocol {
 
@@ -98,3 +101,5 @@ extension CloudKitProcedure where T: CKDiscoverUserInfosOperationProtocol {
         appendConfigureBlock { $0.setDiscoverUserInfosCompletionBlock(block) }
     }
 }
+
+#endif
