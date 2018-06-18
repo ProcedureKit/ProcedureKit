@@ -983,7 +983,6 @@
 				65D367BE1E1843ED00D03E86 /* Sources */,
 				653C9FD91D6097E20070B7A2 /* Tests */,
 				653CA02A1D60A4FB0070B7A2 /* ... */,
-				65E5EB8220C9CAEC00C46965 /* ProcedureKitInstruments */,
 			);
 			sourceTree = "<group>";
 		};
@@ -1196,6 +1195,7 @@
 				65D368651E184AA600D03E86 /* ProcedureKit */,
 				65D367DE1E1844F800D03E86 /* ProcedureKitCloud */,
 				65A0E4B020B851D4002D6C8C /* ProcedureKitCoreData */,
+				65E5EB8220C9CAEC00C46965 /* ProcedureKitInstruments */,
 				65D368131E18450200D03E86 /* ProcedureKitLocation */,
 				65D3681E1E18451000D03E86 /* ProcedureKitMac */,
 				65D368211E18451C00D03E86 /* ProcedureKitMobile */,
@@ -1400,7 +1400,8 @@
 			children = (
 				65E5EB8320C9CAEC00C46965 /* ProcedureKitInstruments.instrpkg */,
 			);
-			path = ProcedureKitInstruments;
+			name = ProcedureKitInstruments;
+			path = Sources/ProcedureKitInstruments;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
