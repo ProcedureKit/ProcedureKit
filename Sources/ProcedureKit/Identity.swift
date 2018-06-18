@@ -5,7 +5,6 @@
 //
 
 import Foundation
-import os
 
 /// `Identifiable` is a generic protocol for defining property based identity.
 public protocol Identifiable {
@@ -43,10 +42,5 @@ extension Procedure: Identifiable {
     /// for a `Procedure` instance, comprised of the Procedure's `name` and a `UUID`.
     public var identity: Identity {
         return Identity(identity: identifier, name: name)
-    }
-
-    @available(iOS 12.0, tvOS 12.0, watchOS 5.0, OSX 10.14, *)
-    internal var signpostID: OSSignpostID {
-        return OSSignpostID(log: ProcedureKit.Signposts.procedure, object: identifier as AnyObject)
     }
 }

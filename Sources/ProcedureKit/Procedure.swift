@@ -213,9 +213,7 @@ open class Procedure: Operation, ProcedureProtocol {
         }
     }
 
-    public let identifier = UUID()
-
-    public internal(set) var parentIdentifier: UUID?
+    internal let identifier = UUID()
 
     internal var typeDescription: String {
         return String(describing: type(of: self))
@@ -279,25 +277,22 @@ open class Procedure: Operation, ProcedureProtocol {
         return stateLock.withCriticalScope { _isFinished }
     }
 
-    /// Boolean indicator for whether the Procedure is a Group
-    public var isGroup: Bool {
-        return false
-    }
-
     public var status: ProcedureStatus {
-        switch (isPending, isExecuting, isFinished, isCancelled, failed) {
-        case (true, _, _, _, _):
-            return .pending
-        case (_, true, _, _, _):
-            return .executing
-        case (_, _, true, _, _):
-            return .finished
-        case (_, _, _, true, _):
-            return .cancelled
-        case (_, _, _, _, true):
-            return .failed
-        default:
-            return .finished
+        return stateLock.withCriticalScope {
+            switch (_isPending, _isExecuting, _isFinished, _isCancelled, (_errors.count > 0)) {
+            case (true, _, _, _, _):
+                return .pending
+            case (_, true, _, _, _):
+                return .executing
+            case (_, _, true, _, _):
+                return .finished
+            case (_, _, _, true, _):
+                return .cancelled
+            case (_, _, _, _, true):
+                return .failed
+            default:
+                return .finished
+            }
         }
     }
 
@@ -489,6 +484,8 @@ open class Procedure: Operation, ProcedureProtocol {
         isAutomaticFinishingDisabled = false
         super.init()
         name = String(describing: type(of: self))
+
+        // Add a signpost observer to every procedure        
         if #available(iOS 12.0, tvOS 12.0, watchOS 5.0, OSX 10.14, *) {
             add(observer: SignpostObserver())
         }

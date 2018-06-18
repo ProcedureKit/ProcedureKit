@@ -46,10 +46,3 @@ extension SignpostObserver: ProcedureObserver {
             "Procedure name: %{public}s, status: %{public}s", procedure.procedureName, procedure.status.rawValue)
     }
 }
-
-extension Bool {
-
-    var intValue: Int {
-        return NSNumber(booleanLiteral: self).intValue
-    }
-}
