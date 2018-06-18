@@ -37,11 +37,6 @@ open class GroupProcedure: Procedure {
         get { return groupStateLock.withCriticalScope { _groupChildren } }
     }
 
-    /// Boolean indicator for whether the Procedure is a Group
-    public override var isGroup: Bool {
-        return true
-    }
-
     /**
      The default service level to apply to the GroupProcedure and its child operations.
      
@@ -395,9 +390,6 @@ public extension GroupProcedure {
                 observer.procedure(self, willAdd: $0)
             }
         }
-
-        // Set parent identifier on the Procedures
-        additional.forEachProcedure { $0.parentIdentifier = self.identifier }
 
         optimizedDispatchEventNotify(group: willAddObserversGroup) {
 
