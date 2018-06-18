@@ -21,7 +21,7 @@ public class AlertProcedure: UIProcedure {
 
      - returns: the preferred style of the alert
      */
-    public var preferredStyle: UIAlertControllerStyle {
+    public var preferredStyle: UIAlertController.Style {
         return alert.preferredStyle
     }
 
@@ -98,7 +98,7 @@ public class AlertProcedure: UIProcedure {
      - parameter from: a generic type conforming to `PresentingViewController`,
      such as an `UIViewController`
      */
-    public init(presentAlertFrom presenting: PresentingViewController, withPreferredStyle preferredAlertStyle: UIAlertControllerStyle = .alert, waitForDismissal: Bool = true) {
+    public init(presentAlertFrom presenting: PresentingViewController, withPreferredStyle preferredAlertStyle: UIAlertController.Style = .alert, waitForDismissal: Bool = true) {
         let alert = UIAlertController(title: nil, message: nil, preferredStyle: preferredAlertStyle)
         super.init(present: alert, from: presenting, withStyle: .present, inNavigationController: false, sender: nil, finishAfterPresenting: !waitForDismissal)
         add(condition: MutuallyExclusive<UIAlertController>())
@@ -114,7 +114,7 @@ public class AlertProcedure: UIProcedure {
      - parameter style: a `UIAlertActionStyle` which defaults to `.default`.
      - parameter handler: a block which receives the operation, and returns Void.
      */
-    @discardableResult public func add(actionWithTitle title: String?, style: UIAlertActionStyle = .default, handler: @escaping (AlertProcedure, UIAlertAction) -> Void = { _, _ in }) -> UIAlertAction {
+    @discardableResult public func add(actionWithTitle title: String?, style: UIAlertAction.Style = .default, handler: @escaping (AlertProcedure, UIAlertAction) -> Void = { _, _ in }) -> UIAlertAction {
         let action = UIAlertAction(title: title, style: style) { [weak self] action in
             guard let strongSelf = self else { return }
             handler(strongSelf, action)

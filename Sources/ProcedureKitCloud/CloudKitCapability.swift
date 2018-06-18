@@ -27,13 +27,13 @@ import CloudKit
  */
 public struct CloudKitStatus: AuthorizationStatus {
 
-    public typealias Requirement = CKApplicationPermissions
+    public typealias Requirement = CKContainer.Application.Permissions
 
     /// - returns: the CKAccountStatus
     public let account: CKAccountStatus
 
     /// - returns: the CKApplicationPermissionStatus?
-    public let permissions: CKApplicationPermissionStatus?
+    public let permissions: CKContainer.Application.PermissionStatus?
 
     /// - returns: any NSError?
     public let error: Error?
@@ -44,7 +44,7 @@ public struct CloudKitStatus: AuthorizationStatus {
      the account status, application permission status, and the required
      application permissions.
      */
-    public func meets(requirement: CKApplicationPermissions?) -> Bool {
+    public func meets(requirement: CKContainer.Application.Permissions?) -> Bool {
         guard error == nil else { return false }
 
         guard let requirement = requirement else {
@@ -66,7 +66,7 @@ extension Capability {
 
     public class CloudKit: CapabilityProtocol {
 
-        public private(set) var requirement: CKApplicationPermissions?
+        public private(set) var requirement: CKContainer.Application.Permissions?
 
         internal let containerId: String?
 
@@ -78,7 +78,7 @@ extension Capability {
             }
         }
 
-        public init(_ requirement: CKApplicationPermissions? = nil, containerId: String? = nil) {
+        public init(_ requirement: CKContainer.Application.Permissions? = nil, containerId: String? = nil) {
             self.requirement = requirement
             self.containerId = containerId
         }

@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+set -euo pipefail
+set +u
+source /usr/local/opt/chruby/share/chruby/chruby.sh
+chruby ruby
+set -u
+bundle install --quiet
+xcodebuild -project "ProcedureKit.xcodeproj" -scheme "tvOS" -destination "platform=tvOS Simulator,name=Apple TV" clean test | tee .ci/results/xcodebuild.log | xcpretty
