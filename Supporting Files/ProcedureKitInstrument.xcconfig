@@ -1,0 +1,10 @@
+//
+//  ProcedureKit
+//
+//  Copyright © 2015-2018 ProcedureKit. All rights reserved.
+//
+
+PRODUCT_BUNDLE_IDENTIFIER = run.kit.procedure.ProcedureKitInstrument
+PRODUCT_NAME = ProcedureKitInstrument
+
+INSTALL_PATH = $(LOCAL_LIBRARY_DIR)/Instruments/Packages

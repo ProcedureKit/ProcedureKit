@@ -224,6 +224,8 @@
 		65D368AB1E184AA600D03E86 /* Support.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D368871E184AA600D03E86 /* Support.swift */; };
 		65D368AC1E184AA600D03E86 /* TimeoutObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D368881E184AA600D03E86 /* TimeoutObserver.swift */; };
 		65D368AD1E184AA600D03E86 /* Transform.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D368891E184AA600D03E86 /* Transform.swift */; };
+		65D4BEF520C8A31100D85877 /* SignpostObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D4BEF420C8A31100D85877 /* SignpostObserver.swift */; };
+		65E5EB8420C9CAEC00C46965 /* ProcedureKitInstruments.instrpkg in Sources */ = {isa = PBXBuildFile; fileRef = 65E5EB8320C9CAEC00C46965 /* ProcedureKitInstruments.instrpkg */; };
 		65ECB2D61DB4F0C000F96F46 /* ProcedureKitNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65ECB2CD1DB4F0C000F96F46 /* ProcedureKitNetwork.framework */; };
 		65ECB2EA1DB4F1A200F96F46 /* ProcedureKitNetwork.h in Headers */ = {isa = PBXBuildFile; fileRef = 65ECB2E81DB4F1A200F96F46 /* ProcedureKitNetwork.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		65ECB2EC1DB4F27700F96F46 /* TestingProcedureKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65CFC6161D60900000CAD875 /* TestingProcedureKit.framework */; };
@@ -754,6 +756,10 @@
 		65D368871E184AA600D03E86 /* Support.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Support.swift; sourceTree = "<group>"; };
 		65D368881E184AA600D03E86 /* TimeoutObserver.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TimeoutObserver.swift; sourceTree = "<group>"; };
 		65D368891E184AA600D03E86 /* Transform.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Transform.swift; sourceTree = "<group>"; };
+		65D4BEF420C8A31100D85877 /* SignpostObserver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignpostObserver.swift; sourceTree = "<group>"; };
+		65D4BEF920C8DDA700D85877 /* ProcedureKitInstruments.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = ProcedureKitInstruments.xcconfig; path = "Supporting Files/ProcedureKitInstruments.xcconfig"; sourceTree = "<group>"; };
+		65E5EB8120C9CAEC00C46965 /* ProcedureKitInstruments.instrdst */ = {isa = PBXFileReference; explicitFileType = com.apple.instruments.instrdst; includeInIndex = 0; path = ProcedureKitInstruments.instrdst; sourceTree = BUILT_PRODUCTS_DIR; };
+		65E5EB8320C9CAEC00C46965 /* ProcedureKitInstruments.instrpkg */ = {isa = PBXFileReference; lastKnownFileType = "com.apple.instruments.package-definition"; path = ProcedureKitInstruments.instrpkg; sourceTree = "<group>"; };
 		65ECB2CD1DB4F0C000F96F46 /* ProcedureKitNetwork.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ProcedureKitNetwork.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		65ECB2D51DB4F0C000F96F46 /* ProcedureKitNetworkTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ProcedureKitNetworkTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		65ECB2E81DB4F1A200F96F46 /* ProcedureKitNetwork.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ProcedureKitNetwork.h; path = "Supporting Files/ProcedureKitNetwork.h"; sourceTree = "<group>"; };
@@ -1003,6 +1009,7 @@
 				65ECB2D51DB4F0C000F96F46 /* ProcedureKitNetworkTests.xctest */,
 				65A0E49920B85168002D6C8C /* ProcedureKitCoreData.framework */,
 				65A0E4A120B85169002D6C8C /* ProcedureKitCoreDataTests.xctest */,
+				65E5EB8120C9CAEC00C46965 /* ProcedureKitInstruments.instrdst */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1023,6 +1030,7 @@
 				65CFC60E1D608AE200CAD875 /* ProcedureKit.xcconfig */,
 				653CA0751D60AB2B0070B7A2 /* ProcedureKitCloud.xcconfig */,
 				65A0E4B520B85297002D6C8C /* ProcedureKitCoreData.xcconfig */,
+				65D4BEF920C8DDA700D85877 /* ProcedureKitInstruments.xcconfig */,
 				659484371DAAA3A60028F83B /* ProcedureKitLocation.xcconfig */,
 				653CA0491D60A6630070B7A2 /* ProcedureKitMac.xcconfig */,
 				653C9FDC1D6098650070B7A2 /* ProcedureKitMobile.xcconfig */,
@@ -1189,6 +1197,7 @@
 				65D368651E184AA600D03E86 /* ProcedureKit */,
 				65D367DE1E1844F800D03E86 /* ProcedureKitCloud */,
 				65A0E4B020B851D4002D6C8C /* ProcedureKitCoreData */,
+				65E5EB8220C9CAEC00C46965 /* ProcedureKitInstruments */,
 				65D368131E18450200D03E86 /* ProcedureKitLocation */,
 				65D3681E1E18451000D03E86 /* ProcedureKitMac */,
 				65D368211E18451C00D03E86 /* ProcedureKitMobile */,
@@ -1344,6 +1353,7 @@
 				65D368791E184AA600D03E86 /* NetworkObserver.swift */,
 				65D368811E184AA600D03E86 /* Profiler.swift */,
 				65D368881E184AA600D03E86 /* TimeoutObserver.swift */,
+				65D4BEF420C8A31100D85877 /* SignpostObserver.swift */,
 			);
 			name = Observers;
 			sourceTree = "<group>";
@@ -1386,6 +1396,15 @@
 				65D368801E184AA600D03E86 /* ProcedureResult.swift */,
 			);
 			name = Core;
+			sourceTree = "<group>";
+		};
+		65E5EB8220C9CAEC00C46965 /* ProcedureKitInstruments */ = {
+			isa = PBXGroup;
+			children = (
+				65E5EB8320C9CAEC00C46965 /* ProcedureKitInstruments.instrpkg */,
+			);
+			name = ProcedureKitInstruments;
+			path = Sources/ProcedureKitInstruments;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -1779,6 +1798,21 @@
 			productReference = 65CFC6161D60900000CAD875 /* TestingProcedureKit.framework */;
 			productType = "com.apple.product-type.framework";
 		};
+		65E5EB8020C9CAEC00C46965 /* ProcedureKitInstruments */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 65E5EB8520C9CAEC00C46965 /* Build configuration list for PBXNativeTarget "ProcedureKitInstruments" */;
+			buildPhases = (
+				65E5EB7F20C9CAEC00C46965 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = ProcedureKitInstruments;
+			productName = ProcedureKitInstruments;
+			productReference = 65E5EB8120C9CAEC00C46965 /* ProcedureKitInstruments.instrdst */;
+			productType = "com.apple.product-type.instruments-package";
+		};
 		65ECB2CC1DB4F0C000F96F46 /* ProcedureKitNetwork */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 65ECB2DE1DB4F0C000F96F46 /* Build configuration list for PBXNativeTarget "ProcedureKitNetwork" */;
@@ -1826,6 +1860,7 @@
 			isa = PBXProject;
 			attributes = {
 				CLASSPREFIX = PCK;
+				DefaultBuildSystemTypeForWorkspace = Latest;
 				LastSwiftUpdateCheck = 0930;
 				LastUpgradeCheck = 0930;
 				ORGANIZATIONNAME = ProcedureKit;
@@ -1898,6 +1933,9 @@
 						CreatedOnToolsVersion = 8.0;
 						LastSwiftMigration = 0920;
 					};
+					65E5EB8020C9CAEC00C46965 = {
+						CreatedOnToolsVersion = 10.0;
+					};
 					65ECB2CC1DB4F0C000F96F46 = {
 						CreatedOnToolsVersion = 8.0;
 						LastSwiftMigration = 0920;
@@ -1939,6 +1977,7 @@
 				65ECB2D41DB4F0C000F96F46 /* ProcedureKitNetworkTests */,
 				653C9FF21D609E650070B7A2 /* ProcedureKitTV */,
 				653C9FFA1D609E660070B7A2 /* ProcedureKitTVTests */,
+				65E5EB8020C9CAEC00C46965 /* ProcedureKitInstruments */,
 			);
 		};
 /* End PBXProject section */
@@ -2295,6 +2334,7 @@
 				652F903D209E3E3D00365B2D /* IgnoreErrors.swift in Sources */,
 				65D368A91E184AA600D03E86 /* Retry.swift in Sources */,
 				65D368931E184AA600D03E86 /* Delay.swift in Sources */,
+				65D4BEF520C8A31100D85877 /* SignpostObserver.swift in Sources */,
 				65D3689B1E184AA600D03E86 /* MutualExclusion.swift in Sources */,
 				65D368991E184AA600D03E86 /* Logging.swift in Sources */,
 				65D368AD1E184AA600D03E86 /* Transform.swift in Sources */,
@@ -2359,6 +2399,14 @@
 				65D367DB1E1844E500D03E86 /* TestCondition.swift in Sources */,
 				65D367D91E1844E500D03E86 /* TestableNetwork.swift in Sources */,
 				65D367D31E1844E500D03E86 /* ConcurrencyTestCase.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		65E5EB7F20C9CAEC00C46965 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				65E5EB8420C9CAEC00C46965 /* ProcedureKitInstruments.instrpkg in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4285,6 +4333,26 @@
 			};
 			name = Release;
 		};
+		65E5EB8620C9CAEC00C46965 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Instruments/Packages";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				VERSIONING_SYSTEM = "";
+			};
+			name = Debug;
+		};
+		65E5EB8720C9CAEC00C46965 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Instruments/Packages";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				VERSIONING_SYSTEM = "";
+			};
+			name = Release;
+		};
 		65ECB2DF1DB4F0C000F96F46 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 65ECB2E91DB4F1A200F96F46 /* ProcedureKitNetwork.xcconfig */;
@@ -4653,6 +4721,15 @@
 			buildConfigurations = (
 				65CFC61B1D60900000CAD875 /* Debug */,
 				65CFC61C1D60900000CAD875 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		65E5EB8520C9CAEC00C46965 /* Build configuration list for PBXNativeTarget "ProcedureKitInstruments" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				65E5EB8620C9CAEC00C46965 /* Debug */,
+				65E5EB8720C9CAEC00C46965 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
