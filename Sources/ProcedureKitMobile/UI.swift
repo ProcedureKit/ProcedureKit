@@ -17,6 +17,7 @@ public protocol PresentingViewController: class {
     func showDetailViewController(_ viewControllerToShow: UIViewController, sender: Any?)
 }
 
+@available(*, deprecated: 5.0.0, message: "UIProcedure is now deprecated and will be removed")
 extension UIViewController: PresentingViewController { }
 
 @available(*, deprecated: 5.0.0, message: "UIProcedure is now deprecated and will be removed")

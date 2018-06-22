@@ -7,6 +7,7 @@
 import Foundation
 import UIKit
 
+@available(*, deprecated: 5.0.0, message: "UIProcedure is now deprecated and will be removed")
 public class AlertProcedure: UIProcedure {
 
     /// - returns: the presented `UIAlertController`.
