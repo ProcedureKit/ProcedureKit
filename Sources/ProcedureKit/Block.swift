@@ -80,16 +80,38 @@ open class UIBlockProcedure: AsyncBlockProcedure {
     public typealias ThrowingOutputBlock = () throws -> Output
 
     public init(block: @escaping ThrowingOutputBlock) {
-        super.init { finishWithResult in
-            let sub = BlockProcedure(block: block)
-            sub.addDidFinishBlockObserver { (_, errors) in
-                finishWithResult(.failure(ProcedureKitError.dependency(finishedWithErrors: errors)))
-            }
-            sub.addDidCancelBlockObserver { (_, errors) in
-                finishWithResult(.failure(ProcedureKitError.dependency(cancelledWithErrors: errors)))
+        super.init { (finishWithResult) in
+
+            func go(_ finishingBlock: FinishingBlock) {
+                do {
+                    try block()
+                    finishWithResult(success)
+                }
+                catch {
+                    finishWithResult(.failure(error))
+                }
             }
 
-            ProcedureQueue.main.add(operation: BlockProcedure(block: block))
+            guard DispatchQueue.isMainDispatchQueue == false else {
+                go(finishWithResult)
+                return
+            }
+
+            let sub = AsyncBlockProcedure { finishWithResult in
+                go(finishWithResult)
+            }
+
+            sub.log.enabled = false
+
+            sub.addDidFinishBlockObserver { (_, errors) in
+                if errors.isEmpty {
+                    finishWithResult(success)
+                } else {
+                    finishWithResult(.failure(ProcedureKitError.dependency(finishedWithErrors: errors)))
+                }
+            }
+
+            ProcedureQueue.main.add(operation: sub)
         }
     }
 }

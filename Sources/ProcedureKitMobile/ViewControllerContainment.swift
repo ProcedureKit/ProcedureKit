@@ -76,6 +76,7 @@ open class AddChildViewControllerProcedure: UIBlockProcedure {
         super.init {
             parent.add(child: child, with: frame, in: view, setAutolayoutConstraints: block)
         }
+        name = "Add Child ViewController"
     }
 
     @available(iOS 9.0, *)
@@ -94,6 +95,7 @@ open class RemoveChildViewControllerProcedure: UIBlockProcedure {
         super.init {
             child.removeFromParent()
         }
+        name = "Remove Child ViewController"
     }
 }
 
@@ -106,6 +108,7 @@ open class SetChildViewControllerProcedure: UIBlockProcedure {
             parent.childViewControllers.forEach { $0.removeFromParent() }
             parent.add(child: child, with: frame, in: view, setAutolayoutConstraints: block)
         }
+        name = "Set Child ViewController"
     }
 
     @available(iOS 9.0, *)
