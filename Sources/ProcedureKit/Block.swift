@@ -81,7 +81,16 @@ open class UIBlockProcedure: AsyncBlockProcedure {
 
     public init(block: @escaping ThrowingOutputBlock) {
         super.init { finishWithResult in
-            let sub = BlockProcedure(block: block)
+
+            let sub = AsyncBlockProcedure { (finishWithResult) in
+                do {
+                    let _ = try block()
+                    finishWithResult(success)
+                }
+                catch {
+                    finishWithResult(.failure(error))
+                }
+            }
             sub.addDidFinishBlockObserver { (_, errors) in
                 finishWithResult(.failure(ProcedureKitError.dependency(finishedWithErrors: errors)))
             }
@@ -89,7 +98,7 @@ open class UIBlockProcedure: AsyncBlockProcedure {
                 finishWithResult(.failure(ProcedureKitError.dependency(cancelledWithErrors: errors)))
             }
 
-            ProcedureQueue.main.add(operation: BlockProcedure(block: block))
+            ProcedureQueue.main.add(operation: sub)
         }
     }
 }
