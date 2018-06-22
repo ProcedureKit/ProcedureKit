@@ -14,9 +14,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "65CFC5EF1D608A5500CAD875"
-               BuildableName = "ProcedureKit.framework"
-               BlueprintName = "ProcedureKit"
+               BlueprintIdentifier = "65A0E49820B85168002D6C8C"
+               BuildableName = "ProcedureKitCoreData.framework"
+               BlueprintName = "ProcedureKitCoreData"
                ReferencedContainer = "container:ProcedureKit.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -26,17 +26,15 @@
       buildConfiguration = "Debug"
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
-      enableThreadSanitizer = "YES"
-      enableUBSanitizer = "YES"
       codeCoverageEnabled = "YES"
       onlyGenerateCoverageForSpecifiedTargets = "YES"
       shouldUseLaunchSchemeArgsEnv = "YES">
       <CodeCoverageTargets>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "65CFC5EF1D608A5500CAD875"
-            BuildableName = "ProcedureKit.framework"
-            BlueprintName = "ProcedureKit"
+            BlueprintIdentifier = "65A0E49820B85168002D6C8C"
+            BuildableName = "ProcedureKitCoreData.framework"
+            BlueprintName = "ProcedureKitCoreData"
             ReferencedContainer = "container:ProcedureKit.xcodeproj">
          </BuildableReference>
       </CodeCoverageTargets>
@@ -47,9 +45,9 @@
             testExecutionOrdering = "random">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "65CFC5F81D608A5500CAD875"
-               BuildableName = "ProcedureKitTests.xctest"
-               BlueprintName = "ProcedureKitTests"
+               BlueprintIdentifier = "65A0E4A020B85169002D6C8C"
+               BuildableName = "ProcedureKitCoreDataTests.xctest"
+               BlueprintName = "ProcedureKitCoreDataTests"
                ReferencedContainer = "container:ProcedureKit.xcodeproj">
             </BuildableReference>
          </TestableReference>
@@ -57,9 +55,9 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "65CFC5EF1D608A5500CAD875"
-            BuildableName = "ProcedureKit.framework"
-            BlueprintName = "ProcedureKit"
+            BlueprintIdentifier = "65A0E49820B85168002D6C8C"
+            BuildableName = "ProcedureKitCoreData.framework"
+            BlueprintName = "ProcedureKitCoreData"
             ReferencedContainer = "container:ProcedureKit.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
@@ -79,9 +77,9 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "65CFC5EF1D608A5500CAD875"
-            BuildableName = "ProcedureKit.framework"
-            BlueprintName = "ProcedureKit"
+            BlueprintIdentifier = "65A0E49820B85168002D6C8C"
+            BuildableName = "ProcedureKitCoreData.framework"
+            BlueprintName = "ProcedureKitCoreData"
             ReferencedContainer = "container:ProcedureKit.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
@@ -97,9 +95,9 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "65CFC5EF1D608A5500CAD875"
-            BuildableName = "ProcedureKit.framework"
-            BlueprintName = "ProcedureKit"
+            BlueprintIdentifier = "65A0E49820B85168002D6C8C"
+            BuildableName = "ProcedureKitCoreData.framework"
+            BlueprintName = "ProcedureKitCoreData"
             ReferencedContainer = "container:ProcedureKit.xcodeproj">
          </BuildableReference>
       </MacroExpansion>

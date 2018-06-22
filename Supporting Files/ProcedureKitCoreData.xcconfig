@@ -1,0 +1,18 @@
+//
+//  ProcedureKit
+//
+//  Copyright © 2015-2018 ProcedureKit. All rights reserved.
+//
+
+PRODUCT_BUNDLE_IDENTIFIER_framework = run.kit.procedure.ProcedureKitCoreData
+PRODUCT_BUNDLE_IDENTIFIER_xctest = run.kit.procedure.ProcedureKitCoreDataTests
+PRODUCT_BUNDLE_IDENTIFIER = $(PRODUCT_BUNDLE_IDENTIFIER_$(WRAPPER_EXTENSION))
+
+PRODUCT_NAME_framework = ProcedureKitCoreData
+PRODUCT_NAME_xctest = ProcedureKitCoreDataTests
+PRODUCT_NAME = $(PRODUCT_NAME_$(WRAPPER_EXTENSION))
+
+MACOSX_DEPLOYMENT_TARGET = 10.12
+IPHONEOS_DEPLOYMENT_TARGET = 10.0
+TVOS_DEPLOYMENT_TARGET = 10.0
+WATCHOS_DEPLOYMENT_TARGET = 3.0

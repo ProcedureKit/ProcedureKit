@@ -109,6 +109,12 @@ open class RetryProcedure<T: Procedure>: RepeatProcedure<T> {
         super.init(dispatchQueue: dispatchQueue, max: max, iterator: retry)
     }
 
+    public init(upto max: Int, wait: WaitStrategy = .constant(0.2), body: @escaping () -> T?) {
+        let payloadIterator = MapIterator(PairIterator(primary: AnyIterator(body), secondary: Delay.iterator(wait.iterator))) { Payload(operation: $0.0, delay: $0.1) }
+        retry = RetryIterator(handler: { $1 }, iterator: payloadIterator)
+        super.init(max: max, iterator: retry)
+    }
+
     /// Handle child willFinish event
     ///
     /// This is used by RetryProcedure to trigger adding the next Procedure,

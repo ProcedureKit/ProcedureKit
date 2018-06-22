@@ -29,10 +29,22 @@
       enableThreadSanitizer = "YES"
       enableUBSanitizer = "YES"
       codeCoverageEnabled = "YES"
+      onlyGenerateCoverageForSpecifiedTargets = "YES"
       shouldUseLaunchSchemeArgsEnv = "YES">
+      <CodeCoverageTargets>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "653C9FF21D609E650070B7A2"
+            BuildableName = "ProcedureKitTV.framework"
+            BlueprintName = "ProcedureKitTV"
+            ReferencedContainer = "container:ProcedureKit.xcodeproj">
+         </BuildableReference>
+      </CodeCoverageTargets>
       <Testables>
          <TestableReference
-            skipped = "NO">
+            skipped = "NO"
+            parallelizable = "YES"
+            testExecutionOrdering = "random">
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "653C9FFA1D609E660070B7A2"

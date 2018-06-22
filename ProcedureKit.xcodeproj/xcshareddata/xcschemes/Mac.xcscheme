@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
-   LastUpgradeVersion = "0930"
-   version = "1.7">
+   LastUpgradeVersion = "1000"
+   version = "1.3">
    <BuildAction
       parallelizeBuildables = "YES"
       buildImplicitDependencies = "YES">
@@ -42,9 +42,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "65ECB2CC1DB4F0C000F96F46"
-               BuildableName = "ProcedureKitNetwork.framework"
-               BlueprintName = "ProcedureKitNetwork"
+               BlueprintIdentifier = "65A0E49820B85168002D6C8C"
+               BuildableName = "ProcedureKitCoreData.framework"
+               BlueprintName = "ProcedureKitCoreData"
                ReferencedContainer = "container:ProcedureKit.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -70,9 +70,23 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "65CFC6151D60900000CAD875"
-               BuildableName = "TestingProcedureKit.framework"
-               BlueprintName = "TestingProcedureKit"
+               BlueprintIdentifier = "653CA02F1D60A5D10070B7A2"
+               BuildableName = "ProcedureKitMac.framework"
+               BlueprintName = "ProcedureKitMac"
+               ReferencedContainer = "container:ProcedureKit.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "65ECB2CC1DB4F0C000F96F46"
+               BuildableName = "ProcedureKitNetwork.framework"
+               BlueprintName = "ProcedureKitNetwork"
                ReferencedContainer = "container:ProcedureKit.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -95,9 +109,9 @@
          </BuildableReference>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "653CA0591D60AA990070B7A2"
-            BuildableName = "ProcedureKitCloud.framework"
-            BlueprintName = "ProcedureKitCloud"
+            BlueprintIdentifier = "65A0E49820B85168002D6C8C"
+            BuildableName = "ProcedureKitCoreData.framework"
+            BlueprintName = "ProcedureKitCoreData"
             ReferencedContainer = "container:ProcedureKit.xcodeproj">
          </BuildableReference>
          <BuildableReference
@@ -109,15 +123,31 @@
          </BuildableReference>
          <BuildableReference
             BuildableIdentifier = "primary"
+            BlueprintIdentifier = "653CA02F1D60A5D10070B7A2"
+            BuildableName = "ProcedureKitMac.framework"
+            BlueprintName = "ProcedureKitMac"
+            ReferencedContainer = "container:ProcedureKit.xcodeproj">
+         </BuildableReference>
+         <BuildableReference
+            BuildableIdentifier = "primary"
             BlueprintIdentifier = "65ECB2CC1DB4F0C000F96F46"
             BuildableName = "ProcedureKitNetwork.framework"
             BlueprintName = "ProcedureKitNetwork"
             ReferencedContainer = "container:ProcedureKit.xcodeproj">
          </BuildableReference>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "653CA0591D60AA990070B7A2"
+            BuildableName = "ProcedureKitCloud.framework"
+            BlueprintName = "ProcedureKitCloud"
+            ReferencedContainer = "container:ProcedureKit.xcodeproj">
+         </BuildableReference>
       </CodeCoverageTargets>
       <Testables>
          <TestableReference
-            skipped = "NO">
+            skipped = "NO"
+            parallelizable = "YES"
+            testExecutionOrdering = "random">
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "65CFC5F81D608A5500CAD875"
@@ -127,17 +157,9 @@
             </BuildableReference>
          </TestableReference>
          <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "653CA0171D60A34E0070B7A2"
-               BuildableName = "ProcedureKitStressTests.xctest"
-               BlueprintName = "ProcedureKitStressTests"
-               ReferencedContainer = "container:ProcedureKit.xcodeproj">
-            </BuildableReference>
-         </TestableReference>
-         <TestableReference
-            skipped = "NO">
+            skipped = "NO"
+            parallelizable = "YES"
+            testExecutionOrdering = "random">
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "653CA0611D60AA990070B7A2"
@@ -147,17 +169,21 @@
             </BuildableReference>
          </TestableReference>
          <TestableReference
-            skipped = "NO">
+            skipped = "NO"
+            parallelizable = "YES"
+            testExecutionOrdering = "random">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "65ECB2D41DB4F0C000F96F46"
-               BuildableName = "ProcedureKitNetworkTests.xctest"
-               BlueprintName = "ProcedureKitNetworkTests"
+               BlueprintIdentifier = "65A0E4A020B85169002D6C8C"
+               BuildableName = "ProcedureKitCoreDataTests.xctest"
+               BlueprintName = "ProcedureKitCoreDataTests"
                ReferencedContainer = "container:ProcedureKit.xcodeproj">
             </BuildableReference>
          </TestableReference>
          <TestableReference
-            skipped = "NO">
+            skipped = "NO"
+            parallelizable = "YES"
+            testExecutionOrdering = "random">
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "659484251DAAA2B90028F83B"
@@ -165,10 +191,30 @@
                BlueprintName = "ProcedureKitLocationTests"
                ReferencedContainer = "container:ProcedureKit.xcodeproj">
             </BuildableReference>
-            <LocationScenarioReference
-               identifier = "London, England"
-               referenceType = "1">
-            </LocationScenarioReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO"
+            parallelizable = "YES"
+            testExecutionOrdering = "random">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "653CA0371D60A5D10070B7A2"
+               BuildableName = "ProcedureKitMacTests.xctest"
+               BlueprintName = "ProcedureKitMacTests"
+               ReferencedContainer = "container:ProcedureKit.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO"
+            parallelizable = "YES"
+            testExecutionOrdering = "random">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "65ECB2D41DB4F0C000F96F46"
+               BuildableName = "ProcedureKitNetworkTests.xctest"
+               BlueprintName = "ProcedureKitNetworkTests"
+               ReferencedContainer = "container:ProcedureKit.xcodeproj">
+            </BuildableReference>
          </TestableReference>
       </Testables>
       <MacroExpansion>

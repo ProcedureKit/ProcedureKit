@@ -38,6 +38,13 @@ class RetryProcedureTests: RetryTestCase {
         XCTAssertEqual(retry.count, 3)
     }
 
+    func test__with_block_fails_after_max() {
+        retry = Retry(upto: 3) { TestProcedure(error: ProcedureKitError.unknown) }
+        wait(for: retry)
+        XCTAssertProcedureFinishedWithErrors(retry)
+        XCTAssertEqual(retry.count, 3)
+    }
+
     func test__with_input_procedure_payload() {
 
         let outputProcedure = TestProcedure()
