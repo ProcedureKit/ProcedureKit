@@ -196,7 +196,7 @@ class NetworkProcedureTests: ProcedureKitTestCase {
         }.injectPayload(fromNetwork: procedure)
 
         wait(for: procedure, transform)
-        XCTAssertProcedureCancelledWithErrors(transform, count: 1)
+        PKAssertProcedureCancelledWithError(transform, ProcedureKitError.dependency(finishedWithError: procedure.error))
         XCTAssertFalse(didReceivePayload)
     }
 }

@@ -60,7 +60,7 @@ class NetworkDataProcedureTests: ProcedureKitTestCase {
             self.download.cancel()
         }
         wait(for: download, delay)
-        XCTAssertProcedureCancelledWithoutErrors(download)
+        PKAssertProcedureCancelled(download)
         XCTAssertTrue(session.didReturnDataTask?.didCancel ?? false)
     }
 
@@ -70,7 +70,7 @@ class NetworkDataProcedureTests: ProcedureKitTestCase {
             procedure.cancel()
         }
         wait(for: download)
-        XCTAssertProcedureCancelledWithoutErrors(download)
+        PKAssertProcedureCancelled(download)
     }
 
     func test__download_cancelled_does_not_call_completion_handler() {
@@ -85,7 +85,7 @@ class NetworkDataProcedureTests: ProcedureKitTestCase {
             procedure.cancel()
         }
         wait(for: download)
-        XCTAssertProcedureCancelledWithoutErrors(download)
+        PKAssertProcedureCancelled(download)
         XCTAssertFalse(calledCompletionHandler)
     }
 
@@ -100,14 +100,15 @@ class NetworkDataProcedureTests: ProcedureKitTestCase {
     func test__no_data__finishes_with_error() {
         session.returnedData = nil
         wait(for: download)
-        XCTAssertProcedureFinishedWithErrors(download, count: 1)        
+        PKAssertProcedureFinishedWithError(download, ProcedureKitError.unknown)
     }
 
     func test__session_error__finishes_with_error() {
-        session.returnedError = NSError(domain: NSURLErrorDomain, code: NSURLErrorNotConnectedToInternet, userInfo: nil)
+        let error = NSError(domain: NSURLErrorDomain, code: NSURLErrorNotConnectedToInternet, userInfo: nil)
+        session.returnedError = error
         wait(for: download)
-        XCTAssertProcedureFinishedWithErrors(download, count: 1)
         XCTAssertNotNil(download.error)
+        PKAssertProcedureFinishedWithError(download, error)
     }
 
     func test__completion_handler_receives_data_and_response() {

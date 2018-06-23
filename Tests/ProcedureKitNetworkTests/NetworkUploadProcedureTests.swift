@@ -63,7 +63,7 @@ class NetworkUploadProcedureTests: ProcedureKitTestCase {
             self.upload.cancel()
         }
         wait(for: upload, delay)
-        XCTAssertProcedureCancelledWithoutErrors(upload)
+        PKAssertProcedureCancelled(upload)
         XCTAssertTrue(session.didReturnUploadTask?.didCancel ?? false)
     }
 
@@ -73,7 +73,7 @@ class NetworkUploadProcedureTests: ProcedureKitTestCase {
             procedure.cancel()
         }
         wait(for: upload)
-        XCTAssertProcedureCancelledWithoutErrors(upload)
+        PKAssertProcedureCancelled(upload)
     }
 
     func test__upload_cancelled_does_not_call_completion_handler() {
@@ -88,7 +88,7 @@ class NetworkUploadProcedureTests: ProcedureKitTestCase {
             procedure.cancel()
         }
         wait(for: upload)
-        XCTAssertProcedureCancelledWithoutErrors(upload)
+        PKAssertProcedureCancelled(upload)
         XCTAssertFalse(calledCompletionHandler)
     }
 
@@ -97,21 +97,20 @@ class NetworkUploadProcedureTests: ProcedureKitTestCase {
     func test__no_requirement__finishes_with_error() {
         upload = NetworkUploadProcedure(session: session) { _ in }
         wait(for: upload)
-        XCTAssertProcedureFinishedWithErrors(upload, count: 1)
-        XCTAssertEqual(upload.errors.first as? ProcedureKitError, ProcedureKitError.requirementNotSatisfied())
+        PKAssertProcedureFinishedWithError(upload, ProcedureKitError.requirementNotSatisfied())
     }
 
     func test__no_data__finishes_with_error() {
         session.returnedData = nil
         wait(for: upload)
-        XCTAssertProcedureFinishedWithErrors(upload, count: 1)
+        PKAssertProcedureFinishedWithError(upload, ProcedureKitError.unknown)
     }
 
     func test__session_error__finishes_with_error() {
-        session.returnedError = NSError(domain: NSURLErrorDomain, code: NSURLErrorNotConnectedToInternet, userInfo: nil)
+        let error = NSError(domain: NSURLErrorDomain, code: NSURLErrorNotConnectedToInternet, userInfo: nil)
+        session.returnedError = error
         wait(for: upload)
-        XCTAssertProcedureFinishedWithErrors(upload, count: 1)
-        XCTAssertNotNil(upload.error)
+        PKAssertProcedureFinishedWithError(upload, error)
     }
 
     func test__completion_handler_receives_data_and_response() {
