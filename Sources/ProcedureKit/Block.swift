@@ -104,10 +104,10 @@ open class UIBlockProcedure: AsyncBlockProcedure {
             sub.log.enabled = false
 
             sub.addDidFinishBlockObserver { (_, error) in
-                if errors.isEmpty {
-                    finishWithResult(success)
-                } else {
+                if let error = error {
                     finishWithResult(.failure(ProcedureKitError.dependency(finishedWithError: error)))
+                } else {
+                    finishWithResult(success)
                 }
             }
 

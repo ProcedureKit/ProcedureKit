@@ -44,19 +44,16 @@ public final class CloudKitRecovery<T: Operation> where T: CKOperationProtocol, 
         addDefaultHandlers()
     }
 
-    func cloudKitErrors(fromInfo info: RetryFailureInfo<WrappedOperation>) -> (CKError.Code, T.AssociatedError)? {
-        let mapped: [(CKError.Code, T.AssociatedError)] = info.errors.compactMap { error in
-            guard
-                let cloudKitError = error as? T.AssociatedError,
-                let code = cloudKitError.code
-            else { return nil }
-            return (code, cloudKitError)
-        }
-        return mapped.first
+    func cloudKitError(fromInfo info: RetryFailureInfo<WrappedOperation>) -> (CKError.Code, T.AssociatedError)? {
+        guard
+            let cloudKitError = info.error as? T.AssociatedError,
+            let code = cloudKitError.code
+        else { return nil }
+        return (code, cloudKitError)
     }
 
     func recover(withInfo info: RetryFailureInfo<WrappedOperation>, payload: Payload) -> Recovery? {
-        guard let (code, error) = cloudKitErrors(fromInfo: info) else { return nil }
+        guard let (code, error) = cloudKitError(fromInfo: info) else { return nil }
 
         let suggestion: Recovery = (payload.delay, info.configure)
 
