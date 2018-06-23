@@ -77,10 +77,11 @@ class CKModifyBadgeOperationTests: CKProcedureTestCase {
     func test__error_with_completion_block() {
         var didExecuteBlock = false
         operation.setModifyBadgeCompletionBlock { didExecuteBlock = true }
-        target.error = TestError()
+        let error = TestError()
+        target.error = error
         wait(for: operation)
-        XCTAssertProcedureFinishedWithErrors(operation, count: 1)
         XCTAssertFalse(didExecuteBlock)
+        PKAssertProcedureFinishedWithError(operation, error)
     }
 }
 
@@ -119,7 +120,7 @@ class CloudKitProcedureModifyBadgeOperationTests: CKProcedureTestCase {
     func test__cancellation() {
         cloudkit.cancel()
         wait(for: cloudkit)
-        XCTAssertProcedureCancelledWithoutErrors(cloudkit)
+        PKAssertProcedureCancelled(cloudkit)
     }
 
     func test__success_without_completion_block_set() {
@@ -148,9 +149,10 @@ class CloudKitProcedureModifyBadgeOperationTests: CKProcedureTestCase {
     }
 
     func test__error_with_completion_block_set() {
+        let error = NSError(domain: CKErrorDomain, code: CKError.internalError.rawValue, userInfo: nil)
         cloudkit = CloudKitProcedure(strategy: .immediate) {
             let operation = TestCKModifyBadgeOperation()
-            operation.error = NSError(domain: CKErrorDomain, code: CKError.internalError.rawValue, userInfo: nil)
+            operation.error = error
             return operation
         }
 
@@ -160,8 +162,8 @@ class CloudKitProcedureModifyBadgeOperationTests: CKProcedureTestCase {
         }
 
         wait(for: cloudkit)
-        XCTAssertProcedureFinishedWithErrors(cloudkit, count: 1)
         XCTAssertFalse(didExecuteBlock)
+        PKAssertProcedureFinishedWithError(cloudkit, error)
     }
 
     func test__error_which_retries_using_retry_after_key() {

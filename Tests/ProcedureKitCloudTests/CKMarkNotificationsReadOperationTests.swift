@@ -83,9 +83,10 @@ class CKMarkNotificationsReadOperationTests: CKProcedureTestCase {
         operation.setMarkNotificationsReadCompletionBlock { notificationIDsMarkedRead in
             didExecuteBlock = true
         }
-        target.error = TestError()
+        let error = TestError()
+        target.error = error
         wait(for: operation)
-        XCTAssertProcedureFinishedWithErrors(operation, count: 1)
+        PKAssertProcedureFinishedWithError(operation, error)
         XCTAssertFalse(didExecuteBlock)
     }
 }
@@ -125,7 +126,7 @@ class CloudKitProcedureMarkNotificationsReadOperationTests: CKProcedureTestCase 
     func test__cancellation() {
         cloudkit.cancel()
         wait(for: cloudkit)
-        XCTAssertProcedureCancelledWithoutErrors(cloudkit)
+        PKAssertProcedureCancelled(cloudkit)
     }
 
     func test__success_without_completion_block_set() {
@@ -154,9 +155,10 @@ class CloudKitProcedureMarkNotificationsReadOperationTests: CKProcedureTestCase 
     }
 
     func test__error_with_completion_block_set() {
+        let error = NSError(domain: CKErrorDomain, code: CKError.internalError.rawValue, userInfo: nil)
         cloudkit = CloudKitProcedure(strategy: .immediate) {
             let operation = TestCKMarkNotificationsReadOperation()
-            operation.error = NSError(domain: CKErrorDomain, code: CKError.internalError.rawValue, userInfo: nil)
+            operation.error = error
             return operation
         }
 
@@ -166,7 +168,7 @@ class CloudKitProcedureMarkNotificationsReadOperationTests: CKProcedureTestCase 
         }
 
         wait(for: cloudkit)
-        XCTAssertProcedureFinishedWithErrors(cloudkit, count: 1)
+        PKAssertProcedureFinishedWithError(cloudkit, error)
         XCTAssertFalse(didExecuteBlock)
     }
 
