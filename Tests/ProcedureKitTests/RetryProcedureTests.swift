@@ -41,7 +41,7 @@ class RetryProcedureTests: RetryTestCase {
     func test__with_block_fails_after_max() {
         retry = Retry(upto: 3) { TestProcedure(error: ProcedureKitError.unknown) }
         wait(for: retry)
-        XCTAssertProcedureFinishedWithErrors(retry)
+        PKAssertProcedureFinishedWithError(retry, ProcedureKitError.unknown)
         XCTAssertEqual(retry.count, 3)
     }
 
@@ -68,7 +68,7 @@ class RetryProcedureTests: RetryTestCase {
         wait(for: retry, outputProcedure)
         PKAssertProcedureFinished(retry)
 
-        #warning("Swift access race in implicit closure.")
+        // TODO: - Fix Swift access race in implicit closure
         XCTAssertEqual(textOutput, ["Hello ProcedureKit"])
     }
 

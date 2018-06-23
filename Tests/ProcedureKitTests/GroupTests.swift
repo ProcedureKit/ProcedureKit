@@ -760,7 +760,7 @@ class GroupEventConcurrencyTests: GroupTestCase {
         // .observer_DidFinish event.
         waitForBaseObserverDidFinish(timeout: 2)
 
-        XCTAssertProcedureCancelledWithoutErrors(group)
+        PKAssertProcedureCancelled(group)
         PKAssertProcedureNoConcurrentEvents(group)
 
         let expectedBeginningEvents: [EventConcurrencyTrackingRegistrar.ProcedureEvent] = [.observer_didAttach, .override_procedureDidCancel, .observer_didCancel, .observer_willExecute, .do_Execute]

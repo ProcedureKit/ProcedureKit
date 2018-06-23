@@ -94,14 +94,13 @@ class NetworkDataProcedureTests: ProcedureKitTestCase {
     func test__no_requirement__finishes_with_error() {
         download = NetworkDataProcedure(session: session) { _ in }
         wait(for: download)
-        XCTAssertProcedureFinishedWithErrors(download, count: 1)
-        XCTAssertEqual(download.errors.first as? ProcedureKitError, ProcedureKitError.requirementNotSatisfied())
+        PKAssertProcedureFinishedWithError(download, ProcedureKitError.requirementNotSatisfied())
     }
 
     func test__no_data__finishes_with_error() {
         session.returnedData = nil
         wait(for: download)
-        XCTAssertProcedureFinishedWithErrors(download, count: 1)
+        XCTAssertProcedureFinishedWithErrors(download, count: 1)        
     }
 
     func test__session_error__finishes_with_error() {

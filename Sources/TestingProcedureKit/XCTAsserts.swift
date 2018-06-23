@@ -176,9 +176,11 @@ public extension ProcedureKitTestCase {
 }
 
 
+// MARK: - Deprecations
+
 public extension ProcedureKitTestCase {
 
-    @available(*, deprecated: 5.0.0, renamed: "PKAssertProcedureFinished", message: "Use PKAssertProcedure* functions instead.")
+    @available(*, unavailable, deprecated: 5.0.0, renamed: "PKAssertProcedureFinished", message: "Use PKAssertProcedure* functions instead.")
     func XCTAssertProcedureFinishedWithoutErrors<T: ProcedureProtocol>(_ exp: @autoclosure () throws -> T, _ message: @autoclosure () -> String = "", file: StaticString = #file, line: UInt = #line) {
         __XCTEvaluateAssertion(testCase: self, message, file: file, line: line) {
             let procedure = try exp()
@@ -195,7 +197,7 @@ public extension ProcedureKitTestCase {
         }
     }
 
-    @available(*, deprecated: 5.0.0, message: "Use PKAssertProcedure* functions instead.")
+    @available(*, unavailable, deprecated: 5.0.0, message: "Use PKAssertProcedure* functions instead.")
     func XCTAssertProcedureFinishedWithErrors<T: ProcedureProtocol>(_ exp: @autoclosure () throws -> T, _ message: @autoclosure () -> String = "", file: StaticString = #file, line: UInt = #line) {
         __XCTEvaluateAssertion(testCase: self, message, file: file, line: line) {
             let procedure = try exp()
@@ -212,10 +214,10 @@ public extension ProcedureKitTestCase {
         }
     }
 
-    @available(*, unavailable, message: "Use PKAssertProcedure* functions instead.")
+    @available(*, unavailable, deprecated: 5.0.0, renamed: "PKAssertProcedureFinishedWithError", message: "Use XCTAssertProcedureFinishedWithErrors instead, providing an appropriate error.")
     func XCTAssertProcedureFinishedWithErrors<T: ProcedureProtocol>(_ exp1: @autoclosure () throws -> T, count exp2: @autoclosure () throws -> Int, _ message: @autoclosure () -> String = "", file: StaticString = #file, line: UInt = #line) { }
 
-    @available(*, deprecated: 5.0.0, message: "Use PKAssertProcedure* functions instead.")
+    @available(*, unavailable, deprecated: 5.0.0, renamed: "PKAssertProcedureCancelled", message: "Use PKAssertProcedureCancelled instead.")
     func XCTAssertProcedureCancelledWithoutErrors<T: ProcedureProtocol>(_ exp: @autoclosure () throws -> T, _ message: @autoclosure () -> String = "", file: StaticString = #file, line: UInt = #line) {
         __XCTEvaluateAssertion(testCase: self, message, file: file, line: line) {
             let procedure = try exp()
@@ -232,7 +234,7 @@ public extension ProcedureKitTestCase {
         }
     }
 
-    @available(*, deprecated: 5.0.0, message: "Use PKAssertProcedure* functions instead.")
+    @available(*, unavailable, deprecated: 5.0.0, renamed: "PKAssertProcedureCancelledWithError", message: "Use PKAssertProcedureCancelledWithError instead, providing an appropriate error.")
     func XCTAssertProcedureCancelledWithErrors<T: ProcedureProtocol>(_ exp: @autoclosure () throws -> T, _ message: @autoclosure () -> String = "", file: StaticString = #file, line: UInt = #line) {
         __XCTEvaluateAssertion(testCase: self, message, file: file, line: line) {
             let procedure = try exp()
@@ -249,15 +251,15 @@ public extension ProcedureKitTestCase {
         }
     }
 
-    @available(*, unavailable, message: "Use PKAssertProcedure* functions instead.")
+    @available(*, unavailable, deprecated: 5.0.0, renamed: "PKAssertProcedureCancelledWithError", message: "Use PKAssertProcedureCancelledWithError instead, providing an appropriate error.")
     func XCTAssertProcedureCancelledWithErrors<T: ProcedureProtocol>(_ exp: @autoclosure () throws -> T, count exp2: @autoclosure () throws -> Int, _ message: @autoclosure () -> String = "", file: StaticString = #file, line: UInt = #line) { }
 
-    @available(*, deprecated: 5.0.0, message: "Use PKAssertProcedure* functions instead.")
+    @available(*, unavailable, deprecated: 5.0.0, message: "Use PKAssertProcedure* functions instead.")
     func XCTAssertConditionResult<E: Error>(_ exp1: @autoclosure () throws -> ConditionResult, failedWithError error: @autoclosure () throws -> E, _ message: @autoclosure () -> String = "", file: StaticString = #file, line: UInt = #line) where E: Equatable {
         PKAssertConditionFailed(exp1, failedWithError: error, message, file: file, line: line)
     }
 
-    @available(*, deprecated: 5.0.0, message: "Use PKAssertProcedure* functions instead.")
+    @available(*, unavailable, deprecated: 5.0.0, message: "Use PKAssertProcedure* functions instead.")
     func XCTAssertConditionResultSatisfied(_ exp1: @autoclosure () throws -> ConditionResult, _ message: @autoclosure () -> String = "", file: StaticString = #file, line: UInt = #line) {
         PKAssertConditionSatisfied(exp1, message, file: file, line: line)
     }

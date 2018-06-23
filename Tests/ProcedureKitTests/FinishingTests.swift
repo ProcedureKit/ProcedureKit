@@ -111,8 +111,9 @@ class FinishingTests: ProcedureKitTestCase {
     }
 
     func test__procedure_finish_from_willexecute_observer() {
+        let error = TestError()
         procedure.addWillExecuteBlockObserver { procedure, _ in
-            procedure.finish(withErrors: [TestError()])
+            procedure.finish(with: error)
         }
         wait(for: procedure)
         XCTAssertTrue(procedure.isFinished)
@@ -122,12 +123,13 @@ class FinishingTests: ProcedureKitTestCase {
     }
 
     func test__procedure_finish_after_cancel_from_willexecute_observer() {
+        let error = TestError()
         procedure.addWillExecuteBlockObserver { procedure, _ in
             procedure.cancel()
-            procedure.finish(withErrors: [TestError()])
+            procedure.finish(with: error)
         }
         wait(for: procedure)
-        XCTAssertProcedureCancelledWithErrors(procedure)
+        PKAssertProcedureCancelledWithError(procedure, error)
         XCTAssertFalse(procedure.didExecute)
     }
 

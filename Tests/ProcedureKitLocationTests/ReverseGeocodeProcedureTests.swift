@@ -23,11 +23,12 @@ class ReverseGeocodeProcedureTests: LocationProcedureTestCase {
     }
 
     func test__geocoder_returns_error_finishes_with_error() {
-        geocoder.error = TestError()
+        let error = TestError()
+        geocoder.error = error
         let procedure = ReverseGeocodeProcedure(location: location)
         procedure.geocoder = geocoder
         wait(for: procedure)
-        XCTAssertProcedureFinishedWithErrors(procedure, count: 1)
+        PKAssertProcedureFinishedWithError(procedure, error)
         XCTAssertEqual(geocoder.didReverseGeocodeLocation, location)
     }
 

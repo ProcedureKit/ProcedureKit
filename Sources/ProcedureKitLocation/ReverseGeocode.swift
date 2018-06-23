@@ -64,7 +64,8 @@ open class ReverseGeocodeProcedure: Procedure, InputProcedure, OutputProcedure {
 
             // Check for placemarks results
             guard let placemarks = results else {
-                strongSelf.finish(withResult: .failure(ProcedureKitError.component(ProcedureKitLocationComponent(), error: error)))
+                let error: Error = error ?? ProcedureKitError.component(ProcedureKitLocationComponent(), error: error)
+                strongSelf.finish(withResult: .failure(error))
                 return
             }
 
