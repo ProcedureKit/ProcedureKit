@@ -235,7 +235,7 @@ class ProcedureConditionsWillFinishObserverCancelThreadSafety: StressTestCase {
         lastBatchStopQueueSuspensionLoop.overwrite(with: true)
 
         for procedure in procedures.access {
-            XCTAssertProcedureCancelledWithErrors(procedure)
+            PKAssertProcedureCancelledWithError(procedure, ProcedureKitError.FalseCondition())
         }
         print ("Queue isSuspended cycles (total, all batches): \(numberOfQueueIsSuspendedCycles.access)")
     }
