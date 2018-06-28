@@ -90,7 +90,7 @@ class CKAcceptSharesOperationTests: CKProcedureTestCase {
         let error = TestError()
         target.error = error
         wait(for: operation)
-        PKAssertProcedureFinishedWithError(operation, error)
+        PKAssertProcedureFinished(operation, withErrors: true)
         XCTAssertFalse(didExecuteBlock)
     }
 }
@@ -181,7 +181,7 @@ class CloudKitProcedureAcceptSharesOperationTests: CKProcedureTestCase {
         var didExecuteBlock = false
         cloudkit.setAcceptSharesCompletionBlock { didExecuteBlock = true }
         wait(for: cloudkit)
-        PKAssertProcedureFinishedWithError(cloudkit, error)
+        PKAssertProcedureFinished(cloudkit, withErrors: true)
         XCTAssertFalse(didExecuteBlock)
     }
 
@@ -198,6 +198,7 @@ class CloudKitProcedureAcceptSharesOperationTests: CKProcedureTestCase {
         }
         var didExecuteBlock = false
         cloudkit.setAcceptSharesCompletionBlock { didExecuteBlock = true }
+        cloudkit.log.severity = .verbose
         wait(for: cloudkit)
         PKAssertProcedureFinished(cloudkit)
         XCTAssertTrue(didExecuteBlock)

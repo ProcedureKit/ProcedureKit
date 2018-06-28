@@ -80,8 +80,8 @@ class CKModifyBadgeOperationTests: CKProcedureTestCase {
         let error = TestError()
         target.error = error
         wait(for: operation)
+        PKAssertProcedureFinished(operation, withErrors: true)
         XCTAssertFalse(didExecuteBlock)
-        PKAssertProcedureFinishedWithError(operation, error)
     }
 }
 
@@ -162,8 +162,8 @@ class CloudKitProcedureModifyBadgeOperationTests: CKProcedureTestCase {
         }
 
         wait(for: cloudkit)
+        PKAssertProcedureFinished(cloudkit, withErrors: true)
         XCTAssertFalse(didExecuteBlock)
-        PKAssertProcedureFinishedWithError(cloudkit, error)
     }
 
     func test__error_which_retries_using_retry_after_key() {

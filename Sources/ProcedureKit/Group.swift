@@ -32,19 +32,14 @@ open class GroupProcedure: Procedure {
     }
 
     // Protected private properties
-    fileprivate var _groupWorkingError = GroupError() // swiftlint:disable:this variable_name
     fileprivate var _groupChildren: [Operation] // swiftlint:disable:this variable_name
     fileprivate var _groupIsFinishing = false // swiftlint:disable:this variable_name
     fileprivate var _groupIsSuspended = false // swiftlint:disable:this variable_name
     fileprivate var _groupTransformChildErrorBlock: TransformChildErrorBlockType?
 
-    public override var error: Error? {
-        get { return super.error ?? makeGroupError() }
-    }
-
     /// - returns: the operations which have been added to the queue
     final public var children: [Operation] {
-        get { return synchronise { _groupChildren } }
+        return synchronise { _groupChildren }
     }
 
     /**
@@ -203,13 +198,19 @@ open class GroupProcedure: Procedure {
      - parameter child: the child Procedure which is finishing
      - parameter errors: an [Error], the errors of the child Procedure
     */
-    open func child(_ child: Procedure, willFinishWithError error: Error?) {
+    open func child(_ child: Procedure, willFinishWithError childError: Error?) {
         assert(!child.isFinished, "child(_:willFinishWithError:) called with a child that has already finished")
-        guard let error = error else { return }
+        guard let childError = childError else { return }
 
         // Default GroupProcedure error-handling is to collect
-        // any errors related to non-Procedure subclasses.
-        append(error: error, fromChild: child)
+        // the first error related to a non-Procedure subclass.
+        setErrorOnce(childError)
+    }
+
+    final public func setErrorOnce(_ childError: Error) {
+        guard error == nil else { return }
+
+        error = childError
     }
 
     @available(*, deprecated: 5.0.0, renamed: "child(_:willFinishWithError:)", message: "Use child(_:,willFinishWithError:) instead.")
@@ -429,65 +430,6 @@ public extension GroupProcedure {
     }
 }
 
-// MARK: - Errors
-
-public extension GroupProcedure {
-
-    public final class GroupError: Error {
-
-        public fileprivate(set) var errors: [Error]
-
-        internal init(errors: [Error] = []) {
-            self.errors = errors
-        }
-
-        internal func append(error: Error) {
-            errors.append(error)
-        }
-    }
-
-    internal func makeGroupError() -> Error? {
-        return synchronise {
-            if _groupWorkingError.errors.isEmpty {
-                return nil
-            }
-            return GroupError(errors: _groupWorkingError.errors)
-        }
-    }
-}
-
-public extension GroupProcedure {
-
-    // MARK: - Aggregating Errors
-
-    /// Append an error to the Group's errors
-    ///
-    /// - Parameter error: an Error
-    final public func append(error: Error, fromChild child: Operation? = nil) {
-        if let child = child {
-            log.warning(message: "\(child.operationName) did encounter error: \(error).")
-        } else {
-            log.warning(message: "Appending error: \(error).")
-        }
-        
-        debugAssertIsExecuting("Cannot append errors to Group which is finishing or already finished.")
-
-        synchronise {
-            _groupWorkingError.append(error: error)
-        }
-    }
-
-    /// Append errors to the Group's errors
-    ///
-    /// - Parameter errors: an [Error]
-    /// - Parameter child: a child Operation
-    @available(*, unavailable, renamed: "append(error:fromChild:)", message: "Use append(error:fromChild:) instead.")
-    final public func append(errors: [Error], fromChild child: Operation? = nil) {
-        guard let error = errors.first else { return }
-        append(error: error, fromChild: child)
-    }
-}
-
 // MARK: - GroupProcedure Private Queue Delegate
 
 internal extension GroupProcedure {
@@ -536,6 +478,7 @@ internal extension GroupProcedure {
 
             let promise = ProcedurePromise()
             strongGroup.dispatchEvent {
+
                 defer { promise.complete() }
 
                 var childError: Error? = error
@@ -778,7 +721,7 @@ fileprivate extension GroupProcedure {
 
 fileprivate extension GroupProcedure {
     fileprivate func _finishGroup() {
-        super.finish(with: makeGroupError())
+        super.finish()
         queue.isSuspended = true
     }
 }
@@ -812,15 +755,21 @@ public extension GroupProcedure {
     @available(*, unavailable, renamed: "add(children:)")
     func addOperations(additional: [Operation]) { }
 
-    @available(*, unavailable, message: "GroupProcedure child error handling customization has been re-worked. Consider overriding child(_:willFinishWithErrors:).")
+    @available(*, unavailable, message: "GroupProcedure child error handling customization has been re-worked. Consider overriding child(_:willFinishWithError:).")
     final public func childDidRecoverFromErrors(_ child: Operation) { }
 
-    @available(*, unavailable, message: "GroupProcedure child error handling customization has been re-worked. Consider overriding child(_:willFinishWithErrors:).")
+    @available(*, unavailable, message: "GroupProcedure child error handling customization has been re-worked. Consider overriding child(_:willFinishWithError:).")
     final public func childDidNotRecoverFromErrors(_ child: Operation) { }
 
-    @available(*, unavailable, renamed: "append(error:)")
+    @available(*, unavailable, message: "GroupProcedure no longer collects all the child errors within itself")
     final public func append(fatalError error: Error) { }
 
-    @available(*, unavailable, renamed: "append(errors:)")
+    @available(*, unavailable, message: "GroupProcedure no longer collects all the child errors within itself")
     final public func append(fatalErrors errors: [Error]) { }
+
+    @available(*, unavailable, message: "GroupProcedure no longer collects all the child errors within itself")
+    final public func append(error: Error, fromChild child: Operation? = nil) { }
+
+    @available(*, unavailable, message: "GroupProcedure no longer collects all the child errors within itself")
+    final public func append(errors: [Error], fromChild child: Operation? = nil) { }
 }

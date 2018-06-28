@@ -116,17 +116,6 @@ open class RepeatProcedure<T: Operation>: GroupProcedure {
         return synchronise { _configure }
     }
 
-    /// - returns: the first error registered with the group
-    public override var error: Error? {
-        get { return makeError() }
-    }
-
-    internal func makeError() -> Error? {
-        return synchronise {
-            return (super.error as? GroupError).flatMap { $0.errors.first }
-        }
-    }
-
     /// Initialize RepeatProcedure with an iterator, the element of the iterator a `RepeatProcedurePayload<T>`.
     /// Other arguments allow for specific dispatch queues, and a maximum count of iteratations.
     ///

@@ -84,7 +84,7 @@ class CKFetchRecordZonesOperationTests: CKProcedureTestCase {
         let error = TestError()
         target.error = error
         wait(for: operation)
-        PKAssertProcedureFinishedWithError(operation, error)
+        PKAssertProcedureFinished(operation, withErrors: true)
         XCTAssertFalse(didExecuteBlock)
     }
 }
@@ -178,7 +178,7 @@ class CloudKitProcedureFetchRecordZonesOperationTests: CKProcedureTestCase {
         }
 
         wait(for: cloudkit)
-        PKAssertProcedureFinishedWithError(cloudkit, error)
+        PKAssertProcedureFinished(cloudkit, withErrors: true)
         XCTAssertFalse(didExecuteBlock)
     }
 

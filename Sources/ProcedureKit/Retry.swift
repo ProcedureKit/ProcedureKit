@@ -125,7 +125,7 @@ open class RetryProcedure<T: Procedure>: RepeatProcedure<T> {
     ///
     /// - IMPORTANT: If subclassing RetryProcedure and overriding this method, consider
     /// carefully whether / when / how you should call `super.child(_:willFinishWithError:)`.
-    open override func child(_ child: Procedure, willFinishWithError error: Error?) {
+    open override func child(_ child: Procedure, willFinishWithError childError: Error?) {
         eventQueue.debugAssertIsOnQueue()
         assert(!child.isFinished, "child(_:willFinishWithErrors:) called with a child that has already finished")
 
@@ -139,22 +139,24 @@ open class RetryProcedure<T: Procedure>: RepeatProcedure<T> {
             return
         }
 
-        guard let error = error else {
+        guard let childError = childError else {
             // The RetryProcedure's current Procedure succeeded - stop retrying.
             return
         }
 
         var willAttemptAnotherOperation = false
         defer {
-            log.notice(message: "\(willAttemptAnotherOperation ? "will attempt" : "will not attempt") recovery from error: \(error) in operation: \(child)")
+            log.notice(message: "\(willAttemptAnotherOperation ? "will attempt" : "will not attempt") recovery from error: \(childError) in operation: \(child)")
         }
-        retry.info = createFailureInfo(for: current, error: error)
+
+        print("*** - child error: \(childError)")
+
+        retry.info = createFailureInfo(for: current, error: childError)
         willAttemptAnotherOperation = _addNextOperation()
         retry.info = .none
         if !willAttemptAnotherOperation {
-            // If no further operation will be attempted, append the error from this child
-            // to the Group's errors.
-            append(error: error, fromChild: child)
+            // If no further operation will be attempted, set the first error
+            setErrorOnce(childError)
         }
         // Do not call super.child(_:willFinishWithErrors:)
         // To ensure that we do not retry/repeat successful procedures (via RepeatProcedure)

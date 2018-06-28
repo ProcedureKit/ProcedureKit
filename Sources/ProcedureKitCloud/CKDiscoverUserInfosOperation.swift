@@ -55,7 +55,7 @@ extension CKProcedure where T: CKDiscoverUserInfosOperationProtocol, T: Associat
     func setDiscoverUserInfosCompletionBlock(_ block: @escaping CloudKitProcedure<T>.DiscoverUserInfosCompletionBlock) {
         operation.discoverUserInfosCompletionBlock = { [weak self] userInfoByEmail, userInfoByRecordID, error in
             if let strongSelf = self, let error = error {
-                strongSelf.append(error: DiscoverUserInfosError(underlyingError: error, userInfoByEmail: userInfoByEmail, userInfoByRecordID: userInfoByRecordID))
+                strongSelf.setErrorOnce(DiscoverUserInfosError(underlyingError: error, userInfoByEmail: userInfoByEmail, userInfoByRecordID: userInfoByRecordID))
             }
             else {
                 block(userInfoByEmail, userInfoByRecordID)

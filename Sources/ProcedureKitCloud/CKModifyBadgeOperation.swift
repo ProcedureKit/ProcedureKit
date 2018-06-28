@@ -37,7 +37,7 @@ extension CKProcedure where T: CKModifyBadgeOperationProtocol, T: AssociatedErro
     func setModifyBadgeCompletionBlock(_ block: @escaping CloudKitProcedure<T>.ModifyBadgeCompletionBlock) {
         operation.modifyBadgeCompletionBlock = { [weak self] error in
             if let strongSelf = self, let error = error {
-                strongSelf.append(error: PKCKError(underlyingError: error))
+                strongSelf.setErrorOnce(PKCKError(underlyingError: error))
             }
             else {
                 block()

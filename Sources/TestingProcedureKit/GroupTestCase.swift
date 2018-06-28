@@ -59,12 +59,10 @@ public extension ProcedureKitTestCase {
                 return .success
             }
 
-            guard let groupError = procedure.error as? GroupProcedure.GroupError else {
-                return .expectedFailure("\(procedure.procedureName) did not have a GroupError.")
-            }
+            let groupErrors = procedure.children.compactMap { ($0 as? Procedure)?.error }
 
-            guard groupError.errors.count == count else {
-                return .expectedFailure("\(procedure.procedureName) expected \(count) errors, received \(groupError.errors.count).")
+            guard groupErrors.count == count else {
+                return .expectedFailure("\(procedure.procedureName) expected \(count) errors, received \(groupErrors.count).")
             }
 
             return .success
@@ -77,15 +75,11 @@ public extension ProcedureKitTestCase {
             let procedure = try exp()
             let otherError = try exp2()
 
-            guard let groupError = procedure.error as? GroupProcedure.GroupError else {
-                return .expectedFailure("\(procedure.procedureName) did not have a GroupError.")
+            guard procedure.error != nil else {
+                return .expectedFailure("\(procedure.procedureName) did not have an error.")
             }
 
-            guard groupError.errors.count > 0 else {
-                return .expectedFailure("\(procedure.procedureName) did not have any errors at all.")
-            }
-
-            let errors = groupError.errors.compactMap({ $0 as? E })
+            let errors: [E] = procedure.children.compactMap { ($0 as? Procedure)?.error as? E }
 
             guard errors.count > 0 else {
                 return .expectedFailure("\(procedure.procedureName) did not have any errors of type \(E.self).")

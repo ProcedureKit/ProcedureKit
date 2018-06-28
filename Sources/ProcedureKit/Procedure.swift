@@ -371,8 +371,17 @@ open class Procedure: Operation, ProcedureProtocol {
 
     // MARK: Errors
 
-    public var error: Error? {
-        return synchronise { _error }
+    final public var error: Error? {
+        get { return synchronise { _error } }
+        set {
+            synchronise {
+                guard _state <= .executing else {
+                    assertionFailure("Cannot append errors to Procedure that is finishing or finished.")
+                    return
+                }
+                protectedProperties.error = newValue
+            }
+        }
     }
 
     // MARK: Log
@@ -1159,7 +1168,7 @@ open class Procedure: Operation, ProcedureProtocol {
     private final func _finish_onEventQueue(withInfo info: FinishingInfo) {
 
         debugAssertIsOnEventQueue()
-        debugAssertIsExecuting()
+        debugSynchronizedAssertIsExecuting()
 
         // Obtain a local strong reference to the Procedure queue
         guard let strongProcedureQueue = procedureQueue else {
@@ -1277,7 +1286,7 @@ open class Procedure: Operation, ProcedureProtocol {
 
     // Internal function used to add AnyObserver<Procedure> to the Procedure's internal array of observers.
     internal func add(anyObserver observer: AnyObserver<Procedure>) {
-        debugAssertIsPending("Adding observers to a Procedure after it has been added to a queue is an inherent race condition, and risks missing events.")
+        debugSynchronizedAssertIsPending("Adding observers to a Procedure after it has been added to a queue is an inherent race condition, and risks missing events.")
 
         dispatchEvent {
 
@@ -1713,7 +1722,7 @@ extension Procedure {
 
 internal extension Procedure {
 
-    internal func debugAssertIsExecuting(_ message: String = "Procedure is not yet finishing or finished.") {
+    internal func debugSynchronizedAssertIsExecuting(_ message: String = "Procedure is not yet finishing or finished.") {
         #if DEBUG
         synchronise {
             guard _state <= .executing else {
@@ -1725,7 +1734,7 @@ internal extension Procedure {
     }
 
     /// Internal Assertions
-    internal func debugAssertIsPending(_ message: String = "Procedure is no longer pending.") {
+    internal func debugSynchronizedAssertIsPending(_ message: String = "Procedure is no longer pending.") {
         #if DEBUG
         synchronise {
             guard _state <= .pending else {
