@@ -16,7 +16,7 @@ public protocol ProcedureProtocol: class {
 
     var isCancelled: Bool { get }
 
-    var errors: [Error] { get }
+    var error: Error? { get }
 
     var log: LoggerProtocol { get }
 
@@ -32,17 +32,17 @@ public protocol ProcedureProtocol: class {
 
     // Cancelling
 
-    func cancel(withErrors: [Error])
+    func cancel(with: Error?)
 
-    func procedureDidCancel(withErrors: [Error])
+    func procedureDidCancel(with: Error?)
 
     // Finishing
 
-    func finish(withErrors: [Error])
+    func finish(with: Error?)
 
-    func procedureWillFinish(withErrors: [Error])
+    func procedureWillFinish(with: Error?)
 
-    func procedureDidFinish(withErrors: [Error])
+    func procedureDidFinish(with: Error?)
 
     // Observers
 
@@ -51,28 +51,60 @@ public protocol ProcedureProtocol: class {
     // Dependencies
 
     func add<Dependency: ProcedureProtocol>(dependency: Dependency)
+
+
+    // Deprecations
+
+    @available(*, deprecated: 5.0.0, message: "Use cancel(with:) instead. This API will now just use the first error.")
+    func cancel(withErrors: [Error])
+
+    @available(*, deprecated: 5.0.0, message: "Use procedureDidCancel(with:) instead. This API will now just use the first error.")
+    func procedureDidCancel(withErrors: [Error])
+
+    @available(*, deprecated: 5.0.0, message: "Use finish(with:) instead. This API will now just use the first error.")
+    func finish(withErrors: [Error])
+
+    @available(*, deprecated: 5.0.0, message: "Use procedureWillFinish(with:) instead. This API will now just receive a single error.")
+    func procedureWillFinish(withErrors: [Error])
+
+    @available(*, deprecated: 5.0.0, message: "Use procedureDidFinish(with:) instead. This API will now just receive a single error.")
+    func procedureDidFinish(withErrors: [Error])
 }
 
+
+/// Default ProcedureProtocol implementations
 public extension ProcedureProtocol {
 
     var failed: Bool {
-        return errors.count > 0
+        return error != nil
     }
 
-    func cancel(withError error: Error?) {
-        cancel(withErrors: error.map { [$0] } ?? [])
+    func procedureDidCancel(with: Error?) { }
+
+    func procedureWillFinish(with: Error?) { }
+
+    func procedureDidFinish(with: Error?) { }
+
+    // Deprecations
+
+    func cancel(withErrors errors: [Error]) {
+        cancel(with: errors.first)
     }
 
-    func procedureWillCancel(withErrors: [Error]) { }
-
-    func procedureDidCancel(withErrors: [Error]) { }
-
-    func finish(withError error: Error? = nil) {
-        finish(withErrors: error.map { [$0] } ?? [])
+    func procedureDidCancel(withErrors errors: [Error]) {
+            procedureDidCancel(with: errors.first)
     }
 
-    func procedureWillFinish(withErrors: [Error]) { }
+    func finish(withErrors errors: [Error]) {
+        finish(with: errors.first)
+    }
 
-    func procedureDidFinish(withErrors: [Error]) { }
+    func procedureWillFinish(withErrors errors: [Error]) {
+        procedureWillFinish(with: errors.first)
+    }
+
+    func procedureDidFinish(withErrors errors: [Error]) {
+        procedureDidFinish(with: errors.first)
+    }
 
 }

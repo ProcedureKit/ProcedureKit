@@ -44,10 +44,6 @@ open class NetworkDownloadProcedure: Procedure, InputProcedure, OutputProcedure,
     private var _input: Pending<URLRequest> = .pending
     private var _output: Pending<NetworkResult> = .pending
 
-    public var networkError: Error? {
-        return errors.first
-    }
-
     public init(session: NetworkSession, request: URLRequest? = nil, completionHandler: @escaping CompletionBlock = { _ in }) {
 
         self.session = session

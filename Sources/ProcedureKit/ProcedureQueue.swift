@@ -117,7 +117,7 @@ public protocol ProcedureQueueDelegate: class {
      - parameter errors: an array of `Error`s.
      - returns: (optional) a `ProcedureFuture` (signaled when handling of the delegate callback is complete), or nil (if there is no need for the `ProcedureQueue` to temporarily block the Procedure from finishing)
      */
-    func procedureQueue(_ queue: ProcedureQueue, willFinishProcedure procedure: Procedure, withErrors errors: [Error]) -> ProcedureFuture?
+    func procedureQueue(_ queue: ProcedureQueue, willFinishProcedure procedure: Procedure, with error: Error?) -> ProcedureFuture?
 
     /**
      A Procedure has finished on the queue.
@@ -126,7 +126,7 @@ public protocol ProcedureQueueDelegate: class {
      - parameter procedure: the `Procedure` instance which finished.
      - parameter errors: an array of `Error`s.
      */
-    func procedureQueue(_ queue: ProcedureQueue, didFinishProcedure procedure: Procedure, withErrors errors: [Error])
+    func procedureQueue(_ queue: ProcedureQueue, didFinishProcedure procedure: Procedure, with error: Error?)
 }
 
 public extension ProcedureQueueDelegate {
@@ -151,10 +151,10 @@ public extension ProcedureQueueDelegate {
     func procedureQueue(_ queue: ProcedureQueue, didAddProcedure procedure: Procedure, context: Any?) { /* default no-op */ }
 
     /// Default - do nothing.
-    func procedureQueue(_ queue: ProcedureQueue, willFinishProcedure procedure: Procedure, withErrors errors: [Error]) -> ProcedureFuture? { /* default no-op */ return nil }
+    func procedureQueue(_ queue: ProcedureQueue, willFinishProcedure procedure: Procedure, with error: Error?) -> ProcedureFuture? { /* default no-op */ return nil }
 
     /// Default - do nothing.
-    func procedureQueue(_ queue: ProcedureQueue, didFinishProcedure procedure: Procedure, withErrors errors: [Error]) { /* default no-op */ }
+    func procedureQueue(_ queue: ProcedureQueue, didFinishProcedure procedure: Procedure, with error: Error?) { /* default no-op */ }
 }
 
 /**
@@ -331,9 +331,9 @@ open class ProcedureQueue: OperationQueue {
         procedure.log.verbose(message: "Adding to queue")
 
         /// Add an observer to invoke the will finish delegate method
-        procedure.addWillFinishBlockObserver { [weak self] procedure, errors, pendingFinish in
+        procedure.addWillFinishBlockObserver { [weak self] procedure, error, pendingFinish in
             if let queue = self {
-                queue.delegate?.procedureQueue(queue, willFinishProcedure: procedure, withErrors: errors)?.then(on: queue.dispatchQueue) {
+                queue.delegate?.procedureQueue(queue, willFinishProcedure: procedure, with: error)?.then(on: queue.dispatchQueue) {
                     // ensure that the observed procedure does not finish prior to the
                     // willFinishProcedure delegate completing
                     pendingFinish.doThisBeforeEvent()
@@ -342,9 +342,9 @@ open class ProcedureQueue: OperationQueue {
         }
 
         /// Add an observer to invoke the did finish delegate method
-        procedure.addDidFinishBlockObserver { [weak self] procedure, errors in
+        procedure.addDidFinishBlockObserver { [weak self] procedure, error in
             if let queue = self {
-                queue.delegate?.procedureQueue(queue, didFinishProcedure: procedure, withErrors: errors)
+                queue.delegate?.procedureQueue(queue, didFinishProcedure: procedure, with: error)
             }
         }
 

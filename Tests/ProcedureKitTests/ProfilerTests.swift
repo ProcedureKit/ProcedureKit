@@ -102,7 +102,7 @@ class ProfilerTests: ProcedureKitTestCase {
         }
 
         validateProfileResult(result: result, after: now)
-        XCTAssertProcedureFinishedWithoutErrors()
+        PKAssertProcedureFinished(procedure)
     }
 
     func test__profile_simple_operation_which_cancels() {
@@ -118,7 +118,7 @@ class ProfilerTests: ProcedureKitTestCase {
         }
 
         validateProfileResult(result: result, after: now)
-        XCTAssertProcedureCancelledWithoutErrors()
+        PKAssertProcedureCancelled(procedure)
     }
 
     func test__profile_operation__which_produces_child() {
@@ -139,7 +139,7 @@ class ProfilerTests: ProcedureKitTestCase {
         }
 
         validateProfileResult(result: result, after: now)
-        XCTAssertProcedureFinishedWithoutErrors()
+        PKAssertProcedureFinished(procedure)
         XCTAssertEqual(result.children.count, 1)
         if let childResult = result.children.first {
             validateProfileResult(result: childResult, after: now)
@@ -148,7 +148,6 @@ class ProfilerTests: ProcedureKitTestCase {
 
     func test__profile_group_operation() {
         let group = GroupProcedure(operations: [ TestProcedure(), TestProcedure() ])
-        group.log.severity = .notice
         group.add(observer: profiler)
 
         waitForReporterAnd(for: group)
@@ -158,7 +157,7 @@ class ProfilerTests: ProcedureKitTestCase {
         }
 
         validateProfileResult(result: result, after: now)
-        XCTAssertProcedureFinishedWithoutErrors(group)
+        PKAssertProcedureFinished(group)
 
         XCTAssertEqual(result.children.count, 2)
         for child in result.children {

@@ -13,35 +13,35 @@ class RetryProcedureTests: RetryTestCase {
     func test__with_payload_iterator() {
         retry = Retry(iterator: createPayloadIterator(succeedsAfterFailureCount: 2), retry: { $1 })
         wait(for: retry)
-        XCTAssertProcedureFinishedWithoutErrors(retry)
+        PKAssertProcedureFinished(retry)
         XCTAssertEqual(retry.count, 3)
     }
 
     func test__with_max_count() {
         retry = Retry(max: 2, iterator: createPayloadIterator(succeedsAfterFailureCount: 4), retry: { $1 })
         wait(for: retry)
-        XCTAssertProcedureFinishedWithErrors(retry, count: 1)
         XCTAssertEqual(retry.count, 2)
+        PKAssertProcedureFinishedWithError(retry, ProcedureKitError.conditionFailed())
     }
 
     func test__with_delay_and_operation_iterator() {
         retry = Retry(delay: Delay.Iterator.fibonacci(withPeriod: 0.001), iterator: createOperationIterator(succeedsAfterFailureCount: 2), retry: { $1 })
         wait(for: retry)
-        XCTAssertProcedureFinishedWithoutErrors(retry)
+        PKAssertProcedureFinished(retry)
         XCTAssertEqual(retry.count, 3)
     }
 
     func test__with_wait_strategy_and_operation_iterator() {
         retry = Retry(wait: .incrementing(initial: 0, increment: 0.001), iterator: createOperationIterator(succeedsAfterFailureCount: 2), retry: { $1 })
         wait(for: retry)
-        XCTAssertProcedureFinishedWithoutErrors(retry)
+        PKAssertProcedureFinished(retry)
         XCTAssertEqual(retry.count, 3)
     }
 
     func test__with_block_fails_after_max() {
         retry = Retry(upto: 3) { TestProcedure(error: ProcedureKitError.unknown) }
         wait(for: retry)
-        XCTAssertProcedureFinishedWithErrors(retry)
+        PKAssertProcedureFinishedWithError(retry, ProcedureKitError.unknown)
         XCTAssertEqual(retry.count, 3)
     }
 
@@ -54,8 +54,8 @@ class RetryProcedureTests: RetryTestCase {
         var textOutput: [String] = []
         retry.addWillAddOperationBlockObserver { (_, operation) in
             if let procedure = operation as? TestProcedure {
-                procedure.addDidFinishBlockObserver { (testProcedure, errors) in
-                    guard errors.count == 0 else { return }
+                procedure.addDidFinishBlockObserver { (testProcedure, error) in
+                    guard error == nil else { return }
                     if let output = testProcedure.output.value?.value {
                         textOutput.append(output)
                     }
@@ -66,8 +66,9 @@ class RetryProcedureTests: RetryTestCase {
         retry.injectResult(from: outputProcedure)
 
         wait(for: retry, outputProcedure)
-        XCTAssertProcedureFinishedWithoutErrors(retry)
+        PKAssertProcedureFinished(retry)
 
+        // TODO: - Fix Swift access race in implicit closure
         XCTAssertEqual(textOutput, ["Hello ProcedureKit"])
     }
 

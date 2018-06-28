@@ -50,21 +50,21 @@ class Baz: Procedure, InputProcedure, OutputProcedure {
 class BaseAnyProcedureTests: ProcedureKitTestCase {
     func test__any_procedure(_ anyProcedure: Procedure) {
         wait(for: anyProcedure)
-        XCTAssertProcedureFinishedWithoutErrors(procedure)
-        XCTAssertProcedureFinishedWithoutErrors(anyProcedure)
+        PKAssertProcedureFinished(procedure)
+        PKAssertProcedureFinished(anyProcedure)
     }
 
     func test__any_procedure_get_correct_result<P: OutputProcedure>(_ anyProcedure: P) where P: Procedure, P.Output == String {
         wait(for: anyProcedure)
-        XCTAssertProcedureFinishedWithoutErrors(procedure)
-        XCTAssertProcedureFinishedWithoutErrors(anyProcedure)
+        PKAssertProcedureFinished(procedure)
+        PKAssertProcedureFinished(anyProcedure)
         XCTAssertEqual(anyProcedure.output.success, "Hello World")
     }
 
     func test__array_of_any_procedures<P: OutputProcedure>(_ procedures: [P]) where P: Procedure, P.Output == String {
         let group = GroupProcedure(operations: procedures)
         wait(for: group)
-        XCTAssertProcedureFinishedWithoutErrors(group)
+        PKAssertProcedureFinished(group)
         XCTAssertEqual(procedures.map { $0.output.success ?? "" }, ["Foo", "Bar", "Baz"])
     }
 
@@ -72,16 +72,16 @@ class BaseAnyProcedureTests: ProcedureKitTestCase {
                                                                 where A: Procedure, P: Procedure , A.Input == String{
         anyProcedure.input = .ready("Hello ")
         wait(for: anyProcedure)
-        XCTAssertProcedureFinishedWithoutErrors(boxedProcedure)
-        XCTAssertProcedureFinishedWithoutErrors(anyProcedure)
+        PKAssertProcedureFinished(boxedProcedure)
+        PKAssertProcedureFinished(anyProcedure)
     }
 
     func test__not_setting_requirement<A: InputProcedure, P: InputProcedure>(anyProcedure: A, boxedProcedure: P)
         where A: Procedure, P: Procedure {
             anyProcedure.input = .pending
             wait(for: anyProcedure)
-            XCTAssertProcedureFinishedWithoutErrors(boxedProcedure)
-            XCTAssertProcedureFinishedWithoutErrors(anyProcedure)
+            PKAssertProcedureFinished(boxedProcedure)
+            PKAssertProcedureFinished(anyProcedure)
     }
 }
 

@@ -86,21 +86,19 @@ open class UserLocationProcedure: Procedure, OutputProcedure, CLLocationManagerD
         }
         log.info(message: "Updated last location: \(location)")
         DispatchQueue.main.async { [weak self] in
-            guard let weakSelf = self, !weakSelf.isFinished else { return }
-            weakSelf.stopLocationUpdates()
-            weakSelf.output = .ready(.success(location))
-            weakSelf.completion?(location)
-            weakSelf.finish()
+            guard let strongSelf = self, !strongSelf.isFinished else { return }
+            strongSelf.stopLocationUpdates()
+            strongSelf.output = .ready(.success(location))
+            strongSelf.completion?(location)
+            strongSelf.finish()
         }
     }
 
     public func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
         DispatchQueue.main.async { [weak self] in
-            guard let weakSelf = self else { return }
-            weakSelf.stopLocationUpdates()
-            let pkerror = ProcedureKitError.component(ProcedureKitLocationComponent(), error: error)
-            weakSelf.output = .ready(.failure(pkerror))
-            weakSelf.finish(withError: pkerror)
+            guard let strongSelf = self else { return }
+            strongSelf.stopLocationUpdates()
+            strongSelf.finish(withResult: .failure(error))
         }
     }
 }

@@ -15,6 +15,7 @@ class BlockProcedureTests: ProcedureKitTestCase {
         let block = BlockProcedure { blockDidExecute = true }
         wait(for: block)
         XCTAssertTrue(blockDidExecute)
+        PKAssertProcedureFinished(block)
     }
 
     func test__block_does_not_execute_if_cancelled() {
@@ -23,12 +24,14 @@ class BlockProcedureTests: ProcedureKitTestCase {
         block.cancel()
         wait(for: block)
         XCTAssertFalse(blockDidExecute)
+        PKAssertProcedureCancelled(block)
     }
 
     func test__block_which_throws_finishes_with_error() {
-        let block = BlockProcedure { throw TestError() }
+        let error = TestError()
+        let block = BlockProcedure { throw error }
         wait(for: block)
-        XCTAssertProcedureFinishedWithErrors(block, count: 1)
+        PKAssertProcedureFinishedWithError(block, error)
     }
 
     func test__block_did_execute_observer() {
@@ -39,6 +42,7 @@ class BlockProcedureTests: ProcedureKitTestCase {
         }
         wait(for: block)
         XCTAssertTrue(didExecuteBlockObserver)
+        PKAssertProcedureFinished(block)
     }
 }
 
@@ -66,6 +70,7 @@ class AsyncBlockProcedureTests: ProcedureKitTestCase {
         }
         wait(for: block)
         XCTAssertTrue(blockDidExecute)
+        PKAssertProcedureFinished(block)
     }
 
     func test__block_does_not_execute_if_cancelled() {
@@ -79,16 +84,18 @@ class AsyncBlockProcedureTests: ProcedureKitTestCase {
         block.cancel()
         wait(for: block)
         XCTAssertFalse(blockDidExecute)
+        PKAssertProcedureCancelled(block)
     }
 
     func test__block_which_finishes_with_error() {
+        let error = TestError()
         let block = AsyncBlockProcedure { finishWithResult in
             self.dispatchQueue.async {
-                finishWithResult(.failure(TestError()))
+                finishWithResult(.failure(error))
             }
         }
         wait(for: block)
-        XCTAssertProcedureFinishedWithErrors(block, count: 1)
+        PKAssertProcedureFinishedWithError(block, error)
     }
 
     func test__block_did_execute_observer() {
@@ -101,6 +108,7 @@ class AsyncBlockProcedureTests: ProcedureKitTestCase {
         }
         wait(for: block)
         XCTAssertTrue(didExecuteBlockObserver)
+        PKAssertProcedureFinished(block)
     }
 }
 

@@ -14,6 +14,7 @@ public struct TestError: Error, Equatable, CustomDebugStringConvertible {
     }
 
     let uuid = UUID()
+
     public init() { }
 
     public var debugDescription: String {
@@ -24,7 +25,7 @@ public struct TestError: Error, Equatable, CustomDebugStringConvertible {
 open class TestProcedure: Procedure, InputProcedure, OutputProcedure {
 
     public let delay: TimeInterval
-    public let error: Error?
+    public let expectedError: Error?
     public let producedOperation: Operation?
     public var input: Pending<String> = .pending
     public var output: Pending<ProcedureResult<String>> = .ready(.success("Hello World"))
@@ -59,7 +60,7 @@ open class TestProcedure: Procedure, InputProcedure, OutputProcedure {
 
     public init(name: String = "TestProcedure", delay: TimeInterval = 0.000_001, error: Error? = .none, produced: Operation? = .none) {
         self.delay = delay
-        self.error = error
+        self.expectedError = error
         self.producedOperation = produced
         super.init()
         self.name = name
@@ -87,27 +88,27 @@ open class TestProcedure: Procedure, InputProcedure, OutputProcedure {
                 // *after* the operation is successfully produced
                 producedOperationGroup.notify(queue: DispatchQueue.global()) {
                     self.didExecute = true
-                    self.finish(withError: self.error)
+                    self.finish(with: self.expectedError)
                 }
             }
         }
         else {
             DispatchQueue.global().asyncAfter(deadline: .now() + delay) {
                 self.didExecute = true
-                self.finish(withError: self.error)
+                self.finish(with: self.expectedError)
             }
         }
     }
 
-    open override func procedureDidCancel(withErrors: [Error]) {
+    open override func procedureDidCancel(with: Error?) {
         procedureDidCancelCalled = true
     }
 
-    open override func procedureWillFinish(withErrors: [Error]) {
+    open override func procedureWillFinish(with: Error?) {
         procedureWillFinishCalled = true
     }
 
-    open override func procedureDidFinish(withErrors: [Error]) {
+    open override func procedureDidFinish(with: Error?) {
         procedureDidFinishCalled = true
     }
 }

@@ -1,4 +1,4 @@
-//
+    //
 //  ProcedureKit
 //
 //  Copyright © 2015-2018 ProcedureKit. All rights reserved.
@@ -17,7 +17,7 @@ import Dispatch
  */
 open class GroupProcedure: Procedure {
 
-    public typealias TransformChildErrorsBlockType = (Procedure, inout [Error]) -> Void
+    public typealias TransformChildErrorBlockType = (Procedure, inout Error?) -> Void
 
     internal let queue = ProcedureQueue()
     internal var queueDelegate: GroupQueueDelegate!
@@ -26,15 +26,20 @@ open class GroupProcedure: Procedure {
     fileprivate var groupCanFinish: CanFinishGroup!
     fileprivate var groupStateLock = PThreadMutex()
 
+    @discardableResult
+    fileprivate func synchronise<T>(block: () -> T) -> T {
+        return groupStateLock.withCriticalScope(block: block)
+    }
+
     // Protected private properties
     fileprivate var _groupChildren: [Operation] // swiftlint:disable:this variable_name
     fileprivate var _groupIsFinishing = false // swiftlint:disable:this variable_name
     fileprivate var _groupIsSuspended = false // swiftlint:disable:this variable_name
-    fileprivate var _groupTransformChildErrorsBlock: TransformChildErrorsBlockType?
+    fileprivate var _groupTransformChildErrorBlock: TransformChildErrorBlockType?
 
     /// - returns: the operations which have been added to the queue
     final public var children: [Operation] {
-        get { return groupStateLock.withCriticalScope { _groupChildren } }
+        return synchronise { _groupChildren }
     }
 
     /**
@@ -65,10 +70,9 @@ open class GroupProcedure: Procedure {
      children to complete, call `cancel()`. The Group will then cancel all of its
      children and finish as soon as they have handled cancellation / finished.
     */
-    final public override func finish(withErrors errors: [Error] = []) {
-        assertionFailure("Do not call finish() on a GroupProcedure or a GroupProcedure subclass.")
+    final public override func finish(with error: Error? = nil) {
+        assertionFailure("Do not call finish() on a GroupProcedure or a GroupProcedure subclass. GroupProcedure will automatically finish when all of its children finish.")
         // no-op
-        //
     }
 
     /**
@@ -125,7 +129,6 @@ open class GroupProcedure: Procedure {
         // we must cancelAllOperations and also ensure the queue is not suspended.
         queue.cancelAllOperations()
         queue.isSuspended = false
-
     }
 
     // MARK: - Handling Cancellation
@@ -134,15 +137,16 @@ open class GroupProcedure: Procedure {
     //
     // This function is called internally by the Group's .cancel() (Procedure.cancel())
     // prior to dispatching DidCancel observers on the Group's EventQueue.
-    override func _procedureDidCancel(withAdditionalErrors additionalErrors: [Error]) {
-        if additionalErrors.isEmpty {
+    override func _procedureDidCancel(with error: Error?) {
+        guard let error = error else {
             children.forEach { $0.cancel() }
+            return
         }
-        else {
-            let (operations, procedures) = children.operationsAndProcedures
-            operations.forEach { $0.cancel() }
-            procedures.forEach { $0.cancel(withError: ProcedureKitError.parent(cancelledWithErrors: additionalErrors)) }
-        }
+
+        let (operations, procedures) = children.operationsAndProcedures
+        operations.forEach { $0.cancel() }
+        procedures.forEach { $0.cancel(with: ProcedureKitError.parent(cancelledWithError: error)) }
+
         // the GroupProcedure ensures that `finish()` is called once all the
         // children have finished in its CanFinishGroup operation
     }
@@ -180,7 +184,7 @@ open class GroupProcedure: Procedure {
     // MARK: - Customizing the Group's Child Error Handling
 
     /**
-     This method is called when a child Procedure will finish (with / without errors).
+     This method is called when a child Procedure will finish (with / without an error).
      (It is called on the Group's EventQueue.)
 
      The default behavior is to append the child's errors, if any, to the Group's errors.
@@ -194,14 +198,25 @@ open class GroupProcedure: Procedure {
      - parameter child: the child Procedure which is finishing
      - parameter errors: an [Error], the errors of the child Procedure
     */
-    open func child(_ child: Procedure, willFinishWithErrors errors: [Error]) {
-        assert(!child.isFinished, "child(_:willFinishWithErrors:) called with a child that has already finished")
+    open func child(_ child: Procedure, willFinishWithError childError: Error?) {
+        assert(!child.isFinished, "child(_:willFinishWithError:) called with a child that has already finished")
+        guard let childError = childError else { return }
 
-        // Default GroupProcedure error-handling behavior:
-        // - Aggregate errors from child Procedures
+        // Default GroupProcedure error-handling is to collect
+        // the first error related to a non-Procedure subclass.
+        setErrorOnce(childError)
+    }
 
-        guard !errors.isEmpty else { return }
-        append(errors: errors, fromChild: child)
+    final public func setErrorOnce(_ childError: Error) {
+        guard error == nil else { return }
+
+        error = childError
+    }
+
+    @available(*, deprecated: 5.0.0, renamed: "child(_:willFinishWithError:)", message: "Use child(_:,willFinishWithError:) instead.")
+    open func child(_ childProcedure: Procedure, willFinishWithErrors errors: [Error]) {
+        assertionFailure("Use child(_:willFinishWithError:) instead.")
+        child(childProcedure, willFinishWithError: errors.first)
     }
 
     /**
@@ -221,13 +236,11 @@ open class GroupProcedure: Procedure {
      utilizes. It does not directly impact the child Procedure itself, nor the child Procedure's errors
      (if obtained or read directly from the child).
     */
-    final public var transformChildErrorsBlock: TransformChildErrorsBlockType? {
-        get { return groupStateLock.withCriticalScope { _groupTransformChildErrorsBlock } }
+    final public var transformChildErrorBlock: TransformChildErrorBlockType? {
+        get { return synchronise { _groupTransformChildErrorBlock } }
         set {
             assert(!isExecuting, "Do not modify the child errors block after the Group has started.")
-            groupStateLock.withCriticalScope {
-                _groupTransformChildErrorsBlock = newValue
-            }
+            synchronise { _groupTransformChildErrorBlock = newValue }
         }
     }
 }
@@ -417,36 +430,6 @@ public extension GroupProcedure {
     }
 }
 
-public extension GroupProcedure {
-
-    // MARK: - Aggregating Errors
-
-    /// Append an error to the Group's errors
-    ///
-    /// - Parameter error: an Error
-    final public func append(error: Error, fromChild child: Operation? = nil) {
-        if let child = child {
-            log.warning(message: "\(child.operationName) did encounter error: \(error).")
-        } else {
-            log.warning(message: "Appending error: \(error).")
-        }
-        append(errors: [error])
-    }
-
-    /// Append errors to the Group's errors
-    ///
-    /// - Parameter errors: an [Error]
-    /// - Parameter child: a child Operation
-    final public func append(errors: [Error], fromChild child: Operation? = nil) {
-        if let child = child {
-            log.warning(message: "\(child.operationName) did encounter \(errors.count) errors.")
-        } else {
-            log.warning(message: "Appending \(errors.count) errors.")
-        }
-        append(errors: errors)
-    }
-}
-
 // MARK: - GroupProcedure Private Queue Delegate
 
 internal extension GroupProcedure {
@@ -486,7 +469,7 @@ internal extension GroupProcedure {
             return strongGroup.willAdd(operation: procedure, context: context)
         }
 
-        public func procedureQueue(_ queue: ProcedureQueue, willFinishProcedure procedure: Procedure, withErrors initialErrors: [Error]) -> ProcedureFuture? {
+        public func procedureQueue(_ queue: ProcedureQueue, willFinishProcedure procedure: Procedure, with error: Error?) -> ProcedureFuture? {
             guard let strongGroup = group else { return nil }
             guard queue === strongGroup.queue else { return nil }
 
@@ -495,17 +478,18 @@ internal extension GroupProcedure {
 
             let promise = ProcedurePromise()
             strongGroup.dispatchEvent {
+
                 defer { promise.complete() }
 
-                var childErrors: [Error] = initialErrors
-                if let transformChildErrors = strongGroup.transformChildErrorsBlock {
-                    // transform child errors
-                    transformChildErrors(procedure, &childErrors)
-                    strongGroup.log.verbose(message: "Child errors for <\(procedure.operationName)> \((initialErrors.count != childErrors.count) ? "were transformed." : "were passed to transform block.")\n\t Initial errors ((initialErrors.count)): \(initialErrors)\n\t Transformed errors (\(childErrors.count)): \(childErrors)")
-                }
+                var childError: Error? = error
 
-                // handle child errors
-                strongGroup.child(procedure, willFinishWithErrors: childErrors)
+                defer { strongGroup.child(procedure, willFinishWithError: childError) }
+
+                guard let transformChildError = strongGroup.transformChildErrorBlock else { return }
+
+                transformChildError(procedure, &childError)
+
+                strongGroup.log.verbose(message: "Child error for <\(procedure.operationName)> was transformed.")
             }
             return promise.future
         }
@@ -737,8 +721,6 @@ fileprivate extension GroupProcedure {
 
 fileprivate extension GroupProcedure {
     fileprivate func _finishGroup() {
-        // Because errors have been added throughout to the (superclass) Procedure's `errors`,
-        // there is no need to pass any additional errors to the call to finish().
         super.finish()
         queue.isSuspended = true
     }
@@ -773,15 +755,21 @@ public extension GroupProcedure {
     @available(*, unavailable, renamed: "add(children:)")
     func addOperations(additional: [Operation]) { }
 
-    @available(*, unavailable, message: "GroupProcedure child error handling customization has been re-worked. Consider overriding child(_:willFinishWithErrors:).")
+    @available(*, unavailable, message: "GroupProcedure child error handling customization has been re-worked. Consider overriding child(_:willFinishWithError:).")
     final public func childDidRecoverFromErrors(_ child: Operation) { }
 
-    @available(*, unavailable, message: "GroupProcedure child error handling customization has been re-worked. Consider overriding child(_:willFinishWithErrors:).")
+    @available(*, unavailable, message: "GroupProcedure child error handling customization has been re-worked. Consider overriding child(_:willFinishWithError:).")
     final public func childDidNotRecoverFromErrors(_ child: Operation) { }
 
-    @available(*, unavailable, renamed: "append(error:)")
+    @available(*, unavailable, message: "GroupProcedure no longer collects all the child errors within itself")
     final public func append(fatalError error: Error) { }
 
-    @available(*, unavailable, renamed: "append(errors:)")
+    @available(*, unavailable, message: "GroupProcedure no longer collects all the child errors within itself")
     final public func append(fatalErrors errors: [Error]) { }
+
+    @available(*, unavailable, message: "GroupProcedure no longer collects all the child errors within itself")
+    final public func append(error: Error, fromChild child: Operation? = nil) { }
+
+    @available(*, unavailable, message: "GroupProcedure no longer collects all the child errors within itself")
+    final public func append(errors: [Error], fromChild child: Operation? = nil) { }
 }

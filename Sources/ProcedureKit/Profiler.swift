@@ -96,6 +96,7 @@ struct PendingProfileResult {
 }
 
 // MARK: ProcedureProfiler
+
 public final class ProcedureProfiler: Identifiable, Equatable {
 
     public let identity = UUID()
@@ -208,7 +209,7 @@ extension ProcedureProfiler: ProcedureObserver {
         addMetric(forEvent: .cancelled)
     }
 
-    public func did(finish procedure: Procedure, withErrors errors: [Error]) {
+    public func did(finish procedure: Procedure, with error: Error?) {
         addMetric(forEvent: .finished)
     }
 

@@ -25,7 +25,7 @@ class BatchProcedureTests: ProcedureKitTestCase {
 
         wait(for: beatles, greetings)
 
-        XCTAssertProcedureFinishedWithoutErrors(greetings)
+        PKAssertProcedureFinished(greetings)
         guard let result = greetings.output.success else {
             XCTFail("Batch did not finish with successful output.")
             return
@@ -40,11 +40,6 @@ class BatchProcedureTests: ProcedureKitTestCase {
 
         wait(for: beatles, greetings)
 
-        XCTAssertProcedureCancelledWithErrors(greetings)
-        guard let result = greetings.output.error as? ProcedureKitError else {
-            XCTFail("Batch did not finish an error.")
-            return
-        }
-        XCTAssertEqual(result, ProcedureKitError.requirementNotSatisfied())
+        PKAssertProcedureCancelledWithError(greetings, ProcedureKitError.dependency(finishedWithError: ProcedureKitError.unknown))
     }
 }

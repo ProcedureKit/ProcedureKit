@@ -18,7 +18,7 @@ open class ResultProcedure<Output>: Procedure, OutputProcedure {
     }
 
     open override func execute() {
-        defer { finish(withError: output.error) }
+        defer { finish(with: output.error) }
         do { output = .ready(.success(try block())) }
         catch { output = .ready(.failure(error)) }
     }
@@ -64,7 +64,7 @@ open class CancellableResultProcedure<Output>: Procedure, OutputProcedure {
     }
 
     open override func execute() {
-        defer { finish(withError: output.error) }
+        defer { finish(with: output.error) }
         do { output = .ready(.success(try block({[unowned self] in return self.isCancelled }))) }
         catch { output = .ready(.failure(error)) }
     }
@@ -103,11 +103,11 @@ open class UIBlockProcedure: AsyncBlockProcedure {
 
             sub.log.enabled = false
 
-            sub.addDidFinishBlockObserver { (_, errors) in
-                if errors.isEmpty {
-                    finishWithResult(success)
+            sub.addDidFinishBlockObserver { (_, error) in
+                if let error = error {
+                    finishWithResult(.failure(ProcedureKitError.dependency(finishedWithError: error)))
                 } else {
-                    finishWithResult(.failure(ProcedureKitError.dependency(finishedWithErrors: errors)))
+                    finishWithResult(success)
                 }
             }
 

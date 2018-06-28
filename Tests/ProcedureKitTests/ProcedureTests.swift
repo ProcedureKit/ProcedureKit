@@ -239,7 +239,7 @@ class ExecutionTests: ProcedureKitTestCase {
         addCompletionBlockTo(procedure: procedure, withExpectationDescription: "\(#function)")
         [procedure].enqueue()
         waitForExpectations(timeout: 3, handler: nil)
-        XCTAssertProcedureFinishedWithoutErrors()
+        PKAssertProcedureFinished(procedure)
     }
 
     func test__enqueue_a_sequence_of_operations_deallocates_queue() {
@@ -455,7 +455,7 @@ class DependencyTests: ProcedureKitTestCase {
             expDidFinishAnother?.fulfill()
         }
         wait(for: one, two) // wait for `one`, `two` and `another` (after `one` and `two`) to finish
-        XCTAssertProcedureFinishedWithoutErrors(another)
+        PKAssertProcedureFinished(another)
         XCTAssertLessThan(one.executedAt, another.executedAt)
         XCTAssertLessThan(two.executedAt, another.executedAt)
         XCTAssertLessThan(procedure.executedAt, another.executedAt)
@@ -468,7 +468,7 @@ class DependencyTests: ProcedureKitTestCase {
         let all = [one, two, procedure].then { another }
         XCTAssertEqual(all.count, 4)
         wait(for: one, two, procedure, another)
-        XCTAssertProcedureFinishedWithoutErrors(another)
+        PKAssertProcedureFinished(another)
         XCTAssertLessThan(one.executedAt, another.executedAt)
         XCTAssertLessThan(two.executedAt, another.executedAt)
         XCTAssertLessThan(procedure.executedAt, another.executedAt)
@@ -495,7 +495,6 @@ class DependencyTests: ProcedureKitTestCase {
 class ProduceTests: ProcedureKitTestCase {
 
     func test__procedure_produce_operation() {
-        LogManager.severity = .verbose
         let producedOperation = BlockProcedure { usleep(5000) }
         producedOperation.name = "ProducedOperation"
         let procedure = EventConcurrencyTrackingProcedure() { procedure in
@@ -504,13 +503,12 @@ class ProduceTests: ProcedureKitTestCase {
         }
         addCompletionBlockTo(procedure: producedOperation) // also wait for the producedOperation to finish
         wait(for: procedure)
-        XCTAssertProcedureFinishedWithoutErrors(producedOperation)
-        XCTAssertProcedureFinishedWithoutErrors(procedure)
-        XCTAssertProcedureNoConcurrentEvents(procedure)
+        PKAssertProcedureFinished(producedOperation)
+        PKAssertProcedureFinished(procedure)
+        PKAssertProcedureNoConcurrentEvents(procedure)
     }
 
     func test__procedure_produce_operation_before_execute() {
-        LogManager.severity = .verbose
         let producedOperation = BlockProcedure { usleep(5000) }
         producedOperation.name = "ProducedOperation"
         let procedure = EventConcurrencyTrackingProcedure() { procedure in
@@ -521,9 +519,9 @@ class ProduceTests: ProcedureKitTestCase {
         }
         addCompletionBlockTo(procedure: producedOperation) // also wait for the producedOperation to finish
         wait(for: procedure)
-        XCTAssertProcedureFinishedWithoutErrors(producedOperation)
-        XCTAssertProcedureFinishedWithoutErrors(procedure)
-        XCTAssertProcedureNoConcurrentEvents(procedure)
+        PKAssertProcedureFinished(producedOperation)
+        PKAssertProcedureFinished(procedure)
+        PKAssertProcedureNoConcurrentEvents(procedure)
     }
 
     func test__procedure_produce_operation_before_execute_async() {
@@ -554,8 +552,8 @@ class ProduceTests: ProcedureKitTestCase {
         }
         addCompletionBlockTo(procedure: producedOperation) // also wait for the producedOperation to finish
         wait(for: procedure)
-        XCTAssertProcedureFinishedWithoutErrors(producedOperation)
-        XCTAssertProcedureFinishedWithoutErrors(procedure)
+        PKAssertProcedureFinished(producedOperation)
+        PKAssertProcedureFinished(procedure)
         XCTAssertTrue(didExecuteWillAddObserverForProducedOperation.access, "procedure never executed its WillAddOperation observer for the produced operation")
         XCTAssertFalse(procedureIsExecuting_InWillAddObserver.access, "procedure was executing when its WillAddOperation observer was fired for the produced operation")
         XCTAssertFalse(procedureIsFinished_InWillAddObserver.access, "procedure was finished when its WillAddOperation observer was fired for the produced operation")
@@ -573,8 +571,8 @@ class ProduceTests: ProcedureKitTestCase {
         }
         addCompletionBlockTo(procedure: producedOperation) // also wait for the producedOperation to finish
         wait(for: procedure)
-        XCTAssertProcedureFinishedWithoutErrors(producedOperation)
-        XCTAssertProcedureFinishedWithoutErrors(procedure)
+        PKAssertProcedureFinished(producedOperation)
+        PKAssertProcedureFinished(procedure)
     }
 
     func test__procedure_produce_operation_before_finish_async() {
@@ -605,8 +603,8 @@ class ProduceTests: ProcedureKitTestCase {
         }
         addCompletionBlockTo(procedure: producedOperation) // also wait for the producedOperation to finish
         wait(for: procedure)
-        XCTAssertProcedureFinishedWithoutErrors(producedOperation)
-        XCTAssertProcedureFinishedWithoutErrors(procedure)
+        PKAssertProcedureFinished(producedOperation)
+        PKAssertProcedureFinished(procedure)
         XCTAssertTrue(didExecuteWillAddObserverForProducedOperation.access, "procedure never executed its WillAddOperation observer for the produced operation")
         XCTAssertFalse(procedureIsExecuting_InWillAddObserver.access, "procedure was executing when its WillAddOperation observer was fired for the produced operation")
         XCTAssertFalse(procedureIsFinished_InWillAddObserver.access, "procedure was finished when its WillAddOperation observer was fired for the produced operation")

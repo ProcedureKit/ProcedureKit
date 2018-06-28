@@ -103,7 +103,7 @@ public class NetworkObserver: ProcedureObserver {
         networkActivityController.start()
     }
 
-    public func did(finish procedure: Procedure, withErrors errors: [Error]) {
+    public func did(finish procedure: Procedure, with error: Error?) {
         networkActivityController.stop()
     }
 }

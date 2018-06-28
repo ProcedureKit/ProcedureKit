@@ -77,16 +77,16 @@ open class ReverseGeocodeUserLocationProcedure: GroupProcedure, OutputProcedure 
 
         reverseGeocodeLocation = ReverseGeocodeProcedure(timeout: timeout).injectResult(from: userLocation)
 
-        finishing.inject(dependency: userLocation) { finishing, userLocation, errors in
-            guard let location = userLocation.location, errors.isEmpty else {
-                finishing.cancel(withError: ProcedureKitError.dependency(finishedWithErrors: errors)); return
+        finishing.inject(dependency: userLocation) { finishing, userLocation, error in
+            guard let location = userLocation.location, error == nil else {
+                finishing.cancel(with: ProcedureKitError.dependency(finishedWithError: error)); return
             }
             finishing.location = .ready(location)
         }
 
-        finishing.inject(dependency: reverseGeocodeLocation) { finishing, reverseGeocodeLocation, errors in
-            guard let placemark = reverseGeocodeLocation.placemark, errors.isEmpty else {
-                finishing.cancel(withError: ProcedureKitError.dependency(finishedWithErrors: errors)); return
+        finishing.inject(dependency: reverseGeocodeLocation) { finishing, reverseGeocodeLocation, error in
+            guard let placemark = reverseGeocodeLocation.placemark, error == nil else {
+                finishing.cancel(with: ProcedureKitError.dependency(finishedWithError: error)); return
             }
             finishing.placemark = .ready(placemark)
         }

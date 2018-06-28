@@ -18,16 +18,17 @@ class ReverseGeocodeProcedureTests: LocationProcedureTestCase {
         let procedure = ReverseGeocodeProcedure(location: location)
         procedure.geocoder = geocoder
         wait(for: procedure)
-        XCTAssertProcedureFinishedWithoutErrors(procedure)
+        PKAssertProcedureFinished(procedure)
         XCTAssertEqual(geocoder.didReverseGeocodeLocation, location)
     }
 
     func test__geocoder_returns_error_finishes_with_error() {
-        geocoder.error = TestError()
+        let error = TestError()
+        geocoder.error = error
         let procedure = ReverseGeocodeProcedure(location: location)
         procedure.geocoder = geocoder
         wait(for: procedure)
-        XCTAssertProcedureFinishedWithErrors(procedure, count: 1)
+        PKAssertProcedureFinishedWithError(procedure, error)
         XCTAssertEqual(geocoder.didReverseGeocodeLocation, location)
     }
 
@@ -43,7 +44,7 @@ class ReverseGeocodeProcedureTests: LocationProcedureTestCase {
         let procedure = ReverseGeocodeProcedure(location: location)
         procedure.geocoder = geocoder
         wait(for: procedure)
-        XCTAssertProcedureFinishedWithoutErrors(procedure)
+        PKAssertProcedureFinished(procedure)
         XCTAssertNotNil(procedure.output.success)
         XCTAssertEqual(procedure.output.success, geocoder.placemarks?.first)
     }
@@ -58,7 +59,7 @@ class ReverseGeocodeProcedureTests: LocationProcedureTestCase {
         }
         procedure.geocoder = geocoder
         wait(for: procedure)
-        XCTAssertProcedureFinishedWithoutErrors(procedure)
+        PKAssertProcedureFinished(procedure)
         XCTAssertNotNil(didReceivePlacemark)
         XCTAssertEqual(didReceivePlacemark, geocoder.placemarks?.first)
     }
@@ -73,7 +74,7 @@ class ReverseGeocodeProcedureTests: LocationProcedureTestCase {
         }
         procedure.geocoder = geocoder
         wait(for: procedure)
-        XCTAssertProcedureFinishedWithoutErrors(procedure)
+        PKAssertProcedureFinished(procedure)
         XCTAssertTrue(didRunCompletionBlockOnMainQueue)
     }
 }

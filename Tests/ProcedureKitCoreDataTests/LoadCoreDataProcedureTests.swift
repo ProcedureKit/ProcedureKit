@@ -15,7 +15,7 @@ final class LoadCoreDataProcedureTests: ProcedureKitCoreDataTestCase {
 
         wait(for: coreDataStack)
 
-        XCTAssertProcedureFinishedWithoutErrors(coreDataStack)
+        PKAssertProcedureFinished(coreDataStack)
 
         guard let _ = coreDataStack.output.success else {
             XCTFail("Did not load container")

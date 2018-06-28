@@ -14,14 +14,14 @@ class IgnoreErrorsProcedureTests: ProcedureKitTestCase {
 
         let procedure = IgnoreErrorsProcedure(ResultProcedure { throw ProcedureKitError.unknown })
         wait(for: procedure)
-        XCTAssertProcedureFinishedWithoutErrors(procedure)
+        PKAssertProcedureFinished(procedure)
     }
 
     func test__procedure_which_does_not_error() {
 
         let procedure = IgnoreErrorsProcedure(ResultProcedure { "Hello" })
         wait(for: procedure)
-        XCTAssertProcedureFinishedWithoutErrors(procedure)
+        PKAssertProcedureFinished(procedure)
     }
 
     func test__procedure_output() {
