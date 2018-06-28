@@ -281,8 +281,8 @@ open class Procedure: Operation, ProcedureProtocol {
     }
 
     public var status: ProcedureStatus {
-        return stateLock.withCriticalScope {
-            switch (_isPending, _isExecuting, _isFinished, _isCancelled, (_errors.count > 0)) {
+        return synchronise {
+            switch (_isPending, _isExecuting, _isFinished, _isCancelled, (_error != nil)) {
             case (true, _, _, _, _):
                 return .pending
             case (_, true, _, _, _):

@@ -149,8 +149,6 @@ open class RetryProcedure<T: Procedure>: RepeatProcedure<T> {
             log.notice(message: "\(willAttemptAnotherOperation ? "will attempt" : "will not attempt") recovery from error: \(childError) in operation: \(child)")
         }
 
-        print("*** - child error: \(childError)")
-
         retry.info = createFailureInfo(for: current, error: childError)
         willAttemptAnotherOperation = _addNextOperation()
         retry.info = .none
