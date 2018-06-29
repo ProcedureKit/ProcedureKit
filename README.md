@@ -23,14 +23,23 @@ Example projects | [danthorpe/Examples](https://github.com/danthorpe/Examples)
 
 ProcedureKit supports all current Apple platforms. The minimum requirements are:
 
-- iOS 8.0+
-- macOS 10.10+
+- iOS 9.0+
+- macOS 10.11+
 - watchOS 3.0+
 - tvOS 9.2+
 
-The current version of ProcedureKit supports Swift 3+, and the use of Xcode 8.2+ is strongly recommended.
+The current released version of ProcedureKit (4.5.0) supports Swift 4.0+, and the use of Xcode 9 is strongly recommended.
 
 (If you need Swift 2.3 support, see [version 3.4.1](https://github.com/ProcedureKit/ProcedureKit/releases/tag/3.4.1) or the [`swift/2.3` branch](https://github.com/ProcedureKit/ProcedureKit/tree/swift/2.3).)
+
+## ProcedureKit Version 5
+The `development` branch, or the _bleeding edge_ is the current state of ProcedureKit v5 work. The focus for v5 is:
+    - [ ] Documentation, guides & sample code
+    - [x] Errors & easier error handling (breaking changes on `development` branch)
+		- [ ] Improved debugging & logging
+    - [ ] Improved BlockProcedure API
+    - [x] Simplified _ProcedureKitNetwork_ classes
+    - [x] Swift 4.2 & Xcode 10 support (on `xcode/10.0/development` branch) 
 
 ## Framework structure
 
