@@ -19,7 +19,7 @@ Updated but not yet complete reference docs | [procedure.kit.run/development](ht
 Programming guide | [operations.readme.io](https://operations.readme.io)
 Example projects | [danthorpe/Examples](https://github.com/danthorpe/Examples)
 
-# ProcedureKit Version 5
+# Version 5 🚀
 The `development` branch, or the _bleeding edge_ is the current state of ProcedureKit v5 work. Handle with care - but migration issues are welcome! The focus for v5 is:
 
   - [x] Swift 4.2 & Xcode 10 support (on `xcode/10.0/development` branch)
