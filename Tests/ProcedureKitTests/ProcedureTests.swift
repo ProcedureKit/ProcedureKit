@@ -86,7 +86,7 @@ class QueueDelegateTests: ProcedureKitTestCase {
 
         expectQueueDelegateDidFinishFor(operations: [operation], procedures: [finishedProcedure])
 
-        queue.add(operations: [operation, finishedProcedure]).then(on: DispatchQueue.main) {
+        queue.addOperations([operation, finishedProcedure]).then(on: DispatchQueue.main) {
             expAddFinished?.fulfill()
         }
         waitForExpectations(timeout: 3)
@@ -103,7 +103,7 @@ class QueueDelegateTests: ProcedureKitTestCase {
 
         expectQueueDelegateDidFinishFor(procedures: [procedure])
 
-        queue.add(operation: procedure).then(on: DispatchQueue.main) {
+        queue.addOperation(procedure).then(on: DispatchQueue.main) {
             expAddFinished?.fulfill()
         }
         waitForExpectations(timeout: 3)
@@ -289,7 +289,7 @@ class ExecutionTests: ProcedureKitTestCase {
         }
 
         addCompletionBlockTo(procedure: procedure)
-        procedureQueue.add(operation: procedure)
+        procedureQueue.addOperation(procedure)
         waitForExpectations(timeout: 3)
 
         XCTAssertTrue(didExecuteOnDesiredQueue.access, "execute() did not execute on the desired underlyingQueue")

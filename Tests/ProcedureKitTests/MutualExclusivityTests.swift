@@ -165,7 +165,7 @@ class MutualExclusiveTests: ProcedureKitTestCase {
         )
 
         addCompletionBlockTo(procedure: procedure)
-        queue.add(operation: procedure)
+        queue.addOperation(procedure)
         waitForExpectations(timeout: 3)
 
         PKAssertProcedureFinished(procedure)
@@ -260,10 +260,10 @@ class MutualExclusiveConcurrencyTests: ConcurrencyTestCase {
         procedure2.add(dependency: procedure1)
 
         // add procedure2 to the queue first
-        queue.add(operation: procedure2).then(on: DispatchQueue.main) { [weak weakQueue = self.queue] in
+        queue.addOperation(procedure2).then(on: DispatchQueue.main) { [weak weakQueue = self.queue] in
             guard let queue = weakQueue else { return }
             // then add procedure1 to the queue
-            queue.add(operation: procedure1)
+            queue.addOperation(procedure1)
         }
 
         waitForExpectations(timeout: 2)
@@ -314,7 +314,7 @@ class MutualExclusiveConcurrencyTests: ConcurrencyTestCase {
                 expProcedureWasStarted.fulfill()
             }
 
-            queue!.add(operation: procedure1)
+            queue!.addOperation(procedure1)
             waitForExpectations(timeout: 3) // wait for the Procedure to be started by the queue
 
             // store a weak reference to the ProcedureQueue

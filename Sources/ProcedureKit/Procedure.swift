@@ -895,7 +895,7 @@ open class Procedure: Operation, ProcedureProtocol {
         log.verbose(message: ".produce() | [event]: AddOperation(\(operation.operationName)) to queue.")
 
         // Add the new produced operation to the ProcedureQueue on which this Procedure was added
-        queue.add(operation: operation, withContext: queueAddContext).then(on: self) {
+        queue.addOperation(operation, withContext: queueAddContext).then(on: self) {
 
             // After adding to the queue completes, proceed to step 3 of handling produce()
             self._produce_step3(operation: operation, onQueue: queue, before: pendingEvent, promise: promise)

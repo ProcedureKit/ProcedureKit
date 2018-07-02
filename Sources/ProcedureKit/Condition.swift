@@ -962,14 +962,14 @@ internal class ConditionEvaluationContext {
     func queue(operation: Operation) -> ProcedureFuture {
         return stateLock.withCriticalScope {
             if _isCancelled { operation.cancel() }
-            return _procedureQueue.add(operation: operation)
+            return _procedureQueue.addOperation(operation)
         }
     }
 
     func queue<S>(operations: S) -> ProcedureFuture where S: Sequence, S.Iterator.Element: Operation {
         return stateLock.withCriticalScope {
             if _isCancelled { operations.forEach { $0.cancel() } }
-            return _procedureQueue.add(operations: operations)
+            return _procedureQueue.addOperations(operations)
         }
     }
 
@@ -977,7 +977,7 @@ internal class ConditionEvaluationContext {
         stateLock.withCriticalScope {
             for operations in operations {
                 if _isCancelled { operations.forEach { $0.cancel() } }
-                _procedureQueue.add(operations: operations)
+                _procedureQueue.addOperations(operations)
             }
         }
     }

@@ -503,7 +503,7 @@ class ConditionTests: ProcedureKitTestCase {
             }
         }
         queue.delegate = customDelegate
-        queue.add(operations: procedure, dependency)
+        queue.addOperations(procedure, dependency)
 
         // wait until the procedure has been added to the queue
         // and the dependency has been started
@@ -573,7 +573,7 @@ class ConditionTests: ProcedureKitTestCase {
         }))
         procedure.add(dependency: dependency)
 
-        queue.add(operations: procedure, dependency, additionalDependency)
+        queue.addOperations(procedure, dependency, additionalDependency)
 
         // wait until the first dependency has finished,
         // and the additionalDependency has started
@@ -1126,7 +1126,7 @@ class ConditionTests: ProcedureKitTestCase {
 
         procedure.add(condition: testCondition)
         addCompletionBlockTo(procedure: procedure)
-        queue.add(operation: procedure)
+        queue.addOperation(procedure)
 
         XCTAssertTrue(conditionWasEvaluatedGroup.wait(timeout: .now() + 1.0) == .timedOut, "The condition was evaluated, despite the ProcedureQueue being suspended.")
 

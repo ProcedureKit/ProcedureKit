@@ -407,7 +407,7 @@ public extension GroupProcedure {
         optimizedDispatchEventNotify(group: willAddObserversGroup) {
 
             // Add to queue
-            self.queue.add(operations: additional, withContext: self.queueAddContext).then(on: self) {
+            self.queue.addOperations(additional, withContext: self.queueAddContext).then(on: self) {
 
                 if let pendingEvent = pendingEvent {
                     pendingEvent.doBeforeEvent {

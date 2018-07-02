@@ -177,7 +177,7 @@ class GroupTests: GroupTestCase {
         }
 
         addCompletionBlockTo(procedure: group)
-        procedureQueue.add(operation: group)
+        procedureQueue.addOperation(group)
         waitForExpectations(timeout: 3)
 
         XCTAssertTrue(didExecuteOnDesiredQueue.access, "execute() did not execute on the desired underlyingQueue")
@@ -451,7 +451,7 @@ extension GroupTests {
         // Adding a TestProcedure to the otherQueue should not result in the Group's
         // Will/DidAddChild observers being called, nor should the Group wait
         // on the other queue's TestProcedure to finish.
-        otherQueue.add(operation: TestProcedure())
+        otherQueue.addOperation(TestProcedure())
         wait(for: group)
         XCTAssertTrue(group.isFinished)
         XCTAssertFalse(observerCalledFromGroupDelegate)

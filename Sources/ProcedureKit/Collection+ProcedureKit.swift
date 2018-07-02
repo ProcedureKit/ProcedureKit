@@ -82,7 +82,7 @@ extension Collection where Iterator.Element: Operation {
      - parameter queue: a ProcedureQueue, with a default argument
     */
     func enqueue(on queue: ProcedureQueue = ProcedureQueue()) {
-        queue.add(operations: self)
+        queue.addOperations(self)
     }
 }
 
