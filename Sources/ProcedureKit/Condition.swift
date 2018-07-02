@@ -1388,7 +1388,7 @@ internal extension Collection where Iterator.Element == Condition {
                 }
 
                 // Set the conditionEvaluateOperation to be dependent on all the Condition dependencies
-                conditionEvaluateOperation.add(dependencies: directDependencies.union(producedDependencies))
+                conditionEvaluateOperation.addDependencies(directDependencies.union(producedDependencies))
 
                 // Sanity-Check the producedDependencies
                 //
@@ -1427,7 +1427,7 @@ internal extension Collection where Iterator.Element == Condition {
                     //     (This ensures that the conditionEvaluateOperation will not become ready while
                     //     being added to the queue.)
                     let workaroundProducedDependency = DummyDependency()
-                    conditionEvaluateOperation.add(dependency: workaroundProducedDependency)
+                    conditionEvaluateOperation.addDependency(workaroundProducedDependency)
                     context.queueOperations([conditionEvaluateOperation, workaroundProducedDependency]).then(on: context.underlyingQueue) {
                         workaroundProducedDependency.finishOnceStarted()
                     }

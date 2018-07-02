@@ -84,8 +84,8 @@ open class InsertManagedObjectsProcedure<Item, ManagedObject>: GroupProcedure, I
         name = "Insert \(ManagedObject.entityName)"
 
         if shouldSave {
-            save.add(dependency: insert)
-            add(child: save)
+            save.addDependency(insert)
+            addChild(save)
         }
 
         bind(to: insert)

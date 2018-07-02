@@ -552,7 +552,7 @@ open class Procedure: Operation, ProcedureProtocol {
             // Add the direct dependencies of the procedure as direct dependencies of the evaluator
             // (to ensure that conditions are evaluated after all of the Procedure's dependencies)
             let directDependencies = protectedProperties.directDependencies
-            evaluator.add(dependencies: directDependencies)
+            evaluator.addDependencies(directDependencies)
 
             // Store the evaluator in the Procedure
             // (the Procedure maintains a strong reference to the EvaluateConditions operation)
@@ -1278,14 +1278,14 @@ open class Procedure: Operation, ProcedureProtocol {
 
      - parameter observer: type conforming to protocol `ProcedureObserver`.
      */
-    open func add<Observer>(observer: Observer) where Observer: ProcedureObserver, Observer.Procedure: Procedure {
+    open func addObserver<Observer>(_ observer: Observer) where Observer: ProcedureObserver, Observer.Procedure: Procedure {
         assert(self as? Observer.Procedure != nil, "add(observer:) passed an Observer with an invalid expected Procedure type. The Observer will not receive any events from this Procedure. (Observer expects a Procedure of type \"\(String(describing: Observer.Procedure.self))\", but `self` is a \"\(typeDescription)\" and cannot be converted.)")
 
-        add(anyObserver: AnyObserver(base: TransformObserver<Observer.Procedure, Procedure>(base: observer)))
+        addAnyObserver(AnyObserver(base: TransformObserver<Observer.Procedure, Procedure>(base: observer)))
     }
 
     // Internal function used to add AnyObserver<Procedure> to the Procedure's internal array of observers.
-    internal func add(anyObserver observer: AnyObserver<Procedure>) {
+    internal func addAnyObserver(_ observer: AnyObserver<Procedure>) {
         debugSynchronizedAssertIsPending("Adding observers to a Procedure after it has been added to a queue is an inherent race condition, and risks missing events.")
 
         dispatchEvent {
@@ -1385,12 +1385,12 @@ open class Procedure: Operation, ProcedureProtocol {
 
 public extension Procedure {
 
-    public final func add<Dependency: ProcedureProtocol>(dependency: Dependency) {
+    public final func addDependency<Dependency: ProcedureProtocol>(_ dependency: Dependency) {
         guard let op = dependency as? Operation else {
             assertionFailure("Adding dependencies which do not subclass Foundation.Operation is not supported.")
             return
         }
-        add(dependency: op)
+        addDependency(op)
     }
 }
 
@@ -1645,7 +1645,7 @@ extension Procedure {
         }
     }
 
-    func add(directDependency: Operation) {
+    func addDirectDependency(_ directDependency: Operation) {
         precondition(state < .started, "Dependencies cannot be modified after a Procedure has started, current state: \(state).")
         stateLock.withCriticalScope { () -> Void in
             protectedProperties.directDependencies.insert(directDependency)
@@ -1653,19 +1653,19 @@ extension Procedure {
             // occurs inside the stateLock to prevent any double-adds of dependencies
             // to the EvaluateConditions operation
             assert(!((_evaluateConditionsProcedure?.isExecuting ?? false) || (_evaluateConditionsProcedure?.isFinished ?? false)), "Conditions are already being evaluated (or have already finished being evaluated). It is too late to add a dependency and have it properly affect the Procedure. Instead, consider adding dependencies before adding the Procedure to a queue, or adding dependencies before all other existing dependencies have finished (for example: from a WillFinish observer on a dependency).")
-            _evaluateConditionsProcedure?.add(dependency: directDependency)
+            _evaluateConditionsProcedure?.addDependency(directDependency)
         }
         super.addDependency(directDependency)
     }
 
-    func remove(directDependency: Operation) {
+    func removeDirectDependency(_ directDependency: Operation) {
         precondition(state < .started, "Dependencies cannot be modified after a Procedure has started, current state: \(state).")
         stateLock.withCriticalScope { () -> Void in
             protectedProperties.directDependencies.remove(directDependency)
 
             // occurs inside the stateLock to ensure that every removed dependency is
             // removed from the EvaluateConditions operation
-            _evaluateConditionsProcedure?.remove(dependency: directDependency)
+            _evaluateConditionsProcedure?.removeDependency(directDependency)
         }
         super.removeDependency(directDependency)
     }
@@ -1685,7 +1685,7 @@ extension Procedure {
      */
     public final override func addDependency(_ operation: Operation) {
         precondition(state < .started, "Dependencies cannot be modified after a Procedure has started, current state: \(state).")
-        add(directDependency: operation)
+        addDirectDependency(operation)
     }
 
     /**
@@ -1700,7 +1700,7 @@ extension Procedure {
      */
     public final override func removeDependency(_ operation: Operation) {
         precondition(state < .started, "Dependencies cannot be modified after a Procedure has started, current state: \(state).")
-        remove(directDependency: operation)
+        removeDirectDependency(operation)
     }
 
     /**
@@ -1710,7 +1710,7 @@ extension Procedure {
 
      - parameter condition: a `Condition` which must be satisfied for the procedure to be executed.
      */
-    public final func add(condition: Condition) {
+    public final func addCondition(_ condition: Condition) {
         assert(state < .willEnqueue, "Cannot modify conditions after a Procedure has been added to a queue, current state: \(state).")
         synchronise { () -> Void in
             protectedProperties.conditions.insert(condition)
@@ -1743,6 +1743,41 @@ internal extension Procedure {
             }
         }
         #endif
+    }
+}
+
+// MARK: - Deprecations
+
+public extension Procedure {
+
+    @available(*, deprecated, renamed: "addObserver(_:)", message: "This has been renamed to use Swift 3/4 naming conventions")
+    func add<Observer>(observer: Observer) where Observer: ProcedureObserver, Observer.Procedure: Procedure {
+        addObserver(observer)
+    }
+
+    @available(*, deprecated, renamed: "addObserver(_:)", message: "This has been renamed to use Swift 3/4 naming conventions")
+    internal func add(anyObserver observer: AnyObserver<Procedure>) {
+        addAnyObserver(observer)
+    }
+
+    @available(*, deprecated, renamed: "addDependency(_:)", message: "This has been renamed to use Swift 3/4 naming conventions")
+    public final func add<Dependency: ProcedureProtocol>(dependency: Dependency) {
+        addDependency(dependency)
+    }
+
+    @available(*, deprecated, renamed: "addDirectDependency(_:)", message: "This has been renamed to use Swift 3/4 naming conventions")
+    func add(directDependency: Operation) {
+        addDirectDependency(directDependency)
+    }
+
+    @available(*, deprecated, renamed: "removeDirectDependency(_:)", message: "This has been renamed to use Swift 3/4 naming conventions")
+    func remove(directDependency: Operation) {
+        removeDirectDependency(directDependency)
+    }
+
+    @available(*, deprecated, renamed: "addCondition(_:)", message: "This has been renamed to use Swift 3/4 naming conventions")
+    public final func add(condition: Condition) {
+        addCondition(condition)
     }
 }
 

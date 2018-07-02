@@ -119,7 +119,7 @@ class NetworkRecovery<T: Procedure> where T: NetworkOperation {
         // Check to see if we should wait for a network reachability change before retrying
         if shouldWaitForReachabilityChange(givenNetworkResponse: networkResponse) {
             let waiter = NetworkReachabilityWaitProcedure(reachability: reachability, via: connectivity)
-            payload.operation.add(dependency: waiter)
+            payload.operation.addDependency(waiter)
             info.addOperations(waiter)
             return RepeatProcedurePayload(operation: payload.operation, delay: nil, configure: payload.configure)
         }
@@ -169,7 +169,7 @@ open class NetworkProcedure<T: Procedure>: RetryProcedure<T> where T: NetworkOpe
         recovery = NetworkRecovery<T>(resilience: resilience, connectivity: connectivity)
         super.init(dispatchQueue: dispatchQueue, max: recovery.max, wait: recovery.wait, iterator: base, retry: recovery.recover(withInfo:payload:))
         if let timeout = resilience.requestTimeout {
-            appendConfigureBlock { $0.add(observer: TimeoutObserver(by: timeout)) }
+            appendConfigureBlock { $0.addObserver(TimeoutObserver(by: timeout)) }
         }
     }
 

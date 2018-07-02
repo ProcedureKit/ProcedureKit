@@ -34,7 +34,7 @@ class NetworkReachabilityWaitProcedureTests: ProcedureKitTestCase {
         let makeNetworkReachable = BlockProcedure {
             self.network.flags = .reachable
         }
-        makeNetworkReachable.add(dependency: delay)
+        makeNetworkReachable.addDependency(delay)
 
         wait(forAll: [delay, makeNetworkReachable, procedure])
         PKAssertProcedureFinished(procedure)
@@ -111,9 +111,9 @@ class NetworkProcedureTests: ProcedureKitTestCase {
         network.flags = .connectionRequired
         let delay = DelayProcedure(by: 0.1)
         let makeSessionSuccessful = BlockProcedure { self.session.returnedError = nil }
-        makeSessionSuccessful.add(dependency: delay)
+        makeSessionSuccessful.addDependency(delay)
         let makeNetworkReachable = BlockProcedure { self.network.flags = .reachable }
-        makeNetworkReachable.add(dependency: makeSessionSuccessful)
+        makeNetworkReachable.addDependency(makeSessionSuccessful)
 
         let procedure = NetworkProcedure<Target>(resilience: resilience, body: createNetworkProcedure)
         procedure.reachability = manager
@@ -129,7 +129,7 @@ class NetworkProcedureTests: ProcedureKitTestCase {
 
         let delay = DelayProcedure(by: 0.1)
         let makeSessionSuccessful = BlockProcedure { self.session.returnedError = nil }
-        makeSessionSuccessful.add(dependency: delay)
+        makeSessionSuccessful.addDependency(delay)
 
         let procedure = NetworkProcedure<Target>(resilience: resilience, body: createNetworkProcedure)
         procedure.reachability = manager
@@ -144,7 +144,7 @@ class NetworkProcedureTests: ProcedureKitTestCase {
 
         let delay = DelayProcedure(by: 0.1)
         let makeSessionSuccessful = BlockProcedure { self.session.returnedResponse = HTTPURLResponse(url: self.url, statusCode: 200, httpVersion: nil, headerFields: nil) }
-        makeSessionSuccessful.add(dependency: delay)
+        makeSessionSuccessful.addDependency(delay)
 
         let procedure = NetworkProcedure<Target>(resilience: resilience, body: createNetworkProcedure)
         procedure.log.severity = .notice
@@ -160,7 +160,7 @@ class NetworkProcedureTests: ProcedureKitTestCase {
 
         let delay = DelayProcedure(by: 0.1)
         let makeSessionSuccessful = BlockProcedure { self.session.returnedResponse = HTTPURLResponse(url: self.url, statusCode: 200, httpVersion: nil, headerFields: nil) }
-        makeSessionSuccessful.add(dependency: delay)
+        makeSessionSuccessful.addDependency(delay)
 
         let procedure = NetworkProcedure<Target>(resilience: resilience, body: createNetworkProcedure)
         procedure.log.severity = .notice

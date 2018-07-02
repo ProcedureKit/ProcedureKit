@@ -187,7 +187,7 @@ open class RepeatProcedure<T: Operation>: GroupProcedure {
             _configure(_current)
             return _current
         }
-        add(child: current)
+        addChild(current)
         super.execute()
     }
 
@@ -244,11 +244,11 @@ open class RepeatProcedure<T: Operation>: GroupProcedure {
         }
 
         if let delay = payload.delay.map({ DelayProcedure(delay: $0) }) {
-            payload.operation.add(dependency: delay)
-            add(children: delay, payload.operation)
+            payload.operation.addDependency(delay)
+            addChildren(delay, payload.operation)
         }
         else {
-            add(child: payload.operation)
+            addChild(payload.operation)
         }
 
         return true

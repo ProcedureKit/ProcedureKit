@@ -26,7 +26,7 @@ class GroupTests: GroupTestCase {
 
     func test__group_adding_operation_to_running_group() {
         let semaphore = DispatchSemaphore(value: 0)
-        group.add(child: BlockOperation {
+        group.addChild(BlockOperation {
             // prevent the Group from finishing before an extra child is added
             // after execute
             semaphore.wait()
@@ -34,7 +34,7 @@ class GroupTests: GroupTestCase {
         let extra = TestProcedure(name: "Extra child")
 
         checkAfterDidExecute(procedure: group) {
-            $0.add(child: extra)
+            $0.addChild(extra)
             semaphore.signal()
         }
 
@@ -107,7 +107,7 @@ class GroupTests: GroupTestCase {
         let groupDidFinish = DispatchGroup()
         let child1 = children[0]
         let child2 = children[1]
-        child2.add(dependency: child1)
+        child2.addDependency(child1)
         group = TestGroupProcedure(operations: [child1, child2])
 
         child1.addWillFinishBlockObserver { (_, _, _) in
@@ -394,7 +394,7 @@ extension GroupTests {
     func test__group_additional_children_are_cancelled_if_group_is_cancelled() {
         group.cancel()
         let additionalChild = TestProcedure(delay: 0)
-        group.add(child: additionalChild)
+        group.addChild(additionalChild)
         wait(for: group)
         XCTAssertTrue(additionalChild.isCancelled)
     }
@@ -474,7 +474,7 @@ extension GroupTests {
     func test__group_does_not_finish_before_child_produced_operations_are_finished() {
         let child = TestProcedure(name: "Child", delay: 0.01)
         let childProducedOperation = TestProcedure(name: "ChildProducedOperation", delay: 0.2)
-        childProducedOperation.add(dependency: child)
+        childProducedOperation.addDependency(child)
         let group = GroupProcedure(operations: [child])
         child.addWillExecuteBlockObserver { operation, pendingExecute in
             try! operation.produce(operation: childProducedOperation, before: pendingExecute) // swiftlint:disable:this force_try
@@ -487,7 +487,7 @@ extension GroupTests {
     func test__group_children_array_receives_operations_produced_by_children() {
         let child = TestProcedure(name: "Child", delay: 0.01)
         let childProducedOperation = TestProcedure(name: "ChildProducedOperation", delay: 0.2)
-        childProducedOperation.add(dependency: child)
+        childProducedOperation.addDependency(child)
         let group = GroupProcedure(operations: [child])
         child.addWillExecuteBlockObserver { operation, pendingExecute in
             try! operation.produce(operation: childProducedOperation, before: pendingExecute) // swiftlint:disable:this force_try
@@ -593,9 +593,9 @@ extension GroupTests {
         // Ensure that this implementation detail is hidden from callbacks, observers, etc.
 
         let childWithFailingCondition = TestProcedure()
-        childWithFailingCondition.add(condition: FalseCondition())
+        childWithFailingCondition.addCondition(FalseCondition())
         let childWithSucceedingCondition = TestProcedure()
-        childWithSucceedingCondition.add(condition: TrueCondition())
+        childWithSucceedingCondition.addCondition(TrueCondition())
 
         let group = CheckForEvaluateConditionsGroupProcedure(operations: [childWithFailingCondition, childWithSucceedingCondition])
         wait(for: group)
@@ -726,7 +726,7 @@ class GroupAddChildConcurrencyTests: ProcedureKitTestCase {
         child.name = "ChildProcedure"
         addCompletionBlockTo(procedure: child)
         let group = EventConcurrencyTrackingGroupProcedure(operations: [], registrar: EventConcurrencyTrackingRegistrar(recordHistory: true))
-        group.add(child: child)
+        group.addChild(child)
         wait(for: group)
         PKAssertProcedureFinished(child)
         PKAssertProcedureFinished(group)
@@ -740,7 +740,7 @@ class GroupAddChildConcurrencyTests: ProcedureKitTestCase {
         let childFinishedOperation = BlockProcedure { DispatchQueue.main.async { expChildOperationFinished?.fulfill() } }
         childFinishedOperation.addDependency(child)
         let group = EventConcurrencyTrackingGroupProcedure(operations: [], registrar: EventConcurrencyTrackingRegistrar(recordHistory: true))
-        group.add(child: child)
+        group.addChild(child)
         wait(for: group, childFinishedOperation)
         XCTAssertTrue(child.isFinished)
         PKAssertProcedureFinished(group)
@@ -756,7 +756,7 @@ class GroupAddChildConcurrencyTests: ProcedureKitTestCase {
         addCompletionBlockTo(procedure: addedChild)
         let group = EventConcurrencyTrackingGroupProcedure(operations: [initialChild], registrar: EventConcurrencyTrackingRegistrar(recordHistory: true))
         initialChild.addWillExecuteBlockObserver { _, _ in
-            group.add(child: addedChild)
+            group.addChild(addedChild)
         }
         wait(for: group)
         PKAssertProcedureFinished(initialChild)
@@ -783,7 +783,7 @@ class GroupAddChildConcurrencyTests: ProcedureKitTestCase {
                 // it should ensure that `procedure` does not execute until producing the
                 // operation succeeds (i.e. until all WillAdd observers have been fired and it's
                 // added to the group)
-                group.add(child: addedChild, before: pendingExecute)
+                group.addChild(addedChild, before: pendingExecute)
             }
         }
         group.addWillAddOperationBlockObserver { procedure, operation in
@@ -817,7 +817,7 @@ class GroupAddChildConcurrencyTests: ProcedureKitTestCase {
                 // it should ensure that `procedure` does not finish until producing the
                 // operation succeeds (i.e. until all WillAdd observers have been fired and it's
                 // added to the group)
-                group.add(child: addedChild, before: pendingFinish)
+                group.addChild(addedChild, before: pendingFinish)
             }
         }
         group.addWillAddOperationBlockObserver { procedure, operation in

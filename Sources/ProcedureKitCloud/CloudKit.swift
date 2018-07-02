@@ -21,7 +21,7 @@ public final class CKProcedure<T: Operation>: ComposedProcedure<T> where T: CKOp
         super.init(dispatchQueue: dispatchQueue, operation: operation)
         log.enabled = false
         if let observer = timeout.map({ TimeoutObserver(by: $0) }) {
-            add(observer: observer)
+            addObserver(observer)
         }
     }
 }

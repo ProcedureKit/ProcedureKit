@@ -91,6 +91,6 @@ open class GatedProcedure<T: Operation>: ComposedProcedure<T> {
     ///   - gate: an escaping ThrowingBoolBlock
     public init(dispatchQueue: DispatchQueue? = nil, operation: T, gate: @escaping ThrowingBoolBlock) {
         super.init(dispatchQueue: dispatchQueue, operation: operation)
-        add(condition: IgnoredCondition(BlockCondition(block: gate)))
+        addCondition(IgnoredCondition(BlockCondition(block: gate)))
     }
 }

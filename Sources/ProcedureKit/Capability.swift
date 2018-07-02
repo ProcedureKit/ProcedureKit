@@ -228,7 +228,7 @@ public class AuthorizeCapabilityProcedure<Status: AuthorizationStatus>: GetAutho
      */
     public override init<Base>(_ base: Base, completion block: Completion? = nil) where Base: CapabilityProtocol, Status == Base.Status {
         super.init(base, completion: block)
-        add(condition: MutuallyExclusive<AuthorizeCapabilityProcedure>(category: "AuthorizeCapabilityProcedure(\(String(describing: type(of: base))))"))
+        addCondition(MutuallyExclusive<AuthorizeCapabilityProcedure>(category: "AuthorizeCapabilityProcedure(\(String(describing: type(of: base))))"))
     }
 
     public override func execute() {

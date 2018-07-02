@@ -56,7 +56,7 @@ open class ProcedureKitCoreDataTestCase: ProcedureKitTestCase {
                 self.output = .ready(.success(managedObjects))
             }
 
-            add(child: insert)
+            addChild(insert)
 
             self.managedObjectContext = insert.managedObjectContext
 

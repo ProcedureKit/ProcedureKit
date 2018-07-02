@@ -630,7 +630,7 @@ class ObserverEventQueueTests: ProcedureKitTestCase {
         let procedure = EventConcurrencyTrackingProcedure(name: "TestingProcedure") { procedure in
             procedure.finish()
         }
-        procedure.add(observer: observer)
+        procedure.addObserver(observer)
         procedure.addDidFinishBlockObserver { _, _ in
             didFinishGroup.leave()
         }
@@ -667,7 +667,7 @@ class ObserverEventQueueTests: ProcedureKitTestCase {
         let registrar = EventConcurrencyTrackingRegistrar()
         // NOTE: Don't do this. This is just for testing.
         let observer = ConcurrencyTrackingObserver(registrar: registrar, eventQueue: procedure.eventQueue)
-        procedure.add(observer: observer)
+        procedure.addObserver(observer)
 
         let finishing = BlockProcedure { }
         finishing.addDependency(procedure)
