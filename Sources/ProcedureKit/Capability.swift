@@ -257,7 +257,7 @@ public class AuthorizedFor<Status: AuthorizationStatus>: Condition {
         if let category = category {
             addToAttachedProcedure(mutuallyExclusiveCategory: category)
         }
-        produce(dependency: AuthorizeCapabilityProcedure(base))
+        produceDependency(AuthorizeCapabilityProcedure(base))
     }
 
     public override func evaluate(procedure: Procedure, completion: @escaping (ConditionResult) -> Void) {

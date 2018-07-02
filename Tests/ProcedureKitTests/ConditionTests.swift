@@ -15,7 +15,7 @@ class ConditionTests: ProcedureKitTestCase {
     func test__condition__produce_dependency() {
         let condition = TrueCondition()
         let dependency = TestProcedure()
-        condition.produce(dependency: dependency)
+        condition.produceDependency(dependency)
         XCTAssertEqual(condition.producedDependencies.count, 1)
         XCTAssertEqual(condition.producedDependencies.first, dependency)
         XCTAssertEqual(condition.dependencies.count, 0)
@@ -24,7 +24,7 @@ class ConditionTests: ProcedureKitTestCase {
     func test__condition__add_dependency() {
         let condition = TrueCondition()
         let dependency = TestProcedure()
-        condition.add(dependency: dependency)
+        condition.addDependency(dependency)
         XCTAssertEqual(condition.dependencies.count, 1)
         XCTAssertEqual(condition.dependencies.first, dependency)
         XCTAssertEqual(condition.producedDependencies.count, 0)
@@ -34,17 +34,17 @@ class ConditionTests: ProcedureKitTestCase {
         let condition = TrueCondition()
         let dependency = TestProcedure()
         let producedDependency = TestProcedure()
-        condition.add(dependency: dependency)
-        condition.produce(dependency: producedDependency)
+        condition.addDependency(dependency)
+        condition.produceDependency(producedDependency)
         XCTAssertEqual(condition.dependencies.count, 1)
         XCTAssertEqual(condition.dependencies.first, dependency)
         XCTAssertEqual(condition.producedDependencies.count, 1)
         XCTAssertEqual(condition.producedDependencies.first, producedDependency)
 
-        condition.remove(dependency: producedDependency)
+        condition.removeDependency(producedDependency)
         XCTAssertEqual(condition.producedDependencies.count, 0, "Produced dependency not removed.")
 
-        condition.remove(dependency: dependency)
+        condition.removeDependency(dependency)
         XCTAssertEqual(condition.producedDependencies.count, 0, "Dependency not removed.")
     }
 
@@ -181,7 +181,7 @@ class ConditionTests: ProcedureKitTestCase {
         longRunningDependency.addDidFinishBlockObserver { _, _ in
             dispatchGroup.leave()
         }
-        longRunningCondition.produce(dependency: longRunningDependency)
+        longRunningCondition.produceDependency(longRunningDependency)
 
         let failSecondCondition = AsyncTestCondition { completion in
             // To ensure order of operations, finish this condition async once the
@@ -333,7 +333,7 @@ class ConditionTests: ProcedureKitTestCase {
             didEvaluateConditionGroup.leave()
             return .success(true)
         }
-        dependencies.forEach { condition.produce(dependency: $0) }
+        dependencies.forEach(condition.produceDependency)
         condition.dependencyRequirements = requirements
 
         procedure.add(condition: condition)
@@ -365,7 +365,7 @@ class ConditionTests: ProcedureKitTestCase {
         conditionDependency1.name = "Condition 1 Dependency"
 
         let condition1 = TrueCondition(name: "Condition 1")
-        condition1.produce(dependency: conditionDependency1)
+        condition1.produceDependency(conditionDependency1)
 
 
         let conditionDependency2 = BlockOperation {
@@ -375,7 +375,7 @@ class ConditionTests: ProcedureKitTestCase {
         conditionDependency2.name = "Condition 2 Dependency"
 
         let condition2 = TrueCondition(name: "Condition 2")
-        condition2.produce(dependency: conditionDependency2)
+        condition2.produceDependency(conditionDependency2)
 
         procedure.add(condition: condition1)
         procedure.add(condition: condition2)
@@ -393,9 +393,9 @@ class ConditionTests: ProcedureKitTestCase {
         let dependency1 = TestProcedure()
         let dependency2 = TestProcedure()
         let condition1 = TrueCondition(name: "Condition 1")
-        condition1.produce(dependency: TestProcedure())
+        condition1.produceDependency(TestProcedure())
         let condition2 = TrueCondition(name: "Condition 2")
-        condition2.produce(dependency: TestProcedure())
+        condition2.produceDependency(TestProcedure())
 
         procedure.add(dependency: dependency1)
         procedure.add(dependency: dependency2)
@@ -411,7 +411,7 @@ class ConditionTests: ProcedureKitTestCase {
     func test__target_and_condition_have_same_dependency() {
         let dependency = TestProcedure()
         let condition = TrueCondition(name: "Condition")
-        condition.add(dependency: dependency)
+        condition.addDependency(dependency)
 
         procedure.add(condition: condition)
         procedure.add(dependency: dependency)
@@ -427,14 +427,14 @@ class ConditionTests: ProcedureKitTestCase {
         let dependency = TestProcedure(name: "Dependency")
 
         let condition1 = TrueCondition(name: "Condition 1")
-        condition1.add(dependency: dependency)
+        condition1.addDependency(dependency)
 
         let procedure1 = TestProcedure(name: "Procedure 1")
         procedure1.add(condition: condition1)
         procedure1.add(dependency: dependency)
 
         let condition2 = TrueCondition(name: "Condition 2")
-        condition2.add(dependency: dependency)
+        condition2.addDependency(dependency)
 
         let procedure2 = TestProcedure(name: "Procedure 2")
         procedure2.add(condition: condition2)
@@ -697,7 +697,7 @@ class ConditionTests: ProcedureKitTestCase {
     func test__compound_condition_produced_dependencies() {
         let conditions: [Condition] = (0..<3).map {
             let condition = TrueCondition(name: "Condition \($0)")
-            condition.produce(dependency: TestProcedure())
+            condition.produceDependency(TestProcedure())
             return condition
         }
         let compoundCondition = CompoundCondition(andPredicateWith: conditions)
@@ -706,14 +706,14 @@ class ConditionTests: ProcedureKitTestCase {
         XCTAssertEqual(compoundCondition.producedDependencies.count, 0)
 
         let producedDependency = TestProcedure()
-        compoundCondition.produce(dependency: producedDependency)
+        compoundCondition.produceDependency(producedDependency)
         XCTAssertTrue(Array(compoundCondition.producedDependencies) == [producedDependency])
     }
 
     func test__compound_condition_added_dependencies() {
         let conditions: [Condition] = (0..<3).map {
             let condition = TrueCondition(name: "Condition \($0)")
-            condition.add(dependency: TestProcedure())
+            condition.addDependency(TestProcedure())
             return condition
         }
         let compoundCondition = CompoundCondition(andPredicateWith: conditions)
@@ -722,7 +722,7 @@ class ConditionTests: ProcedureKitTestCase {
         XCTAssertEqual(compoundCondition.dependencies.count, 0)
 
         let dependency = TestProcedure()
-        compoundCondition.add(dependency: dependency)
+        compoundCondition.addDependency(dependency)
         XCTAssertTrue(Array(compoundCondition.dependencies) == [dependency])
     }
 
@@ -1083,8 +1083,8 @@ class ConditionTests: ProcedureKitTestCase {
         }
 
         let dependentCondition = TrueCondition()
-        dependentCondition.produce(dependency: conditionProducedDependency)
-        dependentCondition.add(dependency: normalDependency)
+        dependentCondition.produceDependency(conditionProducedDependency)
+        dependentCondition.addDependency(normalDependency)
         procedure.add(condition: AndCondition(TrueCondition(), dependentCondition, cancelsProcedureCondition))
 
         // wait on the conditionProducedDependency to finish - but since it is scheduled

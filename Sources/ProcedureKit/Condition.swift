@@ -337,7 +337,7 @@ open class Condition: ConditionProtocol, Hashable {
     /// one `Condition` instance.
     ///
     /// - Parameter dependency: an Operation to be produced as a dependency
-    final public func produce(dependency: Operation) {
+    final public func produceDependency(_ dependency: Operation) {
         assert(!dependency.isExecuting, "Do not call produce(dependency:) with an Operation that is already executing.")
         assert(!dependency.isFinished, "Do not call produce(dependency:) with an Operation that is already finished.")
         synchronise {
@@ -346,7 +346,7 @@ open class Condition: ConditionProtocol, Hashable {
         }
     }
 
-    /// Adds a dependency, just like `Procedure.add(dependency:)`.
+    /// Adds a dependency, just like `Procedure.addDependency(_:)`.
     ///
     /// The framework will wait for the dependency to finish before the Condition's 
     /// `evaluate(procedure:completion:)` function is called.
@@ -356,14 +356,14 @@ open class Condition: ConditionProtocol, Hashable {
     /// for example, adding it to an `OperationQueue` / `ProcedureQueue`.
     ///
     /// - Parameter dependency: an Operation to be added as a dependency
-    final public func add(dependency: Operation) {
+    final public func addDependency(_ dependency: Operation) {
         synchronise {
             debugAssertConditionNotAttachedToProcedure("Dependencies must be modified before the Condition is added to a Procedure.")
             _dependencies.insert(dependency)
         }
     }
 
-    /// Add dependencies, just like `Procedure.add(dependencies:)`.
+    /// Add dependencies, just like `Procedure.addDependencies(_:)`.
     ///
     /// The framework will wait for the dependencies to finish before the Condition's
     /// `evaluate(procedure:completion:)` function is called.
@@ -373,20 +373,21 @@ open class Condition: ConditionProtocol, Hashable {
     /// for example, adding it to an `OperationQueue` / `ProcedureQueue`.
     ///
     /// - Parameter dependencies: an array of Operations to be added as a dependencies
-    final public func add(dependencies: [Operation]) {
+    final public func addDependencies(_ dependencies: [Operation]) {
         synchronise {
             debugAssertConditionNotAttachedToProcedure("Dependencies must be modified before the Condition is added to a Procedure.")
             _dependencies.formUnion(dependencies)
         }
     }
-    final public func add(dependencies: Operation...) {
-        add(dependencies: dependencies)
+
+    final public func addDependencies(_ dependencies: Operation...) {
+        addDependencies(dependencies)
     }
 
     /// Removes a dependency.
     ///
     /// - Parameter dependency: an Operation to be removed from the `producedDependencies` and/or `dependencies`.
-    public func remove(dependency: Operation) {
+    public func removeDependency(_ dependency: Operation) {
         synchronise {
             debugAssertConditionNotAttachedToProcedure("Dependencies must be modified before the Condition is added to a Procedure.")
             _dependencies.remove(dependency)
@@ -397,7 +398,7 @@ open class Condition: ConditionProtocol, Hashable {
     /// Removes dependencies.
     ///
     /// - Parameter dependencies: an array of Operations to be removed from the `producedDependencies` and/or `dependencies`.
-    public func remove(dependencies: [Operation]) {
+    public func removeDependencies(_ dependencies: [Operation]) {
         synchronise {
             debugAssertConditionNotAttachedToProcedure("Dependencies must be modified before the Condition is added to a Procedure.")
             dependencies.forEach {
@@ -406,8 +407,9 @@ open class Condition: ConditionProtocol, Hashable {
             }
         }
     }
-    public func remove(dependencies: Operation...) {
-        remove(dependencies: dependencies)
+
+    public func removeDependencies(_ dependencies: Operation...) {
+        removeDependencies(dependencies)
     }
 
     // MARK: Evaluate
@@ -482,6 +484,46 @@ internal extension Condition {
             return
         }
         #endif
+    }
+}
+
+// MARK: - Deprecations
+
+public extension Condition {
+
+    @available(*, deprecated, renamed: "produceDependency(_:)", message: "This has been renamed to use Swift 3/4 naming conventions")
+    final public func produce(dependency: Operation) {
+        produceDependency(dependency)
+    }
+
+    @available(*, deprecated, renamed: "addDependency(_:)", message: "This has been renamed to use Swift 3/4 naming conventions")
+    final public func add(dependency: Operation) {
+        addDependency(dependency)
+    }
+
+    @available(*, deprecated, renamed: "addDependencies(_:)", message: "This has been renamed to use Swift 3/4 naming conventions")
+    final public func add(dependencies: [Operation]) {
+        addDependencies(dependencies)
+    }
+
+    @available(*, deprecated, renamed: "addDependencies(_:)", message: "This has been renamed to use Swift 3/4 naming conventions")
+    final public func add(dependencies: Operation...) {
+        addDependencies(dependencies)
+    }
+
+    @available(*, deprecated, renamed: "removeDependency(_:)", message: "This has been renamed to use Swift 3/4 naming conventions")
+    public func remove(dependency: Operation) {
+        removeDependency(dependency)
+    }
+
+    @available(*, deprecated, renamed: "removeDependencies(_:)", message: "This has been renamed to use Swift 3/4 naming conventions")
+    public func remove(dependencies: [Operation]) {
+        removeDependencies(dependencies)
+    }
+
+    @available(*, deprecated, renamed: "removeDependencies(_:)", message: "This has been renamed to use Swift 3/4 naming conventions")
+    public func remove(dependencies: Operation...) {
+        removeDependencies(dependencies)
     }
 }
 
@@ -861,9 +903,9 @@ open class ComposedCondition<C: Condition>: Condition {
         }
     }
 
-    override public func remove(dependency: Operation) {
-        condition.remove(dependency: dependency)
-        super.remove(dependency: dependency)
+    override public func removeDependency(_ dependency: Operation) {
+        condition.removeDependency(dependency)
+        super.removeDependency(dependency)
     }
 
     internal override func evaluate(procedure: Procedure, withContext context: ConditionEvaluationContext, completion: @escaping (ConditionResult) -> Void) {
@@ -959,21 +1001,21 @@ internal class ConditionEvaluationContext {
         }
     }
 
-    func queue(operation: Operation) -> ProcedureFuture {
+    func queueOperation(_ operation: Operation) -> ProcedureFuture {
         return stateLock.withCriticalScope {
             if _isCancelled { operation.cancel() }
             return _procedureQueue.addOperation(operation)
         }
     }
 
-    func queue<S>(operations: S) -> ProcedureFuture where S: Sequence, S.Iterator.Element: Operation {
+    func queueOperations<S>(_ operations: S) -> ProcedureFuture where S: Sequence, S.Iterator.Element: Operation {
         return stateLock.withCriticalScope {
             if _isCancelled { operations.forEach { $0.cancel() } }
             return _procedureQueue.addOperations(operations)
         }
     }
 
-    func queue<S>(operations: S...) where S: Sequence, S.Iterator.Element: Operation {
+    func queueOperations<S>(_ operations: S...) where S: Sequence, S.Iterator.Element: Operation {
         stateLock.withCriticalScope {
             for operations in operations {
                 if _isCancelled { operations.forEach { $0.cancel() } }
@@ -1376,7 +1418,7 @@ internal extension Collection where Iterator.Element == Condition {
                 if !producedDependencies.isEmpty {
                     // 1.) Add the `conditionEvaluateOperation` to the queue *before* its
                     //     producedDependencies.
-                    context.queue(operations: [conditionEvaluateOperation], producedDependencies)
+                    context.queueOperations([conditionEvaluateOperation], producedDependencies)
                 }
                 else {
                     // 2.) No produced dependencies (only direct dependencies)
@@ -1386,7 +1428,7 @@ internal extension Collection where Iterator.Element == Condition {
                     //     being added to the queue.)
                     let workaroundProducedDependency = DummyDependency()
                     conditionEvaluateOperation.add(dependency: workaroundProducedDependency)
-                    context.queue(operations: [conditionEvaluateOperation, workaroundProducedDependency]).then(on: context.underlyingQueue) {
+                    context.queueOperations([conditionEvaluateOperation, workaroundProducedDependency]).then(on: context.underlyingQueue) {
                         workaroundProducedDependency.finishOnceStarted()
                     }
                 }
