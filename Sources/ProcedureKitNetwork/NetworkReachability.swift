@@ -13,6 +13,27 @@
 
 import SystemConfiguration
 
+public protocol ReachabilityManagerDelegate: class {
+
+    func manager(manager: ReachabilityManager, didObserveChangeFrom: Reachability.NetworkStatus?, to: Reachability.NetworkStatus)
+}
+
+public protocol ReachabilityManager {
+
+    weak var delegate: ReachabilityManagerDelegate? { get set }
+
+    func startObservingNetworkStatus()
+
+    func stopObservingNetworkStatus()
+}
+
+public extension Reachability {
+
+    public var manager: ReachabilityManager {
+        return Reachability.Manager.shared
+    }
+}
+
 // MARK: - Internal concrete types
 
 extension Reachability {
@@ -20,19 +41,55 @@ extension Reachability {
     final class Manager {
         typealias Status = NetworkStatus
 
-        static let shared = Reachability.Manager(Device())
+        struct ObservationState { // swiftlint:disable:this nesting
+            var globalObservationEnabled: Bool = false
+            var observers: Array<Observer> = []
+            var previousStatus: Status?
+        }
+
+        static let shared: Manager = Reachability.Manager(Device())
 
         let queue = DispatchQueue(label: "run.kit.ProcedureKit.Network.Reachability")
         var network: NetworkReachability
-        fileprivate var protectedObservers = Protector(Array<Observer>())
+        fileprivate var protectedObservationState = Protector(ObservationState())
+
+        weak var delegate: ReachabilityManagerDelegate?
 
         var observers: [Observer] {
-            return protectedObservers.access
+            return protectedObservationState.access.observers
+        }
+
+        var isGlobalObserverRunning: Bool {
+            return protectedObservationState.access.globalObservationEnabled
         }
 
         init(_ network: NetworkReachability) {
             self.network = network
             self.network.delegate = self
+        }
+    }
+}
+
+extension Reachability.Manager: ReachabilityManager {
+
+    func startObservingNetworkStatus() {
+        protectedObservationState.write { (state: inout ObservationState) in
+            state.globalObservationEnabled = true
+            do {
+                try network.startNotifier(onQueue: queue)
+            }
+            catch {
+                print("Caught error: \(error) starting reachability notifier.")
+            }
+        }
+    }
+
+    func stopObservingNetworkStatus() {
+        protectedObservationState.write { (state: inout ObservationState) in
+            state.globalObservationEnabled = false
+            if observers.count == 0 {
+                network.stopNotifier()
+            }
         }
     }
 }
@@ -43,9 +100,15 @@ extension Reachability.Manager: NetworkReachabilityDelegate {
         guard observers.count > 0 else { return }
 
         let status = Status(flags: flags)
-        let observersToCheck = observers
 
-        protectedObservers.write { (observers: inout Array<Reachability.Observer>) in
+        protectedObservationState.write { (state: inout ObservationState) in
+
+            let observersToCheck = state.observers
+
+            if state.globalObservationEnabled, let aDelegate = self.delegate {
+                aDelegate.manager(manager: self, didObserveChangeFrom: state.previousStatus, to: status)
+            }
+            state.previousStatus = status
 
             var observersToBeRemoved = Array<Reachability.Observer>()
 
@@ -57,7 +120,7 @@ extension Reachability.Manager: NetworkReachabilityDelegate {
                 return !shouldRemove
             }
 
-            if newObservers.count == 0 {
+            if newObservers.count == 0 && !state.globalObservationEnabled {
                 self.network.stopNotifier()
             }
 
@@ -67,7 +130,7 @@ extension Reachability.Manager: NetworkReachabilityDelegate {
                 }
             }
 
-            observers = newObservers
+            state.observers = newObservers
         }
     }
 }
@@ -75,9 +138,9 @@ extension Reachability.Manager: NetworkReachabilityDelegate {
 extension Reachability.Manager: SystemReachability {
 
     func whenReachable(via connectivity: Reachability.Connectivity, block: @escaping () -> Void) {
-        protectedObservers.write { (observers: inout Array<Reachability.Observer>) in
+        protectedObservationState.write { (state: inout ObservationState) in
             let observer = Reachability.Observer(connectivity: connectivity, didConnectBlock: block)
-            observers.append(observer)
+            state.observers.append(observer)
         }
         do {
             try network.startNotifier(onQueue: queue)
@@ -87,9 +150,7 @@ extension Reachability.Manager: SystemReachability {
         }
     }
 
-    func reachability(of: URL, block: @escaping (Reachability.NetworkStatus) -> Void) {
-
-    }
+    func reachability(of: URL, block: @escaping (Reachability.NetworkStatus) -> Void) { }
 }
 
 // MARK: - Device Reachability
