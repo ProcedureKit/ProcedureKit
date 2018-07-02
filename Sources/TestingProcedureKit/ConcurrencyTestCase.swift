@@ -445,7 +445,7 @@ open class EventConcurrencyTrackingProcedure: Procedure, EventConcurrencyTrackin
         super.init()
         self.name = name
         if let baseObserver = baseObserver {
-            add(observer: baseObserver)
+            addObserver(baseObserver)
         }
     }
     open override func execute() {
@@ -478,7 +478,7 @@ open class EventConcurrencyTrackingGroupProcedure: GroupProcedure, EventConcurre
         super.init(dispatchQueue: underlyingQueue, operations: operations)
         self.name = name
         if let baseObserver = baseObserver {
-            add(observer: baseObserver)
+            addObserver(baseObserver)
         }
         // GroupProcedure transformChildErrorsBlock
         transformChildErrorBlock = { [concurrencyRegistrar] (child, _) in

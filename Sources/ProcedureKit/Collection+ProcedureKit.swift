@@ -50,7 +50,7 @@ extension Collection where Iterator.Element: Operation {
         var operations = Array(self)
         for operation in self {
             assert(!operation.isFinished, "Cannot add a finished operation as a dependency.")
-            sequence.forEach { $0.add(dependency: operation) }
+            sequence.forEach { $0.addDependency(operation) }
         }
         operations += sequence
         return operations
@@ -82,7 +82,7 @@ extension Collection where Iterator.Element: Operation {
      - parameter queue: a ProcedureQueue, with a default argument
     */
     func enqueue(on queue: ProcedureQueue = ProcedureQueue()) {
-        queue.add(operations: self)
+        queue.addOperations(self)
     }
 }
 
@@ -99,7 +99,7 @@ extension Collection where Iterator.Element: OutputProcedure {
 
         let mapped = ResultProcedure { try self.compactMap { $0.output.success }.compactMap(transform) }
 
-        forEach { mapped.add(dependency: $0) }
+        forEach(mapped.addDependency)
 
         return mapped
     }
@@ -115,7 +115,7 @@ extension Collection where Iterator.Element: OutputProcedure {
 
         let result = ResultProcedure { try self.compactMap { $0.output.success }.reduce(initialResult, nextPartialResult) }
 
-        forEach { result.add(dependency: $0) }
+        forEach(result.addDependency)
 
         return result
     }

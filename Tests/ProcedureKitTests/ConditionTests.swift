@@ -15,7 +15,7 @@ class ConditionTests: ProcedureKitTestCase {
     func test__condition__produce_dependency() {
         let condition = TrueCondition()
         let dependency = TestProcedure()
-        condition.produce(dependency: dependency)
+        condition.produceDependency(dependency)
         XCTAssertEqual(condition.producedDependencies.count, 1)
         XCTAssertEqual(condition.producedDependencies.first, dependency)
         XCTAssertEqual(condition.dependencies.count, 0)
@@ -24,7 +24,7 @@ class ConditionTests: ProcedureKitTestCase {
     func test__condition__add_dependency() {
         let condition = TrueCondition()
         let dependency = TestProcedure()
-        condition.add(dependency: dependency)
+        condition.addDependency(dependency)
         XCTAssertEqual(condition.dependencies.count, 1)
         XCTAssertEqual(condition.dependencies.first, dependency)
         XCTAssertEqual(condition.producedDependencies.count, 0)
@@ -34,17 +34,17 @@ class ConditionTests: ProcedureKitTestCase {
         let condition = TrueCondition()
         let dependency = TestProcedure()
         let producedDependency = TestProcedure()
-        condition.add(dependency: dependency)
-        condition.produce(dependency: producedDependency)
+        condition.addDependency(dependency)
+        condition.produceDependency(producedDependency)
         XCTAssertEqual(condition.dependencies.count, 1)
         XCTAssertEqual(condition.dependencies.first, dependency)
         XCTAssertEqual(condition.producedDependencies.count, 1)
         XCTAssertEqual(condition.producedDependencies.first, producedDependency)
 
-        condition.remove(dependency: producedDependency)
+        condition.removeDependency(producedDependency)
         XCTAssertEqual(condition.producedDependencies.count, 0, "Produced dependency not removed.")
 
-        condition.remove(dependency: dependency)
+        condition.removeDependency(dependency)
         XCTAssertEqual(condition.producedDependencies.count, 0, "Dependency not removed.")
     }
 
@@ -103,14 +103,14 @@ class ConditionTests: ProcedureKitTestCase {
     // MARK: - Single Attachment
 
     func test__single_condition_which_is_satisfied() {
-        procedure.add(condition: TrueCondition())
+        procedure.addCondition(TrueCondition())
         wait(for: procedure)
         PKAssertProcedureFinished(procedure)
     }
 
     func test__single_condition_which_is_failed() {
         procedure.log.severity = .verbose
-        procedure.add(condition: FalseCondition())
+        procedure.addCondition(FalseCondition())
         wait(for: procedure)
         PKAssertProcedureCancelledWithError(procedure, ProcedureKitError.FalseCondition())
     }
@@ -118,33 +118,33 @@ class ConditionTests: ProcedureKitTestCase {
     // MARK: - Multiple Attachment
 
     func test__multiple_conditions_where_all_are_satisfied() {
-        procedure.add(condition: TrueCondition())
-        procedure.add(condition: TrueCondition())
-        procedure.add(condition: TrueCondition())
+        procedure.addCondition(TrueCondition())
+        procedure.addCondition(TrueCondition())
+        procedure.addCondition(TrueCondition())
         wait(for: procedure)
         PKAssertProcedureFinished(procedure)
     }
 
     func test__multiple_conditions_where_all_fail() {
-        procedure.add(condition: FalseCondition())
-        procedure.add(condition: FalseCondition())
-        procedure.add(condition: FalseCondition())
+        procedure.addCondition(FalseCondition())
+        procedure.addCondition(FalseCondition())
+        procedure.addCondition(FalseCondition())
         wait(for: procedure)
         PKAssertProcedureCancelledWithError(procedure, ProcedureKitError.FalseCondition())
     }
 
     func test__multiple_conditions_where_one_succeeds() {
-        procedure.add(condition: TrueCondition())
-        procedure.add(condition: FalseCondition())
-        procedure.add(condition: FalseCondition())
+        procedure.addCondition(TrueCondition())
+        procedure.addCondition(FalseCondition())
+        procedure.addCondition(FalseCondition())
         wait(for: procedure)
         PKAssertProcedureCancelledWithError(procedure, ProcedureKitError.FalseCondition())
     }
 
     func test__multiple_conditions_where_one_fails() {
-        procedure.add(condition: TrueCondition())
-        procedure.add(condition: TrueCondition())
-        procedure.add(condition: FalseCondition())
+        procedure.addCondition(TrueCondition())
+        procedure.addCondition(TrueCondition())
+        procedure.addCondition(FalseCondition())
         wait(for: procedure)
         PKAssertProcedureCancelledWithError(procedure, ProcedureKitError.FalseCondition())
     }
@@ -181,7 +181,7 @@ class ConditionTests: ProcedureKitTestCase {
         longRunningDependency.addDidFinishBlockObserver { _, _ in
             dispatchGroup.leave()
         }
-        longRunningCondition.produce(dependency: longRunningDependency)
+        longRunningCondition.produceDependency(longRunningDependency)
 
         let failSecondCondition = AsyncTestCondition { completion in
             // To ensure order of operations, finish this condition async once the
@@ -195,8 +195,8 @@ class ConditionTests: ProcedureKitTestCase {
             }
         }
 
-        procedure.add(condition: longRunningCondition)
-        procedure.add(condition: failSecondCondition)
+        procedure.addCondition(longRunningCondition)
+        procedure.addCondition(failSecondCondition)
 
         wait(for: procedure, withTimeout: 2)
 
@@ -333,11 +333,11 @@ class ConditionTests: ProcedureKitTestCase {
             didEvaluateConditionGroup.leave()
             return .success(true)
         }
-        dependencies.forEach { condition.produce(dependency: $0) }
+        dependencies.forEach(condition.produceDependency)
         condition.dependencyRequirements = requirements
 
-        procedure.add(condition: condition)
-        additionalConditions.forEach { procedure.add(condition: $0) }
+        procedure.addCondition(condition)
+        additionalConditions.forEach(procedure.addCondition)
         wait(for: procedure)
 
         let didEvaluateCondition = didEvaluateConditionGroup.wait(timeout: .now()) == .success
@@ -356,7 +356,7 @@ class ConditionTests: ProcedureKitTestCase {
 
         let dependency1 = TestProcedure(name: "Dependency 1")
         let dependency2 = TestProcedure(name: "Dependency 2")
-        procedure.add(dependencies: dependency1, dependency2)
+        procedure.addDependencies(dependency1, dependency2)
 
         let conditionDependency1 = BlockOperation {
             XCTAssertTrue(dependency1.isFinished)
@@ -365,7 +365,7 @@ class ConditionTests: ProcedureKitTestCase {
         conditionDependency1.name = "Condition 1 Dependency"
 
         let condition1 = TrueCondition(name: "Condition 1")
-        condition1.produce(dependency: conditionDependency1)
+        condition1.produceDependency(conditionDependency1)
 
 
         let conditionDependency2 = BlockOperation {
@@ -375,10 +375,10 @@ class ConditionTests: ProcedureKitTestCase {
         conditionDependency2.name = "Condition 2 Dependency"
 
         let condition2 = TrueCondition(name: "Condition 2")
-        condition2.produce(dependency: conditionDependency2)
+        condition2.produceDependency(conditionDependency2)
 
-        procedure.add(condition: condition1)
-        procedure.add(condition: condition2)
+        procedure.addCondition(condition1)
+        procedure.addCondition(condition2)
 
         run(operations: dependency1, dependency2)
         wait(for: procedure)
@@ -393,14 +393,14 @@ class ConditionTests: ProcedureKitTestCase {
         let dependency1 = TestProcedure()
         let dependency2 = TestProcedure()
         let condition1 = TrueCondition(name: "Condition 1")
-        condition1.produce(dependency: TestProcedure())
+        condition1.produceDependency(TestProcedure())
         let condition2 = TrueCondition(name: "Condition 2")
-        condition2.produce(dependency: TestProcedure())
+        condition2.produceDependency(TestProcedure())
 
-        procedure.add(dependency: dependency1)
-        procedure.add(dependency: dependency2)
-        procedure.add(condition: condition1)
-        procedure.add(condition: condition2)
+        procedure.addDependency(dependency1)
+        procedure.addDependency(dependency2)
+        procedure.addCondition(condition1)
+        procedure.addCondition(condition2)
 
         run(operations: dependency1, dependency2)
         wait(for: procedure)
@@ -411,10 +411,10 @@ class ConditionTests: ProcedureKitTestCase {
     func test__target_and_condition_have_same_dependency() {
         let dependency = TestProcedure()
         let condition = TrueCondition(name: "Condition")
-        condition.add(dependency: dependency)
+        condition.addDependency(dependency)
 
-        procedure.add(condition: condition)
-        procedure.add(dependency: dependency)
+        procedure.addCondition(condition)
+        procedure.addDependency(dependency)
 
         wait(for: dependency, procedure)
 
@@ -427,18 +427,18 @@ class ConditionTests: ProcedureKitTestCase {
         let dependency = TestProcedure(name: "Dependency")
 
         let condition1 = TrueCondition(name: "Condition 1")
-        condition1.add(dependency: dependency)
+        condition1.addDependency(dependency)
 
         let procedure1 = TestProcedure(name: "Procedure 1")
-        procedure1.add(condition: condition1)
-        procedure1.add(dependency: dependency)
+        procedure1.addCondition(condition1)
+        procedure1.addDependency(dependency)
 
         let condition2 = TrueCondition(name: "Condition 2")
-        condition2.add(dependency: dependency)
+        condition2.addDependency(dependency)
 
         let procedure2 = TestProcedure(name: "Procedure 2")
-        procedure2.add(condition: condition2)
-        procedure2.add(dependency: procedure1)
+        procedure2.addCondition(condition2)
+        procedure2.addDependency(procedure1)
 
         wait(for: procedure1, dependency, procedure2)
 
@@ -464,7 +464,7 @@ class ConditionTests: ProcedureKitTestCase {
                 DispatchQueue.global().asyncAfter(deadline: .now() + 0.2) { [dependenciesToAddInWillAdd] in
                     defer { promise.complete() }
                     guard !dependenciesToAddInWillAdd.contains(procedure) else { return }
-                    procedure.add(dependencies: dependenciesToAddInWillAdd)
+                    procedure.addDependencies(dependenciesToAddInWillAdd)
                 }
                 return promise.future
             }
@@ -488,7 +488,7 @@ class ConditionTests: ProcedureKitTestCase {
             procedureDidFinishGroup.leave()
         }
         conditionEvaluatedGroup.enter()
-        procedure.add(condition: TestCondition(evaluate: {
+        procedure.addCondition(TestCondition(evaluate: {
             // signal when evaluated
             conditionEvaluatedGroup.leave()
             return .success(true)
@@ -503,7 +503,7 @@ class ConditionTests: ProcedureKitTestCase {
             }
         }
         queue.delegate = customDelegate
-        queue.add(operations: procedure, dependency)
+        queue.addOperations(procedure, dependency)
 
         // wait until the procedure has been added to the queue
         // and the dependency has been started
@@ -551,7 +551,7 @@ class ConditionTests: ProcedureKitTestCase {
         }
         dependency.addWillFinishBlockObserver { _, _, _ in
             // add another dependency, before the first dependency finishes
-            procedure.add(dependency: additionalDependency)
+            procedure.addDependency(additionalDependency)
         }
 
         weak var expDependencyDidFinish = expectation(description: "First dependency did finish")
@@ -566,14 +566,14 @@ class ConditionTests: ProcedureKitTestCase {
             procedureDidFinishGroup.leave()
         }
         conditionEvaluatedGroup.enter()
-        procedure.add(condition: TestCondition(evaluate: {
+        procedure.addCondition(TestCondition(evaluate: {
             // signal when evaluated
             conditionEvaluatedGroup.leave()
             return .success(true)
         }))
-        procedure.add(dependency: dependency)
+        procedure.addDependency(dependency)
 
-        queue.add(operations: procedure, dependency, additionalDependency)
+        queue.addOperations(procedure, dependency, additionalDependency)
 
         // wait until the first dependency has finished,
         // and the additionalDependency has started
@@ -650,10 +650,10 @@ class ConditionTests: ProcedureKitTestCase {
     func test__ignored_failing_condition_does_not_result_in_failure() {
 
         let procedure1 = TestProcedure(name: "Procedure 1")
-        procedure1.add(condition: IgnoredCondition(FalseCondition()))
+        procedure1.addCondition(IgnoredCondition(FalseCondition()))
 
         let procedure2 = TestProcedure(name: "Procedure 2")
-        procedure2.add(condition: FalseCondition())
+        procedure2.addCondition(FalseCondition())
 
         wait(for: procedure1, procedure2)
 
@@ -663,10 +663,10 @@ class ConditionTests: ProcedureKitTestCase {
 
     func test__ignored_satisfied_condition_does_not_result_in_failure() {
         let procedure1 = TestProcedure(name: "Procedure 1")
-        procedure1.add(condition: IgnoredCondition(TrueCondition()))
+        procedure1.addCondition(IgnoredCondition(TrueCondition()))
 
         let procedure2 = TestProcedure(name: "Procedure 2")
-        procedure2.add(condition: TrueCondition())
+        procedure2.addCondition(TrueCondition())
 
         wait(for: procedure1, procedure2)
 
@@ -675,7 +675,7 @@ class ConditionTests: ProcedureKitTestCase {
     }
 
     func test__ignored_ignored_condition_does_not_result_in_failure() {
-        procedure.add(condition: IgnoredCondition(IgnoredCondition(FalseCondition())))
+        procedure.addCondition(IgnoredCondition(IgnoredCondition(FalseCondition())))
         wait(for: procedure)
         PKAssertProcedureCancelled(procedure)
     }
@@ -684,8 +684,8 @@ class ConditionTests: ProcedureKitTestCase {
         // A Procedure with one or more ignored conditions and at least one
         // successful condition should be allowed to proceed with execution.
         let procedure1 = TestProcedure(name: "Procedure 1")
-        procedure1.add(condition: IgnoredCondition(FalseCondition()))
-        procedure1.add(condition: TrueCondition())
+        procedure1.addCondition(IgnoredCondition(FalseCondition()))
+        procedure1.addCondition(TrueCondition())
 
         wait(for: procedure1)
 
@@ -697,7 +697,7 @@ class ConditionTests: ProcedureKitTestCase {
     func test__compound_condition_produced_dependencies() {
         let conditions: [Condition] = (0..<3).map {
             let condition = TrueCondition(name: "Condition \($0)")
-            condition.produce(dependency: TestProcedure())
+            condition.produceDependency(TestProcedure())
             return condition
         }
         let compoundCondition = CompoundCondition(andPredicateWith: conditions)
@@ -706,14 +706,14 @@ class ConditionTests: ProcedureKitTestCase {
         XCTAssertEqual(compoundCondition.producedDependencies.count, 0)
 
         let producedDependency = TestProcedure()
-        compoundCondition.produce(dependency: producedDependency)
+        compoundCondition.produceDependency(producedDependency)
         XCTAssertTrue(Array(compoundCondition.producedDependencies) == [producedDependency])
     }
 
     func test__compound_condition_added_dependencies() {
         let conditions: [Condition] = (0..<3).map {
             let condition = TrueCondition(name: "Condition \($0)")
-            condition.add(dependency: TestProcedure())
+            condition.addDependency(TestProcedure())
             return condition
         }
         let compoundCondition = CompoundCondition(andPredicateWith: conditions)
@@ -722,7 +722,7 @@ class ConditionTests: ProcedureKitTestCase {
         XCTAssertEqual(compoundCondition.dependencies.count, 0)
 
         let dependency = TestProcedure()
-        compoundCondition.add(dependency: dependency)
+        compoundCondition.addDependency(dependency)
         XCTAssertTrue(Array(compoundCondition.dependencies) == [dependency])
     }
 
@@ -750,7 +750,7 @@ class ConditionTests: ProcedureKitTestCase {
         let evaluationCount = Protector<Int>(0)
         let condition1 = TestCondition() { evaluationCount.advance(by: 1); return .success(true) }
         let compoundCondition = CompoundCondition(andPredicateWith: condition1, condition1, condition1)
-        procedure.add(condition: compoundCondition)
+        procedure.addCondition(compoundCondition)
         wait(for: procedure)
         XCTAssertEqual(evaluationCount.access, 1)
     }
@@ -759,7 +759,7 @@ class ConditionTests: ProcedureKitTestCase {
         let evaluationCount = Protector<Int>(0)
         let condition1 = TestCondition() { evaluationCount.advance(by: 1); return .success(false) }
         let compoundCondition = CompoundCondition(orPredicateWith: condition1, condition1, condition1)
-        procedure.add(condition: compoundCondition)
+        procedure.addCondition(compoundCondition)
         wait(for: procedure)
         XCTAssertEqual(evaluationCount.access, 1)
     }
@@ -767,79 +767,79 @@ class ConditionTests: ProcedureKitTestCase {
     // MARK: - Compound Conditions - &&
 
     func test__and_condition__with_no_conditions_cancels_without_errors() {
-        procedure.add(condition: AndCondition([]))
+        procedure.addCondition(AndCondition([]))
         wait(for: procedure)
         PKAssertProcedureCancelled(procedure)
     }
 
     func test__and_condition__with_single_successful_condition__succeeds() {
-        procedure.add(condition: AndCondition([TrueCondition()]))
+        procedure.addCondition(AndCondition([TrueCondition()]))
         wait(for: procedure)
         PKAssertProcedureFinished(procedure)
     }
 
     func test__and_condition__with_single_failing_condition__fails() {
-        procedure.add(condition: AndCondition([FalseCondition()]))
+        procedure.addCondition(AndCondition([FalseCondition()]))
         wait(for: procedure)
         PKAssertProcedureCancelledWithError(procedure, ProcedureKitError.FalseCondition())
     }
 
     func test__and_condition__with_single_ignored_condition__does_not_fail() {
-        procedure.add(condition: AndCondition([IgnoredCondition(FalseCondition())]))
+        procedure.addCondition(AndCondition([IgnoredCondition(FalseCondition())]))
         wait(for: procedure)
         PKAssertProcedureCancelled(procedure)
     }
 
     func test__and_condition__with_two_successful_conditions__succeeds() {
-        procedure.add(condition: AndCondition([TrueCondition(), TrueCondition()]))
+        procedure.addCondition(AndCondition([TrueCondition(), TrueCondition()]))
         wait(for: procedure)
         PKAssertProcedureFinished(procedure)
     }
 
     func test__and_condition__with_successful_and_failing_conditions__fails() {
-        procedure.add(condition: AndCondition([TrueCondition(), FalseCondition()]))
+        procedure.addCondition(AndCondition([TrueCondition(), FalseCondition()]))
         wait(for: procedure)
         PKAssertProcedureCancelledWithError(procedure, ProcedureKitError.FalseCondition())
     }
 
     func test__and_condition__with_failing_and_successful_conditions__fails() {
-        procedure.add(condition: AndCondition([FalseCondition(), TrueCondition()]))
+        procedure.addCondition(AndCondition([FalseCondition(), TrueCondition()]))
         wait(for: procedure)
         PKAssertProcedureCancelledWithError(procedure, ProcedureKitError.FalseCondition())
     }
 
     func test__and_condition__with_successful_and_ignored_condition__does_not_fail() {
-        procedure.add(condition: AndCondition([IgnoredCondition(FalseCondition()), TrueCondition()]))
+        procedure.addCondition(AndCondition([IgnoredCondition(FalseCondition()), TrueCondition()]))
         wait(for: procedure)
         PKAssertProcedureFinished(procedure)
     }
 
     func test__and_condition__with_failing_and_ignored_condition__fails() {
-        procedure.add(condition: AndCondition([IgnoredCondition(FalseCondition()), FalseCondition()]))
+        procedure.addCondition(AndCondition([IgnoredCondition(FalseCondition()), FalseCondition()]))
         wait(for: procedure)
         PKAssertProcedureCancelledWithError(procedure, ProcedureKitError.FalseCondition())
     }
 
     func test__and_condition__with_two_ignored_conditions__does_not_fail() {
-        procedure.add(condition: AndCondition([IgnoredCondition(FalseCondition()), IgnoredCondition(FalseCondition())]))
+        procedure.addCondition(AndCondition([IgnoredCondition(FalseCondition()), IgnoredCondition(FalseCondition())]))
         wait(for: procedure)
         PKAssertProcedureCancelled(procedure)
     }
 
     func test__nested_successful_and_conditions() {
-        procedure.add(condition: AndCondition([AndCondition([TrueCondition(), TrueCondition()]), AndCondition([TrueCondition(), TrueCondition()])]))
+        procedure.addCondition(AndCondition([AndCondition([TrueCondition(), TrueCondition()]), AndCondition([TrueCondition(), TrueCondition()])]))
         wait(for: procedure)
         PKAssertProcedureFinished(procedure)
     }
 
     func test__nested_failing_and_conditions() {
-        procedure.add(condition: AndCondition([AndCondition([FalseCondition(), FalseCondition()]), AndCondition([FalseCondition(), FalseCondition()])]))
+        procedure.addCondition(AndCondition([AndCondition([FalseCondition(), FalseCondition()]), AndCondition([FalseCondition(), FalseCondition()])]))
         wait(for: procedure)
         PKAssertProcedureCancelledWithError(procedure, ProcedureKitError.FalseCondition())
     }
 
     func test__ignored_and_condition_does_not_fail() {
-        procedure.add(condition: IgnoredCondition(AndCondition([TrueCondition(), FalseCondition()])))
+        procedure.addCondition(IgnoredCondition(AndCondition([TrueCondition(), FalseCondition()])))
         wait(for: procedure)
         PKAssertProcedureCancelled(procedure)
     }
@@ -847,79 +847,79 @@ class ConditionTests: ProcedureKitTestCase {
     // MARK: - Compound Conditions - ||
 
     func test__or_condition__with_no_conditions_cancels_without_errors() {
-        procedure.add(condition: OrCondition([]))
+        procedure.addCondition(OrCondition([]))
         wait(for: procedure)
         PKAssertProcedureCancelled(procedure)
     }
 
     func test__or_condition__with_single_successful_condition__succeeds() {
-        procedure.add(condition: OrCondition([TrueCondition()]))
+        procedure.addCondition(OrCondition([TrueCondition()]))
         wait(for: procedure)
         PKAssertProcedureFinished(procedure)
     }
 
     func test__or_condition__with_single_failing_condition__fails() {
-        procedure.add(condition: OrCondition([FalseCondition()]))
+        procedure.addCondition(OrCondition([FalseCondition()]))
         wait(for: procedure)
         PKAssertProcedureCancelledWithError(procedure, ProcedureKitError.FalseCondition())
     }
 
     func test__or_condition__with_single_ignored_condition__does_not_fail() {
-        procedure.add(condition: OrCondition([IgnoredCondition(FalseCondition())]))
+        procedure.addCondition(OrCondition([IgnoredCondition(FalseCondition())]))
         wait(for: procedure)
         PKAssertProcedureCancelled(procedure)
     }
 
     func test__or_condition__with_two_successful_conditions__succeeds() {
-        procedure.add(condition: OrCondition([TrueCondition(), TrueCondition()]))
+        procedure.addCondition(OrCondition([TrueCondition(), TrueCondition()]))
         wait(for: procedure)
         PKAssertProcedureFinished(procedure)
     }
 
     func test__or_condition__with_successful_and_failing_conditions__succeeds() {
-        procedure.add(condition: OrCondition([TrueCondition(), FalseCondition()]))
+        procedure.addCondition(OrCondition([TrueCondition(), FalseCondition()]))
         wait(for: procedure)
         PKAssertProcedureFinished(procedure)
     }
 
     func test__or_condition__with_failing_and_successful_conditions__succeeds() {
-        procedure.add(condition: OrCondition([FalseCondition(), TrueCondition()]))
+        procedure.addCondition(OrCondition([FalseCondition(), TrueCondition()]))
         wait(for: procedure)
         PKAssertProcedureFinished(procedure)
     }
 
     func test__or_condition__with_successful_and_ignored_condition__succeeds() {
-        procedure.add(condition: OrCondition([IgnoredCondition(FalseCondition()), TrueCondition()]))
+        procedure.addCondition(OrCondition([IgnoredCondition(FalseCondition()), TrueCondition()]))
         wait(for: procedure)
         PKAssertProcedureFinished(procedure)
     }
 
     func test__or_condition__with_failing_and_ignored_condition__fails() {
-        procedure.add(condition: OrCondition([IgnoredCondition(FalseCondition()), FalseCondition()]))
+        procedure.addCondition(OrCondition([IgnoredCondition(FalseCondition()), FalseCondition()]))
         wait(for: procedure)
         PKAssertProcedureCancelledWithError(procedure, ProcedureKitError.FalseCondition())
     }
 
     func test__or_condition__with_two_ignored_conditions__does_not_fail() {
-        procedure.add(condition: OrCondition([IgnoredCondition(FalseCondition()), IgnoredCondition(FalseCondition())]))
+        procedure.addCondition(OrCondition([IgnoredCondition(FalseCondition()), IgnoredCondition(FalseCondition())]))
         wait(for: procedure)
         PKAssertProcedureCancelled(procedure)
     }
 
     func test__nested_successful_or_conditions() {
-        procedure.add(condition: OrCondition([OrCondition([TrueCondition(), TrueCondition()]), OrCondition([TrueCondition(), TrueCondition()])]))
+        procedure.addCondition(OrCondition([OrCondition([TrueCondition(), TrueCondition()]), OrCondition([TrueCondition(), TrueCondition()])]))
         wait(for: procedure)
         PKAssertProcedureFinished(procedure)
     }
 
     func test__nested_failing_or_conditions() {
-        procedure.add(condition: OrCondition([OrCondition([FalseCondition(), FalseCondition()]), OrCondition([FalseCondition(), FalseCondition()])]))
+        procedure.addCondition(OrCondition([OrCondition([FalseCondition(), FalseCondition()]), OrCondition([FalseCondition(), FalseCondition()])]))
         wait(for: procedure)
         PKAssertProcedureCancelled(procedure, withErrors: true)
     }
 
     func test__ignored_or_condition_does_not_fail() {
-        procedure.add(condition: IgnoredCondition(OrCondition([FalseCondition()])))
+        procedure.addCondition(IgnoredCondition(OrCondition([FalseCondition()])))
         wait(for: procedure)
         PKAssertProcedureCancelled(procedure)
     }
@@ -962,7 +962,7 @@ class ConditionTests: ProcedureKitTestCase {
             procedure!.addDidFinishBlockObserver { _, _ in
                 procedureDidFinishGroup.leave()
             }
-            procedure!.add(condition: condition!)
+            procedure!.addCondition(condition!)
 
             // remove local reference to the Condition
             condition = nil
@@ -1083,9 +1083,9 @@ class ConditionTests: ProcedureKitTestCase {
         }
 
         let dependentCondition = TrueCondition()
-        dependentCondition.produce(dependency: conditionProducedDependency)
-        dependentCondition.add(dependency: normalDependency)
-        procedure.add(condition: AndCondition(TrueCondition(), dependentCondition, cancelsProcedureCondition))
+        dependentCondition.produceDependency(conditionProducedDependency)
+        dependentCondition.addDependency(normalDependency)
+        procedure.addCondition(AndCondition(TrueCondition(), dependentCondition, cancelsProcedureCondition))
 
         // wait on the conditionProducedDependency to finish - but since it is scheduled
         // (and produced) by the dependentCondition, simply add a completion block
@@ -1124,9 +1124,9 @@ class ConditionTests: ProcedureKitTestCase {
             return .success(true)
         }
 
-        procedure.add(condition: testCondition)
+        procedure.addCondition(testCondition)
         addCompletionBlockTo(procedure: procedure)
-        queue.add(operation: procedure)
+        queue.addOperation(procedure)
 
         XCTAssertTrue(conditionWasEvaluatedGroup.wait(timeout: .now() + 1.0) == .timedOut, "The condition was evaluated, despite the ProcedureQueue being suspended.")
 
@@ -1146,9 +1146,9 @@ class ConditionTests: ProcedureKitTestCase {
             return .success(true)
         }
 
-        procedure.add(condition: testCondition)
+        procedure.addCondition(testCondition)
         let group = GroupProcedure(operations: [])
-        group.add(child: procedure) // deliberately use add(child:) to test the non-initializer path
+        group.addChild(procedure) // deliberately use add(child:) to test the non-initializer path
 
         XCTAssertTrue(conditionWasEvaluatedGroup.wait(timeout: .now() + 1.0) == .timedOut, "The condition was evaluated, despite the ProcedureQueue being suspended.")
 

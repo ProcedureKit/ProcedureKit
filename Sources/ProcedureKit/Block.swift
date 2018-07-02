@@ -111,7 +111,7 @@ open class UIBlockProcedure: AsyncBlockProcedure {
                 }
             }
 
-            ProcedureQueue.main.add(operation: sub)
+            ProcedureQueue.main.addOperation(sub)
         }
     }
 }

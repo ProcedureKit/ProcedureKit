@@ -153,7 +153,7 @@ public final class ProcedureProfiler: Identifiable, Equatable {
     func addChild(operation: Operation, now: TimeInterval = CFAbsoluteTimeGetCurrent() as TimeInterval) {
         if let procedure = operation as? Procedure {
             let profiler = ProcedureProfiler(parent: self)
-            procedure.add(observer: profiler)
+            procedure.addObserver(profiler)
             queue.sync { [weak self] in
                 self?.children.append(procedure.identity)
             }

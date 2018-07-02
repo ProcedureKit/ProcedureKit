@@ -72,7 +72,7 @@ open class LoadCoreDataProcedure: Procedure, OutputProcedure {
         self.persistentStoreDescriptions = persistentStoreDescriptions
         super.init()
         self.name = "Load Core Data"
-        add(condition: MutuallyExclusive<LoadCoreDataProcedure>())
+        addCondition(MutuallyExclusive<LoadCoreDataProcedure>())
     }
 
     open override func execute() {

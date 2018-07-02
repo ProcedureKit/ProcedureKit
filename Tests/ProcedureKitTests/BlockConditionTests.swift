@@ -11,20 +11,20 @@ import TestingProcedureKit
 class BlockConditionTests: ProcedureKitTestCase {
 
     func test__procedure_with_successfull_block_finishes() {
-        procedure.add(condition: BlockCondition { true })
+        procedure.addCondition(BlockCondition { true })
         wait(for: procedure)
         PKAssertProcedureFinished(procedure)
     }
 
     func test__procedure_with_unsuccessful_block_cancels_without_errors() {
-        procedure.add(condition: BlockCondition { false })
+        procedure.addCondition(BlockCondition { false })
         wait(for: procedure)
         PKAssertProcedureCancelled(procedure)
     }
 
     func test__procedure_with_throwing_block_cancels_with_error() {
         let error = TestError()
-        procedure.add(condition: BlockCondition { throw error })
+        procedure.addCondition(BlockCondition { throw error })
         wait(for: procedure)
         PKAssertProcedureCancelledWithError(procedure, ProcedureKitError.conditionFailed(with: error))
     }

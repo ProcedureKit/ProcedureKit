@@ -171,8 +171,8 @@ class AuthorizedForTests: TestableCapabilityTestCase {
         let procedure = TestProcedure()
         let authorizedCondition = AuthorizedFor(capability)
 
-        procedure.add(condition: NegatedCondition(authorizedCondition))
-        procedure.add(condition: NoFailedDependenciesCondition())
+        procedure.addCondition(NegatedCondition(authorizedCondition))
+        procedure.addCondition(NoFailedDependenciesCondition())
 
         wait(for: procedure)
         PKAssertProcedureFinished(procedure)

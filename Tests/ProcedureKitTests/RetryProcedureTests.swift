@@ -99,7 +99,7 @@ class RetryProcedureTests: RetryTestCase {
             retry.addDidFinishBlockObserver { _, _ in
                 semaphore.signal()
             }
-            queue.add(operation: retry)
+            queue.addOperation(retry)
             semaphore.wait()
         }
 
