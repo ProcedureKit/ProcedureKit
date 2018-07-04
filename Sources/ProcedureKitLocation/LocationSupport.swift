@@ -31,112 +31,118 @@ internal extension CLGeocoder {
     }
 }
 
-protocol LocationServicesRegistrarProtocol {
+public protocol LocationFetcherDelegate: class {
+    func locationFetcher(_ fetcher: LocationFetcher,
+                         didUpdateLocations locations: [CLLocation])
 
-    func pk_locationServicesEnabled() -> Bool
+    func locationFetcher(_ fetcher: LocationFetcher,
+                         didFailWithError error: Error)
 
-    func pk_authorizationStatus() -> CLAuthorizationStatus
-
-    func pk_set(delegate aDelegate: CLLocationManagerDelegate?)
-
-    @available(iOS 8.0, *)
-    func pk_requestAuthorization(withRequirement: LocationUsage?)
+    func locationServices(_ locationServices: LocationServicesRegistrar,
+                          didChangeAuthorization status: CLAuthorizationStatus)
 }
 
-extension CLLocationManager: LocationServicesRegistrarProtocol {
+public extension LocationFetcherDelegate {
+    func locationFetcher(_ fetcher: LocationFetcher,
+                         didUpdateLocations locations: [CLLocation]) { }
 
-    func pk_locationServicesEnabled() -> Bool {
-        return CLLocationManager.locationServicesEnabled()
+    func locationFetcher(_ fetcher: LocationFetcher,
+                         didFailWithError error: Error) { }
+
+    func locationServices(_ locationServices: LocationServicesRegistrar,
+                         didChangeAuthorization status: CLAuthorizationStatus) { }
+}
+
+public protocol LocationServices {
+    func startUpdatingLocation()
+    func stopUpdatingLocation()
+
+    var locationFetcherDelegate: LocationFetcherDelegate? { get set }
+
+    var desiredAccuracy: CLLocationAccuracy { get set }
+}
+
+public protocol LocationServicesRegistrar {
+    var locationFetcherDelegate: LocationFetcherDelegate? { get set }
+
+    func authorizationStatus() -> CLAuthorizationStatus
+    func locationServicesEnabled() -> Bool
+
+    @available(iOS 8.0, *)
+    func requestWhenInUseAuthorization()
+
+    @available(iOS 8.0, *)
+    func requestAlwaysAuthorization()
+
+    @available(iOS 8.0, *)
+    func requestAuthorization(withRequirement: LocationUsage?)
+}
+
+public typealias LocationFetcher = LocationServices & LocationServicesRegistrar
+
+public extension LocationServicesRegistrar {
+    @available(iOS 8.0, *)
+    public func requestAuthorization(withRequirement requirement: LocationUsage?) {
+        #if os(iOS) || os(watchOS)
+        switch requirement {
+        case .some(.always):
+            requestAlwaysAuthorization()
+        case _:
+            requestWhenInUseAuthorization()
+        }
+        #endif
+
+        #if os(tvOS)
+        requestWhenInUseAuthorization()
+        #endif
+    }
+}
+
+
+extension CLLocationManager: LocationServicesRegistrar {
+    public var locationFetcherDelegate: LocationFetcherDelegate? {
+        get { return delegate as! LocationFetcherDelegate? }
+        set { delegate = newValue as! CLLocationManagerDelegate? }
     }
 
-    func pk_authorizationStatus() -> CLAuthorizationStatus {
+    public func authorizationStatus() -> CLAuthorizationStatus {
         return CLLocationManager.authorizationStatus()
     }
 
-    func pk_set(delegate aDelegate: CLLocationManagerDelegate?) {
-        self.delegate = aDelegate
-    }
-
-    @available(iOS 8.0, *)
-    func pk_requestAuthorization(withRequirement requirement: LocationUsage?) {
-        #if os(iOS) || os(watchOS)
-            switch requirement {
-            case .some(.always):
-                requestAlwaysAuthorization()
-            case _:
-                requestWhenInUseAuthorization()
-            }
-        #endif
-
-        #if os(tvOS)
-            requestWhenInUseAuthorization()
-        #endif
+    public func locationServicesEnabled() -> Bool {
+        return CLLocationManager.locationServicesEnabled()
     }
 }
 
-protocol LocationServicesProtocol {
+extension CLLocationManager: LocationServices { }
 
-    func pk_set(desiredAccuracy: CLLocationAccuracy)
-
-    func pk_startUpdatingLocation()
-
-    func pk_stopUpdatingLocation()
+public protocol LocationAuthorizationDelegate: LocationFetcherDelegate { }
+extension LocationAuthorizationDelegate {
+    public func locationFetcher(_ fetcher: LocationFetcher, didFailWithError error: Error) { }
+    public func locationFetcher(_ fetcher: LocationFetcher, didUpdateLocations locations: [CLLocation]) { }
 }
 
-extension CLLocationManager: LocationServicesProtocol {
+internal class LocationManagerAuthorizationDelegate: NSObject, LocationAuthorizationDelegate, CLLocationManagerDelegate {
+    let didChangeAuthorizationStatusBlock: (LocationServicesRegistrar, CLAuthorizationStatus) -> Void
 
-    func pk_set(desiredAccuracy accuracy: CLLocationAccuracy) {
-        desiredAccuracy = accuracy
-    }
-
-    func pk_startUpdatingLocation() {
-        #if os(iOS) || os(watchOS)
-            startUpdatingLocation()
-        #endif
-
-        #if os(tvOS)
-            requestLocation()
-        #endif
-    }
-
-    func pk_stopUpdatingLocation() {
-        stopUpdatingLocation()
-    }
-}
-
-internal class LocationManagerAuthorizationDelegate: NSObject, CLLocationManagerDelegate {
-
-    let didChangeAuthorizationStatusBlock: (CLLocationManager, CLAuthorizationStatus) -> Void
-
-    init(didChangeAuthorizationStatusBlock block: @escaping (CLLocationManager, CLAuthorizationStatus) -> Void) {
+    init(didChangeAuthorizationStatusBlock block: @escaping (LocationServicesRegistrar, CLAuthorizationStatus) -> Void) {
         didChangeAuthorizationStatusBlock = block
     }
 
+    func locationServices(_ locationServices: LocationServicesRegistrar, didChangeAuthorization status: CLAuthorizationStatus) {
+        didChangeAuthorizationStatusBlock(locationServices, status)
+    }
+
     func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
-        didChangeAuthorizationStatusBlock(manager, status)
+        locationServices(manager, didChangeAuthorization: status)
     }
 }
 
-protocol GeocodeProtocol {
+public protocol ReverseGeocoder {
 
-    func pk_cancel()
+    func cancelGeocode()
+    func reverseGeocodeLocation(_ location: CLLocation,
+                                completionHandler: @escaping CLGeocodeCompletionHandler)
 }
 
-extension CLGeocoder: GeocodeProtocol {
-
-    func pk_cancel() {
-        cancelGeocode()
-    }
-}
-
-protocol ReverseGeocodeProtocol {
-
-    func pk_reverseGeocodeLocation(location: CLLocation, completionHandler completion: @escaping CLGeocodeCompletionHandler)
-}
-
-extension CLGeocoder: ReverseGeocodeProtocol {
-
-    func pk_reverseGeocodeLocation(location: CLLocation, completionHandler completion: @escaping CLGeocodeCompletionHandler) {
-        reverseGeocodeLocation(location, completionHandler: completion)
-    }
-}
+extension CLGeocoder: ReverseGeocoder { }

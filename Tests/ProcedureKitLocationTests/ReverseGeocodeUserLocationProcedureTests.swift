@@ -13,7 +13,7 @@ class ReverseGeocodeUserLocationProcedureTests: LocationProcedureTestCase {
 
     func test__geocoder_starts() {
         geocoder.placemarks = [placemark]
-        let procedure = ReverseGeocodeUserLocationProcedure().set(manager: manager).set(geocoder: geocoder)
+        let procedure = ReverseGeocodeUserLocationProcedure().set(fetcher: locationFetcher).set(geocoder: geocoder)
         wait(for: procedure)
         PKAssertProcedureFinished(procedure)
         XCTAssertEqual(geocoder.didReverseGeocodeLocation, location)
@@ -26,7 +26,7 @@ class ReverseGeocodeUserLocationProcedureTests: LocationProcedureTestCase {
         let procedure = ReverseGeocodeUserLocationProcedure { result in
             didReceiveUserLocationPlacemark = result
             exp.fulfill()
-        }.set(manager: manager).set(geocoder: geocoder)
+        }.set(fetcher: locationFetcher).set(geocoder: geocoder)
         wait(for: procedure)
         PKAssertProcedureFinished(procedure)
         XCTAssertNotNil(didReceiveUserLocationPlacemark)
@@ -35,8 +35,8 @@ class ReverseGeocodeUserLocationProcedureTests: LocationProcedureTestCase {
 
     func test__user_location_returns_error_cancels_with_error() {
         let error = TestError()
-        manager.returnedError = error
-        let procedure = ReverseGeocodeUserLocationProcedure().set(manager: manager).set(geocoder: geocoder)
+        locationFetcher.returnedError = error
+        let procedure = ReverseGeocodeUserLocationProcedure().set(fetcher: locationFetcher).set(geocoder: geocoder)
         wait(for: procedure)
         // There are actually 3 errors here, because the UserLocation fails with
         // an error, the procedures which depend on it then both cancel with errors
@@ -45,8 +45,8 @@ class ReverseGeocodeUserLocationProcedureTests: LocationProcedureTestCase {
     }
 
     func test__no_user_location_finishes_with_errors() {
-        manager.returnedLocation = nil
-        let procedure = ReverseGeocodeUserLocationProcedure(timeout: 1).set(manager: manager).set(geocoder: geocoder)
+        locationFetcher.returnedLocation = nil
+        let procedure = ReverseGeocodeUserLocationProcedure(timeout: 1).set(fetcher: locationFetcher).set(geocoder: geocoder)
         wait(for: procedure)
         PKAssertProcedureCancelledWithError(procedure, ProcedureKitError.timedOut(with: .by(1)))
     }

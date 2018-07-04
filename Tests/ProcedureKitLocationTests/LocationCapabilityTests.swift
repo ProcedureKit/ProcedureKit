@@ -11,13 +11,13 @@ import ProcedureKit
 import TestingProcedureKit
 @testable import ProcedureKitLocation
 
-class CLLocationManagerTests: XCTestCase, CLLocationManagerDelegate {
+class CLLocationManagerTests: XCTestCase, LocationFetcherDelegate, CLLocationManagerDelegate {
 
     func test__extension_set_delegate_works() {
         let manager = CLLocationManager.make()
-        manager.pk_set(delegate: self)
+        manager.locationFetcherDelegate = self
         XCTAssertNotNil(manager.delegate)
-        manager.pk_set(delegate: nil)
+        manager.locationFetcherDelegate = nil
         XCTAssertNil(manager.delegate)
     }
 }
@@ -133,7 +133,7 @@ class LocationCapabilityTests: XCTestCase {
     #if os(iOS)
     func test__given_when_in_use_require_always_request_authorization() {
         weak var exp = expectation(description: "Test: \(#function)")
-        registrar.authorizationStatus = .authorizedWhenInUse
+        registrar.authStatus = .authorizedWhenInUse
         capability = Capability.Location(.always)
         capability.registrar = registrar
         var didComplete = false
@@ -152,7 +152,7 @@ class LocationCapabilityTests: XCTestCase {
 
     func test__given_denied_does_not_request_authorization() {
         weak var exp = expectation(description: "Test: \(#function)")
-        registrar.authorizationStatus = .denied
+        registrar.authStatus = .denied
         var didComplete = false
         capability.requestAuthorization {
             didComplete = true
@@ -167,7 +167,7 @@ class LocationCapabilityTests: XCTestCase {
 
     func test__given_already_authorized_sufficiently_does_not_request_authorization() {
         weak var exp = expectation(description: "Test: \(#function)")
-        registrar.authorizationStatus = {
+        registrar.authStatus = {
             if #available(OSX 10.12, iOS 8.0, tvOS 8.0, watchOS 2.0, *) {
                 return CLAuthorizationStatus.authorizedAlways
             }

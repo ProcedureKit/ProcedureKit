@@ -14,7 +14,8 @@ import Dispatch
 import CoreLocation
 import MapKit
 
-open class UserLocationProcedure: Procedure, OutputProcedure, CLLocationManagerDelegate {
+open class UserLocationProcedure: Procedure, OutputProcedure, LocationFetcherDelegate, CLLocationManagerDelegate {
+
     public typealias CompletionBlock = (CLLocation) -> Void
 
     public let accuracy: CLLocationAccuracy
@@ -28,19 +29,26 @@ open class UserLocationProcedure: Procedure, OutputProcedure, CLLocationManagerD
 
     internal var capability = Capability.Location()
 
-    internal lazy var locationManager: LocationServicesRegistrarProtocol & LocationServicesProtocol = CLLocationManager.make()
-    internal var manager: LocationServicesRegistrarProtocol & LocationServicesProtocol {
-        get { return locationManager }
+    internal lazy var locationFetcher: LocationFetcher = CLLocationManager.make()
+    public var fetcher: LocationFetcher {
+        get { return locationFetcher }
         set {
-            locationManager = newValue
+            locationFetcher = newValue
             capability.registrar = newValue
         }
     }
 
-    public init(timeout: TimeInterval = 3.0, accuracy: CLLocationAccuracy = kCLLocationAccuracyThreeKilometers, completion: CompletionBlock? = nil) {
+    public init(timeout: TimeInterval = 3.0, accuracy: CLLocationAccuracy = kCLLocationAccuracyThreeKilometers,
+                locationFetcher: LocationFetcher? = nil, completion: CompletionBlock? = nil) {
         self.accuracy = accuracy
         self.completion = completion
+
         super.init()
+
+        if let fetcher = locationFetcher {
+            self.fetcher = fetcher
+        }
+
         addCondition(AuthorizedFor(capability))
         addCondition(MutuallyExclusive<UserLocationProcedure>())
         addObserver(TimeoutObserver(by: timeout))
@@ -57,14 +65,14 @@ open class UserLocationProcedure: Procedure, OutputProcedure, CLLocationManagerD
     }
 
     open override func execute() {
-        manager.pk_set(desiredAccuracy: accuracy)
-        manager.pk_set(delegate: self)
-        manager.pk_startUpdatingLocation()
+        locationFetcher.desiredAccuracy = accuracy
+        locationFetcher.locationFetcherDelegate = self
+        locationFetcher.startUpdatingLocation()
     }
 
     public func stopLocationUpdates() {
-        manager.pk_stopUpdatingLocation()
-        manager.pk_set(delegate: nil)
+        locationFetcher.stopUpdatingLocation()
+        locationFetcher.locationFetcherDelegate = nil
     }
 
     open func shouldFinish(afterReceivingLocation location: CLLocation) -> Bool {
@@ -78,7 +86,7 @@ open class UserLocationProcedure: Procedure, OutputProcedure, CLLocationManagerD
         }
     }
 
-    public func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+    public func locationFetcher(_ fetcher: LocationFetcher, didUpdateLocations locations: [CLLocation]) {
         guard !isFinished, let location = locations.last else { return }
         guard shouldFinish(afterReceivingLocation: location) else {
             output = .ready(.success(location))
@@ -94,11 +102,19 @@ open class UserLocationProcedure: Procedure, OutputProcedure, CLLocationManagerD
         }
     }
 
-    public func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
+    public func locationFetcher(_ fetcher: LocationFetcher, didFailWithError error: Error) {
         DispatchQueue.main.async { [weak self] in
             guard let strongSelf = self else { return }
             strongSelf.stopLocationUpdates()
             strongSelf.finish(withResult: .failure(error))
         }
+    }
+
+    public func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        locationFetcher(manager, didUpdateLocations: locations)
+    }
+
+    public func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
+        locationFetcher(manager, didFailWithError: error)
     }
 }
