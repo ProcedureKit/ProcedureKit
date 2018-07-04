@@ -46,6 +46,7 @@ class UserLocationProcedureTests: LocationProcedureTestCase {
 
     func test__updates_stop_when_deallocated() {
         var tmp: UserLocationProcedure! = UserLocationProcedure(accuracy: accuracy, locationFetcher: locationFetcher)
+        XCTAssertNotNil(tmp)
         tmp = nil
         // because of the asynchronous nature of a Procedure, deinit could occur in
         // another thread that is still finishing up a block and releases the last reference
