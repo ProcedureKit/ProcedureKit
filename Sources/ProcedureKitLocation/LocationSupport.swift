@@ -69,18 +69,12 @@ public protocol LocationServicesRegistrar {
     func locationServicesEnabled() -> Bool
 
     @available(iOS 8.0, *)
-    func requestWhenInUseAuthorization()
-
-    @available(iOS 8.0, *)
-    func requestAlwaysAuthorization()
-
-    @available(iOS 8.0, *)
     func requestAuthorization(withRequirement: LocationUsage?)
 }
 
 public typealias LocationFetcher = LocationServices & LocationServicesRegistrar
 
-public extension LocationServicesRegistrar {
+public extension LocationServicesRegistrar where Self: CLLocationManager {
     @available(iOS 8.0, *)
     public func requestAuthorization(withRequirement requirement: LocationUsage?) {
         #if os(iOS) || os(watchOS)
