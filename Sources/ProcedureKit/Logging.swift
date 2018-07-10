@@ -78,7 +78,7 @@ public class Log {
     public static let defaultWriters: [LogWriter] = {
         var writers: [LogWriter] = []
 
-        if #available(iOSApplicationExtension 10.0, OSXApplicationExtension 10.12, *) {
+        if #available(iOS 10.0, iOSApplicationExtension 10.0, OSX 10.12, OSXApplicationExtension 10.12, *) {
             writers.append(OSLogWriter())
         } else {
             writers.append(PrintLogWriter())
@@ -263,7 +263,7 @@ internal struct LoggerContext: LoggerProtocol {
 
 // MARK: - OS Log Writer
 
-@available(iOSApplicationExtension 10.0, OSXApplicationExtension 10.12, *)
+@available(iOS 10.0, iOSApplicationExtension 10.0, OSX 10.12, OSXApplicationExtension 10.12, *)
 internal extension Log.Severity {
 
     var logType: OSLogType {
@@ -278,13 +278,13 @@ internal extension Log.Severity {
     }
 }
 
-@available(iOSApplicationExtension 10.0, OSXApplicationExtension 10.12, *)
+@available(iOS 10.0, iOSApplicationExtension 10.0, OSX 10.12, OSXApplicationExtension 10.12, *)
 internal extension OSLog {
 
     static let procedure = OSLog(subsystem: "run.kit.procedure", category: "ProcedureKit")
 }
 
-@available(iOSApplicationExtension 10.0, OSXApplicationExtension 10.12, *)
+@available(iOS 10.0, iOSApplicationExtension 10.0, OSX 10.12, OSXApplicationExtension 10.12, *)
 internal class OSLogWriter: LogWriter {
 
     let log: OSLog
