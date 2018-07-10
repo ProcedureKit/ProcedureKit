@@ -8,31 +8,69 @@ import Foundation
 import Dispatch
 import os
 
-public typealias LogMessage = () -> String
+public typealias LogMessage = String
 
 public protocol LogWriter {
 
-    func writeLog(with attributes: Log.Attributes, message: @escaping LogMessage)
-}
-
-public extension LogWriter {
-
-    func writeLog(with attributes: Log.Attributes, message: @autoclosure () -> String) {
-        let msg = message()
-        writeLog(with: attributes, message: { msg })
-    }
+    func writeLog(with attributes: Log.Attributes, message: LogMessage)
 }
 
 public protocol LogMessageAdaptor {
 
-    func adapt(message: @escaping LogMessage, with attributes: Log.Attributes) -> LogMessage
+    func adapt(message: LogMessage, with attributes: Log.Attributes) -> LogMessage
 }
 
-public protocol LoggerProtocol: LogWriter {
+public protocol LogMessageAdaptorAggregator {
+
+    var adaptors: [LogMessageAdaptor] { get }
+}
+
+public extension LogMessageAdaptorAggregator {
+
+    func concat(message: LogMessage, with attributes: Log.Attributes) -> LogMessage {
+        return adaptors.reduce("") {
+            let adapted = $1.adapt(message: message, with: attributes)
+            if $0.isEmpty {
+                return adapted
+            }
+            return "\($0) \(adapted)"
+        }
+    }
+}
+
+public protocol LoggerProtocol: LogWriter, LogMessageAdaptorAggregator {
 
     var enabled: Bool { get set }
 
     var severity: Log.Severity { get set }
+
+    var writers: [LogWriter] { get }
+
+    var adaptors: [LogMessageAdaptor] { get set }
+}
+
+public extension LoggerProtocol {
+
+
+    func writeLog(with attributes: Log.Attributes, message: LogMessage) {
+
+        guard shouldLogMessage(given: attributes) else { return }
+
+        Log.queue.async { [writers = self.writers, concat = self.concat(message:with:)] in
+
+            // Adapt the message
+            let adapted: LogMessage = concat(message, attributes)
+
+            // Send it to the writers
+            for w in writers {
+                w.writeLog(with: attributes, message: adapted)
+            }
+        }
+    }
+
+    func writeLog(with attributes: Log.Attributes, message: @autoclosure () -> String) {
+        writeLog(with: attributes, message: message())
+    }
 }
 
 public class Log {
@@ -73,6 +111,10 @@ public class Log {
         let function: String
 
         let line: Int
+    }
+
+    public enum AdaptorStyle {
+        case prepend, append, before, after
     }
 
     public static let defaultWriters: [LogWriter] = {
@@ -213,9 +255,9 @@ public class ProcedureKitLogger<Global: GlobalLogSettingsProtocol>: LoggerProtoc
 
     public var severity: Log.Severity
 
-    internal let writers: [LogWriter]
+    public let writers: [LogWriter]
 
-    internal let adaptors: [LogMessageAdaptor]
+    public var adaptors: [LogMessageAdaptor]
 
     public init(enabled: Bool = Global.enabled, severity: Log.Severity = Global.severity, writers: [LogWriter] = Global.writers, adaptors: [LogMessageAdaptor] = Global.adaptors) {
         self.enabled = enabled
@@ -223,43 +265,9 @@ public class ProcedureKitLogger<Global: GlobalLogSettingsProtocol>: LoggerProtoc
         self.writers = writers
         self.adaptors = adaptors
     }
-
-    public func writeLog(with attributes: Log.Attributes, message: @escaping () -> String) {
-        guard shouldLogMessage(given: attributes) else { return }
-
-        Log.queue.async { [writers = self.writers, adaptors = self.adaptors] in
-
-            // Adapt the message
-            let adapted: LogMessage = adaptors.reduce(message) { $1.adapt(message: $0, with: attributes) }
-
-            // Send it to the writers
-            for w in writers {
-                w.writeLog(with: attributes, message: adapted)
-            }
-        }
-    }
 }
 
 public typealias Logger = ProcedureKitLogger<Log>
-
-internal struct LoggerContext: LoggerProtocol {
-
-    var enabled: Bool
-
-    var severity: Log.Severity
-
-    let block: (Log.Attributes, @escaping LogMessage) -> Void
-
-    init(parent: LoggerProtocol) {
-        enabled = parent.enabled
-        severity = parent.severity
-        block = parent.writeLog(with:message:)
-    }
-
-    func writeLog(with attributes: Log.Attributes, message: @escaping LogMessage) {
-        block(attributes, message)
-    }
-}
 
 // MARK: - OS Log Writer
 
@@ -293,8 +301,8 @@ internal class OSLogWriter: LogWriter {
         self.log = log
     }
 
-    func writeLog(with attributes: Log.Attributes, message: @escaping () -> String) {
-        os_log("%{public}@", log: log, type: attributes.severity.logType, message())
+    func writeLog(with attributes: Log.Attributes, message: LogMessage) {
+        os_log("%{public}@", log: log, type: attributes.severity.logType, message)
     }
 }
 
@@ -302,18 +310,116 @@ internal class OSLogWriter: LogWriter {
 
 internal class PrintLogWriter: LogWriter {
 
-    func writeLog(with attributes: Log.Attributes, message: @escaping () -> String) {
-        print(message())
+    func writeLog(with attributes: Log.Attributes, message: LogMessage) {
+        print(message)
     }
 }
 
 // MARK: - Adaptors
 
+public extension Log {
 
+    public struct MessageAdaptors {
 
+        public class Aggregator: LogMessageAdaptorAggregator, LogMessageAdaptor {
 
+            let style: Log.AdaptorStyle
+            public let adaptors: [LogMessageAdaptor]
 
+            public init(style: Log.AdaptorStyle, adaptors: [LogMessageAdaptor]) {
+                self.style = style
+                self.adaptors = adaptors
+            }
 
+            public func adapt(message: LogMessage, with attributes: Log.Attributes) -> LogMessage {
+
+                let adaption: LogMessage = concat(message: message, with: attributes)
+
+                switch style {
+                case .prepend:
+                    return "\(adaption) → \(message)"
+                case .append:
+                    return "\(message) → \(adaption)"
+                case .before:
+                    return "\(adaption)↴\n\(message)"
+                case .after:
+                    return "\(message)\n↳\(adaption)"
+                }
+            }
+        }
+
+        public class Severity: LogMessageAdaptor {
+
+            public func adapt(message: LogMessage, with attributes: Log.Attributes) -> LogMessage {
+                switch attributes.severity {
+                case .verbose:
+                    return "▪️"
+                case .info:
+                    return "🔷"
+                case .event:
+                    return "🔶"
+                case .debug:
+                    return "◽️"
+                case .warning:
+                    return "⚠️"
+                case .fatal:
+                    return "❌"
+                }
+            }
+        }
+
+        public class Literal: LogMessageAdaptor {
+            let literal: String
+            public init(_ literal: String) {
+                self.literal = literal
+            }
+
+            public func adapt(message: LogMessage, with attributes: Log.Attributes) -> LogMessage {
+                return literal
+            }
+        }
+    }
+}
+
+internal extension LoggerProtocol {
+
+    mutating func setDefaultAdaptors(withOperationName operationName: String) {
+
+        let prependers: [LogMessageAdaptor] = [
+            Log.MessageAdaptors.Severity() as LogMessageAdaptor,
+            Log.MessageAdaptors.Literal(operationName) as LogMessageAdaptor
+        ]
+
+        adaptors = [
+            Log.MessageAdaptors.Aggregator(style: .prepend, adaptors: prependers) as LogMessageAdaptor
+        ]
+    }
+}
+
+internal struct LoggerContext: LoggerProtocol {
+
+    var enabled: Bool
+
+    var severity: Log.Severity
+
+    let writers: [LogWriter]
+
+    var adaptors: [LogMessageAdaptor]
+
+    let block: (Log.Attributes, LogMessage) -> Void
+
+    init(parent: LoggerProtocol) {
+        enabled = parent.enabled
+        severity = parent.severity
+        writers = parent.writers
+        adaptors = parent.adaptors
+        block = parent.writeLog(with:message:)
+    }
+
+    func writeLog(with attributes: Log.Attributes, message: LogMessage) {
+        block(attributes, message)
+    }
+}
 
 
 // MARK: - Convenience

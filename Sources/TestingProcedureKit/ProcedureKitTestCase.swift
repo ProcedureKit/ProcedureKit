@@ -15,7 +15,8 @@ open class ProcedureKitTestCase: XCTestCase {
     open var procedure: TestProcedure!
 
     open override func setUp() {
-        super.setUp()    
+        super.setUp()
+        Log.severity = .verbose
         queue = ProcedureQueue()
         delegate = QueueTestDelegate()
         queue.delegate = delegate

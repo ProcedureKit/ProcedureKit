@@ -198,6 +198,14 @@ open class Procedure: Operation, ProcedureProtocol {
         }
     }
 
+    open override var name: String? {
+        didSet {
+            synchronise {
+                protectedProperties.log.setDefaultAdaptors(withOperationName: operationName)
+            }
+        }
+    }
+
     internal let identifier = UUID()
 
     internal var typeDescription: String {
@@ -363,11 +371,7 @@ open class Procedure: Operation, ProcedureProtocol {
 
     // the log variable to be used *within* the stateLock
     private var _log: LoggerProtocol {
-        get {
-            let operationName = self.operationName
-            return LoggerContext(parent: protectedProperties.log)
-//            return LoggerContext(parent: protectedProperties.log, operationName: operationName)
-        }
+        get { return LoggerContext(parent: protectedProperties.log) }
     }
 
     // MARK: Errors
@@ -424,9 +428,9 @@ open class Procedure: Operation, ProcedureProtocol {
      */
     final public var log: LoggerProtocol {
         get {
-            let operationName = self.operationName
-            return synchronise { LoggerContext(parent: protectedProperties.log) }
-//            return synchronise { LoggerContext(parent: protectedProperties.log, operationName: operationName) }
+            return synchronise {
+                return LoggerContext(parent: protectedProperties.log)
+            }
         }
         set {
             synchronise { protectedProperties.log = newValue }
