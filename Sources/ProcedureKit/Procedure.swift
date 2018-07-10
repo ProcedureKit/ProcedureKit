@@ -792,7 +792,7 @@ open class Procedure: Operation, ProcedureProtocol {
 
         guard nextState2 == .executing else { return }
 
-        log.info(message: "Will Execute")
+        log.verbose(message: "Will Execute")
 
         // Call the execute() function (which should be overriden in Procedure subclasses)
         if let underlyingQueue = queue?.underlyingQueue {
@@ -862,7 +862,7 @@ open class Procedure: Operation, ProcedureProtocol {
 
         let promise = ProcedurePromise()
 
-        log.info(message: ".produce() | Will add \(operation.operationName)")
+        log.verbose(message: ".produce() | Will add \(operation.operationName)")
 
         // Dispatch the innards of produce() onto the EventQueue
         dispatchEvent {
@@ -1007,10 +1007,10 @@ open class Procedure: Operation, ProcedureProtocol {
         }
 
         if let error = resultingError {
-            log.info(message: "Will cancel with error: \(error).")
+            log.verbose(message: "Will cancel with error: \(error).")
         }
         else {
-            log.info(message: "Will cancel with no error.")
+            log.verbose(message: "Will cancel without error.")
         }
 
         didChangeValue(forKey: .cancelled)
@@ -1206,10 +1206,10 @@ open class Procedure: Operation, ProcedureProtocol {
         }
 
         if let error = resultingError {
-            log.info(message: "Will finish with error: \(error).")
+            log.verbose(message: "Will finish with error: \(error).")
         }
         else {
-            log.info(message: "Will finish with no errors.")
+            log.verbose(message: "Will finish with no errors.")
         }
 
         procedureWillFinish(with: resultingError)
@@ -1265,7 +1265,7 @@ open class Procedure: Operation, ProcedureProtocol {
                     self.log.info(message: "Did finish with error: \(error).")
                 }
                 else {
-                    self.log.info(message: "Did finish with no errors.")
+                    self.log.info(message: "Did finish without errors.")
                 }
             }
         }
@@ -1602,7 +1602,7 @@ extension Procedure {
                     self.finish()
                     return
                 case let .failure(error):
-                    procedure.log.verbose(message: "Condition(s) failed with errors: \(error).")
+                    procedure.log.verbose(message: "Condition(s) failed with error: \(error).")
                     procedure.cancel(with: error)
                     // Finish this EvaluateConditions operation immediately
                     self.finish()
