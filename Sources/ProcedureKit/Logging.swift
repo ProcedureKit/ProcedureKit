@@ -294,7 +294,7 @@ internal class OSLogWriter: LogWriter {
     }
 
     func writeLog(with attributes: Log.Attributes, message: @escaping () -> String) {
-        os_log("%{public}s", log: log, type: attributes.severity.logType, message())
+        os_log("%{public}@", log: log, type: attributes.severity.logType, message())
     }
 }
 
