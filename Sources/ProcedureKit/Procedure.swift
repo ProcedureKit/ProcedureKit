@@ -365,7 +365,8 @@ open class Procedure: Operation, ProcedureProtocol {
     private var _log: LoggerProtocol {
         get {
             let operationName = self.operationName
-            return LoggerContext(parent: protectedProperties.log, operationName: operationName)
+            return LoggerContext(parent: protectedProperties.log)
+//            return LoggerContext(parent: protectedProperties.log, operationName: operationName)
         }
     }
 
@@ -424,12 +425,11 @@ open class Procedure: Operation, ProcedureProtocol {
     final public var log: LoggerProtocol {
         get {
             let operationName = self.operationName
-            return synchronise { LoggerContext(parent: protectedProperties.log, operationName: operationName) }
+            return synchronise { LoggerContext(parent: protectedProperties.log) }
+//            return synchronise { LoggerContext(parent: protectedProperties.log, operationName: operationName) }
         }
         set {
-            synchronise {
-                protectedProperties.log = newValue
-            }
+            synchronise { protectedProperties.log = newValue }
         }
     }
 
@@ -792,7 +792,7 @@ open class Procedure: Operation, ProcedureProtocol {
 
         guard nextState2 == .executing else { return }
 
-        log.notice(message: "Will Execute")
+        log.info(message: "Will Execute")
 
         // Call the execute() function (which should be overriden in Procedure subclasses)
         if let underlyingQueue = queue?.underlyingQueue {
@@ -836,7 +836,7 @@ open class Procedure: Operation, ProcedureProtocol {
         }
 
         // Log that execute() has returned
-        log.notice(message: "Did Execute")
+        log.info(message: "Did Execute")
     }
 
     /// Procedure subclasses must override `execute()`.
@@ -862,7 +862,7 @@ open class Procedure: Operation, ProcedureProtocol {
 
         let promise = ProcedurePromise()
 
-        log.notice(message: ".produce() | Will add \(operation.operationName)")
+        log.info(message: ".produce() | Will add \(operation.operationName)")
 
         // Dispatch the innards of produce() onto the EventQueue
         dispatchEvent {
@@ -911,7 +911,7 @@ open class Procedure: Operation, ProcedureProtocol {
             }
         }
 
-        log.notice(message: ".produce() | Did add \(operation.operationName)")
+        log.info(message: ".produce() | Did add \(operation.operationName)")
 
         log.verbose(message: ".produce() | [observers]: DidAddOperation(\(operation.operationName))")
 
@@ -1007,10 +1007,10 @@ open class Procedure: Operation, ProcedureProtocol {
         }
 
         if let error = resultingError {
-            log.notice(message: "Will cancel with error: \(error).")
+            log.info(message: "Will cancel with error: \(error).")
         }
         else {
-            log.notice(message: "Will cancel with no error.")
+            log.info(message: "Will cancel with no error.")
         }
 
         didChangeValue(forKey: .cancelled)
@@ -1206,10 +1206,10 @@ open class Procedure: Operation, ProcedureProtocol {
         }
 
         if let error = resultingError {
-            log.notice(message: "Will finish with error: \(error).")
+            log.info(message: "Will finish with error: \(error).")
         }
         else {
-            log.notice(message: "Will finish with no errors.")
+            log.info(message: "Will finish with no errors.")
         }
 
         procedureWillFinish(with: resultingError)
@@ -1262,10 +1262,10 @@ open class Procedure: Operation, ProcedureProtocol {
                 // Once all the DidFinishObservers have completed, log a final notice
 
                 if let error = resultingError {
-                    self.log.notice(message: "Did finish with error: \(error).")
+                    self.log.info(message: "Did finish with error: \(error).")
                 }
                 else {
-                    self.log.notice(message: "Did finish with no errors.")
+                    self.log.info(message: "Did finish with no errors.")
                 }
             }
         }

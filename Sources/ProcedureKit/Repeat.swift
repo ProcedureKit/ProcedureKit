@@ -229,7 +229,7 @@ open class RepeatProcedure<T: Operation>: GroupProcedure {
 
         guard shouldAddNext(), let payload = _next() else { return false }
 
-        log.notice(message: "Will add next operation.")
+        log.info(message: "Will add next operation.")
 
         _repeatStateLock.withCriticalScope {
             if let newConfigureBlock = payload.configure {

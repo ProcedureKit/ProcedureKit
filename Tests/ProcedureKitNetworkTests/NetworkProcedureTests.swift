@@ -147,7 +147,6 @@ class NetworkProcedureTests: ProcedureKitTestCase {
         makeSessionSuccessful.addDependency(delay)
 
         let procedure = NetworkProcedure<Target>(resilience: resilience, body: createNetworkProcedure)
-        procedure.log.severity = .notice
         procedure.reachability = manager
 
         wait(forAll: [procedure, delay, makeSessionSuccessful], withTimeout: 4)
@@ -163,7 +162,6 @@ class NetworkProcedureTests: ProcedureKitTestCase {
         makeSessionSuccessful.addDependency(delay)
 
         let procedure = NetworkProcedure<Target>(resilience: resilience, body: createNetworkProcedure)
-        procedure.log.severity = .notice
         procedure.reachability = manager
 
         wait(forAll: [procedure, delay, makeSessionSuccessful], withTimeout: 4)

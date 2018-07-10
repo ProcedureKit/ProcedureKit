@@ -146,7 +146,7 @@ open class RetryProcedure<T: Procedure>: RepeatProcedure<T> {
 
         var willAttemptAnotherOperation = false
         defer {
-            log.notice(message: "\(willAttemptAnotherOperation ? "will attempt" : "will not attempt") recovery from error: \(childError) in operation: \(child)")
+            log.info(message: "\(willAttemptAnotherOperation ? "will attempt" : "will not attempt") recovery from error: \(childError) in operation: \(child)")
         }
 
         print("*** - child error: \(childError)")

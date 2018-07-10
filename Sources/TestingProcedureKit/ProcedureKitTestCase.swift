@@ -15,7 +15,7 @@ open class ProcedureKitTestCase: XCTestCase {
     open var procedure: TestProcedure!
 
     open override func setUp() {
-        super.setUp()
+        super.setUp()    
         queue = ProcedureQueue()
         delegate = QueueTestDelegate()
         queue.delegate = delegate
@@ -33,7 +33,7 @@ open class ProcedureKitTestCase: XCTestCase {
         delegate = nil
         queue = nil
         procedure = nil
-        LogManager.severity = .warning
+        Log.severity = .warning
         ExclusivityManager.__tearDownForUnitTesting()
         super.tearDown()
     }
