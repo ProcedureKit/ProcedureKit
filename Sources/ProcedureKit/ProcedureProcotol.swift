@@ -18,7 +18,7 @@ public protocol ProcedureProtocol: class {
 
     var error: Error? { get }
 
-    var log: LoggerProtocol { get }
+    var log: ProcedureLog { get }
 
     // Execution
 

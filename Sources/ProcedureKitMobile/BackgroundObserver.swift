@@ -109,12 +109,12 @@ public class BackgroundObserver: ProcedureObserver {
         }
 
         guard result.contains(.success) else {
-            procedure.log.warning(message: BackgroundObserver.logMessage_FailedToInitiateBackgroundTask)
+            procedure.log.warning.message(BackgroundObserver.logMessage_FailedToInitiateBackgroundTask)
             return
         }
 
         if result.contains(.additionalHandlersForThisProcedure) {
-            procedure.log.info(message: "More than one BackgroundObserver has been attached to this Procedure")
+            procedure.log.warning.message("More than one BackgroundObserver has been attached to this Procedure")
         }
     }
 

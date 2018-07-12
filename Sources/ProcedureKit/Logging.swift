@@ -8,74 +8,30 @@ import Foundation
 import Dispatch
 import os
 
-public typealias LogMessage = String
+internal struct CurrentProcessInfo {
 
-public protocol LogWriter {
-
-    func writeLog(with attributes: Log.Attributes, message: LogMessage)
-}
-
-public protocol LogMessageAdaptor {
-
-    func adapt(message: LogMessage, with attributes: Log.Attributes) -> LogMessage
-}
-
-public protocol LogMessageAdaptorAggregator {
-
-    var adaptors: [LogMessageAdaptor] { get }
-}
-
-public extension LogMessageAdaptorAggregator {
-
-    func concat(message: LogMessage, with attributes: Log.Attributes) -> LogMessage {
-        return adaptors.reduce("") {
-            let adapted = $1.adapt(message: message, with: attributes)
-            if $0.isEmpty {
-                return adapted
-            }
-            return "\($0) \(adapted)"
-        }
-    }
-}
-
-public protocol LoggerProtocol: LogWriter, LogMessageAdaptorAggregator {
-
-    var enabled: Bool { get set }
-
-    var severity: Log.Severity { get set }
-
-    var writers: [LogWriter] { get }
-
-    var adaptors: [LogMessageAdaptor] { get set }
-}
-
-public extension LoggerProtocol {
-
-
-    func writeLog(with attributes: Log.Attributes, message: LogMessage) {
-
-        guard shouldLogMessage(given: attributes) else { return }
-
-        Log.queue.async { [writers = self.writers, concat = self.concat(message:with:)] in
-
-            // Adapt the message
-            let adapted: LogMessage = concat(message, attributes)
-
-            // Send it to the writers
-            for w in writers {
-                w.writeLog(with: attributes, message: adapted)
-            }
-        }
+    static var name: String {
+        return shared.name
     }
 
-    func writeLog(with attributes: Log.Attributes, message: @autoclosure () -> String) {
-        writeLog(with: attributes, message: message())
+    static var ID: Int32 {
+        return shared.ID
+    }
+
+    private static let shared = CurrentProcessInfo()
+
+    private let name: String
+    private let ID: Int32
+
+    private init() {
+        let process = ProcessInfo.processInfo
+        name = process.processName
+        ID = process.processIdentifier
     }
 }
 
 public class Log {
 
-    @objc(LogSeverity)
     public enum Severity: Int, Comparable {
 
         public static func < (lhs: Severity, rhs: Severity) -> Bool {
@@ -102,172 +58,437 @@ public class Log {
         case fatal
     }
 
-    public struct Attributes {
+    public struct Entry: CustomStringConvertible {
 
-        let severity: Severity
+        public enum Payload: CustomStringConvertible {
 
-        let file: String
+            case trace
+            case message(String)
+            case value(Any?)
 
-        let function: String
-
-        let line: Int
-    }
-
-    public enum AdaptorStyle {
-        case prepend, append, before, after
-    }
-
-    public static let defaultWriters: [LogWriter] = {
-        var writers: [LogWriter] = []
-
-        if #available(iOS 10.0, iOSApplicationExtension 10.0, OSX 10.12, OSXApplicationExtension 10.12, *) {
-            writers.append(OSLogWriter())
-        } else {
-            writers.append(PrintLogWriter())
+            public var description: String {
+                switch self {
+                case .trace:
+                    return ""
+                case .message(let text):
+                    return text
+                case .value(let value):
+                    if let value = value {
+                        return "\(value)"
+                    }
+                    return "<nil-value>"
+                }
+            }
         }
 
-        return writers
-    }()
+        public let payload: Payload
 
-    public static let defaultMessageAdaptors: [LogMessageAdaptor] = {
-        var adaptors: [LogMessageAdaptor] = []
+        public let formattedMetadata: String?
 
+        public let severity: Severity
 
-        return adaptors
-    }()
+        public let file: String
 
-    internal static var shared = Log()
+        public let function: String
 
-    internal static var queue: DispatchQueue {
-        return shared.queue
+        public let line: Int
+
+        public let threadID: UInt64
+
+        public let timestamp: Date
+
+        public let processName: String
+
+        public let processID: Int32
+
+        public var description: String {
+            guard let metadata = formattedMetadata else {
+                return payload.description
+            }
+            return "\(metadata) \(payload.description)"
+        }
+
+        public init(payload: Payload, formattedMetadata: String? = nil, severity: Log.Severity, file: String, function: String, line: Int, threadID: UInt64, timestamp: Date = Date()) {
+            self.payload = payload
+            self.formattedMetadata = formattedMetadata
+            self.severity = severity
+            self.file = file
+            self.function = function
+            self.line = line
+            self.threadID = threadID
+            self.timestamp = timestamp
+            self.processName = CurrentProcessInfo.name
+            self.processID = CurrentProcessInfo.ID
+        }
+
+        func append(formattedMetadata newFormattedMetadata: String?) -> Log.Entry {
+            guard let newFormattedMetadata = newFormattedMetadata else { return self }
+            let new: String
+            if let old = formattedMetadata, !old.isEmpty {
+                new = "\(old) \(newFormattedMetadata)"
+            }
+            else {
+                new = newFormattedMetadata
+            }
+            return Log.Entry(payload: payload, formattedMetadata: new, severity: severity, file: file, function: function, line: line, threadID: threadID, timestamp: timestamp)
+        }
     }
+
+    // MARK: - Static Properties
+
+    internal static var shared: LogChannel = Log.Channel<Log>(enabled: true, severity: .info, writer: Log.Writers.standard, formatter: Log.Formatters.standard)
+
+    // MARK: - Instance Properties
 
     private let queue = DispatchQueue(label: "run.kit.procedure.ProcedureKit.Logger", qos: .utility)
 
     private let stateLock = PThreadMutex()
 
-    @discardableResult
-    fileprivate func synchronise<T>(block: () -> T) -> T {
-        return stateLock.withCriticalScope(block: block)
-    }
-
-    private var _enabled: Bool = true
-    private var _severity: Severity = .info
-    private var _writers: [LogWriter]
-    private var _adaptors: [LogMessageAdaptor]
-
-    fileprivate var enabled: Bool {
-        get { return synchronise { _enabled } }
-        set { synchronise { _enabled = newValue } }
-    }
-
-    fileprivate var severity: Severity {
-        get { return synchronise { _severity } }
-        set { synchronise { _severity = newValue } }
-    }
-
-    fileprivate var writers: [LogWriter] {
-        get { return synchronise { _writers } }
-        set { synchronise { _writers = newValue } }
-    }
-
-    fileprivate var adaptors: [LogMessageAdaptor] {
-        get { return synchronise { _adaptors } }
-        set { synchronise { _adaptors = newValue } }
-    }
-
-
-    fileprivate init() {
-        _writers = Log.defaultWriters
-        _adaptors = Log.defaultMessageAdaptors
-    }
-
-    fileprivate func appendWriter(_ writer: LogWriter) {
-        synchronise { _writers.append(writer) }
-    }
-
-    fileprivate func removeAllWriters() {
-        synchronise { _writers.removeAll() }
-    }
-
-    fileprivate func setWriter(_ writer: LogWriter) {
-        synchronise {
-            _writers.removeAll()
-            _writers.append(writer)
-        }
-    }
+    private init() { }
 }
 
-public protocol GlobalLogSettingsProtocol {
+public protocol LogSettings {
 
     static var enabled: Bool { get set }
 
     static var severity: Log.Severity { get set }
 
-    static var writers: [LogWriter] { get }
+    static var writer: LogWriter { get set }
 
-    static var adaptors: [LogMessageAdaptor] { get }
+    static var formatter: LogFormatter { get set }
 }
 
+public protocol LogWriter {
 
-// MARK: - Global Log Settings
+    func write(entry: Log.Entry)
+}
 
-extension Log: GlobalLogSettingsProtocol {
+public protocol LogFormatter {
+
+    func format(entry: Log.Entry) -> Log.Entry
+}
+
+public protocol LogChannel {
+
+    var enabled: Bool { get set }
+
+    var severity: Log.Severity { get set }
+
+    var writer: LogWriter { get set }
+
+    var formatter: LogFormatter { get set }
+}
+
+public protocol LogChannels {
+
+    var verbose: LogChannel { get }
+
+    var info: LogChannel { get }
+
+    var event: LogChannel { get }
+
+    var debug: LogChannel { get }
+
+    var warning: LogChannel { get }
+
+    var fatal: LogChannel { get }
+
+    var current: LogChannel { get }
+}
+
+public typealias ProcedureLog = LogChannels & LogChannel
+
+// MARK: - Protocol Exensions
+
+public extension LogChannel {
+
+    func shouldWrite(severity: Log.Severity) -> Bool {
+        return enabled && Log.enabled && (severity >= Log.severity)
+    }
+
+    func write(entry: Log.Entry) {
+        writer.write(entry: formatter.format(entry: entry))
+    }
+
+    func trace(_ file: String = #file, function: String = #function, line: Int = #line) {
+        guard shouldWrite(severity: severity) else { return }
+        var threadID: UInt64 = 0
+        pthread_threadid_np(nil, &threadID)
+        let entry = Log.Entry(payload: .trace, severity: severity, file: file, function: function, line: line, threadID: threadID)
+        write(entry: entry)
+    }
+
+    func message(_ msg: @autoclosure () -> String, file: String = #file, function: String = #function, line: Int = #line) {
+        guard shouldWrite(severity: severity) else { return }
+        var threadID: UInt64 = 0
+        pthread_threadid_np(nil, &threadID)
+        let entry = Log.Entry(payload: .message(msg()), severity: severity, file: file, function: function, line: line, threadID: threadID)
+        write(entry: entry)
+    }
+
+    func value(_ value: @autoclosure () -> Any?, file: String = #file, function: String = #function, line: Int = #line) {
+        guard shouldWrite(severity: severity) else { return }
+        var threadID: UInt64 = 0
+        pthread_threadid_np(nil, &threadID)
+        let entry = Log.Entry(payload: .value(value()), severity: severity, file: file, function: function, line: line, threadID: threadID)
+        write(entry: entry)
+    }
+}
+
+public extension LogChannels {
+
+    var channels: [LogChannel] {
+        return [verbose, info, event, debug, warning, fatal]
+    }
+}
+
+// MARK: - Protocol Conformance
+
+extension Log: LogSettings {
 
     public static var enabled: Bool {
         get { return shared.enabled }
         set { shared.enabled = newValue }
     }
 
-    public static var severity: Log.Severity {
+    public static var severity: Severity {
         get { return shared.severity }
         set { shared.severity = newValue }
     }
 
-    public static var adaptors: [LogMessageAdaptor] {
-        return shared.adaptors
+    public static var writer: LogWriter {
+        get { return shared.writer }
+        set { shared.writer = newValue }
     }
 
-    public static var writers: [LogWriter] {
-        return shared.writers
+    public static var formatter: LogFormatter {
+        get { return shared.formatter }
+        set { shared.formatter = newValue }
+    }
+}
+
+// MARK: - Log Channel
+
+public extension Log {
+
+    class Channel<Settings: LogSettings>: LogChannel {
+
+        private let stateLock = PThreadMutex()
+
+        private var _enabled: Bool
+        private var _severity: Severity
+        private var _writer: LogWriter
+        private var _formatter: LogFormatter
+
+        public init(enabled: Bool = Settings.enabled, severity: Log.Severity = Settings.severity, writer: LogWriter = Settings.writer, formatter: LogFormatter = Settings.formatter) {
+            _enabled = enabled
+            _severity = severity
+            _writer = writer
+            _formatter = formatter
+        }
+
+        @discardableResult
+        private func synchronise<T>(block: () -> T) -> T {
+            return stateLock.withCriticalScope(block: block)
+        }
+
+        public var enabled: Bool {
+            get { return synchronise { _enabled } }
+            set { synchronise { _enabled = newValue } }
+        }
+
+        public var severity: Severity {
+            get { return synchronise { _severity } }
+            set { synchronise { _severity = newValue } }
+        }
+
+        public var writer: LogWriter {
+            get { return synchronise { _writer } }
+            set { synchronise { _writer = newValue } }
+        }
+
+        public var formatter: LogFormatter {
+            get { return synchronise { _formatter } }
+            set { synchronise { _formatter = newValue } }
+        }
+    }
+}
+
+// MARK: - Log Channels
+
+extension Log {
+
+    public class Channels<Settings: LogSettings>: Log.Channel<Settings>, LogChannels {
+
+        public private(set) var verbose: LogChannel
+
+        public private(set) var info: LogChannel
+
+        public private(set) var event: LogChannel
+
+        public private(set) var debug: LogChannel
+
+        public private(set) var warning: LogChannel
+
+        public private(set) var fatal: LogChannel
+
+        public var current: LogChannel {
+            switch severity {
+            case .verbose: return verbose
+            case .info: return info
+            case .event: return event
+            case .debug: return debug
+            case .warning: return warning
+            case .fatal: return fatal
+            }
+        }
+
+        public override var enabled: Bool {
+            didSet {
+                for var channel in channels {
+                    channel.enabled = enabled
+                }
+            }
+        }
+
+        public override var writer: LogWriter {
+            didSet {
+                for var channel in channels {
+                    channel.writer = writer
+                }
+            }
+        }
+
+        public override var formatter: LogFormatter {
+            didSet {
+                for var channel in channels {
+                    channel.formatter = formatter
+                }
+            }
+        }
+
+        override public init(enabled: Bool = Settings.enabled, severity: Log.Severity = Settings.severity, writer: LogWriter = Settings.writer, formatter: LogFormatter = Settings.formatter) {
+            verbose = Log.Channel<Settings>(enabled: enabled, severity: .verbose, writer: writer, formatter: formatter)
+            info = Log.Channel<Settings>(enabled: enabled, severity: .info, writer: writer, formatter: formatter)
+            event = Log.Channel<Settings>(enabled: enabled, severity: .event, writer: writer, formatter: formatter)
+            debug = Log.Channel<Settings>(enabled: enabled, severity: .debug, writer: writer, formatter: formatter)
+            warning = Log.Channel<Settings>(enabled: enabled, severity: .warning, writer: writer, formatter: formatter)
+            fatal = Log.Channel<Settings>(enabled: enabled, severity: .fatal, writer: writer, formatter: formatter)
+            super.init(enabled: enabled, severity: severity, writer: writer, formatter: formatter)
+        }
+    }
+}
+
+// MARK: - Log Writers
+
+public extension Log {
+
+    public struct Writers {
+
+        public static let standard: LogWriter = {
+            if #available(iOS 10.0, iOSApplicationExtension 10.0, OSX 10.12, OSXApplicationExtension 10.12, *) {
+                return OSLogWriter()
+            }
+            else {
+                return PrintLogWriter()
+            }
+        }()
+
+        public static let system: LogWriter = {
+            if #available(iOS 10.0, iOSApplicationExtension 10.0, OSX 10.12, OSXApplicationExtension 10.12, *) {
+                return Log.Writers.OSLogWriter(log: .procedure)
+            }
+            else {
+                return Log.Writers.PrintLogWriter()
+            }
+        }()
+    }
+}
+
+// MARK: - Log Formatters
+
+public extension Log {
+
+    public struct Formatters {
+
+        public static let standard: LogFormatter = Concatenating([SeverityFormatter(), CallsiteFormatter()])
+
+        public static func makeProcedureLogFormatter(operationName name: String) -> LogFormatter {
+            return Log.Formatters.Concatenating([
+                Log.Formatters.CallsiteFormatter(),
+                Log.Formatters.SeverityFormatter(),
+                Log.Formatters.StaticStringFormatter(name)])
+        }
+    }
+}
+
+public extension Log.Formatters {
+
+    public class Concatenating: LogFormatter {
+
+        public let formatters: [LogFormatter]
+
+        public init(_ formatters: [LogFormatter]) {
+            self.formatters = formatters
+        }
+
+        public func format(entry: Log.Entry) -> Log.Entry {
+            return formatters.reduce(entry) { $1.format(entry: $0) }
+        }
     }
 
-    public static func appendWriter(_ writer: LogWriter) {
-        shared.appendWriter(writer)
+    public class SeverityFormatter: LogFormatter {
+
+        public func format(entry: Log.Entry) -> Log.Entry {
+            return entry.append(formattedMetadata: entry.severity.description)
+        }
     }
 
-    public static func removeAllWriters() {
-        shared.removeAllWriters()
+    public class StaticStringFormatter: LogFormatter {
+
+        public let text: String
+
+        public init(_ text: String) {
+            self.text = text
+        }
+
+        public func format(entry: Log.Entry) -> Log.Entry {
+            return entry.append(formattedMetadata: text)
+        }
     }
 
-    public static func setWriter(_ writer: LogWriter) {
-        shared.setWriter(writer)
+    public class CallsiteFormatter: LogFormatter {
+
+        public func format(entry: Log.Entry) -> Log.Entry {
+            let filename = (entry.file as NSString).pathComponents.last ?? "redacted"
+            return entry.append(formattedMetadata: "\(filename):\(entry.line)")
+        }
+    }
+
+}
+
+extension Log.Severity: CustomStringConvertible {
+
+    public var description: String {
+        switch self {
+        case .verbose:
+            return "▪️"
+        case .info:
+            return "🔷"
+        case .event:
+            return "🔶"
+        case .debug:
+            return "◽️"
+        case .warning:
+            return "⚠️"
+        case .fatal:
+            return "❌"
+        }
     }
 }
 
 
 
-// MARK: - ProcedureKitLogger
-
-public class ProcedureKitLogger<Global: GlobalLogSettingsProtocol>: LoggerProtocol {
-
-    public var enabled: Bool
-
-    public var severity: Log.Severity
-
-    public let writers: [LogWriter]
-
-    public var adaptors: [LogMessageAdaptor]
-
-    public init(enabled: Bool = Global.enabled, severity: Log.Severity = Global.severity, writers: [LogWriter] = Global.writers, adaptors: [LogMessageAdaptor] = Global.adaptors) {
-        self.enabled = enabled
-        self.severity = severity
-        self.writers = writers
-        self.adaptors = adaptors
-    }
-}
-
-public typealias Logger = ProcedureKitLogger<Log>
 
 // MARK: - OS Log Writer
 
@@ -276,12 +497,14 @@ internal extension Log.Severity {
 
     var logType: OSLogType {
         switch self {
-        case .warning, .fatal:
-            return OSLogType.default
-        case .debug:
-            return OSLogType.debug
-        default:
-            return OSLogType.info
+        case .verbose, .debug:
+            return .debug
+        case .info, .event:
+            return .info
+        case .warning:
+            return .default
+        case .fatal:
+            return .error
         }
     }
 }
@@ -292,178 +515,43 @@ internal extension OSLog {
     static let procedure = OSLog(subsystem: "run.kit.procedure", category: "ProcedureKit")
 }
 
-@available(iOS 10.0, iOSApplicationExtension 10.0, OSX 10.12, OSXApplicationExtension 10.12, *)
-internal class OSLogWriter: LogWriter {
+internal extension Log.Writers {
 
-    let log: OSLog
+    @available(iOS 10.0, iOSApplicationExtension 10.0, OSX 10.12, OSXApplicationExtension 10.12, *)
+    class OSLogWriter: LogWriter {
 
-    init(log: OSLog = .procedure) {
-        self.log = log
-    }
+        let log: OSLog
 
-    func writeLog(with attributes: Log.Attributes, message: LogMessage) {
-        os_log("%{public}@", log: log, type: attributes.severity.logType, message)
+        init(log: OSLog = .procedure) {
+            self.log = log
+        }
+
+        func write(entry: Log.Entry) {
+            os_log("%{public}@", log: log, type: entry.severity.logType, entry.description)
+        }
     }
 }
 
 // MARK: - Print Log Writer
+internal extension Log.Writers {
+    class PrintLogWriter: LogWriter {
 
-internal class PrintLogWriter: LogWriter {
-
-    func writeLog(with attributes: Log.Attributes, message: LogMessage) {
-        print(message)
-    }
-}
-
-// MARK: - Adaptors
-
-public extension Log {
-
-    public struct MessageAdaptors {
-
-        public class Aggregator: LogMessageAdaptorAggregator, LogMessageAdaptor {
-
-            let style: Log.AdaptorStyle
-            public let adaptors: [LogMessageAdaptor]
-
-            public init(style: Log.AdaptorStyle, adaptors: [LogMessageAdaptor]) {
-                self.style = style
-                self.adaptors = adaptors
-            }
-
-            public func adapt(message: LogMessage, with attributes: Log.Attributes) -> LogMessage {
-
-                let adaption: LogMessage = concat(message: message, with: attributes)
-
-                switch style {
-                case .prepend:
-                    return "\(adaption) → \(message)"
-                case .append:
-                    return "\(message) → \(adaption)"
-                case .before:
-                    return "\(adaption)↴\n\(message)"
-                case .after:
-                    return "\(message)\n↳\(adaption)"
-                }
-            }
-        }
-
-        public class Severity: LogMessageAdaptor {
-
-            public func adapt(message: LogMessage, with attributes: Log.Attributes) -> LogMessage {
-                switch attributes.severity {
-                case .verbose:
-                    return "▪️"
-                case .info:
-                    return "🔷"
-                case .event:
-                    return "🔶"
-                case .debug:
-                    return "◽️"
-                case .warning:
-                    return "⚠️"
-                case .fatal:
-                    return "❌"
-                }
-            }
-        }
-
-        public class Literal: LogMessageAdaptor {
-            let literal: String
-            public init(_ literal: String) {
-                self.literal = literal
-            }
-
-            public func adapt(message: LogMessage, with attributes: Log.Attributes) -> LogMessage {
-                return literal
-            }
+        func write(entry: Log.Entry) {
+            print(entry)
         }
     }
 }
 
-internal extension LoggerProtocol {
-
-    mutating func setDefaultAdaptors(withOperationName operationName: String) {
-
-        let prependers: [LogMessageAdaptor] = [
-            Log.MessageAdaptors.Severity() as LogMessageAdaptor,
-            Log.MessageAdaptors.Literal(operationName) as LogMessageAdaptor
-        ]
-
-        adaptors = [
-            Log.MessageAdaptors.Aggregator(style: .prepend, adaptors: prependers) as LogMessageAdaptor
-        ]
-    }
-}
-
-internal struct LoggerContext: LoggerProtocol {
-
-    var enabled: Bool
-
-    var severity: Log.Severity
-
-    let writers: [LogWriter]
-
-    var adaptors: [LogMessageAdaptor]
-
-    let block: (Log.Attributes, LogMessage) -> Void
-
-    init(parent: LoggerProtocol) {
-        enabled = parent.enabled
-        severity = parent.severity
-        writers = parent.writers
-        adaptors = parent.adaptors
-        block = parent.writeLog(with:message:)
-    }
-
-    func writeLog(with attributes: Log.Attributes, message: LogMessage) {
-        block(attributes, message)
-    }
-}
-
-
-// MARK: - Convenience
-
-public extension LoggerProtocol {
-
-    func shouldLogMessage(given attributes: Log.Attributes) -> Bool {
-        return enabled && attributes.severity >= self.severity
-    }
-
-    func verbose(file: String = #file, function: String = #function, line: Int = #line, message: @autoclosure () -> String) {
-        writeLog(with: Log.Attributes(severity: .verbose, file: file, function: function, line: line), message: message)
-    }
-
-    func info(file: String = #file, function: String = #function, line: Int = #line, message: @autoclosure () -> String) {
-        writeLog(with: Log.Attributes(severity: .info, file: file, function: function, line: line), message: message)
-    }
-
-    func event(file: String = #file, function: String = #function, line: Int = #line, message: @autoclosure () -> String) {
-        writeLog(with: Log.Attributes(severity: .event, file: file, function: function, line: line), message: message)
-    }
-
-    func debug(file: String = #file, function: String = #function, line: Int = #line, message: @autoclosure () -> String) {
-        writeLog(with: Log.Attributes(severity: .debug, file: file, function: function, line: line), message: message)
-    }
-
-    func warning(file: String = #file, function: String = #function, line: Int = #line, message: @autoclosure () -> String) {
-        writeLog(with: Log.Attributes(severity: .warning, file: file, function: function, line: line), message: message)
-    }
-
-    func fatal(file: String = #file, function: String = #function, line: Int = #line, message: @autoclosure () -> String) {
-        writeLog(with: Log.Attributes(severity: .fatal, file: file, function: function, line: line), message: message)
-    }
-
-}
+// MARK: - Procedure Log
 
 
 // MARK: - Deprecations
 
-public extension LoggerProtocol {
+public extension LogChannel {
 
-    @available(*, deprecated: 5.0.0, renamed: "info(message:)", message: "The .notice severity has been deprecated use .info, .event or .debug instead")
+    @available(*, deprecated: 5.0.0, renamed: "info.message", message: "The .notice severity has been deprecated use .info, .event or .debug instead")
     func notice(message: @autoclosure () -> String, file: String = #file, function: String = #function, line: Int = #line) {
-        info(file: file, function: function, line: line, message: message)
+//        info(file: file, function: function, line: line, message: message)
     }
 }
 

@@ -17,7 +17,7 @@ class DataProcessing: Procedure, InputProcedure, OutputProcedure {
             finish(with: ProcedureKitError.requirementNotSatisfied())
             return
         }
-        log.info(message: output)
+        log.info.message(output)
         finish()
     }
 }
@@ -28,7 +28,7 @@ class Printing: Procedure, InputProcedure, OutputProcedure {
 
     override func execute() {
         if let message = input.value {
-            log.info(message: message)
+            log.info.message(message)
         }
         finish()
     }

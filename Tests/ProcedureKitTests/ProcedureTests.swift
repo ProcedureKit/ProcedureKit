@@ -389,6 +389,8 @@ class ProcedureTests: ProcedureKitTestCase {
 
         let group = GroupProcedure(operations: [])
         XCTAssertEqual(group.name, "GroupProcedure")
+
+        wait(for: group)
     }
 
     func test__identity_is_equatable() {

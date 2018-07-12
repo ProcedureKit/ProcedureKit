@@ -198,7 +198,6 @@ class CloudKitProcedureAcceptSharesOperationTests: CKProcedureTestCase {
         }
         var didExecuteBlock = false
         cloudkit.setAcceptSharesCompletionBlock { didExecuteBlock = true }
-        cloudkit.log.severity = .verbose
         wait(for: cloudkit)
         PKAssertProcedureFinished(cloudkit)
         XCTAssertTrue(didExecuteBlock)

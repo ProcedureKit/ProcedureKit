@@ -138,7 +138,6 @@
 		65D367171E183FB000D03E86 /* FilterProcedureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D366F01E183FB000D03E86 /* FilterProcedureTests.swift */; };
 		65D367191E183FB000D03E86 /* FinishingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D366F11E183FB000D03E86 /* FinishingTests.swift */; };
 		65D3671B1E183FB000D03E86 /* GroupTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D366F21E183FB000D03E86 /* GroupTests.swift */; };
-		65D3671D1E183FB000D03E86 /* LoggerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D366F31E183FB000D03E86 /* LoggerTests.swift */; };
 		65D3671F1E183FB000D03E86 /* MapProcedureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D366F41E183FB000D03E86 /* MapProcedureTests.swift */; };
 		65D367211E183FB000D03E86 /* MutualExclusivityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D366F51E183FB000D03E86 /* MutualExclusivityTests.swift */; };
 		65D367231E183FB000D03E86 /* NegatedConditionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D366F61E183FB000D03E86 /* NegatedConditionTests.swift */; };
@@ -2338,7 +2337,6 @@
 				65D367191E183FB000D03E86 /* FinishingTests.swift in Sources */,
 				EEE79AEE1E21C9750030C768 /* KVONotificationTests.swift in Sources */,
 				65D367131E183FB000D03E86 /* ConditionTests.swift in Sources */,
-				65D3671D1E183FB000D03E86 /* LoggerTests.swift in Sources */,
 				65D3673D1E183FB000D03E86 /* TimeoutObserverTests.swift in Sources */,
 				EE3371091E29AD5A004272E9 /* DispatchQueueExtensionsTests.swift in Sources */,
 				65D3673F1E183FB000D03E86 /* TransformProcedureTests.swift in Sources */,

@@ -49,13 +49,13 @@ class NetworkReachabilityWaitProcedureTests: ProcedureKitTestCase {
         let changeNetwork1 = BlockProcedure {
             self.network.flags = [ .reachable, .isWWAN ]
         }
-        changeNetwork1.add(dependency: delay1)
+        changeNetwork1.addDependency(delay1)
 
         let delay2 = DelayProcedure(by: 0.2)
         let changeNetwork2 = BlockProcedure {
             self.network.flags = .reachable
         }
-        changeNetwork2.add(dependency: delay2)
+        changeNetwork2.addDependency(delay2)
 
 
         wait(forAll: [delay1, changeNetwork1, delay2, changeNetwork2, procedure])

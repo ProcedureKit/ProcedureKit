@@ -270,19 +270,11 @@ struct PrintableProfileResult: CustomStringConvertible {
     }
 }
 
-public class _ProcedureProfileLogger<Manager: GlobalLogSettingsProtocol>: ProcedureProfilerReporter {
-
-    private(set) var logger: ProcedureKitLogger<Manager>
-
-    public init(enabled: Bool = Manager.enabled, severity: Log.Severity = Manager.severity) {
-
-        self.logger = ProcedureKitLogger<Manager>(enabled: enabled, severity: severity)
-    }
+public class _ProcedureProfileLogger<Settings: LogSettings>: Log.Channels<Settings>, ProcedureProfilerReporter {
 
     public func finishedProfiling(withResult result: ProfileResult) {
-        // TODO: Set Operation Name properly
-//        self.logger.operationName = result.identity.description
-        self.logger.info(message: "finished profiling with results:\n\(PrintableProfileResult(result: result))")
+        formatter = Log.Formatters.makeProcedureLogFormatter(operationName: result.identity.description)
+        current.message("finished profiling with results:\n\(PrintableProfileResult(result: result))")
     }
 }
 

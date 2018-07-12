@@ -89,7 +89,7 @@ class BackgroundObserverTests: ProcedureKitTestCase {
         }
 
         // add the background observer
-        procedure.add(observer: backgroundObserver)
+        procedure.addObserver(backgroundObserver)
 
         // wait for attaching the BackgroundObserver to attempt to begin the background task
         weak var expDidBeginTask = expectation(description: "Attaching BackgroundObserver did begin background task")
