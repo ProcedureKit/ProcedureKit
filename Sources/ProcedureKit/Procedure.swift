@@ -430,6 +430,7 @@ open class Procedure: Operation, ProcedureProtocol {
 
     final internal var system: ProcedureLog {
         get { return synchronise { protectedProperties.system } }
+        set { synchronise { protectedProperties.system = newValue } }
     }
 
     // MARK: Observers
@@ -791,7 +792,7 @@ open class Procedure: Operation, ProcedureProtocol {
 
         guard nextState2 == .executing else { return }
 
-        system.info.message("Will Execute")
+        system.verbose.message("Will Execute")
 
         // Call the execute() function (which should be overriden in Procedure subclasses)
         if let underlyingQueue = queue?.underlyingQueue {

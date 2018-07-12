@@ -102,6 +102,7 @@ open class UIBlockProcedure: AsyncBlockProcedure {
             }
 
             sub.log.enabled = false
+            sub.system.enabled = false
 
             sub.addDidFinishBlockObserver { (_, error) in
                 if let error = error {

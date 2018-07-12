@@ -127,6 +127,7 @@ open class ProcedureKitTestCase: XCTestCase {
     func makeFinishingProcedure(for procedure: Procedure, withExpectationDescription expectationDescription: String = #function) -> Procedure {
         let finishing = BlockProcedure { }
         finishing.log.enabled = false
+        finishing.system.enabled = false
         finishing.addDependency(procedure)
         // Adds a will add operation observer, which adds the produced operation as a dependency
         // of the finishing procedure. This way, we don't actually finish, until the
