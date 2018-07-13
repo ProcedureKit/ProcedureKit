@@ -428,7 +428,7 @@ open class Procedure: Operation, ProcedureProtocol {
         set { synchronise { protectedProperties.log = newValue } }
     }
 
-    final internal var system: ProcedureLog {
+    final public var system: ProcedureLog {
         get { return synchronise { protectedProperties.system } }
         set { synchronise { protectedProperties.system = newValue } }
     }
@@ -1089,8 +1089,6 @@ open class Procedure: Operation, ProcedureProtocol {
      - parameter errors: an array of `Error`, which defaults to empty.
      */
     public func finish(with error: Error? = nil) {
-        system.verbose.trace()
-        system.verbose.message("finish() called")
         finish(with: error, from: .finish)
     }
 
@@ -1275,7 +1273,7 @@ open class Procedure: Operation, ProcedureProtocol {
                 // Once all the DidFinishObservers have completed, log a final notice
 
                 if let error = resultingError {
-                    self.system.info.message("Did finish with error: \(error).")
+                    self.system.warning.message("Did finish with error: \(error).")
                 }
                 else {
                     self.system.info.message("Did finish without errors.")

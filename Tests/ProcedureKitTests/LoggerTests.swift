@@ -8,19 +8,7 @@ import XCTest
 @testable import ProcedureKit
 import TestingProcedureKit
 
-class LoggingTests: ProcedureKitTestCase {
-
-    static let defaultEnabled = Log.enabled
-    static let defaultSeverity = Log.severity
-
-    override func tearDown() {
-        Log.enabled = LoggingTests.defaultEnabled
-        Log.severity = LoggingTests.defaultSeverity
-        super.tearDown()
-    }
-}
-
-class LoggerTests: LoggingTests {
+class LoggerTests: LoggingTestCase {
 
     var severity: Log.Severity!
     var log: Logger!
@@ -76,7 +64,7 @@ class LoggerTests: LoggingTests {
 */
 }
 
-class LogManagerTests: LoggingTests {
+class LogManagerTests: LoggingTestCase {
 
     func test__severity() {
         Log.severity = .debug
