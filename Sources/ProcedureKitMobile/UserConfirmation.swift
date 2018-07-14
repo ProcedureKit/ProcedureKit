@@ -29,7 +29,7 @@ public class UserConfirmationCondition: Condition {
         alert.add(actionWithTitle: cancelMessage, style: .cancel) { [weak self] _, _ in
             self?.response = .cancelled
         }
-        produce(dependency: alert)
+        produceDependency(alert)
     }
 
     public override func evaluate(procedure: Procedure, completion: @escaping (ConditionResult) -> Void) {

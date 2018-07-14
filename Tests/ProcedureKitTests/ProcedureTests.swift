@@ -389,6 +389,8 @@ class ProcedureTests: ProcedureKitTestCase {
 
         let group = GroupProcedure(operations: [])
         XCTAssertEqual(group.name, "GroupProcedure")
+
+        wait(for: group)
     }
 
     func test__identity_is_equatable() {
@@ -560,7 +562,6 @@ class ProduceTests: ProcedureKitTestCase {
     }
 
     func test__procedure_produce_operation_before_finish() {
-        LogManager.severity = .verbose
         let producedOperation = BlockProcedure { usleep(5000) }
         producedOperation.name = "ProducedOperation"
         let procedure = EventConcurrencyTrackingProcedure() { procedure in

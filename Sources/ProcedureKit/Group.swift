@@ -298,7 +298,7 @@ public extension GroupProcedure {
         }
         set {
             groupStateLock.withCriticalScope {
-                log.verbose(message: "isSuspended = \(newValue), (old value: \(_groupIsSuspended))")
+                system.verbose.message("isSuspended = \(newValue), (old value: \(_groupIsSuspended))")
                 _groupIsSuspended = newValue
                 queue.isSuspended = newValue
             }
@@ -336,6 +336,9 @@ public extension GroupProcedure {
 
     private func shouldAdd<Additional: Collection>(additional: Additional, toOperationsArray shouldAddToProperty: Bool) -> Bool where Additional.Iterator.Element: Operation {
         return groupStateLock.withCriticalScope {
+
+            system.verbose.trace()
+
             guard !_groupIsFinishing else {
                 assertionFailure("Cannot add new operations to a group after the group has started to finish.")
                 return false
@@ -373,7 +376,8 @@ public extension GroupProcedure {
             return
         }
 
-        log.verbose(message: "is adding \(additional.count) child operations to the queue.")
+        system.verbose.trace()
+        system.verbose.message("is adding \(additional.count) child operations to the queue.")
 
         // If the Group is cancelled, cancel the additional operations
         if isCancelled {
@@ -394,6 +398,8 @@ public extension GroupProcedure {
 
         eventQueue.debugAssertIsOnQueue()
 
+        system.verbose.trace()
+
         // groupWillAdd(child:) override
         additional.forEach { self.groupWillAdd(child: $0) }
 
@@ -411,7 +417,7 @@ public extension GroupProcedure {
 
                 if let pendingEvent = pendingEvent {
                     pendingEvent.doBeforeEvent {
-                        self.log.verbose(message: "Children (\(additional)) added prior to (\(pendingEvent)).")
+                        self.system.verbose.message("Children (\(additional)) added prior to (\(pendingEvent)).")
                     }
                 }
 
@@ -423,7 +429,7 @@ public extension GroupProcedure {
                 }
 
                 self.optimizedDispatchEventNotify(group: didAddObserversGroup) {
-                    self.log.verbose(message: "finished adding child operations to the queue.")
+                    self.system.verbose.message("finished adding child operations to the queue.")
                 }
             }
         }
@@ -489,7 +495,7 @@ internal extension GroupProcedure {
 
                 transformChildError(procedure, &childError)
 
-                strongGroup.log.verbose(message: "Child error for <\(procedure.operationName)> was transformed.")
+                strongGroup.system.verbose.message("Child error for <\(procedure.operationName)> was transformed.")
             }
             return promise.future
         }
@@ -627,8 +633,8 @@ fileprivate extension GroupProcedure {
         func execute() {
 
             if let group = group {
-
-                group.log.verbose(message: "executing can finish group operation.")
+                group.system.verbose.trace()
+                group.system.verbose.message("executing can finish group operation.")
 
                 // All operations that were added as a side-effect of anything up to
                 // WillFinishObservers of prior operations should have been executed.
@@ -652,7 +658,7 @@ fileprivate extension GroupProcedure {
                         // Children were added after this CanFinishOperation became
                         // ready, but before it executed or before the lock could be acquired.
 
-                        group.log.verbose(message: "cannot finish now, as there are children still active.")
+                        group.system.verbose.message("cannot finish now, as there are children still active.")
 
                         // The GroupProcedure should wait for these children to finish
                         // before finishing. Add the oustanding children as
@@ -667,7 +673,7 @@ fileprivate extension GroupProcedure {
                         // There are no additional children to handle.
                         // Ensure that no new operations can be added.
 
-                        group.log.verbose(message: "can now finish.")
+                        group.system.verbose.message("can now finish.")
 
                         group._groupIsFinishing = true
 

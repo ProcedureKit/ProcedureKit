@@ -84,7 +84,7 @@ open class UserLocationProcedure: Procedure, OutputProcedure, CLLocationManagerD
             output = .ready(.success(location))
             return
         }
-        log.info(message: "Updated last location: \(location)")
+        log.info.message("Updated last location: \(location)")
         DispatchQueue.main.async { [weak self] in
             guard let strongSelf = self, !strongSelf.isFinished else { return }
             strongSelf.stopLocationUpdates()

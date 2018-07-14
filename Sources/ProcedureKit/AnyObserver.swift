@@ -114,7 +114,7 @@ internal class TransformObserver<O: ProcedureProtocol, R: ProcedureProtocol>: Pr
 
     private func typedProcedure(_ procedure: R, event: Event) -> O? {
         guard let typedProcedure = procedureTransformBlock(procedure) else {
-            procedure.log.warning(message: ("Observer will not receive event (\(event.string)). Unable to convert \(procedure) to the expected type \"\(String(describing: O.self))\""))
+            procedure.log.warning.message("Observer will not receive event (\(event.string)). Unable to convert \(procedure) to the expected type \"\(String(describing: O.self))\"")
             return nil
         }
         return typedProcedure

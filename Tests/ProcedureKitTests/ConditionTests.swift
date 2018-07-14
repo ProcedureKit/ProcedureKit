@@ -109,7 +109,6 @@ class ConditionTests: ProcedureKitTestCase {
     }
 
     func test__single_condition_which_is_failed() {
-        procedure.log.severity = .verbose
         procedure.addCondition(FalseCondition())
         wait(for: procedure)
         PKAssertProcedureCancelledWithError(procedure, ProcedureKitError.FalseCondition())

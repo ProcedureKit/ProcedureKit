@@ -48,6 +48,8 @@
 		65A0E4C320BB1975002D6C8C /* LoadCoreDataProcedureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65A0E4C220BB1975002D6C8C /* LoadCoreDataProcedureTests.swift */; };
 		65A0E4C520BB2E51002D6C8C /* SaveManagedObjectContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65A0E4C420BB2E51002D6C8C /* SaveManagedObjectContext.swift */; };
 		65A0E4C820BC5540002D6C8C /* SaveManagedObjectContextProcedureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65A0E4C620BC548A002D6C8C /* SaveManagedObjectContextProcedureTests.swift */; };
+		65A1923920F88FD300E0D42C /* LoggingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65A1923820F88FD300E0D42C /* LoggingTests.swift */; };
+		65A1923B20F8900100E0D42C /* TestableLogging.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65A1923A20F8900100E0D42C /* TestableLogging.swift */; };
 		65A72C2A1DA7F37C008597CA /* ProcedureKit.framework in Copy Dependencies */ = {isa = PBXBuildFile; fileRef = 65CFC5F01D608A5500CAD875 /* ProcedureKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		65A72C2B1DA7F37C008597CA /* TestingProcedureKit.framework in Copy Dependencies */ = {isa = PBXBuildFile; fileRef = 65CFC6161D60900000CAD875 /* TestingProcedureKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		65AB7DDA209B95B400726796 /* Batch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65AB7DD9209B95B400726796 /* Batch.swift */; };
@@ -138,7 +140,6 @@
 		65D367171E183FB000D03E86 /* FilterProcedureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D366F01E183FB000D03E86 /* FilterProcedureTests.swift */; };
 		65D367191E183FB000D03E86 /* FinishingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D366F11E183FB000D03E86 /* FinishingTests.swift */; };
 		65D3671B1E183FB000D03E86 /* GroupTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D366F21E183FB000D03E86 /* GroupTests.swift */; };
-		65D3671D1E183FB000D03E86 /* LoggerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D366F31E183FB000D03E86 /* LoggerTests.swift */; };
 		65D3671F1E183FB000D03E86 /* MapProcedureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D366F41E183FB000D03E86 /* MapProcedureTests.swift */; };
 		65D367211E183FB000D03E86 /* MutualExclusivityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D366F51E183FB000D03E86 /* MutualExclusivityTests.swift */; };
 		65D367231E183FB000D03E86 /* NegatedConditionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D366F61E183FB000D03E86 /* NegatedConditionTests.swift */; };
@@ -581,6 +582,8 @@
 		65A0E4C220BB1975002D6C8C /* LoadCoreDataProcedureTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadCoreDataProcedureTests.swift; sourceTree = "<group>"; };
 		65A0E4C420BB2E51002D6C8C /* SaveManagedObjectContext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaveManagedObjectContext.swift; sourceTree = "<group>"; };
 		65A0E4C620BC548A002D6C8C /* SaveManagedObjectContextProcedureTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaveManagedObjectContextProcedureTests.swift; sourceTree = "<group>"; };
+		65A1923820F88FD300E0D42C /* LoggingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoggingTests.swift; sourceTree = "<group>"; };
+		65A1923A20F8900100E0D42C /* TestableLogging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestableLogging.swift; sourceTree = "<group>"; };
 		65AB7DD9209B95B400726796 /* Batch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Batch.swift; sourceTree = "<group>"; };
 		65AEF19E20A3AE340089B6C8 /* ViewControllerContainment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewControllerContainment.swift; sourceTree = "<group>"; };
 		65C88D761DC4EB4300C8D4EB /* Warnings.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = Warnings.xcconfig; path = "Supporting Files/Warnings.xcconfig"; sourceTree = "<group>"; };
@@ -1163,6 +1166,7 @@
 				652F903E209E445200365B2D /* IgnoreErrorsProcedureTests.swift */,
 				EEE79AED1E21C9750030C768 /* KVONotificationTests.swift */,
 				65D366F31E183FB000D03E86 /* LoggerTests.swift */,
+				65A1923820F88FD300E0D42C /* LoggingTests.swift */,
 				65D366F41E183FB000D03E86 /* MapProcedureTests.swift */,
 				65D366F51E183FB000D03E86 /* MutualExclusivityTests.swift */,
 				65D366F61E183FB000D03E86 /* NegatedConditionTests.swift */,
@@ -1223,6 +1227,7 @@
 				65D367CA1E1844E500D03E86 /* QueueTestDelegate.swift */,
 				65D367CB1E1844E500D03E86 /* RepeatTestCase.swift */,
 				65D367CC1E1844E500D03E86 /* StressTestCase.swift */,
+				65A1923A20F8900100E0D42C /* TestableLogging.swift */,
 				65D367CD1E1844E500D03E86 /* TestableNetwork.swift */,
 				65D367CE1E1844E500D03E86 /* TestableNetworkReachability.swift */,
 				65D367CF1E1844E500D03E86 /* TestCondition.swift */,
@@ -2333,12 +2338,12 @@
 				652F903F209E445200365B2D /* IgnoreErrorsProcedureTests.swift in Sources */,
 				65D367091E183FB000D03E86 /* BlockObserverTests.swift in Sources */,
 				65D367391E183FB000D03E86 /* RetryProcedureTests.swift in Sources */,
+				65A1923920F88FD300E0D42C /* LoggingTests.swift in Sources */,
 				65D367331E183FB000D03E86 /* ReduceProcedureTests.swift in Sources */,
 				65D367251E183FB000D03E86 /* NetworkObserverTests.swift in Sources */,
 				65D367191E183FB000D03E86 /* FinishingTests.swift in Sources */,
 				EEE79AEE1E21C9750030C768 /* KVONotificationTests.swift in Sources */,
 				65D367131E183FB000D03E86 /* ConditionTests.swift in Sources */,
-				65D3671D1E183FB000D03E86 /* LoggerTests.swift in Sources */,
 				65D3673D1E183FB000D03E86 /* TimeoutObserverTests.swift in Sources */,
 				EE3371091E29AD5A004272E9 /* DispatchQueueExtensionsTests.swift in Sources */,
 				65D3673F1E183FB000D03E86 /* TransformProcedureTests.swift in Sources */,
@@ -2378,6 +2383,7 @@
 				65D367D41E1844E500D03E86 /* GroupTestCase.swift in Sources */,
 				65D367D21E1844E500D03E86 /* CapabilityTestCase.swift in Sources */,
 				65D367D81E1844E500D03E86 /* StressTestCase.swift in Sources */,
+				65A1923B20F8900100E0D42C /* TestableLogging.swift in Sources */,
 				65D367D61E1844E500D03E86 /* QueueTestDelegate.swift in Sources */,
 				65D367D51E1844E500D03E86 /* ProcedureKitTestCase.swift in Sources */,
 				65D367DB1E1844E500D03E86 /* TestCondition.swift in Sources */,
