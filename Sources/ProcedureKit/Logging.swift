@@ -397,7 +397,7 @@ public extension Log {
     public struct Writers {
 
         public static let standard: LogWriter = {
-            if #available(iOS 10.0, iOSApplicationExtension 10.0, OSX 10.12, OSXApplicationExtension 10.12, *) {
+            if #available(iOS 10.0, iOSApplicationExtension 10.0, tvOS 10.0, tvOSApplicationExtension 10.0, OSX 10.12, OSXApplicationExtension 10.12, *) {
                 return OSLogWriter()
             }
             else {
@@ -406,7 +406,7 @@ public extension Log {
         }()
 
         public static let system: LogWriter = {
-            if #available(iOS 10.0, iOSApplicationExtension 10.0, OSX 10.12, OSXApplicationExtension 10.12, *) {
+            if #available(iOS 10.0, iOSApplicationExtension 10.0, tvOS 10.0, tvOSApplicationExtension 10.0, OSX 10.12, OSXApplicationExtension 10.12, *) {
                 return Log.Writers.OSLogWriter(log: .procedure)
             }
             else {
@@ -503,7 +503,7 @@ extension Log.Severity: CustomStringConvertible {
 
 // MARK: - OS Log Writer
 
-@available(iOS 10.0, iOSApplicationExtension 10.0, OSX 10.12, OSXApplicationExtension 10.12, *)
+@available(iOS 10.0, iOSApplicationExtension 10.0, tvOS 10.0, tvOSApplicationExtension 10.0, OSX 10.12, OSXApplicationExtension 10.12, *)
 internal extension Log.Severity {
 
     var logType: OSLogType {
@@ -520,7 +520,7 @@ internal extension Log.Severity {
     }
 }
 
-@available(iOS 10.0, iOSApplicationExtension 10.0, OSX 10.12, OSXApplicationExtension 10.12, *)
+@available(iOS 10.0, iOSApplicationExtension 10.0, tvOS 10.0, tvOSApplicationExtension 10.0, OSX 10.12, OSXApplicationExtension 10.12, *)
 internal extension OSLog {
 
     static let procedure = OSLog(subsystem: "run.kit.procedure", category: "ProcedureKit")
@@ -528,7 +528,7 @@ internal extension OSLog {
 
 internal extension Log.Writers {
 
-    @available(iOS 10.0, iOSApplicationExtension 10.0, OSX 10.12, OSXApplicationExtension 10.12, *)
+    @available(iOS 10.0, iOSApplicationExtension 10.0, tvOS 10.0, tvOSApplicationExtension 10.0, OSX 10.12, OSXApplicationExtension 10.12, *)
     class OSLogWriter: LogWriter {
 
         let log: OSLog
