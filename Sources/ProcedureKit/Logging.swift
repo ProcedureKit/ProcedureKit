@@ -108,6 +108,15 @@ public class Log {
             return "\(metadata) \(payload.description)"
         }
 
+        public var message: String? {
+            switch payload {
+            case let .message(message):
+                return message
+            default:
+                return nil
+            }
+        }
+
         public init(payload: Payload, formattedMetadata: String? = nil, severity: Log.Severity, file: String, function: String, line: Int, threadID: UInt64, timestamp: Date = Date()) {
             self.payload = payload
             self.formattedMetadata = formattedMetadata
@@ -122,7 +131,9 @@ public class Log {
         }
 
         func append(formattedMetadata newFormattedMetadata: String?) -> Log.Entry {
-            guard let newFormattedMetadata = newFormattedMetadata else { return self }
+            guard let newFormattedMetadata = newFormattedMetadata?.trimmingCharacters(in: .whitespacesAndNewlines) else { return self }
+            guard false == newFormattedMetadata.isEmpty else { return self }
+
             let new: String
             if let old = formattedMetadata, !old.isEmpty {
                 new = "\(old) \(newFormattedMetadata)"
@@ -203,7 +214,7 @@ public typealias ProcedureLog = LogChannels & LogChannel
 public extension LogChannel {
 
     func shouldWrite(severity: Log.Severity) -> Bool {
-        return enabled && Log.enabled && (severity >= Log.severity)
+        return enabled && Log.enabled && (severity >= self.severity)
     }
 
     func write(entry: Log.Entry) {
@@ -551,7 +562,7 @@ public extension LogChannel {
 
     @available(*, deprecated: 5.0.0, renamed: "info.message", message: "The .notice severity has been deprecated use .info, .event or .debug instead")
     func notice(message: @autoclosure () -> String, file: String = #file, function: String = #function, line: Int = #line) {
-//        info(file: file, function: function, line: line, message: message)
+        self.message(message(), file: file, function: function, line: line)
     }
 }
 

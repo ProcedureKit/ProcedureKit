@@ -25,7 +25,9 @@ public class TestableLogWriter: LogWriter {
     }
 
     public func write(entry: Log.Entry) {
-        synchronise { _entries.append(entry) }
+        synchronise {
+            _entries.append(entry)            
+        }
     }
 }
 
@@ -77,3 +79,51 @@ public class TestableLogSettings: LogSettings {
         set { shared.formatter = newValue }
     }
 }
+
+open class LoggingTestCase: ProcedureKitTestCase {
+
+    open var entry: Log.Entry!
+
+    override open func setUp() {
+        super.setUp()
+        TestableLogSettings.writer = TestableLogWriter()
+        TestableLogSettings.formatter = TestableLogFormatter()
+        entry = Log.Entry(payload: .message("Hello World"), severity: .debug, file: "the file", function: "the function", line: 100, threadID: 1000)
+    }
+
+    override open func tearDown() {
+        Log.enabled = true
+        Log.severity = .warning
+        entry = nil
+        super.tearDown()
+    }
+}
+
+public extension ProcedureKitTestCase {
+
+    func PKAssertProcedureLogContainsMessage<T: Procedure>(_ exp: @autoclosure () throws -> T, _ exp2: @autoclosure () throws -> String, _ message: @autoclosure () -> String = "", file: StaticString = #file, line: UInt = #line) {
+        __XCTEvaluateAssertion(testCase: self, message, file: file, line: line) {
+
+            let procedure = try exp()
+
+            guard let writer = procedure.log.writer as? TestableLogWriter else {
+                return .expectedFailure("\(procedure.procedureName) did not have a testable log writer.")
+            }
+
+            let loggedMessages: [String] = writer.entries.compactMap { $0.message }
+
+            guard loggedMessages.count > 0 else {
+                return .expectedFailure("\(procedure.procedureName) did not log any messages")
+            }
+
+            let text = try exp2()
+
+            guard loggedMessages.contains(text) else {
+                return .expectedFailure("\(procedure.procedureName) did not log the message: \(text)")
+            }
+
+            return .success
+        }
+    }
+}
+

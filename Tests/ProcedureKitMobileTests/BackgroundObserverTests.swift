@@ -35,6 +35,7 @@ class BackgroundObserverTests: ProcedureKitTestCase {
     override func setUp() {
         super.setUp()
         backgroundProcedure = WaitsToFinishProcedure()
+        backgroundProcedure.log.writer = TestableLogWriter()
         backgroundTaskName = "Hello world"
         taskGroup = DispatchGroup()
         didBeginTaskBlock = { name, identifier in
@@ -144,11 +145,6 @@ class BackgroundObserverTests: ProcedureKitTestCase {
         // simulate the state in which running in the background is not possible
         testableApplication.backgroundExecutionDisabled = true
 
-        let loggedEntries = Protector<[LoggerInfo]>([])
-        backgroundProcedure.log.logger = { info in
-            loggedEntries.append(info)
-        }
-
         observer = BackgroundObserver(manager: testableBackgroundManager)
 
         // add the background observer
@@ -161,10 +157,7 @@ class BackgroundObserverTests: ProcedureKitTestCase {
         // 2.) But beginBackgroundTask should have returned UIBackgroundTaskInvalid
         XCTAssertEqual(backgroundTaskIdentifier, UIBackgroundTaskInvalid)
         // 3.) Which should have resulted in a warning being logged by the BackgroundObserver
-        XCTAssertTrue(loggedEntries.access.contains(where: { (info) -> Bool in
-            return info.severity == .warning &&
-            info.message.hasSuffix(BackgroundObserver.logMessage_FailedToInitiateBackgroundTask)
-        }))
+        PKAssertProcedureLogContainsMessage(backgroundProcedure, BackgroundObserver.logMessage_FailedToInitiateBackgroundTask)
 
         // run and finish the Procedure
         backgroundProcedure.addDidExecuteBlockObserver { backgroundProcedure in
