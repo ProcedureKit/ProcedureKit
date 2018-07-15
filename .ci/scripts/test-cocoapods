@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+set -euo pipefail
+set +u
+source /usr/local/opt/chruby/share/chruby/chruby.sh
+chruby ruby
+set -u
+
+echo "cd Integrations/CocoaPods"
+cd "Integrations/CocoaPods"
+
+echo "bundle install --quiet"
+bundle install --quiet
+
+echo "--- CocoaPods"
+bundle exec pod install
+
+echo "--- Mac Build & Test"
+
+echo "bundle exec xcodebuild -workspace TryProcedureKit.xcworkspace -scheme TryProcedureKit clean build test | xcpretty"
+bundle exec xcodebuild -workspace TryProcedureKit.xcworkspace -scheme TryProcedureKit clean build test | xcpretty
