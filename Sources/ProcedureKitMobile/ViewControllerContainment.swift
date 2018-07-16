@@ -28,7 +28,7 @@ public enum SetAutolayoutConstraints {
     // Provide a custom block
     case custom(SetAutolayoutConstraintsBlockType)
 
-    var block: SetAutolayoutConstraintsBlockType {
+    public var block: SetAutolayoutConstraintsBlockType {
         switch self {
         case .pinnedToParent:
             return { views in
