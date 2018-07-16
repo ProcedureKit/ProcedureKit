@@ -85,10 +85,10 @@ open class UIBlockProcedure: AsyncBlockProcedure {
             func go(_ finishingBlock: FinishingBlock) {
                 do {
                     try block()
-                    finishWithResult(success)
+                    finishingBlock(success)
                 }
                 catch {
-                    finishWithResult(.failure(error))
+                    finishingBlock(.failure(error))
                 }
             }
 
