@@ -86,6 +86,8 @@ open class LoggingTestCase: ProcedureKitTestCase {
 
     override open func setUp() {
         super.setUp()
+        Log.enabled = true
+        Log.severity = .verbose
         TestableLogSettings.writer = TestableLogWriter()
         TestableLogSettings.formatter = TestableLogFormatter()
         entry = Log.Entry(payload: .message("Hello World"), severity: .debug, file: "the file", function: "the function", line: 100, threadID: 1000)

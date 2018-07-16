@@ -214,7 +214,7 @@ public typealias ProcedureLog = LogChannels & LogChannel
 public extension LogChannel {
 
     func shouldWrite(severity: Log.Severity) -> Bool {
-        return enabled && Log.enabled && (severity >= self.severity)
+        return enabled && Log.enabled && (self.severity >= Log.severity) && (severity >= self.severity)
     }
 
     func write(entry: Log.Entry) {
@@ -471,6 +471,7 @@ public extension Log.Formatters {
     public class CallsiteFormatter: LogFormatter {
 
         public func format(entry: Log.Entry) -> Log.Entry {
+            guard false == entry.file.contains("ProcedureKit") else { return entry }
             let filename = (entry.file as NSString).pathComponents.last ?? "redacted"
             return entry.append(formattedMetadata: "\(filename):\(entry.line)")
         }

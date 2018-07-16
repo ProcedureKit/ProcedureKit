@@ -656,7 +656,6 @@
 		65D366F01E183FB000D03E86 /* FilterProcedureTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FilterProcedureTests.swift; sourceTree = "<group>"; };
 		65D366F11E183FB000D03E86 /* FinishingTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FinishingTests.swift; sourceTree = "<group>"; };
 		65D366F21E183FB000D03E86 /* GroupTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GroupTests.swift; sourceTree = "<group>"; };
-		65D366F31E183FB000D03E86 /* LoggerTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoggerTests.swift; sourceTree = "<group>"; };
 		65D366F41E183FB000D03E86 /* MapProcedureTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MapProcedureTests.swift; sourceTree = "<group>"; };
 		65D366F51E183FB000D03E86 /* MutualExclusivityTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MutualExclusivityTests.swift; sourceTree = "<group>"; };
 		65D366F61E183FB000D03E86 /* NegatedConditionTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NegatedConditionTests.swift; sourceTree = "<group>"; };
@@ -1165,7 +1164,6 @@
 				65D366F21E183FB000D03E86 /* GroupTests.swift */,
 				652F903E209E445200365B2D /* IgnoreErrorsProcedureTests.swift */,
 				EEE79AED1E21C9750030C768 /* KVONotificationTests.swift */,
-				65D366F31E183FB000D03E86 /* LoggerTests.swift */,
 				65A1923820F88FD300E0D42C /* LoggingTests.swift */,
 				65D366F41E183FB000D03E86 /* MapProcedureTests.swift */,
 				65D366F51E183FB000D03E86 /* MutualExclusivityTests.swift */,
