@@ -34,6 +34,7 @@ class BackgroundObserverTests: ProcedureKitTestCase {
 
     override func setUp() {
         super.setUp()
+        Log.enabled = true
         backgroundProcedure = WaitsToFinishProcedure()
         backgroundProcedure.log.writer = TestableLogWriter()
         backgroundTaskName = "Hello world"
