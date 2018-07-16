@@ -93,6 +93,16 @@ class LogChannelTests: LoggingTestCase {
         XCTAssertFalse(channel.shouldWrite(severity: .fatal))
     }
 
+    func test__channel_shouldWrite_false_when_severity_less_than_channel_severity() {
+        channel.severity = .fatal
+        XCTAssertFalse(channel.shouldWrite(severity: .warning))
+    }
+
+    func test__channel_shouldWrite_false_when_severity_less_than_global_severity() {
+        Log.severity = .warning
+        XCTAssertFalse(channel.shouldWrite(severity: .info))
+    }
+
     func test__writer_receives_log_entry_with_trace() {
         guard let writer = TestableLogSettings.writer as? TestableLogWriter else {
             XCTFail("Did not have a testable log writer"); return

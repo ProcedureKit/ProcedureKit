@@ -33,6 +33,7 @@ open class ProcedureKitTestCase: XCTestCase {
         delegate = nil
         queue = nil
         procedure = nil
+        Log.enabled = false
         Log.severity = .warning
         ExclusivityManager.__tearDownForUnitTesting()
         super.tearDown()
