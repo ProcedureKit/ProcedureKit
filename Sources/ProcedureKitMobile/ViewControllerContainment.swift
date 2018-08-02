@@ -51,8 +51,8 @@ internal extension UIViewController {
     func add(child: UIViewController, with frame: CGRect? = nil, in subview: UIView, setAutolayoutConstraints block: @escaping SetAutolayoutConstraintsBlockType) {
         addChildViewController(child)
         child.view.frame = frame ?? CGRect(x: 0, y: 0, width: view.bounds.width, height: view.bounds.height)
-        view.addSubview(child.view)
-        block(AutolayoutViews(child: child.view, parent: view))
+        subview.addSubview(child.view)
+        block(AutolayoutViews(child: child.view, parent: subview))
         child.didMove(toParentViewController: self)
     }
 
