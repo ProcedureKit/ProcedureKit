@@ -9,14 +9,14 @@ open class BlockProcedure: Procedure {
     public typealias SelfBlock = (BlockProcedure) -> Void
     public typealias ThrowingVoidBlock = () throws -> Void
 
-    public enum BlockStorage {
+    enum BlockStorage {
         case asSelf(SelfBlock)
         case asVoid(ThrowingVoidBlock)
     }
 
     public static var defaultTimeoutInterval: TimeInterval = 3.0
 
-    public let storage: BlockStorage
+    let storage: BlockStorage
 
     public init(block: @escaping SelfBlock) {
         self.storage = .asSelf(block)
