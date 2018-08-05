@@ -4,111 +4,78 @@
 //  Copyright © 2015-2018 ProcedureKit. All rights reserved.
 //
 
-open class ResultProcedure<Output>: Procedure, OutputProcedure {
+open class BlockProcedure: Procedure {
 
-    public typealias ThrowingOutputBlock = () throws -> Output
+    public typealias SelfBlock = (BlockProcedure) -> Void
+    public typealias ThrowingVoidBlock = () throws -> Void
 
-    public var output: Pending<ProcedureResult<Output>> = .pending
+    public enum BlockStorage {
+        case asSelf(SelfBlock)
+        case asVoid(ThrowingVoidBlock)
+    }
 
-    public let block: ThrowingOutputBlock
+    public static var defaultTimeoutInterval: TimeInterval = 3.0
 
-    public init(block: @escaping ThrowingOutputBlock) {
-        self.block = block
+    public let storage: BlockStorage
+
+    public init(block: @escaping SelfBlock) {
+        self.storage = .asSelf(block)
+        super.init()
+        addObserver(TimeoutObserver(by: BlockProcedure.defaultTimeoutInterval))
+    }
+
+    public init(block: @escaping ThrowingVoidBlock) {
+        self.storage = .asVoid(block)
         super.init()
     }
 
     open override func execute() {
-        defer { finish(with: output.error) }
-        do { output = .ready(.success(try block())) }
-        catch { output = .ready(.failure(error)) }
+        switch storage {
+        case let .asSelf(block):
+            block(self)
+        case let .asVoid(block):
+            do {
+                try block()
+                finish()
+            }
+            catch { finish(with: error) }
+        }
+    }
+
+    open override func procedureDidCancel(with error: Error?) {
+        if let procedureKitError = error as? ProcedureKitError {
+            if case .timedOut(.by(BlockProcedure.defaultTimeoutInterval)) = procedureKitError.context {
+                log.warning.message("Block not finished after \(BlockProcedure.defaultTimeoutInterval) seconds. This is likely a mistake, check that this block calls .finish() on all code paths.")
+            }
+        }
     }
 }
-
-open class BlockProcedure: ResultProcedure<Void> { }
-
-open class AsyncResultProcedure<Output>: Procedure, OutputProcedure {
-
-    public typealias FinishingBlock = (ProcedureResult<Output>) -> Void
-    public typealias Block = (@escaping FinishingBlock) -> Void
-
-    public let block: Block
-
-    public var output: Pending<ProcedureResult<Output>> = .pending
-
-    public init(block: @escaping Block) {
-        self.block = block
-        super.init()
-    }
-
-    open override func execute() {
-        block { [weak self] in self?.finish(withResult: $0) }
-    }
-}
-
-open class AsyncBlockProcedure: AsyncResultProcedure<Void> { }
-
-open class CancellableResultProcedure<Output>: Procedure, OutputProcedure {
-
-    /// A block that receives a closure (that returns the current value of `isCancelled`
-    /// for the CancellableResultProcedure), and returns a value (which is set as the
-    /// CancellableResultProcedure's `output`).
-    public typealias ThrowingCancellableOutputBlock = (() -> Bool) throws -> Output
-
-    public var output: Pending<ProcedureResult<Output>> = .pending
-
-    public let block: ThrowingCancellableOutputBlock
-
-    public init(cancellableBlock: @escaping ThrowingCancellableOutputBlock) {
-        self.block = cancellableBlock
-        super.init()
-    }
-
-    open override func execute() {
-        defer { finish(with: output.error) }
-        do { output = .ready(.success(try block({[unowned self] in return self.isCancelled }))) }
-        catch { output = .ready(.failure(error)) }
-    }
-}
-
-open class CancellableBlockProcedure: CancellableResultProcedure<Void> { }
 
 /*
  A block based procedure which execute the provided block on the UI/main thread.
  */
-open class UIBlockProcedure: AsyncBlockProcedure {
-
-    public typealias ThrowingOutputBlock = () throws -> Output
-
-    public init(block: @escaping ThrowingOutputBlock) {
-        super.init { (finishWithResult) in
-
-            func go(_ finishingBlock: FinishingBlock) {
-                do {
-                    try block()
-                    finishingBlock(success)
-                }
-                catch {
-                    finishingBlock(.failure(error))
-                }
-            }
+open class UIBlockProcedure: BlockProcedure {
+    public override init(block: @escaping ThrowingVoidBlock) {
+        super.init { (procedure) in
 
             guard DispatchQueue.isMainDispatchQueue == false else {
-                go(finishWithResult)
+                do {
+                    try block()
+                    procedure.finish()
+                }
+                catch { procedure.finish(with: error) }
                 return
             }
 
-            let sub = AsyncBlockProcedure { finishWithResult in
-                go(finishWithResult)
-            }
-
+            let sub = BlockProcedure(block: block)
             sub.log.enabled = false
             sub.system.enabled = false
 
             sub.addDidFinishBlockObserver { (_, error) in
                 if let error = error {
-                    finishWithResult(.failure(ProcedureKitError.dependency(finishedWithError: error)))
+                    procedure.finish(with: ProcedureKitError.dependency(finishedWithError: error))
                 } else {
-                    finishWithResult(success)
+                    procedure.finish()
                 }
             }
 
@@ -116,3 +83,40 @@ open class UIBlockProcedure: AsyncBlockProcedure {
         }
     }
 }
+
+
+@available(*, deprecated: 5.0, message: "Use BlockProcedure directly and call .finish() on the block argument instead.")
+open class AsyncBlockProcedure: BlockProcedure {
+
+    public typealias Output = Void
+    public typealias FinishingBlock = (ProcedureResult<Output>) -> Void
+    public typealias Block = (@escaping FinishingBlock) -> Void
+
+    public init(block: @escaping Block) {
+        super.init { (procedure) in
+            block { result in
+                procedure.finish(with: result.error)
+            }
+        }
+    }
+}
+
+@available(*, deprecated: 5.0, message: "Use BlockProcedure directly and query the procedure argument inside your block.")
+open class CancellableBlockProcedure: BlockProcedure {
+
+    /// A block that receives a closure (that returns the current value of `isCancelled`
+    /// for the CancellableResultProcedure), and returns a value (which is set as the
+    /// CancellableResultProcedure's `output`).
+    public typealias ThrowingCancellableBlock = (() -> Bool) throws -> Void
+
+    public init(cancellableBlock: @escaping ThrowingCancellableBlock) {
+        super.init { (procedure) in
+            do {
+                try cancellableBlock { procedure.isCancelled }
+                procedure.finish()
+            }
+            catch { procedure.finish(with: error) }
+        }
+    }
+}
+
