@@ -157,8 +157,6 @@ class BackgroundObserverTests: ProcedureKitTestCase {
         XCTAssertEqual(testableApplication.backgroundTasks[0].0, expectedBackgroundTaskName)
         // 2.) But beginBackgroundTask should have returned UIBackgroundTaskInvalid
         XCTAssertEqual(backgroundTaskIdentifier, UIBackgroundTaskInvalid)
-        // 3.) Which should have resulted in a warning being logged by the BackgroundObserver
-        PKAssertProcedureLogContainsMessage(backgroundProcedure, BackgroundObserver.logMessage_FailedToInitiateBackgroundTask)
 
         // run and finish the Procedure
         backgroundProcedure.addDidExecuteBlockObserver { backgroundProcedure in
