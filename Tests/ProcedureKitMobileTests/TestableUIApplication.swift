@@ -54,6 +54,9 @@ class TestableUIApplication: BackgroundTaskApplicationProtocol {
     private var _backgroundExecutionDisabled: Bool = false
     private var _testableApplicationState: UIApplicationState
     private var _backgroundTasks: BackgroundTasks = []
+    
+    var applicationDidEnterBackground: ((_ application: TestableUIApplication) -> Void)?
+    var applicationDidBecomeActive: ((_ application: TestableUIApplication) -> Void)?
 
     init(state: UIApplicationState = .active, didBeginTask: DidBeginBackgroundTask? = nil, didEndTask: DidEndBackgroundTask? = nil) {
         _testableApplicationState = state
@@ -105,7 +108,8 @@ class TestableUIApplication: BackgroundTaskApplicationProtocol {
             fatalError("applicationState must be modified from the main thread (re: UIApplication thread-safety).")
         }
         stateLock.withCriticalScope { _testableApplicationState = .background }
-        NotificationCenter.default.post(name: NSNotification.Name.UIApplicationDidEnterBackground, object: self)
+        applicationDidEnterBackground?(self)
+        NotificationCenter.default.post(name: .UIApplicationDidEnterBackground, object: self)
     }
 
     /// - Requires: Must be called from the main thread / queue.
@@ -128,6 +132,7 @@ class TestableUIApplication: BackgroundTaskApplicationProtocol {
             fatalError("applicationState must be modified from the main thread (re: UIApplication thread-safety).")
         }
         stateLock.withCriticalScope { _testableApplicationState = .active }
-        NotificationCenter.default.post(name: NSNotification.Name.UIApplicationDidBecomeActive, object: self)
+        applicationDidBecomeActive?(self)
+        NotificationCenter.default.post(name: .UIApplicationDidBecomeActive, object: self)
     }
 }

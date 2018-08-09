@@ -53,6 +53,8 @@ public extension ProcedureKitError {
 
  In any case, the `Procedure` still has an associated background task until it finishes, which provides a
  [system-determined finite amount of time](https://developer.apple.com/documentation/uikit/uiapplication/1623029-backgroundtimeremaining) to handle cancellation, clean-up, and finish.
+ 
+ For additional details regarding background task debugging, see [this thread on Apple's dev forums](https://forums.developer.apple.com/thread/85066).
 
  - NOTE:
  For a short, finite-length `Procedure` that should be completed even if the app goes into the background,
@@ -239,17 +241,18 @@ internal class BackgroundManager {
     }
 
     struct BackgroundHandlingResult: OptionSet {
-        public let rawValue: UInt8
-        public init(rawValue: UInt8) { self.rawValue = rawValue }
+        let rawValue: UInt8
+        init(rawValue: UInt8) { self.rawValue = rawValue }
 
-        public static let success                               = BackgroundHandlingResult(rawValue: 1 << 0)
-        public static let additionalHandlersForThisProcedure    = BackgroundHandlingResult(rawValue: 1 << 1)
+        static let success                               = BackgroundHandlingResult(rawValue: 1 << 0)
+        static let additionalHandlersForThisProcedure    = BackgroundHandlingResult(rawValue: 1 << 1)
     }
 
     private let registry = ProcedureBackgroundRegistry()
     private let application: BackgroundTaskApplicationProtocol
     private var appIsInBackground: Bool {
-        get { return backgroundStateLock.withCriticalScope { _appIsInBackground } }
+        get { return backgroundStateLock.withCriticalScope {
+            _appIsInBackground } }
         set {
             backgroundStateLock.withCriticalScope {
                 _appIsInBackground = newValue
@@ -264,8 +267,8 @@ internal class BackgroundManager {
 
         // Register to receive Background Enter / Leave notifications
         let nc = NotificationCenter.default
-        nc.addObserver(self, selector: #selector(BackgroundManager.didEnterBackground(withNotification:)), name: NSNotification.Name.UIApplicationDidEnterBackground, object: application)
-        nc.addObserver(self, selector: #selector(BackgroundManager.didBecomeActive(withNotification:)), name: NSNotification.Name.UIApplicationDidBecomeActive, object: application)
+        nc.addObserver(self, selector: #selector(didEnterBackground), name: .UIApplicationDidEnterBackground, object: application)
+        nc.addObserver(self, selector: #selector(didBecomeActive), name: .UIApplicationDidBecomeActive, object: application)
 
         // To obtain the current application state, dispatch to main
         DispatchQueue.main.async {
@@ -295,7 +298,7 @@ internal class BackgroundManager {
         }
     }
 
-    @objc func didEnterBackground(withNotification notification: NSNotification) {
+    @objc func didEnterBackground() {
         assert(DispatchQueue.isMainDispatchQueue || Thread.current.isMainThread)
         // app entered background
         appIsInBackground = true
@@ -303,7 +306,7 @@ internal class BackgroundManager {
         executeAppIsInBackgroundHandlers()
     }
 
-    @objc func didBecomeActive(withNotification notification: NSNotification) {
+    @objc func didBecomeActive() {
         assert(DispatchQueue.isMainDispatchQueue || Thread.current.isMainThread)
         // app became active
         appIsInBackground = false
@@ -351,6 +354,9 @@ internal class BackgroundManager {
 
             // So, dispatch async to main immediately
             DispatchQueue.main.async {
+                // Ensure the app is actually in the background, as background handling could start before the active notification is received.
+               // guard self.application.applicationState == .background else { return }
+                
                 // And then on the main queue, attempt to claim the handler for execution
                 guard self.registry.claim(appIsInBackgroundHandler: backgroundHandler, for: procedure) else {
                     // Something else - such as a processed DidEnterBackground event - claimed this
@@ -432,8 +438,8 @@ internal class BackgroundManager {
         // (Or a crash may result.)
         // Reference: https://developer.apple.com/reference/foundation/notificationcenter/1415360-addobserver
         let nc = NotificationCenter.default
-        nc.removeObserver(self, name: NSNotification.Name.UIApplicationDidEnterBackground, object: nil)
-        nc.removeObserver(self, name: NSNotification.Name.UIApplicationDidBecomeActive, object: nil)
+        nc.removeObserver(self, name: .UIApplicationDidEnterBackground, object: nil)
+        nc.removeObserver(self, name: .UIApplicationDidBecomeActive, object: nil)
     }
 }
 

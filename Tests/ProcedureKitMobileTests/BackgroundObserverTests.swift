@@ -335,4 +335,42 @@ class BackgroundObserverTests: ProcedureKitTestCase {
         XCTAssertEqual(testableApplication.backgroundTasks[0].0, expectedBackgroundTaskName)
         XCTAssertEqual(testableApplication.backgroundTasks[0].2, .ended)
     }
+    
+    func test__background_observer__no_cancellation_when_app_is_foregrounded_after_backgrounding() {
+        
+        //let expectedBackgroundTaskName = BackgroundManager.backgroundTaskName(for: backgroundProcedure)
+        testableApplication.enterBackground()
+        
+
+        observer = BackgroundObserver(manager: testableBackgroundManager, cancelProcedure: .whenAppIsBackgrounded)
+        
+        testableApplication.applicationDidBecomeActive = { _ in
+            // Trigger observer's attach behavior when becoming active, but before notifications are sent.
+            self.add(backgroundObserver: self.observer, to: self.backgroundProcedure)
+            self.addCompletionBlockTo(procedure: self.backgroundProcedure)
+            self.run(operations: self.backgroundProcedure)
+        }
+        
+        var didExecute = false
+        var didCancel = false
+        
+        backgroundProcedure.addDidExecuteBlockObserver(synchronizedWith: DispatchQueue.main) { (backgroundProcedure) in
+            didExecute = true
+            
+            backgroundProcedure.finish()
+        }
+        backgroundProcedure.addDidCancelBlockObserver(synchronizedWith: DispatchQueue.main) { (backgroundProcedure, error) in
+            didCancel = true
+            
+            backgroundProcedure.finish()
+        }
+        
+        testableApplication.becomeActive()
+        
+        waitForExpectations(timeout: 3, handler: nil)
+        
+        PKAssertProcedureFinished(backgroundProcedure)
+        XCTAssertTrue(didExecute)
+        XCTAssertFalse(didCancel)
+    }
 }
