@@ -1,7 +1,7 @@
 //
 //  ProcedureKit
 //
-//  Copyright © 2016 ProcedureKit. All rights reserved.
+//  Copyright © 2015-2018 ProcedureKit. All rights reserved.
 //
 
 #if SWIFT_PACKAGE
@@ -14,7 +14,7 @@
  URLSession based APIs. It only supports the completion block style API, therefore
  do not use this procedure if you wish to use delegate based APIs on URLSession.
  */
-open class NetworkDownloadProcedure<Session: URLSessionTaskFactory>: Procedure, InputProcedure, OutputProcedure, NetworkOperation {
+open class NetworkDownloadProcedure: Procedure, InputProcedure, OutputProcedure, NetworkOperation {
     public typealias NetworkResult = ProcedureResult<HTTPPayloadResponse<URL>>
     public typealias CompletionBlock = (NetworkResult) -> Void
 
@@ -36,19 +36,15 @@ open class NetworkDownloadProcedure<Session: URLSessionTaskFactory>: Procedure, 
         }
     }
 
-    public let session: Session
+    public let session: NetworkSession
     public let completion: CompletionBlock
 
     private let stateLock = NSLock()
-    internal private(set) var task: Session.DownloadTask?
+    internal private(set) var task: NetworkDownloadTask?
     private var _input: Pending<URLRequest> = .pending
     private var _output: Pending<NetworkResult> = .pending
 
-    public var networkError: Error? {
-        return errors.first
-    }
-
-    public init(session: Session, request: URLRequest? = nil, completionHandler: @escaping CompletionBlock = { _ in }) {
+    public init(session: NetworkSession, request: URLRequest? = nil, completionHandler: @escaping CompletionBlock = { _ in }) {
 
         self.session = session
         self.completion = completionHandler

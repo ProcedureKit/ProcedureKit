@@ -23,8 +23,8 @@ DerivedData
 # you should judge for yourself, the pros and cons are mentioned at:
 # http://guides.cocoapods.org/using/using-cocoapods.html#should-i-ignore-the-pods-directory-in-source-control
 #
-# Pods/
-# Examples/*/Pods
+Pods/
+**/**/Pods
 
 # Carthage
 #
@@ -43,4 +43,5 @@ docs
 /Packages
 .DS_Store
 .ci/xcodebuild-data/*
-/.fastlane/README.md
+.fastlane/README.md
+.ci/results/**

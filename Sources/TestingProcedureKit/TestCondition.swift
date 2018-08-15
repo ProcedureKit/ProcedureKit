@@ -1,7 +1,7 @@
 //
 //  ProcedureKit
 //
-//  Copyright © 2016 ProcedureKit. All rights reserved.
+//  Copyright © 2015-2018 ProcedureKit. All rights reserved.
 //
 
 import Foundation
@@ -15,7 +15,7 @@ open class TestCondition: Condition {
         self.evaluate = evaluate
         super.init()
         self.name = name
-        producedDependencies.forEach { produce(dependency: $0) }
+        producedDependencies.forEach(produceDependency)
     }
 
     open override func evaluate(procedure: Procedure, completion: @escaping (ConditionResult) -> Void) {
@@ -39,7 +39,7 @@ open class AsyncTestCondition: Condition {
         self.evaluate = evaluate
         super.init()
         self.name = name
-        producedDependencies.forEach { produce(dependency: $0) }
+        producedDependencies.forEach(produceDependency)
     }
 
     open override func evaluate(procedure: Procedure, completion: @escaping (ConditionResult) -> Void) {

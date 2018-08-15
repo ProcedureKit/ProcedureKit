@@ -1,7 +1,7 @@
 //
 //  ProcedureKit
 //
-//  Copyright © 2016 ProcedureKit. All rights reserved.
+//  Copyright © 2015-2018 ProcedureKit. All rights reserved.
 //
 
 import XCTest
@@ -15,7 +15,7 @@ class NetworkUploadProcedureTests: ProcedureKitTestCase {
     var request: URLRequest!
     var sendingData: Data!
     var session: TestableURLSessionTaskFactory!
-    var upload: NetworkUploadProcedure<TestableURLSessionTaskFactory>!
+    var upload: NetworkUploadProcedure!
 
     override func setUp() {
         super.setUp()
@@ -37,20 +37,20 @@ class NetworkUploadProcedureTests: ProcedureKitTestCase {
 
     func test__session_receives_request() {
         wait(for: upload)
-        XCTAssertProcedureFinishedWithoutErrors(upload)
+        PKAssertProcedureFinished(upload)
         XCTAssertEqual(session.didReceiveUploadRequest?.url, url)
     }
 
     func test__session_creates_upload_task() {
         wait(for: upload)
-        XCTAssertProcedureFinishedWithoutErrors(upload)
+        PKAssertProcedureFinished(upload)
         XCTAssertNotNil(session.didReturnUploadTask)
-        XCTAssertEqual(session.didReturnUploadTask, upload.task)
+        XCTAssertEqual(session.didReturnUploadTask, upload.task as? TestableURLSessionTask)
     }
 
     func test__upload_resumes_data_task() {
         wait(for: upload)
-        XCTAssertProcedureFinishedWithoutErrors(upload)
+        PKAssertProcedureFinished(upload)
         XCTAssertTrue(session.didReturnUploadTask?.didResume ?? false)
     }
 
@@ -63,7 +63,7 @@ class NetworkUploadProcedureTests: ProcedureKitTestCase {
             self.upload.cancel()
         }
         wait(for: upload, delay)
-        XCTAssertProcedureCancelledWithoutErrors(upload)
+        PKAssertProcedureCancelled(upload)
         XCTAssertTrue(session.didReturnUploadTask?.didCancel ?? false)
     }
 
@@ -73,7 +73,7 @@ class NetworkUploadProcedureTests: ProcedureKitTestCase {
             procedure.cancel()
         }
         wait(for: upload)
-        XCTAssertProcedureCancelledWithoutErrors(upload)
+        PKAssertProcedureCancelled(upload)
     }
 
     func test__upload_cancelled_does_not_call_completion_handler() {
@@ -88,7 +88,7 @@ class NetworkUploadProcedureTests: ProcedureKitTestCase {
             procedure.cancel()
         }
         wait(for: upload)
-        XCTAssertProcedureCancelledWithoutErrors(upload)
+        PKAssertProcedureCancelled(upload)
         XCTAssertFalse(calledCompletionHandler)
     }
 
@@ -97,21 +97,20 @@ class NetworkUploadProcedureTests: ProcedureKitTestCase {
     func test__no_requirement__finishes_with_error() {
         upload = NetworkUploadProcedure(session: session) { _ in }
         wait(for: upload)
-        XCTAssertProcedureFinishedWithErrors(upload, count: 1)
-        XCTAssertEqual(upload.errors.first as? ProcedureKitError, ProcedureKitError.requirementNotSatisfied())
+        PKAssertProcedureFinishedWithError(upload, ProcedureKitError.requirementNotSatisfied())
     }
 
     func test__no_data__finishes_with_error() {
         session.returnedData = nil
         wait(for: upload)
-        XCTAssertProcedureFinishedWithErrors(upload, count: 1)
+        PKAssertProcedureFinishedWithError(upload, ProcedureKitError.unknown)
     }
 
     func test__session_error__finishes_with_error() {
-        session.returnedError = NSError(domain: NSURLErrorDomain, code: NSURLErrorNotConnectedToInternet, userInfo: nil)
+        let error = NSError(domain: NSURLErrorDomain, code: NSURLErrorNotConnectedToInternet, userInfo: nil)
+        session.returnedError = error
         wait(for: upload)
-        XCTAssertProcedureFinishedWithErrors(upload, count: 1)
-        XCTAssertNotNil(upload.networkError)
+        PKAssertProcedureFinishedWithError(upload, error)
     }
 
     func test__completion_handler_receives_data_and_response() {
@@ -122,7 +121,7 @@ class NetworkUploadProcedureTests: ProcedureKitTestCase {
             completionHandlerDidExecute = true
         }
         wait(for: upload)
-        XCTAssertProcedureFinishedWithoutErrors(upload)
+        PKAssertProcedureFinished(upload)
         XCTAssertTrue(completionHandlerDidExecute)
     }
 

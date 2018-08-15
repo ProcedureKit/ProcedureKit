@@ -1,7 +1,7 @@
 //
 //  ProcedureKit
 //
-//  Copyright © 2016 ProcedureKit. All rights reserved.
+//  Copyright © 2015-2018 ProcedureKit. All rights reserved.
 //
 
 #if SWIFT_PACKAGE
@@ -15,9 +15,6 @@ import CoreLocation
 import MapKit
 
 public struct UserLocationPlacemark: Equatable {
-    public static func == (lhs: UserLocationPlacemark, rhs: UserLocationPlacemark) -> Bool {
-        return lhs.location == rhs.location && lhs.placemark == rhs.placemark
-    }
     public let location: CLLocation
     public let placemark: CLPlacemark
 }
@@ -42,8 +39,12 @@ open class ReverseGeocodeUserLocationProcedure: GroupProcedure, OutputProcedure 
 
         override func execute() {
 
-            guard let location = location.value, let placemark = placemark.value else {
-                output = .ready(.failure(ProcedureKitError.requirementNotSatisfied()))
+            guard
+                !isCancelled,
+                let location = location.value,
+                let placemark = placemark.value
+            else {
+                finish(withResult: .failure(ProcedureKitError.requirementNotSatisfied()))
                 return
             }
 
@@ -76,22 +77,22 @@ open class ReverseGeocodeUserLocationProcedure: GroupProcedure, OutputProcedure 
 
         reverseGeocodeLocation = ReverseGeocodeProcedure(timeout: timeout).injectResult(from: userLocation)
 
-        finishing.inject(dependency: userLocation) { procedure, userLocation, errors in
-            guard let location = userLocation.location, errors.isEmpty else {
-                procedure.cancel(withError: ProcedureKitError.dependency(finishedWithErrors: errors)); return
+        finishing.inject(dependency: userLocation) { finishing, userLocation, error in
+            guard let location = userLocation.location, error == nil else {
+                finishing.cancel(with: ProcedureKitError.dependency(finishedWithError: error)); return
             }
-            procedure.location = .ready(location)
+            finishing.location = .ready(location)
         }
 
-        finishing.inject(dependency: reverseGeocodeLocation) { procedure, reverseGeocodeLocation, errors in
-            guard let placemark = reverseGeocodeLocation.placemark, errors.isEmpty else {
-                procedure.cancel(withError: ProcedureKitError.dependency(finishedWithErrors: errors)); return
+        finishing.inject(dependency: reverseGeocodeLocation) { finishing, reverseGeocodeLocation, error in
+            guard let placemark = reverseGeocodeLocation.placemark, error == nil else {
+                finishing.cancel(with: ProcedureKitError.dependency(finishedWithError: error)); return
             }
-            procedure.placemark = .ready(placemark)
+            finishing.placemark = .ready(placemark)
         }
 
         super.init(dispatchQueue: dispatchQueue, operations: [userLocation, reverseGeocodeLocation, finishing])
-        add(observer: TimeoutObserver(by: timeout))
+        addObserver(TimeoutObserver(by: timeout))
     }
 
     internal func set(manager: LocationServicesRegistrarProtocol & LocationServicesProtocol) -> ReverseGeocodeUserLocationProcedure {

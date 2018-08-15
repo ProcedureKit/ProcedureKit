@@ -1,7 +1,7 @@
 //
 //  ProcedureKit
 //
-//  Copyright © 2016 ProcedureKit. All rights reserved.
+//  Copyright © 2015-2018 ProcedureKit. All rights reserved.
 //
 
 import Foundation
@@ -29,7 +29,7 @@ public class UserConfirmationCondition: Condition {
         alert.add(actionWithTitle: cancelMessage, style: .cancel) { [weak self] _, _ in
             self?.response = .cancelled
         }
-        produce(dependency: alert)
+        produceDependency(alert)
     }
 
     public override func evaluate(procedure: Procedure, completion: @escaping (ConditionResult) -> Void) {

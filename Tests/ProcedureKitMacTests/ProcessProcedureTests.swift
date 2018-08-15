@@ -1,7 +1,7 @@
 //
 //  ProcedureKit
 //
-//  Copyright © 2016 ProcedureKit. All rights reserved.
+//  Copyright © 2015-2018 ProcedureKit. All rights reserved.
 //
 
 
@@ -33,25 +33,25 @@ class ProcessProcedureTests: ProcedureKitTestCase {
 
     func test__start_process() {
         wait(for: processProcedure)
-        XCTAssertProcedureFinishedWithoutErrors(processProcedure)
+        PKAssertProcedureFinished(processProcedure)
     }
 
     func test__start_process_with_executableurl() {
         processProcedure = ProcessProcedure(executableURL: executableURL, arguments: arguments)
         wait(for: processProcedure)
-        XCTAssertProcedureFinishedWithoutErrors(processProcedure)
+        PKAssertProcedureFinished(processProcedure)
     }
 
     func test__start_process_with_launchpath_only() {
         processProcedure = ProcessProcedure(launchPath: launchPath)
         wait(for: processProcedure)
-        XCTAssertProcedureFinishedWithoutErrors(processProcedure)
+        PKAssertProcedureFinished(processProcedure)
     }
 
     func test__start_process_with_executableurl_only() {
         processProcedure = ProcessProcedure(executableURL: executableURL)
         wait(for: processProcedure)
-        XCTAssertProcedureFinishedWithoutErrors(processProcedure)
+        PKAssertProcedureFinished(processProcedure)
     }
 
     func test__start_process_with_non_existent_launchpath() {
@@ -63,8 +63,7 @@ class ProcessProcedureTests: ProcedureKitTestCase {
         }
         processProcedure = ProcessProcedure(launchPath: nonExistentLaunchPath)
         wait(for: processProcedure)
-        XCTAssertProcedureFinishedWithErrors(processProcedure, count: 1)
-        XCTAssertEqual(processProcedure.errors.first as? ProcessProcedure.Error, ProcessProcedure.Error.invalidLaunchPath)
+        PKAssertProcedureFinishedWithError(processProcedure, ProcessProcedure.Error.invalidLaunchPath)
     }
 
     func test__start_process_with_non_existent_executableurl() {
@@ -76,14 +75,13 @@ class ProcessProcedureTests: ProcedureKitTestCase {
         }
         processProcedure = ProcessProcedure(executableURL: nonExistentExecutableURL)
         wait(for: processProcedure)
-        XCTAssertProcedureFinishedWithErrors(processProcedure, count: 1)
-        XCTAssertEqual(processProcedure.errors.first as? ProcessProcedure.Error, ProcessProcedure.Error.invalidLaunchPath)
+        PKAssertProcedureFinishedWithError(processProcedure, ProcessProcedure.Error.invalidLaunchPath)
     }
 
     func test__cancel_process_before_launched() {
         processProcedure.cancel()
         wait(for: processProcedure)
-        XCTAssertProcedureCancelledWithoutErrors(processProcedure)
+        PKAssertProcedureCancelled(processProcedure)
     }
 
     func test__cancel_process_after_launched() {
@@ -91,7 +89,7 @@ class ProcessProcedureTests: ProcedureKitTestCase {
                 processProcedure.cancel()
         })
         wait(for: processProcedure, withTimeout: 1)
-        XCTAssertProcedureCancelledWithoutErrors(processProcedure)
+        PKAssertProcedureCancelled(processProcedure)
     }
 
     func test__processIdentifier_before_launched() {
@@ -114,7 +112,7 @@ class ProcessProcedureTests: ProcedureKitTestCase {
 
     func test__processIdentifier_after_finished() {
         wait(for: processProcedure)
-        XCTAssertProcedureFinishedWithoutErrors(processProcedure)
+        PKAssertProcedureFinished(processProcedure)
         XCTAssertGreaterThan(processProcedure.processIdentifier, 0)
     }
 
@@ -132,7 +130,7 @@ class ProcessProcedureTests: ProcedureKitTestCase {
 
     func test__suspend_after_finished_returns_false() {
         wait(for: processProcedure)
-        XCTAssertProcedureFinishedWithoutErrors(processProcedure)
+        PKAssertProcedureFinished(processProcedure)
         weak var didSuspendExpectation = expectation(description: "Did Suspend: \(#function)")
         processProcedure.suspend { success in
             DispatchQueue.main.async {
@@ -157,7 +155,7 @@ class ProcessProcedureTests: ProcedureKitTestCase {
 
     func test__resume_after_finished_returns_false() {
         wait(for: processProcedure)
-        XCTAssertProcedureFinishedWithoutErrors(processProcedure)
+        PKAssertProcedureFinished(processProcedure)
         weak var didResumeExpectation = expectation(description: "Did Resume: \(#function)")
         processProcedure.resume { success in
             DispatchQueue.main.async {
@@ -227,8 +225,7 @@ class ProcessProcedureTests: ProcedureKitTestCase {
         }
         XCTAssertEqual(status, exitStatus, "processDidExitCleanly closure did not receive expected status (\(exitStatus)); instead, received: \(status))")
         XCTAssertEqual(reason, .exit, "processDidExitCleanly closure did not receive expected reason (.exit); instead, received: \(reason))")
-        XCTAssertProcedureFinishedWithErrors(processProcedure, count: 1)
-        XCTAssertEqual(processProcedure.errors.first as? ProcessProcedure.Error, ProcessProcedure.Error.didNotExitCleanly(exitStatus, .exit))
+        PKAssertProcedureFinishedWithError(processProcedure, ProcessProcedure.Error.didNotExitCleanly(exitStatus, .exit))
     }
 
     func test__process_did_exit_cleanly_closure_receives_expected_uncaught_signal_input() {
@@ -254,8 +251,7 @@ class ProcessProcedureTests: ProcedureKitTestCase {
         }
         XCTAssertEqual(status, SIGTERM, "processDidExitCleanly closure did not receive expected status (\(SIGTERM)); instead, received: \(status))")
         XCTAssertEqual(reason, .uncaughtSignal, "processDidExitCleanly closure did not receive expected reason (.uncaughtSignal); instead, received: \(reason))")
-        XCTAssertProcedureFinishedWithErrors(processProcedure, count: 1)
-        XCTAssertEqual(processProcedure.errors.first as? ProcessProcedure.Error, ProcessProcedure.Error.didNotExitCleanly(SIGTERM, .uncaughtSignal))
+        PKAssertProcedureFinishedWithError(processProcedure, ProcessProcedure.Error.didNotExitCleanly(SIGTERM, .uncaughtSignal))
     }
 
     // MARK: - Configuration Properties (Read-only)
@@ -329,15 +325,13 @@ class ProcessProcedureTests: ProcedureKitTestCase {
     func test__no_requirement__finishes_with_error() {
         processProcedure = ProcessProcedure()
         wait(for: processProcedure)
-        XCTAssertProcedureFinishedWithErrors(processProcedure, count: 1)
-        XCTAssertEqual(processProcedure.errors.first as? ProcedureKitError, ProcedureKitError.requirementNotSatisfied())
+        PKAssertProcedureFinishedWithError(processProcedure, ProcedureKitError.requirementNotSatisfied())
     }
 
     func test__process_exit_status_1__finishes_with_error() {
         processProcedure = ProcessProcedure(launchPath: bash, arguments: ["-c", "exit 1"])
         wait(for: processProcedure)
-        XCTAssertProcedureFinishedWithErrors(processProcedure, count: 1)
-        XCTAssertEqual(processProcedure.errors.first as? ProcessProcedure.Error, ProcessProcedure.Error.didNotExitCleanly(1, .exit))
+        PKAssertProcedureFinishedWithError(processProcedure, ProcessProcedure.Error.didNotExitCleanly(1, .exit))
     }
 
     func test__process_terminated_with_uncaught_signal__finishes_with_error() {
@@ -350,8 +344,7 @@ class ProcessProcedureTests: ProcedureKitTestCase {
             }
         })
         wait(for: processProcedure)
-        XCTAssertProcedureFinishedWithErrors(processProcedure, count: 1)
-        XCTAssertEqual(processProcedure.errors.first as? ProcessProcedure.Error, ProcessProcedure.Error.didNotExitCleanly(SIGTERM, .uncaughtSignal))
+        PKAssertProcedureFinishedWithError(processProcedure, ProcessProcedure.Error.didNotExitCleanly(SIGTERM, .uncaughtSignal))
     }
 
     func test__process_did_exit_cleanly_closure_false__finishes_with_error() {
@@ -362,8 +355,7 @@ class ProcessProcedureTests: ProcedureKitTestCase {
         })
         wait(for: processProcedure)
         XCTAssertTrue(didCallClosure.access, "processDidExitCleanly closure was not called.")
-        XCTAssertProcedureFinishedWithErrors(processProcedure, count: 1)
-        XCTAssertEqual(processProcedure.errors.first as? ProcessProcedure.Error, ProcessProcedure.Error.didNotExitCleanly(0, .exit))
+        PKAssertProcedureFinishedWithError(processProcedure, ProcessProcedure.Error.didNotExitCleanly(0, .exit))
     }
 
     func test__process_did_exit_cleanly_closure_true__finishes_without_error() {
@@ -374,7 +366,7 @@ class ProcessProcedureTests: ProcedureKitTestCase {
         })
         wait(for: processProcedure)
         XCTAssertTrue(didCallClosure.access, "processDidExitCleanly closure was not called.")
-        XCTAssertProcedureFinishedWithoutErrors(processProcedure)
+        PKAssertProcedureFinished(processProcedure)
     }
 }
 

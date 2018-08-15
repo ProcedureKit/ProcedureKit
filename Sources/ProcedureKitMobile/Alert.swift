@@ -1,7 +1,7 @@
 //
 //  ProcedureKit
 //
-//  Copyright © 2016 ProcedureKit. All rights reserved.
+//  Copyright © 2015-2018 ProcedureKit. All rights reserved.
 //
 
 import Foundation
@@ -101,7 +101,7 @@ public class AlertProcedure: UIProcedure {
     public init(presentAlertFrom presenting: PresentingViewController, withPreferredStyle preferredAlertStyle: UIAlertControllerStyle = .alert, waitForDismissal: Bool = true) {
         let alert = UIAlertController(title: nil, message: nil, preferredStyle: preferredAlertStyle)
         super.init(present: alert, from: presenting, withStyle: .present, inNavigationController: false, sender: nil, finishAfterPresenting: !waitForDismissal)
-        add(condition: MutuallyExclusive<UIAlertController>())
+        addCondition(MutuallyExclusive<UIAlertController>())
     }
 
     /**

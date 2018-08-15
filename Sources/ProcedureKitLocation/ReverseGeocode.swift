@@ -1,7 +1,7 @@
 //
 //  ProcedureKit
 //
-//  Copyright © 2016 ProcedureKit. All rights reserved.
+//  Copyright © 2015-2018 ProcedureKit. All rights reserved.
 //
 
 #if SWIFT_PACKAGE
@@ -36,8 +36,8 @@ open class ReverseGeocodeProcedure: Procedure, InputProcedure, OutputProcedure {
         self.input = location.flatMap { .ready($0) } ?? .pending
         self.completion = completion
         super.init()
-        add(condition: MutuallyExclusive<ReverseGeocodeProcedure>())
-        add(observer: TimeoutObserver(by: timeout))
+        addCondition(MutuallyExclusive<ReverseGeocodeProcedure>())
+        addObserver(TimeoutObserver(by: timeout))
         addDidCancelBlockObserver { [weak self] _, _ in
             DispatchQueue.main.async {
                 self?.cancelGeocoder()
@@ -64,7 +64,8 @@ open class ReverseGeocodeProcedure: Procedure, InputProcedure, OutputProcedure {
 
             // Check for placemarks results
             guard let placemarks = results else {
-                strongSelf.finish(withResult: .failure(ProcedureKitError.component(ProcedureKitLocationComponent(), error: error)))
+                let error: Error = error ?? ProcedureKitError.component(ProcedureKitLocationComponent(), error: error)
+                strongSelf.finish(withResult: .failure(error))
                 return
             }
 

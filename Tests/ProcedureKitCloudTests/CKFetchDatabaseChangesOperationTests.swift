@@ -1,8 +1,10 @@
 //
 //  ProcedureKit
 //
-//  Copyright © 2016 ProcedureKit. All rights reserved.
+//  Copyright © 2015-2018 ProcedureKit. All rights reserved.
 //
+
+#if !swift(>=4.1)
 
 import XCTest
 import CloudKit
@@ -87,7 +89,7 @@ class CKFetchDatabaseChangesOperationTests: CKProcedureTestCase {
 
     func test__success_without_completion_block() {
         wait(for: operation)
-        XCTAssertProcedureFinishedWithoutErrors(operation)
+        PKAssertProcedureFinished(operation)
     }
 
     func test__success_with_completion_block() {
@@ -96,14 +98,14 @@ class CKFetchDatabaseChangesOperationTests: CKProcedureTestCase {
             didExecuteBlock = true
         }
         wait(for: operation)
-        XCTAssertProcedureFinishedWithoutErrors(operation)
+        PKAssertProcedureFinished(operation)
         XCTAssertTrue(didExecuteBlock)
     }
 
     func test__error_without_completion_block() {
         target.error = TestError()
         wait(for: operation)
-        XCTAssertProcedureFinishedWithoutErrors(operation)
+        PKAssertProcedureFinished(operation)
     }
 
     func test__error_with_completion_block() {
@@ -210,7 +212,7 @@ class CloudKitProcedureFetchDatabaseChangesOperationTests: CKProcedureTestCase {
 
     func test__success_without_completion_block_set() {
         wait(for: cloudkit)
-        XCTAssertProcedureFinishedWithoutErrors(cloudkit)
+        PKAssertProcedureFinished(cloudkit)
     }
 
     func test__success_with_completion_block_set() {
@@ -219,7 +221,7 @@ class CloudKitProcedureFetchDatabaseChangesOperationTests: CKProcedureTestCase {
             didExecuteBlock = true
         }
         wait(for: cloudkit)
-        XCTAssertProcedureFinishedWithoutErrors(cloudkit)
+        PKAssertProcedureFinished(cloudkit)
         XCTAssertTrue(didExecuteBlock)
     }
 
@@ -230,7 +232,7 @@ class CloudKitProcedureFetchDatabaseChangesOperationTests: CKProcedureTestCase {
             return operation
         }
         wait(for: cloudkit)
-        XCTAssertProcedureFinishedWithoutErrors(cloudkit)
+        PKAssertProcedureFinished(cloudkit)
     }
 
     func test__error_with_completion_block_set() {
@@ -264,7 +266,7 @@ class CloudKitProcedureFetchDatabaseChangesOperationTests: CKProcedureTestCase {
         var didExecuteBlock = false
         cloudkit.setFetchDatabaseChangesCompletionBlock { _, _ in didExecuteBlock = true }
         wait(for: cloudkit)
-        XCTAssertProcedureFinishedWithoutErrors(cloudkit)
+        PKAssertProcedureFinished(cloudkit)
         XCTAssertTrue(didExecuteBlock)
     }
 
@@ -287,10 +289,12 @@ class CloudKitProcedureFetchDatabaseChangesOperationTests: CKProcedureTestCase {
         var didExecuteBlock = false
         cloudkit.setFetchDatabaseChangesCompletionBlock { _, _ in didExecuteBlock = true }
         wait(for: cloudkit)
-        XCTAssertProcedureFinishedWithoutErrors(cloudkit)
+        PKAssertProcedureFinished(cloudkit)
         XCTAssertTrue(didExecuteBlock)
         XCTAssertTrue(didRunCustomHandler)
     }
     
 }
+
+#endif
 

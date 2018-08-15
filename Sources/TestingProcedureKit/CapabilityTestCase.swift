@@ -1,7 +1,7 @@
 //
 //  ProcedureKit
 //
-//  Copyright © 2016 ProcedureKit. All rights reserved.
+//  Copyright © 2015-2018 ProcedureKit. All rights reserved.
 //
 
 import Foundation
@@ -77,7 +77,7 @@ open class TestableCapabilityTestCase: ProcedureKitTestCase {
         getAuthorizationStatus = GetAuthorizationStatusProcedure(capability)
         authorize = AuthorizeCapabilityProcedure(capability)
         authorizedFor = AuthorizedFor(capability)
-        procedure.add(condition: authorizedFor)
+        procedure.addCondition(authorizedFor)
     }
 
     open override func tearDown() {

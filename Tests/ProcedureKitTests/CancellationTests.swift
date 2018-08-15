@@ -1,7 +1,7 @@
 //
 //  ProcedureKit
 //
-//  Copyright © 2016 ProcedureKit. All rights reserved.
+//  Copyright © 2015-2018 ProcedureKit. All rights reserved.
 //
 
 import XCTest
@@ -12,14 +12,14 @@ import TestingProcedureKit
 class CancellationTests: ProcedureKitTestCase {
 
     func test__procedure_cancel_with_nil_error() {
-        procedure.cancel(withError: nil)
+        procedure.cancel(with: nil)
         XCTAssertFalse(procedure.didExecute)
         XCTAssertTrue(procedure.isCancelled)
         XCTAssertFalse(procedure.failed)
     }
 
     func test__procedure_cancel_with_error() {
-        procedure.cancel(withError: TestError())
+        procedure.cancel(with: TestError())
         XCTAssertFalse(procedure.didExecute)
         XCTAssertTrue(procedure.isCancelled)
         XCTAssertTrue(procedure.failed)
@@ -104,12 +104,12 @@ class CancellationTests: ProcedureKitTestCase {
 
         class TestCancelFinishFromExecuteProcedure: Procedure {
             var didCancel = Protector((false, false))
-            let error = TestError()
+            let expectedError = TestError()
             override func execute() {
                 cancel()
-                finish(withError: error)
+                finish(with: expectedError)
             }
-            override func procedureDidCancel(withErrors: [Error]) {
+            override func procedureDidCancel(with: Error?) {
                 didCancel.overwrite(with: (true, isFinished))
             }
         }
@@ -120,8 +120,7 @@ class CancellationTests: ProcedureKitTestCase {
 
         XCTAssertTrue(special.didCancel.access.0)
         XCTAssertFalse(special.didCancel.access.1)  // isFinished should be false when the didcancel observers run
-        XCTAssertTrue(special.isCancelled)
-        XCTAssertTrue(special.isFinished)
+        PKAssertProcedureCancelled(special, withErrors: true)
     }
 
     func test__procedure_cancelled_then_finished_async_during_execute() {
@@ -137,7 +136,7 @@ class CancellationTests: ProcedureKitTestCase {
                 }
                 semaphore.wait()
             }
-            override func procedureDidCancel(withErrors: [Error]) {
+            override func procedureDidCancel(with: Error?) {
                 didCancel.overwrite(with: true)
             }
         }
@@ -147,8 +146,7 @@ class CancellationTests: ProcedureKitTestCase {
         wait(for: special)
 
         XCTAssertTrue(special.didCancel.access)
-        XCTAssertTrue(special.isCancelled)
-        XCTAssertTrue(special.isFinished)
+        PKAssertProcedureCancelled(special)
     }
 
     func test__procedure_finished_then_cancelled_from_within_execute() {
@@ -159,7 +157,7 @@ class CancellationTests: ProcedureKitTestCase {
                 finish()
                 cancel()
             }
-            override func procedureDidCancel(withErrors: [Error]) {
+            override func procedureDidCancel(with: Error?) {
                 didCancel.overwrite(with: true)
             }
         }
@@ -168,7 +166,7 @@ class CancellationTests: ProcedureKitTestCase {
 
         wait(for: special)
 
-        XCTAssertTrue(special.isFinished)
+        PKAssertProcedureFinished(special)
         XCTAssertFalse(special.didCancel.access)
         XCTAssertFalse(special.isCancelled)
     }
@@ -186,7 +184,7 @@ class CancellationTests: ProcedureKitTestCase {
                 }
                 semaphore.wait()
             }
-            override func procedureDidCancel(withErrors: [Error]) {
+            override func procedureDidCancel(with: Error?) {
                 didCancel.overwrite(with: true)
             }
         }
@@ -195,7 +193,7 @@ class CancellationTests: ProcedureKitTestCase {
 
         wait(for: special)
 
-        XCTAssertTrue(special.isFinished)
+        PKAssertProcedureFinished(special)
         XCTAssertFalse(special.didCancel.access)
         XCTAssertFalse(special.isCancelled)
     }
@@ -203,27 +201,29 @@ class CancellationTests: ProcedureKitTestCase {
     func test__cancel_from_didcancel_observer_is_ignored() {
 
         enum ShouldNotHappen: Error {
-            case CancelledFromWithinDidCancel
+            case cancelledFromWithinDidCancel
         }
+
         procedure.addDidCancelBlockObserver { procedure, error in
-            procedure.cancel(withError: ShouldNotHappen.CancelledFromWithinDidCancel)
+            procedure.cancel(with: ShouldNotHappen.cancelledFromWithinDidCancel)
         }
 
         procedure.cancel()
         wait(for: procedure)
-        XCTAssertProcedureCancelledWithoutErrors(procedure)
+        PKAssertProcedureCancelled(procedure)
     }
 
     func test__cancel_from_willfinish_observer_is_ignored() {
 
         enum ShouldNotHappen: Error {
-            case CancelledFromWithinWillFinish
+            case cancelledFromWithinWillFinish
         }
+        
         procedure.addWillFinishBlockObserver { procedure, error, _ in
-            procedure.cancel(withError: ShouldNotHappen.CancelledFromWithinWillFinish)
+            procedure.cancel(with: ShouldNotHappen.cancelledFromWithinWillFinish)
         }
 
         wait(for: procedure)
-        XCTAssertProcedureFinishedWithoutErrors(procedure)
+        PKAssertProcedureFinished(procedure)
     }
 }

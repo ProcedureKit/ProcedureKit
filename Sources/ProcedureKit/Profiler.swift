@@ -1,7 +1,7 @@
 //
 //  ProcedureKit
 //
-//  Copyright © 2016 ProcedureKit. All rights reserved.
+//  Copyright © 2015-2018 ProcedureKit. All rights reserved.
 //
 
 import Foundation
@@ -96,9 +96,10 @@ struct PendingProfileResult {
 }
 
 // MARK: ProcedureProfiler
+
 public final class ProcedureProfiler: Identifiable, Equatable {
 
-    public let identifier = UUID()
+    public let identity = UUID()
 
     enum Reporter {
         case parent(ProcedureProfiler)
@@ -152,7 +153,7 @@ public final class ProcedureProfiler: Identifiable, Equatable {
     func addChild(operation: Operation, now: TimeInterval = CFAbsoluteTimeGetCurrent() as TimeInterval) {
         if let procedure = operation as? Procedure {
             let profiler = ProcedureProfiler(parent: self)
-            procedure.add(observer: profiler)
+            procedure.addObserver(profiler)
             queue.sync { [weak self] in
                 self?.children.append(procedure.identity)
             }
@@ -208,7 +209,7 @@ extension ProcedureProfiler: ProcedureObserver {
         addMetric(forEvent: .cancelled)
     }
 
-    public func did(finish procedure: Procedure, withErrors errors: [Error]) {
+    public func did(finish procedure: Procedure, with error: Error?) {
         addMetric(forEvent: .finished)
     }
 
@@ -269,22 +270,15 @@ struct PrintableProfileResult: CustomStringConvertible {
     }
 }
 
-public class _ProcedureProfileLogger<Manager: LogManagerProtocol>: ProcedureProfilerReporter {
-
-    private(set) var logger: _Logger<Manager>
-
-    public init(severity: LogSeverity = Manager.severity, enabled: Bool = Manager.enabled, logger: @escaping LoggerBlockType = Manager.logger) {
-
-        self.logger = _Logger<Manager>(severity: severity, enabled: enabled, logger: logger)
-    }
+public class _ProcedureProfileLogger<Settings: LogSettings>: Log.Channels<Settings>, ProcedureProfilerReporter {
 
     public func finishedProfiling(withResult result: ProfileResult) {
-        self.logger.operationName = result.identity.description
-        self.logger.info(message: "finished profiling with results:\n\(PrintableProfileResult(result: result))")
+        formatter = Log.Formatters.makeProcedureLogFormatter(operationName: result.identity.description)
+        current.message("finished profiling with results:\n\(PrintableProfileResult(result: result))")
     }
 }
 
-public typealias ProcedureProfileLogger = _ProcedureProfileLogger<LogManager>
+public typealias ProcedureProfileLogger = _ProcedureProfileLogger<Log>
 
 public extension ProcedureProfiler {
 

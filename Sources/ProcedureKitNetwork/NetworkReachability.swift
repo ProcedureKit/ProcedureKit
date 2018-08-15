@@ -1,7 +1,7 @@
 //
 //  ProcedureKit
 //
-//  Copyright © 2016 ProcedureKit. All rights reserved.
+//  Copyright © 2015-2018 ProcedureKit. All rights reserved.
 //
 
 #if !os(watchOS)
@@ -114,8 +114,6 @@ extension Reachability {
         fileprivate private(set) var threadSafeProtector = Protector(false)
         weak var delegate: NetworkReachabilityDelegate?
 
-        var log: LoggerProtocol
-
         var notifierIsRunning: Bool {
             get { return threadSafeProtector.access }
             set {
@@ -125,9 +123,8 @@ extension Reachability {
             }
         }
 
-        init(log logger: LoggerProtocol = Logger()) {
+        init() {
             defaultRouteReachability = try! Device.makeDefaultRouteReachability() // swiftlint:disable:this force_try
-            log = logger
         }
 
         deinit {

@@ -1,7 +1,7 @@
 //
 //  ProcedureKit
 //
-//  Copyright © 2016 ProcedureKit. All rights reserved.
+//  Copyright © 2015-2018 ProcedureKit. All rights reserved.
 //
 
 public typealias ThrowingBoolBlock = () throws -> Bool
@@ -31,7 +31,7 @@ public final class BlockCondition: Condition {
             completion(.success(try block()))
         }
         catch {
-            completion(.failure(ProcedureKitError.conditionFailed(withErrors: [error])))
+            completion(.failure(ProcedureKitError.conditionFailed(with: error)))
         }
     }
 }

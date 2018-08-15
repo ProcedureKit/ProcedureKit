@@ -1,7 +1,7 @@
 //
 //  ProcedureKit
 //
-//  Copyright © 2016 ProcedureKit. All rights reserved.
+//  Copyright © 2015-2018 ProcedureKit. All rights reserved.
 //
 
 import Foundation
@@ -37,7 +37,7 @@ public class TestableNetworkReachability {
         }
     }
 
-    public var log: LoggerProtocol {
+    public var log: LogChannel {
         get { return stateLock.withCriticalScope { _log } }
         set {
             stateLock.withCriticalScope {
@@ -62,7 +62,7 @@ public class TestableNetworkReachability {
     }
     private var _didStartNotifier = false
     private var _didStopNotifier = false
-    private var _log: LoggerProtocol = Logger()
+    private var _log: LogChannel = Log.Channel<Log>()
     private weak var _delegate: NetworkReachabilityDelegate?
 
     public init() { }
@@ -71,13 +71,13 @@ public class TestableNetworkReachability {
 extension TestableNetworkReachability: NetworkReachability {
 
     public func startNotifier(onQueue queue: DispatchQueue) throws {
-        log.notice(message: "Started Reachability Notifier")
+        log.message("Started Reachability Notifier")
         didStartNotifier = true
         delegate?.didChangeReachability(flags: flags)
     }
 
     public func stopNotifier() {
-        log.notice(message: "Stopped Reachability Notifier")
+        log.message("Stopped Reachability Notifier")
         didStopNotifier = true
     }
 }

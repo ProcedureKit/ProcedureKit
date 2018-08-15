@@ -3,10 +3,15 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 48;
+	objectVersion = 50;
 	objects = {
 
 /* Begin PBXBuildFile section */
+		65068FAD20C62AE300B0A0A3 /* MakesBackgroundManagedObjectContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65068FAC20C62AE300B0A0A3 /* MakesBackgroundManagedObjectContext.swift */; };
+		651E670520C610D800BE520E /* CoreDataHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 651E670420C610D800BE520E /* CoreDataHelpers.swift */; };
+		652F9015209C488600365B2D /* BatchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652F9014209C488600365B2D /* BatchTests.swift */; };
+		652F903D209E3E3D00365B2D /* IgnoreErrors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652F903C209E3E3D00365B2D /* IgnoreErrors.swift */; };
+		652F903F209E445200365B2D /* IgnoreErrorsProcedureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652F903E209E445200365B2D /* IgnoreErrorsProcedureTests.swift */; };
 		653C9FCA1D6097A40070B7A2 /* ProcedureKitMobile.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 653C9FC11D6097A40070B7A2 /* ProcedureKitMobile.framework */; };
 		653C9FDB1D6098330070B7A2 /* ProcedureKitMobile.h in Headers */ = {isa = PBXBuildFile; fileRef = 653C9FDA1D6098330070B7A2 /* ProcedureKitMobile.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		653C9FDF1D6099110070B7A2 /* ProcedureKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65CFC5F01D608A5500CAD875 /* ProcedureKit.framework */; };
@@ -25,12 +30,52 @@
 		653CA0741D60AB1B0070B7A2 /* ProcedureKitCloud.h in Headers */ = {isa = PBXBuildFile; fileRef = 653CA0731D60AB1B0070B7A2 /* ProcedureKitCloud.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		653CA0781D60ABC90070B7A2 /* ProcedureKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65CFC5F01D608A5500CAD875 /* ProcedureKit.framework */; };
 		653CA07B1D60ABD30070B7A2 /* TestingProcedureKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65CFC6161D60900000CAD875 /* TestingProcedureKit.framework */; };
+		658BE06F20BC69170021F11B /* ProcedureKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65CFC5F01D608A5500CAD875 /* ProcedureKit.framework */; };
+		658BE07020BC69170021F11B /* TestingProcedureKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65CFC6161D60900000CAD875 /* TestingProcedureKit.framework */; };
+		658BE07220BC72540021F11B /* MakeFetchedResultController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 658BE07120BC72540021F11B /* MakeFetchedResultController.swift */; };
+		658BE07420BC77AD0021F11B /* MakeFetchedResultsControllerProcedureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 658BE07320BC77AD0021F11B /* MakeFetchedResultsControllerProcedureTests.swift */; };
+		658BE07620BC99100021F11B /* InsertManagedObjects.swift in Sources */ = {isa = PBXBuildFile; fileRef = 658BE07520BC99100021F11B /* InsertManagedObjects.swift */; };
+		658BE07820BCA0500021F11B /* InsertManagedObjectsProcedureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 658BE07720BCA0500021F11B /* InsertManagedObjectsProcedureTests.swift */; };
 		659484271DAAA2B90028F83B /* ProcedureKitLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6594841E1DAAA2B90028F83B /* ProcedureKitLocation.framework */; };
 		659484361DAAA3360028F83B /* ProcedureKitLocation.h in Headers */ = {isa = PBXBuildFile; fileRef = 659484351DAAA3360028F83B /* ProcedureKitLocation.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6594843D1DAAA5430028F83B /* ProcedureKit.framework in Copy Files (2 items) */ = {isa = PBXBuildFile; fileRef = 65CFC5F01D608A5500CAD875 /* ProcedureKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		6594843E1DAAA5430028F83B /* TestingProcedureKit.framework in Copy Files (2 items) */ = {isa = PBXBuildFile; fileRef = 65CFC6161D60900000CAD875 /* TestingProcedureKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		65A0E4A220B85169002D6C8C /* ProcedureKitCoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65A0E49920B85168002D6C8C /* ProcedureKitCoreData.framework */; };
+		65A0E4B220B85213002D6C8C /* LoadCoreData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65A0E4B120B85213002D6C8C /* LoadCoreData.swift */; };
+		65A0E4B420B85258002D6C8C /* ProcedureKitCoreData.h in Headers */ = {isa = PBXBuildFile; fileRef = 65A0E4B320B85258002D6C8C /* ProcedureKitCoreData.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		65A0E4BA20B8548D002D6C8C /* ProcedureKitCoreDataTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65A0E4B820B8548D002D6C8C /* ProcedureKitCoreDataTests.swift */; };
+		65A0E4C120BB18EA002D6C8C /* TestDataModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 65A0E4BF20BB18EA002D6C8C /* TestDataModel.xcdatamodeld */; };
+		65A0E4C320BB1975002D6C8C /* LoadCoreDataProcedureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65A0E4C220BB1975002D6C8C /* LoadCoreDataProcedureTests.swift */; };
+		65A0E4C520BB2E51002D6C8C /* SaveManagedObjectContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65A0E4C420BB2E51002D6C8C /* SaveManagedObjectContext.swift */; };
+		65A0E4C820BC5540002D6C8C /* SaveManagedObjectContextProcedureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65A0E4C620BC548A002D6C8C /* SaveManagedObjectContextProcedureTests.swift */; };
+		65A1923920F88FD300E0D42C /* LoggingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65A1923820F88FD300E0D42C /* LoggingTests.swift */; };
+		65A1923B20F8900100E0D42C /* TestableLogging.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65A1923A20F8900100E0D42C /* TestableLogging.swift */; };
 		65A72C2A1DA7F37C008597CA /* ProcedureKit.framework in Copy Dependencies */ = {isa = PBXBuildFile; fileRef = 65CFC5F01D608A5500CAD875 /* ProcedureKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		65A72C2B1DA7F37C008597CA /* TestingProcedureKit.framework in Copy Dependencies */ = {isa = PBXBuildFile; fileRef = 65CFC6161D60900000CAD875 /* TestingProcedureKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		65AB7DDA209B95B400726796 /* Batch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65AB7DD9209B95B400726796 /* Batch.swift */; };
+		65AEF19F20A3AE340089B6C8 /* ViewControllerContainment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65AEF19E20A3AE340089B6C8 /* ViewControllerContainment.swift */; };
+		65B9AF482116D1D4004DA82B /* Result.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65B9AF472116D1D4004DA82B /* Result.swift */; };
+		65C7BBC22085CEF4009A6D6E /* CKAcceptSharesOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D367DF1E1844F800D03E86 /* CKAcceptSharesOperation.swift */; };
+		65C7BBC32085CF21009A6D6E /* CKDatabaseOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D367E01E1844F800D03E86 /* CKDatabaseOperation.swift */; };
+		65C7BBC42085CF26009A6D6E /* CKDiscoverAllContactsOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D367E11E1844F800D03E86 /* CKDiscoverAllContactsOperation.swift */; };
+		65C7BBC52085CF46009A6D6E /* CKDiscoverAllUserIdentitiesOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D367E21E1844F800D03E86 /* CKDiscoverAllUserIdentitiesOperation.swift */; };
+		65C7BBC62085D0D3009A6D6E /* CKDiscoverUserIdentitiesOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D367E31E1844F800D03E86 /* CKDiscoverUserIdentitiesOperation.swift */; };
+		65C7BBC72085D10E009A6D6E /* CKDiscoverUserInfosOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D367E41E1844F800D03E86 /* CKDiscoverUserInfosOperation.swift */; };
+		65C7BBC82085D121009A6D6E /* CKFetchDatabaseChangesOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D367E51E1844F800D03E86 /* CKFetchDatabaseChangesOperation.swift */; };
+		65C7BBC92085D17C009A6D6E /* CKFetchNotificationChangesOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D367E61E1844F800D03E86 /* CKFetchNotificationChangesOperation.swift */; };
+		65C7BBCA2085D197009A6D6E /* CKFetchRecordChangesOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D367E71E1844F800D03E86 /* CKFetchRecordChangesOperation.swift */; };
+		65C7BBCB2085D1B4009A6D6E /* CKFetchRecordsOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D367E81E1844F800D03E86 /* CKFetchRecordsOperation.swift */; };
+		65C7BBCD2085D26F009A6D6E /* CKFetchRecordZoneChangesOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D367E91E1844F800D03E86 /* CKFetchRecordZoneChangesOperation.swift */; };
+		65C7BBCE2085D294009A6D6E /* CKFetchRecordZonesOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D367EA1E1844F800D03E86 /* CKFetchRecordZonesOperation.swift */; };
+		65C7BBCF2085D2A3009A6D6E /* CKFetchShareMetadataOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D367EB1E1844F800D03E86 /* CKFetchShareMetadataOperation.swift */; };
+		65C7BBD02085D2B1009A6D6E /* CKFetchShareParticipantsOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D367EC1E1844F800D03E86 /* CKFetchShareParticipantsOperation.swift */; };
+		65C7BBD12085D2DC009A6D6E /* CKFetchSubscriptionsOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D367ED1E1844F800D03E86 /* CKFetchSubscriptionsOperation.swift */; };
+		65C7BBD22085D2E8009A6D6E /* CKMarkNotificationsReadOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D367EE1E1844F800D03E86 /* CKMarkNotificationsReadOperation.swift */; };
+		65C7BBD32085D2EE009A6D6E /* CKModifyBadgeOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D367EF1E1844F800D03E86 /* CKModifyBadgeOperation.swift */; };
+		65C7BBD42085D2F3009A6D6E /* CKModifyRecordsOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D367F01E1844F800D03E86 /* CKModifyRecordsOperation.swift */; };
+		65C7BBD52085D30C009A6D6E /* CKModifyRecordZonesOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D367F11E1844F800D03E86 /* CKModifyRecordZonesOperation.swift */; };
+		65C7BBD62085D31F009A6D6E /* CKModifySubscriptionsOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D367F21E1844F800D03E86 /* CKModifySubscriptionsOperation.swift */; };
+		65C7BBD72085D329009A6D6E /* CKQueryOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D367F41E1844F800D03E86 /* CKQueryOperation.swift */; };
 		65CFC5FA1D608A5500CAD875 /* ProcedureKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65CFC5F01D608A5500CAD875 /* ProcedureKit.framework */; };
 		65CFC60B1D608AA700CAD875 /* ProcedureKit.h in Headers */ = {isa = PBXBuildFile; fileRef = 65CFC60A1D608AA700CAD875 /* ProcedureKit.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		65CFC61F1D60904700CAD875 /* TestingProcedureKit.h in Headers */ = {isa = PBXBuildFile; fileRef = 65CFC61E1D60904700CAD875 /* TestingProcedureKit.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -96,7 +141,6 @@
 		65D367171E183FB000D03E86 /* FilterProcedureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D366F01E183FB000D03E86 /* FilterProcedureTests.swift */; };
 		65D367191E183FB000D03E86 /* FinishingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D366F11E183FB000D03E86 /* FinishingTests.swift */; };
 		65D3671B1E183FB000D03E86 /* GroupTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D366F21E183FB000D03E86 /* GroupTests.swift */; };
-		65D3671D1E183FB000D03E86 /* LoggerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D366F31E183FB000D03E86 /* LoggerTests.swift */; };
 		65D3671F1E183FB000D03E86 /* MapProcedureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D366F41E183FB000D03E86 /* MapProcedureTests.swift */; };
 		65D367211E183FB000D03E86 /* MutualExclusivityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D366F51E183FB000D03E86 /* MutualExclusivityTests.swift */; };
 		65D367231E183FB000D03E86 /* NegatedConditionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D366F61E183FB000D03E86 /* NegatedConditionTests.swift */; };
@@ -131,28 +175,7 @@
 		65D367DB1E1844E500D03E86 /* TestCondition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D367CF1E1844E500D03E86 /* TestCondition.swift */; };
 		65D367DC1E1844E500D03E86 /* TestProcedure.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D367D01E1844E500D03E86 /* TestProcedure.swift */; };
 		65D367DD1E1844E500D03E86 /* XCTAsserts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D367D11E1844E500D03E86 /* XCTAsserts.swift */; };
-		65D367F91E1844F800D03E86 /* CKAcceptSharesOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D367DF1E1844F800D03E86 /* CKAcceptSharesOperation.swift */; };
-		65D367FA1E1844F800D03E86 /* CKDatabaseOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D367E01E1844F800D03E86 /* CKDatabaseOperation.swift */; };
-		65D367FB1E1844F800D03E86 /* CKDiscoverAllContactsOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D367E11E1844F800D03E86 /* CKDiscoverAllContactsOperation.swift */; };
-		65D367FC1E1844F800D03E86 /* CKDiscoverAllUserIdentitiesOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D367E21E1844F800D03E86 /* CKDiscoverAllUserIdentitiesOperation.swift */; };
-		65D367FD1E1844F800D03E86 /* CKDiscoverUserIdentitiesOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D367E31E1844F800D03E86 /* CKDiscoverUserIdentitiesOperation.swift */; };
-		65D367FE1E1844F800D03E86 /* CKDiscoverUserInfosOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D367E41E1844F800D03E86 /* CKDiscoverUserInfosOperation.swift */; };
-		65D367FF1E1844F800D03E86 /* CKFetchDatabaseChangesOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D367E51E1844F800D03E86 /* CKFetchDatabaseChangesOperation.swift */; };
-		65D368001E1844F800D03E86 /* CKFetchNotificationChangesOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D367E61E1844F800D03E86 /* CKFetchNotificationChangesOperation.swift */; };
-		65D368011E1844F800D03E86 /* CKFetchRecordChangesOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D367E71E1844F800D03E86 /* CKFetchRecordChangesOperation.swift */; };
-		65D368021E1844F800D03E86 /* CKFetchRecordsOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D367E81E1844F800D03E86 /* CKFetchRecordsOperation.swift */; };
-		65D368031E1844F800D03E86 /* CKFetchRecordZoneChangesOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D367E91E1844F800D03E86 /* CKFetchRecordZoneChangesOperation.swift */; };
-		65D368041E1844F800D03E86 /* CKFetchRecordZonesOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D367EA1E1844F800D03E86 /* CKFetchRecordZonesOperation.swift */; };
-		65D368051E1844F800D03E86 /* CKFetchShareMetadataOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D367EB1E1844F800D03E86 /* CKFetchShareMetadataOperation.swift */; };
-		65D368061E1844F800D03E86 /* CKFetchShareParticipantsOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D367EC1E1844F800D03E86 /* CKFetchShareParticipantsOperation.swift */; };
-		65D368071E1844F800D03E86 /* CKFetchSubscriptionsOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D367ED1E1844F800D03E86 /* CKFetchSubscriptionsOperation.swift */; };
-		65D368081E1844F800D03E86 /* CKMarkNotificationsReadOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D367EE1E1844F800D03E86 /* CKMarkNotificationsReadOperation.swift */; };
-		65D368091E1844F800D03E86 /* CKModifyBadgeOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D367EF1E1844F800D03E86 /* CKModifyBadgeOperation.swift */; };
-		65D3680A1E1844F800D03E86 /* CKModifyRecordsOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D367F01E1844F800D03E86 /* CKModifyRecordsOperation.swift */; };
-		65D3680B1E1844F800D03E86 /* CKModifyRecordZonesOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D367F11E1844F800D03E86 /* CKModifyRecordZonesOperation.swift */; };
-		65D3680C1E1844F800D03E86 /* CKModifySubscriptionsOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D367F21E1844F800D03E86 /* CKModifySubscriptionsOperation.swift */; };
 		65D3680D1E1844F800D03E86 /* CKOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D367F31E1844F800D03E86 /* CKOperation.swift */; };
-		65D3680E1E1844F800D03E86 /* CKQueryOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D367F41E1844F800D03E86 /* CKQueryOperation.swift */; };
 		65D3680F1E1844F800D03E86 /* CloudKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D367F51E1844F800D03E86 /* CloudKit.swift */; };
 		65D368101E1844F800D03E86 /* CloudKitCapability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D367F61E1844F800D03E86 /* CloudKitCapability.swift */; };
 		65D368111E1844F800D03E86 /* CloudKitError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D367F71E1844F800D03E86 /* CloudKitError.swift */; };
@@ -275,6 +298,13 @@
 			remoteGlobalIDString = 65CFC6151D60900000CAD875;
 			remoteInfo = TestingProcedureKit;
 		};
+		65374F3220BC6553009948B4 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 65CFC5E51D608A1A00CAD875 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 65CFC5EF1D608A5500CAD875;
+			remoteInfo = ProcedureKit;
+		};
 		653C9FCB1D6097A40070B7A2 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 65CFC5E51D608A1A00CAD875 /* Project object */;
@@ -387,6 +417,27 @@
 			remoteGlobalIDString = 65CFC6151D60900000CAD875;
 			remoteInfo = TestingProcedureKit;
 		};
+		65A0E4A320B85169002D6C8C /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 65CFC5E51D608A1A00CAD875 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 65A0E49820B85168002D6C8C;
+			remoteInfo = ProcedureKitCoreData;
+		};
+		65A0E4BB20B85880002D6C8C /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 65CFC5E51D608A1A00CAD875 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 65CFC5EF1D608A5500CAD875;
+			remoteInfo = ProcedureKit;
+		};
+		65A0E4BD20B8588F002D6C8C /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 65CFC5E51D608A1A00CAD875 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 65CFC6151D60900000CAD875;
+			remoteInfo = TestingProcedureKit;
+		};
 		65CFC5FB1D608A5500CAD875 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 65CFC5E51D608A1A00CAD875 /* Project object */;
@@ -492,6 +543,11 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		65068FAC20C62AE300B0A0A3 /* MakesBackgroundManagedObjectContext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MakesBackgroundManagedObjectContext.swift; sourceTree = "<group>"; };
+		651E670420C610D800BE520E /* CoreDataHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataHelpers.swift; sourceTree = "<group>"; };
+		652F9014209C488600365B2D /* BatchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BatchTests.swift; sourceTree = "<group>"; };
+		652F903C209E3E3D00365B2D /* IgnoreErrors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IgnoreErrors.swift; sourceTree = "<group>"; };
+		652F903E209E445200365B2D /* IgnoreErrorsProcedureTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IgnoreErrorsProcedureTests.swift; sourceTree = "<group>"; };
 		653C9FC11D6097A40070B7A2 /* ProcedureKitMobile.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ProcedureKitMobile.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		653C9FDA1D6098330070B7A2 /* ProcedureKitMobile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ProcedureKitMobile.h; path = "Supporting Files/ProcedureKitMobile.h"; sourceTree = "<group>"; };
 		653C9FDC1D6098650070B7A2 /* ProcedureKitMobile.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = ProcedureKitMobile.xcconfig; path = "Supporting Files/ProcedureKitMobile.xcconfig"; sourceTree = "<group>"; };
@@ -509,10 +565,29 @@
 		653CA0621D60AA990070B7A2 /* ProcedureKitCloudTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ProcedureKitCloudTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		653CA0731D60AB1B0070B7A2 /* ProcedureKitCloud.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ProcedureKitCloud.h; path = "Supporting Files/ProcedureKitCloud.h"; sourceTree = "<group>"; };
 		653CA0751D60AB2B0070B7A2 /* ProcedureKitCloud.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = ProcedureKitCloud.xcconfig; path = "Supporting Files/ProcedureKitCloud.xcconfig"; sourceTree = "<group>"; };
+		658BE07120BC72540021F11B /* MakeFetchedResultController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MakeFetchedResultController.swift; sourceTree = "<group>"; };
+		658BE07320BC77AD0021F11B /* MakeFetchedResultsControllerProcedureTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MakeFetchedResultsControllerProcedureTests.swift; sourceTree = "<group>"; };
+		658BE07520BC99100021F11B /* InsertManagedObjects.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsertManagedObjects.swift; sourceTree = "<group>"; };
+		658BE07720BCA0500021F11B /* InsertManagedObjectsProcedureTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsertManagedObjectsProcedureTests.swift; sourceTree = "<group>"; };
 		6594841E1DAAA2B90028F83B /* ProcedureKitLocation.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ProcedureKitLocation.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		659484261DAAA2B90028F83B /* ProcedureKitLocationTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ProcedureKitLocationTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		659484351DAAA3360028F83B /* ProcedureKitLocation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ProcedureKitLocation.h; path = "Supporting Files/ProcedureKitLocation.h"; sourceTree = "<group>"; };
 		659484371DAAA3A60028F83B /* ProcedureKitLocation.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = ProcedureKitLocation.xcconfig; path = "Supporting Files/ProcedureKitLocation.xcconfig"; sourceTree = "<group>"; };
+		65A0E49920B85168002D6C8C /* ProcedureKitCoreData.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ProcedureKitCoreData.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		65A0E4A120B85169002D6C8C /* ProcedureKitCoreDataTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ProcedureKitCoreDataTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		65A0E4B120B85213002D6C8C /* LoadCoreData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadCoreData.swift; sourceTree = "<group>"; };
+		65A0E4B320B85258002D6C8C /* ProcedureKitCoreData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ProcedureKitCoreData.h; path = "Supporting Files/ProcedureKitCoreData.h"; sourceTree = "<group>"; };
+		65A0E4B520B85297002D6C8C /* ProcedureKitCoreData.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = ProcedureKitCoreData.xcconfig; path = "Supporting Files/ProcedureKitCoreData.xcconfig"; sourceTree = "<group>"; };
+		65A0E4B820B8548D002D6C8C /* ProcedureKitCoreDataTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProcedureKitCoreDataTests.swift; sourceTree = "<group>"; };
+		65A0E4C020BB18EA002D6C8C /* TestDataModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = TestDataModel.xcdatamodel; sourceTree = "<group>"; };
+		65A0E4C220BB1975002D6C8C /* LoadCoreDataProcedureTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadCoreDataProcedureTests.swift; sourceTree = "<group>"; };
+		65A0E4C420BB2E51002D6C8C /* SaveManagedObjectContext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaveManagedObjectContext.swift; sourceTree = "<group>"; };
+		65A0E4C620BC548A002D6C8C /* SaveManagedObjectContextProcedureTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaveManagedObjectContextProcedureTests.swift; sourceTree = "<group>"; };
+		65A1923820F88FD300E0D42C /* LoggingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoggingTests.swift; sourceTree = "<group>"; };
+		65A1923A20F8900100E0D42C /* TestableLogging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestableLogging.swift; sourceTree = "<group>"; };
+		65AB7DD9209B95B400726796 /* Batch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Batch.swift; sourceTree = "<group>"; };
+		65AEF19E20A3AE340089B6C8 /* ViewControllerContainment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewControllerContainment.swift; sourceTree = "<group>"; };
+		65B9AF472116D1D4004DA82B /* Result.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Result.swift; sourceTree = "<group>"; };
 		65C88D761DC4EB4300C8D4EB /* Warnings.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = Warnings.xcconfig; path = "Supporting Files/Warnings.xcconfig"; sourceTree = "<group>"; };
 		65CFC5F01D608A5500CAD875 /* ProcedureKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ProcedureKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		65CFC5F91D608A5500CAD875 /* ProcedureKitTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ProcedureKitTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -583,7 +658,6 @@
 		65D366F01E183FB000D03E86 /* FilterProcedureTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FilterProcedureTests.swift; sourceTree = "<group>"; };
 		65D366F11E183FB000D03E86 /* FinishingTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FinishingTests.swift; sourceTree = "<group>"; };
 		65D366F21E183FB000D03E86 /* GroupTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GroupTests.swift; sourceTree = "<group>"; };
-		65D366F31E183FB000D03E86 /* LoggerTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoggerTests.swift; sourceTree = "<group>"; };
 		65D366F41E183FB000D03E86 /* MapProcedureTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MapProcedureTests.swift; sourceTree = "<group>"; };
 		65D366F51E183FB000D03E86 /* MutualExclusivityTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MutualExclusivityTests.swift; sourceTree = "<group>"; };
 		65D366F61E183FB000D03E86 /* NegatedConditionTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NegatedConditionTests.swift; sourceTree = "<group>"; };
@@ -801,6 +875,23 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		65A0E49520B85168002D6C8C /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		65A0E49E20B85169002D6C8C /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				658BE06F20BC69170021F11B /* ProcedureKit.framework in Frameworks */,
+				658BE07020BC69170021F11B /* TestingProcedureKit.framework in Frameworks */,
+				65A0E4A220B85169002D6C8C /* ProcedureKitCoreData.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		65CFC5EC1D608A5500CAD875 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -848,14 +939,15 @@
 		653C9FD91D6097E20070B7A2 /* Tests */ = {
 			isa = PBXGroup;
 			children = (
-				65D366E61E183FB000D03E86 /* ProcedureKitTests */,
-				65D367411E183FBE00D03E86 /* ProcedureKitStressTests */,
-				65D366E31E183F8100D03E86 /* ProcedureKitTVTests */,
 				65D366801E183F1900D03E86 /* ProcedureKitCloudTests */,
+				65A0E4B620B8548D002D6C8C /* ProcedureKitCoreDataTests */,
 				65D366B51E183F2600D03E86 /* ProcedureKitLocationTests */,
 				65D366C21E183F3900D03E86 /* ProcedureKitMacTests */,
 				65D366C71E183F5000D03E86 /* ProcedureKitMobileTests */,
 				65D366D41E183F6400D03E86 /* ProcedureKitNetworkTests */,
+				65D367411E183FBE00D03E86 /* ProcedureKitStressTests */,
+				65D366E61E183FB000D03E86 /* ProcedureKitTests */,
+				65D366E31E183F8100D03E86 /* ProcedureKitTVTests */,
 			);
 			name = Tests;
 			sourceTree = "<group>";
@@ -867,6 +959,34 @@
 				65CFC5F11D608A5500CAD875 /* Products */,
 			);
 			name = ...;
+			sourceTree = "<group>";
+		};
+		65A0E4B020B851D4002D6C8C /* ProcedureKitCoreData */ = {
+			isa = PBXGroup;
+			children = (
+				65068FAC20C62AE300B0A0A3 /* MakesBackgroundManagedObjectContext.swift */,
+				651E670420C610D800BE520E /* CoreDataHelpers.swift */,
+				658BE07520BC99100021F11B /* InsertManagedObjects.swift */,
+				65A0E4B120B85213002D6C8C /* LoadCoreData.swift */,
+				658BE07120BC72540021F11B /* MakeFetchedResultController.swift */,
+				65A0E4C420BB2E51002D6C8C /* SaveManagedObjectContext.swift */,
+			);
+			name = ProcedureKitCoreData;
+			path = Sources/ProcedureKitCoreData;
+			sourceTree = "<group>";
+		};
+		65A0E4B620B8548D002D6C8C /* ProcedureKitCoreDataTests */ = {
+			isa = PBXGroup;
+			children = (
+				658BE07720BCA0500021F11B /* InsertManagedObjectsProcedureTests.swift */,
+				65A0E4C220BB1975002D6C8C /* LoadCoreDataProcedureTests.swift */,
+				658BE07320BC77AD0021F11B /* MakeFetchedResultsControllerProcedureTests.swift */,
+				65A0E4B820B8548D002D6C8C /* ProcedureKitCoreDataTests.swift */,
+				65A0E4C620BC548A002D6C8C /* SaveManagedObjectContextProcedureTests.swift */,
+				65A0E4BF20BB18EA002D6C8C /* TestDataModel.xcdatamodeld */,
+			);
+			name = ProcedureKitCoreDataTests;
+			path = Tests/ProcedureKitCoreDataTests;
 			sourceTree = "<group>";
 		};
 		65CFC5E41D608A1A00CAD875 = {
@@ -897,6 +1017,8 @@
 				659484261DAAA2B90028F83B /* ProcedureKitLocationTests.xctest */,
 				65ECB2CD1DB4F0C000F96F46 /* ProcedureKitNetwork.framework */,
 				65ECB2D51DB4F0C000F96F46 /* ProcedureKitNetworkTests.xctest */,
+				65A0E49920B85168002D6C8C /* ProcedureKitCoreData.framework */,
+				65A0E4A120B85169002D6C8C /* ProcedureKitCoreDataTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -906,6 +1028,7 @@
 			children = (
 				65CFC60A1D608AA700CAD875 /* ProcedureKit.h */,
 				653CA0731D60AB1B0070B7A2 /* ProcedureKitCloud.h */,
+				65A0E4B320B85258002D6C8C /* ProcedureKitCoreData.h */,
 				659484351DAAA3360028F83B /* ProcedureKitLocation.h */,
 				653CA0471D60A6060070B7A2 /* ProcedureKitMac.h */,
 				653C9FDA1D6098330070B7A2 /* ProcedureKitMobile.h */,
@@ -915,6 +1038,7 @@
 				65CFC60F1D608B3000CAD875 /* Info.plist */,
 				65CFC60E1D608AE200CAD875 /* ProcedureKit.xcconfig */,
 				653CA0751D60AB2B0070B7A2 /* ProcedureKitCloud.xcconfig */,
+				65A0E4B520B85297002D6C8C /* ProcedureKitCoreData.xcconfig */,
 				659484371DAAA3A60028F83B /* ProcedureKitLocation.xcconfig */,
 				653CA0491D60A6630070B7A2 /* ProcedureKitMac.xcconfig */,
 				653C9FDC1D6098650070B7A2 /* ProcedureKitMobile.xcconfig */,
@@ -1027,6 +1151,7 @@
 			isa = PBXGroup;
 			children = (
 				65D366E71E183FB000D03E86 /* AnyProcedureTests.swift */,
+				652F9014209C488600365B2D /* BatchTests.swift */,
 				65D366E81E183FB000D03E86 /* BlockConditionTests.swift */,
 				65D366E91E183FB000D03E86 /* BlockObserverTests.swift */,
 				65D366EA1E183FB000D03E86 /* BlockProcedureTests.swift */,
@@ -1038,9 +1163,10 @@
 				EE3371071E29AD3E004272E9 /* DispatchQueueExtensionsTests.swift */,
 				65D366F01E183FB000D03E86 /* FilterProcedureTests.swift */,
 				65D366F11E183FB000D03E86 /* FinishingTests.swift */,
-				EEE79AED1E21C9750030C768 /* KVONotificationTests.swift */,
 				65D366F21E183FB000D03E86 /* GroupTests.swift */,
-				65D366F31E183FB000D03E86 /* LoggerTests.swift */,
+				652F903E209E445200365B2D /* IgnoreErrorsProcedureTests.swift */,
+				EEE79AED1E21C9750030C768 /* KVONotificationTests.swift */,
+				65A1923820F88FD300E0D42C /* LoggingTests.swift */,
 				65D366F41E183FB000D03E86 /* MapProcedureTests.swift */,
 				65D366F51E183FB000D03E86 /* MutualExclusivityTests.swift */,
 				65D366F61E183FB000D03E86 /* NegatedConditionTests.swift */,
@@ -1081,6 +1207,7 @@
 			children = (
 				65D368651E184AA600D03E86 /* ProcedureKit */,
 				65D367DE1E1844F800D03E86 /* ProcedureKitCloud */,
+				65A0E4B020B851D4002D6C8C /* ProcedureKitCoreData */,
 				65D368131E18450200D03E86 /* ProcedureKitLocation */,
 				65D3681E1E18451000D03E86 /* ProcedureKitMac */,
 				65D368211E18451C00D03E86 /* ProcedureKitMobile */,
@@ -1100,6 +1227,7 @@
 				65D367CA1E1844E500D03E86 /* QueueTestDelegate.swift */,
 				65D367CB1E1844E500D03E86 /* RepeatTestCase.swift */,
 				65D367CC1E1844E500D03E86 /* StressTestCase.swift */,
+				65A1923A20F8900100E0D42C /* TestableLogging.swift */,
 				65D367CD1E1844E500D03E86 /* TestableNetwork.swift */,
 				65D367CE1E1844E500D03E86 /* TestableNetworkReachability.swift */,
 				65D367CF1E1844E500D03E86 /* TestCondition.swift */,
@@ -1174,6 +1302,7 @@
 				65D368241E18451C00D03E86 /* NetworkObserver+Mobile.swift */,
 				65D368251E18451C00D03E86 /* UI.swift */,
 				65FFC36E1E4BDF03005DC38F /* UserConfirmation.swift */,
+				65AEF19E20A3AE340089B6C8 /* ViewControllerContainment.swift */,
 			);
 			name = ProcedureKitMobile;
 			path = Sources/ProcedureKitMobile;
@@ -1213,15 +1342,18 @@
 			isa = PBXGroup;
 			children = (
 				65D368661E184AA600D03E86 /* Any.swift */,
+				65AB7DD9209B95B400726796 /* Batch.swift */,
 				65D368681E184AA600D03E86 /* Block.swift */,
 				65D3686B1E184AA600D03E86 /* Capability.swift */,
 				65D3686D1E184AA600D03E86 /* Composed.swift */,
 				65D3686F1E184AA600D03E86 /* Delay.swift */,
 				65D368721E184AA600D03E86 /* Filter.swift */,
 				65D368731E184AA600D03E86 /* Group.swift */,
+				652F903C209E3E3D00365B2D /* IgnoreErrors.swift */,
 				65D368761E184AA600D03E86 /* Map.swift */,
 				65D368831E184AA600D03E86 /* Reduce.swift */,
 				65D368841E184AA600D03E86 /* Repeat.swift */,
+				65B9AF472116D1D4004DA82B /* Result.swift */,
 				65D368851E184AA600D03E86 /* Retry.swift */,
 				65D368891E184AA600D03E86 /* Transform.swift */,
 			);
@@ -1320,6 +1452,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				659484361DAAA3360028F83B /* ProcedureKitLocation.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		65A0E49620B85168002D6C8C /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				65A0E4B420B85258002D6C8C /* ProcedureKitCoreData.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1567,6 +1707,45 @@
 			productReference = 659484261DAAA2B90028F83B /* ProcedureKitLocationTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
+		65A0E49820B85168002D6C8C /* ProcedureKitCoreData */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 65A0E4AE20B85169002D6C8C /* Build configuration list for PBXNativeTarget "ProcedureKitCoreData" */;
+			buildPhases = (
+				65A0E49420B85168002D6C8C /* Sources */,
+				65A0E49520B85168002D6C8C /* Frameworks */,
+				65A0E49620B85168002D6C8C /* Headers */,
+				65A0E49720B85168002D6C8C /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				65A0E4BC20B85880002D6C8C /* PBXTargetDependency */,
+			);
+			name = ProcedureKitCoreData;
+			productName = ProcedureKitCoreData;
+			productReference = 65A0E49920B85168002D6C8C /* ProcedureKitCoreData.framework */;
+			productType = "com.apple.product-type.framework";
+		};
+		65A0E4A020B85169002D6C8C /* ProcedureKitCoreDataTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 65A0E4AF20B85169002D6C8C /* Build configuration list for PBXNativeTarget "ProcedureKitCoreDataTests" */;
+			buildPhases = (
+				65A0E49D20B85169002D6C8C /* Sources */,
+				65A0E49E20B85169002D6C8C /* Frameworks */,
+				65A0E49F20B85169002D6C8C /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				65374F3320BC6553009948B4 /* PBXTargetDependency */,
+				65A0E4BE20B8588F002D6C8C /* PBXTargetDependency */,
+				65A0E4A420B85169002D6C8C /* PBXTargetDependency */,
+			);
+			name = ProcedureKitCoreDataTests;
+			productName = ProcedureKitCoreDataTests;
+			productReference = 65A0E4A120B85169002D6C8C /* ProcedureKitCoreDataTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		65CFC5EF1D608A5500CAD875 /* ProcedureKit */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 65CFC6061D608A5500CAD875 /* Build configuration list for PBXNativeTarget "ProcedureKit" */;
@@ -1671,14 +1850,13 @@
 			isa = PBXProject;
 			attributes = {
 				CLASSPREFIX = PCK;
-				LastSwiftUpdateCheck = 0800;
-				LastUpgradeCheck = 0920;
+				LastSwiftUpdateCheck = 0930;
+				LastUpgradeCheck = 0930;
 				ORGANIZATIONNAME = ProcedureKit;
 				TargetAttributes = {
 					653C9FC01D6097A40070B7A2 = {
 						CreatedOnToolsVersion = 8.0;
 						LastSwiftMigration = 0920;
-						ProvisioningStyle = Automatic;
 					};
 					653C9FC81D6097A40070B7A2 = {
 						CreatedOnToolsVersion = 8.0;
@@ -1688,7 +1866,6 @@
 					653C9FF21D609E650070B7A2 = {
 						CreatedOnToolsVersion = 8.0;
 						LastSwiftMigration = 0920;
-						ProvisioningStyle = Automatic;
 					};
 					653C9FFA1D609E660070B7A2 = {
 						CreatedOnToolsVersion = 8.0;
@@ -1701,7 +1878,6 @@
 					653CA02F1D60A5D10070B7A2 = {
 						CreatedOnToolsVersion = 8.0;
 						LastSwiftMigration = 0920;
-						ProvisioningStyle = Automatic;
 					};
 					653CA0371D60A5D10070B7A2 = {
 						CreatedOnToolsVersion = 8.0;
@@ -1711,7 +1887,6 @@
 					653CA0591D60AA990070B7A2 = {
 						CreatedOnToolsVersion = 8.0;
 						LastSwiftMigration = 0920;
-						ProvisioningStyle = Automatic;
 					};
 					653CA0611D60AA990070B7A2 = {
 						CreatedOnToolsVersion = 8.0;
@@ -1721,17 +1896,22 @@
 					6594841D1DAAA2B90028F83B = {
 						CreatedOnToolsVersion = 8.0;
 						LastSwiftMigration = 0920;
-						ProvisioningStyle = Automatic;
 					};
 					659484251DAAA2B90028F83B = {
 						CreatedOnToolsVersion = 8.0;
 						LastSwiftMigration = 0920;
 						ProvisioningStyle = Automatic;
 					};
+					65A0E49820B85168002D6C8C = {
+						CreatedOnToolsVersion = 9.3;
+						LastSwiftMigration = 0930;
+					};
+					65A0E4A020B85169002D6C8C = {
+						CreatedOnToolsVersion = 9.3;
+					};
 					65CFC5EF1D608A5500CAD875 = {
 						CreatedOnToolsVersion = 8.0;
 						LastSwiftMigration = 0920;
-						ProvisioningStyle = Automatic;
 					};
 					65CFC5F81D608A5500CAD875 = {
 						CreatedOnToolsVersion = 8.0;
@@ -1741,12 +1921,10 @@
 					65CFC6151D60900000CAD875 = {
 						CreatedOnToolsVersion = 8.0;
 						LastSwiftMigration = 0920;
-						ProvisioningStyle = Automatic;
 					};
 					65ECB2CC1DB4F0C000F96F46 = {
 						CreatedOnToolsVersion = 8.0;
 						LastSwiftMigration = 0920;
-						ProvisioningStyle = Automatic;
 					};
 					65ECB2D41DB4F0C000F96F46 = {
 						CreatedOnToolsVersion = 8.0;
@@ -1756,7 +1934,7 @@
 				};
 			};
 			buildConfigurationList = 65CFC5E81D608A1A00CAD875 /* Build configuration list for PBXProject "ProcedureKit" */;
-			compatibilityVersion = "Xcode 8.0";
+			compatibilityVersion = "Xcode 9.3";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -1773,6 +1951,8 @@
 				653CA0171D60A34E0070B7A2 /* ProcedureKitStressTests */,
 				653CA0591D60AA990070B7A2 /* ProcedureKitCloud */,
 				653CA0611D60AA990070B7A2 /* ProcedureKitCloudTests */,
+				65A0E49820B85168002D6C8C /* ProcedureKitCoreData */,
+				65A0E4A020B85169002D6C8C /* ProcedureKitCoreDataTests */,
 				6594841D1DAAA2B90028F83B /* ProcedureKitLocation */,
 				659484251DAAA2B90028F83B /* ProcedureKitLocationTests */,
 				653CA02F1D60A5D10070B7A2 /* ProcedureKitMac */,
@@ -1865,6 +2045,20 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		65A0E49720B85168002D6C8C /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		65A0E49F20B85169002D6C8C /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		65CFC5EE1D608A5500CAD875 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1908,6 +2102,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				65FFC36F1E4BDF03005DC38F /* UserConfirmation.swift in Sources */,
+				65AEF19F20A3AE340089B6C8 /* ViewControllerContainment.swift in Sources */,
 				65D368261E18451C00D03E86 /* Alert.swift in Sources */,
 				65D368291E18451C00D03E86 /* UI.swift in Sources */,
 				65D368281E18451C00D03E86 /* NetworkObserver+Mobile.swift in Sources */,
@@ -1976,32 +2171,32 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				65D368071E1844F800D03E86 /* CKFetchSubscriptionsOperation.swift in Sources */,
-				65D368081E1844F800D03E86 /* CKMarkNotificationsReadOperation.swift in Sources */,
 				65D368121E1844F800D03E86 /* CloudKitSupport.swift in Sources */,
-				65D367FA1E1844F800D03E86 /* CKDatabaseOperation.swift in Sources */,
-				65D368031E1844F800D03E86 /* CKFetchRecordZoneChangesOperation.swift in Sources */,
+				65C7BBC62085D0D3009A6D6E /* CKDiscoverUserIdentitiesOperation.swift in Sources */,
+				65C7BBD52085D30C009A6D6E /* CKModifyRecordZonesOperation.swift in Sources */,
+				65C7BBCE2085D294009A6D6E /* CKFetchRecordZonesOperation.swift in Sources */,
+				65C7BBD72085D329009A6D6E /* CKQueryOperation.swift in Sources */,
+				65C7BBC52085CF46009A6D6E /* CKDiscoverAllUserIdentitiesOperation.swift in Sources */,
+				65C7BBCA2085D197009A6D6E /* CKFetchRecordChangesOperation.swift in Sources */,
+				65C7BBD32085D2EE009A6D6E /* CKModifyBadgeOperation.swift in Sources */,
+				65C7BBC82085D121009A6D6E /* CKFetchDatabaseChangesOperation.swift in Sources */,
 				65D368111E1844F800D03E86 /* CloudKitError.swift in Sources */,
+				65C7BBD02085D2B1009A6D6E /* CKFetchShareParticipantsOperation.swift in Sources */,
+				65C7BBCF2085D2A3009A6D6E /* CKFetchShareMetadataOperation.swift in Sources */,
+				65C7BBD22085D2E8009A6D6E /* CKMarkNotificationsReadOperation.swift in Sources */,
+				65C7BBC32085CF21009A6D6E /* CKDatabaseOperation.swift in Sources */,
+				65C7BBC72085D10E009A6D6E /* CKDiscoverUserInfosOperation.swift in Sources */,
 				65D368101E1844F800D03E86 /* CloudKitCapability.swift in Sources */,
-				65D367FD1E1844F800D03E86 /* CKDiscoverUserIdentitiesOperation.swift in Sources */,
-				65D367FC1E1844F800D03E86 /* CKDiscoverAllUserIdentitiesOperation.swift in Sources */,
-				65D368051E1844F800D03E86 /* CKFetchShareMetadataOperation.swift in Sources */,
-				65D367FB1E1844F800D03E86 /* CKDiscoverAllContactsOperation.swift in Sources */,
-				65D3680A1E1844F800D03E86 /* CKModifyRecordsOperation.swift in Sources */,
-				65D367FF1E1844F800D03E86 /* CKFetchDatabaseChangesOperation.swift in Sources */,
-				65D368001E1844F800D03E86 /* CKFetchNotificationChangesOperation.swift in Sources */,
 				65D3680D1E1844F800D03E86 /* CKOperation.swift in Sources */,
-				65D368061E1844F800D03E86 /* CKFetchShareParticipantsOperation.swift in Sources */,
-				65D367F91E1844F800D03E86 /* CKAcceptSharesOperation.swift in Sources */,
-				65D3680E1E1844F800D03E86 /* CKQueryOperation.swift in Sources */,
-				65D368011E1844F800D03E86 /* CKFetchRecordChangesOperation.swift in Sources */,
-				65D3680C1E1844F800D03E86 /* CKModifySubscriptionsOperation.swift in Sources */,
-				65D368091E1844F800D03E86 /* CKModifyBadgeOperation.swift in Sources */,
-				65D3680B1E1844F800D03E86 /* CKModifyRecordZonesOperation.swift in Sources */,
-				65D368041E1844F800D03E86 /* CKFetchRecordZonesOperation.swift in Sources */,
-				65D367FE1E1844F800D03E86 /* CKDiscoverUserInfosOperation.swift in Sources */,
+				65C7BBC42085CF26009A6D6E /* CKDiscoverAllContactsOperation.swift in Sources */,
 				65D3680F1E1844F800D03E86 /* CloudKit.swift in Sources */,
-				65D368021E1844F800D03E86 /* CKFetchRecordsOperation.swift in Sources */,
+				65C7BBD12085D2DC009A6D6E /* CKFetchSubscriptionsOperation.swift in Sources */,
+				65C7BBC92085D17C009A6D6E /* CKFetchNotificationChangesOperation.swift in Sources */,
+				65C7BBD42085D2F3009A6D6E /* CKModifyRecordsOperation.swift in Sources */,
+				65C7BBC22085CEF4009A6D6E /* CKAcceptSharesOperation.swift in Sources */,
+				65C7BBCB2085D1B4009A6D6E /* CKFetchRecordsOperation.swift in Sources */,
+				65C7BBCD2085D26F009A6D6E /* CKFetchRecordZoneChangesOperation.swift in Sources */,
+				65C7BBD62085D31F009A6D6E /* CKModifySubscriptionsOperation.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2063,6 +2258,32 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		65A0E49420B85168002D6C8C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				651E670520C610D800BE520E /* CoreDataHelpers.swift in Sources */,
+				65A0E4B220B85213002D6C8C /* LoadCoreData.swift in Sources */,
+				65068FAD20C62AE300B0A0A3 /* MakesBackgroundManagedObjectContext.swift in Sources */,
+				658BE07620BC99100021F11B /* InsertManagedObjects.swift in Sources */,
+				658BE07220BC72540021F11B /* MakeFetchedResultController.swift in Sources */,
+				65A0E4C520BB2E51002D6C8C /* SaveManagedObjectContext.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		65A0E49D20B85169002D6C8C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				65A0E4C120BB18EA002D6C8C /* TestDataModel.xcdatamodeld in Sources */,
+				658BE07820BCA0500021F11B /* InsertManagedObjectsProcedureTests.swift in Sources */,
+				65A0E4BA20B8548D002D6C8C /* ProcedureKitCoreDataTests.swift in Sources */,
+				65A0E4C320BB1975002D6C8C /* LoadCoreDataProcedureTests.swift in Sources */,
+				65A0E4C820BC5540002D6C8C /* SaveManagedObjectContextProcedureTests.swift in Sources */,
+				658BE07420BC77AD0021F11B /* MakeFetchedResultsControllerProcedureTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		65CFC5EB1D608A5500CAD875 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -2083,7 +2304,9 @@
 				65D368AC1E184AA600D03E86 /* TimeoutObserver.swift in Sources */,
 				EEE79AE81E21B9C90030C768 /* PendingEvent.swift in Sources */,
 				65D3689E1E184AA600D03E86 /* NoFailedDependenciesCondition.swift in Sources */,
+				65AB7DDA209B95B400726796 /* Batch.swift in Sources */,
 				65D368A41E184AA600D03E86 /* ProcedureResult.swift in Sources */,
+				65B9AF482116D1D4004DA82B /* Result.swift in Sources */,
 				65D368A81E184AA600D03E86 /* Repeat.swift in Sources */,
 				65D368AB1E184AA600D03E86 /* Support.swift in Sources */,
 				65D368911E184AA600D03E86 /* Composed.swift in Sources */,
@@ -2100,6 +2323,7 @@
 				65D368A11E184AA600D03E86 /* ProcedureObserver.swift in Sources */,
 				65D368A71E184AA600D03E86 /* Reduce.swift in Sources */,
 				65D3688F1E184AA600D03E86 /* Capability.swift in Sources */,
+				652F903D209E3E3D00365B2D /* IgnoreErrors.swift in Sources */,
 				65D368A91E184AA600D03E86 /* Retry.swift in Sources */,
 				65D368931E184AA600D03E86 /* Delay.swift in Sources */,
 				65D3689B1E184AA600D03E86 /* MutualExclusion.swift in Sources */,
@@ -2113,17 +2337,19 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				652F903F209E445200365B2D /* IgnoreErrorsProcedureTests.swift in Sources */,
 				65D367091E183FB000D03E86 /* BlockObserverTests.swift in Sources */,
 				65D367391E183FB000D03E86 /* RetryProcedureTests.swift in Sources */,
+				65A1923920F88FD300E0D42C /* LoggingTests.swift in Sources */,
 				65D367331E183FB000D03E86 /* ReduceProcedureTests.swift in Sources */,
 				65D367251E183FB000D03E86 /* NetworkObserverTests.swift in Sources */,
 				65D367191E183FB000D03E86 /* FinishingTests.swift in Sources */,
 				EEE79AEE1E21C9750030C768 /* KVONotificationTests.swift in Sources */,
 				65D367131E183FB000D03E86 /* ConditionTests.swift in Sources */,
-				65D3671D1E183FB000D03E86 /* LoggerTests.swift in Sources */,
 				65D3673D1E183FB000D03E86 /* TimeoutObserverTests.swift in Sources */,
 				EE3371091E29AD5A004272E9 /* DispatchQueueExtensionsTests.swift in Sources */,
 				65D3673F1E183FB000D03E86 /* TransformProcedureTests.swift in Sources */,
+				652F9015209C488600365B2D /* BatchTests.swift in Sources */,
 				65D367051E183FB000D03E86 /* AnyProcedureTests.swift in Sources */,
 				65D3672B1E183FB000D03E86 /* ProcedureKitTests.swift in Sources */,
 				65D3670D1E183FB000D03E86 /* CancellationTests.swift in Sources */,
@@ -2159,6 +2385,7 @@
 				65D367D41E1844E500D03E86 /* GroupTestCase.swift in Sources */,
 				65D367D21E1844E500D03E86 /* CapabilityTestCase.swift in Sources */,
 				65D367D81E1844E500D03E86 /* StressTestCase.swift in Sources */,
+				65A1923B20F8900100E0D42C /* TestableLogging.swift in Sources */,
 				65D367D61E1844E500D03E86 /* QueueTestDelegate.swift in Sources */,
 				65D367D51E1844E500D03E86 /* ProcedureKitTestCase.swift in Sources */,
 				65D367DB1E1844E500D03E86 /* TestCondition.swift in Sources */,
@@ -2231,6 +2458,11 @@
 			isa = PBXTargetDependency;
 			target = 65CFC6151D60900000CAD875 /* TestingProcedureKit */;
 			targetProxy = 6532DD571DBCDB3400B030F5 /* PBXContainerItemProxy */;
+		};
+		65374F3320BC6553009948B4 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 65CFC5EF1D608A5500CAD875 /* ProcedureKit */;
+			targetProxy = 65374F3220BC6553009948B4 /* PBXContainerItemProxy */;
 		};
 		653C9FCC1D6097A40070B7A2 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -2312,6 +2544,21 @@
 			target = 65CFC6151D60900000CAD875 /* TestingProcedureKit */;
 			targetProxy = 659484491DAAB5340028F83B /* PBXContainerItemProxy */;
 		};
+		65A0E4A420B85169002D6C8C /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 65A0E49820B85168002D6C8C /* ProcedureKitCoreData */;
+			targetProxy = 65A0E4A320B85169002D6C8C /* PBXContainerItemProxy */;
+		};
+		65A0E4BC20B85880002D6C8C /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 65CFC5EF1D608A5500CAD875 /* ProcedureKit */;
+			targetProxy = 65A0E4BB20B85880002D6C8C /* PBXContainerItemProxy */;
+		};
+		65A0E4BE20B8588F002D6C8C /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 65CFC6151D60900000CAD875 /* TestingProcedureKit */;
+			targetProxy = 65A0E4BD20B8588F002D6C8C /* PBXContainerItemProxy */;
+		};
 		65CFC5FC1D608A5500CAD875 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 65CFC5EF1D608A5500CAD875 /* ProcedureKit */;
@@ -2367,6 +2614,7 @@
 				CLANG_WARN_SUSPICIOUS_MOVES = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Manual;
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = dwarf;
@@ -2392,8 +2640,10 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				MTL_ENABLE_DEBUG_INFO = YES;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_COMPILATION_MODE = singlefile;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";
@@ -2423,6 +2673,7 @@
 				CLANG_WARN_SUSPICIOUS_MOVES = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Manual;
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
@@ -2442,8 +2693,10 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				MTL_ENABLE_DEBUG_INFO = NO;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
-				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 				VERSIONING_SYSTEM = "apple-generic";
@@ -2497,6 +2750,7 @@
 				MTL_ENABLE_DEBUG_INFO = YES;
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_COMPILATION_MODE = singlefile;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				TVOS_DEPLOYMENT_TARGET = 10.0;
 			};
@@ -2541,7 +2795,8 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
-				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				TVOS_DEPLOYMENT_TARGET = 10.0;
 				VALIDATE_PRODUCT = YES;
 			};
@@ -2569,6 +2824,7 @@
 				CLANG_WARN_SUSPICIOUS_MOVES = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Manual;
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = dwarf;
@@ -2594,8 +2850,10 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				MTL_ENABLE_DEBUG_INFO = YES;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_COMPILATION_MODE = singlefile;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				TARGETED_DEVICE_FAMILY = 3;
 				VERSIONING_SYSTEM = "apple-generic";
@@ -2625,6 +2883,7 @@
 				CLANG_WARN_SUSPICIOUS_MOVES = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Manual;
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
@@ -2644,8 +2903,10 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				MTL_ENABLE_DEBUG_INFO = NO;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
-				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				TARGETED_DEVICE_FAMILY = 3;
 				VALIDATE_PRODUCT = YES;
 				VERSIONING_SYSTEM = "apple-generic";
@@ -2697,6 +2958,7 @@
 				MTL_ENABLE_DEBUG_INFO = YES;
 				SDKROOT = appletvos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_COMPILATION_MODE = singlefile;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				TVOS_DEPLOYMENT_TARGET = 10.0;
 			};
@@ -2739,7 +3001,8 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = appletvos;
-				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				TVOS_DEPLOYMENT_TARGET = 10.0;
 				VALIDATE_PRODUCT = YES;
 			};
@@ -2791,6 +3054,7 @@
 				PRODUCT_MODULE_NAME = ProcedureKitStressTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_COMPILATION_MODE = singlefile;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
@@ -2834,7 +3098,8 @@
 				PRODUCT_BUNDLE_IDENTIFIER = run.kit.procedure.ProcedureKitStressTests;
 				PRODUCT_MODULE_NAME = ProcedureKitStressTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
 			};
 			name = Release;
 		};
@@ -2860,6 +3125,7 @@
 				CLANG_WARN_SUSPICIOUS_MOVES = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1;
@@ -2886,10 +3152,16 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/Frameworks",
+				);
 				MTL_ENABLE_DEBUG_INFO = YES;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_COMPILATION_MODE = singlefile;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
@@ -2918,6 +3190,7 @@
 				CLANG_WARN_SUSPICIOUS_MOVES = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1;
@@ -2938,10 +3211,16 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/Frameworks",
+				);
 				MTL_ENABLE_DEBUG_INFO = NO;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
-				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
 			};
@@ -2992,6 +3271,7 @@
 				MTL_ENABLE_DEBUG_INFO = YES;
 				SDKROOT = macosx;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_COMPILATION_MODE = singlefile;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
@@ -3034,7 +3314,8 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = macosx;
-				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
 			};
 			name = Release;
 		};
@@ -3060,6 +3341,7 @@
 				CLANG_WARN_SUSPICIOUS_MOVES = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1;
@@ -3086,10 +3368,16 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
 				MTL_ENABLE_DEBUG_INFO = YES;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_COMPILATION_MODE = singlefile;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
@@ -3118,6 +3406,7 @@
 				CLANG_WARN_SUSPICIOUS_MOVES = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1;
@@ -3138,10 +3427,16 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
 				MTL_ENABLE_DEBUG_INFO = NO;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
-				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
 			};
@@ -3191,8 +3486,8 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
-				SDKROOT = macosx;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_COMPILATION_MODE = singlefile;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				TVOS_DEPLOYMENT_TARGET = 10.0;
 				WATCHOS_DEPLOYMENT_TARGET = 3.0;
@@ -3237,8 +3532,8 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
-				SDKROOT = macosx;
-				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				TVOS_DEPLOYMENT_TARGET = 10.0;
 				WATCHOS_DEPLOYMENT_TARGET = 3.0;
 			};
@@ -3266,10 +3561,12 @@
 				CLANG_WARN_SUSPICIOUS_MOVES = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Manual;
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = "";
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -3289,10 +3586,16 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
 				MTL_ENABLE_DEBUG_INFO = YES;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_COMPILATION_MODE = singlefile;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";
@@ -3322,10 +3625,12 @@
 				CLANG_WARN_SUSPICIOUS_MOVES = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Manual;
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = "";
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -3339,10 +3644,16 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
 				MTL_ENABLE_DEBUG_INFO = NO;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
-				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 				VERSIONING_SYSTEM = "apple-generic";
@@ -3391,10 +3702,9 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.12;
 				MTL_ENABLE_DEBUG_INFO = YES;
-				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_COMPILATION_MODE = singlefile;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
@@ -3434,11 +3744,266 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.12;
 				MTL_ENABLE_DEBUG_INFO = NO;
-				SDKROOT = iphoneos;
-				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		65A0E4AA20B85169002D6C8C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 65A0E4B520B85297002D6C8C /* ProcedureKitCoreData.xcconfig */;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COMBINE_HIDPI_IMAGES = YES;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				FRAMEWORK_VERSION = A;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MTL_ENABLE_DEBUG_INFO = YES;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Debug;
+		};
+		65A0E4AB20B85169002D6C8C /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 65A0E4B520B85297002D6C8C /* ProcedureKitCoreData.xcconfig */;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COMBINE_HIDPI_IMAGES = YES;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				FRAMEWORK_VERSION = A;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MTL_ENABLE_DEBUG_INFO = NO;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SKIP_INSTALL = YES;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Release;
+		};
+		65A0E4AC20B85169002D6C8C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 65A0E4B520B85297002D6C8C /* ProcedureKitCoreData.xcconfig */;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Manual;
+				COMBINE_HIDPI_IMAGES = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				MTL_ENABLE_DEBUG_INFO = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 4.0;
+			};
+			name = Debug;
+		};
+		65A0E4AD20B85169002D6C8C /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 65A0E4B520B85297002D6C8C /* ProcedureKitCoreData.xcconfig */;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Manual;
+				COMBINE_HIDPI_IMAGES = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = "";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 4.0;
 			};
 			name = Release;
 		};
@@ -3446,6 +4011,8 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 65CFC60E1D608AE200CAD875 /* ProcedureKit.xcconfig */;
 			buildSettings = {
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CODE_SIGN_IDENTITY = "";
 				ONLY_ACTIVE_ARCH = YES;
 			};
@@ -3455,6 +4022,8 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 65CFC60E1D608AE200CAD875 /* ProcedureKit.xcconfig */;
 			buildSettings = {
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CODE_SIGN_IDENTITY = "";
 			};
 			name = Release;
@@ -3469,11 +4038,13 @@
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_SUSPICIOUS_MOVES = YES;
+				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = "";
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -3489,10 +4060,16 @@
 					"$(inherited)",
 				);
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
 				MTL_ENABLE_DEBUG_INFO = YES;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_COMPILATION_MODE = singlefile;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
@@ -3509,11 +4086,13 @@
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_SUSPICIOUS_MOVES = YES;
+				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = "";
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -3523,10 +4102,16 @@
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_NO_COMMON_BLOCKS = YES;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
 				MTL_ENABLE_DEBUG_INFO = NO;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
-				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
 			};
@@ -3575,6 +4160,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_COMPILATION_MODE = singlefile;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
@@ -3615,7 +4201,8 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				MTL_ENABLE_DEBUG_INFO = NO;
-				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
 			};
 			name = Release;
 		};
@@ -3641,6 +4228,7 @@
 				CLANG_WARN_SUSPICIOUS_MOVES = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1;
@@ -3666,8 +4254,10 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				MTL_ENABLE_DEBUG_INFO = YES;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_COMPILATION_MODE = singlefile;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
@@ -3696,6 +4286,7 @@
 				CLANG_WARN_SUSPICIOUS_MOVES = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1;
@@ -3715,8 +4306,10 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				MTL_ENABLE_DEBUG_INFO = NO;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
-				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
 			};
@@ -3744,11 +4337,13 @@
 				CLANG_WARN_SUSPICIOUS_MOVES = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = "";
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -3770,10 +4365,16 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
 				MTL_ENABLE_DEBUG_INFO = YES;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_COMPILATION_MODE = singlefile;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
@@ -3802,11 +4403,13 @@
 				CLANG_WARN_SUSPICIOUS_MOVES = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = "";
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -3822,10 +4425,16 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
 				MTL_ENABLE_DEBUG_INFO = NO;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
-				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
 			};
@@ -3875,6 +4484,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_COMPILATION_MODE = singlefile;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
@@ -3916,7 +4526,8 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				MTL_ENABLE_DEBUG_INFO = NO;
-				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
 			};
 			name = Release;
 		};
@@ -4022,6 +4633,24 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
+		65A0E4AE20B85169002D6C8C /* Build configuration list for PBXNativeTarget "ProcedureKitCoreData" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				65A0E4AA20B85169002D6C8C /* Debug */,
+				65A0E4AB20B85169002D6C8C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		65A0E4AF20B85169002D6C8C /* Build configuration list for PBXNativeTarget "ProcedureKitCoreDataTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				65A0E4AC20B85169002D6C8C /* Debug */,
+				65A0E4AD20B85169002D6C8C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		65CFC5E81D608A1A00CAD875 /* Build configuration list for PBXProject "ProcedureKit" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -4077,6 +4706,19 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCVersionGroup section */
+		65A0E4BF20BB18EA002D6C8C /* TestDataModel.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				65A0E4C020BB18EA002D6C8C /* TestDataModel.xcdatamodel */,
+			);
+			currentVersion = 65A0E4C020BB18EA002D6C8C /* TestDataModel.xcdatamodel */;
+			path = TestDataModel.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
 	};
 	rootObject = 65CFC5E51D608A1A00CAD875 /* Project object */;
 }

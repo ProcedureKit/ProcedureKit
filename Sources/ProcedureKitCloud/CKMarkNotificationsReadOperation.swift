@@ -1,7 +1,7 @@
 //
 //  ProcedureKit
 //
-//  Copyright © 2016 ProcedureKit. All rights reserved.
+//  Copyright © 2015-2018 ProcedureKit. All rights reserved.
 //
 
 #if SWIFT_PACKAGE
@@ -46,7 +46,7 @@ extension CKProcedure where T: CKMarkNotificationsReadOperationProtocol, T: Asso
     func setMarkNotificationsReadCompletionBlock(_ block: @escaping CloudKitProcedure<T>.MarkNotificationsReadCompletionBlock) {
         operation.markNotificationsReadCompletionBlock = { [weak self] notificationIDs, error in
             if let strongSelf = self, let error = error {
-                strongSelf.append(error: MarkNotificationsReadError(underlyingError: error, marked: notificationIDs))
+                strongSelf.setErrorOnce(MarkNotificationsReadError(underlyingError: error, marked: notificationIDs))
             }
             else {
                 block(notificationIDs)

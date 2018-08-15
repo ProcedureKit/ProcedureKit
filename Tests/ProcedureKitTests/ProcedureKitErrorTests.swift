@@ -1,7 +1,7 @@
 //
 //  ProcedureKit
 //
-//  Copyright © 2016 ProcedureKit. All rights reserved.
+//  Copyright © 2015-2018 ProcedureKit. All rights reserved.
 //
 
 import XCTest
@@ -50,14 +50,14 @@ class ProcedureKitErrorTests: XCTestCase {
     }
 
     func test__context_equality_dependencyFinishedWithErrors() {
-        context = .dependencyFinishedWithErrors
-        XCTAssertEqual(context, ProcedureKitError.dependency(finishedWithErrors: [TestError()]).context)
+        context = .dependencyFinishedWithError
+        XCTAssertEqual(context, ProcedureKitError.dependency(finishedWithError: TestError()).context)
         XCTAssertNotEqual(context, ProcedureKitError.Context.unknown)
     }
 
     func test__context_equality_dependencyCancelledWithErrors() {
-        context = .dependencyCancelledWithErrors
-        XCTAssertEqual(context, ProcedureKitError.dependency(cancelledWithErrors: [TestError()]).context)
+        context = .dependencyCancelledWithError
+        XCTAssertEqual(context, ProcedureKitError.dependency(cancelledWithError: TestError()).context)
         XCTAssertNotEqual(context, ProcedureKitError.Context.unknown)
     }
 
@@ -68,8 +68,8 @@ class ProcedureKitErrorTests: XCTestCase {
     }
 
     func test__context_equality_parentCancelledWithErrors() {
-        context = .parentCancelledWithErrors
-        XCTAssertEqual(context, ProcedureKitError.parent(cancelledWithErrors: [TestError()]).context)
+        context = .parentCancelledWithError
+        XCTAssertEqual(context, ProcedureKitError.parent(cancelledWithError: TestError()).context)
         XCTAssertNotEqual(context, ProcedureKitError.Context.unknown)
     }
 

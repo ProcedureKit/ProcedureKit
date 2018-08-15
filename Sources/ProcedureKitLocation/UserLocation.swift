@@ -1,7 +1,7 @@
 //
 //  ProcedureKit
 //
-//  Copyright © 2016 ProcedureKit. All rights reserved.
+//  Copyright © 2015-2018 ProcedureKit. All rights reserved.
 //
 
 #if SWIFT_PACKAGE
@@ -41,9 +41,9 @@ open class UserLocationProcedure: Procedure, OutputProcedure, CLLocationManagerD
         self.accuracy = accuracy
         self.completion = completion
         super.init()
-        add(condition: AuthorizedFor(capability))
-        add(condition: MutuallyExclusive<UserLocationProcedure>())
-        add(observer: TimeoutObserver(by: timeout))
+        addCondition(AuthorizedFor(capability))
+        addCondition(MutuallyExclusive<UserLocationProcedure>())
+        addObserver(TimeoutObserver(by: timeout))
         addDidCancelBlockObserver { [weak self] _, _ in
             DispatchQueue.main.async {
                 self?.stopLocationUpdates()
@@ -84,23 +84,21 @@ open class UserLocationProcedure: Procedure, OutputProcedure, CLLocationManagerD
             output = .ready(.success(location))
             return
         }
-        log.info(message: "Updated last location: \(location)")
+        log.info.message("Updated last location: \(location)")
         DispatchQueue.main.async { [weak self] in
-            guard let weakSelf = self, !weakSelf.isFinished else { return }
-            weakSelf.stopLocationUpdates()
-            weakSelf.output = .ready(.success(location))
-            weakSelf.completion?(location)
-            weakSelf.finish()
+            guard let strongSelf = self, !strongSelf.isFinished else { return }
+            strongSelf.stopLocationUpdates()
+            strongSelf.output = .ready(.success(location))
+            strongSelf.completion?(location)
+            strongSelf.finish()
         }
     }
 
     public func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
         DispatchQueue.main.async { [weak self] in
-            guard let weakSelf = self else { return }
-            weakSelf.stopLocationUpdates()
-            let pkerror = ProcedureKitError.component(ProcedureKitLocationComponent(), error: error)
-            weakSelf.output = .ready(.failure(pkerror))
-            weakSelf.finish(withError: pkerror)
+            guard let strongSelf = self else { return }
+            strongSelf.stopLocationUpdates()
+            strongSelf.finish(withResult: .failure(error))
         }
     }
 }

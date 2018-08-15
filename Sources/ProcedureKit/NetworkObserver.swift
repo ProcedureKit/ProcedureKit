@@ -1,7 +1,7 @@
 //
 //  ProcedureKit
 //
-//  Copyright © 2016 ProcedureKit. All rights reserved.
+//  Copyright © 2015-2018 ProcedureKit. All rights reserved.
 //
 
 import Foundation
@@ -103,7 +103,7 @@ public class NetworkObserver: ProcedureObserver {
         networkActivityController.start()
     }
 
-    public func did(finish procedure: Procedure, withErrors errors: [Error]) {
+    public func did(finish procedure: Procedure, with error: Error?) {
         networkActivityController.stop()
     }
 }

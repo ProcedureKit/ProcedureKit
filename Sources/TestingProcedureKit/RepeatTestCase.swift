@@ -1,7 +1,7 @@
 //
 //  ProcedureKit
 //
-//  Copyright © 2016 ProcedureKit. All rights reserved.
+//  Copyright © 2015-2018 ProcedureKit. All rights reserved.
 //
 
 import Foundation
@@ -9,7 +9,20 @@ import XCTest
 import ProcedureKit
 
 open class RepeatTestCase: ProcedureKitTestCase {
+
     public var repeatProcedure: RepeatProcedure<TestProcedure>!
+
+    public var expectedError: TestError!
+
+    open override func setUp() {
+        super.setUp()
+        expectedError = TestError()
+    }
+
+    open override func tearDown() {
+        expectedError = nil
+        super.tearDown()
+    }
 
     public func createIterator(withDelay delay: Delay = .by(0.001)) -> AnyIterator<RepeatProcedurePayload<TestProcedure>> {
         return AnyIterator { RepeatProcedurePayload(operation: TestProcedure(), delay: .by(0.01)) }
@@ -17,11 +30,12 @@ open class RepeatTestCase: ProcedureKitTestCase {
 
     public func createIterator(succeedsAfterCount target: Int) -> AnyIterator<TestProcedure> {
         var count = 0
+        let _error = expectedError
         return AnyIterator {
             guard count < target else { return nil }
             defer { count += 1 }
             if count < target - 1 {
-                return TestProcedure(error: TestError())
+                return TestProcedure(error: _error)
             }
             else {
                 return TestProcedure()
@@ -31,6 +45,7 @@ open class RepeatTestCase: ProcedureKitTestCase {
 }
 
 open class RetryTestCase: ProcedureKitTestCase {
+
     public typealias Test = TestProcedure
     public typealias Retry = RetryProcedure<TestProcedure>
     public typealias Handler = Retry.Handler
@@ -42,11 +57,13 @@ open class RetryTestCase: ProcedureKitTestCase {
 
     public var retry: Retry!
 
+    public var error: TestError!
+
     public func createOperationIterator(succeedsAfterFailureCount failureThreshold: Int) -> AnyIterator<Test> {
         let info = RetryTestCaseInfo()
         return AnyIterator {
             let procedure = TestProcedure()
-            procedure.add(condition: BlockCondition {
+            procedure.addCondition(BlockCondition {
                 guard info.numberOfFailures == failureThreshold else { throw ProcedureKitError.conditionFailed() }
                 return true
             })
@@ -62,7 +79,7 @@ open class RetryTestCase: ProcedureKitTestCase {
         let info = RetryTestCaseInfo()
         return AnyIterator {
             let procedure = TestProcedure()
-            procedure.add(condition: BlockCondition {
+            procedure.addCondition(BlockCondition {
                 guard info.numberOfFailures == failureThreshold else { throw ProcedureKitError.conditionFailed() }
                 return true
             })

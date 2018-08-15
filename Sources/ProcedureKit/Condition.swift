@@ -1,7 +1,7 @@
 //
 //  ProcedureKit
 //
-//  Copyright © 2016 ProcedureKit. All rights reserved.
+//  Copyright © 2015-2018 ProcedureKit. All rights reserved.
 //
 
 // swiftlint:disable file_length
@@ -93,8 +93,8 @@ public extension ProcedureKitError {
         }
     }
 
-    public struct FalseCondition: Error {
-        internal init() { }
+    public struct FalseCondition: Error, Equatable {
+        public init() { }
     }
 
     public struct ConditionEvaluationCancelled: Error {
@@ -102,28 +102,28 @@ public extension ProcedureKitError {
     }
 
     public struct ConditionDependenciesFailed: Error, Equatable, CustomStringConvertible {
+
         public let condition: Condition
+
         internal init(condition: Condition) {
             self.condition = condition
         }
+
         public var description: String {
             return "ProcedureKitError.ConditionDependenciesFailed(condition: \(condition))"
-        }
-        public static func == (lhs: ConditionDependenciesFailed, rhs: ConditionDependenciesFailed) -> Bool {
-            return lhs.condition === rhs.condition
         }
     }
 
     public struct ConditionDependenciesCancelled: Error, Equatable, CustomStringConvertible {
+
         public let condition: Condition
+
         internal init(condition: Condition) {
             self.condition = condition
         }
+
         public var description: String {
             return "ProcedureKitError.ConditionDependenciesCancelled(condition: \(condition))"
-        }
-        public static func == (lhs: ConditionDependenciesCancelled, rhs: ConditionDependenciesCancelled) -> Bool {
-            return lhs.condition === rhs.condition
         }
     }
 }
@@ -224,6 +224,10 @@ open class Condition: ConditionProtocol, Hashable {
     private var _dependencies = Set<Operation>()
     private var _mutuallyExclusiveCategories = Set<String>()
 
+    fileprivate func synchronise<T>(block: () -> T) -> T {
+        return stateLock.withCriticalScope(block: block)
+    }
+
     /// Dependencies to produce and wait on.
     ///
     /// The framework will automatically schedule these dependencies to run
@@ -236,7 +240,7 @@ open class Condition: ConditionProtocol, Hashable {
     /// that is already scheduled for execution or executing, or that will be
     /// scheduled for execution elsewhere.
     public var producedDependencies: Set<Operation> {
-        return stateLock.withCriticalScope { _producedDependencies }
+        return synchronise { _producedDependencies }
     }
 
     /// Dependencies to wait on, added via `add(dependency:)`.
@@ -245,7 +249,7 @@ open class Condition: ConditionProtocol, Hashable {
     /// before the Condition's `evaluate(procedure:completion:)`
     /// function is called.
     public var dependencies: Set<Operation> {
-        return stateLock.withCriticalScope { _dependencies }
+        return synchronise { _dependencies }
     }
 
     /// Mutually exclusive categories to apply to the attached Procedure.
@@ -253,13 +257,13 @@ open class Condition: ConditionProtocol, Hashable {
     /// Only one Procedure with a particular mutuallyExclusiveCategory may
     /// execute at a time.
     public var mutuallyExclusiveCategories: Set<String> {
-        return stateLock.withCriticalScope { _mutuallyExclusiveCategories }
+        return synchronise { _mutuallyExclusiveCategories }
     }
 
     /// A descriptive name for the Condition. (optional)
     public var name: String? {
-        get { return stateLock.withCriticalScope { _name } }
-        set { stateLock.withCriticalScope { _name = newValue } }
+        get { return synchronise { _name } }
+        set { synchronise { _name = newValue } }
     }
 
     /// Requirements that must be satisfied after all dependencies are finished, before
@@ -272,13 +276,10 @@ open class Condition: ConditionProtocol, Hashable {
     ///
     /// - See: `DependencyRequirements`
     public var dependencyRequirements: DependencyRequirements {
-        get { return stateLock.withCriticalScope { _dependencyRequirements } }
+        get { return synchronise { _dependencyRequirements } }
         set {
-            stateLock.withCriticalScope {
-                guard _procedure == nil else {
-                    assertionFailure("Dependency requirement must be modified before the Condition is added to a Procedure.")
-                    return
-                }
+            synchronise {
+                debugAssertConditionNotAttachedToProcedure("Dependency requirement must be modified before the Condition is added to a Procedure.")
                 _dependencyRequirements = newValue
             }
         }
@@ -287,7 +288,7 @@ open class Condition: ConditionProtocol, Hashable {
     /// The ConditionResult.
     /// Will be Pending.ready(ConditionResult) once the Condition has been evaluated.
     public var output: Pending<ConditionResult> {
-        return stateLock.withCriticalScope { _output }
+        return synchronise { _output }
     }
 
     public init() { }
@@ -296,11 +297,8 @@ open class Condition: ConditionProtocol, Hashable {
     ///
     /// - Parameter procedure: the Procedure to which the Condition is being added
     public func willAttach(to procedure: Procedure) {
-        stateLock.withCriticalScope {
-            guard _procedure == nil else {
-                assertionFailure("Cannot add a single Condition instance to multiple Procedures.")
-                return
-            }
+        synchronise {
+            debugAssertConditionNotAttachedToProcedure("Cannot add a single Condition instance to multiple Procedures.")
             _procedure = procedure
         }
     }
@@ -313,11 +311,8 @@ open class Condition: ConditionProtocol, Hashable {
     ///
     /// - Parameter mutuallyExclusiveCategory: a String, which should be unique per category
     final public func addToAttachedProcedure(mutuallyExclusiveCategory: String) {
-        stateLock.withCriticalScope {
-            guard _procedure == nil else {
-                assertionFailure("Categories must be modified before the Condition is added to a Procedure.")
-                return
-            }
+        synchronise {
+            debugAssertConditionNotAttachedToProcedure("Categories must be modified before the Condition is added to a Procedure.")
             _mutuallyExclusiveCategories.insert(mutuallyExclusiveCategory)
         }
     }
@@ -342,19 +337,16 @@ open class Condition: ConditionProtocol, Hashable {
     /// one `Condition` instance.
     ///
     /// - Parameter dependency: an Operation to be produced as a dependency
-    final public func produce(dependency: Operation) {
+    final public func produceDependency(_ dependency: Operation) {
         assert(!dependency.isExecuting, "Do not call produce(dependency:) with an Operation that is already executing.")
         assert(!dependency.isFinished, "Do not call produce(dependency:) with an Operation that is already finished.")
-        stateLock.withCriticalScope {
-            guard _procedure == nil else {
-                assertionFailure("Dependencies must be modified before the Condition is added to a Procedure.")
-                return
-            }
+        synchronise {
+            debugAssertConditionNotAttachedToProcedure("Dependencies must be modified before the Condition is added to a Procedure.")
             _producedDependencies.insert(dependency)
         }
     }
 
-    /// Adds a dependency, just like `Procedure.add(dependency:)`.
+    /// Adds a dependency, just like `Procedure.addDependency(_:)`.
     ///
     /// The framework will wait for the dependency to finish before the Condition's 
     /// `evaluate(procedure:completion:)` function is called.
@@ -364,17 +356,14 @@ open class Condition: ConditionProtocol, Hashable {
     /// for example, adding it to an `OperationQueue` / `ProcedureQueue`.
     ///
     /// - Parameter dependency: an Operation to be added as a dependency
-    final public func add(dependency: Operation) {
-        stateLock.withCriticalScope {
-            guard _procedure == nil else {
-                assertionFailure("Dependencies must be modified before the Condition is added to a Procedure.")
-                return
-            }
+    final public func addDependency(_ dependency: Operation) {
+        synchronise {
+            debugAssertConditionNotAttachedToProcedure("Dependencies must be modified before the Condition is added to a Procedure.")
             _dependencies.insert(dependency)
         }
     }
 
-    /// Add dependencies, just like `Procedure.add(dependencies:)`.
+    /// Add dependencies, just like `Procedure.addDependencies(_:)`.
     ///
     /// The framework will wait for the dependencies to finish before the Condition's
     /// `evaluate(procedure:completion:)` function is called.
@@ -384,28 +373,23 @@ open class Condition: ConditionProtocol, Hashable {
     /// for example, adding it to an `OperationQueue` / `ProcedureQueue`.
     ///
     /// - Parameter dependencies: an array of Operations to be added as a dependencies
-    final public func add(dependencies: [Operation]) {
-        stateLock.withCriticalScope {
-            guard _procedure == nil else {
-                assertionFailure("Dependencies must be modified before the Condition is added to a Procedure.")
-                return
-            }
+    final public func addDependencies(_ dependencies: [Operation]) {
+        synchronise {
+            debugAssertConditionNotAttachedToProcedure("Dependencies must be modified before the Condition is added to a Procedure.")
             _dependencies.formUnion(dependencies)
         }
     }
-    final public func add(dependencies: Operation...) {
-        add(dependencies: dependencies)
+
+    final public func addDependencies(_ dependencies: Operation...) {
+        addDependencies(dependencies)
     }
 
     /// Removes a dependency.
     ///
     /// - Parameter dependency: an Operation to be removed from the `producedDependencies` and/or `dependencies`.
-    public func remove(dependency: Operation) {
-        stateLock.withCriticalScope {
-            guard _procedure == nil else {
-                assertionFailure("Dependencies must be modified before the Condition is added to a Procedure.")
-                return
-            }
+    public func removeDependency(_ dependency: Operation) {
+        synchronise {
+            debugAssertConditionNotAttachedToProcedure("Dependencies must be modified before the Condition is added to a Procedure.")
             _dependencies.remove(dependency)
             _producedDependencies.remove(dependency)
         }
@@ -414,20 +398,18 @@ open class Condition: ConditionProtocol, Hashable {
     /// Removes dependencies.
     ///
     /// - Parameter dependencies: an array of Operations to be removed from the `producedDependencies` and/or `dependencies`.
-    public func remove(dependencies: [Operation]) {
-        stateLock.withCriticalScope {
-            guard _procedure == nil else {
-                assertionFailure("Dependencies must be modified before the Condition is added to a Procedure.")
-                return
-            }
+    public func removeDependencies(_ dependencies: [Operation]) {
+        synchronise {
+            debugAssertConditionNotAttachedToProcedure("Dependencies must be modified before the Condition is added to a Procedure.")
             dependencies.forEach {
                 _dependencies.remove($0)
                 _producedDependencies.remove($0)
             }
         }
     }
-    public func remove(dependencies: Operation...) {
-        remove(dependencies: dependencies)
+
+    public func removeDependencies(_ dependencies: Operation...) {
+        removeDependencies(dependencies)
     }
 
     // MARK: Evaluate
@@ -459,6 +441,7 @@ open class Condition: ConditionProtocol, Hashable {
 }
 
 extension Condition {
+
     public var isMutuallyExclusive: Bool {
         return !mutuallyExclusiveCategories.isEmpty
     }
@@ -472,7 +455,7 @@ internal extension Condition {
     ///   - ifNotAlreadySet: if `true` (the default), the new name will only be set if the existing name is `nil`
     /// - Returns: the resulting name for the Condition
     internal func set(name: String, ifNotAlreadySet: Bool = true) -> String {
-        return stateLock.withCriticalScope {
+        return synchronise {
             if ifNotAlreadySet, let existingName = _name {
                 return existingName
             }
@@ -483,10 +466,64 @@ internal extension Condition {
 
     // Set the output (once the Condition has been evaluated).
     internal func set(output: ConditionResult) {
-        stateLock.withCriticalScope {
+        synchronise {
             assert(_output.isPending, "Trying to set output of Condition evaluation more than once.")
             _output = .ready(output)
         }
+    }
+}
+
+// MARK: - Internal Extensions
+
+internal extension Condition {
+
+    internal func debugAssertConditionNotAttachedToProcedure(_ message: String = "Condition is already attached to a Procedure.") {
+        #if DEBUG
+        guard _procedure == nil else {
+            assertionFailure("Dependencies must be modified before the Condition is added to a Procedure.")
+            return
+        }
+        #endif
+    }
+}
+
+// MARK: - Deprecations
+
+public extension Condition {
+
+    @available(*, deprecated, renamed: "produceDependency(_:)", message: "This has been renamed to use Swift 3/4 naming conventions")
+    final public func produce(dependency: Operation) {
+        produceDependency(dependency)
+    }
+
+    @available(*, deprecated, renamed: "addDependency(_:)", message: "This has been renamed to use Swift 3/4 naming conventions")
+    final public func add(dependency: Operation) {
+        addDependency(dependency)
+    }
+
+    @available(*, deprecated, renamed: "addDependencies(_:)", message: "This has been renamed to use Swift 3/4 naming conventions")
+    final public func add(dependencies: [Operation]) {
+        addDependencies(dependencies)
+    }
+
+    @available(*, deprecated, renamed: "addDependencies(_:)", message: "This has been renamed to use Swift 3/4 naming conventions")
+    final public func add(dependencies: Operation...) {
+        addDependencies(dependencies)
+    }
+
+    @available(*, deprecated, renamed: "removeDependency(_:)", message: "This has been renamed to use Swift 3/4 naming conventions")
+    public func remove(dependency: Operation) {
+        removeDependency(dependency)
+    }
+
+    @available(*, deprecated, renamed: "removeDependencies(_:)", message: "This has been renamed to use Swift 3/4 naming conventions")
+    public func remove(dependencies: [Operation]) {
+        removeDependencies(dependencies)
+    }
+
+    @available(*, deprecated, renamed: "removeDependencies(_:)", message: "This has been renamed to use Swift 3/4 naming conventions")
+    public func remove(dependencies: Operation...) {
+        removeDependencies(dependencies)
     }
 }
 
@@ -866,9 +903,9 @@ open class ComposedCondition<C: Condition>: Condition {
         }
     }
 
-    override public func remove(dependency: Operation) {
-        condition.remove(dependency: dependency)
-        super.remove(dependency: dependency)
+    override public func removeDependency(_ dependency: Operation) {
+        condition.removeDependency(dependency)
+        super.removeDependency(dependency)
     }
 
     internal override func evaluate(procedure: Procedure, withContext context: ConditionEvaluationContext, completion: @escaping (ConditionResult) -> Void) {
@@ -964,25 +1001,25 @@ internal class ConditionEvaluationContext {
         }
     }
 
-    func queue(operation: Operation) -> ProcedureFuture {
+    func queueOperation(_ operation: Operation) -> ProcedureFuture {
         return stateLock.withCriticalScope {
             if _isCancelled { operation.cancel() }
-            return _procedureQueue.add(operation: operation)
+            return _procedureQueue.addOperation(operation)
         }
     }
 
-    func queue<S>(operations: S) -> ProcedureFuture where S: Sequence, S.Iterator.Element: Operation {
+    func queueOperations<S>(_ operations: S) -> ProcedureFuture where S: Sequence, S.Iterator.Element: Operation {
         return stateLock.withCriticalScope {
             if _isCancelled { operations.forEach { $0.cancel() } }
-            return _procedureQueue.add(operations: operations)
+            return _procedureQueue.addOperations(operations)
         }
     }
 
-    func queue<S>(operations: S...) where S: Sequence, S.Iterator.Element: Operation {
+    func queueOperations<S>(_ operations: S...) where S: Sequence, S.Iterator.Element: Operation {
         stateLock.withCriticalScope {
             for operations in operations {
                 if _isCancelled { operations.forEach { $0.cancel() } }
-                _procedureQueue.add(operations: operations)
+                _procedureQueue.addOperations(operations)
             }
         }
     }
@@ -1351,7 +1388,7 @@ internal extension Collection where Iterator.Element == Condition {
                 }
 
                 // Set the conditionEvaluateOperation to be dependent on all the Condition dependencies
-                conditionEvaluateOperation.add(dependencies: directDependencies.union(producedDependencies))
+                conditionEvaluateOperation.addDependencies(directDependencies.union(producedDependencies))
 
                 // Sanity-Check the producedDependencies
                 //
@@ -1381,7 +1418,7 @@ internal extension Collection where Iterator.Element == Condition {
                 if !producedDependencies.isEmpty {
                     // 1.) Add the `conditionEvaluateOperation` to the queue *before* its
                     //     producedDependencies.
-                    context.queue(operations: [conditionEvaluateOperation], producedDependencies)
+                    context.queueOperations([conditionEvaluateOperation], producedDependencies)
                 }
                 else {
                     // 2.) No produced dependencies (only direct dependencies)
@@ -1390,8 +1427,8 @@ internal extension Collection where Iterator.Element == Condition {
                     //     (This ensures that the conditionEvaluateOperation will not become ready while
                     //     being added to the queue.)
                     let workaroundProducedDependency = DummyDependency()
-                    conditionEvaluateOperation.add(dependency: workaroundProducedDependency)
-                    context.queue(operations: [conditionEvaluateOperation, workaroundProducedDependency]).then(on: context.underlyingQueue) {
+                    conditionEvaluateOperation.addDependency(workaroundProducedDependency)
+                    context.queueOperations([conditionEvaluateOperation, workaroundProducedDependency]).then(on: context.underlyingQueue) {
                         workaroundProducedDependency.finishOnceStarted()
                     }
                 }

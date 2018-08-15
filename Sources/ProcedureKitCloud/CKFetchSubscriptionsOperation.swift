@@ -1,7 +1,7 @@
 //
 //  ProcedureKit
 //
-//  Copyright © 2016 ProcedureKit. All rights reserved.
+//  Copyright © 2015-2018 ProcedureKit. All rights reserved.
 //
 
 #if !os(watchOS)
@@ -45,7 +45,7 @@ extension CKProcedure where T: CKFetchSubscriptionsOperationProtocol, T: Associa
     func setFetchSubscriptionCompletionBlock(_ block: @escaping CloudKitProcedure<T>.FetchSubscriptionCompletionBlock) {
         operation.fetchSubscriptionCompletionBlock = { [weak self] subscriptionsByID, error in
             if let strongSelf = self, let error = error {
-                strongSelf.append(error: FetchSubscriptionsError(underlyingError: error, subscriptionsByID: subscriptionsByID))
+                strongSelf.setErrorOnce(FetchSubscriptionsError(underlyingError: error, subscriptionsByID: subscriptionsByID))
             }
             else {
                 block(subscriptionsByID)

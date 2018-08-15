@@ -1,7 +1,7 @@
 //
 //  ProcedureKit
 //
-//  Copyright © 2016 ProcedureKit. All rights reserved.
+//  Copyright © 2015-2018 ProcedureKit. All rights reserved.
 //
 
 import Foundation
@@ -46,14 +46,51 @@ open class ComposedProcedure<T: Operation>: GroupProcedure {
     }
 }
 
+/// Conformance for ComposedProcedure where T implements InputProcedure
+extension ComposedProcedure: InputProcedure where T: InputProcedure {
+
+    public typealias Input = T.Input
+
+    public var input: Pending<T.Input> {
+        get { return operation.input }
+        set { operation.input = newValue }
+    }
+}
+
+/// Conformance for ComposedProcedure where T implements OutputProcedure
+extension ComposedProcedure: OutputProcedure where T: OutputProcedure {
+
+    public typealias Output = T.Output
+
+    public var output: Pending<ProcedureResult<T.Output>> {
+        get { return operation.output }
+        set { operation.output = newValue }
+    }
+}
+
+/**
+ A `Procedure` which composes an Operation, with a block.
+ The block returns a boolean, and can be used for simple control flow.
+ */
 open class GatedProcedure<T: Operation>: ComposedProcedure<T> {
 
+    /// Initialize a GatedProcedure to wrap a specified Operation subclass T
+    ///
+    /// - Parameters:
+    ///   - composed: the composed Operation subclass T
+    ///   - gate: an escaping ThrowingBoolBlock
     public convenience init(_ composed: T, gate: @escaping ThrowingBoolBlock) {
         self.init(operation: composed, gate: gate)
     }
 
+    /// Initialize a GatedProcedure to wrap a specified Operation subclass T
+    ///
+    /// - Parameters:
+    ///   - dispatchQueue: the underlying DispatchQueue for the internal ProcedureQueue onto which the composed operation is submitted
+    ///   - composed: the composed Operation subclass T
+    ///   - gate: an escaping ThrowingBoolBlock
     public init(dispatchQueue: DispatchQueue? = nil, operation: T, gate: @escaping ThrowingBoolBlock) {
         super.init(dispatchQueue: dispatchQueue, operation: operation)
-        add(condition: IgnoredCondition(BlockCondition(block: gate)))
+        addCondition(IgnoredCondition(BlockCondition(block: gate)))
     }
 }

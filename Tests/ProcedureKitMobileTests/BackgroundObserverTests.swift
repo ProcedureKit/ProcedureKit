@@ -1,7 +1,7 @@
 //
 //  ProcedureKit
 //
-//  Copyright © 2016 ProcedureKit. All rights reserved.
+//  Copyright © 2015-2018 ProcedureKit. All rights reserved.
 //
 
 import XCTest
@@ -34,7 +34,9 @@ class BackgroundObserverTests: ProcedureKitTestCase {
 
     override func setUp() {
         super.setUp()
+        Log.enabled = true
         backgroundProcedure = WaitsToFinishProcedure()
+        backgroundProcedure.log.writer = TestableLogWriter()
         backgroundTaskName = "Hello world"
         taskGroup = DispatchGroup()
         didBeginTaskBlock = { name, identifier in
@@ -89,7 +91,7 @@ class BackgroundObserverTests: ProcedureKitTestCase {
         }
 
         // add the background observer
-        procedure.add(observer: backgroundObserver)
+        procedure.addObserver(backgroundObserver)
 
         // wait for attaching the BackgroundObserver to attempt to begin the background task
         weak var expDidBeginTask = expectation(description: "Attaching BackgroundObserver did begin background task")
@@ -126,7 +128,7 @@ class BackgroundObserverTests: ProcedureKitTestCase {
         wait(for: backgroundProcedure)
         waitForTaskGroup()
 
-        XCTAssertProcedureFinishedWithoutErrors(backgroundProcedure)
+        PKAssertProcedureFinished(backgroundProcedure)
         XCTAssertEqual(backgroundTaskName, expectedBackgroundTaskName)
         XCTAssertNotEqual(backgroundTaskIdentifier, UIBackgroundTaskInvalid)
         XCTAssertEqual(backgroundTaskIdentifier, endedBackgroundTaskIdentifier)
@@ -144,11 +146,6 @@ class BackgroundObserverTests: ProcedureKitTestCase {
         // simulate the state in which running in the background is not possible
         testableApplication.backgroundExecutionDisabled = true
 
-        let loggedEntries = Protector<[LoggerInfo]>([])
-        backgroundProcedure.log.logger = { info in
-            loggedEntries.append(info)
-        }
-
         observer = BackgroundObserver(manager: testableBackgroundManager)
 
         // add the background observer
@@ -160,11 +157,6 @@ class BackgroundObserverTests: ProcedureKitTestCase {
         XCTAssertEqual(testableApplication.backgroundTasks[0].0, expectedBackgroundTaskName)
         // 2.) But beginBackgroundTask should have returned UIBackgroundTaskInvalid
         XCTAssertEqual(backgroundTaskIdentifier, UIBackgroundTaskInvalid)
-        // 3.) Which should have resulted in a warning being logged by the BackgroundObserver
-        XCTAssertTrue(loggedEntries.access.contains(where: { (info) -> Bool in
-            return info.severity == .warning &&
-            info.message.hasSuffix(BackgroundObserver.logMessage_FailedToInitiateBackgroundTask)
-        }))
 
         // run and finish the Procedure
         backgroundProcedure.addDidExecuteBlockObserver { backgroundProcedure in
@@ -181,7 +173,7 @@ class BackgroundObserverTests: ProcedureKitTestCase {
         // clean-up - explicitly finish the task group
         taskGroup.leave()
 
-        XCTAssertProcedureFinishedWithoutErrors(backgroundProcedure)
+        PKAssertProcedureFinished(backgroundProcedure)
     }
 
     // MARK: Cancellation Behavior: .never
@@ -223,7 +215,7 @@ class BackgroundObserverTests: ProcedureKitTestCase {
         wait(for: backgroundProcedure)
         waitForTaskGroup()
 
-        XCTAssertProcedureFinishedWithoutErrors(backgroundProcedure)
+        PKAssertProcedureFinished(backgroundProcedure)
         XCTAssertEqual(backgroundTaskName, expectedBackgroundTaskName)
         XCTAssertNotEqual(backgroundTaskIdentifier, UIBackgroundTaskInvalid)
         XCTAssertEqual(backgroundTaskIdentifier, endedBackgroundTaskIdentifier)
@@ -246,10 +238,10 @@ class BackgroundObserverTests: ProcedureKitTestCase {
         observer = BackgroundObserver(manager: testableBackgroundManager, cancelProcedure: .whenAppIsBackgrounded)
 
         let didCancel = DispatchGroup()
-        let cancellationErrors = Protector<[Error]>([])
+        let cancellationError = Protector<Error?>(nil)
         didCancel.enter()
-        backgroundProcedure.addDidCancelBlockObserver { backgroundProcedure, errors in
-            cancellationErrors.append(contentsOf: errors)
+        backgroundProcedure.addDidCancelBlockObserver { backgroundProcedure, error in
+            cancellationError.overwrite(with: error)
             didCancel.leave()
         }
 
@@ -262,9 +254,9 @@ class BackgroundObserverTests: ProcedureKitTestCase {
         }
         waitForExpectations(timeout: 3)
 
-        let receivedCancellationErrors = cancellationErrors.access
-        XCTAssertEqual(receivedCancellationErrors.count, 1)
-        XCTAssertTrue(receivedCancellationErrors[0] is ProcedureKitError.AppWasBackgrounded)
+        let receivedCancellationError = cancellationError.access
+        XCTAssertNotNil(receivedCancellationError)
+        XCTAssertTrue(receivedCancellationError is ProcedureKitError.AppWasBackgrounded)
 
         XCTAssertEqual(testableApplication.backgroundTasks.count, 1)
         XCTAssertEqual(testableApplication.backgroundTasks[0].0, expectedBackgroundTaskName)
@@ -277,10 +269,10 @@ class BackgroundObserverTests: ProcedureKitTestCase {
         observer = BackgroundObserver(manager: testableBackgroundManager, cancelProcedure: .whenAppIsBackgrounded)
 
         let didCancel = DispatchGroup()
-        let cancellationErrors = Protector<[Error]>([])
+        let cancellationError = Protector<Error?>(nil)
         didCancel.enter()
-        backgroundProcedure.addDidCancelBlockObserver { backgroundProcedure, errors in
-            cancellationErrors.append(contentsOf: errors)
+        backgroundProcedure.addDidCancelBlockObserver { backgroundProcedure, error in
+            cancellationError.overwrite(with: error)
             didCancel.leave()
         }
 
@@ -305,9 +297,9 @@ class BackgroundObserverTests: ProcedureKitTestCase {
         }
         waitForExpectations(timeout: 3)
 
-        let receivedCancellationErrors = cancellationErrors.access
-        XCTAssertEqual(receivedCancellationErrors.count, 1)
-        XCTAssertTrue(receivedCancellationErrors[0] is ProcedureKitError.AppWasBackgrounded)
+        let receivedCancellationError = cancellationError.access
+        XCTAssertNotNil(receivedCancellationError)
+        XCTAssertTrue(receivedCancellationError is ProcedureKitError.AppWasBackgrounded)
     }
 
     func test__background_observer__cancel_when_app_is_backgrounded__app_is_active() {
@@ -335,7 +327,7 @@ class BackgroundObserverTests: ProcedureKitTestCase {
         wait(for: backgroundProcedure)
         waitForTaskGroup()
 
-        XCTAssertProcedureFinishedWithoutErrors(backgroundProcedure)
+        PKAssertProcedureFinished(backgroundProcedure)
         XCTAssertEqual(backgroundTaskName, expectedBackgroundTaskName)
         XCTAssertNotEqual(backgroundTaskIdentifier, UIBackgroundTaskInvalid)
         XCTAssertEqual(backgroundTaskIdentifier, endedBackgroundTaskIdentifier)

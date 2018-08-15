@@ -1,7 +1,7 @@
 //
 //  ProcedureKit
 //
-//  Copyright © 2016 ProcedureKit. All rights reserved.
+//  Copyright © 2015-2018 ProcedureKit. All rights reserved.
 //
 
 import Foundation
@@ -117,7 +117,7 @@ public protocol ProcedureQueueDelegate: class {
      - parameter errors: an array of `Error`s.
      - returns: (optional) a `ProcedureFuture` (signaled when handling of the delegate callback is complete), or nil (if there is no need for the `ProcedureQueue` to temporarily block the Procedure from finishing)
      */
-    func procedureQueue(_ queue: ProcedureQueue, willFinishProcedure procedure: Procedure, withErrors errors: [Error]) -> ProcedureFuture?
+    func procedureQueue(_ queue: ProcedureQueue, willFinishProcedure procedure: Procedure, with error: Error?) -> ProcedureFuture?
 
     /**
      A Procedure has finished on the queue.
@@ -126,7 +126,7 @@ public protocol ProcedureQueueDelegate: class {
      - parameter procedure: the `Procedure` instance which finished.
      - parameter errors: an array of `Error`s.
      */
-    func procedureQueue(_ queue: ProcedureQueue, didFinishProcedure procedure: Procedure, withErrors errors: [Error])
+    func procedureQueue(_ queue: ProcedureQueue, didFinishProcedure procedure: Procedure, with error: Error?)
 }
 
 public extension ProcedureQueueDelegate {
@@ -151,10 +151,10 @@ public extension ProcedureQueueDelegate {
     func procedureQueue(_ queue: ProcedureQueue, didAddProcedure procedure: Procedure, context: Any?) { /* default no-op */ }
 
     /// Default - do nothing.
-    func procedureQueue(_ queue: ProcedureQueue, willFinishProcedure procedure: Procedure, withErrors errors: [Error]) -> ProcedureFuture? { /* default no-op */ return nil }
+    func procedureQueue(_ queue: ProcedureQueue, willFinishProcedure procedure: Procedure, with error: Error?) -> ProcedureFuture? { /* default no-op */ return nil }
 
     /// Default - do nothing.
-    func procedureQueue(_ queue: ProcedureQueue, didFinishProcedure procedure: Procedure, withErrors errors: [Error]) { /* default no-op */ }
+    func procedureQueue(_ queue: ProcedureQueue, didFinishProcedure procedure: Procedure, with error: Error?) { /* default no-op */ }
 }
 
 /**
@@ -205,7 +205,7 @@ open class ProcedureQueue: OperationQueue {
      - parameter context: an optional parameter that is passed-through to the Will/DidAdd delegate callbacks
      - returns: a `ProcedureFuture` that is signaled once the operation has been added to the `ProcedureQueue`
      */
-    @discardableResult open func add(operation: Operation, withContext context: Any? = nil) -> ProcedureFuture {
+    @discardableResult open func addOperation(_ operation: Operation, withContext context: Any? = nil) -> ProcedureFuture {
 
         let promise = ProcedurePromise()
 
@@ -221,7 +221,7 @@ open class ProcedureQueue: OperationQueue {
         //    have been called
         //  - the operation may not have been added to the queue yet, but *will* be (if not)
         //
-        _add(operation: operation, context: context, promise: promise)
+        _addOperation(operation, withContext: context, promise: promise)
 
         return promise.future
     }
@@ -242,7 +242,7 @@ open class ProcedureQueue: OperationQueue {
 
     /// Overrides and wraps the Swift 3 interface
     open override func addOperation(_ operation: Operation) {
-        add(operation: operation)
+        addOperation(operation, withContext: nil)
     }
 
     /**
@@ -284,7 +284,7 @@ open class ProcedureQueue: OperationQueue {
 
     // MARK: - Private Implementation
 
-    private func _add(operation: Operation, context: Any?, promise: ProcedurePromise) {
+    private func _addOperation(_ operation: Operation, withContext context: Any?, promise: ProcedurePromise) {
 
         // Stage 1: Add observers / completion block,
         //          willEnqueue(on: self)
@@ -328,12 +328,12 @@ open class ProcedureQueue: OperationQueue {
 
         // Procedure subclass
 
-        procedure.log.verbose(message: "Adding to queue")
+        procedure.system.verbose.message("Adding to queue")
 
         /// Add an observer to invoke the will finish delegate method
-        procedure.addWillFinishBlockObserver { [weak self] procedure, errors, pendingFinish in
+        procedure.addWillFinishBlockObserver { [weak self] procedure, error, pendingFinish in
             if let queue = self {
-                queue.delegate?.procedureQueue(queue, willFinishProcedure: procedure, withErrors: errors)?.then(on: queue.dispatchQueue) {
+                queue.delegate?.procedureQueue(queue, willFinishProcedure: procedure, with: error)?.then(on: queue.dispatchQueue) {
                     // ensure that the observed procedure does not finish prior to the
                     // willFinishProcedure delegate completing
                     pendingFinish.doThisBeforeEvent()
@@ -342,9 +342,9 @@ open class ProcedureQueue: OperationQueue {
         }
 
         /// Add an observer to invoke the did finish delegate method
-        procedure.addDidFinishBlockObserver { [weak self] procedure, errors in
+        procedure.addDidFinishBlockObserver { [weak self] procedure, error in
             if let queue = self {
-                queue.delegate?.procedureQueue(queue, didFinishProcedure: procedure, withErrors: errors)
+                queue.delegate?.procedureQueue(queue, didFinishProcedure: procedure, with: error)
             }
         }
 
@@ -557,11 +557,10 @@ public extension ProcedureQueue {
      - parameter context: an optional parameter that is passed-through to the Will/DidAdd delegate callbacks
      - returns: a `ProcedureFuture` that is signaled once the operations have been added to the `ProcedureQueue`
      */
-    @discardableResult
-    final func add<S: Sequence>(operations: S, withContext context: Any? = nil) -> ProcedureFuture where S.Iterator.Element: Operation {
+    @discardableResult final func addOperations<S: Sequence>(_ operations: S, withContext context: Any? = nil) -> ProcedureFuture where S.Iterator.Element: Operation {
 
         let futures = operations.map {
-            add(operation: $0, withContext: context)
+            addOperation($0, withContext: context)
         }
 
         return futures.future
@@ -574,8 +573,8 @@ public extension ProcedureQueue {
      - parameter context: an optional parameter that is passed-through to the Will/DidAdd delegate callbacks
      - returns: a `ProcedureFuture` that is signaled once the operations have been added to the `ProcedureQueue`
      */
-    final func add(operations: Operation..., withContext context: Any? = nil) -> ProcedureFuture {
-        return add(operations: operations, withContext: context)
+    @discardableResult final func addOperations(_ operations: Operation..., withContext context: Any? = nil) -> ProcedureFuture {
+        return addOperations(operations, withContext: context)
     }
 }
 
@@ -586,7 +585,7 @@ public extension OperationQueue {
      Add operations to the queue as an array
      - parameter operations: a array of `Operation` instances.
      */
-    final func add<S>(operations: S) where S: Sequence, S.Iterator.Element: Operation {
+    final func addOperations<S>(_ operations: S) where S: Sequence, S.Iterator.Element: Operation {
         addOperations(Array(operations), waitUntilFinished: false)
     }
 
@@ -594,8 +593,8 @@ public extension OperationQueue {
      Add operations to the queue as a variadic parameter
      - parameter operations: a variadic array of `Operation` instances.
      */
-    final func add(operations: Operation...) {
-        add(operations: operations)
+    final func addOperations(_ operations: Operation...) {
+        addOperations(operations)
     }
 }
 
@@ -616,3 +615,34 @@ fileprivate class _SyncAlreadyAvailableFuture: ProcedureFuture {
 
 @available(*, unavailable, renamed: "ProcedureQueueDelegate")
 public protocol OperationQueueDelegate: class { }
+
+public extension ProcedureQueue {
+
+    @available(*, deprecated, renamed: "addOperation(_:withContext:)", message: "This has been renamed to use Swift 3/4 naming conventions")
+    @discardableResult func add(operation: Operation, withContext context: Any? = nil) -> ProcedureFuture {
+        return addOperation(operation, withContext: context)
+    }
+
+    @available(*, deprecated, renamed: "addOperations(_:withContext:)", message: "This has been renamed to use Swift 3/4 naming conventions")
+    @discardableResult final func add<S: Sequence>(operations: S, withContext context: Any? = nil) -> ProcedureFuture where S.Iterator.Element: Operation {
+        return addOperations(operations, withContext: context)
+    }
+
+    @available(*, deprecated, renamed: "addOperations(_:withContext:)", message: "This has been renamed to use Swift 3/4 naming conventions")
+    final func add(operations: Operation..., withContext context: Any? = nil) -> ProcedureFuture {
+        return addOperations(operations, withContext: context)
+    }
+}
+
+public extension OperationQueue {
+
+    @available(*, deprecated, renamed: "addOperations(_:)", message: "This has been renamed to use Swift 3/4 naming conventions")
+    final func add<S>(operations: S) where S: Sequence, S.Iterator.Element: Operation {
+        addOperations(operations)
+    }
+
+    @available(*, deprecated, renamed: "addOperations(_:)", message: "This has been renamed to use Swift 3/4 naming conventions")
+    final func add(operations: Operation...) {
+        addOperations(operations)
+    }
+}

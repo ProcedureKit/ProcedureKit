@@ -1,41 +1,46 @@
 //
 //  ProcedureKit
 //
-//  Copyright © 2016 ProcedureKit. All rights reserved.
+//  Copyright © 2015-2018 ProcedureKit. All rights reserved.
 //
 
 import Foundation
 
-/// `Identifiable` provides a unique identifier.
+/// `Identifiable` is a generic protocol for defining property based identity.
 public protocol Identifiable {
+    associatedtype Identity: Hashable
 
-    /// A unique identifier
-    var identifier: UUID { get }
+    /// An identifier
+    var identity: Identity { get }
 }
 
 public func ==<T: Identifiable> (lhs: T, rhs: T) -> Bool {
-    return lhs.identifier == rhs.identifier
+    return lhs.identity == rhs.identity
 }
 
-public extension Procedure {
+public func ==<T, V> (lhs: T, rhs: V) -> Bool where T: Identifiable, V: Identifiable, T.Identity == V.Identity {
+    return lhs.identity == rhs.identity
+}
 
-    struct Identity: Identifiable, Equatable {
+extension Procedure: Identifiable {
 
-        public static func == (lhs: Identity, rhs: Identity) -> Bool {
-            return lhs.identifier == rhs.identifier
-        }
+    public struct Identity: Identifiable, Hashable {
 
-        public let identifier: UUID
+        public let identity: UUID
         public let name: String?
 
+        public var hashValue: Int {
+            return identity.hashValue
+        }
+
         public var description: String {
-            return name.map { "\($0) #\(identifier)" } ?? "Unnamed Procedure #\(identifier)"
+            return name.map { "\($0) #\(identity)" } ?? "Unnamed Procedure #\(identity)"
         }
     }
 
     /// A Procedure's identity (often used for debugging purposes) provides a unique identifier
     /// for a `Procedure` instance, comprised of the Procedure's `name` and a `UUID`.
-    var identity: Identity {
-        return Identity(identifier: identifier, name: name)
+    public var identity: Identity {
+        return Identity(identity: identifier, name: name)
     }
 }

@@ -1,12 +1,12 @@
 //
 //  ProcedureKit
 //
-//  Copyright © 2016 ProcedureKit. All rights reserved.
+//  Copyright © 2015-2018 ProcedureKit. All rights reserved.
 //
 
 open class FilterProcedure<Element>: ReduceProcedure<Element, Array<Element>> {
 
-    public init<S: Sequence>(source: S, isIncluded: @escaping (Element) throws -> Bool) where S.Iterator.Element == Element, S.SubSequence: Sequence, S.SubSequence.Iterator.Element == Element, S.SubSequence.SubSequence == S.SubSequence {
+    public init<S: Sequence>(source: S, isIncluded: @escaping (Element) throws -> Bool) where S.Iterator.Element == Element {
         super.init(source: source, initial: []) { acc, element in
             guard try isIncluded(element) else { return acc }
             return acc + [element]

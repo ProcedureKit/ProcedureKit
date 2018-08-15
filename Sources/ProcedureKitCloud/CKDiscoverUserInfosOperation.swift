@@ -1,7 +1,7 @@
 //
 //  ProcedureKit
 //
-//  Copyright © 2016 ProcedureKit. All rights reserved.
+//  Copyright © 2015-2018 ProcedureKit. All rights reserved.
 //
 
 #if SWIFT_PACKAGE
@@ -55,7 +55,7 @@ extension CKProcedure where T: CKDiscoverUserInfosOperationProtocol, T: Associat
     func setDiscoverUserInfosCompletionBlock(_ block: @escaping CloudKitProcedure<T>.DiscoverUserInfosCompletionBlock) {
         operation.discoverUserInfosCompletionBlock = { [weak self] userInfoByEmail, userInfoByRecordID, error in
             if let strongSelf = self, let error = error {
-                strongSelf.append(error: DiscoverUserInfosError(underlyingError: error, userInfoByEmail: userInfoByEmail, userInfoByRecordID: userInfoByRecordID))
+                strongSelf.setErrorOnce(DiscoverUserInfosError(underlyingError: error, userInfoByEmail: userInfoByEmail, userInfoByRecordID: userInfoByRecordID))
             }
             else {
                 block(userInfoByEmail, userInfoByRecordID)

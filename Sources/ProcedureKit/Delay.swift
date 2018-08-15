@@ -1,7 +1,7 @@
 //
 //  ProcedureKit
 //
-//  Copyright © 2016 ProcedureKit. All rights reserved.
+//  Copyright © 2015-2018 ProcedureKit. All rights reserved.
 //
 
 import Foundation
@@ -12,16 +12,6 @@ import Dispatch
 /// - by: a `TimeInterval`
 /// - until: a `Date`
 public enum Delay: Comparable {
-
-    public static func == (lhs: Delay, rhs: Delay) -> Bool {
-        switch (lhs, rhs) {
-        case let (.by(lhsBy), .by(rhsBy)):
-            return lhsBy == rhsBy
-        case let (.until(lhsUntil), .until(rhsUntil)):
-            return lhsUntil == rhsUntil
-        default: return false
-        }
-    }
 
     public static func < (lhs: Delay, rhs: Delay) -> Bool {
         switch (lhs, rhs) {

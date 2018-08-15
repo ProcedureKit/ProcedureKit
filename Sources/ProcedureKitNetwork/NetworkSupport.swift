@@ -1,7 +1,7 @@
 //
 //  ProcedureKit
 //
-//  Copyright © 2016 ProcedureKit. All rights reserved.
+//  Copyright © 2015-2018 ProcedureKit. All rights reserved.
 //
 
 #if SWIFT_PACKAGE
@@ -16,27 +16,39 @@ public protocol URLSessionTaskProtocol {
     func cancel()
 }
 
-public protocol URLSessionDataTaskProtocol: URLSessionTaskProtocol { }
-public protocol URLSessionDownloadTaskProtocol: URLSessionTaskProtocol { }
-public protocol URLSessionUploadTaskProtocol: URLSessionTaskProtocol { }
+public protocol NetworkDataTask: URLSessionTaskProtocol { }
+public protocol NetworkDownloadTask: URLSessionTaskProtocol { }
+public protocol NetworkUploadTask: URLSessionTaskProtocol { }
 
-public protocol URLSessionTaskFactory {
-    associatedtype DataTask: URLSessionDataTaskProtocol
-    associatedtype DownloadTask: URLSessionDownloadTaskProtocol
-    associatedtype UploadTask: URLSessionUploadTaskProtocol
+public protocol NetworkSession {
 
-    func dataTask(with request: URLRequest, completionHandler: @escaping (Data?, URLResponse?, Error?) -> Void) -> DataTask
+    func dataTask(with request: URLRequest, completionHandler: @escaping (Data?, URLResponse?, Error?) -> Void) -> NetworkDataTask
 
-    func downloadTask(with request: URLRequest, completionHandler: @escaping (URL?, URLResponse?, Error?) -> Void) -> DownloadTask
+    func downloadTask(with request: URLRequest, completionHandler: @escaping (URL?, URLResponse?, Error?) -> Void) -> NetworkDownloadTask
 
-    func uploadTask(with request: URLRequest, from bodyData: Data?, completionHandler: @escaping (Data?, URLResponse?, Error?) -> Void) -> UploadTask
+    func uploadTask(with request: URLRequest, from bodyData: Data?, completionHandler: @escaping (Data?, URLResponse?, Error?) -> Void) -> NetworkUploadTask
 }
 
 extension URLSessionTask: URLSessionTaskProtocol { }
-extension URLSessionDataTask: URLSessionDataTaskProtocol {}
-extension URLSessionDownloadTask: URLSessionDownloadTaskProtocol { }
-extension URLSessionUploadTask: URLSessionUploadTaskProtocol { }
-extension URLSession: URLSessionTaskFactory { }
+extension URLSessionDataTask: NetworkDataTask {}
+extension URLSessionDownloadTask: NetworkDownloadTask { }
+extension URLSessionUploadTask: NetworkUploadTask { }
+extension URLSession: NetworkSession {
+    public func dataTask(with request: URLRequest, completionHandler: @escaping (Data?, URLResponse?, Error?) -> Void) -> NetworkDataTask {
+        let task: URLSessionDataTask = dataTask(with: request, completionHandler: completionHandler)
+        return task
+    }
+    
+    public func downloadTask(with request: URLRequest, completionHandler: @escaping (URL?, URLResponse?, Error?) -> Void) -> NetworkDownloadTask {
+        let task: URLSessionDownloadTask = downloadTask(with: request, completionHandler: completionHandler)
+        return task
+    }
+    
+    public func uploadTask(with request: URLRequest, from bodyData: Data?, completionHandler: @escaping (Data?, URLResponse?, Error?) -> Void) -> NetworkUploadTask {
+        let task: URLSessionUploadTask = uploadTask(with: request, from: bodyData, completionHandler: completionHandler)
+        return task
+    }
+}
 
 extension URL: ExpressibleByStringLiteral {
 
@@ -64,10 +76,6 @@ public protocol HTTPPayloadResponseProtocol: Equatable {
 
 public struct HTTPPayloadResponse<Payload: Equatable>: HTTPPayloadResponseProtocol {
 
-    public static func == (lhs: HTTPPayloadResponse<Payload>, rhs: HTTPPayloadResponse<Payload>) -> Bool {
-        return lhs.payload == rhs.payload && lhs.response == rhs.response
-    }
-
     public var payload: Payload?
     public var response: HTTPURLResponse
 
@@ -78,9 +86,6 @@ public struct HTTPPayloadResponse<Payload: Equatable>: HTTPPayloadResponseProtoc
 }
 
 public struct HTTPPayloadRequest<Payload: Equatable>: Equatable {
-    public static func == (lhs: HTTPPayloadRequest <Payload>, rhs: HTTPPayloadRequest <Payload>) -> Bool {
-        return lhs.payload == rhs.payload && lhs.request == rhs.request
-    }
 
     public var request: URLRequest
     public var payload: Payload?
@@ -147,7 +152,7 @@ struct ProcedureKitNetworkResponse {
 
 public protocol NetworkOperation {
 
-    var networkError: Error? { get }
+    var error: Error? { get }
 
     var urlResponse: HTTPURLResponse? { get }
 }
@@ -286,7 +291,7 @@ public extension HTTPURLResponse {
 extension NetworkOperation {
 
     func makeNetworkResponse() -> ProcedureKitNetworkResponse {
-        return ProcedureKitNetworkResponse(response: urlResponse, error: networkError)
+        return ProcedureKitNetworkResponse(response: urlResponse, error: error)
     }
 }
 

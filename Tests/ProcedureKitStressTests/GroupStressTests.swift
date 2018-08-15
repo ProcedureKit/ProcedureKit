@@ -1,7 +1,7 @@
 //
 //  ProcedureKit
 //
-//  Copyright © 2016 ProcedureKit. All rights reserved.
+//  Copyright © 2015-2018 ProcedureKit. All rights reserved.
 //
 
 import XCTest
@@ -96,7 +96,7 @@ class GroupCancellationHandlerConcurrencyTest: StressTestCase {
             let group = EventConcurrencyTrackingGroupProcedure(operations: [TestProcedure(), TestProcedure()])
             group.addDidFinishBlockObserver(block: { (group, error) in
                 DispatchQueue.main.async {
-                    self.XCTAssertProcedureNoConcurrentEvents(group)
+                    self.PKAssertProcedureNoConcurrentEvents(group)
                     batch.dispatchGroup.leave()
                 }
             })
@@ -117,7 +117,7 @@ class GroupCancellationHandlerConcurrencyTest: StressTestCase {
             let group = EventConcurrencyTrackingGroupProcedure(operations: children)
             group.addDidFinishBlockObserver(block: { (group, error) in
                 DispatchQueue.main.async {
-                    self.XCTAssertProcedureNoConcurrentEvents(group)
+                    self.PKAssertProcedureNoConcurrentEvents(group)
                     batch.dispatchGroup.leave()
                 }
             })
@@ -142,7 +142,7 @@ class GroupCancellationHandlerConcurrencyTest: StressTestCase {
             group.add(child: initialChild)
             group.addDidFinishBlockObserver(block: { (group, error) in
                 DispatchQueue.main.async {
-                    self.XCTAssertProcedureNoConcurrentEvents(group)
+                    self.PKAssertProcedureNoConcurrentEvents(group)
                     batch.dispatchGroup.leave()
                 }
             })

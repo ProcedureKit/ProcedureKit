@@ -1,7 +1,7 @@
 //
 //  ProcedureKit
 //
-//  Copyright © 2016 ProcedureKit. All rights reserved.
+//  Copyright © 2015-2018 ProcedureKit. All rights reserved.
 //
 
 import XCTest
@@ -29,14 +29,14 @@ public class ComposedProcedureTests: ProcedureKitTestCase {
         var didExecute = false
         let composed = ComposedProcedure(BlockOperation { didExecute = true })
         wait(for: composed)
-        XCTAssertProcedureFinishedWithoutErrors(composed)
+        PKAssertProcedureFinished(composed)
         XCTAssertTrue(didExecute)
     }
 
     func test__composed_procedure_is_executed() {
         let composed = ComposedProcedure(procedure)
         wait(for: composed)
-        XCTAssertProcedureFinishedWithoutErrors()
+        PKAssertProcedureFinished(procedure)
     }
 }
 
@@ -45,14 +45,14 @@ public class GatedProcedureTests: ProcedureKitTestCase {
     func test__when_gate_is_closed_procedure_is_cancelled() {
         let gated = GatedProcedure(procedure) { false }
         wait(for: gated)
-        XCTAssertProcedureCancelledWithoutErrors(gated)
+        PKAssertProcedureCancelled(gated)
     }
 
     func test__when_gate_is_open_procedure_is_performed() {
         let gated = GatedProcedure(procedure) { true }
         wait(for: gated)
-        XCTAssertProcedureFinishedWithoutErrors(gated)
-        XCTAssertProcedureFinishedWithoutErrors(procedure)
+        PKAssertProcedureFinished(gated)
+        PKAssertProcedureFinished(procedure)
     }
 }
 

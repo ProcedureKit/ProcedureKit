@@ -1,7 +1,7 @@
 //
 //  ProcedureKit
 //
-//  Copyright © 2016 ProcedureKit. All rights reserved.
+//  Copyright © 2015-2018 ProcedureKit. All rights reserved.
 //
 
 #if SWIFT_PACKAGE
@@ -43,7 +43,7 @@ extension CKProcedure where T: CKFetchRecordZonesOperationProtocol, T: Associate
     func setFetchRecordZonesCompletionBlock(_ block: @escaping CloudKitProcedure<T>.FetchRecordZonesCompletionBlock) {
         operation.fetchRecordZonesCompletionBlock = { [weak self] zonesByID, error in
             if let strongSelf = self, let error = error {
-                strongSelf.append(error: FetchRecordZonesError(underlyingError: error, zonesByID: zonesByID))
+                strongSelf.setErrorOnce(FetchRecordZonesError(underlyingError: error, zonesByID: zonesByID))
             }
             else {
                 block(zonesByID)

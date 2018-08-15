@@ -1,7 +1,7 @@
 //
 //  ProcedureKit
 //
-//  Copyright © 2016 ProcedureKit. All rights reserved.
+//  Copyright © 2015-2018 ProcedureKit. All rights reserved.
 //
 
 import XCTest
@@ -19,14 +19,14 @@ class GroupTests: GroupTestCase {
         for child in group.children {
             XCTAssertTrue(child.isFinished)
         }
-        for testProcedures in group.children.flatMap({ $0 as? TestProcedure }) {
+        for testProcedures in group.children.compactMap({ $0 as? TestProcedure }) {
             XCTAssertTrue(testProcedures.didExecute)
         }
     }
 
     func test__group_adding_operation_to_running_group() {
         let semaphore = DispatchSemaphore(value: 0)
-        group.add(child: BlockOperation {
+        group.addChild(BlockOperation {
             // prevent the Group from finishing before an extra child is added
             // after execute
             semaphore.wait()
@@ -34,7 +34,7 @@ class GroupTests: GroupTestCase {
         let extra = TestProcedure(name: "Extra child")
 
         checkAfterDidExecute(procedure: group) {
-            $0.add(child: extra)
+            $0.addChild(extra)
             semaphore.signal()
         }
 
@@ -107,7 +107,7 @@ class GroupTests: GroupTestCase {
         let groupDidFinish = DispatchGroup()
         let child1 = children[0]
         let child2 = children[1]
-        child2.add(dependency: child1)
+        child2.addDependency(child1)
         group = TestGroupProcedure(operations: [child1, child2])
 
         child1.addWillFinishBlockObserver { (_, _, _) in
@@ -177,45 +177,87 @@ class GroupTests: GroupTestCase {
         }
 
         addCompletionBlockTo(procedure: group)
-        procedureQueue.add(operation: group)
+        procedureQueue.addOperation(group)
         waitForExpectations(timeout: 3)
 
         XCTAssertTrue(didExecuteOnDesiredQueue.access, "execute() did not execute on the desired underlyingQueue")
-        XCTAssertProcedureFinishedWithoutErrors(group)
-        XCTAssertProcedureFinishedWithoutErrors(child)
+        PKAssertProcedureFinished(group)
+        PKAssertProcedureFinished(child)
     }
+}
 
-    // MARK: - Error Tests
+// MARK: - Error Tests
+
+extension GroupTests {
 
     func test__group_exits_correctly_when_child_errors() {
         children = createTestProcedures(shouldError: true)
         group = TestGroupProcedure(operations: children)
 
         wait(for: group)
-
-        XCTAssertEqual(group.errors.count, children.count)
+        PKAssertProcedureFinished(group, withErrors: true)
+        PKAssertGroupErrors(group, count: 5)
     }
 
     func test__group_exits_correctly_when_child_group_finishes_with_errors() {
+
         children = createTestProcedures(shouldError: true)
         let child = TestGroupProcedure(operations: children); child.name = "Child Group"
         group = TestGroupProcedure(operations: child)
 
         wait(for: group)
-        XCTAssertEqual(child.errors.count, children.count)
-        XCTAssertEqual(group.errors.count, 5)
+        PKAssertProcedureFinished(group, withErrors: true)
+        PKAssertGroupErrors(group, count: 1)
+        PKAssertGroupErrors(child, count: 5)
     }
+}
 
-    // MARK: - Custom Error Handling Tests
+// MARK: - Custom Error Handling Tests
+
+class TestGroupChildWillFinishWithErrors: GroupProcedure {
+    enum WillFinishWithErrorsAction {
+        case none
+        case callSuperWithError(Error?)
+        case callSuperWithUnmodifiedInput
+    }
+    let receivedInput = Protector<[Procedure: Error?]>([:])
+    let didReceiveDuplicate = Protector(false)
+    let action: WillFinishWithErrorsAction
+    init(operations: [Operation], action: WillFinishWithErrorsAction) {
+        self.action = action
+        super.init(operations: operations)
+    }
+    open override func child(_ child: Procedure, willFinishWithError error: Error?) {
+
+        let hasExistingEntryForKey = receivedInput.write { ward in
+            return ward.updateValue(error, forKey: child) != nil
+        }
+        if hasExistingEntryForKey {
+            didReceiveDuplicate.overwrite(with: true)
+        }
+
+        // execute action
+        switch action {
+        case .callSuperWithError(let modifiedError):
+            super.child(child, willFinishWithError: modifiedError)
+        case .callSuperWithUnmodifiedInput:
+            super.child(child, willFinishWithError: error)
+        case .none: break
+        }
+    }
+}
+
+extension GroupTests {
 
     func test__group__transform_child_errors_block_receives_children_and_errors() {
-        let receivedInput = Protector<[Procedure: [Error]]>([:])
+
+        let receivedInput = Protector<[Procedure: Error?]>([:])
         let didReceiveDuplicate = Protector(false)
         children = createTestProcedures(shouldError: true)
         group = TestGroupProcedure(operations: children)
-        group.transformChildErrorsBlock = { (child, errors) in
+        group.transformChildErrorBlock = { (child, error) in
             let hasExistingEntryForKey = receivedInput.write { ward in
-                return ward.updateValue(errors, forKey: child) != nil
+                return ward.updateValue(error, forKey: child) != nil
             }
             if hasExistingEntryForKey {
                 didReceiveDuplicate.overwrite(with: true)
@@ -226,129 +268,74 @@ class GroupTests: GroupTestCase {
 
         XCTAssertFalse(receivedInput.access.isEmpty, "transformChildErrorsBlock was not called")
         XCTAssertFalse(didReceiveDuplicate.access, "transformChildErrorsBlock received a duplicate call for the same child")
+
         for child in children {
-            guard let errors = receivedInput.access[child] else {
+            guard let error = receivedInput.access[child] else {
                 XCTFail("transformChildErrorsBlock was not called for child: \(child)")
                 continue
             }
-            XCTAssertEqual(errors.count, child.errors.count, "transformChildErrorsBlock input errors.count (\(errors.count)) does not equal the child's errors.count (\(child.errors.count))")
-            for (idx, error) in errors.enumerated() {
-                guard let blockError = error as? TestError else {
-                    XCTFail("Error provided to block was not a TestError")
-                    continue
-                }
-                guard let childError = child.errors[idx] as? TestError else {
-                    XCTFail("Error in child was not a TestError")
-                    continue
-                }
-                XCTAssertEqual(blockError, childError)
+
+            guard let blockError = error as? TestError else {
+                XCTFail("Error provided to block was not a TestError")
+                continue
             }
-            
+            guard let childError = child.error as? TestError else {
+                XCTFail("Error in child was not a TestError")
+                continue
+            }
+            XCTAssertEqual(blockError, childError)
         }
-        XCTAssertEqual(group.errors.count, children.count)
+
+        PKAssertGroupErrors(group, count: children.count)
     }
 
-    func test__group__simple_transform_child_errors_block_removes_errors() {
-        let transformChildErrorsBlockChildren = Protector<[Procedure]>([])
-        children = createTestProcedures(shouldError: true)
-        let ignoredChild = children.first!
-        group = TestGroupProcedure(operations: children)
-        group.transformChildErrorsBlock = { (child, errors) in
-            transformChildErrorsBlockChildren.append(child)
-            if child === ignoredChild {
-                errors.removeAll()
-            }
-        }
-
-        wait(for: group)
-
-        XCTAssertFalse(transformChildErrorsBlockChildren.access.isEmpty, "transformChildErrorsBlock was not called")
-        for child in children {
-            XCTAssertTrue(transformChildErrorsBlockChildren.access.contains(child), "transformChildErrorsBlock was not called for child: \(child)")
-        }
-
-        XCTAssertEqual(group.errors.count, children.count - 1)
-        let suppressedError = ignoredChild.errors.first! as! TestError
-        XCTAssertFalse(TestError.verify(errors: group.errors, contains: suppressedError), "The supposedly suppressed error is in the Group errors.")
-    }
-
-    func test__group__transform_child_errors_block_removes_errors_from_child_willfinishwitherrors() {
+    func test__group__transform_child_errors_block_removes_errors_from_child_willFinishWithError() {
+        let modifiedError = TestError()
         children = createTestProcedures(shouldError: true)
         let group = TestGroupChildWillFinishWithErrors(operations: children, action: .callSuperWithUnmodifiedInput)
         let ignoredChild = children.first!
-        group.transformChildErrorsBlock = { (child, errors) in
+        group.transformChildErrorBlock = { (child, error) in
             if child === ignoredChild {
-                errors.removeAll()
+                error = modifiedError
             }
         }
 
         wait(for: group)
 
-        XCTAssertFalse(group.receivedInput.access.isEmpty, "child(_:willFinishWithErrors:) was not called")
-        XCTAssertFalse(group.didReceiveDuplicate.access, "child(_:willFinishWithErrors:) received a duplicate call for the same child")
+        XCTAssertNotNil(group.receivedInput.access, "child(_:willFinishWithError:) was not called")
+        XCTAssertFalse(group.didReceiveDuplicate.access, "child(_:willFinishWithError:) received a duplicate call for the same child")
         for child in children {
-            XCTAssertTrue(group.receivedInput.access.keys.contains(child), "child(_:willFinishWithErrors:) was not called for child: \(child)")
+            XCTAssertTrue(group.receivedInput.access.keys.contains(child), "child(_:willFinishWithError:) was not called for child: \(child)")
         }
 
-        XCTAssertEqual(group.errors.count, children.count - 1)
-        guard let receivedErrorsForIgnoredChild = group.receivedInput.access[ignoredChild] else {
-            XCTFail("child(_:willFinishWithErrors:) was not called for the ignoredChild")
+        PKAssertGroupErrors(group, count: children.count)
+
+        guard let receivedErrorsForIgnoredChild = group.receivedInput.access[ignoredChild] as? TestError else {
+            XCTFail("child(_:willFinishWithError:) was not called for the ignoredChild")
             return
         }
-        XCTAssertTrue(receivedErrorsForIgnoredChild.isEmpty, "child(_:willFinishWithErrors:) received a non-empty errors array for the ignoredChild")
+        XCTAssertEqual(receivedErrorsForIgnoredChild, modifiedError)
     }
 
-    class TestGroupChildWillFinishWithErrors: GroupProcedure {
-        enum WillFinishWithErrorsAction {
-            case none
-            case callSuperWithErrors([Error])
-            case callSuperWithUnmodifiedInput
-        }
-        let receivedInput = Protector<[Procedure: [Error]]>([:])
-        let didReceiveDuplicate = Protector(false)
-        let action: WillFinishWithErrorsAction
-        init(operations: [Operation], action: WillFinishWithErrorsAction) {
-            self.action = action
-            super.init(operations: operations)
-        }
-        open override func child(_ child: Procedure, willFinishWithErrors errors: [Error]) {
-            // store received input
-            let hasExistingEntryForKey = receivedInput.write { ward in
-                return ward.updateValue(errors, forKey: child) != nil
-            }
-            if hasExistingEntryForKey {
-                didReceiveDuplicate.overwrite(with: true)
-            }
-
-            // execute action
-            switch action {
-            case .callSuperWithErrors(let error):
-                super.child(child, willFinishWithErrors: error)
-            case .callSuperWithUnmodifiedInput:
-                super.child(child, willFinishWithErrors: errors)
-            case .none: break
-            }
-        }
-    }
-
-    func test__group__child_willfinishwitherrors_does_not_call_super() {
+    func test__group__child_willFinishWithError_does_not_call_super() {
         children = createTestProcedures(shouldError: true)
         let group = TestGroupChildWillFinishWithErrors(operations: children, action: .none)
 
         wait(for: group)
 
-        XCTAssertFalse(group.receivedInput.access.isEmpty, "child(_:willFinishWithErrors:) was not called")
-        XCTAssertFalse(group.didReceiveDuplicate.access, "child(_:willFinishWithErrors:) received a duplicate call for the same child")
+        XCTAssertFalse(group.receivedInput.access.isEmpty, "child(_:willFinishWithError:) was not called")
+        XCTAssertFalse(group.didReceiveDuplicate.access, "child(_:willFinishWithError:) received a duplicate call for the same child")
         for child in children {
-            XCTAssertTrue(group.receivedInput.access.keys.contains(child), "child(_:willFinishWithErrors:) was not called for child: \(child)")
+            XCTAssertTrue(group.receivedInput.access.keys.contains(child), "child(_:willFinishWithError:) was not called for child: \(child)")
         }
 
-        XCTAssertEqual(group.errors.count, 0)
+        PKAssertGroupErrors(group, count: 0)
     }
 
-    func test__group__child_willfinishwitherrors_calls_super_with_modified_errors() {
+    func test__group__child_willFinishWithError_calls_super_with_modified_errors() {
+
         children = createTestProcedures(shouldError: true)
-        let group = TestGroupChildWillFinishWithErrors(operations: children, action: .callSuperWithErrors([]))
+        let group = TestGroupChildWillFinishWithErrors(operations: children, action: .callSuperWithError(nil))
 
         wait(for: group)
 
@@ -358,10 +345,13 @@ class GroupTests: GroupTestCase {
             XCTAssertTrue(group.receivedInput.access.keys.contains(child), "child(_:willFinishWithErrors:) was not called for child: \(child)")
         }
 
-        XCTAssertEqual(group.errors.count, 0)
+        PKAssertGroupErrors(group, count: 0)
     }
+}
 
-    // MARK: - Cancellation Tests
+// MARK: - Cancellation Tests
+
+extension GroupTests {
 
     func test__group_cancels_children() {
         weak var cancelledExpectation = expectation(description: "\(#function): group did cancel")
@@ -396,19 +386,23 @@ class GroupTests: GroupTestCase {
     }
 
     func test__group_cancel_with_errors_does_not_collect_errors_sent_to_children() {
-        check(procedure: group) { $0.cancel(withError: TestError()) }
-        XCTAssertProcedureCancelledWithErrors(group, count: 1)
+        let error = TestError()
+        check(procedure: group) { $0.cancel(with: error) }
+        PKAssertProcedureCancelledWithError(group, error)
     }
 
     func test__group_additional_children_are_cancelled_if_group_is_cancelled() {
         group.cancel()
         let additionalChild = TestProcedure(delay: 0)
-        group.add(child: additionalChild)
+        group.addChild(additionalChild)
         wait(for: group)
         XCTAssertTrue(additionalChild.isCancelled)
     }
+}
 
-    // MARK: - Finishing Tests
+// MARK: - Finishing Tests
+
+extension GroupTests {
 
     func test__group_does_not_finish_before_all_children_finish() {
         var didFinishBlockObserverWasCalled = false
@@ -457,7 +451,7 @@ class GroupTests: GroupTestCase {
         // Adding a TestProcedure to the otherQueue should not result in the Group's
         // Will/DidAddChild observers being called, nor should the Group wait
         // on the other queue's TestProcedure to finish.
-        otherQueue.add(operation: TestProcedure())
+        otherQueue.addOperation(TestProcedure())
         wait(for: group)
         XCTAssertTrue(group.isFinished)
         XCTAssertFalse(observerCalledFromGroupDelegate)
@@ -472,28 +466,28 @@ class GroupTests: GroupTestCase {
         addCompletionBlockTo(procedure: producedOperation)
         group = TestGroupProcedure(operations: child)
         wait(for: group)
-        XCTAssertProcedureFinishedWithoutErrors(group)
-        XCTAssertProcedureFinishedWithoutErrors(child)
-        XCTAssertProcedureFinishedWithoutErrors(producedOperation)
+        PKAssertProcedureFinished(group)
+        PKAssertProcedureFinished(child)
+        PKAssertProcedureFinished(producedOperation)
     }
 
     func test__group_does_not_finish_before_child_produced_operations_are_finished() {
         let child = TestProcedure(name: "Child", delay: 0.01)
         let childProducedOperation = TestProcedure(name: "ChildProducedOperation", delay: 0.2)
-        childProducedOperation.add(dependency: child)
+        childProducedOperation.addDependency(child)
         let group = GroupProcedure(operations: [child])
         child.addWillExecuteBlockObserver { operation, pendingExecute in
             try! operation.produce(operation: childProducedOperation, before: pendingExecute) // swiftlint:disable:this force_try
         }
         wait(for: group)
-        XCTAssertProcedureFinishedWithoutErrors(group)
-        XCTAssertProcedureFinishedWithoutErrors(childProducedOperation)
+        PKAssertProcedureFinished(group)
+        PKAssertProcedureFinished(childProducedOperation)
     }
 
     func test__group_children_array_receives_operations_produced_by_children() {
         let child = TestProcedure(name: "Child", delay: 0.01)
         let childProducedOperation = TestProcedure(name: "ChildProducedOperation", delay: 0.2)
-        childProducedOperation.add(dependency: child)
+        childProducedOperation.addDependency(child)
         let group = GroupProcedure(operations: [child])
         child.addWillExecuteBlockObserver { operation, pendingExecute in
             try! operation.produce(operation: childProducedOperation, before: pendingExecute) // swiftlint:disable:this force_try
@@ -545,8 +539,8 @@ class GroupTests: GroupTestCase {
             case willAddOperationObserver
             case didAddOperationObserver
             case groupWillAdd
-            case childWillFinishWithErrors(Procedure, [Error])
-            case transformChildErrorsBlock(Procedure, [Error])
+            case childWillFinishWithError(Procedure, Error?)
+            case transformChildErrorBlock(Procedure, Error?)
         }
 
         init(operations: [Operation], childEventBlock: @escaping ChildEventBlock = { _,_ in }) {
@@ -558,8 +552,8 @@ class GroupTests: GroupTestCase {
             addDidAddOperationBlockObserver { group, child in
                 group.childEventBlock(.didAddOperationObserver, child)
             }
-            transformChildErrorsBlock = { (child, errors) in
-                childEventBlock(.transformChildErrorsBlock(child, errors), child)
+            transformChildErrorBlock = { (child, error) in
+                childEventBlock(.transformChildErrorBlock(child, error), child)
             }
         }
 
@@ -568,9 +562,10 @@ class GroupTests: GroupTestCase {
             childEventBlock(.groupWillAdd, child)
             super.groupWillAdd(child: child)
         }
-        open override func child(_ child: Procedure, willFinishWithErrors errors: [Error]) {
-            childEventBlock(.childWillFinishWithErrors(child, errors), child)
-            return super.child(child, willFinishWithErrors: errors)
+
+        open override func child(_ child: Procedure, willFinishWithError error: Error?) {
+            childEventBlock(.childWillFinishWithError(child, error), child)
+            return super.child(child, willFinishWithError: error)
         }
     }
 
@@ -598,9 +593,9 @@ class GroupTests: GroupTestCase {
         // Ensure that this implementation detail is hidden from callbacks, observers, etc.
 
         let childWithFailingCondition = TestProcedure()
-        childWithFailingCondition.add(condition: FalseCondition())
+        childWithFailingCondition.addCondition(FalseCondition())
         let childWithSucceedingCondition = TestProcedure()
-        childWithSucceedingCondition.add(condition: TrueCondition())
+        childWithSucceedingCondition.addCondition(TrueCondition())
 
         let group = CheckForEvaluateConditionsGroupProcedure(operations: [childWithFailingCondition, childWithSucceedingCondition])
         wait(for: group)
@@ -695,8 +690,8 @@ class GroupEventConcurrencyTests: GroupTestCase {
         // .observer_DidFinish event.
         waitForBaseObserverDidFinish(timeout: 2)
 
-        XCTAssertProcedureFinishedWithoutErrors(group)
-        XCTAssertProcedureNoConcurrentEvents(group)
+        PKAssertProcedureFinished(group)
+        PKAssertProcedureNoConcurrentEvents(group)
 
         let expectedBeginningEvents: [EventConcurrencyTrackingRegistrar.ProcedureEvent] = [.observer_didAttach, .observer_willExecute, .do_Execute]
         XCTAssertEqual(Array(group.concurrencyRegistrar.eventHistory?.prefix(expectedBeginningEvents.count) ?? []), expectedBeginningEvents)
@@ -715,8 +710,8 @@ class GroupEventConcurrencyTests: GroupTestCase {
         // .observer_DidFinish event.
         waitForBaseObserverDidFinish(timeout: 2)
 
-        XCTAssertProcedureCancelledWithoutErrors(group)
-        XCTAssertProcedureNoConcurrentEvents(group)
+        PKAssertProcedureCancelled(group)
+        PKAssertProcedureNoConcurrentEvents(group)
 
         let expectedBeginningEvents: [EventConcurrencyTrackingRegistrar.ProcedureEvent] = [.observer_didAttach, .override_procedureDidCancel, .observer_didCancel, .observer_willExecute, .do_Execute]
         XCTAssertEqual(Array(group.concurrencyRegistrar.eventHistory?.prefix(expectedBeginningEvents.count) ?? []), expectedBeginningEvents)
@@ -731,11 +726,11 @@ class GroupAddChildConcurrencyTests: ProcedureKitTestCase {
         child.name = "ChildProcedure"
         addCompletionBlockTo(procedure: child)
         let group = EventConcurrencyTrackingGroupProcedure(operations: [], registrar: EventConcurrencyTrackingRegistrar(recordHistory: true))
-        group.add(child: child)
+        group.addChild(child)
         wait(for: group)
-        XCTAssertProcedureFinishedWithoutErrors(child)
-        XCTAssertProcedureFinishedWithoutErrors(group)
-        XCTAssertProcedureNoConcurrentEvents(group)
+        PKAssertProcedureFinished(child)
+        PKAssertProcedureFinished(group)
+        PKAssertProcedureNoConcurrentEvents(group)
     }
 
     func test__group_add_child_operation__prior_to_adding_group_to_queue() {
@@ -745,11 +740,11 @@ class GroupAddChildConcurrencyTests: ProcedureKitTestCase {
         let childFinishedOperation = BlockProcedure { DispatchQueue.main.async { expChildOperationFinished?.fulfill() } }
         childFinishedOperation.addDependency(child)
         let group = EventConcurrencyTrackingGroupProcedure(operations: [], registrar: EventConcurrencyTrackingRegistrar(recordHistory: true))
-        group.add(child: child)
+        group.addChild(child)
         wait(for: group, childFinishedOperation)
         XCTAssertTrue(child.isFinished)
-        XCTAssertProcedureFinishedWithoutErrors(group)
-        XCTAssertProcedureNoConcurrentEvents(group)
+        PKAssertProcedureFinished(group)
+        PKAssertProcedureNoConcurrentEvents(group)
     }
 
     func test__group_add_child__from_an_observer_on_another_child() {
@@ -761,13 +756,13 @@ class GroupAddChildConcurrencyTests: ProcedureKitTestCase {
         addCompletionBlockTo(procedure: addedChild)
         let group = EventConcurrencyTrackingGroupProcedure(operations: [initialChild], registrar: EventConcurrencyTrackingRegistrar(recordHistory: true))
         initialChild.addWillExecuteBlockObserver { _, _ in
-            group.add(child: addedChild)
+            group.addChild(addedChild)
         }
         wait(for: group)
-        XCTAssertProcedureFinishedWithoutErrors(initialChild)
-        XCTAssertProcedureFinishedWithoutErrors(addedChild)
-        XCTAssertProcedureFinishedWithoutErrors(group)
-        XCTAssertProcedureNoConcurrentEvents(group)
+        PKAssertProcedureFinished(initialChild)
+        PKAssertProcedureFinished(addedChild)
+        PKAssertProcedureFinished(group)
+        PKAssertProcedureNoConcurrentEvents(group)
     }
 
     func test__group_add_child__before_procedure_execute_async() {
@@ -788,7 +783,7 @@ class GroupAddChildConcurrencyTests: ProcedureKitTestCase {
                 // it should ensure that `procedure` does not execute until producing the
                 // operation succeeds (i.e. until all WillAdd observers have been fired and it's
                 // added to the group)
-                group.add(child: addedChild, before: pendingExecute)
+                group.addChild(addedChild, before: pendingExecute)
             }
         }
         group.addWillAddOperationBlockObserver { procedure, operation in
@@ -798,7 +793,7 @@ class GroupAddChildConcurrencyTests: ProcedureKitTestCase {
             procedureIsFinished_InWillAddObserver = procedure.isFinished
         }
         wait(for: procedure)
-        XCTAssertProcedureFinishedWithoutErrors(procedure)
+        PKAssertProcedureFinished(procedure)
         XCTAssertTrue(didExecuteWillAddObserverForAddedChildOperation, "group never executed its WillAddOperation observer for the added child operation")
         XCTAssertFalse(procedureIsExecuting_InWillAddObserver, "group was executing when its WillAddOperation observer was fired for the added child operation")
         XCTAssertFalse(procedureIsFinished_InWillAddObserver, "group was finished when its WillAddOperation observer was fired for the added child operation")
@@ -822,7 +817,7 @@ class GroupAddChildConcurrencyTests: ProcedureKitTestCase {
                 // it should ensure that `procedure` does not finish until producing the
                 // operation succeeds (i.e. until all WillAdd observers have been fired and it's
                 // added to the group)
-                group.add(child: addedChild, before: pendingFinish)
+                group.addChild(addedChild, before: pendingFinish)
             }
         }
         group.addWillAddOperationBlockObserver { procedure, operation in
@@ -832,7 +827,7 @@ class GroupAddChildConcurrencyTests: ProcedureKitTestCase {
             procedureIsFinished_InWillAddObserver = procedure.isFinished
         }
         wait(for: procedure)
-        XCTAssertProcedureFinishedWithoutErrors(procedure)
+        PKAssertProcedureFinished(procedure)
         XCTAssertTrue(didExecuteWillAddObserverForAddedChildOperation, "procedure never executed its WillAddOperation observer for the produced operation")
         XCTAssertFalse(procedureIsExecuting_InWillAddObserver, "procedure was executing when its WillAddOperation observer was fired for the produced operation")
         XCTAssertFalse(procedureIsFinished_InWillAddObserver, "procedure was finished when its WillAddOperation observer was fired for the produced operation")

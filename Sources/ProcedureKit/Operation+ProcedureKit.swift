@@ -1,7 +1,7 @@
 //
 //  ProcedureKit
 //
-//  Copyright © 2016 ProcedureKit. All rights reserved.
+//  Copyright © 2015-2018 ProcedureKit. All rights reserved.
 //
 
 import Foundation
@@ -56,48 +56,32 @@ public extension Operation {
     }
 
     /**
-     Add a dependency to the operation, using Swift 3 API style
-     - parameter dependency: the Operation to add as a dependency
-    */
-    func add(dependency: Operation) {
-        addDependency(dependency)
+     Adds dependencies to the operation, using Swift 3 API style
+     - parameter dependencies: a sequencey of Operation instances
+     */
+    func addDependencies<Operations: Sequence>(_ dependencies: Operations) where Operations.Iterator.Element: Operation {
+        dependencies.forEach(addDependency)
     }
 
     /**
      Adds dependencies to the operation, using Swift 3 API style
      - parameter dependencies: a variable number of Operation instances
      */
-    func add(dependencies: Operation...) {
-        add(dependencies: dependencies)
-    }
-
-    /**
-     Adds dependencies to the operation, using Swift 3 API style
-     - parameter dependencies: a sequencey of Operation instances
-     */
-    func add<Operations: Sequence>(dependencies: Operations) where Operations.Iterator.Element: Operation {
-        dependencies.forEach(add(dependency:))
-    }
-
-    /**
-     Remove dependency from the operation, using Swift 3 API style
-     - parameter dependency: a sequencey of Operation instances
-     */
-    func remove(dependency: Operation) {
-        removeDependency(dependency)
+    func addDependencies(_ dependencies: Operation...) {
+        addDependencies(dependencies)
     }
 
     /**
      Removes dependencies to the operation, using Swift 3 API style
      - parameter dependencies: a sequencey of Operation instances
      */
-    func remove<Operations: Sequence>(dependencies: Operations) where Operations.Iterator.Element: Operation {
-        dependencies.forEach(remove(dependency:))
+    func removeDependencies<Operations: Sequence>(_ dependencies: Operations) where Operations.Iterator.Element: Operation {
+        dependencies.forEach(removeDependency)
     }
 
     /// Removes all dependencies from the operation
     func removeAllDependencies() {
-        remove(dependencies: dependencies)
+        addDependencies(dependencies)
     }
 
     /**
@@ -107,7 +91,7 @@ public extension Operation {
     */
     func then(do operation: Operation) -> [Operation] {
         assert(!isFinished, "Cannot add a finished operation as a dependency.")
-        operation.add(dependency: self)
+        operation.addDependency(self)
         return [self, operation]
     }
 
@@ -124,11 +108,29 @@ public extension Operation {
 
 
 public extension Operation {
-    
-    /**
-     Sets the quality of service of the Operation from `UserIntent`
-     - parameter userIntent: a UserIntent value
-     */
-    @available(*, deprecated: 4.5.0, message: "Use underlying quality of service APIs instead.")
-    func setQualityOfService(fromUserIntent userIntent: UserIntent) { }
+
+    @available(*, deprecated, renamed: "addDependencies(_:)", message: "This has been renamed to use Swift 3/4 naming conventions")
+    func add<Operations: Sequence>(dependencies: Operations) where Operations.Iterator.Element: Operation {
+        addDependencies(dependencies)
+    }
+
+    @available(*, deprecated, renamed: "addDependencies(_:)", message: "This has been renamed to use Swift 3/4 naming conventions")
+    func add(dependencies: Operation...) {
+        addDependencies(dependencies)
+    }
+
+    @available(*, deprecated, renamed: "addDependency(_:)", message: "This has been removed.")
+    func add(dependency: Operation) {
+        addDependency(dependency)
+    }
+
+    @available(*, deprecated, renamed: "addDependencies(_:)", message: "This has been renamed to use Swift 3/4 naming conventions")
+    func remove<Operations: Sequence>(dependencies: Operations) where Operations.Iterator.Element: Operation {
+        removeDependencies(dependencies)
+    }
+
+    @available(*, deprecated, renamed: "removeDependency(_:)", message: "This has been removed.")
+    func remove(dependency: Operation) {
+        removeDependency(dependency)
+    }
 }

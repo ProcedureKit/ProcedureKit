@@ -1,12 +1,13 @@
 //
 //  ProcedureKit
 //
-//  Copyright © 2016 ProcedureKit. All rights reserved.
+//  Copyright © 2015-2018 ProcedureKit. All rights reserved.
 //
 
 import Foundation
 import UIKit
 
+@available(*, deprecated: 5.0.0, message: "UIProcedure is now deprecated and will be removed")
 public protocol PresentingViewController: class {
 
     func present(_ viewControllerToPresent: UIViewController, animated flag: Bool, completion: (() -> Void)?)
@@ -18,14 +19,17 @@ public protocol PresentingViewController: class {
 
 extension UIViewController: PresentingViewController { }
 
+@available(*, deprecated: 5.0.0, message: "UIProcedure is now deprecated and will be removed")
 public protocol DismissingViewController: class {
     var didDismissViewControllerBlock: () -> Void { get set }
 }
 
+@available(*, deprecated: 5.0.0, message: "UIProcedure is now deprecated and will be removed")
 public enum PresentationStyle {
     case show, showDetail, present
 }
 
+@available(*, deprecated: 5.0.0, message: "UIProcedure is now deprecated and will be removed")
 open class UIProcedure: Procedure {
 
     public let presented: UIViewController

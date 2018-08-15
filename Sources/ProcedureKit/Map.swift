@@ -1,12 +1,12 @@
 //
 //  ProcedureKit
 //
-//  Copyright © 2016 ProcedureKit. All rights reserved.
+//  Copyright © 2015-2018 ProcedureKit. All rights reserved.
 //
 
 open class MapProcedure<Element, U>: ReduceProcedure<Element, Array<U>> {
 
-    public init<S: Sequence>(source: S, transform: @escaping (Element) throws -> U) where S.Iterator.Element == Element, S.SubSequence: Sequence, S.SubSequence.Iterator.Element == Element, S.SubSequence.SubSequence == S.SubSequence {
+    public init<S: Sequence>(source: S, transform: @escaping (Element) throws -> U) where S.Iterator.Element == Element {
         super.init(source: source, initial: Array<U>()) { acc, element in
             var accumulator = acc
             try accumulator.append(transform(element))
@@ -28,7 +28,7 @@ public extension OutputProcedure where Self.Output: Sequence {
 
 open class FlatMapProcedure<Element, U>: ReduceProcedure<Element, Array<U>> {
 
-    public init<S: Sequence>(source: S, transform: @escaping (Element) throws -> U?) where S.Iterator.Element == Element, S.SubSequence: Sequence, S.SubSequence.Iterator.Element == Element, S.SubSequence.SubSequence == S.SubSequence {
+    public init<S: Sequence>(source: S, transform: @escaping (Element) throws -> U?) where S.Iterator.Element == Element {
         super.init(source: source, initial: Array<U>()) { acc, element in
             guard let u = try transform(element) else { return acc }
             return acc + [u]

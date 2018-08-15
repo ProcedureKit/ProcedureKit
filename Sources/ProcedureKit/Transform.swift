@@ -1,7 +1,7 @@
 //
 //  ProcedureKit
 //
-//  Copyright © 2016 ProcedureKit. All rights reserved.
+//  Copyright © 2015-2018 ProcedureKit. All rights reserved.
 //
 
 open class TransformProcedure<Input, Output>: Procedure, InputProcedure, OutputProcedure {
@@ -19,7 +19,7 @@ open class TransformProcedure<Input, Output>: Procedure, InputProcedure, OutputP
     }
 
     open override func execute() {
-        defer { finish(withError: output.error) }
+        defer { finish(with: output.error) }
         do {
             guard let inputValue = input.value else { throw ProcedureKitError.requirementNotSatisfied() }
             output = .ready(.success(try transform(inputValue)))

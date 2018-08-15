@@ -1,8 +1,10 @@
 //
 //  ProcedureKit
 //
-//  Copyright © 2016 ProcedureKit. All rights reserved.
+//  Copyright © 2015-2018 ProcedureKit. All rights reserved.
 //
+
+#if !swift(>=4.1)
 
 #if SWIFT_PACKAGE
     import ProcedureKit
@@ -95,3 +97,5 @@ extension CloudKitProcedure where T: CKFetchShareParticipantsOperationProtocol {
         appendConfigureBlock { $0.setFetchShareParticipantsCompletionBlock(block) }
     }
 }
+
+#endif
