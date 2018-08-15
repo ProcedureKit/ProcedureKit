@@ -12,8 +12,8 @@ import UIKit
 
 /// A struct of the views which require autolayout constraints
 public struct AutolayoutViews {
-    let child: UIView
-    let parent: UIView
+    public let child: UIView
+    public let parent: UIView
 }
 
 /// A block type which receives the child's view to perform any autolayout.
