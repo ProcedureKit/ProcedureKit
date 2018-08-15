@@ -1,3 +1,156 @@
+# 5.0.0
+This is a _rather long-awaited_ next major version of ProcedureKit.
+
+## Headline Changes
+1. Networking procedures no longer use an associated type for the `URLSession`. Instead `Session` is a free-floating protocol. This makes general usage, subclassing and composing much simpler.
+2. There is now a Core Data module
+3. `BlockProcedure` API has changed.
+4. `Procedure` only supports a single `Error` value, instead of `[Error]` - this has had some fairly wide reaching changes to APIs.
+5. New built-in logger, which uses `os_log` by default.
+6. Changes to `UIProcedure` in _ProcedureKitMobile_ module.
+
+## Breaking Changes
+1. [[823](https://github.com/ProcedureKit/ProcedureKit/pull/823)]: Removes associated types from Network
+
+    Originally raised as an [issue](https://github.com/ProcedureKit/ProcedureKit/issues/814) by [@ericyanush](https://github.com/ericyanush) in which I totally missed the point initially. But, after thinking about it more, made so much sense. Instead of having a generic `URLSessionTaskFactory` protocol, where the various types of tasks were associated types, we now just have a non-generic `NetworkSession` protocol, to which `URLSession` conforms. The impact of this subtle change, is that what was once: `NetworkDataProcedure<Session: URLSessionTaskFactory>` is now `NetworkDataProcedure`. In otherwords, no longer generic, and now super easy to use as that generic `Session` doesn't leak all over the place.
+    
+2. [[#875](https://github.com/ProcedureKit/ProcedureKit/pull/875)]: Refactored `BlockProcedure`
+
+    There has been a long-standing wish for `BlockProcedure` instances to "receive themselves" in their block to allow for access to its logger etc. In v5, the following is all possible, see this [comment](https://github.com/ProcedureKit/ProcedureKit/pull/875#issuecomment-410502324):
+    
+    1. Simple synchronous block (existing functionality):
+        ```swift
+        let block = BlockProcedure { 
+            print("Hello World")
+        }
+        ```
+
+    2. Synchonous block, accessing the procedure inside the block:
+        ```swift
+        let block = BlockProcedure { this in
+            this.log.debug.message("Hello World")
+            this.finish()
+        }
+        ```
+        Note that here, the block is responsible for finishing itself - i.e. call `.finish()` or `.finish(with:)` to finish the Procedure. Using this initializer, by default, `BlockProcedure` will add a `TimeoutObserver` to itself, using `defaultTimeoutInterval` which is set to 3 seconds. This can be modified if needed.
+        ```swift
+        BlockProcedure.defaultTimeoutInterval = 5
+        ```
+
+    3. Asynchronous block with cancellation check, `AsyncBlockProcedure` and `CancellableBlockProcedure` get deprecated warnings.
+        ```swift
+        let block = BlockProcedure { this in
+            guard !this.isCancelled else { this.finish() }
+            DispatchQueue.default.async {
+               print("Hello world")
+               this.finish()
+            }
+        }
+        ```
+
+    4. `ResultProcedure` as been re-written as a subclass of `BlockProcedure` (previously, it was the superclass). Existing functionality has been maintained:
+        ```swift
+        let hello = ResultProcedure { "Hello World" }
+        ```
+3. [[#851](https://github.com/ProcedureKit/ProcedureKit/pull/851)]: Errors
+    
+    At WWDC18 I spent some time with some Swift engineers from Apple talking about framework design and error handling. The key take-away from these discussions was to _increase clarity_ which reduces confusion, and makes _intent_ clear. 
+    
+    This theme drove some significant changes. To increase clarity, each Procedure can only have a single `Error`, because ultimately, how can a framework consumer "handle" an array of `Error` values over just a single one? I realised that the only reason `Procedure` has an `[Error]` property at all was from `GroupProcedure` collecting all of the errors from its children, yet the impact of this is felt throughout the codebase. 
+    
+    This means, to finish a procedure with an error, use:    
+    ```swift
+    finish(with: .downloadFailedError) // this is a made up error type
+    ```
+    
+    Observers only receive a single error now:
+    ```swift
+    procedure.addDidFinishBlockObserver { (this, error) in
+        guard let error = error else {
+            // there is an error, the block argument is Error? type
+	    return
+        }
+	
+	// etc
+    }
+    ```
+    
+    Plus more API changes in `Procedure` and `GroupProcedure` which will result in deprecation warnings for framework consumers.
+    
+    For `GroupProcedure` itself, it will now only set its own error to the first error received. However, to access the errors from child procedures, use the `.children` property. Something like:
+    ```swift
+    let errors = group.children.operationsAndProcedures.1.compactMap { $0.error }
+    ```
+    
+4. [[#861](https://github.com/ProcedureKit/ProcedureKit/pull/861), [#870](https://github.com/ProcedureKit/ProcedureKit/pull/870)]: Logger
+
+    _ProcedureKit_ has its own logging system, which has received an overhawl in v5. The changes are:
+    
+        1. Now uses `os_log` instead of `print()` where available.
+	2. Dedicated severity levels for caveman debugging & user event. See this [comment](https://github.com/ProcedureKit/ProcedureKit/pull/861#issuecomment-404058717).
+	3. Slight API change:
+	    ```swift
+   	    procedure.log.info.message("This is my debug message")
+	    ```
+	    previously, it was:
+	    ```swift
+	    procedure.log.info("This is my debug message")
+	    ```
+	    For module-wide settings:
+	    ```swift
+	    Log.enabled = true
+	    Log.severity = .debug // default is .warning
+	    Log.writer = CustomLogWriter() // See LogWriter protocol
+	    Log.formatter = CustomLogFormatter() // See LogFormatter protocol
+	    ```
+5. [[#860](https://github.com/ProcedureKit/ProcedureKit/pull/860)]: Swift 3/4 API naming & conventions
+
+    [@lukeredpath](https://github.com/lukeredpath) initially raised the issue in [#796](https://github.com/ProcedureKit/ProcedureKit/issues/796), that some APIs such as `add(condition: aCondition)` did not Swift 3/4 API guidelines, and contributed to inconsistency within the framework. These have now been tidied up.
+
+## New Features & Improvements
+1. [[#830](https://github.com/ProcedureKit/ProcedureKit/pull/830), [#837](https://github.com/ProcedureKit/ProcedureKit/pull/837)]: Swift 4.1 & Xcode 9.3 support, (Xcode 10 is ready to go).
+    
+    These changes take advantage of Swift 4.1 capabilities, such as synthesized `Equatable` and conditional conformance.
+
+2. [[#828](https://github.com/ProcedureKit/ProcedureKit/pull/828), [#833](https://github.com/ProcedureKit/ProcedureKit/pull/833)]: Result Injection & Binding
+    
+    Result Injection conformance is added to `RepeatProcedure` (and subclasses such as `RetryProcedure` & `NetworkProcedure`). This means the input can be set on the out `RepeatProcedure`, and this value will be set on every instance of the target procedure (assuming it also conforms to `InputProcedure`). This avoids having to jump through hoops like [this](https://github.com/ProcedureKit/ProcedureKit/issues/876).
+    
+    Additionally, a new _binding_ API can be used, particularly with `GroupProcedure` subclasses, so that the input of a child procedure is "bound" to that of the group itself, likewise, the output of the group is bound to a child. This makes it very easy to encapsulate a chain of procedures which use result injection into a `GroupProcedure` subclass. See [the docs](http://procedure.kit.run/development/advanced-result-injection.html).
+
+3. [[#834](https://github.com/ProcedureKit/ProcedureKit/pull/834)]: Adds `BatchProcedure`
+    
+    `BatchProcedure` is a `GroupProcedure` subclass which can be used to batch process a homogeneous array of objects, so that we get `[T] -> [V]` via a procedure which does `T -> V`. We already have `MapProcedure` which does this via a closure, and so is synchronous, and useful for simple data transforms. `BatchProcedure` allows asynchronous processing via a custom procedure. This is actually a pretty common situation in production apps. For example, consider an API response for a gallery of images, we can use `BatchProcedure` to get all the images in the gallery.
+
+4. [[#838](https://github.com/ProcedureKit/ProcedureKit/pull/838)]: Adds `IgnoreErrorsProcedure`
+    
+    `IgnoreErrorsProcedure` will safely wrap another procedure to execute it and suppress any errors. This can be useful for _fire, forget and ignore_ type behavior.
+
+5. [[#843](https://github.com/ProcedureKit/ProcedureKit/pull/843), [#844](https://github.com/ProcedureKit/ProcedureKit/pull/844), [#847](https://github.com/ProcedureKit/ProcedureKit/pull/847), [#849](https://github.com/ProcedureKit/ProcedureKit/pull/849)]: Adds _ProcedureKitCoreData_.
+
+    - [x] `LoadCoreDataProcedure` - intended to be subclassed by framework consumers for their project, see the docs.
+    - [x] `MakeFetchedResultControllerProcedure`
+    - [x] `SaveManagedObjectContext`
+    - [x] `InsertManagedObjectsProcedure`
+    - [x] `MakesBackgroundManagedObjectContext` - a protocol to allow mixed usage of `NSPersistentContainer`, `NSManagedObjectContext` and `NSPersistentStoreCoordinator`.
+
+6. [[#840](https://github.com/ProcedureKit/ProcedureKit/pull/840), [#858](https://github.com/ProcedureKit/ProcedureKit/pull/858), [#868](https://github.com/ProcedureKit/ProcedureKit/pull/868)]: Adds `UIBlockProcedure`
+
+    `UIBlockProcedure` replaces `UIProcedure`, and it essentially is a block which will always run on the main queue. It is the basis for other UI procedures.
+
+7. [[#841](https://github.com/ProcedureKit/ProcedureKit/pull/841), [#873](https://github.com/ProcedureKit/ProcedureKit/pull/873), [#874](https://github.com/ProcedureKit/ProcedureKit/pull/874)]: Adds `UIViewController` containment procedures
+
+    - [x] `AddChildViewControllerProcedure`
+    - [x] `RemoveChildViewControllerProcedure`
+    - [x] `SetChildViewControllerProcedure`
+    
+    All of these procedures provide configurable auto-layout options. By default the child view controller's view is "pinned" to the bounds of the parent view. However, it is possible to use custom auto-layout behaviour.
+
+## Notes
+
+Thanks to everyone who has contributed to _ProcedureKit_ - v5 has been quite a while in development. There is still quite a bit left to do on the documentation effort - but that will be ongoing for evermore.
+
+
 # 4.5.0
 
 ## Swift 4.0
