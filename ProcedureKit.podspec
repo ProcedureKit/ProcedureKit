@@ -70,7 +70,7 @@ Pod::Spec.new do |s|
 
   # ProcedureKitMobile
   s.subspec 'Mobile' do |ss|
-    ss.platforms = { :ios => "8.0" }
+    ss.platforms = { :ios => "9.0" }
   	ss.dependency 'ProcedureKit/Standard'
   	ss.source_files = ['Sources/ProcedureKitMobile']
   end
