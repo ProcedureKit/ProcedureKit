@@ -55,6 +55,7 @@ open class BlockProcedure: Procedure {
  A block based procedure which execute the provided block on the UI/main thread.
  */
 open class UIBlockProcedure: BlockProcedure {
+
     public override init(block: @escaping ThrowingVoidBlock) {
         super.init { (procedure) in
 

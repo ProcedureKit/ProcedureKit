@@ -14,19 +14,26 @@ public class UserConfirmationCondition: Condition {
     }
 
     fileprivate var alert: AlertProcedure
+
     private var response: Response = .unknown
 
-    public init(presentAlertFrom presenting: PresentingViewController, withPreferredStyle preferredAlertStyle: UIAlertControllerStyle = .alert, title: String = "User confirmation", message: String? = nil, confirmMessage: String = NSLocalizedString("Okay", comment: "Okay"), isDestructive: Bool = true, cancelMessage: String = NSLocalizedString("Cancel", comment: "Cancel")) {
+    public init(
+        title: String? = NSLocalizedString("User Confirmation", comment: "User Confirmation"),
+        message: String? = nil,
+        confirmationActionTitle: String = NSLocalizedString("Okay", comment: "Okay"),
+        isDestructive: Bool = true,
+        cancelActionTitle: String = NSLocalizedString("Cancel", comment: "Cancel"),
+        style: UIAlertControllerStyle = .alert,
+        from viewController: UIViewController) {
 
-        alert = AlertProcedure(presentAlertFrom: presenting, withPreferredStyle: preferredAlertStyle, waitForDismissal: true)
+        alert = AlertProcedure(title: title, message: message, style: style, from: viewController, waitForDismissal: true)
+
         super.init()
         name = "UserConfirmationCondition"
-        alert.title = title
-        alert.message = message
-        alert.add(actionWithTitle: confirmMessage, style: isDestructive ? .destructive : .default) { [weak self] _, _ in
+        alert.add(actionWithTitle: confirmationActionTitle, style: isDestructive ? .destructive : .default) { [weak self] _, _ in
             self?.response = .confirmed
         }
-        alert.add(actionWithTitle: cancelMessage, style: .cancel) { [weak self] _, _ in
+        alert.add(actionWithTitle: cancelActionTitle, style: .cancel) { [weak self] _, _ in
             self?.response = .cancelled
         }
         produceDependency(alert)
