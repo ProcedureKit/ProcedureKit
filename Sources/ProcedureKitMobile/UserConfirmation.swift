@@ -7,8 +7,19 @@
 import Foundation
 import UIKit
 
+
+/**
+ The condition succeeds if the user's response to the shown alert
+ is a confirmation action. Else, the condition will fail.
+
+ Therefore, this condition can be attached to procedures which
+ require the user to consent. For example, consider deleting
+ data or user-generated records. You might present an alert to
+ get the user to confirm deletion.
+ */
 public class UserConfirmationCondition: Condition {
 
+    /// The Response type
     public enum Response {
         case unknown, confirmed, cancelled
     }
@@ -17,16 +28,29 @@ public class UserConfirmationCondition: Condition {
 
     private var response: Response = .unknown
 
+
+    /// Initialize a new UserConfirmationCondition
+    ///
+    /// - Parameters:
+    ///   - title: a String? the alert title, defaults to "User Confirmation"
+    ///   - message: a String?, the alert message, default to nil
+    ///   - confirmationActionTitle: a String, the action title which
+    ///        indicates the user's confirmation. Defaults to "Okay".
+    ///   - isDestructive: a Bool, which indicates if the procedure is
+    //         destructive. Defaults to true.
+    ///   - cancelActionTitle: a String, the action title for the user
+    ///        not confirming. Default to "Cancel"
+    ///   - viewController: a UIViewController, the view controller which will
+    ///        present the alert controller.
     public init(
         title: String? = NSLocalizedString("User Confirmation", comment: "User Confirmation"),
         message: String? = nil,
         confirmationActionTitle: String = NSLocalizedString("Okay", comment: "Okay"),
         isDestructive: Bool = true,
         cancelActionTitle: String = NSLocalizedString("Cancel", comment: "Cancel"),
-        style: UIAlertControllerStyle = .alert,
         from viewController: UIViewController) {
 
-        alert = AlertProcedure(title: title, message: message, style: style, from: viewController, waitForDismissal: true)
+        alert = AlertProcedure(title: title, message: message, from: viewController, waitForDismissal: true)
 
         super.init()
         name = "UserConfirmationCondition"

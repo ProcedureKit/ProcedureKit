@@ -36,12 +36,6 @@ class AlertProcedureTests: ProcedureKitTestCase {
         XCTAssertEqual(alert.preferredStyle, .alert)
     }
 
-    func test__alert_style_actionSheet() {
-        let style: UIAlertControllerStyle = .actionSheet
-        alert = AlertProcedure(style: style, from: presenting)
-        XCTAssertEqual(alert.preferredStyle, style)
-    }
-
     func test__alert_title() {
         alert.title = title
         XCTAssertEqual(alert.title, title)
