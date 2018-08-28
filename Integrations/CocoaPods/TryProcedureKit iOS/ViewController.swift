@@ -32,12 +32,14 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        queue.addOperation(AsyncBlockProcedure { finishWithResult in
+        let block = BlockProcedure { this in
             DispatchQueue.default.async {
-                print("Hello ProcedureKit")
-                finishWithResult(success)
+                this.log.debug.message("Hello ProcedureKit")
+                this.finish()
             }
-        })
+        }
+        block.addCondition(UserConfirmationCondition(from: self))
+        queue.addOperation(block)
     }
 
     override func dismiss(animated flag: Bool, completion: (() -> Void)? = nil) {
@@ -56,14 +58,12 @@ class ViewController: UIViewController {
     }
 
     @IBAction func alert(_ sender: UIButton) {
-        let alert = AlertProcedure(presentAlertFrom: self)
-        alert.add(actionWithTitle: "Sweet") { alert, action in
-            alert.log.info.message("Running the handler!")
-        }
-        alert.log.severity = .info
-        alert.title = "Hello World"
+
+        let alert = AlertProcedure(title: "Hello World", from: self)
         alert.message = "This is a message in an alert"
+        alert.add(actionWithTitle: "Sweet") { (procedure, action) in
+            procedure.log.debug.message("Running the \(action) handler!")
+        }
         queue.addOperation(alert)
     }
 }
-

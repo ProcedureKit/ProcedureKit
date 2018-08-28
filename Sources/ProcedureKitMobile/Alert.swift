@@ -7,12 +7,31 @@
 import Foundation
 import UIKit
 
-public class AlertProcedure: UIProcedure {
+/**
+ `AlertProcedure` is a Procedure subclass which will present a `UIAlertController`.
 
-    /// - returns: the presented `UIAlertController`.
-    public var alert: UIAlertController {
-        return presented as! UIAlertController // swiftlint:disable:this force_cast
-    }
+ The alert controller is entirely managed by the procedure. The title, message,
+ text fields and actions are set via properties and methods on `AlertProcedure`.
+
+ A key understanding here is that `AlertProcedure` can finish when it is
+ dismissed, which is the default behaviour, or after it has presented the alert
+ controller.
+
+ In order to finish when the alert is dismissed, it is critical that the alert
+ action handler includes logic to call finish. Therefore, the procedure itself
+ exposes API to add actions, so that finish is called correctly. Therefore,
+ by restricting exposure to the underlying `UIAlertController` this behaviour
+ can be guaranteed.
+ */
+open class AlertProcedure: Procedure {
+
+    internal let controller: UIAlertController
+
+    internal let waitForDismissal: Bool
+
+    // - returns: The presenting view controller
+    public weak var viewController: PresentingViewController?
+
 
     /**
      The style of the alert controller. (read-only)
@@ -22,7 +41,7 @@ public class AlertProcedure: UIProcedure {
      - returns: the preferred style of the alert
      */
     public var preferredStyle: UIAlertControllerStyle {
-        return alert.preferredStyle
+        return controller.preferredStyle
     }
 
     /**
@@ -33,10 +52,10 @@ public class AlertProcedure: UIProcedure {
      - returns: the optional title String?
      */
     public var title: String? {
-        get { return alert.title }
+        get { return controller.title }
         set {
-            alert.title = newValue
-            name = newValue
+            guard false == isExecuting && false == isFinished else { return }
+            controller.title = newValue
         }
     }
 
@@ -48,8 +67,22 @@ public class AlertProcedure: UIProcedure {
      - returns: the optional message String?
      */
     public var message: String? {
-        get { return alert.message }
-        set { alert.message = newValue }
+        get { return controller.message }
+        set {
+            guard false == isExecuting && false == isFinished else { return }
+            controller.message = newValue
+        }
+    }
+
+    /**
+     The array of text fields displayed by the alert. (read-only)
+
+     Use this property to access the text fields displayed by the alert. The text fields are in the order in which you added them to the alert controller. This order also corresponds to the order in which they are displayed in the alert.
+
+     - returns: the optional array of UITextField instances
+     */
+    public var textFields: [UITextField]? {
+        return controller.textFields
     }
 
     /**
@@ -60,7 +93,7 @@ public class AlertProcedure: UIProcedure {
      - returns: the array of UIAlertAction actions.
      */
     public var actions: [UIAlertAction] {
-        return alert.actions
+        return controller.actions
     }
 
     /**
@@ -76,53 +109,83 @@ public class AlertProcedure: UIProcedure {
      */
     @available (iOS 9.0, *)
     public var preferredAction: UIAlertAction? {
-        get { return alert.preferredAction }
-        set { alert.preferredAction = newValue }
-    }
-
-    /**
-     The array of text fields displayed by the alert. (read-only)
-
-     Use this property to access the text fields displayed by the alert. The text fields are in the order in which you added them to the alert controller. This order also corresponds to the order in which they are displayed in the alert.
-
-     - returns: the optional array of UITextField instances
-     */
-    public var textFields: [UITextField]? {
-        return alert.textFields
+        get { return controller.preferredAction }
+        set { fatalError("Set the preferred action using the add(actionWithTitle:style:isPreferred:handler:) method.") }
     }
 
     /**
      Creates an `AlertProcedure`. It must be constructed with the view
-     controller which the alert will be presented from.
+     controller which the alert will be presented from. This is stored as a
+     weak reference.
 
-     - parameter from: a generic type conforming to `PresentingViewController`,
-     such as an `UIViewController`
+     - parameter title: an optional alert title, defaults to nil
+     - parameter message: an optional alert message, defaults to nil
+     - parameter from: a `UIViewController` instance.
+     - parameter waitForDismissal: a Bool, defaults to true, which indicates whether the
+          procedure should wait until the alert controller is dismissed until finishing.
+
+     - notes: The presenting view controller is weakly held.
+     - notes: The AlertController uses an "alert" style, and it is not possible to use AlertProcedure
+       to show "action sheet" style alerts.
      */
-    public init(presentAlertFrom presenting: PresentingViewController, withPreferredStyle preferredAlertStyle: UIAlertControllerStyle = .alert, waitForDismissal: Bool = true) {
-        let alert = UIAlertController(title: nil, message: nil, preferredStyle: preferredAlertStyle)
-        super.init(present: alert, from: presenting, withStyle: .present, inNavigationController: false, sender: nil, finishAfterPresenting: !waitForDismissal)
+    public init(title: String? = nil, message: String? = nil, from viewController: PresentingViewController, waitForDismissal: Bool = true) {
+        self.controller = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        self.waitForDismissal = waitForDismissal
+        self.viewController = viewController
+        super.init()
         addCondition(MutuallyExclusive<UIAlertController>())
+    }
+
+    @available(*, deprecated: 5.0.0, message: "Use init(title:message:style:from:waitForDismissal:) instead.")
+    public convenience init(presentAlertFrom presenting: PresentingViewController, withPreferredStyle preferredAlertStyle: UIAlertControllerStyle = .alert, waitForDismissal: Bool = true) {
+        self.init(title: nil, message: nil, from: presenting, waitForDismissal: waitForDismissal)
+    }
+
+    open override func execute() {
+        guard false == isCancelled else { return }
+
+        if controller.actions.isEmpty {
+            add(actionWithTitle: NSLocalizedString("Okay", comment: "Okay"))
+        }
+
+        let present = UIBlockProcedure { [weak self] in
+            guard let this = self, let viewController = this.viewController else { return }
+            viewController.present(this.controller, animated: true) {
+                guard let alsothis = self else { return }
+                if false == alsothis.waitForDismissal {
+                    alsothis.finish()
+                }
+            }
+        }
+        present.system.enabled = false
+
+        do { try produce(operation: present) }
+        catch { log.fatal.message("Unable to present alert, error: \(error)") }
     }
 
     /**
      Adds an action button with a title, style and handler.
 
      Do not add actions directly to the `UIAlertController`, as
-     this will prevent the `AlertOperation` from correctly finishing.
+     this will prevent the `AlertProcedure` from correctly finishing.
 
      - parameter actionWithTitle: an optional String?.
      - parameter style: a `UIAlertActionStyle` which defaults to `.default`.
      - parameter handler: a block which receives the operation, and returns Void.
      */
-    @discardableResult public func add(actionWithTitle title: String?, style: UIAlertActionStyle = .default, handler: @escaping (AlertProcedure, UIAlertAction) -> Void = { _, _ in }) -> UIAlertAction {
+    @discardableResult public func add(actionWithTitle title: String?, style: UIAlertActionStyle = .default, isPreferred: Bool = false, handler: @escaping (AlertProcedure, UIAlertAction) -> Void = { _, _ in }) -> UIAlertAction {
         let action = UIAlertAction(title: title, style: style) { [weak self] action in
-            guard let strongSelf = self else { return }
-            handler(strongSelf, action)
-            if strongSelf.shouldWaitUntilDismissal {
-                strongSelf.finish()
+            guard let this = self else { return }
+            handler(this, action)
+            guard this.isExecuting else { return }
+            if this.waitForDismissal {
+                this.finish()
             }
         }
-        alert.addAction(action)
+        controller.addAction(action)
+        if #available(iOS 9.0, *), isPreferred {
+            controller.preferredAction = action
+        }
         return action
     }
 
@@ -136,13 +199,8 @@ public class AlertProcedure: UIProcedure {
      - parameter configurationHandler: A block for configuring the text field prior to displaying the alert. This block has no return value and takes a single parameter corresponding to the text field object. Use that parameter to change the text field properties.
      */
     public func addTextField(configurationHandler: ((UITextField) -> Void)?) {
-        alert.addTextField(configurationHandler: configurationHandler)
-    }
-
-    public override func execute() {
-        if alert.actions.isEmpty {
-            add(actionWithTitle: NSLocalizedString("Okay", comment: "Okay"))
-        }
-        super.execute()
+        controller.addTextField(configurationHandler: configurationHandler)
     }
 }
+
+

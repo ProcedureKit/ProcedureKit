@@ -21,7 +21,7 @@ class AlertProcedureTests: ProcedureKitTestCase {
         title = "This is the alert title"
         message = "This is the alert message"
         presenting = TestablePresentingController()
-        alert = AlertProcedure(presentAlertFrom: presenting)
+        alert = AlertProcedure(from: presenting)
     }
 
     override func tearDown() {
@@ -33,13 +33,7 @@ class AlertProcedureTests: ProcedureKitTestCase {
     }
 
     func test__alert_style_set_default() {
-        XCTAssertEqual(alert.preferredStyle, UIAlertControllerStyle.alert)
-    }
-
-    func test__alert_style_actionSheet() {
-        let style: UIAlertControllerStyle = .actionSheet
-        alert = AlertProcedure(presentAlertFrom: presenting, withPreferredStyle: style)
-        XCTAssertEqual(alert.preferredStyle, style)
+        XCTAssertEqual(alert.preferredStyle, .alert)
     }
 
     func test__alert_title() {
@@ -63,16 +57,14 @@ class AlertProcedureTests: ProcedureKitTestCase {
     }
 
     func test__alert_preferred_action() {
-        let action = alert.add(actionWithTitle: "OK", style: .default)
+        let action = alert.add(actionWithTitle: "OK", style: .default, isPreferred: true)
         alert.add(actionWithTitle: "Cancel", style: .cancel)
-        alert.preferredAction = action
+        XCTAssertEqual(alert.preferredAction?.title ?? "Epic Fail", action.title ?? "Hello")
         XCTAssertNotNil(alert.preferredAction)
     }
 
     func test__alert_presents_alert_controller() {
-        alert = AlertProcedure(presentAlertFrom: presenting, waitForDismissal: false)
-        alert.title = title
-        alert.message = message
+        alert = AlertProcedure(title: title, message: message, from: presenting, waitForDismissal: false)
         presenting.check = { [unowned self] received in
             guard let alertController = received as? UIAlertController else {
                 XCTFail("Did not receive an alert controller")
