@@ -1,7 +1,7 @@
 //
 //  ProcedureKit
 //
-//  Copyright © 2016 ProcedureKit. All rights reserved.
+//  Copyright © 2015-2018 ProcedureKit. All rights reserved.
 //
 
 /**
@@ -228,7 +228,7 @@ public class AuthorizeCapabilityProcedure<Status: AuthorizationStatus>: GetAutho
      */
     public override init<Base>(_ base: Base, completion block: Completion? = nil) where Base: CapabilityProtocol, Status == Base.Status {
         super.init(base, completion: block)
-        add(condition: MutuallyExclusive<AuthorizeCapabilityProcedure>(category: "AuthorizeCapabilityProcedure(\(String(describing: type(of: base))))"))
+        addCondition(MutuallyExclusive<AuthorizeCapabilityProcedure>(category: "AuthorizeCapabilityProcedure(\(String(describing: type(of: base))))"))
     }
 
     public override func execute() {
@@ -257,7 +257,7 @@ public class AuthorizedFor<Status: AuthorizationStatus>: Condition {
         if let category = category {
             addToAttachedProcedure(mutuallyExclusiveCategory: category)
         }
-        produce(dependency: AuthorizeCapabilityProcedure(base))
+        produceDependency(AuthorizeCapabilityProcedure(base))
     }
 
     public override func evaluate(procedure: Procedure, completion: @escaping (ConditionResult) -> Void) {

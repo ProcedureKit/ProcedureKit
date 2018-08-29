@@ -1,20 +1,21 @@
 //
 //  ProcedureKit
 //
-//  Copyright © 2016 ProcedureKit. All rights reserved.
+//  Copyright © 2015-2018 ProcedureKit. All rights reserved.
 //
 
 import Foundation
 
 class AnyObserverBox_<Procedure: ProcedureProtocol>: ProcedureObserver {
     func didAttach(to procedure: Procedure) { _abstractMethod() }
+    func didSetInputReady(on procedure: Procedure) { _abstractMethod() }
     func will(execute procedure: Procedure, pendingExecute: PendingExecuteEvent) { _abstractMethod() }
     func did(execute procedure: Procedure) { _abstractMethod() }
-    func did(cancel procedure: Procedure, withErrors errors: [Error]) { _abstractMethod() }
+    func did(cancel procedure: Procedure, with: Error?) { _abstractMethod() }
     func procedure(_ procedure: Procedure, willAdd newOperation: Operation) { _abstractMethod() }
     func procedure(_ procedure: Procedure, didAdd newOperation: Operation) { _abstractMethod() }
-    func will(finish procedure: Procedure, withErrors errors: [Error], pendingFinish: PendingFinishEvent) { _abstractMethod() }
-    func did(finish procedure: Procedure, withErrors errors: [Error]) { _abstractMethod() }
+    func will(finish procedure: Procedure, with: Error?, pendingFinish: PendingFinishEvent) { _abstractMethod() }
+    func did(finish procedure: Procedure, with: Error?) { _abstractMethod() }
     var eventQueue: DispatchQueueProtocol? { _abstractMethod(); return nil }
 }
 
@@ -29,6 +30,10 @@ class AnyObserverBox<Base: ProcedureObserver>: AnyObserverBox_<Base.Procedure> {
         base.didAttach(to: procedure)
     }
 
+    override func didSetInputReady(on procedure: Base.Procedure) {
+        base.didSetInputReady(on: procedure)
+    }
+
     override func will(execute procedure: Base.Procedure, pendingExecute: PendingExecuteEvent) {
         base.will(execute: procedure, pendingExecute: pendingExecute)
     }
@@ -37,8 +42,8 @@ class AnyObserverBox<Base: ProcedureObserver>: AnyObserverBox_<Base.Procedure> {
         base.did(execute: procedure)
     }
 
-    override func did(cancel procedure: Base.Procedure, withErrors errors: [Error]) {
-        base.did(cancel: procedure, withErrors: errors)
+    override func did(cancel procedure: Base.Procedure, with error: Error?) {
+        base.did(cancel: procedure, with: error)
     }
 
     override func procedure(_ procedure: Base.Procedure, willAdd newOperation: Operation) {
@@ -49,12 +54,12 @@ class AnyObserverBox<Base: ProcedureObserver>: AnyObserverBox_<Base.Procedure> {
         base.procedure(procedure, didAdd: newOperation)
     }
 
-    override func will(finish procedure: Base.Procedure, withErrors errors: [Error], pendingFinish: PendingFinishEvent) {
-        base.will(finish: procedure, withErrors: errors, pendingFinish: pendingFinish)
+    override func will(finish procedure: Base.Procedure, with error: Error?, pendingFinish: PendingFinishEvent) {
+        base.will(finish: procedure, with: error, pendingFinish: pendingFinish)
     }
 
-    override func did(finish procedure: Base.Procedure, withErrors errors: [Error]) {
-        base.did(finish: procedure, withErrors: errors)
+    override func did(finish procedure: Base.Procedure, with error: Error?) {
+        base.did(finish: procedure, with: error)
     }
 
     override var eventQueue: DispatchQueueProtocol? {
@@ -83,6 +88,7 @@ internal class TransformObserver<O: ProcedureProtocol, R: ProcedureProtocol>: Pr
 
     private enum Event {
         case didAttach
+        case didSetInputReady
         case willExecute
         case didExecute
         case didCancel
@@ -94,6 +100,7 @@ internal class TransformObserver<O: ProcedureProtocol, R: ProcedureProtocol>: Pr
         var string: String {
             switch self {
             case .didAttach: return "didAttach"
+            case .didSetInputReady: return "didSetInputReady"
             case .willExecute: return "willExecute"
             case .didExecute: return "didExecute"
             case .didCancel: return "didCancel"
@@ -107,7 +114,7 @@ internal class TransformObserver<O: ProcedureProtocol, R: ProcedureProtocol>: Pr
 
     private func typedProcedure(_ procedure: R, event: Event) -> O? {
         guard let typedProcedure = procedureTransformBlock(procedure) else {
-            procedure.log.warning(message: ("Observer will not receive event (\(event.string)). Unable to convert \(procedure) to the expected type \"\(String(describing: O.self))\""))
+            procedure.log.warning.message("Observer will not receive event (\(event.string)). Unable to convert \(procedure) to the expected type \"\(String(describing: O.self))\"")
             return nil
         }
         return typedProcedure
@@ -116,6 +123,11 @@ internal class TransformObserver<O: ProcedureProtocol, R: ProcedureProtocol>: Pr
     func didAttach(to procedure: Procedure) {
         guard let baseProcedure = typedProcedure(procedure, event: .didAttach) else { return }
         wrapped.didAttach(to: baseProcedure)
+    }
+
+    func didSetInputReady(on procedure: Procedure) {
+        guard let baseProcedure = typedProcedure(procedure, event: .didAttach) else { return }
+        wrapped.didSetInputReady(on: baseProcedure)
     }
 
     func will(execute procedure: Procedure, pendingExecute: PendingExecuteEvent) {
@@ -128,9 +140,9 @@ internal class TransformObserver<O: ProcedureProtocol, R: ProcedureProtocol>: Pr
         wrapped.did(execute: baseProcedure)
     }
 
-    func did(cancel procedure: Procedure, withErrors errors: [Error]) {
+    func did(cancel procedure: Procedure, with error: Error?) {
         guard let baseProcedure = typedProcedure(procedure, event: .didCancel) else { return }
-        wrapped.did(cancel: baseProcedure, withErrors: errors)
+        wrapped.did(cancel: baseProcedure, with: error)
     }
 
     func procedure(_ procedure: Procedure, willAdd newOperation: Operation) {
@@ -143,14 +155,14 @@ internal class TransformObserver<O: ProcedureProtocol, R: ProcedureProtocol>: Pr
         wrapped.procedure(baseProcedure, didAdd: newOperation)
     }
 
-    func will(finish procedure: Procedure, withErrors errors: [Error], pendingFinish: PendingFinishEvent) {
+    func will(finish procedure: Procedure, with error: Error?, pendingFinish: PendingFinishEvent) {
         guard let baseProcedure = typedProcedure(procedure, event: .willFinish) else { return }
-        wrapped.will(finish: baseProcedure, withErrors: errors, pendingFinish: pendingFinish)
+        wrapped.will(finish: baseProcedure, with: error, pendingFinish: pendingFinish)
     }
 
-    func did(finish procedure: Procedure, withErrors errors: [Error]) {
+    func did(finish procedure: Procedure, with error: Error?) {
         guard let baseProcedure = typedProcedure(procedure, event: .didFinish) else { return }
-        wrapped.did(finish: baseProcedure, withErrors: errors)
+        wrapped.did(finish: baseProcedure, with: error)
     }
 
     var eventQueue: DispatchQueueProtocol? {
@@ -171,6 +183,10 @@ public struct AnyObserver<Procedure: ProcedureProtocol>: ProcedureObserver {
         box.didAttach(to: procedure)
     }
 
+    public func didSetInputReady(on procedure: Procedure) {
+        box.didSetInputReady(on: procedure)
+    }
+
     public func will(execute procedure: Procedure, pendingExecute: PendingExecuteEvent) {
         box.will(execute: procedure, pendingExecute: pendingExecute)
     }
@@ -179,8 +195,8 @@ public struct AnyObserver<Procedure: ProcedureProtocol>: ProcedureObserver {
         box.did(execute: procedure)
     }
 
-    public func did(cancel procedure: Procedure, withErrors errors: [Error]) {
-        box.did(cancel: procedure, withErrors: errors)
+    public func did(cancel procedure: Procedure, with error: Error?) {
+        box.did(cancel: procedure, with: error)
     }
 
     public func procedure(_ procedure: Procedure, willAdd newOperation: Operation) {
@@ -191,12 +207,12 @@ public struct AnyObserver<Procedure: ProcedureProtocol>: ProcedureObserver {
         box.procedure(procedure, didAdd: newOperation)
     }
 
-    public func will(finish procedure: Procedure, withErrors errors: [Error], pendingFinish: PendingFinishEvent) {
-        box.will(finish: procedure, withErrors: errors, pendingFinish: pendingFinish)
+    public func will(finish procedure: Procedure, with error: Error?, pendingFinish: PendingFinishEvent) {
+        box.will(finish: procedure, with: error, pendingFinish: pendingFinish)
     }
 
-    public func did(finish procedure: Procedure, withErrors errors: [Error]) {
-        box.did(finish: procedure, withErrors: errors)
+    public func did(finish procedure: Procedure, with error: Error?) {
+        box.did(finish: procedure, with: error)
     }
 
     public var eventQueue: DispatchQueueProtocol? {

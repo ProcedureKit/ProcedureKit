@@ -1,0 +1,25 @@
+target 'TryProcedureKit' do
+  platform :osx, '10.11'
+
+  use_frameworks!
+
+  pod 'ProcedureKit/All', :path => '../..'
+
+  target 'TryProcedureKitTests' do
+    inherit! :search_paths
+    pod 'TestingProcedureKit', :path => '../..'
+  end
+end
+
+target 'TryProcedureKit iOS' do
+  platform :ios, '10.0'
+  use_frameworks!
+
+  pod 'ProcedureKit/All', :path => '../..'
+  pod 'ProcedureKit/Mobile', :path => '../..'  
+
+  target 'TryProcedureKit iOSTests' do
+    inherit! :search_paths
+    pod 'TestingProcedureKit', :path => '../..'
+  end
+end

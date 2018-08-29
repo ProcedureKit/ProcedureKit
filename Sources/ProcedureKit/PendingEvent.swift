@@ -1,7 +1,7 @@
 //
 //  ProcedureKit
 //
-//  Copyright © 2016 ProcedureKit. All rights reserved.
+//  Copyright © 2015-2018 ProcedureKit. All rights reserved.
 //
 
 import Foundation
@@ -56,6 +56,7 @@ final public class PendingEvent: CustomStringConvertible {
 
         public var description: String {
             switch self {
+            case .postDidAttach: return "PostDidAttach"
             case .addOperation: return "AddOperation"
             case .postDidAddOperation: return "PostAddOperation"
             case .execute: return "Execute"
@@ -63,7 +64,6 @@ final public class PendingEvent: CustomStringConvertible {
             case .postDidCancel: return "PostDidCancel"
             case .finish: return "Finish"
             case .postDidFinish: return "PostFinish"
-            case .postDidAttach: return "PostDidAttach"
             }
         }
     }
@@ -99,7 +99,7 @@ final public class PendingEvent: CustomStringConvertible {
     }
 
     private func debugProceed() {
-        procedure.log.verbose(message: "(\(self)) is ready to proceed")
+        (procedure as? Procedure)?.system.verbose.message("(\(self)) is ready to proceed")
     }
 
     public var description: String {
@@ -108,14 +108,15 @@ final public class PendingEvent: CustomStringConvertible {
 }
 
 internal extension PendingEvent {
-    static let execute: (Procedure) -> PendingEvent = { PendingEvent(forProcedure: $0, withEvent: .execute) }
-    static let postDidExecute: (Procedure) -> PendingEvent = { PendingEvent(forProcedure: $0, withEvent: .postDidExecute) }
-    static let finish: (Procedure) -> PendingEvent = { PendingEvent(forProcedure: $0, withEvent: .finish) }
-    static let postFinish: (Procedure) -> PendingEvent = { PendingEvent(forProcedure: $0, withEvent: .postDidFinish) }
+    static let postDidAttach: (Procedure) -> PendingEvent = { PendingEvent(forProcedure: $0, withEvent: .postDidAttach) }
     static let addOperation: (Procedure) -> PendingEvent = { PendingEvent(forProcedure: $0, withEvent: .addOperation) }
     static let postDidAdd: (Procedure) -> PendingEvent = { PendingEvent(forProcedure: $0, withEvent: .postDidAddOperation) }
-    static let postDidAttach: (Procedure) -> PendingEvent = { PendingEvent(forProcedure: $0, withEvent: .postDidAttach) }
+    static let execute: (Procedure) -> PendingEvent = { PendingEvent(forProcedure: $0, withEvent: .execute) }
+    static let postDidExecute: (Procedure) -> PendingEvent = { PendingEvent(forProcedure: $0, withEvent: .postDidExecute) }
     static let postDidCancel: (Procedure) -> PendingEvent = { PendingEvent(forProcedure: $0, withEvent: .postDidCancel) }
+    static let finish: (Procedure) -> PendingEvent = { PendingEvent(forProcedure: $0, withEvent: .finish) }
+    static let postFinish: (Procedure) -> PendingEvent = { PendingEvent(forProcedure: $0, withEvent: .postDidFinish) }
+
 }
 
 public typealias PendingExecuteEvent = PendingEvent

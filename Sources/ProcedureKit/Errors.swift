@@ -1,7 +1,7 @@
 //
 //  ProcedureKit
 //
-//  Copyright © 2016 ProcedureKit. All rights reserved.
+//  Copyright © 2015-2018 ProcedureKit. All rights reserved.
 //
 
 /// A type which has an associated error type
@@ -40,10 +40,10 @@ public struct ProcedureKitError: Error, Equatable, CustomStringConvertible {
             case (.conditionFailed, .conditionFailed),
                  (.dependenciesFailed, .dependenciesFailed),
                  (.dependenciesCancelled, .dependenciesCancelled),
-                 (.dependencyFinishedWithErrors, .dependencyFinishedWithErrors),
-                 (.dependencyCancelledWithErrors, .dependencyCancelledWithErrors),
+                 (.dependencyFinishedWithError, .dependencyFinishedWithError),
+                 (.dependencyCancelledWithError, .dependencyCancelledWithError),
                  (.noQueue, .noQueue),
-                 (.parentCancelledWithErrors, .parentCancelledWithErrors),
+                 (.parentCancelledWithError, .parentCancelledWithError),
                  (.requirementNotSatisfied, .requirementNotSatisfied),
                  (.unknown, .unknown):
                 return true
@@ -57,10 +57,10 @@ public struct ProcedureKitError: Error, Equatable, CustomStringConvertible {
         case conditionFailed
         case dependenciesFailed
         case dependenciesCancelled
-        case dependencyFinishedWithErrors
-        case dependencyCancelledWithErrors
+        case dependencyFinishedWithError
+        case dependencyCancelledWithError
         case noQueue
-        case parentCancelledWithErrors
+        case parentCancelledWithError
         case programmingError(String)
         case requirementNotSatisfied
         case timedOut(Delay)
@@ -68,61 +68,61 @@ public struct ProcedureKitError: Error, Equatable, CustomStringConvertible {
     }
 
     public static func capabilityUnavailable() -> ProcedureKitError {
-        return ProcedureKitError(context: .capability(.unavailable), errors: [])
+        return ProcedureKitError(context: .capability(.unavailable), error: nil)
     }
 
     public static func capabilityUnauthorized() -> ProcedureKitError {
-        return ProcedureKitError(context: .capability(.unauthorized), errors: [])
+        return ProcedureKitError(context: .capability(.unauthorized), error: nil)
     }
 
     public static func component(_ component: ProcedureKitComponent, error: Error?) -> ProcedureKitError {
-        return ProcedureKitError(context: .component(component), errors: error.map { [$0] } ?? [])
+        return ProcedureKitError(context: .component(component), error: error)
     }
 
-    public static func conditionFailed(withErrors errors: [Error] = []) -> ProcedureKitError {
-        return ProcedureKitError(context: .conditionFailed, errors: errors)
+    public static func conditionFailed(with error: Error? = nil) -> ProcedureKitError {
+        return ProcedureKitError(context: .conditionFailed, error: error)
     }
 
     public static func dependenciesFailed() -> ProcedureKitError {
-        return ProcedureKitError(context: .dependenciesFailed, errors: [])
+        return ProcedureKitError(context: .dependenciesFailed, error: nil)
     }
 
     public static func dependenciesCancelled() -> ProcedureKitError {
-        return ProcedureKitError(context: .dependenciesCancelled, errors: [])
+        return ProcedureKitError(context: .dependenciesCancelled, error: nil)
     }
 
-    public static func dependency(finishedWithErrors errors: [Error]) -> ProcedureKitError {
-        return ProcedureKitError(context: .dependencyFinishedWithErrors, errors: errors)
+    public static func dependency(finishedWithError error: Error?) -> ProcedureKitError {
+        return ProcedureKitError(context: .dependencyFinishedWithError, error: error)
     }
 
-    public static func dependency(cancelledWithErrors errors: [Error]) -> ProcedureKitError {
-        return ProcedureKitError(context: .dependencyCancelledWithErrors, errors: errors)
+    public static func dependency(cancelledWithError error: Error?) -> ProcedureKitError {
+        return ProcedureKitError(context: .dependencyCancelledWithError, error: error)
     }
 
     public static func noQueue() -> ProcedureKitError {
-        return ProcedureKitError(context: .noQueue, errors: [])
+        return ProcedureKitError(context: .noQueue, error: nil)
     }
 
-    public static func parent(cancelledWithErrors errors: [Error]) -> ProcedureKitError {
-        return ProcedureKitError(context: .parentCancelledWithErrors, errors: errors)
+    public static func parent(cancelledWithError errors: Error?) -> ProcedureKitError {
+        return ProcedureKitError(context: .parentCancelledWithError, error: errors)
     }
 
     public static func programmingError(reason: String) -> ProcedureKitError {
-        return ProcedureKitError(context: .programmingError(reason), errors: [])
+        return ProcedureKitError(context: .programmingError(reason), error: nil)
     }
 
     public static func requirementNotSatisfied() -> ProcedureKitError {
-        return ProcedureKitError(context: .requirementNotSatisfied, errors: [])
+        return ProcedureKitError(context: .requirementNotSatisfied, error: nil)
     }
 
     public static func timedOut(with delay: Delay) -> ProcedureKitError {
-        return ProcedureKitError(context: .timedOut(delay), errors: [])
+        return ProcedureKitError(context: .timedOut(delay), error: nil)
     }
 
-    public static let unknown = ProcedureKitError(context: .unknown, errors: [])
+    public static let unknown = ProcedureKitError(context: .unknown, error: nil)
 
     public let context: Context
-    public let errors: [Error]
+    public let error: Error?
 
     // Swift 3.0 Leak Fix:
     //
@@ -133,6 +133,9 @@ public struct ProcedureKitError: Error, Equatable, CustomStringConvertible {
     // Symptoms: Malloc 48 byte leaks
     //
     public var description: String {
-        return "ProcedureKitError(context: \(context), errors: \(errors))"
+        if let error = error {
+            return "ProcedureKitError(context: \(context), error: \(error))"
+        }
+        return "ProcedureKitError(context: \(context)"
     }
 }

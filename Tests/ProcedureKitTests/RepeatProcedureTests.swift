@@ -1,7 +1,7 @@
 //
 //  ProcedureKit
 //
-//  Copyright © 2016 ProcedureKit. All rights reserved.
+//  Copyright © 2015-2018 ProcedureKit. All rights reserved.
 //
 
 import XCTest
@@ -13,21 +13,21 @@ class RepeatProcedureTests: RepeatTestCase {
     func test__init_with_max_and_custom_iterator() {
         repeatProcedure = RepeatProcedure(max: 2, iterator: createIterator())
         wait(for: repeatProcedure)
-        XCTAssertProcedureFinishedWithoutErrors(repeatProcedure)
+        PKAssertProcedureFinished(repeatProcedure)
         XCTAssertEqual(repeatProcedure.count, 2)
     }
 
     func test__init_with_max_and_delay_iterator() {
         repeatProcedure = RepeatProcedure(max: 2, delay: Delay.Iterator.immediate, iterator: AnyIterator { TestProcedure() })
         wait(for: repeatProcedure)
-        XCTAssertProcedureFinishedWithoutErrors(repeatProcedure)
+        PKAssertProcedureFinished(repeatProcedure)
         XCTAssertEqual(repeatProcedure.count, 2)
     }
 
     func test__init_with_max_and_wait_strategy() {
         repeatProcedure = RepeatProcedure(max: 2, wait: .constant(0.001), iterator: AnyIterator { TestProcedure() })
         wait(for: repeatProcedure)
-        XCTAssertProcedureFinishedWithoutErrors(repeatProcedure)
+        PKAssertProcedureFinished(repeatProcedure)
         XCTAssertEqual(repeatProcedure.count, 2)
     }
 
@@ -35,7 +35,7 @@ class RepeatProcedureTests: RepeatTestCase {
         let procedureExecutedCount = Protector<Int>(0)
         let repeatProcedure = RepeatProcedure(max: 2) { BlockProcedure(block: { procedureExecutedCount.advance(by: 1) }) }
         wait(for: repeatProcedure)
-        XCTAssertProcedureFinishedWithoutErrors(repeatProcedure)
+        PKAssertProcedureFinished(repeatProcedure)
         XCTAssertEqual(repeatProcedure.count, 2)
         XCTAssertEqual(procedureExecutedCount.access, 2)
     }
@@ -43,15 +43,15 @@ class RepeatProcedureTests: RepeatTestCase {
     func test__init_with_no_max_and_delay_iterator() {
         repeatProcedure = RepeatProcedure(delay: Delay.Iterator.immediate, iterator: createIterator(succeedsAfterCount: 2))
         wait(for: repeatProcedure)
-        XCTAssertProcedureFinishedWithErrors(repeatProcedure, count: 1)
         XCTAssertEqual(repeatProcedure.count, 2)
+        PKAssertProcedureFinishedWithError(repeatProcedure, expectedError)
     }
 
     func test__init_with_no_max_and_wait_strategy() {
         repeatProcedure = RepeatProcedure(wait: .constant(0.001), iterator: createIterator(succeedsAfterCount: 2))
         wait(for: repeatProcedure)
-        XCTAssertProcedureFinishedWithErrors(repeatProcedure, count: 1)
         XCTAssertEqual(repeatProcedure.count, 2)
+        PKAssertProcedureFinishedWithError(repeatProcedure, expectedError)
     }
 
     func test__append_configure_block() {
@@ -97,9 +97,34 @@ class RepeatProcedureTests: RepeatTestCase {
         })
 
         wait(for: repeatProcedure)
-        XCTAssertProcedureFinishedWithoutErrors(repeatProcedure)
+        PKAssertProcedureFinished(repeatProcedure)
         XCTAssertEqual(repeatProcedure.count, 3)
         XCTAssertEqual(didExecuteConfigureBlock, 2)
+    }
+
+    func test__with_input_procedure_payload() {
+
+        let outputProcedure = TestProcedure()
+        outputProcedure.output = .ready(.success("ProcedureKit"))
+        repeatProcedure = RepeatProcedure(max: 3, iterator: createIterator())
+
+        var textOutput: [String] = []
+        repeatProcedure.addWillAddOperationBlockObserver { (_, operation) in
+            if let procedure = operation as? TestProcedure {
+                procedure.addDidFinishBlockObserver { (testProcedure, _) in
+                    if let output = testProcedure.output.value?.value {
+                        textOutput.append(output)
+                    }
+                }
+            }
+        }
+
+        repeatProcedure.injectResult(from: outputProcedure)
+
+        wait(for: repeatProcedure, outputProcedure)
+        PKAssertProcedureFinished(repeatProcedure)
+
+        XCTAssertEqual(textOutput, ["Hello ProcedureKit", "Hello ProcedureKit", "Hello ProcedureKit"])
     }
 }
 
@@ -122,14 +147,14 @@ class RepeatableRepeatProcedureTests: ProcedureKitTestCase {
     func test__init_with_repeatable_procedure() {
         let repeatProcedure = RepeatProcedure { RepeatableTestProcedure() }
         wait(for: repeatProcedure)
-        XCTAssertProcedureFinishedWithoutErrors(repeatProcedure)
+        PKAssertProcedureFinished(repeatProcedure)
         XCTAssertEqual(repeatProcedure.count, 5)
     }
 
     func test__init_with_max_repeatable_procedure() {
         let repeatProcedure = RepeatProcedure(max: 4) { RepeatableTestProcedure() }
         wait(for: repeatProcedure)
-        XCTAssertProcedureFinishedWithoutErrors(repeatProcedure)
+        PKAssertProcedureFinished(repeatProcedure)
         XCTAssertEqual(repeatProcedure.count, 4)
     }
 }

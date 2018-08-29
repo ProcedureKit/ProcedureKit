@@ -1,7 +1,7 @@
 //
 //  ProcedureKit
 //
-//  Copyright © 2016 ProcedureKit. All rights reserved.
+//  Copyright © 2015-2018 ProcedureKit. All rights reserved.
 //
 
 import XCTest
@@ -14,7 +14,7 @@ class NetworkDataProcedureTests: ProcedureKitTestCase {
     var url: URL!
     var request: URLRequest!
     var session: TestableURLSessionTaskFactory!
-    var download: NetworkDataProcedure<TestableURLSessionTaskFactory>!
+    var download: NetworkDataProcedure!
 
     override func setUp() {
         super.setUp()
@@ -34,20 +34,20 @@ class NetworkDataProcedureTests: ProcedureKitTestCase {
 
     func test__session_receives_request() {
         wait(for: download)
-        XCTAssertProcedureFinishedWithoutErrors(download)
+        PKAssertProcedureFinished(download)
         XCTAssertEqual(session.didReceiveDataRequest?.url, url)
     }
 
     func test__session_creates_data_task() {
         wait(for: download)
-        XCTAssertProcedureFinishedWithoutErrors(download)
+        PKAssertProcedureFinished(download)
         XCTAssertNotNil(session.didReturnDataTask)
-        XCTAssertEqual(session.didReturnDataTask, download.task)
+        XCTAssertEqual(session.didReturnDataTask, download.task as? TestableURLSessionTask)
     }
 
     func test__download_resumes_data_task() {
         wait(for: download)
-        XCTAssertProcedureFinishedWithoutErrors(download)
+        PKAssertProcedureFinished(download)
         XCTAssertTrue(session.didReturnDataTask?.didResume ?? false)
     }
 
@@ -60,7 +60,7 @@ class NetworkDataProcedureTests: ProcedureKitTestCase {
             self.download.cancel()
         }
         wait(for: download, delay)
-        XCTAssertProcedureCancelledWithoutErrors(download)
+        PKAssertProcedureCancelled(download)
         XCTAssertTrue(session.didReturnDataTask?.didCancel ?? false)
     }
 
@@ -70,7 +70,7 @@ class NetworkDataProcedureTests: ProcedureKitTestCase {
             procedure.cancel()
         }
         wait(for: download)
-        XCTAssertProcedureCancelledWithoutErrors(download)
+        PKAssertProcedureCancelled(download)
     }
 
     func test__download_cancelled_does_not_call_completion_handler() {
@@ -85,7 +85,7 @@ class NetworkDataProcedureTests: ProcedureKitTestCase {
             procedure.cancel()
         }
         wait(for: download)
-        XCTAssertProcedureCancelledWithoutErrors(download)
+        PKAssertProcedureCancelled(download)
         XCTAssertFalse(calledCompletionHandler)
     }
 
@@ -94,21 +94,21 @@ class NetworkDataProcedureTests: ProcedureKitTestCase {
     func test__no_requirement__finishes_with_error() {
         download = NetworkDataProcedure(session: session) { _ in }
         wait(for: download)
-        XCTAssertProcedureFinishedWithErrors(download, count: 1)
-        XCTAssertEqual(download.errors.first as? ProcedureKitError, ProcedureKitError.requirementNotSatisfied())
+        PKAssertProcedureFinishedWithError(download, ProcedureKitError.requirementNotSatisfied())
     }
 
     func test__no_data__finishes_with_error() {
         session.returnedData = nil
         wait(for: download)
-        XCTAssertProcedureFinishedWithErrors(download, count: 1)
+        PKAssertProcedureFinishedWithError(download, ProcedureKitError.unknown)
     }
 
     func test__session_error__finishes_with_error() {
-        session.returnedError = NSError(domain: NSURLErrorDomain, code: NSURLErrorNotConnectedToInternet, userInfo: nil)
+        let error = NSError(domain: NSURLErrorDomain, code: NSURLErrorNotConnectedToInternet, userInfo: nil)
+        session.returnedError = error
         wait(for: download)
-        XCTAssertProcedureFinishedWithErrors(download, count: 1)
-        XCTAssertNotNil(download.networkError)
+        XCTAssertNotNil(download.error)
+        PKAssertProcedureFinishedWithError(download, error)
     }
 
     func test__completion_handler_receives_data_and_response() {
@@ -119,7 +119,7 @@ class NetworkDataProcedureTests: ProcedureKitTestCase {
             completionHandlerDidExecute = true
         }
         wait(for: download)
-        XCTAssertProcedureFinishedWithoutErrors(download)
+        PKAssertProcedureFinished(download)
         XCTAssertTrue(completionHandlerDidExecute)
     }
 }

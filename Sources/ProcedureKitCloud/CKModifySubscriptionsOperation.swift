@@ -1,7 +1,7 @@
 //
 //  ProcedureKit
 //
-//  Copyright © 2016 ProcedureKit. All rights reserved.
+//  Copyright © 2015-2018 ProcedureKit. All rights reserved.
 //
 
 #if !os(watchOS)
@@ -54,7 +54,7 @@ extension CKProcedure where T: CKModifySubscriptionsOperationProtocol, T: Associ
     func setModifySubscriptionsCompletionBlock(_ block: @escaping CloudKitProcedure<T>.ModifySubscriptionsCompletionBlock) {
         operation.modifySubscriptionsCompletionBlock = { [weak self] saved, deleted, error in
             if let strongSelf = self, let error = error {
-                strongSelf.append(error: ModifySubscriptionsError(underlyingError: error, saved: saved, deleted: deleted))
+                strongSelf.setErrorOnce(ModifySubscriptionsError(underlyingError: error, saved: saved, deleted: deleted))
             }
             else {
                 block(saved, deleted)

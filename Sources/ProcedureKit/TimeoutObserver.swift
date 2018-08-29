@@ -1,7 +1,7 @@
 //
 //  ProcedureKit
 //
-//  Copyright © 2016 ProcedureKit. All rights reserved.
+//  Copyright © 2015-2018 ProcedureKit. All rights reserved.
 //
 
 import Foundation
@@ -53,7 +53,7 @@ public struct TimeoutObserver: ProcedureObserver {
         }
     }
 
-    public func did(finish procedure: Procedure, withErrors errors: [Error]) {
+    public func did(finish procedure: Procedure, with error: Error?) {
         ProcedureTimeoutRegistrar.shared.registerFinished(procedure: procedure)
     }
 }
@@ -74,7 +74,7 @@ internal class ProcedureTimeoutRegistrar {
         timer.setEventHandler { [delay, weak procedure, weak registrar = self] in
             guard let strongProcedure = procedure else { return }
             guard !strongProcedure.isFinished && !strongProcedure.isCancelled else { return }
-            strongProcedure.cancel(withError: ProcedureKitError.timedOut(with: delay))
+            strongProcedure.cancel(with: ProcedureKitError.timedOut(with: delay))
             registrar?.registerTimeoutProcessed(forProcedure: strongProcedure)
         }
         protectedFinishTimers.write {

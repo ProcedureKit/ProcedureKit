@@ -1,7 +1,7 @@
 //
 //  ProcedureKit
 //
-//  Copyright © 2016 ProcedureKit. All rights reserved.
+//  Copyright © 2015-2018 ProcedureKit. All rights reserved.
 //
 
 import XCTest
@@ -11,21 +11,21 @@ import TestingProcedureKit
 class NegatedConditionTests: ProcedureKitTestCase {
 
     func test__procedure_with_negated_successful_condition_fails() {
-        procedure.add(condition: NegatedCondition(TrueCondition()))
+        procedure.addCondition(NegatedCondition(TrueCondition()))
         wait(for: procedure)
-        XCTAssertProcedureCancelledWithErrors(count: 1)
+        PKAssertProcedureCancelledWithError(procedure, ProcedureKitError.conditionFailed())
     }
 
     func test__procedure_with_negated_failed_condition_succeeds() {
-        procedure.add(condition: NegatedCondition(FalseCondition()))
+        procedure.addCondition(NegatedCondition(FalseCondition()))
         wait(for: procedure)
-        XCTAssertProcedureFinishedWithoutErrors()
+        PKAssertProcedureFinished(procedure)
     }
 
     func test__procedure_with_negated_ignored_condition_succeeds() {
-        procedure.add(condition: NegatedCondition(IgnoredCondition(FalseCondition())))
+        procedure.addCondition(NegatedCondition(IgnoredCondition(FalseCondition())))
         wait(for: procedure)
-        XCTAssertProcedureFinishedWithoutErrors()
+        PKAssertProcedureFinished(procedure)
     }
 
     func test__negated_condition_name() {

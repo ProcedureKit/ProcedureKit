@@ -1,7 +1,7 @@
 //
 //  ProcedureKit
 //
-//  Copyright © 2016 ProcedureKit. All rights reserved.
+//  Copyright © 2015-2018 ProcedureKit. All rights reserved.
 //
 
 #if SWIFT_PACKAGE
@@ -49,7 +49,7 @@ extension CKProcedure where T: CKAcceptSharesOperationProtocol, T: AssociatedErr
     func setAcceptSharesCompletionBlock(_ block: @escaping CloudKitProcedure<T>.AcceptSharesCompletionBlock) {
         operation.acceptSharesCompletionBlock = { [weak self] error in
             if let strongSelf = self, let error = error {
-                strongSelf.append(error: PKCKError(underlyingError: error))
+                strongSelf.setErrorOnce(PKCKError(underlyingError: error))
             }
             else {
                 block()

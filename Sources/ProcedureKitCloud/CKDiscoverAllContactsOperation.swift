@@ -1,7 +1,7 @@
 //
 //  ProcedureKit
 //
-//  Copyright © 2016 ProcedureKit. All rights reserved.
+//  Copyright © 2015-2018 ProcedureKit. All rights reserved.
 //
 
 #if !os(tvOS)
@@ -40,7 +40,7 @@ extension CKProcedure where T: CKDiscoverAllContactsOperationProtocol, T: Associ
     func setDiscoverAllContactsCompletionBlock(_ block: @escaping CloudKitProcedure<T>.DiscoverAllContactsCompletionBlock) {
         operation.discoverAllContactsCompletionBlock = { [weak self] userInfos, error in
             if let strongSelf = self, let error = error {
-                strongSelf.append(error: DiscoverAllContactsError(underlyingError: error, userInfo: userInfos))
+                strongSelf.setErrorOnce(DiscoverAllContactsError(underlyingError: error, userInfo: userInfos))
             }
             else {
                 block(userInfos)

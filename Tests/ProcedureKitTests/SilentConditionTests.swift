@@ -1,7 +1,7 @@
 //
 //  ProcedureKit
 //
-//  Copyright © 2016 ProcedureKit. All rights reserved.
+//  Copyright © 2015-2018 ProcedureKit. All rights reserved.
 //
 
 import XCTest
@@ -18,7 +18,7 @@ class SilentConditionTests: ProcedureKitTestCase {
     func test__silent_condition_removes_produced_dependencies_from_composed_condition() {
         let dependency = TestProcedure()
         let condition = TrueCondition()
-        condition.produce(dependency: dependency)
+        condition.produceDependency(dependency)
         let _ = SilentCondition(condition)
         XCTAssertEqual(condition.producedDependencies.count, 0)
     }

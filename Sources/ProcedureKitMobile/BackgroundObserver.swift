@@ -1,7 +1,7 @@
 //
 //  ProcedureKit
 //
-//  Copyright © 2016 ProcedureKit. All rights reserved.
+//  Copyright © 2015-2018 ProcedureKit. All rights reserved.
 //
 
 import Foundation
@@ -109,12 +109,12 @@ public class BackgroundObserver: ProcedureObserver {
         }
 
         guard result.contains(.success) else {
-            procedure.log.warning(message: BackgroundObserver.logMessage_FailedToInitiateBackgroundTask)
+            procedure.log.warning.message(BackgroundObserver.logMessage_FailedToInitiateBackgroundTask)
             return
         }
 
         if result.contains(.additionalHandlersForThisProcedure) {
-            procedure.log.info(message: "More than one BackgroundObserver has been attached to this Procedure")
+            procedure.log.warning.message("More than one BackgroundObserver has been attached to this Procedure")
         }
     }
 
@@ -123,7 +123,7 @@ public class BackgroundObserver: ProcedureObserver {
     /// event handlers.
     ///
     /// - Parameter procedure: the `Procedure`
-    public func did(finish procedure: Procedure, withErrors errors: [Error]) {
+    public func did(finish procedure: Procedure, with error: Error?) {
         manager.didFinish(procedure: procedure)
     }
 }
@@ -229,7 +229,7 @@ internal class BackgroundManager {
                 _backgroundEventHandlersPerProcedure.removeValue(forKey: procedure)
                 return backgroundTasks
             }
-            let backgroundTaskIdentifiers: [UIBackgroundTaskIdentifier]? = backgroundTasks?.flatMap {
+            let backgroundTaskIdentifiers: [UIBackgroundTaskIdentifier]? = backgroundTasks?.compactMap {
                 let identifier = $0.returnCurrentAndOverwrite(with: UIBackgroundTaskInvalid)
                 guard identifier != UIBackgroundTaskInvalid else { return nil }
                 return identifier

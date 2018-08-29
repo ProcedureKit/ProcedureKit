@@ -1,7 +1,7 @@
 //
 //  ProcedureKit
 //
-//  Copyright © 2016 ProcedureKit. All rights reserved.
+//  Copyright © 2015-2018 ProcedureKit. All rights reserved.
 //
 
 import XCTest
@@ -94,7 +94,7 @@ class ProfilerTests: ProcedureKitTestCase {
     }
 
     func test__profile_simple_operation_which_finishes() {
-        procedure.add(observer: profiler)
+        procedure.addObserver(profiler)
 
         waitForReporterAnd(for: procedure)
         guard let result = reporter.didProfileResult else {
@@ -102,15 +102,15 @@ class ProfilerTests: ProcedureKitTestCase {
         }
 
         validateProfileResult(result: result, after: now)
-        XCTAssertProcedureFinishedWithoutErrors()
+        PKAssertProcedureFinished(procedure)
     }
 
     func test__profile_simple_operation_which_cancels() {
 
-        procedure.add(observer: WillExecuteObserver { op, _ in
+        procedure.addObserver(WillExecuteObserver { op, _ in
             op.cancel()
         })
-        procedure.add(observer: profiler)
+        procedure.addObserver(profiler)
         waitForReporterAnd(for: procedure)
 
         guard let result = reporter.didProfileResult else {
@@ -118,7 +118,7 @@ class ProfilerTests: ProcedureKitTestCase {
         }
 
         validateProfileResult(result: result, after: now)
-        XCTAssertProcedureCancelledWithoutErrors()
+        PKAssertProcedureCancelled(procedure)
     }
 
     func test__profile_operation__which_produces_child() {
@@ -128,7 +128,7 @@ class ProfilerTests: ProcedureKitTestCase {
         addCompletionBlockTo(procedure: child)
 
         procedure = TestProcedure(produced: child)
-        procedure.add(observer: profiler)
+        procedure.addObserver(profiler)
 
         // Because of the addCompletionBlockTo line above, wait for the procedure *and*
         // the child it produces to complete
@@ -139,7 +139,7 @@ class ProfilerTests: ProcedureKitTestCase {
         }
 
         validateProfileResult(result: result, after: now)
-        XCTAssertProcedureFinishedWithoutErrors()
+        PKAssertProcedureFinished(procedure)
         XCTAssertEqual(result.children.count, 1)
         if let childResult = result.children.first {
             validateProfileResult(result: childResult, after: now)
@@ -148,8 +148,7 @@ class ProfilerTests: ProcedureKitTestCase {
 
     func test__profile_group_operation() {
         let group = GroupProcedure(operations: [ TestProcedure(), TestProcedure() ])
-        group.log.severity = .notice
-        group.add(observer: profiler)
+        group.addObserver(profiler)
 
         waitForReporterAnd(for: group)
 
@@ -158,7 +157,7 @@ class ProfilerTests: ProcedureKitTestCase {
         }
 
         validateProfileResult(result: result, after: now)
-        XCTAssertProcedureFinishedWithoutErrors(group)
+        PKAssertProcedureFinished(group)
 
         XCTAssertEqual(result.children.count, 2)
         for child in result.children {

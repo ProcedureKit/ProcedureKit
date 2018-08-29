@@ -1,7 +1,7 @@
 //
 //  ProcedureKit
 //
-//  Copyright © 2016 ProcedureKit. All rights reserved.
+//  Copyright © 2015-2018 ProcedureKit. All rights reserved.
 //
 
 import XCTest
@@ -34,10 +34,10 @@ class NetworkReachabilityWaitProcedureTests: ProcedureKitTestCase {
         let makeNetworkReachable = BlockProcedure {
             self.network.flags = .reachable
         }
-        makeNetworkReachable.add(dependency: delay)
+        makeNetworkReachable.addDependency(delay)
 
         wait(forAll: [delay, makeNetworkReachable, procedure])
-        XCTAssertProcedureFinishedWithoutErrors(procedure)
+        PKAssertProcedureFinished(procedure)
     }
 
     #if os(iOS)
@@ -49,17 +49,17 @@ class NetworkReachabilityWaitProcedureTests: ProcedureKitTestCase {
         let changeNetwork1 = BlockProcedure {
             self.network.flags = [ .reachable, .isWWAN ]
         }
-        changeNetwork1.add(dependency: delay1)
+        changeNetwork1.addDependency(delay1)
 
         let delay2 = DelayProcedure(by: 0.2)
         let changeNetwork2 = BlockProcedure {
             self.network.flags = .reachable
         }
-        changeNetwork2.add(dependency: delay2)
+        changeNetwork2.addDependency(delay2)
 
 
         wait(forAll: [delay1, changeNetwork1, delay2, changeNetwork2, procedure])
-        XCTAssertProcedureFinishedWithoutErrors(procedure)
+        PKAssertProcedureFinished(procedure)
     }
     #endif
 
@@ -67,13 +67,13 @@ class NetworkReachabilityWaitProcedureTests: ProcedureKitTestCase {
 
 class NetworkProcedureTests: ProcedureKitTestCase {
 
-    typealias Target = NetworkDataProcedure<TestableURLSessionTaskFactory>
+    typealias Target = NetworkDataProcedure
 
     var url: URL!
     var request: URLRequest!
     var resilience: DefaultNetworkResilience!
     var session: TestableURLSessionTaskFactory!
-    var data: NetworkDataProcedure<TestableURLSessionTaskFactory>!
+    var data: NetworkDataProcedure!
     var network: TestableNetworkReachability!
     var manager: Reachability.Manager!
 
@@ -102,7 +102,7 @@ class NetworkProcedureTests: ProcedureKitTestCase {
         let procedure = NetworkProcedure<Target>(body: createNetworkProcedure)
         procedure.reachability = manager
         wait(for: procedure)
-        XCTAssertProcedureFinishedWithoutErrors(procedure)
+        PKAssertProcedureFinished(procedure)
         XCTAssertFalse(network.didStartNotifier)
     }
 
@@ -111,15 +111,15 @@ class NetworkProcedureTests: ProcedureKitTestCase {
         network.flags = .connectionRequired
         let delay = DelayProcedure(by: 0.1)
         let makeSessionSuccessful = BlockProcedure { self.session.returnedError = nil }
-        makeSessionSuccessful.add(dependency: delay)
+        makeSessionSuccessful.addDependency(delay)
         let makeNetworkReachable = BlockProcedure { self.network.flags = .reachable }
-        makeNetworkReachable.add(dependency: makeSessionSuccessful)
+        makeNetworkReachable.addDependency(makeSessionSuccessful)
 
         let procedure = NetworkProcedure<Target>(resilience: resilience, body: createNetworkProcedure)
         procedure.reachability = manager
 
         wait(forAll: [procedure, delay, makeSessionSuccessful, makeNetworkReachable])
-        XCTAssertProcedureFinishedWithoutErrors(procedure)
+        PKAssertProcedureFinished(procedure)
         XCTAssertEqual(procedure.count, 2)
         XCTAssertTrue(network.didStopNotifier)
     }
@@ -129,13 +129,13 @@ class NetworkProcedureTests: ProcedureKitTestCase {
 
         let delay = DelayProcedure(by: 0.1)
         let makeSessionSuccessful = BlockProcedure { self.session.returnedError = nil }
-        makeSessionSuccessful.add(dependency: delay)
+        makeSessionSuccessful.addDependency(delay)
 
         let procedure = NetworkProcedure<Target>(resilience: resilience, body: createNetworkProcedure)
         procedure.reachability = manager
 
         wait(forAll: [procedure, delay, makeSessionSuccessful], withTimeout: 4)
-        XCTAssertProcedureFinishedWithoutErrors(procedure)
+        PKAssertProcedureFinished(procedure)
         XCTAssertEqual(procedure.count, 2)
     }
 
@@ -144,14 +144,13 @@ class NetworkProcedureTests: ProcedureKitTestCase {
 
         let delay = DelayProcedure(by: 0.1)
         let makeSessionSuccessful = BlockProcedure { self.session.returnedResponse = HTTPURLResponse(url: self.url, statusCode: 200, httpVersion: nil, headerFields: nil) }
-        makeSessionSuccessful.add(dependency: delay)
+        makeSessionSuccessful.addDependency(delay)
 
         let procedure = NetworkProcedure<Target>(resilience: resilience, body: createNetworkProcedure)
-        procedure.log.severity = .notice
         procedure.reachability = manager
 
         wait(forAll: [procedure, delay, makeSessionSuccessful], withTimeout: 4)
-        XCTAssertProcedureFinishedWithoutErrors(procedure)
+        PKAssertProcedureFinished(procedure)
         XCTAssertEqual(procedure.count, 2)
     }
 
@@ -160,14 +159,13 @@ class NetworkProcedureTests: ProcedureKitTestCase {
 
         let delay = DelayProcedure(by: 0.1)
         let makeSessionSuccessful = BlockProcedure { self.session.returnedResponse = HTTPURLResponse(url: self.url, statusCode: 200, httpVersion: nil, headerFields: nil) }
-        makeSessionSuccessful.add(dependency: delay)
+        makeSessionSuccessful.addDependency(delay)
 
         let procedure = NetworkProcedure<Target>(resilience: resilience, body: createNetworkProcedure)
-        procedure.log.severity = .notice
         procedure.reachability = manager
 
         wait(forAll: [procedure, delay, makeSessionSuccessful], withTimeout: 4)
-        XCTAssertProcedureFinishedWithoutErrors(procedure)
+        PKAssertProcedureFinished(procedure)
         XCTAssertEqual(procedure.count, 2)
     }
 
@@ -182,7 +180,7 @@ class NetworkProcedureTests: ProcedureKitTestCase {
         }.injectPayload(fromNetwork: procedure)
 
         wait(for: procedure, transform)
-        XCTAssertProcedureFinishedWithoutErrors(procedure)
+        PKAssertProcedureFinished(procedure)
         XCTAssertTrue(didReceivePayload)
     }
 
@@ -196,7 +194,7 @@ class NetworkProcedureTests: ProcedureKitTestCase {
         }.injectPayload(fromNetwork: procedure)
 
         wait(for: procedure, transform)
-        XCTAssertProcedureCancelledWithErrors(transform, count: 1)
+        PKAssertProcedureCancelledWithError(transform, ProcedureKitError.dependency(finishedWithError: procedure.error))
         XCTAssertFalse(didReceivePayload)
     }
 }

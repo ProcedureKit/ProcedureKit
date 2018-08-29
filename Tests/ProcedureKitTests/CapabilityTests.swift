@@ -1,7 +1,7 @@
 //
 //  ProcedureKit
 //
-//  Copyright © 2016 ProcedureKit. All rights reserved.
+//  Copyright © 2015-2018 ProcedureKit. All rights reserved.
 //
 
 import XCTest
@@ -111,28 +111,24 @@ class AuthorizedForTests: TestableCapabilityTestCase {
     func test__fails_if_capability_is_not_available() {
         capability.serviceIsAvailable = false
         wait(for: procedure)
-        XCTAssertConditionResult(authorizedFor.output.value ?? .success(true), failedWithError: ProcedureKitError.capabilityUnavailable())
-        XCTAssertProcedureCancelledWithErrors(count: 1)
-        XCTAssertProcedure(procedure, firstErrorEquals: ProcedureKitError.capabilityUnavailable())
+        PKAssertConditionFailed(authorizedFor.output.value ?? .success(true), failedWithError: ProcedureKitError.capabilityUnavailable())
+        PKAssertProcedureCancelledWithError(procedure, ProcedureKitError.capabilityUnavailable())
     }
 
     func test__async_fails_if_capability_is_not_available() {
         capability.isAsynchronous = true
         capability.serviceIsAvailable = false
         wait(for: procedure)
-        XCTAssertConditionResult(authorizedFor.output.value ?? .success(true), failedWithError: ProcedureKitError.capabilityUnavailable())
-        XCTAssertProcedureCancelledWithErrors(count: 1)
-        XCTAssertProcedure(procedure, firstErrorEquals: ProcedureKitError.capabilityUnavailable())
+        PKAssertConditionFailed(authorizedFor.output.value ?? .success(true), failedWithError: ProcedureKitError.capabilityUnavailable())
+        PKAssertProcedureCancelledWithError(procedure, ProcedureKitError.capabilityUnavailable())
     }
 
     func test__fails_if_requirement_is_not_met() {
         capability.requirement = .maximum
         capability.responseAuthorizationStatus = .minimumAuthorized
-
         wait(for: procedure)
-        XCTAssertConditionResult(authorizedFor.output.value ?? .success(true), failedWithError: ProcedureKitError.capabilityUnauthorized())
-        XCTAssertProcedureCancelledWithErrors(count: 1)
-        XCTAssertProcedure(procedure, firstErrorEquals: ProcedureKitError.capabilityUnauthorized())
+        PKAssertConditionFailed(authorizedFor.output.value ?? .success(true), failedWithError: ProcedureKitError.capabilityUnauthorized())
+        PKAssertProcedureCancelledWithError(procedure, ProcedureKitError.capabilityUnauthorized())
     }
 
     func test__async_fails_if_requirement_is_not_met() {
@@ -141,22 +137,21 @@ class AuthorizedForTests: TestableCapabilityTestCase {
         capability.responseAuthorizationStatus = .minimumAuthorized
 
         wait(for: procedure)
-        XCTAssertConditionResult(authorizedFor.output.value ?? .success(true), failedWithError: ProcedureKitError.capabilityUnauthorized())
-        XCTAssertProcedureCancelledWithErrors(count: 1)
-        XCTAssertProcedure(procedure, firstErrorEquals: ProcedureKitError.capabilityUnauthorized())
+        PKAssertConditionFailed(authorizedFor.output.value ?? .success(true), failedWithError: ProcedureKitError.capabilityUnauthorized())
+        PKAssertProcedureCancelledWithError(procedure, ProcedureKitError.capabilityUnauthorized())
     }
 
     func test__suceeds_if_requirement_is_met() {
         wait(for: procedure)
-        XCTAssertConditionResultSatisfied(authorizedFor.output.value ?? .success(false))
-        XCTAssertProcedureFinishedWithoutErrors()
+        PKAssertProcedureFinished(procedure)
+        PKAssertConditionSatisfied(authorizedFor.output.value ?? .success(false))
     }
 
     func test__async_suceeds_if_requirement_is_met() {
         capability.isAsynchronous = true
         wait(for: procedure)
-        XCTAssertConditionResultSatisfied(authorizedFor.output.value ?? .success(false))
-        XCTAssertProcedureFinishedWithoutErrors()
+        PKAssertProcedureFinished(procedure)
+        PKAssertConditionSatisfied(authorizedFor.output.value ?? .success(false))
     }
 
     func test__negated_authorized_for_and_no_failed_dependencies_succeeds() {
@@ -176,16 +171,11 @@ class AuthorizedForTests: TestableCapabilityTestCase {
         let procedure = TestProcedure()
         let authorizedCondition = AuthorizedFor(capability)
 
-        procedure.add(condition: NegatedCondition(authorizedCondition))
-        procedure.add(condition: NoFailedDependenciesCondition())
+        procedure.addCondition(NegatedCondition(authorizedCondition))
+        procedure.addCondition(NoFailedDependenciesCondition())
 
         wait(for: procedure)
-        XCTAssertProcedureFinishedWithoutErrors(procedure)
+        PKAssertProcedureFinished(procedure)
     }
 }
-
-
-
-
-
 

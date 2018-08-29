@@ -1,7 +1,7 @@
 //
 //  ProcedureKit
 //
-//  Copyright © 2016 ProcedureKit. All rights reserved.
+//  Copyright © 2015-2018 ProcedureKit. All rights reserved.
 //
 
 import XCTest
@@ -40,11 +40,11 @@ class MutualExclusiveTests: ProcedureKitTestCase {
     func test__mutually_exclusive_operations_can_be_executed() {
         let procedure1 = TestProcedure()
         procedure1.name = "Procedure 1"
-        procedure1.add(condition: MutuallyExclusive<TestProcedure>())
+        procedure1.addCondition(MutuallyExclusive<TestProcedure>())
 
         let procedure2 = TestProcedure()
         procedure2.name = "Procedure 2"
-        procedure2.add(condition: MutuallyExclusive<TestProcedure>())
+        procedure2.addCondition(MutuallyExclusive<TestProcedure>())
 
         wait(for: procedure1, procedure2)
     }
@@ -97,7 +97,7 @@ class MutualExclusiveTests: ProcedureKitTestCase {
         let mutuallyExclusiveConditions = [MutuallyExclusive<TestProcedure>(), MutuallyExclusive<DummyExclusivity>()]
         let expectedMutuallyExclusiveCategories = Set(mutuallyExclusiveConditions.map { $0.mutuallyExclusiveCategories }.joined())
         print("\(expectedMutuallyExclusiveCategories)")
-        mutuallyExclusiveConditions.forEach { procedure.add(condition: $0) }
+        mutuallyExclusiveConditions.forEach { procedure.addCondition($0) }
 
         procedure.addWillExecuteBlockObserver(synchronizedWith: DispatchQueue.main) { procedure, _ in
             // The Procedure should have called procedureClaimLock prior
@@ -165,10 +165,10 @@ class MutualExclusiveTests: ProcedureKitTestCase {
         )
 
         addCompletionBlockTo(procedure: procedure)
-        queue.add(operation: procedure)
+        queue.addOperation(procedure)
         waitForExpectations(timeout: 3)
 
-        XCTAssertProcedureFinishedWithoutErrors(procedure)
+        PKAssertProcedureFinished(procedure)
         XCTAssertTrue(calledRequestLock.access)
         XCTAssertTrue(calledProcedureClaimLock.access)
         XCTAssertTrue(calledUnlock.access)
@@ -187,7 +187,7 @@ class MutualExclusiveConcurrencyTests: ConcurrencyTestCase {
         concurrencyTest(operations: numOperations, withDelayMicroseconds: delayMicroseconds, withTimeout: 3,
             withConfigureBlock: { (testOp) in
                 let condition = MutuallyExclusive<TrackingProcedure>()
-                testOp.add(condition: condition)
+                testOp.addCondition(condition)
                 return testOp
             },
             withExpectations: Expectations(
@@ -211,7 +211,7 @@ class MutualExclusiveConcurrencyTests: ConcurrencyTestCase {
 
         let procedures: [TrackingProcedure] = create(procedures: numOperations, delayMicroseconds: delayMicroseconds, withRegistrar: registrar).map {
             let condition = MutuallyExclusive<TrackingProcedure>()
-            $0.add(condition: condition)
+            $0.addCondition(condition)
             addCompletionBlockTo(procedure: $0, withExpectationDescription: "\(String(describing: $0.name)), didFinish")
             return $0
         }
@@ -250,20 +250,20 @@ class MutualExclusiveConcurrencyTests: ConcurrencyTestCase {
 
         // Two procedures that are mutually-exclusive
         let procedure1 = TestProcedure()
-        procedure1.add(condition: MutuallyExclusive<TestProcedure>())
+        procedure1.addCondition(MutuallyExclusive<TestProcedure>())
         let procedure2 = TestProcedure()
-        procedure2.add(condition: MutuallyExclusive<TestProcedure>())
+        procedure2.addCondition(MutuallyExclusive<TestProcedure>())
 
         addCompletionBlockTo(procedures: [procedure1, procedure2])
 
         // procedure2 will not run until procedure1 is complete
-        procedure2.add(dependency: procedure1)
+        procedure2.addDependency(procedure1)
 
         // add procedure2 to the queue first
-        queue.add(operation: procedure2).then(on: DispatchQueue.main) { [weak weakQueue = self.queue] in
+        queue.addOperation(procedure2).then(on: DispatchQueue.main) { [weak weakQueue = self.queue] in
             guard let queue = weakQueue else { return }
             // then add procedure1 to the queue
-            queue.add(operation: procedure1)
+            queue.addOperation(procedure1)
         }
 
         waitForExpectations(timeout: 2)
@@ -306,7 +306,7 @@ class MutualExclusiveConcurrencyTests: ConcurrencyTestCase {
 
             var queue: ProcedureQueue? = ProcedureQueue()
 
-            procedure1.add(condition: MutuallyExclusive<TestProcedure>())
+            procedure1.addCondition(MutuallyExclusive<TestProcedure>())
 
             let expProcedureWasStarted = expectation(description: "Procedure was started - execute was called")
             procedure1.addDidExecuteBlockObserver(synchronizedWith: DispatchQueue.main) { _ in
@@ -314,7 +314,7 @@ class MutualExclusiveConcurrencyTests: ConcurrencyTestCase {
                 expProcedureWasStarted.fulfill()
             }
 
-            queue!.add(operation: procedure1)
+            queue!.addOperation(procedure1)
             waitForExpectations(timeout: 3) // wait for the Procedure to be started by the queue
 
             // store a weak reference to the ProcedureQueue
@@ -347,7 +347,7 @@ class MutualExclusiveConcurrencyTests: ConcurrencyTestCase {
         }
         waitForExpectations(timeout: 3)
 
-        XCTAssertProcedureFinishedWithoutErrors(procedure1)
+        PKAssertProcedureFinished(procedure1)
     }
 }
 

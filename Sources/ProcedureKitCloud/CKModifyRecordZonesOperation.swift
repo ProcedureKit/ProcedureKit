@@ -1,7 +1,7 @@
 //
 //  ProcedureKit
 //
-//  Copyright © 2016 ProcedureKit. All rights reserved.
+//  Copyright © 2015-2018 ProcedureKit. All rights reserved.
 //
 
 #if SWIFT_PACKAGE
@@ -52,7 +52,7 @@ extension CKProcedure where T: CKModifyRecordZonesOperationProtocol, T: Associat
     func setModifyRecordZonesCompletionBlock(_ block: @escaping CloudKitProcedure<T>.ModifyRecordZonesCompletionBlock) {
         operation.modifyRecordZonesCompletionBlock = { [weak self] saved, deleted, error in
             if let strongSelf = self, let error = error {
-                strongSelf.append(error: ModifyRecordZonesError(underlyingError: error, saved: saved, deleted: deleted))
+                strongSelf.setErrorOnce(ModifyRecordZonesError(underlyingError: error, saved: saved, deleted: deleted))
             }
             else {
                 block(saved, deleted)

@@ -1,7 +1,7 @@
 //
 //  ProcedureKit
 //
-//  Copyright © 2016 ProcedureKit. All rights reserved.
+//  Copyright © 2015-2018 ProcedureKit. All rights reserved.
 //
 
 #if !os(tvOS)
@@ -49,7 +49,7 @@ class CKDiscoverAllContactsOperationTests: CKProcedureTestCase {
 
     func test__success_without_completion_block() {
         wait(for: operation)
-        XCTAssertProcedureFinishedWithoutErrors(operation)
+        PKAssertProcedureFinished(operation)
     }
 
     func test__success_with_completion_block() {
@@ -58,22 +58,23 @@ class CKDiscoverAllContactsOperationTests: CKProcedureTestCase {
             didExecuteBlock = true
         }
         wait(for: operation)
-        XCTAssertProcedureFinishedWithoutErrors(operation)
+        PKAssertProcedureFinished(operation)
         XCTAssertTrue(didExecuteBlock)
     }
 
     func test__error_without_completion_block() {
         target.error = TestError()
         wait(for: operation)
-        XCTAssertProcedureFinishedWithoutErrors(operation)
+        PKAssertProcedureFinished(operation)
     }
 
     func test__error_with_completion_block() {
         var didExecuteBlock = false
         operation.setDiscoverAllContactsCompletionBlock { _ in didExecuteBlock = true }
-        target.error = TestError()
+        let error = TestError()
+        target.error = error
         wait(for: operation)
-        XCTAssertProcedureFinishedWithErrors(operation, count: 1)
+        PKAssertProcedureFinished(operation, withErrors: true)
         XCTAssertFalse(didExecuteBlock)
     }
 }
@@ -101,19 +102,19 @@ class CloudKitProcedureDiscoverAllContactsOperationTests: CKProcedureTestCase {
     func test__cancellation() {
         cloudkit.cancel()
         wait(for: cloudkit)
-        XCTAssertProcedureCancelledWithoutErrors(cloudkit)
+        PKAssertProcedureCancelled(cloudkit)
     }
 
     func test__success_without_completion_block_set() {
         wait(for: cloudkit)
-        XCTAssertProcedureFinishedWithoutErrors(cloudkit)
+        PKAssertProcedureFinished(cloudkit)
     }
 
     func test__success_with_completion_block_set() {
         var didSetDiscoveredUserInfo: [TestCKDiscoverAllContactsOperation.DiscoveredUserInfo]? = nil
         cloudkit.setDiscoverAllContactsCompletionBlock { didSetDiscoveredUserInfo = $0 }
         wait(for: cloudkit)
-        XCTAssertProcedureFinishedWithoutErrors(cloudkit)
+        PKAssertProcedureFinished(cloudkit)
         XCTAssertEqual(didSetDiscoveredUserInfo?.first ?? "not user info", "user info")
     }
 
@@ -124,13 +125,14 @@ class CloudKitProcedureDiscoverAllContactsOperationTests: CKProcedureTestCase {
             return operation
         }
         wait(for: cloudkit)
-        XCTAssertProcedureFinishedWithoutErrors(cloudkit)
+        PKAssertProcedureFinished(cloudkit)
     }
 
     func test__error_with_completion_block_set() {
+        let error = NSError(domain: CKErrorDomain, code: CKError.internalError.rawValue, userInfo: nil)
         cloudkit = CloudKitProcedure(strategy: .immediate) {
             let operation = TestCKDiscoverAllContactsOperation(result: [ "user info" ])
-            operation.error = NSError(domain: CKErrorDomain, code: CKError.internalError.rawValue, userInfo: nil)
+            operation.error = error
             return operation
         }
 
@@ -138,7 +140,7 @@ class CloudKitProcedureDiscoverAllContactsOperationTests: CKProcedureTestCase {
         cloudkit.setDiscoverAllContactsCompletionBlock { didSetDiscoveredUserInfo = $0 }
 
         wait(for: cloudkit)
-        XCTAssertProcedureFinishedWithErrors(cloudkit, count: 1)
+        PKAssertProcedureFinished(cloudkit, withErrors: true)
         XCTAssertNil(didSetDiscoveredUserInfo)
     }
 
@@ -156,7 +158,7 @@ class CloudKitProcedureDiscoverAllContactsOperationTests: CKProcedureTestCase {
         var didExecuteBlock = false
         cloudkit.setDiscoverAllContactsCompletionBlock { _ in didExecuteBlock = true }
         wait(for: cloudkit)
-        XCTAssertProcedureFinishedWithoutErrors(cloudkit)
+        PKAssertProcedureFinished(cloudkit)
         XCTAssertTrue(didExecuteBlock)
     }
 
@@ -179,7 +181,7 @@ class CloudKitProcedureDiscoverAllContactsOperationTests: CKProcedureTestCase {
         var didExecuteBlock = false
         cloudkit.setDiscoverAllContactsCompletionBlock { _ in didExecuteBlock = true }
         wait(for: cloudkit)
-        XCTAssertProcedureFinishedWithoutErrors(cloudkit)
+        PKAssertProcedureFinished(cloudkit)
         XCTAssertTrue(didExecuteBlock)
         XCTAssertTrue(didRunCustomHandler)
     }

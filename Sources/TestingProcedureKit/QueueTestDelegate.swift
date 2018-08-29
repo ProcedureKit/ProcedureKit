@@ -1,7 +1,7 @@
 //
 //  ProcedureKit
 //
-//  Copyright © 2016 ProcedureKit. All rights reserved.
+//  Copyright © 2015-2018 ProcedureKit. All rights reserved.
 //
 
 import Foundation
@@ -12,7 +12,7 @@ public class QueueTestDelegate: ProcedureQueueDelegate {
     public typealias OperationCheckType = (ProcedureQueue, Operation, Any?)
     public typealias OperationFinishType = (ProcedureQueue, Operation)
     public typealias ProcedureCheckType = (ProcedureQueue, Procedure, Any?)
-    public typealias ProcedureFinishType = (ProcedureQueue, Procedure, [Error])
+    public typealias ProcedureFinishType = (ProcedureQueue, Procedure, Error?)
 
     public var procedureQueueWillAddOperation: [OperationCheckType] {
         get { return _procedureQueueWillAddOperation.read { $0 } }
@@ -55,8 +55,8 @@ public class QueueTestDelegate: ProcedureQueueDelegate {
         case didFinishOperation(ProcedureQueue, Operation)
         case willAddProcedure(ProcedureQueue, Procedure, Any?)
         case didAddProcedure(ProcedureQueue, Procedure, Any?)
-        case willFinishProcedure(ProcedureQueue, Procedure, [Error])
-        case didFinishProcedure(ProcedureQueue, Procedure, [Error])
+        case willFinishProcedure(ProcedureQueue, Procedure, Error?)
+        case didFinishProcedure(ProcedureQueue, Procedure, Error?)
     }
     public typealias CallbackBlock = (CallbackKind) -> Void
 
@@ -99,14 +99,14 @@ public class QueueTestDelegate: ProcedureQueueDelegate {
         callbackBlock(.didAddProcedure(queue, procedure, context))
     }
 
-    public func procedureQueue(_ queue: ProcedureQueue, willFinishProcedure procedure: Procedure, withErrors errors: [Error]) -> ProcedureFuture? {
-        _procedureQueueWillFinishProcedure.append((queue, procedure, errors))
-        callbackBlock(.willFinishProcedure(queue, procedure, errors))
+    public func procedureQueue(_ queue: ProcedureQueue, willFinishProcedure procedure: Procedure, with error: Error?) -> ProcedureFuture? {
+        _procedureQueueWillFinishProcedure.append((queue, procedure, error))
+        callbackBlock(.willFinishProcedure(queue, procedure, error))
         return nil
     }
 
-    public func procedureQueue(_ queue: ProcedureQueue, didFinishProcedure procedure: Procedure, withErrors errors: [Error]) {
-        _procedureQueueDidFinishProcedure.append((queue, procedure, errors))
-        callbackBlock(.didFinishProcedure(queue, procedure, errors))
+    public func procedureQueue(_ queue: ProcedureQueue, didFinishProcedure procedure: Procedure, with error: Error?) {
+        _procedureQueueDidFinishProcedure.append((queue, procedure, error))
+        callbackBlock(.didFinishProcedure(queue, procedure, error))
     }
 }

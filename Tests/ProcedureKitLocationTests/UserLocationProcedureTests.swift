@@ -1,7 +1,7 @@
 //
 //  ProcedureKit
 //
-//  Copyright © 2016 ProcedureKit. All rights reserved.
+//  Copyright © 2015-2018 ProcedureKit. All rights reserved.
 //
 
 import XCTest
@@ -17,7 +17,7 @@ class UserLocationProcedureTests: LocationProcedureTestCase {
         let procedure = UserLocationProcedure(accuracy: accuracy)
         procedure.manager = manager
         wait(for: procedure)
-        XCTAssertProcedureFinishedWithoutErrors(procedure)
+        PKAssertProcedureFinished(procedure)
         XCTAssertEqual(procedure.output.success, location)
         XCTAssertEqual(manager.didSetDesiredAccuracy, accuracy)
         XCTAssertTrue(manager.didSetDelegate)
@@ -32,7 +32,7 @@ class UserLocationProcedureTests: LocationProcedureTestCase {
         }
         procedure.manager = manager
         wait(for: procedure)
-        XCTAssertProcedureFinishedWithoutErrors(procedure)
+        PKAssertProcedureFinished(procedure)
         XCTAssertEqual(receivedLocation, location)
         XCTAssertEqual(manager.didSetDesiredAccuracy, accuracy)
         XCTAssertTrue(manager.didSetDelegate)
@@ -61,15 +61,16 @@ class UserLocationProcedureTests: LocationProcedureTestCase {
         let procedure = UserLocationProcedure(accuracy: kCLLocationAccuracyBestForNavigation)
         procedure.manager = manager
         wait(for: procedure)
-        XCTAssertProcedureFinishedWithoutErrors(procedure)
+        PKAssertProcedureFinished(procedure)
     }
 
     func test__finishes_with_error_if_location_manager_fails() {
-        manager.returnedError = TestError()
+        let error = TestError()
+        manager.returnedError = error
         let procedure = UserLocationProcedure(accuracy: accuracy)
         procedure.manager = manager
         wait(for: procedure)
-        XCTAssertProcedureFinishedWithErrors(procedure, count: 1)
+        PKAssertProcedureFinishedWithError(procedure, error)
     }
 
     func test__cancels_with_timeout_if_location_manager_takes_too_long() {
@@ -77,7 +78,7 @@ class UserLocationProcedureTests: LocationProcedureTestCase {
         let procedure = UserLocationProcedure(timeout: 0.1, accuracy: accuracy)
         procedure.manager = manager
         wait(for: procedure)
-        XCTAssertProcedureCancelledWithErrors(procedure, count: 1)
+        PKAssertProcedureCancelledWithError(procedure, ProcedureKitError.timedOut(with: .by(0.1)))
     }
 }
 

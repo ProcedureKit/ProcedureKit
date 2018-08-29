@@ -1,7 +1,7 @@
 //
 //  ProcedureKit
 //
-//  Copyright © 2016 ProcedureKit. All rights reserved.
+//  Copyright © 2015-2018 ProcedureKit. All rights reserved.
 //
 
 #if !os(watchOS)
@@ -18,7 +18,7 @@ public struct Reachability {
         case any, wwan, wifi
     }
 
-    public enum NetworkStatus {
+    public enum NetworkStatus: Equatable {
         case notReachable
         case reachable(Connectivity)
     }
@@ -49,9 +49,7 @@ public protocol NetworkReachabilityDelegate: class {
 
 public protocol NetworkReachability {
 
-    weak var delegate: NetworkReachabilityDelegate? { get set }
-
-    var log: LoggerProtocol { get }
+    var delegate: NetworkReachabilityDelegate? { get set }
 
     func startNotifier(onQueue queue: DispatchQueue) throws
 
@@ -68,20 +66,6 @@ public protocol SystemReachability {
 }
 
 // MARK: Conformance
-
-extension Reachability.NetworkStatus: Equatable {
-
-    public static func == (lhs: Reachability.NetworkStatus, rhs: Reachability.NetworkStatus) -> Bool {
-        switch (lhs, rhs) {
-        case (.notReachable, .notReachable):
-            return true
-        case let (.reachable(lhsConnectivity), .reachable(rhsConnectivity)):
-            return lhsConnectivity == rhsConnectivity
-        default:
-            return false
-        }
-    }
-}
 
 public extension Reachability.NetworkStatus {
 

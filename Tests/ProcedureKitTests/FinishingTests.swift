@@ -1,7 +1,7 @@
 //
 //  ProcedureKit
 //
-//  Copyright © 2016 ProcedureKit. All rights reserved.
+//  Copyright © 2015-2018 ProcedureKit. All rights reserved.
 //
 
 import XCTest
@@ -53,38 +53,42 @@ class FinishingTests: ProcedureKitTestCase {
         //       until it is started by the queue (which, if it is cancelled,
         //       should not be waiting on any dependencies).
 
+        let error = TestError()
         XCTAssertFalse(procedure.isFinished)
         procedure.cancel()
         XCTAssertTrue(procedure.isCancelled)
         XCTAssertFalse(procedure.isFinished)
-        procedure.finish(withErrors: [TestError()])
+        procedure.finish(with: error)
         XCTAssertFalse(procedure.isFinished)
         wait(for: procedure)
-        XCTAssertProcedureCancelledWithErrors(procedure, count: 1)
+        PKAssertProcedureCancelledWithError(procedure, error)
     }
 
     func test__cancelled_procedure_finish_called_before_execute_only_first_finish_succeeds() {
+        let error = TestError()
         XCTAssertFalse(procedure.isFinished)
         procedure.cancel()
         XCTAssertTrue(procedure.isCancelled)
         XCTAssertFalse(procedure.isFinished)
-        procedure.finish(withErrors: [TestError()])
+        procedure.finish(with: error)
         XCTAssertFalse(procedure.isFinished)
         // calling finish a second time should be ignored - only the first call should succeed
-        procedure.finish(withErrors: [])
+        procedure.finish()
         XCTAssertFalse(procedure.isFinished)
         wait(for: procedure)
         // the procedure should be cancelled with 1 error - if there is no error, the second call to finish
         // incorrectly succeeded
-        XCTAssertProcedureCancelledWithErrors(procedure, count: 1)
+        PKAssertProcedureCancelledWithError(procedure, error)
     }
 
     func test__cancelled_procedure_finish_before_execute_from_didcancel_observer() {
+
         class FinishesFromDidCancelProcedure: Procedure {
+            let expectedError = TestError()
             override init() {
                 super.init()
                 addDidCancelBlockObserver { procedure, _ in
-                    procedure.finish(withError: TestError())
+                    procedure.finish(with: procedure.expectedError)
                 }
             }
             override func execute() {
@@ -103,12 +107,13 @@ class FinishingTests: ProcedureKitTestCase {
         XCTAssertTrue(procedure.isCancelled)
         XCTAssertFalse(procedure.isFinished)
         wait(for: procedure)
-        XCTAssertProcedureCancelledWithErrors(procedure, count: 1)
+        PKAssertProcedureCancelledWithError(procedure, procedure.expectedError)
     }
 
     func test__procedure_finish_from_willexecute_observer() {
+        let error = TestError()
         procedure.addWillExecuteBlockObserver { procedure, _ in
-            procedure.finish(withErrors: [TestError()])
+            procedure.finish(with: error)
         }
         wait(for: procedure)
         XCTAssertTrue(procedure.isFinished)
@@ -118,26 +123,27 @@ class FinishingTests: ProcedureKitTestCase {
     }
 
     func test__procedure_finish_after_cancel_from_willexecute_observer() {
+        let error = TestError()
         procedure.addWillExecuteBlockObserver { procedure, _ in
             procedure.cancel()
-            procedure.finish(withErrors: [TestError()])
+            procedure.finish(with: error)
         }
         wait(for: procedure)
-        XCTAssertProcedureCancelledWithErrors(procedure)
+        PKAssertProcedureCancelledWithError(procedure, error)
         XCTAssertFalse(procedure.didExecute)
     }
 
     func test__finish_from_willfinish_observer_is_ignored() {
 
         enum ShouldNotHappen: Error {
-            case FinishedFromWithinWillFinish
+            case finishedFromWithinWillFinish
         }
         procedure.addWillFinishBlockObserver { (procedure, error, _) in
-            procedure.finish(withError: ShouldNotHappen.FinishedFromWithinWillFinish)
+            procedure.finish(with: ShouldNotHappen.finishedFromWithinWillFinish)
         }
 
         wait(for: procedure)
-        XCTAssertProcedureFinishedWithoutErrors(procedure)
+        PKAssertProcedureFinished(procedure)
     }
 }
 

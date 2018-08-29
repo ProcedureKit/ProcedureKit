@@ -1,7 +1,7 @@
 //
 //  ProcedureKit
 //
-//  Copyright © 2016 ProcedureKit. All rights reserved.
+//  Copyright © 2015-2018 ProcedureKit. All rights reserved.
 //
 
 import Foundation
@@ -33,7 +33,8 @@ open class ProcedureKitTestCase: XCTestCase {
         delegate = nil
         queue = nil
         procedure = nil
-        LogManager.severity = .warning
+        Log.enabled = false
+        Log.severity = .warning
         ExclusivityManager.__tearDownForUnitTesting()
         super.tearDown()
     }
@@ -127,13 +128,14 @@ open class ProcedureKitTestCase: XCTestCase {
     func makeFinishingProcedure(for procedure: Procedure, withExpectationDescription expectationDescription: String = #function) -> Procedure {
         let finishing = BlockProcedure { }
         finishing.log.enabled = false
-        finishing.add(dependency: procedure)
+        finishing.system.enabled = false
+        finishing.addDependency(procedure)
         // Adds a will add operation observer, which adds the produced operation as a dependency
         // of the finishing procedure. This way, we don't actually finish, until the
         // procedure, and any produced operations also finish.
         procedure.addWillAddOperationBlockObserver { [weak weakFinishing = finishing] _, operation in
             guard let finishing = weakFinishing else { fatalError("Finishing procedure is finished + gone, but a WillAddOperation observer on a dependency was called. This should never happen.") }
-            finishing.add(dependency: operation)
+            finishing.addDependency(operation)
         }
         finishing.name = "FinishingBlockProcedure(for: \(procedure.operationName))"
         return finishing

@@ -1,7 +1,7 @@
 //
 //  ProcedureKit
 //
-//  Copyright © 2016 ProcedureKit. All rights reserved.
+//  Copyright © 2015-2018 ProcedureKit. All rights reserved.
 //
 
 #if !os(watchOS)
@@ -119,7 +119,7 @@ class NetworkRecovery<T: Procedure> where T: NetworkOperation {
         // Check to see if we should wait for a network reachability change before retrying
         if shouldWaitForReachabilityChange(givenNetworkResponse: networkResponse) {
             let waiter = NetworkReachabilityWaitProcedure(reachability: reachability, via: connectivity)
-            payload.operation.add(dependency: waiter)
+            payload.operation.addDependency(waiter)
             info.addOperations(waiter)
             return RepeatProcedurePayload(operation: payload.operation, delay: nil, configure: payload.configure)
         }
@@ -156,9 +156,7 @@ class NetworkRecovery<T: Procedure> where T: NetworkOperation {
     }
 }
 
-open class NetworkProcedure<T: Procedure>: RetryProcedure<T>, OutputProcedure where T: NetworkOperation, T: OutputProcedure, T.Output: HTTPPayloadResponseProtocol {
-
-    public typealias Output = T.Output
+open class NetworkProcedure<T: Procedure>: RetryProcedure<T> where T: NetworkOperation {
 
     let recovery: NetworkRecovery<T>
 
@@ -171,7 +169,7 @@ open class NetworkProcedure<T: Procedure>: RetryProcedure<T>, OutputProcedure wh
         recovery = NetworkRecovery<T>(resilience: resilience, connectivity: connectivity)
         super.init(dispatchQueue: dispatchQueue, max: recovery.max, wait: recovery.wait, iterator: base, retry: recovery.recover(withInfo:payload:))
         if let timeout = resilience.requestTimeout {
-            appendConfigureBlock { $0.add(observer: TimeoutObserver(by: timeout)) }
+            appendConfigureBlock { $0.addObserver(TimeoutObserver(by: timeout)) }
         }
     }
 
@@ -179,17 +177,17 @@ open class NetworkProcedure<T: Procedure>: RetryProcedure<T>, OutputProcedure wh
         self.init(dispatchQueue: dispatchQueue, resilience: resilience, connectivity: connectivity, iterator: AnyIterator(body))
     }
 
-    open override func child(_ child: Procedure, willFinishWithErrors errors: [Error]) {
-        var networkErrors = errors
+    open override func child(_ child: Procedure, willFinishWithError error: Error?) {
+        var networkError = error
 
         // Ultimately, always call super to correctly manage the operation lifecycle.
-        defer { super.child(child, willFinishWithErrors: networkErrors) }
+        defer { super.child(child, willFinishWithError: networkError) }
 
         // Check that the operation is the current one.
         guard child == current else { return }
 
-        // If we have any errors let RetryProcedure (super) deal with it by returning here
-        guard errors.isEmpty else { return }
+        // If we have an error let RetryProcedure (super) deal with it by returning here
+        guard error == nil else { return }
 
         // Create a network response from the network operation
         let networkResponse = current.makeNetworkResponse()
@@ -198,10 +196,10 @@ open class NetworkProcedure<T: Procedure>: RetryProcedure<T>, OutputProcedure wh
         guard recovery.shouldRetry(givenNetworkResponse: networkResponse), let statusCode = networkResponse.httpStatusCode else { return }
 
         // Create resiliency error
-        let error: ProcedureKitNetworkResiliencyError = .receivedErrorStatusCode(statusCode)
+        let resiliencyError: ProcedureKitNetworkResiliencyError = .receivedErrorStatusCode(statusCode)
 
         // Set the network errors
-        networkErrors = [error]
+        networkError = resiliencyError
     }
 }
 

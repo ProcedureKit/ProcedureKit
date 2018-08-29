@@ -1,65 +1,29 @@
+// swift-tools-version:4.0
+
 import PackageDescription
 
-let package = Package(
-    name: "ProcedureKit",
+let pkg = Package(name: "ProcedureKit")
 
-    targets: [
+pkg.products = [
+    .library(name: "ProcedureKit", targets: ["ProcedureKit"]),
+    .library(name: "ProcedureKitCloud", targets: ["ProcedureKitCloud"]),
+    .library(name: "ProcedureKitLocation", targets: ["ProcedureKitLocation"]),
+    .library(name: "ProcedureKitMac", targets: ["ProcedureKitMac"]),
+    .library(name: "ProcedureKitNetwork", targets: ["ProcedureKitNetwork"]),
+    .library(name: "TestingProcedureKit", targets: ["TestingProcedureKit"])
+]
 
-        /** ProcedureKit libraries */
-        Target(name: "ProcedureKit"),
-
-        Target(
-            name: "ProcedureKitCloud",
-            dependencies: ["ProcedureKit"]),
-
-        Target(
-            name: "ProcedureKitLocation",
-            dependencies: ["ProcedureKit"]),
-
-        Target(
-            name: "ProcedureKitMac",
-            dependencies: ["ProcedureKit"]),
-
-        Target(
-            name: "ProcedureKitNetwork",
-            dependencies: ["ProcedureKit"]),
-
-        /** Test Support library */
-        Target(
-            name: "TestingProcedureKit",
-            dependencies: ["ProcedureKit"]),
-
-        /** Test executables */
-        Target(
-            name: "ProcedureKitTests",
-            dependencies: ["ProcedureKit", "TestingProcedureKit"]),
-
-         Target(
-            name: "ProcedureKitStressTests",
-            dependencies: ["ProcedureKit", "TestingProcedureKit"]),
-
-         Target(
-            name: "ProcedureKitCloudTests",
-            dependencies: ["ProcedureKitCloud", "TestingProcedureKit"]),
-
-         Target(
-            name: "ProcedureKitLocationTests",
-            dependencies: ["ProcedureKitLocation", "TestingProcedureKit"]),
-
-         Target(
-            name: "ProcedureKitMacTests",
-            dependencies: ["ProcedureKitMac", "TestingProcedureKit"]),
-
-         Target(
-            name: "ProcedureKitNetworkTests",
-            dependencies: ["ProcedureKitNetwork", "TestingProcedureKit"])
-
-    ],
-
-    exclude: [
-        "Sources/ProcedureKitMobile",
-        "Sources/ProcedureKitTV",
-        "Tests/ProcedureKitMobileTests",
-        "Tests/ProcedureKitTVTests",
-    ]
-)
+pkg.targets = [
+    .target(name: "ProcedureKit"),
+    .target(name: "ProcedureKitCloud", dependencies: ["ProcedureKit"]),
+    .target(name: "ProcedureKitLocation", dependencies: ["ProcedureKit"]),
+    .target(name: "ProcedureKitMac", dependencies: ["ProcedureKit"]),
+    .target(name: "ProcedureKitNetwork", dependencies: ["ProcedureKit"]),
+    .target(name: "TestingProcedureKit", dependencies: ["ProcedureKit"]),
+    .testTarget(name: "ProcedureKitTests", dependencies: ["ProcedureKit", "TestingProcedureKit"]),
+    .testTarget(name: "ProcedureKitStressTests", dependencies: ["ProcedureKit", "TestingProcedureKit"]),
+    .testTarget(name: "ProcedureKitCloudTests", dependencies: ["ProcedureKitCloud", "TestingProcedureKit"]),
+    .testTarget(name: "ProcedureKitLocationTests", dependencies: ["ProcedureKitLocation", "TestingProcedureKit"]),
+    .testTarget(name: "ProcedureKitMacTests", dependencies: ["ProcedureKitMac", "TestingProcedureKit"]),
+    .testTarget(name: "ProcedureKitNetworkTests", dependencies: ["ProcedureKitNetwork", "TestingProcedureKit"]),
+]
