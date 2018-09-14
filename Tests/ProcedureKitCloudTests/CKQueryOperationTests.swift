@@ -4,8 +4,6 @@
 //  Copyright © 2015-2018 ProcedureKit. All rights reserved.
 //
 
-#if !swift(>=4.1)
-
 import XCTest
 import CloudKit
 import ProcedureKit
@@ -113,9 +111,10 @@ class CKQueryOperationTests: CKProcedureTestCase {
         operation.setQueryCompletionBlock { cursor in
             didExecuteBlock = true
         }
-        target.error = TestError()
+        let error = TestError()
+        target.error = error
         wait(for: operation)
-        XCTAssertProcedureFinishedWithErrors(operation, count: 1)
+        PKAssertProcedureFinished(operation, withErrors: true)
         XCTAssertFalse(didExecuteBlock)
     }
 }
@@ -182,7 +181,7 @@ class CloudKitProcedureQueryOperationTests: CKProcedureTestCase {
     func test__cancellation() {
         cloudkit.cancel()
         wait(for: cloudkit)
-        XCTAssertProcedureCancelledWithoutErrors(cloudkit)
+        PKAssertProcedureCancelled(cloudkit)
     }
 
     func test__success_without_completion_block_set() {
@@ -211,9 +210,10 @@ class CloudKitProcedureQueryOperationTests: CKProcedureTestCase {
     }
 
     func test__error_with_completion_block_set() {
+        let error = NSError(domain: CKErrorDomain, code: CKError.internalError.rawValue, userInfo: nil)
         cloudkit = CloudKitProcedure(strategy: .immediate) {
             let operation = TestCKQueryOperation()
-            operation.error = NSError(domain: CKErrorDomain, code: CKError.internalError.rawValue, userInfo: nil)
+            operation.error = error
             return operation
         }
 
@@ -223,7 +223,7 @@ class CloudKitProcedureQueryOperationTests: CKProcedureTestCase {
         }
 
         wait(for: cloudkit)
-        XCTAssertProcedureFinishedWithErrors(cloudkit, count: 1)
+        PKAssertProcedureFinished(cloudkit, withErrors: true)
         XCTAssertFalse(didExecuteBlock)
     }
 
@@ -270,5 +270,3 @@ class CloudKitProcedureQueryOperationTests: CKProcedureTestCase {
     }
     
 }
-
-#endif

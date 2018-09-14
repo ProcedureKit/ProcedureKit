@@ -4,8 +4,6 @@
 //  Copyright © 2015-2018 ProcedureKit. All rights reserved.
 //
 
-#if !swift(>=4.1)
-
 #if SWIFT_PACKAGE
     import ProcedureKit
     import Foundation
@@ -45,7 +43,7 @@ extension CKProcedure where T: CKFetchNotificationChangesOperationProtocol, T: A
 
         operation.fetchNotificationChangesCompletionBlock = { [weak self] token, error in
             if let strongSelf = self, let error = error {
-                strongSelf.append(error: FetchNotificationChangesError(underlyingError: error, token: token))
+                strongSelf.setErrorOnce(FetchNotificationChangesError(underlyingError: error, token: token))
             }
             else {
                 block(token)
@@ -83,4 +81,3 @@ extension CloudKitProcedure where T: CKFetchNotificationChangesOperationProtocol
     }
 }
 
-#endif

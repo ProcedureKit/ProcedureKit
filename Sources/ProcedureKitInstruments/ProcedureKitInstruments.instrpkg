@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<package>
+	<id>run.kit.procedure.ProcedureKitInstruments</id>
+    <version>3</version>
+	<title>ProcedureKit Instruments</title>
+	<owner>
+		<name>The ProcedureKit Contributors</name>
+	</owner>
+
+    <os-signpost-interval-schema>
+        <id>procedurekit-signpost-schema</id>
+        <title>ProcedureKit</title>
+        <subsystem>"run.kit.procedure"</subsystem>
+        <category>"ProcedureKit"</category>
+
+        <name>?signpostName</name>
+
+        <start-pattern>
+            <message>"Procedure name: " ?procedureName</message>
+        </start-pattern>
+
+        <end-pattern>
+            <message>"Procedure name: " ?procedureName ", status: " ?status</message>
+        </end-pattern>
+
+        <duration-column>
+            <mnemonic>duration</mnemonic>
+            <title>Duration</title>
+            <type>duration</type>
+        </duration-column>
+
+        <column>
+            <mnemonic>signpost-name</mnemonic>
+            <title>Signpost</title>
+            <type>string</type>
+            <expression>?signpostName</expression>
+        </column>
+
+        <column>
+            <mnemonic>procedure-name</mnemonic>
+            <title>Procedure</title>
+            <type>string</type>
+            <expression>?procedureName</expression>
+        </column>
+
+        <column>
+            <mnemonic>status</mnemonic>
+            <title>Status</title>
+            <type>string</type>
+            <expression>?status</expression>
+        </column>
+
+    </os-signpost-interval-schema>
+
+    <instrument>
+        <id>procedurekit-signpost-instrument</id>
+        <title>ProcedureKit Signposts</title>
+        <category>Behavior</category>
+        <purpose>Shows when Procedure are running.</purpose>
+        <icon>Scheduling</icon>
+
+        <create-table>
+            <id>procedurekit-instrument-table</id>
+            <schema-ref>procedurekit-signpost-schema</schema-ref>
+        </create-table>
+
+        <!-- Define graph to draw for your Instrument (optional) -->
+        <graph>
+            <title>Procedure Life Cycle</title>
+            <lane>
+                <title>Procedure Life Cycle</title>
+                <table-ref>procedurekit-instrument-table</table-ref>
+
+                <!-- plot, plot-template or histogram elements -->
+                <plot>
+                    <value-from>procedure-name</value-from>
+                </plot>
+            </lane>
+        </graph>
+
+        <!-- Define at least one detail view for your Instrument -->
+        <list>
+            <title>Procedure Life Cycle</title>
+            <table-ref>procedurekit-instrument-table</table-ref>
+            <column>signpost-name</column>
+            <column>duration</column>
+            <column>procedure-name</column>
+            <column>status</column>
+        </list>
+
+    </instrument>
+
+</package>

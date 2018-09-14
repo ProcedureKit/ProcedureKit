@@ -4,8 +4,6 @@
 //  Copyright © 2015-2018 ProcedureKit. All rights reserved.
 //
 
-#if !swift(>=4.1)
-
 #if SWIFT_PACKAGE
     import ProcedureKit
     import Foundation
@@ -51,7 +49,7 @@ extension CKFetchRecordZoneChangesOperation: CKFetchRecordZoneChangesOperationPr
     public typealias AssociatedError = PKCKError
 
     /// The type of the CloudKit FetchRecordZoneChangesOptions
-    public typealias FetchRecordZoneChangesOptions = CKFetchRecordZoneChangesOptions
+    public typealias FetchRecordZoneChangesOptions = CKFetchRecordZoneChangesOperation.ZoneOptions
 }
 
 extension CKProcedure where T: CKFetchRecordZoneChangesOperationProtocol, T: AssociatedErrorProtocol, T.AssociatedError: CloudKitError {
@@ -96,7 +94,7 @@ extension CKProcedure where T: CKFetchRecordZoneChangesOperationProtocol, T: Ass
     func setFetchRecordZoneChangesCompletionBlock(_ block: @escaping CloudKitProcedure<T>.FetchRecordZoneChangesCompletionBlock) {
         operation.fetchRecordZoneChangesCompletionBlock = { [weak self] error in
             if let strongSelf = self, let error = error {
-                strongSelf.append(error: PKCKError(underlyingError: error))
+                strongSelf.setErrorOnce(PKCKError(underlyingError: error))
             }
             else {
                 block()
@@ -187,5 +185,3 @@ extension CloudKitProcedure where T: CKFetchRecordZoneChangesOperationProtocol {
         appendConfigureBlock { $0.setFetchRecordZoneChangesCompletionBlock(block) }
     }
 }
-
-#endif

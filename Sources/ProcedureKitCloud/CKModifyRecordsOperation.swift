@@ -4,8 +4,6 @@
 //  Copyright © 2015-2018 ProcedureKit. All rights reserved.
 //
 
-#if !swift(>=4.1)
-
 #if SWIFT_PACKAGE
     import ProcedureKit
     import Foundation
@@ -97,7 +95,7 @@ extension CKProcedure where T: CKModifyRecordsOperationProtocol, T: AssociatedEr
     func setModifyRecordsCompletionBlock(_ block: @escaping CloudKitProcedure<T>.ModifyRecordsCompletionBlock) {
         operation.modifyRecordsCompletionBlock = { [weak self] saved, deleted, error in
             if let strongSelf = self, let error = error {
-                strongSelf.append(error: ModifyRecordsError(underlyingError: error, saved: saved, deleted: deleted))
+                strongSelf.setErrorOnce(ModifyRecordsError(underlyingError: error, saved: saved, deleted: deleted))
             }
             else {
                 block(saved, deleted)
@@ -195,5 +193,3 @@ extension CloudKitProcedure where T: CKModifyRecordsOperationProtocol {
         appendConfigureBlock { $0.setModifyRecordsCompletionBlock(block) }
     }
 }
-
-#endif
