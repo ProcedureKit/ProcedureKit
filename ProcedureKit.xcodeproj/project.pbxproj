@@ -1868,7 +1868,7 @@
 				CLASSPREFIX = PCK;
 				DefaultBuildSystemTypeForWorkspace = Latest;
 				LastSwiftUpdateCheck = 0930;
-				LastUpgradeCheck = 0930;
+				LastUpgradeCheck = 1000;
 				ORGANIZATIONNAME = ProcedureKit;
 				TargetAttributes = {
 					653C9FC01D6097A40070B7A2 = {
@@ -4051,6 +4051,7 @@
 				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CODE_SIGN_IDENTITY = "";
+				SWIFT_COMPILATION_MODE = wholemodule;
 			};
 			name = Release;
 		};
@@ -4344,6 +4345,7 @@
 		65E5EB8620C9CAEC00C46965 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = YES;
 				CODE_SIGN_STYLE = Automatic;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Instruments/Packages";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -4354,6 +4356,7 @@
 		65E5EB8720C9CAEC00C46965 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = YES;
 				CODE_SIGN_STYLE = Automatic;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Instruments/Packages";
 				PRODUCT_NAME = "$(TARGET_NAME)";
