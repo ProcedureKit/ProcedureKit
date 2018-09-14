@@ -40,7 +40,7 @@ open class AlertProcedure: Procedure {
 
      - returns: the preferred style of the alert
      */
-    public var preferredStyle: UIAlertControllerStyle {
+    public var preferredStyle: UIAlertController.Style {
         return controller.preferredStyle
     }
 
@@ -137,7 +137,7 @@ open class AlertProcedure: Procedure {
     }
 
     @available(*, deprecated: 5.0.0, message: "Use init(title:message:style:from:waitForDismissal:) instead.")
-    public convenience init(presentAlertFrom presenting: PresentingViewController, withPreferredStyle preferredAlertStyle: UIAlertControllerStyle = .alert, waitForDismissal: Bool = true) {
+    public convenience init(presentAlertFrom presenting: PresentingViewController, withPreferredStyle preferredAlertStyle: UIAlertController.Style = .alert, waitForDismissal: Bool = true) {
         self.init(title: nil, message: nil, from: presenting, waitForDismissal: waitForDismissal)
     }
 
@@ -173,7 +173,7 @@ open class AlertProcedure: Procedure {
      - parameter style: a `UIAlertActionStyle` which defaults to `.default`.
      - parameter handler: a block which receives the operation, and returns Void.
      */
-    @discardableResult public func add(actionWithTitle title: String?, style: UIAlertActionStyle = .default, isPreferred: Bool = false, handler: @escaping (AlertProcedure, UIAlertAction) -> Void = { _, _ in }) -> UIAlertAction {
+    @discardableResult public func add(actionWithTitle title: String?, style: UIAlertAction.Style = .default, isPreferred: Bool = false, handler: @escaping (AlertProcedure, UIAlertAction) -> Void = { _, _ in }) -> UIAlertAction {
         let action = UIAlertAction(title: title, style: style) { [weak self] action in
             guard let this = self else { return }
             handler(this, action)

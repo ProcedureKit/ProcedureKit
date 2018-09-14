@@ -107,7 +107,7 @@ class BackgroundObserverTests: ProcedureKitTestCase {
 
     // MARK: Basic Functionality
 
-    #warning("Test crashes with an index out of bounds in TestableUIProcedure")
+    // TODO: @swiftlyfalling - These tests fail
     func x_test__background_observer_starts_and_ends_background_task() {
 
         let expectedBackgroundTaskName = BackgroundManager.backgroundTaskName(for: backgroundProcedure)
@@ -179,7 +179,7 @@ class BackgroundObserverTests: ProcedureKitTestCase {
 
     // MARK: Cancellation Behavior: .never
 
-    #warning("Test crashes with an index out of bounds in TestableUIProcedure")
+    // TODO: @swiftlyfalling - These tests fail
     func x_test__background_observer__never_cancel_procedure() {
 
         let expectedBackgroundTaskName = BackgroundManager.backgroundTaskName(for: backgroundProcedure)
@@ -304,7 +304,7 @@ class BackgroundObserverTests: ProcedureKitTestCase {
         XCTAssertTrue(receivedCancellationError is ProcedureKitError.AppWasBackgrounded)
     }
 
-    #warning("Test crashes with an index out of bounds in TestableUIProcedure")
+    // TODO: @swiftlyfalling - These tests fail
     func x_test__background_observer__cancel_when_app_is_backgrounded__app_is_active() {
 
         let expectedBackgroundTaskName = BackgroundManager.backgroundTaskName(for: backgroundProcedure)
