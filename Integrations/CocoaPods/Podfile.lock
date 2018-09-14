@@ -1,25 +1,25 @@
 PODS:
-  - ProcedureKit (5.0.0.beta.1):
-    - ProcedureKit/Standard (= 5.0.0.beta.1)
-  - ProcedureKit/All (5.0.0.beta.1):
+  - ProcedureKit (5.0.0-beta.1):
+    - ProcedureKit/Standard (= 5.0.0-beta.1)
+  - ProcedureKit/All (5.0.0-beta.1):
     - ProcedureKit/Cloud
     - ProcedureKit/CoreData
     - ProcedureKit/Location
     - ProcedureKit/Network
-  - ProcedureKit/Cloud (5.0.0.beta.1):
+  - ProcedureKit/Cloud (5.0.0-beta.1):
     - ProcedureKit/Standard
-  - ProcedureKit/CoreData (5.0.0.beta.1):
+  - ProcedureKit/CoreData (5.0.0-beta.1):
     - ProcedureKit/Standard
-  - ProcedureKit/Location (5.0.0.beta.1):
+  - ProcedureKit/Location (5.0.0-beta.1):
     - ProcedureKit/Standard
-  - ProcedureKit/Mobile (5.0.0.beta.1):
+  - ProcedureKit/Mobile (5.0.0-beta.1):
     - ProcedureKit/Standard
-  - ProcedureKit/Network (5.0.0.beta.1):
+  - ProcedureKit/Network (5.0.0-beta.1):
     - ProcedureKit/Standard
-  - ProcedureKit/Standard (5.0.0.beta.1)
-  - TestingProcedureKit (5.0.0.beta.1):
-    - TestingProcedureKit/Testing (= 5.0.0.beta.1)
-  - TestingProcedureKit/Testing (5.0.0.beta.1):
+  - ProcedureKit/Standard (5.0.0-beta.1)
+  - TestingProcedureKit (5.0.0-beta.1):
+    - TestingProcedureKit/Testing (= 5.0.0-beta.1)
+  - TestingProcedureKit/Testing (5.0.0-beta.1):
     - ProcedureKit
 
 DEPENDENCIES:
@@ -34,8 +34,8 @@ EXTERNAL SOURCES:
     :path: "../.."
 
 SPEC CHECKSUMS:
-  ProcedureKit: 5a3655c01ab01af55f1b95a0ae37e2ea8bce112c
-  TestingProcedureKit: 63fb516c0c025e53462961e41593e979a8f13334
+  ProcedureKit: 16af4d8fb51e52b10aff75ffaaeccba8db06d5fd
+  TestingProcedureKit: a95b8a96e977653dcd70aa9bd12b2fed658b5083
 
 PODFILE CHECKSUM: 26b080556a214485b05abef66f81f7be297d9efb
 
