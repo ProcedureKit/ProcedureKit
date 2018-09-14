@@ -17,10 +17,9 @@ Session video | [developer.apple.com](https://developer.apple.com/videos/wwdc/20
 Old but more complete reference documentation | [docs.danthorpe.me/operations](http://docs.danthorpe.me/operations/2.9.0/index.html)
 Updated but not yet complete reference docs | [procedure.kit.run/development](http://procedure.kit.run/development/index.html)
 Programming guide | [operations.readme.io](https://operations.readme.io)
-Example projects | [danthorpe/Examples](https://github.com/danthorpe/Examples)
 
 # Version 5 🚀
-The `development` branch, or the _bleeding edge_ is the current state of ProcedureKit v5 work. Handle with care - but migration issues are welcome! The focus for v5 is:
+The focus for v5 is:
 
   - [x] Swift 4.2 & Xcode 10 support (on `xcode/10.0/development` branch)
   - [ ] Documentation, guides & sample code (currently published to http://procedure.kit.run/development/)
@@ -29,6 +28,7 @@ The `development` branch, or the _bleeding edge_ is the current state of Procedu
   - [x] Simplified BlockProcedure API
   - [x] Simplified _ProcedureKitNetwork_ classes (this was done a while ago, the generic session has been removed)
 
+For Xcode 9.4, use `5.0.0-beta.1` which is a published pre-release. For Xcode 10 GM, use `5.0.0-beta.2`.
 
 ## Compatibility
 
