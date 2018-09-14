@@ -95,7 +95,7 @@ open class NetworkDataProcedure: Procedure, InputProcedure, OutputProcedure, Net
             strongSelf.finish(withResult: .success(http))
         }
 
-        log.notice(message: "Will make request: \(request)")
+        log.info.message("Will make request: \(request)")
         task?.resume()
     }
 }

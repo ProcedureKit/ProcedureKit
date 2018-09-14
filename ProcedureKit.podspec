@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name              = "ProcedureKit"
-  s.version           = "5.0.0.beta.1"
+  s.version           = "5.0.0-beta.1"
   s.summary           = "Advanced Operations in Swift."
   s.homepage          = "https://github.com/ProcedureKit/ProcedureKit"
   s.license           = 'MIT'
@@ -70,7 +70,7 @@ Pod::Spec.new do |s|
 
   # ProcedureKitMobile
   s.subspec 'Mobile' do |ss|
-    ss.platforms = { :ios => "8.0" }
+    ss.platforms = { :ios => "9.0" }
   	ss.dependency 'ProcedureKit/Standard'
   	ss.source_files = ['Sources/ProcedureKitMobile']
   end

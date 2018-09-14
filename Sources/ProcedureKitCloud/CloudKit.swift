@@ -19,9 +19,10 @@ public final class CKProcedure<T: Operation>: ComposedProcedure<T> where T: CKOp
 
     init(dispatchQueue: DispatchQueue? = nil, timeout: TimeInterval? = 30, operation: T) {
         super.init(dispatchQueue: dispatchQueue, operation: operation)
-        log.enabled = false
+        self.log.enabled = false
+        self.system.enabled = false
         if let observer = timeout.map({ TimeoutObserver(by: $0) }) {
-            add(observer: observer)
+            addObserver(observer)
         }
     }
 }
@@ -34,7 +35,7 @@ public final class CloudKitRecovery<T: Operation> where T: CKOperationProtocol, 
     public typealias ConfigureBlock = (WrappedOperation) -> Void
     public typealias Recovery = (Delay?, ConfigureBlock)
     public typealias Payload = RepeatProcedurePayload<WrappedOperation>
-    public typealias Handler = (T, T.AssociatedError, LoggerProtocol, Recovery) -> Recovery?
+    public typealias Handler = (T, T.AssociatedError, LogChannels, Recovery) -> Recovery?
 
     var defaultHandlers: [CKError.Code: Handler] = [:]
     var customHandlers: [CKError.Code: Handler] = [:]
@@ -76,7 +77,7 @@ public final class CloudKitRecovery<T: Operation> where T: CKOperationProtocol, 
     func addDefaultHandlers() {
 
         let exit: Handler = { _, error, log, _ in
-            log.fatal(message: "Exiting due to CloudKit Error: \(error)")
+            log.fatal.message("Exiting due to CloudKit Error: \(error)")
             return nil
         }
 
@@ -92,7 +93,7 @@ public final class CloudKitRecovery<T: Operation> where T: CKOperationProtocol, 
         set(defaultHandlerForCode: .operationCancelled, handler: exit)
 
         let retry: Handler = { _, error, log, suggestion in
-            log.info(message: "Will retry after receiving error: \(error)")
+            log.info.message("Will retry after receiving error: \(error)")
             return error.retryAfterDelay.map { ($0, suggestion.1) } ?? suggestion
         }
 

@@ -41,9 +41,9 @@ open class UserLocationProcedure: Procedure, OutputProcedure, CLLocationManagerD
         self.accuracy = accuracy
         self.completion = completion
         super.init()
-        add(condition: AuthorizedFor(capability))
-        add(condition: MutuallyExclusive<UserLocationProcedure>())
-        add(observer: TimeoutObserver(by: timeout))
+        addCondition(AuthorizedFor(capability))
+        addCondition(MutuallyExclusive<UserLocationProcedure>())
+        addObserver(TimeoutObserver(by: timeout))
         addDidCancelBlockObserver { [weak self] _, _ in
             DispatchQueue.main.async {
                 self?.stopLocationUpdates()
@@ -84,7 +84,7 @@ open class UserLocationProcedure: Procedure, OutputProcedure, CLLocationManagerD
             output = .ready(.success(location))
             return
         }
-        log.info(message: "Updated last location: \(location)")
+        log.info.message("Updated last location: \(location)")
         DispatchQueue.main.async { [weak self] in
             guard let strongSelf = self, !strongSelf.isFinished else { return }
             strongSelf.stopLocationUpdates()

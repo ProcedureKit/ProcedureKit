@@ -213,6 +213,16 @@ open class Procedure: Operation, ProcedureProtocol {
         }
     }
 
+    open override var name: String? {
+        didSet {
+            synchronise {
+                let formatter = Log.Formatters.makeProcedureLogFormatter(operationName: operationName)
+                protectedProperties.system.formatter = formatter
+                protectedProperties.log.formatter = formatter
+            }
+        }
+    }
+
     internal let identifier = UUID()
 
     internal var typeDescription: String {
@@ -245,7 +255,6 @@ open class Procedure: Operation, ProcedureProtocol {
     // the state variable to be used *within* the stateLock
     fileprivate var _state = ProcedureKit.State.initialized { // swiftlint:disable:this variable_name
         willSet(newState) {
-            _log.verbose(message: "\(_state) -> \(newState)")
             assert(_state.canTransition(to: newState, whenCancelled: _isCancelled), "Attempting to perform illegal cyclic state transition, \(_state) -> \(newState) for operation: \(identity). Ensure that Procedure instances are added to a ProcedureQueue not an OperationQueue.")
         }
     }
@@ -381,7 +390,8 @@ open class Procedure: Operation, ProcedureProtocol {
 
     // Grouped in a class to allow for easily deinitializing in `deinit`.
     fileprivate class ProtectedProperties {
-        var log: LoggerProtocol = Logger()
+        var log: ProcedureLog = Log.Channels<Log>()
+        var system: ProcedureLog = Log.Channels<Log>(writer: Log.Writers.system)
         var error: Error? = nil
         var observers = [AnyObserver<Procedure>]()
         var directDependencies = Set<Operation>()
@@ -393,14 +403,6 @@ open class Procedure: Operation, ProcedureProtocol {
     // the errors variable to be used *within* the stateLock
     private var _error: Error? {
         return protectedProperties.error
-    }
-
-    // the log variable to be used *within* the stateLock
-    private var _log: LoggerProtocol {
-        get {
-            let operationName = self.operationName
-            return LoggerContext(parent: protectedProperties.log, operationName: operationName)
-        }
     }
 
     // MARK: Errors
@@ -455,24 +457,20 @@ open class Procedure: Operation, ProcedureProtocol {
      ```
 
      */
-    final public var log: LoggerProtocol {
-        get {
-            let operationName = self.operationName
-            return synchronise { LoggerContext(parent: protectedProperties.log, operationName: operationName) }
-        }
-        set {
-            synchronise {
-                protectedProperties.log = newValue
-            }
-        }
+    final public var log: ProcedureLog {
+        get { return synchronise { protectedProperties.log } }
+        set { synchronise { protectedProperties.log = newValue } }
+    }
+
+    final public var system: ProcedureLog {
+        get { return synchronise { protectedProperties.system } }
+        set { synchronise { protectedProperties.system = newValue } }
     }
 
     // MARK: Observers
 
     final internal var observers: [AnyObserver<Procedure>] {
-        get {
-            return synchronise { protectedProperties.observers }
-        }
+        get { return synchronise { protectedProperties.observers } }
     }
 
     // MARK: Dependencies & Conditions
@@ -594,7 +592,7 @@ open class Procedure: Operation, ProcedureProtocol {
             // Add the direct dependencies of the procedure as direct dependencies of the evaluator
             // (to ensure that conditions are evaluated after all of the Procedure's dependencies)
             let directDependencies = protectedProperties.directDependencies
-            evaluator.add(dependencies: directDependencies)
+            evaluator.addDependencies(directDependencies)
 
             // Store the evaluator in the Procedure
             // (the Procedure maintains a strong reference to the EvaluateConditions operation)
@@ -732,7 +730,8 @@ open class Procedure: Operation, ProcedureProtocol {
 
         debugAssertIsOnEventQueue()
 
-        log.verbose(message: "[observers]: WillExecute")
+        system.verbose.trace()
+        system.verbose.message("[observers]: WillExecute")
 
         // Call the WillExecute observers
         let willExecuteObserversGroup = dispatchObservers(pendingEvent: PendingEvent.execute) { observer, pendingEvent in
@@ -804,7 +803,8 @@ open class Procedure: Operation, ProcedureProtocol {
             }
         }
 
-        log.verbose(message: "[event]: Continue Pending Execute")
+        system.verbose.trace()
+        system.verbose.message("[event]: Continue Pending Execute")
 
         // Determine the next Procedure state (prepare to set to executing, if possible)
         let nextState = getNextState()
@@ -834,7 +834,7 @@ open class Procedure: Operation, ProcedureProtocol {
 
         guard nextState2 == .executing else { return }
 
-        log.notice(message: "Will Execute")
+        system.verbose.message("Will Execute")
 
         // Call the execute() function (which should be overriden in Procedure subclasses)
         if let underlyingQueue = queue?.underlyingQueue {
@@ -872,19 +872,20 @@ open class Procedure: Operation, ProcedureProtocol {
         debugAssertIsOnEventQueue()
 
         // Dispatch DidExecute observers
-        log.verbose(message: "[observers]: DidExecute")
+        system.verbose.trace()
+        system.verbose.message("[observers]: DidExecute")
         _ = dispatchObservers(pendingEvent: PendingEvent.postDidExecute) { observer, _ in
             observer.did(execute: self)
         }
 
         // Log that execute() has returned
-        log.notice(message: "Did Execute")
+        system.info.message("Did Execute")
     }
 
     /// Procedure subclasses must override `execute()`.
     /// - important: Do not call `super.execute()` when subclassing `Procedure` directly.
     open func execute() {
-        print("\(self) must override `execute()`.")
+        log.warning.message("\(self) must override `execute()`.")
         finish()
     }
 
@@ -904,7 +905,8 @@ open class Procedure: Operation, ProcedureProtocol {
 
         let promise = ProcedurePromise()
 
-        log.notice(message: ".produce() | Will add \(operation.operationName)")
+        system.verbose.trace()
+        system.verbose.message(".produce() | Will add \(operation.operationName)")
 
         // Dispatch the innards of produce() onto the EventQueue
         dispatchEvent {
@@ -917,7 +919,8 @@ open class Procedure: Operation, ProcedureProtocol {
     private func _produce(operation: Operation, onQueue queue: ProcedureQueue, before pendingEvent: PendingEvent? = nil, promise: ProcedurePromise) {
         debugAssertIsOnEventQueue()
 
-        log.verbose(message: ".produce() | [observers]: WillAddOperation(\(operation.operationName))")
+        system.verbose.trace()
+        system.verbose.message(".produce() | [observers]: WillAddOperation(\(operation.operationName))")
 
         // Dispatch WillAddOperation observers
         let willAddObserversGroup = dispatchObservers(pendingEvent: PendingEvent.addOperation) { observer, _ in
@@ -934,10 +937,11 @@ open class Procedure: Operation, ProcedureProtocol {
     private func _produce_step2(operation: Operation, onQueue queue: ProcedureQueue, before pendingEvent: PendingEvent? = nil, promise: ProcedurePromise) {
         debugAssertIsOnEventQueue()
 
-        log.verbose(message: ".produce() | [event]: AddOperation(\(operation.operationName)) to queue.")
+        system.verbose.trace()
+        system.verbose.message(".produce() | [event]: AddOperation(\(operation.operationName)) to queue.")
 
         // Add the new produced operation to the ProcedureQueue on which this Procedure was added
-        queue.add(operation: operation, withContext: queueAddContext).then(on: self) {
+        queue.addOperation(operation, withContext: queueAddContext).then(on: self) {
 
             // After adding to the queue completes, proceed to step 3 of handling produce()
             self._produce_step3(operation: operation, onQueue: queue, before: pendingEvent, promise: promise)
@@ -946,16 +950,18 @@ open class Procedure: Operation, ProcedureProtocol {
 
     private func _produce_step3(operation: Operation, onQueue queue: ProcedureQueue, before pendingEvent: PendingEvent? = nil, promise: ProcedurePromise) {
 
+        system.verbose.trace()
+
         if let pendingEvent = pendingEvent {
             // Ensure that the PendingEvent occurs sometime after this point
             pendingEvent.doBeforeEvent {
-                log.verbose(message: "ProcedureQueue.add(\(operation.operationName)) called prior to (\(pendingEvent)).")
+                system.verbose.message("ProcedureQueue.add(\(operation.operationName)) called prior to (\(pendingEvent)).")
             }
         }
 
-        log.notice(message: ".produce() | Did add \(operation.operationName)")
+        system.info.message(".produce() | Did add \(operation.operationName)")
 
-        log.verbose(message: ".produce() | [observers]: DidAddOperation(\(operation.operationName))")
+        system.verbose.message(".produce() | [observers]: DidAddOperation(\(operation.operationName))")
 
         // Complete the promise, since the produced operation has been added to the queue
         promise.complete()
@@ -1030,6 +1036,8 @@ open class Procedure: Operation, ProcedureProtocol {
 
     private final func _cancel(with error: Error?, promise: ProcedurePromise? = nil) {
 
+        system.verbose.trace()
+
         let shouldCancel = self.shouldCancel
 
         guard shouldCancel == .shouldCancel else {
@@ -1049,10 +1057,10 @@ open class Procedure: Operation, ProcedureProtocol {
         }
 
         if let error = resultingError {
-            log.notice(message: "Will cancel with error: \(error).")
+            system.verbose.message("Will cancel with error: \(error).")
         }
         else {
-            log.notice(message: "Will cancel with no error.")
+            system.verbose.message("Will cancel without error.")
         }
 
         didChangeValue(forKey: .cancelled)
@@ -1079,7 +1087,7 @@ open class Procedure: Operation, ProcedureProtocol {
             self.procedureDidCancel(with: resultingError)
 
             // DidCancel observers
-            self.log.verbose(message: "[observers]: DidCancel")
+            self.system.verbose.message("[observers]: DidCancel")
             let didCancelObserversGroup = self.dispatchObservers(pendingEvent: PendingEvent.postDidCancel) { observer, _ in
                 observer.did(cancel: self, with: resultingError)
             }
@@ -1123,7 +1131,6 @@ open class Procedure: Operation, ProcedureProtocol {
      - parameter errors: an array of `Error`, which defaults to empty.
      */
     public func finish(with error: Error? = nil) {
-        log.verbose(message: "finish() called")
         finish(with: error, from: .finish)
     }
 
@@ -1193,8 +1200,10 @@ open class Procedure: Operation, ProcedureProtocol {
 
     private final func finish(with receivedError: Error?, from source: ProcedureKit.FinishingFrom) {
 
+        system.verbose.trace()
+
         guard let finishingInfo = shouldFinish(with: receivedError, from: source) else {
-            log.verbose(message: "An earlier call to finish \((isFinished) ? "has already succeeded." : "is pending. The Procedure will finish from the first call.") This call will have no effect: finish(with: \(receivedError.debugDescription)")
+            system.verbose.message("An earlier call to finish \((isFinished) ? "has already succeeded." : "is pending. The Procedure will finish from the first call.") This call will have no effect: finish(with: \(receivedError.debugDescription)")
             return
         }
 
@@ -1211,6 +1220,8 @@ open class Procedure: Operation, ProcedureProtocol {
 
         debugAssertIsOnEventQueue()
         debugSynchronizedAssertIsExecuting()
+
+        system.verbose.trace()
 
         // Obtain a local strong reference to the Procedure queue
         guard let strongProcedureQueue = procedureQueue else {
@@ -1248,10 +1259,10 @@ open class Procedure: Operation, ProcedureProtocol {
         }
 
         if let error = resultingError {
-            log.notice(message: "Will finish with error: \(error).")
+            system.verbose.message("Will finish with error: \(error).")
         }
         else {
-            log.notice(message: "Will finish with no errors.")
+            system.verbose.message("Will finish with no errors.")
         }
 
         procedureWillFinish(with: resultingError)
@@ -1263,7 +1274,7 @@ open class Procedure: Operation, ProcedureProtocol {
         optimizedDispatchEventNotify(group: willFinishObserversGroup) {
             // Once all the WillFinishObservers have completed, continue processing finish
 
-            self.log.verbose(message: "[event]: Resuming pending finish")
+            self.system.verbose.message("[event]: Resuming pending finish")
 
             // Change the state to .finished and signal `isFinished` KVO.
             //
@@ -1304,10 +1315,10 @@ open class Procedure: Operation, ProcedureProtocol {
                 // Once all the DidFinishObservers have completed, log a final notice
 
                 if let error = resultingError {
-                    self.log.notice(message: "Did finish with error: \(error).")
+                    self.system.warning.message("Did finish with error: \(error).")
                 }
                 else {
-                    self.log.notice(message: "Did finish with no errors.")
+                    self.system.info.message("Did finish without errors.")
                 }
             }
         }
@@ -1320,14 +1331,14 @@ open class Procedure: Operation, ProcedureProtocol {
 
      - parameter observer: type conforming to protocol `ProcedureObserver`.
      */
-    open func add<Observer>(observer: Observer) where Observer: ProcedureObserver, Observer.Procedure: Procedure {
+    open func addObserver<Observer>(_ observer: Observer) where Observer: ProcedureObserver, Observer.Procedure: Procedure {
         assert(self as? Observer.Procedure != nil, "add(observer:) passed an Observer with an invalid expected Procedure type. The Observer will not receive any events from this Procedure. (Observer expects a Procedure of type \"\(String(describing: Observer.Procedure.self))\", but `self` is a \"\(typeDescription)\" and cannot be converted.)")
 
-        add(anyObserver: AnyObserver(base: TransformObserver<Observer.Procedure, Procedure>(base: observer)))
+        addAnyObserver(AnyObserver(base: TransformObserver<Observer.Procedure, Procedure>(base: observer)))
     }
 
     // Internal function used to add AnyObserver<Procedure> to the Procedure's internal array of observers.
-    internal func add(anyObserver observer: AnyObserver<Procedure>) {
+    internal func addAnyObserver(_ observer: AnyObserver<Procedure>) {
         debugSynchronizedAssertIsPending("Adding observers to a Procedure after it has been added to a queue is an inherent race condition, and risks missing events.")
 
         dispatchEvent {
@@ -1427,12 +1438,12 @@ open class Procedure: Operation, ProcedureProtocol {
 
 public extension Procedure {
 
-    public final func add<Dependency: ProcedureProtocol>(dependency: Dependency) {
+    public final func addDependency<Dependency: ProcedureProtocol>(_ dependency: Dependency) {
         guard let op = dependency as? Operation else {
             assertionFailure("Adding dependencies which do not subclass Foundation.Operation is not supported.")
             return
         }
-        add(dependency: op)
+        addDependency(op)
     }
 }
 
@@ -1637,14 +1648,14 @@ extension Procedure {
                     break
                 case .success(false):
                     // One or more conditions failed (with an ignored error)
-                    procedure.log.verbose(message: "Condition(s) failed.")
+                    procedure.system.verbose.message("Condition(s) failed.")
                     // Cancel the Procedure without errors
                     procedure.cancel()
                     // Finish this EvaluateConditions operation immediately
                     self.finish()
                     return
                 case let .failure(error):
-                    procedure.log.verbose(message: "Condition(s) failed with errors: \(error).")
+                    procedure.system.verbose.message("Condition(s) failed with error: \(error).")
                     procedure.cancel(with: error)
                     // Finish this EvaluateConditions operation immediately
                     self.finish()
@@ -1687,7 +1698,7 @@ extension Procedure {
         }
     }
 
-    func add(directDependency: Operation) {
+    func addDirectDependency(_ directDependency: Operation) {
         precondition(state < .started, "Dependencies cannot be modified after a Procedure has started, current state: \(state).")
         stateLock.withCriticalScope { () -> Void in
             protectedProperties.directDependencies.insert(directDependency)
@@ -1695,19 +1706,19 @@ extension Procedure {
             // occurs inside the stateLock to prevent any double-adds of dependencies
             // to the EvaluateConditions operation
             assert(!((_evaluateConditionsProcedure?.isExecuting ?? false) || (_evaluateConditionsProcedure?.isFinished ?? false)), "Conditions are already being evaluated (or have already finished being evaluated). It is too late to add a dependency and have it properly affect the Procedure. Instead, consider adding dependencies before adding the Procedure to a queue, or adding dependencies before all other existing dependencies have finished (for example: from a WillFinish observer on a dependency).")
-            _evaluateConditionsProcedure?.add(dependency: directDependency)
+            _evaluateConditionsProcedure?.addDependency(directDependency)
         }
         super.addDependency(directDependency)
     }
 
-    func remove(directDependency: Operation) {
+    func removeDirectDependency(_ directDependency: Operation) {
         precondition(state < .started, "Dependencies cannot be modified after a Procedure has started, current state: \(state).")
         stateLock.withCriticalScope { () -> Void in
             protectedProperties.directDependencies.remove(directDependency)
 
             // occurs inside the stateLock to ensure that every removed dependency is
             // removed from the EvaluateConditions operation
-            _evaluateConditionsProcedure?.remove(dependency: directDependency)
+            _evaluateConditionsProcedure?.removeDependency(directDependency)
         }
         super.removeDependency(directDependency)
     }
@@ -1727,7 +1738,7 @@ extension Procedure {
      */
     public final override func addDependency(_ operation: Operation) {
         precondition(state < .started, "Dependencies cannot be modified after a Procedure has started, current state: \(state).")
-        add(directDependency: operation)
+        addDirectDependency(operation)
     }
 
     /**
@@ -1742,7 +1753,7 @@ extension Procedure {
      */
     public final override func removeDependency(_ operation: Operation) {
         precondition(state < .started, "Dependencies cannot be modified after a Procedure has started, current state: \(state).")
-        remove(directDependency: operation)
+        removeDirectDependency(operation)
     }
 
     /**
@@ -1752,7 +1763,7 @@ extension Procedure {
 
      - parameter condition: a `Condition` which must be satisfied for the procedure to be executed.
      */
-    public final func add(condition: Condition) {
+    public final func addCondition(_ condition: Condition) {
         assert(state < .willEnqueue, "Cannot modify conditions after a Procedure has been added to a queue, current state: \(state).")
         synchronise { () -> Void in
             protectedProperties.conditions.insert(condition)
@@ -1785,6 +1796,41 @@ internal extension Procedure {
             }
         }
         #endif
+    }
+}
+
+// MARK: - Deprecations
+
+public extension Procedure {
+
+    @available(*, deprecated, renamed: "addObserver(_:)", message: "This has been renamed to use Swift 3/4 naming conventions")
+    func add<Observer>(observer: Observer) where Observer: ProcedureObserver, Observer.Procedure: Procedure {
+        addObserver(observer)
+    }
+
+    @available(*, deprecated, renamed: "addObserver(_:)", message: "This has been renamed to use Swift 3/4 naming conventions")
+    internal func add(anyObserver observer: AnyObserver<Procedure>) {
+        addAnyObserver(observer)
+    }
+
+    @available(*, deprecated, renamed: "addDependency(_:)", message: "This has been renamed to use Swift 3/4 naming conventions")
+    public final func add<Dependency: ProcedureProtocol>(dependency: Dependency) {
+        addDependency(dependency)
+    }
+
+    @available(*, deprecated, renamed: "addDirectDependency(_:)", message: "This has been renamed to use Swift 3/4 naming conventions")
+    func add(directDependency: Operation) {
+        addDirectDependency(directDependency)
+    }
+
+    @available(*, deprecated, renamed: "removeDirectDependency(_:)", message: "This has been renamed to use Swift 3/4 naming conventions")
+    func remove(directDependency: Operation) {
+        removeDirectDependency(directDependency)
+    }
+
+    @available(*, deprecated, renamed: "addCondition(_:)", message: "This has been renamed to use Swift 3/4 naming conventions")
+    public final func add(condition: Condition) {
+        addCondition(condition)
     }
 }
 

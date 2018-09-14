@@ -17,7 +17,7 @@ class DataProcessing: Procedure, InputProcedure, OutputProcedure {
             finish(with: ProcedureKitError.requirementNotSatisfied())
             return
         }
-        log.info(message: output)
+        log.info.message(output)
         finish()
     }
 }
@@ -28,7 +28,7 @@ class Printing: Procedure, InputProcedure, OutputProcedure {
 
     override func execute() {
         if let message = input.value {
-            log.info(message: message)
+            log.info.message(message)
         }
         finish()
     }
@@ -166,7 +166,7 @@ class ResultInjectionTests: ResultInjectionTestCase {
         let world = TransformProcedure<String, String> { "\($0) World" }.injectResult(from: hello)
         let dan = TransformProcedure<String, String> { "\($0) Dan" }
         world.bind(to: dan) // Binds the same input to another procedure
-        dan.add(dependency: world) // note that bind does not setup any dependencies.
+        dan.addDependency(world) // note that bind does not setup any dependencies.
 
         wait(for: hello, world, dan)
         PKAssertProcedureFinished(hello)

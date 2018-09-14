@@ -86,7 +86,7 @@ class QueueDelegateTests: ProcedureKitTestCase {
 
         expectQueueDelegateDidFinishFor(operations: [operation], procedures: [finishedProcedure])
 
-        queue.add(operations: [operation, finishedProcedure]).then(on: DispatchQueue.main) {
+        queue.addOperations([operation, finishedProcedure]).then(on: DispatchQueue.main) {
             expAddFinished?.fulfill()
         }
         waitForExpectations(timeout: 3)
@@ -103,7 +103,7 @@ class QueueDelegateTests: ProcedureKitTestCase {
 
         expectQueueDelegateDidFinishFor(procedures: [procedure])
 
-        queue.add(operation: procedure).then(on: DispatchQueue.main) {
+        queue.addOperation(procedure).then(on: DispatchQueue.main) {
             expAddFinished?.fulfill()
         }
         waitForExpectations(timeout: 3)
@@ -289,7 +289,7 @@ class ExecutionTests: ProcedureKitTestCase {
         }
 
         addCompletionBlockTo(procedure: procedure)
-        procedureQueue.add(operation: procedure)
+        procedureQueue.addOperation(procedure)
         waitForExpectations(timeout: 3)
 
         XCTAssertTrue(didExecuteOnDesiredQueue.access, "execute() did not execute on the desired underlyingQueue")
@@ -389,6 +389,8 @@ class ProcedureTests: ProcedureKitTestCase {
 
         let group = GroupProcedure(operations: [])
         XCTAssertEqual(group.name, "GroupProcedure")
+
+        wait(for: group)
     }
 
     func test__identity_is_equatable() {
@@ -560,7 +562,6 @@ class ProduceTests: ProcedureKitTestCase {
     }
 
     func test__procedure_produce_operation_before_finish() {
-        LogManager.severity = .verbose
         let producedOperation = BlockProcedure { usleep(5000) }
         producedOperation.name = "ProducedOperation"
         let procedure = EventConcurrencyTrackingProcedure() { procedure in
@@ -630,7 +631,7 @@ class ObserverEventQueueTests: ProcedureKitTestCase {
         let procedure = EventConcurrencyTrackingProcedure(name: "TestingProcedure") { procedure in
             procedure.finish()
         }
-        procedure.add(observer: observer)
+        procedure.addObserver(observer)
         procedure.addDidFinishBlockObserver { _, _ in
             didFinishGroup.leave()
         }
@@ -667,7 +668,7 @@ class ObserverEventQueueTests: ProcedureKitTestCase {
         let registrar = EventConcurrencyTrackingRegistrar()
         // NOTE: Don't do this. This is just for testing.
         let observer = ConcurrencyTrackingObserver(registrar: registrar, eventQueue: procedure.eventQueue)
-        procedure.add(observer: observer)
+        procedure.addObserver(observer)
 
         let finishing = BlockProcedure { }
         finishing.addDependency(procedure)

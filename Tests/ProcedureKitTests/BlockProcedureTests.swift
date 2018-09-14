@@ -10,9 +10,21 @@ import TestingProcedureKit
 
 class BlockProcedureTests: ProcedureKitTestCase {
 
-    func test__block_executes() {
+    func test__void_block_procedure() {
         var blockDidExecute = false
         let block = BlockProcedure { blockDidExecute = true }
+        wait(for: block)
+        XCTAssertTrue(blockDidExecute)
+        PKAssertProcedureFinished(block)
+    }
+
+    func test__self_block_procedure() {
+        var blockDidExecute = false
+        let block = BlockProcedure { (procedure) in
+            blockDidExecute = true
+            procedure.log.debug.message("Hello world")
+            procedure.finish()
+        }
         wait(for: block)
         XCTAssertTrue(blockDidExecute)
         PKAssertProcedureFinished(block)
@@ -112,3 +124,46 @@ class AsyncBlockProcedureTests: ProcedureKitTestCase {
     }
 }
 
+class UIBlockProcedureTests: ProcedureKitTestCase {
+
+    func test__block_executes() {
+        var blockDidExecute = false
+        let block = UIBlockProcedure {
+            blockDidExecute = true
+        }
+        wait(for: block)
+        XCTAssertTrue(blockDidExecute)
+        PKAssertProcedureFinished(block)
+    }
+
+    func test__block_executes_on_main_queue() {
+        var blockDidExecuteOnMainQueue = false
+        let block = UIBlockProcedure {
+            blockDidExecuteOnMainQueue = DispatchQueue.isMainDispatchQueue
+        }
+        wait(for: block)
+        XCTAssertTrue(blockDidExecuteOnMainQueue)
+        PKAssertProcedureFinished(block)
+    }
+
+    func test__didFinishObserversCalled() {
+        var blockDidExecute = false
+        var observerDidExecute = false
+        let block = UIBlockProcedure {
+            blockDidExecute = true
+        }
+        block.addDidFinishBlockObserver { (_, error) in
+            observerDidExecute = true
+        }
+        var dependencyDidExecute = false
+        let dep = BlockProcedure {
+            dependencyDidExecute = true
+        }
+        wait(for: block, dep)
+        XCTAssertTrue(blockDidExecute)
+        XCTAssertTrue(observerDidExecute)
+        XCTAssertTrue(dependencyDidExecute)
+        PKAssertProcedureFinished(block)
+        PKAssertProcedureFinished(dep)
+    }
+}

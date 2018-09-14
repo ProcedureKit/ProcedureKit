@@ -26,7 +26,7 @@ final class SaveManagedObjectContextProcedureTests: ProcedureKitCoreDataTestCase
 
         let save = SaveManagedObjectContext().injectResult(from: insert)
 
-        fetchTestEntities.add(dependency: save)
+        fetchTestEntities.addDependency(save)
 
         wait(for: coreDataStack, insert, save, fetchTestEntities)
 

@@ -34,7 +34,7 @@ class NetworkReachabilityWaitProcedureTests: ProcedureKitTestCase {
         let makeNetworkReachable = BlockProcedure {
             self.network.flags = .reachable
         }
-        makeNetworkReachable.add(dependency: delay)
+        makeNetworkReachable.addDependency(delay)
 
         wait(forAll: [delay, makeNetworkReachable, procedure])
         PKAssertProcedureFinished(procedure)
@@ -49,13 +49,13 @@ class NetworkReachabilityWaitProcedureTests: ProcedureKitTestCase {
         let changeNetwork1 = BlockProcedure {
             self.network.flags = [ .reachable, .isWWAN ]
         }
-        changeNetwork1.add(dependency: delay1)
+        changeNetwork1.addDependency(delay1)
 
         let delay2 = DelayProcedure(by: 0.2)
         let changeNetwork2 = BlockProcedure {
             self.network.flags = .reachable
         }
-        changeNetwork2.add(dependency: delay2)
+        changeNetwork2.addDependency(delay2)
 
 
         wait(forAll: [delay1, changeNetwork1, delay2, changeNetwork2, procedure])
@@ -111,9 +111,9 @@ class NetworkProcedureTests: ProcedureKitTestCase {
         network.flags = .connectionRequired
         let delay = DelayProcedure(by: 0.1)
         let makeSessionSuccessful = BlockProcedure { self.session.returnedError = nil }
-        makeSessionSuccessful.add(dependency: delay)
+        makeSessionSuccessful.addDependency(delay)
         let makeNetworkReachable = BlockProcedure { self.network.flags = .reachable }
-        makeNetworkReachable.add(dependency: makeSessionSuccessful)
+        makeNetworkReachable.addDependency(makeSessionSuccessful)
 
         let procedure = NetworkProcedure<Target>(resilience: resilience, body: createNetworkProcedure)
         procedure.reachability = manager
@@ -129,7 +129,7 @@ class NetworkProcedureTests: ProcedureKitTestCase {
 
         let delay = DelayProcedure(by: 0.1)
         let makeSessionSuccessful = BlockProcedure { self.session.returnedError = nil }
-        makeSessionSuccessful.add(dependency: delay)
+        makeSessionSuccessful.addDependency(delay)
 
         let procedure = NetworkProcedure<Target>(resilience: resilience, body: createNetworkProcedure)
         procedure.reachability = manager
@@ -144,10 +144,9 @@ class NetworkProcedureTests: ProcedureKitTestCase {
 
         let delay = DelayProcedure(by: 0.1)
         let makeSessionSuccessful = BlockProcedure { self.session.returnedResponse = HTTPURLResponse(url: self.url, statusCode: 200, httpVersion: nil, headerFields: nil) }
-        makeSessionSuccessful.add(dependency: delay)
+        makeSessionSuccessful.addDependency(delay)
 
         let procedure = NetworkProcedure<Target>(resilience: resilience, body: createNetworkProcedure)
-        procedure.log.severity = .notice
         procedure.reachability = manager
 
         wait(forAll: [procedure, delay, makeSessionSuccessful], withTimeout: 4)
@@ -160,10 +159,9 @@ class NetworkProcedureTests: ProcedureKitTestCase {
 
         let delay = DelayProcedure(by: 0.1)
         let makeSessionSuccessful = BlockProcedure { self.session.returnedResponse = HTTPURLResponse(url: self.url, statusCode: 200, httpVersion: nil, headerFields: nil) }
-        makeSessionSuccessful.add(dependency: delay)
+        makeSessionSuccessful.addDependency(delay)
 
         let procedure = NetworkProcedure<Target>(resilience: resilience, body: createNetworkProcedure)
-        procedure.log.severity = .notice
         procedure.reachability = manager
 
         wait(forAll: [procedure, delay, makeSessionSuccessful], withTimeout: 4)

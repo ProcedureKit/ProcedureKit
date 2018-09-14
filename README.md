@@ -25,8 +25,8 @@ The `development` branch, or the _bleeding edge_ is the current state of Procedu
   - [x] Swift 4.2 & Xcode 10 support (on `xcode/10.0/development` branch)
   - [ ] Documentation, guides & sample code (currently published to http://procedure.kit.run/development/)
   - [x] Errors & easier error handling (breaking changes on `development` branch)
-  - [ ] Improved debugging & logging
-  - [ ] Simplified BlockProcedure API
+  - [x] Improved debugging & logging
+  - [x] Simplified BlockProcedure API
   - [x] Simplified _ProcedureKitNetwork_ classes (this was done a while ago, the generic session has been removed)
 
 

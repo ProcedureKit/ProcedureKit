@@ -1,4 +1,4 @@
-    //
+//
 //  ProcedureKit
 //
 //  Copyright © 2015-2018 ProcedureKit. All rights reserved.
@@ -162,7 +162,7 @@ open class GroupProcedure: Procedure {
         // Add the initial children to the Group's internal queue.
         // (This is delayed until execute to allow WillAdd/DidAdd observers set on the Group, post-init (but pre-execute),
         // to receive the initial children.)
-        add(additional: initialChildren, toOperationsArray: false, alreadyOnEventQueue: true)
+        addAdditionalChildren(initialChildren, toOperationsArray: false, alreadyOnEventQueue: true)
 
         // Add the CanFinishGroup (which is used to provide concurrency-safety for adding children post-execute).
         add(canFinishGroup: groupCanFinish)
@@ -298,7 +298,7 @@ public extension GroupProcedure {
         }
         set {
             groupStateLock.withCriticalScope {
-                log.verbose(message: "isSuspended = \(newValue), (old value: \(_groupIsSuspended))")
+                system.verbose.message("isSuspended = \(newValue), (old value: \(_groupIsSuspended))")
                 _groupIsSuspended = newValue
                 queue.isSuspended = newValue
             }
@@ -314,28 +314,31 @@ public extension GroupProcedure {
      Add a single child Operation instance to the group
      - parameter child: an Operation instance
     */
-    final func add(child: Operation, before pendingEvent: PendingEvent? = nil) {
-        add(children: child, before: pendingEvent)
+    final func addChild(_ child: Operation, before pendingEvent: PendingEvent? = nil) {
+        addChildren(child, before: pendingEvent)
     }
 
     /**
      Add children Operation instances to the group
      - parameter children: a variable number of Operation instances
      */
-    final func add(children: Operation..., before pendingEvent: PendingEvent? = nil) {
-        add(children: children, before: pendingEvent)
+    final func addChildren(_ children: Operation..., before pendingEvent: PendingEvent? = nil) {
+        addChildren(children, before: pendingEvent)
     }
 
     /**
      Add a sequence of Operation instances to the group
      - parameter children: a sequence of Operation instances
      */
-    final func add<Children: Collection>(children: Children, before pendingEvent: PendingEvent? = nil) where Children.Iterator.Element: Operation {
-        add(additional: children, toOperationsArray: true, before: pendingEvent)
+    final func addChildren<Children: Collection>(_ children: Children, before pendingEvent: PendingEvent? = nil) where Children.Iterator.Element: Operation {
+        addAdditionalChildren(children, toOperationsArray: true, before: pendingEvent)
     }
 
     private func shouldAdd<Additional: Collection>(additional: Additional, toOperationsArray shouldAddToProperty: Bool) -> Bool where Additional.Iterator.Element: Operation {
         return groupStateLock.withCriticalScope {
+
+            system.verbose.trace()
+
             guard !_groupIsFinishing else {
                 assertionFailure("Cannot add new operations to a group after the group has started to finish.")
                 return false
@@ -345,7 +348,7 @@ public extension GroupProcedure {
             assert(additional.filter({ if let procedure = $0 as? Procedure { return procedure.isEnqueued } else { return false } }).isEmpty, "Cannot add Procedures to a GroupProcedure that have already been added to another queue / GroupProcedure: \(additional.filter({ if let procedure = $0 as? Procedure { return procedure.isEnqueued } else { return false } }))")
 
             // Add the new children as a dependencies of the internal GroupCanFinish operation
-            groupCanFinish.add(dependencies: additional)
+            groupCanFinish.addDependencies(additional)
 
             // Add the new children to the Group's internal `children` array
             if shouldAddToProperty {
@@ -360,7 +363,7 @@ public extension GroupProcedure {
     /**
      Adds one or more operations to the Group.
     */
-    final fileprivate func add<Additional: Collection>(additional: Additional, toOperationsArray shouldAddToProperty: Bool, before pendingEvent: PendingEvent? = nil, alreadyOnEventQueue: Bool = false) where Additional.Iterator.Element: Operation {
+    final fileprivate func addAdditionalChildren<Additional: Collection>(_ additional: Additional, toOperationsArray shouldAddToProperty: Bool, before pendingEvent: PendingEvent? = nil, alreadyOnEventQueue: Bool = false) where Additional.Iterator.Element: Operation {
 
         // Exit early if there are no children in the collection
         guard !additional.isEmpty else { return }
@@ -373,7 +376,8 @@ public extension GroupProcedure {
             return
         }
 
-        log.verbose(message: "is adding \(additional.count) child operations to the queue.")
+        system.verbose.trace()
+        system.verbose.message("is adding \(additional.count) child operations to the queue.")
 
         // If the Group is cancelled, cancel the additional operations
         if isCancelled {
@@ -394,6 +398,8 @@ public extension GroupProcedure {
 
         eventQueue.debugAssertIsOnQueue()
 
+        system.verbose.trace()
+
         // groupWillAdd(child:) override
         additional.forEach { self.groupWillAdd(child: $0) }
 
@@ -407,11 +413,11 @@ public extension GroupProcedure {
         optimizedDispatchEventNotify(group: willAddObserversGroup) {
 
             // Add to queue
-            self.queue.add(operations: additional, withContext: self.queueAddContext).then(on: self) {
+            self.queue.addOperations(additional, withContext: self.queueAddContext).then(on: self) {
 
                 if let pendingEvent = pendingEvent {
                     pendingEvent.doBeforeEvent {
-                        self.log.verbose(message: "Children (\(additional)) added prior to (\(pendingEvent)).")
+                        self.system.verbose.message("Children (\(additional)) added prior to (\(pendingEvent)).")
                     }
                 }
 
@@ -423,7 +429,7 @@ public extension GroupProcedure {
                 }
 
                 self.optimizedDispatchEventNotify(group: didAddObserversGroup) {
-                    self.log.verbose(message: "finished adding child operations to the queue.")
+                    self.system.verbose.message("finished adding child operations to the queue.")
                 }
             }
         }
@@ -489,7 +495,7 @@ internal extension GroupProcedure {
 
                 transformChildError(procedure, &childError)
 
-                strongGroup.log.verbose(message: "Child error for <\(procedure.operationName)> was transformed.")
+                strongGroup.system.verbose.message("Child error for <\(procedure.operationName)> was transformed.")
             }
             return promise.future
         }
@@ -627,8 +633,8 @@ fileprivate extension GroupProcedure {
         func execute() {
 
             if let group = group {
-
-                group.log.verbose(message: "executing can finish group operation.")
+                group.system.verbose.trace()
+                group.system.verbose.message("executing can finish group operation.")
 
                 // All operations that were added as a side-effect of anything up to
                 // WillFinishObservers of prior operations should have been executed.
@@ -652,7 +658,7 @@ fileprivate extension GroupProcedure {
                         // Children were added after this CanFinishOperation became
                         // ready, but before it executed or before the lock could be acquired.
 
-                        group.log.verbose(message: "cannot finish now, as there are children still active.")
+                        group.system.verbose.message("cannot finish now, as there are children still active.")
 
                         // The GroupProcedure should wait for these children to finish
                         // before finishing. Add the oustanding children as
@@ -667,7 +673,7 @@ fileprivate extension GroupProcedure {
                         // There are no additional children to handle.
                         // Ensure that no new operations can be added.
 
-                        group.log.verbose(message: "can now finish.")
+                        group.system.verbose.message("can now finish.")
 
                         group._groupIsFinishing = true
 
@@ -683,7 +689,7 @@ fileprivate extension GroupProcedure {
                     // add the new children as dependencies to the newCanFinishGroup,
                     // (which is already set as the `group.groupCanFinish` inside the lock
                     // above) and then add the newCanFinishGroup to the group's internal queue
-                    newCanFinishGroup.add(dependencies: newChildrenToWaitOn)
+                    newCanFinishGroup.addDependencies(newChildrenToWaitOn)
                     group.add(canFinishGroup: newCanFinishGroup)
                     // continue on to finish this CanFinishGroup operation
                     // (the newCanFinishGroup takes over responsibility)
@@ -736,7 +742,7 @@ fileprivate extension ProcedureQueue {
     }
 }
 
-// MARK: - Unavailable
+// MARK: - Deprecations Unavailable
 
 public extension GroupProcedure {
 
@@ -746,7 +752,7 @@ public extension GroupProcedure {
     @available(*, unavailable, renamed: "isSuspended")
     final var suspended: Bool { return isSuspended }
 
-    @available(*, unavailable, renamed: "add(child:)")
+    @available(*, unavailable, renamed: "addChild(_:before:)")
     func addOperation(operation: Operation) { }
 
     @available(*, unavailable, renamed: "add(children:)")
@@ -772,4 +778,19 @@ public extension GroupProcedure {
 
     @available(*, unavailable, message: "GroupProcedure no longer collects all the child errors within itself")
     final public func append(errors: [Error], fromChild child: Operation? = nil) { }
+
+    @available(*, deprecated, renamed: "addChild(_:before:)", message: "This has been renamed to use Swift 3/4 naming conventions")
+    final func add(child: Operation, before pendingEvent: PendingEvent? = nil) {
+        addChild(child, before: pendingEvent)
+    }
+
+    @available(*, deprecated, renamed: "addChildren(_:before:)", message: "This has been renamed to use Swift 3/4 naming conventions")
+    final func add(children: Operation..., before pendingEvent: PendingEvent? = nil) {
+        addChildren(children, before: pendingEvent)
+    }
+
+    @available(*, deprecated, renamed: "addChildren(_:before:)", message: "This has been renamed to use Swift 3/4 naming conventions")
+    final func add<Children: Collection>(children: Children, before pendingEvent: PendingEvent? = nil) where Children.Iterator.Element: Operation {
+        addChildren(children, before: pendingEvent)
+    }
 }

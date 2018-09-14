@@ -77,7 +77,7 @@ open class TestableCapabilityTestCase: ProcedureKitTestCase {
         getAuthorizationStatus = GetAuthorizationStatusProcedure(capability)
         authorize = AuthorizeCapabilityProcedure(capability)
         authorizedFor = AuthorizedFor(capability)
-        procedure.add(condition: authorizedFor)
+        procedure.addCondition(authorizedFor)
     }
 
     open override func tearDown() {

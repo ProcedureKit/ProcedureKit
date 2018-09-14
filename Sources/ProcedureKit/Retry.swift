@@ -32,7 +32,7 @@ public struct RetryFailureInfo<T: Procedure> {
     public let addOperations: (Operation...) -> Void
 
     /// - returns: a logger (from the RetryProcedure)
-    public let log: LoggerProtocol
+    public let log: ProcedureLog
 
     /**
      - returns: the block which is used to replace the
@@ -146,7 +146,7 @@ open class RetryProcedure<T: Procedure>: RepeatProcedure<T> {
 
         var willAttemptAnotherOperation = false
         defer {
-            log.notice(message: "\(willAttemptAnotherOperation ? "will attempt" : "will not attempt") recovery from error: \(childError) in operation: \(child)")
+            system.info.message("\(willAttemptAnotherOperation ? "will attempt" : "will not attempt") recovery from error: \(childError) in operation: \(child)")
         }
 
         retry.info = createFailureInfo(for: current, error: childError)
@@ -165,7 +165,7 @@ open class RetryProcedure<T: Procedure>: RepeatProcedure<T> {
             operation: operation,
             error: error,
             count: count,
-            addOperations: { (ops: Operation...) in self.add(children: ops, before: nil); return },
+            addOperations: { (ops: Operation...) in self.addChildren(ops, before: nil); return },
             log: log,
             configure: configure
         )

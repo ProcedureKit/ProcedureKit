@@ -18,7 +18,7 @@ class SilentConditionTests: ProcedureKitTestCase {
     func test__silent_condition_removes_produced_dependencies_from_composed_condition() {
         let dependency = TestProcedure()
         let condition = TrueCondition()
-        condition.produce(dependency: dependency)
+        condition.produceDependency(dependency)
         let _ = SilentCondition(condition)
         XCTAssertEqual(condition.producedDependencies.count, 0)
     }

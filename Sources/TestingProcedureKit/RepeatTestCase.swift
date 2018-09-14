@@ -63,7 +63,7 @@ open class RetryTestCase: ProcedureKitTestCase {
         let info = RetryTestCaseInfo()
         return AnyIterator {
             let procedure = TestProcedure()
-            procedure.add(condition: BlockCondition {
+            procedure.addCondition(BlockCondition {
                 guard info.numberOfFailures == failureThreshold else { throw ProcedureKitError.conditionFailed() }
                 return true
             })
@@ -79,7 +79,7 @@ open class RetryTestCase: ProcedureKitTestCase {
         let info = RetryTestCaseInfo()
         return AnyIterator {
             let procedure = TestProcedure()
-            procedure.add(condition: BlockCondition {
+            procedure.addCondition(BlockCondition {
                 guard info.numberOfFailures == failureThreshold else { throw ProcedureKitError.conditionFailed() }
                 return true
             })

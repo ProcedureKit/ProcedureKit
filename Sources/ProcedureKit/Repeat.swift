@@ -187,7 +187,7 @@ open class RepeatProcedure<T: Operation>: GroupProcedure {
             _configure(_current)
             return _current
         }
-        add(child: current)
+        addChild(current)
         super.execute()
     }
 
@@ -229,7 +229,8 @@ open class RepeatProcedure<T: Operation>: GroupProcedure {
 
         guard shouldAddNext(), let payload = _next() else { return false }
 
-        log.notice(message: "Will add next operation.")
+        system.verbose.trace()
+        system.info.message("Will add next operation.")
 
         _repeatStateLock.withCriticalScope {
             if let newConfigureBlock = payload.configure {
@@ -244,11 +245,11 @@ open class RepeatProcedure<T: Operation>: GroupProcedure {
         }
 
         if let delay = payload.delay.map({ DelayProcedure(delay: $0) }) {
-            payload.operation.add(dependency: delay)
-            add(children: delay, payload.operation)
+            payload.operation.addDependency(delay)
+            addChildren(delay, payload.operation)
         }
         else {
-            add(child: payload.operation)
+            addChild(payload.operation)
         }
 
         return true
@@ -320,7 +321,8 @@ open class RepeatProcedure<T: Operation>: GroupProcedure {
     // of the _repeatStateLock.
     private func _replace(configureBlock block: @escaping Payload.ConfigureBlock) {
         _configure = block
-        log.verbose(message: "did replace configure block.")
+        system.verbose.trace()
+        system.verbose.message("did replace configure block.")
     }
 }
 

@@ -20,7 +20,7 @@ public protocol ProcedureProtocol: class {
 
     var error: Error? { get }
 
-    var log: LoggerProtocol { get }
+    var log: ProcedureLog { get }
 
     // Execution
 
@@ -95,7 +95,7 @@ public extension ProcedureProtocol {
     }
 
     func procedureDidCancel(withErrors errors: [Error]) {
-            procedureDidCancel(with: errors.first)
+        procedureDidCancel(with: errors.first)
     }
 
     func finish(withErrors errors: [Error]) {

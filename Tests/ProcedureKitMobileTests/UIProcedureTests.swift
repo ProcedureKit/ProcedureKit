@@ -105,7 +105,7 @@ class UIProcedureTests: ProcedureKitTestCase {
         let ui = UIProcedure(present: presented, from: presenting, withStyle: .present, sender: nil, waitForDismissal: true)
         let delay = DelayProcedure(by: 0.1)
         let dismiss = BlockProcedure { [unowned self] in self.presented.dismissTheViewController() }
-        dismiss.add(dependency: delay)
+        dismiss.addDependency(delay)
         wait(for: ui, delay, dismiss)
         PKAssertProcedureFinished(ui)
     }

@@ -16,7 +16,7 @@ final class InsertManagedObjectsProcedureTests: ProcedureKitCoreDataTestCase {
         let insert = TestInsert(items: items)
             .injectResult(from: coreDataStack)
 
-        fetchTestEntities.add(dependency: insert)
+        fetchTestEntities.addDependency(insert)
 
         wait(for: coreDataStack, insert, fetchTestEntities)
 
@@ -35,7 +35,7 @@ final class InsertManagedObjectsProcedureTests: ProcedureKitCoreDataTestCase {
         let insert = TestInsert(items: [])
             .injectResult(from: coreDataStack)
 
-        fetchTestEntities.add(dependency: insert)
+        fetchTestEntities.addDependency(insert)
 
         wait(for: coreDataStack, insert, fetchTestEntities)
 
@@ -54,7 +54,7 @@ final class InsertManagedObjectsProcedureTests: ProcedureKitCoreDataTestCase {
         let insert = TestInsert(items: items, andSave: false)
             .injectResult(from: coreDataStack)
 
-        fetchTestEntities.add(dependency: insert)
+        fetchTestEntities.addDependency(insert)
 
         wait(for: coreDataStack, insert, fetchTestEntities)
 

@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name              = "TestingProcedureKit"
-  s.version           = "5.0.0.beta.1"
+  s.version           = "5.0.0-beta.1"
   s.summary           = "XCTest support for ProcedureKit."
   s.homepage          = "https://github.com/ProcedureKit/ProcedureKit"
   s.license           = 'MIT'

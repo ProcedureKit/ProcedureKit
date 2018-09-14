@@ -92,7 +92,7 @@ open class ReverseGeocodeUserLocationProcedure: GroupProcedure, OutputProcedure 
         }
 
         super.init(dispatchQueue: dispatchQueue, operations: [userLocation, reverseGeocodeLocation, finishing])
-        add(observer: TimeoutObserver(by: timeout))
+        addObserver(TimeoutObserver(by: timeout))
     }
 
     internal func set(manager: LocationServicesRegistrarProtocol & LocationServicesProtocol) -> ReverseGeocodeUserLocationProcedure {

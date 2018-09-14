@@ -34,7 +34,9 @@ class BackgroundObserverTests: ProcedureKitTestCase {
 
     override func setUp() {
         super.setUp()
+        Log.enabled = true
         backgroundProcedure = WaitsToFinishProcedure()
+        backgroundProcedure.log.writer = TestableLogWriter()
         backgroundTaskName = "Hello world"
         taskGroup = DispatchGroup()
         didBeginTaskBlock = { name, identifier in
@@ -89,7 +91,7 @@ class BackgroundObserverTests: ProcedureKitTestCase {
         }
 
         // add the background observer
-        procedure.add(observer: backgroundObserver)
+        procedure.addObserver(backgroundObserver)
 
         // wait for attaching the BackgroundObserver to attempt to begin the background task
         weak var expDidBeginTask = expectation(description: "Attaching BackgroundObserver did begin background task")
@@ -145,11 +147,6 @@ class BackgroundObserverTests: ProcedureKitTestCase {
         // simulate the state in which running in the background is not possible
         testableApplication.backgroundExecutionDisabled = true
 
-        let loggedEntries = Protector<[LoggerInfo]>([])
-        backgroundProcedure.log.logger = { info in
-            loggedEntries.append(info)
-        }
-
         observer = BackgroundObserver(manager: testableBackgroundManager)
 
         // add the background observer
@@ -161,11 +158,6 @@ class BackgroundObserverTests: ProcedureKitTestCase {
         XCTAssertEqual(testableApplication.backgroundTasks[0].0, expectedBackgroundTaskName)
         // 2.) But beginBackgroundTask should have returned UIBackgroundTaskInvalid
         XCTAssertEqual(backgroundTaskIdentifier, UIBackgroundTaskIdentifier.invalid)
-        // 3.) Which should have resulted in a warning being logged by the BackgroundObserver
-        XCTAssertTrue(loggedEntries.access.contains(where: { (info) -> Bool in
-            return info.severity == .warning &&
-            info.message.hasSuffix(BackgroundObserver.logMessage_FailedToInitiateBackgroundTask)
-        }))
 
         // run and finish the Procedure
         backgroundProcedure.addDidExecuteBlockObserver { backgroundProcedure in
