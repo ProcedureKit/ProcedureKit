@@ -498,7 +498,7 @@ open class Procedure: Operation, ProcedureProtocol {
 
         // Add a signpost observer to every procedure        
         if #available(iOS 12.0, tvOS 12.0, watchOS 5.0, OSX 10.14, *) {
-            add(observer: SignpostObserver())
+            addObserver(SignpostObserver())
         }
     }
 
@@ -542,7 +542,7 @@ open class Procedure: Operation, ProcedureProtocol {
         super.init()
         name = String(describing: type(of: self))
         if #available(iOS 12.0, tvOS 12.0, watchOS 5.0, OSX 10.14, *) {
-            add(observer: SignpostObserver())
+            addObserver(SignpostObserver())
         }
     }
 

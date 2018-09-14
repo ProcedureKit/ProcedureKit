@@ -1358,8 +1358,8 @@
 				65D3686A1E184AA600D03E86 /* BlockObservers.swift */,
 				65D368791E184AA600D03E86 /* NetworkObserver.swift */,
 				65D368811E184AA600D03E86 /* Profiler.swift */,
-				65D368881E184AA600D03E86 /* TimeoutObserver.swift */,
 				65D4BEF420C8A31100D85877 /* SignpostObserver.swift */,
+				65D368881E184AA600D03E86 /* TimeoutObserver.swift */,
 			);
 			name = Observers;
 			sourceTree = "<group>";

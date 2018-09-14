@@ -29,20 +29,10 @@ public final class SignpostObserver<Procedure: ProcedureProtocol> {
 extension SignpostObserver: ProcedureObserver {
 
     public func will(execute procedure: Procedure, pendingExecute: PendingExecuteEvent) {
-        os_signpost(
-            type: .begin,
-            log: log,
-            name: "Execution",
-            signpostID: signpostID(for: procedure),
-            "Procedure name: %{public}s", procedure.procedureName)
+        os_signpost(.begin, log: log, name: "Executing", signpostID: signpostID(for: procedure), "Procedure name: %{public}s", procedure.procedureName)
     }
 
     public func did(finish procedure: Procedure, withErrors errors: [Error]) {
-        os_signpost(
-            type: .end,
-            log: log,
-            name: "Execution",
-            signpostID: signpostID(for: procedure),
-            "Procedure name: %{public}s, status: %{public}s", procedure.procedureName, procedure.status.rawValue)
+        os_signpost(.end, log: log, name: "Execution", signpostID: signpostID(for: procedure), "Procedure name: %{public}s, status: %{public}s", procedure.procedureName, procedure.status.rawValue)
     }
 }
