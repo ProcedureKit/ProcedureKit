@@ -401,7 +401,7 @@
 			files = (
 			);
 			inputPaths = (
-				"${SRCROOT}/Pods/Target Support Files/Pods-TryProcedureKit iOSTests/Pods-TryProcedureKit iOSTests-frameworks.sh",
+				"${PODS_ROOT}/Target Support Files/Pods-TryProcedureKit iOSTests/Pods-TryProcedureKit iOSTests-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/ProcedureKit-iOS/ProcedureKit.framework",
 				"${BUILT_PRODUCTS_DIR}/TestingProcedureKit-iOS/TestingProcedureKit.framework",
 			);
@@ -412,7 +412,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-TryProcedureKit iOSTests/Pods-TryProcedureKit iOSTests-frameworks.sh\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-TryProcedureKit iOSTests/Pods-TryProcedureKit iOSTests-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		8E92736663D40AC48E98128E /* [CP] Embed Pods Frameworks */ = {
@@ -421,7 +421,7 @@
 			files = (
 			);
 			inputPaths = (
-				"${SRCROOT}/Pods/Target Support Files/Pods-TryProcedureKit/Pods-TryProcedureKit-frameworks.sh",
+				"${PODS_ROOT}/Target Support Files/Pods-TryProcedureKit/Pods-TryProcedureKit-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/ProcedureKit-All-Cloud-CoreData-Location-Network-Standard/ProcedureKit.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
@@ -430,8 +430,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-TryProcedureKit/Pods-TryProcedureKit-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-TryProcedureKit/Pods-TryProcedureKit-frameworks.sh\"\n";
 		};
 		91C29AF8EE5CC40A4A280F7A /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -439,7 +438,7 @@
 			files = (
 			);
 			inputPaths = (
-				"${SRCROOT}/Pods/Target Support Files/Pods-TryProcedureKit iOS/Pods-TryProcedureKit iOS-frameworks.sh",
+				"${PODS_ROOT}/Target Support Files/Pods-TryProcedureKit iOS/Pods-TryProcedureKit iOS-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/ProcedureKit-ae76e0ea/ProcedureKit.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
@@ -448,7 +447,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-TryProcedureKit iOS/Pods-TryProcedureKit iOS-frameworks.sh\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-TryProcedureKit iOS/Pods-TryProcedureKit iOS-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		999CE9F151E217BE25FA8F09 /* [CP] Embed Pods Frameworks */ = {
@@ -457,7 +456,7 @@
 			files = (
 			);
 			inputPaths = (
-				"${SRCROOT}/Pods/Target Support Files/Pods-TryProcedureKitTests/Pods-TryProcedureKitTests-frameworks.sh",
+				"${PODS_ROOT}/Target Support Files/Pods-TryProcedureKitTests/Pods-TryProcedureKitTests-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/ProcedureKit-macOS/ProcedureKit.framework",
 				"${BUILT_PRODUCTS_DIR}/TestingProcedureKit-macOS/TestingProcedureKit.framework",
 			);
@@ -468,7 +467,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-TryProcedureKitTests/Pods-TryProcedureKitTests-frameworks.sh\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-TryProcedureKitTests/Pods-TryProcedureKitTests-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		BDE0E33DCEDDA35E8C213627 /* [CP] Check Pods Manifest.lock */ = {
@@ -635,7 +634,6 @@
 				CLANG_WARN_SUSPICIOUS_MOVES = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_IDENTITY = "-";
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -692,7 +690,6 @@
 				CLANG_WARN_SUSPICIOUS_MOVES = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_IDENTITY = "-";
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
