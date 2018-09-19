@@ -986,6 +986,14 @@
 			path = "Subscription Operations";
 			sourceTree = "<group>";
 		};
+		657FCD532152D86B00F7D7E3 /* Query Operations */ = {
+			isa = PBXGroup;
+			children = (
+				65D367F41E1844F800D03E86 /* CKQueryOperation.swift */,
+			);
+			path = "Query Operations";
+			sourceTree = "<group>";
+		};
 		65A0E4B020B851D4002D6C8C /* ProcedureKitCoreData */ = {
 			isa = PBXGroup;
 			children = (
@@ -1277,7 +1285,7 @@
 				657FCD522152D82500F7D7E3 /* Subscription Operations */,
 				65D367EF1E1844F800D03E86 /* CKModifyBadgeOperation.swift */,
 				65D367F31E1844F800D03E86 /* CKOperation.swift */,
-				65D367F41E1844F800D03E86 /* CKQueryOperation.swift */,
+				657FCD532152D86B00F7D7E3 /* Query Operations */,
 				65D367F51E1844F800D03E86 /* CloudKit.swift */,
 				65D367F61E1844F800D03E86 /* CloudKitCapability.swift */,
 				65D367F71E1844F800D03E86 /* CloudKitError.swift */,
