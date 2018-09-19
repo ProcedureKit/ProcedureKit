@@ -60,7 +60,6 @@ internal struct ProcedureKit {
     internal struct Signposts {
 
         internal static let procedure: OSLog = {
-            /// TODO: Add conditional checking here
             return OSLog(subsystem: "run.kit.procedure", category: "ProcedureKit")
         }()
     }
