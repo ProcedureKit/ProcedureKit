@@ -955,6 +955,19 @@
 			name = ...;
 			sourceTree = "<group>";
 		};
+		657FCD502152D70E00F7D7E3 /* Record Operations */ = {
+			isa = PBXGroup;
+			children = (
+				65D367E51E1844F800D03E86 /* CKFetchDatabaseChangesOperation.swift */,
+				65D367E81E1844F800D03E86 /* CKFetchRecordsOperation.swift */,
+				65D367E91E1844F800D03E86 /* CKFetchRecordZoneChangesOperation.swift */,
+				65D367EA1E1844F800D03E86 /* CKFetchRecordZonesOperation.swift */,
+				65D367F01E1844F800D03E86 /* CKModifyRecordsOperation.swift */,
+				65D367F11E1844F800D03E86 /* CKModifyRecordZonesOperation.swift */,
+			);
+			path = "Record Operations";
+			sourceTree = "<group>";
+		};
 		65A0E4B020B851D4002D6C8C /* ProcedureKitCoreData */ = {
 			isa = PBXGroup;
 			children = (
@@ -1239,18 +1252,13 @@
 				65D367E01E1844F800D03E86 /* CKDatabaseOperation.swift */,
 				65D367E21E1844F800D03E86 /* CKDiscoverAllUserIdentitiesOperation.swift */,
 				65D367E31E1844F800D03E86 /* CKDiscoverUserIdentitiesOperation.swift */,
-				65D367E51E1844F800D03E86 /* CKFetchDatabaseChangesOperation.swift */,
 				65D367E61E1844F800D03E86 /* CKFetchNotificationChangesOperation.swift */,
-				65D367E81E1844F800D03E86 /* CKFetchRecordsOperation.swift */,
-				65D367E91E1844F800D03E86 /* CKFetchRecordZoneChangesOperation.swift */,
-				65D367EA1E1844F800D03E86 /* CKFetchRecordZonesOperation.swift */,
+				657FCD502152D70E00F7D7E3 /* Record Operations */,
 				65D367EB1E1844F800D03E86 /* CKFetchShareMetadataOperation.swift */,
 				65D367EC1E1844F800D03E86 /* CKFetchShareParticipantsOperation.swift */,
 				65D367ED1E1844F800D03E86 /* CKFetchSubscriptionsOperation.swift */,
 				65D367EE1E1844F800D03E86 /* CKMarkNotificationsReadOperation.swift */,
 				65D367EF1E1844F800D03E86 /* CKModifyBadgeOperation.swift */,
-				65D367F01E1844F800D03E86 /* CKModifyRecordsOperation.swift */,
-				65D367F11E1844F800D03E86 /* CKModifyRecordZonesOperation.swift */,
 				65D367F21E1844F800D03E86 /* CKModifySubscriptionsOperation.swift */,
 				65D367F31E1844F800D03E86 /* CKOperation.swift */,
 				65D367F41E1844F800D03E86 /* CKQueryOperation.swift */,
