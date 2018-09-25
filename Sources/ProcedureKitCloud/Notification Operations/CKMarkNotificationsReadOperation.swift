@@ -36,6 +36,10 @@ extension CKMarkNotificationsReadOperation: CKMarkNotificationsReadOperationProt
     public typealias AssociatedError = MarkNotificationsReadError<NotificationID>
 }
 
+@available(iOS, introduced: 8.0, deprecated: 11.0, message: "Instead of iterating notifications to enumerate changed record zones, use CKDatabaseSubscription, CKFetchDatabaseChangesOperation, and CKFetchRecordZoneChangesOperation")
+@available(OSX, introduced: 10.10, deprecated: 10.13, message: "Instead of iterating notifications to enumerate changed record zones, use CKDatabaseSubscription, CKFetchDatabaseChangesOperation, and CKFetchRecordZoneChangesOperation")
+@available(tvOS, introduced: 9.0, deprecated: 11.0, message: "Instead of iterating notifications to enumerate changed record zones, use CKDatabaseSubscription, CKFetchDatabaseChangesOperation, and CKFetchRecordZoneChangesOperation")
+@available(watchOS, introduced: 3.0, deprecated: 4.0, message: "Instead of iterating notifications to enumerate changed record zones, use CKDatabaseSubscription, CKFetchDatabaseChangesOperation, and CKFetchRecordZoneChangesOperation")
 extension CKProcedure where T: CKMarkNotificationsReadOperationProtocol, T: AssociatedErrorProtocol, T.AssociatedError: CloudKitError {
 
     public var notificationIDs: T.NotificationIDsPropertyType {
@@ -55,6 +59,10 @@ extension CKProcedure where T: CKMarkNotificationsReadOperationProtocol, T: Asso
     }
 }
 
+@available(iOS, introduced: 8.0, deprecated: 11.0, message: "Instead of iterating notifications to enumerate changed record zones, use CKDatabaseSubscription, CKFetchDatabaseChangesOperation, and CKFetchRecordZoneChangesOperation")
+@available(OSX, introduced: 10.10, deprecated: 10.13, message: "Instead of iterating notifications to enumerate changed record zones, use CKDatabaseSubscription, CKFetchDatabaseChangesOperation, and CKFetchRecordZoneChangesOperation")
+@available(tvOS, introduced: 9.0, deprecated: 11.0, message: "Instead of iterating notifications to enumerate changed record zones, use CKDatabaseSubscription, CKFetchDatabaseChangesOperation, and CKFetchRecordZoneChangesOperation")
+@available(watchOS, introduced: 3.0, deprecated: 4.0, message: "Instead of iterating notifications to enumerate changed record zones, use CKDatabaseSubscription, CKFetchDatabaseChangesOperation, and CKFetchRecordZoneChangesOperation")
 extension CloudKitProcedure where T: CKMarkNotificationsReadOperationProtocol {
 
     /// A typealias for the block types used by CloudKitOperation<CKMarkNotificationsReadOperation>

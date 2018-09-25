@@ -17,6 +17,9 @@ public protocol CKFetchRecordZoneChangesOperationProtocol: CKDatabaseOperationPr
     /// The type of the CloudKit FetchRecordZoneChangesOptions
     associatedtype FetchRecordZoneChangesOptions
 
+    /// The type of the CloudKit FetchRecordZoneCHangesConfiguration
+    associatedtype FetchRecordZoneChangesConfiguration
+
     /// The type of the recordZoneIDs property
     associatedtype RecordZoneIDsPropertyType
 
@@ -24,7 +27,15 @@ public protocol CKFetchRecordZoneChangesOperationProtocol: CKDatabaseOperationPr
     var recordZoneIDs: RecordZoneIDsPropertyType { get set }
 
     /// - returns: the per-record-zone options
-    var optionsByRecordZoneID: [RecordZoneID : FetchRecordZoneChangesOptions]? { get set }
+    @available(iOS, introduced: 10.0, deprecated: 12.0)
+    @available(OSX, introduced: 10.12, deprecated: 10.14)
+    @available(tvOS, introduced: 10.0, deprecated: 12.0)
+    @available(watchOS, introduced: 3.0, deprecated: 5.0)
+    var optionsByRecordZoneID: [RecordZoneID: FetchRecordZoneChangesOptions]? { get set }
+
+    /// - returns: the per-record-zone configuration
+    @available(iOS 12.0, OSX 10.14, tvOS 12.0, watchOS 5.0, *)
+    var configurationsByRecordZoneID: [RecordZoneID: FetchRecordZoneChangesConfiguration]? { get set }
 
     /// - returns: a block for when a record is changed
     var recordChangedBlock: ((Record) -> Void)? { get set }
@@ -49,7 +60,14 @@ extension CKFetchRecordZoneChangesOperation: CKFetchRecordZoneChangesOperationPr
     public typealias AssociatedError = PKCKError
 
     /// The type of the CloudKit FetchRecordZoneChangesOptions
+    @available(iOS, introduced: 10.0, deprecated: 12.0)
+    @available(OSX, introduced: 10.12, deprecated: 10.14)
+    @available(tvOS, introduced: 10.0, deprecated: 12.0)
+    @available(watchOS, introduced: 3.0, deprecated: 5.0)
     public typealias FetchRecordZoneChangesOptions = CKFetchRecordZoneChangesOperation.ZoneOptions
+
+    @available(iOS 12.0, OSX 10.14, tvOS 12.0, watchOS 5.0, *)
+    public typealias FetchRecordZoneChangesConfiguration = CKFetchRecordZoneChangesOperation.ZoneConfiguration
 }
 
 extension CKProcedure where T: CKFetchRecordZoneChangesOperationProtocol, T: AssociatedErrorProtocol, T.AssociatedError: CloudKitError {
@@ -61,9 +79,20 @@ extension CKProcedure where T: CKFetchRecordZoneChangesOperationProtocol, T: Ass
     }
 
     /// - returns: the per-record-zone options
+    @available(iOS, introduced: 10.0, deprecated: 12.0)
+    @available(OSX, introduced: 10.12, deprecated: 10.14)
+    @available(tvOS, introduced: 10.0, deprecated: 12.0)
+    @available(watchOS, introduced: 3.0, deprecated: 5.0)
     public var optionsByRecordZoneID: [T.RecordZoneID : T.FetchRecordZoneChangesOptions]? {
         get { return operation.optionsByRecordZoneID }
         set { operation.optionsByRecordZoneID = newValue }
+    }
+
+    /// - returns: the per-record-zone configuration
+    @available(iOS 12.0, OSX 10.14, tvOS 12.0, watchOS 5.0, *)
+    public var configurationsByRecordZoneID: [T.RecordZoneID: T.FetchRecordZoneChangesConfiguration]? {
+        get { return operation.configurationsByRecordZoneID }
+        set {operation.configurationsByRecordZoneID = newValue }
     }
 
     /// - returns: a block for when a record is changed
@@ -130,11 +159,25 @@ extension CloudKitProcedure where T: CKFetchRecordZoneChangesOperationProtocol {
     }
 
     /// - returns: the per-record-zone options
+    @available(iOS, introduced: 10.0, deprecated: 12.0)
+    @available(OSX, introduced: 10.12, deprecated: 10.14)
+    @available(tvOS, introduced: 10.0, deprecated: 12.0)
+    @available(watchOS, introduced: 3.0, deprecated: 5.0)
     public var optionsByRecordZoneID: [T.RecordZoneID : T.FetchRecordZoneChangesOptions]? {
         get { return current.optionsByRecordZoneID }
         set {
             current.optionsByRecordZoneID = newValue
             appendConfigureBlock { $0.optionsByRecordZoneID = newValue }
+        }
+    }
+
+    /// - returns: the per-record-zone configuration
+    @available(iOS 12.0, OSX 10.14, tvOS 12.0, watchOS 5.0, *)
+    public var configurationsByRecordZoneID: [T.RecordZoneID: T.FetchRecordZoneChangesConfiguration]? {
+        get { return current.configurationsByRecordZoneID }
+        set {
+            current.configurationsByRecordZoneID = newValue
+            appendConfigureBlock { $0.configurationsByRecordZoneID = newValue }
         }
     }
 
