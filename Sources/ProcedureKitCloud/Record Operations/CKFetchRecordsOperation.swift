@@ -4,8 +4,6 @@
 //  Copyright © 2015-2018 ProcedureKit. All rights reserved.
 //
 
-#if !swift(>=4.1)
-
 #if SWIFT_PACKAGE
     import ProcedureKit
     import Foundation
@@ -61,7 +59,7 @@ extension CKProcedure where T: CKFetchRecordsOperationProtocol, T: AssociatedErr
     func setFetchRecordsCompletionBlock(_ block: @escaping CloudKitProcedure<T>.FetchRecordsCompletionBlock) {
         operation.fetchRecordsCompletionBlock = { [weak self] recordsByID, error in
             if let strongSelf = self, let error = error {
-                strongSelf.append(error: FetchRecordsError(underlyingError: error, recordsByID: recordsByID))
+                strongSelf.setErrorOnce(FetchRecordsError(underlyingError: error, recordsByID: recordsByID))
             }
             else {
                 block(recordsByID)
@@ -120,4 +118,3 @@ extension CloudKitProcedure where T: CKFetchRecordsOperationProtocol {
     }
 }
 
-#endif

@@ -27,6 +27,10 @@ extension CKModifyBadgeOperation: CKModifyBadgeOperationProtocol, AssociatedErro
     public typealias AssociatedError = PKCKError
 }
 
+@available(iOS, introduced: 8.0, deprecated: 11.0, message: "No longer supported, will cease working at some point in the future")
+@available(OSX, introduced: 10.10, deprecated: 10.13, message: "No longer supported, will cease working at some point in the future")
+@available(tvOS, introduced: 9.0, deprecated: 11.0, message: "No longer supported, will cease working at some point in the future")
+@available(watchOS, introduced: 3.0, deprecated: 4.0, message: "No longer supported, will cease working at some point in the future")
 extension CKProcedure where T: CKModifyBadgeOperationProtocol, T: AssociatedErrorProtocol, T.AssociatedError: CloudKitError {
 
     public var badgeValue: Int {
@@ -46,6 +50,10 @@ extension CKProcedure where T: CKModifyBadgeOperationProtocol, T: AssociatedErro
     }
 }
 
+@available(iOS, introduced: 8.0, deprecated: 11.0, message: "No longer supported, will cease working at some point in the future")
+@available(OSX, introduced: 10.10, deprecated: 10.13, message: "No longer supported, will cease working at some point in the future")
+@available(tvOS, introduced: 9.0, deprecated: 11.0, message: "No longer supported, will cease working at some point in the future")
+@available(watchOS, introduced: 3.0, deprecated: 4.0, message: "No longer supported, will cease working at some point in the future")
 extension CloudKitProcedure where T: CKModifyBadgeOperationProtocol {
 
     /// A typealias for the block types used by CloudKitOperation<CKModifyBadgeOperation>

@@ -15,13 +15,13 @@ class TestableCloudKitContainerRegistrar: CloudKitContainerRegistrar {
     var accountStatus: CKAccountStatus = .couldNotDetermine
     var accountStatusError: Error? = nil
 
-    var verifyApplicationPermissionStatus: CKApplicationPermissionStatus = .initialState
+    var verifyApplicationPermissionStatus: CKContainer.Application.PermissionStatus = .initialState
     var verifyApplicationPermissionsError: Error? = nil
-    var verifyApplicationPermissions: CKApplicationPermissions? = nil
+    var verifyApplicationPermissions: CKContainer.Application.Permissions? = nil
 
-    var requestApplicationPermissionStatus: CKApplicationPermissionStatus = .granted
+    var requestApplicationPermissionStatus: CKContainer.Application.PermissionStatus = .granted
     var requestApplicationPermissionsError: Error? = nil
-    var requestApplicationPermissions: CKApplicationPermissions? = nil
+    var requestApplicationPermissions: CKContainer.Application.Permissions? = nil
 
     var didGetAccountStatus = false
     var didVerifyApplicationStatus = false
@@ -32,13 +32,13 @@ class TestableCloudKitContainerRegistrar: CloudKitContainerRegistrar {
         completionHandler(accountStatus, accountStatusError)
     }
 
-    func pk_status(forApplicationPermission applicationPermission: CKApplicationPermissions, completionHandler: @escaping CKApplicationPermissionBlock) {
+    func pk_status(forApplicationPermission applicationPermission: CKContainer.Application.Permissions, completionHandler: @escaping CKContainer.Application.PermissionBlock) {
         didVerifyApplicationStatus = true
         verifyApplicationPermissions = applicationPermission
         completionHandler(verifyApplicationPermissionStatus, verifyApplicationPermissionsError)
     }
 
-    func pk_requestApplicationPermission(_ applicationPermission: CKApplicationPermissions, completionHandler: @escaping CKApplicationPermissionBlock) {
+    func pk_requestApplicationPermission(_ applicationPermission: CKContainer.Application.Permissions, completionHandler: @escaping CKContainer.Application.PermissionBlock) {
         didRequestApplicationStatus = true
         requestApplicationPermissions = applicationPermission
         completionHandler(requestApplicationPermissionStatus, requestApplicationPermissionsError)

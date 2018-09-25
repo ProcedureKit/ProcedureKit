@@ -22,7 +22,9 @@ class TestableUIApplication: BackgroundTaskApplicationProtocol {
     /// (TaskName, Handler, TaskState)
     typealias BackgroundTasks = [(String?, (() -> Void)?, BackgroundTaskState)]
 
-    private var testableApplicationState: UIApplicationState { return stateLock.withCriticalScope { _testableApplicationState } }
+    let stateLock = PThreadMutex()
+
+    private var testableApplicationState: UIApplication.State { return stateLock.withCriticalScope { _testableApplicationState } }
     var backgroundTasks: BackgroundTasks { return stateLock.withCriticalScope { _backgroundTasks } }
     var didBeginBackgroundTask: DidBeginBackgroundTask? {
         get { return stateLock.withCriticalScope { _didBeginBackgroundTask } }
@@ -48,21 +50,21 @@ class TestableUIApplication: BackgroundTaskApplicationProtocol {
             }
         }
     }
-    let stateLock = PThreadMutex()
+
     private var _didBeginBackgroundTask: DidBeginBackgroundTask?
     private var _didEndBackgroundTask: DidEndBackgroundTask?
     private var _backgroundExecutionDisabled: Bool = false
-    private var _testableApplicationState: UIApplicationState
+    private var _testableApplicationState: UIApplication.State
     private var _backgroundTasks: BackgroundTasks = []
 
-    init(state: UIApplicationState = .active, didBeginTask: DidBeginBackgroundTask? = nil, didEndTask: DidEndBackgroundTask? = nil) {
+    init(state: UIApplication.State = .active, didBeginTask: DidBeginBackgroundTask? = nil, didEndTask: DidEndBackgroundTask? = nil) {
         _testableApplicationState = state
         didBeginBackgroundTask = didBeginTask
         didEndBackgroundTask = didEndTask
     }
 
     /// - Requires: Must be called from the main thread / queue.
-    var applicationState: UIApplicationState {
+    var applicationState: UIApplication.State {
         guard Thread.isMainThread || DispatchQueue.isMainDispatchQueue else {
             fatalError("applicationState must be read from the main thread (re: UIApplication thread-safety).")
         }
@@ -74,11 +76,11 @@ class TestableUIApplication: BackgroundTaskApplicationProtocol {
         let identifier: UIBackgroundTaskIdentifier = stateLock.withCriticalScope {
             _backgroundTasks.append((taskName, handler, .running))
             guard !_backgroundExecutionDisabled else {
-                return UIBackgroundTaskInvalid
+                return UIBackgroundTaskIdentifier.invalid
             }
             let identifier = _backgroundTasks.count
-            assert(identifier != UIBackgroundTaskInvalid, "Generated an identifier (\(identifier)) == UIBackgroundTaskInvalid, which will break the internals of BackgroundObserver. The TestableUIApplication must be fixed.")
-            return identifier
+            assert(identifier != UIBackgroundTaskIdentifier.invalid.rawValue, "Generated an identifier (\(identifier)) == UIBackgroundTaskInvalid, which will break the internals of BackgroundObserver. The TestableUIApplication must be fixed.")
+            return UIBackgroundTaskIdentifier(rawValue: identifier)
         }
         didBeginBackgroundTask?(taskName, identifier)
         return identifier
@@ -87,13 +89,16 @@ class TestableUIApplication: BackgroundTaskApplicationProtocol {
     /// May be called from any thread.
     func endBackgroundTask(_ identifier: UIBackgroundTaskIdentifier) {
         stateLock.withCriticalScope { // () -> Bool in
-            guard identifier != UIBackgroundTaskInvalid else {
+            guard identifier != UIBackgroundTaskIdentifier.invalid else {
                 fatalError("Called endBackgroundTask with `UIBackgroundTaskInvalid`.")
             }
-            guard identifier <= _backgroundTasks.count && identifier > 0 else {
+            guard identifier.rawValue <= _backgroundTasks.count && identifier.rawValue > 0 else {
                 fatalError("Called endBackgroundTask with an invalid identifier.")
             }
-            let taskIndex = identifier - 1
+            let taskIndex = identifier.rawValue
+            guard _backgroundTasks.count > taskIndex else {
+                fatalError("Identifier not stored with background tasks.")
+            }
             _backgroundTasks[taskIndex].2 = .ended
         }
         didEndBackgroundTask?(identifier)
@@ -105,7 +110,7 @@ class TestableUIApplication: BackgroundTaskApplicationProtocol {
             fatalError("applicationState must be modified from the main thread (re: UIApplication thread-safety).")
         }
         stateLock.withCriticalScope { _testableApplicationState = .background }
-        NotificationCenter.default.post(name: NSNotification.Name.UIApplicationDidEnterBackground, object: self)
+        NotificationCenter.default.post(name: UIApplication.didEnterBackgroundNotification, object: self)
     }
 
     /// - Requires: Must be called from the main thread / queue.
@@ -128,6 +133,6 @@ class TestableUIApplication: BackgroundTaskApplicationProtocol {
             fatalError("applicationState must be modified from the main thread (re: UIApplication thread-safety).")
         }
         stateLock.withCriticalScope { _testableApplicationState = .active }
-        NotificationCenter.default.post(name: NSNotification.Name.UIApplicationDidBecomeActive, object: self)
+        NotificationCenter.default.post(name: UIApplication.didBecomeActiveNotification, object: self)
     }
 }

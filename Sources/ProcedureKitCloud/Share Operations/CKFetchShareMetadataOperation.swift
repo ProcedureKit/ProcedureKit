@@ -17,6 +17,9 @@ public protocol CKFetchShareMetadataOperationProtocol: CKOperationProtocol {
     /// The type of the shareURLs property
     associatedtype ShareURLsPropertyType
 
+    /// The type of the field keys
+    associatedtype FieldKey
+
     /// - returns: the share URLs
     var shareURLs: ShareURLsPropertyType { get set }
 
@@ -24,7 +27,7 @@ public protocol CKFetchShareMetadataOperationProtocol: CKOperationProtocol {
     var shouldFetchRootRecord: Bool { get set }
 
     /// - returns: the share root record desired keys
-    var rootRecordDesiredKeys: [String]? { get set }
+    var rootRecordDesiredKeys: [FieldKey]? { get set }
 
     /// - returns: the per share metadata block
     var perShareMetadataBlock: ((URL, ShareMetadata?, Error?) -> Void)? { get set }
@@ -38,6 +41,12 @@ extension CKFetchShareMetadataOperation: CKFetchShareMetadataOperationProtocol, 
 
     // The associated error type
     public typealias AssociatedError = PKCKError
+
+    #if swift(>=4.2)
+    public typealias FieldKey = CKRecord.FieldKey
+    #else
+    public typealias FieldKey = String
+    #endif
 }
 
 extension CKProcedure where T: CKFetchShareMetadataOperationProtocol, T: AssociatedErrorProtocol, T.AssociatedError: CloudKitError {
@@ -52,7 +61,7 @@ extension CKProcedure where T: CKFetchShareMetadataOperationProtocol, T: Associa
         set { operation.shouldFetchRootRecord = newValue }
     }
 
-    public var rootRecordDesiredKeys: [String]? {
+    public var rootRecordDesiredKeys: [T.FieldKey]? {
         get { return operation.rootRecordDesiredKeys }
         set { operation.rootRecordDesiredKeys = newValue }
     }
@@ -101,7 +110,7 @@ extension CloudKitProcedure where T: CKFetchShareMetadataOperationProtocol {
     }
 
     /// - returns: the share root record desired keys
-    public var rootRecordDesiredKeys: [String]? {
+    public var rootRecordDesiredKeys: [T.FieldKey]? {
         get { return current.rootRecordDesiredKeys }
         set {
             current.rootRecordDesiredKeys = newValue

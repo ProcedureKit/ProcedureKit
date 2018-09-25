@@ -18,7 +18,6 @@ public protocol PresentingViewController: class {
 
 extension UIViewController: PresentingViewController { }
 
-
 public protocol DismissingViewController: class {
     var didDismissViewControllerBlock: () -> Void { get set }
 }

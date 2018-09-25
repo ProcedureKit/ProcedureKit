@@ -4,8 +4,6 @@
 //  Copyright © 2015-2018 ProcedureKit. All rights reserved.
 //
 
-#if !swift(>=4.1)
-
 #if SWIFT_PACKAGE
     import ProcedureKit
     import Foundation
@@ -34,6 +32,10 @@ extension CKFetchNotificationChangesOperation: CKFetchNotificationChangesOperati
     public typealias AssociatedError = FetchNotificationChangesError<ServerChangeToken>
 }
 
+@available(iOS, introduced: 8.0, deprecated: 11.0, message: "Instead of iterating notifications to enumerate changed record zones, use CKDatabaseSubscription, CKFetchDatabaseChangesOperation, and CKFetchRecordZoneChangesOperation")
+@available(OSX, introduced: 10.10, deprecated: 10.13, message: "Instead of iterating notifications to enumerate changed record zones, use CKDatabaseSubscription, CKFetchDatabaseChangesOperation, and CKFetchRecordZoneChangesOperation")
+@available(tvOS, introduced: 9.0, deprecated: 11.0, message: "Instead of iterating notifications to enumerate changed record zones, use CKDatabaseSubscription, CKFetchDatabaseChangesOperation, and CKFetchRecordZoneChangesOperation")
+@available(watchOS, introduced: 3.0, deprecated: 4.0, message: "Instead of iterating notifications to enumerate changed record zones, use CKDatabaseSubscription, CKFetchDatabaseChangesOperation, and CKFetchRecordZoneChangesOperation")
 extension CKProcedure where T: CKFetchNotificationChangesOperationProtocol, T: AssociatedErrorProtocol, T.AssociatedError: CloudKitError {
 
     public var notificationChangedBlock: CloudKitProcedure<T>.FetchNotificationChangesChangedBlock? {
@@ -45,7 +47,7 @@ extension CKProcedure where T: CKFetchNotificationChangesOperationProtocol, T: A
 
         operation.fetchNotificationChangesCompletionBlock = { [weak self] token, error in
             if let strongSelf = self, let error = error {
-                strongSelf.append(error: FetchNotificationChangesError(underlyingError: error, token: token))
+                strongSelf.setErrorOnce(FetchNotificationChangesError(underlyingError: error, token: token))
             }
             else {
                 block(token)
@@ -54,6 +56,10 @@ extension CKProcedure where T: CKFetchNotificationChangesOperationProtocol, T: A
     }
 }
 
+@available(iOS, introduced: 8.0, deprecated: 11.0, message: "Instead of iterating notifications to enumerate changed record zones, use CKDatabaseSubscription, CKFetchDatabaseChangesOperation, and CKFetchRecordZoneChangesOperation")
+@available(OSX, introduced: 10.10, deprecated: 10.13, message: "Instead of iterating notifications to enumerate changed record zones, use CKDatabaseSubscription, CKFetchDatabaseChangesOperation, and CKFetchRecordZoneChangesOperation")
+@available(tvOS, introduced: 9.0, deprecated: 11.0, message: "Instead of iterating notifications to enumerate changed record zones, use CKDatabaseSubscription, CKFetchDatabaseChangesOperation, and CKFetchRecordZoneChangesOperation")
+@available(watchOS, introduced: 3.0, deprecated: 4.0, message: "Instead of iterating notifications to enumerate changed record zones, use CKDatabaseSubscription, CKFetchDatabaseChangesOperation, and CKFetchRecordZoneChangesOperation")
 extension CloudKitProcedure where T: CKFetchNotificationChangesOperationProtocol {
 
     /// A typealias for the block types used by CloudKitOperation<CKFetchNotificationChangesOperation>
@@ -83,4 +89,3 @@ extension CloudKitProcedure where T: CKFetchNotificationChangesOperationProtocol
     }
 }
 
-#endif

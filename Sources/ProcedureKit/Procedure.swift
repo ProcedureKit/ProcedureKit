@@ -8,6 +8,7 @@
 // swiftlint:disable type_body_length
 
 import Foundation
+import os
 
 internal struct ProcedureKit {
 
@@ -55,8 +56,21 @@ internal struct ProcedureKit {
         }
     }
 
+    @available(iOS 12.0, tvOS 12.0, watchOS 5.0, OSX 10.14, *)
+    internal struct Signposts {
+
+        internal static let procedure: OSLog = {
+            return OSLog(subsystem: "run.kit.procedure", category: "ProcedureKit")
+        }()
+    }
+
     private init() { }
 }
+
+public enum ProcedureStatus: String {
+    case pending, executing, cancelled, failed, finished
+}
+
 
 /**
  Type to express the intent of the user in regards to executing an Operation instance
@@ -76,6 +90,7 @@ internal struct ProcedureKit {
         }
     }
 }
+
 
 /**
  Procedure is an Operation subclass. It is an abstract class which should be subclassed.
@@ -146,7 +161,6 @@ open class Procedure: Operation, ProcedureProtocol {
     private var _isTransitioningToExecuting = false
     private var _isHandlingCancel = false
     private var _isCancelled = false  // should always be set by .cancel()
-
     private var _isHandlingFinish: Bool = false
 
     fileprivate let isAutomaticFinishingDisabled: Bool
@@ -272,6 +286,25 @@ open class Procedure: Operation, ProcedureProtocol {
     /// Boolean indicator for whether the Procedure has finished or not
     final public override var isFinished: Bool {
         return synchronise { _isFinished }
+    }
+
+    public var status: ProcedureStatus {
+        return synchronise {
+            switch (_isPending, _isExecuting, _isFinished, _isCancelled, (_error != nil)) {
+            case (true, _, _, _, _):
+                return .pending
+            case (_, true, _, _, _):
+                return .executing
+            case (_, _, true, _, _):
+                return .finished
+            case (_, _, _, true, _):
+                return .cancelled
+            case (_, _, _, _, true):
+                return .failed
+            default:
+                return .finished
+            }
+        }
     }
 
     private var _mutuallyExclusiveCategories: Set<String>?
@@ -461,6 +494,11 @@ open class Procedure: Operation, ProcedureProtocol {
         isAutomaticFinishingDisabled = false
         super.init()
         name = String(describing: type(of: self))
+
+        // Add a signpost observer to every procedure        
+        if #available(iOS 12.0, tvOS 12.0, watchOS 5.0, OSX 10.14, *) {
+            addObserver(SignpostObserver())
+        }
     }
 
     // MARK: - Disable Automatic Finishing
@@ -502,6 +540,9 @@ open class Procedure: Operation, ProcedureProtocol {
         isAutomaticFinishingDisabled = disableAutomaticFinishing
         super.init()
         name = String(describing: type(of: self))
+        if #available(iOS 12.0, tvOS 12.0, watchOS 5.0, OSX 10.14, *) {
+            addObserver(SignpostObserver())
+        }
     }
 
     // MARK: - Execution

@@ -4,8 +4,6 @@
 //  Copyright © 2015-2018 ProcedureKit. All rights reserved.
 //
 
-#if !swift(>=4.1)
-
 #if SWIFT_PACKAGE
     import ProcedureKit
     import Foundation
@@ -69,7 +67,7 @@ extension CKProcedure where T: CKQueryOperationProtocol, T: AssociatedErrorProto
     func setQueryCompletionBlock(_ block: @escaping CloudKitProcedure<T>.QueryCompletionBlock) {
         operation.queryCompletionBlock = { [weak self] cursor, error in
             if let strongSelf = self, let error = error {
-                strongSelf.append(error: QueryError(underlyingError: error, cursor: cursor))
+                strongSelf.setErrorOnce(QueryError(underlyingError: error, cursor: cursor))
             }
             else {
                 block(cursor)
@@ -133,5 +131,3 @@ extension CloudKitProcedure where T: CKQueryOperationProtocol {
         appendConfigureBlock { $0.setQueryCompletionBlock(block) }
     }
 }
-
-#endif

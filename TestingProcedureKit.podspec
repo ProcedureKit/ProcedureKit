@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name              = "TestingProcedureKit"
-  s.version           = "5.0.0-beta.1"
+  s.version           = "5.0.0-beta.2"
   s.summary           = "XCTest support for ProcedureKit."
   s.homepage          = "https://github.com/ProcedureKit/ProcedureKit"
   s.license           = 'MIT'
@@ -15,7 +15,7 @@ Pod::Spec.new do |s|
   s.frameworks = 'XCTest'
   
   # Ensure the correct version of Swift is used
-  s.swift_version = '4.1'
+  s.swift_version = '4.2'
 
   # Defaul spec is 'Testing'
   s.default_subspec   = 'Testing'

@@ -5,7 +5,6 @@
 //
 
 #if !os(tvOS)
-#if !swift(>=4.1)
 
 #if SWIFT_PACKAGE
     import ProcedureKit
@@ -41,7 +40,7 @@ extension CKProcedure where T: CKDiscoverAllUserIdentitiesOperationProtocol, T: 
     func setDiscoverAllUserIdentitiesCompletionBlock(_ block: @escaping CloudKitProcedure<T>.DiscoverAllUserIdentitiesCompletionBlock) {
         operation.discoverAllUserIdentitiesCompletionBlock = { [weak self] error in
             if let strongSelf = self, let error = error {
-                strongSelf.append(error: PKCKError(underlyingError: error))
+                strongSelf.setErrorOnce(PKCKError(underlyingError: error))
             }
             else {
                 block()
@@ -79,5 +78,4 @@ extension CloudKitProcedure where T: CKDiscoverAllUserIdentitiesOperationProtoco
     }
 }
 
-#endif
 #endif
