@@ -207,7 +207,9 @@ internal extension EventQueue {
             originalQueue.queue.resume()
         }
     }
+}
 
+public extension EventQueue {
     public func makeTimerSource(flags: DispatchSource.TimerFlags = []) -> DispatchSourceTimer {
         return DispatchSource.makeTimerSource(flags: flags, queue: queue)
     }
