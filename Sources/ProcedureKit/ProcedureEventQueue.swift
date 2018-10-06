@@ -24,14 +24,18 @@ public class EventQueue {
     fileprivate let eventQueueLock = PThreadMutex()
     internal var qualityOfService: DispatchQoS = .default // is updated by Procedure
 
-    public init(label: String, qos: DispatchQoS = .default) {
+    public convenience init(label: String, qos: DispatchQoS = .default) {
         // The internal DispatchQueue is created as a serial queue with no specified QoS level
         // to permit the setting of any desired minimum QoS level for a block later.
-        self.queue = DispatchQueue(label: label)
-        self.qualityOfService = qos
+        self.init(serialQeueue: DispatchQueue(label: label, qos: qos))
+    }
+    
+    public init(serialQeueue: DispatchQueue) {
+        self.queue = serialQeueue
+        self.qualityOfService =  serialQeueue.qos
         #if DEBUG
-            key = DispatchSpecificKey()
-            queue.setSpecific(key: key, value: value)
+        key = DispatchSpecificKey()
+        queue.setSpecific(key: key, value: value)
         #endif
     }
 
@@ -203,8 +207,10 @@ internal extension EventQueue {
             originalQueue.queue.resume()
         }
     }
+}
 
-    func makeTimerSource(flags: DispatchSource.TimerFlags = []) -> DispatchSourceTimer {
+public extension EventQueue {
+    public func makeTimerSource(flags: DispatchSource.TimerFlags = []) -> DispatchSourceTimer {
         return DispatchSource.makeTimerSource(flags: flags, queue: queue)
     }
 }

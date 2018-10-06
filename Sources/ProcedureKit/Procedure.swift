@@ -190,7 +190,7 @@ open class Procedure: Operation, ProcedureProtocol {
     // The Procedure's EventQueue
     // A serial FIFO queue onto which all Procedure Events that call user code are dispatched.
     // (ex. `execute()` overrides, observer callbacks, etc.)
-    public let eventQueue = EventQueue(label: "run.kit.procedure.ProcedureKit.Procedure.EventQueue")
+    public let eventQueue: EventQueue
 
     /**
      Expresses the user intent in regards to the execution of this Procedure.
@@ -490,62 +490,57 @@ open class Procedure: Operation, ProcedureProtocol {
     }
 
     // MARK: - Initialization
-
-    public override init() {
-        isAutomaticFinishingDisabled = false
-        super.init()
-        name = String(describing: type(of: self))
-
-        // Add a signpost observer to every procedure        
-        if #available(iOS 12.0, tvOS 12.0, watchOS 5.0, OSX 10.14, *) {
-            addObserver(SignpostObserver())
-        }
-    }
-
-    // MARK: - Disable Automatic Finishing
-
+    
     /**
+     Disable Automatic Finishing
+     
      Ability to override Procedure's built-in finishing behavior, if a
      subclass requires full control over when `finish()` is called.
-
+     
      Used for GroupProcedure to implement proper .Finished state-handling
      (only finishing after all child operations have finished).
-
+     
      The default behavior of Procedure is to automatically call `finish()`
      when:
      (a) the Procedure is cancelled prior to it starting
-         (in which case, the Procedure will skip calling `execute()`)
+     (in which case, the Procedure will skip calling `execute()`)
      (b) when willExecuteObservers log errors
-
+     
      To ensure that a Procedure subclass does not finish until the
      subclass calls `finish()`:
      call `super.init(disableAutomaticFinishing: true)` in the init.
-
+     
      - Important: If `disableAutomaticFinishing == TRUE`, the subclass is
      responsible for calling `finish()` in **ALL** cases, including when the
      Procedure is cancelled.
-
+     
      You can react to cancellation using a `DidCancelObserver` and/or
      checking periodically during `execute()` with something like:
-
+     
      ```swift
      guard !cancelled else {
-        // do any necessary clean-up
-        finish()    // always call finish if automatic finishing is disabled
-        return
+     // do any necessary clean-up
+     finish()    // always call finish if automatic finishing is disabled
+     return
      }
      ```
-
+     
      */
-    public init(disableAutomaticFinishing: Bool) {
-        isAutomaticFinishingDisabled = disableAutomaticFinishing
+    
+    public init(eventQueue: EventQueue = EventQueue(label: "run.kit.procedure.ProcedureKit.Procedure.EventQueue"),
+                disableAutomaticFinishing: Bool = false) {
+        self.eventQueue = eventQueue
+        self.isAutomaticFinishingDisabled = disableAutomaticFinishing
+        
         super.init()
         name = String(describing: type(of: self))
+        
+        // Add a signpost observer to every procedure
         if #available(iOS 12.0, tvOS 12.0, watchOS 5.0, OSX 10.14, *) {
             addObserver(SignpostObserver())
         }
     }
-
+    
     // MARK: - Execution
 
     /// Called by the framework before a Procedure is added to a ProcedureQueue.
