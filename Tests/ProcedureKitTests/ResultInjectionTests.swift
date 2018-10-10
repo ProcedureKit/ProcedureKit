@@ -204,32 +204,6 @@ class ResultInjectionTests: ResultInjectionTestCase {
         PKAssertProcedureFinished(group)
         PKAssertProcedureOutput(group, "Hello World, we are running on ProcedureKit")
     }
-
-    func test__procedures_released() {
-        class TestGroup: TestGroupProcedure {
-
-            var foo = TestProcedure()
-            var bar = TestProcedure()
-
-            override init(dispatchQueue underlyingQueue: DispatchQueue?, operations: [Operation]) {
-                foo.injectResult(from: bar)
-                super.init(operations: [foo, bar])
-            }
-        }
-
-        var group: TestGroup! = TestGroup()
-        weak var foo: TestProcedure! = group.foo
-        weak var bar: TestProcedure! = group.bar
-
-        wait(for: group)
-        PKAssertProcedureFinished(group)
-        PKAssertProcedureFinished(foo)
-        PKAssertProcedureFinished(bar)
-
-        group = nil
-        XCTAssertNil(foo)
-        XCTAssertNil(bar)
-    }
 }
 
 
