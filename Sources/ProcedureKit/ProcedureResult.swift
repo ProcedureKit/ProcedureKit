@@ -195,7 +195,7 @@ public extension ProcedureProtocol {
             case let .cancel(e):
                 procedure.cancel(with: e)
             case let .success(output):
-                block(self, output)
+                block(procedure, output)
             }
         }
     }
