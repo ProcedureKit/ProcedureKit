@@ -167,3 +167,20 @@ class UIBlockProcedureTests: ProcedureKitTestCase {
         PKAssertProcedureFinished(dep)
     }
 }
+
+class ResultProcedureTests: ProcedureKitTestCase {
+
+    func test__throwing_output() {
+        typealias TypeUnderTest = ResultProcedure<String>
+        var blockDidExecute = false
+
+        let result = TypeUnderTest { (_) -> String in
+            blockDidExecute = true
+            return "Hello World"
+        }
+
+        wait(for: result)
+        XCTAssertTrue(blockDidExecute)
+        PKAssertProcedureOutput(result, "Hello World")
+    }
+}
