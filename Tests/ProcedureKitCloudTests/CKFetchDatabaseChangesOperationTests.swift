@@ -235,10 +235,9 @@ class CloudKitProcedureFetchDatabaseChangesOperationTests: CKProcedureTestCase {
     }
 
     func test__error_with_completion_block_set() {
-        let error = NSError(domain: CKErrorDomain, code: CKError.internalError.rawValue, userInfo: nil)
         cloudkit = CloudKitProcedure(strategy: .immediate) {
             let operation = TestCKFetchDatabaseChangesOperation()
-            operation.error = error
+            operation.error = NSError(domain: CKErrorDomain, code: CKError.internalError.rawValue, userInfo: nil)
             return operation
         }
         var didExecuteBlock = false
