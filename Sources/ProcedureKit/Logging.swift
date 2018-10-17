@@ -164,6 +164,8 @@ public protocol LogSettings {
 
     static var severity: Log.Severity { get set }
 
+    static var channel: LogChannel { get set }
+
     static var writer: LogWriter { get set }
 
     static var formatter: LogFormatter { get set }
@@ -267,14 +269,19 @@ extension Log: LogSettings {
         set { shared.severity = newValue }
     }
 
+    public static var channel: LogChannel {
+        get { return shared }
+        set { shared = newValue }
+    }
+
     public static var writer: LogWriter {
-        get { return shared.writer }
-        set { shared.writer = newValue }
+        get { return channel.writer }
+        set { channel.writer = newValue }
     }
 
     public static var formatter: LogFormatter {
-        get { return shared.formatter }
-        set { shared.formatter = newValue }
+        get { return channel.formatter }
+        set { channel.formatter = newValue }
     }
 }
 
