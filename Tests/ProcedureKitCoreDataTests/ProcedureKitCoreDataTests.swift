@@ -21,7 +21,6 @@ open class ProcedureKitCoreDataTestCase: ProcedureKitTestCase {
 
         let shouldSave: Bool
         let download: ResultProcedure<[Item]>
-        var managedObjectContext: NSManagedObjectContext!
 
         init(items: [Item], andSave shouldSave: Bool = true) {
             self.shouldSave = shouldSave
@@ -57,8 +56,6 @@ open class ProcedureKitCoreDataTestCase: ProcedureKitTestCase {
             }
 
             addChild(insert)
-
-            self.managedObjectContext = insert.managedObjectContext
 
             super.execute()
         }

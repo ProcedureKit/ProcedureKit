@@ -30,6 +30,7 @@
 		653CA0741D60AB1B0070B7A2 /* ProcedureKitCloud.h in Headers */ = {isa = PBXBuildFile; fileRef = 653CA0731D60AB1B0070B7A2 /* ProcedureKitCloud.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		653CA0781D60ABC90070B7A2 /* ProcedureKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65CFC5F01D608A5500CAD875 /* ProcedureKit.framework */; };
 		653CA07B1D60ABD30070B7A2 /* TestingProcedureKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65CFC6161D60900000CAD875 /* TestingProcedureKit.framework */; };
+		6573A4FC21787D0000FDA362 /* ProcessManagedObjectContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6573A4FB21787D0000FDA362 /* ProcessManagedObjectContext.swift */; };
 		658BE06F20BC69170021F11B /* ProcedureKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65CFC5F01D608A5500CAD875 /* ProcedureKit.framework */; };
 		658BE07020BC69170021F11B /* TestingProcedureKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65CFC6161D60900000CAD875 /* TestingProcedureKit.framework */; };
 		658BE07220BC72540021F11B /* MakeFetchedResultController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 658BE07120BC72540021F11B /* MakeFetchedResultController.swift */; };
@@ -561,6 +562,7 @@
 		653CA0621D60AA990070B7A2 /* ProcedureKitCloudTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ProcedureKitCloudTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		653CA0731D60AB1B0070B7A2 /* ProcedureKitCloud.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ProcedureKitCloud.h; path = "Supporting Files/ProcedureKitCloud.h"; sourceTree = "<group>"; };
 		653CA0751D60AB2B0070B7A2 /* ProcedureKitCloud.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = ProcedureKitCloud.xcconfig; path = "Supporting Files/ProcedureKitCloud.xcconfig"; sourceTree = "<group>"; };
+		6573A4FB21787D0000FDA362 /* ProcessManagedObjectContext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProcessManagedObjectContext.swift; sourceTree = "<group>"; };
 		658BE07120BC72540021F11B /* MakeFetchedResultController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MakeFetchedResultController.swift; sourceTree = "<group>"; };
 		658BE07320BC77AD0021F11B /* MakeFetchedResultsControllerProcedureTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MakeFetchedResultsControllerProcedureTests.swift; sourceTree = "<group>"; };
 		658BE07520BC99100021F11B /* InsertManagedObjects.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsertManagedObjects.swift; sourceTree = "<group>"; };
@@ -1018,11 +1020,12 @@
 		65A0E4B020B851D4002D6C8C /* ProcedureKitCoreData */ = {
 			isa = PBXGroup;
 			children = (
-				65068FAC20C62AE300B0A0A3 /* MakesBackgroundManagedObjectContext.swift */,
 				651E670420C610D800BE520E /* CoreDataHelpers.swift */,
 				658BE07520BC99100021F11B /* InsertManagedObjects.swift */,
 				65A0E4B120B85213002D6C8C /* LoadCoreData.swift */,
 				658BE07120BC72540021F11B /* MakeFetchedResultController.swift */,
+				65068FAC20C62AE300B0A0A3 /* MakesBackgroundManagedObjectContext.swift */,
+				6573A4FB21787D0000FDA362 /* ProcessManagedObjectContext.swift */,
 				65A0E4C420BB2E51002D6C8C /* SaveManagedObjectContext.swift */,
 			);
 			name = ProcedureKitCoreData;
@@ -2332,6 +2335,7 @@
 				658BE07620BC99100021F11B /* InsertManagedObjects.swift in Sources */,
 				658BE07220BC72540021F11B /* MakeFetchedResultController.swift in Sources */,
 				65A0E4C520BB2E51002D6C8C /* SaveManagedObjectContext.swift in Sources */,
+				6573A4FC21787D0000FDA362 /* ProcessManagedObjectContext.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
