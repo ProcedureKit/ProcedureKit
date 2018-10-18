@@ -43,7 +43,7 @@ Pod::Spec.new do |s|
   s.subspec 'Cloud' do |ss|
   	ss.dependency 'ProcedureKit/Standard'
   	ss.frameworks = 'CloudKit'
-  	ss.source_files = ['Sources/ProcedureKitCloud']
+  	ss.source_files = ['Sources/ProcedureKitCloud/**/*']
   end
 
   # ProcedureKitCoreData
