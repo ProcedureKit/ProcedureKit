@@ -30,11 +30,53 @@ import CoreData
 @available(iOS 10.0, OSX 10.12, tvOS 10.0, watchOS 3.0, *)
 open class InsertManagedObjectsProcedure<Item, ManagedObject>: GroupProcedure, InputProcedure, OutputProcedure where ManagedObject: NSManagedObject {
 
+    public typealias ProcessingBlock = (Int, Item, ManagedObject) -> ()
+
+    private class Insert: Procedure, InputProcedure, OutputProcedure, ManagedObjectContextProcessing {
+
+        var input: Pending<[Item]> = .pending
+
+        var output: Pending<ProcedureResult<[NSManagedObjectID]>> = .pending
+
+        var managedObjectContext: Pending<NSManagedObjectContext> = .pending
+
+        let block: ProcessingBlock
+
+        init(_ block: @escaping ProcessingBlock) {
+            self.block = block
+            super.init()
+        }
+
+        override func execute() {
+
+            guard
+                let managedObjectContext = managedObjectContext.value,
+                let items = input.value
+            else {
+                finish(with: ProcedureKitError.requirementNotSatisfied())
+                return
+            }
+
+            guard items.count > 0 else {
+                finish(withResult: .success([]))
+                return
+            }
+
+            let result: Output = managedObjectContext.performAndWait {
+                return items.enumerated().map { (enumeratedItem) in
+                    let managed = ManagedObject(context: managedObjectContext)
+                    block(enumeratedItem.0, enumeratedItem.1, managed)
+                    return managed.objectID
+                }
+            }
+
+            finish(withResult: .success(result))
+        }
+    }
+
     public var input: Pending<[Item]> = .pending
 
     public var output: Pending<ProcedureResult<[NSManagedObjectID]>> = .pending
-
-    public let managedObjectContext: NSManagedObjectContext
 
     /**
      Initialize the Procedure with the NSManagedObjectContext to insert into, and
@@ -46,48 +88,34 @@ open class InsertManagedObjectsProcedure<Item, ManagedObject>: GroupProcedure, I
         managedObject.name = item.name
      }.injectResult(from: downloadItems)
      ```
-     In the above example, we assume that `downloadItems` has an output of `[MyItem]`.
+     In the above example, we assume that `downloadItems` has an output
+       of `[MyItem]`, and `MyItem` is a PONSO or "dumb" struct type. Certainly
+       it must be a type which is safe to be used across threads (so not another
+       NSManagedObject instance).
 
-     - parameter into: a MakesBackgroundManagedObjectContext type, which in turn will create a new background context to insert into.
-     - parameter andSave: a Bool, default true, which if set to false will not save the context.
-     - parameter block: a `(Int, Item, ManagedObject) -> ()` block, the arguments are the index in the
-             array of items, the item this index, and the inserted managed object which represents the item.
+     - parameter dispatchQueue: an optional DispatchQueue to specify.
+     - parameter into: a MakesBackgroundManagedObjectContext type,
+         which in turn will create a new background context to insert into.
+     - parameter andSave: a Bool, default true, which if set to
+         false will not save the context.
+     - parameter block: a `(Int, Item, ManagedObject) -> ()` block,
+         the arguments are the index in the array of items, the
+         item this index, and the inserted managed object which
+         represents the item.
     */
-    public init(into makesManagedObjectContext: MakesBackgroundManagedObjectContext, andSave shouldSave: Bool = true, block: @escaping (Int, Item, ManagedObject) -> ()) {
+    public init(dispatchQueue: DispatchQueue? = nil, into makesManagedObjectContext: MakesBackgroundManagedObjectContext, andSave shouldSave: Bool = true, block: @escaping ProcessingBlock) {
 
-        let moc = makesManagedObjectContext.newBackgroundContext()
+        let queue: DispatchQueue = dispatchQueue ?? .initiated
 
-        let insert = AsyncTransformProcedure<Input, Output> { (items, finishWithResult) in
+        let insert = Insert(block)
 
-            guard items.count > 0 else {
-                finishWithResult(.success([]))
-                return
-            }
-            
-            moc.perform {
+        let processing = ProcessManagedObjectContext(dispatchQueue: queue, do: insert, in: makesManagedObjectContext, save: shouldSave)
+        processing.name = "Processing Inserts of \(ManagedObject.entityName)"
 
-                let result: Output = items.enumerated().map { (enumeratedItem) in
-                    let managed = ManagedObject(context: moc)
-                    block(enumeratedItem.0, enumeratedItem.1, managed)
-                    return managed.objectID
-                }
-
-                finishWithResult(.success(result))
-            }
-        }
-
-        let save = SaveManagedObjectContext(moc)
-
-        self.managedObjectContext = moc
-
-        super.init(operations: [insert])
+        super.init(dispatchQueue: queue, operations: [processing])
         name = "Insert \(ManagedObject.entityName)"
 
-        if shouldSave {
-            save.addDependency(insert)
-            addChild(save)
-        }
-
         bind(to: insert)
+        bind(from: insert)
     }
 }

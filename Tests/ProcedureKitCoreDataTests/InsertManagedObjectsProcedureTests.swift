@@ -66,7 +66,5 @@ final class InsertManagedObjectsProcedureTests: ProcedureKitCoreDataTestCase {
         }
 
         XCTAssertEqual(names.count, 0)
-        XCTAssertTrue(insert.managedObjectContext.hasChanges)
-
     }
 }
