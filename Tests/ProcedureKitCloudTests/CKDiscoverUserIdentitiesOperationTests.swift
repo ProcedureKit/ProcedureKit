@@ -4,8 +4,6 @@
 //  Copyright © 2015-2018 ProcedureKit. All rights reserved.
 //
 
-#if !swift(>=4.1)
-
 import XCTest
 import CloudKit
 import ProcedureKit
@@ -89,7 +87,7 @@ class CKDiscoverUserIdentitiesOperationTests: CKProcedureTestCase {
         operation.setDiscoverUserIdentitiesCompletionBlock { didExecuteBlock = true }
         target.error = TestError()
         wait(for: operation)
-        XCTAssertProcedureFinishedWithErrors(operation, count: 1)
+        PKAssertProcedureFinished(operation, withErrors: true)
         XCTAssertFalse(didExecuteBlock)
     }
 }
@@ -140,7 +138,7 @@ class CloudKitProcedureDiscoverUserIdentitiesOperationTests: CKProcedureTestCase
     func test__cancellation() {
         cloudkit.cancel()
         wait(for: cloudkit)
-        XCTAssertProcedureCancelledWithoutErrors(cloudkit)
+        PKAssertProcedureCancelled(cloudkit)
     }
 
     func test__success_without_completion_block_set() {
@@ -181,7 +179,7 @@ class CloudKitProcedureDiscoverUserIdentitiesOperationTests: CKProcedureTestCase
         }
 
         wait(for: cloudkit)
-        XCTAssertProcedureFinishedWithErrors(cloudkit, count: 1)
+        PKAssertProcedureFinished(cloudkit, withErrors: true)
         XCTAssertFalse(didExecuteBlock)
     }
 
@@ -228,5 +226,3 @@ class CloudKitProcedureDiscoverUserIdentitiesOperationTests: CKProcedureTestCase
     }
     
 }
-
-#endif

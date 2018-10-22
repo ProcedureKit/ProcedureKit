@@ -149,19 +149,17 @@ public extension ProcedureProtocol {
         precondition(dependency !== self, "Cannot inject result of self into self.")
 
         dependency.addWillFinishBlockObserver(synchronizedWith: (self as? QueueProvider)) { [weak self] dependency, error, _ in
-            if let strongSelf = self {
-                block(strongSelf, dependency, error)
-            }
+            guard let this = self else { return }
+            block(this, dependency, error)
         }
 
         dependency.addDidCancelBlockObserver { [weak self] _, error in
-            if let strongSelf = self {
-                if let dependencyError = error {
-                    strongSelf.cancel(with: ProcedureKitError.dependency(cancelledWithError: dependencyError))
-                }
-                else {
-                    strongSelf.cancel(with: ProcedureKitError.dependenciesCancelled())
-                }
+            guard let this = self else { return }
+            if let dependencyError = error {
+                this.cancel(with: ProcedureKitError.dependency(cancelledWithError: dependencyError))
+            }
+            else {
+                this.cancel(with: ProcedureKitError.dependenciesCancelled())
             }
         }
 
@@ -171,7 +169,6 @@ public extension ProcedureProtocol {
     }
 
     @discardableResult func injectResult<Dependency: OutputProcedure>(from dependency: Dependency, block: @escaping (Self, Dependency.Output) -> Void) -> Self {
-
 
         func injectionResultGiven(_ pendingResult: Pending<ProcedureResult<Dependency.Output>>, and error: Error?) -> InjectionResult<Dependency> {
 
@@ -198,7 +195,7 @@ public extension ProcedureProtocol {
             case let .cancel(e):
                 procedure.cancel(with: e)
             case let .success(output):
-                block(self, output)
+                block(procedure, output)
             }
         }
     }

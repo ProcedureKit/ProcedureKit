@@ -64,17 +64,34 @@ internal extension Delay {
  make it execute after a timeout, or in a repeated fashion with a
  time-out.
  */
-public class DelayProcedure: Procedure {
+public class DelayProcedure: Procedure, InputProcedure {
 
-    private let delay: Delay
+    public var input: Pending<Delay> = .pending
+
     private let leeway: DispatchTimeInterval
     private var _timer: DispatchSourceTimer?
 
-    internal init(delay: Delay, leeway: DispatchTimeInterval = .milliseconds(1)) {
-        self.delay = delay
+    /**
+     Initialize the `DelayProcedure` with a `Delay?` value.
+
+     - parameter delay: an optional `Delay`, defaults to nil. Use if
+         injecting the delay value after initilization.
+     - parameter leeway: an `DispatchTimeInterval` representing leeway
+     for the timer. This defaults to 1 milli-second accuracy.
+     This is partly from a energy standpoint as nanosecond
+     accuracy is costly.
+     */
+
+    public init(delay: Delay? = nil, leeway: DispatchTimeInterval = .milliseconds(1)) {
         self.leeway = leeway
         super.init()
-        name = "Delay \(delay)"
+        if let delay = delay {
+            name = "Delay \(delay)"
+            input = .ready(delay)
+        }
+        else {
+            name = "Delay"
+        }
         addDidCancelBlockObserver { procedure, _ in
             procedure._timer?.cancel()
             procedure.finish()
@@ -113,6 +130,10 @@ public class DelayProcedure: Procedure {
      greater than zero. (Otherwise it finishes immediately.)
      */
     public override func execute() {
+        guard let delay = input.value else {
+            cancel(with: ProcedureKitError.requirementNotSatisfied())
+            return
+        }
         switch delay.interval {
         case (let interval) where interval > 0.0:
             guard !isCancelled else { return }
@@ -130,5 +151,21 @@ public class DelayProcedure: Procedure {
         default:
             finish()
         }
+    }
+}
+
+
+// MARK: - InputProcedure convenience methods
+
+extension InputProcedure where Self.Input == Delay {
+
+    @discardableResult
+    func injectDelay<Dependency: OutputProcedure>(from dependency: Dependency, by makeIntervalFrom: @escaping (Dependency.Output) throws -> TimeInterval) -> Self {
+        return injectResult(from: dependency) { try .by(makeIntervalFrom($0)) }
+    }
+
+    @discardableResult
+    func injectDelay<Dependency: OutputProcedure>(from dependency: Dependency, until makeDateFrom: @escaping (Dependency.Output) throws -> Date) -> Self {
+        return injectResult(from: dependency) { try .until(makeDateFrom($0)) }
     }
 }

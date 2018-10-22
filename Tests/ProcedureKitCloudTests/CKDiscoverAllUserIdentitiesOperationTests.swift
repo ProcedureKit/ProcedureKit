@@ -5,7 +5,6 @@
 //
 
 #if !os(tvOS)
-#if !swift(>=4.1)
 
 import XCTest
 import CloudKit
@@ -80,9 +79,10 @@ class CKDiscoverAllUserIdentitiesOperationTests: CKProcedureTestCase {
     func test__error_with_completion_block() {
         var didExecuteBlock = false
         operation.setDiscoverAllUserIdentitiesCompletionBlock { didExecuteBlock = true }
-        target.error = TestError()
+        let error = TestError()
+        target.error = error
         wait(for: operation)
-        XCTAssertProcedureFinishedWithErrors(operation, count: 1)
+        PKAssertProcedureFinished(operation, withErrors: true)
         XCTAssertFalse(didExecuteBlock)
     }
 }
@@ -127,7 +127,7 @@ class CloudKitProcedureDiscoverAllUserIdentitiesOperationTests: CKProcedureTestC
     func test__cancellation() {
         cloudkit.cancel()
         wait(for: cloudkit)
-        XCTAssertProcedureCancelledWithoutErrors(cloudkit)
+        PKAssertProcedureCancelled(cloudkit)
     }
 
     func test__success_without_completion_block_set() {
@@ -168,7 +168,7 @@ class CloudKitProcedureDiscoverAllUserIdentitiesOperationTests: CKProcedureTestC
         }
 
         wait(for: cloudkit)
-        XCTAssertProcedureFinishedWithErrors(cloudkit, count: 1)
+        PKAssertProcedureFinished(cloudkit, withErrors: true)
         XCTAssertFalse(didExecuteBlock)
     }
 
@@ -215,5 +215,4 @@ class CloudKitProcedureDiscoverAllUserIdentitiesOperationTests: CKProcedureTestC
     }
 }
 
-#endif
 #endif

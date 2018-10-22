@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name              = "ProcedureKit"
-  s.version           = "5.0.0-beta.2"
+  s.version           = "5.0.0"
   s.summary           = "Advanced Operations in Swift."
   s.homepage          = "https://github.com/ProcedureKit/ProcedureKit"
   s.license           = 'MIT'
@@ -43,7 +43,7 @@ Pod::Spec.new do |s|
   s.subspec 'Cloud' do |ss|
   	ss.dependency 'ProcedureKit/Standard'
   	ss.frameworks = 'CloudKit'
-  	ss.source_files = ['Sources/ProcedureKitCloud']
+  	ss.source_files = ['Sources/ProcedureKitCloud/**/*']
   end
 
   # ProcedureKitCoreData
