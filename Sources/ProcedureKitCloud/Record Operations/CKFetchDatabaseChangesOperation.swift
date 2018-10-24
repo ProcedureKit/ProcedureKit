@@ -38,8 +38,6 @@ extension CloudKitProcedure where T: CKFetchAllChanges {
     }
 }
 
-#if !swift(>=4.1)
-
 /// A generic protocol which exposes the properties used by Apple's CKFetchDatabaseChangesOperationType.
 public protocol CKFetchDatabaseChangesOperationProtocol: CKDatabaseOperationProtocol, CKFetchAllChanges, CKPreviousServerChangeToken, CKResultsLimit {
 
@@ -89,7 +87,7 @@ extension CKProcedure where T: CKFetchDatabaseChangesOperationProtocol, T: Assoc
     func setFetchDatabaseChangesCompletionBlock(_ block: @escaping CloudKitProcedure<T>.FetchDatabaseChangesCompletionBlock) {
         operation.fetchDatabaseChangesCompletionBlock = { [weak self] (serverChangeToken, moreComing, error) in
             if let strongSelf = self, let error = error {
-                strongSelf.append(error: FetchDatabaseChangesError(underlyingError: error, token: serverChangeToken, moreComing: moreComing))
+                strongSelf.setErrorOnce(FetchDatabaseChangesError(underlyingError: error, token: serverChangeToken, moreComing: moreComing))
             }
             else {
                 block(serverChangeToken, moreComing)
@@ -150,5 +148,3 @@ extension CloudKitProcedure where T: CKFetchDatabaseChangesOperationProtocol {
         appendConfigureBlock { $0.setFetchDatabaseChangesCompletionBlock(block) }
     }
 }
-
-#endif
