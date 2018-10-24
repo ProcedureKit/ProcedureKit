@@ -70,7 +70,6 @@ open class UIBlockProcedure: BlockProcedure {
 
             let sub = BlockProcedure(block: block)
             sub.log.enabled = false
-            sub.system.enabled = false
 
             sub.addDidFinishBlockObserver { (_, error) in
                 if let error = error {

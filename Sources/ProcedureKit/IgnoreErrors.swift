@@ -22,6 +22,6 @@ final public class IgnoreErrorsProcedure<T: Procedure>: ComposedProcedure<T> {
         }
 
         // If there are errors, just log them.
-        system.warning.message("Ignoring \(e) errors from \(child.operationName).")
+        log.warning.message("Ignoring \(e) errors from \(child.operationName).")
     }
 }
