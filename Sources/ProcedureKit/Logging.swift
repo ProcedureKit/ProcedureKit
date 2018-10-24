@@ -411,7 +411,7 @@ public extension Log {
 
         public static let standard: LogWriter = {
             if #available(iOS 10.0, iOSApplicationExtension 10.0, tvOS 10.0, tvOSApplicationExtension 10.0, OSX 10.12, OSXApplicationExtension 10.12, *) {
-                return OSLogWriter()
+                return OSLogWriter(log: .procedure)
             }
             else {
                 return PrintLogWriter()
@@ -515,10 +515,13 @@ extension Log.Severity: CustomStringConvertible {
 
 
 
-// MARK: - OS Log Writer
+// MARK: - Log Writer
+
+
+// MARK: - OSLog Writer
 
 @available(iOS 10.0, iOSApplicationExtension 10.0, tvOS 10.0, tvOSApplicationExtension 10.0, OSX 10.12, OSXApplicationExtension 10.12, *)
-internal extension Log.Severity {
+public extension Log.Severity {
 
     var logType: OSLogType {
         switch self {
@@ -534,35 +537,52 @@ internal extension Log.Severity {
     }
 }
 
+extension Log.Writers {
+
+    @available(iOS 10.0, iOSApplicationExtension 10.0, tvOS 10.0, tvOSApplicationExtension 10.0, OSX 10.12, OSXApplicationExtension 10.12, *)
+    public class OSLogWriter: LogWriter {
+
+        public let log: OSLog
+
+        public init(log: OSLog) {
+            self.log = log
+        }
+
+        public func write(entry: Log.Entry) {
+            os_log("%{public}@", log: log, type: entry.severity.logType, entry.description)
+        }
+    }
+}
+
 @available(iOS 10.0, iOSApplicationExtension 10.0, tvOS 10.0, tvOSApplicationExtension 10.0, OSX 10.12, OSXApplicationExtension 10.12, *)
 internal extension OSLog {
 
     static let procedure = OSLog(subsystem: "run.kit.procedure", category: "ProcedureKit")
 }
 
-internal extension Log.Writers {
+// MARK: - Print Log Writer
+extension Log.Writers {
 
-    @available(iOS 10.0, iOSApplicationExtension 10.0, tvOS 10.0, tvOSApplicationExtension 10.0, OSX 10.12, OSXApplicationExtension 10.12, *)
-    class OSLogWriter: LogWriter {
+    public class PrintLogWriter: LogWriter {
 
-        let log: OSLog
-
-        init(log: OSLog = .procedure) {
-            self.log = log
-        }
-
-        func write(entry: Log.Entry) {
-            os_log("%{public}@", log: log, type: entry.severity.logType, entry.description)
+        public func write(entry: Log.Entry) {
+            print(entry)
         }
     }
 }
 
-// MARK: - Print Log Writer
-internal extension Log.Writers {
-    class PrintLogWriter: LogWriter {
+extension Log.Writers {
 
-        func write(entry: Log.Entry) {
-            print(entry)
+    public class Redirecting: LogWriter {
+
+        public let writers: [LogWriter]
+
+        public init(writers: [LogWriter]) {
+            self.writers = writers
+        }
+
+        public func write(entry: Log.Entry) {
+            writers.forEach { $0.write(entry: entry) }
         }
     }
 }

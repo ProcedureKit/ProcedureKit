@@ -242,7 +242,7 @@ open class Procedure: Operation, ProcedureProtocol {
         }
     }
 
-    // MARK: State
+    // MARK: - State
 
     fileprivate let stateLock = PThreadMutex()
 
@@ -383,7 +383,7 @@ open class Procedure: Operation, ProcedureProtocol {
         return _state == .finished
     }
 
-    // MARK: Protected Internal Properties
+    // MARK: - Protected Internal Properties
 
     fileprivate var _evaluateConditionsProcedure: EvaluateConditions? // swiftlint:disable:this variable_name
 
@@ -403,7 +403,7 @@ open class Procedure: Operation, ProcedureProtocol {
         return protectedProperties.error
     }
 
-    // MARK: Errors
+    // MARK: - Errors
 
     final public var error: Error? {
         get { return synchronise { _error } }
@@ -418,7 +418,7 @@ open class Procedure: Operation, ProcedureProtocol {
         }
     }
 
-    // MARK: Log
+    // MARK: - Log
 
     /**
      Access the logger for this Operation
@@ -460,13 +460,13 @@ open class Procedure: Operation, ProcedureProtocol {
         set { synchronise { protectedProperties.log = newValue } }
     }
 
-    // MARK: Observers
+    // MARK: - Observers
 
     final internal var observers: [AnyObserver<Procedure>] {
         get { return synchronise { protectedProperties.observers } }
     }
 
-    // MARK: Dependencies & Conditions
+    // MARK: - Dependencies & Conditions
 
     internal var directDependencies: Set<Operation> {
         get { return synchronise { protectedProperties.directDependencies } }
@@ -1427,7 +1427,7 @@ open class Procedure: Operation, ProcedureProtocol {
     }
 }
 
-// MARK: Dependencies
+// MARK: - Dependencies
 
 public extension Procedure {
 
@@ -1476,7 +1476,7 @@ internal extension Procedure {
     }
 }
 
-// MARK: Conditions
+// MARK: - Conditions
 
 extension Procedure {
 
