@@ -259,19 +259,19 @@ public extension LogChannels {
 
 extension Log: LogSettings {
 
-    public static var enabled: Bool {
-        get { return shared.enabled }
-        set { shared.enabled = newValue }
-    }
-
-    public static var severity: Severity {
-        get { return shared.severity }
-        set { shared.severity = newValue }
-    }
-
     public static var channel: LogChannel {
         get { return shared }
         set { shared = newValue }
+    }
+
+    public static var enabled: Bool {
+        get { return channel.enabled }
+        set { channel.enabled = newValue }
+    }
+
+    public static var severity: Severity {
+        get { return channel.severity }
+        set { channel.severity = newValue }
     }
 
     public static var writer: LogWriter {
@@ -283,6 +283,12 @@ extension Log: LogSettings {
         get { return channel.formatter }
         set { channel.formatter = newValue }
     }
+
+    @available(iOS 10.0, iOSApplicationExtension 10.0, tvOS 10.0, tvOSApplicationExtension 10.0, OSX 10.12, OSXApplicationExtension 10.12, *)
+    public static func setWriterUsingOSLog(_ log: OSLog) {
+        writer = Log.Writers.OSLogWriter(log: log)
+    }
+
 }
 
 // MARK: - Log Channel
