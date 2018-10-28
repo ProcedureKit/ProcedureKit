@@ -58,7 +58,7 @@ public protocol ProcedureObserver {
 
      - parameter procedure: the observed `Procedure`.
      */
-    func did(cancel procedure: Procedure, with: Error?)
+    func did(cancel procedure: Procedure, with error: Error?)
 
     /**
      The procedure will add a new `Operation` instance to the
@@ -86,7 +86,7 @@ public protocol ProcedureObserver {
      - parameter procedure: the observed `Procedure`.
      - parameter errors: an array of `Error`s.
      */
-    func will(finish procedure: Procedure, with: Error?, pendingFinish: PendingFinishEvent)
+    func will(finish procedure: Procedure, with error: Error?, pendingFinish: PendingFinishEvent)
 
     /**
      The procedure did finish. Any errors that were encountered are collected here.
@@ -94,7 +94,7 @@ public protocol ProcedureObserver {
      - parameter procedure: the observed `Procedure`.
      - parameter errors: an array of `ErrorType`s.
      */
-    func did(finish procedure: Procedure, with: Error?)
+    func did(finish procedure: Procedure, with error: Error?)
 
     /**
      Provide a queue onto which observer callbacks will be dispatched.
