@@ -34,17 +34,17 @@ public protocol ProcedureProtocol: class {
 
     // Cancelling
 
-    func cancel(with: Error?)
+    func cancel(with error: Error?)
 
-    func procedureDidCancel(with: Error?)
+    func procedureDidCancel(with error: Error?)
 
     // Finishing
 
-    func finish(with: Error?)
+    func finish(with error: Error?)
 
-    func procedureWillFinish(with: Error?)
+    func procedureWillFinish(with error: Error?)
 
-    func procedureDidFinish(with: Error?)
+    func procedureDidFinish(with error: Error?)
 
     // Observers
 
@@ -82,11 +82,11 @@ public extension ProcedureProtocol {
         return error != nil
     }
 
-    func procedureDidCancel(with: Error?) { }
+    func procedureDidCancel(with error: Error?) { }
 
-    func procedureWillFinish(with: Error?) { }
+    func procedureWillFinish(with error: Error?) { }
 
-    func procedureDidFinish(with: Error?) { }
+    func procedureDidFinish(with error: Error?) { }
 
     // Deprecations
 
