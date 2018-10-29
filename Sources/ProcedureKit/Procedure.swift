@@ -996,7 +996,7 @@ open class Procedure: Operation, ProcedureProtocol {
 
      */
 
-    open func procedureDidCancel(with: Error?) {
+    open func procedureDidCancel(with error: Error?) {
         // no-op
     }
 
@@ -1115,9 +1115,9 @@ open class Procedure: Operation, ProcedureProtocol {
 
     // MARK: - Finishing
 
-    open func procedureWillFinish(with: Error?) { }
+    open func procedureWillFinish(with error: Error?) { }
 
-    open func procedureDidFinish(with: Error?) { }
+    open func procedureDidFinish(with error: Error?) { }
 
     /**
      Finish method which must be called eventually after an operation has

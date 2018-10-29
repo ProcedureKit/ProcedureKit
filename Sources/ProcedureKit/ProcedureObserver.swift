@@ -84,7 +84,7 @@ public protocol ProcedureObserver {
      The procedure will finish. Any errors that were encountered are collected here.
 
      - parameter procedure: the observed `Procedure`.
-     - parameter errors: an array of `Error`s.
+     - parameter errors: an Error.
      */
     func will(finish procedure: Procedure, with error: Error?, pendingFinish: PendingFinishEvent)
 
@@ -92,7 +92,7 @@ public protocol ProcedureObserver {
      The procedure did finish. Any errors that were encountered are collected here.
 
      - parameter procedure: the observed `Procedure`.
-     - parameter errors: an array of `ErrorType`s.
+     - parameter error: an Error.
      */
     func did(finish procedure: Procedure, with error: Error?)
 
@@ -141,7 +141,7 @@ public extension ProcedureObserver {
     func did(execute procedure: Procedure) { }
 
     /// Do nothing.
-    func did(cancel procedure: Procedure, with: Error?) { }
+    func did(cancel procedure: Procedure, with error: Error?) { }
 
     /// Do nothing.
     func procedure(_ procedure: Procedure, willAdd newOperation: Operation) { }
@@ -150,10 +150,10 @@ public extension ProcedureObserver {
     func procedure(_ procedure: Procedure, didAdd newOperation: Operation) { }
 
     /// Do nothing.
-    func will(finish procedure: Procedure, with: Error?, pendingFinish: PendingFinishEvent) { }
+    func will(finish procedure: Procedure, with error: Error?, pendingFinish: PendingFinishEvent) { }
 
     /// Do nothing.
-    func did(finish procedure: Procedure, with: Error?) { }
+    func did(finish procedure: Procedure, with error: Error?) { }
 
     /// - Returns: nil
     var eventQueue: DispatchQueueProtocol? { return nil }
