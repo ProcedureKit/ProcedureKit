@@ -62,7 +62,6 @@ public class AnyInputProcedure<Input>: GroupProcedure, InputProcedure {
         self.inputBox = ProcedureInputBoxCreator.inputBox(for: base)
         super.init(dispatchQueue: dispatchQueue, operations: [base])
         self.log.enabled = false
-        self.system.enabled = false
     }
 }
 
@@ -81,7 +80,6 @@ public class AnyOutputProcedure<Output>: GroupProcedure, OutputProcedure {
         self.outputBox = ProcedureOutputBoxCreator.outputBox(for: base)
         super.init(dispatchQueue: dispatchQueue, operations: [base])
         self.log.enabled = false
-        self.system.enabled = false
     }
 }
 
@@ -111,6 +109,5 @@ public class AnyProcedure<Input, Output>: GroupProcedure, InputProcedure, Output
         self.outputBox = ProcedureOutputBoxCreator.outputBox(for: base)
         super.init(dispatchQueue: dispatchQueue, operations: [base])
         self.log.enabled = false
-        self.system.enabled = false
     }
 }

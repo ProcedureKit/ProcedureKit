@@ -59,24 +59,29 @@ public class TestableLogSettings: LogSettings {
 
     private static var shared: LogChannel = Log.Channel<TestableLogSettings>(enabled: true, severity: .verbose, writer: TestableLogWriter(), formatter: TestableLogFormatter())
 
+    public static var channel: LogChannel {
+        get { return shared }
+        set { shared = newValue }
+    }
+
     public static var enabled: Bool {
-        get { return shared.enabled }
-        set { shared.enabled = newValue }
+        get { return channel.enabled }
+        set { channel.enabled = newValue }
     }
 
     public static var severity: Log.Severity {
-        get { return shared.severity }
-        set { shared.severity = newValue }
+        get { return channel.severity }
+        set { channel.severity = newValue }
     }
 
     public static var writer: LogWriter {
-        get { return shared.writer }
-        set { shared.writer = newValue }
+        get { return channel.writer }
+        set { channel.writer = newValue }
     }
 
     public static var formatter: LogFormatter {
-        get { return shared.formatter }
-        set { shared.formatter = newValue }
+        get { return channel.formatter }
+        set { channel.formatter = newValue }
     }
 }
 

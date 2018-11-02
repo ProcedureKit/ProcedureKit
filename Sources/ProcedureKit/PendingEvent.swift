@@ -99,7 +99,7 @@ final public class PendingEvent: CustomStringConvertible {
     }
 
     private func debugProceed() {
-        (procedure as? Procedure)?.system.verbose.message("(\(self)) is ready to proceed")
+        (procedure as? Procedure)?.log.verbose.message("(\(self)) is ready to proceed")
     }
 
     public var description: String {
