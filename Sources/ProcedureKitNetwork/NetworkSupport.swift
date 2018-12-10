@@ -135,7 +135,7 @@ struct ProcedureKitNetworkError: Error {
     }
 }
 
-struct ProcedureKitNetworkResponse {
+public struct ProcedureKitNetworkResponse {
 
     let response: HTTPURLResponse?
     let error: ProcedureKitNetworkError?
@@ -144,7 +144,7 @@ struct ProcedureKitNetworkResponse {
         return response?.code
     }
 
-    init(response: HTTPURLResponse? = nil, error: Error? = nil) {
+    public init(response: HTTPURLResponse? = nil, error: Error? = nil) {
         self.response = response
         self.error = error.map { ProcedureKitNetworkError(error: $0) }
     }
@@ -288,9 +288,9 @@ public extension HTTPURLResponse {
     }
 }
 
-extension NetworkOperation {
+public extension NetworkOperation {
 
-    func makeNetworkResponse() -> ProcedureKitNetworkResponse {
+    public func makeNetworkResponse() -> ProcedureKitNetworkResponse {
         return ProcedureKitNetworkResponse(response: urlResponse, error: error)
     }
 }
