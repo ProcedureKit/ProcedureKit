@@ -98,15 +98,15 @@ public struct HTTPPayloadRequest<Payload: Equatable>: Equatable {
 
 // MARK: - Error Handling
 
-struct ProcedureKitNetworkError: Error {
+public struct ProcedureKitNetworkError: Error {
 
-    let underlyingError: Error
+    public let underlyingError: Error
 
-    var errorCode: Int {
+    public var errorCode: Int {
         return (underlyingError as NSError).code
     }
 
-    var isTransientError: Bool {
+    public var isTransientError: Bool {
         switch errorCode {
         case NSURLErrorNetworkConnectionLost:
             return true
@@ -115,7 +115,7 @@ struct ProcedureKitNetworkError: Error {
         }
     }
 
-    var isTimeoutError: Bool {
+    public var isTimeoutError: Bool {
         guard let procedureKitError = underlyingError as? ProcedureKitError else { return false }
         guard case .timedOut(with: _) = procedureKitError.context else { return false }
         return true
@@ -137,10 +137,10 @@ struct ProcedureKitNetworkError: Error {
 
 public struct ProcedureKitNetworkResponse {
 
-    let response: HTTPURLResponse?
-    let error: ProcedureKitNetworkError?
+    public let response: HTTPURLResponse?
+    public let error: ProcedureKitNetworkError?
 
-    var httpStatusCode: HTTPStatusCode? {
+    public var httpStatusCode: HTTPStatusCode? {
         return response?.code
     }
 
