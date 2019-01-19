@@ -222,7 +222,7 @@ open class Procedure: Operation, ProcedureProtocol {
         }
     }
 
-    internal let identifier = UUID()
+    internal let uuid = UUID()
 
     internal var typeDescription: String {
         return String(describing: type(of: self))
