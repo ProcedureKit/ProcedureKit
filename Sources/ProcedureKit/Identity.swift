@@ -26,21 +26,21 @@ extension Procedure: Identifiable {
 
     public struct Identity: Identifiable, Hashable {
 
-        public let identity: UUID
+        public let identity: ObjectIdentifier
         public let name: String?
-
-        public var hashValue: Int {
-            return identity.hashValue
-        }
 
         public var description: String {
             return name.map { "\($0) #\(identity)" } ?? "Unnamed Procedure #\(identity)"
+        }
+
+        public func hash(into hasher: inout Hasher) {
+            hasher.combine(identity)
         }
     }
 
     /// A Procedure's identity (often used for debugging purposes) provides a unique identifier
     /// for a `Procedure` instance, comprised of the Procedure's `name` and a `UUID`.
     public var identity: Identity {
-        return Identity(identity: identifier, name: name)
+        return Identity(identity: ObjectIdentifier(self), name: name)
     }
 }
