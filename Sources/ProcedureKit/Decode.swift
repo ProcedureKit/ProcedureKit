@@ -6,8 +6,22 @@
 
 import Foundation
 
+/// A generic Procedure to perfrom JSON decoding of any Decodable type from Data
 public final class DecodeJSONProcedure<T: Decodable>: TransformProcedure<Data, T> {
 
+    /// Convenience initializer which allows optional configuration
+    /// of the JSONDecoder. All configurations are optional, with
+    /// default arguments of nil. Therefore the default behaviour
+    /// is that of JSONDecoder itself.
+    ///
+    /// - See: `JSONDecoder`
+    ///
+    /// - Parameters:
+    ///   - dateDecodingStrategy: an optional DateDecodingStrategy
+    ///   - dataDecodingStrategy: an optional DataDecodingStrategy
+    ///   - nonConformingFloatDecodingStrategy: an optional NonConformingFloatDecodingStrategy
+    ///   - keyDecodingStrategy: an optional KeyDecodingStrategy
+    ///   - userInfo: an optional [CodingUserInfoKey: Any]
     public convenience init(
         dateDecodingStrategy: JSONDecoder.DateDecodingStrategy? = nil,
         dataDecodingStrategy: JSONDecoder.DataDecodingStrategy? = nil,
@@ -40,6 +54,9 @@ public final class DecodeJSONProcedure<T: Decodable>: TransformProcedure<Data, T
         self.init(decoder)
     }
 
+    /// Initialize the procedure with a JSONDecoder instance
+    ///
+    /// - Parameter decoder: the JSONDecoder to use
     public init(_ decoder: JSONDecoder) {
         super.init { return try decoder.decode(T.self, from: $0) }
     }
