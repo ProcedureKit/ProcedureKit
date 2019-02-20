@@ -45,3 +45,4 @@ docs
 .ci/xcodebuild-data/*
 .fastlane/README.md
 .ci/results/**
+/Integrations/SPM/Package.resolved
