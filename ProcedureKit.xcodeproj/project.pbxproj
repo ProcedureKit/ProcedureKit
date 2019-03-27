@@ -1928,7 +1928,7 @@
 				CLASSPREFIX = PCK;
 				DefaultBuildSystemTypeForWorkspace = Latest;
 				LastSwiftUpdateCheck = 0930;
-				LastUpgradeCheck = 1000;
+				LastUpgradeCheck = 1020;
 				ORGANIZATIONNAME = ProcedureKit;
 				TargetAttributes = {
 					653C9FC01D6097A40070B7A2 = {
