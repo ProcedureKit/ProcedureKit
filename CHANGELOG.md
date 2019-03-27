@@ -1,6 +1,21 @@
 # 5.1.0
 This will be the last update specifically supporting Xcode 10.1 and Swift 4.2. 
 
+## New Procedures
+
+1. [[919](https://github.com/ProcedureKit/ProcedureKit/pull/919)]: JSON Coding procedures.
+
+    This changes introduced a generic `JSONDecodingProcedure` and `JSONEncodingProcedure` which can be used to decode/decode a `Data` representing a UTF-8 encoded JSON string into a suitable `Codable` type. The procedure allows full injection of the `JSONDecoder` with a convenience initializer to user or override the default behavior. Additionally, the  `Data` can be inject from a network procedure. For decoding errors - the procedure will fail with the coding error from the `JSONDecoder`. This might be quite tricky to recover from and manage in production code, so in some cases it would make sense to decode into a type which can handle JSON error responses, e.g. `{"message": "Failed to authorize"}`.
+
+## Other Changes
+
+1. [[908](https://github.com/ProcedureKit/ProcedureKit/pull/908), [909](https://github.com/ProcedureKit/ProcedureKit/pull/909)]: Updates the parameter names in method signature named `with: Error?` to include `error`. This greatly improves code completion. Thanks to [@pronebird](https://github.com/pronebird) and [@juliensagot](https://github.com/juliensagot) for these.
+2. [[906](https://github.com/ProcedureKit/ProcedureKit/pull/906)]: Updates to the logging mechanisms.
+3. [[918](https://github.com/ProcedureKit/ProcedureKit/pull/918)]: The `Identity` property of `Procedure` now uses `ObjectIdentifier` and `Hasher` under the hood instead of UUIDs. Thanks to 
+4. [[912](https://github.com/ProcedureKit/ProcedureKit/pull/912)]: Fixes some public accessor attributes for `NetworkRecovery` - thanks to [@ericyanush](https://github.com/ericyanush) for this one.
+5. [[923](https://github.com/ProcedureKit/ProcedureKit/pull/923)]: Added an integration point in CI to check that SwiftPM was correctly integrating.
+6. [[924](https://github.com/ProcedureKit/ProcedureKit/pull/924)]: Fixes public accessor methods to the `LaunchRequest` type in `ProcessProcedure`.
+
 # 5.0.0
 This is a _rather long-awaited_ next major version of ProcedureKit.
 
