@@ -27,7 +27,7 @@ extension Collection where Iterator.Element: Operation {
         return compactMap { $0 as? Condition }
     }
     
-    @available(*, deprecated: 4.5.0, message: "Use underlying quality of service APIs instead.")
+    @available(*, deprecated, message: "Use underlying quality of service APIs instead.")
     internal var userIntent: UserIntent {
         get { return .none }
     }

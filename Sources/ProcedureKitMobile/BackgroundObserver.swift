@@ -24,7 +24,7 @@ public extension ProcedureKitError {
     /// Procedures with an attached `BackgroundObserver` with
     /// cancellationOption == `.cancelProcedureWhenAppIsBackgrounded`
     /// will be cancelled with this error.
-    public struct AppWasBackgrounded: Error {
+    struct AppWasBackgrounded: Error {
         internal init() { }
     }
 }

@@ -128,6 +128,7 @@ class RepeatProcedureTests: RepeatTestCase {
     }
 }
 
+@available(*, deprecated, message: "Protocol is now deprecated")
 class RepeatableTestProcedure: TestProcedure, Repeatable {
 
     let limit: Int
@@ -142,6 +143,7 @@ class RepeatableTestProcedure: TestProcedure, Repeatable {
     }
 }
 
+@available(*, deprecated, message: "Protocol is now deprecated")
 class RepeatableRepeatProcedureTests: ProcedureKitTestCase {
 
     func test__init_with_repeatable_procedure() {

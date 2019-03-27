@@ -136,7 +136,7 @@ open class AlertProcedure: Procedure {
         addCondition(MutuallyExclusive<UIAlertController>())
     }
 
-    @available(*, deprecated: 5.0.0, message: "Use init(title:message:style:from:waitForDismissal:) instead.")
+    @available(*, deprecated, message: "Use init(title:message:style:from:waitForDismissal:) instead.")
     public convenience init(presentAlertFrom presenting: PresentingViewController, withPreferredStyle preferredAlertStyle: UIAlertController.Style = .alert, waitForDismissal: Bool = true) {
         self.init(title: nil, message: nil, from: presenting, waitForDismissal: waitForDismissal)
     }

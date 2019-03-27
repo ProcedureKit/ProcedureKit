@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 51;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -2015,11 +2015,12 @@
 				};
 			};
 			buildConfigurationList = 65CFC5E81D608A1A00CAD875 /* Build configuration list for PBXProject "ProcedureKit" */;
-			compatibilityVersion = "Xcode 9.3";
-			developmentRegion = English;
+			compatibilityVersion = "Xcode 10.0";
+			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
+				Base,
 			);
 			mainGroup = 65CFC5E41D608A1A00CAD875;
 			productRefGroup = 65CFC5F11D608A5500CAD875 /* Products */;

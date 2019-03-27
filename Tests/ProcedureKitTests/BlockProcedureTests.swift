@@ -74,10 +74,10 @@ class AsyncBlockProcedureTests: ProcedureKitTestCase {
 
     func test__block_executes() {
         var blockDidExecute = false
-        let block = AsyncBlockProcedure { finishWithResult in
+        let block = BlockProcedure { this in
             self.dispatchQueue.async {
                 blockDidExecute = true
-                finishWithResult(success)
+                this.finish()
             }
         }
         wait(for: block)
@@ -87,10 +87,10 @@ class AsyncBlockProcedureTests: ProcedureKitTestCase {
 
     func test__block_does_not_execute_if_cancelled() {
         var blockDidExecute = false
-        let block = AsyncBlockProcedure { finishWithResult in
+        let block = BlockProcedure { this in
             self.dispatchQueue.async {
                 blockDidExecute = true
-                finishWithResult(success)
+                this.finish()
             }
         }
         block.cancel()
@@ -101,9 +101,9 @@ class AsyncBlockProcedureTests: ProcedureKitTestCase {
 
     func test__block_which_finishes_with_error() {
         let error = TestError()
-        let block = AsyncBlockProcedure { finishWithResult in
+        let block = BlockProcedure { this in
             self.dispatchQueue.async {
-                finishWithResult(.failure(error))
+                this.finish(with: error)
             }
         }
         wait(for: block)
@@ -111,8 +111,10 @@ class AsyncBlockProcedureTests: ProcedureKitTestCase {
     }
 
     func test__block_did_execute_observer() {
-        let block = AsyncBlockProcedure { finishWithResult in
-            self.dispatchQueue.async { finishWithResult(success) }
+        let block = BlockProcedure { this in
+            self.dispatchQueue.async {
+                this.finish()
+            }
         }
         var didExecuteBlockObserver = false
         block.addDidExecuteBlockObserver { procedure in

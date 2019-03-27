@@ -167,7 +167,7 @@ class ConditionTests: ProcedureKitTestCase {
         }
         let didStartLongRunningDependencyGroup = DispatchGroup()
         didStartLongRunningDependencyGroup.enter()
-        let longRunningDependency = AsyncBlockProcedure { completion in
+        let longRunningDependency = BlockProcedure { this in
             didStartLongRunningDependencyGroup.leave()
             // never finishes by itself
         }
@@ -475,7 +475,7 @@ class ConditionTests: ProcedureKitTestCase {
         let procedureDidFinishGroup = DispatchGroup()
         let conditionEvaluatedGroup = DispatchGroup()
         weak var expDependencyDidStart = expectation(description: "Did Start Dependency")
-        let dependency = AsyncBlockProcedure { completion in
+        let dependency = BlockProcedure { this in
             DispatchQueue.main.async {
                 expDependencyDidStart?.fulfill()
             }
@@ -542,7 +542,7 @@ class ConditionTests: ProcedureKitTestCase {
 
         weak var expDependencyDidStart = expectation(description: "Did Start additionalDependency")
         let dependency = TestProcedure()
-        let additionalDependency = AsyncBlockProcedure { completion in
+        let additionalDependency = BlockProcedure { this in
             DispatchQueue.main.async {
                 expDependencyDidStart?.fulfill()
             }
@@ -1059,7 +1059,7 @@ class ConditionTests: ProcedureKitTestCase {
         }
 
         testDependencyExecutedGroup.enter()
-        let normalDependency = AsyncBlockProcedure { _ in
+        let normalDependency = BlockProcedure { this in
             testDependencyExecutedGroup.leave()
             // do not finish
         }

@@ -77,7 +77,7 @@ public enum ProcedureStatus: String {
 
  - see: https://developer.apple.com/library/ios/documentation/Performance/Conceptual/EnergyGuide-iOS/PrioritizeWorkWithQoS.html#//apple_ref/doc/uid/TP40015243-CH39
  */
-@available(*, deprecated: 4.5.0, message: "Use underlying quality of service APIs instead.")
+@available(*, deprecated, message: "Use underlying quality of service APIs instead.")
 @objc public enum UserIntent: Int {
     case none = 0, sideEffect, initiated
 
@@ -200,7 +200,7 @@ open class Procedure: Operation, ProcedureProtocol {
      - requires: self must not have started yet. i.e. either hasn't been added
      to a queue, or is waiting on dependencies.
      */
-    @available(*, deprecated: 4.5.0, message: "Use underlying quality of service APIs instead.")
+    @available(*, deprecated, message: "Use underlying quality of service APIs instead.")
     public var userIntent: UserIntent = .none
 
     @available(OSX 10.10, iOS 8.0, tvOS 8.0, watchOS 2.0, *)
@@ -1431,7 +1431,7 @@ open class Procedure: Operation, ProcedureProtocol {
 
 public extension Procedure {
 
-    public final func addDependency<Dependency: ProcedureProtocol>(_ dependency: Dependency) {
+    final func addDependency<Dependency: ProcedureProtocol>(_ dependency: Dependency) {
         guard let op = dependency as? Operation else {
             assertionFailure("Adding dependencies which do not subclass Foundation.Operation is not supported.")
             return
@@ -1448,12 +1448,12 @@ internal extension Procedure {
     ///
     /// - Parameters:
     ///   - block: a block to execute on the EventQueue
-    internal func dispatchEvent(minimumQoS: DispatchQoS? = nil, block: @escaping () -> Void) {
+    func dispatchEvent(minimumQoS: DispatchQoS? = nil, block: @escaping () -> Void) {
         eventQueue.dispatchEventBlockInternal(minimumQoS: minimumQoS, block: block)
     }
 
     // Only to be called when already on the eventQueue
-    internal func optimizedDispatchEventNotify(group: DispatchGroup, inheritQoS: Bool = false, block: @escaping () -> Void) {
+    func optimizedDispatchEventNotify(group: DispatchGroup, inheritQoS: Bool = false, block: @escaping () -> Void) {
         debugAssertIsOnEventQueue()
 
         if group.wait(timeout: .now()) == .success {
@@ -1471,7 +1471,7 @@ internal extension Procedure {
         }
     }
 
-    internal func debugAssertIsOnEventQueue() {
+    func debugAssertIsOnEventQueue() {
         eventQueue.debugAssertIsOnQueue()
     }
 }
@@ -1768,7 +1768,7 @@ extension Procedure {
 
 internal extension Procedure {
 
-    internal func debugSynchronizedAssertIsExecuting(_ message: String = "Procedure is not yet finishing or finished.") {
+    func debugSynchronizedAssertIsExecuting(_ message: String = "Procedure is not yet finishing or finished.") {
         #if DEBUG
         synchronise {
             guard _state <= .executing else {
@@ -1780,7 +1780,7 @@ internal extension Procedure {
     }
 
     /// Internal Assertions
-    internal func debugSynchronizedAssertIsPending(_ message: String = "Procedure is no longer pending.") {
+    func debugSynchronizedAssertIsPending(_ message: String = "Procedure is no longer pending.") {
         #if DEBUG
         synchronise {
             guard _state <= .pending else {
@@ -1807,7 +1807,7 @@ public extension Procedure {
     }
 
     @available(*, deprecated, renamed: "addDependency(_:)", message: "This has been renamed to use Swift 3/4 naming conventions")
-    public final func add<Dependency: ProcedureProtocol>(dependency: Dependency) {
+    final func add<Dependency: ProcedureProtocol>(dependency: Dependency) {
         addDependency(dependency)
     }
 
@@ -1822,7 +1822,7 @@ public extension Procedure {
     }
 
     @available(*, deprecated, renamed: "addCondition(_:)", message: "This has been renamed to use Swift 3/4 naming conventions")
-    public final func add(condition: Condition) {
+    final func add(condition: Condition) {
         addCondition(condition)
     }
 }
