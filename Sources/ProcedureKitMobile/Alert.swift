@@ -157,7 +157,7 @@ open class AlertProcedure: Procedure {
                 }
             }
         }
-        present.system.enabled = false
+        present.log.enabled = false
 
         do { try produce(operation: present) }
         catch { log.fatal.message("Unable to present alert, error: \(error)") }

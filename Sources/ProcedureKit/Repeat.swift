@@ -229,8 +229,8 @@ open class RepeatProcedure<T: Operation>: GroupProcedure {
 
         guard shouldAddNext(), let payload = _next() else { return false }
 
-        system.verbose.trace()
-        system.info.message("Will add next operation.")
+        log.verbose.trace()
+        log.info.message("Will add next operation.")
 
         _repeatStateLock.withCriticalScope {
             if let newConfigureBlock = payload.configure {
@@ -321,8 +321,8 @@ open class RepeatProcedure<T: Operation>: GroupProcedure {
     // of the _repeatStateLock.
     private func _replace(configureBlock block: @escaping Payload.ConfigureBlock) {
         _configure = block
-        system.verbose.trace()
-        system.verbose.message("did replace configure block.")
+        log.verbose.trace()
+        log.verbose.message("did replace configure block.")
     }
 }
 

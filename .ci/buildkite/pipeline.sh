@@ -47,8 +47,13 @@ steps:
   name: "Test CocoaPods Integration"
   command: ".ci/scripts/test-cocoapods"  
   agents:
-    queue: "iOS-Simulator"
     xcode: "$XCODE"
+- 
+  name: "Test SPM Integration"
+  command: ".ci/scripts/test-spm"  
+  agents:
+    xcode: "$XCODE"
+    
 YAML
 
 cat <<-YAML

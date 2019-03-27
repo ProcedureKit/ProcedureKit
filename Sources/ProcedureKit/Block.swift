@@ -4,6 +4,8 @@
 //  Copyright © 2015-2018 ProcedureKit. All rights reserved.
 //
 
+import Foundation
+
 open class BlockProcedure: Procedure {
 
     public typealias SelfBlock = (BlockProcedure) -> Void
@@ -70,7 +72,6 @@ open class UIBlockProcedure: BlockProcedure {
 
             let sub = BlockProcedure(block: block)
             sub.log.enabled = false
-            sub.system.enabled = false
 
             sub.addDidFinishBlockObserver { (_, error) in
                 if let error = error {
