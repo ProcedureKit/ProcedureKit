@@ -1,3 +1,6 @@
+# 5.1.0
+This will be the last update specifically supporting Xcode 10.1 and Swift 4.2. 
+
 # 5.0.0
 This is a _rather long-awaited_ next major version of ProcedureKit.
 

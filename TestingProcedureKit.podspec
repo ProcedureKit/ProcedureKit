@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name              = "TestingProcedureKit"
-  s.version           = "5.0.0"
+  s.version           = "5.1.0"
   s.summary           = "XCTest support for ProcedureKit."
   s.homepage          = "https://github.com/ProcedureKit/ProcedureKit"
   s.license           = 'MIT'
@@ -27,5 +27,3 @@ Pod::Spec.new do |s|
   	ss.source_files = ['Sources/TestingProcedureKit']
   end
 end
-
-
