@@ -197,7 +197,7 @@ internal class BackgroundManager {
             return lock.withCriticalScope { () -> Bool in
                 // verify that the AppIsInBackgroundHandlerRecord is still in the _backgroundEventHandlersPerProcedure
                 guard var backgroundHandlersForProcedure = _backgroundEventHandlersPerProcedure[procedure] else { return false }
-                guard let handlerRecordIndex = backgroundHandlersForProcedure.index(where: { $0 === record }) else {
+                guard let handlerRecordIndex = backgroundHandlersForProcedure.firstIndex(where: { $0 === record }) else {
                     // otherwise, something else (ex. background state change) already claimed it
                     return false
                 }

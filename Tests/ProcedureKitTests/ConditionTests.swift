@@ -604,7 +604,7 @@ class ConditionTests: ProcedureKitTestCase {
 
     // Verifies that a Procedure (and its condition evaluator) have a dependency and are waiting
     private func XCTAssertProcedureIsWaiting<T: Procedure>(_ exp: @autoclosure () throws -> T, withDependency dependency: Operation, _ message: @autoclosure () -> String = "", file: StaticString = #file, line: UInt = #line) {
-        __XCTEvaluateAssertion(testCase: self, message, file: file, line: line) {
+        __XCTEvaluateAssertion(testCase: self, message(), file: file, line: line) {
             let procedure = try exp()
 
             guard procedure.isEnqueued else {

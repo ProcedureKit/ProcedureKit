@@ -148,19 +148,22 @@ class UIBlockProcedureTests: ProcedureKitTestCase {
         PKAssertProcedureFinished(block)
     }
 
-    func test__didFinishObserversCalled() {
+    func test__willFinishObserversCalled() {
         var blockDidExecute = false
         var observerDidExecute = false
         let block = UIBlockProcedure {
             blockDidExecute = true
         }
-        block.addDidFinishBlockObserver { (_, error) in
-            observerDidExecute = true
+        block.addWillFinishBlockObserver { (_, _, pendingFinish) in
+            pendingFinish.doBeforeEvent {
+                observerDidExecute = true
+            }
         }
         var dependencyDidExecute = false
         let dep = BlockProcedure {
             dependencyDidExecute = true
         }
+        block.addDependency(dep)
         wait(for: block, dep)
         XCTAssertTrue(blockDidExecute)
         XCTAssertTrue(observerDidExecute)

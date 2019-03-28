@@ -72,6 +72,7 @@ class UIProcedureTests: ProcedureKitTestCase {
         }
     }
 
+    @available(*, deprecated, message: "UIProcedure is now deprecated and will be removed")
     func test__present_style() {
         presenting.check = checkReceivedViewController(inNavigationController: true)
         let ui = UIProcedure(present: presented, from: presenting, withStyle: .present, sender: nil)
@@ -79,6 +80,7 @@ class UIProcedureTests: ProcedureKitTestCase {
         PKAssertProcedureFinished(ui)
     }
 
+    @available(*, deprecated, message: "UIProcedure is now deprecated and will be removed")
     func test__present_style_without_navigation_controller() {
         presenting.check = checkReceivedViewController(inNavigationController: false)
         let ui = UIProcedure(present: presented, from: presenting, withStyle: .present, inNavigationController: false, sender: nil)
@@ -86,6 +88,7 @@ class UIProcedureTests: ProcedureKitTestCase {
         PKAssertProcedureFinished(ui)
     }
 
+    @available(*, deprecated, message: "UIProcedure is now deprecated and will be removed")
     func test__show_style() {
         presenting.check = checkReceivedViewController(inNavigationController: false)
         let ui = UIProcedure(present: presented, from: presenting, withStyle: .show, sender: nil)
@@ -93,6 +96,7 @@ class UIProcedureTests: ProcedureKitTestCase {
         PKAssertProcedureFinished(ui)
     }
 
+    @available(*, deprecated, message: "UIProcedure is now deprecated and will be removed")
     func test__show_detail_style() {
         presenting.check = checkReceivedViewController(inNavigationController: false)
         let ui = UIProcedure(present: presented, from: presenting, withStyle: .showDetail, sender: nil)
@@ -100,6 +104,7 @@ class UIProcedureTests: ProcedureKitTestCase {
         PKAssertProcedureFinished(ui)
     }
 
+    @available(*, deprecated, message: "UIProcedure is now deprecated and will be removed")
     func test__present_dismissing_view_controller() {
         presenting.check = checkReceivedViewController(inNavigationController: true)
         let ui = UIProcedure(present: presented, from: presenting, withStyle: .present, sender: nil, waitForDismissal: true)
