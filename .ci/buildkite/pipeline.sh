@@ -9,7 +9,6 @@ steps:
   artifact_paths:
     - ".ci/results/xcodebuild.log"
   agents:
-    queue: "stress-tests"
     xcode: "$XCODE"
 -
   name: "macOS"
@@ -28,7 +27,6 @@ steps:
   artifact_paths:
     - ".ci/results/xcodebuild.log"
   agents:
-    queue: "iOS-Simulator"
     xcode: "$XCODE"
 -
   name: "tvOS"
@@ -38,7 +36,6 @@ steps:
   artifact_paths:
     - ".ci/results/xcodebuild.log"
   agents:
-    queue: "iOS-Simulator"
     xcode: "$XCODE"
     
 - wait
