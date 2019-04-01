@@ -120,6 +120,7 @@ open class AlertProcedure: Procedure {
 
      - parameter title: an optional alert title, defaults to nil
      - parameter message: an optional alert message, defaults to nil
+     - parameter style: preferred presentation style for the alert, defaults to .alert
      - parameter from: a `UIViewController` instance.
      - parameter waitForDismissal: a Bool, defaults to true, which indicates whether the
           procedure should wait until the alert controller is dismissed until finishing.
@@ -128,8 +129,8 @@ open class AlertProcedure: Procedure {
      - notes: The AlertController uses an "alert" style, and it is not possible to use AlertProcedure
        to show "action sheet" style alerts.
      */
-    public init(title: String? = nil, message: String? = nil, from viewController: PresentingViewController, waitForDismissal: Bool = true) {
-        self.controller = UIAlertController(title: title, message: message, preferredStyle: .alert)
+    public init(title: String? = nil, message: String? = nil, with style: UIAlertController.Style = .alert, from viewController: PresentingViewController, waitForDismissal: Bool = true) {
+        self.controller = UIAlertController(title: title, message: message, preferredStyle: style)
         self.waitForDismissal = waitForDismissal
         self.viewController = viewController
         super.init()
@@ -138,7 +139,7 @@ open class AlertProcedure: Procedure {
 
     @available(*, deprecated: 5.0.0, message: "Use init(title:message:style:from:waitForDismissal:) instead.")
     public convenience init(presentAlertFrom presenting: PresentingViewController, withPreferredStyle preferredAlertStyle: UIAlertController.Style = .alert, waitForDismissal: Bool = true) {
-        self.init(title: nil, message: nil, from: presenting, waitForDismissal: waitForDismissal)
+        self.init(title: nil, message: nil, with: preferredAlertStyle, from: presenting, waitForDismissal: waitForDismissal)
     }
 
     open override func execute() {
