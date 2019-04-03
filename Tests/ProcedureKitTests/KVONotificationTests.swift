@@ -192,7 +192,7 @@ class KVOTests: ProcedureKitTestCase {
     private func verifyKVO_cancelledNotifications(_ observedKVO: [NSOperationKVOObserver.KVONotification]) -> (success: Bool, isReadyIndex: Int?, failureMessage: String?) {
         // ensure that the observedKVO contains:
         // "isReady", with at least one "isCancelled" before it
-        if let isReadyIndex = observedKVO.index(where: { $0.keyPath == NSOperationKVOObserver.KeyPath.ready.rawValue }) {
+        if let isReadyIndex = observedKVO.firstIndex(where: { $0.keyPath == NSOperationKVOObserver.KeyPath.ready.rawValue }) {
             var foundIsCancelled = false
             guard isReadyIndex > 0 else {
                 return (success: false, isReadyIndex: isReadyIndex, failureMessage: "Found isReady KVO notification, but no isCancelled beforehand.")

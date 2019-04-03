@@ -109,7 +109,7 @@ open class LoggingTestCase: ProcedureKitTestCase {
 public extension ProcedureKitTestCase {
 
     func PKAssertProcedureLogContainsMessage<T: Procedure>(_ exp: @autoclosure () throws -> T, _ exp2: @autoclosure () throws -> String, _ message: @autoclosure () -> String = "", file: StaticString = #file, line: UInt = #line) {
-        __XCTEvaluateAssertion(testCase: self, message, file: file, line: line) {
+        __XCTEvaluateAssertion(testCase: self, message(), file: file, line: line) {
 
             let procedure = try exp()
 

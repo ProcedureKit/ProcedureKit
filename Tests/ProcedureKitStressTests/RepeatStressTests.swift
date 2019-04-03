@@ -20,7 +20,7 @@ class RepeatStressTests: StressTestCase {
             repeatProcedure.addDidFinishBlockObserver { _, _ in
                 batch.dispatchGroup.leave()
             }
-            batch.queue.add(operation: repeatProcedure)
+            batch.queue.addOperation(repeatProcedure)
             repeatProcedure.cancel()
         }
     }

@@ -15,11 +15,12 @@ class CancelBlockProcedureStessTests: StressTestCase {
         stress(level: .custom(10, 5_000)) { batch, _ in
             batch.dispatchGroup.enter() // enter once for cancel
             batch.dispatchGroup.enter() // enter once for finish
-            let block = CancellableBlockProcedure { isCancelled in
+            let block = BlockProcedure { this in
                 // prevent the BlockProcedure from finishing before it is cancelled
-                while !isCancelled() {
+                while false == this.isCancelled {
                     usleep(10)
                 }
+                this.finish()
             }
             block.addDidCancelBlockObserver { _, _ in
                 batch.dispatchGroup.leave() // leave once for cancel
@@ -27,7 +28,7 @@ class CancelBlockProcedureStessTests: StressTestCase {
             block.addDidFinishBlockObserver { _, _ in
                 batch.dispatchGroup.leave() // leave once for finish
             }
-            batch.queue.add(operation: block)
+            batch.queue.addOperation(block)
             block.cancel()
         }
     }
@@ -46,7 +47,7 @@ class CancelBlockProcedureStessTests: StressTestCase {
             block.addDidFinishBlockObserver { _, _ in
                 batch.dispatchGroup.leave()
             }
-            batch.queue.add(operation: block)
+            batch.queue.addOperation(block)
             block.cancel()
         }
     }

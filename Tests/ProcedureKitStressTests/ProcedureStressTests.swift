@@ -17,7 +17,7 @@ class ProcedureCompletionBlockStressTest: StressTestCase {
             batch.dispatchGroup.enter()
             let procedure = TestProcedure(name: "Batch \(batch.number), Iteration \(iteration)")
             procedure.addCompletionBlock { batch.dispatchGroup.leave() }
-            batch.queue.add(operation: procedure)
+            batch.queue.addOperation(procedure)
         }
     }
 }
@@ -34,7 +34,7 @@ class CancelProcedureWithErrorsStressTest: StressTestCase {
             procedure.addDidFinishBlockObserver { _, _ in
                 batch.dispatchGroup.leave()
             }
-            batch.queue.add(operation: procedure)
+            batch.queue.addOperation(procedure)
             procedure.cancel(with: TestError())
         }
     }
@@ -56,7 +56,7 @@ class CancelProcedureWithErrorsStressTest: StressTestCase {
                 }
             }
             procedure.cancel(with: TestError())
-            batch.queue.add(operation: procedure)
+            batch.queue.addOperation(procedure)
         }
     }
 
@@ -79,7 +79,7 @@ class CancelProcedureWithErrorsStressTest: StressTestCase {
             procedure.addWillExecuteBlockObserver { (procedure, _) in
                 procedure.cancel(with: TestError())
             }
-            batch.queue.add(operation: procedure)
+            batch.queue.addOperation(procedure)
         }
     }
 }
@@ -89,7 +89,7 @@ class ProcedureConditionStressTest: StressTestCase {
     func test__adding_many_conditions() {
 
         StressLevel.custom(1, 10_000).forEach { _, _ in
-            procedure.add(condition: TrueCondition())
+            procedure.addCondition(TrueCondition())
         }
         wait(for: procedure, withTimeout: 10)
         PKAssertProcedureFinished(procedure)
@@ -98,7 +98,7 @@ class ProcedureConditionStressTest: StressTestCase {
     func test__adding_many_conditions_each_with_single_dependency() {
 
         StressLevel.custom(1, 10_000).forEach { _, _ in
-            procedure.add(condition: TestCondition(producedDependencies: [TestProcedure()]) { .success(true) })
+            procedure.addCondition(TestCondition(producedDependencies: [TestProcedure()]) { .success(true) })
         }
         wait(for: procedure, withTimeout: 10)
         PKAssertProcedureFinished(procedure)
@@ -128,7 +128,7 @@ class ProcedureConditionStressTest: StressTestCase {
 
             let dependency1 = TestProcedure(name: "Dependency 1 (\(batch.number): \(iteration))")
             let dependency2 = TestProcedure(name: "Dependency 2 (\(batch.number): \(iteration))")
-            procedure.add(dependencies: dependency1, dependency2)
+            procedure.addDependencies(dependency1, dependency2)
 
             let conditionDependency1 = BlockOperation {
                 // dependency1 and dependency2 should be finished
@@ -140,12 +140,12 @@ class ProcedureConditionStressTest: StressTestCase {
             conditionDependency1.name = "Condition 1 Dependency"
 
             let condition1 = TrueCondition(name: "Condition 1")
-            condition1.produce(dependency: conditionDependency1)
+            condition1.produceDependency(conditionDependency1)
 
-            procedure.add(condition: condition1)
+            procedure.addCondition(condition1)
 
-            batch.queue.add(operations: dependency1, dependency2)
-            batch.queue.add(operation: procedure)
+            batch.queue.addOperations(dependency1, dependency2)
+            batch.queue.addOperation(procedure)
         }
 
         let finalFailures = failures.access
@@ -187,11 +187,11 @@ class ProcedureConditionsWillFinishObserverCancelThreadSafety: StressTestCase {
         stress { batch, iteration in
             batch.dispatchGroup.enter()
             let procedure = TestProcedure()
-            procedure.add(condition: FalseCondition())
+            procedure.addCondition(FalseCondition())
             procedure.addDidFinishBlockObserver { _, _ in
                 batch.dispatchGroup.leave()
             }
-            batch.queue.add(operation: procedure)
+            batch.queue.addOperation(procedure)
             procedure.cancel()
         }
     }
@@ -224,12 +224,12 @@ class ProcedureConditionsWillFinishObserverCancelThreadSafety: StressTestCase {
             }
             batch.dispatchGroup.enter()
             let procedure = TestProcedure()
-            procedure.add(condition: FalseCondition())
+            procedure.addCondition(FalseCondition())
             procedure.addDidFinishBlockObserver { _, _ in
                 batch.dispatchGroup.leave()
             }
             procedures.append(procedure)
-            batch.queue.add(operation: procedure)
+            batch.queue.addOperation(procedure)
         }
 
         lastBatchStopQueueSuspensionLoop.overwrite(with: true)
@@ -289,7 +289,7 @@ class ProcedureFinishStressTest: StressTestCase {
                     batch.dispatchGroup.leave()
                 }
             }
-            batch.queue.add(operation: procedure)
+            batch.queue.addOperation(procedure)
         }
     }
 
@@ -315,7 +315,7 @@ class ProcedureCancellationHandlerConcurrencyTest: StressTestCase {
                     batch.dispatchGroup.leave()
                 }
             })
-            batch.queue.add(operation: procedure)
+            batch.queue.addOperation(procedure)
             procedure.cancel()
         }
     }
@@ -345,7 +345,7 @@ class ProcedureFinishHandlerConcurrencyTest: StressTestCase {
                     batch.dispatchGroup.leave()
                 }
             })
-            batch.queue.add(operation: procedure)
+            batch.queue.addOperation(procedure)
             procedure.cancel()
         }
     }

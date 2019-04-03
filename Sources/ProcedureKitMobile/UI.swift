@@ -26,7 +26,7 @@ public enum PresentationStyle {
     case show, showDetail, present
 }
 
-@available(*, deprecated: 5.0.0, message: "UIProcedure is now deprecated and will be removed")
+@available(*, deprecated, message: "UIProcedure is now deprecated and will be removed")
 open class UIProcedure: Procedure {
 
     public let presented: UIViewController

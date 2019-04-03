@@ -283,14 +283,14 @@ public enum HTTPStatusCode: Int, CustomStringConvertible {
 
 public extension HTTPURLResponse {
 
-    public var code: HTTPStatusCode? {
+    var code: HTTPStatusCode? {
         return HTTPStatusCode(rawValue: statusCode)
     }
 }
 
 public extension NetworkOperation {
 
-    public func makeNetworkResponse() -> ProcedureKitNetworkResponse {
+    func makeNetworkResponse() -> ProcedureKitNetworkResponse {
         return ProcedureKitNetworkResponse(response: urlResponse, error: error)
     }
 }

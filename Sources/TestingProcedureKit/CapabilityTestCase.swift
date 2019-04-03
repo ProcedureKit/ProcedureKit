@@ -91,7 +91,7 @@ open class TestableCapabilityTestCase: ProcedureKitTestCase {
     }
 
     public func XCTAssertGetAuthorizationStatus<Status: AuthorizationStatus>(_ exp1: @autoclosure () throws -> (Bool, Status)?, expected exp2: @autoclosure () throws -> (Bool, Status), _ message: @autoclosure () -> String = "", file: StaticString = #file, line: UInt = #line) where Status: Equatable {
-        __XCTEvaluateAssertion(testCase: self, message, file: file, line: line) {
+        __XCTEvaluateAssertion(testCase: self, message(), file: file, line: line) {
             let result = try exp1()
             let expected = try exp2()
 
@@ -109,7 +109,7 @@ open class TestableCapabilityTestCase: ProcedureKitTestCase {
     }
 
     public func XCTAssertTestCapabilityStatusChecked(_ message: @autoclosure () -> String = "", file: StaticString = #file, line: UInt = #line) {
-        __XCTEvaluateAssertion(testCase: self, message, file: file, line: line) {
+        __XCTEvaluateAssertion(testCase: self, message(), file: file, line: line) {
             guard capability.didCheckIsAvailable else {
                 return .expectedFailure("Capability did not check availability.")
             }

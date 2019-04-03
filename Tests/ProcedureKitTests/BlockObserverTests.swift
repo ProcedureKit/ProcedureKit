@@ -39,14 +39,14 @@ class BlockObserverTests: ProcedureKitTestCase {
         let error = TestError()
         let cancelWaitGroup = DispatchGroup()
         cancelWaitGroup.enter()
-        let procedure = AsyncBlockProcedure { finishWithResult in
+        let procedure = BlockProcedure { this in
             // Wait for the Procedure to be cancelled by the test
             // (and for all didCancel observers to be triggered)
             // to avoid a race condition in which the Procedure finishes
             // before the check block below can cancel it and/or the DidCancel
             // observers can be called.
             cancelWaitGroup.notify(queue: DispatchQueue.global()) {
-                finishWithResult(success)
+                this.finish()
             }
         }
         procedure.addObserver(BlockObserver(didCancel: {
@@ -216,14 +216,14 @@ class BlockObserverSynchronizationTests: ProcedureKitTestCase {
             let cancelWaitGroup = DispatchGroup()
             cancelWaitGroup.enter()
             cancelWaitGroup.enter()
-            let procedure = AsyncBlockProcedure { finishWithResult in
+            let procedure = BlockProcedure { this in
                 // Wait for the Procedure to be cancelled by the test
                 // (and for all didCancel observers to be triggered)
                 // to avoid a race condition in which the Procedure finishes
                 // before the check block below can cancel it and/or the DidCancel
                 // observers can be called.
                 cancelWaitGroup.notify(queue: DispatchQueue.global()) {
-                    finishWithResult(success)
+                    this.finish()
                 }
             }
             procedure.addDidCancelBlockObserver(synchronizedWith: syncObject) { procedure, error in
