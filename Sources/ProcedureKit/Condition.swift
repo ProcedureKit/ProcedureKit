@@ -74,7 +74,7 @@ public extension ConditionProtocol {
 
 public extension ProcedureKitError {
 
-    public struct FailedConditions: Error {
+    struct FailedConditions: Error {
         public let errors: [Error]
 
         internal init(errors: [Error]) {
@@ -93,15 +93,15 @@ public extension ProcedureKitError {
         }
     }
 
-    public struct FalseCondition: Error, Equatable {
+    struct FalseCondition: Error, Equatable {
         public init() { }
     }
 
-    public struct ConditionEvaluationCancelled: Error {
+    struct ConditionEvaluationCancelled: Error {
         public init() { }
     }
 
-    public struct ConditionDependenciesFailed: Error, Equatable, CustomStringConvertible {
+    struct ConditionDependenciesFailed: Error, Equatable, CustomStringConvertible {
 
         public let condition: Condition
 
@@ -114,7 +114,7 @@ public extension ProcedureKitError {
         }
     }
 
-    public struct ConditionDependenciesCancelled: Error, Equatable, CustomStringConvertible {
+    struct ConditionDependenciesCancelled: Error, Equatable, CustomStringConvertible {
 
         public let condition: Condition
 
@@ -427,10 +427,11 @@ open class Condition: ConditionProtocol, Hashable {
     public static func == (lhs: Condition, rhs: Condition) -> Bool {
         return lhs === rhs
     }
-
-    public var hashValue: Int {
-        return ObjectIdentifier(self).hashValue
+    
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(ObjectIdentifier(self).hashValue)
     }
+
 
     // MARK: Internal Implementation
 
@@ -454,7 +455,7 @@ internal extension Condition {
     ///   - name: the new name (String)
     ///   - ifNotAlreadySet: if `true` (the default), the new name will only be set if the existing name is `nil`
     /// - Returns: the resulting name for the Condition
-    internal func set(name: String, ifNotAlreadySet: Bool = true) -> String {
+    func set(name: String, ifNotAlreadySet: Bool = true) -> String {
         return synchronise {
             if ifNotAlreadySet, let existingName = _name {
                 return existingName
@@ -465,7 +466,7 @@ internal extension Condition {
     }
 
     // Set the output (once the Condition has been evaluated).
-    internal func set(output: ConditionResult) {
+    func set(output: ConditionResult) {
         synchronise {
             assert(_output.isPending, "Trying to set output of Condition evaluation more than once.")
             _output = .ready(output)
@@ -477,7 +478,7 @@ internal extension Condition {
 
 internal extension Condition {
 
-    internal func debugAssertConditionNotAttachedToProcedure(_ message: String = "Condition is already attached to a Procedure.") {
+    func debugAssertConditionNotAttachedToProcedure(_ message: String = "Condition is already attached to a Procedure.") {
         #if DEBUG
         guard _procedure == nil else {
             assertionFailure("Dependencies must be modified before the Condition is added to a Procedure.")
@@ -492,37 +493,37 @@ internal extension Condition {
 public extension Condition {
 
     @available(*, deprecated, renamed: "produceDependency(_:)", message: "This has been renamed to use Swift 3/4 naming conventions")
-    final public func produce(dependency: Operation) {
+    final func produce(dependency: Operation) {
         produceDependency(dependency)
     }
 
     @available(*, deprecated, renamed: "addDependency(_:)", message: "This has been renamed to use Swift 3/4 naming conventions")
-    final public func add(dependency: Operation) {
+    final func add(dependency: Operation) {
         addDependency(dependency)
     }
 
     @available(*, deprecated, renamed: "addDependencies(_:)", message: "This has been renamed to use Swift 3/4 naming conventions")
-    final public func add(dependencies: [Operation]) {
+    final func add(dependencies: [Operation]) {
         addDependencies(dependencies)
     }
 
     @available(*, deprecated, renamed: "addDependencies(_:)", message: "This has been renamed to use Swift 3/4 naming conventions")
-    final public func add(dependencies: Operation...) {
+    final func add(dependencies: Operation...) {
         addDependencies(dependencies)
     }
 
     @available(*, deprecated, renamed: "removeDependency(_:)", message: "This has been renamed to use Swift 3/4 naming conventions")
-    public func remove(dependency: Operation) {
+    func remove(dependency: Operation) {
         removeDependency(dependency)
     }
 
     @available(*, deprecated, renamed: "removeDependencies(_:)", message: "This has been renamed to use Swift 3/4 naming conventions")
-    public func remove(dependencies: [Operation]) {
+    func remove(dependencies: [Operation]) {
         removeDependencies(dependencies)
     }
 
     @available(*, deprecated, renamed: "removeDependencies(_:)", message: "This has been renamed to use Swift 3/4 naming conventions")
-    public func remove(dependencies: Operation...) {
+    func remove(dependencies: Operation...) {
         removeDependencies(dependencies)
     }
 }
@@ -1190,7 +1191,7 @@ fileprivate class ConditionResultAggregator {
 
 internal extension Condition {
 
-    internal enum DependencyVerificationResult {
+    enum DependencyVerificationResult {
         case success
         case dependencyFailed
         case dependencyCancelled
@@ -1285,7 +1286,7 @@ fileprivate class DummyDependency: Operation {
 
 internal extension Collection where Iterator.Element == Condition {
 
-    internal var producedDependencies: Set<Operation> {
+    var producedDependencies: Set<Operation> {
         var result = Set<Operation>()
         for condition in self {
             result.formUnion(condition.producedDependencies)
@@ -1293,7 +1294,7 @@ internal extension Collection where Iterator.Element == Condition {
         return result
     }
 
-    internal var dependencies: Set<Operation> {
+    var dependencies: Set<Operation> {
         var result = Set<Operation>()
         for condition in self {
             result.formUnion(condition.dependencies)
@@ -1301,7 +1302,7 @@ internal extension Collection where Iterator.Element == Condition {
         return result
     }
 
-    internal var mutuallyExclusiveCategories: Set<String> {
+    var mutuallyExclusiveCategories: Set<String> {
         var result = Set<String>()
         for condition in self {
             result.formUnion(condition.mutuallyExclusiveCategories)
@@ -1328,7 +1329,7 @@ internal extension Collection where Iterator.Element == Condition {
     ///   - context: a ConditionEvaluationContext, containing parameters like the aggregation behavior
     ///   - completion: the completion block that is called with a result as soon as it is known
 
-    internal func evaluate(procedure: Procedure, withContext context: ConditionEvaluationContext, completion: @escaping (ConditionResult) -> Void) {
+    func evaluate(procedure: Procedure, withContext context: ConditionEvaluationContext, completion: @escaping (ConditionResult) -> Void) {
 
         let aggregator = context.aggregator
         for condition in self {
@@ -1458,7 +1459,7 @@ internal extension Collection where Iterator.Element == Condition {
 internal extension Collection where Iterator.Element == ConditionResult {
 
     // Get a single conditionResult for a collection of results
-    internal var conditionResult: ConditionResult {
+    var conditionResult: ConditionResult {
         return self.reduce(.success(false)) { lhs, result in
             // Unwrap the condition's output
             let rhs = result
@@ -1488,7 +1489,7 @@ internal extension Collection where Iterator.Element == ConditionResult {
     }
 
     // Determine if any result in a collection of results is `.success(true)`
-    internal var hasSuccessfulConditionResult: Bool {
+    var hasSuccessfulConditionResult: Bool {
         for result in self {
             switch result {
             case .success(true): return true
@@ -1519,7 +1520,7 @@ internal extension Sequence where Iterator.Element: Hashable {
 public extension Condition {
 
     @available(*, unavailable, renamed: "addToAttachedProcedure(mutuallyExclusiveCategory:)")
-    public var mutuallyExclusiveCategory: String? {
+    var mutuallyExclusiveCategory: String? {
         get { fatalError("Unavailable. Use `mutuallyExclusiveCategories` instead to query.") }
         set { fatalError("Unavailable. Use `addToAttachedProcedure(mutuallyExclusiveCategory:)` instead to set.") }
     }

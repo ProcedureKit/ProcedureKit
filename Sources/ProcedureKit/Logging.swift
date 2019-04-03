@@ -407,7 +407,7 @@ extension Log {
 
 public extension Log {
 
-    public struct Writers {
+    struct Writers {
 
         public static let standard: LogWriter = {
             if #available(iOS 10.0, iOSApplicationExtension 10.0, tvOS 10.0, tvOSApplicationExtension 10.0, OSX 10.12, OSXApplicationExtension 10.12, *) {
@@ -433,7 +433,7 @@ public extension Log {
 
 public extension Log {
 
-    public struct Formatters {
+    struct Formatters {
 
         public static let standard: LogFormatter = Concatenating([SeverityFormatter(), CallsiteFormatter()])
 
@@ -448,7 +448,7 @@ public extension Log {
 
 public extension Log.Formatters {
 
-    public class Concatenating: LogFormatter {
+    class Concatenating: LogFormatter {
 
         public let formatters: [LogFormatter]
 
@@ -461,14 +461,14 @@ public extension Log.Formatters {
         }
     }
 
-    public class SeverityFormatter: LogFormatter {
+    class SeverityFormatter: LogFormatter {
 
         public func format(entry: Log.Entry) -> Log.Entry {
             return entry.append(formattedMetadata: entry.severity.description)
         }
     }
 
-    public class StaticStringFormatter: LogFormatter {
+    class StaticStringFormatter: LogFormatter {
 
         public let text: String
 
@@ -481,7 +481,7 @@ public extension Log.Formatters {
         }
     }
 
-    public class CallsiteFormatter: LogFormatter {
+    class CallsiteFormatter: LogFormatter {
 
         public func format(entry: Log.Entry) -> Log.Entry {
             guard false == entry.file.contains("ProcedureKit") else { return entry }
@@ -594,7 +594,7 @@ extension Log.Writers {
 
 public extension LogChannel {
 
-    @available(*, deprecated: 5.0.0, renamed: "info.message", message: "The .notice severity has been deprecated use .info, .event or .debug instead")
+    @available(*, deprecated, renamed: "info.message", message: "The .notice severity has been deprecated use .info, .event or .debug instead")
     func notice(message: @autoclosure () -> String, file: String = #file, function: String = #function, line: Int = #line) {
         self.message(message(), file: file, function: function, line: line)
     }

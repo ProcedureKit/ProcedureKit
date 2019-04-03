@@ -18,7 +18,7 @@ class CancelGroupStressTests: StressTestCase {
             group.addDidFinishBlockObserver { _, _ in
                 batch.dispatchGroup.leave()
             }
-            batch.queue.add(operation: group)
+            batch.queue.addOperation(group)
             group.cancel()
         }
     }
@@ -33,11 +33,11 @@ class GroupCancelAndAddOperationStressTests: StressTestCase {
             self.operationsToAddOnExecute = operationsToAddOnExecute
             super.init(operations: [])
             name = "TestGroupProcedureWhichAddsOperationsAfterSuperInit"
-            add(children: operations) // add operations during init, after super.init
+            addChildren(operations) // add operations during init, after super.init
         }
 
         override func execute() {
-            add(children: operationsToAddOnExecute) // add operations during execute
+            addChildren(operationsToAddOnExecute) // add operations during execute
             super.execute()
         }
     }
@@ -50,7 +50,7 @@ class GroupCancelAndAddOperationStressTests: StressTestCase {
             group.addDidFinishBlockObserver { _, _ in
                 batch.dispatchGroup.leave()
             }
-            batch.queue.add(operation: group)
+            batch.queue.addOperation(group)
             group.cancel()
         }
     }
@@ -75,7 +75,7 @@ class GroupDoesNotFinishBeforeChildOperationsAreFinished: StressTestCase {
                 }
                 batch.dispatchGroup.leave()
             }
-            batch.queue.add(operation: group)
+            batch.queue.addOperation(group)
             group.cancel()
         }
     }
@@ -100,7 +100,7 @@ class GroupCancellationHandlerConcurrencyTest: StressTestCase {
                     batch.dispatchGroup.leave()
                 }
             })
-            batch.queue.add(operation: group)
+            batch.queue.addOperation(group)
             group.cancel()
         }
     }
@@ -121,7 +121,7 @@ class GroupCancellationHandlerConcurrencyTest: StressTestCase {
                     batch.dispatchGroup.leave()
                 }
             })
-            batch.queue.add(operation: group)
+            batch.queue.addOperation(group)
         }
     }
 
@@ -136,17 +136,17 @@ class GroupCancellationHandlerConcurrencyTest: StressTestCase {
             }
             let group = EventConcurrencyTrackingGroupProcedure(operations: [])
             let initialChild = BlockProcedure {
-                group.add(children: additionalChildren)
+                group.addChildren(additionalChildren)
             }
             initialChild.name = "Child: 0 (initial)"
-            group.add(child: initialChild)
+            group.addChild(initialChild)
             group.addDidFinishBlockObserver(block: { (group, error) in
                 DispatchQueue.main.async {
                     self.PKAssertProcedureNoConcurrentEvents(group)
                     batch.dispatchGroup.leave()
                 }
             })
-            batch.queue.add(operation: group)
+            batch.queue.addOperation(group)
         }
     }
 }

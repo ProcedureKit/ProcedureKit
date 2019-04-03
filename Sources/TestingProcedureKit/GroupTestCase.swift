@@ -47,7 +47,7 @@ open class GroupTestCase: ProcedureKitTestCase {
 public extension ProcedureKitTestCase {
 
     func PKAssertGroupErrors<T: GroupProcedure>(_ exp: @autoclosure () throws -> T, count exp2:  @autoclosure () throws -> Int, _ message: @autoclosure () -> String = "", file: StaticString = #file, line: UInt = #line) {
-        __XCTEvaluateAssertion(testCase: self, message, file: file, line: line) {
+        __XCTEvaluateAssertion(testCase: self, message(), file: file, line: line) {
 
             let procedure = try exp()
             let count = try exp2()
@@ -70,7 +70,7 @@ public extension ProcedureKitTestCase {
     }
 
     func PKAssertGroupErrors<T: GroupProcedure, E: Error>(_ exp: @autoclosure () throws -> T, doesNot: Bool = false, contain exp2:  @autoclosure () throws -> E, _ message: @autoclosure () -> String = "", file: StaticString = #file, line: UInt = #line) where E: Equatable {
-        __XCTEvaluateAssertion(testCase: self, message, file: file, line: line) {
+        __XCTEvaluateAssertion(testCase: self, message(), file: file, line: line) {
 
             let procedure = try exp()
             let otherError = try exp2()

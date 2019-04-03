@@ -110,17 +110,17 @@ public extension ProcedureObserver {
     @available(*, unavailable, renamed: "will(finish:withErrors:pendingFinish:)")
     func will(finish procedure: Procedure, withErrors: [Error]) { }
 
-    @available(*, deprecated: 5.0.0, renamed: "did(cancel:with:)", message: "Use did(cancel:with:) instead.")
+    @available(*, deprecated, renamed: "did(cancel:with:)", message: "Use did(cancel:with:) instead.")
     func did(cancel procedure: Procedure, withErrors errors: [Error]) {
         did(cancel: procedure, with: errors.first)
     }
 
-    @available(*, deprecated: 5.0.0, renamed: "will(finish:with:pendingFinish:)", message: "Use will(finish:with:pendingFinish:) instead.")
+    @available(*, deprecated, renamed: "will(finish:with:pendingFinish:)", message: "Use will(finish:with:pendingFinish:) instead.")
     func will(finish procedure: Procedure, withErrors errors: [Error], pendingFinish: PendingFinishEvent) {
         will(finish: procedure, with: errors.first, pendingFinish: pendingFinish)
     }
 
-    @available(*, deprecated: 5.0.0, renamed: "did(finish:with:)", message: "Use did(finish:with:) instead.")
+    @available(*, deprecated, renamed: "did(finish:with:)", message: "Use did(finish:with:) instead.")
     func did(finish procedure: Procedure, withErrors errors: [Error]) {
         did(finish: procedure, with: errors.first)
     }

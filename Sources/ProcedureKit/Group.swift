@@ -213,7 +213,7 @@ open class GroupProcedure: Procedure {
         error = childError
     }
 
-    @available(*, deprecated: 5.0.0, renamed: "child(_:willFinishWithError:)", message: "Use child(_:,willFinishWithError:) instead.")
+    @available(*, deprecated, renamed: "child(_:willFinishWithError:)", message: "Use child(_:,willFinishWithError:) instead.")
     open func child(_ childProcedure: Procedure, willFinishWithErrors errors: [Error]) {
         assertionFailure("Use child(_:willFinishWithError:) instead.")
         child(childProcedure, willFinishWithError: errors.first)
@@ -453,7 +453,7 @@ internal extension GroupProcedure {
      of group operation state.
      */
 
-    internal class GroupQueueDelegate: ProcedureQueueDelegate {
+    class GroupQueueDelegate: ProcedureQueueDelegate {
 
         private weak var group: GroupProcedure?
 
@@ -596,7 +596,7 @@ internal extension GroupProcedure {
 
 fileprivate extension GroupProcedure {
 
-    fileprivate final class CanFinishGroup: Operation {
+    final class CanFinishGroup: Operation {
 
         private weak var group: GroupProcedure?
         private var _isFinished = false
@@ -720,13 +720,14 @@ fileprivate extension GroupProcedure {
         }
     }
 
-    fileprivate func add(canFinishGroup: CanFinishGroup) {
+    func add(canFinishGroup: CanFinishGroup) {
         queue.add(canFinishGroup: canFinishGroup)
     }
 }
 
 fileprivate extension GroupProcedure {
-    fileprivate func _finishGroup() {
+
+    func _finishGroup() {
         super.finish()
         queue.isSuspended = true
     }
@@ -762,22 +763,22 @@ public extension GroupProcedure {
     func addOperations(additional: [Operation]) { }
 
     @available(*, unavailable, message: "GroupProcedure child error handling customization has been re-worked. Consider overriding child(_:willFinishWithError:).")
-    final public func childDidRecoverFromErrors(_ child: Operation) { }
+    final func childDidRecoverFromErrors(_ child: Operation) { }
 
     @available(*, unavailable, message: "GroupProcedure child error handling customization has been re-worked. Consider overriding child(_:willFinishWithError:).")
-    final public func childDidNotRecoverFromErrors(_ child: Operation) { }
+    final func childDidNotRecoverFromErrors(_ child: Operation) { }
 
     @available(*, unavailable, message: "GroupProcedure no longer collects all the child errors within itself")
-    final public func append(fatalError error: Error) { }
+    final func append(fatalError error: Error) { }
 
     @available(*, unavailable, message: "GroupProcedure no longer collects all the child errors within itself")
-    final public func append(fatalErrors errors: [Error]) { }
+    final func append(fatalErrors errors: [Error]) { }
 
     @available(*, unavailable, message: "GroupProcedure no longer collects all the child errors within itself")
-    final public func append(error: Error, fromChild child: Operation? = nil) { }
+    final func append(error: Error, fromChild child: Operation? = nil) { }
 
     @available(*, unavailable, message: "GroupProcedure no longer collects all the child errors within itself")
-    final public func append(errors: [Error], fromChild child: Operation? = nil) { }
+    final func append(errors: [Error], fromChild child: Operation? = nil) { }
 
     @available(*, deprecated, renamed: "addChild(_:before:)", message: "This has been renamed to use Swift 3/4 naming conventions")
     final func add(child: Operation, before pendingEvent: PendingEvent? = nil) {

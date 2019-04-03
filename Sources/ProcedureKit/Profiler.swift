@@ -183,7 +183,7 @@ extension ProcedureProfiler: ProcedureProfilerReporter {
     public func finishedProfiling(withResult result: ProfileResult) {
         queue.sync { [weak self] in
             guard let strongSelf = self else { return }
-            if let index = strongSelf.children.index(of: result.identity) {
+            if let index = strongSelf.children.firstIndex(of: result.identity) {
                 strongSelf.result = strongSelf.result.add(child: result)
                 strongSelf.children.remove(at: index)
             }
