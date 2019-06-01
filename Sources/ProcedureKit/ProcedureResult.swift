@@ -247,7 +247,10 @@ public extension InputProcedure {
 
     func bind<T: InputProcedure>(to target: T) where T.Input == Self.Input {
         addDidSetInputReadyBlockObserver { (procedure) in
-            target.input = procedure.input
+            if case .ready = procedure.input {
+                target.input = procedure.input
+                target.didSetInputReady()
+            }
         }
     }
 }
