@@ -28,7 +28,7 @@ class IgnoreErrorsProcedureTests: ProcedureKitTestCase {
 
         let procedure = IgnoreErrorsProcedure(ResultProcedure { "Hello" })
         wait(for: procedure)
-        XCTAssertProcedureOutputSuccess(procedure, "Hello")       
+        PKAssertProcedureOutput(procedure, "Hello")
     }
 }
 

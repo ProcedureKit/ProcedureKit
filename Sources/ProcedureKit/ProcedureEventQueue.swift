@@ -106,7 +106,7 @@ internal extension EventQueue {
     ///   - minimumQoS: a minimum QoS level for the submitted block
     ///   - block: a block to execute on the EventQueue
     @discardableResult
-    internal func dispatchEventBlockInternal(minimumQoS: DispatchQoS? = nil, block: @escaping () -> Void) -> DispatchWorkItem {
+    func dispatchEventBlockInternal(minimumQoS: DispatchQoS? = nil, block: @escaping () -> Void) -> DispatchWorkItem {
         let resultingQoS = minimumQoS ?? qualityOfService
 
         let workItem = DispatchWorkItem(qos: resultingQoS, flags: [DispatchWorkItemFlags.enforceQoS]) {
@@ -120,7 +120,7 @@ internal extension EventQueue {
         return workItem
     }
 
-    internal func dispatchNotify(withGroup group: DispatchGroup, minimumQoS: DispatchQoS? = nil, block: @escaping () -> Void) {
+    func dispatchNotify(withGroup group: DispatchGroup, minimumQoS: DispatchQoS? = nil, block: @escaping () -> Void) {
         let resultingQoS = minimumQoS ?? qualityOfService
 
         group.notify(qos: resultingQoS, flags: [DispatchWorkItemFlags.enforceQoS], queue: queue, execute: {
@@ -153,7 +153,7 @@ internal extension EventQueue {
     /// - Parameters:
     ///   - otherQueue: another queue (EventQueue, DispatchQueue) onto which to asynchronously submit the block
     ///   - block: the block that is asynchronously submitted to the otherQueue
-    internal func dispatchSynchronizedBlock(onOtherQueue otherQueue: DispatchQueueProtocol, block: @escaping () -> Void) {
+    func dispatchSynchronizedBlock(onOtherQueue otherQueue: DispatchQueueProtocol, block: @escaping () -> Void) {
         debugAssertIsOnQueue()
         assert(otherQueue !== self, "Cannot dispatch synchronized block onOtherQueue if otherQueue is self.")
 
@@ -206,7 +206,7 @@ internal extension EventQueue {
 }
 
 public extension EventQueue {
-    public func makeTimerSource(flags: DispatchSource.TimerFlags = []) -> DispatchSourceTimer {
+    func makeTimerSource(flags: DispatchSource.TimerFlags = []) -> DispatchSourceTimer {
         return DispatchSource.makeTimerSource(flags: flags, queue: queue)
     }
 }
@@ -292,7 +292,7 @@ fileprivate extension DispatchQueue {
     //
     // For compatibility with Xcode < 9 and Swift 3, this custom clearSpecific(key:)
     // function is provided.
-    fileprivate func pk_clearSpecific<T>(key: DispatchSpecificKey<T>) {
+    func pk_clearSpecific<T>(key: DispatchSpecificKey<T>) {
         let k = Unmanaged.passUnretained(key).toOpaque()
         __dispatch_queue_set_specific(self, k, nil, nil)
     }

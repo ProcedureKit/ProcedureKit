@@ -150,7 +150,7 @@ open class ConcurrencyRegistrar {
     }
     public func deregisterRunning(_ operation: Operation) {
         state.write { ward in
-            if let opIndex = ward.operations.index(of: operation) {
+            if let opIndex = ward.operations.firstIndex(of: operation) {
                 ward.operations.remove(at: opIndex)
             }
         }

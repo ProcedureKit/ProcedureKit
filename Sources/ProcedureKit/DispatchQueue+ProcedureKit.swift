@@ -64,6 +64,8 @@ internal extension QualityOfService {
         case .utility: return DispatchQoS.utility
         case .background: return DispatchQoS.background
         case .default: return DispatchQoS.default
+        @unknown default:
+            return DispatchQoS.default
         }
     }
 
@@ -74,6 +76,8 @@ internal extension QualityOfService {
         case .utility: return .utility
         case .background: return .background
         case .default: return .default
+        @unknown default:
+            return .default
         }
     }
 }
@@ -103,6 +107,8 @@ extension DispatchQoS.QoSClass: Comparable {
             return rhs == .userInteractive
         case .userInteractive:
             return false
+        @unknown default:
+            fatalError()
         }
     }
 }

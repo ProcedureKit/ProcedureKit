@@ -87,7 +87,7 @@ open class UIBlockProcedure: BlockProcedure {
 }
 
 
-@available(*, deprecated: 5.0, message: "Use BlockProcedure directly and call .finish() on the block argument instead.")
+@available(*, deprecated, message: "Use BlockProcedure directly and call .finish() on the block argument instead.")
 open class AsyncBlockProcedure: BlockProcedure {
 
     public typealias Output = Void
@@ -103,7 +103,7 @@ open class AsyncBlockProcedure: BlockProcedure {
     }
 }
 
-@available(*, deprecated: 5.0, message: "Use BlockProcedure directly and query the procedure argument inside your block.")
+@available(*, deprecated, message: "Use BlockProcedure directly and query the procedure argument inside your block.")
 open class CancellableBlockProcedure: BlockProcedure {
 
     /// A block that receives a closure (that returns the current value of `isCancelled`

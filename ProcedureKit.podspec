@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name              = "ProcedureKit"
-  s.version           = "5.1.0"
+  s.version           = "5.2.0"
   s.summary           = "Advanced Operations in Swift."
   s.homepage          = "https://github.com/ProcedureKit/ProcedureKit"
   s.license           = 'MIT'
@@ -14,7 +14,7 @@ Pod::Spec.new do |s|
   s.osx.deployment_target = '10.11'
   
   # Ensure the correct version of Swift is used
-  s.swift_version = '4.2'
+  s.swift_version = '5.0'
 
   # Default spec is 'Standard'
   s.default_subspec = 'Standard'

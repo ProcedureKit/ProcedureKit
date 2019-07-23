@@ -369,7 +369,7 @@ public extension ProcessProcedure {
     /// The processIdentifier remains non-zero after the ProcessProcedure starts the
     /// Process - even after the Process terminates. Do not assume based on a non-zero
     /// processIdentifier that the expected associated Process is still running.
-    public fileprivate(set) var processIdentifier: Int32 {
+    fileprivate(set) var processIdentifier: Int32 {
         get { return stateLock.withCriticalScope { _processIdentifier } }
         set {
             stateLock.withCriticalScope {
@@ -475,7 +475,7 @@ public extension ProcessProcedure {
 
 fileprivate extension ProcessProcedure {
 
-    fileprivate func createProcess(withRequest request: LaunchRequest) -> Process {
+    func createProcess(withRequest request: LaunchRequest) -> Process {
         let process = Process()
 
         #if swift(>=3.2)
@@ -520,7 +520,7 @@ fileprivate extension ProcessProcedure {
     // On macOS 10.13+, new methods on Process are available that throw errors
     // (instead of raising Objective-C exceptions). This method uses them if
     // possible.
-    fileprivate func run(process: Process) throws {
+    func run(process: Process) throws {
         if #available(OSX 10.13, *) {
             try process.run()
         }

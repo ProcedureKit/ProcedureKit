@@ -1,3 +1,6 @@
+# 5.2.0
+Xcode 10.2 & Swift 5 compatible.
+
 # 5.1.0
 This will be the last update specifically supporting Xcode 10.1 and Swift 4.2. 
 

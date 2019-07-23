@@ -81,7 +81,7 @@ open class AsyncResultProcedure<Output>: ResultProcedure<Output> {
     }
 }
 
-@available(*, deprecated: 5.0, message: "Use ResultProcedure directly and query the procedure argument inside your block.")
+@available(*, deprecated, message: "Use ResultProcedure directly and query the procedure argument inside your block.")
 open class CancellableResultProcedure<Output>: ResultProcedure<Output> {
 
     /// A block that receives a closure (that returns the current value of `isCancelled`
