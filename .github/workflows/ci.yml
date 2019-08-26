@@ -4,48 +4,50 @@ on: push
 
 jobs:
 
-  macOS:
-    name: Test macOS 
-    runs-on: macOS-latest
-    steps:
-      - uses: actions/checkout@v1    
-      - name: macOS
-        run: xcodebuild -project "ProcedureKit.xcodeproj" -scheme "Mac" -destination "platform=macOS" clean test | tee .ci/results/xcodebuild-mac.log
-  iOS:
-    name: Test iOS 
-    runs-on: macOS-latest
-    steps:
-      - uses: actions/checkout@v1            
-      - name: iOS
-        run: xcodebuild -project "ProcedureKit.xcodeproj" -scheme "iOS" -destination "platform=iOS Simulator,name=iPhone X" clean test | tee .ci/results/xcodebuild-ios.log
-  tvOS:
-    name: Test tvOS 
-    runs-on: macOS-latest
-    steps:
-      - uses: actions/checkout@v1            
-      - name: tvOS
-        run: xcodebuild -project "ProcedureKit.xcodeproj" -scheme "tvOS" -destination "platform=tvOS Simulator,name=Apple TV" clean test | tee .ci/results/xcodebuild-tvOS.log
-
-  stressTest:
-    name: Stress Test
-    runs-on: macOS-latest
-    steps:
-      - uses: actions/checkout@v1            
-      - name: Stress Test
-        run: xcodebuild -project "ProcedureKit.xcodeproj" -scheme "Stress Tests" -destination "platform=macOS" clean test | tee .ci/results/xcodebuild-stress.log
-        
+#  macOS:
+#    name: Test macOS 
+#    runs-on: macOS-latest
+#    steps:
+#      - uses: actions/checkout@v1    
+#      - name: macOS
+#        run: xcodebuild -project "ProcedureKit.xcodeproj" -scheme "Mac" -destination "platform=macOS" clean test | tee .ci/results/xcodebuild-mac.log
+#  iOS:
+#    name: Test iOS 
+#    runs-on: macOS-latest
+#    steps:
+#      - uses: actions/checkout@v1            
+#      - name: iOS
+#        run: xcodebuild -project "ProcedureKit.xcodeproj" -scheme "iOS" -destination "platform=iOS Simulator,name=iPhone X" clean test | tee .ci/results/xcodebuild-ios.log
+#  tvOS:
+#    name: Test tvOS 
+#    runs-on: macOS-latest
+#    steps:
+#      - uses: actions/checkout@v1            
+#      - name: tvOS
+#        run: xcodebuild -project "ProcedureKit.xcodeproj" -scheme "tvOS" -destination "platform=tvOS Simulator,name=Apple TV" clean test | tee .ci/results/xcodebuild-tvOS.log
+#
+#  stressTest:
+#    name: Stress Test
+#    runs-on: macOS-latest
+#    steps:
+#      - uses: actions/checkout@v1            
+#      - name: Stress Test
+#        run: xcodebuild -project "ProcedureKit.xcodeproj" -scheme "Stress Tests" -destination "platform=macOS" clean test | tee .ci/results/xcodebuild-stress.log
         
   cocoapods:
     name: Test Integration with Cocoapods
     runs-on: macOS-latest    
-    needs: [macOS, iOS, tvOS, stressTest]
+#    needs: [macOS, iOS, tvOS, stressTest]
     steps:
       - uses: actions/checkout@v1
       - uses: actions/setup-ruby@v1
         with:
           ruby-version: '2.x'      
       - run: bundle install --quiet
-      - run: cd 'Integrations/CocoaPods'
+      - name: Navigate to the correct directory      
+        run: cd 'Integrations/CocoaPods'
+        run: pwd
+        run: ls -al
       - run: bundle exec pod install
       - name: Mac Build & Test
         run: bundle exec xcodebuild -workspace TryProcedureKit.xcworkspace -scheme TryProcedureKit clean build test | xcpretty
