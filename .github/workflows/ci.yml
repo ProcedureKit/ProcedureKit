@@ -37,6 +37,7 @@ jobs:
         
   cocoapods:
     name: Test Integration with Cocoapods
+    runs-on: macOS-latest    
     needs: [macOS, iOS, tvOS, stressTest]
     steps:
       - uses: actions/checkout@v1
