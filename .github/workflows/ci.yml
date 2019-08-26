@@ -44,7 +44,7 @@ jobs:
       - uses: actions/setup-ruby@v1
         with:
           ruby-version: '2.x'      
-      - run: bundle intstall --quiet
+      - run: bundle install --quiet
       - run: cd 'Integrations/CocoaPods'
       - run: bundle exec pod install
       - name: Mac Build & Test
