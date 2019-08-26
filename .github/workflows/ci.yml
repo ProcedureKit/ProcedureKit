@@ -33,3 +33,18 @@ jobs:
       - uses: actions/checkout@v1            
       - name: Stress Test
         run: xcodebuild -project "ProcedureKit.xcodeproj" -scheme "Stress Tests" -destination "platform=macOS" clean test | tee .ci/results/xcodebuild-stress.log
+        
+        
+  cocoapods:
+    name: Test Integration with Cocoapods
+    needs: [macOS, iOS, tvOS, stressTest]
+    steps:
+      - uses: actions/checkout@v1
+      - uses: actions/setup-ruby@v1
+        with:
+          ruby-version: '2.x'      
+      - run: bundle intstall --quiet
+      - run: cd 'Integrations/CocoaPods'
+      - run: bundle exec pod install
+      - name: Mac Build & Test
+        run: bundle exec xcodebuild -workspace TryProcedureKit.xcworkspace -scheme TryProcedureKit clean build test | xcpretty
