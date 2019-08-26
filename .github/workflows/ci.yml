@@ -8,5 +8,5 @@ jobs:
     runs-on: macOS-latest
     steps:
       - uses: actions/checkout@v1    
-      - name: Run a one-line script
-        run: echo Hello, world!
+      - name: Build & Test
+        run: xcodebuild -project "ProcedureKit.xcodeproj" -scheme "Mac" -destination "platform=macOS" clean test | tee .ci/results/xcodebuild.log
