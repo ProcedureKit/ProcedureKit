@@ -1,0 +1,11 @@
+name: ProcedureKit CI
+
+on: push
+
+jobs:
+  test:
+    name: Test
+    runs-on: macOS-latest
+    steps:
+      - name: Build & Test
+        run: xcodebuild -project "ProcedureKit.xcodeproj" -scheme "Mac" -destination "platform=macOS" clean test | tee .ci/results/xcodebuild.log
