@@ -3,10 +3,33 @@ name: ProcedureKit CI
 on: push
 
 jobs:
-  test:
-    name: Test
+
+  macOS:
+    name: Test macOS 
     runs-on: macOS-latest
     steps:
       - uses: actions/checkout@v1    
-      - name: Build & Test
-        run: xcodebuild -project "ProcedureKit.xcodeproj" -scheme "Mac" -destination "platform=macOS" clean test | tee .ci/results/xcodebuild.log
+      - name: macOS
+        run: xcodebuild -project "ProcedureKit.xcodeproj" -scheme "Mac" -destination "platform=macOS" clean test | tee .ci/results/xcodebuild-mac.log
+  iOS:
+    name: Test iOS 
+    runs-on: macOS-latest
+    steps:
+      - uses: actions/checkout@v1            
+      - name: iOS
+        run: xcodebuild -project "ProcedureKit.xcodeproj" -scheme "iOS" -destination "platform=iOS Simulator,name=iPhone X" clean test | tee .ci/results/xcodebuild-ios.log
+  tvOS:
+    name: Test tvOS 
+    runs-on: macOS-latest
+    steps:
+      - uses: actions/checkout@v1            
+      - name: tvOS
+        run: xcodebuild -project "ProcedureKit.xcodeproj" -scheme "tvOS" -destination "platform=tvOS Simulator,name=Apple TV" clean test | tee .ci/results/xcodebuild-tvOS.log
+
+  stressTest:
+    name: Stress Test
+    runs-on: macOS-latest
+    steps:
+      - uses: actions/checkout@v1            
+      - name: Stress Test
+        run: xcodebuild -project "ProcedureKit.xcodeproj" -scheme "Stress Tests" -destination "platform=macOS" clean test | tee .ci/results/xcodebuild-stress.log
