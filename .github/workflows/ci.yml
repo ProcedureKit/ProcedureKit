@@ -47,8 +47,8 @@ jobs:
       - name: Navigate to the correct directory      
         run: |      
           cd 'Integrations/CocoaPods'
-          pwd
-          ls -al
-      - run: bundle exec pod install
+          bundle exec pod install
       - name: Mac Build & Test
-        run: bundle exec xcodebuild -workspace TryProcedureKit.xcworkspace -scheme TryProcedureKit clean build test | xcpretty
+        run: |      
+          cd 'Integrations/CocoaPods'
+          bundle exec xcodebuild -workspace TryProcedureKit.xcworkspace -scheme TryProcedureKit clean build test | xcpretty
