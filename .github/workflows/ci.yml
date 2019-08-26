@@ -45,9 +45,10 @@ jobs:
           ruby-version: '2.x'      
       - run: bundle install --quiet
       - name: Navigate to the correct directory      
-        run: cd 'Integrations/CocoaPods'
-        run: pwd
-        run: ls -al
+        run: |      
+          cd 'Integrations/CocoaPods'
+          pwd
+          ls -al
       - run: bundle exec pod install
       - name: Mac Build & Test
         run: bundle exec xcodebuild -workspace TryProcedureKit.xcworkspace -scheme TryProcedureKit clean build test | xcpretty
