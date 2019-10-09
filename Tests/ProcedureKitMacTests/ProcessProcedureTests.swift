@@ -6,6 +6,7 @@
 
 
 import XCTest
+import ProcedureKit
 import TestingProcedureKit
 import Foundation
 @testable import ProcedureKitMac
