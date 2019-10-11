@@ -27,11 +27,9 @@ func createPlacemark(coordinate: CLLocationCoordinate2D) -> CLPlacemark {
 }
 
 class TestableLocationServicesRegistrar {
-    static let fake = CLLocationManager()
-
-    weak var delegate: CLLocationManagerDelegate? = nil
+    weak var delegate: LocationFetcherDelegate? = nil
     var servicesEnabled = true
-    var authorizationStatus: CLAuthorizationStatus = .notDetermined
+    var authStatus: CLAuthorizationStatus = .notDetermined
     var responseStatus: CLAuthorizationStatus = {
         if #available(OSX 10.12, iOS 8.0, tvOS 8.0, watchOS 2.0, *) {
             return CLAuthorizationStatus.authorizedAlways
@@ -52,29 +50,41 @@ class TestableLocationServicesRegistrar {
     var didRequestAuthorizationForUsage: LocationUsage? = nil
 }
 
-extension TestableLocationServicesRegistrar: LocationServicesRegistrarProtocol {
+extension TestableLocationServicesRegistrar: LocationServicesRegistrar {
 
-    func pk_locationServicesEnabled() -> Bool {
+    func locationServicesEnabled() -> Bool {
         didCheckServiceEnabled = true
         return servicesEnabled
     }
 
-    func pk_authorizationStatus() -> CLAuthorizationStatus {
+    func authorizationStatus() -> CLAuthorizationStatus {
         didCheckAuthorizationStatus = true
-        return authorizationStatus
+        return authStatus
     }
 
-    func pk_set(delegate aDelegate: CLLocationManagerDelegate?) {
-        didSetDelegate = true
-        delegate = aDelegate
+    var locationFetcherDelegate: LocationFetcherDelegate? {
+        get { return delegate }
+        set {
+            didSetDelegate = true
+            delegate = newValue
+        }
     }
 
-    func pk_requestAuthorization(withRequirement requirement: LocationUsage?) {
+    func requestAuthorization(withRequirement requirement: LocationUsage?) {
         didRequestAuthorization = true
         didRequestAuthorizationForUsage = requirement
+
         // In some cases CLLocationManager will immediately send a .NotDetermined
-        delegate?.locationManager!(TestableLocationServicesRegistrar.fake, didChangeAuthorization: .notDetermined)
-        delegate?.locationManager!(TestableLocationServicesRegistrar.fake, didChangeAuthorization: responseStatus)
+        delegate?.locationServices(self, didChangeAuthorization: .notDetermined)
+        delegate?.locationServices(self, didChangeAuthorization: responseStatus)
+    }
+
+    func requestWhenInUseAuthorization() {
+        requestAuthorization(withRequirement: .whenInUse)
+    }
+
+    func requestAlwaysAuthorization() {
+        requestAuthorization(withRequirement: .always)
     }
 }
 
@@ -109,29 +119,30 @@ class TestableLocationManager: TestableLocationServicesRegistrar {
     }
 }
 
-extension TestableLocationManager: LocationServicesProtocol {
+extension TestableLocationManager: LocationServices {
 
-    func pk_set(desiredAccuracy: CLLocationAccuracy) {
-        didSetDesiredAccuracy = desiredAccuracy
+    var desiredAccuracy: CLLocationAccuracy {
+        set { didSetDesiredAccuracy = newValue }
+        get { return didSetDesiredAccuracy! }
     }
 
-    func pk_startUpdatingLocation() {
+    func startUpdatingLocation() {
         stateLock.withCriticalScope {
             _didStartUpdatingLocationCount += 1
             updatingLocationGroup.enter()
         }
         didStartUpdatingLocation = true
         if let error = returnedError {
-            delegate?.locationManager!(TestableLocationServicesRegistrar.fake, didFailWithError: error)
+            delegate?.locationFetcher(self, didFailWithError: error)
         }
         else {
             DispatchQueue.main.asyncAfter(deadline: .now() + returnAfterDelay) {
-                self.delegate?.locationManager!(TestableLocationServicesRegistrar.fake, didUpdateLocations: self.returnedLocation.flatMap { [$0] } ?? [])
+                self.delegate?.locationFetcher(self, didUpdateLocations: self.returnedLocation.flatMap { [$0] } ?? [])
             }
         }
     }
 
-    func pk_stopUpdatingLocation() {
+    func stopUpdatingLocation() {
         stateLock.withCriticalScope {
             guard _didStartUpdatingLocationCount > 0 else { return }
             _didStartUpdatingLocationCount -= 1
@@ -141,30 +152,27 @@ extension TestableLocationManager: LocationServicesProtocol {
     }
 }
 
-class TestableGeocoder: GeocodeProtocol {
+class TestableReverseGeocoder: ReverseGeocoder {
 
     var didCancel = false
 
-    func pk_cancel() {
+    func cancelGeocode() {
         didCancel = true
     }
-}
-
-class TestableReverseGeocoder: TestableGeocoder, ReverseGeocodeProtocol {
 
     var didReverseGeocodeLocation: CLLocation? = nil
 
     var placemarks: [CLPlacemark]? = nil
     var error: Error? = nil
 
-    func pk_reverseGeocodeLocation(location: CLLocation, completionHandler completion: @escaping CLGeocodeCompletionHandler) {
+    func reverseGeocodeLocation(_ location: CLLocation, completionHandler: @escaping CLGeocodeCompletionHandler) {
         didReverseGeocodeLocation = location
         // To replicate CLGeocoder, the completion block must be called on the main thread
         DispatchQueue.main.async { [weak self] in
             guard let strongSelf = self else {
                 fatalError("TestableReverseGeocoder disappeared before completion was called")
             }
-            completion(strongSelf.placemarks, strongSelf.error)
+            completionHandler(strongSelf.placemarks, strongSelf.error)
         }
     }
 }
@@ -174,15 +182,15 @@ class LocationProcedureTestCase: ProcedureKitTestCase {
     var location: CLLocation!
     var placemark: CLPlacemark!    
     let accuracy: CLLocationAccuracy = 10
-    var manager: TestableLocationManager!
+    var locationFetcher: TestableLocationManager!
     var geocoder: TestableReverseGeocoder!
 
     override func setUp() {
         super.setUp()
         location = createLocation(withAccuracy: accuracy)
         placemark = createPlacemark(coordinate: location.coordinate)
-        manager = TestableLocationManager()
-        manager.authorizationStatus = {
+        locationFetcher = TestableLocationManager()
+        locationFetcher.authStatus = {
             if #available(OSX 10.12, iOS 8.0, tvOS 8.0, watchOS 2.0, *) {
                 return CLAuthorizationStatus.authorizedAlways
             }
@@ -194,13 +202,13 @@ class LocationProcedureTestCase: ProcedureKitTestCase {
                 #endif
             }
         }()
-        manager.returnedLocation = location
+        locationFetcher.returnedLocation = location
         geocoder = TestableReverseGeocoder()
     }
 
     override func tearDown() {
         location = nil
-        manager = nil
+        locationFetcher = nil
         geocoder = nil
         super.tearDown()
     }

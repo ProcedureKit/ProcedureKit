@@ -69,7 +69,8 @@ open class ReverseGeocodeUserLocationProcedure: GroupProcedure, OutputProcedure 
         set { assertionFailure("\(#function) should not be publically settable.") }
     }
 
-    public init(dispatchQueue: DispatchQueue? = nil, timeout: TimeInterval = 3.0, accuracy: CLLocationAccuracy = kCLLocationAccuracyThreeKilometers, completion: CompletionBlock? = nil) {
+    public init(dispatchQueue: DispatchQueue? = nil, timeout: TimeInterval = 3.0, accuracy: CLLocationAccuracy = kCLLocationAccuracyThreeKilometers,
+                locationFetcher: LocationFetcher? = nil, geocoder: ReverseGeocoder? = nil, completion: CompletionBlock? = nil) {
 
         finishing = Finishing(completion: completion)
 
@@ -95,13 +96,13 @@ open class ReverseGeocodeUserLocationProcedure: GroupProcedure, OutputProcedure 
         addObserver(TimeoutObserver(by: timeout))
     }
 
-    internal func set(manager: LocationServicesRegistrarProtocol & LocationServicesProtocol) -> ReverseGeocodeUserLocationProcedure {
+    public func set(fetcher: LocationFetcher) -> ReverseGeocodeUserLocationProcedure {
         precondition(!isExecuting)
-        userLocation.manager = manager
+        userLocation.fetcher = fetcher
         return self
     }
 
-    internal func set(geocoder: ReverseGeocodeProtocol & GeocodeProtocol) -> ReverseGeocodeUserLocationProcedure {
+    public func set(geocoder: ReverseGeocoder) -> ReverseGeocodeUserLocationProcedure {
         precondition(!isExecuting)
         reverseGeocodeLocation.geocoder = geocoder
         return self

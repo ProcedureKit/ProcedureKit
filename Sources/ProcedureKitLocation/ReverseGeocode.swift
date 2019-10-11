@@ -30,12 +30,17 @@ open class ReverseGeocodeProcedure: Procedure, InputProcedure, OutputProcedure {
         return input.value
     }
 
-    internal var geocoder: ReverseGeocodeProtocol & GeocodeProtocol = CLGeocoder.make()
+    public var geocoder: ReverseGeocoder = CLGeocoder.make()
 
-    public init(timeout: TimeInterval = 3.0, location: CLLocation? = nil, completion: CompletionBlock? = nil) {
+    public init(timeout: TimeInterval = 3.0, location: CLLocation? = nil, reverseGeocoder: ReverseGeocoder? = nil, completion: CompletionBlock? = nil) {
         self.input = location.flatMap { .ready($0) } ?? .pending
         self.completion = completion
         super.init()
+
+        if let geocoder = reverseGeocoder {
+            self.geocoder = geocoder
+        }
+
         addCondition(MutuallyExclusive<ReverseGeocodeProcedure>())
         addObserver(TimeoutObserver(by: timeout))
         addDidCancelBlockObserver { [weak self] _, _ in
@@ -57,7 +62,7 @@ open class ReverseGeocodeProcedure: Procedure, InputProcedure, OutputProcedure {
             return
         }
 
-        geocoder.pk_reverseGeocodeLocation(location: location) { [weak self] results, error in
+        geocoder.reverseGeocodeLocation(location) { [weak self] results, error in
 
             // Check that the procedure is still running
             guard let strongSelf = self, !strongSelf.isFinished else { return }
@@ -80,7 +85,7 @@ open class ReverseGeocodeProcedure: Procedure, InputProcedure, OutputProcedure {
     }
 
     public func cancelGeocoder() {
-        geocoder.pk_cancel()
+        geocoder.cancelGeocode()
     }
 
     open func shouldFinish(afterReceivingPlacemarks placemarks: [CLPlacemark]) -> CLPlacemark? {

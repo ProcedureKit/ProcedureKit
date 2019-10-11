@@ -45,7 +45,7 @@ public extension Capability {
 
         public private(set) var requirement: LocationUsage?
 
-        internal lazy var registrar: LocationServicesRegistrarProtocol = CLLocationManager.make()
+        internal lazy var registrar: LocationServicesRegistrar = CLLocationManager.make()
 
         // Note, that this property is the authorization delegate, however, it is not
         // owned by anything else, so should not be weak referenced.
@@ -56,15 +56,15 @@ public extension Capability {
         }
 
         deinit {
-            registrar.pk_set(delegate: nil)
+            registrar.locationFetcherDelegate = nil
         }
 
         public func isAvailable() -> Bool {
-            return registrar.pk_locationServicesEnabled()
+            return registrar.locationServicesEnabled()
         }
 
         public func getAuthorizationStatus(_ completion: @escaping (CLAuthorizationStatus) -> Void) {
-            completion(registrar.pk_authorizationStatus())
+            completion(registrar.authorizationStatus())
         }
 
         public func requestAuthorization(withCompletion completion: @escaping () -> Void) {
@@ -73,15 +73,15 @@ public extension Capability {
                 return
             }
 
-            let status = registrar.pk_authorizationStatus()
+            let status = registrar.authorizationStatus()
             switch (status, requirement) {
             case (.notDetermined, _), (.authorizedWhenInUse, .some(.always)):
                 authorizationDelegate = LocationManagerAuthorizationDelegate { _, status in
                     guard status != .notDetermined else { return }
                     completion()
                 }
-                registrar.pk_set(delegate: authorizationDelegate)
-                registrar.pk_requestAuthorization(withRequirement: requirement)
+                registrar.locationFetcherDelegate = authorizationDelegate
+                registrar.requestAuthorization(withRequirement: requirement)
             default:
                 completion()
             }
