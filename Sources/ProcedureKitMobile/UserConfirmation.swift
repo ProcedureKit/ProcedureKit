@@ -4,9 +4,10 @@
 //  Copyright © 2015-2018 ProcedureKit. All rights reserved.
 //
 
+#if canImport(UIKit)
+import ProcedureKit
 import Foundation
 import UIKit
-
 
 /**
  The condition succeeds if the user's response to the shown alert
@@ -74,3 +75,4 @@ public class UserConfirmationCondition: Condition {
         completion(result)
     }
 }
+#endif

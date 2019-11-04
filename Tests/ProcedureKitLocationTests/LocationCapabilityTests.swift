@@ -14,6 +14,7 @@ import TestingProcedureKit
 class CLLocationManagerTests: XCTestCase, CLLocationManagerDelegate {
 
     func test__extension_set_delegate_works() {
+        XCTFail()
         let manager = CLLocationManager.make()
         manager.pk_set(delegate: self)
         XCTAssertNotNil(manager.delegate)

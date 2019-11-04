@@ -4,6 +4,8 @@
 //  Copyright © 2015-2018 ProcedureKit. All rights reserved.
 //
 
+#if canImport(UIKit)
+import ProcedureKit
 import Foundation
 import UIKit
 
@@ -91,3 +93,4 @@ open class UIProcedure: Procedure {
         }
     }
 }
+#endif

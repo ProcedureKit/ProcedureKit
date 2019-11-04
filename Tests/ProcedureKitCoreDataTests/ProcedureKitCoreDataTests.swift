@@ -5,10 +5,12 @@
 //
 
 import XCTest
+import CoreData
 import ProcedureKit
 import TestingProcedureKit
 @testable import ProcedureKitCoreData
 
+@available(macOS 10.12, iOS 10.0, tvOS 10.0, watchOS 3.0, *)
 open class ProcedureKitCoreDataTestCase: ProcedureKitTestCase {
 
     typealias Insert = InsertManagedObjectsProcedure<TestEntityItem, TestEntity>
@@ -63,9 +65,32 @@ open class ProcedureKitCoreDataTestCase: ProcedureKitTestCase {
 
     var managedObjectModel: NSManagedObjectModel {
         let bundle = Bundle(for: type(of: self))
-        guard let model = NSManagedObjectModel.mergedModel(from: [bundle]) else {
-            fatalError("Unable to load TestDataModel.xcdatamodeld from test bundle.")
+        if let model = NSManagedObjectModel.mergedModel(from: [bundle]), model.entities.count > 0 {
+            return model
         }
+        
+        // Running the tests using `swift test` or through an xcode project generated
+        // with `swift package generate-xcodeproj` will not have the Core Data model
+        // bundled. So, we're going to construct the simple model manually.
+        
+        let testEntity = NSEntityDescription()
+        testEntity.name = "TestEntity"
+        testEntity.managedObjectClassName = "TestEntity"
+        
+        let identifier = NSAttributeDescription()
+        identifier.name = "identifier"
+        identifier.attributeType = .stringAttributeType
+        
+        let name = NSAttributeDescription()
+        name.name = "name"
+        name.attributeType = .stringAttributeType
+        
+        testEntity.properties.append(identifier)
+        testEntity.properties.append(name)
+        
+        let model = NSManagedObjectModel()
+        model.entities = [testEntity]
+        
         return model
     }
 
@@ -119,17 +144,20 @@ open class ProcedureKitCoreDataTestCase: ProcedureKitTestCase {
     }
 }
 
+@available(macOS 10.12, iOS 10.0, tvOS 10.0, watchOS 3.0, *)
 internal struct TestEntityItem: Identifiable {
     let identity: String
     let name: String
 }
 
+@available(macOS 10.12, iOS 10.0, tvOS 10.0, watchOS 3.0, *)
 extension TestEntity: Identifiable {
     public var identity: String {
         return identifier! // Beware: it is not optional in core data, doesn't guarantee this.
     }
 }
 
+@available(macOS 10.12, iOS 10.0, tvOS 10.0, watchOS 3.0, *)
 class TestSuiteRuns: XCTestCase {
 
     func test__suite_runs() {
