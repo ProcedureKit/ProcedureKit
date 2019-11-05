@@ -9,6 +9,7 @@ import ProcedureKit
 import TestingProcedureKit
 @testable import ProcedureKitCoreData
 
+@available(macOS 10.12, iOS 10.0, tvOS 10.0, watchOS 3.0, *)
 final class InsertManagedObjectsProcedureTests: ProcedureKitCoreDataTestCase {
 
     func test__insert_multiple_items_and_save() {

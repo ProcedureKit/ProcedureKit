@@ -4,11 +4,10 @@
 //  Copyright © 2015-2018 ProcedureKit. All rights reserved.
 //
 
-#if SWIFT_PACKAGE
+#if canImport(UIKit)
 import ProcedureKit
 import Foundation
 import UIKit
-#endif
 
 /// A struct of the views which require autolayout constraints
 public struct AutolayoutViews {
@@ -21,13 +20,13 @@ public typealias SetAutolayoutConstraintsBlockType = (AutolayoutViews) -> ()
 
 @available(iOS 9.0, *)
 public enum SetAutolayoutConstraints {
-
+    
     // Uses NSLayoutConstraint pinning the child to the parent's anchors.
     case pinnedToParent
-
+    
     // Provide a custom block
     case custom(SetAutolayoutConstraintsBlockType)
-
+    
     public var block: SetAutolayoutConstraintsBlockType {
         switch self {
         case .pinnedToParent:
@@ -47,7 +46,7 @@ public enum SetAutolayoutConstraints {
 
 
 internal extension UIViewController {
-
+    
     func pk_add(child: UIViewController, with frame: CGRect? = nil, in subview: UIView, setAutolayoutConstraints block: @escaping SetAutolayoutConstraintsBlockType) {
         addChild(child)
         child.view.frame = frame ?? CGRect(x: 0, y: 0, width: view.bounds.width, height: view.bounds.height)
@@ -55,7 +54,7 @@ internal extension UIViewController {
         block(AutolayoutViews(child: child.view, parent: subview))
         child.didMove(toParent: self)
     }
-
+    
     func pk_removeFromParent() {
         self.willMove(toParent: nil)
         self.view.removeFromSuperview()
@@ -69,7 +68,7 @@ internal extension UIViewController {
  UIViewController containment.
  */
 open class AddChildViewControllerProcedure: UIBlockProcedure {
-
+    
     public init(_ child: UIViewController, to parent: UIViewController, with frame: CGRect? = nil, in subview: UIView? = nil, setAutolayoutConstraints block: @escaping SetAutolayoutConstraintsBlockType) {
         let view: UIView = subview ?? parent.view
         assert(view.isDescendant(of: parent.view))
@@ -78,7 +77,7 @@ open class AddChildViewControllerProcedure: UIBlockProcedure {
         }
         name = "Add Child ViewController"
     }
-
+    
     @available(iOS 9.0, *)
     public convenience init(_ child: UIViewController, to parent: UIViewController, with frame: CGRect? = nil, in subview: UIView? = nil, setAutolayoutConstraints strategy: SetAutolayoutConstraints = .pinnedToParent) {
         self.init(child, to: parent, with: frame, in: subview, setAutolayoutConstraints: strategy.block)
@@ -90,7 +89,7 @@ open class AddChildViewControllerProcedure: UIBlockProcedure {
  UIViewController containment.
  */
 open class RemoveChildViewControllerProcedure: UIBlockProcedure {
-
+    
     public init(_ child: UIViewController) {
         super.init {
             child.pk_removeFromParent()
@@ -100,7 +99,7 @@ open class RemoveChildViewControllerProcedure: UIBlockProcedure {
 }
 
 open class SetChildViewControllerProcedure: UIBlockProcedure {
-
+    
     public init(_ child: UIViewController, in parent: UIViewController, with frame: CGRect? = nil, in subview: UIView? = nil, setAutolayoutConstraints block: @escaping SetAutolayoutConstraintsBlockType) {
         let view: UIView = subview ?? parent.view
         assert(view.isDescendant(of: parent.view))
@@ -110,11 +109,10 @@ open class SetChildViewControllerProcedure: UIBlockProcedure {
         }
         name = "Set Child ViewController"
     }
-
+    
     @available(iOS 9.0, *)
     public convenience init(_ child: UIViewController, in parent: UIViewController, with frame: CGRect? = nil, in subview: UIView? = nil, setAutolayoutConstraints strategy: SetAutolayoutConstraints = .pinnedToParent) {
         self.init(child, in: parent, with: frame, in: subview, setAutolayoutConstraints: strategy.block)
     }
 }
-
-
+#endif

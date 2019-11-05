@@ -4,10 +4,12 @@
 //  Copyright © 2015-2018 ProcedureKit. All rights reserved.
 //
 
-
+#if canImport(AppKit)
 import XCTest
 import TestingProcedureKit
 import Foundation
+import class  ProcedureKit.Protector
+import struct ProcedureKit.ProcedureKitError
 @testable import ProcedureKitMac
 
 class ProcessProcedureTests: ProcedureKitTestCase {
@@ -375,6 +377,10 @@ extension Process.TerminationReason: CustomStringConvertible {
         switch self {
         case .exit: return ".exit"
         case .uncaughtSignal: return ".uncaughtSignal"
+        @unknown default:
+            fatalError()
         }
     }
 }
+
+#endif

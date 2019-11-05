@@ -20,7 +20,16 @@ struct ProcedureKitLocationComponent: ProcedureKitComponent {
 internal extension CLLocationManager {
 
     static func make() -> CLLocationManager {
-        return DispatchQueue.onMain { CLLocationManager() }
+        fatalError("FIX THIS")
+//        var manager : CLLocationManager
+//        performSelector(onMainThread: #selector(make(new:)), with: &manager, waitUntilDone: true)
+//        return manager
+        // return DispatchQueue.onMain { CLLocationManager() }
+    }
+    
+    @objc static func make(new manager: CLLocationManager) {
+        fatalError("FIX THIS")
+//        manager = CLLocationManager.init()
     }
 }
 

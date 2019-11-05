@@ -162,7 +162,7 @@ class GroupTests: GroupTestCase {
 
         let customDispatchQueueLabel = "run.kit.procedure.ProcedureKit.Tests.TestUnderlyingQueue"
         let customDispatchQueue = DispatchQueue(label: customDispatchQueueLabel, attributes: [.concurrent])
-        let customScheduler = ProcedureKit.Scheduler(queue: customDispatchQueue)
+        let customScheduler = Scheduler(queue: customDispatchQueue)
 
         let procedureQueue = ProcedureQueue()
         procedureQueue.underlyingQueue = customDispatchQueue

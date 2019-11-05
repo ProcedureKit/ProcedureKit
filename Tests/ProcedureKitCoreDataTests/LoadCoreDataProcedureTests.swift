@@ -9,6 +9,7 @@ import ProcedureKit
 import TestingProcedureKit
 @testable import ProcedureKitCoreData
 
+@available(macOS 10.12, iOS 10.0, tvOS 10.0, watchOS 3.0, *)
 final class LoadCoreDataProcedureTests: ProcedureKitCoreDataTestCase {
 
     func test__load_core_data_stack_with_custom_model() {
